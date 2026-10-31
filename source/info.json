@@ -1,0 +1,24 @@
+{
+  "name": "more-infinite-research",
+  "version": "5.0.21000",
+  "title": "More Infinite Research",
+  "author": "Julesc013",
+  "description": "Configurable infinite research with native effects, explicit compatibility bindings and the Research Library.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "(?) aai-vehicles-ironclad",
+    "(?) bobelectronics",
+    "(?) bobtech",
+    "(?) elevated-rails",
+    "(?) angelssmelting",
+    "? recycler >= 2.1.23",
+    "(?) quality",
+    "(?) Krastorio2",
+    "(?) Krastorio2-spaced-out",
+    "(?) pypostprocessing",
+    "(?) space-exploration",
+    "? space-age >= 2.1.23",
+    "? space-is-fake"
+  ]
+}

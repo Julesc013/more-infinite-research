@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "kind": "mir5-legacy-boolean-cap-published-source",
+  "origin_tag": "4.0.0",
+  "origin_archive_body": "09eb6ece484c8e3c1bcdafaea31451ce84a27108",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name": "base", "version": "2.0.77", "enabled": true},
+    {"name": "more-infinite-research", "version": "4.0.20000", "enabled": true},
+    {"name": "mir-fixture-mir5-legacy-boolean-cap", "version": "0.1.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "more-infinite-research_4.0.20000.zip": "5C0E299D78C4EE545958448DAE48D87BE5FE1B959875D4CB93A264D95D3DB0AE",
+    "mir-fixture-mir5-legacy-boolean-cap_0.1.0.zip": "A33E86829C63B995228E79CEA7421E669A4D2C5F7F76BDAF8F2D7F2B742F4C3D"
+  },
+  "scope": "Prepared F200 published 4.0.0 policy-v1 source only: cap-two player gear earns two real labs and an observed enabled-to-disabled transition before a protected save and two cold reloads. The separate disabled foreign sentinel is not an owned enablement right. No successor, migration, or release result is claimed."
+}

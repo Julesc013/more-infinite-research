@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "kind": "mir5-migration-origin-published-default-prototype-capture-selection",
+  "origin_tag": "1.2.0",
+  "origin_source_commit": "b80413b2aa225529a236b7b00a7cee9420af65bc",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_1.2.0.zip": "880C137F7AB35FE7AF1DA5538BFA91F620C80785134DB488800352DD6154AB22",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "scope": "Exact published MIR 1.2.0 F200 Defaults data/settings observation. Invoke-PrototypeCapture adds the separately hash-bound published MIR archive, so the actual native selection is Base, MIR 1.2.0 and the active-mods observer only. This profile creates no map, save, gameplay, migration, performance or release qualification."
+}

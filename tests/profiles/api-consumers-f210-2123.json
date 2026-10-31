@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "kind": "mir5-api-consumers-f210-native-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.21000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-api-alpha",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-api-beta",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-api-beta-production",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.21000.zip": "2ABAF369E020D8AD18A0C04940A8811BECFA5E63E5B479C668E2D3A3123D032B",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "mir-fixture-mir5-api-alpha_0.1.0.zip": "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
+    "mir-fixture-mir5-api-beta_0.1.0.zip": "943AF6BF26C0B4C0CE4861C1E25CAC0CB90DACF08A7A8229669A1DA481F01894",
+    "mir-fixture-mir5-api-beta-production_0.1.0.zip": "25084C8B20FF4EBFB819C8351E351F38325B06E65F741D2660067C775C061A19"
+  },
+  "scope": "Exact current6873c211 F2102.1.23/2ABAF369 player and selected Alpha/Beta/beta-production/observer archive containers, with fixture source members verified separately; private qualification input, not a native result."
+}

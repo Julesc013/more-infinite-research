@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "kind": "MIR5FiveAlloyEC7NativeAdverseReadbackV1",
+  "status": "failed-fixture-runtime-foundry-storage-assertion",
+  "controller_commit": "f890ffe6256145529272d489509552bd77d29467",
+  "player_sha256": "EC7AD6B0E40C3209335912FDCFDC585726B32A235B5BAE3C59A090331163B107",
+  "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+  "profile_sha256": "FB22795FE628AFCD90BBB57B8B7FB8191DE8F4B10C85A5CE022505CFD0D9C036",
+  "fixture_sha256": "C1F4D3797AB1C2EF78EDC32296D93D0D47ABCCC7F7A6D7290DB35D82555D8E47",
+  "native_result_sha256": "B2FCD61E73BB8C3AC4A3F0A8AE2A559499CB89175A9C894388E3EF4A8884E2B8",
+  "custody": {
+    "path": "build/mir5/recovery-historical/bob-full-sa-five-alloy-locale-r02",
+    "manifest_sha256": "3DDEFB26902929D0EEFC22B0E2A93EF351BD482B36F8F34430176CC94655D94D",
+    "original_and_primary_members_verified": 12,
+    "bytes": 1142394,
+    "mismatches": []
+  },
+  "native_observation": {
+    "create": "passed",
+    "production": "failed",
+    "tick": 2405,
+    "diagnostic": "physical-before bob-copper-tungsten-alloy native metallurgy fluid machine differs",
+    "real_labs_completed": 0,
+    "cold_reloads_completed": 0,
+    "completed_save": false
+  },
+  "diagnosis": {
+    "record_sha256": "6A9BCD8D0A329602602F4C7342271E6D33DAA7309B8D8AF43950E87D23282C19",
+    "scope": "Read-only exact installed API/source-order review, not a native retry or runtime-value observation.",
+    "finding": "begin_alloy asserts exposed fluid storages before setting its recipe, while the cloned foundry deliberately retains fluid_boxes_off_when_no_fluid_recipe. Static prototype geometry and currently exposed runtime storages are different observations. Move the runtime check after successful recipe selection, retain the independent static geometry guard and log bounded pre/post observations.",
+    "actual_count_or_capacities_logged": false
+  },
+  "restoration": {
+    "native_control_status": "restored-direct-library-controls",
+    "receipt_sha256": "1AF612D4AB49D0FDEFE15534C6A44069E2CB96322A30EC483B4182521B02847E",
+    "original_archives_restored": true
+  },
+  "caller_preflight_refusal": {
+    "receipt_sha256": "6037FC1EF7EED8840AF422B6F8B4633A88EA9DF9A25CC309BA836DF8B37BD5B8",
+    "meaning": "A separate caller guard omitted a prerequisite helper import before native invocation. Preserved as a host-only refusal, then corrected by using the complete canonical imports."
+  },
+  "limits": [
+    "This failed five-route case grants no material gameplay/save/reload acceptance.",
+    "The earlier exact two-route201992 pass remains distinct and is not relabelled as this expanded current input.",
+    "No player Generator fault or measured performance conclusion follows from this fixture assertion."
+  ]
+}

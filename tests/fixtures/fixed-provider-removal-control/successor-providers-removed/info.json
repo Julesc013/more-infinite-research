@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-mir5-fixed-provider-removal-control",
+  "author": "MIR maintainers",
+  "factorio_version": "2.0",
+  "version": "0.4.0",
+  "title": "MIR5 provider-absent removal control",
+  "description": "Private F200 Space Age successor observing engine removal separately from MIR retention.",
+  "dependencies": [
+    "base >= 2.0.77",
+    "space-age = 2.0.77",
+    "more-infinite-research = 5.0.20000"
+  ]
+}

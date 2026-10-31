@@ -1,0 +1,381 @@
+{
+  "schema": 1,
+  "kind": "MIRPublishedRepeatabilityDiagnosticNativeChainV1",
+  "status": "completed-fixed-five-diagnostic-both-predeclared-pairs-within-tolerance",
+  "scope": "One published-only warmup plus four observations on Black Glass2.1.23/8DC, exact B6 and Bob/Angel/Space Age05F278 profile. Same original actor/helper/Settings endpoint/resource/cache/tolerance policy, one quiet block with local builds/host/native work held. Raw diagnostic only; original failed38 cohort is unchanged and final-current-candidate performance acceptance is still required.",
+  "controller_commit": "4d0a782d062f9b2a56c217c4879dcdcfd8a26607",
+  "original_body_review": {
+    "status": "complete",
+    "evidence_path": "spec/evidence/f210-menu-aa-pilot-source-records-r01.json",
+    "independent_review": "https://github.com/Julesc013/more-infinite-research/pull/1328#issuecomment-6470803995",
+    "scope": "Six original bodies match declared hashes/lengths. The hash-bound retained_diagnosis contains the independent phase readback and limits."
+  },
+  "original_failed_cohort": {
+    "path": "spec/evidence/f210-575e-menu-native-chain-r01.json",
+    "sha256": "A5D12894F3B834D7830491A7959FF65CC37EB65E1ABF9D5F7C30EE4C9AA292F5",
+    "failed_aa_verdict_unchanged": true
+  },
+  "typed_parameters": {
+    "FactorioBin": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+    "ExpectedFactorioSha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "ExpectedEngineVersion": "2.1.23",
+    "ExpectedFactorioLine": "2.1",
+    "ArchiveLibrary": "D:/Projects/Factorio/testmods/2.1",
+    "ProfilePath": "tests/profiles/bob-angel-full-space-age-standalone-f210-2123.json",
+    "ExpectedProfileSha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980",
+    "PublishedArchive": "D:/Projects/Factorio/testmods/2.1/more-infinite-research_4.7.21003.zip",
+    "ExpectedPublishedSha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+    "OrdinaryPlayerConfigPath": "D:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\recovery\\menu-f210-inputs-r01\\ordinary-config.ini",
+    "ExpectedOrdinaryPlayerConfigSha256": "DA9A92AB9047EBD9F9640B34DC9EF6C084801DF85B8F75B1A490E786F40DD510",
+    "PlayerDataPath": "D:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\recovery\\menu-f210-inputs-r01\\player-data.json",
+    "ExpectedPlayerDataSha256": "285ED61F8778CFF44FA173F8EDCC5E417F4DF8C1019A3DDD02814729CEE56EF9",
+    "OutputRoot": "build/tmp/f210-menu-repeatability-published-r01",
+    "ActiveModsObserver": "mir-fixture-mir5-active-mods-observer",
+    "TimeoutSeconds": 300,
+    "ExpectedPeakMemoryMiB": 9216,
+    "MaxNewOutputMiB": 2048,
+    "CounterbalancedBlocks": 8,
+    "AdmissionWaitSeconds": 30,
+    "LibraryIdleWaitMilliseconds": 5000,
+    "AaAbsoluteToleranceSeconds": 0.5,
+    "AaRelativeTolerancePercent": 5.0,
+    "ControlRegressionToleranceSeconds": 0.5,
+    "MinimumMirAddedTimeReductionPercent": 50.0,
+    "RepeatabilityDiagnostic": true
+  },
+  "typed_packet": {
+    "path": "build/qualification/f210-menu-repeatability-published-r01-controller/accepted-prepared-packet.json",
+    "bytes": 6307,
+    "sha256": "824F0DD361A5A17F58C7E5AFD9346801E3C27553ED84C3A98BE7AA480545BAC8"
+  },
+  "source_freeze": {
+    "path": "build/qualification/f210-menu-repeatability-published-r01-controller/source-freeze.json",
+    "bytes": 1816,
+    "sha256": "14717E1C517A20BB3591C917C2F388DAAD7A3BA3A3E050270223C713F973B0F5"
+  },
+  "caller": {
+    "path": "build/qualification/f210-menu-repeatability-published-r01-controller/Invoke-FrozenDiagnostic.ps1",
+    "bytes": 3030,
+    "sha256": "773CA7707FA300B5BAFC2652E3999DAC2534972DFD9A48D9763D07BA292EF228"
+  },
+  "terminal": {
+    "path": "build/qualification/f210-menu-repeatability-published-r01-controller/execution-record/terminal.json",
+    "bytes": 14116,
+    "sha256": "4DA6514F80BBE21FC61034CBAE4D5E5B61709E2AC1E915F9F5C5DFB205D0D282"
+  },
+  "endpoint_helper_equality": [
+    {
+      "path": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
+      "sha256": "D069C014D74E883C249928E812A258E2A2CB34AFE499219CB46A513345C2EC34",
+      "original_38_controller": "6c274a9274edee68df7216d07353092770776c27",
+      "bytes_identical": true
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/Invoke-MIRResponsiveMenuActor.ps1",
+      "sha256": "DC4816352962EC14ED443E5865F71FF3F2A989B47DCF4F45916048F1B5A55D55",
+      "original_38_controller": "6c274a9274edee68df7216d07353092770776c27",
+      "bytes_identical": true
+    }
+  ],
+  "samples": [
+    {
+      "ordinal": 1,
+      "phase": "repeatability-warmup",
+      "elapsed_seconds": 57.0323565,
+      "capture_attempts": 2,
+      "observer_diagnostics": {
+        "schema": 1,
+        "capture_requests": 2,
+        "captured_frames": 2,
+        "no_main_window": 0,
+        "not_visible_or_minimized": 0,
+        "foreground_mismatch": 0,
+        "foreground_request_attempts": 0,
+        "foreground_request_refused": 0,
+        "foreground_request_not_acquired": 0,
+        "client_geometry_unavailable": 0,
+        "offscreen": 0,
+        "occluded": 0,
+        "last_occlusion": null,
+        "last_rejection": ""
+      },
+      "actor": {
+        "path": "build/qualification/f210-menu-repeatability-published-r01-controller/native-output/runs/01-repeatability-warmup-published-4.7/responsive-menu-actor/actor-result.json",
+        "bytes": 22379,
+        "sha256": "088AA7DA205C3009EA5BCEE82D272957A6108067A9F81F9048AA2C72092398F3"
+      },
+      "native_log": {
+        "path": "build/qualification/f210-menu-repeatability-published-r01-controller/native-output/runs/01-repeatability-warmup-published-4.7/factorio.log",
+        "bytes": 48760,
+        "sha256": "059BEB13720006BACB7DEBF51B63AD5969CDC96D7A3D4F9740A8EE9658F5B005"
+      },
+      "resource_ledger": {
+        "path": "build/qualification/f210-menu-repeatability-published-r01-controller/native-output/process-1.resources.jsonl",
+        "bytes": 20417,
+        "sha256": "E16A5C4297ABEA47731F072B7FA192428A75B3742401D316BD741F32692B0F26"
+      },
+      "resource_rows": 34,
+      "actual_loaded_selection_verified": true,
+      "actor_process_id": 40744,
+      "actor_status": "observed-response-awaiting-parent-selection-validation",
+      "final_endpoint_validation": "Parent validates actual loaded selection, exact engine and owned-window Settings response after the actor observation."
+    },
+    {
+      "ordinal": 2,
+      "phase": "repeatability-observation",
+      "elapsed_seconds": 30.9353857,
+      "capture_attempts": 2,
+      "observer_diagnostics": {
+        "schema": 1,
+        "capture_requests": 2,
+        "captured_frames": 2,
+        "no_main_window": 0,
+        "not_visible_or_minimized": 0,
+        "foreground_mismatch": 0,
+        "foreground_request_attempts": 0,
+        "foreground_request_refused": 0,
+        "foreground_request_not_acquired": 0,
+        "client_geometry_unavailable": 0,
+        "offscreen": 0,
+        "occluded": 0,
+        "last_occlusion": null,
+        "last_rejection": ""
+      },
+      "actor": {
+        "path": "build/qualification/f210-menu-repeatability-published-r01-controller/native-output/runs/02-repeatability-observation-published-4.7/responsive-menu-actor/actor-result.json",
+        "bytes": 21030,
+        "sha256": "42A81BA6936C44B1B566AA492A6160D81FC2989CA3838A50D8F286DD53749F57"
+      },
+      "native_log": {
+        "path": "build/qualification/f210-menu-repeatability-published-r01-controller/native-output/runs/02-repeatability-observation-published-4.7/factorio.log",
+        "bytes": 48673,
+        "sha256": "EE9DE170B4571B3357258032464068458AF75550019A6C00EC5A9A9975D8B519"
+      },
+      "resource_ledger": {
+        "path": "build/qualification/f210-menu-repeatability-published-r01-controller/native-output/process-2.resources.jsonl",
+        "bytes": 15504,
+        "sha256": "E5C721C152C5ED1CB322D2B4A3ACC3D45E7F22F7B96A6063CB2DC6508BDBC5E0"
+      },
+      "resource_rows": 26,
+      "actual_loaded_selection_verified": true,
+      "actor_process_id": 73756,
+      "actor_status": "observed-response-awaiting-parent-selection-validation",
+      "final_endpoint_validation": "Parent validates actual loaded selection, exact engine and owned-window Settings response after the actor observation."
+    },
+    {
+      "ordinal": 3,
+      "phase": "repeatability-observation",
+      "elapsed_seconds": 30.8517034,
+      "capture_attempts": 3,
+      "observer_diagnostics": {
+        "schema": 1,
+        "capture_requests": 3,
+        "captured_frames": 3,
+        "no_main_window": 0,
+        "not_visible_or_minimized": 0,
+        "foreground_mismatch": 0,
+        "foreground_request_attempts": 0,
+        "foreground_request_refused": 0,
+        "foreground_request_not_acquired": 0,
+        "client_geometry_unavailable": 0,
+        "offscreen": 0,
+        "occluded": 0,
+        "last_occlusion": null,
+        "last_rejection": ""
+      },
+      "actor": {
+        "path": "build/qualification/f210-menu-repeatability-published-r01-controller/native-output/runs/03-repeatability-observation-published-4.7/responsive-menu-actor/actor-result.json",
+        "bytes": 21711,
+        "sha256": "6B9EEB9FCBE17B70E3CCC7ECC7290569C09CC2BC177771FDF2CF3174EAF4D921"
+      },
+      "native_log": {
+        "path": "build/qualification/f210-menu-repeatability-published-r01-controller/native-output/runs/03-repeatability-observation-published-4.7/factorio.log",
+        "bytes": 48673,
+        "sha256": "A018FE06600A697502DC9C7C7C795A0A890409FF291E9D23FDD6D8E1F91809F0"
+      },
+      "resource_ledger": {
+        "path": "build/qualification/f210-menu-repeatability-published-r01-controller/native-output/process-3.resources.jsonl",
+        "bytes": 15504,
+        "sha256": "B57D9E2F4C32DFE32091B14654C6A367B697B2296BBC38ECB3A40CCD2D0434DD"
+      },
+      "resource_rows": 26,
+      "actual_loaded_selection_verified": true,
+      "actor_process_id": 75884,
+      "actor_status": "observed-response-awaiting-parent-selection-validation",
+      "final_endpoint_validation": "Parent validates actual loaded selection, exact engine and owned-window Settings response after the actor observation."
+    },
+    {
+      "ordinal": 4,
+      "phase": "repeatability-observation",
+      "elapsed_seconds": 30.8851116,
+      "capture_attempts": 2,
+      "observer_diagnostics": {
+        "schema": 1,
+        "capture_requests": 2,
+        "captured_frames": 2,
+        "no_main_window": 0,
+        "not_visible_or_minimized": 0,
+        "foreground_mismatch": 0,
+        "foreground_request_attempts": 0,
+        "foreground_request_refused": 0,
+        "foreground_request_not_acquired": 0,
+        "client_geometry_unavailable": 0,
+        "offscreen": 0,
+        "occluded": 0,
+        "last_occlusion": null,
+        "last_rejection": ""
+      },
+      "actor": {
+        "path": "build/qualification/f210-menu-repeatability-published-r01-controller/native-output/runs/04-repeatability-observation-published-4.7/responsive-menu-actor/actor-result.json",
+        "bytes": 20243,
+        "sha256": "686520E18FB8596F0EAF7FA2D604C2FAF2829D10B808869F18EDDC30202256DD"
+      },
+      "native_log": {
+        "path": "build/qualification/f210-menu-repeatability-published-r01-controller/native-output/runs/04-repeatability-observation-published-4.7/factorio.log",
+        "bytes": 48673,
+        "sha256": "923E9BC79C31377B81777234AE8A70322159271BD205904FBB396791FF22501F"
+      },
+      "resource_ledger": {
+        "path": "build/qualification/f210-menu-repeatability-published-r01-controller/native-output/process-4.resources.jsonl",
+        "bytes": 14894,
+        "sha256": "9F23C286D1FE11F141FD74A57234EEBC6C7C1B7825409496DB2666B72A65D3A4"
+      },
+      "resource_rows": 25,
+      "actual_loaded_selection_verified": true,
+      "actor_process_id": 86908,
+      "actor_status": "observed-response-awaiting-parent-selection-validation",
+      "final_endpoint_validation": "Parent validates actual loaded selection, exact engine and owned-window Settings response after the actor observation."
+    },
+    {
+      "ordinal": 5,
+      "phase": "repeatability-observation",
+      "elapsed_seconds": 30.7345608,
+      "capture_attempts": 2,
+      "observer_diagnostics": {
+        "schema": 1,
+        "capture_requests": 2,
+        "captured_frames": 2,
+        "no_main_window": 0,
+        "not_visible_or_minimized": 0,
+        "foreground_mismatch": 0,
+        "foreground_request_attempts": 0,
+        "foreground_request_refused": 0,
+        "foreground_request_not_acquired": 0,
+        "client_geometry_unavailable": 0,
+        "offscreen": 0,
+        "occluded": 0,
+        "last_occlusion": null,
+        "last_rejection": ""
+      },
+      "actor": {
+        "path": "build/qualification/f210-menu-repeatability-published-r01-controller/native-output/runs/05-repeatability-observation-published-4.7/responsive-menu-actor/actor-result.json",
+        "bytes": 23115,
+        "sha256": "9E8AF5C3253CAEF9A7D9E1E008AF7A15CF36A3F72126AA1A278DA66F2798CDA1"
+      },
+      "native_log": {
+        "path": "build/qualification/f210-menu-repeatability-published-r01-controller/native-output/runs/05-repeatability-observation-published-4.7/factorio.log",
+        "bytes": 48673,
+        "sha256": "67352695A7479FAA4EEBE92CA33F9F9505C9343AFE0D9372C83DB5A3F1ABFAFC"
+      },
+      "resource_ledger": {
+        "path": "build/qualification/f210-menu-repeatability-published-r01-controller/native-output/process-5.resources.jsonl",
+        "bytes": 14892,
+        "sha256": "5313239EEB6745DA7297196C343C6961A75F274B1533B7FD089C860767506CF3"
+      },
+      "resource_rows": 25,
+      "actual_loaded_selection_verified": true,
+      "actor_process_id": 72220,
+      "actor_status": "observed-response-awaiting-parent-selection-validation",
+      "final_endpoint_validation": "Parent validates actual loaded selection, exact engine and owned-window Settings response after the actor observation."
+    }
+  ],
+  "predeclared_adjacent_pairs": [
+    {
+      "observations": [
+        1,
+        2
+      ],
+      "sample_ordinals": [
+        2,
+        3
+      ],
+      "seconds": [
+        30.9353857,
+        30.8517034
+      ],
+      "difference_seconds": 0.08368229999999954,
+      "allowed_seconds": 1.5446772275000002,
+      "within_predeclared_tolerance": true
+    },
+    {
+      "observations": [
+        3,
+        4
+      ],
+      "sample_ordinals": [
+        4,
+        5
+      ],
+      "seconds": [
+        30.8851116,
+        30.7345608
+      ],
+      "difference_seconds": 0.15055079999999776,
+      "allowed_seconds": 1.54049181,
+      "within_predeclared_tolerance": true
+    }
+  ],
+  "readback": {
+    "path": "build/qualification/f210-menu-repeatability-published-r01-controller/root-readback-r01.json",
+    "bytes": 19086,
+    "sha256": "7A3FE5A3AB076B576ECC88EC2F2B24B354D0C318C49DF6B7638157676E13ECBF",
+    "files": 61,
+    "bytes_per_copy": 125796252,
+    "decoded_pngs": 15,
+    "png_dimensions": [
+      2560,
+      1440
+    ]
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/f210-menu-repeatability-published-native-receipts-r01.json.gz",
+    "sha256": "A8806A65AA97FF35EDBD6CA528C1597BEA4EE792D7D79F4D823E33882E848A89",
+    "bytes": 114414,
+    "records": 19,
+    "uncompressed_bytes": 663361,
+    "all_original_exact_bytes_round_trip": true,
+    "transported_actual_actor_log_resource_records": 15
+  },
+  "actual_native_processes": 5,
+  "factorio_processes_after_restoration": 0,
+  "quiet_block_ended": true,
+  "visual_inspection": {
+    "scope": "Two representative owned screenshots opened with view_image after the timed block: actual2.1.23 main menu and distinct Settings response. Other PNGs are decoded/hash-verified, not claimed individually viewed.",
+    "images": [
+      {
+        "path": "build/qualification/f210-menu-repeatability-published-r01-controller/native-output/runs/02-repeatability-observation-published-4.7/responsive-menu-actor/main-menu.png",
+        "bytes": 9665830,
+        "sha256": "670B2540F7C7CF4328C3E5545EE6CA98493F1BAE41DBD0136E81D0332C0433AA"
+      },
+      {
+        "path": "build/qualification/f210-menu-repeatability-published-r01-controller/native-output/runs/05-repeatability-observation-published-4.7/responsive-menu-actor/settings-response.png",
+        "bytes": 6451811,
+        "sha256": "308B09B290D415ED31978FFC14D25AC327B7371088AB032352E0ABE6E3F29000"
+      }
+    ]
+  },
+  "claims": {
+    "new_native_observations": true,
+    "causal_explanation_established": false,
+    "full_performance_acceptance": false,
+    "release_qualification": false
+  },
+  "next_action": "Independent review of all exact diagnostic bodies and readback. If accepted as valid repeatability evidence, freeze one complete current005D comparison with the declared38-sample schedule/semantic preconditions and unchanged acceptance policy. No retries/extension/selective pooling or relabelled original pilot.",
+  "limits": [
+    "The predeclared warmup57.0323565 seconds is retained. Only the four predeclared observations form adjacent pairs; no outlier was removed or observation substituted.",
+    "Both pairs are within the unchanged rule max(.5 seconds,5 percent pair mean). This does not by itself establish all-machine/all-workload repeatability, a cause for the earlier discrepancy or accepted candidate speed.",
+    "Actor status intentionally awaits parent selection validation; parent result supplies exact actual loaded-selection/engine endpoint checks. These are not standalone model judgements.",
+    "Resource ledgers and actor aggregate counters are retained; missing per-attempt timelines/CPU/GPU/disk/thermal telemetry remains unobserved. Power mode was recorded, not changed.",
+    "Owned PNGs are preserved in primary custody and all15 decode. Their hashes/dimensions are recorded; no raw player-data/config credential body is transported."
+  ]
+}

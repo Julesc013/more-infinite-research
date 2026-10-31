@@ -1,0 +1,271 @@
+{
+  "schema": 1,
+  "kind": "MIRApi10ScopedQualificationDecisionV1",
+  "status": "documented-subset-qualified-contract-frozen-product-unreleased",
+  "observed_at_utc": "2026-10-29T23:48:43.084126+00:00",
+  "api_version": "1.0.0",
+  "public_data_module": "__more-infinite-research__.api.v1.data",
+  "public_runtime_interface": "more-infinite-research.api.v1",
+  "candidate_source": "42032477d45ced683e72736a4fe30a7a3195b995",
+  "candidate_packages": [
+    {
+      "target": "f200",
+      "path": "build/packages/support-exports-aero-independent-r01/more-infinite-research_5.0.20000.zip",
+      "version": "5.0.20000",
+      "sha256": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+      "bytes": 696588,
+      "three_core_payloads_identical": true
+    },
+    {
+      "target": "f210",
+      "path": "build/packages/support-exports-aero-independent-r01/more-infinite-research_5.0.21000.zip",
+      "version": "5.0.21000",
+      "sha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+      "bytes": 696972,
+      "three_core_payloads_identical": true
+    }
+  ],
+  "reviewed_evidence": [
+    {
+      "path": "spec/evidence/api-documented-subset-matrix-aero-r01.json",
+      "bytes": 16739,
+      "sha256": "52A96476E616BCAFCB91B6BDB0F97E0EF04666DDECF76FE88E79AAFDF439CECF"
+    },
+    {
+      "path": "spec/evidence/api-boundary-host-aero-measurement-r01.json",
+      "bytes": 9414,
+      "sha256": "18A3687000620024F1CFD23B034DEB289D2C24DC73F6F08749778A6DA57D9121"
+    },
+    {
+      "path": "spec/evidence/api-boundary-f200-native-chain-r01.json",
+      "bytes": 5674,
+      "sha256": "8132895316D1DC882C1A6A4C7C287F4C50F8A67E5E74DED5085D291ACB2D945F"
+    },
+    {
+      "path": "spec/evidence/api-boundary-f210-native-chain-r01.json",
+      "bytes": 5939,
+      "sha256": "A3822A2B073AA748E76F6957F491826094CD4C40DB0761599599E842BBCF31D4"
+    },
+    {
+      "path": "spec/evidence/api-physical-modern-native-chain-r01.json",
+      "bytes": 10634,
+      "sha256": "D3B36AE8F8EC6262D803F12B347A1FB4C6B90D5B333E9F24773BD758E7CCB982"
+    },
+    {
+      "path": "spec/evidence/library-f200-native-names-private-native-chain-r01.json",
+      "bytes": 9854,
+      "sha256": "B37ECDE6449CD92568DD74C59994B414F3E932775787093174D44411C2FFBEE9"
+    },
+    {
+      "path": "spec/evidence/library-f210-native-names-private-native-chain-r01.json",
+      "bytes": 43239,
+      "sha256": "BA1D597FE975FD24E204E5A44A9A22C99A549FBD882BA6A775AEE88D0863BB52"
+    },
+    {
+      "path": "spec/evidence/api-optional-absence-f200-aero-applicability-r01.json",
+      "bytes": 3774,
+      "sha256": "DF5773EE1A7EE7040D2A0FAFE64DE044ADFBED901B436D61836AD4901C46D8CF"
+    },
+    {
+      "path": "spec/evidence/api-optional-absence-f210-aero-applicability-r01.json",
+      "bytes": 5979,
+      "sha256": "A76C7F5A77A77D3F9AC612289A36A5510947AA601ACBC11FC6161EA4125C25DE"
+    },
+    {
+      "path": "spec/evidence/api-production-current7b0-aero-applicability-r01.json",
+      "bytes": 9254,
+      "sha256": "C5A895F61128392F7C6DB62C85F431716BC1E2DE570BDECC3A9155B28663133C"
+    },
+    {
+      "path": "spec/evidence/support-exports-consumed-path-applicability-aero-r01.json",
+      "bytes": 47953,
+      "sha256": "85D103F3E73535E3B5A30AFC33A1AB3B2369C6616DCBBE3F2C97F4C588B2DCF9"
+    },
+    {
+      "path": "spec/evidence/api-consumer-available-archive-audit-chain.json",
+      "bytes": 2269,
+      "sha256": "1AF7A2F4E1DD5D1159AF35C7DAF93F4CA3B506A37851B13C332FB0EBB1874447"
+    }
+  ],
+  "documented_methods": [
+    "get_version",
+    "get_capabilities",
+    "add_technology",
+    "add_technologies",
+    "add_productivity",
+    "get_research"
+  ],
+  "supported_present_mir": [
+    {
+      "target": "f200",
+      "engine_version": "2.0.77",
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "candidate_sha256": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0"
+    },
+    {
+      "target": "f210",
+      "engine_version": "2.1.23",
+      "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "candidate_sha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B"
+    }
+  ],
+  "host_admission_budgets": {
+    "family_rows_upper_bound": 64,
+    "combined_definition_entries": 512,
+    "table_nesting_depth": 16,
+    "string_bytes": 4096,
+    "recipe_targets": 64,
+    "all_limits_apply_together": true,
+    "native_performance_claim": false,
+    "all_maxima_simultaneously_accepted": false,
+    "observations": 100
+  },
+  "package_core_pairs": [
+    {
+      "target": "f200",
+      "core_payloads": [
+        {
+          "path": "api/v1/data.lua",
+          "sha256": "9CCDD2B5FFBE14156D002F50ECEB9799F70124CADA0A0A3767D84CA242413FA5",
+          "bytes": 12993
+        },
+        {
+          "path": "api/v1/runtime.lua",
+          "sha256": "5FA121E602EF99CC67DAE4C1E17C5334A8FB26BBEF97F00BF0AE9AE242D9C873",
+          "bytes": 3663
+        },
+        {
+          "path": "research/generator.lua",
+          "sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526",
+          "bytes": 5491
+        },
+        {
+          "path": "platform/target.lua",
+          "sha256": "C76444C8F5891C057082F6CDDD6DDA51BE91ADD1FE3369B8261EDC78578D852B",
+          "bytes": 396
+        },
+        {
+          "path": "data.lua",
+          "sha256": "F38FC47B1E731E517A4278DAD8E62A3D6ADEBF387F3FDA85C0D7EC9580508A2D",
+          "bytes": 243
+        },
+        {
+          "path": "control.lua",
+          "sha256": "17201196D4EB573265CE34C0599748ED78DF856EBFCB4229018C05C4E056C0C9",
+          "bytes": 248
+        },
+        {
+          "path": "runtime/configuration.lua",
+          "sha256": "21C832FF2C234C178D86DA51E24ABA34A51724A009E9E8299EBBF62F91EDAD5E",
+          "bytes": 347
+        }
+      ]
+    },
+    {
+      "target": "f210",
+      "core_payloads": [
+        {
+          "path": "api/v1/data.lua",
+          "sha256": "9CCDD2B5FFBE14156D002F50ECEB9799F70124CADA0A0A3767D84CA242413FA5",
+          "bytes": 12993
+        },
+        {
+          "path": "api/v1/runtime.lua",
+          "sha256": "5FA121E602EF99CC67DAE4C1E17C5334A8FB26BBEF97F00BF0AE9AE242D9C873",
+          "bytes": 3663
+        },
+        {
+          "path": "research/generator.lua",
+          "sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526",
+          "bytes": 5491
+        },
+        {
+          "path": "platform/target.lua",
+          "sha256": "4826A89FD40A9F0CEF385EC0B9F8CCE02CF1B7AE64A78AE431920A55DC56A601",
+          "bytes": 406
+        },
+        {
+          "path": "data.lua",
+          "sha256": "F38FC47B1E731E517A4278DAD8E62A3D6ADEBF387F3FDA85C0D7EC9580508A2D",
+          "bytes": 243
+        },
+        {
+          "path": "control.lua",
+          "sha256": "17201196D4EB573265CE34C0599748ED78DF856EBFCB4229018C05C4E056C0C9",
+          "bytes": 248
+        },
+        {
+          "path": "runtime/configuration.lua",
+          "sha256": "21C832FF2C234C178D86DA51E24ABA34A51724A009E9E8299EBBF62F91EDAD5E",
+          "bytes": 347
+        }
+      ]
+    }
+  ],
+  "independent_review": {
+    "reviewer": "/root/review_pending_evidence",
+    "mode": "read-only actual evidence and source/package comparison",
+    "artifact_written_by_reviewer": false,
+    "source_refs": [
+      "12c5d21fd7466299e7c3c7e316f2bae693145c20",
+      "a95dbc6b35c165b46aa9991d2a0ef7274d4ec04a",
+      "42032477d45ced683e72736a4fe30a7a3195b995",
+      "b2e9243dacf8c10f623fe90ddac957329fbf1d9e",
+      "3960d05746a39a10ffc9c174947b14b7e0586f7e"
+    ],
+    "seven_consumed_payloads_identical_at_refs": true,
+    "actual_candidate_zip_core_members_rehashed": true,
+    "verdict": "No further native case is indispensable for this scoped documented-subset stability decision; create a new aggregate record and retain original identities and limits."
+  },
+  "decisions": [
+    {
+      "subject": "single-call/data boundary",
+      "verdict": "qualified",
+      "basis": "Both modern N1 actual native cases observe one immediate publication, caller input isolation, duplicate/invalid-family refusal before writes, family order, detached query results and fixed named-prototype snapshots."
+    },
+    {
+      "subject": "late final-fixes/native physical/save",
+      "verdict": "qualified",
+      "basis": "Both modern N2 cases observe two independent installed consumers, actual 100-plate inputs yielding 200 then 202 cables, +0.01 native productivity, no modules/beacons, native-setter research and two unchanged-save cold reloads each. Zero laboratory claim."
+    },
+    {
+      "subject": "joining clients",
+      "verdict": "qualified-through-exact-consumed-path-applicability",
+      "basis": "F200 D3 and F210 standalone8DC Base/SpaceAge initial/rejoin/saved-host EN/DE clients have actual Alpha/Beta read-only load-query pairs. The seven unchanged consumed payloads support candidate B applicability; old original packages and all client identities remain unchanged."
+    },
+    {
+      "subject": "optional absence",
+      "verdict": "qualified-only-for-original-no-MIR-guards",
+      "basis": "F200 D3 exact no-MIR CreateOnly result and F210 SteamFE4 actual two-mod absence result retain their original engines/fixtures. F210 dirty-source label and missing original profile bytes remain explicit. Byte-identical first-line guards precede changed code. No standalone8DC absence execution is asserted."
+    },
+    {
+      "subject": "boundary budgets",
+      "verdict": "qualified-host-admission-contract-only",
+      "basis": "Existing 100 host observations establish the combined finite admission contract. A populated 64-row family may exceed the shared512-entry budget; no native speed or all-limits-at-once promise follows."
+    },
+    {
+      "subject": "foreign interface/previous consumers",
+      "verdict": "bounded-host-and-available-archive-review",
+      "basis": "Foreign-interface collision refusal is host-only. Thirty-one-archive audit has zero named old-interface/SDK/MEP matches; computed/external names remain unknown. No externally consumed old contract is retired."
+    },
+    {
+      "subject": "F210 private N2 caller",
+      "verdict": "adverse-preserved",
+      "basis": "Public runner passes. The private outer all-exits-zero guard rejects its documented supervised production stop with exit-1/predicateobserved. No controller pass, receipt rewrite or native rerun is claimed."
+    }
+  ],
+  "stability_decision": {
+    "documented_modern_subset_stable": true,
+    "api_contract_frozen": true,
+    "player_implementation_changed": false,
+    "new_native_execution": false,
+    "product_released": false,
+    "release_qualification": false
+  },
+  "limits": [
+    "Documented numeric-count declaration subset only; no arbitrary native schema or historical capability promise.",
+    "No universal modpack, third-party consumer, foreign-owner, crash, latency, protected-save or lab-earned-progression claim.",
+    "Original matrices/chains retain historical pending/false fields; this aggregate records the later decision without rewriting them.",
+    "Whole-product MIR5 acceptance and final package/publication/delivery gates remain separate."
+  ]
+}

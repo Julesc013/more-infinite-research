@@ -1,0 +1,184 @@
+{
+  "schema": 1,
+  "kind": "MIRPublishedF100F210WorkCorrectionPreparedV1",
+  "status": "host-verified-target-work-correction-no-replacement-native",
+  "implementation_commit": "6e46ebbc09cc2da9495a8479d187fa447a02c495",
+  "reason": "R04 loaded the protected F100 save but failed its strict inherited F110 tick-rounded work assertion. Its retained actual military witness has inventory31/stored0.42/capacity1. This disproves 35/60 consumed-equivalents for F210 and independently yields exact0.58 remaining investment. R04 remains failed.",
+  "independent_reference": {
+    "path": "tests/fixtures/published-f100-forward/f210-work-reference-r02.json",
+    "bytes": 3151,
+    "sha256": "988896CFE18CFCC3B901960FA97C7E7E904050C84F567CCD57552652FF5768A6"
+  },
+  "fixture": {
+    "stage": "f210",
+    "name": "mir-fixture-mir5-historical-transition",
+    "version": "0.5.0",
+    "archive": {
+      "path": "D:/Projects/Factorio/mir5-published-f100-f210-work-fixture-r01/build/tmp/published-f100-f210-work-correction-r08-inputs/mir-fixture-mir5-historical-transition_0.5.0.zip",
+      "bytes": 7539,
+      "sha256": "3415C773F299B50BEDD7A9245BEB5923EE6CC9506DAA2DAF4AAAE03C789E07FE"
+    },
+    "members": [
+      {
+        "source_commit": "6e46ebbc09cc2da9495a8479d187fa447a02c495",
+        "source": "tests/fixtures/published-f100-forward/f210/control.lua",
+        "destination": "control.lua",
+        "bytes": 27,
+        "sha256": "1A0ED8A26C09447C61170923210BCCE255293A01A18F5D9174A31E90A27B7B03"
+      },
+      {
+        "source_commit": "6e46ebbc09cc2da9495a8479d187fa447a02c495",
+        "source": "tests/fixtures/published-f100-forward/f210/data-final-fixes.lua",
+        "destination": "data-final-fixes.lua",
+        "bytes": 30,
+        "sha256": "B193C566BDC17949E9082C258018BD57DADC37063377B0C12971988E9513E588"
+      },
+      {
+        "source_commit": "6e46ebbc09cc2da9495a8479d187fa447a02c495",
+        "source": "tests/fixtures/published-f100-forward/shared/control.lua",
+        "destination": "fixture_control.lua",
+        "bytes": 17167,
+        "sha256": "3FF13208075CF5B461B7DF754A84B0901791D3B4DC7999A138C8649ADFAA5A8E"
+      },
+      {
+        "source_commit": "6e46ebbc09cc2da9495a8479d187fa447a02c495",
+        "source": "tests/fixtures/published-f100-forward/shared/data-final-fixes.lua",
+        "destination": "fixture_data_final.lua",
+        "bytes": 1552,
+        "sha256": "8047C6115C51B5B00B32E125F44647494EF0E22CF4DF7752E2E8E501323B03E6"
+      },
+      {
+        "source_commit": "6e46ebbc09cc2da9495a8479d187fa447a02c495",
+        "source": "tests/fixtures/published-f100-forward/f210/info.json",
+        "destination": "info.json",
+        "bytes": 277,
+        "sha256": "55B1FFFDD1F8C468D3340D01EA810974A743E72BB255149060EE3DCF883AF3B5"
+      },
+      {
+        "source_commit": "6e46ebbc09cc2da9495a8479d187fa447a02c495",
+        "source": "tests/fixtures/published-f100-forward/f210/settings-updates.lua",
+        "destination": "settings-updates.lua",
+        "bytes": 73,
+        "sha256": "0C3C400CA97DF5B2A636FC77D16441E320EFF836C7787084F5E0CE3BCB9F1E30"
+      },
+      {
+        "source_commit": "6e46ebbc09cc2da9495a8479d187fa447a02c495",
+        "source": "tests/fixtures/published-f100-forward/f210/stage.lua",
+        "destination": "stage.lua",
+        "bytes": 142,
+        "sha256": "14A5598FAE0289B1F250479AA1E8DEB99CBD0B2270703E0A3CF1675490DBDF61"
+      }
+    ],
+    "projection": "D:/Projects/Factorio/mir5-published-f100-f210-work-fixture-r01/build/tmp/published-f100-f210-work-correction-r08-inputs/source"
+  },
+  "target_work": {
+    "f210": {
+      "units": 0.58,
+      "stored_remainder": 0.42,
+      "required_inventory_each": 31,
+      "required_capacity": 1,
+      "derivation": "1-source_progress and independently32-(31+0.42/1). No legacy tick rounding on this target."
+    },
+    "f110": {
+      "units": 0.5833333333333334,
+      "stored_remainder": 0.4166666666666667,
+      "derivation": "Unchanged accepted legacy tool-stack consumption."
+    },
+    "scope": "Only military was observed by R04. Both packs must be logged before assertions and both must satisfy the one exact F210 contract in a fresh run;utility remains unobserved before that run. Never admit both old and corrected quantities."
+  },
+  "unchanged_semantics": [
+    "F100 source,F110 bridge and accepted F110 destination behavior remains unchanged. All23 retained rows,effects,queues,foreign forces,source-lab checks and read-only on_load requirements stay exact.",
+    "F210 retains item/default-capacity1 guards,script-disabled zero-energy completed lab,one useful successor completion and two unchanged-byte read-only cold reload requirements.",
+    "Player packages,settings and protected0381 source are unchanged;reuse accepted B7F29 source qualification without reseeding or source production."
+  ],
+  "retained_adverse": {
+    "schema": 1,
+    "kind": "MIRPublishedF100F210ScienceWorkAdverseRootReadbackV1",
+    "status": "failed-fixture-engine-specific-work-expectation",
+    "packet": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r04-controller/packet-r04.json",
+      "bytes": 18432,
+      "sha256": "50ECA871CF66E93C3A8F96C6D764BEAF864837700CF8A0BACE1A4E2B6B523364"
+    },
+    "caller": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r04-controller/Invoke-Owned.ps1",
+      "bytes": 24368,
+      "sha256": "AC0FAE3E9B180B257FAC5AFC1A455697CAB857BFD72A8B209854387601741AB2"
+    },
+    "terminal": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r04-controller/execution-record/terminal.json",
+      "bytes": 4814,
+      "sha256": "854030E2132B1B8FE5315FDB79D05E554C737875D606A5E0040FAF97A4344E9E"
+    },
+    "native_result": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r04-controller/native-captures/result.json",
+      "bytes": 5974,
+      "sha256": "9D2F98AE81406B48C9D64B2AF0FA438D1F380DB6A385132C7A35644ECAB21E7F"
+    },
+    "custody": {
+      "native_custody": {
+        "files": 9,
+        "bytes": 54738,
+        "all_original_copy_hashes_equal": true
+      },
+      "controller_custody": {
+        "files": 2,
+        "bytes": 569561,
+        "all_original_copy_hashes_equal": true
+      }
+    },
+    "actual_engine_pids": [
+      86988
+    ],
+    "actual_engines": 1,
+    "error": "successor plain-item science consumption differs",
+    "location": "fixture_control.lua:126",
+    "direct_original_save_loaded": true,
+    "in_game_reached": true,
+    "accepted_successor_labs": 0,
+    "completed_successor_saves": 0,
+    "accepted_cold_reloads": 0,
+    "source_input_unchanged": true,
+    "library_restoration_verified": true,
+    "factorio_processes": 0,
+    "bridge_authority": false,
+    "performance_acceptance": false,
+    "release_qualification": false,
+    "actual_science_prefix": {
+      "pack": "military-science-pack",
+      "inventory_count": 31,
+      "stored_durability": 0.42,
+      "science_capacity": 1,
+      "expected_old_remainder": 0.41666666666666663,
+      "utility_observation": "not reached before strict military assertion failed"
+    }
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/published-f100-f210-work-adverse-receipts-r04.json.gz",
+    "bytes": 32067,
+    "sha256": "4FF9FB8DE0CFF836618FCF4451470271D25F50C95341F7E751C7CA8144751EAB",
+    "bodies": 12
+  },
+  "host_controls": {
+    "command": "python -X utf8 -B tests/test_published_f100_forward_fixture.py --lua-runtime-dir D:/Projects/Factorio/more-infinite-research/build/tmp/mir421-lua-runtime",
+    "tests": 8,
+    "status": "passed",
+    "scope": "Independent work reference units/remainder/sum and actual saved units are bound. Both packs have wrong legacy-remainder and missing-value refusal controls;both prefix records remain captured even when first validation fails. Prior item/API/lifecycle/state/runner opponents remain. No native process.",
+    "driver_plan": "Existing selected published-F100 host plan inspected before controls."
+  },
+  "old_failed_fixture": {
+    "sha256": "F9E9B59B294507DBB6E65955469A80CB4900C0D173A042563C12A49BF4C40583",
+    "bytes": 7446,
+    "source_commit": "b47d81f2d7edcb676a564e35e0fffca071efd375",
+    "disposition": "Keep exact R04 packet/caller/native failure/restoration;zero accepted successor save/colds. R01 formula,R02 lab API and R03 science API failures remain unchanged."
+  },
+  "remaining": [
+    "Independent declaration/capsule review and all four required exact-head checks.",
+    "New packet separately freezes the later clean declaration HEAD,consumed6e46 implementation,seven raw members/container/profile/caller/governor and fresh output.",
+    "One strictly checked direct F100\u2192F210 attempt,then actual utility/world/save/two-readonly-cold evidence before qualification."
+  ],
+  "bridge_authority": false,
+  "replacement_native_execution": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}

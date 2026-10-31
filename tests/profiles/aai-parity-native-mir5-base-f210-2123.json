@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "kind": "mir5-aai-parity-native-current-successor",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "aai-industry",
+      "version": "0.7.5",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.21000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-aai-parity-native",
+      "version": "0.2.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "aai-industry_0.7.5.zip": "DFB734B8B9B8BF847C90759E8A63D2DB4C24B5DF871D49E2A230E1AE58E7E829",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "more-infinite-research_5.0.21000.zip": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE"
+  },
+  "scope": "Exact b251ae7a54104ace87cb0da4cf531cf53f03c93d/player79b73a6a8e68987737e69bf2d95ec6555b49f901 F210 Base successor only: consumes the immutable published4.7.3 AAI source save through InputSavePath/ExpectedInputSaveSha256, completes the declared successor lab and two cold reloads. Current MIR archive E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE is 679250 bytes. Prepared input only; native execution remains required."
+}

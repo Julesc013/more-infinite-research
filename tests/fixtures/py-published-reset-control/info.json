@@ -1,0 +1,17 @@
+{
+  "name": "mir-fixture-mir5-integration-catalogue-upgrade",
+  "version": "0.2.0",
+  "title": "MIR 5 private Py published reset control",
+  "author": "MIR maintainers",
+  "description": "Disposable published-MIR configuration-boundary observer; not player content.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base = 2.0.77",
+    "? pycoalprocessing = 3.0.44",
+    "? pyalienlife = 3.0.67",
+    "? pyhightech = 3.0.19",
+    "? pypostprocessing = 3.0.42",
+    "? mir-fixture-mir5-active-mods-observer = 0.1.0",
+    "more-infinite-research = 4.7.20002"
+  ]
+}

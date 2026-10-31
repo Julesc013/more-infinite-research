@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "kind": "MIR5LibraryMultiplayerCanonicalLabDiagnosticAdverseChainV1",
+  "status": "current333-f200-library-diagnostic-adverse-after-one-completion",
+  "run": 40130980860,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40130980860",
+  "controller_commit": "edc0b2787982ecd436d2610739fefe87382a5013",
+  "source_commit": "14ec65e7771a0e2662bba54bdcb07d7f6a07bc7c",
+  "engine": {
+    "target": "f200",
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "player": {
+    "source_commit": "333fb9f94d4e48d07455154e22129c5c765b7ef9",
+    "version": "5.0.20000",
+    "sha256": "5B00EDE316CDC139085EBF274E8CDF02CD96F8961242E2942A2A55F55C9BB76D",
+    "bytes": 547144,
+    "asset_inventory_sha256": "2C48DE548DED0BDC2B2F01AD1B851D58158E25916A02BD8AAAD281A52C28CBC0"
+  },
+  "fixture": {
+    "archive_sha256": "24E53199D4F85B9D3BA0F609BAD433A73E59978701900DC10313A7E936B9314B",
+    "archive_bytes": 10215,
+    "members": [
+      {
+        "source": "tests/fixtures/library-multiplayer/info.json",
+        "member": "info.json",
+        "sha256": "268818EA58DFEE57DD2BF30073BD6F557ECEB412730571ABE347604135446D4D",
+        "bytes": 383
+      },
+      {
+        "source": "tests/fixtures/library-multiplayer/control.lua",
+        "member": "control.lua",
+        "sha256": "74D018FFAD8272225DB6E900CA08FF503F76125943091AF4106A54A88AA1B7D1",
+        "bytes": 37089
+      },
+      {
+        "source": "tests/fixtures/library-multiplayer/settings-updates.lua",
+        "member": "settings-updates.lua",
+        "sha256": "659D9D74EA46394BB7E7FB8C17BFEDB0EAFFB63555B2284FDA35D44B6A23B2D1",
+        "bytes": 1137
+      }
+    ],
+    "active_mods_observer_sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+    "active_mods_observer_raw_git_conformance": true,
+    "active_mods_observer_repacked": false
+  },
+  "profile": {
+    "raw_git_path": "tests/profiles/library-multiplayer-f200-2077.json",
+    "raw_sha256": "4CDC1DED1FA6FF882C27BF0B86813718CA1C65F51D989448F2C6C174A3693DFD",
+    "execution_sha256": "740F3CE92DC0E5739AB3DFF589DD900DCF12C3E84C176E9F8B1B971D36379FC0"
+  },
+  "native_session": {
+    "status": "failed",
+    "failure": "[mir441-process-exit] 1",
+    "controls_restored": true,
+    "private_chain_sha256": "72274F670584BDAF08D85C65948A9405569591C308608E851FBE5E858DE6ED4A"
+  },
+  "diagnostic": {
+    "raw_marker_sha256": "DE403FA463FAA91D89ED9D6CA9BB0E3A75886B49D1703AE6D91F2A77AE16554B",
+    "raw_marker_lines": 12,
+    "unique_records": 2,
+    "queued": {
+      "tick": 3998,
+      "started": 1,
+      "finished": 0,
+      "research_current": "recipe-prod-research_gears-1",
+      "research_progress": 0,
+      "queue_count": 2,
+      "science_counts": {
+        "automation-science-pack": 2,
+        "logistic-science-pack": 2,
+        "chemical-science-pack": 2,
+        "production-science-pack": 2
+      }
+    },
+    "deadline": {
+      "tick": 7598,
+      "started": 2,
+      "finished": 1,
+      "research_current": "recipe-prod-research_gears-1",
+      "research_progress": 0.9988888888888875,
+      "queue_count": 1,
+      "science_counts": {
+        "automation-science-pack": 0,
+        "logistic-science-pack": 0,
+        "chemical-science-pack": 0,
+        "production-science-pack": 0
+      },
+      "laboratory_active": true,
+      "laboratory_valid": true,
+      "laboratory_energy": 1066.6666666666667,
+      "laboratory_status_numeric": 31,
+      "status_numeric_interpretation": "not asserted"
+    },
+    "finding": "The retained safe records show one completed laboratory research and a second active research below completion at the deadline. They do not establish why the second research did not complete."
+  },
+  "rounding_context": {
+    "classification": "external explanatory context only; not observed native causation",
+    "source_url": "https://forums.factorio.com/133495",
+    "statement": "The recorded 0.9988888888888875 progress is consistent with the discussed Factorio rounding behavior, but this run does not establish rounding as the cause of the deadline."
+  },
+  "related_adverses": [
+    {
+      "path": "spec/evidence/library-multiplayer-canonical-caption-type-adverse-chain.json",
+      "run": 40126672429,
+      "disposition": "separate fixture caption-type adverse before any laboratory completion"
+    },
+    {
+      "path": "spec/evidence/library-multiplayer-canonical-deadline-adverse-chain.json",
+      "run": 40129169284,
+      "disposition": "separate earlier corrected-fixture deadline adverse without durable terminal state"
+    }
+  ],
+  "staged_follow_up": {
+    "fixture_commit": "e23abaad5d4fdfa93b572d8481c0dcebd973e5f8",
+    "accepted_dev_commit": "44ba13676225f43b8bb44d0f8e50a540649096cb",
+    "scope": "staged one-pack feeding preserves total two packs and is pending native confirmation",
+    "does_not_establish": "a retry pass, a revised deadline, a changed oracle, or a release result"
+  },
+  "custody": {
+    "primary_safe_path": "build/mir5/recovery-historical/library-multiplayer-canonical/40130980860",
+    "artifact_manifest_sha256": "C2C704066A435EBF65D02E7499D61A3D4EC54037ACA2768600C497B3808D8864",
+    "members_verified": 202,
+    "safe_marker_selection_sha256": "49D975E947E9E3960608062C43073005D2A38B37FCB761358E1926CD28EE746D",
+    "full_original_private_artifacts": "retained in Black Glass worker custody; public evidence excludes workflow CLI, RCON credentials, player data, server stdout, client logs, saves, and session specifications"
+  },
+  "raw_evidence": {
+    "path": "spec/evidence/library-multiplayer-canonical-lab-diagnostic-adverse-receipts.json.gz",
+    "members": 3,
+    "uncompressed_bytes": 77856,
+    "uncompressed_sha256": "F7FA9A6AF4D16AD325236F894C076CD6F0B092251E7F6FE7642E8B3B017C8E5B",
+    "gzip_bytes": 14301,
+    "gzip_sha256": "8D8E1BC4E17F52FDCE7A09EB87E51C3DAADF4CA4B98110D1A602E11D304B899F"
+  },
+  "limits": [
+    "This adverse establishes no Library multiplayer pass, second laboratory completion, save/reload, client rejoin, performance, broad compatibility, or release result.",
+    "It records the numeric laboratory status without assigning an enum interpretation and does not infer a product or fixture cause from the marker records.",
+    "The previous caption-type and deadline adverses remain separate executions with their original inputs and manifests.",
+    "The staged one-pack feeding fixture is not native-qualified by this evidence."
+  ],
+  "next_step": "Review the staged fixture as a changed input and obtain a separate bounded native result before any Library acceptance claim."
+}

@@ -1,0 +1,14 @@
+{
+  "name": "mir-fixture-mir5-agriculture-scale-matched-tier-128",
+  "version": "0.1.0",
+  "title": "MIR matched agriculture 128-tower tier",
+  "author": "MIR maintainers",
+  "description": "Selects only the 128-tower test tier for a published or Defaults arm; no player settings are changed.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "mir-fixture-mir5-agriculture-scale-paired >= 0.1.0",
+    "? mir-fixture-mir5-agriculture-scale-arm-candidate-defaults >= 0.1.0",
+    "? mir-fixture-mir5-agriculture-scale-arm-published >= 0.1.0"
+  ]
+}

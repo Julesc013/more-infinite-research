@@ -1,0 +1,16 @@
+{
+  "name": "mir-fixture-mir5-f200-legacy-cap",
+  "version": "0.7.0",
+  "title": "MIR F200 positive-cap F210 re-enabled successor",
+  "author": "MIR maintainers",
+  "description": "Disposable Factorio 2.1 restoration of a retained F200 MIR cap right after the required disabled intermediate.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "? elevated-rails = 2.1.23",
+    "? quality = 2.1.23",
+    "? recycler = 2.1.23",
+    "? space-age = 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "schema": 1,
+  "kind": "MIR5MigrationOrigin110DirectC74NativeChainV1",
+  "status": "passed-bounded-direct-successors-from-one-protected-published-mir1-f200-source",
+  "scope": "Two exact Base direct successors of one protected published MIR 1.1.0 F200 source save: F210 on2.1.23 and F200 on2.0.77, each with the exact c74b7c46 candidate and only the two independently verified source-default inputs. This record is not arbitrary mod-settings-file recovery, Space Age, an modules-disabled arm, a current-release qualification, multiplayer, physical-production, performance, or release evidence.",
+  "source_stage_reused": {
+    "chain": "spec/evidence/migration-origin-110-f200-source-native-chain-r05.json",
+    "receipts": "spec/evidence/migration-origin-110-f200-source-native-receipts-r05.json.gz",
+    "status": "passed-exact-published-mir1-f200-source-stage",
+    "origin_tag": "1.1.0",
+    "origin_archive_sha256": "6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
+    "source_result_sha256": "4FBD622144E3B69E39C0530385AA70C92971208584CA32D4A10B1FCC1A978997",
+    "protected_save_sha256": "88FC8E9891040275E001930C3E6AA0A4A7A28C31D81DF30E3F08AEDD98E5019A",
+    "protected_save_bytes": 793858,
+    "source_actual_gear_laboratory_completions": 1,
+    "reuse_limit": "The source laboratory is one historical completion in the shared protected source stage. It is counted once across this pair, was not recreated, and is not additional work in either successor."
+  },
+  "frozen_current_candidate": {
+    "source_commit": "c74b7c4680545f3ccf27f38016d1144fefe8eee3",
+    "player_tree": "f81c63afca2e6eb5b7e46dffe892548553899db3",
+    "asset_readback": {
+      "path": "spec/evidence/current-assets-c74b7c46-root-readback.json",
+      "sha256": "8956F453C9A45832C52E0F0CA118A524FA92C286F16788311DC5C6165CCC641D",
+      "bytes": 7619
+    },
+    "applicability": "This record binds only these two c74 Base archive bytes. It does not relabel later packages or establish their applicability."
+  },
+  "explicit_source_defaults_input": {
+    "settings_mode": "Defaults",
+    "original_effective_values_guarded": 42,
+    "fixture_settings_updates_only": {
+      "ips-require-space-gate": true,
+      "ips-enable-research_inventory_capacity": false
+    },
+    "interpretation": "The fixture stages exactly the two source values that differ from current Defaults and verifies the full original effective set. It does not read, write, or qualify a persisted player mod-settings file."
+  },
+  "direct_successors": [
+    {
+      "target": "f210-base",
+      "engine": {
+        "product_version": "2.1.23",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+      },
+      "execution": {
+        "fixture_controller_commit": "0141a411d599f69be4e35ea42c18b25d5287ba56",
+        "profile_sha256": "70433C2561192B52954E1C165A882109EA8438D42279C59B7B6D228CBC67F995",
+        "candidate_archive_sha256": "625756F9E2536383954A121EB24FFB3AE0C0A540B7557E3F03A79C2D8A6A0D59",
+        "candidate_archive_bytes": 686005,
+        "fixture_archive_sha256": "3597682FF6AC7A7BFBA9B62B38A9E3958A1BCA04692750B4DDE18B746346B871",
+        "observer_archive_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+      },
+      "native_result": {
+        "status": "passed-private-native-fixture",
+        "sha256": "BFA37A92DFEDB3491DC7A41E2FE66ED26CEE1C1FFF9968ABC45D9FAA7EFA1EA7",
+        "bytes": 35692,
+        "terminal_sha256": "80808FF76A732253CCDB8759E5F2BDBD48C84B665DE5196D64A0FBEA78564E74",
+        "completed_save_sha256": "D272E72B1D68EDFECBF4E48F62186085F608C08561C3EDF7DA186842052F0ED6",
+        "completed_save_bytes": 814057,
+        "processes": 3
+      },
+      "observed_state": {
+        "source_rows": 31,
+        "new_candidate_actual_gear_laboratory_completions": 1,
+        "direct_level": {
+          "source": 2,
+          "candidate": 3
+        },
+        "gear_productivity_bonus": {
+          "source": 0.10000000149012,
+          "candidate": 0.2
+        },
+        "worker_robot_battery_bonus": 0.1,
+        "tier_one_module_bonus": {
+          "source": 0.1099999994,
+          "candidate": 0.11
+        },
+        "foreign_queue_progress": 0.42,
+        "detached_progress": 0.27,
+        "native_reset_assertion_passed": true,
+        "cold_reloads": 2,
+        "all_cold_reloads_read_only_and_save_byte_identical": true
+      },
+      "custody": {
+        "primary_root": "build/qualification/migration-origins/migration-origin-110-f210-source-defaults-r15-r02/native-output",
+        "original_root": "D:\\Projects\\Factorio\\mir5-migration-origin-110-successor-r15\\build\\tmp\\migration-origin-110-f210-source-defaults-r15-r02",
+        "members": 17,
+        "bytes": 931628,
+        "original_and_primary_file_hashes_checked": 34,
+        "manifest_sha256": "F4BDA17A0885276B840F07612291B74C0DEBC333795E6B2D9C9A2AD048522E0E",
+        "all_member_hashes_matched": true
+      }
+    },
+    {
+      "target": "f200-base",
+      "engine": {
+        "product_version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "execution": {
+        "fixture_controller_commit": "14cf88541cdba7804a3cdd5fb8db37ab991129a7",
+        "profile_sha256": "4C05602349EDB3FF07725B73CDA052AF579DD3BA183A9AEEE400765A731AF2CA",
+        "candidate_archive_sha256": "050AC35BAB6BA1F01E160DB612B73A03E58E0ABE6A291D18109FAB1B235B63B5",
+        "candidate_archive_bytes": 685621,
+        "fixture_archive_sha256": "C47A1234C472202EEA11B69D34D8510D087BD6569F0BE7063607CB5830B7EB12",
+        "observer_archive_sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+      },
+      "native_result": {
+        "status": "passed-private-native-fixture",
+        "sha256": "CAC2F20DFBF5930C3B804F93E46322B061E441E193C6C79B4D32863353CEBD01",
+        "bytes": 36127,
+        "terminal_sha256": "0F7066F2158A7FFB68BFEA35E0DCDE61C45D4AE02A01715271312CC5EB5449FF",
+        "completed_save_sha256": "95D8C279D6D578361BCED267C661B3B161EDC3E9653A0CDF9FFB947499339BC1",
+        "completed_save_bytes": 811798,
+        "processes": 3
+      },
+      "observed_state": {
+        "source_rows": 31,
+        "new_candidate_actual_gear_laboratory_completions": 1,
+        "direct_level": {
+          "source": 2,
+          "candidate": 3
+        },
+        "gear_productivity_bonus": {
+          "source": 0.10000000149012,
+          "candidate": 0.20000000298023
+        },
+        "worker_robot_battery_bonus": 0.1,
+        "tier_one_module_bonus": {
+          "source": 0.1099999994,
+          "candidate": 0.11
+        },
+        "foreign_queue_progress": 0.42,
+        "detached_progress": 0.27,
+        "native_reset_assertion_passed": true,
+        "cold_reloads": 2,
+        "all_cold_reloads_read_only_and_save_byte_identical": true
+      },
+      "custody": {
+        "primary_root": "build/qualification/migration-origins/migration-origin-110-f200-source-defaults-r02b/native-output",
+        "original_root": "D:\\Projects\\Factorio\\mir5-migration-origin-110-successor-source-defaults-f200-r01\\build\\tmp\\migration-origin-110-f200-source-defaults-r02b",
+        "members": 18,
+        "bytes": 919754,
+        "original_and_primary_file_hashes_checked": 36,
+        "manifest_sha256": "9B4CAED31CC2E58A458C43D6E6BCE3C63A150BB54FD498F5390489A334EC1832",
+        "all_member_hashes_matched": true
+      }
+    }
+  ],
+  "f210_outer_caller_adverse_recovered_without_retry": {
+    "caller_sha256": "61C34C509FB10DEB4032B1CEC9F4F45B95F8E2A1F2044B8925BBFB1794758E56",
+    "terminal_sha256": "80808FF76A732253CCDB8759E5F2BDBD48C84B665DE5196D64A0FBEA78564E74",
+    "terminal_native_status": "passed-private-native-fixture",
+    "post_terminal_assertion": "stale gear bonuses .2/.3",
+    "disposition": "The outer caller assertion occurred after the native result and terminal were written. The separate recovery record verifies the actual protected-source approximately .1 and candidate .2 observations; it is not a native retry or a product assertion change.",
+    "derived_verification_only": {
+      "path": "build/qualification/migration-origins/migration-origin-110-f210-source-defaults-r15-r02/recovery-readback.json",
+      "sha256": "00332C31FF4F333C4F05C983B9008CD0F19FDC5FBAAA6067DD8C04F9F1DD31C5",
+      "bytes": 4212
+    }
+  },
+  "retained_adverses_and_refusals": {
+    "native_fixture_results": [
+      {
+        "id": "f210-r07",
+        "result_sha256": "6A2C08C6B076B6B66BCDF17B36C49DA7FCA9C612C5EF56D6EE8B2175B095D517",
+        "disposition": "Failed before a successor laboratory or save: player saved source effect multiset differs for recipe-prod-research_robot_battery-1."
+      },
+      {
+        "id": "f210-r08",
+        "result_sha256": "E7FE425890B92CBAE4259B8A4DE56502043B0E978E689F0DED2C57C4DDF49F2F",
+        "disposition": "Failed before a successor laboratory or save: foreign saved source technology differs for recipe-prod-research_gears-1."
+      },
+      {
+        "id": "f210-r13",
+        "result_sha256": "BB6251D4B95D7CAA5108280AE3E1D1A59B87D2EB1BEF326D7DC5E71FBCCD83BD",
+        "disposition": "Failed before a successor laboratory or save: foreign saved recipe-bonus count differs."
+      },
+      {
+        "id": "f210-r14-r02",
+        "result_sha256": "0EADF337345DF9A75731483FE8359FF2A53D7743D8F64649AB538A98FD130763",
+        "disposition": "Failed before a successor laboratory or save with the ips-require-space-gate key. The failed native marker did not log the actual operand. Independent source/default comparison establishes published true versus current false; that comparison supports the input diagnosis corrected by the explicit two-value source-default arm."
+      }
+    ],
+    "zero_native_profile_fixture_pin_refusal": {
+      "path": "build/qualification/migration-origins/migration-origin-110-successor-r12-zero-native-admission-r01.json",
+      "sha256": "207BA7A858450D42CA7956A8A85797E0A732846167357335A4260625C4C5181E",
+      "verdict": "R12 refused before caller materialization, direct-library mutation, engine launch, or save access because tracked profile fixture pins disagreed with the packet containers."
+    },
+    "f200_observer_map_refusal": {
+      "terminal_sha256": "D4AB20B542F8AA93B8B7A604BB273391092D14D37D1F33991A45479BAA74202B",
+      "verdict": "R02 reported no-native-result before engine work: [mir-library-fixture-source] info.json. Its observer projection was corrected before the separately retained R02b pass."
+    }
+  },
+  "receipts": {
+    "path": "spec/evidence/migration-origin-110-direct-c74-native-receipts-r01.json.gz",
+    "sha256": "674DD3552BD474744532456934FF685EEEAD83470F5D755C0B01318E5569729C",
+    "bytes": 21755,
+    "uncompressed_sha256": "485985FF7107E05C47F0BC3E5EF526CF386E109DFBDA4520BFD6567782527844",
+    "uncompressed_bytes": 137614,
+    "exact_native_result_receipts": 6,
+    "derived_safe_marker_records": 1,
+    "strict_utf8_decode_roundtrip_verified": true,
+    "exclusions": "Saves, full logs, runtime configuration, player data, preflight payloads, library-control payloads, and archive payloads remain outside this public-safe capsule."
+  },
+  "claims": {
+    "same_immutable_original_source_save_consumed_by_both_successors": true,
+    "f200_direct_successor": true,
+    "f210_direct_engine_hop_successor": true,
+    "source_world_recreated": false,
+    "arbitrary_mod_settings_file_recovery": false,
+    "space_age": false,
+    "modules-disabled": false,
+    "later_candidate_applicability": false,
+    "multiplayer": false,
+    "physical_factory": false,
+    "performance": false,
+    "release_qualification": false
+  },
+  "limitations": "This chain covers only the exact published MIR1.1.0 F200 source, the protected88FC source save, the c74 Base F200/F210 candidate archives, their two exact engine families, and the two explicitly staged source defaults. It does not qualify arbitrary persisted settings files, Space Age, modules-disabled or cap closures, another current candidate, a release, or every historical origin."
+}

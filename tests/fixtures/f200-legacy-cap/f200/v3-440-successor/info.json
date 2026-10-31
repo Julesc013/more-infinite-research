@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-mir5-f200-legacy-cap",
+  "version": "0.10.0",
+  "title": "MIR F200 4.4.0 structured-V3 cap successor",
+  "author": "MIR maintainers",
+  "description": "Disposable exact 4.4.20000/0.9 source to MIR5 F200 cap successor.",
+  "factorio_version": "2.0",
+  "dependencies": ["base = 2.0.77", "more-infinite-research = 5.0.20000"]
+}

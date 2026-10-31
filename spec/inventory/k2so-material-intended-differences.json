@@ -1,0 +1,235 @@
+{
+  "schema": 2,
+  "kind": "MIR5ModernCatalogueReviewedDifferencesV1",
+  "differences": [
+    {
+      "id": "restore-recipe-prod-research_material_rare_metals-1",
+      "profile": "k2so-f210",
+      "domain": "data",
+      "type": "technology",
+      "name": "recipe-prod-research_material_rare_metals-1",
+      "expected_candidate": {
+        "type": "technology",
+        "name": "recipe-prod-research_material_rare_metals-1",
+        "icons": [
+          {
+            "icon": "__Krastorio2Assets__/icons/items/rare-metals.png",
+            "icon_size": 64
+          },
+          {
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ],
+            "floating": true
+          }
+        ],
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.kr-rare-metals"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "level": 1,
+        "upgrade": true,
+        "max_level": 3,
+        "order": "p[research_material_rare_metals]",
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "kr-rare-metal-processing",
+          "kr-enriched-ores"
+        ],
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "kr-rare-metals",
+            "change": 0.02
+          },
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "kr-rare-metals-from-enriched-rare-metals",
+            "change": 0.02
+          }
+        ],
+        "unit": {
+          "count_formula": "200*2^(L-1)",
+          "time": 30,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ]
+          ]
+        }
+      },
+      "reason": "Recover independently sourced A05 finite material identity from MIR4 authored declarations, current No-MIR named route facts and native closure markers. Missing from current captured MIR4.7 K2SO due reviewed-forward tuple withholding; all other captured output remains exact."
+    },
+    {
+      "id": "restore-recipe-prod-research_material_silicon-1",
+      "profile": "k2so-f210",
+      "domain": "data",
+      "type": "technology",
+      "name": "recipe-prod-research_material_silicon-1",
+      "expected_candidate": {
+        "type": "technology",
+        "name": "recipe-prod-research_material_silicon-1",
+        "icons": [
+          {
+            "icon": "__Krastorio2Assets__/icons/items/silicon.png",
+            "icon_size": 64
+          },
+          {
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ],
+            "floating": true
+          }
+        ],
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.kr-silicon"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "level": 1,
+        "upgrade": true,
+        "max_level": 3,
+        "order": "p[research_material_silicon]",
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "kr-silicon-processing"
+        ],
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "kr-silicon",
+            "change": 0.02
+          }
+        ],
+        "unit": {
+          "count_formula": "200*2^(L-1)",
+          "time": 30,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ]
+          ]
+        }
+      },
+      "reason": "Recover independently sourced A05 finite material identity from MIR4 authored declarations, current No-MIR named route facts and native closure markers. Missing from current captured MIR4.7 K2SO due reviewed-forward tuple withholding; all other captured output remains exact."
+    },
+    {
+      "id": "restore-recipe-prod-research_material_glass-1",
+      "profile": "k2so-f210",
+      "domain": "data",
+      "type": "technology",
+      "name": "recipe-prod-research_material_glass-1",
+      "expected_candidate": {
+        "type": "technology",
+        "name": "recipe-prod-research_material_glass-1",
+        "icons": [
+          {
+            "icon": "__Krastorio2Assets__/icons/items/glass.png",
+            "icon_size": 64
+          },
+          {
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ],
+            "floating": true
+          }
+        ],
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.kr-glass"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "level": 1,
+        "upgrade": true,
+        "max_level": 3,
+        "order": "p[research_material_glass]",
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "kr-stone-processing"
+        ],
+        "effects": [
+          {
+            "type": "change-recipe-productivity",
+            "recipe": "kr-glass",
+            "change": 0.02
+          }
+        ],
+        "unit": {
+          "count_formula": "200*2^(L-1)",
+          "time": 30,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ]
+          ]
+        }
+      },
+      "reason": "Recover independently sourced A05 finite material identity from MIR4 authored declarations, current No-MIR named route facts and native closure markers. Missing from current captured MIR4.7 K2SO due reviewed-forward tuple withholding; all other captured output remains exact."
+    }
+  ]
+}

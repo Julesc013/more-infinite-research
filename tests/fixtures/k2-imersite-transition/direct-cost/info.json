@@ -1,0 +1,15 @@
+{
+  "name": "mir-fixture-mir5-k2-imersite-direct-cost",
+  "version": "0.1.0",
+  "title": "MIR 5 K2 Imersite direct-cost fixture",
+  "author": "MIR maintainers",
+  "description": "Private direct 4.6-to-MIR5 cost continuity witness for the K2 Imersite transition.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "space-age",
+    "Krastorio2-spaced-out",
+    "more-infinite-research = 5.0.21000",
+    "mir-fixture-mir5-k2-imersite-transition >= 0.3.0"
+  ]
+}

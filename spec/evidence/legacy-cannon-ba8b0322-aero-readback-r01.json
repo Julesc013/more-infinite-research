@@ -1,0 +1,283 @@
+{
+  "schema": 1,
+  "kind": "MIRAeroLegacyCannonPackageReadbackV1",
+  "status": "passed-exact-source-build-and-member-readback-only",
+  "source": {
+    "commit": "ba8b0322d3a0ab64ecda40e5114f85ec6b0b58f4",
+    "player_tree": "5ba53a8514b4641c749e91c0a68f32521fb3fee7",
+    "reviewed_pr_head": "575e418c72eff2970fa5f6274956f6e8944d4e19",
+    "merged_pr": "https://github.com/Julesc013/more-infinite-research/pull/1299",
+    "actual_merge_parent": "5cfb21f70b3793040f566467d7cba5e64af52bd3",
+    "expected_merge_tree": "d82594227cd2db137d0e1545a954321698962aaf",
+    "actual_merge_tree_verified": true
+  },
+  "baseline": {
+    "commit": "f119e30761a55c70e262fb2a69823b9531f6e45e",
+    "player_tree": "0229b2bb3ad0c514fc4dca18c32fd544b9ba7d72",
+    "f200_sha256": "20A200883EFB29F8D216EA408C688F1862C80612D536DCD4FCDDC1E47768541D",
+    "f210_sha256": "654C57DDCE2E994C1E8DDC4F808198D4FAC7EAB6284B18C4A628E6DA5465DE23",
+    "custody_preserved": true
+  },
+  "controller": {
+    "package_tool": "tools/package.py",
+    "git_blob": "02ed2ddf44fb18fb39ba2e3ae1cb18ce5d4e068f",
+    "sha256": "32BDBE5E0D8B776A57BC8DF63DD536DD81AEDF54141AC6EC6B1BEF4044C90674",
+    "python": "3.14.7",
+    "zlib_compiled": "1.3.1.zlib-ng",
+    "zlib_runtime": "1.3.1.zlib-ng",
+    "inputs": "Exact committed blobs and committed target records; no working-tree or native fixture input."
+  },
+  "modern_assets": [
+    {
+      "target": "f200",
+      "source_commit": "ba8b0322d3a0ab64ecda40e5114f85ec6b0b58f4",
+      "archive": "build/qualification/legacy-cannon-ba8b0322-aero-r01/more-infinite-research_5.0.20000.zip",
+      "sha256": "EF66506789F1C81F7E15ECF7048311865C2AB2B3D803E2736CD6B9567C6A3D2C",
+      "bytes": 690998,
+      "root_version": "5.0.20000",
+      "factorio_version": "2.0",
+      "members": 218,
+      "added": [
+        "research/legacy_cannon_credit_definitions.lua",
+        "runtime/legacy_cannon_credits.lua"
+      ],
+      "removed": [],
+      "changed": [
+        "changelog.txt",
+        "data-final-fixes.lua",
+        "runtime/bootstrap.lua"
+      ],
+      "unchanged_members": 213
+    },
+    {
+      "target": "f210",
+      "source_commit": "ba8b0322d3a0ab64ecda40e5114f85ec6b0b58f4",
+      "archive": "build/qualification/legacy-cannon-ba8b0322-aero-r01/more-infinite-research_5.0.21000.zip",
+      "sha256": "A8D0A4590154F3106E59BDB269F1AEB3ED8CC523F18F00ED7D76DC89059F5B8D",
+      "bytes": 691382,
+      "root_version": "5.0.21000",
+      "factorio_version": "2.1",
+      "members": 219,
+      "added": [
+        "research/legacy_cannon_credit_definitions.lua",
+        "runtime/legacy_cannon_credits.lua"
+      ],
+      "removed": [],
+      "changed": [
+        "changelog.txt",
+        "data-final-fixes.lua",
+        "runtime/bootstrap.lua"
+      ],
+      "unchanged_members": 214
+    }
+  ],
+  "other_target_member_maps": [
+    {
+      "target": "f013",
+      "target_record": "targets/editions.json",
+      "target_record_sha256": "2A2E2A7E9C54224AECE72366A1BB3EF7D9007A7BEC92BB53C4D9B0276B6E33F6",
+      "members": 127,
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "unchanged_members": 126,
+      "metadata_unchanged": true,
+      "modern_cannon_modules_absent": true
+    },
+    {
+      "target": "f014",
+      "target_record": "targets/editions.json",
+      "target_record_sha256": "2A2E2A7E9C54224AECE72366A1BB3EF7D9007A7BEC92BB53C4D9B0276B6E33F6",
+      "members": 127,
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "unchanged_members": 126,
+      "metadata_unchanged": true,
+      "modern_cannon_modules_absent": true
+    },
+    {
+      "target": "f015",
+      "target_record": "targets/editions.json",
+      "target_record_sha256": "2A2E2A7E9C54224AECE72366A1BB3EF7D9007A7BEC92BB53C4D9B0276B6E33F6",
+      "members": 127,
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "unchanged_members": 126,
+      "metadata_unchanged": true,
+      "modern_cannon_modules_absent": true
+    },
+    {
+      "target": "f016",
+      "target_record": "targets/editions.json",
+      "target_record_sha256": "2A2E2A7E9C54224AECE72366A1BB3EF7D9007A7BEC92BB53C4D9B0276B6E33F6",
+      "members": 127,
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "unchanged_members": 126,
+      "metadata_unchanged": true,
+      "modern_cannon_modules_absent": true
+    },
+    {
+      "target": "f017",
+      "target_record": "targets/editions.json",
+      "target_record_sha256": "2A2E2A7E9C54224AECE72366A1BB3EF7D9007A7BEC92BB53C4D9B0276B6E33F6",
+      "members": 127,
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "unchanged_members": 126,
+      "metadata_unchanged": true,
+      "modern_cannon_modules_absent": true
+    },
+    {
+      "target": "f018",
+      "target_record": "targets/editions.json",
+      "target_record_sha256": "2A2E2A7E9C54224AECE72366A1BB3EF7D9007A7BEC92BB53C4D9B0276B6E33F6",
+      "members": 127,
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "unchanged_members": 126,
+      "metadata_unchanged": true,
+      "modern_cannon_modules_absent": true
+    },
+    {
+      "target": "f100",
+      "target_record": "targets/editions.json",
+      "target_record_sha256": "2A2E2A7E9C54224AECE72366A1BB3EF7D9007A7BEC92BB53C4D9B0276B6E33F6",
+      "members": 127,
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "unchanged_members": 126,
+      "metadata_unchanged": true,
+      "modern_cannon_modules_absent": true
+    },
+    {
+      "target": "f110",
+      "target_record": "targets/editions.json",
+      "target_record_sha256": "2A2E2A7E9C54224AECE72366A1BB3EF7D9007A7BEC92BB53C4D9B0276B6E33F6",
+      "members": 128,
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "unchanged_members": 127,
+      "metadata_unchanged": true,
+      "modern_cannon_modules_absent": true
+    },
+    {
+      "target": "f006",
+      "target_record": "targets/early-editions.json",
+      "target_record_sha256": "CD8825F4ED2BF937D90A61484E4DC496D4208D1B307C09DE7B07C79B4C6DBB72",
+      "members": 10,
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "unchanged_members": 9,
+      "metadata_unchanged": true,
+      "modern_cannon_modules_absent": true
+    },
+    {
+      "target": "f007",
+      "target_record": "targets/early-editions.json",
+      "target_record_sha256": "CD8825F4ED2BF937D90A61484E4DC496D4208D1B307C09DE7B07C79B4C6DBB72",
+      "members": 10,
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "unchanged_members": 9,
+      "metadata_unchanged": true,
+      "modern_cannon_modules_absent": true
+    },
+    {
+      "target": "f008",
+      "target_record": "targets/early-editions.json",
+      "target_record_sha256": "CD8825F4ED2BF937D90A61484E4DC496D4208D1B307C09DE7B07C79B4C6DBB72",
+      "members": 10,
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "unchanged_members": 9,
+      "metadata_unchanged": true,
+      "modern_cannon_modules_absent": true
+    },
+    {
+      "target": "f009",
+      "target_record": "targets/early-editions.json",
+      "target_record_sha256": "CD8825F4ED2BF937D90A61484E4DC496D4208D1B307C09DE7B07C79B4C6DBB72",
+      "members": 10,
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "unchanged_members": 9,
+      "metadata_unchanged": true,
+      "modern_cannon_modules_absent": true
+    },
+    {
+      "target": "f010",
+      "target_record": "targets/early-editions.json",
+      "target_record_sha256": "CD8825F4ED2BF937D90A61484E4DC496D4208D1B307C09DE7B07C79B4C6DBB72",
+      "members": 10,
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "unchanged_members": 9,
+      "metadata_unchanged": true,
+      "modern_cannon_modules_absent": true
+    },
+    {
+      "target": "f011",
+      "target_record": "targets/early-editions.json",
+      "target_record_sha256": "CD8825F4ED2BF937D90A61484E4DC496D4208D1B307C09DE7B07C79B4C6DBB72",
+      "members": 10,
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "unchanged_members": 9,
+      "metadata_unchanged": true,
+      "modern_cannon_modules_absent": true
+    },
+    {
+      "target": "f012",
+      "target_record": "targets/early-editions.json",
+      "target_record_sha256": "CD8825F4ED2BF937D90A61484E4DC496D4208D1B307C09DE7B07C79B4C6DBB72",
+      "members": 10,
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "unchanged_members": 9,
+      "metadata_unchanged": true,
+      "modern_cannon_modules_absent": true
+    }
+  ],
+  "local_readbacks": [
+    {
+      "path": "build/qualification/legacy-cannon-ba8b0322-aero-r01/aero-readback.json",
+      "sha256": "8747AAF3A246B0806498EF376D542164D9507509705C5ACF02CFBDE4A57CA569",
+      "bytes": 50575
+    },
+    {
+      "path": "build/qualification/legacy-cannon-ba8b0322-aero-r01/historical-member-readback.json",
+      "sha256": "687547E1AA708AE2A978DF466537349332A01CFEAB42F3A02F829F34C9AF2B09",
+      "bytes": 125079
+    }
+  ],
+  "method": "Build each affected modern ZIP once with the unchanged packager; independently read every ZIP member and compare bytes to retained f119/f0dd packages. For the other15 targets, load each revision source once and materialize exact member maps without creating duplicate ZIPs.",
+  "claims": {
+    "independent_modern_build_and_member_comparison": true,
+    "fifteen_historical_maps_only_changelog_changed": true,
+    "native_execution": false,
+    "native_migration_qualification": false,
+    "performance": false,
+    "final_candidate_or_release_qualification": false
+  },
+  "limits": "This does not select Black Glass's candidate or change a live packet. The exact FDC9 MIR1.2 source and prior f0dd cannon-loss adverse remain preserved. Native save/laboratory/reset/reload qualification belongs to the separate named chain under its own exact execution identities; this receipt establishes only build/member identity. Existing target support limits and all other release gates remain open.",
+  "separate_native_evidence": {
+    "path": "spec/evidence/migration-origin-120-575e-direct-native-chain-r01.json",
+    "sha256": "8B42D0FEC713CB6DD6CEC57C9C3BCA70ACA05E09ECE1228B36AE4F041733E240",
+    "relationship": "Separate exact native execution consumes the independently matching modern ZIPs. This package readback does not become an additional native run or laboratory count."
+  }
+}

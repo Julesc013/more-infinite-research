@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-mir5-fresh-science-sources",
+  "version": "0.1.0",
+  "title": "MIR 5 fresh science source data-stage fixture",
+  "author": "MIR maintainers",
+  "description": "Private F210 data-stage witness for a bounded fresh science source; no gameplay, save, migration or performance qualification.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.23", "more-infinite-research >= 4.7.21003"]
+}

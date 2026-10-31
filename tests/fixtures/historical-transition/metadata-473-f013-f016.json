@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "kind": "MIR5HistoricalTransitionFixtureV1",
+  "name": "mir-fixture-mir5-historical-transition",
+  "version": "0.1.0",
+  "predecessor_release": "v4.7.3",
+  "published_release_id": 422732162,
+  "published_tag_source": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+  "scope": "Prepared F013-F016 published-source selections only. The shared fixture checks its named character-mining-speed contract; no source save, full-catalogue, successor, gameplay or release pass is claimed.",
+  "targets": {
+    "f013": {
+      "factorio_version": "0.13",
+      "minimum_base": "0.13.20",
+      "published_mir_version": "4.7.01303",
+      "mir_version": "5.0.01300",
+      "published_archive_sha256": "3918B10A0902FABD09BEA6D1F0E7EFF06B20B84F3D8CC5EC73E36FEDAAE64D4D",
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.05,
+      "direct_science": [
+        "alien-science-pack"
+      ],
+      "successor_mode": "preservation-only"
+    },
+    "f014": {
+      "factorio_version": "0.14",
+      "minimum_base": "0.14.23",
+      "published_mir_version": "4.7.01403",
+      "mir_version": "5.0.01400",
+      "published_archive_sha256": "85C7798BD6DC80FAA021AB0F33519B57A740B8D3969E695A82BA55634BA1C87A",
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.05,
+      "direct_science": [
+        "alien-science-pack"
+      ],
+      "successor_mode": "preservation-only"
+    },
+    "f015": {
+      "factorio_version": "0.15",
+      "minimum_base": "0.15.40",
+      "published_mir_version": "4.7.01503",
+      "mir_version": "5.0.01500",
+      "published_archive_sha256": "0F8DD4DD21B8D1542FF5EDF96FDC38F75C9AB3CE577DF29C5E9DE99E0643B510",
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.05,
+      "direct_science": [
+        "high-tech-science-pack",
+        "military-science-pack"
+      ],
+      "partial_progress": 0.42,
+      "successor_mode": "lab"
+    },
+    "f016": {
+      "factorio_version": "0.16",
+      "minimum_base": "0.16.51",
+      "published_mir_version": "4.7.01603",
+      "mir_version": "5.0.01600",
+      "published_archive_sha256": "DAC63B9B14278C952B1020F9AE600C1437A9812C79CBBA17DE3CB15AF0CED6BD",
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.05,
+      "direct_science": [
+        "high-tech-science-pack",
+        "military-science-pack"
+      ],
+      "partial_progress": 0.42,
+      "successor_mode": "lab"
+    }
+  }
+}

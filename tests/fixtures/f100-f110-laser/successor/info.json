@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-f100-f110-laser",
+  "version": "0.2.0",
+  "title": "MIR F110 renamed laser migration successor",
+  "author": "MIR maintainers",
+  "factorio_version": "1.1",
+  "dependencies": ["base >= 1.1.110", "more-infinite-research = 5.0.11000"]
+}

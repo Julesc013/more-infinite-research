@@ -1,0 +1,559 @@
+{
+  "kind": "MIR5NativeFixtureV1",
+  "status": "passed-private-native-fixture",
+  "case": "owned-gear-upgrade",
+  "source_head": "0a46fdc204fff78262a14b76053419cb0641ac02",
+  "source_dirty": true,
+  "harness_sha256": "00738675D162FDDE0F53567225A2022531C694FA87A14C59EC87F8CEE41ED050",
+  "native_probe_sha256": "FF8E62687A8AA05080E3F9AFF45DED34BA7FCFDF1F309542A66893380B7D51E3",
+  "governor_sha256": "9E27C4DDCCC10028246F89A09A7663F7FCA1D7BD26444681A7A8635F74D9BE96",
+  "engine": {
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "profile": {
+    "sha256": "AC9BCE7056E653A00D4938968DD5DCD428390AC12A6E5BA5372816A6209C426F",
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\owned-gear-upgrade-f210.json"
+  },
+  "fixtures": [
+    {
+      "sha256": "C9C01B2A1F524FC078251B6B6014CB184546980F03D21E88B67BAE0841F97056",
+      "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-owned-gear-upgrade_0.1.0.zip",
+      "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\owned-gear-upgrade"
+    }
+  ],
+  "mir_archive": {
+    "sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1",
+    "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_4.7.21000.zip"
+  },
+  "observation": "native-fixture-production-and-two-cold-reloads",
+  "input_save": null,
+  "release_qualification": false,
+  "initial_admission_wait": {
+    "phase": "fixture-initial",
+    "admission_wait_seconds": 0,
+    "status": "not-requested",
+    "attempt_count": 0,
+    "refusal_count": 0,
+    "elapsed_seconds": 0.0,
+    "first_refusal": null,
+    "last_refusal": null,
+    "last_error": null,
+    "started_at": "2026-10-23T03:50:17.6073910+00:00",
+    "deadline_at": "2026-10-23T03:50:17.6073910+00:00",
+    "admission": null
+  },
+  "create": {
+    "process": {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 10.410173,
+        "peak_working_set_bytes": 251355136,
+        "peak_sampled_private_bytes": 243294208,
+        "admission": {
+          "observed_at": "2026-10-23T03:50:23.1905596+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 6434410496,
+            "committed_bytes": 13695500288,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65777709056,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65777709056,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    },
+    "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\create.factorio.log",
+    "log_sha256": "7D13129821DBCD61A3F5B1FD16F7434A7869ADC0D51780509E7D79D365707C1F",
+    "loaded_selection": [
+      "base@2.1.23",
+      "mir-fixture-mir5-owned-gear-upgrade@0.1.0",
+      "more-infinite-research@4.7.21000"
+    ],
+    "consumers": {}
+  },
+  "seed_sha256": "3F7498AAECE175A1447971017A683776301136A090DC1A6F710EA042C3EA855F",
+  "server_settings": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\server-settings.json",
+    "sha256": "5B4C546FFCA63E1AEC8F67FFA5C32F3108CBC334DFA5AB1C5E2C212005639610",
+    "template": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\server-settings.example.json",
+    "template_sha256": "61E85918C477D86D0B347F8BF3E41B43413EC53F284D37F2888F1648FCA0849A"
+  },
+  "production": {
+    "process": {
+      "index": 2,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-2.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-2.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-2.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": -1,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 5.712586,
+        "peak_working_set_bytes": 254816256,
+        "peak_sampled_private_bytes": 251920384,
+        "admission": {
+          "observed_at": "2026-10-23T03:50:35.4536830+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 6645817344,
+            "committed_bytes": 13570179072,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65772732416,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65772732416,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    },
+    "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\production.factorio.log",
+    "log_sha256": "E11195A5AC2799AB44254D54082E4E7C7FBDBFFEB5CBF4F543F6AE45A58CA3E0",
+    "loaded_selection": [
+      "base@2.1.23",
+      "mir-fixture-mir5-owned-gear-upgrade@0.1.0",
+      "more-infinite-research@4.7.21000"
+    ],
+    "consumers": {}
+  },
+  "initial": {
+    "stage": "initial",
+    "case": "owned-gear-upgrade",
+    "status": "passed",
+    "witnesses": {
+      "source_mir_version": "4.7.21000",
+      "fixture_version": "0.1.0",
+      "lab_completed_levels": 2,
+      "no_gear_researched_setter": true,
+      "original_player_enabled": true,
+      "original_player_visible_when_disabled": false,
+      "post_cap_player_enabled": false,
+      "post_cap_player_visible_when_disabled": true,
+      "next_level": 3,
+      "productivity_bonus": 0.2,
+      "science_units_consumed": {
+        "automation-science-pack": 2,
+        "logistic-science-pack": 2,
+        "chemical-science-pack": 2,
+        "production-science-pack": 2
+      },
+      "lab_energy_seen": true,
+      "foreign_enabled": false,
+      "foreign_visible_when_disabled": false,
+      "on_load_read_only": false,
+      "qualification": "native-runner-readback-required"
+    }
+  },
+  "reloads": [
+    {
+      "stage": {
+        "process": {
+          "index": 3,
+          "status": "passed",
+          "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-3.resources.jsonl",
+          "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-3.stdout.txt",
+          "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-3.stderr.txt",
+          "result": {
+            "status": "passed",
+            "exit_code": 0,
+            "timed_out": false,
+            "passed": true,
+            "completion_predicate_observed": false,
+            "duration_seconds": 5.209475,
+            "peak_working_set_bytes": 211963904,
+            "peak_sampled_private_bytes": 207216640,
+            "admission": {
+              "observed_at": "2026-10-23T03:50:42.6468332+00:00",
+              "memory": {
+                "total_bytes": 17047683072,
+                "free_bytes": 6605946880,
+                "committed_bytes": 13662138368,
+                "commit_limit_bytes": 20357242880
+              },
+              "work_volume": {
+                "name": "C:\\",
+                "free_bytes": 65770954752,
+                "total_bytes": 472446398464
+              },
+              "system_volume": {
+                "name": "C:\\",
+                "free_bytes": 65770954752,
+                "total_bytes": 472446398464
+              }
+            },
+            "duration_measurement": {
+              "scope": "direct-native-executable-start-to-exit",
+              "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+              "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+            }
+          }
+        },
+        "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\reload-1.factorio.log",
+        "log_sha256": "D0DF2A9E3DBFB20EC4869B8814A1A475618D1F5A814876F0A962FA4C66E1A1D0",
+        "loaded_selection": [
+          "base@2.1.23",
+          "mir-fixture-mir5-owned-gear-upgrade@0.1.0",
+          "more-infinite-research@4.7.21000"
+        ],
+        "consumers": {}
+      },
+      "save_sha256": "D75557DF4226537E20B5C68C30A180AFAEDAEC233FC1775924D42C98EF066537",
+      "ordinal": 1,
+      "result": {
+        "stage": "reload",
+        "case": "owned-gear-upgrade",
+        "status": "passed",
+        "witnesses": {
+          "source_mir_version": "4.7.21000",
+          "fixture_version": "0.1.0",
+          "lab_completed_levels": 2,
+          "no_gear_researched_setter": true,
+          "original_player_enabled": true,
+          "original_player_visible_when_disabled": false,
+          "post_cap_player_enabled": false,
+          "post_cap_player_visible_when_disabled": true,
+          "next_level": 3,
+          "productivity_bonus": 0.2,
+          "science_units_consumed": {
+            "automation-science-pack": 2,
+            "logistic-science-pack": 2,
+            "chemical-science-pack": 2,
+            "production-science-pack": 2
+          },
+          "lab_energy_seen": true,
+          "foreign_enabled": false,
+          "foreign_visible_when_disabled": false,
+          "on_load_read_only": true,
+          "qualification": "native-runner-readback-required"
+        }
+      },
+      "save_byte_identical": true
+    },
+    {
+      "stage": {
+        "process": {
+          "index": 4,
+          "status": "passed",
+          "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-4.resources.jsonl",
+          "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-4.stdout.txt",
+          "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-4.stderr.txt",
+          "result": {
+            "status": "passed",
+            "exit_code": 0,
+            "timed_out": false,
+            "passed": true,
+            "completion_predicate_observed": false,
+            "duration_seconds": 5.456541,
+            "peak_working_set_bytes": 227172352,
+            "peak_sampled_private_bytes": 222195712,
+            "admission": {
+              "observed_at": "2026-10-23T03:50:49.5096207+00:00",
+              "memory": {
+                "total_bytes": 17047683072,
+                "free_bytes": 6542544896,
+                "committed_bytes": 13664247808,
+                "commit_limit_bytes": 20357242880
+              },
+              "work_volume": {
+                "name": "C:\\",
+                "free_bytes": 65771462656,
+                "total_bytes": 472446398464
+              },
+              "system_volume": {
+                "name": "C:\\",
+                "free_bytes": 65771462656,
+                "total_bytes": 472446398464
+              }
+            },
+            "duration_measurement": {
+              "scope": "direct-native-executable-start-to-exit",
+              "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+              "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+            }
+          }
+        },
+        "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\reload-2.factorio.log",
+        "log_sha256": "FADAEA897D15924406C70DB176855A516E74DB1A34DC83AB7E012C4E4CAC4085",
+        "loaded_selection": [
+          "base@2.1.23",
+          "mir-fixture-mir5-owned-gear-upgrade@0.1.0",
+          "more-infinite-research@4.7.21000"
+        ],
+        "consumers": {}
+      },
+      "save_sha256": "D75557DF4226537E20B5C68C30A180AFAEDAEC233FC1775924D42C98EF066537",
+      "ordinal": 2,
+      "result": {
+        "stage": "reload",
+        "case": "owned-gear-upgrade",
+        "status": "passed",
+        "witnesses": {
+          "source_mir_version": "4.7.21000",
+          "fixture_version": "0.1.0",
+          "lab_completed_levels": 2,
+          "no_gear_researched_setter": true,
+          "original_player_enabled": true,
+          "original_player_visible_when_disabled": false,
+          "post_cap_player_enabled": false,
+          "post_cap_player_visible_when_disabled": true,
+          "next_level": 3,
+          "productivity_bonus": 0.2,
+          "science_units_consumed": {
+            "automation-science-pack": 2,
+            "logistic-science-pack": 2,
+            "chemical-science-pack": 2,
+            "production-science-pack": 2
+          },
+          "lab_energy_seen": true,
+          "foreign_enabled": false,
+          "foreign_visible_when_disabled": false,
+          "on_load_read_only": true,
+          "qualification": "native-runner-readback-required"
+        }
+      },
+      "save_byte_identical": true
+    }
+  ],
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "AC9BCE7056E653A00D4938968DD5DCD428390AC12A6E5BA5372816A6209C426F",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:036C000000246719",
+        "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F",
+        "bytes": 193
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "4.7.21000",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_4.7.21000.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:00910000001EAD77",
+        "sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1",
+        "bytes": 1461799
+      },
+      {
+        "name": "mir-fixture-mir5-owned-gear-upgrade",
+        "version": "0.1.0",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-owned-gear-upgrade_0.1.0.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:006F00000015A3CA",
+        "sha256": "C9C01B2A1F524FC078251B6B6014CB184546980F03D21E88B67BAE0841F97056",
+        "bytes": 4646
+      }
+    ]
+  },
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 10.410173,
+        "peak_working_set_bytes": 251355136,
+        "peak_sampled_private_bytes": 243294208,
+        "admission": {
+          "observed_at": "2026-10-23T03:50:23.1905596+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 6434410496,
+            "committed_bytes": 13695500288,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65777709056,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65777709056,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    },
+    {
+      "index": 2,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-2.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-2.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-2.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": -1,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 5.712586,
+        "peak_working_set_bytes": 254816256,
+        "peak_sampled_private_bytes": 251920384,
+        "admission": {
+          "observed_at": "2026-10-23T03:50:35.4536830+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 6645817344,
+            "committed_bytes": 13570179072,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65772732416,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65772732416,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    },
+    {
+      "index": 3,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-3.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-3.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-3.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 5.209475,
+        "peak_working_set_bytes": 211963904,
+        "peak_sampled_private_bytes": 207216640,
+        "admission": {
+          "observed_at": "2026-10-23T03:50:42.6468332+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 6605946880,
+            "committed_bytes": 13662138368,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65770954752,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65770954752,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    },
+    {
+      "index": 4,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-4.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-4.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\process-4.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 5.456541,
+        "peak_working_set_bytes": 227172352,
+        "peak_sampled_private_bytes": 222195712,
+        "admission": {
+          "observed_at": "2026-10-23T03:50:49.5096207+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 6542544896,
+            "committed_bytes": 13664247808,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65771462656,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65771462656,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,613 @@
+{
+  "schema": 1,
+  "kind": "MIR5Historical473F017F100CurrentNativeChainV1",
+  "status": "passed-exact-473-f017-f100-source-to-current-7a2-direct-routes",
+  "scope": "Exact published4.7.01703 on0.17.79/E699 and4.7.10003 on1.0.0/99F1 to current7a2/player505 same-edition successors. One new source mining lab/+5%, loaded42% partial-work and probe-queue checks, then one separate successor lab/+10% total and two read-only cold reloads at each saved stage. Named Base mining/queue routes only, not whole-edition catalogue/settings/modpack, another engine, performance, Portal or release qualification.",
+  "candidate_source": "7a2f93224c846b86261b2da709f50ea683fc708d",
+  "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+  "prepared_input_evidence": {
+    "path": "spec/evidence/historical-473-f017-f100-prepared-inputs-r01.json",
+    "sha256": "620AAECF422D0E11C38B6C28512B05BF206FBE1206687B2C4B611F62B33CCCB2"
+  },
+  "host_controls": {
+    "passed": 11,
+    "scope": "pinned Lua host fixture controls; independent of actual native observations"
+  },
+  "readback": {
+    "path": "build/qualification/historical-473-f017-f100-7a2-r01-readback/root-readback-r01.json",
+    "bytes": 50632,
+    "sha256": "42FD2EC9D9440E2BDA54B807935B844EF3EF8DAA9EEB7CEAAF3D89807FC87EB8",
+    "files": 268,
+    "bytes_per_copy": 9017067
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/historical-473-f017-f100-7a2-native-receipts-r01.json.gz",
+    "bytes": 27842,
+    "sha256": "FAC9BAC791DE7AC1B7A92CA208681E39962D95F8DC90A28BEAB407518E7AC969",
+    "records": 5,
+    "actual_native_results": 4,
+    "zero_native_refusals": 1,
+    "uncompressed_bytes": 210732,
+    "all_original_exact_bytes_round_trip": true
+  },
+  "editions": [
+    {
+      "target": "f017",
+      "controller_commit": "ba750fd662a03b8233c717ed58714b3e92772f37",
+      "packet": {
+        "path": "build/qualification/historical-473-f017-7a2-r02-controller/packet.json",
+        "bytes": 10781,
+        "sha256": "D90C4E76DB01723C5CCC160ACB7512E3F02CBE760C48952FBBB3D61BD28C197E"
+      },
+      "caller": {
+        "path": "build/qualification/historical-473-f017-7a2-r02-controller/Invoke-OwnedF017Pair.ps1",
+        "bytes": 4927,
+        "sha256": "840B8B3CB434FD15BEE48B438FFCA4CDBD629DCE3D14F88B97FC20B39902EFCC"
+      },
+      "terminal": {
+        "path": "build/qualification/historical-473-f017-7a2-r02-controller/execution-record/terminal.json",
+        "bytes": 31262,
+        "sha256": "8C12B0571FC43F88802A6B90836C531FEBCA179084C1B351AF7009BF70AE9B9A"
+      },
+      "protected_original_source": {
+        "path": "build/qualification/historical-473-f017-7a2-r02-controller/native-published/write-data/saves/mir5-native-complete.zip",
+        "bytes": 699327,
+        "sha256": "B3F45A935B2D3541653D601AE73905F0AB0F7C4350E180FA543D2E8027FC4617"
+      },
+      "stages": [
+        {
+          "stage": "published",
+          "result": {
+            "path": "build/qualification/historical-473-f017-7a2-r02-controller/native-published/result.json",
+            "bytes": 43335,
+            "sha256": "7D808777321609EC4809D8E2AC8E0BDE90B96BE3B195ABF5CA22E21F02EFB953"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\0.17\\bin\\x64\\factorio.exe",
+            "sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06",
+            "file_version": "0.17.79.47865",
+            "product_version": "0.17.79",
+            "base_version": "0.17.79"
+          },
+          "profile": {
+            "sha256": "E156A1CECF59121D529BA035263B9E01D2FED225B38C5C68942CEB79FBFBFE49",
+            "path": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\tests\\profiles\\historical-transition-473-published-f017.json"
+          },
+          "fixtures": [
+            {
+              "sha256": "91279B1B2CDDCCBFE5501906A4575217B77E6993C5E4111150844C77C9BE4620",
+              "source": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f017-7a2-r02-inputs\\published\\source",
+              "archive": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f017-7a2-r02-inputs\\published\\library\\mir-fixture-mir5-historical-transition_0.1.0.zip"
+            }
+          ],
+          "mir_archive": {
+            "sha256": "9BCF1813BBDCBBD90088D74672CEF639FBC96689604673E529CF3AA8FC8D89AF",
+            "path": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f017-7a2-r02-inputs\\published\\library\\more-infinite-research_4.7.01703.zip"
+          },
+          "initial_observation": {
+            "case": "historical-transition",
+            "stage": "initial",
+            "transition_stage": "published",
+            "status": "passed",
+            "target": "f017",
+            "direct": "recipe-prod-research_character_mining_speed-1",
+            "source_direct_lab_completions": 1,
+            "successor_direct_lab_completions": 0,
+            "mining_bonus": 0.05,
+            "current_research": "recipe-prod-research_character_mining_speed-1",
+            "research_progress": 0.42,
+            "queue_api": true,
+            "research_queue_enabled": true,
+            "foreign_saved_progress": null,
+            "two_cold_reload_witness": false,
+            "on_load_read_only": false
+          },
+          "completed_save": {
+            "path": "build/qualification/historical-473-f017-7a2-r02-controller/native-published/write-data/saves/mir5-native-complete.zip",
+            "bytes": 699327,
+            "sha256": "B3F45A935B2D3541653D601AE73905F0AB0F7C4350E180FA543D2E8027FC4617"
+          },
+          "reloads": [
+            {
+              "ordinal": 1,
+              "save_byte_identical": true,
+              "save_sha256": "B3F45A935B2D3541653D601AE73905F0AB0F7C4350E180FA543D2E8027FC4617",
+              "observation": {
+                "case": "historical-transition",
+                "stage": "reload",
+                "transition_stage": "published",
+                "status": "passed",
+                "target": "f017",
+                "direct": "recipe-prod-research_character_mining_speed-1",
+                "source_direct_lab_completions": 1,
+                "successor_direct_lab_completions": 0,
+                "mining_bonus": 0.05,
+                "current_research": "recipe-prod-research_character_mining_speed-1",
+                "research_progress": 0.42,
+                "queue_api": true,
+                "research_queue_enabled": true,
+                "foreign_saved_progress": null,
+                "two_cold_reload_witness": true,
+                "on_load_read_only": true
+              }
+            },
+            {
+              "ordinal": 2,
+              "save_byte_identical": true,
+              "save_sha256": "B3F45A935B2D3541653D601AE73905F0AB0F7C4350E180FA543D2E8027FC4617",
+              "observation": {
+                "case": "historical-transition",
+                "stage": "reload",
+                "transition_stage": "published",
+                "status": "passed",
+                "target": "f017",
+                "direct": "recipe-prod-research_character_mining_speed-1",
+                "source_direct_lab_completions": 1,
+                "successor_direct_lab_completions": 0,
+                "mining_bonus": 0.05,
+                "current_research": "recipe-prod-research_character_mining_speed-1",
+                "research_progress": 0.42,
+                "queue_api": true,
+                "research_queue_enabled": true,
+                "foreign_saved_progress": null,
+                "two_cold_reload_witness": true,
+                "on_load_read_only": true
+              }
+            }
+          ],
+          "native_startup_logs": [
+            {
+              "path": "build/qualification/historical-473-f017-7a2-r02-controller/native-published/create.factorio.log",
+              "bytes": 6334,
+              "sha256": "45B9710BC9EC8FE11DDC153A002CBDD5168FD93F06ACFF2ED85542A407C3807A",
+              "actual_native_startup": "   0.000 2026-10-28 23:27:28; Factorio 0.17.79 (build 47865, win64, alpha)"
+            },
+            {
+              "path": "build/qualification/historical-473-f017-7a2-r02-controller/native-published/production.factorio.log",
+              "bytes": 8176,
+              "sha256": "0481F46C7B0717874DDAD391C01A69D06512606BE99EB3347B9B0810296052DE",
+              "actual_native_startup": "   0.000 2026-10-28 23:27:31; Factorio 0.17.79 (build 47865, win64, alpha)"
+            },
+            {
+              "path": "build/qualification/historical-473-f017-7a2-r02-controller/native-published/reload-1.factorio.log",
+              "bytes": 7947,
+              "sha256": "CCEFF146A8929B898BCE034168833532D58BAE75209132A5E1BA041FE659FFDC",
+              "actual_native_startup": "   0.000 2026-10-28 23:27:34; Factorio 0.17.79 (build 47865, win64, alpha)"
+            },
+            {
+              "path": "build/qualification/historical-473-f017-7a2-r02-controller/native-published/reload-2.factorio.log",
+              "bytes": 7947,
+              "sha256": "2484575D3B079879C60FE843500ECF05E714203B8DF12539161C7E3A2EAAE5BC",
+              "actual_native_startup": "   0.000 2026-10-28 23:27:36; Factorio 0.17.79 (build 47865, win64, alpha)"
+            }
+          ],
+          "actual_native_processes": 4,
+          "new_actual_lab_completions_in_this_stage": 1
+        },
+        {
+          "stage": "mir5",
+          "result": {
+            "path": "build/qualification/historical-473-f017-7a2-r02-controller/native-mir5/result.json",
+            "bytes": 34884,
+            "sha256": "95D79923CD7CB86D2DBE0A412720CF120F5FD07C19C163B32F50A3202E574D68"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\0.17\\bin\\x64\\factorio.exe",
+            "sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06",
+            "file_version": "0.17.79.47865",
+            "product_version": "0.17.79",
+            "base_version": "0.17.79"
+          },
+          "profile": {
+            "sha256": "390A2C2914A013BC8A4CCC60668AB3D4DCD7643400B99F2C77EEC9000A4EB166",
+            "path": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\tests\\profiles\\historical-transition-mir5-f017.json"
+          },
+          "fixtures": [
+            {
+              "sha256": "AD692BA7D26A43FE4EC0A5A5699991B42DCF7AF5E2CD4CED829210B519144F47",
+              "source": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f017-7a2-r02-inputs\\mir5\\source",
+              "archive": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f017-7a2-r02-inputs\\mir5\\library\\mir-fixture-mir5-historical-transition_0.1.0.zip"
+            }
+          ],
+          "mir_archive": {
+            "sha256": "95228385A0862A807DB20A73F56CA0113693A1CDB3437410187303C598D784C7",
+            "path": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f017-7a2-r02-inputs\\mir5\\library\\more-infinite-research_5.0.01700.zip"
+          },
+          "initial_observation": {
+            "case": "historical-transition",
+            "stage": "initial",
+            "transition_stage": "mir5",
+            "status": "passed",
+            "target": "f017",
+            "direct": "recipe-prod-research_character_mining_speed-1",
+            "source_direct_lab_completions": 1,
+            "successor_direct_lab_completions": 1,
+            "mining_bonus": 0.1,
+            "current_research": "braking-force-1",
+            "research_progress": 0,
+            "queue_api": true,
+            "research_queue_enabled": true,
+            "foreign_saved_progress": null,
+            "two_cold_reload_witness": false,
+            "on_load_read_only": false
+          },
+          "completed_save": {
+            "path": "build/qualification/historical-473-f017-7a2-r02-controller/native-mir5/write-data/saves/mir5-native-complete.zip",
+            "bytes": 700198,
+            "sha256": "6FCB428D330E1D3C3B1F834B97EE8B8998792A89509536373E0CFD49CEDCC785"
+          },
+          "reloads": [
+            {
+              "ordinal": 1,
+              "save_byte_identical": true,
+              "save_sha256": "6FCB428D330E1D3C3B1F834B97EE8B8998792A89509536373E0CFD49CEDCC785",
+              "observation": {
+                "case": "historical-transition",
+                "stage": "reload",
+                "transition_stage": "mir5",
+                "status": "passed",
+                "target": "f017",
+                "direct": "recipe-prod-research_character_mining_speed-1",
+                "source_direct_lab_completions": 1,
+                "successor_direct_lab_completions": 1,
+                "mining_bonus": 0.1,
+                "current_research": "braking-force-1",
+                "research_progress": 0,
+                "queue_api": true,
+                "research_queue_enabled": true,
+                "foreign_saved_progress": null,
+                "two_cold_reload_witness": true,
+                "on_load_read_only": true
+              }
+            },
+            {
+              "ordinal": 2,
+              "save_byte_identical": true,
+              "save_sha256": "6FCB428D330E1D3C3B1F834B97EE8B8998792A89509536373E0CFD49CEDCC785",
+              "observation": {
+                "case": "historical-transition",
+                "stage": "reload",
+                "transition_stage": "mir5",
+                "status": "passed",
+                "target": "f017",
+                "direct": "recipe-prod-research_character_mining_speed-1",
+                "source_direct_lab_completions": 1,
+                "successor_direct_lab_completions": 1,
+                "mining_bonus": 0.1,
+                "current_research": "braking-force-1",
+                "research_progress": 0,
+                "queue_api": true,
+                "research_queue_enabled": true,
+                "foreign_saved_progress": null,
+                "two_cold_reload_witness": true,
+                "on_load_read_only": true
+              }
+            }
+          ],
+          "native_startup_logs": [
+            {
+              "path": "build/qualification/historical-473-f017-7a2-r02-controller/native-mir5/production.factorio.log",
+              "bytes": 4990,
+              "sha256": "533834086DB9EC4C881E423F80A5BA8FD94881577883FDCBD7ED93B6C3BCFAFF",
+              "actual_native_startup": "   0.000 2026-10-28 23:27:39; Factorio 0.17.79 (build 47865, win64, alpha)"
+            },
+            {
+              "path": "build/qualification/historical-473-f017-7a2-r02-controller/native-mir5/reload-1.factorio.log",
+              "bytes": 4743,
+              "sha256": "580D32DD78D445B5FB949EB28D641C41541C67CB84091D8002CF62742DA8C081",
+              "actual_native_startup": "   0.000 2026-10-28 23:27:42; Factorio 0.17.79 (build 47865, win64, alpha)"
+            },
+            {
+              "path": "build/qualification/historical-473-f017-7a2-r02-controller/native-mir5/reload-2.factorio.log",
+              "bytes": 4743,
+              "sha256": "9A4135CCC0F4564696C6E24760F58332F34FA9B299E31E9A7A9BC15A84D242E0",
+              "actual_native_startup": "   0.000 2026-10-28 23:27:43; Factorio 0.17.79 (build 47865, win64, alpha)"
+            }
+          ],
+          "actual_native_processes": 3,
+          "new_actual_lab_completions_in_this_stage": 1
+        }
+      ],
+      "actual_native_processes": 7,
+      "actual_lab_completions": 2,
+      "actual_read_only_cold_reloads": 4
+    },
+    {
+      "target": "f100",
+      "controller_commit": "ba750fd662a03b8233c717ed58714b3e92772f37",
+      "packet": {
+        "path": "build/qualification/historical-473-f100-7a2-r01-controller/packet.json",
+        "bytes": 10538,
+        "sha256": "338A0612D4E8AFB7E382C8E08F942B5E5D50CD00C1A6BEA76A317ADB9C8AE8A7"
+      },
+      "caller": {
+        "path": "build/qualification/historical-473-f100-7a2-r01-controller/Invoke-OwnedF100Pair.ps1",
+        "bytes": 4927,
+        "sha256": "16A9211BEEAABDDD00BC831559BE5E94F7C153032140B6BC43C4096B05705DB0"
+      },
+      "terminal": {
+        "path": "build/qualification/historical-473-f100-7a2-r01-controller/execution-record/terminal.json",
+        "bytes": 32080,
+        "sha256": "F4279280432833DB72EFA3E970694F5D9535E253AE4A672DB4217BE4EDFC2C44"
+      },
+      "protected_original_source": {
+        "path": "build/qualification/historical-473-f100-7a2-r01-controller/native-published/write-data/saves/mir5-native-complete.zip",
+        "bytes": 656574,
+        "sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811"
+      },
+      "stages": [
+        {
+          "stage": "published",
+          "result": {
+            "path": "build/qualification/historical-473-f100-7a2-r01-controller/native-published/result.json",
+            "bytes": 43336,
+            "sha256": "7017B65C1DC53D32D30EA1F6699442AAE48634548C73084C7027A6F5D91F594E"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\1.0\\bin\\x64\\factorio.exe",
+            "sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70",
+            "file_version": "1.0.0.54889",
+            "product_version": "1.0.0",
+            "base_version": "1.0.0"
+          },
+          "profile": {
+            "path": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\tests\\profiles\\historical-transition-473-published-f100.json",
+            "sha256": "552D19B62ACC5A77056121062057981E48FA929E52677AFA116AED12F1B2A2EB"
+          },
+          "fixtures": [
+            {
+              "sha256": "B9B1298B6D8050CF6784E8C536C5AA1F38093CD7D87F488D57F013960638F0B6",
+              "source": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f100-7a2-r01-inputs\\published\\source",
+              "archive": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f100-7a2-r01-inputs\\published\\library\\mir-fixture-mir5-historical-transition_0.1.0.zip"
+            }
+          ],
+          "mir_archive": {
+            "path": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f100-7a2-r01-inputs\\published\\library\\more-infinite-research_4.7.10003.zip",
+            "sha256": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1"
+          },
+          "initial_observation": {
+            "case": "historical-transition",
+            "stage": "initial",
+            "transition_stage": "published",
+            "status": "passed",
+            "target": "f100",
+            "direct": "recipe-prod-research_character_mining_speed-1",
+            "source_direct_lab_completions": 1,
+            "successor_direct_lab_completions": 0,
+            "mining_bonus": 0.05,
+            "current_research": "recipe-prod-research_character_mining_speed-1",
+            "research_progress": 0.42,
+            "queue_api": true,
+            "research_queue_enabled": true,
+            "foreign_saved_progress": null,
+            "two_cold_reload_witness": false,
+            "on_load_read_only": false
+          },
+          "completed_save": {
+            "path": "build/qualification/historical-473-f100-7a2-r01-controller/native-published/write-data/saves/mir5-native-complete.zip",
+            "bytes": 656574,
+            "sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811"
+          },
+          "reloads": [
+            {
+              "ordinal": 1,
+              "save_byte_identical": true,
+              "save_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811",
+              "observation": {
+                "case": "historical-transition",
+                "stage": "reload",
+                "transition_stage": "published",
+                "status": "passed",
+                "target": "f100",
+                "direct": "recipe-prod-research_character_mining_speed-1",
+                "source_direct_lab_completions": 1,
+                "successor_direct_lab_completions": 0,
+                "mining_bonus": 0.05,
+                "current_research": "recipe-prod-research_character_mining_speed-1",
+                "research_progress": 0.42,
+                "queue_api": true,
+                "research_queue_enabled": true,
+                "foreign_saved_progress": null,
+                "two_cold_reload_witness": true,
+                "on_load_read_only": true
+              }
+            },
+            {
+              "ordinal": 2,
+              "save_byte_identical": true,
+              "save_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811",
+              "observation": {
+                "case": "historical-transition",
+                "stage": "reload",
+                "transition_stage": "published",
+                "status": "passed",
+                "target": "f100",
+                "direct": "recipe-prod-research_character_mining_speed-1",
+                "source_direct_lab_completions": 1,
+                "successor_direct_lab_completions": 0,
+                "mining_bonus": 0.05,
+                "current_research": "recipe-prod-research_character_mining_speed-1",
+                "research_progress": 0.42,
+                "queue_api": true,
+                "research_queue_enabled": true,
+                "foreign_saved_progress": null,
+                "two_cold_reload_witness": true,
+                "on_load_read_only": true
+              }
+            }
+          ],
+          "native_startup_logs": [
+            {
+              "path": "build/qualification/historical-473-f100-7a2-r01-controller/native-published/create.factorio.log",
+              "bytes": 6327,
+              "sha256": "57C08B1A9083834CF0732B57179A71033A07F9BCF9569E4DA7F21C9CE9EEF7F2",
+              "actual_native_startup": "   0.000 2026-10-28 23:29:28; Factorio 1.0.0 (build 54889, win64, alpha)"
+            },
+            {
+              "path": "build/qualification/historical-473-f100-7a2-r01-controller/native-published/production.factorio.log",
+              "bytes": 8188,
+              "sha256": "D50919BE7C128C197882F9CAAE565A81F1239E5ADE6DB25D98B7E5B0A5D16D01",
+              "actual_native_startup": "   0.000 2026-10-28 23:29:31; Factorio 1.0.0 (build 54889, win64, alpha)"
+            },
+            {
+              "path": "build/qualification/historical-473-f100-7a2-r01-controller/native-published/reload-1.factorio.log",
+              "bytes": 7959,
+              "sha256": "6AF0D03177BDA43FDA1761A26D273BE8891724A41077C82A9A6E2A4E846FC78A",
+              "actual_native_startup": "   0.000 2026-10-28 23:29:34; Factorio 1.0.0 (build 54889, win64, alpha)"
+            },
+            {
+              "path": "build/qualification/historical-473-f100-7a2-r01-controller/native-published/reload-2.factorio.log",
+              "bytes": 7959,
+              "sha256": "9CE982E0C915B3C806F0BC421256DEE76A4E461BCCCCE5C6E568B4A8D70B46F5",
+              "actual_native_startup": "   0.000 2026-10-28 23:29:36; Factorio 1.0.0 (build 54889, win64, alpha)"
+            }
+          ],
+          "actual_native_processes": 4,
+          "new_actual_lab_completions_in_this_stage": 1
+        },
+        {
+          "stage": "mir5",
+          "result": {
+            "path": "build/qualification/historical-473-f100-7a2-r01-controller/native-mir5/result.json",
+            "bytes": 34876,
+            "sha256": "DDC272038CD83808FB5AE969E6B928D1042855D3CB63040DF5BA13FE28B2D35E"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\1.0\\bin\\x64\\factorio.exe",
+            "sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70",
+            "file_version": "1.0.0.54889",
+            "product_version": "1.0.0",
+            "base_version": "1.0.0"
+          },
+          "profile": {
+            "path": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\tests\\profiles\\historical-transition-mir5-f100.json",
+            "sha256": "E5548AD48D3AB1CC16617E452C6DAD96C1A65B0630B78CF66B6B224C9DF5E666"
+          },
+          "fixtures": [
+            {
+              "sha256": "ED7153A978ED22D9D2BF6878C92C097B951225AA1D3F5D2C17AF7C6DC91BA830",
+              "source": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f100-7a2-r01-inputs\\mir5\\source",
+              "archive": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f100-7a2-r01-inputs\\mir5\\library\\mir-fixture-mir5-historical-transition_0.1.0.zip"
+            }
+          ],
+          "mir_archive": {
+            "path": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f100-7a2-r01-inputs\\mir5\\library\\more-infinite-research_5.0.10000.zip",
+            "sha256": "6BAE382DBD0AEC7199474921887CFBAC61016B8BF5E8FB990656493A8A174B6C"
+          },
+          "initial_observation": {
+            "case": "historical-transition",
+            "stage": "initial",
+            "transition_stage": "mir5",
+            "status": "passed",
+            "target": "f100",
+            "direct": "recipe-prod-research_character_mining_speed-1",
+            "source_direct_lab_completions": 1,
+            "successor_direct_lab_completions": 1,
+            "mining_bonus": 0.1,
+            "current_research": "braking-force-1",
+            "research_progress": 0,
+            "queue_api": true,
+            "research_queue_enabled": true,
+            "foreign_saved_progress": null,
+            "two_cold_reload_witness": false,
+            "on_load_read_only": false
+          },
+          "completed_save": {
+            "path": "build/qualification/historical-473-f100-7a2-r01-controller/native-mir5/write-data/saves/mir5-native-complete.zip",
+            "bytes": 657518,
+            "sha256": "0331D3C4186B8C7203317B391701C2A051619B9A095B61F889E445DFDD0919B3"
+          },
+          "reloads": [
+            {
+              "ordinal": 1,
+              "save_byte_identical": true,
+              "save_sha256": "0331D3C4186B8C7203317B391701C2A051619B9A095B61F889E445DFDD0919B3",
+              "observation": {
+                "case": "historical-transition",
+                "stage": "reload",
+                "transition_stage": "mir5",
+                "status": "passed",
+                "target": "f100",
+                "direct": "recipe-prod-research_character_mining_speed-1",
+                "source_direct_lab_completions": 1,
+                "successor_direct_lab_completions": 1,
+                "mining_bonus": 0.1,
+                "current_research": "braking-force-1",
+                "research_progress": 0,
+                "queue_api": true,
+                "research_queue_enabled": true,
+                "foreign_saved_progress": null,
+                "two_cold_reload_witness": true,
+                "on_load_read_only": true
+              }
+            },
+            {
+              "ordinal": 2,
+              "save_byte_identical": true,
+              "save_sha256": "0331D3C4186B8C7203317B391701C2A051619B9A095B61F889E445DFDD0919B3",
+              "observation": {
+                "case": "historical-transition",
+                "stage": "reload",
+                "transition_stage": "mir5",
+                "status": "passed",
+                "target": "f100",
+                "direct": "recipe-prod-research_character_mining_speed-1",
+                "source_direct_lab_completions": 1,
+                "successor_direct_lab_completions": 1,
+                "mining_bonus": 0.1,
+                "current_research": "braking-force-1",
+                "research_progress": 0,
+                "queue_api": true,
+                "research_queue_enabled": true,
+                "foreign_saved_progress": null,
+                "two_cold_reload_witness": true,
+                "on_load_read_only": true
+              }
+            }
+          ],
+          "native_startup_logs": [
+            {
+              "path": "build/qualification/historical-473-f100-7a2-r01-controller/native-mir5/production.factorio.log",
+              "bytes": 4999,
+              "sha256": "06C1C702F107953CE1F63C7E87D07092E07C1CFCD6A77E0527F678D2D5C8BF71",
+              "actual_native_startup": "   0.000 2026-10-28 23:29:39; Factorio 1.0.0 (build 54889, win64, alpha)"
+            },
+            {
+              "path": "build/qualification/historical-473-f100-7a2-r01-controller/native-mir5/reload-1.factorio.log",
+              "bytes": 4753,
+              "sha256": "5E404707CF38F8975BE00E81067BCE1CB7227AE7ECD54D760816EC9D06E77B42",
+              "actual_native_startup": "   0.000 2026-10-28 23:29:42; Factorio 1.0.0 (build 54889, win64, alpha)"
+            },
+            {
+              "path": "build/qualification/historical-473-f100-7a2-r01-controller/native-mir5/reload-2.factorio.log",
+              "bytes": 4753,
+              "sha256": "4B1FAF561A17291D1BCF29DB6F0DB981086F4EAE869ACB43F603B61EEFADCE6A",
+              "actual_native_startup": "   0.000 2026-10-28 23:29:43; Factorio 1.0.0 (build 54889, win64, alpha)"
+            }
+          ],
+          "actual_native_processes": 3,
+          "new_actual_lab_completions_in_this_stage": 1
+        }
+      ],
+      "actual_native_processes": 7,
+      "actual_lab_completions": 2,
+      "actual_read_only_cold_reloads": 4
+    }
+  ],
+  "actual_native_processes": 14,
+  "actual_lab_completions": 4,
+  "actual_read_only_cold_reloads": 8,
+  "factorio_processes_after_restoration": 0,
+  "prior_zero_native_refusal": {
+    "path": "build/qualification/historical-473-f017-7a2-r01-controller/execution-record/terminal.json",
+    "bytes": 649,
+    "sha256": "22B9FCF50423E719CD9B834CCB0EB4B47F791AB6DB738D3428F5B2F5DC3D65E0"
+  },
+  "limits": [
+    "The first F017 packet placed its metadata outside the projected source directory. Preflight refused before Factorio; exact metadata was then placed beside both sources without altering archive payloads, fixture assertions or player code. The original refusal remains retained.",
+    "Own fixture containers are locally built with their actual recorded hashes from the four reviewed shared Lua members and canonical target literals. Adjacent metadata is excluded from runtime ZIPs. Aero prepared containers keep their separate original identities.",
+    "Each accepted source is created once and reused directly for its candidate. A carried source-lab counter in successor/reload markers is not another new completion.",
+    "The source partial research is resumed by the actual successor lab. Completing it legitimately advances the native queue to braking-force-1; it is not promised to remain42% after research completion.",
+    "F018 remains separately experimental/best effort. These F100 results are not0.18 results."
+  ]
+}

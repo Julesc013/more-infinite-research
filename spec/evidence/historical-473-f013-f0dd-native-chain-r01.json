@@ -1,0 +1,201 @@
+{
+  "schema": 1,
+  "kind": "MIR5Historical473F013F0ddNativeChainV1",
+  "status": "passed-bounded-f013-published-to-f0dd-preservation-chain",
+  "scope": "One exact Factorio 0.13.20 F013 transition only: a published MIR 4.7.01303 source save followed directly by the named f0dd MIR 5.0.01300 preservation-only successor. It is not a complete catalogue, modpack, API, multiplayer, performance, release, or wider historical-origin qualification.",
+  "execution": {
+    "source_controller_commit": "c6eb150dc9edff3cbcebbafe5f5fd44776afa6ef",
+    "r04_controller_commit": "affc6b5126ac4a3a37523e125f4c142146c87388",
+    "source_runner_sha256": "B9E4685187C4B172FBF16D4359FFCB320C99F443643B6F16E0861AF9E8641489",
+    "r04_runner_sha256": "205C01C461E2BD9AD2757C84BB55828D4E5931890FD175D052DABA485D97288E",
+    "engine": {
+      "base_version": "0.13.20",
+      "path": "D:\\Games\\Factorio\\0.13\\bin\\x64\\factorio.exe",
+      "sha256": "F12C0DF5A5EF0D72F50A24BD76E077DFC9CBEAB4B31EE9EF0951A4A9C086B856"
+    },
+    "published_predecessor": {
+      "archive": "more-infinite-research_4.7.01303.zip",
+      "version": "4.7.01303",
+      "sha256": "3918B10A0902FABD09BEA6D1F0E7EFF06B20B84F3D8CC5EC73E36FEDAAE64D4D",
+      "bytes": 695785,
+      "profile_sha256": "BD7EC11778E769507490D228C4B8B1C08C8E52AD5B801C9C44C237719F29D5E3"
+    },
+    "f0dd_successor": {
+      "source_label": "f0dd9f62-root-r01",
+      "player_label": "0229",
+      "archive": "more-infinite-research_5.0.01300.zip",
+      "version": "5.0.01300",
+      "sha256": "C4E36AE31F5ED4F6F521FB389968C124C0178927B549409AAD8DAEE6D8CD8455",
+      "bytes": 453595,
+      "profile_sha256": "11E529ABE241F753A889A48AB5C1AC2A6C7E6FF83D7E0F4114DBFE1847AFD30C",
+      "source_commit": "f0dd9f62adc8bf0a8eaaf9babc1fcfef9f3241ea",
+      "player_tree": "0229b2bb3ad0c514fc4dca18c32fd544b9ba7d72",
+      "asset_readback": {
+        "path": "spec/evidence/current-assets-f0dd9f62-root-readback.json",
+        "sha256": "2BF5793D92C16ABD17F507884FE190BA74E1182F9979C8FBA2DA68E7BD10B121"
+      }
+    },
+    "fixture": {
+      "name": "mir-fixture-mir5-historical-transition",
+      "version": "0.1.0",
+      "metadata_sha256": "633F34471E5F84E08ED03BFF1DFE0F58EBCCAC6B16D3D12AC16C04CDABEC4247",
+      "r05_source_projection_members": {
+        "control.lua": "4E1A5B8B1EA1A0769C6E80531F956358EDA94EAAD5F32F78023EDA07D9F9A2A0",
+        "data-final-fixes.lua": "60BA1672EC7DA621A61CAC5C7759EA0F67FADE5B36F0D4F07C52657B8728591F",
+        "settings-updates.lua": "683B095B2AC3A2B6EC6493F967B6C5BB4F9CF10FE69735F7E52D9EDCC37C5AE2",
+        "target.lua": "00ACC312215D37C3138432F871C1609493FA46300D2458E79C3515B50C32F489",
+        "target-literal.lua": "E80149E90D9ACAA19D05C3149CCAD0936518F09A2023FA9E896CBBAF58A9A898",
+        "info.json": "5FB93E36C7AAA9C64154B5D0C74B0CDA12DE4A86123712E57C05B2976AA65A8B",
+        "metadata-473-f013-f016.json": "633F34471E5F84E08ED03BFF1DFE0F58EBCCAC6B16D3D12AC16C04CDABEC4247"
+      },
+      "published_r05_archive": {
+        "sha256": "79337039A73AACE47879E85F8B50BF5BDFF4FEFF26E4AA7A3C11665D356A7179",
+        "bytes": 6812
+      },
+      "successor_r01_archive": {
+        "sha256": "62394115A8B0E1443834F9FFBB4C3745EEB3AF6CFA71F10CC7A38B0AF9445345",
+        "bytes": 6805
+      },
+      "retained_r04_archive": {
+        "sha256": "F7948108B9BAFA04047611F70CC2921E53D833C1547431EE24BDCE93A4E2498F",
+        "bytes": 6774
+      }
+    }
+  },
+  "retained_adverses": {
+    "r01": {
+      "status": "pre-engine-zero-native-refusal",
+      "receipt_path": "build/qualification/historical-473-f013-published-source-r01-launch-records/execute-refusal-r01.json",
+      "receipt_sha256": "E2C4602C3C6B91FF916E6DE51D3A3F44A71EA3CE3C331C3E4AD4D4BB5B0D01E2",
+      "reason": "fresh-root caller admission collision",
+      "engine_processes": 0
+    },
+    "r02": {
+      "status": "pre-engine-adverse-with-restoration-recovery",
+      "terminal_path": "build/qualification/historical-473-f013-published-source-r02/terminal.json",
+      "terminal_sha256": "CEEE2FB6CDC43E145E4F2507104499E1ED005871C55F9FFE2C5F167CDC4187D3",
+      "recovery_path": "build/qualification/historical-473-f013-published-source-r02-execution/manual-restoration-r02.json",
+      "recovery_sha256": "6B6468A4478FB828723C2A0C90F4592997CA4CE2F46096F427AEE95E1428848C",
+      "reason": "fixture metadata adjacency refusal followed by retained archive-restoration recovery",
+      "engine_processes": 0
+    },
+    "r03": {
+      "status": "pre-engine-zero-native-adverse",
+      "terminal_path": "build/qualification/historical-473-f013-published-source-r03/terminal.json",
+      "terminal_sha256": "1F5E44A4513226BD595CE44B632B47694E517DC41D7E3225F2F4F3802C64F03E",
+      "native_result_path": "build/qualification/historical-473-f013-published-source-r03/native-output/result.json",
+      "native_result_sha256": "6E54A4A164560ABC0CB3DB90DB02D22B5E151C8BA4CB69C571069F90132AB680",
+      "reason": "checkout-local flat-library requirement refused before any native process run",
+      "engine_processes": 0
+    },
+    "r04": {
+      "status": "native-startup-adverse",
+      "result_sha256": "82B0E88DE13796CB8D50CF7E5FF57FFF8BC24180DE141EDE80171EB34C223BBE",
+      "terminal_sha256": "AAE70034976D3A6D185B11BA7EF2DB3B62DDE55CB41D5FE76E897BA0413D11D1",
+      "native_error": "No such node (title)",
+      "engine_processes": 1,
+      "source_lab_completed": false,
+      "source_save_produced": false,
+      "disposition": "The missing required legacy fixture title was corrected in later fixture input; this original startup receipt remains immutable."
+    }
+  },
+  "accepted_stages": [
+    {
+      "id": "r05-published-source",
+      "status": "passed-private-native-fixture",
+      "result_sha256": "7E0F0C2F28ECA246DEC939749C6C23F5240B27A7FC90EA7321EA52926CC68B48",
+      "terminal_sha256": "48566A9DAAFADE3003623BCF99D30CFFA1EA3536C5D9366F63AD233648DA8318",
+      "caller_sha256": "32058784CF5AD38C4ADB55D97435B57D3C7612E7B0DF0D01641623A43C724F7F",
+      "prepared_packet_sha256": "38D2FF13C2B6E41A308E73687117DAD69A7DDE4B26C0740D5C483CFA5111A849",
+      "source_laboratory_completions": 1,
+      "successor_laboratory_completions": 0,
+      "earned_mining_bonus": 0.05,
+      "protected_save": {
+        "sha256": "B9E2B660907C758412D473675AC1FCFA03879BB3132333469FE95FE48F8FF9EC",
+        "bytes": 1036934,
+        "path": "build/qualification/historical-473-f013-owned-inputs-r05/native-output/write-data/saves/mir5-native-complete.zip"
+      },
+      "process_runs": 4,
+      "pure_byte_identical_cold_reloads": 2,
+      "primary_custody": {
+        "root": "build/qualification/historical-473-f013-owned-inputs-r05/native-output",
+        "raw_primary_members": 61,
+        "raw_primary_bytes": 3521509,
+        "execution_records": 3,
+        "execution_record_bytes": 73151,
+        "independent_readback_path": "build/qualification/historical-473-f013-owned-inputs-r05/root-native-source-readback-r01.json",
+        "independent_readback_sha256": "988648F6447AD5AC9004FB2CCC2D970545C63AB5891BA9CD9CC867187BF48502"
+      }
+    },
+    {
+      "id": "r01-f0dd-successor",
+      "status": "passed-private-native-fixture",
+      "result_sha256": "7F1CE114BCB2B6483A96DF34B83FEBBAF33FE3827DD57B3E59C3B43DDE8CE77B",
+      "terminal_sha256": "124180CB4D31D732C398DCBAF0EF5931F5F761401994EE99FF1E4BF3FA79CFB5",
+      "caller_sha256": "2037942583DBEEB9ED3A4DEF29069DF79E8A773931A596B4A45E749038071DA2",
+      "prepared_packet_sha256": "2BDD3987665F4D657E1F4FD133D3FF672D83EADAA6F3B9ACC99B17CBBD805A11",
+      "input_save": {
+        "sha256": "B9E2B660907C758412D473675AC1FCFA03879BB3132333469FE95FE48F8FF9EC",
+        "byte_identical_to_protected_source_save": true
+      },
+      "carried_source_laboratory_completions": 1,
+      "new_successor_laboratory_completions": 0,
+      "preserved_mining_bonus": 0.05,
+      "successor_save": {
+        "sha256": "779D0ABF39258418E8D65AB0B12DBF8EE15B447E24C5E5D028572626DCF5814B",
+        "bytes": 1036835,
+        "path": "build/qualification/historical-473-f013-mir5-successor-r01/native-output/write-data/saves/mir5-native-complete.zip"
+      },
+      "process_runs": 3,
+      "pure_byte_identical_cold_reloads": 2,
+      "primary_custody": {
+        "root": "build/qualification/historical-473-f013-mir5-successor-r01/native-output",
+        "raw_primary_members": 55,
+        "raw_primary_bytes": 2465557,
+        "execution_records": 3,
+        "execution_record_bytes": 72477,
+        "independent_readback_path": "build/qualification/historical-473-f013-mir5-successor-r01/root-native-successor-readback-r01.json",
+        "independent_readback_sha256": "5AB91D94D3B97B8F245616A7AAA1959F40111EA297412B6919BD63034518DBBF"
+      }
+    }
+  ],
+  "chain_accounting": {
+    "published_source_laboratory_completions": 1,
+    "new_successor_laboratory_completions": 0,
+    "accepted_process_runs": 7,
+    "native_startup_adverse_process_runs": 1,
+    "accepted_pure_cold_reloads": 4,
+    "completed_saves": 2,
+    "source_save_reused_directly_for_successor": true
+  },
+  "errata": [
+    {
+      "record": "historical-473-f013-owned-inputs-r05/prepared-inputs-r05.json",
+      "original_statement": "R04 pre-engine metadata/load adverse",
+      "correction": "The immutable R04 result 82B0 is a real Factorio startup failure caused by the missing mandatory title; it is not a pre-engine result."
+    }
+  ],
+  "receipts": {
+    "path": "spec/evidence/historical-473-f013-f0dd-native-receipts-r01.json.gz",
+    "sha256": "69A4FF5C709AF7B921360E3D1830665887402C529DB868CEFEB3C6405FBFBA7C",
+    "bytes": 17432,
+    "uncompressed_sha256": "3EAA2D46852E3B55B961E06E10DCA378438E6B1BB521B73FB2604E7561436169",
+    "uncompressed_bytes": 113981,
+    "exact_original_raw_native_result_receipts": 3,
+    "strict_utf8_decode_roundtrip_verified": true,
+    "base64_roundtrip_verified": true,
+    "gzip_mtime_zero": true,
+    "exclusions": "Saves, full logs, runtime configuration, player data, preflight payloads, library-control payloads, archive payloads, and outer terminal payloads remain private."
+  },
+  "claims": {
+    "bounded_f013_published_to_f0dd_preservation_chain": true,
+    "complete_catalogue": false,
+    "modpack": false,
+    "api": false,
+    "multiplayer": false,
+    "performance": false,
+    "release_qualification": false,
+    "other_origins_or_targets": false
+  },
+  "limitations": "This evidence names only the F013 published 4.7.01303 source and the f0dd 5.0.01300 successor with their exact fixture, engine, profile, caller and protected-save inputs. It does not qualify a general 4.7.3 transition, other historical targets, new laboratory work in the successor, arbitrary saves, current packages, or release behavior."
+}

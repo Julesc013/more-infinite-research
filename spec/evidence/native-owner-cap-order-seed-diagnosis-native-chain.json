@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeCapFixtureSeedDiagnosisV1",
+  "status": "original-seed-acquires-mir-right-before-foreign-disablement",
+  "diagnostic_source": "f755c1dbaf6786b8f283f146c85145f023ed5e75",
+  "diagnostic_player_tree": "1f449efad05e660d52597e06321579130c7619e0",
+  "diagnostic_archive_sha256": "DE8FC8D19178D2785F0A3538351C85A4C1C54C1B413CDC65431C78CDE05A56D2",
+  "baseline_archive_sha256": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE",
+  "diagnostic_member_difference": [
+    "runtime/caps.lua",
+    "runtime/lifecycle.lua"
+  ],
+  "fixture_source": "0ddeb251984d166b075afb6f69367837ffd34dc7",
+  "fixture_pin_metadata_source": "3e76fe2d41b8e99305f6a132c00024b2f927bee9",
+  "engine_version": "2.1.23",
+  "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+  "cases": [
+    {
+      "primary_root": "build/mir5/recovery-historical/native-owner-cap-order-runtime-ownership-r01",
+      "native_result_sha256": "76A2EC496CCFEABB1C1B0435F3A31FC38E9BA58C5EA625223367AED89D4D90CF",
+      "status": "failed",
+      "original_and_primary_members_verified": 7,
+      "bytes": 53300,
+      "log_sha256": "82067D6C732EDF1E4EE6EC4816A3B3404BE28FBF865B5F8F2131DCFCA959E77D",
+      "diagnostic_rows": 8
+    },
+    {
+      "primary_root": "build/mir5/recovery-historical/native-owner-cap-order-runtime-ownership-canonical-r01",
+      "native_result_sha256": "9B906DB0E9873389A8D8D6155F1F26E12486DDEE167E5C506642896661062AE3",
+      "status": "passed-private-native-fixture",
+      "original_and_primary_members_verified": 22,
+      "bytes": 1526287,
+      "log_sha256": "9D9BF8E0159534A25A160B2110FE45975713A1965688C486BC69A6829525589D",
+      "diagnostic_rows": 28
+    }
+  ],
+  "observations": [
+    "During fresh canonical setup, foreign level=2 assignment synchronously fires research-finished while enabled=true and before a MIR restoration record exists. MIR caps then disable the above-cap technology and record disabled=true.",
+    "Only after that callback does the old fixture explicitly disable the foreign technology. Its subsequent reset event again exposes enabled=true before MIR handles the reset. Therefore this source never establishes foreign disablement predating MIR cap ownership.",
+    "The relaxed trace confirms the same foreign restoration right was already present on entry to configuration; relaxation does not create that right.",
+    "No permuted diagnostic rerun was needed after the fresh canonical trace identified the first acquisition. The original E3 permuted pass and relaxed adverse remain preserved under their original inputs."
+  ],
+  "disposition": "Correct fixture setup with a protected uncapped source save and explicit foreign disablement after native reset, then enable finite caps through ordinary configuration. Preserve the original foreign=false expectation and all previous native adverses.",
+  "limits": [
+    "This diagnosis uses a private read-only logging variant, not an accepted player package or performance input.",
+    "The old fixture seeded zero lab completions. The diagnostic canonical save and two cold reloads validate the trace only, not a genuine pre-disabled foreign transition.",
+    "No caps/lifecycle source-policy fix follows from this artificial seed alone. Corrected pre-cap source, permutation, relaxation and saved-state qualification remain open.",
+    "Native results and outer custody/optional-field faults remain distinct in the exact receipts. No original failed terminal is rewritten."
+  ],
+  "receipts": {
+    "path": "spec/evidence/native-owner-cap-order-seed-diagnosis-receipts.json.gz",
+    "bytes": 18466,
+    "sha256": "EC8A544CF493ADB09FBFA55F1BF6D8D34804798C5F601BA776AC96AEC4F630CE",
+    "uncompressed_sha256": "81C368D63837C63A65D2F88FCBCA250250AE6D496630A75E29CA24826FAB602F",
+    "members": 7
+  }
+}

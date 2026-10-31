@@ -1,0 +1,313 @@
+{
+  "schema": 1,
+  "kind": "MIR5ScriptedEffectsTwoClientNativeChainV1",
+  "run": 40046121628,
+  "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40046121628",
+  "source": "cae60ba2b2403940e8738ca960a2d55830dc11d7",
+  "status": "passed-private-two-client-fixture",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "file_version": "2.0.77.84539",
+    "product_version": "2.0.77",
+    "base_version": "2.0.77"
+  },
+  "player": {
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+    "sha256": "69768BCF6B5439556C37AD4EC02EADBFC80465FD7445FADB2165EF60BBBEB440"
+  },
+  "manifest_members_verified": 218,
+  "manifest_sha256": "4157186A40AF22F3C07C8BD2CA0E13ED9B1FD24464DCC46DBA0917DA5727B6E4",
+  "markers": [
+    {
+      "case": "scripted-effects-multiplayer",
+      "stage": "ready",
+      "status": "passed",
+      "witnesses": {
+        "actual_join_events": 0,
+        "two_connected_clients_required": true,
+        "runtime_owned_state_checked": false,
+        "physical_rates_checked": false,
+        "foreign_offsets_preserved": false,
+        "expected_client_locales": {
+          "MIR5English": "en",
+          "MIR5Deutsch": "de"
+        },
+        "actual_target_completions": {
+          "agricultural_growth_speed": 0,
+          "spoilage_preservation": 0
+        },
+        "external_spoilage": {
+          "initial_baseline": 2
+        },
+        "agriculture": {},
+        "spoilage": {
+          "fixture_item_spoil_ticks": 600,
+          "spoiled_physically": false
+        },
+        "passive_repair": {
+          "player_repaired": false,
+          "comparison_repaired": false,
+          "restart_queue_seeded": false,
+          "restart_repaired": false
+        },
+        "force_lifecycle": {
+          "created": false,
+          "reset_observed": false,
+          "merged": false
+        },
+        "host_restart_observed": false,
+        "on_load_read_only": false,
+        "rendering_qualified": false,
+        "performance_or_stress_qualified": false,
+        "gameplay_scope": "disposable-f200-space-age-scripted-effects-multiplayer-only"
+      }
+    },
+    {
+      "case": "scripted-effects-multiplayer",
+      "stage": "rejoin-ready",
+      "status": "passed",
+      "witnesses": {
+        "actual_join_events": 2,
+        "two_connected_clients_required": true,
+        "runtime_owned_state_checked": true,
+        "physical_rates_checked": true,
+        "foreign_offsets_preserved": true,
+        "expected_client_locales": {
+          "MIR5English": "en",
+          "MIR5Deutsch": "de"
+        },
+        "actual_target_completions": {
+          "agricultural_growth_speed": 1,
+          "spoilage_preservation": 1
+        },
+        "external_spoilage": {
+          "initial_baseline": 2,
+          "after_player_level": 2.02,
+          "after_external_force": 2.0402,
+          "after_force_merge": 2.02,
+          "player_spoilage_level_after_merge": 2,
+          "after_external_rebase": 3
+        },
+        "agriculture": {
+          "player_remaining_ticks": 17821,
+          "comparison_remaining_ticks": 18000,
+          "native_growth_ticks": 18000
+        },
+        "spoilage": {
+          "fixture_item_spoil_ticks": 600,
+          "expected_scaled_ticks": 1800,
+          "observed_player_ticks": 1800,
+          "observed_comparison_ticks": 1800,
+          "spoiled_physically": true
+        },
+        "passive_repair": {
+          "player_repaired": true,
+          "comparison_repaired": true,
+          "restart_queue_seeded": false,
+          "restart_repaired": false
+        },
+        "force_lifecycle": {
+          "created": true,
+          "reset_observed": true,
+          "merged": true
+        },
+        "host_restart_observed": false,
+        "on_load_read_only": false,
+        "rendering_qualified": false,
+        "performance_or_stress_qualified": false,
+        "gameplay_scope": "disposable-f200-space-age-scripted-effects-multiplayer-only"
+      }
+    },
+    {
+      "case": "scripted-effects-multiplayer",
+      "stage": "restart-ready",
+      "status": "passed",
+      "witnesses": {
+        "actual_join_events": 4,
+        "two_connected_clients_required": true,
+        "runtime_owned_state_checked": true,
+        "physical_rates_checked": true,
+        "foreign_offsets_preserved": true,
+        "expected_client_locales": {
+          "MIR5English": "en",
+          "MIR5Deutsch": "de"
+        },
+        "actual_target_completions": {
+          "agricultural_growth_speed": 1,
+          "spoilage_preservation": 1
+        },
+        "external_spoilage": {
+          "initial_baseline": 2,
+          "after_player_level": 2.02,
+          "after_external_force": 2.0402,
+          "after_force_merge": 2.02,
+          "player_spoilage_level_after_merge": 2,
+          "after_external_rebase": 3
+        },
+        "agriculture": {
+          "player_remaining_ticks": 17821,
+          "comparison_remaining_ticks": 18000,
+          "native_growth_ticks": 18000
+        },
+        "spoilage": {
+          "fixture_item_spoil_ticks": 600,
+          "expected_scaled_ticks": 1800,
+          "observed_player_ticks": 1800,
+          "observed_comparison_ticks": 1800,
+          "spoiled_physically": true
+        },
+        "passive_repair": {
+          "player_repaired": true,
+          "comparison_repaired": true,
+          "restart_queue_seeded": true,
+          "restart_repaired": false
+        },
+        "force_lifecycle": {
+          "created": true,
+          "reset_observed": true,
+          "merged": true
+        },
+        "host_restart_observed": false,
+        "on_load_read_only": false,
+        "rendering_qualified": false,
+        "performance_or_stress_qualified": false,
+        "gameplay_scope": "disposable-f200-space-age-scripted-effects-multiplayer-only"
+      }
+    },
+    {
+      "case": "scripted-effects-multiplayer",
+      "stage": "completed",
+      "status": "passed",
+      "witnesses": {
+        "actual_join_events": 6,
+        "two_connected_clients_required": true,
+        "runtime_owned_state_checked": true,
+        "physical_rates_checked": true,
+        "foreign_offsets_preserved": true,
+        "expected_client_locales": {
+          "MIR5English": "en",
+          "MIR5Deutsch": "de"
+        },
+        "actual_target_completions": {
+          "agricultural_growth_speed": 1,
+          "spoilage_preservation": 1
+        },
+        "external_spoilage": {
+          "initial_baseline": 2,
+          "after_player_level": 2.02,
+          "after_external_force": 2.0402,
+          "after_force_merge": 2.02,
+          "player_spoilage_level_after_merge": 2,
+          "after_external_rebase": 3
+        },
+        "agriculture": {
+          "player_remaining_ticks": 17821,
+          "comparison_remaining_ticks": 18000,
+          "native_growth_ticks": 18000
+        },
+        "spoilage": {
+          "fixture_item_spoil_ticks": 600,
+          "expected_scaled_ticks": 1800,
+          "observed_player_ticks": 1800,
+          "observed_comparison_ticks": 1800,
+          "spoiled_physically": true
+        },
+        "passive_repair": {
+          "player_repaired": true,
+          "comparison_repaired": true,
+          "restart_queue_seeded": true,
+          "restart_repaired": true
+        },
+        "force_lifecycle": {
+          "created": true,
+          "reset_observed": true,
+          "merged": true
+        },
+        "host_restart_observed": true,
+        "on_load_read_only": true,
+        "rendering_qualified": false,
+        "performance_or_stress_qualified": false,
+        "gameplay_scope": "disposable-f200-space-age-scripted-effects-multiplayer-only"
+      }
+    }
+  ],
+  "receipts": [
+    {
+      "artifact_path": "multiplayer/preparation/result.json",
+      "gzip": "spec/mir5/evidence/scripted-effects-multiplayer-40046121628-multiplayer-preparation-result.json.gz",
+      "uncompressed_sha256": "17B87153267CAB3658A20ADA9AFB4D49FB32F1C4BC5AAF69B2EB267FD5866125"
+    },
+    {
+      "artifact_path": "multiplayer/session/result.json",
+      "gzip": "spec/mir5/evidence/scripted-effects-multiplayer-40046121628-multiplayer-session-result.json.gz",
+      "uncompressed_sha256": "38D8657207050FB3F2EC392979C0EB0CAEFD3AE0D518F7A47E5C51E1AEDDBAAF"
+    },
+    {
+      "artifact_path": "multiplayer/session/session.json",
+      "gzip": "spec/mir5/evidence/scripted-effects-multiplayer-40046121628-multiplayer-session-session.json.gz",
+      "uncompressed_sha256": "55C17DEEBE93695DAC054E89AA1ACD3565B83150F2F9C7CBACCEA6E627401230"
+    },
+    {
+      "artifact_path": "multiplayer/session/phase-server-initial.stdout.log",
+      "gzip": "spec/mir5/evidence/scripted-effects-multiplayer-40046121628-multiplayer-session-phase-server-initial.stdout.log.gz",
+      "uncompressed_sha256": "9E6A03FC4E18D44BE3D56D5F4EEE9D4C2F26E0BDFD5650D7D893B8D0D52DF397"
+    },
+    {
+      "artifact_path": "multiplayer/session/phase-server-restart.stdout.log",
+      "gzip": "spec/mir5/evidence/scripted-effects-multiplayer-40046121628-multiplayer-session-phase-server-restart.stdout.log.gz",
+      "uncompressed_sha256": "604C391FEADD762313D684F2A0B9BCEB6C0B41B210AD3F0F4A00711AA1157658"
+    }
+  ],
+  "session": {
+    "schema": 1,
+    "kind": "MIR5ScriptedEffectsMultiplayerSessionV1",
+    "case": "scripted-effects-multiplayer",
+    "status": "passed-private-two-client-session",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "seed_sha256": "BA067851CE9EA4122FBD415E773E5BD4528090EF86A9034310EE946B3FC9E961",
+    "restart_save_sha256": "CF83CF9E6CB04FEEEAC6AC01AC24671B5E2E2B773E9AB3DDD32C67EC85CD58A4",
+    "final_save_sha256": "EDAE349CCC00643F3901162F5EBE6914CE6401390D8603C1F1B94766ABBA73A1",
+    "markers": [
+      "ready",
+      "rejoin-ready",
+      "restart-ready",
+      "completed"
+    ],
+    "clients": [
+      {
+        "name": "MIR5English",
+        "locale": "en",
+        "port": 61669,
+        "config": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40046121628-1\\multiplayer\\session\\client-en.ini",
+        "write_data": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40046121628-1\\multiplayer\\session\\client-en"
+      },
+      {
+        "name": "MIR5Deutsch",
+        "locale": "de",
+        "port": 61670,
+        "config": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40046121628-1\\multiplayer\\session\\client-de.ini",
+        "write_data": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40046121628-1\\multiplayer\\session\\client-de"
+      }
+    ],
+    "client_graphics_arguments": [
+      "--force-graphics-preset",
+      "low",
+      "--video-memory-usage",
+      "low"
+    ],
+    "screenshots": []
+  },
+  "release_qualification": false,
+  "limitations": [
+    "Exact F2002.0.77 Space Age disposable runtime scenario at the recorded source, before later packaging/adapter changes. Not final-layout or final-package qualification.",
+    "Two actual clients use native low graphics/low VRAM settings on one loopback host; no rendered screenshot, cross-hardware, numeric UI latency, menu timing, or stress claim.",
+    "Actual lab completions, planted growth timers, physical spoiled items and repaired damaged walls are distinct from the fixture-supplied independent higher-force level.",
+    "The read-only load witness covers scalar fixture state and retained native outcomes with real joining clients; separate host controls own the implementation-level no-on_load-write checks.",
+    "Removal/readdition of the scripted feature/mod and large scheduled-entity stress remain separate obligations."
+  ],
+  "adverse_chains": [
+    "spec/mir5/evidence/scripted-effects-multiplayer-adverse-chain.json",
+    "spec/mir5/evidence/scripted-effects-multiplayer-locale-adverse-chain.json"
+  ]
+}

@@ -1,0 +1,166 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentF200LibraryClientReadbackV1",
+  "derived": true,
+  "status": "passed-exact-two-client-functional-and-bounded-visual-scope",
+  "release_qualification": false,
+  "run": 40191437691,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40191437691",
+  "controller_commit": "7ac8d758babe9bc7b13cd00e94862a8f3988d32d",
+  "fixture_harness_source_commit": "0e50d9ba8c9ee370f440db2db8a53a4372d60ea2",
+  "player_source_commit": "fa1146e9778ecf7fc1b80449a2deec7ee0083ec3",
+  "player_tree": "41b78703f25bdceb1e05b57d7c725e0f6c9bef2c",
+  "player_sha256": "76D4D21B12EA8EA939DFFC599EC0746A1D9E13656326CACF5CB4A6D0303EB663",
+  "engine_version": "2.0.77",
+  "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+  "manifest_sha256": "77AFCB14B4CAD68CC44F28026227B9134F5AE96BEFD5682C3A05DB6726CFEBBE",
+  "manifest_members_verified": 224,
+  "artifact_bytes_verified": 22158299,
+  "native_receipt_sha256": "FFEA3D8D4B1FDBD86AADBA629757B00DCC9F3A88D7C28DDC0E4A07B97D924D14",
+  "protected_seed_byte_identical": true,
+  "library_controls_restored": true,
+  "restart_save_sha256": "6935663373C4417EBC5B258278966D517D0E00680E67F9A52AF747EDF28EA93A",
+  "final_save_sha256": "168600CBA2BC072B5A2E28F2F548B38491B4287A68845823393DA5D0004C1B37",
+  "actual_server_log_markers": [
+    {
+      "log": "phase-server-initial.stdout.log",
+      "log_sha256": "AF3F0E831B51E950708702F6B86FE6AC3755C64FE4FF867C0856DB0D202F5DAD",
+      "stage": "ready",
+      "actual_join_events": 0,
+      "screenshot_calls": 0,
+      "initial_settled_without_reopen": false
+    },
+    {
+      "log": "phase-server-initial.stdout.log",
+      "log_sha256": "AF3F0E831B51E950708702F6B86FE6AC3755C64FE4FF867C0856DB0D202F5DAD",
+      "stage": "rejoin-ready",
+      "actual_join_events": 2,
+      "screenshot_calls": 6,
+      "initial_settled_without_reopen": true
+    },
+    {
+      "log": "phase-server-initial.stdout.log",
+      "log_sha256": "AF3F0E831B51E950708702F6B86FE6AC3755C64FE4FF867C0856DB0D202F5DAD",
+      "stage": "restart-ready",
+      "actual_join_events": 4,
+      "screenshot_calls": 8,
+      "initial_settled_without_reopen": true
+    },
+    {
+      "log": "phase-server-restart.stdout.log",
+      "log_sha256": "08C24313D319F106C8A9EA4028F08E3056F2B861A38B09F0F2C6F7EC07A4A90A",
+      "stage": "completed",
+      "actual_join_events": 6,
+      "screenshot_calls": 10,
+      "initial_settled_without_reopen": true
+    }
+  ],
+  "screenshots": [
+    {
+      "client": "client-en",
+      "stage": "availability",
+      "path": "library-multiplayer-current-f200-canonical/native/session/client-en/script-output/mir5-library-multiplayer/availability-1.png",
+      "sha256": "61BFE89D0D6430E77C70B9A146EC80DD883CA3647527E11E458D1C2857DAFD0F",
+      "bytes": 1062894,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "client": "client-en",
+      "stage": "initial",
+      "path": "library-multiplayer-current-f200-canonical/native/session/client-en/script-output/mir5-library-multiplayer/initial-1.png",
+      "sha256": "B27190B785AB4B2F193EFFF168F6D5C22FCC40F28AA4E4516504D7D685A41283",
+      "bytes": 1104462,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "client": "client-en",
+      "stage": "settled",
+      "path": "library-multiplayer-current-f200-canonical/native/session/client-en/script-output/mir5-library-multiplayer/settled-1.png",
+      "sha256": "A3EF5B6F0E4780892E5DB6BA133FBBDA8F8EF451BB642D57F172F7D6FD498FA9",
+      "bytes": 1101624,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "client": "client-en",
+      "stage": "rejoin",
+      "path": "library-multiplayer-current-f200-canonical/native/session/client-en/script-output/mir5-library-multiplayer/rejoin-1.png",
+      "sha256": "99A00538FC0AD47964367B8129E573E2A2B603D3821767900DB83B3A53CB726F",
+      "bytes": 1151151,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "client": "client-en",
+      "stage": "restart",
+      "path": "library-multiplayer-current-f200-canonical/native/session/client-en/script-output/mir5-library-multiplayer/restart-1.png",
+      "sha256": "2A1A6D53EAF49846E78847CA58230479F7473BBA2F7E7B2545A0B91B72983AA4",
+      "bytes": 1197657,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "client": "client-de",
+      "stage": "availability",
+      "path": "library-multiplayer-current-f200-canonical/native/session/client-de/script-output/mir5-library-multiplayer/availability-2.png",
+      "sha256": "C9058E8180CFA19CA12118DA88069F6BFC7FF22A5D46E4010F9DFA802BA96979",
+      "bytes": 1067146,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "client": "client-de",
+      "stage": "initial",
+      "path": "library-multiplayer-current-f200-canonical/native/session/client-de/script-output/mir5-library-multiplayer/initial-2.png",
+      "sha256": "F4E1B31155516479C3C7F925F20095513E945A0F1C4862D80A1BCC94C47ED880",
+      "bytes": 1113467,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "client": "client-de",
+      "stage": "settled",
+      "path": "library-multiplayer-current-f200-canonical/native/session/client-de/script-output/mir5-library-multiplayer/settled-2.png",
+      "sha256": "4BBBA9CEE83FB0302F8BFA64A9BEA7898A75F176D8A664B83762BDFE6C71D1F5",
+      "bytes": 1110073,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "client": "client-de",
+      "stage": "rejoin",
+      "path": "library-multiplayer-current-f200-canonical/native/session/client-de/script-output/mir5-library-multiplayer/rejoin-2.png",
+      "sha256": "8A26E9EFD0832741755E985DB923C229D4C77C1B2C86C36CFABF78E06C85E22D",
+      "bytes": 1162610,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "client": "client-de",
+      "stage": "restart",
+      "path": "library-multiplayer-current-f200-canonical/native/session/client-de/script-output/mir5-library-multiplayer/restart-2.png",
+      "sha256": "9F3ABCBED2BB3F9A692C3E4AB7D0FF3A7412D2CE70F738B6ED76EE8A34F18E4D",
+      "bytes": 1199142,
+      "width": 1280,
+      "height": 720
+    }
+  ],
+  "root_visual_review": {
+    "method": "view_image of all ten original native PNGs after SHA256 readback",
+    "images_reviewed": 10,
+    "observed": [
+      "English gear and German mining-drill views remain distinct through settle, rejoin and host restart.",
+      "Base-only Space Age absence explanations are readable in both clients.",
+      "The selected header, filters, research rows and visible detail text render without the previously observed German horizontal clipping.",
+      "Existing English fallbacks and native identifier text remain visible in the German view; vertical scrolling is required for lower details."
+    ],
+    "scope": "These ten selected1280x720 views only; no claim of complete translation or every Library interaction/resolution."
+  },
+  "limits": [
+    "This is currentfa114/76D4 F200 Base-only functional evidence. It does not qualify F210, Space Age native-lab explanations, scripted-effects multiplayer or every mod profile.",
+    "Functional profiler/log observations are not a matched Library-latency or memory acceptance result.",
+    "Original saves, configurations, complete logs and screenshots remain in primary custody at build/mir5/recovery-historical/library-multiplayer-current-f200/40191437691/black-glass-library-multiplayer-current-f200-canonical-40191437691-1."
+  ]
+}

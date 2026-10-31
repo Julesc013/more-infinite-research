@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "kind": "MIR5FixedCompetingF200SAReferenceChainV1",
+  "run": {
+    "id": 40009033780,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40009033780",
+    "conclusion": "success"
+  },
+  "custody": "build/mir5/black-glass/incoming/40009033780/black-glass-competing-fixed-reference-40009033780-1",
+  "manifest_members_verified": 119,
+  "providers": [
+    {
+      "key": "plates",
+      "arms": {
+        "upstream": {
+          "gzip": "spec/mir5/evidence/competing-fixed-plates-upstream-native.json.gz",
+          "uncompressed_sha256": "34BA482E2DEE98B72BA73DB55E57CB53DB348B11B8F5CE8671AB72610A1D2BB4"
+        },
+        "published": {
+          "gzip": "spec/mir5/evidence/competing-fixed-plates-published-native.json.gz",
+          "uncompressed_sha256": "EC15D107D498474125E0D4F47CED0B684B68C8D7C1E612E1271D39110B7AE96D"
+        },
+        "foreign": {
+          "gzip": "spec/mir5/evidence/competing-fixed-plates-foreign-native.json.gz",
+          "uncompressed_sha256": "4EEE1A7B51CA9752A4CB920A127BE94C20023D04DD73483BA70A08FE14FEECB2"
+        }
+      }
+    },
+    {
+      "key": "science-packs",
+      "arms": {
+        "upstream": {
+          "gzip": "spec/mir5/evidence/competing-fixed-science-packs-upstream-native.json.gz",
+          "uncompressed_sha256": "8B2C26BC7281EBA57C42608F93E11509F2245A7883452605AC0386E6C1D4EB5B"
+        },
+        "published": {
+          "gzip": "spec/mir5/evidence/competing-fixed-science-packs-published-native.json.gz",
+          "uncompressed_sha256": "6253C36385FE31CA9F2A035D90B76132CF40A42A5448181CD60278FBE2609735"
+        },
+        "foreign": {
+          "gzip": "spec/mir5/evidence/competing-fixed-science-packs-foreign-native.json.gz",
+          "uncompressed_sha256": "400E4FD058A7B0ED84A50E714B85B323DD77719C2A8ECE984267126A8C789C0E"
+        }
+      }
+    },
+    {
+      "key": "bioflux",
+      "arms": {
+        "upstream": {
+          "gzip": "spec/mir5/evidence/competing-fixed-bioflux-upstream-native.json.gz",
+          "uncompressed_sha256": "80920088E4335B54011FB2383EEEE79BF88600D7813E1999B28363FF3C6A5EA1"
+        },
+        "published": {
+          "gzip": "spec/mir5/evidence/competing-fixed-bioflux-published-native.json.gz",
+          "uncompressed_sha256": "4489B6EE96AD271F91E7BC60DAC41ABDE8973FA37FDDA249153B9A81B0723B67"
+        },
+        "foreign": {
+          "gzip": "spec/mir5/evidence/competing-fixed-bioflux-foreign-native.json.gz",
+          "uncompressed_sha256": "015F8AD4209FDA99144A2F11DE35F064FF8329C9FCEF41FE381A428EB2E165DF"
+        }
+      }
+    },
+    {
+      "key": "fish",
+      "arms": {
+        "upstream": {
+          "gzip": "spec/mir5/evidence/competing-fixed-fish-upstream-native.json.gz",
+          "uncompressed_sha256": "5128519DE594647C935E13B0AA2EDC1E0364EE31C7EBA3265027F5C4972CCA4B"
+        },
+        "published": {
+          "gzip": "spec/mir5/evidence/competing-fixed-fish-published-native.json.gz",
+          "uncompressed_sha256": "92221BF2853531E12FACD62A14D62BA784F55AA8F2253CF47D0EBB19575E067A"
+        },
+        "foreign": {
+          "gzip": "spec/mir5/evidence/competing-fixed-fish-foreign-native.json.gz",
+          "uncompressed_sha256": "7AB72C64D9F105EE8A8411D54B61A41BDF4393713DBFC523C9245CFA15E2924F"
+        }
+      }
+    }
+  ],
+  "release_qualification": false,
+  "source": "9e450aed8114c4b1e28a46af4e26863ee0dc0f7c",
+  "facts": {
+    "path": "tests/mir5/fixtures/competing-fixed-f200-sa-captured-facts.json",
+    "sha256": "5832D7B55CDE46132CB9677BCE2C009AF67A713525179C5CD1365B6F5C484889"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-mir5-scripted-effects-native",
+  "version": "0.1.0",
+  "title": "MIR 5 private native scripted-effects fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable Space Age lab, agricultural tower, and spoilage-clock qualification fixture.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.23", "space-age", "more-infinite-research = 5.0.21000"]
+}

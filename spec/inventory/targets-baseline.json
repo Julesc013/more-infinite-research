@@ -1,0 +1,537 @@
+{
+  "format": 1,
+  "kind": "mir5-published-target-subsets-baseline",
+  "status": "source-characterized-not-mir5-or-native-qualified",
+  "scope": {
+    "subject": "Nine shipped MIR 4.7 target archives retained by targets.md",
+    "target_contract": "spec/mir5/targets.md baseline table: F013, F014, F015, F016, F017, F100, F110, F200 and F210; F018 is not a baseline target.",
+    "not_a_claim": [
+      "Archive contents are historical evidence, not MIR5 player-package authority.",
+      "Matching archived Lua does not establish target support.",
+      "This record does not establish a current installed engine, native execution, save migration, or MIR5 qualification."
+    ]
+  },
+  "published_baseline": {
+    "release_tag": "v4.7.0",
+    "source_commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+    "archive_directory": "dist/4.7.0",
+    "hash_authorities": [
+      "dist/4.7.0/SHA256SUMS.txt",
+      "dist/4.7.0/RELEASE-MANIFEST.json"
+    ],
+    "verification": "Each whole-ZIP SHA-256 below matched both published hash authorities; ZIP central directories and members were read in place without extraction or copies."
+  },
+  "common_player_entrypoints": {
+    "all_nine_have": [
+      {
+        "member": "data.lua",
+        "sha256": "99b39402887b8a5971891b0275015d2ff250e45ba3bfed0230d8b65fe65ea856",
+        "calls": "prototypes.mir.stage.data.run"
+      },
+      {
+        "member": "data-updates.lua",
+        "sha256": "18ea44aa66ee8321c36b5c3271ab06fbf28abd246c68ea8b92945fa751cdf811",
+        "calls": "prototypes.mir.stage.data_updates.run"
+      },
+      {
+        "member": "data-final-fixes.lua",
+        "sha256": "2c1cb52080ba1b73a2dcdbdc617f918adc7cb743caff5422f61d6be1cdb22930",
+        "calls": "prototypes.mir.stage.data_final_fixes.run"
+      },
+      {
+        "member": "settings.lua",
+        "sha256": "5e5dbc03d7d1ac3ac3977cf4ff1c349847ed29e4ff295f19b5b6de18889cbd7a",
+        "calls": "prototypes.mir.stage.settings.run"
+      },
+      {
+        "member": "control.lua",
+        "sha256": "91ec8a63ffec27aacddc9f6ec841a64e782ea923214ac5fb37c367a716e4ace9",
+        "calls": "prototypes.mir.stage.control.run"
+      }
+    ],
+    "absent_from_all_nine": [
+      "settings-updates.lua"
+    ]
+  },
+  "explicit_shipped_gate_evidence": {
+    "member": "prototypes/mir/stage/control.lua",
+    "sha256": "af3934244889ffbda6b44a425240279d78eedb093e1601d3c981b1ff832915b5",
+    "lines": {
+      "16-18": "Registers runtime scripted_techs only when scripted_techs, productivity_family_adoption, or research_library is true.",
+      "20-21": "Registers runtime settings_profile only when settings_profiles is true."
+    },
+    "research_effect_gate": {
+      "member": "prototypes/mir/planner/stream_compiler/qualify.lua",
+      "line": 175,
+      "condition": "recipe_productivity false skips the recipe-productivity qualification path."
+    },
+    "interpretation_limit": "These are archived source routing facts. A true gate records shipped selection only; it is not an observed engine capability."
+  },
+  "subset_evidence": {
+    "F013_to_F110": {
+      "targets": [
+        "F013",
+        "F014",
+        "F015",
+        "F016",
+        "F017",
+        "F100",
+        "F110"
+      ],
+      "member_count_each": 282,
+      "explicitly_disabled_by_each_profile": [
+        "compatibility_repairs",
+        "module_permissions",
+        "pipeline_extent",
+        "productivity_family_adoption",
+        "prototype_limits",
+        "recipe_productivity",
+        "research_library",
+        "scripted_techs",
+        "settings_profiles",
+        "technology_constant_overlays"
+      ],
+      "runtime_ui_settings_effect_result": "The common control gate does not register scripted runtime/UI or settings-profile handlers, and the recipe-productivity planner path is disabled.",
+      "hard_member_omissions_relative_to_F200": [
+        "prototypes/mir/runtime/research_browser.lua",
+        "prototypes/mir/runtime/research_browser_actions.lua",
+        "prototypes/mir/runtime/research_browser_core.lua",
+        "prototypes/mir/runtime/research_browser_factorio_catalogue.lua",
+        "prototypes/mir/runtime/research_browser_mir_provider.lua",
+        "prototypes/mir/runtime/research_browser_model.lua",
+        "prototypes/mir/runtime/effects/passive_repair.lua",
+        "prototypes/mir/runtime/maximum_level_control.lua"
+      ],
+      "migration_members": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json"
+      ],
+      "missing_migration_member": "migrations/more-infinite-research_4.7.0.json"
+    },
+    "F200": {
+      "relative_to": "F013",
+      "member_count_delta": 60,
+      "profile_enabled_gates": [
+        "compatibility_repairs",
+        "module_permissions",
+        "pipeline_extent",
+        "prototype_limits",
+        "recipe_productivity",
+        "research_library",
+        "scripted_techs",
+        "settings_profiles",
+        "technology_constant_overlays"
+      ],
+      "profile_disabled_gate": "productivity_family_adoption",
+      "selected_added_members": [
+        {
+          "member": "prototypes/mir/runtime/research_browser.lua",
+          "sha256": "ff0f10494b38753bd17609ca5fe8abbfd8bf967d54c23f24ceffecb4fccf56c0"
+        },
+        {
+          "member": "prototypes/mir/runtime/effects/passive_repair.lua",
+          "sha256": "38178a2f06abd99e45cb71eaf9770278033afb544317261df3173c746d851ab3"
+        },
+        {
+          "member": "prototypes/mir/runtime/maximum_level_control.lua",
+          "sha256": "d786e6d522b87b9102f2d774d7b0caa825b54ddf18753c4cc776cd6db1789fce"
+        }
+      ],
+      "migration_omission": "migrations/more-infinite-research_4.7.0.json is absent.",
+      "relative_member_additions": 61,
+      "relative_member_removal": "prototypes/mir/compatibility/policies/k2_science_phase.lua"
+    },
+    "F210": {
+      "relative_to": "F200",
+      "member_count_delta": 5,
+      "profile_enabled_gates": [
+        "compatibility_repairs",
+        "module_permissions",
+        "pipeline_extent",
+        "productivity_family_adoption",
+        "prototype_limits",
+        "recipe_productivity",
+        "research_library",
+        "scripted_techs",
+        "settings_profiles",
+        "technology_constant_overlays"
+      ],
+      "added_members": [
+        {
+          "member": "migrations/more-infinite-research_4.7.0.json",
+          "sha256": "0980b0b6f1675f6827a8e4151f778143ea74c9c6c3440cc2318129dbce63c379"
+        },
+        {
+          "member": "prototypes/mir/compatibility/policies/k2_science_phase.lua",
+          "sha256": "799611770d758603b1082f3716e9b18e715dd0506b0323ac6b9eeb6480075780"
+        },
+        {
+          "member": "prototypes/mir/planner/stream_compiler/k2_imersite_migration_alias.lua",
+          "sha256": "a7464826c29b4e9f84ff3d5eea75a5358f71852179352c85ab24c79f2f782b37"
+        },
+        {
+          "member": "prototypes/mir/runtime/k2_imersite_staged_state_migration.lua",
+          "sha256": "9fd7a9d218bb7bd1f7722781ac3b3b11725994faefff77d81a716ef3e9a144b4"
+        },
+        {
+          "member": "prototypes/mir/runtime/planet_discovery_recovery.lua",
+          "sha256": "0e2fc69b9338f9a4a1b2ed7dc4495d2ee08f0d02135cf07491bb352222bc1098"
+        }
+      ]
+    }
+  },
+  "targets": [
+    {
+      "target": "F013",
+      "baseline_engine": "0.13.20",
+      "archive": "more-infinite-research_4.7.01300.zip",
+      "archive_sha256": "3567958ff79fea3ad84232f506226f9dd99fe297821d565f7588837d811221e0",
+      "zip_member_count": 282,
+      "archive_root": "more-infinite-research_4.7.01300",
+      "info": {
+        "version": "4.7.01300",
+        "factorio_version": "0.13",
+        "base_minimum": "base >= 0.13.20"
+      },
+      "target_adapter": {
+        "member": "prototypes/mir/platform/factorio/target_profiles.lua",
+        "sha256": "e5e2b90c1630d80c94405c0f791b82c67227b9b5ab0f4ab97c91105821df04ae",
+        "profile": {
+          "support_class": "terminal-derived-historical",
+          "validation_status": "exact-engine-smoke-required",
+          "runtime_state_backend": "global",
+          "science_family": "legacy-0.15",
+          "reduced_legacy": true,
+          "supports_space_age": false,
+          "expected_stream_count": 9,
+          "feature_values": {
+            "compatibility_repairs": false,
+            "module_permissions": false,
+            "pipeline_extent": false,
+            "productivity_family_adoption": false,
+            "prototype_limits": false,
+            "recipe_productivity": false,
+            "research_library": false,
+            "scripted_techs": false,
+            "settings_profiles": false,
+            "technology_constant_overlays": false,
+            "legacy_numeric_research_cost": true
+          }
+        }
+      }
+    },
+    {
+      "target": "F014",
+      "baseline_engine": "0.14.23",
+      "archive": "more-infinite-research_4.7.01400.zip",
+      "archive_sha256": "44d26b38b0b2f19d5387f9845a7fba4a105e107534aeb76dc8f1921074b7584e",
+      "zip_member_count": 282,
+      "archive_root": "more-infinite-research_4.7.01400",
+      "info": {
+        "version": "4.7.01400",
+        "factorio_version": "0.14",
+        "base_minimum": "base >= 0.14.23"
+      },
+      "target_adapter": {
+        "member": "prototypes/mir/platform/factorio/target_profiles.lua",
+        "sha256": "e7b0a265d98ac28b247f24019f274d76955806758fca8b16a0907a0c9c0c693a",
+        "profile": {
+          "support_class": "terminal-derived-historical",
+          "validation_status": "exact-engine-smoke-required",
+          "runtime_state_backend": "global",
+          "science_family": "legacy-0.15",
+          "reduced_legacy": true,
+          "supports_space_age": false,
+          "expected_stream_count": 9,
+          "feature_values": {
+            "compatibility_repairs": false,
+            "module_permissions": false,
+            "pipeline_extent": false,
+            "productivity_family_adoption": false,
+            "prototype_limits": false,
+            "recipe_productivity": false,
+            "research_library": false,
+            "scripted_techs": false,
+            "settings_profiles": false,
+            "technology_constant_overlays": false,
+            "legacy_numeric_research_cost": true
+          }
+        }
+      }
+    },
+    {
+      "target": "F015",
+      "baseline_engine": "0.15.40",
+      "archive": "more-infinite-research_4.7.01500.zip",
+      "archive_sha256": "29cfd63b20b5649da14c3c66bf236013b482c05bc98c268d549fda4e1cc20b80",
+      "zip_member_count": 282,
+      "archive_root": "more-infinite-research_4.7.01500",
+      "info": {
+        "version": "4.7.01500",
+        "factorio_version": "0.15",
+        "base_minimum": "base >= 0.15.40"
+      },
+      "target_adapter": {
+        "member": "prototypes/mir/platform/factorio/target_profiles.lua",
+        "sha256": "217d7359821ba5eb1a50e51f18028c73d2f1aff3e99b66b9f0d7c8de6173e212",
+        "profile": {
+          "support_class": "minimal-native-infinite",
+          "validation_status": "exact-engine-smoke-required",
+          "runtime_state_backend": "global",
+          "science_family": "legacy-0.15",
+          "reduced_legacy": true,
+          "supports_space_age": false,
+          "expected_stream_count": 11,
+          "feature_values": {
+            "compatibility_repairs": false,
+            "module_permissions": false,
+            "pipeline_extent": false,
+            "productivity_family_adoption": false,
+            "prototype_limits": false,
+            "recipe_productivity": false,
+            "research_library": false,
+            "scripted_techs": false,
+            "settings_profiles": false,
+            "technology_constant_overlays": false,
+            "legacy_numeric_research_cost": false
+          }
+        }
+      }
+    },
+    {
+      "target": "F016",
+      "baseline_engine": "0.16.51",
+      "archive": "more-infinite-research_4.7.01600.zip",
+      "archive_sha256": "eafc3c2a3f49475531e2ef0df8b6486ecc26d12d5d1673fbae9bb2b1df31e179",
+      "zip_member_count": 282,
+      "archive_root": "more-infinite-research_4.7.01600",
+      "info": {
+        "version": "4.7.01600",
+        "factorio_version": "0.16",
+        "base_minimum": "base >= 0.16.51"
+      },
+      "target_adapter": {
+        "member": "prototypes/mir/platform/factorio/target_profiles.lua",
+        "sha256": "fb50732c567d8ade7fa06da50f71c18e77dfb1e5797bd65c426c31e460ebd831",
+        "profile": {
+          "support_class": "old-science-native-infinite",
+          "validation_status": "exact-engine-smoke-required",
+          "runtime_state_backend": "global",
+          "science_family": "legacy-0.16",
+          "reduced_legacy": true,
+          "supports_space_age": false,
+          "expected_stream_count": 11,
+          "feature_values": {
+            "compatibility_repairs": false,
+            "module_permissions": false,
+            "pipeline_extent": false,
+            "productivity_family_adoption": false,
+            "prototype_limits": false,
+            "recipe_productivity": false,
+            "research_library": false,
+            "scripted_techs": false,
+            "settings_profiles": false,
+            "technology_constant_overlays": false,
+            "legacy_numeric_research_cost": false
+          }
+        }
+      }
+    },
+    {
+      "target": "F017",
+      "baseline_engine": "0.17.79",
+      "archive": "more-infinite-research_4.7.01700.zip",
+      "archive_sha256": "9001ac9fd6802c9360e8a86da8c96c67f6104b736473c227e2c2459bef742835",
+      "zip_member_count": 282,
+      "archive_root": "more-infinite-research_4.7.01700",
+      "info": {
+        "version": "4.7.01700",
+        "factorio_version": "0.17",
+        "base_minimum": "base >= 0.17.79"
+      },
+      "target_adapter": {
+        "member": "prototypes/mir/platform/factorio/target_profiles.lua",
+        "sha256": "17de3b482789596ed46ce0591c2151f85c3bc056adff824875a073cffe86d21d",
+        "profile": {
+          "support_class": "historical-private-playtest",
+          "validation_status": "exact-engine-smoke-required",
+          "runtime_state_backend": "global",
+          "science_family": "modern-pre-space-age",
+          "reduced_legacy": true,
+          "supports_space_age": false,
+          "expected_stream_count": 11,
+          "feature_values": {
+            "compatibility_repairs": false,
+            "module_permissions": false,
+            "pipeline_extent": false,
+            "productivity_family_adoption": false,
+            "prototype_limits": false,
+            "recipe_productivity": false,
+            "research_library": false,
+            "scripted_techs": false,
+            "settings_profiles": false,
+            "technology_constant_overlays": false
+          }
+        }
+      }
+    },
+    {
+      "target": "F100",
+      "baseline_engine": "1.0.0",
+      "archive": "more-infinite-research_4.7.10000.zip",
+      "archive_sha256": "d909a97bcc3438c801a37b532224dceb62f5611f574a6150e9bfd05a5d36ca32",
+      "zip_member_count": 282,
+      "archive_root": "more-infinite-research_4.7.10000",
+      "info": {
+        "version": "4.7.10000",
+        "factorio_version": "1.0",
+        "base_minimum": "base >= 1.0.0"
+      },
+      "target_adapter": {
+        "member": "prototypes/mir/platform/factorio/target_profiles.lua",
+        "sha256": "f28121bae32dd120ae2acb18842228046a9ef447faa89a49e42dddf620b03ab9",
+        "profile": {
+          "support_class": "reduced-compatibility-port",
+          "validation_status": "validated-historical-release",
+          "runtime_state_backend": "global",
+          "science_family": "modern-pre-space-age",
+          "reduced_legacy": true,
+          "supports_space_age": false,
+          "expected_stream_count": 11,
+          "feature_values": {
+            "compatibility_repairs": false,
+            "module_permissions": false,
+            "pipeline_extent": false,
+            "productivity_family_adoption": false,
+            "prototype_limits": false,
+            "recipe_productivity": false,
+            "research_library": false,
+            "scripted_techs": false,
+            "settings_profiles": false,
+            "technology_constant_overlays": false
+          }
+        }
+      }
+    },
+    {
+      "target": "F110",
+      "baseline_engine": "1.1.110",
+      "archive": "more-infinite-research_4.7.11000.zip",
+      "archive_sha256": "d054e78f2c090e2b354a5d3945fd74380cf6c553ba9c08ba56d827550d58653a",
+      "zip_member_count": 282,
+      "archive_root": "more-infinite-research_4.7.11000",
+      "info": {
+        "version": "4.7.11000",
+        "factorio_version": "1.1",
+        "base_minimum": "base >= 1.1.110"
+      },
+      "target_adapter": {
+        "member": "prototypes/mir/platform/factorio/target_profiles.lua",
+        "sha256": "f28121bae32dd120ae2acb18842228046a9ef447faa89a49e42dddf620b03ab9",
+        "profile": {
+          "support_class": "reduced-compatibility-port",
+          "validation_status": "validated-historical-release",
+          "runtime_state_backend": "global",
+          "science_family": "modern-pre-space-age",
+          "reduced_legacy": true,
+          "supports_space_age": false,
+          "expected_stream_count": 11,
+          "feature_values": {
+            "compatibility_repairs": false,
+            "module_permissions": false,
+            "pipeline_extent": false,
+            "productivity_family_adoption": false,
+            "prototype_limits": false,
+            "recipe_productivity": false,
+            "research_library": false,
+            "scripted_techs": false,
+            "settings_profiles": false,
+            "technology_constant_overlays": false
+          }
+        }
+      }
+    },
+    {
+      "target": "F200",
+      "baseline_engine": "2.0.77",
+      "archive": "more-infinite-research_4.7.20000.zip",
+      "archive_sha256": "7958731aad672c7f16b9307e7b20f97b8e97b58cc57e5d1f9ae670018a8a1b5b",
+      "zip_member_count": 342,
+      "archive_root": "more-infinite-research_4.7.20000",
+      "info": {
+        "version": "4.7.20000",
+        "factorio_version": "2.0",
+        "base_minimum": "base >= 2.0.77"
+      },
+      "target_adapter": {
+        "member": "prototypes/mir/platform/factorio/target_profiles.lua",
+        "sha256": "e0f2c1479e68aeaec0ec9dc708dd02e4de1871f2dfb9d7d6bf584e5f5c442d52",
+        "profile": {
+          "support_class": "maintained-modern-port",
+          "validation_status": "validated-historical-release",
+          "runtime_state_backend": "storage",
+          "science_family": "modern-space-age-capable",
+          "reduced_legacy": false,
+          "supports_space_age": true,
+          "expected_stream_count": 115,
+          "feature_values": {
+            "compatibility_repairs": true,
+            "module_permissions": true,
+            "pipeline_extent": true,
+            "productivity_family_adoption": false,
+            "prototype_limits": true,
+            "recipe_productivity": true,
+            "research_library": true,
+            "scripted_techs": true,
+            "settings_profiles": true,
+            "technology_constant_overlays": true
+          }
+        }
+      }
+    },
+    {
+      "target": "F210",
+      "baseline_engine": "2.1.23",
+      "archive": "more-infinite-research_4.7.21000.zip",
+      "archive_sha256": "708a529f1f6d649e0a732216cd8d8fefe68f2c6c2df2b40da030c2c4c51558d1",
+      "zip_member_count": 347,
+      "archive_root": "more-infinite-research_4.7.21000",
+      "info": {
+        "version": "4.7.21000",
+        "factorio_version": "2.1",
+        "base_minimum": "base >= 2.1.23"
+      },
+      "target_adapter": {
+        "member": "prototypes/mir/platform/factorio/target_profiles.lua",
+        "sha256": "54356d6836b140c1249c8d2d7277f0079805902a2916d9f6348c7aaa995d35c5",
+        "profile": {
+          "support_class": "canonical-modern",
+          "validation_status": "validated",
+          "runtime_state_backend": "storage",
+          "science_family": "modern-space-age-capable",
+          "reduced_legacy": false,
+          "supports_space_age": true,
+          "expected_stream_count": 117,
+          "feature_values": {
+            "compatibility_repairs": true,
+            "module_permissions": true,
+            "pipeline_extent": true,
+            "productivity_family_adoption": true,
+            "prototype_limits": true,
+            "recipe_productivity": true,
+            "research_library": true,
+            "scripted_techs": true,
+            "settings_profiles": true,
+            "technology_constant_overlays": true
+          }
+        }
+      }
+    }
+  ],
+  "unresolved_exact_engine_checks": [
+    "Whether each archived target subset loads and behaves on its exact current executable, consumed official mods, and documentation set.",
+    "Whether the archived migration members upgrade actual saves correctly.",
+    "Whether any archived UI, runtime, settings, or research-effect gate maps to a current MIR5 implementation or supported target.",
+    "Any target outside the nine target identifiers in targets.md, including F018."
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeContinuityAdverseChainV1",
+  "source": "7cbb2e9a53c74735aa134586cd0721d90119a430",
+  "run": {
+    "id": 40007854238,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40007854238",
+    "conclusion": "failure"
+  },
+  "custody": "build/mir5/black-glass/incoming/40007854238/black-glass-f200-legacy-caps-40007854238-1",
+  "manifest_members_verified": 104,
+  "source_receipt": {
+    "gzip": "spec/mir5/evidence/f200-legacy-cap-science-accounting-adverse-published.json.gz",
+    "uncompressed_sha256": "F56D519B72C43145047865F03C8E765674C6F0913AD3AF0FAF08130AFAFAF890"
+  },
+  "failed_upgrade_receipt": {
+    "gzip": "spec/mir5/evidence/f200-legacy-cap-science-accounting-adverse-upgrade.json.gz",
+    "uncompressed_sha256": "C2EA228100F4A19B9A36A3B8E8D37B4BF30FDE1CF0DC4ED06DF3D506EA483EEC"
+  },
+  "failed_upgrade_log": {
+    "gzip": "spec/mir5/evidence/f200-legacy-cap-science-accounting-adverse-upgrade.log.gz",
+    "uncompressed_sha256": "16B74C5DDAE977F339BFEBF93E40EB3C5BD0521C6EBB1739A9AC505BF6CBE24F"
+  },
+  "diagnosis": [
+    "Published source again passed two lab completions and both cold reloads. Corrected MIR5 import passed the restored earned level/effect/owned presentation/foreign-state assertions before queuing a successor lab.",
+    "The successor completed exactly one further native lab level and passed the new native level/effect checks, then failed a whole-item-count science assertion.",
+    "The fixture resumes 27% saved research: F200 tool durability can retain the partially consumed science item. Whole item count minus one is not a valid fractional consumption oracle.",
+    "The revised observer checks science units through LuaItemCommon.durability and LuaItemPrototype.get_durability(quality), requires the known normal-quality unit-durability input and checks the remaining0.73 investment. Wrong-consumption opponents remain failures.",
+    "No successor save/cold-reload or full upgrade acceptance is claimed from this adverse run."
+  ],
+  "api_source": "D:/Programs/Factorio/2.0/doc-html/runtime-api.json",
+  "release_qualification": false
+}

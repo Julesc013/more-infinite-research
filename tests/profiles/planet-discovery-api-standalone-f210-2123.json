@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "kind": "mir-readonly-planet-discovery-api-native-selection",
+  "target": "f210-standalone",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-planet-discovery-api",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.1.23",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "mir-fixture-planet-discovery-api_0.1.0.zip": "AFE06C60410AEBAB92E1063DEA03E60DCCA878B1FD744E375AD32134AB1BEC9A"
+  },
+  "case": "planet-discovery-api-f210-2123",
+  "consumer_markers": [
+    "MIR_PLANET_DISCOVERY_API"
+  ],
+  "scope": "Prepared changed-input CreateOnly/MIRAbsent read-only API witness with six exact official2.1.23/owned selections. An empty data.lua makes the selected control-only fixture visible to the unchanged native loaded-selection verifier. Original two-member509D native observation retains its failed post-observation runner verdict; this2193-byte variant still needs native execution. No MIR helper, historical save, gameplay, reload, performance or release acceptance follows."
+}

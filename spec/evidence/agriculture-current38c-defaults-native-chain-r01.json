@@ -1,0 +1,340 @@
+{
+  "schema": 1,
+  "kind": "MIRCurrent38CDefaultsAgricultureNativeChainV1",
+  "status": "passed-named-current-defaults-physical-tiers-1-32-128",
+  "controller_commit": "c6993940cfb9a717001ae2ef64ea68852c687cdd",
+  "candidate": {
+    "source_commit": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+    "player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+    "archive_sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447"
+  },
+  "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+  "fixture_archives": [
+    {
+      "role": "core",
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\agriculture-current38c-defaults-r01-controller\\mir-fixture-mir5-agriculture-scale_0.1.0.zip",
+      "sha256": "23E7CAC41B86C0337D53B8778B7A445D5560A328B74D7A0A9F02E75DBB58AF6E",
+      "bytes": 10216
+    },
+    {
+      "role": "paired",
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\agriculture-current38c-defaults-r01-controller\\mir-fixture-mir5-agriculture-scale-paired_0.1.0.zip",
+      "sha256": "05D17B49A9C0C5112F601B5295C748E55B5F9AAA29E9829D589997B0DDC3D422",
+      "bytes": 829
+    },
+    {
+      "role": "arm-candidate-defaults",
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\agriculture-current38c-defaults-r01-controller\\mir-fixture-mir5-agriculture-scale-arm-candidate-defaults_0.1.0.zip",
+      "sha256": "8F1BCD0378E71A3CC9DF21AF1344AC6B88B64294A90DA03044BE7F7DC5A1EB12",
+      "bytes": 1022
+    },
+    {
+      "role": "matched-tier-1",
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\agriculture-current38c-defaults-r01-controller\\mir-fixture-mir5-agriculture-scale-matched-tier-1_0.1.0.zip",
+      "sha256": "176564869AD1210F281D5C211EDC551BFAEE979959B44C57D56006BBCFEA0349",
+      "bytes": 888
+    },
+    {
+      "role": "matched-tier-32",
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\agriculture-current38c-defaults-r01-controller\\mir-fixture-mir5-agriculture-scale-matched-tier-32_0.1.0.zip",
+      "sha256": "736075D6F4A64CBD3E8C0369D307BB55BD400A6610B804DD02B5C87452A87688",
+      "bytes": 895
+    },
+    {
+      "role": "matched-tier-128",
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\agriculture-current38c-defaults-r01-controller\\mir-fixture-mir5-agriculture-scale-matched-tier-128_0.1.0.zip",
+      "sha256": "C97B2F698E34DB8A15C22CF13A02879AF792446E615C510E979EAADF23E50BF3",
+      "bytes": 903
+    },
+    {
+      "role": "observer",
+      "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+      "bytes": 835
+    }
+  ],
+  "composition": {
+    "core": {
+      "info.json": "tests/fixtures/agriculture-scale/core/info.json",
+      "control.lua": "tests/fixtures/agriculture-scale/core/control.lua",
+      "data-final-fixes.lua": "tests/fixtures/agriculture-scale/core/data-final-fixes.lua",
+      "settings.lua": "tests/fixtures/agriculture-scale/core/settings.lua"
+    },
+    "paired": {
+      "info.json": "tests/fixtures/agriculture-scale/paired/info.json",
+      "settings-updates.lua": "tests/fixtures/agriculture-scale/paired/settings-updates.lua"
+    },
+    "arm-candidate-defaults": {
+      "info.json": "tests/fixtures/agriculture-scale/arm-candidate-defaults/info.json",
+      "settings-updates.lua": "tests/fixtures/agriculture-scale/arm-candidate-defaults/settings-updates.lua"
+    },
+    "matched-tier-1": {
+      "info.json": "tests/fixtures/agriculture-scale/matched-tier-1/info.json",
+      "settings-updates.lua": "tests/fixtures/agriculture-scale/matched-tier-1/settings-updates.lua"
+    },
+    "matched-tier-32": {
+      "info.json": "tests/fixtures/agriculture-scale/matched-tier-32/info.json",
+      "settings-updates.lua": "tests/fixtures/agriculture-scale/matched-tier-32/settings-updates.lua"
+    },
+    "matched-tier-128": {
+      "info.json": "tests/fixtures/agriculture-scale/matched-tier-128/info.json",
+      "settings-updates.lua": "tests/fixtures/agriculture-scale/matched-tier-128/settings-updates.lua"
+    },
+    "observer": {
+      "info.json": "tests/fixtures/active-mods-observer/info.json",
+      "data-final-fixes.lua": "tests/fixtures/active-mods-observer/data-final-fixes.lua"
+    }
+  },
+  "packet": {
+    "path": "build/qualification/agriculture-current38c-defaults-r01-controller/packet.json",
+    "sha256": "A8208E26B2846B0EC3E20F171A978EB810E8E3A6EE99B1125A45E6DD69CAFA6D"
+  },
+  "caller": {
+    "path": "build/qualification/agriculture-current38c-defaults-r01-controller/Invoke-OwnedCurrentAgriculture.ps1",
+    "sha256": "6C751767023B89B547C68497EAA2F483BCEC27C4BAEBAB4EE3285ACCCFD9A079"
+  },
+  "cases": [
+    {
+      "tier": 1,
+      "initial": {
+        "case": "agriculture-scale",
+        "stage": "initial",
+        "status": "passed",
+        "witnesses": {
+          "profile": "space-age-f210",
+          "tier": 1,
+          "real_lab_agriculture_completions": 2,
+          "all_official_science": [
+            "automation-science-pack",
+            "logistic-science-pack",
+            "chemical-science-pack",
+            "production-science-pack",
+            "agricultural-science-pack",
+            "electromagnetic-science-pack",
+            "cryogenic-science-pack"
+          ],
+          "science_contract": {
+            "arm": "candidate-defaults-mir5",
+            "packs": [
+              "automation-science-pack",
+              "logistic-science-pack",
+              "chemical-science-pack",
+              "production-science-pack",
+              "agricultural-science-pack",
+              "electromagnetic-science-pack",
+              "cryogenic-science-pack"
+            ]
+          },
+          "defaults_prototype_contract": "independently-matched-36CCE250-EE77416C",
+          "nominal_nonperishable_science_consumed_each": 2,
+          "agricultural_science_physical_consumption": 3,
+          "native_towers": {
+            "player": 1,
+            "foreign_zero_research": 1
+          },
+          "native_planting_events": {
+            "expected": 2,
+            "observed": 2
+          },
+          "plant": "yumako-tree",
+          "native_growth_ticks": 18000,
+          "trained_remaining_ticks": 17645,
+          "foreign_remaining_ticks": 18000,
+          "generated_chunk_radius": 3,
+          "native_yumako_soil_tiles": 242,
+          "native_spoilable_stacks": 4,
+          "native_yumako_prototype_spoil_ticks": 216000,
+          "native_spoilage_baseline": 1,
+          "seed_insertion_profiler": "[LuaProfiler]",
+          "profiler_timing_decision": "not-evaluated",
+          "published_4_7_contract": "not-selected",
+          "cold_reload_witness": false,
+          "on_load_read_only": false,
+          "ordinary_tuning_qualified": false,
+          "gameplay_scope": "fixed-tier-native-agriculture-scale-only"
+        }
+      },
+      "result_sha256": "6FCCBFEC0FCD6DDE32CC6CA520EC4732C50006F95344F39A5A85EAD59996433C",
+      "profile_sha256": "488DBF4771686B4EA002C1A0DBAE72BEA21C540B63B9229ED395188D99B32FD7",
+      "completed_save": {
+        "path": "build/qualification/agriculture-current38c-defaults-r01-controller/native-tier-1/write-data/saves/mir5-native-complete.zip",
+        "sha256": "648B9B0ABB1A82069CC1BAB5ED3E6D35F035A125E66512C7A9003697EC4F6517",
+        "bytes": 785841
+      },
+      "new_processes": 4,
+      "new_labs": 2,
+      "new_saves": 1,
+      "new_cold_reloads": 2
+    },
+    {
+      "tier": 32,
+      "initial": {
+        "case": "agriculture-scale",
+        "stage": "initial",
+        "status": "passed",
+        "witnesses": {
+          "profile": "space-age-f210",
+          "tier": 32,
+          "real_lab_agriculture_completions": 2,
+          "all_official_science": [
+            "automation-science-pack",
+            "logistic-science-pack",
+            "chemical-science-pack",
+            "production-science-pack",
+            "agricultural-science-pack",
+            "electromagnetic-science-pack",
+            "cryogenic-science-pack"
+          ],
+          "science_contract": {
+            "arm": "candidate-defaults-mir5",
+            "packs": [
+              "automation-science-pack",
+              "logistic-science-pack",
+              "chemical-science-pack",
+              "production-science-pack",
+              "agricultural-science-pack",
+              "electromagnetic-science-pack",
+              "cryogenic-science-pack"
+            ]
+          },
+          "defaults_prototype_contract": "independently-matched-36CCE250-EE77416C",
+          "nominal_nonperishable_science_consumed_each": 2,
+          "agricultural_science_physical_consumption": 3,
+          "native_towers": {
+            "player": 32,
+            "foreign_zero_research": 32
+          },
+          "native_planting_events": {
+            "expected": 64,
+            "observed": 64
+          },
+          "plant": "yumako-tree",
+          "native_growth_ticks": 18000,
+          "trained_remaining_ticks": 17645,
+          "foreign_remaining_ticks": 18000,
+          "generated_chunk_radius": 5,
+          "native_yumako_soil_tiles": 7744,
+          "native_spoilable_stacks": 4,
+          "native_yumako_prototype_spoil_ticks": 216000,
+          "native_spoilage_baseline": 1,
+          "seed_insertion_profiler": "[LuaProfiler]",
+          "profiler_timing_decision": "not-evaluated",
+          "published_4_7_contract": "not-selected",
+          "cold_reload_witness": false,
+          "on_load_read_only": false,
+          "ordinary_tuning_qualified": false,
+          "gameplay_scope": "fixed-tier-native-agriculture-scale-only"
+        }
+      },
+      "result_sha256": "74F01B324F15DDFD79FB2FFB715D67E633A518F8B4063D9627B2B23B2BD9EDB7",
+      "profile_sha256": "E3780DA1999567C3E75A88EB7968C9CBC3D169D04761BFEA714DA90FA6432575",
+      "completed_save": {
+        "path": "build/qualification/agriculture-current38c-defaults-r01-controller/native-tier-32/write-data/saves/mir5-native-complete.zip",
+        "sha256": "2591A931F911C8F78F7CA3BCE5EE355E45E0FF79700AAFDB05430F00878EC073",
+        "bytes": 902981
+      },
+      "new_processes": 4,
+      "new_labs": 2,
+      "new_saves": 1,
+      "new_cold_reloads": 2
+    },
+    {
+      "tier": 128,
+      "initial": {
+        "case": "agriculture-scale",
+        "stage": "initial",
+        "status": "passed",
+        "witnesses": {
+          "profile": "space-age-f210",
+          "tier": 128,
+          "real_lab_agriculture_completions": 2,
+          "all_official_science": [
+            "automation-science-pack",
+            "logistic-science-pack",
+            "chemical-science-pack",
+            "production-science-pack",
+            "agricultural-science-pack",
+            "electromagnetic-science-pack",
+            "cryogenic-science-pack"
+          ],
+          "science_contract": {
+            "arm": "candidate-defaults-mir5",
+            "packs": [
+              "automation-science-pack",
+              "logistic-science-pack",
+              "chemical-science-pack",
+              "production-science-pack",
+              "agricultural-science-pack",
+              "electromagnetic-science-pack",
+              "cryogenic-science-pack"
+            ]
+          },
+          "defaults_prototype_contract": "independently-matched-36CCE250-EE77416C",
+          "nominal_nonperishable_science_consumed_each": 2,
+          "agricultural_science_physical_consumption": 3,
+          "native_towers": {
+            "player": 128,
+            "foreign_zero_research": 128
+          },
+          "native_planting_events": {
+            "expected": 256,
+            "observed": 256
+          },
+          "plant": "yumako-tree",
+          "native_growth_ticks": 18000,
+          "trained_remaining_ticks": 17645,
+          "foreign_remaining_ticks": 18000,
+          "generated_chunk_radius": 8,
+          "native_yumako_soil_tiles": 30976,
+          "native_spoilable_stacks": 4,
+          "native_yumako_prototype_spoil_ticks": 216000,
+          "native_spoilage_baseline": 1,
+          "seed_insertion_profiler": "[LuaProfiler]",
+          "profiler_timing_decision": "not-evaluated",
+          "published_4_7_contract": "not-selected",
+          "cold_reload_witness": false,
+          "on_load_read_only": false,
+          "ordinary_tuning_qualified": false,
+          "gameplay_scope": "fixed-tier-native-agriculture-scale-only"
+        }
+      },
+      "result_sha256": "7EE476CBA7C143D3DA7AD6B50E9D50EFD9583BA80926D5E5BA1CEC9B1F4D88F3",
+      "profile_sha256": "CD9C28A3A0B9ECFE2C7389D241CF158D559177D25E69E0041E59083B11EB63AC",
+      "completed_save": {
+        "path": "build/qualification/agriculture-current38c-defaults-r01-controller/native-tier-128/write-data/saves/mir5-native-complete.zip",
+        "sha256": "BD9011860F908868DA08DD7B62533A76551891CE162EF4DD5DD9C1A8CBC36DF7",
+        "bytes": 1362684
+      },
+      "new_processes": 4,
+      "new_labs": 2,
+      "new_saves": 1,
+      "new_cold_reloads": 2
+    }
+  ],
+  "root_readback": {
+    "path": "build/qualification/agriculture-current38c-defaults-r01-controller/root-readback-r01.json",
+    "sha256": "60166AC16F4BB7BCA709E0BA69D0639782AFCCA9C8D0570193D2516BAF390103",
+    "files": 69,
+    "bytes_per_copy": 6148303
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/agriculture-current38c-defaults-native-receipts-r01.json.gz",
+    "sha256": "E3299088D9ECD2B41DFCFBF479B179EA42DE78293B41FEF77911F9F197188E1B",
+    "bytes": 84003,
+    "records": 19
+  },
+  "counts": {
+    "new_native_processes": 12,
+    "new_actual_labs": 6,
+    "new_saves": 3,
+    "new_cold_reloads": 6,
+    "native_planting_events": 322
+  },
+  "scope": "Unmodified current38C/standalone2.1.23/8DC Defaults,existing independent seven-pack/one-percent agriculture fixture at fixed1/32/128 towers per force. Each world earns two actual lab levels,plants2N native crops,checks trained17645 versus foreign18000 growth ticks,four native spoilable stacks/global baseline1,and saves/two unchanged-byte colds. No player or fixture/oracle change.",
+  "limits": [
+    "Current physical/runtime correctness and fixed-tier stress only. This is not a scored runtime,CPU,retained-memory,UI/save-load latency,published comparison or release verdict. Profiler output remains not-evaluated.",
+    "Nonperishable science consumes exactly two each. Agricultural science physically consumes three in each observed world,inside the existing independent2..4 guard;do not relabel every input as two. Cold reloads retain the observed count.",
+    "The fixture explicitly leaves ordinary tuning unqualified. Seven-pack Defaults selection changes only the private tier;it does not establish all science policies,overhauls,force-merge/provider/DLC transitions or arbitrary factories.",
+    "Original B2/other native/runtime observations remain unchanged. These six lab completions and322 events are new current-package work,not carried source or old scheduled benchmark counts."
+  ]
+}

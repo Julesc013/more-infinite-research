@@ -1,0 +1,165 @@
+{
+  "schema": 1,
+  "kind": "MIRPublishedF100F210MiningPreflightReferenceV1",
+  "scope": "Independent accepted published B6 Base native row is the expectation; unchanged B637 capture confirms equality. F210 canonical formula differs in spelling from the legacy F110 successor. No cost,science,effect,player source or other-stage relaxation.",
+  "published_capture": {
+    "result": {
+      "locator": "D:/Projects/Factorio/more-infinite-research/build/qualification/f210-vanilla-published-b6-default-capture-r02/native-output/base/result.json",
+      "sha256": "7CD28BEC385E85230FEB537B9DB3170F6E8E74F08E36539DD8660DF9126952B5",
+      "bytes": 12732
+    },
+    "data": {
+      "locator": "D:/Projects/Factorio/more-infinite-research/build/qualification/f210-vanilla-published-b6-default-capture-r02/native-output/base/write-data/script-output/data-raw-dump.json",
+      "sha256": "FFCC1446621A55CC8B498685177F6FCE10D38E2C500CA3905F1CF2EF0DD5F7C4",
+      "bytes": 14286542
+    },
+    "engine": {
+      "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+      "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+      "base_version": "2.1.23",
+      "factorio_version": "2.1"
+    }
+  },
+  "candidate_readback": {
+    "result": {
+      "locator": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-base-f210-admission-r01-controller/native-captures/candidate-mir5/result.json",
+      "sha256": "F58D38CAE558FD9810FB0394615472ADBCFAB37A9DADDE9B2957CC94C7F0BB95",
+      "bytes": 12730
+    },
+    "data": {
+      "locator": "D:/Projects/Factorio/more-infinite-research/build/qualification/whole-product-base-f210-admission-r01-controller/native-captures/candidate-mir5/write-data/script-output/data-raw-dump.json",
+      "sha256": "90CF2568E69BE8FB082DBFF4C95C20936B6B56797A1236E955AD4BB4FAA4309E",
+      "bytes": 13910097
+    },
+    "engine": {
+      "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "base_version": "2.1.23",
+      "factorio_version": "2.1"
+    }
+  },
+  "canonical_row_bytes": 843,
+  "canonical_row_sha256": "998680B78322F3C92A51544FFE1210066CEEA90EB3D1F6A4D95B7B97FDCE78EB",
+  "published_row": {
+    "name": "recipe-prod-research_character_mining_speed-1",
+    "localised_name": [
+      "technology-name.more-infinite-research.research_character_mining_speed",
+      [
+        "technology-name.steel-axe"
+      ]
+    ],
+    "localised_description": [
+      "technology-description.more-infinite-research.direct_effect"
+    ],
+    "icons": [
+      {
+        "icon": "__base__/graphics/technology/steel-axe.png",
+        "icon_size": 256
+      },
+      {
+        "icon": "__core__/graphics/icons/technology/constants/constant-mining.png",
+        "icon_size": 128,
+        "scale": 0.5,
+        "shift": [
+          50,
+          50
+        ],
+        "floating": true
+      }
+    ],
+    "effects": [
+      {
+        "type": "character-mining-speed",
+        "modifier": 0.05
+      }
+    ],
+    "prerequisites": [
+      "utility-science-pack",
+      "military-science-pack"
+    ],
+    "unit": {
+      "ingredients": [
+        [
+          "utility-science-pack",
+          1
+        ],
+        [
+          "military-science-pack",
+          1
+        ]
+      ],
+      "count_formula": "8000*2^(L-1)",
+      "time": 60
+    },
+    "max_level": "infinite",
+    "order": "p[research_character_mining_speed]",
+    "level": 1,
+    "upgrade": true,
+    "type": "technology"
+  },
+  "candidate_row": {
+    "type": "technology",
+    "name": "recipe-prod-research_character_mining_speed-1",
+    "icons": [
+      {
+        "icon": "__base__/graphics/technology/steel-axe.png",
+        "icon_size": 256
+      },
+      {
+        "icon": "__core__/graphics/icons/technology/constants/constant-mining.png",
+        "icon_size": 128,
+        "scale": 0.5,
+        "shift": [
+          50,
+          50
+        ],
+        "floating": true
+      }
+    ],
+    "localised_name": [
+      "technology-name.more-infinite-research.research_character_mining_speed",
+      [
+        "technology-name.steel-axe"
+      ]
+    ],
+    "localised_description": [
+      "technology-description.more-infinite-research.direct_effect"
+    ],
+    "level": 1,
+    "upgrade": true,
+    "max_level": "infinite",
+    "order": "p[research_character_mining_speed]",
+    "prerequisites": [
+      "utility-science-pack",
+      "military-science-pack"
+    ],
+    "effects": [
+      {
+        "type": "character-mining-speed",
+        "modifier": 0.05
+      }
+    ],
+    "unit": {
+      "count_formula": "8000*2^(L-1)",
+      "time": 60,
+      "ingredients": [
+        [
+          "utility-science-pack",
+          1
+        ],
+        [
+          "military-science-pack",
+          1
+        ]
+      ]
+    }
+  },
+  "authored_contract": [
+    "source/research/native_direct_definitions.lua:83",
+    "source/research/cost.lua:17"
+  ],
+  "limits": [
+    "Existing native captures only;no new engine execution or release claim.",
+    "Do not admit the wrapped formula for F210 or the unwrapped formula for F110 successor. Original source/bridge stages retain the canonical unwrapped formula."
+  ]
+}

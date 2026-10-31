@@ -1,0 +1,317 @@
+{
+  "schema": 1,
+  "kind": "MIRWholeProductHeavySpaceAgeF210DataAdmissionNativeChainV1",
+  "status": "completed-data-stage-admission-only",
+  "source_commit": "b7caa8df9141523a556bb57ca8faf7c43d250c3d",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+    "bytes": 49398736,
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "version": "2.1.23"
+  },
+  "profile": {
+    "path": "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\tests\\profiles\\bob-angel-full-space-age-standalone-f210-2123.json",
+    "bytes": 8020,
+    "sha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980",
+    "selected_rows": 37,
+    "official_space_age_rows": 5,
+    "bob_angel_rows": 31,
+    "selected_nonbuiltin_archives": 32
+  },
+  "active_mods_observer": {
+    "name": "mir-fixture-mir5-active-mods-observer",
+    "version": "0.1.0",
+    "archive": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "bytes": 835,
+    "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+  },
+  "arms": [
+    {
+      "id": "control-without-mir",
+      "archive": null
+    },
+    {
+      "id": "terminal-mir3.2.11",
+      "archive": {
+        "path": "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\build\\tmp\\whole-product-heavy-space-age-f210-inputs-r01\\owned-source-archives\\more-infinite-research_3.2.11.zip",
+        "bytes": 1067720,
+        "sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A"
+      }
+    },
+    {
+      "id": "published-mir4.7",
+      "archive": {
+        "path": "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\build\\tmp\\whole-product-heavy-space-age-f210-inputs-r01\\owned-source-archives\\more-infinite-research_4.7.21003.zip",
+        "bytes": 1463293,
+        "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
+      }
+    },
+    {
+      "id": "candidate-mir5",
+      "archive": {
+        "path": "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\build\\tmp\\whole-product-heavy-space-age-f210-inputs-r01\\owned-source-archives\\more-infinite-research_5.0.21000.zip",
+        "bytes": 696972,
+        "sha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B"
+      }
+    }
+  ],
+  "packet_sha256": "4AD1A901F0E8B7DD26C0CEF661AAD0DEA1182377929CD3E932ECFDEE47CF5BD5",
+  "caller_sha256": "7833E4BCA104BB6CA6540BB35033E9DA63F8CB88F6E6F6A79DA456D8EB8C655C",
+  "terminal_sha256": "FA7D04B1BAD1C85FFBE26298759331338BFDA08EC4E83803E7C2ED65CC7115EE",
+  "observations": [
+    {
+      "arm": "control-without-mir",
+      "native_processes": 1,
+      "exit_code": 0,
+      "loaded_selection": [
+        "angelsaddons-mobility-graphics-crawler@2.1.0",
+        "angelsaddons-mobility-graphics-petro@2.1.0",
+        "angelsaddons-mobility-graphics-smelting@2.1.0",
+        "angelsaddons-mobility@2.1.1",
+        "angelsaddons-storage@2.1.1",
+        "angelsbioprocessing@2.1.2",
+        "angelsbioprocessinggraphics@2.1.0",
+        "angelsinfiniteores@2.1.0",
+        "angelspetrochem@2.1.3",
+        "angelspetrochemgraphics@2.1.0",
+        "angelsrefining@2.1.3",
+        "angelsrefininggraphics@2.1.0",
+        "angelssmelting@2.1.1",
+        "angelssmeltinggraphics@2.1.1",
+        "base@2.1.23",
+        "bobassembly@3.0.2",
+        "bobelectronics@3.0.1",
+        "bobenemies@3.0.1",
+        "bobequipment@3.0.0",
+        "bobgreenhouse@3.0.1",
+        "bobinserters@3.0.0",
+        "boblibrary@3.0.1",
+        "boblogistics@3.0.2",
+        "bobmining@3.0.2",
+        "bobmodules@3.0.1",
+        "bobores@3.0.0",
+        "bobplates@3.0.2",
+        "bobpower@3.0.1",
+        "bobrevamp@3.0.1",
+        "bobtech@3.0.0",
+        "bobvehicleequipment@3.0.0",
+        "bobwarfare@3.0.2",
+        "elevated-rails@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23"
+      ],
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 67302883,
+          "sha256": "3CEA9040B2ABCB5BD9E8615AC2866A798DACE7B6B31A999CB498B8CFCCA8AB92"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 36519,
+          "sha256": "3CED1BE6BBDDB651DE8D40CE5FAA76BCF41260B386238B0B1F3FA47C14C8B0AB"
+        }
+      }
+    },
+    {
+      "arm": "terminal-mir3.2.11",
+      "native_processes": 1,
+      "exit_code": 0,
+      "loaded_selection": [
+        "angelsaddons-mobility-graphics-crawler@2.1.0",
+        "angelsaddons-mobility-graphics-petro@2.1.0",
+        "angelsaddons-mobility-graphics-smelting@2.1.0",
+        "angelsaddons-mobility@2.1.1",
+        "angelsaddons-storage@2.1.1",
+        "angelsbioprocessing@2.1.2",
+        "angelsbioprocessinggraphics@2.1.0",
+        "angelsinfiniteores@2.1.0",
+        "angelspetrochem@2.1.3",
+        "angelspetrochemgraphics@2.1.0",
+        "angelsrefining@2.1.3",
+        "angelsrefininggraphics@2.1.0",
+        "angelssmelting@2.1.1",
+        "angelssmeltinggraphics@2.1.1",
+        "base@2.1.23",
+        "bobassembly@3.0.2",
+        "bobelectronics@3.0.1",
+        "bobenemies@3.0.1",
+        "bobequipment@3.0.0",
+        "bobgreenhouse@3.0.1",
+        "bobinserters@3.0.0",
+        "boblibrary@3.0.1",
+        "boblogistics@3.0.2",
+        "bobmining@3.0.2",
+        "bobmodules@3.0.1",
+        "bobores@3.0.0",
+        "bobplates@3.0.2",
+        "bobpower@3.0.1",
+        "bobrevamp@3.0.1",
+        "bobtech@3.0.0",
+        "bobvehicleequipment@3.0.0",
+        "bobwarfare@3.0.2",
+        "elevated-rails@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@3.2.11",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23"
+      ],
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 67624951,
+          "sha256": "681ADF0E07653217DB289F85E869DFAFD0E0EE54FF57EF026376BF5156DFF3D6"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 682775,
+          "sha256": "AA5E4A218A8FF64AA7ADBD759C14871E8D74E84A20342A04DC5512ABF651641C"
+        }
+      }
+    },
+    {
+      "arm": "published-mir4.7",
+      "native_processes": 1,
+      "exit_code": 0,
+      "loaded_selection": [
+        "angelsaddons-mobility-graphics-crawler@2.1.0",
+        "angelsaddons-mobility-graphics-petro@2.1.0",
+        "angelsaddons-mobility-graphics-smelting@2.1.0",
+        "angelsaddons-mobility@2.1.1",
+        "angelsaddons-storage@2.1.1",
+        "angelsbioprocessing@2.1.2",
+        "angelsbioprocessinggraphics@2.1.0",
+        "angelsinfiniteores@2.1.0",
+        "angelspetrochem@2.1.3",
+        "angelspetrochemgraphics@2.1.0",
+        "angelsrefining@2.1.3",
+        "angelsrefininggraphics@2.1.0",
+        "angelssmelting@2.1.1",
+        "angelssmeltinggraphics@2.1.1",
+        "base@2.1.23",
+        "bobassembly@3.0.2",
+        "bobelectronics@3.0.1",
+        "bobenemies@3.0.1",
+        "bobequipment@3.0.0",
+        "bobgreenhouse@3.0.1",
+        "bobinserters@3.0.0",
+        "boblibrary@3.0.1",
+        "boblogistics@3.0.2",
+        "bobmining@3.0.2",
+        "bobmodules@3.0.1",
+        "bobores@3.0.0",
+        "bobplates@3.0.2",
+        "bobpower@3.0.1",
+        "bobrevamp@3.0.1",
+        "bobtech@3.0.0",
+        "bobvehicleequipment@3.0.0",
+        "bobwarfare@3.0.2",
+        "elevated-rails@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@4.7.21003",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23"
+      ],
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 67953508,
+          "sha256": "A8935196FBF9A58DA01BB26EFD739CE74941DB2885C6A1514E9379F64A33C3C1"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 1078518,
+          "sha256": "5385BE2E5B4ADD9EC17FAFEB7AB2A01FA60987AAEA849C77347618BD5E8CBBA4"
+        }
+      }
+    },
+    {
+      "arm": "candidate-mir5",
+      "native_processes": 1,
+      "exit_code": 0,
+      "loaded_selection": [
+        "angelsaddons-mobility-graphics-crawler@2.1.0",
+        "angelsaddons-mobility-graphics-petro@2.1.0",
+        "angelsaddons-mobility-graphics-smelting@2.1.0",
+        "angelsaddons-mobility@2.1.1",
+        "angelsaddons-storage@2.1.1",
+        "angelsbioprocessing@2.1.2",
+        "angelsbioprocessinggraphics@2.1.0",
+        "angelsinfiniteores@2.1.0",
+        "angelspetrochem@2.1.3",
+        "angelspetrochemgraphics@2.1.0",
+        "angelsrefining@2.1.3",
+        "angelsrefininggraphics@2.1.0",
+        "angelssmelting@2.1.1",
+        "angelssmeltinggraphics@2.1.1",
+        "base@2.1.23",
+        "bobassembly@3.0.2",
+        "bobelectronics@3.0.1",
+        "bobenemies@3.0.1",
+        "bobequipment@3.0.0",
+        "bobgreenhouse@3.0.1",
+        "bobinserters@3.0.0",
+        "boblibrary@3.0.1",
+        "boblogistics@3.0.2",
+        "bobmining@3.0.2",
+        "bobmodules@3.0.1",
+        "bobores@3.0.0",
+        "bobplates@3.0.2",
+        "bobpower@3.0.1",
+        "bobrevamp@3.0.1",
+        "bobtech@3.0.0",
+        "bobvehicleequipment@3.0.0",
+        "bobwarfare@3.0.2",
+        "elevated-rails@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@5.0.21000",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23"
+      ],
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 67505937,
+          "sha256": "DD2A57EE38D1038F5B76DC25F7C5B9296654C4CEB6117DE2036E774EA83093FA"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 783931,
+          "sha256": "83C3A4166488BFEF80225DE9818810DE4CE0DDD37760C6B17BEC810AC8162D17"
+        }
+      }
+    }
+  ],
+  "native_processes": 4,
+  "custody": {
+    "source": "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\build\\tmp\\whole-product-heavy-space-age-f210-admission-r01",
+    "copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-heavy-space-age-f210-admission-r01-controller\\native-captures",
+    "files_per_copy": 36,
+    "bytes_per_copy": 273372885
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/whole-product-heavy-space-age-f210-admission-receipts-r01.json.gz",
+    "bytes": 188662,
+    "sha256": "A2EA6C54DEB646E3FCB0D26A37931DEBC35FA93B71EF05CCC2A9B8C2081D8903",
+    "bodies": 26
+  },
+  "restoration": {
+    "all_four_result_records_restore_library_controls": true,
+    "factorio_processes_after": 0
+  },
+  "evidence_assembly_validation": "Full SHA256/size comparison of all36 terminal-manifest source and retained-copy members;all26 capsule bodies are original raw bytes with paths,size and SHA256 preserved.",
+  "scope": "Four serial unscored F210 full Bob/Angel/Space Age prototype/data-stage admissions. The common closure is exact2.1.23 five official Space Age rows,31 Bob/Angel rows and one A15 observer;arms are NoMIR,actual terminal3.2.11,published4.7.21003 and candidate5.0.21000. Dump bodies are locally retained/hash-pinned;the capsule carries compact controller/result/selection/stdout/resource bodies only.",
+  "limits": [
+    "No responsive-menu,cold-launch,factory/runtime,save,client,memory-comparison,activity,useful-work,semantic-parity,equal-work,product-performance or release acceptance.",
+    "MIR3 is the actual published3.2.11 arm;no historical archive is edited or replay-labelled.",
+    "Technology/settings payloads are retained as raw data-stage dumps;this admission records loading and custody,not a semantic comparison."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}

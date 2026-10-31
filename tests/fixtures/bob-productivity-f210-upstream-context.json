@@ -1,0 +1,71 @@
+{
+  "schema": "MIR5BobProductivityF210UpstreamContextV1",
+  "scope": {
+    "engine": {"base_version": "2.1.23", "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"},
+    "source_commit": "13283e85115ac460380b872a20242dffa71d5d6c",
+    "published_archive": {"name": "more-infinite-research_4.7.21003.zip", "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"},
+    "claims": {"candidate_raw_used": false, "native_qualification": false, "release_qualification": false}
+  },
+  "provider_fact": {
+    "archive": {"name": "bobrevamp_3.0.1.zip", "sha256": "BE2D0EEA2DE65CF32218107EB1DB679BF0B826599C89C4E2892F60B234405F5F"},
+    "source_member": "bobrevamp/data-updates.lua",
+    "source_lines": [47, 52, 73, 78],
+    "fact": "bobrevamp hides vanilla sulfuric-acid when Bob sulfur-acid routes exist and hides vanilla sulfur when bob-sulfur-2 or bob-sulfur-3 exists"
+  },
+  "cases": {
+    "base": {
+      "capture": {
+        "case": "q005",
+        "upstream_result_sha256": "F4225D5898019EB61A078B63378DB4C529B6FA6CA29109D4205EDEC81B930BC1",
+        "upstream_raw_sha256": "E50A66C38427AE45765564D301085BF42BC17FB904BAF93EB296C4CF4B648D6F",
+        "published_result_sha256": "2AAF8E6831993B6303A30E5EE32026B6C090C77C3D6EB8D0653B3CDEE5B27696",
+        "published_raw_sha256": "80462037B1982AF008B845D1389045C69E8D0BF58C0D7BC7A287BD4B4FC4024F",
+        "profile_sha256": "A5017E19A99B8240D8671DD9D88F03F055492C7E764159DB167221568FD90AA7",
+        "library_controls_restored": true
+      },
+      "selection": {"base": "2.1.23", "bobplates": "3.0.2", "bobrevamp": "3.0.1"},
+      "raw": {
+        "recipe": {
+          "sulfur": {"enabled": false, "hidden": true, "allow_productivity": false, "ingredients": [{"type": "fluid", "name": "water", "amount": 30}, {"type": "fluid", "name": "petroleum-gas", "amount": 30}], "results": [{"type": "item", "name": "sulfur", "amount": 2}]},
+          "sulfuric-acid": {"enabled": false, "hidden": true, "allow_productivity": false, "ingredients": [{"type": "item", "name": "sulfur", "amount": 5}, {"type": "item", "name": "iron-plate", "amount": 1}, {"type": "fluid", "name": "water", "amount": 100}], "results": [{"type": "fluid", "name": "sulfuric-acid", "amount": 50}]},
+          "bob-sulfur-2": {"enabled": false, "ingredients": [{"type": "fluid", "name": "bob-sulfur-dioxide", "amount": 50}, {"type": "fluid", "name": "bob-hydrogen", "amount": 80}], "results": [{"type": "item", "name": "sulfur", "amount": 5}]},
+          "bob-sulfur-3": {"enabled": false, "ingredients": [{"type": "fluid", "name": "bob-hydrogen-sulfide", "amount": 50}, {"type": "fluid", "name": "bob-oxygen", "amount": 25}], "results": [{"type": "item", "name": "sulfur", "amount": 5}]},
+          "bob-sulfuric-acid-2": {"enabled": false, "ingredients": [{"type": "fluid", "name": "bob-sulfur-dioxide", "amount": 50}, {"type": "fluid", "name": "bob-hydrogen-peroxide", "amount": 50}], "results": [{"type": "fluid", "name": "sulfuric-acid", "amount": 50}]},
+          "bob-sulfuric-acid-3": {"enabled": false, "ingredients": [{"type": "fluid", "name": "bob-hydrogen-sulfide", "amount": 50}, {"type": "fluid", "name": "bob-oxygen", "amount": 100}], "results": [{"type": "fluid", "name": "sulfuric-acid", "amount": 50}]}
+        }
+      },
+      "published_rows": {
+        "recipe-prod-research_sulfur-1": {"unit": {"ingredients": [["automation-science-pack", 1], ["logistic-science-pack", 1], ["chemical-science-pack", 1], ["production-science-pack", 1]], "count_formula": "8000*2^(L-1)", "time": 60}, "prerequisites": ["automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"], "effects": [{"type": "change-recipe-productivity", "recipe": "bob-sulfur-2", "change": 0.1}, {"type": "change-recipe-productivity", "recipe": "bob-sulfur-3", "change": 0.1}]},
+        "recipe-prod-research_sulfuric_acid_productivity-1": {"unit": {"ingredients": [["automation-science-pack", 1], ["logistic-science-pack", 1], ["chemical-science-pack", 1], ["production-science-pack", 1]], "count_formula": "8000*2^(L-1)", "time": 60}, "prerequisites": ["automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"], "effects": [{"type": "change-recipe-productivity", "recipe": "bob-sulfuric-acid-2", "change": 0.1}, {"type": "change-recipe-productivity", "recipe": "bob-sulfuric-acid-3", "change": 0.1}]}
+      }
+    },
+    "space_age": {
+      "capture": {
+        "case": "q006",
+        "upstream_result_sha256": "0DDBE3715C0AE618C803985FCFB94E6871739D0F866B9B8CF63F677FCF376AB6",
+        "upstream_raw_sha256": "9850830424454DE5760C3CE0DB2A6D0055875339DE40B80EC08433E288EAFE2A",
+        "published_result_sha256": "10457D03E6ABFE06D2D44C2DFD3BD1B613AE5582BAFE7EF08FD5ED06F183A27C",
+        "published_raw_sha256": "0419DF1FD2C5495B5BEC692268F30294F1E19C168D199CB9BF4C7569EF20E6A4",
+        "profile_sha256": "47A538A60B8B9446FA525B5FEFE2E7C2AA4D32C357BE45276748FC2F28C9A1D4",
+        "library_controls_restored": true
+      },
+      "selection": {"base": "2.1.23", "bobplates": "3.0.2", "bobrevamp": "3.0.1", "space-age": "2.1.23"},
+      "raw": {
+        "recipe": {
+          "sulfur": {"enabled": false, "hidden": true, "allow_productivity": false, "ingredients": [{"type": "fluid", "name": "water", "amount": 30}, {"type": "fluid", "name": "petroleum-gas", "amount": 30}], "results": [{"type": "item", "name": "sulfur", "amount": 2}]},
+          "sulfuric-acid": {"enabled": false, "hidden": true, "allow_productivity": false, "ingredients": [{"type": "item", "name": "sulfur", "amount": 5}, {"type": "item", "name": "iron-plate", "amount": 1}, {"type": "fluid", "name": "water", "amount": 100}], "results": [{"type": "fluid", "name": "sulfuric-acid", "amount": 50}]},
+          "bob-sulfur-2": {"enabled": false, "ingredients": [{"type": "fluid", "name": "bob-sulfur-dioxide", "amount": 50}, {"type": "fluid", "name": "bob-hydrogen", "amount": 80}], "results": [{"type": "item", "name": "sulfur", "amount": 5}]},
+          "bob-sulfur-3": {"enabled": false, "ingredients": [{"type": "fluid", "name": "bob-hydrogen-sulfide", "amount": 50}, {"type": "fluid", "name": "bob-oxygen", "amount": 25}], "results": [{"type": "item", "name": "sulfur", "amount": 5}]},
+          "bob-sulfuric-acid-2": {"enabled": false, "ingredients": [{"type": "fluid", "name": "bob-sulfur-dioxide", "amount": 50}, {"type": "fluid", "name": "bob-hydrogen-peroxide", "amount": 50}], "results": [{"type": "fluid", "name": "sulfuric-acid", "amount": 50}]},
+          "bob-sulfuric-acid-3": {"enabled": false, "ingredients": [{"type": "fluid", "name": "bob-hydrogen-sulfide", "amount": 50}, {"type": "fluid", "name": "bob-oxygen", "amount": 100}], "results": [{"type": "fluid", "name": "sulfuric-acid", "amount": 50}]},
+          "biosulfur": {"enabled": false, "allow_productivity": true, "ingredients": [{"type": "item", "name": "spoilage", "amount": 5}, {"type": "item", "name": "bioflux", "amount": 1}], "results": [{"type": "item", "name": "sulfur", "amount": 2}]},
+          "acid-neutralisation": {"enabled": false, "allow_productivity": false, "ingredients": [{"type": "item", "name": "calcite", "amount": 1}, {"type": "fluid", "name": "sulfuric-acid", "amount": 100}], "results": [{"type": "fluid", "name": "steam", "amount": 1000, "temperature": 500}]}
+        }
+      },
+      "published_rows": {
+        "recipe-prod-research_sulfur-1": {"unit": {"ingredients": [["automation-science-pack", 1], ["logistic-science-pack", 1], ["chemical-science-pack", 1], ["production-science-pack", 1], ["metallurgic-science-pack", 1]], "count_formula": "8000*2^(L-1)", "time": 60}, "prerequisites": ["automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "metallurgic-science-pack"], "effects": [{"type": "change-recipe-productivity", "recipe": "biosulfur", "change": 0.1}, {"type": "change-recipe-productivity", "recipe": "bob-sulfur-2", "change": 0.1}, {"type": "change-recipe-productivity", "recipe": "bob-sulfur-3", "change": 0.1}]},
+        "recipe-prod-research_sulfuric_acid_productivity-1": {"unit": {"ingredients": [["automation-science-pack", 1], ["logistic-science-pack", 1], ["chemical-science-pack", 1], ["production-science-pack", 1], ["metallurgic-science-pack", 1]], "count_formula": "8000*2^(L-1)", "time": 60}, "prerequisites": ["automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "metallurgic-science-pack"], "effects": [{"type": "change-recipe-productivity", "recipe": "acid-neutralisation", "change": 0.1}, {"type": "change-recipe-productivity", "recipe": "bob-sulfuric-acid-2", "change": 0.1}, {"type": "change-recipe-productivity", "recipe": "bob-sulfuric-acid-3", "change": 0.1}]}
+      }
+    }
+  }
+}

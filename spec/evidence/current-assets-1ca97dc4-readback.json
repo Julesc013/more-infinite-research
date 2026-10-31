@@ -1,0 +1,277 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentAssetFreezeReadbackV1",
+  "status": "nine-editions-rebuilt-byte-identical-not-native-acceptance",
+  "source": {
+    "commit": "1ca97dc4981444d742118febf822461a03481e90",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "ebfa50354994bd586e6965e91db44127e3625880",
+    "tree": "64436c33d4dabfea2f66ddde5cff50a2f6cd2e71"
+  },
+  "accepted_dev": {
+    "commit": "6a40fcc65b1e96e2a5ea9f445ee2120612896039",
+    "tree": "64436c33d4dabfea2f66ddde5cff50a2f6cd2e71",
+    "full_tree_equal": true,
+    "original_review_ancestry_preserved": true
+  },
+  "inventory_file_sha256": "86c52911fd8017afe5a8a504a79c9b58069d8fa5498e5ae477e1bd3c09d3d522",
+  "inventory_content_sha256": "ef4f45c5781fda2b397311c2906229bf7b7c16214661575ee304c4c6328b790f",
+  "controller": {
+    "package_tool": {
+      "path": "tools/package.py",
+      "sha256": "3f40c95979397cb8ba35150418389d88ffe28994d0858a6a4cbdcfa26dd91385"
+    },
+    "release_tool": {
+      "path": "tools/release.py",
+      "sha256": "291ab42469954f78c065d069c7eafc7df0c23e38555a587dc0e316dccfcb8763"
+    },
+    "runtime": {
+      "implementation": "cpython",
+      "version": [
+        3,
+        14,
+        7
+      ],
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    },
+    "zip_policy": {
+      "compression": "ZIP_DEFLATED",
+      "compresslevel": 9,
+      "member_create_system": 3,
+      "member_external_attr": 2175008768,
+      "member_timestamp": [
+        1980,
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "commands": [
+    "python tools/release.py --source source --revision 1ca97dc4981444d742118febf822461a03481e90 --output ../mir5-current-assets-1ca97dc4-r01",
+    "python tools/release.py --source source --output ../mir5-current-assets-1ca97dc4-r01 --verify"
+  ],
+  "assets": [
+    {
+      "target": "f013",
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 346515,
+      "archive_sha256": "d16dfee374d17a7b03c85ffe2a7ce5fb91cfe641b3a735a5e0cfe01c4cb82424",
+      "minimum_base": "0.13.20",
+      "factorio_version": "0.13",
+      "version": "5.0.01300"
+    },
+    {
+      "target": "f014",
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 346515,
+      "archive_sha256": "d5592982dbb16718727174c16d977a7b0fbe9c037f9a29bcc961e664ee9de150",
+      "minimum_base": "0.14.23",
+      "factorio_version": "0.14",
+      "version": "5.0.01400"
+    },
+    {
+      "target": "f015",
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 346475,
+      "archive_sha256": "59d07b6187ddb46f0692878a9980738f2baf34588c4f4b84868c81e815d3c5e5",
+      "minimum_base": "0.15.40",
+      "factorio_version": "0.15",
+      "version": "5.0.01500"
+    },
+    {
+      "target": "f016",
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 346466,
+      "archive_sha256": "6300f09b6a272f23501df7659584684a98d0bae54d0536db91947f1a0a5806be",
+      "minimum_base": "0.16.51",
+      "factorio_version": "0.16",
+      "version": "5.0.01600"
+    },
+    {
+      "target": "f017",
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 346355,
+      "archive_sha256": "04777cddf04b57ff97e94e4cc3b9c8c721c7afa66d5500f92e74d0c4e02d8eb3",
+      "minimum_base": "0.17.79",
+      "factorio_version": "0.17",
+      "version": "5.0.01700"
+    },
+    {
+      "target": "f100",
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 360147,
+      "archive_sha256": "1af8cf9b83fe17aeec35218f21afd5ce5e77adacd9fc6d6c61fc0d4bb7431a37",
+      "minimum_base": "1.0.0",
+      "factorio_version": "1.0",
+      "version": "5.0.10000"
+    },
+    {
+      "target": "f110",
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 360144,
+      "archive_sha256": "9fad85cb25a2741254ad897bcb671cbee21adc96dd99d86dfb30b34d9a3b1fab",
+      "minimum_base": "1.1.110",
+      "factorio_version": "1.1",
+      "version": "5.0.11000"
+    },
+    {
+      "target": "f200",
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 550213,
+      "archive_sha256": "38dd584c7830630e30760a1df29f884e49858a302c48243c8bf788ec616fdc9e",
+      "minimum_base": "2.0.77",
+      "factorio_version": "2.0",
+      "version": "5.0.20000"
+    },
+    {
+      "target": "f210",
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 550749,
+      "archive_sha256": "3d6ae35b16a5ce7492ef617b62cf3d6dbe6aab2c1540096af05bb3ccfefc942b",
+      "minimum_base": "2.1.23",
+      "factorio_version": "2.1",
+      "version": "5.0.21000"
+    }
+  ],
+  "checksums": {
+    "bytes": 927,
+    "name": "SHA256SUMS.txt",
+    "sha256": "814a1344bc6749083a42a66bd4a27b3d97f159ad0b34b047141f85cb29fea231"
+  },
+  "previous_freeze": {
+    "source_commit": "04c2684be262509ef6bb312e1dd0c60d9e11cc74",
+    "comparison": [
+      {
+        "target": "f013",
+        "previous_archive_sha256": "d16dfee374d17a7b03c85ffe2a7ce5fb91cfe641b3a735a5e0cfe01c4cb82424",
+        "current_archive_sha256": "d16dfee374d17a7b03c85ffe2a7ce5fb91cfe641b3a735a5e0cfe01c4cb82424",
+        "changed_members": []
+      },
+      {
+        "target": "f014",
+        "previous_archive_sha256": "d5592982dbb16718727174c16d977a7b0fbe9c037f9a29bcc961e664ee9de150",
+        "current_archive_sha256": "d5592982dbb16718727174c16d977a7b0fbe9c037f9a29bcc961e664ee9de150",
+        "changed_members": []
+      },
+      {
+        "target": "f015",
+        "previous_archive_sha256": "59d07b6187ddb46f0692878a9980738f2baf34588c4f4b84868c81e815d3c5e5",
+        "current_archive_sha256": "59d07b6187ddb46f0692878a9980738f2baf34588c4f4b84868c81e815d3c5e5",
+        "changed_members": []
+      },
+      {
+        "target": "f016",
+        "previous_archive_sha256": "6300f09b6a272f23501df7659584684a98d0bae54d0536db91947f1a0a5806be",
+        "current_archive_sha256": "6300f09b6a272f23501df7659584684a98d0bae54d0536db91947f1a0a5806be",
+        "changed_members": []
+      },
+      {
+        "target": "f017",
+        "previous_archive_sha256": "04777cddf04b57ff97e94e4cc3b9c8c721c7afa66d5500f92e74d0c4e02d8eb3",
+        "current_archive_sha256": "04777cddf04b57ff97e94e4cc3b9c8c721c7afa66d5500f92e74d0c4e02d8eb3",
+        "changed_members": []
+      },
+      {
+        "target": "f100",
+        "previous_archive_sha256": "1af8cf9b83fe17aeec35218f21afd5ce5e77adacd9fc6d6c61fc0d4bb7431a37",
+        "current_archive_sha256": "1af8cf9b83fe17aeec35218f21afd5ce5e77adacd9fc6d6c61fc0d4bb7431a37",
+        "changed_members": []
+      },
+      {
+        "target": "f110",
+        "previous_archive_sha256": "9fad85cb25a2741254ad897bcb671cbee21adc96dd99d86dfb30b34d9a3b1fab",
+        "current_archive_sha256": "9fad85cb25a2741254ad897bcb671cbee21adc96dd99d86dfb30b34d9a3b1fab",
+        "changed_members": []
+      },
+      {
+        "target": "f200",
+        "previous_archive_sha256": "116d03da199d23fd06c13af84c45420ef07b0852484c3e90aad69f8fd50a8037",
+        "current_archive_sha256": "38dd584c7830630e30760a1df29f884e49858a302c48243c8bf788ec616fdc9e",
+        "changed_members": [
+          "compatibility/product_targets.lua",
+          "research/product_target_extension.lua"
+        ]
+      },
+      {
+        "target": "f210",
+        "previous_archive_sha256": "c8e0c570213f41ca8c816a29d1556fd40a36896d31ed56b07856652b2de7f32a",
+        "current_archive_sha256": "3d6ae35b16a5ce7492ef617b62cf3d6dbe6aab2c1540096af05bb3ccfefc942b",
+        "changed_members": [
+          "compatibility/product_targets.lua",
+          "research/product_target_extension.lua"
+        ]
+      }
+    ]
+  },
+  "primary_custody": "build/mir5/assets/1ca97dc4-r01",
+  "primary_verified_files": [
+    {
+      "path": "MIR5ReleaseAssetInventoryV1.json",
+      "bytes": 175097,
+      "sha256": "86c52911fd8017afe5a8a504a79c9b58069d8fa5498e5ae477e1bd3c09d3d522"
+    },
+    {
+      "path": "SHA256SUMS.txt",
+      "bytes": 927,
+      "sha256": "814a1344bc6749083a42a66bd4a27b3d97f159ad0b34b047141f85cb29fea231"
+    },
+    {
+      "path": "more-infinite-research_5.0.01300.zip",
+      "bytes": 346515,
+      "sha256": "d16dfee374d17a7b03c85ffe2a7ce5fb91cfe641b3a735a5e0cfe01c4cb82424"
+    },
+    {
+      "path": "more-infinite-research_5.0.01400.zip",
+      "bytes": 346515,
+      "sha256": "d5592982dbb16718727174c16d977a7b0fbe9c037f9a29bcc961e664ee9de150"
+    },
+    {
+      "path": "more-infinite-research_5.0.01500.zip",
+      "bytes": 346475,
+      "sha256": "59d07b6187ddb46f0692878a9980738f2baf34588c4f4b84868c81e815d3c5e5"
+    },
+    {
+      "path": "more-infinite-research_5.0.01600.zip",
+      "bytes": 346466,
+      "sha256": "6300f09b6a272f23501df7659584684a98d0bae54d0536db91947f1a0a5806be"
+    },
+    {
+      "path": "more-infinite-research_5.0.01700.zip",
+      "bytes": 346355,
+      "sha256": "04777cddf04b57ff97e94e4cc3b9c8c721c7afa66d5500f92e74d0c4e02d8eb3"
+    },
+    {
+      "path": "more-infinite-research_5.0.10000.zip",
+      "bytes": 360147,
+      "sha256": "1af8cf9b83fe17aeec35218f21afd5ce5e77adacd9fc6d6c61fc0d4bb7431a37"
+    },
+    {
+      "path": "more-infinite-research_5.0.11000.zip",
+      "bytes": 360144,
+      "sha256": "9fad85cb25a2741254ad897bcb671cbee21adc96dd99d86dfb30b34d9a3b1fab"
+    },
+    {
+      "path": "more-infinite-research_5.0.20000.zip",
+      "bytes": 550213,
+      "sha256": "38dd584c7830630e30760a1df29f884e49858a302c48243c8bf788ec616fdc9e"
+    },
+    {
+      "path": "more-infinite-research_5.0.21000.zip",
+      "bytes": 550749,
+      "sha256": "3d6ae35b16a5ce7492ef617b62cf3d6dbe6aab2c1540096af05bb3ccfefc942b"
+    }
+  ],
+  "native_acceptance": false,
+  "limits": [
+    "Aero PR926 restores the delivered dynamic lab-input science productivity targets outside Generator. Only the selected package member differences are qualified by this offline readback.",
+    "All nine editions rebuild byte-identically; unchanged earlier-edition bytes retain their existing exact identity. Affected native fresh-science, saved transition, catalogue and performance qualification remains required.",
+    "Earlier C8/116D observations remain original-scope evidence and are not relabelled as these changed modern archives."
+  ]
+}

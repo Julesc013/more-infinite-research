@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "kind": "published-f100-forward",
+  "stage": "source",
+  "target": "f100",
+  "factorio_line": "1.0",
+  "settings_mode": "Defaults",
+  "predecessor_origin": "published-f100-4.7.10003",
+  "protected_source_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811",
+  "engine": {
+    "version": "1.0.0",
+    "sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70"
+  },
+  "mods": [
+    {
+      "name": "base",
+      "version": "1.0.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "4.7.10003",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-historical-transition",
+      "version": "0.2.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_4.7.10003.zip": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1",
+    "mir-fixture-mir5-historical-transition_0.2.0.zip": "E2F1D24D3C878F6A3B58A6F38ADD045FB942C31599079FD837CAB5FCBB291280"
+  },
+  "scope": "One enhanced disposable copy of the protected published F100 source, shared by both requested F110/F210 destinations. No new predecessor world/lab or changed startup setting. Seeded laser/inserter witnesses are labelled;original mining lab is reused. Original source retained unchanged;not native qualification."
+}

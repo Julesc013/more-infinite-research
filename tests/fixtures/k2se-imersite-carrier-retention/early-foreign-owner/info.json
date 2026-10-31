@@ -1,0 +1,13 @@
+{
+  "name": "a-mir-fixture-k2se-foreign-owner",
+  "version": "0.1.0",
+  "title": "MIR K2SE private early foreign-lock owner",
+  "author": "MIR tests",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "Krastorio2 = 2.1.4",
+    "space-exploration = 0.7.63",
+    "! Krastorio2-spaced-out"
+  ]
+}

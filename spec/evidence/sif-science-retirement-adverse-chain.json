@@ -1,0 +1,170 @@
+{
+  "kind": "MIR5SifScienceRetirementAdverseChainV1",
+  "limits": [
+    "Original exact adverse receipts and two bounded F200 startup passes only.",
+    "No laboratories, save transitions, F210 matrix, performance or release qualification."
+  ],
+  "next_step": "Repair the SIF-specific promethium owner binding without changing the six-pack oracle; freeze new player assets and qualify exact new inputs.",
+  "player_sha256": "89DF8C29D1E03CB4237CCDCA61DA4F2F4295DE738DB74B4A0452EAF72CAA31A6",
+  "player_source_commit": "f5223e1fb755a0fe3669551a51cc08f207b7e1df",
+  "raw_evidence": {
+    "gzip_bytes": 135345,
+    "gzip_sha256": "6D15224C587C838F708A46507FABA987B8AE1EB0D7DC8C3D5C45C50B7ECD2ACA",
+    "members": 19,
+    "path": "spec/evidence/sif-science-retirement-adverse-receipts.json.gz",
+    "uncompressed_sha256": "54C8CFD37F3C687BDA4BBF2660A7CEA413044580E8518CDFA0886D319F07D647"
+  },
+  "runs": [
+    {
+      "artifact_manifest_sha256": "3A76BF872F123F637FA81930AD5817E056B0E4E60C953CD097B53DA13F78758F",
+      "artifact_members_verified": 124,
+      "cases": [
+        {
+          "case": "sif-science-retirement-f200-configured",
+          "controls_restored": true,
+          "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+          "failure": "[mir441-process-exit] 1",
+          "laboratory_or_transition_qualification": false,
+          "native_log_path": "sif-science-retirement/native/f200/candidate-configured/write-data/factorio-current.log",
+          "native_log_sha256": "447770C15A794385B88A05A37FE85891AC93D820BA0695B064C71B0A061AC457",
+          "player_sha256": "89DF8C29D1E03CB4237CCDCA61DA4F2F4295DE738DB74B4A0452EAF72CAA31A6",
+          "result_path": "sif-science-retirement/native/f200/candidate-configured/result.json",
+          "result_sha256": "AF9C394304390D48DFC932FDCA68DF11F795257E2355022FD800A8BD909DE3FB",
+          "startup_markers": [],
+          "status": "failed"
+        }
+      ],
+      "classification": "fixture-late-import",
+      "controller_commit": "c23857156d821df46dce489dca7ed54f5bc15671",
+      "fixture_source_commit": "a8840cf4e125aaf87cf30ea79c3a784761ba69a4",
+      "observation": "Require cannot be used outside control.lua parsing.",
+      "player_source_commit": "f5223e1fb755a0fe3669551a51cc08f207b7e1df",
+      "primary_custody": "build/mir5/recovery-historical/sif-science-retirement/40113421536/black-glass-sif-science-retirement-40113421536-1",
+      "run": 40113421536,
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40113421536",
+      "workflow_conclusion": "failure"
+    },
+    {
+      "artifact_manifest_sha256": "9733B5C14FD52AD252786DECDCD3FBBC76792113AA7179797547FDD5332385C6",
+      "artifact_members_verified": 124,
+      "cases": [
+        {
+          "case": "sif-science-retirement-f200-configured",
+          "controls_restored": true,
+          "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+          "failure": "[mir441-process-exit] 1",
+          "laboratory_or_transition_qualification": false,
+          "native_log_path": "sif-science-retirement/native/f200/candidate-configured/write-data/factorio-current.log",
+          "native_log_sha256": "97639643D0776E218346B770B742714E5341B725AD27ECBADB835F5B4D22D206",
+          "player_sha256": "89DF8C29D1E03CB4237CCDCA61DA4F2F4295DE738DB74B4A0452EAF72CAA31A6",
+          "result_path": "sif-science-retirement/native/f200/candidate-configured/result.json",
+          "result_sha256": "D0CDC8EB1972FB2F8BFC11F7F9D4BBEF6063B6708CD41184CA2D7392EFB7B6EE",
+          "startup_markers": [],
+          "status": "failed"
+        }
+      ],
+      "classification": "fixture-positional-runtime-check",
+      "controller_commit": "78ffc2cf7ea3bd6a97f0f8f39a738296e20abdf8",
+      "fixture_source_commit": "5b4a8100624ecb460576b70dc7241cab1c5ceedf",
+      "observation": "research-speed-7 runtime science differs at 3.",
+      "player_source_commit": "f5223e1fb755a0fe3669551a51cc08f207b7e1df",
+      "primary_custody": "build/mir5/recovery-historical/sif-science-retirement/40114465992/black-glass-sif-science-retirement-40114465992-1",
+      "run": 40114465992,
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40114465992",
+      "workflow_conclusion": "failure"
+    },
+    {
+      "artifact_manifest_sha256": "966DCAFD4A0406E30F4F0E0EE4B9C10E1B54BED16260386B4858937F40319B38",
+      "artifact_members_verified": 142,
+      "cases": [
+        {
+          "case": "sif-science-retirement-f200-configured",
+          "controls_restored": true,
+          "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+          "failure": null,
+          "laboratory_or_transition_qualification": false,
+          "native_log_path": "sif-science-retirement/native/f200/candidate-configured/create.factorio.log",
+          "native_log_sha256": "FB611251A9098775E8A15EE067C54D63F1F2A6344080586853A189E462268C4C",
+          "player_sha256": "89DF8C29D1E03CB4237CCDCA61DA4F2F4295DE738DB74B4A0452EAF72CAA31A6",
+          "result_path": "sif-science-retirement/native/f200/candidate-configured/result.json",
+          "result_sha256": "81DA4F7F12871B03E4829B64E2F377EC7C0185F0415DC73283E61493F00AD3D1",
+          "startup_markers": [
+            {
+              "case": "sif-science-retirement-f200-configured",
+              "stage": "init",
+              "status": "passed",
+              "witnesses": {
+                "fresh_candidate": true,
+                "mir_version": "5.0.20000",
+                "native_state_writes": false,
+                "policy": "configured",
+                "retired_space_prerequisite": false,
+                "retired_space_science": false,
+                "runtime_rows": true,
+                "storage_writes": false,
+                "target": "f200"
+              }
+            }
+          ],
+          "status": "passed-private-native-runtime-load-only"
+        },
+        {
+          "case": "sif-science-retirement-f200-space",
+          "controls_restored": true,
+          "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+          "failure": null,
+          "laboratory_or_transition_qualification": false,
+          "native_log_path": "sif-science-retirement/native/f200/candidate-space/create.factorio.log",
+          "native_log_sha256": "D322F95DB74A374E54FACAA3B6930EB689DAFE22F37791DCB7748258E0CCE2C4",
+          "player_sha256": "89DF8C29D1E03CB4237CCDCA61DA4F2F4295DE738DB74B4A0452EAF72CAA31A6",
+          "result_path": "sif-science-retirement/native/f200/candidate-space/result.json",
+          "result_sha256": "DB4C20507B8C9F06CF89C6DFDD6F222E23533977CC1DB99AF26741FA0E224309",
+          "startup_markers": [
+            {
+              "case": "sif-science-retirement-f200-space",
+              "stage": "init",
+              "status": "passed",
+              "witnesses": {
+                "fresh_candidate": true,
+                "mir_version": "5.0.20000",
+                "native_state_writes": false,
+                "policy": "space",
+                "retired_space_prerequisite": false,
+                "retired_space_science": false,
+                "runtime_rows": true,
+                "storage_writes": false,
+                "target": "f200"
+              }
+            }
+          ],
+          "status": "passed-private-native-runtime-load-only"
+        },
+        {
+          "case": "sif-science-retirement-f200-space-and-promethium",
+          "controls_restored": true,
+          "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+          "failure": "[mir441-process-exit] 1",
+          "laboratory_or_transition_qualification": false,
+          "native_log_path": "sif-science-retirement/native/f200/candidate-space-and-promethium/write-data/factorio-current.log",
+          "native_log_sha256": "9B7FAAD5F12DC09EF9F5AE35B01C3FE86AE3E21B2FC5BAC7E22F1B9192FB3754",
+          "player_sha256": "89DF8C29D1E03CB4237CCDCA61DA4F2F4295DE738DB74B4A0452EAF72CAA31A6",
+          "result_path": "sif-science-retirement/native/f200/candidate-space-and-promethium/result.json",
+          "result_sha256": "8AD32A1DBC7CC8E27712D1F3D5C0EA90913B29189AD4417E52465EE6910DD1B6",
+          "startup_markers": [],
+          "status": "failed"
+        }
+      ],
+      "classification": "product-science-owner-binding",
+      "controller_commit": "ca768e56f1c9e3b99af3c1dfa3518d8107218c3c",
+      "fixture_source_commit": "04da2bb6acbf84be12fa1d07030f744786c37b4d",
+      "observation": "weapon-shooting-speed-7 science count differs under space-and-promethium; source audit identifies SIF removing promethium-owner prerequisites required by f522.",
+      "player_source_commit": "f5223e1fb755a0fe3669551a51cc08f207b7e1df",
+      "primary_custody": "build/mir5/recovery-historical/sif-science-retirement/40115628145/black-glass-sif-science-retirement-40115628145-1",
+      "run": 40115628145,
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40115628145",
+      "workflow_conclusion": "failure"
+    }
+  ],
+  "schema": 1,
+  "status": "open-product-binding-defect-after-fixture-corrections"
+}

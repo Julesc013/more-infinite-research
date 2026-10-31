@@ -1,0 +1,94 @@
+{
+  "kind": "MIRArmorCompleteRecipePreservationReadbackV1",
+  "recipe": "bob-mech-armor-plate",
+  "inputs": {
+    "control-without-mir": {
+      "path": "D:\\Projects\\Factorio\\mir5-f200-armor-activation-r01\\build\\tmp\\f200-armor-activation-r05\\control-without-mir\\write-data\\script-output\\data-raw-dump.json",
+      "bytes": 64158856,
+      "sha256": "CD0CC1295BE5EE83163AA974D2E9D6C647C9B1A0DD5FEACB1A6476939AAB9DFC"
+    },
+    "candidate-corrected": {
+      "path": "D:\\Projects\\Factorio\\mir5-f200-armor-activation-r01\\build\\tmp\\f200-armor-activation-r05\\candidate-corrected\\write-data\\script-output\\data-raw-dump.json",
+      "bytes": 64340064,
+      "sha256": "D9912FCEA98F046572A5D24E0E74D5895D22407B65D42B881756C71A185AE5F4"
+    }
+  },
+  "complete_rows": {
+    "control-without-mir": {
+      "type": "recipe",
+      "name": "bob-mech-armor-plate",
+      "enabled": true,
+      "energy_required": 1,
+      "ingredients": [
+        {
+          "type": "item",
+          "name": "low-density-structure",
+          "amount": 5
+        },
+        {
+          "name": "tungsten-carbide",
+          "amount": 2,
+          "type": "item"
+        }
+      ],
+      "results": [
+        {
+          "type": "item",
+          "name": "bob-mech-armor-plate",
+          "amount": 1
+        }
+      ],
+      "allow_productivity": true
+    },
+    "candidate-corrected": {
+      "type": "recipe",
+      "name": "bob-mech-armor-plate",
+      "enabled": true,
+      "energy_required": 1,
+      "ingredients": [
+        {
+          "type": "item",
+          "name": "low-density-structure",
+          "amount": 5
+        },
+        {
+          "name": "tungsten-carbide",
+          "amount": 2,
+          "type": "item"
+        }
+      ],
+      "results": [
+        {
+          "type": "item",
+          "name": "bob-mech-armor-plate",
+          "amount": 1
+        }
+      ],
+      "allow_productivity": true
+    }
+  },
+  "canonical_sha256": {
+    "control-without-mir": "3F95D01674DA72569C626AD0183FBCB9A409B0FA39542DD96294D79D6CD129C7",
+    "candidate-corrected": "3F95D01674DA72569C626AD0183FBCB9A409B0FA39542DD96294D79D6CD129C7"
+  },
+  "changed_keys": [],
+  "complete_row_equal": true,
+  "native_replay": false,
+  "original_terminal_remains_adverse": true,
+  "status": "passed-scoped-read-only-complete-row-comparison",
+  "related_native_chain": "spec/evidence/f200-armor-activation-post-adverse-readback-chain-r01.json",
+  "source_execution_public_commit": "82fae1c9edb56544d3c976ab838eff9ffde2bf87",
+  "original_root_record": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\f200-armor-activation-r05-controller\\root-armor-recipe-row-readback-r01.json",
+    "bytes": 2258,
+    "sha256": "6F1A633D2DD47C7ADBA2B9199FD39E6FC8351E327EC6149BD663F1B1D0FCD189"
+  },
+  "serialization": "Complete recipe objects are derived JSON serializations from the two hash-verified native data-raw dumps; every field and array value retained, no default filling or normalization.",
+  "limits": [
+    "One retained armor recipe row only; all other upstream technology/setting comparisons retain their cited-chain scope.",
+    "Original R12 controller terminal remains adverse. No engine replay, gameplay, physical-output, save, client, performance or release acceptance is claimed."
+  ],
+  "performance_acceptance": false,
+  "gameplay_acceptance": false,
+  "release_qualification": false
+}

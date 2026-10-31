@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "kind": "MIR5CompleteHostControlObservationV1",
+  "status": "passed",
+  "controls": 82,
+  "lua_controls": 73,
+  "non_lua_controls": 9,
+  "source_commit": "58159f246d17a24a724475118c51ac4600cf3ee7",
+  "repository_tree": "37d37f97f26a12cf6cad539c8e015bfa6e595b5b",
+  "player_source_tree": "430ced6634b88e8d4c53c4fd82bfa0be5fe0dcfa",
+  "command": ".\\tests\\mir5\\Test-MIR5HostControls.ps1 -LuaRuntimeDir build/tmp/mir421-lua-runtime",
+  "process_exit_code": 0,
+  "source_writers_held": true,
+  "working_tree_clean_before_and_after": true,
+  "log": {
+    "gzip": "spec/mir5/evidence/host-controls-58159-82.gz",
+    "compressed_sha256": "7C9BECC7F693B4338D6B58DF837FD543C29F3BD1D12CE0FAE9F1CD8386373746",
+    "uncompressed_sha256": "BF586CDC76DACD887733CDA551130D86EA80EDCD5D1CDEB68BE9EF69F2874305"
+  },
+  "plan": {
+    "gzip": "spec/mir5/evidence/host-plan-58159-82.json.gz",
+    "compressed_sha256": "F87DFD9EB05C78950F4D8B13C7F3A293E15603B0F790D0087448FC1E2BE3BD99",
+    "uncompressed_sha256": "793A7F78C4DC0A46CA75521E01167AABE7C3E24090C9C1D66CF67EC80F152861",
+    "materialized_before_run": true
+  },
+  "scope": [
+    "All82 selected host commands pass against one committed source with shared source/test/doc writers held throughout.",
+    "Includes all14 independently recovered Bob-core material rows, five named unlock-owner bindings, explicit native-default equivalences, detached shared material construction, bounded Availability, override depth controls and offline nine-edition freeze/tamper cases.",
+    "The two optional skipped cases are retained below. The actual-library fixed-provider case passed separately under its original observation; this receipt does not relabel that execution.",
+    "No native candidate catalogue, lab gameplay, save/client safety, elapsed startup/runtime performance, final-layout or release qualification follows."
+  ],
+  "skipped_cases": [
+    "test_local_matched_capture_proves_opt_in_and_no_generated_auto_ids_when_present (__main__.AutomaticFamilyNonEmissionTests.test_local_matched_capture_proves_opt_in_and_no_generated_auto_ids_when_present) ... skipped 'developer-custody raw captures are optional; portable facts remain checked'",
+    "test_local_archive_source_matches_portable_facts_when_the_pinned_library_is_present (__main__.FixedCompetingReferenceTests.test_local_archive_source_matches_portable_facts_when_the_pinned_library_is_present) ... skipped 'archive source verification requires --archive-library'"
+  ],
+  "native_execution": false,
+  "release_qualification": false
+}

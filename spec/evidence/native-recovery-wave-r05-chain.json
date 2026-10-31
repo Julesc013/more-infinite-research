@@ -1,0 +1,267 @@
+{
+  "accepted": [
+    {
+      "direct_library_control_restoration": "restored-direct-library-controls",
+      "initial_witness": {
+        "destination_actual_lab_completions": 1,
+        "destination_mir": "5.0.21000",
+        "direct_predecessor_handoff": true,
+        "handoff_source": "direct-4.6",
+        "on_load_read_only": false,
+        "powder_productivity": 0.12,
+        "public_continuation_readded": false,
+        "recovered_tail_saved_progress_before_lab": 0.42000000000000004,
+        "retained_source_next_level": 6,
+        "source_actual_lab_completions": 5,
+        "source_mir": "4.6.21000",
+        "tail_next_level": 7
+      },
+      "manifest_members_verified": 34,
+      "manifest_sha256": "99FA71DAD8C5579E1F047385156903A54C29BFB875ACBE98FD1F1896C48DD5F9",
+      "player_archive_sha256": "AFCAF4532F6CAA85A623CAFD7D0CCC0D06A1BD934D206F0F6C99829A7B1A9D82",
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_byte_identical": true,
+          "save_sha256": "E8421996B7D2BFFD26A4DA33B9B03DF1782FF0212F01BB645B3742697908CAC0"
+        },
+        {
+          "ordinal": 2,
+          "save_byte_identical": true,
+          "save_sha256": "E8421996B7D2BFFD26A4DA33B9B03DF1782FF0212F01BB645B3742697908CAC0"
+        }
+      ],
+      "result_sha256": "5D8EBD73BFF92CB7A614373A5C6EB8EDB64353A5EF551B611E814F07D30720D7",
+      "run": 40082348767,
+      "scenario": "direct-k2-recovery",
+      "source_commit": "8c14aa1aa72b96fab9cd00cbcbcc83919278babb",
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40082348767",
+      "controller_commit": "aedde1c92a6cac64afb70e03ea3f2a5562e7f6cd"
+    },
+    {
+      "direct_library_control_restoration": "restored-direct-library-controls",
+      "initial_witness": {
+        "actual_lab_completions": 2,
+        "agricultural_science": {
+          "inventory_count": 30,
+          "prototype_lab_ignores_spoil_percent": false,
+          "prototype_science_capacity": 1,
+          "prototype_spoil_ticks": 216000,
+          "stacks": [
+            {
+              "count": 30,
+              "slot": 9,
+              "spoil_percent": 0.0005555555555555314,
+              "spoil_tick": 216000
+            }
+          ],
+          "stored_durability": 0.9991712962962962
+        },
+        "agricultural_science_items_drawn": 2,
+        "each_nonperishable_official_science_consumed": 1,
+        "exact_reporter_modpack": false,
+        "fixture_accelerates_gear_count_and_time": true,
+        "foreign_owner_input": "mir5-cryogenic-native-science",
+        "foreign_owner_science_consumed": 1,
+        "gear": {
+          "level": 2,
+          "recipe_effect_change": 0.1,
+          "recipe_effect_matches": 1,
+          "researched": false,
+          "technology": "recipe-prod-research_gears-1"
+        },
+        "laboratory_productivity": 0,
+        "native_gear_productivity": 0.1,
+        "official_science_inputs": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "military-science-pack",
+          "utility-science-pack",
+          "space-science-pack",
+          "agricultural-science-pack",
+          "metallurgic-science-pack",
+          "electromagnetic-science-pack",
+          "cryogenic-science-pack",
+          "promethium-science-pack"
+        ],
+        "on_load_read_only": false,
+        "ordinary_tuning_qualified": false,
+        "policy": "all-official",
+        "resource_mining_observed": false
+      },
+      "manifest_members_verified": 39,
+      "manifest_sha256": "46AEA975E89CD3240F16D2035415D865E52ED5D58F786FE724EEC5DA4C78F5B7",
+      "player_archive_sha256": "AFCAF4532F6CAA85A623CAFD7D0CCC0D06A1BD934D206F0F6C99829A7B1A9D82",
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_byte_identical": true,
+          "save_sha256": "ADC7FDC1D56FF3936650070A5D294CD54532AA50E309BC1D285E3EB66C2D193E"
+        },
+        {
+          "ordinal": 2,
+          "save_byte_identical": true,
+          "save_sha256": "ADC7FDC1D56FF3936650070A5D294CD54532AA50E309BC1D285E3EB66C2D193E"
+        }
+      ],
+      "result_sha256": "5C995F62C13259B9A2AED92B8C9D94C50E6AF578132D561F2C4EB84F01CC60C8",
+      "run": 40082484361,
+      "scenario": "cryogenic-gameplay",
+      "source_commit": "8c14aa1aa72b96fab9cd00cbcbcc83919278babb",
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40082484361",
+      "controller_commit": "aedde1c92a6cac64afb70e03ea3f2a5562e7f6cd"
+    },
+    {
+      "direct_library_control_restoration": "restored-direct-library-controls",
+      "initial_witness": {
+        "data_energy_usage_watts": 1,
+        "data_stage_pipeline_extent": 480,
+        "data_stage_receiver_ranges": true,
+        "on_load_read_only": false,
+        "ordinary_tuning_qualified": false,
+        "physical_iron_gear_wheels": 6,
+        "physical_iron_plate_consumed": 10,
+        "physical_module_count": 2,
+        "public_module_permission_maps": true,
+        "runtime_energy_usage_joules_per_tick": 0.016666666666666666,
+        "runtime_productivity_cap": 1,
+        "runtime_recycling_probability": 0.2,
+        "self_recycling_classifier": "inactive-cap1-threshold4"
+      },
+      "manifest_members_verified": 36,
+      "manifest_sha256": "CF48C5348B52EDA72CC6AF28A230748FB101DD33880459203B044AC9EAEE009D",
+      "player_archive_sha256": "BA853C9EA41D406C01FAFCD623B3F836AA42BB7BCC8103E92116BFE33F1DBE71",
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_byte_identical": true,
+          "save_sha256": "53223DED0D20F494C63A0C1E5E59E3B69C4E0E4890A52287466765DDBEF6A737"
+        },
+        {
+          "ordinal": 2,
+          "save_byte_identical": true,
+          "save_sha256": "53223DED0D20F494C63A0C1E5E59E3B69C4E0E4890A52287466765DDBEF6A737"
+        }
+      ],
+      "result_sha256": "9C785AA43303381D7E18E443D54096B16D6900D246546437722F04C1B842978A",
+      "run": 40082592194,
+      "scenario": "override-interactions",
+      "source_commit": "a031f09101d877d0558cd79e92a344a0a4315bfc",
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40082592194",
+      "controller_commit": "aedde1c92a6cac64afb70e03ea3f2a5562e7f6cd"
+    }
+  ],
+  "adverse_history": [
+    {
+      "failure": "artifact manifest contains no generated member",
+      "manifest_sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "result_sha256": null,
+      "run": 40077322192,
+      "scenario": "direct-k2-recovery",
+      "source_commit": null,
+      "status": "no-native-result"
+    },
+    {
+      "failure": "[mir441-process-exit] 1",
+      "manifest_sha256": "199BFCAE37D7ABF2A6D6AF0D53E6E9C7DA618CFF294F142DE2D25F460DE7F2E9",
+      "result_sha256": "9FD2E6A5D8B60C36C7E52328062C4EF75DA585E38C7BCA82CE4BE0E80BE3D87C",
+      "run": 40077395277,
+      "scenario": "direct-k2-recovery",
+      "source_commit": "8f938f810d6e10837c4643e8574032f2e55f317b",
+      "status": "failed"
+    },
+    {
+      "failure": "[mir441-process-exit] 1",
+      "manifest_sha256": "5175E35F0378B2E49A1A81D63AAC1515F82BB9274E68AA2818F71E95FBDFA162",
+      "result_sha256": "A86F363DF2D1357ABBC70F2D1F4BE41932B3252D848D596938A7623FB9483576",
+      "run": 40079427588,
+      "scenario": "direct-k2-recovery",
+      "source_commit": "e4b6814cf70acac17a8b90552048b24023d64844",
+      "status": "failed"
+    },
+    {
+      "failure": "[mir441-process-exit] 1",
+      "manifest_sha256": "887CF263614603AEC0E87BDC465EAC647030D59FADAE5E4E9B1FB8B6C9AA90FF",
+      "result_sha256": "71EA85A0710095ECA25F27C3D11E51D6C5DFDD365B06C026BA2ED3881F0822C2",
+      "run": 40075774579,
+      "scenario": "cryogenic-gameplay",
+      "source_commit": "d31d4d0638b2054667e5205e08f6254524f91cb5",
+      "status": "failed"
+    },
+    {
+      "failure": "[mir441-process-exit] -1",
+      "manifest_sha256": "088DD32D57D4DA43CF4097520DF0B31790A8C589851DE0B2FE437957E5C821EA",
+      "result_sha256": "BD2FA913E11BBA6188BE962BDFC8554957B5C67B1593DFE869B2FC556B4A2C7F",
+      "run": 40076699140,
+      "scenario": "cryogenic-gameplay",
+      "source_commit": "d31d4d0638b2054667e5205e08f6254524f91cb5",
+      "status": "failed"
+    },
+    {
+      "failure": "fatal native production diagnostic",
+      "manifest_sha256": "637EE434231CC2EB31BEB70BD2B1603EE755D5519C9CA127F048F18C344446F9",
+      "result_sha256": "69E35EE2BDD50AF478DD11F7A5DFDF65099276F498AD51823265151B9C2CB603",
+      "run": 40079283825,
+      "scenario": "cryogenic-gameplay",
+      "source_commit": "e4b6814cf70acac17a8b90552048b24023d64844",
+      "status": "failed"
+    },
+    {
+      "failure": "[mir441-process-exit] 1",
+      "manifest_sha256": "9F19F7BDBBBF189C9DD6555570B9D212BE02A5D8342A7E6AEF015A8541A90A5D",
+      "result_sha256": "86A5B4A3437CB6EC8E1DD4FEA9D58F66986B978128555FCC39A2AE948DBE88DB",
+      "run": 40077727837,
+      "scenario": "override-interactions",
+      "source_commit": "d31d4d0638b2054667e5205e08f6254524f91cb5",
+      "status": "failed"
+    },
+    {
+      "failure": "[mir441-process-exit] 1",
+      "manifest_sha256": "EA283A79C25E63D2E84536E1C87127C83B970D190CAF1649689E37139FB0A3D8",
+      "result_sha256": "37CC13E28EE017461605E4079E4D86E6AE782D27128C8AA830E3F5CA29EA615D",
+      "run": 40079632527,
+      "scenario": "override-interactions",
+      "source_commit": "e4b6814cf70acac17a8b90552048b24023d64844",
+      "status": "failed"
+    }
+  ],
+  "direct_k2_predecessor_reuse": {
+    "cold_reloads_reused": 2,
+    "complete_save_sha256": "538B7321F57A79807371B4CE415A9EF97FA72DEA8BB0A9B05DC41D00D035F828",
+    "native_processes_reused": 4,
+    "receipt": {
+      "bytes": 1052,
+      "path": "build/mir5/recovery-historical/k2-imersite-transition-direct-recovery/40082348767/black-glass-k2-imersite-transition-direct-recovery-40082348767-1/predecessor-reuse.json",
+      "sha256": "3DA5C7D8F037EBF61295766FC4FB012FAEFFBACDE6C09693F89C955348F5DDD1"
+    },
+    "reused_run": 40071490977
+  },
+  "engine": {
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "version": "2.1.23"
+  },
+  "kind": "MIR5NativeRecoveryWaveR05ChainV1",
+  "limitations": "Each acceptance is a named native fixture observation with its own frozen source, package, profile, fixture closure, direct-library restoration and result. Direct K2 acceptance covers only the accelerated matching-cost direct 4.6-to-MIR5 path; it does not qualify ordinary cost tuning or the published 4.7.2 carrier path. The retained published-carrier intermediate run 40075366627 failed before MIR5 and remains unresolved. This bundle makes no whole-product performance, menu, multiplayer, arbitrary-modpack, universal startup safety or release qualification claim.",
+  "receipt_bundle": {
+    "compressed_sha256": "21A841539806C2DD76674408BBC53BBBF1E32A677F2DB2ADB12B260C204E25D5",
+    "members": 12,
+    "path": "spec/mir5/evidence/native-recovery-wave-r05-receipts.json.gz",
+    "uncompressed_sha256": "813744FAA6A693662E542D739D943FA577219FAFCA03F7701DA3A025326E83CE"
+  },
+  "release_qualification": false,
+  "schema": 1,
+  "status": "three-named-native-fixture-passes",
+  "direct_k2_scope": {
+    "accepted_path": "Direct published-4.6 to MIR5 recovery only, under the fixture-specific matching one-count/one-second cost companion for the named public early row and JSON holder.",
+    "retained_published_carrier_intermediate": {
+      "run": 40075366627,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40075366627",
+      "controller_commit": "a0729bf9bf9a26e725d2118c92c5fd65acb0d5b9",
+      "source_commit": "d31d4d0638b2054667e5205e08f6254524f91cb5",
+      "status": "failed-before-mir5",
+      "failure": "[mir441-process-exit] 1; published 4.7.2 fixture attempted to restore force progress with no active research."
+    }
+  }
+}

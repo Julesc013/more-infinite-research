@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-agriculture-scale-paired",
+  "version": "0.1.0",
+  "title": "MIR agriculture paired-arm selector",
+  "author": "MIR maintainers",
+  "description": "Selects the shared one-tower agriculture physical fixture with exactly one science-contract arm.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "mir-fixture-mir5-agriculture-scale >= 0.1.0"
+  ]
+}

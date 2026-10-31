@@ -1,0 +1,165 @@
+{
+  "schema": 1,
+  "kind": "MIRFreshClientLibraryAPICurrentApplicabilityV1",
+  "status": "reviewed-reuse-of-original-fresh-client-functional-results",
+  "original_source_commit": "7a2f93224c846b86261b2da709f50ea683fc708d",
+  "original_player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+  "current_source_commit": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+  "current_player_tree": "fbb7e9135280ce7f69692e9b0c4a44d743793f45",
+  "package_member_comparison": "spec/evidence/current-fbb7-historical-applicability-r01.json",
+  "package_pairs": [
+    {
+      "target": "f200",
+      "name": "more-infinite-research_5.0.20000.zip",
+      "prior_sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
+      "current_sha256": "E9D349931E082AD77057C150E3D6093490E4086E84F0FAFECB0ED1257FD5ED4F",
+      "changed_members": [
+        "changelog.txt",
+        "runtime/caps.lua",
+        "runtime/lifecycle.lua"
+      ],
+      "applicability": "Changed runtime paths require their separately named affected qualification;not granted by this record.",
+      "reference_scope": "Exact archive hashes and changed-member list only;this new record supplies the separate fresh-client source applicability decision."
+    },
+    {
+      "target": "f210",
+      "name": "more-infinite-research_5.0.21000.zip",
+      "prior_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+      "current_sha256": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447",
+      "changed_members": [
+        "changelog.txt",
+        "runtime/caps.lua",
+        "runtime/lifecycle.lua"
+      ],
+      "applicability": "Changed runtime paths require their separately named affected qualification;not granted by this record.",
+      "reference_scope": "Exact archive hashes and changed-member list only;this new record supplies the separate fresh-client source applicability decision."
+    }
+  ],
+  "identical_consumed_modules": [
+    {
+      "path": "api/v1/data.lua",
+      "sha256": "9CCDD2B5FFBE14156D002F50ECEB9799F70124CADA0A0A3767D84CA242413FA5",
+      "bytes": 12993
+    },
+    {
+      "path": "api/v1/runtime.lua",
+      "sha256": "5FA121E602EF99CC67DAE4C1E17C5334A8FB26BBEF97F00BF0AE9AE242D9C873",
+      "bytes": 3663
+    },
+    {
+      "path": "control.lua",
+      "sha256": "17201196D4EB573265CE34C0599748ED78DF856EBFCB4229018C05C4E056C0C9",
+      "bytes": 248
+    },
+    {
+      "path": "platform/target.lua",
+      "sha256": "9D0231B2F7643B9A3D3E5DC1406DC9B639AF4F799C33FDD0D4E32DD37452441A",
+      "bytes": 502
+    },
+    {
+      "path": "presentation/library_model.lua",
+      "sha256": "591F69FDB536CF1F750AA711F876408617C2BE89A0BA4AB53AE6B99C43C94381",
+      "bytes": 19512
+    },
+    {
+      "path": "research/catalogue.lua",
+      "sha256": "EACCBED9C41C08FE8236991FC92F7AED78B1CCD3D7BFBDD6729487342BA8CA2C",
+      "bytes": 13752
+    },
+    {
+      "path": "runtime/bootstrap.lua",
+      "sha256": "9082E729CAC88C38182576DE88B5B2C378ECD0333339BAAE0A93DAD0DDFB8EDB",
+      "bytes": 28235
+    },
+    {
+      "path": "runtime/cap_admission.lua",
+      "sha256": "BB0D9B0B62AC0DD8012CC424C3403B303E18347FBFCE0E250A65A81D5B9D1E54",
+      "bytes": 2692
+    },
+    {
+      "path": "runtime/legacy_caps.lua",
+      "sha256": "C13466CF0416461F298217D897D060BA1AE916A571A51CA8A663371A3747EA18",
+      "bytes": 23297
+    },
+    {
+      "path": "runtime/library.lua",
+      "sha256": "24A7CC1A0D501BEDA5533FD19385B087D5FEB50629706B97CC12E723219E3EBB",
+      "bytes": 86998
+    },
+    {
+      "path": "runtime/library_translations.lua",
+      "sha256": "2F988BDE25CEA126465FD8E400361FB40352E2B0419D617EB2AEAC6AA9FC5FDF",
+      "bytes": 16237
+    },
+    {
+      "path": "runtime/native_credits.lua",
+      "sha256": "5A0B690558BA86805D9416FB7BA0EC049EDC28045EE10799B1D73A24E8CACBDB",
+      "bytes": 13393
+    }
+  ],
+  "source_scope_proof": [
+    "These are fresh MIR5 create-only seeds, followed by their own MIR5 saves; they contain no published MIR4 storage.mir.maximum_level_control bucket and their fixtures do not import private MIR state.",
+    "M.on_init still calls reconcile_all(false). On configuration, import_legacy_caps_on_configuration returns immediately when the legacy bucket is absent, so the newly added imported_reenabled argument remains nil.",
+    "With that optional argument nil, caps.reconcile computes the same boolean restoration ownership as before; its new exact-record exception is false. Existing enabled/disabled records, limits, queues and visibility decisions retain their prior meanings.",
+    "With that optional argument nil, reconcile_authored_prototype_disablement assigns the same false to existing visibility-only records. The new created-record facts/map collection is reachable only inside the legacy-import path, outside these fresh cases.",
+    "Ordinary event callers retain nil for the optional argument. Control registration,bootstrap,Library/model/translations,API modules,catalogue,cap admission,legacy decoder and native-credit modules are byte-identical. The only other lifecycle change is historical F210 metadata commentary.",
+    "The change of configuration-call syntax from a trailing one-result function call to explicit owners/imported bindings passes the same nil optional argument in these cases; it changes no fresh-world native action or joining-client state.",
+    "This proof excludes the changed MIR4 V3 first-import enablement boundary. Its exact current native routes are separately recorded; they are not adopted through this fresh-client reuse."
+  ],
+  "original_cases": [
+    {
+      "path": "spec/evidence/library-api-1318-native-chain-r01.json",
+      "sha256": "27255E63BB641364B0B76A7C4F4443D973A078BD241CE6DC2E703C7676272153",
+      "original_candidate": {
+        "source_commit": "7a2f93224c846b86261b2da709f50ea683fc708d",
+        "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+        "archive_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+        "bytes": 692050
+      },
+      "original_controller": "4a253ba8a0764cd94b8ecf03f762ecd319630620",
+      "capsule": {
+        "path": "spec/evidence/library-api-1318-native-receipts-r01.json.gz",
+        "bytes": 27316,
+        "sha256": "0350E4A3D354F335C49DCE142394B9AED03BABA81B4AAAE409E0EF91642D50D0",
+        "records": 6,
+        "uncompressed_bytes": 164925,
+        "round_trip": "all original exact bytes verified"
+      },
+      "sessions": 2,
+      "scope": "Exact F2107a2/005D Base and Space Age disposable worlds on standalone2.1.23 only. Genuine English/German clients, two new gear labs, API consumer read-only load queries, join/rejoin/host restart, saved-state and20 decoded1280x720 screenshots, with six visually inspected representatives. Not old-save migration, physical production, ordinary tuning, arbitrary modpacks, full API stability, performance or release qualification."
+    },
+    {
+      "path": "spec/evidence/library-f200-7a2-current-native-chain-r02.json",
+      "sha256": "50E735961C658013DE7D6F985110842F07DCF7DD370E9993143749AF3F2F6CCD",
+      "original_candidate": {
+        "source_commit": "7a2f93224c846b86261b2da709f50ea683fc708d",
+        "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+        "archive_sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
+        "bytes": 691666
+      },
+      "original_controller": "f9c9a7e99923254ec87dd3d1015cb4bdf3e98059",
+      "capsule": {
+        "path": "spec/evidence/library-f200-7a2-current-native-receipts-r02.json.gz",
+        "bytes": 11845,
+        "sha256": "DAC4EFFE9791A679FE8749241F9C08DF8C03D92DA06F5ADD201BB78498E6C46B",
+        "records": 3,
+        "uncompressed_bytes": 61216,
+        "all_original_exact_bytes_round_trip": true
+      },
+      "sessions": 1,
+      "scope": "Exact F20065FC/7a2 Base four-mod fresh disposable world on2.0.77/D3. Two genuine English/German clients, two real gear labs, queue/cancellation and foreign-force isolation, join/rejoin/saved-host restart and ten visually inspected native screenshots. Not private0.3, original-save migration, physical production, ordinary cost/time tuning, API consumer, performance or release qualification."
+    }
+  ],
+  "original_metadata_bodies_verified": 9,
+  "new_native_processes": 0,
+  "new_labs": 0,
+  "release_qualification": false,
+  "remaining": [
+    "F200 private-credit action/visibility regression is not covered by its normal0.1 functional session or paired timing fixture.",
+    "Persisted private selections/queue state,earned private-credit values and foreign hidden-row inspection remain outside the level1 F210 private probe.",
+    "Actual Esc/E/drag interaction,asynchronous foreign focus and vanished/removed-player lifecycle checks retain their specific outstanding native obligations; no extra input action is inferred.",
+    "Library/load/process-memory validity and retained-session/churn memory remain separate experiments.",
+    "No new8DC/F200 execution,PNG visual inspection,ordinary tuning,physical production or whole API/CONT-10/14/release verdict."
+  ],
+  "custody_limits": "Aero verifies nine transported original JSON metadata bodies and the source/package-member comparisons. Original raw process logs,binary saves and PNGs retain the native owner custody/readback;no independent binary-save scan or new visual inspection is claimed here. Fresh-world absence of the old MIR4 bucket follows from the original create/init protocol and reviewed source,not a direct serialized-save scan."
+}

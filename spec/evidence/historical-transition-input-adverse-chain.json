@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "kind": "MIR5HistoricalTransitionInputAdverseV1",
+  "run": 40016463085,
+  "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40016463085",
+  "manifest_members_verified": 69,
+  "observations": [
+    {
+      "target": "f013",
+      "source": "6e7f05a718cdcf688780d78eb1a0b67b55144571",
+      "engine": {
+        "path": "D:\\Games\\Factorio\\0.13\\bin\\x64\\factorio.exe",
+        "sha256": "F12C0DF5A5EF0D72F50A24BD76E077DFC9CBEAB4B31EE9EF0951A4A9C086B856",
+        "file_version": "",
+        "product_version": "",
+        "base_version": "0.13.20"
+      },
+      "receipt": {
+        "gzip": "spec/mir5/evidence/historical-transition-f013-published-adverse-native.json.gz",
+        "uncompressed_sha256": "F711C3122F3B066168E47DD2A566466C7B4E09533D4864C3CBF7F8ED3A78FBBC"
+      },
+      "log": {
+        "gzip": "spec/mir5/evidence/historical-transition-f013-published-adverse.log.gz",
+        "uncompressed_sha256": "1DEF83D2250F125BB2AA478D4375AF7DC16442F8FEC3ECD2012AD9CC34F8820E"
+      }
+    },
+    {
+      "target": "f014",
+      "source": "6e7f05a718cdcf688780d78eb1a0b67b55144571",
+      "engine": {
+        "path": "D:\\Games\\Factorio\\0.14\\bin\\x64\\factorio.exe",
+        "sha256": "A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F",
+        "file_version": "0.14.23.25374",
+        "product_version": "0.14.23",
+        "base_version": "0.14.23"
+      },
+      "receipt": {
+        "gzip": "spec/mir5/evidence/historical-transition-f014-published-adverse-native.json.gz",
+        "uncompressed_sha256": "72042A3D7D78C4B8399553CB6FCCFF2047B759CC14E1C4D940D20C81263A016B"
+      },
+      "log": {
+        "gzip": "spec/mir5/evidence/historical-transition-f014-published-adverse.log.gz",
+        "uncompressed_sha256": "19F8C479E0476A686552EA2ACC719B7EC595A4198DFC38621D10C6D34FE966BC"
+      }
+    },
+    {
+      "target": "f015",
+      "source": "6e7f05a718cdcf688780d78eb1a0b67b55144571",
+      "engine": {
+        "path": "D:\\Games\\Factorio\\0.15\\bin\\x64\\factorio.exe",
+        "sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6",
+        "file_version": "0.15.40.30950",
+        "product_version": "0.15.40",
+        "base_version": "0.15.40"
+      },
+      "receipt": {
+        "gzip": "spec/mir5/evidence/historical-transition-f015-published-adverse-native.json.gz",
+        "uncompressed_sha256": "94D36AA196073088BFBEBCEBF10E34756EE64F16900BE5C25E0DF41FCD492E86"
+      },
+      "log": {
+        "gzip": "spec/mir5/evidence/historical-transition-f015-published-adverse.log.gz",
+        "uncompressed_sha256": "730BAB6A266B9D6832BB24498A3D3D207C26BA2790A986A4D224ECEF5778F141"
+      }
+    },
+    {
+      "target": "f016",
+      "source": "6e7f05a718cdcf688780d78eb1a0b67b55144571",
+      "engine": {
+        "path": "D:\\Games\\Factorio\\0.16\\bin\\x64\\factorio.exe",
+        "sha256": "ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966",
+        "file_version": "0.16.51.36654",
+        "product_version": "0.16.51",
+        "base_version": "0.16.51"
+      },
+      "receipt": {
+        "gzip": "spec/mir5/evidence/historical-transition-f016-published-adverse-native.json.gz",
+        "uncompressed_sha256": "96670CD068CCE7D457EA0C9D0122B2B08BAD0AEBD0D0E374C2AC493F6A01C8C1"
+      },
+      "log": {
+        "gzip": "spec/mir5/evidence/historical-transition-f016-published-adverse.log.gz",
+        "uncompressed_sha256": "EA65AB863C828F812F7CED3B98D4BF1F0940C733DCD327CE0B04156F3018DAF9"
+      }
+    },
+    {
+      "target": "f017",
+      "source": "6e7f05a718cdcf688780d78eb1a0b67b55144571",
+      "engine": {
+        "path": "D:\\Games\\Factorio\\0.17\\bin\\x64\\factorio.exe",
+        "sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06",
+        "file_version": "0.17.79.47865",
+        "product_version": "0.17.79",
+        "base_version": "0.17.79"
+      },
+      "receipt": {
+        "gzip": "spec/mir5/evidence/historical-transition-f017-published-adverse-native.json.gz",
+        "uncompressed_sha256": "E99BDE091AA494FF359D5CC11AF3AFD01C1F4F6EA12B567CCF2DE8CF8C4AD289"
+      },
+      "log": {
+        "gzip": "spec/mir5/evidence/historical-transition-f017-published-adverse.log.gz",
+        "uncompressed_sha256": "FDCE2AE03FCC254B036BD058C5BA609C3ECB54B4E4799BDD706FFB9B5E99DC5A"
+      }
+    },
+    {
+      "target": "f100",
+      "source": "6e7f05a718cdcf688780d78eb1a0b67b55144571",
+      "engine": {
+        "path": "D:\\Games\\Factorio\\1.0\\bin\\x64\\factorio.exe",
+        "sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70",
+        "file_version": "1.0.0.54889",
+        "product_version": "1.0.0",
+        "base_version": "1.0.0"
+      },
+      "receipt": {
+        "gzip": "spec/mir5/evidence/historical-transition-f100-published-adverse-native.json.gz",
+        "uncompressed_sha256": "AE5D6BCCE9B6207854500E1AE03DA716F979874E3C42A8EDFD09282D83175222"
+      },
+      "log": {
+        "gzip": "spec/mir5/evidence/historical-transition-f100-published-adverse.log.gz",
+        "uncompressed_sha256": "454EDCAD3A7E61777AA2EC7E0242DD9285E5B35E6C3C9BE9F086785AB8CB819B"
+      }
+    },
+    {
+      "target": "f110",
+      "source": "6e7f05a718cdcf688780d78eb1a0b67b55144571",
+      "engine": {
+        "path": "D:\\Games\\Factorio\\1.1\\bin\\x64\\factorio.exe",
+        "sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+        "file_version": "1.1.110.62357",
+        "product_version": "1.1.110",
+        "base_version": "1.1.110"
+      },
+      "receipt": {
+        "gzip": "spec/mir5/evidence/historical-transition-f110-published-adverse-native.json.gz",
+        "uncompressed_sha256": "77ED071718CF04BB6AC46B6B6CE2720D3AF360E00E2CC4B991E087E17D02C5B3"
+      },
+      "log": {
+        "gzip": "spec/mir5/evidence/historical-transition-f110-published-adverse.log.gz",
+        "uncompressed_sha256": "AF339DB4D8474B0217E602A12470262B30FD61DFED0F2601A4B008DC6FA2AFAD"
+      }
+    }
+  ],
+  "finding": "F013 throughF016 reject newer dependency syntax in aai-industry even when disabled in the mixed1.0 library. F017/F100/F110 reject the fixture numeric-cost assumption before gameplay. No MIR5 successor was launched.",
+  "next": "Use permanent exact engine-family master libraries containing only needed own archives, preserve the mixed library; select independently recovered numeric/formula preflight and retry.",
+  "native_upgrade_pass": false,
+  "release_qualification": false
+}

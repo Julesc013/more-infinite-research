@@ -1,0 +1,311 @@
+{
+  "schema": 1,
+  "kind": "MIRPublishedF100F210NativeChainV1",
+  "status": "passed-direct-published-f100-origin-f210-destination",
+  "scope": "One protected published4.7.3 F100-origin journey directly to B F210 on2.1.23. Source enhancement seeds are labelled;no source/world recreation or bridge. Actual current archive/engine/fixture/world/save/two fresh-process reloads are qualified only under these exact inputs.",
+  "shared_source_chain": {
+    "path": "spec/evidence/published473-f100-f110-native-chain-r01.json",
+    "bytes": 9769,
+    "sha256": "F8AC8F7A74DD6A92AEEC42830D4B9CE018460C1615CBC11D7CC3A439F73888A3"
+  },
+  "shared_source_qualification": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-enhanced-source-cold-continuation-r03-controller/native-captures/result.json",
+    "bytes": 23811,
+    "sha256": "B7F29A3FD3BDCAE2CDA21E77419213BE31C418AB982738199CE77CC2E109C7E7"
+  },
+  "source_qualification_reused_no_new_source_engines": true,
+  "protected_original_source_sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811",
+  "qualified_enhanced_source_sha256": "0381F33BAC7F229D9697C486B68B6F14D975B1D79FE5C88D7EE663EBFEE4ACA9",
+  "public_declaration_head": "5f0f9a291fce67c5fe00ed5606de250181eeb949",
+  "fixture_implementation_commit": "6e46ebbc09cc2da9495a8479d187fa447a02c495",
+  "player_source_commit": "42032477d45ced683e72736a4fe30a7a3195b995",
+  "candidate": {
+    "path": "D:/Projects/Factorio/mir5-published-f100-f210-work-fixture-r01/build/tmp/published473-f100-f210-work-inputs-r05/more-infinite-research_5.0.21000.zip",
+    "bytes": 696972,
+    "sha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B"
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "fixture": {
+    "archive": {
+      "path": "D:/Projects/Factorio/mir5-published-f100-f210-work-fixture-r01/build/tmp/published-f100-f210-work-correction-r08-inputs/mir-fixture-mir5-historical-transition_0.5.0.zip",
+      "bytes": 7539,
+      "sha256": "3415C773F299B50BEDD7A9245BEB5923EE6CC9506DAA2DAF4AAAE03C789E07FE"
+    },
+    "source_commit": "6e46ebbc09cc2da9495a8479d187fa447a02c495",
+    "members": [
+      {
+        "source_commit": "6e46ebbc09cc2da9495a8479d187fa447a02c495",
+        "source": "tests/fixtures/published-f100-forward/f210/control.lua",
+        "destination": "control.lua",
+        "bytes": 27,
+        "sha256": "1A0ED8A26C09447C61170923210BCCE255293A01A18F5D9174A31E90A27B7B03"
+      },
+      {
+        "source_commit": "6e46ebbc09cc2da9495a8479d187fa447a02c495",
+        "source": "tests/fixtures/published-f100-forward/f210/data-final-fixes.lua",
+        "destination": "data-final-fixes.lua",
+        "bytes": 30,
+        "sha256": "B193C566BDC17949E9082C258018BD57DADC37063377B0C12971988E9513E588"
+      },
+      {
+        "source_commit": "6e46ebbc09cc2da9495a8479d187fa447a02c495",
+        "source": "tests/fixtures/published-f100-forward/shared/control.lua",
+        "destination": "fixture_control.lua",
+        "bytes": 17167,
+        "sha256": "3FF13208075CF5B461B7DF754A84B0901791D3B4DC7999A138C8649ADFAA5A8E"
+      },
+      {
+        "source_commit": "6e46ebbc09cc2da9495a8479d187fa447a02c495",
+        "source": "tests/fixtures/published-f100-forward/shared/data-final-fixes.lua",
+        "destination": "fixture_data_final.lua",
+        "bytes": 1552,
+        "sha256": "8047C6115C51B5B00B32E125F44647494EF0E22CF4DF7752E2E8E501323B03E6"
+      },
+      {
+        "source_commit": "6e46ebbc09cc2da9495a8479d187fa447a02c495",
+        "source": "tests/fixtures/published-f100-forward/f210/info.json",
+        "destination": "info.json",
+        "bytes": 277,
+        "sha256": "55B1FFFDD1F8C468D3340D01EA810974A743E72BB255149060EE3DCF883AF3B5"
+      },
+      {
+        "source_commit": "6e46ebbc09cc2da9495a8479d187fa447a02c495",
+        "source": "tests/fixtures/published-f100-forward/f210/settings-updates.lua",
+        "destination": "settings-updates.lua",
+        "bytes": 73,
+        "sha256": "0C3C400CA97DF5B2A636FC77D16441E320EFF836C7787084F5E0CE3BCB9F1E30"
+      },
+      {
+        "source_commit": "6e46ebbc09cc2da9495a8479d187fa447a02c495",
+        "source": "tests/fixtures/published-f100-forward/f210/stage.lua",
+        "destination": "stage.lua",
+        "bytes": 142,
+        "sha256": "14A5598FAE0289B1F250479AA1E8DEB99CBD0B2270703E0A3CF1675490DBDF61"
+      }
+    ]
+  },
+  "profile": {
+    "path": "D:/Projects/Factorio/mir5-published-f100-f210-work-fixture-r01/build/tmp/published473-f100-f210-work-inputs-r05/profile.json",
+    "bytes": 1257,
+    "sha256": "7099C214FAF3F93936BEB5BB5059ADA2C9634F1F5870FE43763AA4EA80380659"
+  },
+  "packet": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r05-controller/packet-r05.json",
+    "bytes": 20512,
+    "sha256": "84B91D1C1E90C200C65E2EC09F5A805FC15B31F4577CE55CA0051EB4C5A81E56"
+  },
+  "caller": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r05-controller/Invoke-Owned.ps1",
+    "bytes": 26111,
+    "sha256": "12D4EC8BBAB71D9662B912CB55F91BF6DB88A027356415CC4046514E512165A6"
+  },
+  "terminal": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r05-controller/execution-record/terminal.json",
+    "bytes": 6685,
+    "sha256": "7813AE7837EA4B207C7ACA07A20523D1EDBFA0963133FF416A1FC678C94FA703"
+  },
+  "result": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r05-controller/native-captures/result.json",
+    "bytes": 33842,
+    "sha256": "3C70400909EF8FB25B49639154D55A037ACB0B8085B903B79CEC389AE31B90EF"
+  },
+  "root_readback": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r05-controller/root-readback-r01.json",
+    "bytes": 3751,
+    "sha256": "D034DF64BB720372F679BBD50768C36B9F6C0027D68CD6FC6C8B3A25BCF31773"
+  },
+  "independent_actual_data_review": {
+    "status": "passed",
+    "scope": "Original/copied custody,exact source/candidate/engine/fixture,all three native witness/science/log/ledger chains,target ZIP CRC and both unchanged-byte reloads,source protection and full library restoration."
+  },
+  "actual_new_engines": 3,
+  "actual_engine_pids": [
+    86964,
+    78816,
+    25016
+  ],
+  "retained_prior_adverse_engines": 4,
+  "prior_adverse_preparations": [
+    {
+      "path": "spec/evidence/published-f100-f210-cost-preflight-prepared-r05.json",
+      "bytes": 7679,
+      "sha256": "18CF61E9E89E46EA73632B451658770F6408BA5EF5290ED9990CB2866A21EDB5"
+    },
+    {
+      "path": "spec/evidence/published-f100-f210-lab-api-prepared-r06.json",
+      "bytes": 8102,
+      "sha256": "A362C79A06657E4E8B785504B330D59F25C5E1031F6CFAF8BCD057F2EAA6772C"
+    },
+    {
+      "path": "spec/evidence/published-f100-f210-science-api-prepared-r07.json",
+      "bytes": 8904,
+      "sha256": "59F6D95FD7EB1AB3B7E344B1A611E0D6379F1DF2FCC15B3F4F43BFE775956842"
+    },
+    {
+      "path": "spec/evidence/published-f100-f210-work-prepared-r08.json",
+      "bytes": 9090,
+      "sha256": "D5AE336EE400004FE884BC0A63081C2FC027D142561ECEAD10A7FEBF2ED17337"
+    }
+  ],
+  "counting": "R01cost/R02labAPI/R03scienceAPI/R04work assertions are four separate failed actual direct attempts. R05 supplies three accepted processes. Shared source colds and earlier source observer adverses remain in their original chains and are not recounted.",
+  "initial_witness": {
+    "case": "published-f100-forward",
+    "stage": "initial",
+    "role": "successor",
+    "target": "f210",
+    "status": "passed",
+    "origin": "published-f100-4.7.10003",
+    "retained_rows": 23,
+    "reused_source_labs": 1,
+    "new_source_labs": 0,
+    "seeded_finite_lasers": 7,
+    "seeded_inserter_levels": 1,
+    "successor_labs": 1,
+    "laser_bonus": 2.2,
+    "inserter_bonus": 2,
+    "stack_or_bulk_bonus": 4,
+    "source_queued_progress": 0.42,
+    "suspended_progress": 0.27,
+    "foreign_disabled": true,
+    "on_load_read_only": false
+  },
+  "actual_science": [
+    {
+      "stage": "initial",
+      "prefix_records": 138,
+      "both_pack_counts": 31,
+      "both_pack_stored_durability": 0.42,
+      "both_pack_capacity": 1,
+      "consumed_equivalents_each": 0.58
+    },
+    {
+      "stage": "reload-1",
+      "prefix_records": 2,
+      "both_pack_counts": 31,
+      "both_pack_stored_durability": 0.42,
+      "both_pack_capacity": 1,
+      "consumed_equivalents_each": 0.58
+    },
+    {
+      "stage": "reload-2",
+      "prefix_records": 2,
+      "both_pack_counts": 31,
+      "both_pack_stored_durability": 0.42,
+      "both_pack_capacity": 1,
+      "consumed_equivalents_each": 0.58
+    }
+  ],
+  "source_lab_reused_once": 1,
+  "new_source_labs": 0,
+  "new_successor_labs": 1,
+  "seeded_finite_lasers": 7,
+  "seeded_inserter_levels": 1,
+  "seed_scope": "The source enhancement explicitly seeds seven finite lasers and one inserter level. The original mining lab and completed source are reused. This does not claim those seeded rights were historically lab-earned.",
+  "completed_successor": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r05-controller/native-captures/write-data/saves/mir5-native-complete.zip",
+    "bytes": 682343,
+    "sha256": "4CA6D387B92CECDAFCF82F20D5808E7259368B4DC619CB4BE07350943066629B",
+    "zip_entries": 56
+  },
+  "cold_reloads": [
+    {
+      "ordinal": 1,
+      "result": {
+        "case": "published-f100-forward",
+        "stage": "reload",
+        "role": "successor",
+        "target": "f210",
+        "status": "passed",
+        "origin": "published-f100-4.7.10003",
+        "retained_rows": 23,
+        "reused_source_labs": 1,
+        "new_source_labs": 0,
+        "seeded_finite_lasers": 7,
+        "seeded_inserter_levels": 1,
+        "successor_labs": 1,
+        "laser_bonus": 2.2,
+        "inserter_bonus": 2,
+        "stack_or_bulk_bonus": 4,
+        "source_queued_progress": 0.42,
+        "suspended_progress": 0.27,
+        "foreign_disabled": true,
+        "on_load_read_only": true
+      },
+      "save_sha256": "4CA6D387B92CECDAFCF82F20D5808E7259368B4DC619CB4BE07350943066629B",
+      "save_byte_identical": true
+    },
+    {
+      "ordinal": 2,
+      "result": {
+        "case": "published-f100-forward",
+        "stage": "reload",
+        "role": "successor",
+        "target": "f210",
+        "status": "passed",
+        "origin": "published-f100-4.7.10003",
+        "retained_rows": 23,
+        "reused_source_labs": 1,
+        "new_source_labs": 0,
+        "seeded_finite_lasers": 7,
+        "seeded_inserter_levels": 1,
+        "successor_labs": 1,
+        "laser_bonus": 2.2,
+        "inserter_bonus": 2,
+        "stack_or_bulk_bonus": 4,
+        "source_queued_progress": 0.42,
+        "suspended_progress": 0.27,
+        "foreign_disabled": true,
+        "on_load_read_only": true
+      },
+      "save_sha256": "4CA6D387B92CECDAFCF82F20D5808E7259368B4DC619CB4BE07350943066629B",
+      "save_byte_identical": true
+    }
+  ],
+  "process_protocols": {
+    "production": "supervised expected -1 stop after completion predicate",
+    "reloads": "two natural exit0 one-update benchmark reloads;completion predicates not used",
+    "source": "tools/Invoke-NativeFixture.ps1 historicalProcess selector696/reload branch965"
+  },
+  "reader_protocol_refusal": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/published473-f100-f210-native-r05-controller/root-reader-protocol-refusal-r01.json",
+    "bytes": 799,
+    "sha256": "752D571D0CD6ED4D0C6FEDCA9177B5F421BB3C4F41875775D6AEFA9E5D59AA9D"
+  },
+  "reader_protocol_disposition": "The first read-only reader overconstrained modern colds to the F110 supervised-1 protocol. Preserve its refused script;the frozen runner explicitly uses natural exit0 one-update benchmarks for F210 reloads. Re-read the unchanged native bodies;no native rerun or passed failed process.",
+  "custody": {
+    "native_custody": {
+      "files": 19,
+      "bytes": 848058,
+      "all_original_copy_hashes_equal": true
+    },
+    "controller_custody": {
+      "files": 2,
+      "bytes": 569561,
+      "all_original_copy_hashes_equal": true
+    }
+  },
+  "original_library_restored": true,
+  "protected_source_unchanged": true,
+  "factorio_processes": 0,
+  "bridge_used": false,
+  "receipt_capsule": {
+    "path": "spec/evidence/published473-f100-f210-native-receipts-r05.json.gz",
+    "bytes": 65067,
+    "sha256": "D112234590E82EBCFA3E026EBDF1D98F06B4E29FCBDAD2F1382DD2B7F65E0069",
+    "bodies": 29
+  },
+  "limits": [
+    "The four requested published-origin journeys now have distinct scoped evidence;this result closes only the named F100\u2192F210 endpoint.",
+    "Base-only B637/8DC evidence is not a DLC/provider switch,client/input/export,large factory,performance or universal-history verdict.",
+    "Genuine MIR1.2 cannon import and predecessor-private selected/native-queue obligations remain separate.",
+    "Source enhancement seeds and the four original direct adverses remain labelled and preserved."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}

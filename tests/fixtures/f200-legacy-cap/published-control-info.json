@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-f200-legacy-cap",
+  "version": "0.3.0",
+  "title": "MIR F200 published relaxed-cap control fixture",
+  "author": "MIR maintainers",
+  "description": "Private Factorio 2.0 published-MIR cap-relaxation control with one further real gear lab.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.77",
+    "more-infinite-research = 4.7.20002"
+  ]
+}

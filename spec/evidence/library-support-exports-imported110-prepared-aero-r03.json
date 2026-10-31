@@ -1,0 +1,245 @@
+{
+  "schema": 1,
+  "kind": "MIRLibrarySupportExportExactServerOriginPreparedV1",
+  "status": "prepared-not-native-qualified",
+  "fixture_revision": "4a42d6f71e834cb2365cfdc4c2a3a3698d84dd35",
+  "previous_preparation": {
+    "path": "spec/evidence/library-support-exports-imported110-prepared-aero-r02.json",
+    "commit": "f215d38a6b3d49bfc863e7f2c2076a42e6b88a03",
+    "bytes": 23238,
+    "sha256": "5A27EB85B23E7145AAC76BBCBD22337718457E33773C51753048FAEBF0C8244C",
+    "disposition": "Preserved unchanged; prior r01/r02 source/containers/profiles remain historical inputs, not corrected r03 dispatch."
+  },
+  "player_source_commit": "42032477d45ced683e72736a4fe30a7a3195b995",
+  "player_source_tree": "5a6adf0aab4e945aeca13420ddd045ad45f050a0",
+  "profiles": [
+    {
+      "target": "f200",
+      "profile": {
+        "path": "tests/profiles/library-support-exports-imported110-f200-2077-r03.json",
+        "sha256": "F6372FC1CFC2064BF6DBB5D04EEAB9E1827B0181E6CDABEE50C72B7EA8DB3421",
+        "bytes": 2765
+      },
+      "protected_input_save": {
+        "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+        "bytes": 811812,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "engine": {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "archive_sha256": {
+        "more-infinite-research_5.0.20000.zip": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "D30D00A0D57A2A8195565E52DCEFDF94B92DCBA37DC85A83B37245336157E9C0",
+        "mir-fixture-mir5-library-native-input_0.2.0.zip": "EFFDF47FB2398FEE33EA5F2239108B23E272876966E6097CBE8CF00992B01814"
+      },
+      "owned_preservation_fixture": {
+        "name": "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip",
+        "sha256": "D30D00A0D57A2A8195565E52DCEFDF94B92DCBA37DC85A83B37245336157E9C0",
+        "bytes": 11465,
+        "source": "build/qualification/library-support-exports-imported110-prepared-aero-r01/f200/preservation/source",
+        "members": [
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/control.lua",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "CF7C05066854105C1CBDE51876268F6AE685DC52170A732EBE051C3928D75E7F",
+            "bytes": 26440,
+            "destination": "control.lua"
+          },
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/catalogue.lua",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "39BC46FC931CD178756FC47E499744C92A58D4C725B62403B06254F57A7FFA26",
+            "bytes": 9263,
+            "destination": "catalogue.lua"
+          },
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/data-final-fixes.lua",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "D5D8AA96AF9AADC3FDDA3D485E87E78F81CF15D36BDF9CB090E32F8E7AA4BB5B",
+            "bytes": 3846,
+            "destination": "data-final-fixes.lua"
+          },
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/settings-updates.lua",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "3429707833D111634156F95ADAD458A453137D9B800771C9DEFCA6DF2DC9ECEB",
+            "bytes": 1357,
+            "destination": "settings-updates.lua"
+          },
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/info-f200-source-defaults.json",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "5D05C5252AF6ABAA29957A9D85EC910A0D74F11FA47DEBD573F90DFA00BB1575",
+            "bytes": 521,
+            "destination": "info.json"
+          }
+        ]
+      },
+      "owned_export_observer": {
+        "name": "mir-fixture-mir5-library-native-input_0.2.0.zip",
+        "sha256": "EFFDF47FB2398FEE33EA5F2239108B23E272876966E6097CBE8CF00992B01814",
+        "bytes": 10601,
+        "source": "build/qualification/library-support-exports-imported110-prepared-aero-r03/f200/exports/source",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "4a42d6f71e834cb2365cfdc4c2a3a3698d84dd35",
+            "destination": "control.lua",
+            "sha256": "7F962902A663CD4BDEB99A8001F862A1B3C9C5A64C7DA951B3EC8BDBC8CA9BD2",
+            "bytes": 20490
+          },
+          {
+            "source": "tests/fixtures/library-native-input/support-exports.lua",
+            "source_revision": "4a42d6f71e834cb2365cfdc4c2a3a3698d84dd35",
+            "destination": "support-exports.lua",
+            "sha256": "46F284F6C19BE32AECEF94BD627E9FF53719B062C22A1C4172C8AC8C2661606B",
+            "bytes": 14345
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-exports-f200.json",
+            "source_revision": "4a42d6f71e834cb2365cfdc4c2a3a3698d84dd35",
+            "destination": "info.json",
+            "sha256": "C23352E05F62F13343DEFB09DAE1DC017E2B4FE5B046BED4989B315689AD2B9A",
+            "bytes": 348
+          }
+        ],
+        "archive": "build/qualification/library-support-exports-imported110-prepared-aero-r03/f200/exports/mir-fixture-mir5-library-native-input_0.2.0.zip"
+      }
+    },
+    {
+      "target": "f210",
+      "profile": {
+        "path": "tests/profiles/library-support-exports-imported110-f210-2123-r03.json",
+        "sha256": "118AE4A084F534CFBDCFA81ABBE756E8EDAC7A0384B07BD60BEFBD72323D6842",
+        "bytes": 2765
+      },
+      "protected_input_save": {
+        "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+        "bytes": 814068,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "engine": {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "archive_sha256": {
+        "more-infinite-research_5.0.21000.zip": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+        "mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip": "E07DF42B2FBFACEA5BA32F3E616AF5BBFAB4E355B116187DC023252CFCD09B43",
+        "mir-fixture-mir5-library-native-input_0.2.0.zip": "2224E0C146AF0AAB6132D930A524BD5AD6C00E197D4B7AECA2C30BB682551D4C"
+      },
+      "owned_preservation_fixture": {
+        "name": "mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip",
+        "sha256": "E07DF42B2FBFACEA5BA32F3E616AF5BBFAB4E355B116187DC023252CFCD09B43",
+        "bytes": 11472,
+        "source": "build/qualification/library-support-exports-imported110-prepared-aero-r01/f210/preservation/source",
+        "members": [
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/control.lua",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "CF7C05066854105C1CBDE51876268F6AE685DC52170A732EBE051C3928D75E7F",
+            "bytes": 26440,
+            "destination": "control.lua"
+          },
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/catalogue.lua",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "39BC46FC931CD178756FC47E499744C92A58D4C725B62403B06254F57A7FFA26",
+            "bytes": 9263,
+            "destination": "catalogue.lua"
+          },
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/data-final-fixes.lua",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "D5D8AA96AF9AADC3FDDA3D485E87E78F81CF15D36BDF9CB090E32F8E7AA4BB5B",
+            "bytes": 3846,
+            "destination": "data-final-fixes.lua"
+          },
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/settings-updates.lua",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "3429707833D111634156F95ADAD458A453137D9B800771C9DEFCA6DF2DC9ECEB",
+            "bytes": 1357,
+            "destination": "settings-updates.lua"
+          },
+          {
+            "source": "tests/fixtures/migration-origins/f200-110-successor/info-f210-source-defaults.json",
+            "source_revision": "dc3bb5899bac55396fd865fb2a504ce213b07bec",
+            "sha256": "92FDBA41067B51984C1F90BC98E9A17F215548E89AB8D550B60ED401F6AA2C8D",
+            "bytes": 526,
+            "destination": "info.json"
+          }
+        ]
+      },
+      "owned_export_observer": {
+        "name": "mir-fixture-mir5-library-native-input_0.2.0.zip",
+        "sha256": "2224E0C146AF0AAB6132D930A524BD5AD6C00E197D4B7AECA2C30BB682551D4C",
+        "bytes": 10603,
+        "source": "build/qualification/library-support-exports-imported110-prepared-aero-r03/f210/exports/source",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "4a42d6f71e834cb2365cfdc4c2a3a3698d84dd35",
+            "destination": "control.lua",
+            "sha256": "7F962902A663CD4BDEB99A8001F862A1B3C9C5A64C7DA951B3EC8BDBC8CA9BD2",
+            "bytes": 20490
+          },
+          {
+            "source": "tests/fixtures/library-native-input/support-exports.lua",
+            "source_revision": "4a42d6f71e834cb2365cfdc4c2a3a3698d84dd35",
+            "destination": "support-exports.lua",
+            "sha256": "46F284F6C19BE32AECEF94BD627E9FF53719B062C22A1C4172C8AC8C2661606B",
+            "bytes": 14345
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-exports-f210.json",
+            "source_revision": "4a42d6f71e834cb2365cfdc4c2a3a3698d84dd35",
+            "destination": "info.json",
+            "sha256": "59301D40D7266BA0BAB66E3C64162D91FFFB249FC49AE1134D9E0B783942E005",
+            "bytes": 348
+          }
+        ],
+        "archive": "build/qualification/library-support-exports-imported110-prepared-aero-r03/f210/exports/mir-fixture-mir5-library-native-input_0.2.0.zip"
+      }
+    }
+  ],
+  "review_correction": {
+    "comment_id": 6505765634,
+    "requirement": "Require event.player_index == nil for either explicit server-console export. Numeric0 is a writer target, not a valid console event origin.",
+    "original_opponent_commit": "b6e99c5554380c912e370d62a92e4e71474f54f0",
+    "original_r02_unexpectedly_accepted_variants": 2,
+    "pinned_api_basis": "Both installed2.0.77 and2.1.23 on_console_command document optional player_index as the player if any. Exact absent-origin positives remain."
+  },
+  "independent_expected": [
+    "One nil-origin mir-settings-export and one nil-origin mir-diagnostics-export only after the DE rejoin and before checkpoint. Zero/real-player/duplicate/wrong-phase command events refuse.",
+    "All r02 role/phase,13-click,5-join,2-save,exact inherited-world/settings,client-local file/profile/report,controlled I/O failure and actual peer/PID expectations remain unchanged. Initial/restart role pairs may arrive in either order.",
+    "No state/game access mutation on_load; the original0.1 control.lua remains byte-identical. Native caller independently verifies actual events,processes,role-local files/errors and restoration; host controls are not native acceptance."
+  ],
+  "host_validation": {
+    "observer_controls": 7,
+    "runtime": "Lua5.2/build/tmp/mir421-lua-runtime",
+    "plan": "build/qualification/library-support-exports-correction-aero-r03/host-plan-before.json",
+    "native_execution": 0,
+    "before": {
+      "path": "build/qualification/library-support-exports-correction-aero-r03/before-correction-host.log",
+      "bytes": 3344,
+      "sha256": "EDAD7A4F2A8CB0F9131A5D52F2867728A15106B2A15D0DE2D8CD1258B632833A",
+      "exit_code": 1
+    },
+    "after": {
+      "path": "build/qualification/library-support-exports-correction-aero-r03/after-correction-host.log",
+      "bytes": 1525,
+      "sha256": "18BB1C571858776AFBD8DE23579BC1ADCE106B827CED5264D2C6D910EC9D8BB7",
+      "exit_code": 0
+    }
+  },
+  "native_execution": {
+    "processes": 0,
+    "verdict": "not-run"
+  },
+  "player_source_changed": false,
+  "release_qualification": false
+}

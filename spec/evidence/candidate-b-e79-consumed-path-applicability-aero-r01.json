@@ -1,0 +1,474 @@
+{
+  "schema": 1,
+  "kind": "MIRCandidateBToPreparedE79ApplicabilityAeroV1",
+  "status": "package-and-source-delta-classified-native-and-measurement-limits-retained",
+  "previous_source": "42032477d45ced683e72736a4fe30a7a3195b995",
+  "prepared_source": "e79f34d674d3dcc48f6d9cf823e555f9fe71b196",
+  "previous_source_tree": "5a6adf0aab4e945aeca13420ddd045ad45f050a0",
+  "prepared_source_tree": "701e275a2d598b48101d794e0594f522c35267b1",
+  "prepared_inventory": {
+    "sha256": "0866DC0BD6886168DE07636BF8C84DDCA1A8DAEBC742070920F8D8FC754412F1",
+    "bytes": 210569,
+    "public_assets": 19,
+    "zips": 17,
+    "player_members": 1530,
+    "status": "offline-preparation-only-not-native-accepted"
+  },
+  "source_delta": [
+    {
+      "status": "M",
+      "path": "source/README.md",
+      "before": {
+        "bytes": 2644,
+        "sha256": "0BBD8D76CADFDDB1460FDF25F0301CBAB04B6666FB9103DD686592676AE347B6"
+      },
+      "after": {
+        "bytes": 2700,
+        "sha256": "14BA99C7B57CB1E75C920098C391207026EAA3B8D90269FC9CE8C5FFA64F6E3D"
+      }
+    },
+    {
+      "status": "M",
+      "path": "source/changelog.txt",
+      "before": {
+        "bytes": 125539,
+        "sha256": "9B18113C485CDEF0AF12CCA1708FA1D1FCAA04E167866ABE4566461241326F54"
+      },
+      "after": {
+        "bytes": 125878,
+        "sha256": "B42BC496831F425EE707A720980C113764496F93B30039F9BE25FF469D66B2E1"
+      }
+    },
+    {
+      "status": "A",
+      "path": "source/compatibility/bob_angel_f200_combined_profile.lua",
+      "after": {
+        "bytes": 1254,
+        "sha256": "1394CB3B3A133A56D0413CC77FAB65FE6B7E211078C847F5C4E33872C560ECF8"
+      }
+    },
+    {
+      "status": "M",
+      "path": "source/compatibility/bob_angel_materials.lua",
+      "before": {
+        "bytes": 6223,
+        "sha256": "5AE23646857AD0E2123EB4AECFD48C2F5407AD1AE992B3503C63D07E4AC6B435"
+      },
+      "after": {
+        "bytes": 6553,
+        "sha256": "2C8552A5BD2ADC368542222172819C3C17188C84DC947E4A78B2052021276767"
+      }
+    },
+    {
+      "status": "M",
+      "path": "source/compatibility/modern_catalogue.lua",
+      "before": {
+        "bytes": 59250,
+        "sha256": "DCA31A41B34A2A7CE8A59E1206E6D71AD2CDB9637B0094ABEDDDDA959C05B89F"
+      },
+      "after": {
+        "bytes": 62272,
+        "sha256": "93B79AB9BB59D9BA319233A9C662EF0225D2344759D78FBFFD8218755441D818"
+      }
+    },
+    {
+      "status": "A",
+      "path": "source/compatibility/modern_catalogue/bob_angel_f200_combined.lua",
+      "after": {
+        "bytes": 31111,
+        "sha256": "FBBDF9845ADBE62478A3F75F6F12CBDC1F83A000B91320B134F1701C6247F3A8"
+      }
+    },
+    {
+      "status": "M",
+      "path": "source/data-final-fixes.lua",
+      "before": {
+        "bytes": 13443,
+        "sha256": "F907FA9EE1EFEBEAAE57D915FFB49C62B322CF8A13B540D9BDB0B4C95539B758"
+      },
+      "after": {
+        "bytes": 13849,
+        "sha256": "9046EC538420178BBBD9926B6D7FD0B4E83E2798A576C3B0D6F69CC37CA4F543"
+      }
+    },
+    {
+      "status": "M",
+      "path": "source/research/modern.lua",
+      "before": {
+        "bytes": 23218,
+        "sha256": "C1F94193BF11F625655D6B02C630C0FECF195066D40FABF0186DCDF073DA1EE2"
+      },
+      "after": {
+        "bytes": 23360,
+        "sha256": "97D9B0E2F0E2608C9BE0FDC1A8E19120721B556C6F4E1B329E47524061969CAC"
+      }
+    }
+  ],
+  "unchanged_subtrees": {
+    "source/runtime": "90acf0451784973821e53b60cd3207d8a898a3f4",
+    "source/api": "e707b13432a2a9c85713943e158b9a71eb9fc933",
+    "source/migrations": "24d0b810ef1e6c63c6a2ac1f93dc679650c0d4a7",
+    "source/presentation": "1c71469623e6ac037c1cef02abb727726b6588af",
+    "source/platform": "451c7ad69484acfaeba18286006412aa6557add1",
+    "source/overrides": "576894efa43c4de5a86546184a1da299eb8622d9",
+    "source/adapters": "965fd5270c0454133272a1a6e9efcb4c1c4c0d2b",
+    "source/locale": "3561436d903f9e8c066f797e92be75d7cf3daf42"
+  },
+  "unchanged_packager_sha256": "32BDBE5E0D8B776A57BC8DF63DD536DD81AEDF54141AC6EC6B1BEF4044C90674",
+  "unchanged_target_tree": "386a0958415f61053c70a5c414e4bc45e3f41625",
+  "package_delta": [
+    {
+      "target": "f013",
+      "candidate_B_members": 127,
+      "prepared_members": 127,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ],
+      "removed": [],
+      "prepared_sha256": "a3a5c6910790a3288168a270b01cb93d519b2c6680bfa2077d028a085070dd1b"
+    },
+    {
+      "target": "f014",
+      "candidate_B_members": 127,
+      "prepared_members": 127,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ],
+      "removed": [],
+      "prepared_sha256": "ca6c831f9704597b52f687ed2a4289074305733257e909d46a5a28428fde6e15"
+    },
+    {
+      "target": "f015",
+      "candidate_B_members": 127,
+      "prepared_members": 127,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ],
+      "removed": [],
+      "prepared_sha256": "1da628fb1c1a8ffbfa107b516a75d61df14a117560b6630b4290e169cfe16d08"
+    },
+    {
+      "target": "f016",
+      "candidate_B_members": 127,
+      "prepared_members": 127,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ],
+      "removed": [],
+      "prepared_sha256": "1eb502815ebfb9a53d04f457122085cbd6cbe725fb1e9ddf4126a7866e8dfcfe"
+    },
+    {
+      "target": "f017",
+      "candidate_B_members": 127,
+      "prepared_members": 127,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ],
+      "removed": [],
+      "prepared_sha256": "d1a357151ae74fe89ee822ea4cf1d8fa55012fddc64de20d49647896a4a59e1c"
+    },
+    {
+      "target": "f018",
+      "candidate_B_members": 127,
+      "prepared_members": 127,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ],
+      "removed": [],
+      "prepared_sha256": "871023ae440fb57eb2ca497cf479b45dc028d4dcd7a3909876ab5cded414f19f"
+    },
+    {
+      "target": "f100",
+      "candidate_B_members": 127,
+      "prepared_members": 127,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ],
+      "removed": [],
+      "prepared_sha256": "9b2f5bd9a1067fe9b4d7b7ee854bb3cf09cb17c26f7972e15d9996aefe03c88b"
+    },
+    {
+      "target": "f110",
+      "candidate_B_members": 128,
+      "prepared_members": 128,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ],
+      "removed": [],
+      "prepared_sha256": "85f208f225224f55a6ce7866451b951535f4dfdebded351fe4fc699df9184019"
+    },
+    {
+      "target": "f200",
+      "candidate_B_members": 219,
+      "prepared_members": 221,
+      "added": [
+        "compatibility/bob_angel_f200_combined_profile.lua",
+        "compatibility/modern_catalogue/bob_angel_f200_combined.lua"
+      ],
+      "changed": [
+        "changelog.txt",
+        "compatibility/bob_angel_materials.lua",
+        "compatibility/modern_catalogue.lua",
+        "data-final-fixes.lua",
+        "research/modern.lua"
+      ],
+      "removed": [],
+      "prepared_sha256": "6e88c16e39c756e4297f4e6a5b83e7be21e21fa08b080049a11062d7bcd54190"
+    },
+    {
+      "target": "f210",
+      "candidate_B_members": 220,
+      "prepared_members": 222,
+      "added": [
+        "compatibility/bob_angel_f200_combined_profile.lua",
+        "compatibility/modern_catalogue/bob_angel_f200_combined.lua"
+      ],
+      "changed": [
+        "changelog.txt",
+        "compatibility/bob_angel_materials.lua",
+        "compatibility/modern_catalogue.lua",
+        "data-final-fixes.lua",
+        "research/modern.lua"
+      ],
+      "removed": [],
+      "prepared_sha256": "82308ad0ab41e3a0a2ef3bbb0d35923bce1474dc01d4f0d5318742d30fece143"
+    },
+    {
+      "target": "f006",
+      "candidate_B_members": 10,
+      "prepared_members": 10,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ],
+      "removed": [],
+      "prepared_sha256": "b749e7b89abf9fb6114b790b4053e67874ba24b58204ca71bc7e35db692391d1"
+    },
+    {
+      "target": "f007",
+      "candidate_B_members": 10,
+      "prepared_members": 10,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ],
+      "removed": [],
+      "prepared_sha256": "1d51742f6df999adf5aeea1ed8fb7845e5a30bd81053acafc026484681be8e79"
+    },
+    {
+      "target": "f008",
+      "candidate_B_members": 10,
+      "prepared_members": 10,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ],
+      "removed": [],
+      "prepared_sha256": "bdad4bdbc6e3df995ee52773209d2a08050c97b8bafaf5b8195852c7e6d9030f"
+    },
+    {
+      "target": "f009",
+      "candidate_B_members": 10,
+      "prepared_members": 10,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ],
+      "removed": [],
+      "prepared_sha256": "802327384fd650f052460c8aa9bd7b76d1c2767e06f687262b5c3fbeba5c96c3"
+    },
+    {
+      "target": "f010",
+      "candidate_B_members": 10,
+      "prepared_members": 10,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ],
+      "removed": [],
+      "prepared_sha256": "9542fabf3edffb495e91692a1d4740ce75e75b1e360af87f1cc97ae394ed45e1"
+    },
+    {
+      "target": "f011",
+      "candidate_B_members": 10,
+      "prepared_members": 10,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ],
+      "removed": [],
+      "prepared_sha256": "6bd39889ac5e77c7f21b05582f597be02f2b4c99af0030eacab28886987a2d88"
+    },
+    {
+      "target": "f012",
+      "candidate_B_members": 10,
+      "prepared_members": 10,
+      "added": [],
+      "changed": [
+        "changelog.txt"
+      ],
+      "removed": [],
+      "prepared_sha256": "ccbed654544e2f71cce68e677b1e88965f4eaf422a801ce8da2ec85430c40892"
+    }
+  ],
+  "reviewed_inputs": [
+    {
+      "path": "spec/evidence/support-exports-coherent17-package-chain-r01.json",
+      "bytes": 10063,
+      "sha256": "E9CB25E00B179920B3F1046335C402B2A286166022151050BB09E79D1E669659"
+    },
+    {
+      "path": "spec/evidence/support-exports-consumed-path-applicability-aero-r01.json",
+      "bytes": 47953,
+      "sha256": "85D103F3E73535E3B5A30AFC33A1AB3B2369C6616DCBBE3F2C97F4C588B2DCF9"
+    },
+    {
+      "path": "spec/evidence/api1-documented-subset-qualification-r01.json",
+      "bytes": 11208,
+      "sha256": "CF141FC284FF323114801646B57F13BAEA65805FBDE147FB0CE9A8795DC2B006"
+    },
+    {
+      "path": "spec/evidence/heavy-space-age-f200-current-native-chain-r03.json",
+      "bytes": 19244,
+      "sha256": "B7698AEECABA365680952BDBCFAEB0982D0BD1087885B885622470E8CC863B96"
+    },
+    {
+      "path": "spec/inventory/migration-origins.json",
+      "bytes": 263335,
+      "sha256": "0EECB8662BBDDE8F6B8A8F133DCABB9C630180AB7CB82B200E87A4A2BFB69DB8"
+    }
+  ],
+  "gate": {
+    "source": "source/compatibility/bob_angel_f200_combined_profile.lua",
+    "requires_target": "f200 / Factorio2.0 / minimum2.0.77",
+    "required_provider_names": 13,
+    "excluded_provider_names": 6,
+    "checks_versions": false,
+    "review": "Named provider selection, not a whole-modpack fingerprint. Each actual engine/archive/settings closure and consumed raw-prototype contract remains required.",
+    "selection_calls": "A normal modern_catalogue.select evaluates the gate five times through direct selection, legacy selection and continuation paths; these are bounded named checks. No measured cost is inferred.",
+    "inactive_f210": "The gate is imported, then target.id short-circuits before provider enumeration. The combined body is not dynamically imported. Both new files remain in the static ZIP closure."
+  },
+  "scopes": [
+    {
+      "scope": "All fifteen nonmodern packages: F006-F018,F100,F110; F006-F012 are best effort and F018 is experimental",
+      "bytes": "Only changelog.txt differs from candidateB; all other payload paths/order/bytes are identical.",
+      "disposition": "No migration/gameplay rerun is introduced by this F200 data-stage change. Retain existing named observations and their old execution identities; do not add scope or elapsed values."
+    },
+    {
+      "scope": "F210 Base,plain SpaceAge,and previously qualified F210 Bob/Angel closures",
+      "bytes": "Four common Lua payloads and two added modules differ; F200 selection short-circuits. Runtime/API/migration/UI bodies and declared target values remain identical.",
+      "disposition": "Source-reviewed semantic non-selection preserves the named prior output interpretation when all other consumed inputs match. This is not byte-identical startup input or a new current-package native execution. Final timing/memory verdicts remain open."
+    },
+    {
+      "scope": "F200 Base,plain SpaceAge and previously qualified nonmatching Bob/Angel closures",
+      "bytes": "The gate runs but remains unselected: Base lacks space-age; plain SpaceAge lacks angelsbioprocessing; legacy no-BobTech selection remains.",
+      "disposition": "Source review predicts retained output; no full broad sweep follows. A bounded current F200 data/smoke result is still needed for a claimed final-byte load. Exact known profile/settings inputs remain essential."
+    },
+    {
+      "scope": "F200 SpaceAge+Bob/Angel/BobTech admitted combined closure",
+      "bytes": "New authored definitions/science/product bindings/continuations/scripted bindings/effect order/preflight.",
+      "disposition": "CandidateB cannot qualify this profile. The exact8C93 ordinary prototype/settings capture retains its69 public/28 private/875 settings result. The armor activation correction still requires its prepared false-to-true native witness; useful research/physical/save/client/performance claims remain separate."
+    }
+  ],
+  "functional_reuse_limits": {
+    "runtime_api_ui_migrations": "Subtree equality means no new implementation in those owners. New F200 combined data changes their inputs and receives no inherited whole-profile result. Existing export/init/configuration/input checks not previously passed remain open.",
+    "four_requested_routes": [
+      {
+        "origin": "published4.7.3 F100",
+        "destination": "MIR5 F110",
+        "status": "closed",
+        "evidence": [
+          {
+            "path": "spec/evidence/published473-f100-f110-native-chain-r01.json",
+            "bytes": 9769,
+            "sha256": "F8AC8F7A74DD6A92AEEC42830D4B9CE018460C1615CBC11D7CC3A439F73888A3"
+          }
+        ]
+      },
+      {
+        "origin": "published4.7.3 F100",
+        "destination": "MIR5 F210",
+        "status": "closed",
+        "evidence": [
+          {
+            "path": "spec/evidence/published473-f100-f210-native-chain-r05.json",
+            "bytes": 13431,
+            "sha256": "D20CD591F9364E44BB5747E0DD4BA6D505816E4C8B8B6760ADF975A072E135DB"
+          }
+        ]
+      },
+      {
+        "origin": "published4.7.3 F110",
+        "destination": "MIR5 F210",
+        "status": "closed",
+        "evidence": [
+          {
+            "path": "spec/evidence/published473-f110-f210-native-chain-r01.json",
+            "sha256": "5F7765140938DF0CD99B958CB35AD134A69D7711D4977191A5161AF8C1143C6C",
+            "bytes": 11750
+          }
+        ]
+      },
+      {
+        "origin": "published4.7.3 F200 Base",
+        "destination": "MIR5 F210 Base",
+        "status": "closed",
+        "evidence": [
+          {
+            "path": "spec/evidence/full-catalogue-473-f200-current7a2-native-chain-r01.json",
+            "source_revision": "d67aa095334bd7106b34569e3983dc834ae257bf",
+            "sha256": "37DD13431E3E492F8ABB94C206B85365EA135710727DFB9B5C1AA6F0660F0C0A",
+            "bytes": 16653
+          },
+          {
+            "path": "spec/evidence/current-7b0-nongui-aero-applicability-r01.json",
+            "source_revision": "d67aa095334bd7106b34569e3983dc834ae257bf",
+            "sha256": "552C495EB545F38597528FC020752105CEC2D9698CB2414A9116FABAE70C5572",
+            "bytes": 13913
+          }
+        ]
+      }
+    ],
+    "routes_disposition": "Retain all four closed original journey scopes. F110 destination is unchanged except changelog; F210 data selection excludes the new F200 body. This delta adds no origin/save recreation. In particular,the earlier F200 Base-to-F210 Base journey does not observe the later support-exports header/init/configuration writes. Those affected lifecycle/GUI cases and final measurements remain open under the prior applicability record; no new native run is claimed.",
+    "historical_inventory": "All nine4.7.3 same-edition routes and seven selected older groups keep their existing scoped statuses; this record does not turn them into full-edition/release acceptance."
+  },
+  "remaining_native_and_delivery": [
+    {
+      "obligation": "Current F200 combined profile",
+      "next": "Existing prepared armor activation witness from PR1474, with NoMIR validity, old8C93 refusal and corrected-output readback; preserve marker/reset/error differences. Separate useful gameplay/save/client/performance still need their actual results."
+    },
+    {
+      "obligation": "Private credits and export/input/client lifecycle",
+      "next": "Reuse passed exact cases only. Actual imported earnings/stale saved selections/queues, peer-targeted exports, Esc/E/drag/focus/rejoin/restart and other recorded missing cases remain open; unchanged code is not an execution."
+    },
+    {
+      "obligation": "Whole-product startup,active factories,Library/save-load/retained memory",
+      "next": "Preserve all accepted/adverse datasets under original inputs. Shared selector and archive footprint changed, so do not relabel candidateB or older timings as e79. Black Glass owns controlled final applicable execution and method diagnosis."
+    },
+    {
+      "obligation": "Final source/artifact verdict and delivery",
+      "next": "The e79 set is preparation, not an accepted freeze. Select final source/date/maturity, finish the actual verdict, then main/tag/draft/probes/staged and anonymous download verification/dist. Stable Portal uses identical ZIPs; conversion is retired."
+    }
+  ],
+  "custody": {
+    "executing_checkout": "C:/Projects/Factorio/more-infinite-research",
+    "prepared_archives": "C:/Projects/Factorio/mir5-source-release-versioning-e79-r01",
+    "reader_result": {
+      "path": "build/qualification/candidate-b-e79-applicability-aero-r01/package-byte-delta.json",
+      "bytes": 6721,
+      "sha256": "53D8BFF341DDC76FA3B78316676BB94DEF7F77174C5650407E39847816144DAE"
+    },
+    "package_readback": "build/qualification/source-release-versioning-aero-r01/actual-package-readback-r02.json"
+  },
+  "new_native_execution": false,
+  "new_scored_dataset": false,
+  "release_qualification": false
+}

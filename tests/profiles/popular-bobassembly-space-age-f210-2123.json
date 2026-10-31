@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "kind": "mir5-popular-root-f210-native-reference-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "bobassembly",
+      "version": "3.0.2",
+      "enabled": true
+    },
+    {
+      "name": "boblibrary",
+      "version": "3.0.1",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.1.23",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "bobassembly_3.0.2.zip": "872E973046FEFB716E899F74AB70A74E1811122B28074C454D7EFCB09A4A3AE7",
+    "boblibrary_3.0.1.zip": "3DD83A195E120BAECC51A43B0B3EB965C0D419A09883F9DAA018B3921C12D51B",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+  },
+  "scope": "Exact bobassembly ranked-root space-age input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance. Refreshed with the 2026-10-26 officially downloaded F210 archives; prior cohort remains bound to its original Git source and hashes."
+}

@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "kind": "mir5-f210-bob-core-progression-source-contract",
+  "evidence_kind": "independent published-4.7.2 data-stage capture; not a MIR5 native result",
+  "independent_reference": {
+    "native_run": {
+      "id": 40069301778,
+      "artifact_id": 12550447321,
+      "members_verified": 26
+    },
+    "published_raw_sha256": "A5F1BCDF17656D43F481DD41A534BBA0B0573BD2837EB1B1B76E2AB9FD186263",
+    "upstream_raw_sha256": "BA5AC0732E0DB51EC13089F2F7728882B45BCB247A9DC3A9F9582D0CAD88D6E3",
+    "candidate_output_used": false,
+    "release_qualification": false
+  },
+  "required_mods": {
+    "base": "2.1.23",
+    "space-age": "2.1.23",
+    "boblibrary": "3.0.1",
+    "bobores": "3.0.0",
+    "bobplates": "3.0.2",
+    "bobelectronics": "3.0.1",
+    "bobtech": "3.0.0"
+  },
+  "advanced_logistic_science": {
+    "name": "bob-advanced-logistic-science-pack",
+    "recipe": {
+      "enabled": false,
+      "allow_productivity": true,
+      "results": [
+        {"type": "item", "name": "bob-advanced-logistic-science-pack", "amount": 3}
+      ]
+    },
+    "owner": {
+      "name": "bob-advanced-logistic-science-pack",
+      "unlock_recipe": "bob-advanced-logistic-science-pack"
+    }
+  },
+  "continuations": {
+    "braking_force": [
+      "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "utility-science-pack", "bob-advanced-logistic-science-pack", "space-science-pack"
+    ],
+    "inserter_capacity_bonus": [
+      "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "utility-science-pack", "bob-advanced-logistic-science-pack", "agricultural-science-pack"
+    ],
+    "research_speed": [
+      "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "military-science-pack", "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack", "bob-advanced-logistic-science-pack"
+    ],
+    "worker_robots_storage": [
+      "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "utility-science-pack", "bob-advanced-logistic-science-pack", "electromagnetic-science-pack"
+    ]
+  },
+  "science_pack_productivity": {
+    "science": [
+      "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "utility-science-pack", "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack", "bob-advanced-logistic-science-pack"
+    ],
+    "effects": [
+      "agricultural-science-pack", "automation-science-pack", "bob-advanced-logistic-science-pack", "chemical-science-pack", "cryogenic-science-pack", "electromagnetic-science-pack", "logistic-science-pack", "metallurgic-science-pack", "military-science-pack", "production-science-pack", "promethium-science-pack", "space-science-pack", "utility-science-pack"
+    ]
+  },
+  "advanced_circuit_icon": {
+    "icon": "__bobelectronics__/graphics/icons/technology/advanced-electronics.png",
+    "icon_size": 128
+  },
+  "material_tail_default_cap": 150
+}

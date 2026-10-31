@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentF210LibraryClientAdverseReadbackV1",
+  "derived": true,
+  "status": "three-preserved-adverse-attempts-no-current-client-pass",
+  "release_qualification": false,
+  "player_source_commit": "fa1146e9778ecf7fc1b80449a2deec7ee0083ec3",
+  "player_tree": "41b78703f25bdceb1e05b57d7c725e0f6c9bef2c",
+  "player_archive_sha256": "4D5E32CE2E74C65259E5D3E085CE7BE3BC37DC0A739308C6379BF621F7B5BDA1",
+  "engine_version": "2.1.23",
+  "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+  "manifest_members_verified": 324,
+  "attempts": [
+    {
+      "run": 40185318148,
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40185318148",
+      "controller_commit": "a0ec04536eeb1de91b22ea6b915b0fbe287d6632",
+      "fixture_harness_source_commit": "05ea6b4f201afe07756b0775967fce0d53af42b2",
+      "manifest_sha256": "8706C2CFF5B7B163573A200A0A714530085B6ADC1B286FAA5762C16A4398C4BA",
+      "manifest_members_verified": 88,
+      "artifact_bytes_verified": 2209540,
+      "native_session_receipt_sha256": "9DF0BEB96750813442D0290F6FAC0182596AB4FAAEC11914CC1864D55DF6E53C",
+      "status": "failed",
+      "classification": "session-reader-hardcoded-F200-witness-rejects-F210-ready",
+      "protected_seed_byte_identical": true,
+      "library_controls_restored": true,
+      "required_fixture_pngs": 0,
+      "two_client_session_passed": false,
+      "join_log_observations": [],
+      "primary_custody": "build/mir5/recovery-historical/library-multiplayer-f210/40185318148/black-glass-library-multiplayer-f210-canonical-40185318148-1"
+    },
+    {
+      "run": 40188245071,
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40188245071",
+      "controller_commit": "7ac8d758babe9bc7b13cd00e94862a8f3988d32d",
+      "fixture_harness_source_commit": "0e50d9ba8c9ee370f440db2db8a53a4372d60ea2",
+      "manifest_sha256": "5CA2E32C73E248973922B08C13EA02489C4456A05134AFA90C24A50009522323",
+      "manifest_members_verified": 92,
+      "artifact_bytes_verified": 1889971,
+      "native_session_receipt_sha256": "C8BE16120955E971A722EF5A43EA89E4DD2B796630EC15826358A59E65677A3F",
+      "status": "failed",
+      "classification": "Steam-IPC-initialization-fails-before-client-join",
+      "protected_seed_byte_identical": true,
+      "library_controls_restored": true,
+      "required_fixture_pngs": 0,
+      "two_client_session_passed": false,
+      "join_log_observations": [],
+      "primary_custody": "build/mir5/recovery-historical/library-multiplayer-f210/40188245071/black-glass-library-multiplayer-f210-canonical-40188245071-1"
+    },
+    {
+      "run": 40189106127,
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40189106127",
+      "controller_commit": "7ac8d758babe9bc7b13cd00e94862a8f3988d32d",
+      "fixture_harness_source_commit": "0e50d9ba8c9ee370f440db2db8a53a4372d60ea2",
+      "manifest_sha256": "C7134ACECC3D63F0D388666748B5F73B433712F0046F7276446525E0F6CA76F9",
+      "manifest_members_verified": 144,
+      "artifact_bytes_verified": 6554407,
+      "native_session_receipt_sha256": "EEA0B29EE32587A8BF3EFDB1797ADCCDC425B77AE10FA4E7414D2FEF4CDAD369",
+      "status": "failed",
+      "classification": "actual-Steam-account-join-does-not-match-synthetic-test-name",
+      "protected_seed_byte_identical": true,
+      "library_controls_restored": true,
+      "required_fixture_pngs": 0,
+      "two_client_session_passed": false,
+      "join_log_observations": [
+        {
+          "log": "library-multiplayer-f210-canonical/native/session/client-en/factorio-current.log",
+          "log_sha256": "5AA7E86EE5A167CEA5F8E521D86DDE91BE9C7BD770A971F8916152805D591498",
+          "player": "Julesc013",
+          "ordinal": 1
+        },
+        {
+          "log": "library-multiplayer-f210-canonical/native/session/server/factorio-current.log",
+          "log_sha256": "ED577C5341A536AC44AACD47113C04DC6F4D12E1F27474AE347DF501121E2A65",
+          "player": "Julesc013",
+          "ordinal": 1
+        }
+      ],
+      "primary_custody": "build/mir5/recovery-historical/library-multiplayer-f210/40189106127/black-glass-library-multiplayer-f210-canonical-40189106127-1"
+    }
+  ],
+  "next_action": "Use an evidenced supported test-client identity mechanism that preserves two distinct real clients; never accept one account twice, relabel the actual join as absent, or weaken screenshot/rejoin/restart requirements.",
+  "limits": [
+    "Run40189106127 contains one genuine client join, observed independently in client and server logs. Its timeout is a synthetic-name wait mismatch, not proof of a game or MIR join failure.",
+    "The first two attempts have no actual client-join marker. The Steam IPC and ready-reader failures remain distinct from the later identity mismatch.",
+    "No required UI PNG, two-client session, rejoin, restart, elapsed-time or release result passed. Complete configurations, process arguments and saves remain in primary custody, outside this public derived record."
+  ]
+}

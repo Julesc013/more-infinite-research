@@ -1,0 +1,196 @@
+{
+  "schema": 1,
+  "kind": "MIRWholeProductSpaceAgeF210DataAdmissionNativeChainV1",
+  "status": "passed-data-stage-admission-only",
+  "source_commit": "b7caa8df9141523a556bb57ca8faf7c43d250c3d",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+    "bytes": 49398736,
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "version": "2.1.23"
+  },
+  "profile": {
+    "path": "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\build\\tmp\\whole-product-space-age-f210-inputs-r01\\space-age-f210-standalone-derived.json",
+    "bytes": 1419,
+    "sha256": "10787C9728321EC877EF55EC1BBA8CD460888EDB312C73B61F155267F5A1EA40"
+  },
+  "arms": [
+    {
+      "id": "control-without-mir",
+      "archive": null
+    },
+    {
+      "id": "terminal-mir3.2.11",
+      "archive": {
+        "path": "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\build\\tmp\\whole-product-space-age-f210-inputs-r01\\owned-source-archives\\more-infinite-research_3.2.11.zip",
+        "bytes": 1067720,
+        "sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A"
+      }
+    },
+    {
+      "id": "published-mir4.7",
+      "archive": {
+        "path": "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\build\\tmp\\whole-product-space-age-f210-inputs-r01\\owned-source-archives\\more-infinite-research_4.7.21003.zip",
+        "bytes": 1463293,
+        "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
+      }
+    },
+    {
+      "id": "candidate-mir5",
+      "archive": {
+        "path": "D:\\Projects\\Factorio\\mir5-whole-product-capture-fixed-r01\\build\\tmp\\whole-product-space-age-f210-inputs-r01\\owned-source-archives\\more-infinite-research_5.0.21000.zip",
+        "bytes": 696972,
+        "sha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B"
+      }
+    }
+  ],
+  "packet_sha256": "3724E39342B44A3EC8B4CF691F835C9AE6293F38CE18A5DDE4080AE5B74D24A5",
+  "caller_sha256": "62DDA240EDFE5E2FAC87A29C8FDD4EEE0DC7808E8CE42E8B61C6A51EF76915EB",
+  "terminal_sha256": "5C306F3909B37EF4B5DA55C476869B9C1BF80580A743DCE6D014B5AF35251626",
+  "observations": [
+    {
+      "arm": "control-without-mir",
+      "native_processes": 1,
+      "direct_native_pid": 55880,
+      "exit_code": 0,
+      "loaded_selection": [
+        "base@2.1.23",
+        "elevated-rails@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23"
+      ],
+      "technology_rows": 277,
+      "setting_rows": 0,
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 29535981,
+          "sha256": "04CAD41D26A0471702AB1D7538A842E95433C98E5E4AD6D27F0415E401F210ED"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 5,
+          "sha256": "DDC90D598D1720B207196690C35441CAEFE32A4E25535EDC93A80484C659D69E"
+        }
+      }
+    },
+    {
+      "arm": "terminal-mir3.2.11",
+      "native_processes": 1,
+      "direct_native_pid": 46460,
+      "exit_code": 0,
+      "loaded_selection": [
+        "base@2.1.23",
+        "elevated-rails@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@3.2.11",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23"
+      ],
+      "technology_rows": 348,
+      "setting_rows": 599,
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 29838278,
+          "sha256": "BD097C746B5D5CE794D3938061A39DB66B0F47DE6D8FD0FD03A8D2BAD89960A7"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 646372,
+          "sha256": "50F390D5B889BAA3EBEF9205CD0945D2B276308538AC176B517458FE5CA181F1"
+        }
+      }
+    },
+    {
+      "arm": "published-mir4.7",
+      "native_processes": 1,
+      "direct_native_pid": 55516,
+      "exit_code": 0,
+      "loaded_selection": [
+        "base@2.1.23",
+        "elevated-rails@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@4.7.21003",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23"
+      ],
+      "technology_rows": 348,
+      "setting_rows": 889,
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 30179903,
+          "sha256": "B13C11F13E165A4100E49396C0EA5E13EC5C098156EE0A1CF5CA887F5DFA2517"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 1045195,
+          "sha256": "AF860572993038E1004C44E91F11A65D91C764F97C541CF335DF74FE5542C8C8"
+        }
+      }
+    },
+    {
+      "arm": "candidate-mir5",
+      "native_processes": 1,
+      "direct_native_pid": 73556,
+      "exit_code": 0,
+      "loaded_selection": [
+        "base@2.1.23",
+        "elevated-rails@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@5.0.21000",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23"
+      ],
+      "technology_rows": 376,
+      "setting_rows": 889,
+      "dumps": {
+        "data_raw": {
+          "path": "write-data/script-output/data-raw-dump.json",
+          "bytes": 29721011,
+          "sha256": "D4BE291EAE7D964089CD435CBE2C6F3F3951F63BFA546EAD91EBBF0A703F9E31"
+        },
+        "mod_settings": {
+          "path": "write-data/script-output/mod-settings-dump.json",
+          "bytes": 750608,
+          "sha256": "9131BB9E24A416509C14962BB5C0299FC9613115FB12FEE5F795B85337F2588B"
+        }
+      }
+    }
+  ],
+  "native_processes": 4,
+  "readback": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-space-age-f210-admission-r01-controller\\root-readback.json",
+    "sha256": "F80A82B273065B8A7C77ACD15FAE1EFD76AAC0E4B8366909D1676F1F173F787A",
+    "files_per_copy": 36,
+    "bytes_per_copy": 121941421
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/whole-product-space-age-f210-admission-receipts-r01.json.gz",
+    "bytes": 95639,
+    "sha256": "1569E8D5554E092EF8CBE262BE50771E4BF6D4A2947675957C8B5DF548167425",
+    "bodies": 26
+  },
+  "restoration": {
+    "original_controls_archives": true,
+    "factorio_processes_after": 0,
+    "dependency_bytes_copied": 0,
+    "dependency_links": 0,
+    "dependency_extractions": 0
+  },
+  "prior_zero_native_preparation": "Exact typed profile/raw-Git/source-copy closure,missing-observer opposing VerifyOnly and valid no-Execute refusal passed before staging/native. No prior native attempt or old-world/gameplay result is claimed.",
+  "independent_review": "Separate actual-data reviewer verifies36 source/copied files/121941421bytes percopy,4 actual direct native PID/exit0/8DC/loaded selections/dump counts/restoration. No native timing or parity claim.",
+  "scope": "Four serial unscored SpaceAge2.1.23/8DC --dump-data admissions. Full data/settings dumps are unchanged,hash-pinned in both local copies;public counts are as-shipped totals,not semantic parity/equal work.",
+  "limits": [
+    "No responsive-menu,cold launch,factory/runtime,save,client,memory-comparison or release acceptance.",
+    "MIR3 is actual published3.2.11;no historical archive was edited to force an arm through."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}

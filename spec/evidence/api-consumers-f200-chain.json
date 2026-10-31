@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeQualificationChainV1",
+  "source": "86a9babd4462b5967f56bcc57669c22de26474fb",
+  "run": {
+    "id": 39991837615,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39991837615",
+    "conclusion": "success"
+  },
+  "custody": "build/mir5/black-glass/incoming/39991837615/black-glass-api-consumers-39991837615-1",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "file_version": "2.0.77.84539",
+    "product_version": "2.0.77",
+    "base_version": "2.0.77"
+  },
+  "player": {
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+    "sha256": "D51312D2474E7DFAD09D5D6D190AADAB833A51C557F571B0A1FFDC3084AC56E3"
+  },
+  "cases": {
+    "consumers": {
+      "receipt_gzip": "spec/mir5/evidence/api-consumers-f200-consumers-native.json.gz",
+      "uncompressed_receipt_sha256": "302640CB1BD8E7653AE5DE3E131459C73B5EAB2648B818ED5783D476746B956D",
+      "status": "passed-private-native-fixture",
+      "witnesses": {
+        "beta_consumer_marker_required": "MIR5_API_BETA",
+        "beta_technology": "mir-api-fixture-beta-cable-1",
+        "beta_public_query_before_research": true,
+        "beta_public_query_after_research": true,
+        "research_completed_by_native_setter": true,
+        "laboratory_research_used": false,
+        "native_effect_change": 0.01,
+        "baseline_recipe_productivity_bonus": 0,
+        "researched_recipe_productivity_bonus": 0.01,
+        "baseline_assembler_productivity_bonus": 0,
+        "researched_assembler_productivity_bonus": 0,
+        "assembler_modules_empty": true,
+        "beacon_entities_created": false,
+        "baseline_copper_plates_inserted": 100,
+        "researched_copper_plates_inserted": 100,
+        "baseline_copper_cables_output": 200,
+        "researched_copper_cables_output": 202,
+        "production_observation": "native-runner-readback-required",
+        "fixture_on_load_defers_native_checks": false
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "4379B07B9F640CBC665E70711F194F366CA8F568C7D1AC745D12F64EB77EA485",
+          "byte_identical": true
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "4379B07B9F640CBC665E70711F194F366CA8F568C7D1AC745D12F64EB77EA485",
+          "byte_identical": true
+        }
+      ]
+    }
+  },
+  "release_qualification": false,
+  "independent_consumer_readback": {
+    "create.factorio.log": {
+      "MIR5_API_ALPHA": {
+        "stage": "init",
+        "force_index": 1,
+        "researched": true,
+        "level": 1,
+        "max_level": 1,
+        "manual_crafting_speed_modifier": 0.05,
+        "tick": 0,
+        "reload_researched": true,
+        "reload_level": 1,
+        "reload_manual_crafting_speed_modifier": 0.05
+      },
+      "MIR5_API_BETA": {
+        "stage": "init",
+        "force_index": 1,
+        "researched": false,
+        "level": 1,
+        "max_level": 1,
+        "manual_crafting_speed_modifier": 0.05,
+        "tick": 0,
+        "reload_level": 1,
+        "reload_manual_crafting_speed_modifier": 0.05
+      }
+    },
+    "production.factorio.log": {
+      "MIR5_API_ALPHA": {
+        "stage": "load",
+        "tick": 0,
+        "reload_researched": true,
+        "reload_level": 1,
+        "reload_manual_crafting_speed_modifier": 0.05
+      },
+      "MIR5_API_BETA": {
+        "stage": "load",
+        "tick": 0,
+        "reload_level": 1,
+        "reload_manual_crafting_speed_modifier": 0.05
+      }
+    },
+    "reload-1.factorio.log": {
+      "MIR5_API_ALPHA": {
+        "stage": "load",
+        "tick": 4803,
+        "reload_researched": true,
+        "reload_level": 1,
+        "reload_manual_crafting_speed_modifier": 0.05
+      },
+      "MIR5_API_BETA": {
+        "stage": "load",
+        "tick": 4803,
+        "reload_level": 1,
+        "reload_manual_crafting_speed_modifier": 0.05
+      }
+    },
+    "reload-2.factorio.log": {
+      "MIR5_API_ALPHA": {
+        "stage": "load",
+        "tick": 4803,
+        "reload_researched": true,
+        "reload_level": 1,
+        "reload_manual_crafting_speed_modifier": 0.05
+      },
+      "MIR5_API_BETA": {
+        "stage": "load",
+        "tick": 4803,
+        "reload_level": 1,
+        "reload_manual_crafting_speed_modifier": 0.05
+      }
+    }
+  },
+  "claims": {
+    "required_alpha_immediate_family": true,
+    "optional_beta_late_creation": true,
+    "read_only_detached_runtime_query": true,
+    "physical_cable_output_200_then_202": true,
+    "save_two_cold_reloads": true,
+    "laboratory_research": false,
+    "optional_absence_native": false,
+    "multiplayer": false,
+    "release": false
+  }
+}

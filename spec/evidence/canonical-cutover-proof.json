@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "kind": "MIR5CanonicalCutoverProofV1",
+  "status": "host-tooling-and-package-parity-passed-final-layout-native-pending",
+  "pre_cutover_source": "2a18ba8867276d2a283f44b23c07a11e7ee6ea90",
+  "mechanical_commit": "bb9d3328e8b79c193eb86d8cc927bcb2b9b4db38",
+  "current_qualification_source": "ddc091e7b41f7716d8246a743c9996c84bc44ad8",
+  "dispositions": {
+    "tracked_preimages": 6626,
+    "keep": 52,
+    "move": 1509,
+    "retire": 5065,
+    "exported_outputs": 1561
+  },
+  "custody": [
+    {
+      "path": "spec/evidence/canonical-cutover-dispositions.json.gz",
+      "sha256": "51E31FF5FCE54FAE166A3C6FD69D07BFCC53E622FC500954394825E718410992",
+      "bytes": 559673,
+      "uncompressed_sha256": "E21A01F7491D3A909194F8F72723214724779764FB90B1166F65E0B8074BC6D1",
+      "uncompressed_bytes": 3433413
+    },
+    {
+      "path": "spec/evidence/canonical-cutover-export.json.gz",
+      "sha256": "F5B25B02BDA2D174326321E480EA568487B6672CC77070CC40559FDF02C05233",
+      "bytes": 358176,
+      "uncompressed_sha256": "BD3CEC48DD5BAE42CFA51BAD53370C855D9F1EB59A292E34A9A64A9C41E5F8E2",
+      "uncompressed_bytes": 2159893
+    }
+  ],
+  "admitted_player_blobs_unchanged": 217,
+  "original_request_ledger_unchanged": true,
+  "package_parity": {
+    "kind": "MIR5CanonicalCutoverPackageParityV1",
+    "status": "passed",
+    "old_source": "ca382b13f1e1f42fbc0ba6146adcb5048b9dd2d2",
+    "new_source": "bb9d3328e8b79c193eb86d8cc927bcb2b9b4db38",
+    "all_archive_bytes_equal": true,
+    "all_member_names_and_bytes_equal": true,
+    "checksums_equal": true,
+    "assets": [
+      {
+        "name": "more-infinite-research_5.0.01300.zip",
+        "members": 128,
+        "bytes": 341733,
+        "sha256": "c6173ee61ad90d500e74804516452ed97461564f0616c4a11a8ffd2e0f6d0161"
+      },
+      {
+        "name": "more-infinite-research_5.0.01400.zip",
+        "members": 128,
+        "bytes": 341734,
+        "sha256": "98fa80fc23dd422536a096eeccebd51016960e00e89619ef933089f1dd6cd831"
+      },
+      {
+        "name": "more-infinite-research_5.0.01500.zip",
+        "members": 128,
+        "bytes": 341689,
+        "sha256": "4c3ad69e771cd426a4d3c71b6d4f4d4cb7f3f931eca7d32ade4535cc06498d0a"
+      },
+      {
+        "name": "more-infinite-research_5.0.01600.zip",
+        "members": 128,
+        "bytes": 341684,
+        "sha256": "5e32eb75ddad67f7b305b43328a4ea76c49f2be49bdbf74b347357b8b949d31f"
+      },
+      {
+        "name": "more-infinite-research_5.0.01700.zip",
+        "members": 128,
+        "bytes": 341567,
+        "sha256": "72650c32cd7a3b4020692c8d03718c44d9e0be901f5bbe5c7296df3c92f49158"
+      },
+      {
+        "name": "more-infinite-research_5.0.10000.zip",
+        "members": 128,
+        "bytes": 355407,
+        "sha256": "c17812a01cde16e9bccc10024603a4b5b779442d220c38b59f17a44a23c13b85"
+      },
+      {
+        "name": "more-infinite-research_5.0.11000.zip",
+        "members": 128,
+        "bytes": 355404,
+        "sha256": "2d21a4c6b73af5e30c49a4ef0717d54728d400234db450f8140d9245b298a048"
+      },
+      {
+        "name": "more-infinite-research_5.0.20000.zip",
+        "members": 198,
+        "bytes": 543109,
+        "sha256": "72f01fe7f6e104d8260c81bb6b6f76569597b66497a13c8f57a1ec29b7920905"
+      },
+      {
+        "name": "more-infinite-research_5.0.21000.zip",
+        "members": 198,
+        "bytes": 543645,
+        "sha256": "c02404c97a35d107af3abe332fd46e7ad4d6a4e19080c9344cf90fcf62a75cc7"
+      }
+    ],
+    "native_execution": false,
+    "release_qualification": false
+  },
+  "followup_corrections": [
+    "c0b1b9a3e6969903944fa076a3702b002bf6a3ad restores original native fact Git blobs and maps historical prefixes only at lookup consumers.",
+    "c666e1be6895c19c8070f41714db61ef25a92c78 integrates original Aero808 comparator correction and reviewed Py fixture ancestry.",
+    "811d6ff824e6a8f5c7389659f1bbd6fa9236fc56 locates the four unchanged Py fixture files canonically."
+  ],
+  "limits": [
+    "The disposition/export records are immutable developer evidence, excluded from player packages, and do not retain retired source or executable framework.",
+    "Package parity is exact actual ZIP, member-name/member-byte and checksum equality, not native gameplay or performance acceptance.",
+    "The original disposition precedes deliberate consumer lookup corrections and current-only diagnostic/doc fixes; its output hashes do not claim to describe those later edits.",
+    "All original saved worlds, adverse receipts, active source worktrees, external raw custody and frozen test refs remain under their original identities.",
+    "Final-layout native, client/save, coherent performance and remaining product acceptance remain open."
+  ],
+  "current_host_evidence": "spec/evidence/canonical-host-controls-ddc091e7-chain.json"
+}

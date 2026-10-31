@@ -1,0 +1,191 @@
+{
+  "schema": 1,
+  "kind": "MIR5LiteralProductTargetHostControlsV1",
+  "status": "44-host-commands-pass-native-pending",
+  "contract": "CONT-04 partial literal-product target preservation",
+  "input_members": [
+    {
+      "path": "source/mir5/compatibility/product_bindings.lua",
+      "sha256": "1E6C5B093DF63F0EC8ECF33A3F38BF311322B36434FB7144C4A467C1D7CC6469"
+    },
+    {
+      "path": "source/mir5/compatibility/product_targets.lua",
+      "sha256": "CA0AA8B361FDC62F6E3975747B3F47C95FD99F10F289465B99F40D1736368D6D"
+    },
+    {
+      "path": "source/mir5/research/product_target_extension.lua",
+      "sha256": "3EBD82F7C007B8014BBF12B5C6511649AE5C2D1431FDEC1B858FA2DBFEF75C63"
+    },
+    {
+      "path": "source/mir5/data-final-fixes.lua",
+      "sha256": "D267FF7F9D45A5EBAE1D8B8B73B505DD6C0B76EC5B76E2F4C5A73DEF31D192AB"
+    },
+    {
+      "path": "tests/mir5/test_product_targets.py",
+      "sha256": "76AB67234DABA1E304E5FC51119C2DCDCFE354C80E3BD03A3A5A05D5F4575FE4"
+    },
+    {
+      "path": "tests/mir5/test_product_target_extension.py",
+      "sha256": "7E4CDDC7CC78B13CEEFD08E9C8D599BF0BF62D0A8D9C82F37DF48EDDEB61C476"
+    },
+    {
+      "path": "tests/mir5/Test-MIR5HostControls.ps1",
+      "sha256": "F23D9E3769CC9E56569F83A91F358F751302C38FD7DC833950585B7DDD16BA0A"
+    },
+    {
+      "path": "tests/mir5/test_host_controls.py",
+      "sha256": "FD93B6C307E43E1221AFF8E8B3433ADFF546DF03DA921FDD86D0B0F8C7E850D6"
+    }
+  ],
+  "host_log": {
+    "path": "build/mir5/product-targets-host-controls-r01.txt",
+    "sha256": "F2B71C6634CB3BC85A8E70460D5FF96F5772F09E0AF7DF3F7958AAE1766840C6"
+  },
+  "exact_native_input_probe": [
+    {
+      "profile": "base-f210",
+      "differences": [],
+      "work": {
+        "matches": 67,
+        "recipes": 217,
+        "products": 219,
+        "ingredients": 523
+      }
+    },
+    {
+      "profile": "space-age-f210",
+      "differences": [
+        {
+          "family": "research_lithium",
+          "missing": [
+            "lithium"
+          ],
+          "extra": [],
+          "weights": []
+        }
+      ],
+      "work": {
+        "matches": 628,
+        "ingredients": 1173,
+        "recipes": 662,
+        "products": 1092
+      }
+    },
+    {
+      "profile": "k2so-f210",
+      "differences": [
+        {
+          "family": "research_belts",
+          "missing": [
+            "kr-advanced-loader",
+            "kr-express-loader",
+            "kr-fast-loader",
+            "kr-loader",
+            "kr-superior-loader",
+            "kr-superior-splitter",
+            "kr-superior-transport-belt",
+            "kr-superior-underground-belt"
+          ],
+          "extra": [],
+          "weights": []
+        },
+        {
+          "family": "research_heavy_ammo",
+          "missing": [
+            "kr-antimatter-artillery-shell",
+            "kr-nuclear-artillery-shell"
+          ],
+          "extra": [],
+          "weights": []
+        },
+        {
+          "family": "research_inserters",
+          "missing": [
+            "kr-superior-inserter",
+            "kr-superior-long-inserter"
+          ],
+          "extra": [],
+          "weights": []
+        },
+        {
+          "family": "research_lithium",
+          "missing": [
+            "lithium"
+          ],
+          "extra": [],
+          "weights": []
+        },
+        {
+          "family": "research_mining_drill",
+          "missing": [
+            "kr-quarry-drill"
+          ],
+          "extra": [],
+          "weights": []
+        },
+        {
+          "family": "research_science_pack_productivity",
+          "missing": [
+            "kr-advanced-tech-card",
+            "kr-advanced-tech-card-cooling",
+            "kr-matter-tech-card",
+            "kr-matter-tech-card-cooling",
+            "kr-singularity-tech-card",
+            "kr-singularity-tech-card-cooling"
+          ],
+          "extra": [],
+          "weights": []
+        }
+      ],
+      "work": {
+        "matches": 803,
+        "ingredients": 2948,
+        "products": 2166,
+        "recipes": 1883
+      }
+    },
+    {
+      "profile": "base-f200",
+      "differences": [],
+      "work": {
+        "matches": 67,
+        "ingredients": 523,
+        "products": 219,
+        "recipes": 217
+      }
+    },
+    {
+      "profile": "space-age-f200",
+      "differences": [
+        {
+          "family": "research_lithium",
+          "missing": [
+            "lithium"
+          ],
+          "extra": [],
+          "weights": []
+        }
+      ],
+      "work": {
+        "matches": 626,
+        "recipes": 659,
+        "products": 1084,
+        "ingredients": 1167
+      }
+    }
+  ],
+  "probe_semantics": "Collector selection only, compared against published productivity effects scaled by independently recovered setting defaults. Missing literal routes remain authored; no extra targets appear in the five exact reference inputs.",
+  "guarantees": [
+    "One product pass across selected authored families outside the Generator.",
+    "Existing effect identities, weights and order retained; deterministic additional targets only.",
+    "Typed outputs, positive nonignored yield, per-group exclusions, first admitted group and current settings retained.",
+    "Disabled owned identities retain matched effects to preserve earned bonuses; no foreign technologies inspected."
+  ],
+  "limits": [
+    "Host controls and replay over captured native input only; not a new native execution.",
+    "Literal selector subset only: pattern, module tiers, place-result structural routes, native-owner expansion and undeclared mod material families remain open.",
+    "No complete broad-mod compatibility, saves, multiplayer, performance or release acceptance claim."
+  ],
+  "native_execution": false,
+  "release_qualification": false
+}

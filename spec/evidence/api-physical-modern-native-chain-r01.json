@@ -1,0 +1,221 @@
+{
+  "schema": 1,
+  "kind": "MIRApiPhysicalModernNativeChainV1",
+  "status": "two-public-native-physical-subcases-pass-f210-outer-guard-adverse-preserved",
+  "cases": [
+    {
+      "target": "f200",
+      "source_commit": "b2e9243dacf8c10f623fe90ddac957329fbf1d9e",
+      "packet_sha256": "B8B4867558348273BE8EB73CFEBCE00895A85E940AE7BD43844463AC4E6340A2",
+      "caller_sha256": "240D6F8051E82D57DFC4702B99CC7ABB8384B4C699C7FE786D84DDBCF2A1A588",
+      "profile": {
+        "path": "D:/Projects/Factorio/mir5-api-boundary-f200-native-r01/tests/profiles/api-space-age-production-support-exports-f200-r01.json",
+        "bytes": 2076,
+        "sha256": "C04DFA1F0E25685EACCD154E611919806A9D7A23A062DCA329EE0B89E95EBFED",
+        "repo": "D:/Projects/Factorio/mir5-api-boundary-f200-native-r01",
+        "commit": "b2e9243dacf8c10f623fe90ddac957329fbf1d9e",
+        "relative_path": "tests/profiles/api-space-age-production-support-exports-f200-r01.json"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "file_version": "2.0.77.84539",
+        "product_version": "2.0.77",
+        "base_version": "2.0.77"
+      },
+      "candidate": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/packages/support-exports-all17-r01/more-infinite-research_5.0.20000.zip",
+        "bytes": 696588,
+        "sha256": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0"
+      },
+      "public_runner_status": "passed-private-native-fixture",
+      "outer_controller_exit": 0,
+      "outer_controller_exception": null,
+      "native_pids": [
+        72132,
+        87708,
+        60192,
+        4712
+      ],
+      "raw_loaded_selection": [
+        "base@2.0.77",
+        "elevated-rails@2.0.77",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "mir-fixture-mir5-api-alpha@0.1.0",
+        "mir-fixture-mir5-api-beta-production@0.1.0",
+        "mir-fixture-mir5-api-beta@0.1.0",
+        "more-infinite-research@5.0.20000",
+        "quality@2.0.77",
+        "space-age@2.0.77"
+      ],
+      "custody": {
+        "native_custody": {
+          "members": 23,
+          "bytes_per_copy": 1936765,
+          "all_original_copy_sha256_equal": true
+        },
+        "controller_custody": {
+          "members": 6,
+          "bytes_per_copy": 565558,
+          "all_original_copy_sha256_equal": true
+        }
+      },
+      "physical_witnesses": {
+        "beta_consumer_marker_required": "MIR5_API_BETA",
+        "beta_technology": "mir-api-fixture-beta-cable-1",
+        "beta_public_query_before_research": true,
+        "beta_public_query_after_research": true,
+        "research_completed_by_native_setter": true,
+        "laboratory_research_used": false,
+        "native_effect_change": 0.01,
+        "baseline_recipe_productivity_bonus": 0,
+        "researched_recipe_productivity_bonus": 0.01,
+        "baseline_assembler_productivity_bonus": 0,
+        "researched_assembler_productivity_bonus": 0,
+        "assembler_modules_empty": true,
+        "beacon_entities_created": false,
+        "baseline_copper_plates_inserted": 100,
+        "researched_copper_plates_inserted": 100,
+        "baseline_copper_cables_output": 200,
+        "researched_copper_cables_output": 202,
+        "production_observation": "native-runner-readback-required"
+      },
+      "actual_physical_and_reload_markers": 3,
+      "actual_consumer_bodies": 8,
+      "completed_save_sha256": "FB0AA27511605729772A4A21E5FC355B94D2DE8D83FA91EC8783B42228D122CA",
+      "seed_sha256": "322A70D735BE7CE621659CE4B4ABBEAE3D783921E4AE041152CEA02F18D8D180",
+      "seed_and_complete_crc_verified": true,
+      "unchanged_completed_save_cold_reloads": 2,
+      "root_readback_sha256": "10B51312528997910806C64B4EFB51A7073799C834ECB548AA15FC39D97AF847",
+      "terminal_sha256": "F168F464B341A39C21BD9E800221439353A3285A98B0569DF0B6647F14D69089",
+      "library_states_restored": 8,
+      "factorio_processes_after": 0
+    },
+    {
+      "target": "f210",
+      "source_commit": "b2e9243dacf8c10f623fe90ddac957329fbf1d9e",
+      "packet_sha256": "AE5FB658209229532A1FF5CCC7280422E9581D089FC62FBF0F544C79915C7EA7",
+      "caller_sha256": "56E586DBFEB4690789C18444E50267206F3C082723CBADFAB0507301334DACA8",
+      "profile": {
+        "path": "D:/Projects/Factorio/mir5-api-boundary-f210-native-r01/tests/profiles/api-space-age-production-support-exports-f210-r01.json",
+        "bytes": 2164,
+        "sha256": "44FF9FF0DFB41A1F02ECBD711E42414E63DB0E2796D338FFF232EABC5DCF0BF2",
+        "repo": "D:/Projects/Factorio/mir5-api-boundary-f210-native-r01",
+        "commit": "b2e9243dacf8c10f623fe90ddac957329fbf1d9e",
+        "relative_path": "tests/profiles/api-space-age-production-support-exports-f210-r01.json"
+      },
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "candidate": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\support-exports-all17-r01\\more-infinite-research_5.0.21000.zip",
+        "bytes": 696972,
+        "sha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B"
+      },
+      "public_runner_status": "passed-private-native-fixture",
+      "outer_controller_exit": 1,
+      "outer_controller_exception": "[api-production-f210-native-r01] native production process result differs",
+      "native_pids": [
+        21204,
+        86328,
+        2636,
+        62804
+      ],
+      "raw_loaded_selection": [
+        "base@2.1.23",
+        "elevated-rails@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "mir-fixture-mir5-api-alpha@0.1.0",
+        "mir-fixture-mir5-api-beta-production@0.1.0",
+        "mir-fixture-mir5-api-beta@0.1.0",
+        "more-infinite-research@5.0.21000",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23"
+      ],
+      "custody": {
+        "native_custody": {
+          "members": 23,
+          "bytes_per_copy": 1632319,
+          "all_original_copy_sha256_equal": true
+        },
+        "controller_custody": {
+          "members": 6,
+          "bytes_per_copy": 581000,
+          "all_original_copy_sha256_equal": true
+        }
+      },
+      "physical_witnesses": {
+        "beta_consumer_marker_required": "MIR5_API_BETA",
+        "beta_technology": "mir-api-fixture-beta-cable-1",
+        "beta_public_query_before_research": true,
+        "beta_public_query_after_research": true,
+        "research_completed_by_native_setter": true,
+        "laboratory_research_used": false,
+        "native_effect_change": 0.01,
+        "baseline_recipe_productivity_bonus": 0,
+        "researched_recipe_productivity_bonus": 0.01,
+        "baseline_assembler_productivity_bonus": 0,
+        "researched_assembler_productivity_bonus": 0,
+        "assembler_modules_empty": true,
+        "beacon_entities_created": false,
+        "baseline_copper_plates_inserted": 100,
+        "researched_copper_plates_inserted": 100,
+        "baseline_copper_cables_output": 200,
+        "researched_copper_cables_output": 202,
+        "production_observation": "native-runner-readback-required"
+      },
+      "actual_physical_and_reload_markers": 3,
+      "actual_consumer_bodies": 8,
+      "completed_save_sha256": "9D9D151B56BC1B5020C08647161E72389706B13478D9377B43C8BB04ED9FD9CA",
+      "seed_sha256": "EE1BFD30B955792A8D3C61B1E57CCE98EC6D3547E8E87EE1A49D9563B437C75E",
+      "seed_and_complete_crc_verified": true,
+      "unchanged_completed_save_cold_reloads": 2,
+      "root_readback_sha256": "454BF0B7BC08DA7BC333910BD9BF52C14455E021129024E64D1442805134786B",
+      "terminal_sha256": "9FD4DA4F1B821F8B907E805B2FF07932815F25045B94EC105CEFD1A56D17985C",
+      "library_states_restored": 8,
+      "factorio_processes_after": 0
+    }
+  ],
+  "native_processes": 8,
+  "laboratory_completions": 0,
+  "physical_production_cases": 2,
+  "cold_reloads": 4,
+  "independent_actual_data_review": "Both exact public runner cases pass actual-data/custody/witness/restore review;F210 outer caller remains failed because its extra all-exits-zero guard rejects the documented supervised production stop.",
+  "f210_outer_guard_adverse": {
+    "status": "failed-preserved",
+    "cause": "Private caller incorrectly requires all four exit codes zero. Public runner and governor explicitly accept passed && !timed_out && (exit0 || completion_predicate_observed).",
+    "actual_exit_codes": [
+      0,
+      -1,
+      0,
+      0
+    ],
+    "production_completion_predicate_observed": true,
+    "original_terminal_and_caller_unchanged": true,
+    "native_reruns": 0,
+    "prospective_correction": "F200 caller uses the documented contract;real retained F210 results plus missing-predicate/passed-false/timeout opponents test that exact PowerShell guard before F200 dispatch."
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/api-physical-modern-native-receipts-r01.json.gz",
+    "sha256": "C9BBABA47710AB08F5BA848B383D6C2A80409BDD09AC6F4768CDE012148F5524",
+    "bytes": 136423,
+    "bodies": 67
+  },
+  "limits": [
+    "Physical fixture work uses a native research setter and game speed16;it does not establish lab-earned progression,ordinary tuning,real-factory performance or protected historical-save preservation.",
+    "All seed/completed saves,player-data and prior archive binaries remain in original/primary hash-verified custody;they are excluded from the public capsule.",
+    "F210 public protocol passes while its additional private guard remains adverse;no original receipt is changed or hidden and no completed gameplay is rerun.",
+    "The initial F210 readback incorrectly required engine selection order to match authored profile order;the corrected comparator preserves both raw orders and checks exact names,versions and multiplicity. This is not a native failure.",
+    "Pre-native F200 target/distribution projection refusals and all provisional bytes remain retained locally;no native/stage occurred in those controls.",
+    "Both N1 and N2 modern cases now have actual scoped evidence;final documented API subset/budget/client/absence reconciliation and independent stability decision remain required.",
+    "No whole-product startup/runtime/memory/performance or release qualification follows."
+  ],
+  "api_stability_verdict": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}

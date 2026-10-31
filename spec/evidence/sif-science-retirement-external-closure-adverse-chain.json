@@ -1,0 +1,72 @@
+{
+  "artifact_manifest": {
+    "members_verified": 120,
+    "path": "build/mir5/recovery-historical/sif-science-retirement/40127538360/artifact-manifest.json",
+    "selection_receipt_sha256": "3B03E3432BE74A03A30713EF24B365D01F3E2DA58CA50242F2E7EBC4A0648D19",
+    "sha256": "B83E8A458F6FCC8947013E324D98EA245A81E262F192F17BA50F2C65F1CF0ECF"
+  },
+  "controller_commit": "090dcb9aa7d3763bc5596541e64d7b3426f940e8",
+  "engine": {
+    "base_version": "2.1.23",
+    "file_version": "2.1.23.87750",
+    "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "product_version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "external_archives": {
+    "cr_commons_1_0_33_sha256": "378D3114B09C872358088B33500BC4AB0B9B9EFD9E5650DBEA0E87B5914C29BB",
+    "cr_extras_1_0_01_sha256": "874B204234446EBA9DD333D84569433A11E99D3C001FD853E26B13A01B2CBC82",
+    "space_is_fake_1_0_78_sha256": "3B5F2A381ADF1D9AECF048293E20035963A528720FBDC148CCC2B0418049FF13"
+  },
+  "fixture_source_commit": "7341f54e8fc6641fbb6668c15bf9743c0d72e294",
+  "kind": "MIR5SifScienceRetirementExternalClosureAdverseChainV1",
+  "limits": [
+    "This adverse is an external-closure startup observation before any MIR marker; it does not establish a MIR runtime defect or upstream attribution.",
+    "No F200 case, laboratory, save/reload, performance, compatibility or release qualification ran."
+  ],
+  "native_log": {
+    "diagnostic": "Error while loading item prototype \"foliax-glass-bottle\" (capsule): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.",
+    "path": "sif-science-retirement/native/f210/candidate-configured/write-data/factorio-current.log",
+    "sha256": "222A86F1AE911B5221458B89E6FF46664F072737617B6DC8C4785E7BFAA41B39"
+  },
+  "next_step": "Run the separately reviewed upstream-only F210 diagnostic with the same external closure, MIR absent, before assigning cause. Do not patch or substitute third-party archives/profile settings from this adverse alone.",
+  "observations": {
+    "candidate_marker_emitted": false,
+    "controls_restored": true,
+    "f200_cases_started": false,
+    "laboratory_or_transition_qualification": false
+  },
+  "player": {
+    "asset_inventory_sha256": "2C48DE548DED0BDC2B2F01AD1B851D58158E25916A02BD8AAAD281A52C28CBC0",
+    "bytes": 547680,
+    "sha256": "36E4D9E6B315C3C747F168A9F0D350FD298522DC0C874612CB403D0D32E84AC6",
+    "target": "f210"
+  },
+  "player_source_commit": "333fb9f94d4e48d07455154e22129c5c765b7ef9",
+  "profile": {
+    "path": "tests/profiles/sif-science-retirement-mir5-configured-f210-2123.json",
+    "sha256": "5F1FA776DD68E03460841BA029945761E510148B73E8BC3415FB2FB0749951EF"
+  },
+  "raw_evidence": {
+    "gzip_bytes": 50053,
+    "gzip_sha256": "886DC0368EDEBEA702C99DFD135E75D629BF24D27FD34F9E4AF5014DD1FE317A",
+    "members": 10,
+    "path": "spec/evidence/sif-science-retirement-external-closure-adverse-receipts.json.gz",
+    "uncompressed_bytes": 222998,
+    "uncompressed_sha256": "8B5F76525CF469373D93AFDC9F5CC6C815A3101A626416C6F48BCD066EADDDDC"
+  },
+  "result": {
+    "failure": "[mir441-process-exit] 1",
+    "path": "sif-science-retirement/native/f210/candidate-configured/result.json",
+    "sha256": "A112E9E7E894F8610A4DEE7643A8F7A4B98A63F4FD941E6B50490B1C23A3A622",
+    "status": "failed"
+  },
+  "run": 40127538360,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40127538360",
+  "schema": 1,
+  "status": "current333-f210-external-closure-startup-adverse-before-marker",
+  "target_execution_order": [
+    "f210",
+    "f200"
+  ]
+}

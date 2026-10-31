@@ -1,0 +1,285 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryRetainedFinalR01ReaderRefusalV1",
+  "status": "stopped-before-scoring-reader-schema-refusal",
+  "recorded_at_utc": "2026-10-29T12:37:03.981678+00:00",
+  "public_head": "c7b0260e49e78e033e46df50dc8a4bda20cf0ac5",
+  "private_head": "64108c9b22bfb427d209b122dc5fafeaed38b699",
+  "packet_sha256": "D9AF5E89F7F333BDD964D29E07D79131B844463CE67E3F26670E5562200ED7BB",
+  "plan_sha256": "947415B9774773CBBE885C82F837182B0AD7F5D9165FDB89AC221DD48A9A8FAA",
+  "prepared_sha256": "9D7076517A8AD37F7142F75F4A0A86161D61240014D04ACAEE48D2398878FC3F",
+  "failure": "The reader expected six session.profiler_observations records; the actual stable harness records two server native logs and stores all six stdout logs at canonical owned paths.",
+  "original_terminal_exception": "[library-retained-final] 38-endpoint A/A gate data is invalid",
+  "counts": {
+    "completed_sessions": 4,
+    "warmups": 2,
+    "published_control_observations": 2,
+    "actual_native_processes": 28,
+    "actual_client_joins": 16,
+    "worlds": 4,
+    "saved_host_restarts": 4,
+    "new_labs": 0,
+    "screenshots": 48,
+    "visually_reviewed": 0,
+    "closed_save_archives": 12,
+    "scored_sessions": 0,
+    "extensions": 0
+  },
+  "original_custody": {
+    "schema": 1,
+    "kind": "MIRLibraryRetainedFinalR01StoppedCustodyReadbackV1",
+    "observed_at_utc": "2026-10-29T12:23:50.658120+00:00",
+    "packet_sha256": "D9AF5E89F7F333BDD964D29E07D79131B844463CE67E3F26670E5562200ED7BB",
+    "original_terminal_exception": "[library-retained-final] 38-endpoint A/A gate data is invalid",
+    "completed_sessions": 4,
+    "native_files": 852,
+    "native_bytes": 108618639,
+    "controller_files": 31,
+    "original_and_copied_files_equal": true,
+    "original_library_controls_restored": true,
+    "actual_native_processes": 28,
+    "new_labs": 0,
+    "scored_sessions": 0,
+    "comparisons_scored": 0,
+    "aa_control_decision": "not-computed-by-dispatched-reader",
+    "native_reader_revision": "64108c9b22bfb427d209b122dc5fafeaed38b699",
+    "readback_reader": "F814E499F59540972BCC87E8107E77C0DA11B8684323050D0DCEF9831C09CCF1",
+    "performance_acceptance": false,
+    "release_qualification": false
+  },
+  "native_stdout": [
+    {
+      "case": "01-warmup-published",
+      "role": "create",
+      "sha256": "A36EFC577FCA1C29E10C8EF3EB202CC8364B30BD90C49C006C049D44A25B9A33"
+    },
+    {
+      "case": "01-warmup-published",
+      "role": "initial/server",
+      "sha256": "B650AD49F37F26B8D3A4F4AB8DF279438E59B8F14825898E98B1CE28954BFE0F"
+    },
+    {
+      "case": "01-warmup-published",
+      "role": "initial/en",
+      "sha256": "8BFC8FABD19B203C004FE7D0115F70E0CF07CC125A9A2B54F99D00DF6C0C512D"
+    },
+    {
+      "case": "01-warmup-published",
+      "role": "initial/de",
+      "sha256": "B3B24306A06D0E1128C1F0248D0FC22D4F54926BC86920852BD9E06143B05BEC"
+    },
+    {
+      "case": "01-warmup-published",
+      "role": "restart/server",
+      "sha256": "27C7ACAFDE8F5D458111490D151C049E7CD95D73CCBD0E37FB257DD20632485B"
+    },
+    {
+      "case": "01-warmup-published",
+      "role": "restart/en",
+      "sha256": "29AECF73BA0EA41AFAC0E7FBF3C0C0EA2B9161B6D35544CB224D9DDCC41A9315"
+    },
+    {
+      "case": "01-warmup-published",
+      "role": "restart/de",
+      "sha256": "854484EB77F6D35AB9E73A3C777A72E84C6CB67867D5B5AB99392A74F60751E0"
+    },
+    {
+      "case": "02-warmup-candidate",
+      "role": "create",
+      "sha256": "4DFA8286C9E8BE5BEF44F29D394E8BBFDE9D885934E3BF582FE5E2DA528D878A"
+    },
+    {
+      "case": "02-warmup-candidate",
+      "role": "initial/server",
+      "sha256": "858DBF03D835957DC5CB2A748E87591127E4301CBA7390DA66E0959A8207D90B"
+    },
+    {
+      "case": "02-warmup-candidate",
+      "role": "initial/en",
+      "sha256": "251A0CA582AC6FC7C2B847948DBAE5C8CB76DDFE32F76BAC23414C82D016912D"
+    },
+    {
+      "case": "02-warmup-candidate",
+      "role": "initial/de",
+      "sha256": "D5578FC602705C7E97C9D7A3870C165DAC5FB32121B001A217B9C4A092BEB9D1"
+    },
+    {
+      "case": "02-warmup-candidate",
+      "role": "restart/server",
+      "sha256": "F46E7AAF3037419BF7F2FD2B4B175B501B00A19EDB6636415B78FA63A1314C30"
+    },
+    {
+      "case": "02-warmup-candidate",
+      "role": "restart/en",
+      "sha256": "17BBBFB52E9D4746CFA8E10674179F761279FAC774C2BC3CA9179678BE986E72"
+    },
+    {
+      "case": "02-warmup-candidate",
+      "role": "restart/de",
+      "sha256": "3943FE37C6724265C29829CE637D6033E62389596F8836278BF887680D56C610"
+    },
+    {
+      "case": "03-control-published",
+      "role": "create",
+      "sha256": "0C9C7EA8E8F75630727E508B37879A5C2BD83956A226F43E32118827DF088DD7"
+    },
+    {
+      "case": "03-control-published",
+      "role": "initial/server",
+      "sha256": "CF0B033C62770E999E829BA86B85344006475F2F00B1A1AAE628AD6BAEA41DF2"
+    },
+    {
+      "case": "03-control-published",
+      "role": "initial/en",
+      "sha256": "306A9F1A40C4D174F3243217510728F0BC8A51226A6AF259516BE0DA36AA39E1"
+    },
+    {
+      "case": "03-control-published",
+      "role": "initial/de",
+      "sha256": "0FEF5FF1D5686B18BD79722F68F60AC1743DB24AF890563F13E9AAB68B8657DB"
+    },
+    {
+      "case": "03-control-published",
+      "role": "restart/server",
+      "sha256": "98C44E6558A59B3B44CDADA4072F2A915E649B2D8B33D5ECC51041BCDD49C17A"
+    },
+    {
+      "case": "03-control-published",
+      "role": "restart/en",
+      "sha256": "B3222DEC2F7FA4C98712A8BAD37C1963003F200CDB5B65BF4C2D97C1ADDA6F14"
+    },
+    {
+      "case": "03-control-published",
+      "role": "restart/de",
+      "sha256": "5F8B9724FB30D37AAA271C2F292E38338612B8CF971339683ECA54EF589F2A55"
+    },
+    {
+      "case": "04-control-published",
+      "role": "create",
+      "sha256": "FE8B317AAE3FF9A71A4B9C498D9494CB4BE539D226219EA57488D62B157026AA"
+    },
+    {
+      "case": "04-control-published",
+      "role": "initial/server",
+      "sha256": "A15B342A49A21C57C2BACAB0BBD898CB3559C5EFDF9AC8ABE6FB2D5A72BA9DC5"
+    },
+    {
+      "case": "04-control-published",
+      "role": "initial/en",
+      "sha256": "56E6AE17FCEAE08AD2087CB1C5F910DF404B96306EBB38C57C05C704B8C2A4B0"
+    },
+    {
+      "case": "04-control-published",
+      "role": "initial/de",
+      "sha256": "F062B31BF30D87B2BBB8D5F6C3CE887C8F6A141C16B8CD247B470E2F1285D0BF"
+    },
+    {
+      "case": "04-control-published",
+      "role": "restart/server",
+      "sha256": "504581D80550903830D60C670636D78D66AB3881429BD2553B8B40CB43FADD6F"
+    },
+    {
+      "case": "04-control-published",
+      "role": "restart/en",
+      "sha256": "4F6E3E66A6EB18A8C5E47DF806512551A39033C0770A072269ED87D33CC68DA9"
+    },
+    {
+      "case": "04-control-published",
+      "role": "restart/de",
+      "sha256": "60A0EF1DF2800B7A04B77AAB9EF2BE03D540AE296FE788EB57010A093B9CB91E"
+    }
+  ],
+  "saves": [
+    {
+      "case": "01-warmup-published",
+      "role": "seed_sha256",
+      "bytes": 811285,
+      "sha256": "DA50F52ECE78B4CAE3836C110A0CA2C8666B28FB3DAC8F20E0A2EF9BA9898DB5"
+    },
+    {
+      "case": "01-warmup-published",
+      "role": "restart_save_sha256",
+      "bytes": 947256,
+      "sha256": "3B7F27A3F871F8F48DAA9FE29217E65CD81FAD744F83B483CD2E2AD86C4ED08C"
+    },
+    {
+      "case": "01-warmup-published",
+      "role": "final_save_sha256",
+      "bytes": 1051460,
+      "sha256": "2EF0F17653B3B683986FFB272CD9AF33E002F915F4BFE162918041161BF512AB"
+    },
+    {
+      "case": "02-warmup-candidate",
+      "role": "seed_sha256",
+      "bytes": 810757,
+      "sha256": "99718787B31200DE5CC39A14A132F7E138F3BD3FAC87015F4AB4681F8F3025C6"
+    },
+    {
+      "case": "02-warmup-candidate",
+      "role": "restart_save_sha256",
+      "bytes": 940841,
+      "sha256": "5D4D0EEFB0812D2CECDA85B9E1BD7DEB950B79A585AAD58E40A332F68D6E6093"
+    },
+    {
+      "case": "02-warmup-candidate",
+      "role": "final_save_sha256",
+      "bytes": 1038379,
+      "sha256": "0B445BD8E5397897992990ECB796881D612183BA4A64CA09BCE4C1A461388558"
+    },
+    {
+      "case": "03-control-published",
+      "role": "seed_sha256",
+      "bytes": 811285,
+      "sha256": "DA50F52ECE78B4CAE3836C110A0CA2C8666B28FB3DAC8F20E0A2EF9BA9898DB5"
+    },
+    {
+      "case": "03-control-published",
+      "role": "restart_save_sha256",
+      "bytes": 937488,
+      "sha256": "3ABF12759601BC438807E6CBF4F7568F0C708B20165DD3264C478D6A0DEF222B"
+    },
+    {
+      "case": "03-control-published",
+      "role": "final_save_sha256",
+      "bytes": 1048242,
+      "sha256": "1B781DCDD3F9D108E9A1C2631B9F079FA8B7DC21F5307ABFE3494F06BA4E7C46"
+    },
+    {
+      "case": "04-control-published",
+      "role": "seed_sha256",
+      "bytes": 811285,
+      "sha256": "DA50F52ECE78B4CAE3836C110A0CA2C8666B28FB3DAC8F20E0A2EF9BA9898DB5"
+    },
+    {
+      "case": "04-control-published",
+      "role": "restart_save_sha256",
+      "bytes": 941800,
+      "sha256": "857466AF4A60DBB497703309AAFF48D6FC69BB184E857EF6FAE6EBCF29FE56DB"
+    },
+    {
+      "case": "04-control-published",
+      "role": "final_save_sha256",
+      "bytes": 1048255,
+      "sha256": "FCEE4143964BC48F1A847620DFE21FE0B0039DCA236E3DA5D731F507152E880B"
+    }
+  ],
+  "capsule": {
+    "path": "spec/evidence/library-retained-final-r01-reader-refusal-receipts.json.gz",
+    "sha256": "8EBE9C0C66E58F6B75FBDAE523D9E080DE70A4339AFB6D9243A7B604196AED82",
+    "bytes": 539389,
+    "bodies": 68,
+    "native_stdout_bodies": 28,
+    "already_redacted_rcon_arguments": 8
+  },
+  "aa_decision": "Not computed by the dispatched reader. Any later offline corrected readback must be separately labelled; this stopped run remains stopped.",
+  "controls_restored": true,
+  "factorio_processes_after_terminal": 0,
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "limits": [
+    "No scored session or comparison; no MIR regression or same-build repeatability verdict follows from a reader refusal.",
+    "The four native sessions and all adverse data remain unchanged. The final twelve-session component remains incomplete.",
+    "All48PNG hashes/CRCs/decompression pass;this record claims no visual review or imported/input/whole-product factory acceptance.",
+    "Source correction is offline and requires independent review/actual-record controls before another separately frozen dispatch. No automatic retry or threshold change."
+  ]
+}

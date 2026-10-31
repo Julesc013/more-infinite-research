@@ -1,0 +1,284 @@
+{
+  "schema": 1,
+  "kind": "MIR5HistoricalAllScience4CNativeChainV1",
+  "status": "passed-candidate-only-historical-all-science",
+  "native_execution": true,
+  "release_qualification": false,
+  "native_run": {
+    "run": 40187069542,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40187069542",
+    "artifact": 12596324441,
+    "artifact_name": "black-glass-historical-all-science-canonical-40187069542-1",
+    "artifact_bytes": 5753163,
+    "controller_provenance": {
+      "head_sha": "bccdf387b8fada164fcfe7cf4d9d807961e9e2a8",
+      "source": "GitHub Actions run metadata",
+      "artifact_attested": false,
+      "scope": "External workflow identity; artifact plan and native JSON independently bind fixture, player, engine, and outcome inputs."
+    }
+  },
+  "source": {
+    "fixture_and_runner_commit": "4c0376f5b8e38cde2aacc1fb520712a81f3e7a41",
+    "fixture_harness_tree": "1c4960cd420aefde7b2e0ce2befe56b191fcf994",
+    "player_source_commit": "1ca97dc4981444d742118febf822461a03481e90",
+    "player_source_tree": "ebfa50354994bd586e6965e91db44127e3625880",
+    "frozen_player_source_tree": "ebfa50354994bd586e6965e91db44127e3625880",
+    "asset_inventory_sha256": "86C52911FD8017AFE5A8A504A79C9B58069D8FA5498E5AE477E1BD3C09D3D522",
+    "historical_archives_in_current_freeze": 7,
+    "executed_targets": [
+      "f017",
+      "f100",
+      "f110"
+    ]
+  },
+  "artifact_manifest": {
+    "path": "build/mir5/aero-historical-all-science-40187069542/artifact-manifest.json",
+    "sha256": "CF03137280F447E8DEBAE85A500094E16D0589D9C6AD59E0DB01D147295F5C72",
+    "members": 222,
+    "verified_members": 222,
+    "member_bytes": 8853771,
+    "file_set": "All declared safe paths, byte counts, and hashes verified; artifact-manifest.json is the sole expected self-excluded file."
+  },
+  "arm_scope": {
+    "candidate_only": true,
+    "published_predecessor": null,
+    "external_input_save": null,
+    "input_save_scope": "Each case creates and hash-binds its own seed save; no pre-existing external input save is preserved."
+  },
+  "aggregate_witness": {
+    "targets": 3,
+    "real_labs": 6,
+    "direct_lab_completions": 3,
+    "continuation_lab_completions": 3,
+    "cold_reloads": 6
+  },
+  "cases": [
+    {
+      "target": "f017",
+      "engine": {
+        "version": "0.17.79",
+        "sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06"
+      },
+      "player": {
+        "version": "5.0.01700",
+        "sha256": "04777CDDF04B57FF97E94E4CC3B9C8C721C7AFA66D5500F92E74D0C4E02D8EB3",
+        "bytes": 346355
+      },
+      "fixture": {
+        "sha256": "1761A22FFE84963C22280EC6D5B8F7BF64C993CB9429E086DC5FD72BB4BDFD00",
+        "profile_sha256": "F1E03CB5E8A53C8F9A8AC737550383946A81C26B789987531899A4A21393B9AB"
+      },
+      "result": {
+        "path": "build/mir5/aero-historical-all-science-40187069542/historical-all-science-canonical/f017/native/result.json",
+        "sha256": "37519B619D2E83FD2EF2607AC431C72910FDFC4EFD785E643FFB45C49F681234",
+        "status": "passed-private-native-fixture"
+      },
+      "witness": {
+        "labs": 2,
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.1,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_lab_completions": 1,
+        "science_packs_per_lab": 7,
+        "initial_pack_count": 32,
+        "direct_event_and_next_tick_pack_count": 31,
+        "continuation_event_and_next_tick_pack_count": 31,
+        "direct_research_unit": {
+          "count": 1,
+          "energy": 60
+        },
+        "continuation_research_unit": {
+          "count": 1,
+          "energy": 60
+        },
+        "energy": "Exact fixture payload powers only the active lab at 100000000, the other at 0, and freezes both at 0; no per-lab runtime energy field is logged."
+      },
+      "saves": {
+        "seed_sha256": "003A640689220727F8A5C67B2D28B541A4F106DBE09559F525BCC43A6D868960",
+        "completed_save_sha256": "7B05E25252DA7A5EC309E003E9D39E07765DD73A1484636D0DACA4C77CA45407",
+        "cold_reloads": 2,
+        "save_byte_identical": true,
+        "on_load_read_only": true
+      },
+      "library_restoration": {
+        "status": "restored-direct-library-controls",
+        "dependency_payload_bytes_copied": 0,
+        "archive_links_created": 0,
+        "archive_extractions": 0,
+        "owned_archive_names_temporarily_hidden": 0
+      }
+    },
+    {
+      "target": "f100",
+      "engine": {
+        "version": "1.0.0",
+        "sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70"
+      },
+      "player": {
+        "version": "5.0.10000",
+        "sha256": "1AF8CF9B83FE17AEEC35218F21AFD5CE5E77ADACD9FC6D6C61FC0D4BB7431A37",
+        "bytes": 360147
+      },
+      "fixture": {
+        "sha256": "CDC49F7A390D05D3192BEB9392F52B4389AFF6C9F65AA62DE0FA3491665B65BE",
+        "profile_sha256": "4BE1D4755A050F5A3E5DA1362ACAC09B5DDC918423350B15B0F66E75003B16CE"
+      },
+      "result": {
+        "path": "build/mir5/aero-historical-all-science-40187069542/historical-all-science-canonical/f100/native/result.json",
+        "sha256": "593B17F25A00C735E3BB6C153B90C8EECD60578171F7D41341E82F31A01A8BD4",
+        "status": "passed-private-native-fixture"
+      },
+      "witness": {
+        "labs": 2,
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.1,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_lab_completions": 1,
+        "science_packs_per_lab": 7,
+        "initial_pack_count": 32,
+        "direct_event_and_next_tick_pack_count": 31,
+        "continuation_event_and_next_tick_pack_count": 31,
+        "direct_research_unit": {
+          "count": 1,
+          "energy": 60
+        },
+        "continuation_research_unit": {
+          "count": 1,
+          "energy": 60
+        },
+        "energy": "Exact fixture payload powers only the active lab at 100000000, the other at 0, and freezes both at 0; no per-lab runtime energy field is logged."
+      },
+      "saves": {
+        "seed_sha256": "CECA7434F726F440B993FFEE3FEAA2B26F2733CC630B579150302D350EE1570B",
+        "completed_save_sha256": "5393BD6C21B89AA6219381BC87A640ADDFBF803A7355E04CDDEE8B93F70DF181",
+        "cold_reloads": 2,
+        "save_byte_identical": true,
+        "on_load_read_only": true
+      },
+      "library_restoration": {
+        "status": "restored-direct-library-controls",
+        "dependency_payload_bytes_copied": 0,
+        "archive_links_created": 0,
+        "archive_extractions": 0,
+        "owned_archive_names_temporarily_hidden": 0
+      }
+    },
+    {
+      "target": "f110",
+      "engine": {
+        "version": "1.1.110",
+        "sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1"
+      },
+      "player": {
+        "version": "5.0.11000",
+        "sha256": "9FAD85CB25A2741254AD897BCB671CBEE21ADC96DD99D86DFB30B34D9A3B1FAB",
+        "bytes": 360144
+      },
+      "fixture": {
+        "sha256": "F6E252D4F173812953E160758BEB12BDFF618281444A0A151DCE4D5A635CC7D7",
+        "profile_sha256": "6D54A5C9724088F8417922CCEA168C7C45FD24E3367EEB30E9624F7B6B220269"
+      },
+      "result": {
+        "path": "build/mir5/aero-historical-all-science-40187069542/historical-all-science-canonical/f110/native/result.json",
+        "sha256": "A0143832AFB24080C7E99E2F26F349A72D5E7AE802EFE2E9E3C8556613DAA403",
+        "status": "passed-private-native-fixture"
+      },
+      "witness": {
+        "labs": 2,
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.1,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_lab_completions": 1,
+        "science_packs_per_lab": 7,
+        "initial_pack_count": 32,
+        "direct_event_and_next_tick_pack_count": 31,
+        "continuation_event_and_next_tick_pack_count": 31,
+        "direct_research_unit": {
+          "count": 1,
+          "energy": 60
+        },
+        "continuation_research_unit": {
+          "count": 1,
+          "energy": 60
+        },
+        "energy": "Exact fixture payload powers only the active lab at 100000000, the other at 0, and freezes both at 0; no per-lab runtime energy field is logged."
+      },
+      "saves": {
+        "seed_sha256": "2463E5DFC5B87F3A046409575EBA464ECE752A0DDF452C11A26C6D9DB7AFD23B",
+        "completed_save_sha256": "785B8E5E2347087BCC6E7797CB9E2B9B1F70E52A87E94E09CED829EFA3C84E13",
+        "cold_reloads": 2,
+        "save_byte_identical": true,
+        "on_load_read_only": true
+      },
+      "library_restoration": {
+        "status": "restored-direct-library-controls",
+        "dependency_payload_bytes_copied": 0,
+        "archive_links_created": 0,
+        "archive_extractions": 0,
+        "owned_archive_names_temporarily_hidden": 0
+      }
+    }
+  ],
+  "retained_adverses": [
+    {
+      "run": 40178948847,
+      "disposition": "Original adverse retained unchanged; it is not relabelled by this corrected run."
+    },
+    {
+      "run": 40182229022,
+      "disposition": "Original adverse retained unchanged; it is not relabelled by this corrected run."
+    }
+  ],
+  "portable_capsule": {
+    "path": "historical-all-science-4c-native-capsule.zip",
+    "sha256": "43810E1BCFB411CD52B3B213FB4013617A2BCED4059329AFFC3992F2E47AAFB7",
+    "bytes": 26415,
+    "members": [
+      {
+        "path": "artifact-manifest.json",
+        "bytes": 49733,
+        "sha256": "CF03137280F447E8DEBAE85A500094E16D0589D9C6AD59E0DB01D147295F5C72",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "historical-current-packages.json",
+        "bytes": 13543,
+        "sha256": "E2AA68581677BBC89ECA15500EB274F4E40A2994F1E7671302683D487D156760",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "f017-native-result.json",
+        "bytes": 42640,
+        "sha256": "37519B619D2E83FD2EF2607AC431C72910FDFC4EFD785E643FFB45C49F681234",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "f100-native-result.json",
+        "bytes": 42635,
+        "sha256": "593B17F25A00C735E3BB6C153B90C8EECD60578171F7D41341E82F31A01A8BD4",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "f110-native-result.json",
+        "bytes": 42651,
+        "sha256": "A0143832AFB24080C7E99E2F26F349A72D5E7AE802EFE2E9E3C8556613DAA403",
+        "custody": "exact original artifact bytes"
+      },
+      {
+        "path": "independent-readback.json",
+        "bytes": 3425,
+        "sha256": "4CB802FA48434484715D33520CA90079AB03CB3B016EB554F239AC524703D7FC",
+        "custody": "explicitly derived manifest, raw-Git source-payload and target-render binding, and selected native marker readback"
+      }
+    ]
+  },
+  "limits": [
+    "This corrected native run covers only the three selected current-package historical targets f017, f100, and f110; the current freeze contains seven historical archives but the other four were not executed here.",
+    "The all-policy physical witness is two real labs per target, one direct and one continuation completion, seven individual pack debits, exact one-unit/60-energy technology fields, and two read-only cold reloads per target.",
+    "Phase energy isolation is enforced by the exact fixture payload and exercised by the native run, but no artifact marker reads the two lab energy fields at runtime.",
+    "No external input save, published-to-current predecessor, multiplayer, broader historical migration, performance, full profile, or release verdict follows."
+  ]
+}

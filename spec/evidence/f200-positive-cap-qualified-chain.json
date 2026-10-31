@@ -1,0 +1,169 @@
+{
+  "schema": 1,
+  "kind": "MIR5F200PublishedPositiveCapUpgradeChainsV1",
+  "cases": [
+    {
+      "family": "gear",
+      "source": "bb602332f6526920b0c455718c9210ae08722f15",
+      "run": 40018587234,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40018587234",
+      "manifest_members_verified": 63,
+      "stages": {
+        "published": {
+          "receipt": {
+            "gzip": "spec/mir5/evidence/f200-legacy-gear-qualified-published-native.json.gz",
+            "uncompressed_sha256": "DBE85C176D9A70A5F6E36FF1DBB46A4BB55CF5ED16CB3C82CD2909270DA94BF5"
+          },
+          "player": {
+            "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip"
+          },
+          "witnesses": {
+            "source_mir": "4.7.20002",
+            "actual_lab_completions": 2,
+            "milestone": "actual2labs",
+            "seededpartial": "after-actual2labs",
+            "next_level": 3,
+            "productivity_bonus": 0.019999999552965164,
+            "player_enabled": false,
+            "player_visible_when_disabled": true,
+            "saved_progress": 0.27,
+            "foreign_queue_progress": 0.42000000000000004,
+            "foreign_disabled": true,
+            "on_load_read_only": false
+          },
+          "input_save": null
+        },
+        "upgrade": {
+          "receipt": {
+            "gzip": "spec/mir5/evidence/f200-legacy-gear-qualified-upgrade-native.json.gz",
+            "uncompressed_sha256": "31752612BBA2202D542CF3EA54B5AD8665BC3A247F49507F13ACD4B12797244B"
+          },
+          "player": {
+            "sha256": "C93B3CF3DD904AFBAD3555EFBC6F858D86C9B54100B866D0B2FB03E68D2F6ED8",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+          },
+          "witnesses": {
+            "source_mir": "4.7.20002",
+            "destination_mir": "5.0.20000",
+            "source_actual_lab_completions": 2,
+            "destination_actual_lab_completions": 1,
+            "milestone": "actual2labs",
+            "next_level": 4,
+            "productivity_bonus": 0.029999999329447746,
+            "player_enabled": true,
+            "player_visible_when_disabled": true,
+            "foreign_queue_progress": 0.42000000000000004,
+            "science_consumed_units": 0.7333333333333333,
+            "science_remaining_ticks": 44,
+            "science_processing_ticks": 44,
+            "science_elapsed_ticks": 43,
+            "science_units_after": {
+              "automation-science-pack": 21.266666666666666,
+              "logistic-science-pack": 21.266666666666666,
+              "chemical-science-pack": 21.266666666666666,
+              "production-science-pack": 21.266666666666666
+            },
+            "on_load_read_only": false
+          },
+          "input_save": {
+            "sha256": "AB7418DAA262CAE38E8FF137D4C4895FB9F320E6895F75A3C2CB7399003AF46A",
+            "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40018587234-1\\gameplay\\published\\write-data\\saves\\mir5-native-complete.zip"
+          }
+        }
+      }
+    },
+    {
+      "family": "worker",
+      "source": "bb602332f6526920b0c455718c9210ae08722f15",
+      "run": 40018592992,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40018592992",
+      "manifest_members_verified": 63,
+      "stages": {
+        "published": {
+          "receipt": {
+            "gzip": "spec/mir5/evidence/f200-legacy-worker-qualified-published-native.json.gz",
+            "uncompressed_sha256": "6A5C450AC547923D0AD3BAD0DC6F22406214C15ADB0F9B17F0483F603940AA5D"
+          },
+          "player": {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip",
+            "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
+          },
+          "witnesses": {
+            "source_mir": "4.7.20002",
+            "source_policy_transport": "settings-derived-v3",
+            "source_ownership_kind": "settings-derived-v3",
+            "source_operation": "native-owner-cap",
+            "native_owner": "worker-robots-speed-6",
+            "native_effect_modifier": 0.65,
+            "actual_lab_completions": 2,
+            "milestone": "actual2labs",
+            "seededpartial": "after-actual2labs",
+            "next_level": 8,
+            "worker_speed_modifier": 3.8229999999999995,
+            "independent_modifier_baseline": 2.5229999999999997,
+            "published_controller_initial_visible_when_disabled": true,
+            "player_enabled": false,
+            "player_visible_when_disabled": true,
+            "saved_progress": 0.27,
+            "foreign_queue_progress": 0.42000000000000004,
+            "foreign_disabled": true,
+            "on_load_read_only": false
+          },
+          "input_save": null
+        },
+        "upgrade": {
+          "receipt": {
+            "gzip": "spec/mir5/evidence/f200-legacy-worker-qualified-upgrade-native.json.gz",
+            "uncompressed_sha256": "DC671579BD1431AB870F98CE7CFDFF4A6AF73E14DE25266C8DE19B8A9311B7A5"
+          },
+          "player": {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+            "sha256": "C93B3CF3DD904AFBAD3555EFBC6F858D86C9B54100B866D0B2FB03E68D2F6ED8"
+          },
+          "witnesses": {
+            "source_mir": "4.7.20002",
+            "destination_mir": "5.0.20000",
+            "source_actual_lab_completions": 2,
+            "destination_actual_lab_completions": 1,
+            "native_owner": "worker-robots-speed-6",
+            "native_effect_modifier": 0.65,
+            "milestone": "actual2labs",
+            "next_level": 9,
+            "worker_speed_modifier": 4.473,
+            "independent_modifier_baseline": 2.5229999999999997,
+            "player_enabled": true,
+            "player_visible_when_disabled": true,
+            "foreign_queue_progress": 0.42000000000000004,
+            "science_consumed_units": 0.7333333333333333,
+            "science_remaining_ticks": 44,
+            "science_processing_ticks": 44,
+            "science_elapsed_ticks": 43,
+            "science_units_after": {
+              "automation-science-pack": 21.266666666666666,
+              "logistic-science-pack": 21.266666666666666,
+              "chemical-science-pack": 21.266666666666666,
+              "production-science-pack": 21.266666666666666,
+              "utility-science-pack": 21.266666666666666,
+              "space-science-pack": 21.266666666666666
+            },
+            "on_load_read_only": false
+          },
+          "input_save": {
+            "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40018592992-1\\gameplay\\published\\write-data\\saves\\mir5-native-complete.zip",
+            "sha256": "90B23B42FA040368E7ED8E4D720D1682BD252A554A2DEB103CE60D8AF2930D82"
+          }
+        }
+      }
+    }
+  ],
+  "scope": [
+    "Exact F2002.0.77 Base, published4.7.20002 to MIR5: two actual source labs, retained earned bonuses/27% investment/foreign disablement and42% queued work, restored positive-cap ownership, then one actual successor lab.",
+    "Gear cap2 to40 and native worker-speed cap7 to40; worker keeps independent modifier offsets.",
+    "Original predecessor save inputs protected; every stage saves and independently cold-reloads twice. Science consumption agrees with independent published-only44-processing-tick control."
+  ],
+  "limitations": [
+    "Non-final packages; other targets/profiles, historical full-catalogue saves and candidate stress/performance remain separate."
+  ],
+  "release_qualification": false
+}

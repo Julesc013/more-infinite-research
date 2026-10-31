@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "kind": "MIRFoundationActivityR02AdverseChainV1",
+  "status": "one-native-interrupted-by-incomplete-output-scan-before-activity",
+  "source_commit": "26815ee25b1775147f1c34eb118afe7d4538d8d0",
+  "packet_sha256": "4EA002ADD6F26436DB5F12BD2897D54C9FE191C79F6C34F4FFD77594EE37AA38",
+  "caller_sha256": "6748E8B954B34D1783E53A7B70406BD1623A85B983EC1C6CAA7A6A521F6BCBC2",
+  "terminal_sha256": "7B2F27512B96154ED12609F78486B03DD93FCFC0B7D0294CE1FF32ACEC9C58F3",
+  "root_readback_sha256": "BB0366077AE25281F2DD4BE5E9C75DDFA135F940A1DB4ABF04D28504A972CD7B",
+  "native_processes": 1,
+  "native_pid": 24968,
+  "no_mir_selected": true,
+  "scan_failure": {
+    "files": 48,
+    "bytes": 1147451,
+    "complete": false,
+    "stopped_by": "time-limit",
+    "elapsed_ms": 2030.782,
+    "reparse_points": 0
+  },
+  "failure_evidence": {
+    "error": "[mir441-resource-output-scan-incomplete] {\"files\":48,\"bytes\":1147451,\"complete\":false,\"stopped_by\":\"time-limit\",\"elapsed_ms\":2030.782,\"reparse_points\":0}",
+    "resource_admission": null,
+    "prestart_admission_wait": null,
+    "exception_chain_truncated": false
+  },
+  "last_native_stage": "Factorio initialized, then loading level.dat from the current2.0.55 save; no activity marker or benchmark summary.",
+  "activity_start_markers": 0,
+  "activity_complete_markers": 0,
+  "accepted_benchmark_observations": 0,
+  "custody": {
+    "native_custody": {
+      "members": 60,
+      "bytes_per_copy": 109747629,
+      "all_sha256_and_bytes_equal": true,
+      "physically_distinct": true
+    },
+    "controller_custody": {
+      "members": 2,
+      "bytes_per_copy": 6100,
+      "all_sha256_and_bytes_equal": true,
+      "physically_distinct": true
+    }
+  },
+  "protected_save_after": {
+    "source": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-inputs-r01\\protected-saves\\foundation-iii-original.zip",
+      "bytes": 108548262,
+      "sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA",
+      "file_identity": "1B6DF063:00580000000D9A79",
+      "reparse_point": false
+    },
+    "owned_copy": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation-current-world-f200-activity-r02-controller\\owned-inputs\\foundation-iii-original.zip",
+      "bytes": 108548262,
+      "sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA",
+      "file_identity": "1B6DF063:00050000000E28F6",
+      "reparse_point": false
+    },
+    "staged": {
+      "path": "D:\\Projects\\Factorio\\mir5-foundation-current-f200-activity-r01\\build\\tmp\\foundation-current-world-f200-activity-r02\\staged-protected-save\\foundation-iii-original.zip",
+      "bytes": 108548262,
+      "sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA",
+      "file_identity": "1B6DF063:00030000000E6C17",
+      "reparse_point": false
+    }
+  },
+  "immutable_lease_state": "failed-with-all-pre-post-hashes-equal",
+  "library_controls_restored": true,
+  "factorio_processes_after": 0,
+  "selection_receipt": {
+    "path": "build/qualification/foundation-save-selection-r02/selection.json",
+    "sha256": "1791B50680DBA0C4BA4A96B34F65020551F179BBC440A6CD9437A80DABD5D64B",
+    "original_save": "C:/Users/Jules/AppData/Roaming/Factorio/saves/Foundation III 250616 0Y.zip",
+    "newest_and_largest_found": true
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/foundation-current-world-f200-activity-adverse-receipts-r02.json.gz",
+    "sha256": "309A3B0225B1C5C92884E25F408613F7AA7DE9708196A32F1E91A4123468225E",
+    "bytes": 58915,
+    "bodies": 18
+  },
+  "limits": [
+    "One actual governed NoMIR engine is retained; this is not the earlier zero-native memory refusal.",
+    "The actual output scan stopped at its2-second bound; no memory breach, engine timeout, crash, candidate regression or root cause of scan latency is inferred.",
+    "Current36-row profile/14 dependency-version updates reach data initialization and current-save loading only; completed loading,settings/preservation/activity/useful work and performance remain unqualified.",
+    "The three protected/owned/staged save bodies and all60 native raw files remain unchanged in hash-verified original/primary custody; no save or dependency binary is embedded in the public capsule.",
+    "Do not retry this completed packet or relax bounds. Massive-modset startup remains primary; the maintainer permits smaller/older in-game saves when RAM requires it.",
+    "Original R01 memory/custody adverse and all preparation errors are preserved; the largest Foundation selection is confirmed without a new input or fabricated fresh credits."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}

@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "kind": "MIR5ForeignResearchNativeTransitionChainV1",
+  "community_id": "SCI-RESEARCH-01",
+  "community_disposition": "representative-passes-original-provider-profile-unknown",
+  "status": "published-470-upgrade-and-two-cold-reloads-preserve-research",
+  "source_commit": "25296f5017679acaddc7d5e6f7fccf301e452079",
+  "player_sha256": "D43C3159F608D04B4B6E7CFE5F6DECCBB98704F8715DD0A6E697AE372B9E0E02",
+  "published_470_sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1",
+  "records": [
+    {
+      "id": "published-source",
+      "path": "spec/mir5/evidence/foreign-research-source-470-native.json",
+      "sha256": "6D6AE8CE185752D74B1CDC89FA8A81FDBDECD181FB96671896F2999F15ABC6DF",
+      "capture_custody": "build\\tmp\\mir5-foreign-source-470-r02"
+    },
+    {
+      "id": "mir5-upgrade",
+      "path": "spec/mir5/evidence/foreign-research-upgrade-native.json",
+      "sha256": "2499ECBDD27592720B479AA175E1E88A6EC687177188636ABAFDCC547964B1D7",
+      "capture_custody": "build\\tmp\\mir5-foreign-upgrade-5-r01"
+    }
+  ],
+  "original_save_sha256": "5C7FDF05B82FB2CB621993DF8AAB287E1CE3F4E6667F80B0A2806A08635A387A",
+  "original_save_byte_identical": true,
+  "witnesses": {
+    "source_mir": "4.7.21000",
+    "destination_mir": "5.0.21000",
+    "foreign_name": "Space-Lab-Research-61",
+    "foreign_level": 61,
+    "foreign_researched": true,
+    "native_name": "research-speed-7",
+    "native_level": 8,
+    "mir_name": "recipe-prod-research_gears-1",
+    "mir_level": 3,
+    "mir_productivity_bonus": 0.2,
+    "laboratory_speed_modifier": 3.161,
+    "direct_native_setter_completion": "foreign-finite-61,native-lab-speed,mir-gear-levels",
+    "current_research": "Space-Lab-Research-62",
+    "queue": [
+      "Space-Lab-Research-62",
+      "recipe-prod-research_gears-1"
+    ],
+    "foreign_progress": 0.42000000000000004,
+    "mir_saved_progress": 0.27,
+    "on_load_read_only": false
+  },
+  "limits": [
+    "Disposable Base/foreign representative only; exact reporter configuration is unknown.",
+    "Native setters seed earned levels; not a lab-completion or physical-production result.",
+    "Does not qualify all save profiles, modded catalogues, multiplayer, GUI, performance or stable release."
+  ],
+  "release_qualification": false
+}

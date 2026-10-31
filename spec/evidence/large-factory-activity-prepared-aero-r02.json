@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "kind": "MIRLargeFactoryActivityPerActivationPreparedV1",
+  "status": "prepared-not-native-qualified",
+  "source_commit": "00809f4a1e17bfe758d9479cd3a2b8d88c931da0",
+  "review_comment": 6506128547,
+  "previous_preparation": {
+    "path": "spec/evidence/large-factory-activity-prepared-aero-r01.json",
+    "commit": "2435b5e4e7bdd980b94472584af5ddedea0f03ae",
+    "bytes": 6228,
+    "sha256": "E0FA6F2D02A3A573297D71D48C0ABB51FC2C65978CA1ABD520B10E6AE5803E18",
+    "disposition": "Preserved unchanged. New r02 states existing per-activation semantics and pins wording-only source containers."
+  },
+  "input_save": {
+    "name": "Foundation III 250616 0Y.zip",
+    "bytes": 108548262,
+    "sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA",
+    "current_header": "2.0.55 / 35 mods; original initial 2.0.32 / 30 mods is a distinct historical header"
+  },
+  "parent_selection": {
+    "commit": "b207593f67df6b94a7a35c66b5223ddfb5c2c7f2",
+    "path": "tests/profiles/foundation-available-space-age-f200-2077.json",
+    "sha256": "6A78405687485F7C8335304C3232EAE8284F741F5120E19720462DDDFFE5E537",
+    "bytes": 7426
+  },
+  "observer_archives": [
+    {
+      "target": "f200",
+      "path": "build/qualification/large-factory-activity-aero-r02/f200/mir-fixture-mir5-large-factory-activity_0.1.0.zip",
+      "sha256": "6E81303BECA10AD720251FF0921009FEDA26DDF6C8BB50F788AFC5D7F142E60D",
+      "bytes": 3178,
+      "members": [
+        {
+          "source": "tests/fixtures/large-factory-activity/control.lua",
+          "destination": "control.lua",
+          "bytes": 7571,
+          "sha256": "E9EB441A7D813ED6725E69A4EDBB6361FB2EF31457AB6D319B797734C6F4B3B3"
+        },
+        {
+          "source": "tests/fixtures/large-factory-activity/info-f200.json",
+          "destination": "info.json",
+          "bytes": 264,
+          "sha256": "DE4F336242DD33860334863969E64131C604E796E5BB5A348625A99583FC42CE"
+        }
+      ]
+    },
+    {
+      "target": "f210",
+      "path": "build/qualification/large-factory-activity-aero-r02/f210/mir-fixture-mir5-large-factory-activity_0.1.0.zip",
+      "sha256": "DC41D110D2002AB7C07C1F96FD0E9458FFD37BBB32A8C3B394EE18C2316B8CB6",
+      "bytes": 3179,
+      "members": [
+        {
+          "source": "tests/fixtures/large-factory-activity/control.lua",
+          "destination": "control.lua",
+          "bytes": 7571,
+          "sha256": "E9EB441A7D813ED6725E69A4EDBB6361FB2EF31457AB6D319B797734C6F4B3B3"
+        },
+        {
+          "source": "tests/fixtures/large-factory-activity/info-f210.json",
+          "destination": "info.json",
+          "bytes": 264,
+          "sha256": "4CAC7BBA6328FCE20EF6833E4182E2C5EE9341C3DF7DC2C054E494E9803535C1"
+        }
+      ]
+    }
+  ],
+  "profile": {
+    "path": "tests/profiles/foundation-available-activity-f200-2077-r02.json",
+    "bytes": 7752,
+    "sha256": "DE6F0554AC752624B9CA1D9D0F3379E6AD25B1937752CC0E174CB706DB0314F0"
+  },
+  "independent_expected_result": {
+    "window_ticks": 600,
+    "max_initial_surfaces": 32,
+    "max_sampled_machines_per_surface": 256,
+    "max_active_mods": 128,
+    "max_report_bytes": 65536,
+    "native_entity_type_counts": 9,
+    "normal_quality_item_counters": 15,
+    "start_marker": "[MIR5_LARGE_FACTORY_ACTIVITY] START ",
+    "complete_marker": "[MIR5_LARGE_FACTORY_ACTIVITY] COMPLETE ",
+    "completion_requires": "The latest init/config/load activation clears local observations and arms one600-tick window. Exactly600 ticks after that window first observes, retire its callback and emit COMPLETE. Another activation re-arms, including after earlier completion; unfinished earlier local observations are cleared. No once-per-save claim.",
+    "activity_requires": "Positive selected native production or sampled products_finished delta; entity count alone never qualifies activity.",
+    "read_only": "No storage, research, entity, inventory, setting, GUI, save or file writes; native chronological log only."
+  },
+  "execution_handoff": {
+    "owner": "Black Glass sole native lane",
+    "existing_runner": "Existing governed protected-save benchmark/admission caller; no new runner.",
+    "before": "Independently verify source and all actual archive/member/engine pins, current-world selection and inherited settings; stage only the owned observer with existing exclusive library custody; use a fresh disposable save copy and freeze the exact diagnostic caller/profile/packet.",
+    "run": "Use the existing 3600-tick diagnostic benchmark path and exact 2.0.77/D3 engine, keeping the first complete 600-tick log observation separate from benchmark timing. Native log must retain START and COMPLETE JSON; sanitized aggregate output alone is insufficient.",
+    "after": "Preserve full terminal engine log, measurements, original/owned/staged save hashes and control restoration. Review useful work and actual scale independently.",
+    "failure": "Preserve failed run/log/input identity before any relaunch. No completion or activity claim from partial rows. Diagnose missing work or a concrete bound separately; do not weaken bounds or change player behavior to pass."
+  },
+  "limits": [
+    "Diagnostic-only instrumentation is excluded from scored startup/runtime/memory comparisons. No overhead subtraction.",
+    "No native dispatch, completed activity, scale qualification, saved-state preservation, stall attribution, percentile or performance acceptance claimed.",
+    "Normal-quality production counters cover only 15 named items. Bounded native-order machine samples are not random or whole-factory estimates.",
+    "Source settings, dependency updates and any F210 removed-mod route require their own actual-input review. F210 observer payload does not establish a matching Foundation profile.",
+    "Old 30-row admission and all prior adverse/accepted results retain their original identities."
+  ],
+  "validation": {
+    "existing_pinned_Lua52_controls": 7,
+    "successive_activated_windows": "Host positive100\u2192700 and800\u21921400 emits two START/COMPLETE pairs; callbacks retire after each.",
+    "zip_crc_and_member_readback": "passed both engine-specific own containers",
+    "native_execution": 0
+  },
+  "player_source_changed": false,
+  "native_execution_count": 0,
+  "release_qualification": false
+}

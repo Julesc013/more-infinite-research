@@ -1,0 +1,160 @@
+"""Tier 0 boundaries for the current MIR 5 player source tree."""
+import importlib.util
+import json
+from pathlib import Path
+import re
+import unittest
+
+
+ROOT = Path(__file__).resolve().parents[1]
+PLAYER = ROOT / "source"
+IMPORT = re.compile(r"require\s*\(\s*[\"']([^\"']+)[\"']\s*\)")
+PACKAGE_PREFIX = "__more-infinite-research__/"
+F110_PLUS_MIGRATION = "migrations/more-infinite-research_5.0.11000.json"
+
+
+def load_module(name, relative):
+    specification = importlib.util.spec_from_file_location(name, ROOT / relative)
+    module = importlib.util.module_from_spec(specification)
+    specification.loader.exec_module(module)
+    return module
+
+
+package = load_module("mir5_package_under_test", "tools/package.py")
+
+
+def imports(path):
+    return IMPORT.findall(path.read_text(encoding="utf-8"))
+
+
+def local_module(target):
+    if target.startswith(PACKAGE_PREFIX):
+        target = target[len(PACKAGE_PREFIX):].replace("/", ".")
+    return PLAYER / (target.replace(".", "/") + ".lua")
+
+
+def local_closure(roots):
+    pending = list(roots)
+    seen = set()
+    while pending:
+        path = pending.pop()
+        if path in seen:
+            continue
+        seen.add(path)
+        for target in imports(path):
+            candidate = local_module(target)
+            if not candidate.is_file():
+                raise AssertionError(f"player import is outside the MIR 5 root: {target}")
+            pending.append(candidate)
+    return seen
+
+
+class PackTests(unittest.TestCase):
+    def test_player_package_admits_only_native_files_and_all_locale_assets(self):
+        _, members = package.members(PLAYER)
+        admitted = {path for path, _ in members}
+        expected = {"info.json", "LICENSE", "changelog.txt", "thumbnail.png"}
+        expected.update(
+            name for name in {"LICENSE", "LICENSE.txt", "changelog.txt"}
+            if (PLAYER / name).is_file()
+        )
+        expected.update(path.relative_to(PLAYER).as_posix() for path in PLAYER.rglob("*.lua"))
+        migrations = PLAYER / "migrations"
+        expected.update(path.relative_to(PLAYER).as_posix() for path in migrations.glob("*.json"))
+        expected.update(path.relative_to(PLAYER).as_posix() for path in (PLAYER / "locale").rglob("*.cfg"))
+        graphics = PLAYER / "graphics"
+        if graphics.is_dir():
+            expected.update(
+                path.relative_to(PLAYER).as_posix()
+                for path in graphics.rglob("*")
+                if path.is_file() and path.suffix.lower() in {".png", ".jpg", ".ogg"}
+            )
+        self.assertEqual(admitted, expected)
+        self.assertIn("locale/en/more-infinite-research.cfg", admitted)
+        self.assertEqual(
+            {path for path in admitted if path.startswith("migrations/")},
+            {"migrations/more-infinite-research_2.0.5.json", "migrations/more-infinite-research_2.1.0.json",
+             "migrations/more-infinite-research_4.7.0.json", F110_PLUS_MIGRATION},
+        )
+        self.assertNotIn("README.md", admitted)
+        standalone = {"info.json", "LICENSE", "LICENSE.txt", "changelog.txt"}
+        self.assertTrue(
+            all(path in standalone or path.endswith((".lua", ".cfg", ".png", ".jpg", ".ogg"))
+                or (path.startswith("migrations/") and path.endswith(".json")) for path in admitted)
+        )
+
+    def test_settings_stage_closure_is_data_only(self):
+        closure = local_closure([PLAYER / "settings.lua"])
+        self.assertEqual(
+            {path.relative_to(PLAYER).as_posix() for path in closure},
+            {
+                "settings.lua",
+                "research/settings.lua",
+                "research/settings_profile.lua",
+                "research/historical_settings.lua",
+                "research/native_direct_definitions.lua",
+                "platform/target.lua",
+                "compatibility/modern_catalogue.lua",
+                "compatibility/modern_catalogue/base.lua",
+                "compatibility/modern_catalogue/k2_base.lua",
+                "compatibility/modern_catalogue/space_exploration.lua",
+                "compatibility/modern_catalogue/k2_space_exploration.lua",
+                "compatibility/modern_catalogue/bob_angel.lua",
+                "compatibility/modern_catalogue/bob_angel_f200_combined.lua",
+                "compatibility/modern_catalogue/bob_core.lua",
+                "compatibility/modern_catalogue/bob_tech_progression.lua",
+                "compatibility/angel_f210_profile.lua",
+                "compatibility/modern_catalogue/angel_f210.lua",
+                "compatibility/bob_angel_profile.lua",
+                "compatibility/bob_angel_f200_combined_profile.lua",
+                "compatibility/bob_tech_profile.lua",
+                "compatibility/bob_core_profile.lua",
+                "compatibility/bob_plates_profile.lua",
+                "compatibility/bob_productivity.lua",
+                "compatibility/ironclad.lua",
+                "compatibility/bob_angel_f210_profile.lua",
+                "compatibility/modern_catalogue/bob_angel_f210.lua",
+                "research/bob_plates_materials.lua",
+                "research/bob_core_materials.lua",
+                "compatibility/bob_warfare_profile.lua",
+                "compatibility/py_profile.lua",
+                "compatibility/modern_catalogue/bob_warfare.lua",
+                "compatibility/modern_catalogue/py.lua",
+                "compatibility/modern_catalogue/py_f210.lua",
+                "compatibility/native_modded_continuations.lua",
+                "compatibility/atan_profile.lua",
+                "compatibility/modern_catalogue/space_age.lua",
+                "compatibility/modern_catalogue/k2so.lua",
+            },
+        )
+        self.assertNotIn(PLAYER / "research/generator.lua", closure)
+        self.assertFalse(any("runtime" in path.parts or "api" in path.parts for path in closure))
+
+    def test_runtime_closure_never_imports_the_generator(self):
+        closure = local_closure([PLAYER / "control.lua", PLAYER / "api/v1/runtime.lua"])
+        relative = {path.relative_to(PLAYER).as_posix() for path in closure}
+        self.assertIn("runtime/lifecycle.lua", relative)
+        self.assertIn("runtime/caps.lua", relative)
+        self.assertIn("runtime/spoilage_contribution.lua", relative)
+        self.assertNotIn("research/generator.lua", relative)
+        self.assertNotIn("api/v1/data.lua", relative)
+
+    def test_player_imports_cannot_route_to_mir4(self):
+        for path in PLAYER.rglob("*.lua"):
+            for target in imports(path):
+                lowered = target.lower()
+                self.assertNotIn("mir4", lowered, f"{path}: {target}")
+                self.assertNotRegex(lowered, r"(?:^|[./])(?:src|prototypes)(?:[./]|$)", f"{path}: {target}")
+                self.assertTrue(local_module(target).is_file(), f"{path}: {target}")
+
+    def test_player_identity_preserves_product_metadata_without_qualification_claims(self):
+        info = json.loads((PLAYER / "info.json").read_text(encoding="utf-8"))
+        self.assertEqual(info["name"], "more-infinite-research")
+        self.assertEqual(info["factorio_version"], "2.1")
+        self.assertEqual(info["title"], "More Infinite Research")
+        self.assertFalse(re.search(r"qualified|crash.free|50%|tested on all", info["description"], re.IGNORECASE))
+        self.assertIn("disposable test worlds", (PLAYER / "README.md").read_text(encoding="utf-8"))
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

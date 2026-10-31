@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "kind": "mir5-popular-root-f210-native-reference-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "grappling-gun",
+      "version": "0.5.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.1.23",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "grappling-gun_0.5.0.zip": "9846B823CBF53AFE8D70BDDBBF60A22C0DE96B2D025736D2F44A1E694838938B",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+  },
+  "scope": "Exact grappling-gun ranked-root space-age input. Mandatory archived dependencies only; recommended providers are not automatically selected. Input metadata is not native engine admission, gameplay, save, client or support acceptance."
+}

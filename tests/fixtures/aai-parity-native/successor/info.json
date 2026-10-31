@@ -1,0 +1,17 @@
+{
+  "name": "mir-fixture-mir5-aai-parity-native",
+  "version": "0.2.0",
+  "author": "MIR maintainers",
+  "title": "MIR5 AAI parity native successor stage",
+  "factorio_version": "2.1",
+  "description": "Disposable MIR5 AAI Industry same-closure save hand-off and cold reload witness.",
+  "dependencies": [
+    "base = 2.1.23",
+    "? elevated-rails = 2.1.23",
+    "? quality = 2.1.23",
+    "? recycler = 2.1.23",
+    "? space-age = 2.1.23",
+    "aai-industry = 0.7.5",
+    "more-infinite-research = 5.0.21000"
+  ]
+}

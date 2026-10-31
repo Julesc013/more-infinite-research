@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "kind": "MIR5CanonicalAPINativeChainV1",
+  "status": "exact-source-native-consumers-and-loads-passed",
+  "api": "1.0.0-draft.3",
+  "source_commit": "554c5af31cc2986e3f0901f68909a447bd4c6304",
+  "controller_commit": "7d42246d7d7efa60aa36d3759ddf1675ee6c2942",
+  "cases": [
+    {
+      "run": 40096282039,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40096282039",
+      "scenario": "api-consumers-canonical",
+      "manifest_sha256": "37FF6664124C8403CEB87A93CA0618F2C025524292B2640BA8BDCF7AC0A5B886",
+      "verified_members": 46,
+      "github_artifact_digest": "3af2d82dcd1e02ff4bc947eeeda63aba2bbd5f4f280ab0e0d0c3d3c981b69dbc",
+      "outcome_sha256": "8A210E445130EB78A87FA7E83E2C307421B1A5DFF168033ABD851952718E9C86",
+      "native_result_sha256": "06C84D6DBAB03417128298F4816AF10CC068B8708AEF4FC6A982BDCD212EA820",
+      "native_status": "passed-private-native-fixture",
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "file_version": "2.0.77.84539",
+        "product_version": "2.0.77",
+        "base_version": "2.0.77"
+      },
+      "player_sha256": "99D295DC1803F0FE85F491B8E21C64C415DF4497C1427E53FCC0224E3BAB0BD3",
+      "scope": "actual F200 consumer effects, production, save, and two cold reloads",
+      "direct_library_controls_restored": true,
+      "research_completed_by_native_setter": true,
+      "laboratory_research_used": false,
+      "effect_change": 0.01,
+      "copper_cables_from_equal_100_plates": [
+        200,
+        202
+      ],
+      "cold_reloads": 2,
+      "unchanged_save_sha256": "D9FD18E720A936BD90CA9722E851921EDEBC92C64A326B2B6956B648CE4E416E"
+    },
+    {
+      "run": 40096649319,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40096649319",
+      "scenario": "api-namespace-collision-canonical",
+      "manifest_sha256": "35EBB8C8E79B1A5FCE4DEB14F67107F60BDA5B88D7372A5216F6EC14A325A0B3",
+      "verified_members": 28,
+      "github_artifact_digest": "9432b3a3a89cc4a9d719254374160baffb82eb2ddd52b337aa24800987e7accd",
+      "outcome_sha256": "4D85C3E47DB3BE137C845CC1563EAF59EA3AD26662859873A64F2A1751E90626",
+      "native_result_sha256": "54FAC913296733A896C1A8BD8045EC858DA66B10A972EFD61C582D47FBA1C82B",
+      "native_status": "passed-private-native-runtime-load-only",
+      "engine": {
+        "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "player_sha256": "064BCF42A2264FF39C1ECBC0B371C5A8FA098636D03437592BE259BB0AD93B8C",
+      "scope": "CreateOnly native load data/API observation; no gameplay, save, or release claim",
+      "direct_library_controls_restored": true,
+      "consumer_markers": {
+        "MIR5_API_NAMESPACE_ALPHA": {
+          "case": "api-namespace-collision",
+          "stage": "init",
+          "status": "passed",
+          "consumer": "mir-fixture-mir5-api-namespace-alpha",
+          "technology": "mir-api-namespace-alpha-gears-1",
+          "recipe": "iron-gear-wheel",
+          "change": 0.01
+        },
+        "MIR5_API_NAMESPACE_BETA": {
+          "case": "api-namespace-collision",
+          "stage": "init",
+          "status": "passed",
+          "consumer": "mir-fixture-mir5-api-namespace-beta",
+          "technology": "mir-api-namespace-beta-cable-1",
+          "recipe": "copper-cable",
+          "change": 0.02
+        }
+      }
+    },
+    {
+      "run": 40096782298,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40096782298",
+      "scenario": "science-ambiguity-canonical",
+      "manifest_sha256": "AEA532D14CE6E6D0F075F4DB5FFB419E019218CC524AB6FABDEA5109E089D439",
+      "verified_members": 19,
+      "github_artifact_digest": "ddf624fa95e16db048b30c33879574a9e4370faf5e8f2716590fa63ed6aae478",
+      "outcome_sha256": "1C651D53443587BD8B10D9A01526B690E2D3E03718797ECBA353B093F3C4D2BF",
+      "native_result_sha256": "800543A7DB5182EF98B0365490F84FF527220D4343CC669B24E9A4380695D924",
+      "native_status": "passed-private-native-runtime-load-only",
+      "engine": {
+        "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "player_sha256": "064BCF42A2264FF39C1ECBC0B371C5A8FA098636D03437592BE259BB0AD93B8C",
+      "scope": "CreateOnly native load data/API observation; no gameplay, save, or release claim",
+      "direct_library_controls_restored": true,
+      "representative_reporter_profile_qualified": false
+    }
+  ],
+  "raw_receipt": {
+    "path": "spec/evidence/api-canonical-native-receipts.json.gz",
+    "sha256": "70DA09063B3CD6BC2287A24268037F499AC917DE9E29CDC850E2634B80100A3C",
+    "bytes": 147878,
+    "uncompressed_sha256": "A377ECE966226E4AE1F9B977BDA2C2B293A37C78D46567886169F2AE71F80C48",
+    "uncompressed_bytes": 623765,
+    "selected_files": 62
+  },
+  "adverse_runs_retained": [
+    {
+      "run": 40094162766,
+      "scope": "pre-engine controller/staging adverse; not a Factorio gameplay result"
+    },
+    {
+      "run": 40094367300,
+      "scope": "pre-engine controller/staging adverse; not a Factorio gameplay result"
+    },
+    {
+      "run": 40094531926,
+      "scope": "pre-engine controller/staging adverse; not a Factorio gameplay result"
+    },
+    {
+      "run": 40095399358,
+      "scope": "pre-engine controller/staging adverse; not a Factorio gameplay result"
+    },
+    {
+      "run": 40095677496,
+      "scope": "pre-engine controller/staging adverse; not a Factorio gameplay result"
+    }
+  ],
+  "lock_failure_disposition": {
+    "cause": "wrapper already held the same non-reentrant exclusive library lock requested by its guarded archive installer",
+    "fix_original_commit": "4adeeb067f8829225855c9a949c9e2ee1877b264",
+    "accepted_controller_commit": "7d42246d7d7efa60aa36d3759ddf1675ee6c2942",
+    "offline_nested_lock_opponent_passed": true,
+    "guarded_installer_and_native_activation_locks_retained": true
+  },
+  "native_execution": true,
+  "release_qualification": false,
+  "limits": [
+    "Actual F200 effects/production/save/two cold reloads use native research setters, not real laboratory completion.",
+    "F210 namespace and representative science ambiguity are CreateOnly native loads; no gameplay/save/client claims.",
+    "Unknown reporter closure remains unqualified. API1.0 stability, affected real joining clients and final-current-package acceptance remain separate.",
+    "Each result retains exact source554, controller7d422, engine, archives, fixtures and endpoint identity; no newer product is relabelled as executed."
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-mir5-f200-legacy-cap",
+  "version": "0.12.0",
+  "title": "MIR F210 first enabled finite-cap hold",
+  "author": "MIR maintainers",
+  "description": "Disposable first-upgrade cap2 hold with the gear family enabled, followed by a separate relaxation.",
+  "factorio_version": "2.1",
+  "dependencies": ["base = 2.1.23", "? elevated-rails = 2.1.23", "? quality = 2.1.23", "? recycler = 2.1.23", "? space-age = 2.1.23", "more-infinite-research = 5.0.21000"]
+}

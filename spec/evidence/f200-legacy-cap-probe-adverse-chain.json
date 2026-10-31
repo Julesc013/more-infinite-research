@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeContinuityAdverseChainV1",
+  "run": {
+    "id": 40002802354,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40002802354",
+    "conclusion": "failure"
+  },
+  "source": "62a666cd04d37aecafe3fec3dd775e21f503df70",
+  "player": {
+    "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip"
+  },
+  "receipt": {
+    "gzip": "spec/mir5/evidence/f200-legacy-cap-probe-adverse-native.json.gz",
+    "uncompressed_sha256": "2EA099EA36A27F0DF7F3556AFE7B2124403E4E0E2E64EFDCE611BF72F9FD49E2"
+  },
+  "logs": [
+    {
+      "gzip": "spec/mir5/evidence/f200-legacy-cap-probe-adverse-create.log.gz",
+      "uncompressed_sha256": "17DC9A95AB89D65D8EFAC045097FE452CBD4192E36BEB94F80A4786735CA8A45"
+    }
+  ],
+  "custody": "C:/Projects/Factorio/more-infinite-research/build/mir5/black-glass/incoming/40002802354/black-glass-f200-legacy-caps-40002802354-1",
+  "manifest_members_verified": 29,
+  "diagnosis": [
+    "The corrected positive-cap presentation passed source initialization; the source then failed to enqueue the automation witness after real recursive prerequisite setup had already researched it.",
+    "The fixture now uses the explicitly unrelated braking-force-1 probe and verifies it is unresearched before queuing. It never clears earned research to manufacture a probe.",
+    "No published-source lab/save or MIR5 migration pass is claimed from this failed world creation."
+  ],
+  "release_qualification": false
+}

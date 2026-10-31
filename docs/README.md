@@ -1,34 +1,30 @@
 ---
-title: "More Infinite Research 4 documentation"
+title: "MIR documentation"
 status: current
-applies_to: "MIR 4.x"
-audience: maintainer
+applies_to: "MIR development"
+audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-31
+last_reviewed: 2026-10-27
 supersedes: []
 superseded_by: []
-generated_from: []
+source_of_truth_for:
+  - mir-replacement-readme-guide
 ---
 
-# More Infinite Research 4 documentation
+# MIR documentation
 
-This is the package-excluded documentation landing page for MIR 4. Choose the route that matches what you are trying to do; the repository root `README.md` remains byte-stable and package-visible until M41-05B deliberately separates repository presentation from generated player-package documentation.
+This is the current MIR5 implementation and qualification documentation for the canonical dev tree. Authored research, the Generator, settings, migrations, scripted effects, Library and API are implemented in the [player-source tree](../source/README.md). The [progress record](progress.md) distinguishes exact-source host and native observations from remaining release work. MIR5.0.0 is not yet released.
 
-## By reader
+| Need | Read |
+|---|---|
+| Understand the whole lifecycle visually | [Architecture explainer](architecture.md) and [offline atlas](diagrams/index.html) |
+| Editable/rendered diagrams | [Diagram index](diagrams/README.md) |
+| Why this design and what was changed | [Design summary](design.md) |
+| Implement a bounded change | [Development](development.md) |
+| Read or maintain the complete release history | [Changelog](../CHANGELOG.md) and [formatting workflow](development.md#changelog-ownership-and-formatting) |
+| Use the implemented candidate integration | [API guide](api.md) and [SDK](../sdk/README.md) |
+| Understand support and safe upgrades | [Support](support.md) |
+| Find normative requirements | [Specification index](../spec/README.md) |
 
-- Players and modpack users: [user guide](user/README.md)
-- Mod and extension developers: [developer guide](developer/README.md)
-- Contributors and maintainers: [maintainer guide](maintainer/README.md)
-- Exact formats and commands: [reference](reference/README.md)
-
-## By need
-
-- Learn by completing a guided path: [tutorials](tutorials/README.md)
-- Complete a specific task: [how-to guides](how-to/README.md)
-- Look up an exact contract: [reference](reference/README.md)
-- Understand design and policy: [explanation](explanation/README.md)
-
-Architecture, compatibility, capabilities, releases, decisions, and historical material remain available through the [architecture](architecture/README.md), [compatibility](compatibility/README.md), [capabilities](capabilities/README.md), [release](releases/README.md), [ADR](adr/README.md), and [archive](archive/README.md) indexes.
-
-Every current Markdown document under `docs/` owns its editable metadata in front matter. `.mir/docs.yml` and generated indexes are projections. Repository documentation, schemas, tests, fixtures, build reports, and evidence do not belong in player ZIPs.
+Historical evidence is read selectively by pinned source/fixture reference. Do not search every old transcript for instructions. One contract governs each responsibility, and source/qualification gaps remain explicit.

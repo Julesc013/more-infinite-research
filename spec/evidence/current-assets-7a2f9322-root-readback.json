@@ -1,0 +1,332 @@
+{
+  "schema": 1,
+  "kind": "MIR5Current7a2f9322AssetsRootReadbackV1",
+  "status": "all17-repeat-verified-and-primary-custody-rehashed",
+  "scope": "Offline package freeze, repeat build, complete member maps and source-delta proof only; not native/gameplay/save/client/performance/Portal or release acceptance.",
+  "source": {
+    "commit": "7a2f93224c846b86261b2da709f50ea683fc708d",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+    "tree": "d4fd1bbb9517531c6ff17e12b2a331c9b68a43f3"
+  },
+  "controller": {
+    "package_tool": {
+      "path": "tools/package.py",
+      "sha256": "32bdbe5e0d8b776a57bc8df63dd536dd81aedf54141ac6ec6b1bef4044c90674"
+    },
+    "release_tool": {
+      "path": "tools/release.py",
+      "sha256": "07972040468b3646c8d85d5b238a8c0a920664ebfd540237b84cc9d44d698377"
+    },
+    "runtime": {
+      "implementation": "cpython",
+      "version": [
+        3,
+        14,
+        7
+      ],
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    },
+    "zip_policy": {
+      "compression": "ZIP_DEFLATED",
+      "compresslevel": 9,
+      "member_create_system": 3,
+      "member_external_attr": 2175008768,
+      "member_timestamp": [
+        1980,
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "source_commit": "7a2f93224c846b86261b2da709f50ea683fc708d",
+  "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+  "qualification_controller_commit": "8e76ff18b44c00b23a51b34d62e2b8cee3ff506c",
+  "original_output": "D:\\Projects\\Factorio\\mir5-packages-7a2f9322-root-r01",
+  "primary_output": "build/packages/7a2f9322-root-r01",
+  "files": [
+    {
+      "name": "MIR5ReleaseAssetInventoryV1.json",
+      "bytes": 209701,
+      "sha256": "17B41BA71293BA14941F1D4F12F40C858D7081C414E9C7AFAF0B1D6ED74DC4F3"
+    },
+    {
+      "name": "more-infinite-research_5.0.00600.zip",
+      "bytes": 136231,
+      "sha256": "B9DEC15E05D47F1BCFECEC8F754249FE48C979B29E1EA35D0A6AC374D4F244A0"
+    },
+    {
+      "name": "more-infinite-research_5.0.00700.zip",
+      "bytes": 136231,
+      "sha256": "E6004197A2F9E7A5AEDD01A05A726442FEE5351CFD6471837B702200BF98307C"
+    },
+    {
+      "name": "more-infinite-research_5.0.00800.zip",
+      "bytes": 136229,
+      "sha256": "83E1B90B1C7E3DFF1B421FE3E4C0702338B5416088636D3D62C031E6DBCF76E9"
+    },
+    {
+      "name": "more-infinite-research_5.0.00900.zip",
+      "bytes": 136231,
+      "sha256": "530FEA5E30ADA919199E811937BCA3F1183995DE0E2CD3BA3FB221E6443AA9FF"
+    },
+    {
+      "name": "more-infinite-research_5.0.01000.zip",
+      "bytes": 136231,
+      "sha256": "CAB9502F6A978D165F90C5A626479DDFBE42958874343C59C82BF83B64128D92"
+    },
+    {
+      "name": "more-infinite-research_5.0.01100.zip",
+      "bytes": 136231,
+      "sha256": "8CA02182FB0C8319312F239515D42CFEA197060A50BA5C2127E3918FD121B67D"
+    },
+    {
+      "name": "more-infinite-research_5.0.01200.zip",
+      "bytes": 136233,
+      "sha256": "38FB946D041D4DC7765D2964F81887434F56203291B9583034554F0D2DE209DA"
+    },
+    {
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 453709,
+      "sha256": "4DB2D8848EBD2B4EECBF6D91CBEF8F69F5C31F634432496BB26AC40A3FC8964A"
+    },
+    {
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 453711,
+      "sha256": "0A2BE7297D09DCCF084B8A10734651C1499FDE218FA3E2635873329F36250834"
+    },
+    {
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 453710,
+      "sha256": "37F7AC276460BC37C82D2426983B89D87393C22DFF8D39ECA17ACC7753F1480D"
+    },
+    {
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 453712,
+      "sha256": "35A8624065D3137E463EBC89DE21C06531F52F9E5E90632EC3C997CF52EEE839"
+    },
+    {
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 453711,
+      "sha256": "95228385A0862A807DB20A73F56CA0113693A1CDB3437410187303C598D784C7"
+    },
+    {
+      "name": "more-infinite-research_5.0.01800.zip",
+      "bytes": 453712,
+      "sha256": "16B0F13A139AFC9D3E4A4F2FB277206661F356D8F708C8784A2F60052649CE66"
+    },
+    {
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 453703,
+      "sha256": "6BAE382DBD0AEC7199474921887CFBAC61016B8BF5E8FB990656493A8A174B6C"
+    },
+    {
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 454014,
+      "sha256": "1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9"
+    },
+    {
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 691666,
+      "sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60"
+    },
+    {
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 692050,
+      "sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2"
+    },
+    {
+      "name": "SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "83F5ECD2517FFEF482AA87F6255BAB3C673F5C8128FB5A3DA6D02905C91CF745"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "CA25E7FACD4768543F3DAF47BA2AB5E194C3F907C3FC6B6263637067D701E2C6"
+    }
+  ],
+  "file_count": 20,
+  "bytes": 6178767,
+  "inventory_file_sha256": "17B41BA71293BA14941F1D4F12F40C858D7081C414E9C7AFAF0B1D6ED74DC4F3",
+  "assets": [
+    {
+      "target": "f013",
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 453709,
+      "sha256": "4DB2D8848EBD2B4EECBF6D91CBEF8F69F5C31F634432496BB26AC40A3FC8964A",
+      "changed_members_from_575e": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "target": "f014",
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 453711,
+      "sha256": "0A2BE7297D09DCCF084B8A10734651C1499FDE218FA3E2635873329F36250834",
+      "changed_members_from_575e": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "target": "f015",
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 453710,
+      "sha256": "37F7AC276460BC37C82D2426983B89D87393C22DFF8D39ECA17ACC7753F1480D",
+      "changed_members_from_575e": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "target": "f016",
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 453712,
+      "sha256": "35A8624065D3137E463EBC89DE21C06531F52F9E5E90632EC3C997CF52EEE839",
+      "changed_members_from_575e": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "target": "f017",
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 453711,
+      "sha256": "95228385A0862A807DB20A73F56CA0113693A1CDB3437410187303C598D784C7",
+      "changed_members_from_575e": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "target": "f018",
+      "name": "more-infinite-research_5.0.01800.zip",
+      "bytes": 453712,
+      "sha256": "16B0F13A139AFC9D3E4A4F2FB277206661F356D8F708C8784A2F60052649CE66",
+      "changed_members_from_575e": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "target": "f100",
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 453703,
+      "sha256": "6BAE382DBD0AEC7199474921887CFBAC61016B8BF5E8FB990656493A8A174B6C",
+      "changed_members_from_575e": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "target": "f110",
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 454014,
+      "sha256": "1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9",
+      "changed_members_from_575e": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "target": "f200",
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 691666,
+      "sha256": "65FC7E907FE3198B7290167989FE2564C1474190D06DAD49860063BEC418EC60",
+      "changed_members_from_575e": [
+        "changelog.txt",
+        "presentation/library_model.lua",
+        "research/catalogue.lua",
+        "runtime/library.lua"
+      ]
+    },
+    {
+      "target": "f210",
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 692050,
+      "sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+      "changed_members_from_575e": [
+        "changelog.txt",
+        "presentation/library_model.lua",
+        "research/catalogue.lua",
+        "runtime/library.lua"
+      ]
+    },
+    {
+      "target": "f006",
+      "name": "more-infinite-research_5.0.00600.zip",
+      "bytes": 136231,
+      "sha256": "B9DEC15E05D47F1BCFECEC8F754249FE48C979B29E1EA35D0A6AC374D4F244A0",
+      "changed_members_from_575e": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "target": "f007",
+      "name": "more-infinite-research_5.0.00700.zip",
+      "bytes": 136231,
+      "sha256": "E6004197A2F9E7A5AEDD01A05A726442FEE5351CFD6471837B702200BF98307C",
+      "changed_members_from_575e": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "target": "f008",
+      "name": "more-infinite-research_5.0.00800.zip",
+      "bytes": 136229,
+      "sha256": "83E1B90B1C7E3DFF1B421FE3E4C0702338B5416088636D3D62C031E6DBCF76E9",
+      "changed_members_from_575e": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "target": "f009",
+      "name": "more-infinite-research_5.0.00900.zip",
+      "bytes": 136231,
+      "sha256": "530FEA5E30ADA919199E811937BCA3F1183995DE0E2CD3BA3FB221E6443AA9FF",
+      "changed_members_from_575e": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "target": "f010",
+      "name": "more-infinite-research_5.0.01000.zip",
+      "bytes": 136231,
+      "sha256": "CAB9502F6A978D165F90C5A626479DDFBE42958874343C59C82BF83B64128D92",
+      "changed_members_from_575e": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "target": "f011",
+      "name": "more-infinite-research_5.0.01100.zip",
+      "bytes": 136231,
+      "sha256": "8CA02182FB0C8319312F239515D42CFEA197060A50BA5C2127E3918FD121B67D",
+      "changed_members_from_575e": [
+        "changelog.txt"
+      ]
+    },
+    {
+      "target": "f012",
+      "name": "more-infinite-research_5.0.01200.zip",
+      "bytes": 136233,
+      "sha256": "38FB946D041D4DC7765D2964F81887434F56203291B9583034554F0D2DE209DA",
+      "changed_members_from_575e": [
+        "changelog.txt"
+      ]
+    }
+  ],
+  "f018_support": "experimental-best-effort-github-only",
+  "previous_asset_evidence": "spec/evidence/current-assets-575e418c-root-readback.json",
+  "change_reason": "PR1313 excludes exactly four private migration credit holders from Library rows/details/translations/displayed queue/actions; no Generator, prototype, migration, effect or native queue mutation changes.",
+  "evidence_reuse_policy": "Earlier native results retain original package/controller identities. Complete unchanged relevant member proofs support only an explicit affected-path applicability review. Current changed Library paths need affected native client/view checks.",
+  "freeze_stdout": {
+    "path": "build/qualification/current-assets-7a2f9322-root-r01/freeze.json",
+    "sha256": "C5EBB44BE509F2A6028C7D5CA9E1A772F7561D836B9A477EF5AC1B3B2E3FF949"
+  },
+  "repeat_verification": {
+    "path": "build/qualification/current-assets-7a2f9322-root-r01/repeat-verification.json",
+    "sha256": "C5EBB44BE509F2A6028C7D5CA9E1A772F7561D836B9A477EF5AC1B3B2E3FF949"
+  }
+}

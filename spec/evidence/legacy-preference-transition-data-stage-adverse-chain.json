@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "kind": "MIR5LegacyPreferenceFixtureDataStageAdverseV1",
+  "runs": [
+    {
+      "run": 40048536676,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40048536676",
+      "manifest_members_verified": 43,
+      "manifest_sha256": "D829127D6EBEB8DFFE751433FFDB2140CE3E8465397CC96181B6CF12931BC449",
+      "cases": [
+        {
+          "path": "gameplay/from-false/published/result.json",
+          "status": "failed",
+          "source": "e1bc62df0e73eb79be5b71e9c4b47102214790bc",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/legacy-preference-transition-data-stage-adverse-40048536676-gameplay-from-false-published-native.json.gz",
+            "uncompressed_sha256": "4567A465E112D0D8FA7729630F74F1D59AEFC57E588672C09B5E286CF1C6436A"
+          },
+          "failure": "[mir441-process-exit] 1"
+        }
+      ]
+    }
+  ],
+  "scope": [
+    "All43 artifact members verified. The exact published4.7.20002 seed aborts during the private fixture data-final stage, before world creation, research, migration or guard execution.",
+    "The fixture incorrectly read settings prototypes from data.raw in the prototype stage. Native settings-updates has a separate settings prototype environment; data-final must read settings.startup[name].value.",
+    "Changed-input correction uses native-shaped settings and removes settings prototypes before host data-final execution; the opposing wrong-runtime-preference input refuses before unit acceleration.",
+    "No MIR4 production change, native preference migration pass, expected guard refusal or successor save is claimed. The direct-library receipt restores previous controls."
+  ],
+  "release_qualification": false,
+  "control_source": "bef8ab126ff25abdaa7cabab5664bee0a60a847a",
+  "native_log": {
+    "gzip": "spec/mir5/evidence/legacy-preference-transition-data-stage-adverse-40048536676-factorio.log.gz",
+    "uncompressed_sha256": "6EE7E98C949D0CE7B54323803FCDBF4ECA8C0D3BB0B06058B75CB502B520EAFE"
+  }
+}

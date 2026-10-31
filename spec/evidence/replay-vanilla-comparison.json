@@ -1,0 +1,117 @@
+{
+  "differences": [],
+  "kind": "MIR5CompleteReplayNativeOutputComparisonV1",
+  "left": {
+    "files": [
+      {
+        "bytes": 12895,
+        "path": "result.json",
+        "sha256": "C12D7AD8E23FD56930D505B3144D8683395277BCBA6C7EB2428E390A19B452BF"
+      },
+      {
+        "bytes": 220,
+        "path": "selection.json",
+        "sha256": "314456DB6A693C9A471530ECA5A683520569BE41618112686CD89ABCF656280A"
+      },
+      {
+        "bytes": 14286542,
+        "path": "write-data/script-output/data-raw-dump.json",
+        "sha256": "8FED49837245AA6EB9D6BAE6011439AD5F7AA8846329E2D8F262E5CEEDA4E865"
+      },
+      {
+        "bytes": 1048583,
+        "path": "write-data/script-output/mod-settings-dump.json",
+        "sha256": "F51DFBAD30F8CDE639B4F77CD71A90E1B3FFD26C9EBC38EF9AA289F6AF75544A"
+      },
+      {
+        "bytes": 49373136,
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+      },
+      {
+        "bytes": 79,
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\vanilla-f210.json",
+        "sha256": "6771D59F2CDAA4FA1927DD09F541C1B5889CB4A165B82FBC7FBE4F3959C064B3"
+      },
+      {
+        "bytes": 14736,
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\tools\\mir5\\Invoke-PrototypeCapture.ps1",
+        "sha256": "D1D3D5CAA71E01CE5E9517498226971DC8F468755279CF940133D62FF2954140"
+      },
+      {
+        "bytes": 1461799,
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\dist\\4.7.0\\more-infinite-research_4.7.21000.zip",
+        "sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1"
+      },
+      {
+        "bytes": 193,
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\base\\info.json",
+        "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F"
+      },
+      {
+        "bytes": 1461799,
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\dist\\4.7.0\\more-infinite-research_4.7.21000.zip",
+        "sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1"
+      }
+    ],
+    "result_sha256": "C12D7AD8E23FD56930D505B3144D8683395277BCBA6C7EB2428E390A19B452BF"
+  },
+  "right": {
+    "files": [
+      {
+        "bytes": 17674,
+        "path": "result.json",
+        "sha256": "9D404BA6610FCCA9A4F219AA1A888AF40D29DDC6E03A27F6F365CCD5A4FD947E"
+      },
+      {
+        "bytes": 220,
+        "path": "selection.json",
+        "sha256": "314456DB6A693C9A471530ECA5A683520569BE41618112686CD89ABCF656280A"
+      },
+      {
+        "bytes": 14286542,
+        "path": "write-data/script-output/data-raw-dump.json",
+        "sha256": "02E48ADDB482CD7A6F0AC3180453B21C8A7ADE2F14F90ADCA36A39BF926AA07D"
+      },
+      {
+        "bytes": 1048583,
+        "path": "write-data/script-output/mod-settings-dump.json",
+        "sha256": "E46A429CCFA314E0378223E19E1E42D4EB98BE2ABB699C7723FC0D68F466C664"
+      },
+      {
+        "bytes": 49373136,
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+      },
+      {
+        "bytes": 79,
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\vanilla-f210.json",
+        "sha256": "6771D59F2CDAA4FA1927DD09F541C1B5889CB4A165B82FBC7FBE4F3959C064B3"
+      },
+      {
+        "bytes": 14736,
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\tools\\mir5\\Invoke-PrototypeCapture.ps1",
+        "sha256": "D1D3D5CAA71E01CE5E9517498226971DC8F468755279CF940133D62FF2954140"
+      },
+      {
+        "bytes": 1524038,
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\replay-vanilla-r03\\composed-r01\\more-infinite-research_4.7.21000.zip",
+        "sha256": "17997B5CF05C897EDE0070681A5192CBEB473B16A97AC42F71A308DF0512B9FC"
+      },
+      {
+        "bytes": 193,
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\base\\info.json",
+        "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F"
+      },
+      {
+        "bytes": 1524038,
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\replay-vanilla-r03\\composed-r01\\more-infinite-research_4.7.21000.zip",
+        "sha256": "17997B5CF05C897EDE0070681A5192CBEB473B16A97AC42F71A308DF0512B9FC"
+      }
+    ],
+    "result_sha256": "9D404BA6610FCCA9A4F219AA1A888AF40D29DDC6E03A27F6F365CCD5A4FD947E"
+  },
+  "schema": 1,
+  "scope": "data/settings only; no gameplay, menu, runtime or release qualification",
+  "status": "equal-complete-native-output"
+}

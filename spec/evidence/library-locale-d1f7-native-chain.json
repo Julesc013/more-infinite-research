@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "kind": "MIR5CorrectedLocaleF210LibraryNativeChainV1",
+  "status": "functional-two-client-pass-rendering-raw-drill-name-still-open",
+  "source_commit": "d1f7ca1f560c42863c7c0ceb6ca3746895a7773f",
+  "player_source_tree": "fd8cc434cd1328aebf9a715022082f7cd564da2b",
+  "player_sha256": "EC7AD6B0E40C3209335912FDCFDC585726B32A235B5BAE3C59A090331163B107",
+  "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+  "profile_sha256": "55DE734C9E376EE65DF127F0A9B42C7B3DE884C323C6DBA49CF2C774ECB40E03",
+  "native_result_sha256": "AD7619CFE243F4C8F0D07FA41DE9B66E5B0A47D95A01144E27DCAD842C093555",
+  "session_sha256": "6F07DCBD8A33DF430007027009F8096C90A24D043D0948214CACA4736C11D5A9",
+  "native_completed_witness": {
+    "case": "library-multiplayer",
+    "stage": "completed",
+    "status": "passed",
+    "witnesses": {
+      "base_version": "2.1.23",
+      "mir_version": "5.0.21000",
+      "actual_join_events": 6,
+      "screenshot_calls": 10,
+      "initial_settled_without_reopen": true,
+      "initial_settle_ticks": 60,
+      "first_open": true,
+      "search": true,
+      "refresh": true,
+      "reopen": true,
+      "measurement_output": "native-localised-profiler-log",
+      "timing_values_stored": false,
+      "two_connected_clients_required": true,
+      "locales_required": [
+        "en",
+        "de"
+      ],
+      "distinct_personal_query_and_selection": true,
+      "initial_native_snapshot_immutable": true,
+      "live_refresh": {
+        "real_lab_completions": 2,
+        "native_laboratory_completion_by_script": false,
+        "native_research_started_events": 3,
+        "queue_lengths_observed": [
+          2,
+          1,
+          0
+        ],
+        "native_research_cancelled_events": 1,
+        "native_foreign_force_created_events": 1,
+        "gear_level": 3,
+        "gear_productivity": 0.2,
+        "science_consumed_per_named_pack": 2,
+        "fixture_accelerates_gear_count_and_time_only": true,
+        "ordinary_tuning_qualified": false,
+        "root_and_query_identity_preserved": true,
+        "cross_force_view_state_preserved": true
+      },
+      "availability_terminal_labels_checked": true,
+      "host_restart_observed": true,
+      "on_load_read_only": true,
+      "rendering_pending_external_png_readback": true,
+      "screenshot_requests_are_not_headless_rendering_proof": true
+    }
+  },
+  "custody": {
+    "path": "build/mir5/recovery-historical/library-standalone-locale-r06",
+    "manifest_sha256": "70589C97F5ED6571B22AA9664AABCFA01D91D6E211D46EC54418DFD797EF2426",
+    "original_and_primary_members_verified": 216,
+    "bytes": 21079156,
+    "mismatches": []
+  },
+  "restoration": {
+    "receipt_sha256": "0D0F5C1B218911C6AB7EA3FF64D1DC4E45D51F027B3A2BE917C357099DA2EF37",
+    "native_control_status": "restored-direct-library-controls",
+    "input_save_byte_identical": true,
+    "original_player_and_fixture_absence_restored": true
+  },
+  "visual_review": {
+    "method": "Root manually inspected all ten native1280x720 PNGs and independently rehashed them.",
+    "status": "not-accepted",
+    "finding": "German initial, settled, rejoin and restart still show recipe-prod-research_mining_drill-1 after the missing locale values are restored in EC7. The locale restoration is real but insufficient to explain or fix the displayed raw ID; a further Library/prototype presentation path remains under investigation.",
+    "english_limit": "Four native achievement notifications obscure initial/settled English content. Rejoin/restart English views are clear and display the preserved gear title.",
+    "layout_limit": "No obvious outer-frame clipping in these ten views; full small-screen/scroll/long-text/rendering acceptance remains open.",
+    "runner_visual_review_flag_unchanged": false
+  },
+  "diagnostic_corrections": {
+    "preengine_r05": {
+      "receipt_sha256": "2A8AA7FB7F5997C0254350B291819042971E01C5504031C7092F797AD4AD4AF7",
+      "reason": "Caller supplied an exact 3-member projection, while the normal standalone runner requires the canonical tests/fixtures/library-multiplayer source and internally materializes that same projection.",
+      "native_execution": false,
+      "projection_members_verified": 5
+    },
+    "outer_path_observation": {
+      "original_receipt_sha256": "51A26FF226A212EF6579A089B3C42591E2AEB2A239D884AA020521C5F875231F",
+      "correction_sha256": "27590B2FC864F270CDD0EE17A0BFCC8A9B12FA0BD5302EB2E6FCA55DC2D48C6F",
+      "fact": "The original observer checked native-output/result.json. This route correctly writes native-output/session/result.json; the actual outer result passed and restored controls. The limited wrong-path observation and restoration reason are preserved without being treated as a wrapper/native failure."
+    }
+  },
+  "raw_receipts": {
+    "path": "spec/evidence/library-locale-d1f7-native-receipts.json.gz",
+    "gzip_bytes": 39870,
+    "gzip_sha256": "E2E1DAD97FE2ED886C9E076673A3AB0809DA88F724D4A6B54DAAEB1FFFC8E974",
+    "uncompressed_sha256": "20850BD7A2734AD7DF2CB36FDAB444909D1CB18C1A7EC553B15AD26972F3B7F9",
+    "members": 8
+  },
+  "limits": [
+    "Exact Base-only functional client case, not Space Age/modpack client coverage.",
+    "No rendering, language fallback, ordinary tuning, scored performance, complete current-package or release acceptance.",
+    "The earlier201992/r04 missing-locale diagnosis was incomplete: restored data does not resolve this raw name by itself."
+  ]
+}

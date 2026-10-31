@@ -1,0 +1,236 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalTransition473LatePreparedInputsV1",
+  "status": "metadata-and-profile-prepared-no-native-result",
+  "review_unit_base": "6ae667ad208eec0d125b9cd05db0db501c14a4ea",
+  "controller": {
+    "path": "tools/Invoke-NativeFixture.ps1",
+    "sha256": "C87C5778E320471F84A2A5B0B6AFF12B083C2E1BF7D0E8B977CEEDE351261233"
+  },
+  "metadata": {
+    "path": "tests/fixtures/historical-transition/metadata-473-f017-f100.json",
+    "sha256": "EFD713EDAF197D211AA55CB306670ECA74D0BF848CB69B1F497549A364A7D8CD"
+  },
+  "origins": [
+    {
+      "target": "f017",
+      "published4_7_2": {
+        "path": "build/qualification/historical-473-f017-f100-prepared-r01/recovered-published-472/more-infinite-research_4.7.01702.zip",
+        "sha256": "3FB8750565526816C1C33B3ADD6B82165B5AA6D026D47CD242251455FE5CFE32",
+        "bytes": 695133,
+        "outside_mod_root_members": []
+      },
+      "published4_7_3": {
+        "path": "dist/more-infinite-research_4.7.01703.zip",
+        "sha256": "9BCF1813BBDCBBD90088D74672CEF639FBC96689604673E529CF3AA8FC8D89AF",
+        "bytes": 695297,
+        "outside_mod_root_members": []
+      },
+      "same_mod_root_member_names": 282,
+      "changed_mod_root_members": [
+        {
+          "path": "README.md",
+          "4_7_2_sha256": "93F5DCDD72B8EAB99BB042E0BDA72317A5A25B7E848AFA2A410425C2EB80D7E8",
+          "4_7_3_sha256": "AD2ED8B55B6BFE079767B048893F4F914F5CE83B26D2A0DC73E0C2DEAD93027B"
+        },
+        {
+          "path": "changelog.txt",
+          "4_7_2_sha256": "755494A237193ECFFB239ABEABF8E7EA12316B4AD97C84879F24D5B60BD991CE",
+          "4_7_3_sha256": "5AA7D5CFE7B6A9D39D8B3AD68C864EB754FB5C6EFC6D76B2275641CF91D3E23C"
+        },
+        {
+          "path": "info.json",
+          "4_7_2_sha256": "82858475D28A5F490F21A3F6D5529DF099C5FEF71F9B15DC27CC03EC2A152994",
+          "4_7_3_sha256": "CD717955470A413A590B5118B0DEDA8D4F7C8813B37B49B9A46282750F507F92"
+        },
+        {
+          "path": "prototypes/mir/capabilities/science_integration/pack_bindings.lua",
+          "4_7_2_sha256": "05A4FD9E230A97848D35851B2E7C9609C8C52DC70C27A04D208D351F1620DC0B",
+          "4_7_3_sha256": "BF2C54E3C877010586AB7D8CD740ABEA88A550447D084E005920F6844704DC5F"
+        },
+        {
+          "path": "prototypes/mir/streams/registry.lua",
+          "4_7_2_sha256": "30978E143C19C0500D97E4BBA2319C9B6A785B3B8B61AC17FB078D2401BA5F04",
+          "4_7_3_sha256": "E3F0E422E02315E37329D91DF84DE0828872C939F0206F3DFFE439E381323791"
+        }
+      ],
+      "unchanged_direct_inputs": [
+        {
+          "path": "data-final-fixes.lua",
+          "sha256": "2C1CB52080BA1B73A2DCDBDC617F918ADC7CB743CAFF5422F61D6BE1CDB22930"
+        },
+        {
+          "path": "prototypes/mir/stage/data_final_fixes.lua",
+          "sha256": "F0C6AB72F816C59DC241734AC5BCB96992D8F221F0848074CDAE8B68FED8D24A"
+        },
+        {
+          "path": "prototypes/streams/direct-effects.lua",
+          "sha256": "7AA6D11919D4CBB0149B1347474B732400010156A79C0E0E83635EB8290D8DC4"
+        }
+      ],
+      "profile": {
+        "path": "tests/profiles/historical-transition-473-published-f017.json",
+        "sha256": "E156A1CECF59121D529BA035263B9E01D2FED225B38C5C68942CEB79FBFBFE49"
+      },
+      "local_comparison_container_variant": {
+        "path": "dist/more-infinite-research_4.7.01702.zip",
+        "sha256": "FCD4619D58B4C5BCCAC8B7352F5D29107BF04DE1268FDF3F0A285B76A4FA8D8E",
+        "bytes": 1404844,
+        "outside_mod_root_members": [
+          {
+            "path": "more-infinite-research_4.7.10002.zip",
+            "bytes": 709563,
+            "sha256": "87A80EB76B30A73BC8F16A8F4B92AA59BA3CC400FF5921819CB5E9CEFAB745E0"
+          }
+        ],
+        "disposition": "Preserved local container variant, not the published4.7.2 artifact. Extra nested F100 ZIP changed whole-archive hash. Every mod-root payload matches the recovered published3FB archive; no emitted-output or native claim follows from that byte check."
+      }
+    },
+    {
+      "target": "f100",
+      "published4_7_2": {
+        "path": "dist/more-infinite-research_4.7.10002.zip",
+        "sha256": "87A80EB76B30A73BC8F16A8F4B92AA59BA3CC400FF5921819CB5E9CEFAB745E0",
+        "bytes": 709563,
+        "outside_mod_root_members": []
+      },
+      "published4_7_3": {
+        "path": "dist/more-infinite-research_4.7.10003.zip",
+        "sha256": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1",
+        "bytes": 709722,
+        "outside_mod_root_members": []
+      },
+      "same_mod_root_member_names": 282,
+      "changed_mod_root_members": [
+        {
+          "path": "README.md",
+          "4_7_2_sha256": "3DA39515F544196BDF8FF9A6183C80D17E221F9B1801066E9F2D259D77CA8AEE",
+          "4_7_3_sha256": "169840AC57C24B0DAB0179CD51FE36A8AC0FF919E29FEED5643475AD21512B0E"
+        },
+        {
+          "path": "changelog.txt",
+          "4_7_2_sha256": "87A719718580582EF027638ED1319F4BF76DE58EDCA9E613E5DA02164505AA26",
+          "4_7_3_sha256": "63447A7867E5B73F32A141B4225F339C8C980A5CB251D65465EA8CA3629D5790"
+        },
+        {
+          "path": "info.json",
+          "4_7_2_sha256": "0AB30D9365ED9E2EADE5438A0E84FEBAB3E4F7CD61DB05E6DAE43D78B8CE71D3",
+          "4_7_3_sha256": "4ED1ECFB3AA01D7D02C3762342DF9FF4D1B9EEA0C10EF1169349663D719EC8ED"
+        },
+        {
+          "path": "prototypes/mir/capabilities/science_integration/pack_bindings.lua",
+          "4_7_2_sha256": "05A4FD9E230A97848D35851B2E7C9609C8C52DC70C27A04D208D351F1620DC0B",
+          "4_7_3_sha256": "BF2C54E3C877010586AB7D8CD740ABEA88A550447D084E005920F6844704DC5F"
+        },
+        {
+          "path": "prototypes/mir/streams/registry.lua",
+          "4_7_2_sha256": "30978E143C19C0500D97E4BBA2319C9B6A785B3B8B61AC17FB078D2401BA5F04",
+          "4_7_3_sha256": "E3F0E422E02315E37329D91DF84DE0828872C939F0206F3DFFE439E381323791"
+        }
+      ],
+      "unchanged_direct_inputs": [
+        {
+          "path": "data-final-fixes.lua",
+          "sha256": "2C1CB52080BA1B73A2DCDBDC617F918ADC7CB743CAFF5422F61D6BE1CDB22930"
+        },
+        {
+          "path": "prototypes/mir/stage/data_final_fixes.lua",
+          "sha256": "F0C6AB72F816C59DC241734AC5BCB96992D8F221F0848074CDAE8B68FED8D24A"
+        },
+        {
+          "path": "prototypes/streams/direct-effects.lua",
+          "sha256": "7AA6D11919D4CBB0149B1347474B732400010156A79C0E0E83635EB8290D8DC4"
+        }
+      ],
+      "profile": {
+        "path": "tests/profiles/historical-transition-473-published-f100.json",
+        "sha256": "552D19B62ACC5A77056121062057981E48FA929E52677AFA116AED12F1B2A2EB"
+      }
+    }
+  ],
+  "shared_fixture_payloads": [
+    {
+      "path": "tests/fixtures/historical-transition/control.lua",
+      "sha256": "64E76AA8DFE63500E7F1CE26A838785F8E256872FE6407849453971D33F8E57F",
+      "raw_commit": "6ae667ad208eec0d125b9cd05db0db501c14a4ea"
+    },
+    {
+      "path": "tests/fixtures/historical-transition/data-final-fixes.lua",
+      "sha256": "60BA1672EC7DA621A61CAC5C7759EA0F67FADE5B36F0D4F07C52657B8728591F",
+      "raw_commit": "6ae667ad208eec0d125b9cd05db0db501c14a4ea"
+    },
+    {
+      "path": "tests/fixtures/historical-transition/settings-updates.lua",
+      "sha256": "683B095B2AC3A2B6EC6493F967B6C5BB4F9CF10FE69735F7E52D9EDCC37C5AE2",
+      "raw_commit": "6ae667ad208eec0d125b9cd05db0db501c14a4ea"
+    },
+    {
+      "path": "tests/fixtures/historical-transition/target.lua",
+      "sha256": "00ACC312215D37C3138432F871C1609493FA46300D2458E79C3515B50C32F489",
+      "raw_commit": "6ae667ad208eec0d125b9cd05db0db501c14a4ea"
+    }
+  ],
+  "interpretation": "Published direct-effect declarations and stage entrypoints match, but science bindings/registry changed. Expected ingredients/effect remain strict source-stage assertions, not4.7.3 output equivalence or permission to rewrite an unexpected result. The local F0174.7.2 container variant remains explicitly separate from the recovered published3FB artifact; their282 mod-root payloads match. No prior native receipt is relabelled.",
+  "remaining": "Black Glass must bind the exact installed engine/library/profile and freeze its existing native caller, create/protect the actual4.7.3 sources and two reloads, then bind current9522/6BAE for successor/save/two-reload cases. Four own fixtures are prepared/guarded, not native qualification.",
+  "claims": {
+    "metadata_profiles_prepared": true,
+    "fixture_archive_built": true,
+    "source_save_created": false,
+    "native_execution": false,
+    "release_qualification": false
+  },
+  "fixture_projection": {
+    "offline_caller": {
+      "path": "build/qualification/historical-473-f017-f100-prepared-r01/prepare-fixtures.ps1",
+      "sha256": "4138B75928FD0986D12366A2D6AC7DFAFECE4FB3A3427B393321B934CCE770AA"
+    },
+    "method": "Only the existing five offline metadata/ZIP helper definitions were loaded from the hash-pinned runner AST; the native driver was never imported/invoked. Shared Lua came from exact raw Git6ae blobs. Existing package.py emitted each own six-member fixture and Assert-HistoricalTransitionFixtureArchive accepted each. Adjacent metadata is excluded from ZIPs.",
+    "rows": [
+      {
+        "target": "f017",
+        "stage": "published",
+        "archive": "build/qualification/historical-473-f017-f100-prepared-r01/f017-published/mir-fixture-mir5-historical-transition_0.1.0.zip",
+        "sha256": "00428C09C1F54C4242590757D3B930CBCF414367B677336A0BE08D58FA20522A",
+        "bytes": 6953,
+        "source": "build/qualification/historical-473-f017-f100-prepared-r01/f017-published/source",
+        "metadata_sha256": "EFD713EDAF197D211AA55CB306670ECA74D0BF848CB69B1F497549A364A7D8CD",
+        "guard_passed": true,
+        "native_executed": false
+      },
+      {
+        "target": "f017",
+        "stage": "mir5",
+        "archive": "build/qualification/historical-473-f017-f100-prepared-r01/f017-mir5/mir-fixture-mir5-historical-transition_0.1.0.zip",
+        "sha256": "FF4C861BFEF84D43FDD47044E7717A5501C7CBB6AC9041FDA0D32A6BDC0E9597",
+        "bytes": 6948,
+        "source": "build/qualification/historical-473-f017-f100-prepared-r01/f017-mir5/source",
+        "metadata_sha256": "EFD713EDAF197D211AA55CB306670ECA74D0BF848CB69B1F497549A364A7D8CD",
+        "guard_passed": true,
+        "native_executed": false
+      },
+      {
+        "target": "f100",
+        "stage": "published",
+        "archive": "build/qualification/historical-473-f017-f100-prepared-r01/f100-published/mir-fixture-mir5-historical-transition_0.1.0.zip",
+        "sha256": "DB97BBC5BC723FE6743811EFBF81E0BCAF857917892560C76BB8FCA04F700AEB",
+        "bytes": 6947,
+        "source": "build/qualification/historical-473-f017-f100-prepared-r01/f100-published/source",
+        "metadata_sha256": "EFD713EDAF197D211AA55CB306670ECA74D0BF848CB69B1F497549A364A7D8CD",
+        "guard_passed": true,
+        "native_executed": false
+      },
+      {
+        "target": "f100",
+        "stage": "mir5",
+        "archive": "build/qualification/historical-473-f017-f100-prepared-r01/f100-mir5/mir-fixture-mir5-historical-transition_0.1.0.zip",
+        "sha256": "5D4B5D44828750894828AAE1A70AD52201BC5CCCC459931EB8544E7F59C296DB",
+        "bytes": 6939,
+        "source": "build/qualification/historical-473-f017-f100-prepared-r01/f100-mir5/source",
+        "metadata_sha256": "EFD713EDAF197D211AA55CB306670ECA74D0BF848CB69B1F497549A364A7D8CD",
+        "guard_passed": true,
+        "native_executed": false
+      }
+    ],
+    "resource_or_library_mutation": false
+  }
+}

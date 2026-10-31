@@ -1,0 +1,279 @@
+{
+  "schema": 1,
+  "kind": "MIR5PrototypeCaptureV1",
+  "status": "completed-data-stage-observation-only",
+  "endpoint_class": "factorio-data-stage-dump-only",
+  "claims": {
+    "gameplay": false,
+    "menu": false,
+    "save": false,
+    "release_qualification": false
+  },
+  "source_head": "b6f45af029d8f0926aa2922221eb2d1d013f5db7",
+  "harness": {
+    "path": "tools/mir5/Invoke-PrototypeCapture.ps1",
+    "sha256": "BDEFE909F1C0CF146B6CBC6F0E4917F2AD0C03975489F85A276BD2A405E662ED",
+    "direct_library_startup_measurement_sha256": "74F91F11B559B920F872E658AE1737C1ECAB9F425B48BBAC028BD1026D782AD9",
+    "native_probe_resources_sha256": "FF8E62687A8AA05080E3F9AFF45DED34BA7FCFDF1F309542A66893380B7D51E3",
+    "library_activation_sha256": "FA6D606C5CD1BCE9F262781C896853BAC0F1E9DCA2B396CB0B5548FA520D88D2"
+  },
+  "engine": {
+    "path": "D:\\Programs\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "base_version": "2.0.77",
+    "factorio_version": "2.0"
+  },
+  "profile_input": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\space-age-f200-2077.json",
+    "sha256": "4035B0AC7D99C77593605BCBD7BCDF8ADCABE2D5007E325565B2B39C310B085F"
+  },
+  "mir_archive": {
+    "path": "C:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+    "sha256": "001C81B0DB412E775606935112BF7EF7EA6B1DE9AE5E52DE64228F5BC1904BC9",
+    "name": "more-infinite-research",
+    "version": "5.0.20000",
+    "factorio_version": "2.0",
+    "root": "more-infinite-research_5.0.20000"
+  },
+  "active_mods_observer": null,
+  "budget": {
+    "timeout_seconds": 240,
+    "expected_peak_memory_mib": 1024,
+    "max_new_output_mib": 512
+  },
+  "native_qualification": false,
+  "initial_admission_wait": {
+    "phase": "prototype-capture-initial",
+    "admission_wait_seconds": 0,
+    "status": "not-requested",
+    "attempt_count": 0,
+    "refusal_count": 0,
+    "elapsed_seconds": 0.0,
+    "first_refusal": null,
+    "last_refusal": null,
+    "last_error": null,
+    "started_at": "2026-10-23T09:46:04.2567611+00:00",
+    "deadline_at": "2026-10-23T09:46:04.2567611+00:00",
+    "admission": null
+  },
+  "generated_selection": {
+    "path": "selection.json",
+    "sha256": "E146BC2FD7CA4592D4B945D8C11DF332F4BD3D3B449A7819DD1A1DEBB81D9909",
+    "mods": [
+      {
+        "name": "base",
+        "version": "2.0.77",
+        "enabled": true
+      },
+      {
+        "name": "elevated-rails",
+        "version": "2.0.77",
+        "enabled": true
+      },
+      {
+        "name": "quality",
+        "version": "2.0.77",
+        "enabled": true
+      },
+      {
+        "name": "space-age",
+        "version": "2.0.77",
+        "enabled": true
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.20000",
+        "enabled": true
+      }
+    ]
+  },
+  "selected_archives": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "builtin": true,
+      "path": "D:\\Programs\\Factorio\\2.0\\data\\base\\info.json",
+      "sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786"
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.0.77",
+      "builtin": true,
+      "path": "D:\\Programs\\Factorio\\2.0\\data\\elevated-rails\\info.json",
+      "sha256": "310A4C06D65F08199A76780388BA93C333BB752B1258415EA4D5211D9A681089"
+    },
+    {
+      "name": "quality",
+      "version": "2.0.77",
+      "builtin": true,
+      "path": "D:\\Programs\\Factorio\\2.0\\data\\quality\\info.json",
+      "sha256": "2C2578FD84CC2E920C944C90047EAA5A1F6984A1CE07C246FC1906D90C5505AD"
+    },
+    {
+      "name": "space-age",
+      "version": "2.0.77",
+      "builtin": true,
+      "path": "D:\\Programs\\Factorio\\2.0\\data\\space-age\\info.json",
+      "sha256": "F8957FC975949BB647B64CA246A4DE7F981232C4AB47C4DB4F60CCEA6AEF5E1A"
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.20000",
+      "builtin": false,
+      "path": "C:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+      "sha256": "001C81B0DB412E775606935112BF7EF7EA6B1DE9AE5E52DE64228F5BC1904BC9"
+    }
+  ],
+  "process": {
+    "status": "passed",
+    "exit_code": 0,
+    "timed_out": false,
+    "passed": true,
+    "completion_predicate_observed": false,
+    "duration_seconds": 7.883327,
+    "peak_working_set_bytes": 490885120,
+    "peak_sampled_private_bytes": 486715392,
+    "admission": {
+      "observed_at": "2026-10-23T09:46:09.5356898+00:00",
+      "memory": {
+        "total_bytes": 17047683072,
+        "free_bytes": 6660648960,
+        "committed_bytes": 14313918464,
+        "commit_limit_bytes": 20357242880
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 64281014272,
+        "total_bytes": 472446398464
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 64281014272,
+        "total_bytes": 472446398464
+      }
+    },
+    "duration_measurement": {
+      "scope": "direct-native-executable-start-to-exit",
+      "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+      "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+    }
+  },
+  "loaded_selection": [
+    "base@2.0.77",
+    "elevated-rails@2.0.77",
+    "more-infinite-research@5.0.20000",
+    "quality@2.0.77",
+    "space-age@2.0.77"
+  ],
+  "dumps": {
+    "data_raw": {
+      "path": "write-data/script-output/data-raw-dump.json",
+      "bytes": 27943600,
+      "sha256": "CB61A13D0F5C7C0E02140A7F6615D8712BD44F57D2E72780D6B3498334A55735"
+    },
+    "mod_settings": {
+      "path": "write-data/script-output/mod-settings-dump.json",
+      "bytes": 734628,
+      "sha256": "D0B0341C3C157BCCC5AA23CE9EA71F7AED58EA42F85DFF19902CBEF22A324CD7"
+    }
+  },
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "E146BC2FD7CA4592D4B945D8C11DF332F4BD3D3B449A7819DD1A1DEBB81D9909",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.0.77",
+        "path": "D:\\Programs\\Factorio\\2.0\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "7B33D0CB:0001000000066ED0",
+        "sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786",
+        "bytes": 193
+      },
+      {
+        "name": "elevated-rails",
+        "version": "2.0.77",
+        "path": "D:\\Programs\\Factorio\\2.0\\data\\elevated-rails\\info.json",
+        "builtin": true,
+        "identity": "7B33D0CB:0001000000069726",
+        "sha256": "310A4C06D65F08199A76780388BA93C333BB752B1258415EA4D5211D9A681089",
+        "bytes": 286
+      },
+      {
+        "name": "quality",
+        "version": "2.0.77",
+        "path": "D:\\Programs\\Factorio\\2.0\\data\\quality\\info.json",
+        "builtin": true,
+        "identity": "7B33D0CB:0001000000069894",
+        "sha256": "2C2578FD84CC2E920C944C90047EAA5A1F6984A1CE07C246FC1906D90C5505AD",
+        "bytes": 267
+      },
+      {
+        "name": "space-age",
+        "version": "2.0.77",
+        "path": "D:\\Programs\\Factorio\\2.0\\data\\space-age\\info.json",
+        "builtin": true,
+        "identity": "7B33D0CB:0001000000069971",
+        "sha256": "F8957FC975949BB647B64CA246A4DE7F981232C4AB47C4DB4F60CCEA6AEF5E1A",
+        "bytes": 483
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.20000",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:00A200000025B368",
+        "sha256": "001C81B0DB412E775606935112BF7EF7EA6B1DE9AE5E52DE64228F5BC1904BC9",
+        "bytes": 332131
+      }
+    ]
+  },
+  "library_controls_restored": true,
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-science-space-age-f200-native-r01\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-science-space-age-f200-native-r01\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-science-space-age-f200-native-r01\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 7.883327,
+        "peak_working_set_bytes": 490885120,
+        "peak_sampled_private_bytes": 486715392,
+        "admission": {
+          "observed_at": "2026-10-23T09:46:09.5356898+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 6660648960,
+            "committed_bytes": 14313918464,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 64281014272,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 64281014272,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    }
+  ]
+}

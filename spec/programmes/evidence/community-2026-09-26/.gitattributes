@@ -1,2 +1,0 @@
-# Native receipts retain their exact original bytes and SHA-256 on every host.
-*.json -text

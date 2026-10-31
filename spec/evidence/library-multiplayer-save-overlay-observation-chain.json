@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "kind": "MIR5LibraryMultiplayerRenderingObservationV1",
+  "source": "5bb4f3e3175e45597168c6b14eef220ac9ef9d45",
+  "player": {
+    "sha256": "3E41CBBF2FA3A50675AEC31EFD592C6C552FD05BEEB4B607953788AC352E0D7A",
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+  },
+  "run": {
+    "id": 40003932229,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40003932229",
+    "conclusion": "success"
+  },
+  "custody": "build/mir5/black-glass/incoming/40003932229/black-glass-library-multiplayer-40003932229-1",
+  "manifest_members_verified": 220,
+  "receipt": {
+    "gzip": "spec/mir5/evidence/library-multiplayer-save-overlay-observation-native.json.gz",
+    "uncompressed_sha256": "0E7C5D11A7526931028A5AC939E1DC420BC4AEF07D07FF577F05015629BEDDA0"
+  },
+  "session": {
+    "gzip": "spec/mir5/evidence/library-multiplayer-save-overlay-observation-session.json.gz",
+    "uncompressed_sha256": "364F5E3D9E0BC03C8472AF82315D8A2F11F675024B686E74AB930F8FD54490D4"
+  },
+  "server_log": {
+    "gzip": "spec/mir5/evidence/library-multiplayer-save-overlay-observation-server.log.gz",
+    "uncompressed_sha256": "B1392A3E8591FB8A3AA306B2FCCFAF67D1DBEE3A1CB226F32F500B49E6B1061B"
+  },
+  "input_save_byte_identical": true,
+  "lifecycle_markers": [
+    "ready",
+    "rejoin-ready",
+    "restart-ready",
+    "completed"
+  ],
+  "screenshots": [
+    {
+      "path": "spec/mir5/evidence/library-multiplayer-save-overlay-observation-en-initial.png",
+      "sha256": "343793A9BFC62A3EB79DB08C0674E89B80B3C71DB36EE2EB1119FEA862391881",
+      "locale": "en",
+      "stage": "initial"
+    },
+    {
+      "path": "spec/mir5/evidence/library-multiplayer-save-overlay-observation-en-rejoin.png",
+      "sha256": "D71C4F17E536EAD63C286718189C3551FEFBF4B7D533683C5D3DD71FEDB7EBC7",
+      "locale": "en",
+      "stage": "rejoin"
+    },
+    {
+      "path": "spec/mir5/evidence/library-multiplayer-save-overlay-observation-en-restart.png",
+      "sha256": "96D71BCD3EB971F7E9B627296EA52D3F1B60D3DD2E3827CC37F106D3A8AA7DBA",
+      "locale": "en",
+      "stage": "restart"
+    },
+    {
+      "path": "spec/mir5/evidence/library-multiplayer-save-overlay-observation-de-initial.png",
+      "sha256": "8BA58F1AEC6ADAA6063B6072CD393F4C42520A51F3C68A304B3109DC5D30C1FE",
+      "locale": "de",
+      "stage": "initial"
+    },
+    {
+      "path": "spec/mir5/evidence/library-multiplayer-save-overlay-observation-de-rejoin.png",
+      "sha256": "2110C78393C02C625DAEDE481C26B6FC96B8383D1AB9F0AD0010F40162035749",
+      "locale": "de",
+      "stage": "rejoin"
+    },
+    {
+      "path": "spec/mir5/evidence/library-multiplayer-save-overlay-observation-de-restart.png",
+      "sha256": "C72690D9D13A968C7B3D336A6A65CBA8B0285995EB2F6E8324CAD7634CE28034",
+      "locale": "de",
+      "stage": "restart"
+    }
+  ],
+  "independent_review": [
+    "The automated native actor passed all six actual joins, different en/de personal GUI views, native research/queue/effect preservation, rejoin and host restart.",
+    "Visual inspection confirmed readable English restart and German initial Library views with a 60-second unit label and bounded frame.",
+    "German rejoin and restart PNGs show the native saving overlay instead of the Library. Those images do not qualify GUI rendering after rejoin/restart.",
+    "The fixture requested asynchronous screenshots and saved in the same simulation tick. Revised fixture defers each subsequent save by60 ticks; all six actual PNGs still need independent review.",
+    "LuaProfiler strings are not usable numeric performance results; no performance, cross-hardware, other-engine or final-candidate qualification is claimed."
+  ],
+  "complete_rendering_qualification": false,
+  "release_qualification": false
+}

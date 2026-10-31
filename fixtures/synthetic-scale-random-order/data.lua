@@ -1,1 +1,0 @@
--- Presence of this fixture selects the deterministic permutation in scale fixtures.

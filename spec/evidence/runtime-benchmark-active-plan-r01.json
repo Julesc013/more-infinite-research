@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "kind": "MIR5PredeclaredActiveRuntimeBenchmarkPlanV1",
+  "status": "predeclared-active-save-capture-required-not-a-result",
+  "host": "BLACKGLASS-WIN1",
+  "plan_source": {
+    "commit": "9427bd28526030d059ddd6641166ca82f6e62e61",
+    "tree": "6a944e2c052d67e212a02590a1bc190a2d43a76f"
+  },
+  "supersedes_nothing": "runtime-benchmark-plan-r01.json remains the retained completed-idle/steady-state declaration and is not an active-work result.",
+  "candidate": {
+    "source_commit": "fa1146e9778ecf7fc1b80449a2deec7ee0083ec3",
+    "source_tree": "41b78703f25bdceb1e05b57d7c725e0f6c9bef2c",
+    "f210_archive": {
+      "name": "more-infinite-research_5.0.21000.zip",
+      "sha256": "4D5E32CE2E74C65259E5D3E085CE7BE3BC37DC0A739308C6379BF621F7B5BDA1"
+    }
+  },
+  "published": {
+    "f210_archive": {
+      "name": "more-infinite-research_4.7.21002.zip",
+      "sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F"
+    }
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "public_harness": {
+    "source_reference": "9427bd28526030d059ddd6641166ca82f6e62e61",
+    "git_blob_sha256": [
+      {"path": "tools/Invoke-NativeFixture.ps1", "sha256": "ADC582E1CBA9C6A88DB5F244340FFE1C19FAE032E7EFDB07AB2C881BA0CCD4CE"},
+      {"path": "tools/lib/validation/NativeProbeResources.ps1", "sha256": "2826EF1D491615C10B39F6D05C6BDEE5D4317EB10BBA753AD0BA159ED95B9311"},
+      {"path": "tools/lib/validation/ResourceGovernor.ps1", "sha256": "50E5172BF9836B2742A9857F7A0F86DFF3E5FD6C40A4E149F42334A199302A6E"},
+      {"path": "tools/lib/validation/OwnedProcessMemorySampler.ps1", "sha256": "8786DC06671A7B6ED6F48BD211275C4DA783F65BBB0FCDCE5562104BC3B28124"},
+      {"path": "tools/lib/validation/ImmutableInputStaging.ps1", "sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C"},
+      {"path": "tools/lib/compatibility/LibraryActivation.ps1", "sha256": "123A2241B895B57217AA969A677FF21BBFB268FE55E9734287883B4D6AE25099"}
+    ]
+  },
+  "benchmark_command": {
+    "arguments": ["--benchmark", "<fresh-owned-active-seed.zip>", "--benchmark-ticks", "25000", "--benchmark-runs", "1", "--benchmark-sanitize"],
+    "preparation_outside_timed_benchmark": true,
+    "fresh_owned_seed_per_launch": true,
+    "input_seed_hash_before_and_after_each_group": true,
+    "raw_stdout_retained": true,
+    "engine_reported_time_per_tick_required": true
+  },
+  "process_memory_observation": {
+    "context": "benchmark",
+    "expected_slot": {"phase": "benchmark", "role": "factorio"},
+    "target_interval_milliseconds": 250,
+    "maximum_duration_seconds": 900,
+    "maximum_observations": 12000,
+    "maximum_serialized_bytes": 8388608,
+    "interpretation": "The operating-system peak working set is distinct from the maximum sampled working/private bytes. Real gaps and incomplete observations are retained; sampled private bytes are not an instantaneous proven peak."
+  },
+  "resources": {
+    "expected_peak_memory_mib_per_factorio": 4096,
+    "maximum_new_output_mib_per_launch": 120,
+    "exclusive_native_lock": true,
+    "direct_existing_archive_library_only": true,
+    "no_dependency_copy_hardlink_or_extraction": true
+  },
+  "comparison_rules": {
+    "counterbalancing": "Within every scored pair, odd blocks run published then candidate and even blocks candidate then published. Warm-ups are unscored and retained separately.",
+    "candidate_time_per_tick_limit": {"rule": "candidate median <= published median + max(10 percent of published median, 0.25 ms/tick)", "relative_fraction": 0.1, "absolute_milliseconds_per_tick": 0.25},
+    "candidate_memory_limits": {"metrics": ["operating_system_peak_working_set_bytes", "maximum_sampled_working_set_bytes", "maximum_sampled_private_bytes"], "rule": "candidate median <= published median + max(10 percent of published median, 64 MiB), evaluated separately for each metric", "relative_fraction": 0.1, "absolute_bytes": 67108864},
+    "agriculture_within_arm_increment_128_minus_1": {"metrics": ["engine_reported_average_ms_per_tick", "operating_system_peak_working_set_bytes", "maximum_sampled_working_set_bytes", "maximum_sampled_private_bytes"], "rule": "Report candidate and published 128-minus-1 raw differences separately. A percentage comparison is permitted only when the matching published incremental denominator is finite and strictly positive; otherwise report raw differences only, with no percentage or inferred non-regression conclusion from noise."}
+  },
+  "schedule": {
+    "repair_active": {"warmups_per_arm": 2, "scored_pairs": 8, "arms": ["published", "candidate"], "physical_work": "First post-load tick damages exactly1000 eligible walls plus two foreign-wall sentinels and one non-wall sentinel.256 eligible player/reciprocal-friendly walls await native passive repair; the744 eligible overflow walls and intentionally damaged foreign/non-wall sentinels remain unrepaired."},
+    "agriculture_active": {"tiers": [1, 32, 128], "warmups_per_arm_per_tier": 2, "scored_pairs_per_tier": 6, "arms": ["published", "candidate-defaults"], "physical_work": "Two real lab completions and N towers per player/zero-research foreign force are prepared before saving. The first post-load tick performs one native seed insertion per tower and requires exactly 2N on_tower_planted_seed events."},
+    "total_launches": 68
+  },
+  "active_fixture_contract": {
+    "repair": {
+      "control_path": "tests/fixtures/repair-stress/control.lua",
+      "control_sha256": "521D75CBE29B65257E02921B13A3DFF227FE291F9406F6F41F366D4750AF86C7",
+      "profiles": [
+        {"path": "tests/profiles/repair-stress-active-published-f210-2123.json", "sha256": "AC354044B9BB57D2BA8A747185292B0E4790C0C308D3F5A32D423B975CE630C9"},
+        {"path": "tests/profiles/repair-stress-active-mir5-f210-2123.json", "sha256": "16A2A57DDF263143132983E4721BF6383D790E93F2D6004EE94FB276806B68F3"}
+      ],
+      "required_markers": ["prepared", "start", "complete"]
+    },
+    "agriculture": {
+      "control_path": "tests/fixtures/agriculture-scale/core/control.lua",
+      "control_sha256": "A77890C76B13D622B9990274EEB28577767C1A776B9F773EDB9A5C31727F6816",
+      "profiles": [
+        {"path": "tests/profiles/agriculture-active-matched-published-1-f210-2123.json", "sha256": "8E7403F4B3E625103F6D88706F6B2AE1118F367D8F31A363CD4C44369624D2A6"},
+        {"path": "tests/profiles/agriculture-active-matched-candidate-defaults-1-f210-2123.json", "sha256": "924790EE180265E7EA0F1A768BD10F32D672812272BEA81191BC46B994BEE0C7"},
+        {"path": "tests/profiles/agriculture-active-matched-published-32-f210-2123.json", "sha256": "53F0786047DFCCACD6D8A1626E9116003B7250C3E273BFA46F557641163508EE"},
+        {"path": "tests/profiles/agriculture-active-matched-candidate-defaults-32-f210-2123.json", "sha256": "9D3274CF1A2CBF44993B2D301DBCD188BB5BDAFB50F89137FC21AC8A759BBF44"},
+        {"path": "tests/profiles/agriculture-active-matched-published-128-f210-2123.json", "sha256": "FCE250D18B0FB75122425EBCFBCE592518466459BB3B6365B3155ED62AC6FDCF"},
+        {"path": "tests/profiles/agriculture-active-matched-candidate-defaults-128-f210-2123.json", "sha256": "7FF93BF107EEDEFD19C1932A88766543A36141A48AA1E58F4407ECD3278CCE95"}
+      ],
+      "required_markers": ["prepared", "start", "complete"]
+    }
+  },
+  "execution_admission": {
+    "preparation_outside_scored_timing": [
+      "Native active-seed preparation, not generic CreateOnly: the selected repair or agriculture fixture must reach one unique prepared marker and write a closed mir5-native-active save before the benchmark loads it. Agriculture preparation includes its two real lab completions; repair preparation stops before its first post-load physical damage.",
+      "The prepared-save receipt must bind the exact selected profile, fixture archives, player archive, active-save hash and marker raw log. It is a seed-preparation observation, not a timing result.",
+      "An unscored post-load marker pilot must retain one unique start and one unique complete active marker for the selected arm/tier before any scored benchmark sample. The pilot is not a performance acceptance sample.",
+      "Fresh private controller binding to this plan, its raw helper bytes, the active-save receipts and the current direct libraries is required before scored timing. A source/profile staging read may occur before active saves exist, but must refuse timing without them."
+    ],
+    "missing_inputs_refuse": true,
+    "results": []
+  },
+  "performance_acceptance": false,
+  "release_qualification": false
+}

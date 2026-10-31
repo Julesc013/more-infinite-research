@@ -1,0 +1,591 @@
+{
+  "schema": 1,
+  "kind": "MIRFoundationCurrentF200DataNativeChainV1",
+  "status": "completed-current-profile-data-admission-only",
+  "source_commit": "0db5ea5383a6d30bdaab6dce4f54ee0bef7fa744",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "bytes": 43530192,
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "version": "2.0.77",
+    "factorio_line": "2.0"
+  },
+  "profile": {
+    "path": "D:\\Projects\\Factorio\\mir5-foundation-current-f200-data-r01\\tests\\profiles\\foundation-available-space-age-f200-2077.json",
+    "bytes": 7426,
+    "sha256": "6A78405687485F7C8335304C3232EAE8284F741F5120E19720462DDDFFE5E537",
+    "kind": "mir5-foundation-available-space-age-f200-admission-selection",
+    "settings_mode": "Defaults"
+  },
+  "header_preparation": {
+    "path": "D:\\Projects\\Factorio\\mir5-foundation-current-f200-data-r01\\spec\\evidence\\large-active-save-current-header-inputs-aero-r01.json",
+    "bytes": 32243,
+    "sha256": "8F077C728187247A60C43AC972A477FC11A3AB78E178B6DE3A37010736AA71A8",
+    "kind": "MIRLargeActiveSaveAvailableInputPreparationV1",
+    "source_save_sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA",
+    "source_save_bytes": 108548262,
+    "current_header_factorio_version": "2.0.55",
+    "current_header_mods": 35,
+    "derived_defaults_profile_mods": 36,
+    "third_party_mods": 31,
+    "declared_available_version_updates": 14,
+    "source_commit": "0db5ea5383a6d30bdaab6dce4f54ee0bef7fa744"
+  },
+  "packet_sha256": "1A033851281BFE6CDAB08ECE5B80D85CC790071B0B3A2C847990730EC43EDAC0",
+  "caller_sha256": "32C669AC1B804DCC28685CD6D1D401BA73813FA3A5304B543F18FD754E279767",
+  "terminal_sha256": "12C74285707978386E69BAB65DA69F0416DFBC5178315D5425C54F59FCD7BB0D",
+  "observation": {
+    "kind": "MIRFoundationCurrentWorldF200DataRootReadbackV1",
+    "packet_sha256": "1A033851281BFE6CDAB08ECE5B80D85CC790071B0B3A2C847990730EC43EDAC0",
+    "terminal_sha256": "12C74285707978386E69BAB65DA69F0416DFBC5178315D5425C54F59FCD7BB0D",
+    "native_processes": 4,
+    "native_files_per_copy": 36,
+    "native_bytes_per_copy": 120619141,
+    "controller_files_per_copy": 4,
+    "controller_bytes_per_copy": 2175145,
+    "full_source_and_copy_hash_checks": 80,
+    "library_restored": true,
+    "factorio_processes": 0,
+    "observations": [
+      {
+        "arm": "control-without-mir",
+        "actual_mir_version": null,
+        "native_pid": 14932,
+        "exit_code": 0,
+        "loaded_selection": [
+          "base@2.0.77",
+          "Bottleneck@0.12.1",
+          "Brighter-Lamps@2.0.0",
+          "bullet-trails@0.7.1",
+          "car-finder@2.0.0",
+          "EditorExtensions@2.5.2",
+          "electric_pole_free_light@0.0.3",
+          "elevated-rails@2.0.77",
+          "even-distribution@2.0.2",
+          "factoryplanner@2.0.50",
+          "FactorySearch@1.14.3",
+          "far-reach@2.0.2",
+          "flib@0.16.5",
+          "fluid_permutations_fixed@0.6.0",
+          "GUI_Unifyer@2.0.1",
+          "Honk@5.1.1",
+          "inventory-repair@20.0.3",
+          "Kux-CoreLib@3.17.8",
+          "Kux-ZoomRunning@3.3.2",
+          "light-overhaul@0.2.2",
+          "lightorio@2.0.1",
+          "MaxRateCalculator@200.0.53",
+          "Milestones@1.4.7",
+          "mining-patch-planner@1.7.19",
+          "mir-fixture-mir5-active-mods-observer@0.1.0",
+          "ModuleInserterEx@7.4.1",
+          "OilOutpostPlanner@1.6.10",
+          "quality@2.0.77",
+          "RateCalculator@3.3.8",
+          "Shortcuts-ick@2.0.7",
+          "space-age@2.0.77",
+          "squeak-through-2@0.1.5",
+          "stdlib2@2.0.1",
+          "tree_collision@2.0.0",
+          "VehicleSnap@2.0.3",
+          "YARM@1.0.5"
+        ],
+        "technology_rows": 276,
+        "setting_rows": 390,
+        "dumps": {
+          "data_raw": {
+            "path": "write-data/script-output/data-raw-dump.json",
+            "bytes": 29172629,
+            "sha256": "5C91B93F4FF4DC1FDC3C121EE33AD8B52EBEDF88CAF3D6917B5F1DF4460E754A"
+          },
+          "mod_settings": {
+            "path": "write-data/script-output/mod-settings-dump.json",
+            "bytes": 159065,
+            "sha256": "FAF47EAF39D3EB9E9F7AE254034A1D12F822E7F88575EF55230F6B03853284B1"
+          }
+        }
+      },
+      {
+        "arm": "published-mir3",
+        "actual_mir_version": "2.5.11",
+        "native_pid": 16936,
+        "exit_code": 0,
+        "loaded_selection": [
+          "base@2.0.77",
+          "Bottleneck@0.12.1",
+          "Brighter-Lamps@2.0.0",
+          "bullet-trails@0.7.1",
+          "car-finder@2.0.0",
+          "EditorExtensions@2.5.2",
+          "electric_pole_free_light@0.0.3",
+          "elevated-rails@2.0.77",
+          "even-distribution@2.0.2",
+          "factoryplanner@2.0.50",
+          "FactorySearch@1.14.3",
+          "far-reach@2.0.2",
+          "flib@0.16.5",
+          "fluid_permutations_fixed@0.6.0",
+          "GUI_Unifyer@2.0.1",
+          "Honk@5.1.1",
+          "inventory-repair@20.0.3",
+          "Kux-CoreLib@3.17.8",
+          "Kux-ZoomRunning@3.3.2",
+          "light-overhaul@0.2.2",
+          "lightorio@2.0.1",
+          "MaxRateCalculator@200.0.53",
+          "Milestones@1.4.7",
+          "mining-patch-planner@1.7.19",
+          "mir-fixture-mir5-active-mods-observer@0.1.0",
+          "ModuleInserterEx@7.4.1",
+          "more-infinite-research@2.5.11",
+          "OilOutpostPlanner@1.6.10",
+          "quality@2.0.77",
+          "RateCalculator@3.3.8",
+          "Shortcuts-ick@2.0.7",
+          "space-age@2.0.77",
+          "squeak-through-2@0.1.5",
+          "stdlib2@2.0.1",
+          "tree_collision@2.0.0",
+          "VehicleSnap@2.0.3",
+          "YARM@1.0.5"
+        ],
+        "technology_rows": 345,
+        "setting_rows": 975,
+        "dumps": {
+          "data_raw": {
+            "path": "write-data/script-output/data-raw-dump.json",
+            "bytes": 29327073,
+            "sha256": "195271E1F173B47ED0AB9CB2C769B27FE2AF73AF2B503D638B4F7E4B9536FC13"
+          },
+          "mod_settings": {
+            "path": "write-data/script-output/mod-settings-dump.json",
+            "bytes": 786629,
+            "sha256": "C34189516C5920DCC050DA44CE41FDA170184C491B6303AA617358AE21002B2B"
+          }
+        }
+      },
+      {
+        "arm": "published-mir4.7",
+        "actual_mir_version": "4.7.20003",
+        "native_pid": 58968,
+        "exit_code": 0,
+        "loaded_selection": [
+          "base@2.0.77",
+          "Bottleneck@0.12.1",
+          "Brighter-Lamps@2.0.0",
+          "bullet-trails@0.7.1",
+          "car-finder@2.0.0",
+          "EditorExtensions@2.5.2",
+          "electric_pole_free_light@0.0.3",
+          "elevated-rails@2.0.77",
+          "even-distribution@2.0.2",
+          "factoryplanner@2.0.50",
+          "FactorySearch@1.14.3",
+          "far-reach@2.0.2",
+          "flib@0.16.5",
+          "fluid_permutations_fixed@0.6.0",
+          "GUI_Unifyer@2.0.1",
+          "Honk@5.1.1",
+          "inventory-repair@20.0.3",
+          "Kux-CoreLib@3.17.8",
+          "Kux-ZoomRunning@3.3.2",
+          "light-overhaul@0.2.2",
+          "lightorio@2.0.1",
+          "MaxRateCalculator@200.0.53",
+          "Milestones@1.4.7",
+          "mining-patch-planner@1.7.19",
+          "mir-fixture-mir5-active-mods-observer@0.1.0",
+          "ModuleInserterEx@7.4.1",
+          "more-infinite-research@4.7.20003",
+          "OilOutpostPlanner@1.6.10",
+          "quality@2.0.77",
+          "RateCalculator@3.3.8",
+          "Shortcuts-ick@2.0.7",
+          "space-age@2.0.77",
+          "squeak-through-2@0.1.5",
+          "stdlib2@2.0.1",
+          "tree_collision@2.0.0",
+          "VehicleSnap@2.0.3",
+          "YARM@1.0.5"
+        ],
+        "technology_rows": 345,
+        "setting_rows": 1265,
+        "dumps": {
+          "data_raw": {
+            "path": "write-data/script-output/data-raw-dump.json",
+            "bytes": 29327492,
+            "sha256": "F0467B581D8A2459AC6E8E51F1652F69EFDF439CA2179C8058948CFF85E52C23"
+          },
+          "mod_settings": {
+            "path": "write-data/script-output/mod-settings-dump.json",
+            "bytes": 1185452,
+            "sha256": "6412A5E67278C68BD74F4D888D48BAF7240A62A2A6123F74F17AD1733AC4B9AC"
+          }
+        }
+      },
+      {
+        "arm": "candidate-mir5",
+        "actual_mir_version": "5.0.20000",
+        "native_pid": 77080,
+        "exit_code": 0,
+        "loaded_selection": [
+          "base@2.0.77",
+          "Bottleneck@0.12.1",
+          "Brighter-Lamps@2.0.0",
+          "bullet-trails@0.7.1",
+          "car-finder@2.0.0",
+          "EditorExtensions@2.5.2",
+          "electric_pole_free_light@0.0.3",
+          "elevated-rails@2.0.77",
+          "even-distribution@2.0.2",
+          "factoryplanner@2.0.50",
+          "FactorySearch@1.14.3",
+          "far-reach@2.0.2",
+          "flib@0.16.5",
+          "fluid_permutations_fixed@0.6.0",
+          "GUI_Unifyer@2.0.1",
+          "Honk@5.1.1",
+          "inventory-repair@20.0.3",
+          "Kux-CoreLib@3.17.8",
+          "Kux-ZoomRunning@3.3.2",
+          "light-overhaul@0.2.2",
+          "lightorio@2.0.1",
+          "MaxRateCalculator@200.0.53",
+          "Milestones@1.4.7",
+          "mining-patch-planner@1.7.19",
+          "mir-fixture-mir5-active-mods-observer@0.1.0",
+          "ModuleInserterEx@7.4.1",
+          "more-infinite-research@5.0.20000",
+          "OilOutpostPlanner@1.6.10",
+          "quality@2.0.77",
+          "RateCalculator@3.3.8",
+          "Shortcuts-ick@2.0.7",
+          "space-age@2.0.77",
+          "squeak-through-2@0.1.5",
+          "stdlib2@2.0.1",
+          "tree_collision@2.0.0",
+          "VehicleSnap@2.0.3",
+          "YARM@1.0.5"
+        ],
+        "technology_rows": 373,
+        "setting_rows": 1265,
+        "dumps": {
+          "data_raw": {
+            "path": "write-data/script-output/data-raw-dump.json",
+            "bytes": 29352942,
+            "sha256": "51D613ED6739DAF39ABF05F77B44B7C7C582E0F42889E37EBBCB3DB70FCE38FF"
+          },
+          "mod_settings": {
+            "path": "write-data/script-output/mod-settings-dump.json",
+            "bytes": 897086,
+            "sha256": "913348BBDABC64ED1269841C74403E964573E896992194968FFE75ECB3412A17"
+          }
+        }
+      }
+    ],
+    "terminal_timestamp_projection": {
+      "count": 56,
+      "method": "PowerShell ConvertFrom-Json/ConvertTo-Json reserializes the UTC native timestamp strings in local+11:00. Only observed_at/started_at/deadline_at are normalized;all represented seconds and all7fraction digits match. Every other field/type matches. Both original bodies remain unchanged.",
+      "differences": [
+        {
+          "path": "control-without-mir.initial_admission_wait.started_at",
+          "terminal": "2026-10-30T06:34:05.7499242+11:00",
+          "native": "2026-10-29T19:34:05.7499242+00:00"
+        },
+        {
+          "path": "control-without-mir.initial_admission_wait.deadline_at",
+          "terminal": "2026-10-30T06:34:35.7499242+11:00",
+          "native": "2026-10-29T19:34:35.7499242+00:00"
+        },
+        {
+          "path": "control-without-mir.initial_admission_wait.admission.observed_at",
+          "terminal": "2026-10-30T06:34:05.8215564+11:00",
+          "native": "2026-10-29T19:34:05.8215564+00:00"
+        },
+        {
+          "path": "control-without-mir.process.admission.observed_at",
+          "terminal": "2026-10-30T06:34:07.7272077+11:00",
+          "native": "2026-10-29T19:34:07.7272077+00:00"
+        },
+        {
+          "path": "control-without-mir.process.admission_wait.started_at",
+          "terminal": "2026-10-30T06:34:07.6262454+11:00",
+          "native": "2026-10-29T19:34:07.6262454+00:00"
+        },
+        {
+          "path": "control-without-mir.process.admission_wait.deadline_at",
+          "terminal": "2026-10-30T06:34:37.6262454+11:00",
+          "native": "2026-10-29T19:34:37.6262454+00:00"
+        },
+        {
+          "path": "control-without-mir.process.admission_wait.admission.observed_at",
+          "terminal": "2026-10-30T06:34:07.7272077+11:00",
+          "native": "2026-10-29T19:34:07.7272077+00:00"
+        },
+        {
+          "path": "control-without-mir.process_runs[0].result.admission.observed_at",
+          "terminal": "2026-10-30T06:34:07.7272077+11:00",
+          "native": "2026-10-29T19:34:07.7272077+00:00"
+        },
+        {
+          "path": "control-without-mir.process_runs[0].result.admission_wait.started_at",
+          "terminal": "2026-10-30T06:34:07.6262454+11:00",
+          "native": "2026-10-29T19:34:07.6262454+00:00"
+        },
+        {
+          "path": "control-without-mir.process_runs[0].result.admission_wait.deadline_at",
+          "terminal": "2026-10-30T06:34:37.6262454+11:00",
+          "native": "2026-10-29T19:34:37.6262454+00:00"
+        },
+        {
+          "path": "control-without-mir.process_runs[0].result.admission_wait.admission.observed_at",
+          "terminal": "2026-10-30T06:34:07.7272077+11:00",
+          "native": "2026-10-29T19:34:07.7272077+00:00"
+        },
+        {
+          "path": "control-without-mir.process_runs[0].admission_wait.started_at",
+          "terminal": "2026-10-30T06:34:07.6262454+11:00",
+          "native": "2026-10-29T19:34:07.6262454+00:00"
+        },
+        {
+          "path": "control-without-mir.process_runs[0].admission_wait.deadline_at",
+          "terminal": "2026-10-30T06:34:37.6262454+11:00",
+          "native": "2026-10-29T19:34:37.6262454+00:00"
+        },
+        {
+          "path": "control-without-mir.process_runs[0].admission_wait.admission.observed_at",
+          "terminal": "2026-10-30T06:34:07.7272077+11:00",
+          "native": "2026-10-29T19:34:07.7272077+00:00"
+        },
+        {
+          "path": "published-mir3.initial_admission_wait.started_at",
+          "terminal": "2026-10-30T06:34:23.564984+11:00",
+          "native": "2026-10-29T19:34:23.5649840+00:00"
+        },
+        {
+          "path": "published-mir3.initial_admission_wait.deadline_at",
+          "terminal": "2026-10-30T06:34:53.564984+11:00",
+          "native": "2026-10-29T19:34:53.5649840+00:00"
+        },
+        {
+          "path": "published-mir3.initial_admission_wait.admission.observed_at",
+          "terminal": "2026-10-30T06:34:23.5736322+11:00",
+          "native": "2026-10-29T19:34:23.5736322+00:00"
+        },
+        {
+          "path": "published-mir3.process.admission.observed_at",
+          "terminal": "2026-10-30T06:34:25.1943257+11:00",
+          "native": "2026-10-29T19:34:25.1943257+00:00"
+        },
+        {
+          "path": "published-mir3.process.admission_wait.started_at",
+          "terminal": "2026-10-30T06:34:25.1158728+11:00",
+          "native": "2026-10-29T19:34:25.1158728+00:00"
+        },
+        {
+          "path": "published-mir3.process.admission_wait.deadline_at",
+          "terminal": "2026-10-30T06:34:55.1158728+11:00",
+          "native": "2026-10-29T19:34:55.1158728+00:00"
+        },
+        {
+          "path": "published-mir3.process.admission_wait.admission.observed_at",
+          "terminal": "2026-10-30T06:34:25.1943257+11:00",
+          "native": "2026-10-29T19:34:25.1943257+00:00"
+        },
+        {
+          "path": "published-mir3.process_runs[0].result.admission.observed_at",
+          "terminal": "2026-10-30T06:34:25.1943257+11:00",
+          "native": "2026-10-29T19:34:25.1943257+00:00"
+        },
+        {
+          "path": "published-mir3.process_runs[0].result.admission_wait.started_at",
+          "terminal": "2026-10-30T06:34:25.1158728+11:00",
+          "native": "2026-10-29T19:34:25.1158728+00:00"
+        },
+        {
+          "path": "published-mir3.process_runs[0].result.admission_wait.deadline_at",
+          "terminal": "2026-10-30T06:34:55.1158728+11:00",
+          "native": "2026-10-29T19:34:55.1158728+00:00"
+        },
+        {
+          "path": "published-mir3.process_runs[0].result.admission_wait.admission.observed_at",
+          "terminal": "2026-10-30T06:34:25.1943257+11:00",
+          "native": "2026-10-29T19:34:25.1943257+00:00"
+        },
+        {
+          "path": "published-mir3.process_runs[0].admission_wait.started_at",
+          "terminal": "2026-10-30T06:34:25.1158728+11:00",
+          "native": "2026-10-29T19:34:25.1158728+00:00"
+        },
+        {
+          "path": "published-mir3.process_runs[0].admission_wait.deadline_at",
+          "terminal": "2026-10-30T06:34:55.1158728+11:00",
+          "native": "2026-10-29T19:34:55.1158728+00:00"
+        },
+        {
+          "path": "published-mir3.process_runs[0].admission_wait.admission.observed_at",
+          "terminal": "2026-10-30T06:34:25.1943257+11:00",
+          "native": "2026-10-29T19:34:25.1943257+00:00"
+        },
+        {
+          "path": "published-mir4.7.initial_admission_wait.started_at",
+          "terminal": "2026-10-30T06:34:32.6993215+11:00",
+          "native": "2026-10-29T19:34:32.6993215+00:00"
+        },
+        {
+          "path": "published-mir4.7.initial_admission_wait.deadline_at",
+          "terminal": "2026-10-30T06:35:02.6993215+11:00",
+          "native": "2026-10-29T19:35:02.6993215+00:00"
+        },
+        {
+          "path": "published-mir4.7.initial_admission_wait.admission.observed_at",
+          "terminal": "2026-10-30T06:34:32.7079639+11:00",
+          "native": "2026-10-29T19:34:32.7079639+00:00"
+        },
+        {
+          "path": "published-mir4.7.process.admission.observed_at",
+          "terminal": "2026-10-30T06:34:34.3142462+11:00",
+          "native": "2026-10-29T19:34:34.3142462+00:00"
+        },
+        {
+          "path": "published-mir4.7.process.admission_wait.started_at",
+          "terminal": "2026-10-30T06:34:34.2336577+11:00",
+          "native": "2026-10-29T19:34:34.2336577+00:00"
+        },
+        {
+          "path": "published-mir4.7.process.admission_wait.deadline_at",
+          "terminal": "2026-10-30T06:35:04.2336577+11:00",
+          "native": "2026-10-29T19:35:04.2336577+00:00"
+        },
+        {
+          "path": "published-mir4.7.process.admission_wait.admission.observed_at",
+          "terminal": "2026-10-30T06:34:34.3142462+11:00",
+          "native": "2026-10-29T19:34:34.3142462+00:00"
+        },
+        {
+          "path": "published-mir4.7.process_runs[0].result.admission.observed_at",
+          "terminal": "2026-10-30T06:34:34.3142462+11:00",
+          "native": "2026-10-29T19:34:34.3142462+00:00"
+        },
+        {
+          "path": "published-mir4.7.process_runs[0].result.admission_wait.started_at",
+          "terminal": "2026-10-30T06:34:34.2336577+11:00",
+          "native": "2026-10-29T19:34:34.2336577+00:00"
+        },
+        {
+          "path": "published-mir4.7.process_runs[0].result.admission_wait.deadline_at",
+          "terminal": "2026-10-30T06:35:04.2336577+11:00",
+          "native": "2026-10-29T19:35:04.2336577+00:00"
+        },
+        {
+          "path": "published-mir4.7.process_runs[0].result.admission_wait.admission.observed_at",
+          "terminal": "2026-10-30T06:34:34.3142462+11:00",
+          "native": "2026-10-29T19:34:34.3142462+00:00"
+        },
+        {
+          "path": "published-mir4.7.process_runs[0].admission_wait.started_at",
+          "terminal": "2026-10-30T06:34:34.2336577+11:00",
+          "native": "2026-10-29T19:34:34.2336577+00:00"
+        },
+        {
+          "path": "published-mir4.7.process_runs[0].admission_wait.deadline_at",
+          "terminal": "2026-10-30T06:35:04.2336577+11:00",
+          "native": "2026-10-29T19:35:04.2336577+00:00"
+        },
+        {
+          "path": "published-mir4.7.process_runs[0].admission_wait.admission.observed_at",
+          "terminal": "2026-10-30T06:34:34.3142462+11:00",
+          "native": "2026-10-29T19:34:34.3142462+00:00"
+        },
+        {
+          "path": "candidate-mir5.initial_admission_wait.started_at",
+          "terminal": "2026-10-30T06:34:41.2548972+11:00",
+          "native": "2026-10-29T19:34:41.2548972+00:00"
+        },
+        {
+          "path": "candidate-mir5.initial_admission_wait.deadline_at",
+          "terminal": "2026-10-30T06:35:11.2548972+11:00",
+          "native": "2026-10-29T19:35:11.2548972+00:00"
+        },
+        {
+          "path": "candidate-mir5.initial_admission_wait.admission.observed_at",
+          "terminal": "2026-10-30T06:34:41.2634651+11:00",
+          "native": "2026-10-29T19:34:41.2634651+00:00"
+        },
+        {
+          "path": "candidate-mir5.process.admission.observed_at",
+          "terminal": "2026-10-30T06:34:42.8904447+11:00",
+          "native": "2026-10-29T19:34:42.8904447+00:00"
+        },
+        {
+          "path": "candidate-mir5.process.admission_wait.started_at",
+          "terminal": "2026-10-30T06:34:42.810386+11:00",
+          "native": "2026-10-29T19:34:42.8103860+00:00"
+        },
+        {
+          "path": "candidate-mir5.process.admission_wait.deadline_at",
+          "terminal": "2026-10-30T06:35:12.810386+11:00",
+          "native": "2026-10-29T19:35:12.8103860+00:00"
+        },
+        {
+          "path": "candidate-mir5.process.admission_wait.admission.observed_at",
+          "terminal": "2026-10-30T06:34:42.8904447+11:00",
+          "native": "2026-10-29T19:34:42.8904447+00:00"
+        },
+        {
+          "path": "candidate-mir5.process_runs[0].result.admission.observed_at",
+          "terminal": "2026-10-30T06:34:42.8904447+11:00",
+          "native": "2026-10-29T19:34:42.8904447+00:00"
+        },
+        {
+          "path": "candidate-mir5.process_runs[0].result.admission_wait.started_at",
+          "terminal": "2026-10-30T06:34:42.810386+11:00",
+          "native": "2026-10-29T19:34:42.8103860+00:00"
+        },
+        {
+          "path": "candidate-mir5.process_runs[0].result.admission_wait.deadline_at",
+          "terminal": "2026-10-30T06:35:12.810386+11:00",
+          "native": "2026-10-29T19:35:12.8103860+00:00"
+        },
+        {
+          "path": "candidate-mir5.process_runs[0].result.admission_wait.admission.observed_at",
+          "terminal": "2026-10-30T06:34:42.8904447+11:00",
+          "native": "2026-10-29T19:34:42.8904447+00:00"
+        },
+        {
+          "path": "candidate-mir5.process_runs[0].admission_wait.started_at",
+          "terminal": "2026-10-30T06:34:42.810386+11:00",
+          "native": "2026-10-29T19:34:42.8103860+00:00"
+        },
+        {
+          "path": "candidate-mir5.process_runs[0].admission_wait.deadline_at",
+          "terminal": "2026-10-30T06:35:12.810386+11:00",
+          "native": "2026-10-29T19:35:12.8103860+00:00"
+        },
+        {
+          "path": "candidate-mir5.process_runs[0].admission_wait.admission.observed_at",
+          "terminal": "2026-10-30T06:34:42.8904447+11:00",
+          "native": "2026-10-29T19:34:42.8904447+00:00"
+        }
+      ]
+    },
+    "performance_acceptance": false,
+    "release_qualification": false
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/foundation-current-world-f200-data-admission-receipts-r01.json.gz",
+    "sha256": "301C5EC5205C316DD1043D237EC90B64F83F2CE353733B202812080FFDED6A66",
+    "bytes": 232001,
+    "bodies": 32
+  },
+  "limits": [
+    "Four actual serial --dump-data admissions of the current35-header-derived36-row Defaults selection only;no save opened or copied in this assignment.",
+    "The protected EAF0/2.0.55 header identifies the declared upstream35 names;native engines here are2.0.77/D3 with the14 declared available-version updates. Historical inherited/effective save settings and active factory work remain unqualified.",
+    "The preserved schedule alias published-mir3 actually consumes available2.5.11/4AE3 on F200;the literal loaded version is retained and is not relabelled as3.x. Other engines/releases retain their exact separately recorded arms.",
+    "Technology/settings row counts are as-shipped diagnostics,not semantic parity/equal work/cost/percentage results.",
+    "No responsive menu,reboot-cold,save-load,active factory,useful work,spikes,queue,memory-comparison,migration,gameplay,performance or release verdict.",
+    "Original preflight provenance/header/custody and caller-pin refusal bytes/manifests remain preserved locally;these were zero-native preparation controls."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}

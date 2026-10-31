@@ -1,0 +1,502 @@
+{
+  "schema": 1,
+  "kind": "MIRApiFiniteNativePreparedV1",
+  "status": "prepared-not-native-executed",
+  "source_commit": "857932b1670f3d1330235dcc1e9db192dc38c3a7",
+  "player_source_commit": "42032477d45ced683e72736a4fe30a7a3195b995",
+  "player_source_changed": false,
+  "existing_runner": {
+    "path": "tools/Invoke-NativeFixture.ps1",
+    "bytes": 92235,
+    "sha256": "61F391350E06E866AF02BEAE854695C69B192F80067C0EF134F4FF7C1276EA04"
+  },
+  "zip_method": {
+    "member_order": "sorted destination paths",
+    "timestamp": "1980-01-01T00:00:00",
+    "compression": "deflate level9",
+    "create_system": 3,
+    "external_attr": 2175008768
+  },
+  "own_archives": [
+    {
+      "target": "f200",
+      "role": "api-boundary",
+      "name": "mir-fixture-mir5-api-boundary",
+      "version": "0.1.0",
+      "path": "build/qualification/api-native-prepared-aero-r01/f200/archives/mir-fixture-mir5-api-boundary_0.1.0.zip",
+      "fixture_source": "build/qualification/api-native-prepared-aero-r01/f200/fixture-source/api-boundary",
+      "bytes": 2741,
+      "sha256": "D3F0198DA1F58A59DE1DFDD5A2043E3020066A19C3FDC07DB42579E0954E8B39",
+      "members": [
+        {
+          "source": "tests/fixtures/api-boundary/control.lua",
+          "destination": "control.lua",
+          "bytes": 2644,
+          "sha256": "8687BFF500F76CB09E4B6F0A7DA111D9F7AEB235F3C1EBDB010D1D96FFE62602"
+        },
+        {
+          "source": "tests/fixtures/api-boundary/data-final-fixes.lua",
+          "destination": "data-final-fixes.lua",
+          "bytes": 2916,
+          "sha256": "FF968DD6FA798B18B16B6164485D7E11D34B082468FFF0B82D10803064BDDBC5"
+        },
+        {
+          "source": "tests/fixtures/api-boundary/info-f200.json",
+          "destination": "info.json",
+          "bytes": 256,
+          "sha256": "4A53DAF525985CAE55C39BFF08DA482666EF44FB115B6B74029DC56BBC0C91A9"
+        }
+      ]
+    },
+    {
+      "target": "f200",
+      "role": "api-alpha",
+      "name": "mir-fixture-mir5-api-alpha",
+      "version": "0.1.0",
+      "path": "build/qualification/api-native-prepared-aero-r01/f200/archives/mir-fixture-mir5-api-alpha_0.1.0.zip",
+      "fixture_source": "build/qualification/api-native-prepared-aero-r01/f200/fixture-source/api-alpha",
+      "bytes": 2773,
+      "sha256": "09317C92BA2C94AA18E3A67F68F8B961370673C22D288E04813CB5DB35041DE1",
+      "members": [
+        {
+          "source": "tests/fixtures/api-alpha/control.lua",
+          "destination": "control.lua",
+          "bytes": 4989,
+          "sha256": "8C5531606C96A1B93DD7B2E72C46F239866FC1EB161728BCFD66635B9592C8DB"
+        },
+        {
+          "source": "tests/fixtures/api-alpha/data.lua",
+          "destination": "data.lua",
+          "bytes": 736,
+          "sha256": "EF8BF389DF2694649EBF70B2F94C00E964D0AAA43AD72CC6A930B85203E41881"
+        },
+        {
+          "source": "tests/fixtures/api-alpha/graphics/icon.png",
+          "destination": "graphics/icon.png",
+          "bytes": 137,
+          "sha256": "AAEB6587D7BB7F5332AF05DAB446DF3DB3B100C0776E45FA078DE2A574DABB3D"
+        },
+        {
+          "source": "tests/fixtures/api-alpha/info-f200.json",
+          "destination": "info.json",
+          "bytes": 375,
+          "sha256": "8F1C8AD42C31C9FD3230E4446E0622D31B2780AAA8B3ED1C262CB0EA9E1D60CE"
+        }
+      ]
+    },
+    {
+      "target": "f200",
+      "role": "api-beta",
+      "name": "mir-fixture-mir5-api-beta",
+      "version": "0.1.0",
+      "path": "build/qualification/api-native-prepared-aero-r01/f200/archives/mir-fixture-mir5-api-beta_0.1.0.zip",
+      "fixture_source": "build/qualification/api-native-prepared-aero-r01/f200/fixture-source/api-beta",
+      "bytes": 2813,
+      "sha256": "C7110EFD2C3D8BEC08B165789C6FFB6586BA1197E99FED739AD87EF2C70D0C3B",
+      "members": [
+        {
+          "source": "tests/fixtures/api-beta/control.lua",
+          "destination": "control.lua",
+          "bytes": 4428,
+          "sha256": "81994E94DE86BFBB303160196A3E6EA99A00FD527A552763E7F6EDC18FF8F729"
+        },
+        {
+          "source": "tests/fixtures/api-beta/data-final-fixes.lua",
+          "destination": "data-final-fixes.lua",
+          "bytes": 952,
+          "sha256": "66502AB391A50F57D30150CDE9BDAEBE42ACDC2101A75AC15E54D9D8AC27B2B4"
+        },
+        {
+          "source": "tests/fixtures/api-beta/graphics/icon.png",
+          "destination": "graphics/icon.png",
+          "bytes": 137,
+          "sha256": "530F9250623036693D3E5A79F830B9C8A6D61E727C92219FD6A28EE62A424CCE"
+        },
+        {
+          "source": "tests/fixtures/api-beta/info-f200.json",
+          "destination": "info.json",
+          "bytes": 380,
+          "sha256": "40DA274C7B3A907BD9CB52561FB651D12A104BCDFA5DC28F2862C8EF9445E055"
+        }
+      ]
+    },
+    {
+      "target": "f200",
+      "role": "api-beta-production",
+      "name": "mir-fixture-mir5-api-beta-production",
+      "version": "0.1.0",
+      "path": "build/qualification/api-native-prepared-aero-r01/f200/archives/mir-fixture-mir5-api-beta-production_0.1.0.zip",
+      "fixture_source": "build/qualification/api-native-prepared-aero-r01/f200/fixture-source/api-beta-production",
+      "bytes": 4293,
+      "sha256": "270F470FA6DC68D8B8762DC7DE549E3C6775CCE16F9D15B8DE11D4617D78676F",
+      "members": [
+        {
+          "source": "tests/fixtures/api-beta-production/control.lua",
+          "destination": "control.lua",
+          "bytes": 14105,
+          "sha256": "CFAF0D288CD51BF03BCF88D09468858A5DD11AC52EF6E4216673EE2AF306B5CF"
+        },
+        {
+          "source": "tests/fixtures/api-beta-production/info-f200.json",
+          "destination": "info.json",
+          "bytes": 432,
+          "sha256": "FCBDBA570B4CD4485B60E930633AD9A52503159195B3BA0D92A73CF127233A71"
+        }
+      ]
+    },
+    {
+      "target": "f200",
+      "role": "active-mods-observer",
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "path": "build/qualification/api-native-prepared-aero-r01/f200/archives/mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "fixture_source": "build/qualification/api-native-prepared-aero-r01/f200/fixture-source/active-mods-observer",
+      "bytes": 833,
+      "sha256": "9158D3B9CF68C0C857EF3974C85E459B6AFC838CCC70BEEAA2BA6B14709A7E73",
+      "members": [
+        {
+          "source": "tests/fixtures/active-mods-observer/data-final-fixes.lua",
+          "destination": "data-final-fixes.lua",
+          "bytes": 477,
+          "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C"
+        },
+        {
+          "source": "tests/fixtures/active-mods-observer/info-f200.json",
+          "destination": "info.json",
+          "bytes": 231,
+          "sha256": "5C4A351958060F5FED504AA86E8C201A2F50A36C2732E624727B5697F216475A"
+        }
+      ]
+    },
+    {
+      "target": "f210",
+      "role": "api-boundary",
+      "name": "mir-fixture-mir5-api-boundary",
+      "version": "0.1.0",
+      "path": "build/qualification/api-native-prepared-aero-r01/f210/archives/mir-fixture-mir5-api-boundary_0.1.0.zip",
+      "fixture_source": "build/qualification/api-native-prepared-aero-r01/f210/fixture-source/api-boundary",
+      "bytes": 2744,
+      "sha256": "5D107ED28B2DF8282296BBB3E5705542DE7853B91EEE93C4F9DA70AB0E175BB8",
+      "members": [
+        {
+          "source": "tests/fixtures/api-boundary/control.lua",
+          "destination": "control.lua",
+          "bytes": 2644,
+          "sha256": "8687BFF500F76CB09E4B6F0A7DA111D9F7AEB235F3C1EBDB010D1D96FFE62602"
+        },
+        {
+          "source": "tests/fixtures/api-boundary/data-final-fixes.lua",
+          "destination": "data-final-fixes.lua",
+          "bytes": 2916,
+          "sha256": "FF968DD6FA798B18B16B6164485D7E11D34B082468FFF0B82D10803064BDDBC5"
+        },
+        {
+          "source": "tests/fixtures/api-boundary/info-f210.json",
+          "destination": "info.json",
+          "bytes": 256,
+          "sha256": "7A88576725759B5414F99DE8CF8985F476B04381CAA157D2249137434E477B18"
+        }
+      ]
+    },
+    {
+      "target": "f210",
+      "role": "api-alpha",
+      "name": "mir-fixture-mir5-api-alpha",
+      "version": "0.1.0",
+      "path": "build/qualification/api-native-prepared-aero-r01/f210/archives/mir-fixture-mir5-api-alpha_0.1.0.zip",
+      "fixture_source": "build/qualification/api-native-prepared-aero-r01/f210/fixture-source/api-alpha",
+      "bytes": 2776,
+      "sha256": "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
+      "members": [
+        {
+          "source": "tests/fixtures/api-alpha/control.lua",
+          "destination": "control.lua",
+          "bytes": 4989,
+          "sha256": "8C5531606C96A1B93DD7B2E72C46F239866FC1EB161728BCFD66635B9592C8DB"
+        },
+        {
+          "source": "tests/fixtures/api-alpha/data.lua",
+          "destination": "data.lua",
+          "bytes": 736,
+          "sha256": "EF8BF389DF2694649EBF70B2F94C00E964D0AAA43AD72CC6A930B85203E41881"
+        },
+        {
+          "source": "tests/fixtures/api-alpha/graphics/icon.png",
+          "destination": "graphics/icon.png",
+          "bytes": 137,
+          "sha256": "AAEB6587D7BB7F5332AF05DAB446DF3DB3B100C0776E45FA078DE2A574DABB3D"
+        },
+        {
+          "source": "tests/fixtures/api-alpha/info.json",
+          "destination": "info.json",
+          "bytes": 375,
+          "sha256": "CC8C9254B536C16B44A6F9E7B4B63250F1477C5ADAF2337C1A401A8E459DCF7F"
+        }
+      ]
+    },
+    {
+      "target": "f210",
+      "role": "api-beta",
+      "name": "mir-fixture-mir5-api-beta",
+      "version": "0.1.0",
+      "path": "build/qualification/api-native-prepared-aero-r01/f210/archives/mir-fixture-mir5-api-beta_0.1.0.zip",
+      "fixture_source": "build/qualification/api-native-prepared-aero-r01/f210/fixture-source/api-beta",
+      "bytes": 2815,
+      "sha256": "943AF6BF26C0B4C0CE4861C1E25CAC0CB90DACF08A7A8229669A1DA481F01894",
+      "members": [
+        {
+          "source": "tests/fixtures/api-beta/control.lua",
+          "destination": "control.lua",
+          "bytes": 4428,
+          "sha256": "81994E94DE86BFBB303160196A3E6EA99A00FD527A552763E7F6EDC18FF8F729"
+        },
+        {
+          "source": "tests/fixtures/api-beta/data-final-fixes.lua",
+          "destination": "data-final-fixes.lua",
+          "bytes": 952,
+          "sha256": "66502AB391A50F57D30150CDE9BDAEBE42ACDC2101A75AC15E54D9D8AC27B2B4"
+        },
+        {
+          "source": "tests/fixtures/api-beta/graphics/icon.png",
+          "destination": "graphics/icon.png",
+          "bytes": 137,
+          "sha256": "530F9250623036693D3E5A79F830B9C8A6D61E727C92219FD6A28EE62A424CCE"
+        },
+        {
+          "source": "tests/fixtures/api-beta/info.json",
+          "destination": "info.json",
+          "bytes": 380,
+          "sha256": "5C2611225712DFD0B89B77DDCB13267F48AD5E6592BE535282C82015E8DB486C"
+        }
+      ]
+    },
+    {
+      "target": "f210",
+      "role": "api-beta-production",
+      "name": "mir-fixture-mir5-api-beta-production",
+      "version": "0.1.0",
+      "path": "build/qualification/api-native-prepared-aero-r01/f210/archives/mir-fixture-mir5-api-beta-production_0.1.0.zip",
+      "fixture_source": "build/qualification/api-native-prepared-aero-r01/f210/fixture-source/api-beta-production",
+      "bytes": 4295,
+      "sha256": "25084C8B20FF4EBFB819C8351E351F38325B06E65F741D2660067C775C061A19",
+      "members": [
+        {
+          "source": "tests/fixtures/api-beta-production/control.lua",
+          "destination": "control.lua",
+          "bytes": 14105,
+          "sha256": "CFAF0D288CD51BF03BCF88D09468858A5DD11AC52EF6E4216673EE2AF306B5CF"
+        },
+        {
+          "source": "tests/fixtures/api-beta-production/info.json",
+          "destination": "info.json",
+          "bytes": 432,
+          "sha256": "2DDBF822E5C06774BCBEB88F0341026E4EB152D0A468EAF6DC061C17060FCB46"
+        }
+      ]
+    },
+    {
+      "target": "f210",
+      "role": "active-mods-observer",
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "path": "build/qualification/api-native-prepared-aero-r01/f210/archives/mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "fixture_source": "build/qualification/api-native-prepared-aero-r01/f210/fixture-source/active-mods-observer",
+      "bytes": 834,
+      "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+      "members": [
+        {
+          "source": "tests/fixtures/active-mods-observer/data-final-fixes.lua",
+          "destination": "data-final-fixes.lua",
+          "bytes": 477,
+          "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C"
+        },
+        {
+          "source": "tests/fixtures/active-mods-observer/info.json",
+          "destination": "info.json",
+          "bytes": 231,
+          "sha256": "C37A55C4776F1B4DABA7E4D5C98CF22FD0E978A461D3E6FD8A95E238B97908BD"
+        }
+      ]
+    }
+  ],
+  "profiles": [
+    {
+      "path": "tests/profiles/api-boundary-support-exports-f200-r01.json",
+      "sha256": "E61DFDC7E3DA4A144B38D3635ADA522680F624D8213287909BF149A4665DD5E7",
+      "bytes": 1780,
+      "target": "f200",
+      "kind": "boundary",
+      "mods": 6,
+      "archives": 5
+    },
+    {
+      "path": "tests/profiles/api-space-age-production-support-exports-f200-r01.json",
+      "sha256": "C04DFA1F0E25685EACCD154E611919806A9D7A23A062DCA329EE0B89E95EBFED",
+      "bytes": 2076,
+      "target": "f200",
+      "kind": "space-age-production",
+      "mods": 9,
+      "archives": 5
+    },
+    {
+      "path": "tests/profiles/api-boundary-support-exports-f210-r01.json",
+      "sha256": "3378702480625FFB50335AE31B8466CB744ACA54AB3C3E6513335A2B5DF449B9",
+      "bytes": 1780,
+      "target": "f210",
+      "kind": "boundary",
+      "mods": 6,
+      "archives": 5
+    },
+    {
+      "path": "tests/profiles/api-space-age-production-support-exports-f210-r01.json",
+      "sha256": "44FF9FF0DFB41A1F02ECBD711E42414E63DB0E2796D338FFF232EABC5DCF0BF2",
+      "bytes": 2164,
+      "target": "f210",
+      "kind": "space-age-production",
+      "mods": 10,
+      "archives": 5
+    }
+  ],
+  "cases": [
+    {
+      "id": "boundary-f200",
+      "profile": "tests/profiles/api-boundary-support-exports-f200-r01.json",
+      "existing_command": "tools/Invoke-NativeFixture.ps1",
+      "arguments": {
+        "ArchiveLibrary": "D:/Projects/Factorio/testmods/2.0",
+        "FactorioBin": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+        "ProfilePath": "tests/profiles/api-boundary-support-exports-f200-r01.json",
+        "FixtureSources": [
+          "build/qualification/api-native-prepared-aero-r01/f200/fixture-source/active-mods-observer",
+          "build/qualification/api-native-prepared-aero-r01/f200/fixture-source/api-alpha",
+          "build/qualification/api-native-prepared-aero-r01/f200/fixture-source/api-beta",
+          "build/qualification/api-native-prepared-aero-r01/f200/fixture-source/api-boundary"
+        ],
+        "ExpectedMIRArchiveSha256": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+        "ActiveModsObserver": "mir-fixture-mir5-active-mods-observer",
+        "CaseName": "api-boundary",
+        "OutputRoot": "build/tmp/api-boundary-support-exports-f200-r01",
+        "ConsumerMarkers": [
+          "MIR5_API_ALPHA",
+          "MIR5_API_BETA",
+          "MIR5_API_BOUNDARY"
+        ],
+        "CreateOnly": true,
+        "ExpectedPeakMemoryMiB": 4096,
+        "TimeoutSeconds": 180,
+        "AdmissionWaitSeconds": 30
+      },
+      "expected": "One init Alpha/Beta/Boundary result each; DATA boundary marker and three fresh native rows, exact .03125 effect, rejected names absent, detached query and unchanged native modifier."
+    },
+    {
+      "id": "space-age-production-f200",
+      "profile": "tests/profiles/api-space-age-production-support-exports-f200-r01.json",
+      "existing_command": "tools/Invoke-NativeFixture.ps1",
+      "arguments": {
+        "ArchiveLibrary": "D:/Projects/Factorio/testmods/2.0",
+        "FactorioBin": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+        "ProfilePath": "tests/profiles/api-space-age-production-support-exports-f200-r01.json",
+        "FixtureSources": [
+          "build/qualification/api-native-prepared-aero-r01/f200/fixture-source/active-mods-observer",
+          "build/qualification/api-native-prepared-aero-r01/f200/fixture-source/api-alpha",
+          "build/qualification/api-native-prepared-aero-r01/f200/fixture-source/api-beta",
+          "build/qualification/api-native-prepared-aero-r01/f200/fixture-source/api-beta-production"
+        ],
+        "ExpectedMIRArchiveSha256": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+        "ActiveModsObserver": "mir-fixture-mir5-active-mods-observer",
+        "CaseName": "api-beta-production",
+        "OutputRoot": "build/tmp/api-space-age-production-support-exports-f200-r01",
+        "ConsumerMarkers": [
+          "MIR5_API_ALPHA",
+          "MIR5_API_BETA"
+        ],
+        "CreateOnly": false,
+        "ExpectedPeakMemoryMiB": 4096,
+        "TimeoutSeconds": 180,
+        "AdmissionWaitSeconds": 30
+      },
+      "expected": "Equal100 plates yield200 then202 cables, native Beta+0.01, Alpha+0.05, empty modules/no beacons, save and two byte-unchanged cold reloads with Alpha/Beta read-only load markers."
+    },
+    {
+      "id": "boundary-f210",
+      "profile": "tests/profiles/api-boundary-support-exports-f210-r01.json",
+      "existing_command": "tools/Invoke-NativeFixture.ps1",
+      "arguments": {
+        "ArchiveLibrary": "D:/Projects/Factorio/testmods/2.1",
+        "FactorioBin": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+        "ProfilePath": "tests/profiles/api-boundary-support-exports-f210-r01.json",
+        "FixtureSources": [
+          "build/qualification/api-native-prepared-aero-r01/f210/fixture-source/active-mods-observer",
+          "build/qualification/api-native-prepared-aero-r01/f210/fixture-source/api-alpha",
+          "build/qualification/api-native-prepared-aero-r01/f210/fixture-source/api-beta",
+          "build/qualification/api-native-prepared-aero-r01/f210/fixture-source/api-boundary"
+        ],
+        "ExpectedMIRArchiveSha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+        "ActiveModsObserver": "mir-fixture-mir5-active-mods-observer",
+        "CaseName": "api-boundary",
+        "OutputRoot": "build/tmp/api-boundary-support-exports-f210-r01",
+        "ConsumerMarkers": [
+          "MIR5_API_ALPHA",
+          "MIR5_API_BETA",
+          "MIR5_API_BOUNDARY"
+        ],
+        "CreateOnly": true,
+        "ExpectedPeakMemoryMiB": 4096,
+        "TimeoutSeconds": 180,
+        "AdmissionWaitSeconds": 30
+      },
+      "expected": "One init Alpha/Beta/Boundary result each; DATA boundary marker and three fresh native rows, exact .03125 effect, rejected names absent, detached query and unchanged native modifier."
+    },
+    {
+      "id": "space-age-production-f210",
+      "profile": "tests/profiles/api-space-age-production-support-exports-f210-r01.json",
+      "existing_command": "tools/Invoke-NativeFixture.ps1",
+      "arguments": {
+        "ArchiveLibrary": "D:/Projects/Factorio/testmods/2.1",
+        "FactorioBin": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+        "ProfilePath": "tests/profiles/api-space-age-production-support-exports-f210-r01.json",
+        "FixtureSources": [
+          "build/qualification/api-native-prepared-aero-r01/f210/fixture-source/active-mods-observer",
+          "build/qualification/api-native-prepared-aero-r01/f210/fixture-source/api-alpha",
+          "build/qualification/api-native-prepared-aero-r01/f210/fixture-source/api-beta",
+          "build/qualification/api-native-prepared-aero-r01/f210/fixture-source/api-beta-production"
+        ],
+        "ExpectedMIRArchiveSha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+        "ActiveModsObserver": "mir-fixture-mir5-active-mods-observer",
+        "CaseName": "api-beta-production",
+        "OutputRoot": "build/tmp/api-space-age-production-support-exports-f210-r01",
+        "ConsumerMarkers": [
+          "MIR5_API_ALPHA",
+          "MIR5_API_BETA"
+        ],
+        "CreateOnly": false,
+        "ExpectedPeakMemoryMiB": 4096,
+        "TimeoutSeconds": 180,
+        "AdmissionWaitSeconds": 30
+      },
+      "expected": "Equal100 plates yield200 then202 cables, native Beta+0.01, Alpha+0.05, empty modules/no beacons, save and two byte-unchanged cold reloads with Alpha/Beta read-only load markers."
+    }
+  ],
+  "handoff": [
+    "Root independently reads exact committed payload/profile bytes, reproduces own containers and reviews all native expectations. Existing candidate B remains fixed; no published archive is patched.",
+    "Materialize only the exact listed fixture members under the executing checkout, rename the selected info to info.json and stage own archives/candidate through the existing exclusive install/restore wrapper. Do not copy dependency libraries or mutate a live timing selection.",
+    "The command arguments are a PowerShell splat recipe, not a claimed executed command. Resolve relative source/profile/output paths under the independently verified executing checkout, require fresh output and freeze actual caller/resource packet before native launch.",
+    "ConsumerMarkers and FixtureSources are arrays passed by the existing PowerShell caller; do not flatten them into comma-bearing literal strings for pwsh -File.",
+    "Keep only one native job active and one actually ready pending. These four case definitions do not create four dispatched assignments; adopt exact matching work if already underway.",
+    "On failure preserve terminal native log, stdout, ledger, selection, source/candidate/fixture hashes and save before any relaunch. Correct only the demonstrated fixture/product path and retain original adverse evidence."
+  ],
+  "host_validation": {
+    "fixture_controls": 5,
+    "host_plan_controls": 3,
+    "pinned_runtime": "Lua5.2/build/tmp/mir421-lua-runtime",
+    "all_10_own_zip_crc_and_member_readback": true,
+    "new_native_processes": 0
+  },
+  "limits": [
+    "Profiles and own containers are prepared inputs. Actual independent preflight, engines/official mods, upstream selection, resource admission, native effect/physical/save/load, restoration and API1.0 freeze decisions remain unqualified.",
+    "Boundary is fresh CreateOnly, not gameplay or a foreign-interface collision test. Ordinary timing never consumes these instrumented fixture worlds.",
+    "Space Age output is one exact useful production witness, not a whole expansion/modpack performance or migration verdict. Existing Base and absence evidence retain original package/engine/input identities."
+  ],
+  "native_execution_count": 0,
+  "release_qualification": false
+}

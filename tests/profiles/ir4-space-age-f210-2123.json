@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "kind": "mir5-independent-mod-f210-native-reference-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "IndustrialRevolution4",
+      "version": "0.6.3",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "IndustrialRevolution4_0.6.3.zip": "CE056C8558356B522059686727D2036AEC7501958E533D077F0B0981AB50A4EF",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+  },
+  "scope": "Exact local ir4 space-age mandatory-closure input for independent upstream/published4.7.3/current data/settings captures. Latest numerically selected local archives require actual engine admission; these inputs establish no startup, research/physical, migration, client or support result."
+}

@@ -1,0 +1,208 @@
+{
+  "schema": 1,
+  "kind": "MIR5MigrationOrigin120575eDirectNativeChainV1",
+  "status": "passed-two-exact-base-direct-successors",
+  "scope": "Published MIR1.2.0 original F200 source to separately qualified F210 Base and F200 Base successors only. Both consume the same original source; neither uses a MIR5 intermediate. Space Age, other origins/settings/modpacks, clients, performance and release remain unqualified by this chain.",
+  "source": {
+    "published_version": "1.2.0",
+    "published_archive_sha256": "880C137F7AB35FE7AF1DA5538BFA91F620C80785134DB488800352DD6154AB22",
+    "source_evidence": "spec/evidence/migration-origin-120-f200-source-native-chain-r06.json",
+    "protected_save": {
+      "path": "build/qualification/migration-origins/migration-origin-120-f200-source-r06-native/native-output/write-data/saves/mir5-native-complete.zip",
+      "sha256": "FDC9BA445B17716CAE7C021959B9B3BF4E1C7EE9F6485AA76DBCC59D70101CAC",
+      "bytes": 817810
+    },
+    "original_source_laboratory_completions_counted_once": 1
+  },
+  "candidate": {
+    "source_commit": "575e418c72eff2970fa5f6274956f6e8944d4e19",
+    "player_tree": "5ba53a8514b4641c749e91c0a68f32521fb3fee7",
+    "asset_inventory_readback": {
+      "path": "spec/evidence/current-assets-575e418c-root-readback.json",
+      "sha256": "BE4C1397F7AEB381BC7AE202E567A628EE38EA8091208AB132F5D7AB03BA7222"
+    },
+    "inventory_sha256": "EA6AA71B8DCB9E953C9EFB270ABCE51D8245FA66D95BB72364EF7942A3AA50F7"
+  },
+  "controller": {
+    "commit": "6c274a9274edee68df7216d07353092770776c27",
+    "runner_sha256": "B9E4685187C4B172FBF16D4359FFCB320C99F443643B6F16E0861AF9E8641489",
+    "fixture_raw_git_commit": "a715adbe89468ba6d6a88526920d2d93af611244",
+    "fixture_changed_from_failed_f0dd_attempt": false
+  },
+  "retained_adverse": "spec/evidence/migration-origin-120-f210-cannon-credit-f0dd-adverse-r02.json",
+  "stages": [
+    {
+      "target": "f210",
+      "status": "passed-private-native-fixture",
+      "case": "migration-origin-1.2.0-f210-successor",
+      "engine": {
+        "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+        "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+        "file_version": "2.1.23.87750",
+        "product_version": "2.1.23",
+        "base_version": "2.1.23"
+      },
+      "profile": {
+        "path": "build/qualification/migration-origins/migration-origin-120-f210-successor-575e-r01-native/profile.json",
+        "sha256": "0A33C8B9BA8A1B6EBE24B2E919F4B44AB3C27FE0A943721B1333B168935A54A4",
+        "bytes": 2353
+      },
+      "result": {
+        "path": "build/qualification/migration-origins/migration-origin-120-f210-successor-575e-r01-native/native-output/result.json",
+        "sha256": "5A5942B5D874251F0856DCDB49AABE26C1DF820DBBE1886C3101F5150AD665B6",
+        "bytes": 34829
+      },
+      "terminal": {
+        "path": "build/qualification/migration-origins/migration-origin-120-f210-successor-575e-r01-native/terminal.json",
+        "sha256": "C6EEF190B8510B94C478DE193A42251928B7B69CF56031D49686C0726AC1A60F",
+        "bytes": 4562
+      },
+      "caller": {
+        "path": "build/qualification/migration-origins/migration-origin-120-f210-successor-575e-r01-native/caller.ps1",
+        "sha256": "0835633692A96C3456089FABDFBC85ACA4576586499D156090A9318E86BB6622",
+        "bytes": 19856
+      },
+      "prepared_packet": {
+        "path": "build/qualification/migration-origins/migration-origin-120-f210-successor-575e-r01-native/prepared-inputs-r03.json",
+        "sha256": "755F0E2EB6C99A6B62636DDB1FAE1BF0230657203157C39A185158B14AEF233B",
+        "bytes": 6219
+      },
+      "candidate_archive_sha256": "A8D0A4590154F3106E59BDB269F1AEB3ED8CC523F18F00ED7D76DC89059F5B8D",
+      "fixture_archive_sha256": "3E4E51C3E67DFF85A721BAE94D30106D90C9A74DC56387DE89AE48EB2D44AFF3",
+      "initial_result": {
+        "case": "migration-origin-1.2.0-f210-successor",
+        "stage": "initial",
+        "status": "passed",
+        "source_origin": "1.2.0",
+        "source_rows": 34,
+        "source_actual_labs": 1,
+        "candidate_actual_labs": 1,
+        "source_rocket_gun": 0.1,
+        "candidate_rocket_gun": 3.5,
+        "source_cannon_gun": 0.1,
+        "candidate_cannon_gun": 2.4,
+        "foreign_queue_progress": 0.42,
+        "detached_progress": 0.27,
+        "on_load_read_only": false
+      },
+      "successor_save": {
+        "path": "build/qualification/migration-origins/migration-origin-120-f210-successor-575e-r01-native/native-output/write-data/saves/mir5-native-complete.zip",
+        "sha256": "6E9740AC97EEA5A8E3ED72B43433E58556CF0A2F0586672C71421FF2D5D3189D",
+        "bytes": 835328
+      },
+      "pure_byte_identical_cold_reloads": 2,
+      "process_runs": 3,
+      "original_source_save_unchanged": true,
+      "controls_restored": "restored-direct-library-controls",
+      "root_custody_readback": {
+        "path": "build/qualification/migration-origins/migration-origin-120-f210-successor-575e-r01-native/root-readback-r02.json",
+        "sha256": "6DD04729798536C3AA98D21558260D18F4391E8B64CBD61256D65B265ECCCBDA",
+        "bytes": 1081
+      },
+      "native_members": 17,
+      "native_bytes": 965648
+    },
+    {
+      "target": "f200",
+      "status": "passed-private-native-fixture",
+      "case": "migration-origin-1.2.0-f200-successor",
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "file_version": "2.0.77.84539",
+        "product_version": "2.0.77",
+        "base_version": "2.0.77"
+      },
+      "profile": {
+        "path": "build/qualification/migration-origins/migration-origin-120-f200-successor-575e-r01-native/profile.json",
+        "sha256": "03DCE3D2518787C00A49DC383086F134952C9CDE4B3F994ABC2A54C885702528",
+        "bytes": 2159
+      },
+      "result": {
+        "path": "build/qualification/migration-origins/migration-origin-120-f200-successor-575e-r01-native/native-output/result.json",
+        "sha256": "967FAB6885A16FA9254F98EB3D509FB189F6A55A018D2F853F76388B7C49F49C",
+        "bytes": 34762
+      },
+      "terminal": {
+        "path": "build/qualification/migration-origins/migration-origin-120-f200-successor-575e-r01-native/terminal.json",
+        "sha256": "3F6F9DA36E5FD1A5FD17A53AB87DEF4A63985E887625EACE51E478F002FDBF0F",
+        "bytes": 4746
+      },
+      "caller": {
+        "path": "build/qualification/migration-origins/migration-origin-120-f200-successor-575e-r01-native/caller.ps1",
+        "sha256": "5627A7B3AFF889CAB94CDE718599C50027E71BECC343C6B5BA7A196998872568",
+        "bytes": 19847
+      },
+      "prepared_packet": {
+        "path": "build/qualification/migration-origins/migration-origin-120-f200-successor-575e-r01-native/prepared-inputs-f200-r01.json",
+        "sha256": "D1566E64ED2B99947D7E522B5FBF285998F00A3C477E46248A4591BBFEADE41F",
+        "bytes": 6402
+      },
+      "candidate_archive_sha256": "EF66506789F1C81F7E15ECF7048311865C2AB2B3D803E2736CD6B9567C6A3D2C",
+      "fixture_archive_sha256": "FE670CD6DE44FE3164F65C9D7A1702483E4A7EC2D59351519169B63A4BA4F078",
+      "initial_result": {
+        "case": "migration-origin-1.2.0-f200-successor",
+        "stage": "initial",
+        "status": "passed",
+        "source_origin": "1.2.0",
+        "source_rows": 34,
+        "source_actual_labs": 1,
+        "candidate_actual_labs": 1,
+        "source_rocket_gun": 0.1,
+        "candidate_rocket_gun": 3.5,
+        "source_cannon_gun": 0.1,
+        "candidate_cannon_gun": 2.4,
+        "foreign_queue_progress": 0.42,
+        "detached_progress": 0.27,
+        "on_load_read_only": false
+      },
+      "successor_save": {
+        "path": "build/qualification/migration-origins/migration-origin-120-f200-successor-575e-r01-native/native-output/write-data/saves/mir5-native-complete.zip",
+        "sha256": "B980E0216AEE7F08192B554DCBE7564C8CFF08C26E9B57C62E4FC5479F119175",
+        "bytes": 832588
+      },
+      "pure_byte_identical_cold_reloads": 2,
+      "process_runs": 3,
+      "original_source_save_unchanged": true,
+      "controls_restored": "restored-direct-library-controls",
+      "root_custody_readback": {
+        "path": "build/qualification/migration-origins/migration-origin-120-f200-successor-575e-r01-native/root-readback-r02.json",
+        "sha256": "91039345E616E8CE6563D1AC86EDAC441D636CDA4A9C0C7681C68B8DBE61C322",
+        "bytes": 1081
+      },
+      "native_members": 18,
+      "native_bytes": 950871
+    }
+  ],
+  "accounting": {
+    "candidate_laboratory_completions": 2,
+    "candidate_process_runs": 6,
+    "candidate_pure_byte_identical_cold_reloads": 4,
+    "successor_saves": 2,
+    "source_laboratory_completions_counted_once": 1,
+    "all_thirty_four_source_rows_checked_per_destination": true,
+    "recipe_battery_three_force_gun_credit_queue_and_detached_checks": true,
+    "effects_reset_checked_per_destination": true,
+    "initial_expected_player_cannon": 2.4,
+    "old_foreign_and_detached_paid_cannon": 0.1
+  },
+  "receipts": {
+    "path": "spec/evidence/migration-origin-120-575e-direct-native-receipts-r01.json.gz",
+    "sha256": "BADFBE01BC7702DBB83E548323E9A43731C53FAFC3788FCBEC153CC1E68BD33E",
+    "bytes": 14396,
+    "uncompressed_sha256": "1C519C27E43D58D16D88D886649B724E007EC5B7C1BDD4DD802AAFC9AA606520",
+    "uncompressed_bytes": 93768,
+    "exact_original_raw_native_result_receipts": 2,
+    "gzip_mtime_zero": true
+  },
+  "claims": {
+    "exact_two_base_direct_successors": true,
+    "other_origins": false,
+    "space_age": false,
+    "arbitrary_settings": false,
+    "full_modpack": false,
+    "client_or_multiplayer": false,
+    "performance": false,
+    "release_qualification": false
+  }
+}

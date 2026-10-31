@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "kind": "MIRDiscoveryRecoveryPreparedInputsV1",
+  "status": "prepared-not-dispatched-not-native-qualified",
+  "scope": "Only the named published MIR 3.2.x discovery source-save boundary. This packet does not qualify a successor, helper, whole-origin catalogue, migration, performance, or release.",
+  "fixture_source_commit": "c17bf7423d0884c05e39c0bad69de288aaf859db",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "published_source_reference": {
+    "version": "3.2.0",
+    "archive_sha256": "35372EE6D16DA6765E8C30AEAAF5DA4A5D300F02C0A0A03648C80893A5394F32",
+    "archive_bytes": 1029464,
+    "data_raw_sha256": "5BF261F92779F7AE565E524E99B059821792DE6D833AAF99A587E5EFDF5FF110",
+    "planet_discovery_vulcanus": {
+      "effect": {
+        "type": "unlock-travel-to-space-platforms",
+        "modifier": true
+      },
+      "prerequisites": [
+        "space-platform-thruster"
+      ]
+    }
+  },
+  "published_source_321_review": {
+    "archive_sha256": "4CE24BE8550CB76EADC2B076747277025E9FD3E7BAAE3E4A996EDD36F78005A6",
+    "archive_bytes": 1029716,
+    "result": "No authored planet-discovery-vulcanus mutation was found in either 3.2.0 or 3.2.1 archive; the sole unlock-space-location occurrence is the shared generic effect-contract key, not a target definition."
+  },
+  "owned_archives": {
+    "observer": {
+      "source_ref": "784d7985020f9d71f6af7a293238afb4c6d0dc68",
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "archive": "build/qualification/discovery-recovery-prepared-r01/observer/mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+      "bytes": 834,
+      "members": [
+        {
+          "path": "info.json",
+          "git_blob": "7d9113c418e49ef4a7a6c5db454c0e0cf40dedf7",
+          "sha256": "C37A55C4776F1B4DABA7E4D5C98CF22FD0E978A461D3E6FD8A95E238B97908BD",
+          "bytes": 231
+        },
+        {
+          "path": "data-final-fixes.lua",
+          "git_blob": "0561997352770afb91631e80c83ae92ce0921945",
+          "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C",
+          "bytes": 477
+        }
+      ]
+    },
+    "source_320": {
+      "name": "mir-fixture-discovery-recovery",
+      "version": "0.1.0",
+      "archive": "build/qualification/discovery-recovery-prepared-r03/source-320/archive/mir-fixture-discovery-recovery_0.1.0.zip",
+      "projection": "build/qualification/discovery-recovery-prepared-r03/source-320/source",
+      "sha256": "F316A9D1E7B5403C475B6811CEA24A9436F0C5C76FA09EDE1705D1A9E2B9706B",
+      "bytes": 8180,
+      "members": [
+        { "path": "info.json", "git_path": "tests/fixtures/discovery-recovery/source-320/info.json", "git_blob": "fff9241c9675d5c81d748f904836bd96884db2de", "sha256": "802F40CF7A271F08880CC6309CF04C59D2812991E9014753F239B3F308996C58", "bytes": 407 },
+        { "path": "control.lua", "git_path": "tests/fixtures/discovery-recovery/source-320/control.lua", "git_blob": "d9e0ee2cff5189d2ce501620fe789d4c22ce5a47", "sha256": "D18EAA01A4033505AAE30CC539001E5A070A7F57551F2B45EA549ED4E14A439B", "bytes": 78 },
+        { "path": "data-final-fixes.lua", "git_path": "tests/fixtures/discovery-recovery/source-320/data-final-fixes.lua", "git_blob": "34501785cbac7ca82647ef906111d6f02f9c1b61", "sha256": "B4EF9262D44DEB7EC01825F6E0E78B01F8059F1553D5FCC78DE518E05CDE5F0E", "bytes": 81 },
+        { "path": "fixture_control.lua", "git_path": "tests/fixtures/discovery-recovery/fixture_control.lua", "git_blob": "e33ed03543033f61e9699fb56f4edcea096a90dc", "sha256": "468B24267B5523AA4E9372D47EA0BE0946CC62B17BC0F680386A366A93AFE4FC", "bytes": 23279 },
+        { "path": "fixture_data_final.lua", "git_path": "tests/fixtures/discovery-recovery/fixture_data_final.lua", "git_blob": "82f6e7a29edaf0bcc617276a396744a3d62c0bb7", "sha256": "69D67B2F5D23A586CB182E013A0C4EAECC9DD753705B8F2E4BFEBFA6F895F91E", "bytes": 4261 }
+      ]
+    },
+    "source_321": {
+      "name": "mir-fixture-discovery-recovery",
+      "version": "0.1.1",
+      "archive": "build/qualification/discovery-recovery-prepared-r03/source-321/archive/mir-fixture-discovery-recovery_0.1.1.zip",
+      "projection": "build/qualification/discovery-recovery-prepared-r03/source-321/source",
+      "sha256": "36BAF9A257FE2F3DC8326A5C65F73C5AA7966C71C4F2ED197D4143C927CDEBDE",
+      "bytes": 8180,
+      "members": [
+        { "path": "info.json", "git_path": "tests/fixtures/discovery-recovery/source-321/info.json", "git_blob": "219931f1dfac03bedd6705cee0da8056aa0526ab", "sha256": "643A22839800592DBC3007B186D7E2A54C63D1E369CA5F6C955581757DE6B891", "bytes": 407 },
+        { "path": "control.lua", "git_path": "tests/fixtures/discovery-recovery/source-321/control.lua", "git_blob": "d9e0ee2cff5189d2ce501620fe789d4c22ce5a47", "sha256": "D18EAA01A4033505AAE30CC539001E5A070A7F57551F2B45EA549ED4E14A439B", "bytes": 78 },
+        { "path": "data-final-fixes.lua", "git_path": "tests/fixtures/discovery-recovery/source-321/data-final-fixes.lua", "git_blob": "34501785cbac7ca82647ef906111d6f02f9c1b61", "sha256": "B4EF9262D44DEB7EC01825F6E0E78B01F8059F1553D5FCC78DE518E05CDE5F0E", "bytes": 81 },
+        { "path": "fixture_control.lua", "git_path": "tests/fixtures/discovery-recovery/fixture_control.lua", "git_blob": "e33ed03543033f61e9699fb56f4edcea096a90dc", "sha256": "468B24267B5523AA4E9372D47EA0BE0946CC62B17BC0F680386A366A93AFE4FC", "bytes": 23279 },
+        { "path": "fixture_data_final.lua", "git_path": "tests/fixtures/discovery-recovery/fixture_data_final.lua", "git_blob": "82f6e7a29edaf0bcc617276a396744a3d62c0bb7", "sha256": "69D67B2F5D23A586CB182E013A0C4EAECC9DD753705B8F2E4BFEBFA6F895F91E", "bytes": 4261 }
+      ]
+    },
+    "successor": {
+      "name": "mir-fixture-discovery-recovery",
+      "version": "0.2.0",
+      "archive": "build/qualification/discovery-recovery-prepared-r03/successor/archive/mir-fixture-discovery-recovery_0.2.0.zip",
+      "projection": "build/qualification/discovery-recovery-prepared-r03/successor/source",
+      "sha256": "93EFFF6FD0C740BCF7F77AA7A8EA1A90A211038AF53C0516A58B555252923380",
+      "bytes": 8191,
+      "members": [
+        { "path": "info.json", "git_path": "tests/fixtures/discovery-recovery/successor/info.json", "git_blob": "ca6867a4f9128716a2bc94c74171a13ea6b72821", "sha256": "92FCB2F900BA707702CB5A7CB533EC9AEAAC0A5AACDEFDEB6A9E2229321FBC60", "bytes": 401 },
+        { "path": "control.lua", "git_path": "tests/fixtures/discovery-recovery/successor/control.lua", "git_blob": "34debd82fbe9a4e32c230936cdac3ce7a76ea410", "sha256": "B4EBB5F477117B9B045C96E8CB82E34B0DEB77B7C841A6CBCAA0D8F74DAC0365", "bytes": 81 },
+        { "path": "data-final-fixes.lua", "git_path": "tests/fixtures/discovery-recovery/successor/data-final-fixes.lua", "git_blob": "6de0705a1a363c3d7cc7bacf282e9933d633fb48", "sha256": "61C5FDC8A20712BDA09C510D5B91C8A163FFEAF5252101356C8A2DBBD153D209", "bytes": 84 },
+        { "path": "fixture_control.lua", "git_path": "tests/fixtures/discovery-recovery/fixture_control.lua", "git_blob": "e33ed03543033f61e9699fb56f4edcea096a90dc", "sha256": "468B24267B5523AA4E9372D47EA0BE0946CC62B17BC0F680386A366A93AFE4FC", "bytes": 23279 },
+        { "path": "fixture_data_final.lua", "git_path": "tests/fixtures/discovery-recovery/fixture_data_final.lua", "git_blob": "82f6e7a29edaf0bcc617276a396744a3d62c0bb7", "sha256": "69D67B2F5D23A586CB182E013A0C4EAECC9DD753705B8F2E4BFEBFA6F895F91E", "bytes": 4261 }
+      ]
+    }
+  },
+  "profiles": [
+    { "path": "tests/profiles/discovery-recovery-source-320-f210-2123.json", "sha256": "508214CE97DE19DA93FBEB579E343C05E5A0C851BF8EB5B41EBDB1BEFEB3D72A", "role": "published-source" },
+    { "path": "tests/profiles/discovery-recovery-source-321-f210-2123.json", "sha256": "BA927C7816C84CB93FE18AE2782C9D7E73DD3B5E15AA4194D0D19C350C2AF72D", "role": "published-source" },
+    { "path": "tests/profiles/discovery-recovery-successor-private-e47-f210-2123.json", "sha256": "BD62F1CDCDFABD8F5059BB41FD9EE3BCBD310FB458C6709EF89012C1383A2B77", "role": "private-proposed-recovery-successor" },
+    { "path": "tests/profiles/discovery-recovery-successor-control-a575-f210-2123.json", "sha256": "2E4C0652A695C5C7687567BA8B36E533B3F345795AA2F925D2149DFBAABC4DF4", "role": "comparison-without-proposed-helper" }
+  ],
+  "private_candidate": {
+    "source_commit": "e47a0fdf746ce0e7ba237ab97be87172eacd4fb7",
+    "player_source": "1d71d0936bfe836764300174d9ae8457c31e72f4",
+    "archive_sha256": "99EDF6EF6723434EBBDA1AED4AA58A74A26827D94FD18F67E88C118C3DF96BD6",
+    "archive_bytes": 682781,
+    "native_qualification": false,
+    "release_candidate": false
+  },
+  "runner": {
+    "path": "tools/Invoke-NativeFixture.ps1",
+    "case": "discovery-recovery",
+    "timeout_seconds": 180,
+    "expected_peak_memory_mib": 4096,
+    "native_execution": false
+  },
+  "supersedes": {
+    "path": "spec/evidence/discovery-recovery-prepared-inputs-r02.json",
+    "reason": "R02 incorrectly asserted an unlock-space-location effect and synthetically locked the source/foreign locations. R03 binds the published unlock-travel-to-space-platforms effect and requires the actual source researched-but-native-locked state without writing location locks."
+  }
+}

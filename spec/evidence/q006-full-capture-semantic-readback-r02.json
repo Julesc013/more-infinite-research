@@ -1,0 +1,325 @@
+{
+  "schema": 1,
+  "kind": "MIRQ006FullCaptureSemanticReadbackV1",
+  "status": "captured-prototype-and-settings-comparison-complete-not-current-native-acceptance",
+  "scope": "Read-only independent comparison of all complete q006 Bob-full/Space-Age captured technology and settings objects. Includes hidden/private rows,not only selected public IDs. No execution/import of historical audit code and no new native run.",
+  "reader_sha256": "94D909D4A91A21AB521247259F1FFE2A44FA2D0B34BA10335FDD1F34EBD89744",
+  "inputs": {
+    "transport_path": "spec/evidence/q006-full-technology-settings-projections-r01.json.gz",
+    "transport_sha256": "D279B2AE549D326A719C82C47E1D42E3B55E55BFA7F8A01F47725FF371228595",
+    "transport_records_verified": 13,
+    "records": [
+      {
+        "path": "historical-reference/audit_a1fd_public.py",
+        "bytes": 22140,
+        "sha256": "9E00D07FC4287C65A1FC2CAF7DCA27A92EF36D7857EE618407A296B6FDBE5028"
+      },
+      {
+        "path": "q006-575e-upstream/technology.json",
+        "bytes": 942114,
+        "sha256": "8FD4A1CA9C9FA77ACE38F37F6AD4A93AC089363FC83127E379EC18D1EC96D6C3"
+      },
+      {
+        "path": "q006-575e-upstream/settings.json",
+        "bytes": 28826,
+        "sha256": "A66A00EB052466AE5615F921386024DDDB90B994DCD44FF61DAC83073CCC9219"
+      },
+      {
+        "path": "q006-575e-upstream/result.json",
+        "bytes": 27198,
+        "sha256": "C7BF5C387935ACB409A3875641FE0DDF1A9F8DAA816DD74A943684FA8462FD57"
+      },
+      {
+        "path": "q006-575e-published/technology.json",
+        "bytes": 1112894,
+        "sha256": "6030BFD4EA8C2C36D28639DB6107C5FEC9708E2B135FC73BB551265C0ACE4FD9"
+      },
+      {
+        "path": "q006-575e-published/settings.json",
+        "bytes": 1071441,
+        "sha256": "CBC3F12DD307DBF47BF3BB34ADDE664082842AF03D68681D4D16DAE47FE650BD"
+      },
+      {
+        "path": "q006-575e-published/result.json",
+        "bytes": 28361,
+        "sha256": "8EE3FA416F506381DDA7CBE06F9241DC6C2683F7190FA0A5396ADA3804453A29"
+      },
+      {
+        "path": "q006-575e-candidate/technology.json",
+        "bytes": 1165748,
+        "sha256": "C81158CF1EC8E59859A1FABB4EEA67FDC64BC2EC720F05E690044D506ACB2BA0"
+      },
+      {
+        "path": "q006-575e-candidate/settings.json",
+        "bytes": 776854,
+        "sha256": "DE3A4C64980D4355CC5848024581CCC8C8AD953F59E675CB4EBBCBB9315C6C4E"
+      },
+      {
+        "path": "q006-575e-candidate/result.json",
+        "bytes": 28358,
+        "sha256": "B97A8E1BCAB8818FE561C1448F916853775E8925945E4B54CFB6B2ECE601AFD2"
+      },
+      {
+        "path": "q006-a1fd-candidate/technology.json",
+        "bytes": 1162482,
+        "sha256": "D42C3EC36C77EAD7618272080349C7C56165EF62E3F9CB5F9ED675CE28D8D9B5"
+      },
+      {
+        "path": "q006-a1fd-candidate/settings.json",
+        "bytes": 776854,
+        "sha256": "DE3A4C64980D4355CC5848024581CCC8C8AD953F59E675CB4EBBCBB9315C6C4E"
+      },
+      {
+        "path": "q006-a1fd-candidate/result.json",
+        "bytes": 28280,
+        "sha256": "D62E0A4711D2502FACAC3FA82BD856C0C05657DEA07B0C24B1FF967D3F8D6DA6"
+      }
+    ]
+  },
+  "method": [
+    "Every original record hash and byte count is verified before parsing. Object field order is JSON semantics; array order is retained except the six named native recipe-productivity effect lists.",
+    "For those six lists only,compare complete serialized effect payload multisets including duplicate multiplicity,type,target and modifier. All effects are independently verified as change-recipe-productivity. No tolerance or field omission is used.",
+    "All common technology fields,all setting identities/types/defaults/minima/allowed values are compared. Report every remaining difference and all additions.",
+    "Captured data retains its original575e/a1fd/B6/upstream execution identity. Later current-data applicability,native rendering/effects/migrations/clients and useful physical output are separate."
+  ],
+  "technology_summary": {
+    "upstream": 673,
+    "published": 746,
+    "candidate": 785,
+    "a1fd": 781,
+    "published_missing": 0,
+    "exact_common_rows": 738,
+    "effect_order_only_rows": 6,
+    "presentation_rows": 3,
+    "distinct_common_rows_with_any_difference": 8,
+    "common_gameplay_payload_changes": 0,
+    "private_hidden_additions": 28,
+    "public_additions": 11
+  },
+  "settings_summary": {
+    "published_identities": 1022,
+    "candidate_identities": 1022,
+    "missing": 0,
+    "added": 0,
+    "unchanged_rows": 133,
+    "retired_targets_metadata_rows": 889,
+    "maximum_bound_rows": 123,
+    "other_field_changes": 0
+  },
+  "a1fd_to_575e": {
+    "missing": 0,
+    "private_hidden_added": [
+      "mir-legacy-cannon-credit-rocket-shooting-speed",
+      "mir-legacy-module-credit-efficiency-module",
+      "mir-legacy-module-credit-productivity-module",
+      "mir-legacy-module-credit-speed-module"
+    ],
+    "changed": [
+      {
+        "name": "recipe-prod-research_mining_drill-1",
+        "changes": {
+          "localised_name": {
+            "a1fd": [
+              "technology-name.more-infinite-research.research_mining_drill",
+              [
+                "item-name.electric-mining-drill"
+              ]
+            ],
+            "candidate": [
+              "technology-name.more-infinite-research.research_mining_drill"
+            ]
+          }
+        }
+      },
+      {
+        "name": "recipe-prod-research_walls-1",
+        "changes": {
+          "localised_name": {
+            "a1fd": [
+              "technology-name.more-infinite-research.research_walls",
+              [
+                "item-name.stone-wall"
+              ]
+            ],
+            "candidate": [
+              "technology-name.more-infinite-research.research_walls"
+            ]
+          }
+        }
+      }
+    ],
+    "settings_exact": true
+  },
+  "remaining_disposition": [
+    "The ten material level1/4 additions and science-pack row are absent from both upstream and published B6; do not relabel them retained published rows. Their applicability/progression/physical qualification remains separately evidenced.",
+    "The existing full-Bob material native chain covers selected material applicability and actual labs/crafts at its original inputs; this report adds no gameplay execution.",
+    "Icon/localised-name changes remain explicit presentation differences; rendered correctness is a client concern.",
+    "The123 growth maxima1000 match the adopted settings bound; removing889 planner targets is metadata removal,not removal of settings. This report does not supply new setting-behavior execution.",
+    "No final-current-package,all-modpack,saved-state,performance or release verdict follows."
+  ],
+  "full_readback": {
+    "path": "spec/evidence/q006-full-capture-semantic-details-r02.json.gz",
+    "sha256": "4D26575D2D13FFDC65CE3124A997113EE68502F9DFDCE84B741A4AD09D971DFF",
+    "bytes": 20478,
+    "decoded_sha256": "CDE5A9778FB1DFD4619BEF5332651BF282DD5CE694DC78E9164BEA4CE6636142",
+    "decoded_bytes": 552753
+  },
+  "effect_order_row_names": [
+    "recipe-prod-research_carbon-1",
+    "recipe-prod-research_copper-1",
+    "recipe-prod-research_heavy_ammo-1",
+    "recipe-prod-research_inserters-1",
+    "recipe-prod-research_lithium-1",
+    "recipe-prod-research_modules-1"
+  ],
+  "presentation_changes": [
+    {
+      "name": "recipe-prod-research_inserters-1",
+      "changes": {
+        "icons": {
+          "published": [
+            {
+              "icon": "__boblogistics__/graphics/icons/technology/long-inserters.png",
+              "icon_size": 128
+            },
+            {
+              "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+              "icon_size": 128,
+              "scale": 0.5,
+              "shift": [
+                50,
+                50
+              ],
+              "floating": true
+            }
+          ],
+          "candidate": [
+            {
+              "icon": "__base__/graphics/technology/fast-inserter.png",
+              "icon_size": 256
+            },
+            {
+              "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+              "icon_size": 128,
+              "scale": 0.5,
+              "shift": [
+                50,
+                50
+              ],
+              "floating": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "recipe-prod-research_mining_drill-1",
+      "changes": {
+        "icons": {
+          "published": [
+            {
+              "icon": "__bobmining__/graphics/icons/electric-mining-drill-1.png",
+              "icon_size": 64
+            },
+            {
+              "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+              "icon_size": 128,
+              "scale": 0.5,
+              "shift": [
+                50,
+                50
+              ],
+              "floating": true
+            }
+          ],
+          "candidate": [
+            {
+              "icon": "__base__/graphics/icons/electric-mining-drill.png",
+              "icon_size": 64
+            },
+            {
+              "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+              "icon_size": 128,
+              "scale": 0.5,
+              "shift": [
+                50,
+                50
+              ],
+              "floating": true
+            }
+          ]
+        },
+        "localised_name": {
+          "published": [
+            "technology-name.more-infinite-research.research_mining_drill",
+            [
+              "item-name.electric-mining-drill"
+            ]
+          ],
+          "candidate": [
+            "technology-name.more-infinite-research.research_mining_drill"
+          ]
+        }
+      }
+    },
+    {
+      "name": "recipe-prod-research_walls-1",
+      "changes": {
+        "localised_name": {
+          "published": [
+            "technology-name.more-infinite-research.research_walls",
+            [
+              "item-name.stone-wall"
+            ]
+          ],
+          "candidate": [
+            "technology-name.more-infinite-research.research_walls"
+          ]
+        }
+      }
+    }
+  ],
+  "public_addition_names": [
+    "recipe-prod-research_material_bronze-1",
+    "recipe-prod-research_material_bronze-4",
+    "recipe-prod-research_material_copper_tungsten-1",
+    "recipe-prod-research_material_copper_tungsten-4",
+    "recipe-prod-research_material_gunmetal-1",
+    "recipe-prod-research_material_gunmetal-4",
+    "recipe-prod-research_material_invar-1",
+    "recipe-prod-research_material_invar-4",
+    "recipe-prod-research_material_nitinol-1",
+    "recipe-prod-research_material_nitinol-4",
+    "recipe-prod-research_science_pack_productivity-1"
+  ],
+  "private_addition_names": [
+    "mir-legacy-cannon-credit-rocket-shooting-speed",
+    "mir-legacy-module-credit-efficiency-module",
+    "mir-legacy-module-credit-productivity-module",
+    "mir-legacy-module-credit-speed-module",
+    "mir-native-credit-research_breeding-fish-breeding-negative",
+    "mir-native-credit-research_breeding-fish-breeding-positive",
+    "mir-native-credit-research_breeding-pentapod-egg-negative",
+    "mir-native-credit-research_breeding-pentapod-egg-positive",
+    "mir-native-credit-research_bullets-firearm-magazine-negative",
+    "mir-native-credit-research_bullets-firearm-magazine-positive",
+    "mir-native-credit-research_concrete-stone-brick-negative",
+    "mir-native-credit-research_concrete-stone-brick-positive",
+    "mir-native-credit-research_copper-copper-plate-negative",
+    "mir-native-credit-research_copper-copper-plate-positive",
+    "mir-native-credit-research_grenades-grenade-negative",
+    "mir-native-credit-research_grenades-grenade-positive",
+    "mir-native-credit-research_iron-iron-plate-negative",
+    "mir-native-credit-research_iron-iron-plate-positive",
+    "mir-native-credit-research_lubricant_productivity-lubricant-negative",
+    "mir-native-credit-research_lubricant_productivity-lubricant-positive",
+    "mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-negative",
+    "mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-positive",
+    "mir-native-credit-research_oil_processing_productivity-basic-oil-processing-negative",
+    "mir-native-credit-research_oil_processing_productivity-basic-oil-processing-positive",
+    "mir-native-credit-research_oil_processing_productivity-coal-liquefaction-negative",
+    "mir-native-credit-research_oil_processing_productivity-coal-liquefaction-positive",
+    "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-negative",
+    "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-positive"
+  ]
+}

@@ -1,0 +1,399 @@
+Set-StrictMode -Version Latest
+
+function Get-MIR441PhysicalMemorySnapshot {
+  if (-not $IsWindows) { throw '[mir441-resource-monitor-windows-required]' }
+  if ($null -eq ('MIR441MemoryNative' -as [type])) {
+    Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class MIR441MemoryNative {
+  [StructLayout(LayoutKind.Sequential)] public struct Info {
+    public uint Size;
+    public UIntPtr CommitTotal,CommitLimit,CommitPeak,PhysicalTotal,PhysicalAvailable,SystemCache,KernelTotal,KernelPaged,KernelNonpaged,PageSize;
+    public uint Handles,Processes,Threads;
+  }
+  [DllImport("psapi.dll",SetLastError=true)] static extern bool GetPerformanceInfo(out Info info,uint size);
+  public static Info Read() {
+    Info info;
+    if(!GetPerformanceInfo(out info,(uint)Marshal.SizeOf(typeof(Info)))) throw new System.ComponentModel.Win32Exception();
+    return info;
+  }
+}
+'@
+  }
+  $info=[MIR441MemoryNative]::Read();$page=$info.PageSize.ToUInt64()
+  return [pscustomobject][ordered]@{total_bytes=[int64]($info.PhysicalTotal.ToUInt64()*$page);free_bytes=[int64]($info.PhysicalAvailable.ToUInt64()*$page);committed_bytes=[int64]($info.CommitTotal.ToUInt64()*$page);commit_limit_bytes=[int64]($info.CommitLimit.ToUInt64()*$page)}
+}
+
+function Resolve-MIR441RecoveryScratchPath {
+  param([Parameter(Mandatory)][string]$Path)
+  $repo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..'))
+  $full=[IO.Path]::GetFullPath($Path);$admitted=$false
+  foreach($relative in @('build/tmp','build/p')) {
+    $root=[IO.Path]::GetFullPath((Join-Path $repo $relative)).TrimEnd('\','/')
+    if($full.Equals($root,[StringComparison]::OrdinalIgnoreCase)-or$full.StartsWith($root+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){$admitted=$true}
+  }
+  if(-not$admitted){throw "[mir441-resource-output-root] $full"}
+  $current=$full
+  while($current){
+    if(Test-Path -LiteralPath $current){if((Get-Item -LiteralPath $current -Force).Attributes-band[IO.FileAttributes]::ReparsePoint){throw '[mir441-resource-output-reparse]'}}
+    $current=Split-Path -Parent $current
+  }
+  return $full
+}
+
+function Get-MIR441ResourceSnapshot {
+  param([Parameter(Mandatory)][string]$WorkRoot)
+  $memory=Get-MIR441PhysicalMemorySnapshot
+  $workDrive=[IO.DriveInfo]::new([IO.Path]::GetPathRoot([IO.Path]::GetFullPath($WorkRoot)))
+  $systemDrive=[IO.DriveInfo]::new([IO.Path]::GetPathRoot([Environment]::SystemDirectory))
+  return [pscustomobject][ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');memory=$memory;work_volume=[ordered]@{name=$workDrive.Name;free_bytes=[int64]$workDrive.AvailableFreeSpace;total_bytes=[int64]$workDrive.TotalSize};system_volume=[ordered]@{name=$systemDrive.Name;free_bytes=[int64]$systemDrive.AvailableFreeSpace;total_bytes=[int64]$systemDrive.TotalSize}}
+}
+
+function Get-MIR441ResourceLimits {
+  param([Parameter(Mandatory)]$Policy,[Parameter(Mandatory)]$Snapshot)
+  # Physical headroom retains the authored caller policy.  CommitLimit includes
+  # pagefile capacity, so its reserve instead tracks installed physical memory:
+  # a pagefile resize must not change the retained execution margin.
+  $value={param($name) $property=$Policy.PSObject.Properties[$name];if($null-ne$property){[double]$property.Value*1GB}else{[double]0}}
+  return [pscustomobject]@{
+    physical_bytes=[int64][Math]::Max([Math]::Max(2GB,[double]$Snapshot.memory.total_bytes*.2),[Math]::Max((&$value 'minimum_free_ram_gib'),(&$value 'hard_stop_free_ram_gib')))
+    commit_bytes=[int64][Math]::Max(2GB,[double]$Snapshot.memory.total_bytes*.2)
+    system_bytes=[int64][Math]::Max(20GB,[Math]::Max((&$value 'system_drive_hard_stop_free_gib'),(&$value 'system_drive_target_free_gib')))
+    work_bytes=[int64][Math]::Max(20GB,(&$value 'work_volume_reserve_gib'))
+  }
+}
+
+function Assert-MIR441ResourceAdmission {
+  param([Parameter(Mandatory)]$Policy,[Parameter(Mandatory)][string]$WorkRoot,[int64]$EstimatedPeakBytes=0,[int64]$ExpectedPeakMemoryBytes=0)
+  $null=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot
+  if($EstimatedPeakBytes-lt0-or$EstimatedPeakBytes-gt8GB-or$ExpectedPeakMemoryBytes-lt0){throw '[mir441-resource-staging-budget]'}
+  $snapshot=Get-MIR441ResourceSnapshot -WorkRoot $WorkRoot;$limits=Get-MIR441ResourceLimits -Policy $Policy -Snapshot $snapshot
+  $failure=''
+  if([int64]$snapshot.memory.free_bytes-lt$limits.physical_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-memory]'}
+  elseif([int64]$snapshot.memory.commit_limit_bytes-[int64]$snapshot.memory.committed_bytes-lt$limits.commit_bytes+$ExpectedPeakMemoryBytes){$failure='[mir441-resource-admission-commit]'}
+  elseif([int64]$snapshot.system_volume.free_bytes-lt$limits.system_bytes+2*$EstimatedPeakBytes){$failure='[mir441-resource-admission-system-disk]'}
+  elseif([int64]$snapshot.work_volume.free_bytes-lt$limits.work_bytes+2*$EstimatedPeakBytes){$failure='[mir441-resource-admission-work-disk]'}
+  if($failure){
+    # Retain the actual throwing snapshot; a later sample cannot explain a
+    # prelaunch refusal or live interruption. Admission thresholds are exact.
+    $exception=[InvalidOperationException]::new($failure)
+    $exception.Data['mir441_resource_admission']=[ordered]@{
+      snapshot=$snapshot;limits=$limits;estimated_peak_bytes=$EstimatedPeakBytes;
+      expected_peak_memory_bytes=$ExpectedPeakMemoryBytes
+    }
+    throw $exception
+  }
+  return $snapshot
+}
+
+# This is deliberately a pre-start helper.  It uses the governor's existing
+# admission decision and thresholds, but gives a transient physical-memory or
+# commit refusal a bounded opportunity to recover before an owned process has
+# been created.  A state object may be supplied to span the ordinary first
+# check and the under-lock recheck with one deadline.
+function New-MIR441PreStartAdmissionWait {
+  param(
+    [ValidateRange(0,300)][int]$AdmissionWaitSeconds=0,
+    [Parameter(Mandatory)][string]$Phase
+  )
+  $started=[DateTimeOffset]::UtcNow
+  [pscustomobject][ordered]@{
+    phase=$Phase;admission_wait_seconds=$AdmissionWaitSeconds;status='not-requested';
+    attempt_count=0;refusal_count=0;elapsed_seconds=0.0;first_refusal=$null;
+    last_refusal=$null;last_error=$null;started_at=$started.ToString('o');
+    deadline_at=$started.AddSeconds($AdmissionWaitSeconds).ToString('o');admission=$null
+  }
+}
+
+function Wait-MIR441PreStartResourceAdmission {
+  param(
+    [Parameter(Mandatory)]$Policy,
+    [Parameter(Mandatory)][string]$WorkRoot,
+    [Parameter(Mandatory)][int64]$EstimatedPeakBytes,
+    [Parameter(Mandatory)][int64]$ExpectedPeakMemoryBytes,
+    [Parameter(Mandatory)]$State
+  )
+  if([int]$State.admission_wait_seconds -eq 0){return $State}
+  $started=[DateTimeOffset]::Parse([string]$State.started_at)
+  $deadline=[DateTimeOffset]::Parse([string]$State.deadline_at)
+  while($true){
+    if([DateTimeOffset]::UtcNow -ge $deadline){
+      $State.status='capacity-timeout'
+      $State.elapsed_seconds=[Math]::Round(([DateTimeOffset]::UtcNow-$started).TotalSeconds,3)
+      $timeout=[InvalidOperationException]::new($(if([int]$State.refusal_count -gt 0){[string]$State.last_error}else{'[mir441-resource-admission-wait-timeout]'}))
+      $timeout.Data['mir_direct_startup_admission_wait']=$State
+      $timeout.Data['mir441_prestart_admission_wait']=$State
+      throw $timeout
+    }
+    $State.attempt_count=[int]$State.attempt_count+1
+    try {
+      $admission=Assert-MIR441ResourceAdmission -Policy $Policy -WorkRoot $WorkRoot -EstimatedPeakBytes $EstimatedPeakBytes -ExpectedPeakMemoryBytes $ExpectedPeakMemoryBytes
+      $State.status=if([int]$State.refusal_count -gt 0){'admitted-after-wait'}else{'admitted-without-wait'}
+      $State.elapsed_seconds=[Math]::Round(([DateTimeOffset]::UtcNow-$started).TotalSeconds,3)
+      $State.admission=$admission
+      return $State
+    } catch {
+      $message=$_.Exception.Message
+      if($message -cnotin @('[mir441-resource-admission-memory]','[mir441-resource-admission-commit]')){throw}
+      $snapshot=Get-MIR441ResourceSnapshot -WorkRoot $WorkRoot
+      $refusal=[ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');error=$message;snapshot=$snapshot}
+      if($null -eq $State.first_refusal){$State.first_refusal=$refusal}
+      $State.last_refusal=$refusal;$State.last_error=$message
+      $State.refusal_count=[int]$State.refusal_count+1
+      $State.elapsed_seconds=[Math]::Round(([DateTimeOffset]::UtcNow-$started).TotalSeconds,3)
+      if([DateTimeOffset]::UtcNow -ge $deadline){
+        $State.status='capacity-timeout'
+        $_.Exception.Data['mir_direct_startup_admission_wait']=$State
+        $_.Exception.Data['mir441_prestart_admission_wait']=$State
+        throw
+      }
+      $remaining=[Math]::Max(0.0,($deadline-[DateTimeOffset]::UtcNow).TotalSeconds)
+      # Leave a small bounded scheduling margin for the last exact governor
+      # check.  The deadline itself still rejects a late launch.
+      $sleepMilliseconds=[Math]::Max(1,[Math]::Min(500,[int][Math]::Floor($remaining*1000)-25))
+      Start-Sleep -Milliseconds $sleepMilliseconds
+    }
+  }
+}
+
+function Assert-MIR441PreStartAdmissionWaitState {
+  param([Parameter(Mandatory)]$State)
+  try {
+    $seconds=[int]$State.admission_wait_seconds
+    $phase=[string]$State.phase
+    $started=[DateTimeOffset]::Parse([string]$State.started_at)
+    $deadline=[DateTimeOffset]::Parse([string]$State.deadline_at)
+  } catch { throw '[mir441-resource-prestart-wait-state]' }
+  if($seconds -lt 1 -or $seconds -gt 300 -or [string]::IsNullOrWhiteSpace($phase) -or $deadline -ne $started.AddSeconds($seconds)){
+    throw '[mir441-resource-prestart-wait-state]'
+  }
+}
+
+function Test-MIR441RetiredDirectory {
+  param([Parameter(Mandatory)][IO.DirectoryInfo]$Directory)
+  return -not([IO.Directory]::Exists($Directory.FullName)-or[IO.File]::Exists($Directory.FullName))
+}
+
+function Get-MIR441TreeUsage {
+  param([Parameter(Mandatory)][string]$Path)
+  [int64]$bytes=0;[int64]$files=0;$complete=$true;$reparsePoints=0;$watch=[Diagnostics.Stopwatch]::StartNew()
+  if(Test-Path -LiteralPath $Path -PathType Container){
+    $pending=[Collections.Generic.Stack[IO.DirectoryInfo]]::new();$pending.Push([IO.DirectoryInfo]::new([IO.Path]::GetFullPath($Path)))
+    while($pending.Count){
+      $directory=$pending.Pop()
+      try {
+        foreach($item in $directory.EnumerateFileSystemInfos()){
+          if($item.Attributes-band[IO.FileAttributes]::ReparsePoint){$complete=$false;$reparsePoints++;continue}
+          if($item-is[IO.DirectoryInfo]){$pending.Push($item)}else{$bytes+=$item.Length;$files++}
+          if($files-ge10000-or$watch.Elapsed.TotalSeconds-ge2){return [pscustomobject][ordered]@{files=$files;bytes=$bytes;complete=$false;stopped_by=$(if($files-ge10000){'file-limit'}else{'time-limit'});elapsed_ms=$watch.Elapsed.TotalMilliseconds;reparse_points=$reparsePoints}}
+        }
+      } catch [IO.DirectoryNotFoundException] {
+        # A constructor can retire a queued directory while this live scan is
+        # running. Ignore only actual disappearance; replacements and all
+        # other I/O failures still stop the governed process.
+        if(-not(Test-MIR441RetiredDirectory -Directory $directory)){throw}
+      }
+    }
+  }
+  return [pscustomobject][ordered]@{files=$files;bytes=$bytes;complete=$complete;stopped_by=$(if($complete){$null}else{'reparse-point'});elapsed_ms=$watch.Elapsed.TotalMilliseconds;reparse_points=$reparsePoints}
+}
+
+function Get-MIR441OwnedProcessTree {
+  param([Parameter(Mandatory)][Diagnostics.Process]$Process,[Parameter(Mandatory)][datetime]$StartedUtc)
+  # Query only direct children of processes we have already established as
+  # owned.  A full Win32_Process snapshot retained every machine process on
+  # each watchdog sample even when the governed process had no children.
+  $ids=[Collections.Generic.HashSet[int]]::new();$owned=[Collections.Generic.List[int]]::new();$pending=[Collections.Generic.Queue[int]]::new();$createdUtcById=[Collections.Generic.Dictionary[int,datetime]]::new()
+  $rootId=[int]$Process.Id;[void]$ids.Add($rootId);$owned.Add($rootId);$pending.Enqueue($rootId)
+  while($pending.Count){
+    $parentId=$pending.Dequeue()
+    foreach($row in @(Get-CimInstance -ClassName Win32_Process -Filter ("ParentProcessId=$parentId") -ErrorAction Stop)){
+      $childId=[int]$row.ProcessId
+      $createdUtc=$null
+      if($row.CreationDate){$createdUtc=$row.CreationDate.ToUniversalTime()}
+      if($null-ne$createdUtc-and$createdUtc-ge$StartedUtc-and$ids.Add($childId)){
+        [void]$createdUtcById.Add($childId,$createdUtc);$owned.Add($childId);$pending.Enqueue($childId)
+      }
+    }
+  }
+  [int64]$working=0;[int64]$private=0;$children=@()
+  foreach($id in $owned){
+    $p=$null
+    try{
+      $p=Get-Process -Id $id -ErrorAction Stop
+      if($id-ne$rootId){
+        if($p.HasExited){continue}
+        $childStarted=$p.StartTime
+        if($null-eq$childStarted){
+          if($p.HasExited){continue}
+          throw '[mir441-owned-child-identity]'
+        }
+        $childStartedUtc=$childStarted.ToUniversalTime();$capturedStartedUtc=$createdUtcById[$id]
+        # Win32_Process CreationDate is microsecond precision.  Bind only at
+        # that common precision, while retaining the complete process value.
+        [int64]$childTicks=$childStartedUtc.Ticks;[int64]$capturedTicks=$capturedStartedUtc.Ticks
+        if(($childTicks-($childTicks%10))-ne($capturedTicks-($capturedTicks%10))){throw '[mir441-owned-child-identity]'}
+      }
+      $working+=$p.WorkingSet64;$private+=$p.PrivateMemorySize64
+      if($id-ne$rootId){$children+=[pscustomobject]@{id=$p.Id;started_utc=$childStartedUtc}}
+    }catch [Microsoft.PowerShell.Commands.ProcessCommandException]{}catch [InvalidOperationException]{
+      if($null-ne$p-and$p.HasExited){continue}
+      throw
+    }finally{if($null-ne$p){$p.Dispose()}}
+  }
+  return [pscustomobject]@{working_set_bytes=$working;private_bytes=$private;children=$children}
+}
+
+function Stop-MIR441OwnedProcess {
+  param([Diagnostics.Process]$Process,[object[]]$Children=@())
+  if($null-ne$Process-and-not$Process.HasExited){[void]$Process.CloseMainWindow();if(-not$Process.WaitForExit(200)){$Process.Kill($true);[void]$Process.WaitForExit(3000)}}
+  foreach($child in $Children){
+    $p=$null
+    try{
+      $p=Get-Process -Id $child.id -ErrorAction Stop
+      if($p.HasExited){continue}
+      $childStarted=$p.StartTime
+      if($null-eq$childStarted){
+        if($p.HasExited){continue}
+        throw '[mir441-owned-child-identity]'
+      }
+      if($childStarted.ToUniversalTime()-eq$child.started_utc){$p.Kill($true);[void]$p.WaitForExit(3000)}
+    }catch [Microsoft.PowerShell.Commands.ProcessCommandException]{}catch [InvalidOperationException]{
+      if($null-ne$p-and$p.HasExited){continue}
+      throw
+    }finally{if($null-ne$p){$p.Dispose()}}
+  }
+}
+
+function Invoke-MIR441OwnedProcessObservation {
+  param(
+    [scriptblock]$Callback,
+    [Parameter(Mandatory)][Diagnostics.Process]$Process,
+    [Parameter(Mandatory)][datetime]$StartedUtc,
+    [Parameter(Mandatory)][Diagnostics.Stopwatch]$Timer,
+    [switch]$NaturalExit
+  )
+  if ($null -eq $Callback) { return }
+  $event = [pscustomobject][ordered]@{
+    process = $Process
+    pid = [int]$Process.Id
+    started_utc = $StartedUtc.ToString('o')
+    elapsed_monotonic_milliseconds = [Math]::Round([double]$Timer.Elapsed.TotalMilliseconds, 3)
+    natural_exit = [bool]$NaturalExit
+  }
+  $output = @(& $Callback $event)
+  if ($output.Count -ne 0) { throw '[mir441-resource-observation-callback-output]' }
+}
+
+function Invoke-MIR441MonitoredProcess {
+  param(
+    [Parameter(Mandatory)][string]$FilePath,[Parameter(Mandatory)][string[]]$Arguments,
+    [Parameter(Mandatory)][string]$WorkRoot,[Parameter(Mandatory)][string]$LedgerPath,[Parameter(Mandatory)]$Policy,
+    [int64]$EstimatedPeakBytes=0,[int64]$ExpectedPeakMemoryBytes=0,
+    [ValidateRange(1,5)][int]$SampleSeconds=1,[ValidateRange(1,86400)][int]$TimeoutSeconds=900,
+    [ValidateSet(0,250)][int]$SampleMilliseconds=0,
+    [scriptblock]$OwnedProcessSampleCallback=$null,
+    [scriptblock]$OwnedProcessExitCallback=$null,
+    [string]$StdoutPath='',[string]$StderrPath='',[switch]$AllowNonZeroExit,
+    [switch]$FactorioSteamIdentity,
+    $PreStartAdmissionWait=$null,
+    [scriptblock]$CompletionPredicate=$null
+  )
+  if ($SampleMilliseconds -eq 250 -and $null -eq $OwnedProcessSampleCallback) { throw '[mir441-resource-observation-callback-required]' }
+  if ($SampleMilliseconds -eq 0 -and $null -ne $OwnedProcessSampleCallback) { throw '[mir441-resource-observation-cadence-required]' }
+  if ($null -ne $OwnedProcessExitCallback -and $null -eq $OwnedProcessSampleCallback) { throw '[mir441-resource-observation-exit-callback-requires-sample]' }
+  # Benchmark observations close on natural exit; live marker endpoints keep
+  # the existing completion-predicate path without observation callbacks.
+  if ($null -ne $CompletionPredicate -and $null -ne $OwnedProcessSampleCallback) { throw '[mir441-resource-observation-completion-predicate]' }
+  $work=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot;$ledger=Resolve-MIR441RecoveryScratchPath -Path $LedgerPath
+  foreach($path in @($ledger,$StdoutPath,$StderrPath)|Where-Object {$_}){
+    $resolved=Resolve-MIR441RecoveryScratchPath -Path $path
+    if(-not$resolved.StartsWith($work.TrimEnd('\','/')+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){throw '[mir441-resource-output-work-root]'}
+  }
+  if($EstimatedPeakBytes-le0-or$ExpectedPeakMemoryBytes-le0){throw '[mir441-resource-peak-budget-required]'}
+  if($null -ne $PreStartAdmissionWait){Assert-MIR441PreStartAdmissionWaitState -State $PreStartAdmissionWait}
+  if($null -ne $PreStartAdmissionWait){
+    $admission=(Wait-MIR441PreStartResourceAdmission -Policy $Policy -WorkRoot $work -EstimatedPeakBytes $EstimatedPeakBytes -ExpectedPeakMemoryBytes $ExpectedPeakMemoryBytes -State $PreStartAdmissionWait).admission
+  }else{
+    $admission=Assert-MIR441ResourceAdmission -Policy $Policy -WorkRoot $work -EstimatedPeakBytes $EstimatedPeakBytes -ExpectedPeakMemoryBytes $ExpectedPeakMemoryBytes
+  }
+  $before=Get-MIR441TreeUsage -Path $work;if(-not$before.complete){throw ('[mir441-resource-output-scan-incomplete] '+($before|ConvertTo-Json -Compress))}
+  $lockPath=Join-Path ([IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..'))) 'build/tmp/mir-heavy.lock'
+  $null=Resolve-MIR441RecoveryScratchPath -Path $lockPath
+  New-Item -ItemType Directory -Force -Path (Split-Path -Parent $lockPath)|Out-Null
+  try{$lock=[IO.File]::Open($lockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{throw '[mir441-resource-heavy-job-active]'}
+  $process=$null;$streams=@();$copies=@();$children=@();$temp=Join-Path $work ('temp-'+[guid]::NewGuid().ToString('N'));$peak=0L;$privatePeak=0L;$started=$null;$timer=$null;$timedOut=$false;$completionObserved=$false
+  try{
+    # Check again under the lock, before any job output or worker is allocated.
+    if($null -ne $PreStartAdmissionWait){
+      $admission=(Wait-MIR441PreStartResourceAdmission -Policy $Policy -WorkRoot $work -EstimatedPeakBytes $EstimatedPeakBytes -ExpectedPeakMemoryBytes $ExpectedPeakMemoryBytes -State $PreStartAdmissionWait).admission
+    }else{
+      $null=Assert-MIR441ResourceAdmission -Policy $Policy -WorkRoot $work -EstimatedPeakBytes $EstimatedPeakBytes -ExpectedPeakMemoryBytes $ExpectedPeakMemoryBytes
+    }
+    New-Item -ItemType Directory -Force -Path $temp|Out-Null
+    $start=[Diagnostics.ProcessStartInfo]::new();$start.FileName=$FilePath;$start.UseShellExecute=$false;$start.CreateNoWindow=$true;$start.WorkingDirectory=$work
+    $start.Environment['TEMP']=$temp;$start.Environment['TMP']=$temp
+    # Factorio only needs these fixed Steam identifiers in its owned child.
+    # Keep this narrow option separate from the governor's custody variables:
+    # callers cannot supply arbitrary child environment keys or replace TEMP/TMP.
+    if($FactorioSteamIdentity){$start.Environment['SteamAppId']='427520';$start.Environment['SteamGameId']='427520'}
+    foreach($argument in $Arguments){[void]$start.ArgumentList.Add($argument)}
+    $start.RedirectStandardOutput=[bool]$StdoutPath;$start.RedirectStandardError=[bool]$StderrPath
+    $process=[Diagnostics.Process]::new();$process.StartInfo=$start
+    if(-not$process.Start()){throw '[mir441-process-start]'}
+    $started=$process.StartTime.ToUniversalTime();$timer=[Diagnostics.Stopwatch]::StartNew()
+    # Streaming capture avoids retaining the complete child output in RAM.
+    foreach($pair in @(@($StdoutPath,'StandardOutput'),@($StderrPath,'StandardError'))){if($pair[0]){$stream=[IO.File]::Create($pair[0]);$streams+=$stream;$copies+=$process.($pair[1]).BaseStream.CopyToAsync($stream)}}
+    while($true){
+      $tree=Get-MIR441OwnedProcessTree -Process $process -StartedUtc $started;$children=@($children+$tree.children|Sort-Object id,started_utc -Unique);$peak=[Math]::Max($peak,[int64]$tree.working_set_bytes)
+      $privatePeak=[Math]::Max($privatePeak,[int64]$tree.private_bytes)
+      # A reaction margin cancels before the retained reserve, subject to sampling latency.
+      $sample=Assert-MIR441ResourceAdmission -Policy $Policy -WorkRoot $work -EstimatedPeakBytes 32MB -ExpectedPeakMemoryBytes 64MB
+      # Preserve the triggering process observation before enforcing its budget.
+      # Private bytes can exceed working set during graphical resource loading.
+      $sample|Add-Member -NotePropertyName process -NotePropertyValue ([ordered]@{id=$process.Id;working_set_bytes=$tree.working_set_bytes;private_bytes=$tree.private_bytes;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;expected_peak_memory_bytes=$ExpectedPeakMemoryBytes;phase='running';memory_enforcement='sampled-watchdog-not-hard-cap'})
+      Write-MIR441Json -Value $sample -Path $ledger -Append
+      if($tree.working_set_bytes-gt$ExpectedPeakMemoryBytes-or$tree.private_bytes-gt$ExpectedPeakMemoryBytes){throw '[mir441-resource-process-budget]'}
+      $usage=Get-MIR441TreeUsage -Path $work;if(-not$usage.complete){throw ('[mir441-resource-output-scan-incomplete] '+($usage|ConvertTo-Json -Compress))}
+      if($usage.bytes-$before.bytes-gt$EstimatedPeakBytes){throw '[mir441-resource-output-budget]'}
+      if($process.HasExited){
+        Invoke-MIR441OwnedProcessObservation -Callback $OwnedProcessExitCallback -Process $process -StartedUtc $started -Timer $timer -NaturalExit
+        break
+      }
+      if($timer.Elapsed.TotalSeconds-ge$TimeoutSeconds){$timedOut=$true;throw '[mir441-process-timeout]'}
+      if($null-ne$CompletionPredicate){
+        $decision=@(& $CompletionPredicate)
+        if($decision.Count-ne1-or$decision[0]-isnot[bool]){throw '[mir441-process-completion-predicate-invalid]'}
+        if($decision[0]){$completionObserved=$true;break}
+      }
+      Invoke-MIR441OwnedProcessObservation -Callback $OwnedProcessSampleCallback -Process $process -StartedUtc $started -Timer $timer
+      $waitMilliseconds=if($SampleMilliseconds -eq 250){250}else{$SampleSeconds*1000}
+      [void]$process.WaitForExit($waitMilliseconds)
+    }
+    Stop-MIR441OwnedProcess -Process $process -Children $children
+    foreach($copy in $copies){$null=$copy.GetAwaiter().GetResult()}
+    $process.Refresh();$peak=[Math]::Max($peak,[int64]$process.PeakWorkingSet64)
+    if($process.ExitCode-ne0-and-not$AllowNonZeroExit-and-not$completionObserved){throw "[mir441-process-exit] $($process.ExitCode)"}
+    $passed=$completionObserved-or$process.ExitCode-eq0
+    Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='completed';exit_code=$process.ExitCode;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;completion_predicate_observed=$completionObserved}) -Path $ledger -Append
+    # Native process timestamps keep watchdog sampling overhead out of engine timing.
+    $completed=[pscustomobject][ordered]@{status=$(if($passed){'passed'}else{'failed'});exit_code=$process.ExitCode;timed_out=$false;passed=$passed;completion_predicate_observed=$completionObserved;duration_seconds=[Math]::Round(($process.ExitTime-$process.StartTime).TotalSeconds,6);peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;admission=$admission}
+    if($null -ne $PreStartAdmissionWait){$completed|Add-Member -NotePropertyName admission_wait -NotePropertyValue $PreStartAdmissionWait}
+    return $completed
+  }catch{
+    $failure=$_
+    if($null-ne$process){try{$tree=Get-MIR441OwnedProcessTree -Process $process -StartedUtc $started;$children=@($children+$tree.children)}catch{}}
+    Stop-MIR441OwnedProcess -Process $process -Children $children
+    Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='interrupted';timed_out=$timedOut;error=$failure.Exception.Message;resource_admission=$failure.Exception.Data['mir441_resource_admission'];peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak}) -Path $ledger -Append
+    throw $failure
+  }finally{
+    try{Stop-MIR441OwnedProcess -Process $process -Children $children}finally{
+      try{
+        foreach($copy in $copies){try{$null=$copy.Wait(3000)}catch{}}
+        foreach($stream in $streams){$stream.Dispose()};if($null-ne$process){$process.Dispose()}
+        if(Test-Path -LiteralPath $temp){$null=Resolve-MIR441RecoveryScratchPath -Path $temp;Remove-Item -LiteralPath $temp -Recurse -Force}
+      }finally{$lock.Dispose()}
+    }
+  }
+}

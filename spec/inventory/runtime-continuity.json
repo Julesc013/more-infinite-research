@@ -1,0 +1,293 @@
+{
+  "format": 1,
+  "kind": "mir5-source-recovered-runtime-continuity",
+  "status": "source-recovered-not-native-qualified",
+  "scope": {
+    "subjects": [
+      "K2 Imersite 4.6.21000 to 4.7.21000 staged-continuation migration",
+      "native worker robot speed absolute-cap ownership"
+    ],
+    "target": "F210",
+    "not_a_claim": "This record does not establish an MIR5 implementation, a native run result, or save-upgrade acceptance."
+  },
+  "published_baseline": {
+    "release_tag": "v4.7.0",
+    "source_commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+    "archive": "dist/4.7.0/more-infinite-research_4.7.21000.zip",
+    "archive_sha256": "708a529f1f6d649e0a732216cd8d8fefe68f2c6c2df2b40da030c2c4c51558d1",
+    "archive_root": "more-infinite-research_4.7.21000",
+    "package_dependency": "base >= 2.1.23"
+  },
+  "published_byte_verification": {
+    "method": "SHA-256 of each archive entry equals SHA-256 of git cat-file blob v4.7.0:<source path>; no extraction or engine execution.",
+    "verified_entries": [
+      {
+        "source": "source/prototypes/mir/domain/research/k2_imersite_staged_state.lua",
+        "archive_entry": "prototypes/mir/domain/research/k2_imersite_staged_state.lua",
+        "sha256": "6354a5fe226fe4f1f4939079c01aa39c44ffdcee2cf3ed5eb0e75cb2f35f5cfc"
+      },
+      {
+        "source": "source/prototypes/mir/planner/stream_compiler/k2_imersite_migration_alias.lua",
+        "archive_entry": "prototypes/mir/planner/stream_compiler/k2_imersite_migration_alias.lua",
+        "sha256": "a7464826c29b4e9f84ff3d5eea75a5358f71852179352c85ab24c79f2f782b37"
+      },
+      {
+        "source": "source/prototypes/mir/runtime/k2_imersite_staged_state_migration.lua",
+        "archive_entry": "prototypes/mir/runtime/k2_imersite_staged_state_migration.lua",
+        "sha256": "9fd7a9d218bb7bd1f7722781ac3b3b11725994faefff77d81a716ef3e9a144b4"
+      },
+      {
+        "source": "source/prototypes/mir/domain/technology/maximum_level_binding.lua",
+        "archive_entry": "prototypes/mir/domain/technology/maximum_level_binding.lua",
+        "sha256": "d708964579efe63102c3b2ecbe2e1726def7880ad8b2027af73e1255918b3d71"
+      },
+      {
+        "source": "source/prototypes/mir/runtime/maximum_level_control.lua",
+        "archive_entry": "prototypes/mir/runtime/maximum_level_control.lua",
+        "sha256": "d786e6d522b87b9102f2d774d7b0caa825b54ddf18753c4cc776cd6db1789fce"
+      },
+      {
+        "source": "source/prototypes/streams/productivity.lua",
+        "archive_entry": "prototypes/streams/productivity.lua",
+        "sha256": "ea66b64c03943a99b877847fd6e3903a099c83ab0333a441a29957c1c2142853"
+      },
+      {
+        "source": "source/prototypes/mir/families/material_progression.lua",
+        "archive_entry": "prototypes/mir/families/material_progression.lua",
+        "sha256": "7d2a756053e074badc62ea5b5017fd2b307cd53a29782e43c47d3eecaea245ad"
+      }
+    ]
+  },
+  "k2_imersite": {
+    "activation_boundary": {
+      "factorio_line": "2.1",
+      "required_features": ["scripted_techs", "productivity_family_adoption"],
+      "required_recipe": "kr-imersite-powder",
+      "stream_key": "research_material_imersite",
+      "predecessor_version": "4.6.21000",
+      "policy": "exact-current-K2/K2SO tuple; MIR owns powder only"
+    },
+    "public_technologies": {
+      "early": {
+        "id": "recipe-prod-research_material_imersite-1",
+        "first_level": 1,
+        "maximum_level": 3,
+        "effect": {
+          "type": "change-recipe-productivity",
+          "recipe": "kr-imersite-powder",
+          "change": 0.02
+        }
+      },
+      "continuation": {
+        "id": "recipe-prod-research_material_imersite-4",
+        "first_level": 4,
+        "maximum_level": "infinite",
+        "required_prerequisite": "recipe-prod-research_material_imersite-1",
+        "effect": {
+          "type": "change-recipe-productivity",
+          "recipe": "kr-imersite-powder",
+          "change": 0.02
+        }
+      },
+      "configured_unit_contract": "The visible stream and each state holder use the same configured cost, formula/time and science-unit authority; do not substitute a fixed default. The continuation fallback anchors at level 4 from the early model's evaluated next-level cost.",
+      "native_crystal_owner": {
+        "id": "kr-imersite-productivity",
+        "effect": {
+          "type": "change-recipe-productivity",
+          "recipe": "kr-imersite-crystal",
+          "change": 0.1
+        },
+        "must_remain_separate": true,
+        "prohibited_on_mir_early_and_continuation": "change-recipe-productivity for kr-imersite-crystal"
+      }
+    },
+    "migration_carriers": [
+      {
+        "id": "mir-k2-imersite-staged-state-1",
+        "stream_key": "__migration_state/k2_imersite_staged_v1",
+        "manifest_id": "mir-k2-imersite-staged-state-1",
+        "source_technology": "recipe-prod-research_material_imersite-1",
+        "initial_level": 1
+      },
+      {
+        "id": "mir-k2-imersite-continuation-state-4",
+        "stream_key": "__migration_state/k2_imersite_continuation_v1",
+        "manifest_id": "mir-k2-imersite-continuation-state-4",
+        "source_technology": "recipe-prod-research_material_imersite-4",
+        "initial_level": 4
+      }
+    ],
+    "carrier_contract": {
+      "stage_kind": "migration-state-alias",
+      "migration_policy": "retain-hidden-alias",
+      "emitted_prototype": {
+        "hidden": true,
+        "enabled": true,
+        "upgrade": false,
+        "maximum_level": "infinite",
+        "order": "zz[mir-migration-state]",
+        "effects": [{"type": "change-recipe-productivity", "recipe": "kr-imersite-powder", "change": 0.02}]
+      },
+      "post_reconciliation": "A fresh/default or consumed carrier is disabled, invisible, unresearched, unqueued and reset to its own initial level with zero saved progress. A carrier is never a player research path.",
+      "shape_guard": "A holder is admitted only if hidden, carries exactly the powder effect, has a positive research unit with a count or formula and nonempty unique positive ingredients. Planned unit fields must match the visible configured unit before emission."
+    },
+    "state_transfer": {
+      "saved_fields": ["level", "researched", "saved_progress", "research_queue", "current_research", "research_progress"],
+      "completed_level_mapping": [
+        {
+          "source_infinite_next_level": 1,
+          "source_completed_levels": 0,
+          "early_destination": {"level": 1, "researched": false},
+          "continuation_destination": {"level": 4, "researched": false},
+          "active_queue_target": "recipe-prod-research_material_imersite-1"
+        },
+        {
+          "source_infinite_next_level": 3,
+          "source_completed_levels": 2,
+          "early_destination": {"level": 3, "researched": false},
+          "continuation_destination": {"level": 4, "researched": false},
+          "active_queue_target": "recipe-prod-research_material_imersite-1"
+        },
+        {
+          "source_infinite_next_level": 4,
+          "source_completed_levels": 3,
+          "early_destination": {"level": 3, "researched": true},
+          "continuation_destination": {"level": 4, "researched": false},
+          "active_queue_target": "recipe-prod-research_material_imersite-4"
+        },
+        {
+          "source_infinite_next_level": 8,
+          "source_completed_levels": 7,
+          "early_destination": {"level": 3, "researched": true},
+          "continuation_destination": {"level": 8, "researched": false},
+          "active_queue_target": "recipe-prod-research_material_imersite-4"
+        }
+      ],
+      "earned_effect_invariant": "Each completed MIR powder level remains 0.02: three early levels plus the first continuation level yield 0.08; the native crystal bonus remains independently 0.10.",
+      "queue_and_progress": "Map only carrier queue/current identities to the matching public technology, preserve mapped fractional progress after readback, and roll back every state mutation if queue/current/progress readback fails.",
+      "missing_or_invalid_destination": "Remove only carrier queue entries and retain hidden disabled holders plus the record; do not manufacture an unsafe public research path. If the player later changes the remaining queue, restore owned earned state but never replay the old queue.",
+      "finite_only_destination": "If the finite early stage is valid but continuation is unavailable, retain any later tail in the hidden continuation holder, disabled and unqueued, until a valid continuation can consume it."
+    },
+    "fixture_contract": {
+      "upgrade_fixture": "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000",
+      "documented_profile": {
+        "source_mir": "4.6.21000",
+        "target_mir": "4.7.21000",
+        "engine": "2.1.22",
+        "Krastorio2": "2.1.4",
+        "Krastorio2-spaced-out": "2.0.19",
+        "seeded_completed_levels": [0, 2, 3, 7],
+        "fractional_progress": 0.42
+      },
+      "current_package_profile_definition": "fixtures/run-profiles/k2-214-imersite-f210-470-2123.json (Factorio 2.1.23, MIR 4.7.21000, K2 2.1.4, K2SO 2.0.19)"
+    }
+  },
+  "worker_robot_speed_absolute_cap": {
+    "setting": {
+      "id": "mir-max-level-worker-robots-speed",
+      "type": "int-setting",
+      "setting_type": "startup",
+      "default_value": 0,
+      "minimum_value": 0,
+      "maximum_value": 2147483647,
+      "zero_sentinel": "unlimited"
+    },
+    "native_owner_admission": {
+      "accepted_tail_candidates_in_priority_order": [
+        {"technology_id": "worker-robots-speed-7", "immediate_predecessor": "worker-robots-speed-6"},
+        {"technology_id": "worker-robots-speed-6", "immediate_predecessor": "worker-robots-speed-5"}
+      ],
+      "required_shape": {
+        "maximum_level": "infinite",
+        "sole_effect": {"type": "worker-robot-speed", "modifier": 0.65}
+      },
+      "rejection": "No finite cap binding is created when no exact candidate satisfies every check, including a candidate with an extra effect."
+    },
+    "finite_cap_contract": {
+      "semantics": "absolute-highest-technology-level",
+      "policy_scope": "exact-native-owner",
+      "prototype_maximum": "infinite",
+      "runtime_strategy": "absolute-cap-controller",
+      "queue_strategy": "remove only current or queued levels above the cap; retain valid fractional progress",
+      "completed_bonuses": "retain completed levels and worker-speed bonuses",
+      "presentation": "make a disabled above-cap technology visible while disabled; restore owned visibility on relaxation"
+    },
+    "per_force_ownership_state": {
+      "buckets": ["disabled_by_cap", "visibility_by_cap", "unowned_disabled_by_cap"],
+      "disable_record": "MIR records an enablement restoration right only after it changes enabled=true to enabled=false, with policy version, exact force index, ownership key/kind, binding fingerprint and enabled_before_cap=true.",
+      "relaxation": "MIR re-enables only when the recorded disable belongs to the same force and policy and enabled_before_cap=true. It separately restores only MIR-owned visibility.",
+      "foreign_disabled_case": "If technology.enabled was already false, cap enforcement may own the temporary visibility change but does not create a disable ownership record; removing the cap leaves enabled=false and restores the prior visibility.",
+      "v2_migration_exception": "Only the exact recognized V2 visibility-without-disable shape is retained once as unowned-disable continuity. It is never general MIR enablement ownership.",
+      "force_lifecycle": "Force reset clears that force's records before reconciliation; a force merge clears the removed source index so a reused index cannot inherit disablement ownership."
+    },
+    "fixture_contract": {
+      "host_control": "tests/runtime/worker_robot_speed_cap.lua",
+      "positive_case": "cap 10, technology level 10: remove the second queued level-11 occurrence while keeping technology enabled and worker_robots_speed_modifier unchanged; at level 11 disable it without changing earned bonuses.",
+      "owned_relaxation": "cap 0 restores enabled=true and visible_when_disabled=false only after MIR's own level-11 disable record.",
+      "foreign_relaxation": "cap 0 leaves a pre-disabled level-11 native technology disabled and restores its original visibility.",
+      "malformed_tail": "an extra native effect produces no managed binding and no queue/enablement mutation."
+    }
+  },
+  "source_references": [
+    {
+      "path": "source/prototypes/mir/domain/research/k2_imersite_staged_state.lua",
+      "lines": [9, 35, 66, 93],
+      "purpose": "K2 identities, carrier shape and planned-unit equality guard"
+    },
+    {
+      "path": "source/prototypes/mir/planner/stream_compiler/k2_imersite_migration_alias.lua",
+      "lines": [73, 146, 195],
+      "purpose": "configured units, hidden carrier fields and F210/K2 emission gate"
+    },
+    {
+      "path": "source/prototypes/mir/runtime/k2_imersite_staged_state_migration.lua",
+      "lines": [24, 196, 361, 393, 657],
+      "purpose": "state mapping, staged restoration, held-tail behavior and lifecycle reconciliation"
+    },
+    {
+      "path": "source/prototypes/streams/productivity.lua",
+      "lines": [1121, 1131],
+      "purpose": "MIR powder ownership, retained crystal anchor and exact K2 continuation attachment"
+    },
+    {
+      "path": "source/prototypes/mir/families/material_progression.lua",
+      "lines": [11, 42, 45],
+      "purpose": "three-level early stage, level-four continuation and no native-owner admission authority"
+    },
+    {
+      "path": "source/prototypes/mir/domain/technology/maximum_level_binding.lua",
+      "lines": [14, 46, 107, 126, 258],
+      "purpose": "native worker-speed admission, zero sentinel, cap strategy and carrier exclusion"
+    },
+    {
+      "path": "source/prototypes/mir/runtime/maximum_level_control.lua",
+      "lines": [656, 692, 705, 772, 808, 827],
+      "purpose": "per-force cap state, owned-disable proof, V2 continuity, queue filtering and restoration"
+    },
+    {
+      "path": "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/control.lua",
+      "lines": [197, 405, 492],
+      "purpose": "independent upgrade fixture expectations for definitions, 0/2/3/7 progress mapping and reload"
+    },
+    {
+      "path": "tests/runtime/worker_robot_speed_cap.lua",
+      "lines": [42, 73, 89, 104],
+      "purpose": "host control for exact-tail admission and owned-versus-foreign enablement behavior"
+    }
+  ],
+  "native_evidence": {
+    "status": "missing-current-MIR5-native-verdict",
+    "available_inputs": [
+      "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000",
+      "fixtures/run-profiles/k2-214-imersite-f210-470-2123.json",
+      "tests/runtime/worker_robot_speed_cap.lua"
+    ],
+    "not_established_by_this_record": [
+      "Factorio data-final-fixes prototype readback",
+      "4.6.21000 save upgrade through a MIR5 build and a cold reload",
+      "K2 powder/crystal production and force bonus observation",
+      "worker-speed cap lifecycle on the exact MIR5 package"
+    ],
+    "required_future_proof": "Run the named exact-profile K2 upgrade fixture against the candidate package with a predecessor save and cold reload, then run native worker-speed owned/foreign disable and cap-relaxation cases per force. Preserve the final-prototype and save-state readbacks with their exact package, engine, settings and mod hashes."
+  }
+}

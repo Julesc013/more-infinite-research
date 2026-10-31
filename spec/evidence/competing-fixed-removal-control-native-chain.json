@@ -1,0 +1,308 @@
+{
+  "schema": 1,
+  "kind": "MIR5FixedProviderRemovalControlNativeChainV1",
+  "run": {
+    "id": 40041159042,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40041159042",
+    "source": "fb37b7c0ad57cbbec5c254f39ef38548ed7645e7",
+    "source_dirty": false,
+    "manifest_members_verified": 137,
+    "manifest_sha256": "A91FBB001616B7700D759D17C7DB9B9DFF512A1CEA84FA9500C1EF03BDF8C4F1",
+    "custody": "build/mir5/black-glass/incoming/40041159042/black-glass-fixed-provider-removal-control-40041159042-1"
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "file_version": "2.0.77.84539",
+    "product_version": "2.0.77",
+    "base_version": "2.0.77"
+  },
+  "players": {
+    "published_4_7_20002": {
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip",
+      "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
+    },
+    "mir5_0_20000": {
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+      "sha256": "69768BCF6B5439556C37AD4EC02EADBFC80465FD7445FADB2165EF60BBBEB440"
+    }
+  },
+  "scenario": {
+    "case": "f200-fixed-provider-removal-control",
+    "engine_target": "F2002.0.77 Space Age",
+    "providers": [
+      "plates-n-circuit-productivity@0.0.2",
+      "Science_packs_productivity@0.0.1",
+      "bioflux-productivity@0.1.0",
+      "fish-productivity@1.0.0"
+    ],
+    "stages": [
+      {
+        "stage": "published",
+        "status": "passed-private-native-fixture",
+        "input_save_byte_identical": null,
+        "two_cold_reloads": [
+          {
+            "ordinal": 1,
+            "save_sha256": "C01268FB1020D2A1FF2FCFAA347EF377760E9A5C1E255751C8CEDFA58B80B090",
+            "save_byte_identical": true
+          },
+          {
+            "ordinal": 2,
+            "save_sha256": "C01268FB1020D2A1FF2FCFAA347EF377760E9A5C1E255751C8CEDFA58B80B090",
+            "save_byte_identical": true
+          }
+        ],
+        "initial_witnesses": {
+          "source_actual_provider_labs": 2,
+          "mir_actual_labs": 0,
+          "phase": "source-completed",
+          "native_current": "braking-force-1",
+          "native_current_progress": 0.27,
+          "native_tail_saved": 0.42000000000000004,
+          "mir_bioflux_next": false,
+          "mir_breeding_next": 1,
+          "credit_positive_next": false,
+          "credit_negative_next": false,
+          "bioflux_bonus": 0.10000000149011612,
+          "fish_bonus": 0.10000000149011612,
+          "biter_bonus": 0,
+          "pentapod_bonus": 0,
+          "foreign_mir_bioflux_disabled": false,
+          "on_load_read_only": false
+        },
+        "receipt": {
+          "gzip": "spec/mir5/evidence/competing-fixed-removal-control-40041159042-published-native.json.gz",
+          "gzip_sha256": "A85A619A5F3B9C14C06795A8F7ADB75FEFDD26102D4D965196ECEE1304419110",
+          "uncompressed_sha256": "E2B925466332CFBA8B0C665D21E92E774A37F40EDA7BBDFE7CDABA29AB9343B2",
+          "uncompressed_bytes": 49159,
+          "artifact_path": "gameplay/published/result.json"
+        }
+      },
+      {
+        "stage": "mir5-prefer-mir",
+        "status": "passed-private-native-fixture",
+        "input_save_byte_identical": true,
+        "two_cold_reloads": [
+          {
+            "ordinal": 1,
+            "save_sha256": "6429AE9272A992758A77FD9F80BB9104BD39097F71141055A324DFEC211B0F38",
+            "save_byte_identical": true
+          },
+          {
+            "ordinal": 2,
+            "save_sha256": "6429AE9272A992758A77FD9F80BB9104BD39097F71141055A324DFEC211B0F38",
+            "save_byte_identical": true
+          }
+        ],
+        "initial_witnesses": {
+          "source_actual_provider_labs": 2,
+          "mir_actual_labs": 2,
+          "phase": "true-completed",
+          "native_current": "braking-force-1",
+          "native_current_progress": 0.27,
+          "native_tail_saved": 0.42000000000000004,
+          "mir_bioflux_next": 2,
+          "mir_breeding_next": 2,
+          "credit_positive_next": 1,
+          "credit_negative_next": 1,
+          "bioflux_bonus": 0.20000000298023224,
+          "fish_bonus": 0.20000000298023224,
+          "biter_bonus": 0.10000000149011612,
+          "pentapod_bonus": 0.10000000149011612,
+          "foreign_mir_bioflux_disabled": true,
+          "on_load_read_only": false
+        },
+        "receipt": {
+          "gzip": "spec/mir5/evidence/competing-fixed-removal-control-40041159042-mir5-prefer-mir-native.json.gz",
+          "gzip_sha256": "271547C2E66574AB6515A79D74DB8B89F2E5B00F77958EED20510CC662A4E69C",
+          "uncompressed_sha256": "D4FD426CA00DF5E08070C4DD2FFF66CDD434C00684E7771F7E3374174E89B13A",
+          "uncompressed_bytes": 40615,
+          "artifact_path": "gameplay/mir5-prefer-mir/result.json"
+        }
+      },
+      {
+        "stage": "mir5-prefer-foreign",
+        "status": "passed-private-native-fixture",
+        "input_save_byte_identical": true,
+        "two_cold_reloads": [
+          {
+            "ordinal": 1,
+            "save_sha256": "2CBE1CEEA5DB10C7D05902A37A63DD2D47FD06AFB3FB4314F576D71262B63EE3",
+            "save_byte_identical": true
+          },
+          {
+            "ordinal": 2,
+            "save_sha256": "2CBE1CEEA5DB10C7D05902A37A63DD2D47FD06AFB3FB4314F576D71262B63EE3",
+            "save_byte_identical": true
+          }
+        ],
+        "initial_witnesses": {
+          "source_actual_provider_labs": 2,
+          "mir_actual_labs": 3,
+          "phase": "false-completed",
+          "native_current": "braking-force-1",
+          "native_current_progress": 0.27,
+          "native_tail_saved": 0.42000000000000004,
+          "mir_bioflux_next": 2,
+          "mir_breeding_next": 3,
+          "credit_positive_next": 2,
+          "credit_negative_next": 1,
+          "bioflux_bonus": 0.20000000298023224,
+          "fish_bonus": 0.20000000298023224,
+          "biter_bonus": 0.20000000298023224,
+          "pentapod_bonus": 0.20000000298023224,
+          "foreign_mir_bioflux_disabled": true,
+          "on_load_read_only": false
+        },
+        "receipt": {
+          "gzip": "spec/mir5/evidence/competing-fixed-removal-control-40041159042-mir5-prefer-foreign-native.json.gz",
+          "gzip_sha256": "465EBAE94DB243712CA956F003C285DEC5FF96F10BF82CB89E86C1A8E5C204C6",
+          "uncompressed_sha256": "8B9BBC52323BF5D3B2C240DA8D929DF2C72C6D4302B9E8DE38D74A74BC9AED86",
+          "uncompressed_bytes": 40727,
+          "artifact_path": "gameplay/mir5-prefer-foreign/result.json"
+        }
+      },
+      {
+        "stage": "mir5-providers-removed",
+        "status": "passed-private-native-fixture",
+        "input_save_byte_identical": true,
+        "two_cold_reloads": [
+          {
+            "ordinal": 1,
+            "save_sha256": "861DC0820452D40453B99024A676C6D76DB22216DD113F2D0E0A9A722C7F3D31",
+            "save_byte_identical": true
+          },
+          {
+            "ordinal": 2,
+            "save_sha256": "861DC0820452D40453B99024A676C6D76DB22216DD113F2D0E0A9A722C7F3D31",
+            "save_byte_identical": true
+          }
+        ],
+        "initial_witnesses": {
+          "source_actual_provider_labs": 2,
+          "mir_actual_labs": 3,
+          "phase": "removed-completed",
+          "native_current": "braking-force-1",
+          "native_current_progress": 0.27,
+          "native_tail_saved": 0.42000000000000004,
+          "mir_bioflux_next": 2,
+          "mir_breeding_next": 3,
+          "credit_positive_next": 1,
+          "credit_negative_next": 2,
+          "bioflux_bonus": 0.10000000149011612,
+          "fish_bonus": 0.10000000149011612,
+          "biter_bonus": 0.20000000298023224,
+          "pentapod_bonus": 0.20000000298023224,
+          "foreign_mir_bioflux_disabled": true,
+          "on_load_read_only": false
+        },
+        "receipt": {
+          "gzip": "spec/mir5/evidence/competing-fixed-removal-control-40041159042-mir5-providers-removed-native.json.gz",
+          "gzip_sha256": "BB93657B14AB8D8998E4539D2EE4837A1EB1C9C0495253EE5DB0A8A8214A136F",
+          "uncompressed_sha256": "16C62425F986DF5F63DE0F8A54F8771BE6327A05CE0731D8DD13F93DF6C8EED1",
+          "uncompressed_bytes": 38795,
+          "artifact_path": "gameplay/mir5-providers-removed/result.json"
+        }
+      },
+      {
+        "stage": "mir5-providers-readded-foreign",
+        "status": "passed-private-native-fixture",
+        "input_save_byte_identical": true,
+        "two_cold_reloads": [
+          {
+            "ordinal": 1,
+            "save_sha256": "9D9913B6A477AAA9F141A1650DEEFB89C10EDF01EBCD6D4F3009512D49D5E970",
+            "save_byte_identical": true
+          },
+          {
+            "ordinal": 2,
+            "save_sha256": "9D9913B6A477AAA9F141A1650DEEFB89C10EDF01EBCD6D4F3009512D49D5E970",
+            "save_byte_identical": true
+          }
+        ],
+        "initial_witnesses": {
+          "source_actual_provider_labs": 2,
+          "mir_actual_labs": 3,
+          "phase": "readded-completed",
+          "native_current": "braking-force-1",
+          "native_current_progress": 0.27,
+          "native_tail_saved": 0.42000000000000004,
+          "mir_bioflux_next": 2,
+          "mir_breeding_next": 3,
+          "credit_positive_next": 2,
+          "credit_negative_next": 1,
+          "bioflux_bonus": 0.10000000149011612,
+          "fish_bonus": 0.10000000149011612,
+          "biter_bonus": 0.20000000298023224,
+          "pentapod_bonus": 0.20000000298023224,
+          "foreign_mir_bioflux_disabled": true,
+          "on_load_read_only": false
+        },
+        "receipt": {
+          "gzip": "spec/mir5/evidence/competing-fixed-removal-control-40041159042-mir5-providers-readded-foreign-native.json.gz",
+          "gzip_sha256": "AE43098A8873B2497802D44B3286AF7DAC6D4B8651F9099E00E3A767105514F9",
+          "uncompressed_sha256": "917043C857425F291037C634F0E8997CC5EEFEAB30B3030B22D4B39CF5E8D6EE",
+          "uncompressed_bytes": 41004,
+          "artifact_path": "gameplay/mir5-providers-readded-foreign/result.json"
+        }
+      }
+    ]
+  },
+  "adverse_inputs": [
+    {
+      "run": 40039483282,
+      "source": "40aa7698087d6e72ad9145a1a08a912bcf89bb51",
+      "manifest_members_verified": 107,
+      "manifest_sha256": "7CA06D986B8BB6D8F072B0AB98FBB56975A3A0891B5E506FA0ABD519DF7D3FA5",
+      "case": "published",
+      "failure": "The v0.1 source fixture incorrectly required recipe-prod-research_bioflux-1 even though published false preference omits it.",
+      "receipt": {
+        "gzip": "spec/mir5/evidence/competing-fixed-removal-control-adverse-40039483282-published-native.json.gz",
+        "gzip_sha256": "2E5E8833FE528E941D45E71E30DCC37DD9724B9F1C6DCACDD311511233D5BFC4",
+        "uncompressed_sha256": "07BCD78A11BC9DB7AE002CF25A0ACA6D35B93200F03BCCB74D77031131528FB8",
+        "uncompressed_bytes": 18699,
+        "artifact_path": "gameplay/published/result.json"
+      },
+      "log_receipt": {
+        "gzip": "spec/mir5/evidence/competing-fixed-removal-control-adverse-40039483282-published-factorio.log.gz",
+        "gzip_sha256": "2290E45AFC8ECD237DF05EA3B08363241FBFBF8A434B3CD496CB4C21E8E00EC9",
+        "uncompressed_sha256": "A7310AA5773480B6A3770D7C5450F6F903C78E5E4EB6CC29598B9813308168AE",
+        "uncompressed_bytes": 33358,
+        "artifact_path": "gameplay/published/write-data/factorio-current.log"
+      }
+    },
+    {
+      "run": 40040255322,
+      "source": "42034fe9bf70816779a8be828f90b84907ee5651",
+      "manifest_members_verified": 91,
+      "manifest_sha256": "69BE7BAD1299A9026D4BF852F5959BEF645779B35DCC2E531305CD00ED940262",
+      "case": "mir5-prefer-foreign",
+      "failure": "The v0.3 foreign-stage fixture incorrectly asserted the preferred-MIR bioflux state; native readback had the row disabled at level 2.",
+      "receipt": {
+        "gzip": "spec/mir5/evidence/competing-fixed-removal-control-adverse-40040255322-prefer-foreign-native.json.gz",
+        "gzip_sha256": "38A304D1F31F1F8B001528BFCAC85BF2EB986E8E87308668682CE16AF32F1438",
+        "uncompressed_sha256": "74019CA79003DA2B9A99144A1FD12FAADB5974929ECF2E7A6CCF4278A6CC1AF7",
+        "uncompressed_bytes": 9997,
+        "artifact_path": "gameplay/mir5-prefer-foreign/result.json"
+      },
+      "log_receipt": {
+        "gzip": "spec/mir5/evidence/competing-fixed-removal-control-adverse-40040255322-prefer-foreign-factorio.log.gz",
+        "gzip_sha256": "35BA32CD6C1D60A2EF464D9E7A880E0B9B3AF105AF638BAE250F846B0E57FED0",
+        "uncompressed_sha256": "1E3F7B0584022F38BC40ED429BEFD7713BDE75D01DDE37EC1D217B830A873F23",
+        "uncompressed_bytes": 9952,
+        "artifact_path": "gameplay/mir5-prefer-foreign/write-data/factorio-current.log"
+      }
+    }
+  ],
+  "scope": [
+    "The corrected five-stage F2002.0.77 Space Age control witnesses published false preference, MIR5 true, MIR5 false, provider removal, and provider readdition with false preference.",
+    "Each stage saves and completes two byte-identical cold reloads. The fixture preserves its named current 27% and detached tail 42% research witnesses, a pre-disabled foreign MIR bioflux row, and its explicitly checked earned bonus/credit-holder state.",
+    "The providers-removed stage is a native removal boundary: provider-only technologies naturally disappear with their absent mod. This chain claims preservation of its named MIR-owned effects and queue witnesses only; it does not claim availability or restoration of removed provider-only rows."
+  ],
+  "limitations": [
+    "This is a disposable, exact four-provider F200 Space Age scenario; it does not qualify other provider combinations, arbitrary co-owners, F210, or release output.",
+    "It does not infer an unpersisted MIR4 prior preference mode or prove a general foreign-prototype migration policy."
+  ],
+  "release_qualification": false
+}

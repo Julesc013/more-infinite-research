@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "kind": "MIR5K2F210GearBindingFactsV1",
+  "status": "developer-only-source-test-input",
+  "engine": {
+    "target": "f210",
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "cases": [
+    {
+      "id": "k2-base",
+      "profile": "tests/profiles/k2-base-f210-2123.json",
+      "profile_sha256": "54B7E64C6AB1DB8345EC407B74B67C423AF51779A3D9104C40ACD9D523B34CC2",
+      "raw": {
+        "path": "build/mir5/recovery-historical/broad-ecosystem-f210-r01/batch-5c51-r04/c02-upstream/write-data/script-output/data-raw-dump.json",
+        "sha256": "00C65693962DF31769CD1288E2FACD368191281ACD009660E3E4FFC41468F6B7"
+      },
+      "mods": {
+        "base": "2.1.23",
+        "Krastorio2": "2.1.4",
+        "Krastorio2Assets": "2.1.0",
+        "Krastorio2MenuSimulations": "2.1.0",
+        "flib": "0.17.2"
+      }
+    },
+    {
+      "id": "k2se-base",
+      "profile": "tests/profiles/k2se-base-f210-2123.json",
+      "profile_sha256": "7EE8A1F8F3EC078D2019EB080F07107D5D1C4B332857C7A293CA61ED1E02B35E",
+      "raw": {
+        "path": "build/mir5/recovery-historical/broad-ecosystem-f210-r01/batch-5c51-r04/c03-upstream/write-data/script-output/data-raw-dump.json",
+        "sha256": "53D55E243F1E2B5A7D861E736F12D16D4356E56A6FAF0EC28C0B76C78E06074F"
+      },
+      "mods": {
+        "base": "2.1.23",
+        "Krastorio2": "2.1.4",
+        "Krastorio2Assets": "2.1.0",
+        "Krastorio2MenuSimulations": "2.1.0",
+        "flib": "0.17.2",
+        "space-exploration": "0.7.63"
+      }
+    }
+  ],
+  "gear": {
+    "recipe": "iron-gear-wheel",
+    "ingredients": [{"type": "item", "name": "iron-plate", "amount": 1}],
+    "results": [{"type": "item", "name": "iron-gear-wheel", "amount": 1}],
+    "item_icon": "__Krastorio2Assets__/icons/items/iron-gear-wheel.png",
+    "binding_profile": "k2-base-f210"
+  },
+  "owner_science": [
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack"
+  ],
+  "science_and_lab_facts": {
+    "k2-base": {
+      "technologies": {
+        "automation-science-pack": {"prerequisites": ["kr-laboratory"], "unit": {"count": 50, "time": 30, "ingredients": [["kr-basic-tech-card", 1]]}},
+        "logistic-science-pack": {"prerequisites": ["automation-science-pack", "electronics"], "unit": {"count": 75, "time": 5, "ingredients": [["kr-basic-tech-card", 1], ["automation-science-pack", 1]]}},
+        "chemical-science-pack": {"prerequisites": ["advanced-circuit", "sulfur-processing"], "unit": {"count": 75, "time": 10, "ingredients": [["automation-science-pack", 1], ["logistic-science-pack", 1]]}},
+        "production-science-pack": {"prerequisites": ["productivity-module", "advanced-material-processing-2", "railway", "kr-advanced-lab", "kr-research-server", "uranium-processing"], "unit": {"count": 250, "time": 30, "ingredients": [["automation-science-pack", 1], ["logistic-science-pack", 1], ["chemical-science-pack", 1]]}}
+      },
+      "advanced_lab_inputs": ["automation-science-pack", "logistic-science-pack", "military-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack"]
+    },
+    "k2se-base": {
+      "technologies": {
+        "automation-science-pack": {"prerequisites": ["kr-automation-core"], "unit": {"count": 50, "time": 30, "ingredients": [["kr-basic-tech-card", 1]]}},
+        "logistic-science-pack": {"prerequisites": ["basic-logistics", "electric-lab"], "unit": {"count": 75, "time": 5, "ingredients": [["kr-basic-tech-card", 1], ["automation-science-pack", 1]]}},
+        "chemical-science-pack": {"prerequisites": ["advanced-circuit", "sulfur-processing"], "unit": {"count": 75, "time": 10, "ingredients": [["automation-science-pack", 1], ["logistic-science-pack", 1]]}},
+        "production-science-pack": {"prerequisites": ["se-space-supercomputer-1", "se-space-plasma-generator", "se-pyroflux-smelting", "productivity-module"], "unit": {"count": 500, "time": 30, "ingredients": [["automation-science-pack", 1], ["logistic-science-pack", 1], ["chemical-science-pack", 1], ["se-rocket-science-pack", 1], ["space-science-pack", 1]]}}
+      },
+      "advanced_lab_inputs": ["kr-basic-tech-card", "automation-science-pack", "logistic-science-pack", "military-science-pack", "chemical-science-pack", "se-rocket-science-pack", "space-science-pack", "production-science-pack", "utility-science-pack", "kr-optimization-tech-card"]
+    }
+  }
+}

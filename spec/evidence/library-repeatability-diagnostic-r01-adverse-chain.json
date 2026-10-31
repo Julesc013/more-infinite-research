@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryRepeatabilityDiagnosticR01AdverseChainV1",
+  "status": "first-warmup-interrupted-before-control-pairs",
+  "source_commit": "341ee6916e95a4264ccd09521f3c1b4e159b536e",
+  "private_controller": "60718e2496b7683f0e2bf95b197bf6c8dedf059d",
+  "original_plan": {
+    "path": "spec/evidence/library-current-e9-repeatability-diagnostic-plan-r01.json",
+    "sha256": "F8172990E329F3016A86D9E8B527DA2F43EA754F6B9B7C09C2A7335923D8783F",
+    "git_ref": "341ee6916e95a4264ccd09521f3c1b4e159b536e"
+  },
+  "packet_sha256": "5A2BDAB918E964A10A102EB7BF70F00EEBB2BCC0B1436C1EFB177CD27B97217B",
+  "input_scope": "F2002.0.77/D3,published4.7.20002/F394 only;candidateE9 not launched.",
+  "native_observation": {
+    "native_processes": 4,
+    "preparation_worlds": 1,
+    "initial_clients": 2,
+    "cold_restarts": 0,
+    "completed_sessions": 0,
+    "scored_pairs": 0,
+    "lab_completions": 0,
+    "initial_pngs": 8,
+    "native_stages": [
+      "ready",
+      "first-open",
+      "search",
+      "refresh",
+      "restart-ready"
+    ],
+    "closed_restart_save": true
+  },
+  "failure": {
+    "boundary": "test harness screenshot matcher",
+    "trigger": "first-open-*.png also matches first-open-settled-1.png. Each client writes both;the exact-one-count reader permanently waits.",
+    "interruption": "Root verified server81136/executable/startUTC and stopped that one owned server at04:40:13UTC. Original active-process assertion/finally closed clients and governor,then the private sampler and archive custody/restoration completed.",
+    "terminal_exception": "[mir441-process-exit] 1",
+    "product_defect_inferred": false
+  },
+  "custody": {
+    "primary_controller": "build/qualification/library-repeatability-diagnostic-r01-controller",
+    "original_output": "D:/Projects/Factorio/mir5-legacy-cannon-credit-r01/build/tmp/library-repeatability-diagnostic-r01",
+    "files": 198,
+    "bytes_per_copy": 19325800,
+    "root_readback_sha256": "42524E57DEB8F70309829170A7455B6B7ECBC04CD22D58D9FFA5E86352B3E080",
+    "capsule": {
+      "path": "spec/evidence/library-repeatability-diagnostic-r01-adverse-receipts.json.gz",
+      "sha256": "87F566999E7F3C7FC9399CD01CF5DBF8A374070B961553A9C1912AB520F4C02E",
+      "bytes": 112383,
+      "exact_bodies": 20
+    }
+  },
+  "system_observation": {
+    "samples": 238,
+    "elapsed_seconds": 240.6817577,
+    "collector_cpu_seconds": 5.125,
+    "actual_os_process_lifetimes": 4,
+    "all_exits_observed": true,
+    "thermal_clock_status": "unavailable",
+    "scope": "Diagnostic observations only; preparation also lies inside the sampler block. Initial reader3-actor assumption is preserved and corrected to4,without native retry."
+  },
+  "credential_readback": {
+    "native_argument_occurrences": 1,
+    "redacted": 1,
+    "unredacted": 0,
+    "unparsed": 0,
+    "scope": "Independent whole-capsule scan accepts Factorio native private placeholders. The earlier root counter matched only unquoted options and reported0;it is not the authoritative credential scan."
+  },
+  "controls_restored": true,
+  "factorio_processes_after": 0,
+  "required_correction": "Exact stage/index filename matching,real-file collision/duplicate/missing/bad-PNG/identity opponents and separately reviewed fresh diagnostic inputs. No automatic extension,threshold change or product optimization.",
+  "performance_acceptance": false,
+  "release_qualification": false
+}

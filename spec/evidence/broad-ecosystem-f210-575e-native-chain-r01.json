@@ -1,0 +1,3699 @@
+{
+  "schema": 1,
+  "kind": "MIR5BroadF210575eNativeChainV1",
+  "status": "completed-121-valid-current-startups-11-upstream-refusals-no-candidate-adverse",
+  "scope": "Factorio2.1.23 native startup, data/settings capture and exact input/custody verification only. This is not technology-intent comparison, gameplay, save migration, client, multiplayer, responsive-menu timing or release qualification.",
+  "candidate": {
+    "source_commit": "575e418c72eff2970fa5f6274956f6e8944d4e19",
+    "player_tree": "5ba53a8514b4641c749e91c0a68f32521fb3fee7",
+    "archive": "more-infinite-research_5.0.21000.zip",
+    "sha256": "A8D0A4590154F3106E59BDB269F1AEB3ED8CC523F18F00ED7D76DC89059F5B8D",
+    "bytes": 691382,
+    "asset_evidence": "spec/evidence/current-assets-575e418c-root-readback.json"
+  },
+  "baseline": {
+    "version": "4.7.21003",
+    "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+    "bytes": 1463293
+  },
+  "executor": {
+    "controller_commit": "6c274a9274edee68df7216d07353092770776c27",
+    "capture_helper_sha256": "7ABE4FBFABBDF06A12AA51408352F1FEB9AB1E9929C25F21672BADF23A4A9F23",
+    "dispatcher_sha256": "D7CB52C8797F79A848A0258509815A2716A7CBE18170973A75B9FECFA58A0592",
+    "engine": {
+      "factorio_version": "2.1.23",
+      "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+    },
+    "plan": {
+      "path": "build/qualification/broad-ecosystem-f210-575e-r02-controller/plan.json",
+      "sha256": "260F14061C40220044E65FA04DBD3DC6CA2E1226C06DCB4A29F73D38DC19072B",
+      "bytes": 227310
+    },
+    "preflight": {
+      "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/batch-preflight.json",
+      "sha256": "EC8385B0116BA228891975726608125CB3E90F7BD50331A2ABBD200D1CF10A69",
+      "bytes": 56383
+    },
+    "batch_result": {
+      "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/batch-result.json",
+      "sha256": "3AE08354B1213AB96413316130E32BE860E2196430EEFAA13F932DCAFA690793",
+      "bytes": 1734986
+    },
+    "outer_terminal": {
+      "path": "build/qualification/broad-ecosystem-f210-575e-r02-controller/native-stage-record/terminal.json",
+      "sha256": "8D12360F4F4E9A020FBA9CB0E7B478CF008028B4ABF4D176F7651F3B5DE76A18",
+      "bytes": 1501
+    },
+    "retained_zero_native_r01_refusal": {
+      "path": "build/qualification/broad-ecosystem-f210-575e-r01-controller/preflight-stage-record/terminal.json",
+      "sha256": "81E49215A4334E02BBF7C3E9CBCD82C7C8113D829662E0092029FD16AA9FCDA7",
+      "bytes": 1593
+    }
+  },
+  "batch_limits": {
+    "case_count": 132,
+    "maximum_launches": 396,
+    "sequential_only": true,
+    "maximum_runtime_seconds": 14400,
+    "maximum_new_output_mib": 24576,
+    "note": "Four-hour and24-GiB aggregate admission/output guards, not a reservation or performance claim. Stop and retain exact unrun cases at a cap."
+  },
+  "resources_per_launch": {
+    "timeout_seconds": 240,
+    "expected_peak_memory_mib": 4096,
+    "max_new_output_mib": 512,
+    "admission_wait_seconds": 30,
+    "heavy_expected_peak_memory_mib": 8192
+  },
+  "observations": {
+    "profiles_considered": 132,
+    "valid_upstream_profiles": 121,
+    "actual_native_process_runs": 374,
+    "candidate_startup_passes": 121,
+    "candidate_startup_adverses": 0,
+    "published_startup_passes": 117,
+    "published_startup_adverses": 4,
+    "upstream_startup_adverses_mir_arms_skipped": 11,
+    "original_keeper_and_observer_restored": true,
+    "controls_restored_every_arm": true,
+    "dependency_archive_copies": 0,
+    "archive_hardlinks_or_extractions": 0
+  },
+  "independent_readback": {
+    "path": "build/qualification/broad-ecosystem-f210-575e-r02-controller/root-readback-r01.json",
+    "sha256": "DFE297B19A1354EEAC8D62AC1FDE4FB7247B9AC6CF2D8B0F925C169EFDC674D0",
+    "bytes": 248482,
+    "native_members_each_copy": 3351,
+    "native_bytes_each_copy": 9100484388,
+    "all_original_primary_hashes_equal": true,
+    "all_selected_archive_maps_match_exact_profile_and_arm": true
+  },
+  "cases": [
+    {
+      "id": "q001",
+      "profile": "tests/profiles/py-suite-base-f210-2123.json",
+      "profile_sha256": "3706BBD447A445ECD072FA6E13B7453BF1C566092D19E88AB933E3FF178938AF",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B6FCFF75F6BB15C3D6A5A1A7E69B1204E8AA582ED69044ABD6ABDC021E44B3B9",
+          "result_bytes": 27162
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A1F37FD0C69C2D85A795EFD2D44E64CE8D6DCD9DC7CB0A1E413310C97F96DD70",
+          "result_bytes": 28338
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1B64554AF3C4E9944B7F70118B580AD1B6631637BE634F594F0D6DE415C26047",
+          "result_bytes": 28330
+        }
+      ]
+    },
+    {
+      "id": "q002",
+      "profile": "tests/profiles/py-suite-space-age-f210-2123.json",
+      "profile_sha256": "859FBAB6053AE4F37B2E793B9C08E073FC79C77DC391071EA30A22E8488E3DC2",
+      "disposition": "upstream-engine-adverse-skip-mir-arms",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "F523951AFE779F622946E35A0A0732333BF96C39C3B7E939AFAADE11DDFE0F52",
+          "result_bytes": 23419
+        }
+      ]
+    },
+    {
+      "id": "q003",
+      "profile": "tests/profiles/py-suite-with-productivity-base-f210-2123.json",
+      "profile_sha256": "BCA125D265CBA75527ACDCCC109B98AC032DB16E7363A268AC6822EAC9B55355",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "337C53B3E0A994E0AE93CEBC1F0172476FD150ABEFEC5C4D6D286BD862D4779B",
+          "result_bytes": 27954
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2D1625938CEF8EAE3DD0DF8EFB0699374DADC605E13B5CFCEDC2FF8D0C9FE693",
+          "result_bytes": 29118
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "45464210E3639D36D029627CED9B37C0BC641D6A27685F5D26206BA70EF17710",
+          "result_bytes": 29115
+        }
+      ]
+    },
+    {
+      "id": "q004",
+      "profile": "tests/profiles/py-suite-with-productivity-space-age-f210-2123.json",
+      "profile_sha256": "D480AFB9DFECC923B52E5BCF12893E9683028F9D58435906DBEE7C3FE87CC02C",
+      "disposition": "upstream-engine-adverse-skip-mir-arms",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "049BB6E2A79685C0416283CA00D1916B5EC508E70E86315D42071E436E82B974",
+          "result_bytes": 24171
+        }
+      ]
+    },
+    {
+      "id": "q005",
+      "profile": "tests/profiles/bob-full-base-f210-2123.json",
+      "profile_sha256": "A5017E19A99B8240D8671DD9D88F03F055492C7E764159DB167221568FD90AA7",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0CEEB80DD269ECBB46A9D7A660BF328D5186E265D67A2C444A64F97BEB7A2E01",
+          "result_bytes": 24149
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "81B5C0FBB16659811FA55AD6E8B3E4FC8EBEFCD364DC2F26D46A045F731D7460",
+          "result_bytes": 25311
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "BFFA99C1A16FC7F8267619289C264102253270D6CFB2CFDDC9507F9BE3EACF48",
+          "result_bytes": 25307
+        }
+      ]
+    },
+    {
+      "id": "q006",
+      "profile": "tests/profiles/bob-full-space-age-f210-2123.json",
+      "profile_sha256": "47A538A60B8B9446FA525B5FEFE2E7C2AA4D32C357BE45276748FC2F28C9A1D4",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C7BF5C387935ACB409A3875641FE0DDF1A9F8DAA816DD74A943684FA8462FD57",
+          "result_bytes": 27198
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8EE3FA416F506381DDA7CBE06F9241DC6C2683F7190FA0A5396ADA3804453A29",
+          "result_bytes": 28361
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B97A8E1BCAB8818FE561C1448F916853775E8925945E4B54CFB6B2ECE601AFD2",
+          "result_bytes": 28358
+        }
+      ]
+    },
+    {
+      "id": "q007",
+      "profile": "tests/profiles/angel-full-base-f210-2123.json",
+      "profile_sha256": "ADFE6B262232E7C296BA591BFBA5812B62B2E45761A78F1E9588D141B7AABF00",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D209BFC967BF8F18352E6ECC4536256639F0FF004A1EB7A2217DF417AD5C821E",
+          "result_bytes": 23006
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "90CF2CFCB84F3D93654C8E7095F64468356BFA7423957C50C0A3418A05246EB1",
+          "result_bytes": 24169
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4ADEAA0ABF259A1F24892A12B94033ED71D3778768C2EE04E9BC5E834259B70E",
+          "result_bytes": 24167
+        }
+      ]
+    },
+    {
+      "id": "q008",
+      "profile": "tests/profiles/angel-full-space-age-f210-2123.json",
+      "profile_sha256": "4CAD1401B56D8BE7B09B9CC2EAB045773FC4DE9C11C37BF283A51C3E11758B49",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "04E0F805B623CF0B444E88E522ADB963897FBD1D9F6079487BC36D4D7D3419B9",
+          "result_bytes": 26054
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1307104D6A4CC24F4CDEB5DB16D06B926B9C65B5BD8492DC8BBCE7815EEA65C3",
+          "result_bytes": 27216
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6476736EE3A4A2B9C9DE6B2FB7CD03CFF1E405DF3FE8591A5A4984CE0725AAE4",
+          "result_bytes": 27213
+        }
+      ]
+    },
+    {
+      "id": "q009",
+      "profile": "tests/profiles/bob-angel-full-base-f210-2123.json",
+      "profile_sha256": "760945672E7D5F03BEBE25CA477A68C95D54AA359C62D34AE69D55BF9161372F",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F78660B4FA9B574E8E91E2898424AD12ECC7E6F21C4C6D991B521A0E9454D4E2",
+          "result_bytes": 35589
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4F6E2DC290D26487F74061D1929F7181C333772BA0E43DDCF00CEAC2D923BBBF",
+          "result_bytes": 36753
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5EE700199F46ED56D437AA713EC30AAFBA8115990563C9E30668333B9A231818",
+          "result_bytes": 36752
+        }
+      ]
+    },
+    {
+      "id": "q010",
+      "profile": "tests/profiles/bob-angel-full-space-age-f210-2123.json",
+      "profile_sha256": "79C589FDFC329CDCE8C204ABD4E939E60759792ACF4A9C7CEF8D326A5CC124B1",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2978C6EFAADB96E2A8618B1AFD8C6FDEEF741B408A2FFF4823F08216AB7E4C0B",
+          "result_bytes": 38643
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1AB591E0AF585334A3C44504AC9A9617D12E499DD86606F70BE59EC5EBBD4FCB",
+          "result_bytes": 39806
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9F81F1A3ED2F1ADDCEF398AD76C6051F184678D11777FDA677644460126D9DAC",
+          "result_bytes": 39805
+        }
+      ]
+    },
+    {
+      "id": "q011",
+      "profile": "tests/profiles/space-exploration-base-f210-2123.json",
+      "profile_sha256": "379280A208B1CC709413FA3EA3117547CD1E209FD3032235D7AA04C404BF40EF",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2AAE4A79FE1894B4196744025A82CB7065CBDE0116D6E185EC39C6FB0986A087",
+          "result_bytes": 24291
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AF661164266A564F26B5270CC98345E27A63BE6946A2AAFD2DEA6A58F8654BC8",
+          "result_bytes": 25455
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CC6FB762EAEAAF2E4A6685C7C24C49E27AE05007C001CB3C5577B0435BC37D05",
+          "result_bytes": 25450
+        }
+      ]
+    },
+    {
+      "id": "q012",
+      "profile": "tests/profiles/k2-base-f210-2123.json",
+      "profile_sha256": "54B7E64C6AB1DB8345EC407B74B67C423AF51779A3D9104C40ACD9D523B34CC2",
+      "disposition": "published-adverse-candidate-continued",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "ED57D01F184B3745AA9A9EB3F4EB7EEAE309484CB2C929B3E172200106439EED",
+          "result_bytes": 15406
+        },
+        {
+          "arm": "published",
+          "status": "failed",
+          "result_sha256": "D5E1B2CC02B1F3A55E3F597C838D1C366719207A937DB1400688C4F6DE9F355B",
+          "result_bytes": 10323
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7613C31782FC863EAC81553FB3E4C9D0F9CE48868D0355C5F5969E6131895889",
+          "result_bytes": 16569
+        }
+      ]
+    },
+    {
+      "id": "q013",
+      "profile": "tests/profiles/k2se-base-f210-2123.json",
+      "profile_sha256": "FA586BDDE8C0914BB536CDE19909C56762CE009459366730BC9C36CCAF389B16",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CF3451B0C3E1611124396CE1476714990A223E52BA7D1104454C740AE258948E",
+          "result_bytes": 28127
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2B2057E9029E53974A36D96E1BB3EB2A533CBC180AD8619B64C52BF5C7173CDE",
+          "result_bytes": 29289
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E3AE878774DC6159670FE84E98D7A3DBCA6AFA30600395604C2D463A0A7464B4",
+          "result_bytes": 29287
+        }
+      ]
+    },
+    {
+      "id": "q014",
+      "profile": "tests/profiles/k2se-bz-available-six-base-f210-2123.json",
+      "profile_sha256": "7F7EC554778097EDFEBD91917F3F821FEBFC643CAEA6BCAD7EA272BAB45949A2",
+      "disposition": "upstream-engine-adverse-skip-mir-arms",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "24E5D2A9D6834F68FA87FD3C2009EFCBA9999743C1356E49226F1A815A36B2D5",
+          "result_bytes": 25625
+        }
+      ]
+    },
+    {
+      "id": "q015",
+      "profile": "tests/profiles/ir4-base-f210-2123.json",
+      "profile_sha256": "6630F2E3852C3150DFD14D87542323E7FC11799942DA54FB8C1B7F3CF7C9868F",
+      "disposition": "upstream-engine-adverse-skip-mir-arms",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "AA033ECC0A075B3827CFEB6C5271EC426FFBD69E55AFE60E4B57EAB304095190",
+          "result_bytes": 6276
+        }
+      ]
+    },
+    {
+      "id": "q016",
+      "profile": "tests/profiles/ir4-space-age-f210-2123.json",
+      "profile_sha256": "BE688D57A1DDE1BEB5B2B600AD460577D794D8889A242160D6E7981E5725DE37",
+      "disposition": "upstream-engine-adverse-skip-mir-arms",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "45F582FB0623EBCD0CBFB92CE01B4F39FA7D1C8D0397A0B5289FAD96E242480D",
+          "result_bytes": 9223
+        }
+      ]
+    },
+    {
+      "id": "q017",
+      "profile": "tests/profiles/aai-bz-available-six-base-f210-2123.json",
+      "profile_sha256": "B8B8B5471E87307025C3E354DB4A08C7252DEBE3C47BE87E80ED9212B24651D8",
+      "disposition": "published-adverse-candidate-continued",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4E10523117DE99FD8B741CC4B3997163FBAEDC669A612D59A4B453AB4D502750",
+          "result_bytes": 16714
+        },
+        {
+          "arm": "published",
+          "status": "failed",
+          "result_sha256": "8A1EE6EBC8205200EA7F4766B80B328A87BB1AEE8CF2A3B83811A982A3882869",
+          "result_bytes": 11610
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A547411B3EB616941924677C60FCFAA25117B4DC929951B4ADCE5B256FDCD46B",
+          "result_bytes": 17875
+        }
+      ]
+    },
+    {
+      "id": "q018",
+      "profile": "tests/profiles/aai-bz-available-six-space-age-f210-2123.json",
+      "profile_sha256": "340013C433FA85AEDE09CA97625A0D735B64FD88153D73486B1B39F9600F3E22",
+      "disposition": "upstream-engine-adverse-skip-mir-arms",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "277C83596FAFF04876EE3FC42B22EBB16D81D9F22498FF341CCE4FC091470CF5",
+          "result_bytes": 13438
+        }
+      ]
+    },
+    {
+      "id": "q019",
+      "profile": "tests/profiles/aai-bob-angel-bz-available-six-base-f210-2123.json",
+      "profile_sha256": "71CC2A696754AAC4B4D6AAE45114694ED9725BA43914CF8670E0D3D47E9CC8F3",
+      "disposition": "upstream-engine-adverse-skip-mir-arms",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "4350603AC2B3CE965E350B65BF36E4127E33DDBEFEE262032F84F44B83224EAD",
+          "result_bytes": 33544
+        }
+      ]
+    },
+    {
+      "id": "q020",
+      "profile": "tests/profiles/aai-bob-angel-bz-available-six-space-age-f210-2123.json",
+      "profile_sha256": "28A54F1A1021DD2132443BFE91FF3350A19506865CB261E55B95C985FBAFFC3A",
+      "disposition": "upstream-engine-adverse-skip-mir-arms",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "BD660101EA11005E98A4EC041D8A81AAAA2AEED8CC87E1C3BF4BB6375BBA95EB",
+          "result_bytes": 36491
+        }
+      ]
+    },
+    {
+      "id": "q021",
+      "profile": "tests/profiles/bz-available-six-base-f210-2123.json",
+      "profile_sha256": "F63E5AD98520B85F13595A8D862FB0CD789C1BCD4C7B5556D29D0B00FEE2BC4C",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "72422B0F804A16FA1768BFAE9CBA9B425C0A6083ADB81F217CD4DD0D73EF8A8E",
+          "result_bytes": 15962
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "BFEB7640200A47482BE0F1B515E0D2A197FF84268E716CC71CBC16FA9C8E3AB2",
+          "result_bytes": 17125
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8C2D68E4FB11F3E1CB4296516A41A94B2574F4C7B18FB7CBE47EF7B1C4D5F3C3",
+          "result_bytes": 17123
+        }
+      ]
+    },
+    {
+      "id": "q022",
+      "profile": "tests/profiles/bz-available-six-space-age-f210-2123.json",
+      "profile_sha256": "D9950C8689E0ABBC06088831616FF89724DD8666F98E872E52A8BD3DA89D8711",
+      "disposition": "upstream-engine-adverse-skip-mir-arms",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "62BFF0629FD733C04EC00064005A37CD2DD7C90FB5910AB3393CBD61D0CD6A29",
+          "result_bytes": 12713
+        }
+      ]
+    },
+    {
+      "id": "q023",
+      "profile": "tests/profiles/bzcarbon-base-f210-2123.json",
+      "profile_sha256": "6539E73D8C576CD7185D31586F6974FE859748F8F303F5059889F50C552290F1",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7497BC05FC99B10339FC15062B6E2B3FC8A562D1D62DBB083A51A1AE96963303",
+          "result_bytes": 12297
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6AA88474116EBD36B7C9CD67FC30E407669B5D39A2ADC6A23E9401B5AEAE9191",
+          "result_bytes": 13460
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "DD3D97C8CE73FBCE689E05774C0DDEBF303F46679910E52EAA119A7C84F6B335",
+          "result_bytes": 13458
+        }
+      ]
+    },
+    {
+      "id": "q024",
+      "profile": "tests/profiles/bzcarbon-space-age-f210-2123.json",
+      "profile_sha256": "6E006C3DFB2929F286BDE47688DDCC6D73D9FDF4562F3D964D6A8F78656B714B",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "08BEA90F4E0CEC3BB18A0052CEAEDCA6E545E704D9D604DDEEED0D92C48DD92F",
+          "result_bytes": 15346
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0E0314D79CD7908620BB6551B42066E788FECE96D4E29353911C5DA9A90BCA5E",
+          "result_bytes": 16509
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "3D615C1D91BE098DC644CAA51B7D736D6929343D87F24F5ACDBD48E569A55A54",
+          "result_bytes": 16507
+        }
+      ]
+    },
+    {
+      "id": "q025",
+      "profile": "tests/profiles/bzlead-base-f210-2123.json",
+      "profile_sha256": "CDED6F51E1C9F4318DB828C6D1D469D1E5533303DA70E69334FAC38FF2999A05",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "BE2A63D4D4C8B44AF49C383780B918E4FE3C4B8E624F164CE0C9BAD027106CD7",
+          "result_bytes": 12282
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F9B01CC30217513C710EE60D306A89B244B256FA7B5C39424D568221F6A4886C",
+          "result_bytes": 13446
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8FF29A15532399E6AE3B1DF0CC6887729DE4793263ED1CD3AD05EDA37567FE0B",
+          "result_bytes": 13440
+        }
+      ]
+    },
+    {
+      "id": "q026",
+      "profile": "tests/profiles/bzlead-space-age-f210-2123.json",
+      "profile_sha256": "B77F0428E9B585AD2152EC26A90BE1B52E878A1AF27BF881FF0E1A35A1C68926",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D4F6A4957681A0B77058D1E5B25BC8BF5D34E3FEDF587D045109B5CE034F5A50",
+          "result_bytes": 15331
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D1E45D24830504FBF43E07F5B6EDAEAD18402179E35D154E846D32D8B6F7CF54",
+          "result_bytes": 16495
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C0D0D1E8399871F65617216E26D09E5A76FDF40C7404243E33EA3BCD1EA9F857",
+          "result_bytes": 16491
+        }
+      ]
+    },
+    {
+      "id": "q027",
+      "profile": "tests/profiles/bzsilicon-base-f210-2123.json",
+      "profile_sha256": "C3708034977F02438CB47D93975AC35B0975A55641802A096D84A319D5EF38F5",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "57ABAE98F02FFD22C7147C3ADD1869368A510A2A953F3F62D2908569512DD005",
+          "result_bytes": 12304
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B19E3F3C4378AF6FFC5303186F07998222D069B2DF83406DB446D2B08750C0D9",
+          "result_bytes": 13468
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "271DB02B8440807815D384283B83FC24F80CAA3F58918F6254BCFC5CFF9DCF11",
+          "result_bytes": 13466
+        }
+      ]
+    },
+    {
+      "id": "q028",
+      "profile": "tests/profiles/bzsilicon-space-age-f210-2123.json",
+      "profile_sha256": "7E92E64F17F2B3BDD227C86997996BD20BBE1D43BD8C193B75F143FD2EC7276E",
+      "disposition": "upstream-engine-adverse-skip-mir-arms",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "1442D76C767F90651AE84534ED038D5B662E5FEAAED5DCFC0A8B128857EAF1A0",
+          "result_bytes": 9176
+        }
+      ]
+    },
+    {
+      "id": "q029",
+      "profile": "tests/profiles/bztin-base-f210-2123.json",
+      "profile_sha256": "3F720F41E7C663ED369E35F08D4F82990F84F1FF942AD37ED1EA300CEFA4A0C2",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "205FCDEA29C96D54B37408F338EE9B8F2F1E923190B59BF5C5C2B9B9CE3B9B6C",
+          "result_bytes": 12275
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "3C89F6787595D7143ABE0467EDDED2EB8588A0DDB0633041C6C9C162E0785C59",
+          "result_bytes": 13438
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C1AE202AD79ABC6973E4E10229D24BBC5AEAD3BB39537634B3DCB321CEDCD501",
+          "result_bytes": 13437
+        }
+      ]
+    },
+    {
+      "id": "q030",
+      "profile": "tests/profiles/bztin-space-age-f210-2123.json",
+      "profile_sha256": "3EF887695DFEEB12EFC01199EE48550F9041F3785B46075C9D9C871BEB592B63",
+      "disposition": "upstream-engine-adverse-skip-mir-arms",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "450E7AC33C409D0013C8F9A9C792D3339E893AFEEDAADBA2138D292D8DE0057C",
+          "result_bytes": 9151
+        }
+      ]
+    },
+    {
+      "id": "q031",
+      "profile": "tests/profiles/bztitanium-base-f210-2123.json",
+      "profile_sha256": "DF4E72989958752E3410F4F7CD79F9F7493DC7C9FA3F45C926F1C0AEFE21E219",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4067A13F20CB91E2B62800585EE0A1980A799BC03AD540A2C9AD9B4EDF36EDA7",
+          "result_bytes": 12311
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "267328D121945DEBCFD87748E577B9B87AD58502DDB28C98471527566F418B43",
+          "result_bytes": 13474
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "EAADBEA3ACE688E659C864BF55F48B113F1E0E063CE98F6796E60EA8D8CA9553",
+          "result_bytes": 13472
+        }
+      ]
+    },
+    {
+      "id": "q032",
+      "profile": "tests/profiles/bztitanium-space-age-f210-2123.json",
+      "profile_sha256": "F068DA0675F5100ED553BC9F8AAC4641861F077CFE99D4EF12FE3F1C2235E977",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "758B70FDC3D487367B5EA03850ACAB23A6C0E68B93F6E4184C987FF53854C851",
+          "result_bytes": 15360
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D8C707661F100C644239DE7D82AB12A9180A962D1322290D86A909E85EE0D5F8",
+          "result_bytes": 16520
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B7B78A2A14126A9B0854FCF47BFCC42CEB45C68D64AD0CCC340E9E074AA92193",
+          "result_bytes": 16520
+        }
+      ]
+    },
+    {
+      "id": "q033",
+      "profile": "tests/profiles/bzzirconium-base-f210-2123.json",
+      "profile_sha256": "7036DA134C1D853E67375EBF52DE552F58EE485F0B98ED2B2EC038F210A2C9A5",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "91641540CAABBB00FE6CAA0DA47587DFD8EA1EFD9458AEBBA54EEAB7421FFF1B",
+          "result_bytes": 12318
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "43CECF523B18574CBCC34B3659CDCCE6EBD6121A9D0482ABF3A974D05C6871CF",
+          "result_bytes": 13481
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "143C9D6F2B53A4038510917685612E73CF8DAC6BD8631722AA997E1829A9C89A",
+          "result_bytes": 13479
+        }
+      ]
+    },
+    {
+      "id": "q034",
+      "profile": "tests/profiles/bzzirconium-space-age-f210-2123.json",
+      "profile_sha256": "5275D78B66B2BA13F9AA174E920964A7273B934551CD4BACD304F5F268473AB5",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5D9DE9420FC9CDA85157A28AC22A4D7055A20196353C7F299E52DBA6A3C441E3",
+          "result_bytes": 15366
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "57CAAF8B6E6A6C990ADD17A82D369067976BD71521A57286624C51FAE1EF1544",
+          "result_bytes": 16530
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D34A9617FCDF2C6CDFCB5CA6D2CCE19EC03859F267D3E08F4687BB94CD7FE4A1",
+          "result_bytes": 16528
+        }
+      ]
+    },
+    {
+      "id": "q035",
+      "profile": "tests/profiles/popular-alien-biomes-base-f210-2123.json",
+      "profile_sha256": "23F6701921EAA353ABBC04E062D66CB5B6EDBD96DD50091EF6E4AC322B1DBE3C",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C2DA35E9F117E21D55ABB5F4F0EFE6AE9A407748C72B3D8CE0CD8B232471C5F5",
+          "result_bytes": 13131
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AE9E582E031C6675492FF93F6450AF5D7B53BF2565DE2E31D0EEDF60EB7B0A82",
+          "result_bytes": 14293
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0CFF75D59105491134F4690C2EEFDC1EF3E53902035ADC791C03DEA1343DC518",
+          "result_bytes": 14287
+        }
+      ]
+    },
+    {
+      "id": "q036",
+      "profile": "tests/profiles/popular-alien-biomes-space-age-f210-2123.json",
+      "profile_sha256": "462163141B1205A5B54B1B0D432330F68504A0FB1A613A87352E0E75FA0545E5",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "FEC42EE2F98B21786B71CC98A1DADAF0460993C685C8D661DB78501051418CAF",
+          "result_bytes": 16180
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "03EC19C2720779616387E2550D5096D59507E9B927EC4370B94017E3DD7A9B83",
+          "result_bytes": 17337
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "71A66CD15B34684B3A196D37C4E7E1732343B6277C5B97E46BFB29DB2A93C1C9",
+          "result_bytes": 17340
+        }
+      ]
+    },
+    {
+      "id": "q037",
+      "profile": "tests/profiles/popular-informatron-base-f210-2123.json",
+      "profile_sha256": "0FC8DE2773DE8735DAB463338D8EE9CE781F7CB62859DAAD9DE09C34216502A8",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B936FCA13C781C5EE2D3C06C5E5ABC9A00B6AA0266B5967F3287C64F19E55E87",
+          "result_bytes": 12315
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "BF140B3223E8CF8E63C90CF2294C9284A32B6C4B64435228EE8DCD58490D7C94",
+          "result_bytes": 13482
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E582A6E6FC75423BBA28226CB0B5E88176218EA40F94F4AD4470C9D5DC346606",
+          "result_bytes": 13480
+        }
+      ]
+    },
+    {
+      "id": "q038",
+      "profile": "tests/profiles/popular-informatron-space-age-f210-2123.json",
+      "profile_sha256": "8DE985E7BBC0B9102AB0B9A7B6AA949A751873ED8CBB07687A3C1974CD6F5000",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "3EC93BF1E24ED06355A6F4C35A5992C0156E9CFB6AD3A099574ED8A81E9ED1B7",
+          "result_bytes": 15365
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "77F9879B82A90E8003D39DBB54C507A8534B35446D91F4D5E2A92AC29FA77392",
+          "result_bytes": 16531
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0BF269B34866BA1C530258103EFE7F0D8793A603BDC43B6EC8CDB64B49D6D5D2",
+          "result_bytes": 16529
+        }
+      ]
+    },
+    {
+      "id": "q039",
+      "profile": "tests/profiles/popular-jetpack-base-f210-2123.json",
+      "profile_sha256": "2E324AAE4B16A180BA413B0582FD2564DD95FC5895A5B8C645898CD5E59F8266",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "3E7A7343FDF6D223720085CFDA8DBE9F831CDC9A37C3D095C598B8A543013268",
+          "result_bytes": 12292
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "83010A6B366742F4CFE240EDF702DEA069C4848D078FD2C9B42F9A163ED62234",
+          "result_bytes": 13455
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D0997FF3F8BDED826714C3BB2FBAA3EC0AFFE461031739E3C36D03CAF8B3CCFF",
+          "result_bytes": 13452
+        }
+      ]
+    },
+    {
+      "id": "q040",
+      "profile": "tests/profiles/popular-jetpack-space-age-f210-2123.json",
+      "profile_sha256": "7A8442587E4C12D7D89481396E0F293738C30D20B5A2A27A89689B3703FC707F",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9EAC8363BBD99382007F0364A54AFC6725F0EBC5AE669BDBCEB25E1C63D58738",
+          "result_bytes": 15341
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2422F19811D23530A85969A861B6EC0CE9CCEA8A1EFC526189D8C5A5F6C624A1",
+          "result_bytes": 16504
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AF3129FD748C90A2A17A4AA1D3BD097EFCE63D35E093622E05441C8004E408AF",
+          "result_bytes": 16502
+        }
+      ]
+    },
+    {
+      "id": "q041",
+      "profile": "tests/profiles/popular-aai-containers-base-f210-2123.json",
+      "profile_sha256": "1D347969E5C28C9BDB52BC912D3FA0B2845117F2BC6B4C4224F9392EB281353E",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "318007F0523A1528D9F898F953F61067C42D83FAB8704727FE693A2E91BADF04",
+          "result_bytes": 12340
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "64A6309AAEE920C526DA2D697B1902959F988E10CBC072068513CBBA8DB5094D",
+          "result_bytes": 13503
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4590B0C8F0A06A02AE8461D5FAF933F89EBC58B14C143F16D3A8EB1A7BB52A4F",
+          "result_bytes": 13501
+        }
+      ]
+    },
+    {
+      "id": "q042",
+      "profile": "tests/profiles/popular-aai-containers-space-age-f210-2123.json",
+      "profile_sha256": "632889D5E54E66800C76C89D5E71643294C7BDC2B5405160B2C14D5B117C4175",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "000C4CE37007BD6DF75581F61273F11A03615EE7E457DEFB6671F97F2D872F9F",
+          "result_bytes": 15389
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F308D86DFC289654447E72B9995556DD0AD1C133EF58C232A32750064382393B",
+          "result_bytes": 16548
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B67323FC3EF6055C449BD1F69CB40774D16CFF129790674ECE52A7327FB845F8",
+          "result_bytes": 16550
+        }
+      ]
+    },
+    {
+      "id": "q043",
+      "profile": "tests/profiles/aai-industry-base-f210-2123.json",
+      "profile_sha256": "CCA0DE592673EF81C8255CE695428285EB8B6E8B128436C44B618A19C6548E15",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2B8A7740BE5B0A2B6865776E23E68212A627100ED8C935B6194A68877B291F4E",
+          "result_bytes": 12319
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "01B4645AC44F9ED604B17B733C66AEC035BA805C0BCFBFFFBF9E1C663F8DBCB8",
+          "result_bytes": 13480
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B2B9DA9505C0DF977CF846379609E9FB721FBFEBC8B1C1B073AF3B76D9877072",
+          "result_bytes": 13480
+        }
+      ]
+    },
+    {
+      "id": "q044",
+      "profile": "tests/profiles/aai-industry-space-age-f210-2123.json",
+      "profile_sha256": "25EE100A0D723AE9802C27642B7D84C9C79E44B5C1941C39F9F97DA92AA7F9D0",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6A4D9813E0B5B930DBB4E1D3EB3B60BEE33AE07EDDCAAC831F0A221A409C0446",
+          "result_bytes": 15368
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CE627870DB5F28F0274CE3B52672001DF6B9E8102CC139A9BF7627CED71DDB90",
+          "result_bytes": 16531
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C506CBB6D52F8295A1A5E555DF8487FEEFB29E1C630F632D68BFAE76E5678101",
+          "result_bytes": 16529
+        }
+      ]
+    },
+    {
+      "id": "q045",
+      "profile": "tests/profiles/popular-aai-signal-transmission-base-f210-2123.json",
+      "profile_sha256": "47D236082F7C4F4A2D2DBAE9195FA53FFA14359CDCF7FA838D1597FEE25DCC53",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7BEAD268766911E176661AA0C004BCFBBF81E95C7D23EBA7C926372D07434454",
+          "result_bytes": 12402
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "3F337CA9F3E11E65E71A5A684BAED93C5CD89CCAE711416AB734B504765A649F",
+          "result_bytes": 13568
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "355476610CAB004F3365F63C12A0DDE193C84648E9D72AAB4B31B12B8FF29C42",
+          "result_bytes": 13566
+        }
+      ]
+    },
+    {
+      "id": "q046",
+      "profile": "tests/profiles/popular-aai-signal-transmission-space-age-f210-2123.json",
+      "profile_sha256": "96A3B82700C82A42E23487AE0B22D847F31183B0744356F2F2022A7CB9B797CA",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "DB42E7458127629FA350027060211041228E54A3965431AD588A1A4EF24C34FD",
+          "result_bytes": 15451
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1A0DCA53EFCEC2F675B9A9706E393333F42BDFA1B8479E68252D4734C5B86176",
+          "result_bytes": 16617
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A55BAF3F15EAD0087798497CAEB89691041E3DFA5DD9C0983540083253DA2F6C",
+          "result_bytes": 16615
+        }
+      ]
+    },
+    {
+      "id": "q047",
+      "profile": "tests/profiles/popular-shield-projector-base-f210-2123.json",
+      "profile_sha256": "7074092D6C79506F51A37A49B2B3A4CF824ABF89D6C7CEB746F3A4179C88204E",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E9ED78C42CF75B5C24A02AE2DAB901EF5E24A134C54AF2F76ECD11BAFDEDB7D4",
+          "result_bytes": 12353
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "76993FAF0E06C4ED457599DB494D3ABC8DC09E4EFAC945B1E8F5B1927533E258",
+          "result_bytes": 13519
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "972171AF65859745316A6589EB7D6289D12CB39431DB9CF837B157D8EEA52FE8",
+          "result_bytes": 13517
+        }
+      ]
+    },
+    {
+      "id": "q048",
+      "profile": "tests/profiles/popular-shield-projector-space-age-f210-2123.json",
+      "profile_sha256": "7119021407EB98BFE3501D5FD5AE3BD9C191DB11CFEC439359A79F9D5E585651",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "DBE2A171CF4D9341DBC9BFEB4466BB4C88D588DF76B9D8125A8E0CC026D559DF",
+          "result_bytes": 15402
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "64F3E3194599606AB9B2998B82A6BFB36FF621E64F410987415BC199AD098B77",
+          "result_bytes": 16568
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9FC7F86E503EB59C5FB5A664D9646074F78D4B0A34C8A1AE6B8994B1D35DA5D0",
+          "result_bytes": 16566
+        }
+      ]
+    },
+    {
+      "id": "q049",
+      "profile": "tests/profiles/popular-robot-attrition-base-f210-2123.json",
+      "profile_sha256": "FA1D8424D96F971AB373E3E2524809805789D9EFB001BCCD924607B6A00421E5",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AB35750A9C73B318FEFB31F0E75563D7D14E605A14FC6A5887E66515B69967F5",
+          "result_bytes": 12346
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5E7215B71C69D87D627843B5750AFC1E9B1FC762AAC8D847A8CAE82ED526C5D4",
+          "result_bytes": 13510
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0CD3DB9AD6909454DE979569AEAD53324F14DF78B1F54236D7AC56B9D3FC1BBD",
+          "result_bytes": 13506
+        }
+      ]
+    },
+    {
+      "id": "q050",
+      "profile": "tests/profiles/popular-robot-attrition-space-age-f210-2123.json",
+      "profile_sha256": "835E9144D5C6B11A9301607AA17BD76DCDABDFE60BFAD54840486E474F1DB38C",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2DF1AEAE15DA67F61A506C592F4FA1F4E4FFBEA49F80A6C54289EF0D23A53E75",
+          "result_bytes": 15395
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B6ABB7029FCB6579B857A835A7A50FE2556158CF2FAF405EBC3855CF7370E3B1",
+          "result_bytes": 16559
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "86314DE7765BE45C25D68573D33AB39B2169345AB776E6BA2E199D2BD0BEBF70",
+          "result_bytes": 16557
+        }
+      ]
+    },
+    {
+      "id": "q051",
+      "profile": "tests/profiles/popular-helmod-base-f210-2123.json",
+      "profile_sha256": "8DDB37C739315577EE96D2A11BC68989B8688AB6FD93BA3B617625831A64081C",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4AF9121DA8BD69A67A189F42FEF77BB445D6BC16BDD3F0446C3ACA17880E93EE",
+          "result_bytes": 12285
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5A82DA3297C7B0BB9C76AD62AF0E8357AD7C1ECE37FAA72EF98435E9A7B1D5BA",
+          "result_bytes": 13446
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CC7885EC75207F40FF5E9D67F7993065046915424C7386B0114ABFC619D568CB",
+          "result_bytes": 13446
+        }
+      ]
+    },
+    {
+      "id": "q052",
+      "profile": "tests/profiles/popular-helmod-space-age-f210-2123.json",
+      "profile_sha256": "97472DA931B4EB892006229364E74E857548A15BDF987562F70536B52CC407A8",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1B16656C0E97EF4D88F8DD58589C509BEAC5B4CC3729E55A199BE96FF7A677EB",
+          "result_bytes": 15334
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "3619E96133090414575151B746D99ABADE870A0FDC0D8CA261D90E28C542E320",
+          "result_bytes": 16497
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "80B3AC41B6B23FE4C9E527060B4B14BBF8C3BEE697A8AAA2E5768F147BB3A6C5",
+          "result_bytes": 16492
+        }
+      ]
+    },
+    {
+      "id": "q053",
+      "profile": "tests/profiles/popular-even-distribution-base-f210-2123.json",
+      "profile_sha256": "6C1BC7046EB2E4011A9E1543BE2E2947F7836F1D45DB4EEE18A469D2C375544D",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F94FBB50FEEDD675883B4BA791E918EDEA52AC39F8485AE841915FAFDC1247ED",
+          "result_bytes": 12361
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C11A3A6E9B658CC25751619D3253AD78B9BD6301D5FC90F299909ABC234AB81D",
+          "result_bytes": 13524
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "DDA42D32820A6205C4C11C2C926D9856985E7DE9396695D5206BC7A84392094D",
+          "result_bytes": 13522
+        }
+      ]
+    },
+    {
+      "id": "q054",
+      "profile": "tests/profiles/popular-even-distribution-space-age-f210-2123.json",
+      "profile_sha256": "017311036BD2BB46C59E43037E02A25101FBDE83B42E1DE038551F14BA93370D",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "76F5BA784AE4B38C94A1BB9A71FBB7F5B63C93295170BC3CCBE7387CC108B0FE",
+          "result_bytes": 15410
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8C60570E26F5C6BFFF522A139B75098ADD60787CA3FDA71FBFAC5399554D9FC1",
+          "result_bytes": 16572
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "852F47AFC2AE2D86149E2DFBC6B21527B0295CDF7DF19F94DF5C377C3439C726",
+          "result_bytes": 16571
+        }
+      ]
+    },
+    {
+      "id": "q055",
+      "profile": "tests/profiles/popular-bullet-trails-base-f210-2123.json",
+      "profile_sha256": "6AE2E24FDE9AFEAA129977C34AE8939594F6126D147F3BA9FB13B95B434A11C4",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "570342B6E22A0261084A8C452D11F1B65B5AAE8ADC1C0204D51784460CCD6F60",
+          "result_bytes": 12329
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4D4B966ACD2C167C80738BC61F0379A3579B673FF9D2038ADB956E1356E6CAC0",
+          "result_bytes": 13495
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B978AA6A294796A59347598388C88F5B43F510F3230D2DDBBE67C9DCEE2D3C96",
+          "result_bytes": 13493
+        }
+      ]
+    },
+    {
+      "id": "q056",
+      "profile": "tests/profiles/popular-bullet-trails-space-age-f210-2123.json",
+      "profile_sha256": "FF07A96C8B0D43DDBACA518266A8C4EDA04D3F2015602AF6AE392DA6F264D52F",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5B51512DE5F738319CD47734A4267F78013066E5D60A9B26397CEF98081776AC",
+          "result_bytes": 15378
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1656ABE93DB1B6D5B4CA1D2E783EFF1E7813F1D81103F07A0846E14B375F8D20",
+          "result_bytes": 16542
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5ED6DB009F8DB40FC7FB18CC08D6D1CDD530E32C74183535ABC19F38855D14EC",
+          "result_bytes": 16542
+        }
+      ]
+    },
+    {
+      "id": "q057",
+      "profile": "tests/profiles/popular-ratecalculator-base-f210-2123.json",
+      "profile_sha256": "A415DBB8EA5F531671633289C749EDA48D694494D3F15D76230B38B279842376",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C88A8BB222A8C8BFA6F42110B75AD1DD4C72DF2331152C91CDBDDB3AFBE05C7E",
+          "result_bytes": 13044
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "01244B90547A0E6374F6421F7A762061CF13E6469A62103B70D50387D9F60B29",
+          "result_bytes": 14207
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E94F1CF97FD163E82C5CBA482D1F7656FD680A68159A03CBD3A47009D74FD1AB",
+          "result_bytes": 14205
+        }
+      ]
+    },
+    {
+      "id": "q058",
+      "profile": "tests/profiles/popular-ratecalculator-space-age-f210-2123.json",
+      "profile_sha256": "9785A8816C9A2186246226BD12BDF0087D8F5E893CCE66107F71B8DA0FA1CFF5",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "57EE54567943D574A0CB3A0155C6737B798BA4D99FDAB1F9E839C4C29E4B4A45",
+          "result_bytes": 16093
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "EE2C7BD7AAF5F9B5B7BA62EB56DED36A9E35033102DFDB455921BD295E985DC1",
+          "result_bytes": 17256
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F858977A4F26DC4F67B3B2DE9855C99833B6D948F070D98389E21C68F5FD7BA0",
+          "result_bytes": 17254
+        }
+      ]
+    },
+    {
+      "id": "q059",
+      "profile": "tests/profiles/popular-bobinserters-base-f210-2123.json",
+      "profile_sha256": "2BFAF2B171703DB9A851A01F6B8657DDF0B1529C1E4E5E3B7387E73FC3A8F9ED",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6977250B2097B7428228457AA79C1EF765AD3834E4458CC4EE8BBC7C2F576FAD",
+          "result_bytes": 12326
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9DA277E746A6ED4FF94DE19979BE0DD461C6EE01512B93D0FD3849841CD60562",
+          "result_bytes": 13489
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "81676BA33DCEB80E52DC8DA588D15B540D457884508CB6E589B77E459A3B2E47",
+          "result_bytes": 13487
+        }
+      ]
+    },
+    {
+      "id": "q060",
+      "profile": "tests/profiles/popular-bobinserters-space-age-f210-2123.json",
+      "profile_sha256": "F6A5787678B523EA26A099280B17E01EA4318D041E8A17C3C32842E10CC8373D",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "29C22633773493E7198715F1F3AAA9DD018C75B46852A780374B60B5E21EB66B",
+          "result_bytes": 15373
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "177E79E023776D049802CB2C4EE5B0C63C489F3F145B8B73F12BE66ACACBCF17",
+          "result_bytes": 16538
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C4CB90D0A63924E3F49A30321D46F9C7044FC653C6C4954603F6BDAF0F94EBE6",
+          "result_bytes": 16533
+        }
+      ]
+    },
+    {
+      "id": "q061",
+      "profile": "tests/profiles/popular-krastorio2-base-f210-2123.json",
+      "profile_sha256": "12CA669CE9BD332DEE14331A36F7675E3460CD70A2EBAA6F088AE329C4A27439",
+      "disposition": "published-adverse-candidate-continued",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5DBFEF3FFCE7300906682FC19BF4DBBABDAFC7C563D1E872B1D34182F5A034CA",
+          "result_bytes": 14617
+        },
+        {
+          "arm": "published",
+          "status": "failed",
+          "result_sha256": "3C94B00F4E523839524265691857FCE4B5F226ADBC957B29ECA40E91ABD2842D",
+          "result_bytes": 9569
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4603476C5B28F143A6EC0FD7A338342C8D1C822CC132CA916A65D4B2C0B21F41",
+          "result_bytes": 15778
+        }
+      ]
+    },
+    {
+      "id": "q062",
+      "profile": "tests/profiles/popular-krastorio2-space-age-f210-2123.json",
+      "profile_sha256": "616AF92086506996F0C934CEED2076E5EBB5975A9C6FF2A9C0E26AB2DB0EC215",
+      "disposition": "published-adverse-candidate-continued",
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C24BD2EC3F1E10865994297838BE183A38B115B2DFE8A2E974B95387CA8F162C",
+          "result_bytes": 17666
+        },
+        {
+          "arm": "published",
+          "status": "failed",
+          "result_sha256": "A1FC858FBDA848E4BDD5D9008939AC179102A5239C2ED36E021B3E7D6816236C",
+          "result_bytes": 12516
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0C53FF449451457D1E2D05480399042CF769DFB9BE9453611BA3B4AC0AD6EDA0",
+          "result_bytes": 18826
+        }
+      ]
+    },
+    {
+      "id": "q063",
+      "profile": "tests/profiles/popular-autodeconstruct-base-f210-2123.json",
+      "profile_sha256": "96F5EF23BEE994A0EFFFB79BD27E896E7271CA0B3C1143471B3A0F4DB136EA0C",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F547E73DAF48788B21369333712E6FAA835678252D77CF43434DFEF47A054F1B",
+          "result_bytes": 12346
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "90415C91D404E8A4D0ED5DC269A0C857D4751A440EA15E656DF146AEF3E72B75",
+          "result_bytes": 13509
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F272291E20E9440830FF8AF6AFE54934E934FA3BED35C0DA98E4805154B60E45",
+          "result_bytes": 13502
+        }
+      ]
+    },
+    {
+      "id": "q064",
+      "profile": "tests/profiles/popular-autodeconstruct-space-age-f210-2123.json",
+      "profile_sha256": "FB0ECF598757976582B90B86EB4DC316D65CC3CF1F3C8B2B41A95346A942F6D5",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "20095241E568748FA6D4C1E2DC7EF62BD23357BD632B79D292ACB622582DC39D",
+          "result_bytes": 15395
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9F188775993435363467028F3D764F10F3BF894637E0BDC9287A35318F4E62C8",
+          "result_bytes": 16558
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7894A270FEC2DAF6917733BAAFE469E9131E4C6415E3DF1EB99F40DED15C68A8",
+          "result_bytes": 16556
+        }
+      ]
+    },
+    {
+      "id": "q065",
+      "profile": "tests/profiles/popular-fnei-base-f210-2123.json",
+      "profile_sha256": "C3B2485CCD35290A932278B821B8226270CFD262179B4AB096BA963D1754D73B",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B5AA3E632F1181823040683729665311181A4A5F67505D5FF0E6A25A34ADF994",
+          "result_bytes": 12267
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F57D12E0ED3F70B239CB44C7DFC0ECF638B4C7CBCCAA399A6149776883E3F483",
+          "result_bytes": 13431
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "EA53F48134FD468A908E5EC2DAC3FC25719A1654D844FC5A6B7D7853E593EFA9",
+          "result_bytes": 13431
+        }
+      ]
+    },
+    {
+      "id": "q066",
+      "profile": "tests/profiles/popular-fnei-space-age-f210-2123.json",
+      "profile_sha256": "644FC6B6232A78D3E3A195459D306F5C04643CAFFA67671C0499F4ADED78766F",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9716C2BFDCC92939BFB503C4E57A760AEAF1EFA01963D09EBDDEA13EA881C097",
+          "result_bytes": 15316
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "62D6C1754144A0B7BDF61E63F0D780C4CED0B268F0F38008B189E29DE0D742F9",
+          "result_bytes": 16481
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "60C15E82C4910912103DFE240C9886842EB645BF4C92164A9A62A7C732B01EE6",
+          "result_bytes": 16480
+        }
+      ]
+    },
+    {
+      "id": "q067",
+      "profile": "tests/profiles/popular-combat-mechanics-overhaul-base-f210-2123.json",
+      "profile_sha256": "A4807AF58E94A75907E6CE270D3330F1D21C651A92F4B37512DE2E66661BB755",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "ADD517C21C92CA8CE494142AD17EE93913F928B5E3B8B48EB916EC9CCA32BC1C",
+          "result_bytes": 12416
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "72FD6597E52EC41E69634FED1602AD8C0BC7A333B08AE0FD09CA39769D9A182F",
+          "result_bytes": 13577
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "666C7BDE677BC8129F4B5D581D187A07C6405B0A97726C4961A3C691C3CDA17F",
+          "result_bytes": 13577
+        }
+      ]
+    },
+    {
+      "id": "q068",
+      "profile": "tests/profiles/popular-combat-mechanics-overhaul-space-age-f210-2123.json",
+      "profile_sha256": "8E4EFF88C5183583CF4BCAACC316982C928131B1C4D686C61174855E679B1CB8",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "BA2294246EB2204CD27D43EB4953118C32BA53451AD48CD6BBE6FFA8E1DD4FC1",
+          "result_bytes": 15463
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8B5255991C126294B4AFC80F979EF6D2A1D1D312B2F481034E1263B9EA228F4D",
+          "result_bytes": 16628
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C95CEDBD7A0F1CF2D64222A04314C3EC373D80ACA68BC23F75896DD47C3DAC2A",
+          "result_bytes": 16626
+        }
+      ]
+    },
+    {
+      "id": "q069",
+      "profile": "tests/profiles/popular-milestones-base-f210-2123.json",
+      "profile_sha256": "95F1B85C64EC6C2F1D709FD128729401CF0074A9EC86A9164E0E12DE24555FEE",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "051D2EFBCCD27AF3FA97A9A011DB2C203E4C2973781BBD627751F5C71843B8E2",
+          "result_bytes": 12312
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "37FB4FB860113D31767C5E5EA957D365873F2B02F1BF5C39F6015E5CDE74C637",
+          "result_bytes": 13475
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "DD3FD5D85039918181C5F95CC7AF25BC24541563269E285F627DEFA11F31DF45",
+          "result_bytes": 13469
+        }
+      ]
+    },
+    {
+      "id": "q070",
+      "profile": "tests/profiles/popular-milestones-space-age-f210-2123.json",
+      "profile_sha256": "28224D6A2029B6E012C65DD9605AB0A59A6115DB20BE4AE7575860239928C4E1",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "08F16D4C7430918D4553B6911D0D2EDDFB5A8FE8E895C95F9EC32D5DC1A7DDDD",
+          "result_bytes": 15361
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5941854360201E42B1F520153B130F95F40AB2708DAB2AD5B87B7A83C1A2FA4E",
+          "result_bytes": 16518
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5CADAAA8FC8612C1167EF99AF6EF114BDA8E15427D1EB7F0B5B6C1194A4BC719",
+          "result_bytes": 16522
+        }
+      ]
+    },
+    {
+      "id": "q071",
+      "profile": "tests/profiles/popular-textplates-base-f210-2123.json",
+      "profile_sha256": "DE272A61FD90288095C4B3800824929A9169D4C9827356B3E7F17005EADF0DD4",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4621D7E987E8BB937448F8C4EE07ACEDEF24E7A20F4AE7C7520433294CB97D75",
+          "result_bytes": 12310
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "769FA12C04166B411AFC6E029F66D1D4FD55F327A63F1133BDBA0F6C792B6505",
+          "result_bytes": 13473
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B89D25BFB176C20F3A90F97E60748C9987A36B37DAFE97A6151DFA1C08768584",
+          "result_bytes": 13474
+        }
+      ]
+    },
+    {
+      "id": "q072",
+      "profile": "tests/profiles/popular-textplates-space-age-f210-2123.json",
+      "profile_sha256": "6A557064218F8223C6538C3534C27452253375FB19BF5E58590A8ED5DA4817DC",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "034CB267C475C35A0A8C7E5A8A3EEB00E782E7F5063DD62BA5873F142FEB488F",
+          "result_bytes": 15359
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "59A3B479C83CC3D4284FE09EE195BDB2A362461CD6525896C66CC89E978DB354",
+          "result_bytes": 16525
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "95A681A309F30A98B904713458B9B22B982525A31529237A40D8F26B74F7E254",
+          "result_bytes": 16523
+        }
+      ]
+    },
+    {
+      "id": "q073",
+      "profile": "tests/profiles/popular-boblogistics-base-f210-2123.json",
+      "profile_sha256": "BCABC502848BE49ECD6B33C3AA45BFEBA3BC59750D94342249D0ADD2D4AC0CFD",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "78CF97E9DD723F70B1956FB0C1202E7C3055260D6195D6AFF41AC0242555BA50",
+          "result_bytes": 13064
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5791B7FBAF96C67678DC7D1931E931C3CEE3D0CB71FDC095EA59C3D82C549088",
+          "result_bytes": 14226
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "BF356ECF0E8DF3C5DC4681B96F2D651AF4B2CB875B1316F98A4BB60CB6A335F8",
+          "result_bytes": 14225
+        }
+      ]
+    },
+    {
+      "id": "q074",
+      "profile": "tests/profiles/popular-boblogistics-space-age-f210-2123.json",
+      "profile_sha256": "338D799BE5FD4FA9E70CCD8577926D3ECDDDEB9E143DD6F874D24E416E329B16",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "14B303E13D332798164DD7782A759202A6EDCD2AD546E8617E3C0F9C0F022FE4",
+          "result_bytes": 16113
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "FC37311AFE6EC9930697422536FC7A7CF8CCFBBE5070BA36E6A0AC7996FE88B8",
+          "result_bytes": 17273
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4F8BBBC0F1DD7172404E9C73B3CA61B815A5BB69519A5459994ED7C97F1F9FA4",
+          "result_bytes": 17274
+        }
+      ]
+    },
+    {
+      "id": "q075",
+      "profile": "tests/profiles/popular-factoryplanner-base-f210-2123.json",
+      "profile_sha256": "C50D6D02B34BFC8BB5001D807B5B4FEC274715830275D02D3B979B245E741933",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CD03C6AB1A07F2181D19592566F4690E1C09874B9369E687D5A6DC21A59C59FC",
+          "result_bytes": 12343
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B63135EF3CA1EEB33C13EDEB5D62F2C243B575BFE480C1F4DC8E0E7C1B4B9EEE",
+          "result_bytes": 13509
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "DCF13349BE2CFC170779B29B1086D3786330666E7742AC1CA2F6DC1D7B59FABB",
+          "result_bytes": 13505
+        }
+      ]
+    },
+    {
+      "id": "q076",
+      "profile": "tests/profiles/popular-factoryplanner-space-age-f210-2123.json",
+      "profile_sha256": "446FEB39E99DD668722C5A3B57714CD2CBBD73FEF91773D046143CB6DA656B2E",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0EF0689C786478067E2F01619FA5099358DF11CD16F96154EED72EF2A0C34297",
+          "result_bytes": 15392
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B28F4A03507C6DCAF6491A8B2CFEFBE50720B89F92DE22395FFB311625218872",
+          "result_bytes": 16558
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "EED21E493359AF674C5C3DEC655C84FAE9BFCEEDD16FB390C974B0B66E530B42",
+          "result_bytes": 16556
+        }
+      ]
+    },
+    {
+      "id": "q077",
+      "profile": "tests/profiles/popular-discoscience-base-f210-2123.json",
+      "profile_sha256": "DDB13A7D762D50FB78469E28509D1E00441071729FD971D6E444AC56A5AED4AB",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8EE61948D38728BF066995ABBAC1013278D568B3DC9B0F7DEAB0AA218C0F99C2",
+          "result_bytes": 12326
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E1A0409D39DF45309A191826AFF4E6C15452206448BD7ACC228AA9CDA361C476",
+          "result_bytes": 13490
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AF08187AC0D35C4FB046091BA1581FB0FC66D5018DEE465081B1A488E528F81E",
+          "result_bytes": 13488
+        }
+      ]
+    },
+    {
+      "id": "q078",
+      "profile": "tests/profiles/popular-discoscience-space-age-f210-2123.json",
+      "profile_sha256": "8E71986767569193E8A729E7CCC00F7CE917090F55EDFBA85E2643CE3206DF45",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "228C6D55B72296ACCE27C87D57A4CDD5CCEB9F1339B05525E16A5443A78ACC5B",
+          "result_bytes": 15375
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "230E533C15AF4EE71EF833E800C949996DB5CDB5157FB98AB533A1FE3A096A2D",
+          "result_bytes": 16539
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5D29A26F64F77C1FBD6E25E0C6E9C2BD78E83952CAEF5DFFB77B3387B547A23E",
+          "result_bytes": 16535
+        }
+      ]
+    },
+    {
+      "id": "q079",
+      "profile": "tests/profiles/popular-grappling-gun-base-f210-2123.json",
+      "profile_sha256": "D593289C869306F50A685CDC9CB3D24E4EFBCD5F647807CB5E168AC952D39387",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "10F92D06957B4BDB227EA9604A7CA306FE24BD80C2B044BB0FA4865074F0048B",
+          "result_bytes": 12328
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "02C85E21FE19D529053B5C8F20665C960D5FAC7CF8DA59AD41F6665A9D460CD3",
+          "result_bytes": 13495
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "305497D1DB893164F06C5C9324C0B8635B9DB04619B5C87002B8B9A64C77046F",
+          "result_bytes": 13493
+        }
+      ]
+    },
+    {
+      "id": "q080",
+      "profile": "tests/profiles/popular-grappling-gun-space-age-f210-2123.json",
+      "profile_sha256": "E6074350F8CA36D6F8F49CDCAC9A3240901F1738C394910DEDCFDC80C62617FD",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "97CED3FEE84E1C72B09003578A4ECC93549B7DF9895D2AA2183869FD31175D9C",
+          "result_bytes": 15378
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "FE1F41431C3571540EB8E4A4409E913D3D2964D111BA8342D16E50151A60A86F",
+          "result_bytes": 16544
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8529BA93EE4011BC730B309184E776D256EE177541E7E2F156F3A3C9A70EE51D",
+          "result_bytes": 16542
+        }
+      ]
+    },
+    {
+      "id": "q081",
+      "profile": "tests/profiles/popular-bobpower-base-f210-2123.json",
+      "profile_sha256": "A54CD80D2D5DE58EE37755B6707C026B067477E8F7CF7C28FDCFFA296E694ECE",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6144B401F8E929F7A6D336C2DFDFD23876C07B289279A8B92C1D1BA10ECE47CF",
+          "result_bytes": 13035
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "69B61300D32F95C620B6928E88B974A2D8FD1DCFBD8E8FACBC8205B6013C713E",
+          "result_bytes": 14198
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D48C417C20CA0ECB008BEE81F13FED7E69F681BE80FFC458A99129CC7FEB500C",
+          "result_bytes": 14196
+        }
+      ]
+    },
+    {
+      "id": "q082",
+      "profile": "tests/profiles/popular-bobpower-space-age-f210-2123.json",
+      "profile_sha256": "29BEE073AD6457434FEA841BD843E6B469B14D2CBB98948D6EAA289C78943FA5",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "58CCBBC4E5AAFEA94F22DDE5B49773A620103CF97F63BF989CE2B4A27505A85A",
+          "result_bytes": 16081
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1F3D24623A10CA9C13CDBF39DBCFB0CE50BEAA73C54434E0E885C763707ACFD5",
+          "result_bytes": 17247
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4D53FA7F70F84650A18D2BF8F3C19E4FA1F001957AC9BF1F9CA3AB0E13221504",
+          "result_bytes": 17245
+        }
+      ]
+    },
+    {
+      "id": "q083",
+      "profile": "tests/profiles/popular-bobwarfare-base-f210-2123.json",
+      "profile_sha256": "55C2704323B74795623FE865B9EFEC469E1E32F913C8AFA92BCBC00290410522",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AAE55252762187911EDA24263D7D9FE670EA66C3F51CDD4890E0AF5BB416C55B",
+          "result_bytes": 13049
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "414DD06D7B84E088BECE8C092F2CF9E7B3EFD2D5C0C71C77A2B6D702C2E77249",
+          "result_bytes": 14212
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8F66595A3D114E050821F4302EA1045D6815A0291C73933C9F1C4738A16508A0",
+          "result_bytes": 14208
+        }
+      ]
+    },
+    {
+      "id": "q084",
+      "profile": "tests/profiles/popular-bobwarfare-space-age-f210-2123.json",
+      "profile_sha256": "DDF98B3E1D5D8CD89A5D566BED2793A28AE463A916A790D1C54ACE245D38B64F",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C3D8834C47C944AE55BD2060AE3D9FA5E103311C6B2AE5A819ACF4421607602A",
+          "result_bytes": 16098
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F3081F8B11E1B5D71B32FD070922C714E4A8AD2430F5E97FA15DA377BA7B3B14",
+          "result_bytes": 17261
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9AAC32872E3E4F0796153872314078641E82650D80965913E5FE0341B962C26B",
+          "result_bytes": 17259
+        }
+      ]
+    },
+    {
+      "id": "q085",
+      "profile": "tests/profiles/popular-waterfill-v17-base-f210-2123.json",
+      "profile_sha256": "0275A00FFD08E2B5F9B1C1571BC2BC9A6080555905CF553D78532E7681F3D35B",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "82153D9052ED8F57694F999F4CD2490CD3046F30F8266452B0B54E9F37BBD726",
+          "result_bytes": 12331
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E2F3FDB56F832425C6658A0D84EC83849B65716DCEC51EB1F8AA45AC02A34518",
+          "result_bytes": 13493
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "890CC5718DCF741933D28C0247FDA9AB102FAEEFA0FF8CCB0A7B3216A6106A04",
+          "result_bytes": 13493
+        }
+      ]
+    },
+    {
+      "id": "q086",
+      "profile": "tests/profiles/popular-waterfill-v17-space-age-f210-2123.json",
+      "profile_sha256": "0D75AD10286F2B16873634ED9BA7FE7C6CB09A864F309A85979337165843F3E9",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E7B0695CB4C8C538A833E196F0A1E1B8C4218FA3B3AB77B3BA54F9162E0E6673",
+          "result_bytes": 15380
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5F6ADD795E59082421E2D47148AFDDC55CB335CD674CF4BAEE00CC1E16B87D18",
+          "result_bytes": 16544
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "DCE006375CE0EBFE89D6620B4C98E33FEFEEC3EC3360AA19B6E86C03F9F9C7A0",
+          "result_bytes": 16542
+        }
+      ]
+    },
+    {
+      "id": "q087",
+      "profile": "tests/profiles/popular-bobassembly-base-f210-2123.json",
+      "profile_sha256": "307596C4C1A7D3389437092E403E31227628B96C48FCB43C348F821F549F7D68",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1E899CEA0061A5D904B9E1E2FF9299B8BAE9A860B8D390C5423BB3641D5ABE9C",
+          "result_bytes": 13057
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5B5DAAB6C6B29C31F4537B92381400C9A2F71231092F2FC4E75BC2EC2359B579",
+          "result_bytes": 14220
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "FFD8AE78387B921427FB17888BDA05677ED72145F91F612832ABF51B7612D193",
+          "result_bytes": 14218
+        }
+      ]
+    },
+    {
+      "id": "q088",
+      "profile": "tests/profiles/popular-bobassembly-space-age-f210-2123.json",
+      "profile_sha256": "375DF286BA12530646191BF3D2B0898642EF54CE3A3EE9112031EA7F7175DA8E",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "759738EF45DC2AD1DD34011EF3F0FF82B3E4351BD86EE1EF36245A84DB32DB00",
+          "result_bytes": 16106
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CE86FA6BB6DD0BE277C5DD96B04786DEEA24274C770524C3794709D9C8A2DBCD",
+          "result_bytes": 17269
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B1CCDE2D1EB0758A3FB34A67E6C27FF1A765A59AF860F924B8A57E0DF51A7F38",
+          "result_bytes": 17267
+        }
+      ]
+    },
+    {
+      "id": "q089",
+      "profile": "tests/profiles/popular-bobmining-base-f210-2123.json",
+      "profile_sha256": "C9C0591456C38B8EEF0A65F131F9B43083AF42B56515077B1D5C760AEE6BA88C",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9133FE5D3B421ACE82F35D78BE2E7E6D8BDC723BD731398364DAD357EE0123CD",
+          "result_bytes": 13041
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2F49ABC6C0A5938DFEC179FFCDCD34CD841F5E58D700B5D190D522B162384D24",
+          "result_bytes": 14205
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C6D7BA1CB54146D1E9BE10AD51815E2B9EF36CCD73188275A802AC6C5D7E1FAA",
+          "result_bytes": 14203
+        }
+      ]
+    },
+    {
+      "id": "q090",
+      "profile": "tests/profiles/popular-bobmining-space-age-f210-2123.json",
+      "profile_sha256": "B1A880E2A5F456DC15FCDDE237A2F9C8355095A045438622D99750D481F1DC5B",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2DEB116C2EC563E47D44BB8FB3DA77B90A5BBB2F1F16519C417FFD8F3D6E0205",
+          "result_bytes": 16091
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7132918A75CC6F342AAEA681AC8AB8FEE68EE0A1380F19A41E4D03EC985FEA6A",
+          "result_bytes": 17254
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CFF06AA0A9135F961AC64D86657C975E82D9DB526198DD5203C292D4AD8E7EDF",
+          "result_bytes": 17252
+        }
+      ]
+    },
+    {
+      "id": "q091",
+      "profile": "tests/profiles/popular-equipment-gantry-base-f210-2123.json",
+      "profile_sha256": "003A72C24DF72C0F826B107C7D1B09CDC8EABFB71D8210018A27864F2C142D8F",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9540CAC95B3465350DFF7714B4335BC819AB10CDB7BCACBE9AD2F7977F9FC349",
+          "result_bytes": 12351
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CBE45AFCBABC1965EDE6575806EA45C1B2FC513337C3B0F11A00BADCF5490136",
+          "result_bytes": 13517
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AD1CAAA2FCA858531D49120CF0237ECB1EAFEF77C05DE175ACD736B9659A2FB7",
+          "result_bytes": 13515
+        }
+      ]
+    },
+    {
+      "id": "q092",
+      "profile": "tests/profiles/popular-equipment-gantry-space-age-f210-2123.json",
+      "profile_sha256": "ADB059BDB3B39AE9EDF4FEDA6AAB2CCFE52344CA7093B403904575422A98CC7E",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B113432C8129E2C38EFD1CFEAB2BC1FB2E7038236F43E0B24140AF1D0C2E579A",
+          "result_bytes": 15402
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4BD4ADC5E34105A688B90134AAA7416675E804E22C89D1020C87B21DE4D79C88",
+          "result_bytes": 16566
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C66BA3BE8CBD7971F7F230C4A98F2622DCACE45540C06FC645FE808B9F10BCB5",
+          "result_bytes": 16564
+        }
+      ]
+    },
+    {
+      "id": "q093",
+      "profile": "tests/profiles/popular-bobores-base-f210-2123.json",
+      "profile_sha256": "6176CD193A788F07EF70DEA283CFDBC88D5EDF1469A77EAF57CBCFB7E1C618DA",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CC41697777C91EEE4E0D9F9126CDA05D4827A52B05E86721DA4E39BD6A5B8418",
+          "result_bytes": 13025
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D801FBABB6B0E5222E335DEF7DAA53AFF9680356904B2EC4F7F5A9A17D69F363",
+          "result_bytes": 14188
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "88503B6FD605E8B63AB1E936B7BAD6A9DACCBE5205CA79CB5CFE459CD519C21D",
+          "result_bytes": 14188
+        }
+      ]
+    },
+    {
+      "id": "q094",
+      "profile": "tests/profiles/popular-bobores-space-age-f210-2123.json",
+      "profile_sha256": "725042B9F9D4700B4ADFBEA86133BAF2309C8B90C6AC30D55AA5A4E708386125",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D7A5C5769F4B1529043A8C4817897467D259CE1704C9F63B59C23927EE46B370",
+          "result_bytes": 16076
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "183E3D8267A70FF24EC4038800CE4910E5055EDF23D42F30C0F22E987C74D6EB",
+          "result_bytes": 17238
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "70F54B4A39A2CB97C2B7D40EDC1F872BD340E5CCDC659C4613854E3218B5F07C",
+          "result_bytes": 17237
+        }
+      ]
+    },
+    {
+      "id": "q095",
+      "profile": "tests/profiles/popular-vehiclesnap-base-f210-2123.json",
+      "profile_sha256": "44031D4480A2A2143908F784107E7CC20AE0E345AC50C73C28170A09256B8F5C",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5E1FBACEC9042E2E8CD86FA01DFC126D328502B1960518DA2F84316BB4ED06C2",
+          "result_bytes": 12317
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E5747F1B9AB6DB30D9983BA1F414A67B1E91731DB2BCD596FEDB66B217D19C16",
+          "result_bytes": 13481
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2D9F7C5DD1774C03714B9284C8CB0563A4D8446E819B08B3EF83B119A5B3B401",
+          "result_bytes": 13478
+        }
+      ]
+    },
+    {
+      "id": "q096",
+      "profile": "tests/profiles/popular-vehiclesnap-space-age-f210-2123.json",
+      "profile_sha256": "846EAC1E15370C0412E52A7297F037D0E6B34FDCBDF1B93C2DEB2689BB72A0F1",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6F32216E82E31DD364EA692B9FC38638B16E1CE28C34285AB263AD42801CA8B3",
+          "result_bytes": 15365
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4E8114895B7998956FBA1DBEF6ED18CE58FCCC9307F65E8DC818E3B42CC808C8",
+          "result_bytes": 16529
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "3D8CFE1139E0E5D1F59389A69157A00150BD4B5188E00DB3D2835F3544E7CFD8",
+          "result_bytes": 16526
+        }
+      ]
+    },
+    {
+      "id": "q097",
+      "profile": "tests/profiles/popular-bobplates-base-f210-2123.json",
+      "profile_sha256": "7814CE47CB9D76CCDB4EA4B30E7EFA801B955C4C6ED5A8FBEE5D17CA96D916E5",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1B76654842922FB9D96D15F5DEBCA783161AD0FD2B363563DD20DA38C92EC62F",
+          "result_bytes": 13759
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9B3A2F1A104B39B9141CF7D6207A4728E44B05CEC3B4AF847F87A692293D92BD",
+          "result_bytes": 14921
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A0009EC210F8115A266264A8305699A2C5E2BD2836548E8B0294A288CFEE46C0",
+          "result_bytes": 14920
+        }
+      ]
+    },
+    {
+      "id": "q098",
+      "profile": "tests/profiles/popular-bobplates-space-age-f210-2123.json",
+      "profile_sha256": "F905BE74E77612F9CED2CC77BEB7C19A074E03EF1E2B728F0E7AB807F0ABB44B",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4921B8BC1CEF6BE5F2CD435AF68037F1C4D27707C9F80027DB4BC35E217C2604",
+          "result_bytes": 16805
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2C5DAEAA58CADB90973641AC08C077C27FEA82F227EA12D49DA6DF7D8AEFFA35",
+          "result_bytes": 17971
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "DEAB005D343DFDE9605C49DAA452193B3D37C49C6949B47A0E92BC64D77D6090",
+          "result_bytes": 17969
+        }
+      ]
+    },
+    {
+      "id": "q099",
+      "profile": "tests/profiles/popular-squeak-through-2-base-f210-2123.json",
+      "profile_sha256": "21201E46FAF719CDBB4FDC32D0927262DFA40B012DEC3D0C19762DB2B72AACE7",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "BDDEA72E1B3B91C859D80658C222E802C88F29D5A507BA8E6E5A3E5C47FF2FEF",
+          "result_bytes": 12352
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "03448BCB224CD6652B1A166BA4CCA036FC76291A758EF3377C2011BDAC92610B",
+          "result_bytes": 13516
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2C1C2194B5C2CCFFD6FA4B8A843E3791ECDA33104CBCC0F73FF8175D3261DC5C",
+          "result_bytes": 13514
+        }
+      ]
+    },
+    {
+      "id": "q100",
+      "profile": "tests/profiles/popular-squeak-through-2-space-age-f210-2123.json",
+      "profile_sha256": "67D69F348448A5D1D499DBB278BEEFCF3FD255C36CD1BC37DFC6499D1476E3DF",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "38518D63A439454426424A028C24E4B5F4C39C3A2BF84A021AD2BADD2A53C2F8",
+          "result_bytes": 15402
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AB4546BFC6FC62D2FACCDDF800288FCA36AA615FDE059F080480CC34E561732D",
+          "result_bytes": 16565
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "FBA3D4AEBFCA0335BB2DC8E28B8EA3DF116D756264C453C6B92F4B16385E2BFC",
+          "result_bytes": 16563
+        }
+      ]
+    },
+    {
+      "id": "q101",
+      "profile": "tests/profiles/popular-logistictrainnetwork-base-f210-2123.json",
+      "profile_sha256": "E85020DE3DE035D12FCA8DF79E3E891598B3840CB74D1F26329010AF9B4B27A3",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "078990A94B6E846826A14451D7334FD9B56AB697E7BC0E296A5595F290B1D1C8",
+          "result_bytes": 12382
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6EDE69F767FDF92A06268C9338E37F520BF7D11B0E4A1EE253899F26A6DAB82E",
+          "result_bytes": 13545
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7221D2EF1199521CC489350F6B785E83D58A920BE0795DB7F41E54A9EC999E33",
+          "result_bytes": 13543
+        }
+      ]
+    },
+    {
+      "id": "q102",
+      "profile": "tests/profiles/popular-logistictrainnetwork-space-age-f210-2123.json",
+      "profile_sha256": "41044E2849B9E7464A146FA47E806D3C1B98A8DAAA04C20561115D5ED8990782",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4F632984D73D93F3CA007D6E7ED6F7C2AC88261D9574BFF5EBEEEBAE12034EDB",
+          "result_bytes": 15431
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "333CD9B453ED23BE9CD572092E6EA7E1C9A5EB6BFCFDDE4AD32BC876FDA1DBFD",
+          "result_bytes": 16591
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5552E4A6E0B9BB69DE43686F067C778F115E93D08B074C05193F4A060C5D065B",
+          "result_bytes": 16592
+        }
+      ]
+    },
+    {
+      "id": "q103",
+      "profile": "tests/profiles/popular-bobenemies-base-f210-2123.json",
+      "profile_sha256": "8134E0527CD7CB3EBB4E460A3E98591F79CECACA7DF2B53DE904FDCF9764A73B",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CC2A5C6C64817DCC0149492854EFBDA721071ED32C0857AF61BAC997B97D4276",
+          "result_bytes": 13049
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6ACD49C0A4204F6C8F1D70AA878DC6449434017A8EC0B38456557718C4A10473",
+          "result_bytes": 14212
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "377BAFD5A39857A2AA2823A99C9D82B8949612C7C933EFEC881646F7B04042C6",
+          "result_bytes": 14205
+        }
+      ]
+    },
+    {
+      "id": "q104",
+      "profile": "tests/profiles/popular-bobenemies-space-age-f210-2123.json",
+      "profile_sha256": "4497DBE1C82F7268AE8843273A3AE20B0E08E4BDE0EF0DC62EF3746FC92A442C",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AC14CC19EEF3BD0CBFB65F7969B946252C7F13AD3B64FC1500110D7670BE3045",
+          "result_bytes": 16098
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "46B9571CC63EBCB0B597B3BD750812F851A9F3B7C9E45F3EF87FCFA7335C9ED4",
+          "result_bytes": 17261
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CB01CB4C4CCE33ACE56668B03548A6C57C0B45D4ACB041152935776F230AEDE8",
+          "result_bytes": 17259
+        }
+      ]
+    },
+    {
+      "id": "q105",
+      "profile": "tests/profiles/popular-cargo-ships-base-f210-2123.json",
+      "profile_sha256": "5519621B16EDC2BD8E9BCF58842ABB9A841EC5DDABE973730F9C7573AA0DAD82",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E15E09D06E96F30F6E7FDEA09E9929164CE770C1B06580AA2F0DEBF2D2C94709",
+          "result_bytes": 13856
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AD0F65FE9E388DCAC6FA7352168133F8DBD35206A151C0DF266ED2BB4A317859",
+          "result_bytes": 15019
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8A5BFD3EFFA094A2F0335FA87522D1CE7CF88EFF3427110DAE928D2544ED322F",
+          "result_bytes": 15017
+        }
+      ]
+    },
+    {
+      "id": "q106",
+      "profile": "tests/profiles/popular-cargo-ships-space-age-f210-2123.json",
+      "profile_sha256": "1F1A4F274903C5BB1D1D8BECF78B559F9A080D6BB60468786A8B5ACE9F477C55",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D16A514DA61A5F0235D29571C47FEB5BDC35DDFD3EC3CBB953C9A92C983B33B4",
+          "result_bytes": 16905
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D03F87BEEB8E784BBB696E9FEC6819EF1B969274F592E943E005A70FBC4D0AF2",
+          "result_bytes": 18068
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CD6DCAC53B94D899AA064AD9EC70EC7BD66BBDD5E5932380CD6A7830FAE5949D",
+          "result_bytes": 18066
+        }
+      ]
+    },
+    {
+      "id": "q107",
+      "profile": "tests/profiles/popular-todo-list-base-f210-2123.json",
+      "profile_sha256": "C4E90ECFEC793D795DC60F183A3C2D42E612F993B1E019E2D3D15FEEE18B8A08",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9F72A9341A5E978B1B1C8A344516C7A11F3052594984A74C52E1EC72BA36A1D6",
+          "result_bytes": 12314
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B99B002BF34B1D4420A49B03434360124EE2353255B44C1D3947D69A8D640B0B",
+          "result_bytes": 13479
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C5BD097F36B329009B469D7A7D5520926E1EF868806DF828EB86CA7DB0A2C3B0",
+          "result_bytes": 13477
+        }
+      ]
+    },
+    {
+      "id": "q108",
+      "profile": "tests/profiles/popular-todo-list-space-age-f210-2123.json",
+      "profile_sha256": "3D75F42B146D9D2C847F4194506B6534E64F121AD594D5E296552D86249A2E8E",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "DFB6D4781B88616181D6B91135AAFCFFE8A0AFE93093E53A5064E94EA659E864",
+          "result_bytes": 15365
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "81C517BE428C648A24ECAD2EAC49B9B49019712D35E6460C2A8F88C2A9820CBF",
+          "result_bytes": 16525
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "42546823CAF96625446DA82D5E3CE9846FFA0E164D75C0427BBDCC25EAAFAA58",
+          "result_bytes": 16523
+        }
+      ]
+    },
+    {
+      "id": "q109",
+      "profile": "tests/profiles/popular-bobelectronics-base-f210-2123.json",
+      "profile_sha256": "356FDF63A7B47C1CF46845FCB2E7330D7E4464843E256F5BD4A83BC4AE25FE6E",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "84DCD5049DCFC6C384344995763ED7625E908168E73519BE39BD74FE24356499",
+          "result_bytes": 13075
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5310FE36F61A657907599DEBB7B70E7E315E252004835FA4D1D51F7982950FE4",
+          "result_bytes": 14239
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8E1B4F8F8613577698E3385BB363C77A0147D399C76F2AC5D72D3B6F5D88B0B7",
+          "result_bytes": 14236
+        }
+      ]
+    },
+    {
+      "id": "q110",
+      "profile": "tests/profiles/popular-bobelectronics-space-age-f210-2123.json",
+      "profile_sha256": "E124CFC9BAD9DE0C381C55806674A7041F0EB053B9B3BF5191B5DC4CB6EFA8DA",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "06EB8E3C70128C103D6FD9C2C3F248C1D7BE189E07974DE00DCBB7846875A74A",
+          "result_bytes": 16122
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C5653E137812A2EF6B44B2F6AAE768EA10D33D89883786328C42A3718A06B8D8",
+          "result_bytes": 17288
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D43FBD96A1E6454E92EAD7B8F3ADA694F66B00D0C63195AD232DA7836485115C",
+          "result_bytes": 17283
+        }
+      ]
+    },
+    {
+      "id": "q111",
+      "profile": "tests/profiles/popular-bobmodules-base-f210-2123.json",
+      "profile_sha256": "ED8A18D336916296C0301313FAF0416109BEDCB95021B8A9266C27DB2D1B5BE3",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C9F48B26DC4D52850A23BCA69BD1278F6A89CA15ABBE5DD38EC6F59EE003E5F0",
+          "result_bytes": 13048
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5DA57A684CAFACF6CA30819CAC89D52B408337943D3102E55EB1492CDB6B85B8",
+          "result_bytes": 14209
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1C11828F604F795086BF4C8E355AE88AA3729C5A3E680A4BFC6D620F72B94CBC",
+          "result_bytes": 14210
+        }
+      ]
+    },
+    {
+      "id": "q112",
+      "profile": "tests/profiles/popular-bobmodules-space-age-f210-2123.json",
+      "profile_sha256": "3C5E18A5A93CAD88DCC79B702AFA3050984A82F9E5F1A9B8361C6D4B2054BB5E",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "00A658FBFC265EAB24D065CA17C90D15C480FA193296219206DB9AE227B94BCE",
+          "result_bytes": 16098
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "83D4D3679BDDC4AF3F6A93D85D503D6F1ED794CCC36E9A588E481538CF92F675",
+          "result_bytes": 17256
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1CF81BF76D726714FEAACF79A6133917E9E42E4DD4612DB90CA0D942014B610D",
+          "result_bytes": 17258
+        }
+      ]
+    },
+    {
+      "id": "q113",
+      "profile": "tests/profiles/popular-bobtech-base-f210-2123.json",
+      "profile_sha256": "0679BC9AF600F39E2A233A7BB29B3C84283F6FC0F30737EDCADA30453249C9AA",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5519FEC1F6885B85030FE3048D98E88644AFAA06F3823DD8F539D29E498AFB4D",
+          "result_bytes": 13027
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "67FA61AA1E2A4476C12CFED068A7B6A363F4828B1E93AC61BAE10FD774CEC6FF",
+          "result_bytes": 14188
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "493A40FE7990EBA09C729CDEFC4DF215150368196308D20CA6993F4473A28F9D",
+          "result_bytes": 14186
+        }
+      ]
+    },
+    {
+      "id": "q114",
+      "profile": "tests/profiles/popular-bobtech-space-age-f210-2123.json",
+      "profile_sha256": "556CA5E0D370C75A556067698E9B4098EF0D759AFB7A2F028AA5BE2065021882",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "01ECA97D6F7062B0A6B59E2E34CF1662901D0E4AEED702D001177F4C40A2E9AE",
+          "result_bytes": 16076
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B202D29CDFA568E9CE52C3156BD543B9606BD5B5205376A1DBFDC8D25AA212A7",
+          "result_bytes": 17240
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "957B38CC16BA41C5BEAAD25455E4C784DD77F510CEF2A570B2E467E628AADE3F",
+          "result_bytes": 17238
+        }
+      ]
+    },
+    {
+      "id": "q115",
+      "profile": "tests/profiles/popular-bobequipment-base-f210-2123.json",
+      "profile_sha256": "A6B72D4D0B4787527AF48D0A7F5C0EA8ACAFB9F85CF177D6852272D367FE50C5",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "88B34A655411791DB40845A7D4F7B94E31FB164156E17392851A104A697F6206",
+          "result_bytes": 13057
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4F35E921C1F6AD268C481C1F9FC1024F5F638A7498C1CE8B3A38AC85013F135C",
+          "result_bytes": 14226
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D48EBAD1B95B90FA537E4A154CED4AB645DDAECC2AC00A6F99E66162919825DC",
+          "result_bytes": 14221
+        }
+      ]
+    },
+    {
+      "id": "q116",
+      "profile": "tests/profiles/popular-bobequipment-space-age-f210-2123.json",
+      "profile_sha256": "5789A0B3289C6802E2439E795680A7DE620A671F7F9ED2D48E2C3C4AFB866535",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "48327B746EBD692226574AC9F197F79E94AEF17C2B3849CCCBD65FEBD94E2332",
+          "result_bytes": 16110
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7B922F008C422F10726A27B971C040E17FAC6DDB761913A6C2635F0D76AFDFC0",
+          "result_bytes": 17275
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "898BA397E88D2AFB21A6523D6A6BFCB676DD80C9D8C7CE62E1DDB1DEB61F785D",
+          "result_bytes": 17271
+        }
+      ]
+    },
+    {
+      "id": "q117",
+      "profile": "tests/profiles/popular-aai-vehicles-ironclad-base-f210-2123.json",
+      "profile_sha256": "1524B6E03D3ADEFA2CBAFCBF8CBA8C24C1E560C8BB01A7FCDF0F28979F56D669",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A592734A769673F1B502046F9BFC67D95B2AFB617A2E94EF80D699152D4B7E5F",
+          "result_bytes": 12387
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "59DE0B11A4695B8481E9F90FD3BD222D5CC2974EAA9DD08ACA8478362250FFF8",
+          "result_bytes": 13550
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "DA51D207A15F12B99019425B8BAFB7651A0E143BC72AB037F95F8B36A0CD5CEA",
+          "result_bytes": 13551
+        }
+      ]
+    },
+    {
+      "id": "q118",
+      "profile": "tests/profiles/popular-aai-vehicles-ironclad-space-age-f210-2123.json",
+      "profile_sha256": "C98ECD5B8CCB2A4DECC51359A10B97B33A7CCC96BF87CADBD868755F83532123",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "63255BC0C498E50F19BDEDE48D8577E88B9AD689FFCABF045FF7CF87687A2C22",
+          "result_bytes": 15436
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C4E7D372DBBA82916A3E6D518A14B0DC3DC8D2BD5463926FC5BB7C8597185820",
+          "result_bytes": 16602
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "84A02E729D622A4972D58254ADE73E222CE9F156C321D78CC76BDD45A85D8912",
+          "result_bytes": 16600
+        }
+      ]
+    },
+    {
+      "id": "q119",
+      "profile": "tests/profiles/popular-fluidmustflow-base-f210-2123.json",
+      "profile_sha256": "F0AE70EDC92787CDFB5B75D74487F9583BA650993D79E9D7C287B5067654B04F",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "236FF41E354403A2FB5B393E3D0A04A248C1C05C59DDF16A7417CADA7F0367D4",
+          "result_bytes": 12333
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0193C67870C3872A43D379E2B3078C7D573BEC925AAC61F7AE539A6950EE1B4A",
+          "result_bytes": 13494
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8E9D292CCFD4771256B5607444C35589E3EDB0D3F0C1C392C4333108B9F1D64A",
+          "result_bytes": 13492
+        }
+      ]
+    },
+    {
+      "id": "q120",
+      "profile": "tests/profiles/popular-fluidmustflow-space-age-f210-2123.json",
+      "profile_sha256": "1EC71A479B916C60EBAF79C1CFBFF28D93B42558CC9E604C00B1F169C3C9E553",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B59EFD24E2F3860C80E701561189D290CD9DCD25B81041E6AC31207410C8AA47",
+          "result_bytes": 15382
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4ADAEFD4CEEE51FE6F113F774B7578156C69C7788FEB7415F456BEE6BB7428E5",
+          "result_bytes": 16546
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8FE8FC3A3B51EBD44E2E47BA05D3BC1F98415ACBAD5B636003BA48F22B6ED878",
+          "result_bytes": 16543
+        }
+      ]
+    },
+    {
+      "id": "q121",
+      "profile": "tests/profiles/popular-bobrevamp-base-f210-2123.json",
+      "profile_sha256": "662C0D2CE743FBC3F20DE8B5A786D3E16024BD707C61EB7DC18BB4975B46C867",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "252F7A84F45C4727824A9EB653E8A32CC566095712845642281B0512F3FF6ADF",
+          "result_bytes": 13038
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "68F4C0FF287569AFDA8DECD57184140FED5A851E36562D87FD7A084334FB03B8",
+          "result_bytes": 14204
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "72CD9F8AEA0ADC21D1583B1798078D108DF3BB2FF7E1E219E046A164D7527841",
+          "result_bytes": 14199
+        }
+      ]
+    },
+    {
+      "id": "q122",
+      "profile": "tests/profiles/popular-bobrevamp-space-age-f210-2123.json",
+      "profile_sha256": "8F7AEC601B1031D717FFD2D4740D8D02D498E997AE99B5B79778A1A9D7C8E71F",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "69273FF63698EB3A39100AC88D265E4181C9CF1CD2F8B3DBB8F96530BA566FF7",
+          "result_bytes": 16089
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "BB25DE1D128406A449D52655E88E75B4C57F96865690B8B4A3C5823ADB34A9DF",
+          "result_bytes": 17250
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "237118B358E1D74CF75F278BF2BBC32E1BFABFF6887D77BD9587E04F5563B9CD",
+          "result_bytes": 17246
+        }
+      ]
+    },
+    {
+      "id": "q123",
+      "profile": "tests/profiles/popular-far-reach-base-f210-2123.json",
+      "profile_sha256": "8DE42D1660844804B165A11CB27E477500A1BCC4743046A9407F0E1323AA0215",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "119FD038C636B2CAF90FD0210F39034126DE1A26C2B7E455AF1856F13662834B",
+          "result_bytes": 12302
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "27D5EAFB05B52A3C84A073F79467F6DB154CF8FCB81D141AB46A40666442EAA4",
+          "result_bytes": 13465
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CC785E1268E58B8F986735F0935E32B5F7BA5D31BEF6D496E506DB6D884ECBB8",
+          "result_bytes": 13457
+        }
+      ]
+    },
+    {
+      "id": "q124",
+      "profile": "tests/profiles/popular-far-reach-space-age-f210-2123.json",
+      "profile_sha256": "C8DC3FFEBA9D8816135690EAF27B1ED39E1914B0D3B7DD360800835F2A9B0776",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8E897ECA620EA4913F59482C8D802F4553A70F2E32B2CAA8CAD8D30305D54856",
+          "result_bytes": 15353
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "560DC170C8F6CB15718A0A5E43C1CC56F7DD0CF92CF0C5D0B13B3C4078695163",
+          "result_bytes": 16511
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F4187C3DBCBF6711EE81D4FAEC81DB10929A370B84DDD25580B17041228E7AC3",
+          "result_bytes": 16511
+        }
+      ]
+    },
+    {
+      "id": "q125",
+      "profile": "tests/profiles/popular-warehousing-base-f210-2123.json",
+      "profile_sha256": "DBF591911D0334DB417F1B3D58768256594925928C25E51EC067417C5E22C8D6",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E40469C68E5EC52869D82A89F52BFEAED4582EAF320C52CB9BDA303D4E4F83C4",
+          "result_bytes": 12316
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "04086AF87EBFBE4ECA51B0530BA919D9470E1791C9B089C7360EC1759F829C5C",
+          "result_bytes": 13483
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "04B13DC1377EEB85494347269C9FE047FFBEA4484E638555DAEFC34243D9F083",
+          "result_bytes": 13481
+        }
+      ]
+    },
+    {
+      "id": "q126",
+      "profile": "tests/profiles/popular-warehousing-space-age-f210-2123.json",
+      "profile_sha256": "4F9EDFDA055FC0D382ACFD375BD6D5F370072F4C96FF86E30DCDA4F2B747BC04",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "452261069FB9068B0BB6DCDE40DBCDC51C2B8E897FC78F76E3A9349207DAB559",
+          "result_bytes": 15368
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F1445E857A2AC1BF251DA29242DF54C18DBA712BC9B753C8BF0C4729FCC2CC47",
+          "result_bytes": 16532
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "44A6B7B5D5757BA31CBA3292446790642780988034AE5AA071AD59873AFA6E99",
+          "result_bytes": 16527
+        }
+      ]
+    },
+    {
+      "id": "q127",
+      "profile": "tests/profiles/popular-bottlenecklite-base-f210-2123.json",
+      "profile_sha256": "8E12B963C4CCFD0229F560CF0AFA0D3D70EA96BC7FCB6FD270168A7685F550BA",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D13E8028C48109C681180FFD2867A361F98DD27EEAA784D4EB2DE33F2F7FC4AA",
+          "result_bytes": 13044
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "51EAD8612708B1AE7C30D2C9E1A07F1C458E04B296739CE359F897F84A28C49C",
+          "result_bytes": 14207
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5CD9C60B229C0AA91576C533E492BEAE0D1F94B4BDA48645ACA14C9502E2B797",
+          "result_bytes": 14204
+        }
+      ]
+    },
+    {
+      "id": "q128",
+      "profile": "tests/profiles/popular-bottlenecklite-space-age-f210-2123.json",
+      "profile_sha256": "61AB6E1BFD70C3CA907CF505D355FB23693147D15FC78FA5F2240249DC274395",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5F281F35B9422398F26FFF81541B26940D9936CC25C8EC69424A9BB243A6328D",
+          "result_bytes": 16093
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "419B8C25B6440DFA46678D9A085FA49E045416020C937B6A8CA0515998B9B554",
+          "result_bytes": 17255
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "39F32383304A44E3010927BC6D5CFA3B8DB7FEEF792EDB0793EE65EE56634E31",
+          "result_bytes": 17254
+        }
+      ]
+    },
+    {
+      "id": "q129",
+      "profile": "tests/profiles/popular-power-armor-mk3-base-f210-2123.json",
+      "profile_sha256": "16959B9331C8266FC967650AD586C0BF2526AC2B83B09E8FD56F8F4125456EA5",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "06FCD4CD7DAA3A5F6CC4AD14654BEC5CFD6EA238E3419D1AFBF4825E8F58A00B",
+          "result_bytes": 12352
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D55430F0284262E34F8C9C3BFB5CEE0715F56E557963B272B8881FE18B932B7E",
+          "result_bytes": 13513
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D3B27F87FFC805E2E013587B1121BD3FA8893996D0BEF5A73C662F4E8C1E6B71",
+          "result_bytes": 13507
+        }
+      ]
+    },
+    {
+      "id": "q130",
+      "profile": "tests/profiles/popular-power-armor-mk3-space-age-f210-2123.json",
+      "profile_sha256": "7337C3C16D0AE917FDCEB9C3103CFC90E1226BF1CBC65BB3FC4A692826722D96",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "19807FEC7CBFAF60FB8AEDD6050BB0ED4611D5800EF8FD27CCD7728F69B986AE",
+          "result_bytes": 15401
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B7764B7E57414815CC8CFFAFF9E2540E1D0B353F8A1A68F909974A8EDEB019C2",
+          "result_bytes": 16563
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8B25122B9BF96F5AE28E8068F6D5C0B77F585293B47D54FCA82008327F34B5E4",
+          "result_bytes": 16558
+        }
+      ]
+    },
+    {
+      "id": "q131",
+      "profile": "tests/profiles/popular-angelsrefining-base-f210-2123.json",
+      "profile_sha256": "763BB1A357FB0EB9B8B60D440865976BAF4754C596781EA733C98D5A1B1963E6",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4634440C53332F15807D77B60F9770BD1E092631986007E4E3A5F6FFF96C4058",
+          "result_bytes": 13149
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B27D7E83F40B2A94DE340D345771AD7DF4C502246941E133E49CBF483D231D2E",
+          "result_bytes": 14312
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A13B0CD746B1DC0777DFDC4BAD3F03BF8D84C43CA4C30C746F89786B9EBCE219",
+          "result_bytes": 14307
+        }
+      ]
+    },
+    {
+      "id": "q132",
+      "profile": "tests/profiles/popular-angelsrefining-space-age-f210-2123.json",
+      "profile_sha256": "282A54F7E20F037565541C40DBA3DFAAFAD689BF2430F14D35C88611C8DCE974",
+      "disposition": null,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "467E1474143800C786E52C47AFF2B83D82A3842933628F87B3A63C823E3DB636",
+          "result_bytes": 16198
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "29DD4A5DC8F066A2A6644DD92CF5FB84161C720EC35215E9695B6287DFC58C86",
+          "result_bytes": 17359
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "51DFB49259D1FEA7189ACF78D7702FE4101171DFAC805B555897879629D249E9",
+          "result_bytes": 17359
+        }
+      ]
+    }
+  ],
+  "adverse_observations": [
+    {
+      "id": "q002",
+      "profile": "tests/profiles/py-suite-space-age-f210-2123.json",
+      "arm": "upstream",
+      "result": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q002-upstream/result.json",
+        "sha256": "F523951AFE779F622946E35A0A0732333BF96C39C3B7E939AFAADE11DDFE0F52",
+        "bytes": 23419
+      },
+      "classification": "upstream-engine-adverse-skip-mir-arms",
+      "actual_native_engine_diagnostic": true,
+      "derived_diagnostic_excerpt": "  12.489 Error Util.cpp:81: Failed to load mod \"pypostprocessing\": __pypostprocessing__/data.lua:16: \n[font=default-semibold][color=255,0,0]The Space Age mod is not currently compatible with Pyanodons.[/color] Please disable Space Age.\nNote: In order to gain DLC features in Pyanodons such as spoilage, elevated rails, and stacking belts you may install the \"Enable All Feature Flags\" mod.\nhttps://mods.factorio.com/mod/enable-all-feature-flags[/font]",
+      "diagnostic_log": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q002-upstream/process-1.stdout.txt",
+        "sha256": "59525CE20C85CD5C103FBA0250F51C3EE54D146E1DE0F5993DE0650760A882E2",
+        "bytes": 20824
+      },
+      "library_controls_restored": true
+    },
+    {
+      "id": "q004",
+      "profile": "tests/profiles/py-suite-with-productivity-space-age-f210-2123.json",
+      "arm": "upstream",
+      "result": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q004-upstream/result.json",
+        "sha256": "049BB6E2A79685C0416283CA00D1916B5EC508E70E86315D42071E436E82B974",
+        "bytes": 24171
+      },
+      "classification": "upstream-engine-adverse-skip-mir-arms",
+      "actual_native_engine_diagnostic": true,
+      "derived_diagnostic_excerpt": "   1.805 Error Util.cpp:81: Failed to load mod \"pypostprocessing\": __pypostprocessing__/data.lua:16: \n[font=default-semibold][color=255,0,0]The Space Age mod is not currently compatible with Pyanodons.[/color] Please disable Space Age.\nNote: In order to gain DLC features in Pyanodons such as spoilage, elevated rails, and stacking belts you may install the \"Enable All Feature Flags\" mod.\nhttps://mods.factorio.com/mod/enable-all-feature-flags[/font]",
+      "diagnostic_log": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q004-upstream/process-1.stdout.txt",
+        "sha256": "71085364D454B255CF432DF19763B20B948DDDB9637BD140D951E0E02953AE3D",
+        "bytes": 21123
+      },
+      "library_controls_restored": true
+    },
+    {
+      "id": "q012",
+      "profile": "tests/profiles/k2-base-f210-2123.json",
+      "arm": "published",
+      "result": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q012-published/result.json",
+        "sha256": "D5E1B2CC02B1F3A55E3F597C838D1C366719207A937DB1400688C4F6DE9F355B",
+        "bytes": 10323
+      },
+      "classification": "published-adverse-candidate-continued",
+      "actual_native_engine_diagnostic": true,
+      "derived_diagnostic_excerpt": "   1.458 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:2: ...infinite-research__/prototypes/mir/pipeline/commands.lua:255: ...infinite-research__/prototypes/mir/pipeline/commands.lua:74: .../pipeline/compiler_orchestrator/context_construction.lua:82: ...s/mir/capabilities/science_integration/science_packs.lua:35: MIR approved science binding is unresolved: automation-science-pack (unresolved-approved-pack-dependencies:automation-science-pack). No research was removed and the former solver will not be invoked.\nstack traceback:\n\t[C]: in function 'error'\n\t...s/mir/capabilities/science_integration/science_packs.lua:27: in function 'source_for'\n\t...s/mir/capabilities/science_integ",
+      "diagnostic_log": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q012-published/process-1.stdout.txt",
+        "sha256": "28D97CDEDE76BBCB5EED602EC08A4A4E064AEEF55E526C7AAE00A2DE2008D537",
+        "bytes": 25544
+      },
+      "library_controls_restored": true
+    },
+    {
+      "id": "q014",
+      "profile": "tests/profiles/k2se-bz-available-six-base-f210-2123.json",
+      "arm": "upstream",
+      "result": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q014-upstream/result.json",
+        "sha256": "24E5D2A9D6834F68FA87FD3C2009EFCBA9999743C1356E49226F1A815A36B2D5",
+        "bytes": 25625
+      },
+      "classification": "upstream-engine-adverse-skip-mir-arms",
+      "actual_native_engine_diagnostic": true,
+      "derived_diagnostic_excerpt": "   1.616 Error Util.cpp:81: Failed to load mod \"bzsilicon\": __bzsilicon__/recipes/silicon-vulcanite.lua:16: attempt to index global 'recipe' (a nil value)\nstack traceback:\n\t__bzsilicon__/recipes/silicon-vulcanite.lua:16: in main chunk\n\t[C]: in function 'require'\n\t__bzsilicon__/data-updates.lua:3: in main chunk\n------------- Error -------------",
+      "diagnostic_log": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q014-upstream/process-1.stdout.txt",
+        "sha256": "0C7DC32B5B825D5F1AF247720E46C9ADE753E6F0796058B56C851D8BE9AEE35B",
+        "bytes": 16184
+      },
+      "library_controls_restored": true
+    },
+    {
+      "id": "q015",
+      "profile": "tests/profiles/ir4-base-f210-2123.json",
+      "arm": "upstream",
+      "result": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q015-upstream/result.json",
+        "sha256": "AA033ECC0A075B3827CFEB6C5271EC426FFBD69E55AFE60E4B57EAB304095190",
+        "bytes": 6276
+      },
+      "classification": "upstream-engine-adverse-skip-mir-arms",
+      "actual_native_engine_diagnostic": true,
+      "derived_diagnostic_excerpt": "  52.254 Error Util.cpp:81: Error while loading item prototype \"ir4-steam-cell\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.\nModifications: Industrial Revolution 4\n------------- Error -------------\nError while loading item prototype \"ir4-steam-cell\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.\nModifications: Industrial Revolution 4\n---------------------------------",
+      "diagnostic_log": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q015-upstream/process-1.stdout.txt",
+        "sha256": "87F5EB1FF5EA85139B63E2DE7225F2777C59EF142DCB8AFA281E78DB5740FB39",
+        "bytes": 960642
+      },
+      "library_controls_restored": true
+    },
+    {
+      "id": "q016",
+      "profile": "tests/profiles/ir4-space-age-f210-2123.json",
+      "arm": "upstream",
+      "result": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q016-upstream/result.json",
+        "sha256": "45F582FB0623EBCD0CBFB92CE01B4F39FA7D1C8D0397A0B5289FAD96E242480D",
+        "bytes": 9223
+      },
+      "classification": "upstream-engine-adverse-skip-mir-arms",
+      "actual_native_engine_diagnostic": true,
+      "derived_diagnostic_excerpt": "  92.335 Error Util.cpp:81: Error while loading item prototype \"ir4-steam-cell\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.\nModifications: Industrial Revolution 4\n------------- Error -------------\nError while loading item prototype \"ir4-steam-cell\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.\nModifications: Industrial Revolution 4\n---------------------------------",
+      "diagnostic_log": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q016-upstream/process-1.stdout.txt",
+        "sha256": "06EB59796AFCE3DD5CDEAEF386322D746ED9D4656CA5F2011596ED6097D5F3F7",
+        "bytes": 1576919
+      },
+      "library_controls_restored": true
+    },
+    {
+      "id": "q017",
+      "profile": "tests/profiles/aai-bz-available-six-base-f210-2123.json",
+      "arm": "published",
+      "result": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q017-published/result.json",
+        "sha256": "8A1EE6EBC8205200EA7F4766B80B328A87BB1AEE8CF2A3B83811A982A3882869",
+        "bytes": 11610
+      },
+      "classification": "published-adverse-candidate-continued",
+      "actual_native_engine_diagnostic": true,
+      "derived_diagnostic_excerpt": "   1.347 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:2: ...infinite-research__/prototypes/mir/pipeline/commands.lua:255: ...infinite-research__/prototypes/mir/pipeline/commands.lua:74: .../pipeline/compiler_orchestrator/context_construction.lua:82: ...s/mir/capabilities/science_integration/science_packs.lua:35: MIR approved science binding is unresolved: chemical-science-pack (rejected-approved-pack-unlock:chemical-science-pack:chemical-science-pack=technology-cycle-mir32-f3fa73f7). No research was removed and the former solver will not be invoked.\nstack traceback:\n\t[C]: in function 'error'\n\t...s/mir/capabilities/science_integration/science_packs.lua:27: in function 'source",
+      "diagnostic_log": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q017-published/process-1.stdout.txt",
+        "sha256": "32E239DD88CC01DFABA05D9A5F4144405D0279D4B644F8EF4C8AD06BE13B998A",
+        "bytes": 27106
+      },
+      "library_controls_restored": true
+    },
+    {
+      "id": "q018",
+      "profile": "tests/profiles/aai-bz-available-six-space-age-f210-2123.json",
+      "arm": "upstream",
+      "result": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q018-upstream/result.json",
+        "sha256": "277C83596FAFF04876EE3FC42B22EBB16D81D9F22498FF341CCE4FC091470CF5",
+        "bytes": 13438
+      },
+      "classification": "upstream-engine-adverse-skip-mir-arms",
+      "actual_native_engine_diagnostic": true,
+      "derived_diagnostic_excerpt": "   1.611 Error Util.cpp:81: Error while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.\nModifications: Silica & Silicon\n------------- Error -------------\nError while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.\nModifications: Silica & Silicon\n---------------------------------",
+      "diagnostic_log": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q018-upstream/process-1.stdout.txt",
+        "sha256": "DBF2500DC59962DEC1CD5AB43058D2808CEC8AE29CEECABB0E899AB5770E6A0D",
+        "bytes": 16824
+      },
+      "library_controls_restored": true
+    },
+    {
+      "id": "q019",
+      "profile": "tests/profiles/aai-bob-angel-bz-available-six-base-f210-2123.json",
+      "arm": "upstream",
+      "result": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q019-upstream/result.json",
+        "sha256": "4350603AC2B3CE965E350B65BF36E4127E33DDBEFEE262032F84F44B83224EAD",
+        "bytes": 33544
+      },
+      "classification": "upstream-engine-adverse-skip-mir-arms",
+      "actual_native_engine_diagnostic": true,
+      "derived_diagnostic_excerpt": "   3.060 Error Util.cpp:81: Error while loading technology prototype \"sand-processing\" (technology): Key \"entities\" not found in property tree at ROOT.technology.sand-processing.research_trigger\nModifications: AAI Industry \u203a\u00a0Bob's Metals, Chemicals and Intermediates mod \u203a\u00a0AAI Industry\n------------- Error -------------\nError while loading technology prototype \"sand-processing\" (technology): Key \"entities\" not found in property tree at ROOT.technology.sand-processing.research_trigger\nModifications: AAI Industry \u203a\u00a0Bob's Metals, Chemicals and Intermediates mod \u203a\u00a0AAI Industry\n---------------------------------",
+      "diagnostic_log": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q019-upstream/process-1.stdout.txt",
+        "sha256": "1EFB25A2B54043D6C1DDA330AB5E8250EFE92F4738E54EDBF795A8D208081862",
+        "bytes": 24273
+      },
+      "library_controls_restored": true
+    },
+    {
+      "id": "q020",
+      "profile": "tests/profiles/aai-bob-angel-bz-available-six-space-age-f210-2123.json",
+      "arm": "upstream",
+      "result": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q020-upstream/result.json",
+        "sha256": "BD660101EA11005E98A4EC041D8A81AAAA2AEED8CC87E1C3BF4BB6375BBA95EB",
+        "bytes": 36491
+      },
+      "classification": "upstream-engine-adverse-skip-mir-arms",
+      "actual_native_engine_diagnostic": true,
+      "derived_diagnostic_excerpt": "   4.059 Error Util.cpp:81: Error while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.\nModifications: Silica & Silicon\n------------- Error -------------\nError while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.\nModifications: Silica & Silicon\n---------------------------------",
+      "diagnostic_log": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q020-upstream/process-1.stdout.txt",
+        "sha256": "EBF901E2C06CE64363574D6F44439D73E6237B078FBA2600856171C6F1A27971",
+        "bytes": 29952
+      },
+      "library_controls_restored": true
+    },
+    {
+      "id": "q022",
+      "profile": "tests/profiles/bz-available-six-space-age-f210-2123.json",
+      "arm": "upstream",
+      "result": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q022-upstream/result.json",
+        "sha256": "62BFF0629FD733C04EC00064005A37CD2DD7C90FB5910AB3393CBD61D0CD6A29",
+        "bytes": 12713
+      },
+      "classification": "upstream-engine-adverse-skip-mir-arms",
+      "actual_native_engine_diagnostic": true,
+      "derived_diagnostic_excerpt": "   1.562 Error Util.cpp:81: Error while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.\nModifications: Silica & Silicon\n------------- Error -------------\nError while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.\nModifications: Silica & Silicon\n---------------------------------",
+      "diagnostic_log": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q022-upstream/process-1.stdout.txt",
+        "sha256": "89BFF73FE50A85604AEDEE82B824DA8C92811576408D6D9D196EAA8BA8591D71",
+        "bytes": 14512
+      },
+      "library_controls_restored": true
+    },
+    {
+      "id": "q028",
+      "profile": "tests/profiles/bzsilicon-space-age-f210-2123.json",
+      "arm": "upstream",
+      "result": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q028-upstream/result.json",
+        "sha256": "1442D76C767F90651AE84534ED038D5B662E5FEAAED5DCFC0A8B128857EAF1A0",
+        "bytes": 9176
+      },
+      "classification": "upstream-engine-adverse-skip-mir-arms",
+      "actual_native_engine_diagnostic": true,
+      "derived_diagnostic_excerpt": "   1.386 Error Util.cpp:81: Error while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.\nModifications: Silica & Silicon\n------------- Error -------------\nError while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.\nModifications: Silica & Silicon\n---------------------------------",
+      "diagnostic_log": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q028-upstream/process-1.stdout.txt",
+        "sha256": "62D9D3E2E0CC1E915B940203FF26495517437F1E8A5A5BE2E1CAA22CD95D0DF6",
+        "bytes": 11942
+      },
+      "library_controls_restored": true
+    },
+    {
+      "id": "q030",
+      "profile": "tests/profiles/bztin-space-age-f210-2123.json",
+      "arm": "upstream",
+      "result": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q030-upstream/result.json",
+        "sha256": "450E7AC33C409D0013C8F9A9C792D3339E893AFEEDAADBA2138D292D8DE0057C",
+        "bytes": 9151
+      },
+      "classification": "upstream-engine-adverse-skip-mir-arms",
+      "actual_native_engine_diagnostic": true,
+      "derived_diagnostic_excerpt": "   1.440 Error Util.cpp:81: Error while loading item prototype \"jellyskin\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.\nModifications: Tin\n------------- Error -------------\nError while loading item prototype \"jellyskin\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.\nModifications: Tin\n---------------------------------",
+      "diagnostic_log": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q030-upstream/process-1.stdout.txt",
+        "sha256": "AAEE693AC047528FA4B6DB6A69B06D1D98994A268F56A85AE418D212D786350D",
+        "bytes": 11803
+      },
+      "library_controls_restored": true
+    },
+    {
+      "id": "q061",
+      "profile": "tests/profiles/popular-krastorio2-base-f210-2123.json",
+      "arm": "published",
+      "result": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q061-published/result.json",
+        "sha256": "3C94B00F4E523839524265691857FCE4B5F226ADBC957B29ECA40E91ABD2842D",
+        "bytes": 9569
+      },
+      "classification": "published-adverse-candidate-continued",
+      "actual_native_engine_diagnostic": true,
+      "derived_diagnostic_excerpt": "   1.429 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:2: ...infinite-research__/prototypes/mir/pipeline/commands.lua:255: ...infinite-research__/prototypes/mir/pipeline/commands.lua:74: .../pipeline/compiler_orchestrator/context_construction.lua:82: ...s/mir/capabilities/science_integration/science_packs.lua:35: MIR approved science binding is unresolved: automation-science-pack (unresolved-approved-pack-dependencies:automation-science-pack). No research was removed and the former solver will not be invoked.\nstack traceback:\n\t[C]: in function 'error'\n\t...s/mir/capabilities/science_integration/science_packs.lua:27: in function 'source_for'\n\t...s/mir/capabilities/science_integ",
+      "diagnostic_log": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q061-published/process-1.stdout.txt",
+        "sha256": "B2C6554FB8EDEFF2E0681C0C8044FD23CA6BAF01A1FD747853DCC955D17AA30C",
+        "bytes": 25383
+      },
+      "library_controls_restored": true
+    },
+    {
+      "id": "q062",
+      "profile": "tests/profiles/popular-krastorio2-space-age-f210-2123.json",
+      "arm": "published",
+      "result": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q062-published/result.json",
+        "sha256": "A1FC858FBDA848E4BDD5D9008939AC179102A5239C2ED36E021B3E7D6816236C",
+        "bytes": 12516
+      },
+      "classification": "published-adverse-candidate-continued",
+      "actual_native_engine_diagnostic": true,
+      "derived_diagnostic_excerpt": "   1.939 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:2: ...infinite-research__/prototypes/mir/pipeline/commands.lua:255: ...infinite-research__/prototypes/mir/pipeline/commands.lua:74: .../pipeline/compiler_orchestrator/context_construction.lua:82: ...s/mir/capabilities/science_integration/science_packs.lua:35: MIR approved science binding is unresolved: automation-science-pack (unresolved-approved-pack-dependencies:automation-science-pack). No research was removed and the former solver will not be invoked.\nstack traceback:\n\t[C]: in function 'error'\n\t...s/mir/capabilities/science_integration/science_packs.lua:27: in function 'source_for'\n\t...s/mir/capabilities/science_integ",
+      "diagnostic_log": {
+        "path": "build/qualification/broad-ecosystem-f210-575e-r02-native/q062-published/process-1.stdout.txt",
+        "sha256": "D0FC638507E23A230E89706737075E8C031415D6D1596D3EB51A241DDCA9609F",
+        "bytes": 25872
+      },
+      "library_controls_restored": true
+    }
+  ],
+  "receipts": {
+    "path": "spec/evidence/broad-ecosystem-f210-575e-native-receipts-r01.json.gz",
+    "sha256": "0956B2A308D38C596F7C251D0DA9750F7D52B7BB551D21DB37197EBA74A2F6C4",
+    "bytes": 1049928,
+    "uncompressed_sha256": "3AB80B79BB557C34E0023CCC8F2FC6FA8347D5425DCC4A8159D2A909BC2F2064",
+    "uncompressed_bytes": 8134390,
+    "exact_original_raw_receipts": 374,
+    "gzip_mtime_zero": true
+  },
+  "claims": {
+    "bounded_native_startup_and_data_capture": true,
+    "all_arbitrary_mod_combinations": false,
+    "technology_intent_or_full_catalogue": false,
+    "gameplay": false,
+    "save_migration": false,
+    "clients_or_multiplayer": false,
+    "performance": false,
+    "release_qualification": false
+  }
+}

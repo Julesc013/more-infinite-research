@@ -1,0 +1,3833 @@
+{
+  "schema": 1,
+  "kind": "MIR5BroadEcosystemF210EA41NativeChainV1",
+  "status": "completed-mixed-data-stage-outcomes-not-full-mod-parity",
+  "source_commit": "ea41cbc6d27626283db9d8bbf6211b2171b6e36a",
+  "player_tree": "a807f775c18189e9bc1a276d91346c6b75fd31eb",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "candidate_archive_sha256": "CE1165CAC174EDA4800EBECAAEF29FC2E071B2E7160CD98F799FE21C2F151F9B",
+  "published_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+  "observer_binding": {
+    "actual_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "canonical_profile_sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "amendment": "broad-ecosystem-f210-ea41-plan-r03.json",
+    "correction_receipts": "broad-ea41-observer-correction-receipts-r01.json.gz"
+  },
+  "claims": {
+    "native_execution": true,
+    "data_stage_observation": true,
+    "full_mod_parity": false,
+    "research_qualification": false,
+    "physical_qualification": false,
+    "save_qualification": false,
+    "client_qualification": false,
+    "performance_qualification": false,
+    "release_qualification": false
+  },
+  "schedule": {
+    "planned_profiles": 132,
+    "maximum_native_slots": 396,
+    "actual_native_results": 374,
+    "completed_data_stage_results": 352,
+    "failed_native_results": 22,
+    "counts": {
+      "candidate:completed-data-stage-observation-only": 114,
+      "candidate:failed": 7,
+      "published:completed-data-stage-observation-only": 117,
+      "published:failed": 4,
+      "skipped_after_upstream_failure": 22,
+      "upstream:completed-data-stage-observation-only": 121,
+      "upstream:failed": 11
+    },
+    "upstream_failure_rule": "Skip only the two MIR arms of a profile whose actual native upstream control fails; no MIR pass or incompatibility verdict inferred.",
+    "conservative_wall_start_utc": "2026-10-26T01:44:15.9282697Z",
+    "absolute_deadline_utc": "2026-10-26T05:44:15.9282697Z",
+    "completed_utc": "2026-10-26T04:10:58.3852441Z"
+  },
+  "custody": {
+    "primary_root": "build/mir5/recovery-historical/broad-ecosystem-f210-r02",
+    "carried_bytes": 3157323063,
+    "resumed_members_independently_rehashed": 2209,
+    "resumed_bytes_independently_rehashed": 5654960294,
+    "total_bytes": 8812283357,
+    "maximum_bytes": 25769803776,
+    "all_374_result_bytes_independently_rehashed": true,
+    "all_controls_restored": true,
+    "frozen_inputs_not_retargeted": true
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/broad-ecosystem-f210-ea41-native-receipts-r01.json.gz",
+    "bytes": 1948850,
+    "sha256": "3AD91BD974203731DF17402BD498702427F11E4410FCA186ACC22A71B0893D84",
+    "records": 400,
+    "all_records_roundtrip_verified": true
+  },
+  "cases": [
+    {
+      "id": "q001",
+      "profile": "tests/profiles/py-suite-base-f210-2123.json",
+      "profile_sha256": "E3A5A48EF7894589222CDFC81C1FDA56E474836ABC43C529180DC8F2758A387A",
+      "input_signature_sha256": "DE435E53F464C05302FE2C83EABE37702C0E15F33CC8D0D5B8B7AF58E788A6B4",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "09BBB1FBB10B0E1F7557691067E913E71B758D67B4DF7C0F278BC95E6CCAED4C",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CD98FBC2040A69DC98D687484D844180C151EBB653B51B9CED35F1317AAB26FD",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8F5F542726FC54C1973583D9440413748BD08613FB2B7D92627D90F742E4FD1A",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q002",
+      "profile": "tests/profiles/py-suite-space-age-f210-2123.json",
+      "profile_sha256": "859FBAB6053AE4F37B2E793B9C08E073FC79C77DC391071EA30A22E8488E3DC2",
+      "input_signature_sha256": "8BFAEFFA52071AC789EC8852C94359913DD0F369DF1BDFCC13A2E1457BEA79B8",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "5C737B0F9EF637C2252DDF8360AACAD5873E4026191E8AF5AC94E644DEFE1BE9",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "4410C1FF5917D932BA77FE518F3A15F20D5B7D44E0ECA4180E2112BBC8099DA5",
+          "diagnostic_excerpt": [
+            "   0.860 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.860 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.860 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   1.777 Error Util.cpp:81: Failed to load mod \"pypostprocessing\": __pypostprocessing__/data.lua:16: ",
+            "------------- Error -------------",
+            "Failed to load mod \"pypostprocessing\": __pypostprocessing__/data.lua:16: "
+          ]
+        },
+        {
+          "arm": "published",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        },
+        {
+          "arm": "candidate",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        }
+      ]
+    },
+    {
+      "id": "q003",
+      "profile": "tests/profiles/py-suite-with-productivity-base-f210-2123.json",
+      "profile_sha256": "8FF5241AD54D508A749A5622DA45DF2D59B79B1B3E646EE1F37BD91C7BB47069",
+      "input_signature_sha256": "08DAB58FDFC456AA63E72C5706AA36FC2A8C2BFF80E3F8B90695AC32C159B6E3",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AC58C71A2AC1F7E83A207B7A5A997B176B4D9D71F352E9E7F9828A4B67567F50",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B6B942340E59BDF3693E3B84BC7573773D285F237CB3CFC46000F21CEF9F4BB1",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C7036EE869E6821D84A74E85F10B85F7E72261DC318464C5E319B742201217C0",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q004",
+      "profile": "tests/profiles/py-suite-with-productivity-space-age-f210-2123.json",
+      "profile_sha256": "D480AFB9DFECC923B52E5BCF12893E9683028F9D58435906DBEE7C3FE87CC02C",
+      "input_signature_sha256": "5C1C3629D6EE1EF86CEA0A84493818229B220840B48CE5702F87009F8FDAC0D8",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "6750F13F2459F0B8F3F5E9CA399A21526CC2635184001ED127D5E1565378FB96",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "028D6BE5221E0EEFBD8BC535F12E585FD8301339A73F24EA32837D916ED79DEE",
+          "diagnostic_excerpt": [
+            "   0.853 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.853 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.853 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   1.757 Error Util.cpp:81: Failed to load mod \"pypostprocessing\": __pypostprocessing__/data.lua:16: ",
+            "------------- Error -------------",
+            "Failed to load mod \"pypostprocessing\": __pypostprocessing__/data.lua:16: "
+          ]
+        },
+        {
+          "arm": "published",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        },
+        {
+          "arm": "candidate",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        }
+      ]
+    },
+    {
+      "id": "q005",
+      "profile": "tests/profiles/bob-full-base-f210-2123.json",
+      "profile_sha256": "61165C045E1D23AD7437E0D7E4B4925B8B95491BF6C8651BEA2E25622F12834E",
+      "input_signature_sha256": "660C9E606B3F15F8C16FC8103957990274CDEA167E2E759C94E8DEA2D267E3AD",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A3BDB63E4A02517422180D14AC744475E19820BF63B18F60C42F0FE329B7F04D",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D2EA633FB74D29192F1C35EB7019A427338E71F5A5C370876D922EFD53C88337",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "failed",
+          "result_sha256": "D954CCF5CB2D7380DB5F304F50FE008455D33CD7548254A1E1A6A000AD4217FF",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "DE39873CE4884F02721B7D17680F3D1C88B833C2B469E20F16B38CA440BD54A4",
+          "diagnostic_excerpt": [
+            "   0.857 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.857 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.857 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   1.773 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:177: MIR technology preflight: duplicate technology inserter-capacity-bonus-8",
+            "------------- Error -------------",
+            "Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:177: MIR technology preflight: duplicate technology inserter-capacity-bonus-8"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q006",
+      "profile": "tests/profiles/bob-full-space-age-f210-2123.json",
+      "profile_sha256": "B9354B36838446C4B44ADF752A9B5CEC127BD687299CE708DD957497268D4989",
+      "input_signature_sha256": "5492A8A67E0102911761569CDBA421B144F71364EB9C2AB1CAA9009A42490D56",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "54E06C838AD8F53F6D28DFBCE20B7228EAD446AA3CC366304CFA411AC4A67CDF",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "37E78B8C197BC7BCBEC3554C0C234C39BD910B686C0B107FC710678F0160FACB",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "failed",
+          "result_sha256": "E8C815806EB8DA9080612E5D094FD482F1ED902B05A5DAE69D518C2883D0D3DC",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "D19B3F613E32CBD6F956E13A14720EF12041EB7802C5C9F4A894670233FBED3D",
+          "diagnostic_excerpt": [
+            "   0.848 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.848 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.848 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   2.312 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:177: MIR technology preflight: duplicate technology inserter-capacity-bonus-8",
+            "------------- Error -------------",
+            "Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:177: MIR technology preflight: duplicate technology inserter-capacity-bonus-8"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q007",
+      "profile": "tests/profiles/angel-full-base-f210-2123.json",
+      "profile_sha256": "9A10E9C4F326E0BBE6B3E370B49CA15B9B6DDD397D808BBB13BB520D82EFC995",
+      "input_signature_sha256": "7BF9884016B2FAA50EF77D770B5B70781CC1B91F8E5AABC002B41A55626E903A",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2C3C2DEC2CF4119E81D3F64F60ADFFCA840C6514275294A2C7220DD7F3F81DBC",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C5C664A0F99EDE2F1E046F3243233E218C2A5ACA7992716E28C3362671FBB9C7",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7AFA14D9F3CB4A935A1AB19FCC57162558F4DC97F65D97EBAD25A03050273B0A",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q008",
+      "profile": "tests/profiles/angel-full-space-age-f210-2123.json",
+      "profile_sha256": "B1F97004AE75E8C95297A7BEE17F6568813CF9DF2F3B302194E92DBAE2E6368D",
+      "input_signature_sha256": "7745482163947B34AC7490A154D96D9FD102EC8E64761A430DBB70632D278113",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "345AB63F8A2C49A7430644DA277A84908F0C5CA9D501FEEB8D9215745BC90ACD",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "64C6B8B149CB45E4B0B4AC604AA7DC78739AA1676591C84D45021798EBCC3B7A",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6C32BB60E0394BB8642DF013ADCEFDC0194F1ECF7785BDB64BB130DCAE72485D",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q009",
+      "profile": "tests/profiles/bob-angel-full-base-f210-2123.json",
+      "profile_sha256": "3AC0B9CBB82F0FA030AE4BAB910E1CBE1617B0873BD33A6348B17B82709285EB",
+      "input_signature_sha256": "4C0280590BD664AB367234D600E8F7BAA4357C8AEFB3C710999C7B586C3D1974",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C48037EE409BCC14BA9686EF55C7C8BB67FB13B688E5738535CBF42F0F989565",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C2DEC7D83147410EAB1B9799FE83704F8EB3B7298AFA2085BC0DEBE1ED2760A5",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "failed",
+          "result_sha256": "9B6C16D59A14AEA547A6877863A080E3A492AE362249985B5509E50CEB5AA3A5",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "9FC89E4637391F7E74D008FD5A792CCFDA7B09787B1FE424A4BECDFFFAFC5481",
+          "diagnostic_excerpt": [
+            "   0.852 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.852 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.852 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   2.493 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:177: MIR technology preflight: duplicate technology inserter-capacity-bonus-8",
+            "------------- Error -------------",
+            "Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:177: MIR technology preflight: duplicate technology inserter-capacity-bonus-8"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q010",
+      "profile": "tests/profiles/bob-angel-full-space-age-f210-2123.json",
+      "profile_sha256": "83C36305768623BB6B50AFE24AA6857C014B6C6DF871DD8E24E97EBD0153FCE3",
+      "input_signature_sha256": "8163639115FDAEC159954FC090D565D260FB4FAE6278ADF73B698A7884544666",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "EACF5263F56B0D96531198A86FBD3F6BC527CBBD277960C0597A6E72ABBC55CB",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "721AD985E70198AF93F61F9FDEC21E6D5BD40C414F69A46E2B3D64B65383271C",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "failed",
+          "result_sha256": "0DE7F9780744F0213560FE8FA6F567E1F78493E27348DD920F7F50A3A0D80348",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "429F039DB2335070A30F351D1B302F60E6101B42A1B9DCAB262256F13077001E",
+          "diagnostic_excerpt": [
+            "   0.847 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.847 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.847 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   3.363 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:177: MIR technology preflight: duplicate technology inserter-capacity-bonus-8",
+            "------------- Error -------------",
+            "Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:177: MIR technology preflight: duplicate technology inserter-capacity-bonus-8"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q011",
+      "profile": "tests/profiles/space-exploration-base-f210-2123.json",
+      "profile_sha256": "379280A208B1CC709413FA3EA3117547CD1E209FD3032235D7AA04C404BF40EF",
+      "input_signature_sha256": "CFFDDBAEBB9A49AAF4D02A4F6184B4E0E413223AA0A20796A59A61CA8EDC312A",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "BF3C15F1CCA6BEE7B92FA54CEB73B35448B68183082A6C7D8C098B3D286DB814",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A579CBDC13012E5437E880F7FAB126B92E05D663F85776BD71D94CD63DF5C85F",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "80168A7DD1736251C99BF5BEAA1205557612C5196FC032B778FDC8CD26E7EEB8",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q012",
+      "profile": "tests/profiles/k2-base-f210-2123.json",
+      "profile_sha256": "54B7E64C6AB1DB8345EC407B74B67C423AF51779A3D9104C40ACD9D523B34CC2",
+      "input_signature_sha256": "D529FC657054BD41125FED0AAB0B060BA1A182A876E570617C0A838159EBEFF1",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "93DB06C6D7935FAA0AD0EAA137D77FCBB8106DA9BC59B63F5CA2DF7DF177DB45",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "failed",
+          "result_sha256": "78C40789053F532858458ED3FCA16B0ED7A50D906A8A16845B6F6613416F6A36",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "5B585834C9C77CE8E78E799D487B8DB48FCCE216D85087D161032F82E22D6852",
+          "diagnostic_excerpt": [
+            "   0.864 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.864 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.864 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   1.503 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:2: ...infinite-research__/prototypes/mir/pipeline/commands.lua:255: ...infinite-research__/prototypes/mir/pipeline/commands.lua:74: .../pipeline/compiler_orchestrator/context_construction.lua:82: ...s/mir/capabilities/science_integration/science_packs.lua:35: MIR approved science binding is unresolved: automation-science-pack (unresolved-approved-pack-dependencies:automation-science-pack). No research was removed and the former solver will not be invoked.",
+            "------------- Error -------------",
+            "Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:2: ...infinite-research__/prototypes/mir/pipeline/commands.lua:255: ...infinite-research__/prototypes/mir/pipeline/commands.lua:74: .../pipeline/compiler_orchestrator/context_construction.lua:82: ...s/mir/capabilities/science_integration/science_packs.lua:35: MIR approved science binding is unresolved: automation-science-pack (unresolved-approved-pack-dependencies:automation-science-pack). No research was removed and the former solver will not be invoked."
+          ]
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E5D77F253A950A361C066E957FD417411AA934E72A918F69AC37E29DA1A055C0",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q013",
+      "profile": "tests/profiles/k2se-base-f210-2123.json",
+      "profile_sha256": "7EE8A1F8F3EC078D2019EB080F07107D5D1C4B332857C7A293CA61ED1E02B35E",
+      "input_signature_sha256": "5865401EFB861792150A0456DF84D2CE536D0A4BB11A4EA1E9DD789E3BA2A96A",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0A7DBA7E5C5738AE4917028D58AF32C39D9EA93CA2A4C90273CD4FA17F874726",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4EDCE3C79E0E2C96F82FF9B276B546D5AB0B65DEE99C0EB45B323F1AA537D8F1",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D1BCCEE9F2BAE26152BDB1CEDACAA03AEFA388ACDAE40CD156EA62AA9114BEC8",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q014",
+      "profile": "tests/profiles/k2se-bz-available-six-base-f210-2123.json",
+      "profile_sha256": "7F7EC554778097EDFEBD91917F3F821FEBFC643CAEA6BCAD7EA272BAB45949A2",
+      "input_signature_sha256": "AFE5F3CE050EF4EDD9C2F42B192AC9F35F676F816D71FAEE21059F2279779F25",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "9185F7A0EEB9F1221D3BC3BE4E1C3FC97AF5793EC304BFCD30631A701A84FA69",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "0CA3F9B84CD4DD09FB673EB1296DDF12E1B7DFAE4B6713D71B03A6F49344EC83",
+          "diagnostic_excerpt": [
+            "   0.836 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.836 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.836 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   1.562 Error Util.cpp:81: Failed to load mod \"bzsilicon\": __bzsilicon__/recipes/silicon-vulcanite.lua:16: attempt to index global 'recipe' (a nil value)",
+            "------------- Error -------------",
+            "Failed to load mod \"bzsilicon\": __bzsilicon__/recipes/silicon-vulcanite.lua:16: attempt to index global 'recipe' (a nil value)"
+          ]
+        },
+        {
+          "arm": "published",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        },
+        {
+          "arm": "candidate",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        }
+      ]
+    },
+    {
+      "id": "q015",
+      "profile": "tests/profiles/ir4-base-f210-2123.json",
+      "profile_sha256": "6630F2E3852C3150DFD14D87542323E7FC11799942DA54FB8C1B7F3CF7C9868F",
+      "input_signature_sha256": "08B5B9F6E7A7E24557BBDEF2BCE11BE89076762BB3103EE290713134D4889C65",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "260568EF44F370B4D97B1D1AF964F02FB72604BC2F5F3024D6875093590076DF",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "2475DF17FD532A000457A857549FDD7CA71152E07D2B7722CB1420251ABC3B81",
+          "diagnostic_excerpt": [
+            "   0.847 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.847 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.847 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "  52.523 Error Util.cpp:81: Error while loading item prototype \"ir4-steam-cell\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.",
+            "------------- Error -------------",
+            "Error while loading item prototype \"ir4-steam-cell\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+          ]
+        },
+        {
+          "arm": "published",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        },
+        {
+          "arm": "candidate",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        }
+      ]
+    },
+    {
+      "id": "q016",
+      "profile": "tests/profiles/ir4-space-age-f210-2123.json",
+      "profile_sha256": "BE688D57A1DDE1BEB5B2B600AD460577D794D8889A242160D6E7981E5725DE37",
+      "input_signature_sha256": "61DF0B58772C3FF764B9486BB419BFE900C0CBCEF7954F08596791268B045E90",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "9495D8F245C52F93D3154A486C858DEBCDCE7D38077E69ADB9CE0BFD71CB1BEA",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "7898D1877668D8076C82CAC27933122C1A214B8D64F5F91E0F0E84445F03337F",
+          "diagnostic_excerpt": [
+            "   0.878 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.878 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.878 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "  92.240 Error Util.cpp:81: Error while loading item prototype \"ir4-steam-cell\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.",
+            "------------- Error -------------",
+            "Error while loading item prototype \"ir4-steam-cell\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+          ]
+        },
+        {
+          "arm": "published",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        },
+        {
+          "arm": "candidate",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        }
+      ]
+    },
+    {
+      "id": "q017",
+      "profile": "tests/profiles/aai-bz-available-six-base-f210-2123.json",
+      "profile_sha256": "B8B8B5471E87307025C3E354DB4A08C7252DEBE3C47BE87E80ED9212B24651D8",
+      "input_signature_sha256": "867B5CB8939157074EDBF4089E8EE6BE85B5432CC4509A00D132E1C9F9E20A0B",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1D9A106CE2DBD56C81860108A21D8FB479F47AA18B67DA341BCD9732E83D83EB",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "failed",
+          "result_sha256": "D449714A91AD650E1EB86B23C02910CB9E5B50875EFD4546CC89757AC77F60A3",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "8993B69DD60314BF07F59E43C242BC0EE142DEBC266A7552FF3D9EEC4C123852",
+          "diagnostic_excerpt": [
+            "   0.884 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.884 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.884 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   1.417 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:2: ...infinite-research__/prototypes/mir/pipeline/commands.lua:255: ...infinite-research__/prototypes/mir/pipeline/commands.lua:74: .../pipeline/compiler_orchestrator/context_construction.lua:82: ...s/mir/capabilities/science_integration/science_packs.lua:35: MIR approved science binding is unresolved: chemical-science-pack (rejected-approved-pack-unlock:chemical-science-pack:chemical-science-pack=technology-cycle-mir32-f3fa73f7). No research was removed and the former solver will not be invoked.",
+            "------------- Error -------------",
+            "Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:2: ...infinite-research__/prototypes/mir/pipeline/commands.lua:255: ...infinite-research__/prototypes/mir/pipeline/commands.lua:74: .../pipeline/compiler_orchestrator/context_construction.lua:82: ...s/mir/capabilities/science_integration/science_packs.lua:35: MIR approved science binding is unresolved: chemical-science-pack (rejected-approved-pack-unlock:chemical-science-pack:chemical-science-pack=technology-cycle-mir32-f3fa73f7). No research was removed and the former solver will not be invoked."
+          ]
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D49F8E5FEF35662401390344691FC846B9939C1924497777C332CBF5148F32C9",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q018",
+      "profile": "tests/profiles/aai-bz-available-six-space-age-f210-2123.json",
+      "profile_sha256": "340013C433FA85AEDE09CA97625A0D735B64FD88153D73486B1B39F9600F3E22",
+      "input_signature_sha256": "0FF61BBCB015517DB0D5D8AD6AA9906FB093C1DAA688A19051242351902C4EA9",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "77B159D587050A6149362120E015D11D5C285960F9704CEBCA8975E1C75A7CE5",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "7C1EC420DDB1CD5D7FF2D8E31A50172C2B9B45AD376FBCDD70D1BA2813F27EF1",
+          "diagnostic_excerpt": [
+            "   0.845 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.845 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.845 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   1.661 Error Util.cpp:81: Error while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.",
+            "------------- Error -------------",
+            "Error while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+          ]
+        },
+        {
+          "arm": "published",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        },
+        {
+          "arm": "candidate",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        }
+      ]
+    },
+    {
+      "id": "q019",
+      "profile": "tests/profiles/aai-bob-angel-bz-available-six-base-f210-2123.json",
+      "profile_sha256": "71CC2A696754AAC4B4D6AAE45114694ED9725BA43914CF8670E0D3D47E9CC8F3",
+      "input_signature_sha256": "ABE3B7FA0483D0033789F0390A450FB82A589C2747DEEFBBD59802F7D56C5FA0",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "D99ECFCBC0ABBE0FB050E36F183E9A6574CF6A51991EA912E1B950AD4A7AC622",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "2221883A5F8F64D113EF92FEF01DFCB21658B60152D024CBD6F402915D3E7C50",
+          "diagnostic_excerpt": [
+            "   0.862 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.862 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.862 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   2.974 Error Util.cpp:81: Error while loading technology prototype \"sand-processing\" (technology): Key \"entities\" not found in property tree at ROOT.technology.sand-processing.research_trigger",
+            "------------- Error -------------",
+            "Error while loading technology prototype \"sand-processing\" (technology): Key \"entities\" not found in property tree at ROOT.technology.sand-processing.research_trigger"
+          ]
+        },
+        {
+          "arm": "published",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        },
+        {
+          "arm": "candidate",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        }
+      ]
+    },
+    {
+      "id": "q020",
+      "profile": "tests/profiles/aai-bob-angel-bz-available-six-space-age-f210-2123.json",
+      "profile_sha256": "28A54F1A1021DD2132443BFE91FF3350A19506865CB261E55B95C985FBAFFC3A",
+      "input_signature_sha256": "CE2D7C58CCD4EEFF865E6B5F4293E1136CBFF04F1868A9084399FE40B05FE8F4",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "0157D3ECCD9786742D67CADC5F5FE1A31F2D03120485446A280374C47177A643",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "CA40CE979D70B3FAD2959540A382BB3472EBE26D444D84A8B588E66910E5F315",
+          "diagnostic_excerpt": [
+            "   0.845 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.845 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.845 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   3.914 Error Util.cpp:81: Error while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.",
+            "------------- Error -------------",
+            "Error while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+          ]
+        },
+        {
+          "arm": "published",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        },
+        {
+          "arm": "candidate",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        }
+      ]
+    },
+    {
+      "id": "q021",
+      "profile": "tests/profiles/bz-available-six-base-f210-2123.json",
+      "profile_sha256": "F63E5AD98520B85F13595A8D862FB0CD789C1BCD4C7B5556D29D0B00FEE2BC4C",
+      "input_signature_sha256": "C25460DF07B69699C45307016F66727F8EA10851667241C8E251861CF4C3F9D2",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7054A9558E2CBC2972CD41D7A8D85C3E5E7C5397DDC129933E1DCB26668AD81F",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C82F946F19C1A1B36CE6E0A024F8D33D68076F4E88A3F09D24997458E1517F0A",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B63843B1C87E8058D45C9B527796E0DD9A5D0FD7DC4CFE528D4D514466E1FA4C",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q022",
+      "profile": "tests/profiles/bz-available-six-space-age-f210-2123.json",
+      "profile_sha256": "D9950C8689E0ABBC06088831616FF89724DD8666F98E872E52A8BD3DA89D8711",
+      "input_signature_sha256": "74DF7CD7962CA7DEB1E11B454D82B5E54F153921F1D7781401E58BC47AC05B72",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "25492CC7BF6A896E0514DE5182DA270104BB5EB4087C2E1D9AE2C717B7EE8A23",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "57A2824F4B2D247467DBA16F27286059A8DFB5F728AE1D04537968C5D19FEC07",
+          "diagnostic_excerpt": [
+            "   0.858 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.858 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.858 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   1.622 Error Util.cpp:81: Error while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.",
+            "------------- Error -------------",
+            "Error while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+          ]
+        },
+        {
+          "arm": "published",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        },
+        {
+          "arm": "candidate",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        }
+      ]
+    },
+    {
+      "id": "q023",
+      "profile": "tests/profiles/bzcarbon-base-f210-2123.json",
+      "profile_sha256": "6539E73D8C576CD7185D31586F6974FE859748F8F303F5059889F50C552290F1",
+      "input_signature_sha256": "313F41B5D28D2C7727173C6665626170B11C310127CDC69CC1952B1D81A09747",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "54383F3086F1E58932285BCF08FE2025248AB278A4BAE2AE29A1CBA56FAD2821",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A46B7534524D74D86E2F7AE6BBDD5C500D64177FEF595D4D27E11A3B64C75409",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0F22F1A3FE880A1396F4E61E42822F587E3398F1F886F0F2FAEC51457D1B6049",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q024",
+      "profile": "tests/profiles/bzcarbon-space-age-f210-2123.json",
+      "profile_sha256": "6E006C3DFB2929F286BDE47688DDCC6D73D9FDF4562F3D964D6A8F78656B714B",
+      "input_signature_sha256": "767F9DD599EBD62CB8A2DF1FF88D1921FA8D58E1C664ADF073ADC211903D4286",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D45F4C020382DD3159299EA5F2026F76EB3F03DFB60310CD80903B9341C7C83F",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "3C69C316BFBF6FE73B000B603CC276D2CCF5A5F459BF0D379B8230041BC515D4",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AAF075819978DAF02DCDA8B93D558A023A51839BB49C0CC1F8335DE60B9B1271",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q025",
+      "profile": "tests/profiles/bzlead-base-f210-2123.json",
+      "profile_sha256": "CDED6F51E1C9F4318DB828C6D1D469D1E5533303DA70E69334FAC38FF2999A05",
+      "input_signature_sha256": "1B9EBBBB87AFFBAC152A1A2382B055675ABDFE98CEF27C6125D192DDDAA252ED",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8ECFF8C303D00D9CDAE9CAE69512F4DB73162C1D8A87522A5C4F3376EC954F02",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "574579C0044310164CC36F4A71B7590ADC42DAE0F5A306E20518EDD7B38FF05F",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0263A2AB7B3F9EAA0F1335D883B2CBA51A98D3D90D5DDDF7B8BAB771FF6B8F25",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q026",
+      "profile": "tests/profiles/bzlead-space-age-f210-2123.json",
+      "profile_sha256": "B77F0428E9B585AD2152EC26A90BE1B52E878A1AF27BF881FF0E1A35A1C68926",
+      "input_signature_sha256": "395213AE759CE1C35D2EE1B2304D104E86E44592F86A8DFC0F76E14CD0AA0710",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6844FB3B520227E723ADC04C9F705D3BFFA2339E9163C0C66E71E8BADE5F251B",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "81580B96ABAF3C3E45BF306B2D10FF0E163B0091DA1B8DE88D327E6F32EB7D4A",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A9D7ED8E9CBE79FBAED97D88170BEF9EA03A245920D4C9B0B3F6106B4AFEA450",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q027",
+      "profile": "tests/profiles/bzsilicon-base-f210-2123.json",
+      "profile_sha256": "C3708034977F02438CB47D93975AC35B0975A55641802A096D84A319D5EF38F5",
+      "input_signature_sha256": "898823EAEFCE5464E6A225B9B852ACD3B959248467145EC95A0B382C8239C42C",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2F9486A4A90ADFC4322D311B1EF305798C4600B4B6363954CB8B57F06F31F032",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "3A360E924302CB471C5C5AB5AED2A1597DE769AD44FE04FE97B244CB6B310534",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E2929543FCE008630DCA1F51188ACB60D492863934479B08C3BF497F81721B51",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q028",
+      "profile": "tests/profiles/bzsilicon-space-age-f210-2123.json",
+      "profile_sha256": "7E92E64F17F2B3BDD227C86997996BD20BBE1D43BD8C193B75F143FD2EC7276E",
+      "input_signature_sha256": "8AB65F8C0B7B7036DC96C834295E56762A4C645ED196C389B53415D88369CBCF",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "552A8519657BD56274CDD0FF35F1455755D5E70FED8BEB59381AAF17EA922787",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "DD14EFE52B1B0BFEFFA2444A37796B1A659B390B9DE3EC1C5C4DF1216C0DB798",
+          "diagnostic_excerpt": [
+            "   0.857 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.857 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.857 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   1.434 Error Util.cpp:81: Error while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.",
+            "------------- Error -------------",
+            "Error while loading item prototype \"razorgrass\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+          ]
+        },
+        {
+          "arm": "published",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        },
+        {
+          "arm": "candidate",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        }
+      ]
+    },
+    {
+      "id": "q029",
+      "profile": "tests/profiles/bztin-base-f210-2123.json",
+      "profile_sha256": "3F720F41E7C663ED369E35F08D4F82990F84F1FF942AD37ED1EA300CEFA4A0C2",
+      "input_signature_sha256": "5AC4582A546A0C7E312BC65540E532679BF872D20ECADE430679A5C292BD4176",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "FED7B4AC913870FBEFEAEAA18D84B0143B2B651B4915E2B8633306F60F090DDD",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1050BE54FA79B027039B49AA2F5BCD8796D77234E4B566B5BEB2BAE35AB9661F",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "055A71CCF4F5933EECE62E265CF7996FF331C7E941BC6AF32A41C44EBE52190D",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q030",
+      "profile": "tests/profiles/bztin-space-age-f210-2123.json",
+      "profile_sha256": "3EF887695DFEEB12EFC01199EE48550F9041F3785B46075C9D9C871BEB592B63",
+      "input_signature_sha256": "44DDA691631BC915D41621D007BF593E7B5C999D8180895D6137BE7F1D82F287",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "failed",
+          "result_sha256": "98EA63453A723028FC7FD2B1470419E9F6A8E7420F3EA28D43D0A35F78D68974",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "597914FB0A1E7926771C016022BCC91BC4EACE6F48ECA6200E008DB3959C45EF",
+          "diagnostic_excerpt": [
+            "   0.848 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.848 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.848 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   1.421 Error Util.cpp:81: Error while loading item prototype \"jellyskin\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.",
+            "------------- Error -------------",
+            "Error while loading item prototype \"jellyskin\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories."
+          ]
+        },
+        {
+          "arm": "published",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        },
+        {
+          "arm": "candidate",
+          "status": "not-run-after-native-upstream-failure",
+          "native_execution": false
+        }
+      ]
+    },
+    {
+      "id": "q031",
+      "profile": "tests/profiles/bztitanium-base-f210-2123.json",
+      "profile_sha256": "DF4E72989958752E3410F4F7CD79F9F7493DC7C9FA3F45C926F1C0AEFE21E219",
+      "input_signature_sha256": "A678628E5FCFAFFBAEF12B8F1DE7B4BB20E38E6D7A797030AB933DD9B61CCAED",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AF98F69C1F991A127886C60432D0403EB40A7026B5D79E30A5B30A337357F077",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6320DAEF0C427BBD9248783DBBB5F81B977068C10E9D7890ABF8CF9C3B9BE3E4",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7C93C39D16C5C14A88B9AAEB7282766116B626C1FDBBEBEFB1249658ACAD471F",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q032",
+      "profile": "tests/profiles/bztitanium-space-age-f210-2123.json",
+      "profile_sha256": "F068DA0675F5100ED553BC9F8AAC4641861F077CFE99D4EF12FE3F1C2235E977",
+      "input_signature_sha256": "541F907C71833BB79CD99AD21FBE0F5FEDD2919C2988F93CADA9AD2FB68DAC65",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "44C435B62D218F2597D088489DE98913B4F32DFDC0320B852EBDDB9647C46396",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CC004B48F27C7CEBD8A1278B59CF591B515EDDC697CD42FA03A9CCF4A9413C4D",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1777EF175CCB4D7E0D7616035498B330AF1E3982A155BB120B1803693D28778E",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q033",
+      "profile": "tests/profiles/bzzirconium-base-f210-2123.json",
+      "profile_sha256": "7036DA134C1D853E67375EBF52DE552F58EE485F0B98ED2B2EC038F210A2C9A5",
+      "input_signature_sha256": "DF3AB517EF0B00F0EF46A18A12AAFE0777EB5A85E299649C1971CE57053D7BFF",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "63AD70AF51E29CC6B9868A073B612F3C6EE9E80638A122824F17C4EE2D0C63C0",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4B51F22FE47ADBC86B8EC85FB74B308933235F0172BE938292D84D70513CD1B9",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B1FCF82410F5B6A79DE44089A112451B9CA5D1B1C1CF3DA8BE67710AA116F337",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q034",
+      "profile": "tests/profiles/bzzirconium-space-age-f210-2123.json",
+      "profile_sha256": "5275D78B66B2BA13F9AA174E920964A7273B934551CD4BACD304F5F268473AB5",
+      "input_signature_sha256": "BB4AD73AFA1747C4FCA74724A8CDDE3522AC31302C857413C959EB96F0E4100C",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E8EA4A4C002BFF60F72575034BC139616DA4A8EB808CD4F204BB60DD89E1B1E9",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1FF4851700A68217C694867CDCBF9FE20EDE595B3A2692864CE97DBF7789D71E",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "BA834CE058CC4866A8EC6BD45887CA5FEADC78E5C3678D68EF0334DA79ED6AB7",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q035",
+      "profile": "tests/profiles/popular-alien-biomes-base-f210-2123.json",
+      "profile_sha256": "23F6701921EAA353ABBC04E062D66CB5B6EDBD96DD50091EF6E4AC322B1DBE3C",
+      "input_signature_sha256": "E3A3010B771E7643C39862CB7DD27D0EE941E4DD8DACBC4F96BE1A9919313EE8",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C878A79786E5C5A3EDBD9AACF018277B1D599D0AF33A1F04E1272A825FD8E797",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C8590265F519556DEF52C431FFDCCF2F7CCCEED471484226E1B5328FA8308C50",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "DFF2BC9008025BAC15CCB60786384E7D9CC8182F205AF2846C3D7B0A267F9145",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q036",
+      "profile": "tests/profiles/popular-alien-biomes-space-age-f210-2123.json",
+      "profile_sha256": "462163141B1205A5B54B1B0D432330F68504A0FB1A613A87352E0E75FA0545E5",
+      "input_signature_sha256": "1B7092D979E10D6368F70FF0B3175C652C1628528FDBB40051D7FCB5DAFD8239",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5AA31FF22BB5A742A69FC60540B996F741BF650FD409F8359C8B5A5087C2A5B6",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4964F36B11E60A9A05343A1CB06D3D6EE5D3C603A260D375B893DF499EA384F3",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "985521B5474C7DCEB626812535E3B98F6AF2A690D5164F3C92D7946DE4ACB124",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q037",
+      "profile": "tests/profiles/popular-informatron-base-f210-2123.json",
+      "profile_sha256": "0FC8DE2773DE8735DAB463338D8EE9CE781F7CB62859DAAD9DE09C34216502A8",
+      "input_signature_sha256": "F91CA86B553D84370294F8F01846D5DD04F2FC2EA8548F803D8B8066F7F0835F",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "DBD968E9BAE4A5511F0BA5D1376CD1A8189665CB864D60DE36AA4C67F31C40BC",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "77A8694C1A402FD8A72AC001A1C17E17874163F07F1010960AB58DA7922E92F8",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "BD3296B717AE14F675AA29FAD0BF09AFBB7517D5BE71ED145012BD614AC1A749",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q038",
+      "profile": "tests/profiles/popular-informatron-space-age-f210-2123.json",
+      "profile_sha256": "8DE985E7BBC0B9102AB0B9A7B6AA949A751873ED8CBB07687A3C1974CD6F5000",
+      "input_signature_sha256": "A94E554D4531196DD9B2271C043C339E286F8E687E1E765DD64D948D3B2E40D7",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0BFB60D3F05AC1F7A392FD2F0F8D3004C94A33D2D8B8BDBA4CD3BA8BD314B9A7",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D80EFB6B10D7F5FFBB41A6C262F26C62746E37DB78C36907F522EC4124216A1F",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "865134522E8C62DE670DE5C4636979CC780FB842C5D08BD17533D3EED11E3750",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q039",
+      "profile": "tests/profiles/popular-jetpack-base-f210-2123.json",
+      "profile_sha256": "2E324AAE4B16A180BA413B0582FD2564DD95FC5895A5B8C645898CD5E59F8266",
+      "input_signature_sha256": "D21DD4A2E643367868DB63D5C5AC3A8EC51BEED01AD206066D5022ED8427E086",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1E02B0FD67B440FEA5A8095773F61FABC07708D774CE4393587853218DBC2322",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8FFBE71D424B207AA2DF85F6D90B24258D50AB3AB72081FF13D5D2BD38B3876B",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CE2D4D69D52108A85255801D82B853E656DEDE1E856F8B7DC7F987E947B94331",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q040",
+      "profile": "tests/profiles/popular-jetpack-space-age-f210-2123.json",
+      "profile_sha256": "7A8442587E4C12D7D89481396E0F293738C30D20B5A2A27A89689B3703FC707F",
+      "input_signature_sha256": "5FBA4CFEF05F172FD11F201ADB7BBFD1F4C3069E61185B3C437290D9B2AE6581",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "41109B2D0BA3735810C1B999EECCFE563DD64E6265A9005404A59713B997D5EA",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "360DEFDA1818CB0F0D7DA227540BC325B27647F3CCD02CA3C7F830BF9FEFB98A",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "950622B5BC1F91F4B83E2A42A568489D4013B554E0A7FD45B161A345E9ECC43A",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q041",
+      "profile": "tests/profiles/popular-aai-containers-base-f210-2123.json",
+      "profile_sha256": "1D347969E5C28C9BDB52BC912D3FA0B2845117F2BC6B4C4224F9392EB281353E",
+      "input_signature_sha256": "519E2DC7F90F8E52C2C34E592B88B2E4EA9D577614B7FDEAF732041DB5C86C06",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "584C7A9C26950C9F0511C626830E4AA323DB7B049400F1AC1FFBE8315AAB1290",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "84659574A15CAB9CAED8F044CD1267CDEB3A3AB6CDDCCAE412486D3607606169",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "77014E711970F4F8FC979DBDCA8C9D6426470F89A4C511194F543B8BB1E413C8",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q042",
+      "profile": "tests/profiles/popular-aai-containers-space-age-f210-2123.json",
+      "profile_sha256": "632889D5E54E66800C76C89D5E71643294C7BDC2B5405160B2C14D5B117C4175",
+      "input_signature_sha256": "BD0E2BA71B9E8C127DFE11D51C9BC8FABBD8DD27D2FA528DF29C6B2346FC56EF",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F86771B9B9ECF225F8A7E97E84F69F2864540A576901C4057F56C8049290CCD6",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7E5855236DAC8DCC88E7464391C05BF520B419A3E7AA385A5FA4413FB95E1CEC",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B60D863B16A8843EE555B04338896E9BF9E7BDF3786CC33DAAC6C4F64ACD3D42",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q043",
+      "profile": "tests/profiles/aai-industry-base-f210-2123.json",
+      "profile_sha256": "CCA0DE592673EF81C8255CE695428285EB8B6E8B128436C44B618A19C6548E15",
+      "input_signature_sha256": "BE39881F670F0738570D3D36826BF09ACE96EC6055303F41C2B7E9334730A5A6",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C3ABAC74CD45522540C327D28067C76CB6D3F5AC1AFFFE0739587C7CBF10290E",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A10EBB15EB27AF65DFDB034E50A5B172228789366667AF0B8BA1E1E68D523491",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B93B0D1A38DC96F558293E0B7F16A287C440CED38252186DE5CCDCE4C6AEC37B",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q044",
+      "profile": "tests/profiles/aai-industry-space-age-f210-2123.json",
+      "profile_sha256": "25EE100A0D723AE9802C27642B7D84C9C79E44B5C1941C39F9F97DA92AA7F9D0",
+      "input_signature_sha256": "D53182EE92B108B928D6A190817B505E37FAA7F70CF1A9ACA7E248799247006A",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D1F5C07DE1B4E5CF68EF1D894737572DA0C4244CCF77D0F895462DC74B595216",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A289E8DC5F8568E53EC1C4DD7DF3F4AEB01D9E6655676F9D90308D7816CA8FDE",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7B81420A75FE90DA625D280284D63A25E405458F98D376E9216691D75ED549D1",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q045",
+      "profile": "tests/profiles/popular-aai-signal-transmission-base-f210-2123.json",
+      "profile_sha256": "47D236082F7C4F4A2D2DBAE9195FA53FFA14359CDCF7FA838D1597FEE25DCC53",
+      "input_signature_sha256": "24154D5A7BD6285D8A7F91C22027343FFE64DB45750BB558235366E8D5A18252",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6C609493A1F820FD03215AB4C0432AF4CE7C3585944341F2A347B75A30345D0F",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D41E3DCD4337BB0BC037C113235A8EE034133BF2F60E383A1C4C1E3C6265908B",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "46DF4DC4CCDE0FF4E023B9EC390185E69D181D3545166D7328797FA081FF7530",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q046",
+      "profile": "tests/profiles/popular-aai-signal-transmission-space-age-f210-2123.json",
+      "profile_sha256": "96A3B82700C82A42E23487AE0B22D847F31183B0744356F2F2022A7CB9B797CA",
+      "input_signature_sha256": "76BA282AFFE63A00FD6251224AE9D556AADCE047FAAC01D8F6D31AB935C395A4",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "96DB685E12280AA443F0F3574D5A4620F93D3A02ED8029AC0EBBD40B441C0559",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "BC2733E6AA7677173946934BB09533EFD13049AA0BDBAAD8463EB2EC35B8BC78",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "08270EBFA052AD15B3383FF8BB48C742559E68DD195DF1C052EA9F040644BC95",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q047",
+      "profile": "tests/profiles/popular-shield-projector-base-f210-2123.json",
+      "profile_sha256": "7074092D6C79506F51A37A49B2B3A4CF824ABF89D6C7CEB746F3A4179C88204E",
+      "input_signature_sha256": "A02A2DBE229D418A9AC9B4CF3BE2F5B4B1BB498C5AB83680003DA3B85BF3556E",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "614445FF0F9120B44DD816F431178BED3753B47CA2CB150F00640D31438915D5",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5CA5CF6022138344B417E034C37501473FA599FB3DE38E443E0761649067E3A3",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B2BFD02B7631DAC84F1DBD252D888F76698B6B3059FA75BCCEF2C02ECEC07052",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q048",
+      "profile": "tests/profiles/popular-shield-projector-space-age-f210-2123.json",
+      "profile_sha256": "7119021407EB98BFE3501D5FD5AE3BD9C191DB11CFEC439359A79F9D5E585651",
+      "input_signature_sha256": "B1C1B414DA0B4E84856FEC48FBFBAAC618096CD31CF5B2697FDA612ED189B55E",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5AFDAB842D0A18CB00DC6377FDC746FBD505E568DD56D594F780FE6AC36F7655",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "85E90F126FB8F8CF0D5BF6E818919930729609B8A86EC22D94FA56E5B4526236",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "73F0595ABD3D4671166F290EBC886D241E555C77C6C74369A334A8045847D900",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q049",
+      "profile": "tests/profiles/popular-robot-attrition-base-f210-2123.json",
+      "profile_sha256": "FA1D8424D96F971AB373E3E2524809805789D9EFB001BCCD924607B6A00421E5",
+      "input_signature_sha256": "75ABE665CE4F960986AF07A02A235F08213121413A419AF72D738DAEDB505628",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7716C5C5C1B93CD6FE792D5D2757577B98F14A99FADD5DED787C8EF6CFEA2DD8",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E83CFD08C1FC8236A67EF8CB0FC4CF26857E635EC6CAECDDB3F8F20FABB354CA",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "39182E3AB5E8BBC83AAABBFF549AB5C3B8A58246CB93C0320AADE4C94DD8CC0D",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q050",
+      "profile": "tests/profiles/popular-robot-attrition-space-age-f210-2123.json",
+      "profile_sha256": "835E9144D5C6B11A9301607AA17BD76DCDABDFE60BFAD54840486E474F1DB38C",
+      "input_signature_sha256": "82AB2098888C2C6BC25B7C8FD3DC924952299FF248A4319D8837F90295A3DA33",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6A7C3849ECE81A965F7B20B80DD6D70FFD83978D5F83A559F2776BF9B0C0FA4C",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "79803786C2FF4BF2F5FAE8F5AB9D21BB5AB113E29E5E45199BD51269D2BFA677",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AB4FC6DF8482450BEB57B591AB13AFEDBC2CDB6D6E5EB5EA4D54E09F04C2D3BA",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q051",
+      "profile": "tests/profiles/popular-helmod-base-f210-2123.json",
+      "profile_sha256": "8DDB37C739315577EE96D2A11BC68989B8688AB6FD93BA3B617625831A64081C",
+      "input_signature_sha256": "23624AEE102AFCE23B1F73B872F46C737CA3DDB80701551BF56F906CAA69AC45",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D5B27E8864D2D0C8FA6DF62E3A678637E3FEA536EC504A01FDB6CF9E1D4BCA7B",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C9414E89C03C4931806126BA28A511AC72B80D4614EEB3BF04B04AB29018B845",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AE36C07DB990CAA0F8397DC4B0627428629E3639C57900217F682CF8E0BBAE70",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q052",
+      "profile": "tests/profiles/popular-helmod-space-age-f210-2123.json",
+      "profile_sha256": "97472DA931B4EB892006229364E74E857548A15BDF987562F70536B52CC407A8",
+      "input_signature_sha256": "3C71143391031818D5B513116405B9A28795B2D989FD68836A8589C1E88A9752",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "42BB40987FB6674DA7B779DC5FBC9D685FED37C4A853B867936A214E649864E6",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "55D9E1BB40EA9914C778B1B6AC04788B9BC97A1591852F67344AF8B228ADD568",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7AE71DF5097D40576021BFEC0FA5306000195DCF20DB6057B12AB81A5E7F7080",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q053",
+      "profile": "tests/profiles/popular-even-distribution-base-f210-2123.json",
+      "profile_sha256": "6C1BC7046EB2E4011A9E1543BE2E2947F7836F1D45DB4EEE18A469D2C375544D",
+      "input_signature_sha256": "9CEF5B7FA825C40218F28E9BFE7B6FE234E31047F7AA23DAAA0A44D88DC47579",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AE79E74E9AA2A6C2A8E00DCC5AD2A342B834CF70388758873BC9FE1B2A35F023",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E2193B29F299D10ADD98EB83B59AB8E3F7546D24C085D041E5CF0AF1B1EC12F4",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0582FAB4439B2AD405D283C4EE9A7E426A39434A3D53FFB81853BAA232042945",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q054",
+      "profile": "tests/profiles/popular-even-distribution-space-age-f210-2123.json",
+      "profile_sha256": "017311036BD2BB46C59E43037E02A25101FBDE83B42E1DE038551F14BA93370D",
+      "input_signature_sha256": "DA221A1C3F7865B9C5AED6180A40855A271A56A84BCAA8CB126A3ADD40C6C422",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "41FA11855F8790BA5DF347F5F64FC04A31C6855E5A384BC599662B293E0A01DD",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "BB3EC831C31A83EBCFB1066360A3ABC82F98A9514782E43E01ACB7C650E5CBF1",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "69652E05EBF1BB4ACC77211A0D7DEBECC7E89886A115A511D3A2F671835198DE",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q055",
+      "profile": "tests/profiles/popular-bullet-trails-base-f210-2123.json",
+      "profile_sha256": "6AE2E24FDE9AFEAA129977C34AE8939594F6126D147F3BA9FB13B95B434A11C4",
+      "input_signature_sha256": "37203F6F720CFD9D8532C153BA3C344BCE17804CC6E906D43973126FDD9C2F35",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A65924E064A884C84CDFC38D934C0B9C792F9620B14E7E8A507D616D140C457E",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C3A81BC14DB01873EF99C21B7951028110D830E425AC2566CD34EA16BD737F69",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "942F2869915B82B856DA68C56AEE78703D7C1B1486634DB4F20DA405FD7B72D6",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q056",
+      "profile": "tests/profiles/popular-bullet-trails-space-age-f210-2123.json",
+      "profile_sha256": "FF07A96C8B0D43DDBACA518266A8C4EDA04D3F2015602AF6AE392DA6F264D52F",
+      "input_signature_sha256": "864D3893CED2247EB81D58AA701B064EBAB6879770D62D1079295AB2DFC378C3",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "485D176813EB9F6210E3BE65581DF3EE28731FC4461440A6AC0A55AF028892F2",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "82AC430B5DE762F3C39CD65EAECE1B12BB9F75D47EC29C778338792C5C4481F4",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C5C253698B5DF828B1297B6B991F61857CC0F612DFC34EABC30AE106D592292B",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q057",
+      "profile": "tests/profiles/popular-ratecalculator-base-f210-2123.json",
+      "profile_sha256": "A415DBB8EA5F531671633289C749EDA48D694494D3F15D76230B38B279842376",
+      "input_signature_sha256": "13E142DFCA2BBB2E23F532DC5A429674558AAE10BB296EC2DE1838D30AA141F7",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "23AE8E97E1E8289B8521F0CE1CAD1CA5D229336E8588E73C08E31B03479F9AA8",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AA0206A715250605871C8342E6325400AFED9C356F6C8232EA515085BF625A3F",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "565D6215F1614AC1D56DCFE144B87F14F74EE90AFBC010C303D40F9A45CD4DD9",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q058",
+      "profile": "tests/profiles/popular-ratecalculator-space-age-f210-2123.json",
+      "profile_sha256": "9785A8816C9A2186246226BD12BDF0087D8F5E893CCE66107F71B8DA0FA1CFF5",
+      "input_signature_sha256": "9C02EA7C408B932C220302267722085B9686593D2D76356E2005EA6B266F576B",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CD90C8C5F956B165E5CE39CEABDDEC003ED7C4DC233E69A68DF9FC5CC6FFF52C",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AEC86C9DB88BC278473DA5DA46148F856173C3D212F69682DA05510DBCAEB901",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "23F369CBDD36F7F1500691E7CFAB875D828E5ED9DF83B0F157AAE2CFAE095A7E",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q059",
+      "profile": "tests/profiles/popular-bobinserters-base-f210-2123.json",
+      "profile_sha256": "2BFAF2B171703DB9A851A01F6B8657DDF0B1529C1E4E5E3B7387E73FC3A8F9ED",
+      "input_signature_sha256": "7C59E50A5EE90D67427361D311D5423DE020BE841B546042CCBE259569A93041",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "DDCA3D85342A2627F9638B6B38543D57E979F14A051BB12AFE8AD3BFFA04CEEC",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "FF72BA7EEDE12F15F512B14CC2F02F965FFEF57AB3F443B4F872CF14EF6C477E",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "44573D8DA97D960A7844E51F2436F8E184531EFD4D28F4B3F5D79AEFF9C86FDA",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q060",
+      "profile": "tests/profiles/popular-bobinserters-space-age-f210-2123.json",
+      "profile_sha256": "F6A5787678B523EA26A099280B17E01EA4318D041E8A17C3C32842E10CC8373D",
+      "input_signature_sha256": "746ADD5CA5204A038DDC7C5723F1883B0943600BD94CC935FE457A0CE165D1F9",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "07BC35659C1BF3EDDE03BDDD4726EA3334EF8E2A5A9A2DEADD0949551BF00E4C",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "100404E7E5D9E12124102F6E263E393C1B0C6D25FC2932B51F7FBA1541F8F1C1",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "888E5375F9753CDDCC5E0EC3CC4B2E761DA9E157AF3514ABC88256A0DF3FBD60",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q061",
+      "profile": "tests/profiles/popular-krastorio2-base-f210-2123.json",
+      "profile_sha256": "12CA669CE9BD332DEE14331A36F7675E3460CD70A2EBAA6F088AE329C4A27439",
+      "input_signature_sha256": "D26FCA52453985C8AEC8046A37CF533999406F8E7016056C1D8648F4EA001A29",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "AFC53E03C0E9721D1D4C76D21A7A38F74D8AE2168559EFF28CE31AE797C9D0C4",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "failed",
+          "result_sha256": "59F15CBC480FF5FC94BC005E5B719B891A56FE71A3BE8375F158FC14144C1871",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "45B147A42B5BF1131AE51AE43B0655D4780DE60B5E1ACB75E86CF71478DE78B2",
+          "diagnostic_excerpt": [
+            "   0.909 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.909 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.909 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   1.556 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:2: ...infinite-research__/prototypes/mir/pipeline/commands.lua:255: ...infinite-research__/prototypes/mir/pipeline/commands.lua:74: .../pipeline/compiler_orchestrator/context_construction.lua:82: ...s/mir/capabilities/science_integration/science_packs.lua:35: MIR approved science binding is unresolved: automation-science-pack (unresolved-approved-pack-dependencies:automation-science-pack). No research was removed and the former solver will not be invoked.",
+            "------------- Error -------------",
+            "Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:2: ...infinite-research__/prototypes/mir/pipeline/commands.lua:255: ...infinite-research__/prototypes/mir/pipeline/commands.lua:74: .../pipeline/compiler_orchestrator/context_construction.lua:82: ...s/mir/capabilities/science_integration/science_packs.lua:35: MIR approved science binding is unresolved: automation-science-pack (unresolved-approved-pack-dependencies:automation-science-pack). No research was removed and the former solver will not be invoked."
+          ]
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4801A66088F588E849A113AE680847A07BCB85988D64C0222FCEA1C4BA098C8D",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q062",
+      "profile": "tests/profiles/popular-krastorio2-space-age-f210-2123.json",
+      "profile_sha256": "E8D2FC2D9C2BF8820E306DDC4EED984377A75CEBDCF95E56AF2EC84B05339BC4",
+      "input_signature_sha256": "814C312A01CB0C6AE89D3FD8BB9C63D9DB4B3EE2284CFAE7EA746BCDEA1C82A1",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1299317B59C7DA1476914CB9883A240486760C9BA56C1B8C23016F95A80A9604",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "failed",
+          "result_sha256": "86E9EAED625E0F00AA3971E09851B5227289AF44E8DE1779D4B85162ECF1E309",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "C6C4339CE1C97478FEC1DC4D65A2C86DDCF4A5E56689B4C271A4F7E98DE29E4F",
+          "diagnostic_excerpt": [
+            "   0.839 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.839 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.839 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   1.989 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:2: ...infinite-research__/prototypes/mir/pipeline/commands.lua:255: ...infinite-research__/prototypes/mir/pipeline/commands.lua:74: .../pipeline/compiler_orchestrator/context_construction.lua:82: ...s/mir/capabilities/science_integration/science_packs.lua:35: MIR approved science binding is unresolved: automation-science-pack (unresolved-approved-pack-dependencies:automation-science-pack). No research was removed and the former solver will not be invoked.",
+            "------------- Error -------------",
+            "Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:2: ...infinite-research__/prototypes/mir/pipeline/commands.lua:255: ...infinite-research__/prototypes/mir/pipeline/commands.lua:74: .../pipeline/compiler_orchestrator/context_construction.lua:82: ...s/mir/capabilities/science_integration/science_packs.lua:35: MIR approved science binding is unresolved: automation-science-pack (unresolved-approved-pack-dependencies:automation-science-pack). No research was removed and the former solver will not be invoked."
+          ]
+        },
+        {
+          "arm": "candidate",
+          "status": "failed",
+          "result_sha256": "91FB76BFDB637D539F4383B87E203BDD4B29F948E2CAAC3B9FB7C411C375FD0C",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "257A0BE4ED6371709816265A35EA4547E2A4FA3E529CF88F9566A9757C1B7CA1",
+          "diagnostic_excerpt": [
+            "   0.855 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.855 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.855 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   1.460 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:27: MIR gear binding has an unsupported partial K2SO selection",
+            "------------- Error -------------",
+            "Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:27: MIR gear binding has an unsupported partial K2SO selection"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q063",
+      "profile": "tests/profiles/popular-autodeconstruct-base-f210-2123.json",
+      "profile_sha256": "96F5EF23BEE994A0EFFFB79BD27E896E7271CA0B3C1143471B3A0F4DB136EA0C",
+      "input_signature_sha256": "BF8A35C9223B351823F0A6B0C3318244897AAAF20070838EAE860BCF6D8867C9",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "89643B9A4500095E41D2C4B8B8E6C1799BC6AE9E44C755B30015FF8FEFFB4B69",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4DB04555E694B868DF036B90BC84FFF5147D5834AA7286780A3A1E233255CA62",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F77531CDA79D7353766252849A1B832644A603E83CE01856235BDD8FFA9BF8E4",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q064",
+      "profile": "tests/profiles/popular-autodeconstruct-space-age-f210-2123.json",
+      "profile_sha256": "FB0ECF598757976582B90B86EB4DC316D65CC3CF1F3C8B2B41A95346A942F6D5",
+      "input_signature_sha256": "481F34FA8B6D35AA677CC98D7BFF24262B25B0A84D8E64E9A4BC4D147865A5D2",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "07F5009BA9EDA381F340F184B556B3E576AB723101A31D9878972B9FE1B69FFF",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "3A85AB54A5E0B43B0EE20C4B45F4BA7DC11729A8BA7DCF0B490B3069D321A8C7",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "EB71B4E9A0C26C031A29518644E4619840B8E8C62C2E046A17C88F91278403F1",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q065",
+      "profile": "tests/profiles/popular-fnei-base-f210-2123.json",
+      "profile_sha256": "C3B2485CCD35290A932278B821B8226270CFD262179B4AB096BA963D1754D73B",
+      "input_signature_sha256": "53DC6F720608EC1F30C895BA3FA6DD08DF3F908592C0809390E55A4FC90595EB",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "068449BD863720BA161FFEF9B7B405E6F157F4A06BC1D50CE43C54FE97893007",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E3CB62FF0C2A886A782F2B766220A1D3D9880B26DD8B718E4926E66FA1A5E532",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "49A7B1C1EAAFE7F6B6BBBC84B915370056D1DE4819BF98BF7BCC06F719444F70",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q066",
+      "profile": "tests/profiles/popular-fnei-space-age-f210-2123.json",
+      "profile_sha256": "644FC6B6232A78D3E3A195459D306F5C04643CAFFA67671C0499F4ADED78766F",
+      "input_signature_sha256": "CA3A681679ADE161C7F791F64E2F7F246D3CCB2D34E1A2FD171F53E4D7D1F395",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "45AE89965C0B474251676437900B88A44744CE72188B9BDBA55D96F65543F41B",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "41219B4459CEE5F0D1A57116BB5D25FA6AD4C1CE0441EE97335D607A777E2694",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0870A1C6DC2696B6A5A75CAA2EF7FE7FE417CD9368FD10AF74222E3EC0776576",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q067",
+      "profile": "tests/profiles/popular-combat-mechanics-overhaul-base-f210-2123.json",
+      "profile_sha256": "A4807AF58E94A75907E6CE270D3330F1D21C651A92F4B37512DE2E66661BB755",
+      "input_signature_sha256": "807FE37DEDC923E2364EEFADD42FFB83D958F7890F69E9B0FEB89F89170B1477",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1F0AC32391B336FE97DA75E3F608B94145F456BA5B621E4986ABE92CE5395287",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A8AA051B554189BA07C4F1D00B796DDA72C11202DF99E57AB195D8947F6B9012",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0F976496C6A353E3AE1D9B6A6C14058A587DB697EA92717101603F2C821C9689",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q068",
+      "profile": "tests/profiles/popular-combat-mechanics-overhaul-space-age-f210-2123.json",
+      "profile_sha256": "8E4EFF88C5183583CF4BCAACC316982C928131B1C4D686C61174855E679B1CB8",
+      "input_signature_sha256": "384BD969674837796EA6E29463D4AF4D2B481EDF5D05265287D6A4CE0E7ACD07",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5B15BF8858B25A809EC64E9CFA2C934BF7D63820A395C1186B37FFDF9D3A4104",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5B82DF9CF4493E4391A50095F111575F124A410D643F18FA8D489A1831F177D7",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "15CC0BB28B9991DF0C4A8E9E078C0F46D566C4D0D67F10DD1CBCC1F5B6D2DD8A",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q069",
+      "profile": "tests/profiles/popular-milestones-base-f210-2123.json",
+      "profile_sha256": "95F1B85C64EC6C2F1D709FD128729401CF0074A9EC86A9164E0E12DE24555FEE",
+      "input_signature_sha256": "5F130DCF41760AF9FD9B0291D734096AA54D61B2E6A946B8E76B0321FC765331",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E3908BDB620BC431CFFD5AD5FA0EDEAA19CF42837D19F77C2298A292F82A5B19",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "06BB3BAB5F05BC98C85808CCB5C412FAEBE34177A1F8CCD2930C1A67F3C0B916",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "BD17656369C6AC20D3615B09E53036D532A394A0EC1D56D5C668A63062E7A36F",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q070",
+      "profile": "tests/profiles/popular-milestones-space-age-f210-2123.json",
+      "profile_sha256": "28224D6A2029B6E012C65DD9605AB0A59A6115DB20BE4AE7575860239928C4E1",
+      "input_signature_sha256": "85BD63A9D56041F87FB7304F5BCA13F1A9FC28A7DF2893199267950E2F33D183",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D067B51F4EC8E95E49F78E382BC3659DBE707B3686FE55A73F4FC7369838E725",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "337B72EFDFFDC05E65B2C7839EB88BBAACD08D0E0C3D6FD41111AFDD7E23D308",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9222726F89338E45BB1C1F9013EB32CDA44819D8992B61E54575CEE8FD15001C",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q071",
+      "profile": "tests/profiles/popular-textplates-base-f210-2123.json",
+      "profile_sha256": "DE272A61FD90288095C4B3800824929A9169D4C9827356B3E7F17005EADF0DD4",
+      "input_signature_sha256": "AC3A03F309FBD9776190BA1D7CD6DEE0ECDC2E3C0EC1E59BC75CB8138054D932",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "21B96CB1ED535E590CC60A00623D0F157E8589CF05A68214E0E6A74E4756514D",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8FA573948CF7685CF17F4E54875E4C7A96FA6C65B83A2375659F1CBD8CBC647C",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2C54B30F888032BAC35086D3F1E538D2B47E923A3CEBF27B8E39D6E99218B99D",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q072",
+      "profile": "tests/profiles/popular-textplates-space-age-f210-2123.json",
+      "profile_sha256": "6A557064218F8223C6538C3534C27452253375FB19BF5E58590A8ED5DA4817DC",
+      "input_signature_sha256": "E0E7C88DBA8620261CAE247DAEB28D3E301F38732C8DD5059B0EECDD7B80B5EE",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "737AEA0F2DDF3EE312FF02E9682AB0AD124EB673A41F28C9C9A49FD9D4A9EC48",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "44A8ECAC8C16933AF78D7BF7349CF931F40855BE5B06D975A29F755F446C2ABB",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7B16228468C6BEDDDA8653D8B61B5C8D71A29FE16E71A6F2FA585638382214F8",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q073",
+      "profile": "tests/profiles/popular-boblogistics-base-f210-2123.json",
+      "profile_sha256": "01F051B23E875D2FDF2AB3D452F66EA4D55CACEF6E2D0F35CC982EC6A77262A9",
+      "input_signature_sha256": "943BE35BB813AFE95BB2C65063888E615D12D7EFD7845A7C7631FCB22F20A34F",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E60B7E06509C0B9D2D23EBB76B1D4DBB4CC89C1BEF218D42F37837F1F662DF83",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9816995A31DBF5F912F56D7F0AE379450159F7CB9144BB426F6DBD53F54F8461",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "failed",
+          "result_sha256": "8386E8C2CB04FF5B37C3881D1FAB70278CAA1184344B257C892365277CEA56FB",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "6C2AB666902CF83F54E654D1193ED3FAE65A600B15ED7F77599DFDA19D34ED0E",
+          "diagnostic_excerpt": [
+            "   0.852 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.852 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.852 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   1.134 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:177: MIR technology preflight: duplicate technology inserter-capacity-bonus-8",
+            "------------- Error -------------",
+            "Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:177: MIR technology preflight: duplicate technology inserter-capacity-bonus-8"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q074",
+      "profile": "tests/profiles/popular-boblogistics-space-age-f210-2123.json",
+      "profile_sha256": "DA84F573F2A719DC40A81BBD01504C8CDC725B61C44CFC7577091E4AB87909B7",
+      "input_signature_sha256": "1A67C51FF7CA093368A33A83341416A73DB2E63EBB188C3AC1BFA98107C6AC06",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0A25420D717ABE7A0D191940949BD49BF8D04DB50DCF03AC6CF41CBC4B3D8123",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "549055F9DE88B408AA4BD0BAB8A4F4F4EC49D45B332440FA0551D7CC30ABA5A0",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "failed",
+          "result_sha256": "FC7257B29A5169B472673BFC9B8AC07207CC9451DDF8E3C1A42BA5AB888447FE",
+          "controls_restored": true,
+          "controller_failure": "[mir441-process-exit] 1",
+          "native_stdout_sha256": "29049E61A31937DED5EDB72BAB69AE4383F894BADEFA71B601A01B4C9F622A19",
+          "diagnostic_excerpt": [
+            "   0.859 Info ModManager.cpp:280: Found duplicate mod squeak-through-2, using highest version (0.2.1).",
+            "   0.859 Info ModManager.cpp:280: Found duplicate mod vulcanus-sulfuric-bacteria, using highest version (1.3.0).",
+            "   0.859 Info ModManager.cpp:280: Found duplicate mod xy-k2so-enhancements-nulls-fork, using highest version (0.8.5).",
+            "   1.459 Error Util.cpp:81: Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:177: MIR technology preflight: duplicate technology inserter-capacity-bonus-8",
+            "------------- Error -------------",
+            "Failed to load mod \"more-infinite-research\": __more-infinite-research__/data-final-fixes.lua:177: MIR technology preflight: duplicate technology inserter-capacity-bonus-8"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "q075",
+      "profile": "tests/profiles/popular-factoryplanner-base-f210-2123.json",
+      "profile_sha256": "C50D6D02B34BFC8BB5001D807B5B4FEC274715830275D02D3B979B245E741933",
+      "input_signature_sha256": "7A49A3EC57B17D1CFA28F98F20488E7FEC2AB9B57A30E5486BBB7D2A04688205",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9A108A1EF2FE98273A342E7D860ACE9AE84B8585F314070E3D77FB9E9C8F4C8B",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A1D94384C9EFD4995E8892A01A1B4473C1729B1FACB50970F934D130A20E4357",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8062CD1DD1489331C5933A4F74EBB7493ED87EAB286A97E2B6DDC4CA352FB2C6",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q076",
+      "profile": "tests/profiles/popular-factoryplanner-space-age-f210-2123.json",
+      "profile_sha256": "446FEB39E99DD668722C5A3B57714CD2CBBD73FEF91773D046143CB6DA656B2E",
+      "input_signature_sha256": "0EB11424AB941CEF9BD1700B3EAC07F0248EB600636A6F7219664FA6338D5077",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8B979567DECC96E31E0E31C708736F870E1A68A939F74CD17BB66089974C0BEA",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "BB38AB0FA5456FE4752FDBD7F79134F1D0565E3ED4DDABFB244B3205B6AE3D25",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "76A13FA7FC061E0336744BCC474ED3944211A7EACF512B6A19AAC844A6E3E223",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q077",
+      "profile": "tests/profiles/popular-discoscience-base-f210-2123.json",
+      "profile_sha256": "DDB13A7D762D50FB78469E28509D1E00441071729FD971D6E444AC56A5AED4AB",
+      "input_signature_sha256": "0E2F8F044E4B2EEA0222ADFE43A7577DCDE17E2382F4BCCD700B26010B0E2EC7",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B4CA00509E3453F61CDB4B91B9E9EED5B6410163EF9F0F48D34E99729A4089CE",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D0205F77A561E91C2F928D7910CBA154AB47080C903E7A20519B0D7040179E00",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7EC9F772497D2ED7143AFDE7A6B8251F2D9002C54C59D7A85BB83DFB59362339",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q078",
+      "profile": "tests/profiles/popular-discoscience-space-age-f210-2123.json",
+      "profile_sha256": "8E71986767569193E8A729E7CCC00F7CE917090F55EDFBA85E2643CE3206DF45",
+      "input_signature_sha256": "576588D1C92D2F76ED9F2A4700EA39E3DCA4A1411E5CB912B353EBED882CF68C",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "24237848F935ED973913B70DDF372134E472CC7CD57D162FA3D6FF93321BCA96",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "639E85C5E7513F5AE073E0B40B6F4536CAA6273340FBFBDA2EB4720C67A1DEF6",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B1D76265749643DFB6E43CF84494B887EF570B0F3D21320C655E6EF4964BF364",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q079",
+      "profile": "tests/profiles/popular-grappling-gun-base-f210-2123.json",
+      "profile_sha256": "D593289C869306F50A685CDC9CB3D24E4EFBCD5F647807CB5E168AC952D39387",
+      "input_signature_sha256": "CF4D54BDFC7975EE9CA73A808E9735890AE0AFA9D4F44F120A6F464F98C42C68",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C2D14602F8975A3F765C72EA52D3466917F4A1B827D517202C24A6C09505BBB3",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "07F0CC2E5C7B0AACAEB771D1C87976B72999068F8F44330DF5CAC69CF81E239D",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8B81867A940203E90D52EA33642B4F86BE03B3FF6597C5930D0A0735B8770CE9",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q080",
+      "profile": "tests/profiles/popular-grappling-gun-space-age-f210-2123.json",
+      "profile_sha256": "E6074350F8CA36D6F8F49CDCAC9A3240901F1738C394910DEDCFDC80C62617FD",
+      "input_signature_sha256": "B57684886F46151FC6D8D3934B46150F4031DA13FEF0BF718E0D7D68F454F2B8",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E3E9928AD97BFC6C5BD500692991A2A5658408D75D9A05A575E09F72A9314DEF",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5FA056F885B397B0B6C89EFFBC2AC250AE00250432029A6A2E713AF4CA4ECB39",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0C5AB592C6D9FBE6B383B4659B0041A79A39BD939727F2CA282618588C5C770A",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q081",
+      "profile": "tests/profiles/popular-bobpower-base-f210-2123.json",
+      "profile_sha256": "A54CD80D2D5DE58EE37755B6707C026B067477E8F7CF7C28FDCFFA296E694ECE",
+      "input_signature_sha256": "2981736D1F810B4A839975F551066ABECFBB71389BB9F3D0DEE77F9EBCA1DBBA",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "EC25FB29339BCDAF8126008DE76F2A2EF2EBDAD3B37F69997232264C422AAE5D",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "FEF736BB01DA4808CCC49DF5BB90D2D9D572D612CDE8E59C043074AC703A8C7A",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "10114A426AADC2E673062B1894537B9E9D8522E4EE6C9B90A2FA4FE2FC32AD74",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q082",
+      "profile": "tests/profiles/popular-bobpower-space-age-f210-2123.json",
+      "profile_sha256": "29BEE073AD6457434FEA841BD843E6B469B14D2CBB98948D6EAA289C78943FA5",
+      "input_signature_sha256": "4923A2B5CF392C99F2273CBB25CF71C17B0A032F8CA1A419AAE13E06DE5DAE06",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "04849041544170A2ACC46D9F30255D46A5FDA9491E63BC9AA24EA777007210D2",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "32113D2B960C7551993952AA9CD6C66043F5ACEE4F311493A89F3E275C59B890",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5FF80EBAE5D78C05D164FBC43673D42439B73494FAB9BD462677738A719C101B",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q083",
+      "profile": "tests/profiles/popular-bobwarfare-base-f210-2123.json",
+      "profile_sha256": "55C2704323B74795623FE865B9EFEC469E1E32F913C8AFA92BCBC00290410522",
+      "input_signature_sha256": "555F55CDA0E2EA57C3A23AFB3E22432F148385725807F2FC5E41EC31B76BFB57",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4A4E3101EF92453DB9D4A96DBD39389B8B24B170E41530DDAE690392A6F03A7B",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8F552892C57AD9041B6E6DBC29A67BC02B6E64147F4198438D2F2AA2DA676391",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A43F0DC73AF5407ADCD7B65573178A1A34F50065CA1F9B17410F0AAA791F76EF",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q084",
+      "profile": "tests/profiles/popular-bobwarfare-space-age-f210-2123.json",
+      "profile_sha256": "DDF98B3E1D5D8CD89A5D566BED2793A28AE463A916A790D1C54ACE245D38B64F",
+      "input_signature_sha256": "60599CA1AF1EEDFE39FF892ED50B43A30FB17E8AF8E6E4A38D5C0E608345E248",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5313F941C9D324E22773E193459BA0C172964B7D81476DB527C717ABA168F9CC",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1F57E8DD1AD2549B608A10F7BF32FAC767780C3855192CDCE55A1DE9B1BFEEC7",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "93C318BE078730CD291A8EE9C45A0329487D7B7F9B0CBF91434933FABFC4EB41",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q085",
+      "profile": "tests/profiles/popular-waterfill-v17-base-f210-2123.json",
+      "profile_sha256": "0275A00FFD08E2B5F9B1C1571BC2BC9A6080555905CF553D78532E7681F3D35B",
+      "input_signature_sha256": "43C10E080742CDB50A99D090A1EE7FFD59A5B0D0D1C18BFA638850C3F003A68E",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "83201A424CD94FD992BDEF2235A82AB952A5B0E2B6FC751668D2D3A413164011",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2BEEBAA8984A36C36BDFAAD45EA4BB2ADCC890D390E60F9285D1838C836CC81E",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "716F76B7866BE20E23A48ED00645EFF99BAD784249D8CF8EA6C857FCDD342625",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q086",
+      "profile": "tests/profiles/popular-waterfill-v17-space-age-f210-2123.json",
+      "profile_sha256": "0D75AD10286F2B16873634ED9BA7FE7C6CB09A864F309A85979337165843F3E9",
+      "input_signature_sha256": "094FD8D08FB839F1F525939CC2B7890EF42315B6B7B57C80595C34C219A2940A",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CA8C77F0A802EECD73334B7E19972BC18316FA5A9705838A643755720A833B1B",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E5B69CA45EA78CD7321ADDFF6EDC1209337B38A35ACAB1AA1361C883A40632ED",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C1891E46767FDC09714F57C533DFB52E61CFC4F48AFA0DB873626E70BCECD0F3",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q087",
+      "profile": "tests/profiles/popular-bobassembly-base-f210-2123.json",
+      "profile_sha256": "307596C4C1A7D3389437092E403E31227628B96C48FCB43C348F821F549F7D68",
+      "input_signature_sha256": "D92FDF6DCC4505111E39DAB53D90CB3B6704A4CEE116BB524BCB4395513D708D",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B39892963FD8CFA1159B50B2AD7529E8E7F4C0F54F0691E16ED6482B45DDCB49",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F9124F8181ADAC9E56A5F5BBAD96C972650628AA130143FEE7095BEF164CED5D",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "22FFC5213ED04CF2DF0D549E281D09585E000BD8F98FFFC7138A600617B99985",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q088",
+      "profile": "tests/profiles/popular-bobassembly-space-age-f210-2123.json",
+      "profile_sha256": "375DF286BA12530646191BF3D2B0898642EF54CE3A3EE9112031EA7F7175DA8E",
+      "input_signature_sha256": "5ED7854E8966B6C406A92C846CE729DE17AFD4F084069F59FEF4D8A758EB102F",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B4022999907545864518CD2817C6AE11C3BF265E75BC177BB914FC773A4CCDF1",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D51C9779C67AA656B412A4571B7E4C85C8A0C4500E9095145103E6CDD2300CC2",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "67F58CBD700C15A41A28FE0BE7DC1514A2AA5A4DE5147DD72620E2C3508C56B1",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q089",
+      "profile": "tests/profiles/popular-bobmining-base-f210-2123.json",
+      "profile_sha256": "C9C0591456C38B8EEF0A65F131F9B43083AF42B56515077B1D5C760AEE6BA88C",
+      "input_signature_sha256": "AD30A96295A691240F96341421FB1A08ED52C2119201555E8A5408EFF1C56B94",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A50536772A05541078FB6518682676495F992BFC8B794995BBECCC6042DCCBBA",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7BDE1E1A81A3EBF6311CD5F39C3305B4C1B51761ECD26900652181BAD11F4A6C",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "FACB5B8E674A49E24BCDB0C0FD4D4CE2D6FA9649E932633469DD99E969AC8B32",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q090",
+      "profile": "tests/profiles/popular-bobmining-space-age-f210-2123.json",
+      "profile_sha256": "B1A880E2A5F456DC15FCDDE237A2F9C8355095A045438622D99750D481F1DC5B",
+      "input_signature_sha256": "CBEF48CA7508D03EFC655CEBE65F8666722A19073A98FB21C267C1D5DF9E9468",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E7DFFF3D453765C16AB284B87C81EA67B6464A93B7FB8112B73E71B3E1670454",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "71DCA152E465B6C23A34E76A9A65ECDA21E4683019C4505DC7172942D2BA65EF",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "DB2E0CB30D7DB09B1E73A6D5178EDB14C39AC5C075DA14B23ACC4AC749BF134D",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q091",
+      "profile": "tests/profiles/popular-equipment-gantry-base-f210-2123.json",
+      "profile_sha256": "003A72C24DF72C0F826B107C7D1B09CDC8EABFB71D8210018A27864F2C142D8F",
+      "input_signature_sha256": "0DD5FC4EE9740682322F1EFF44B61DDE82AC8ED979EC206682E8B0C9D6F6CAE3",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CBC654EEF36D678EAB1D397FBB7D574F97BB6FDEF55DFFED993FF37072C7ABDC",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "77AE4404815A4CC77BD36BB43D1F946F17DDDAD799D73412FD748F39464387F9",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "31C7FCAC53DDDD56C0BC9E3A828E4603BB16CDD0C2BC381935E7CAEEF3E67480",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q092",
+      "profile": "tests/profiles/popular-equipment-gantry-space-age-f210-2123.json",
+      "profile_sha256": "ADB059BDB3B39AE9EDF4FEDA6AAB2CCFE52344CA7093B403904575422A98CC7E",
+      "input_signature_sha256": "72001C017AA926A4044A5E03A6908F909A6C8D9D536C85EEB75FAB8F29055F8B",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "355C110CBCB8352E504420BD3A88EE2BCA3480CE49AAECD8F984E3F119D11BDB",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "708FCBB954D3B8C88E849FECF7359731A2EE8E09032DAA28979AE400C4E607B9",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "36EFC4BD86A06D6720F52A2D272405F11A19FD813C2E3410D37B61C5601B3D05",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q093",
+      "profile": "tests/profiles/popular-bobores-base-f210-2123.json",
+      "profile_sha256": "6176CD193A788F07EF70DEA283CFDBC88D5EDF1469A77EAF57CBCFB7E1C618DA",
+      "input_signature_sha256": "DA4CBCAD6ABFFEDF020742BE9B1898A77551D6AE30D495076DA2D1257E97BFC1",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "66EDB1473752257F57F18C43AD91480A858D3F23BB5EA5127D93B8DC5DB49BDC",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F86C84B4BA60EACD12D6C71470A03834300D8780A6A19A6C0880DA8D2754ADE7",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "75A7AF0AD4554E8EBA7DE580F0E08512E823C31D1073FFBFE66EA24C131B29D8",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q094",
+      "profile": "tests/profiles/popular-bobores-space-age-f210-2123.json",
+      "profile_sha256": "725042B9F9D4700B4ADFBEA86133BAF2309C8B90C6AC30D55AA5A4E708386125",
+      "input_signature_sha256": "F5A8176D322A700241D62A31DEBA4E841B4CBB583CC8B49E777CDF1FB9039777",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F6D0AFAB13D2AE84EEC2B69A63CE9F1DC696285D6C23BD858AA136A7A2B5E37C",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7400AFEB004F1B1BE1E56C6A0D9296F5DE2E710D5E4D35D889F4DFA4DB69D2D3",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CBB6F622EDA2AEF072C9D0C08DD41DBA8A48AA6868E09DDBF06A2B6D70A70F85",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q095",
+      "profile": "tests/profiles/popular-vehiclesnap-base-f210-2123.json",
+      "profile_sha256": "44031D4480A2A2143908F784107E7CC20AE0E345AC50C73C28170A09256B8F5C",
+      "input_signature_sha256": "DEDDE0E1A6AA5277019CC3479D7BD3A719A14EDB9721CC61633964A38382B949",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "062C86A47DE048EE4B02F28CF3DF5916A3C9D62DFA9B0A2E1D613940FFD7059D",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5A7CAFDBD693C12C3E3C2284DF6094F83A89F61CE8339CC959B15159CD42E423",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7A34765B44849A1A02A239AC15B0C26C3A4A95393E87EC3FB3EB2C4EA8F95B57",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q096",
+      "profile": "tests/profiles/popular-vehiclesnap-space-age-f210-2123.json",
+      "profile_sha256": "846EAC1E15370C0412E52A7297F037D0E6B34FDCBDF1B93C2DEB2689BB72A0F1",
+      "input_signature_sha256": "3EFC785437E64AD59803C504EA92ACEBA222DF90A1B6CAD44FE84C493114C214",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1880716F0D44F426FFCE8E05BB2BA4830E2C572271D29676C42076120038D68D",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "ED5D71A25D2BBAB06FF7145BAEFE6D757CEBDD8C09C5349EA9E95D178016B53C",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "575BE1D44B32B22D754A726FB7B826E14EA82ABA934B7014C76D51C0769B7544",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q097",
+      "profile": "tests/profiles/popular-bobplates-base-f210-2123.json",
+      "profile_sha256": "7814CE47CB9D76CCDB4EA4B30E7EFA801B955C4C6ED5A8FBEE5D17CA96D916E5",
+      "input_signature_sha256": "9E95B7C56346A1B1787AA213EC2EE7C56872EBE598B465950618E605874BBE9E",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "FB4574840BBD890B8864574256450F11D7F77AFB94161A9C3E34A30FF2F93A26",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9845F81D7223C57AE856DC2FB6330185046C0265C55A2A52D6E61AA62F9877C0",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7B53835113CB9FB725123A01F38C6B304638EF49B95B4472A975334D8BA19E65",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q098",
+      "profile": "tests/profiles/popular-bobplates-space-age-f210-2123.json",
+      "profile_sha256": "F905BE74E77612F9CED2CC77BEB7C19A074E03EF1E2B728F0E7AB807F0ABB44B",
+      "input_signature_sha256": "9011B28A3B4F8B1074F39D96A6D83CC97F044740686E6D89C7F951BF554FE5F5",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C44DE8A261719CF3C0176ACF20D4AB322043D1F740EB92118674265B552E15C3",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "973B9E70B68AE7B2C05A31EE6270FFA9A66F5F64E1BD89E12D6E93D6EBCD1D29",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "99CA1D45A68BE8F1279A7EEAB179A03659B6ECD9F9140E2725AFE62FF67F4257",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q099",
+      "profile": "tests/profiles/popular-squeak-through-2-base-f210-2123.json",
+      "profile_sha256": "21201E46FAF719CDBB4FDC32D0927262DFA40B012DEC3D0C19762DB2B72AACE7",
+      "input_signature_sha256": "DE713B5A95382754A2A5CFD20632C85BBBFF8305D47475BA5670154D7E55A79C",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5246E326B228849E39E0CB23A85C0481B10DF08ECB54DADBFF02674BBB9C21AD",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "48F66DB3225C228F4EEC05AD306EC232A1A88CCAC4614FB5CC3DDD5E30BF015F",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5E383AF27F63D4C9E46AE8DB1D0C4B87AA16FAED5619AD8990ACA4B74307675C",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q100",
+      "profile": "tests/profiles/popular-squeak-through-2-space-age-f210-2123.json",
+      "profile_sha256": "67D69F348448A5D1D499DBB278BEEFCF3FD255C36CD1BC37DFC6499D1476E3DF",
+      "input_signature_sha256": "17B5D2586F31F4CF95BB5809CADF5DC6B6E033AEC3D8C52190F79456B1C1FA8C",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4D11657CA992CAE91F20DC2B7965E0E5FD2CBCA7DB0992E037AA1FF50C840347",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8187BF071A3751D35FFF373B7065F40D73A6C180BA8A131E3440B2669B2EAB51",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F80667E6E22E82ABE0CA48A0DB90386772244996F83FE3FA41B598587C1780EB",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q101",
+      "profile": "tests/profiles/popular-logistictrainnetwork-base-f210-2123.json",
+      "profile_sha256": "E85020DE3DE035D12FCA8DF79E3E891598B3840CB74D1F26329010AF9B4B27A3",
+      "input_signature_sha256": "B4BA6E06C451082F8EE32A72ACC784E4E5FD09EF3441B02C207AF1EBD2861785",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "219196C95E4380FCB1408FA2E30AB9C0EB8BBD26971B735D432965A9C908A92D",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F5E60485C2C0FE0BB24F59D35CDF4117933B3AB4E84F6957370F79B93DBC8D8E",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4BFA699843FF15A5677D00EA7B85F9EAE0E481264B9C785E86CF08B6231F225D",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q102",
+      "profile": "tests/profiles/popular-logistictrainnetwork-space-age-f210-2123.json",
+      "profile_sha256": "41044E2849B9E7464A146FA47E806D3C1B98A8DAAA04C20561115D5ED8990782",
+      "input_signature_sha256": "6079F986DBD3827219459D419A86F3C57BA183E73C4EC57824CD26C63E350F52",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "022DFF4109935BBF6DC6E1DBFBC2EF1D462FF20A742B4C13DDE1FE4D3DD0F045",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6839BF5000FF70BC50A3427E3D61423C97CB6C4913F6C8A46104FAC501A27372",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4BD76280D38D67B8647573DBA8C36E308EDC77AD574E2225C2191993931CFDD3",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q103",
+      "profile": "tests/profiles/popular-bobenemies-base-f210-2123.json",
+      "profile_sha256": "8134E0527CD7CB3EBB4E460A3E98591F79CECACA7DF2B53DE904FDCF9764A73B",
+      "input_signature_sha256": "262E09D4F4AA5B8E684B050493B9CBD3A488796F8E74CFDDD8D9F067086246FE",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "27C693617BDE3667BDF8841A14E363C41F87A307651F2A9F2498FC5BA3E36DEE",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F510D1A3C4BB83F560D32572C019442C3539722B29548306E809727C757D05EF",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4AA4F97FBB874FFBF3D74FC484168D79C294F4EAB3C05A138118C127414BE93D",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q104",
+      "profile": "tests/profiles/popular-bobenemies-space-age-f210-2123.json",
+      "profile_sha256": "4497DBE1C82F7268AE8843273A3AE20B0E08E4BDE0EF0DC62EF3746FC92A442C",
+      "input_signature_sha256": "FCEA92AA95B957EB57827FF26FA00F75C143CFD48F6E81CB5F8F96DC775132E4",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6182EF403DC3C2D7702F96D06BCB8E9378EDA09622FCC8565A6C8475DAAB739E",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2275C43B9F3DFE3A886D733697B44904DB4C129A0E7A61BDB9D11B654B6C49C5",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9D6F0BE363C4B41BC25319D12AA5F1419265DB7BA629A422E4B25020E3D8198F",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q105",
+      "profile": "tests/profiles/popular-cargo-ships-base-f210-2123.json",
+      "profile_sha256": "5519621B16EDC2BD8E9BCF58842ABB9A841EC5DDABE973730F9C7573AA0DAD82",
+      "input_signature_sha256": "17788B13258EE2098FC3C3DE244C55A3B934673AC648F50DA9E3B1CB309AF3A3",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F3EF77A59D9F17431B6383CD112DD519711185B8EAFB831CD1C88A5CE7A24CF7",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2B89CB294A3027B23C12657D2E5DCA9587D3E59875668FC5A1B25F7BA65157C2",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "821742EA3C34A4D1075D707BCE8287A9276A2123CA34AF665111575B46C60216",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q106",
+      "profile": "tests/profiles/popular-cargo-ships-space-age-f210-2123.json",
+      "profile_sha256": "1F1A4F274903C5BB1D1D8BECF78B559F9A080D6BB60468786A8B5ACE9F477C55",
+      "input_signature_sha256": "CEA72DE0DD6FFE096DC9C641CC55619C2EA74D18292C30038463AA673FECB08B",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6DBBA98B841006C54E070342DE5E13B7AE05806964E4C73AEA35374BC88F1886",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0E764A2F92630E894C01FB57186303563E6991EB45928407D149B60AD1C3D791",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "856853F90D42FA015C4E11354A28631193163616836FC068870CC466B2E182AF",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q107",
+      "profile": "tests/profiles/popular-todo-list-base-f210-2123.json",
+      "profile_sha256": "C4E90ECFEC793D795DC60F183A3C2D42E612F993B1E019E2D3D15FEEE18B8A08",
+      "input_signature_sha256": "7818799E3F89C5451A06822A17D4BBD926DFB420043EBA5F92A60777BE69D7A1",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "36FADD699097B60B9914B2F245798592AA57271C8986F3981DA953AC184B6F51",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5A72F336BB49DFC2C3ECCC15298858929F7FF894DC4FD65639EE6D4C65429D81",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "66B233DC923D5503D3C82F0178400A89F85848937561BD2BAD65DF3A00BC1A51",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q108",
+      "profile": "tests/profiles/popular-todo-list-space-age-f210-2123.json",
+      "profile_sha256": "3D75F42B146D9D2C847F4194506B6534E64F121AD594D5E296552D86249A2E8E",
+      "input_signature_sha256": "F3887D0221BDAE3DD56224D508B76FAC9608D2CEDAE38E45408BD601F6EAFE5D",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5240193C08ABA27BB3474054D807AD07923E224E149179BE00A932D4300C9826",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E2695283418EBBA36C86B04231C7A43204DA9E073893CB1353493BCC742DF023",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E978625783CFBE28873E42D29A0868B1E799CB1961D6A5DBF94050FB9C2FB67A",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q109",
+      "profile": "tests/profiles/popular-bobelectronics-base-f210-2123.json",
+      "profile_sha256": "356FDF63A7B47C1CF46845FCB2E7330D7E4464843E256F5BD4A83BC4AE25FE6E",
+      "input_signature_sha256": "C0752F4A485C1292A49622AEC80B24D9557CDE20649767410F1443372FC41023",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D0C85F064D01DB397AB6638B506462785600CEFB967FD09630603341D0B4F99F",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E781806C52913FA6D4E6390CB11875284A5EE409752408951020C6A57D6B9BFC",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "CC2B2BB2DE243C0D03785D7334C2DA23877AC6C192797BEB050D3D24794B3242",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q110",
+      "profile": "tests/profiles/popular-bobelectronics-space-age-f210-2123.json",
+      "profile_sha256": "E124CFC9BAD9DE0C381C55806674A7041F0EB053B9B3BF5191B5DC4CB6EFA8DA",
+      "input_signature_sha256": "FF808D2229398AF19CDDDF8452644836F7AC26A7D212456DC8B4C3B34F7D4CEA",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E7609716CAA9969CD0E4D7557A3700029E3F8D632DE46833E0169CBB174028B5",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1FF49904D21989D24E90B7846AE988AFE625A65992B9A06CBA54497DFF90B1A6",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "51AE65845C36256AF96FA9B981CABC9B9BB2442CE3E43AE5919B120E9FE7EA81",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q111",
+      "profile": "tests/profiles/popular-bobmodules-base-f210-2123.json",
+      "profile_sha256": "ED8A18D336916296C0301313FAF0416109BEDCB95021B8A9266C27DB2D1B5BE3",
+      "input_signature_sha256": "E180FB039061CE82F6D8B0AB9443FF2D88DF4688D544B3057F06467DCE5377E2",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7E862C21280F8A4135E2CE41C244EB44ECE0486B399E902A327C9A71BB5FEBD6",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0B942FEF451C60A497FFBD4053C99612CE49BEC0C05213393B9DAD6BC8C33C33",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "835F684CEF4D4483F4555915794B26B2754C8C737C64ED56EA877C21A94B1947",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q112",
+      "profile": "tests/profiles/popular-bobmodules-space-age-f210-2123.json",
+      "profile_sha256": "3C5E18A5A93CAD88DCC79B702AFA3050984A82F9E5F1A9B8361C6D4B2054BB5E",
+      "input_signature_sha256": "70E91D34D0185F604B036E61CC4624A463D79EC72ADD24EEF59D4D1795F8C00E",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A368ACA898124838A5E07535A7402F3350FA245243D0F8194F5F579B4F8956F6",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "10560B7401276D75D4297F14457A75ACFF777B484817BA318C3B3B78B53B54DD",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "98ECF310A7F3DDB333012354B1D8A35D0F27467C6E11DAB9B273BCBBB853053F",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q113",
+      "profile": "tests/profiles/popular-bobtech-base-f210-2123.json",
+      "profile_sha256": "0679BC9AF600F39E2A233A7BB29B3C84283F6FC0F30737EDCADA30453249C9AA",
+      "input_signature_sha256": "9F66388468B59362D28F86D8FCEA27DCC64BE75480DE299F5E1BE29DB4EA9B4F",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "039547074B0851670890CB88D083D23E9605A767F5C34185F2D5D7CEDFD0BD5C",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "E30BD79BF87361F150626437A7BFD5061172708BBFF7FE6154DCCD0F2748E504",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5F672187530CD85FE4C0DFE3E2BE8E494DAB55AE591542095229D99C7F3642E8",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q114",
+      "profile": "tests/profiles/popular-bobtech-space-age-f210-2123.json",
+      "profile_sha256": "556CA5E0D370C75A556067698E9B4098EF0D759AFB7A2F028AA5BE2065021882",
+      "input_signature_sha256": "99FCABD8866A9F678D97EA293EB89B6CF8559AC26E6D23619250B38980404445",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "40A051F8E70CA110366C677C4358134523EEA65106BB3D9A64B1B74EF21279E8",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "44EE03C5D3383675E2672EED446BE2571B8A9F24D9D5ECFA4D58CC95DF874BB1",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6363C1A0D5719B0B433C16D6F7F4AC23597F99F2ECDCB64714D719A6ABE77EB1",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q115",
+      "profile": "tests/profiles/popular-bobequipment-base-f210-2123.json",
+      "profile_sha256": "A6B72D4D0B4787527AF48D0A7F5C0EA8ACAFB9F85CF177D6852272D367FE50C5",
+      "input_signature_sha256": "3F7F17705CACC5FDC9FFB883C3BE48790B2D2AC5990CAD8161012E31DBD8F3FB",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2957348FC9F0355D93BD37BA53BC736A0CFE2B8C7790597C8642C4C778EDDC38",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D2D0557611CAA1DF49E180020E69B9A623EF1035D9CE977CF0C89690642AAC09",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "7848F3DFD0BBF751B99CB1EADBDCBD73628503E63CDA418076C1808702F07B0F",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q116",
+      "profile": "tests/profiles/popular-bobequipment-space-age-f210-2123.json",
+      "profile_sha256": "5789A0B3289C6802E2439E795680A7DE620A671F7F9ED2D48E2C3C4AFB866535",
+      "input_signature_sha256": "0A1844F362D7E2214DABA2A3170BEEA148853EC01D39D510FED41FDF90C4E5FC",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1B6FABDB4FB81AAAB0812A2F4A7D9D99AD5B3F983AB338738CEDA7AD284158B8",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "114C901B795FBC60C6617F66B9F6AE8281F0A76CB4A3489A436408902B6A044D",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "33D1431D4928309D2F142CB3313F49E1655F478658213F554F405BDAB45D000C",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q117",
+      "profile": "tests/profiles/popular-aai-vehicles-ironclad-base-f210-2123.json",
+      "profile_sha256": "1524B6E03D3ADEFA2CBAFCBF8CBA8C24C1E560C8BB01A7FCDF0F28979F56D669",
+      "input_signature_sha256": "294B41B4806D23287BB54E13AE621F64846F6B4F20684F957D47281E68222482",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "84F05EB2380454B96069D19509866E34AB00DB441641F344E6B8F6A0688D0070",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "41AAC606CBF113CD8F0F7E9DC0A55AE644AFEF3135C3CB6310F7123297AC9557",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "223D32427503272B7DE9518CE2C26A0F27523AE1C30CDC27238348B510C6ADB0",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q118",
+      "profile": "tests/profiles/popular-aai-vehicles-ironclad-space-age-f210-2123.json",
+      "profile_sha256": "C98ECD5B8CCB2A4DECC51359A10B97B33A7CCC96BF87CADBD868755F83532123",
+      "input_signature_sha256": "91F679DB5E8E38BFE15CD271D92FC25D7589D63FE354683FAEDC4B13E360277E",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1B42058CC89A2EBD2820B31C6F81FD19414EC1CA9606997DCECA0EAB7F475E77",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "DF8C46BE316D990015317D829E2CE09EAEBD5794086C6B22EFDC4E78DA302D38",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "96F5A8139F1D0869263B79BC3115EC44E744BA33EC6135735C646AED00955656",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q119",
+      "profile": "tests/profiles/popular-fluidmustflow-base-f210-2123.json",
+      "profile_sha256": "F0AE70EDC92787CDFB5B75D74487F9583BA650993D79E9D7C287B5067654B04F",
+      "input_signature_sha256": "D7661D38D09159C15D4FFEF9D8CAA314971ACBEB1BF1B5EF54DBBD4D690489C1",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C5D156ED1C94D94C998AB52C13266FEE1EBFCBC01DDCF5D463079DBCF89429FD",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "86EAE8299509FCD753E33A9F1D1553A65F19F45EAE70B8D5C308682BAB4DA864",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D979A9F254F3AF7DC4A0D695B8C6A164888BF82AFEEA2456EB93CEECB22BD4A4",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q120",
+      "profile": "tests/profiles/popular-fluidmustflow-space-age-f210-2123.json",
+      "profile_sha256": "1EC71A479B916C60EBAF79C1CFBFF28D93B42558CC9E604C00B1F169C3C9E553",
+      "input_signature_sha256": "F6DB2A8CCCF42572824B207FDB6711564F5CC0B8B31120DEC2023753AA884247",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "37B6AC2B2BCC35F43FFCF56849AEE8076F1912895625DD62A692F3D600BC88B6",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C9B2234F22AE7BAB47793F9E698DD6CA972637DDEB8B80F5BF4747FA16B840CE",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9DDF1A87822861854993C45A28E61CFB997B327630164C505C3E5D4C5C3E7326",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q121",
+      "profile": "tests/profiles/popular-bobrevamp-base-f210-2123.json",
+      "profile_sha256": "662C0D2CE743FBC3F20DE8B5A786D3E16024BD707C61EB7DC18BB4975B46C867",
+      "input_signature_sha256": "9D994039A058F7F90E1654ECA4F43B378EC02E6394369C41E672636CC68405AA",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "77255489B1333D5EC23B78A1BA8E277F2B7345D6A9E3ED8D78ABE7A196D71CE5",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8AEE2C8A97E2280D328F3865F3DDD21C4A102B3ED8BA96EB9905FC118F0D5C3C",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "5DA48C17093E510F9AA20999C75115664880C7F50EE73682726ED70405C8F725",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q122",
+      "profile": "tests/profiles/popular-bobrevamp-space-age-f210-2123.json",
+      "profile_sha256": "8F7AEC601B1031D717FFD2D4740D8D02D498E997AE99B5B79778A1A9D7C8E71F",
+      "input_signature_sha256": "A78262FF7E46D33553128B3F25FB4BE975C0FCD4C9968B20A478692A63E80AE4",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D603FFAD50F4CED9A32C858F968A1E4B970D4A5615A744597BC0B84BEC222316",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "2F666BBF55DFEA55F7EF862374C324E85E68B2F0862D1A238FF45D096DA3AF8D",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "142BF1BFF82DA17D94ED2ABD8A2EEEE4F5082730D091D8CDD8B5CEAAE61FF06A",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q123",
+      "profile": "tests/profiles/popular-far-reach-base-f210-2123.json",
+      "profile_sha256": "8DE42D1660844804B165A11CB27E477500A1BCC4743046A9407F0E1323AA0215",
+      "input_signature_sha256": "C4934AAC9B01FA440A6553A371D2507C8D9F343B22608B4FEA69FC7AE445ED7D",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "124EDE11FEB343D23777AE57F145A426FB15BE2ADA6A8E02759F4CDFAD8B25BA",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9E269DAA85A3837A3EF113AE82F05478E3FF259FAD15274A01289FBBCDA5774B",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "430A13ED6150A52DEFDB5FC209DE98A8553815A2FB4993CC6BA94DC1FEEF6DBB",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q124",
+      "profile": "tests/profiles/popular-far-reach-space-age-f210-2123.json",
+      "profile_sha256": "C8DC3FFEBA9D8816135690EAF27B1ED39E1914B0D3B7DD360800835F2A9B0776",
+      "input_signature_sha256": "E750368B832D803044C3CA7DAED085BAAED507729ABDBF7237A378DD2A8C8E2E",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F9509B0615B6A645A7E3F2D507E8CC044FCC72B4098FE9FDC04AFEFBB420EE58",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "3FE69CDBA85B74FE2D9890DF49282E02EE25A911C52A1153BE4AD34B112D4DEA",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1FA2552EE287C08BBA410D5B80031D2537AE07241E9E19F5B0CE3313CAED97ED",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q125",
+      "profile": "tests/profiles/popular-warehousing-base-f210-2123.json",
+      "profile_sha256": "DBF591911D0334DB417F1B3D58768256594925928C25E51EC067417C5E22C8D6",
+      "input_signature_sha256": "889A549661D8430083D43511E397DE904217DEF729488A6C5C7DBBFCEE7767BD",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "01B769777D5D5C4BEF1A607B81966612D88EAD3E108400E030DD9FF368BCFC44",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6A932F5111F4415C11FFE56DE94B28323FC176379AACB64E41FE790F89075C4A",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F761878258D83B2DEF5A4695853A7AC0391235DF5FC4D3CEB07949F47E26DF89",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q126",
+      "profile": "tests/profiles/popular-warehousing-space-age-f210-2123.json",
+      "profile_sha256": "4F9EDFDA055FC0D382ACFD375BD6D5F370072F4C96FF86E30DCDA4F2B747BC04",
+      "input_signature_sha256": "DA956F0F256A39AC366A9E58A7A94BD59B61EBA84083701E94AA91003485CD23",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "0EA0769A54AD70D97C3CB0C3ABD9AC3BBB114A8FA770399A70DC367551BDC21D",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "D8A06B32CA67FE411ED7B5A90D5AB709CE3D8F6ABBF6EBAE3840E4297D9CF152",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "96A623878B6C6570B53977BB4795F808E8B016B680762B247872E4ACC7169F35",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q127",
+      "profile": "tests/profiles/popular-bottlenecklite-base-f210-2123.json",
+      "profile_sha256": "8E12B963C4CCFD0229F560CF0AFA0D3D70EA96BC7FCB6FD270168A7685F550BA",
+      "input_signature_sha256": "36B60D82ED05ADD681BE79318261A77615C5E7F6CF8E214858BA37642F244471",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "A526AA4A54D650AA95393459974E57858A9D6D932DD68E87720CA44299E21762",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "DDD904111A3BD2787E41197B5C2F7F7A1A35BBD6D00557CA19D52FED378FBC16",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "9FFC4DB8F3DC0081A1AC7AA061AD6E04AA3B9177015FBA40714B41A688943238",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q128",
+      "profile": "tests/profiles/popular-bottlenecklite-space-age-f210-2123.json",
+      "profile_sha256": "61AB6E1BFD70C3CA907CF505D355FB23693147D15FC78FA5F2240249DC274395",
+      "input_signature_sha256": "E1A56DD0E3DFA18D337C3E3D94E620828F9032D17F4A610C99F9389CE928C12E",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "F105D4659120A79845838E765BCABAB4292EE52E67D94F7207708F941750DBCE",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C1D033D116511DECB927CE1BB650626EA7237255FF114F97283D891403719288",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "8CF63E2E6A7D685E38B6938A8F038F7AF916F185C482F6CE8164393C18C698D1",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q129",
+      "profile": "tests/profiles/popular-power-armor-mk3-base-f210-2123.json",
+      "profile_sha256": "16959B9331C8266FC967650AD586C0BF2526AC2B83B09E8FD56F8F4125456EA5",
+      "input_signature_sha256": "C43A2A22335B7B17EA7EE246DF5EF05BF329D36ACE8E0F9789E4AB6F7255CB19",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "77AC440DE175E7A7773059B04F21AEBD301E14A02937724598250BFF283124AE",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "81E66B7FD5035B4594CAE388801B677A5B9EF437C5986A43AFAF3A799122C0F2",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C4B1F1E8BA5AFEE75F2DB32FC8EA19BA1E7981B2550939757467C2F387F803D0",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q130",
+      "profile": "tests/profiles/popular-power-armor-mk3-space-age-f210-2123.json",
+      "profile_sha256": "7337C3C16D0AE917FDCEB9C3103CFC90E1226BF1CBC65BB3FC4A692826722D96",
+      "input_signature_sha256": "C11347EF7DE3AFD860D7DDAD8F2797FF360F4E9D2350818FC58DD24B97B3D0AC",
+      "heavy": false,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "21019E294423BB2492A3D182890E03A65E40E05DB335F278C7B5442822841F54",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "540EC101FF9C0E2CB00B23BC5A0D6C58EF8ABF81A6C70A458305DE202FDB10C2",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "C95320D7984F7987B459B9E47113138B67DDE491242A65253B74954C44304C13",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q131",
+      "profile": "tests/profiles/popular-angelsrefining-base-f210-2123.json",
+      "profile_sha256": "763BB1A357FB0EB9B8B60D440865976BAF4754C596781EA733C98D5A1B1963E6",
+      "input_signature_sha256": "05F4DC07EF7ED6EE96FD507709BEE9D446365DC9BDBA464745981316876B38C3",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "B3E23155E4B8820C17331E9AC6C972F65130F807F0B8FD4D8513345BE260676A",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "84F834E33C9166BBDBC8C614A542AC498B6F33302E802D5AB932530A48F2A586",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "1F37031B682FBE4E23ED9C326C818DF4B417FBB6CE9BB24F8962F8841CB9344A",
+          "controls_restored": true
+        }
+      ]
+    },
+    {
+      "id": "q132",
+      "profile": "tests/profiles/popular-angelsrefining-space-age-f210-2123.json",
+      "profile_sha256": "282A54F7E20F037565541C40DBA3DFAAFAD689BF2430F14D35C88611C8DCE974",
+      "input_signature_sha256": "DCD41532CC044609927E48FAE09BDC1C689F18F6723A8849EDDBBF3822939555",
+      "heavy": true,
+      "arms": [
+        {
+          "arm": "upstream",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "042A2BAEBEFD0B090440CB97F6A4971F310BFA09620C101A8C5A9A5ED65B86D6",
+          "controls_restored": true
+        },
+        {
+          "arm": "published",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "6E3B023AAF0571CF42C393E9136B9BC61693ECB84F4A89E30C859AC711106CE4",
+          "controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "status": "completed-data-stage-observation-only",
+          "result_sha256": "4247E5696D13CE65FD915B33D485ED498B94688D4936ADED2F89AF0946B11753",
+          "controls_restored": true
+        }
+      ]
+    }
+  ],
+  "next_required": "Fresh corrected-package native retries for the seven MIR-only startup failures; independent public-row reconciliation; actual gameplay, saves, engine/DLC transitions, clients and affected final-package/performance qualification."
+}

@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeOwnerCapOrderCurrentPreparedInputsV1",
+  "status": "exact-current-candidate-inputs-prepared-not-native-qualified",
+  "controller_base_commit": "98fbdd33fe47eb678a5e1aaf17fee903eba2a22a",
+  "controller_base_source_tree": "ffc5f2e3359de4f326a184cf6a3c29a55941150a",
+  "candidate": {
+    "source_commit": "98fbdd33fe47eb678a5e1aaf17fee903eba2a22a",
+    "source_tree": "ffc5f2e3359de4f326a184cf6a3c29a55941150a",
+    "archive": "D:/Projects/Factorio/mir5-cap-baseline-reviewed-root-r02/more-infinite-research_5.0.21000.zip",
+    "sha256": "58F04FB9D417F2726835F4A6740490DE3C1841665DAC81C2BA3DFA94050D9457",
+    "bytes": 679860,
+    "full_release_inventory_sha256": "FD6EDAACECCF4F98086D29DEA1A4004C1712E751C099D037E00C1C3C31E497B6"
+  },
+  "engine": {
+    "path": "D:/Games/Steam/steamapps/common/Factorio/bin/x64/factorio.exe",
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "observer": {
+    "archive_name": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "bytes": 834,
+    "library_prestate": "A15 container is preserved and restored after the temporary canonical 2E selection"
+  },
+  "trusted_source_save": {
+    "origin": "protected uncapped pre-disabled source stage; no source replay",
+    "source_result": "build/mir5/recovery-historical/native-owner-cap-order-pre-disabled-source-09a66acc9-r04-native-r02/source-native-output/result.json",
+    "source_result_sha256": "E6903CAF232E691B9E05E57B2D0F4D073038C2E1A7BB7B67BFB12EC1D5C54FF4",
+    "completed_save": "build/mir5/recovery-historical/native-owner-cap-order-pre-disabled-source-09a66acc9-r04-native-r02/source-native-output/write-data/saves/mir5-native-complete.zip",
+    "completed_save_sha256": "C804033F523F3C4E91CE2E8E92E84B7568E53E3830C39A7663EBFC2C611EB843",
+    "completed_save_bytes": 568597,
+    "source_candidate_sha256": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE",
+    "rejected_prior_input": "3CFC770BF52C1982D98D19F11C9E60656B045AB7FE903B08C6C4A8FEB074C9CD"
+  },
+  "raw_fixture_provenance": {
+    "fixture_source_commit": "09a66acc9c613617f95074f23f3fd9a4aab4765b",
+    "packager_sha256": "00ED00D66BD558554068405C8882419F852FC2F66646088052888D70E25DA61E",
+    "projection_contract": "exact seven raw Git members per stage; canonical, permuted, and relaxed container hashes must remain the retained historical identities"
+  },
+  "stages": [
+    {
+      "stage": "canonical",
+      "profile": "tests/profiles/native-owner-cap-order-current-canonical-space-age-f210.json",
+      "profile_sha256": "912846816940169985CC29A87F00D8CD95279B63DFC891FD61C71488156AE8C7",
+      "profile_bytes": 1781,
+      "fixture_version": "0.1.0",
+      "fixture_sha256": "C903D4B2AC0A98AF4CC28B8BB737C07B19CAC72BBB27C8E3B5DC9E780069482D",
+      "fixture_bytes": 7085,
+      "package_record_sha256": "10C79F9935A15A13061B564178A394AD36C421C77533B2987341A3EFF2BBAA66"
+    },
+    {
+      "stage": "permuted",
+      "profile": "tests/profiles/native-owner-cap-order-current-permuted-space-age-f210.json",
+      "profile_sha256": "59130F68FE3EDCFE017738A77675C2A4787A58A2D3245BC05BE5CBA1615D110E",
+      "profile_bytes": 1755,
+      "fixture_version": "0.2.0",
+      "fixture_sha256": "DF603E559893BD6DCDE11CCB7AD637A18470457F95EB9476CCB3347B2A0840B7",
+      "fixture_bytes": 7091,
+      "package_record_sha256": "5B968F628F280DC377029B0F7EB3CBFB73704FBCF6BFA198C3860FA71AC20FF8"
+    },
+    {
+      "stage": "relaxed",
+      "profile": "tests/profiles/native-owner-cap-order-current-relaxed-space-age-f210.json",
+      "profile_sha256": "E64B0C4189D23433BE57CF811DC11899AA96ED2ADC1B5CDBB7D3AC0BFA6AC916",
+      "profile_bytes": 1764,
+      "fixture_version": "0.3.0",
+      "fixture_sha256": "4B6D90A3A53F946AE349A35F9F76F75FB7226FECF0ED0D9FCED798C9043FD354",
+      "fixture_bytes": 7082,
+      "package_record_sha256": "7244A93B7D76E81EA0CC9830AC8F84296ABDFD841A3E779E7AD5217D26C166E6"
+    }
+  ],
+  "execution_contract": {
+    "sequence": [
+      "protected E3 source C804 -> current canonical cap=1",
+      "current canonical completed save -> current permuted cap=1",
+      "current permuted completed save -> current relaxed cap=0"
+    ],
+    "each_successor_requires": [
+      "server-stage completion",
+      "protected completed save",
+      "two byte-identical read-only cold reloads",
+      "foreign false and own true at the relaxed leg",
+      "archive and direct-library-control restoration"
+    ],
+    "no_lab_claim": true,
+    "no_performance_or_release_claim": true,
+    "native_execution": "pending"
+  },
+  "retained_adverse": [
+    "The 8a9b prepared-only inputs remain distinct from this reviewed candidate.",
+    "The earlier E3 cap-chain adverse and its original saves/receipts remain immutable.",
+    "The rejected 3CFC permuted input is never used as a source for this route."
+  ]
+}

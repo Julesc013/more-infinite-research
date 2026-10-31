@@ -1,0 +1,202 @@
+{
+  "schema": 1,
+  "kind": "MIRCurrentDiscoveryNativeChainV1",
+  "status": "passed-current005d-protected320-discovery-boundary",
+  "scope": "One exact protected publishedMIR3.2.0 EC0E source to current7a2/player505/005D on actual2.1.23/8DC with unchanged no-helper R05 A7E/2E1 fixture/observer. Preserve42% player iron/27% foreign work,Vulcanus native grant/foreign lock,one new gear lab,+.1 effect,save/two unchanged-byte read-only cold reloads. No source recreation,arbitrary lock recovery,3.2.1/full catalogue/client/performance or release claim.",
+  "controller_commit": "9fe15cc265987d8989b69b865e5a5e94e4bb7d42",
+  "candidate_source": "7a2f93224c846b86261b2da709f50ea683fc708d",
+  "player_tree": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+  "candidate_sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+  "packet": {
+    "path": "build/qualification/discovery-current7a2-r01-controller/packet.json",
+    "bytes": 13446,
+    "sha256": "FA36F8BEFF270DE5D62FE4828CDDED5074356BFCD804E0F690970AA50E8D1435"
+  },
+  "caller": {
+    "path": "build/qualification/discovery-current7a2-r01-controller/Invoke-OwnedDiscovery.ps1",
+    "bytes": 7410,
+    "sha256": "F1F9F925C759E7DE66FE92DD33797AE592530E1A76EDAED4142CBAD1C53016CF"
+  },
+  "terminal": {
+    "path": "build/qualification/discovery-current7a2-r01-controller/execution-record/terminal.json",
+    "bytes": 6062,
+    "sha256": "B5B59AC3755D2682566CDD8769C134D88F8BC4407AECFBE950C45485FBC49187"
+  },
+  "protected_original_source": {
+    "path": "build/qualification/migration-origins/discovery-recovery-source-320-r04/native-output/write-data/saves/mir5-native-complete.zip",
+    "bytes": 534441,
+    "sha256": "EC0E42396591C1310AC6F39840C7F9309EBCFB7671FC5A9E0EDF44164B4889DF"
+  },
+  "source_actual_lab_reused_not_new": 1,
+  "preparation": {
+    "path": "spec/evidence/discovery-recovery-current005d-prepared-inputs-r01.json",
+    "sha256": "99419065B9E62F38327C241644D65F76BF888E3C79DB60EB8808E5C3833FE403"
+  },
+  "earlier_native_chain": {
+    "path": "spec/evidence/discovery-recovery-a575-native-chain-r05.json",
+    "sha256": "BA4FF5A3CD12904B9EEC3A60193C11DC6E314C2DD7130BD75BD6E1E0CAD6EF08"
+  },
+  "readback": {
+    "path": "build/qualification/discovery-current7a2-r01-controller/root-readback-r01.json",
+    "bytes": 2868,
+    "sha256": "2DE5786443C47CCFEE0AB45CFA66028800F5CE3B0E563D2F8304B490FC2DB8FB",
+    "files": 18,
+    "bytes_per_copy": 677360
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/discovery-current7a2-native-receipts-r01.json.gz",
+    "sha256": "2FDBC7FF64586A893AFF740969C430256C5FA79B5F2418508AB0A7751EF952F6",
+    "bytes": 9828,
+    "records": 1,
+    "original_exact_bytes_round_trip": true
+  },
+  "native_observation": {
+    "result": {
+      "path": "build/qualification/discovery-current7a2-r01-controller/native-current/result.json",
+      "bytes": 37295,
+      "sha256": "3F1B44DB8D59A58DAC824CB917753AAFE8CF3CDE4A9405B5A11733B0742D999C"
+    },
+    "engine": {
+      "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "file_version": "2.1.23.87750",
+      "product_version": "2.1.23",
+      "base_version": "2.1.23"
+    },
+    "profile": {
+      "sha256": "47A2F691BD3ED04685EF05DB68F87DDA98A9B05CFD9592370AC83EBCD7067E24",
+      "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\tests\\profiles\\discovery-recovery-successor-current005d-r05-f210-2123.json"
+    },
+    "fixtures": [
+      {
+        "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-discovery-recovery_0.2.0.zip",
+        "sha256": "A7E0E2FDA3740BEB1273ECBEDD137A33AE5B8BB2E7E863FE2D88A8BFFDAB6CFB",
+        "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\discovery-current7a2-r01-inputs\\successor"
+      },
+      {
+        "archive": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+        "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+        "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\discovery-current7a2-r01-inputs\\observer"
+      }
+    ],
+    "initial": {
+      "case": "discovery-recovery",
+      "stage": "initial",
+      "status": "passed",
+      "qualification": "native-runner-readback-required",
+      "fixture_role": "successor",
+      "source_version": "3.2.0",
+      "source_actual_labs": 1,
+      "successor_actual_labs": 1,
+      "source_scripted_iron_level": 3,
+      "source_scripted_iron_plate_bonus": 0.2,
+      "player_iron_queue_current": "recipe-prod-research_iron-1",
+      "player_iron_queue_progress": 0.42000000000000004,
+      "successor_gear_level_before": 1,
+      "successor_gear_bonus_before": 0,
+      "successor_gear_level_after": 2,
+      "successor_gear_bonus_after": 0.1,
+      "successor_gear_native_effect": 0.1,
+      "foreign_iron_progress": 0.27,
+      "source_discovery_lab_researched": true,
+      "source_vulcanus_native_locked_after_discovery": true,
+      "player_vulcanus_unlocked": true,
+      "foreign_vulcanus_unresearched_locked": true,
+      "on_load_read_only": false
+    },
+    "completed_save": {
+      "path": "build/qualification/discovery-current7a2-r01-controller/native-current/write-data/saves/mir5-native-complete.zip",
+      "bytes": 543765,
+      "sha256": "9CC289D15F59D35C878B7450641C6E53FA753DC5EFE55EB027E00C4F12EABBE5"
+    },
+    "cold_reloads": [
+      {
+        "ordinal": 1,
+        "save_sha256": "9CC289D15F59D35C878B7450641C6E53FA753DC5EFE55EB027E00C4F12EABBE5",
+        "save_byte_identical": true,
+        "observation": {
+          "case": "discovery-recovery",
+          "stage": "reload",
+          "status": "passed",
+          "qualification": "native-runner-readback-required",
+          "fixture_role": "successor",
+          "source_version": "3.2.0",
+          "source_actual_labs": 1,
+          "successor_actual_labs": 1,
+          "source_scripted_iron_level": 3,
+          "source_scripted_iron_plate_bonus": 0.2,
+          "player_iron_queue_current": "recipe-prod-research_iron-1",
+          "player_iron_queue_progress": 0.42000000000000004,
+          "successor_gear_level_before": 1,
+          "successor_gear_bonus_before": 0,
+          "successor_gear_level_after": 2,
+          "successor_gear_bonus_after": 0.1,
+          "successor_gear_native_effect": 0.1,
+          "foreign_iron_progress": 0.27,
+          "source_discovery_lab_researched": true,
+          "source_vulcanus_native_locked_after_discovery": true,
+          "player_vulcanus_unlocked": true,
+          "foreign_vulcanus_unresearched_locked": true,
+          "on_load_read_only": true
+        }
+      },
+      {
+        "ordinal": 2,
+        "save_sha256": "9CC289D15F59D35C878B7450641C6E53FA753DC5EFE55EB027E00C4F12EABBE5",
+        "save_byte_identical": true,
+        "observation": {
+          "case": "discovery-recovery",
+          "stage": "reload",
+          "status": "passed",
+          "qualification": "native-runner-readback-required",
+          "fixture_role": "successor",
+          "source_version": "3.2.0",
+          "source_actual_labs": 1,
+          "successor_actual_labs": 1,
+          "source_scripted_iron_level": 3,
+          "source_scripted_iron_plate_bonus": 0.2,
+          "player_iron_queue_current": "recipe-prod-research_iron-1",
+          "player_iron_queue_progress": 0.42000000000000004,
+          "successor_gear_level_before": 1,
+          "successor_gear_bonus_before": 0,
+          "successor_gear_level_after": 2,
+          "successor_gear_bonus_after": 0.1,
+          "successor_gear_native_effect": 0.1,
+          "foreign_iron_progress": 0.27,
+          "source_discovery_lab_researched": true,
+          "source_vulcanus_native_locked_after_discovery": true,
+          "player_vulcanus_unlocked": true,
+          "foreign_vulcanus_unresearched_locked": true,
+          "on_load_read_only": true
+        }
+      }
+    ],
+    "native_startup_logs": [
+      {
+        "path": "build/qualification/discovery-current7a2-r01-controller/native-current/production.factorio.log",
+        "bytes": 14699,
+        "sha256": "D11CB4A4C39884F9002BE5B3805AA9F987AD43E0578F1FE0AD21C5199AE95B3A"
+      },
+      {
+        "path": "build/qualification/discovery-current7a2-r01-controller/native-current/reload-1.factorio.log",
+        "bytes": 13253,
+        "sha256": "57A1C5A7FCFAAE535C0B87A1E247EB88F46372A6CFC3C151F4404D0451D822A4"
+      },
+      {
+        "path": "build/qualification/discovery-current7a2-r01-controller/native-current/reload-2.factorio.log",
+        "bytes": 13253,
+        "sha256": "C6730CA114EEFAAD0EA4C3744ED4280625B364B7990319B9FFBE52EC10122300"
+      }
+    ]
+  },
+  "actual_native_processes": 3,
+  "actual_new_laboratories": 1,
+  "actual_read_only_cold_reloads": 2,
+  "factorio_processes_after_restoration": 0,
+  "limits": [
+    "Original EC0E/3.2.0 source and a575/R05 plus R01/R04 adverses retain original execution identities. Source lab counted once,not per successor/reload.",
+    "Copied private caller retained MIRCurrent473CapNativeTerminalV1 kind text. Exact current-discovery packet,case,source/controller/profile/fixture/result/paths bind the real scenario; actual receipt is preserved without renaming.",
+    "The native engine grant is observed without proposed automatic helper. Later ambiguous foreign locks retain explicit operator-repair/support limits.",
+    "Known cap reenabling failure remains a separate required blocker; this passing discovery boundary does not qualify its ownership path,whole product or future changed inputs."
+  ]
+}

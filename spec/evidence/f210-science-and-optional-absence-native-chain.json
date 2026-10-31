@@ -1,0 +1,235 @@
+{
+  "schema": 1,
+  "kind": "MIR5F210ScienceAndOptionalAbsenceReadbackV1",
+  "status": "exact-scenarios-passed-not-release-acceptance",
+  "derived": true,
+  "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+  "observer_sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+  "cases": [
+    {
+      "run": 40179792172,
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40179792172",
+      "manifest_sha256": "DD3D601366355E04F2E097E00157A976B1133EC7A9C944B08F72025633F2263D",
+      "verified_members": 58,
+      "primary_custody": "build/mir5/recovery-historical/fresh-science-transition/40179792172/black-glass-fresh-science-transition-canonical-40179792172-1",
+      "scenario": "earned-science-transition",
+      "fixture_harness_source": "b51f363991a2367436c8fece50efc2dc9efe3343",
+      "player_source": "12c5d21fd7466299e7c3c7e316f2bae693145c20",
+      "raw_git_members_verified": 10,
+      "stages": [
+        {
+          "stage": "published",
+          "player_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+          "result_sha256": "91BED76E1909F648E53BE6BD05DE3F2F422660E5692F2CFD2C16B6DFA077C397",
+          "completed_save_sha256": "58FB5CACB480AA1B4100E7562EF23CC66DBAA88032DD170066396DD84F3BA164",
+          "native_logs": [
+            {
+              "path": "production.factorio.log",
+              "sha256": "8ECD04DF22B6C2501166E30FEFB59C977938BFD4BD5C098530DA68817203B875",
+              "marker": {
+                "case": "fresh-science-transition",
+                "stage": "initial",
+                "status": "passed",
+                "qualification": "native-runner-readback-required",
+                "witnesses": {
+                  "source_mir": "4.7.21003",
+                  "destination_mir": "4.7.21003",
+                  "source_actual_lab_completions": 1,
+                  "successor_actual_lab_completions": 0,
+                  "science_target": "recipe-prod-research_science_pack_productivity-1",
+                  "next_level": 2,
+                  "next_research_unit_count": 2,
+                  "circular_recipe_productivity": 0.1,
+                  "seeded_recipe_productivity": 0.1,
+                  "on_load_read_only": false
+                }
+              }
+            },
+            {
+              "path": "reload-1.factorio.log",
+              "sha256": "1C1F5C6968A4B791354556DFF6C4092C9CE1EEF317937561DE2E09F982F75154",
+              "marker": {
+                "case": "fresh-science-transition",
+                "stage": "reload",
+                "status": "passed",
+                "qualification": "native-runner-readback-required",
+                "witnesses": {
+                  "source_mir": "4.7.21003",
+                  "destination_mir": "4.7.21003",
+                  "source_actual_lab_completions": 1,
+                  "successor_actual_lab_completions": 0,
+                  "science_target": "recipe-prod-research_science_pack_productivity-1",
+                  "next_level": 2,
+                  "next_research_unit_count": 2,
+                  "circular_recipe_productivity": 0.1,
+                  "seeded_recipe_productivity": 0.1,
+                  "on_load_read_only": true
+                }
+              }
+            },
+            {
+              "path": "reload-2.factorio.log",
+              "sha256": "6EF5A05626019FD267D90CCFE77800C6D6D9685C668F31DC25E2F4151BA37679",
+              "marker": {
+                "case": "fresh-science-transition",
+                "stage": "reload",
+                "status": "passed",
+                "qualification": "native-runner-readback-required",
+                "witnesses": {
+                  "source_mir": "4.7.21003",
+                  "destination_mir": "4.7.21003",
+                  "source_actual_lab_completions": 1,
+                  "successor_actual_lab_completions": 0,
+                  "science_target": "recipe-prod-research_science_pack_productivity-1",
+                  "next_level": 2,
+                  "next_research_unit_count": 2,
+                  "circular_recipe_productivity": 0.1,
+                  "seeded_recipe_productivity": 0.1,
+                  "on_load_read_only": true
+                }
+              }
+            }
+          ]
+        },
+        {
+          "stage": "candidate",
+          "player_sha256": "4806BF2B9675DE2C4AE471D6C4F42F6ECE9CEFF68256562346026F086A7A8605",
+          "result_sha256": "4902CF23CC3195100ECB2DAE619F246838555B9384A682229FC24C7923D14C6D",
+          "completed_save_sha256": "8D45103D89741184CA72B13BCAC02899C25FBFF1FAB12105B78F74535773F47C",
+          "native_logs": [
+            {
+              "path": "production.factorio.log",
+              "sha256": "D173A842715FCD3FB837E718EF59CE62C6A74AFDC64DECDF568857C6EC519FB7",
+              "marker": {
+                "case": "fresh-science-transition",
+                "stage": "initial",
+                "status": "passed",
+                "qualification": "native-runner-readback-required",
+                "witnesses": {
+                  "source_mir": "4.7.21003",
+                  "destination_mir": "5.0.21000",
+                  "source_actual_lab_completions": 1,
+                  "successor_actual_lab_completions": 1,
+                  "science_target": "recipe-prod-research_science_pack_productivity-1",
+                  "next_level": 3,
+                  "next_research_unit_count": 4,
+                  "circular_recipe_productivity": 0.2,
+                  "seeded_recipe_productivity": 0.2,
+                  "on_load_read_only": false
+                }
+              }
+            },
+            {
+              "path": "reload-1.factorio.log",
+              "sha256": "F0A0DA056C81516735081787343CD75EE905D66CE4168D000A0E6E260173A3EB",
+              "marker": {
+                "case": "fresh-science-transition",
+                "stage": "reload",
+                "status": "passed",
+                "qualification": "native-runner-readback-required",
+                "witnesses": {
+                  "source_mir": "4.7.21003",
+                  "destination_mir": "5.0.21000",
+                  "source_actual_lab_completions": 1,
+                  "successor_actual_lab_completions": 1,
+                  "science_target": "recipe-prod-research_science_pack_productivity-1",
+                  "next_level": 3,
+                  "next_research_unit_count": 4,
+                  "circular_recipe_productivity": 0.2,
+                  "seeded_recipe_productivity": 0.2,
+                  "on_load_read_only": true
+                }
+              }
+            },
+            {
+              "path": "reload-2.factorio.log",
+              "sha256": "2FC729834CD7455786A7D4852C08B4464026F89FA624D0DE323E779228EEE36E",
+              "marker": {
+                "case": "fresh-science-transition",
+                "stage": "reload",
+                "status": "passed",
+                "qualification": "native-runner-readback-required",
+                "witnesses": {
+                  "source_mir": "4.7.21003",
+                  "destination_mir": "5.0.21000",
+                  "source_actual_lab_completions": 1,
+                  "successor_actual_lab_completions": 1,
+                  "science_target": "recipe-prod-research_science_pack_productivity-1",
+                  "next_level": 3,
+                  "next_research_unit_count": 4,
+                  "circular_recipe_productivity": 0.2,
+                  "seeded_recipe_productivity": 0.2,
+                  "on_load_read_only": true
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "scope": "One real biolab completion per side; .10 earned productivity retained and advanced to .20; two unchanged-save cold reloads per stage. Both original fresh-source data witnesses retain65/effects148 before disposable witness acceleration. No client or performance claim."
+    },
+    {
+      "run": 40179590983,
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40179590983",
+      "manifest_sha256": "2B261C4B4ACFB12699E8E1503AEBE2F94747C0D7E70345E79F7847726F131E5C",
+      "verified_members": 24,
+      "primary_custody": "build/mir5/recovery-historical/api-optional-absence-f210/40179590983/black-glass-api-optional-absence-f210-canonical-40179590983-1",
+      "scenario": "optional-MIR-absence",
+      "fixture_harness_source": "bfbf1a8863437632e0c7854d4e52a0ef2dc61270",
+      "player_source": null,
+      "result_sha256": "028516156554B1559DDBC4FFDB5ED674BD743EF941B825764D205428C753677D",
+      "native_log": {
+        "path": "create.factorio.log",
+        "sha256": "06C68176598392DAC6CA77463E34F1058DF8743A4C65DBABEEF4FBAE60017618",
+        "marker": {
+          "case": "api-optional-absence",
+          "stage": "init",
+          "status": "passed",
+          "qualification": "optional-consumer-absence-startup-only",
+          "consumer": "mir-fixture-mir5-api-beta",
+          "mir_present": false,
+          "runtime_interface_present": false,
+          "optional_technology_present": false,
+          "cable_productivity_bonus": 0
+        }
+      },
+      "scope": "Single CreateOnly startup with MIR absent and optional beta consumer present; no research, save, client, performance or API stability claim."
+    }
+  ],
+  "limits": [
+    "Earlier1ca and C8 native observations retain their exact original identities.",
+    "Full native logs, configurations, original saves and other artifact bytes stay in primary custody. This portable capsule contains three exact safe JSON receipts and one explicitly derived readback.",
+    "The unresolved historical all-science consumption assertion, clients, current other-package acceptance and matched performance are separate open work."
+  ],
+  "portable_capsule": {
+    "path": "f210-science-and-optional-absence-native-capsule.zip",
+    "bytes": 7112,
+    "sha256": "16C3636B0F4051CE1DDFD07C3EC958DD671CD5400F16432ACA8E1325482CEDED",
+    "members": [
+      {
+        "path": "science/prepare.json",
+        "bytes": 9322,
+        "sha256": "BCB5752A11AB4CFFBFF7E3D8A02408DC703DB615258E0E206990A31E7235AFD1",
+        "custody": "exact-original-json"
+      },
+      {
+        "path": "absence/outcome.json",
+        "bytes": 510,
+        "sha256": "8EC4E9AA25191C206748DE0A6CDE33AFC650DC43259F2988ABE549A1F34967DD",
+        "custody": "exact-original-json"
+      },
+      {
+        "path": "absence/fixture-members.json",
+        "bytes": 4963,
+        "sha256": "268C2669B868A53C6D8AE12D100570A5FC834C8041F9D9A28FFA1464B45339B3",
+        "custody": "exact-original-json"
+      },
+      {
+        "path": "derived/root-readback.json",
+        "bytes": 10004,
+        "sha256": "BA522BC06A2105A924E02F4C98CFC1FB869ED1B02C2A11E7FE48F1ABFAA191C8",
+        "custody": "derived"
+      }
+    ]
+  }
+}

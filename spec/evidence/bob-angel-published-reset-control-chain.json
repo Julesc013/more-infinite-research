@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeQualificationChainV1",
+  "source": "86a9babd4462b5967f56bcc57669c22de26474fb",
+  "run": {
+    "id": 39991831062,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39991831062",
+    "conclusion": "success"
+  },
+  "custody": "build/mir5/black-glass/incoming/39991831062/black-glass-bob-angel-reset-control-39991831062-1",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "file_version": "2.0.77.84539",
+    "product_version": "2.0.77",
+    "base_version": "2.0.77"
+  },
+  "player": {
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip",
+    "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
+  },
+  "cases": {
+    "published": {
+      "receipt_gzip": "spec/mir5/evidence/bob-angel-published-reset-control-published-native.json.gz",
+      "uncompressed_receipt_sha256": "A6EA49B05E22FB8F490579CA44A44B97EBC660240B641EE945B6D24D22581536",
+      "status": "passed-private-native-fixture",
+      "witnesses": {
+        "source_mir": "4.7.20002",
+        "finite_tail_level": 150,
+        "finite_tail_effect_percent": 2,
+        "seeded_boundary_levels": true,
+        "historical_lab_completed_levels": 0,
+        "no_fabricated_150_completion_claim": true,
+        "native_recipe_bonus": 3,
+        "foreign_disabled": true,
+        "foreign_queue": "mir5-ba-continuity-queue-probe",
+        "foreign_progress": 0.42000000000000004,
+        "foreign_external_disable_transition": true,
+        "foreign_prewrite_enabled": true,
+        "on_load_read_only": false,
+        "qualification": "native-runner-readback-required"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "B9082ED22AA8119E0AEB20D2CD542F275F5BEF43694B0CB2C227253DD54D2C29",
+          "byte_identical": true
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "B9082ED22AA8119E0AEB20D2CD542F275F5BEF43694B0CB2C227253DD54D2C29",
+          "byte_identical": true
+        }
+      ]
+    },
+    "published-config-control": {
+      "receipt_gzip": "spec/mir5/evidence/bob-angel-published-reset-control-published-config-control-native.json.gz",
+      "uncompressed_receipt_sha256": "153DC3C597CB5933ECA745853ED89F84880A93C6AEEE2052258D9C8DFED244ED",
+      "status": "passed-private-native-fixture",
+      "witnesses": {
+        "source_mir": "4.7.20002",
+        "source_fixture_version": "0.1.0",
+        "upstream_reset_observed": true,
+        "all_ten_native_material_technologies_reenabled": true,
+        "earned_early_level": 3,
+        "earned_tail_level": 150,
+        "native_recipe_bonus": 3,
+        "foreign_queue_probe": "mir5-ba-continuity-queue-probe",
+        "foreign_queue_progress": 0.42000000000000004,
+        "on_load_read_only": false,
+        "qualification": "native-runner-readback-required"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "7001C7CCB71F815EB3694014BE3D3E60E2D6B8D7727A0B20C04DA47CADCE0278",
+          "byte_identical": true
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "7001C7CCB71F815EB3694014BE3D3E60E2D6B8D7727A0B20C04DA47CADCE0278",
+          "byte_identical": true
+        }
+      ]
+    }
+  },
+  "release_qualification": false,
+  "claims": {
+    "published_upstream_reset_reenables_all_ten_technologies": true,
+    "earned_native_bonus_and_queue_preserved": true,
+    "save_two_cold_reloads": true,
+    "mir5_upgrade": false,
+    "foreign_disablement_survives_upstream_reset": false,
+    "release": false
+  },
+  "limits": [
+    "The finite150 boundary is seeded through native API, not150 actual lab completions.",
+    "This independent published472 control establishes upstream AngelsRefining reenable behavior. It does not authorize MIR to infer or re-create a discarded foreign disablement.",
+    "MIR5 profile expectations explicitly follow this native baseline; foreign disable preservation is separately tested where no upstream reset overwrites it."
+  ]
+}

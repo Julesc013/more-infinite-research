@@ -311,7 +311,7 @@ function Start-MIRPackageLibraryActivation {
   )
   # A package smoke uses the same library transaction as progression/upgrade
   # consumers. Only this small selection document is generated for the run.
-  . (Join-Path $PSScriptRoot '../../mir/application/release/readiness/ResourceGovernor.ps1')
+  . (Join-Path $PSScriptRoot '../validation/ResourceGovernor.ps1')
   $profile=Resolve-MIR441RecoveryScratchPath -Path $ProfilePath
   $inventory=@(Get-MIRLibraryInventory -LibraryDirectory $LibraryDirectory -EngineDataDirectory $EngineDataDirectory)
   $disabledFixtures=@()
@@ -377,7 +377,11 @@ function Assert-MIRLibraryActivation {
       $parent=Get-CimInstance Win32_Process -Filter "ProcessId=$($process.Id)"
       if($owned.Count-ne1-or$owned[0].HasExited-or$owned[0].StartTime-ne$process.StartTime-or$parent.ParentProcessId-ne$PID){throw '[mir-library-unowned-process]'}
     }
-  }else{Assert-MIRLibraryIdle}
+  }else{
+    # Serial stages retain the lock while a completed engine disappears from
+    # process enumeration. Never exempt or terminate an observable client.
+    Assert-MIRLibraryIdle -WaitMilliseconds 3000
+  }
   $current=@(Get-MIRLibraryInventory -LibraryDirectory $Activation.library -EngineDataDirectory $Activation.engine_data)
   $signature={param($rows) @($rows|Sort-Object path|ForEach-Object {$_.path+'|'+$_.identity+'|'+$_.version}) -join "`n"}
   if((& $signature $current) -cne (& $signature $Activation.inventory)){throw '[mir-library-inventory-changed]'}
@@ -434,7 +438,7 @@ function Assert-MIRLibraryLoadedSelection {
 
 function Assert-MIRLibraryLaunch {
   param([Parameter(Mandatory)]$Activation,[string]$FactorioBin,[string[]]$Arguments,[object[]]$OwnedProcesses=@())
-  . (Join-Path $PSScriptRoot '../../mir/application/release/readiness/ResourceGovernor.ps1')
+  . (Join-Path $PSScriptRoot '../validation/ResourceGovernor.ps1')
   foreach($arg in $Arguments){
     if($arg -match '^(?:--(?:sync-mods|apply-update|download|update-mods)(?:=|$)|--(?:config|mod-directory)=|-c$)'){throw '[mir-library-acquisition-or-ambiguous-argument]'}
   }

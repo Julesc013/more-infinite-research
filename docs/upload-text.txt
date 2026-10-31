@@ -1,0 +1,17 @@
+First MIR 5.0.0 community beta: uploader checklist
+
+- Release title: MIR 5.0.0
+- Canonical tag: v5.0.0
+- GitHub prerelease: true
+- GitHub make_latest: false
+- Channel: GitHub only. Do not upload this beta to the Mod Portal.
+- Body: use the reviewed player release notes without source front matter. Keep the changes, upgrade instructions and unfinished GUI/performance limitations; do not paste developer logs or campaign reports.
+- Player text and asset labels: use actual Factorio versions and ordinary player terms. Do not show internal edition codes, machine nicknames, candidate hashes or test-run IDs.
+- Assets: publish exactly the individual player ZIPs and checksum files in the accepted frozen inventory. The current selection is seventeen ZIPs and two checksum files. Keep the developer inventory, bundles, instructions and receipts out of release assets.
+- Versions: keep the exact tested ZIPs and edition version numbers. Do not convert versions or rebuild packages during publication.
+- Supported-edition labels: name the Factorio family, exact minimum version and beta status.
+- Experimental label: Factorio 0.18.47, experimental/best effort, GitHub only; in-game load/crash testing remains unverified.
+- Older-build labels: name the actual Factorio version and minimum from the inventory, basic research only, best effort and untested in-game. Include extraction instructions for Factorio 0.6–0.8.
+- Publication gate: retain the reviewed exact-candidate package/provenance/upgrade-safety verdict, checked main/tag identity, both administration probes and complete staged-asset readback. The maintainer permits unfinished Library input/export/personal-view checks and performance testing to remain explicitly unverified for this first beta; stable acceptance still requires their outcomes.
+- Delivery: verify every selected anonymous download. Put the identical ZIPs, sums, published notes body and this checklist in the primary checkout's dist.
+- Mod Portal: maintainer-owned, stable releases only, using identical tested ZIPs.

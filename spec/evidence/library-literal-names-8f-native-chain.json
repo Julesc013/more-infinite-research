@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "kind": "MIR5LiteralNamesF210LibraryNativeChainV1",
+  "status": "passed-targeted-base-en-de-functional-and-rendering",
+  "controller_commit": "581770246949882353cdac4e1f724a0556996b8c",
+  "player_source_tree": "44eadfad017440d384f0e932b0eecbcb991a5e40",
+  "accepted_asset_readback": "spec/evidence/current-assets-61bc49e5-aero-readback.json",
+  "player_sha256": "8F858F6B7E604757DE84D960E7D7701021B956782C65A13978E3AFD711F7B071",
+  "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+  "profile_sha256": "55DE734C9E376EE65DF127F0A9B42C7B3DE884C323C6DBA49CF2C774ECB40E03",
+  "fixtures": [
+    {
+      "name": "mir-fixture-mir5-library-multiplayer_0.1.0.zip",
+      "sha256": "32788E1C795F356CFDB39A0AE8C52D6C567DA8A20CAA05C25A55D1FE5B735692"
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+    }
+  ],
+  "native_result_sha256": "377B1EAD0A49B0AFDEDC294AEF1AA3BB0F352CCF6D7C07D87E3541C590BE23C1",
+  "session_sha256": "994371E1E46885E8C596605461723D7787F8265AE20CA8B88DD22CA502BED4C1",
+  "native_completed_witness": {
+    "case": "library-multiplayer",
+    "stage": "completed",
+    "status": "passed",
+    "witnesses": {
+      "base_version": "2.1.23",
+      "mir_version": "5.0.21000",
+      "actual_join_events": 6,
+      "screenshot_calls": 10,
+      "initial_settled_without_reopen": true,
+      "initial_settle_ticks": 60,
+      "first_open": true,
+      "search": true,
+      "refresh": true,
+      "reopen": true,
+      "measurement_output": "native-localised-profiler-log",
+      "timing_values_stored": false,
+      "two_connected_clients_required": true,
+      "locales_required": [
+        "en",
+        "de"
+      ],
+      "distinct_personal_query_and_selection": true,
+      "initial_native_snapshot_immutable": true,
+      "live_refresh": {
+        "real_lab_completions": 2,
+        "native_laboratory_completion_by_script": false,
+        "native_research_started_events": 3,
+        "queue_lengths_observed": [
+          2,
+          1,
+          0
+        ],
+        "native_research_cancelled_events": 1,
+        "native_foreign_force_created_events": 1,
+        "gear_level": 3,
+        "gear_productivity": 0.2,
+        "science_consumed_per_named_pack": 2,
+        "fixture_accelerates_gear_count_and_time_only": true,
+        "ordinary_tuning_qualified": false,
+        "root_and_query_identity_preserved": true,
+        "cross_force_view_state_preserved": true
+      },
+      "availability_terminal_labels_checked": true,
+      "host_restart_observed": true,
+      "on_load_read_only": true,
+      "rendering_pending_external_png_readback": true,
+      "screenshot_requests_are_not_headless_rendering_proof": true
+    }
+  },
+  "custody": {
+    "path": "build/mir5/recovery-historical/library-standalone-names-r08",
+    "manifest_sha256": "EF6976FB2D94760ABBC094901C22E49C0207AAA1DC512495D038789359D35DFB",
+    "original_and_primary_members_verified": 216,
+    "bytes": 19463990,
+    "mismatches": []
+  },
+  "restoration": {
+    "library_player_sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+    "library_fixture": "absent",
+    "factorio_process_count": 0
+  },
+  "input_save_byte_identical": true,
+  "save_hashes": {
+    "seed_sha256": "59FAB47C32F9B67F81F8DB8539F757E44C3B7689A5523FF93F5D67D3E814C135",
+    "restart_save_sha256": "ADF82ACDC6FEAE9556464F525045DB5171D455FA54A3B88733A0B7222E99137D",
+    "final_save_sha256": "E8FB3025B93F2A63254E628CDA44D3A4285643E50388B2A4580A42397734C7C0"
+  },
+  "visual_review": {
+    "method": "Root inspected all ten actual PNGs and independently rehashed them.",
+    "status": "accepted-targeted-1280x720-en-de-views",
+    "finding": "German initial, settled, rejoin and restart list/detail views display Erzförderer-Produktivität. English gear titles and both availability views render. All ten views are clear of native achievement-toast obstruction; no obvious outer-frame clipping is observed.",
+    "original_runner_visual_review_flag_preserved": false,
+    "screenshots": [
+      {
+        "sha256": "6C39D439C5D39FE5858CC3F9DD95CE522B67287ACDD4A3CA76EEB27381DA104F",
+        "width": 1280,
+        "height": 720,
+        "path": "session/client-en/script-output/mir5-library-multiplayer/availability-1.png"
+      },
+      {
+        "sha256": "F34FF90AC2E0374EC9DEDEE1259BE9431DE1C4C0D973CA474CAD6A40827EB779",
+        "width": 1280,
+        "height": 720,
+        "path": "session/client-en/script-output/mir5-library-multiplayer/initial-1.png"
+      },
+      {
+        "sha256": "8D9E27423D5326F8125F7393F799EFAED50876C81F941561EAB821C7F5DC2ED4",
+        "width": 1280,
+        "height": 720,
+        "path": "session/client-en/script-output/mir5-library-multiplayer/settled-1.png"
+      },
+      {
+        "sha256": "A23AC6C89A2651DDB5129A89D0EE13690DC0F501EE4C78AD68288C28B61C9FB7",
+        "width": 1280,
+        "height": 720,
+        "path": "session/client-en/script-output/mir5-library-multiplayer/rejoin-1.png"
+      },
+      {
+        "sha256": "3056A99AA2008B8CA12204B0FF30F8CCDCF2F35144240C2A8B6551575A13E570",
+        "width": 1280,
+        "height": 720,
+        "path": "session/client-en/script-output/mir5-library-multiplayer/restart-1.png"
+      },
+      {
+        "sha256": "49451548260FE6BDD8A6CCB4B869B43A7456D1694B71A672CB601F06C4BE784B",
+        "width": 1280,
+        "height": 720,
+        "path": "session/client-de/script-output/mir5-library-multiplayer/availability-2.png"
+      },
+      {
+        "sha256": "35E03ED1645E268F75EA715AF4947223EA9716C5106000492BB10EF280ECCFC0",
+        "width": 1280,
+        "height": 720,
+        "path": "session/client-de/script-output/mir5-library-multiplayer/initial-2.png"
+      },
+      {
+        "sha256": "11338899D1A9587F48707FB84F144DF9F88F51CF527EC0112F01C9781671750D",
+        "width": 1280,
+        "height": 720,
+        "path": "session/client-de/script-output/mir5-library-multiplayer/settled-2.png"
+      },
+      {
+        "sha256": "569E303AB7C4A86501E83F7A355A3CC363AF20CE99D180030A05977BFA8EA176",
+        "width": 1280,
+        "height": 720,
+        "path": "session/client-de/script-output/mir5-library-multiplayer/rejoin-2.png"
+      },
+      {
+        "sha256": "5DF877911FBF37FBEEC726350E5D56C7448B422824FC11D6D8D89CA6BA164639",
+        "width": 1280,
+        "height": 720,
+        "path": "session/client-de/script-output/mir5-library-multiplayer/restart-2.png"
+      }
+    ],
+    "limits": "Other languages, fallback text, display scales, small screens, all scroll positions and full presentation acceptance remain open."
+  },
+  "diagnostic_correction": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\recovery-historical\\library-standalone-names-r08\\primary-custody-readback-r01.json",
+    "sha256": "0F6193EB3AFE39D85E74114785CF9360CE7A4A5E71FF2074B84F4B869EEC98B1",
+    "correction": "r01 members were correct but total_bytes was serialized as 0 by a dictionary-property aggregation error"
+  },
+  "caller_outcome": {
+    "terminal_sha256": "39C84E616F97AC43AA786B8AA775A84F401281CE67722C46F56037A6B47E0148",
+    "status": "adverse-after-native-session",
+    "failure": "Get-TreeFiles was not recognized during the outer caller custody handoff.",
+    "native_result_status": "passed-private-two-client-fixture",
+    "native_result_sha256": "377B1EAD0A49B0AFDEDC294AEF1AA3BB0F352CCF6D7C07D87E3541C590BE23C1",
+    "recovered_custody_manifest_sha256": "EF6976FB2D94760ABBC094901C22E49C0207AAA1DC512495D038789359D35DFB",
+    "recovered_members": 216,
+    "recovered_bytes": 19463990,
+    "disposition": "The actual native session passed. The original caller terminal remains adverse in the raw capsule; the separate r02 custody readback verifies the complete recovered copy. This is distinct from the r01 aggregate-total correction and does not claim that the caller passed."
+  },
+  "raw_receipts": {
+    "path": "spec/evidence/library-literal-names-8f-native-receipts.json.gz",
+    "gzip_bytes": 52676,
+    "gzip_sha256": "793D7978A5EC8EAF3F7FF6558E72A21401BF6AF5C3C2086D411D53EE9B638241",
+    "uncompressed_sha256": "DC508DF3AF3DD034A09A3162B40E4CA153C2940DCBBFFDB29311858FDF721D06",
+    "members": 7
+  },
+  "limits": [
+    "Exact Base-only functional/client and targeted rendering subset; Space Age/modpack/API clients remain open.",
+    "Fixture-accelerated research does not qualify ordinary tuning or scored performance.",
+    "Earlier r04/r06 raw-name/rendering failures remain unchanged under their exact identities.",
+    "No full-current-package or release acceptance follows."
+  ]
+}

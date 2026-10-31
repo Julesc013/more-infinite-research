@@ -1,0 +1,198 @@
+{
+  "schema": 1,
+  "kind": "MIRHistorical473PreparedSourceInputsV1",
+  "status": "prepared-inputs-only-not-native-executed",
+  "scope": "Exact F013-F016 published4.7.3 source input admission for the retained historical-transition fixture. No source world, native save/lab/reload, full-catalogue, successor or release acceptance is claimed.",
+  "reviewed_source": {
+    "commit": "8bcad55c030213c42e165135bf2ac812fe64431f",
+    "tree": "287fddae0362222c28c947c0c684c2163018c598"
+  },
+  "metadata": {
+    "path": "tests/fixtures/historical-transition/metadata-473-f013-f016.json",
+    "sha256": "633F34471E5F84E08ED03BFF1DFE0F58EBCCAC6B16D3D12AC16C04CDABEC4247",
+    "bytes": 2506,
+    "predecessor_release": "v4.7.3",
+    "published_release_id": 422732162,
+    "published_tag_source": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+  },
+  "controller": {
+    "runner": {
+      "path": "tools/Invoke-NativeFixture.ps1",
+      "sha256": "205C01C461E2BD9AD2757C84BB55828D4E5931890FD175D052DABA485D97288E",
+      "bytes": 66820,
+      "loaded_from_raw_git_ast": true
+    },
+    "package": {
+      "path": "tools/package.py",
+      "sha256": "32BDBE5E0D8B776A57BC8DF63DD536DD81AEDF54141AC6EC6B1BEF4044C90674",
+      "bytes": 26198,
+      "working_copy_byte_identical_to_reviewed": true
+    }
+  },
+  "shared_raw_members": {
+    "control.lua": {
+      "path": "tests/fixtures/historical-transition/control.lua",
+      "sha256": "4E1A5B8B1EA1A0769C6E80531F956358EDA94EAAD5F32F78023EDA07D9F9A2A0",
+      "bytes": 16490
+    },
+    "settings-updates.lua": {
+      "path": "tests/fixtures/historical-transition/settings-updates.lua",
+      "sha256": "683B095B2AC3A2B6EC6493F967B6C5BB4F9CF10FE69735F7E52D9EDCC37C5AE2",
+      "bytes": 152
+    },
+    "data-final-fixes.lua": {
+      "path": "tests/fixtures/historical-transition/data-final-fixes.lua",
+      "sha256": "60BA1672EC7DA621A61CAC5C7759EA0F67FADE5B36F0D4F07C52657B8728591F",
+      "bytes": 3852
+    },
+    "target.lua": {
+      "path": "tests/fixtures/historical-transition/target.lua",
+      "sha256": "00ACC312215D37C3138432F871C1609493FA46300D2458E79C3515B50C32F489",
+      "bytes": 183
+    }
+  },
+  "published_archive_custody": {
+    "root": "build/qualification/mir473-f013-f016-archives-aero-r01",
+    "archive_readback": "readback.json",
+    "archive_readback_sha256": "56B68AE0FACEAF4D89B37CE9D2B5DFB064A5D573094EE378D47597C844E34FA6",
+    "source_contract_readback": "source-contract-readback.json",
+    "source_contract_readback_sha256": "7A644EFD893E223799CA4F00E6BB765A3E473C4160BF8DDBF68961131F7FFB41",
+    "contract_limit": "Read-only original archive/source interpretation of the named .05 character-mining-speed row, 8000/growth2/time60 and per-target science aliases. This is not observed engine/data-stage output."
+  },
+  "fixture_custody": {
+    "root": "build/qualification/historical-473-f013-f016-prepared-r01",
+    "readback": "prepared-readback.json",
+    "sha256": "1A6FC63932B9179157046575613E8E0337FF975864FAC27ED0465C730F428964"
+  },
+  "rows": [
+    {
+      "target": "f013",
+      "engine_floor": "0.13.20",
+      "published_mir": {
+        "filename": "more-infinite-research_4.7.01303.zip",
+        "release_asset_id": 672267870,
+        "sha256": "3918B10A0902FABD09BEA6D1F0E7EFF06B20B84F3D8CC5EC73E36FEDAAE64D4D",
+        "bytes": 695785,
+        "root": "more-infinite-research_4.7.01303",
+        "members": 282
+      },
+      "profile": {
+        "path": "tests/profiles/historical-transition-473-published-f013.json",
+        "sha256": "BD7EC11778E769507490D228C4B8B1C08C8E52AD5B801C9C44C237719F29D5E3",
+        "bytes": 326
+      },
+      "fixture_archive": {
+        "filename": "mir-fixture-mir5-historical-transition_0.1.0.zip",
+        "path": "archives/f013/mir-fixture-mir5-historical-transition_0.1.0.zip",
+        "sha256": "F7948108B9BAFA04047611F70CC2921E53D833C1547431EE24BDCE93A4E2498F",
+        "bytes": 6774,
+        "root": "mir-fixture-mir5-historical-transition_0.1.0",
+        "archive_guard": "passed-via-exact-reviewed-runner-ast"
+      },
+      "projection": "projections/f013"
+    },
+    {
+      "target": "f014",
+      "engine_floor": "0.14.23",
+      "published_mir": {
+        "filename": "more-infinite-research_4.7.01403.zip",
+        "release_asset_id": 672267840,
+        "sha256": "85C7798BD6DC80FAA021AB0F33519B57A740B8D3969E695A82BA55634BA1C87A",
+        "bytes": 695784,
+        "root": "more-infinite-research_4.7.01403",
+        "members": 282
+      },
+      "profile": {
+        "path": "tests/profiles/historical-transition-473-published-f014.json",
+        "sha256": "008FE77D980BD54092F31CC54275C48459F405D5791096A8B4C5C5F3F79B3EF1",
+        "bytes": 326
+      },
+      "fixture_archive": {
+        "filename": "mir-fixture-mir5-historical-transition_0.1.0.zip",
+        "path": "archives/f014/mir-fixture-mir5-historical-transition_0.1.0.zip",
+        "sha256": "7ED44447393DDFAEAB0361A2E91A01FD5CA25B6D89A7948E83FDCA439AFF1DB9",
+        "bytes": 6776,
+        "root": "mir-fixture-mir5-historical-transition_0.1.0",
+        "archive_guard": "passed-via-exact-reviewed-runner-ast"
+      },
+      "projection": "projections/f014"
+    },
+    {
+      "target": "f015",
+      "engine_floor": "0.15.40",
+      "published_mir": {
+        "filename": "more-infinite-research_4.7.01503.zip",
+        "release_asset_id": 672267816,
+        "sha256": "0F8DD4DD21B8D1542FF5EDF96FDC38F75C9AB3CE577DF29C5E9DE99E0643B510",
+        "bytes": 695575,
+        "root": "more-infinite-research_4.7.01503",
+        "members": 282
+      },
+      "profile": {
+        "path": "tests/profiles/historical-transition-473-published-f015.json",
+        "sha256": "1894A48E6E5FD27FD418EDB30E7B108F014122894ED0E770000CE29F8549B89F",
+        "bytes": 326
+      },
+      "fixture_archive": {
+        "filename": "mir-fixture-mir5-historical-transition_0.1.0.zip",
+        "path": "archives/f015/mir-fixture-mir5-historical-transition_0.1.0.zip",
+        "sha256": "659462E39DB817C70BD0E92ABF34DCCB3682BDA8A0C9A1DEB954C80537AD0271",
+        "bytes": 6794,
+        "root": "mir-fixture-mir5-historical-transition_0.1.0",
+        "archive_guard": "passed-via-exact-reviewed-runner-ast"
+      },
+      "projection": "projections/f015"
+    },
+    {
+      "target": "f016",
+      "engine_floor": "0.16.51",
+      "published_mir": {
+        "filename": "more-infinite-research_4.7.01603.zip",
+        "release_asset_id": 672267773,
+        "sha256": "DAC63B9B14278C952B1020F9AE600C1437A9812C79CBBA17DE3CB15AF0CED6BD",
+        "bytes": 695583,
+        "root": "more-infinite-research_4.7.01603",
+        "members": 282
+      },
+      "profile": {
+        "path": "tests/profiles/historical-transition-473-published-f016.json",
+        "sha256": "2065F9C690ABE89A759A7346EE86E81FA35E1EDEE0AC71A3D7CF83D7B412571D",
+        "bytes": 326
+      },
+      "fixture_archive": {
+        "filename": "mir-fixture-mir5-historical-transition_0.1.0.zip",
+        "path": "archives/f016/mir-fixture-mir5-historical-transition_0.1.0.zip",
+        "sha256": "2F98068AD31BED27288B211CE4AE51A3334CAFC3603127BE09BAE507546E900D",
+        "bytes": 6796,
+        "root": "mir-fixture-mir5-historical-transition_0.1.0",
+        "archive_guard": "passed-via-exact-reviewed-runner-ast"
+      },
+      "projection": "projections/f016"
+    }
+  ],
+  "validation": {
+    "historical_transition_host_controls": 9,
+    "repository_document_static_check": "passed",
+    "exact_archive_guards": 4,
+    "fixture_zip_members_rehashed": 24,
+    "default_metadata_profiles_and_shared_lua": "unchanged from original source; only a new explicit predecessor selection is added",
+    "opponents": [
+      "unsupported predecessor release",
+      "wrong release ID",
+      "string release ID",
+      "wrong tag source",
+      "wrong published archive hash",
+      "stale predecessor version",
+      "extra or unsupported target"
+    ]
+  },
+  "remaining": "Native owner must separately admit an actual4.7.3 source stage on each exact engine, preserve its resulting save and two cold reloads, then bind the chosen MIR5 successor to that original save/hash. No additional native assignment or library ownership is created.",
+  "claims": {
+    "native_execution": false,
+    "source_world": false,
+    "source_save": false,
+    "migration_qualification": false,
+    "candidate_package_qualification": false,
+    "release_qualification": false
+  }
+}

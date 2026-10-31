@@ -1,0 +1,278 @@
+{
+  "schema": 1,
+  "kind": "MIRBaseF210MenuResourceAdverseNativeChainV1",
+  "status": "stopped-prelaunch-ordinal15-partial-cohort-zero-scores",
+  "source_commit": "b7caa8df9141523a556bb57ca8faf7c43d250c3d",
+  "private_source": "a6e713a94945cafe8e727fd1fabb16ec4352ff49",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+    "bytes": 49398736,
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "version": "2.1.23"
+  },
+  "packet_sha256": "09695186D71AD864BEB1230A6D0B264AF0A1446C0DF45CBBB5229FE877C64899",
+  "caller_sha256": "EE972A80DBB75E9C935F13D9283D4ACD289FB466328ED6DD1C7C0478782A92D9",
+  "terminal_sha256": "C4B7CDD4D85436F1F90AD754099EC7DA01E129BCB799C588775933FE0526CEA2",
+  "observation": {
+    "kind": "MIRBaseF210MenuResourceAdverseRootReadbackV1",
+    "packet_sha256": "09695186D71AD864BEB1230A6D0B264AF0A1446C0DF45CBBB5229FE877C64899",
+    "native_processes": 14,
+    "warmups": 4,
+    "aa_observations": 2,
+    "comparison_phase_observations": 8,
+    "accepted_scores": 0,
+    "observations": [
+      {
+        "ordinal": 1,
+        "id": "01-warmup-control-without-mir",
+        "phase": "warmup",
+        "arm": "control-without-mir",
+        "actual_factorio_pid": 84280,
+        "actual_factorio_start_utc": "2026-10-29T16:36:47.5518409Z",
+        "ready_elapsed_seconds": 14.498257
+      },
+      {
+        "ordinal": 2,
+        "id": "02-warmup-published-mir3",
+        "phase": "warmup",
+        "arm": "published-mir3",
+        "actual_factorio_pid": 83208,
+        "actual_factorio_start_utc": "2026-10-29T16:37:05.5106125Z",
+        "ready_elapsed_seconds": 11.8532469
+      },
+      {
+        "ordinal": 3,
+        "id": "03-warmup-published-mir4.7",
+        "phase": "warmup",
+        "arm": "published-mir4.7",
+        "actual_factorio_pid": 78604,
+        "actual_factorio_start_utc": "2026-10-29T16:37:21.4377828Z",
+        "ready_elapsed_seconds": 10.793543
+      },
+      {
+        "ordinal": 4,
+        "id": "04-warmup-candidate-mir5",
+        "phase": "warmup",
+        "arm": "candidate-mir5",
+        "actual_factorio_pid": 80152,
+        "actual_factorio_start_utc": "2026-10-29T16:37:35.6007324Z",
+        "ready_elapsed_seconds": 11.3205382
+      },
+      {
+        "ordinal": 5,
+        "id": "05-published-aa-published-mir4.7",
+        "phase": "published-aa",
+        "arm": "published-mir4.7",
+        "actual_factorio_pid": 70472,
+        "actual_factorio_start_utc": "2026-10-29T16:37:50.1894488Z",
+        "ready_elapsed_seconds": 10.8319919
+      },
+      {
+        "ordinal": 6,
+        "id": "06-published-aa-published-mir4.7",
+        "phase": "published-aa",
+        "arm": "published-mir4.7",
+        "actual_factorio_pid": 36416,
+        "actual_factorio_start_utc": "2026-10-29T16:38:04.2208311Z",
+        "ready_elapsed_seconds": 10.7515987
+      },
+      {
+        "ordinal": 7,
+        "id": "07-latin-comparison-control-without-mir",
+        "phase": "latin-comparison",
+        "arm": "control-without-mir",
+        "actual_factorio_pid": 5592,
+        "actual_factorio_start_utc": "2026-10-29T16:38:20.8817505Z",
+        "ready_elapsed_seconds": 11.3874091
+      },
+      {
+        "ordinal": 8,
+        "id": "08-latin-comparison-published-mir3",
+        "phase": "latin-comparison",
+        "arm": "published-mir3",
+        "actual_factorio_pid": 86492,
+        "actual_factorio_start_utc": "2026-10-29T16:38:35.8176462Z",
+        "ready_elapsed_seconds": 12.0371893
+      },
+      {
+        "ordinal": 9,
+        "id": "09-latin-comparison-published-mir4.7",
+        "phase": "latin-comparison",
+        "arm": "published-mir4.7",
+        "actual_factorio_pid": 80872,
+        "actual_factorio_start_utc": "2026-10-29T16:38:51.5865785Z",
+        "ready_elapsed_seconds": 11.091262
+      },
+      {
+        "ordinal": 10,
+        "id": "10-latin-comparison-candidate-mir5",
+        "phase": "latin-comparison",
+        "arm": "candidate-mir5",
+        "actual_factorio_pid": 22428,
+        "actual_factorio_start_utc": "2026-10-29T16:39:05.9144479Z",
+        "ready_elapsed_seconds": 10.5232306
+      },
+      {
+        "ordinal": 11,
+        "id": "11-latin-comparison-published-mir3",
+        "phase": "latin-comparison",
+        "arm": "published-mir3",
+        "actual_factorio_pid": 47928,
+        "actual_factorio_start_utc": "2026-10-29T16:39:19.7824463Z",
+        "ready_elapsed_seconds": 12.1723705
+      },
+      {
+        "ordinal": 12,
+        "id": "12-latin-comparison-published-mir4.7",
+        "phase": "latin-comparison",
+        "arm": "published-mir4.7",
+        "actual_factorio_pid": 78348,
+        "actual_factorio_start_utc": "2026-10-29T16:39:35.4422676Z",
+        "ready_elapsed_seconds": 10.8893175
+      },
+      {
+        "ordinal": 13,
+        "id": "13-latin-comparison-candidate-mir5",
+        "phase": "latin-comparison",
+        "arm": "candidate-mir5",
+        "actual_factorio_pid": 276,
+        "actual_factorio_start_utc": "2026-10-29T16:39:49.5510351Z",
+        "ready_elapsed_seconds": 11.2994498
+      },
+      {
+        "ordinal": 14,
+        "id": "14-latin-comparison-control-without-mir",
+        "phase": "latin-comparison",
+        "arm": "control-without-mir",
+        "actual_factorio_pid": 76616,
+        "actual_factorio_start_utc": "2026-10-29T16:40:04.0341709Z",
+        "ready_elapsed_seconds": 11.5011128
+      }
+    ],
+    "native_files_per_copy": 161,
+    "native_bytes_per_copy": 379614564,
+    "controller_files_per_copy": 5,
+    "controller_bytes_per_copy": 2163408,
+    "pngs_fully_decoded": 42,
+    "pngs_visually_viewed": 0,
+    "aa_gate": {
+      "schema": 1,
+      "kind": "MIRWholeProductResponsiveMenuAAGateV1",
+      "status": "passed-before-ordinal-seven",
+      "packet_sha256": "09695186D71AD864BEB1230A6D0B264AF0A1446C0DF45CBBB5229FE877C64899",
+      "reader_sha256": "13DA2660F2AB5F50D0B191AA37EDF7147880BADA0A52AB4231A2C23BEFA8A092",
+      "prefix_samples_sha256": "AA0B0EE6E8FB901BC4E126AB87115CED78137C60543B4C410526445DC4C35402",
+      "published_aa": {
+        "values_seconds": [
+          10.8319919,
+          10.7515987
+        ],
+        "difference_seconds": 0.08039319999999961,
+        "allowance_seconds": 0.539589765,
+        "within_declared_allowance": true
+      },
+      "performance_acceptance": false,
+      "release_qualification": false
+    },
+    "resource_peaks": [
+      {
+        "ordinal": 1,
+        "working_set_bytes": 1865285632,
+        "sampled_private_bytes": 3968864256
+      },
+      {
+        "ordinal": 2,
+        "working_set_bytes": 1753645056,
+        "sampled_private_bytes": 4053962752
+      },
+      {
+        "ordinal": 3,
+        "working_set_bytes": 1875468288,
+        "sampled_private_bytes": 4041928704
+      },
+      {
+        "ordinal": 4,
+        "working_set_bytes": 1836916736,
+        "sampled_private_bytes": 4061265920
+      },
+      {
+        "ordinal": 5,
+        "working_set_bytes": 1640603648,
+        "sampled_private_bytes": 3791314944
+      },
+      {
+        "ordinal": 6,
+        "working_set_bytes": 1806151680,
+        "sampled_private_bytes": 3965652992
+      },
+      {
+        "ordinal": 7,
+        "working_set_bytes": 1953755136,
+        "sampled_private_bytes": 4038819840
+      },
+      {
+        "ordinal": 8,
+        "working_set_bytes": 1815244800,
+        "sampled_private_bytes": 4063301632
+      },
+      {
+        "ordinal": 9,
+        "working_set_bytes": 1775747072,
+        "sampled_private_bytes": 3828436992
+      },
+      {
+        "ordinal": 10,
+        "working_set_bytes": 1778827264,
+        "sampled_private_bytes": 3891556352
+      },
+      {
+        "ordinal": 11,
+        "working_set_bytes": 1855897600,
+        "sampled_private_bytes": 4158992384
+      },
+      {
+        "ordinal": 12,
+        "working_set_bytes": 1883856896,
+        "sampled_private_bytes": 3934040064
+      },
+      {
+        "ordinal": 13,
+        "working_set_bytes": 1800953856,
+        "sampled_private_bytes": 3911938048
+      },
+      {
+        "ordinal": 14,
+        "working_set_bytes": 1845800960,
+        "sampled_private_bytes": 3883794432
+      }
+    ],
+    "attempt15_native_processes": 0,
+    "factorio_processes_after": 0,
+    "throwing_resource_snapshot_retained": false,
+    "cause_identified": false,
+    "shared_current_log_absent_after_attempt15": true,
+    "all14_immutable_native_logs_retained": true,
+    "performance_acceptance": false,
+    "release_qualification": false
+  },
+  "readback": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\whole-product-base-f210-menu-r02-controller\\root-adverse-readback.json",
+    "sha256": "02C36451C9D0E8D2985986F6DF3AA40BBFE52818E032CB742DE6F7C631E2ABAF"
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/whole-product-base-f210-menu-resource-adverse-receipts-r02.json.gz",
+    "sha256": "7D3E91C61B1764B37B2C924F03AF4393705BA00C3AB743154442043B1F97703D",
+    "bytes": 312681,
+    "bodies": 111
+  },
+  "independent_review": "Exact161 native and5 controller members/bytes per source/copy;14 distinct child identities,raw stdout/log/ledger/PNG integrity,original archive/control restoration and pre15 refusal are independently verified. No score or cause verdict.",
+  "limits": [
+    "Only the error label survives;the caller dropped the governor exception context. No actual throwing snapshot or historical memory-pressure cause is reconstructed.",
+    "Attempt15 removed the shared current log before resource admission. All14 per-run immutable logs remain intact. Complete-reader validation cannot turn this stopped prefix into a completed cohort.",
+    "The passing early A/A gate is a prerequisite only;8 comparison-phase observations are incomplete and are never pooled into another cohort.",
+    "Forty-two PNGs are CRC/zlib/scanline/IEND validated;no visual-content review is claimed.",
+    "Prospective privatebfa17e3 captures original exception data for future failures only;it does not backfill or change this record."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}

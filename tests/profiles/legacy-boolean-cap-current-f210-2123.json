@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "kind": "mir5-legacy-boolean-cap-current-f210-direct-successor",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name": "base", "version": "2.1.23", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.21000", "enabled": true},
+    {"name": "mir-fixture-mir5-legacy-boolean-cap", "version": "0.3.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.21000.zip": "7CE6A4DF78019F6B98237E638A1C927C5FDB538D4A1442EE22D846DD962DDCDC",
+    "mir-fixture-mir5-legacy-boolean-cap_0.3.0.zip": "D1BDF52D254F6C1DE051117293D9F731295BFC8E3C1909DFFA8F2DA15413F876"
+  },
+  "candidate_binding": {
+    "source_commit": "a575a4198807b6aea9e26963e3d9970fc5c068ae",
+    "player_tree": "398c79c687d2bc662c976355ced1436201c43f11",
+    "package_path": "build/packages/a575a419-root-r01/more-infinite-research_5.0.21000.zip",
+    "bytes": 681347
+  },
+  "scope": "Prepared direct F200-to-F210 policy-v1 successor only: bind the reviewed F210 archive through MIRArchive and ExpectedMIRArchiveSha256, consume the same protected 4.0.0 F200 source save, restore only the proven player right, complete one real gear lab, then save and cold-reload twice. This route is independent of the F200 successor and is not a native, migration, or release result."
+}

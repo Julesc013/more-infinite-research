@@ -1,0 +1,209 @@
+{
+  "schema": 1,
+  "kind": "MIR5F200ForeignCapBaselineF0ddNativeChainV1",
+  "status": "passed-bounded-seeded-f200-cap-ownership-chain",
+  "scope": "One exact F200 seeded cap-ownership chain on the f0dd package: source cap 0, finite cap 1, then relaxed cap 0. It establishes only the named fixture's ownership and restoration behavior; it is not a laboratory, source-origin, migration, general cap-policy, performance, multiplayer, physical-production, release, or current-candidate qualification.",
+  "execution": {
+    "native_controller_commit": "77881291507a57fd30adb3f37af519d8262f6976",
+    "fixture_source_commit": "24dd0497e8f550b8b2bc2dc74b885d7a606dcf08",
+    "prepared_packet": {
+      "path": "build/qualification/f200-foreign-cap-baseline-f0dd-prepared-r01/prepared-inputs-f0dd-r01.json",
+      "sha256": "30780A2353BDB83B4165D76F73CDB24EE4781721F1E17A1C847B300F2F97666E",
+      "bytes": 10569,
+      "native_execution_field_before_run": false
+    },
+    "candidate": {
+      "source_commit": "f0dd9f62adc8bf0a8eaaf9babc1fcfef9f3241ea",
+      "player_tree": "0229b2bb3ad0c514fc4dca18c32fd544b9ba7d72",
+      "archive": "more-infinite-research_5.0.20000.zip",
+      "sha256": "20A200883EFB29F8D216EA408C688F1862C80612D536DCD4FCDDC1E47768541D",
+      "bytes": 685696,
+      "asset_readback": {
+        "path": "build/qualification/current-assets-f0dd9f62-local-readback-r01.json",
+        "sha256": "5F508EC757D0D191BE1C187145E3A21FBFF65096618278EA4087941E1BC05B38"
+      }
+    },
+    "engine": {
+      "factorio_version": "2.0.77",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "observer": {
+      "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+    },
+    "profiles": {
+      "source": "0B3347E02614218DA2BA286E9785A18683D6195889A0FEE3243855CE289A88B0",
+      "finite": "5BFE1ED0DB65115644BE98C12815046DB29036C66E7CC6719AA536B3064E0954",
+      "relaxed": "AC959F8BE68409850AF0ADBF0E617C8D2DD0DB59E076FA65045E1ABB2A8B44A6"
+    },
+    "fixtures": {
+      "source_0_1_0": {
+        "sha256": "3D514CCF22CD1B42DB28DEE2DE928D5A8DBC73E9E1A8B45BBBC32F87F1601651",
+        "bytes": 6446
+      },
+      "finite_0_2_0": {
+        "sha256": "71440309308B3E82F23E21597CC1AE49C79E9BFF4A69388F104B86FB5DCA304E",
+        "bytes": 6450
+      },
+      "relaxed_0_3_0": {
+        "sha256": "E76721DC9C0EE5858366ED2C4C589862572303B0616EE8B5E5DE249B7F9CE875",
+        "bytes": 6450
+      }
+    }
+  },
+  "stages": [
+    {
+      "stage": "source",
+      "fixture_version": "0.1.0",
+      "cap": 0,
+      "result": {
+        "status": "passed-private-native-fixture",
+        "sha256": "BC89BE6EE03C27DE102333FB9D37768175673EF1FE0D7884FBBBF1088ADBCADF",
+        "bytes": 43297
+      },
+      "input_save": null,
+      "completed_save": {
+        "sha256": "DEF5FD2A70F4CF8F7C14728E3332F21FA658BE5AF12819A21B3757CB8E0819B0",
+        "bytes": 664273
+      },
+      "observed_state": {
+        "laboratory_completions": 0,
+        "player_level": 3,
+        "earned_productivity_bonus": 0.02,
+        "player_saved_progress": 0.27,
+        "player_enabled": true,
+        "player_visible_when_disabled": false,
+        "foreign_enabled": false,
+        "foreign_visible_when_disabled": false,
+        "foreign_queue_progress": 0.42,
+        "cold_reloads": 2,
+        "cold_reloads_read_only_and_save_byte_identical": true
+      }
+    },
+    {
+      "stage": "finite",
+      "fixture_version": "0.2.0",
+      "cap": 1,
+      "result": {
+        "status": "passed-private-native-fixture",
+        "sha256": "7D520274381A6C44C4763276F582DA0D7DF3DF6FC1B4AFED072B595F18BCFF91",
+        "bytes": 35069
+      },
+      "input_save": {
+        "sha256": "DEF5FD2A70F4CF8F7C14728E3332F21FA658BE5AF12819A21B3757CB8E0819B0",
+        "byte_identical_to_source_completed_save": true
+      },
+      "completed_save": {
+        "sha256": "C1CFD345E1E4BB65DE894D7006AECC15AFF88EE461C7BD6F622D5D97F22246F8",
+        "bytes": 664572
+      },
+      "observed_state": {
+        "laboratory_completions": 0,
+        "player_level": 3,
+        "earned_productivity_bonus": 0.02,
+        "player_saved_progress": 0.27,
+        "player_enabled": false,
+        "player_visible_when_disabled": true,
+        "foreign_enabled": false,
+        "foreign_visible_when_disabled": true,
+        "foreign_queue_progress": 0.42,
+        "cold_reloads": 2,
+        "cold_reloads_read_only_and_save_byte_identical": true
+      }
+    },
+    {
+      "stage": "relaxed",
+      "fixture_version": "0.3.0",
+      "cap": 0,
+      "result": {
+        "status": "passed-private-native-fixture",
+        "sha256": "C28C5D805CB91459B08517060D60C2D7F21CA4D3B436802AF9B2A0D3E41FE2AF",
+        "bytes": 35098
+      },
+      "input_save": {
+        "sha256": "C1CFD345E1E4BB65DE894D7006AECC15AFF88EE461C7BD6F622D5D97F22246F8",
+        "byte_identical_to_finite_completed_save": true
+      },
+      "completed_save": {
+        "sha256": "2A8FCA4A89A0725952847979AF3D1C209F24245F1A2DCB3AC22481F3F04A2F51",
+        "bytes": 664548
+      },
+      "observed_state": {
+        "laboratory_completions": 0,
+        "player_level": 3,
+        "earned_productivity_bonus": 0.02,
+        "player_saved_progress": 0.27,
+        "player_enabled": true,
+        "player_visible_when_disabled": false,
+        "foreign_enabled": false,
+        "foreign_visible_when_disabled": false,
+        "foreign_queue_progress": 0.42,
+        "cold_reloads": 2,
+        "cold_reloads_read_only_and_save_byte_identical": true
+      }
+    }
+  ],
+  "earned_state_interpretation": {
+    "fixture_effect_per_level": 0.01,
+    "level": 3,
+    "asserted_total_bonus": 0.02,
+    "meaning": "The fixture deliberately uses one percent per level. This record does not substitute a two-tenths bonus or make a broader productivity claim."
+  },
+  "custody_and_restoration": {
+    "primary_root": "build/qualification/f200-foreign-cap-baseline-f0dd-r01",
+    "root_independent_readback": {
+      "path": "build/qualification/f200-foreign-cap-baseline-f0dd-r01/root-independent-readback.json",
+      "sha256": "D0D97F0261888163CF2792EE8573B39F1BE7DF7C19DC47ACBC895580B043DD27",
+      "bytes": 3923,
+      "status": "passed-exact-bounded-chain-readback"
+    },
+    "raw_and_primary_members": 59,
+    "raw_and_primary_bytes": 2977605,
+    "all_raw_primary_hashes_equal": true,
+    "controls_restored": true,
+    "keeper_b67_restored": true,
+    "observer_723d_restored": true,
+    "owned_fixture_0_1_0_absent_after": true,
+    "owned_fixture_0_2_0_absent_after": true,
+    "owned_fixture_0_3_0_absent_after": true,
+    "factorio_processes_after": 0,
+    "private_payload_boundary": "The public record names completed-save hashes and private custody paths, but does not embed saves, full logs, configurations, player data, preflight payloads, library-control snapshots, terminals, or archive payloads."
+  },
+  "prior_preparations_preserved": [
+    {
+      "id": "ce48-58f-prepared-inputs",
+      "path": "spec/evidence/f200-foreign-cap-baseline-58f-prepared-inputs.json",
+      "sha256": "2CEBAB2DE60723D74C981B3C3AE2DBDF92A2F629DE7A2E4577154E8DFC257569",
+      "status": "exact-source-fixtures-built-not-native-qualified",
+      "native_result": false
+    },
+    {
+      "id": "c74-local-preparation",
+      "path": "build/qualification/f200-foreign-cap-baseline-c74-r02/local-preparation-readback-r01.json",
+      "sha256": "88914780E90D39DFDE2F9D552BAA92DDF2C83A06BF8E236760E0FF7C7D449346",
+      "status": "prepared-no-library-mutation-no-native-process",
+      "native_result": false
+    }
+  ],
+  "receipts": {
+    "path": "spec/evidence/f200-foreign-cap-baseline-f0dd-native-receipts-r01.json.gz",
+    "sha256": "E6EBF6188BBEBF2DDEB023D0D31056D5FB75BC52A15751B9DE789186ABA57389",
+    "bytes": 21972,
+    "uncompressed_sha256": "0336C0D150D607BCE7F3706F91778C02696C038F8A34240AC721F1D9E7ED5420",
+    "uncompressed_bytes": 152652,
+    "exact_original_raw_native_result_receipts": 3,
+    "strict_utf8_decode_roundtrip_verified": true,
+    "base64_roundtrip_verified": true,
+    "gzip_mtime_zero": true,
+    "exclusions": "Saves, full logs, runtime configuration, player data, preflight payloads, library-control payloads, outer terminals, and archive payloads remain private."
+  },
+  "claims": {
+    "seeded_f200_cap_ownership_only": true,
+    "laboratory_work": false,
+    "source_origin_migration": false,
+    "general_cap_policy": false,
+    "performance": false,
+    "release_qualification": false,
+    "other_engines_or_modpacks": false
+  },
+  "limitations": "This bounded record covers only the f0dd F200 package, exact 24dd fixtures, D3 engine, 723D observer, one seeded zero-laboratory source-to-finite-to-relaxed cap sequence, and the retained private custody. It does not relabel ce48, 58f, or c74 preparation as native evidence and does not qualify a later candidate, arbitrary prior save, general foreign-cap behavior, or release."
+}

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "kind": "mir5-first-enabled-finite-cap-held",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {"version": "2.1.23", "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"},
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name": "base", "version": "2.1.23", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.21000", "enabled": true},
+    {"name": "mir-fixture-mir5-f200-legacy-cap", "version": "0.12.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "more-infinite-research_5.0.21000.zip": "38C84CCBC4BFDA62FCB078772C4690AB81228484744A36D9EA303F5A75B16447"
+  },
+  "scope": "Reuse protected81AF published4.7.3/0.4 F200 source. First F210 upgrade keeps the family and native prototype enabled but cap2 below earned level3; no successor lab is permitted. Preserve .02 effect/.27 work/foreign disabled42% queue,save and reload twice. Candidate992c/playerfbb7 only; prepared input,not native acceptance or a final freeze."
+}

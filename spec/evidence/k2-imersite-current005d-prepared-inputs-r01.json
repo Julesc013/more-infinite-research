@@ -1,0 +1,266 @@
+{
+  "schema": 1,
+  "kind": "MIR5K2ImersiteCurrent005DPreparedInputsV1",
+  "status": "prepared-inputs-awaiting-owner-resource-admission",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "profile": {
+    "path": "tests/profiles/k2-imersite-transition-direct-current005d-standalone-f210.json",
+    "sha256": "2E734FAA43B3593F044D880CF81369CCCEF0A2D2F6F27F3FEFBB5618ED696CAE",
+    "bytes": 4299
+  },
+  "original_direct_profile": {
+    "path": "tests/profiles/k2-imersite-transition-direct-f210.json",
+    "sha256": "7F6DDCA55C7E2DE99087CF74C70C042B0C36682DBEE24D89DFA9884FD1DFA9C5",
+    "bytes": 3278,
+    "unchanged": true
+  },
+  "candidate": {
+    "source_commit": "7a2f93224c846b86261b2da709f50ea683fc708d",
+    "player_source": "5058373348e9049f8b67ec4dbb79b400a904acd6",
+    "archive": {
+      "path": "build/qualification/current-assets-7a2-aero-independent-r01/more-infinite-research_5.0.21000.zip",
+      "sha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+      "bytes": 692050
+    },
+    "independent_readback": {
+      "path": "build/qualification/current-assets-7a2-aero-independent-r01/aero-independent-readback.json",
+      "sha256": "F525C44F03A9D5DA10AC870CCAAAB8BD73838F7D0834D8D2E8634EA9A7B8109B",
+      "bytes": 4111
+    }
+  },
+  "protected_source_save": {
+    "sha256": "538B7321F57A79807371B4CE415A9EF97FA72DEA8BB0A9B05DC41D00D035F828",
+    "source_version": "4.6.21000",
+    "chain": {
+      "path": "spec/evidence/native-recovery-wave-r05-chain.json",
+      "sha256": "36B34E7CCB41BFF138B41B9602DDEAB9C56502020EDE4CC9699F300667609F6B",
+      "json_pointer": "direct_k2_predecessor_reuse",
+      "receipt_path": "build/mir5/recovery-historical/k2-imersite-transition-direct-recovery/40082348767/black-glass-k2-imersite-transition-direct-recovery-40082348767-1/predecessor-reuse.json",
+      "receipt_sha256": "3DA5C7D8F037EBF61295766FC4FB012FAEFFBACDE6C09693F89C955348F5DDD1"
+    },
+    "local_save_bytes_available": false
+  },
+  "raw_git_projections": {
+    "path": "build/qualification/k2-imersite-current005d-prepared-aero-r01/raw-git-projections.json",
+    "sha256": "1746B724B6EC54791FBB81E492A7500D12AD9067B754C57F36499AB5A8D409A0",
+    "fixture_source_commit": "3e7aaaabe7ddf789c3f3b65aec22595303bb27d3",
+    "package_tool": {
+      "path": "tools/package.py",
+      "executed_worktree_sha256": "32BDBE5E0D8B776A57BC8DF63DD536DD81AEDF54141AC6EC6B1BEF4044C90674",
+      "committed_sha256": "32BDBE5E0D8B776A57BC8DF63DD536DD81AEDF54141AC6EC6B1BEF4044C90674"
+    },
+    "stages": {
+      "successor": {
+        "name": "mir-fixture-mir5-k2-imersite-transition",
+        "version": "0.3.0",
+        "projection": "build/qualification/k2-imersite-current005d-prepared-aero-r01/projections/successor",
+        "archive": "build/qualification/k2-imersite-current005d-prepared-aero-r01/archives/mir-fixture-mir5-k2-imersite-transition_0.3.0.zip",
+        "sha256": "E98A97B3CB6A9AC34F8C1D4EB5103F99252324A73774381AD6C555D2EAE39080",
+        "bytes": 5708,
+        "members": [
+          {
+            "path": "control.lua",
+            "source_path": "tests/fixtures/k2-imersite-transition/successor/control.lua",
+            "git_blob": "62496c1e0d21081a9605f15e8f87fd4f656fcceb",
+            "sha256": "44EF021966099D58F024E80112237FB772E7AD2D2AA5BCCD9305A4F31BCB1954",
+            "bytes": 11033
+          },
+          {
+            "path": "data-final-fixes.lua",
+            "source_path": "tests/fixtures/k2-imersite-transition/successor/data-final-fixes.lua",
+            "git_blob": "b5159f2dca49e3d33b8ff27108d0a051947d782a",
+            "sha256": "36AA69ACA6901338A54CCB13452C3B6E3052639A26728209117DA6D6F77D97AA",
+            "bytes": 4158
+          },
+          {
+            "path": "info.json",
+            "source_path": "tests/fixtures/k2-imersite-transition/successor/info.json",
+            "git_blob": "2c3f6dd4842726b0defef5133ec929ddc51d6ff6",
+            "sha256": "8E2971734D0B854263767D6E4F987A119372E8FA48F94A03BE6B0C2BA393B531",
+            "bytes": 420
+          },
+          {
+            "path": "settings-updates.lua",
+            "source_path": "tests/fixtures/k2-imersite-transition/successor/settings-updates.lua",
+            "git_blob": "93f5facc3e0b4290f7479c031669e1c4d3eabe78",
+            "sha256": "110A811A5F9F24527DBACD40793089763AE75EA504A7831F36EFB7246F3D530F",
+            "bytes": 406
+          }
+        ]
+      },
+      "direct-cost": {
+        "name": "mir-fixture-mir5-k2-imersite-direct-cost",
+        "version": "0.1.0",
+        "projection": "build/qualification/k2-imersite-current005d-prepared-aero-r01/projections/direct-cost",
+        "archive": "build/qualification/k2-imersite-current005d-prepared-aero-r01/archives/mir-fixture-mir5-k2-imersite-direct-cost_0.1.0.zip",
+        "sha256": "74E5D9A50677BA6CE55A61D3B13AE588E57245938C43BE88639EEB604EFBEC3C",
+        "bytes": 1943,
+        "members": [
+          {
+            "path": "data-final-fixes.lua",
+            "source_path": "tests/fixtures/k2-imersite-transition/direct-cost/data-final-fixes.lua",
+            "git_blob": "07d41d9ec57997ee47d57232e3a27337d5f63120",
+            "sha256": "D00B58D1EDD9F0DEA126329B23A0DA3A390953530514061D3DB10C0CFCD4E15E",
+            "bytes": 3504
+          },
+          {
+            "path": "info.json",
+            "source_path": "tests/fixtures/k2-imersite-transition/direct-cost/info.json",
+            "git_blob": "8a5dadd853ccddd6ecdfee66a31f57c818fc050b",
+            "sha256": "2621B2F744F7913540E95DB7511A3E5A0F7571F140E19CD3C8E6BC607D6D53D5",
+            "bytes": 484
+          }
+        ]
+      }
+    }
+  },
+  "observer": {
+    "source_readback_path": "build/qualification/discovery-recovery-prepared-r01/raw-git-readback.json",
+    "source_readback_sha256": "9B78051AE366E2B9578132DBDDF828728F34F3A129E169F5C6F64D1BBF317FBF",
+    "source_ref": "784d7985020f9d71f6af7a293238afb4c6d0dc68",
+    "archive": "build/qualification/discovery-recovery-prepared-r01/observer/mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "bytes": 834,
+    "projection": "build/qualification/discovery-recovery-prepared-r01/observer/source",
+    "members": [
+      {
+        "path": "info.json",
+        "git_path": "tests/fixtures/active-mods-observer/info.json",
+        "git_blob": "7d9113c418e49ef4a7a6c5db454c0e0cf40dedf7",
+        "sha256": "C37A55C4776F1B4DABA7E4D5C98CF22FD0E978A461D3E6FD8A95E238B97908BD",
+        "bytes": 231
+      },
+      {
+        "path": "data-final-fixes.lua",
+        "git_path": "tests/fixtures/active-mods-observer/data-final-fixes.lua",
+        "git_blob": "0561997352770afb91631e80c83ae92ce0921945",
+        "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C",
+        "bytes": 477
+      }
+    ]
+  },
+  "runner": {
+    "script": "tools/Invoke-NativeFixture.ps1",
+    "case_name": "k2-imersite-mir5-recovery",
+    "input_save_mode": "generic-InputSave-with-ExpectedInputSaveSha256",
+    "expected_input_save_sha256": "538B7321F57A79807371B4CE415A9EF97FA72DEA8BB0A9B05DC41D00D035F828",
+    "fixture_sources": [
+      "build/qualification/k2-imersite-current005d-prepared-aero-r01/projections/successor",
+      "build/qualification/k2-imersite-current005d-prepared-aero-r01/projections/direct-cost",
+      "build/qualification/discovery-recovery-prepared-r01/observer/source"
+    ],
+    "active_mods_observer": "mir-fixture-mir5-active-mods-observer"
+  },
+  "guard_readback": {
+    "path": "build/qualification/k2-imersite-current005d-prepared-aero-r01/guard-readback.json",
+    "sha256": "59A377267F070C0BF9532D6CCA85006EA1E185EEFCA4AE7FFAFB0323FAA20E28",
+    "archive_guard": "three-owned-fixture-sources-pass-real-guard",
+    "declared_input_guard": "current005D-selected-candidate-accepted",
+    "adversaries": {
+      "missing_observer_archive": true,
+      "bad_old_candidate": true,
+      "changed_fixture_member": true
+    }
+  },
+  "native_execution": false,
+  "library_mutation": false,
+  "release_qualification": false,
+  "limitations": [
+    "No protected source-save bytes are present in Aero custody; the R05 chain records their immutable identity and private predecessor-reuse locator only.",
+    "No resource admission, Factorio launch, direct-library activation, source-world recreation, gameplay observation, save/reload result, ordinary tuning, published4.7 carrier recovery, performance result, or release qualification is claimed.",
+    "The current destination is005D/7a2/player505 on8DC. It does not relabel/reuse the original FE4/AFCAF R05 execution or turn the later b251/E3A prepared profile into native evidence."
+  ],
+  "prepared_against_commit": "3e7aaaabe7ddf789c3f3b65aec22595303bb27d3",
+  "previous_native_result": {
+    "direct_library_control_restoration": "restored-direct-library-controls",
+    "initial_witness": {
+      "destination_actual_lab_completions": 1,
+      "destination_mir": "5.0.21000",
+      "direct_predecessor_handoff": true,
+      "handoff_source": "direct-4.6",
+      "on_load_read_only": false,
+      "powder_productivity": 0.12,
+      "public_continuation_readded": false,
+      "recovered_tail_saved_progress_before_lab": 0.42000000000000004,
+      "retained_source_next_level": 6,
+      "source_actual_lab_completions": 5,
+      "source_mir": "4.6.21000",
+      "tail_next_level": 7
+    },
+    "manifest_members_verified": 34,
+    "manifest_sha256": "99FA71DAD8C5579E1F047385156903A54C29BFB875ACBE98FD1F1896C48DD5F9",
+    "player_archive_sha256": "AFCAF4532F6CAA85A623CAFD7D0CCC0D06A1BD934D206F0F6C99829A7B1A9D82",
+    "reloads": [
+      {
+        "ordinal": 1,
+        "save_byte_identical": true,
+        "save_sha256": "E8421996B7D2BFFD26A4DA33B9B03DF1782FF0212F01BB645B3742697908CAC0"
+      },
+      {
+        "ordinal": 2,
+        "save_byte_identical": true,
+        "save_sha256": "E8421996B7D2BFFD26A4DA33B9B03DF1782FF0212F01BB645B3742697908CAC0"
+      }
+    ],
+    "result_sha256": "5D8EBD73BFF92CB7A614373A5C6EB8EDB64353A5EF551B611E814F07D30720D7",
+    "run": 40082348767,
+    "scenario": "direct-k2-recovery",
+    "source_commit": "8c14aa1aa72b96fab9cd00cbcbcc83919278babb",
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40082348767",
+    "controller_commit": "aedde1c92a6cac64afb70e03ea3f2a5562e7f6cd"
+  },
+  "previous_prepared_selection": {
+    "source_commit": "b251ae7a54104ace87cb0da4cf531cf53f03c93d",
+    "player_tree": "79b73a6a8e68987737e69bf2d95ec6555b49f901",
+    "archive_sha256": "E3A65C08AC7798A66FB1BE30D24307B17C8B366DD901953BDE2A09BD6939C8CE",
+    "scope": "Later prepared profile identity only; not the AFCAF archive of the original accepted R05 execution."
+  },
+  "arguments": {
+    "ArchiveLibrary": "<owner exclusive2.1 direct library with exact selected archives>",
+    "FactorioBin": "<owner standalone2.1.23/8DC executable>",
+    "ProfilePath": "tests/profiles/k2-imersite-transition-direct-current005d-standalone-f210.json",
+    "FixtureSources": [
+      "build/qualification/k2-imersite-current005d-prepared-aero-r01/projections/successor",
+      "build/qualification/k2-imersite-current005d-prepared-aero-r01/projections/direct-cost",
+      "build/qualification/discovery-recovery-prepared-r01/observer/source"
+    ],
+    "InputSavePath": "<owner protected538B original save; use recorded predecessor locator>",
+    "ExpectedInputSaveSha256": "538B7321F57A79807371B4CE415A9EF97FA72DEA8BB0A9B05DC41D00D035F828",
+    "ExpectedMIRArchiveSha256": "005D420671270306155CB4AC25E9CF77541202DFA16B206DCC016237619C9AA2",
+    "ActiveModsObserver": "mir-fixture-mir5-active-mods-observer",
+    "CaseName": "k2-imersite-mir5-recovery",
+    "ExpectedPeakMemoryMiB": 8192,
+    "TimeoutSeconds": 180,
+    "AdmissionWaitSeconds": 30,
+    "OutputRoot": "<fresh governed checkout-local output>"
+  },
+  "resource_plan": {
+    "expected_peak_memory_mib": 8192,
+    "meaning": "Conservative planning ceiling within the unchanged existing runner128-8192 range; not observed K2 memory or accepted memory/performance. The native owner must govern actual admission/reserves before launch and preserve any refusal; no tolerance/reserve or runner change.",
+    "owner_bindings_pending": [
+      "protected source-save bytes/actual locator",
+      "exact engine and direct library availability/restoration custody",
+      "fresh admitted output and frozen committed caller",
+      "actual resource-governor admission"
+    ]
+  },
+  "fixture_reproduction": "Compose only the recorded raw Git members from3e7aaaab into each own projection, then use existing tools/package.py --source <projection> --output <canonical own ZIP path>, without target/version overrides. The recorded package.py SHA and canonical recipe reproduce E98A97B3/74E5D9A5; reuse original2E1 observer container. Do not copy dependency libraries or substitute a differently hashed own ZIP silently.",
+  "independent_expected_result": {
+    "source_real_lab_completions_reused": 5,
+    "source_next_level": 6,
+    "source_powder_productivity": 0.1,
+    "restored_detached_tail_progress_before_lab": 0.42,
+    "new_tail_lab_completions": 1,
+    "post_lab_tail_next_level": 7,
+    "post_lab_powder_productivity": 0.12,
+    "cold_reloads": 2,
+    "completed_save_byte_identical_through_reloads": true,
+    "basis": "Published4.6 source and retained R05 direct case, enforced by the unchanged successor/direct-cost preflights and native fixture assertions. Acceleration does not qualify ordinary cost/timing."
+  },
+  "independent_preparation_review": "Scoped approval of input bindings, fixture bytes and strict positive/negative guards. Root corrected E3A-preparation versus AFCAF-native identity and selected an8192MiB planning bound within the unchanged runner; admission/native remain pending."
+}

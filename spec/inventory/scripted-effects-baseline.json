@@ -1,0 +1,420 @@
+{
+  "format": 1,
+  "kind": "mir5-published-scripted-effects-source-characterization",
+  "status": "source-characterized-native-realization-not-claimed",
+  "scope": {
+    "subject": "published MIR 4.7.21000 F210 scripted spoilage, agricultural-growth, and passive-repair behavior",
+    "pinned_source_commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+    "published_package": {
+      "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_4.7.21000.zip",
+      "sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1",
+      "info": {
+        "name": "more-infinite-research",
+        "version": "4.7.21000",
+        "factorio_version": "2.1",
+        "base_dependency": "base >= 2.1.23"
+      }
+    },
+    "claims": {
+      "source_behavior_recovered": true,
+      "native_load_or_gameplay_qualified": false,
+      "mir5_port_or_adoption_decided": false,
+      "technology_emission_claimed": false
+    },
+    "boundary": "This is a compact historical source inventory. It records the 4.7 F210 implementation surface and excludes implementation, removal, package, save-migration, or native-effect claims for MIR5."
+  },
+  "evidence": {
+    "archive_members": [
+      {
+        "member": "more-infinite-research_4.7.21000/prototypes/mir/runtime/scripted_techs.lua",
+        "sha256": "E4812434404D3213079B7D21EC5006ECA3C766E90111AA2A344E74932B780559",
+        "source_path_at_pinned_commit": "source/prototypes/mir/runtime/scripted_techs.lua",
+        "lines": [
+          1,
+          125
+        ]
+      },
+      {
+        "member": "more-infinite-research_4.7.21000/prototypes/mir/runtime/effects/spoilage_preservation.lua",
+        "sha256": "8973E17244AC389253B8CD06C5BBD694771995949767C95A6313D90B729BDBCC",
+        "source_path_at_pinned_commit": "source/prototypes/mir/runtime/effects/spoilage_preservation.lua",
+        "lines": [
+          1,
+          149
+        ]
+      },
+      {
+        "member": "more-infinite-research_4.7.21000/prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+        "sha256": "5C87E41DAD5FA476BE1BCE7DED41654DAC02AA873D9DC4800457E89202A6F2C0",
+        "source_path_at_pinned_commit": "source/prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+        "lines": [
+          1,
+          127
+        ]
+      },
+      {
+        "member": "more-infinite-research_4.7.21000/prototypes/mir/runtime/effects/passive_repair.lua",
+        "sha256": "38178A2F06ABD99E45CB71EAF9770278033AFB544317261DF3173C746D851AB3",
+        "source_path_at_pinned_commit": "source/prototypes/mir/runtime/effects/passive_repair.lua",
+        "lines": [
+          1,
+          258
+        ]
+      },
+      {
+        "member": "more-infinite-research_4.7.21000/prototypes/streams/direct-effects.lua",
+        "sha256": "7AA6D11919D4CBB0149B1347474B732400010156A79C0E0E83635EB8290D8DC4",
+        "source_path_at_pinned_commit": "source/prototypes/streams/direct-effects.lua",
+        "lines": [
+          10,
+          80
+        ]
+      },
+      {
+        "member": "more-infinite-research_4.7.21000/prototypes/mir/settings/catalog.lua",
+        "sha256": "82E2457B3A0550B196CB741F93911F98586995E36C46754750CDAEA9A2D1410D",
+        "source_path_at_pinned_commit": "source/prototypes/mir/settings/catalog.lua",
+        "line_ranges": [
+          [
+            18,
+            18
+          ],
+          [
+            260,
+            322
+          ],
+          [
+            334,
+            375
+          ]
+        ]
+      },
+      {
+        "member": "more-infinite-research_4.7.21000/prototypes/mir/settings/defaults.lua",
+        "sha256": "7537E3792A07DE60C4591972925C65D208808C2329C432891FECE2528467AC63",
+        "source_path_at_pinned_commit": "source/prototypes/mir/settings/defaults.lua",
+        "lines": [
+          3,
+          30
+        ]
+      },
+      {
+        "member": "more-infinite-research_4.7.21000/prototypes/mir/runtime/startup_settings.lua",
+        "sha256": "4E6E6B19411130F0C2BC244400592407AD94EC12FBD27A986CE3C889AF0C1B37",
+        "source_path_at_pinned_commit": "source/prototypes/mir/runtime/startup_settings.lua",
+        "lines": [
+          7,
+          59
+        ]
+      },
+      {
+        "member": "more-infinite-research_4.7.21000/prototypes/mir/platform/factorio/target_profiles.lua",
+        "sha256": "54356D6836B140C1249C8D2D7277F0079805902A2916D9F6348C7AAA995D35C5",
+        "source_path_at_pinned_commit": "source/prototypes/mir/platform/factorio/target_profiles.lua",
+        "lines": [
+          7,
+          110
+        ]
+      }
+    ]
+  },
+  "dispatch_and_target_capability": {
+    "entrypoint": {
+      "member": "more-infinite-research_4.7.21000/prototypes/mir/stage/control.lua",
+      "sha256": "AF3934244889FFBDA6B44A425240279D78EEDB093E1601D3C981B1FF832915B5",
+      "source_path_at_pinned_commit": "source/prototypes/mir/stage/control.lua",
+      "lines": [
+        14,
+        23
+      ],
+      "condition": "scripted_techs OR productivity_family_adoption OR research_library loads runtime.scripted_techs; settings_profiles independently loads settings_profile"
+    },
+    "scripted_dispatch": {
+      "source_lines": [
+        17,
+        124
+      ],
+      "registered_modules": [
+        "spoilage_preservation",
+        "agricultural_growth_speed",
+        "passive_repair"
+      ],
+      "lifecycle": [
+        "on_init -> run_all",
+        "on_configuration_changed -> run_all",
+        "on_research_finished and on_research_reversed -> matching technology handler",
+        "on_technology_effects_reset -> run_all",
+        "on_tower_planted_seed -> agricultural growth only"
+      ],
+      "passive_repair_registration": "registers damage filter separately; its conditional 60-tick subscription is established by its own state."
+    },
+    "target_profiles_source_record": {
+      "f210": {
+        "factorio_version": "2.1",
+        "runtime_state_backend": "storage",
+        "supports_space_age": true,
+        "emitter_families_include": "scripted-effect",
+        "scripted_techs": true,
+        "source_lines": [
+          7,
+          70
+        ]
+      },
+      "f200": {
+        "factorio_version": "2.0",
+        "runtime_state_backend": "storage",
+        "supports_space_age": true,
+        "emitter_families_include": "scripted-effect",
+        "scripted_techs": true,
+        "source_lines": [
+          112,
+          204
+        ],
+        "package_membership_for_this_f210_archive": "not claimed"
+      },
+      "historical_exclusions": {
+        "f110_and_older_target_records": {
+          "scripted_techs": false,
+          "emitter_families": [
+            "technology"
+          ],
+          "runtime_state_backend": "global",
+          "source_lines_for_f110": [
+            206,
+            279
+          ]
+        },
+        "consequence": "The source target records exclude these scripted modules and the passive-repair startup setting from 1.1-and-older target behavior."
+      }
+    }
+  },
+  "settings_and_precedence": {
+    "startup_profile": {
+      "import_setting": "mir-settings-profile-import",
+      "default": "",
+      "codec_identity": {
+        "schema": 1,
+        "kind": "mir-settings-profile",
+        "format": 1,
+        "prefix": "MIRSET1:"
+      },
+      "precedence": [
+        "If the import setting decodes to a schema-1, recognized profile and a named startup setting exists, a validated imported value is used.",
+        "An absent, blank, invalid, unavailable, or unvalidated imported value falls back to the raw startup setting.",
+        "The import setting itself is never overridden by its imported profile."
+      ],
+      "source": [
+        {
+          "member": "prototypes/mir/runtime/startup_settings.lua",
+          "lines": [
+            13,
+            59
+          ]
+        },
+        {
+          "member": "prototypes/mir/settings/profile_codec.lua",
+          "sha256": "54E9610324AE701FDF4CEE657FABAF34E9B76D8973276449C42F80A0BA3DFDCA",
+          "lines": [
+            5,
+            10
+          ]
+        }
+      ]
+    },
+    "scripted_stream_setting_defaults": {
+      "shared_inherited": {
+        "linear_increment": 0,
+        "max_level": 0,
+        "max_level_zero_meaning": "infinite",
+        "effect_per_level_display_value": 1,
+        "effect_per_level_unit": "percent",
+        "canonical_runtime_delta": 0.01
+      },
+      "research_spoilage_preservation": {
+        "enable_setting": "ips-enable-research_spoilage_preservation",
+        "defaults": {
+          "enabled": true,
+          "base_cost": 50000,
+          "growth_factor": 1.5,
+          "research_time": 120,
+          "max_level": 0
+        },
+        "effect_setting": "ips-effect-per-level-research_spoilage_preservation"
+      },
+      "research_agricultural_growth_speed": {
+        "enable_setting": "ips-enable-research_agricultural_growth_speed",
+        "defaults": {
+          "enabled": true,
+          "base_cost": 40000,
+          "growth_factor": 1.5,
+          "research_time": 90,
+          "max_level": 0
+        },
+        "effect_setting": "ips-effect-per-level-research_agricultural_growth_speed"
+      },
+      "passive_repair": {
+        "enable_setting": "mir-enable-passive-repair",
+        "default": false,
+        "debug_setting": "mir-debug-scripted-effects",
+        "debug_default": false
+      }
+    },
+    "historical_setting_availability": {
+      "stream_settings": "direct stream declaration required space-age and scripted_techs; source realization remains separate from this characterization.",
+      "passive_repair_setting": "catalog target requires scripted_techs; it was not emitted for historical target profiles without that feature."
+    }
+  },
+  "scripted_subsets": [
+    {
+      "id": "spoilage_preservation",
+      "technology": {
+        "stable_id": "recipe-prod-research_spoilage_preservation-1",
+        "stream_key": "research_spoilage_preservation",
+        "declared_effect": {
+          "type": "nothing",
+          "description_key": "modifier-description.more-infinite-research.spoilage_preservation"
+        },
+        "required_mod": "space-age",
+        "generation_items_any": [
+          "spoilage",
+          "agricultural-science-pack"
+        ],
+        "source": {
+          "member": "prototypes/streams/direct-effects.lua",
+          "lines": [
+            10,
+            48
+          ]
+        }
+      },
+      "level_and_rate": {
+        "completed_levels": "max(0, technology.level - 1), then maximum across all non-enemy/non-neutral forces",
+        "per_level_multiplier": "1 + selected effect setting / 100; canonical selected default is 1 percent",
+        "target": "clamp(baseline * multiplier^effective_level, 0.01, 100)"
+      },
+      "external_writes_and_ownership": {
+        "writes": [
+          "game.difficulty_settings.spoil_time_modifier"
+        ],
+        "saved_bucket": "storage.mir.spoilage_preservation",
+        "saved_fields": [
+          "baseline",
+          "effective_level",
+          "applied_multiplier",
+          "last_applied_value"
+        ],
+        "external_change_policy": "if the observed modifier differs from last_applied_value, rebase baseline by dividing by the prior multiplier; on restore, write baseline only when the observed value still equals last_applied_value."
+      },
+      "event_surface": [
+        "on_init",
+        "on_configuration_changed",
+        "on_research_finished",
+        "on_research_reversed",
+        "on_technology_effects_reset"
+      ],
+      "native_qualification": "not run or claimed"
+    },
+    {
+      "id": "agricultural_growth_speed",
+      "technology": {
+        "stable_id": "recipe-prod-research_agricultural_growth_speed-1",
+        "stream_key": "research_agricultural_growth_speed",
+        "declared_effect": {
+          "type": "nothing",
+          "description_key": "modifier-description.more-infinite-research.agricultural_growth_speed"
+        },
+        "required_mod": "space-age",
+        "generation_items": [
+          "agricultural-science-pack"
+        ],
+        "source": {
+          "member": "prototypes/streams/direct-effects.lua",
+          "lines": [
+            50,
+            80
+          ]
+        }
+      },
+      "level_and_rate": {
+        "completed_levels": "max(0, technology.level - 1) for the planting tower force, or the plant force when the tower is unavailable",
+        "per_level_multiplier": "min(10, (1 + selected effect setting / 100)^completed_levels)",
+        "application": "on_tower_planted_seed only; if remaining tick_grown time is greater than 1, write now + max(1, floor(remaining / multiplier)); existing plants are not scanned."
+      },
+      "external_writes_and_ownership": {
+        "writes": [
+          "LuaEntity.tick_grown for the event plant"
+        ],
+        "saved_bucket": "storage.mir.agricultural_growth_speed",
+        "saved_fields": [
+          "force_multipliers[force_name].level",
+          "force_multipliers[force_name].multiplier"
+        ],
+        "force_policy": "refresh stores non-enemy/non-neutral force snapshots, while application resolves the event tower/plant force directly.",
+        "external_change_policy": "no baseline or restoration protocol; a successful protected tick_grown write is the only mutation."
+      },
+      "event_surface": [
+        "on_init",
+        "on_configuration_changed",
+        "on_research_finished",
+        "on_research_reversed",
+        "on_technology_effects_reset",
+        "on_tower_planted_seed"
+      ],
+      "native_qualification": "not run or claimed"
+    },
+    {
+      "id": "passive_repair",
+      "technology": null,
+      "startup_gate": "mir-enable-passive-repair == true",
+      "entity_scope": {
+        "accepted_types": [
+          "wall",
+          "gate"
+        ],
+        "force_policy": "player force or reciprocal friend of player force; enemy and neutral are excluded",
+        "maximum_pending": 256,
+        "quiet_ticks_after_damage": 600,
+        "repair_interval_ticks": 60,
+        "repair_amount": 1,
+        "per_nth_tick_budget": 8
+      },
+      "external_writes_and_ownership": {
+        "writes": [
+          "LuaEntity.health"
+        ],
+        "saved_bucket": "storage.mir.passive_repair",
+        "saved_shape": {
+          "queue": "ordered entity unit numbers",
+          "members": "by unit number: entity LuaObject reference, force_index, surface_index, quiet_until, next_repair_tick",
+          "scheduled": "boolean"
+        },
+        "lifecycle": "damage adds or postpones a member; 60-tick processing repairs eligible incomplete entities, removes healed/invalid entries, and unregisters the tick subscription once queue is empty.",
+        "external_change_policy": "does not repair an invalid, destroyed, wrong-force, wrong-surface, zero-health, or full-health entity; disabling clears queue and members."
+      },
+      "event_surface": [
+        "on_entity_damaged with wall/gate filters when enabled",
+        "on_nth_tick(60) only while scheduled",
+        "on_init",
+        "on_configuration_changed",
+        "on_load"
+      ],
+      "native_qualification": "not run or claimed"
+    }
+  ],
+  "state_backend_and_migration_boundary": {
+    "f210_runtime_root": "storage",
+    "namespace": "storage.mir",
+    "schema_versions": {
+      "spoilage_preservation": "no explicit schema field",
+      "agricultural_growth_speed": "no explicit schema field",
+      "passive_repair": "no explicit schema field",
+      "scripted_techs": "no explicit schema field; dispatcher creates its bucket before lifecycle handling"
+    },
+    "migration_status": "No MIR5 state mapping, preservation, cleanup, or schema migration is specified by this recovery."
+  },
+  "non_claims": [
+    "The F210 archive evidence does not establish current MIR5 support, safety, balance, performance, save migration, or native runtime behavior.",
+    "The two catalogued scripted modern streams used a technology effect of type nothing; their actual outcomes were historical Lua runtime writes rather than native technology effects.",
+    "Passive repair was a separate startup-gated runtime subsystem, not a recovered emitted technology family."
+  ]
+}

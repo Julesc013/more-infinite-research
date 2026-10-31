@@ -1,0 +1,250 @@
+{
+  "schema": 1,
+  "kind": "MIR5BlackGlassK2BaseReferenceChainV1",
+  "status": "mir5-complete-intended-output-and-seven-native-lab-completions-two-reloads-passed",
+  "host": "BLACKGLASS-WIN1",
+  "control_source": "3945b662481fdb66bec3210e48de21e52f6139cf",
+  "tested_source": "b26d45025c8e012951169724ecdf56ae632644e7",
+  "profile": "tests/mir5/profiles/k2-base-f200-2077.json",
+  "cases": [
+    {
+      "run_id": "39962601418",
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39962601418",
+      "status": "completed-data-stage-observation-only",
+      "records": {
+        "receipt": {
+          "path": "spec/mir5/evidence/k2-base-f200-no-mir-native.json",
+          "bytes": 15527,
+          "sha256": "4BD2F4D9C01026B10A2680C9FFEECC8E3CBEDFC5131B3DD616202FCBCBF51539"
+        },
+        "private_artifact_manifest": {
+          "path": "build/mir5/black-glass/incoming/39962601418/black-glass-k2-upstream-39962601418-1/artifact-manifest.json",
+          "bytes": 2067,
+          "sha256": "E8A5BF6EC572E7B60658481CF24E661ECD7E4B69381F1C85EEE57AD534171EC6"
+        },
+        "raw_custody": "build/mir5/black-glass/incoming/39962601418/black-glass-k2-upstream-39962601418-1"
+      }
+    },
+    {
+      "run_id": "39962719955",
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39962719955",
+      "status": "failed",
+      "records": {
+        "receipt": {
+          "path": "spec/mir5/evidence/k2-base-f200-published-adverse.json",
+          "bytes": 10443,
+          "sha256": "4FEC51D027632D52A6FA1CBE64111CD305CE4D13D56CF45C37B3D6BB36B973B9"
+        },
+        "private_artifact_manifest": {
+          "path": "build/mir5/black-glass/incoming/39962719955/black-glass-k2-published-39962719955-1/artifact-manifest.json",
+          "bytes": 1884,
+          "sha256": "D0B6F29D574A1739992B0ECED4E5430071873B506249C0773565B362267BA1E1"
+        },
+        "raw_custody": "build/mir5/black-glass/incoming/39962719955/black-glass-k2-published-39962719955-1",
+        "native_log": {
+          "path": "build/mir5/black-glass/incoming/39962719955/black-glass-k2-published-39962719955-1/capture/write-data/factorio-current.log",
+          "bytes": 12047,
+          "sha256": "D3F3C67579F3468BBE40D8F3419C0029D3307AF222180657079457CEB5243851"
+        },
+        "compressed_native_log": {
+          "path": "spec/mir5/evidence/k2-base-f200-published-adverse.log.gz",
+          "bytes": 2098,
+          "sha256": "96DFFC8176CA6FC0A2494A52451C54DCB288EE090E71F2E23477833DAEEB3957"
+        }
+      }
+    },
+    {
+      "run_id": "39968795644",
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39968795644",
+      "tested_source": "0d6bd9f0cb37ab3724d2890b0bbd8f56b9c9e964",
+      "control_source": "4f89148de0708c36bdcf1d63859451418025d6b5",
+      "status": "failed",
+      "records": {
+        "receipt": {
+          "path": "spec/mir5/evidence/k2-base-f200-published-472-adverse.json",
+          "bytes": 10443,
+          "sha256": "5D8D86FB622CDBDB09DBFCD846B13380EC9CB6AA725C06661A9C34295CA465D4"
+        },
+        "private_artifact_manifest": {
+          "path": "build/mir5/black-glass/incoming/39968795644/black-glass-k2-hotfix-reference-39968795644-1/artifact-manifest.json",
+          "bytes": 2200,
+          "sha256": "50693DF559F98A121E57F932FF0E8AB50F57565E051201CC2134CFED02E61125"
+        },
+        "raw_custody": "build/mir5/black-glass/incoming/39968795644/black-glass-k2-hotfix-reference-39968795644-1",
+        "native_log": {
+          "path": "build/mir5/black-glass/incoming/39968795644/black-glass-k2-hotfix-reference-39968795644-1/capture/write-data/factorio-current.log",
+          "bytes": 12047,
+          "sha256": "4064BB90002757161FAB73ACCA578AC53C18DCF962477A34B3535FC4E72D3042"
+        },
+        "compressed_native_log": {
+          "path": "spec/mir5/evidence/k2-base-f200-published-472-adverse.log.gz",
+          "bytes": 2102,
+          "sha256": "F522DEB00C24524898736ED70B76E9795F8E30B13BF45F1FC05DF46C3E22FFFB"
+        }
+      }
+    },
+    {
+      "run_id": "39969822288",
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39969822288",
+      "tested_source": "c74bfb5411da52cb8f314fd7bc3875566a2b5707",
+      "control_source": "4f89148de0708c36bdcf1d63859451418025d6b5",
+      "status": "completed-data-stage-with-nine-icon-differences",
+      "records": {
+        "receipt": {
+          "path": "spec/mir5/evidence/k2-base-f200-c74-native.json",
+          "bytes": 16685,
+          "sha256": "36FAFD506C6DF75DDCE04A8E55B93911B8795C971C03539D5936C12013660FCB"
+        },
+        "private_artifact_manifest": {
+          "path": "build/mir5/black-glass/incoming/39969822288/black-glass-k2-candidate-39969822288-1/artifact-manifest.json",
+          "bytes": 2387,
+          "sha256": "7488ADBDF9C460C06129D4E30775818F9AEF3B2A2E6648689B5C2D30EE91BF4F"
+        },
+        "raw_custody": "build/mir5/black-glass/incoming/39969822288/black-glass-k2-candidate-39969822288-1",
+        "comparison": {
+          "path": "spec/mir5/evidence/k2-base-f200-c74-adverse-comparison.json",
+          "bytes": 9798,
+          "sha256": "1B26F1FF7E3278BBABEF17113B60D045528DD17967EE42C8CB99FD840281FE00"
+        }
+      }
+    },
+    {
+      "run_id": "39972744631",
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39972744631",
+      "tested_source": "db0504b049342878ac6cf5f83eaca59917505886",
+      "control_source": "4f89148de0708c36bdcf1d63859451418025d6b5",
+      "status": "equal-intended-native-output",
+      "records": {
+        "receipt": {
+          "path": "spec/mir5/evidence/k2-base-f200-native.json",
+          "bytes": 16685,
+          "sha256": "A481102306323E3AF9E2162C8F7F6FCDE28FD9F81C35A1DDFE993EA1CD98BA5C"
+        },
+        "comparison": {
+          "path": "spec/mir5/evidence/k2-base-f200-native-comparison.json",
+          "bytes": 9376,
+          "sha256": "1DBBA5999E79EB612D54253F3F41D82B61EB573040338C32AF1517EF341255B0"
+        },
+        "private_artifact_manifest": {
+          "path": "build/mir5/black-glass/incoming/39972744631/black-glass-k2-candidate-39972744631-1/artifact-manifest.json",
+          "bytes": 2387,
+          "sha256": "348E81F34027AF637A48DD620B8B5A52ABA81B3E10BD26716EAB9780EC40A5CD"
+        },
+        "raw_custody": "build/mir5/black-glass/incoming/39972744631/black-glass-k2-candidate-39972744631-1",
+        "player_archive": {
+          "path": "build/mir5/black-glass/incoming/39972744631/black-glass-k2-candidate-39972744631-1/player/more-infinite-research_5.0.20000.zip",
+          "bytes": 353516,
+          "sha256": "03C4D13BE983FFAF73358DEFCB9D442D3C479E9A6FA0F9BD13769E89372E8F6E"
+        }
+      }
+    },
+    {
+      "run_id": "39974903162",
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39974903162",
+      "tested_source": "98f139f62db7dd1b143b37723f587141ce4060d0",
+      "control_source": "2f5ac6b67a10c91d48a7fd6209cbff5c151d9ad1",
+      "status": "failed",
+      "records": {
+        "receipt": {
+          "path": "spec/mir5/evidence/k2-base-gameplay-precision-adverse.json",
+          "bytes": 8145,
+          "sha256": "C34E16EE582F660319C65AA479BD0582E363DD4AA4FDBC1659A9CB105A3AE27C"
+        },
+        "private_artifact_manifest": {
+          "path": "build/mir5/black-glass/incoming/39974903162/black-glass-k2-gameplay-39974903162-1/artifact-manifest.json",
+          "bytes": 3459,
+          "sha256": "4FEEA79269FFCECCD90902F7555B0B51DD5E14BA5E36472D1E064DC2CFE25E1D"
+        },
+        "raw_custody": "build/mir5/black-glass/incoming/39974903162/black-glass-k2-gameplay-39974903162-1",
+        "compressed_native_stdout": {
+          "path": "spec/mir5/evidence/k2-base-gameplay-precision-adverse.log.gz",
+          "bytes": 2123,
+          "sha256": "7BA86BF43A6629AFA20BFBA568BBDEADB0E1464FE9A6EC476358E1B209B4F66D"
+        }
+      }
+    },
+    {
+      "run_id": "39975776031",
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39975776031",
+      "tested_source": "bdde9419f662977b0f3fee51bdbe47dad0fa40ad",
+      "control_source": "c94ebab9e6f11b7f13caf0686991abb63b8a053a",
+      "status": "failed",
+      "records": {
+        "receipt": {
+          "path": "spec/mir5/evidence/k2-base-gameplay-queue-api-adverse.json",
+          "bytes": 8145,
+          "sha256": "21F776ED3ADB922C3E9067AE03C8C91E5DD1F6BA61364C4269B89D169CAF8BCE"
+        },
+        "private_artifact_manifest": {
+          "path": "build/mir5/black-glass/incoming/39975776031/black-glass-k2-gameplay-39975776031-1/artifact-manifest.json",
+          "bytes": 3459,
+          "sha256": "99851B011B2D25AB161E3AAC165F05062DD1506FAD214B88A0DADFFAA9774A7F"
+        },
+        "raw_custody": "build/mir5/black-glass/incoming/39975776031/black-glass-k2-gameplay-39975776031-1",
+        "compressed_native_stdout": {
+          "path": "spec/mir5/evidence/k2-base-gameplay-queue-api-adverse.log.gz",
+          "bytes": 2069,
+          "sha256": "2DC14B4A5988A2CD4DB127B0BF9B6E593DA8E7C70DDDA26CAC7E8BC20CB82788"
+        }
+      }
+    },
+    {
+      "run_id": "39976300516",
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39976300516",
+      "tested_source": "d72a54b1df4810b158c3fe070ba55972c4acf542",
+      "control_source": "c94ebab9e6f11b7f13caf0686991abb63b8a053a",
+      "status": "passed-private-native-fixture",
+      "records": {
+        "receipt": {
+          "path": "spec/mir5/evidence/k2-base-gameplay-native.json",
+          "bytes": 48836,
+          "sha256": "751BEF47E40B5A3D92C16F8F9129896CA99BE6D4734C4BE3294441F0AEE518D6"
+        },
+        "private_artifact_manifest": {
+          "path": "build/mir5/black-glass/incoming/39976300516/black-glass-k2-gameplay-39976300516-1/artifact-manifest.json",
+          "bytes": 6063,
+          "sha256": "0D5B308024EA07A83523D981FA7E9DF324AF98D45BFBB8E65E08637A0F2E1199"
+        },
+        "raw_custody": "build/mir5/black-glass/incoming/39976300516/black-glass-k2-gameplay-39976300516-1",
+        "fixture_source_members": {
+          "path": "build/mir5/black-glass/incoming/39976300516/black-glass-k2-gameplay-39976300516-1/gameplay-fixture-members.json",
+          "bytes": 1895,
+          "sha256": "AD0C7A95EDB14BCFC39DFCECA1515C5E839F3D9884B22B728EE6D52102498DDE"
+        }
+      }
+    }
+  ],
+  "failure_class": "SCI-UNLOCK-01; published MIR4 approved automation science binding unresolved",
+  "claims": {
+    "upstream_native_prototype_reference": true,
+    "published_mir_successful_oracle": false,
+    "mir5_candidate_qualification": false,
+    "physical_effects": false,
+    "migration": false,
+    "performance": false,
+    "release_qualification": false,
+    "mir5_complete_intended_native_data_settings": true,
+    "native_lab_effects_and_two_cold_reloads": true
+  },
+  "limits": [
+    "Reference/prototype arms are data-stage only; no native output dump exists for the failed published arms",
+    "All original artifact member hashes verified after private download; source receipts unchanged",
+    "Published4.7 F200 archive hash7958731AAD672C7F16B9307E7B20F97B8E97B58CC57E5D1F9AE670018A8A1B5B",
+    "Original failed arm remains adverse evidence; no expectations recovered from a failed capture",
+    "Black Glass has F210 2.1.14 standalone and 2.1.17 Steam; neither qualifies the required 2.1.23 target",
+    "The c74 candidate has complete native data-stage output; its independent comparison finds exactly nine icon-row differences and zero setting differences. The corrected comparison is recorded separately.",
+    "Corrected db0504 candidate matches the independently frozen complete data/settings output; this does not qualify physical effects, gameplay, saves, multiplayer, performance or release.",
+    "Seven actual lab completions verify native force and three gear recipe bonuses with two cold reloads; no physical crafting, predecessor upgrade, multiplayer or final-candidate release claim. Numeric gear effect native readback is 0.10000000149011612; exact raw defaults remain 0.1."
+  ],
+  "frozen_corrected_expectation": {
+    "path": "build/mir5/k2-base-catalogue-r01/comparison-r01/expected-r02.json",
+    "sha256": "9A83773BC5BEB7A57C03D3FD369C1A20AF9AFCA468D8B69947F253C3CD74DEB7",
+    "basis": "published Base F200 plus explicit K2 source/native facts and independent raw/settings locks; frozen before corrected candidate execution"
+  },
+  "prior_expectation": {
+    "path": "build/mir5/k2-base-catalogue-r01/comparison-r01/expected.json",
+    "sha256": "F5E5DB183C014CA713E711ADA66A9EE0BD7D5597256A11879A6A1679BB4AD10C",
+    "basis": "published Base F200 plus explicit K2 source/native facts, frozen before corrected candidate execution",
+    "disposition": "preserved original c74 comparison expectation; tightened by adding the independent native-settings hash before corrected native execution"
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "kind": "MIR5NativeFixtureV1",
+  "status": "failed",
+  "case": "worker-speed-cap-relaxed",
+  "source_head": "80e4aec3c723583e9c731d4cfc70a37c192ab29e",
+  "source_dirty": false,
+  "harness_sha256": "00738675D162FDDE0F53567225A2022531C694FA87A14C59EC87F8CEE41ED050",
+  "native_probe_sha256": "FF8E62687A8AA05080E3F9AFF45DED34BA7FCFDF1F309542A66893380B7D51E3",
+  "governor_sha256": "9E27C4DDCCC10028246F89A09A7663F7FCA1D7BD26444681A7A8635F74D9BE96",
+  "engine": {
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "profile": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\worker-speed-cap-relaxed-f210.json",
+    "sha256": "0B49ADF1D989A9796D58ADCE7565B420A8C0AEB8AD44CAFF6E09C66F999F8EA2"
+  },
+  "fixtures": [
+    {
+      "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\worker-speed-cap-relaxed",
+      "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-worker-speed-cap_0.2.2.zip",
+      "sha256": "834FE84323E275AE457B21604F344684E5F0F2D0609458813EF310E767E47E88"
+    }
+  ],
+  "mir_archive": {
+    "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+    "sha256": "31EDAD840A721C313E25BBCE996BCC30E3D9B862E695B075F998B1186E9150EE"
+  },
+  "observation": "native-fixture-production-and-two-cold-reloads",
+  "input_save": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-cap-native-r02\\write-data\\saves\\mir5-native-complete.zip",
+    "sha256": "7356A34C30B28967371A3B7E6BB639C5CD6B37282E0AF9E965114C2762ED4483"
+  },
+  "release_qualification": false,
+  "initial_admission_wait": {
+    "phase": "fixture-initial",
+    "admission_wait_seconds": 0,
+    "status": "not-requested",
+    "attempt_count": 0,
+    "refusal_count": 0,
+    "elapsed_seconds": 0.0,
+    "first_refusal": null,
+    "last_refusal": null,
+    "last_error": null,
+    "started_at": "2026-10-23T05:13:12.7014345+00:00",
+    "deadline_at": "2026-10-23T05:13:12.7014345+00:00",
+    "admission": null
+  },
+  "seed_sha256": "7356A34C30B28967371A3B7E6BB639C5CD6B37282E0AF9E965114C2762ED4483",
+  "server_settings": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-uncap-native-r03\\server-settings.json",
+    "template": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\server-settings.example.json",
+    "template_sha256": "61E85918C477D86D0B347F8BF3E41B43413EC53F284D37F2888F1648FCA0849A",
+    "sha256": "2FB3E97FE934B92B6C4CCC2403A90A16C357BEC9183E9BC7E550822AC57504E4"
+  },
+  "failure": "[mir441-process-exit] -1",
+  "resource_admission": null,
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "0B49ADF1D989A9796D58ADCE7565B420A8C0AEB8AD44CAFF6E09C66F999F8EA2",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:036C000000246719",
+        "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F",
+        "bytes": 193
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.21000",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:0050000000198946",
+        "sha256": "31EDAD840A721C313E25BBCE996BCC30E3D9B862E695B075F998B1186E9150EE",
+        "bytes": 212590
+      },
+      {
+        "name": "mir-fixture-mir5-worker-speed-cap",
+        "version": "0.2.2",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-worker-speed-cap_0.2.2.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:004B00000020AF82",
+        "sha256": "834FE84323E275AE457B21604F344684E5F0F2D0609458813EF310E767E47E88",
+        "bytes": 3129
+      }
+    ]
+  },
+  "input_save_byte_identical": true,
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "interrupted",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-uncap-native-r03\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-uncap-native-r03\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-uncap-native-r03\\process-1.stderr.txt",
+      "error": "[mir441-process-exit] -1"
+    }
+  ]
+}

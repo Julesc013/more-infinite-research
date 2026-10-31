@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-mir5-named-science-replacement",
+  "version": "0.1.0",
+  "title": "MIR named science replacement fixture",
+  "author": "MIR maintainers",
+  "description": "Private F210 data-stage witness for a missing named electromagnetic science recipe with one direct seeded replacement.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.23", "more-infinite-research >= 4.7.21003"]
+}

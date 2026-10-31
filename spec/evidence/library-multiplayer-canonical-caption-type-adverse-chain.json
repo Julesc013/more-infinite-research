@@ -1,0 +1,88 @@
+{
+  "artifact_manifest": {
+    "members_verified": 202,
+    "path": "build/mir5/recovery-historical/library-multiplayer-canonical/40126672429/artifact-manifest.json",
+    "selection_receipt_sha256": "80926382A1E6DCB43662A980879FB00B0ABE5D161AF66C01C7CB05D1D429467E",
+    "sha256": "293FCBC6E0D69E6D64F13665D1794C64083FB1BD296C1759965F929A678C42F5"
+  },
+  "controller_commit": "1b329020040d8b34d340313ae583ac6b5b63c17a",
+  "controls_restored": true,
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "version": "2.0.77"
+  },
+  "fixture_archive": {
+    "bytes": 9630,
+    "members": [
+      {
+        "bytes": 383,
+        "member": "info.json",
+        "sha256": "268818EA58DFEE57DD2BF30073BD6F557ECEB412730571ABE347604135446D4D",
+        "source": "tests/fixtures/library-multiplayer/info.json"
+      },
+      {
+        "bytes": 34874,
+        "member": "control.lua",
+        "sha256": "A0AC4B7537234AF1B8B65B3C2BE25AC1876509EB8C45F04E5433571A050D028D",
+        "source": "tests/fixtures/library-multiplayer/control.lua"
+      },
+      {
+        "bytes": 1137,
+        "member": "settings-updates.lua",
+        "sha256": "659D9D74EA46394BB7E7FB8C17BFEDB0EAFFB63555B2284FDA35D44B6A23B2D1",
+        "source": "tests/fixtures/library-multiplayer/settings-updates.lua"
+      }
+    ],
+    "sha256": "D1D0BC07BD35AF1959E4FA5335F443F895A4AFEA1D2C29CA2CBBCC55A614D72A"
+  },
+  "kind": "MIR5LibraryMultiplayerCanonicalCaptionTypeAdverseChainV1",
+  "limits": [
+    "This adverse establishes no Library multiplayer pass, lab, save/reload, performance, broad compatibility, or release result.",
+    "The corrected fixture must preserve the original product/player identity only where its independently verified inputs match; this adverse is not relabelled."
+  ],
+  "next_input": "The corrected caption fixture revision 90960abf34ef8aa5e2fd363f16ba625db8013fea needs its own separately recorded native retry.",
+  "observed_failure": {
+    "classification": "fixture caption LocalisedString parameter type mismatch; not a product diagnosis",
+    "message": "[mir5-library-multiplayer] native Library refresh level differs",
+    "phase": "initial two-client session before any lab completion"
+  },
+  "player": {
+    "asset_inventory_sha256": "2C48DE548DED0BDC2B2F01AD1B851D58158E25916A02BD8AAAD281A52C28CBC0",
+    "bytes": 547144,
+    "sha256": "5B00EDE316CDC139085EBF274E8CDF02CD96F8961242E2942A2A55F55C9BB76D",
+    "target": "f200",
+    "version": "5.0.20000"
+  },
+  "preparation": {
+    "path": "library-multiplayer-canonical/native/preparation/result.json",
+    "sha256": "AEAA3A315DF22EDE45D9D03D1912846C90B5B0069A957DE89A389269A54F71F2",
+    "status": "passed-private-native-runtime-load-only"
+  },
+  "profile": {
+    "execution_path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40126672429-1\\library-multiplayer-canonical\\library-multiplayer-canonical-inputs\\library-multiplayer-canonical.json",
+    "execution_sha256": "881ACF499F9E06D0544373F316CAD29D3CDD5650DB9AAF71DC3520C88645A232",
+    "raw_git_path": "tests/profiles/library-multiplayer-f200-2077.json",
+    "raw_path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40126672429-1\\library-multiplayer-canonical\\library-multiplayer-canonical-inputs\\library-multiplayer-f200-2077.raw.json",
+    "raw_sha256": "4CDC1DED1FA6FF882C27BF0B86813718CA1C65F51D989448F2C6C174A3693DFD"
+  },
+  "raw_evidence": {
+    "gzip_bytes": 38114,
+    "gzip_sha256": "6A636E8937BB87BE73CAC9FBA45F6D19ADB3168854D27A3CC1AF9F2A41E8230E",
+    "members": 10,
+    "path": "spec/evidence/library-multiplayer-canonical-caption-type-adverse-receipts.json.gz",
+    "uncompressed_bytes": 150075,
+    "uncompressed_sha256": "53591A59EE8F08CC04B6285BF4F644B24039274CF13C1FB8C2C43095C9C6EC95"
+  },
+  "run": 40126672429,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40126672429",
+  "schema": 1,
+  "session": {
+    "failure": "[mir441-process-exit] 1",
+    "path": "library-multiplayer-canonical/native/session/result.json",
+    "sha256": "036FEB83F5971A1149649EF3E7E2C38FBF688E22FCE9BEC5FEF727A434CAEDD3",
+    "status": "failed"
+  },
+  "source_commit": "333fb9f94d4e48d07455154e22129c5c765b7ef9",
+  "status": "current333-f200-library-caption-type-adverse-before-labs"
+}

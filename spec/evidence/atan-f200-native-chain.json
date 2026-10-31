@@ -1,0 +1,43 @@
+{
+  "claims": {
+    "complete_native_data_settings": true,
+    "gameplay": false,
+    "historical_save_upgrade": false,
+    "multiplayer": false,
+    "performance": false,
+    "physical_production": false,
+    "release": false
+  },
+  "kind": "MIR5AtanF200NativeReferenceChainV1",
+  "limitations": [
+    "Exact F200 Base/Space Age bindings only; no F210 or future ATAN patch admission.",
+    "Native gameplay, cap changes, historical saves and final candidate still require acceptance."
+  ],
+  "profiles": [
+    {
+      "comparison": "spec/mir5/evidence/atan-base-f200-native-comparison.json",
+      "custody": "build/mir5/black-glass/incoming/39983357778/black-glass-atan-base-candidate-39983357778-1",
+      "player_sha256": "2f2decbfdcfeac49f45146f1cf754a5ba1b6d3ef55dcc023aa158d1e45a103b2",
+      "profile": "atan-base-f200",
+      "run": 39983357778,
+      "source": "f1863064e7b01039af3f21e58f3782be16329953",
+      "technologies": 56,
+      "unexplained_differences": 0,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39983357778"
+    },
+    {
+      "comparison": "spec/mir5/evidence/atan-space-age-f200-native-comparison.json",
+      "custody": "build/mir5/black-glass/incoming/39983364186/black-glass-atan-space-age-candidate-39983364186-1",
+      "player_sha256": "2f2decbfdcfeac49f45146f1cf754a5ba1b6d3ef55dcc023aa158d1e45a103b2",
+      "profile": "atan-space-age-f200",
+      "run": 39983364186,
+      "source": "f1863064e7b01039af3f21e58f3782be16329953",
+      "technologies": 71,
+      "unexplained_differences": 0,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39983364186"
+    }
+  ],
+  "schema": 1,
+  "status": "both-complete-native-comparisons-passed",
+  "worker_control_source": "cf1a95cd52a1b94cace13a87532172b9456be986"
+}

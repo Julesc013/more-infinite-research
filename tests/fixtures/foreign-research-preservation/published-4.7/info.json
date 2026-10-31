@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-foreign-research-preservation",
+  "version": "0.1.0",
+  "title": "MIR 5 foreign research preservation source fixture",
+  "author": "MIR maintainers",
+  "description": "Representative 4.7 source for foreign Space-Lab-Research-61 continuity; not the reporter's mod profile.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "more-infinite-research = 4.7.21000"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "kind": "MIR5OriginalIndependentBaselineReadbackV1",
+  "status": "exact-original-receipt-and-full-profile-document-verified",
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39974658753",
+  "artifact_id": 12510707253,
+  "artifact_name": "black-glass-bob-angel-upstream-39974658753-1",
+  "manifest_sha256": "5CDAC2104AA1A138195169C3E8A45B9B49BD7ED107FC0882721F8F9C522E8CED",
+  "verified_members": 13,
+  "original_source": "98f139f62db7dd1b143b37723f587141ce4060d0",
+  "original_result_sha256": "48444A48A0AFA05AC1C493BC2A1BBAB4328A96D566FDE083406ABA6D737DB563",
+  "inventory": {
+    "path": "spec/inventory/bob-angel-f200-472.json",
+    "sha256": "3AD7EA25EC20DD47AC55425E0C6ECAB204808C6BDAA43F7A7DBB93495CF992AC",
+    "full_capture_receipt_equal": true
+  },
+  "profile": {
+    "original_git_path": "tests/mir5/profiles/bob-angel-f200-2077.json",
+    "original_git_blob_sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90",
+    "original_checkout_crlf_sha256": "93EA20609F3EACDA4C8C1ABFCB5168BD82E89937A62824A2EB4140478262BE78",
+    "original_checkout_bytes_reconstructed_from_exact_git_blob_and_verified": true,
+    "current_path": "tests/profiles/bob-angel-f200-2077.json",
+    "current_checkout_sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90",
+    "complete_json_document_equal": true,
+    "ignored_fields": []
+  },
+  "comparison_contract": "Use the original capture/result receipt unchanged with compare_candidate and explicit hash-verified paired original-CRLF/current-LF profile files. No baseline envelope alias, ignored field or rewritten inventory is necessary.",
+  "native_execution": false,
+  "new_timing_samples": 0,
+  "release_qualification": false
+}

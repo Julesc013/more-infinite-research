@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-mir5-api-namespace-beta",
+  "version": "0.1.0",
+  "title": "MIR 5 API namespace beta fixture",
+  "author": "MIR maintainers",
+  "description": "Private F210 consumer with a deliberately incompatible local platform target.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.23", "more-infinite-research = 5.0.21000"]
+}

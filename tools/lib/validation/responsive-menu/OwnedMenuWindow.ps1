@@ -17,9 +17,20 @@ public static class MIROwnedMenuNative {
   [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
   [DllImport("user32.dll")] public static extern bool IsIconic(IntPtr h);
   [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr h, out uint pid);
+  public static bool TrySameOwnedProcess(IntPtr h, uint ownedPid, out bool sameProcess) {
+    sameProcess = false;
+    uint candidatePid;
+    if (GetWindowThreadProcessId(h, out candidatePid) == 0 || candidatePid == 0) return false;
+    sameProcess = candidatePid == ownedPid;
+    return true;
+  }
   [DllImport("user32.dll")] public static extern bool GetClientRect(IntPtr h, out Rect r);
   [DllImport("user32.dll")] public static extern bool ClientToScreen(IntPtr h, ref Point p);
   [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
+  [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
+  [DllImport("kernel32.dll")] public static extern uint GetCurrentThreadId();
+  [DllImport("user32.dll")] public static extern IntPtr GetThreadDesktop(uint threadId);
+  [DllImport("user32.dll", SetLastError=true)] public static extern bool AttachThreadInput(uint attachingThread, uint attachedThread, bool attach);
   [DllImport("user32.dll")] public static extern IntPtr WindowFromPoint(Point p);
   [DllImport("user32.dll")] public static extern IntPtr GetAncestor(IntPtr h, uint flag);
   [DllImport("user32.dll")] public static extern bool PostMessage(IntPtr h, uint message, UIntPtr w, IntPtr l);
@@ -28,38 +39,310 @@ public static class MIROwnedMenuNative {
 '@
 }
 
-function Get-MIROwnedMenuWindow {
-  param([Parameter(Mandatory)][Diagnostics.Process]$Process, [Parameter(Mandatory)][datetime]$ExpectedStartUtc)
+function New-MIROwnedMenuObserverDiagnostics {
+  [ordered]@{
+    schema=1
+    capture_requests=0
+    captured_frames=0
+    no_main_window=0
+    not_visible_or_minimized=0
+    foreground_mismatch=0
+    foreground_request_attempts=0
+    foreground_request_refused=0
+    foreground_request_not_acquired=0
+    owned_peer_foreground_identity_refused=0
+    owned_peer_foreground_foreign_refused=0
+    owned_peer_foreground_desktop_refused=0
+    owned_peer_foreground_attach_refused=0
+    owned_peer_foreground_activation_refused=0
+    owned_peer_foreground_detach_refused=0
+    owned_peer_foreground_post_detach_not_target=0
+    owned_peer_foreground_already_target_drift=0
+    owned_peer_foreground_last=$null
+    client_geometry_unavailable=0
+    offscreen=0
+    occluded=0
+    last_occlusion=$null
+    last_rejection=''
+  }
+}
+
+function Add-MIROwnedMenuRejection {
+  param([AllowNull()][Collections.IDictionary]$Diagnostics,[Parameter(Mandatory)][string]$Name)
+  if ($null -eq $Diagnostics) { return }
+  if (-not $Diagnostics.Contains($Name)) { throw "[mir-menu-observer-diagnostic-name] $Name" }
+  $Diagnostics[$Name]=[int]$Diagnostics[$Name]+1
+  $Diagnostics.last_rejection=$Name
+}
+
+# These small wrappers keep ownership decisions in this file and let the host
+# controls exercise the Win32 boundary without a graphical Factorio process.
+function Get-MIROwnedMenuMainWindowHandle {
+  param([Parameter(Mandatory)][Diagnostics.Process]$Process)
+  $Process.Refresh()
+  return $Process.MainWindowHandle
+}
+
+function Get-MIROwnedMenuWindowProcessId {
+  param([Parameter(Mandatory)][IntPtr]$Handle)
+  [uint32]$ownerId=0
+  $null=[MIROwnedMenuNative]::GetWindowThreadProcessId($Handle,[ref]$ownerId)
+  return $ownerId
+}
+
+function Test-MIROwnedMenuWindowHandle {
+  param([Parameter(Mandatory)][IntPtr]$Handle)
+  return [MIROwnedMenuNative]::IsWindow($Handle)
+}
+
+function Test-MIROwnedMenuWindowVisible {
+  param([Parameter(Mandatory)][IntPtr]$Handle)
+  return [MIROwnedMenuNative]::IsWindowVisible($Handle)
+}
+
+function Test-MIROwnedMenuWindowIconic {
+  param([Parameter(Mandatory)][IntPtr]$Handle)
+  return [MIROwnedMenuNative]::IsIconic($Handle)
+}
+
+function Get-MIROwnedMenuForegroundHandle {
+  return [MIROwnedMenuNative]::GetForegroundWindow()
+}
+
+function Get-MIROwnedMenuPointRoot {
+  param([Parameter(Mandatory)][int]$X,[Parameter(Mandatory)][int]$Y)
+  $probe = New-Object MIROwnedMenuNative+Point
+  $probe.X=$X; $probe.Y=$Y
+  $under=[MIROwnedMenuNative]::WindowFromPoint($probe)
+  return [MIROwnedMenuNative]::GetAncestor($under,2)
+}
+
+function Get-MIROwnedMenuOcclusion {
+  param([Parameter(Mandatory)][IntPtr]$Handle,[Parameter(Mandatory)][uint32]$OwnedProcessId,[Parameter(Mandatory)][int]$X,[Parameter(Mandatory)][int]$Y,[Parameter(Mandatory)][int]$Width,[Parameter(Mandatory)][int]$Height)
+  $probeIndex=0
+  foreach ($offset in @(@(1,1),@(($Width-2),1),@(1,($Height-2)),@(($Width-2),($Height-2)),@([int]($Width/2),[int]($Height/2)))) {
+    $probeX=$X+$offset[0]; $probeY=$Y+$offset[1]
+    $root=Get-MIROwnedMenuPointRoot -X $probeX -Y $probeY
+    if ($root -ne $Handle) {
+      # Record only our own geometry and a hit-test category. Never collect
+      # foreign window identities, titles, text or pixels for this diagnostic.
+      $relation=if($root-eq[IntPtr]::Zero){'unresolved'}else{Get-MIROwnedMenuHitProcessRelation -Handle $root -OwnedProcessId $OwnedProcessId}
+      return [ordered]@{probe_index=$probeIndex;probe_x=$probeX;probe_y=$probeY;owned_x=$X;owned_y=$Y;owned_width=$Width;owned_height=$Height;hit=$(if($root-eq[IntPtr]::Zero){'no-window'}else{'other-window'});hit_process_relation=$relation}
+    }
+    $probeIndex++
+  }
+  return $null
+}
+
+function Get-MIROwnedMenuHitProcessRelation {
+  param([Parameter(Mandatory)][IntPtr]$Handle,[Parameter(Mandatory)][uint32]$OwnedProcessId)
+  # The native boundary exposes only success and equality, never another PID.
+  [bool]$sameProcess=$false
+  if (-not [MIROwnedMenuNative]::TrySameOwnedProcess($Handle,$OwnedProcessId,[ref]$sameProcess)) { return 'unresolved' }
+  if ($sameProcess) { return 'owned-process' }
+  return 'other-process'
+}
+
+function Set-MIROwnedMenuForegroundHandle {
+  param([Parameter(Mandatory)][IntPtr]$Handle)
+  return [MIROwnedMenuNative]::SetForegroundWindow($Handle)
+}
+
+function Get-MIROwnedMenuWindowThreadId {
+  param([Parameter(Mandatory)][IntPtr]$Handle)
+  [uint32]$ownerId=0
+  return [uint32][MIROwnedMenuNative]::GetWindowThreadProcessId($Handle,[ref]$ownerId)
+}
+
+function Get-MIROwnedMenuControllerThreadId {
+  return [uint32][MIROwnedMenuNative]::GetCurrentThreadId()
+}
+
+function Get-MIROwnedMenuThreadDesktop {
+  param([Parameter(Mandatory)][uint32]$ThreadId)
+  return [MIROwnedMenuNative]::GetThreadDesktop($ThreadId)
+}
+
+function Connect-MIROwnedMenuInputThread {
+  param([Parameter(Mandatory)][uint32]$AttachingThread,[Parameter(Mandatory)][uint32]$AttachedThread,[Parameter(Mandatory)][bool]$Attach)
+  return [MIROwnedMenuNative]::AttachThreadInput($AttachingThread,$AttachedThread,$Attach)
+}
+
+function Assert-MIROwnedMenuOwnedPeerWindow {
+  param(
+    [Parameter(Mandatory)][Diagnostics.Process]$Process,
+    [Parameter(Mandatory)][datetime]$ExpectedStartUtc,
+    [Parameter(Mandatory)][string]$ExpectedExecutable,
+    [Parameter(Mandatory)][IntPtr]$ExpectedHandle,
+    [Parameter(Mandatory)][ValidateSet('target','peer')][string]$Role
+  )
+  $Process.Refresh()
+  if ($Process.HasExited -or $Process.StartTime.ToUniversalTime() -ne $ExpectedStartUtc) { throw "[mir-menu-owned-peer-$Role-identity]" }
+  $actualExecutable=[IO.Path]::GetFullPath([string]$Process.MainModule.FileName)
+  if ($actualExecutable -cne [IO.Path]::GetFullPath($ExpectedExecutable)) { throw "[mir-menu-owned-peer-$Role-executable]" }
+  $actualHandle=Get-MIROwnedMenuMainWindowHandle $Process
+  if ($actualHandle -eq [IntPtr]::Zero -or $actualHandle -ne $ExpectedHandle -or -not(Test-MIROwnedMenuWindowHandle $actualHandle) -or (Get-MIROwnedMenuWindowProcessId $actualHandle) -ne $Process.Id) { throw "[mir-menu-owned-peer-$Role-window]" }
+  if (-not(Test-MIROwnedMenuWindowVisible $actualHandle) -or (Test-MIROwnedMenuWindowIconic $actualHandle)) { throw "[mir-menu-owned-peer-$Role-not-visible]" }
+  $threadId=Get-MIROwnedMenuWindowThreadId $actualHandle
+  if ($threadId -eq 0) { throw "[mir-menu-owned-peer-$Role-thread]" }
+  return [pscustomobject]@{process=$Process;handle=$actualHandle;thread_id=[uint32]$threadId}
+}
+
+function Invoke-MIROwnedMenuOwnedPeerForeground {
+  param(
+    [Parameter(Mandatory)][Diagnostics.Process]$TargetProcess,
+    [Parameter(Mandatory)][datetime]$TargetExpectedStartUtc,
+    [Parameter(Mandatory)][string]$TargetExpectedExecutable,
+    [Parameter(Mandatory)][IntPtr]$TargetHandle,
+    [Parameter(Mandatory)][Diagnostics.Process]$PeerProcess,
+    [Parameter(Mandatory)][datetime]$PeerExpectedStartUtc,
+    [Parameter(Mandatory)][string]$PeerExpectedExecutable,
+    [Parameter(Mandatory)][IntPtr]$PeerHandle,
+    [Parameter(Mandatory)][Collections.IDictionary]$Diagnostics
+  )
+  # This is an opt-in, one-shot capture-boundary fallback. It never grants
+  # foreground permission generally and never attaches to an unknown window.
+  # AttachThreadInput resets queue key state: call only at a quiescent capture
+  # boundary after synchronous actor release, and always detach before capture.
+  # https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-attachthreadinput
+  $attempted=$false;$attached=$false;$detached=$false;$setForeground=$false;$before='unobserved';$after='unobserved';$outcome='started';$failure=$null
+  try {
+    $target=Assert-MIROwnedMenuOwnedPeerWindow -Process $TargetProcess -ExpectedStartUtc $TargetExpectedStartUtc -ExpectedExecutable $TargetExpectedExecutable -ExpectedHandle $TargetHandle -Role target
+    $peer=Assert-MIROwnedMenuOwnedPeerWindow -Process $PeerProcess -ExpectedStartUtc $PeerExpectedStartUtc -ExpectedExecutable $PeerExpectedExecutable -ExpectedHandle $PeerHandle -Role peer
+    if ($target.process.Id -eq $peer.process.Id -or $target.handle -eq $peer.handle) { throw '[mir-menu-owned-peer-distinct-identities]' }
+    $controllerThread=Get-MIROwnedMenuControllerThreadId
+    if ($controllerThread -eq 0 -or $controllerThread -eq $target.thread_id -or $controllerThread -eq $peer.thread_id -or $target.thread_id -eq $peer.thread_id) { throw '[mir-menu-owned-peer-thread-identity]' }
+    $controllerDesktop=Get-MIROwnedMenuThreadDesktop $controllerThread;$targetDesktop=Get-MIROwnedMenuThreadDesktop $target.thread_id;$peerDesktop=Get-MIROwnedMenuThreadDesktop $peer.thread_id
+    if ($controllerDesktop -eq [IntPtr]::Zero -or $targetDesktop -eq [IntPtr]::Zero -or $peerDesktop -eq [IntPtr]::Zero -or $controllerDesktop -ne $targetDesktop -or $controllerDesktop -ne $peerDesktop) { throw '[mir-menu-owned-peer-desktop]' }
+    $foreground=Get-MIROwnedMenuForegroundHandle
+    $before=if($foreground-eq$target.handle){'target'}elseif($foreground-eq$peer.handle){'peer'}elseif($foreground-eq[IntPtr]::Zero){'none'}else{'other'}
+    if($before-ceq'target'){
+      # The normal asynchronous request may have won the race. Revalidate only
+      # our two owned windows and foreground state; never attach in this path.
+      $null=Assert-MIROwnedMenuOwnedPeerWindow -Process $TargetProcess -ExpectedStartUtc $TargetExpectedStartUtc -ExpectedExecutable $TargetExpectedExecutable -ExpectedHandle $TargetHandle -Role target
+      $null=Assert-MIROwnedMenuOwnedPeerWindow -Process $PeerProcess -ExpectedStartUtc $PeerExpectedStartUtc -ExpectedExecutable $PeerExpectedExecutable -ExpectedHandle $PeerHandle -Role peer
+      if((Get-MIROwnedMenuForegroundHandle)-ne$target.handle){throw '[mir-menu-owned-peer-already-target-foreground]'}
+      $after='target-revalidated';$outcome='already-target'
+    }elseif($before-ceq'peer'){
+      $attempted=$true
+      if (-not(Connect-MIROwnedMenuInputThread -AttachingThread $controllerThread -AttachedThread $peer.thread_id -Attach $true)) { throw '[mir-menu-owned-peer-attach]' }
+      $attached=$true
+      if (-not(Set-MIROwnedMenuForegroundHandle $target.handle)) { throw '[mir-menu-owned-peer-activation]' }
+      $setForeground=$true
+      if ((Get-MIROwnedMenuForegroundHandle) -ne $target.handle) { throw '[mir-menu-owned-peer-activation]' }
+      $after='target';$outcome='activated'
+    }else{throw '[mir-menu-owned-peer-foreground]'}
+  } catch {
+    $failure=$_.Exception.Message
+    if ($failure -match 'desktop') { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_desktop_refused';$outcome='desktop-refused' }
+    elseif ($failure -match 'already-target') { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_already_target_drift';$outcome='already-target-drift' }
+    elseif ($failure -match 'foreground') { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_foreign_refused';$outcome='foreground-refused' }
+    elseif ($failure -match 'attach') { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_attach_refused';$outcome='attach-refused' }
+    elseif ($failure -match 'activation') { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_activation_refused';$outcome='activation-refused' }
+    else { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_identity_refused';$outcome='identity-refused' }
+  } finally {
+    if ($attached) {
+      if (Connect-MIROwnedMenuInputThread -AttachingThread $controllerThread -AttachedThread $peer.thread_id -Attach $false) { $detached=$true }
+      else { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_detach_refused';$outcome='detach-refused';if($null-eq$failure){$failure='[mir-menu-owned-peer-detach]'} }
+    }
+  }
+  if($null-eq$failure-and$attached-and$detached){
+    try {
+      $null=Assert-MIROwnedMenuOwnedPeerWindow -Process $TargetProcess -ExpectedStartUtc $TargetExpectedStartUtc -ExpectedExecutable $TargetExpectedExecutable -ExpectedHandle $TargetHandle -Role target
+      $null=Assert-MIROwnedMenuOwnedPeerWindow -Process $PeerProcess -ExpectedStartUtc $PeerExpectedStartUtc -ExpectedExecutable $PeerExpectedExecutable -ExpectedHandle $PeerHandle -Role peer
+      if((Get-MIROwnedMenuForegroundHandle)-ne$TargetHandle){throw '[mir-menu-owned-peer-post-detach-foreground]'}
+      $after='target-post-detach'
+    } catch {
+      $failure=$_.Exception.Message
+      if($failure-match'post-detach-foreground'){Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_post_detach_not_target';$outcome='post-detach-not-target'}
+      else{Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_identity_refused';$outcome='post-detach-identity-refused'}
+    }
+  }
+  $Diagnostics.owned_peer_foreground_last=[ordered]@{kind='MIROwnedMenuOwnedPeerForegroundV1';attempted=$attempted;before_foreground=$before;after_foreground=$after;attached=$attached;detached=$detached;set_foreground=$setForeground;outcome=$outcome}
+  if($null-ne$failure){throw $failure}
+  return $Diagnostics.owned_peer_foreground_last
+}
+
+function Request-MIROwnedMenuForeground {
+  param(
+    [Parameter(Mandatory)][Diagnostics.Process]$Process,
+    [Parameter(Mandatory)][datetime]$ExpectedStartUtc,
+    [Parameter(Mandatory)][IntPtr]$Handle,
+    [Parameter(Mandatory)][Collections.IDictionary]$Diagnostics
+  )
   $Process.Refresh()
   if ($Process.HasExited) { throw '[mir-menu-owned-process-exited]' }
   if ($Process.StartTime.ToUniversalTime() -ne $ExpectedStartUtc) { throw '[mir-menu-owned-process-identity]' }
-  $handle = $Process.MainWindowHandle
-  if ($handle -eq [IntPtr]::Zero) { return $null }
-  $ownerId = [uint32]0
-  $null = [MIROwnedMenuNative]::GetWindowThreadProcessId($handle, [ref]$ownerId)
-  if ($ownerId -ne $Process.Id -or -not [MIROwnedMenuNative]::IsWindow($handle)) { throw '[mir-menu-owned-window-identity]' }
-  if (-not [MIROwnedMenuNative]::IsWindowVisible($handle) -or [MIROwnedMenuNative]::IsIconic($handle)) { return $null }
-  if ([MIROwnedMenuNative]::GetForegroundWindow() -ne $handle) { return $null }
+  if ((Get-MIROwnedMenuWindowProcessId $Handle) -ne $Process.Id -or -not(Test-MIROwnedMenuWindowHandle $Handle)) { throw '[mir-menu-owned-window-identity]' }
+  if (-not(Test-MIROwnedMenuWindowVisible $Handle) -or (Test-MIROwnedMenuWindowIconic $Handle)) {
+    Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'not_visible_or_minimized'
+    return $false
+  }
+  $Diagnostics.foreground_request_attempts=[int]$Diagnostics.foreground_request_attempts+1
+  if (-not(Set-MIROwnedMenuForegroundHandle $Handle)) {
+    Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'foreground_request_refused'
+    return $false
+  }
+  if ((Get-MIROwnedMenuForegroundHandle) -ne $Handle) {
+    Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'foreground_request_not_acquired'
+    return $false
+  }
+  return $true
+}
+
+function Get-MIROwnedMenuWindow {
+  param([Parameter(Mandatory)][Diagnostics.Process]$Process, [Parameter(Mandatory)][datetime]$ExpectedStartUtc,[AllowNull()][Collections.IDictionary]$Diagnostics=$null,[switch]$AttemptForeground)
+  $Process.Refresh()
+  if ($Process.HasExited) { throw '[mir-menu-owned-process-exited]' }
+  if ($Process.StartTime.ToUniversalTime() -ne $ExpectedStartUtc) { throw '[mir-menu-owned-process-identity]' }
+  $handle = Get-MIROwnedMenuMainWindowHandle $Process
+  if ($handle -eq [IntPtr]::Zero) { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'no_main_window'; return $null }
+  if ((Get-MIROwnedMenuWindowProcessId $handle) -ne $Process.Id -or -not(Test-MIROwnedMenuWindowHandle $handle)) { throw '[mir-menu-owned-window-identity]' }
+  if (-not(Test-MIROwnedMenuWindowVisible $handle) -or (Test-MIROwnedMenuWindowIconic $handle)) { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'not_visible_or_minimized'; return $null }
+  if ((Get-MIROwnedMenuForegroundHandle) -ne $handle) {
+    if ($AttemptForeground -and $null-ne$Diagnostics -and [int]$Diagnostics.foreground_request_attempts-eq0) {
+      if (-not(Request-MIROwnedMenuForeground -Process $Process -ExpectedStartUtc $ExpectedStartUtc -Handle $handle -Diagnostics $Diagnostics)) { return $null }
+    }
+    if ((Get-MIROwnedMenuForegroundHandle) -ne $handle) { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'foreground_mismatch'; return $null }
+  }
   $rect = New-Object MIROwnedMenuNative+Rect
   $point = New-Object MIROwnedMenuNative+Point
-  if (-not [MIROwnedMenuNative]::GetClientRect($handle, [ref]$rect) -or -not [MIROwnedMenuNative]::ClientToScreen($handle, [ref]$point)) { return $null }
+  if (-not [MIROwnedMenuNative]::GetClientRect($handle, [ref]$rect) -or -not [MIROwnedMenuNative]::ClientToScreen($handle, [ref]$point)) { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'client_geometry_unavailable'; return $null }
   $width = $rect.Right - $rect.Left; $height = $rect.Bottom - $rect.Top
   if ($width -lt 100 -or $height -lt 100 -or $width -gt 4096 -or $height -gt 4096) { throw '[mir-menu-owned-window-bounds]' }
   $screen = [Windows.Forms.SystemInformation]::VirtualScreen
-  if ($point.X -lt $screen.Left -or $point.Y -lt $screen.Top -or $point.X + $width -gt $screen.Right -or $point.Y + $height -gt $screen.Bottom) { return $null }
+  if ($point.X -lt $screen.Left -or $point.Y -lt $screen.Top -or $point.X + $width -gt $screen.Right -or $point.Y + $height -gt $screen.Bottom) { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'offscreen'; return $null }
   # Reject covered capture regions, including a foreign always-on-top window.
-  foreach ($offset in @(@(1,1),@(($width-2),1),@(1,($height-2)),@(($width-2),($height-2)),@([int]($width/2),[int]($height/2)))) {
-    $probe = New-Object MIROwnedMenuNative+Point
-    $probe.X = $point.X + $offset[0]; $probe.Y = $point.Y + $offset[1]
-    $under = [MIROwnedMenuNative]::WindowFromPoint($probe)
-    if ([MIROwnedMenuNative]::GetAncestor($under, 2) -ne $handle) { return $null }
+  $occlusion=Get-MIROwnedMenuOcclusion -Handle $handle -OwnedProcessId $Process.Id -X $point.X -Y $point.Y -Width $width -Height $height
+  if ($null-ne$occlusion) {
+    if ($null-ne$Diagnostics) { $Diagnostics.last_occlusion=$occlusion }
+    Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'occluded'
+    return $null
   }
   [pscustomobject]@{process_id=$Process.Id;start_utc=$ExpectedStartUtc.ToString('o');handle=$handle.ToInt64();x=$point.X;y=$point.Y;width=$width;height=$height}
 }
 
+function Save-MIROwnedMenuBitmapPng {
+  param([Parameter(Mandatory)][Drawing.Bitmap]$Bitmap,[Parameter(Mandatory)][string]$Path)
+  # The observer reuses this path on every capture.  Saving through an explicit
+  # Create stream prevents bytes from an earlier, longer PNG surviving after
+  # the new image's IEND chunk.
+  $stream=$null
+  $fullPath=[IO.Path]::GetFullPath($Path)
+  try {
+    $stream=[IO.File]::Open($fullPath,[IO.FileMode]::Create,[IO.FileAccess]::Write,[IO.FileShare]::None)
+    $Bitmap.Save($stream,[Drawing.Imaging.ImageFormat]::Png)
+    $stream.Flush($true)
+  } finally {
+    if($null-ne$stream){$stream.Dispose()}
+  }
+  return $fullPath
+}
+
 function Save-MIROwnedMenuCapture {
-  param([Parameter(Mandatory)][Diagnostics.Process]$Process,[Parameter(Mandatory)][datetime]$ExpectedStartUtc,[Parameter(Mandatory)][string]$Path)
-  $before = Get-MIROwnedMenuWindow $Process $ExpectedStartUtc
+  param([Parameter(Mandatory)][Diagnostics.Process]$Process,[Parameter(Mandatory)][datetime]$ExpectedStartUtc,[Parameter(Mandatory)][string]$Path,[AllowNull()][Collections.IDictionary]$Diagnostics=$null)
+  if ($null-ne$Diagnostics) { $Diagnostics.capture_requests=[int]$Diagnostics.capture_requests+1 }
+  $before = Get-MIROwnedMenuWindow -Process $Process -ExpectedStartUtc $ExpectedStartUtc -Diagnostics $Diagnostics -AttemptForeground
   if ($null -eq $before) { return $null }
   $startQpc = [Diagnostics.Stopwatch]::GetTimestamp()
   $bitmap = New-Object Drawing.Bitmap($before.width,$before.height)
@@ -72,16 +355,17 @@ function Save-MIROwnedMenuCapture {
     try {
       if (-not [MIROwnedMenuNative]::PrintWindow([IntPtr]$before.handle,$dc,3)) { throw '[mir-menu-owned-window-capture-failed]' }
     } finally { $graphics.ReleaseHdc($dc) }
-    $after = Get-MIROwnedMenuWindow $Process $ExpectedStartUtc
+    $after = Get-MIROwnedMenuWindow -Process $Process -ExpectedStartUtc $ExpectedStartUtc -Diagnostics $Diagnostics
     if ($null -eq $after -or ($before | ConvertTo-Json -Compress) -cne ($after | ConvertTo-Json -Compress)) { return $null }
-    $bitmap.Save([IO.Path]::GetFullPath($Path),[Drawing.Imaging.ImageFormat]::Png)
-    [pscustomobject]@{window=$after;method='owned-hwnd-printwindow-client';capture_started_qpc=$startQpc;capture_completed_qpc=[Diagnostics.Stopwatch]::GetTimestamp();path=[IO.Path]::GetFullPath($Path)}
+    $capturedPath=Save-MIROwnedMenuBitmapPng -Bitmap $bitmap -Path $Path
+    if ($null-ne$Diagnostics) { $Diagnostics.captured_frames=[int]$Diagnostics.captured_frames+1 }
+    [pscustomobject]@{window=$after;method='owned-hwnd-printwindow-client';capture_started_qpc=$startQpc;capture_completed_qpc=[Diagnostics.Stopwatch]::GetTimestamp();path=$capturedPath}
   } finally { $graphics.Dispose(); $bitmap.Dispose() }
 }
 
 function Send-MIROwnedMenuSettingsAction {
-  param([Parameter(Mandatory)][Diagnostics.Process]$Process,[Parameter(Mandatory)][datetime]$ExpectedStartUtc,[Parameter(Mandatory)]$Capture,[Parameter(Mandatory)]$Observation)
-  $current = Get-MIROwnedMenuWindow $Process $ExpectedStartUtc
+  param([Parameter(Mandatory)][Diagnostics.Process]$Process,[Parameter(Mandatory)][datetime]$ExpectedStartUtc,[Parameter(Mandatory)]$Capture,[Parameter(Mandatory)]$Observation,[AllowNull()][Collections.IDictionary]$Diagnostics=$null)
+  $current = Get-MIROwnedMenuWindow -Process $Process -ExpectedStartUtc $ExpectedStartUtc -Diagnostics $Diagnostics
   if ($null -eq $current -or ($current | ConvertTo-Json -Compress) -cne ($Capture.window | ConvertTo-Json -Compress)) { throw '[mir-menu-owned-action-window-changed]' }
   if ($Observation.width -ne $current.width -or $Observation.height -ne $current.height) { throw '[mir-menu-owned-action-image-size]' }
   $target = Get-MIRMenuSettingsTarget $Observation
@@ -111,9 +395,15 @@ function Read-MIRMenuInitialisedLiveLog {
 }
 
 function Wait-MIROwnedMenuResponse {
-  param([Parameter(Mandatory)][Diagnostics.Process]$Process,[Parameter(Mandatory)][datetime]$ExpectedStartUtc,[Parameter(Mandatory)]$Ocr,[Parameter(Mandatory)][string]$OutputRoot,[Parameter(Mandatory)][long]$LaunchQpc,[ValidateRange(1,300)][int]$TimeoutSeconds=30,[string]$RequiredInitialisedLog='')
+  param([Parameter(Mandatory)][Diagnostics.Process]$Process,[Parameter(Mandatory)][datetime]$ExpectedStartUtc,[Parameter(Mandatory)]$Ocr,[Parameter(Mandatory)][string]$OutputRoot,[Parameter(Mandatory)][long]$LaunchQpc,[ValidateRange(1,300)][int]$TimeoutSeconds=30,[string]$RequiredInitialisedLog='',[AllowNull()][Collections.IDictionary]$Diagnostics=$null)
+  if ($null-eq$Diagnostics) { $Diagnostics=New-MIROwnedMenuObserverDiagnostics }
   $timer = [Diagnostics.Stopwatch]::StartNew()
   $firstMenu = $null; $action = $null; $response = $null; $attempts = 0; $maxObserverSeconds = 0.0
+  # Return the first 64 completed capture/classification attempts on success,
+  # without another capture, file or timed logging call. Ownership rejections
+  # remain in Diagnostics; endpoint records stay separate even after truncation.
+  $attemptDiagnostics=[Collections.Generic.List[object]]::new()
+  $attemptDiagnosticsLimit=64
   $path = Join-Path $OutputRoot 'latest-owned-window.png'
   $initialisedLogObserved = $false
   while ($timer.Elapsed.TotalSeconds -lt $TimeoutSeconds) {
@@ -127,11 +417,14 @@ function Wait-MIROwnedMenuResponse {
       $initialisedLogObserved = $true
     }
     $observerTimer = [Diagnostics.Stopwatch]::StartNew()
-    $capture = Save-MIROwnedMenuCapture $Process $ExpectedStartUtc $path
+    $capture = Save-MIROwnedMenuCapture -Process $Process -ExpectedStartUtc $ExpectedStartUtc -Path $path -Diagnostics $Diagnostics
     if ($null -eq $capture) { Start-Sleep -Milliseconds 100; continue }
     $observation = Read-MIRMenuImage $Ocr $capture.path
+    $ocrCompletedQpc=[Diagnostics.Stopwatch]::GetTimestamp()
     $attempts++
     $state = Get-MIRMenuState $observation
+    $classifiedQpc=[Diagnostics.Stopwatch]::GetTimestamp()
+    $attemptPhase=if($null-eq$action){'await-main-menu'}else{'await-settings-response'}
     if ($state -eq 'blocked-or-loading') { throw '[mir-menu-blocked-or-loading-after-initialisation]' }
     if ($null -eq $action -and $state -eq 'main-menu') {
       $firstMenu = [pscustomobject]@{capture=$capture;ocr=$observation;observed_qpc=[Diagnostics.Stopwatch]::GetTimestamp()}
@@ -139,7 +432,7 @@ function Wait-MIROwnedMenuResponse {
       [IO.File]::Copy($path,$mainImage,$true)
       $firstMenu.capture.path = [IO.Path]::GetFullPath($mainImage)
       $firstMenu.capture | Add-Member -NotePropertyName sha256 -NotePropertyValue (Get-MIRMenuFileSha256 $mainImage)
-      $action = Send-MIROwnedMenuSettingsAction $Process $ExpectedStartUtc $capture $observation
+      $action = Send-MIROwnedMenuSettingsAction -Process $Process -ExpectedStartUtc $ExpectedStartUtc -Capture $capture -Observation $observation -Diagnostics $Diagnostics
     } elseif ($null -ne $action -and $state -eq 'settings-menu') {
       $response = [pscustomobject]@{capture=$capture;ocr=$observation;observed_qpc=[Diagnostics.Stopwatch]::GetTimestamp()}
       $responseImage = Join-Path $OutputRoot 'settings-response.png'
@@ -147,10 +440,13 @@ function Wait-MIROwnedMenuResponse {
       $response.capture.path = [IO.Path]::GetFullPath($responseImage)
       $response.capture | Add-Member -NotePropertyName sha256 -NotePropertyValue (Get-MIRMenuFileSha256 $responseImage)
     }
+    if($attemptDiagnostics.Count-lt$attemptDiagnosticsLimit){
+      $attemptDiagnostics.Add([pscustomobject][ordered]@{ordinal=$attempts;phase=$attemptPhase;state=$state;capture_started_qpc=[long]$capture.capture_started_qpc;capture_completed_qpc=[long]$capture.capture_completed_qpc;ocr_completed_qpc=$ocrCompletedQpc;classified_qpc=$classifiedQpc;iteration_finished_qpc=[Diagnostics.Stopwatch]::GetTimestamp()})
+    }
     $maxObserverSeconds = [Math]::Max($maxObserverSeconds,$observerTimer.Elapsed.TotalSeconds)
     if ($null -ne $response) {
       $frequency = [double][Diagnostics.Stopwatch]::Frequency
-      return [pscustomobject]@{status='owned-menu-settings-response-observed';process_id=$Process.Id;launch_qpc=$LaunchQpc;clock_frequency=$frequency;first_render_observed_seconds=($firstMenu.observed_qpc-$LaunchQpc)/$frequency;confirmed_response_seconds=($response.observed_qpc-$LaunchQpc)/$frequency;interaction_response_seconds=($response.observed_qpc-$action.posted_qpc)/$frequency;observer_max_iteration_seconds=$maxObserverSeconds;poll_interval_milliseconds=100;capture_attempts=$attempts;first_menu=$firstMenu;action=$action;response=$response;claims_factorio_acceptance=$false}
+      return [pscustomobject]@{status='owned-menu-settings-response-observed';process_id=$Process.Id;launch_qpc=$LaunchQpc;clock_frequency=$frequency;first_render_observed_seconds=($firstMenu.observed_qpc-$LaunchQpc)/$frequency;confirmed_response_seconds=($response.observed_qpc-$LaunchQpc)/$frequency;interaction_response_seconds=($response.observed_qpc-$action.posted_qpc)/$frequency;observer_max_iteration_seconds=$maxObserverSeconds;poll_interval_milliseconds=100;capture_attempts=$attempts;observer_attempt_diagnostics=[pscustomobject]@{limit=$attemptDiagnosticsLimit;omitted=($attempts-$attemptDiagnostics.Count);attempts=@($attemptDiagnostics.ToArray())};first_menu=$firstMenu;action=$action;response=$response;claims_factorio_acceptance=$false}
     }
     Start-Sleep -Milliseconds 100
   }

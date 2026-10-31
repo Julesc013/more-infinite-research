@@ -1,0 +1,255 @@
+{
+  "kind": "MIR5NativeFixtureV1",
+  "status": "failed",
+  "case": "bob-angel-continuity-mir5",
+  "source_head": "5eb0d8ed0e6f47a3c60fe79e3f0ebeed9a22024c",
+  "source_dirty": false,
+  "harness_sha256": "C3C7FD214E7400D038C2513D93CA53D5E6B4674AD609293C5224809504C8D36C",
+  "native_probe_sha256": "7DE4BD5B86B30BC6702D4F02EE6808F368EB2372C25FB10D8EA1CB576E67EEC6",
+  "governor_sha256": "9E27C4DDCCC10028246F89A09A7663F7FCA1D7BD26444681A7A8635F74D9BE96",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "file_version": "2.0.77.84539",
+    "product_version": "2.0.77",
+    "base_version": "2.0.77"
+  },
+  "profile": {
+    "sha256": "351871A58DA289CA880FA10F17763C9BACE1D340C6301F1E189A4E01CBEBA7C0",
+    "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\tests\\mir5\\profiles\\bob-angel-continuity-f200.json"
+  },
+  "fixtures": [
+    {
+      "source": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39985808892-1\\fixture-sources\\bob-angel-continuity\\mir5",
+      "sha256": "146BD8EEB1581B4AC52C7EC7B7E286BCE1F28748B02415A16FE21E6F0B34DAD9",
+      "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-bob-angel-continuity_0.2.0.zip"
+    },
+    {
+      "source": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39985808892-1\\fixture-sources\\active-mods-observer",
+      "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+      "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+    }
+  ],
+  "historical_target": null,
+  "mir_archive": {
+    "sha256": "2F2DECBFDCFEAC49F45146F1CF754A5BA1B6D3EF55DCC023AA158D1E45A103B2",
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+  },
+  "observation": "native-fixture-production-and-two-cold-reloads",
+  "input_save": null,
+  "release_qualification": false,
+  "initial_admission_wait": {
+    "phase": "fixture-initial",
+    "admission_wait_seconds": 30,
+    "status": "admitted-without-wait",
+    "attempt_count": 1,
+    "refusal_count": 0,
+    "elapsed_seconds": 0.062,
+    "first_refusal": null,
+    "last_refusal": null,
+    "last_error": null,
+    "started_at": "2026-10-23T16:19:54.0163775+00:00",
+    "deadline_at": "2026-10-23T16:20:24.0163775+00:00",
+    "admission": {
+      "observed_at": "2026-10-23T16:19:54.0546253+00:00",
+      "memory": {
+        "total_bytes": 34045980672,
+        "free_bytes": 20192382976,
+        "committed_bytes": 18932162560,
+        "commit_limit_bytes": 44388642816
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 204972335104,
+        "total_bytes": 599395090432
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 204972335104,
+        "total_bytes": 599395090432
+      }
+    }
+  },
+  "active_mods_observer": {
+    "name": "mir-fixture-mir5-active-mods-observer",
+    "version": "0.1.0",
+    "source": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39985808892-1\\fixture-sources\\active-mods-observer",
+    "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "failure": "[mir441-process-exit] 1",
+  "resource_admission": null,
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "351871A58DA289CA880FA10F17763C9BACE1D340C6301F1E189A4E01CBEBA7C0",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.0.77",
+        "path": "D:\\Games\\Factorio\\2.0\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "1B6DF063:00070000001F6A5B",
+        "sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786",
+        "bytes": 193
+      },
+      {
+        "name": "angelsbioprocessing",
+        "version": "2.0.3",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\angelsbioprocessing_2.0.3.zip",
+        "builtin": false,
+        "identity": "1B6DF063:005600000001A2B8",
+        "sha256": "766B5784C3EB7A0B43D1B2C58ABCEC47EA69E4677129DC5C9255BEB66DC86B1B",
+        "bytes": 167665
+      },
+      {
+        "name": "angelsbioprocessinggraphics",
+        "version": "2.0.0",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\angelsbioprocessinggraphics_2.0.0.zip",
+        "builtin": false,
+        "identity": "1B6DF063:003E00000001A24C",
+        "sha256": "8C4DCBBF61772C4276A9B655FB9173A4D3B0FCE0872D8F60FD8600225A16AB66",
+        "bytes": 28984409
+      },
+      {
+        "name": "angelspetrochem",
+        "version": "2.0.3",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\angelspetrochem_2.0.3.zip",
+        "builtin": false,
+        "identity": "1B6DF063:002C00000001A304",
+        "sha256": "DFEBBC1F4E9F13016006071CBB064FF6289EFBAF92A7290D716C0D1E8C20430D",
+        "bytes": 171774
+      },
+      {
+        "name": "angelspetrochemgraphics",
+        "version": "2.0.1",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\angelspetrochemgraphics_2.0.1.zip",
+        "builtin": false,
+        "identity": "1B6DF063:00E500000001A2F9",
+        "sha256": "B8D877865D50E1157EED80CCE56F21174A69D81453075A825A837AB375CF3262",
+        "bytes": 21046201
+      },
+      {
+        "name": "angelsrefining",
+        "version": "2.0.4",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\angelsrefining_2.0.4.zip",
+        "builtin": false,
+        "identity": "1B6DF063:002E00000001A307",
+        "sha256": "8E78BA1FE453BA90999F6FECED81F9DBF41F1EF49EEB423BA6C4CE08C1DCDC42",
+        "bytes": 524566
+      },
+      {
+        "name": "angelsrefininggraphics",
+        "version": "2.0.0",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\angelsrefininggraphics_2.0.0.zip",
+        "builtin": false,
+        "identity": "1B6DF063:003000000001A306",
+        "sha256": "0B09E4335640DC580F742B04F9C109ED544F74A685C11CB1878B33DB36D7AF25",
+        "bytes": 85675072
+      },
+      {
+        "name": "angelssmelting",
+        "version": "2.0.5",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\angelssmelting_2.0.5.zip",
+        "builtin": false,
+        "identity": "1B6DF063:001000000001A30C",
+        "sha256": "6DDF5D7BAF4BACDE0398E47BF29EF3AECE41A34F33210439AD0C60C7ADE7FBB4",
+        "bytes": 198937
+      },
+      {
+        "name": "angelssmeltinggraphics",
+        "version": "2.0.0",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\angelssmeltinggraphics_2.0.0.zip",
+        "builtin": false,
+        "identity": "1B6DF063:002600000001A309",
+        "sha256": "D638AA7A67405811279F96370BF5FC026CCE476048FDF16D91261354A858C6EF",
+        "bytes": 43682108
+      },
+      {
+        "name": "bobelectronics",
+        "version": "2.1.1",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\bobelectronics_2.1.1.zip",
+        "builtin": false,
+        "identity": "1B6DF063:007C00000001A44F",
+        "sha256": "BF11C8AB53F732564770DB0E7AAD24C07AF30196DA49394FA6E03E85939B38F3",
+        "bytes": 464241
+      },
+      {
+        "name": "boblibrary",
+        "version": "2.1.0",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\boblibrary_2.1.0.zip",
+        "builtin": false,
+        "identity": "1B6DF063:001100000001A455",
+        "sha256": "1CB971B7A39F0805F14DD0F27F17CC832B7FFC6608CB2234E182062FC8DBF62B",
+        "bytes": 5538241
+      },
+      {
+        "name": "bobores",
+        "version": "2.1.2",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\bobores_2.1.2.zip",
+        "builtin": false,
+        "identity": "1B6DF063:000A00000001A459",
+        "sha256": "BB0916DC28C1DD2E4A62E3F102298F7C47B5E07930FA5C84302B0879D983DF94",
+        "bytes": 150993
+      },
+      {
+        "name": "bobplates",
+        "version": "2.1.1",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\bobplates_2.1.1.zip",
+        "builtin": false,
+        "identity": "1B6DF063:000F00000001A45B",
+        "sha256": "A6DBCA13C579E6E65E2A8E2D605AC97C789771F3C6E2660AA0F19AE1049FC77B",
+        "bytes": 7477119
+      },
+      {
+        "name": "bobrevamp",
+        "version": "2.1.1",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\bobrevamp_2.1.1.zip",
+        "builtin": false,
+        "identity": "1B6DF063:007200000001A45D",
+        "sha256": "CF9AD291B6135125E29CDF452DC363101FDDAAB759DC9F713FE51DC29F1B9EEB",
+        "bytes": 289565
+      },
+      {
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+        "builtin": false,
+        "identity": "1B6DF063:0008000000023718",
+        "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "bytes": 834
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.20000",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+        "builtin": false,
+        "identity": "1B6DF063:000D0000000217BA",
+        "sha256": "2F2DECBFDCFEAC49F45146F1CF754A5BA1B6D3EF55DCC023AA158D1E45A103B2",
+        "bytes": 366963
+      },
+      {
+        "name": "mir-fixture-mir5-bob-angel-continuity",
+        "version": "0.2.0",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-bob-angel-continuity_0.2.0.zip",
+        "builtin": false,
+        "identity": "1B6DF063:00060000000218C5",
+        "sha256": "146BD8EEB1581B4AC52C7EC7B7E286BCE1F28748B02415A16FE21E6F0B34DAD9",
+        "bytes": 7865
+      }
+    ]
+  },
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "interrupted",
+      "ledger": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39985808892-1\\gameplay\\fresh\\process-1.resources.jsonl",
+      "stdout": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39985808892-1\\gameplay\\fresh\\process-1.stdout.txt",
+      "stderr": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39985808892-1\\gameplay\\fresh\\process-1.stderr.txt",
+      "error": "[mir441-process-exit] 1"
+    }
+  ]
+}
