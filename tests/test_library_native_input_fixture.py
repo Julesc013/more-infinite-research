@@ -230,6 +230,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                     self.assertEqual(
                         hashlib.sha256(profile_bytes).hexdigest().upper(), profile["profile"]["sha256"]
                     )
+                    profile_value = json.loads(profile_bytes)
                     members = {row["destination"]: row for row in profile["owned_fixture"]["members"]}
                     self.assertEqual(set(members), {"control.lua", "info.json"})
                     control = raw_git_bytes(members["control.lua"])
@@ -248,6 +249,10 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                     )
                     self.assertEqual(
                         profile["archive_sha256"]["mir-fixture-mir5-library-native-input_0.3.0.zip"],
+                        profile["owned_fixture"]["sha256"],
+                    )
+                    self.assertEqual(
+                        profile_value["archive_sha256"]["mir-fixture-mir5-library-native-input_0.3.0.zip"],
                         profile["owned_fixture"]["sha256"],
                     )
 

@@ -48,7 +48,7 @@
       "profile": {
         "path": "tests/profiles/library-native-input-imported110-f200-2077-r13.json",
         "bytes": 3396,
-        "sha256": "628E1BBCD67F480307CE166570F62A89FEF58C9DDE3DC2F71CB7889C71F00E0A"
+        "sha256": "56CB938A996EA6F2DA2B138C6E99FD06F95E5E4227D881FC722EE1C1DBF7A4D9"
       },
       "engine": {
         "version": "2.0.77",
@@ -63,12 +63,12 @@
         "more-infinite-research_5.0.20000.zip": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
         "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
         "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "D30D00A0D57A2A8195565E52DCEFDF94B92DCBA37DC85A83B37245336157E9C0",
-        "mir-fixture-mir5-library-native-input_0.3.0.zip": "4F0290A7FD5C50C1D4FC1B8FFD66EED823555F0DE84CCB2096F951F917C881E3"
+        "mir-fixture-mir5-library-native-input_0.3.0.zip": "CA76C6A425E935A7C8F116848725E10DF334C86C2AE433288057593C98DDEC44"
       },
       "owned_fixture": {
         "name": "mir-fixture-mir5-library-native-input_0.3.0.zip",
-        "bytes": 8162,
-        "sha256": "4F0290A7FD5C50C1D4FC1B8FFD66EED823555F0DE84CCB2096F951F917C881E3",
+        "bytes": 8164,
+        "sha256": "CA76C6A425E935A7C8F116848725E10DF334C86C2AE433288057593C98DDEC44",
         "local_custody": "build/qualification/library-input-removal-observed-r13/f200/input/mir-fixture-mir5-library-native-input_0.3.0.zip",
         "members": [
           {
@@ -80,10 +80,10 @@
           },
           {
             "source": "tests/fixtures/library-native-input/info-input-identity-f200.json",
-            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "source_revision": "70e4f235dfd94e9be09d317377e8661608390069",
             "destination": "info.json",
-            "bytes": 345,
-            "sha256": "CC35B55624B2F95EAA2B198048C2C413D787F4EB3FD62EB0938E68CA2B5A7F81"
+            "bytes": 349,
+            "sha256": "498FFA9E29D14132F150B2B2B8FBA38FD087D289D8331455D17411E6C915017C"
           }
         ]
       }
@@ -95,7 +95,7 @@
       "profile": {
         "path": "tests/profiles/library-native-input-imported110-f210-2123-r13.json",
         "bytes": 3396,
-        "sha256": "BB7A108EA02AB52C9FA622584FD0DA47077744BA3573CA55A6657AB571DB2CA2"
+        "sha256": "27ACCA4C6CBAA76AF31FC2F88583E8E06EE1578732FE18E46F1439FF2E39E38A"
       },
       "engine": {
         "version": "2.1.23",
@@ -110,12 +110,12 @@
         "more-infinite-research_5.0.21000.zip": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
         "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
         "mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip": "E07DF42B2FBFACEA5BA32F3E616AF5BBFAB4E355B116187DC023252CFCD09B43",
-        "mir-fixture-mir5-library-native-input_0.3.0.zip": "4A9CCFE443ED8FC6BD7BA6A877A168365DEA3A53B724C57815601D1CC58B5369"
+        "mir-fixture-mir5-library-native-input_0.3.0.zip": "A5BF0786076AD75769006C324C5EB14EC8B1A659EA0CB3D6220E2608C3652562"
       },
       "owned_fixture": {
         "name": "mir-fixture-mir5-library-native-input_0.3.0.zip",
-        "bytes": 8165,
-        "sha256": "4A9CCFE443ED8FC6BD7BA6A877A168365DEA3A53B724C57815601D1CC58B5369",
+        "bytes": 8168,
+        "sha256": "A5BF0786076AD75769006C324C5EB14EC8B1A659EA0CB3D6220E2608C3652562",
         "local_custody": "build/qualification/library-input-removal-observed-r13/f210/input/mir-fixture-mir5-library-native-input_0.3.0.zip",
         "members": [
           {
@@ -127,10 +127,10 @@
           },
           {
             "source": "tests/fixtures/library-native-input/info-input-identity-f210.json",
-            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "source_revision": "70e4f235dfd94e9be09d317377e8661608390069",
             "destination": "info.json",
-            "bytes": 345,
-            "sha256": "A9B20176471FF3D329306D199EEB02CB99492AC299FEDB63DA27C9429C0524B5"
+            "bytes": 349,
+            "sha256": "02D5DBA0239808B897F95461B6D2A7A89D79F11230E29D77F9110FB05D12230F"
           }
         ]
       }
@@ -155,7 +155,7 @@
     "disposition": "The r09 export rows and their raw member pins remain exactly those frozen rows; this input-only preparation neither rebuilds nor qualifies support exports."
   },
   "validation": {
-    "raw_control": "Both r13 archives contain the exact 7cf raw control blob and target-specific d9e raw metadata blobs. The historical r12 projection continues to resolve each member from its own recorded source revision.",
+    "raw_control": "Both r13 archives contain the exact 7cf raw control blob and target-specific 70e no-order metadata blobs. The historical r12 projection continues to resolve each member from its own recorded source revision.",
     "archive_reproduction": "The r13 projections use Python zipfile with ZIP_DEFLATED compresslevel9 per member, fixed 1980 timestamp, create_system3, and Unix100644 external attributes. No dependency archive was copied, extracted, linked, or replaced.",
     "native_execution": false,
     "release_qualification": false
