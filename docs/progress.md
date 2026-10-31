@@ -1,7 +1,7 @@
 ---
 title: "MIR 5 release progress and continuation"
 status: current
-applies_to: "MIR 5.0.0 replacement development"
+applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
@@ -605,6 +605,13 @@ The [policy-v1 current-package applicability review](../spec/evidence/legacy-boo
 The [current005D R05 discovery inputs](../spec/evidence/discovery-recovery-current005d-prepared-inputs-r01.json) supplied protected3.2.0/EC0E, exact2.1.23/8DC, retained A7E fixture and2E1 observer without changing their payloads or the queued iron unit. Independent review caught a missing observer source in the draft command; the corrected two-source packet passed the existing archive/observer guards, and missing/duplicate observer controls refused. The packet was preparation rather than a native result. The later [current native successor](../spec/evidence/discovery-current7a2-native-chain-r01.json) now closes the selected3.2.0 route with its own lab/save/two-reload result. Original a575/7CE execution and prior refusals remain separate; later3.2.1/ambiguous-lock behavior and release acceptance remain unqualified.
 
 ## Ordered remaining work
+
+| Release decision | Current rule |
+|---|---|
+| Next source version | 5.0.1; keep the published 5.0.0 tag and ZIPs unchanged. Do not bump package metadata before a public release. |
+| Maturity | If 5.0.1 ships as a GitHub prerelease and stable work changes package bytes, publish the successor as 5.0.2 stable. If the exact 5.0.1 ZIPs pass stable gates unchanged, promote their release metadata. If no 5.0.1 prerelease ships, 5.0.1 may be the stable release. |
+| Library restoration | Active branch adds the accepted retained/split layout, close/size controls, localized research/recipe/settings search, affected-recipe details, and on-demand science-flow view. The ordered 149 host controls pass. No native GUI or stable acceptance is claimed. |
+| Remaining audit | Complete the real-input/visual Library checks and the historical behavior/test dispositions. Reuse unaffected evidence; do not replay every old campaign. |
 
 The 31 October first-beta checkpoint freezes source125fc7464414dbbe769fee160399e0cb5a9c9eed/source-tree0f5f0c63083e1aa15a1976494c83fb404fcc9d2c in seventeen unchanged player ZIPs plus two checksum files, inventory2E263EF28AABA4660BFB490ABD4F4CD5CE5AB2AB875F3323DEDC4E9FB862FFBF. The [independent package/upgrade-safety verdict](../spec/evidence/mir5-beta-00-package-upgrade-safety-r01.json) verifies all seventeen reconstructed ZIPs/1530 members and adopts only the recorded nine same-edition4.7.3 routes, seven selected older-contract groups and four named forward routes. The [one-off startup snapshot](../spec/evidence/mir5-beta-00-startup-snapshot-r01.json) records six normal-graphical initialization cohorts and three separately verified menu cohorts on2.0.77/2.1.23, with original before/after controls, exact historical archives, lossless bodies and all adverse outcomes preserved. It is ordered N=1 with no reboot/cache clearing, not performance acceptance or a gameplay-lag estimate; the2.1 heavy initialization column is retrospective and does not repair failed menu observations. The maintainer authorizes this GitHub-only build00 beta with Library input/export/personal-view and full performance acceptance deferred to stable. Package/provenance/scoped upgrade safety remain mandatory and have a beta GO; checked promotion, both administration probes, one mutable prerelease, nineteen verified public assets and primary delivery remain publication steps. Final docs/evidence are package-excluded and do not rename native execution or alter the frozen player tree. Stable follows the same finite queue below without restarting completed campaigns.
 

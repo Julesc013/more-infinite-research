@@ -508,6 +508,56 @@ class LibraryModelTests(unittest.TestCase):
           assert(#hidden == 1 and hidden[1].hidden and hidden[1].status == "ready")
         ''')
 
+    def test_localized_recipe_and_product_search_text_is_separate_from_the_caption(self):
+        self.lua.execute('''
+          local id = "recipe-prod-research_gears-1"
+          local gear = technology(id)
+          local force = {technologies = {[id] = gear}, research_queue = {}}
+          local translated = {[id] = "Gear productivity\\31Gear recipe\\31Gear product"}
+          local declared = {{id = id, family = "research_gears"}}
+          local rows = model.rows(force, declared, {search = "gear product"}, translated)
+          assert(#rows == 1 and rows[1].name == "Gear productivity"
+            and rows[1].search_text == "Gear recipe\\31Gear product")
+          assert(#model.rows(force, declared, {search = "gear recipe"}, translated) == 1)
+          assert(#model.rows(force, declared, {search = "not a translated term"}, translated) == 0)
+        ''')
+
+    def test_selected_detail_retains_bounded_affected_recipe_targets_beyond_effect_preview(self):
+        self.lua.execute('''
+          local id = "recipe-prod-research_gears-1"
+          local effects = {}
+          for index = 1, 70 do
+            effects[index] = {type = "change-recipe-productivity", recipe = "recipe-" .. index, change = .1}
+          end
+          local gear = technology(id, {effects = effects})
+          local force = {technologies = {[id] = gear}, research_queue = {}}
+          local detail = assert(model.detail(force, {{id = id, family = "research_gears"}}, {selected = id}, {}))
+          assert(#detail.effects == 16 and not detail.effects_complete)
+          assert(#detail.recipe_targets == 70 and detail.recipe_targets_complete)
+          assert(detail.recipe_targets[1] == "recipe-1" and detail.recipe_targets[70] == "recipe-70")
+          detail.recipe_targets[1] = "changed"
+          assert(effects[1].recipe == "recipe-1")
+        ''')
+
+    def test_search_localization_payload_contains_bounded_recipe_and_product_names(self):
+        self.lua.execute('''
+          local localization = require("presentation.library_localization")
+          local request, subjects, limited = localization.search_request({
+            name = "research-gears", localised_name = {"technology-name.research-gears"},
+            prototype = {effects = {{type="unlock-recipe", recipe="gear-recipe"}}}
+          }, {
+            recipe = { ["gear-recipe"] = {localised_name={"recipe-name.gear"},products={{type="item",name="gear"}}} },
+            item = {gear = {localised_name={"item-name.gear"}}}, fluid = {}
+          })
+          assert(type(request) == "table" and subjects == 2 and not limited)
+          assert(request[1] == "" and #request <= 20)
+          local rows = model.rows({technologies={
+            ["recipe-prod-research_gears-1"] = technology("recipe-prod-research_gears-1")
+          }, research_queue={}}, {{id="recipe-prod-research_gears-1",family="research_gears"}},
+            {search="localized-product"}, {["recipe-prod-research_gears-1"]="Gear research\\31Localized recipe\\31Localized product"})
+          assert(#rows == 1)
+        ''')
+
     def test_selected_detail_is_bounded_and_never_reuses_native_tables(self):
         self.lua.execute('''
           local id = "recipe-prod-research_gears-1"

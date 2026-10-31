@@ -1,4 +1,4 @@
--- Private, first vertical slice of the MIR Research Library.
+-- Player-local Research Library presentation and interaction.
 --
 -- The catalogue/model modules own research facts. This module owns only a
 -- player's small view preference and GUI construction. Control.lua must route
@@ -12,9 +12,12 @@ local settings_catalog = require("research.settings")
 local effective_configuration = require("runtime.configuration")
 local profile_codec = require("research.settings_profile")
 local library_model = require("presentation.library_model")
+local library_layout = require("presentation.library_layout")
+local library_localization = require("presentation.library_localization")
 local availability = require("presentation.availability")
 local target = require("platform.target")
 local translation_queue = require("runtime.library_translations")
+local library_production = require("runtime.library_production")
 local support_exports
 if helpers and type(helpers.write_file) == "function" then
   support_exports = require("runtime.settings_commands")
@@ -37,6 +40,7 @@ local MAX_HIDDEN = 128
 local MAX_PAGE = 30000
 local MAX_FAMILY_DESCRIPTORS = 128
 local MAX_SETTING_DESCRIPTORS = 2048
+local SETTING_TRANSLATION_PREFIX = "@setting:"
 local LEGACY_NAMESPACE = "mir"
 local LEGACY_BROWSER_KEY = "research_browser"
 local LEGACY_ROOT_MARKER = "mir_browser_tabs"
@@ -47,6 +51,8 @@ local LEGACY_SNAPSHOT_MAX_STRING = 4096
 local cap_provider = nil
 local TRANSLATION_SCHEMA = 1
 local TRANSLATION_MAINTENANCE_TICKS = 61
+local setting_groups_cache
+local setting_prototype_cache
 local TABS = {"research", "queue", "settings", "help"}
 local TAB_INDEX = {research = 1, queue = 2, settings = 3, help = 4}
 
@@ -279,6 +285,12 @@ local function location(value)
   return {x = value.x, y = value.y}
 end
 
+local function geometry(value)
+  if type(value) ~= "table" or not finite_number(value.width) or not finite_number(value.height) then return nil end
+  if value.width < 1 or value.height < 1 then return nil end
+  return {width = math.floor(value.width), height = math.floor(value.height)}
+end
+
 local function local_view(raw)
   raw = type(raw) == "table" and raw or {}
   local value = {
@@ -300,6 +312,7 @@ local function local_view(raw)
     open = raw.open == true,
     refresh_pending = raw.refresh_pending == true,
     location = location(raw.location),
+    geometry = geometry(raw.geometry),
     scroll = type(raw.scroll) == "number" and raw.scroll > 0 and math.floor(raw.scroll) or 1
   }
   -- The data-only model independently normalizes its own read surface. Keep
@@ -397,7 +410,7 @@ local function reconnect_translation_caches()
   if type(working) ~= "table" then return end
   for index, saved in pairs(working) do
     if whole_number(index, 1) and type(saved) == "table" and saved.schema == 1
-        and technology_id(saved.family) ~= nil and type(saved.scope) == "table"
+        and (saved.family == "settings" or technology_id(saved.family) ~= nil) and type(saved.scope) == "table"
         and saved.scope.player_index == index
         and translation_queue.labels(saved.cache, saved.scope) ~= nil then
       translation_caches[index] = {
@@ -441,15 +454,24 @@ local function same_translation_scope(left, right)
     and left.force_index == right.force_index and left.generation == right.generation
 end
 
+local function setting_prototypes_by_name()
+  if setting_prototype_cache ~= nil then return setting_prototype_cache end
+  local ok, values = pcall(settings_catalog.prototypes)
+  if not ok or type(values) ~= "table" or #values > MAX_SETTING_DESCRIPTORS then return nil end
+  local result = {}
+  for _, prototype in ipairs(values) do
+    if type(prototype) ~= "table" or type(prototype.name) ~= "string" or prototype.name == ""
+      or result[prototype.name] ~= nil then return nil end
+    result[prototype.name] = prototype
+  end
+  setting_prototype_cache = result
+  return setting_prototype_cache
+end
+
 -- Authored-only family views translate only declared technologies that exist
 -- in this force. All/external views scan the caller's current native force
 -- once per family/scope change and keep a bounded deterministic request order.
 local function ordered_translation_ids(player, family)
-  local ok, declared = pcall(authored_declarations)
-  if not ok or type(declared) ~= "table" then return nil end
-  local force = player and player.force
-  local technologies = force and force.technologies
-  if technologies == nil then return nil end
   local ids, seen = {}, {}
   local function add_id(id)
     if type(id) ~= "string" or id == "" or #id > translation_queue.label_limit then return false end
@@ -459,6 +481,19 @@ local function ordered_translation_ids(player, family)
     ids[#ids + 1] = id
     return true
   end
+  if family == "settings" then
+    local names_ok, names = pcall(settings_catalog.registered_names)
+    if not names_ok or type(names) ~= "table" or #names > MAX_SETTING_DESCRIPTORS then return nil end
+    for _, name in ipairs(names) do
+      if type(name) ~= "string" or name == "" or not add_id(SETTING_TRANSLATION_PREFIX .. name) then return nil end
+    end
+    return ids
+  end
+  local ok, declared = pcall(authored_declarations)
+  if not ok or type(declared) ~= "table" then return nil end
+  local force = player and player.force
+  local technologies = force and force.technologies
+  if technologies == nil then return nil end
   local function technology_exists(id)
     local found, technology = pcall(function() return technologies[id] end)
     return found and valid(technology)
@@ -597,6 +632,7 @@ local function legacy_view_as_private(value)
     settings_query = value.settings_search,
     setting_selected = value.setting_selection,
     location = value.location,
+    geometry = value.geometry,
     scroll = value.scroll
   })
 end
@@ -740,7 +776,8 @@ end
 local function open_translation_cache(player, view)
   local index = player and player.index
   if not whole_number(index, 1) then return nil end
-  local family = type(view) == "table" and family_option(view.family) or "mir"
+  local family = type(view) == "table" and view.tab == "settings" and "settings"
+    or (type(view) == "table" and family_option(view.family) or "mir")
   local retained = translation_caches[index]
   local same_live_scope = retained and retained.scope and retained.scope.locale == player.locale
     and retained.scope.force_index == (player.force and player.force.index)
@@ -810,14 +847,29 @@ local function current_tick()
 end
 
 local function request_translation(player, key)
-  if private_credit_id(key) or not valid(player) or player.connected ~= true
+  if not valid(player) or player.connected ~= true
       or type(player.request_translation) ~= "function" then return nil end
   local ok, request_id = pcall(function()
+    local setting_name = type(key) == "string" and key:match("^" .. SETTING_TRANSLATION_PREFIX .. "(.+)$") or nil
+    if setting_name then
+      local prototypes = setting_prototypes_by_name()
+      local prototype = prototypes and prototypes[setting_name] or nil
+      if prototype == nil or prototype.localised_name == nil then return nil end
+      return player.request_translation(prototype.localised_name)
+    end
+    if private_credit_id(key) then return nil end
     local force = player.force
     local technologies = force and force.technologies
     local technology = technologies and technologies[key] or nil
     if not valid(technology) then return nil end
-    return player.request_translation(technology.localised_name)
+    local collections = {}
+    local collections_ok = pcall(function()
+      collections.recipe = prototypes and prototypes.recipe
+      collections.item = prototypes and prototypes.item
+      collections.fluid = prototypes and prototypes.fluid
+    end)
+    local payload = collections_ok and library_localization.search_request(technology, collections) or technology.localised_name
+    return player.request_translation(payload)
   end)
   return ok and request_id or nil
 end
@@ -891,11 +943,70 @@ end
 
 local function native_item_name(id)
   local ok, name = pcall(function()
-    local item = prototypes.item[id]
+    local item = prototypes.item[id] or (prototypes.fluid and prototypes.fluid[id])
     return valid(item) and item.localised_name or nil
   end)
   if ok and (type(name) == "table" or (type(name) == "string" and name ~= "")) then return name end
   return nil
+end
+
+local function affected_recipe_rows(player, detail)
+  local result = {}
+  if type(detail) ~= "table" or type(detail.recipe_targets) ~= "table" then return result end
+  local seen = {}
+  for _, id in ipairs(detail.recipe_targets) do
+    if type(id) == "string" and id ~= "" and not seen[id] then
+      seen[id] = true
+      local ok, recipe = pcall(function()
+        local force_recipe = player.force and player.force.recipes and player.force.recipes[id]
+        if valid(force_recipe) then return force_recipe end
+        return prototypes.recipe and prototypes.recipe[id]
+      end)
+      if ok and valid(recipe) then
+        local ok_name, name = pcall(function()
+          return recipe.localised_name or (recipe.prototype and recipe.prototype.localised_name)
+        end)
+        result[#result + 1] = {id = id, recipe = recipe, name = ok_name and name or id}
+      end
+    end
+  end
+  return result
+end
+
+local add
+
+local function show_production_snapshot(panel, player, technology)
+  if not valid(panel) then return end
+  panel.clear()
+  local report = library_production.snapshot(player, technology)
+  if type(report) ~= "table" then
+    add(panel, {type = "label", name = PREFIX .. "production_unavailable", caption = {"mir-browser.production-unavailable"}})
+    return
+  end
+  local scope_caption = report.scope == "force"
+    and {"mir-browser.production-scope-force", report.force_name}
+    or {"mir-browser.production-scope", report.force_name, report.surface_name}
+  add(panel, {type = "label", name = PREFIX .. "production_scope", caption = scope_caption})
+  add(panel, {type = "label", name = PREFIX .. "production_snapshot",
+    caption = {"mir-browser.production-snapshot", tostring(report.tick)}})
+  add(panel, {type = "label", name = PREFIX .. "production_note", caption = {"mir-browser.production-note"}})
+  for index, row in ipairs(report.rows) do
+    local item = native_item_name(row.name) or row.name
+    add(panel, {type = "label", name = PREFIX .. "production_row_" .. index,
+      caption = {"mir-browser.production-row", item, string.format("%.3g", row.produced),
+        string.format("%.3g", row.consumed), string.format("%.3g", row.balance)}})
+  end
+end
+
+local function open_recipe_entry(player, detail, index)
+  if type(player.open_factoriopedia_gui) ~= "function" then return false end
+  local recipe = affected_recipe_rows(player, detail)[index]
+  if recipe == nil then return false end
+  local ok = pcall(function()
+    local prototype = recipe.recipe.prototype or recipe.recipe
+    player.open_factoriopedia_gui(prototype)
+  end)
+  return ok
 end
 
 local function caption(row, player)
@@ -915,7 +1026,7 @@ local function row_index(rows, selected)
   return nil
 end
 
-local function add(parent, spec)
+add = function(parent, spec)
   local element = parent.add(spec)
   -- Bound only this owned GUI subtree. Native labels wrap inside their
   -- container; no world/catalogue work is involved in sizing a requested view.
@@ -947,10 +1058,17 @@ local function detail_lines(parent, row, detail, player)
     return
   end
 
-  add(parent, {type = "label", name = PREFIX .. "detail_title", caption = caption(row, player)})
+  local technology = known_technology(player, row.id)
+  if technology then
+    add(parent, {type = "sprite", name = PREFIX .. "detail_icon", sprite = "technology/" .. row.id,
+      tooltip = technology.localised_name})
+  end
+  local title = add(parent, {type = "label", name = PREFIX .. "detail_title", caption = caption(row, player)})
+  if title.style then title.style.font = "default-large-bold" end
   local family = row.family or "mir"
   local family_name = family_caption(family, {[family] = native_technology_name(player, row.id)})
-  add(parent, {type = "label", name = PREFIX .. "detail_family", caption = {"mir-browser.family", family_name}})
+  local family_label = add(parent, {type = "label", name = PREFIX .. "detail_family", caption = {"mir-browser.family", family_name}})
+  if family_label.style then family_label.style.font = "default-semibold" end
   local context = add(parent, {type = "flow", name = PREFIX .. "detail_context", direction = "vertical"})
   local status_key = {
     ready = "mir-browser.status-ready",
@@ -988,7 +1106,8 @@ local function detail_lines(parent, row, detail, player)
     add(parent, {type = "label", name = PREFIX .. "detail_cost", caption = {"mir-browser.research-cost", tostring(type(detail.cost) == "table" and (detail.cost.count or detail.cost[1] or "?") or detail.cost), tostring(research_seconds(detail.cost))}})
     if type(detail.cost) == "table" and type(detail.cost.ingredients) == "table"
         and #detail.cost.ingredients > 0 then
-      add(parent, {type = "label", name = PREFIX .. "detail_science", caption = {"mir-browser.science"}})
+      local science_heading = add(parent, {type = "label", name = PREFIX .. "detail_science", caption = {"mir-browser.science"}})
+      if science_heading.style then science_heading.style.font = "default-bold" end
       for index, ingredient in ipairs(detail.cost.ingredients) do
         if type(ingredient) == "table" then
           add(parent, {type = "label", name = PREFIX .. "science_" .. index,
@@ -998,14 +1117,16 @@ local function detail_lines(parent, row, detail, player)
     end
   end
   if type(detail) == "table" and type(detail.prerequisites) == "table" and #detail.prerequisites > 0 then
-    add(parent, {type = "label", name = PREFIX .. "detail_prerequisites", caption = {"mir-browser.prerequisites"}})
+    local prerequisite_heading = add(parent, {type = "label", name = PREFIX .. "detail_prerequisites", caption = {"mir-browser.prerequisites"}})
+    if prerequisite_heading.style then prerequisite_heading.style.font = "default-bold" end
     for index, prerequisite in ipairs(detail.prerequisites) do
       add(parent, {type = "label", name = PREFIX .. "prerequisite_" .. index,
         caption = native_technology_name(player, prerequisite) or tostring(prerequisite)})
     end
   end
   if type(detail) == "table" and type(detail.effects) == "table" and #detail.effects > 0 then
-    add(parent, {type = "label", name = PREFIX .. "detail_benefits", caption = {"mir-browser.benefits"}})
+    local benefits_heading = add(parent, {type = "label", name = PREFIX .. "detail_benefits", caption = {"mir-browser.benefits"}})
+    if benefits_heading.style then benefits_heading.style.font = "default-bold" end
     for index, effect in ipairs(detail.effects) do
       local effect_type = type(effect) == "table" and effect.type or effect
       local change = type(effect) == "table" and (effect.change or effect.modifier) or nil
@@ -1022,11 +1143,58 @@ local function detail_lines(parent, row, detail, player)
       add(parent, {type = "label", name = PREFIX .. "effect_" .. index, caption = text_value})
     end
   end
+  local recipe_rows = affected_recipe_rows(player, detail)
+  if #recipe_rows > 0 then
+    local recipe_heading = add(parent, {type = "label", name = PREFIX .. "detail_affected_recipes",
+      caption = {"mir-browser.affected-recipes"}})
+    if recipe_heading.style then recipe_heading.style.font = "default-bold" end
+    local items = {}
+    for index, recipe in ipairs(recipe_rows) do
+      items[index] = {"", "[img=recipe/" .. recipe.id .. "] ", recipe.name}
+    end
+    local recipe_navigation = type(player.open_factoriopedia_gui) == "function"
+    local recipe_hint = recipe_navigation and "mir-browser.recipe-select-hint" or "mir-browser.recipe-list-only-hint"
+    local list = add(parent, {type = "list-box", name = PREFIX .. "recipe_list", items = items,
+      selected_index = 0, tooltip = {recipe_hint}})
+    if list.style then
+      list.style.width = parent.style and parent.style.maximal_width or 560
+      list.style.height = math.min(196, math.max(72, #items * 28))
+    end
+    if not recipe_navigation then
+      add(parent, {type = "label", name = PREFIX .. "recipe_hint", caption = {recipe_hint}})
+    end
+  end
+  if type(detail) == "table" and type(detail.cost) == "table"
+      and type(detail.cost.ingredients) == "table" and #detail.cost.ingredients > 0 then
+    add(parent, {type = "button", name = PREFIX .. "production_check",
+      caption = {"mir-browser.production-check"}})
+    add(parent, {type = "flow", name = PREFIX .. "production_results", direction = "vertical"})
+  end
 end
 
 local function tab_content(frame, tab)
   local tabs = frame and frame[PREFIX .. "tabs"]
   return valid(tabs) and tabs[PREFIX .. tab .. "_content"] or nil
+end
+
+local function research_content_type(player, view)
+  local width, height = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
+  local pairs_per_row = library_layout.filter_layout(width)
+  local content_width = style_pixels(width - 48)
+  local content_height = style_pixels(library_layout.content_height(height, pairs_per_row))
+  return library_layout.split_sizes(content_width, content_height).columns == 1 and "scroll-pane" or "table"
+end
+
+local function frame_layout_ready(frame, player, view)
+  local title = frame and frame[PREFIX .. "title"]
+  local tabs = frame and frame[PREFIX .. "tabs"]
+  local research = valid(tabs) and tabs[PREFIX .. "research_content"] or nil
+  local settings = valid(tabs) and tabs[PREFIX .. "settings_content"] or nil
+  return valid(title) and valid(title[PREFIX .. "layout_smaller"])
+    and valid(title[PREFIX .. "layout_larger"]) and valid(title[PREFIX .. "layout_reset"])
+    and valid(title[PREFIX .. "close"])
+    and valid(research) and research.type == research_content_type(player, view)
+    and valid(settings) and valid(settings.type == "scroll-pane" and settings or nil)
 end
 
 local function update_research_content(content, player, view, context, translations)
@@ -1037,29 +1205,55 @@ local function update_research_content(content, player, view, context, translati
   local item_labels = {}
   for index, row in ipairs(rows) do item_labels[index] = caption(row, player) end
   local selected_index = row_index(rows, view.selected) or 0
+  if selected_index == 0 and #rows > 0 and view.selected == nil then
+    selected_index, view.selected = 1, rows[1].id
+  end
+  local width = content.style and content.style.maximal_width or 592
+  local height = content.style and content.style.maximal_height or 220
+  local panes = library_layout.split_sizes(width, height)
+  if content.type == "table" then content.column_count = panes.columns end
+  local selected = selected_index > 0 and rows[selected_index] or nil
+  if selected then
+    view.selected = selected.id
+    selected.hidden = view.hidden[selected.id] == true
+  end
+
+  local actions
+  if panes.columns == 1 then
+    actions = add(content, {type = "flow", name = PREFIX .. "actions", direction = "horizontal"})
+    add(actions, {type = "label", name = PREFIX .. "count", caption = {"mir-browser.count", #rows}})
+  else
+    add(content, {type = "label", name = PREFIX .. "count", caption = {"mir-browser.count", #rows}})
+    actions = add(content, {type = "flow", name = PREFIX .. "actions", direction = "horizontal"})
+  end
+  add(actions, {type = "sprite-button", name = PREFIX .. "hide", style = "tool_button",
+    sprite = selected and selected.hidden and "utility/expand" or "utility/collapse",
+    enabled = selected ~= nil,
+    tooltip = {"mir-browser." .. (selected and selected.hidden and "show-tooltip" or "hide-tooltip")}})
+  add(actions, {type = "button", name = PREFIX .. "inspect_settings", caption = {"mir-browser.settings"},
+    enabled = selected ~= nil and type(selected.cap_setting) == "string", tooltip = {"mir-browser.inspect-settings"}})
+  add(actions, {type = "sprite-button", name = PREFIX .. "open_native", style = "tool_button",
+    sprite = "utility/side_menu_technology_icon",
+    enabled = selected ~= nil, tooltip = {"mir-browser.open-research"}})
+  add(actions, {type = "button", name = PREFIX .. "close", caption = {"mir-browser.close"}})
+  if view.visibility == 2 then
+    add(actions, {type = "sprite-button", name = PREFIX .. "show_hidden", style = "tool_button",
+      sprite = "utility/reset", tooltip = {"mir-browser.show-hidden"}})
+  end
+
   local results = add(content, {type = "list-box", name = PREFIX .. "results", items = item_labels, selected_index = selected_index})
+  if results.style then results.style.width, results.style.height = panes.list_width, panes.list_height end
   if view.scroll and view.scroll <= #item_labels and type(results.scroll_to_item) == "function" then
     results.scroll_to_item(view.scroll, "top-third")
   end
-  add(content, {type = "label", name = PREFIX .. "count", caption = {"mir-browser.count", #rows}})
-
-  local selected = selected_index > 0 and rows[selected_index] or nil
-  if selected then view.selected = selected.id end
   local detail = selected and selected_detail(player, view, context, translations) or nil
-  local detail_box = add(content, {type = "flow", name = PREFIX .. "detail", direction = "vertical"})
-  -- A maximum only caps growth: it does not prevent a vertical detail flow
-  -- from shrinking to the natural width of one short child. Give this one
-  -- owned detail flow the already-established research pane width before its
-  -- labels are added, so long native ingredient IDs can wrap in the pane.
-  local detail_width = content.style and content.style.maximal_width
-  if detail_box.style and type(detail_width) == "number" and detail_width > 0 then
-    detail_box.style.width = detail_width
+  local detail_box = add(content, {type = "scroll-pane", name = PREFIX .. "detail",
+    horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
+  if detail_box.style then
+    detail_box.style.width, detail_box.style.height = panes.detail_width, panes.detail_height
+    detail_box.style.maximal_width = panes.detail_width
   end
   detail_lines(detail_box, selected, detail, player)
-
-  local actions = add(content, {type = "flow", name = PREFIX .. "actions", direction = "horizontal"})
-  add(actions, {type = "button", name = PREFIX .. "open_native", caption = {"mir-browser.open-research"}, enabled = selected ~= nil})
-  add(actions, {type = "button", name = PREFIX .. "close", caption = {"mir-browser.close"}})
 end
 
 local function setting_value(startup, name, fallback)
@@ -1081,18 +1275,15 @@ local function setting_display(name, value)
 end
 
 local function setting_catalogue()
+  -- Startup settings and their imported-profile precedence cannot change
+  -- during a running session. Build the bounded grouping once, then reuse it
+  -- for search keystrokes, selection changes and window resizing.
+  if setting_groups_cache ~= nil then return setting_groups_cache end
   local ok, names = pcall(settings_catalog.registered_names)
   if not ok or type(names) ~= "table" or #names > MAX_SETTING_DESCRIPTORS then return nil end
 
-  local prototypes, by_name = {}, {}
-  local prototypes_ok, all_prototypes = pcall(settings_catalog.prototypes)
-  if prototypes_ok and type(all_prototypes) == "table" then
-    for _, prototype in ipairs(all_prototypes) do
-      if type(prototype) == "table" and type(prototype.name) == "string" then
-        prototypes[prototype.name] = prototype
-      end
-    end
-  end
+  local prototypes, by_name = setting_prototypes_by_name(), {}
+  if prototypes == nil then return nil end
 
   local startup = settings and settings.startup or nil
   local effective_ok, effective = pcall(settings_catalog.effective_values, startup, helpers)
@@ -1153,16 +1344,32 @@ local function setting_catalogue()
     end)
   end
   table.sort(ordered, function(left, right) return left.key < right.key end)
-  return ordered
+  setting_groups_cache = ordered
+  return setting_groups_cache
 end
 
-local function setting_search_matches(group, query)
+local function setting_search_matches(group, query, translations)
   if query == "" then return true end
-  local haystack = group.search:lower():gsub("[-_]", " ")
+  local haystack = group.search
+  if type(translations) == "table" then
+    for _, field in ipairs(group.fields) do
+      local label = translations[SETTING_TRANSLATION_PREFIX .. field.name]
+      if type(label) == "string" and label ~= "" then haystack = haystack .. " " .. label end
+    end
+  end
+  haystack = haystack:lower():gsub("[-_]", " ")
   return haystack:find(query:lower():gsub("[-_]", " "), 1, true) ~= nil
 end
 
-local function update_settings_content(content, view, preserve_query)
+local function settings_group_key(setting_name)
+  if type(setting_name) ~= "string" then return nil end
+  local ok, spec = pcall(settings_catalog.spec, setting_name)
+  if not ok or type(spec) ~= "table" then return setting_name end
+  local stream = type(spec.stream) == "table" and spec.stream or nil
+  return stream and type(stream.key) == "string" and stream.key or setting_name
+end
+
+local function update_settings_content(content, view, preserve_query, translations)
   if not valid(content) then return end
   local toolbar = content[PREFIX .. "settings_toolbar"]
   if not valid(toolbar) then
@@ -1178,31 +1385,57 @@ local function update_settings_content(content, view, preserve_query)
   end
   local query = content[PREFIX .. "settings_query"]
   if not valid(query) then
-    query = add(content, {type = "textfield", name = PREFIX .. "settings_query", text = view.settings_query})
+    query = add(content, {type = "textfield", name = PREFIX .. "settings_query", text = view.settings_query,
+      tooltip = {"mir-browser.search-settings"}})
   elseif not preserve_query then
     query.text = view.settings_query
   end
   local dynamic = content[PREFIX .. "settings_dynamic"]
-  if not valid(dynamic) then dynamic = add(content, {type = "flow", name = PREFIX .. "settings_dynamic", direction = "vertical"}) end
+  if not valid(dynamic) then dynamic = add(content, {type = "table", name = PREFIX .. "settings_dynamic", column_count = 2}) end
+  if dynamic.style and content.style then
+    dynamic.style.width = content.style.maximal_width or content.style.width or 592
+    dynamic.style.maximal_width = content.style.maximal_width or content.style.width or 592
+    local available_height = content.style.maximal_height or content.style.height or 220
+    local dynamic_height = math.max(80, available_height - 64)
+    dynamic.style.height, dynamic.style.maximal_height = dynamic_height, dynamic_height
+  end
   dynamic.clear()
 
   local groups = setting_catalogue()
   if groups == nil then
+    dynamic.column_count = 1
     add(dynamic, {type = "label", name = PREFIX .. "settings_unavailable", caption = {"mir-browser.detail-unavailable", "settings"}})
     return
   end
   local visible, items = {}, {}
   for _, group in ipairs(groups) do
-    if group.scope == view.settings_scope and setting_search_matches(group, view.settings_query) then
+    if group.scope == view.settings_scope and setting_search_matches(group, view.settings_query, translations) then
       visible[#visible + 1], items[#items + 1] = group, group.title
     end
   end
   local selected_index = 0
   for index, group in ipairs(visible) do if group.key == view.setting_selected then selected_index = index; break end end
-  if selected_index == 0 and #visible > 0 then selected_index, view.setting_selected = 1, visible[1].key end
-  local list = add(dynamic, {type = "list-box", name = PREFIX .. "settings_list", items = items, selected_index = selected_index})
+  if selected_index == 0 and #visible > 0 then
+    selected_index, view.setting_selected = 1, visible[1].key
+  end
+  local width = dynamic.style and dynamic.style.maximal_width or 592
+  local height = dynamic.style and dynamic.style.maximal_height or 156
+  local panes = library_layout.split_sizes(width, height)
+  dynamic.column_count = panes.columns
   add(dynamic, {type = "label", name = PREFIX .. "settings_count", caption = {"mir-browser.settings-count", #visible}})
-  local detail = add(dynamic, {type = "flow", name = PREFIX .. "settings_detail", direction = "vertical"})
+  add(dynamic, {type = "label", name = PREFIX .. "settings_scope_label",
+    caption = {"mir-browser.settings-scope-" .. view.settings_scope}})
+  local list = add(dynamic, {type = "list-box", name = PREFIX .. "settings_list", items = items, selected_index = selected_index})
+  if list.style then list.style.width, list.style.height = panes.list_width, panes.list_height end
+  if selected_index > 0 and type(list.scroll_to_item) == "function" then
+    list.scroll_to_item(selected_index, "top-third")
+  end
+  local detail = add(dynamic, {type = "scroll-pane", name = PREFIX .. "settings_detail",
+    horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
+  if detail.style then
+    detail.style.width, detail.style.height = panes.detail_width, panes.detail_height
+    detail.style.maximal_width = panes.detail_width
+  end
   local selected = visible[selected_index]
   if selected == nil then
     add(detail, {type = "label", name = PREFIX .. "settings_empty", caption = {"mir-browser.settings-empty"}})
@@ -1216,6 +1449,9 @@ local function update_settings_content(content, view, preserve_query)
     add(detail, {type = "label", name = name .. "_name", caption = field.caption, tooltip = field.description})
     add(detail, {type = "label", name = name .. "_value", caption = setting_display(field.name, field.effective),
       tooltip = {"mir-browser.setting-provenance", setting_display(field.name, field.direct),
+        setting_display(field.name, field.default), {"mir-browser.source-" .. field.source}}})
+    add(detail, {type = "label", name = name .. "_source",
+      caption = {"mir-browser.setting-provenance", setting_display(field.name, field.direct),
         setting_display(field.name, field.default), {"mir-browser.source-" .. field.source}}})
   end
   add(detail, {type = "label", name = PREFIX .. "settings_source", caption = {"mir-browser.configuration-source"}})
@@ -1260,6 +1496,7 @@ end
 local function update_availability_content(content, player, view)
   if not valid(content) then return end
   content.clear()
+  content.column_count = 1
   -- This bounded view has no compiler ledger and no native catalogue pass. It
   -- presents only the authored terminal explanations selected by exact active
   -- mod and named native-owner facts.
@@ -1316,6 +1553,50 @@ local function show_export_profile(content, encoded)
   end
 end
 
+local function icon_button(parent, name, sprite, tooltip)
+  local control = add(parent, {type = "sprite-button", name = PREFIX .. name,
+    style = "tool_button", sprite = sprite, tooltip = tooltip})
+  if control.style then control.style.width, control.style.height = 30, 30 end
+  return control
+end
+
+local function sync_frame_layout(player, view, frame)
+  local width, height = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
+  local pairs_per_row, control_width = library_layout.filter_layout(width)
+  local content_width = style_pixels(width - 48)
+  local content_height = style_pixels(library_layout.content_height(height, pairs_per_row))
+  if frame.style then
+    frame.style.width, frame.style.height = width, height
+    frame.style.maximal_width = width
+  end
+  local clamped_location = library_layout.clamp_location(view.location, player.display_resolution,
+    player.display_scale, width, height)
+  if clamped_location then
+    view.location = clamped_location
+    frame.location = clamped_location
+  end
+  local filters = frame[PREFIX .. "filters"]
+  if valid(filters) then
+    filters.column_count = 2 * pairs_per_row
+    for _, field in ipairs({"query", "family", "visibility", "mode", "status", "sort"}) do
+      local control = filters[PREFIX .. field]
+      if valid(control) and control.style then control.style.width = control_width end
+    end
+  end
+  local tabs = frame[PREFIX .. "tabs"]
+  if valid(tabs) then
+    if tabs.style then tabs.style.maximal_width = style_pixels(width - 32) end
+    for _, tab_name in ipairs(TABS) do
+      local content = tabs[PREFIX .. tab_name .. "_content"]
+      if valid(content) and content.style then
+        content.style.width, content.style.maximal_width = content_width, content_width
+        content.style.height, content.style.maximal_height = content_height, content_height
+      end
+    end
+  end
+  return width, height, content_width, content_height
+end
+
 local function create_frame(player, view)
   local screen = player.gui and player.gui.screen
   if not valid(screen) then return nil end
@@ -1323,14 +1604,6 @@ local function create_frame(player, view)
     type = "frame", name = ROOT, direction = "vertical",
     tags = {[ROOT_TAG] = true}
   })
-  local resolution, scale = player.display_resolution, player.display_scale
-  scale = type(scale) == "number" and scale > 0 and scale or 1
-  local width = style_pixels(math.min(1000, math.max(1, (resolution and resolution.width or 1280) / scale - 32)))
-  local height = style_pixels(math.min(800, math.max(1, (resolution and resolution.height or 720) / scale - 32)))
-  if frame.style then
-    frame.style.width, frame.style.height = width, height
-    frame.style.maximal_width = width
-  end
   if view.location then frame.location = view.location
   elseif type(frame.force_auto_center) == "function" then frame.force_auto_center() end
 
@@ -1341,52 +1614,56 @@ local function create_frame(player, view)
   drag.style.height = 24
   drag.drag_target = frame
 
+  icon_button(title, "layout_smaller", "utility/left_arrow", {"mir-browser.layout-smaller"})
+  icon_button(title, "layout_larger", "utility/right_arrow", {"mir-browser.layout-larger"})
+  icon_button(title, "layout_reset", "utility/reset", {"mir-browser.layout-reset"})
+  icon_button(title, "close", "utility/close", {"mir-browser.close"})
+
+  local width = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
   local pairs_per_row = width >= 800 and 2 or 1
   local filters = add(frame, {type = "table", name = PREFIX .. "filters", column_count = 2 * pairs_per_row})
   add(filters, {type = "label", name = PREFIX .. "search_label", caption = {"mir-browser.search-label"}})
-  add(filters, {type = "textfield", name = PREFIX .. "query", text = view.query})
+  add(filters, {type = "textfield", name = PREFIX .. "query", text = view.query,
+    tooltip = {"mir-browser.search-label"}})
   add(filters, {type = "label", name = PREFIX .. "family_label", caption = {"mir-browser.filter-scope"}})
   local families = family_values()
   add(filters, {type = "drop-down", name = PREFIX .. "family", items = family_items(families, player),
-    selected_index = family_index(families, view.family) or 1})
+    selected_index = family_index(families, view.family) or 1, tooltip = {"mir-browser.filter-scope"}})
   add(filters, {type = "label", name = PREFIX .. "visibility_label", caption = {"mir-browser.visibility"}})
   add(filters, {type = "drop-down", name = PREFIX .. "visibility", items = {
     {"mir-browser.visibility-normal"}, {"mir-browser.visibility-hidden"}, {"mir-browser.not-added"}
-  }, selected_index = view.visibility})
+  }, selected_index = view.visibility, tooltip = {"mir-browser.visibility"}})
   add(filters, {type = "label", name = PREFIX .. "mode_label", caption = {"mir-browser.filter-level"}})
   add(filters, {type = "drop-down", name = PREFIX .. "mode", items = {
     {"mir-browser.all"}, {"mir-browser.finite"}, {"mir-browser.infinite"}
-  }, selected_index = view.mode})
+  }, selected_index = view.mode, tooltip = {"mir-browser.filter-level"}})
   add(filters, {type = "label", name = PREFIX .. "status_label", caption = {"mir-browser.filter-status"}})
-  add(filters, {type = "drop-down", name = PREFIX .. "status", items = {{"mir-browser.status-all"}, {"mir-browser.status-ready"}, {"mir-browser.status-locked"}, {"mir-browser.status-queued"}}, selected_index = view.status})
+  add(filters, {type = "drop-down", name = PREFIX .. "status", items = {{"mir-browser.status-all"}, {"mir-browser.status-ready"}, {"mir-browser.status-locked"}, {"mir-browser.status-queued"}}, selected_index = view.status,
+    tooltip = {"mir-browser.filter-status"}})
   add(filters, {type = "label", name = PREFIX .. "sort_label", caption = {"mir-browser.filter-order"}})
   add(filters, {type = "drop-down", name = PREFIX .. "sort", items = {
     {"mir-browser.order-progression"}, {"mir-browser.order-native"},
     {"mir-browser.order-name-asc"}, {"mir-browser.order-name-desc"}
-  }, selected_index = SORT_INDEX[view.sort] or 1})
-  local control_width = style_pixels(math.min(280, math.max(100, width / pairs_per_row - 175)))
+  }, selected_index = SORT_INDEX[view.sort] or 1, tooltip = {"mir-browser.filter-order"}})
+  local _, control_width = library_layout.filter_layout(width)
   for _, field in ipairs({"query", "family", "visibility", "mode", "status", "sort"}) do
     local control = filters[PREFIX .. field]
     if control.style then control.style.width = control_width end
   end
   local tabs = add(frame, {type = "tabbed-pane", name = PREFIX .. "tabs"})
-  local tabs_width = style_pixels(math.max(1, width - 32))
-  if tabs.style then tabs.style.maximal_width = tabs_width end
-  local content_width = style_pixels(math.max(1, width - 48))
-  local content_height = style_pixels(math.max(1, height - (pairs_per_row == 2 and 230 or 350)))
   for _, tab_name in ipairs(TABS) do
     local tab = add(tabs, {type = "tab", name = PREFIX .. "tab_" .. tab_name,
       caption = {"mir-browser." .. (tab_name == "queue" and "queue-tab" or tab_name)}})
-    local content = add(tabs, {type = "scroll-pane", name = PREFIX .. tab_name .. "_content",
-      horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
-    if content.style then
-      content.style.width = content_width
-      content.style.maximal_width = content_width
-      content.style.height = content_height
-    end
+    local content_spec = tab_name == "research"
+      and {type = research_content_type(player, view), column_count = 2,
+        horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"}
+      or {type = "scroll-pane", horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"}
+    content_spec.name = PREFIX .. tab_name .. "_content"
+    local content = add(tabs, content_spec)
     tabs.add_tab(tab, content)
   end
   tabs.selected_tab_index = TAB_INDEX[view.tab] or 1
+  sync_frame_layout(player, view, frame)
   return frame
 end
 
@@ -1396,6 +1673,11 @@ local function render(player, view, context, preserve_query)
   if not valid(player) or player.connected ~= true then return nil end
   context = context or context_for(player.force)
   local frame = owned_root(player)
+  if valid(frame) and not frame_layout_ready(frame, player, view) then
+    remember_location(view, frame)
+    frame.destroy()
+    frame = nil
+  end
   if not valid(frame) then
     -- A foreign same-named root is a collision, not a frame this module may
     -- reuse or replace. In particular it must not cause player preferences.
@@ -1403,6 +1685,7 @@ local function render(player, view, context, preserve_query)
     frame = create_frame(player, view)
   end
   if not valid(frame) then return nil end
+  sync_frame_layout(player, view, frame)
 
   local filters = frame[PREFIX .. "filters"]
   if valid(filters) then filters.visible = view.tab == "research" end
@@ -1436,13 +1719,16 @@ local function render(player, view, context, preserve_query)
     local translations = open_translation_cache(player, view)
     update_research_content(content, player, view, context, translated_labels(translations))
     dispatch_translations(player, translations)
+  elseif view.tab == "settings" then
+    local translations = open_translation_cache(player, view)
+    local labels = translated_labels(translations)
+    update_settings_content(content, view, preserve_query, labels)
+    dispatch_translations(player, translations)
   else
     -- A closed Research tab must not retain a local catalogue or spend more
     -- translation work. Issued IDs stay in the small durable ledger.
     discard_translation_cache(player.index)
-    if view.tab == "settings" then
-      update_settings_content(content, view, preserve_query)
-    elseif view.tab == "queue" then
+    if view.tab == "queue" then
       update_queue_content(content, player, view)
     else
       update_help_content(content)
@@ -1479,7 +1765,7 @@ function M.open(player, options)
     view.settings_scope, view.setting_selected = options.settings_scope, nil
   end
   if type(options.settings_search) == "string" then
-    view.settings_query, view.setting_selected = text(options.settings_search), nil
+  view.settings_query, view.setting_selected = text(options.settings_search), nil
   end
   if type(options.query) == "string" then
     view.query, reset_page = text(options.query), true
@@ -1642,6 +1928,15 @@ function M.on_gui_selection_state_changed(event)
       view.scroll = index
       render(player, view, context)
     end
+  elseif element.name == PREFIX .. "recipe_list" then
+    if not owns_element(player, element, {
+      PREFIX .. "recipe_list", PREFIX .. "detail", PREFIX .. "research_content", PREFIX .. "tabs", ROOT
+    }) then return end
+    local view = view_for(player.index)
+    local detail = selected_detail(player, view, context_for(player.force),
+      translated_labels(translation_caches[player.index]))
+    local index = whole_option(element.selected_index, 1, 512)
+    if index then open_recipe_entry(player, detail, index) end
   elseif element.name == PREFIX .. "settings_list" then
     if not owns_element(player, element, {
       PREFIX .. "settings_list", PREFIX .. "settings_dynamic", PREFIX .. "settings_content", PREFIX .. "tabs", ROOT
@@ -1649,9 +1944,10 @@ function M.on_gui_selection_state_changed(event)
     local groups = setting_catalogue()
     if groups == nil then return end
     local view = view_for(player.index)
+    local translations = translated_labels(translation_caches[player.index])
     local visible = {}
     for _, group in ipairs(groups) do
-      if group.scope == view.settings_scope and setting_search_matches(group, view.settings_query) then
+      if group.scope == view.settings_scope and setting_search_matches(group, view.settings_query, translations) then
         visible[#visible + 1] = group
       end
     end
@@ -1676,6 +1972,21 @@ function M.on_gui_click(event)
   if not valid(element) then return end
   local player = player_for(event and event.player_index)
   if not player then return end
+  if element.name == PREFIX .. "layout_smaller" or element.name == PREFIX .. "layout_larger"
+      or element.name == PREFIX .. "layout_reset" then
+    if not owns_element(player, element, {element.name, PREFIX .. "title", ROOT}) then return end
+    local view = view_for(player.index)
+    if element.name == PREFIX .. "layout_reset" then
+      view.geometry, view.location = nil, nil
+    else
+      local delta = element.name == PREFIX .. "layout_larger" and 64 or -64
+      view.geometry = library_layout.resize(player.display_resolution, player.display_scale, view.geometry, delta)
+    end
+    local frame = render(player, view)
+    if element.name == PREFIX .. "layout_reset" and valid(frame)
+        and type(frame.force_auto_center) == "function" then frame.force_auto_center() end
+    return
+  end
   if support_exports and (element.name == PREFIX .. "export_settings" or element.name == PREFIX .. "export_compact") then
     if not owns_element(player, element, {
       element.name, PREFIX .. "settings_toolbar", PREFIX .. "settings_content", PREFIX .. "tabs", ROOT
@@ -1694,11 +2005,72 @@ function M.on_gui_click(event)
     show_export_profile(element.parent, encoded)
     return
   end
-  if element.name == PREFIX .. "close" then
+  if element.name == PREFIX .. "production_check" then
     if not owns_element(player, element, {
-      PREFIX .. "close", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "tabs", ROOT
+      PREFIX .. "production_check", PREFIX .. "detail", PREFIX .. "research_content", PREFIX .. "tabs", ROOT
     }) then return end
+    local view = view_for(player.index)
+    local id = technology_id(view.selected)
+    local technology = id and known_technology(player, id) or nil
+    local panel = element.parent and element.parent[PREFIX .. "production_results"] or nil
+    if technology and valid(panel) then show_production_snapshot(panel, player, technology) end
+    return
+  end
+  if element.name == PREFIX .. "close" then
+    local in_research_actions = owns_element(player, element, {
+      PREFIX .. "close", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "tabs", ROOT
+    })
+    local in_title = owns_element(player, element, {PREFIX .. "close", PREFIX .. "title", ROOT})
+    if not in_research_actions and not in_title then return end
     M.close(player)
+    return
+  end
+  if element.name == PREFIX .. "hide" then
+    if not owns_element(player, element, {
+      PREFIX .. "hide", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "tabs", ROOT
+    }) then return end
+    local view = view_for(player.index)
+    local id = technology_id(view.selected)
+    if id == nil or not known_technology(player, id) then return end
+    if view.hidden[id] then
+      view.hidden[id], view.selected = nil, id
+      if view.visibility == 2 then view.visibility = 1 end
+    else
+      local count = 0
+      for _, hidden in pairs(view.hidden) do if hidden == true then count = count + 1 end end
+      if count >= MAX_HIDDEN then return end
+      view.hidden[id], view.selected = true, nil
+    end
+    view.page, view.scroll = 1, 1
+    render(player, view)
+    return
+  end
+  if element.name == PREFIX .. "show_hidden" then
+    if not owns_element(player, element, {
+      PREFIX .. "show_hidden", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "tabs", ROOT
+    }) then return end
+    local view = view_for(player.index)
+    view.hidden, view.visibility, view.selected = {}, 1, nil
+    view.page, view.scroll = 1, 1
+    render(player, view)
+    return
+  end
+  if element.name == PREFIX .. "inspect_settings" then
+    if not owns_element(player, element, {
+      PREFIX .. "inspect_settings", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "tabs", ROOT
+    }) then return end
+    local view = view_for(player.index)
+    local selected = technology_id(view.selected)
+    if selected == nil then return end
+    local rows = rows_for(player, view, context_for(player.force), translated_labels(translation_caches[player.index]))
+    local row
+    for _, candidate in ipairs(rows) do if candidate.id == selected then row = candidate; break end end
+    local setting = row and row.cap_setting
+    local key = settings_group_key(setting)
+    if key then
+      view.tab, view.settings_scope, view.settings_query, view.setting_selected = "settings", "research", "", key
+      render(player, view)
+    end
     return
   end
   if element.name == PREFIX .. "settings_research" or element.name == PREFIX .. "settings_options" then
@@ -2034,6 +2406,8 @@ end
 function M.on_configuration_changed()
   reconnect_translation_caches()
   declaration_cache = nil
+  setting_groups_cache = nil
+  setting_prototype_cache = nil
   local legacy = legacy_browser_state()
   local legacy_players = legacy and legacy.players
   if type(legacy_players) == "table" then

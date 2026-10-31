@@ -120,8 +120,18 @@ class LibraryTests(unittest.TestCase):
               detail = function(force, rows, view, translations)
                 for _, row in ipairs(rows) do
                   if row.id == view.selected then
-                    return {cost = {count = 8000, time = 60}, prerequisites = {},
-                      effects = {{type = "change-recipe-productivity", change = 0.1}}}
+                    local technology = force.technologies[row.id]
+                    local effects, recipe_targets = {}, {}
+                    for _, effect in ipairs(technology.prototype.effects or {}) do
+                      effects[#effects + 1] = effect
+                      if (effect.type == "unlock-recipe" or effect.type == "change-recipe-productivity")
+                          and type(effect.recipe) == "string" then
+                        recipe_targets[#recipe_targets + 1] = effect.recipe
+                      end
+                    end
+                    return {cost = {count = 8000, time = 60,
+                        ingredients = technology.research_unit_ingredients or {}},
+                      prerequisites = {}, effects = effects, recipe_targets = recipe_targets}
                   end
                 end
                 return nil
@@ -222,6 +232,7 @@ class LibraryTests(unittest.TestCase):
               researched = false, enabled = true, visible_when_disabled = false,
               localised_name = "Foreign research", prototype = {max_level = 3}}
             player = {valid = true, index = 1, locale = "en", connected = true, gui = {screen = screen},
+              display_resolution = {width = 1280, height = 720}, display_scale = 1,
               force = {
                 index = 1, technologies = {[gear.name] = gear, [foreign.name] = foreign},
                 research_queue = {gear}, current_research = gear, research_progress = .5,
@@ -615,15 +626,16 @@ class LibraryTests(unittest.TestCase):
             and root.style.maximal_height <= 720/1.25)
           assert(root.auto_center == true and root.force_auto_center_calls == 1)
           local filters = root["mir_library_filters"]
-          assert(filters.type == "table" and filters.column_count == 4)
+          assert(filters.type == "table" and filters.column_count == 2)
           local family_style = filters["mir_library_family"].style
           assert(family_style.minimal_width == family_style.maximal_width and family_style.maximal_width <= 280)
           local content = research_content(root)
-          assert(content.type == "scroll-pane" and content.horizontal_scroll_policy == "never")
+          assert(content.type == "table" and content.column_count == 2)
           assert(content.style.maximal_height < root.style.maximal_height and content.style.maximal_width < root_width)
           local detail = content["mir_library_detail"]
-          assert(detail.style.minimal_width == content.style.maximal_width
-            and detail.style.maximal_width == content.style.maximal_width)
+          assert(detail.type == "scroll-pane" and detail.horizontal_scroll_policy == "never")
+          assert(detail.style.minimal_width < content.style.maximal_width
+            and detail.style.maximal_width == 334)
           local cost = content["mir_library_detail"]["mir_library_detail_cost"]
           assert(cost.caption[1] == "mir-browser.research-cost" and tonumber(cost.caption[3]) == 60)
           assert(cost.style.single_line == false and cost.style.maximal_width == detail.style.maximal_width)
@@ -670,6 +682,55 @@ class LibraryTests(unittest.TestCase):
           assert(foreign.valid, "opening/closing the Library destroyed a foreign GUI")
         ''')
 
+    def test_science_production_snapshot_is_bounded_read_only_and_refuses_invalid_inputs(self):
+        self.lua.execute(r'''
+          local production = require("runtime.library_production")
+          local force = {valid=true,index=4,name="player",get_item_production_statistics=function(surface)
+            assert(surface.index == 2)
+            return {valid=true,get_flow_count=function(spec)
+              assert(spec.name.quality == "normal" and spec.count == false
+                and spec.precision_index == defines.flow_precision_index.one_minute)
+              return spec.category == "input" and 12.5 or 4.25
+            end}
+          end}
+          local surface = {valid=true,index=2,name="nauvis"}
+          local technology = {valid=true,name="science-tech",force=force,
+            research_unit_ingredients={{name="automation-science-pack"},{name="logistic-science-pack"}}}
+          defines = {flow_precision_index={one_minute=3}}
+          game = {tick=1200}
+          local report = assert(production.snapshot({force=force,surface=surface},technology))
+          assert(report.tick == 1200 and report.force_name == "player" and report.surface_name == "nauvis")
+          assert(#report.rows == 2 and report.rows[1].name == "automation-science-pack"
+            and report.rows[1].produced == 12.5 and report.rows[1].consumed == 4.25
+            and report.rows[1].balance == 8.25)
+          technology.force = {valid=true,index=5}
+          assert(production.snapshot({force=force,surface=surface},technology) == nil)
+          technology.force = force
+          technology.research_unit_ingredients[2] = technology.research_unit_ingredients[1]
+          assert(production.snapshot({force=force,surface=surface},technology) == nil)
+        ''')
+
+    def test_older_engine_production_statistics_keep_force_scope_and_legacy_flow_arguments(self):
+        self.lua.execute(r'''
+          local production = require("runtime.library_production")
+          local statistics = {valid=true,get_flow_count=function(spec)
+            assert(type(spec.name) == "string" and spec.input ~= nil and spec.category == nil
+              and spec.precision_index == defines.flow_precision_index.one_minute and spec.count == false)
+            return spec.input and 9 or 3
+          end}
+          local force = {valid=true,index=8,name="player",item_production_statistics=statistics}
+          local surface = {valid=true,index=4,name="nauvis"}
+          local technology = {valid=true,name="older-science",force=force,
+            research_unit_ingredients={{name="automation-science-pack"}}}
+          defines = {flow_precision_index={one_minute=2}}
+          game = {tick=600}
+          local report = assert(production.snapshot({force=force,surface=surface},technology))
+          assert(report.scope == "force" and report.surface_name == nil
+            and report.rows[1].produced == 9 and report.rows[1].consumed == 3)
+          force.item_production_statistics = nil
+          assert(production.snapshot({force=force,surface=surface},technology) == nil)
+        ''')
+
     def test_background_library_refresh_does_not_take_native_focus(self):
         self.lua.execute(r'''
           boot()
@@ -695,17 +756,217 @@ class LibraryTests(unittest.TestCase):
           -- is fractional again. The native LuaStyle setters take int32 only.
           player.display_resolution, player.display_scale = {width=1042,height=768}, 1.25
           local root = library.open(player,{selected=gear.name})
-          assert(root.style.minimal_width == 801 and root.style.maximal_width == 801)
-          assert(root.style.minimal_height == 582 and root.style.maximal_height == 582)
+          assert(root.style.minimal_width == 640 and root.style.maximal_width == 640)
+          assert(root.style.minimal_height == 460 and root.style.maximal_height == 460)
           assert(root.force_auto_center_calls == 1)
           local filters = root["mir_library_filters"]
           local family = filters["mir_library_family"]
-          assert(family.style.minimal_width == 225 and family.style.maximal_width == 225)
+          assert(family.style.minimal_width == 280 and family.style.maximal_width == 280)
           local tabs = root["mir_library_tabs"]
-          assert(tabs.style.maximal_width == 769)
+          assert(tabs.style.maximal_width == 608)
           local content = research_content(root)
-          assert(content.style.minimal_width == 753 and content.style.maximal_width == 753)
-          assert(content.style.minimal_height == 352 and content.style.maximal_height == 352)
+          assert(content.style.minimal_width == 592 and content.style.maximal_width == 592)
+          assert(content.style.minimal_height == 170 and content.style.maximal_height == 170)
+          assert(content.type == "table" and content.column_count == 2)
+          assert(content["mir_library_results"].style.minimal_width == 222)
+          assert(content["mir_library_detail"].style.minimal_width == 334)
+        ''')
+
+    def test_research_library_opens_with_a_selected_split_detail_view(self):
+        self.lua.execute(r'''
+          boot()
+          local root = library.open(player)
+          local content = research_content(root)
+          local results, detail = content["mir_library_results"], content["mir_library_detail"]
+          assert(content.type == "table" and content.column_count == 2)
+          assert(results.type == "list-box" and results.selected_index == 1)
+          assert(detail.type == "scroll-pane" and detail.vertical_scroll_policy == "auto"
+            and detail.horizontal_scroll_policy == "never")
+          assert(detail["mir_library_detail_title"].caption == gear.localised_name)
+          assert(detail["mir_library_detail_icon"].sprite == "technology/" .. gear.name)
+          assert(results.style.maximal_width < detail.style.maximal_width)
+          local title = root["mir_library_title"]
+          assert(title["mir_library_layout_smaller"] and title["mir_library_layout_larger"]
+            and title["mir_library_layout_reset"])
+
+          local settings_root = library.open(player, {tab="settings"})
+          local settings_content = settings_root["mir_library_tabs"]["mir_library_settings_content"]
+          local panes = settings_content["mir_library_settings_dynamic"]
+          assert(panes.type == "table" and panes.column_count == 2)
+          assert(panes["mir_library_settings_list"].type == "list-box")
+          assert(panes["mir_library_settings_detail"].type == "scroll-pane")
+          assert(panes.style.maximal_height < settings_content.style.maximal_height)
+          assert(panes["mir_library_settings_list"].style.minimal_height
+            == panes["mir_library_settings_detail"].style.minimal_height)
+          root = library.open(player, {tab="research", selected=gear.name})
+          local actions = research_content(root)["mir_library_actions"]
+          assert(actions["mir_library_inspect_settings"].enabled)
+          library.on_gui_click({player_index=1, element=actions["mir_library_inspect_settings"]})
+          assert(storage.mir_library.players[1].tab == "settings"
+            and storage.mir_library.players[1].setting_selected == "research_gears")
+        ''')
+
+    def test_affected_recipe_selection_opens_factoriopedia_and_production_check_reads_flow_stats(self):
+        self.lua.execute(r'''
+          boot()
+          local recipe_prototype = {valid=true,name="iron-gear-wheel",localised_name="Gear wheel"}
+          gear.prototype.effects = {{type="change-recipe-productivity",recipe="iron-gear-wheel",change=.1}}
+          gear.research_unit_ingredients = {{name="automation-science-pack",amount=1}}
+          gear.force = player.force
+          player.force.valid = true
+          player.force.recipes = { ["iron-gear-wheel"] = {
+            valid=true,name="iron-gear-wheel",localised_name="Gear wheel",prototype=recipe_prototype
+          }}
+          player.force.get_item_production_statistics = function(surface)
+            assert(surface == player.surface)
+            return {valid=true,get_flow_count=function(spec)
+              return spec.category == "input" and 20 or 8
+            end}
+          end
+          player.surface = {valid=true,index=1,name="nauvis"}
+          player.open_factoriopedia_gui = function(prototype) player.opened_recipe = prototype end
+          defines = {flow_precision_index={one_minute=1}}
+          game.tick = 240
+          local queue, level = player.force.research_queue, gear.level
+          library.open(player, {selected=gear.name})
+          local content = research_content(player.gui.screen["mir_research_browser"])
+          local recipes = content["mir_library_detail"]["mir_library_recipe_list"]
+          assert(recipes and #recipes.items == 1 and recipes.items[1][3] == "Gear wheel")
+          recipes.selected_index = 1
+          library.on_gui_selection_state_changed({player_index=1,element=recipes})
+          assert(player.opened_recipe == recipe_prototype)
+          player.open_factoriopedia_gui = nil
+          library.open(player, {selected=gear.name})
+          content = research_content(player.gui.screen["mir_research_browser"])
+          recipes = content["mir_library_detail"]["mir_library_recipe_list"]
+          assert(recipes.tooltip[1] == "mir-browser.recipe-list-only-hint"
+            and content["mir_library_detail"]["mir_library_recipe_hint"].caption[1]
+              == "mir-browser.recipe-list-only-hint")
+          local check = content["mir_library_detail"]["mir_library_production_check"]
+          assert(check and check.caption[1] == "mir-browser.production-check")
+          library.on_gui_click({player_index=1,element=check})
+          local panel = content["mir_library_detail"]["mir_library_production_results"]
+          assert(panel["mir_library_production_scope"].caption[1] == "mir-browser.production-scope")
+          assert(panel["mir_library_production_snapshot"].caption[2] == "240")
+          assert(panel["mir_library_production_row_1"].caption[1] == "mir-browser.production-row")
+          assert(queue == player.force.research_queue and gear.level == level)
+        ''')
+
+    def test_narrow_display_uses_a_scrollable_stacked_library(self):
+        self.lua.execute(r'''
+          boot()
+          player.display_resolution, player.display_scale = {width=800,height=600}, 1.5
+          local root = library.open(player, {selected=gear.name})
+          local content = research_content(root)
+          assert(content.type == "scroll-pane" and content.vertical_scroll_policy == "auto")
+          assert(content["mir_library_actions"] and content["mir_library_results"]
+            and content["mir_library_detail"])
+          assert(content["mir_library_results"].style.minimal_height >= 76
+            and content["mir_library_detail"].style.minimal_height >= 80)
+          assert(content["mir_library_results"].style.maximal_width
+            == content["mir_library_detail"].style.maximal_width
+            and content["mir_library_results"].style.maximal_width <= content.style.maximal_width)
+        ''')
+
+    def test_title_close_button_closes_the_library_from_every_tab(self):
+        self.lua.execute(r'''
+          boot()
+          local root = library.open(player, {tab="settings"})
+          local close = root["mir_library_title"]["mir_library_close"]
+          assert(close and close.sprite == "utility/close")
+          library.on_gui_click({player_index=1, element=close})
+          assert(root.valid == false and storage.mir_library.players[1].open == false)
+        ''')
+
+    def test_layout_controls_resize_reset_and_rebuild_an_outdated_saved_window(self):
+        self.lua.execute(r'''
+          boot()
+          local root = library.open(player, {selected=gear.name})
+          assert(root.style.minimal_width == 640 and root.style.minimal_height == 540)
+          local title = root["mir_library_title"]
+          root.location = {x=1200,y=680}
+          library.on_gui_location_changed({player_index=1, element=root})
+          library.on_gui_click({player_index=1, element=title["mir_library_layout_larger"]})
+          assert(root.style.minimal_width == 704 and root.style.minimal_height == 604)
+          assert(storage.mir_library.players[1].geometry.width == 704)
+          assert(root.location.x <= player.display_resolution.width - root.style.maximal_width * player.display_scale
+            and root.location.y <= player.display_resolution.height - root.style.maximal_height * player.display_scale)
+          library.on_gui_click({player_index=1, element=title["mir_library_layout_smaller"]})
+          assert(root.style.minimal_width == 640 and root.style.minimal_height == 540)
+          root.location = {x=81,y=42}
+          library.on_gui_location_changed({player_index=1, element=root})
+          library.on_gui_click({player_index=1, element=title["mir_library_layout_reset"]})
+          assert(root.style.minimal_width == 640 and root.style.minimal_height == 540)
+          assert(storage.mir_library.players[1].geometry == nil and storage.mir_library.players[1].location == nil)
+          assert(root.force_auto_center_calls == 2)
+
+          local old = root
+          old["mir_library_title"]["mir_library_layout_smaller"].destroy()
+          research_content(old).type = "scroll-pane"
+          root = library.open(player)
+          assert(root and root ~= old and research_content(root).type == "table")
+          assert(root["mir_library_title"]["mir_library_layout_smaller"] ~= nil)
+          assert(storage.mir_library.players[1].selected == gear.name)
+        ''')
+
+    def test_repeated_resize_stays_within_display_bounds(self):
+        self.lua.execute(r'''
+          boot()
+          local root = library.open(player, {selected=gear.name})
+          local title = root["mir_library_title"]
+          for _ = 1, 20 do
+            library.on_gui_click({player_index=1, element=title["mir_library_layout_larger"]})
+          end
+          local geometry = storage.mir_library.players[1].geometry
+          assert(geometry.width == 1256 and geometry.height == 696)
+          assert(root.style.maximal_width == geometry.width and root.style.maximal_height == geometry.height)
+          library.on_gui_click({player_index=1, element=title["mir_library_layout_smaller"]})
+          assert(storage.mir_library.players[1].geometry.width < geometry.width
+            and storage.mir_library.players[1].geometry.height < geometry.height)
+        ''')
+
+    def test_hide_show_and_restore_actions_are_personal_and_keep_native_research_unchanged(self):
+        self.lua.execute(r'''
+          boot()
+          local model = require("presentation.library_model")
+          local original_rows = model.rows
+          model.rows = function(force, declarations, view, labels, context)
+            local rows, visible = original_rows(force, declarations, view, labels, context), {}
+            for _, row in ipairs(rows) do
+              row.hidden = view.hidden[row.id] == true
+              if (view.visibility == 1 and not row.hidden) or (view.visibility == 2 and row.hidden) then
+                visible[#visible + 1] = row
+              end
+            end
+            return visible
+          end
+          local queue, level = player.force.research_queue, gear.level
+          local root = library.open(player, {selected=gear.name})
+          local content = research_content(root)
+          assert(content["mir_library_actions"]["mir_library_hide"].sprite == "utility/collapse")
+          library.on_gui_click({player_index=1, element=content["mir_library_actions"]["mir_library_hide"]})
+          assert(storage.mir_library.players[1].hidden[gear.name] == true)
+          assert(#content["mir_library_results"].items == 0)
+          assert(player.force.research_queue == queue and gear.level == level)
+
+          local filters = root["mir_library_filters"]
+          filters["mir_library_visibility"].selected_index = 2
+          library.on_gui_selection_state_changed({player_index=1, element=filters["mir_library_visibility"]})
+          assert(content["mir_library_results"].selected_index == 1)
+          assert(content["mir_library_actions"]["mir_library_hide"].sprite == "utility/expand"
+            and content["mir_library_actions"]["mir_library_hide"].tooltip[1] == "mir-browser.show-tooltip")
+          library.on_gui_click({player_index=1, element=content["mir_library_actions"]["mir_library_hide"]})
+          assert(storage.mir_library.players[1].hidden[gear.name] == nil
+            and storage.mir_library.players[1].visibility == 1)
+          assert(#content["mir_library_results"].items == 1 and content["mir_library_results"].selected_index == 1)
+
+          library.on_gui_click({player_index=1, element=content["mir_library_actions"]["mir_library_hide"]})
+          filters["mir_library_visibility"].selected_index = 2
+          library.on_gui_selection_state_changed({player_index=1, element=filters["mir_library_visibility"]})
+          library.on_gui_click({player_index=1, element=content["mir_library_actions"]["mir_library_show_hidden"]})
+          assert(next(storage.mir_library.players[1].hidden) == nil
+            and storage.mir_library.players[1].visibility == 1)
+          assert(player.force.research_queue == queue and gear.level == level)
         ''')
 
     def test_pure_prototype_constructor_preserves_published_shortcut_identity(self):
@@ -726,6 +987,9 @@ class LibraryTests(unittest.TestCase):
             "availability", "availability-empty", "configuration-source", "count", "effective-values",
             "help", "help-summary", "productivity-increment", "queue-empty", "queue-tab",
             "not-added",
+            "search-settings", "hide", "show", "show-hidden", "inspect-settings", "hide-tooltip",
+            "show-tooltip", "layout-smaller",
+            "layout-larger", "layout-reset",
             "science-ingredient", "scope-startup", "setting-off", "setting-on", "setting-provenance",
             "settings", "settings-count", "settings-empty", "settings-scope-options",
             "settings-scope-research", "source-direct", "source-mirset1",
@@ -859,6 +1123,8 @@ class LibraryTests(unittest.TestCase):
           root = player.gui.screen["mir_research_browser"]
           local state = storage.mir_library.players[1]
           assert(state.query == "gear wheel" and state.selected == gear.name and state.scroll == 1)
+          assert(research_content(root)["mir_library_actions"]["mir_library_open_native"].sprite
+            == "utility/side_menu_technology_icon")
           assert(state.location.x == 91 and state.location.y == 44)
           local before = storage.mir_library
           library.on_load()
@@ -922,13 +1188,30 @@ class LibraryTests(unittest.TestCase):
             ["item-name.iron-gear-wheel"] = "Eisenrad"
           }
           local function translate(value)
-            local key = type(value) == "table" and value[1] or value
-            local text = assert(locale[key], "unresolved F210 Base locale key: " .. tostring(key))
-            if type(value) == "table" then
-              for index = 2, #value do
-                local replacement = translate(value[index])
-                text = string.gsub(text, "__" .. tostring(index - 1) .. "__", replacement)
+            if type(value) == "string" then
+              if locale[value] ~= nil then return locale[value] end
+              if string.find(value, "%-name%.") then
+                error("unresolved F210 Base locale key: " .. value)
               end
+              return value
+            end
+            assert(type(value) == "table" and type(value[1]) == "string", "invalid LocalisedString")
+            local key = value[1]
+            if key == "" then
+              local parts = {}
+              for index = 2, #value do parts[#parts + 1] = translate(value[index]) end
+              return table.concat(parts)
+            elseif key == "?" then
+              for index = 2, #value do
+                local ok, result = pcall(translate, value[index])
+                if ok and result ~= "" then return result end
+              end
+              return ""
+            end
+            local text = assert(locale[key], "unresolved F210 Base locale key: " .. tostring(key))
+            for index = 2, #value do
+              local replacement = translate(value[index])
+              text = string.gsub(text, "__" .. tostring(index - 1) .. "__", function() return replacement end)
             end
             return text
           end
@@ -1608,7 +1891,7 @@ class LibraryTests(unittest.TestCase):
           library.open(player)
           local root = player.gui.screen["mir_research_browser"]
           local detail = research_content(root)["mir_library_detail"]
-          assert(cap_calls == 1 and detail["mir_library_detail_cap"] == nil)
+          assert(cap_calls == 1 and detail["mir_library_detail_cap"] ~= nil)
           local rows = research_content(root)["mir_library_results"]
           rows.selected_index = 1
           library.on_gui_selection_state_changed({player_index = 1, element = rows})
@@ -1977,10 +2260,11 @@ class LibraryTests(unittest.TestCase):
             and view.hidden["foreign-research"])
           assert(view.tab == "settings" and view.settings_scope == "options"
             and view.settings_query == "cost tuning" and view.setting_selected == "ips-cost-base-research_gears")
+          assert(view.geometry.width == 900 and view.geometry.height == 700)
           assert(state.players[2].tab == "research" and state.players[2].visibility == 3)
-          -- The currently open published frame location wins over its stale
-          -- persisted location, as the old browser itself did on close.
-          assert(view.location.x == 55 and view.location.y == 66)
+          -- The current frame location is the starting point, then the
+          -- oversized saved frame is clamped fully onto the display.
+          assert(view.location.x == 55 and view.location.y == 24)
           assert(storage.mir.research_browser.players[1] == historical)
           local preserved = state.legacy_browser
           assert(preserved.version == 1 and preserved.source == "storage.mir.research_browser")
@@ -2032,6 +2316,9 @@ class LibraryTests(unittest.TestCase):
             and enabled.tooltip[2][1] == "mir-browser.setting-off"
             and enabled.tooltip[3][1] == "mir-browser.setting-on"
             and enabled.tooltip[4][1] == "mir-browser.source-direct")
+          local enabled_source = settings_dynamic["mir_library_settings_detail"]["mir_library_setting_1_source"]
+          assert(enabled_source.caption[1] == "mir-browser.setting-provenance"
+            and enabled_source.caption[4][1] == "mir-browser.source-direct")
           local cost = settings_dynamic["mir_library_settings_detail"]["mir_library_setting_2_value"]
           assert(cost.caption == "777" and cost.tooltip[1] == "mir-browser.setting-provenance"
             and cost.tooltip[2] == "4242" and cost.tooltip[4][1] == "mir-browser.source-mirset1")
@@ -2045,7 +2332,8 @@ class LibraryTests(unittest.TestCase):
           library.on_gui_selection_state_changed({player_index = 1, element = settings_list})
           assert(storage.mir_library.players[1].setting_selected == "research_gears"
             and settings_content["mir_library_settings_query"] == settings_query)
-          assert(#player.translation_requests == 0)
+          assert(#player.translation_requests > 0,
+            "settings view should request translated setting labels for localized search")
 
           tabs.selected_tab_index = 2
           library.on_gui_selected_tab_changed({player_index = 1, element = tabs})
@@ -2073,6 +2361,47 @@ class LibraryTests(unittest.TestCase):
           library.on_gui_selected_tab_changed({player_index = 1, element = tabs})
           assert(tabs["mir_library_help_content"]["mir_library_help_summary"].caption[1]
             == "mir-browser.help-summary")
+        ''')
+
+    def test_localized_settings_search_survives_load_without_rebuilding_its_request_scope(self):
+        self.lua.execute(r'''
+          boot()
+          local catalog = require("research.settings")
+          local names, specs, setting_prototype = catalog.registered_names(), {}, nil
+          for _, prototype in ipairs(catalog.prototypes()) do specs[prototype.name] = prototype end
+          local target = names[1]
+          assert(type(target) == "string" and specs[target] and specs[target].localised_name)
+          local scope = catalog.spec(target).stream and "research" or "options"
+          library.open(player, {tab="settings", settings_scope=scope})
+          assert(#player.translation_requests > 0)
+          local target_request
+          for _, request in ipairs(player.translation_requests) do
+            local function equal(left, right)
+              if type(left) ~= type(right) then return false end
+              if type(left) ~= "table" then return left == right end
+              for key, value in pairs(left) do if not equal(value, right[key]) then return false end end
+              for key in pairs(right) do if left[key] == nil then return false end end
+              return true
+            end
+            if equal(request.localised, specs[target].localised_name) then target_request = request; break end
+          end
+          assert(target_request, "the settings translation batch omitted its first declared label")
+
+          package.loaded["runtime.library"] = nil
+          library = require("runtime.library")
+          library.on_load()
+          library.on_string_translated({player_index=1, id=target_request.id,
+            translated=true, result="localized-setting-needle"})
+
+          local root = player.gui.screen["mir_research_browser"]
+          local content = root["mir_library_tabs"]["mir_library_settings_content"]
+          local query = content["mir_library_settings_query"]
+          query.text = "localized-setting-needle"
+          library.on_gui_text_changed({player_index=1, element=query})
+          local dynamic = content["mir_library_settings_dynamic"]
+          local list = dynamic["mir_library_settings_list"]
+          assert(#list.items == 1 and dynamic["mir_library_settings_count"].caption[2] == 1,
+            "the localized field label should find its group after loading")
         ''')
 
     def test_new_tab_and_settings_callbacks_do_not_claim_an_unowned_gui(self):

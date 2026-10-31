@@ -269,9 +269,12 @@ class LibraryTranslationTests(unittest.TestCase):
           assert(translations.snapshot(cache, active).stats.outstanding == 16)
           assert(translations.complete(cache, active, 1, string.rep("a", 1024)).published)
           assert(translations.complete(cache, active, 2, string.rep("b", 1025)).published)
+          assert(translations.complete(cache, active, 3,
+            string.rep("c", translations.translated_label_limit + 1)).published)
           local snapshot = assert(translations.snapshot(cache, active))
-          assert(#snapshot.labels["item-1"] == 1024 and snapshot.labels["item-2"] == nil)
-          assert(snapshot.stats.cached_bytes == 1024)
+          assert(#snapshot.labels["item-1"] == 1024 and #snapshot.labels["item-2"] == 1025
+            and snapshot.labels["item-3"] == nil)
+          assert(snapshot.stats.cached_bytes == 2049)
 
           local too_many = {}
           for index = 1, translations.catalogue_limit + 1 do too_many[index] = "catalogue-" .. index end
@@ -280,8 +283,8 @@ class LibraryTranslationTests(unittest.TestCase):
 
           -- This valid persisted boundary must not admit an additional label.
           cache.cached_bytes = translations.translated_name_byte_limit
-          assert(translations.complete(cache, active, 3, "capacity").published)
-          assert(translations.labels(cache, active)["item-3"] == nil)
+          assert(translations.complete(cache, active, 4, "capacity").published)
+          assert(translations.labels(cache, active)["item-4"] == nil)
           assert(translations.snapshot(cache, active).stats.cached_bytes == translations.translated_name_byte_limit)
         ''')
 

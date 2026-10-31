@@ -330,10 +330,24 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               filters[SORT].selected_index=options.sort=="native" and 2 or 1
               local tabs=element("tabbed-pane",TABS)
               root[TABS]=tabs
-              local content=element("flow",CONTENT)
+              local content=element("table",CONTENT)
+              content.column_count=2
               content.children={}
               content.style.width=760
               tabs[CONTENT]=content
+              local list_width=math.floor((content.style.maximal_width-36)*.4)
+              local detail_width=content.style.maximal_width-36-list_width
+              local function browser_results()
+                local results=element("list-box",RESULTS)
+                results.style.width=list_width
+                return results
+              end
+              local function browser_detail()
+                local detail=element("scroll-pane",DETAIL)
+                detail.horizontal_scroll_policy="never"
+                detail.style.width=detail_width
+                return detail
+              end
               if options.tab=="availability" then
                 if selected.space_age then
                   local label=element("label",AVAILABILITY[1])
@@ -368,10 +382,10 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                   local hidden=client.personal_hidden and client.personal_hidden[options.search]==true
                   local present=(options.visibility==1 and not hidden) or (options.visibility==2 and hidden)
                   if opponent=="positive-foreign-suppressed" then present=false end
-                  local results=element("list-box",RESULTS)
+                  local results=browser_results()
                   results.items=present and {options.search} or {};results.selected_index=present and 1 or 0
                   content[RESULTS]=results
-                  local detail=element("flow",DETAIL)
+                  local detail=browser_detail()
                   detail[present and DETAIL_TITLE or DETAIL_EMPTY]=element("label",present and DETAIL_TITLE or DETAIL_EMPTY)
                   content[DETAIL]=detail
                   local actions=element("flow",ACTIONS)
@@ -386,14 +400,13 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               if private_query then
                 private_query_calls=private_query_calls+1
                 private_query_order[#private_query_order+1]={player=client.index,family=options.family,id=options.selected}
-                local results=element("list-box",RESULTS)
+                local results=browser_results()
                 results.items={};results.selected_index=0
                 if opponent=="private-credit-listed" then
                   results.items={options.selected};results.selected_index=1
                 end
                 content[RESULTS]=results
-                local detail=element("flow",DETAIL)
-                detail.style.width=content.style.maximal_width
+                local detail=browser_detail()
                 detail[DETAIL_EMPTY]=element("label",DETAIL_EMPTY)
                 content[DETAIL]=detail
                 local actions=element("flow",ACTIONS)
@@ -414,11 +427,10 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 (opponent=="private-credit-empty-all" and options.family=="all") or
                 (opponent=="private-credit-empty-external" and options.family=="external")
               ) then
-                local results=element("list-box",RESULTS)
+                local results=browser_results()
                 results.items={};results.selected_index=0
                 content[RESULTS]=results
-                local detail=element("flow",DETAIL)
-                detail.style.width=content.style.maximal_width
+                local detail=browser_detail()
                 detail[DETAIL_EMPTY]=element("label",DETAIL_EMPTY)
                 content[DETAIL]=detail
                 local actions=element("flow",ACTIONS)
@@ -430,11 +442,10 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               end
               if opponent=="private-credit-restore" and private_query_calls>0 and options.family=="mir" then filters[QUERY].text="restoration-failed" end
               if opponent=="private-credit-stale-external-family" and private_query_calls>0 and options.family=="mir" then filters[FAMILY].selected_index=3 end
-              local results=element("list-box",RESULTS)
+              local results=browser_results()
               results.items={options.selected};results.selected_index=1
               content[RESULTS]=results
-              local detail=element("flow",DETAIL)
-              detail.style.width=content.style.maximal_width
+              local detail=browser_detail()
               if opponent=="detail-width-narrow" then detail.style.width=180 end
               detail[DETAIL_TITLE]=element("label",DETAIL_TITLE)
               detail[DETAIL_TITLE].caption=options.selected
@@ -2364,7 +2375,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertTrue(result["ok"], result["message"])
         failed = self.run_case("detail-width-narrow")
         self.assertFalse(failed["ok"])
-        self.assertIn("native public browser detail width differs", failed["message"])
+        self.assertIn("native public browser list/detail pane geometry differs", failed["message"])
 
     def test_lab_deadline_logs_native_state_without_repair_or_success(self):
         result = self.run_case("lab-deadline")
