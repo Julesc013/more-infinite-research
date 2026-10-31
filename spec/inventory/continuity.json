@@ -552,17 +552,17 @@
         "two_clients"
       ],
       "remaining_implementation": [
-        "Integrate and reconcile the in-progress Library restoration against the accepted 4.2 interaction contract and the current RUN-04 promises. The published 5.0.0 list/detail layout is a known regression, not an accepted new design; no beta bytes are replaced."
+        "The published-beta stacked layout is corrected in dev and rejected by the CONT-10 host negative control. No additional source defect is established yet; use native rendering and real input to identify any further correction."
       ],
       "remaining_qualification": [
         "Complete accepted paired Library/save-load timing and retained-session/churn memory. Corrected R02 diagnostics contain all26 endpoints and pass28 UI-duration/save-ready controls but fail five same-published memory controls;retain both original adverse datasets and review the next bounded measurement protocol before scoring. New7b0 functional/rendered F200/F210 results are separate from performance.",
         "Preserve documented locale fallback/visual limits;the named Space Age native-laboratory explanation and Base absence rows are now observed in the exact corrected7b0 client cases above. This does not establish arbitrary third-party translation quality.",
         "Qualify the accepted1026/1027 Library corrections on the final coherent F200/F210 player packages: actual Esc/E close and dragging/location retention, foreign GUI focus during asynchronous refresh, vanished-root subscription retirement and removed-player translation resumption. Preserve earlier client receipts at their original inputs.",
         "Earned or persisted private selections/queue state and foreign hidden-row inspection still require affected native cases. Fresh F2001D45 and F2102DDD zero-credit private visibility/action/native-state checks now pass;do not relabel them as positive imported credit or paired timing evidence.",
-        "Complete historical_preservation_review: demonstrate tests reject the known broken layout/handlers, then qualify the affected rendered/input/lifecycle and burst/retained-memory paths on the successor. Old source/native mappings alone do not preserve the accepted interaction design."
+        "Complete historical_preservation_review: retain the layout negative control and add rejection controls for any known broken handlers, then qualify the affected rendered/input/lifecycle and burst/retained-memory paths on the successor. Old source/native mappings alone do not preserve the accepted interaction design."
       ],
       "historical_preservation_review": {
-        "status": "accepted-obligations-recovered-restoration-unverified",
+        "status": "restored-layout-host-negative-control-passed-native-acceptance-pending",
         "request_ids": [
           "UI-01",
           "UI-02",
@@ -592,12 +592,13 @@
             ],
             "current_host_controls": [
               "tests/test_library.py::test_requested_view_fits_scaled_display_wraps_details_and_converts_native_ticks",
-              "tests/test_library.py::test_default_closed_then_query_selection_location_native_navigation_and_reload_rebuild"
+              "tests/test_library.py::test_default_closed_then_query_selection_location_native_navigation_and_reload_rebuild",
+              "tests/test_library.py::test_research_library_opens_with_a_selected_split_detail_view"
             ],
-            "verification_status": "partial-host-mapping-not-restored-ui-acceptance",
+            "verification_status": "restored-source-host-negative-control-passed-rendered-and-input-acceptance-pending",
             "remaining_verification": [
-              "Integrate the in-progress successor layout; show each important tab at representative widths/scales and long English/German text.",
-              "Add controls that reject the published stacked-list/detail geometry and missing explicit size/reset actions. Separately preserve and exercise the existing visible Close action; the beta already has Close."
+              "Show each important tab at representative widths/scales and long English/German text. The host negative control in spec/evidence/library-cont10-layout-negative-control-r01.json passes on restored source and fails on the published beta at the split-layout assertion.",
+              "Exercise Close, explicit size/reset and personal geometry with real input; retain the existing visible Close action. The control does not establish native rendering or interaction."
             ]
           },
           {
@@ -774,7 +775,7 @@
             ]
           }
         ],
-        "qualification_limit": "This bounded source/expectation review ran no Factorio. Existing host mappings and original client receipts remain useful at their named inputs, but did not reject the demonstrated beta layout regression or qualify the current restoration."
+        "qualification_limit": "The focused host negative control passes on restored source and fails on the published beta source at the split-layout assertion. It does not establish native rendering or input. The retained R08 screenshots show the German split view; the English detail view is obscured by the Factorio research chooser. Existing client receipts remain useful only at their named inputs."
       }
     },
     {
