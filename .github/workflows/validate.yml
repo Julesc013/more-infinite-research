@@ -105,7 +105,7 @@ jobs:
         run: |
           "plan_artifact=mir5-host-plan-${{ github.run_id }}-${{ github.run_attempt }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
       - name: Preserve the bound host-control plan
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           include-hidden-files: true
           name: ${{ steps.artifact.outputs.plan_artifact }}
