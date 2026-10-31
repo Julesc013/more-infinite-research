@@ -31,12 +31,14 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                       (
                           ROOT / "tests/profiles/library-native-input-imported110-f200-2077-r12.json",
                           ROOT / "tests/profiles/library-native-input-imported110-f200-2077-r13.json",
+                          ROOT / "tests/profiles/library-native-input-imported110-f200-2077-r14.json",
                       ),
                       FIXTURE / "info-input-identity-f200.json"),
             "f210": ("2.1.23", "5.0.21000", "0.4.0",
                       (
                           ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r12.json",
                           ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r13.json",
+                          ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r14.json",
                       ),
                       FIXTURE / "info-input-identity-f210.json"),
         }
@@ -44,11 +46,26 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         self.assertIn(f'require("__{historical}__/catalogue")', control)
         self.assertIn('script.active_mods["more-infinite-research"]', control)
         self.assertIn("script.active_mods[historical.fixture]", control)
+        self.assertEqual(
+            json.loads((FIXTURE / "info-input-identity-f200.json").read_text(encoding="utf-8"))["version"],
+            "0.3.0",
+        )
+        self.assertEqual(
+            json.loads((FIXTURE / "info-input-identity-f210.json").read_text(encoding="utf-8"))["version"],
+            "0.3.0",
+        )
+        for target in ("f200", "f210"):
+            self.assertEqual(
+                json.loads((FIXTURE / f"info-input-identity-{target}-slot-reuse.json").read_text(encoding="utf-8"))["version"],
+                "0.3.1",
+            )
         parser = ROOT / "tools/lib/compatibility/LibraryActivation.ps1"
 
         for target, (base, mir, source_version, profile_paths, info_path) in cases.items():
             for profile_path in profile_paths:
-                info = json.loads(info_path.read_text(encoding="utf-8"))
+                slot_reuse = profile_path.name.endswith("-r14.json")
+                selected_info_path = FIXTURE / f"info-input-identity-{target}-slot-reuse.json" if slot_reuse else info_path
+                info = json.loads(selected_info_path.read_text(encoding="utf-8"))
                 profile = json.loads(profile_path.read_text(encoding="utf-8"))
                 expected_dependencies = [
                     f"base = {base}",
@@ -56,6 +73,12 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                     f"~ {historical} = {source_version}",
                 ]
                 self.assertEqual(info["dependencies"], expected_dependencies)
+                if slot_reuse:
+                    join_contract = profile["client_identity"]["join"]
+                    if target == "f210":
+                        self.assertIn("numeric index may be reused", join_contract)
+                    else:
+                        self.assertIn("reuse of the removed slot is refused", join_contract)
                 self.assertEqual(
                     [(row["name"], row["version"], row["enabled"]) for row in profile["mods"]],
                     [
@@ -63,7 +86,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                         ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
                         ("more-infinite-research", mir, True),
                         (historical, source_version, True),
-                        (fixture, "0.3.0", True),
+                        (fixture, "0.3.1" if slot_reuse else "0.3.0", True),
                     ],
                 )
                 # Factorio orders runtime handlers by dependency depth then natural
@@ -85,7 +108,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 command = f"""
                     $ErrorActionPreference = 'Stop'
                     . '{quote(parser)}'
-                    $info = Get-Content -Raw -LiteralPath '{quote(info_path)}' | ConvertFrom-Json -AsHashtable
+                    $info = Get-Content -Raw -LiteralPath '{quote(selected_info_path)}' | ConvertFrom-Json -AsHashtable
                     $profile = Get-Content -Raw -LiteralPath '{quote(profile_path)}' | ConvertFrom-Json -AsHashtable
                     $rows = @($info.dependencies | ForEach-Object {{ ConvertFrom-MIRDependencyString -Dependency $_ }})
                     if ($rows.Count -ne 3 -or $rows[0].kind -cne 'required' -or -not $rows[0].required) {{ throw 'base dependency is not required' }}
@@ -433,7 +456,8 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             local base=target=="f200" and "2.0.77" or "2.1.23"
             local active={base=base,["more-infinite-research"]=target=="f200" and "5.0.20000" or "5.0.21000",
               [historical.fixture]=target=="f200" and "0.3.0" or "0.4.0",
-              ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]="0.3.0"}
+              ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
+              ["mir-fixture-mir5-library-native-input"]="0.3.1"}
             local env={game=game,storage=store,defines={events=events,gui_type={custom=99},controllers={character=7,cutscene=11}},log=function(message)logs[#logs+1]=message end,
               helpers={table_to_json=function()return "{}"end},
               require=function(name)assert(name=="__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue");return historical end,
@@ -521,14 +545,14 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               click(en,other);type_text(en,"focus");step("foreign-prefix");game.tick=game.tick+60
               step("foreign-refresh");type_text(en," kept");step("foreign-suffix")
               if opponent~="remove-connected" then de.connected=false;connected() end
-              step("remove-de");de=join(opponent=="removed-index-reused" and 2 or 3,"de");step("replacement");game.tick=game.tick+60;step("save")
+              step("remove-de");de=join(opponent=="removed-index-reused" and 2 or (opponent=="replacement-index-reuses-en" and 1 or 3),"de");step("replacement");game.tick=game.tick+60;step("save")
               en.connected=false;de.connected=false;connected()
               for _,p in pairs(game.players) do for _,node in pairs(p.gui.screen) do invalidate(node) end;p.gui.screen=element("screen","screen") end
               parse();before=fingerprint(store);callbacks.load();readonly_load=before==fingerprint(store)
               -- Native-shaped MIR join restoration, not an observer open call.
               build(en,memory[en.index]);build(de,memory[de.index]);join(opponent=="changed-restart-index" and 4 or 0,"en")
               if opponent=="duplicate-restart-role" then join(0,"en") end
-              join(3,"de")
+              join(opponent=="removed-index-reused" and 2 or 3,"de")
               if opponent=="cold-lost-query" then query(en).text="wrong" end
               if opponent=="cold-lost-location" then en.gui.screen[root_name].location={x=999,y=100} end
               cold_calls_before=calls
@@ -810,11 +834,24 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
 
     def test_join_phase_and_retained_identity_are_required(self):
         for target in ("f200", "f210"):
-            for opponent in ("duplicate-initial-join", "join-during-input", "removed-index-reused",
+            for opponent in ("duplicate-initial-join", "join-during-input", "replacement-index-reuses-en",
                              "changed-restart-index", "duplicate-restart-role"):
                 with self.subTest(target=target, opponent=opponent):
                     result = self.run_case(target, opponent)
                     self.assertFalse(result["ok"], result["message"])
+
+    def test_replacement_join_accepts_reuse_only_in_new_f210_observer(self):
+        result = self.run_case("f210", "removed-index-reused")
+        self.assertTrue(result["ok"], result["message"])
+        self.assertFalse(result["native_input_evidence"])
+        self.assertEqual(result["final"]["actual_removed_events"], 1)
+        self.assertEqual(result["final"]["removed_index"], result["final"]["de_index"])
+        self.assertEqual(result["final"]["actual_joins"], 5)
+
+    def test_f200_observer_still_rejects_reused_removed_numeric_index(self):
+        result = self.run_case("f200", "removed-index-reused")
+        self.assertFalse(result["ok"], result["message"])
+        self.assertFalse(result["native_input_evidence"])
 
 
 class LibrarySupportExportObserverControls(unittest.TestCase):
