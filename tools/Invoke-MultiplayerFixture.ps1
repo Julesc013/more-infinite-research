@@ -397,10 +397,50 @@ function New-LibraryPositiveFixtureSourceProjection {
   Assert-Session (@(Get-ChildItem -LiteralPath $stage -File).Count-eq5) 'positive-state source member count differs'
   return [pscustomobject]@{source=$stage;canonical_source=$canonical;members=$members;source_metadata=('info-'+$Target+'.json');excluded_canonical_members=@('README.md','info.json','info-f210.json','info-f210-space-age.json','info-f210-private-credits.json')}
 }
+function Get-StandaloneF210NativeFixtureGitMembers {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$SourceRevision,
+    [Parameter(Mandatory)][ValidateSet('library-multiplayer','active-mods-observer')][string]$FixtureDirectory
+  )
+  $prefix='tests/fixtures/'+$FixtureDirectory+'/'
+  $paths=@(& git -C $RepoRoot ls-tree -r --name-only $SourceRevision -- ('tests/fixtures/'+$FixtureDirectory))
+  Assert-Session ($LASTEXITCODE-eq0) "standalone F210 fixture source tree is unavailable: $FixtureDirectory"
+  $names=@($paths|ForEach-Object {
+    Assert-Session ($_.StartsWith($prefix,[StringComparison]::Ordinal)) "standalone F210 fixture source path differs: $FixtureDirectory"
+    $_.Substring($prefix.Length)
+  })
+  return $names
+}
+function Get-StandaloneF210NativeFixtureRawGitMemberBytes {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$SourceRevision,
+    [Parameter(Mandatory)][ValidateSet('library-multiplayer','active-mods-observer')][string]$FixtureDirectory,
+    [Parameter(Mandatory)][string]$Member
+  )
+  $allowed=if($FixtureDirectory-ceq'library-multiplayer'){@('README.md','control.lua','info-f210-private-credits.json','info-f210-space-age.json','info-f210.json','info.json','settings-updates.lua')}else{@('data-final-fixes.lua','info-f200.json','info.json')}
+  Assert-Session ($allowed-ccontains$Member) "standalone F210 fixture member is not admitted: $FixtureDirectory/$Member"
+  $path='tests/fixtures/'+$FixtureDirectory+'/'+$Member
+  $start=[Diagnostics.ProcessStartInfo]::new()
+  $start.FileName='git';$start.UseShellExecute=$false;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
+  foreach($argument in @('-C',$RepoRoot,'show',($SourceRevision+':'+$path))){$null=$start.ArgumentList.Add($argument)}
+  $process=[Diagnostics.Process]::new();$process.StartInfo=$start
+  Assert-Session ($process.Start()) "standalone F210 fixture raw Git read did not start: $FixtureDirectory/$Member"
+  $bytes=[IO.MemoryStream]::new()
+  try{
+    $process.StandardOutput.BaseStream.CopyTo($bytes)
+    $null=$process.StandardError.ReadToEnd()
+    $process.WaitForExit()
+    Assert-Session ($process.ExitCode-eq0) "standalone F210 fixture raw Git member is unavailable: $FixtureDirectory/$Member"
+  } finally {$process.Dispose()}
+  return ,$bytes.ToArray()
+}
 function New-StandaloneF210LibraryFixtureSourceProjection {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][string]$OutputRoot,
+    [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$SourceRevision,
     [switch]$SpaceAgeLibrary,
     [switch]$PrivateCreditChecks
   )
@@ -408,27 +448,26 @@ function New-StandaloneF210LibraryFixtureSourceProjection {
   # Every F210 route stages precisely three runtime members. The selected
   # metadata is the only Base/Space Age distinction; it is copied unchanged.
   $canonical=(Resolve-Path -LiteralPath (Join-Path $RepoRoot 'tests/fixtures/library-multiplayer')).Path
-  $canonicalFiles=@(Get-ChildItem -LiteralPath $canonical -Recurse -File|Sort-Object FullName)
-  $canonicalNames=@($canonicalFiles|ForEach-Object {[IO.Path]::GetRelativePath($canonical,$_.FullName).Replace('\','/')})
+  $canonicalNames=@(Get-StandaloneF210NativeFixtureGitMembers -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer')
   $baseCanonical=@('README.md','control.lua','info-f210.json','info.json','settings-updates.lua')
   $spaceAgeMetadata='info-f210-space-age.json'
   $privateCreditMetadata='info-f210-private-credits.json'
   $knownOptionalMetadata=@($spaceAgeMetadata,$privateCreditMetadata)
   $expectedCanonical=$baseCanonical+@($canonicalNames|Where-Object {$knownOptionalMetadata-ccontains$_})
   Assert-Session ($canonicalNames.Count-eq$expectedCanonical.Count-and ((@($canonicalNames|Sort-Object)-join '|')-ceq(@($expectedCanonical|Sort-Object)-join '|'))) 'standalone F210 canonical Library fixture members differ'
-  $f200Info=Get-Content -LiteralPath (Join-Path $canonical 'info.json') -Raw|ConvertFrom-Json -AsHashtable
-  $f210BaseInfo=Get-Content -LiteralPath (Join-Path $canonical 'info-f210.json') -Raw|ConvertFrom-Json -AsHashtable
+  $f200Info=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member 'info.json'))|ConvertFrom-Json -AsHashtable
+  $f210BaseInfo=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member 'info-f210.json'))|ConvertFrom-Json -AsHashtable
   Assert-Session ([string]$f200Info.name-ceq'mir-fixture-mir5-library-multiplayer' -and [string]$f200Info.version-ceq'0.1.0' -and [string]$f200Info.factorio_version-ceq'2.0') 'standalone F210 canonical F200 fixture metadata differs'
   Assert-Session ([string]$f210BaseInfo.name-ceq[string]$f200Info.name -and [string]$f210BaseInfo.version-ceq[string]$f200Info.version -and [string]$f210BaseInfo.factorio_version-ceq'2.1' -and ((@($f210BaseInfo.dependencies)-join '|')-ceq'base >= 2.1.23|more-infinite-research = 5.0.21000')) 'standalone F210 canonical Base fixture metadata differs'
   $metadata=if($PrivateCreditChecks){$privateCreditMetadata}elseif($SpaceAgeLibrary){$spaceAgeMetadata}else{'info-f210.json'}
   if($SpaceAgeLibrary){
     Assert-Session ($canonicalNames-ccontains$spaceAgeMetadata) 'standalone F210 Space Age fixture metadata is absent'
-    $f210SpaceAgeInfo=Get-Content -LiteralPath (Join-Path $canonical $spaceAgeMetadata) -Raw|ConvertFrom-Json -AsHashtable
+    $f210SpaceAgeInfo=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member $spaceAgeMetadata))|ConvertFrom-Json -AsHashtable
     Assert-Session ([string]$f210SpaceAgeInfo.name-ceq[string]$f200Info.name -and [string]$f210SpaceAgeInfo.version-ceq'0.2.0' -and [string]$f210SpaceAgeInfo.factorio_version-ceq'2.1' -and ((@($f210SpaceAgeInfo.dependencies)-join '|')-ceq'base >= 2.1.23|space-age >= 2.1.23|more-infinite-research = 5.0.21000')) 'standalone F210 Space Age fixture metadata differs'
   }
   if($PrivateCreditChecks){
     Assert-Session ($canonicalNames-ccontains$privateCreditMetadata) 'standalone F210 private-credit fixture metadata is absent'
-    $f210PrivateCreditInfo=Get-Content -LiteralPath (Join-Path $canonical $privateCreditMetadata) -Raw|ConvertFrom-Json -AsHashtable
+    $f210PrivateCreditInfo=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member $privateCreditMetadata))|ConvertFrom-Json -AsHashtable
     Assert-Session ([string]$f210PrivateCreditInfo.name-ceq[string]$f200Info.name -and [string]$f210PrivateCreditInfo.version-ceq'0.3.0' -and [string]$f210PrivateCreditInfo.factorio_version-ceq'2.1' -and ((@($f210PrivateCreditInfo.dependencies)-join '|')-ceq'base >= 2.1.23|? space-age >= 2.1.23|more-infinite-research = 5.0.21000')) 'standalone F210 private-credit fixture metadata differs'
   }
   $stage=Join-Path $OutputRoot 'standalone-f210-library-fixture-source'
@@ -439,33 +478,36 @@ function New-StandaloneF210LibraryFixtureSourceProjection {
     'settings-updates.lua'='settings-updates.lua'
     'info.json'=$metadata
   }
-  foreach($entry in $bindings.GetEnumerator()){[IO.File]::Copy((Join-Path $canonical $entry.Value),(Join-Path $stage $entry.Key),$false)}
+  foreach($entry in $bindings.GetEnumerator()){
+    [IO.File]::WriteAllBytes((Join-Path $stage $entry.Key),(Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member $entry.Value))
+  }
   $stageNames=@(Get-ChildItem -LiteralPath $stage -Recurse -File|ForEach-Object {[IO.Path]::GetRelativePath($stage,$_.FullName).Replace('\','/')})
   $runtimeNames=@($bindings.Keys|Sort-Object)
   Assert-Session ($stageNames.Count-eq$runtimeNames.Count-and ((@($stageNames|Sort-Object)-join '|')-ceq($runtimeNames-join '|'))) 'standalone F210 fixture projection members differ'
   foreach($entry in $bindings.GetEnumerator()){
-    Assert-Session ((Get-FileHash -LiteralPath (Join-Path $stage $entry.Key) -Algorithm SHA256).Hash.ToUpperInvariant()-ceq(Get-FileHash -LiteralPath (Join-Path $canonical $entry.Value) -Algorithm SHA256).Hash.ToUpperInvariant()) "standalone F210 fixture projection bytes differ: $($entry.Key)"
+    $expected=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member $entry.Value)))
+    Assert-Session ((Get-FileHash -LiteralPath (Join-Path $stage $entry.Key) -Algorithm SHA256).Hash.ToUpperInvariant()-ceq$expected) "standalone F210 fixture projection bytes differ: $($entry.Key)"
   }
   $selectedCanonicalMembers=@($bindings.Values|Sort-Object -Unique)
   $excluded=@($canonicalNames|Where-Object {$selectedCanonicalMembers-cnotcontains$_}|Sort-Object)
-  return [pscustomobject]@{source=$stage;canonical_source=$canonical;members=@($bindings.Keys|Sort-Object|ForEach-Object {$sourceName=if($_-ceq'info.json'){$metadata}else{$_};[ordered]@{path=$_;source=$sourceName;sha256=(Get-FileHash -LiteralPath (Join-Path $stage $_) -Algorithm SHA256).Hash.ToUpperInvariant()}});source_metadata=$metadata;excluded_canonical_members=$excluded}
+  return [pscustomobject]@{source=$stage;source_revision=$SourceRevision;canonical_source=$canonical;members=@($bindings.Keys|Sort-Object|ForEach-Object {$sourceName=if($_-ceq'info.json'){$metadata}else{$_};[ordered]@{path=$_;source=$sourceName;sha256=(Get-FileHash -LiteralPath (Join-Path $stage $_) -Algorithm SHA256).Hash.ToUpperInvariant()}});source_metadata=$metadata;excluded_canonical_members=$excluded}
 }
 function New-StandaloneIdentityObserverSourceProjection {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][string]$ArchiveLibrary,
     [Parameter(Mandatory)][string]$OutputRoot,
+    [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$SourceRevision,
     [Parameter(Mandatory)][ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$ExpectedArchiveSha256
   )
   # info-f200.json is alternate-engine packaging metadata.  The immutable F210
   # A15 container intentionally consists only of its two 2.1 runtime members.
   $canonical=(Resolve-Path -LiteralPath (Join-Path $RepoRoot 'tests/fixtures/active-mods-observer')).Path
-  $canonicalFiles=@(Get-ChildItem -LiteralPath $canonical -Recurse -File|Sort-Object FullName)
-  $canonicalNames=@($canonicalFiles|ForEach-Object {[IO.Path]::GetRelativePath($canonical,$_.FullName).Replace('\','/')})
+  $canonicalNames=@(Get-StandaloneF210NativeFixtureGitMembers -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'active-mods-observer')
   $expectedCanonical=@('data-final-fixes.lua','info-f200.json','info.json')
   Assert-Session ($canonicalNames.Count-eq$expectedCanonical.Count-and ((@($canonicalNames|Sort-Object)-join '|')-ceq(@($expectedCanonical|Sort-Object)-join '|'))) 'standalone identity discovery canonical observer source members differ'
-  $info=Get-Content -LiteralPath (Join-Path $canonical 'info.json') -Raw|ConvertFrom-Json -AsHashtable
-  $f200Info=Get-Content -LiteralPath (Join-Path $canonical 'info-f200.json') -Raw|ConvertFrom-Json -AsHashtable
+  $info=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'active-mods-observer' -Member 'info.json'))|ConvertFrom-Json -AsHashtable
+  $f200Info=[Text.Encoding]::UTF8.GetString((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'active-mods-observer' -Member 'info-f200.json'))|ConvertFrom-Json -AsHashtable
   Assert-Session ([string]$info.name-ceq'mir-fixture-mir5-active-mods-observer' -and [string]$info.version-ceq'0.1.0' -and [string]$info.factorio_version-ceq'2.1') 'standalone identity discovery canonical F210 observer metadata differs'
   Assert-Session ([string]$f200Info.name-ceq[string]$info.name -and [string]$f200Info.version-ceq[string]$info.version -and [string]$f200Info.factorio_version-ceq'2.0') 'standalone identity discovery alternate F200 observer metadata differs'
   $archive=Join-Path (Resolve-Path -LiteralPath $ArchiveLibrary).Path 'mir-fixture-mir5-active-mods-observer_0.1.0.zip'
@@ -477,21 +519,23 @@ function New-StandaloneIdentityObserverSourceProjection {
     $expectedEntries=@($runtimeNames|ForEach-Object {$prefix+$_})
     Assert-Session ($entryNames.Count-eq$expectedEntries.Count-and ((@($entryNames|Sort-Object)-join '|')-ceq(@($expectedEntries|Sort-Object)-join '|'))) 'standalone identity discovery A15 observer archive members differ'
     foreach($name in $runtimeNames){
-      $source=Join-Path $canonical $name;$entry=$zip.GetEntry($prefix+$name)
-      Assert-Session ($null-ne$entry-and $entry.Length-eq(Get-Item -LiteralPath $source).Length) "standalone identity discovery A15 observer member differs: $name"
+      $expectedBytes=Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'active-mods-observer' -Member $name
+      $entry=$zip.GetEntry($prefix+$name)
+      Assert-Session ($null-ne$entry-and $entry.Length-eq$expectedBytes.Length) "standalone identity discovery A15 observer member differs: $name"
       $stream=$entry.Open();try{$entryHash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream))}finally{$stream.Dispose()}
-      Assert-Session ($entryHash-ceq(Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash.ToUpperInvariant()) "standalone identity discovery A15 observer bytes differ: $name"
+      $expectedHash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($expectedBytes))
+      Assert-Session ($entryHash-ceq$expectedHash) "standalone identity discovery A15 observer bytes differ: $name"
     }
   } finally {$zip.Dispose()}
   $stage=Join-Path $OutputRoot 'standalone-identity-observer-source'
   Assert-Session (-not(Test-Path -LiteralPath $stage)) 'standalone identity discovery observer source stage already exists'
   $null=New-Item -ItemType Directory -Path $stage
-  foreach($name in $runtimeNames){[IO.File]::Copy((Join-Path $canonical $name),(Join-Path $stage $name),$false)}
+  foreach($name in $runtimeNames){[IO.File]::WriteAllBytes((Join-Path $stage $name),(Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'active-mods-observer' -Member $name))}
   $stageNames=@(Get-ChildItem -LiteralPath $stage -Recurse -File|ForEach-Object {[IO.Path]::GetRelativePath($stage,$_.FullName).Replace('\','/')})
   Assert-Session ($stageNames.Count-eq$runtimeNames.Count-and ((@($stageNames|Sort-Object)-join '|')-ceq(@($runtimeNames|Sort-Object)-join '|'))) 'standalone identity discovery observer projection members differ'
-  foreach($name in $runtimeNames){Assert-Session ((Get-FileHash -LiteralPath (Join-Path $stage $name) -Algorithm SHA256).Hash.ToUpperInvariant()-ceq(Get-FileHash -LiteralPath (Join-Path $canonical $name) -Algorithm SHA256).Hash.ToUpperInvariant()) "standalone identity discovery observer projection bytes differ: $name"}
+  foreach($name in $runtimeNames){$expected=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'active-mods-observer' -Member $name)));Assert-Session ((Get-FileHash -LiteralPath (Join-Path $stage $name) -Algorithm SHA256).Hash.ToUpperInvariant()-ceq$expected) "standalone identity discovery observer projection bytes differ: $name"}
   Assert-MIRLibraryFixtureArchive -Archive $archive -SourceDirectory $stage
-  return [pscustomobject]@{source=$stage;canonical_source=$canonical;archive=$archive;sha256=$ExpectedArchiveSha256.ToUpperInvariant();members=@($runtimeNames|ForEach-Object {[ordered]@{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $stage $_) -Algorithm SHA256).Hash.ToUpperInvariant()}});alternate_metadata='info-f200.json'}
+  return [pscustomobject]@{source=$stage;source_revision=$SourceRevision;canonical_source=$canonical;archive=$archive;sha256=$ExpectedArchiveSha256.ToUpperInvariant();members=@($runtimeNames|ForEach-Object {[ordered]@{path=$_;sha256=(Get-FileHash -LiteralPath (Join-Path $stage $_) -Algorithm SHA256).Hash.ToUpperInvariant()}});alternate_metadata='info-f200.json'}
 }
 function Resolve-StandaloneF210ApiConsumerSourceRevision {
   param([Parameter(Mandatory)][string]$RepoRoot)
@@ -688,14 +732,15 @@ $discoveryFixture=$null;$discoveryInstall=$null;$fixtureSourcesForRun=@($Fixture
 $standaloneObserver=$null;$standaloneLibraryFixture=$null
 $standaloneApiConsumerFixtures=@{}
 $standaloneApiConsumerSources=@{}
-$apiConsumerSourceRevision=$null
+$standaloneFixtureSourceRevision=$null;$apiConsumerSourceRevision=$null
 if($StandaloneIdentityDiscovery){
   # The checked-in functional profile is a template only.  The actual
   # environmental packet is assembled below from the standalone engine, C563,
   # A15 and the staged 0.1.1 fixture; it never relabels the FE4/2E profile.
   $null=Assert-MultiplayerFixtureSelection -Selection $selection -EngineSha256 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' -FixtureCase 'library-multiplayer'
+  $standaloneFixtureSourceRevision=Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $repo
   $discoveryFixture=New-StandaloneIdentityFixtureStage -Sources $FixtureSources -OutputRoot $output
-  $discoveryObserver=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $output -ExpectedArchiveSha256 'A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
+  $discoveryObserver=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $output -SourceRevision $standaloneFixtureSourceRevision -ExpectedArchiveSha256 'A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
   $fixtureSourcesForRun=Get-StandaloneIdentityFixtureSources -Sources $FixtureSources -LibraryFixtureSource (Join-Path $repo 'tests/fixtures/library-multiplayer') -StagedLibraryFixtureSource $discoveryFixture.source -StagedObserverSource $discoveryObserver.source -RepoRoot $repo
   $selection=[ordered]@{
     schema=1;kind='mir5-library-standalone-identity-discovery-f210-selection';target='standalone-identity-discovery';factorio_line='2.1';settings_mode='Defaults'
@@ -721,12 +766,13 @@ $spaceAgeLibrary=($target.PSObject.Properties['space_age_library'] -and $target.
 $privateCreditChecks=($target.PSObject.Properties['private_credit_checks'] -and $target.private_credit_checks -eq $true)
 $positivePrivateStateChecks=($target.PSObject.Properties['positive_private_state_checks'] -and $target.positive_private_state_checks -eq $true)
 if($standaloneF210){
+  $standaloneFixtureSourceRevision=Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $repo
   # Standalone Base and Space Age retain their 0.1.0/0.2.0 metadata; only the
   # two explicit private-credit selections stage the common 0.3.0 metadata.
-  $standaloneLibraryFixture=if($positivePrivateStateChecks){New-LibraryPositiveFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -Target 'f210'}else{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -SpaceAgeLibrary:$spaceAgeLibrary -PrivateCreditChecks:$privateCreditChecks}
-  $standaloneObserver=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $output -ExpectedArchiveSha256 ([string]$target.observer_sha256)
+  $standaloneLibraryFixture=if($positivePrivateStateChecks){New-LibraryPositiveFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -Target 'f210'}else{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -SourceRevision $standaloneFixtureSourceRevision -SpaceAgeLibrary:$spaceAgeLibrary -PrivateCreditChecks:$privateCreditChecks}
+  $standaloneObserver=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $output -SourceRevision $standaloneFixtureSourceRevision -ExpectedArchiveSha256 ([string]$target.observer_sha256)
   if($target.PSObject.Properties['api_client_consumers']-and$target.api_client_consumers-eq$true){
-    $apiConsumerSourceRevision=Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $repo
+    $apiConsumerSourceRevision=$standaloneFixtureSourceRevision
     foreach($name in @('mir-fixture-mir5-api-alpha','mir-fixture-mir5-api-beta')){
       $archiveName=$name+'_0.1.0.zip'
       $standaloneApiConsumerFixtures[$name]=New-StandaloneF210ApiConsumerSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $output -FixtureName $name -ExpectedArchiveSha256 ([string]$target.api_consumer_archive_sha256[$archiveName]) -SourceRevision $apiConsumerSourceRevision
@@ -764,8 +810,8 @@ $record=[ordered]@{
   kind=$(if($StandaloneIdentityDiscovery){'MIR5StandaloneIdentityDiscoveryNativeResultV1'}else{switch($FixtureCase){'library-multiplayer'{'MIR5LibraryMultiplayerNativeResultV1'};'library-paired-browser'{'MIR5LibraryPairedBrowserNativeResultV1'};default{'MIR5ScriptedEffectsMultiplayerNativeResultV1'}}});case=$FixtureCase;status='started';source_head=$prepared.source_head
   engine=$prepared.engine;profile=$prepared.profile;fixtures=$prepared.fixtures;mir_archive=$prepared.mir_archive
   preparation=$prepared;session_expected_peak_memory_mib=$SessionExpectedPeakMemoryMiB;release_qualification=$false;visual_review=$false
-  standalone_identity_discovery=if($StandaloneIdentityDiscovery){[ordered]@{fixture_source=$discoveryFixture.source;fixture_archive_sha256=[string]$selection.archive_sha256['mir-fixture-mir5-library-multiplayer_0.1.1.zip'];observer_source=$discoveryObserver.source;observer_canonical_source=$discoveryObserver.canonical_source;observer_archive_sha256=$discoveryObserver.sha256;observer_members=$discoveryObserver.members;observer_alternate_metadata=$discoveryObserver.alternate_metadata;environmental_only=$true}}else{$null}
-  standalone_f210=if($standaloneF210){[ordered]@{fixture_source=$standaloneLibraryFixture.source;fixture_canonical_source=$standaloneLibraryFixture.canonical_source;fixture_members=$standaloneLibraryFixture.members;fixture_source_metadata=$standaloneLibraryFixture.source_metadata;fixture_excluded_canonical_members=$standaloneLibraryFixture.excluded_canonical_members;observer_source=$standaloneObserver.source;observer_canonical_source=$standaloneObserver.canonical_source;observer_archive_sha256=$standaloneObserver.sha256;observer_members=$standaloneObserver.members;observer_alternate_metadata=$standaloneObserver.alternate_metadata;api_consumer_source_revision=$apiConsumerSourceRevision;private_credit_checks=$privateCreditChecks;steam_identity=$false}}else{$null}
+  standalone_identity_discovery=if($StandaloneIdentityDiscovery){[ordered]@{fixture_source_revision=$standaloneFixtureSourceRevision;fixture_source=$discoveryFixture.source;fixture_archive_sha256=[string]$selection.archive_sha256['mir-fixture-mir5-library-multiplayer_0.1.1.zip'];observer_source=$discoveryObserver.source;observer_canonical_source=$discoveryObserver.canonical_source;observer_archive_sha256=$discoveryObserver.sha256;observer_members=$discoveryObserver.members;observer_alternate_metadata=$discoveryObserver.alternate_metadata;environmental_only=$true}}else{$null}
+  standalone_f210=if($standaloneF210){[ordered]@{fixture_source_revision=$standaloneFixtureSourceRevision;fixture_source=$standaloneLibraryFixture.source;fixture_canonical_source=$standaloneLibraryFixture.canonical_source;fixture_members=$standaloneLibraryFixture.members;fixture_source_metadata=$standaloneLibraryFixture.source_metadata;fixture_excluded_canonical_members=$standaloneLibraryFixture.excluded_canonical_members;observer_source=$standaloneObserver.source;observer_canonical_source=$standaloneObserver.canonical_source;observer_archive_sha256=$standaloneObserver.sha256;observer_members=$standaloneObserver.members;observer_alternate_metadata=$standaloneObserver.alternate_metadata;api_consumer_source_revision=$apiConsumerSourceRevision;private_credit_checks=$privateCreditChecks;steam_identity=$false}}else{$null}
   harness_sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash
 }
 try {
