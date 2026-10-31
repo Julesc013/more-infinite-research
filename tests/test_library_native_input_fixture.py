@@ -107,36 +107,51 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         )
         fixture = "mir-fixture-mir5-library-native-input_0.3.0"
         cases = {
-            "f200": ROOT / "tests/fixtures/library-native-input/info-input-identity-f200.json",
-            "f210": ROOT / "tests/fixtures/library-native-input/info-input-identity-f210.json",
+            "f200": "tests/fixtures/library-native-input/info-input-identity-f200.json",
+            "f210": "tests/fixtures/library-native-input/info-input-identity-f210.json",
         }
-        control = (FIXTURE / "control.lua").read_bytes()
+        revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+
+        def raw_git_head(path):
+            return subprocess.check_output(["git", "show", f"{revision}:{path}"], cwd=ROOT)
+
+        def write_archive(output, members):
+            with zipfile.ZipFile(
+                output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
+            ) as archive:
+                for destination, contents in members:
+                    entry = zipfile.ZipInfo(
+                        f"{fixture}/{destination}", date_time=(1980, 1, 1, 0, 0, 0)
+                    )
+                    entry.create_system = 3
+                    entry.external_attr = 0o100644 << 16
+                    entry.compress_type = zipfile.ZIP_DEFLATED
+                    archive.writestr(entry, contents, compresslevel=9)
 
         with tempfile.TemporaryDirectory() as temporary:
             temporary = Path(temporary)
-            for target, info_path in cases.items():
+            for target, info_source in cases.items():
                 with self.subTest(target=target):
-                    output = temporary / f"{target}.zip"
-                    with zipfile.ZipFile(
-                        output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
-                    ) as archive:
-                        for destination, contents in (
-                            ("control.lua", control),
-                            ("info.json", info_path.read_bytes()),
-                        ):
-                            entry = zipfile.ZipInfo(
-                                f"{fixture}/{destination}", date_time=(1980, 1, 1, 0, 0, 0)
-                            )
-                            entry.create_system = 3
-                            entry.external_attr = 0o100644 << 16
-                            entry.compress_type = zipfile.ZIP_DEFLATED
-                            archive.writestr(entry, contents, compresslevel=9)
-
                     profile = next(
                         row
                         for row in record["profiles"]
                         if row["target"] == target and row["mode"] == "input"
                     )
+                    members = {row["destination"]: row for row in profile["owned_fixture"]["members"]}
+                    self.assertEqual(set(members), {"control.lua", "info.json"})
+                    self.assertEqual(members["control.lua"]["source"], "tests/fixtures/library-native-input/control.lua")
+                    self.assertEqual(members["info.json"]["source"], info_source)
+                    control = raw_git_head(members["control.lua"]["source"])
+                    info = raw_git_head(members["info.json"]["source"])
+                    for destination, contents in (("control.lua", control), ("info.json", info)):
+                        self.assertEqual(len(contents), members[destination]["bytes"])
+                        self.assertEqual(
+                            hashlib.sha256(contents).hexdigest().upper(),
+                            members[destination]["sha256"],
+                        )
+
+                    output = temporary / f"{target}.zip"
+                    write_archive(output, (("control.lua", control), ("info.json", info)))
                     raw = output.read_bytes()
                     self.assertEqual(len(raw), profile["owned_fixture"]["bytes"])
                     self.assertEqual(
@@ -163,6 +178,15 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                             hashlib.sha256(raw).hexdigest().upper(),
                             "6BD418D9EE0B6DE418B1C6BD8835B8E405779F250EB637221AED2B5F451B9C38",
                         )
+                        crlf_checkout = temporary / "crlf-checkout-control.lua"
+                        crlf_checkout.write_bytes(control.replace(b"\n", b"\r\n"))
+                        self.assertNotEqual(crlf_checkout.read_bytes(), control)
+                        crlf_output = temporary / "f200-crlf-checkout.zip"
+                        write_archive(
+                            crlf_output,
+                            (("control.lua", crlf_checkout.read_bytes()), ("info.json", info)),
+                        )
+                        self.assertNotEqual(crlf_output.read_bytes(), raw)
 
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
