@@ -1,0 +1,222 @@
+{
+  "schema": 1,
+  "kind": "MIR5BetaPackageAndUpgradeSafetyVerificationV1",
+  "status": "scoped-beta-go-package-integrity-and-named-upgrade-safety",
+  "recorded_at_utc": "2026-10-31T04:55:52.7863441Z",
+  "scope": {
+    "release": "MIR 5.0.0 GitHub community beta only",
+    "source_release_tag_field": "v5.0.0",
+    "source_release_title": "MIR 5.0.0",
+    "not_a_stable_acceptance_or_publication_record": true,
+    "not_a_native_or_performance_result": true
+  },
+  "frozen_source": {
+    "checkout": "D:/Projects/Factorio/mir5-beta-00-freeze-r01",
+    "commit": "125fc7464414dbbe769fee160399e0cb5a9c9eed",
+    "source_tree": "0f5f0c63083e1aa15a1976494c83fb404fcc9d2c",
+    "source_distribution_version": "5.0.21000",
+    "source_version": "5.0.0",
+    "raw_git_player_delta_from_e79": [
+      "source/changelog.txt"
+    ],
+    "e79_prepared_source": "e79f34d674d3dcc48f6d9cf823e555f9fe71b196",
+    "e79_prepared_source_tree": "701e275a2d598b48101d794e0594f522c35267b1",
+    "current_dev_commit_at_review": "e6e70cfa093dcd905d5bba73f7c19fad7ae817de",
+    "current_dev_source_tree_at_review": "d45f7beafafdfc3cec78c5e5853ec4990aec6486",
+    "raw_git_player_delta_from_beta_to_current_dev": [
+      "source/changelog.txt"
+    ]
+  },
+  "beta_policy_delta": {
+    "base_commit": "e6e70cfa093dcd905d5bba73f7c19fad7ae817de",
+    "changed_paths": [
+      "AGENTS.md",
+      "CHANGELOG.md",
+      "README.md",
+      "docs/development.md",
+      "docs/progress.md",
+      "docs/release-notes.md",
+      "docs/upload-text.txt",
+      "source/changelog.txt",
+      "spec/targets.md",
+      "spec/verification.md"
+    ],
+    "authorization": "The first GitHub beta may disclose unfinished Library input/export/personal-view checks and performance as unverified work deferred to stable; package integrity, exact source/package/controller provenance, upgrade safety, normal checked publication, and completed/failed/unverified disclosure remain mandatory.",
+    "references": [
+      {
+        "path": "docs/development.md",
+        "sha256": "d06e4ded4b7478974766bcda60a9c570c1b439b3ac49b9289cd742bd7b296c9e"
+      },
+      {
+        "path": "spec/verification.md",
+        "sha256": "adfa7e43e0007a575ec26116cca9ad28f850669b30a7ad90fae93ffee7f08d81"
+      }
+    ]
+  },
+  "frozen_inventory": {
+    "path": "D:/Projects/Factorio/mir5-freeze/v5.0.0-beta-00-r01/MIR5ReleaseAssetInventoryV1.json",
+    "bytes": 210569,
+    "file_sha256": "2e263ef28aaba4660bfb490abd4f4cd5ce5ab2ab875f3323dedc4e9fb862ffbf",
+    "self_sha256": "c07f015b10345af8d1913cca5d96b40a90e0cf6e965eae65ce2c2677447b8c12",
+    "canonical_json": true,
+    "stable_assets": 10,
+    "early_best_effort_assets": 7,
+    "archive_assets": 17,
+    "output_entries": 20,
+    "player_members_verified": 1530
+  },
+  "controller_provenance": {
+    "verifier_checkout": "D:/Projects/Factorio/mir5-beta-00-verifier-r01",
+    "branch": "verify/v500-beta-00-r01",
+    "head": "125fc7464414dbbe769fee160399e0cb5a9c9eed",
+    "clean_before_output": true,
+    "package_tool": {
+      "path": "tools/package.py",
+      "git_blob": "02ed2ddf44fb18fb39ba2e3ae1cb18ce5d4e068f",
+      "sha256": "32bdbe5e0d8b776a57bc8df63dd536dd81aedf54141ac6ec6b1bef4044c90674",
+      "bytes": 26198
+    },
+    "release_tool": {
+      "path": "tools/release.py",
+      "git_blob": "768fd224da8797afce274ae08c00c15e83bf1255",
+      "sha256": "e0e399cf34b1f616e92a7120515537e2321298ac2b0180c5c9c89c504040ad29",
+      "bytes": 25334
+    },
+    "runtime": {
+      "implementation": "cpython",
+      "version": "3.14.7",
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    },
+    "zip_policy": {
+      "compression": "ZIP_DEFLATED",
+      "compresslevel": 9,
+      "member_create_system": 3,
+      "member_external_attr": 2175008768,
+      "member_timestamp": [1980, 1, 1, 0, 0, 0]
+    }
+  },
+  "independent_reconstruction": {
+    "output": "D:/Projects/Factorio/mir5-freeze/v5.0.0-beta-00-verifier-r01",
+    "freeze_command": "python -B tools/release.py --source source --revision 125fc7464414dbbe769fee160399e0cb5a9c9eed --output D:/Projects/Factorio/mir5-freeze/v5.0.0-beta-00-verifier-r01 --early-target-record targets/early-editions.json",
+    "verify_command": "python -B tools/release.py --source source --output D:/Projects/Factorio/mir5-freeze/v5.0.0-beta-00-verifier-r01 --early-target-record targets/early-editions.json --verify",
+    "freeze_and_verify_result": "passed; release verification rebuilt every recorded archive in temporary custody and compared exact bytes",
+    "logs": [
+      {
+        "path": "D:/Projects/Factorio/mir5-freeze/v5.0.0-beta-00-verifier-r01-freeze-output.json",
+        "bytes": 306092,
+        "sha256": "c8eee9ef4a82376f09d99c80a60a12de2264e2c6a63eb71c2da381e2827db03c"
+      },
+      {
+        "path": "D:/Projects/Factorio/mir5-freeze/v5.0.0-beta-00-verifier-r01-verify-output.json",
+        "bytes": 306092,
+        "sha256": "c8eee9ef4a82376f09d99c80a60a12de2264e2c6a63eb71c2da381e2827db03c"
+      },
+      {
+        "path": "D:/Projects/Factorio/mir5-freeze/v5.0.0-beta-00-verifier-r02-inspection.json",
+        "bytes": 7957,
+        "sha256": "9de633f1c080b1061704c6461afd08073e7e205907e6490322a35500535add5d",
+        "scope": "independent ZIP/member/info/changelog/checksum/policy inspection"
+      }
+    ],
+    "independent_archive_checks": {
+      "all_archive_hashes_and_sizes_match_inventory": true,
+      "all_member_paths_sizes_and_hashes_match_inventory": true,
+      "all_zip_member_ordering_matches_inventory": true,
+      "all_roots_filenames_and_numeric_target_codecs_match_inventory": true,
+      "all_info_identity_fields_and_minimum_base_dependencies_match_inventory": true,
+      "all_changelog_headers_retain_source_version_5_0_0": true,
+      "both_checksum_files_match_the_archive_lists": true,
+      "excluded_development_prefixes_absent": ["docs/", "tests/", "tools/", "spec/", "sdk/", "build/", "dist/", ".git/", "__pycache__/"],
+      "full_packaged_info_key_set": ["author", "dependencies", "description", "factorio_version", "name", "title", "version"]
+    }
+  },
+  "checksum_manifests": [
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "c8154173b8cecab7aaf567abe14347e82d7001d1e54e794f267d1dd50efdf2f7"
+    },
+    {
+      "name": "SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "dff456329a245f763bec37d7e503600a9fd6d14e186d0b9ea95bc46f5e29f712"
+    }
+  ],
+  "assets": [
+    {"target":"f013","filename":"more-infinite-research_5.0.01300.zip","bytes":454826,"sha256":"ed6b2372f2c12c7e57c4465b8900daf2742b80c0eaa0f2a4cd14fae2853a7849","root":"more-infinite-research_5.0.01300","factorio_version":"0.13","minimum_base":"0.13.20","members":127},
+    {"target":"f014","filename":"more-infinite-research_5.0.01400.zip","bytes":454828,"sha256":"dc2b03ec0b26779e78a8f7ab1fe64973b6a95066f2ce292f0efd929c0496cd24","root":"more-infinite-research_5.0.01400","factorio_version":"0.14","minimum_base":"0.14.23","members":127},
+    {"target":"f015","filename":"more-infinite-research_5.0.01500.zip","bytes":454827,"sha256":"7df127ad392ffea0ec94f0c3da6cd5ff7689a0842ed621d16d0023a7a2993205","root":"more-infinite-research_5.0.01500","factorio_version":"0.15","minimum_base":"0.15.40","members":127},
+    {"target":"f016","filename":"more-infinite-research_5.0.01600.zip","bytes":454829,"sha256":"24848b1012e5ed7c31f8ce51d6a396afa5bf0d716ee58518aecbb1581b9b3cbe","root":"more-infinite-research_5.0.01600","factorio_version":"0.16","minimum_base":"0.16.51","members":127},
+    {"target":"f017","filename":"more-infinite-research_5.0.01700.zip","bytes":454828,"sha256":"3741c93095050391cbff45ff9faa0155bf270d594e7f84e1f4633ee57780459b","root":"more-infinite-research_5.0.01700","factorio_version":"0.17","minimum_base":"0.17.79","members":127},
+    {"target":"f018","filename":"more-infinite-research_5.0.01800.zip","bytes":454829,"sha256":"0d29be4a7ae95a88a216d289a25156dc763f6401563bc505f0d1ed2c769f76b8","root":"more-infinite-research_5.0.01800","factorio_version":"0.18","minimum_base":"0.18.47","members":127,"support":"experimental-best-effort-github-only"},
+    {"target":"f100","filename":"more-infinite-research_5.0.10000.zip","bytes":454820,"sha256":"9c42310c4ff0e8885b3c5d4ed13b35923520081b33679dee5e03284b7aaeed6c","root":"more-infinite-research_5.0.10000","factorio_version":"1.0","minimum_base":"1.0.0","members":127},
+    {"target":"f110","filename":"more-infinite-research_5.0.11000.zip","bytes":455131,"sha256":"2388cb60ebbbffe3e660fca55fcbba68cdea60d1d56ed6fda78b35dccdb1aeb3","root":"more-infinite-research_5.0.11000","factorio_version":"1.1","minimum_base":"1.1.110","members":128},
+    {"target":"f200","filename":"more-infinite-research_5.0.20000.zip","bytes":704588,"sha256":"54650cb19c3bae3c2dd7fe8d728a3fe8104648c8e99b68e14cbfc3f92a0ab3a9","root":"more-infinite-research_5.0.20000","factorio_version":"2.0","minimum_base":"2.0.77","members":221},
+    {"target":"f210","filename":"more-infinite-research_5.0.21000.zip","bytes":704972,"sha256":"b49d7bbb99ea51c7a90af9f72dde5d5c0120f80e492fce0917d96d4159c32407","root":"more-infinite-research_5.0.21000","factorio_version":"2.1","minimum_base":"2.1.23","members":222},
+    {"target":"f006","filename":"more-infinite-research_5.0.00600.zip","bytes":136281,"sha256":"c3f87169987dbedbe8ce45ddb5fbf29ec22f3337694fc08140864ae2c8163b77","root":"more-infinite-research_5.0.00600","factorio_version":"0.6","minimum_base":"0.6.4","members":10,"delivery":"extract-to-folder"},
+    {"target":"f007","filename":"more-infinite-research_5.0.00700.zip","bytes":136281,"sha256":"181d35b002c6bb2c4edbbcd09b2e8651ccfddc2b9a64bcc6fe95a5a7556162dc","root":"more-infinite-research_5.0.00700","factorio_version":"0.7","minimum_base":"0.7.5","members":10,"delivery":"extract-to-folder"},
+    {"target":"f008","filename":"more-infinite-research_5.0.00800.zip","bytes":136279,"sha256":"6ce07ddd09e29d044e0a152a75abf105a21dc94bbff3d2f45cdfef6d370ad7d6","root":"more-infinite-research_5.0.00800","factorio_version":"0.8","minimum_base":"0.8.8","members":10,"delivery":"extract-to-folder"},
+    {"target":"f009","filename":"more-infinite-research_5.0.00900.zip","bytes":136281,"sha256":"c87394b7de0798aa1762082618e7f9e33e78291fc4b2c6000d2067907b44d569","root":"more-infinite-research_5.0.00900","factorio_version":"0.9","minimum_base":"0.9.8","members":10,"delivery":"zip"},
+    {"target":"f010","filename":"more-infinite-research_5.0.01000.zip","bytes":136281,"sha256":"0527d3a39fd53db39761c7c32b988319a5e90dcbf005ba995f55b0283ce99546","root":"more-infinite-research_5.0.01000","factorio_version":"0.10","minimum_base":"0.10.12","members":10,"delivery":"zip"},
+    {"target":"f011","filename":"more-infinite-research_5.0.01100.zip","bytes":136281,"sha256":"4eec5a2e6e2fb97c4775d4581924af0e479486f9dec45c43bf56b4aca45f4131","root":"more-infinite-research_5.0.01100","factorio_version":"0.11","minimum_base":"0.11.22","members":10,"delivery":"zip"},
+    {"target":"f012","filename":"more-infinite-research_5.0.01200.zip","bytes":136283,"sha256":"6f93a7c617e598e9581c72fb6c5260dcf3501b779b0e6b371c6160ccec5ce4a6","root":"more-infinite-research_5.0.01200","factorio_version":"0.12","minimum_base":"0.12.35","members":10,"delivery":"zip"}
+  ],
+  "upgrade_safety_applicability": {
+    "candidate_record": {
+      "path": "spec/evidence/candidate-b-e79-consumed-path-applicability-aero-r01.json",
+      "bytes": 18411,
+      "sha256": "0850dff8544481777fbd53bf7e603458e77df62acceea0fbb6f947afe504e1cc"
+    },
+    "migration_inventory": {
+      "path": "spec/inventory/migration-origins.json",
+      "bytes": 263335,
+      "sha256": "0eecb8662bbdde8f6b8a8f133dcabb9c630180ab7cb82b200e87a4a2bfb69db8",
+      "execution_matrix_authority": "migration_execution_matrix.completion_queue_5_0_0",
+      "published_4_7_3_same_edition_routes": {
+        "count": 9,
+        "editions": ["f013", "f014", "f015", "f016", "f017", "f100", "f110", "f200", "f210"],
+        "status": "all nine named current_completion routes are closed under their recorded scopes; this is not nine fully-qualified editions"
+      },
+      "selected_older_contract_groups": {
+        "count": 7,
+        "all_status": "closed under their recorded scopes",
+        "boundaries": [
+          "MIR1.0 data-only identities",
+          "MIR1.1 module credits and disabled public row",
+          "MIR1.2 combined rocket/cannon credit",
+          "Policy-v1 literal-boolean cap ownership",
+          "Structured-V3 cap ownership and F200/F210 label collision",
+          "MIR3.2 researched discovery and foreign locks",
+          "K2 Imersite public/carrier identities"
+        ]
+      },
+      "published_forward_routes": {
+        "count": 4,
+        "all_status": "closed under their recorded scopes",
+        "routes": [
+          "published4.7.3 F100 -> MIR5 F110",
+          "published4.7.3 F100 -> MIR5 F210",
+          "published4.7.3 F110 -> MIR5 F210",
+          "published4.7.3 F200 Base -> MIR5 F210 Base"
+        ]
+      },
+      "permitted_known_limits": [
+        "Uncertain older1.9-3.x runtime writer histories: explicitly-unverified-deferred",
+        "K2 published4.7.2 intermediate: explicitly-unverified-deferred",
+        "Unselected DLC/provider permutations and remove-save-readd: not-applicable absent a specifically admitted route",
+        "F018 exact4.7.3 predecessor: not-applicable; no published predecessor artifact",
+        "F001-F012 and unavailable older origins: explicitly-unverified-deferred"
+      ]
+    },
+    "decision": "No concrete package-integrity or selected named upgrade-safety blocker was found for this frozen beta. This conclusion adopts only the named, input-bound scopes above and does not promote their retained evidence to universal save/modpack support."
+  },
+  "remaining_beta_limits": [
+    "No stable-release acceptance claim.",
+    "Library input/export/personal-view GUI checks remain explicitly unverified and deferred to stable.",
+    "Performance testing remains explicitly unverified and deferred to stable.",
+    "No general modpack, all-save, all-provider, all-engine, gameplay, multiplayer, or native acceptance is inferred beyond the cited evidence scopes.",
+    "No GitHub release, tag, publication, anonymous-download readback, or primary dist delivery occurred in this verification."
+  ],
+  "conclusion": "GO for the narrowly authorized beta package-integrity and selected upgrade-safety gate, subject to the separate normal checked-publication gates and accurate disclosure of the stated limits."
+}
