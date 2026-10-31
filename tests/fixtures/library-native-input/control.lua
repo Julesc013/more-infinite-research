@@ -188,8 +188,13 @@ local function input_state(p)
     foreign_query=valid(other_query) and other_query.type=="textfield" and other_query.text or false,
     opened_kind=opened_kind,opened_is_library_root=opened_is_library_root}
 end
+local function controller_type(p)
+  local ok,value=pcall(function()return p.controller_type end)
+  return ok and type(value)=="number" and value or false
+end
 local function inspect_opened_snapshot(en,de)
-  return {tick=game.tick,en_input=input_state(en),de_input=input_state(de)}
+  return {tick=game.tick,en_input=input_state(en),de_input=input_state(de),
+    en_controller_type=controller_type(en),de_controller_type=controller_type(de)}
 end
 local function report()
   local s=storage[KEY];if type(s)~="table" then return nil end
@@ -205,6 +210,7 @@ local function report()
     en_locale=valid(en) and en.locale or false,de_locale=valid(de) and de.locale or false,
     en_connected=valid(en) and en.connected or false,de_connected=valid(de) and de.connected or false,
     en_input=input_state(en),de_input=input_state(de),
+    en_controller_type=controller_type(en),de_controller_type=controller_type(de),
     inspect_opened_snapshots=refs.inspect_opened_snapshots or false,
     removed_index=s.removed_index or false,readonly_imported_probe=s.imported_probe_verified==true,
     imported_earnings=true,fixture_seeds_credit=false,load_observed=loaded_restart,

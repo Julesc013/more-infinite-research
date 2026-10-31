@@ -136,9 +136,10 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               if not p then
                 p={valid=true,index=index,name=locale=="en" and "MIR5English" or "MIR5Deutsch",locale=locale,
                   connected=true,force=forces.player,gui={screen=element("screen","screen")},display_scale=1,
-                  display_resolution={width=1280,height=720}}
+                  display_resolution={width=1280,height=720},controller_type=locale=="en" and 7 or 11}
                 game.players[index]=p
               end
+              if opponent=="controller-type-non-scalar" and locale=="de" then p.controller_type="cutscene" end
               p.connected=true;connected()
               if locale=="de" and (opponent=="pending-locale" or opponent=="locale-never-ready") then p.locale="en" end
               if opponent=="unexpected-client-name" and locale=="de" then p.name="UnexpectedDeutsch" end
@@ -178,7 +179,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             local active={base=base,["more-infinite-research"]=target=="f200" and "5.0.20000" or "5.0.21000",
               [historical.fixture]=target=="f200" and "0.3.0" or "0.4.0",
               ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]="0.3.0"}
-            local env={game=game,storage=store,defines={events=events,gui_type={custom=99}},log=function()end,
+            local env={game=game,storage=store,defines={events=events,gui_type={custom=99},controllers={character=7,cutscene=11}},log=function()end,
               helpers={table_to_json=function()return "{}"end},
               require=function(name)assert(name=="__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue");return historical end,
               remote={add_interface=function(name,value)interfaces[name]=value end,
@@ -317,10 +318,12 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertTrue(result["readonly_load"])
                 self.assertIs(result["initial_report"]["en_input"], False)
                 self.assertIs(result["initial_report"]["de_input"], False)
+                self.assertEqual((result["initial_report"]["en_controller_type"], result["initial_report"]["de_controller_type"]), (False, False))
                 phases = {row["phase"]: row for row in result["trace"]}
                 initial = phases["text-prefix"]
                 self.assertEqual(initial["en_input"], {"library_open": True, "library_query": "", "foreign_open": False, "foreign_query": False,
                                                        "opened_kind": "table", "opened_is_library_root": True})
+                self.assertEqual((initial["en_controller_type"], initial["de_controller_type"]), (7, 11))
                 self.assertEqual(initial["de_input"]["library_query"], "recipe-prod-research_mining_drill-1")
                 self.assertEqual((initial["de_input"]["opened_kind"], initial["de_input"]["opened_is_library_root"]), ("table", True))
                 self.assertEqual(phases["prefix-refresh"]["en_input"]["library_query"], "ge")
@@ -353,11 +356,18 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertEqual(
                     snapshots,
                     {
-                        "after_exclusion_probe": {"tick": 0, "en_input": expected_input(expected_private_query), "de_input": expected_input(expected_private_query)},
-                        "after_final_open_en": {"tick": 0, "en_input": expected_input(""), "de_input": expected_input(expected_private_query)},
-                        "after_final_open_de": {"tick": 0, "en_input": expected_input(""), "de_input": expected_input("recipe-prod-research_mining_drill-1")},
+                        "after_exclusion_probe": {"tick": 0, "en_input": expected_input(expected_private_query), "de_input": expected_input(expected_private_query), "en_controller_type": 7, "de_controller_type": 11},
+                        "after_final_open_en": {"tick": 0, "en_input": expected_input(""), "de_input": expected_input(expected_private_query), "en_controller_type": 7, "de_controller_type": 11},
+                        "after_final_open_de": {"tick": 0, "en_input": expected_input(""), "de_input": expected_input("recipe-prod-research_mining_drill-1"), "en_controller_type": 7, "de_controller_type": 11},
                     },
                 )
+                self.assertEqual((inspect["en_controller_type"], inspect["de_controller_type"]), (7, 11))
+                invalid = self.run_case(target, "controller-type-non-scalar")
+                self.assertTrue(invalid["ok"], invalid["message"])
+                invalid_inspect = next(row for row in invalid["trace"] if row["phase"] == "text-prefix")
+                self.assertTrue(all(row["en_controller_type"] == 7 and row["de_controller_type"] is False
+                                    for row in invalid_inspect["inspect_opened_snapshots"].values()))
+                self.assertEqual((invalid_inspect["en_controller_type"], invalid_inspect["de_controller_type"]), (7, False))
                 self.assertIs(result["final"]["inspect_opened_snapshots"], False)
                 self.assertEqual((result["final"]["private_queries"], result["calls"]), (48, 69))
 
