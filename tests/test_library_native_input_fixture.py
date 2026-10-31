@@ -1,10 +1,13 @@
 """Independent input-observer controls with native-shaped doubles, not native input evidence."""
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 import unittest
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/library-native-input"
@@ -25,10 +28,10 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         fixture = "mir-fixture-mir5-library-native-input"
         cases = {
             "f200": ("2.0.77", "5.0.20000", "0.3.0",
-                      ROOT / "tests/profiles/library-native-input-imported110-f200-2077-r11.json",
+                      ROOT / "tests/profiles/library-native-input-imported110-f200-2077-r12.json",
                       FIXTURE / "info-input-identity-f200.json"),
             "f210": ("2.1.23", "5.0.21000", "0.4.0",
-                      ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r11.json",
+                      ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r12.json",
                       FIXTURE / "info-input-identity-f210.json"),
         }
         control = (FIXTURE / "control.lua").read_text(encoding="utf-8")
@@ -97,6 +100,69 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                     check=False,
                 )
                 self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+
+    def test_order_neutral_input_archives_use_the_canonical_two_member_policy(self):
+        record = json.loads(
+            (ROOT / "spec/evidence/library-input-order-neutral-prepared-r01.json").read_text(encoding="utf-8")
+        )
+        fixture = "mir-fixture-mir5-library-native-input_0.3.0"
+        cases = {
+            "f200": ROOT / "tests/fixtures/library-native-input/info-input-identity-f200.json",
+            "f210": ROOT / "tests/fixtures/library-native-input/info-input-identity-f210.json",
+        }
+        control = (FIXTURE / "control.lua").read_bytes()
+
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            for target, info_path in cases.items():
+                with self.subTest(target=target):
+                    output = temporary / f"{target}.zip"
+                    with zipfile.ZipFile(
+                        output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
+                    ) as archive:
+                        for destination, contents in (
+                            ("control.lua", control),
+                            ("info.json", info_path.read_bytes()),
+                        ):
+                            entry = zipfile.ZipInfo(
+                                f"{fixture}/{destination}", date_time=(1980, 1, 1, 0, 0, 0)
+                            )
+                            entry.create_system = 3
+                            entry.external_attr = 0o100644 << 16
+                            entry.compress_type = zipfile.ZIP_DEFLATED
+                            archive.writestr(entry, contents, compresslevel=9)
+
+                    profile = next(
+                        row
+                        for row in record["profiles"]
+                        if row["target"] == target and row["mode"] == "input"
+                    )
+                    raw = output.read_bytes()
+                    self.assertEqual(len(raw), profile["owned_fixture"]["bytes"])
+                    self.assertEqual(
+                        hashlib.sha256(raw).hexdigest().upper(), profile["owned_fixture"]["sha256"]
+                    )
+                    self.assertEqual(
+                        profile["archive_sha256"]["mir-fixture-mir5-library-native-input_0.3.0.zip"],
+                        profile["owned_fixture"]["sha256"],
+                    )
+                    with zipfile.ZipFile(output) as archive:
+                        infos = archive.infolist()
+                        self.assertEqual(
+                            [entry.filename for entry in infos],
+                            [f"{fixture}/control.lua", f"{fixture}/info.json"],
+                        )
+                        for entry in infos:
+                            self.assertEqual(entry.date_time, (1980, 1, 1, 0, 0, 0))
+                            self.assertEqual(entry.create_system, 3)
+                            self.assertEqual(entry.external_attr, 0o100644 << 16)
+                            self.assertEqual(entry.compress_type, zipfile.ZIP_DEFLATED)
+                    if target == "f200":
+                        self.assertEqual(len(raw), 7996)
+                        self.assertEqual(
+                            hashlib.sha256(raw).hexdigest().upper(),
+                            "6BD418D9EE0B6DE418B1C6BD8835B8E405779F250EB637221AED2B5F451B9C38",
+                        )
 
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
