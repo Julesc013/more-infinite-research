@@ -28,10 +28,16 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         fixture = "mir-fixture-mir5-library-native-input"
         cases = {
             "f200": ("2.0.77", "5.0.20000", "0.3.0",
-                      ROOT / "tests/profiles/library-native-input-imported110-f200-2077-r12.json",
+                      (
+                          ROOT / "tests/profiles/library-native-input-imported110-f200-2077-r12.json",
+                          ROOT / "tests/profiles/library-native-input-imported110-f200-2077-r13.json",
+                      ),
                       FIXTURE / "info-input-identity-f200.json"),
             "f210": ("2.1.23", "5.0.21000", "0.4.0",
-                      ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r12.json",
+                      (
+                          ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r12.json",
+                          ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r13.json",
+                      ),
                       FIXTURE / "info-input-identity-f210.json"),
         }
         control = (FIXTURE / "control.lua").read_text(encoding="utf-8")
@@ -40,8 +46,8 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         self.assertIn("script.active_mods[historical.fixture]", control)
         parser = ROOT / "tools/lib/compatibility/LibraryActivation.ps1"
 
-        for target, (base, mir, source_version, profile_path, info_path) in cases.items():
-            with self.subTest(target=target):
+        for target, (base, mir, source_version, profile_paths, info_path) in cases.items():
+            for profile_path in profile_paths:
                 info = json.loads(info_path.read_text(encoding="utf-8"))
                 profile = json.loads(profile_path.read_text(encoding="utf-8"))
                 expected_dependencies = [
@@ -187,6 +193,63 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                             (("control.lua", crlf_checkout.read_bytes()), ("info.json", info)),
                         )
                         self.assertNotEqual(crlf_output.read_bytes(), raw)
+
+    def test_removal_observed_archives_use_current_pinned_raw_members(self):
+        record = json.loads(
+            (ROOT / "spec/evidence/library-input-removal-observed-prepared-r01.json").read_text(encoding="utf-8")
+        )
+        fixture = "mir-fixture-mir5-library-native-input_0.3.0"
+
+        def raw_git_bytes(member):
+            return subprocess.check_output(
+                ["git", "show", f"{member['source_revision']}:{member['source']}"], cwd=ROOT
+            )
+
+        def write_archive(output, members):
+            with zipfile.ZipFile(
+                output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
+            ) as archive:
+                for destination, contents in members:
+                    entry = zipfile.ZipInfo(
+                        f"{fixture}/{destination}", date_time=(1980, 1, 1, 0, 0, 0)
+                    )
+                    entry.create_system = 3
+                    entry.external_attr = 0o100644 << 16
+                    entry.compress_type = zipfile.ZIP_DEFLATED
+                    archive.writestr(entry, contents, compresslevel=9)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            for target in ("f200", "f210"):
+                with self.subTest(target=target):
+                    profile = next(
+                        row for row in record["profiles"] if row["target"] == target and row["mode"] == "input"
+                    )
+                    profile_bytes = (ROOT / profile["profile"]["path"]).read_bytes()
+                    self.assertEqual(len(profile_bytes), profile["profile"]["bytes"])
+                    self.assertEqual(
+                        hashlib.sha256(profile_bytes).hexdigest().upper(), profile["profile"]["sha256"]
+                    )
+                    members = {row["destination"]: row for row in profile["owned_fixture"]["members"]}
+                    self.assertEqual(set(members), {"control.lua", "info.json"})
+                    control = raw_git_bytes(members["control.lua"])
+                    info = raw_git_bytes(members["info.json"])
+                    for destination, contents in (("control.lua", control), ("info.json", info)):
+                        self.assertEqual(len(contents), members[destination]["bytes"])
+                        self.assertEqual(
+                            hashlib.sha256(contents).hexdigest().upper(), members[destination]["sha256"]
+                        )
+                    output = temporary / f"removal-observed-{target}.zip"
+                    write_archive(output, (("control.lua", control), ("info.json", info)))
+                    raw = output.read_bytes()
+                    self.assertEqual(len(raw), profile["owned_fixture"]["bytes"])
+                    self.assertEqual(
+                        hashlib.sha256(raw).hexdigest().upper(), profile["owned_fixture"]["sha256"]
+                    )
+                    self.assertEqual(
+                        profile["archive_sha256"]["mir-fixture-mir5-library-native-input_0.3.0.zip"],
+                        profile["owned_fixture"]["sha256"],
+                    )
 
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)

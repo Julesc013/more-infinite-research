@@ -1,0 +1,167 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryClientIdentityPreparedInputsV1",
+  "status": "fixture-prepared-not-native-qualified",
+  "fixture_source": "7cf634060cde6441031e744c7d155b0647fa0851",
+  "fixture_base": "b555ac1fd95cb6364015c741b456c64c76618c14",
+  "player_source": "42032477d45ced683e72736a4fe30a7a3195b995",
+  "player_tree": "5a6adf0aab4e945aeca13420ddd045ad45f050a0",
+  "changed_player_members": [],
+  "previous_preparation": {
+    "path": "spec/evidence/library-input-order-neutral-prepared-r01.json",
+    "bytes": 19629,
+    "sha256": "FC1D9D4911C86787E0616159B2321F11A778C51277719BF65756B2E908F523C5",
+    "disposition": "The r12 metadata-order counterfactual, its two canonical archives, and all frozen predecessor records remain unchanged. This r13 record is a separate unexecuted removal-observation preparation."
+  },
+  "prior_adverses": {
+    "r34_remove_de": {
+      "terminal": {
+        "path": "build/qualification/imported-library-native-input-runtime-r34-controller/execution-record/terminal.json",
+        "sha256": "CBF1B51457BD3788836133F68726E8E4DCE0ED53EC2FF4E310F1F06171167789"
+      },
+      "root_readback": {
+        "path": "build/qualification/imported-library-native-input-runtime-r34-controller/root-readback-r01.json",
+        "sha256": "1EA6DE1CEAD4BA2ADD1F8C4EE7959A2E2F1EA7B353D6FCC6C3A765AB91FDE9D6"
+      },
+      "scope": "R34 reached remove-de then refused its compound offline-player/root assertion. Its raw reply did not identify which operand differed; it remains adverse evidence, not a product, removal, lifecycle, or input result."
+    }
+  },
+  "diagnostic_observer": {
+    "control": {
+      "source": "tests/fixtures/library-native-input/control.lua",
+      "source_revision": "7cf634060cde6441031e744c7d155b0647fa0851",
+      "bytes": 29497,
+      "sha256": "8D42AB376C45F1B04D6E7A6B02C617F56AF37CAA498AB04DAD6F87E7AB11E80F"
+    },
+    "fields": {
+      "removal_observation": "Immediately after game.remove_offline_players, records removed_events plus the valid-state booleans for the indexed player and retained German root/query before the unchanged compound assertion.",
+      "removal_engine_log": "A deterministic MIR5_LIBRARY_NATIVE_INPUT_REMOVE_DE line carries the same four operands even when the following unchanged assertion refuses."
+    },
+    "behavior": "The remove-de action, event registration, four-term admission predicate, replacement flow, original world assertions, and all input actions are unchanged. This preparation adds no retry, cleanup, state repair, replacement assumption, or acceptance alternative.",
+    "native_execution": false
+  },
+  "profiles": [
+    {
+      "target": "f200",
+      "mode": "input",
+      "version": "0.3.0",
+      "profile": {
+        "path": "tests/profiles/library-native-input-imported110-f200-2077-r13.json",
+        "bytes": 3396,
+        "sha256": "628E1BBCD67F480307CE166570F62A89FEF58C9DDE3DC2F71CB7889C71F00E0A"
+      },
+      "engine": {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "protected_input_save": {
+        "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+        "bytes": 811812,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "archive_sha256": {
+        "more-infinite-research_5.0.20000.zip": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "D30D00A0D57A2A8195565E52DCEFDF94B92DCBA37DC85A83B37245336157E9C0",
+        "mir-fixture-mir5-library-native-input_0.3.0.zip": "4F0290A7FD5C50C1D4FC1B8FFD66EED823555F0DE84CCB2096F951F917C881E3"
+      },
+      "owned_fixture": {
+        "name": "mir-fixture-mir5-library-native-input_0.3.0.zip",
+        "bytes": 8162,
+        "sha256": "4F0290A7FD5C50C1D4FC1B8FFD66EED823555F0DE84CCB2096F951F917C881E3",
+        "local_custody": "build/qualification/library-input-removal-observed-r13/f200/input/mir-fixture-mir5-library-native-input_0.3.0.zip",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "7cf634060cde6441031e744c7d155b0647fa0851",
+            "destination": "control.lua",
+            "bytes": 29497,
+            "sha256": "8D42AB376C45F1B04D6E7A6B02C617F56AF37CAA498AB04DAD6F87E7AB11E80F"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-input-identity-f200.json",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "info.json",
+            "bytes": 345,
+            "sha256": "CC35B55624B2F95EAA2B198048C2C413D787F4EB3FD62EB0938E68CA2B5A7F81"
+          }
+        ]
+      }
+    },
+    {
+      "target": "f210",
+      "mode": "input",
+      "version": "0.3.0",
+      "profile": {
+        "path": "tests/profiles/library-native-input-imported110-f210-2123-r13.json",
+        "bytes": 3396,
+        "sha256": "BB7A108EA02AB52C9FA622584FD0DA47077744BA3573CA55A6657AB571DB2CA2"
+      },
+      "engine": {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "protected_input_save": {
+        "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+        "bytes": 814068,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "archive_sha256": {
+        "more-infinite-research_5.0.21000.zip": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+        "mir-fixture-mir5-migration-origin-f200-110-source_0.4.0.zip": "E07DF42B2FBFACEA5BA32F3E616AF5BBFAB4E355B116187DC023252CFCD09B43",
+        "mir-fixture-mir5-library-native-input_0.3.0.zip": "4A9CCFE443ED8FC6BD7BA6A877A168365DEA3A53B724C57815601D1CC58B5369"
+      },
+      "owned_fixture": {
+        "name": "mir-fixture-mir5-library-native-input_0.3.0.zip",
+        "bytes": 8165,
+        "sha256": "4A9CCFE443ED8FC6BD7BA6A877A168365DEA3A53B724C57815601D1CC58B5369",
+        "local_custody": "build/qualification/library-input-removal-observed-r13/f210/input/mir-fixture-mir5-library-native-input_0.3.0.zip",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "7cf634060cde6441031e744c7d155b0647fa0851",
+            "destination": "control.lua",
+            "bytes": 29497,
+            "sha256": "8D42AB376C45F1B04D6E7A6B02C617F56AF37CAA498AB04DAD6F87E7AB11E80F"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-input-identity-f210.json",
+            "source_revision": "d9e6dd74427763b09d8f21da585b17e059dedd08",
+            "destination": "info.json",
+            "bytes": 345,
+            "sha256": "A9B20176471FF3D329306D199EEB02CB99492AC299FEDB63DA27C9429C0524B5"
+          }
+        ]
+      }
+    }
+  ],
+  "unchanged_export_rows": {
+    "preparation": {
+      "path": "spec/evidence/library-input-order-neutral-prepared-r01.json",
+      "bytes": 19629,
+      "sha256": "FC1D9D4911C86787E0616159B2321F11A778C51277719BF65756B2E908F523C5"
+    },
+    "f200": {
+      "profile": "tests/profiles/library-support-exports-imported110-f200-2077-r04.json",
+      "profile_sha256": "11F56F05563F9DEE90F6CAC1CC8003C5A87784EFEA8209261AA1EFF41051811F",
+      "archive_sha256": "6D6362DF9998F54B71D0BBCDC5DF82A800C5BE802CF8279E86C2ADA6A469845C"
+    },
+    "f210": {
+      "profile": "tests/profiles/library-support-exports-imported110-f210-2123-r04.json",
+      "profile_sha256": "50988621122FF6B25725793EEED79D9198BC541B8F6BDCF877C508125B220AC5",
+      "archive_sha256": "20504B66CC353C6BBC9C60A1E99DB583654B3A9B9E4D1A958B9991CA142B44A1"
+    },
+    "disposition": "The r09 export rows and their raw member pins remain exactly those frozen rows; this input-only preparation neither rebuilds nor qualifies support exports."
+  },
+  "validation": {
+    "raw_control": "Both r13 archives contain the exact 7cf raw control blob and target-specific d9e raw metadata blobs. The historical r12 projection continues to resolve each member from its own recorded source revision.",
+    "archive_reproduction": "The r13 projections use Python zipfile with ZIP_DEFLATED compresslevel9 per member, fixed 1980 timestamp, create_system3, and Unix100644 external attributes. No dependency archive was copied, extracted, linked, or replaced.",
+    "native_execution": false,
+    "release_qualification": false
+  },
+  "limits": [
+    "This record prepares only the immediate post-remove operand observation. It does not rerun R34; identify a removal cause; establish a player-removal event; alter a close predicate; or qualify input, lifecycle, gameplay, support exports, saves, performance, or release.",
+    "No packet, private caller, direct-library staging, archive installation, Factorio process, controller action, input, or replay is authorized by this prepared record."
+  ]
+}
