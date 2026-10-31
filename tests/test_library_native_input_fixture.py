@@ -28,10 +28,16 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         fixture = "mir-fixture-mir5-library-native-input"
         cases = {
             "f200": ("2.0.77", "5.0.20000", "0.3.0",
-                      ROOT / "tests/profiles/library-native-input-imported110-f200-2077-r12.json",
+                      (
+                          ROOT / "tests/profiles/library-native-input-imported110-f200-2077-r12.json",
+                          ROOT / "tests/profiles/library-native-input-imported110-f200-2077-r13.json",
+                      ),
                       FIXTURE / "info-input-identity-f200.json"),
             "f210": ("2.1.23", "5.0.21000", "0.4.0",
-                      ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r12.json",
+                      (
+                          ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r12.json",
+                          ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r13.json",
+                      ),
                       FIXTURE / "info-input-identity-f210.json"),
         }
         control = (FIXTURE / "control.lua").read_text(encoding="utf-8")
@@ -40,8 +46,8 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         self.assertIn("script.active_mods[historical.fixture]", control)
         parser = ROOT / "tools/lib/compatibility/LibraryActivation.ps1"
 
-        for target, (base, mir, source_version, profile_path, info_path) in cases.items():
-            with self.subTest(target=target):
+        for target, (base, mir, source_version, profile_paths, info_path) in cases.items():
+            for profile_path in profile_paths:
                 info = json.loads(info_path.read_text(encoding="utf-8"))
                 profile = json.loads(profile_path.read_text(encoding="utf-8"))
                 expected_dependencies = [
@@ -110,10 +116,10 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             "f200": "tests/fixtures/library-native-input/info-input-identity-f200.json",
             "f210": "tests/fixtures/library-native-input/info-input-identity-f210.json",
         }
-        revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
-
-        def raw_git_head(path):
-            return subprocess.check_output(["git", "show", f"{revision}:{path}"], cwd=ROOT)
+        def raw_git_bytes(member):
+            return subprocess.check_output(
+                ["git", "show", f"{member['source_revision']}:{member['source']}"], cwd=ROOT
+            )
 
         def write_archive(output, members):
             with zipfile.ZipFile(
@@ -141,8 +147,8 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                     self.assertEqual(set(members), {"control.lua", "info.json"})
                     self.assertEqual(members["control.lua"]["source"], "tests/fixtures/library-native-input/control.lua")
                     self.assertEqual(members["info.json"]["source"], info_source)
-                    control = raw_git_head(members["control.lua"]["source"])
-                    info = raw_git_head(members["info.json"]["source"])
+                    control = raw_git_bytes(members["control.lua"])
+                    info = raw_git_bytes(members["info.json"])
                     for destination, contents in (("control.lua", control), ("info.json", info)):
                         self.assertEqual(len(contents), members[destination]["bytes"])
                         self.assertEqual(
@@ -188,6 +194,68 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                         )
                         self.assertNotEqual(crlf_output.read_bytes(), raw)
 
+    def test_removal_observed_archives_use_current_pinned_raw_members(self):
+        record = json.loads(
+            (ROOT / "spec/evidence/library-input-removal-observed-prepared-r01.json").read_text(encoding="utf-8")
+        )
+        fixture = "mir-fixture-mir5-library-native-input_0.3.0"
+
+        def raw_git_bytes(member):
+            return subprocess.check_output(
+                ["git", "show", f"{member['source_revision']}:{member['source']}"], cwd=ROOT
+            )
+
+        def write_archive(output, members):
+            with zipfile.ZipFile(
+                output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
+            ) as archive:
+                for destination, contents in members:
+                    entry = zipfile.ZipInfo(
+                        f"{fixture}/{destination}", date_time=(1980, 1, 1, 0, 0, 0)
+                    )
+                    entry.create_system = 3
+                    entry.external_attr = 0o100644 << 16
+                    entry.compress_type = zipfile.ZIP_DEFLATED
+                    archive.writestr(entry, contents, compresslevel=9)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            for target in ("f200", "f210"):
+                with self.subTest(target=target):
+                    profile = next(
+                        row for row in record["profiles"] if row["target"] == target and row["mode"] == "input"
+                    )
+                    profile_bytes = (ROOT / profile["profile"]["path"]).read_bytes()
+                    self.assertEqual(len(profile_bytes), profile["profile"]["bytes"])
+                    self.assertEqual(
+                        hashlib.sha256(profile_bytes).hexdigest().upper(), profile["profile"]["sha256"]
+                    )
+                    profile_value = json.loads(profile_bytes)
+                    members = {row["destination"]: row for row in profile["owned_fixture"]["members"]}
+                    self.assertEqual(set(members), {"control.lua", "info.json"})
+                    control = raw_git_bytes(members["control.lua"])
+                    info = raw_git_bytes(members["info.json"])
+                    for destination, contents in (("control.lua", control), ("info.json", info)):
+                        self.assertEqual(len(contents), members[destination]["bytes"])
+                        self.assertEqual(
+                            hashlib.sha256(contents).hexdigest().upper(), members[destination]["sha256"]
+                        )
+                    output = temporary / f"removal-observed-{target}.zip"
+                    write_archive(output, (("control.lua", control), ("info.json", info)))
+                    raw = output.read_bytes()
+                    self.assertEqual(len(raw), profile["owned_fixture"]["bytes"])
+                    self.assertEqual(
+                        hashlib.sha256(raw).hexdigest().upper(), profile["owned_fixture"]["sha256"]
+                    )
+                    self.assertEqual(
+                        profile["archive_sha256"]["mir-fixture-mir5-library-native-input_0.3.0.zip"],
+                        profile["owned_fixture"]["sha256"],
+                    )
+                    self.assertEqual(
+                        profile_value["archive_sha256"]["mir-fixture-mir5-library-native-input_0.3.0.zip"],
+                        profile["owned_fixture"]["sha256"],
+                    )
+
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().observer_path = (FIXTURE / "control.lua").as_posix()
@@ -205,6 +273,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             local key="mir5_library_native_input"
             local store,callbacks,interfaces,memory,trace={},{},{},{},{}
             local calls,resets=0,0
+            local logs={}
             local forces={}
             for force_index,name in ipairs({"player","mir5-migration-origin-f200-110-foreign","mir5-migration-origin-f200-110-detached"}) do
               local force={valid=true,name=name,index=force_index,technologies={},recipes={},research_queue={},research_progress=0,
@@ -322,11 +391,21 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             end
             game.remove_offline_players=function(indices)
               assert(#indices==1 and indices[1]==de.index and not de.connected)
-              if opponent=="removal-no-event" then return end
               local index=indices[1]
-              for _,node in pairs(de.gui.screen) do invalidate(node) end
-              de.valid=false;game.players[index]=nil
-              callbacks.events[7]({player_index=index});connected()
+              if opponent=="removal-player-retained" then
+                for _,node in pairs(de.gui.screen) do invalidate(node) end
+              elseif opponent=="removal-root-retained" then
+                invalidate(de.gui.screen[root_name].mir_library_filters.mir_library_query)
+                de.valid=false;game.players[index]=nil
+              elseif opponent=="removal-query-retained" then
+                de.gui.screen[root_name].valid=false
+                de.valid=false;game.players[index]=nil
+              else
+                for _,node in pairs(de.gui.screen) do invalidate(node) end
+                de.valid=false;game.players[index]=nil
+              end
+              if opponent~="removal-no-event" then callbacks.events[7]({player_index=index}) end
+              connected()
             end
             forces.player.reset_technology_effects=function()
               resets=resets+1
@@ -348,7 +427,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             local active={base=base,["more-infinite-research"]=target=="f200" and "5.0.20000" or "5.0.21000",
               [historical.fixture]=target=="f200" and "0.3.0" or "0.4.0",
               ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]="0.3.0"}
-            local env={game=game,storage=store,defines={events=events,gui_type={custom=99},controllers={character=7,cutscene=11}},log=function()end,
+            local env={game=game,storage=store,defines={events=events,gui_type={custom=99},controllers={character=7,cutscene=11}},log=function(message)logs[#logs+1]=message end,
               helpers={table_to_json=function()return "{}"end},
               require=function(name)assert(name=="__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue");return historical end,
               remote={add_interface=function(name,value)interfaces[name]=value end,
@@ -449,7 +528,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               step("restart");cold_calls_after=calls
               game.tick=game.tick+60;step("complete-save")
             end)
-            return {ok=ok,message=tostring(message),trace=trace,saves=game.saves,readonly_report=readonly_report,
+            return {ok=ok,message=tostring(message),trace=trace,saves=game.saves,logs=logs,readonly_report=readonly_report,
               initial_report=initial_report,missing_query_report=missing_query_report,missing_query_readonly=missing_query_readonly,
               opened_getter_report=opened_getter_report,opened_getter_readonly=opened_getter_readonly,
               readonly_load=readonly_load,resets=resets,calls=calls,cold_calls_before=cold_calls_before,cold_calls_after=cold_calls_after,
@@ -473,10 +552,44 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 final = result["final"]
                 self.assertEqual((final["phase"], final["actual_joins"], final["private_queries"]), ("delivered", 5, 48))
                 self.assertEqual((final["actual_library_closed_events"], final["actual_drag_events"], final["actual_removed_events"]), (2, 1, 1))
+                self.assertEqual(
+                    final["removal_observation"],
+                    {"removed_events": 1, "remaining_player_valid": False,
+                     "retained_de_root_valid": False, "retained_de_query_valid": False},
+                )
                 self.assertTrue(final["imported_earnings"])
                 self.assertFalse(final["fixture_seeds_credit"])
                 self.assertTrue(final["load_observed"])
                 self.assertEqual(final["en_geometry"]["location"], {"x": 170, "y": 100})
+
+    def test_remove_de_records_each_native_operand_before_the_unchanged_compound_refusal(self):
+        cases = {
+            "removal-no-event": {"removed_events": 0, "remaining_player_valid": False,
+                                 "retained_de_root_valid": False, "retained_de_query_valid": False},
+            "removal-player-retained": {"removed_events": 1, "remaining_player_valid": True,
+                                         "retained_de_root_valid": False, "retained_de_query_valid": False},
+            "removal-root-retained": {"removed_events": 1, "remaining_player_valid": False,
+                                      "retained_de_root_valid": True, "retained_de_query_valid": False},
+            "removal-query-retained": {"removed_events": 1, "remaining_player_valid": False,
+                                       "retained_de_root_valid": False, "retained_de_query_valid": True},
+        }
+        for target in ("f200", "f210"):
+            for opponent, expected in cases.items():
+                with self.subTest(target=target, opponent=opponent):
+                    result = self.run_case(target, opponent)
+                    self.assertFalse(result["ok"], result["message"])
+                    self.assertIn("actual offline player/root removal differs:", result["message"])
+                    self.assertEqual(result["final"]["phase"], "removing-de")
+                    self.assertEqual(result["final"]["removal_observation"], expected)
+                    line = result["logs"][-1]
+                    self.assertEqual(
+                        line,
+                        "[MIR5_LIBRARY_NATIVE_INPUT_REMOVE_DE] "
+                        f"removed_events={expected['removed_events']} "
+                        f"remaining_player_valid={str(expected['remaining_player_valid']).lower()} "
+                        f"retained_de_root_valid={str(expected['retained_de_root_valid']).lower()} "
+                        f"retained_de_query_valid={str(expected['retained_de_query_valid']).lower()}",
+                    )
 
     def test_readonly_reports_expose_actual_library_and_foreign_input_state(self):
         for target in ("f200", "f210"):
