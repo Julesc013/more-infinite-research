@@ -36,14 +36,14 @@ source_of_truth_for:
 | MIR version | 2.0 Base | 2.0 Space Age | 2.0 heavy | 2.1 Base | 2.1 Space Age | 2.1 heavy |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | No MIR, initial launch | 14.46 | 45.72 | 40.22 | 12.86 | 30.24 | 42.06 |
-| No MIR, final reference | 8.99 | 18.44 | 26.95 | 8.52 | 20.54 | 28.68 |
+| No MIR, final reference | 8.99 | 18.44 | 26.96 | 8.52 | 20.54 | 28.68 |
 | MIR 1 | 9.17 | 18.44 | 27.24 | — | — | — |
 | MIR 2 | 8.98 | 18.76 | 28.17 | 8.47 | 20.47 | 29.01 |
-| MIR 3 | 10.31 | 19.92 | 31.35 | 9.05 | 22.09 | 33.00 |
+| MIR 3 | 10.31 | 19.92 | 31.35 | 9.06 | 22.09 | 33.00 |
 | MIR 4.7.3 | 10.24 | 19.89 | 29.71 | 9.08 | 22.26 | 31.77 |
-| MIR 5.0.0 beta | 9.04 | 19.13 | 28.00 | 8.28 | 20.66 | 28.88 |
+| MIR 5.0.0 beta | 9.05 | 19.13 | 28.00 | 8.28 | 20.66 | 28.88 |
 | MIR 5 minus final no MIR | +0.06 | +0.69 | +1.05 | -0.24 | +0.11 | +0.21 |
-| Seconds saved: MIR 4 to MIR 5 | 1.20 | 0.76 | 1.71 | 0.80 | 1.61 | 2.88 |
+| Seconds saved: MIR 4 to MIR 5 | 1.20 | 0.76 | 1.71 | 0.80 | 1.61 | 2.89 |
 
 - The 2.1 heavy column uses retained initialization logs from runs whose menu checks failed. It remains a diagnostic comparison; those failures are not counted as menu passes.
 - Signed differences are descriptive: a small negative value does not mean MIR makes Factorio faster than running without it. This snapshot cannot resolve small overheads reliably.
