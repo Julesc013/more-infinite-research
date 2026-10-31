@@ -48,6 +48,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact corrected F200 cap queue fixture-source fetch failed.' }
           git fetch --no-tags --depth=1 origin 9ef64ff41e0c7140467df044dfe20837f1fa5a40
           if ($LASTEXITCODE -ne 0) { throw 'Exact legacy boolean cap fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin d8c6f9e1990d5b5540901d6fd4fa3c5a9e970979
+          if ($LASTEXITCODE -ne 0) { throw 'Exact raw-close input fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 70e4f235dfd94e9be09d317377e8661608390069
+          if ($LASTEXITCODE -ne 0) { throw 'Exact order-neutral input metadata-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 7cf634060cde6441031e744c7d155b0647fa0851
+          if ($LASTEXITCODE -ne 0) { throw 'Exact removal operand fixture-source fetch failed.' }
       - id: bind
         name: Bind the exact ordered host-control plan
         shell: pwsh
@@ -137,6 +143,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact corrected F200 cap queue fixture-source fetch failed.' }
           git fetch --no-tags --depth=1 origin 9ef64ff41e0c7140467df044dfe20837f1fa5a40
           if ($LASTEXITCODE -ne 0) { throw 'Exact legacy boolean cap fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin d8c6f9e1990d5b5540901d6fd4fa3c5a9e970979
+          if ($LASTEXITCODE -ne 0) { throw 'Exact raw-close input fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 70e4f235dfd94e9be09d317377e8661608390069
+          if ($LASTEXITCODE -ne 0) { throw 'Exact order-neutral input metadata-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 7cf634060cde6441031e744c7d155b0647fa0851
+          if ($LASTEXITCODE -ne 0) { throw 'Exact removal operand fixture-source fetch failed.' }
       - name: Restore the bound host-control plan
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:

@@ -228,8 +228,17 @@ class HostControlsTests(unittest.TestCase):
         self.assertIsNotNone(fixture_revision)
         required_fetch = "git fetch --no-tags --depth=1 origin " + fixture_revision.group(1)
         jobs = dict(re.findall(r"(?ms)^  ([a-z-]+):\n(.*?)(?=^  [a-z-]+:\n|\Z)", workflow))
+        input_revisions = set()
+        for name in ("library-input-order-neutral-prepared-r01.json", "library-input-removal-observed-prepared-r01.json"):
+            declaration = json.loads((ROOT / "spec/evidence" / name).read_text(encoding="utf-8"))
+            for profile in declaration["profiles"]:
+                if profile["mode"] == "input":
+                    input_revisions.update(member["source_revision"] for member in profile["owned_fixture"]["members"])
         for job in ("verification-plan", "host-controls"):
             self.assertIn(required_fetch, jobs[job], job)
+            for revision in input_revisions:
+                self.assertRegex(revision, r"^[0-9a-f]{40}$")
+                self.assertIn("git fetch --no-tags --depth=1 origin " + revision, jobs[job], (job, revision))
         self.assertIn("actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1", workflow)
         self.assertIn("actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065", workflow)
         self.assertIn("python-version: '3.14'", workflow)
