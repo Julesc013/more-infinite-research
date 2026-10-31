@@ -28,6 +28,9 @@ public static class MIROwnedMenuNative {
   [DllImport("user32.dll")] public static extern bool ClientToScreen(IntPtr h, ref Point p);
   [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
   [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
+  [DllImport("kernel32.dll")] public static extern uint GetCurrentThreadId();
+  [DllImport("user32.dll")] public static extern IntPtr GetThreadDesktop(uint threadId);
+  [DllImport("user32.dll", SetLastError=true)] public static extern bool AttachThreadInput(uint attachingThread, uint attachedThread, bool attach);
   [DllImport("user32.dll")] public static extern IntPtr WindowFromPoint(Point p);
   [DllImport("user32.dll")] public static extern IntPtr GetAncestor(IntPtr h, uint flag);
   [DllImport("user32.dll")] public static extern bool PostMessage(IntPtr h, uint message, UIntPtr w, IntPtr l);
@@ -47,6 +50,14 @@ function New-MIROwnedMenuObserverDiagnostics {
     foreground_request_attempts=0
     foreground_request_refused=0
     foreground_request_not_acquired=0
+    owned_peer_foreground_identity_refused=0
+    owned_peer_foreground_foreign_refused=0
+    owned_peer_foreground_desktop_refused=0
+    owned_peer_foreground_attach_refused=0
+    owned_peer_foreground_activation_refused=0
+    owned_peer_foreground_detach_refused=0
+    owned_peer_foreground_post_detach_not_target=0
+    owned_peer_foreground_last=$null
     client_geometry_unavailable=0
     offscreen=0
     occluded=0
@@ -134,6 +145,111 @@ function Get-MIROwnedMenuHitProcessRelation {
 function Set-MIROwnedMenuForegroundHandle {
   param([Parameter(Mandatory)][IntPtr]$Handle)
   return [MIROwnedMenuNative]::SetForegroundWindow($Handle)
+}
+
+function Get-MIROwnedMenuWindowThreadId {
+  param([Parameter(Mandatory)][IntPtr]$Handle)
+  [uint32]$ownerId=0
+  return [uint32][MIROwnedMenuNative]::GetWindowThreadProcessId($Handle,[ref]$ownerId)
+}
+
+function Get-MIROwnedMenuControllerThreadId {
+  return [uint32][MIROwnedMenuNative]::GetCurrentThreadId()
+}
+
+function Get-MIROwnedMenuThreadDesktop {
+  param([Parameter(Mandatory)][uint32]$ThreadId)
+  return [MIROwnedMenuNative]::GetThreadDesktop($ThreadId)
+}
+
+function Connect-MIROwnedMenuInputThread {
+  param([Parameter(Mandatory)][uint32]$AttachingThread,[Parameter(Mandatory)][uint32]$AttachedThread,[Parameter(Mandatory)][bool]$Attach)
+  return [MIROwnedMenuNative]::AttachThreadInput($AttachingThread,$AttachedThread,$Attach)
+}
+
+function Assert-MIROwnedMenuOwnedPeerWindow {
+  param(
+    [Parameter(Mandatory)][Diagnostics.Process]$Process,
+    [Parameter(Mandatory)][datetime]$ExpectedStartUtc,
+    [Parameter(Mandatory)][string]$ExpectedExecutable,
+    [Parameter(Mandatory)][IntPtr]$ExpectedHandle,
+    [Parameter(Mandatory)][ValidateSet('target','peer')][string]$Role
+  )
+  $Process.Refresh()
+  if ($Process.HasExited -or $Process.StartTime.ToUniversalTime() -ne $ExpectedStartUtc) { throw "[mir-menu-owned-peer-$Role-identity]" }
+  $actualExecutable=[IO.Path]::GetFullPath([string]$Process.MainModule.FileName)
+  if ($actualExecutable -cne [IO.Path]::GetFullPath($ExpectedExecutable)) { throw "[mir-menu-owned-peer-$Role-executable]" }
+  $actualHandle=Get-MIROwnedMenuMainWindowHandle $Process
+  if ($actualHandle -eq [IntPtr]::Zero -or $actualHandle -ne $ExpectedHandle -or -not(Test-MIROwnedMenuWindowHandle $actualHandle) -or (Get-MIROwnedMenuWindowProcessId $actualHandle) -ne $Process.Id) { throw "[mir-menu-owned-peer-$Role-window]" }
+  if (-not(Test-MIROwnedMenuWindowVisible $actualHandle) -or (Test-MIROwnedMenuWindowIconic $actualHandle)) { throw "[mir-menu-owned-peer-$Role-not-visible]" }
+  $threadId=Get-MIROwnedMenuWindowThreadId $actualHandle
+  if ($threadId -eq 0) { throw "[mir-menu-owned-peer-$Role-thread]" }
+  return [pscustomobject]@{process=$Process;handle=$actualHandle;thread_id=[uint32]$threadId}
+}
+
+function Invoke-MIROwnedMenuOwnedPeerForeground {
+  param(
+    [Parameter(Mandatory)][Diagnostics.Process]$TargetProcess,
+    [Parameter(Mandatory)][datetime]$TargetExpectedStartUtc,
+    [Parameter(Mandatory)][string]$TargetExpectedExecutable,
+    [Parameter(Mandatory)][IntPtr]$TargetHandle,
+    [Parameter(Mandatory)][Diagnostics.Process]$PeerProcess,
+    [Parameter(Mandatory)][datetime]$PeerExpectedStartUtc,
+    [Parameter(Mandatory)][string]$PeerExpectedExecutable,
+    [Parameter(Mandatory)][IntPtr]$PeerHandle,
+    [Parameter(Mandatory)][Collections.IDictionary]$Diagnostics
+  )
+  # This is an opt-in, one-shot capture-boundary fallback. It never grants
+  # foreground permission generally and never attaches to an unknown window.
+  # AttachThreadInput resets queue key state: call only at a quiescent capture
+  # boundary after synchronous actor release, and always detach before capture.
+  # https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-attachthreadinput
+  $attempted=$false;$attached=$false;$detached=$false;$setForeground=$false;$before='unobserved';$after='unobserved';$outcome='started';$failure=$null
+  try {
+    $target=Assert-MIROwnedMenuOwnedPeerWindow -Process $TargetProcess -ExpectedStartUtc $TargetExpectedStartUtc -ExpectedExecutable $TargetExpectedExecutable -ExpectedHandle $TargetHandle -Role target
+    $peer=Assert-MIROwnedMenuOwnedPeerWindow -Process $PeerProcess -ExpectedStartUtc $PeerExpectedStartUtc -ExpectedExecutable $PeerExpectedExecutable -ExpectedHandle $PeerHandle -Role peer
+    if ($target.process.Id -eq $peer.process.Id -or $target.handle -eq $peer.handle) { throw '[mir-menu-owned-peer-distinct-identities]' }
+    $controllerThread=Get-MIROwnedMenuControllerThreadId
+    if ($controllerThread -eq 0 -or $controllerThread -eq $target.thread_id -or $controllerThread -eq $peer.thread_id -or $target.thread_id -eq $peer.thread_id) { throw '[mir-menu-owned-peer-thread-identity]' }
+    $controllerDesktop=Get-MIROwnedMenuThreadDesktop $controllerThread;$targetDesktop=Get-MIROwnedMenuThreadDesktop $target.thread_id;$peerDesktop=Get-MIROwnedMenuThreadDesktop $peer.thread_id
+    if ($controllerDesktop -eq [IntPtr]::Zero -or $targetDesktop -eq [IntPtr]::Zero -or $peerDesktop -eq [IntPtr]::Zero -or $controllerDesktop -ne $targetDesktop -or $controllerDesktop -ne $peerDesktop) { throw '[mir-menu-owned-peer-desktop]' }
+    $foreground=Get-MIROwnedMenuForegroundHandle
+    if ($foreground -ne $peer.handle) { throw '[mir-menu-owned-peer-foreground]' }
+    $before='peer';$attempted=$true
+    if (-not(Connect-MIROwnedMenuInputThread -AttachingThread $controllerThread -AttachedThread $peer.thread_id -Attach $true)) { throw '[mir-menu-owned-peer-attach]' }
+    $attached=$true
+    if (-not(Set-MIROwnedMenuForegroundHandle $target.handle)) { throw '[mir-menu-owned-peer-activation]' }
+    $setForeground=$true
+    if ((Get-MIROwnedMenuForegroundHandle) -ne $target.handle) { throw '[mir-menu-owned-peer-activation]' }
+    $after='target';$outcome='activated'
+  } catch {
+    $failure=$_.Exception.Message
+    if ($failure -match 'desktop') { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_desktop_refused';$outcome='desktop-refused' }
+    elseif ($failure -match 'foreground') { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_foreign_refused';$outcome='foreground-refused' }
+    elseif ($failure -match 'attach') { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_attach_refused';$outcome='attach-refused' }
+    elseif ($failure -match 'activation') { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_activation_refused';$outcome='activation-refused' }
+    else { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_identity_refused';$outcome='identity-refused' }
+  } finally {
+    if ($attached) {
+      if (Connect-MIROwnedMenuInputThread -AttachingThread $controllerThread -AttachedThread $peer.thread_id -Attach $false) { $detached=$true }
+      else { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_detach_refused';$outcome='detach-refused';if($null-eq$failure){$failure='[mir-menu-owned-peer-detach]'} }
+    }
+  }
+  if($null-eq$failure-and$attached-and$detached){
+    try {
+      $null=Assert-MIROwnedMenuOwnedPeerWindow -Process $TargetProcess -ExpectedStartUtc $TargetExpectedStartUtc -ExpectedExecutable $TargetExpectedExecutable -ExpectedHandle $TargetHandle -Role target
+      $null=Assert-MIROwnedMenuOwnedPeerWindow -Process $PeerProcess -ExpectedStartUtc $PeerExpectedStartUtc -ExpectedExecutable $PeerExpectedExecutable -ExpectedHandle $PeerHandle -Role peer
+      if((Get-MIROwnedMenuForegroundHandle)-ne$TargetHandle){throw '[mir-menu-owned-peer-post-detach-foreground]'}
+      $after='target-post-detach'
+    } catch {
+      $failure=$_.Exception.Message
+      if($failure-match'post-detach-foreground'){Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_post_detach_not_target';$outcome='post-detach-not-target'}
+      else{Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'owned_peer_foreground_identity_refused';$outcome='post-detach-identity-refused'}
+    }
+  }
+  $Diagnostics.owned_peer_foreground_last=[ordered]@{kind='MIROwnedMenuOwnedPeerForegroundV1';attempted=$attempted;before_foreground=$before;after_foreground=$after;attached=$attached;detached=$detached;set_foreground=$setForeground;outcome=$outcome}
+  if($null-ne$failure){throw $failure}
+  return $Diagnostics.owned_peer_foreground_last
 }
 
 function Request-MIROwnedMenuForeground {
