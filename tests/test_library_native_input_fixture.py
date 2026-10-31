@@ -386,7 +386,6 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             end
             game.remove_offline_players=function(indices)
               assert(#indices==1 and indices[1]==de.index and not de.connected)
-              if opponent=="removal-no-event" then return end
               local index=indices[1]
               if opponent=="removal-player-retained" then
                 for _,node in pairs(de.gui.screen) do invalidate(node) end
@@ -400,7 +399,8 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 for _,node in pairs(de.gui.screen) do invalidate(node) end
                 de.valid=false;game.players[index]=nil
               end
-              callbacks.events[7]({player_index=index});connected()
+              if opponent~="removal-no-event" then callbacks.events[7]({player_index=index}) end
+              connected()
             end
             forces.player.reset_technology_effects=function()
               resets=resets+1
@@ -559,8 +559,8 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
 
     def test_remove_de_records_each_native_operand_before_the_unchanged_compound_refusal(self):
         cases = {
-            "removal-no-event": {"removed_events": 0, "remaining_player_valid": True,
-                                 "retained_de_root_valid": True, "retained_de_query_valid": True},
+            "removal-no-event": {"removed_events": 0, "remaining_player_valid": False,
+                                 "retained_de_root_valid": False, "retained_de_query_valid": False},
             "removal-player-retained": {"removed_events": 1, "remaining_player_valid": True,
                                          "retained_de_root_valid": False, "retained_de_query_valid": False},
             "removal-root-retained": {"removed_events": 1, "remaining_player_valid": False,
