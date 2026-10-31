@@ -391,7 +391,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                   detail[present and DETAIL_TITLE or DETAIL_EMPTY]=element("label",present and DETAIL_TITLE or DETAIL_EMPTY)
                   content[DETAIL]=detail
                   local actions=element("flow",ACTIONS)
-                  actions[OPEN_NATIVE]=element("button",OPEN_NATIVE);actions[OPEN_NATIVE].enabled=present
+                  actions[OPEN_NATIVE]=element("sprite-button",OPEN_NATIVE);actions[OPEN_NATIVE].enabled=present
                   content[ACTIONS]=actions
                   target.gui.screen[ROOT_NAME]=root
                   return
@@ -412,7 +412,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 detail[DETAIL_EMPTY]=element("label",DETAIL_EMPTY)
                 content[DETAIL]=detail
                 local actions=element("flow",ACTIONS)
-                actions[OPEN_NATIVE]=element("button",OPEN_NATIVE)
+                actions[OPEN_NATIVE]=element("sprite-button",OPEN_NATIVE)
                 actions[OPEN_NATIVE].enabled=opponent=="private-credit-action-enabled"
                 content[ACTIONS]=actions
                 target.gui.screen[ROOT_NAME]=root
@@ -436,7 +436,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 detail[DETAIL_EMPTY]=element("label",DETAIL_EMPTY)
                 content[DETAIL]=detail
                 local actions=element("flow",ACTIONS)
-                actions[OPEN_NATIVE]=element("button",OPEN_NATIVE)
+                actions[OPEN_NATIVE]=element("sprite-button",OPEN_NATIVE)
                 actions[OPEN_NATIVE].enabled=false
                 content[ACTIONS]=actions
                 target.gui.screen[ROOT_NAME]=root
@@ -458,7 +458,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               content[DETAIL]=detail
               if ordinary_private_query then
                 local actions=element("flow",ACTIONS)
-                actions[OPEN_NATIVE]=element("button",OPEN_NATIVE)
+                actions[OPEN_NATIVE]=element("sprite-button",OPEN_NATIVE)
                 actions[OPEN_NATIVE].enabled=true
                 content[ACTIONS]=actions
               end
@@ -972,12 +972,13 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             "mir-fixture-mir5-active-mods-observer_0.1.0.zip":
                 "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
             "more-infinite-research_5.0.21000.zip":
-                "6AFD86ABB0678B025D1DA3F44F5A8047458C29271F0CC3A9D7473D6ADC9E4C4C",
+                "1EF57E3ACD05BE9B1097AC3744C913933A7784FE6513F12C2771B0096CDB2029",
             "mir-fixture-mir5-api-alpha_0.1.0.zip":
                 "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
             "mir-fixture-mir5-api-beta_0.1.0.zip":
                 "0E48351A5D515506B133ED16FE265119D72EB781FA2A4473D1771C451C3EB633",
         })
+        self.assertIn("restored Library and read-only responsive table layout", profile["scope"])
         self.assertIn("cfeac3e8a6583576f6d0165a9f5cf6a9087b441e", profile["scope"])
         self.assertIn("does not replace or qualify the published beta", profile["scope"])
 
@@ -993,7 +994,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           if($node.Count-ne1){throw 'selection function is absent or ambiguous'}
           Invoke-Expression $node[0].Extent.Text
           $profile=Get-Content -LiteralPath $env:MIR_TEST_RESTORATION_PROFILE -Raw|ConvertFrom-Json -AsHashtable
-          $mir='6AFD86ABB0678B025D1DA3F44F5A8047458C29271F0CC3A9D7473D6ADC9E4C4C'
+          $mir='1EF57E3ACD05BE9B1097AC3744C913933A7784FE6513F12C2771B0096CDB2029'
           $engine='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38'
           $target=Assert-MultiplayerFixtureSelection -Selection $profile -EngineSha256 $engine -FixtureCase 'library-multiplayer' -ExpectedMIRArchiveSha256 $mir -SessionExpectedPeakMemoryMiB 8192
           if($target.kind-cne'mir5-library-restoration-cfeac3-space-age-standalone-f210-native-selection' -or
@@ -3176,6 +3177,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
 
     def test_fixture_uses_only_public_browser_and_native_gui_witnesses(self):
         source = CONTROL.read_text(encoding="utf-8")
+        library = (ROOT / "source/runtime/library.lua").read_text(encoding="utf-8")
+        harness = Path(__file__).read_text(encoding="utf-8")
+        self.assertIn('type = "sprite-button", name = PREFIX .. "open_native"', library)
+        self.assertIn('native_open.type ~= "sprite-button"', source)
+        self.assertIn('actions[OPEN_NATIVE]=element("sprite-button",OPEN_NATIVE)', harness)
         self.assertIn('remote.call(BROWSER, "open", player.index', source)
         self.assertIn('{tab="availability", search=""}', source)
         self.assertIn('tab="research", visibility=1', source)

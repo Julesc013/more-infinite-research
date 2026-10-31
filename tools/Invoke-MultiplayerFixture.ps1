@@ -165,7 +165,7 @@ function Assert-MultiplayerFixtureSelection {
       kind='mir5-library-restoration-cfeac3-space-age-standalone-f210-native-selection';factorio_line='2.1';base='2.1.23'
       engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';mir='5.0.21000';build_version=87750
       observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
-      mir_archive_sha256='6AFD86ABB0678B025D1DA3F44F5A8047458C29271F0CC3A9D7473D6ADC9E4C4C'
+      mir_archive_sha256='1EF57E3ACD05BE9B1097AC3744C913933A7784FE6513F12C2771B0096CDB2029'
       fixture_mods=@('elevated-rails@2.1.23','quality@2.1.23','recycler@2.1.23','space-age@2.1.23','mir-fixture-mir5-library-multiplayer@0.3.0','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
       optional_archives=@('more-infinite-research_5.0.21000.zip','mir-fixture-mir5-library-multiplayer_0.3.0.zip','mir-fixture-mir5-api-alpha_0.1.0.zip','mir-fixture-mir5-api-beta_0.1.0.zip')
       api_consumer_archive_sha256=[ordered]@{

@@ -123,7 +123,7 @@ Assert-Preview ($LASTEXITCODE-eq0-and$dirty.Count-eq0) 'source checkout must be 
 Assert-Preview ($profileDefinition.kind-ceq'mir5-library-restoration-cfeac3-space-age-standalone-f210-native-selection' -and
   $profileDefinition.target-ceq'f210-standalone' -and $profileDefinition.engine.version-ceq'2.1.23' -and
   $profileDefinition.engine.sha256-ceq'8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38' -and
-  $profileDefinition.archive_sha256['more-infinite-research_5.0.21000.zip']-ceq'6AFD86ABB0678B025D1DA3F44F5A8047458C29271F0CC3A9D7473D6ADC9E4C4C' -and
+  $profileDefinition.archive_sha256['more-infinite-research_5.0.21000.zip']-ceq'1EF57E3ACD05BE9B1097AC3744C913933A7784FE6513F12C2771B0096CDB2029' -and
   $profileDefinition.archive_sha256['mir-fixture-mir5-api-beta_0.1.0.zip']-ceq'0E48351A5D515506B133ED16FE265119D72EB781FA2A4473D1771C451C3EB633') 'fixed F210 Space Age profile differs'
 Assert-Preview ($engineSha-ceq[string]$profileDefinition.engine.sha256) 'engine SHA-256 differs from the profile'
 Assert-Preview ($engine-ceq'D:\Games\Factorio\2.1\bin\x64\factorio.exe') 'only the declared standalone engine is admitted'

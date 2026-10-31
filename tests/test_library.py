@@ -187,6 +187,17 @@ class LibraryTests(unittest.TestCase):
               for key, field in pairs(spec) do
                 if key == "style" then element.style_name = field else element[key] = field end
               end
+              local read_only_column_count = element.column_count
+              rawset(element, "column_count", nil)
+              setmetatable(element, {
+                __index = function(_, key)
+                  if key == "column_count" then return read_only_column_count end
+                end,
+                __newindex = function(target, key, field)
+                  if key == "column_count" then error("LuaGuiElement.column_count is read only") end
+                  rawset(target, key, field)
+                end
+              })
               value._children[#value._children + 1] = element
               if element.name then value[element.name] = element end
               element.destroy = function()
@@ -1018,6 +1029,71 @@ class LibraryTests(unittest.TestCase):
           library.on_gui_click({player_index=1, element=title["mir_library_layout_smaller"]})
           assert(storage.mir_library.players[1].geometry.width < geometry.width
             and storage.mir_library.players[1].geometry.height < geometry.height)
+        ''')
+
+    def test_layout_tables_recreate_for_column_changes_and_never_mutate_column_count(self):
+        self.lua.execute(r'''
+          boot()
+          local root = library.open(player, {query="gear"})
+          local original_root = root
+          assert(root["mir_library_filters"].column_count == 2)
+          local filters = root["mir_library_filters"]
+          filters["mir_library_mode"].selected_index = 3
+          library.on_gui_selection_state_changed({player_index=1, element=filters["mir_library_mode"]})
+          filters = root["mir_library_filters"]
+          filters["mir_library_status"].selected_index = 4
+          library.on_gui_selection_state_changed({player_index=1, element=filters["mir_library_status"]})
+          filters = root["mir_library_filters"]
+          filters["mir_library_sort"].selected_index = 3
+          library.on_gui_selection_state_changed({player_index=1, element=filters["mir_library_sort"]})
+          local original_tabs = root["mir_library_tabs"]
+          for _ = 1, 3 do
+            local larger = root["mir_library_title"]["mir_library_layout_larger"]
+            library.on_gui_click({player_index=1, element=larger})
+            root = player.gui.screen["mir_research_browser"]
+          end
+          assert(storage.mir_library.players[1].geometry.width == 832)
+          assert(root == original_root and root.valid,
+            "resizing the filters must retain the Library window")
+          assert(not original_tabs.valid and root["mir_library_tabs"] ~= original_tabs,
+            "the creation-time filter breakpoint must rebuild only the tabs below its stable slot")
+          local live_children = {}
+          for _, child in ipairs(root._children) do
+            if child.valid then live_children[#live_children + 1] = child end
+          end
+          assert(#live_children == 3 and live_children[1] == root["mir_library_title"]
+            and live_children[2] == root["mir_library_filters"]
+            and live_children[3] == root["mir_library_tabs"],
+            "rebuilding the filters must preserve their position above the tabs")
+          assert(root["mir_library_filters"].column_count == 4,
+            "the filter table must be recreated when its creation-time columns change")
+          filters = root["mir_library_filters"]
+          assert(filters["mir_library_query"].text == "gear"
+            and filters["mir_library_mode"].selected_index == 3
+            and filters["mir_library_status"].selected_index == 4
+            and filters["mir_library_sort"].selected_index == 3,
+            "recreated GUI controls must reflect the saved per-player filter state")
+
+          root = library.open(player, {tab="settings", settings_scope="options", settings_search=""})
+          local view = storage.mir_library.players[1]
+          local selected_setting = view.setting_selected
+          assert(view.settings_scope == "options" and selected_setting ~= nil)
+          local settings = root["mir_library_tabs"]["mir_library_settings_content"]["mir_library_settings_dynamic"]
+          assert(settings.column_count == 2)
+          player.display_resolution = {width=480,height=400}
+          root = library.open(player, {tab="settings"})
+          view = storage.mir_library.players[1]
+          assert(view.settings_scope == "options" and view.settings_query == ""
+            and view.setting_selected == selected_setting,
+            "narrow-layout reconstruction must preserve saved settings scope, query and selection")
+          settings = root["mir_library_tabs"]["mir_library_settings_content"]["mir_library_settings_dynamic"]
+          assert(settings.column_count == 1,
+            "the settings detail table must be recreated as a stacked layout on a narrow display")
+
+          root = library.open(player, {tab="availability"})
+          assert(root == player.gui.screen["mir_research_browser"])
+          assert(research_content(root).type == "scroll-pane",
+            "a narrow single-column view must use a scroll pane without changing its column count")
         ''')
 
     def test_hide_show_and_restore_actions_are_personal_and_keep_native_research_unchanged(self):
