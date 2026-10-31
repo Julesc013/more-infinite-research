@@ -1,5 +1,11 @@
 ---------------------------------------------------------------------------------------------------
 Version: 5.0.0
+Date: 2026-10-31
+
+  Beta testing:
+
+    - Performance testing and in-game checks for Library keyboard/focus behavior, saved personal views and export files remain
+      unfinished.
 
   Changes:
 

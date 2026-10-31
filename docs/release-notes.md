@@ -1,7 +1,7 @@
 ---
 title: "MIR 5.0.0 release notes"
 status: draft
-applies_to: "MIR 5.0.0 proposed first GitHub community beta"
+applies_to: "MIR 5.0.0 first GitHub community beta"
 audience: player
 doc_type: reference
 owner: mir-maintainers
@@ -23,6 +23,6 @@ source_of_truth_for:
 - **Experimental older builds:** Factorio 0.18.47 remains experimental. The Factorio 0.6–0.12 builds contain basic finite research only, without mod settings, the Library or save migrations; they remain untested best effort. Unzip the Factorio 0.6–0.8 downloads as labelled.
 - **Before upgrading:** back up the save and matching mods/settings. Test a copy with settings unchanged, inspect research and bonuses, then save and restart Factorio before adopting it. Read the [upgrade guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.0/docs/support.md#first-upgrade) before changing Factorio versions or productivity-provider mods.
 - **Already-lost research:** the 4.2.1 incident may require a pre-update backup; installing MIR 5 cannot reconstruct erased history. Follow the [recovery instructions](https://github.com/Julesc013/more-infinite-research/blob/v5.0.0/docs/support.md#recovery-from-the-421-incident).
-- **Known limits:** performance testing continues for heavy modpacks, large active factories, save loading and Library memory. Final speed and memory claims are pending; extreme modpack loading delays remain under investigation.
+- **Beta limits:** in-game verification of Library keyboard/focus behavior, saved personal views and export files is unfinished. Performance testing continues for heavy modpacks, large factories, save loading and Library memory; extreme loading delays remain under investigation.
 - **Full changes:** see the [changelog](https://github.com/Julesc013/more-infinite-research/blob/v5.0.0/CHANGELOG.md).
 - **Bug reports:** include Factorio/MIR versions, the mod list, a full settings profile, the engine log and a reproducible save where possible. See [support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.0/SUPPORT.md).
