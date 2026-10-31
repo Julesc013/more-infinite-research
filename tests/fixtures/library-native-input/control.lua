@@ -171,15 +171,22 @@ local function geometry(p)
   if not valid(root) then return nil end
   return {location=location(root),style_maximal_width=root.style.maximal_width,display_scale=p.display_scale,display_resolution=p.display_resolution}
 end
+local function observed_opened(p, root)
+  local ok, opened=pcall(function() return p.opened end)
+  if not ok then return "getter-error",false,nil,false end
+  return type(opened),valid(root) and opened~=nil and opened==root or false,opened,true
+end
 local function input_state(p)
   if not valid(p) then return false end
   local root=p.gui.screen[ROOT];local filters=valid(root) and root[FILTERS] or nil
   local query=valid(filters) and filters[QUERY] or nil
   local other=p.gui.screen[OTHER];local other_query=valid(other) and other[OTHER_QUERY] or nil
+  local opened_kind,opened_is_library_root,opened,opened_available=observed_opened(p,root)
   return {library_open=valid(root)==true,
     library_query=valid(query) and query.type=="textfield" and query.text or false,
-    foreign_open=valid(other)==true and p.opened==other,
-    foreign_query=valid(other_query) and other_query.type=="textfield" and other_query.text or false}
+    foreign_open=valid(other)==true and opened_available and opened==other,
+    foreign_query=valid(other_query) and other_query.type=="textfield" and other_query.text or false,
+    opened_kind=opened_kind,opened_is_library_root=opened_is_library_root}
 end
 local function report()
   local s=storage[KEY];if type(s)~="table" then return nil end
