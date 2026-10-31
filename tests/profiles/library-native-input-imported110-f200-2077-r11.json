@@ -45,7 +45,7 @@
     "more-infinite-research_5.0.20000.zip": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
     "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "D30D00A0D57A2A8195565E52DCEFDF94B92DCBA37DC85A83B37245336157E9C0",
-    "mir-fixture-mir5-library-native-input_0.3.0.zip": "46155E3963927EF1F2038692BB91447FAE691989AA6BB92BE3B60B0B4F71591B"
+    "mir-fixture-mir5-library-native-input_0.3.0.zip": "E45CA56D2FA90427883EC0E365AC0020636DF8346A3466C2B6A8758CAFBBCD15"
   },
   "display": {
     "requested_window": "1280x720",
@@ -61,7 +61,7 @@
     "drag_baseline": "Latest native root location and event count at successful suffix, not initial inspect.",
     "minimum_new_location_events": 1
   },
-  "scope": "Fresh r11 refusal-only transient opened-state/controller diagnostic input. It retains the r07 protocol, protected imported110 save, candidateB, and original drag/text/lifecycle contract. The fixture arm_close guard, action, and event predicates are unchanged; report-only transient snapshots add per-role input state and safe controller-type scalars after the existing exclusion probe and each final open, while top-level constants bind the native character/cutscene enum values. Q24 and Q28 remain adverse and Q29 remains declined evidence; this prepared input establishes no native pass, replay, close event, cause, controller readiness, or lifecycle acceptance.",
+  "scope": "Fresh r11 refusal-only transient opened-state/controller/close diagnostic input. It retains the r07 protocol, protected imported110 save, candidateB, and original drag/text/lifecycle contract. The fixture arm_close guard, action, and acceptance predicate are unchanged; report-only state adds per-role input/controller snapshots, top-level character/cutscene constants, and bounded raw armed-close rows before the existing player/phase/custom-type filter. Q24 and Q28 remain adverse and Q29 remains declined evidence; this prepared input establishes no native pass, replay, close event, cause, controller readiness, or lifecycle acceptance.",
   "client_identity": {
     "en": "MIR5English",
     "de": "MIR5Deutsch",
