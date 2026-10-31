@@ -1212,11 +1212,13 @@ end
 local function frame_layout_ready(frame, player, view)
   local title = frame and frame[PREFIX .. "title"]
   local tabs = frame and frame[PREFIX .. "tabs"]
+  local filters = frame and frame[PREFIX .. "filters"] or nil
   local research = valid(tabs) and tabs[PREFIX .. "research_content"] or nil
   local settings = valid(tabs) and tabs[PREFIX .. "settings_content"] or nil
   return valid(title) and valid(title[PREFIX .. "layout_smaller"])
     and valid(title[PREFIX .. "layout_larger"]) and valid(title[PREFIX .. "layout_reset"])
     and valid(title[PREFIX .. "close"])
+    and valid(filters) and filters.type == "table"
     and valid(research) and research.type == research_content_type(player, view)
     and valid(settings) and valid(settings.type == "scroll-pane" and settings or nil)
 end
@@ -1235,7 +1237,6 @@ local function update_research_content(content, player, view, context, translati
   local width = content.style and content.style.maximal_width or 592
   local height = content.style and content.style.maximal_height or 220
   local panes = library_layout.split_sizes(width, height)
-  if content.type == "table" then content.column_count = panes.columns end
   local selected = selected_index > 0 and rows[selected_index] or nil
   if selected then
     view.selected = selected.id
@@ -1414,20 +1415,27 @@ local function update_settings_content(content, view, preserve_query, translatio
   elseif not preserve_query then
     query.text = view.settings_query
   end
+  local width = content.style and (content.style.maximal_width or content.style.width) or 592
+  local available_height = content.style and (content.style.maximal_height or content.style.height) or 220
+  local dynamic_height = math.max(80, available_height - 64)
+  local panes = library_layout.split_sizes(width, dynamic_height)
   local dynamic = content[PREFIX .. "settings_dynamic"]
-  if not valid(dynamic) then dynamic = add(content, {type = "table", name = PREFIX .. "settings_dynamic", column_count = 2}) end
+  if valid(dynamic) and dynamic.column_count ~= panes.columns then
+    dynamic.destroy()
+    dynamic = nil
+  end
+  if not valid(dynamic) then
+    dynamic = add(content, {type = "table", name = PREFIX .. "settings_dynamic", column_count = panes.columns})
+  end
   if dynamic.style and content.style then
-    dynamic.style.width = content.style.maximal_width or content.style.width or 592
-    dynamic.style.maximal_width = content.style.maximal_width or content.style.width or 592
-    local available_height = content.style.maximal_height or content.style.height or 220
-    local dynamic_height = math.max(80, available_height - 64)
+    dynamic.style.width = width
+    dynamic.style.maximal_width = width
     dynamic.style.height, dynamic.style.maximal_height = dynamic_height, dynamic_height
   end
   dynamic.clear()
 
   local groups = setting_catalogue()
   if groups == nil then
-    dynamic.column_count = 1
     add(dynamic, {type = "label", name = PREFIX .. "settings_unavailable", caption = {"mir-browser.detail-unavailable", "settings"}})
     return
   end
@@ -1442,10 +1450,6 @@ local function update_settings_content(content, view, preserve_query, translatio
   if selected_index == 0 and #visible > 0 then
     selected_index, view.setting_selected = 1, visible[1].key
   end
-  local width = dynamic.style and dynamic.style.maximal_width or 592
-  local height = dynamic.style and dynamic.style.maximal_height or 156
-  local panes = library_layout.split_sizes(width, height)
-  dynamic.column_count = panes.columns
   add(dynamic, {type = "label", name = PREFIX .. "settings_count", caption = {"mir-browser.settings-count", #visible}})
   add(dynamic, {type = "label", name = PREFIX .. "settings_scope_label",
     caption = {"mir-browser.settings-scope-" .. view.settings_scope}})
@@ -1520,7 +1524,6 @@ end
 local function update_availability_content(content, player, view)
   if not valid(content) then return end
   content.clear()
-  content.column_count = 1
   -- This bounded view has no compiler ledger and no native catalogue pass. It
   -- presents only the authored terminal explanations selected by exact active
   -- mod and named native-owner facts.
@@ -1584,6 +1587,58 @@ local function icon_button(parent, name, sprite, tooltip)
   return control
 end
 
+local function create_filters(frame, player, view, width)
+  local pairs_per_row, control_width = library_layout.filter_layout(width)
+  local filters = add(frame, {type = "table", name = PREFIX .. "filters", column_count = 2 * pairs_per_row})
+  add(filters, {type = "label", name = PREFIX .. "search_label", caption = {"mir-browser.search-label"}})
+  add(filters, {type = "textfield", name = PREFIX .. "query", text = view.query,
+    tooltip = {"mir-browser.search-label"}})
+  add(filters, {type = "label", name = PREFIX .. "family_label", caption = {"mir-browser.filter-scope"}})
+  local families = family_values()
+  add(filters, {type = "drop-down", name = PREFIX .. "family", items = family_items(families, player),
+    selected_index = family_index(families, view.family) or 1, tooltip = {"mir-browser.filter-scope"}})
+  add(filters, {type = "label", name = PREFIX .. "visibility_label", caption = {"mir-browser.visibility"}})
+  add(filters, {type = "drop-down", name = PREFIX .. "visibility", items = {
+    {"mir-browser.visibility-normal"}, {"mir-browser.visibility-hidden"}, {"mir-browser.not-added"}
+  }, selected_index = view.visibility, tooltip = {"mir-browser.visibility"}})
+  add(filters, {type = "label", name = PREFIX .. "mode_label", caption = {"mir-browser.filter-level"}})
+  add(filters, {type = "drop-down", name = PREFIX .. "mode", items = {
+    {"mir-browser.all"}, {"mir-browser.finite"}, {"mir-browser.infinite"}
+  }, selected_index = view.mode, tooltip = {"mir-browser.filter-level"}})
+  add(filters, {type = "label", name = PREFIX .. "status_label", caption = {"mir-browser.filter-status"}})
+  add(filters, {type = "drop-down", name = PREFIX .. "status", items = {
+    {"mir-browser.status-all"}, {"mir-browser.status-ready"},
+    {"mir-browser.status-locked"}, {"mir-browser.status-queued"}
+  }, selected_index = view.status, tooltip = {"mir-browser.filter-status"}})
+  add(filters, {type = "label", name = PREFIX .. "sort_label", caption = {"mir-browser.filter-order"}})
+  add(filters, {type = "drop-down", name = PREFIX .. "sort", items = {
+    {"mir-browser.order-progression"}, {"mir-browser.order-native"},
+    {"mir-browser.order-name-asc"}, {"mir-browser.order-name-desc"}
+  }, selected_index = SORT_INDEX[view.sort] or 1, tooltip = {"mir-browser.filter-order"}})
+  for _, field in ipairs({"query", "family", "visibility", "mode", "status", "sort"}) do
+    local control = filters[PREFIX .. field]
+    if control.style then control.style.width = control_width end
+  end
+  return filters
+end
+
+local function create_tabs(frame, player, view)
+  local tabs = add(frame, {type = "tabbed-pane", name = PREFIX .. "tabs"})
+  for _, tab_name in ipairs(TABS) do
+    local tab = add(tabs, {type = "tab", name = PREFIX .. "tab_" .. tab_name,
+      caption = {"mir-browser." .. (tab_name == "queue" and "queue-tab" or tab_name)}})
+    local content_type = tab_name == "research" and research_content_type(player, view) or "scroll-pane"
+    local content_spec = {type = content_type,
+      horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"}
+    if content_type == "table" then content_spec.column_count = 2 end
+    content_spec.name = PREFIX .. tab_name .. "_content"
+    local content = add(tabs, content_spec)
+    tabs.add_tab(tab, content)
+  end
+  tabs.selected_tab_index = TAB_INDEX[view.tab] or 1
+  return tabs
+end
+
 local function sync_frame_layout(player, view, frame)
   local width, height = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
   local pairs_per_row, control_width = library_layout.filter_layout(width)
@@ -1600,8 +1655,17 @@ local function sync_frame_layout(player, view, frame)
     frame.location = clamped_location
   end
   local filters = frame[PREFIX .. "filters"]
+  if valid(filters) and filters.column_count ~= 2 * pairs_per_row then
+    filters.destroy()
+    local tabs = frame[PREFIX .. "tabs"]
+    if valid(tabs) then tabs.destroy() end
+    filters = nil
+  end
+  if not valid(filters) then
+    filters = create_filters(frame, player, view, width)
+    create_tabs(frame, player, view)
+  end
   if valid(filters) then
-    filters.column_count = 2 * pairs_per_row
     for _, field in ipairs({"query", "family", "visibility", "mode", "status", "sort"}) do
       local control = filters[PREFIX .. field]
       if valid(control) and control.style then control.style.width = control_width end
@@ -1644,49 +1708,8 @@ local function create_frame(player, view)
   icon_button(title, "close", "utility/close", {"mir-browser.close"})
 
   local width = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
-  local pairs_per_row = width >= 800 and 2 or 1
-  local filters = add(frame, {type = "table", name = PREFIX .. "filters", column_count = 2 * pairs_per_row})
-  add(filters, {type = "label", name = PREFIX .. "search_label", caption = {"mir-browser.search-label"}})
-  add(filters, {type = "textfield", name = PREFIX .. "query", text = view.query,
-    tooltip = {"mir-browser.search-label"}})
-  add(filters, {type = "label", name = PREFIX .. "family_label", caption = {"mir-browser.filter-scope"}})
-  local families = family_values()
-  add(filters, {type = "drop-down", name = PREFIX .. "family", items = family_items(families, player),
-    selected_index = family_index(families, view.family) or 1, tooltip = {"mir-browser.filter-scope"}})
-  add(filters, {type = "label", name = PREFIX .. "visibility_label", caption = {"mir-browser.visibility"}})
-  add(filters, {type = "drop-down", name = PREFIX .. "visibility", items = {
-    {"mir-browser.visibility-normal"}, {"mir-browser.visibility-hidden"}, {"mir-browser.not-added"}
-  }, selected_index = view.visibility, tooltip = {"mir-browser.visibility"}})
-  add(filters, {type = "label", name = PREFIX .. "mode_label", caption = {"mir-browser.filter-level"}})
-  add(filters, {type = "drop-down", name = PREFIX .. "mode", items = {
-    {"mir-browser.all"}, {"mir-browser.finite"}, {"mir-browser.infinite"}
-  }, selected_index = view.mode, tooltip = {"mir-browser.filter-level"}})
-  add(filters, {type = "label", name = PREFIX .. "status_label", caption = {"mir-browser.filter-status"}})
-  add(filters, {type = "drop-down", name = PREFIX .. "status", items = {{"mir-browser.status-all"}, {"mir-browser.status-ready"}, {"mir-browser.status-locked"}, {"mir-browser.status-queued"}}, selected_index = view.status,
-    tooltip = {"mir-browser.filter-status"}})
-  add(filters, {type = "label", name = PREFIX .. "sort_label", caption = {"mir-browser.filter-order"}})
-  add(filters, {type = "drop-down", name = PREFIX .. "sort", items = {
-    {"mir-browser.order-progression"}, {"mir-browser.order-native"},
-    {"mir-browser.order-name-asc"}, {"mir-browser.order-name-desc"}
-  }, selected_index = SORT_INDEX[view.sort] or 1, tooltip = {"mir-browser.filter-order"}})
-  local _, control_width = library_layout.filter_layout(width)
-  for _, field in ipairs({"query", "family", "visibility", "mode", "status", "sort"}) do
-    local control = filters[PREFIX .. field]
-    if control.style then control.style.width = control_width end
-  end
-  local tabs = add(frame, {type = "tabbed-pane", name = PREFIX .. "tabs"})
-  for _, tab_name in ipairs(TABS) do
-    local tab = add(tabs, {type = "tab", name = PREFIX .. "tab_" .. tab_name,
-      caption = {"mir-browser." .. (tab_name == "queue" and "queue-tab" or tab_name)}})
-    local content_spec = tab_name == "research"
-      and {type = research_content_type(player, view), column_count = 2,
-        horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"}
-      or {type = "scroll-pane", horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"}
-    content_spec.name = PREFIX .. tab_name .. "_content"
-    local content = add(tabs, content_spec)
-    tabs.add_tab(tab, content)
-  end
-  tabs.selected_tab_index = TAB_INDEX[view.tab] or 1
+  create_filters(frame, player, view, width)
+  create_tabs(frame, player, view)
   sync_frame_layout(player, view, frame)
   return frame
 end
