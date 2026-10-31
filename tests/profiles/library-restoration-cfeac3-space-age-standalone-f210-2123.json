@@ -26,9 +26,9 @@
   ],
   "archive_sha256": {
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
-    "more-infinite-research_5.0.21000.zip": "6AFD86ABB0678B025D1DA3F44F5A8047458C29271F0CC3A9D7473D6ADC9E4C4C",
+    "more-infinite-research_5.0.21000.zip": "1EF57E3ACD05BE9B1097AC3744C913933A7784FE6513F12C2771B0096CDB2029",
     "mir-fixture-mir5-api-alpha_0.1.0.zip": "DB5ED843FA9D85A1ABDC22595E62D315CA1A2191C846208079F85D4D016CE904",
     "mir-fixture-mir5-api-beta_0.1.0.zip": "0E48351A5D515506B133ED16FE265119D72EB781FA2A4473D1771C451C3EB633"
   },
-  "scope": "Private two-client Space Age GUI preview for the restored Library, using Factorio 2.1.23 and the exact F210 archive built from source cfeac3e8a6583576f6d0165a9f5cf6a9087b441e. This is a non-release local test candidate; its 5.0.0-era package version does not replace or qualify the published beta. The 8192 MiB figure is an admission ceiling, not a measured peak."
+  "scope": "Private two-client Space Age GUI preview for the restored Library and read-only responsive table layout, using Factorio 2.1.23. The candidate preserves the workload prepared from restoration commit cfeac3e8a6583576f6d0165a9f5cf6a9087b441e while exercising the corrected table layout. This is a non-release local test candidate; its 5.0.0-era package version does not replace or qualify the published beta. The 8192 MiB figure is an admission ceiling, not a measured peak."
 }
