@@ -634,11 +634,11 @@
               "source/presentation/library_model.lua"
             ],
             "current_host_controls": [
-              "tests/test_library.py::test_default_closed_then_query_selection_location_native_navigation_and_reload_rebuild"
+              "tests/test_library.py::test_default_closed_then_query_selection_location_native_navigation_and_reload_rebuild",
+              "tests/test_library.py::test_filter_click_is_inert_and_native_selection_updates_the_retained_window"
             ],
             "verification_status": "partial-host-mapping-not-restored-ui-acceptance",
             "remaining_verification": [
-              "Add known-bad handler/rebuild negative controls grounded in the historical handler regression.",
               "Use real click/type/select input, not only direct callback invocation, to prove controls survive and results update."
             ]
           },

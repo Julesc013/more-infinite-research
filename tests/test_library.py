@@ -927,6 +927,39 @@ class LibraryTests(unittest.TestCase):
           assert(root.valid == false and storage.mir_library.players[1].open == false)
         ''')
 
+    def test_filter_click_is_inert_and_native_selection_updates_the_retained_window(self):
+        self.lua.execute(r'''
+          boot()
+          local model = require("presentation.library_model")
+          local original_rows, row_calls = model.rows, 0
+          model.rows = function(...)
+            row_calls = row_calls + 1
+            return original_rows(...)
+          end
+
+          local root = library.open(player)
+          local filters = root["mir_library_filters"]
+          local status = filters["mir_library_status"]
+          local query = filters["mir_library_query"]
+          local initial_rows = row_calls
+          library.on_gui_click({player_index=1, element=status})
+          assert(row_calls == initial_rows,
+            "clicking a native dropdown must not fall through to a catalogue rebuild")
+          assert(player.gui.screen["mir_research_browser"] == root
+            and filters["mir_library_status"] == status
+            and filters["mir_library_query"] == query and status.valid and query.valid,
+            "an inert dropdown click must keep the retained controls alive")
+
+          status.selected_index = 4
+          library.on_gui_selection_state_changed({player_index=1, element=status})
+          assert(row_calls > initial_rows and storage.mir_library.players[1].status == 4,
+            "the separate native selection event must apply the selected filter")
+          assert(player.gui.screen["mir_research_browser"] == root
+            and root["mir_library_filters"]["mir_library_status"] == status
+            and root["mir_library_filters"]["mir_library_query"] == query,
+            "filter selection must update the retained view without replacing the window or query")
+        ''')
+
     def test_layout_controls_resize_reset_and_rebuild_an_outdated_saved_window(self):
         self.lua.execute(r'''
           boot()
