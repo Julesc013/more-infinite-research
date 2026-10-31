@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryInputPlayerSlotReusePreparedV1",
+  "status": "fixture-and-profile-closure-verified-not-native-qualified",
+  "source": {
+    "repository": "Julesc013/more-infinite-research",
+    "commit": "cc10f042423ba00d5874b4c2e0b37da252113f33",
+    "scope": "Test-only observer correction; no player-source members changed."
+  },
+  "profiles_and_archives": [
+    {
+      "target": "f200",
+      "factorio_line": "2.0",
+      "engine": {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "protected_input_save": {
+        "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+        "bytes": 811812,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "profile": {
+        "path": "tests/profiles/library-native-input-imported110-f200-2077-r14.json",
+        "bytes": 3511,
+        "sha256": "2D47DB3A37474C97EE8D09F6B01B717E1F50D86D148A93DBBB104020F24161FA"
+      },
+      "archive": {
+        "name": "mir-fixture-mir5-library-native-input_0.3.1.zip",
+        "bytes": 8342,
+        "sha256": "819A1AA3D61FB09E2D130912E58D7EF5A3F8170F7D362E4E9F2C49261A17A468",
+        "local_custody": "build/qualification/library-input-player-slot-reuse-r02/f200/input/mir-fixture-mir5-library-native-input_0.3.1.zip",
+        "root": "mir-fixture-mir5-library-native-input_0.3.1",
+        "compression": "ZIP_DEFLATED level 9; fixed 1980 timestamp; Unix regular mode 0644",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "cc10f042423ba00d5874b4c2e0b37da252113f33",
+            "destination": "control.lua",
+            "bytes": 30416,
+            "sha256": "0A1225A131FAF6B5BC86CBCE9F8E1E528AA29E43A432B8226B0375FE2B747E47"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-input-identity-f200-slot-reuse.json",
+            "source_revision": "cc10f042423ba00d5874b4c2e0b37da252113f33",
+            "destination": "info.json",
+            "bytes": 349,
+            "sha256": "157245177F9AA8B9D00949A4F6B6013F2CB6CAEF2686849118C5205ED2ED0925"
+          }
+        ]
+      }
+    },
+    {
+      "target": "f210",
+      "factorio_line": "2.1",
+      "engine": {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "protected_input_save": {
+        "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+        "bytes": 814068,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "profile": {
+        "path": "tests/profiles/library-native-input-imported110-f210-2123-r14.json",
+        "bytes": 3380,
+        "sha256": "AD9D335E8AF60AE25B43BFE7B783A61C1284F56D1F8056BAFC878A144EA9D5A5"
+      },
+      "archive": {
+        "name": "mir-fixture-mir5-library-native-input_0.3.1.zip",
+        "bytes": 8347,
+        "sha256": "6B7C11A1F338E273950EA58D021E5334897FC807DECBBBD8B95B8DCBB91A13C7",
+        "local_custody": "build/qualification/library-input-player-slot-reuse-r02/f210/input/mir-fixture-mir5-library-native-input_0.3.1.zip",
+        "root": "mir-fixture-mir5-library-native-input_0.3.1",
+        "compression": "ZIP_DEFLATED level 9; fixed 1980 timestamp; Unix regular mode 0644",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "cc10f042423ba00d5874b4c2e0b37da252113f33",
+            "destination": "control.lua",
+            "bytes": 30416,
+            "sha256": "0A1225A131FAF6B5BC86CBCE9F8E1E528AA29E43A432B8226B0375FE2B747E47"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-input-identity-f210-slot-reuse.json",
+            "source_revision": "cc10f042423ba00d5874b4c2e0b37da252113f33",
+            "destination": "info.json",
+            "bytes": 349,
+            "sha256": "48163341F867E2ECFE767FC11573D69DD3914F9B7A3BB1B6545282B9B2090E05"
+          }
+        ]
+      }
+    }
+  ],
+  "policy": {
+    "f200": "The 2.0.77 observer continues rejecting replacement reuse of the removed German player index.",
+    "f210": "The 2.1.23 observer permits a later German replacement to reuse the removed player slot, while retaining exact role, phase, distinct-connected-English, locale, removal-event, retired-reference, input, save and restart checks."
+  },
+  "validation": {
+    "focused_observer_controls": 25,
+    "archive_reconstruction": "Deterministic archives were reconstructed from raw Git bytes and match profile hashes and retained local ZIPs byte-for-byte.",
+    "native_execution": false,
+    "native_ready": false,
+    "performance_acceptance": false,
+    "release_qualification": false
+  }
+}

@@ -1058,6 +1058,82 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
                     self.lua.globals().run_export_observer(target, "zero-server-index")
 
 
+class LibraryNativeInputArchiveClosureControls(unittest.TestCase):
+    def test_slot_reuse_r14_archives_and_profiles_reconstruct_from_committed_source(self):
+        record = json.loads(
+            (ROOT / "spec/evidence/library-input-player-slot-reuse-prepared-r01.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(record["kind"], "MIRLibraryInputPlayerSlotReusePreparedV1")
+        self.assertEqual(record["status"], "fixture-and-profile-closure-verified-not-native-qualified")
+        source_revision = record["source"]["commit"]
+        self.assertEqual(len(source_revision), 40)
+        fixture = "mir-fixture-mir5-library-native-input_0.3.1"
+
+        def raw_git_bytes(member):
+            return subprocess.check_output(
+                ["git", "show", f"{member['source_revision']}:{member['source']}"], cwd=ROOT
+            )
+
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            for prepared in record["profiles_and_archives"]:
+                target = prepared["target"]
+                with self.subTest(target=target):
+                    profile_path = ROOT / prepared["profile"]["path"]
+                    profile_bytes = profile_path.read_bytes()
+                    self.assertEqual(len(profile_bytes), prepared["profile"]["bytes"])
+                    self.assertEqual(
+                        hashlib.sha256(profile_bytes).hexdigest().upper(), prepared["profile"]["sha256"]
+                    )
+                    profile = json.loads(profile_bytes)
+                    self.assertEqual(profile["target"], target)
+                    self.assertEqual(profile["engine"], prepared["engine"])
+                    self.assertEqual(profile["protected_input_save"], prepared["protected_input_save"])
+                    observer_rows = [row for row in profile["mods"] if row["name"] == "mir-fixture-mir5-library-native-input"]
+                    self.assertEqual(len(observer_rows), 1)
+                    self.assertEqual(observer_rows[0]["version"], "0.3.1")
+
+                    archive_record = prepared["archive"]
+                    members = archive_record["members"]
+                    self.assertEqual([row["destination"] for row in members], ["control.lua", "info.json"])
+                    self.assertTrue(all(row["source_revision"] == source_revision for row in members))
+                    member_bytes = {}
+                    for member in members:
+                        raw_member = raw_git_bytes(member)
+                        self.assertEqual(len(raw_member), member["bytes"])
+                        self.assertEqual(
+                            hashlib.sha256(raw_member).hexdigest().upper(), member["sha256"]
+                        )
+                        member_bytes[member["destination"]] = raw_member
+
+                    output = temporary / archive_record["name"]
+                    with zipfile.ZipFile(
+                        output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
+                    ) as archive:
+                        for member in members:
+                            entry = zipfile.ZipInfo(
+                                f"{fixture}/{member['destination']}", date_time=(1980, 1, 1, 0, 0, 0)
+                            )
+                            entry.create_system = 3
+                            entry.external_attr = 0o100644 << 16
+                            entry.compress_type = zipfile.ZIP_DEFLATED
+                            archive.writestr(entry, member_bytes[member["destination"]], compresslevel=9)
+
+                    rebuilt = output.read_bytes()
+                    digest = hashlib.sha256(rebuilt).hexdigest().upper()
+                    self.assertEqual(len(rebuilt), archive_record["bytes"])
+                    self.assertEqual(digest, archive_record["sha256"])
+                    self.assertEqual(profile["archive_sha256"][archive_record["name"]], digest)
+                    local_archive = ROOT / archive_record["local_custody"]
+                    self.assertEqual(local_archive.read_bytes(), rebuilt)
+                    with zipfile.ZipFile(output) as archive:
+                        self.assertIsNone(archive.testzip())
+                        self.assertEqual(
+                            archive.namelist(),
+                            [f"{fixture}/control.lua", f"{fixture}/info.json"],
+                        )
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--lua-runtime-dir", type=Path, required=True)
