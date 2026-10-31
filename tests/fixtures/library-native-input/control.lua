@@ -203,6 +203,17 @@ local function inspect_opened_snapshot(en,de)
   return {tick=game.tick,en_input=input_state(en),de_input=input_state(de),
     en_controller_type=controller_type(en),de_controller_type=controller_type(de)}
 end
+local function observe_removal(s)
+  local observed={removed_events=s.removed_events,
+    remaining_player_valid=valid(game.get_player(s.removed_index)),
+    retained_de_root_valid=valid(refs.de_root),retained_de_query_valid=valid(refs.de_query)}
+  s.removal_observation=observed
+  log("[MIR5_LIBRARY_NATIVE_INPUT_REMOVE_DE] removed_events="..tostring(observed.removed_events)
+    .." remaining_player_valid="..tostring(observed.remaining_player_valid)
+    .." retained_de_root_valid="..tostring(observed.retained_de_root_valid)
+    .." retained_de_query_valid="..tostring(observed.retained_de_query_valid))
+  return observed
+end
 local function report()
   local s=storage[KEY];if type(s)~="table" then return nil end
   local en=s.en_index~=nil and game.get_player(s.en_index) or nil
@@ -212,6 +223,7 @@ local function report()
     actual_library_close_observations=s.close_observations,
     close_expected=s.close_expected and {phase=s.close_expected.phase,player_index=s.close_expected.player_index,ordinal=s.close_expected.ordinal} or false,
     actual_drag_events=s.drag_events,actual_effect_reset_events=s.reset_events,requested_native_resets=s.requested_resets,actual_removed_events=s.removed_events,
+    removal_observation=s.removal_observation or false,
     initial_location=s.initial_location,drag_baseline=s.drag_baseline,drag_events_before=s.drag_events_before,
     private_queries=s.private_queries,en_index=s.en_index or false,de_index=s.de_index or false,
     en_name=valid(en) and en.name or false,de_name=valid(de) and de.name or false,
@@ -336,7 +348,13 @@ local function advance(step)
     phase("disconnect-de");local de=player(s.de_index)
     if de.connected then fail("test German client must disconnect before removal") end
     s.removed_index=de.index;s.phase="removing-de";game.remove_offline_players({de.index})
-    if s.removed_events~=1 or valid(game.get_player(s.removed_index)) or valid(refs.de_root) or valid(refs.de_query) then fail("actual offline player/root removal differs") end
+    local observed=observe_removal(s)
+    if s.removed_events~=1 or valid(game.get_player(s.removed_index)) or valid(refs.de_root) or valid(refs.de_query) then
+      fail("actual offline player/root removal differs: removed_events="..tostring(observed.removed_events)
+        .." remaining_player_valid="..tostring(observed.remaining_player_valid)
+        .." retained_de_root_valid="..tostring(observed.retained_de_root_valid)
+        .." retained_de_query_valid="..tostring(observed.retained_de_query_valid))
+    end
     s.de_index=nil;s.phase="replacement";assert_world()
   elseif step=="replacement" then
     phase("replacement");local en,de=pair()
