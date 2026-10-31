@@ -205,8 +205,8 @@ local function inspect_opened_snapshot(en,de)
 end
 local function observe_removal(s)
   local observed={removed_events=s.removed_events,
-    remaining_player_valid=valid(game.get_player(s.removed_index)),
-    retained_de_root_valid=valid(refs.de_root),retained_de_query_valid=valid(refs.de_query)}
+    remaining_player_valid=valid(game.get_player(s.removed_index))==true,
+    retained_de_root_valid=valid(refs.de_root)==true,retained_de_query_valid=valid(refs.de_query)==true}
   s.removal_observation=observed
   log("[MIR5_LIBRARY_NATIVE_INPUT_REMOVE_DE] removed_events="..tostring(observed.removed_events)
     .." remaining_player_valid="..tostring(observed.remaining_player_valid)
