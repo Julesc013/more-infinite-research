@@ -551,13 +551,230 @@
         "library",
         "two_clients"
       ],
-      "remaining_implementation": [],
+      "remaining_implementation": [
+        "Integrate and reconcile the in-progress Library restoration against the accepted 4.2 interaction contract and the current RUN-04 promises. The published 5.0.0 list/detail layout is a known regression, not an accepted new design; no beta bytes are replaced."
+      ],
       "remaining_qualification": [
         "Complete accepted paired Library/save-load timing and retained-session/churn memory. Corrected R02 diagnostics contain all26 endpoints and pass28 UI-duration/save-ready controls but fail five same-published memory controls;retain both original adverse datasets and review the next bounded measurement protocol before scoring. New7b0 functional/rendered F200/F210 results are separate from performance.",
         "Preserve documented locale fallback/visual limits;the named Space Age native-laboratory explanation and Base absence rows are now observed in the exact corrected7b0 client cases above. This does not establish arbitrary third-party translation quality.",
         "Qualify the accepted1026/1027 Library corrections on the final coherent F200/F210 player packages: actual Esc/E close and dragging/location retention, foreign GUI focus during asynchronous refresh, vanished-root subscription retirement and removed-player translation resumption. Preserve earlier client receipts at their original inputs.",
-        "Earned or persisted private selections/queue state and foreign hidden-row inspection still require affected native cases. Fresh F2001D45 and F2102DDD zero-credit private visibility/action/native-state checks now pass;do not relabel them as positive imported credit or paired timing evidence."
-      ]
+        "Earned or persisted private selections/queue state and foreign hidden-row inspection still require affected native cases. Fresh F2001D45 and F2102DDD zero-credit private visibility/action/native-state checks now pass;do not relabel them as positive imported credit or paired timing evidence.",
+        "Complete historical_preservation_review: demonstrate tests reject the known broken layout/handlers, then qualify the affected rendered/input/lifecycle and burst/retained-memory paths on the successor. Old source/native mappings alone do not preserve the accepted interaction design."
+      ],
+      "historical_preservation_review": {
+        "status": "accepted-obligations-recovered-restoration-unverified",
+        "request_ids": [
+          "UI-01",
+          "UI-02",
+          "UI-03",
+          "UI-04"
+        ],
+        "source_references": "historical_preservation_audit.historical_sources",
+        "superseded_expectations": [
+          "PREVIEW23 changing tab/window sizes and compact Queue/Availability shrink tests.",
+          "Player pagination combined with scrolling; developer/core page helpers remain a separate internal matter.",
+          "Direct queue-mutation/rollback authority withheld by the accepted interaction amendment.",
+          "Drag-resize behavior never qualified merely because the window is movable."
+        ],
+        "acceptance_rows": [
+          {
+            "area": "window-and-layout",
+            "historical_sources": [
+              "accepted-42-interaction-amendment",
+              "published-47-library-characterization",
+              "published-50-beta-layout"
+            ],
+            "disposition": "port",
+            "required_behavior": "One retained window with stable geometry across tabs, visible close, remembered personal size/location and explicit size/reset controls. Fit the viewport; normal widths use independently accessible browse/details and narrow views remain readable. Do not restore shrinking tabs, required horizontal scrolling or claim drag-resizing.",
+            "current_implementation": [
+              "source/runtime/library.lua",
+              "source/presentation/library_model.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_library.py::test_requested_view_fits_scaled_display_wraps_details_and_converts_native_ticks",
+              "tests/test_library.py::test_default_closed_then_query_selection_location_native_navigation_and_reload_rebuild"
+            ],
+            "verification_status": "partial-host-mapping-not-restored-ui-acceptance",
+            "remaining_verification": [
+              "Integrate the in-progress successor layout; show each important tab at representative widths/scales and long English/German text.",
+              "Add controls that reject the published stacked-list/detail geometry and missing explicit size/reset actions. Separately preserve and exercise the existing visible Close action; the beta already has Close."
+            ]
+          },
+          {
+            "area": "continuous-lists-and-selection",
+            "historical_sources": [
+              "accepted-42-separated-panes",
+              "accepted-42-interaction-amendment"
+            ],
+            "disposition": "retain",
+            "required_behavior": "Player results scroll continuously; keep selected details accessible and clear stale/empty selections according to the declared filter policy. Developer/core paging is not player pagination.",
+            "current_implementation": [
+              "source/runtime/library.lua",
+              "source/presentation/library_model.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_library_model.py::test_retained_page_never_slices_or_reorders_the_continuous_library_rows",
+              "tests/test_library.py::test_historical_filter_order_hidden_page_and_selection_options_drive_real_library_state"
+            ],
+            "verification_status": "partial-host-mapping-not-restored-ui-acceptance",
+            "remaining_verification": [
+              "Exercise a long result list and a filter that removes the selected row; confirm details are visible without scrolling past the list."
+            ]
+          },
+          {
+            "area": "dropdowns-search-and-event-ownership",
+            "historical_sources": [
+              "accepted-42-interaction-amendment",
+              "accepted-42-search-interaction"
+            ],
+            "disposition": "port",
+            "required_behavior": "Opening a dropdown must leave it open/selectable. Typing preserves the search control, focus/caret and independent tab queries. Unrelated clicks and selection changes must not rebuild the whole retained window.",
+            "current_implementation": [
+              "source/runtime/library.lua",
+              "source/presentation/library_model.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_library.py::test_default_closed_then_query_selection_location_native_navigation_and_reload_rebuild"
+            ],
+            "verification_status": "partial-host-mapping-not-restored-ui-acceptance",
+            "remaining_verification": [
+              "Add known-bad handler/rebuild negative controls grounded in the historical handler regression.",
+              "Use real click/type/select input, not only direct callback invocation, to prove controls survive and results update."
+            ]
+          },
+          {
+            "area": "localized-discovery-and-details",
+            "historical_sources": [
+              "accepted-42-localized-discovery",
+              "accepted-42-separated-panes",
+              "published-47-library-characterization"
+            ],
+            "disposition": "retain",
+            "required_behavior": "Search technology/product/recipe names through bounded asynchronous personal indexing with honest pending/fallback behavior. Show benefits, science, prerequisites, availability and controlling settings. Displayed-setting discovery and long-language fit remain explicit current acceptance work.",
+            "current_implementation": [
+              "source/runtime/library.lua",
+              "source/presentation/library_model.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_library.py::test_native_names_render_before_search_translation_and_in_selected_details",
+              "tests/test_library.py::test_pending_translations_survive_locale_change_close_and_reload"
+            ],
+            "verification_status": "partial-host-mapping-not-restored-ui-acceptance",
+            "remaining_verification": [
+              "Verify English/German localized product/recipe and displayed-setting searches, late translations, empty results and non-English fit on the successor."
+            ]
+          },
+          {
+            "area": "personal-filters-and-native-research",
+            "historical_sources": [
+              "accepted-42-interaction-amendment",
+              "published-47-library-characterization"
+            ],
+            "disposition": "retain",
+            "required_behavior": "Finite/infinite/status/family and reversible personal hiding affect presentation only. Native research and its queue remain authoritative; keep the native research/Factoriopedia handoff and do not restore withheld direct queue mutation.",
+            "current_implementation": [
+              "source/runtime/library.lua",
+              "source/presentation/library_model.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_library.py::test_historical_filter_order_hidden_page_and_selection_options_drive_real_library_state",
+              "tests/test_library.py::test_delivered_tabs_show_effective_startup_settings_and_keep_native_queue_authoritative"
+            ],
+            "verification_status": "partial-host-mapping-not-restored-ui-acceptance",
+            "remaining_verification": [
+              "Operate filters/hide/unhide with separate clients and compare unchanged force research, current/queued/suspended state.",
+              "Verify native-open and foreign-hidden/private-credit action boundaries on the affected UI."
+            ]
+          },
+          {
+            "area": "settings-and-provenance",
+            "historical_sources": [
+              "accepted-42-setting-provenance",
+              "accepted-42-interaction-amendment"
+            ],
+            "disposition": "retain",
+            "required_behavior": "Group settings with raw/default/effective values, profile/override provenance and restart requirements. Preserve false and zero meanings and links from research to its controlling setting; startup edits must not claim immediate application.",
+            "current_implementation": [
+              "source/runtime/library.lua",
+              "source/presentation/library_model.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_library.py::test_delivered_tabs_show_effective_startup_settings_and_keep_native_queue_authoritative"
+            ],
+            "verification_status": "partial-host-mapping-not-restored-ui-acceptance",
+            "remaining_verification": [
+              "Verify grouped search/selection, displayed labels, controlling-setting navigation and false/zero/profile-origin details in the real UI."
+            ]
+          },
+          {
+            "area": "diagnostics-and-support-exports",
+            "historical_sources": [
+              "accepted-42-interaction-amendment",
+              "accepted-42-presentation-wording",
+              "published-47-library-characterization"
+            ],
+            "disposition": "port",
+            "required_behavior": "Retain the separate diagnostics/help scope and bounded local reports/settings exports. Reuse current MIRSET1 codec and file targeting; no automatic upload, persistent log history or promise to copy the full engine log from Lua.",
+            "current_implementation": [
+              "source/runtime/library.lua",
+              "source/presentation/library_model.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_library.py::test_support_exports_are_owned_local_and_inactive_on_research_views"
+            ],
+            "verification_status": "partial-host-mapping-not-restored-ui-acceptance",
+            "remaining_verification": [
+              "Execute the corrected export observer on the successor using actual dispatch composition; verify selectable strings/files, requesting-player/server targeting, write failures and no native-state mutation.",
+              "The interrupted beta R08-R11 controller attempts are preserved; they do not establish a passed GUI export."
+            ]
+          },
+          {
+            "area": "personal-state-and-client-lifecycle",
+            "historical_sources": [
+              "published-47-library-characterization",
+              "accepted-42-interaction-amendment"
+            ],
+            "disposition": "retain",
+            "required_behavior": "Retain appropriate query/selection/scroll/position/size across reopen and affected save/configuration transitions; keep locale/translation generations isolated, retire vanished players/GUI and avoid on_load save mutation. RUN-04 focus/scroll promises exceed some characterized 4.7 behavior and require explicit current tests.",
+            "current_implementation": [
+              "source/runtime/library.lua",
+              "source/presentation/library_model.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_library.py::test_configuration_migrates_published_browser_view_without_dropping_later_fidelity_fields",
+              "tests/test_library.py::test_pending_translations_survive_locale_change_close_and_reload",
+              "tests/test_library.py::test_translation_dispatch_is_open_connected_only_and_closed_callbacks_only_release"
+            ],
+            "verification_status": "partial-host-mapping-not-restored-ui-acceptance",
+            "remaining_verification": [
+              "Check protected published 5.0.0 personal state upgrading to the successor, plus applicable accepted 4.2/4.7 geometry fields.",
+              "Complete real two-client different-language join/rejoin, removed-player and host-save/restart checks after the layout/state changes."
+            ]
+          },
+          {
+            "area": "closed-view-and-burst-work",
+            "historical_sources": [
+              "published-42-mass-research-observation",
+              "accepted-42-search-interaction"
+            ],
+            "disposition": "port",
+            "required_behavior": "Closed settled Library has no refresh/catalogue rebuild; coalesce open-view mass-research changes, keep focus/scroll/order and bound useful translation cleanup. Event/count diagnostics and normal-logging timings remain separate; do not rebind the old package-specific timings.",
+            "current_implementation": [
+              "source/runtime/library.lua",
+              "source/presentation/library_model.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_library.py::test_translation_dispatch_is_open_connected_only_and_closed_callbacks_only_release"
+            ],
+            "verification_status": "partial-host-mapping-not-restored-ui-acceptance",
+            "remaining_verification": [
+              "Add a current burst regression that fails repeated catalogue/frame rebuilds; observe closed/open cases and completed work.",
+              "Repeat only affected rendering/interaction/retained-memory checks for the changed UI; existing startup and unchanged migration evidence retain their original scope."
+            ]
+          }
+        ],
+        "qualification_limit": "This bounded source/expectation review ran no Factorio. Existing host mappings and original client receipts remain useful at their named inputs, but did not reject the demonstrated beta layout regression or qualify the current restoration."
+      }
     },
     {
       "id": "CONT-11",
@@ -4351,5 +4568,360 @@
     "native_qualification_complete": false,
     "release_qualification": false
   },
-  "reference_path_policy": "Current source lookup pointers below use existing canonical paths. Removed MIR4 implementation locators are pinned under historical_source to the original recovery baseline; removed documentation pointers retain an explicit evidence_revision or historical_documentation commit. These source/doc lookups do not relabel historical execution identities or native scopes."
+  "reference_path_policy": "Current source lookup pointers below use existing canonical paths. Removed MIR4 implementation locators are pinned under historical_source to the original recovery baseline; removed documentation pointers retain an explicit evidence_revision or historical_documentation commit. These source/doc lookups do not relabel historical execution identities or native scopes.",
+  "historical_preservation_audit": {
+    "status": "initial-bounded-recovery-not-complete-stable-preservation",
+    "reviewed_on": "2026-10-31",
+    "reviewed_current_commit": "15702bad074130cecb7299bfc92a478c958fc84e",
+    "native_tests_run_in_this_audit": false,
+    "source_reconciliation_complete": false,
+    "test_intent_reconciliation_complete": false,
+    "source_inventory": {
+      "scope": "Local canonical numeric release tags plus historical v4.2.0-stable. Read-only Git tree/blob inventory, not semantic review, native evidence or all inter-release history.",
+      "selection": "Tests/fixtures/validation/verification paths; named test/verify/validate code; named playtest/findings/decisions/requests/design/worklist/acceptance/history files. Other old scripts and unindexed attachments/discussions remain an explicit follow-up.",
+      "selected_tag_count": 91,
+      "unique_selected_git_blobs": 5058,
+      "unique_selected_test_code_blobs": 2792,
+      "distinct_test_code_sets": 79,
+      "limits": [
+        "This is a source-discovery inventory, not a count of tests or passing behaviors.",
+        "The 91 local tag refs are not independent proof of GitHub publication or complete inter-release history.",
+        "Every selected tag defaults to unresolved intent triage except the exact source decisions mapped below and previously scoped CONT records.",
+        "Inter-release removed tests, original issue/PR discussions and unindexed screenshots/attachments still need reconciliation; missing originals remain unresolved.",
+        "No old source, generated assurance framework, dependency library or historical test estate is restored to the active tree."
+      ],
+      "default_disposition": "unresolved",
+      "tag_commits": {
+        "0.10.0": "3377f835243c0cf9e7d2c2e76641c2c471341975",
+        "0.11.0": "679774c94bafdaa4d5432b793b8684ee4e43c257",
+        "0.12.0": "82a349bd8137abe21145b321be4edb1e43e1e9e1",
+        "0.6.0": "12a5683c2aaed745f35e1261b437930a9a1476bc",
+        "0.7.0": "cb2991e3ea67b0413076c0e6d0dacf29d7f784b6",
+        "0.8.0": "080fa92ea38b4b40156f26429bc7cba54948aef0",
+        "0.9.0": "9325e744f1dd36baa33372dab6e7d9528ccfbab8",
+        "1.0.0": "f0057a96847512b50acdd6e23fc21b5b41e75adb",
+        "1.1.0": "2fb64822b82569e3b50f0653e361fb7148f18b63",
+        "1.1.5": "ccd86acce668d6c3b4878bd08ec0b55a60ef2271",
+        "1.2.0": "b80413b2aa225529a236b7b00a7cee9420af65bc",
+        "1.2.5": "172156bfc815a004162754732b0e604983e19c58",
+        "1.2.9": "e0f081e4cad7121c1bddedbfadbd3b83d42c438c",
+        "1.3.0": "a33b99c1f39e1e779986a12a558a79ea97e69239",
+        "1.3.5": "7293cad3801d1c02f4a5d577fc20a425cced0b0e",
+        "1.3.9": "b9459906a0971e237aed66855b51231e9b6bf028",
+        "1.4.0": "fa192796ab274dd590c65b96d0f3f6a0f35cb155",
+        "1.4.5": "efa372c95517c0d224828e7362433fcd9eb0a91b",
+        "1.4.9": "8f75fa45d52a55650e74423a99f04a0252db429b",
+        "1.5.0": "c2b526fd6dde81be7703daef53b075a1fd773e09",
+        "1.5.5": "2486bebf1909b6af1b0e99fce9e2d327e670a1c6",
+        "1.5.9": "8098510acc3530321a2dc32b8d2292aa814bb9c3",
+        "1.6.0": "a48509ed1dfbae8eba4b3dc7a701065063c12d5f",
+        "1.6.5": "da298d36cd41b6874e51eae31252cebd079872ad",
+        "1.6.9": "595ebcfc8b1f35b53906ea85fdb2d1de70f9bb2d",
+        "1.7.0": "1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b",
+        "1.7.1": "9d9095c92055aebe557a55a7ab99bb9588fe73fb",
+        "1.7.5": "c6692980dc9f5a1332a7888da33385a0107ae004",
+        "1.7.9": "215ccced7018aac70919221c73e15d795f9d1653",
+        "1.8.0": "5662c66c372e6aca025eab9f446de55a5cc6c1c9",
+        "1.8.1": "33b6bb2cc6fe069aa1cb2226e82b14975756f6a2",
+        "1.8.2": "0a192c27674a6b13847e2f5e1b2b530e62419ee8",
+        "1.8.5": "2fa5b6fc1f86fe2a17779628efcbf83ffb033aed",
+        "1.8.9": "8cdc87db5a686b12b1aa3c6f432ae8e4b74a4309",
+        "1.9.0": "4e386ca6a3b54a1109bbd2a991c73e11ac920704",
+        "1.9.1": "734e99dc5cebcd1b10285804359068167d3694f5",
+        "1.9.2": "4a56169922c1472bbf8ef1947b8eaa18d8ad992f",
+        "1.9.3": "c1bb2a6b05bb5d9ed782e010d0ab08f21c16af9c",
+        "1.9.4": "426d6d48c6578a786ea7de0f224282baff9d342b",
+        "1.9.5": "67036cb43e3e4814626e5abf5ce5df17a6f765f7",
+        "1.9.9": "2243cfd31c0d6c575782c5b004514c3845d1907c",
+        "2.0.0": "f7cfb1ecbed44122c4d9f6eb9544c90c7c772ff7",
+        "2.0.5": "f02f783b662de9f0f5d01a8f29e823c0312d35ba",
+        "2.1.0": "9d2da8ea08191a13605cd689f04972e820647cbb",
+        "2.1.5": "6008c51f99fc26d42458b85029869a30f27fb769",
+        "2.2.0": "62a0015abe1a5dd4560c3e7a9a8c24b5a8609d1b",
+        "2.3.0": "64389779dedaf87ad6b2f0e2e0b12844b1b9585e",
+        "2.3.5": "9eabc5439d3743be10c6f76d5ee36d9804a60f25",
+        "2.4.0": "584b398f98d3e317fac31cba63edcb11360a5bb1",
+        "2.4.5": "7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4",
+        "2.4.9": "7ebe93029695bbf809a15a14c6540530738a9e62",
+        "2.5.0": "bea21b068fb38dc26479b619454e50d5b4cf4793",
+        "2.5.10": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+        "2.5.11": "e08e6b0a8c054c8e9d09a7081cec3bd65de0e3af",
+        "2.5.5": "27877275854eb131efeb42672d3676c9c513c85e",
+        "2.5.9": "89719eb8ea5c938b6a0e9d816e6324d4d59b87bb",
+        "3.0.0": "8da631a6e5774af6d8804a49107a61a7964a5b2c",
+        "3.0.5": "89d7764c4f0f5b67f7b2a2ca0a3827006e3a63d7",
+        "3.1.0": "8b5bdfa95e6538e75699a3138073d070aef64fb6",
+        "3.1.1": "e91963cf5f20b7f8c785196840a6ebcae8e8dd66",
+        "3.1.2": "4d7451400fecfb464dd9f34092f41c6c9a729b53",
+        "3.1.5": "c8bf4a742910cec9d6d3dee305c83deba1aa49eb",
+        "3.1.9": "1b9c6f32fc2bb53c413a593534e103a6043b4be3",
+        "3.2.0": "c8f3d8248cc89b8636cf1ee485fd8889422c6124",
+        "3.2.1": "666bf1c24795036e934db2d31ae93b84b2e4cacf",
+        "3.2.10": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6",
+        "3.2.11": "e3d787deb35ff30157bb2013fa1cc745a445e629",
+        "3.2.2": "1138ed55ad7ad42e38cf9e821d1d4e7de5df6378",
+        "3.2.3": "1abe07573cde814c3cacf6153b5ae64dee4038ba",
+        "3.2.5": "62fddd86b51db7c0238731815d15ca26a4b45857",
+        "3.2.9": "a60230a0695d2dd8fd1e727744614e746cda0bd8",
+        "v3.0.0": "70bb513f5b388ad23c4a5d46dfc945571c3b8217",
+        "v4.0.0": "5ca449820bdfa5595ca03686f32c74904c46daf3",
+        "v4.1.0": "3562377b520cccb071b97b3968946eae7024c950",
+        "v4.2.0": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+        "v4.2.0-stable": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+        "v4.2.1": "27c4777c27b3287f18df02e200235a1870bac465",
+        "v4.2.2": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+        "v4.3.0": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+        "v4.4.0": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+        "v4.4.1": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+        "v4.4.2": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+        "v4.5.0": "3096e89a044d705828cbcda93ac05bd877535d12",
+        "v4.5.1": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+        "v4.5.2": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+        "v4.6.0": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+        "v4.7.0": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+        "v4.7.1": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+        "v4.7.2": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+        "v4.7.3": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "v5.0.0": "7e77f203859ab9384208c2c673983b1ffea44d2f"
+      }
+    },
+    "allowed_dispositions": [
+      "retain",
+      "port",
+      "consolidate",
+      "superseded",
+      "obsolete-implementation-only",
+      "rejected-or-proposed",
+      "unresolved"
+    ],
+    "request_ledger": {
+      "path": "spec/programmes/community-requests.json",
+      "record_count": 87,
+      "rows_with_additive_mir5_route_disposition": 35,
+      "qualification_limit": "Original IDs, requests, decisions, statuses and adverse evidence remain unchanged. A source-route mapping is not adequate evidence of accepted interaction or final-package behavior; proposed/rejected/withheld requests do not become promises."
+    },
+    "historical_sources": {
+      "accepted-42-interaction-amendment": {
+        "commit": "8a3b190d987bc55897f54e3c6e0643128fd90a9c",
+        "paths": [
+          "docs/releases/mir42-playtest-findings.md",
+          "source/prototypes/mir/runtime/research_browser.lua",
+          "source/prototypes/mir/runtime/research_browser_core.lua",
+          "tests/runtime/research_browser_core_regressions.lua",
+          "tests/runtime/research_browser_handler_regressions.lua"
+        ],
+        "decision": "Accepted September29 repair and September30 appearance; supersedes changing tab sizes and player pagination. Native interaction and wider language/lifecycle qualification remain separately scoped."
+      },
+      "accepted-42-presentation-wording": {
+        "commit": "cb33254d7d746d56d52b9ca57dbaae5fa1448bf4",
+        "paths": [
+          "docs/releases/mir42-playtest-findings.md"
+        ],
+        "decision": "Research/Queue/Settings/Debug describes the required presentation scope; historical Help tab contains Debug controls. A literal caption is not a new authority or queue feature."
+      },
+      "accepted-42-separated-panes": {
+        "commit": "e7b285066bd1856b3a1532ed30f8bc67643d683a",
+        "paths": [
+          "docs/releases/mir42-playtest-findings.md",
+          "source/prototypes/mir/runtime/research_browser.lua"
+        ],
+        "decision": "Keep fixed controls above bounded browse/detail panes and eligible selection stable. Its older page controls do not override the later continuous-list amendment."
+      },
+      "accepted-42-localized-discovery": {
+        "commit": "284c124cf879c46504a9678184b2ab982af1daf6",
+        "paths": [
+          "source/prototypes/mir/runtime/research_browser.lua"
+        ],
+        "decision": "Localized recipe/material discovery uses bounded asynchronous player-local indexing and native-ID fallback."
+      },
+      "accepted-42-search-interaction": {
+        "commit": "441d1d879c0ecf03a0404fac1ba627f44c15174a",
+        "paths": [
+          "source/prototypes/mir/runtime/research_browser.lua"
+        ],
+        "decision": "Refresh after a typing pause, in place and only for the affected player."
+      },
+      "accepted-42-setting-provenance": {
+        "commit": "aecb62b0ea8c73c1fcfb8419d404350758deb2eb",
+        "paths": [
+          "source/prototypes/mir/runtime/research_browser.lua"
+        ],
+        "decision": "Selected MIR setting details distinguish raw/effective value and imported-profile origin; false is not missing. No invented foreign setting/cap ownership."
+      },
+      "published-42-mass-research-observation": {
+        "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+        "paths": [
+          "docs/releases/mir42-playtest-findings.md"
+        ],
+        "decision": "Controlled closed/open Library mass-research observations retain their exact old packages/save/engine. PF-01 remained open; timings are not current MIR5 evidence."
+      },
+      "published-47-library-characterization": {
+        "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+        "paths": [
+          "source/prototypes/mir/runtime/research_browser.lua",
+          "source/prototypes/mir/runtime/research_browser_core.lua"
+        ],
+        "current_record": "spec/inventory/library-baseline.json",
+        "decision": "Source/package characterization includes retained geometry/location and smaller/larger/reset actions; it explicitly does not prove native rendering/input. List-scroll restoration and explicit search focus were not implemented in that characterized baseline; current RUN-04 promises need their own verification."
+      },
+      "published-50-beta-layout": {
+        "commit": "7e77f203859ab9384208c2c673983b1ffea44d2f",
+        "paths": [
+          "source/runtime/library.lua",
+          "tests/test_library.py",
+          "tests/test_library_model.py"
+        ],
+        "decision": "Frozen beta creates results and selected detail under one research-content scroll pane. The maintainer reported this regression on October31; the successor must reject that layout without changing beta bytes."
+      },
+      "unmerged-42-local-evidence-index": {
+        "commit": "a0f0b569ab5379030d3c0a07c37268cdc7e390a5",
+        "paths": [
+          ".mir/releases/governance/mir4/MIR42-Historical-Local-Evidence-IndexV1.json",
+          "tests/release/Test-MIR42HistoricalPublicAdmissionLocalEvidenceIndex.ps1"
+        ],
+        "pull_request": "https://github.com/Julesc013/more-infinite-research/pull/344",
+        "disposition": "unresolved",
+        "decision": "Existing unmerged historical local index explicitly needs missing private custody and supplies no public-admission or MIR5 native proof. Preserve its exact source; reconcile useful expected continuity separately without importing the retired governance/verifier estate."
+      }
+    },
+    "first_slice_subject": "CONT-10",
+    "non_library_followups": [
+      {
+        "subjects": [
+          "CONT-03"
+        ],
+        "disposition": "retain",
+        "obligation": "False/zero/inheritance, hidden historical setting identities and effective profile precedence.",
+        "implementation": [
+          "source/research/historical_settings.lua",
+          "source/research/settings.lua",
+          "source/research/product_target_extension.lua"
+        ],
+        "host_controls": [
+          "tests/test_settings_profile.py",
+          "tests/test_settings_commands.py",
+          "tests/test_legacy_preference_transition_fixture.py"
+        ],
+        "remaining": "Pair existing host expectations with the affected nondefault native output/runtime witness; preserve original preference-transition identities."
+      },
+      {
+        "subjects": [
+          "CONT-08",
+          "CONT-09"
+        ],
+        "disposition": "consolidate",
+        "obligation": "Scripted ownership, force reset/merge/removal/readd and bounded completed repair/agriculture/spoilage work.",
+        "implementation": [
+          "source/runtime/bootstrap.lua",
+          "source/runtime/scripted_effects.lua",
+          "source/runtime/passive_repair.lua"
+        ],
+        "host_controls": [
+          "tests/test_passive_repair.py",
+          "tests/test_spoilage.py"
+        ],
+        "evidence": [
+          "spec/evidence/settings-repair-chain.json",
+          "spec/evidence/repair-stress-native-chain.json",
+          "spec/evidence/runtime-active-r06-observation-analysis-chain.json"
+        ],
+        "remaining": "Keep each original native scope; qualify changed-package applicability and remaining removal/readd/large active scheduled-work boundaries rather than rebuilding a runtime framework."
+      },
+      {
+        "subjects": [
+          "CONT-11"
+        ],
+        "disposition": "port",
+        "obligation": "Historical identity/effect/ownership contracts, applied migration filenames and required live carriers.",
+        "implementation": [
+          "source/runtime/k2_imersite_migration.lua",
+          "source/migrations/more-infinite-research_4.7.0.json"
+        ],
+        "host_controls": [
+          "tests/test_k2_imersite_migration.py"
+        ],
+        "decision": "MIG-05 supersedes the every-patch campaign; MIG-06 retains meaningful historical continuity without reviving the compiler.",
+        "remaining": "Use the protected required origins and actual remaining state/provider/engine boundaries, including affected beta-to-successor state. Unknown histories are not qualified by adjacency."
+      },
+      {
+        "subjects": [
+          "CONT-12"
+        ],
+        "disposition": "unresolved",
+        "obligation": "Named Angel/BobTech/Ironclad/full-suite useful semantic reconciliation and actual material routes.",
+        "implementation": [
+          "source/compatibility/modern_catalogue",
+          "source/research/bob_core_materials.lua",
+          "source/research/bob_plates_materials.lua",
+          "source/research/py_materials.lua"
+        ],
+        "remaining": "Reconcile the existing CONT-12 implementation/qualification entries with exact admitted profiles. Withheld K2/Bob rows retain their actual environment decisions; do not emit them merely to satisfy a broad request label."
+      },
+      {
+        "subjects": [
+          "CONT-14"
+        ],
+        "disposition": "consolidate",
+        "obligation": "The actual versioned API/consumer boundaries and side-effect-free queries.",
+        "implementation": [
+          "source/api/v1/data.lua",
+          "source/api/v1/runtime.lua"
+        ],
+        "host_controls": [
+          "tests/test_api.py",
+          "tests/test_runtime_api.py",
+          "tests/test_api_boundary_fixture.py"
+        ],
+        "remaining": "Complete the documented-subset/capability/version/budget verdict from existing API evidence. An old MEP preview is not the API 1 implementation or a promise to hypothetical consumers."
+      },
+      {
+        "subjects": [
+          "CONT-01",
+          "CONT-02",
+          "CONT-15"
+        ],
+        "disposition": "obsolete-implementation-only",
+        "obligation": "Retain externally meaningful research/science/effect/identity expectations formerly protected by compiler tests.",
+        "historical_source": {
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "paths": [
+            "source/prototypes/mir/domain/compiler",
+            "source/prototypes/mir/graph",
+            "source/prototypes/mir/index",
+            "source/prototypes/mir/planner"
+          ]
+        },
+        "remaining": "Classify each selected old test intent before retirement. Planner/fingerprint internals need no active replacement; technology/settings/effect/save expectations still need the current CONT mapping."
+      },
+      {
+        "subjects": [
+          "CONT-15"
+        ],
+        "disposition": "rejected-or-proposed",
+        "request_ids": [
+          "PIPE-01",
+          "VEH-01",
+          "VEH-02",
+          "PLAT-UI-01"
+        ],
+        "obligation": "Preserve explicit denials, engine exclusions and proposed UI scope as decisions, not missing implementation.",
+        "remaining": "Inspect original request decisions without rewriting IDs/text/status; a new acceptance decision would need explicit maintainer authority."
+      },
+      {
+        "subjects": [
+          "CONT-15"
+        ],
+        "disposition": "unresolved",
+        "request_ids": [
+          "SCI-UNLOCK-01",
+          "SCI-RESEARCH-01",
+          "COMP-TRUE-NUKES-01",
+          "MP-JOIN-01"
+        ],
+        "obligation": "Original reporter-specific defects and missing input histories.",
+        "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
+      }
+    ],
+    "next_bounded_work": "Complete the CONT-10 known-bad-versus-restored behavior mapping and packaged visual/input slice with the native owner; then classify the deduplicated old test intents by the existing CONT subjects. Do not rerun all old campaigns or reopen unrelated accepted migrations/startup evidence."
+  }
 }
