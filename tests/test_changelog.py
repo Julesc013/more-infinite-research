@@ -38,7 +38,10 @@ class ChangelogTests(unittest.TestCase):
         output = changelog.rendered()
         self.assertEqual((ROOT / "source/changelog.txt").read_text(encoding="utf-8"), output)
         self.assertNotIn("@DISTRIBUTION_VERSION@", output)
-        self.assertTrue(output.startswith(changelog.SEPARATOR + "\nVersion: 5.0.0\n"))
+        distribution = json.loads((ROOT / "source/info.json").read_text(encoding="utf-8"))["version"]
+        major, minor, encoded = distribution.split(".")
+        source_version = f"{major}.{minor}.{int(encoded) % 100}"
+        self.assertTrue(output.startswith(changelog.SEPARATOR + "\nVersion: " + source_version + "\n"))
         self.assertLessEqual(max(map(len, output.splitlines())), 132)
         self.assertIn("\nVersion: 4.7.3\n", output)
         self.assertIn("\nVersion: 1.0.0\n", output)

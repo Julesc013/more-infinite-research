@@ -351,16 +351,23 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               local filters=root.mir_library_filters
               filters.mir_library_query.text=search
               filters.mir_library_family.selected_index=options.family=="all" and 2 or (options.family=="external" and 3 or 1)
-              local content=element("flow","mir_library_research_content")
+              local content=element("table","mir_library_research_content")
+              content.column_count=2
+              content.style.maximal_width=760
               root.mir_library_tabs.mir_library_research_content=content
               local private=false;for _,id in ipairs(ids) do if search==id then private=true end end
               local present=not private
               if opponent=="private-listed" and private then present=true end
               if opponent=="empty-ordinary" and not private then present=false end
               content.mir_library_results=element("list-box","mir_library_results")
+              content.mir_library_results.style.minimal_width=294
+              content.mir_library_results.style.maximal_width=294
               content.mir_library_results.items=present and {search} or {}
               content.mir_library_results.selected_index=present and 1 or 0
-              content.mir_library_detail=element("flow","mir_library_detail")
+              content.mir_library_detail=element("scroll-pane","mir_library_detail")
+              content.mir_library_detail.vertical_scroll_policy="auto"
+              content.mir_library_detail.style.minimal_width=442
+              content.mir_library_detail.style.maximal_width=442
               content.mir_library_detail[present and "mir_library_detail_title" or "mir_library_detail_empty"]=element("label","label")
               content.mir_library_actions=element("flow","mir_library_actions")
               content.mir_library_actions.mir_library_open_native=element("button","mir_library_open_native")

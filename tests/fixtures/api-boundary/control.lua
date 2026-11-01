@@ -5,7 +5,7 @@ local names = {single, "mir-api-boundary-family-a-1", "mir-api-boundary-family-b
 local function fail(message) error("[mir5-api-boundary] " .. message) end
 script.on_init(function()
   local base = script.active_mods.base
-  local expected = ({["2.0.77"] = "5.0.20000", ["2.1.23"] = "5.0.21000"})[base]
+  local expected = ({["2.0.77"] = "5.0.20001", ["2.1.23"] = "5.0.21001"})[base]
   if not expected or script.active_mods["more-infinite-research"] ~= expected then fail("engine or MIR differs") end
   if remote.interfaces[interface] == nil then fail("public interface absent") end
   local force = game.forces.player

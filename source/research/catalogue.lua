@@ -58,6 +58,7 @@ local function continuation_settings(key)
     "mir-cost-growth-" .. key, "mir-max-level-" .. key, "mir-research-time-" .. key,
     "mir-effect-per-level-" .. key}
 end
+
 local function locale_key(value)
   if type(value) == "string" then return value end
   return type(value) == "table" and value[1] or nil
@@ -172,7 +173,7 @@ local function py_material_rows()
   return rows
 end
 
-local function static_rows()
+local function static_rows(existing_technology_prototypes)
   local rows = {generated_row(GEAR_ID, "research_gears", "p[research_gears]",
     "technology-name.more-infinite-research.research_gears", "iron-gear-wheel")}
   for _, row in ipairs(bob_tech_rows()) do rows[#rows + 1] = row end
@@ -180,7 +181,13 @@ local function static_rows()
   for _, row in ipairs(bob_plates_rows()) do rows[#rows + 1] = row end
   for _, row in ipairs(material_rows(modern_catalogue.angel_material_definitions(active_mods))) do rows[#rows + 1] = row end
   local selected
-  if ordinary_profile or k2_base_profile or k2so_profile then selected = modern_catalogue.select(active_mods) end
+  if ordinary_profile or k2_base_profile or k2so_profile then
+    selected = modern_catalogue.select(active_mods)
+    if existing_technology_prototypes ~= nil then
+      selected.continuations = modern_catalogue.omit_existing_continuations(
+        selected.continuations, existing_technology_prototypes)
+    end
+  end
   if not selected then
     if space_age_active then
       rows[#rows + 1] = generated_row(AGRICULTURE_ID, "research_agricultural_growth_speed",
@@ -264,10 +271,23 @@ end
 -- rather than rebuilding the selected profile for each Library/cap query.
 -- Data-stage consumers also import this module for stable IDs only; they do
 -- not need to construct runtime metadata before their own local preflights.
-local runtime_rows = script and static_rows() or nil
+local runtime_rows
+local runtime_rows_source
 
-function M.declared()
-  local rows = runtime_rows or static_rows()
+local function prepare_rows(existing_technology_prototypes)
+  if runtime_rows == nil or runtime_rows_source ~= existing_technology_prototypes then
+    runtime_rows_source = existing_technology_prototypes
+    runtime_rows = static_rows(existing_technology_prototypes)
+  end
+  return runtime_rows
+end
+
+function M.prepare(existing_technology_prototypes)
+  prepare_rows(existing_technology_prototypes)
+end
+
+function M.declared(existing_technology_prototypes)
+  local rows = prepare_rows(existing_technology_prototypes)
   local out = {}
   for index = 1, #rows do out[index] = copy(rows[index]) end
   return out

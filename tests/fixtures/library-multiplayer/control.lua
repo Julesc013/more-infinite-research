@@ -259,14 +259,19 @@ local function frame_parts(player)
   local detail = valid(content) and content[DETAIL] or nil
   if not valid(query) or query.type ~= "textfield" or not valid(sort) or sort.type ~= "drop-down"
       or not valid(tabs) or tabs.type ~= "tabbed-pane" or not valid(results) or results.type ~= "list-box"
-      or not valid(detail) or not valid(detail[DETAIL_TITLE]) then
+      or not valid(content) or content.type ~= "table" or content.column_count ~= 2
+      or not valid(detail) or detail.type ~= "scroll-pane" or not valid(detail[DETAIL_TITLE]) then
     fail("native public browser GUI tree is incomplete")
   end
   local content_width = content.style and content.style.maximal_width
+  local results_style = results.style
   local detail_style = detail.style
-  if type(content_width) ~= "number" or content_width <= 0 or detail_style == nil
-      or detail_style.minimal_width ~= content_width or detail_style.maximal_width ~= content_width then
-    fail("native public browser detail width differs")
+  if type(content_width) ~= "number" or content_width <= 0 or results_style == nil or detail_style == nil
+      or type(results_style.minimal_width) ~= "number" or results_style.minimal_width < 200
+      or type(detail_style.minimal_width) ~= "number" or detail_style.minimal_width < 280
+      or results_style.minimal_width >= detail_style.minimal_width
+      or results_style.minimal_width + detail_style.minimal_width > content_width then
+    fail("native public browser list/detail pane geometry differs")
   end
   return root, query, sort, results, detail
 end
@@ -307,7 +312,7 @@ local function assert_private_credit_empty_view(player, family, id)
       or not valid(family_picker) or family_picker.type ~= "drop-down" or family_picker.selected_index ~= family_index
       or not valid(results) or results.type ~= "list-box" or #results.items ~= 0 or results.selected_index ~= 0
       or not valid(detail) or valid(detail[DETAIL_TITLE]) or not valid(detail[DETAIL_EMPTY])
-      or not valid(native_open) or native_open.type ~= "button" or native_open.enabled ~= false then
+      or not valid(native_open) or native_open.type ~= "sprite-button" or native_open.enabled ~= false then
     fail("private credit query exposed a public result or native action: " .. family .. "/" .. id)
   end
 end
@@ -342,7 +347,7 @@ local function assert_public_browser_result(player, family, query)
       or not valid(family_picker) or family_picker.type ~= "drop-down" or family_picker.selected_index ~= family_index
       or not valid(results) or results.type ~= "list-box" or #results.items < 1 or results.selected_index < 1
       or not valid(detail) or not valid(detail[DETAIL_TITLE])
-      or not valid(native_open) or native_open.type ~= "button" or native_open.enabled ~= true then
+      or not valid(native_open) or native_open.type ~= "sprite-button" or native_open.enabled ~= true then
     fail("public Library " .. family .. " query did not expose a selected ordinary result: " .. query)
   end
 end

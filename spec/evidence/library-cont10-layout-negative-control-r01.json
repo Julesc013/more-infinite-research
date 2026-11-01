@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryHistoricalLayoutNegativeControlV1",
+  "requirement": {
+    "continuity_id": "CONT-10",
+    "area": "window-and-layout"
+  },
+  "control": {
+    "test": "tests/test_library.py::LibraryTests.test_research_library_opens_with_a_selected_split_detail_view",
+    "test_sha256": "EA54E39200575AF6106CC978C289D31AD1D04305CE21563D49C09F5FCF449274",
+    "runner_sha256": "C97B91ECFA03615BB464D12A5CC380A283CEEAD59D53581ED0784510E7647B46",
+    "runtime": "pinned Lupa Lua 5.2 host",
+    "output_root": "build/tmp/cont10-layout-oracle-r01"
+  },
+  "published_beta": {
+    "tag": "v5.0.0",
+    "commit": "7e77f203859ab9384208c2c673983b1ffea44d2f",
+    "library_sha256": "19C0BBF4B88B5DE6A63C0D4D5CBAA4FBDF2389D9278449F08F5D8D56FBAC55A5",
+    "result": "expected-negative",
+    "exit_code": 1,
+    "failure": "The control fails at its first split-layout assertion: research content must be a two-column table."
+  },
+  "successor_source": {
+    "branch": "dev",
+    "commit": "5799002dd6f47ad9181c117ef4a499c669a8b70f",
+    "library_sha256": "E7ACDDB2E6F3FE97269F8C01CE5EA0075DEDA6A1A00ACD6D6587CCC38F8AC129",
+    "result": "passed",
+    "exit_code": 0
+  },
+  "retained_visual_review": {
+    "source_commit": "40fdc11d3ad6a011d3a95abc99ea481d3384f978",
+    "player_zip_sha256": "1EF57E3ACD05BE9B1097AC3744C913933A7784FE6513F12C2771B0096CDB2029",
+    "screenshots": [
+      {
+        "path": "build/tmp/library-restoration-preview-cfeac3-f210-r08/session/client-de/script-output/mir5-library-multiplayer/settled-2.png",
+        "sha256": "E49A258F7D881471E858864364A707F799C3087BD849C10F394B308833AFDE53",
+        "observation": "German Research view shows separate result and detail panes with localized detail text."
+      },
+      {
+        "path": "build/tmp/library-restoration-preview-cfeac3-f210-r08/session/client-en/script-output/mir5-library-multiplayer/settled-1.png",
+        "sha256": "EFA40B4B547B0BABF00FF19DAD0AC6EC7C4EA4D578328A9D1F4A0F5381B7331B",
+        "observation": "Factorio's research chooser overlays the detail pane; English detail rendering is inconclusive in this capture."
+      }
+    ]
+  },
+  "limits": [
+    "The negative control uses the host GUI double; it demonstrates the known beta layout regression and successor source behavior, not Factorio rendering or real input.",
+    "The R08 screenshots do not cover Settings, Queue, Debug, Help, actual pointer or keyboard input, or representative display scales."
+  ]
+}

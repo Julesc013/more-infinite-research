@@ -11,8 +11,10 @@ local M = {
   expiry_ticks = 1800,
   uint32_max = 4294967295,
   -- Lua's string length is a byte length. This limit applies to locale,
-  -- catalogue-key, and translated-label byte strings.
+  -- catalogue-key, and translated-label byte strings. Search-label payloads
+  -- may contain bounded associated recipe and product names.
   label_limit = 1024,
+  translated_label_limit = 32768,
   translated_name_byte_limit = 16 * 1024 * 1024,
   catalogue_limit = 30000
 }
@@ -113,7 +115,7 @@ local function resolve(cache, key, label)
   cache.resolved_keys[key] = true
   cache.resolved = cache.resolved + 1
   cache.completed_since_refresh = cache.completed_since_refresh + 1
-  if type(label) == "string" and #label > 0 and #label <= M.label_limit
+  if type(label) == "string" and #label > 0 and #label <= M.translated_label_limit
       and cache.cached_bytes + #label <= M.translated_name_byte_limit then
     cache.labels[key] = label
     cache.cached_bytes = cache.cached_bytes + #label

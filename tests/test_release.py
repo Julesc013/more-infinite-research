@@ -47,22 +47,34 @@ class ReleaseTests(unittest.TestCase):
         distribution_version = major + "." + minor + "." + str(21000 + int(patch)).zfill(5)
         info_path = source / "info.json"
         info = json.loads(info_path.read_text(encoding="utf-8"))
+        old_distribution = info["version"]
         info["version"] = distribution_version
         info_path.write_bytes((json.dumps(info, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
         target_path = source / "platform/target.lua"
         target = target_path.read_text(encoding="utf-8")
-        old_distribution = 'distribution_version="5.0.21000"'
-        if target.count(old_distribution) != 1:
+        old_target_distribution = 'distribution_version="' + old_distribution + '"'
+        if target.count(old_target_distribution) != 1:
             raise AssertionError("Fixture source lacks one canonical F210 distribution version")
         target_path.write_bytes(
-            target.replace(old_distribution, 'distribution_version="' + distribution_version + '"').encode("utf-8"))
+            target.replace(old_target_distribution,
+                           'distribution_version="' + distribution_version + '"').encode("utf-8"))
         changelog_path = source / "changelog.txt"
         changelog = changelog_path.read_text(encoding="utf-8")
-        old_header = "Version: 5.0.0\n"
+        old_header = "Version: " + release.package.source_changelog_version(old_distribution) + "\n"
         if changelog.count(old_header) != 1:
             raise AssertionError("Fixture source lacks one current changelog header")
-        changelog_path.write_bytes(
-            changelog.replace(old_header, "Version: " + source_version + "\n").encode("utf-8"))
+        requested_header = "Version: " + source_version + "\n"
+        headers = [line for line in changelog.splitlines(keepends=True) if line.startswith("Version: ")]
+        if requested_header in headers[1:]:
+            requested_at = changelog.find(requested_header)
+            separator = "-" * 99 + "\n"
+            start = changelog.rfind(separator, 0, requested_at)
+            if start < 0:
+                raise AssertionError("Fixture changelog lacks the requested historical release")
+            changelog = changelog[start:]
+        else:
+            changelog = changelog.replace(old_header, requested_header, 1)
+        changelog_path.write_bytes(changelog.encode("utf-8"))
 
     @classmethod
     def _archive_name(cls, target, distribution_version=None):

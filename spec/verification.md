@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-30
+last_reviewed: 2026-10-31
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -51,6 +51,16 @@ The [required migration boundaries](migrations.md#required-origin-coverage) reta
 Keep these independent: feature parity; supported-profile correctness; migration/client safety; performance improvement; non-regression controls; package/delivery identity. A public release deadline or green host CI does not override a missing stable-acceptance verdict. A separately reviewed community prerelease identifies its exact bytes, completed/failed/unverified gates and support limits; its GitHub prerelease flag does not claim stable acceptance. The maintainer authorizes the first `v5.0.0` GitHub beta with unfinished Library input/export/personal-view checks and performance tests disclosed as unverified and deferred to stable. Package integrity, exact source/package/controller provenance, upgrade safety and normal checked publication remain mandatory; no missing or adverse result is reclassified as passed. Stable publication still requires every applicable verdict. No native test is counted as passed when unavailable, refused or not run.
 
 Do not execute another local native job if the maintainer's worker already owns the same scenario. Three total agent slots and one heavy native workload per admitted machine remain the working capacity rule; a multiplayer scenario may require its intended simultaneous participants. Preserve and restore mod-list/settings controls.
+
+## Historical preservation before stable
+
+`VER-07` — Before declaring MIR5 stable, reconcile the historical tests, fixes, accepted requests and design decisions in the existing [continuity inventory](inventory/continuity.json) and [original request ledger](programmes/community-requests.json). Inventory published tags/packages, changed tests and fixtures, issue/PR discussions, changelogs, accepted design/playtest records and retained screenshots; deduplicate identical Git blobs instead of rereading each release. Account for all inventoried sources, grouping equivalent test intents or superseded machinery with their original references rather than requiring separate semantic work per blob or patch. Every applicable delivered behavior or accepted decision needs its original identity/decision, current implementation and adequate verification mapping. Unreviewed source groups, missing inputs and uncertain intent remain unresolved. An initial source inventory or source-route mapping does not complete this gate.
+
+Retain correct tests; port only obsolete harness boundaries around valid independent expectations; consolidate duplicates while preserving their obligation links. Retire implementation-only compiler assertions, and preserve proposed, rejected and superseded decisions without turning them into promised features. Do not import the old framework or automatically rewrite/rerun every historical campaign. A changed oracle or mock needs an accepted historical decision or independent engine evidence. New regression controls must detect the known broken behavior, not merely accept the candidate's element names or mock geometry.
+
+Start with the accepted 4.2 Library interaction amendment recorded under `CONT-10`: retained stable window, usable split browse/details with a narrow-screen fallback, continuous lists, working search/dropdowns, localized discovery, settings provenance, personal state, diagnostics/exports and native-research handoff. Do not restore superseded pagination/shrinking tabs or withheld queue authority. Host behavior, rendered screenshots and actual mouse/keyboard input establish separate scopes. Check the affected tabs, sizes/scales, long English/German text, lifecycle and burst/closed-view costs on the changed candidate; retain unrelated technology/migration results under their original inputs. Published 5.0.0 bytes remain fixed, and affected beta-to-successor state continuity needs its own result.
+
+Native UI preparation must exercise the dispatcher's actual path resolution, archive-role binding, directory creation and launch validation before starting Factorio. Validate the complete config/write-data/output/capture composition with a cheap temporary-directory control. Review a bounded permitted action sequence before dispatch, then enforce desktop, process/window identity, foreground, geometry and state guards at each action and stop on an unexpected state. This does not bypass any existing safeguard or turn preparation into native acceptance.
 
 ## Implementation status
 

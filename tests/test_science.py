@@ -1340,23 +1340,39 @@ class ScienceTests(unittest.TestCase):
             assert(result.enabled and names(row.unit.ingredients) == "kr-basic-tech-card:3,production-science-pack:4")
           end
 
-          for _, marker in ipairs(markers) do
-            local changed = {}
-            for name, version in pairs(exact) do changed[name] = version end
-            -- Exercise a concrete official patch as well as changed provider
-            -- versions. A complete predecessor must not fall back to the
-            -- ordinary vector and retain its basic card.
-            changed[marker] = marker == "base" and "2.1.24" or "unreviewed-version"
-            local ok, message = pcall(bindings.select, {id="f210"}, changed)
-            assert(not ok and tostring(message):find("unsupported F210 K2SO science%-phase saved%-profile transition"),
-              "changed K2SO tuple silently selected for " .. marker)
-            row = technology({{"kr-basic-tech-card",3},{"production-science-pack",4}})
-            local before = names(row.unit.ingredients)
-            ok, message = pcall(function()
-              return science.apply(row, {}, science.prepare({raw=raw, target={id="f210"}, mods=changed, options={}}))
-            end)
-            assert(not ok and tostring(message):find("unsupported F210 K2SO science%-phase saved%-profile transition"))
-            assert(names(row.unit.ingredients) == before, "changed phase tuple mutated owned science")
+          local changed = {
+            base="2.1.24", ["space-age"]="2.1.24", Krastorio2="2.1.5",
+            ["Krastorio2-spaced-out"]="2.0.20", Krastorio2Assets="2.1.1", ["k2so-assets"]="1.0.8"
+          }
+          local selected = bindings.select({id="f210"}, changed)
+          assert(selected.k2_phase ~= nil, "complete K2SO providers were rejected after version updates")
+          row = technology({{"kr-basic-tech-card",3},{"production-science-pack",4}})
+          result = science.apply(row, {}, science.prepare({raw=raw, target={id="f210"}, mods=changed, options={}}))
+          assert(result.enabled and names(row.unit.ingredients) == "production-science-pack:4",
+            "recognized K2SO phase identities changed when provider patch versions changed")
+
+          for name, version in pairs(exact) do
+            local changed_line = {}
+            for key, value in pairs(exact) do changed_line[key] = value end
+            local major, minor = version:match("^(%d+)%.(%d+)%.")
+            changed_line[name] = tostring(tonumber(major) + 1) .. "." .. minor .. ".0"
+            local ok, message = pcall(bindings.select, {id="f210"}, changed_line)
+            assert(not ok and tostring(message):find("provider version line changed", 1, true),
+              "incompatible K2SO provider line was admitted for " .. name)
+
+            changed_line = {}
+            for key, value in pairs(exact) do changed_line[key] = value end
+            changed_line[name] = major .. "." .. tostring(tonumber(minor) + 1) .. ".0"
+            ok, message = pcall(bindings.select, {id="f210"}, changed_line)
+            assert(not ok and tostring(message):find("provider version line changed", 1, true),
+              "changed K2SO minor line was admitted for " .. name)
+
+            changed_line = {}
+            for key, value in pairs(exact) do changed_line[key] = value end
+            changed_line[name] = "unreviewed-version"
+            ok, message = pcall(bindings.select, {id="f210"}, changed_line)
+            assert(not ok and tostring(message):find("provider version line changed", 1, true),
+              "malformed K2SO version was admitted for " .. name)
           end
         ''')
 
