@@ -54,6 +54,10 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact order-neutral input metadata-source fetch failed.' }
           git fetch --no-tags --depth=1 origin 7cf634060cde6441031e744c7d155b0647fa0851
           if ($LASTEXITCODE -ne 0) { throw 'Exact removal operand fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 4fadd571dfddc93d8ac9f3482b7105d09c9fa4a7
+          if ($LASTEXITCODE -ne 0) { throw 'Exact r14 F210 observer fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 94806c5508d60698c4f0ecb72fd7e267344e622d
+          if ($LASTEXITCODE -ne 0) { throw 'Exact r15 observer fixture-source fetch failed.' }
       - id: bind
         name: Bind the exact ordered host-control plan
         shell: pwsh
@@ -149,6 +153,10 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact order-neutral input metadata-source fetch failed.' }
           git fetch --no-tags --depth=1 origin 7cf634060cde6441031e744c7d155b0647fa0851
           if ($LASTEXITCODE -ne 0) { throw 'Exact removal operand fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 4fadd571dfddc93d8ac9f3482b7105d09c9fa4a7
+          if ($LASTEXITCODE -ne 0) { throw 'Exact r14 F210 observer fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 94806c5508d60698c4f0ecb72fd7e267344e622d
+          if ($LASTEXITCODE -ne 0) { throw 'Exact r15 observer fixture-source fetch failed.' }
       - name: Restore the bound host-control plan
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:

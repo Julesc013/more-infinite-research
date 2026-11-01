@@ -234,9 +234,21 @@ class HostControlsTests(unittest.TestCase):
             for profile in declaration["profiles"]:
                 if profile["mode"] == "input":
                     input_revisions.update(member["source_revision"] for member in profile["owned_fixture"]["members"])
+        observer_record = json.loads(
+            (ROOT / "spec/evidence/library-native-input-observer-r15-prepared.json").read_text(encoding="utf-8")
+        )
+        observer_revisions = {observer_record["source"]["commit"]}
+        observer_revisions.update(
+            member["source_revision"]
+            for prepared in observer_record["profiles_and_archives"]
+            for member in prepared["archive"]["members"]
+        )
         for job in ("verification-plan", "host-controls"):
             self.assertIn(required_fetch, jobs[job], job)
             for revision in input_revisions:
+                self.assertRegex(revision, r"^[0-9a-f]{40}$")
+                self.assertIn("git fetch --no-tags --depth=1 origin " + revision, jobs[job], (job, revision))
+            for revision in observer_revisions:
                 self.assertRegex(revision, r"^[0-9a-f]{40}$")
                 self.assertIn("git fetch --no-tags --depth=1 origin " + revision, jobs[job], (job, revision))
         self.assertIn("actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1", workflow)
