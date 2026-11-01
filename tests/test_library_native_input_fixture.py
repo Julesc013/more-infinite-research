@@ -36,6 +36,36 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertEqual(new["name"], "mir-fixture-mir5-migration-origin-f200-110-source")
                 self.assertEqual(new["version"], "0.3.0" if target == "f200" else "0.4.0")
 
+    def test_r16_profiles_reconstruct_dependency_correct_preservation_archives(self):
+        record = json.loads((ROOT / "spec/evidence/library-native-input-imported110-prepared-blackglass-r04.json").read_text())
+        for prepared in record["profiles"]:
+            profile = json.loads((ROOT / prepared["profile"]["source"]).read_text())
+            historical = next(row for row in profile["mods"] if row["name"] == "mir-fixture-mir5-migration-origin-f200-110-source")
+            root = historical["name"] + "_" + historical["version"]
+            output = io.BytesIO()
+            members = prepared["owned_imported_fixture_members"]
+            self.assertEqual([member["destination"] for member in members], ["control.lua", "catalogue.lua", "data-final-fixes.lua", "settings-updates.lua", "info.json"])
+            with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_STORED) as archive:
+                for member in members:
+                    data = subprocess.check_output(["git", "show", member["source_revision"] + ":" + member["source"]], cwd=ROOT)
+                    self.assertEqual(len(data), member["bytes"])
+                    self.assertEqual(hashlib.sha256(data).hexdigest().upper(), member["sha256"])
+                    if member["destination"] != "info.json":
+                        original = subprocess.check_output(["git", "show", "dc3bb5899bac55396fd865fb2a504ce213b07bec:" + member["source"]], cwd=ROOT)
+                        self.assertEqual(data, original)
+                    else:
+                        info = json.loads(data)
+                        player = next(row for row in profile["mods"] if row["name"] == "more-infinite-research")
+                        self.assertEqual(info["dependencies"], ["base = " + profile["engine"]["version"], "more-infinite-research = " + player["version"]])
+                    entry = zipfile.ZipInfo(root + "/" + member["destination"], date_time=(1980, 1, 1, 0, 0, 0))
+                    entry.create_system = 3
+                    entry.external_attr = 0o100644 << 16
+                    entry.compress_type = zipfile.ZIP_STORED
+                    archive.writestr(entry, data)
+            digest = hashlib.sha256(output.getvalue()).hexdigest().upper()
+            self.assertEqual(digest, profile["archive_sha256"][root + ".zip"])
+            self.assertEqual(digest, prepared["frozen_player_and_observer_archives"][root + ".zip"])
+
     def test_input_metadata_keeps_required_versions_without_mir_runtime_order_edges(self):
         historical = "mir-fixture-mir5-migration-origin-f200-110-source"
         fixture = "mir-fixture-mir5-library-native-input"
