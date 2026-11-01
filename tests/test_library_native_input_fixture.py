@@ -147,8 +147,13 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             "C6C2470B438846484732E0E05D124DB31A1100C2F1AA0E770B327A4A6FBAFA5D",
         )
         control_path = FIXTURE / "control.lua"
-        control_bytes = control_path.read_bytes()
-        info_bytes = info_path.read_bytes()
+        control_bytes = subprocess.check_output(
+            ["git", "show", "HEAD:tests/fixtures/library-native-input/control.lua"], cwd=ROOT
+        )
+        info_bytes = subprocess.check_output(
+            ["git", "show", "HEAD:tests/fixtures/library-native-input/info-input-identity-f210-501.json"],
+            cwd=ROOT,
+        )
         self.assertIn(b'observer_version=="0.3.2"', control_bytes)
         archive_bytes = io.BytesIO()
         archive_name = f"{info['name']}_{info['version']}"
