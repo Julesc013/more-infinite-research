@@ -309,6 +309,8 @@ local function local_view(raw)
     settings_scope = raw.settings_scope,
     settings_query = text(raw.settings_query),
     setting_selected = technology_id(raw.setting_selected),
+    report_settings = raw.report_settings == true,
+    report_omissions = raw.report_omissions == true,
     open = raw.open == true,
     refresh_pending = raw.refresh_pending == true,
     location = location(raw.location),
@@ -631,10 +633,25 @@ local function legacy_view_as_private(value)
     settings_scope = value.settings_scope,
     settings_query = value.settings_search,
     setting_selected = value.setting_selection,
+    report_settings = value.report_settings,
+    report_omissions = value.report_omissions,
     location = value.location,
     geometry = value.geometry,
     scroll = value.scroll
   })
+end
+
+local function carry_report_choices(view, historical)
+  if type(view) ~= "table" or type(historical) ~= "table" then return end
+  for _, field in ipairs({"report_settings", "report_omissions"}) do
+    if view[field] == nil and type(historical[field]) == "boolean" then view[field] = historical[field] end
+  end
+end
+
+local function legacy_player_retired(state, index)
+  local preserved = state and state.legacy_browser
+  local retired = type(preserved) == "table" and preserved.retired_players or nil
+  return type(retired) == "table" and retired[index] == true
 end
 
 local function named_root(player)
@@ -1589,12 +1606,49 @@ local function update_availability_content(content, player, view)
   end
 end
 
-local function update_help_content(content)
+local function report_options(player, view)
+  local rows
+  if view.report_omissions then
+    local active_mods = script and script.active_mods or mods or {}
+    local streams = type(effective_configuration) == "table" and effective_configuration.streams or nil
+    rows = availability.rows(active_mods, target, player.force, nil, streams)
+  end
+  return {report_settings = view.report_settings, report_omissions = view.report_omissions, availability_rows = rows}
+end
+
+local function update_report_preview(content, player, view)
+  local preview = content and content[PREFIX .. "report_preview"]
+  if not valid(preview) then return end
+  local result, err = diagnostics.preview(player.index, view.selected, report_options(player, view))
+  preview.text = result or ("Diagnostic preview unavailable: " .. tostring(err))
+end
+
+local function update_help_content(content, player, view)
   if not valid(content) then return end
+  -- Keep the preview as a snapshot. Research/translation refreshes must not
+  -- repeatedly encode hundreds of settings or replace a player's selection.
+  if valid(content[PREFIX .. "help_summary"]) then return end
   content.clear()
   add(content, {type = "label", name = PREFIX .. "help_summary", caption = {"mir-browser.help-summary"}})
   add(content, {type = "label", name = PREFIX .. "help_queue", caption = {"mir-browser.native-queue-guidance"}})
   if diagnostics then
+    add(content, {type = "label", name = PREFIX .. "report_options", caption = {"mir-browser.report-options"}})
+    for _, option in ipairs({"report_settings", "report_omissions"}) do
+      add(content, {type = "checkbox", name = PREFIX .. option, state = view[option],
+        caption = {"mir-browser." .. option:gsub("_", "-")}})
+    end
+    local preview = add(content, {type = "text-box", name = PREFIX .. "report_preview", text = "",
+      tooltip = {"mir-browser.report-preview"}})
+    preview.read_only, preview.word_wrap = true, true
+    if preview.style then
+      preview.style.maximal_width, preview.style.height = 650, 160
+      preview.style.horizontally_stretchable = true
+    end
+    add(content, {type = "button", name = PREFIX .. "report_select", caption = {"mir-browser.report-select"}})
+    add(content, {type = "button", name = PREFIX .. "report_refresh", caption = {"mir-browser.debug-refresh"}})
+    local local_only = add(content, {type = "label", name = PREFIX .. "report_local", caption = {"mir-browser.report-local"}})
+    if local_only.style then local_only.style.single_line = false; local_only.style.maximal_width = 650 end
+    update_report_preview(content, player, view)
     add(content, {type = "button", name = PREFIX .. "export_diagnostics", caption = {"mir-browser.export-diagnostics"},
       tooltip = {"mir-browser.export-diagnostics-tooltip"}})
     local guidance = add(content, {type = "label", name = PREFIX .. "export_privacy", caption = {"mir-browser.export-sharing-guidance"}})
@@ -1822,7 +1876,7 @@ local function render(player, view, context, preserve_query)
     if view.tab == "queue" then
       update_queue_content(content, player, view)
     else
-      update_help_content(content)
+      update_help_content(content, player, view)
     end
   end
   set_shortcut(player, true)
@@ -1948,6 +2002,20 @@ function M.on_gui_selected_tab_changed(event)
   if view.tab == tab then return end
   view.tab = tab
   render(player, view)
+end
+
+function M.on_gui_checked_state_changed(event)
+  local element = event and event.element
+  if not valid(element) or element.type ~= "checkbox" then return end
+  local field = element.name == PREFIX .. "report_settings" and "report_settings"
+    or element.name == PREFIX .. "report_omissions" and "report_omissions" or nil
+  if not diagnostics or not field then return end
+  local player = player_for(event and event.player_index)
+  if not player or type(element.state) ~= "boolean" then return end
+  if not owns_element(player, element, {element.name, PREFIX .. "help_content", PREFIX .. "tabs", ROOT}) then return end
+  local view = view_for(player.index)
+  view[field] = element.state
+  update_report_preview(element.parent, player, view)
 end
 
 function M.on_gui_selection_state_changed(event)
@@ -2092,8 +2160,24 @@ function M.on_gui_click(event)
       element.name, PREFIX .. "help_content", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
-    local encoded = diagnostics.export(player.index, view.selected)
+    local encoded, _, report = diagnostics.export(player.index, view.selected, report_options(player, view))
+    if report and valid(element.parent[PREFIX .. "report_preview"]) then
+      element.parent[PREFIX .. "report_preview"].text = report
+    end
     show_export_profile(element.parent, encoded)
+    return
+  end
+  if diagnostics and (element.name == PREFIX .. "report_select" or element.name == PREFIX .. "report_refresh") then
+    if not owns_element(player, element, {element.name, PREFIX .. "help_content", PREFIX .. "tabs", ROOT}) then return end
+    if element.name == PREFIX .. "report_refresh" then
+      update_report_preview(element.parent, player, view_for(player.index))
+      return
+    end
+    local preview = element.parent[PREFIX .. "report_preview"]
+    if valid(preview) then
+      if type(preview.focus) == "function" then preview.focus() end
+      if type(preview.select_all) == "function" then preview.select_all() end
+    end
     return
   end
   if element.name == PREFIX .. "production_check" then
@@ -2429,6 +2513,13 @@ function M.on_player_removed(event)
   if not state then return end
   local index = event.player_index
   state.players[index] = nil
+  local preserved = state.legacy_browser
+  if type(preserved) == "table" and type(preserved.players) == "table" and preserved.players[index] ~= nil then
+    -- Preserve original history, but never import its personal choices into a
+    -- different account that later receives the same native player index.
+    if type(preserved.retired_players) ~= "table" then preserved.retired_players = {} end
+    preserved.retired_players[index] = true
+  end
   discard_translation_cache(index)
   local ledger = existing_translation_ledger(state)
   if not ledger then return end
@@ -2514,7 +2605,7 @@ function M.on_configuration_changed()
     local candidates = {}
     for index, historical_view in pairs(legacy_players) do
       local normalized_index = player_index(index)
-      if normalized_index and type(historical_view) == "table" then
+      if normalized_index and type(historical_view) == "table" and not legacy_player_retired(existing_state(), normalized_index) then
         candidates[#candidates + 1] = {index = normalized_index, view = historical_view}
       end
     end
@@ -2544,6 +2635,8 @@ function M.on_configuration_changed()
         end
         if type(state.players[index]) ~= "table" then
           state.players[index] = legacy_view_as_private(historical_view)
+        else
+          carry_report_choices(state.players[index], historical_view)
         end
       end
 
@@ -2567,6 +2660,10 @@ function M.on_configuration_changed()
   if current then
     for index, view in pairs(current.players) do
       if type(view) == "table" then
+        local snapshots = type(current.legacy_browser) == "table" and current.legacy_browser.players or nil
+        if not legacy_player_retired(current, index) then
+          carry_report_choices(view, type(snapshots) == "table" and snapshots[index] or nil)
+        end
         local player = player_for(index)
         view.open = player ~= nil and player.connected == true and valid(owned_root(player))
         view.refresh_pending = view.open

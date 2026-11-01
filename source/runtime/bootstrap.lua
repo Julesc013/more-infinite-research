@@ -399,6 +399,11 @@ local function on_library_selection_changed(event)
   reconcile_translations()
 end
 
+local function on_library_checked_changed(event)
+  library.on_gui_checked_state_changed(event)
+  reconcile_translations()
+end
+
 local function on_library_tab_changed(event)
   library.on_gui_selected_tab_changed(event)
   reconcile_translations()
@@ -648,6 +653,7 @@ function M.register()
   if events.on_gui_text_changed then script.on_event(events.on_gui_text_changed, on_library_text_changed) end
   if events.on_gui_selected_tab_changed then script.on_event(events.on_gui_selected_tab_changed, on_library_tab_changed) end
   if events.on_gui_selection_state_changed then script.on_event(events.on_gui_selection_state_changed, on_library_selection_changed) end
+  if events.on_gui_checked_state_changed then script.on_event(events.on_gui_checked_state_changed, on_library_checked_changed) end
   if events.on_gui_click then script.on_event(events.on_gui_click, on_library_click) end
   if events.on_gui_location_changed then script.on_event(events.on_gui_location_changed, on_library_location_changed) end
   if events.on_gui_closed then script.on_event(events.on_gui_closed, on_library_closed) end

@@ -1195,15 +1195,28 @@
             "required_behavior": "Retain the separate diagnostics/help scope and bounded local reports/settings exports. Reuse current MIRSET1 codec and file targeting; no automatic upload, persistent log history or promise to copy the full engine log from Lua.",
             "current_implementation": [
               "source/runtime/library.lua",
-              "source/presentation/library_model.lua"
+              "source/presentation/library_model.lua",
+              "source/runtime/diagnostics.lua",
+              "source/runtime/settings_commands.lua",
+              "source/runtime/bootstrap.lua"
             ],
             "current_host_controls": [
-              "tests/test_library.py::test_support_exports_are_owned_local_and_inactive_on_research_views"
+              "tests/test_library.py::test_support_exports_are_owned_local_and_inactive_on_research_views",
+              "tests/test_library.py::test_help_report_choices_are_owned_personal_retained_and_do_not_export_on_refresh",
+              "tests/test_library.py::test_report_choices_and_previews_stay_separate_for_players_sharing_a_force",
+              "tests/test_library.py::test_configuration_restores_legacy_report_choices_without_overwriting_current_choices",
+              "tests/test_library.py::test_removed_player_report_choices_are_not_resurrected_from_retained_legacy_history",
+              "tests/test_settings_commands.py::test_report_preview_is_read_only_and_inline_choices_preserve_the_full_export",
+              "tests/test_settings_commands.py::test_report_preview_bounds_availability_and_reports_capture_failure_without_writes",
+              "tests/test_bootstrap.py::test_report_checkbox_event_has_one_bootstrap_registration_owner"
             ],
-            "verification_status": "partial-host-mapping-not-restored-ui-acceptance",
+            "verification_status": "recovered-report-controls-source-and-host-passed-native-input-export-client-and-costs-pending",
             "remaining_verification": [
               "Execute the corrected export observer on the successor using actual dispatch composition; verify selectable strings/files, requesting-player/server targeting, write failures and no native-state mutation.",
-              "The interrupted beta R08-R11 controller attempts are preserved; they do not establish a passed GUI export."
+              "The interrupted beta R08-R11 controller attempts are preserved; they do not establish a passed GUI export.",
+              "Exercise both actual personal report checkboxes, Refresh/select, two-client separation, closed/cold-reopened preferences and full-file export while inline settings are unchecked; compare requesting-peer file bytes and retain write refusals.",
+              "Qualify removal/configuration/reused-index behavior on the final package. The new optional retirement metadata prevents re-import after a removal observed by this code; preexisting beta histories without account/removal provenance remain unverified.",
+              "Measure affected Help first-open/checked settings capture/reopen and retained memory; a snapshot/host counter is not native performance acceptance."
             ]
           },
           {
@@ -1254,6 +1267,88 @@
         ],
         "qualification_limit": "The focused host negative control passes on restored source and fails on the published beta source at the split-layout assertion. It does not establish native rendering or input. The retained R08 screenshots show the German split view; the English detail view is obscured by the Factorio research chooser. Existing client receipts remain useful only at their named inputs.",
         "additional_regression_record": "historical-library-handlers-hidden-readiness-production-intents"
+      },
+      "report_options_restoration_review": {
+        "reviewed_on": "2026-11-02",
+        "reviewed_against": "5871c67d675ef2fcf41e2143ba51a8dd8cf895db",
+        "subjects": [
+          "CONT-10"
+        ],
+        "disposition": "port",
+        "historical_source": {
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "source/prototypes/mir/runtime/research_browser.lua",
+          "published_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+          "asset_id": 672267722,
+          "reviewed_slices": [
+            "report_text",
+            "debug_rows",
+            "owned report_settings/report_omissions checked callback"
+          ],
+          "deduplication": "Four historical UI blobs in the existing91-tag inventory contain two report_text and two debug_rows variants. Reviewed differences are only prototype-collection adapter access and gating of the separate settings-export button. The two report choices/readonly preview/select semantics agree; unrelated UI code and inter-release history are not dispositioned by this slice."
+        },
+        "independent_expectation": "Published Help has two false-by-default per-player report checkboxes and a readonly selectable local report preview. The personal migration baseline explicitly lists report-option carry-forward. Viewing/changing choices does not apply settings, change research or write a file. Removed players must not regain their old private view through a later configuration import.",
+        "implementation": [
+          "source/runtime/library.lua",
+          "source/runtime/diagnostics.lua",
+          "source/runtime/settings_commands.lua",
+          "source/runtime/bootstrap.lua"
+        ],
+        "current_host_controls": [
+          "tests/test_library.py::test_help_report_choices_are_owned_personal_retained_and_do_not_export_on_refresh",
+          "tests/test_library.py::test_report_choices_and_previews_stay_separate_for_players_sharing_a_force",
+          "tests/test_library.py::test_configuration_restores_legacy_report_choices_without_overwriting_current_choices",
+          "tests/test_library.py::test_removed_player_report_choices_are_not_resurrected_from_retained_legacy_history",
+          "tests/test_settings_commands.py::test_report_preview_is_read_only_and_inline_choices_preserve_the_full_export",
+          "tests/test_settings_commands.py::test_report_preview_bounds_availability_and_reports_capture_failure_without_writes",
+          "tests/test_bootstrap.py::test_report_checkbox_event_has_one_bootstrap_registration_owner"
+        ],
+        "new_behavior": [
+          "Active personal choices are normalized and carried from original/snapshot fields without overwriting explicit current booleans. One bootstrap event owner routes only owned checked callbacks.",
+          "Help shows a bounded readonly snapshot with explicit Refresh/select actions. Unchecked Help open and background rerenders do not encode a full profile. Choices/Refresh preview without writes; explicit export updates the preview with the exact report written.",
+          "Inline settings reuse the ordinary MIRSET1 capture. Explicit diagnostics always writes the full separate settings file even if its inline section is unchecked; console/default exports and init/configuration headers retain their meanings.",
+          "Omission choice reports only current canonical authored Availability facts, capped at250, within the existing64KiB report. It does not rebuild an old compiler ledger or claim complete omission coverage.",
+          "Removing a player with preserved legacy history sets optional library-owned legacy_browser.retired_players metadata. Original source/snapshot rows stay unchanged; a later configuration cannot re-import that retired index. No new schema framework, native/foreign state write or load-time migration is introduced."
+        ],
+        "authored_locales": {
+          "languages": 50,
+          "values_recovered": 350,
+          "keys": [
+            "report-options",
+            "report-settings",
+            "report-omissions",
+            "report-preview",
+            "report-select",
+            "report-local",
+            "debug-refresh"
+          ],
+          "method": "All values match source and the actual hash-verified published4.7.3 ZIP. Existing authored lines are unchanged; no new translation is generated."
+        },
+        "host_scope": {
+          "new_controls": 7,
+          "prior_selected_controls": 106,
+          "total_selected_controls": 113,
+          "source_opponents_rejected": 10,
+          "opponent_limit": "Injected faults demonstrate sensitivity; they are not ten newly observed production defects. All seven controls reject the prior reviewed source before correction.",
+          "runtime": "Pinned Lupa2.6 lua52; exact2.0.77/2.1.23 GUI event/state/text/focus/select APIs inspected locally. No native engine is started."
+        },
+        "superseded_or_implementation_only": [
+          "Old timestamped report history/path is superseded by accepted PR1424 latest bounded mir.log plus the existing full settings file. Do not restore report history.",
+          "Old compiler/provider omission snapshots remain retired; current report states the bounded authored Availability scope explicitly.",
+          "Old GUI layout/feature-table/coordinator representation does not become an active dependency. Reduced MIR5 editions do not gain a Library."
+        ],
+        "remaining_executable_check": [
+          "Execute the corrected export observer on the successor using actual dispatch composition; verify selectable strings/files, requesting-player/server targeting, write failures and no native-state mutation.",
+          "The interrupted beta R08-R11 controller attempts are preserved; they do not establish a passed GUI export.",
+          "Exercise both actual personal report checkboxes, Refresh/select, two-client separation, closed/cold-reopened preferences and full-file export while inline settings are unchecked; compare requesting-peer file bytes and retain write refusals.",
+          "Qualify removal/configuration/reused-index behavior on the final package. The new optional retirement metadata prevents re-import after a removal observed by this code; preexisting beta histories without account/removal provenance remain unverified.",
+          "Measure affected Help first-open/checked settings capture/reopen and retained memory; a snapshot/host counter is not native performance acceptance."
+        ],
+        "owner": "Aero owns historical/source/host correction; Black Glass independently reviews/integrates and owns affected native input/files/clients and performance.",
+        "custody": "build/qualification/aero-report-options-r01/",
+        "limits": "Not an integrated5.0.2 freeze, changed public501 bytes or native/stable acceptance. Historical beta account reuse without original provenance remains unverified; no blanket recovery claim.",
+        "native_execution": false,
+        "release_qualification": false
       }
     },
     {
@@ -5990,6 +6085,13 @@
       "verdict": "NOT-READY: Library native/input/export/personal-state, historical-source reconciliation, current profile/save/API applicability, complete performance and final-candidate/delivery gates remain open.",
       "native_execution": false,
       "release_qualification": false
+    },
+    "report_options_restoration_review": {
+      "subject": "CONT-10",
+      "record": "subjects[CONT-10].report_options_restoration_review",
+      "disposition": "port",
+      "whole_historical_source_reconciliation_complete": false,
+      "native_execution": false
     }
   }
 }
