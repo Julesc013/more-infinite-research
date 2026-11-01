@@ -9,7 +9,7 @@ MIR 5.0.1 beta: uploader checklist
 - Player text and asset labels: use actual Factorio versions and player-facing terms. Do not show internal edition codes, machine nicknames, candidate hashes, or test-run IDs.
 - Assets: publish exactly the individual player ZIPs and checksum files in the accepted frozen inventory: seventeen ZIPs and two checksum files. Keep the developer inventory, bundles, instructions, and receipts out of release assets.
 - Versions: keep the exact tested ZIPs and edition version numbers. Do not convert versions or rebuild packages during publication.
-- Asset labels: state each supported Factorio family, exact minimum version, and beta status. Label the experimental Factorio 0.18.47 build and best-effort older builds according to the frozen inventory.
+- Asset labels: use exactly MIR 5.0.1 for Factorio x.y.z (zip), with each ZIP's exact declared minimum Base version. Keep canonical filenames and bytes. State beta, experimental/best-effort limits and early-build extraction instructions in the release notes.
 - Publication gate: require independent exact-candidate package, provenance, and upgrade-safety review; checked main/tag identity; both administration probes; and complete staged-asset readback. The maintainer has authorized unfinished Library input/export/saved-view and performance checks to remain explicitly unverified for this prerelease; stable acceptance still requires their outcomes.
 - Delivery: verify every selected anonymous download. Put identical ZIPs, checksums, published notes, and this checklist in the primary checkout's dist.
 - Mod Portal: maintainer-owned; stable releases only, using identical tested ZIPs.

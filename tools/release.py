@@ -242,6 +242,8 @@ def _asset(record, target, edition, source_distribution_version):
     asset = {
         "target": target,
         "name": path.name,
+        "label": ("MIR " + _release_identity(source_distribution_version)["source_version"]
+                  + " for Factorio " + edition["minimum_base"] + " (zip)"),
         "version": version,
         "factorio_version": edition["factorio_version"],
         "minimum_base": edition["minimum_base"],

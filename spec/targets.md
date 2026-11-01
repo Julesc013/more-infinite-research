@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-30
+last_reviewed: 2026-11-01
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -80,7 +80,9 @@ For a stable release, the maintainer uploads the identical qualified GitHub ZIPs
 
 `TGT-04` — Promote accepted development through `dev` then `main` using the existing permissions and required checks. This specification does not authorize changing branch protection, signing, release immutability settings or credentials. Preserve prior releases and provenance; repository cleanup must not rewrite tags.
 
-Use title `MIR MAJOR.MINOR.PATCH`, exact tested patch labels without `+`, the nine stable player ZIPs and any buildable explicitly labelled best-effort historical editions, including experimental F018, plus useful checksum/signature files. Keep bundles, upload instructions and developer artifacts out of public player downloads unless expressly requested. Preserve full master history in packaged changelogs. Verify anonymous downloads and local delivery by bytes. Agent-managed publication is GitHub-only for all releases; the maintainer handles upload of the identical qualified stable ZIPs, credentials and Portal readback, which are not agent completion gates. F018 is never a Portal deliverable.
+Use title `MIR MAJOR.MINOR.PATCH`, the nine stable player ZIPs and any buildable historical editions with explicit best-effort limits, including experimental F018, plus useful checksum/signature files. Keep bundles, upload instructions and developer artifacts out of public player downloads unless expressly requested. Preserve full master history in packaged changelogs. Verify anonymous downloads and local delivery by bytes. Agent-managed publication is GitHub-only for all releases; the maintainer handles upload of the identical qualified stable ZIPs, credentials and Portal readback, which are not agent completion gates. F018 is never a Portal deliverable.
+
+For every MIR 5 and later release, each player ZIP's GitHub download display label is exactly `MIR MAJOR.MINOR.PATCH for Factorio x.y.z (zip)`, for example `MIR 5.0.1 for Factorio 2.1.23 (zip)`. Use the source release version and the package's exact declared minimum Base version, without `+`; retain the canonical distribution filename, asset URL and bytes. Maturity, experimental/best-effort status, qualification limits and any required extraction instructions belong in the release notes and inventory support fields. This display-label policy applies to existing MIR 5 releases as well as future releases and changes no acceptance verdict.
 
 Cryptographic identity and successful CI do not prove gameplay correctness. Stable release requires the separate parity, native/migration and performance outcomes in [Verification](verification.md); the authorized first `v5.0.0` GitHub beta may instead disclose unfinished Library input/export/personal-view checks and performance tests, while retaining its package, provenance, upgrade-safety and checked-publication gates.
 
