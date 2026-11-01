@@ -827,6 +827,133 @@
             "tests/test_package.py"
           ],
           "scope": "Published4.7.3 membership retains2.0.5 SHA07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2 and2.1.0 SHAF427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D on every target, while4.7.0 SHA0980B0B6F1675F6827A8E4151F778143EA74C9C6C3440CC2318129DBCE63C379 is F210-only. PR1040 restores that target selection without changing source JSON filenames or bytes; a new controller-bound nine-edition inventory/freeze is required and this records no native harm or migration pass."
+        },
+        {
+          "id": "selected-migration-queue-and-reduced-input-review-2026-11-02",
+          "source": [
+            "spec/inventory/migration-origins.json",
+            "spec/migrations.md",
+            "source/adapters/reduced",
+            "source/compatibility/science_bindings.lua",
+            "tools/package.py"
+          ],
+          "matrix_source_commit": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+          "matrix_blob": "e01f81ca03841699d6e11b0c982ef98aa360f50e",
+          "original_observation": "The existing execution matrix closes nine named same-edition4.7.3 routes, seven selected older-contract groups and four explicitly requested published-forward journeys at their recorded inputs. Its five named transition dispositions remain separately preserved and overlap some routes; do not add the counts as independent runs. Earlier CONT text that mentioned only seven4.7.2 mining chains or an entirely unrun F200-to-F210 journey was stale.",
+          "required_scope": "MIG-05 and the preserved28/29October decisions retain those named boundaries, protected originals and future5.x continuity. The matrix's permitted_limits explicitly excludes a blanket promise for unselected DLC/provider permutations and remove-save-readd. This review interprets the older all-adjacent inventory accordingly; it creates no new pass and does not waive a named failure or an actually admitted route.",
+          "reduced_input_review": {
+            "native_source_commit": "7a2f93224c846b86261b2da709f50ea683fc708d",
+            "original_freeze": "spec/evidence/current-assets-7a2f9322-root-readback.json",
+            "published501_source": "b677ced0b1ae0d8bd9ae47eb6b272443faec6d63",
+            "code_correction_source": "2e2035d2006edb6f75b3c4059d429fa9dc938c70",
+            "method": "Existing packager with exact --revision, separate fresh output custody, full ZIP SHA256 and every uncompressed member compared with the original freeze and anonymously downloaded501. The seven reconstructed7a2 ZIP hashes match the original freeze; reconstruction is not possession or regeneration of the original native saves.",
+            "rows": [
+              {
+                "target": "f013",
+                "reconstructed7a2_sha256": "4DB2D8848EBD2B4EECBF6D91CBEF8F69F5C31F634432496BB26AC40A3FC8964A",
+                "downloaded501_sha256": "A6DCCDA8DBAF38BFD8BD2B4386199C4F59CD16C6F5C98B6CC93C14BA43A8AF92",
+                "correction2e2035_matches_downloaded501": true,
+                "old_to501_changed_members": 54,
+                "base_science_selection_unchanged": true
+              },
+              {
+                "target": "f014",
+                "reconstructed7a2_sha256": "0A2BE7297D09DCCF084B8A10734651C1499FDE218FA3E2635873329F36250834",
+                "downloaded501_sha256": "DC1420891553E3C9CF0E8EEC6707BD06F305E46EBE374E2E6E21E4DF1F206053",
+                "correction2e2035_matches_downloaded501": true,
+                "old_to501_changed_members": 54,
+                "base_science_selection_unchanged": true
+              },
+              {
+                "target": "f015",
+                "reconstructed7a2_sha256": "37F7AC276460BC37C82D2426983B89D87393C22DFF8D39ECA17ACC7753F1480D",
+                "downloaded501_sha256": "3CB8B3C75CF3CDFEF97501BDF6AE7AF94B06DFDE5AA19207FBF33D2FC26E9FD5",
+                "correction2e2035_matches_downloaded501": true,
+                "old_to501_changed_members": 54,
+                "base_science_selection_unchanged": true
+              },
+              {
+                "target": "f016",
+                "reconstructed7a2_sha256": "35A8624065D3137E463EBC89DE21C06531F52F9E5E90632EC3C997CF52EEE839",
+                "downloaded501_sha256": "9B74CA6E26E1FCFDF9EBAE679B89DC380D6F49DAD5C3B155EF39CFAAC185785B",
+                "correction2e2035_matches_downloaded501": true,
+                "old_to501_changed_members": 54,
+                "base_science_selection_unchanged": true
+              },
+              {
+                "target": "f017",
+                "reconstructed7a2_sha256": "95228385A0862A807DB20A73F56CA0113693A1CDB3437410187303C598D784C7",
+                "downloaded501_sha256": "6A3580500811728BAD03293736CE22115E9C139CCF4D59D89E50EE22DEFA5210",
+                "correction2e2035_matches_downloaded501": true,
+                "old_to501_changed_members": 54,
+                "base_science_selection_unchanged": true
+              },
+              {
+                "target": "f100",
+                "reconstructed7a2_sha256": "6BAE382DBD0AEC7199474921887CFBAC61016B8BF5E8FB990656493A8A174B6C",
+                "downloaded501_sha256": "07D0C2C04DE31AE8A9FCB9CAB36BC282F8E7559A08B3A345860251FF9E2667D5",
+                "correction2e2035_matches_downloaded501": true,
+                "old_to501_changed_members": 54,
+                "base_science_selection_unchanged": true
+              },
+              {
+                "target": "f110",
+                "reconstructed7a2_sha256": "1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9",
+                "downloaded501_sha256": "BF56CE16F633C887B80B8F24F3662EA534253971515E0E95BE37C159DEA143AC",
+                "correction2e2035_matches_downloaded501": true,
+                "old_to501_changed_members": 54,
+                "base_science_selection_unchanged": true
+              }
+            ],
+            "changed_members": "Each edition changes54members: changelog, info, target module, compatibility/science_bindings.lua and50 Library locale files. Info differs only in version and target only in distribution_version; migration names/bytes and all other Lua members are unchanged. The science diff changes F210 K2SO phase selection/guards only; pinned Lupa2.6/lua52 comparisons of the complete M.select tables match for each reduced target's exact Base-only engine pin.",
+            "correction_exclusion": "runtime/catalogue.lua, runtime/bootstrap.lua and runtime/library.lua are absent from all seven reduced closures. Fresh2e2035 packages and the separate8aea Settings-search correction packages each match downloaded501 at private source5.0.1. These are separate branch readbacks, not an integrated or5.0.2 release freeze.",
+            "applicability": "No altered reduced player-state implementation input was identified for the original7a2 earned-effect/mining/queue/save observations in the Base-only named routes. Retain those observations under their original execution identities. Changed archive versions, package/locale parsing and public API version results require final exact-package review; this does not relabel old native executions501 or qualify unselected mod closures.",
+            "receipts": [
+              {
+                "path": "build/qualification/aero-migration-501-inputs-r01/historical-seven-member-comparison.json",
+                "sha256": "804B1EC08184F6BDB354FBB31C4C53875C20796BEBD6CDCBED1DDCE299C77F39"
+              },
+              {
+                "path": "build/qualification/aero-migration-501-inputs-r01/reduced-science-binding-readback.json",
+                "sha256": "E606F4F02F7191A4C9A8159D885B11CF600BF38E2BC5A625122F0D8271243830"
+              },
+              {
+                "path": "build/qualification/aero-migration-501-inputs-r01/reduced-metadata-and-migrations-readback.json",
+                "sha256": "C493C7EC1D6B162BE60B55800C4A986C99C6294D6B593F97FEF8B2736DA0AFB4"
+              },
+              {
+                "path": "build/qualification/aero-migration-501-inputs-r01/correction2e2035-reduced-byte-readback.json",
+                "sha256": "CFFFEC458AB389848550725F6066875D9781C67436B5C5AA327FDD0D9DAA431F"
+              },
+              {
+                "path": "build/qualification/aero-migration-501-inputs-r01/correction8aea-reduced-byte-readback.json",
+                "sha256": "1BD03359D3342B51B985B9D12A10B1A4E34F1F2AC348DF0D061609C53BD98D97"
+              }
+            ],
+            "reader_adverse": "The first science comparison imported the default lupa.lua_type, which does not recognize lua52 tables; cross-runtime object identity falsely rejected F013. The engine-specific lua52 reader corrects that local reader error. first-science-reader-refusal.json is retained; it is not a product or native failure.",
+            "native_processes": 0
+          },
+          "remaining_executable_work": [
+            {
+              "obligation": "Final seven reduced edition identities",
+              "independent_expectation": "Exact minimum engine, mod identity, cumulative migration names, API distribution version and package/tag/changelog codec agree.",
+              "next_check": "Review the exact integrated release freeze, its version-sensitive fixtures and archive/member deltas; reuse only unaffected original state observations and execute affected package/engine paths.",
+              "owner": "Aero package/applicability review; Black Glass native execution"
+            },
+            {
+              "obligation": "Modern named migration and ownership paths",
+              "independent_expectation": "Retain the named earned/current/queued/suspended/foreign-state and two-reload expectations; preserve MIR-created braking rows while excluding foreign-created collisions.",
+              "next_check": "Review final F200/F210 consumed inputs; qualify corrected runtime creation-history parsing, Library/cap membership and affected configuration/save/client paths. Current501/source-correction controls do not complete this native check.",
+              "owner": "Black Glass native queue; Aero independent expectations/review"
+            },
+            {
+              "obligation": "Public beta to corrected successor",
+              "independent_expectation": "Preserve actually earned personal/save state and legacy explicit/retained Settings search under protected5.0.0/5.0.1 source inputs.",
+              "next_check": "Select existing protected beta saves and affected exact candidate upgrade/reload/client/Library checks; no source-save recreation or invented provenance.",
+              "owner": "Black Glass packet/execution; Aero review"
+            }
+          ],
+          "limits": "CONT-11/13 remain partial; inventory_complete remains false. No source save, native process, fixture/controller, original result, request decision or support contract is changed. Full catalogue/settings/client/performance and final release verdicts are independent."
         }
       ],
       "test_subjects": [
@@ -835,9 +962,9 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Complete full relevant earned/current/queued catalogue-state and migration reconciliation beyond the seven passing bounded predecessor chains.",
-        "Qualify Imersite hidden carriers through removal/readdition and complete migration filename/state reconciliation.",
-        "Reconcile separate MIR-version, Factorio-version, Base/Space Age and modset-change migration axes for the exact named/popular profiles; existing same-engine predecessor tests do not cover the other axes."
+        "Apply the exact final-candidate consumed-input review to the named nine4.7.3 same-edition routes, seven selected older-contract groups, four published-forward journeys and five separately recorded transition dispositions; preserve each original scope, protected source and adverse identity.",
+        "Complete affected current catalogue/settings/ownership/save/client checks beyond the bounded named routes, including the corrected modern braking-creation boundary; direct Imersite/K2SE fixture-owned results do not establish arbitrary removal/readdition or foreign-rights repair.",
+        "Qualify affected public5.0.0/5.0.1-to-successor state and final package/API/version identities. Execute specifically admitted engine/DLC/provider changes only with their protected route/oracle; unselected permutations carry no blanket support claim."
       ]
     },
     {
@@ -4046,6 +4173,12 @@
             "The old packages have no unified more-infinite-research.api interface. Current v1 query API is additive; exact native API/client qualification remains pending."
           ],
           "limits": "No new gameplay, native/save/client/performance or all-target parity pass. F018 inherits the reduced F100 implementation; its active independent verification is package metadata and a basic0.18.47 native load smoke. Separate predecessor, modpack, client and performance campaigns remain best effort under the later maintainer decision. CONT-13 remains partial."
+        },
+        {
+          "id": "selected-migration-scope-current-inputs-2026-11-02",
+          "evidence": "spec/inventory/migration-origins.json",
+          "related_record": "CONT-11 selected-migration-queue-and-reduced-input-review-2026-11-02",
+          "scope": "Use CONT-11 selected-migration-queue-and-reduced-input-review-2026-11-02 for the nine/seven/four named-route reconciliation, preserved five transition dispositions and bounded seven-edition package/science input review. The older adjacent-axis list below remains historical inventory, not an additional every-adjacent stable campaign or a substitute for the four published-origin journeys. Final affected package/native qualification remains open."
         }
       ],
       "test_subjects": [
@@ -4054,48 +4187,59 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Run final current-package and affected native checks for the nine stable editions; apply the explicit metadata/load-smoke-only F018 and other best-effort support limits.",
-        "Prioritize exact current F2102.1.23 acceptance while preserving F2002.0.77 and all seven historical-edition obligations; report each tested subset and remaining gaps without relabelling earlier receipts.",
-        "Qualify actual game-version save hops and Base/Space Age transitions above; fresh worlds and same-engine MIR upgrades are separate evidence."
+        "Review final current-package identities and affected native checks for all nine stable editions, preserving the explicit experimental metadata/load-smoke-only F018 and early best-effort limits.",
+        "Prioritize final F2102.1.23 and F2002.0.77 acceptance while preserving the seven reduced obligations and original named-route evidence; no final candidate or release pass follows from a matching private package.",
+        "Close the affected named engine/provider/preference and public-beta-to-successor checks under the existing finite migration matrix. Unselected adjacent/DLC/provider axes remain unverified without a support claim, not additional campaigns or passed routes."
       ],
       "version_transition_coverage": {
-        "status": "not-established",
-        "distinction": "Existing historical published-MIR-to-MIR5 transitions use the same Factorio binary. They do not qualify any Factorio engine-version save hop.",
+        "status": "named-routes-closed-at-recorded-inputs-final-candidate-applicability-open",
+        "distinction": "Same-engine MIR upgrades, selected published-origin engine journeys and DLC/provider changes retain separate observations. The nine/seven/four selected boundaries and five named transition dispositions live in migration-origins.json; none grants arbitrary engine hops or DLC switches.",
         "adjacent_game_version_save_hops_required": [
           {
             "from": "0.13.20",
             "to": "0.14.23",
-            "status": "unrun-requires-supported-save-route-and-exact-profile"
+            "status": "unselected-adjacent-axis-unverified-no-blanket-support-claim",
+            "prior_inventory_status": "unrun-requires-supported-save-route-and-exact-profile"
           },
           {
             "from": "0.14.23",
             "to": "0.15.40",
-            "status": "unrun-requires-supported-save-route-and-exact-profile"
+            "status": "unselected-adjacent-axis-unverified-no-blanket-support-claim",
+            "prior_inventory_status": "unrun-requires-supported-save-route-and-exact-profile"
           },
           {
             "from": "0.15.40",
             "to": "0.16.51",
-            "status": "unrun-requires-supported-save-route-and-exact-profile"
+            "status": "unselected-adjacent-axis-unverified-no-blanket-support-claim",
+            "prior_inventory_status": "unrun-requires-supported-save-route-and-exact-profile"
           },
           {
             "from": "0.16.51",
             "to": "0.17.79",
-            "status": "unrun-requires-supported-save-route-and-exact-profile"
+            "status": "unselected-adjacent-axis-unverified-no-blanket-support-claim",
+            "prior_inventory_status": "unrun-requires-supported-save-route-and-exact-profile"
           },
           {
             "from": "0.17.79",
             "to": "1.0.0",
-            "status": "unrun-requires-supported-save-route-and-exact-profile"
+            "status": "unselected-adjacent-axis-unverified-no-blanket-support-claim",
+            "prior_inventory_status": "unrun-requires-supported-save-route-and-exact-profile"
           },
           {
             "from": "1.0.0",
             "to": "1.1.110",
-            "status": "unrun-requires-supported-save-route-and-exact-profile"
+            "status": "named-f100-f110-routes-closed-at-recorded-inputs-final-applicability-open",
+            "prior_inventory_status": "unrun-requires-supported-save-route-and-exact-profile",
+            "current_evidence": [
+              "spec/evidence/f100-f110-laser-native-chain-r03.json",
+              "spec/evidence/published473-f100-f110-native-chain-r01.json"
+            ],
+            "scope": "Keep the MIR5 laser-rename and direct published4.7.3-origin journeys distinct; neither qualifies arbitrary F100 saves or final changed inputs."
           },
           {
             "from": "1.1.110",
             "to": "2.0.77",
-            "status": "unrun-requires-supported-save-route-and-exact-profile",
+            "status": "named-published473-f110-f200-route-closed-at-recorded-inputs-final-applicability-open",
             "required_native_witness": {
               "technology": "inserter-capacity-bonus-8",
               "source_effects": [
@@ -4123,18 +4267,23 @@
                 "spec/inventory/modern-f200-470.json"
               ],
               "scope": "The tracked F110 historical capture and F200 published catalogue establish an actual engine effect-token replacement, not a missing MIR identity or a new native pass. Preserve earned source levels and the same technology ID, observe the expected F200 effective bulk-inserter contribution, save the candidate and verify two cold reloads. Do not restore the unsupported 1.1 effect token on2.0 or relabel same-engine MIR upgrades as this game-version transition."
-            }
+            },
+            "prior_inventory_status": "unrun-requires-supported-save-route-and-exact-profile",
+            "current_evidence": "spec/evidence/f110-f200-current7a2-native-chain-r01.json",
+            "scope": "The published-origin route preserves the recorded inserter2/stack-or-bulk4 witness and state under its actual D524/65FC/D3 inputs; no blanket MIR5-to-MIR5 engine-update claim."
           },
           {
             "from": "2.0.77",
             "to": "2.1.23",
-            "status": "exact-4.7.20003-source-and-corrected-F210-successor-prepared-native-unrun",
+            "status": "named-published473-f200-base-to-f210-base-closed-at-recorded-inputs-final-applicability-open",
             "profiles": [
               "tests/profiles/full-catalogue-cross-f200-f210-published-f200-2077.json",
               "tests/profiles/full-catalogue-cross-f200-f210-mir5-f210-2123.json"
             ],
             "fixture_code_commit": "3664d87b8e732be037bdb65167c13ee9d62f0a59",
-            "scope": "Prepared direct published4.7.20003 F200 Base to MIR5 F210 Base route only; this does not qualify MIR5-to-MIR5 game updates, other closures or any native save migration."
+            "scope": "The later actual named published4.7.20003 Base to MIR5 F2107a2/005D/8DC result supersedes this preparation-only pending description. Other closures, MIR5-to-MIR5 changes and final corrected inputs remain separate.",
+            "prior_inventory_status": "exact-4.7.20003-source-and-corrected-F210-successor-prepared-native-unrun",
+            "current_evidence": "spec/evidence/full-catalogue-473-f200-current7a2-native-chain-r01.json"
           }
         ],
         "official_mod_save_transitions_required": [
@@ -4142,30 +4291,36 @@
             "engine": "2.0.77",
             "from": "Base",
             "to": "Space Age",
-            "status": "unrun-requires-supported-route-and-state-oracle"
+            "status": "unselected-permutation-unverified-no-blanket-support-claim",
+            "prior_inventory_status": "unrun-requires-supported-route-and-state-oracle"
           },
           {
             "engine": "2.0.77",
             "from": "Space Age",
             "to": "Base",
-            "status": "unrun-requires-supported-route-and-state-oracle"
+            "status": "unselected-permutation-unverified-no-blanket-support-claim",
+            "prior_inventory_status": "unrun-requires-supported-route-and-state-oracle"
           },
           {
             "engine": "2.1.23",
             "from": "Base",
             "to": "Space Age",
-            "status": "unrun-requires-supported-route-and-state-oracle"
+            "status": "unselected-permutation-unverified-no-blanket-support-claim",
+            "prior_inventory_status": "unrun-requires-supported-route-and-state-oracle"
           },
           {
             "engine": "2.1.23",
             "from": "Space Age",
             "to": "Base",
-            "status": "unrun-requires-supported-route-and-state-oracle"
+            "status": "unselected-permutation-unverified-no-blanket-support-claim",
+            "prior_inventory_status": "unrun-requires-supported-route-and-state-oracle"
           }
         ],
         "per_edition_worlds": "Base on every delivered edition; Base and Space Age plus relevant independently enabled official capabilities on F200/F210. Expansion-only cases are inapplicable on historical engines, not passed there.",
-        "required_state": "Preserve original saves and check earned effects/levels, current and queued/suspended work, carriers, foreign state, native capability changes, save and two cold reloads at each accepted hop.",
-        "upstream_limits": "Use the actual supported stepping route. A demonstrated engine/upstream refusal preserves the source and requires an explicit supported/unsupported disposition; never relabel it as a passed upgrade."
+        "required_state": "For each selected/admitted route preserve original saves and check earned effects/levels, current and queued/suspended work, carriers, foreign state, native capability changes, save and two cold reloads; do not infer inverse transitions or arbitrary support from a named pass.",
+        "upstream_limits": "Use the actual supported stepping route. A demonstrated engine/upstream refusal preserves the source and requires an explicit supported/unsupported disposition; never relabel it as a passed upgrade.",
+        "selection_authority": "spec/migrations.md MIG-05; migration_execution_matrix.completion_queue_5_0_0.explicit_published_forward_routes_2026_10_29 and permitted_limits. Original request text and implementation interpretation remain distinct there.",
+        "historical_axis_list_disposition": "The following earlier *_required arrays are retained with their prior observations for custody, not as an additional all-adjacent/all-DLC release queue. Execute selected/admitted routes under the current matrix; an unrun axis is not passed."
       }
     },
     {
