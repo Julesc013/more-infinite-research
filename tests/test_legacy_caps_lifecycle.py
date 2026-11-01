@@ -162,6 +162,7 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
               target.productivity_ignores_stats = false
             end
             package.loaded["research.catalogue"] = nil
+            package.loaded["runtime.catalogue"] = nil
             local streams = {}
             for _, row in ipairs(require("research.catalogue").declared()) do
               local value = {enabled = options.enabled ~= false, max_level = options.limit or 0}
