@@ -4,6 +4,12 @@
   "reviewed_on": "2026-11-01",
   "scope": "Published MIR5+ player ZIP display metadata; no package/source/tag/maturity or acceptance change",
   "requested_format": "MIR MAJOR.MINOR.PATCH for Factorio x.y.z (zip)",
+  "maintainer_decision": {
+    "source": "Direct live maintainer message in the Aero Codex goal thread 01a1971a-6d6d-7ec0-aa6c-714cdf19314d, 2026-11-01 AEDT",
+    "verbatim_request": "also, we need to go back and edit the vanity fo our MIR 5 releases, for all MIR 5+ releases and downloads mod dists files downloads should have the display nameof the format \"MIR x.x.x for Factorio x.x.x (zip)\"",
+    "public_custody": "https://github.com/Julesc013/more-infinite-research/pull/1539#issuecomment-6558562402",
+    "implementation_interpretation_not_verbatim": "Use the requested complete format for every existing and future MIR5+ player ZIP display label, without qualifier suffixes. Retain the full beta, experimental/best-effort, extraction and qualification disclosures in release notes and inventory support fields. This supersedes earlier per-label presentation wording and changes no support or acceptance scope."
+  },
   "source_version_and_minimum": "Each label was derived from its canonical release tag and the anonymously downloaded ZIP info.json base dependency, with the distribution codec independently checked.",
   "local_custody": "build/qualification/aero-stable-recovery-r01/download-labels",
   "releases": [
