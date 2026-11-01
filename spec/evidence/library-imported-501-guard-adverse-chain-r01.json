@@ -29,9 +29,9 @@
   "root_readback_sha256": "6855D8BEDE6779CB2C050D4033CA6F054DB5823EB5A973A77DA27BD20B6FF1B8",
   "receipt_capsule": {
     "path": "spec/evidence/library-imported-501-guard-adverse-receipts-r01.json.gz",
-    "bytes": 15992,
-    "sha256": "F1531851E0BD142082EE4FAEAC6926F90AAF1517BFBCC0EA2F88BA9463ABE49B",
-    "bodies": 11
+    "bytes": 16278,
+    "sha256": "8104C265F5BBA5EDF93A5A6288B6C417FF258F0FB0735A9E02871266784E1023",
+    "bodies": 12
   },
   "original_custody": "D:/Projects/Factorio/mir5-blackglass-r15-runtime-r01/build/qualification/imported-library-r16-native-r01",
   "primary_custody": "D:/Projects/Factorio/more-infinite-research/build/qualification/imported-library-r16-native-adverse-r01",
@@ -43,5 +43,14 @@
     "The pending-ledger terminal field is preserved; one actual engine is established independently by its owned allocation identity, terminal teardown identity and raw engine log."
   ],
   "performance_acceptance": false,
-  "release_qualification": false
+  "release_qualification": false,
+  "engine_error_excerpt": {
+    "capsule_path": "native/settings-failure-excerpt.txt",
+    "source_log_sha256": "A77B2ED09B236193E36360E7DE8C3DB2ED940711A9B394AC9FAA58228CBD1456",
+    "source_log_bytes": 10568,
+    "start_byte": 10197,
+    "bytes": 371,
+    "sha256": "2ECBEBB173FCB7FA4A05C01D5694A9F18E8127CA40CD14FC0DC35D79F1F17AF4",
+    "operation": "Exact original UTF8 suffix beginning at the native Error Util.cpp line; no reserialization, redaction or synthesized log. Full original log remains in native/primary custody."
+  }
 }
