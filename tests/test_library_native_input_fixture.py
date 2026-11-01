@@ -70,6 +70,39 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             self.assertEqual(digest, profile["archive_sha256"][root + ".zip"])
             self.assertEqual(digest, prepared["frozen_player_and_observer_archives"][root + ".zip"])
 
+    def test_r18_preparation_changes_only_the_f200_observer_input_epoch(self):
+        previous = json.loads((ROOT / "spec/evidence/library-native-input-imported110-prepared-blackglass-r05.json").read_text(encoding="utf-8"))
+        current = json.loads((ROOT / "spec/evidence/library-native-input-imported110-prepared-blackglass-r06.json").read_text(encoding="utf-8"))
+        self.assertEqual(current["profiles"][1], previous["profiles"][1])
+        self.assertEqual(current["player_source_commit"], previous["player_source_commit"])
+        self.assertEqual(current["player_tree"], previous["player_tree"])
+        self.assertEqual(current["changed_player_members"], [])
+        before, prepared = previous["profiles"][0], current["profiles"][0]
+        for field in ("protected_input_save", "owned_imported_fixture_members"):
+            self.assertEqual(prepared[field], before[field])
+        profile_bytes = subprocess.check_output(["git", "show", prepared["profile"]["source_revision"] + ":" + prepared["profile"]["source"]], cwd=ROOT)
+        self.assertEqual(len(profile_bytes), prepared["profile"]["bytes"])
+        self.assertEqual(hashlib.sha256(profile_bytes).hexdigest().upper(), prepared["profile"]["sha256"])
+        profile = json.loads(profile_bytes)
+        output = io.BytesIO()
+        with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_STORED) as archive:
+            for member in prepared["owned_input_observer_members"]:
+                data = subprocess.check_output(["git", "show", member["source_revision"] + ":" + member["source"]], cwd=ROOT)
+                self.assertEqual(len(data), member["bytes"])
+                self.assertEqual(hashlib.sha256(data).hexdigest().upper(), member["sha256"])
+                entry = zipfile.ZipInfo("mir-fixture-mir5-library-native-input_0.3.3/" + member["destination"], (1980, 1, 1, 0, 0, 0))
+                entry.create_system, entry.external_attr = 3, 0o100644 << 16
+                archive.writestr(entry, data)
+        archive_name = "mir-fixture-mir5-library-native-input_0.3.3.zip"
+        digest = hashlib.sha256(output.getvalue()).hexdigest().upper()
+        self.assertEqual(digest, profile["archive_sha256"][archive_name])
+        self.assertEqual(digest, prepared["frozen_player_and_observer_archives"][archive_name])
+        self.assertNotEqual(digest, before["frozen_player_and_observer_archives"][archive_name])
+        for name, checksum in before["frozen_player_and_observer_archives"].items():
+            if name != archive_name:
+                self.assertEqual(prepared["frozen_player_and_observer_archives"][name], checksum)
+        self.assertFalse(current["independent_removed_slot_oracle"]["actual_native_execution"])
+
     def test_input_metadata_keeps_required_versions_without_mir_runtime_order_edges(self):
         historical = "mir-fixture-mir5-migration-origin-f200-110-source"
         fixture = "mir-fixture-mir5-library-native-input"
