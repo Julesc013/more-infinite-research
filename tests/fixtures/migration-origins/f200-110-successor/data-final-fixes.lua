@@ -2,7 +2,9 @@ local catalogue = require("__mir-fixture-mir5-migration-origin-f200-110-source__
 
 local selected, selected_target = nil, nil
 for name, expected in pairs(catalogue.targets) do
-  if mods.base == expected.base and mods["more-infinite-research"] == expected.mir
+  if mods.base == expected.base and (mods["more-infinite-research"] == expected.mir
+        or (name == "f200_source_defaults" and mods["more-infinite-research"] == "5.0.20001")
+        or (name == "f210_source_defaults" and mods["more-infinite-research"] == "5.0.21001"))
       and mods[catalogue.fixture] == expected.fixture
       and mods["mir-fixture-mir5-active-mods-observer"] == "0.1.0" then
     selected, selected_target = name, expected
