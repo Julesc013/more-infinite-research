@@ -22,6 +22,8 @@ The input report now exposes `en_name`, `de_name`, `en_locale`, `de_locale`, `en
 
 The separate r14 F210 selection targets the published 5.0.1 beta archive and uses input observer0.3.2, whose runtime identity guard admits only that exact package version. Its two-member ZIP is stored without compression so its hash is independent of zlib versions. The r12/r13 profiles and0.3.0 observer inputs remain unchanged; earlier native results do not transfer to r14.
 
+The r15 profiles bind observer0.3.3 to the published 5.0.1 packages on both engine lines. This observer permits the engine-documented reuse of a removed numeric player index only for the exact F210 candidate; F200 and earlier F210 observers retain the refusal. The prepared profiles and host control do not establish native input or lifecycle acceptance.
+
 Compose each observer from the exact raw Git members and revisions in its prepared record. Input0.3 uses `control.lua` and the corresponding `info-input-identity-*.json`; export0.4 retains its separately pinned `control.lua`, `support-exports.lua` and `info-exports-identity-*.json`. An input-only correction does not retarget the export archive to current source. Input ZIPs use the exact declared0.3.x version; export ZIPs retain0.4.0. Preserve the original31-row/75-effect/three-force source fixture and saved inputs; no source recreation, credit seeding or player-package change is required.
 
 ## Native input delivery observation
