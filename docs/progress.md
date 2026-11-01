@@ -14,11 +14,26 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
+## Current checkpoint (2026-11-01)
+
+| Item | State |
+|---|---|
+| Public release | `v5.0.1` remains the GitHub prerelease; no stable release is published. |
+| Branches | `main` is `b677ced0b1ae0d8bd9ae47eb6b272443faec6d63`; `dev` is `4e46d0720f23027ce5469dfe01a1d04881403d54`. |
+| Checked preparation | PR #1534 merged at `709861045c846bfe9fdea6d5f85000d79009cd1f`; all four required checks passed. PR #1536 merged at `4e46d0720f23027ce5469dfe01a1d04881403d54`; all four required checks passed. |
+| Open documentation PR | PR #1535 head `827c81f4ad85ffb0cee452c4c33378c5cbad8bcd` is open. Its branch-policy, native-tooling-controls and verification-plan checks pass; host-controls run `41275031626` was pending when captured. |
+| Native state | No Factorio process is running; neither direct library has an active `.mir-active-profile.json` marker. F210 `mod-list.json` and `mod-settings.dat` match the recorded pre-run hashes. The r15 packet remains not native-ready; no new native run was launched. |
+| Local work | The primary checkout remains dirty with 15 files on its test branch. Its diff is preserved locally and is not merged or pushed. |
+| Stable gates | Full Library input/visual/lifecycle/export coverage, the historical audit, remaining compatibility/save/API applicability, complete performance and memory acceptance, and final candidate documentation/review remain open. |
+| Next action | Finish the existing #1535 host check and merge only if all required checks pass. Complete the r15 runtime/actor binding and independent review before any native dispatch. |
+
+
+
 The 31 October historical-preservation pass is recorded in the existing [continuity inventory](../spec/inventory/continuity.json), with the stable requirement in [VER-07](../spec/verification.md#historical-preservation-before-stable). Read-only discovery indexed 91 local numeric/historical-stable tag refs and deduplicated 5,058 selected Git blobs, including 2,792 test-code blobs; these are source counts, not test passes or completed semantic review. All 87 original request records and decisions remain unchanged. Inter-release omissions, original issue/PR discussions, attachments and screenshot coverage still require reconciliation; `inventory_complete` remains false.
 
-PR #1534's first hosted host-controls run (`41269517299`) failed because its shallow checkout did not fetch the exact r14/r15 observer-source commits used by the prepared archive reader. Both workflow jobs now fetch those evidence-pinned commits, and the workflow control derives its required fetch list from the prepared record. The pinned local host driver and repository checks pass on this follow-up worktree; native execution and release qualification remain false, and hosted checks must pass on the pushed head before merge.
+PR #1534's first hosted host-controls run (`41269517299`) failed because its shallow checkout lacked the exact r14/r15 observer-source commits. The follow-up workflow fetched the evidence-pinned commits, all four required hosted checks passed, and PR #1534 merged at `709861045c846bfe9fdea6d5f85000d79009cd1f`. This closes input-preparation controls only; native execution and release qualification remain false.
 
-On 1 November, player Driku reported three MIR 5.0.0 startup failures in the public beta thread: Strategy Mortar Turret changes Ironclad's mortar bonus, an updated full Krastorio 2: Spaced Out profile is refused by the F210 science-phase version guard, and another mod defines `braking-force-8`. The next patch targets those exact boundaries while preserving all 5.0.0 assets. Reported mod archive versions and the complete player profile were not supplied, so native reproduction of the reporter's exact cases remains open. Independent source review passed, and the complete host-control driver passed 149 controls on product/test tree `4d85d7404ce0bb36214afc23b877ab3d7bcc4fa9`; its receipt explicitly records `native_execution=false` and `release_qualification=false`. Current hosted checks, checked PR/promotion, package freeze and GitHub delivery remain open.
+On 1 November, player Driku reported startup failures involving Ironclad mortar speed, an updated Krastorio 2: Spaced Out profile, and an existing `braking-force-8` technology. Corrections for these failure classes are included in the public 5.0.1 beta. The complete mod list and archive versions were not supplied, so the reporter's combined setup has not been reproduced. The focused 149-control host run records `native_execution=false`; beta delivery is complete, while exact reproduction and stable qualification remain open.
 
 The isolated 5.0.1 candidate allows a valid changed Ironclad mortar modifier, applies the retained K2SO phase mapping only within the captured provider major/minor lines, and omits only MIR's braking-force continuation when another mod already provides that identity. All other duplicate continuation identities still fail Generator preflight; the runtime Library/cap catalogue follows the same narrow exception. Focused host controls passed: Ironclad (9), science (34, including major/minor/malformed-version refusals), Generator (43, including Py/Bob Warfare adapter collisions and refusal for an unrelated collision), Library (73), K2 base (6), K2 Space Age context (6), package (17), changelog (6), release tooling (11); repository checks passed. These are host/tool controls, not native reproduction of Driku's exact mod set. Exact archives/configuration, final independent hotfix review, checked PR/promotion, package freeze, and GitHub delivery remain open.
 
