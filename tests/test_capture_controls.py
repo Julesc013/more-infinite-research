@@ -344,7 +344,11 @@ $cases=[ordered]@{{
   published=(Invoke-SelectionCase (New-RepairRows '0.1.0') @([pscustomobject]@{{name='more-infinite-research';version='4.7.21002'}}))
   candidate=(Invoke-SelectionCase (New-RepairRows '0.2.0') @([pscustomobject]@{{name='more-infinite-research';version='5.0.21000'}}))
   candidate_wrong_base=(Invoke-SelectionCase (New-RepairRows '0.1.0') @([pscustomobject]@{{name='more-infinite-research';version='5.0.21000'}}))
-  unknown_mir=(Invoke-SelectionCase (New-RepairRows '0.2.0') @([pscustomobject]@{{name='more-infinite-research';version='5.0.21001'}}))
+  candidate501=(Invoke-SelectionCase (New-RepairRows '0.2.0') @([pscustomobject]@{{name='more-infinite-research';version='5.0.21001'}}))
+  candidate501_missing_selector=(Invoke-SelectionCase @([pscustomobject]@{{name='mir-fixture-mir5-repair-stress';version='0.2.0';enabled=$true}}) @([pscustomobject]@{{name='more-infinite-research';version='5.0.21001'}}))
+  candidate501_wrong_selector=(Invoke-SelectionCase @([pscustomobject]@{{name='mir-fixture-mir5-repair-stress-active';version='0.2.0';enabled=$true}},[pscustomobject]@{{name='mir-fixture-mir5-repair-stress';version='0.2.0';enabled=$true}}) @([pscustomobject]@{{name='more-infinite-research';version='5.0.21001'}}))
+  candidate501_wrong_base=(Invoke-SelectionCase (New-RepairRows '0.1.0') @([pscustomobject]@{{name='more-infinite-research';version='5.0.21001'}}))
+  unknown_mir=(Invoke-SelectionCase (New-RepairRows '0.2.0') @([pscustomobject]@{{name='more-infinite-research';version='5.0.21002'}}))
 }}
 $cases | ConvertTo-Json -Compress -Depth 6
 """
@@ -721,7 +725,8 @@ class CaptureControlTests(unittest.TestCase):
         cases = native_fixture_active_selection_guard_cases()
         self.assertTrue(cases["published"]["valid"])
         self.assertTrue(cases["candidate"]["valid"])
-        for name in ("candidate_wrong_base", "unknown_mir"):
+        self.assertTrue(cases["candidate501"]["valid"])
+        for name in ("candidate_wrong_base", "candidate501_missing_selector", "candidate501_wrong_selector", "candidate501_wrong_base", "unknown_mir"):
             with self.subTest(name=name):
                 self.assertFalse(cases[name]["valid"])
                 self.assertIn("active", cases[name]["message"])
