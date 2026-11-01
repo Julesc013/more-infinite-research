@@ -216,7 +216,7 @@ end
 local function browser_options(player, options)
   if type(options) ~= "table" then return nil end
   local result = {}
-  if type(options.search) == "string" then result.query = options.search end
+  if type(options.search) == "string" then result.search = options.search end
   if options.tab == "research" or options.tab == "settings" or options.tab == "queue"
       or options.tab == "availability" or options.tab == "help" then
     result.tab = options.tab

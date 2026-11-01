@@ -667,6 +667,249 @@
           ],
           "related_record": "CONT-02 runtime-braking-continuation-native-creator-boundary",
           "scope": "The source correction retains the MIR-created braking row and excludes pre-existing foreign creators. Its four host contexts and two known-broken opponents are verified;actual native Library/cap/creator and final-candidate lifecycle acceptance remain pending. Source501 ZIP member equality confirms the old omission is in both published modern editions. No earlier native/render/input result is overwritten."
+        },
+        {
+          "id": "historical-library-handlers-hidden-readiness-production-intents",
+          "reviewed_against": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+          "reviewed_on": "2026-11-02",
+          "scope": "Three historical regression paths, eight deduplicated blobs. Complete bounded entrypoint/delta intent review, not all91tags, every dependency of the old browser harness or VER-07 completion.",
+          "sources": [
+            {
+              "path": "tests/runtime/research_browser_handler_regressions.lua",
+              "blob": "4e9bd3d61b8133c64a1e7a6478a7f2cf7d873ab3",
+              "sha256": "FCC29692148BADD9751C7A696A39EBA597F48BB0E83625F52A0C7466D751197B",
+              "tags": [
+                "v4.2.0",
+                "v4.2.0-stable"
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_handler_regressions.lua",
+              "blob": "f686aba377b73dae94c40ee78214de98ddb79fc6",
+              "sha256": "40F2CE692E51971658F3FAB53F7DB80036E88C62D2B3EBCB5CC47EDC842C4E74",
+              "tags": [
+                "v4.2.1"
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_handler_regressions.lua",
+              "blob": "5077ab952378c2a0b53449aff86f9845ed91882b",
+              "sha256": "7B38616688BCED285326DFA85F142C5A6D33085B53565073A44DA3B8090648A2",
+              "tags": [
+                "v4.2.2"
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_handler_regressions.lua",
+              "blob": "4506a9c48183becbcc95cfc29872c86144cde14b",
+              "sha256": "869F7A1315FAEA851A452F39B61FFC72AA8D74A3CBD0F1311B0FBA2EFCD52DCB",
+              "tags": [
+                "v4.3.0",
+                "v4.4.0",
+                "v4.4.1",
+                "v4.4.2",
+                "v4.5.0",
+                "v4.5.1",
+                "v4.5.2",
+                "v4.6.0",
+                "v4.7.0",
+                "v4.7.1",
+                "v4.7.2",
+                "v4.7.3"
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_hidden_regressions.lua",
+              "blob": "22737de42027584cd6f9a1d8c0c7c827fb61873f",
+              "sha256": "E4CE6E8DE4A212EE682983E4128872D50B4EF4EEE409D3EB3820D3377082AF0E",
+              "tags": [
+                "v4.2.1"
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_hidden_regressions.lua",
+              "blob": "86cd4e60ea5b0ea98174a749e0ed3a2d6b7a983c",
+              "sha256": "E1BECB3CC98ABDF6F97ABE9A287B6CFC0411CB2AB621BD0C98410B3D2BB98D22",
+              "tags": [
+                "v4.2.2",
+                "v4.3.0",
+                "v4.4.0",
+                "v4.4.1",
+                "v4.4.2",
+                "v4.5.0",
+                "v4.5.1",
+                "v4.5.2",
+                "v4.6.0",
+                "v4.7.0",
+                "v4.7.1",
+                "v4.7.2",
+                "v4.7.3"
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_production_regressions.lua",
+              "blob": "aee4994f3fe35fcd13c5d27e84fb263ef81bfdc9",
+              "sha256": "F2ADB342D4706485D0174D7BECFBC90BC6CD52F6F0B88D77CD6A6C148FE634FF",
+              "tags": [
+                "v4.2.1"
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_production_regressions.lua",
+              "blob": "5d94f54afcf07eb497338af4a68c6b66fe18a03c",
+              "sha256": "E466AB11DD38DE87090903AF73046B7E03E07C2C77D96DD4FD319037F1F87AB2",
+              "tags": [
+                "v4.2.2",
+                "v4.3.0",
+                "v4.4.0",
+                "v4.4.1",
+                "v4.4.2",
+                "v4.5.0",
+                "v4.5.1",
+                "v4.5.2",
+                "v4.6.0",
+                "v4.7.0",
+                "v4.7.1",
+                "v4.7.2",
+                "v4.7.3"
+              ]
+            }
+          ],
+          "independent_readiness_oracle": {
+            "published_source": "v4.7.3",
+            "paths": [
+              "source/prototypes/mir/runtime/research_browser_factorio_catalogue.lua",
+              "source/prototypes/mir/runtime/research_browser_core.lua",
+              "source/prototypes/mir/runtime/research_browser.lua"
+            ],
+            "expectation": "The actual published available() rejects disabled, researched, hidden and trigger research and unmet prerequisites. Core Ready filtering follows that availability independently of queue membership; Locked excludes completed rows. Native queued hidden identities remain inspectable without changing research. Published captions distinguish completed and disabled state.",
+            "current_defect_before_correction": "Real current-model probe returned ordinary:1:ready,hidden:1:ready,researched:1:ready,trigger:1:ready for the Ready filter. The downloaded5.0.1 presentation/library_model.lua exactly equals the reviewed raw source, so this is a public product regression, not only a host fixture issue.",
+            "engine_facts": "Pinned2.0.77 and installed2.1.23 runtime API JSONs declare boolean LuaTechnology.enabled/researched, LuaTechnologyPrototype inheritance of LuaPrototypeBase.hidden, and optional modern research_trigger. Their SHA256 are594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578 and7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373. The host supplies the modern capability explicitly; the pure model never imports a host or probes that field on legacy inputs.",
+            "implementation": [
+              "source/presentation/library_model.lua",
+              "source/runtime/library.lua"
+            ],
+            "correction": "Compute readiness from actual native enabled/researched/prerequisite/hidden/trigger state; keep queue inspection separate. Render existing completed/disabled locale keys and retain native visibility, earned state, queue and current filters. No research or storage mutation, new queue, translation keys or version bump."
+          },
+          "groups": [
+            {
+              "intent": "Owned GUI lifecycle and inert unrelated clicks",
+              "disposition": "port",
+              "expectation": "A globally shared name cannot close or move the current owned window; foreign, replaced, child, invalid and missing-player events preserve the other player's view and native research. Genuine owned close/movement still work.",
+              "current_controls": [
+                "tests/test_library.py::test_foreign_or_replaced_same_named_lifecycle_events_preserve_the_live_owned_window",
+                "tests/test_library.py::test_foreign_same_named_root_and_children_never_create_preferences_or_receive_callbacks",
+                "tests/test_library.py::test_filter_click_is_inert_and_native_selection_updates_the_retained_window"
+              ],
+              "gap_closed": "All73 previous Library controls accepted a name-only Close opponent. The new live-owned-window control rejects it at the exact foreign-close assertion; production source already had the correct guard."
+            },
+            {
+              "intent": "Hidden/native availability and queue inspection",
+              "disposition": "port",
+              "expectation": "Keep foreign hidden identities inspectable while excluding hidden/completed/trigger/disabled research from Ready. Preserve actual queued hidden entries and independent enabled/researched/earned/progress state. A personally hidden row is a separate preference from native prototype.hidden.",
+              "current_controls": [
+                "tests/test_library_model.py::test_native_readiness_excludes_hidden_completed_disabled_and_trigger_research_without_losing_queues",
+                "tests/test_library_model.py::test_legacy_readiness_never_reads_a_modern_trigger_property",
+                "tests/test_library_model.py::test_exact_private_credits_stay_out_of_library_views_and_detail"
+              ],
+              "remaining": "Native final-package Ready/Locked/Queue/All and detail explanations on F200/F210, including earned private credit and foreign hidden state; host matrices are not engine runs."
+            },
+            {
+              "intent": "On-demand production snapshots",
+              "disposition": "retain",
+              "expectation": "Only the explicit owned action reads bounded selected-ingredient production/consumption averages. Opening/navigating details never polls. One action patches its small panel, preserves controls/queue/levels and uses honest surface/normal-quality or legacy force scope; invalid statistics are unavailable rather than invented zero/throughput forecasts.",
+              "current_controls": [
+                "tests/test_library.py::test_affected_recipe_selection_opens_factoriopedia_and_production_check_reads_flow_stats",
+                "tests/test_library.py::test_science_production_snapshot_is_bounded_read_only_and_refuses_invalid_inputs",
+                "tests/test_library.py::test_older_engine_production_statistics_keep_force_scope_and_legacy_flow_arguments"
+              ],
+              "gap_closed": "All73 prior Library controls accepted an automatic-on-open production opponent. The strengthened actual-click control rejects it, checks zero unsolicited reads, two rates per pack, retained controls and inert retired buttons. The module implementation is unchanged."
+            },
+            {
+              "intent": "Outstanding translations and idle subscription retirement",
+              "disposition": "consolidate",
+              "expectation": "Load reconnects outstanding callbacks, closing preserves issued work until it settles, and final completion/removal retires maintenance without reopening the view. Locale/force/removed-player epochs preserve peer state.",
+              "current_controls": [
+                "tests/test_library.py::test_completed_open_translation_work_survives_load_and_is_retired_on_close",
+                "tests/test_library.py::test_issued_only_legacy_translation_sidecar_loads_read_only_and_drains_without_reissue",
+                "tests/test_library.py::test_retired_translation_callbacks_resume_an_open_reused_player_without_publishing_old_labels"
+              ],
+              "boundary": "The retired61-tick interval and old cache representation are implementation details; no restore of that timer/framework or new native acceptance."
+            },
+            {
+              "intent": "Engine capability and native recipe navigation",
+              "disposition": "consolidate",
+              "expectation": "Use only supported prototype/event/file/navigation fields; unavailable engine capabilities must not guess a host API. Library availability is independent of settings-profile tools where supported.",
+              "current_controls": [
+                "tests/test_library.py::test_real_model_readiness_uses_completed_disabled_and_trigger_explanations",
+                "tests/test_library.py::test_legacy_engine_prototype_collections_supply_library_recipe_and_item_names",
+                "tests/test_target_adapters.py::test_reduced_data_and_settings_adapters_are_target_bound_and_skip_library"
+              ],
+              "boundary": "MIR5 reduced packages intentionally omit the Library. Older-host helper controls do not add Library support to those editions. Retired coordinator imports/feature-table assertions are not a new player dependency."
+            },
+            {
+              "intent": "Force-cache lifecycle observations",
+              "disposition": "consolidate",
+              "expectation": "Changing/merging forces must not publish stale source-force research or corrupt destination/peer state.",
+              "current_controls": [
+                "tests/test_library.py::test_queue_reversal_effect_reset_and_force_boundaries_route_live_native_views",
+                "tests/test_library.py::test_force_change_refreshes_an_open_queue_tab_without_a_translation_cache"
+              ],
+              "boundary": "The current model reads actual force state and has no old catalogue snapshot cache. Old exact cache-read counts/methods are obsolete implementation assertions; actual affected merge/client/save qualification remains separate."
+            },
+            {
+              "intent": "Old direct enqueue helper",
+              "disposition": "superseded-by-accepted-interaction-scope",
+              "expectation": "Retain the hidden/unavailable safety meaning, but do not resurrect player queue-mutation/rollback controls that the accepted interaction amendment withheld.",
+              "authority": "CONT-10 historical_preservation_review.superseded_expectations; spec/inventory/library-baseline.json entrypoints_and_native_navigation.research_queue_boundary; RUN-04 native research authority.",
+              "boundary": "This records the existing decision; it does not waive a delivered player feature or create new authority."
+            }
+          ],
+          "validation": {
+            "focused_controls": 174,
+            "passed": true,
+            "lua": "Lupa2.6/lua52",
+            "native_processes": 0,
+            "opponents": "Two newly rejected historical bug opponents (name-only Close and unsolicited production on open) plus eight readiness/original-source/host-capability/legacy-field/filter opponents. Every rejection is checked against its intended assertion; no tracked mutant, native fixture or engine was changed.",
+            "preserved_adverses": "first-lifecycle-stale-view-refusal.json records an initial test retaining a superseded normalized preference table; the corrected test rereads the actual durable view. model-first-after.log records a strict proxy missing inherited native hidden=false; adding that actual API field retains its zero-unsupported-read assertion. The first GUI regression setup also had a completed technology in the active queue; its corrected ordinary completion case clears that contradictory fixture state, and the original-source opponent still fails at completion explanation.",
+            "custody": "build/qualification/aero-library-regression-intents-r01/",
+            "receipts": [
+              {
+                "name": "source-variants.json",
+                "sha256": "849AE9E24E05FDAE464A740E63616669406E2D7D3CCB9EFDACB9044560B1CA55"
+              },
+              {
+                "name": "before-controls-and-opponents.json",
+                "sha256": "1308B03187EB404D86D2B870FB66FE032DA91581D6DCD83FCF224BCC178D272A"
+              },
+              {
+                "name": "after-controls-and-opponents.json",
+                "sha256": "D8F3EE449C06B9CE8CF4B1ECCB79AB9BEE63C94D5C9FAD4F1601F0F808AFF511"
+              },
+              {
+                "name": "readiness-before.json",
+                "sha256": "4B88FFE8EB5E31F2B61D3CAC9718E1967BA9B956932C0815CFF9F2A62D22B1C1"
+              },
+              {
+                "name": "readiness-api-facts.json",
+                "sha256": "7D8AA2FD3474D3776E884C79825CC464B271AE12A8A9C73BA0A70E28C016A1B8"
+              },
+              {
+                "name": "readiness-regression-before.json",
+                "sha256": "2417DF2486E92E9DB81763CFA0507810D1958FF197E048012AFE76213C122CD2"
+              },
+              {
+                "name": "readiness-opponents.json",
+                "sha256": "ADFFD3DB08CAB31E074281C027B0AAC231F1B5D367E7DB6F28AB4585E86D2BA6"
+              },
+              {
+                "name": "focused-after.json",
+                "sha256": "E745B90679D39D0509D32B488C2DA88B3045CAD2F029E82122940875289B1DAB"
+              }
+            ]
+          },
+          "remaining_native_check": "Black Glass qualifies the final integrated F200/F210 candidate's availability filters/detail captions and retained foreign/hidden/queued/private state plus actual foreign-GUI lifecycle and explicit production action, then affected save/reload/client/performance paths. Keep frozen public501 packetA unchanged; source correctionB requires review, exact-head CI and later changed public version5.0.2 unless live history advances.",
+          "limits": "All original87 request records, other CONT subjects, source/tag/asset identities and historical failures remain intact. inventory_complete and broad historical source/test reconciliation remain false. No reporter-specific crash, engine/native/performance or stable release verdict is granted."
         }
       ],
       "test_subjects": [
@@ -674,14 +917,15 @@
         "two_clients"
       ],
       "remaining_implementation": [
-        "The published-beta stacked layout is corrected in dev and rejected by the CONT-10 host negative control. No additional source defect is established yet; use native rendering and real input to identify any further correction."
+        "The published-beta stacked layout is corrected in dev. This bounded unit also corrects the demonstrated public501 Ready-filter/native-status regression; independent integration review and affected final-package/native qualification remain required. These three entrypoint groups establish no additional player-source defect beyond the readiness correction."
       ],
       "remaining_qualification": [
         "Complete accepted paired Library/save-load timing and retained-session/churn memory. Corrected R02 diagnostics contain all26 endpoints and pass28 UI-duration/save-ready controls but fail five same-published memory controls;retain both original adverse datasets and review the next bounded measurement protocol before scoring. New7b0 functional/rendered F200/F210 results are separate from performance.",
         "Preserve documented locale fallback/visual limits;the named Space Age native-laboratory explanation and Base absence rows are now observed in the exact corrected7b0 client cases above. This does not establish arbitrary third-party translation quality.",
         "Qualify the accepted1026/1027 Library corrections on the final coherent F200/F210 player packages: actual Esc/E close and dragging/location retention, foreign GUI focus during asynchronous refresh, vanished-root subscription retirement and removed-player translation resumption. Preserve earlier client receipts at their original inputs.",
         "Earned or persisted private selections/queue state and foreign hidden-row inspection still require affected native cases. Fresh F2001D45 and F2102DDD zero-credit private visibility/action/native-state checks now pass;do not relabel them as positive imported credit or paired timing evidence.",
-        "Complete historical_preservation_review: retain the layout negative control and add rejection controls for any known broken handlers, then qualify the affected rendered/input/lifecycle and burst/retained-memory paths on the successor. Old source/native mappings alone do not preserve the accepted interaction design."
+        "Complete historical_preservation_review: retain the layout negative control and add rejection controls for any known broken handlers, then qualify the affected rendered/input/lifecycle and burst/retained-memory paths on the successor. Old source/native mappings alone do not preserve the accepted interaction design.",
+        "Qualify Ready/Locked/Queue/All and completed/disabled/hidden/trigger details from actual final F200/F210 native state, preserving earned effects, queued/suspended work, foreign hidden inspection and private credits. Host174 and opposing-source controls do not complete native acceptance."
       ],
       "historical_preservation_review": {
         "status": "restored-layout-host-negative-control-passed-native-acceptance-pending",
@@ -897,7 +1141,8 @@
             ]
           }
         ],
-        "qualification_limit": "The focused host negative control passes on restored source and fails on the published beta source at the split-layout assertion. It does not establish native rendering or input. The retained R08 screenshots show the German split view; the English detail view is obscured by the Factorio research chooser. Existing client receipts remain useful only at their named inputs."
+        "qualification_limit": "The focused host negative control passes on restored source and fails on the published beta source at the split-layout assertion. It does not establish native rendering or input. The retained R08 screenshots show the German split view; the English detail view is obscured by the Factorio research chooser. Existing client receipts remain useful only at their named inputs.",
+        "additional_regression_record": "historical-library-handlers-hidden-readiness-production-intents"
       }
     },
     {
@@ -4361,9 +4606,450 @@
           "scope": "One100-observation Lua52 host experiment measures the unchanged admission limits on named valid family and malformed wide/deep shapes for F200/F210. Accepted cases publish once with exact effects;rejections make zero writes. The two-body portable capsule retains actual observer and raw observations. Quantized VM counts exclude native internals;no Factorio speed,API stability,changed limit or release verdict follows."
         },
         {
-          "id": "api1-documented-subset-existing-freeze",
+          "id": "historical-api-sdk-entrypoint-intents",
+          "subjects": [
+            "CONT-14",
+            "CONT-16",
+            "CONT-17"
+          ],
+          "reviewed_against": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+          "reviewed_on": "2026-11-02",
+          "scope": "Nine historical API/SDK test, command, validator-authority and preview-metadata paths across the existing91-tag snapshot, deduplicated to12 blobs. Entry-point assertions, declaration authority and the small variant deltas are reconciled; this is not a correctness audit of every generated SDK binding/schema or complete inter-release/consumer discovery.",
+          "sources": [
+            {
+              "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+              "variants": [
+                {
+                  "git_blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41",
+                  "bytes": 1968,
+                  "tags": [
+                    "v4.1.0",
+                    "v4.2.0",
+                    "v4.2.0-stable",
+                    "v4.2.1",
+                    "v4.2.2",
+                    "v4.3.0",
+                    "v4.4.0",
+                    "v4.4.1",
+                    "v4.4.2",
+                    "v4.5.0",
+                    "v4.5.1",
+                    "v4.5.2",
+                    "v4.6.0",
+                    "v4.7.0",
+                    "v4.7.1",
+                    "v4.7.2",
+                    "v4.7.3"
+                  ],
+                  "sha256": "62886BB18F9D5C16DA72967F9BEEA066C44532629E3BCF93956C6C234618ED71"
+                }
+              ]
+            },
+            {
+              "path": "tests/mir4/Test-MIR4SdkV1T08.ps1",
+              "variants": [
+                {
+                  "git_blob": "1d4a634077e55e895e23a8a1bd6d280b8a08a558",
+                  "bytes": 5363,
+                  "tags": [
+                    "v4.1.0"
+                  ],
+                  "sha256": "5C859E61EC6B9ABD6DBF52BE46487985DCACA9837A35B1501037869622BA6E6C"
+                },
+                {
+                  "git_blob": "de1976eb470a86dc1327174b348c0fc3a91fa0f9",
+                  "bytes": 5370,
+                  "tags": [
+                    "v4.2.0",
+                    "v4.2.0-stable",
+                    "v4.2.1",
+                    "v4.2.2",
+                    "v4.3.0",
+                    "v4.4.0",
+                    "v4.4.1",
+                    "v4.4.2",
+                    "v4.5.0",
+                    "v4.5.1",
+                    "v4.5.2",
+                    "v4.6.0",
+                    "v4.7.0",
+                    "v4.7.1",
+                    "v4.7.2",
+                    "v4.7.3"
+                  ],
+                  "sha256": "3F0CCFDB987152A597BDAA4494BCE2CCAA3850033306841DC406B6AB1395D0AB"
+                }
+              ]
+            },
+            {
+              "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+              "variants": [
+                {
+                  "git_blob": "7804f9c0998e8cfccd826188ae565f7d26f1dc1a",
+                  "bytes": 7543,
+                  "tags": [
+                    "v4.1.0"
+                  ],
+                  "sha256": "D150F5F9212C2668141FED8FDB3C7CF2005C608C49B2D84BF0547441FC8F64C7"
+                },
+                {
+                  "git_blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b",
+                  "bytes": 7769,
+                  "tags": [
+                    "v4.2.0",
+                    "v4.2.0-stable",
+                    "v4.2.1",
+                    "v4.2.2",
+                    "v4.3.0",
+                    "v4.4.0",
+                    "v4.4.1",
+                    "v4.4.2",
+                    "v4.5.0",
+                    "v4.5.1",
+                    "v4.5.2",
+                    "v4.6.0",
+                    "v4.7.0",
+                    "v4.7.1",
+                    "v4.7.2",
+                    "v4.7.3"
+                  ],
+                  "sha256": "3B5344B2F950A565D345E04E629E8F260E03B14757EBF981C3B81CF5DCF313B2"
+                }
+              ]
+            },
+            {
+              "path": "tests/extensions/Test-MIR4ModuleSdkMepMigration.ps1",
+              "variants": [
+                {
+                  "git_blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee",
+                  "bytes": 2104,
+                  "tags": [
+                    "v4.0.0",
+                    "v4.1.0",
+                    "v4.2.0",
+                    "v4.2.0-stable",
+                    "v4.2.1",
+                    "v4.2.2",
+                    "v4.3.0",
+                    "v4.4.0",
+                    "v4.4.1",
+                    "v4.4.2",
+                    "v4.5.0",
+                    "v4.5.1",
+                    "v4.5.2",
+                    "v4.6.0",
+                    "v4.7.0",
+                    "v4.7.1",
+                    "v4.7.2",
+                    "v4.7.3"
+                  ],
+                  "sha256": "DEEF516B2A0A4CD075CE0DDB98052EA8AD140EE17FDC8EE331DEBBB4054123F6"
+                }
+              ]
+            },
+            {
+              "path": "tests/support/MIRSdkGenerationRepairControls.ps1",
+              "variants": [
+                {
+                  "git_blob": "76dbd60faa3681b7b1fbe9cc6f4120ce39cd626c",
+                  "bytes": 9466,
+                  "tags": [
+                    "v4.2.1",
+                    "v4.2.2",
+                    "v4.3.0",
+                    "v4.4.0",
+                    "v4.4.1",
+                    "v4.4.2",
+                    "v4.5.0",
+                    "v4.5.1",
+                    "v4.5.2",
+                    "v4.6.0",
+                    "v4.7.0",
+                    "v4.7.1",
+                    "v4.7.2",
+                    "v4.7.3"
+                  ],
+                  "sha256": "5B25073FFDB22EF1BFECE54DBFD264E19D0EC87EAEC907C2CC60A5E214FD8A14"
+                }
+              ]
+            },
+            {
+              "path": "tools/mir/cli/Invoke-MIR4ExperimentalApi.ps1",
+              "variants": [
+                {
+                  "git_blob": "c9a6d637a958df51fa686e2537a30b71319892bb",
+                  "bytes": 2381,
+                  "tags": [
+                    "v4.0.0",
+                    "v4.1.0",
+                    "v4.2.0",
+                    "v4.2.0-stable",
+                    "v4.2.1",
+                    "v4.2.2",
+                    "v4.3.0",
+                    "v4.4.0",
+                    "v4.4.1",
+                    "v4.4.2",
+                    "v4.5.0",
+                    "v4.5.1",
+                    "v4.5.2",
+                    "v4.6.0",
+                    "v4.7.0",
+                    "v4.7.1",
+                    "v4.7.2",
+                    "v4.7.3"
+                  ],
+                  "sha256": "5EAD9846D8AC9D838C3CFA08F72E69E33891DDF013A3ED22BE04155B1FF8E621"
+                }
+              ]
+            },
+            {
+              "path": "tools/mir/application/extensions/ExperimentalApiSdk.ps1",
+              "variants": [
+                {
+                  "git_blob": "423dee1bb803e8fc325ec04332f9b96b88425caa",
+                  "bytes": 46575,
+                  "tags": [
+                    "v4.0.0",
+                    "v4.1.0"
+                  ],
+                  "sha256": "16A574D8D17AB1AB5D2F1E9131F34E5CD5B634CDE1014C29C9B8261C76F53F5C"
+                },
+                {
+                  "git_blob": "8e24bcdd6b75476001a034ae6ede2fdaa1981db8",
+                  "bytes": 46979,
+                  "tags": [
+                    "v4.2.0",
+                    "v4.2.0-stable",
+                    "v4.2.1",
+                    "v4.2.2",
+                    "v4.3.0",
+                    "v4.4.0",
+                    "v4.4.1",
+                    "v4.4.2",
+                    "v4.5.0",
+                    "v4.5.1",
+                    "v4.5.2",
+                    "v4.6.0",
+                    "v4.7.0",
+                    "v4.7.1",
+                    "v4.7.2",
+                    "v4.7.3"
+                  ],
+                  "sha256": "E6CBE5386CDBD95BEBBDDBC8CD7CB69B5C2AC9543FAF551D7D28082B83C37077"
+                }
+              ]
+            },
+            {
+              "path": "sdk/preview/mir4/api-v1/package-metadata.json",
+              "variants": [
+                {
+                  "git_blob": "c66c279b0fb77038bc8e8139dd646cb710442f03",
+                  "bytes": 682,
+                  "tags": [
+                    "v4.0.0",
+                    "v4.1.0",
+                    "v4.2.0",
+                    "v4.2.0-stable",
+                    "v4.2.1",
+                    "v4.2.2",
+                    "v4.3.0",
+                    "v4.4.0",
+                    "v4.4.1",
+                    "v4.4.2",
+                    "v4.5.0",
+                    "v4.5.1",
+                    "v4.5.2",
+                    "v4.6.0",
+                    "v4.7.0",
+                    "v4.7.1",
+                    "v4.7.2",
+                    "v4.7.3"
+                  ],
+                  "sha256": "D193340197A290C3E6FD8EE926E473DD5F269883C740322C8C54C35C65C8FD17"
+                }
+              ]
+            },
+            {
+              "path": "sdk/preview/mir4/mep-v1/package-metadata.json",
+              "variants": [
+                {
+                  "git_blob": "796d4fda0ebda1d6f7dd52a2c874f6872090b8af",
+                  "bytes": 573,
+                  "tags": [
+                    "v4.0.0",
+                    "v4.1.0",
+                    "v4.2.0",
+                    "v4.2.0-stable",
+                    "v4.2.1",
+                    "v4.2.2",
+                    "v4.3.0",
+                    "v4.4.0",
+                    "v4.4.1",
+                    "v4.4.2",
+                    "v4.5.0",
+                    "v4.5.1",
+                    "v4.5.2",
+                    "v4.6.0",
+                    "v4.7.0",
+                    "v4.7.1",
+                    "v4.7.2",
+                    "v4.7.3"
+                  ],
+                  "sha256": "9222ED49C6B2F828CBEF312FF722E267B3D8FE603C7254E509390E00794B578D"
+                }
+              ]
+            }
+          ],
+          "variant_disposition": "T08 changes only its package-presentation adapter. T11 changes only current-target package resolution/presentation. The V0 validator adds IDictionary-versus-PSCustomObject namespace enumeration to both generated and source PowerShell paths; no player API surface is added. Other selected blobs are byte-identical across their listed tags.",
+          "groups": [
+            {
+              "id": "v0-static-preview-records",
+              "disposition": "obsolete-implementation-only",
+              "expectation": "The V0 CLI validates six build-time/static envelope kinds, canonical JSON/digests, namespaces and positive/negative fixtures; its Lua shape guards and generated outputs remain excluded from player ZIPs.",
+              "authority": "Historical preview names, canonicalization,128 capabilities and32 namespaces are not the modern MIR API1.0 methods or gameplay budgets. Preserve the original Git records; do not import its compiler/exporter/schema generator or infer an external consumer.",
+              "current_mapping": [
+                "spec/api.md",
+                "sdk/README.md",
+                "tests/test_api.py",
+                "tests/test_runtime_api.py"
+              ]
+            },
+            {
+              "id": "v1-preview-sdk-conformance",
+              "disposition": "consolidate",
+              "expectation": "T08 checks four-language validator/canonical-byte/digest agreement, deterministic developer SDK ZIPs, extracted conformance and unchanged player-package fingerprint.",
+              "authority": "The metadata says developer-preview,package_visible=false,publication_authorized=false,version4.0.0-preview. Its12-positive/18-negative corpus and bounded-page helpers do not require player pagination or a JSON runtime transport in MIR5.",
+              "current_mapping": [
+                "spec/inventory/api-transition-baseline.json",
+                "spec/api.md",
+                "tests/test_package.py"
+              ]
+            },
+            {
+              "id": "mep-shadow-discovery",
+              "disposition": "superseded",
+              "expectation": "T11 explicitly requires blocked-by-terminal-emitter,inert host absence,32-record limit,conflict/invalid-envelope quarantine,shadow-only output and no emitter/player mutation.",
+              "authority": "MEP metadata denies player/prototype writes,public publication and release authority. This was not a delivered MIR5 extension mutation path or a missing runtime transport. Existing MOD-data/SDK history stays available by its exact Git refs.",
+              "current_mapping": [
+                "docs/design.md",
+                "spec/api.md",
+                "spec/inventory/api-transition-baseline.json"
+              ]
+            },
+            {
+              "id": "historical-tooling-custody",
+              "disposition": "retain",
+              "expectation": "The module/SDK/MEP migration test preserves one immutable historical receipt and refuses generator writes. SDK repair controls reject unrelated failures,dirty checkout,changed player source and unowned diffs rather than waiving verification.",
+              "current_scope": "Retain immutable authored/history/publication bytes and checked review ownership. The retired SDK fixed-point repair/generation machinery is implementation-only and is not restored. This review does not rerun or hand-edit its historical receipts.",
+              "current_mapping": [
+                "AGENTS.md",
+                "docs/development.md",
+                "tools/release.py",
+                "tests/test_release.py"
+              ]
+            }
+          ],
+          "limits": [
+            "The available31-archive consumer audit retains its exact literal-only scope; computed names and external consumers remain unknown. No externally consumed contract is removed by this review.",
+            "Other test groups,original discussions,attachments and inter-release changes remain unresolved. This slice does not complete VER-07."
+          ],
+          "native_execution": false,
+          "source_reconciliation_complete": false,
+          "test_intent_reconciliation_complete": false
+        },
+        {
+          "id": "api10-freeze-routing-reconciled",
           "evidence": "spec/evidence/api1-documented-subset-qualification-r01.json",
-          "scope": "The original 42032477 aggregate already records documented_modern_subset_stable=true and api_contract_frozen=true from named native data/physical/save/client, exact absence and host-budget evidence. This closes the stale pending contract-verdict description, preserves its original product-unreleased state and inputs, and grants no automatic final-candidate or whole-product verdict."
+          "scope": "The documented-subset/capability/version and combined-boundary-budget freeze verdict was completed at source42032477d45ced683e72736a4fe30a7a3195b995,with exact7CAC/B637 packages. The old pending instruction is stale; all original matrices,adverse receipts,absence identities and limits remain unchanged.",
+          "published501_core_readback": [
+            {
+              "target": "f200",
+              "old_archive_sha256": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+              "published501_archive_sha256": "750ECA842134AFDDCC7C45B2B656510CA60F09940A2E82B21896AAE7E3D8C1BE",
+              "identical_paths": [
+                "api/v1/data.lua",
+                "api/v1/runtime.lua",
+                "research/generator.lua",
+                "data.lua",
+                "control.lua",
+                "runtime/configuration.lua"
+              ],
+              "metadata_change": {
+                "path": "platform/target.lua",
+                "old_sha256": "C76444C8F5891C057082F6CDDD6DDA51BE91ADD1FE3369B8261EDC78578D852B",
+                "new_sha256": "89E6F38E2F738F387B8BF13E8C8D421465B9D78D57B1D623DED129495F638166",
+                "only_changed_field": "distribution_version",
+                "old_value": "5.0.20000",
+                "new_value": "5.0.20001"
+              }
+            },
+            {
+              "target": "f210",
+              "old_archive_sha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+              "published501_archive_sha256": "C6C2470B438846484732E0E05D124DB31A1100C2F1AA0E770B327A4A6FBAFA5D",
+              "identical_paths": [
+                "api/v1/data.lua",
+                "api/v1/runtime.lua",
+                "research/generator.lua",
+                "data.lua",
+                "control.lua",
+                "runtime/configuration.lua"
+              ],
+              "metadata_change": {
+                "path": "platform/target.lua",
+                "old_sha256": "4826A89FD40A9F0CEF385EC0B9F8CCE02CF1B7AE64A78AE431920A55DC56A601",
+                "new_sha256": "4FCF9384C15CFAF7C1D4A7C523C5C56C21C5CDEF536A2F0615B626CAC6F006FE",
+                "only_changed_field": "distribution_version",
+                "old_value": "5.0.21000",
+                "new_value": "5.0.21001"
+              }
+            }
+          ],
+          "interpretation": "Rehashed original frozen packages and the already anonymously verified published501 downloads. Across14 selected core payloads,12 are identical;the two target modules differ only in distribution_version patch00 to01. API version remains1.0.0,with the actual product distribution correctly changing. Bootstrap/Library/shared catalogue changes are outside this seven-member equivalence and do not receive a blanket native-client or release verdict.",
+          "remaining": "Apply consumed-input review to the final corrected candidate registration/client/load boundaries. Retain absent-MIR evidence where MIR is not consumed; do not restart the entire API matrix or label the old executions new."
+        },
+        {
+          "id": "legacy-browser-tab-aware-search-correction",
+          "historical_sources": {
+            "v4.7.0": {
+              "commit": "82d5a7279ddc236b31539d84f8ea1b0dba904956",
+              "path": "source/prototypes/mir/runtime/research_browser.lua",
+              "search_statement": "v[(options.tab or v.tab) == \"settings\" and \"settings_search\" or \"search\"] = string.sub(options.search, 1, 160)"
+            },
+            "v4.7.3": {
+              "commit": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+              "path": "source/prototypes/mir/runtime/research_browser.lua",
+              "search_statement": "v[(options.tab or v.tab) == \"settings\" and \"settings_search\" or \"search\"] = string.sub(options.search, 1, 160)"
+            }
+          },
+          "independent_expectation": "The player-shipped more-infinite-research-browser.open search input targets settings when settings is explicitly selected or is the retained tab;otherwise it targets research. Keep the other query,caller-owned options,native research/queue and160-byte bound intact.",
+          "demonstrated_before": "At3755e98a2,opening settings with legacy search=repair changes research query gear to repair and leaves settings query empty. The new focused control rejects the broken source. The first test-fixture attempt used a nonexistent global force;the next stale-view assertion held a replaced durable view object. Both test-only refusals are retained separately and neither counts as product opposition.",
+          "source": [
+            "source/runtime/bootstrap.lua",
+            "source/runtime/library.lua"
+          ],
+          "implementation": "The bridge passes the legacy search field to the Library,which resolves it after selecting/retaining the tab. Existing explicit internal query/settings_search fields keep their separate meanings and override their matching field. No research mutation or new framework.",
+          "controls": [
+            "tests/test_library.py:LibraryTests.test_legacy_remote_search_uses_selected_or_retained_tab_without_cross_query_writes",
+            "tests/test_bootstrap.py:BootstrapTests.test_control_composes_lifecycle_library_api_legacy_interface_and_command"
+          ],
+          "validation": {
+            "focused_groups": [
+              "tests/test_library.py",
+              "tests/test_bootstrap.py",
+              "tests/test_api.py",
+              "tests/test_runtime_api.py"
+            ],
+            "passed": 117,
+            "runtime": "Explicit existing Lupa2.6/lua52",
+            "known_broken_opponent": "Both in-memory research-only Library routing and the original bridge query-field mapping are rejected at their named assertions.",
+            "opponent_source_sha256": "CB9E1D361C9F04367A233C5DA108A25C12AFE61C063D4EA5ADB1616305B70D4F",
+            "native_execution": false
+          },
+          "custody": "Primary checkout build/qualification/aero-api-history-r01/{legacy-settings-search-before.json,legacy-search-regression-before.json,legacy-search-regression-fixture-refusal.json,legacy-search-stale-view-control-refusal.json,legacy-search-focused-after.json,legacy-search-negative-control.json,api-core-package-readback.json,source-variants.json}",
+          "remaining_native_check": "On the final corrected package,exercise the retained browser interface in a controlled Library case with explicit settings tab and then omitted tab;observe the filtered Settings text/results and unchanged independent research query/native state. Review affected shared Library registration/lifecycle inputs;host tables are not native GUI acceptance. Native owner selects this bounded case before dispatch,not while clients wait.",
+          "release_handling": "Preserve the frozen published501 native input packet and every published byte. This correction is separate development work;the next changed public package is5.0.2 unless live release history has advanced. Source version/changelog/publication are reconciled in the reviewed release batch,not consumed per test/commit."
         }
       ],
       "test_subjects": [
@@ -4372,7 +5058,9 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Retain the existing API1.0 documented-subset/capability/version/budget freeze at its original 42032477 source and package inputs. Review the final candidate consumed API/helper, Generator, configuration, target, metadata, fixture/controller, engine/mod, save and endpoint inputs before evidence reuse; run only genuinely affected documented methods/closures and consumer/client boundaries. Preserve original execution identities, adverse receipts and both legacy runtime bridges. Unknown/computed/external consumers remain unknown; no arbitrary third-party method or historical-target qualification follows, and no unchanged API campaign is restarted."
+        "Retain the existing API1.0 documented-subset/capability/version/budget freeze at its original 42032477 source and package inputs. Review the final candidate consumed API/helper, Generator, configuration, target, metadata, fixture/controller, engine/mod, save and endpoint inputs before evidence reuse; run only genuinely affected documented methods/closures and consumer/client boundaries. Preserve original execution identities, adverse receipts and both legacy runtime bridges. Unknown/computed/external consumers remain unknown; no arbitrary third-party method or historical-target qualification follows, and no unchanged API campaign is restarted.",
+        "Qualify the legacy-browser-tab-aware-search-correction on the final corrected package with explicit and retained Settings-tab legacy search and independent native/research-query state. Keep current frozen501 execution distinct;do not claim host opposition as native acceptance.",
+        "Complete remaining historical/inter-release and actual legacy-consumer reconciliation without fabricating unavailable originals,retiring unknown consumers,or restoring unconsumed preview frameworks."
       ]
     },
     {
@@ -4923,6 +5611,22 @@
         "pull_request": "https://github.com/Julesc013/more-infinite-research/pull/344",
         "disposition": "unresolved",
         "decision": "Existing unmerged historical local index explicitly needs missing private custody and supplies no public-admission or MIR5 native proof. Preserve its exact source; reconcile useful expected continuity separately without importing the retired governance/verifier estate."
+      },
+      "published-api-sdk-preview-and-legacy-search-boundary": {
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "paths": [
+          "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+          "tests/mir4/Test-MIR4SdkV1T08.ps1",
+          "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+          "tests/extensions/Test-MIR4ModuleSdkMepMigration.ps1",
+          "tests/support/MIRSdkGenerationRepairControls.ps1",
+          "tools/mir/cli/Invoke-MIR4ExperimentalApi.ps1",
+          "tools/mir/application/extensions/ExperimentalApiSdk.ps1",
+          "sdk/preview/mir4/api-v1/package-metadata.json",
+          "sdk/preview/mir4/mep-v1/package-metadata.json"
+        ],
+        "review_record": "CONT-14 historical-api-sdk-entrypoint-intents",
+        "decision": "Preview test intent is reconciled separately from player-shipped legacy interfaces;the original tab-aware legacy search obligation exposed a bounded MIR5 correction. Other historical groups remain unresolved."
       }
     },
     "first_slice_subject": "CONT-10",
@@ -5013,7 +5717,7 @@
           "tests/test_runtime_api.py",
           "tests/test_api_boundary_fixture.py"
         ],
-        "remaining": "Retain the existing API1.0 documented-subset/capability/version/budget freeze at its original 42032477 source and package inputs. Review the final candidate consumed API/helper, Generator, configuration, target, metadata, fixture/controller, engine/mod, save and endpoint inputs before evidence reuse; run only genuinely affected documented methods/closures and consumer/client boundaries. Preserve original execution identities, adverse receipts and both legacy runtime bridges. Unknown/computed/external consumers remain unknown; no arbitrary third-party method or historical-target qualification follows, and no unchanged API campaign is restarted."
+        "remaining": "Retain the existing API1.0 documented-subset/capability/version/budget freeze at its original 42032477 source and package inputs. Review the final candidate consumed API/helper, Generator, configuration, target, metadata, fixture/controller, engine/mod, save and endpoint inputs before evidence reuse; run only genuinely affected documented methods/closures and consumer/client boundaries. Preserve original execution identities, adverse receipts and both legacy runtime bridges. Unknown/computed/external consumers remain unknown; no arbitrary third-party method or historical-target qualification follows, and no unchanged API campaign is restarted. Qualify the legacy-browser-tab-aware-search-correction on the final corrected package with explicit and retained Settings-tab legacy search and independent native/research-query state. Keep current frozen501 execution distinct;do not claim host opposition as native acceptance. Complete remaining historical/inter-release and actual legacy-consumer reconciliation without fabricating unavailable originals,retiring unknown consumers,or restoring unconsumed preview frameworks."
       },
       {
         "subjects": [
@@ -5063,7 +5767,7 @@
         "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
       }
     ],
-    "next_bounded_work": "Complete independent r15 packet review when Black Glass binds the exact runtime/actions; continue the unresolved historical Library/crash/runtime/compatibility/API groups using bounded intent reviews. Reconcile stale subject descriptions against their named original results, without editing the progress header concurrently or rerunning every historical campaign.",
+    "next_bounded_work": "Complete actual r17 preparation/runtime/action/offline-composition packet readback when Black Glass transports the bound records;keep frozen501 execution distinct from the legacy-search correction. Continue unresolved historical Library/crash/compatibility/inter-release/consumer groups. Resolve current descriptions against exact existing verdicts without rewriting original receipts or sharing the progress header.",
     "bounded_intent_reviews": [
       {
         "subjects": [
@@ -6041,7 +6745,8 @@
                 "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
                 "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
               }
-            ]
+            ],
+            "prior_intent_record": "CONT-14.historical-api-sdk-entrypoint-intents"
           },
           {
             "path": "tests/mir4/Test-MIR4ModuleEcosystemW05.ps1",
@@ -6340,7 +7045,8 @@
                 "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
                 "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
               }
-            ]
+            ],
+            "prior_intent_record": "CONT-14.historical-api-sdk-entrypoint-intents"
           },
           {
             "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
@@ -6372,7 +7078,8 @@
                 "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
                 "blob": "7804f9c0998e8cfccd826188ae565f7d26f1dc1a"
               }
-            ]
+            ],
+            "prior_intent_record": "CONT-14.historical-api-sdk-entrypoint-intents"
           },
           {
             "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
@@ -6600,7 +7307,8 @@
                 "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
                 "blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b"
               }
-            ]
+            ],
+            "prior_intent_record": "CONT-14.historical-api-sdk-entrypoint-intents"
           },
           {
             "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
@@ -6937,8 +7645,9 @@
           "previously_pending": "Independent documented-subset/capability/version/budget freeze verdict.",
           "existing_decision": "spec/evidence/api1-documented-subset-qualification-r01.json",
           "closed_scope": "Original documented-modern-subset contract freeze at recorded 42032477 inputs, independently reviewed there.",
-          "still_open": "Retain the existing API1.0 documented-subset/capability/version/budget freeze at its original 42032477 source and package inputs. Review the final candidate consumed API/helper, Generator, configuration, target, metadata, fixture/controller, engine/mod, save and endpoint inputs before evidence reuse; run only genuinely affected documented methods/closures and consumer/client boundaries. Preserve original execution identities, adverse receipts and both legacy runtime bridges. Unknown/computed/external consumers remain unknown; no arbitrary third-party method or historical-target qualification follows, and no unchanged API campaign is restarted.",
-          "historical_evidence_modified": false
+          "still_open": "Retain the existing API1.0 documented-subset/capability/version/budget freeze at its original 42032477 source and package inputs. Review the final candidate consumed API/helper, Generator, configuration, target, metadata, fixture/controller, engine/mod, save and endpoint inputs before evidence reuse; run only genuinely affected documented methods/closures and consumer/client boundaries. Preserve original execution identities, adverse receipts and both legacy runtime bridges. Unknown/computed/external consumers remain unknown; no arbitrary third-party method or historical-target qualification follows, and no unchanged API campaign is restarted. Qualify the legacy-browser-tab-aware-search-correction on the final corrected package with explicit and retained Settings-tab legacy search and independent native/research-query state. Keep current frozen501 execution distinct;do not claim host opposition as native acceptance. Complete remaining historical/inter-release and actual legacy-consumer reconciliation without fabricating unavailable originals,retiring unknown consumers,or restoring unconsumed preview frameworks.",
+          "historical_evidence_modified": false,
+          "accepted_freeze_record": "CONT-14.api10-freeze-routing-reconciled"
         },
         "published_beta_readback": {
           "tags": [
@@ -7136,6 +7845,19 @@
           "asset_mutations": 0,
           "new_candidate_packages_built": 0,
           "scope": "Package boundary readback only; global stable and final-candidate gates remain open."
+        },
+        "overlap_reconciliation": {
+          "accepted_record": "CONT-14.historical-api-sdk-entrypoint-intents",
+          "accepted_reviewed_against": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+          "selected_blobs": 17,
+          "already_reconciled_blobs": [
+            "22f6f391dc55d391a0c73cb6ea8f09c763cda73b",
+            "7804f9c0998e8cfccd826188ae565f7d26f1dc1a",
+            "c954e2ad2684d06e3781a1a4213e04db240b4bee",
+            "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+          ],
+          "additional_selected_blobs": 13,
+          "disposition": "Consolidate the shared SDK validation, discovery and tooling-custody intents with the accepted record. The 17 selected blobs and 127 tag/path references describe this bounded review corpus, not 17 newly uncovered behaviors. Preserve the accepted source variants, freeze readback, legacy Settings-search correction and its required native check unchanged."
         }
       }
     ],
@@ -7316,10 +8038,10 @@
             "spec/evidence/api-production-current7b0-aero-applicability-r01.json",
             "spec/evidence/api1-documented-subset-qualification-r01.json"
           ],
-          "remaining_executable_check": "Retain the existing API1.0 documented-subset/capability/version/budget freeze at its original 42032477 source and package inputs. Review the final candidate consumed API/helper, Generator, configuration, target, metadata, fixture/controller, engine/mod, save and endpoint inputs before evidence reuse; run only genuinely affected documented methods/closures and consumer/client boundaries. Preserve original execution identities, adverse receipts and both legacy runtime bridges. Unknown/computed/external consumers remain unknown; no arbitrary third-party method or historical-target qualification follows, and no unchanged API campaign is restarted.",
+          "remaining_executable_check": "Retain the existing API1.0 documented-subset/capability/version/budget freeze at its original 42032477 source and package inputs. Review the final candidate consumed API/helper, Generator, configuration, target, metadata, fixture/controller, engine/mod, save and endpoint inputs before evidence reuse; run only genuinely affected documented methods/closures and consumer/client boundaries. Preserve original execution identities, adverse receipts and both legacy runtime bridges. Unknown/computed/external consumers remain unknown; no arbitrary third-party method or historical-target qualification follows, and no unchanged API campaign is restarted. Qualify the legacy-browser-tab-aware-search-correction on the final corrected package with explicit and retained Settings-tab legacy search and independent native/research-query state. Keep current frozen501 execution distinct;do not claim host opposition as native acceptance.",
           "owner": "Aero; Black Glass executes affected checks",
           "independent_review": "Aero",
-          "status": "original documented-subset contract freeze recorded; final-candidate applicability remains open"
+          "status": "original documented-subset contract freeze recorded; final-candidate applicability and changed legacy-search native check remain open"
         },
         {
           "subjects": [

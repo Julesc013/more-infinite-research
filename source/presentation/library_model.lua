@@ -211,7 +211,7 @@ end
 local function prerequisite_facts(technology)
   if technology == nil then return {}, false, true end
   local prerequisites = native_read(technology, "prerequisites")
-  local names, ready = {}, native_read(technology, "enabled") ~= false
+  local names, ready = {}, native_read(technology, "enabled") == true
   if prerequisites == nil then return names, ready, true end
   local complete = true
   local ok = pcall(function()
@@ -266,6 +266,13 @@ local function row_for(force, declaration, id, technology, queue_count, queue_in
   local is_current = current == id
   local researched = native_read(technology, "researched") == true
   local enabled = native_read(technology, "enabled") == true
+  local prototype = native_read(technology, "prototype")
+  local native_hidden = native_read(prototype, "hidden") == true
+  -- Only the host's explicit engine capability admits this modern field.
+  -- Historical prototypes must never be probed for research_trigger.
+  local triggered = type(context) == "table" and context.research_triggers_supported == true
+    and native_read(prototype, "research_trigger") ~= nil
+  ready = ready and enabled and not researched and not native_hidden and not triggered
   local visible = native_read(technology, "visible_when_disabled") == true
   local native_order = bounded_string(native_read(technology, "order"), MAX_TEXT)
     or (declaration and declaration.native_order) or ""
@@ -302,6 +309,8 @@ local function row_for(force, declaration, id, technology, queue_count, queue_in
   }
   if technology == nil then row.status = "missing"
   elseif queued_count > 0 or is_current then row.status = "queued"
+  elseif researched then row.status = "complete"
+  elseif not enabled then row.status = "disabled"
   elseif ready then row.status = "ready"
   else row.status = "locked" end
   return row
@@ -341,8 +350,8 @@ end
 
 local function status_matches(row, status)
   if status == 1 then return true end
-  if status == 2 then return row.status == "ready" end
-  if status == 3 then return row.status == "locked" end
+  if status == 2 then return row.ready == true end
+  if status == 3 then return row.status ~= "missing" and row.ready ~= true and row.researched ~= true end
   return row.status == "queued" end
 
 local function mode_matches(row, mode)
