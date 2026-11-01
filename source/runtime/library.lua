@@ -1811,6 +1811,16 @@ function M.open(player, options)
   if options.settings_scope == "research" or options.settings_scope == "options" then
     view.settings_scope, view.setting_selected = options.settings_scope, nil
   end
+  -- The shipped remote browser's search follows its selected or retained tab.
+  -- Keep the explicit internal query fields independent from this legacy input.
+  if type(options.search) == "string" then
+    if view.tab == "settings" then
+      view.settings_query, view.setting_selected = text(options.search), nil
+    else
+      view.query = text(options.search)
+    end
+    reset_page = true
+  end
   if type(options.settings_search) == "string" then
     view.settings_query, view.setting_selected = text(options.settings_search), nil
   end
