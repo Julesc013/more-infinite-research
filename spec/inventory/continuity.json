@@ -4924,6 +4924,594 @@
         "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
       }
     ],
-    "next_bounded_work": "Complete the CONT-10 known-bad-versus-restored behavior mapping and packaged visual/input slice with the native owner; then classify the deduplicated old test intents by the existing CONT subjects. Do not rerun all old campaigns or reopen unrelated accepted migrations/startup evidence."
+    "next_bounded_work": "Complete independent r15 packet review when Black Glass binds the exact runtime/actions; continue the unresolved historical Library/crash/runtime/compatibility/API groups using bounded intent reviews. Reconcile stale subject descriptions against their named original results, without editing the progress header concurrently or rerunning every historical campaign.",
+    "bounded_intent_reviews": [
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-07",
+          "CONT-11"
+        ],
+        "reviewed_against": "a79145266b9cc5a4b108310e94817e9e0f9c6fb7",
+        "scope": "Eight selected historical entry points plus three directly consumed settings/browser controls. This is bounded intent reconciliation, not a disposition of every historical test or all dependencies of the old native runners.",
+        "method": "Compare exact published 4.7.3 source with preserved 4.2.1 adverse history, deduplicate equal blob OIDs, inspect named assertions and follow wrapper-only settings tests to their actual Python/Lua expectations. No old runner is executed or restored.",
+        "sources": [
+          {
+            "path": "tests/runtime/Test-MIRClassicProfileBrowserStatus.ps1",
+            "references": [
+              {
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "32485f98802fbb27e64342c45385ec9a92f8cf76",
+                "role": "published-4.7.3-reference"
+              }
+            ]
+          },
+          {
+            "path": "tests/runtime/Test-MIR42F200SettingsCapTransition.ps1",
+            "references": [
+              {
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "4150e1173f2fe72d4b91c949d1cc4afc3402a5d3",
+                "role": "published-4.7.3-reference"
+              },
+              {
+                "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                "blob": "4150e1173f2fe72d4b91c949d1cc4afc3402a5d3",
+                "role": "4.2.1-adverse-history-comparator"
+              }
+            ]
+          },
+          {
+            "path": "tests/runtime/Test-MIR42F200SettingsCapTransitionStatic.ps1",
+            "references": [
+              {
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "de07f158cb44b20949dd54623a74025f17c56061",
+                "role": "published-4.7.3-reference"
+              },
+              {
+                "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                "blob": "de07f158cb44b20949dd54623a74025f17c56061",
+                "role": "4.2.1-adverse-history-comparator"
+              }
+            ]
+          },
+          {
+            "path": "tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1",
+            "references": [
+              {
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "b3ec4ad75536b5a5f814233f1175eb3f37f34780",
+                "role": "published-4.7.3-reference"
+              },
+              {
+                "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                "blob": "e976f4a083aeb423f896cd54474739f5811b49c8",
+                "role": "4.2.1-adverse-history-comparator"
+              }
+            ]
+          },
+          {
+            "path": "tests/runtime/Test-MIR42V2V3CapMigration.ps1",
+            "references": [
+              {
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "bf77bd0275507e58d34be26c9f0f69ec9cd367ea",
+                "role": "published-4.7.3-reference"
+              },
+              {
+                "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                "blob": "3a981acbaaf1e7efd6d3655531b57ec01c0cf6be",
+                "role": "4.2.1-adverse-history-comparator"
+              }
+            ]
+          },
+          {
+            "path": "tests/runtime/Test-MIRSettingsCatalogueLifecycle.ps1",
+            "references": [
+              {
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "8c0f1671ee2edb665921a58dc4afa6c1de6fcf34",
+                "role": "published-4.7.3-reference"
+              }
+            ]
+          },
+          {
+            "path": "tests/runtime/Test-MIRK2213ImersiteMigration.ps1",
+            "references": [
+              {
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "1929be52ea3ac0112b33228e4576aa291cdb949f",
+                "role": "published-4.7.3-reference"
+              },
+              {
+                "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                "blob": "1929be52ea3ac0112b33228e4576aa291cdb949f",
+                "role": "4.2.1-adverse-history-comparator"
+              }
+            ]
+          },
+          {
+            "path": "tests/runtime/Test-MIR4RuntimeContinuityMigration.ps1",
+            "references": [
+              {
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "148813c9021d151184bc61c5ebfcc24080638d25",
+                "role": "published-4.7.3-reference"
+              },
+              {
+                "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                "blob": "148813c9021d151184bc61c5ebfcc24080638d25",
+                "role": "4.2.1-adverse-history-comparator"
+              }
+            ]
+          },
+          {
+            "path": "tests/runtime/run_classic_profile_browser_status_controls.py",
+            "references": [
+              {
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "b67ceb82862cd6c0f2a37ee83697955c7ceba77c",
+                "role": "published-4.7.3-reference"
+              }
+            ]
+          },
+          {
+            "path": "tests/runtime/classic_profile_browser_status.lua",
+            "references": [
+              {
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "53e6464262ceebf3abe6d9ea3f6cb92e1dcdd791",
+                "role": "published-4.7.3-reference"
+              }
+            ]
+          },
+          {
+            "path": "tests/runtime/run_settings_catalogue_lifecycle_controls.py",
+            "references": [
+              {
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "401f5da14fc440762d02e8aa169d8e6590082e59",
+                "role": "published-4.7.3-reference"
+              }
+            ]
+          }
+        ],
+        "groups": [
+          {
+            "subjects": [
+              "CONT-03"
+            ],
+            "disposition": "consolidate",
+            "historical_paths": [
+              "tests/runtime/Test-MIRClassicProfileBrowserStatus.ps1",
+              "tests/runtime/run_classic_profile_browser_status_controls.py",
+              "tests/runtime/classic_profile_browser_status.lua"
+            ],
+            "independent_expectation": "Classic-profile browser SCB-01..05: an old hidden classic preference keeps the full Library enrichment available after parsing; stale reduced-profile transport must not recreate an alternate catalogue or trigger callback-time module loading.",
+            "current_implementation": [
+              "source/research/historical_settings.lua",
+              "source/research/settings.lua",
+              "source/runtime/library.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_settings_profile.py",
+              "tests/test_library_model.py",
+              "tests/test_library.py"
+            ],
+            "original_evidence": [],
+            "remaining_executable_check": "Bind the retained hidden preference to the selected successor and observe the affected nondefault catalogue/Library output. Keep callback-stage isolation host controls; do not recreate the retired compiler DTO.",
+            "owner": {
+              "reconciliation": "Aero",
+              "native": "Black Glass"
+            },
+            "limits": "The old compiler_scope field and declaration-module names are implementation-only. The saved setting identity and no-reduced-catalogue behavior remain retained; no new native result is claimed."
+          },
+          {
+            "subjects": [
+              "CONT-03",
+              "CONT-07"
+            ],
+            "disposition": "port",
+            "historical_paths": [
+              "tests/runtime/Test-MIR42F200SettingsCapTransition.ps1",
+              "tests/runtime/Test-MIR42F200SettingsCapTransitionStatic.ps1"
+            ],
+            "independent_expectation": "Assert-State seed/capped/relaxed: a settings-derived F200 gear cap retains earned levels/effects and foreign disablement; relaxation restores only MIR-owned changes. The static control fixes the Base-only official-mod closure explicitly.",
+            "current_implementation": [
+              "source/runtime/legacy_caps.lua",
+              "source/runtime/caps.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_legacy_caps.py::test_imports_only_the_published_f200_settings_derived_gear_tuple",
+              "tests/test_legacy_caps_lifecycle.py::test_f200_settings_derived_gear_right_restores_only_on_the_f200_catalogue"
+            ],
+            "original_evidence": [
+              "spec/evidence/f200-positive-cap-qualified-chain.json",
+              "spec/evidence/f200-published-science-control-chain.json"
+            ],
+            "remaining_executable_check": "Review consumed inputs of the original gear/worker native chains against the frozen successor; execute only affected setting/configuration/removal-readdition boundaries.",
+            "owner": {
+              "reconciliation": "Aero",
+              "native": "Black Glass"
+            },
+            "limits": "Identical old static/native blobs are consolidated across the two refs. Existing gear/worker evidence is bounded to its recorded engine, save and owners; other caps are unqualified by analogy."
+          },
+          {
+            "subjects": [
+              "CONT-07"
+            ],
+            "disposition": "port",
+            "historical_paths": [
+              "tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1"
+            ],
+            "independent_expectation": "Assert-MIR42Data/State: enforce caps for the named force, preserve earned-above-cap effects and unrelated current/queued research and fractional progress, and restore only owned enablement/visibility changes. Foreign disablement stays untouched.",
+            "current_implementation": [
+              "source/runtime/caps.lua",
+              "source/runtime/legacy_caps.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_caps.py",
+              "tests/test_legacy_caps.py",
+              "tests/test_legacy_caps_lifecycle.py"
+            ],
+            "original_evidence": [
+              "spec/evidence/f200-positive-cap-qualified-chain.json",
+              "spec/evidence/full-catalogue-upgrade-chain.json",
+              "spec/evidence/competing-fixed-removal-control-native-chain.json"
+            ],
+            "remaining_executable_check": "Map admitted owner/force identities to the exact native scenario before reusing the bounded receipts; qualify remaining cap identities and remove/readd transitions affected by the candidate.",
+            "owner": {
+              "reconciliation": "Aero",
+              "native": "Black Glass"
+            },
+            "limits": "The differing 4.2.1 and 4.7.3 blobs remain separate observations. This classification does not treat the adverse version as a desired implementation or assert all-force native coverage."
+          },
+          {
+            "subjects": [
+              "CONT-07",
+              "CONT-11"
+            ],
+            "disposition": "port",
+            "historical_paths": [
+              "tests/runtime/Test-MIR42V2V3CapMigration.ps1"
+            ],
+            "independent_expectation": "Assert-State: retain versioned cap rights across V2/V3 transport, cap-zero restoration, current/queued research, fractional progress and named-force state; ownership must distinguish foreign or subsequently changed enablement from visibility.",
+            "current_implementation": [
+              "source/runtime/legacy_caps.lua",
+              "source/runtime/caps.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_legacy_caps.py::test_schema1_keeps_foreign_and_changed_enablement_separate_from_visibility",
+              "tests/test_legacy_caps_lifecycle.py"
+            ],
+            "original_evidence": [
+              "spec/inventory/migration-origins.json"
+            ],
+            "remaining_executable_check": "Match each relevant schema/owner state to an existing selected migration route by consumed state, or name its missing protected input. Use one affected route for a genuinely uncovered contract, not every patch.",
+            "owner": {
+              "reconciliation": "Aero",
+              "native": "Black Glass"
+            },
+            "limits": "The old harness excludes F200 V2-to-V3 qualification; this source review does not supply that missing result or reopen the accepted finite migration policy."
+          },
+          {
+            "subjects": [
+              "CONT-03"
+            ],
+            "disposition": "port",
+            "historical_paths": [
+              "tests/runtime/Test-MIRSettingsCatalogueLifecycle.ps1",
+              "tests/runtime/run_settings_catalogue_lifecycle_controls.py"
+            ],
+            "independent_expectation": "Settings lifecycle runner: the setting-spec catalogue is stable after parse closure; spec/default/profile validation and runtime-setting bindings remain usable without late requires. Its intentionally lazy old-catalogue opponent fails at the post-parse require boundary.",
+            "current_implementation": [
+              "source/research/settings.lua",
+              "source/research/historical_settings.lua",
+              "source/runtime/catalogue.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_settings_profile.py",
+              "tests/test_settings_commands.py",
+              "tests/test_library_model.py"
+            ],
+            "original_evidence": [],
+            "remaining_executable_check": "Review current host coverage of catalogue immutability and callback-time availability; retain or port an independent rejection control if that expectation is missing. The old compiler-profile eager-use assertion itself needs no replacement.",
+            "owner": {
+              "reconciliation": "Aero",
+              "native": "Black Glass"
+            },
+            "limits": "The wrapper is followed to its real independent assertions. Python/Lua transport and compiler-profile module shape are obsolete machinery, while the runtime stage-safety obligation remains."
+          },
+          {
+            "subjects": [
+              "CONT-11"
+            ],
+            "disposition": "port",
+            "historical_paths": [
+              "tests/runtime/Test-MIRK2213ImersiteMigration.ps1"
+            ],
+            "independent_expectation": "The pinned K2 2.1.3/K2SO 2.0.13 predecessor-to-continuation case preserves actual hidden Imersite credit and named state through upgrade/save/reload; do not replace exact inputs or treat a retired staging runner as current qualification.",
+            "current_implementation": [
+              "source/runtime/k2_imersite_migration.lua",
+              "source/migrations/more-infinite-research_4.7.0.json"
+            ],
+            "current_host_controls": [
+              "tests/test_k2_imersite_migration.py"
+            ],
+            "original_evidence": [
+              "spec/evidence/k2-direct-current38c-native-chain-r01.json"
+            ],
+            "remaining_executable_check": "Review the exact current-direct chain against the successor; qualify affected carrier removal/readdition and filename/state reconciliation without rerunning an unchanged predecessor campaign.",
+            "owner": {
+              "reconciliation": "Aero",
+              "native": "Black Glass"
+            },
+            "limits": "The preserved old runner is explicitly retired. k2so-material-native-chain.json excludes predecessor migration and cannot satisfy this row. Current-direct evidence keeps its original inputs and observation identity."
+          },
+          {
+            "subjects": [
+              "CONT-11"
+            ],
+            "disposition": "obsolete-implementation-only",
+            "historical_paths": [
+              "tests/runtime/Test-MIR4RuntimeContinuityMigration.ps1"
+            ],
+            "independent_expectation": "The historical runtime-continuity tooling test verifies an immutable receipt, read-only check/show parity and rejection of generate/write operations; it is not a gameplay save migration.",
+            "current_implementation": [],
+            "current_host_controls": [],
+            "original_evidence": [],
+            "remaining_executable_check": "No port or native rerun for this receipt-only assertion. Keep applicable player migration filename/state obligations under CONT-11 and the existing migration-origin inventory.",
+            "owner": {
+              "reconciliation": "Aero",
+              "native": "Black Glass"
+            },
+            "limits": "Retire only the old governance/CLI projection assertions. Preserve their source refs and receipt custody; this disposition supplies no migration acceptance."
+          }
+        ],
+        "unreviewed_dependencies": "Other consumers/helpers, inter-release edits, issues/PR discussions and attachments remain in the unresolved VER-07 source inventory. These eleven paths and grouped expectations do not close CONT-03, CONT-07 or CONT-11.",
+        "native_execution": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false
+      }
+    ],
+    "stable_coverage_review": {
+      "reviewed_against": "a79145266b9cc5a4b108310e94817e9e0f9c6fb7",
+      "public_candidate": "v5.0.1 prerelease; next changed public player bytes use 5.0.2 unless live history advances",
+      "scope": "Finite routing of the existing CONT and release obligations, not a second request ledger, a complete historical-source disposition or a candidate qualification verdict. The detailed CONT-10 acceptance_rows remain authoritative for their nine UI areas.",
+      "rows": [
+        {
+          "subjects": [
+            "CONT-10",
+            "VER-07"
+          ],
+          "independent_expectation": "Accepted 4.2 interaction amendment: retained split browse/details, narrow fallback, continuous results, operable dropdowns/checkboxes/search/filter/hide/size/reset and native handoff; no restored pagination or queue-mutation authority.",
+          "implementation": [
+            "source/runtime/library.lua",
+            "source/presentation/library_model.lua"
+          ],
+          "applicable_evidence": [
+            "spec/evidence/library-cont10-layout-negative-control-r01.json"
+          ],
+          "remaining_executable_check": "Exercise each affected Research/Availability/Queue/Settings/Help control with actual pointer/keyboard input at representative sizes/scales and English/German text; retain rendered frames and unchanged native research/foreign state. r15 alone does not cover all views or controls.",
+          "owner": "Black Glass",
+          "independent_review": "Aero",
+          "status": "open; original evidence is not relabelled as current"
+        },
+        {
+          "subjects": [
+            "CONT-10"
+          ],
+          "independent_expectation": "The exact imported 1.1 successor retains earned private credits while refusing hidden selection/actions; real typing, drag, both close events, foreign focus, removal/replacement, saved-host restart and read-only load keep distinct client identity and personal views.",
+          "implementation": [
+            "tests/fixtures/library-native-input/control.lua",
+            "source/runtime/library.lua"
+          ],
+          "applicable_evidence": [
+            "spec/evidence/library-native-input-observer-r15-prepared.json",
+            "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+          ],
+          "remaining_executable_check": "Bind final 5.0.1 player/archive/profile/runtime/action/controller/packet hashes, pass real dispatcher composition offline, obtain independent complete-packet review, then run r15 on each affected engine family. F210 index reuse still requires exact name/phase/removal/ref retirement; preparation is not a result.",
+          "owner": "Black Glass",
+          "independent_review": "Aero",
+          "status": "open; original evidence is not relabelled as current"
+        },
+        {
+          "subjects": [
+            "CONT-03",
+            "CONT-10"
+          ],
+          "independent_expectation": "Settings show raw/default/effective values and provenance, preserving false/zero; full/compact MIRSET1 import/export validates meaning and actual files target the requesting client/server without native mutation or automatic upload.",
+          "implementation": [
+            "source/runtime/library.lua",
+            "source/research/settings.lua",
+            "source/research/settings_profile.lua"
+          ],
+          "applicable_evidence": [],
+          "remaining_executable_check": "Complete the reviewed export/import and requesting-player/server file checks with actual UI input, malformed/read-only/write-failure controls and lifecycle. Preserve failed export/controller attempts; do not classify them as product passes.",
+          "owner": "Black Glass",
+          "independent_review": "Aero",
+          "status": "open; original evidence is not relabelled as current"
+        },
+        {
+          "subjects": [
+            "CONT-10",
+            "CONT-11"
+          ],
+          "independent_expectation": "Accepted personal query/selection/scroll/position/size survives relevant reopen/save/configuration transitions; removed roots/players and late translations are retired. Public-beta-to-successor continuity is separate from the imported 1.1 case.",
+          "implementation": [
+            "source/runtime/library.lua",
+            "source/runtime/library_translations.lua"
+          ],
+          "applicable_evidence": [
+            "spec/inventory/library-baseline.json"
+          ],
+          "remaining_executable_check": "Preserve a protected published 5.0.0/5.0.1 personal-state input and qualify the affected successor transition, including separate-client locale/translation state. Name missing input explicitly; imported credit r15 is not proof of this route.",
+          "owner": "Black Glass",
+          "independent_review": "Aero",
+          "status": "open; original evidence is not relabelled as current"
+        },
+        {
+          "subjects": [
+            "CONT-03",
+            "CONT-07",
+            "CONT-11"
+          ],
+          "independent_expectation": "The bounded settings/cap source intents above retain false/zero/profile precedence, earned-above-cap, force/queue/progress and foreign-state ownership across settings/configuration changes.",
+          "implementation": [
+            "source/research/settings.lua",
+            "source/runtime/caps.lua",
+            "source/runtime/legacy_caps.lua"
+          ],
+          "applicable_evidence": [
+            "spec/evidence/f200-positive-cap-qualified-chain.json"
+          ],
+          "remaining_executable_check": "Finish source-intent mapping for the named group and review original consumed inputs; run affected nondefault output and remaining admitted owner/removal-readdition cases rather than restarting all old cap campaigns.",
+          "owner": "Aero; Black Glass executes native checks",
+          "independent_review": "Aero",
+          "status": "open; original evidence is not relabelled as current"
+        },
+        {
+          "subjects": [
+            "CONT-11",
+            "CONT-13"
+          ],
+          "independent_expectation": "Retain the accepted nine 4.7.3 same-edition routes, seven selected older-contract groups and four forward journeys within their actual scopes; preserve cumulative migration filenames and ambiguous foreign locks.",
+          "implementation": [
+            "source/migrations",
+            "source/runtime/k2_imersite_migration.lua"
+          ],
+          "applicable_evidence": [
+            "spec/inventory/migration-origins.json"
+          ],
+          "remaining_executable_check": "Review final-candidate source/data/engine/mod/settings/save/harness/endpoint applicability for each named route; retain unaffected original identities, execute affected routes and beta-to-successor state only. No every-old-patch or expanded historical campaign.",
+          "owner": "Aero; Black Glass executes affected checks",
+          "independent_review": "Aero",
+          "status": "open; original evidence is not relabelled as current"
+        },
+        {
+          "subjects": [
+            "CONT-01",
+            "CONT-02",
+            "CONT-04",
+            "CONT-05",
+            "CONT-06",
+            "CONT-12"
+          ],
+          "independent_expectation": "The supported profile retains complete delivered catalogue/settings/science/owner/effect semantics and useful physical output under dependency-valid inputs; host or boot success is not gameplay parity.",
+          "implementation": [
+            "source/research",
+            "source/compatibility/modern_catalogue"
+          ],
+          "applicable_evidence": [
+            "spec/inventory/continuity.json"
+          ],
+          "remaining_executable_check": "Reconcile existing subject-specific exact chains and consumed inputs into the selected-profile native queue; qualify remaining named full-suite/provider/settings/output boundaries. Keep Driku/report-specific unknown archives and intentional exclusions explicit.",
+          "owner": "Aero; Black Glass owns native queue",
+          "independent_review": "Aero",
+          "status": "open; original evidence is not relabelled as current"
+        },
+        {
+          "subjects": [
+            "CONT-08",
+            "CONT-09",
+            "CONT-10",
+            "PERF-01",
+            "PERF-02",
+            "PERF-03",
+            "PERF-04"
+          ],
+          "independent_expectation": "Matched Base, Space Age and fixed upstream-valid heavy Space Age on pinned 2.0/2.1 measure process-to-responsive-menu, load, large useful active work/spikes, throughput/backlog/delay, Library closed/open and retained memory; normal acceptance and diagnostics remain separate.",
+          "implementation": [
+            "source/runtime/bootstrap.lua",
+            "source/runtime/scripted_effects.lua",
+            "source/runtime/passive_repair.lua",
+            "source/runtime/library.lua"
+          ],
+          "applicable_evidence": [
+            "spec/evidence/runtime-current38c-complete-native-chain-r01.json",
+            "spec/evidence/library-repeatability-diagnostic-r02-native-chain.json",
+            "spec/evidence/library-diagnostic-r02-aero-independent-review-r01.json"
+          ],
+          "remaining_executable_check": "Review the whole-product fixed inputs and retained five failed memory controls, then complete only ready admitted campaigns and affected current-package comparisons. No relaxed tolerances, changed workload, informational MIR1-5 rerun or automatic reboot campaign.",
+          "owner": "Black Glass",
+          "independent_review": "Aero",
+          "status": "open; original evidence is not relabelled as current"
+        },
+        {
+          "subjects": [
+            "CONT-14"
+          ],
+          "independent_expectation": "Draft API query/capability/version/budget and actual useful independent-consumer state/effect boundaries must be verified before API 1.0 stability; queries do not mutate state.",
+          "implementation": [
+            "source/api/v1/data.lua",
+            "source/api/v1/runtime.lua",
+            "sdk"
+          ],
+          "applicable_evidence": [
+            "spec/evidence/api-production-current7b0-aero-applicability-r01.json"
+          ],
+          "remaining_executable_check": "Finish documented-subset/version/capability/budget verdict and consumed-input applicability. Reuse only the methods/closures already observed; execute genuinely affected uncovered consumer/client boundaries.",
+          "owner": "Aero; Black Glass executes affected checks",
+          "independent_review": "Aero",
+          "status": "open; original evidence is not relabelled as current"
+        },
+        {
+          "subjects": [
+            "CONT-13",
+            "CONT-16",
+            "CONT-17"
+          ],
+          "independent_expectation": "One final candidate has the nine stable edition subsets, correct exact Base floors, source/tag/FFFPP identities, package contents, authored history and usable README/support/API/upgrade copy. F018 and early extras remain experimental/best effort.",
+          "implementation": [
+            "targets/editions.json",
+            "tools/package.py",
+            "README.md",
+            "CHANGELOG.md",
+            "source/changelog.txt"
+          ],
+          "applicable_evidence": [],
+          "remaining_executable_check": "Freeze exact committed source and accepted packages; independently verify membership/root/info/changelog/filename/tag and final documentation. Keep published beta bytes and all custody; do not rebuild an existing public version.",
+          "owner": "Aero; Black Glass freezes candidate",
+          "independent_review": "Aero",
+          "status": "open; original evidence is not relabelled as current"
+        },
+        {
+          "subjects": [
+            "VER-07",
+            "CONT-15"
+          ],
+          "independent_expectation": "Disposition every relevant inventoried source group and accepted behavior with original IDs/decisions; preserve rejected/proposed intent and missing original reporter configurations honestly.",
+          "implementation": [
+            "spec/inventory/continuity.json",
+            "spec/programmes/community-requests.json"
+          ],
+          "applicable_evidence": [],
+          "remaining_executable_check": "Continue deduplicated Library/crash/runtime/compatibility/API test intents, inter-release removals and original discussions/attachments; unresolved sources stay unresolved. Retain all 87 original request records unchanged; do not substitute representative fixtures for missing reporters.",
+          "owner": "Aero",
+          "independent_review": "Aero",
+          "status": "open; original evidence is not relabelled as current"
+        },
+        {
+          "subjects": [
+            "CONT-16",
+            "CONT-17"
+          ],
+          "independent_expectation": "Stable GO requires one coherent qualified candidate, independent review, required exact-head CI, checked main/tag promotion, administration and distinct immutability probes, identical public downloads and primary dist handoff.",
+          "implementation": [
+            "tools/commands/release/Test-MIRGitHubAdministration.ps1",
+            "tools/release.py"
+          ],
+          "applicable_evidence": [],
+          "remaining_executable_check": "After all applicable verdicts close, review the complete inventory/release claims, publish GitHub only through Black Glass, anonymously hash-verify each asset and verify primary clean synchronized delivery. The maintainer owns Mod Portal.",
+          "owner": "Black Glass; Aero independently verifies delivery",
+          "independent_review": "Aero",
+          "status": "open; original evidence is not relabelled as current"
+        }
+      ],
+      "verdict": "NOT-READY: Library native/input/export/personal-state, historical-source reconciliation, current profile/save/API applicability, complete performance and final-candidate/delivery gates remain open.",
+      "native_execution": false,
+      "release_qualification": false
+    }
   }
 }
