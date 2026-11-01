@@ -1,4 +1,23 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.1
+Date: 2026-11-01
+
+  Changes:
+
+    - Restore the Research Library's research list and selected details side by side at normal window widths, with a readable
+      stacked layout when space is narrow.
+    - Add explicit larger, smaller and reset controls, and retain the Library's size and position while switching tabs.
+    - Restore native localized research names and complete selected-research details.
+    - Keep search and filters responsive while the displayed results refresh.
+
+  Bugfixes:
+
+    - Keep loading when Strategy Mortar Turret changes Ironclad's mortar firing-speed bonus.
+    - Avoid a false startup refusal after Krastorio 2: Spaced Out patch updates within the reviewed major/minor version lines.
+    - Preserve an existing train-braking research technology instead of failing on a duplicate.
+    - Close MIR's owned Library window before a player is removed, preventing stale views from surviving player-slot reuse.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.0
 Date: 2026-10-31
 

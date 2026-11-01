@@ -19,6 +19,19 @@ class LibraryModelTests(unittest.TestCase):
           assert(catalogue.gear_id() == "recipe-prod-research_gears-1")
         ''')
 
+    def test_runtime_catalogue_passes_foreign_technology_map_to_pure_declarations(self):
+        self.lua.execute('''
+          script, mods = {active_mods={base="2.1.23"}}, nil
+          prototypes = {technology={ ["braking-force-8"]={owner="foreign"} }}
+          package.loaded["research.catalogue"] = nil
+          package.loaded["runtime.catalogue"] = nil
+          local catalogue = require("runtime.catalogue")
+          local ids = {}
+          for _, row in ipairs(catalogue.declared()) do ids[row.id] = true end
+          assert(not ids["braking-force-8"], "runtime adapter retained an already-owned native id")
+          assert(ids["research-speed-7"], "runtime adapter omitted an unrelated MIR continuation")
+        ''')
+
     def test_real_catalogue_queries_need_no_imports_or_reselection_after_control_parse(self):
         editions = json.loads((ROOT / "targets/editions.json").read_text())["targets"]
         profiles = [
@@ -50,7 +63,7 @@ class LibraryModelTests(unittest.TestCase):
                     selections = selections + 1
                     return select(...)
                   end
-                  local catalogue = require("research.catalogue")
+                  local catalogue = require("runtime.catalogue")
                   local parse_selections = selections
                   -- Factorio refuses even cached require calls in callbacks.
                   require = function(name) error("late runtime import: " .. name) end

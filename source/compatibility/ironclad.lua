@@ -2,6 +2,10 @@
 -- shooting-speed chain. Keep this one known binding outside the Generator.
 local M = {}
 
+local function finite_number(value)
+  return type(value) == "number" and value == value and value > -math.huge and value < math.huge
+end
+
 function M.continuation_effect()
   -- MIR's retained 40-percent anchor scales the native 1.3 mortar bonus.
   return {type = "gun-speed", ammo_category = "mortar-bomb", scale = 3.25}
@@ -23,8 +27,10 @@ function M.preflight(raw)
       error("MIR Ironclad native shooting-speed effect is malformed", 2)
     end
     if effect.type == "gun-speed" and effect.ammo_category == "mortar-bomb" then
-      if effect.modifier ~= 1.3 then
-        error("MIR Ironclad native mortar shooting-speed bonus changed", 2)
+      -- Other mods may rebalance this native value. MIR's continuation is an
+      -- authored 40-percent anchor and does not derive its output from it.
+      if not finite_number(effect.modifier) or effect.modifier < 0 then
+        error("MIR Ironclad native mortar shooting-speed bonus is invalid", 2)
       end
       matches = matches + 1
     end

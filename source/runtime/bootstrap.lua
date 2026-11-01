@@ -6,7 +6,7 @@
 -- callbacks.
 local lifecycle = require("runtime.lifecycle")
 local library = require("runtime.library")
-local catalogue = require("research.catalogue")
+local catalogue = require("runtime.catalogue")
 local runtime_api = require("api.v1.runtime")
 local settings_profile = require("runtime.settings_profile")
 local settings_commands = require("runtime.settings_commands")

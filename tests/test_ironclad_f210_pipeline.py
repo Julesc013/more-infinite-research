@@ -201,20 +201,38 @@ class IroncladF210PipelineTests(unittest.TestCase):
                 for category in ("bullet", "shotgun-shell", "cannon-shell", "rocket"):
                     self.assertEqual(native_by_category[category], effects[category])
 
-    def test_missing_category_or_changed_native_mortar_refuses_before_publication(self):
+    def test_rebalanced_native_mortar_bonus_keeps_mir_anchor(self):
+        for modifier in (1.0, 1.4):
+            def rebalance(raw):
+                for effect in raw["technology"]["weapon-shooting-speed-6"]["effects"]:
+                    if effect.get("ammo_category") == "mortar-bomb":
+                        effect["modifier"] = modifier
+
+            with self.subTest(modifier=modifier):
+                lua = self.stage("q117", mutate=rebalance)
+                self.assertTrue(lua.globals().outcome, str(lua.globals().message))
+                row = _plain(lua.globals().emitted)["weapon-shooting-speed-7"]
+                self.assertEqual(1.3, row["effects"][-1]["modifier"])
+
+    def test_missing_or_invalid_mortar_source_refuses_before_publication(self):
         def missing_category(raw):
             raw["ammo-category"].pop("mortar-bomb")
 
-        def changed_bonus(raw):
+        def missing_modifier(raw):
             for effect in raw["technology"]["weapon-shooting-speed-6"]["effects"]:
                 if effect.get("ammo_category") == "mortar-bomb":
-                    effect["modifier"] = 1.4
+                    effect.pop("modifier")
+
+        def invalid_bonus(raw):
+            for effect in raw["technology"]["weapon-shooting-speed-6"]["effects"]:
+                if effect.get("ammo_category") == "mortar-bomb":
+                    effect["modifier"] = -1
 
         def duplicate_bonus(raw):
             raw["technology"]["weapon-shooting-speed-6"]["effects"].append(
                 {"type": "gun-speed", "ammo_category": "mortar-bomb", "modifier": 1.3})
 
-        for mutate in (missing_category, changed_bonus, duplicate_bonus):
+        for mutate in (missing_category, missing_modifier, invalid_bonus, duplicate_bonus):
             with self.subTest(mutation=mutate.__name__):
                 lua = self.stage("q117", mutate=mutate)
                 self.assertFalse(lua.globals().outcome)

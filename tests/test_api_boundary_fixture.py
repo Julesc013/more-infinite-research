@@ -96,7 +96,7 @@ class ApiBoundaryFixtureTests(unittest.TestCase):
           if opponent=="missing" then technologies[names[2]]=nil end
           if opponent=="refused" then technologies["mir-api-boundary-refused-a-1"]={} end
           local force=readonly({valid=true,index=1,technologies=readonly(technologies),manual_crafting_speed_modifier=.05})
-          local product=base=="2.0.77" and "5.0.20000" or "5.0.21000"
+          local product=base=="2.0.77" and "5.0.20001" or "5.0.21001"
           local aliased
           local env={script={active_mods={base=base,["more-infinite-research"]=product},
             on_init=function(fn) callback=fn end},
@@ -143,7 +143,7 @@ class ApiBoundaryFixtureTests(unittest.TestCase):
                 self.assertEqual(result.logs, 0)
 
     def test_metadata_requires_exact_modern_candidate_and_has_no_private_import(self):
-        for target, family, base, product in (("f200", "2.0", "2.0.77", "5.0.20000"), ("f210", "2.1", "2.1.23", "5.0.21000")):
+        for target, family, base, product in (("f200", "2.0", "2.0.77", "5.0.20001"), ("f210", "2.1", "2.1.23", "5.0.21001")):
             value = json.loads((FIXTURE / f"info-{target}.json").read_text())
             self.assertEqual(value["factorio_version"], family)
             self.assertEqual(value["dependencies"], [f"base = {base}", f"more-infinite-research = {product}"])

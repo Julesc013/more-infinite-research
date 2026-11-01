@@ -4,7 +4,7 @@
 -- player's small view preference and GUI construction. Control.lua must route
 -- its callbacks explicitly; this file never registers handlers or creates a
 -- recurring subscription by itself.
-local catalogue = require("research.catalogue")
+local catalogue = require("runtime.catalogue")
 local settings_catalog = require("research.settings")
 -- Configuration resolves MIRSET1 precedence once at control parse time. The
 -- Availability view receives its compact stream map rather than resolving a

@@ -32,25 +32,28 @@ F110_PLUS_MIGRATION_TARGETS = {"f110", "f200", "f210"}
 
 class PackageTests(unittest.TestCase):
     def test_source_header_is_a_heading_not_an_entry_mention(self):
-        entry = (b"-" * 99 + b"\nVersion: 5.0.0\n\n  Changes:\n"
-                 b"    - Example source label: Version: 5.0.0\n")
+        source_distribution = json.loads(
+            (ROOT / "source/info.json").read_text(encoding="utf-8"))["version"]
+        source_version = pack.source_changelog_version(source_distribution)
+        entry = ("-" * 99 + "\nVersion: " + source_version + "\n\n  Changes:\n"
+                 "    - Example source label: Version: 5.0.0\n").encode("utf-8")
         files = {"LICENSE": b"retained license", "thumbnail.png": b"retained image",
                  "changelog.txt": entry,
                  pack.SOURCE_TARGET_PATH: (ROOT / "source" / pack.SOURCE_TARGET_PATH).read_bytes()}
-        self.assertEqual(files, pack.player_presentation(files, {"version": "5.0.21000"}))
+        self.assertEqual(files, pack.player_presentation(files, {"version": source_distribution}))
         local_files = pack.render_local_mir_target_version(
-            files, "5.0.21000", "6.1.21002", "more-infinite-research")
+            files, source_distribution, "6.1.21002", "more-infinite-research")
         self.assertEqual(b"Version: 6.1.2", local_files["changelog.txt"].splitlines()[1])
         self.assertIn(b"    - Example source label: Version: 5.0.0\n", local_files["changelog.txt"])
         for invalid in (b"Version: 4.7.3\n" + entry, entry + entry):
             with self.subTest(changelog=invalid):
                 with self.assertRaisesRegex(ValueError, "source-version header"):
                     pack.player_presentation(dict(files, **{"changelog.txt": invalid}),
-                                             {"version": "5.0.21000"})
+                                             {"version": source_distribution})
                 with self.assertRaisesRegex(ValueError, "source-version header"):
                     pack.render_local_mir_target_version(
                         dict(files, **{"changelog.txt": invalid}),
-                        "5.0.21000", "6.1.21002", "more-infinite-research")
+                        source_distribution, "6.1.21002", "more-infinite-research")
 
     @staticmethod
     def _git(repository, *arguments):
@@ -82,6 +85,9 @@ class PackageTests(unittest.TestCase):
 
     def test_selected_editions_have_one_actual_import_closure_and_exact_codec(self):
         source = ROOT / "source"
+        canonical = json.loads((source / "info.json").read_text(encoding="utf-8"))["version"]
+        major, minor, encoded = canonical.split(".")
+        source_patch = int(encoded) % 100
         published = json.loads((ROOT / "spec/inventory/target-load-order-470.json").read_text())
         dependencies = {row["target"]: row["dependencies"] for row in published["records"]}
         sif_ordering = "? space-is-fake"
@@ -121,7 +127,10 @@ class PackageTests(unittest.TestCase):
                 self.assertEqual(info["factorio_version"], family)
                 self.assertEqual(info["dependencies"], expected_dependencies)
                 self.assertEqual(info["dependencies"][0], "base >= " + minimum)
-                self.assertEqual(info["version"], "5.0." + target[1:] + "00")
+                self.assertEqual(
+                    info["version"],
+                    f"{major}.{minor}.{target[1:]}{source_patch:02d}",
+                )
                 self.assertEqual(json.loads(files["info.json"])["version"], info["version"])
                 self.assertIn(('id = "' + target + '"').encode(), files["platform/target.lua"])
                 probability = "independent_probability" if target == "f210" else "probability"
@@ -308,6 +317,8 @@ class PackageTests(unittest.TestCase):
     def test_committed_target_record_is_frozen_with_the_player_source_and_refuses_dirty_metadata(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
+            package_version = json.loads((ROOT / "source/info.json").read_text(encoding="utf-8"))["version"]
+            package_root = "more-infinite-research_" + package_version
             def git(*arguments):
                 return subprocess.check_output(["git", "-C", str(root), *arguments])
             git("init", "-q")
@@ -319,7 +330,7 @@ class PackageTests(unittest.TestCase):
                 file.parent.mkdir(parents=True, exist_ok=True)
                 file.write_text("return {}\n")
             (source / "info.json").write_text(json.dumps({"name":"more-infinite-research",
-                "version":"5.0.21000","factorio_version":"2.1","dependencies":["base >= 2.1.23"]}))
+                "version":package_version,"factorio_version":"2.1","dependencies":["base >= 2.1.23"]}))
             for name in ("LICENSE", "thumbnail.png", "changelog.txt"):
                 destination = source / name
                 destination.parent.mkdir(parents=True, exist_ok=True)
@@ -331,18 +342,18 @@ class PackageTests(unittest.TestCase):
             git("add", ".")
             git("commit", "-qm", "frozen player and edition")
             commit = git("rev-parse", "HEAD").decode().strip()
-            record = pack.build(source, root / "out/more-infinite-research_5.0.21000.zip",
+            record = pack.build(source, root / "out" / (package_root + ".zip"),
                                 revision=commit, target="f210")
             self.assertEqual(record["edition_record_sha256"], hashlib.sha256(original).hexdigest())
             self.assertEqual(record["source_commit"], commit)
             self.assertEqual(record["target"], "f210")
             self.assertEqual(record["target_record"], pack.TARGET_RECORD)
             with zipfile.ZipFile(record["archive"]) as archive:
-                info = json.loads(archive.read("more-infinite-research_5.0.21000/info.json"))
+                info = json.loads(archive.read(package_root + "/info.json"))
                 self.assertEqual(info["dependencies"], ["base >= 2.1.23"])
             edition.write_text('{"schema":1,"targets":{}}\n')
             git("add", edition.relative_to(root).as_posix())
-            rejected = root / "dirty/more-infinite-research_5.0.21000.zip"
+            rejected = root / "dirty" / (package_root + ".zip")
             with self.assertRaisesRegex(ValueError, "target record differs from the frozen revision"):
                 pack.build(source, rejected, revision=commit, target="f210")
             self.assertFalse(rejected.exists())
@@ -351,6 +362,9 @@ class PackageTests(unittest.TestCase):
     def test_staged_and_canonical_target_record_layouts_have_identical_selected_members(self):
         with tempfile.TemporaryDirectory() as temporary:
             temporary = Path(temporary)
+            source_version = json.loads((ROOT / "source/info.json").read_text(encoding="utf-8"))["version"]
+            major, minor, encoded = source_version.split(".")
+            source_patch = int(encoded) % 100
             staged_repository = temporary / "staged"
             canonical_repository = temporary / "canonical"
             staged_repository.mkdir()
@@ -363,7 +377,7 @@ class PackageTests(unittest.TestCase):
             self.assertEqual(set(editions), {"f013", "f014", "f015", "f016", "f017", "f018", "f100", "f110", "f200", "f210"})
             for target_id, edition in editions.items():
                 with self.subTest(target=target_id):
-                    version = "5.0." + target_id[1:] + "00"
+                    version = f"{major}.{minor}.{target_id[1:]}{source_patch:02d}"
                     member_root = "more-infinite-research_" + version
                     filename = member_root + ".zip"
                     staged = pack.build(
@@ -407,6 +421,8 @@ class PackageTests(unittest.TestCase):
 
     def test_every_edition_gets_the_complete_master_history_and_preserves_player_assets(self):
         source = ROOT / "source"
+        source_version = pack.source_changelog_version(
+            json.loads((source / "info.json").read_text(encoding="utf-8"))["version"])
         recovered = json.loads((ROOT / "spec/inventory/package-presentation-472.json").read_bytes())
         self.assertEqual(recovered["sums_sha256"], "5DF0282024F4CA376CBA56E6E848F8512D768E1520D47E1C6AD257567BC561A9")
         self.assertEqual(len(recovered["records"]), 9)
@@ -434,7 +450,7 @@ class PackageTests(unittest.TestCase):
                 self.assertEqual(current["license_sha256"], record["license_sha256"])
                 self.assertEqual(files["changelog.txt"], entry)
                 self.assertTrue(files["changelog.txt"].startswith(
-                    b"-" * 99 + b"\nVersion: 5.0.0\n"))
+                    ("-" * 99 + "\nVersion: " + source_version + "\n").encode("utf-8")))
                 self.assertEqual(files["changelog.txt"].count(b"Version: 1.0.0\n"), 1)
                 self.assertNotIn(b"Version: 1.9.5\n", files["changelog.txt"])
                 self.assertEqual(hashlib.sha256(files["LICENSE"]).hexdigest().upper(), record["license_sha256"])

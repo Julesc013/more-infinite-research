@@ -10,7 +10,7 @@
   "settings_mode": "Defaults",
   "mods": [
     {"name": "base", "version": "2.1.23", "enabled": true},
-    {"name": "more-infinite-research", "version": "5.0.21000", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.21001", "enabled": true},
     {"name": "mir-fixture-mir5-api-namespace-alpha", "version": "0.1.0", "enabled": true},
     {"name": "mir-fixture-mir5-api-namespace-beta", "version": "0.1.0", "enabled": true},
     {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true}

@@ -1,6 +1,7 @@
 """Pure controls for selected-target API capabilities and reduced stage adapters."""
 import argparse
 import importlib.util
+import json
 from pathlib import Path
 import sys
 import tempfile
@@ -139,10 +140,10 @@ class TargetAdapterTests(unittest.TestCase):
           package.loaded["__more-infinite-research__.api.v1.data"] = nil
           local selected = require("platform.target")
           assert(selected.id == "f210" and selected.factorio_version == "2.1")
-          assert(selected.minimum_base == "2.1.23" and selected.distribution_version == "5.0.21000")
+          assert(selected.minimum_base == "2.1.23" and selected.distribution_version == "5.0.21001")
           assert(not selected.reduced and selected.research_levels and selected.recipe_productivity)
           local api = require("__more-infinite-research__.api.v1.data")
-          assert(api.get_version().product == "5.0.21000")
+          assert(api.get_version().product == "5.0.21001")
           assert(api.get_capabilities().technology_creation and api.get_capabilities().recipe_productivity)
         ''')
 
@@ -219,13 +220,17 @@ class TargetAdapterTests(unittest.TestCase):
         ''')
 
     def test_selected_f018_package_runs_the_actual_reduced_stages(self):
+        source_version = json.loads((ROOT / "source/info.json").read_text(encoding="utf-8"))["version"]
+        major, minor, encoded = source_version.split(".")
+        source_patch = int(encoded) % 100
+        package_root = f"more-infinite-research_{major}.{minor}.018{source_patch:02d}"
         with tempfile.TemporaryDirectory() as temporary:
             temporary = Path(temporary)
-            archive = temporary / "more-infinite-research_5.0.01800.zip"
+            archive = temporary / (package_root + ".zip")
             pack.build(ROOT / "source", archive, target="f018")
             with zipfile.ZipFile(archive) as package:
                 package.extractall(temporary)
-            self.lua.globals().player_root = (temporary / "more-infinite-research_5.0.01800").as_posix()
+            self.lua.globals().player_root = (temporary / package_root).as_posix()
             self.lua.execute(r'''
               package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
               package.loaded["platform.target"] = nil
