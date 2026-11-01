@@ -147,11 +147,14 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             "C6C2470B438846484732E0E05D124DB31A1100C2F1AA0E770B327A4A6FBAFA5D",
         )
         control_path = FIXTURE / "control.lua"
+        # Keep the .3.2 archive bound to the immutable source used when r14
+        # was prepared; the current observer advances independently.
+        r14_source_revision = "4fadd571dfddc93d8ac9f3482b7105d09c9fa4a7"
         control_bytes = subprocess.check_output(
-            ["git", "show", "HEAD:tests/fixtures/library-native-input/control.lua"], cwd=ROOT
+            ["git", "show", f"{r14_source_revision}:tests/fixtures/library-native-input/control.lua"], cwd=ROOT
         )
         info_bytes = subprocess.check_output(
-            ["git", "show", "HEAD:tests/fixtures/library-native-input/info-input-identity-f210-501.json"],
+            ["git", "show", f"{r14_source_revision}:tests/fixtures/library-native-input/info-input-identity-f210-501.json"],
             cwd=ROOT,
         )
         self.assertIn(b'observer_version=="0.3.2"', control_bytes)
@@ -177,6 +180,79 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         old = json.loads((ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r13.json").read_text(encoding="utf-8"))
         self.assertEqual(old["mods"][2]["version"], "5.0.21000")
         self.assertEqual(old["mods"][4]["version"], "0.3.0")
+
+    def test_503_r15_profiles_reconstruct_the_exact_observer_archives(self):
+        record = json.loads(
+            (ROOT / "spec/evidence/library-native-input-observer-r15-prepared.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(record["kind"], "MIRLibraryNativeInputObserverPreparedV1")
+        self.assertEqual(record["status"], "exact r15 observer, archive and profile closure prepared; native execution pending")
+        source_revision = record["source"]["commit"]
+        self.assertEqual(len(source_revision), 40)
+
+        def raw_git_bytes(member):
+            return subprocess.check_output(
+                ["git", "show", f"{member['source_revision']}:{member['source']}"], cwd=ROOT
+            )
+
+        for prepared in record["profiles_and_archives"]:
+            target = prepared["target"]
+            with self.subTest(target=target):
+                profile_record = prepared["profile"]
+                profile_bytes = (ROOT / profile_record["path"]).read_bytes()
+                self.assertEqual(len(profile_bytes), profile_record["bytes"])
+                self.assertEqual(hashlib.sha256(profile_bytes).hexdigest().upper(), profile_record["sha256"])
+                profile = json.loads(profile_bytes)
+                self.assertEqual(profile["target"], target)
+                self.assertEqual(profile["engine"], prepared["engine"])
+                self.assertEqual(profile["protected_input_save"], prepared["protected_input_save"])
+                observer_rows = [row for row in profile["mods"] if row["name"] == "mir-fixture-mir5-library-native-input"]
+                self.assertEqual([(row["version"], row["enabled"]) for row in observer_rows], [("0.3.3", True)])
+                player_rows = [row for row in profile["mods"] if row["name"] == "more-infinite-research"]
+                self.assertEqual(len(player_rows), 1)
+                self.assertEqual(
+                    profile["archive_sha256"][prepared["player_package"]["name"]],
+                    prepared["player_package"]["sha256"],
+                )
+                self.assertEqual(len(prepared["archive"]["members"]), 2)
+                self.assertTrue(all(row["source_revision"] == source_revision for row in prepared["archive"]["members"]))
+
+                member_bytes = {row["destination"]: raw_git_bytes(row) for row in prepared["archive"]["members"]}
+                for member in prepared["archive"]["members"]:
+                    contents = member_bytes[member["destination"]]
+                    self.assertEqual(len(contents), member["bytes"])
+                    self.assertEqual(hashlib.sha256(contents).hexdigest().upper(), member["sha256"])
+                info = json.loads(member_bytes["info.json"])
+                self.assertEqual(info["name"], "mir-fixture-mir5-library-native-input")
+                self.assertEqual(info["version"], "0.3.3")
+                self.assertEqual(info["factorio_version"], prepared["factorio_line"])
+                historical_rows = [row for row in profile["mods"] if row["name"] == "mir-fixture-mir5-migration-origin-f200-110-source"]
+                self.assertEqual(len(historical_rows), 1)
+                self.assertEqual(info["dependencies"], [
+                    f"base = {prepared['engine']['version']}",
+                    f"~ more-infinite-research = {player_rows[0]['version']}",
+                    f"~ {historical_rows[0]['name']} = {historical_rows[0]['version']}",
+                ])
+
+                archive_record = prepared["archive"]
+                archive_name = archive_record["name"]
+                fixture_root = archive_record["root"]
+                archive_bytes = io.BytesIO()
+                with zipfile.ZipFile(archive_bytes, "w", compression=zipfile.ZIP_STORED) as archive:
+                    for member in prepared["archive"]["members"]:
+                        entry = zipfile.ZipInfo(
+                            f"{fixture_root}/{member['destination']}", date_time=(1980, 1, 1, 0, 0, 0)
+                        )
+                        entry.create_system = 3
+                        entry.external_attr = 0o100644 << 16
+                        entry.compress_type = zipfile.ZIP_STORED
+                        archive.writestr(entry, member_bytes[member["destination"]])
+                rebuilt = archive_bytes.getvalue()
+                digest = hashlib.sha256(rebuilt).hexdigest().upper()
+                self.assertEqual(len(rebuilt), archive_record["bytes"])
+                self.assertEqual(digest, archive_record["sha256"])
+                self.assertEqual(profile["archive_sha256"][archive_name], digest)
+                self.assertEqual(archive_name, "mir-fixture-mir5-library-native-input_0.3.3.zip")
 
     def test_order_neutral_input_archives_use_the_canonical_two_member_policy(self):
         record = json.loads(

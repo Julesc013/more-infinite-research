@@ -1,0 +1,118 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryNativeInputObserverPreparedV1",
+  "status": "exact r15 observer, archive and profile closure prepared; native execution pending",
+  "source": {
+    "repository": "Julesc013/more-infinite-research",
+    "commit": "94806c5508d60698c4f0ecb72fd7e267344e622d",
+    "scope": "Test-only observer/profile correction; no player-source members changed."
+  },
+  "profiles_and_archives": [
+    {
+      "target": "f200",
+      "factorio_line": "2.0",
+      "engine": {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "protected_input_save": {
+        "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+        "bytes": 811812,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "player_package": {
+        "name": "more-infinite-research_5.0.20001.zip",
+        "sha256": "750ECA842134AFDDCC7C45B2B656510CA60F09940A2E82B21896AAE7E3D8C1BE"
+      },
+      "profile": {
+        "path": "tests/profiles/library-native-input-imported110-f200-2077-r15.json",
+        "bytes": 3428,
+        "sha256": "093C4363E0642D88E378810E24504AE871DC030BBCDBA8F881BBBA73CB136A80"
+      },
+      "archive": {
+        "name": "mir-fixture-mir5-library-native-input_0.3.3.zip",
+        "bytes": 31816,
+        "sha256": "1243C3B416D4FF29C85919A7159FEB67C32E13F769E2ECA5B58AE7BAE6E559FA",
+        "local_custody": "build/tmp/library-native-input-observer-r15/f200/input/mir-fixture-mir5-library-native-input_0.3.3.zip",
+        "root": "mir-fixture-mir5-library-native-input_0.3.3",
+        "compression": "ZIP_STORED; fixed 1980 timestamp; Unix regular mode 0644",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "94806c5508d60698c4f0ecb72fd7e267344e622d",
+            "destination": "control.lua",
+            "bytes": 31077,
+            "sha256": "F06DE8C9D2A6EAAD3B020F971C971DEE4C21998FA746BBF7953897BB8F087182"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-input-identity-f200-033.json",
+            "source_revision": "94806c5508d60698c4f0ecb72fd7e267344e622d",
+            "destination": "info.json",
+            "bytes": 349,
+            "sha256": "312C9BEB8AFEB7C75C20AAEDDE952DC9F4DC17B9A3F42EDF286BA82CB6905A1C"
+          }
+        ]
+      }
+    },
+    {
+      "target": "f210",
+      "factorio_line": "2.1",
+      "engine": {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "protected_input_save": {
+        "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+        "bytes": 814068,
+        "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      },
+      "player_package": {
+        "name": "more-infinite-research_5.0.21001.zip",
+        "sha256": "C6C2470B438846484732E0E05D124DB31A1100C2F1AA0E770B327A4A6FBAFA5D"
+      },
+      "profile": {
+        "path": "tests/profiles/library-native-input-imported110-f210-2123-r15.json",
+        "bytes": 3426,
+        "sha256": "67CB16ACED0137DA12E8F30D570569C4C3C65F7911B6484DFBED73AFCF306B1B"
+      },
+      "archive": {
+        "name": "mir-fixture-mir5-library-native-input_0.3.3.zip",
+        "bytes": 31816,
+        "sha256": "36CDB11802370519CF3A72B91097E17B9F462FDBCBE4A28E6DB4D49070BBD666",
+        "local_custody": "build/tmp/library-native-input-observer-r15/f210/input/mir-fixture-mir5-library-native-input_0.3.3.zip",
+        "root": "mir-fixture-mir5-library-native-input_0.3.3",
+        "compression": "ZIP_STORED; fixed 1980 timestamp; Unix regular mode 0644",
+        "members": [
+          {
+            "source": "tests/fixtures/library-native-input/control.lua",
+            "source_revision": "94806c5508d60698c4f0ecb72fd7e267344e622d",
+            "destination": "control.lua",
+            "bytes": 31077,
+            "sha256": "F06DE8C9D2A6EAAD3B020F971C971DEE4C21998FA746BBF7953897BB8F087182"
+          },
+          {
+            "source": "tests/fixtures/library-native-input/info-input-identity-f210-033.json",
+            "source_revision": "94806c5508d60698c4f0ecb72fd7e267344e622d",
+            "destination": "info.json",
+            "bytes": 349,
+            "sha256": "48EFB5BDB983C8E5D6D0877365C6D02D4B17E29062F7CE86F777EC45EAA238E4"
+          }
+        ]
+      }
+    }
+  ],
+  "policy": {
+    "f200": "Rejects replacement reuse of the removed numeric player index.",
+    "f210": "Accepts removed-index reuse only for exact MIR 5.0.1 package and observer 0.3.3; all client identity, lifecycle and native-state assertions remain required."
+  },
+  "validation": {
+    "focused_observer_controls": 28,
+    "full_host_controls": 149,
+    "repository_check": "passed",
+    "archive_reconstruction": "Built from exact raw Git bytes with deterministic ZIP_STORED members; SHA-256 retained per profile.",
+    "native_execution": false,
+    "native_ready": false,
+    "performance_acceptance": false,
+    "release_qualification": false
+  }
+}
