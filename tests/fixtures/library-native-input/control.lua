@@ -7,8 +7,9 @@ local BROWSER = "more-infinite-research-browser"
 local ROOT, FILTERS, QUERY = "mir_research_browser", "mir_library_filters", "mir_library_query"
 local OTHER, OTHER_QUERY = "mir5_input_other", "mir5_input_other_query"
 local INPUT_OBSERVER = script.active_mods["mir-fixture-mir5-library-native-input"]
-local ALLOW_REMOVED_INDEX_REUSE = script.active_mods.base=="2.1.23"
-  and script.active_mods["more-infinite-research"]=="5.0.21001" and INPUT_OBSERVER=="0.3.3"
+local ALLOW_REMOVED_INDEX_REUSE = INPUT_OBSERVER=="0.3.3" and (
+  (script.active_mods.base=="2.0.77" and script.active_mods["more-infinite-research"]=="5.0.20001")
+  or (script.active_mods.base=="2.1.23" and script.active_mods["more-infinite-research"]=="5.0.21001"))
 local GEAR, MINING = "recipe-prod-research_gears-1", "recipe-prod-research_mining_drill-1"
 local IDS = {"mir-legacy-module-credit-speed-module", "mir-legacy-module-credit-productivity-module",
   "mir-legacy-module-credit-efficiency-module", "mir-legacy-cannon-credit-rocket-shooting-speed"}
