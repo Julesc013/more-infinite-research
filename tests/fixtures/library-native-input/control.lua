@@ -6,6 +6,9 @@ local KEY, INTERFACE = "mir5_library_native_input", "mir5-library-native-input"
 local BROWSER = "more-infinite-research-browser"
 local ROOT, FILTERS, QUERY = "mir_research_browser", "mir_library_filters", "mir_library_query"
 local OTHER, OTHER_QUERY = "mir5_input_other", "mir5_input_other_query"
+local INPUT_OBSERVER = script.active_mods["mir-fixture-mir5-library-native-input"]
+local ALLOW_REMOVED_INDEX_REUSE = script.active_mods.base=="2.1.23"
+  and script.active_mods["more-infinite-research"]=="5.0.21001" and INPUT_OBSERVER=="0.3.3"
 local GEAR, MINING = "recipe-prod-research_gears-1", "recipe-prod-research_mining_drill-1"
 local IDS = {"mir-legacy-module-credit-speed-module", "mir-legacy-module-credit-productivity-module",
   "mir-legacy-module-credit-efficiency-module", "mir-legacy-cannon-credit-rocket-shooting-speed"}
@@ -365,7 +368,7 @@ local function advance(step)
     s.de_index=nil;s.phase="replacement";assert_world()
   elseif step=="replacement" then
     phase("replacement");local en,de=pair()
-    if de.index==s.removed_index or s.joins~=3 then fail("actual replacement client join differs") end
+    if (de.index==s.removed_index and not ALLOW_REMOVED_INDEX_REUSE) or s.joins~=3 then fail("actual replacement client join differs") end
     open(de,MINING,MINING,"native");personal(en,de,"gears");s.wait_tick=game.tick+60;s.phase="pre-save";assert_world()
   elseif step=="save" then
     phase("pre-save");local en,de=pair();if game.tick<s.wait_tick then fail("save render grace is incomplete") end
@@ -401,6 +404,10 @@ script.on_init(function()
       and {mir="5.0.21000",fixture="0.4.0",observer="0.3.0"})
     or (script.active_mods.base=="2.1.23" and observer_version=="0.3.2"
       and {mir="5.0.21001",fixture="0.4.0",observer="0.3.2"})
+    or (script.active_mods.base=="2.0.77" and observer_version=="0.3.3"
+      and {mir="5.0.20001",fixture="0.3.0",observer="0.3.3"})
+    or (script.active_mods.base=="2.1.23" and observer_version=="0.3.3"
+      and {mir="5.0.21001",fixture="0.4.0",observer="0.3.3"})
   if not expected or script.active_mods["more-infinite-research"]~=expected.mir
       or script.active_mods[historical.fixture]~=expected.fixture then fail("imported native target differs") end
   local allowed={base=script.active_mods.base,["more-infinite-research"]=expected.mir,[historical.fixture]=expected.fixture,
@@ -421,7 +428,8 @@ script.on_event(defines.events.on_player_joined_game,function(event)
   if not loaded_restart and s.phase=="waiting-clients" then
     if s[key]~=nil then fail("duplicate initial client role") end
   elseif not loaded_restart and s.phase=="replacement" and joined_role=="de" then
-    if s.de_index~=nil or s.removed_index==nil or p.index==s.removed_index or p.index==s.en_index then fail("replacement identity differs") end
+    if s.de_index~=nil or s.removed_index==nil or (p.index==s.removed_index and not ALLOW_REMOVED_INDEX_REUSE)
+        or p.index==s.en_index then fail("replacement identity differs") end
   elseif loaded_restart and s.phase=="awaiting-restart" then
     if s[key]~=p.index or s.restart_joins[joined_role] then fail("saved client identity or restart role differs") end
     s.restart_joins[joined_role]=true

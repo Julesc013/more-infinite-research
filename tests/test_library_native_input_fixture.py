@@ -593,14 +593,14 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               click(en,other);type_text(en,"focus");step("foreign-prefix");game.tick=game.tick+60
               step("foreign-refresh");type_text(en," kept");step("foreign-suffix")
               if opponent~="remove-connected" then de.connected=false;connected() end
-              step("remove-de");de=join(opponent=="removed-index-reused" and 2 or 3,"de");step("replacement");game.tick=game.tick+60;step("save")
+              step("remove-de");de=join(opponent=="removed-index-reused" and 2 or (opponent=="replacement-index-reuses-en" and 1 or 3),"de");step("replacement");game.tick=game.tick+60;step("save")
               en.connected=false;de.connected=false;connected()
               for _,p in pairs(game.players) do for _,node in pairs(p.gui.screen) do invalidate(node) end;p.gui.screen=element("screen","screen") end
               parse();before=fingerprint(store);callbacks.load();readonly_load=before==fingerprint(store)
               -- Native-shaped MIR join restoration, not an observer open call.
               build(en,memory[en.index]);build(de,memory[de.index]);join(opponent=="changed-restart-index" and 4 or 0,"en")
               if opponent=="duplicate-restart-role" then join(0,"en") end
-              join(3,"de")
+              join(opponent=="removed-index-reused" and 2 or 3,"de")
               if opponent=="cold-lost-query" then query(en).text="wrong" end
               if opponent=="cold-lost-location" then en.gui.screen[root_name].location={x=999,y=100} end
               cold_calls_before=calls
@@ -654,6 +654,44 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             with self.subTest(target=target, package_version=package_version, observer_version=observer_version):
                 rejected = self.run_case(
                     target, package_version=package_version, input_observer_version=observer_version
+                )
+                self.assertFalse(rejected["ok"])
+                self.assertIn("imported native target differs", rejected["message"])
+
+    def test_503_observer_allows_only_f210_removed_player_index_reuse(self):
+        accepted = self.run_case(
+            "f210", "removed-index-reused", "5.0.21001", "0.3.3"
+        )
+        self.assertTrue(accepted["ok"], accepted["message"])
+        self.assertFalse(accepted["native_input_evidence"])
+        self.assertEqual(accepted["final"]["actual_joins"], 5)
+        self.assertEqual(
+            accepted["final"]["removed_index"], accepted["final"]["de_index"]
+        )
+
+        # The old F210 observer and the F200 observer must keep rejecting the
+        # same collision. Reuse is enabled only by the exact new F210 identity.
+        for target, package_version, observer_version in (
+            ("f210", "5.0.21001", "0.3.2"),
+            ("f200", "5.0.20001", "0.3.3"),
+        ):
+            with self.subTest(target=target, observer_version=observer_version):
+                rejected = self.run_case(
+                    target, "removed-index-reused", package_version, observer_version
+                )
+                self.assertFalse(rejected["ok"])
+                self.assertFalse(rejected["native_input_evidence"])
+
+    def test_503_observer_still_requires_exact_501_candidate_identity(self):
+        for target, package_version in (
+            ("f200", "5.0.20000"),
+            ("f200", "5.0.20002"),
+            ("f210", "5.0.21000"),
+            ("f210", "5.0.21002"),
+        ):
+            with self.subTest(target=target, package_version=package_version):
+                rejected = self.run_case(
+                    target, package_version=package_version, input_observer_version="0.3.3"
                 )
                 self.assertFalse(rejected["ok"])
                 self.assertIn("imported native target differs", rejected["message"])
@@ -899,7 +937,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
 
     def test_join_phase_and_retained_identity_are_required(self):
         for target in ("f200", "f210"):
-            for opponent in ("duplicate-initial-join", "join-during-input", "removed-index-reused",
+            for opponent in ("duplicate-initial-join", "join-during-input", "removed-index-reused", "replacement-index-reuses-en",
                              "changed-restart-index", "duplicate-restart-role"):
                 with self.subTest(target=target, opponent=opponent):
                     result = self.run_case(target, opponent)
