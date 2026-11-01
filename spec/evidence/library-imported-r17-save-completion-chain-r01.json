@@ -1,0 +1,279 @@
+{
+  "schema": 1,
+  "kind": "MIRImportedLibraryR17SaveCompletionChainV1",
+  "status": "exact-published501-f210-base-imported-input-lifecycle-complete",
+  "previous_adverse_chain": "spec/evidence/library-imported-r17-adverse-chain-r01.json",
+  "player_source": "b677ced0b1ae0d8bd9ae47eb6b272443faec6d63",
+  "player_tree": "e6497bde988908fb96fe00a16ee5ae1f51a5088f",
+  "player_zip_sha256": "C6C2470B438846484732E0E05D124DB31A1100C2F1AA0E770B327A4A6FBAFA5D",
+  "public_input_source": "245387dfdcf783bd355ee0d640e8fffc565fb3d5",
+  "final_private_source": "c4410358fb6aa9fcf08d2137a79ce703d017ca75",
+  "cases": [
+    {
+      "id": "save-r03",
+      "primary_custody": "build/qualification/imported-library-r17-native-save-adverse-r01",
+      "root_readback": {
+        "kind": "MIRImportedSaveAdverseRootReadbackV1",
+        "status": "adverse-before-cold-restart",
+        "terminal_sha256": "4989C0CCDE6FFA7F84B4F7F4B07A754507D893231E9ACB49DBD6EC5203A7F8DE",
+        "preparation_sha256": "6F668D17764B0684330B840D56C042A03CD29EA9CD0AB0465E3DFB4107D2DD3E",
+        "runtime_sha256": "8C79F572AE95102CA64DFFC9D9D1FE6D784DC041A68420E356974EEB3DF8682B",
+        "actual_process_allocations": 4,
+        "native_members": 154,
+        "native_bytes": 17941996,
+        "controller_members": 4,
+        "primary_files": 193,
+        "primary_bytes": 18144494,
+        "source_copy_primary_verified": true,
+        "saved_input_crc_entries": 55,
+        "saved_input_and_controls_unchanged": true,
+        "terminal_factorio_zero": true,
+        "cleanup_errors": [],
+        "error": "[imported-library-native-input] restart save is absent",
+        "last_report": {
+          "relative_path": "server/factorio-current.log.save.rcon-bad7e27f8b3743f2837f760d5002a26e.json",
+          "bytes": 5806,
+          "sha256": "7FB9A2AAE808BC0FD0981F8ABB4F1EB34F12DCBABC8B03BB1A567109621344D6"
+        },
+        "replacement_clients_started": 1,
+        "new_saves_created": 1,
+        "cold_restart_processes_started": 0,
+        "native_lifecycle_acceptance": false,
+        "performance_acceptance": false,
+        "scope": "Real actor and replacement observations only. Last raw save response retained unchanged; immediate save-file assertion stopped before cold restart. Expected exact archive exists after teardown; native save-finished marker is retained. Async save race is a runner classification, not product failure or full lifecycle acceptance."
+      },
+      "terminal": {
+        "bytes": 41707,
+        "sha256": "4989C0CCDE6FFA7F84B4F7F4B07A754507D893231E9ACB49DBD6EC5203A7F8DE"
+      },
+      "receipt_bodies": 63
+    },
+    {
+      "id": "save-path-r04",
+      "primary_custody": "build/qualification/imported-library-r17-native-save-path-adverse-r01",
+      "root_readback": {
+        "kind": "MIRImportedSaveAdverseRootReadbackV1",
+        "status": "adverse-before-cold-restart",
+        "terminal_sha256": "BDDE3B3326514B77C28285E6DC29EA6F1F23AA989F45EE9BF7D9C02A70EBB37E",
+        "preparation_sha256": "74EA45EDBE03286B777CBC361894409E82B5D26CE34442623A5E5370B42C9756",
+        "runtime_sha256": "FB6D8C97B1D0250801E0216853B4F7C049ECA42D2AADA9870D98052FBB398855",
+        "actual_process_allocations": 4,
+        "native_members": 154,
+        "native_bytes": 17893804,
+        "controller_members": 4,
+        "primary_files": 193,
+        "primary_bytes": 18096253,
+        "source_copy_primary_verified": true,
+        "saved_input_crc_entries": 55,
+        "saved_input_and_controls_unchanged": true,
+        "terminal_factorio_zero": true,
+        "cleanup_errors": [],
+        "error": "[imported-library-native-input] native restart save path differs",
+        "last_report": {
+          "relative_path": "server/factorio-current.log.save.rcon-b658f13f1a394c22a0155257a7dc8abd.json",
+          "bytes": 5806,
+          "sha256": "EEC644A4820A1ED3AE103D3B6EA2438F007D7B2102C15016B226CB8F40D130F4"
+        },
+        "replacement_clients_started": 1,
+        "new_saves_created": 1,
+        "cold_restart_processes_started": 0,
+        "native_lifecycle_acceptance": false,
+        "performance_acceptance": false,
+        "scope": "Real actor and replacement observations only. Last raw save response retained unchanged; strict native-name assertion stopped before cold restart because its expected name had a trailing dot. Exact native name and ZIP have no trailing dot. Native save-finished marker is retained. PowerShell null-string extension handling is a runner classification, not product failure or full lifecycle acceptance."
+      },
+      "terminal": {
+        "bytes": 41716,
+        "sha256": "BDDE3B3326514B77C28285E6DC29EA6F1F23AA989F45EE9BF7D9C02A70EBB37E"
+      },
+      "receipt_bodies": 63
+    },
+    {
+      "id": "f210-complete-r05",
+      "primary_custody": "build/qualification/imported-library-r17-native-f210-complete-r01",
+      "root_readback": {
+        "kind": "MIRImportedF210CompleteRootReadbackV1",
+        "status": "completed-exact-f210-unscored-imported-input-lifecycle",
+        "terminal_sha256": "F1CA11F03BE6951025E6CC4A1045AA13FA88151140C274A9917154616956F2F2",
+        "preparation_sha256": "DCC000D8F116D7AD69D9BB20E7C4AA8FC66AD6ADF71EE0F6DD713002AC3299EE",
+        "runtime_sha256": "F167E176A9F7FDF9B6B8E2BCAE73C1412C2F4473C7BB73D99AC11326C61D9C9A",
+        "actual_process_allocations": 7,
+        "native_members": 181,
+        "native_bytes": 23716796,
+        "controller_members": 4,
+        "controller_bytes": 43766,
+        "primary_packet_files": 220,
+        "primary_packet_bytes": 23949808,
+        "original_copy_primary_verified": true,
+        "original_controls_restored": true,
+        "protected_inputs": [
+          {
+            "target": "f200",
+            "role": "protected_original",
+            "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+            "crc_entries": 55
+          },
+          {
+            "target": "f200",
+            "role": "protected_copy",
+            "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+            "crc_entries": 55
+          },
+          {
+            "target": "f210",
+            "role": "protected_original",
+            "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+            "crc_entries": 55
+          },
+          {
+            "target": "f210",
+            "role": "protected_copy",
+            "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+            "crc_entries": 55
+          }
+        ],
+        "produced_saves": [
+          {
+            "role": "restart_save",
+            "path": "D:/Projects/Factorio/mir5-blackglass-r17-runtime-r03/build/tmp/imported-library-r17-native-r05-f210/server/saves/mir5-library-native-input-restart.zip",
+            "bytes": 2686658,
+            "sha256": "A0E1E35F14C7C6BA4F24DF6B34FC0B52048B613958B03A65823A67A55189E700",
+            "crc_entries": 59
+          },
+          {
+            "role": "final_save",
+            "path": "D:/Projects/Factorio/mir5-blackglass-r17-runtime-r03/build/tmp/imported-library-r17-native-r05-f210/server/saves/mir5-library-native-input-complete.zip",
+            "bytes": 2687439,
+            "sha256": "3CFD321C39020C879F2F7DA9D7CD6FB65267D36E3BE88A794836D2D101AF05CE",
+            "crc_entries": 59
+          }
+        ],
+        "actual_report_counters": {
+          "actual_joins": 5,
+          "actual_text_events": 15,
+          "actual_library_closed_events": 2,
+          "actual_library_close_observations": [
+            {
+              "phase": "escape",
+              "armed_phase": "escape",
+              "player_index": 1,
+              "player_lookup_ok": true,
+              "player_name": "MIR5English",
+              "armed_player_index": 1,
+              "ordinal": 1,
+              "tick": 131426,
+              "gui_type": 16,
+              "expected_gui_type": 16,
+              "element_present": true,
+              "element_type": "userdata",
+              "element_name": "mir_research_browser",
+              "accepted": true,
+              "element_valid": true,
+              "same_root": true
+            },
+            {
+              "phase": "inventory",
+              "armed_phase": "inventory",
+              "player_index": 1,
+              "player_lookup_ok": true,
+              "player_name": "MIR5English",
+              "armed_player_index": 1,
+              "ordinal": 2,
+              "tick": 132198,
+              "gui_type": 16,
+              "expected_gui_type": 16,
+              "element_present": true,
+              "element_type": "userdata",
+              "element_name": "mir_research_browser",
+              "accepted": true,
+              "element_valid": true,
+              "same_root": true
+            }
+          ],
+          "actual_drag_events": 5,
+          "actual_effect_reset_events": 2,
+          "actual_removed_events": 1
+        },
+        "private_queries": 48,
+        "load_observed": true,
+        "nine_actor_results": true,
+        "factorio_zero": true,
+        "cleanup_errors": [],
+        "native_case_acceptance": "Exact frozen published501 F210 Base imported lifecycle only; independent full result review remains required",
+        "limits": [
+          "F200 native remains unexecuted",
+          "Full Library views/controls/exports, candidateB qualification and performance remain open",
+          "Final produced save is CRC-valid; the restart save was cold-loaded; final save has not been separately reloaded"
+        ],
+        "performance_acceptance": false,
+        "release_qualification": false
+      },
+      "terminal": {
+        "bytes": 61343,
+        "sha256": "F1CA11F03BE6951025E6CC4A1045AA13FA88151140C274A9917154616956F2F2"
+      },
+      "receipt_bodies": 68
+    }
+  ],
+  "receipt_capsule": {
+    "path": "spec/evidence/library-imported-r17-save-completion-receipts-r01.json.gz",
+    "bytes": 286853,
+    "sha256": "DDF62DD7D99EBF20E29B6B93F4AC4302F9B3E5C6FACB4F44B76FF0D8A17DE325",
+    "bodies": 194
+  },
+  "corrections": [
+    {
+      "case": "save-r03",
+      "classification": "runner async save-completion race",
+      "fixed_source": "be7e907af34e6e783d9ff06e1ef11a98d23db557",
+      "preserved_failure": true
+    },
+    {
+      "case": "save-path-r04",
+      "classification": "runner expected save basename had trailing dot",
+      "fixed_source": "5a5471e99b131124b69fe293d57a5f7baba34b68",
+      "preserved_failure": true
+    }
+  ],
+  "independent_native_result_review": {
+    "primary_path": "build/qualification/r17-f210-native-result-review-r01/review.json",
+    "bytes": 213968,
+    "sha256": "F915A9A707D8C55ECECD7F23FA44BC34B28E18211CCA02AD23CE636CC3B7D704",
+    "verdict": "GO for this exact published501 F210 Base imported-input lifecycle only"
+  },
+  "measured_scope": {
+    "allocated_engines": 7,
+    "actual_joins": 5,
+    "actor_actions": 9,
+    "actual_drag_actions": 1,
+    "location_or_centering_events": 5,
+    "accepted_library_close_events": 2,
+    "effect_resets": 2,
+    "removed_players": 1,
+    "private_queries": 48,
+    "read_only_load_observed": true,
+    "retired_player_index": 2,
+    "replacement_player_index": 2,
+    "reused_numeric_slot_permitted": true,
+    "old_player_and_roots_invalidated": true,
+    "restart_save_actually_cold_loaded": true,
+    "final_save_separately_reloaded": false,
+    "save_crc_entries_each": 59,
+    "native_text_changed_events": 15
+  },
+  "acceptance": {
+    "exact_f210_base_imported_lifecycle": true,
+    "changed_dev_candidate": false,
+    "whole_library": false,
+    "new_lab_campaign": false,
+    "performance": false,
+    "release": false
+  },
+  "limits": [
+    "Original adverse and terminal bodies remain unchanged, including their original pending/unscored fields. The later independent review supplies the bounded case verdict.",
+    "Five location/centering events include one actual drag action. Replacement is a new live instance in a reused numeric slot, not a newly numbered player.",
+    "Retained original preservation/lab results keep their original identities; this run adds no new lab campaign.",
+    "No full Library controls/views/export/scales, changed candidate-B behavior, F200, performance or stable acceptance follows.",
+    "Save ZIPs, desktop PNGs and complete credential-bearing native log headers remain in verified primary custody; this capsule preserves exact selected JSON receipt bodies only.",
+    "A fresh independent capsule/checkpoint review and required CI precede integration."
+  ]
+}
