@@ -1133,6 +1133,50 @@ class LibraryNativeInputArchiveClosureControls(unittest.TestCase):
                             [f"{fixture}/control.lua", f"{fixture}/info.json"],
                         )
 
+    def test_r03_input_declaration_binds_r14_slot_reuse_and_candidate_b(self):
+        declaration = json.loads(
+            (ROOT / "spec/evidence/library-native-input-imported110-prepared-r03.json").read_text(encoding="utf-8")
+        )
+        closure = json.loads(
+            (ROOT / "spec/evidence/library-input-player-slot-reuse-prepared-r01.json").read_text(encoding="utf-8")
+        )
+        candidate = json.loads(
+            (ROOT / "spec/evidence/support-exports-coherent17-package-chain-r01.json").read_text(encoding="utf-8")
+        )
+        previous = json.loads(
+            (ROOT / "spec/evidence/library-native-input-imported110-prepared-aero-r02.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(declaration["status"], "public-observer-and-actor-prepared-private-caller-not-yet-bound")
+        self.assertEqual(declaration["source_commit"], closure["source"]["commit"])
+        self.assertEqual(declaration["player_source_commit"], candidate["source_commit"])
+        self.assertEqual(declaration["player_tree"], candidate["source_tree"])
+        self.assertEqual(declaration["previous_preparation"], "spec/evidence/library-native-input-imported110-prepared-aero-r02.json")
+        self.assertFalse(declaration["host_validation"]["actual_factorio_execution"])
+        closure_targets = {row["target"]: row for row in closure["profiles_and_archives"]}
+        candidate_archives = {row["name"]: row["sha256"] for row in candidate["files"]}
+        for target_row in declaration["profiles"]:
+            target = target_row["target"]
+            with self.subTest(target=target):
+                prepared = closure_targets[target]
+                profile_record = target_row["profile"]
+                profile_bytes = (ROOT / profile_record["source"]).read_bytes()
+                self.assertEqual(profile_record["source_revision"], closure["source"]["commit"])
+                self.assertEqual(len(profile_bytes), profile_record["bytes"])
+                self.assertEqual(hashlib.sha256(profile_bytes).hexdigest().upper(), profile_record["sha256"])
+                profile = json.loads(profile_bytes)
+                self.assertEqual(profile["protected_input_save"], target_row["protected_input_save"])
+                observer_name = prepared["archive"]["name"]
+                self.assertEqual(profile["archive_sha256"][observer_name], prepared["archive"]["sha256"])
+                self.assertEqual(target_row["owned_input_observer_members"], [
+                    {"source": member["source"], "source_revision": member["source_revision"],
+                     "sha256": member["sha256"], "bytes": member["bytes"], "destination": member["destination"]}
+                    for member in prepared["archive"]["members"]
+                ])
+                player_archive = next(name for name in profile["archive_sha256"] if name.startswith("more-infinite-research_"))
+                self.assertEqual(profile["archive_sha256"][player_archive], candidate_archives[player_archive])
+        self.assertEqual(previous["profiles"][0]["owned_input_observer_members"][0]["source_revision"],
+                         "dc3bb5899bac55396fd865fb2a504ce213b07bec")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
