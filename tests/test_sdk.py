@@ -155,7 +155,7 @@ class SdkTests(unittest.TestCase):
 
     def fresh_data_stage(self):
         self.lua.execute(
-            'data = sdk_world(); mods = {["more-infinite-research"] = "5.0.21000"}; '
+            'data = sdk_world(); mods = {["more-infinite-research"] = "5.0.21001"}; '
             'package.loaded["__more-infinite-research__.api.v1.data"] = nil'
         )
 
@@ -205,7 +205,7 @@ class SdkTests(unittest.TestCase):
         self.lua.execute(r'''
           local api = require("__more-infinite-research__.api.v1.data")
           local version = api.get_version()
-          assert(version.major == 1 and version.minor == 0 and version.product == "5.0.21000")
+          assert(version.major == 1 and version.minor == 0 and version.product == "5.0.21001")
           version.major = 99
           assert(api.get_version().major == 1)
 
