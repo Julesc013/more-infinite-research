@@ -575,6 +575,95 @@ class GeneratorTests(unittest.TestCase):
           assert(#space_declared == 76 and owners == 5)
         ''')
 
+    def test_mining_effects_preserve_published_denial_policy_without_granting_recipe_permissions(self):
+        # Original permission runner at v4.7.3 (a502c05016d2d56b9961c46b4441f1cf455aec78)
+        # independently pins these weights to the v4.2.2/v4.3.0 declarations.
+        self.lua.execute(r'''
+          local extension = require("research.product_target_extension")
+          for _, space_age in ipairs({false, true}) do
+            local active = {base="2.1.23"}
+            if space_age then active["space-age"] = "2.1.23" end
+            local selection = modern_catalogue.select(active)
+            local values = config.resolve(defaults())
+            local mining
+            for _, row in ipairs(modern.technologies(selection, values)) do
+              if row.name == "recipe-prod-research_mining_drill-1" then mining = row end
+            end
+            assert(mining, "published mining family disappeared")
+            local recipes, items = {}, {}
+            local expected = {['burner-mining-drill']=.20, ['electric-mining-drill']=.10,
+              ['big-mining-drill']=.05, ['se-core-miner-drill']=.05,
+              ['omega-drill']=.05, ['omega-tau']=.05, ['foreign-mining-drill']=.05}
+            for name in pairs(expected) do
+              recipes[name] = {enabled=true, ingredients={{"ore",1}},
+                results={{type="item", name=name, amount=1}},
+                allow_productivity=false, maximum_productivity=0, foreign={owner=name}}
+              items[name] = {}
+            end
+            recipes['ore-yield'] = {ingredients={}, results={{type="item",name="iron-ore",amount=1}}}
+            for _, name in ipairs({'capture-robot-rocket','ice-platform','space-platform-foundation'}) do
+              recipes[name] = {allow_productivity=false}
+            end
+            local raw = {recipe=recipes, item=items}
+            modern.preflight_recipe_patches(selection, raw)
+            modern.apply_recipe_patches(selection, raw)
+            extension.extend({mining}, values, {raw=raw, mods=active})
+            local emitted = {}
+            for _, effect in ipairs(mining.effects) do
+              assert(effect.type == "change-recipe-productivity")
+              assert(expected[effect.recipe] and not emitted[effect.recipe], "unexpected/duplicate drill effect")
+              emitted[effect.recipe] = effect.change
+            end
+            assert(#mining.effects == 7, "published denied drill recipe effect was lost")
+            for name, change in pairs(expected) do
+              assert(emitted[name] and math.abs(emitted[name]-change)<1e-12, name)
+              assert(recipes[name].allow_productivity == false and recipes[name].maximum_productivity == 0,
+                "mining research granted upstream recipe permission")
+              assert(recipes[name].foreign.owner == name)
+            end
+            assert(recipes['ore-yield'].allow_productivity == nil)
+          end
+        ''')
+
+    def test_space_age_recipe_permissions_have_exact_scope_and_preflight_before_writes(self):
+        # Port the three positive permissions from the historical 3d65d3c3 fixture;
+        # normal/expensive recipe variants belong to its retired harness, not 2.x.
+        self.lua.execute(r'''
+          local names = {'capture-robot-rocket','ice-platform','space-platform-foundation'}
+          local function recipes()
+            local out = {['electric-mining-drill']={allow_productivity=false},
+              foreign={allow_productivity=false, maximum_productivity=0}}
+            for _, name in ipairs(names) do
+              out[name] = {allow_productivity=false, maximum_productivity=7, foreign={owner=name}}
+            end
+            return out
+          end
+          local base = modern_catalogue.select({base="2.1.23"})
+          local base_raw = {recipe=recipes()}
+          modern.preflight_recipe_patches(base, base_raw)
+          modern.apply_recipe_patches(base, base_raw)
+          for _, recipe in pairs(base_raw.recipe) do assert(recipe.allow_productivity == false) end
+          local space = modern_catalogue.select({base="2.1.23", ['space-age']="2.1.23"})
+          local raw = {recipe=recipes()}
+          modern.preflight_recipe_patches(space, raw)
+          modern.apply_recipe_patches(space, raw)
+          for _, name in ipairs(names) do
+            assert(raw.recipe[name].allow_productivity == true, name)
+            assert(raw.recipe[name].maximum_productivity == 7 and raw.recipe[name].foreign.owner == name)
+          end
+          assert(raw.recipe.foreign.allow_productivity == false and raw.recipe.foreign.maximum_productivity == 0)
+          assert(raw.recipe['electric-mining-drill'].allow_productivity == false)
+          for _, missing in ipairs(names) do
+            local incomplete = {recipe=recipes()}
+            incomplete.recipe[missing] = nil
+            local ok, message = pcall(modern.apply_recipe_patches, space, incomplete)
+            assert(not ok and tostring(message):find("missing required recipe " .. missing,1,true))
+            for _, recipe in pairs(incomplete.recipe) do
+              assert(recipe.allow_productivity == false, "partial permission write before refusal")
+            end
+          end
+        ''')
+
     def test_native_owner_settings_keep_zero_time_as_native_inherit_only_for_active_owners(self):
         self.lua.execute('''
           local function startup_for(configuration)
