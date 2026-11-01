@@ -5,7 +5,7 @@ applies_to: "MIR 5.0.1 GitHub prerelease"
 audience: player
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-01
+last_reviewed: 2026-11-02
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -18,5 +18,6 @@ source_of_truth_for:
 - **Performance:** the startup comparisons in the [MIR 5.0.0 beta notes](https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.0) describe that release only. No new startup, large-factory, or memory measurements are claimed for 5.0.1.
 - **Beta limits:** full in-game Library input, saved-view lifecycle, and export-file checks remain unfinished. Large active-factory performance and retained-memory testing remain open. The exact mod archives and complete player configuration for the reported startup failures were not available for reproduction.
 - **Before upgrading:** back up your save and test a copy with the same mods and settings. Follow the [upgrade guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.1/docs/support.md#first-upgrade).
-- **Downloads:** choose the archive labelled for your Factorio version; each label states its minimum version. The Factorio 0.18 build is experimental. Factorio 0.6–0.12 builds are limited best effort and have not been tested in-game.
+- **Downloads:** choose the archive labelled for your Factorio version; each label states its minimum version. Factorio 0.18.47 is experimental, best effort and available only on GitHub. Its qualification scope is package metadata and an in-game load/crash check; the in-game check is unverified.
+- **Early downloads (Factorio 0.6–0.12):** finite Base research with fixed defaults only; no MIR runtime effects, mod settings, Research Library, runtime API or save migrations. These builds remain best effort and untested in-game. Unzip the Factorio 0.6–0.8 downloads into the mods folder.
 - **Bug reports:** include Factorio and MIR versions, the complete mod list, settings, the current log, and a reproducible save where possible. See [support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.1/SUPPORT.md).
