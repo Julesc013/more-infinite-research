@@ -304,5 +304,28 @@
       "path": "response-decoding-adverse.json",
       "sha256": "2DA3896674C4E690495D5E703213EF372C8D6B9E47C3DE7B1712201060BE4F38"
     }
-  ]
+  ],
+  "public_note_scope_followup": {
+    "reviewed_on": "2026-11-02",
+    "review": "https://github.com/Julesc013/more-infinite-research/pull/1539#issuecomment-6558634361",
+    "scope": "After the original label/byte readback, both release bodies explicitly retain the experimental/best-effort/GitHub-only Factorio 0.18.47 limit and metadata/load-crash-check scope. The in-game check remains unverified. Labels, assets, tags and maturity are unchanged.",
+    "local_custody": "build/qualification/aero-stable-recovery-r01/download-labels/scope-followup.json",
+    "custody_sha256": "EAA6AA9C079917DB5A96DFBA4631BCCD5820AEE21C74329105C8D5E63E9D8877",
+    "releases": [
+      {
+        "release_id": 430311801,
+        "tag": "v5.0.1",
+        "before_body_sha256": "BAF0CBC8FF2B38954213BA3B8F034FCE4625E1FB5F9EA672D1AF07E288B27AEE",
+        "after_body_sha256": "51463C02EC65ED4197044450A91113F9BD29E8195947F2254E2B6E8889764CC6",
+        "all_asset_identity_label_and_digest_fields_unchanged": true
+      },
+      {
+        "release_id": 429799579,
+        "tag": "v5.0.0",
+        "before_body_sha256": "D584173A9CC6A446C2B1B245140CAF193A32278024B7D7C3E0F34EBDFE1647FD",
+        "after_body_sha256": "9D14B3940B4D22955DFB07DC853A9C19B8A323CE154C9D73BA5164705162796A",
+        "all_asset_identity_label_and_digest_fields_unchanged": true
+      }
+    ]
+  }
 }
