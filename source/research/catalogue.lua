@@ -58,6 +58,13 @@ local function continuation_settings(key)
     "mir-cost-growth-" .. key, "mir-max-level-" .. key, "mir-research-time-" .. key,
     "mir-effect-per-level-" .. key}
 end
+
+local function runtime_technology_prototypes()
+  if target.id ~= "f200" and target.id ~= "f210" then return nil end
+  if prototypes ~= nil and prototypes.technology ~= nil then return prototypes.technology end
+  if game ~= nil then return game.technology_prototypes end
+  return nil
+end
 local function locale_key(value)
   if type(value) == "string" then return value end
   return type(value) == "table" and value[1] or nil
@@ -180,7 +187,13 @@ local function static_rows()
   for _, row in ipairs(bob_plates_rows()) do rows[#rows + 1] = row end
   for _, row in ipairs(material_rows(modern_catalogue.angel_material_definitions(active_mods))) do rows[#rows + 1] = row end
   local selected
-  if ordinary_profile or k2_base_profile or k2so_profile then selected = modern_catalogue.select(active_mods) end
+  if ordinary_profile or k2_base_profile or k2so_profile then
+    selected = modern_catalogue.select(active_mods)
+    if script then
+      selected.continuations = modern_catalogue.omit_existing_continuations(
+        selected.continuations, runtime_technology_prototypes())
+    end
+  end
   if not selected then
     if space_age_active then
       rows[#rows + 1] = generated_row(AGRICULTURE_ID, "research_agricultural_growth_speed",

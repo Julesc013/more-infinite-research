@@ -2,6 +2,22 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.1] - 2026-11-01
+
+### Changes
+
+- Restore the Research Library's research list and selected details side by side at normal window widths, with a readable stacked layout when space is narrow.
+- Add explicit larger, smaller and reset controls, and retain the Library's size and position while switching tabs.
+- Restore native localized research names and complete selected-research details.
+- Keep search and filters responsive while the displayed results refresh.
+
+### Bugfixes
+
+- Keep loading when Strategy Mortar Turret changes Ironclad's mortar firing-speed bonus.
+- Fix a startup failure with supported Krastorio 2: Spaced Out patch updates.
+- Preserve an existing train-braking research technology instead of failing on a duplicate.
+- Close MIR's owned Library window before a player is removed, preventing stale views from surviving player-slot reuse.
+
 ## [5.0.0] - 2026-10-31
 
 ### Beta testing

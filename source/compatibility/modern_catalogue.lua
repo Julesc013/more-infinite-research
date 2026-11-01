@@ -1050,8 +1050,24 @@ local function append_native_weapon_categories(row, raw)
   end
 end
 
+function M.omit_existing_continuations(rows, technology_prototypes)
+  if technology_prototypes == nil then return rows end
+  local retained = {}
+  for _, row in ipairs(rows) do
+    if technology_prototypes[row.id] == nil then retained[#retained + 1] = row end
+  end
+  return retained
+end
+
 function M.continuations(active_mods, raw)
   local rows = copy(CONTINUATIONS)
+  -- A third-party mod may already own one of these exact native continuation
+  -- identities. Preserve its prototype and omit only MIR's colliding row;
+  -- Generator still rejects duplicate names inside MIR's own output.
+  local existing_technologies = type(raw) == "table" and raw.technology
+  if type(existing_technologies) == "table" then
+    rows = M.omit_existing_continuations(rows, existing_technologies)
+  end
   local bob_angel_f210 = M.bob_angel_f210_profile(active_mods)
   local bob_angel_f200_combined = M.bob_angel_f200_combined_profile(active_mods)
   if M.is_bob_angel(active_mods) then
@@ -1125,7 +1141,7 @@ function M.continuations(active_mods, raw)
   local adapter = native_modded_continuations(active_mods)
   if adapter then
     local known_ids = {}
-    for _, row in ipairs(rows) do known_ids[row.id] = true end
+    for _, row in ipairs(CONTINUATIONS) do known_ids[row.id] = true end
     merge_continuation_fields(overrides_by_id, adapter.continuation_overrides(active_mods), known_ids)
   end
   for index = 1, #rows do
