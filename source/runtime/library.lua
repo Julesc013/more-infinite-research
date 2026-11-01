@@ -705,7 +705,10 @@ local function model_view(view)
 end
 
 local function context_for(force)
-  local context = {private_credit_ids = private_credit_ids}
+  local context = {
+    private_credit_ids = private_credit_ids,
+    research_triggers_supported = target.id == "f200" or target.id == "f210"
+  }
   if type(cap_provider) ~= "function" then return context end
   local ok, caps = pcall(cap_provider, force)
   if not ok or type(caps) ~= "table" then return context end
@@ -1096,6 +1099,8 @@ local function detail_lines(parent, row, detail, player)
   local context = add(parent, {type = "flow", name = PREFIX .. "detail_context", direction = "vertical"})
   local status_key = {
     ready = "mir-browser.status-ready",
+    complete = "mir-browser.status-complete",
+    disabled = "mir-browser.status-disabled",
     locked = "mir-browser.status-locked",
     queued = "mir-browser.status-queued",
     missing = "mir-browser.status-missing"
