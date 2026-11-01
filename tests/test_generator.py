@@ -900,10 +900,11 @@ class GeneratorTests(unittest.TestCase):
           for _, id in ipairs(holder_ids) do technologies[id] = runtime_technology(rows[id], 1, false) end
           local force = {valid=true, index=1, technologies=technologies, research_queue={"preserved"}, research_progress=.42}
           game = {forces={player=force}}
-          script = {active_mods={base="2.1.23", ["more-infinite-research"]="5.0.21000"}}
+          local candidate_version = require("platform.target").distribution_version
+          script = {active_mods={base="2.1.23", ["more-infinite-research"]=candidate_version}}
           package.loaded["runtime.legacy_module_credits"] = nil
           local credits = require("runtime.legacy_module_credits")
-          local event = {mod_changes={ ["more-infinite-research"]={old_version="1.1.0", new_version="5.0.21000"}}}
+          local event = {mod_changes={ ["more-infinite-research"]={old_version="1.1.0", new_version=candidate_version}}}
           local plan = credits.preflight(event)
           assert(plan and plan.target == "f210" and #plan.forces == 1)
           assert(credits.apply(plan) == true)
@@ -1134,6 +1135,57 @@ class GeneratorTests(unittest.TestCase):
                   .. tostring(technology.effects[#technology.effects].ammo_category))
             end
           end
+        ''')
+
+    def test_existing_native_continuation_identity_is_preserved_without_mir_collision(self):
+        self.lua.execute('''
+          local environment = full_world({})
+          local foreign = {type="technology", name="braking-force-8", marker="owned-by-another-mod"}
+          environment.raw.technology[foreign.name] = foreign
+          local selection = modern_catalogue.select({}, environment.raw)
+          for _, row in ipairs(selection.continuations) do
+            assert(row.id ~= foreign.name, "MIR selected a continuation with an existing foreign identity")
+          end
+          local generated = modern.technologies(selection, config.resolve(defaults()))
+          for _, row in ipairs(generated) do
+            assert(row.name ~= foreign.name, "MIR emitted the colliding native continuation")
+          end
+          generator.install(generated, environment)
+          assert(environment.writes == 1, "the remaining authored family did not publish once")
+          assert(environment.raw.technology[foreign.name] == foreign and foreign.marker == "owned-by-another-mod",
+            "MIR changed the existing technology")
+          local emitted = {}; for _, row in ipairs(environment.emitted) do emitted[row.name] = true end
+          assert(not emitted[foreign.name] and emitted["inserter-capacity-bonus-8"]
+            and emitted["research-speed-7"], "collision handling dropped unrelated continuations")
+
+          local py_mods = {pycoalprocessing="3.0.44", pyalienlife="3.0.67", pyhightech="3.0.19"}
+          local py_selection = modern_catalogue.select(py_mods, {technology={[foreign.name]=foreign}})
+          local py_rows = {}; for _, row in ipairs(py_selection.continuations) do py_rows[row.id] = row end
+          assert(py_rows[foreign.name] == nil and py_rows["research-speed-7"]
+            and py_rows["research-speed-7"].order == "autotech-[000848]-[research-speed-6]",
+            "a colliding Py continuation refused or changed the other selected adapter rows")
+
+          local warfare_foreign = {type="technology", name="braking-force-8", marker="foreign warfare owner"}
+          local warfare_rows = modern_catalogue.continuations({bobwarfare="1.2.0"},
+            {technology={[warfare_foreign.name]=warfare_foreign}})
+          local warfare_by_id = {}; for _, row in ipairs(warfare_rows) do warfare_by_id[row.id] = row end
+          assert(warfare_by_id[warfare_foreign.name] == nil and warfare_by_id["laser-shooting-speed-8"],
+            "a colliding Bob Warfare override refused or dropped unrelated continuations")
+
+          local other_foreign = {type="technology", name="research-speed-7", marker="unexpected collision"}
+          local other_selection = modern_catalogue.select({}, {technology={[other_foreign.name]=other_foreign}})
+          local other_generated = modern.technologies(other_selection, config.resolve(defaults()))
+          local other_ok, other_error = pcall(generator.install, other_generated, {raw={technology={[other_foreign.name]=other_foreign}}})
+          assert(not other_ok and tostring(other_error):find("duplicate technology research%-speed%-7"),
+            "an unapproved continuation collision no longer fails closed")
+
+          script = {active_mods={base="2.1.23"}}
+          prototypes = {technology={[foreign.name]=foreign}}
+          package.loaded["research.catalogue"] = nil
+          local runtime_rows = require("research.catalogue").declared()
+          local runtime_ids = {}; for _, row in ipairs(runtime_rows) do runtime_ids[row.id] = true end
+          assert(not runtime_ids[foreign.name] and runtime_ids["inserter-capacity-bonus-8"],
+            "runtime catalogue still claimed the existing foreign continuation")
         ''')
 
     def test_pipeline_extent_uses_effective_import_and_never_imports_for_defaults(self):

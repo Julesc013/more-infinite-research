@@ -42,20 +42,17 @@ local KNOWN_TARGETS = {
 local INITIAL_RED_TARGETS = {f017 = true, f018 = true, f100 = true, f110 = true}
 local SATELLITE_SOURCE_TARGETS = {f017 = true, f018 = true, f100 = true, f110 = true}
 
--- The delivered K2SO normalization was an exact science-phase contract.  It
--- is intentionally not inferred from a Krastorio marker: another revision
--- keeps its authored vector unless it receives a separately reviewed row.
-local K2SO_PHASE_V8 = {
-  -- This phase rule is narrower than ordinary catalogue K2SO admission.  Its
-  -- published vector was observed with every marker below, so a partial tuple
-  -- or a later archive with the same names keeps its authored ingredients.
+-- This retained phase rule is selected only when the complete named K2SO
+-- provider set is present. Patch versions do not change which science-card
+-- identities this rule consumes.
+local K2SO_PHASE = {
   profile = {
-    base = "2.1.23",
-    ["space-age"] = "2.1.23",
-    Krastorio2 = "2.1.4",
-    ["Krastorio2-spaced-out"] = "2.0.19",
-    Krastorio2Assets = "2.1.0",
-    ["k2so-assets"] = "1.0.7"
+    base = "2.1",
+    ["space-age"] = "2.1",
+    Krastorio2 = "2.1",
+    ["Krastorio2-spaced-out"] = "2.0",
+    Krastorio2Assets = "2.1",
+    ["k2so-assets"] = "1.0"
   },
   basic = "kr-basic-tech-card",
   early = {
@@ -85,18 +82,24 @@ local function promethium_owner_prerequisites(target, mods)
     or F210_PROMETHIUM_OWNER_PREREQUISITES)
 end
 
-local function exact_profile(mods, expected)
+local function has_profile_markers(mods, expected)
   if type(mods) ~= "table" then return false end
-  for name, version in pairs(expected) do
-    if mods[name] ~= version then return false end
+  for name in pairs(expected) do
+    if mods[name] == nil then return false end
   end
   return true
 end
 
-local function complete_profile(mods, expected)
+local function profile_version_line(version, expected_line)
+  if type(version) ~= "string" then return false end
+  local major, minor, patch = version:match("^(%d+)%.(%d+)%.(%d+)$")
+  return major ~= nil and (major .. "." .. minor) == expected_line and patch ~= nil
+end
+
+local function supported_profile_versions(mods, expected)
   if type(mods) ~= "table" then return false end
-  for name in pairs(expected) do
-    if mods[name] == nil then return false end
+  for name, version_line in pairs(expected) do
+    if not profile_version_line(mods[name], version_line) then return false end
   end
   return true
 end
@@ -423,18 +426,17 @@ function M.select(target, mods)
     end_game = nil
   }
   if target.id == "f210" then
-    if exact_profile(mods, K2SO_PHASE_V8.profile) then
+    if supported_profile_versions(mods, K2SO_PHASE.profile) then
       selected.k2_phase = {
-        basic = K2SO_PHASE_V8.basic,
-        early = copy_list(K2SO_PHASE_V8.early),
-        phase_one = copy_list(K2SO_PHASE_V8.phase_one),
-        phase_two = copy_list(K2SO_PHASE_V8.phase_two)
+        basic = K2SO_PHASE.basic,
+        early = copy_list(K2SO_PHASE.early),
+        phase_one = copy_list(K2SO_PHASE.phase_one),
+        phase_two = copy_list(K2SO_PHASE.phase_two)
       }
-    elseif complete_profile(mods, K2SO_PHASE_V8.profile) then
-      -- The published K2SO vector removes named early packs by phase. A full
-      -- changed closure may carry those owned identities, so ordinary science
-      -- is not a safe fallback until another vector is explicitly reviewed.
-      error("MIR unsupported F210 K2SO science-phase saved-profile transition: captured tuple changed", 2)
+    elseif has_profile_markers(mods, K2SO_PHASE.profile) then
+      -- Keep the K2 phase rule within its captured engine/provider minor
+      -- lines. A changed line may alter the science-card contract.
+      error("MIR unsupported F210 K2SO science-phase saved-profile transition: provider version line changed", 2)
     end
   end
   if has_space_age then
