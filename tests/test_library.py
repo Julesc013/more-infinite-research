@@ -1015,6 +1015,43 @@ class LibraryTests(unittest.TestCase):
           assert(storage.mir_library.players[1].selected == gear.name)
         ''')
 
+    def test_legacy_remote_search_uses_selected_or_retained_tab_without_cross_query_writes(self):
+        self.lua.execute(r'''
+          boot()
+          library.open(player, {query="gear", page=7})
+          local before_level, before_queue = gear.level, player.force.research_queue
+          local options = {tab="settings", settings_scope="options", search="repair"}
+          library.open(player, options)
+          local view = storage.mir_library.players[1]
+          assert(view.settings_query == "repair" and view.query == "gear",
+            "legacy settings search must leave the research query unchanged")
+          assert(view.page == 1, "legacy search must retain its published remote page reset")
+          assert(options.search == "repair" and options.query == nil,
+            "legacy search options must remain caller-owned")
+          library.open(player, {search="default"})
+          view = storage.mir_library.players[1]
+          assert(view.tab == "settings" and view.settings_query == "default" and view.query == "gear",
+            "legacy search without a tab must use the retained settings tab")
+          library.open(player, {search=""})
+          view = storage.mir_library.players[1]
+          assert(view.settings_query == "" and view.query == "gear",
+            "empty legacy settings search must clear only that query")
+          library.open(player, {tab="research", search="copper"})
+          view = storage.mir_library.players[1]
+          assert(view.query == "copper" and view.settings_query == "",
+            "legacy research search must leave the settings query unchanged")
+          library.open(player, {tab="settings", search=string.rep("x", 161)})
+          view = storage.mir_library.players[1]
+          assert(view.settings_query == string.rep("x", 160) and view.query == "copper",
+            "legacy settings search must retain the published 160-byte bound")
+          library.open(player, {search="legacy", settings_search="explicit", query="iron"})
+          view = storage.mir_library.players[1]
+          assert(view.settings_query == "explicit" and view.query == "iron",
+            "explicit internal query fields must retain their separate meanings")
+          assert(gear.level == before_level and player.force.research_queue == before_queue,
+            "legacy search must not change native research or queue state")
+        ''')
+
     def test_repeated_resize_stays_within_display_bounds(self):
         self.lua.execute(r'''
           boot()

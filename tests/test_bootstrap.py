@@ -324,12 +324,19 @@ class BootstrapTests(unittest.TestCase):
           local hidden = {known_technology.name}
           assert(browser.open(1, {search = "gear", family = "mir", selected = known_technology.name,
             status = 4, mode = 3, sort = "name-desc", page = 7, hidden = hidden}))
-          assert(library_calls.open.player == player and library_calls.open.options.query == "gear")
+          assert(library_calls.open.player == player and library_calls.open.options.search == "gear"
+            and library_calls.open.options.query == nil,
+            "legacy search must reach the Library without the bridge choosing a query field")
           assert(library_calls.open.options.family == "mir"
             and library_calls.open.options.selected == known_technology.name
             and library_calls.open.options.status == 4 and library_calls.open.options.mode == 3
             and library_calls.open.options.sort == "name-desc"
             and library_calls.open.options.page == 7 and library_calls.open.options.hidden == hidden)
+          assert(browser.open(1, {tab = "settings", settings_scope = "options", search = "repair"}))
+          assert(library_calls.open.options.tab == "settings"
+            and library_calls.open.options.settings_scope == "options"
+            and library_calls.open.options.search == "repair" and library_calls.open.options.query == nil,
+            "legacy Settings search and scope must reach the Library together")
           assert(browser.open(1, {family = "research_gears", visibility = 2}))
           assert(library_calls.open.options.family == "research_gears"
             and library_calls.open.options.visibility == 2)
