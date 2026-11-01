@@ -152,20 +152,21 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         self.assertIn(b'observer_version=="0.3.2"', control_bytes)
         archive_bytes = io.BytesIO()
         archive_name = f"{info['name']}_{info['version']}"
-        with zipfile.ZipFile(archive_bytes, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
+        with zipfile.ZipFile(archive_bytes, "w", compression=zipfile.ZIP_STORED) as archive:
             for destination, contents in (("control.lua", control_bytes), ("info.json", info_bytes)):
                 entry = zipfile.ZipInfo(f"{archive_name}/{destination}", date_time=(1980, 1, 1, 0, 0, 0))
                 entry.create_system = 3
                 entry.external_attr = 0o100644 << 16
-                entry.compress_type = zipfile.ZIP_DEFLATED
-                archive.writestr(entry, contents, compresslevel=9)
+                entry.compress_type = zipfile.ZIP_STORED
+                archive.writestr(entry, contents)
+        self.assertEqual(len(archive_bytes.getvalue()), 31225)
         self.assertEqual(
             hashlib.sha256(archive_bytes.getvalue()).hexdigest().upper(),
             profile["archive_sha256"][f"{archive_name}.zip"],
         )
         self.assertEqual(
             profile["archive_sha256"][f"{archive_name}.zip"],
-            "D7ABBCB734EABEC189DF16972D152957A886C43DFC45FC01AC5809A9BBC72DB6",
+            "1A6CBB6E285402CB0EDEF3B461E5CFE70965B9882541594ECC42D4A563DE7C2C",
         )
 
         old = json.loads((ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r13.json").read_text(encoding="utf-8"))
