@@ -14,6 +14,11 @@ local MAX_RECIPE_TARGETS = 512
 local MAX_NATIVE_EFFECT_SCAN = 1024
 local INFINITE_MAX_LEVEL = 4294967295
 local SEARCH_LABEL_SEPARATOR = "\31"
+local PRODUCTIVITY_HEADROOM_EPSILON = 0.000000001
+
+local function finite_number(value)
+  return type(value) == "number" and value == value and value > -math.huge and value < math.huge
+end
 
 local function finite_integer(value)
   return type(value) == "number" and value == value and value > -math.huge
@@ -342,6 +347,59 @@ local function wants_native_catalogue(family)
   return family == "all" or family == "external"
 end
 
+-- Read only the selected authored research's named productive recipes. Lists
+-- never call this helper, and no native object or derived cache is retained.
+local function recipe_benefits(force, technology, row, context)
+  if type(context) ~= "table" or context.recipe_productivity_supported ~= true then
+    return nil, "unsupported"
+  end
+  local effects = native_read(native_read(technology, "prototype"), "effects")
+  local ids, changes, complete, only_productivity = {}, {}, true, true
+  local ok = pcall(function()
+    for index, effect in ipairs(effects or {}) do
+      if index > MAX_NATIVE_EFFECT_SCAN then complete = false; return end
+      if native_read(effect, "type") == "change-recipe-productivity" then
+        local id = bounded_string(native_read(effect, "recipe"), MAX_TEXT)
+        local change = native_read(effect, "change")
+        if not id or id == "" or not finite_number(change) then complete = false; return end
+        if changes[id] == nil then
+          ids[#ids + 1], changes[id] = id, 0
+        end
+        changes[id] = changes[id] + change
+        if not finite_number(changes[id]) then complete = false; return end
+      else
+        only_productivity = false
+      end
+    end
+  end)
+  if not ok or not complete then return nil, "unavailable" end
+  if #ids == 0 then return nil, "not-applicable" end
+
+  local eligible = row.enabled and not row.researched
+  if eligible then
+    if not finite_integer(row.current_level) or row.current_level < 1
+        or not finite_integer(row.max_level) or row.max_level < 1 then return nil, "unavailable" end
+    eligible = row.current_level <= row.max_level and (row.cap == nil or row.current_level <= row.cap)
+  end
+  local recipes, result, any_benefit = native_read(force, "recipes"), {}, false
+  for _, id in ipairs(ids) do
+    local recipe = native_read(recipes, id)
+    local current = native_read(recipe, "productivity_bonus")
+    local maximum = native_read(native_read(recipe, "prototype"), "maximum_productivity")
+    if native_read(recipe, "valid") ~= true or not finite_number(current) or current < 0
+        or not finite_number(maximum) or maximum < 0 then return nil, "unavailable" end
+    -- Preserve the published headroom boundary; it is not an estimate of
+    -- machine throughput, module bonuses or future native queue behavior.
+    local useful = eligible and changes[id] > 0 and current < maximum - PRODUCTIVITY_HEADROOM_EPSILON
+    result[#result + 1] = {
+      recipe_id = id, effect_change = changes[id], current_productivity_bonus = current,
+      maximum_productivity = maximum, next_level_has_effective_benefit = useful
+    }
+    any_benefit = any_benefit or useful
+  end
+  return result, "available", eligible, any_benefit, only_productivity
+end
+
 local function family_matches(row, family)
   if family == "all" then return true end
   if family == "mir" then return row.family ~= "external" end
@@ -510,6 +568,11 @@ function M.detail(force, catalogue, view, translations, context)
   row.effects, row.effects_complete = effects, effects_complete
   row.cost, row.ingredients_complete = cost, ingredients_complete
   row.recipe_targets, row.recipe_targets_complete = copy_recipe_targets(technology)
+  if by_id[id] ~= nil then
+    row.recipe_benefits, row.recipe_benefits_state, row.next_level_eligible,
+      row.next_level_has_effective_benefit, row.recipe_benefits_only_effects =
+      recipe_benefits(force, technology, row, context)
+  end
   return row
 end
 

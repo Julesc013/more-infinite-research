@@ -580,6 +580,139 @@ class LibraryModelTests(unittest.TestCase):
             "legacy availability must not probe an unsupported research_trigger property")
         ''')
 
+    def test_selected_productivity_details_refresh_live_recipes_without_eager_list_reads(self):
+        self.lua.execute('''
+          local id, recipe_id = "recipe-prod-research_gears-1", "iron-gear-wheel"
+          local native = technology(id, {effects={
+            {type="change-recipe-productivity", recipe=recipe_id, change=.1},
+            {type="change-recipe-productivity", recipe=recipe_id, change=.2},
+            {type="unlock-recipe", recipe="unrelated-unlock"}
+          }})
+          local recipe = {valid=true, productivity_bonus=0, prototype={maximum_productivity=3}}
+          local reads = 0
+          local force = {technologies={[id]=native}, research_queue={}, recipes=setmetatable({}, {
+            __index=function(_, name) reads=reads+1; assert(name==recipe_id); return recipe end,
+            __pairs=function() error("detail enumerated recipes") end
+          })}
+          local declared = {{id=id, family="research_gears"}}
+          local context = {recipe_productivity_supported=true}
+          assert(#model.rows(force, declared, {}, {}, context) == 1 and reads == 0,
+            "ordinary Library lists must not inspect live recipe productivity")
+          local first = assert(model.detail(force, declared, {selected=id}, {}, context))
+          assert(first.recipe_benefits_state == "available" and #first.recipe_benefits == 1,
+            "selected MIR detail must restore live recipe benefit facts")
+          local benefit = first.recipe_benefits[1]
+          assert(reads == 1 and benefit.recipe_id == recipe_id and math.abs(benefit.effect_change-.3)<1e-12
+            and benefit.current_productivity_bonus == 0 and benefit.maximum_productivity == 3
+            and first.next_level_eligible == true and first.next_level_has_effective_benefit == true)
+          first.recipe_benefits[1].recipe_id = "forged"
+          recipe.productivity_bonus = 3
+          local second = assert(model.detail(force, declared, {selected=id}, {}, context))
+          assert(second.recipe_benefits[1].recipe_id == recipe_id
+            and second.recipe_benefits[1].current_productivity_bonus == 3
+            and second.next_level_has_effective_benefit == false and reads == 2,
+            "reopening selected detail must observe saturation without retaining or mutating native facts")
+          assert(native.level == 1 and native.enabled and not native.researched and #force.research_queue == 0)
+          assert(first.recipe_benefits[1].current_productivity_bonus == 0)
+        ''')
+
+    def test_productivity_detail_missing_facts_and_budgets_never_invent_zero_or_a_gain(self):
+        self.lua.execute('''
+          local id, recipe_id = "recipe-prod-research_gears-1", "gear"
+          local native = technology(id, {effects={{type="change-recipe-productivity",recipe=recipe_id,change=.1}}})
+          local recipe = {valid=true,productivity_bonus=0,prototype={maximum_productivity=3}}
+          local reads = 0
+          local force = {technologies={[id]=native},research_queue={},recipes=setmetatable({}, {
+            __index=function() reads=reads+1; return recipe end
+          })}
+          local declared = {{id=id,family="research_gears"}}
+          local function detail(context) return assert(model.detail(force,declared,{selected=id},{},context)) end
+          local unsupported = detail({recipe_productivity_supported=false})
+          assert(unsupported.recipe_benefits == nil and reads == 0,
+            "unsupported engines must not read recipe productivity fields")
+          local foreign = assert(model.detail(force,{}, {selected=id},{},{recipe_productivity_supported=true}))
+          assert(foreign.recipe_benefits == nil and reads == 0,
+            "undeclared foreign research must not gain MIR benefit claims")
+          for _, bad in ipairs{false,-1,math.huge,0/0,"0"} do
+            recipe.productivity_bonus = bad
+            local missing = detail({recipe_productivity_supported=true})
+            assert(missing.recipe_benefits_state == "unavailable" and missing.recipe_benefits == nil
+              and missing.next_level_has_effective_benefit == nil,
+              "unverified live facts must remain unavailable rather than become zero or a saturation claim")
+          end
+          recipe.productivity_bonus, recipe.valid = 0, false
+          assert(detail({recipe_productivity_supported=true}).recipe_benefits_state == "unavailable")
+          recipe.valid = true; recipe.prototype.maximum_productivity = nil
+          assert(detail({recipe_productivity_supported=true}).recipe_benefits_state == "unavailable")
+          recipe = nil
+          assert(detail({recipe_productivity_supported=true}).recipe_benefits_state == "unavailable")
+          native.prototype.effects = {{type="unlock-recipe",recipe="not-productive"}}
+          local before = reads
+          assert(detail({recipe_productivity_supported=true}).recipe_benefits == nil and reads == before)
+          local effects = {}
+          for index=1,1025 do effects[index]={type="change-recipe-productivity",recipe="many-"..index,change=.1} end
+          native.prototype.effects = effects
+          local bounded = detail({recipe_productivity_supported=true})
+          assert(bounded.recipe_benefits_state == "unavailable" and reads == before,
+            "oversized selected effects must refuse before any live recipe reads or aggregate benefit claim")
+          effects = {}
+          for index=1,1025 do effects[index]={type="change-recipe-productivity",recipe=recipe_id,change=.1} end
+          native.prototype.effects = effects
+          assert(detail({recipe_productivity_supported=true}).recipe_benefits_state == "unavailable"
+            and reads == before, "duplicate recipe identities cannot bypass the native effect scan bound")
+        ''')
+
+    def test_live_productivity_facts_do_not_drop_recipes_beyond_the_short_effect_preview(self):
+        self.lua.execute('''
+          local id = "recipe-prod-research_gears-1"
+          local effects, recipes = {}, {}
+          for index=1,600 do
+            local recipe_id = "gear-" .. index
+            effects[index] = {type="change-recipe-productivity",recipe=recipe_id,change=.1}
+            recipes[recipe_id] = {valid=true,productivity_bonus=index==600 and 0 or 3,
+              prototype={maximum_productivity=3}}
+          end
+          local native = technology(id,{effects=effects})
+          local detail = assert(model.detail({technologies={[id]=native},research_queue={},recipes=recipes},
+            {{id=id,family="research_gears"}},{selected=id},{},{recipe_productivity_supported=true}))
+          assert(#detail.effects == 16 and #detail.recipe_targets == 512 and #detail.recipe_benefits == 600
+            and detail.next_level_has_effective_benefit == true,
+            "a useful recipe beyond the effect preview must prevent a false no-benefit claim")
+        ''')
+
+    def test_productivity_headroom_retains_absolute_cap_and_native_final_level_boundaries(self):
+        self.lua.execute('''
+          local id = "recipe-prod-research_gears-1"
+          local native = technology(id, {level=2,max_level=2,effects={
+            {type="change-recipe-productivity",recipe="gear",change=.1}
+          }})
+          local recipe = {valid=true,productivity_bonus=0,prototype={maximum_productivity=3}}
+          local force = {technologies={[id]=native},research_queue={},recipes={gear=recipe}}
+          local declared = {{id=id,family="research_gears"}}
+          local context = {recipe_productivity_supported=true,cap_provider=function()return {[id]=2}end}
+          local function detail() return assert(model.detail(force,declared,{selected=id},{},context)) end
+          assert(detail().next_level_has_effective_benefit == true,
+            "the final selected native level remains researchable at the inclusive cap")
+          native.level = 3
+          assert(detail().next_level_eligible == false and detail().next_level_has_effective_benefit == false)
+          native.level = 2; native.enabled = false
+          assert(detail().next_level_has_effective_benefit == false)
+          native.enabled = true; native.researched = true
+          assert(detail().next_level_has_effective_benefit == false)
+          native.researched = false
+          recipe.productivity_bonus = 3-2e-9
+          assert(detail().next_level_has_effective_benefit == true)
+          recipe.productivity_bonus = 3-.5e-9
+          assert(detail().next_level_has_effective_benefit == false,
+            "retain the independently published1e-9 headroom boundary")
+          recipe.productivity_bonus = 4
+          assert(detail().recipe_benefits[1].current_productivity_bonus == 4
+            and detail().next_level_has_effective_benefit == false)
+          context.cap_provider = nil; native.level = 3
+          assert(detail().next_level_eligible == false,
+            "absence of a MIR cap must not override the finite native maximum")
+        ''')
+
     def test_localized_recipe_and_product_search_text_is_separate_from_the_caption(self):
         self.lua.execute('''
           local id = "recipe-prod-research_gears-1"

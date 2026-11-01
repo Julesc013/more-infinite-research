@@ -707,7 +707,8 @@ end
 local function context_for(force)
   local context = {
     private_credit_ids = private_credit_ids,
-    research_triggers_supported = target.id == "f200" or target.id == "f210"
+    research_triggers_supported = target.id == "f200" or target.id == "f210",
+    recipe_productivity_supported = target.recipe_productivity == true
   }
   if type(cap_provider) ~= "function" then return context end
   local ok, caps = pcall(cap_provider, force)
@@ -1079,6 +1080,43 @@ local function research_seconds(cost)
   return cost.time or cost[2] or "?"
 end
 
+local function add_recipe_benefits(parent, detail)
+  if type(detail) ~= "table" then return end
+  if detail.recipe_benefits_state == "unavailable" then
+    add(parent, {type = "label", name = PREFIX .. "live_detail_unavailable",
+      caption = {"mir-browser.live-detail-unavailable"}})
+    return
+  end
+  local benefits = detail.recipe_benefits
+  if detail.recipe_benefits_state ~= "available" or type(benefits) ~= "table" or #benefits == 0 then return end
+  local current_min, current_max = benefits[1].current_productivity_bonus, benefits[1].current_productivity_bonus
+  local maximum_min, maximum_max = benefits[1].maximum_productivity, benefits[1].maximum_productivity
+  for index = 2, #benefits do
+    local benefit = benefits[index]
+    current_min = math.min(current_min, benefit.current_productivity_bonus)
+    current_max = math.max(current_max, benefit.current_productivity_bonus)
+    maximum_min = math.min(maximum_min, benefit.maximum_productivity)
+    maximum_max = math.max(maximum_max, benefit.maximum_productivity)
+  end
+  if current_max * 100 == math.huge or maximum_max * 100 == math.huge then
+    add(parent, {type = "label", name = PREFIX .. "live_detail_unavailable",
+      caption = {"mir-browser.live-detail-unavailable"}})
+    return
+  end
+  local low, high = string.format("%.6g", current_min * 100), string.format("%.6g", current_max * 100)
+  local cap_low, cap_high = string.format("%.6g", maximum_min * 100), string.format("%.6g", maximum_max * 100)
+  local caption = low == high and cap_low == cap_high
+    and {"mir-browser.productivity-current-cap", low, cap_low}
+    or {"mir-browser.productivity-current-cap-range", low, high, cap_low, cap_high}
+  add(parent, {type = "label", name = PREFIX .. "productivity_current_cap", caption = caption})
+  -- The authored message covers all MIR benefit; mixed native effects may
+  -- still grant something beyond recipe productivity.
+  if detail.next_level_has_effective_benefit == false and detail.recipe_benefits_only_effects == true then
+    add(parent, {type = "label", name = PREFIX .. "no_next_benefit",
+      caption = {"mir-browser.no-next-benefit", #benefits}})
+  end
+end
+
 local function detail_lines(parent, row, detail, player)
   if not row then
     add(parent, {type = "label", name = PREFIX .. "detail_empty", caption = {"mir-browser.no-results"}})
@@ -1172,6 +1210,7 @@ local function detail_lines(parent, row, detail, player)
       add(parent, {type = "label", name = PREFIX .. "effect_" .. index, caption = text_value})
     end
   end
+  add_recipe_benefits(parent, detail)
   local recipe_rows = affected_recipe_rows(player, detail)
   if #recipe_rows > 0 then
     local recipe_heading = add(parent, {type = "label", name = PREFIX .. "detail_affected_recipes",

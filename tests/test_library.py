@@ -894,6 +894,59 @@ class LibraryTests(unittest.TestCase):
             "a retired production action must not sample or reopen the closed Library")
         ''')
 
+    def test_selected_live_productivity_limits_and_saturation_render_without_stale_values(self):
+        self.lua.execute('''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          boot()
+          gear.researched, gear.enabled = false, true
+          gear.level = 1
+          player.force.research_queue, player.force.current_research = {}, nil
+          gear.prototype.effects = {{type="change-recipe-productivity",recipe="gear",change=.1}}
+          local recipe = {valid=true,name="gear",localised_name="Gear",productivity_bonus=0,
+            prototype={maximum_productivity=3}}
+          player.force.recipes = {gear=recipe}
+          local function detail()
+            local root = library.open(player,{selected=gear.name})
+            return research_content(root)["mir_library_detail"]
+          end
+          local first = detail()
+          assert(first["mir_library_productivity_current_cap"]
+            and first["mir_library_productivity_current_cap"].caption[2] == "0"
+            and first["mir_library_productivity_current_cap"].caption[3] == "300",
+            "selected details must show the actual recipe bonus and maximum")
+          assert(first["mir_library_no_next_benefit"] == nil)
+          recipe.productivity_bonus = 3
+          local saturated = detail()
+          assert(saturated["mir_library_productivity_current_cap"].caption[2] == "300"
+            and saturated["mir_library_no_next_benefit"].caption[1] == "mir-browser.no-next-benefit")
+          gear.prototype.effects[2] = {type="change-recipe-productivity",recipe="other-gear",change=.2}
+          player.force.recipes["other-gear"] = {valid=true,name="other-gear",localised_name="Other gear",
+            productivity_bonus=1.5,prototype={maximum_productivity=5}}
+          recipe.productivity_bonus = .25
+          local mixed = detail()["mir_library_productivity_current_cap"].caption
+          assert(mixed[1] == "mir-browser.productivity-current-cap-range"
+            and mixed[2] == "25" and mixed[3] == "150" and mixed[4] == "300" and mixed[5] == "500")
+          recipe.productivity_bonus = 3
+          player.force.recipes["other-gear"].productivity_bonus = 5
+          gear.prototype.effects[3] = {type="unlock-recipe",recipe="another-benefit"}
+          assert(detail()["mir_library_no_next_benefit"] == nil,
+            "saturated recipe productivity must not deny other kinds of native benefit")
+          gear.prototype.effects = {{type="change-recipe-productivity",recipe="gear",change=.1}}
+          player.force.recipes.gear = nil
+          local missing = detail()
+          assert(missing["mir_library_live_detail_unavailable"].caption[1] == "mir-browser.live-detail-unavailable"
+            and missing["mir_library_productivity_current_cap"] == nil
+            and missing["mir_library_no_next_benefit"] == nil,
+            "missing live facts must replace stale numbers without claiming saturation")
+          player.force.recipes.gear = recipe
+          recipe.prototype.maximum_productivity = 1e308
+          assert(detail()["mir_library_live_detail_unavailable"] ~= nil,
+            "unrepresentable percentages must not display invented infinite limits")
+          assert(gear.level == 1 and gear.enabled and not gear.researched
+            and #player.force.research_queue == 0)
+        ''')
+
     def test_legacy_engine_prototype_collections_supply_library_recipe_and_item_names(self):
         self.lua.execute(r'''
           boot()
@@ -1175,7 +1228,8 @@ class LibraryTests(unittest.TestCase):
         required = {
             "availability", "availability-empty", "configuration-source", "count", "effective-values",
             "help", "help-summary", "productivity-increment", "queue-empty", "queue-tab",
-            "not-added",
+            "not-added", "productivity-current-cap", "productivity-current-cap-range",
+            "no-next-benefit", "live-detail-unavailable",
             "search-settings", "hide", "show", "show-hidden", "inspect-settings", "hide-tooltip",
             "show-tooltip", "layout-smaller",
             "layout-larger", "layout-reset",

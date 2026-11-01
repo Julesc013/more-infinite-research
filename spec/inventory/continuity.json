@@ -788,6 +788,237 @@
           },
           "remaining_native_check": "Black Glass qualifies the final integrated F200/F210 candidate's availability filters/detail captions and retained foreign/hidden/queued/private state plus actual foreign-GUI lifecycle and explicit production action, then affected save/reload/client/performance paths. Keep frozen public501 packetA unchanged; source correctionB requires review, exact-head CI and later changed public version5.0.2 unless live history advances.",
           "limits": "All original87 request records, other CONT subjects, source/tag/asset identities and historical failures remain intact. inventory_complete and broad historical source/test reconciliation remain false. No reporter-specific crash, engine/native/performance or stable release verdict is granted."
+        },
+        {
+          "id": "selected-live-recipe-productivity-detail-preservation",
+          "reviewed_base": "a32ddbbd28aae6829ea22ca03c0cb90e03f78828",
+          "historical_source": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "historical_test": {
+            "path": "tests/runtime/research_browser_omissions.lua",
+            "blob": "0b6ff3eeabafb6c0bfb560fa87f68a9e6cc5807a",
+            "tag_locators": 16
+          },
+          "source_witnesses": [
+            {
+              "path": "source/prototypes/mir/runtime/research_browser.lua",
+              "blob": "46f93a983f6231d435e65ecfc7bf63551eaac4e3",
+              "sha256": "712D672BDA7ADAC4A768A06300F405FFB00D6F97335E6BA6E17EFA46FEF3A82C",
+              "tags": [
+                "v4.2.0",
+                "v4.2.0-stable"
+              ]
+            },
+            {
+              "path": "source/prototypes/mir/runtime/research_browser_mir_provider.lua",
+              "blob": "acb9889708dfdac45493305a68560f6fda522932",
+              "sha256": "BB3A1877DC7CB69358B6C6D0F88CAEA716C4479E9D35DCF3880240D5D11FCACC",
+              "tags": [
+                "v4.2.0",
+                "v4.2.0-stable",
+                "v4.2.1"
+              ]
+            },
+            {
+              "path": "source/prototypes/mir/runtime/research_browser.lua",
+              "blob": "5e0afec36963c08167ca952f476170b3050ff39a",
+              "sha256": "F72A6E0C9DF153222DC74DFDEFEAAB423A0B6973F189D5DF33C474EBC97ED5DE",
+              "tags": [
+                "v4.2.1"
+              ]
+            },
+            {
+              "path": "source/prototypes/mir/runtime/research_browser.lua",
+              "blob": "40ebb59d18e113297ed424451691bf4671d29303",
+              "sha256": "5DAD134AC15280F43FA8341539D0827FEFDE283F7B005B738E2D121F44CC9F43",
+              "tags": [
+                "v4.2.2"
+              ]
+            },
+            {
+              "path": "source/prototypes/mir/runtime/research_browser_mir_provider.lua",
+              "blob": "522a8bc25cb5cc4a0bf0a237e790eb201ee1e09e",
+              "sha256": "7493EDA611B8D5B0693E5F95CC1C2D92472968DD42CC9B155750EC180EF2A971",
+              "tags": [
+                "v4.2.2",
+                "v4.4.0",
+                "v4.4.1",
+                "v4.4.2",
+                "v4.5.0",
+                "v4.5.1",
+                "v4.5.2",
+                "v4.6.0",
+                "v4.7.0",
+                "v4.7.1",
+                "v4.7.2",
+                "v4.7.3"
+              ]
+            },
+            {
+              "path": "source/prototypes/mir/runtime/research_browser.lua",
+              "blob": "4c375e78aa53ae11a7c464f4ade8e1f370437da5",
+              "sha256": "FF0F10494B38753BD17609CA5FE8ABBFD8BF967D54C23F24CEFFECB4FCCF56C0",
+              "tags": [
+                "v4.3.0",
+                "v4.4.0",
+                "v4.4.1",
+                "v4.4.2",
+                "v4.5.0",
+                "v4.5.1",
+                "v4.5.2",
+                "v4.6.0",
+                "v4.7.0",
+                "v4.7.1",
+                "v4.7.2",
+                "v4.7.3"
+              ]
+            },
+            {
+              "path": "source/prototypes/mir/runtime/research_browser_mir_provider.lua",
+              "blob": "5d6ee1c72da0147e70ca4d4daf481ebe1ecc058c",
+              "sha256": "8AC9BF88637B2C13D54CE1BADDCF2EBCBC5B42FBCAB6B9BF29E7DA4AC45EB2CA",
+              "tags": [
+                "v4.3.0"
+              ]
+            }
+          ],
+          "helper_disposition": "The relevant next-level eligibility, recipe headroom and live-fact helper bodies each have one identical body across the seven selected provider/UI source blobs at16 original-test tag locators. This is bounded function/regression intent reconciliation, not review of all logic in those modules or every inter-release source.",
+          "additional_core_witness": {
+            "path": "source/prototypes/mir/runtime/research_browser_core.lua",
+            "blob": "bf33867aac4a69ef47e99d57c1f6db08bb108ed8",
+            "scope": "validated_recipe_benefits and detail_recipe_index consume the normalized MIR enrichment; they do not establish a separate foreign-research ownership or preview API promise."
+          },
+          "published_witness": {
+            "release_id": 422732162,
+            "asset_id": 672267722,
+            "name": "more-infinite-research_4.7.21003.zip",
+            "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+            "scope": "The actual archived UI member equals its source-tag blob, contains the live current/maximum/saturation consumer, and the ZIP hash matches the live GitHub asset digest. All200 restored locale values also match that published archive. This is delivery/source identity, not a new native result."
+          },
+          "independent_expectations": [
+            "Selected MIR productivity details observe current native recipe bonus/maximum and reflect changed live facts on reopening; detached DTO edits cannot mutate recipes or later observations.",
+            "Lightweight catalogue queries do not inspect live recipe productivity. Selected details read only named affected recipes; no whole-recipe/prototype traversal, Generator import or persistent compiler snapshot.",
+            "The final selected absolute/native level remains researchable at the inclusive cap. Disabled/completed or above-cap research has no currently usable next benefit. Preserve the published1e-9 headroom boundary rather than weakening it.",
+            "Unknown/invalid live fields or an exceeded native-effect scan budget are unavailable, never invented zero, partial aggregate saturation or a claim that research disappeared.",
+            "A useful recipe beyond the16-effect preview or512-entry navigation list still prevents a false no-benefit claim; the bounded native effect scan covers up to1024effects. The recipe list and aggregate have different purposes.",
+            "Foreign undeclared rows gain no MIR ownership/benefit claim. The generic no-additional-MIR-benefit message is withheld for mixed native effect kinds, which may grant another benefit."
+          ],
+          "implementation": [
+            "source/presentation/library_model.lua",
+            "source/runtime/library.lua"
+          ],
+          "native_api_facts": {
+            "versions": [
+              "2.0.77",
+              "2.1.23"
+            ],
+            "fields": [
+              "LuaRecipe.productivity_bonus",
+              "LuaRecipePrototype.maximum_productivity",
+              "LuaTechnologyPrototype.max_level"
+            ],
+            "input_sha256": [
+              "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578",
+              "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373"
+            ],
+            "scope": "Actual force recipe bonus and prototype limit, not machine/module/quality throughput. The host supplies its explicit recipe-productivity capability; legacy/unsupported contexts do not read those fields."
+          },
+          "locale_preservation": {
+            "source": "v4.7.3:source/locale/<language>/more-infinite-research.cfg [mir-browser]",
+            "destination": "source/locale/<language>/mir-library.cfg",
+            "languages": 50,
+            "keys": [
+              "no-next-benefit",
+              "productivity-current-cap",
+              "productivity-current-cap-range",
+              "live-detail-unavailable"
+            ],
+            "disposition": "Port four exact authored values per language, preserving every prior current line. No new translation or documentation estate regeneration."
+          },
+          "historical_transport_dispositions": [
+            {
+              "intent": "Omitted versus existing-disabled research",
+              "disposition": "consolidate",
+              "mapping": [
+                "source/presentation/availability.lua",
+                "tests/test_library.py::test_availability_mode_searches_authored_rows_without_native_actions",
+                "tests/test_library_model.py::test_availability_binds_withheld_materials_to_exact_bob_closures_without_force_mutation"
+              ],
+              "limit": "Retain current force presence/availability meaning; retired sealed compiler plan DTO/fingerprint/cache counters are not implementation requirements."
+            },
+            {
+              "intent": "Live selected facts and lightweight listing",
+              "disposition": "port",
+              "mapping": [
+                "tests/test_library_model.py::test_selected_productivity_details_refresh_live_recipes_without_eager_list_reads",
+                "tests/test_library_model.py::test_live_productivity_facts_do_not_drop_recipes_beyond_the_short_effect_preview",
+                "tests/test_library.py::test_selected_live_productivity_limits_and_saturation_render_without_stale_values"
+              ]
+            },
+            {
+              "intent": "Runtime setting/controller ownership and configuration invalidation",
+              "disposition": "retain-under-existing-subjects",
+              "mapping": [
+                "CONT-03",
+                "CONT-07",
+                "source/runtime/library.lua",
+                "source/runtime/configuration.lua",
+                "tests/test_library.py::test_cap_provider_is_configured_without_force_extension_or_periodic_work",
+                "tests/test_settings_commands.py"
+              ],
+              "limit": "The old matching owned setting/controller and foreign/unregistered-negative expectations remain relevant; this unit does not qualify every current native binding, profile/cache lifetime or foreign-setting provenance. Original compiled registry/fingerprint transport is obsolete, not the player obligation."
+            },
+            {
+              "intent": "Old sealed emission ownership and public-fingerprint machinery",
+              "disposition": "obsolete-implementation-only",
+              "mapping": [
+                "source/research/catalogue.lua",
+                "source/runtime/catalogue.lua",
+                "source/research/generator.lua"
+              ],
+              "limit": "Use canonical authored identity/admission and actual force state. Do not restore old mod_data/compiler/public-fingerprint frameworks or infer ownership from a disabled/absent technology. Preserve the separate native creator-boundary correction and actual historical receipts."
+            }
+          ],
+          "validation": {
+            "focused_tests": 179,
+            "lua": "Lupa2.6/lua52",
+            "source_opponents_rejected": 11,
+            "native_processes": 0,
+            "before": "All four initial focused live-detail controls fail on the unchanged checked parent at their missing-fact/explanation expectations. Opponents include the old model, eager lists, stale observations, preview truncation, cap off-by-one, missing-fact zero, unsupported/foreign claims, changed epsilon and incomplete host/mixed-benefit guards.",
+            "custody": "build/qualification/aero-live-benefits-r01/",
+            "receipts": [
+              {
+                "name": "source-variants.json",
+                "sha256": "FF63A9724FE68A268C10F4EF0FAE4ED1389BFE4AAC6124F84731A24E84DA58F7"
+              },
+              {
+                "name": "provider-function-readback.json",
+                "sha256": "623CF8BC256C46C6C97B43FB1EE67384D97C1D8CA0C8E50D3AEAFD1917F5F0FF"
+              },
+              {
+                "name": "regression-before.json",
+                "sha256": "0C3F2D1AB45127F7457CC3AF4184DCC6B13514F864034E06A2576885D0C7AA6A"
+              },
+              {
+                "name": "focused-after.json",
+                "sha256": "53984E4BCC55684DA88C3985085E4DE1825CD98EAB4A7760929D75C2A7078513"
+              },
+              {
+                "name": "negative-controls.json",
+                "sha256": "9FF64C45C58802FAB22948B7E21C9110EC7FCC3A4A26C549D301DAF8C06899CB"
+              },
+              {
+                "name": "api-facts.json",
+                "sha256": "1B1C7076BB7430DC45A336D0EAEDB7A6B3A4A7786198F1300279D069182E4C96"
+              },
+              {
+                "name": "locale-port-readback.json",
+                "sha256": "F34D879A3B65C4031B56572D5D981D2C3A3755C448306A6BA58C31E884DDDD42"
+              }
+            ]
+          },
+          "package_applicability": "The two Library modules affect modern presentation; the50 restored locale members also occur in reduced packages, so those ZIP bytes change and are not called identical to501. Review exact private package members, locale parsing and the final public5.0.2 freeze separately. No source version, published byte, tag, direct library, fixture/controller or protected save changes here.",
+          "remaining_native_check": "Black Glass observes selected current bonus/limit before and after an actual useful lab, saturated and mixed/disabled/cap cases, reopened/cold/client views and representative English/German geometry on the final F200/F210 candidate. Review old-edition locale/package parsing applicability and final candidate first-open/refresh/memory cost; source/host identity is not native acceptance.",
+          "limits": "This checked-parent correction remains separate from frozen public501 packetA and still needs independent review/integration, exact-head CI and final affected native/package/performance qualification. All87 request decisions, other CONT subjects and broad audit flags remain unchanged; VER-07 and stable acceptance remain incomplete."
         }
       ],
       "test_subjects": [
@@ -795,7 +1026,8 @@
         "two_clients"
       ],
       "remaining_implementation": [
-        "The published-beta stacked layout is corrected in dev. This bounded unit also corrects the demonstrated public501 Ready-filter/native-status regression; independent integration review and affected final-package/native qualification remain required. These three entrypoint groups establish no additional player-source defect beyond the readiness correction."
+        "The published-beta stacked layout is corrected in dev. This bounded unit also corrects the demonstrated public501 Ready-filter/native-status regression; independent integration review and affected final-package/native qualification remain required. These three entrypoint groups establish no additional player-source defect beyond the readiness correction.",
+        "The delivered live recipe productivity/current-maximum/saturation detail is restored in this bounded correction, with authored locale values and read-only selected native facts. Independent integration review and affected native/package/performance acceptance remain open."
       ],
       "remaining_qualification": [
         "Complete accepted paired Library/save-load timing and retained-session/churn memory. Corrected R02 diagnostics contain all26 endpoints and pass28 UI-duration/save-ready controls but fail five same-published memory controls;retain both original adverse datasets and review the next bounded measurement protocol before scoring. New7b0 functional/rendered F200/F210 results are separate from performance.",
@@ -803,7 +1035,8 @@
         "Qualify the accepted1026/1027 Library corrections on the final coherent F200/F210 player packages: actual Esc/E close and dragging/location retention, foreign GUI focus during asynchronous refresh, vanished-root subscription retirement and removed-player translation resumption. Preserve earlier client receipts at their original inputs.",
         "Earned or persisted private selections/queue state and foreign hidden-row inspection still require affected native cases. Fresh F2001D45 and F2102DDD zero-credit private visibility/action/native-state checks now pass;do not relabel them as positive imported credit or paired timing evidence.",
         "Complete historical_preservation_review: retain the layout negative control and add rejection controls for any known broken handlers, then qualify the affected rendered/input/lifecycle and burst/retained-memory paths on the successor. Old source/native mappings alone do not preserve the accepted interaction design.",
-        "Qualify Ready/Locked/Queue/All and completed/disabled/hidden/trigger details from actual final F200/F210 native state, preserving earned effects, queued/suspended work, foreign hidden inspection and private credits. Host174 and opposing-source controls do not complete native acceptance."
+        "Qualify Ready/Locked/Queue/All and completed/disabled/hidden/trigger details from actual final F200/F210 native state, preserving earned effects, queued/suspended work, foreign hidden inspection and private credits. Host174 and opposing-source controls do not complete native acceptance.",
+        "Qualify final native current recipe bonus/maximum/headroom and unavailable/mixed/cap detail states, plus affected locale parsing, English/German fit, first-open/refresh and retained memory. Keep all original historical/source/package identities and frozen501 native inputs distinct."
       ],
       "historical_preservation_review": {
         "status": "restored-layout-host-negative-control-passed-native-acceptance-pending",
