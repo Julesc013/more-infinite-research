@@ -794,7 +794,10 @@ class BootstrapTests(unittest.TestCase):
           local bucket = {queue = queue, members = members, scheduled = false, unknown = "keep"}
           storage.mir = {passive_repair = bucket, historical_other = "keep"}
           game = setmetatable({}, {__index = function() error("on_load accessed game") end})
+          local saved_metatable = getmetatable(storage)
+          setmetatable(storage, {__newindex = function() error("on_load wrote a saved root key") end})
           handlers.load()
+          setmetatable(storage, saved_metatable)
           assert(type(handlers.nth[60]) == "function")
           assert(storage.mir.passive_repair == bucket and bucket.queue == queue and bucket.members == members)
           assert(bucket.scheduled == false and bucket.unknown == "keep" and storage.mir.historical_other == "keep")
