@@ -6,7 +6,7 @@
 -- callbacks.
 local lifecycle = require("runtime.lifecycle")
 local library = require("runtime.library")
-local catalogue = require("research.catalogue")
+local catalogue = require("runtime.catalogue")
 local runtime_api = require("api.v1.runtime")
 local settings_profile = require("runtime.settings_profile")
 local settings_commands = require("runtime.settings_commands")
@@ -424,6 +424,11 @@ local function on_library_player_removed(event)
   reconcile_translations()
 end
 
+local function on_library_player_pre_removed(event)
+  library.on_pre_player_removed(event)
+  reconcile_translations()
+end
+
 local function on_library_string_translated(event)
   library.on_string_translated(event)
   reconcile_translations()
@@ -646,6 +651,7 @@ function M.register()
   if events.on_gui_click then script.on_event(events.on_gui_click, on_library_click) end
   if events.on_gui_location_changed then script.on_event(events.on_gui_location_changed, on_library_location_changed) end
   if events.on_gui_closed then script.on_event(events.on_gui_closed, on_library_closed) end
+  if events.on_pre_player_removed then script.on_event(events.on_pre_player_removed, on_library_player_pre_removed) end
   if events.on_player_removed then script.on_event(events.on_player_removed, on_library_player_removed) end
   if events.on_string_translated then script.on_event(events.on_string_translated, on_library_string_translated) end
   if events.on_player_locale_changed then script.on_event(events.on_player_locale_changed, on_library_locale_changed) end

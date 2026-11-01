@@ -172,11 +172,19 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
               else
                 local filters = element("table", "mir_library_filters")
                 local tabs = element("tabbed-pane", "mir_library_tabs")
-                local content = element("flow", "mir_library_research_content")
+                local stacked = opponent == "narrow-display" or opponent == "bad-stacked-width"
+                local content = element(stacked and "scroll-pane" or "table", "mir_library_research_content")
+                content.style = {maximal_width=stacked and 430 or 760}
+                if stacked then content.vertical_scroll_policy = "auto" else content.column_count = 2 end
                 filters["mir_library_query"] = {valid=true, type="textfield", text=options.search}
                 if opponent ~= "missing-family" then filters["mir_library_family"] = family end
                 content["mir_library_results"] = listbox("mir_library_results")
-                content["mir_library_detail"] = element("flow", "mir_library_detail")
+                local pane_width = stacked and 406 or 294
+                content["mir_library_results"].style = {minimal_width=pane_width, maximal_width=pane_width}
+                content["mir_library_detail"] = element("scroll-pane", "mir_library_detail")
+                local detail_width = stacked and 406 or 442
+                if opponent == "bad-stacked-width" then detail_width = 300 end
+                content["mir_library_detail"].style = {minimal_width=detail_width, maximal_width=detail_width}
                 tabs["mir_library_research_content"] = content
                 root["mir_library_filters"] = filters
                 root["mir_library_tabs"] = tabs
@@ -784,6 +792,13 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                     result = self.runtime_result(arm, opponent)
                     self.assertFalse(result["ok"])
                     self.assertIn(expected, result["message"])
+
+    def test_mir5_browser_observer_accepts_responsive_stacked_geometry(self):
+        result = self.runtime_result("mir5", "narrow-display")
+        self.assertTrue(result["ok"], result["message"])
+        malformed = self.runtime_result("mir5", "bad-stacked-width")
+        self.assertFalse(malformed["ok"])
+        self.assertIn("MIR5 public browser stacked list/detail geometry differs", malformed["message"])
 
 
 if __name__ == "__main__":

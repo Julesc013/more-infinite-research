@@ -7,7 +7,7 @@ end
 local api = require("__more-infinite-research__.api.v1.data")
 local version = api.get_version()
 local capabilities = api.get_capabilities()
-if version.major ~= 1 or version.minor ~= 0 or version.product ~= "5.0.21000"
+if version.major ~= 1 or version.minor ~= 0 or version.product ~= "5.0.21001"
     or capabilities.recipe_productivity ~= true then
   error("MIR API namespace alpha fixture: public target metadata differs")
 end

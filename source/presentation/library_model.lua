@@ -9,7 +9,11 @@ local MAX_PREREQUISITES = 64
 local MAX_EFFECTS = 16
 local MAX_INGREDIENTS = 16
 local MAX_TEXT = 1024
+local MAX_SEARCH_TEXT = 32768
+local MAX_RECIPE_TARGETS = 512
+local MAX_NATIVE_EFFECT_SCAN = 1024
 local INFINITE_MAX_LEVEL = 4294967295
+local SEARCH_LABEL_SEPARATOR = "\31"
 
 local function finite_integer(value)
   return type(value) == "number" and value == value and value > -math.huge
@@ -232,8 +236,17 @@ local function native_maximum(technology)
 end
 
 local function display_name(translations, declaration, id)
-  local translated = type(translations) == "table" and bounded_string(translations[id], MAX_TEXT) or nil
-  return translated or id
+  local translated = type(translations) == "table" and bounded_string(translations[id], MAX_SEARCH_TEXT) or nil
+  if translated then
+    local separator = string.find(translated, SEARCH_LABEL_SEPARATOR, 1, true)
+    if separator then
+      local name = bounded_string(string.sub(translated, 1, separator - 1), MAX_TEXT)
+      local search = bounded_string(string.sub(translated, separator + 1), MAX_SEARCH_TEXT)
+      return name or id, search or translated
+    end
+    return bounded_string(translated, MAX_TEXT) or id, translated
+  end
+  return id, id
 end
 
 local function copy_settings(settings)
@@ -257,10 +270,11 @@ local function row_for(force, declaration, id, technology, queue_count, queue_in
   local native_order = bounded_string(native_read(technology, "order"), MAX_TEXT)
     or (declaration and declaration.native_order) or ""
   local family = declaration and declaration.family or "external"
-  local name = display_name(translations, declaration, id)
+  local name, search_text = display_name(translations, declaration, id)
   local row = {
     id = id,
     name = name,
+    search_text = search_text,
     family = family,
     progression = declaration and declaration.progression or 0,
     order = native_order,
@@ -293,6 +307,28 @@ local function row_for(force, declaration, id, technology, queue_count, queue_in
   return row
 end
 
+local function copy_recipe_targets(technology)
+  local prototype = native_read(technology, "prototype")
+  local effects = native_read(prototype, "effects")
+  local result, seen, complete = {}, {}, true
+  if effects == nil then return result, complete end
+  local ok = pcall(function()
+    for index, effect in ipairs(effects) do
+      if index > MAX_NATIVE_EFFECT_SCAN then complete = false; break end
+      local kind = native_read(effect, "type")
+      if kind == "unlock-recipe" or kind == "change-recipe-productivity" then
+        local id = bounded_string(native_read(effect, "recipe"), MAX_TEXT)
+        if id and not seen[id] then
+          if #result >= MAX_RECIPE_TARGETS then complete = false; break end
+          seen[id] = true
+          result[#result + 1] = id
+        end
+      end
+    end
+  end)
+  return ok and result or {}, ok and complete or false
+end
+
 local function wants_native_catalogue(family)
   return family == "all" or family == "external"
 end
@@ -321,8 +357,8 @@ local function row_matches(row, view)
   if view.visibility == 1 and view.hidden[row.id] then return false end
   if view.visibility == 2 and not view.hidden[row.id] then return false end
   if view.search == "" then return true end
-  return matches(row.id .. " " .. row.family .. " " .. row.name .. " "
-    .. (row.recipe or "") .. " " .. (row.locale_key or ""), view.search)
+  return matches(row.id .. " " .. row.family .. " " .. row.name .. " " .. (row.search_text or "")
+    .. " " .. (row.recipe or "") .. " " .. (row.locale_key or ""), view.search)
 end
 
 local function ordered(left, right, sort)
@@ -464,6 +500,7 @@ function M.detail(force, catalogue, view, translations, context)
   local cost, ingredients_complete = copy_cost(technology)
   row.effects, row.effects_complete = effects, effects_complete
   row.cost, row.ingredients_complete = cost, ingredients_complete
+  row.recipe_targets, row.recipe_targets_complete = copy_recipe_targets(technology)
   return row
 end
 

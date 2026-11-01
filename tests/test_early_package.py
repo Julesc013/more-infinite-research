@@ -49,6 +49,8 @@ class EarlyPackageTests(unittest.TestCase):
         )
         self.assertEqual(set(early["targets"]), {"f006", "f007", "f008", "f009", "f010", "f011", "f012"})
         with self._early_repository() as (repository, source, revision):
+            source_version = json.loads((source / "info.json").read_text(encoding="utf-8"))["version"]
+            patch_suffix = str(int(source_version.split(".")[-1]) % 100).zfill(2)
             for target, selected in early["targets"].items():
                 with self.subTest(target=target):
                     # This deliberately does not use the normal player-root
@@ -61,11 +63,11 @@ class EarlyPackageTests(unittest.TestCase):
                         target=target,
                         target_record=EARLY_RECORD,
                     )
-                    root = "more-infinite-research_5.0." + target[1:] + "00"
+                    root = "more-infinite-research_5.0." + target[1:] + patch_suffix
                     self.assertEqual(record["kind"], "early-data-only-package-members-not-gameplay-qualification")
                     self.assertEqual(record["delivery"], selected["delivery"])
                     self.assertEqual(record["target_record"], EARLY_RECORD)
-                    self.assertEqual(record["version"], "5.0." + target[1:] + "00")
+                    self.assertEqual(record["version"], "5.0." + target[1:] + patch_suffix)
                     with zipfile.ZipFile(output) as archive:
                         names = archive.namelist()
                         info = json.loads(archive.read(root + "/info.json"))
@@ -87,7 +89,7 @@ class EarlyPackageTests(unittest.TestCase):
                     ])
                     self.assertEqual(info, {
                         "name": "more-infinite-research",
-                        "version": "5.0." + target[1:] + "00",
+                        "version": "5.0." + target[1:] + patch_suffix,
                         "title": "More Infinite Research",
                         "author": "Julesc013",
                         "description": pack.EARLY_DESCRIPTION,

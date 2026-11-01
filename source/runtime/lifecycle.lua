@@ -5,7 +5,7 @@ local caps = require("runtime.caps")
 local legacy_caps = require("runtime.legacy_caps")
 local native_owners = require("research.native_owners")
 local cap_admission = require("runtime.cap_admission")
-local catalogue = require("research.catalogue")
+local catalogue = require("runtime.catalogue")
 local platform_target = require("platform.target")
 
 local M = {}

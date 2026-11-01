@@ -263,6 +263,32 @@ local function assert_shape(player, arm, view)
     local tabs = child(root, shape.tabs)
     local content = child(tabs, shape.content)
     results, detail = child(content, shape.results), child(content, shape.detail)
+    if not valid(content) or not valid(results) then
+      fail("MIR5 public browser research panes are absent")
+    end
+    if not valid(detail) then fail("public browser detail differs") end
+    local content_style, results_style, detail_style = content.style, results.style, detail.style
+    local content_width = content_style and content_style.maximal_width
+    if type(content_width) ~= "number" or content_width <= 0 or results_style == nil or detail_style == nil
+        or type(results_style.minimal_width) ~= "number" or type(detail_style.minimal_width) ~= "number"
+        or results_style.minimal_width < 120 or detail_style.minimal_width < 120 then
+      fail("MIR5 public browser list/detail pane geometry differs")
+    end
+    if content.type == "table" then
+      if content.column_count ~= 2 or results_style.minimal_width < 200 or detail_style.minimal_width < 280
+          or results_style.minimal_width >= detail_style.minimal_width
+          or results_style.minimal_width + detail_style.minimal_width > content_width then
+        fail("MIR5 public browser split list/detail geometry differs")
+      end
+    elseif content.type == "scroll-pane" then
+      if content.vertical_scroll_policy ~= "auto"
+          or math.abs(results_style.minimal_width - detail_style.minimal_width) > 1
+          or results_style.minimal_width > content_width then
+        fail("MIR5 public browser stacked list/detail geometry differs")
+      end
+    else
+      fail("MIR5 public browser is not using the responsive research layout")
+    end
   else
     local tabs = child(root, shape.tabs)
     local content = child(tabs, shape.content)
@@ -280,7 +306,8 @@ local function assert_shape(player, arm, view)
   if not valid(results) or results.type ~= "list-box" or #results.items < 1 or results.selected_index < 1 then
     fail("public browser selected results differ")
   end
-  if not valid(detail) or detail.type ~= "flow" then fail("public browser detail differs") end
+  local expected_detail_type = shape.filters and "scroll-pane" or "flow"
+  if not valid(detail) or detail.type ~= expected_detail_type then fail("public browser detail differs") end
 end
 
 local function open(player, view)
