@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-10-31
+last_reviewed: 2026-11-02
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -76,7 +76,8 @@ git clone https://github.com/Julesc013/more-infinite-research.git
 cd more-infinite-research
 git switch dev
 git switch -c fix/my-bounded-change
-python tools/package.py --source source --target f210 --output ../mir-local/more-infinite-research_5.0.21000.zip
+$mirLocalVersion = (Get-Content -LiteralPath source/info.json -Raw | ConvertFrom-Json).version
+python tools/package.py --source source --target f210 --output "../mir-local/more-infinite-research_$mirLocalVersion.zip"
 ```
 
 `--target` selects an implemented edition and derives its numeric version from `source/info.json`; it is not native qualification. For a one-off same-name package without target adaptation, use a valid five-digit distribution version and a matching output filename:
