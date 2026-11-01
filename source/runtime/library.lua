@@ -1627,7 +1627,19 @@ local function update_help_content(content, player, view)
   if not valid(content) then return end
   -- Keep the preview as a snapshot. Research/translation refreshes must not
   -- repeatedly encode hundreds of settings or replace a player's selection.
-  if valid(content[PREFIX .. "help_summary"]) then return end
+  local settings_box, omissions_box = content[PREFIX .. "report_settings"], content[PREFIX .. "report_omissions"]
+  local preview = content[PREFIX .. "report_preview"]
+  local complete_help = valid(content[PREFIX .. "help_summary"]) and (not diagnostics or (
+    valid(settings_box) and settings_box.type == "checkbox" and valid(omissions_box) and omissions_box.type == "checkbox"
+    and valid(preview) and preview.type == "text-box" and valid(content[PREFIX .. "report_select"])
+    and valid(content[PREFIX .. "report_refresh"])))
+  if complete_help then
+    if diagnostics and (settings_box.state ~= view.report_settings or omissions_box.state ~= view.report_omissions) then
+      settings_box.state, omissions_box.state = view.report_settings, view.report_omissions
+      update_report_preview(content, player, view)
+    end
+    return
+  end
   content.clear()
   add(content, {type = "label", name = PREFIX .. "help_summary", caption = {"mir-browser.help-summary"}})
   add(content, {type = "label", name = PREFIX .. "help_queue", caption = {"mir-browser.native-queue-guidance"}})

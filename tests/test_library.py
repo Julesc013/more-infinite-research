@@ -2903,6 +2903,41 @@ class LibraryTests(unittest.TestCase):
           assert(storage.mir_library.players[2]==nil)
         ''')
 
+    def test_existing_beta_help_pane_gains_report_controls_and_configuration_syncs_its_choices(self):
+        self.lua.execute(r'''
+          local encodes,writes=0,0
+          script={active_mods={base="2.1.23",["more-infinite-research"]="5.0.21001"}}
+          helpers={game_version="2.1.23",encode_string=function(text) encodes=encodes+1; return text end,
+            decode_string=function(text) return text end,json_to_table=function() return nil end,
+            write_file=function() writes=writes+1 end}
+          boot()
+          local root=library.open(player,{tab="help"})
+          local help=root.mir_library_tabs.mir_library_help_content
+          -- Exact published501 Help shape: two labels, export button and
+          -- privacy guidance. Its root/tab ownership already matches MIR5.
+          help.clear()
+          help.add({type="label",name="mir_library_help_summary"})
+          help.add({type="label",name="mir_library_help_queue"})
+          help.add({type="button",name="mir_library_export_diagnostics"})
+          help.add({type="label",name="mir_library_export_privacy"})
+          library.on_configuration_changed({})
+          library.on_native_refresh_tick()
+          assert(help.mir_library_report_settings and help.mir_library_report_omissions,
+            "existing beta Help did not gain the new controls")
+          assert(help.mir_library_report_preview and encodes==0 and writes==0)
+          storage.mir={research_browser={players={[1]={report_settings=true,report_omissions=true}}}}
+          storage.mir_library.players[1].report_settings=nil
+          storage.mir_library.players[1].report_omissions=nil
+          library.on_configuration_changed({})
+          library.on_native_refresh_tick()
+          assert(help.mir_library_report_settings.state and help.mir_library_report_omissions.state)
+          assert(encodes==1 and writes==0)
+          local preview=help.mir_library_report_preview
+          library.on_native_state_changed({force=player.force})
+          library.on_native_refresh_tick()
+          assert(encodes==1 and writes==0 and help.mir_library_report_preview==preview)
+        ''')
+
     def test_removed_player_report_choices_are_not_resurrected_from_retained_legacy_history(self):
         self.lua.execute(r'''
           boot()

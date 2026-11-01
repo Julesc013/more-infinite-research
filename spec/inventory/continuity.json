@@ -1208,7 +1208,8 @@
               "tests/test_library.py::test_removed_player_report_choices_are_not_resurrected_from_retained_legacy_history",
               "tests/test_settings_commands.py::test_report_preview_is_read_only_and_inline_choices_preserve_the_full_export",
               "tests/test_settings_commands.py::test_report_preview_bounds_availability_and_reports_capture_failure_without_writes",
-              "tests/test_bootstrap.py::test_report_checkbox_event_has_one_bootstrap_registration_owner"
+              "tests/test_bootstrap.py::test_report_checkbox_event_has_one_bootstrap_registration_owner",
+              "tests/test_library.py::test_existing_beta_help_pane_gains_report_controls_and_configuration_syncs_its_choices"
             ],
             "verification_status": "recovered-report-controls-source-and-host-passed-native-input-export-client-and-costs-pending",
             "remaining_verification": [
@@ -1301,11 +1302,12 @@
           "tests/test_library.py::test_removed_player_report_choices_are_not_resurrected_from_retained_legacy_history",
           "tests/test_settings_commands.py::test_report_preview_is_read_only_and_inline_choices_preserve_the_full_export",
           "tests/test_settings_commands.py::test_report_preview_bounds_availability_and_reports_capture_failure_without_writes",
-          "tests/test_bootstrap.py::test_report_checkbox_event_has_one_bootstrap_registration_owner"
+          "tests/test_bootstrap.py::test_report_checkbox_event_has_one_bootstrap_registration_owner",
+          "tests/test_library.py::test_existing_beta_help_pane_gains_report_controls_and_configuration_syncs_its_choices"
         ],
         "new_behavior": [
           "Active personal choices are normalized and carried from original/snapshot fields without overwriting explicit current booleans. One bootstrap event owner routes only owned checked callbacks.",
-          "Help shows a bounded readonly snapshot with explicit Refresh/select actions. Unchecked Help open and background rerenders do not encode a full profile. Choices/Refresh preview without writes; explicit export updates the preview with the exact report written.",
+          "Help shows a bounded readonly snapshot with explicit Refresh/select actions. Unchecked Help open and background rerenders do not encode a full profile. Choices/Refresh preview without writes; explicit export updates the preview with the exact report written. A retained four-control published501 Help pane is rebuilt to add the new controls; configuration-carried choices synchronize existing checkboxes once without rebuilding ordinary snapshots.",
           "Inline settings reuse the ordinary MIRSET1 capture. Explicit diagnostics always writes the full separate settings file even if its inline section is unchecked; console/default exports and init/configuration headers retain their meanings.",
           "Omission choice reports only current canonical authored Availability facts, capped at250, within the existing64KiB report. It does not rebuild an old compiler ledger or claim complete omission coverage.",
           "Removing a player with preserved legacy history sets optional library-owned legacy_browser.retired_players metadata. Original source/snapshot rows stay unchanged; a later configuration cannot re-import that retired index. No new schema framework, native/foreign state write or load-time migration is introduced."
@@ -1325,11 +1327,11 @@
           "method": "All values match source and the actual hash-verified published4.7.3 ZIP. Existing authored lines are unchanged; no new translation is generated."
         },
         "host_scope": {
-          "new_controls": 7,
+          "new_controls": 8,
           "prior_selected_controls": 106,
-          "total_selected_controls": 113,
-          "source_opponents_rejected": 10,
-          "opponent_limit": "Injected faults demonstrate sensitivity; they are not ten newly observed production defects. All seven controls reject the prior reviewed source before correction.",
+          "total_selected_controls": 114,
+          "source_opponents_rejected": 11,
+          "opponent_limit": "Injected faults demonstrate sensitivity; they are not eleven newly observed production defects. All eight controls reject the prior reviewed source before correction. Initial0d source separately fails the retained-beta-Help control; its earlier seven-control/package/CI identity is preserved.",
           "runtime": "Pinned Lupa2.6 lua52; exact2.0.77/2.1.23 GUI event/state/text/focus/select APIs inspected locally. No native engine is started."
         },
         "superseded_or_implementation_only": [
