@@ -62,6 +62,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact imported preservation fixture-source fetch failed.' }
           git fetch --no-tags --depth=1 origin cecb68738bc2e5a0612effddf269660d62e8760e
           if ($LASTEXITCODE -ne 0) { throw 'Exact patch01 preservation metadata-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 9c6f952aaf2fea0348a910016c3a2c3c4e3937ef
+          if ($LASTEXITCODE -ne 0) { throw 'Exact patch01 preservation guard-source fetch failed.' }
       - id: bind
         name: Bind the exact ordered host-control plan
         shell: pwsh
@@ -165,6 +167,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact imported preservation fixture-source fetch failed.' }
           git fetch --no-tags --depth=1 origin cecb68738bc2e5a0612effddf269660d62e8760e
           if ($LASTEXITCODE -ne 0) { throw 'Exact patch01 preservation metadata-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 9c6f952aaf2fea0348a910016c3a2c3c4e3937ef
+          if ($LASTEXITCODE -ne 0) { throw 'Exact patch01 preservation guard-source fetch failed.' }
       - name: Restore the bound host-control plan
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
