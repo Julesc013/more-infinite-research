@@ -20,7 +20,9 @@ Join roles are the exact names `MIR5English` and `MIR5Deutsch`, with the permitt
 
 The input report now exposes `en_name`, `de_name`, `en_locale`, `de_locale`, `en_connected` and `de_connected`, alongside the retained role indices. The export report exposes the same observations under `geometry.en` and `geometry.de`. The caller must read those actual observations before input, not infer readiness from a join count. Absent indices remain distinct from numeric indices. Host doubles exercise Lua index0 as robustness only; R04's networking index0 did not establish a Lua player index0.
 
-Compose each observer from the exact raw Git members and revisions in its prepared record. Input0.3 uses `control.lua` and the corresponding `info-input-identity-*.json`; export0.4 retains its separately pinned `control.lua`, `support-exports.lua` and `info-exports-identity-*.json`. An input-only correction does not retarget the export archive to current source. ZIP roots use the unchanged observer name and declared0.3.0 or0.4.0 version. Preserve the original31-row/75-effect/three-force source fixture and saved inputs; no source recreation, credit seeding or player-package change is required.
+The separate r14 F210 selection targets the published 5.0.1 beta archive and uses input observer0.3.2, whose runtime identity guard admits only that exact package version. The r12/r13 profiles and0.3.0 observer inputs remain unchanged; earlier native results do not transfer to r14.
+
+Compose each observer from the exact raw Git members and revisions in its prepared record. Input0.3 uses `control.lua` and the corresponding `info-input-identity-*.json`; export0.4 retains its separately pinned `control.lua`, `support-exports.lua` and `info-exports-identity-*.json`. An input-only correction does not retarget the export archive to current source. Input ZIPs use the exact declared0.3.x version; export ZIPs retain0.4.0. Preserve the original31-row/75-effect/three-force source fixture and saved inputs; no source recreation, credit seeding or player-package change is required.
 
 ## Native input delivery observation
 

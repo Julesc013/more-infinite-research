@@ -394,12 +394,17 @@ if script.active_mods["mir-fixture-mir5-library-native-input"] == "0.4.0" then
 end
 remote.add_interface(INTERFACE,{report=report,advance=advance})
 script.on_init(function()
-  local expected=script.active_mods.base=="2.0.77" and {mir="5.0.20000",fixture="0.3.0"}
-    or (script.active_mods.base=="2.1.23" and {mir="5.0.21000",fixture="0.4.0"})
+  local observer_version=script.active_mods["mir-fixture-mir5-library-native-input"]
+  local expected=(script.active_mods.base=="2.0.77" and observer_version=="0.3.0")
+      and {mir="5.0.20000",fixture="0.3.0",observer="0.3.0"}
+    or (script.active_mods.base=="2.1.23" and observer_version=="0.3.0"
+      and {mir="5.0.21000",fixture="0.4.0",observer="0.3.0"})
+    or (script.active_mods.base=="2.1.23" and observer_version=="0.3.2"
+      and {mir="5.0.21001",fixture="0.4.0",observer="0.3.2"})
   if not expected or script.active_mods["more-infinite-research"]~=expected.mir
       or script.active_mods[historical.fixture]~=expected.fixture then fail("imported native target differs") end
   local allowed={base=script.active_mods.base,["more-infinite-research"]=expected.mir,[historical.fixture]=expected.fixture,
-    ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]="0.3.0"}
+    ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]=expected.observer}
   for name,version in pairs(script.active_mods) do if allowed[name]~=version then fail("unexpected imported observer closure") end end
   for name,version in pairs(allowed) do if script.active_mods[name]~=version then fail("missing imported observer closure member") end end
   for _ in pairs(game.players) do fail("protected headless source must contain no pre-existing players") end

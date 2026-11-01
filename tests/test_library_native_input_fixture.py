@@ -1,6 +1,7 @@
 """Independent input-observer controls with native-shaped doubles, not native input evidence."""
 import argparse
 import hashlib
+import io
 import json
 from pathlib import Path
 import subprocess
@@ -106,6 +107,68 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                     check=False,
                 )
                 self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+
+    def test_501_f210_profile_pins_the_public_beta_and_distinct_observer(self):
+        profile_path = ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r14.json"
+        info_path = FIXTURE / "info-input-identity-f210-501.json"
+        profile = json.loads(profile_path.read_text(encoding="utf-8"))
+        info = json.loads(info_path.read_text(encoding="utf-8"))
+        historical = "mir-fixture-mir5-migration-origin-f200-110-source"
+        fixture = "mir-fixture-mir5-library-native-input"
+
+        self.assertEqual(profile["kind"], "mir5-library-native-input-imported110-native-selection")
+        self.assertEqual(profile["target"], "f210")
+        self.assertEqual(profile["engine"], {
+            "version": "2.1.23",
+            "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        })
+        self.assertEqual(profile["protected_input_save"]["sha256"],
+                         "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C")
+        self.assertEqual(info["version"], "0.3.2")
+        self.assertEqual(info["dependencies"], [
+            "base = 2.1.23",
+            "~ more-infinite-research = 5.0.21001",
+            f"~ {historical} = 0.4.0",
+        ])
+        self.assertEqual(
+            [(row["name"], row["version"], row["enabled"]) for row in profile["mods"]],
+            [
+                ("base", "2.1.23", True),
+                ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+                ("more-infinite-research", "5.0.21001", True),
+                (historical, "0.4.0", True),
+                (fixture, "0.3.2", True),
+            ],
+        )
+        self.assertEqual(
+            profile["archive_sha256"]["more-infinite-research_5.0.21001.zip"],
+            "C6C2470B438846484732E0E05D124DB31A1100C2F1AA0E770B327A4A6FBAFA5D",
+        )
+        self.assertEqual(
+            profile["archive_sha256"]["mir-fixture-mir5-library-native-input_0.3.2.zip"],
+            "D7ABBCB734EABEC189DF16972D152957A886C43DFC45FC01AC5809A9BBC72DB6",
+        )
+        control_path = FIXTURE / "control.lua"
+        control_bytes = control_path.read_bytes()
+        info_bytes = info_path.read_bytes()
+        self.assertIn(b'observer_version=="0.3.2"', control_bytes)
+        archive_bytes = io.BytesIO()
+        archive_name = f"{fixture}_0.3.2"
+        with zipfile.ZipFile(archive_bytes, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
+            for destination, contents in (("control.lua", control_bytes), ("info.json", info_bytes)):
+                entry = zipfile.ZipInfo(f"{archive_name}/{destination}", date_time=(1980, 1, 1, 0, 0, 0))
+                entry.create_system = 3
+                entry.external_attr = 0o100644 << 16
+                entry.compress_type = zipfile.ZIP_DEFLATED
+                archive.writestr(entry, contents, compresslevel=9)
+        self.assertEqual(
+            hashlib.sha256(archive_bytes.getvalue()).hexdigest().upper(),
+            profile["archive_sha256"][f"{archive_name}.zip"],
+        )
+
+        old = json.loads((ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r13.json").read_text(encoding="utf-8"))
+        self.assertEqual(old["mods"][2]["version"], "5.0.21000")
+        self.assertEqual(old["mods"][4]["version"], "0.3.0")
 
     def test_order_neutral_input_archives_use_the_canonical_two_member_policy(self):
         record = json.loads(
@@ -262,7 +325,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         self.lua.globals().historical_path = (ROOT / "tests/fixtures/migration-origins/f200-110-successor/catalogue.lua").as_posix()
         self.lua.globals().fingerprint = lambda value: json.dumps(plain(value), sort_keys=True)
         self.lua.execute(r'''
-          function run_input_observer(target,opponent)
+          function run_input_observer(target,opponent,package_version,input_observer_version)
             local historical=assert(loadfile(historical_path))()
             local events={on_player_joined_game=1,on_gui_text_changed=2,on_gui_click=3,on_gui_location_changed=4,
               on_gui_closed=5,on_technology_effects_reset=6,on_player_removed=7}
@@ -431,9 +494,10 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               end
             end
             local base=target=="f200" and "2.0.77" or "2.1.23"
-            local active={base=base,["more-infinite-research"]=target=="f200" and "5.0.20000" or "5.0.21000",
+            local active={base=base,["more-infinite-research"]=package_version or (target=="f200" and "5.0.20000" or "5.0.21000"),
               [historical.fixture]=target=="f200" and "0.3.0" or "0.4.0",
-              ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]="0.3.0"}
+              ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
+              ["mir-fixture-mir5-library-native-input"]=input_observer_version or "0.3.0"}
             local env={game=game,storage=store,defines={events=events,gui_type={custom=99},controllers={character=7,cutscene=11}},log=function(message)logs[#logs+1]=message end,
               helpers={table_to_json=function()return "{}"end},
               require=function(name)assert(name=="__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue");return historical end,
@@ -543,8 +607,8 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
           end
         ''')
 
-    def run_case(self, target="f210", opponent=None):
-        return plain(self.lua.globals().run_input_observer(target, opponent))
+    def run_case(self, target="f210", opponent=None, package_version=None, input_observer_version=None):
+        return plain(self.lua.globals().run_input_observer(target, opponent, package_version, input_observer_version))
 
     def test_imported_probe_and_actual_event_observer_keep_the_declared_finite_sequence(self):
         for target in ("f200", "f210"):
@@ -568,6 +632,22 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertFalse(final["fixture_seeds_credit"])
                 self.assertTrue(final["load_observed"])
                 self.assertEqual(final["en_geometry"]["location"], {"x": 170, "y": 100})
+
+    def test_501_f210_observer_accepts_only_its_exact_candidate_identity(self):
+        accepted = self.run_case("f210", package_version="5.0.21001", input_observer_version="0.3.2")
+        self.assertTrue(accepted["ok"], accepted["message"])
+        self.assertEqual(accepted["final"]["phase"], "delivered")
+        for target, package_version in (
+            ("f210", "5.0.21000"),
+            ("f210", "5.0.21002"),
+            ("f200", "5.0.20001"),
+        ):
+            with self.subTest(target=target, package_version=package_version):
+                rejected = self.run_case(
+                    target, package_version=package_version, input_observer_version="0.3.2"
+                )
+                self.assertFalse(rejected["ok"])
+                self.assertIn("imported native target differs", rejected["message"])
 
     def test_remove_de_records_each_native_operand_before_the_unchanged_compound_refusal(self):
         cases = {
