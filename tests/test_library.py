@@ -841,9 +841,12 @@ class LibraryTests(unittest.TestCase):
           player.force.recipes = { ["iron-gear-wheel"] = {
             valid=true,name="iron-gear-wheel",localised_name="Gear wheel",prototype=recipe_prototype
           }}
+          local statistics_reads, flow_reads = 0, 0
           player.force.get_item_production_statistics = function(surface)
             assert(surface == player.surface)
+            statistics_reads = statistics_reads + 1
             return {valid=true,get_flow_count=function(spec)
+              flow_reads = flow_reads + 1
               return spec.category == "input" and 20 or 8
             end}
           end
@@ -854,6 +857,8 @@ class LibraryTests(unittest.TestCase):
           local queue, level = player.force.research_queue, gear.level
           library.open(player, {selected=gear.name})
           local content = research_content(player.gui.screen["mir_research_browser"])
+          assert(statistics_reads == 0 and flow_reads == 0,
+            "opening research details must not sample production without its explicit action")
           local recipes = content["mir_library_detail"]["mir_library_recipe_list"]
           assert(recipes and #recipes.items == 1 and recipes.items[1][3] == "Gear wheel")
           recipes.selected_index = 1
@@ -862,18 +867,31 @@ class LibraryTests(unittest.TestCase):
           player.open_factoriopedia_gui = nil
           library.open(player, {selected=gear.name})
           content = research_content(player.gui.screen["mir_research_browser"])
+          assert(statistics_reads == 0 and flow_reads == 0,
+            "recipe navigation and rebuilding details must not poll production")
           recipes = content["mir_library_detail"]["mir_library_recipe_list"]
           assert(recipes.tooltip[1] == "mir-browser.recipe-list-only-hint"
             and content["mir_library_detail"]["mir_library_recipe_hint"].caption[1]
               == "mir-browser.recipe-list-only-hint")
           local check = content["mir_library_detail"]["mir_library_production_check"]
           assert(check and check.caption[1] == "mir-browser.production-check")
+          local retained_root = player.gui.screen["mir_research_browser"]
+          local retained_query = retained_root["mir_library_filters"]["mir_library_query"]
           library.on_gui_click({player_index=1,element=check})
+          assert(statistics_reads == 1 and flow_reads == 2,
+            "one production action must read exactly the selected pack's two rates")
+          assert(player.gui.screen["mir_research_browser"] == retained_root
+            and retained_root["mir_library_filters"]["mir_library_query"] == retained_query,
+            "a production action must patch its panel without rebuilding the retained controls")
           local panel = content["mir_library_detail"]["mir_library_production_results"]
           assert(panel["mir_library_production_scope"].caption[1] == "mir-browser.production-scope")
           assert(panel["mir_library_production_snapshot"].caption[2] == "240")
           assert(panel["mir_library_production_row_1"].caption[1] == "mir-browser.production-row")
           assert(queue == player.force.research_queue and gear.level == level)
+          library.close(player)
+          library.on_gui_click({player_index=1,element=check})
+          assert(statistics_reads == 1 and flow_reads == 2,
+            "a retired production action must not sample or reopen the closed Library")
         ''')
 
     def test_legacy_engine_prototype_collections_supply_library_recipe_and_item_names(self):
@@ -2057,6 +2075,79 @@ class LibraryTests(unittest.TestCase):
           assert(next(storage) == nil and foreign.valid)
           assert(query.text == "attempted mutation" and family.selected_index == 2 and status.selected_index == 4)
           assert(player.gui.screen["mir_research_browser"] == foreign and player.opened_technology == nil)
+        ''')
+
+    def test_foreign_or_replaced_same_named_lifecycle_events_preserve_the_live_owned_window(self):
+        self.lua.execute('''
+          boot()
+          local retired = library.open(player)
+          library.close(player)
+          local root = library.open(player, {query="gear", selected=gear.name})
+          assert(retired ~= root and not retired.valid)
+          root.location = {x=31, y=41}
+          library.on_gui_location_changed({player_index=1, element=root})
+          local function live_view() return storage.mir_library.players[1] end
+          local peer = {query="peer search", location={x=61, y=71}}
+          storage.mir_library.players[2] = peer
+          local queue, current, progress = player.force.research_queue,
+            player.force.current_research, player.force.research_progress
+          local level, enabled = gear.level, gear.enabled
+          local container = screen.add{type="flow", name="foreign_container"}
+          local foreign_root = container.add{type="frame", name="mir_research_browser"}
+          foreign_root.location = {x=901, y=902}
+          local named_child = root.add{type="frame", name="mir_research_browser"}
+          named_child.location = {x=701, y=702}
+
+          for _, element in ipairs{foreign_root, named_child, retired} do
+            library.on_gui_location_changed({player_index=1, element=element})
+            assert(live_view().location.x == 31 and live_view().location.y == 41,
+              "same-named foreign or stale roots must not replace the owned location")
+            library.on_gui_closed({player_index=1, element=element})
+            assert(root.valid and player.gui.screen["mir_research_browser"] == root
+              and player.opened == root and player.shortcut_toggled == true,
+              "same-named foreign or stale roots must not close the owned Library")
+          end
+          library.on_gui_closed({player_index=99, element=root})
+          library.on_gui_closed({player_index=1})
+          library.on_gui_closed(nil)
+          assert(root.valid and live_view().query == "gear" and live_view().selected == gear.name)
+          assert(storage.mir_library.players[2] == peer
+            and peer.query == "peer search" and peer.location.x == 61)
+
+          root.location = {x=83, y=94}
+          library.on_gui_location_changed({player_index=1, element=root})
+          assert(live_view().location.x == 83 and live_view().location.y == 94,
+            "the actual owned root must still persist its position")
+          library.on_gui_closed({player_index=1, element=root})
+          assert(not root.valid and player.gui.screen["mir_research_browser"] == nil
+            and player.shortcut_toggled == false and live_view().location.x == 83)
+          assert(foreign_root.valid and storage.mir_library.players[2] == peer)
+          assert(queue == player.force.research_queue and current == player.force.current_research
+            and progress == player.force.research_progress and level == gear.level and enabled == gear.enabled,
+            "GUI lifecycle events must preserve native research and the peer's personal view")
+        ''')
+
+    def test_real_model_readiness_uses_completed_disabled_and_trigger_explanations(self):
+        self.lua.execute('''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          boot()
+          gear.prototype.hidden = false
+          player.force.research_queue, player.force.current_research = {}, nil
+          local function status()
+            local root = library.open(player, {selected=gear.name})
+            local context = research_content(root)["mir_library_detail"]["mir_library_detail_context"]
+            return context["mir_library_context_status"].caption[2][1]
+          end
+          assert(status() == "mir-browser.status-complete",
+            "completed research must have its native completion explanation")
+          gear.researched = false
+          assert(status() == "mir-browser.status-disabled",
+            "disabled research must have its native disablement explanation")
+          gear.enabled = true
+          gear.prototype.research_trigger = {type="craft-item", item="iron-plate", count=1}
+          assert(status() == "mir-browser.status-locked",
+            "the modern Library host must supply its trigger capability to the pure model")
         ''')
 
     def test_cap_provider_is_configured_without_force_extension_or_periodic_work(self):

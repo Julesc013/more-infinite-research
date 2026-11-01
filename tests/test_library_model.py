@@ -100,7 +100,7 @@ class LibraryModelTests(unittest.TestCase):
               visible_when_disabled = options.visible_when_disabled == true,
               order = options.order or "p[research_gears]",
               prerequisites = prerequisite,
-              prototype = {max_level = options.max_level or 4294967295, effects = effects},
+              prototype = {max_level = options.max_level or 4294967295, effects = effects, hidden = false},
               research_unit_count = options.count or 8000,
               research_unit_count_formula = options.count_formula,
               research_unit_energy = options.energy or 60,
@@ -521,6 +521,65 @@ class LibraryModelTests(unittest.TestCase):
           assert(#hidden == 1 and hidden[1].hidden and hidden[1].status == "ready")
         ''')
 
+    def test_native_readiness_excludes_hidden_completed_disabled_and_trigger_research_without_losing_queues(self):
+        self.lua.execute('''
+          for _, engine in ipairs{"f200", "f210"} do
+            for _, case in ipairs{
+              {name="ordinary", ready=true, status="ready"},
+              {name="disabled", enabled=false, status="disabled", locked=true},
+              {name="completed", researched=true, status="complete"},
+              {name="hidden", hidden=true, status="locked", locked=true},
+              {name="trigger", trigger=true, status="locked", locked=true},
+              {name="prerequisite", prerequisite=false, status="locked", locked=true},
+              {name="queued", queued=true, ready=true, status="queued"},
+              {name="hidden-queued", hidden=true, queued=true, status="queued", locked=true},
+            } do
+              local id = engine .. "-" .. case.name
+              local native = technology(id, {enabled=case.enabled, researched=case.researched,
+                prerequisites={gate={name="gate", researched=case.prerequisite ~= false}}})
+              native.prototype.hidden = case.hidden == true
+              native.prototype.research_trigger = case.trigger
+                and {type="craft-item", item="iron-plate", count=1} or nil
+              local queue = case.queued and {native} or {}
+              local force = {technologies={[id]=native}, research_queue=queue, research_progress=.42}
+              local context = {research_triggers_supported=true}
+              local rows = model.rows(force, {}, {family="all"}, {}, context)
+              assert(#rows == 1 and rows[1].id == id,
+                "hidden and completed native research must remain inspectable")
+              assert(rows[1].ready == (case.ready == true) and rows[1].status == case.status,
+                "Library readiness must follow native enabled, completed, hidden and trigger state: " .. id)
+              local ready = model.rows(force, {}, {family="all", status=2}, {}, context)
+              local locked = model.rows(force, {}, {family="all", status=3}, {}, context)
+              local queued = model.rows(force, {}, {family="all", status=4}, {}, context)
+              assert(#ready == (case.ready and 1 or 0), "Ready filter admitted unavailable research: " .. id)
+              assert(#locked == (case.locked and 1 or 0), "Locked filter lost native availability: " .. id)
+              assert(#queued == (case.queued and 1 or 0), "Queue inspection changed: " .. id)
+              local detail = assert(model.detail(force, {}, {selected=id}, {}, context))
+              assert(detail.status == case.status and detail.ready == (case.ready == true))
+              assert(force.research_queue == queue and force.research_progress == .42
+                and native.enabled == (case.enabled ~= false) and native.researched == (case.researched == true)
+                and native.prototype.hidden == (case.hidden == true),
+                "readiness inspection must preserve native research and queued state")
+            end
+          end
+        ''')
+
+    def test_legacy_readiness_never_reads_a_modern_trigger_property(self):
+        self.lua.execute('''
+          local id = "legacy-visible"
+          local native = technology(id)
+          local trigger_reads = 0
+          native.prototype.hidden = false
+          setmetatable(native.prototype, {__index=function(_, key)
+            if key == "research_trigger" then trigger_reads = trigger_reads + 1 end
+            error("unsupported legacy prototype property: " .. tostring(key))
+          end})
+          local force = {technologies={[id]=native}, research_queue={}}
+          local rows = model.rows(force, {}, {family="all", status=2}, {}, {research_triggers_supported=false})
+          assert(#rows == 1 and rows[1].ready and trigger_reads == 0,
+            "legacy availability must not probe an unsupported research_trigger property")
+        ''')
+
     def test_localized_recipe_and_product_search_text_is_separate_from_the_caption(self):
         self.lua.execute('''
           local id = "recipe-prod-research_gears-1"
@@ -624,7 +683,7 @@ class LibraryModelTests(unittest.TestCase):
           local ingredient = hostile({name = "automation-science-pack", amount = 1}, "ResearchIngredient")
           local effect = hostile({type = "change-recipe-productivity", recipe = "iron-gear-wheel", change = .1}, "TechnologyModifier")
           local prerequisite = hostile({name = "automation", researched = true}, "LuaTechnology prerequisite")
-          local prototype = hostile({max_level = 4294967295, effects = {effect}}, "LuaTechnologyPrototype")
+          local prototype = hostile({max_level = 4294967295, effects = {effect}, hidden = false}, "LuaTechnologyPrototype")
           local gear = hostile({
             name = id, level = 6, researched = false, enabled = true,
             visible_when_disabled = false, order = "p[research_gears]",
