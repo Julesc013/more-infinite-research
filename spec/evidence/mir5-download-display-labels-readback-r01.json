@@ -327,5 +327,29 @@
         "all_asset_identity_label_and_digest_fields_unchanged": true
       }
     ]
+  },
+  "early_subset_disclosure_2026_11_02": {
+    "kind": "MIRExistingBetaEarlySubsetDisclosureMaintenanceV1",
+    "observed_at_utc": "2026-11-01T22:25:29.769199+00:00",
+    "request": "https://github.com/Julesc013/more-infinite-research/pull/1539#issuecomment-6564205730",
+    "request_description": "Black Glass requested the explicit finite-only/no-runtime/settings/Library/migrations disclosure in existing5.0.1 notes and matching authored text; original request comment is retained separately in this custody.",
+    "release_id": 430311801,
+    "tag": "v5.0.1",
+    "title": "MIR 5.0.1",
+    "prerelease": true,
+    "body_before_sha256": "51463C02EC65ED4197044450A91113F9BD29E8195947F2254E2B6E8889764CC6",
+    "body_after_sha256": "349771E2FAA56DFB19881E8BE59693F1D295AB48D81F1C1FB5A1D702FDEC5C59",
+    "early_subset_statement": "- **Early downloads (Factorio 0.6\u20130.12):** finite Base research with fixed defaults only; no MIR runtime effects, mod settings, Research Library, runtime API or save migrations. These builds remain best effort and untested in-game. Unzip the Factorio 0.6\u20130.8 downloads into the mods folder.",
+    "f018_experimental_unverified_and_beta_limits_retained": true,
+    "asset_identity_label_name_url_size_digest_state_unchanged": true,
+    "local_dist_asset_digests_verified": 19,
+    "local_release_notes_match_live_body": true,
+    "local_upload_text_matches_authored": true,
+    "asset_mutations": 0,
+    "release_creation_or_maturity_change": false,
+    "native_execution": false,
+    "local_authoring_adverse": "Initial local writes changed LF to CRLF; preserved refusal and prepared files, restored LF before live maintenance. No published body/asset was changed by that failed local authoring check.",
+    "custody": "build/qualification/aero-501-early-disclosure-r01/",
+    "scope": "Current support disclosure only; original anonymous asset download results retain their identities. No new package, engine observation, performance or stable verdict."
   }
 }
