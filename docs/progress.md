@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-01
+last_reviewed: 2026-11-02
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,20 +14,17 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
-## Current checkpoint (2026-11-01)
+## Current checkpoint (2026-11-02)
 
 | Item | State |
 |---|---|
-| Public release | `v5.0.1` remains the GitHub prerelease; no stable release is published. |
-| Branches | `main` is `b677ced0b1ae0d8bd9ae47eb6b272443faec6d63`; `dev` is `4e46d0720f23027ce5469dfe01a1d04881403d54`. |
-| Checked preparation | PR #1534 merged at `709861045c846bfe9fdea6d5f85000d79009cd1f`; all four required checks passed. PR #1536 merged at `4e46d0720f23027ce5469dfe01a1d04881403d54`; all four required checks passed. |
-| Open documentation PR | PR #1535 head `827c81f4ad85ffb0cee452c4c33378c5cbad8bcd` is open. Its branch-policy, native-tooling-controls and verification-plan checks pass; host-controls run `41275031626` was pending when captured. |
-| Native state | No Factorio process is running; neither direct library has an active `.mir-active-profile.json` marker. F210 `mod-list.json` and `mod-settings.dat` match the recorded pre-run hashes. The r15 packet remains not native-ready; no new native run was launched. |
-| Local work | The primary checkout remains dirty with 15 files on its test branch. Its diff is preserved locally and is not merged or pushed. |
-| Stable gates | Full Library input/visual/lifecycle/export coverage, the historical audit, remaining compatibility/save/API applicability, complete performance and memory acceptance, and final candidate documentation/review remain open. |
-| Next action | Finish the existing #1535 host check and merge only if all required checks pass. Complete the r15 runtime/actor binding and independent review before any native dispatch. |
-
-
+| Release verdict | **NOT READY for stable.** `v5.0.1` remains the published GitHub beta; `main` remains `b677ced0b1ae0d8bd9ae47eb6b272443faec6d63`. No package bytes or release version changed in this batch. |
+| Checked integration | PR #1535 is merged and its earlier pending state is obsolete. PR #1538 integrated dependency-valid r16 inputs at `c8c7a732d90e92ece7d642f63102fbcab39b81a3`; PR #1541 integrated the three-stage exact-cohort guard correction at `d4f0ae13f1d1ff05064cac9742399cc5447c6181`. Aero's bounded coverage and build-guide PRs #1537/#1540 are integrated through observed `dev` `3755e98a2ab660bfbad721e7bfe38b48169a6c70`. All four required checks passed on each integrated PR head; original review branches/commits are preserved. |
+| Custody | The exact 15-file primary draft is committed/pushed as `b28339a311c437a465949ba5e0b8e81b01d81b92` on `preserve/blackglass-primary-drafts-20261101-r01`, without integrating its superseded implementation. Its patch matches the earlier preservation hash. The bounded inventory retains all485 local refs and354 worktree statuses;364 tips exactly match merged PR heads, while115 require further disposition. No unrelated worktree/ref was discarded. |
+| Latest native result | The reviewed r16 F210 packet `291DC428BBB23FC5CBDFA85CC1A07B07512C8B4B9ECE7D44CC450EA594915777` started one owned engine, then the historical preservation fixture's settings-stage patch00 guard rejected the selected5.0.21001 package. Zero clients, actor inputs, labs or new saves occurred. All9 native files/837425bytes and4 controller files/6976bytes match original/custody;31 primary packet files/922871bytes match, protected saved input and controls restore, and Factorio0. [PR #1542](https://github.com/Julesc013/more-infinite-research/pull/1542) retains the adverse and eleven exact receipt bodies. This is fixture failure, not product or native acceptance. |
+| Next frozen input | [PR #1544](https://github.com/Julesc013/more-infinite-research/pull/1544) binds distinct r17 archives to the reviewed settings/data/runtime guard correction. The guard controls pass22 cases with failing original-guard opponents;30 input/observer/archive controls and46 private-controller controls pass. Frozen source `5fe35fd870c27bd4a75f12c591d86e9c7bba718d`, private controller `1d013ea42e2f09021cf1ecdad45246e819710fcb`, preparation `60A90E5F1FE1B67D304DDE726A28FDEE8C402181E72232260137798AF62E50B7` and actual F210 offline composition are prepared; complete independent readback and exact-head hosted checks remain separate gates before retry. The published player ZIP, observer and protected saved input remain unchanged. |
+| Intake and open gates | Resolved bounded issues #1359 and #1350 are closed with exact evidence and explicit remaining parity/save limits. Broader #621/#446 remain open. Three forks and existing PRs are inventoried; the one unique Russian translation contribution remains a selective review input. Full Library input/visual/lifecycle/export coverage, VER-07 reconciliation, supported-profile/save/API applicability, whole-product performance/memory and final candidate documentation/review remain open. Release-label PR #1539 awaits reconciliation with the required experimental/support disclosures. |
+| Next executable work and timing | Complete the r17 packet review and required checks, then run the guarded imported-save lifecycle with actual input. Keep one active and one prepared native assignment; advance the existing whole-product queue if GUI preparation blocks again. The first batch exposed composition and fixture-identity defects; it supplies no completed Library case or new performance duration from which to shorten the7–8November go/no-go target. Re-estimate after the first complete lifecycle and an admitted performance cohort. No next beta or stable publication precedes passing applicable exact-candidate validation and evidence-based issue disposition; stable additionally requires every applicable stable verdict. |
 
 The 31 October historical-preservation pass is recorded in the existing [continuity inventory](../spec/inventory/continuity.json), with the stable requirement in [VER-07](../spec/verification.md#historical-preservation-before-stable). Read-only discovery indexed 91 local numeric/historical-stable tag refs and deduplicated 5,058 selected Git blobs, including 2,792 test-code blobs; these are source counts, not test passes or completed semantic review. All 87 original request records and decisions remain unchanged. Inter-release omissions, original issue/PR discussions, attachments and screenshot coverage still require reconciliation; `inventory_complete` remains false.
 
