@@ -24,6 +24,18 @@ def plain(value):
 
 
 class LibraryNativeInputFixtureControls(unittest.TestCase):
+    def test_imported_preservation_501_metadata_changes_only_the_exact_mir_dependency(self):
+        directory = ROOT / "tests/fixtures/migration-origins/f200-110-successor"
+        for target, engine, player in [("f200", "2.0.77", "5.0.20001"), ("f210", "2.1.23", "5.0.21001")]:
+            with self.subTest(target=target):
+                old = json.loads((directory / f"info-{target}-source-defaults.json").read_text())
+                new = json.loads((directory / f"info-{target}-source-defaults-501.json").read_text())
+                expected = dict(old, dependencies=[f"base = {engine}", f"more-infinite-research = {player}"])
+                self.assertEqual(new, expected)
+                self.assertNotEqual(old["dependencies"], expected["dependencies"])
+                self.assertEqual(new["name"], "mir-fixture-mir5-migration-origin-f200-110-source")
+                self.assertEqual(new["version"], "0.3.0" if target == "f200" else "0.4.0")
+
     def test_input_metadata_keeps_required_versions_without_mir_runtime_order_edges(self):
         historical = "mir-fixture-mir5-migration-origin-f200-110-source"
         fixture = "mir-fixture-mir5-library-native-input"
