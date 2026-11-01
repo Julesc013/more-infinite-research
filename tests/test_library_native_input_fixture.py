@@ -124,7 +124,9 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         })
         self.assertEqual(profile["protected_input_save"]["sha256"],
                          "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C")
+        self.assertEqual(info["name"], fixture)
         self.assertEqual(info["version"], "0.3.2")
+        self.assertEqual(info["factorio_version"], "2.1")
         self.assertEqual(info["dependencies"], [
             "base = 2.1.23",
             "~ more-infinite-research = 5.0.21001",
@@ -144,16 +146,12 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             profile["archive_sha256"]["more-infinite-research_5.0.21001.zip"],
             "C6C2470B438846484732E0E05D124DB31A1100C2F1AA0E770B327A4A6FBAFA5D",
         )
-        self.assertEqual(
-            profile["archive_sha256"]["mir-fixture-mir5-library-native-input_0.3.2.zip"],
-            "D7ABBCB734EABEC189DF16972D152957A886C43DFC45FC01AC5809A9BBC72DB6",
-        )
         control_path = FIXTURE / "control.lua"
         control_bytes = control_path.read_bytes()
         info_bytes = info_path.read_bytes()
         self.assertIn(b'observer_version=="0.3.2"', control_bytes)
         archive_bytes = io.BytesIO()
-        archive_name = f"{fixture}_0.3.2"
+        archive_name = f"{info['name']}_{info['version']}"
         with zipfile.ZipFile(archive_bytes, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
             for destination, contents in (("control.lua", control_bytes), ("info.json", info_bytes)):
                 entry = zipfile.ZipInfo(f"{archive_name}/{destination}", date_time=(1980, 1, 1, 0, 0, 0))
@@ -164,6 +162,10 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         self.assertEqual(
             hashlib.sha256(archive_bytes.getvalue()).hexdigest().upper(),
             profile["archive_sha256"][f"{archive_name}.zip"],
+        )
+        self.assertEqual(
+            profile["archive_sha256"][f"{archive_name}.zip"],
+            "D7ABBCB734EABEC189DF16972D152957A886C43DFC45FC01AC5809A9BBC72DB6",
         )
 
         old = json.loads((ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r13.json").read_text(encoding="utf-8"))
@@ -637,14 +639,15 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         accepted = self.run_case("f210", package_version="5.0.21001", input_observer_version="0.3.2")
         self.assertTrue(accepted["ok"], accepted["message"])
         self.assertEqual(accepted["final"]["phase"], "delivered")
-        for target, package_version in (
-            ("f210", "5.0.21000"),
-            ("f210", "5.0.21002"),
-            ("f200", "5.0.20001"),
+        for target, package_version, observer_version in (
+            ("f210", "5.0.21000", "0.3.2"),
+            ("f210", "5.0.21002", "0.3.2"),
+            ("f200", "5.0.20001", "0.3.2"),
+            ("f210", "5.0.21001", "0.3.0"),
         ):
-            with self.subTest(target=target, package_version=package_version):
+            with self.subTest(target=target, package_version=package_version, observer_version=observer_version):
                 rejected = self.run_case(
-                    target, package_version=package_version, input_observer_version="0.3.2"
+                    target, package_version=package_version, input_observer_version=observer_version
                 )
                 self.assertFalse(rejected["ok"])
                 self.assertIn("imported native target differs", rejected["message"])
