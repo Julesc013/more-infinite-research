@@ -439,7 +439,30 @@ function Assert-MIRLibraryActivation {
     if(-not$control.exists){throw '[mir-library-live-selection]'}
     $actual=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($control.bytes)).TrimStart([char]0xFEFF)|ConvertFrom-Json
     $expected=[Text.Encoding]::UTF8.GetString($Activation.mod_list_bytes)|ConvertFrom-Json
-    $selection={param($rows) @($rows|Sort-Object name|ForEach-Object {if($_.enabled -isnot [bool]){throw '[mir-library-live-selection]'};$version=if($_.enabled){if($null-eq$_.PSObject.Properties['version']){throw '[mir-library-live-selection]'};[string]$_.version}else{''};[string]$_.name+'|'+[string]$_.enabled+'|'+$version})-join "`n"}
+    $selection={param($rows) @($rows|Sort-Object name|ForEach-Object {
+      if($_.name -isnot [string] -or -not(Test-MIRLibraryModName $_.name) -or $_.enabled -isnot [bool]){throw '[mir-library-live-selection]'}
+      $version=''
+      if($_.enabled){
+        $property=$_.PSObject.Properties['version']
+        if($null-ne$property){
+          if($property.Value -isnot [string] -or $property.Value -cnotmatch '^\d+[.]\d+[.]\d+$'){throw '[mir-library-live-selection]'}
+          $version=$property.Value
+        }else{
+          # Normal native exit removes enabled version properties. Accept that
+          # serialization only when it still resolves to the exact selection:
+          # one numeric greatest version across the unchanged whole inventory.
+          # Keep incompatible alternatives in this conservative comparison and
+          # refuse numeric ties; never rewrite a live client's controls.
+          $name=$_.name
+          $available=@($current|Where-Object name -CEQ $name|Sort-Object {[version]$_.version} -Descending)
+          if(-not$available.Count){throw '[mir-library-live-selection]'}
+          $greatest=[version]$available[0].version
+          if(@($available|Where-Object {([version]$_.version)-eq$greatest}).Count-ne1){throw '[mir-library-live-selection]'}
+          $version=[string]$available[0].version
+        }
+      }
+      $_.name+'|'+[string]$_.enabled+'|'+$version
+    })-join "`n"}
     if((& $selection $actual.mods)-cne(& $selection $expected.mods)){throw '[mir-library-live-selection]'}
   }else{Write-MIRLibraryControl -Path (Join-Path $Activation.library 'mod-list.json') -Bytes $Activation.mod_list_bytes}
 }

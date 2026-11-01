@@ -112,6 +112,61 @@ try {
   } finally {if($null-ne$activation-and-not$activation.closed){$completion=Complete-MIRLibraryActivation -Activation $activation}}
   Assert-Library ($completion.status-ceq'restored-direct-library-controls'-and-not(Test-Path -LiteralPath (Join-Path $library '.mir-active-profile.json'))) 'completion'
   Assert-Library ((Get-Content -Raw -LiteralPath (Join-Path $library 'mod-list.json'))-ceq$originalList-and([IO.File]::ReadAllBytes((Join-Path $library 'mod-settings.dat'))-join',')-ceq($originalSettings-join',')) 'restoration'
+  # Native 2.1.23 normal exit preserves names/booleans but removes enabled
+  # versions. Exercise the real guard with host-only owned-process doubles.
+  # Independent versions deliberately distinguish numeric from lexical order.
+  $priorGetProcess=Get-Item Function:Get-Process -ErrorAction SilentlyContinue
+  $priorGetCim=Get-Item Function:Get-CimInstance -ErrorAction SilentlyContinue
+  $script:liveProcesses=@()
+  function Get-Process {param([string]$Name,[int[]]$Id,$ErrorAction) if($Id){return Microsoft.PowerShell.Management\Get-Process -Id $Id};if($Name-cne'factorio'){throw 'unexpected live process query'};$script:liveProcesses}
+  function Get-CimInstance {param([string]$ClassName,[string]$Filter) if($ClassName-cne'Win32_Process'-or$Filter-cne'ProcessId=555001'){throw 'unexpected live parent query'};[pscustomobject]@{ParentProcessId=$PID}}
+  try{
+    foreach($mode in @('latest','older','higher-incompatible','numeric-tie')){
+      $liveLibrary=Join-Path $root ('live-'+$mode);[IO.Directory]::CreateDirectory($liveLibrary)|Out-Null
+      $null=New-TestArchive $liveLibrary 'controlled' '1.9.0'
+      $null=New-TestArchive $liveLibrary 'controlled' '1.10.0'
+      $null=New-TestArchive $liveLibrary 'disabled' '1.0.0'
+      if($mode-ceq'higher-incompatible'){$null=New-TestArchive $liveLibrary 'controlled' '2.0.0' '2.0'}
+      if($mode-ceq'numeric-tie'){$null=New-TestArchive $liveLibrary 'controlled' '1.010.0'}
+      $chosen=if($mode-ceq'older'){'1.9.0'}else{'1.10.0'}
+      $liveProfile=Join-Path $root ('live-'+$mode+'.json')
+      [IO.File]::WriteAllText($liveProfile,(@{mods=@(@{name='base';version='2.1.23';enabled=$true},@{name='controlled';version=$chosen;enabled=$true})}|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+      $liveArchive=Join-Path $liveLibrary ('controlled_'+$chosen+'.zip')
+      $liveActivation=Start-MIRLibraryActivation -LibraryDirectory $liveLibrary -EngineDataDirectory $data -ProfilePath $liveProfile -ArchiveHashes @{([IO.Path]::GetFileName($liveArchive))=(Get-MIRImmutableInputSha256 $liveArchive)}
+      $script:liveProcesses=@([pscustomobject]@{Id=555001;HasExited=$false;StartTime=[datetime]'2026-11-02T00:00:00Z'})
+      function Assert-LiveList($Rows,[string]$Expected=''){
+        $path=Join-Path $liveLibrary 'mod-list.json'
+        [IO.File]::WriteAllText($path,(@{mods=@($Rows)}|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+        $hash=Get-MIRImmutableInputSha256 $path;$ticks=(Get-Item -LiteralPath $path).LastWriteTimeUtc.Ticks
+        if($Expected){Refuses-Library {Assert-MIRLibraryActivation -Activation $liveActivation -OwnedProcesses $script:liveProcesses} $Expected}else{Assert-MIRLibraryActivation -Activation $liveActivation -OwnedProcesses $script:liveProcesses;Assert-Library $true ('live-'+$mode)}
+        Assert-Library ((Get-MIRImmutableInputSha256 $path)-ceq$hash-and(Get-Item -LiteralPath $path).LastWriteTimeUtc.Ticks-eq$ticks) 'live-controls-never-written'
+      }
+      try{
+        $pinned=@(@{name='base';enabled=$true;version='2.1.23'},@{name='controlled';enabled=$true;version=$chosen},@{name='disabled';enabled=$false})
+        Assert-LiveList $pinned
+        $native=@(@{name='base';enabled=$true},@{name='controlled';enabled=$true},@{name='disabled';enabled=$false})
+        if($mode-ceq'latest'){
+          Assert-LiveList $native
+          Assert-LiveList @(@{name='controlled';enabled=$true;version=$chosen},@{name='disabled';enabled=$false},@{name='base';enabled=$true})
+          foreach($wrong in @('1.9.0','',$null,110)){
+            Assert-LiveList @(@{name='base';enabled=$true},@{name='controlled';enabled=$true;version=$wrong},@{name='disabled';enabled=$false}) '[mir-library-live-selection]'
+          }
+          Assert-LiveList @(@{name='base';enabled=$true},@{name='controlled';enabled=$false},@{name='disabled';enabled=$false}) '[mir-library-live-selection]'
+          Assert-LiveList @(@{name='base';enabled=$true},@{name='controlled';enabled='true'},@{name='disabled';enabled=$false}) '[mir-library-live-selection]'
+          Assert-LiveList ($native+@{name='unexpected';enabled=$true;version='1.0.0'}) '[mir-library-live-selection]'
+          Assert-LiveList ($native+$native[0]) '[mir-library-live-selection]'
+          Assert-LiveList @($native[0],$native[1]) '[mir-library-live-selection]'
+          $extra=New-TestArchive $liveLibrary 'unexpected' '1.0.0'
+          Assert-LiveList $native '[mir-library-inventory-changed]'
+          [IO.File]::Delete($extra)
+        }else{Assert-LiveList $native '[mir-library-live-selection]'}
+      }finally{$script:liveProcesses=@();$null=Complete-MIRLibraryActivation -Activation $liveActivation}
+    }
+  }finally{
+    Remove-Item Function:Get-Process,Function:Get-CimInstance -ErrorAction SilentlyContinue
+    if($null-ne$priorGetProcess){Set-Item Function:Get-Process $priorGetProcess.ScriptBlock}
+    if($null-ne$priorGetCim){Set-Item Function:Get-CimInstance $priorGetCim.ScriptBlock}
+  }
   # Exercise the existing legacy owned-name transaction with disposable
   # authored ZIPs only. No real engine or external mod library is accessed.
   $legacy=Join-Path $root 'legacy-library';$legacyData=Join-Path $root 'legacy-engine/data'
