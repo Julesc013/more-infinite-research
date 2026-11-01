@@ -111,6 +111,120 @@
             "tests/test_generator.py"
           ],
           "scope": "Accepted PR1036/1042/1043 source and host controls retain the two named F210 Bob Logistics infinite owners and setting identities, omit only duplicate MIR continuations, and require one selected read-only preflight before publication. A fresh nine-edition freeze and focused native retry are required; EA41 failures remain recorded and no gameplay, save, performance or release result is claimed."
+        },
+        {
+          "id": "runtime-braking-continuation-native-creator-boundary",
+          "reviewed_against": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+          "reviewed_on": "2026-11-02",
+          "independent_expectation": "MIR-created braking-force-8 remains in the runtime authored catalogue for Library/cap binding. A continuation already created by another mod remains outside MIR declaration ownership. Later prototype changes do not change which mod created it. Preserve the existing data-stage collision refusal/omission policy.",
+          "requirements": [
+            "MIG-01",
+            "RUN-02",
+            "RUN-04",
+            "CONT-01",
+            "CONT-07",
+            "CONT-10"
+          ],
+          "demonstrated_before": "The published501 runtime adapter forwards the complete post-emission technology map to the pre-emission existing-ID exclusion. It therefore drops MIR-created braking-force-8 as if it were foreign. The probe materializes the real Generator-emitted rows before runtime and reproduces the omission even with a valid history record naming MIR as creator.",
+          "published_package_member_readback": [
+            {
+              "target": "f200",
+              "package": "more-infinite-research_5.0.20001.zip",
+              "archive_sha256": "750ECA842134AFDDCC7C45B2B656510CA60F09940A2E82B21896AAE7E3D8C1BE",
+              "before_member_sha256": "3809178C83136696ACF1CE4FAF1EE5C4AA53C95BD176E048D82769FC391B4A54",
+              "equals_reviewed_dev_source": true
+            },
+            {
+              "target": "f210",
+              "package": "more-infinite-research_5.0.21001.zip",
+              "archive_sha256": "C6C2470B438846484732E0E05D124DB31A1100C2F1AA0E770B327A4A6FBAFA5D",
+              "before_member_sha256": "3809178C83136696ACF1CE4FAF1EE5C4AA53C95BD176E048D82769FC391B4A54",
+              "equals_reviewed_dev_source": true
+            }
+          ],
+          "source": [
+            "source/runtime/catalogue.lua",
+            "source/research/catalogue.lua",
+            "source/compatibility/modern_catalogue.lua"
+          ],
+          "changed_implementation": "Only runtime/catalogue.lua changes: inspect the one preserved collision and obtain its native creator once during control parsing. Pass only a foreign-created prototype to the existing pure catalogue exclusion. Missing/malformed creation history refuses classification. No prototype/saved-state writes,marker prototypes,Generator import,domain scan or new owner registry.",
+          "api_contract_evidence": {
+            "facts": [
+              {
+                "version": "2.0.77",
+                "api_sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578",
+                "method": "LuaPrototypes.get_history(type,name)",
+                "parameters": [
+                  "type",
+                  "name"
+                ],
+                "takes_table": false,
+                "returns": "PrototypeHistory",
+                "created_type": "string",
+                "native_call_observed": false
+              },
+              {
+                "version": "2.1.23",
+                "api_sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373",
+                "method": "LuaPrototypes.get_history(type,name)",
+                "parameters": [
+                  "type",
+                  "name"
+                ],
+                "takes_table": false,
+                "returns": "PrototypeHistory",
+                "created_type": "string",
+                "native_call_observed": false
+              }
+            ],
+            "documentation": [
+              "https://lua-api.factorio.com/latest/classes/LuaPrototypes.html#get_history",
+              "https://lua-api.factorio.com/latest/concepts/PrototypeHistory.html"
+            ],
+            "method": "Both local version-specific API JSON bodies were rehashed;both declare the two-string-argument getter and required string created field. These are API-description facts,not an observed native call or proof of control-parse availability.",
+            "local_sources": [
+              "Primary build/qualification/release-preparation-r01/official-runtime-api-2.0.77.json",
+              "Installed2.1.23 doc-html/runtime-api.json"
+            ]
+          },
+          "controls": [
+            "tests/test_generator.py:GeneratorTests.test_existing_native_continuation_identity_is_preserved_without_mir_collision",
+            "tests/test_generator.py:GeneratorTests.test_runtime_catalogue_preserves_mir_created_continuation_and_excludes_foreign_creators",
+            "tests/test_generator.py:GeneratorTests.test_runtime_catalogue_refuses_unknown_creator_instead_of_guessing_ownership",
+            "tests/test_library_model.py:LibraryModelTests.test_runtime_catalogue_passes_foreign_technology_map_to_pure_declarations"
+          ],
+          "host_scope": "F200/F210 Base and Space Age host contexts each distinguish MIR,another-mod and base creators even when the last changer differs;repeated reads use one cached history lookup. Poisoned game/storage and non-enumerable prototype maps protect control-parse/read-only/bounded behavior. Absent prototypes require no history query;missing getter/history/creator and empty creator refuse.",
+          "focused_validation": {
+            "groups": [
+              "test_generator",
+              "test_bootstrap",
+              "test_library",
+              "test_lifecycle",
+              "test_library_model"
+            ],
+            "passed": 186,
+            "runtime": "Explicit existing Lupa2.6/lua52",
+            "native_execution": false
+          },
+          "negative_controls": [
+            {
+              "opponent": "published-presence-only-adapter",
+              "source_normalized_sha256": "3809178C83136696ACF1CE4FAF1EE5C4AA53C95BD176E048D82769FC391B4A54",
+              "rejected": true
+            },
+            {
+              "opponent": "last-writer-instead-of-creator",
+              "source_normalized_sha256": "0BBFE1433374A21F49B288C5CA5DD5DDF86B30EB23A09EDD1DA4AB31F4A7082F",
+              "rejected": true
+            }
+          ],
+          "native_remaining": "On exact final F2002.0.77/D3 and F2102.1.23/8DC packages,verify creator history is available during control parsing and observe actual MIR-created and pre-existing foreign braking continuations. Confirm own Library/cap declaration and foreign exclusion,unchanged native effects/foreign disablement,and affected load/reload/client behavior. Preserve the frozen501 packet and original native identities;the host models/API description are not this native verdict.",
+          "limits": "This is the named pre-emission collision boundary. It does not authenticate arbitrary mods or qualify unknown later overwrite/recreation scenarios. All nine-edition/final-candidate and whole-product gates remain separate.",
+          "custody": "Primary build/qualification/aero-runtime-catalogue-owner-r01/{owned-continuation-before.json,regression-controls-before.json,focused-after.json,negative-controls.json,api-and-published-package-readback.json}",
+          "reader_disposition": "The first probe import omitted tests/ from sys.path;the next probe omitted materialization because full_world data:extend records output without filling raw. Both are fixture/reader setup corrections recorded in owned-continuation-before.json,not product failures or valid opposition.",
+          "native_execution": false,
+          "release_qualification": false,
+          "hosted_first_failure": "Host run41323354344/job124898219435 refused one old Library-model double lacking get_history. The fixture now supplies the pinned native creator API and keeps its original foreign-exclusion/unrelated-continuation assertions. Product guards are unchanged;the original failed log remains in primary custody."
         }
       ],
       "test_subjects": [
@@ -545,6 +659,14 @@
           "id": "corrected-f210-base-space-age-private-client-native-names",
           "evidence": "spec/evidence/library-f210-native-names-private-native-chain-r01.json",
           "scope": "Actual corrected2DDD/player7b0/standalone2.1.23/8DC Base and SpaceAge:four real labs,+20%,twelve joins,two cold host restarts,twenty decoded/viewedPNG and twelve two-consumer load-phase witnesses. Native names/science/prerequisites and German context/cap/status resolve through initial/settled/rejoin/restart. Base DLC-absence and SpaceAge native-laboratory explanation are rendered. Four fresh zero-credit holder states remain unchanged through private action filtering. Two original caller/packet refusals remain zero-engine;no guard relaxed. Positive credits,foreign-hidden/actual keyboard/churn/performance remain separate."
+        },
+        {
+          "id": "owned-braking-row-runtime-manifest-correction",
+          "source": [
+            "source/runtime/catalogue.lua"
+          ],
+          "related_record": "CONT-02 runtime-braking-continuation-native-creator-boundary",
+          "scope": "The source correction retains the MIR-created braking row and excludes pre-existing foreign creators. Its four host contexts and two known-broken opponents are verified;actual native Library/cap/creator and final-candidate lifecycle acceptance remain pending. Source501 ZIP member equality confirms the old omission is in both published modern editions. No earlier native/render/input result is overwritten."
         }
       ],
       "test_subjects": [
