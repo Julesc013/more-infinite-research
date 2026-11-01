@@ -21,8 +21,13 @@ class LibraryModelTests(unittest.TestCase):
 
     def test_runtime_catalogue_passes_foreign_technology_map_to_pure_declarations(self):
         self.lua.execute('''
-          script, mods = {active_mods={base="2.1.23"}}, nil
-          prototypes = {technology={ ["braking-force-8"]={owner="foreign"} }}
+          script, mods = {active_mods={base="2.1.23", foreign="1.0.0",
+            ["more-infinite-research"]="5.0.21001"}}, nil
+          prototypes = {technology={ ["braking-force-8"]={owner="foreign"} },
+            get_history=function(kind, name)
+              assert(kind == "technology" and name == "braking-force-8")
+              return {created="foreign", changed={"more-infinite-research"}}
+            end}
           package.loaded["research.catalogue"] = nil
           package.loaded["runtime.catalogue"] = nil
           local catalogue = require("runtime.catalogue")

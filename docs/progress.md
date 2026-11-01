@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-01
+last_reviewed: 2026-11-02
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,20 +14,17 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
-## Current checkpoint (2026-11-01)
+## Current checkpoint (2026-11-02)
 
 | Item | State |
 |---|---|
-| Public release | `v5.0.1` remains the GitHub prerelease; no stable release is published. |
-| Branches | `main` is `b677ced0b1ae0d8bd9ae47eb6b272443faec6d63`; `dev` is `4e46d0720f23027ce5469dfe01a1d04881403d54`. |
-| Checked preparation | PR #1534 merged at `709861045c846bfe9fdea6d5f85000d79009cd1f`; all four required checks passed. PR #1536 merged at `4e46d0720f23027ce5469dfe01a1d04881403d54`; all four required checks passed. |
-| Open documentation PR | PR #1535 head `827c81f4ad85ffb0cee452c4c33378c5cbad8bcd` is open. Its branch-policy, native-tooling-controls and verification-plan checks pass; host-controls run `41275031626` was pending when captured. |
-| Native state | No Factorio process is running; neither direct library has an active `.mir-active-profile.json` marker. F210 `mod-list.json` and `mod-settings.dat` match the recorded pre-run hashes. The r15 packet remains not native-ready; no new native run was launched. |
-| Local work | The primary checkout remains dirty with 15 files on its test branch. Its diff is preserved locally and is not merged or pushed. |
-| Stable gates | Full Library input/visual/lifecycle/export coverage, the historical audit, remaining compatibility/save/API applicability, complete performance and memory acceptance, and final candidate documentation/review remain open. |
-| Next action | Finish the existing #1535 host check and merge only if all required checks pass. Complete the r15 runtime/actor binding and independent review before any native dispatch. |
-
-
+| Release verdict | **NOT READY for stable.** `v5.0.1` remains the published GitHub beta; `main` remains `b677ced0b1ae0d8bd9ae47eb6b272443faec6d63`. No package bytes or release version changed in this batch. |
+| Checked integration | PR #1535 is merged; its earlier pending state and the resolved #1534 shallow-source problem are obsolete. Checked dependency/fixture/input work #1538/#1541/#1544 and Aero's coverage/build guide #1537/#1540 are integrated. The independently reviewed multiplayer handler regression #1543 and twelve-body r16 adverse evidence #1542 are integrated through observed `dev` `7744a44a3aa3a5e379564a0d33308b26b78805f3`. All four required checks passed on each integrated PR head; original review branches/commits are preserved. |
+| Custody | The exact 15-file primary draft is committed/pushed as `b28339a311c437a465949ba5e0b8e81b01d81b92` on `preserve/blackglass-primary-drafts-20261101-r01`, without integrating its superseded implementation. Its patch matches the earlier preservation hash. The bounded inventory retains all485 local refs and354 worktree statuses;364 tips exactly match merged PR heads, while115 require further disposition. No unrelated worktree/ref was discarded. |
+| Latest native result | Independently reviewed r17 R01 reached two real clients, then correctly refused its1024x576 capture before input. Fresh R02 requested1280x720 and completed nine real actor actions, reporting two joins,15 text characters, two Library closes, five drag events, two effect resets and one removal. `[mir-library-live-selection]` stopped replacement prelaunch; no replacement client, new save or restart acceptance occurred. All144 native files/12660320bytes, four controller records and182 primary packet files/12834865bytes match custody; protected saved input and controls restore, Factorio0. The [r17 adverse chain](../spec/evidence/library-imported-r17-adverse-chain-r01.json) retains53 exact receipt bodies and both failures. Original refusal selection bytes are unavailable; no cause is fabricated. |
+| Bounded diagnosis and next frozen input | A separate one-engine2.1.23 menu initialization/normal-exit probe, private source `9708cf3852ed0eaf66a1e522cebd47b07f9b9544`, retained exact controls before restoration: all555 names/booleans stayed unchanged while native exit removed all five enabled-version properties. Normal exit0, no game/save/input/joins, restored controls, Factorio0; elapsed time is not a performance sample. [PR #1558](https://github.com/Julesc013/more-infinite-research/pull/1558), head `245387dfdcf783bd355ee0d640e8fffc565fb3d5`, preserves exact selection by accepting an omitted pin only for a unique numeric greatest version across the full unchanged inventory.90 focused controls pass; the original guard rejects the new positive control. Method/implementation review passes; exact-head full CI and a freshly bound packet/helper review precede affected native replay. Published player ZIP, observer and protected saved input remain unchanged. |
+| Intake and open gates | Resolved bounded issues #1359/#1350 are closed with evidence and remaining parity/save limits; broader #621/#446 remain open. Three forks are refreshed; the unique Russian translation remains a selective review input. Aero's newly submitted continuity/settings/API/migration and scoped Library/runtime corrections await review/integration as candidate B while published5.0.1 remains native candidate A. Release-label #1539 has green checks and verified identities; explicit early finite-subset limits in5.0.1 notes remain the review hold. Full Library/lifecycle/export, VER-07, supported-profile/save/API applicability, whole-product performance/memory and final candidate/package/docs review remain open. |
+| Next executable work and timing | Integrate reviewed #1558 through green exact-head checks, bind distinct helper/runtime inputs and replay the affected imported-save lifecycle. Reconcile #1547's consumed-input performance review and prepare the earliest existing whole-product assignment while native preparation runs; use one active and one prepared native case. The probe cost and partial interaction run supply no completed Library/performance verdict from which to shorten the7–8November go/no-go target. Re-estimate after a complete lifecycle and admitted performance cohort. No next beta or stable publication precedes passing applicable exact-candidate validation and evidence-based issue disposition; stable additionally requires every applicable stable verdict. |
 
 The 31 October historical-preservation pass is recorded in the existing [continuity inventory](../spec/inventory/continuity.json), with the stable requirement in [VER-07](../spec/verification.md#historical-preservation-before-stable). Read-only discovery indexed 91 local numeric/historical-stable tag refs and deduplicated 5,058 selected Git blobs, including 2,792 test-code blobs; these are source counts, not test passes or completed semantic review. All 87 original request records and decisions remain unchanged. Inter-release omissions, original issue/PR discussions, attachments and screenshot coverage still require reconciliation; `inventory_complete` remains false.
 

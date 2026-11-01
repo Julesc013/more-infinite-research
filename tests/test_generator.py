@@ -1180,13 +1180,95 @@ class GeneratorTests(unittest.TestCase):
             "an unapproved continuation collision no longer fails closed")
 
           script = {active_mods={base="2.1.23"}}
-          prototypes = {technology={[foreign.name]=foreign}}
+          prototypes = {technology={[foreign.name]=foreign}, get_history=function(kind, name)
+            assert(kind == "technology" and name == foreign.name)
+            return {created="another-mod", changed={"another-mod", "more-infinite-research"}}
+          end}
           package.loaded["research.catalogue"] = nil
           package.loaded["runtime.catalogue"] = nil
           local runtime_rows = require("runtime.catalogue").declared()
           local runtime_ids = {}; for _, row in ipairs(runtime_rows) do runtime_ids[row.id] = true end
           assert(not runtime_ids[foreign.name] and runtime_ids["inserter-capacity-bonus-8"],
             "runtime catalogue still claimed the existing foreign continuation")
+        ''')
+
+    def test_runtime_catalogue_preserves_mir_created_continuation_and_excludes_foreign_creators(self):
+        self.lua.execute('''
+          local environment = full_world({})
+          local selection = modern_catalogue.select({}, environment.raw)
+          generator.install(modern.technologies(selection, config.resolve(defaults())), environment)
+          local emitted
+          for _, row in ipairs(environment.emitted) do
+            if row.name == "braking-force-8" then emitted = row end
+          end
+          assert(emitted, "MIR must emit its owned braking continuation before runtime")
+          game = setmetatable({}, {__index=function() error("control parsing read game") end})
+          storage = setmetatable({}, {
+            __index=function() error("catalogue read saved state") end,
+            __newindex=function() error("catalogue wrote saved state") end
+          })
+          local target = require("platform.target")
+          for _, id in ipairs({"f200", "f210"}) do
+            target.id, target.factorio_version = id, id == "f200" and "2.0" or "2.1"
+            target.minimum_base = id == "f200" and "2.0.77" or "2.1.23"
+            target.cargo_research = id == "f210"
+            target.distribution_version = id == "f200" and "5.0.20001" or "5.0.21001"
+            target.recipe_probability = id == "f200" and "probability" or "independent_probability"
+            target.receiver_limits = id == "f210"
+            for _, space_age in ipairs({false, true}) do
+              for _, creator in ipairs({"more-infinite-research", "another-mod", "base"}) do
+                local calls = 0
+                script = {active_mods={base=target.minimum_base,
+                  ["more-infinite-research"]=target.distribution_version, ["another-mod"]="1.0.0"}}
+                if space_age then script.active_mods["space-age"] = target.minimum_base end
+                local technologies = setmetatable({[emitted.name]=emitted}, {
+                  __pairs=function() error("catalogue scanned the prototype domain") end,
+                  __newindex=function() error("catalogue wrote prototypes") end
+                })
+                prototypes = {technology=technologies, get_history=function(kind, name)
+                  assert(kind == "technology" and name == emitted.name)
+                  calls = calls + 1
+                  return {created=creator, changed={creator == "more-infinite-research" and "another-mod"
+                    or "more-infinite-research"}}
+                end}
+                package.loaded["research.catalogue"], package.loaded["runtime.catalogue"] = nil, nil
+                local runtime = require("runtime.catalogue")
+                for _ = 1, 2 do
+                  local present = false
+                  for _, row in ipairs(runtime.declared()) do
+                    if row.id == emitted.name then present = true end
+                  end
+                  assert(present == (creator == "more-infinite-research"),
+                    "runtime catalogue must distinguish MIR emission from a foreign continuation")
+                end
+                assert(calls == 1, "creator history must be read once at control parsing")
+              end
+            end
+          end
+        ''')
+
+    def test_runtime_catalogue_refuses_unknown_creator_instead_of_guessing_ownership(self):
+        self.lua.execute('''
+          script = {active_mods={base="2.1.23"}}
+          for _, mode in ipairs({"missing-lookup", "missing-history", "missing-creator", "empty-creator"}) do
+            prototypes = {technology={["braking-force-8"]={name="braking-force-8"}}}
+            if mode ~= "missing-lookup" then
+              prototypes.get_history = function()
+                if mode == "missing-history" then return nil end
+                if mode == "empty-creator" then return {created=""} end
+                return {changed={"another-mod"}}
+              end
+            end
+            package.loaded["research.catalogue"], package.loaded["runtime.catalogue"] = nil, nil
+            local ok, err = pcall(require, "runtime.catalogue")
+            assert(not ok and tostring(err):find("MIR runtime catalogue requires prototype creation history", 1, true),
+              "runtime must refuse an unknown creator rather than drop or claim the continuation")
+          end
+          local calls = 0
+          prototypes = {technology={}, get_history=function() calls=calls+1; error("absent prototype queried") end}
+          package.loaded["research.catalogue"], package.loaded["runtime.catalogue"] = nil, nil
+          require("runtime.catalogue").declared()
+          assert(calls == 0, "an absent continuation must not request prototype history")
         ''')
 
     def test_pipeline_extent_uses_effective_import_and_never_imports_for_defaults(self):

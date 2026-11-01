@@ -111,6 +111,120 @@
             "tests/test_generator.py"
           ],
           "scope": "Accepted PR1036/1042/1043 source and host controls retain the two named F210 Bob Logistics infinite owners and setting identities, omit only duplicate MIR continuations, and require one selected read-only preflight before publication. A fresh nine-edition freeze and focused native retry are required; EA41 failures remain recorded and no gameplay, save, performance or release result is claimed."
+        },
+        {
+          "id": "runtime-braking-continuation-native-creator-boundary",
+          "reviewed_against": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+          "reviewed_on": "2026-11-02",
+          "independent_expectation": "MIR-created braking-force-8 remains in the runtime authored catalogue for Library/cap binding. A continuation already created by another mod remains outside MIR declaration ownership. Later prototype changes do not change which mod created it. Preserve the existing data-stage collision refusal/omission policy.",
+          "requirements": [
+            "MIG-01",
+            "RUN-02",
+            "RUN-04",
+            "CONT-01",
+            "CONT-07",
+            "CONT-10"
+          ],
+          "demonstrated_before": "The published501 runtime adapter forwards the complete post-emission technology map to the pre-emission existing-ID exclusion. It therefore drops MIR-created braking-force-8 as if it were foreign. The probe materializes the real Generator-emitted rows before runtime and reproduces the omission even with a valid history record naming MIR as creator.",
+          "published_package_member_readback": [
+            {
+              "target": "f200",
+              "package": "more-infinite-research_5.0.20001.zip",
+              "archive_sha256": "750ECA842134AFDDCC7C45B2B656510CA60F09940A2E82B21896AAE7E3D8C1BE",
+              "before_member_sha256": "3809178C83136696ACF1CE4FAF1EE5C4AA53C95BD176E048D82769FC391B4A54",
+              "equals_reviewed_dev_source": true
+            },
+            {
+              "target": "f210",
+              "package": "more-infinite-research_5.0.21001.zip",
+              "archive_sha256": "C6C2470B438846484732E0E05D124DB31A1100C2F1AA0E770B327A4A6FBAFA5D",
+              "before_member_sha256": "3809178C83136696ACF1CE4FAF1EE5C4AA53C95BD176E048D82769FC391B4A54",
+              "equals_reviewed_dev_source": true
+            }
+          ],
+          "source": [
+            "source/runtime/catalogue.lua",
+            "source/research/catalogue.lua",
+            "source/compatibility/modern_catalogue.lua"
+          ],
+          "changed_implementation": "Only runtime/catalogue.lua changes: inspect the one preserved collision and obtain its native creator once during control parsing. Pass only a foreign-created prototype to the existing pure catalogue exclusion. Missing/malformed creation history refuses classification. No prototype/saved-state writes,marker prototypes,Generator import,domain scan or new owner registry.",
+          "api_contract_evidence": {
+            "facts": [
+              {
+                "version": "2.0.77",
+                "api_sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578",
+                "method": "LuaPrototypes.get_history(type,name)",
+                "parameters": [
+                  "type",
+                  "name"
+                ],
+                "takes_table": false,
+                "returns": "PrototypeHistory",
+                "created_type": "string",
+                "native_call_observed": false
+              },
+              {
+                "version": "2.1.23",
+                "api_sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373",
+                "method": "LuaPrototypes.get_history(type,name)",
+                "parameters": [
+                  "type",
+                  "name"
+                ],
+                "takes_table": false,
+                "returns": "PrototypeHistory",
+                "created_type": "string",
+                "native_call_observed": false
+              }
+            ],
+            "documentation": [
+              "https://lua-api.factorio.com/latest/classes/LuaPrototypes.html#get_history",
+              "https://lua-api.factorio.com/latest/concepts/PrototypeHistory.html"
+            ],
+            "method": "Both local version-specific API JSON bodies were rehashed;both declare the two-string-argument getter and required string created field. These are API-description facts,not an observed native call or proof of control-parse availability.",
+            "local_sources": [
+              "Primary build/qualification/release-preparation-r01/official-runtime-api-2.0.77.json",
+              "Installed2.1.23 doc-html/runtime-api.json"
+            ]
+          },
+          "controls": [
+            "tests/test_generator.py:GeneratorTests.test_existing_native_continuation_identity_is_preserved_without_mir_collision",
+            "tests/test_generator.py:GeneratorTests.test_runtime_catalogue_preserves_mir_created_continuation_and_excludes_foreign_creators",
+            "tests/test_generator.py:GeneratorTests.test_runtime_catalogue_refuses_unknown_creator_instead_of_guessing_ownership",
+            "tests/test_library_model.py:LibraryModelTests.test_runtime_catalogue_passes_foreign_technology_map_to_pure_declarations"
+          ],
+          "host_scope": "F200/F210 Base and Space Age host contexts each distinguish MIR,another-mod and base creators even when the last changer differs;repeated reads use one cached history lookup. Poisoned game/storage and non-enumerable prototype maps protect control-parse/read-only/bounded behavior. Absent prototypes require no history query;missing getter/history/creator and empty creator refuse.",
+          "focused_validation": {
+            "groups": [
+              "test_generator",
+              "test_bootstrap",
+              "test_library",
+              "test_lifecycle",
+              "test_library_model"
+            ],
+            "passed": 186,
+            "runtime": "Explicit existing Lupa2.6/lua52",
+            "native_execution": false
+          },
+          "negative_controls": [
+            {
+              "opponent": "published-presence-only-adapter",
+              "source_normalized_sha256": "3809178C83136696ACF1CE4FAF1EE5C4AA53C95BD176E048D82769FC391B4A54",
+              "rejected": true
+            },
+            {
+              "opponent": "last-writer-instead-of-creator",
+              "source_normalized_sha256": "0BBFE1433374A21F49B288C5CA5DD5DDF86B30EB23A09EDD1DA4AB31F4A7082F",
+              "rejected": true
+            }
+          ],
+          "native_remaining": "On exact final F2002.0.77/D3 and F2102.1.23/8DC packages,verify creator history is available during control parsing and observe actual MIR-created and pre-existing foreign braking continuations. Confirm own Library/cap declaration and foreign exclusion,unchanged native effects/foreign disablement,and affected load/reload/client behavior. Preserve the frozen501 packet and original native identities;the host models/API description are not this native verdict.",
+          "limits": "This is the named pre-emission collision boundary. It does not authenticate arbitrary mods or qualify unknown later overwrite/recreation scenarios. All nine-edition/final-candidate and whole-product gates remain separate.",
+          "custody": "Primary build/qualification/aero-runtime-catalogue-owner-r01/{owned-continuation-before.json,regression-controls-before.json,focused-after.json,negative-controls.json,api-and-published-package-readback.json}",
+          "reader_disposition": "The first probe import omitted tests/ from sys.path;the next probe omitted materialization because full_world data:extend records output without filling raw. Both are fixture/reader setup corrections recorded in owned-continuation-before.json,not product failures or valid opposition.",
+          "native_execution": false,
+          "release_qualification": false,
+          "hosted_first_failure": "Host run41323354344/job124898219435 refused one old Library-model double lacking get_history. The fixture now supplies the pinned native creator API and keeps its original foreign-exclusion/unrelated-continuation assertions. Product guards are unchanged;the original failed log remains in primary custody."
         }
       ],
       "test_subjects": [
@@ -545,6 +659,14 @@
           "id": "corrected-f210-base-space-age-private-client-native-names",
           "evidence": "spec/evidence/library-f210-native-names-private-native-chain-r01.json",
           "scope": "Actual corrected2DDD/player7b0/standalone2.1.23/8DC Base and SpaceAge:four real labs,+20%,twelve joins,two cold host restarts,twenty decoded/viewedPNG and twelve two-consumer load-phase witnesses. Native names/science/prerequisites and German context/cap/status resolve through initial/settled/rejoin/restart. Base DLC-absence and SpaceAge native-laboratory explanation are rendered. Four fresh zero-credit holder states remain unchanged through private action filtering. Two original caller/packet refusals remain zero-engine;no guard relaxed. Positive credits,foreign-hidden/actual keyboard/churn/performance remain separate."
+        },
+        {
+          "id": "owned-braking-row-runtime-manifest-correction",
+          "source": [
+            "source/runtime/catalogue.lua"
+          ],
+          "related_record": "CONT-02 runtime-braking-continuation-native-creator-boundary",
+          "scope": "The source correction retains the MIR-created braking row and excludes pre-existing foreign creators. Its four host contexts and two known-broken opponents are verified;actual native Library/cap/creator and final-candidate lifecycle acceptance remain pending. Source501 ZIP member equality confirms the old omission is in both published modern editions. No earlier native/render/input result is overwritten."
         }
       ],
       "test_subjects": [
@@ -4463,6 +4585,18 @@
             "MP-JOIN-01"
           ],
           "scope": "Retain the True Nukes enabling/nuclear-test report and the post-update second-client join failure as new unqualified records. The original screenshot error and exact engine/archive/mod/settings/save inputs remain missing. SCI-UNLOCK-01 separately gains verified cached public links for its original thread, the cryogenic pack variant and the historical Angel silver repair. No historical fix claim or representative test is relabelled as reporter closure."
+        },
+        {
+          "id": "mp-join-original-error-and-handler-negative-control",
+          "request_ids": [
+            "MP-JOIN-01"
+          ],
+          "source": [
+            "source/runtime/bootstrap.lua",
+            "tests/test_bootstrap.py"
+          ],
+          "evidence": "spec/evidence/mp-join-original-error-handler-control-r01.json",
+          "scope": "The original screenshot is now readable and identifies an event-handler mismatch; the strengthened existing settled-load host control passes on current source and rejects the historical load-only-tick failure class. Original reporter inputs/status and native acceptance remain unresolved."
         }
       ],
       "test_subjects": [
@@ -5278,6 +5412,432 @@
         "native_execution": false,
         "source_reconciliation_complete": false,
         "test_intent_reconciliation_complete": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-08",
+          "CONT-09",
+          "CONT-10",
+          "CONT-11",
+          "CONT-15",
+          "CONT-17"
+        ],
+        "reviewed_on": "2026-11-02",
+        "reviewed_against": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+        "scope": "Five named runtime test/source paths across the existing 91-tag snapshot. All twelve distinct selected blobs are dispositioned by their actual assertions; other paths, inter-release removals and imported helper implementations remain outside this slice. No overall historical or native gate closes.",
+        "method": "A bounded git cat-file metadata pass deduplicated equal blobs before reading tests and changes. Compare real passive-repair probe assertions and source semantics separately from retired generated record/cardinality/digest checks. Preserve the historical on_load-notice policy reversal rather than porting its stale assertions.",
+        "tag_commit_reference": "historical_preservation_audit.source_inventory.tag_commits",
+        "selected_paths": [
+          "tests/runtime/Test-MIRPassiveRepair.ps1",
+          "tests/runtime/passive_repair_host_probe.lua",
+          "tests/runtime/Test-MIR4RuntimeContinuity.ps1",
+          "tests/mir4/Test-MIR4RuntimeContinuityW04.ps1",
+          "source/prototypes/mir/runtime/effects/passive_repair.lua"
+        ],
+        "selected_tag_scope": 91,
+        "missing_commit_inputs": [],
+        "selected_blob_variants": [
+          {
+            "path": "tests/runtime/Test-MIR4RuntimeContinuity.ps1",
+            "blob": "ec351edb93e0a3b745b01dbd00976ed96252c1ca",
+            "bytes": 5152,
+            "inventory_tags": [
+              "v4.0.0",
+              "v4.1.0",
+              "v4.2.0",
+              "v4.2.0-stable",
+              "v4.2.1",
+              "v4.2.2"
+            ],
+            "disposition": "obsolete-implementation-only",
+            "intent_groups": [
+              "retired-preview-matrices"
+            ]
+          },
+          {
+            "path": "tests/mir4/Test-MIR4RuntimeContinuityW04.ps1",
+            "blob": "12c119e3b036dda78344ed638a36a223004fe311",
+            "bytes": 7863,
+            "inventory_tags": [
+              "v4.1.0"
+            ],
+            "disposition": "obsolete-implementation-only",
+            "intent_groups": [
+              "retired-preview-matrices",
+              "repair-saved-lifecycle",
+              "superseded-load-notice"
+            ]
+          },
+          {
+            "path": "tests/runtime/Test-MIRPassiveRepair.ps1",
+            "blob": "20c7fe6f336d9d52d97835025d02cf15f63b5e80",
+            "bytes": 7141,
+            "inventory_tags": [
+              "v4.2.0",
+              "v4.2.0-stable"
+            ],
+            "disposition": "port",
+            "intent_groups": [
+              "repair-execution-boundary"
+            ]
+          },
+          {
+            "path": "tests/runtime/passive_repair_host_probe.lua",
+            "blob": "9b8c2b6be947e70f87f839d0e25a31bdef29fddb",
+            "bytes": 5633,
+            "inventory_tags": [
+              "v4.2.0",
+              "v4.2.0-stable",
+              "v4.2.1",
+              "v4.2.2",
+              "v4.3.0",
+              "v4.4.0",
+              "v4.4.1",
+              "v4.4.2",
+              "v4.5.0",
+              "v4.5.1",
+              "v4.5.2",
+              "v4.6.0",
+              "v4.7.0",
+              "v4.7.1",
+              "v4.7.2",
+              "v4.7.3"
+            ],
+            "disposition": "retain",
+            "intent_groups": [
+              "repair-native-observations",
+              "repair-rate-and-capacity",
+              "repair-saved-lifecycle"
+            ]
+          },
+          {
+            "path": "tests/mir4/Test-MIR4RuntimeContinuityW04.ps1",
+            "blob": "7b925073eae8d61d85bc596963eed729266d3bf0",
+            "bytes": 14809,
+            "inventory_tags": [
+              "v4.2.0",
+              "v4.2.0-stable",
+              "v4.2.1"
+            ],
+            "disposition": "obsolete-implementation-only",
+            "intent_groups": [
+              "retired-preview-matrices",
+              "repair-saved-lifecycle",
+              "superseded-load-notice"
+            ]
+          },
+          {
+            "path": "source/prototypes/mir/runtime/effects/passive_repair.lua",
+            "blob": "4a57cc534a2c0c2ecd30625c4fbab18cd5a73a8b",
+            "bytes": 8062,
+            "inventory_tags": [
+              "v4.2.0",
+              "v4.2.0-stable",
+              "v4.2.1",
+              "v4.2.2",
+              "v4.3.0",
+              "v4.4.0",
+              "v4.4.1",
+              "v4.4.2",
+              "v4.5.0",
+              "v4.5.1",
+              "v4.5.2",
+              "v4.6.0",
+              "v4.7.0",
+              "v4.7.1",
+              "v4.7.2",
+              "v4.7.3"
+            ],
+            "disposition": "consolidate",
+            "intent_groups": [
+              "repair-native-observations",
+              "repair-rate-and-capacity",
+              "repair-saved-lifecycle"
+            ]
+          },
+          {
+            "path": "tests/runtime/Test-MIRPassiveRepair.ps1",
+            "blob": "9e75041325f52351232c88ecc2ece142fd57a382",
+            "bytes": 9225,
+            "inventory_tags": [
+              "v4.2.1",
+              "v4.2.2",
+              "v4.3.0",
+              "v4.4.0",
+              "v4.4.1",
+              "v4.4.2",
+              "v4.5.0",
+              "v4.5.1",
+              "v4.5.2",
+              "v4.6.0",
+              "v4.7.0",
+              "v4.7.1",
+              "v4.7.2",
+              "v4.7.3"
+            ],
+            "disposition": "port",
+            "intent_groups": [
+              "repair-execution-boundary"
+            ]
+          },
+          {
+            "path": "tests/mir4/Test-MIR4RuntimeContinuityW04.ps1",
+            "blob": "9476239eb20f6176d67b58386e4e6e4c94713ce4",
+            "bytes": 17003,
+            "inventory_tags": [
+              "v4.2.2"
+            ],
+            "disposition": "obsolete-implementation-only",
+            "intent_groups": [
+              "retired-preview-matrices",
+              "repair-saved-lifecycle",
+              "superseded-load-notice"
+            ]
+          },
+          {
+            "path": "tests/runtime/Test-MIR4RuntimeContinuity.ps1",
+            "blob": "ba206defb6d4b7f343f5d6f836eb4bce2b875a0f",
+            "bytes": 6177,
+            "inventory_tags": [
+              "v4.3.0",
+              "v4.4.0",
+              "v4.4.1"
+            ],
+            "disposition": "obsolete-implementation-only",
+            "intent_groups": [
+              "retired-preview-matrices"
+            ]
+          },
+          {
+            "path": "tests/mir4/Test-MIR4RuntimeContinuityW04.ps1",
+            "blob": "52f46ba503b0572ec210dafd0d4c463034cd601d",
+            "bytes": 19828,
+            "inventory_tags": [
+              "v4.3.0",
+              "v4.4.0",
+              "v4.4.1"
+            ],
+            "disposition": "obsolete-implementation-only",
+            "intent_groups": [
+              "retired-preview-matrices",
+              "repair-saved-lifecycle",
+              "superseded-load-notice"
+            ]
+          },
+          {
+            "path": "tests/runtime/Test-MIR4RuntimeContinuity.ps1",
+            "blob": "a4124251d6618e05920c6b090e558ecbfaa6777b",
+            "bytes": 5620,
+            "inventory_tags": [
+              "v4.4.2",
+              "v4.5.0",
+              "v4.5.1",
+              "v4.5.2",
+              "v4.6.0",
+              "v4.7.0",
+              "v4.7.1",
+              "v4.7.2",
+              "v4.7.3"
+            ],
+            "disposition": "obsolete-implementation-only",
+            "intent_groups": [
+              "retired-preview-matrices"
+            ]
+          },
+          {
+            "path": "tests/mir4/Test-MIR4RuntimeContinuityW04.ps1",
+            "blob": "9f41cca5167dcc3a4f83390eb9d51627c67ad830",
+            "bytes": 18634,
+            "inventory_tags": [
+              "v4.4.2",
+              "v4.5.0",
+              "v4.5.1",
+              "v4.5.2",
+              "v4.6.0",
+              "v4.7.0",
+              "v4.7.1",
+              "v4.7.2",
+              "v4.7.3"
+            ],
+            "disposition": "obsolete-implementation-only",
+            "intent_groups": [
+              "retired-preview-matrices",
+              "repair-saved-lifecycle",
+              "superseded-load-notice"
+            ]
+          }
+        ],
+        "groups": [
+          {
+            "id": "repair-native-observations",
+            "subjects": [
+              "CONT-09"
+            ],
+            "disposition": "retain",
+            "independent_expectation": "passive_repair_host_probe.lua:19,47-81: default-off behavior leaves actual damage unchanged. With the option enabled, only player or reciprocal-friendly walls/gates repair; hostile, one-way-friend and nonwall entities do not. Force-transferred/destroyed entries never receive foreign repair or revival.",
+            "implementation": [
+              "source/runtime/passive_repair.lua",
+              "source/runtime/bootstrap.lua"
+            ],
+            "host_controls": [
+              "tests/test_passive_repair.py::test_only_player_or_reciprocal_friend_walls_and_gates_are_accepted",
+              "tests/test_passive_repair.py::test_destroyed_force_changed_surface_changed_and_full_members_are_dropped"
+            ],
+            "original_evidence": [
+              "spec/evidence/settings-repair-chain.json",
+              "spec/evidence/repair-stress-native-chain.json"
+            ],
+            "remaining_executable_check": "Review original engine/package/settings/save/harness applicability and execute only uncovered affected eligibility/disable/removal-readdition outcomes on the selected candidate. The named native chains retain their own scenarios, not a universal player-package pass.",
+            "owner": "Aero reviews applicability; Black Glass owns native execution"
+          },
+          {
+            "id": "repair-rate-and-capacity",
+            "subjects": [
+              "CONT-09"
+            ],
+            "disposition": "consolidate",
+            "independent_expectation": "The single historical repair source blob shared by sixteen tags declares quiet_ticks=600, repair_interval_ticks=60, repair_amount=1, maximum_pending=256 and per_tick_budget=8. The native probe observes unchanged health at600 and gains at661/721/781 for its small eligible set; it does not prove every queued wall heals once per second under saturation.",
+            "implementation": [
+              "source/runtime/passive_repair.lua",
+              "source/runtime/bootstrap.lua"
+            ],
+            "host_controls": [
+              "tests/test_passive_repair.py::test_repeated_damage_postpones_without_duplicates_and_repairs_at_rate_one",
+              "tests/test_passive_repair.py::test_pending_queue_is_capped_at_256",
+              "tests/test_passive_repair.py::test_ordered_queue_observes_eight_entity_budget_and_keeps_remainder_first",
+              "tests/test_passive_repair.py::test_fixed_relevant_burst_drains_without_scanning_unrelated_factory"
+            ],
+            "original_evidence": [
+              "spec/evidence/repair-stress-native-chain.json"
+            ],
+            "evidence_limit": "The exact recorded 1000-wall F200 arms repair the first256 and leave744 overflow walls damaged; they observe eight repairs per60-tick service and reactivation. This is bounded behavior, not elapsed CPU/memory or unrestricted large-factory throughput.",
+            "remaining_executable_check": "Preserve workload admission, completions/backlog and delays in final-candidate performance comparisons; review affected inputs before reusing the original native capacity/rate result. Do not hide overflow or claim a per-entity saturated rate the evidence does not show.",
+            "owner": "Aero reviews controls/results; Black Glass owns performance"
+          },
+          {
+            "id": "repair-saved-lifecycle",
+            "subjects": [
+              "CONT-08",
+              "CONT-09",
+              "CONT-10"
+            ],
+            "disposition": "port",
+            "independent_expectation": "The native probe saves before quiet repair and again while healing, then requires continued gains after actual reloads. Historical repair peek_state/on_load must not allocate mir or a repair bucket. The W04 saved-state-mutation/storage.changed opponent is rejected; load reconnects required subscriptions without game access or persistent writes.",
+            "implementation": [
+              "source/runtime/bootstrap.lua",
+              "source/runtime/passive_repair.lua",
+              "source/runtime/library.lua"
+            ],
+            "host_controls": [
+              "tests/test_bootstrap.py::test_repair_load_reconnects_without_save_writes_or_game_access_and_disable_clears",
+              "tests/test_passive_repair.py::test_known_unversioned_bucket_shape_with_lua_entity_members_remains_usable",
+              "tests/test_passive_repair.py::test_disable_clears_state_readdition_is_fresh_and_on_load_is_read_only"
+            ],
+            "original_evidence": [
+              "spec/evidence/settings-repair-chain.json",
+              "spec/evidence/repair-stress-native-chain.json"
+            ],
+            "negative_control": {
+              "source_commit": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+              "test_selector": "tests/test_bootstrap.py::test_repair_load_reconnects_without_save_writes_or_game_access_and_disable_clears",
+              "test_source_lf_sha256": "C9E3C9BAA500235DE3628F26B0542EBE4E4FE0330EB2DC0FBA977E1B9F5D4339",
+              "bootstrap_raw_git_sha256": "2F4444488CE1143F391CC4FA682467DD8A2309DA2155F2C0BAE1A86DFA66D967",
+              "runtime": {
+                "lupa": "2.6",
+                "lua": "lua52"
+              },
+              "current_control_passed": true,
+              "previous_control_accepted_same_opponent": true,
+              "opponent": {
+                "change": "Insert storage.changed = true as the first on_load statement; no player files are changed.",
+                "in_memory_only": true,
+                "rejected": true,
+                "failure": {
+                  "type": "LuaError",
+                  "message": "[string \"<python>\"]:9: on_load wrote a saved root key\nstack traceback:\n\t[string \"<python>\"]:10: in main chunk\n\t[string \"historical-saved-root-write-opponent\"]:374: in function 'load'\n\t[string \"<python>\"]:9: in function '__newindex'\n\t[C]: in function 'error'"
+                }
+              },
+              "bootstrap_controls_passed": 22,
+              "passive_repair_controls_passed": 9,
+              "native_execution": false,
+              "release_qualification": false
+            },
+            "verification_limit": "The added root-key write guard rejects this known historical opponent. Existing owned-bucket assertions remain; this small host control does not establish every possible saved-state write or actual multiplayer/old pending-queue migration. The settings-repair native chain explicitly excludes historical pending-repair queue upgrades.",
+            "remaining_executable_check": "Review protected pending/healing state against the selected runtime-state boundaries and current candidate; adopt exact applicable cold-load evidence and execute only the uncovered affected transition. Keep unavailable predecessor worlds explicit and retain the finite migration policy.",
+            "owner": "Aero owns expectation/host controls; Black Glass owns native saved-state checks"
+          },
+          {
+            "id": "repair-execution-boundary",
+            "subjects": [
+              "CONT-09",
+              "CONT-17"
+            ],
+            "disposition": "port",
+            "independent_expectation": "Both Test-MIRPassiveRepair.ps1 variants consume the same native probe, pin the selected repair module and require observed enabled/disabled/save/reload results. Their delta is process/resource/custody enforcement and final retirement of materialized-mod-directory execution, not a new gameplay oracle.",
+            "implementation": [
+              "tools/Invoke-NativeFixture.ps1",
+              "tests/fixtures/settings-repair",
+              "tests/fixtures/repair-stress"
+            ],
+            "host_controls": [
+              "tests/test_passive_repair.py",
+              "tests/test_bootstrap.py"
+            ],
+            "remaining_executable_check": "Use the existing direct-library/native-resource path for affected selected scenarios; do not execute the retired runner or restore its copied/hardlinked mod directory. Existing archive/save/control custody remains preserved.",
+            "owner": "Black Glass"
+          },
+          {
+            "id": "retired-preview-matrices",
+            "subjects": [
+              "CONT-08",
+              "CONT-11"
+            ],
+            "disposition": "obsolete-implementation-only",
+            "independent_expectation": "The three runtime-continuity and five W04 variants assert modeled feature/state/registration/target/migration counts, private-candidate/template hashes, authority fields and exporter digests. They explicitly deny runtime mutation/release proof; modeled rows are not observed native behavior.",
+            "implementation": [
+              "source/runtime/bootstrap.lua",
+              "source/runtime/lifecycle.lua",
+              "source/runtime/scripted_effects.lua"
+            ],
+            "host_controls": [
+              "tests/test_bootstrap.py",
+              "tests/test_lifecycle.py",
+              "tests/test_scripted_effects_lifecycle.py"
+            ],
+            "remaining_executable_check": "Do not port the old matrices/exporter/cardinality/fingerprint framework. Retain the externally meaningful one-owner, deterministic reconstruction, read-only load and state-preservation obligations in current CONT mappings and their actual native scenarios; helper implementations and other feature-specific intents stay unresolved outside this slice.",
+            "owner": "Aero"
+          },
+          {
+            "id": "superseded-load-notice",
+            "subjects": [
+              "CONT-03",
+              "CONT-08",
+              "CONT-10",
+              "CONT-15"
+            ],
+            "disposition": "superseded",
+            "historical_blobs": [
+              "ba206defb6d4b7f343f5d6f836eb4bce2b875a0f",
+              "52f46ba503b0572ec210dafd0d4c463034cd601d"
+            ],
+            "independent_expectation": "The v4.3.0/v4.4.0/v4.4.1 preview assertions include an eighth compiler-profile notice and conditional load-only tick. Actual hotfix03bc43ea1212782ee7efa2d0dc0b637237650141 retires the unsafe load-only callback; later v4.4.2 preview variants remove the notice and reject even a conditional one-shot load-only tick. A stale generated assertion in a tag is not an accepted feature promise or proof of the tagged player callback.",
+            "implementation": [
+              "source/runtime/bootstrap.lua"
+            ],
+            "host_controls": [
+              "tests/test_bootstrap.py::test_settled_native_only_world_has_no_periodic_work_after_view_cycles_and_reload"
+            ],
+            "related_review": "https://github.com/Julesc013/more-infinite-research/pull/1543",
+            "remaining_executable_check": "Keep the actual handler-reconstruction obligation and MP-JOIN-01 error/source control; never reintroduce the retired notice or infer exact reporter closure from this source review.",
+            "owner": "Aero; Black Glass owns genuine client checks"
+          }
+        ],
+        "qualification_limit": "This slice accounts for selected source/test intent only. CONT-08 global contribution/spoilage/agriculture source intents, other runtime tests, inter-release changes, discussions and attachments still need their own dispositions. Old native results remain under original input identities; final candidate/runtime/performance and historical preservation verdicts remain open.",
+        "native_execution": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "release_qualification": false
       },
       {
         "subjects": [

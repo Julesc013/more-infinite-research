@@ -222,7 +222,7 @@ class BootstrapTests(unittest.TestCase):
               on_entity_damaged = 14, on_string_translated = 15,
               on_player_locale_changed = 16, on_player_changed_force = 17,
               on_player_joined_game = 18, on_research_reversed = 19,
-              on_technology_effects_reset = 20, on_gui_selected_tab_changed = 21
+              on_technology_effects_reset = 20, on_gui_selected_tab_changed = 21, on_tick = 23
             }}
             known_technology = {valid = true, name = "recipe-prod-research_gears-1"}
             player = {valid = true, index = 1, frame = {valid = true},
@@ -390,7 +390,9 @@ class BootstrapTests(unittest.TestCase):
           end
           game=setmetatable({}, {__index=function()error("idle/reload world access")end,
             __newindex=function()error("idle/reload world write")end})
+          assert(handlers.events[defines.events.on_tick]==nil, "settled server has an ordinary on_tick handler")
           handlers.load()
+          assert(handlers.events[defines.events.on_tick]==nil, "on_load added an ordinary on_tick handler")
           assert(next(handlers.nth)==nil)
           for _,id in ipairs({4,5,6,19,20})do assert(handlers.events[id]==nil)end
           assert(storage.mir==nil)
@@ -794,7 +796,10 @@ class BootstrapTests(unittest.TestCase):
           local bucket = {queue = queue, members = members, scheduled = false, unknown = "keep"}
           storage.mir = {passive_repair = bucket, historical_other = "keep"}
           game = setmetatable({}, {__index = function() error("on_load accessed game") end})
+          local saved_metatable = getmetatable(storage)
+          setmetatable(storage, {__newindex = function() error("on_load wrote a saved root key") end})
           handlers.load()
+          setmetatable(storage, saved_metatable)
           assert(type(handlers.nth[60]) == "function")
           assert(storage.mir.passive_repair == bucket and bucket.queue == queue and bucket.members == members)
           assert(bucket.scheduled == false and bucket.unknown == "keep" and storage.mir.historical_other == "keep")
