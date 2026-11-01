@@ -112,6 +112,18 @@ class ReleaseTests(unittest.TestCase):
                 "tag": "v5.0.2", "title": "MIR 5.0.2"})
             self.assertEqual([asset["target"] for asset in inventory["assets"]], list(self.NORMAL_TARGETS))
             self.assertEqual(len(inventory["assets"]), 10)
+            self.assertEqual({asset["target"]: asset["label"] for asset in inventory["assets"]}, {
+                "f013": "MIR 5.0.2 for Factorio 0.13.20 (zip)",
+                "f014": "MIR 5.0.2 for Factorio 0.14.23 (zip)",
+                "f015": "MIR 5.0.2 for Factorio 0.15.40 (zip)",
+                "f016": "MIR 5.0.2 for Factorio 0.16.51 (zip)",
+                "f017": "MIR 5.0.2 for Factorio 0.17.79 (zip)",
+                "f018": "MIR 5.0.2 for Factorio 0.18.47 (zip)",
+                "f100": "MIR 5.0.2 for Factorio 1.0.0 (zip)",
+                "f110": "MIR 5.0.2 for Factorio 1.1.110 (zip)",
+                "f200": "MIR 5.0.2 for Factorio 2.0.77 (zip)",
+                "f210": "MIR 5.0.2 for Factorio 2.1.23 (zip)",
+            })
             f018 = next(asset for asset in inventory["assets"] if asset["target"] == "f018")
             self.assertEqual(
                 {key: f018[key] for key in ("version", "factorio_version", "minimum_base", "support")},
@@ -170,6 +182,15 @@ class ReleaseTests(unittest.TestCase):
             self.assertEqual(cohort["qualification"], release.EARLY_QUALIFICATION)
             self.assertEqual(cohort["target_record"]["path"], release.package.EARLY_TARGET_RECORD)
             self.assertEqual([asset["target"] for asset in cohort["assets"]], list(release.EARLY_TARGETS))
+            self.assertEqual({asset["target"]: asset["label"] for asset in cohort["assets"]}, {
+                "f006": "MIR 5.1.0 for Factorio 0.6.4 (zip)",
+                "f007": "MIR 5.1.0 for Factorio 0.7.5 (zip)",
+                "f008": "MIR 5.1.0 for Factorio 0.8.8 (zip)",
+                "f009": "MIR 5.1.0 for Factorio 0.9.8 (zip)",
+                "f010": "MIR 5.1.0 for Factorio 0.10.12 (zip)",
+                "f011": "MIR 5.1.0 for Factorio 0.11.22 (zip)",
+                "f012": "MIR 5.1.0 for Factorio 0.12.35 (zip)",
+            })
             self.assertEqual(
                 {asset["target"]: asset["delivery"] for asset in cohort["assets"]},
                 {"f006": "extract-to-folder", "f007": "extract-to-folder", "f008": "extract-to-folder",
@@ -215,6 +236,9 @@ class ReleaseTests(unittest.TestCase):
                     versions = {asset["target"]: asset["version"] for asset in inventory["assets"]}
                     self.assertEqual(versions["f013"], f013_version)
                     self.assertEqual(versions["f210"], f210_version)
+                    self.assertEqual(next(asset["label"] for asset in inventory["assets"]
+                                          if asset["target"] == "f210"),
+                                     "MIR " + source_version + " for Factorio 2.1.23 (zip)")
                     self.assertEqual(
                         frozen / self._archive_name("f013", distribution_version),
                         frozen / ("more-infinite-research_" + f013_version + ".zip"),
@@ -369,6 +393,7 @@ class ReleaseTests(unittest.TestCase):
             cases = {
                 "release-source-version": alter(("release", "source_version"), "5.0.3"),
                 "release-title": alter(("release", "title"), "MIR 5.0.3"),
+                "asset-label": alter(("assets", 0, "label"), "MIR 5.0.01302 for Factorio 0.13 (zip)"),
                 "release-tag": alter(("release", "tag"), "v5.0.3"),
                 "source-distribution-version": alter(("source", "source_distribution_version"), "5.0.21003"),
                 "source-tree": alter(("source", "tree"), "0" * 40),
