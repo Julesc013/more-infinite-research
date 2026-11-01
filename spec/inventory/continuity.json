@@ -667,6 +667,249 @@
           ],
           "related_record": "CONT-02 runtime-braking-continuation-native-creator-boundary",
           "scope": "The source correction retains the MIR-created braking row and excludes pre-existing foreign creators. Its four host contexts and two known-broken opponents are verified;actual native Library/cap/creator and final-candidate lifecycle acceptance remain pending. Source501 ZIP member equality confirms the old omission is in both published modern editions. No earlier native/render/input result is overwritten."
+        },
+        {
+          "id": "historical-library-handlers-hidden-readiness-production-intents",
+          "reviewed_against": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+          "reviewed_on": "2026-11-02",
+          "scope": "Three historical regression paths, eight deduplicated blobs. Complete bounded entrypoint/delta intent review, not all91tags, every dependency of the old browser harness or VER-07 completion.",
+          "sources": [
+            {
+              "path": "tests/runtime/research_browser_handler_regressions.lua",
+              "blob": "4e9bd3d61b8133c64a1e7a6478a7f2cf7d873ab3",
+              "sha256": "FCC29692148BADD9751C7A696A39EBA597F48BB0E83625F52A0C7466D751197B",
+              "tags": [
+                "v4.2.0",
+                "v4.2.0-stable"
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_handler_regressions.lua",
+              "blob": "f686aba377b73dae94c40ee78214de98ddb79fc6",
+              "sha256": "40F2CE692E51971658F3FAB53F7DB80036E88C62D2B3EBCB5CC47EDC842C4E74",
+              "tags": [
+                "v4.2.1"
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_handler_regressions.lua",
+              "blob": "5077ab952378c2a0b53449aff86f9845ed91882b",
+              "sha256": "7B38616688BCED285326DFA85F142C5A6D33085B53565073A44DA3B8090648A2",
+              "tags": [
+                "v4.2.2"
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_handler_regressions.lua",
+              "blob": "4506a9c48183becbcc95cfc29872c86144cde14b",
+              "sha256": "869F7A1315FAEA851A452F39B61FFC72AA8D74A3CBD0F1311B0FBA2EFCD52DCB",
+              "tags": [
+                "v4.3.0",
+                "v4.4.0",
+                "v4.4.1",
+                "v4.4.2",
+                "v4.5.0",
+                "v4.5.1",
+                "v4.5.2",
+                "v4.6.0",
+                "v4.7.0",
+                "v4.7.1",
+                "v4.7.2",
+                "v4.7.3"
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_hidden_regressions.lua",
+              "blob": "22737de42027584cd6f9a1d8c0c7c827fb61873f",
+              "sha256": "E4CE6E8DE4A212EE682983E4128872D50B4EF4EEE409D3EB3820D3377082AF0E",
+              "tags": [
+                "v4.2.1"
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_hidden_regressions.lua",
+              "blob": "86cd4e60ea5b0ea98174a749e0ed3a2d6b7a983c",
+              "sha256": "E1BECB3CC98ABDF6F97ABE9A287B6CFC0411CB2AB621BD0C98410B3D2BB98D22",
+              "tags": [
+                "v4.2.2",
+                "v4.3.0",
+                "v4.4.0",
+                "v4.4.1",
+                "v4.4.2",
+                "v4.5.0",
+                "v4.5.1",
+                "v4.5.2",
+                "v4.6.0",
+                "v4.7.0",
+                "v4.7.1",
+                "v4.7.2",
+                "v4.7.3"
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_production_regressions.lua",
+              "blob": "aee4994f3fe35fcd13c5d27e84fb263ef81bfdc9",
+              "sha256": "F2ADB342D4706485D0174D7BECFBC90BC6CD52F6F0B88D77CD6A6C148FE634FF",
+              "tags": [
+                "v4.2.1"
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_production_regressions.lua",
+              "blob": "5d94f54afcf07eb497338af4a68c6b66fe18a03c",
+              "sha256": "E466AB11DD38DE87090903AF73046B7E03E07C2C77D96DD4FD319037F1F87AB2",
+              "tags": [
+                "v4.2.2",
+                "v4.3.0",
+                "v4.4.0",
+                "v4.4.1",
+                "v4.4.2",
+                "v4.5.0",
+                "v4.5.1",
+                "v4.5.2",
+                "v4.6.0",
+                "v4.7.0",
+                "v4.7.1",
+                "v4.7.2",
+                "v4.7.3"
+              ]
+            }
+          ],
+          "independent_readiness_oracle": {
+            "published_source": "v4.7.3",
+            "paths": [
+              "source/prototypes/mir/runtime/research_browser_factorio_catalogue.lua",
+              "source/prototypes/mir/runtime/research_browser_core.lua",
+              "source/prototypes/mir/runtime/research_browser.lua"
+            ],
+            "expectation": "The actual published available() rejects disabled, researched, hidden and trigger research and unmet prerequisites. Core Ready filtering follows that availability independently of queue membership; Locked excludes completed rows. Native queued hidden identities remain inspectable without changing research. Published captions distinguish completed and disabled state.",
+            "current_defect_before_correction": "Real current-model probe returned ordinary:1:ready,hidden:1:ready,researched:1:ready,trigger:1:ready for the Ready filter. The downloaded5.0.1 presentation/library_model.lua exactly equals the reviewed raw source, so this is a public product regression, not only a host fixture issue.",
+            "engine_facts": "Pinned2.0.77 and installed2.1.23 runtime API JSONs declare boolean LuaTechnology.enabled/researched, LuaTechnologyPrototype inheritance of LuaPrototypeBase.hidden, and optional modern research_trigger. Their SHA256 are594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578 and7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373. The host supplies the modern capability explicitly; the pure model never imports a host or probes that field on legacy inputs.",
+            "implementation": [
+              "source/presentation/library_model.lua",
+              "source/runtime/library.lua"
+            ],
+            "correction": "Compute readiness from actual native enabled/researched/prerequisite/hidden/trigger state; keep queue inspection separate. Render existing completed/disabled locale keys and retain native visibility, earned state, queue and current filters. No research or storage mutation, new queue, translation keys or version bump."
+          },
+          "groups": [
+            {
+              "intent": "Owned GUI lifecycle and inert unrelated clicks",
+              "disposition": "port",
+              "expectation": "A globally shared name cannot close or move the current owned window; foreign, replaced, child, invalid and missing-player events preserve the other player's view and native research. Genuine owned close/movement still work.",
+              "current_controls": [
+                "tests/test_library.py::test_foreign_or_replaced_same_named_lifecycle_events_preserve_the_live_owned_window",
+                "tests/test_library.py::test_foreign_same_named_root_and_children_never_create_preferences_or_receive_callbacks",
+                "tests/test_library.py::test_filter_click_is_inert_and_native_selection_updates_the_retained_window"
+              ],
+              "gap_closed": "All73 previous Library controls accepted a name-only Close opponent. The new live-owned-window control rejects it at the exact foreign-close assertion; production source already had the correct guard."
+            },
+            {
+              "intent": "Hidden/native availability and queue inspection",
+              "disposition": "port",
+              "expectation": "Keep foreign hidden identities inspectable while excluding hidden/completed/trigger/disabled research from Ready. Preserve actual queued hidden entries and independent enabled/researched/earned/progress state. A personally hidden row is a separate preference from native prototype.hidden.",
+              "current_controls": [
+                "tests/test_library_model.py::test_native_readiness_excludes_hidden_completed_disabled_and_trigger_research_without_losing_queues",
+                "tests/test_library_model.py::test_legacy_readiness_never_reads_a_modern_trigger_property",
+                "tests/test_library_model.py::test_exact_private_credits_stay_out_of_library_views_and_detail"
+              ],
+              "remaining": "Native final-package Ready/Locked/Queue/All and detail explanations on F200/F210, including earned private credit and foreign hidden state; host matrices are not engine runs."
+            },
+            {
+              "intent": "On-demand production snapshots",
+              "disposition": "retain",
+              "expectation": "Only the explicit owned action reads bounded selected-ingredient production/consumption averages. Opening/navigating details never polls. One action patches its small panel, preserves controls/queue/levels and uses honest surface/normal-quality or legacy force scope; invalid statistics are unavailable rather than invented zero/throughput forecasts.",
+              "current_controls": [
+                "tests/test_library.py::test_affected_recipe_selection_opens_factoriopedia_and_production_check_reads_flow_stats",
+                "tests/test_library.py::test_science_production_snapshot_is_bounded_read_only_and_refuses_invalid_inputs",
+                "tests/test_library.py::test_older_engine_production_statistics_keep_force_scope_and_legacy_flow_arguments"
+              ],
+              "gap_closed": "All73 prior Library controls accepted an automatic-on-open production opponent. The strengthened actual-click control rejects it, checks zero unsolicited reads, two rates per pack, retained controls and inert retired buttons. The module implementation is unchanged."
+            },
+            {
+              "intent": "Outstanding translations and idle subscription retirement",
+              "disposition": "consolidate",
+              "expectation": "Load reconnects outstanding callbacks, closing preserves issued work until it settles, and final completion/removal retires maintenance without reopening the view. Locale/force/removed-player epochs preserve peer state.",
+              "current_controls": [
+                "tests/test_library.py::test_completed_open_translation_work_survives_load_and_is_retired_on_close",
+                "tests/test_library.py::test_issued_only_legacy_translation_sidecar_loads_read_only_and_drains_without_reissue",
+                "tests/test_library.py::test_retired_translation_callbacks_resume_an_open_reused_player_without_publishing_old_labels"
+              ],
+              "boundary": "The retired61-tick interval and old cache representation are implementation details; no restore of that timer/framework or new native acceptance."
+            },
+            {
+              "intent": "Engine capability and native recipe navigation",
+              "disposition": "consolidate",
+              "expectation": "Use only supported prototype/event/file/navigation fields; unavailable engine capabilities must not guess a host API. Library availability is independent of settings-profile tools where supported.",
+              "current_controls": [
+                "tests/test_library.py::test_real_model_readiness_uses_completed_disabled_and_trigger_explanations",
+                "tests/test_library.py::test_legacy_engine_prototype_collections_supply_library_recipe_and_item_names",
+                "tests/test_target_adapters.py::test_reduced_data_and_settings_adapters_are_target_bound_and_skip_library"
+              ],
+              "boundary": "MIR5 reduced packages intentionally omit the Library. Older-host helper controls do not add Library support to those editions. Retired coordinator imports/feature-table assertions are not a new player dependency."
+            },
+            {
+              "intent": "Force-cache lifecycle observations",
+              "disposition": "consolidate",
+              "expectation": "Changing/merging forces must not publish stale source-force research or corrupt destination/peer state.",
+              "current_controls": [
+                "tests/test_library.py::test_queue_reversal_effect_reset_and_force_boundaries_route_live_native_views",
+                "tests/test_library.py::test_force_change_refreshes_an_open_queue_tab_without_a_translation_cache"
+              ],
+              "boundary": "The current model reads actual force state and has no old catalogue snapshot cache. Old exact cache-read counts/methods are obsolete implementation assertions; actual affected merge/client/save qualification remains separate."
+            },
+            {
+              "intent": "Old direct enqueue helper",
+              "disposition": "superseded-by-accepted-interaction-scope",
+              "expectation": "Retain the hidden/unavailable safety meaning, but do not resurrect player queue-mutation/rollback controls that the accepted interaction amendment withheld.",
+              "authority": "CONT-10 historical_preservation_review.superseded_expectations; spec/inventory/library-baseline.json entrypoints_and_native_navigation.research_queue_boundary; RUN-04 native research authority.",
+              "boundary": "This records the existing decision; it does not waive a delivered player feature or create new authority."
+            }
+          ],
+          "validation": {
+            "focused_controls": 174,
+            "passed": true,
+            "lua": "Lupa2.6/lua52",
+            "native_processes": 0,
+            "opponents": "Two newly rejected historical bug opponents (name-only Close and unsolicited production on open) plus eight readiness/original-source/host-capability/legacy-field/filter opponents. Every rejection is checked against its intended assertion; no tracked mutant, native fixture or engine was changed.",
+            "preserved_adverses": "first-lifecycle-stale-view-refusal.json records an initial test retaining a superseded normalized preference table; the corrected test rereads the actual durable view. model-first-after.log records a strict proxy missing inherited native hidden=false; adding that actual API field retains its zero-unsupported-read assertion. The first GUI regression setup also had a completed technology in the active queue; its corrected ordinary completion case clears that contradictory fixture state, and the original-source opponent still fails at completion explanation.",
+            "custody": "build/qualification/aero-library-regression-intents-r01/",
+            "receipts": [
+              {
+                "name": "source-variants.json",
+                "sha256": "849AE9E24E05FDAE464A740E63616669406E2D7D3CCB9EFDACB9044560B1CA55"
+              },
+              {
+                "name": "before-controls-and-opponents.json",
+                "sha256": "1308B03187EB404D86D2B870FB66FE032DA91581D6DCD83FCF224BCC178D272A"
+              },
+              {
+                "name": "after-controls-and-opponents.json",
+                "sha256": "D8F3EE449C06B9CE8CF4B1ECCB79AB9BEE63C94D5C9FAD4F1601F0F808AFF511"
+              },
+              {
+                "name": "readiness-before.json",
+                "sha256": "4B88FFE8EB5E31F2B61D3CAC9718E1967BA9B956932C0815CFF9F2A62D22B1C1"
+              },
+              {
+                "name": "readiness-api-facts.json",
+                "sha256": "7D8AA2FD3474D3776E884C79825CC464B271AE12A8A9C73BA0A70E28C016A1B8"
+              },
+              {
+                "name": "readiness-regression-before.json",
+                "sha256": "2417DF2486E92E9DB81763CFA0507810D1958FF197E048012AFE76213C122CD2"
+              },
+              {
+                "name": "readiness-opponents.json",
+                "sha256": "ADFFD3DB08CAB31E074281C027B0AAC231F1B5D367E7DB6F28AB4585E86D2BA6"
+              },
+              {
+                "name": "focused-after.json",
+                "sha256": "E745B90679D39D0509D32B488C2DA88B3045CAD2F029E82122940875289B1DAB"
+              }
+            ]
+          },
+          "remaining_native_check": "Black Glass qualifies the final integrated F200/F210 candidate's availability filters/detail captions and retained foreign/hidden/queued/private state plus actual foreign-GUI lifecycle and explicit production action, then affected save/reload/client/performance paths. Keep frozen public501 packetA unchanged; source correctionB requires review, exact-head CI and later changed public version5.0.2 unless live history advances.",
+          "limits": "All original87 request records, other CONT subjects, source/tag/asset identities and historical failures remain intact. inventory_complete and broad historical source/test reconciliation remain false. No reporter-specific crash, engine/native/performance or stable release verdict is granted."
         }
       ],
       "test_subjects": [
@@ -674,14 +917,15 @@
         "two_clients"
       ],
       "remaining_implementation": [
-        "The published-beta stacked layout is corrected in dev and rejected by the CONT-10 host negative control. No additional source defect is established yet; use native rendering and real input to identify any further correction."
+        "The published-beta stacked layout is corrected in dev. This bounded unit also corrects the demonstrated public501 Ready-filter/native-status regression; independent integration review and affected final-package/native qualification remain required. These three entrypoint groups establish no additional player-source defect beyond the readiness correction."
       ],
       "remaining_qualification": [
         "Complete accepted paired Library/save-load timing and retained-session/churn memory. Corrected R02 diagnostics contain all26 endpoints and pass28 UI-duration/save-ready controls but fail five same-published memory controls;retain both original adverse datasets and review the next bounded measurement protocol before scoring. New7b0 functional/rendered F200/F210 results are separate from performance.",
         "Preserve documented locale fallback/visual limits;the named Space Age native-laboratory explanation and Base absence rows are now observed in the exact corrected7b0 client cases above. This does not establish arbitrary third-party translation quality.",
         "Qualify the accepted1026/1027 Library corrections on the final coherent F200/F210 player packages: actual Esc/E close and dragging/location retention, foreign GUI focus during asynchronous refresh, vanished-root subscription retirement and removed-player translation resumption. Preserve earlier client receipts at their original inputs.",
         "Earned or persisted private selections/queue state and foreign hidden-row inspection still require affected native cases. Fresh F2001D45 and F2102DDD zero-credit private visibility/action/native-state checks now pass;do not relabel them as positive imported credit or paired timing evidence.",
-        "Complete historical_preservation_review: retain the layout negative control and add rejection controls for any known broken handlers, then qualify the affected rendered/input/lifecycle and burst/retained-memory paths on the successor. Old source/native mappings alone do not preserve the accepted interaction design."
+        "Complete historical_preservation_review: retain the layout negative control and add rejection controls for any known broken handlers, then qualify the affected rendered/input/lifecycle and burst/retained-memory paths on the successor. Old source/native mappings alone do not preserve the accepted interaction design.",
+        "Qualify Ready/Locked/Queue/All and completed/disabled/hidden/trigger details from actual final F200/F210 native state, preserving earned effects, queued/suspended work, foreign hidden inspection and private credits. Host174 and opposing-source controls do not complete native acceptance."
       ],
       "historical_preservation_review": {
         "status": "restored-layout-host-negative-control-passed-native-acceptance-pending",
@@ -897,7 +1141,8 @@
             ]
           }
         ],
-        "qualification_limit": "The focused host negative control passes on restored source and fails on the published beta source at the split-layout assertion. It does not establish native rendering or input. The retained R08 screenshots show the German split view; the English detail view is obscured by the Factorio research chooser. Existing client receipts remain useful only at their named inputs."
+        "qualification_limit": "The focused host negative control passes on restored source and fails on the published beta source at the split-layout assertion. It does not establish native rendering or input. The retained R08 screenshots show the German split view; the English detail view is obscured by the Factorio research chooser. Existing client receipts remain useful only at their named inputs.",
+        "additional_regression_record": "historical-library-handlers-hidden-readiness-production-intents"
       }
     },
     {
