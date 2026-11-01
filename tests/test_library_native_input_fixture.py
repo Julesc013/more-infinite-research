@@ -36,9 +36,9 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertEqual(new["name"], "mir-fixture-mir5-migration-origin-f200-110-source")
                 self.assertEqual(new["version"], "0.3.0" if target == "f200" else "0.4.0")
 
-    def test_r16_profiles_reconstruct_dependency_correct_preservation_archives(self):
-        record = json.loads((ROOT / "spec/evidence/library-native-input-imported110-prepared-blackglass-r04.json").read_text())
-        for prepared in record["profiles"]:
+    def test_r16_r17_profiles_reconstruct_exact_preservation_archives(self):
+        records = [json.loads((ROOT / f"spec/evidence/library-native-input-imported110-prepared-blackglass-r{number:02}.json").read_text()) for number in (4, 5)]
+        for record, prepared in [(record, prepared) for record in records for prepared in record["profiles"]]:
             profile = json.loads((ROOT / prepared["profile"]["source"]).read_text())
             historical = next(row for row in profile["mods"] if row["name"] == "mir-fixture-mir5-migration-origin-f200-110-source")
             root = historical["name"] + "_" + historical["version"]
@@ -51,7 +51,11 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                     self.assertEqual(len(data), member["bytes"])
                     self.assertEqual(hashlib.sha256(data).hexdigest().upper(), member["sha256"])
                     if member["destination"] != "info.json":
-                        original = subprocess.check_output(["git", "show", "dc3bb5899bac55396fd865fb2a504ce213b07bec:" + member["source"]], cwd=ROOT)
+                        original_revision = "dc3bb5899bac55396fd865fb2a504ce213b07bec"
+                        if "fixture_guard_source" in record and member["destination"] in {"control.lua", "data-final-fixes.lua", "settings-updates.lua"}:
+                            self.assertEqual(record["fixture_guard_source"], "9c6f952aaf2fea0348a910016c3a2c3c4e3937ef")
+                            original_revision = record["fixture_guard_source"]
+                        original = subprocess.check_output(["git", "show", original_revision + ":" + member["source"]], cwd=ROOT)
                         self.assertEqual(data, original)
                     else:
                         info = json.loads(data)

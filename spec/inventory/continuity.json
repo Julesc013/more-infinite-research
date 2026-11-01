@@ -4458,6 +4458,18 @@
             "MP-JOIN-01"
           ],
           "scope": "Retain the True Nukes enabling/nuclear-test report and the post-update second-client join failure as new unqualified records. The original screenshot error and exact engine/archive/mod/settings/save inputs remain missing. SCI-UNLOCK-01 separately gains verified cached public links for its original thread, the cryogenic pack variant and the historical Angel silver repair. No historical fix claim or representative test is relabelled as reporter closure."
+        },
+        {
+          "id": "mp-join-original-error-and-handler-negative-control",
+          "request_ids": [
+            "MP-JOIN-01"
+          ],
+          "source": [
+            "source/runtime/bootstrap.lua",
+            "tests/test_bootstrap.py"
+          ],
+          "evidence": "spec/evidence/mp-join-original-error-handler-control-r01.json",
+          "scope": "The original screenshot is now readable and identifies an event-handler mismatch; the strengthened existing settled-load host control passes on current source and rejects the historical load-only-tick failure class. Original reporter inputs/status and native acceptance remain unresolved."
         }
       ],
       "test_subjects": [

@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "kind": "mir5-library-native-input-imported110-native-selection",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "session_expected_peak_memory_mib": 7168,
+  "protected_input_save": {
+    "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+    "bytes": 811812,
+    "original_chain": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+  },
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.20001",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-migration-origin-f200-110-source",
+      "version": "0.3.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-library-native-input",
+      "version": "0.3.3",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_5.0.20000.zip": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+    "mir-fixture-mir5-migration-origin-f200-110-source_0.3.0.zip": "AA58F89F3AB4494428A020D2A07AA71B1807CF4D5C6A3D444455FB8B7156A96D",
+    "more-infinite-research_5.0.20001.zip": "750ECA842134AFDDCC7C45B2B656510CA60F09940A2E82B21896AAE7E3D8C1BE",
+    "mir-fixture-mir5-library-native-input_0.3.3.zip": "1243C3B416D4FF29C85919A7159FEB67C32E13F769E2ECA5B58AE7BAE6E559FA"
+  },
+  "display": {
+    "requested_window": "1280x720",
+    "actual_owned_client_geometry_required": [
+      1280,
+      720
+    ],
+    "points": "Freeze from current native geometry and an owned desktop capture before input;Factorio screenshot request is not desktop geometry proof.",
+    "drag_delta": [
+      -30,
+      0
+    ],
+    "drag_baseline": "Latest native root location and event count at successful suffix, not initial inspect.",
+    "minimum_new_location_events": 1
+  },
+  "scope": "Distinct exact-input preparation after the retained r16 native fixture version refusal. The preservation fixture admits only the exact published patch01 engine/cohort at settings, data and runtime. World/effect/credit/settings/queue/lab/load expectations, protected saves, observer0.3.3 and playerZIPs remain unchanged. No native or release acceptance is demonstrated.",
+  "client_identity": {
+    "en": "MIR5English",
+    "de": "MIR5Deutsch",
+    "replacement": "MIR5Deutsch",
+    "join": "exact name plus permitted phase; replacement slot policy is target-specific and independently asserted",
+    "readiness": "actual connected EN/DE locales before inspection/actions",
+    "zero_lua_index": "host-shaped robustness only; not observed by R04"
+  },
+  "native_input_delivery": {
+    "poll_budget_seconds": 10,
+    "maximum_report_calls": 50,
+    "poll_milliseconds": 200,
+    "read_only_report_only": true,
+    "mutating_advance_retries": 0,
+    "input_retries": 0
+  },
+  "native_close_observation": {
+    "armed_owned_open_library": true,
+    "same_player_and_custom_gui": true,
+    "invalid_element_requires_retired_roots": true,
+    "root_disappearance_without_event_rejected": true,
+    "native_close_count": 2
+  }
+}
