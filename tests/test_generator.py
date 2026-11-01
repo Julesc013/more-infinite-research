@@ -1182,7 +1182,8 @@ class GeneratorTests(unittest.TestCase):
           script = {active_mods={base="2.1.23"}}
           prototypes = {technology={[foreign.name]=foreign}}
           package.loaded["research.catalogue"] = nil
-          local runtime_rows = require("research.catalogue").declared()
+          package.loaded["runtime.catalogue"] = nil
+          local runtime_rows = require("runtime.catalogue").declared()
           local runtime_ids = {}; for _, row in ipairs(runtime_rows) do runtime_ids[row.id] = true end
           assert(not runtime_ids[foreign.name] and runtime_ids["inserter-capacity-bonus-8"],
             "runtime catalogue still claimed the existing foreign continuation")
