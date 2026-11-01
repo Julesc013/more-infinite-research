@@ -780,7 +780,15 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertFalse(rejected["ok"])
                 self.assertIn("imported native target differs", rejected["message"])
 
-    def test_503_observer_allows_only_f210_removed_player_index_reuse(self):
+    def test_503_f200_observer_accepts_removed_player_index_reuse(self):
+        # Factorio 2.0 runtime-api.json LuaPlayer.index permits reuse after removal.
+        accepted = self.run_case("f200", "removed-index-reused", "5.0.20001", "0.3.3")
+        self.assertTrue(accepted["ok"], accepted["message"])
+        self.assertFalse(accepted["native_input_evidence"])
+        self.assertEqual(accepted["final"]["actual_joins"], 5)
+        self.assertEqual(accepted["final"]["removed_index"], accepted["final"]["de_index"])
+
+    def test_503_f210_observer_accepts_removed_player_index_reuse(self):
         accepted = self.run_case(
             "f210", "removed-index-reused", "5.0.21001", "0.3.3"
         )
@@ -791,17 +799,26 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             accepted["final"]["removed_index"], accepted["final"]["de_index"]
         )
 
-        # The old F210 observer and the F200 observer must keep rejecting the
-        # same collision. Reuse is enabled only by the exact new F210 identity.
+        # Older observer identities still reject the same collision.
         for target, package_version, observer_version in (
             ("f210", "5.0.21001", "0.3.2"),
-            ("f200", "5.0.20001", "0.3.3"),
+            ("f200", "5.0.20000", "0.3.0"),
         ):
             with self.subTest(target=target, observer_version=observer_version):
                 rejected = self.run_case(
                     target, "removed-index-reused", package_version, observer_version
                 )
                 self.assertFalse(rejected["ok"])
+                self.assertFalse(rejected["native_input_evidence"])
+
+    def test_503_f200_reuse_keeps_removal_and_identity_guards(self):
+        for opponent in ("removal-no-event", "removal-player-retained", "removal-root-retained",
+                         "removal-query-retained", "locale-never-ready", "unexpected-client-name",
+                         "replacement-index-reuses-en", "changed-restart-index", "duplicate-restart-role",
+                         "private-listed", "extra-mod", "missing-click-event", "native-effect-change"):
+            with self.subTest(opponent=opponent):
+                rejected = self.run_case("f200", opponent, "5.0.20001", "0.3.3")
+                self.assertFalse(rejected["ok"], rejected["message"])
                 self.assertFalse(rejected["native_input_evidence"])
 
     def test_503_observer_still_requires_exact_501_candidate_identity(self):
