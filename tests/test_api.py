@@ -63,13 +63,13 @@ class ApiTests(unittest.TestCase):
         ''')
 
     def fresh(self):
-        self.lua.execute("data = world(); mods = {[\"more-infinite-research\"] = \"5.0.21000\"}")
+        self.lua.execute("data = world(); mods = {[\"more-infinite-research\"] = \"5.0.21001\"}")
 
     def fresh_f200(self):
         self.lua.execute('''
           package.loaded["platform.target"] = {
             id = "f200", factorio_version = "2.0", minimum_base = "2.0.77",
-            distribution_version = "5.0.20000", reduced = false,
+            distribution_version = "5.0.20001", reduced = false,
             research_levels = true, recipe_productivity = true,
             recipe_probability = "independent_probability",
             productivity_ignores_stats = true, receiver_limits = true,
@@ -79,14 +79,14 @@ class ApiTests(unittest.TestCase):
           package.loaded["__more-infinite-research__.api.v1.data"] = nil
           api = require("__more-infinite-research__.api.v1.data")
           data = world()
-          mods = {["more-infinite-research"] = "5.0.20000"}
+          mods = {["more-infinite-research"] = "5.0.20001"}
         ''')
 
     def test_version_and_capabilities_are_detached_actual_metadata(self):
         self.fresh()
         self.lua.execute('''
           local version = api.get_version()
-          assert(version.major == 1 and version.minor == 0 and version.product == "5.0.21000")
+          assert(version.major == 1 and version.minor == 0 and version.product == "5.0.21001")
           version.major = 99
           assert(api.get_version().major == 1)
           local capabilities = api.get_capabilities()
@@ -126,7 +126,7 @@ class ApiTests(unittest.TestCase):
             package.loaded["__more-infinite-research__/platform/target"] = nil
             package.loaded["__more-infinite-research__.api.v1.data"] = nil
             local external_api = require("__more-infinite-research__.api.v1.data")
-            assert(external_api.get_version().product == "5.0.21000",
+            assert(external_api.get_version().product == "5.0.21001",
               "external API consumed " .. consumer .. "'s private target metadata")
             assert(external_api.get_capabilities().recipe_productivity)
             local name = "mir-api-namespace-" .. consumer
@@ -152,7 +152,7 @@ class ApiTests(unittest.TestCase):
             [(row["name"], row["version"], row["enabled"]) for row in profile["mods"]],
             [
                 ("base", "2.1.23", True),
-                ("more-infinite-research", "5.0.21000", True),
+                ("more-infinite-research", "5.0.21001", True),
                 ("mir-fixture-mir5-api-namespace-alpha", "0.1.0", True),
                 ("mir-fixture-mir5-api-namespace-beta", "0.1.0", True),
                 ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
@@ -166,7 +166,7 @@ class ApiTests(unittest.TestCase):
             self.assertEqual(info["name"], f"mir-fixture-mir5-api-namespace-{consumer}")
             self.assertEqual(info["factorio_version"], "2.1")
             self.assertEqual(info["dependencies"], [
-                "base >= 2.1.23", "more-infinite-research = 5.0.21000",
+                "base >= 2.1.23", "more-infinite-research = 5.0.21001",
             ])
 
         self.lua.globals().namespace_alpha_data = (alpha_root / "data.lua").as_posix()
@@ -243,7 +243,7 @@ class ApiTests(unittest.TestCase):
           assert(beta.effects[1].recipe == "copper-cable" and beta.effects[1].change == .02)
           assert(alpha_private.distribution_version == "private-alpha-target"
             and beta_private.distribution_version == "private-beta-target")
-          assert(api.get_version().product == "5.0.21000" and api.get_capabilities().recipe_productivity)
+          assert(api.get_version().product == "5.0.21001" and api.get_capabilities().recipe_productivity)
 
           local ok, message, alpha_result, alpha_log = run_namespace_control(
             namespace_alpha_control, alpha_private, "mir-api-namespace-alpha-gears-1", "iron-gear-wheel", .01)
@@ -464,7 +464,7 @@ class ApiTests(unittest.TestCase):
         self.lua.globals().alpha_fixture = alpha.as_posix()
         self.lua.globals().beta_fixture = beta.as_posix()
         self.lua.execute('''
-          assert(api.get_version().product == "5.0.20000")
+          assert(api.get_version().product == "5.0.20001")
           assert(api.get_capabilities().recipe_productivity == true)
           assert(loadfile(alpha_fixture))()
           assert(loadfile(beta_fixture))()

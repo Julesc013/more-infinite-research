@@ -5,5 +5,5 @@
   "author": "MIR maintainers",
   "description": "Private F210 consumer with a deliberately incompatible local platform target.",
   "factorio_version": "2.1",
-  "dependencies": ["base >= 2.1.23", "more-infinite-research = 5.0.21000"]
+  "dependencies": ["base >= 2.1.23", "more-infinite-research = 5.0.21001"]
 }
