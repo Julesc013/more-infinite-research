@@ -216,6 +216,7 @@ class ReleaseTests(unittest.TestCase):
     def test_freeze_accepts_successive_patch_and_patch_limit(self):
         cases = (
             ("5.0.1", "5.0.21001", "5.0.01301", "5.0.21001"),
+            ("5.0.2", "5.0.21002", "5.0.01302", "5.0.21002"),
             ("5.0.99", "5.0.21099", "5.0.01399", "5.0.21099"),
         )
         with tempfile.TemporaryDirectory() as temporary:

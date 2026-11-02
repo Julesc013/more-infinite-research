@@ -63,13 +63,13 @@ class ApiTests(unittest.TestCase):
         ''')
 
     def fresh(self):
-        self.lua.execute("data = world(); mods = {[\"more-infinite-research\"] = \"5.0.21001\"}")
+        self.lua.execute("data = world(); mods = {[\"more-infinite-research\"] = \"5.0.21002\"}")
 
     def fresh_f200(self):
         self.lua.execute('''
           package.loaded["platform.target"] = {
             id = "f200", factorio_version = "2.0", minimum_base = "2.0.77",
-            distribution_version = "5.0.20001", reduced = false,
+            distribution_version = "5.0.20002", reduced = false,
             research_levels = true, recipe_productivity = true,
             recipe_probability = "independent_probability",
             productivity_ignores_stats = true, receiver_limits = true,
@@ -79,14 +79,14 @@ class ApiTests(unittest.TestCase):
           package.loaded["__more-infinite-research__.api.v1.data"] = nil
           api = require("__more-infinite-research__.api.v1.data")
           data = world()
-          mods = {["more-infinite-research"] = "5.0.20001"}
+          mods = {["more-infinite-research"] = "5.0.20002"}
         ''')
 
     def test_version_and_capabilities_are_detached_actual_metadata(self):
         self.fresh()
         self.lua.execute('''
           local version = api.get_version()
-          assert(version.major == 1 and version.minor == 0 and version.product == "5.0.21001")
+          assert(version.major == 1 and version.minor == 0 and version.product == "5.0.21002")
           version.major = 99
           assert(api.get_version().major == 1)
           local capabilities = api.get_capabilities()
@@ -126,7 +126,7 @@ class ApiTests(unittest.TestCase):
             package.loaded["__more-infinite-research__/platform/target"] = nil
             package.loaded["__more-infinite-research__.api.v1.data"] = nil
             local external_api = require("__more-infinite-research__.api.v1.data")
-            assert(external_api.get_version().product == "5.0.21001",
+            assert(external_api.get_version().product == "5.0.21002",
               "external API consumed " .. consumer .. "'s private target metadata")
             assert(external_api.get_capabilities().recipe_productivity)
             local name = "mir-api-namespace-" .. consumer
@@ -229,6 +229,12 @@ class ApiTests(unittest.TestCase):
         ''')
 
         self.fresh()
+        # These immutable consumer fixtures describe the published 5.0.1 identity.
+        # Select that identity for this host scenario without changing their pins.
+        self.lua.execute('''
+          package.loaded["__more-infinite-research__/platform/target"].distribution_version = "5.0.21001"
+          mods["more-infinite-research"] = "5.0.21001"
+        ''')
         self.lua.execute(r'''
           local alpha_private = namespace_target(namespace_alpha_target)
           local beta_private = namespace_target(namespace_beta_target)
@@ -464,7 +470,7 @@ class ApiTests(unittest.TestCase):
         self.lua.globals().alpha_fixture = alpha.as_posix()
         self.lua.globals().beta_fixture = beta.as_posix()
         self.lua.execute('''
-          assert(api.get_version().product == "5.0.20001")
+          assert(api.get_version().product == "5.0.20002")
           assert(api.get_capabilities().recipe_productivity == true)
           assert(loadfile(alpha_fixture))()
           assert(loadfile(beta_fixture))()
