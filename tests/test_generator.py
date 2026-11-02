@@ -436,6 +436,106 @@ class GeneratorTests(unittest.TestCase):
           assert(b.prerequisites[1] == "automation-science-pack")
         ''')
 
+    def test_inactive_provider_artwork_keeps_original_raw_and_imported_setting_cases(self):
+        # Literal cases from v4.7.3 Get-MIRBrowserIconCase. The expectation is
+        # the old final-artwork assertion, not a candidate-derived snapshot.
+        cases = (("Defaults", False, None), ("RawOptIn", True, None),
+                 ("ImportedOptIn", False, True), ("RawOptInImportedOff", True, False))
+        source_version = json.loads((ROOT / "source/info.json").read_text(encoding="utf-8"))["version"]
+        major, minor, encoded = source_version.split(".")
+        self.artwork_observations = []
+        cell = 0
+        for target_id, engine in (("f210", "2.1.23"), ("f200", "2.0.77")):
+            for case, raw, imported in cases:
+                with self.subTest(target=target_id, case=case):
+                    # Each complete stage has its own existing full_world
+                    # fixture and Lua module lifetime, just like other tests.
+                    if cell:
+                        self.setUp()
+                    cell += 1
+                    self.lua.globals().art_target = target_id
+                    self.lua.globals().art_engine = engine
+                    self.lua.globals().art_distribution = f"{major}.{minor}.{int(target_id[1:]) * 100 + int(encoded) % 100:05d}"
+                    self.lua.globals().art_raw = raw
+                    self.lua.globals().art_imported = imported
+                    result = self.lua.execute(r'''
+                      local target=require("platform.target")
+                      target.id,target.factorio_version,target.minimum_base=art_target,art_engine:match("^(%d+%.%d+)"),art_engine
+                      target.distribution_version=art_distribution
+                      target.cargo_research,target.receiver_limits=art_target=="f210",art_target=="f210"
+                      target.recipe_probability=art_target=="f210" and "independent_probability" or "probability"
+                      mods,script={base=art_engine},nil
+                      package.loaded["research.settings"]=nil
+                      config=require("research.settings")
+                      data=full_world(mods)
+                      data.raw.shortcut={}
+                      data.raw.technology["foreign-art-sentinel"]={type="technology",name="foreign-art-sentinel",
+                        icons={{icon="__base__/graphics/icons/stone.png",icon_size=64}}}
+                      function data:extend(rows)
+                        self.writes=self.writes+1
+                        for _,row in ipairs(rows) do
+                          self.raw[row.type]=self.raw[row.type] or {}
+                          assert(self.raw[row.type][row.name]==nil,"duplicate fixture prototype: "..row.name)
+                          self.raw[row.type][row.name]=row
+                        end
+                      end
+                      dofile(player_root.."/settings.lua")
+                      local startup=defaults()
+                      local name="mir-use-installed-space-age-icons"
+                      assert(data.raw["bool-setting"][name],"the saved icon setting identity disappeared")
+                      startup[name].value=art_raw
+                      local payload={schema=1,kind="mir-settings-profile",settings={[name]=art_imported}}
+                      helpers={game_version=art_engine,
+                        encode_string=function(value)return value end,
+                        decode_string=function(value)assert(value=="icon-input");return value end,
+                        json_to_table=function(value)assert(value=="icon-input");return payload end}
+                      if art_imported~=nil then startup[config.import_setting_name].value="MIRSET1:icon-input" end
+                      settings,log={startup=startup},function()end
+                      local effective=config.effective_values(startup,helpers)
+                      local expected=art_imported
+                      if expected==nil then expected=art_raw end
+                      assert(effective[name]==expected and startup[name].value==art_raw,
+                        "raw/imported icon preferences did not retain their actual precedence")
+                      dofile(player_root.."/data.lua")
+                      dofile(data_final_path)
+                      assert(data.raw.technology["recipe-prod-research_gears-1"],
+                        "the complete final stage did not publish MIR research")
+                      local shortcut=assert(data.raw.shortcut["mir-research-browser"])
+                      assert(shortcut.icon=="__base__/graphics/icons/lab.png" and shortcut.small_icon==shortcut.icon
+                        and shortcut.icon_size==64 and shortcut.small_icon_size==64,
+                        "inactive-provider preferences changed the base shortcut fallback")
+                      local strings,technologies,shortcuts=0,0,0
+                      local function inspect(value)
+                        if type(value)=="table" then for _,child in pairs(value) do inspect(child) end
+                        elseif type(value)=="string" then
+                          strings=strings+1
+                          for _,provider in ipairs({"space-age","elevated-rails"}) do
+                            assert(not value:find("__"..provider.."__/",1,true),
+                              "inactive-provider resource survived in final technology/shortcut output")
+                          end
+                        end
+                      end
+                      for _,row in pairs(data.raw.technology) do technologies=technologies+1;inspect(row) end
+                      for _,row in pairs(data.raw.shortcut) do shortcuts=shortcuts+1;inspect(row) end
+                      assert(technologies>1 and shortcuts>0 and strings>0,"final artwork scan was empty")
+                      -- Oppose a blanket DLC ban using the real data-stage
+                      -- entrypoint. This is not an active-DLC final-stage run.
+                      mods["space-age"]=art_engine
+                      data.raw.shortcut={}
+                      dofile(player_root.."/data.lua")
+                      local active=data.raw.shortcut["mir-research-browser"]
+                      assert(active.icon=="__space-age__/graphics/technology/research-productivity.png"
+                        and active.small_icon==active.icon and active.icon_size==256 and active.small_icon_size==256,
+                        "active-provider data stage lost its guaranteed artwork")
+                      return {target=art_target,engine=art_engine,raw=art_raw,effective=effective[name],
+                        technologies_scanned=technologies,shortcuts_scanned=shortcuts,strings_scanned=strings,
+                        inactive_provider_references=0,active_shortcut_opponent_checked=true}
+                    ''')
+                    observation = plain_lua(result)
+                    observation["case"] = case
+                    observation["imported"] = imported
+                    self.artwork_observations.append(observation)
+
     def test_approved_profile_bindings_match_frozen_full_native_rows(self):
         profiles = {
             "vanilla": ({}, ["iron-gear-wheel"]),
@@ -573,6 +673,95 @@ class GeneratorTests(unittest.TestCase):
             end
           end
           assert(#space_declared == 76 and owners == 5)
+        ''')
+
+    def test_mining_effects_preserve_published_denial_policy_without_granting_recipe_permissions(self):
+        # Original permission runner at v4.7.3 (a502c05016d2d56b9961c46b4441f1cf455aec78)
+        # independently pins these weights to the v4.2.2/v4.3.0 declarations.
+        self.lua.execute(r'''
+          local extension = require("research.product_target_extension")
+          for _, space_age in ipairs({false, true}) do
+            local active = {base="2.1.23"}
+            if space_age then active["space-age"] = "2.1.23" end
+            local selection = modern_catalogue.select(active)
+            local values = config.resolve(defaults())
+            local mining
+            for _, row in ipairs(modern.technologies(selection, values)) do
+              if row.name == "recipe-prod-research_mining_drill-1" then mining = row end
+            end
+            assert(mining, "published mining family disappeared")
+            local recipes, items = {}, {}
+            local expected = {['burner-mining-drill']=.20, ['electric-mining-drill']=.10,
+              ['big-mining-drill']=.05, ['se-core-miner-drill']=.05,
+              ['omega-drill']=.05, ['omega-tau']=.05, ['foreign-mining-drill']=.05}
+            for name in pairs(expected) do
+              recipes[name] = {enabled=true, ingredients={{"ore",1}},
+                results={{type="item", name=name, amount=1}},
+                allow_productivity=false, maximum_productivity=0, foreign={owner=name}}
+              items[name] = {}
+            end
+            recipes['ore-yield'] = {ingredients={}, results={{type="item",name="iron-ore",amount=1}}}
+            for _, name in ipairs({'capture-robot-rocket','ice-platform','space-platform-foundation'}) do
+              recipes[name] = {allow_productivity=false}
+            end
+            local raw = {recipe=recipes, item=items}
+            modern.preflight_recipe_patches(selection, raw)
+            modern.apply_recipe_patches(selection, raw)
+            extension.extend({mining}, values, {raw=raw, mods=active})
+            local emitted = {}
+            for _, effect in ipairs(mining.effects) do
+              assert(effect.type == "change-recipe-productivity")
+              assert(expected[effect.recipe] and not emitted[effect.recipe], "unexpected/duplicate drill effect")
+              emitted[effect.recipe] = effect.change
+            end
+            assert(#mining.effects == 7, "published denied drill recipe effect was lost")
+            for name, change in pairs(expected) do
+              assert(emitted[name] and math.abs(emitted[name]-change)<1e-12, name)
+              assert(recipes[name].allow_productivity == false and recipes[name].maximum_productivity == 0,
+                "mining research granted upstream recipe permission")
+              assert(recipes[name].foreign.owner == name)
+            end
+            assert(recipes['ore-yield'].allow_productivity == nil)
+          end
+        ''')
+
+    def test_space_age_recipe_permissions_have_exact_scope_and_preflight_before_writes(self):
+        # Port the three positive permissions from the historical 3d65d3c3 fixture;
+        # normal/expensive recipe variants belong to its retired harness, not 2.x.
+        self.lua.execute(r'''
+          local names = {'capture-robot-rocket','ice-platform','space-platform-foundation'}
+          local function recipes()
+            local out = {['electric-mining-drill']={allow_productivity=false},
+              foreign={allow_productivity=false, maximum_productivity=0}}
+            for _, name in ipairs(names) do
+              out[name] = {allow_productivity=false, maximum_productivity=7, foreign={owner=name}}
+            end
+            return out
+          end
+          local base = modern_catalogue.select({base="2.1.23"})
+          local base_raw = {recipe=recipes()}
+          modern.preflight_recipe_patches(base, base_raw)
+          modern.apply_recipe_patches(base, base_raw)
+          for _, recipe in pairs(base_raw.recipe) do assert(recipe.allow_productivity == false) end
+          local space = modern_catalogue.select({base="2.1.23", ['space-age']="2.1.23"})
+          local raw = {recipe=recipes()}
+          modern.preflight_recipe_patches(space, raw)
+          modern.apply_recipe_patches(space, raw)
+          for _, name in ipairs(names) do
+            assert(raw.recipe[name].allow_productivity == true, name)
+            assert(raw.recipe[name].maximum_productivity == 7 and raw.recipe[name].foreign.owner == name)
+          end
+          assert(raw.recipe.foreign.allow_productivity == false and raw.recipe.foreign.maximum_productivity == 0)
+          assert(raw.recipe['electric-mining-drill'].allow_productivity == false)
+          for _, missing in ipairs(names) do
+            local incomplete = {recipe=recipes()}
+            incomplete.recipe[missing] = nil
+            local ok, message = pcall(modern.apply_recipe_patches, space, incomplete)
+            assert(not ok and tostring(message):find("missing required recipe " .. missing,1,true))
+            for _, recipe in pairs(incomplete.recipe) do
+              assert(recipe.allow_productivity == false, "partial permission write before refusal")
+            end
+          end
         ''')
 
     def test_native_owner_settings_keep_zero_time_as_native_inherit_only_for_active_owners(self):
