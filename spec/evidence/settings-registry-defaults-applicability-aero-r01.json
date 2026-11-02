@@ -1,0 +1,2223 @@
+{
+  "schema": 1,
+  "kind": "MIRAeroHistoricalSettingsRegistryDefaultsApplicabilityV1",
+  "status": "bounded-source-intent-and-original-B-global-declaration-parity-only",
+  "reviewed_against": "2ac3bb33df8905bc109331b6b7cfaa0e69ab165d",
+  "current_player_tree": "701e314ee50f19ac6cef02a1d4a598cca843eb0f",
+  "source_scope": {
+    "families": [
+      "settings/defaults.lua",
+      "settings/registry.lua"
+    ],
+    "source_aliases": [
+      "prototypes/mir/",
+      "source/prototypes/mir/"
+    ],
+    "indexed_tags": 91,
+    "unique_commits": 90,
+    "unique_bodies": 22,
+    "bytes": 84907,
+    "retained_remote_tag_bindings": 148,
+    "commit_only_bindings": 2,
+    "earlier_to_latest_comparisons": 20,
+    "raw_data_difference_rows": 545,
+    "deduplicated_exact_key_value_changes": 92,
+    "limits": "Counts describe source/data deduplication, not independent obligations or native passes. Earlier target-specific values remain exact historical facts; modern defaults are not copied onto unsupported earlier engines."
+  },
+  "semantic_comparison": [
+    {
+      "family": "settings/registry.lua",
+      "earlier_blob": "04cb316c6c0c931f82f16ccac101f609cbec4751",
+      "latest_blob": "d3dfb83d1635d7706f6764c71b23cd67150138e0",
+      "data_differences": 19
+    },
+    {
+      "family": "settings/registry.lua",
+      "earlier_blob": "0845b2ba2a426c1dd2db57b308c07c8f7119a4a9",
+      "latest_blob": "d3dfb83d1635d7706f6764c71b23cd67150138e0",
+      "data_differences": 2
+    },
+    {
+      "family": "settings/defaults.lua",
+      "earlier_blob": "19756cf05ccc45372a04a40a7d6324f33d7007d2",
+      "latest_blob": "95b96cf50093cd4eb522cec4f419b8f879ed69c5",
+      "data_differences": 47
+    },
+    {
+      "family": "settings/defaults.lua",
+      "earlier_blob": "1e2eada50cd9de5876b7728801f81f5299c6a800",
+      "latest_blob": "95b96cf50093cd4eb522cec4f419b8f879ed69c5",
+      "data_differences": 49
+    },
+    {
+      "family": "settings/defaults.lua",
+      "earlier_blob": "2eec565ba6fcf03029b1bef4d3efabc27596b117",
+      "latest_blob": "95b96cf50093cd4eb522cec4f419b8f879ed69c5",
+      "data_differences": 41
+    },
+    {
+      "family": "settings/registry.lua",
+      "earlier_blob": "3534d16f4c4b9550fb08be02c06c843e1a5c46a7",
+      "latest_blob": "d3dfb83d1635d7706f6764c71b23cd67150138e0",
+      "data_differences": 6
+    },
+    {
+      "family": "settings/defaults.lua",
+      "earlier_blob": "37954af68df0eb601ae43121487a3691b9e77b4c",
+      "latest_blob": "95b96cf50093cd4eb522cec4f419b8f879ed69c5",
+      "data_differences": 46
+    },
+    {
+      "family": "settings/registry.lua",
+      "earlier_blob": "4018680632bdb93fbefc0ed211b90045f9bfd4fc",
+      "latest_blob": "d3dfb83d1635d7706f6764c71b23cd67150138e0",
+      "data_differences": 1
+    },
+    {
+      "family": "settings/defaults.lua",
+      "earlier_blob": "453df9189656dca43b13f4c0aa333fc2a1428874",
+      "latest_blob": "95b96cf50093cd4eb522cec4f419b8f879ed69c5",
+      "data_differences": 1
+    },
+    {
+      "family": "settings/registry.lua",
+      "earlier_blob": "4e6c0640b233fec9160f09d29fc8d869a4597cb9",
+      "latest_blob": "d3dfb83d1635d7706f6764c71b23cd67150138e0",
+      "data_differences": 6
+    },
+    {
+      "family": "settings/defaults.lua",
+      "earlier_blob": "4efd9a86fe0e60da5b840194194a420323538253",
+      "latest_blob": "95b96cf50093cd4eb522cec4f419b8f879ed69c5",
+      "data_differences": 33
+    },
+    {
+      "family": "settings/registry.lua",
+      "earlier_blob": "73a703a21b06b1802915f3efc153ea5a992858fb",
+      "latest_blob": "d3dfb83d1635d7706f6764c71b23cd67150138e0",
+      "data_differences": 10
+    },
+    {
+      "family": "settings/defaults.lua",
+      "earlier_blob": "7f20dabd7352d2d554d1db3afdd4f1870663ecf7",
+      "latest_blob": "95b96cf50093cd4eb522cec4f419b8f879ed69c5",
+      "data_differences": 39
+    },
+    {
+      "family": "settings/defaults.lua",
+      "earlier_blob": "8f8d180924a867d1fc95ef3677e5e861f9c35c7c",
+      "latest_blob": "95b96cf50093cd4eb522cec4f419b8f879ed69c5",
+      "data_differences": 45
+    },
+    {
+      "family": "settings/defaults.lua",
+      "earlier_blob": "a3ab4f17e5ed9d8ba043c581806269f594af528e",
+      "latest_blob": "95b96cf50093cd4eb522cec4f419b8f879ed69c5",
+      "data_differences": 39
+    },
+    {
+      "family": "settings/defaults.lua",
+      "earlier_blob": "e28c42ed17b03b17943cd50e1af363c6bd06ccda",
+      "latest_blob": "95b96cf50093cd4eb522cec4f419b8f879ed69c5",
+      "data_differences": 46
+    },
+    {
+      "family": "settings/defaults.lua",
+      "earlier_blob": "efb2ed07bfdef1976258938e223911c5c83f130a",
+      "latest_blob": "95b96cf50093cd4eb522cec4f419b8f879ed69c5",
+      "data_differences": 14
+    },
+    {
+      "family": "settings/defaults.lua",
+      "earlier_blob": "f4a40539d7c0096fd8c42faa454544cdfa9654d6",
+      "latest_blob": "95b96cf50093cd4eb522cec4f419b8f879ed69c5",
+      "data_differences": 40
+    },
+    {
+      "family": "settings/registry.lua",
+      "earlier_blob": "f5acfb35a67e82e510a962286937489fdbcf3a80",
+      "latest_blob": "d3dfb83d1635d7706f6764c71b23cd67150138e0",
+      "data_differences": 11
+    },
+    {
+      "family": "settings/defaults.lua",
+      "earlier_blob": "fbd0642a127305b7c8e4ac40c30a46b39cc1918e",
+      "latest_blob": "95b96cf50093cd4eb522cec4f419b8f879ed69c5",
+      "data_differences": 50
+    }
+  ],
+  "independent_expectation": {
+    "global_baseline": {
+      "path": "spec/inventory/settings-baseline.json",
+      "source_commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+      "current_record_sha256": "EAD937D768F6B697EE998B0364A14E92DECF59EAF25075B14D0FBDF4374FDC28",
+      "producer_identity": [
+        {
+          "path": "source/prototypes/mir/settings/catalog.lua",
+          "v470_blob": "78f27304922d970a2374abf30bdf1e209845b1fd",
+          "v473_blob": "78f27304922d970a2374abf30bdf1e209845b1fd",
+          "identical": true
+        },
+        {
+          "path": "source/prototypes/mir/settings/automatic_compiler_contract.lua",
+          "v470_blob": "91e32369c3bcf70a4faa1de64e5e64f2505518c5",
+          "v473_blob": "91e32369c3bcf70a4faa1de64e5e64f2505518c5",
+          "identical": true
+        },
+        {
+          "path": "source/prototypes/mir/settings/compiler_profile.lua",
+          "v470_blob": "f2020ef97d543384902485b49cce8e20b76c3047",
+          "v473_blob": "f2020ef97d543384902485b49cce8e20b76c3047",
+          "identical": true
+        },
+        {
+          "path": "source/prototypes/mir/settings/prototype_limits.lua",
+          "v470_blob": "1ff9f2f231b089a944614a6b2d9932a36158add0",
+          "v473_blob": "1ff9f2f231b089a944614a6b2d9932a36158add0",
+          "identical": true
+        },
+        {
+          "path": "source/prototypes/mir/settings/effective.lua",
+          "v470_blob": "31f220dd993374a39123c6cc9f615a224956728a",
+          "v473_blob": "31f220dd993374a39123c6cc9f615a224956728a",
+          "identical": true
+        },
+        {
+          "path": "source/prototypes/mir/settings/profile_codec.lua",
+          "v470_blob": "1a5f4b32c54d472309e5abf355b005e97f000314",
+          "v473_blob": "1a5f4b32c54d472309e5abf355b005e97f000314",
+          "identical": true
+        },
+        {
+          "path": "source/prototypes/mir/settings/cost_contract.lua",
+          "v470_blob": "6db8a6041437bf65c0861f777b338add0de88b18",
+          "v473_blob": "6db8a6041437bf65c0861f777b338add0de88b18",
+          "identical": true
+        },
+        {
+          "path": "source/prototypes/mir/settings/defaults.lua",
+          "v470_blob": "95b96cf50093cd4eb522cec4f419b8f879ed69c5",
+          "v473_blob": "95b96cf50093cd4eb522cec4f419b8f879ed69c5",
+          "identical": true
+        },
+        {
+          "path": "source/prototypes/mir/domain/technology/maximum_level_binding.lua",
+          "v470_blob": "439a3266279dcae287337b2516cf0303d49ddb16",
+          "v473_blob": "439a3266279dcae287337b2516cf0303d49ddb16",
+          "identical": true
+        },
+        {
+          "path": "source/package-source.json",
+          "v470_blob": "a3a14c00993707413832bcc3b95be7b063502d1c",
+          "v473_blob": "c5b06a69c4e44ef21ce803ea506d407c033985aa",
+          "identical": false
+        }
+      ],
+      "basis": "All nine implementation producer bodies named by the unchanged4.7.0 source characterization equal their4.7.3 bodies. Only package-source version metadata differs. This proves source-characterization applicability, not a historical4.7.3 native capture."
+    },
+    "explicit_default_blob": "95b96cf50093cd4eb522cec4f419b8f879ed69c5",
+    "explicit_default_sha256": "7537E3792A07DE60C4591972925C65D208808C2329C432891FECE2528467AC63",
+    "registry_blob": "d3dfb83d1635d7706f6764c71b23cd67150138e0",
+    "candidate_used_as_expected_output": false,
+    "actual_global_visibility": "Historical stage_builder inserts catalog.global_setting_prototypes() directly; registry.global mode alone is not the produced prototype. compiler_profile.prototype explicitly hides the retained full/classic alias. Do not restore a visible compiler selector from the unused registry metadata."
+  },
+  "explicit_defaults": {
+    "scope": "Only68 explicitly authored numeric/boolean stream and continuation overrides; no inferred shared fallback or science policy expansion.",
+    "host_source": "257565fd5010e98415016c7baa77bd96b137405c",
+    "host_profile": {
+      "base": "2.1.23",
+      "space-age": "2.1.23"
+    },
+    "all_equal": true,
+    "rows": [
+      {
+        "setting": "ips-cost-base-research_cannon_shooting_speed",
+        "historical_group": "streams",
+        "historical_key": "research_cannon_shooting_speed",
+        "field": "base_cost",
+        "expected": 60,
+        "observed": 60
+      },
+      {
+        "setting": "ips-cost-growth-research_cannon_shooting_speed",
+        "historical_group": "streams",
+        "historical_key": "research_cannon_shooting_speed",
+        "field": "growth_factor",
+        "expected": 1.5,
+        "observed": 1.5
+      },
+      {
+        "setting": "ips-enable-research_agricultural_growth_speed",
+        "historical_group": "streams",
+        "historical_key": "research_agricultural_growth_speed",
+        "field": "enabled",
+        "expected": true,
+        "observed": true
+      },
+      {
+        "setting": "ips-cost-base-research_agricultural_growth_speed",
+        "historical_group": "streams",
+        "historical_key": "research_agricultural_growth_speed",
+        "field": "base_cost",
+        "expected": 40000,
+        "observed": 40000
+      },
+      {
+        "setting": "ips-cost-growth-research_agricultural_growth_speed",
+        "historical_group": "streams",
+        "historical_key": "research_agricultural_growth_speed",
+        "field": "growth_factor",
+        "expected": 1.5,
+        "observed": 1.5
+      },
+      {
+        "setting": "ips-max-level-research_agricultural_growth_speed",
+        "historical_group": "streams",
+        "historical_key": "research_agricultural_growth_speed",
+        "field": "max_level",
+        "expected": 0,
+        "observed": 0
+      },
+      {
+        "setting": "ips-research-time-research_agricultural_growth_speed",
+        "historical_group": "streams",
+        "historical_key": "research_agricultural_growth_speed",
+        "field": "research_time",
+        "expected": 90,
+        "observed": 90
+      },
+      {
+        "setting": "ips-cost-growth-research_robot_battery",
+        "historical_group": "streams",
+        "historical_key": "research_robot_battery",
+        "field": "growth_factor",
+        "expected": 1.2,
+        "observed": 1.2
+      },
+      {
+        "setting": "ips-enable-research_cargo_landing_pad_count",
+        "historical_group": "streams",
+        "historical_key": "research_cargo_landing_pad_count",
+        "field": "enabled",
+        "expected": true,
+        "observed": true
+      },
+      {
+        "setting": "ips-cost-base-research_cargo_landing_pad_count",
+        "historical_group": "streams",
+        "historical_key": "research_cargo_landing_pad_count",
+        "field": "base_cost",
+        "expected": 1000000,
+        "observed": 1000000
+      },
+      {
+        "setting": "ips-cost-growth-research_cargo_landing_pad_count",
+        "historical_group": "streams",
+        "historical_key": "research_cargo_landing_pad_count",
+        "field": "growth_factor",
+        "expected": 10,
+        "observed": 10
+      },
+      {
+        "setting": "ips-max-level-research_cargo_landing_pad_count",
+        "historical_group": "streams",
+        "historical_key": "research_cargo_landing_pad_count",
+        "field": "max_level",
+        "expected": 0,
+        "observed": 0
+      },
+      {
+        "setting": "ips-research-time-research_cargo_landing_pad_count",
+        "historical_group": "streams",
+        "historical_key": "research_cargo_landing_pad_count",
+        "field": "research_time",
+        "expected": 240,
+        "observed": 240
+      },
+      {
+        "setting": "ips-enable-research_spoilage_preservation",
+        "historical_group": "streams",
+        "historical_key": "research_spoilage_preservation",
+        "field": "enabled",
+        "expected": true,
+        "observed": true
+      },
+      {
+        "setting": "ips-cost-base-research_spoilage_preservation",
+        "historical_group": "streams",
+        "historical_key": "research_spoilage_preservation",
+        "field": "base_cost",
+        "expected": 50000,
+        "observed": 50000
+      },
+      {
+        "setting": "ips-cost-growth-research_spoilage_preservation",
+        "historical_group": "streams",
+        "historical_key": "research_spoilage_preservation",
+        "field": "growth_factor",
+        "expected": 1.5,
+        "observed": 1.5
+      },
+      {
+        "setting": "ips-max-level-research_spoilage_preservation",
+        "historical_group": "streams",
+        "historical_key": "research_spoilage_preservation",
+        "field": "max_level",
+        "expected": 0,
+        "observed": 0
+      },
+      {
+        "setting": "ips-research-time-research_spoilage_preservation",
+        "historical_group": "streams",
+        "historical_key": "research_spoilage_preservation",
+        "field": "research_time",
+        "expected": 120,
+        "observed": 120
+      },
+      {
+        "setting": "ips-cost-base-research_flamethrower_shooting_speed",
+        "historical_group": "streams",
+        "historical_key": "research_flamethrower_shooting_speed",
+        "field": "base_cost",
+        "expected": 60,
+        "observed": 60
+      },
+      {
+        "setting": "ips-cost-growth-research_flamethrower_shooting_speed",
+        "historical_group": "streams",
+        "historical_key": "research_flamethrower_shooting_speed",
+        "field": "growth_factor",
+        "expected": 1.5,
+        "observed": 1.5
+      },
+      {
+        "setting": "ips-cost-base-research_electric_shooting_speed",
+        "historical_group": "streams",
+        "historical_key": "research_electric_shooting_speed",
+        "field": "base_cost",
+        "expected": 60,
+        "observed": 60
+      },
+      {
+        "setting": "ips-cost-growth-research_electric_shooting_speed",
+        "historical_group": "streams",
+        "historical_key": "research_electric_shooting_speed",
+        "field": "growth_factor",
+        "expected": 1.5,
+        "observed": 1.5
+      },
+      {
+        "setting": "ips-cost-growth-research_inventory_capacity",
+        "historical_group": "streams",
+        "historical_key": "research_inventory_capacity",
+        "field": "growth_factor",
+        "expected": 1.1,
+        "observed": 1.1
+      },
+      {
+        "setting": "ips-cost-base-research_rocket_shooting_speed",
+        "historical_group": "streams",
+        "historical_key": "research_rocket_shooting_speed",
+        "field": "base_cost",
+        "expected": 60,
+        "observed": 60
+      },
+      {
+        "setting": "ips-cost-growth-research_rocket_shooting_speed",
+        "historical_group": "streams",
+        "historical_key": "research_rocket_shooting_speed",
+        "field": "growth_factor",
+        "expected": 1.5,
+        "observed": 1.5
+      },
+      {
+        "setting": "ips-enable-research_character_reach",
+        "historical_group": "streams",
+        "historical_key": "research_character_reach",
+        "field": "enabled",
+        "expected": true,
+        "observed": true
+      },
+      {
+        "setting": "ips-research-time-research_science_pack_productivity",
+        "historical_group": "streams",
+        "historical_key": "research_science_pack_productivity",
+        "field": "research_time",
+        "expected": 120,
+        "observed": 120
+      },
+      {
+        "setting": "ips-cost-base-research_lab_productivity",
+        "historical_group": "streams",
+        "historical_key": "research_lab_productivity",
+        "field": "base_cost",
+        "expected": 1000,
+        "observed": 1000
+      },
+      {
+        "setting": "ips-cost-growth-research_lab_productivity",
+        "historical_group": "streams",
+        "historical_key": "research_lab_productivity",
+        "field": "growth_factor",
+        "expected": 1.2,
+        "observed": 1.2
+      },
+      {
+        "setting": "ips-max-level-research_lab_productivity",
+        "historical_group": "streams",
+        "historical_key": "research_lab_productivity",
+        "field": "max_level",
+        "expected": 0,
+        "observed": 0
+      },
+      {
+        "setting": "ips-research-time-research_lab_productivity",
+        "historical_group": "streams",
+        "historical_key": "research_lab_productivity",
+        "field": "research_time",
+        "expected": 120,
+        "observed": 120
+      },
+      {
+        "setting": "ips-research-time-research_ash_separation",
+        "historical_group": "streams",
+        "historical_key": "research_ash_separation",
+        "field": "research_time",
+        "expected": 90,
+        "observed": 90
+      },
+      {
+        "setting": "ips-enable-research_breeding",
+        "historical_group": "streams",
+        "historical_key": "research_breeding",
+        "field": "enabled",
+        "expected": true,
+        "observed": true
+      },
+      {
+        "setting": "ips-enable-research_cargo_bay_unloading_distance",
+        "historical_group": "streams",
+        "historical_key": "research_cargo_bay_unloading_distance",
+        "field": "enabled",
+        "expected": true,
+        "observed": true
+      },
+      {
+        "setting": "ips-cost-base-research_cargo_bay_unloading_distance",
+        "historical_group": "streams",
+        "historical_key": "research_cargo_bay_unloading_distance",
+        "field": "base_cost",
+        "expected": 100000,
+        "observed": 100000
+      },
+      {
+        "setting": "ips-cost-growth-research_cargo_bay_unloading_distance",
+        "historical_group": "streams",
+        "historical_key": "research_cargo_bay_unloading_distance",
+        "field": "growth_factor",
+        "expected": 3,
+        "observed": 3
+      },
+      {
+        "setting": "ips-max-level-research_cargo_bay_unloading_distance",
+        "historical_group": "streams",
+        "historical_key": "research_cargo_bay_unloading_distance",
+        "field": "max_level",
+        "expected": 0,
+        "observed": 0
+      },
+      {
+        "setting": "ips-research-time-research_cargo_bay_unloading_distance",
+        "historical_group": "streams",
+        "historical_key": "research_cargo_bay_unloading_distance",
+        "field": "research_time",
+        "expected": 120,
+        "observed": 120
+      },
+      {
+        "setting": "mir-enable-braking-force",
+        "historical_group": "base_extensions",
+        "historical_key": "braking-force",
+        "field": "enabled",
+        "expected": true,
+        "observed": true
+      },
+      {
+        "setting": "mir-cost-base-braking-force",
+        "historical_group": "base_extensions",
+        "historical_key": "braking-force",
+        "field": "base_cost",
+        "expected": 115,
+        "observed": 115
+      },
+      {
+        "setting": "mir-cost-growth-braking-force",
+        "historical_group": "base_extensions",
+        "historical_key": "braking-force",
+        "field": "growth_factor",
+        "expected": 1.333333333333,
+        "observed": 1.333333333333
+      },
+      {
+        "setting": "mir-max-level-braking-force",
+        "historical_group": "base_extensions",
+        "historical_key": "braking-force",
+        "field": "max_level",
+        "expected": 0,
+        "observed": 0
+      },
+      {
+        "setting": "mir-research-time-braking-force",
+        "historical_group": "base_extensions",
+        "historical_key": "braking-force",
+        "field": "research_time",
+        "expected": 60,
+        "observed": 60
+      },
+      {
+        "setting": "mir-enable-research-speed",
+        "historical_group": "base_extensions",
+        "historical_key": "research-speed",
+        "field": "enabled",
+        "expected": true,
+        "observed": true
+      },
+      {
+        "setting": "mir-cost-base-research-speed",
+        "historical_group": "base_extensions",
+        "historical_key": "research-speed",
+        "field": "base_cost",
+        "expected": 60,
+        "observed": 60
+      },
+      {
+        "setting": "mir-cost-growth-research-speed",
+        "historical_group": "base_extensions",
+        "historical_key": "research-speed",
+        "field": "growth_factor",
+        "expected": 1.5,
+        "observed": 1.5
+      },
+      {
+        "setting": "mir-max-level-research-speed",
+        "historical_group": "base_extensions",
+        "historical_key": "research-speed",
+        "field": "max_level",
+        "expected": 0,
+        "observed": 0
+      },
+      {
+        "setting": "mir-research-time-research-speed",
+        "historical_group": "base_extensions",
+        "historical_key": "research-speed",
+        "field": "research_time",
+        "expected": 120,
+        "observed": 120
+      },
+      {
+        "setting": "mir-enable-weapon-shooting-speed",
+        "historical_group": "base_extensions",
+        "historical_key": "weapon-shooting-speed",
+        "field": "enabled",
+        "expected": true,
+        "observed": true
+      },
+      {
+        "setting": "mir-cost-base-weapon-shooting-speed",
+        "historical_group": "base_extensions",
+        "historical_key": "weapon-shooting-speed",
+        "field": "base_cost",
+        "expected": 60,
+        "observed": 60
+      },
+      {
+        "setting": "mir-cost-growth-weapon-shooting-speed",
+        "historical_group": "base_extensions",
+        "historical_key": "weapon-shooting-speed",
+        "field": "growth_factor",
+        "expected": 1.5,
+        "observed": 1.5
+      },
+      {
+        "setting": "mir-max-level-weapon-shooting-speed",
+        "historical_group": "base_extensions",
+        "historical_key": "weapon-shooting-speed",
+        "field": "max_level",
+        "expected": 0,
+        "observed": 0
+      },
+      {
+        "setting": "mir-research-time-weapon-shooting-speed",
+        "historical_group": "base_extensions",
+        "historical_key": "weapon-shooting-speed",
+        "field": "research_time",
+        "expected": 120,
+        "observed": 120
+      },
+      {
+        "setting": "mir-enable-laser-shooting-speed",
+        "historical_group": "base_extensions",
+        "historical_key": "laser-shooting-speed",
+        "field": "enabled",
+        "expected": true,
+        "observed": true
+      },
+      {
+        "setting": "mir-cost-base-laser-shooting-speed",
+        "historical_group": "base_extensions",
+        "historical_key": "laser-shooting-speed",
+        "field": "base_cost",
+        "expected": 60,
+        "observed": 60
+      },
+      {
+        "setting": "mir-cost-growth-laser-shooting-speed",
+        "historical_group": "base_extensions",
+        "historical_key": "laser-shooting-speed",
+        "field": "growth_factor",
+        "expected": 1.5,
+        "observed": 1.5
+      },
+      {
+        "setting": "mir-max-level-laser-shooting-speed",
+        "historical_group": "base_extensions",
+        "historical_key": "laser-shooting-speed",
+        "field": "max_level",
+        "expected": 0,
+        "observed": 0
+      },
+      {
+        "setting": "mir-research-time-laser-shooting-speed",
+        "historical_group": "base_extensions",
+        "historical_key": "laser-shooting-speed",
+        "field": "research_time",
+        "expected": 120,
+        "observed": 120
+      },
+      {
+        "setting": "mir-enable-inserter-capacity-bonus",
+        "historical_group": "base_extensions",
+        "historical_key": "inserter-capacity-bonus",
+        "field": "enabled",
+        "expected": true,
+        "observed": true
+      },
+      {
+        "setting": "mir-cost-base-inserter-capacity-bonus",
+        "historical_group": "base_extensions",
+        "historical_key": "inserter-capacity-bonus",
+        "field": "base_cost",
+        "expected": 200,
+        "observed": 200
+      },
+      {
+        "setting": "mir-cost-growth-inserter-capacity-bonus",
+        "historical_group": "base_extensions",
+        "historical_key": "inserter-capacity-bonus",
+        "field": "growth_factor",
+        "expected": 3.333333333333,
+        "observed": 3.333333333333
+      },
+      {
+        "setting": "mir-max-level-inserter-capacity-bonus",
+        "historical_group": "base_extensions",
+        "historical_key": "inserter-capacity-bonus",
+        "field": "max_level",
+        "expected": 0,
+        "observed": 0
+      },
+      {
+        "setting": "mir-research-time-inserter-capacity-bonus",
+        "historical_group": "base_extensions",
+        "historical_key": "inserter-capacity-bonus",
+        "field": "research_time",
+        "expected": 60,
+        "observed": 60
+      },
+      {
+        "setting": "mir-enable-worker-robots-storage",
+        "historical_group": "base_extensions",
+        "historical_key": "worker-robots-storage",
+        "field": "enabled",
+        "expected": true,
+        "observed": true
+      },
+      {
+        "setting": "mir-cost-base-worker-robots-storage",
+        "historical_group": "base_extensions",
+        "historical_key": "worker-robots-storage",
+        "field": "base_cost",
+        "expected": 200,
+        "observed": 200
+      },
+      {
+        "setting": "mir-cost-growth-worker-robots-storage",
+        "historical_group": "base_extensions",
+        "historical_key": "worker-robots-storage",
+        "field": "growth_factor",
+        "expected": 1.5,
+        "observed": 1.5
+      },
+      {
+        "setting": "mir-max-level-worker-robots-storage",
+        "historical_group": "base_extensions",
+        "historical_key": "worker-robots-storage",
+        "field": "max_level",
+        "expected": 0,
+        "observed": 0
+      },
+      {
+        "setting": "mir-research-time-worker-robots-storage",
+        "historical_group": "base_extensions",
+        "historical_key": "worker-robots-storage",
+        "field": "research_time",
+        "expected": 60,
+        "observed": 60
+      }
+    ]
+  },
+  "global_declarations": {
+    "fields_in_each_vector": [
+      "type",
+      "setting_type",
+      "default_value",
+      "minimum_value",
+      "maximum_value",
+      "allowed_values",
+      "hidden"
+    ],
+    "settings": 28,
+    "fields": 196,
+    "all26_registry_global_keys_included": true,
+    "additional_historical_globals": [
+      "mir-enable-passive-repair",
+      "mir-max-level-worker-robots-speed"
+    ],
+    "host_source": "257565fd5010e98415016c7baa77bd96b137405c",
+    "host_profile": {
+      "base": "2.1.23",
+      "space-age": "2.1.23"
+    },
+    "native_verdict": "GO-for-these-original-B-Base2.0.77-declared-fields-only",
+    "original_native_execution": {
+      "result_review_sha256": "629E2935BCDC6BE633CB964D2745EA18702B88F270957EE2E032805ED0033FDA",
+      "source_player": "a2dcfae65a9dbe1c81bc0a8ce8ba933972c6048c",
+      "player_zip_sha256": "2113F85C4678580C75A6E88FDDD6F3A96506D6BAE5FE85B5BB7BE52C2B77E5B9",
+      "engine": "2.0.77",
+      "profile": "181D1983F21656437511567321EE8DCF054F16925016051C28B2D62837DCB398",
+      "dump_bytes": 741217,
+      "dump_sha256": "AF2569096906BB8B20AE0B0978B080F6438A40DBB58D95DD7DB519633207A48D"
+    },
+    "actual_native_capsule": "spec/evidence/candidate502-f200-base-prototype-receipts-r01.json.gz",
+    "actual_native_chain": "spec/evidence/candidate502-f200-base-prototype-chain-r01.json",
+    "original_dump_body_path": "native/write-data/script-output/mod-settings-dump.json",
+    "rows": [
+      {
+        "name": "mir-compiler-profile",
+        "historical_expected": [
+          "string-setting",
+          "startup",
+          "full",
+          null,
+          null,
+          [
+            "full",
+            "classic"
+          ],
+          true
+        ],
+        "current_host_declaration": [
+          "string-setting",
+          "startup",
+          "full",
+          null,
+          null,
+          [
+            "full",
+            "classic"
+          ],
+          true
+        ],
+        "original_B_native_declaration": [
+          "string-setting",
+          "startup",
+          "full",
+          null,
+          null,
+          [
+            "full",
+            "classic"
+          ],
+          true
+        ]
+      },
+      {
+        "name": "ips-require-space-gate",
+        "historical_expected": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          false
+        ],
+        "current_host_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ],
+        "original_B_native_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "name": "mir-science-pack-ingredient-policy",
+        "historical_expected": [
+          "string-setting",
+          "startup",
+          "configured",
+          null,
+          null,
+          [
+            "configured",
+            "space",
+            "space-and-promethium",
+            "space-age-progression",
+            "official-progression",
+            "mod-progression",
+            "all-official",
+            "all"
+          ],
+          false
+        ],
+        "current_host_declaration": [
+          "string-setting",
+          "startup",
+          "configured",
+          null,
+          null,
+          [
+            "configured",
+            "space",
+            "space-and-promethium",
+            "space-age-progression",
+            "official-progression",
+            "mod-progression",
+            "all-official",
+            "all"
+          ],
+          null
+        ],
+        "original_B_native_declaration": [
+          "string-setting",
+          "startup",
+          "configured",
+          null,
+          null,
+          [
+            "configured",
+            "space",
+            "space-and-promethium",
+            "space-age-progression",
+            "official-progression",
+            "mod-progression",
+            "all-official",
+            "all"
+          ],
+          null
+        ]
+      },
+      {
+        "name": "mir-lab-incompatibility-policy",
+        "historical_expected": [
+          "string-setting",
+          "startup",
+          "reduce",
+          null,
+          null,
+          [
+            "reduce",
+            "skip",
+            "engine-default"
+          ],
+          false
+        ],
+        "current_host_declaration": [
+          "string-setting",
+          "startup",
+          "reduce",
+          null,
+          null,
+          [
+            "reduce",
+            "skip",
+            "engine-default"
+          ],
+          null
+        ],
+        "original_B_native_declaration": [
+          "string-setting",
+          "startup",
+          "reduce",
+          null,
+          null,
+          [
+            "reduce",
+            "skip",
+            "engine-default"
+          ],
+          null
+        ]
+      },
+      {
+        "name": "mir-prefer-this-mod-for-competing-techs",
+        "historical_expected": [
+          "bool-setting",
+          "startup",
+          true,
+          null,
+          null,
+          null,
+          false
+        ],
+        "current_host_declaration": [
+          "bool-setting",
+          "startup",
+          true,
+          null,
+          null,
+          null,
+          null
+        ],
+        "original_B_native_declaration": [
+          "bool-setting",
+          "startup",
+          true,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "name": "mir-adjust-vanilla-weapon-speed-techs",
+        "historical_expected": [
+          "string-setting",
+          "startup",
+          "only-when-dedicated-tech-enabled",
+          null,
+          null,
+          [
+            "off",
+            "only-when-dedicated-tech-enabled",
+            "always"
+          ],
+          false
+        ],
+        "current_host_declaration": [
+          "string-setting",
+          "startup",
+          "only-when-dedicated-tech-enabled",
+          null,
+          null,
+          [
+            "off",
+            "only-when-dedicated-tech-enabled",
+            "always"
+          ],
+          null
+        ],
+        "original_B_native_declaration": [
+          "string-setting",
+          "startup",
+          "only-when-dedicated-tech-enabled",
+          null,
+          null,
+          [
+            "off",
+            "only-when-dedicated-tech-enabled",
+            "always"
+          ],
+          null
+        ]
+      },
+      {
+        "name": "mir-max-level-worker-robots-speed",
+        "historical_expected": [
+          "int-setting",
+          "startup",
+          0,
+          0,
+          2147483647,
+          null,
+          false
+        ],
+        "current_host_declaration": [
+          "int-setting",
+          "startup",
+          0,
+          0,
+          2147483647,
+          null,
+          null
+        ],
+        "original_B_native_declaration": [
+          "int-setting",
+          "startup",
+          0,
+          0,
+          2147483647,
+          null,
+          null
+        ]
+      },
+      {
+        "name": "mir-use-installed-space-age-icons",
+        "historical_expected": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          false
+        ],
+        "current_host_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ],
+        "original_B_native_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "name": "mir-pipeline-extent-multiplier",
+        "historical_expected": [
+          "string-setting",
+          "startup",
+          "100",
+          null,
+          null,
+          [
+            "1000",
+            "750",
+            "500",
+            "400",
+            "300",
+            "250",
+            "200",
+            "150",
+            "125",
+            "100",
+            "75",
+            "50",
+            "25"
+          ],
+          false
+        ],
+        "current_host_declaration": [
+          "string-setting",
+          "startup",
+          "100",
+          null,
+          null,
+          [
+            "1000",
+            "750",
+            "500",
+            "400",
+            "300",
+            "250",
+            "200",
+            "150",
+            "125",
+            "100",
+            "75",
+            "50",
+            "25"
+          ],
+          null
+        ],
+        "original_B_native_declaration": [
+          "string-setting",
+          "startup",
+          "100",
+          null,
+          null,
+          [
+            "1000",
+            "750",
+            "500",
+            "400",
+            "300",
+            "250",
+            "200",
+            "150",
+            "125",
+            "100",
+            "75",
+            "50",
+            "25"
+          ],
+          null
+        ]
+      },
+      {
+        "name": "mir-automatic-productivity-action",
+        "historical_expected": [
+          "string-setting",
+          "startup",
+          "apply",
+          null,
+          null,
+          [
+            "disabled",
+            "preview",
+            "apply"
+          ],
+          false
+        ],
+        "current_host_declaration": [
+          "string-setting",
+          "startup",
+          "apply",
+          null,
+          null,
+          [
+            "disabled",
+            "preview",
+            "apply"
+          ],
+          null
+        ],
+        "original_B_native_declaration": [
+          "string-setting",
+          "startup",
+          "apply",
+          null,
+          null,
+          [
+            "disabled",
+            "preview",
+            "apply"
+          ],
+          null
+        ]
+      },
+      {
+        "name": "mir-automatic-create-research",
+        "historical_expected": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          false
+        ],
+        "current_host_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ],
+        "original_B_native_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "name": "mir-automatic-require-reviewed-data",
+        "historical_expected": [
+          "bool-setting",
+          "startup",
+          true,
+          null,
+          null,
+          null,
+          false
+        ],
+        "current_host_declaration": [
+          "bool-setting",
+          "startup",
+          true,
+          null,
+          null,
+          null,
+          null
+        ],
+        "original_B_native_declaration": [
+          "bool-setting",
+          "startup",
+          true,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "name": "mir-automatic-compiler-mode",
+        "historical_expected": [
+          "string-setting",
+          "startup",
+          "safe-attach",
+          null,
+          null,
+          [
+            "off",
+            "report",
+            "safe-attach",
+            "exact-pack",
+            "safe-generate"
+          ],
+          true
+        ],
+        "current_host_declaration": [
+          "string-setting",
+          "startup",
+          "safe-attach",
+          null,
+          null,
+          [
+            "off",
+            "report",
+            "safe-attach",
+            "exact-pack",
+            "safe-generate"
+          ],
+          true
+        ],
+        "original_B_native_declaration": [
+          "string-setting",
+          "startup",
+          "safe-attach",
+          null,
+          null,
+          [
+            "off",
+            "report",
+            "safe-attach",
+            "exact-pack",
+            "safe-generate"
+          ],
+          true
+        ]
+      },
+      {
+        "name": "mir-prototype-productivity-cap",
+        "historical_expected": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "percent-100000",
+            "percent-25000",
+            "percent-10000",
+            "percent-5000",
+            "percent-2500",
+            "percent-1000",
+            "percent-750",
+            "percent-500",
+            "percent-400",
+            "engine-default",
+            "percent-250",
+            "percent-200",
+            "percent-150",
+            "percent-125",
+            "percent-100",
+            "percent-75",
+            "percent-50",
+            "percent-25"
+          ],
+          false
+        ],
+        "current_host_declaration": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "percent-100000",
+            "percent-25000",
+            "percent-10000",
+            "percent-5000",
+            "percent-2500",
+            "percent-1000",
+            "percent-750",
+            "percent-500",
+            "percent-400",
+            "engine-default",
+            "percent-250",
+            "percent-200",
+            "percent-150",
+            "percent-125",
+            "percent-100",
+            "percent-75",
+            "percent-50",
+            "percent-25"
+          ],
+          null
+        ],
+        "original_B_native_declaration": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "percent-100000",
+            "percent-25000",
+            "percent-10000",
+            "percent-5000",
+            "percent-2500",
+            "percent-1000",
+            "percent-750",
+            "percent-500",
+            "percent-400",
+            "engine-default",
+            "percent-250",
+            "percent-200",
+            "percent-150",
+            "percent-125",
+            "percent-100",
+            "percent-75",
+            "percent-50",
+            "percent-25"
+          ],
+          null
+        ]
+      },
+      {
+        "name": "mir-prototype-efficiency-cap",
+        "historical_expected": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "saving-9999",
+            "saving-999",
+            "saving-99",
+            "saving-95",
+            "saving-90",
+            "engine-default",
+            "saving-75",
+            "saving-50",
+            "saving-25"
+          ],
+          false
+        ],
+        "current_host_declaration": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "saving-9999",
+            "saving-999",
+            "saving-99",
+            "saving-95",
+            "saving-90",
+            "engine-default",
+            "saving-75",
+            "saving-50",
+            "saving-25"
+          ],
+          null
+        ],
+        "original_B_native_declaration": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "saving-9999",
+            "saving-999",
+            "saving-99",
+            "saving-95",
+            "saving-90",
+            "engine-default",
+            "saving-75",
+            "saving-50",
+            "saving-25"
+          ],
+          null
+        ]
+      },
+      {
+        "name": "mir-prototype-pollution-cap",
+        "historical_expected": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "saving-9999",
+            "saving-999",
+            "saving-99",
+            "saving-95",
+            "saving-90",
+            "engine-default",
+            "saving-75",
+            "saving-50",
+            "saving-25"
+          ],
+          false
+        ],
+        "current_host_declaration": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "saving-9999",
+            "saving-999",
+            "saving-99",
+            "saving-95",
+            "saving-90",
+            "engine-default",
+            "saving-75",
+            "saving-50",
+            "saving-25"
+          ],
+          null
+        ],
+        "original_B_native_declaration": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "saving-9999",
+            "saving-999",
+            "saving-99",
+            "saving-95",
+            "saving-90",
+            "engine-default",
+            "saving-75",
+            "saving-50",
+            "saving-25"
+          ],
+          null
+        ]
+      },
+      {
+        "name": "mir-prototype-speed-floor",
+        "historical_expected": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "saving-9999",
+            "saving-999",
+            "saving-99",
+            "saving-95",
+            "saving-90",
+            "engine-default",
+            "saving-75",
+            "saving-50",
+            "saving-25"
+          ],
+          false
+        ],
+        "current_host_declaration": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "saving-9999",
+            "saving-999",
+            "saving-99",
+            "saving-95",
+            "saving-90",
+            "engine-default",
+            "saving-75",
+            "saving-50",
+            "saving-25"
+          ],
+          null
+        ],
+        "original_B_native_declaration": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "saving-9999",
+            "saving-999",
+            "saving-99",
+            "saving-95",
+            "saving-90",
+            "engine-default",
+            "saving-75",
+            "saving-50",
+            "saving-25"
+          ],
+          null
+        ]
+      },
+      {
+        "name": "mir-prototype-speed-cap",
+        "historical_expected": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "engine-default",
+            "bonus-25000",
+            "bonus-10000",
+            "bonus-5000",
+            "bonus-2500",
+            "bonus-1000",
+            "bonus-750",
+            "bonus-500",
+            "bonus-400",
+            "bonus-300",
+            "bonus-250",
+            "bonus-200",
+            "bonus-150",
+            "bonus-125",
+            "bonus-100",
+            "bonus-75",
+            "bonus-50",
+            "bonus-25"
+          ],
+          false
+        ],
+        "current_host_declaration": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "engine-default",
+            "bonus-25000",
+            "bonus-10000",
+            "bonus-5000",
+            "bonus-2500",
+            "bonus-1000",
+            "bonus-750",
+            "bonus-500",
+            "bonus-400",
+            "bonus-300",
+            "bonus-250",
+            "bonus-200",
+            "bonus-150",
+            "bonus-125",
+            "bonus-100",
+            "bonus-75",
+            "bonus-50",
+            "bonus-25"
+          ],
+          null
+        ],
+        "original_B_native_declaration": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "engine-default",
+            "bonus-25000",
+            "bonus-10000",
+            "bonus-5000",
+            "bonus-2500",
+            "bonus-1000",
+            "bonus-750",
+            "bonus-500",
+            "bonus-400",
+            "bonus-300",
+            "bonus-250",
+            "bonus-200",
+            "bonus-150",
+            "bonus-125",
+            "bonus-100",
+            "bonus-75",
+            "bonus-50",
+            "bonus-25"
+          ],
+          null
+        ]
+      },
+      {
+        "name": "mir-prototype-quality-cap",
+        "historical_expected": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "engine-default",
+            "bonus-25000",
+            "bonus-10000",
+            "bonus-5000",
+            "bonus-2500",
+            "bonus-1000",
+            "bonus-750",
+            "bonus-500",
+            "bonus-400",
+            "bonus-300",
+            "bonus-250",
+            "bonus-200",
+            "bonus-150",
+            "bonus-125",
+            "bonus-100",
+            "bonus-75",
+            "bonus-50",
+            "bonus-25"
+          ],
+          false
+        ],
+        "current_host_declaration": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "engine-default",
+            "bonus-25000",
+            "bonus-10000",
+            "bonus-5000",
+            "bonus-2500",
+            "bonus-1000",
+            "bonus-750",
+            "bonus-500",
+            "bonus-400",
+            "bonus-300",
+            "bonus-250",
+            "bonus-200",
+            "bonus-150",
+            "bonus-125",
+            "bonus-100",
+            "bonus-75",
+            "bonus-50",
+            "bonus-25"
+          ],
+          null
+        ],
+        "original_B_native_declaration": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "engine-default",
+            "bonus-25000",
+            "bonus-10000",
+            "bonus-5000",
+            "bonus-2500",
+            "bonus-1000",
+            "bonus-750",
+            "bonus-500",
+            "bonus-400",
+            "bonus-300",
+            "bonus-250",
+            "bonus-200",
+            "bonus-150",
+            "bonus-125",
+            "bonus-100",
+            "bonus-75",
+            "bonus-50",
+            "bonus-25"
+          ],
+          null
+        ]
+      },
+      {
+        "name": "mir-recycling-return-chance",
+        "historical_expected": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "engine-default",
+            "match-productivity-cap",
+            "percent-20",
+            "percent-15",
+            "percent-12-5",
+            "percent-10",
+            "percent-7-5",
+            "percent-5",
+            "percent-2-5",
+            "percent-1",
+            "percent-0-5",
+            "percent-0-1"
+          ],
+          false
+        ],
+        "current_host_declaration": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "engine-default",
+            "match-productivity-cap",
+            "percent-20",
+            "percent-15",
+            "percent-12-5",
+            "percent-10",
+            "percent-7-5",
+            "percent-5",
+            "percent-2-5",
+            "percent-1",
+            "percent-0-5",
+            "percent-0-1"
+          ],
+          null
+        ],
+        "original_B_native_declaration": [
+          "string-setting",
+          "startup",
+          "engine-default",
+          null,
+          null,
+          [
+            "engine-default",
+            "match-productivity-cap",
+            "percent-20",
+            "percent-15",
+            "percent-12-5",
+            "percent-10",
+            "percent-7-5",
+            "percent-5",
+            "percent-2-5",
+            "percent-1",
+            "percent-0-5",
+            "percent-0-1"
+          ],
+          null
+        ]
+      },
+      {
+        "name": "mir-productivity-cap-self-recycling-only",
+        "historical_expected": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          false
+        ],
+        "current_host_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ],
+        "original_B_native_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "name": "mir-unrestricted-modules",
+        "historical_expected": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          false
+        ],
+        "current_host_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ],
+        "original_B_native_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "name": "mir-prototype-positive-power-floor",
+        "historical_expected": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          false
+        ],
+        "current_host_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ],
+        "original_B_native_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "name": "mir-settings-profile-import",
+        "historical_expected": [
+          "string-setting",
+          "startup",
+          "",
+          null,
+          null,
+          null,
+          false
+        ],
+        "current_host_declaration": [
+          "string-setting",
+          "startup",
+          "",
+          null,
+          null,
+          null,
+          null
+        ],
+        "original_B_native_declaration": [
+          "string-setting",
+          "startup",
+          "",
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "name": "mir-enable-passive-repair",
+        "historical_expected": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          false
+        ],
+        "current_host_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ],
+        "original_B_native_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "name": "mir-debug-generation-report",
+        "historical_expected": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          false
+        ],
+        "current_host_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ],
+        "original_B_native_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "name": "mir-debug-recipe-matches",
+        "historical_expected": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          false
+        ],
+        "current_host_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ],
+        "original_B_native_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "name": "mir-debug-scripted-effects",
+        "historical_expected": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          false
+        ],
+        "current_host_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ],
+        "original_B_native_declaration": [
+          "bool-setting",
+          "startup",
+          false,
+          null,
+          null,
+          null,
+          null
+        ]
+      }
+    ],
+    "comparison_rules": "Types, startup lifetime, defaults, bounds and ordered allowed values compare directly. Preserve raw missing optional hidden versus explicitfalse in both vectors; compare only their visibility semantics. Booleanfalse never equals numeric0. No other normalization or skipped setting.",
+    "negative_controls": [
+      {
+        "name": "mir-debug-scripted-effects",
+        "field": "default_value",
+        "changed_observation": 0,
+        "exact_failure": "mir-debug-scripted-effects:default_value"
+      },
+      {
+        "name": "mir-debug-scripted-effects",
+        "field": "default_value",
+        "changed_observation": true,
+        "exact_failure": "mir-debug-scripted-effects:default_value"
+      },
+      {
+        "name": "mir-compiler-profile",
+        "field": "hidden",
+        "changed_observation": false,
+        "exact_failure": "mir-compiler-profile:hidden"
+      },
+      {
+        "name": "mir-compiler-profile",
+        "field": "allowed_values",
+        "changed_observation": [
+          "full"
+        ],
+        "exact_failure": "mir-compiler-profile:allowed_values"
+      },
+      {
+        "name": "mir-lab-incompatibility-policy",
+        "field": "default_value",
+        "changed_observation": "skip",
+        "exact_failure": "mir-lab-incompatibility-policy:default_value"
+      },
+      {
+        "name": "mir-settings-profile-import",
+        "field": "setting_type",
+        "changed_observation": "runtime-per-user",
+        "exact_failure": "mir-settings-profile-import:setting_type"
+      },
+      {
+        "name": "mir-prototype-productivity-cap",
+        "field": "type",
+        "changed_observation": "bool-setting",
+        "exact_failure": "mir-prototype-productivity-cap:type"
+      }
+    ],
+    "opponent_scope": "Seven separate named observation-field mutations refuse at exactly their intended field; only in-memory copies change. Original expected values, whole dump, source, tolerances and receipts remain unchanged.",
+    "limits": [
+      "Original B Base2.0.77 declared settings prototypes only, not effective import precedence, changed configured values, exports, physical effects or another engine/profile.",
+      "No new native run, no renamed B result and no fresh C loader admission. C component applicability retains separate B6830BA4 scoped decision.",
+      "Missing optional hidden field and explicitfalse are reported separately and compared only as visibility semantics; booleans never equal numeric0."
+    ]
+  },
+  "current_C_applicability": {
+    "record": "spec/evidence/candidate502-7fdb-consumed-input-applicability-aero-r01.json",
+    "original_decision_sha256": "B6830BA49629D82F9B69B51BAAE286A42299278274359E950216960CF3B8AC0C",
+    "basis": "The exact B-to-C inventory/member review proves every member except one valid changelog word unchanged. Reuse this original B settings-declaration component under its original identity only.",
+    "fresh_C_native_admission": false,
+    "old_B_caller_can_dispatch_C": false
+  },
+  "host_controls": {
+    "controls": [
+      {
+        "path": "tests/test_settings_profile.py",
+        "command": [
+          "C:\\Program Files\\Python314\\python.exe",
+          "-B",
+          "tests/test_settings_profile.py",
+          "--lua-runtime-dir",
+          "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir421-lua-runtime"
+        ],
+        "exit_code": 0,
+        "tests": 8,
+        "elapsed_seconds": 0.642
+      },
+      {
+        "path": "tests/test_settings_commands.py",
+        "command": [
+          "C:\\Program Files\\Python314\\python.exe",
+          "-B",
+          "tests/test_settings_commands.py",
+          "--lua-runtime-dir",
+          "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir421-lua-runtime"
+        ],
+        "exit_code": 0,
+        "tests": 10,
+        "elapsed_seconds": 0.589
+      },
+      {
+        "path": "tests/test_historical_continuations.py",
+        "command": [
+          "C:\\Program Files\\Python314\\python.exe",
+          "-B",
+          "tests/test_historical_continuations.py",
+          "--lua-runtime-dir",
+          "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir421-lua-runtime"
+        ],
+        "exit_code": 0,
+        "tests": 7,
+        "elapsed_seconds": 0.243
+      },
+      {
+        "path": "tests/test_science.py",
+        "command": [
+          "C:\\Program Files\\Python314\\python.exe",
+          "-B",
+          "tests/test_science.py",
+          "--lua-runtime-dir",
+          "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir421-lua-runtime"
+        ],
+        "exit_code": 0,
+        "tests": 35,
+        "elapsed_seconds": 0.401
+      }
+    ],
+    "lua": "5.2",
+    "lupa": "2.6",
+    "native_execution": false
+  },
+  "inspector_correction": {
+    "original_observation": "The first inspector queried config.spec instead of config.prototypes: consumer metadata intentionally omits setting_type and excludes the import-transport row.",
+    "correction": "Observe actual settings-stage prototypes including the import transport; unchanged historical expectations then match all196 fields. Original wrong-boundary observation retained in primary custody.",
+    "classification": "inspection-boundary-error-not-product-or-native-failure"
+  },
+  "worker_scope": "One explicitly selected gpt-6-luna/high read-only worker extracted20 source diffs. No independent runtime model identifier was available. Lead owns all current semantic/source/native analysis; worker has completed and its slot is released.",
+  "remaining": [
+    "Configured nondefault effects, import provenance, actual full/compact files, reset/remove/readd/save/client and supported-profile/native target boundaries remain under their existing obligations.",
+    "Other registry/catalog/default/builder imports, inter-release removals, external consumers, request/discussion/attachment intent and global VER-07 remain unreconciled beyond this named slice.",
+    "Source templates, science additions, inheritance and risk metadata are mapped to current owners/controls; this is not a new native verdict for their composed outcomes.",
+    "No F210 native result, new original4.7.3 capture, fresh C execution, whole-product performance or release qualification."
+  ],
+  "new_native_execution": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}
