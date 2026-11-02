@@ -62,7 +62,7 @@ end
 local function snapshot(force)
   assert_rows(force)
   local out = {technologies={},bonuses={},queue={},current=force.current_research and force.current_research.name or false,
-    progress=force.research_progress,queue_enabled=force.research_queue_enabled,
+    progress=force.research_progress,
     mining=force.mining_drill_productivity_bonus,lab=force.laboratory_speed_modifier}
   for _, row in ipairs(C.rows) do
     out.technologies[id(row)]=status(technology(force,id(row)))
@@ -137,7 +137,8 @@ local function prepare_source()
   end
   native.researched=false;native.level=4;native.enabled=true;native.saved_progress=.37
   force.reset_technology_effects()
-  force.research_queue_enabled=true
+  -- Exact2.0.77 has no LuaForce research_queue_enabled switch. Observe the
+  -- supported queue/current/progress state and require both native additions.
   if #(force.research_queue or {})~=0 or force.current_research then fail("source queue was not empty") end
   if not force.add_research(C.foreign) or not force.add_research(id(C.rows[2])) then
     fail("published native API refused the required foreign/plastic queue; no fallback")
