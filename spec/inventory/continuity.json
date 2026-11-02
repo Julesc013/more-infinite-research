@@ -8783,7 +8783,7 @@
         "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
       }
     ],
-    "next_bounded_work": "Preserve the accepted final optional-runtime integration and finish independent review/integration of the settings/state-helper and upgrade-runner units through exact-head checks. The35-body generic upgrade runner family below is now mapped; reconcile remaining imported full-state/specialization fixture assertions, registry/default/control/compatibility/inter-release and unknown-consumer groups without reviving retired machinery. Apply the existing finite selected migration queue and final consumed-input review, not a new every-old-patch campaign. Black Glass owns the exact034 runtime/action packet and complete independent review after the preserved r19 NO-GO, native queue and current progress header. Old033/adverse/native identities stay fixed; unchanged completed smoke checks do not restart.",
+    "next_bounded_work": "Integrate independently reviewed pending historical author units. The generic upgrade caller and Classic/K2/Space Is Fake specialization helpers below are now mapped; reconcile imported complete-state/frontier/canonical-fixture assertions, the five-row older SIF earned-state coverage, registry/default/control/architecture/compatibility/inter-release and unknown-consumer groups without reviving retired machinery. Preserve the existing finite nine/seven/four migration selection and consumed-input applicability review. Black Glass owns coherent unpublished5.0.2 identity/freeze, affected successor/native queue and progress header. Exact packageA501/F200/034 r20 input/lifecycle has its completed independent native verdict and217-body public chain; original r19 NO-GO/033/adverse identities stay fixed. No unchanged completed campaign restarts and no packageA result becomes candidateB acceptance.",
     "bounded_intent_reviews": [
       {
         "subjects": [
@@ -13978,6 +13978,600 @@
         },
         "custody": "build/qualification/aero-upgrade-intents-r01/",
         "qualification_limit": "No demonstrated player defect, test/oracle change, source-save mutation or new native campaign. Only this runner/wrapper source family is reconciled. Global VER-07, imported fixture/helper intent and all affected final-candidate native/save/client/performance/release verdicts remain open. Original source/execution/result identities and existing scoped closed routes are unchanged.",
+        "native_execution": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "release_qualification": false
+      },
+      {
+        "status": "bounded-helper-source-intents-mapped-not-global-acceptance",
+        "requirement_ids": [
+          "VER-07",
+          "MIG-01",
+          "MIG-02",
+          "MIG-03",
+          "MIG-05",
+          "CONT-03",
+          "CONT-11",
+          "CONT-12",
+          "CONT-13"
+        ],
+        "families": {
+          "MIR430ClassicUpgrade.ps1": 1,
+          "MIR421K2Upgrade.ps1": 3,
+          "MIR421SpaceFakeUpgrade.ps1": 12,
+          "MIR421SpaceFakeUpgrade.lua": 1
+        },
+        "method": "Review the exact latest bodies, retain the prior complete Classic/K2 source review and pure-reader observations, then inspect every unique earlier positive diff block. A verified line partition accounts for every line of all17 source bodies using latest source or157 deduplicated earlier blocks/187 lines. Every54 retained published-tag/commit/path binding and raw body hash verifies. Do not execute an old runner, fixture specializer, archive operation or native engine.",
+        "original_sources": [
+          {
+            "blob": "2338a22130b239a7365953d162b8ee0a6aef6177",
+            "family": "MIR421K2Upgrade.ps1",
+            "bytes": 4039,
+            "lines": 59,
+            "sha256": "F10C2B70E088D7474384FEFAC8416321389B6E204BFC715F3302BD3D65906C78",
+            "references": [
+              {
+                "tag": "v4.2.1",
+                "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                "path": "tests/support/MIR421K2Upgrade.ps1"
+              }
+            ]
+          },
+          {
+            "blob": "f110e0916b95ef67e661e88939cd17237fc3592d",
+            "family": "MIR421SpaceFakeUpgrade.lua",
+            "bytes": 11366,
+            "lines": 210,
+            "sha256": "A153718B20F15599657D9B9B4574AF0C28E7FBCBEAE2784968135B9D1C4DA479",
+            "references": [
+              {
+                "tag": "v4.2.1",
+                "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.lua"
+              },
+              {
+                "tag": "v4.2.2",
+                "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.lua"
+              },
+              {
+                "tag": "v4.3.0",
+                "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.lua"
+              },
+              {
+                "tag": "v4.4.0",
+                "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.lua"
+              },
+              {
+                "tag": "v4.4.1",
+                "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.lua"
+              },
+              {
+                "tag": "v4.4.2",
+                "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.lua"
+              },
+              {
+                "tag": "v4.5.0",
+                "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.lua"
+              },
+              {
+                "tag": "v4.5.1",
+                "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.lua"
+              },
+              {
+                "tag": "v4.5.2",
+                "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.lua"
+              },
+              {
+                "tag": "v4.6.0",
+                "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.lua"
+              },
+              {
+                "tag": "v4.7.0",
+                "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.lua"
+              },
+              {
+                "tag": "v4.7.1",
+                "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.lua"
+              },
+              {
+                "tag": "v4.7.2",
+                "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.lua"
+              },
+              {
+                "tag": "v4.7.3",
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.lua"
+              }
+            ]
+          },
+          {
+            "blob": "fa1cce02b96c0e3ef09fb28cee085bf24f4062cd",
+            "family": "MIR421SpaceFakeUpgrade.ps1",
+            "bytes": 11136,
+            "lines": 165,
+            "sha256": "6A676E31EF2A772688FAC9A1780633E6BF44E142883215649DE83DFEDC6CC20E",
+            "references": [
+              {
+                "tag": "v4.2.1",
+                "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.ps1"
+              }
+            ]
+          },
+          {
+            "blob": "0092b926895d3f4329f8e0109c0c38f17aabef8b",
+            "family": "MIR421K2Upgrade.ps1",
+            "bytes": 4778,
+            "lines": 68,
+            "sha256": "258E4893CDC95F2CD7C1F5BFB47E5CB63BD09B634AB792762BDDE9B2ACA247A3",
+            "references": [
+              {
+                "tag": "v4.2.2",
+                "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+                "path": "tests/support/MIR421K2Upgrade.ps1"
+              },
+              {
+                "tag": "v4.3.0",
+                "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+                "path": "tests/support/MIR421K2Upgrade.ps1"
+              },
+              {
+                "tag": "v4.4.0",
+                "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+                "path": "tests/support/MIR421K2Upgrade.ps1"
+              },
+              {
+                "tag": "v4.4.1",
+                "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+                "path": "tests/support/MIR421K2Upgrade.ps1"
+              },
+              {
+                "tag": "v4.4.2",
+                "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+                "path": "tests/support/MIR421K2Upgrade.ps1"
+              },
+              {
+                "tag": "v4.5.0",
+                "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+                "path": "tests/support/MIR421K2Upgrade.ps1"
+              },
+              {
+                "tag": "v4.5.1",
+                "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+                "path": "tests/support/MIR421K2Upgrade.ps1"
+              },
+              {
+                "tag": "v4.5.2",
+                "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+                "path": "tests/support/MIR421K2Upgrade.ps1"
+              },
+              {
+                "tag": "v4.6.0",
+                "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+                "path": "tests/support/MIR421K2Upgrade.ps1"
+              }
+            ]
+          },
+          {
+            "blob": "f15d09b57c6bd7026b17daa3718b7f74042c1656",
+            "family": "MIR421SpaceFakeUpgrade.ps1",
+            "bytes": 20942,
+            "lines": 299,
+            "sha256": "FE4C53D77B7C16C18892BC1A05FF7F2222DFEF46F70449FC47044CD7D7B9EFDD",
+            "references": [
+              {
+                "tag": "v4.2.2",
+                "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.ps1"
+              }
+            ]
+          },
+          {
+            "blob": "78a062eb4c768ab127a2f3314aa039c9b63eeba9",
+            "family": "MIR421SpaceFakeUpgrade.ps1",
+            "bytes": 46118,
+            "lines": 652,
+            "sha256": "97F1B66F273A5847A4B41BFAF810E98C861CD9ED24741FEB9845D55C6F556633",
+            "references": [
+              {
+                "tag": "v4.3.0",
+                "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.ps1"
+              }
+            ]
+          },
+          {
+            "blob": "286f77c4f5e704e46962152037ac25fca8586293",
+            "family": "MIR430ClassicUpgrade.ps1",
+            "bytes": 30981,
+            "lines": 646,
+            "sha256": "AB534D2BD1A33B6FDB29A2460AC7E396327979DF80F4F498432C622ABA91A018",
+            "references": [
+              {
+                "tag": "v4.3.0",
+                "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+                "path": "tests/support/MIR430ClassicUpgrade.ps1"
+              },
+              {
+                "tag": "v4.4.0",
+                "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+                "path": "tests/support/MIR430ClassicUpgrade.ps1"
+              },
+              {
+                "tag": "v4.4.1",
+                "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+                "path": "tests/support/MIR430ClassicUpgrade.ps1"
+              },
+              {
+                "tag": "v4.4.2",
+                "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+                "path": "tests/support/MIR430ClassicUpgrade.ps1"
+              },
+              {
+                "tag": "v4.5.0",
+                "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+                "path": "tests/support/MIR430ClassicUpgrade.ps1"
+              },
+              {
+                "tag": "v4.5.1",
+                "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+                "path": "tests/support/MIR430ClassicUpgrade.ps1"
+              },
+              {
+                "tag": "v4.5.2",
+                "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+                "path": "tests/support/MIR430ClassicUpgrade.ps1"
+              },
+              {
+                "tag": "v4.6.0",
+                "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+                "path": "tests/support/MIR430ClassicUpgrade.ps1"
+              },
+              {
+                "tag": "v4.7.0",
+                "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+                "path": "tests/support/MIR430ClassicUpgrade.ps1"
+              },
+              {
+                "tag": "v4.7.1",
+                "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+                "path": "tests/support/MIR430ClassicUpgrade.ps1"
+              },
+              {
+                "tag": "v4.7.2",
+                "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+                "path": "tests/support/MIR430ClassicUpgrade.ps1"
+              },
+              {
+                "tag": "v4.7.3",
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "path": "tests/support/MIR430ClassicUpgrade.ps1"
+              }
+            ]
+          },
+          {
+            "blob": "02e9d745ddfcc87506e64709fe1f768a153a6968",
+            "family": "MIR421SpaceFakeUpgrade.ps1",
+            "bytes": 59618,
+            "lines": 808,
+            "sha256": "6FE3897D2CAEAC944B545FF5558B5D8A958CBECEFC297B48257E368BC71FAC11",
+            "references": [
+              {
+                "tag": "v4.4.0",
+                "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.ps1"
+              },
+              {
+                "tag": "v4.4.1",
+                "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.ps1"
+              }
+            ]
+          },
+          {
+            "blob": "2c42d5dbcb7ce78f54ed6c0789c92515cc8f1f4f",
+            "family": "MIR421SpaceFakeUpgrade.ps1",
+            "bytes": 72276,
+            "lines": 990,
+            "sha256": "1AA8E84525FE975CF34DD81ADEC0B2FD57102EAD83230A28AE3EA96C648588C5",
+            "references": [
+              {
+                "tag": "v4.4.2",
+                "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.ps1"
+              }
+            ]
+          },
+          {
+            "blob": "cb16a8d9ec1ae30eb49d264320a417d2dbcd0cbf",
+            "family": "MIR421SpaceFakeUpgrade.ps1",
+            "bytes": 76887,
+            "lines": 1050,
+            "sha256": "A90A273FDD36E68661EECBE578AABAA0F33EFEF3C1B38AD9150EB3D0CD18DD19",
+            "references": [
+              {
+                "tag": "v4.5.0",
+                "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.ps1"
+              },
+              {
+                "tag": "v4.5.1",
+                "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.ps1"
+              }
+            ]
+          },
+          {
+            "blob": "b50b5919819145bc19cc265a5a78b5b8821b37b9",
+            "family": "MIR421SpaceFakeUpgrade.ps1",
+            "bytes": 80958,
+            "lines": 1104,
+            "sha256": "149666970D3656598A72589C066F5EE27965B6CB8E29AD6F6A7B8DB13306E994",
+            "references": [
+              {
+                "tag": "v4.5.2",
+                "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.ps1"
+              }
+            ]
+          },
+          {
+            "blob": "426782799b5665831cb4743652942c9ecae19e43",
+            "family": "MIR421SpaceFakeUpgrade.ps1",
+            "bytes": 89974,
+            "lines": 1245,
+            "sha256": "D13B009610E5F8521C76E4032C8BF80A6678AAE49CFF81C33CAF379070D8CD29",
+            "references": [
+              {
+                "tag": "v4.6.0",
+                "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.ps1"
+              }
+            ]
+          },
+          {
+            "blob": "abb62ba553a1a32e4b7e0d4be71e93882ff16f8d",
+            "family": "MIR421K2Upgrade.ps1",
+            "bytes": 16124,
+            "lines": 228,
+            "sha256": "A5C233F9F70EBC8E2170A30239268D2B0DA6194FB18905E4A6B439BE6053B4EE",
+            "references": [
+              {
+                "tag": "v4.7.0",
+                "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+                "path": "tests/support/MIR421K2Upgrade.ps1"
+              },
+              {
+                "tag": "v4.7.1",
+                "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+                "path": "tests/support/MIR421K2Upgrade.ps1"
+              },
+              {
+                "tag": "v4.7.2",
+                "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+                "path": "tests/support/MIR421K2Upgrade.ps1"
+              },
+              {
+                "tag": "v4.7.3",
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "path": "tests/support/MIR421K2Upgrade.ps1"
+              }
+            ]
+          },
+          {
+            "blob": "0fa3eb4ede8521257d67add45e4a386d4d9f97fd",
+            "family": "MIR421SpaceFakeUpgrade.ps1",
+            "bytes": 91978,
+            "lines": 1274,
+            "sha256": "4D42CE9160951FC62FED400C333672168813D76CFDA46C19BCE65C18481B797F",
+            "references": [
+              {
+                "tag": "v4.7.0",
+                "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.ps1"
+              }
+            ]
+          },
+          {
+            "blob": "d6c45bba7b0c882977dcf05d60855703dfd685ee",
+            "family": "MIR421SpaceFakeUpgrade.ps1",
+            "bytes": 92077,
+            "lines": 1275,
+            "sha256": "2D1EBDD6BC552DB0308917664DA4FDF482B40D0AF51350C7CB7CC3C1FAE4FFC3",
+            "references": [
+              {
+                "tag": "v4.7.1",
+                "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.ps1"
+              }
+            ]
+          },
+          {
+            "blob": "dbd3394b6685a1f6006c60d010a865e78e097885",
+            "family": "MIR421SpaceFakeUpgrade.ps1",
+            "bytes": 92140,
+            "lines": 1275,
+            "sha256": "B93E2BD9E22435793CF6472FEEFE5EF3B27813A8B39227D9BE62423DA3843DCA",
+            "references": [
+              {
+                "tag": "v4.7.2",
+                "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.ps1"
+              }
+            ]
+          },
+          {
+            "blob": "f7f335074dea8f7a8cf9fb55a81902590ad151ee",
+            "family": "MIR421SpaceFakeUpgrade.ps1",
+            "bytes": 92201,
+            "lines": 1275,
+            "sha256": "6D6839D7EA1E2E3F62A5235BB483243FD8A78694D005A1323AE45B76DF245546",
+            "references": [
+              {
+                "tag": "v4.7.3",
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "path": "tests/support/MIR421SpaceFakeUpgrade.ps1"
+              }
+            ]
+          }
+        ],
+        "groups": [
+          {
+            "id": "classic-declared-subset-work-and-retired-omissions",
+            "source_families": [
+              "MIR430ClassicUpgrade.ps1"
+            ],
+            "disposition": "retain-independent-subset-expectations-retire-reduced-output-policy",
+            "independent_expectation": "The embedded original Lua fixture explicitly declares inventory capacity, character crafting speed, mining speed, reach and walking speed IDs/effects; preserve their earned state and selected native/base effects and queue. Its old work oracle clamps source fractional progress times source unit count divided by candidate unit count. Preserve the hidden full/classic setting identity and authored omission history; the accepted single complete MIR5 output supersedes reduced Classic generation.",
+            "implementation": [
+              "source/research/settings.lua",
+              "source/research/catalogue.lua",
+              "source/runtime/lifecycle.lua",
+              "source/migrations"
+            ],
+            "host_controls": [
+              "tests/test_settings_profile.py::test_registered_settings_are_the_single_active_profile_authority",
+              "tests/test_full_catalogue_upgrade_fixture.py"
+            ],
+            "variant_decision": "The exact646-line body is identical across its12 retained tag/path bindings. Its selected five rows and omitted iron research are explicit; a successful old reduced-subset snapshot neither proves full catalogue continuity nor recovers previously erased state. Preserve the six-function pure reader observation:42% of100 units becomes84% of50; unchanged42%, earned-level loss, changed foreign effect and an undeclared candidate prefix all refuse. Synthetic empty effect arrays exercise the PowerShell projection only; the embedded independent Lua effect assertions and native outcome remain separate. This arithmetic is not imposed as a universal current migration formula.",
+            "remaining_executable_check": "Keep the retired-Classic support warning, hidden stored setting and existing selected migration boundaries. Review actual protected original states and applicable current native results before reusing a reduced-Classic observation; unknown or erased histories remain explicitly unverified. No reduced generator or new all-old-patch campaign.",
+            "owner": "Aero historical/source/support review; Black Glass affected native checks"
+          },
+          {
+            "id": "k2-exact-cap-provider-sentinel-and-marker",
+            "source_families": [
+              "MIR421K2Upgrade.ps1"
+            ],
+            "disposition": "retain-exact-stage-and-credit-expectations-supersede-marker-bug",
+            "independent_expectation": "Admit the exact engine/upstream/fixture closure and source/destination tuple. Distinguish implicit default finite cap3 from explicit cap0, source sentinel restoration from MIR cap restoration, staged public/native carriers and independent foreign/current/detached state. A native default and an injected override are different inputs.",
+            "implementation": [
+              "source/research/k2_imersite.lua",
+              "source/runtime/k2_imersite_migration.lua",
+              "source/runtime/caps.lua"
+            ],
+            "host_controls": [
+              "tests/test_k2_imersite_migration.py",
+              "tests/test_k2_imersite_transition_fixture.py"
+            ],
+            "variant_decision": "Three original bodies retain14 references. Older2.1.21/K2 2.1.3/K2SO2.0.13 differs from later2.1.22/2.1.23 with K2 2.1.4/K2SO2.0.19. The later2.1.23 pin is the FE4 Steam executable, not any same-version standalone hash. The metadata specializer changes the exact engine pin without rewriting the sentinel control. Original substring reader2338a221 accepts cap30 ascap3; later0092b926/abb62ba5 exact numeric/end-of-line readers reject it. All three refuse wrong stage. That superseded runner weakness is not a player parity requirement, fresh native proof or reason to rewrite original receipts.",
+            "remaining_executable_check": "Keep the named staged/direct/rollback and ownership routes with their original actual evidence. Reconcile imported K2 fixture assertions separately and review final consumed inputs, implicit settings, actual earned effects, saved successor and two cold reloads. This helper source review does not qualify another provider/engine build or cancellation/saved-slot transition.",
+            "owner": "Aero source/oracle review; Black Glass K2/profile/native queue"
+          },
+          {
+            "id": "sif-two-continuations-and-paid-manufacturing",
+            "source_families": [
+              "MIR421SpaceFakeUpgrade.lua",
+              "MIR421SpaceFakeUpgrade.ps1"
+            ],
+            "disposition": "retain-narrow-independent-science-and-earned-state-expectations",
+            "independent_expectation": "For exact SIF predecessor inputs, weapon-shooting-speed-7 and research-speed-7 drop retired space science and its prerequisite while retaining finite level-six anchors, other inherited science amounts and earned lab/bullet effects. The exact F2004.2.20000/SIF1.0.60 source additionally seeds five paid manufacturing identities at distinct earned levels, retains their hidden/non-enqueue state, actual recipe bonuses, ordered foreign queue and current/detached work, and requires a separate fresh force to receive zero unearned reward.",
+            "implementation": [
+              "source/compatibility/science_bindings.lua",
+              "source/research/science.lua",
+              "source/research/catalogue.lua",
+              "source/runtime/lifecycle.lua",
+              "source/runtime/native_credits.lua"
+            ],
+            "host_controls": [
+              "tests/test_sif_science_retirement_fixture.py",
+              "tests/test_full_catalogue_upgrade_fixture.py",
+              "tests/test_full_catalogue_upgrade_f210_fixture.py"
+            ],
+            "variant_decision": "The sole210-line Lua body retains14 exact bindings. An absent continuation is permitted only for4.2.20000/SIF1.0.60 and then must appear at untouched level7 with independently declared science. Existing continuations preserve state exactly. Removing the derived production ingredient from weapon speed is allowed only for4.2.21000/SIF1.0.78 when its finite anchor did not require it. Five paid manufacturing rows are low_density_structure, plastic, processing_unit, rocket_fuel and steel; their exact recipe bonuses and fresh-force zero expectations are separate from the two-continuation science requirement. LuaTechnologyPrototype recipe-productivity snapshots use change; tolerance and explicit source witnesses are not adjusted. The new tiny original-Lua probe accepts three scoped valid observations and rejects12 broken science/anchor/reward/hidden/queue/progress observations; it executes verify only against owned host tables, never capture or an engine.",
+            "applicable_evidence": [
+              "spec/evidence/sif-science-fa114-native-chain.json",
+              "spec/evidence/sif-science-retirement-f200-selected-native-chain.json"
+            ],
+            "evidence_limit": "The fa114/41b chain already passes the two-target eight-policy emission matrix and both configured predecessor/save/two-reload routes under its exact4.7.20002/4.7.21002 origins. Do not repeat the older selected-F200 chain's F210-unrun description as current status, or relabel either execution. These two-continuation results alone do not establish the older five-row paid-manufacturing state or final candidateB applicability.",
+            "remaining_executable_check": "Reconcile the five-row earned manufacturing expectation with existing selected older-contract/ownership coverage and actual preserved source states; document any missing original/input or unproven case explicitly. Review exact consumed-input applicability for the already completed SIF science chains and run only affected remaining checks on the frozen final candidate. No automatic restart of the completed policy matrix, expansion to every old patch, or arbitrary-mod support claim.",
+            "owner": "Aero historical/coverage applicability; Black Glass admitted affected native execution"
+          },
+          {
+            "id": "full-state-specialization-and-reviewed-addition-sets",
+            "source_families": [
+              "MIR421SpaceFakeUpgrade.ps1"
+            ],
+            "disposition": "retain-independently-justified-deltas-retire-old-fixture-construction",
+            "independent_expectation": "Complete state compares source, upgrade and reload separately, preserving admitted technologies/recipes/effects/settings/queue/progress and exact active mod closure. Only independently justified named definition/default additions may differ. Keep private fixture revisions unique for distinct predecessor paths, leaving published inputs unchanged.",
+            "implementation": [
+              "source/research",
+              "source/compatibility",
+              "source/runtime",
+              "tests/fixtures/full-catalogue-upgrade",
+              "tests/fixtures/full-catalogue-upgrade/f210"
+            ],
+            "host_controls": [
+              "tests/test_full_catalogue_upgrade_fixture.py",
+              "tests/test_full_catalogue_upgrade_f210_fixture.py",
+              "tests/test_settings_profile.py"
+            ],
+            "variant_decision": "The1275-line latest helper and earlier variants adapt exact4.2-4.7 modern/historical fixture identities and source/upgrade/reload hooks, not MIR5 release authority. F200 and Base specializations omit only three Space-Age-only reported rows while retaining the full comparator. Newly added full selector/default worker cap0 and18-family seven-setting defaults have exact guards. The narrow F210 inherited-promethium delta and F200 frontier table are imported dependencies, not candidate-derived allowances. Galore+Space Age uses native mining-productivity-3, separately from Base mining-productivity-4. The direct Bob/Angel4.2.2-to4.4.2 slice fixes exactly six finite native tails, two direct streams and two copper/tungsten stages; the4.5.2-to4.6.0 slice fixes eight aluminium/gold/tin/titanium stages with2% effects, early-stage cap3/later-stage cap150 and independent cost/science/prerequisite contracts. Tin retains Automation-only early science. Other performance-only lanes reject extra technologies. Broad acceptance cannot follow merely from a complete-state marker with at least3 technologies/1 recipe.",
+            "remaining_executable_check": "Review the imported generic complete-state Lua comparator, canonical modern fixture and reviewed frontier data bodies as their own source groups, then align original published source/default and native evidence with current named catalogue/settings/profile owners. Current host controls and copied helper paths are not full gameplay qualification. Keep existing nine same-edition/seven older-contract/four forward journeys unchanged.",
+            "owner": "Aero imported-oracle/coverage review; Black Glass exact source/save/profile execution"
+          },
+          {
+            "id": "helper-input-custody-and-retired-transport",
+            "source_families": [
+              "MIR430ClassicUpgrade.ps1",
+              "MIR421K2Upgrade.ps1",
+              "MIR421SpaceFakeUpgrade.ps1"
+            ],
+            "disposition": "obsolete-transport-retain-input-identity-and-restoration-obligations",
+            "independent_expectation": "Exact published artifact/source identities and engine/dependency closure, actual active-mod equality, protected originals, bounded owned scratch and restoration remain binding. Local locators are inputs, not portable repository dependencies or authorization to alter a library.",
+            "implementation": [
+              "tools/Invoke-NativeFixture.ps1",
+              "tools/lib/compatibility/LibraryActivation.ps1",
+              "tools/lib/validation/NativeProbeResources.ps1"
+            ],
+            "host_controls": [
+              "tests/test_historical_native_runner.py"
+            ],
+            "variant_decision": "Preserve the independently pinned4.1.20000 archive/release/manifest reader and source references, exact SIF1.0.78/commons1.0.33 versus1.0.60/1.0.27, Galore and13-mod Bob/Angel input records without reproducing machine paths or old populated profiles. Helpers contain historical hardlink/profile construction, generated-fixture rewrites and moves; those mechanisms are retired and are not executed. Current no-external-hardlink, exclusive direct-library ownership and guarded restoration rules govern new work. Earlier fixture versions and transition allowlists record actual historical lanes, not new every-old-patch obligations.",
+            "remaining_executable_check": "Use current guarded tools only for a separately reviewed exact packet. Missing archives/original saves remain missing; do not download, regenerate, hardlink external inputs or infer a reporter configuration to make a helper pass. Original native evidence keeps actual scope and identity.",
+            "owner": "Aero mapping; Black Glass private controller/input/native custody"
+          }
+        ],
+        "pure_original_oracle_observations": [
+          {
+            "path": "build/qualification/aero-upgrade-intents-r01/classic-pure-work-oracle-observation.json",
+            "sha256": "9B56AC48C3DDE3FA240968FD499B9BE42BB239BE7EDC1502FEA14B7D13F784F4"
+          },
+          {
+            "path": "build/qualification/aero-upgrade-intents-r01/k2-pure-marker-oracle-observation.json",
+            "sha256": "D6740CAE4B0D081A1349429D4FEB8FAED224253C7249FC2565C52D9A4E575881"
+          },
+          {
+            "path": "build/qualification/aero-upgrade-specializations-r01/sif-pure-oracle-observation.json",
+            "sha256": "0D20E72AFD32EA0DB076BF6769F10542066C81AD16D708BBB3AF06FAE0C4E1FB"
+          }
+        ],
+        "host_validation": {
+          "existing_selected_controls": 49,
+          "sif_science_retirement": 16,
+          "k2_imersite_migration": 13,
+          "full_catalogue_f200": 5,
+          "full_catalogue_f210": 7,
+          "settings_profile": 8,
+          "lua": "5.2",
+          "lupa": "2.6",
+          "new_or_modified_tests": 0,
+          "native_execution": false
+        },
+        "custody": "build/qualification/aero-upgrade-specializations-r01/",
+        "qualification_limit": "Only the17 selected helper bodies and their54 original references are dispositioned. Imported generic comparator/frontier/canonical fixture bodies, other history groups and actual final-candidate source/profile/save/client/performance acceptance remain open. Original request records, old adverse/scoped results and selected migration routes remain unchanged. No current product defect is demonstrated merely by a historical oracle probe.",
         "native_execution": false,
         "source_reconciliation_complete": false,
         "test_intent_reconciliation_complete": false,
