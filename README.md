@@ -203,7 +203,7 @@ The first generated level is the anchor. A zero additive increment with multipli
 | Max level | `0` (infinite) |
 | Research unit time | `60` seconds |
 
-**Base-technology extensions** use the same formula, but their first generated level starts after the vanilla chain. A setting value of **`0`** for base cost, exponential multiplier, or research unit time means *derive this from the vanilla chain*. Additive cost per level defaults to `0`.
+**Base-technology extensions** start after the existing native chain. Their positive base-cost setting is a **level-1 coefficient**. If the first continuation starts at level `N`, its initial formula value is `base_cost * exponential_multiplier^(N - 1)`. Later levels apply the additive increment and exponential multiplier from that anchor. Setting base cost, exponential multiplier, or research unit time to **`0`** inherits the corresponding native-chain behavior; a modded native chain can supply that baseline. Additive cost per level defaults to `0`.
 
 If a positive base-extension max level is below the first generated continuation level, MIR **skips that extension** instead of creating an impossible capped technology.
 
@@ -478,7 +478,7 @@ Every base extension receives:
 | Setting pattern | Type | Meaning |
 | --- | --- | --- |
 | `mir-enable-<technology>` | bool | Enables or disables the infinite continuation. |
-| `mir-cost-base-<technology>` | int, min `0` | `0` derives the exact cost of the first MIR continuation level from the vanilla chain; positive values override that first-level cost. |
+| `mir-cost-base-<technology>` | int, min `0` | Level-1 cost coefficient. `0` inherits it from the native chain; a positive value is multiplied by growth raised to `first_continuation_level - 1` to obtain the first continuation's formula value. |
 | `mir-cost-linear-increment-<technology>` | int, min `0` | Research units added per continuation level before exponential multiplication. `0` means no additive growth. |
 | `mir-cost-growth-<technology>` | double, min `0` | `0` derives the exponential multiplier from the vanilla chain; positive values override it. The stable ID is unchanged. |
 | `mir-max-level-<technology>` | int, min `0` | `0` means infinite; positive values cap the generated continuation. |
