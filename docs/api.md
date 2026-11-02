@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-10-30
+last_reviewed: 2026-11-02
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,9 +14,9 @@ source_of_truth_for:
 
 # MIR API guide
 
-## Implemented candidate interface
+## Implemented interface
 
-The [API contract](../spec/api.md) defines one public name, two lifecycle surfaces and a Lua-first SDK. The candidate implements the [data helper](../source/api/v1/data.lua) and [runtime queries](../source/api/v1/runtime.lua). Two independently installed consumers have named native data, physical/save and current real-client evidence. The [scoped API1.0 qualification](../spec/evidence/api1-documented-subset-qualification-r01.json) freezes the documented modern contract for the pending release; whole-product MIR5 acceptance and publication remain separate. Use the independent examples in disposable test worlds.
+The [API contract](../spec/api.md) defines one public name, two lifecycle surfaces and a Lua-first SDK. MIR5 betas include the [data helper](../source/api/v1/data.lua) and [runtime queries](../source/api/v1/runtime.lua). Two independently installed consumers have recorded native data, physical/save and real-client evidence. The [scoped API1.0 qualification](../spec/evidence/api1-documented-subset-qualification-r01.json) freezes the documented modern contract at its recorded inputs; stable whole-product acceptance and final-candidate evidence applicability remain separate. Use the independent examples in disposable test worlds.
 
 A required extension declares a normal dependency on MIR, calls the data helper only after its own references are available, and owns its runtime behavior. An optional extension checks for MIR and its capability before using it; its absent-MIR case must actually load.
 
@@ -68,7 +68,7 @@ The linked decision covers the two named consumers, exact absence guards, orderi
 
 ## Contract version and family creation
 
-The examples follow the frozen **MIR API1.0.0** documented subset for the pending MIR5 release. The module path is `__more-infinite-research__.api.v1.data`; the runtime remote interface is `more-infinite-research.api.v1`. These implemented MIR5 surfaces are absent from released MIR4. The product version and API version remain independent.
+The examples follow the frozen **MIR API1.0.0** documented subset included in MIR5 betas. The module path is `__more-infinite-research__.api.v1.data`; the runtime remote interface is `more-infinite-research.api.v1`. These implemented MIR5 surfaces are absent from released MIR4. The product version and API version remain independent.
 
 Data creation is qualified within the linked F200/F210 scope. It accepts only the documented numeric-count technology subset: control-byte-free names, existing prerequisites, distinct science ingredients, time from `1/60` through `3600000` seconds, `character-crafting-speed` effects for ordinary creation, and API-created recipe-productivity effects. F200 science must be an existing `ToolPrototype`; F210 accepts the explicit `ItemPrototype` categories listed in the contract. MIR supplies the packaged thumbnail for every API result. Formula costs, caller assets, localization, triggers, arbitrary native fields and caller productivity effects reject before writes. Use `add_technologies(prototypes)` for an ordered finite family with internal forward references. All local preflight occurs before intended writes; an invalid family does not become a partially accepted pending registration. A later foreign target still requires calling in the proper later data-stage round. See [the API contract](../spec/api.md) and diagram 06 in the [atlas](diagrams/index.html).
 

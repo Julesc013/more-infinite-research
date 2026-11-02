@@ -4887,7 +4887,7 @@
             "docs/design.md",
             "docs/api.md"
           ],
-          "scope": "MEP remains a separately distributed data-only preview with no player emission authority; it is not a missing runtime transport."
+          "scope": "The inspected historical MEP/SDK entrypoints explicitly describe a separately distributed read-only developer preview with no player-emission authority and a blocked independent production consumer. They do not establish a missing runtime transport or authorize executable MIR API1 contributions. External/computed consumers remain outside this bounded source finding."
         },
         {
           "id": "optional-consumer-native-absence",
@@ -5388,7 +5388,7 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "The scoped API1.0 freeze decision is recorded under api10-freeze-routing-reconciled,not pending. It retains original source/packages/engines/absence and host-budget limits;final corrected candidate registration/client applicability remains a consumed-input decision.",
+        "Retain the existing API1.0 documented-subset/capability/version/budget freeze at its original 42032477 source and package inputs. Review the final candidate consumed API/helper, Generator, configuration, target, metadata, fixture/controller, engine/mod, save and endpoint inputs before evidence reuse; run only genuinely affected documented methods/closures and consumer/client boundaries. Preserve original execution identities, adverse receipts and both legacy runtime bridges. Unknown/computed/external consumers remain unknown; no arbitrary third-party method or historical-target qualification follows, and no unchanged API campaign is restarted.",
         "Qualify the legacy-browser-tab-aware-search-correction on the final corrected package with explicit and retained Settings-tab legacy search and independent native/research-query state. Keep current frozen501 execution distinct;do not claim host opposition as native acceptance.",
         "Complete remaining historical/inter-release and actual legacy-consumer reconciliation without fabricating unavailable originals,retiring unknown consumers,or restoring unconsumed preview frameworks."
       ]
@@ -6047,7 +6047,7 @@
           "tests/test_runtime_api.py",
           "tests/test_api_boundary_fixture.py"
         ],
-        "remaining": "The original documented API1.0 freeze verdict is complete at its exact42032477 scope;CONT-14 records current core-byte/metadata applicability and the recovered legacy Settings-search correction. Review final-candidate registration/client inputs and run the bounded changed legacy-search native case. Preserve absence cases where MIR is not consumed. Preview serialization/MEP tests do not add MIR5 runtime transport or mutation authority."
+        "remaining": "Retain the existing API1.0 documented-subset/capability/version/budget freeze at its original 42032477 source and package inputs. Review the final candidate consumed API/helper, Generator, configuration, target, metadata, fixture/controller, engine/mod, save and endpoint inputs before evidence reuse; run only genuinely affected documented methods/closures and consumer/client boundaries. Preserve original execution identities, adverse receipts and both legacy runtime bridges. Unknown/computed/external consumers remain unknown; no arbitrary third-party method or historical-target qualification follows, and no unchanged API campaign is restarted. Qualify the legacy-browser-tab-aware-search-correction on the final corrected package with explicit and retained Settings-tab legacy search and independent native/research-query state. Keep current frozen501 execution distinct;do not claim host opposition as native acceptance. Complete remaining historical/inter-release and actual legacy-consumer reconciliation without fabricating unavailable originals,retiring unknown consumers,or restoring unconsumed preview frameworks."
       },
       {
         "subjects": [
@@ -6872,6 +6872,1331 @@
         "source_reconciliation_complete": false,
         "test_intent_reconciliation_complete": false,
         "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-14",
+          "CONT-03",
+          "CONT-11",
+          "CONT-13"
+        ],
+        "reviewed_on": "2026-11-02",
+        "reviewed_against": "4f08a72343b6498e4ec0ce9bf40ddfed88caf430",
+        "scope": "Seventeen selected test-code blobs across seven canonical API/MEP/platform-preview test families and 127 verified tag/path references in the existing 91-tag inventory. The fourteen added variants cover validation/tests-to-tests path aliases, SDK V0 validation, T09, T11, W05 and platform preview. This is the named preview family only, not every historical helper/fixture, inter-release source, discussion, attachment, consumer or native behavior.",
+        "method": "Deduplicate exact Git blobs, verify every selected commit/path lookup and inspect canonical bodies plus 153 variant-diff lines and the older W05 locator diff. Preserve source/package path distinctions; resolve the 8-to-7 runtime descriptor count against original code and published Classic retirement. Map useful boundaries to current controls and actual published package contents; do not execute or restore old preview generators, runners or projected assurance records.",
+        "sources": [
+          {
+            "path": "tests/extensions/Test-MIR4ModuleEcosystem.ps1",
+            "sha256": "C398A6826E3424AD9F3A488CADE620857AC8F521A1D678109559F057F79BBB6F",
+            "references": [
+              {
+                "tag": "v4.0.0",
+                "commit": "5ca449820bdfa5595ca03686f32c74904c46daf3",
+                "blob": "4a380fb4aaaefbb2a715632b2e7be65b8ec0bcd9"
+              },
+              {
+                "tag": "v4.1.0",
+                "commit": "3562377b520cccb071b97b3968946eae7024c950",
+                "blob": "4a380fb4aaaefbb2a715632b2e7be65b8ec0bcd9"
+              },
+              {
+                "tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "blob": "4a380fb4aaaefbb2a715632b2e7be65b8ec0bcd9"
+              },
+              {
+                "tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "blob": "4a380fb4aaaefbb2a715632b2e7be65b8ec0bcd9"
+              },
+              {
+                "tag": "v4.2.1",
+                "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                "blob": "4a380fb4aaaefbb2a715632b2e7be65b8ec0bcd9"
+              },
+              {
+                "tag": "v4.2.2",
+                "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+                "blob": "4a380fb4aaaefbb2a715632b2e7be65b8ec0bcd9"
+              },
+              {
+                "tag": "v4.3.0",
+                "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+                "blob": "4a380fb4aaaefbb2a715632b2e7be65b8ec0bcd9"
+              },
+              {
+                "tag": "v4.4.0",
+                "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+                "blob": "4a380fb4aaaefbb2a715632b2e7be65b8ec0bcd9"
+              },
+              {
+                "tag": "v4.4.1",
+                "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+                "blob": "4a380fb4aaaefbb2a715632b2e7be65b8ec0bcd9"
+              },
+              {
+                "tag": "v4.4.2",
+                "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+                "blob": "4a380fb4aaaefbb2a715632b2e7be65b8ec0bcd9"
+              },
+              {
+                "tag": "v4.5.0",
+                "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+                "blob": "4a380fb4aaaefbb2a715632b2e7be65b8ec0bcd9"
+              },
+              {
+                "tag": "v4.5.1",
+                "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+                "blob": "4a380fb4aaaefbb2a715632b2e7be65b8ec0bcd9"
+              },
+              {
+                "tag": "v4.5.2",
+                "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+                "blob": "4a380fb4aaaefbb2a715632b2e7be65b8ec0bcd9"
+              },
+              {
+                "tag": "v4.6.0",
+                "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+                "blob": "4a380fb4aaaefbb2a715632b2e7be65b8ec0bcd9"
+              },
+              {
+                "tag": "v4.7.0",
+                "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+                "blob": "4a380fb4aaaefbb2a715632b2e7be65b8ec0bcd9"
+              },
+              {
+                "tag": "v4.7.1",
+                "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+                "blob": "4a380fb4aaaefbb2a715632b2e7be65b8ec0bcd9"
+              },
+              {
+                "tag": "v4.7.2",
+                "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+                "blob": "4a380fb4aaaefbb2a715632b2e7be65b8ec0bcd9"
+              },
+              {
+                "tag": "v4.7.3",
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "4a380fb4aaaefbb2a715632b2e7be65b8ec0bcd9"
+              }
+            ]
+          },
+          {
+            "path": "tests/extensions/Test-MIR4ModuleSdkMepMigration.ps1",
+            "sha256": "DEEF516B2A0A4CD075CE0DDB98052EA8AD140EE17FDC8EE331DEBBB4054123F6",
+            "references": [
+              {
+                "tag": "v4.0.0",
+                "commit": "5ca449820bdfa5595ca03686f32c74904c46daf3",
+                "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
+              },
+              {
+                "tag": "v4.1.0",
+                "commit": "3562377b520cccb071b97b3968946eae7024c950",
+                "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
+              },
+              {
+                "tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
+              },
+              {
+                "tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
+              },
+              {
+                "tag": "v4.2.1",
+                "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
+              },
+              {
+                "tag": "v4.2.2",
+                "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+                "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
+              },
+              {
+                "tag": "v4.3.0",
+                "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+                "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
+              },
+              {
+                "tag": "v4.4.0",
+                "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+                "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
+              },
+              {
+                "tag": "v4.4.1",
+                "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+                "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
+              },
+              {
+                "tag": "v4.4.2",
+                "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+                "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
+              },
+              {
+                "tag": "v4.5.0",
+                "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+                "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
+              },
+              {
+                "tag": "v4.5.1",
+                "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+                "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
+              },
+              {
+                "tag": "v4.5.2",
+                "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+                "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
+              },
+              {
+                "tag": "v4.6.0",
+                "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+                "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
+              },
+              {
+                "tag": "v4.7.0",
+                "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+                "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
+              },
+              {
+                "tag": "v4.7.1",
+                "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+                "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
+              },
+              {
+                "tag": "v4.7.2",
+                "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+                "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
+              },
+              {
+                "tag": "v4.7.3",
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "c954e2ad2684d06e3781a1a4213e04db240b4bee"
+              }
+            ],
+            "prior_intent_record": "CONT-14.historical-api-sdk-entrypoint-intents"
+          },
+          {
+            "path": "tests/mir4/Test-MIR4ModuleEcosystemW05.ps1",
+            "sha256": "B5FD024AA4B09C2DBA3803083D049970D4C3559602A2F5FA392DC103B5D3AC09",
+            "references": [
+              {
+                "tag": "v4.1.0",
+                "commit": "3562377b520cccb071b97b3968946eae7024c950",
+                "blob": "c1675fce20f8f5c4387fbc80f8b87b70b04d40a9"
+              },
+              {
+                "tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "blob": "c1675fce20f8f5c4387fbc80f8b87b70b04d40a9"
+              },
+              {
+                "tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "blob": "c1675fce20f8f5c4387fbc80f8b87b70b04d40a9"
+              },
+              {
+                "tag": "v4.2.1",
+                "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                "blob": "c1675fce20f8f5c4387fbc80f8b87b70b04d40a9"
+              },
+              {
+                "tag": "v4.2.2",
+                "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+                "blob": "c1675fce20f8f5c4387fbc80f8b87b70b04d40a9"
+              },
+              {
+                "tag": "v4.3.0",
+                "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+                "blob": "c1675fce20f8f5c4387fbc80f8b87b70b04d40a9"
+              },
+              {
+                "tag": "v4.4.0",
+                "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+                "blob": "c1675fce20f8f5c4387fbc80f8b87b70b04d40a9"
+              },
+              {
+                "tag": "v4.4.1",
+                "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+                "blob": "c1675fce20f8f5c4387fbc80f8b87b70b04d40a9"
+              },
+              {
+                "tag": "v4.4.2",
+                "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+                "blob": "c1675fce20f8f5c4387fbc80f8b87b70b04d40a9"
+              },
+              {
+                "tag": "v4.5.0",
+                "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+                "blob": "c1675fce20f8f5c4387fbc80f8b87b70b04d40a9"
+              },
+              {
+                "tag": "v4.5.1",
+                "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+                "blob": "c1675fce20f8f5c4387fbc80f8b87b70b04d40a9"
+              },
+              {
+                "tag": "v4.5.2",
+                "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+                "blob": "c1675fce20f8f5c4387fbc80f8b87b70b04d40a9"
+              },
+              {
+                "tag": "v4.6.0",
+                "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+                "blob": "c1675fce20f8f5c4387fbc80f8b87b70b04d40a9"
+              },
+              {
+                "tag": "v4.7.0",
+                "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+                "blob": "c1675fce20f8f5c4387fbc80f8b87b70b04d40a9"
+              },
+              {
+                "tag": "v4.7.1",
+                "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+                "blob": "c1675fce20f8f5c4387fbc80f8b87b70b04d40a9"
+              },
+              {
+                "tag": "v4.7.2",
+                "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+                "blob": "c1675fce20f8f5c4387fbc80f8b87b70b04d40a9"
+              },
+              {
+                "tag": "v4.7.3",
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "c1675fce20f8f5c4387fbc80f8b87b70b04d40a9"
+              }
+            ]
+          },
+          {
+            "path": "validation/tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+            "path_aliases": [
+              "validation/tests/mir4/Test-MIR4ExperimentalApiSdk.ps1"
+            ],
+            "blob": "0f1db90703e4771146ef4ca509307dad8bcdeb53",
+            "sha256": "1F48248B7F085F0895AB3FF89D9ACDEBDB189EA025E9596D9E383DCC49E4B10B",
+            "references": [
+              {
+                "tag": "3.2.11",
+                "commit": "e3d787deb35ff30157bb2013fa1cc745a445e629",
+                "path": "validation/tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "0f1db90703e4771146ef4ca509307dad8bcdeb53"
+              }
+            ]
+          },
+          {
+            "path": "validation/tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+            "path_aliases": [
+              "validation/tests/mir4/Test-MIR4ExperimentalApiSdk.ps1"
+            ],
+            "blob": "e31830e12bd5bffce26f90f52ee20c65541d8dc5",
+            "sha256": "691C37806CF565FF6DDC2D9AE24892751C2EFD723A0837C842E9ED4BACCAE05A",
+            "references": [
+              {
+                "tag": "v4.0.0",
+                "commit": "5ca449820bdfa5595ca03686f32c74904c46daf3",
+                "path": "validation/tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "e31830e12bd5bffce26f90f52ee20c65541d8dc5"
+              }
+            ]
+          },
+          {
+            "path": "validation/tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+            "path_aliases": [
+              "validation/tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1"
+            ],
+            "blob": "58e7b540688500a77a0af8829cb1543afb66ac94",
+            "sha256": "872AA67AF4DA1EA3923196F9699F6804E4114F2F8BF13FDA2E19ABA4AE82C782",
+            "references": [
+              {
+                "tag": "v4.0.0",
+                "commit": "5ca449820bdfa5595ca03686f32c74904c46daf3",
+                "path": "validation/tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+                "blob": "58e7b540688500a77a0af8829cb1543afb66ac94"
+              }
+            ]
+          },
+          {
+            "path": "validation/tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+            "path_aliases": [
+              "validation/tests/mir4/Test-MIR4MepDiscoveryT11.ps1"
+            ],
+            "blob": "97d9bc75b7d95234555ad87b81d55296178471d4",
+            "sha256": "E90C334379F663EA306566FED974D3B4F90E9975CFC46D7A1336E565635A2CE3",
+            "references": [
+              {
+                "tag": "v4.0.0",
+                "commit": "5ca449820bdfa5595ca03686f32c74904c46daf3",
+                "path": "validation/tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+                "blob": "97d9bc75b7d95234555ad87b81d55296178471d4"
+              }
+            ]
+          },
+          {
+            "path": "validation/tests/mir4/Test-MIR4ModuleEcosystemW05.ps1",
+            "path_aliases": [
+              "validation/tests/mir4/Test-MIR4ModuleEcosystemW05.ps1"
+            ],
+            "blob": "3ffa8c2a2f1c1c6bfe9eed1bc8f8b7b8574a8135",
+            "sha256": "BCA03F1A34F4A3098277A8F83B789FD373B7E86F7F41FE653DA77DFCD9BC2AB7",
+            "references": [
+              {
+                "tag": "v4.0.0",
+                "commit": "5ca449820bdfa5595ca03686f32c74904c46daf3",
+                "path": "validation/tests/mir4/Test-MIR4ModuleEcosystemW05.ps1",
+                "blob": "3ffa8c2a2f1c1c6bfe9eed1bc8f8b7b8574a8135"
+              }
+            ]
+          },
+          {
+            "path": "validation/tests/mir4/Test-MIR4PlatformPreview.ps1",
+            "path_aliases": [
+              "validation/tests/mir4/Test-MIR4PlatformPreview.ps1"
+            ],
+            "blob": "d7ba21a169d1462f1cd1ea1adf5dd8d57730fa2c",
+            "sha256": "1697DA1C663D1CF0757A08BE515B9521FB26FFEF7510EAD81C55FA7A2526F359",
+            "references": [
+              {
+                "tag": "v4.0.0",
+                "commit": "5ca449820bdfa5595ca03686f32c74904c46daf3",
+                "path": "validation/tests/mir4/Test-MIR4PlatformPreview.ps1",
+                "blob": "d7ba21a169d1462f1cd1ea1adf5dd8d57730fa2c"
+              }
+            ]
+          },
+          {
+            "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+            "path_aliases": [
+              "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1"
+            ],
+            "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41",
+            "sha256": "62886BB18F9D5C16DA72967F9BEEA066C44532629E3BCF93956C6C234618ED71",
+            "references": [
+              {
+                "tag": "v4.1.0",
+                "commit": "3562377b520cccb071b97b3968946eae7024c950",
+                "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+              },
+              {
+                "tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+              },
+              {
+                "tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+              },
+              {
+                "tag": "v4.2.1",
+                "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+              },
+              {
+                "tag": "v4.2.2",
+                "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+                "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+              },
+              {
+                "tag": "v4.3.0",
+                "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+                "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+              },
+              {
+                "tag": "v4.4.0",
+                "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+                "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+              },
+              {
+                "tag": "v4.4.1",
+                "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+                "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+              },
+              {
+                "tag": "v4.4.2",
+                "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+                "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+              },
+              {
+                "tag": "v4.5.0",
+                "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+                "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+              },
+              {
+                "tag": "v4.5.1",
+                "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+                "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+              },
+              {
+                "tag": "v4.5.2",
+                "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+                "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+              },
+              {
+                "tag": "v4.6.0",
+                "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+                "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+              },
+              {
+                "tag": "v4.7.0",
+                "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+                "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+              },
+              {
+                "tag": "v4.7.1",
+                "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+                "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+              },
+              {
+                "tag": "v4.7.2",
+                "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+                "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+              },
+              {
+                "tag": "v4.7.3",
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+                "blob": "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+              }
+            ],
+            "prior_intent_record": "CONT-14.historical-api-sdk-entrypoint-intents"
+          },
+          {
+            "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+            "path_aliases": [
+              "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1"
+            ],
+            "blob": "4e35698a71d0797d057406db9655efbc52b122d7",
+            "sha256": "22C2F020B4F01779D2D903F626BDB4DE204568C171D4191FA9A6A054E01EEF7C",
+            "references": [
+              {
+                "tag": "v4.1.0",
+                "commit": "3562377b520cccb071b97b3968946eae7024c950",
+                "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+                "blob": "4e35698a71d0797d057406db9655efbc52b122d7"
+              }
+            ]
+          },
+          {
+            "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+            "path_aliases": [
+              "tests/mir4/Test-MIR4MepDiscoveryT11.ps1"
+            ],
+            "blob": "7804f9c0998e8cfccd826188ae565f7d26f1dc1a",
+            "sha256": "D150F5F9212C2668141FED8FDB3C7CF2005C608C49B2D84BF0547441FC8F64C7",
+            "references": [
+              {
+                "tag": "v4.1.0",
+                "commit": "3562377b520cccb071b97b3968946eae7024c950",
+                "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+                "blob": "7804f9c0998e8cfccd826188ae565f7d26f1dc1a"
+              }
+            ],
+            "prior_intent_record": "CONT-14.historical-api-sdk-entrypoint-intents"
+          },
+          {
+            "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+            "path_aliases": [
+              "tests/mir4/Test-MIR4PlatformPreview.ps1"
+            ],
+            "blob": "60c0fe7e9d238917051fd0cfca53624208f84145",
+            "sha256": "B4BBC518A052CAFB6E4FF1E8738D93AAA880FDDE3D2452B85F0DC088A2B97AF9",
+            "references": [
+              {
+                "tag": "v4.1.0",
+                "commit": "3562377b520cccb071b97b3968946eae7024c950",
+                "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+                "blob": "60c0fe7e9d238917051fd0cfca53624208f84145"
+              }
+            ]
+          },
+          {
+            "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+            "path_aliases": [
+              "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1"
+            ],
+            "blob": "ce9778ad05e65ed9b3ad1e43b5d649d1e928e796",
+            "sha256": "8541A2A156C18691A896B4D7CE38F90382BF5BEAE118E576458ED75B21284B1F",
+            "references": [
+              {
+                "tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+                "blob": "ce9778ad05e65ed9b3ad1e43b5d649d1e928e796"
+              },
+              {
+                "tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+                "blob": "ce9778ad05e65ed9b3ad1e43b5d649d1e928e796"
+              },
+              {
+                "tag": "v4.2.1",
+                "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+                "blob": "ce9778ad05e65ed9b3ad1e43b5d649d1e928e796"
+              },
+              {
+                "tag": "v4.2.2",
+                "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+                "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+                "blob": "ce9778ad05e65ed9b3ad1e43b5d649d1e928e796"
+              },
+              {
+                "tag": "v4.3.0",
+                "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+                "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+                "blob": "ce9778ad05e65ed9b3ad1e43b5d649d1e928e796"
+              },
+              {
+                "tag": "v4.4.0",
+                "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+                "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+                "blob": "ce9778ad05e65ed9b3ad1e43b5d649d1e928e796"
+              },
+              {
+                "tag": "v4.4.1",
+                "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+                "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+                "blob": "ce9778ad05e65ed9b3ad1e43b5d649d1e928e796"
+              },
+              {
+                "tag": "v4.4.2",
+                "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+                "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+                "blob": "ce9778ad05e65ed9b3ad1e43b5d649d1e928e796"
+              },
+              {
+                "tag": "v4.5.0",
+                "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+                "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+                "blob": "ce9778ad05e65ed9b3ad1e43b5d649d1e928e796"
+              },
+              {
+                "tag": "v4.5.1",
+                "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+                "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+                "blob": "ce9778ad05e65ed9b3ad1e43b5d649d1e928e796"
+              },
+              {
+                "tag": "v4.5.2",
+                "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+                "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+                "blob": "ce9778ad05e65ed9b3ad1e43b5d649d1e928e796"
+              },
+              {
+                "tag": "v4.6.0",
+                "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+                "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+                "blob": "ce9778ad05e65ed9b3ad1e43b5d649d1e928e796"
+              },
+              {
+                "tag": "v4.7.0",
+                "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+                "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+                "blob": "ce9778ad05e65ed9b3ad1e43b5d649d1e928e796"
+              },
+              {
+                "tag": "v4.7.1",
+                "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+                "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+                "blob": "ce9778ad05e65ed9b3ad1e43b5d649d1e928e796"
+              },
+              {
+                "tag": "v4.7.2",
+                "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+                "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+                "blob": "ce9778ad05e65ed9b3ad1e43b5d649d1e928e796"
+              },
+              {
+                "tag": "v4.7.3",
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+                "blob": "ce9778ad05e65ed9b3ad1e43b5d649d1e928e796"
+              }
+            ]
+          },
+          {
+            "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+            "path_aliases": [
+              "tests/mir4/Test-MIR4MepDiscoveryT11.ps1"
+            ],
+            "blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b",
+            "sha256": "3B5344B2F950A565D345E04E629E8F260E03B14757EBF981C3B81CF5DCF313B2",
+            "references": [
+              {
+                "tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+                "blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b"
+              },
+              {
+                "tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+                "blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b"
+              },
+              {
+                "tag": "v4.2.1",
+                "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+                "blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b"
+              },
+              {
+                "tag": "v4.2.2",
+                "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+                "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+                "blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b"
+              },
+              {
+                "tag": "v4.3.0",
+                "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+                "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+                "blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b"
+              },
+              {
+                "tag": "v4.4.0",
+                "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+                "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+                "blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b"
+              },
+              {
+                "tag": "v4.4.1",
+                "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+                "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+                "blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b"
+              },
+              {
+                "tag": "v4.4.2",
+                "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+                "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+                "blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b"
+              },
+              {
+                "tag": "v4.5.0",
+                "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+                "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+                "blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b"
+              },
+              {
+                "tag": "v4.5.1",
+                "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+                "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+                "blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b"
+              },
+              {
+                "tag": "v4.5.2",
+                "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+                "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+                "blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b"
+              },
+              {
+                "tag": "v4.6.0",
+                "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+                "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+                "blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b"
+              },
+              {
+                "tag": "v4.7.0",
+                "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+                "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+                "blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b"
+              },
+              {
+                "tag": "v4.7.1",
+                "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+                "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+                "blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b"
+              },
+              {
+                "tag": "v4.7.2",
+                "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+                "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+                "blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b"
+              },
+              {
+                "tag": "v4.7.3",
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+                "blob": "22f6f391dc55d391a0c73cb6ea8f09c763cda73b"
+              }
+            ],
+            "prior_intent_record": "CONT-14.historical-api-sdk-entrypoint-intents"
+          },
+          {
+            "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+            "path_aliases": [
+              "tests/mir4/Test-MIR4PlatformPreview.ps1"
+            ],
+            "blob": "8bc74c2507d76a50eb90b451c73bd0cc2012af89",
+            "sha256": "FCC1BF07A76EB3809011CCE2D2805CF28A115835DD20D9DD6A31D3C5766E8C32",
+            "references": [
+              {
+                "tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+                "blob": "8bc74c2507d76a50eb90b451c73bd0cc2012af89"
+              },
+              {
+                "tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+                "blob": "8bc74c2507d76a50eb90b451c73bd0cc2012af89"
+              },
+              {
+                "tag": "v4.2.1",
+                "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+                "blob": "8bc74c2507d76a50eb90b451c73bd0cc2012af89"
+              },
+              {
+                "tag": "v4.2.2",
+                "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+                "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+                "blob": "8bc74c2507d76a50eb90b451c73bd0cc2012af89"
+              },
+              {
+                "tag": "v4.4.2",
+                "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+                "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+                "blob": "8bc74c2507d76a50eb90b451c73bd0cc2012af89"
+              },
+              {
+                "tag": "v4.5.0",
+                "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+                "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+                "blob": "8bc74c2507d76a50eb90b451c73bd0cc2012af89"
+              },
+              {
+                "tag": "v4.5.1",
+                "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+                "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+                "blob": "8bc74c2507d76a50eb90b451c73bd0cc2012af89"
+              },
+              {
+                "tag": "v4.5.2",
+                "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+                "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+                "blob": "8bc74c2507d76a50eb90b451c73bd0cc2012af89"
+              },
+              {
+                "tag": "v4.6.0",
+                "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+                "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+                "blob": "8bc74c2507d76a50eb90b451c73bd0cc2012af89"
+              },
+              {
+                "tag": "v4.7.0",
+                "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+                "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+                "blob": "8bc74c2507d76a50eb90b451c73bd0cc2012af89"
+              },
+              {
+                "tag": "v4.7.1",
+                "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+                "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+                "blob": "8bc74c2507d76a50eb90b451c73bd0cc2012af89"
+              },
+              {
+                "tag": "v4.7.2",
+                "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+                "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+                "blob": "8bc74c2507d76a50eb90b451c73bd0cc2012af89"
+              },
+              {
+                "tag": "v4.7.3",
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+                "blob": "8bc74c2507d76a50eb90b451c73bd0cc2012af89"
+              }
+            ]
+          },
+          {
+            "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+            "path_aliases": [
+              "tests/mir4/Test-MIR4PlatformPreview.ps1"
+            ],
+            "blob": "e3a47983a653a19753db5fea47869362ff7253ed",
+            "sha256": "C2C12228AA6C0BECEC4DD79762F33361A78B9E83233FD6FE5562C6FBF91A9D0F",
+            "references": [
+              {
+                "tag": "v4.3.0",
+                "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+                "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+                "blob": "e3a47983a653a19753db5fea47869362ff7253ed"
+              },
+              {
+                "tag": "v4.4.0",
+                "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+                "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+                "blob": "e3a47983a653a19753db5fea47869362ff7253ed"
+              },
+              {
+                "tag": "v4.4.1",
+                "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+                "path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+                "blob": "e3a47983a653a19753db5fea47869362ff7253ed"
+              }
+            ]
+          }
+        ],
+        "historical_tooling_receipt": {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "releases/migrations/MIR4-Module-Sdk-Mep-Tooling-MigrationV1.json",
+          "blob": "feb35e34a5dd828c4ffa3c0203eb6d123fea40c2",
+          "bytes": 55477,
+          "sha256": "AFA11010DBAB95012433522BA99B1481D02709E0ACE50C8E6BDFCBC3D732C0FA",
+          "declared_frozen_sha256": "AFA11010DBAB95012433522BA99B1481D02709E0ACE50C8E6BDFCBC3D732C0FA",
+          "declared_frozen_bytes": 55477
+        },
+        "original_api_decision": {
+          "path": "spec/evidence/api1-documented-subset-qualification-r01.json",
+          "blob": "712b13b5ea76cc537b665e69443366a48b84e89c",
+          "bytes": 11208,
+          "sha256": "CF141FC284FF323114801646B57F13BAEA65805FBDE147FB0CE9A8795DC2B006",
+          "candidate_source": "42032477d45ced683e72736a4fe30a7a3195b995",
+          "original_observed_at_utc": "2026-10-29T23:48:43.084126+00:00",
+          "original_status": "documented-subset-qualified-contract-frozen-product-unreleased",
+          "original_stability_decision": {
+            "documented_modern_subset_stable": true,
+            "api_contract_frozen": true,
+            "player_implementation_changed": false,
+            "new_native_execution": false,
+            "product_released": false,
+            "release_qualification": false
+          }
+        },
+        "groups": [
+          {
+            "subjects": [
+              "CONT-14"
+            ],
+            "disposition": "rejected-or-proposed",
+            "historical_paths": [
+              "tests/extensions/Test-MIR4ModuleEcosystem.ps1",
+              "tests/extensions/Test-MIR4ModuleSdkMepMigration.ps1",
+              "tests/mir4/Test-MIR4ModuleEcosystemW05.ps1",
+              "validation/tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+              "validation/tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+              "validation/tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+              "validation/tests/mir4/Test-MIR4ModuleEcosystemW05.ps1",
+              "validation/tests/mir4/Test-MIR4PlatformPreview.ps1",
+              "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+              "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+              "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+              "tests/mir4/Test-MIR4PlatformPreview.ps1"
+            ],
+            "independent_expectation": "The old entrypoints deny semantic/prototype/runtime/migration/support/signing/publication authority, require BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER and ungraduated synthetic fallback, and keep shadow output non-authoritative. The 12-fragment/nine-surface/17-transport/11-command/56-file preview estate and V0-to-V1 envelope converter do not establish delivered player features or an executed contribution contract. Experimental V0 envelope validators, T09 doctor/lock/diff/generated CI and portable multi-language preview SDKs, T11 read-only mod-data discovery/quarantine and platform shadow constructors remain explicitly non-authoritative. A 32-record discovery limit or 128 preview capabilities does not replace API1 admission limits. The developer-only 300-second T09 path bound is not a player-performance acceptance target.",
+            "current_implementation": [
+              "spec/api.md",
+              "docs/api.md"
+            ],
+            "current_host_controls": [
+              "tests/test_sdk.py::test_data_metadata_is_detached_and_reports_only_implemented_capabilities"
+            ],
+            "original_evidence": [],
+            "remaining_executable_check": "Retain exact source references and explicit preview/non-graduation limits. Do not restore the old platform or fabricate a production consumer. Reconcile an actual externally consumed contract if one is recovered; existing bridges and unknown-consumer status remain intact.",
+            "owner": {
+              "reconciliation": "Aero",
+              "native": "Black Glass"
+            },
+            "limits": "This dispositions only the explicit proposed preview surfaces in the selected tests. It does not prove that no outside consumer ever existed or retire an externally consumed contract. Preview asset plans and generated law_results fields are not observed player outputs. Proposed V0/V1 preview compatibility and conversion do not establish current native API wire compatibility or a real outside consumer."
+          },
+          {
+            "subjects": [
+              "CONT-14"
+            ],
+            "disposition": "consolidate",
+            "historical_paths": [
+              "tests/extensions/Test-MIR4ModuleEcosystem.ps1",
+              "tests/extensions/Test-MIR4ModuleSdkMepMigration.ps1",
+              "tests/mir4/Test-MIR4ModuleEcosystemW05.ps1",
+              "validation/tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+              "validation/tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+              "validation/tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+              "validation/tests/mir4/Test-MIR4ModuleEcosystemW05.ps1",
+              "validation/tests/mir4/Test-MIR4PlatformPreview.ps1",
+              "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+              "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+              "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+              "tests/mir4/Test-MIR4PlatformPreview.ps1"
+            ],
+            "independent_expectation": "Retain the useful independent boundaries: detached caller/result data, truthful unavailable versus zero, bounded deterministic processing, rejected malformed/conflicting inputs before mutation and truthful unsupported capabilities. Old preview pagination and dependency-envelope grammar are not silently promoted into the separately versioned native API1 contract. Retain exclusion of SDK/tests/tools/docs from player ZIPs, deterministic packaging, preserved caller/source bytes, exact root/info/version/target/controller identity, useful integrity hashes and truthful support/maturity limits. Current release custody owns its inventory outside player ZIPs; old preview SBOM/provenance/manifest files are not imported into player packages.",
+            "current_implementation": [
+              "source/api/v1/data.lua",
+              "source/api/v1/runtime.lua",
+              "sdk",
+              "tools/package.py",
+              "tools/release.py"
+            ],
+            "current_host_controls": [
+              "tests/test_api.py::test_version_and_capabilities_are_detached_actual_metadata",
+              "tests/test_api.py::test_single_creation_is_immediate_and_detached",
+              "tests/test_api.py::test_family_keeps_order_and_permits_local_forward_references",
+              "tests/test_api.py::test_invalid_cycles_metatables_and_sparse_inputs_fail_before_writes",
+              "tests/test_runtime_api.py::test_unavailable_game_is_read_only_and_reported",
+              "tests/test_runtime_api.py::test_exact_native_research_fields_are_detached_without_derived_levels",
+              "tests/test_runtime_api.py::test_missing_and_invalid_inputs_are_distinct_read_only_results",
+              "tests/test_sdk.py::test_data_metadata_is_detached_and_reports_only_implemented_capabilities",
+              "tests/test_sdk.py::test_optional_example_is_inert_before_import_when_mir_is_absent",
+              "tests/test_sdk.py::test_runtime_unknown_method_and_missing_technology_remain_nonmutating",
+              "tests/test_package.py::test_reproducible_members_and_fixture_version",
+              "tests/test_package.py::test_committed_build_ignores_dirty_untracked_and_line_ending_worktree_bytes",
+              "tests/test_package.py::test_selected_editions_have_one_actual_import_closure_and_exact_codec",
+              "tests/test_release.py::test_freeze_builds_ten_canonical_archives_and_repeats_across_roots",
+              "tests/test_release.py::test_verification_rejects_missing_extra_changed_and_duplicate_assets",
+              "tests/test_release.py::test_verification_rejects_release_source_target_and_controller_identity_mutations",
+              "tests/test_release.py::test_verification_refuses_changed_archive_root_and_info_even_with_new_inventory_digests",
+              "tests/test_release.py::test_verification_rejects_absent_or_changed_f018_support_disposition",
+              "tests/test_package.py::test_every_edition_gets_the_complete_master_history_and_preserves_player_assets"
+            ],
+            "original_evidence": [
+              "spec/evidence/api1-documented-subset-qualification-r01.json"
+            ],
+            "remaining_executable_check": "Retain the existing API1.0 documented-subset/capability/version/budget freeze at its original 42032477 source and package inputs. Review the final candidate consumed API/helper, Generator, configuration, target, metadata, fixture/controller, engine/mod, save and endpoint inputs before evidence reuse; run only genuinely affected documented methods/closures and consumer/client boundaries. Preserve original execution identities, adverse receipts and both legacy runtime bridges. Unknown/computed/external consumers remain unknown; no arbitrary third-party method or historical-target qualification follows, and no unchanged API campaign is restarted.",
+            "owner": {
+              "reconciliation": "Aero",
+              "native": "Black Glass"
+            },
+            "limits": "Current named snapshot queries and immediate native declaration calls retain their own admitted contract. Mapping equivalent safety intent does not assert old/new wire compatibility, add pagination, claim arbitrary modpack support or relabel historical native results. Actual seventeen published 5.0.1 ZIPs pass local-versus-GitHub digest, sole root/info identity, CRC, license presence and developer-artifact exclusion readback. That verifies these released package boundaries only; it is not new native, final-successor or complete delivery acceptance."
+          },
+          {
+            "subjects": [
+              "CONT-14"
+            ],
+            "disposition": "obsolete-implementation-only",
+            "historical_paths": [
+              "tests/extensions/Test-MIR4ModuleSdkMepMigration.ps1"
+            ],
+            "independent_expectation": "Preserve the original MIR4-MODULE-SDK-MEP-TOOLING-V1 receipt identity and its writer-disabled decision. It migrates developer tooling, not player save state. Exact historical source/receipt hashes remain evidence without becoming a current generated-framework dependency.",
+            "current_implementation": [
+              "docs/development.md",
+              "spec/repository.md"
+            ],
+            "current_host_controls": [],
+            "original_evidence": [],
+            "remaining_executable_check": "No player migration is required by this tooling receipt. Preserve its original Git blob (55,477 bytes), SHA-256 AFA11010DBAB95012433522BA99B1481D02709E0ACE50C8E6BDFCBC3D732C0FA and published history; do not regenerate or import the old assurance estate.",
+            "owner": {
+              "reconciliation": "Aero",
+              "native": "Black Glass"
+            },
+            "limits": "Published player migration filenames and real saved-state transition obligations are untouched."
+          },
+          {
+            "subjects": [
+              "CONT-14"
+            ],
+            "disposition": "obsolete-implementation-only",
+            "historical_paths": [
+              "validation/tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+              "validation/tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+              "validation/tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+              "validation/tests/mir4/Test-MIR4ModuleEcosystemW05.ps1",
+              "validation/tests/mir4/Test-MIR4PlatformPreview.ps1",
+              "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+              "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+              "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+              "tests/mir4/Test-MIR4PlatformPreview.ps1"
+            ],
+            "independent_expectation": "Fixed counts and generated schemas/graph laws/target transports/ProcessIR/effect registries/state matrices/migration graphs/continuity templates, canonical JSON and inspector/build CLI shapes characterize the old developer preview estate. Preserve their original references and non-authority boundaries without making that implementation a prerequisite for current player behavior.",
+            "current_implementation": [
+              "spec/repository.md",
+              "spec/api.md",
+              "tools/check_repository.py",
+              "tools/package.py",
+              "tools/release.py"
+            ],
+            "current_host_controls": [
+              "tests/test_package.py::test_reproducible_members_and_fixture_version",
+              "tests/test_package.py::test_committed_build_ignores_dirty_untracked_and_line_ending_worktree_bytes",
+              "tests/test_package.py::test_selected_editions_have_one_actual_import_closure_and_exact_codec",
+              "tests/test_release.py::test_freeze_builds_ten_canonical_archives_and_repeats_across_roots",
+              "tests/test_release.py::test_verification_rejects_missing_extra_changed_and_duplicate_assets",
+              "tests/test_release.py::test_verification_rejects_release_source_target_and_controller_identity_mutations",
+              "tests/test_release.py::test_verification_refuses_changed_archive_root_and_info_even_with_new_inventory_digests",
+              "tests/test_release.py::test_verification_rejects_absent_or_changed_f018_support_disposition"
+            ],
+            "original_evidence": [],
+            "remaining_executable_check": "Use current repository checks, actual package allowlists and exact release verification. No old fixed-point generator, preview compiler, inspector, multi-language generated SDK, template archive, release-DAG engine or five-minute developer campaign is restored or rerun. Retain actual player/runtime/migration obligations through their existing CONT subjects.",
+            "owner": {
+              "reconciliation": "Aero",
+              "native": "Black Glass"
+            },
+            "limits": "Retiring generated preview machinery does not waive native target/save/client/performance, license, integrity, control or publication safeguards. The original preview migration matrix explicitly lacked complete public-release proof."
+          },
+          {
+            "subjects": [
+              "CONT-03"
+            ],
+            "disposition": "superseded",
+            "historical_paths": [
+              "validation/tests/mir4/Test-MIR4PlatformPreview.ps1",
+              "tests/mir4/Test-MIR4PlatformPreview.ps1"
+            ],
+            "independent_expectation": "Published 4.7.3 authored history retires reduced Classic for omitting established research, keeps Full/Classic stored setting values as compatibility inputs and requires one complete generation path. The old one-shot reduced-profile warning becomes inapplicable; its removal does not authorize losing setting identity, catalogue coverage or saved state.",
+            "current_implementation": [
+              "source/research/historical_settings.lua",
+              "source/research/historical_direct_settings.lua",
+              "source/research/settings.lua",
+              "source/runtime/library.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_settings_profile.py::test_registered_settings_are_the_single_active_profile_authority",
+              "tests/test_library_model.py::test_catalogue_is_complete_base_metadata_and_detached"
+            ],
+            "original_evidence": [],
+            "remaining_executable_check": "Retain mir-compiler-profile as a hidden startup string with full/classic values, and complete affected nondefault settings/catalogue/Library and saved-state checks under existing CONT-03/CONT-10/CONT-11 work. No reduced-Classic notice campaign or reduced generator is restored; already erased historical state cannot be fabricated.",
+            "owner": {
+              "reconciliation": "Aero",
+              "native": "Black Glass"
+            },
+            "limits": "The exact runtime inventory change removes only runtime.compiler-profile-notice. Current read-only host observation confirms its retained descriptor/default/values, not all native settings, saved views, lifecycle or target behavior."
+          }
+        ],
+        "active_description_reconciliation": {
+          "previously_pending": "Independent documented-subset/capability/version/budget freeze verdict.",
+          "existing_decision": "spec/evidence/api1-documented-subset-qualification-r01.json",
+          "closed_scope": "Original documented-modern-subset contract freeze at recorded 42032477 inputs, independently reviewed there.",
+          "still_open": "Retain the existing API1.0 documented-subset/capability/version/budget freeze at its original 42032477 source and package inputs. Review the final candidate consumed API/helper, Generator, configuration, target, metadata, fixture/controller, engine/mod, save and endpoint inputs before evidence reuse; run only genuinely affected documented methods/closures and consumer/client boundaries. Preserve original execution identities, adverse receipts and both legacy runtime bridges. Unknown/computed/external consumers remain unknown; no arbitrary third-party method or historical-target qualification follows, and no unchanged API campaign is restarted. Qualify the legacy-browser-tab-aware-search-correction on the final corrected package with explicit and retained Settings-tab legacy search and independent native/research-query state. Keep current frozen501 execution distinct;do not claim host opposition as native acceptance. Complete remaining historical/inter-release and actual legacy-consumer reconciliation without fabricating unavailable originals,retiring unknown consumers,or restoring unconsumed preview frameworks.",
+          "historical_evidence_modified": false,
+          "accepted_freeze_record": "CONT-14.api10-freeze-routing-reconciled"
+        },
+        "published_beta_readback": {
+          "tags": [
+            "v5.0.0",
+            "v5.0.1"
+          ],
+          "modern_5_0_1_player_zip_digests_and_api_presence_verified": true,
+          "scope": "Correct current published-beta documentation only; no final-candidate native applicability or stable product verdict."
+        },
+        "custody": "build/qualification/aero-api-preview-family-r01/",
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false,
+        "initial_review": {
+          "head": "4f08a72343b6498e4ec0ce9bf40ddfed88caf430",
+          "reviewed_against": "b11cdde1f4144fcbecf21ab13a4ea845e1ef8379",
+          "selected_blobs": 3,
+          "selected_tag_path_references": 53,
+          "validation": "Original 35 selected API/runtime/SDK/boundary controls and four required checks pass, full host run 41351317058. This is the original result identity; the follow-up receives its own exact-head checks.",
+          "custody": "build/qualification/aero-api-preview-continuity-r01/"
+        },
+        "classic_notice_retirement": {
+          "removed_id": "runtime.compiler-profile-notice",
+          "retired_source": {
+            "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+            "path": "source/prototypes/mir/runtime/compiler_profile_notice.lua",
+            "blob": "9456351817c0d1e82df13ed05f8a68527252922d",
+            "sha256": "35F9B6C4E003D5E3F771AE319C5682F5C122E07DBB8E7183D22D236B4C0C503D"
+          },
+          "published_decision": {
+            "tag": "v4.7.3",
+            "path": "README.md",
+            "blob": "53949515eb2f28dee94b653bd77f4553321d9217",
+            "sha256": "B01D30ED58CDD65B37BD73589052D23DF713796350B6FF1A939D5D1787FB7946",
+            "authored_retirement_paragraph": "**The reduced Classic option from 4.3.0 is retired because it omitted established MIR research.** The single generation path is required to preserve established useful definitions, but cannot reconstruct levels, bonuses or progress already erased by re-saving a factory with omitted technologies. Use an untouched backup where available. Performance and upgrade claims require qualification of the actual package and active mod configuration; the source cutover alone does not establish those results."
+          },
+          "deletion_checkpoint": "c88f9a44cf78e06a1929556b5c079b64edd117aa",
+          "retained_descriptor_host_observation": {
+            "name": "mir-compiler-profile",
+            "prototype_present": true,
+            "profile_spec_present": true,
+            "scope": "Read-only host descriptor observation for the current source target; not native setting/render/save acceptance.",
+            "native_execution": false,
+            "type": "string-setting",
+            "setting_type": "startup",
+            "hidden": true,
+            "default_value": "full",
+            "allowed_values": [
+              "full",
+              "classic"
+            ]
+          },
+          "other_seven_descriptors_are_not_dispositioned_by_a_count": true
+        },
+        "retained_runtime_subject_links": [
+          {
+            "historical_id": "runtime.agricultural-growth-speed",
+            "historical_package_member": "prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+            "historical_disable_or_removal_description": "stop-applying-and-reconstruct-cache",
+            "subjects": [
+              "CONT-09"
+            ],
+            "current_implementation": [
+              "source/runtime/agriculture.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_agriculture.py"
+            ],
+            "scope": "Preservation link to the existing subject, not a new native verdict or full behavioral disposition from preview metadata."
+          },
+          {
+            "historical_id": "runtime.maximum-level-control",
+            "historical_package_member": "prototypes/mir/runtime/maximum_level_control.lua",
+            "historical_disable_or_removal_description": "restore-only-properties-owned-by-this-feature",
+            "subjects": [
+              "CONT-07"
+            ],
+            "current_implementation": [
+              "source/runtime/caps.lua",
+              "source/runtime/legacy_caps.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_caps.py",
+              "tests/test_legacy_caps.py"
+            ],
+            "scope": "Preservation link to the existing subject, not a new native verdict or full behavioral disposition from preview metadata."
+          },
+          {
+            "historical_id": "runtime.planet-discovery-recovery",
+            "historical_package_member": "prototypes/mir/runtime/planet_discovery_recovery.lua",
+            "historical_disable_or_removal_description": "no-persistent-state",
+            "subjects": [
+              "CONT-11",
+              "CONT-13"
+            ],
+            "current_implementation": [],
+            "current_host_controls": [
+              "tests/test_discovery_recovery_fixture.py"
+            ],
+            "scope": "Preservation link to the existing subject, not a new native verdict or full behavioral disposition from preview metadata."
+          },
+          {
+            "historical_id": "runtime.productivity-family-adoption",
+            "historical_package_member": "prototypes/mir/runtime/productivity_family_adoption.lua",
+            "historical_disable_or_removal_description": "retain-engine-normalized-progress-and-drop-reconstructible-history",
+            "subjects": [
+              "CONT-08",
+              "CONT-12"
+            ],
+            "current_implementation": [
+              "source/runtime/competing_productivity.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_competing_productivity.py"
+            ],
+            "scope": "Preservation link to the existing subject, not a new native verdict or full behavioral disposition from preview metadata."
+          },
+          {
+            "historical_id": "runtime.scripted-dispatcher",
+            "historical_package_member": "prototypes/mir/runtime/scripted_techs.lua",
+            "historical_disable_or_removal_description": "dispatcher-not-registered-when-target-feature-disabled",
+            "subjects": [
+              "CONT-08"
+            ],
+            "current_implementation": [
+              "source/runtime/bootstrap.lua",
+              "source/runtime/scripted_effects.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_scripted_effects_lifecycle.py"
+            ],
+            "scope": "Preservation link to the existing subject, not a new native verdict or full behavioral disposition from preview metadata."
+          },
+          {
+            "historical_id": "runtime.settings-profile",
+            "historical_package_member": "prototypes/mir/runtime/settings_profile.lua",
+            "historical_disable_or_removal_description": "commands-and-interface-not-registered",
+            "subjects": [
+              "CONT-03",
+              "CONT-10"
+            ],
+            "current_implementation": [
+              "source/runtime/settings_profile.lua",
+              "source/runtime/settings_commands.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_settings_profile.py",
+              "tests/test_settings_commands.py"
+            ],
+            "scope": "Preservation link to the existing subject, not a new native verdict or full behavioral disposition from preview metadata."
+          },
+          {
+            "historical_id": "runtime.spoilage-preservation",
+            "historical_package_member": "prototypes/mir/runtime/effects/spoilage_preservation.lua",
+            "historical_disable_or_removal_description": "restore-owned-baseline-when-current-value-still-owned-else-rebase",
+            "subjects": [
+              "CONT-08"
+            ],
+            "current_implementation": [
+              "source/runtime/spoilage.lua",
+              "source/runtime/spoilage_contribution.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_spoilage.py"
+            ],
+            "scope": "Preservation link to the existing subject, not a new native verdict or full behavioral disposition from preview metadata."
+          }
+        ],
+        "discovery_recovery_scope_reconciliation": {
+          "historical_source": {
+            "tag": "v4.7.3",
+            "path": "source/adapters/f210/prototypes/mir/runtime/planet_discovery_recovery.lua",
+            "blob": "94ecc4ec773cf9a7429da1fa221c313a1fb49891",
+            "sha256": "0E2FC69B9338F9A4A1B2ED7DC4495D2EE08F0D02135CF07491BB352222BC1098",
+            "scope": "Original exact3.2.0/3.2.1-to3.2.2 guard only; no general current repair promise."
+          },
+          "independent_expectation": "The original F210 recovery handler accepts only MIR3.2.0/3.2.1-to3.2.2, not every configuration change or every future MIR upgrade. Preserve ambiguous foreign locks under the recorded maintainer decision.",
+          "maintainer_policy": {
+            "path": "spec/inventory/migration-origins.json",
+            "verbatim_answer": "Preserve ambiguous locks; explicit repair"
+          },
+          "existing_applicable_boundary": {
+            "path": "spec/evidence/discovery-current7a2-native-chain-r01.json",
+            "blob": "47a916c6e3e6dfd2d73c618c8144e034f27eed53",
+            "sha256": "56D34B48BDAAD3E142DCD4993567BFFB9CFE4C5D1518C5BBBB02D28AF9BD9A74",
+            "scope": "Original current7a2/protected3.2.0 no-helper boundary and its limits; no new result or wider source coverage."
+          },
+          "remaining_executable_check": "Retain original 7a2/protected3.2.0/005D/8DC no-helper result and review final consumed inputs through the existing selected older-contract matrix. Do not infer 3.2.1, arbitrary lock repair or full historical coverage; no new helper or native campaign is required merely because this preview descriptor exists.",
+          "native_execution": false
+        },
+        "followup_package_observation": {
+          "release": "v5.0.1",
+          "archives": 17,
+          "checks": "Actual released digests, sole root/info identity, CRC, license presence and absence of developer/preview artifacts.",
+          "asset_mutations": 0,
+          "new_candidate_packages_built": 0,
+          "scope": "Package boundary readback only; global stable and final-candidate gates remain open."
+        },
+        "overlap_reconciliation": {
+          "accepted_record": "CONT-14.historical-api-sdk-entrypoint-intents",
+          "accepted_reviewed_against": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+          "selected_blobs": 17,
+          "already_reconciled_blobs": [
+            "22f6f391dc55d391a0c73cb6ea8f09c763cda73b",
+            "7804f9c0998e8cfccd826188ae565f7d26f1dc1a",
+            "c954e2ad2684d06e3781a1a4213e04db240b4bee",
+            "edee76c07805fea25bf08aa3dbff500aa8ca7e41"
+          ],
+          "additional_selected_blobs": 13,
+          "disposition": "Consolidate the shared SDK validation, discovery and tooling-custody intents with the accepted record. The 17 selected blobs and 127 tag/path references describe this bounded review corpus, not 17 newly uncovered behaviors. Preserve the accepted source variants, freeze readback, legacy Settings-search correction and its required native check unchanged."
+        },
+        "source_reference_label_correction": {
+          "submitted_head": "35a5205460da093eb92c576af9f14486e6b31f76",
+          "submitted_label": "v4.2.0",
+          "actual_retained_tag": "v4.2.0-stable",
+          "actual_commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "references": 7,
+          "scope": "Correct new Git-tag labels only. Original submitted commits, all127 commit/path/blob/hash references, authored decisions, original API freeze and remaining applicability/unknown-consumer obligations are retained."
+        }
       }
     ],
     "stable_coverage_review": {
@@ -7041,19 +8366,20 @@
           "subjects": [
             "CONT-14"
           ],
-          "independent_expectation": "Draft API query/capability/version/budget and actual useful independent-consumer state/effect boundaries must be verified before API 1.0 stability; queries do not mutate state.",
+          "independent_expectation": "The frozen documented API1.0 subset retains read-only query/capability/version semantics, bounded admission and useful independent-consumer state/effect behavior within qualified inputs; evidence reuse follows actual consumed inputs.",
           "implementation": [
             "source/api/v1/data.lua",
             "source/api/v1/runtime.lua",
             "sdk"
           ],
           "applicable_evidence": [
-            "spec/evidence/api-production-current7b0-aero-applicability-r01.json"
+            "spec/evidence/api-production-current7b0-aero-applicability-r01.json",
+            "spec/evidence/api1-documented-subset-qualification-r01.json"
           ],
-          "remaining_executable_check": "Finish documented-subset/version/capability/budget verdict and consumed-input applicability. Reuse only the methods/closures already observed; execute genuinely affected uncovered consumer/client boundaries.",
+          "remaining_executable_check": "Retain the existing API1.0 documented-subset/capability/version/budget freeze at its original 42032477 source and package inputs. Review the final candidate consumed API/helper, Generator, configuration, target, metadata, fixture/controller, engine/mod, save and endpoint inputs before evidence reuse; run only genuinely affected documented methods/closures and consumer/client boundaries. Preserve original execution identities, adverse receipts and both legacy runtime bridges. Unknown/computed/external consumers remain unknown; no arbitrary third-party method or historical-target qualification follows, and no unchanged API campaign is restarted. Qualify the legacy-browser-tab-aware-search-correction on the final corrected package with explicit and retained Settings-tab legacy search and independent native/research-query state. Keep current frozen501 execution distinct;do not claim host opposition as native acceptance.",
           "owner": "Aero; Black Glass executes affected checks",
           "independent_review": "Aero",
-          "status": "open; original evidence is not relabelled as current"
+          "status": "original documented-subset contract freeze recorded; final-candidate applicability and changed legacy-search native check remain open"
         },
         {
           "subjects": [
