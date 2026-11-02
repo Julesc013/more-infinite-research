@@ -5,7 +5,7 @@ applies_to: "MIR players and upgrades"
 audience: player
 doc_type: guide
 owner: mir-maintainers
-last_reviewed: 2026-10-31
+last_reviewed: 2026-11-02
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -19,6 +19,8 @@ source_of_truth_for:
 ## Candidate editions
 
 - Choose the package for the Factorio version you actually run. Do not choose another package because its number is larger.
+
+- MIR 5 and later player ZIP downloads use **MIR x.x.x for Factorio x.x.x (zip)**. The first version is MIR's release; the Factorio version is that archive's declared minimum. Best-effort builds retain the limits below.
 
 | Factorio family | Minimum version | Player-facing scope |
 | --- | --- | --- |
@@ -148,7 +150,7 @@ source_of_truth_for:
 - Exporting and checking a profile never applies settings or changes research. Profiles do not back up other mods, map settings or research.
 
 - **Export Diagnostics** or `/mir-diagnostics-export` replaces the latest support report at `script-output/more-infinite-research/mir.log` and exports the full settings profile.
-- In Library Help, **Startup settings** and **Omission reasons** choose the preview/report sections for your player. Omission reasons cover the current authored Availability facts. **Refresh** updates the snapshot and **Select text to copy** selects it; neither writes files. **Export Diagnostics** always writes the full settings profile separately, even when its inline report section is unchecked.
+- In Library **Debug**, **Startup settings** and **Omission reasons** choose the preview/report sections for your player. Omission reasons cover the current authored Availability facts. **Refresh observations** updates the snapshot and **Select text to copy** selects it; neither writes files. **Export Diagnostics** always writes the full settings profile separately, even when its inline report section is unchecked.
 - Attach `factorio-current.log` separately for startup or crash problems; MIR cannot copy the engine log.
 - File-write errors leave gameplay unchanged. A partial export may still leave its already-written settings file.
 
