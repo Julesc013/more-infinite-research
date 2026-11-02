@@ -228,12 +228,16 @@ class ApiTests(unittest.TestCase):
           end
         ''')
 
-        self.fresh()
         # These immutable consumer fixtures describe the published 5.0.1 identity.
-        # Select that identity for this host scenario without changing their pins.
+        # Select a separate historical target before loading its API instance.
         self.lua.execute('''
-          package.loaded["__more-infinite-research__/platform/target"].distribution_version = "5.0.21001"
-          mods["more-infinite-research"] = "5.0.21001"
+          local historical_target = assert(loadfile(player_root .. "/platform/target.lua"))()
+          historical_target.distribution_version = "5.0.21001"
+          package.loaded["__more-infinite-research__/platform/target"] = historical_target
+          data = world()
+          mods = {["more-infinite-research"] = "5.0.21001"}
+          package.loaded["__more-infinite-research__.api.v1.data"] = nil
+          api = require("__more-infinite-research__.api.v1.data")
         ''')
         self.lua.execute(r'''
           local alpha_private = namespace_target(namespace_alpha_target)
