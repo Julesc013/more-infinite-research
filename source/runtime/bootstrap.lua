@@ -330,7 +330,34 @@ local function discard_absent_competing_productivity_state()
   storage.mir_competing_productivity = nil
 end
 
+-- PRIVATE DIAGNOSTIC BUILD ONLY: read-only snapshots for the exact protected
+-- SIF upgrade failure. This is not an acceptance package or a state repair.
+local function trace_sif_disablement(phase)
+  if target.id ~= "f200" or active_mods["space-is-fake"] ~= "1.0.60" then return end
+  local out = {phase=phase, forces={}}
+  local names = {"recipe-prod-research_low_density_structure-1", "recipe-prod-research_plastic-1",
+    "recipe-prod-research_processing_unit-1", "recipe-prod-research_rocket_fuel-1",
+    "recipe-prod-research_steel-1", "mining-productivity-3"}
+  for _, force_name in ipairs({"player", "mir5-sif-retained-foreign"}) do
+    local force = game.forces[force_name]
+    if force then
+      local rows = {}
+      for _, name in ipairs(names) do
+        local technology = force.technologies[name]
+        if technology then
+          rows[name] = {level=technology.level, researched=technology.researched,
+            enabled=technology.enabled, saved_progress=technology.saved_progress,
+            prototype_enabled=technology.prototype.enabled, prototype_hidden=technology.prototype.hidden}
+        end
+      end
+      out.forces[force_name] = rows
+    end
+  end
+  log("[MIR5_SIF_DISABLE_DIAGNOSTIC] " .. helpers.table_to_json(out))
+end
+
 local function on_configuration_changed(event)
+  trace_sif_disablement("configuration-entry")
   local changes = event and event.mod_changes
   local muria = type(changes) == "table" and changes.Muria
   local mir = type(changes) == "table" and changes["more-infinite-research"]
@@ -348,16 +375,22 @@ local function on_configuration_changed(event)
   if native_credits then
     native_credits.preflight_legacy_preference_transition(event, relevant_competing_provider_transition(event))
   end
+  trace_sif_disablement("after-native-credit-preflight")
   local module_credit_plan = legacy_module_credits and legacy_module_credits.preflight(event)
   local cannon_credit_plan = legacy_cannon_credits and legacy_cannon_credits.preflight(event)
+  trace_sif_disablement("after-module-cannon-preflight")
   reconcile_imersite()
+  trace_sif_disablement("after-imersite")
   lifecycle.on_configuration_changed(event)
+  trace_sif_disablement("after-lifecycle")
   if native_credits then native_credits.on_configuration_changed(event) end
+  trace_sif_disablement("after-native-credits")
   if competing_productivity then
     competing_productivity.on_configuration_changed(event)
   else
     discard_absent_competing_productivity_state()
   end
+  trace_sif_disablement("after-competing-productivity")
   if scripted_effects then
     scripted_effects.on_configuration_changed(event)
   else
@@ -374,12 +407,18 @@ local function on_configuration_changed(event)
       end
     end
   end
+  trace_sif_disablement("after-scripted-effects")
   if legacy_module_credits then legacy_module_credits.apply(module_credit_plan) end
+  trace_sif_disablement("after-module-credits")
   if legacy_cannon_credits then legacy_cannon_credits.apply(cannon_credit_plan) end
+  trace_sif_disablement("after-cannon-credits")
   library.on_configuration_changed(event)
+  trace_sif_disablement("after-library")
   reconcile_repair()
+  trace_sif_disablement("after-repair")
   reconcile_translations()
   if diagnostics then diagnostics.startup("MIR configuration change") end
+  trace_sif_disablement("configuration-exit")
 end
 
 local function on_load()
