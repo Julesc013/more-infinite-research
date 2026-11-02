@@ -1,5 +1,6 @@
 """MIRSET1 settings-profile host controls (Lua 5.2; not native evidence)."""
 import argparse
+import json
 from pathlib import Path
 import sys
 import unittest
@@ -273,6 +274,135 @@ class SettingsProfileTests(unittest.TestCase):
           assert(profile == nil and decode_error == "empty")
           profile, decode_error = codec.decode("not-a-profile", helpers)
           assert(profile == nil and decode_error == "unsupported profile format")
+        ''')
+
+    def test_all_registered_effect_defaults_export_in_full_and_disappear_in_compact(self):
+        # Published round-trip fixture635deae0 tests the entire effect-setting
+        # surface, independently of any serializer's selected examples/counts.
+        self.lua.execute(r'''
+          expected_effect_defaults = {}
+          for _, spec in ipairs(config.prototypes()) do
+            if spec.name:find("^ips%-effect%-per%-level%-") or spec.name:find("^mir%-effect%-per%-level%-") then
+              assert(spec.type == "int-setting" or spec.type == "double-setting")
+              assert(config.validate_value(spec.name, spec.default_value))
+              if spec.minimum_value ~= nil then
+                assert(not config.validate_value(spec.name, spec.minimum_value - 1))
+              end
+              if spec.maximum_value ~= nil then
+                assert(not config.validate_value(spec.name, spec.maximum_value + 1))
+              end
+              expected_effect_defaults[spec.name] = spec.default_value
+            end
+          end
+          full_effect_wire = assert(facade.export_string({compact=false}))
+          compact_effect_wire = assert(facade.export_string({compact=true}))
+        ''')
+        expected = dict(self.lua.globals().expected_effect_defaults.items())
+        self.assertIn("ips-effect-per-level-research_gears", expected)
+        self.assertIn("mir-effect-per-level-weapon-shooting-speed", expected)
+        for mode in ["full", "compact"]:
+            wire = self.lua.globals()[mode + "_effect_wire"]
+            self.assertTrue(wire.startswith("MIRSET1:"))
+            profile = json.loads(wire[len("MIRSET1:"):])
+            self.assertEqual(profile["metadata"]["export_mode"], mode)
+            settings_values = profile["settings"]
+            # The empty Lua table encodes as []; this port checks zero
+            # settings, as the published fixture does, not object spelling.
+            if isinstance(settings_values, list):
+                self.assertEqual(settings_values, [])
+                settings_values = {}
+            self.assertIsInstance(settings_values, dict)
+            effects = {name: value for name, value in settings_values.items()
+                       if name.startswith(("ips-effect-per-level-", "mir-effect-per-level-"))}
+            self.assertEqual(effects, expected if mode == "full" else {})
+
+    def test_published_numeric_dropdown_imports_reach_effects_and_export_without_raw_writes(self):
+        # Independent inputs/ranges from published4.7.3's profile catalogue
+        # and round-trip fixture635deae0, not native dropdown values.
+        self.lua.execute(r'''
+          portable_values = {
+            ["mir-pipeline-extent-multiplier"]=123.45,
+            ["mir-prototype-productivity-cap"]=4321.5,
+            ["mir-prototype-efficiency-cap"]=-83.25,
+            ["mir-prototype-pollution-cap"]=-91.125,
+            ["mir-prototype-speed-floor"]=-75.5,
+            ["mir-prototype-speed-cap"]=1234.5,
+            ["mir-prototype-quality-cap"]=678.9,
+            ["mir-recycling-return-chance"]=12.34,
+          }
+          for name,value in pairs(portable_values) do
+            local ok,why=config.validate_value(name,value)
+            assert(ok,name..": "..tostring(why))
+            assert(config.spec(name).type=="string-setting")
+          end
+          decoded.portable={schema=1,settings=portable_values}
+          settings.startup[config.import_setting_name].value="MIRSET1:portable"
+          local status=facade.validate_string("MIRSET1:portable")
+          assert(status.valid and status.recognized==8 and status.invalid==0 and status.unknown==0)
+          local values=config.resolve(settings.startup,helpers)
+          for name,value in pairs(portable_values) do
+            assert(values.options[name]==value)
+            assert(settings.startup[name].value==config.default_value(name))
+          end
+          local raw={recipe={ordinary={maximum_productivity=1}},
+            ["assembling-machine"]={a={effect_receiver={foreign=7}}},
+            pipe={p={fluid_box={max_pipeline_extent=100}}}}
+          require("overrides.prototype_limits").apply(raw,values.options)
+          require("overrides.pipeline_extent").apply(raw,values.options["mir-pipeline-extent-multiplier"])
+          local receiver=raw["assembling-machine"].a.effect_receiver
+          assert(math.abs(raw.recipe.ordinary.maximum_productivity-43.215)<1e-12)
+          assert(math.abs(receiver.consumption_limits.low+.8325)<1e-12)
+          assert(math.abs(receiver.pollution_limits.low+.91125)<1e-12)
+          assert(receiver.speed_limits.low==-.755 and receiver.speed_limits.high==12.345)
+          assert(receiver.quality_limits.high==6.789 and receiver.foreign==7)
+          assert(raw.pipe.p.fluid_box.max_pipeline_extent==123)
+          portable_wire=assert(facade.export_string({compact=false}))
+          assert(settings.startup[config.import_setting_name].value=="MIRSET1:portable")
+        ''')
+        exported = json.loads(self.lua.globals().portable_wire[len("MIRSET1:"):])["settings"]
+        for name, value in self.lua.globals().portable_values.items():
+            self.assertEqual(exported[name], value)
+
+    def test_published_import_only_boundaries_and_aliases_do_not_expand_dropdowns(self):
+        self.lua.execute(r'''
+          local ranges={
+            {"mir-pipeline-extent-multiplier",.1,100000},
+            {"mir-prototype-productivity-cap",0,100000},
+            {"mir-prototype-efficiency-cap",-99.99,0},
+            {"mir-prototype-pollution-cap",-99.99,0},
+            {"mir-prototype-speed-floor",-99.99,0},
+            {"mir-prototype-speed-cap",0,100000},
+            {"mir-prototype-quality-cap",0,100000},
+            {"mir-recycling-return-chance",0,25},
+          }
+          for _,row in ipairs(ranges) do
+            assert(config.validate_value(row[1],row[2]) and config.validate_value(row[1],row[3]))
+            for _,bad in ipairs({row[2]-.01,row[3]+.01,true,{},0/0,math.huge,-math.huge}) do
+              assert(not config.validate_value(row[1],bad),row[1].." accepted invalid import")
+            end
+          end
+          assert(not config.validate_value("mir-science-pack-ingredient-policy",12.34))
+          assert(not config.validate_value("not-an-authored-setting",12.34))
+          local aliases={
+            ["mir-prototype-speed-cap"]="bonus-100000",
+            ["mir-prototype-quality-cap"]="bonus-100000",
+            ["mir-recycling-return-chance"]="percent-25",
+          }
+          for name,value in pairs(aliases) do
+            assert(config.validate_value(name,value))
+            for _,visible in ipairs(config.spec(name).allowed_values) do assert(visible~=value) end
+          end
+          decoded.aliases={schema=1,settings=aliases}
+          settings.startup[config.import_setting_name].value="MIRSET1:aliases"
+          local effective=config.effective_values(settings.startup,helpers)
+          for name,value in pairs(aliases) do assert(effective[name]==value) end
+          decoded.invalid={schema=1,settings={["mir-recycling-return-chance"]=25.1}}
+          settings.startup[config.import_setting_name].value="MIRSET1:invalid"
+          effective=config.effective_values(settings.startup,helpers)
+          assert(effective["mir-recycling-return-chance"]==config.default_value("mir-recycling-return-chance"))
+          settings.startup[config.import_setting_name].value=""
+          settings.startup["mir-pipeline-extent-multiplier"].value=123.45
+          assert(not pcall(config.effective_values,settings.startup,helpers),"raw dropdown admitted a numeric import")
         ''')
 
     def test_runtime_facade_exports_effective_values_and_reports_read_only_counts(self):

@@ -1,0 +1,512 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalSettingsProfileRoundtripIntentReviewV1",
+  "status": "bounded-source-reconciliation-with-profile-import-correction-native-pending",
+  "reviewed_against": "c837d0cab1eb7f4cc58106635e6fb2d99237491f",
+  "subjects": [
+    "CONT-03",
+    "CONT-07",
+    "CONT-13",
+    "CONT-14",
+    "SET-01"
+  ],
+  "scope": "Exactly nine deduplicated assert-settings-profile-roundtrip/data-final-fixes.lua bodies and their retained target aliases. This is not all settings, inter-release history or native serialization acceptance.",
+  "source_bindings": {
+    "bodies": [
+      {
+        "blob": "1af96f3db8c43e80de1ddd8e52ee878a92acd0fe",
+        "bytes": 7154,
+        "sha256": "9feca4382bacf7ea32676bda32fdfada609b1fdb2dd90f9ff3a44c79b3977014",
+        "path_tag_bindings": [
+          {
+            "path": ".mir/target-lines/1.3.0/fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "3.2.0",
+              "3.2.1",
+              "3.2.2",
+              "3.2.3",
+              "3.2.5"
+            ]
+          },
+          {
+            "path": ".mir/target-lines/1.4.0/fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "3.2.0",
+              "3.2.1",
+              "3.2.2",
+              "3.2.3",
+              "3.2.5"
+            ]
+          },
+          {
+            "path": ".mir/target-lines/1.5.0/fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "3.2.0",
+              "3.2.1",
+              "3.2.2",
+              "3.2.3",
+              "3.2.5"
+            ]
+          },
+          {
+            "path": ".mir/target-lines/1.6.0/fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "3.2.0",
+              "3.2.1",
+              "3.2.2",
+              "3.2.3",
+              "3.2.5"
+            ]
+          },
+          {
+            "path": ".mir/target-lines/1.7.1/fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "3.2.0",
+              "3.2.1",
+              "3.2.2",
+              "3.2.3",
+              "3.2.5"
+            ]
+          },
+          {
+            "path": "fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "1.3.0",
+              "1.3.5",
+              "1.3.9",
+              "1.4.0",
+              "1.4.5",
+              "1.4.9",
+              "1.5.0",
+              "1.5.5",
+              "1.5.9",
+              "1.6.0",
+              "1.6.5",
+              "1.6.9",
+              "1.7.0",
+              "1.7.1",
+              "1.7.5",
+              "1.7.9"
+            ]
+          }
+        ]
+      },
+      {
+        "blob": "3f285b4e58d233c29fd9fb623281792adc66925f",
+        "bytes": 3960,
+        "sha256": "e6818d3476ccf92c443810477934661f2f154da19523cb13effb46bd356dff8a",
+        "path_tag_bindings": [
+          {
+            "path": "fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "2.3.0",
+              "3.0.0"
+            ]
+          }
+        ]
+      },
+      {
+        "blob": "635deae0d9670a3cc36a65dbed2d1def54b12144",
+        "bytes": 8876,
+        "sha256": "32d3cc2438adefbf7c41a4816f9654d49d967a08cb5c9037e3b906aceb193281",
+        "path_tag_bindings": [
+          {
+            "path": "fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "3.1.0",
+              "3.1.1",
+              "3.1.2"
+            ]
+          }
+        ]
+      },
+      {
+        "blob": "7a484627474f3a4ce5f79d16e86179d905e16bd1",
+        "bytes": 9551,
+        "sha256": "fdd2a8a01b83fff799172b844bab0536fc68fe264a5667fecf71684716939332",
+        "path_tag_bindings": [
+          {
+            "path": ".mir/target-lines/0.10.0/fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "3.2.0",
+              "3.2.1",
+              "3.2.2",
+              "3.2.3",
+              "3.2.5"
+            ]
+          },
+          {
+            "path": ".mir/target-lines/0.11.0/fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "3.2.0",
+              "3.2.1",
+              "3.2.2",
+              "3.2.3",
+              "3.2.5"
+            ]
+          },
+          {
+            "path": ".mir/target-lines/0.12.0/fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "3.2.0",
+              "3.2.1",
+              "3.2.2",
+              "3.2.3",
+              "3.2.5"
+            ]
+          },
+          {
+            "path": ".mir/target-lines/0.6.0/fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "3.2.0",
+              "3.2.1",
+              "3.2.2",
+              "3.2.3",
+              "3.2.5"
+            ]
+          },
+          {
+            "path": ".mir/target-lines/0.7.0/fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "3.2.0",
+              "3.2.1",
+              "3.2.2",
+              "3.2.3",
+              "3.2.5"
+            ]
+          },
+          {
+            "path": ".mir/target-lines/0.8.0/fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "3.2.0",
+              "3.2.1",
+              "3.2.2",
+              "3.2.3",
+              "3.2.5"
+            ]
+          },
+          {
+            "path": ".mir/target-lines/0.9.0/fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "3.2.0",
+              "3.2.1",
+              "3.2.2",
+              "3.2.3",
+              "3.2.5"
+            ]
+          },
+          {
+            "path": ".mir/target-lines/1.8.2/fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "3.2.0",
+              "3.2.1",
+              "3.2.2",
+              "3.2.3",
+              "3.2.5"
+            ]
+          },
+          {
+            "path": ".mir/target-lines/1.9.4/fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "3.2.0",
+              "3.2.1",
+              "3.2.2",
+              "3.2.3",
+              "3.2.5"
+            ]
+          },
+          {
+            "path": ".mir/target-lines/2.4.5/fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "3.2.0",
+              "3.2.1",
+              "3.2.2",
+              "3.2.3",
+              "3.2.5"
+            ]
+          },
+          {
+            "path": ".mir/target-lines/2.4.9/fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "3.2.0",
+              "3.2.1",
+              "3.2.2",
+              "3.2.3",
+              "3.2.5"
+            ]
+          },
+          {
+            "path": ".mir/target-lines/3.1.9/fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "3.2.0",
+              "3.2.1",
+              "3.2.2",
+              "3.2.3",
+              "3.2.5"
+            ]
+          },
+          {
+            "path": "fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "0.10.0",
+              "0.11.0",
+              "0.12.0",
+              "0.6.0",
+              "0.7.0",
+              "0.8.0",
+              "0.9.0",
+              "1.8.2",
+              "1.8.5",
+              "1.8.9",
+              "1.9.4",
+              "1.9.5",
+              "1.9.9",
+              "2.4.0",
+              "2.4.5",
+              "2.4.9",
+              "2.5.0",
+              "2.5.10",
+              "2.5.11",
+              "2.5.5",
+              "2.5.9",
+              "3.1.5",
+              "3.1.9",
+              "3.2.0",
+              "3.2.1",
+              "3.2.10",
+              "3.2.11",
+              "3.2.2",
+              "3.2.3",
+              "3.2.5",
+              "3.2.9",
+              "v4.0.0",
+              "v4.1.0",
+              "v4.2.0",
+              "v4.2.0-stable"
+            ]
+          }
+        ]
+      },
+      {
+        "blob": "9c0edfdce416685815a7e9f37076fc2ded3d67d6",
+        "bytes": 7152,
+        "sha256": "1a24d6ccce1a6406060d803a3960ee94e79e488879ec9ddd67fd46bd2b5468d2",
+        "path_tag_bindings": [
+          {
+            "path": "fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "1.8.1"
+            ]
+          }
+        ]
+      },
+      {
+        "blob": "a6f9a7fa551a431aaf39f797bf7dcaed404ac9ef",
+        "bytes": 6978,
+        "sha256": "fa5b0ee0e7045e0c07595e7da7b8ffc6840e7f7388fec7738deb440b80de4ae8",
+        "path_tag_bindings": [
+          {
+            "path": "fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "1.8.0"
+            ]
+          }
+        ]
+      },
+      {
+        "blob": "d081e0413b8141e7dbb25b97023c26c4625a7b1f",
+        "bytes": 5638,
+        "sha256": "6db6f979ba3d937ab3087a7bb858c1c71a316e0ea0342bd10fe04c8d9bee077e",
+        "path_tag_bindings": [
+          {
+            "path": "fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "1.9.3"
+            ]
+          }
+        ]
+      },
+      {
+        "blob": "dea579ea32c8956e2828eb06b3cc6ccfcc5a2b53",
+        "bytes": 5897,
+        "sha256": "08b3e1986ae4a3e824759af3371e818c38af81cefe2ac03e4083264c69610277",
+        "path_tag_bindings": [
+          {
+            "path": "fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "2.3.5",
+              "3.0.5"
+            ]
+          }
+        ]
+      },
+      {
+        "blob": "e148d09fcc3ae742bd31c9a2ae46deda8e75ce4a",
+        "bytes": 11352,
+        "sha256": "e51ccfe98c4369c8efadb60e33bf3916219eb3da13657272c4da8ac01e648327",
+        "path_tag_bindings": [
+          {
+            "path": "fixtures/assert-settings-profile-roundtrip/data-final-fixes.lua",
+            "tags": [
+              "v4.2.1",
+              "v4.2.2",
+              "v4.3.0",
+              "v4.4.0",
+              "v4.4.1",
+              "v4.4.2",
+              "v4.5.0",
+              "v4.5.1",
+              "v4.5.2",
+              "v4.6.0",
+              "v4.7.0",
+              "v4.7.1",
+              "v4.7.2",
+              "v4.7.3"
+            ]
+          }
+        ]
+      }
+    ],
+    "tag_commit_source": "spec/inventory/continuity.json#/historical_preservation_audit/source_inventory/tag_commits",
+    "local_alias_rule": "v4.2.0 is a local alias for the same6d19c874 commit as live remote v4.2.0-stable; do not describe the absent remote alias as published.",
+    "all_canonical_remote_tags_and_git_members_verified": true,
+    "exact_reference_count": 160,
+    "canonical_remote_tag_count": 74
+  },
+  "independent_published_implementation": {
+    "archive": "more-infinite-research_4.7.21003.zip",
+    "bytes": 1463293,
+    "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+    "archive_identity_source": "spec/inventory/migration-origins.json",
+    "members": [
+      {
+        "path": "prototypes/mir/settings/catalog.lua",
+        "bytes": 21844,
+        "sha256": "82e2457b3a0550b196cb741f93911f98586995e36c46754750cdaea9a2d1410d"
+      },
+      {
+        "path": "prototypes/mir/settings/pipeline_extent.lua",
+        "bytes": 992,
+        "sha256": "996b9f61fc61e9bca14eb8f2d9aaec7521ca72f40f369700903f38726204d09c"
+      },
+      {
+        "path": "prototypes/mir/settings/prototype_limits.lua",
+        "bytes": 7358,
+        "sha256": "80c7ba32fc1b09e4ecb6135c2c0200e836f4f3bc71013c510514fa6590a6a97c"
+      }
+    ]
+  },
+  "dispositions": [
+    {
+      "obligation": "Deterministic MIRSET1 full/compact profiles preserve recognized effective values, hidden settings, false and fractional numbers; invalid/unknown values keep their classification and fallback.",
+      "disposition": "retain-consolidated-controls",
+      "implementation": [
+        "source/research/settings_profile.lua",
+        "source/research/settings.lua",
+        "source/runtime/settings_profile.lua"
+      ],
+      "controls": [
+        "tests/test_settings_profile.py::test_codec_has_canonical_identity_and_strict_compact_option",
+        "tests/test_settings_profile.py::test_import_precedence_uses_profile_validation_before_consumer_normalization",
+        "tests/test_settings_profile.py::test_runtime_facade_exports_effective_values_and_reports_read_only_counts",
+        "tests/test_settings_commands.py::test_full_export_preserves_effective_values_and_command_metadata"
+      ],
+      "limit": "Host JSON/string helpers and command stubs do not establish native compression, actual files or gameplay."
+    },
+    {
+      "obligation": "Every registered effect-setting default validates, survives full export and disappears from compact export; declared numeric bounds reject outside values and catalogue descriptors remain detached.",
+      "disposition": "port-export-completeness-and-consolidate-isolation",
+      "independent_source": "635deae0d9670a3cc36a65dbed2d1def54b12144 and its7a484627/e148d09f extensions",
+      "controls": [
+        "tests/test_settings_profile.py::test_all_registered_effect_defaults_export_in_full_and_disappear_in_compact",
+        "tests/test_settings_profile.py::test_settings_descriptors_remain_stable_after_caller_mutation_and_parse_closure"
+      ],
+      "opposition": "Missing one registered effect, leaking its default into compact output and accepting its out-of-range value each evade the prior eleven methods but fail the new control.",
+      "limit": "Do not carry forward the weak at-least70 count as a catalogue oracle; check the registered effect-setting domain and independent named seeds. Empty-table settings count is zero for either empty JSON container spelling."
+    },
+    {
+      "obligation": "Published numeric percentages and three import-only legacy values remain accepted by profiles while native dropdown types/choices stay unchanged.",
+      "disposition": "correct-demonstrated-import-regression",
+      "failure": "MIR5 valid() rejected the published numeric dropdown inputs and legacy aliases before the consumer, silently falling back to raw defaults. Two independent controls fail at c837d0cab before correction.",
+      "correction": "A finite eight-setting range/three-alias policy in research.settings restores profile admission and validates the selected imported value as imported. Raw startup values remain subject to native dropdown validation. No consumer, identity, default or prototype mutation change.",
+      "numeric_ranges": {
+        "mir-pipeline-extent-multiplier": [
+          0.1,
+          100000
+        ],
+        "mir-prototype-productivity-cap": [
+          0,
+          100000
+        ],
+        "mir-prototype-efficiency-cap": [
+          -99.99,
+          0
+        ],
+        "mir-prototype-pollution-cap": [
+          -99.99,
+          0
+        ],
+        "mir-prototype-speed-floor": [
+          -99.99,
+          0
+        ],
+        "mir-prototype-speed-cap": [
+          0,
+          100000
+        ],
+        "mir-prototype-quality-cap": [
+          0,
+          100000
+        ],
+        "mir-recycling-return-chance": [
+          0,
+          25
+        ]
+      },
+      "import_only_aliases": {
+        "mir-prototype-speed-cap": "bonus-100000",
+        "mir-prototype-quality-cap": "bonus-100000",
+        "mir-recycling-return-chance": "percent-25"
+      },
+      "controls": [
+        "tests/test_settings_profile.py::test_published_numeric_dropdown_imports_reach_effects_and_export_without_raw_writes",
+        "tests/test_settings_profile.py::test_published_import_only_boundaries_and_aliases_do_not_expand_dropdowns"
+      ],
+      "host_observations": "The restored profile reaches actual pipeline/prototype-limit modules, changes the selected fields and reexports unchanged numeric values without writing raw startup objects. Exact endpoints, invalid types/nonfinite/outside values, unqualified names, hidden aliases and invalid-import fallback are checked.",
+      "remaining_native": "Observe these imported percentages and aliases on an exact corrected package through actual helpers, changed prototype/runtime output, export/import and affected save/reload. Reuse other results only after consumed-input applicability review.",
+      "owner": "Aero source/host correction and independent expectations; Black Glass affected native packet/execution."
+    },
+    {
+      "obligation": "Reduced targets retain their actual settings surface and localized continuation names/descriptions without claiming an unsupported native codec.",
+      "disposition": "consolidate-target-controls-and-retire-placeholder-assertion",
+      "controls": [
+        "tests/test_early_target_adapter.py::test_all_seven_early_catalogues_and_rejected_inputs",
+        "tests/test_historical_direct.py::test_exact_profile_surfaces_and_settings",
+        "tests/test_historical_direct.py::test_numeric_formula_maximum_visibility_and_constant_overlay_shapes"
+      ],
+      "limit": "The old reduced branch concatenates one fixed unavailable-codec marker twice; that proves no serialization. Its all-technologies suffix scan is an obsolete test mechanism, not authority for a new production scan. F018 and earlier best-effort builds retain their separate limits."
+    },
+    {
+      "obligation": "Retain historical preview-selector setting identities and accurately disposition their old outcomes without activating the retired compiler.",
+      "disposition": "retain-existing-preview-boundary-unresolved-beyond-this-slice",
+      "implementation": [
+        "source/research/historical_settings.lua",
+        "docs/design.md"
+      ],
+      "limit": "Four serialized preview controls in7a484627/e148d09f do not establish a consumed production compiler. Existing preview dispositions remain; this slice does not close every selector/inter-release expectation."
+    },
+    {
+      "obligation": "Imported cost/false values win with documented precedence; unavailable/changed/empty input and later helpers have correct fallback without repeatedly rebuilding settings state.",
+      "disposition": "consolidate-reviewed-startup-decode-ports",
+      "evidence": "spec/evidence/startup-profile-decode-intents-aero-r01.json",
+      "limit": "The old400-read getter/cache and synthetic mutation of startup objects are retired harness mechanics. Current batch resolution and the reviewed raw/helper/fresh-conversion controls preserve accepted intent; native helper/file/state evidence remains separate."
+    }
+  ],
+  "validation": {
+    "selected_profile_methods": 14,
+    "native_execution": false,
+    "earlier_fixture_error": "An initial Python check assumed an empty settings table must be a JSON object. Preserve its error log and exclude it from product/opponent failures; the corrected control checks the published zero-settings semantics and rejects nonempty arrays."
+  },
+  "release_qualification": false,
+  "whole_historical_preservation_complete": false
+}
