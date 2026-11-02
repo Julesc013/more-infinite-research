@@ -111,6 +111,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_named_science_replacement_fixture.py",
             "tests/test_fresh_science_transition_fixture.py",
             "tests/test_sif_retained_manufacturing.py",
+            "tests/test_sif_retained_manufacturing_native.py",
             "tests/test_sif_science_retirement_fixture.py",
             "tests/test_cryogenic_native_fixture.py",
             "tests/test_cryogenic_gameplay_fixture.py",
