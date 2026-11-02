@@ -1,0 +1,255 @@
+{
+  "kind": "MIRAeroFrozen502AffectedInputCoverageV1",
+  "source": {
+    "commit": "a2dcfae65a9dbe1c81bc0a8ce8ba933972c6048c",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21002",
+    "source_tree": "a4f79fbaa626653642670708794344f52d0c7e8c",
+    "tree": "d035c8b2265d29eaaef2c700070c678d89fc44cd"
+  },
+  "published_predecessor": "b677ced0b1ae0d8bd9ae47eb6b272443faec6d63",
+  "inventory_sha256": "5BE6CFCF30FD8E51837CB6FA5BC03778B5E0F12CCA534C4468C087A7F95921DD",
+  "player_source_changed_paths": [
+    "source/changelog.txt",
+    "source/info.json",
+    "source/locale/af/mir-library.cfg",
+    "source/locale/ar/mir-library.cfg",
+    "source/locale/be/mir-library.cfg",
+    "source/locale/bg/mir-library.cfg",
+    "source/locale/ca/mir-library.cfg",
+    "source/locale/cs/mir-library.cfg",
+    "source/locale/da/mir-library.cfg",
+    "source/locale/de/mir-library.cfg",
+    "source/locale/el/mir-library.cfg",
+    "source/locale/en/mir-library.cfg",
+    "source/locale/eo/mir-library.cfg",
+    "source/locale/es-ES/mir-library.cfg",
+    "source/locale/et/mir-library.cfg",
+    "source/locale/eu/mir-library.cfg",
+    "source/locale/fa/mir-library.cfg",
+    "source/locale/fi/mir-library.cfg",
+    "source/locale/fil/mir-library.cfg",
+    "source/locale/fr/mir-library.cfg",
+    "source/locale/fy-NL/mir-library.cfg",
+    "source/locale/ga-IE/mir-library.cfg",
+    "source/locale/he/mir-library.cfg",
+    "source/locale/hr/mir-library.cfg",
+    "source/locale/hu/mir-library.cfg",
+    "source/locale/id/mir-library.cfg",
+    "source/locale/is/mir-library.cfg",
+    "source/locale/it/mir-library.cfg",
+    "source/locale/ja/mir-library.cfg",
+    "source/locale/ka/mir-library.cfg",
+    "source/locale/kk/mir-library.cfg",
+    "source/locale/ko/mir-library.cfg",
+    "source/locale/lt/mir-library.cfg",
+    "source/locale/lv/mir-library.cfg",
+    "source/locale/nl/mir-library.cfg",
+    "source/locale/no/mir-library.cfg",
+    "source/locale/pl/mir-library.cfg",
+    "source/locale/pt-BR/mir-library.cfg",
+    "source/locale/pt-PT/mir-library.cfg",
+    "source/locale/ro/mir-library.cfg",
+    "source/locale/ru/mir-library.cfg",
+    "source/locale/ru/more-infinite-research.cfg",
+    "source/locale/sk/mir-library.cfg",
+    "source/locale/sl/mir-library.cfg",
+    "source/locale/sq/mir-library.cfg",
+    "source/locale/sr/mir-library.cfg",
+    "source/locale/sv-SE/mir-library.cfg",
+    "source/locale/th/mir-library.cfg",
+    "source/locale/tr/mir-library.cfg",
+    "source/locale/uk/mir-library.cfg",
+    "source/locale/vi/mir-library.cfg",
+    "source/locale/zh-CN/mir-library.cfg",
+    "source/locale/zh-TW/mir-library.cfg",
+    "source/platform/target.lua",
+    "source/presentation/library_model.lua",
+    "source/runtime/bootstrap.lua",
+    "source/runtime/catalogue.lua",
+    "source/runtime/diagnostics.lua",
+    "source/runtime/library.lua",
+    "source/runtime/library_translations.lua",
+    "source/runtime/settings_commands.lua"
+  ],
+  "unchanged_source_groups": [
+    "source/api",
+    "source/research",
+    "source/compatibility",
+    "source/migrations",
+    "source/adapters/reduced",
+    "source/runtime/legacy_caps.lua",
+    "source/runtime/k2_imersite_migration.lua"
+  ],
+  "api_source_unchanged_but_target_version_and_observed_state_review_required": true,
+  "documented_api10_scoped_qualification_preserved": true,
+  "rows": [
+    {
+      "id": "catalogue-caps-observed-state",
+      "obligation": "Correct own/foreign braking creation and affected cap/state observations",
+      "independent_expectation": "Preserve authored identities, earned-above-cap research and foreign disablement; only the independently admitted foreign braking-force-8 collision can suppress MIR continuation. Runtime observations must use actual native meanings and must not mutate foreign state.",
+      "implementation": [
+        "source/runtime/catalogue.lua",
+        "source/runtime/bootstrap.lua",
+        "source/runtime/legacy_caps.lua",
+        "source/api/v1/runtime.lua"
+      ],
+      "applicable_original_evidence": [
+        "spec/inventory/continuity.json CONT-07/11",
+        "spec/evidence/api1-documented-subset-qualification-r01.json"
+      ],
+      "remaining_executable_check": "Bind exact502 package and pinned2.0/2.1 engine/profile to actual own-versus-foreign creation history. Observe resulting catalogue/cap/native status and affected save/configuration paths, including already-earned and foreign-disabled state. Catalogue history is shared by bootstrap caps and Library; the API directly queries native state, so its effect is indirect rather than a changed API implementation.",
+      "owner": "Black Glass packet/native execution; Aero independent applicability/result review",
+      "status": "Current candidate native verdict open"
+    },
+    {
+      "id": "library-controls-and-layout",
+      "obligation": "Complete actual controls, views and rendering",
+      "independent_expectation": "Accepted4.2 interaction: retained split browse/details and narrow fallback; continuous results; operable dropdowns/checkboxes/search/filter/hiding/size/reset and native handoff, without pagination or new queue authority. Readiness reflects actual enabled/researched/trigger state; useful selected details/search retain authored meaning.",
+      "implementation": [
+        "source/runtime/library.lua",
+        "source/presentation/library_model.lua",
+        "source/runtime/bootstrap.lua"
+      ],
+      "applicable_original_evidence": [
+        "spec/evidence/library-cont10-layout-negative-control-r01.json",
+        "spec/evidence/library-imported-r20-f200-completion-chain-r01.json"
+      ],
+      "remaining_executable_check": "Rebind the existing guarded input/lifecycle tooling to frozen502, exercise the real dispatcher archive/config/write-data/output/capture composition offline, and independently review the complete bounded action packet before execution. Complete actual Research/Availability/Queue/Settings/Debug controls, scrolling, split/narrow geometry, representative sizes/scales and native research/foreign-state preservation. R20 is only exact501/F200/034 input slice.",
+      "owner": "Black Glass packet/native execution; Aero independent applicability/result review",
+      "status": "Current candidate native verdict open"
+    },
+    {
+      "id": "translations-and-clients",
+      "obligation": "Localized presentation and late-response isolation",
+      "independent_expectation": "Personal language/search does not change gameplay. Discovery/detail/search metadata remains useful; stale translation responses and retired GUI/player identities cannot mutate a new view. Actual joining clients reconstruct consistent state.",
+      "implementation": [
+        "source/runtime/library_translations.lua",
+        "source/runtime/library.lua",
+        "source/locale"
+      ],
+      "applicable_original_evidence": [
+        "spec/evidence/library-imported-r17-save-completion-chain-r01.json",
+        "spec/evidence/library-imported-r20-f200-completion-chain-r01.json"
+      ],
+      "remaining_executable_check": "Review and execute affected502 representative English/German long-text layouts and actual separate-client/locale/lifecycle transitions, including discovery metadata renewal and late callbacks. Retain prior R05/r20 package/controller/engine/locale limits. Host locale key coverage and50 rewritten Library locale files do not prove native rendering in every language.",
+      "owner": "Black Glass packet/native execution; Aero independent applicability/result review",
+      "status": "Current candidate native verdict open"
+    },
+    {
+      "id": "personal-and-beta-successor-state",
+      "obligation": "Imported private state and public-beta-to-successor continuity",
+      "independent_expectation": "Preserve legitimate private earned credits, personal settings/search/selection/geometry and distinct client identities while hiding private rows/actions. Actual removal retires old player/root/query references; numeric player-index reuse is legal and must not resurrect the old identity. on_load remains read-only.",
+      "implementation": [
+        "source/runtime/library.lua",
+        "source/runtime/bootstrap.lua"
+      ],
+      "applicable_original_evidence": [
+        "spec/evidence/library-imported-r20-f200-completion-chain-r01.json",
+        "spec/evidence/library-imported-r17-save-completion-chain-r01.json",
+        "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+      ],
+      "remaining_executable_check": "Select actual protected501 source saves, not recreated baselines; rebind exact502 fixture/profile/runtime/action inputs and complete packet review. Exercise affected legacy explicit/retained Settings search, report preferences, translation cache, personal removal/replacement/index reuse, host restart/read-only load and distinct clients. Existing501 r20 saves are potential inputs, not pre-approved502 packets. Preserve final-save/no-separate-cold-load limits of the original r20.",
+      "owner": "Black Glass packet/native execution; Aero independent applicability/result review",
+      "status": "Current candidate native verdict open"
+    },
+    {
+      "id": "settings-and-physical-exports",
+      "obligation": "Settings provenance, validation and real export files",
+      "independent_expectation": "Full/compact MIRSET1 preserves false/zero and raw/default/effective provenance. Preview/refresh/copy is read-only and writes no file. Requested diagnostics always writes a separate full settings profile even when its inline report section is unchecked; files go to the requesting client/server, partial errors remain truthful and nothing uploads automatically.",
+      "implementation": [
+        "source/runtime/diagnostics.lua",
+        "source/runtime/settings_commands.lua",
+        "source/runtime/library.lua",
+        "source/research/settings_profile.lua"
+      ],
+      "applicable_original_evidence": [
+        "spec/evidence/api1-documented-subset-qualification-r01.json",
+        "spec/evidence/support-exports-consumed-path-applicability-aero-r01.json"
+      ],
+      "remaining_executable_check": "Run exact502 changed support-export/preview paths against actual files and requester identities, with full/compact validation, inline profile/omission choices, refresh/copy nonwrites and relevant error/partial-write cases. Preserve existing codec/core qualified observations only after consumed-input review; old export results do not qualify changed composition.",
+      "owner": "Black Glass packet/native execution; Aero independent applicability/result review",
+      "status": "Current candidate native verdict open"
+    },
+    {
+      "id": "editions-migrations-and-api",
+      "obligation": "Nine stable editions, selected saved-state routes and API identity",
+      "independent_expectation": "Keep named nine4.7.3 same-edition, seven older-contract and four published-forward routes under original scopes; preserve migration filenames/bytes and unknown-history limits. The documented API1.0 subset is already scoped-qualified at its recorded inputs, including two actual consumers, physical/save/client behavior and exact absence guards.",
+      "implementation": [
+        "source/adapters/reduced",
+        "source/migrations",
+        "source/api",
+        "source/platform/target.lua",
+        "spec/inventory/migration-origins.json"
+      ],
+      "applicable_original_evidence": [
+        "spec/inventory/migration-origins.json",
+        "spec/evidence/api1-documented-subset-qualification-r01.json",
+        "spec/evidence/current-assets-candidate502-a2dcfae65-root-readback-r01.json"
+      ],
+      "remaining_executable_check": "Finish final consumed-input applicability for selected routes and target/API product metadata; execute genuinely affected checks. API implementation is byte-identical501-to502, product version changes through platform.target, and runtime bootstrap/catalogue can change observed native state. Do not reopen the entire already-qualified API campaign or relabel old F210 absence engine as the newer standalone engine. Seven reduced ZIPs change51locales plus3identity/history members, with unchanged member sets/state code; native exact-package parsing/version endpoints and any actually changed input remain distinct. F018/early builds keep their experimental/best-effort scope.",
+      "owner": "Black Glass packet/native execution; Aero independent applicability/result review",
+      "status": "Current candidate native verdict open"
+    },
+    {
+      "id": "whole-product-performance",
+      "obligation": "All required full-process and gameplay endpoints",
+      "independent_expectation": "On one declared host and fixed2.0/2.1 inputs compare Base, Space Age and a fixed upstream-valid heavy Space Age cohort with equivalent useful work. Separate total/MIR-added startup, save loading, active-factory/spike throughput/backlog, closed/open Library and peak/retained memory. Keep predeclared tolerances and substantial MIR-added improvement objective where measurable.",
+      "implementation": [
+        "source/runtime/bootstrap.lua",
+        "source/runtime/catalogue.lua",
+        "source/runtime/library.lua",
+        "source/runtime/library_translations.lua",
+        "spec/performance.md"
+      ],
+      "applicable_original_evidence": [
+        "spec/evidence/whole-product-base-f200-published-repeatability-chain-r01.json",
+        "spec/evidence/repair501-single-marker-chain-r01.json"
+      ],
+      "remaining_executable_check": "Prepare/execute ready fixed-input whole-product cases without waiting for every GUI case. Use one active and one prepared native assignment; keep diagnostic logging separate. Published473 five-run startup repeatability and501 single repair marker establish their original limited context only. No502 paired startup/performance acceptance follows, no unchanged refusal retries, workload shrink or historical informational-table/reboot campaign.",
+      "owner": "Black Glass packet/native execution; Aero independent applicability/result review",
+      "status": "Current candidate native verdict open"
+    },
+    {
+      "id": "artifacts-docs-delivery",
+      "obligation": "One exact candidate and accurate public delivery",
+      "independent_expectation": "Exact source/tag/changelog/ZIP root/info/codec and declared floors agree; all published bytes survive. Download labels are MIR x.x.x for Factorio x.x.x (zip). Stable publication requires all applicable verdicts, independent review/required CI and exact artifacts, with experimental limits explicit.",
+      "implementation": [
+        "tools/release.py",
+        "docs/support.md",
+        "docs/release-notes.md",
+        "docs/upload-text.txt",
+        "sdk/api-v1.lua"
+      ],
+      "applicable_original_evidence": [
+        "spec/evidence/current-assets-candidate502-a2dcfae65-root-readback-r01.json",
+        "https://github.com/Julesc013/more-infinite-research/issues/1537#issuecomment-6570767900"
+      ],
+      "remaining_executable_check": "Offline17-ZIP/20-file artifact GO is complete for sourcea2dc/inventory5BE6CFCF. Independently review/integrate SDK1590/support1592 and final maturity-specific notes after actual verdicts; update the current pendingAero checkpoint without editing raw snapshots. Black Glass owns checked main/tag/GitHub publication, administration/immutability probes and delivery; Aero verifies final claims and anonymous downloads. No502 tag/public package exists and Mod Portal is maintainer-owned.",
+      "owner": "Aero artifacts/docs/independent delivery review; Black Glass integration/publication",
+      "status": "Offline502 artifact integrity GO; final docs/qualification/publication/delivery open"
+    },
+    {
+      "id": "historical-preservation",
+      "obligation": "Complete dispositions of relevant historical behavior and sources",
+      "independent_expectation": "Each applicable delivered behavior/accepted decision has original identity, current implementation and adequate verification. Deduplicate intent and superseded machinery; retain original source/results, missing evidence and rejected proposals without inventing expectations or a new history estate.",
+      "implementation": [
+        "spec/inventory/continuity.json",
+        "spec/programmes/community-requests.json"
+      ],
+      "applicable_original_evidence": [
+        "https://github.com/Julesc013/more-infinite-research/pull/1587",
+        "https://github.com/Julesc013/more-infinite-research/pull/1591"
+      ],
+      "remaining_executable_check": "Finish independent1587/1591 integration; reconcile applicable original frontier snapshot custody, older SIF five paid rows and unresolved registry/default/control/compatibility/inter-release/consumer/discussion/attachment groups. Selected source disposition and host counts are not complete VER07. Preserve all original87 request records/decisions; no automatic rewrite or rerun of every recovered test.",
+      "owner": "Aero historical reconciliation/coverage; Black Glass independent review/integration",
+      "status": "Current candidate native verdict open"
+    }
+  ],
+  "status": "Finite review/queue routing; not a native action packet, waiver or new campaign",
+  "safeguard": "No new human approval gate. Existing exact packet, ownership, resource, archive/control restoration and per-action live guards remain binding.",
+  "native_execution": false,
+  "release_qualification": false
+}
