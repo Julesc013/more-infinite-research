@@ -735,6 +735,84 @@ class ScienceTests(unittest.TestCase):
           assert(result.enabled and names(row.unit.ingredients) == "archival-token:9")
         ''')
 
+    def test_nuclear_craft_triggers_are_foreign_gates_not_lab_science(self):
+        # Accepted trigger/tool boundary: v4.7.3 tests/compiler/approved_pack_bindings.lua,
+        # blob e947985dfa73acbda052b151ef962399eaa097ed (also present since v4.4.2).
+        # COMP-TRUE-NUKES-01 remains open: these shapes are not the reporter's closure.
+        self.lua.execute(r'''
+          local generator = require("research.generator")
+          local gates = {
+            {name="atomic-bomb", item="test-pack-atomic-20t-1"},
+            {name="full-fission-atomics", item="test-pack-atomic-500t-1"}
+          }
+          local function nuclear_world()
+            local raw = raw_with({"automation-science-pack", "logistic-science-pack"},
+              {lab={"automation-science-pack", "logistic-science-pack"}})
+            source_recipe(raw, "automation-science-pack", true)
+            source_recipe(raw, "logistic-science-pack", false)
+            source_owner(raw, "logistic-science-pack", "logistic-science-pack")
+            for _, gate in ipairs(gates) do
+              raw.tool[gate.item] = {type="tool", name=gate.item}
+              raw.technology[gate.name] = {type="technology", name=gate.name, prerequisites={},
+                research_trigger={type="craft-item", item=gate.item, count=1},
+                unit={count=1, time=60, ingredients={{"unbound-nuclear-science", 1}}}}
+            end
+            return raw
+          end
+          local function select_science(raw)
+            local row = technology({{"automation-science-pack", 2}},
+              {"atomic-bomb", "full-fission-atomics"})
+            local context = science.prepare({raw=raw, target={id="f210"},
+              options={["mir-science-pack-ingredient-policy"]="all"}})
+            local result = science.apply(row, {}, context)
+            return row, result, context
+          end
+
+          local raw = nuclear_world()
+          local foreign = {raw.technology["atomic-bomb"], raw.technology["full-fission-atomics"]}
+          local row, result, context = select_science(raw)
+          assert(result.enabled and result.reason == "all", result.reason)
+          assert(context.fresh_recipe_visits == 0 and context.fresh_technology_visits == 0,
+            "non-lab nuclear test tools initiated a foreign science search")
+          assert(names(row.unit.ingredients) == "automation-science-pack:2,logistic-science-pack:1",
+            "a non-lab nuclear test tool became science or ordinary lab science disappeared")
+          assert(same(row.prerequisites,
+            {"atomic-bomb", "full-fission-atomics", "logistic-science-pack"}),
+            "foreign trigger prerequisites or the real science owner were lost")
+          row.type = "technology"
+          local stage = {raw=raw, writes=0}
+          function stage:extend(rows)
+            self.writes = self.writes + 1
+            for _, prototype in ipairs(rows) do self.raw.technology[prototype.name] = prototype end
+          end
+          generator.install({row}, stage)
+          assert(stage.writes == 1 and raw.technology[row.name] == row)
+          for index, gate in ipairs(gates) do
+            local owner = raw.technology[gate.name]
+            assert(owner == foreign[index] and owner.name == gate.name and owner.type == "technology")
+            assert(owner.research_trigger.type == "craft-item" and owner.research_trigger.item == gate.item
+              and owner.research_trigger.count == 1 and #owner.prerequisites == 0)
+            assert(owner.unit.count == 1 and owner.unit.time == 60 and #owner.unit.ingredients == 1
+              and owner.unit.ingredients[1][1] == "unbound-nuclear-science"
+              and owner.unit.ingredients[1][2] == 1, "foreign inherited research unit was rewritten")
+          end
+
+          -- An actual lab input still needs a source. A self-requiring nuclear
+          -- test trigger cannot silently approve or hide its own lab ingredient.
+          for _, gate in ipairs(gates) do
+            raw = nuclear_world()
+            raw.lab.lab.inputs[#raw.lab.lab.inputs + 1] = gate.item
+            row, result = select_science(raw)
+            assert(result.enabled and row.enabled ~= false,
+              "an unresolved optional addition disabled established ordinary research")
+            assert(names(row.unit.ingredients) == "automation-science-pack:2,logistic-science-pack:1"
+              and result.reason ~= "all",
+              "an unbound nuclear test was admitted or reported as fully bound science")
+            assert(same(row.prerequisites,
+              {"atomic-bomb", "full-fission-atomics", "logistic-science-pack"}))
+          end
+        ''')
+
     def test_empty_broad_selection_retains_a_disabled_valid_identity(self):
         self.lua.execute(r'''
           local raw = raw_with({"foreign-only"}, {lab={"foreign-only"}})
