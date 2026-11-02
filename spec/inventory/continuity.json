@@ -8783,7 +8783,7 @@
         "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
       }
     ],
-    "next_bounded_work": "Independently review/integrate the ready #1571 host unit and #1575 secondary raw-recipe-ID correction, keeping frozen501 native package A distinct from corrected candidate B. Before affected GUI dispatch/reuse, Black Glass must close the capture-composition/safe-execution hold and bind a fresh complete packet; the actual one-engine guard adverse remains preserved. Continue unresolved historical runtime/control/compatibility/inter-release/consumer groups and original reporter evidence. Final candidate and whole-product performance/application/state checks retain their actual owners and consumed-input limits; do not rewrite original receipts or share the progress header.",
+    "next_bounded_work": "Preserve the accepted final optional-runtime integration and finish independent review/integration of the settings/state-helper and upgrade-runner units through exact-head checks. The35-body generic upgrade runner family below is now mapped; reconcile remaining imported full-state/specialization fixture assertions, registry/default/control/compatibility/inter-release and unknown-consumer groups without reviving retired machinery. Apply the existing finite selected migration queue and final consumed-input review, not a new every-old-patch campaign. Black Glass owns the exact034 runtime/action packet and complete independent review after the preserved r19 NO-GO, native queue and current progress header. Old033/adverse/native identities stay fixed; unchanged completed smoke checks do not restart.",
     "bounded_intent_reviews": [
       {
         "subjects": [
@@ -12179,6 +12179,1805 @@
         },
         "custody": "build/qualification/aero-optional-runtime-intents-r01/",
         "qualification_limit": "Six tagged test families, two recovered original report-source bodies and their grouped obligations only. Other inter-release/runtime/consumer/crash/request sources and global VER-07 remain unresolved. New current control passes without a player source correction. No old runner/prototype framework/native campaign is restored, no source count is native acceptance, and original adverse/unknown scopes remain intact.",
+        "native_execution": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-08",
+          "CONT-09",
+          "CONT-11",
+          "CONT-14"
+        ],
+        "reviewed_on": "2026-11-02",
+        "reviewed_against": "8f668713b15e5f97f8ab2d7e4446a0170ba10d78",
+        "scope": "Six named settings/state helper families and source/non-source aliases across the existing91-tag snapshot. Fourteen exact bodies have three finite behavior dispositions. Other helpers/registry/default declarations, tests, inter-release removals, external consumers, discussions and screenshots remain outside this slice.",
+        "method": "Deduplicate immutable blobs, read all six latest bodies and all eight earlier variant diffs. Verify392 retained remote tag/commit/path references and three explicit commit-only local-alias references. Exercise the three exact startup-reader bodies to distinguish the older false-loss bug from corrected behavior, then run existing current controls. No old framework, engine or native runner is restored.",
+        "selected_tag_scope": 91,
+        "selected_commit_scope": 90,
+        "selected_blob_count": 14,
+        "distinct_retained_tag_references": 392,
+        "distinct_commit_only_references": 3,
+        "reference_limits": [
+          "The preserved local v3.0.0 alias at70bb513f5b388ad23c4a5d46dfc945571c3b8217 has no matching remote tag; its three available helper bodies are cited by exact commit/path without claiming publication. The distinct remote3.0.0 tag is not substituted.",
+          "The indexed v4.2.0 alias maps to the retained v4.2.0-stable tag at the same commit; original source-index custody is unchanged."
+        ],
+        "selected_blob_variants": [
+          {
+            "blob": "06725ed82ab2898203ecfeea3847eb9a5955b7bb",
+            "paths": [
+              "prototypes/mir/runtime/settings_resolver.lua"
+            ],
+            "bytes": 1108,
+            "sha256": "838AA3E1C3B033A4DF86BC0603833B3CCDDBEA5AC2833F2F42A1E218F3A56776",
+            "tag_path_references": [
+              "0.10.0:prototypes/mir/runtime/settings_resolver.lua",
+              "0.11.0:prototypes/mir/runtime/settings_resolver.lua",
+              "0.12.0:prototypes/mir/runtime/settings_resolver.lua",
+              "0.6.0:prototypes/mir/runtime/settings_resolver.lua",
+              "0.7.0:prototypes/mir/runtime/settings_resolver.lua",
+              "0.8.0:prototypes/mir/runtime/settings_resolver.lua",
+              "0.9.0:prototypes/mir/runtime/settings_resolver.lua",
+              "1.8.2:prototypes/mir/runtime/settings_resolver.lua",
+              "1.8.5:prototypes/mir/runtime/settings_resolver.lua",
+              "1.8.9:prototypes/mir/runtime/settings_resolver.lua",
+              "1.9.4:prototypes/mir/runtime/settings_resolver.lua",
+              "1.9.5:prototypes/mir/runtime/settings_resolver.lua",
+              "1.9.9:prototypes/mir/runtime/settings_resolver.lua",
+              "2.3.5:prototypes/mir/runtime/settings_resolver.lua",
+              "2.4.0:prototypes/mir/runtime/settings_resolver.lua",
+              "2.4.5:prototypes/mir/runtime/settings_resolver.lua",
+              "2.4.9:prototypes/mir/runtime/settings_resolver.lua",
+              "3.0.5:prototypes/mir/runtime/settings_resolver.lua",
+              "3.1.0:prototypes/mir/runtime/settings_resolver.lua",
+              "3.1.1:prototypes/mir/runtime/settings_resolver.lua",
+              "3.1.2:prototypes/mir/runtime/settings_resolver.lua",
+              "3.1.5:prototypes/mir/runtime/settings_resolver.lua",
+              "3.1.9:prototypes/mir/runtime/settings_resolver.lua"
+            ],
+            "intent_groups": [
+              "default-and-runtime-value-resolution"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "1a84015b4c3ec36b856407649d33d12c83f17e0d",
+            "paths": [
+              "source/prototypes/mir/runtime/startup_settings.lua"
+            ],
+            "bytes": 987,
+            "sha256": "7326679D9ABD4216AA5B8697BE15454724AD89A706F9720945B4DF644FB44E3A",
+            "tag_path_references": [
+              "v4.2.0-stable:source/prototypes/mir/runtime/startup_settings.lua"
+            ],
+            "intent_groups": [
+              "effective-import-lifetime"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "21605e5c524d624ededb6ee9c8c07dcb1966b6eb",
+            "paths": [
+              "prototypes/mir/settings/resolver.lua",
+              "source/prototypes/mir/settings/resolver.lua"
+            ],
+            "bytes": 1358,
+            "sha256": "FE00D102D84029F498829E983F5D0E7D1A756CFFD875FBD5E6FF3662FFD13438",
+            "tag_path_references": [
+              "0.10.0:prototypes/mir/settings/resolver.lua",
+              "0.11.0:prototypes/mir/settings/resolver.lua",
+              "0.12.0:prototypes/mir/settings/resolver.lua",
+              "0.6.0:prototypes/mir/settings/resolver.lua",
+              "0.7.0:prototypes/mir/settings/resolver.lua",
+              "0.8.0:prototypes/mir/settings/resolver.lua",
+              "0.9.0:prototypes/mir/settings/resolver.lua",
+              "1.3.0:prototypes/mir/settings/resolver.lua",
+              "1.3.5:prototypes/mir/settings/resolver.lua",
+              "1.3.9:prototypes/mir/settings/resolver.lua",
+              "1.4.0:prototypes/mir/settings/resolver.lua",
+              "1.4.5:prototypes/mir/settings/resolver.lua",
+              "1.4.9:prototypes/mir/settings/resolver.lua",
+              "1.5.0:prototypes/mir/settings/resolver.lua",
+              "1.5.5:prototypes/mir/settings/resolver.lua",
+              "1.5.9:prototypes/mir/settings/resolver.lua",
+              "1.6.0:prototypes/mir/settings/resolver.lua",
+              "1.6.5:prototypes/mir/settings/resolver.lua",
+              "1.6.9:prototypes/mir/settings/resolver.lua",
+              "1.7.0:prototypes/mir/settings/resolver.lua",
+              "1.7.1:prototypes/mir/settings/resolver.lua",
+              "1.7.5:prototypes/mir/settings/resolver.lua",
+              "1.7.9:prototypes/mir/settings/resolver.lua",
+              "1.8.0:prototypes/mir/settings/resolver.lua",
+              "1.8.1:prototypes/mir/settings/resolver.lua",
+              "1.8.2:prototypes/mir/settings/resolver.lua",
+              "1.8.5:prototypes/mir/settings/resolver.lua",
+              "1.8.9:prototypes/mir/settings/resolver.lua",
+              "1.9.3:prototypes/mir/settings/resolver.lua",
+              "1.9.4:prototypes/mir/settings/resolver.lua",
+              "1.9.5:prototypes/mir/settings/resolver.lua",
+              "1.9.9:prototypes/mir/settings/resolver.lua",
+              "2.3.0:prototypes/mir/settings/resolver.lua",
+              "2.3.5:prototypes/mir/settings/resolver.lua",
+              "2.4.0:prototypes/mir/settings/resolver.lua",
+              "2.4.5:prototypes/mir/settings/resolver.lua",
+              "2.4.9:prototypes/mir/settings/resolver.lua",
+              "2.5.0:prototypes/mir/settings/resolver.lua",
+              "2.5.10:prototypes/mir/settings/resolver.lua",
+              "2.5.11:prototypes/mir/settings/resolver.lua",
+              "2.5.5:prototypes/mir/settings/resolver.lua",
+              "2.5.9:prototypes/mir/settings/resolver.lua",
+              "3.0.0:prototypes/mir/settings/resolver.lua",
+              "3.0.5:prototypes/mir/settings/resolver.lua",
+              "3.1.0:prototypes/mir/settings/resolver.lua",
+              "3.1.1:prototypes/mir/settings/resolver.lua",
+              "3.1.2:prototypes/mir/settings/resolver.lua",
+              "3.1.5:prototypes/mir/settings/resolver.lua",
+              "3.1.9:prototypes/mir/settings/resolver.lua",
+              "3.2.0:prototypes/mir/settings/resolver.lua",
+              "3.2.1:prototypes/mir/settings/resolver.lua",
+              "3.2.10:prototypes/mir/settings/resolver.lua",
+              "3.2.11:prototypes/mir/settings/resolver.lua",
+              "3.2.2:prototypes/mir/settings/resolver.lua",
+              "3.2.3:prototypes/mir/settings/resolver.lua",
+              "3.2.5:prototypes/mir/settings/resolver.lua",
+              "3.2.9:prototypes/mir/settings/resolver.lua",
+              "v4.0.0:prototypes/mir/settings/resolver.lua",
+              "v4.1.0:prototypes/mir/settings/resolver.lua",
+              "v4.2.0-stable:source/prototypes/mir/settings/resolver.lua",
+              "v4.2.1:source/prototypes/mir/settings/resolver.lua",
+              "v4.2.2:source/prototypes/mir/settings/resolver.lua",
+              "v4.3.0:source/prototypes/mir/settings/resolver.lua",
+              "v4.4.0:source/prototypes/mir/settings/resolver.lua",
+              "v4.4.1:source/prototypes/mir/settings/resolver.lua",
+              "v4.4.2:source/prototypes/mir/settings/resolver.lua",
+              "v4.5.0:source/prototypes/mir/settings/resolver.lua",
+              "v4.5.1:source/prototypes/mir/settings/resolver.lua",
+              "v4.5.2:source/prototypes/mir/settings/resolver.lua",
+              "v4.6.0:source/prototypes/mir/settings/resolver.lua",
+              "v4.7.0:source/prototypes/mir/settings/resolver.lua",
+              "v4.7.1:source/prototypes/mir/settings/resolver.lua",
+              "v4.7.2:source/prototypes/mir/settings/resolver.lua",
+              "v4.7.3:source/prototypes/mir/settings/resolver.lua"
+            ],
+            "commit_only_references": [
+              {
+                "commit": "70bb513f5b388ad23c4a5d46dfc945571c3b8217",
+                "path": "prototypes/mir/settings/resolver.lua",
+                "indexed_tag": "v3.0.0",
+                "ref_kind": "commit-only-local-alias-not-published"
+              }
+            ],
+            "intent_groups": [
+              "default-and-runtime-value-resolution"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "31f220dd993374a39123c6cc9f615a224956728a",
+            "paths": [
+              "source/prototypes/mir/settings/effective.lua"
+            ],
+            "bytes": 2992,
+            "sha256": "B4B552DEFBFB2934E810377CB08CCD0FC7166030A7076FC83BD11B06EA9BA660",
+            "tag_path_references": [
+              "v4.3.0:source/prototypes/mir/settings/effective.lua",
+              "v4.4.0:source/prototypes/mir/settings/effective.lua",
+              "v4.4.1:source/prototypes/mir/settings/effective.lua",
+              "v4.4.2:source/prototypes/mir/settings/effective.lua",
+              "v4.5.0:source/prototypes/mir/settings/effective.lua",
+              "v4.5.1:source/prototypes/mir/settings/effective.lua",
+              "v4.5.2:source/prototypes/mir/settings/effective.lua",
+              "v4.6.0:source/prototypes/mir/settings/effective.lua",
+              "v4.7.0:source/prototypes/mir/settings/effective.lua",
+              "v4.7.1:source/prototypes/mir/settings/effective.lua",
+              "v4.7.2:source/prototypes/mir/settings/effective.lua",
+              "v4.7.3:source/prototypes/mir/settings/effective.lua"
+            ],
+            "intent_groups": [
+              "effective-import-lifetime"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "3317dbb2c5cbff54d9511803e08c72da25479620",
+            "paths": [
+              "prototypes/mir/runtime/startup_settings.lua"
+            ],
+            "bytes": 966,
+            "sha256": "77B04FB969BD146AA0A67FAE37E649435EC627788CB1BD7FD72967C43D7376A0",
+            "tag_path_references": [
+              "2.5.0:prototypes/mir/runtime/startup_settings.lua",
+              "2.5.10:prototypes/mir/runtime/startup_settings.lua",
+              "2.5.11:prototypes/mir/runtime/startup_settings.lua",
+              "2.5.5:prototypes/mir/runtime/startup_settings.lua",
+              "2.5.9:prototypes/mir/runtime/startup_settings.lua",
+              "3.2.0:prototypes/mir/runtime/startup_settings.lua",
+              "3.2.1:prototypes/mir/runtime/startup_settings.lua",
+              "3.2.10:prototypes/mir/runtime/startup_settings.lua",
+              "3.2.11:prototypes/mir/runtime/startup_settings.lua",
+              "3.2.2:prototypes/mir/runtime/startup_settings.lua",
+              "3.2.3:prototypes/mir/runtime/startup_settings.lua",
+              "3.2.5:prototypes/mir/runtime/startup_settings.lua",
+              "3.2.9:prototypes/mir/runtime/startup_settings.lua",
+              "v4.0.0:prototypes/mir/runtime/startup_settings.lua",
+              "v4.1.0:prototypes/mir/runtime/startup_settings.lua"
+            ],
+            "intent_groups": [
+              "effective-import-lifetime"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Known older raw false-to-nil bug is not parity: its and/or accessor loses false; the retained later1a84015b and4af0495b accessors preserve false. All three preserve numeric0. Exact-source host readback confirms the distinction without running an old native harness."
+          },
+          {
+            "blob": "3fc719fb62944059b642335cf5f9407ef037d5db",
+            "paths": [
+              "prototypes/mir/settings/effective.lua"
+            ],
+            "bytes": 2072,
+            "sha256": "5BE887E70DA5A7758E66F7305B2872520FF66363BCE9E6DA2B17AE56C467E126",
+            "tag_path_references": [],
+            "commit_only_references": [
+              {
+                "commit": "70bb513f5b388ad23c4a5d46dfc945571c3b8217",
+                "path": "prototypes/mir/settings/effective.lua",
+                "indexed_tag": "v3.0.0",
+                "ref_kind": "commit-only-local-alias-not-published"
+              }
+            ],
+            "intent_groups": [
+              "effective-import-lifetime"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Older import acceptance checked only the raw fallback type. Later original a0a0b399/7736ba12/31f220dd uses the registered settings catalogue and adds invalid counts; preserve the later validation boundary, not the earlier permissive input bug."
+          },
+          {
+            "blob": "4af0495bcfb4adec0e6f7813ba87b6f0683a3e56",
+            "paths": [
+              "source/prototypes/mir/runtime/startup_settings.lua"
+            ],
+            "bytes": 1975,
+            "sha256": "4E6E6B19411130F0C2BC244400592407AD94EC12FBD27A986CE3C889AF0C1B37",
+            "tag_path_references": [
+              "v4.2.1:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.2.2:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.3.0:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.4.0:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.4.1:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.4.2:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.5.0:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.5.1:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.5.2:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.6.0:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.7.0:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.7.1:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.7.2:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.7.3:source/prototypes/mir/runtime/startup_settings.lua"
+            ],
+            "intent_groups": [
+              "effective-import-lifetime"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "75520dd8232506069d699acd28d1bf2dcaccd9f2",
+            "paths": [
+              "prototypes/mir/runtime/settings_resolver.lua",
+              "source/prototypes/mir/runtime/settings_resolver.lua"
+            ],
+            "bytes": 1110,
+            "sha256": "57122FB881A76C970ACE3591F5E418949FB8E3D4883CF386962CDC21F2EBB720",
+            "tag_path_references": [
+              "2.5.0:prototypes/mir/runtime/settings_resolver.lua",
+              "2.5.10:prototypes/mir/runtime/settings_resolver.lua",
+              "2.5.11:prototypes/mir/runtime/settings_resolver.lua",
+              "2.5.5:prototypes/mir/runtime/settings_resolver.lua",
+              "2.5.9:prototypes/mir/runtime/settings_resolver.lua",
+              "3.2.0:prototypes/mir/runtime/settings_resolver.lua",
+              "3.2.1:prototypes/mir/runtime/settings_resolver.lua",
+              "3.2.10:prototypes/mir/runtime/settings_resolver.lua",
+              "3.2.11:prototypes/mir/runtime/settings_resolver.lua",
+              "3.2.2:prototypes/mir/runtime/settings_resolver.lua",
+              "3.2.3:prototypes/mir/runtime/settings_resolver.lua",
+              "3.2.5:prototypes/mir/runtime/settings_resolver.lua",
+              "3.2.9:prototypes/mir/runtime/settings_resolver.lua",
+              "v4.0.0:prototypes/mir/runtime/settings_resolver.lua",
+              "v4.1.0:prototypes/mir/runtime/settings_resolver.lua",
+              "v4.2.0-stable:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.2.1:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.2.2:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.3.0:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.4.0:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.4.1:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.4.2:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.5.0:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.5.1:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.5.2:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.6.0:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.7.0:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.7.1:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.7.2:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.7.3:source/prototypes/mir/runtime/settings_resolver.lua"
+            ],
+            "intent_groups": [
+              "default-and-runtime-value-resolution"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "7736ba122bd38d794c5c931ca1f686dede696116",
+            "paths": [
+              "prototypes/mir/settings/effective.lua",
+              "source/prototypes/mir/settings/effective.lua"
+            ],
+            "bytes": 2965,
+            "sha256": "4A50344CF38C88A3C8D80BEE25956F99421C5BDDE5AD91D862145863FECFF495",
+            "tag_path_references": [
+              "2.5.0:prototypes/mir/settings/effective.lua",
+              "2.5.10:prototypes/mir/settings/effective.lua",
+              "2.5.11:prototypes/mir/settings/effective.lua",
+              "2.5.5:prototypes/mir/settings/effective.lua",
+              "2.5.9:prototypes/mir/settings/effective.lua",
+              "3.2.0:prototypes/mir/settings/effective.lua",
+              "3.2.1:prototypes/mir/settings/effective.lua",
+              "3.2.10:prototypes/mir/settings/effective.lua",
+              "3.2.11:prototypes/mir/settings/effective.lua",
+              "3.2.2:prototypes/mir/settings/effective.lua",
+              "3.2.3:prototypes/mir/settings/effective.lua",
+              "3.2.5:prototypes/mir/settings/effective.lua",
+              "3.2.9:prototypes/mir/settings/effective.lua",
+              "v4.0.0:prototypes/mir/settings/effective.lua",
+              "v4.1.0:prototypes/mir/settings/effective.lua",
+              "v4.2.0-stable:source/prototypes/mir/settings/effective.lua",
+              "v4.2.1:source/prototypes/mir/settings/effective.lua",
+              "v4.2.2:source/prototypes/mir/settings/effective.lua"
+            ],
+            "intent_groups": [
+              "effective-import-lifetime"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "7808b54f0f331e644bfac646859d398d9b2afbc0",
+            "paths": [
+              "prototypes/mir/platform/factorio/runtime_state.lua",
+              "source/prototypes/mir/platform/factorio/runtime_state.lua"
+            ],
+            "bytes": 691,
+            "sha256": "2F36854B538F73291E8386BCFEFB708E9F96B2778DC350B54E22C11E38418706",
+            "tag_path_references": [
+              "0.10.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "0.11.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "0.12.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "0.6.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "0.7.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "0.8.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "0.9.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.3.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.3.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.3.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.4.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.4.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.4.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.5.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.5.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.5.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.6.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.6.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.6.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.7.1:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.7.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.7.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.8.2:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.8.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.8.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.9.4:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.9.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.9.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "2.3.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "2.4.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "2.4.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "2.4.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "2.5.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "2.5.10:prototypes/mir/platform/factorio/runtime_state.lua",
+              "2.5.11:prototypes/mir/platform/factorio/runtime_state.lua",
+              "2.5.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "2.5.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.0.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.1.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.1.1:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.1.2:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.1.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.1.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.2.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.2.1:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.2.10:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.2.11:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.2.2:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.2.3:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.2.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.2.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.0.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.1.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.2.0-stable:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.2.1:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.2.2:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.3.0:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.4.0:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.4.1:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.4.2:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.5.0:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.5.1:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.5.2:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.6.0:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.7.0:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.7.1:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.7.2:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.7.3:source/prototypes/mir/platform/factorio/runtime_state.lua"
+            ],
+            "intent_groups": [
+              "saved-state-custody"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "a0a0b399517bd3cd2169979e439bc30170faf167",
+            "paths": [
+              "prototypes/mir/settings/effective.lua"
+            ],
+            "bytes": 1971,
+            "sha256": "A0BC5D97A3DBD65DA4C0199F5663A1B30FA116543917E673165E5B0150BDDC1A",
+            "tag_path_references": [
+              "0.10.0:prototypes/mir/settings/effective.lua",
+              "0.11.0:prototypes/mir/settings/effective.lua",
+              "0.12.0:prototypes/mir/settings/effective.lua",
+              "0.6.0:prototypes/mir/settings/effective.lua",
+              "0.7.0:prototypes/mir/settings/effective.lua",
+              "0.8.0:prototypes/mir/settings/effective.lua",
+              "0.9.0:prototypes/mir/settings/effective.lua",
+              "1.3.0:prototypes/mir/settings/effective.lua",
+              "1.3.5:prototypes/mir/settings/effective.lua",
+              "1.3.9:prototypes/mir/settings/effective.lua",
+              "1.4.0:prototypes/mir/settings/effective.lua",
+              "1.4.5:prototypes/mir/settings/effective.lua",
+              "1.4.9:prototypes/mir/settings/effective.lua",
+              "1.5.0:prototypes/mir/settings/effective.lua",
+              "1.5.5:prototypes/mir/settings/effective.lua",
+              "1.5.9:prototypes/mir/settings/effective.lua",
+              "1.6.0:prototypes/mir/settings/effective.lua",
+              "1.6.5:prototypes/mir/settings/effective.lua",
+              "1.6.9:prototypes/mir/settings/effective.lua",
+              "1.7.0:prototypes/mir/settings/effective.lua",
+              "1.7.1:prototypes/mir/settings/effective.lua",
+              "1.7.5:prototypes/mir/settings/effective.lua",
+              "1.7.9:prototypes/mir/settings/effective.lua",
+              "1.8.0:prototypes/mir/settings/effective.lua",
+              "1.8.1:prototypes/mir/settings/effective.lua",
+              "1.8.2:prototypes/mir/settings/effective.lua",
+              "1.8.5:prototypes/mir/settings/effective.lua",
+              "1.8.9:prototypes/mir/settings/effective.lua",
+              "1.9.3:prototypes/mir/settings/effective.lua",
+              "1.9.4:prototypes/mir/settings/effective.lua",
+              "1.9.5:prototypes/mir/settings/effective.lua",
+              "1.9.9:prototypes/mir/settings/effective.lua",
+              "2.3.0:prototypes/mir/settings/effective.lua",
+              "2.3.5:prototypes/mir/settings/effective.lua",
+              "2.4.0:prototypes/mir/settings/effective.lua",
+              "2.4.5:prototypes/mir/settings/effective.lua",
+              "2.4.9:prototypes/mir/settings/effective.lua",
+              "3.0.0:prototypes/mir/settings/effective.lua",
+              "3.0.5:prototypes/mir/settings/effective.lua",
+              "3.1.0:prototypes/mir/settings/effective.lua",
+              "3.1.1:prototypes/mir/settings/effective.lua",
+              "3.1.2:prototypes/mir/settings/effective.lua",
+              "3.1.5:prototypes/mir/settings/effective.lua",
+              "3.1.9:prototypes/mir/settings/effective.lua"
+            ],
+            "intent_groups": [
+              "effective-import-lifetime"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "a0de500543acb191faed464ce86b52d8cfceb179",
+            "paths": [
+              "prototypes/mir/runtime/state.lua"
+            ],
+            "bytes": 479,
+            "sha256": "F2604900B741522FD2DC9B71806EE20DA6CCF14DC53230D983C48AA32D334ACF",
+            "tag_path_references": [
+              "1.3.0:prototypes/mir/runtime/state.lua",
+              "1.3.5:prototypes/mir/runtime/state.lua",
+              "1.3.9:prototypes/mir/runtime/state.lua",
+              "1.4.0:prototypes/mir/runtime/state.lua",
+              "1.4.5:prototypes/mir/runtime/state.lua",
+              "1.4.9:prototypes/mir/runtime/state.lua",
+              "1.5.0:prototypes/mir/runtime/state.lua",
+              "1.5.5:prototypes/mir/runtime/state.lua",
+              "1.5.9:prototypes/mir/runtime/state.lua",
+              "1.6.0:prototypes/mir/runtime/state.lua",
+              "1.6.5:prototypes/mir/runtime/state.lua",
+              "1.6.9:prototypes/mir/runtime/state.lua",
+              "1.7.0:prototypes/mir/runtime/state.lua",
+              "1.7.1:prototypes/mir/runtime/state.lua",
+              "1.7.5:prototypes/mir/runtime/state.lua",
+              "1.7.9:prototypes/mir/runtime/state.lua",
+              "1.8.0:prototypes/mir/runtime/state.lua",
+              "1.8.1:prototypes/mir/runtime/state.lua",
+              "1.9.3:prototypes/mir/runtime/state.lua"
+            ],
+            "intent_groups": [
+              "saved-state-custody"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Older root helper preferred any global table before storage. Later original d1a0f0c/7808b54f explicitly selects the target backend. Preserve actual saved-state ownership per target; do not revive ambiguous cross-backend fallback."
+          },
+          {
+            "blob": "d1a0f0c003333a38dd5b6bff1b4ac09283c6b154",
+            "paths": [
+              "prototypes/mir/runtime/state.lua",
+              "source/prototypes/mir/runtime/state.lua"
+            ],
+            "bytes": 367,
+            "sha256": "72AE3AD63EDF56D4437CECEE68F6D0A62F7ED0F8F63F8C135FA9D55CFDB4D739",
+            "tag_path_references": [
+              "0.10.0:prototypes/mir/runtime/state.lua",
+              "0.11.0:prototypes/mir/runtime/state.lua",
+              "0.12.0:prototypes/mir/runtime/state.lua",
+              "0.6.0:prototypes/mir/runtime/state.lua",
+              "0.7.0:prototypes/mir/runtime/state.lua",
+              "0.8.0:prototypes/mir/runtime/state.lua",
+              "0.9.0:prototypes/mir/runtime/state.lua",
+              "1.8.2:prototypes/mir/runtime/state.lua",
+              "1.8.5:prototypes/mir/runtime/state.lua",
+              "1.8.9:prototypes/mir/runtime/state.lua",
+              "1.9.4:prototypes/mir/runtime/state.lua",
+              "1.9.5:prototypes/mir/runtime/state.lua",
+              "1.9.9:prototypes/mir/runtime/state.lua",
+              "2.3.5:prototypes/mir/runtime/state.lua",
+              "2.4.0:prototypes/mir/runtime/state.lua",
+              "2.4.5:prototypes/mir/runtime/state.lua",
+              "2.4.9:prototypes/mir/runtime/state.lua",
+              "2.5.0:prototypes/mir/runtime/state.lua",
+              "2.5.10:prototypes/mir/runtime/state.lua",
+              "2.5.11:prototypes/mir/runtime/state.lua",
+              "2.5.5:prototypes/mir/runtime/state.lua",
+              "2.5.9:prototypes/mir/runtime/state.lua",
+              "3.0.5:prototypes/mir/runtime/state.lua",
+              "3.1.0:prototypes/mir/runtime/state.lua",
+              "3.1.1:prototypes/mir/runtime/state.lua",
+              "3.1.2:prototypes/mir/runtime/state.lua",
+              "3.1.5:prototypes/mir/runtime/state.lua",
+              "3.1.9:prototypes/mir/runtime/state.lua",
+              "3.2.0:prototypes/mir/runtime/state.lua",
+              "3.2.1:prototypes/mir/runtime/state.lua",
+              "3.2.10:prototypes/mir/runtime/state.lua",
+              "3.2.11:prototypes/mir/runtime/state.lua",
+              "3.2.2:prototypes/mir/runtime/state.lua",
+              "3.2.3:prototypes/mir/runtime/state.lua",
+              "3.2.5:prototypes/mir/runtime/state.lua",
+              "3.2.9:prototypes/mir/runtime/state.lua",
+              "v4.0.0:prototypes/mir/runtime/state.lua",
+              "v4.1.0:prototypes/mir/runtime/state.lua",
+              "v4.2.0-stable:source/prototypes/mir/runtime/state.lua",
+              "v4.2.1:source/prototypes/mir/runtime/state.lua",
+              "v4.2.2:source/prototypes/mir/runtime/state.lua",
+              "v4.3.0:source/prototypes/mir/runtime/state.lua",
+              "v4.4.0:source/prototypes/mir/runtime/state.lua",
+              "v4.4.1:source/prototypes/mir/runtime/state.lua",
+              "v4.4.2:source/prototypes/mir/runtime/state.lua",
+              "v4.5.0:source/prototypes/mir/runtime/state.lua",
+              "v4.5.1:source/prototypes/mir/runtime/state.lua",
+              "v4.5.2:source/prototypes/mir/runtime/state.lua",
+              "v4.6.0:source/prototypes/mir/runtime/state.lua",
+              "v4.7.0:source/prototypes/mir/runtime/state.lua",
+              "v4.7.1:source/prototypes/mir/runtime/state.lua",
+              "v4.7.2:source/prototypes/mir/runtime/state.lua",
+              "v4.7.3:source/prototypes/mir/runtime/state.lua"
+            ],
+            "intent_groups": [
+              "saved-state-custody"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "ece294604ebdcdebf1e97391bf4ddbdf2f838370",
+            "paths": [
+              "prototypes/mir/runtime/settings_resolver.lua"
+            ],
+            "bytes": 793,
+            "sha256": "DB82436254D6E30D823A9AB22E4A712371C4EEE03B397B234936925BC3A35926",
+            "tag_path_references": [
+              "1.3.0:prototypes/mir/runtime/settings_resolver.lua",
+              "1.3.5:prototypes/mir/runtime/settings_resolver.lua",
+              "1.3.9:prototypes/mir/runtime/settings_resolver.lua",
+              "1.4.0:prototypes/mir/runtime/settings_resolver.lua",
+              "1.4.5:prototypes/mir/runtime/settings_resolver.lua",
+              "1.4.9:prototypes/mir/runtime/settings_resolver.lua",
+              "1.5.0:prototypes/mir/runtime/settings_resolver.lua",
+              "1.5.5:prototypes/mir/runtime/settings_resolver.lua",
+              "1.5.9:prototypes/mir/runtime/settings_resolver.lua",
+              "1.6.0:prototypes/mir/runtime/settings_resolver.lua",
+              "1.6.5:prototypes/mir/runtime/settings_resolver.lua",
+              "1.6.9:prototypes/mir/runtime/settings_resolver.lua",
+              "1.7.0:prototypes/mir/runtime/settings_resolver.lua",
+              "1.7.1:prototypes/mir/runtime/settings_resolver.lua",
+              "1.7.5:prototypes/mir/runtime/settings_resolver.lua",
+              "1.7.9:prototypes/mir/runtime/settings_resolver.lua",
+              "1.8.0:prototypes/mir/runtime/settings_resolver.lua",
+              "1.8.1:prototypes/mir/runtime/settings_resolver.lua",
+              "1.9.3:prototypes/mir/runtime/settings_resolver.lua",
+              "2.3.0:prototypes/mir/runtime/settings_resolver.lua",
+              "3.0.0:prototypes/mir/runtime/settings_resolver.lua"
+            ],
+            "commit_only_references": [
+              {
+                "commit": "70bb513f5b388ad23c4a5d46dfc945571c3b8217",
+                "path": "prototypes/mir/runtime/settings_resolver.lua",
+                "indexed_tag": "v3.0.0",
+                "ref_kind": "commit-only-local-alias-not-published"
+              }
+            ],
+            "intent_groups": [
+              "default-and-runtime-value-resolution"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          }
+        ],
+        "groups": [
+          {
+            "id": "default-and-runtime-value-resolution",
+            "disposition": "consolidate",
+            "historical_blobs": [
+              "06725ed82ab2898203ecfeea3847eb9a5955b7bb",
+              "75520dd8232506069d699acd28d1bf2dcaccd9f2",
+              "ece294604ebdcdebf1e97391bf4ddbdf2f838370",
+              "21605e5c524d624ededb6ee9c8c07dcb1966b6eb"
+            ],
+            "independent_expectation": "Explicit stream/base defaults precede spec/shared/fallback defaults. A supplied false is distinct from absence; admitted percent settings become1+percent/100 and absent values use the authored canonical delta. Older resolver lacks the later configurable multiplier; preserve the latest delivered setting/effect boundary.",
+            "implementation": [
+              "source/research/settings.lua",
+              "source/runtime/configuration.lua",
+              "source/runtime/agriculture.lua",
+              "source/runtime/spoilage.lua"
+            ],
+            "host_controls": [
+              "tests/test_settings_profile.py::test_registered_settings_are_the_single_active_profile_authority",
+              "tests/test_settings_profile.py::test_import_precedence_uses_profile_validation_before_consumer_normalization",
+              "tests/test_agriculture.py",
+              "tests/test_spoilage.py"
+            ],
+            "remaining_executable_check": "Existing CONT-03/CONT-08 catalogue/default/allowed-value and affected nondefault native-effect checks remain. The helper-only fallback or negative clamp does not qualify a descriptor, malformed input, arbitrary provider or native profile. Review final consumed inputs rather than replaying unchanged helper mappings.",
+            "owner": "Aero mapping/applicability; Black Glass native execution"
+          },
+          {
+            "id": "effective-import-lifetime",
+            "disposition": "retain-corrected-behavior-retire-obsolete-transport",
+            "historical_blobs": [
+              "1a84015b4c3ec36b856407649d33d12c83f17e0d",
+              "3317dbb2c5cbff54d9511803e08c72da25479620",
+              "4af0495bcfb4adec0e6f7813ba87b6f0683a3e56",
+              "31f220dd993374a39123c6cc9f615a224956728a",
+              "3fc719fb62944059b642335cf5f9407ef037d5db",
+              "7736ba122bd38d794c5c931ca1f686dede696116",
+              "a0a0b399517bd3cd2169979e439bc30170faf167"
+            ],
+            "independent_expectation": "Read raw values without losing false/0. Only registered, actually present and catalogue-valid imported values override raw values; the import setting cannot import itself. Malformed profiles fall back with diagnosis. Queries/export retain effective values, useful recognized/invalid/unknown counts and caller-mutation isolation after control parsing closes. Do not persist a second settings authority.",
+            "implementation": [
+              "source/research/settings.lua",
+              "source/research/settings_profile.lua",
+              "source/runtime/configuration.lua",
+              "source/runtime/settings_profile.lua"
+            ],
+            "host_controls": [
+              "tests/test_settings_profile.py::test_import_precedence_uses_profile_validation_before_consumer_normalization",
+              "tests/test_settings_profile.py::test_malformed_import_falls_back_without_executing_input",
+              "tests/test_settings_profile.py::test_runtime_facade_exports_effective_values_and_reports_read_only_counts",
+              "tests/test_settings_profile.py::test_settings_queries_and_runtime_profile_facade_work_after_module_loading_closes",
+              "tests/test_settings_profile.py::test_settings_descriptors_remain_stable_after_caller_mutation_and_parse_closure"
+            ],
+            "variant_decision": "Compiler-context state views, settings-fingerprint snapshots and helper-identity cache invalidation are not a requirement to restore that architecture. Current owners resolve startup values once per loaded control instance; existing read-only facade resolves on request. Earlier false-loss/type-only-validation bugs stay contradicted. Unknown external/private-method consumers remain unresolved under CONT-14.",
+            "remaining_executable_check": "Qualify affected final-package import/provenance, actual full/compact export files and client/server lifecycle through the existing Library/settings queue. These host/source mappings do not accept file output or retire unknown API consumers.",
+            "owner": "Aero mapping/review; Black Glass native/output execution"
+          },
+          {
+            "id": "saved-state-custody",
+            "disposition": "retain-state-identity-retire-layout-only-helper",
+            "historical_blobs": [
+              "a0de500543acb191faed464ce86b52d8cfceb179",
+              "d1a0f0c003333a38dd5b6bff1b4ac09283c6b154",
+              "7808b54f0f331e644bfac646859d398d9b2afbc0"
+            ],
+            "independent_expectation": "Preserve the actual target saved-state backend and existing mir namespace/bucket identities, retaining unrelated foreign/historical fields. Modern Space Age effects consume their exact original unversioned buckets. Read-only loading must not initialize or mutate saved state. A reduced historical target exposes only its admitted API and no unavailable modern event maintenance.",
+            "implementation": [
+              "source/runtime/scripted_effects.lua",
+              "source/runtime/bootstrap.lua",
+              "source/adapters/reduced/control.lua",
+              "source/platform/target.lua"
+            ],
+            "host_controls": [
+              "tests/test_scripted_effects_lifecycle.py::test_imports_historical_buckets_and_uses_named_event_paths",
+              "tests/test_scripted_effects_lifecycle.py::test_disable_restores_only_our_matching_global_write_and_keeps_foreign_write",
+              "tests/test_scripted_effects_lifecycle.py::test_force_reset_merge_and_retired_source_reconcile_without_cap_callbacks",
+              "tests/test_target_adapters.py::test_reduced_control_registers_only_the_unified_api",
+              "tests/test_target_adapters.py::test_reduced_adapters_contain_no_library_or_event_maintenance"
+            ],
+            "variant_decision": "Do not import the old generic namespace/bucket initializer or opportunistically prefer global over storage. Preserve useful state/read-only semantics through current named owners and target capabilities; a global/storage locator alone proves no migration.",
+            "remaining_executable_check": "Existing selected migration/native global-contribution/removal-readdition/save/client routes and final-candidate applicability remain required. Host lifecycle and reduced-adapter controls are not native backend or historical save qualification.",
+            "owner": "Aero mapping/applicability; Black Glass native execution"
+          }
+        ],
+        "host_validation": {
+          "existing_selected_controls": 25,
+          "settings_profile": 8,
+          "scripted_effects_lifecycle": 3,
+          "target_adapters": 14,
+          "lua": "5.2",
+          "lupa": "2.6",
+          "new_or_modified_tests": 0,
+          "native_execution": false
+        },
+        "custody": "build/qualification/aero-runtime-helper-intents-r01/",
+        "qualification_limit": "Only the six selected helper source intents and their named current control mappings are reconciled. No demonstrated current product defect or new player source change. Global VER-07 and registry/default/catalogue/inter-release/external-consumer/native/output/performance/release gates remain open. Original results retain their original identities.",
+        "native_execution": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-07",
+          "CONT-08",
+          "CONT-11",
+          "CONT-12",
+          "CONT-13",
+          "VER-07"
+        ],
+        "reviewed_on": "2026-11-02",
+        "reviewed_against": "8f668713b15e5f97f8ab2d7e4446a0170ba10d78",
+        "scope": "The35 deduplicated Test-MIRUpgrade.ps1 bodies and their172 retained tag/path references in the original source index. This dispositions the runner/wrapper family, not every invoked fixture/helper, historical upgrade result, inter-release change or selected final-candidate route.",
+        "method": "Read the complete latest1800-line runner, partition every earlier body against its exact lines, and read all331 unique earlier change blocks/825 lines in context. Equal-line plus changed-block coverage accounts for every line of every selected original. The resulting source identity and semantic mapping do not execute old runners or turn marker labels into independent fixture oracles.",
+        "selected_blob_count": 35,
+        "distinct_retained_tag_references": 172,
+        "redirect_only_wrappers": 2,
+        "reference_limits": [
+          "The indexed v4.2.0 alias consolidates with v4.2.0-stable at the same commit without altering original source-index custody. All retained tag/commit/path lookups were checked.",
+          "A historical tag containing embedded .mir/target-lines copies does not establish that those copies executed at that tag. Source presence, executed harness identity and native verdict are distinct."
+        ],
+        "selected_blob_variants": [
+          {
+            "blob": "563d02aaf32d5c8bb10333516c7975f71afdf8e5",
+            "bytes": 7238,
+            "sha256": "B5E225C9855AD3B81010C9CC362B97977E7C1784652FF477B7D9DF8F22E36AD9",
+            "paths": [
+              ".mir/target-lines/0.10.0/scripts/Test-MIRUpgrade.ps1",
+              ".mir/target-lines/0.11.0/scripts/Test-MIRUpgrade.ps1",
+              ".mir/target-lines/0.12.0/scripts/Test-MIRUpgrade.ps1",
+              ".mir/target-lines/0.6.0/scripts/Test-MIRUpgrade.ps1",
+              ".mir/target-lines/0.7.0/scripts/Test-MIRUpgrade.ps1",
+              ".mir/target-lines/0.8.0/scripts/Test-MIRUpgrade.ps1",
+              ".mir/target-lines/0.9.0/scripts/Test-MIRUpgrade.ps1",
+              ".mir/target-lines/1.3.0/scripts/Test-MIRUpgrade.ps1",
+              ".mir/target-lines/1.4.0/scripts/Test-MIRUpgrade.ps1",
+              ".mir/target-lines/1.5.0/scripts/Test-MIRUpgrade.ps1",
+              ".mir/target-lines/1.6.0/scripts/Test-MIRUpgrade.ps1",
+              ".mir/target-lines/1.7.1/scripts/Test-MIRUpgrade.ps1",
+              ".mir/target-lines/1.8.2/scripts/Test-MIRUpgrade.ps1",
+              ".mir/target-lines/1.9.4/scripts/Test-MIRUpgrade.ps1",
+              "scripts/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "0.10.0:scripts/Test-MIRUpgrade.ps1",
+              "0.11.0:scripts/Test-MIRUpgrade.ps1",
+              "0.12.0:scripts/Test-MIRUpgrade.ps1",
+              "0.6.0:scripts/Test-MIRUpgrade.ps1",
+              "0.7.0:scripts/Test-MIRUpgrade.ps1",
+              "0.8.0:scripts/Test-MIRUpgrade.ps1",
+              "0.9.0:scripts/Test-MIRUpgrade.ps1",
+              "1.3.0:scripts/Test-MIRUpgrade.ps1",
+              "1.4.0:scripts/Test-MIRUpgrade.ps1",
+              "1.5.0:scripts/Test-MIRUpgrade.ps1",
+              "1.6.0:scripts/Test-MIRUpgrade.ps1",
+              "1.7.1:scripts/Test-MIRUpgrade.ps1",
+              "1.8.2:scripts/Test-MIRUpgrade.ps1",
+              "1.8.5:scripts/Test-MIRUpgrade.ps1",
+              "1.8.9:scripts/Test-MIRUpgrade.ps1",
+              "1.9.4:scripts/Test-MIRUpgrade.ps1",
+              "1.9.5:scripts/Test-MIRUpgrade.ps1",
+              "1.9.9:scripts/Test-MIRUpgrade.ps1",
+              "3.2.0:.mir/target-lines/0.10.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.0:.mir/target-lines/0.11.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.0:.mir/target-lines/0.12.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.0:.mir/target-lines/0.6.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.0:.mir/target-lines/0.7.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.0:.mir/target-lines/0.8.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.0:.mir/target-lines/0.9.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.0:.mir/target-lines/1.3.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.0:.mir/target-lines/1.4.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.0:.mir/target-lines/1.5.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.0:.mir/target-lines/1.6.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.0:.mir/target-lines/1.7.1/scripts/Test-MIRUpgrade.ps1",
+              "3.2.0:.mir/target-lines/1.8.2/scripts/Test-MIRUpgrade.ps1",
+              "3.2.0:.mir/target-lines/1.9.4/scripts/Test-MIRUpgrade.ps1",
+              "3.2.1:.mir/target-lines/0.10.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.1:.mir/target-lines/0.11.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.1:.mir/target-lines/0.12.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.1:.mir/target-lines/0.6.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.1:.mir/target-lines/0.7.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.1:.mir/target-lines/0.8.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.1:.mir/target-lines/0.9.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.1:.mir/target-lines/1.3.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.1:.mir/target-lines/1.4.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.1:.mir/target-lines/1.5.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.1:.mir/target-lines/1.6.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.1:.mir/target-lines/1.7.1/scripts/Test-MIRUpgrade.ps1",
+              "3.2.1:.mir/target-lines/1.8.2/scripts/Test-MIRUpgrade.ps1",
+              "3.2.1:.mir/target-lines/1.9.4/scripts/Test-MIRUpgrade.ps1",
+              "3.2.2:.mir/target-lines/0.10.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.2:.mir/target-lines/0.11.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.2:.mir/target-lines/0.12.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.2:.mir/target-lines/0.6.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.2:.mir/target-lines/0.7.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.2:.mir/target-lines/0.8.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.2:.mir/target-lines/0.9.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.2:.mir/target-lines/1.3.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.2:.mir/target-lines/1.4.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.2:.mir/target-lines/1.5.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.2:.mir/target-lines/1.6.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.2:.mir/target-lines/1.7.1/scripts/Test-MIRUpgrade.ps1",
+              "3.2.2:.mir/target-lines/1.8.2/scripts/Test-MIRUpgrade.ps1",
+              "3.2.2:.mir/target-lines/1.9.4/scripts/Test-MIRUpgrade.ps1",
+              "3.2.3:.mir/target-lines/0.10.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.3:.mir/target-lines/0.11.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.3:.mir/target-lines/0.12.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.3:.mir/target-lines/0.6.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.3:.mir/target-lines/0.7.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.3:.mir/target-lines/0.8.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.3:.mir/target-lines/0.9.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.3:.mir/target-lines/1.3.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.3:.mir/target-lines/1.4.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.3:.mir/target-lines/1.5.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.3:.mir/target-lines/1.6.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.3:.mir/target-lines/1.7.1/scripts/Test-MIRUpgrade.ps1",
+              "3.2.3:.mir/target-lines/1.8.2/scripts/Test-MIRUpgrade.ps1",
+              "3.2.3:.mir/target-lines/1.9.4/scripts/Test-MIRUpgrade.ps1",
+              "3.2.5:.mir/target-lines/0.10.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.5:.mir/target-lines/0.11.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.5:.mir/target-lines/0.12.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.5:.mir/target-lines/0.6.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.5:.mir/target-lines/0.7.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.5:.mir/target-lines/0.8.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.5:.mir/target-lines/0.9.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.5:.mir/target-lines/1.3.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.5:.mir/target-lines/1.4.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.5:.mir/target-lines/1.5.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.5:.mir/target-lines/1.6.0/scripts/Test-MIRUpgrade.ps1",
+              "3.2.5:.mir/target-lines/1.7.1/scripts/Test-MIRUpgrade.ps1",
+              "3.2.5:.mir/target-lines/1.8.2/scripts/Test-MIRUpgrade.ps1",
+              "3.2.5:.mir/target-lines/1.9.4/scripts/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "source/load marker only; no two-reload assertion"
+          },
+          {
+            "blob": "11724ccb0be021244c7f2342b1ccda0ebf9b38b3",
+            "bytes": 10196,
+            "sha256": "B18253618D62110795F0924EB6F6D4FCC60803D96B74DD1CB48614358D3B9031",
+            "paths": [
+              "scripts/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "1.3.5:scripts/Test-MIRUpgrade.ps1",
+              "1.3.9:scripts/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "source/load marker only; no two-reload assertion"
+          },
+          {
+            "blob": "b38a2aade25bf59e3fa6d5fbe2bacfc36badf505",
+            "bytes": 9708,
+            "sha256": "9AC9826EDC5FCB1FF60795F1C3602ADEF84450EE033B6A14150EA14505F6E9DC",
+            "paths": [
+              "scripts/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "1.4.5:scripts/Test-MIRUpgrade.ps1",
+              "1.4.9:scripts/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "source/load marker only; no two-reload assertion"
+          },
+          {
+            "blob": "4aff69f0f6e42a8f2fce78a6a2fa965f2379881b",
+            "bytes": 9201,
+            "sha256": "AAD62D416805745D32B05A4B1F5341A2521A957C4B34F5B3196CBFEB55CAF017",
+            "paths": [
+              "scripts/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "1.5.5:scripts/Test-MIRUpgrade.ps1",
+              "1.5.9:scripts/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "source/load marker only; no two-reload assertion"
+          },
+          {
+            "blob": "e56e7668e6dacc694e042aa1119c1f1dfee400a2",
+            "bytes": 8179,
+            "sha256": "92EA16B047488DB5B26791667A68313541FA1C8B97955CC5DEDF4D0A85DFC284",
+            "paths": [
+              "scripts/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "1.6.5:scripts/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "source/load marker only; no two-reload assertion"
+          },
+          {
+            "blob": "68253bb8728c1cb74c3ed4e65987e9831d63a0e6",
+            "bytes": 8742,
+            "sha256": "EC00645921F659BFDECD5B3A06B18620BFADA1885B5C11A97A5920479A881D56",
+            "paths": [
+              "scripts/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "1.6.9:scripts/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "source/load marker only; no two-reload assertion"
+          },
+          {
+            "blob": "d7149689a6233f1170321eb5dccef77157db3acf",
+            "bytes": 8107,
+            "sha256": "3B849F9EB1B9A995EE382A06FAFF1058A510C3673EEC5CBEB57ABD4DE73E3182",
+            "paths": [
+              "scripts/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "1.7.5:scripts/Test-MIRUpgrade.ps1",
+              "1.7.9:scripts/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "source/load marker only; no two-reload assertion"
+          },
+          {
+            "blob": "f287693879fba88df191a4e793dc5419bac8b50f",
+            "bytes": 5962,
+            "sha256": "34C7DF41522B59DFB454685F2549C469AEC8DB249BB9E0E16A47692E1633FEAE",
+            "paths": [
+              "scripts/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "2.4.0:scripts/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "source/load marker only; no two-reload assertion"
+          },
+          {
+            "blob": "4a42f4886db3ce838bd092f6563fe2db28638b16",
+            "bytes": 6436,
+            "sha256": "BC4967AB03FE8FCE8122D9E1A60A18338D6D136203F96F71769A579B4FD5F22E",
+            "paths": [
+              ".mir/target-lines/2.4.5/scripts/Test-MIRUpgrade.ps1",
+              "scripts/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "2.4.5:scripts/Test-MIRUpgrade.ps1",
+              "3.2.0:.mir/target-lines/2.4.5/scripts/Test-MIRUpgrade.ps1",
+              "3.2.1:.mir/target-lines/2.4.5/scripts/Test-MIRUpgrade.ps1",
+              "3.2.2:.mir/target-lines/2.4.5/scripts/Test-MIRUpgrade.ps1",
+              "3.2.3:.mir/target-lines/2.4.5/scripts/Test-MIRUpgrade.ps1",
+              "3.2.5:.mir/target-lines/2.4.5/scripts/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "source/load marker only; no two-reload assertion"
+          },
+          {
+            "blob": "3e416783733f773f9ba61937e0e786cabb1adedc",
+            "bytes": 9585,
+            "sha256": "F7FAA7AD1E3926D9045DCA1219A5CC109D092E83944045DD7E626EF69FD30D2C",
+            "paths": [
+              ".mir/target-lines/2.4.9/scripts/Test-MIRUpgrade.ps1",
+              "scripts/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "2.4.9:scripts/Test-MIRUpgrade.ps1",
+              "3.2.0:.mir/target-lines/2.4.9/scripts/Test-MIRUpgrade.ps1",
+              "3.2.1:.mir/target-lines/2.4.9/scripts/Test-MIRUpgrade.ps1",
+              "3.2.2:.mir/target-lines/2.4.9/scripts/Test-MIRUpgrade.ps1",
+              "3.2.3:.mir/target-lines/2.4.9/scripts/Test-MIRUpgrade.ps1",
+              "3.2.5:.mir/target-lines/2.4.9/scripts/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "source/load marker only; no two-reload assertion"
+          },
+          {
+            "blob": "6f983cfe7cbca4f960cf7d69174a7d9838b2b4d4",
+            "bytes": 13056,
+            "sha256": "D05FC7E543726781CCB4D06ED29AD84DEFF086776487B9AFDAEBDE1F89AB54CE",
+            "paths": [
+              "scripts/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "2.5.0:scripts/Test-MIRUpgrade.ps1",
+              "3.2.0:scripts/Test-MIRUpgrade.ps1",
+              "3.2.1:scripts/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "source/load marker only; no two-reload assertion"
+          },
+          {
+            "blob": "bf1a953ba7c213ee58e6806da452bfd0695d9dde",
+            "bytes": 13056,
+            "sha256": "74D944A87A437CEA8BC2D7AAF09FF28BA55B2847A2B0D976740145E25D1D55CC",
+            "paths": [
+              "scripts/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "2.5.10:scripts/Test-MIRUpgrade.ps1",
+              "2.5.11:scripts/Test-MIRUpgrade.ps1",
+              "2.5.5:scripts/Test-MIRUpgrade.ps1",
+              "2.5.9:scripts/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "source/load marker only; no two-reload assertion"
+          },
+          {
+            "blob": "62a21c915c05dccb53e35777746444539f191d33",
+            "bytes": 5874,
+            "sha256": "B8A494587ED4E60AE12146C595CAFA8CAD9A920BFEF8D5EF45994364AC25A5BC",
+            "paths": [
+              "scripts/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "3.1.0:scripts/Test-MIRUpgrade.ps1",
+              "3.1.1:scripts/Test-MIRUpgrade.ps1",
+              "3.1.2:scripts/Test-MIRUpgrade.ps1",
+              "3.1.5:scripts/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "source/load marker only; no two-reload assertion"
+          },
+          {
+            "blob": "86124d6866c5181454390d07745ef77c4e2b1721",
+            "bytes": 6233,
+            "sha256": "234DE7FCF4CAF78FEDB643382F5DC53E004A53D3E97EBAF70E540F6955AF3B81",
+            "paths": [
+              ".mir/target-lines/3.1.9/scripts/Test-MIRUpgrade.ps1",
+              "scripts/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "3.1.9:scripts/Test-MIRUpgrade.ps1",
+              "3.2.0:.mir/target-lines/3.1.9/scripts/Test-MIRUpgrade.ps1",
+              "3.2.1:.mir/target-lines/3.1.9/scripts/Test-MIRUpgrade.ps1",
+              "3.2.2:.mir/target-lines/3.1.9/scripts/Test-MIRUpgrade.ps1",
+              "3.2.3:.mir/target-lines/3.1.9/scripts/Test-MIRUpgrade.ps1",
+              "3.2.5:.mir/target-lines/3.1.9/scripts/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "source/load marker only; no two-reload assertion"
+          },
+          {
+            "blob": "6deda5fcb75238d29196b0556b09ae5a63de5602",
+            "bytes": 815,
+            "sha256": "5F2141F9C435ABA379263C541CD2B65FB37027F0526AE7D2596207541B560B55",
+            "paths": [
+              "scripts/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "3.2.10:scripts/Test-MIRUpgrade.ps1",
+              "3.2.11:scripts/Test-MIRUpgrade.ps1",
+              "3.2.5:scripts/Test-MIRUpgrade.ps1",
+              "3.2.9:scripts/Test-MIRUpgrade.ps1",
+              "v4.0.0:scripts/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "obsolete-implementation-only",
+            "intent_groups": [
+              "retired-runner-transport"
+            ],
+            "variant_decision": "A seventeen-line parameter/forwarding wrapper changes only the canonical script path; it owns no independent native oracle. Retain historical lookup identity without restoring either command layout."
+          },
+          {
+            "blob": "f3cb9913ac86a3665bebf96b603d32b890e21825",
+            "bytes": 21089,
+            "sha256": "8FAEA0505924463786E06DB41D88E84536D28E19F49D5ED90E2F0249C2B845B0",
+            "paths": [
+              "validation/tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "3.2.10:validation/tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport",
+              "fresh-native-save-and-reload"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "explicit selected save plus two reload branches"
+          },
+          {
+            "blob": "86fcbaa1fdcbfbb199ff093feeefceb38f9bb407",
+            "bytes": 21729,
+            "sha256": "BD49C44655A423A26175DD61F7B08ED87F9E978D1675BE3601D13ED1E8EF3C9F",
+            "paths": [
+              "validation/tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "3.2.11:validation/tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport",
+              "fresh-native-save-and-reload"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "explicit selected save plus two reload branches"
+          },
+          {
+            "blob": "1dfe6cfa2db383b1e18db3efc8eb542cc7c954e8",
+            "bytes": 13280,
+            "sha256": "38B2A3CBA458966E718FFF786D92E39D2D2B6168CF3B702A92626F61BCD83893",
+            "paths": [
+              "scripts/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "3.2.2:scripts/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "source/load marker only; no two-reload assertion"
+          },
+          {
+            "blob": "7fda47ebd349dbb0193eeb437aaa1f4ca1267386",
+            "bytes": 17617,
+            "sha256": "E8C699D5737079928EDF41F26A67BFE90B3554C8842A90715AD0DA3E68635A37",
+            "paths": [
+              "scripts/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "3.2.3:scripts/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport",
+              "fresh-native-save-and-reload"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "selected save/reload branch without two-reload proof"
+          },
+          {
+            "blob": "9be2059c0f77699b9d67015c8d822721f67be8df",
+            "bytes": 19233,
+            "sha256": "27B077904C6ED31F78D3B45D21721A0BCBF01C8AC9D0DA94980C272FB21293D5",
+            "paths": [
+              "validation/tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "3.2.5:validation/tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport",
+              "fresh-native-save-and-reload"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "explicit selected save plus two reload branches"
+          },
+          {
+            "blob": "02b223f90e587d59183fcc48169a968278fae40b",
+            "bytes": 20121,
+            "sha256": "3606257629222A4EBD6513A2545E5F4617F663FFC7FA9C518D5C3BA6E097E320",
+            "paths": [
+              "validation/tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "3.2.9:validation/tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport",
+              "fresh-native-save-and-reload"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "explicit selected save plus two reload branches"
+          },
+          {
+            "blob": "c0fca7c33f212d673cc7692a983d20ecd262ddb1",
+            "bytes": 21809,
+            "sha256": "2088D1F709E6753C4B7C7DB8E8274A504C37283620E3D7C877B30ABF6292645D",
+            "paths": [
+              "validation/tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "v4.0.0:validation/tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport",
+              "fresh-native-save-and-reload"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "explicit selected save plus two reload branches"
+          },
+          {
+            "blob": "7539505be9533772155096e22fca1de0dda627c3",
+            "bytes": 804,
+            "sha256": "9BBD8FA66ABA3F3EB3F7A36D876BE1D3871816FC30CA3CAD74238B828FFC4E89",
+            "paths": [
+              "scripts/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "v4.1.0:scripts/Test-MIRUpgrade.ps1",
+              "v4.2.0-stable:scripts/Test-MIRUpgrade.ps1",
+              "v4.2.1:scripts/Test-MIRUpgrade.ps1",
+              "v4.2.2:scripts/Test-MIRUpgrade.ps1",
+              "v4.3.0:scripts/Test-MIRUpgrade.ps1",
+              "v4.4.0:scripts/Test-MIRUpgrade.ps1",
+              "v4.4.1:scripts/Test-MIRUpgrade.ps1",
+              "v4.4.2:scripts/Test-MIRUpgrade.ps1",
+              "v4.5.0:scripts/Test-MIRUpgrade.ps1",
+              "v4.5.1:scripts/Test-MIRUpgrade.ps1",
+              "v4.5.2:scripts/Test-MIRUpgrade.ps1",
+              "v4.6.0:scripts/Test-MIRUpgrade.ps1",
+              "v4.7.0:scripts/Test-MIRUpgrade.ps1",
+              "v4.7.1:scripts/Test-MIRUpgrade.ps1",
+              "v4.7.2:scripts/Test-MIRUpgrade.ps1",
+              "v4.7.3:scripts/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "obsolete-implementation-only",
+            "intent_groups": [
+              "retired-runner-transport"
+            ],
+            "variant_decision": "A seventeen-line parameter/forwarding wrapper changes only the canonical script path; it owns no independent native oracle. Retain historical lookup identity without restoring either command layout."
+          },
+          {
+            "blob": "1fc77ba4dfadb84247cff2312352329b971f7ce2",
+            "bytes": 25134,
+            "sha256": "EEAA5949651236B43B7883964B86B2485854B259523F7605C929AF4187C46ABC",
+            "paths": [
+              "tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "v4.1.0:tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport",
+              "fresh-native-save-and-reload"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "explicit selected save plus two reload branches"
+          },
+          {
+            "blob": "630fcb037ff36f66e8977bb85d33d59d42f97e1e",
+            "bytes": 34011,
+            "sha256": "8A35A94EA30F71176F647628280D352E46C29F2DE0470EBDAD6110ABA65941AD",
+            "paths": [
+              "tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "v4.2.0-stable:tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport",
+              "fresh-native-save-and-reload"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "explicit selected save plus two reload branches"
+          },
+          {
+            "blob": "9931ed24ddb48dec5fb37822756d8edf320d3f97",
+            "bytes": 59324,
+            "sha256": "3E5AC1608E99AD31401336CEFF1BA7991A3579723C54182F4CF4FBFE95BF2C7E",
+            "paths": [
+              "tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "v4.2.1:tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport",
+              "fresh-native-save-and-reload"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "explicit selected save plus two reload branches"
+          },
+          {
+            "blob": "9ffeabe553631a33839573281918b96d1aab677e",
+            "bytes": 72341,
+            "sha256": "AC1F00510C3D87B2F20DDF06864CAC26799427A71B26E5A25709FCAE37C4EC3A",
+            "paths": [
+              "tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "v4.2.2:tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport",
+              "fresh-native-save-and-reload",
+              "full-state-and-narrow-definition-deltas"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "explicit selected save plus two reload branches"
+          },
+          {
+            "blob": "03b72781cfd5f8683455f686b314ec11fa1c2ee5",
+            "bytes": 96956,
+            "sha256": "27A3A40FCA186182004BA66B183F58C13C4B4495344A0FBACCBC70A372668B5A",
+            "paths": [
+              "tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "v4.3.0:tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport",
+              "fresh-native-save-and-reload",
+              "full-state-and-narrow-definition-deltas",
+              "historical-classic-and-unrecoverable-state"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "explicit selected save plus two reload branches"
+          },
+          {
+            "blob": "4c55b55731cda53984b62f6087a56b7c1aed2769",
+            "bytes": 104624,
+            "sha256": "E76A806C7277AA356C802711328CEBB815D2ED4C154583453F135EA17F2F1B03",
+            "paths": [
+              "tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "v4.4.0:tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport",
+              "fresh-native-save-and-reload",
+              "full-state-and-narrow-definition-deltas",
+              "historical-classic-and-unrecoverable-state"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "explicit selected save plus two reload branches"
+          },
+          {
+            "blob": "cf6126246f8ba8bc5e559d0330f5da609b453b90",
+            "bytes": 104712,
+            "sha256": "936BD2EBC56AD681BD8ECC693C778374877DA93228A07E64B9D35B29F70742A4",
+            "paths": [
+              "tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "v4.4.1:tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport",
+              "fresh-native-save-and-reload",
+              "full-state-and-narrow-definition-deltas",
+              "historical-classic-and-unrecoverable-state"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "explicit selected save plus two reload branches"
+          },
+          {
+            "blob": "02dc96d09161c015d3a2511c75cff6fc46426f43",
+            "bytes": 106804,
+            "sha256": "BE80DC60273725723C7DB5CFE2BF59C1CC44A1BA53588ED3F11A31833D5FD157",
+            "paths": [
+              "tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "v4.4.2:tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport",
+              "fresh-native-save-and-reload",
+              "full-state-and-narrow-definition-deltas",
+              "historical-classic-and-unrecoverable-state"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "explicit selected save plus two reload branches"
+          },
+          {
+            "blob": "5734b4a7d30d4629f440b0fd9e3eeed548ea5b30",
+            "bytes": 109948,
+            "sha256": "40534617F7D6B037846110C8FD89ED6C004E700F1C62A739E7485952617709C7",
+            "paths": [
+              "tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "v4.5.0:tests/runtime/Test-MIRUpgrade.ps1",
+              "v4.5.1:tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport",
+              "fresh-native-save-and-reload",
+              "full-state-and-narrow-definition-deltas",
+              "historical-classic-and-unrecoverable-state"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "explicit selected save plus two reload branches"
+          },
+          {
+            "blob": "be139dba50e056dea67f83434a68860c6fc50a26",
+            "bytes": 112666,
+            "sha256": "F297B07A853E6E27DE744C25FA6DFA8F112D861A0FA7AD6F8D4A8F36F4B73945",
+            "paths": [
+              "tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "v4.5.2:tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport",
+              "fresh-native-save-and-reload",
+              "full-state-and-narrow-definition-deltas",
+              "historical-classic-and-unrecoverable-state"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "explicit selected save plus two reload branches"
+          },
+          {
+            "blob": "f2bd9a8e473643d2ae4685a9732b7180e218369d",
+            "bytes": 115477,
+            "sha256": "7F453AC32C67B63D25C773A8D6C008CEBC1B2FDFD0F8BCD32EE72CA0AB894020",
+            "paths": [
+              "tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "v4.6.0:tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport",
+              "fresh-native-save-and-reload",
+              "full-state-and-narrow-definition-deltas",
+              "historical-classic-and-unrecoverable-state"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "explicit selected save plus two reload branches"
+          },
+          {
+            "blob": "89c84963b8e888bd587443b4d4b20be4d0529210",
+            "bytes": 133289,
+            "sha256": "3CE5A0E350E7823FD588215CFE125B40F29F5B5711486719C3D4E77D867C7355",
+            "paths": [
+              "tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "tag_path_references": [
+              "v4.7.0:tests/runtime/Test-MIRUpgrade.ps1",
+              "v4.7.1:tests/runtime/Test-MIRUpgrade.ps1",
+              "v4.7.2:tests/runtime/Test-MIRUpgrade.ps1",
+              "v4.7.3:tests/runtime/Test-MIRUpgrade.ps1"
+            ],
+            "disposition": "consolidate-runner-expectations-retain-dependent-oracle-review",
+            "intent_groups": [
+              "exact-input-and-custody",
+              "earned-and-foreign-state",
+              "retired-runner-transport",
+              "fresh-native-save-and-reload",
+              "full-state-and-narrow-definition-deltas",
+              "historical-classic-and-unrecoverable-state"
+            ],
+            "variant_decision": "Retain the finite mapped acceptance obligations, not old version selectors/builders/transport or result-schema labels. Embedded target-line copies and equal blobs are source references, not independent tests. Imported fixture/helper semantics and actual saved-state/results retain their separate identities and unresolved applicability.",
+            "original_reload_scope": "explicit selected save plus two reload branches"
+          }
+        ],
+        "review_custody": {
+          "baseline_blob": "89c84963b8e888bd587443b4d4b20be4d0529210",
+          "latest_lines": 1800,
+          "earlier_unique_change_blocks": 331,
+          "earlier_unique_change_lines": 825,
+          "chunks": [
+            {
+              "path": "legacy-review-chunk-1.txt",
+              "bytes": 14235,
+              "sha256": "93A3C6167789866F633F8135F7B9AB316A29BED763BBFAA927DB7A69BC824EE4",
+              "reviewed": true
+            },
+            {
+              "path": "legacy-review-chunk-2.txt",
+              "bytes": 14052,
+              "sha256": "1F91741B04F03F590D74127B670065B153AC2B6B2222644772D05CB38003EA86",
+              "reviewed": true
+            },
+            {
+              "path": "legacy-review-chunk-3.txt",
+              "bytes": 14188,
+              "sha256": "F4C06F298E77282EA351ABAD8D3A60F325AB120C713C0312CE4543BB58CA8044",
+              "reviewed": true
+            },
+            {
+              "path": "legacy-review-chunk-4.txt",
+              "bytes": 13986,
+              "sha256": "B7C5A4D695AA82D9F6AF728B38A30F1DAA4A223CAF51D9120E8A282DC7A6E743",
+              "reviewed": true
+            },
+            {
+              "path": "legacy-review-chunk-5.txt",
+              "bytes": 14161,
+              "sha256": "4A1387C4EF17EF7EE87F1133930F60E27502EFA1581FAB47E1A77B2589973BF4",
+              "reviewed": true
+            },
+            {
+              "path": "legacy-review-chunk-6.txt",
+              "bytes": 13992,
+              "sha256": "453CAD4F39CF976008339B972A2F575A88B5E785332C60DD3D825C14FB20014E",
+              "reviewed": true
+            },
+            {
+              "path": "legacy-review-chunk-7.txt",
+              "bytes": 4307,
+              "sha256": "8F21A04F3C4654706692D5A2420F52D2E69A2D524EBBBAE451D9D9D9BE04EE90",
+              "reviewed": true
+            }
+          ],
+          "line_partition_file": "legacy-delta-blocks.json"
+        },
+        "groups": [
+          {
+            "id": "exact-input-and-custody",
+            "disposition": "retain",
+            "independent_expectation": "Authenticate the exact predecessor and candidate archive/member/version/target/engine/settings/upstream inputs; preserve original source saves, use an owned copy and keep exact native results separate. Candidate/preparation manifests and same-name or adjacent-version packages are not substitutes for consumed bytes.",
+            "implementation": [
+              "tools/Invoke-NativeFixture.ps1",
+              "tools/lib/validation/ImmutableInputStaging.ps1",
+              "tools/lib/compatibility/LibraryActivation.ps1"
+            ],
+            "host_controls": [
+              "tests/test_historical_native_runner.py::test_actual_archive_guard_accepts_six_members_and_rejects_merged_dependencies_or_missing_member",
+              "tests/test_migration_origins_successor_controls.py::test_data_guard_admits_only_the_two_exact_current_targets_and_only_accelerates_direct_cost",
+              "tests/test_full_catalogue_upgrade_fixture.py::test_profiles_controls_and_native_boundaries_are_explicit"
+            ],
+            "remaining_executable_check": "Apply existing VER-06 consumed-input review after final freeze to the named nine4.7.3 same-edition routes, seven older-contract groups and four published forward journeys. Preserve their existing closed-at-recorded-inputs results and original protected saves; execute genuinely affected paths only.",
+            "owner": "Aero applicability/review; Black Glass native queue"
+          },
+          {
+            "id": "earned-and-foreign-state",
+            "disposition": "retain-dependent-oracles",
+            "independent_expectation": "Preserve applicable technology/settings identities, earned level/effect and legitimate current/queued/detached work, ordered queue and unrelated custom recipe/force/runtime state across upgrade/configuration. Old labels also distinguish completed research-unit work from a raw fraction when costs change; neither label alone supplies the expected arithmetic.",
+            "implementation": [
+              "source/migrations",
+              "source/runtime/bootstrap.lua",
+              "source/runtime/k2_imersite_migration.lua",
+              "source/runtime/legacy_caps.lua"
+            ],
+            "host_controls": [
+              "tests/test_full_catalogue_upgrade_fixture.py::test_exact_oracle_identity_effect_and_credit_closure",
+              "tests/test_full_catalogue_upgrade_f210_fixture.py::test_exact_independent_inventory_and_published_owner_closure",
+              "tests/test_migration_origins_successor_controls.py::test_control_preserves_the_actual_source_baseline_then_records_separate_f200_and_f210_labs"
+            ],
+            "variant_decision": "Earlier named2.4.5-to2.4.9 labels protect post-reconciliation custom recipe/force effects; other variants name native-owner cost pairing, platform-owner transfer and researched-discovery locks. These remain original expectation references requiring their actual imported oracle/accepted-decision mapping; do not infer values from the candidate or impose uniform unchanged percentages across an authorized cost transition.",
+            "remaining_executable_check": "Keep current selected native/source oracles and adverse receipts distinct. Finish imported fixture/helper intent for any unmapped custom-state/cost/owner assertion; review final package effects and affected save/client routes. Host preservation and marker strings are not actual native saved-progress or earned-work qualification.",
+            "owner": "Aero source/oracle mapping; Black Glass affected native execution"
+          },
+          {
+            "id": "fresh-native-save-and-reload",
+            "disposition": "retain-stricter-current-boundary",
+            "independent_expectation": "A required save and each of two cold reloads need their actual selected process, fresh invocation evidence, preserved archive and applicable read-only state assertions. Preserve closed-archive/CRC checks and distinguish engine-specific server/benchmark capability from the scenario endpoint.",
+            "implementation": [
+              "tools/Invoke-NativeFixture.ps1",
+              "tools/lib/validation/NativeProbeCommon.ps1"
+            ],
+            "host_controls": [
+              "tests/test_historical_native_runner.py::test_runner_keeps_historical_server_reloads_separate_from_the_modern_benchmark_vector",
+              "tests/test_historical_native_runner.py::test_historical_save_completion_requires_a_closed_native_archive",
+              "tests/test_full_catalogue_upgrade_f210_fixture.py::test_f210_473_source_snapshot_reaches_the_current_successor_unchanged",
+              "tests/test_migration_origins_successor_controls.py::test_control_registers_configuration_lifecycle_without_work_at_parse_time"
+            ],
+            "variant_decision": "Earlier branches could replace a legacy server timeout/nonzero transport result with a successful configuration marker; that historical scope does not prove normal engine exit. Earlier no-log-rotation reloads could retain old markers; the latest body explicitly clears the owned log before each reload and copies separate snapshots. Original declared counters and status=passed fields are not independent actual-PID or fresh-state evidence. No historical receipt is rewritten or retroactively failed merely from this source review.",
+            "remaining_executable_check": "For any reused named chain, inspect its actual original process/log/save/CRC/endpoint witnesses and exact harness applicability. Preserve adverse/scoped-success distinctions. Current runner controls and fixture existence do not qualify an old run or complete client lifecycle.",
+            "owner": "Aero evidence review; Black Glass native execution"
+          },
+          {
+            "id": "full-state-and-narrow-definition-deltas",
+            "disposition": "retain-narrow-independent-expectations",
+            "independent_expectation": "Full-catalogue comparisons preserve every admitted existing technology/effect/queue and exact active mod closure, except an independently justified named transition. Source/upgrade/reload observations remain separate. Explicit K2 carrier, Space Is Fake science, Bob/Angel/Galore closure and trigger-science cases do not qualify other profiles.",
+            "implementation": [
+              "source/research",
+              "source/compatibility",
+              "source/runtime/k2_imersite_migration.lua"
+            ],
+            "host_controls": [
+              "tests/test_full_catalogue_upgrade_fixture.py",
+              "tests/test_full_catalogue_upgrade_f210_fixture.py"
+            ],
+            "variant_decision": "The latest test-only trigger case permits only space-science-pack prerequisites space-platform to rocket-silo plus removal of its one matching unlock-recipe effect; all other fields are compared. Its source is the untouched published input and target-only altered input is separate from the earlier failed altered-source case. Do not transfer that allowance to MIR5 or an unrelated prototype. K2 default cap3/unlimited/earned6%/8%/independent crystal10% labels retain their original engine/provider/fixture meaning; later staged transfers need their own original oracle.",
+            "remaining_executable_check": "Reconcile imported full-state/specialization helpers and fixture assertions under existing CONT-12 and selected migration coverage before claiming those helper source groups complete. Preserve named required profile/gameplay/output checks and unresolved reporter inputs; no automatic all-modpack or old-patch rerun.",
+            "owner": "Aero semantic/evidence mapping; Black Glass admitted profile execution"
+          },
+          {
+            "id": "historical-classic-and-unrecoverable-state",
+            "disposition": "superseded-output-mode-retain-history",
+            "independent_expectation": "Preserve the hidden saved full/classic setting identity and truthful known omission/damage history. Current MIR5 uses the accepted single full output behavior; a reduced Classic omission policy is not recreated. Already discarded engine state cannot be inferred or fabricated.",
+            "implementation": [
+              "source/research/settings.lua",
+              "source/migrations"
+            ],
+            "host_controls": [
+              "tests/test_settings_profile.py::test_registered_settings_are_the_single_active_profile_authority"
+            ],
+            "variant_decision": "Old Classic snapshot/omission results explicitly did not preserve omitted research. The persisted-damage branch keeps the authentic intermediate archive/save and surviving work separate from the external pre-damage snapshot, with lost_history_recovered=false. Preserve these limits rather than converting a pre-damage snapshot into native recovery evidence.",
+            "remaining_executable_check": "Retain existing CONT-03/CONT-11/CONT-14 Classic and unknown-consumer dispositions, protected originals and support guidance. Unknown older histories stay explicitly unverified under the accepted migration policy; no new loss-reconstruction mechanism or native campaign follows.",
+            "owner": "Aero historical/source/support review"
+          },
+          {
+            "id": "retired-runner-transport",
+            "disposition": "obsolete-implementation-only",
+            "independent_expectation": "Keep current guarded process ownership/admission, private settings/output composition, archive/control restoration and original evidence custody. Preserve distribution/version identities without old path/build/receipt-framework authority.",
+            "implementation": [
+              "tools/Invoke-NativeFixture.ps1",
+              "tools/lib/compatibility/LibraryActivation.ps1",
+              "tools/lib/validation/NativeProbeResources.ps1",
+              "tools/release.py"
+            ],
+            "host_controls": [
+              "tests/test_historical_native_runner.py::test_historical_server_settings_are_private_unpaused_and_use_supported_bind_flags"
+            ],
+            "variant_decision": "Retire scripts/validation redirections, populated temporary mod-directory copying, old materializer/technical-seal/record schemas, fixed old release selectors and transport-specific marker/counter mechanics. Their source references remain preserved. Old route allowlists are historical selection, not a renewed every-old-patch campaign; MIG-05 and the current maintainer clarification govern required selection. Current resource/ownership/restoration safeguards remain binding.",
+            "remaining_executable_check": "Use current registered guarded tools for actual new packets, preserving their exact qualification. This source review grants no execution, publication, support or cleanup authority and changes no live archive library.",
+            "owner": "Aero mapping/review; Black Glass private/native controllers"
+          }
+        ],
+        "dependent_oracle_scope": "The runner mostly checks named log markers and imports concrete fixture/control/specialization helpers. Those implementations, original protected saves/results, screenshots, issues and inter-release variants are not dispositioned merely because the caller lists an assertion. The selected caller family is mapped; unmapped dependent assertions remain explicit follow-up under existing CONT subjects.",
+        "host_validation": {
+          "existing_selected_controls": 35,
+          "full_catalogue_f200": 5,
+          "full_catalogue_f210": 7,
+          "historical_native_runner": 17,
+          "modern_origin_successor": 6,
+          "lua": "5.2",
+          "lupa": "2.6",
+          "new_or_modified_tests": 0,
+          "native_execution": false
+        },
+        "custody": "build/qualification/aero-upgrade-intents-r01/",
+        "qualification_limit": "No demonstrated player defect, test/oracle change, source-save mutation or new native campaign. Only this runner/wrapper source family is reconciled. Global VER-07, imported fixture/helper intent and all affected final-candidate native/save/client/performance/release verdicts remain open. Original source/execution/result identities and existing scoped closed routes are unchanged.",
         "native_execution": false,
         "source_reconciliation_complete": false,
         "test_intent_reconciliation_complete": false,
