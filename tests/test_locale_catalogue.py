@@ -123,6 +123,24 @@ CURRENT_TRANSLATION_OVERRIDES = {
     },
 }
 
+# Accepted meaning corrections from AstardGrimoire/more-infinite-research,
+# commit 389a8b848145a89713be32b658c80113565246b4, locale/ru/more-infinite-research.cfg.
+# Require each reviewed current literal before normalizing only that value to
+# its historical B6 literal; the complete historical projection stays pinned.
+ACCEPTED_POST_B6_CORRECTIONS = {
+    'ru': {
+        'technology-name.more-infinite-research.research_heavy_ammo': (
+            'Продуктивность пушечных снарядов', 'Производительность артиллерийского снаряда',
+        ),
+        'technology-name.more-infinite-research.research_thruster_fuel_productivity': (
+            'Продуктивность топлива для ускорителя', 'Расход топлива двигателя',
+        ),
+        'technology-name.more-infinite-research.research_thruster_oxidizer_productivity': (
+            'Продуктивность окислителя для ускорителя', 'Производительность двигателя окислителя',
+        ),
+    },
+}
+
 EXPECTED_RETAINED_PROJECTION_SHA256 = {
     'af': 'CB8F1EEEEBA24911BAC1E2B4A909C6698736BE14F50734D57EB86E86BD4F3817',
     'ar': '09F2DD177C5A1F1660E7456B895B01723E0ED93F1B924D7539CDCD492CAFDCDE',
@@ -285,6 +303,9 @@ class LocaleCatalogueTests(unittest.TestCase):
             projection = retained_projection(sections)
             for full_key, expected in CURRENT_TRANSLATION_OVERRIDES.get(language, {}).items():
                 self.assertEqual(projection[full_key], expected, f"{language}: {full_key}")
+            for full_key, (corrected, historical) in ACCEPTED_POST_B6_CORRECTIONS.get(language, {}).items():
+                self.assertEqual(projection[full_key], corrected, f"{language}: {full_key}")
+                projection[full_key] = historical
             actual = hashlib.sha256(
                 json.dumps(projection, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
             ).hexdigest().upper()
