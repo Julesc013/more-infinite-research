@@ -132,7 +132,7 @@ local function prepare_source()
   for _, prerequisite in pairs(native.prerequisites) do prerequisite.research_recursive() end
   for index,row in ipairs(C.rows) do
     local value=technology(force,id(row));value.researched=false;value.level=index+1
-    value.enabled=index~=3;value.saved_progress=index/10
+    value.saved_progress=index/10
     if value.level~=index+1 or value.researched or not close(value.saved_progress,index/10) then fail("source seed failed") end
   end
   native.researched=false;native.level=4;native.enabled=true;native.saved_progress=.37
@@ -144,7 +144,11 @@ local function prepare_source()
     fail("published native API refused the required foreign/plastic queue; no fallback")
   end
   force.research_progress=.42
+  -- Set intentional enablement after level/progress/effect/queue operations:
+  -- published R03 showed earlier assignments normalized before capture.
+  for index,row in ipairs(C.rows) do technology(force,id(row)).enabled=index~=3 end
   local player=snapshot(force)
+  if player.technologies[id(C.rows[3])].enabled~=false then fail("disabled paid source was not retained") end
   if #player.queue~=2 or player.queue[1]~=C.foreign or player.queue[2]~=id(C.rows[2])
       or player.current~=C.foreign or not close(player.progress,.42) then fail("source queue seed differs") end
   for index,row in ipairs(C.rows) do
@@ -154,10 +158,12 @@ local function prepare_source()
   end
   local foreign=game.create_force(FOREIGN_FORCE)
   local foreign_native=technology(foreign,C.foreign)
-  foreign_native.researched=false;foreign_native.level=5;foreign_native.enabled=false;foreign_native.saved_progress=.27
-  foreign.reset_technology_effects();zero_manufacturing(foreign)
+  foreign_native.researched=false;foreign_native.level=5;foreign_native.saved_progress=.27
+  foreign.reset_technology_effects();foreign_native.enabled=false;zero_manufacturing(foreign)
+  local foreign_snapshot=snapshot(foreign)
+  if foreign_snapshot.foreign.enabled~=false then fail("disabled foreign source was not retained") end
   storage[KEY]={kind="explicit-published-native-fixture-seed-not-lab-earned",source_mir=C.source,
-    phase="source-pending",player=player,foreign_index=foreign.index,foreign=snapshot(foreign)}
+    phase="source-pending",player=player,foreign_index=foreign.index,foreign=foreign_snapshot}
 end
 script.on_init(prepare_source)
 script.on_configuration_changed(function()

@@ -69,6 +69,11 @@ class RetainedNativeFixtureTests(unittest.TestCase):
               researched=false,enabled=true,saved_progress=0,prerequisites={},prototype={hidden=false}}
             function f.reset_technology_effects()
               reset_calls=reset_calls+1
+              -- Oppose the observed published source reset/reconciliation:
+              -- source R03 captured true despite earlier false assignments.
+              if reset_reenables then
+                for _,technology in pairs(f.technologies) do technology.enabled=true end
+              end
               for _,r in ipairs(rows) do
                 local value=f.technologies["recipe-prod-research_"..r[1].."-1"]
                 for _,recipe in ipairs(r[2]) do f.recipes[recipe].productivity_bonus=(value.level-1)*.1 end
@@ -187,6 +192,15 @@ class RetainedNativeFixtureTests(unittest.TestCase):
         self.assertFalse(self.lua.eval("game.forces.player.technologies['recipe-prod-research_processing_unit-1'].enabled"))
         self.assertAlmostEqual(.42, self.lua.eval("game.forces.player.research_progress"))
         self.assertTrue(self.lua.eval("markers[4].witnesses.hidden_library_enqueue_not_exercised"))
+
+    def test_disabled_source_is_seeded_after_reset_side_effects(self):
+        self.lua.execute("reset_reenables=true")
+        self.source()
+        self.assertFalse(self.lua.eval("game.forces.player.technologies['recipe-prod-research_processing_unit-1'].enabled"))
+        self.assertFalse(self.lua.eval("game.forces['mir5-sif-retained-foreign'].technologies['mining-productivity-3'].enabled"))
+        self.successor()
+        self.cold()
+        self.cold()
 
     def test_known_five_row_omission_refuses_before_successor_fixture_mutation(self):
         self.source()
