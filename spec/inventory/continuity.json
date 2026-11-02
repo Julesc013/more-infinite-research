@@ -1141,6 +1141,408 @@
           "package_applicability": "The two Library modules affect modern presentation; the50 restored locale members also occur in reduced packages, so those ZIP bytes change and are not called identical to501. Review exact private package members, locale parsing and the final public5.0.2 freeze separately. No source version, published byte, tag, direct library, fixture/controller or protected save changes here.",
           "remaining_native_check": "Black Glass observes selected current bonus/limit before and after an actual useful lab, saturated and mixed/disabled/cap cases, reopened/cold/client views and representative English/German geometry on the final F200/F210 candidate. Review old-edition locale/package parsing applicability and final candidate first-open/refresh/memory cost; source/host identity is not native acceptance.",
           "limits": "This checked-parent correction remains separate from frozen public501 packetA and still needs independent review/integration, exact-head CI and final affected native/package/performance qualification. All87 request decisions, other CONT subjects and broad audit flags remain unchanged; VER-07 and stable acceptance remain incomplete."
+        },
+        {
+          "id": "historical-library-core-omissions-native-discovery-intents",
+          "reviewed_against": "085471a3b0b1c02a5e71b039d28ea096d63f8495",
+          "reviewed_on": "2026-11-02",
+          "scope": "Complete intent review of three selected regression files, three deduplicated blobs/46 verified tag-path references. Other browser harness/provider/fixture dependencies, inter-release changes and original discussions remain outside this slice; this is not VER-07 completion.",
+          "sources": [
+            {
+              "path": "tests/runtime/research_browser_core_regressions.lua",
+              "blob": "55be2847fae29855efac6a294887012827013eef",
+              "sha256": "BD13B530B5BACCAB14E74452F5884283FC8DAD58C90F79CF45B5F44D66C8171F",
+              "bytes": 9882,
+              "lines": 210,
+              "references": [
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_omissions.lua",
+              "blob": "0b6ff3eeabafb6c0bfb560fa87f68a9e6cc5807a",
+              "sha256": "341A843CA5E7DAECD04A370B162BB665B941C279C7A4FDA2C7244BBF89DBF5D4",
+              "bytes": 16491,
+              "lines": 261,
+              "references": [
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_native_discovery_regressions.lua",
+              "blob": "e0352ae042f5748d77a7bb2a6ac049e04d43496e",
+              "sha256": "1C031554D97CB7F87E20D0D5F86231B3DDED8A49A8876A2ECAC6E8A76CF2E1B3",
+              "bytes": 10797,
+              "lines": 162,
+              "references": [
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            }
+          ],
+          "groups": [
+            {
+              "id": "zero-direct-default-finite-imported-cap",
+              "disposition": "port",
+              "independent_expectation": "A valid zero maximum default/direct value remains the unbounded sentinel while an imported effective maximum10 selects a finite cap. Display the effective cap and preserve both raw/default provenance; neither zero nor finite imported values are invalidated by their difference.",
+              "current_implementation": [
+                "source/research/settings.lua",
+                "source/runtime/library.lua",
+                "source/presentation/library_model.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library.py::test_imported_finite_cap_keeps_zero_default_and_direct_provenance",
+                "tests/test_settings_profile.py::test_import_precedence_uses_profile_validation_before_consumer_normalization"
+              ],
+              "remaining_executable_check": "Final-package actual imported/direct cap and Settings provenance, configuration/reload and affected native cap lifecycle retain their existing required cases.",
+              "owner": "Aero: historical intent/current host mapping; Black Glass: integrated candidate and affected native execution."
+            },
+            {
+              "id": "sparse-lists-live-broad-recipe-details",
+              "disposition": "consolidate",
+              "independent_expectation": "List discovery does not require eager rich recipe reads. Selected detail refreshes actual level/productivity/limit facts, retains all70 validated recipe identities beyond a short preview, returns detached data and reports missing live facts as unavailable rather than zero or an invented gain.",
+              "current_implementation": [
+                "source/presentation/library_model.lua",
+                "source/runtime/library.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library_model.py::test_selected_productivity_details_refresh_live_recipes_without_eager_list_reads",
+                "tests/test_library_model.py::test_productivity_detail_missing_facts_and_budgets_never_invent_zero_or_a_gain",
+                "tests/test_library_model.py::test_live_productivity_facts_do_not_drop_recipes_beyond_the_short_effect_preview",
+                "tests/test_library_model.py::test_selected_detail_retains_bounded_affected_recipe_targets_beyond_effect_preview"
+              ],
+              "existing_record": "CONT-10.selected-live-recipe-productivity-detail-preservation",
+              "remaining_executable_check": "Qualify the accepted #1562 detail changes on the final frozen package, including broad-list scrolling and changed/missing live recipe facts. The old private64-row collection window is not a new UI pagination requirement.",
+              "owner": "Aero: historical intent/current host mapping; Black Glass: integrated candidate and affected native execution."
+            },
+            {
+              "id": "managed-absence-and-private-ownership",
+              "disposition": "consolidate",
+              "independent_expectation": "A skipped/absent declaration or disabled foreign technology is not evidence of a live MIR-owned research row. Retain actual live managed identities and keep absent availability explanations separate. Hidden earned-credit carriers remain private and cannot leak through list/detail/translation paths.",
+              "current_implementation": [
+                "source/runtime/catalogue.lua",
+                "source/presentation/library_model.lua",
+                "source/runtime/library.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library_model.py::test_absent_declared_technology_is_not_a_library_row_or_availability_placeholder",
+                "tests/test_library_model.py::test_availability_is_small_authored_detached_and_checks_only_the_named_lab_owner",
+                "tests/test_library_model.py::test_exact_private_credits_stay_out_of_library_views_and_detail",
+                "tests/test_library.py::test_private_credit_holders_stay_out_of_library_selection_translation_and_native_open"
+              ],
+              "remaining_executable_check": "Retain affected final-package availability, foreign-state and positive imported/private-credit native checks. An old admitted empty-effect provider row does not authorize exposing private carriers.",
+              "owner": "Aero: historical intent/current host mapping; Black Glass: integrated candidate and affected native execution."
+            },
+            {
+              "id": "controller-authority-and-configuration-lifetimes",
+              "disposition": "consolidate",
+              "independent_expectation": "Only registered owned settings/controller facts explain a cap; arbitrary same-valued names or foreign settings do not become bindings. Return copied values, refresh live facts and adopt changed startup/controller inputs at the actual configuration boundary.",
+              "current_implementation": [
+                "source/research/settings.lua",
+                "source/runtime/lifecycle.lua",
+                "source/runtime/library.lua",
+                "source/runtime/settings_profile.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_settings_profile.py::test_registered_settings_are_the_single_active_profile_authority",
+                "tests/test_settings_profile.py::test_runtime_facade_exports_effective_values_and_reports_read_only_counts",
+                "tests/test_library.py::test_availability_uses_parse_time_effective_streams_without_profile_resolution_on_refresh",
+                "tests/test_library.py::test_cap_provider_is_configured_without_force_extension_or_periodic_work"
+              ],
+              "additional_pending_control": "PR#1553, original1dbff0f1ae6ac820752eae8d3bbafebcf0a5941e, supplies a separate proposed settings-catalogue lifecycle regression; it is not treated as integrated by this review.",
+              "remaining_executable_check": "Complete affected startup import/configuration and saved Library/cap native paths. No new generic controller registry, private provider DTO or compiler ownership transport is restored.",
+              "owner": "Aero: historical intent/current host mapping; Black Glass: integrated candidate and affected native execution."
+            },
+            {
+              "id": "retired-private-enrichment-and-plan-sealing",
+              "disposition": "obsolete-implementation-only",
+              "independent_expectation": "Malformed/contradictory private envelopes, duplicate ownership and mutable cached data were rejected; these safety intentions remain. The old schema2 enrichment, public generation-plan fingerprint, one-fingerprint-per-epoch counter and generic provider/controller DTOs are retired implementation boundaries.",
+              "current_implementation": [
+                "source/runtime/catalogue.lua",
+                "source/presentation/library_model.lua",
+                "source/research/settings.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library_model.py::test_catalogue_is_complete_base_metadata_and_detached",
+                "tests/test_library_model.py::test_selected_detail_is_bounded_and_never_reuses_native_tables",
+                "tests/test_settings_profile.py::test_malformed_import_falls_back_without_executing_input"
+              ],
+              "remaining_executable_check": "Keep original Git records. Do not import the old compiler snapshot, schema validator or fingerprint/cache framework; final package ownership and public consumer applicability still require their existing evidence.",
+              "owner": "Aero: historical intent/current host mapping; Black Glass: integrated candidate and affected native execution."
+            },
+            {
+              "id": "detached-continuous-query-and-legacy-boundary",
+              "disposition": "consolidate",
+              "independent_expectation": "Expose a deterministically sorted detached collection without silently discarding later rows. Preserve useful old search/options and saved-state semantics while the accepted continuous-list UI supersedes visible pagination.",
+              "current_implementation": [
+                "source/presentation/library_model.lua",
+                "source/runtime/library.lua",
+                "source/runtime/bootstrap.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library_model.py::test_normalize_keeps_bounded_historical_page_and_sort_state",
+                "tests/test_library_model.py::test_retained_page_never_slices_or_reorders_the_continuous_library_rows",
+                "tests/test_library_model.py::test_explicit_external_and_all_views_scan_once_and_sort_deterministically",
+                "tests/test_library.py::test_legacy_remote_search_uses_selected_or_retained_tab_without_cross_query_writes"
+              ],
+              "historical_interface_readback": "v4.7.3 source/prototypes/mir/runtime/research_browser.lua registers only open on more-infinite-research-browser. The tested core.query/query_all/detail_recipe helpers are internal calls, not additional registered remote methods. The existing open option/bridge remains; this does not establish absence of computed/private external consumers.",
+              "remaining_executable_check": "Preserve unknown consumer reconciliation under CONT-14. Final native continuous scrolling, sorted/filter/selection behavior and legacy open handoff remain required; do not reinstate superseded visible page controls.",
+              "owner": "Aero: historical intent/current host mapping; Black Glass: integrated candidate and affected native execution."
+            },
+            {
+              "id": "full-localized-search-and-callback-identity",
+              "disposition": "port",
+              "independent_expectation": "A complete translation containing technology/recipe/item/fluid search terms beyond1KiB must reach the owned view. An unrelated ID, failed/truncated/malformed callback, stale locale/player scope or disconnected identity cannot establish the expected localized searches. Caption and secondary search text remain distinct; neither callbacks nor search mutate research or rebuild the owned window.",
+              "current_implementation": [
+                "source/presentation/library_localization.lua",
+                "source/runtime/library_translations.lua",
+                "source/runtime/library.lua",
+                "source/presentation/library_model.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library.py::test_full_translation_callback_keeps_late_recipe_item_and_fluid_search_terms",
+                "tests/test_library_translations.py::test_dispatch_label_and_catalogue_bounds",
+                "tests/test_library_translations.py::test_two_players_keep_separate_locale_labels",
+                "tests/test_library_translations.py::test_stale_locale_force_and_configuration_callbacks_only_release_slots",
+                "tests/test_library.py::test_translation_callback_checks_live_scope_and_discards_vanished_root",
+                "tests/test_library_model.py::test_localized_recipe_and_product_search_text_is_separate_from_the_caption"
+              ],
+              "remaining_executable_check": "Review consumed-input applicability and observe the genuinely affected final-package native callback/localized technology/recipe/item/fluid searches, long payloads and both clients. Current host flattening is not actual engine translation.",
+              "owner": "Aero: historical intent/current host mapping; Black Glass: integrated candidate and affected native execution."
+            },
+            {
+              "id": "old-native-witness-integrity",
+              "disposition": "consolidate",
+              "independent_expectation": "A host-shaped completion result is not a native result. Zero players is unexercised; selected identities cannot disappear; display settling is bounded; callback-only or GUI-only success is insufficient; ownership, force state and widget identity remain intact; each player must complete its own callback/search boundary.",
+              "current_implementation": [
+                "tests/fixtures/library-native/control.lua",
+                "tests/fixtures/library-native-input/control.lua",
+                "tools/Invoke-LibraryNativeInput.ps1"
+              ],
+              "current_host_controls": [
+                "tests/test_library_native_input_fixture.py::test_imported_probe_and_actual_event_observer_keep_the_declared_finite_sequence",
+                "tests/test_library_native_input_fixture.py::test_503_f200_reuse_keeps_removal_and_identity_guards",
+                "tests/test_library.py::test_foreign_or_replaced_same_named_lifecycle_events_preserve_the_live_owned_window"
+              ],
+              "remaining_executable_check": "Use the existing exact native queue and original receipt identities, not a replay of the retired witness merely to reproduce its protocol. Its simulated passed-native status and fixture2.0/2.1 category shape checks do not qualify current engine translation, physical input, two-client behavior, performance or release. Preserve old deadlines/limits in their original records.",
+              "owner": "Aero: historical intent/current host mapping; Black Glass: integrated candidate and affected native execution."
+            }
+          ],
+          "validation": {
+            "library_controls": 84,
+            "library_model_controls": 31,
+            "translation_queue_controls": 15,
+            "settings_profile_controls": 6,
+            "named_control_mappings_verified": 30,
+            "two_new_current_controls_pass": true,
+            "semantic_in_memory_opponents_detected": 2,
+            "lua": "5.2",
+            "lupa": "2.6",
+            "exact_head_ci": "required after commit"
+          },
+          "limits": [
+            "The merged #1562 source closes the previously identified host detail gap only; final native qualification remains open.",
+            "The previous original native/host records retain their exact identities. No old execution is labelled current by this mapping.",
+            "The initial new cap-control helper/model doubles were incomplete; their logs/draft are preserved, and completing the real codec/model changes no expected value.",
+            "No player code, package, original request/evidence body or progress header is changed."
+          ],
+          "custody": "build/qualification/aero-library-core-intents-r01/",
+          "native_execution": false,
+          "source_reconciliation_complete": false,
+          "test_intent_reconciliation_complete": false,
+          "release_qualification": false,
+          "source_reference_label_correction": {
+            "submitted_head": "880b89faa28df21a765c3ddc6bf37eafccae23fc",
+            "submitted_label": "v4.2.0",
+            "actual_retained_tag": "v4.2.0-stable",
+            "actual_commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+            "corrected_references": 2,
+            "original_indexed_locator_entries": 46,
+            "distinct_retained_tag_path_locators": 44,
+            "scope": "The original91-tag local index includes an unpublished alias alongside the retained stable tag. Keep every original locator entry and mark its submitted_tag where corrected; do not count canonicalized duplicate labels as independent sources. Commit/path/blob/hash tuples, original commits/raw index/receipts, authored expectations and all native limits remain unchanged. No remote or local Git tag is modified."
+          }
         }
       ],
       "test_subjects": [

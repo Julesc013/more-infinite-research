@@ -1576,6 +1576,100 @@ class LibraryTests(unittest.TestCase):
           assert(content["mir_library_detail"]["mir_library_detail_title"].caption == "Erzförderer-Produktivität")
         ''')
 
+    def test_imported_finite_cap_keeps_zero_default_and_direct_provenance(self):
+        # Accepted zero/direct/effective case from historical portable-core
+        # blob 55be2847fae29855efac6a294887012827013eef.
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          boot()
+          local catalog = require("research.settings")
+          local name = "ips-max-level-research_gears"
+          assert(catalog.spec(name).default_value == 0)
+          helpers = {encode_string=function(value) return value end,
+            decode_string=function(value) return value end,
+            json_to_table=function(value)
+              assert(value == "finite-cap-profile")
+              return {schema=1, kind="mir-settings-profile", settings={[name]=10}}
+            end}
+          settings.startup[name] = {value=0}
+          settings.startup[catalog.import_setting_name] = {value="MIRSET1:finite-cap-profile"}
+          local effective = catalog.effective_values(settings.startup, helpers)
+          assert(effective[name] == 10, "valid zero direct/default cap blocked a finite imported value")
+          library.set_cap_provider(function(force)
+            assert(force == player.force)
+            return {[gear.name]=effective[name]}
+          end)
+          local root = library.open(player, {selected=gear.name})
+          local cap = research_content(root)["mir_library_detail"]["mir_library_detail_cap"]
+          assert(cap.caption[1] == "mir-browser.cap-finite" and cap.caption[2] == 10)
+          library.open(player, {tab="settings", settings_scope="research", settings_search="research_gears"})
+          local detail = root["mir_library_tabs"]["mir_library_settings_content"]
+            ["mir_library_settings_dynamic"]["mir_library_settings_detail"]
+          local value = detail["mir_library_setting_" .. catalog.spec(name).field_index .. "_value"]
+          assert(value.caption == "10" and value.tooltip[2][1] == "mir-browser.setting-unlimited"
+            and value.tooltip[3][1] == "mir-browser.setting-unlimited"
+            and value.tooltip[4][1] == "mir-browser.source-mirset1",
+            "finite imported cap lost its valid zero default/direct provenance")
+          assert(settings.startup[name].value == 0 and gear.level == 3 and gear.researched and not gear.enabled)
+        ''')
+
+    def test_full_translation_callback_keeps_late_recipe_item_and_fluid_search_terms(self):
+        # v4.7.3 research_browser_native_discovery_regressions.lua rejects the
+        # original 1 KiB callback truncation; this is host coverage, not native input.
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          boot()
+          player.locale = "de"
+          gear.localised_name = "Produktivitätsforschung"
+          gear.prototype.effects = {{type="unlock-recipe", recipe="broad-recipe"}}
+          prototypes = {
+            recipe = {["broad-recipe"] = {
+              localised_name=string.rep("Langes Rezept ", 100) .. "recipe-tail",
+              products={{type="item", name="broad-item"}, {type="fluid", name="broad-fluid"}}
+            }},
+            item = {["broad-item"] = {localised_name="item-tail"}},
+            fluid = {["broad-fluid"] = {localised_name="fluid-tail"}}
+          }
+          local function translated(value)
+            if type(value) == "string" then return value end
+            assert(type(value) == "table")
+            if value[1] == "?" then return translated(value[2]) end
+            assert(value[1] == "")
+            local parts = {}
+            for index=2,#value do parts[#parts+1] = translated(value[index]) end
+            return table.concat(parts)
+          end
+          local native_queue, current = player.force.research_queue, player.force.current_research
+          local root = library.open(player, {query="item-tail", selected=gear.name})
+          local query = root["mir_library_filters"]["mir_library_query"]
+          local request = player.translation_requests[1]
+          assert(#player.translation_requests == 1)
+          local payload = translated(request.localised)
+          for _, term in ipairs({"recipe-tail", "item-tail", "fluid-tail"}) do
+            assert(string.find(payload, term, 1, true) > 1024)
+          end
+          assert(#research_content(root)["mir_library_results"].items == 0)
+          library.on_string_translated({player_index=1, id=request.id+999, translated=true, result=payload})
+          assert(#research_content(root)["mir_library_results"].items == 0,
+            "an unrelated callback published localized search data")
+          library.on_string_translated({player_index=1, id=request.id, translated=true, result=payload})
+          for _, term in ipairs({"recipe-tail", "item-tail", "fluid-tail"}) do
+            query.text = term
+            library.on_gui_text_changed({player_index=1, element=query})
+            local listed = research_content(root)["mir_library_results"].items
+            assert(#listed == 1 and listed[1] == "Produktivitätsforschung",
+              "a late recipe/item/fluid term was lost through callback or refresh: " .. term)
+            assert(player.gui.screen["mir_research_browser"] == root and root.valid
+              and root["mir_library_filters"]["mir_library_query"] == query,
+              "localized search rebuilt the owned window or query control")
+          end
+          assert(player.force.research_queue == native_queue and player.force.current_research == current
+            and gear.level == 3 and gear.researched and not gear.enabled,
+            "localized search changed native research state")
+        ''')
+
     def test_all_view_scans_native_identities_once_and_family_change_invalidates_unissued_work(self):
         self.lua.execute('''
           boot()
