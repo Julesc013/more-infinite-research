@@ -62,6 +62,10 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact r18 F200 removed-slot observer-source fetch failed.' }
           git fetch --no-tags --depth=1 origin 9691e26d1cf910ee1366594e115cba5e31448866
           if ($LASTEXITCODE -ne 0) { throw 'Exact r18 F200 profile-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 61393d0a0e83a86edd9c1443c102e6a5e1168fba
+          if ($LASTEXITCODE -ne 0) { throw 'Exact r20 retained-target fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 880daa2c40641065202780810d3daf3674efc3c1
+          if ($LASTEXITCODE -ne 0) { throw 'Exact r20 retained-target profile-source fetch failed.' }
           git fetch --no-tags --depth=1 origin dc3bb5899bac55396fd865fb2a504ce213b07bec
           if ($LASTEXITCODE -ne 0) { throw 'Exact imported preservation fixture-source fetch failed.' }
           git fetch --no-tags --depth=1 origin cecb68738bc2e5a0612effddf269660d62e8760e
@@ -171,6 +175,10 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact r18 F200 removed-slot observer-source fetch failed.' }
           git fetch --no-tags --depth=1 origin 9691e26d1cf910ee1366594e115cba5e31448866
           if ($LASTEXITCODE -ne 0) { throw 'Exact r18 F200 profile-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 61393d0a0e83a86edd9c1443c102e6a5e1168fba
+          if ($LASTEXITCODE -ne 0) { throw 'Exact r20 retained-target fixture-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 880daa2c40641065202780810d3daf3674efc3c1
+          if ($LASTEXITCODE -ne 0) { throw 'Exact r20 retained-target profile-source fetch failed.' }
           git fetch --no-tags --depth=1 origin dc3bb5899bac55396fd865fb2a504ce213b07bec
           if ($LASTEXITCODE -ne 0) { throw 'Exact imported preservation fixture-source fetch failed.' }
           git fetch --no-tags --depth=1 origin cecb68738bc2e5a0612effddf269660d62e8760e
