@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIRImportedLibraryNativeInputPreparedInputsV1",
-  "status": "public-witness-fixture-projected-private-source-reviewed-runtime-packet-not-bound",
+  "status": "public-observer-and-actor-prepared-private-caller-not-yet-bound",
   "source_commit": "61393d0a0e83a86edd9c1443c102e6a5e1168fba",
   "player_source_commit": "b677ced0b1ae0d8bd9ae47eb6b272443faec6d63",
   "player_tree": "e6497bde988908fb96fe00a16ee5ae1f51a5088f",

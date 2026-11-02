@@ -106,6 +106,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
     def test_r20_witness_inputs_keep_published_player_saves_and_exact_archive_identity(self):
         previous = json.loads((ROOT / "spec/evidence/library-native-input-imported110-prepared-blackglass-r06.json").read_text())
         current = json.loads((ROOT / "spec/evidence/library-native-input-imported110-prepared-blackglass-r07.json").read_text())
+        self.assertEqual(current["status"], "public-observer-and-actor-prepared-private-caller-not-yet-bound")
         self.assertEqual(current["source_commit"], "61393d0a0e83a86edd9c1443c102e6a5e1168fba")
         for field in ("player_source_commit", "player_tree", "public_helper_pins", "fixture_guard_source"):
             self.assertEqual(current[field], previous[field])
