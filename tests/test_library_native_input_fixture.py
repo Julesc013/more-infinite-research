@@ -546,7 +546,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                   else dimensions[key]=value end
                 end,
               })
-              local node={valid=true,type=kind,name=name,style=style}
+              local node={valid=true,type=kind,name=name,style=style,visible=true,enabled=true,player_index=0}
               node.add=function(spec)
                 local child=element(spec.type,spec.name);child.text=spec.text;node[spec.name]=child;return child
               end
@@ -702,6 +702,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 gui_type=opponent=="wrong-close-type" and 1 or 99,element=event_element}) end
               if opponent=="duplicate-close-event" then callbacks.events[5]({player_index=p.index,gui_type=99,element=root}) end
             end
+            local witness_before,witness_after,witness_wrong,witness_parent_hidden,witness_parent_disabled,witness_parent_invalid,foreign_witness,readonly_witness
             local readonly_report,readonly_load,cold_calls_before,cold_calls_after,initial_report,missing_query_report,missing_query_readonly,opened_getter_report,opened_getter_readonly
             local ok,message=pcall(function()
               parse()
@@ -730,7 +731,15 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 local root=en.gui.screen[root_name];root.location={x=265,y=24}
                 callbacks.events[4]({player_index=en.index,element=root})
               end
-              click(en,query(en));type_text(en,"ge");step("prefix")
+              local before_witness=fingerprint(store);witness_before=api().report();readonly_witness=before_witness==fingerprint(store)
+              click(en,query(en));witness_after=api().report()
+              local saved=query(en);en.gui.screen[root_name].mir_library_filters.mir_library_query=element("textfield","replacement")
+              witness_wrong=api().report();en.gui.screen[root_name].mir_library_filters.mir_library_query=saved
+              local filter=en.gui.screen[root_name].mir_library_filters
+              filter.visible=false;witness_parent_hidden=api().report();filter.visible=true
+              filter.enabled=false;witness_parent_disabled=api().report();filter.enabled=true
+              filter.valid=false;witness_parent_invalid=api().report();filter.valid=true
+              type_text(en,"ge");step("prefix")
               if opponent~="short-refresh" then game.tick=game.tick+60 end
               step("refresh");type_text(en,"ars");step("suffix")
               local root=en.gui.screen[root_name];root.location={x=root.location.x-30,y=root.location.y}
@@ -745,7 +754,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                end
               step("drag");key_close(en);step("escape");key_close(en);step("inventory")
               local other=en.gui.screen.mir5_input_other.mir5_input_other_query
-              click(en,other);type_text(en,"focus");step("foreign-prefix");game.tick=game.tick+60
+              click(en,other);foreign_witness=api().report();type_text(en,"focus");step("foreign-prefix");game.tick=game.tick+60
               step("foreign-refresh");type_text(en," kept");step("foreign-suffix")
               if opponent~="remove-connected" then de.connected=false;connected() end
               step("remove-de");de=join(opponent=="removed-index-reused" and 2 or (opponent=="replacement-index-reuses-en" and 1 or 3),"de");step("replacement");game.tick=game.tick+60;step("save")
@@ -763,6 +772,8 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               game.tick=game.tick+60;step("complete-save")
             end)
             return {ok=ok,message=tostring(message),trace=trace,saves=game.saves,logs=logs,readonly_report=readonly_report,
+              witness_before=witness_before,witness_after=witness_after,witness_wrong=witness_wrong,readonly_witness=readonly_witness,
+              witness_parent_hidden=witness_parent_hidden,witness_parent_disabled=witness_parent_disabled,witness_parent_invalid=witness_parent_invalid,foreign_witness=foreign_witness,
               initial_report=initial_report,missing_query_report=missing_query_report,missing_query_readonly=missing_query_readonly,
               opened_getter_report=opened_getter_report,opened_getter_readonly=opened_getter_readonly,
               readonly_load=readonly_load,resets=resets,calls=calls,cold_calls_before=cold_calls_before,cold_calls_after=cold_calls_after,
@@ -896,6 +907,41 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                         f"retained_de_root_valid={str(expected['retained_de_root_valid']).lower()} "
                         f"retained_de_query_valid={str(expected['retained_de_query_valid']).lower()}",
                     )
+
+    def test_034_is_exactly_scoped_and_preserves_removed_index_reuse(self):
+        for target, package, wrong in (("f200", "5.0.20001", "5.0.20000"), ("f210", "5.0.21001", "5.0.21000")):
+            with self.subTest(target=target):
+                directory = ROOT / "tests/fixtures/library-native-input"
+                old = json.loads((directory / f"info-input-identity-{target}-033.json").read_text(encoding="utf-8"))
+                new = json.loads((directory / f"info-input-identity-{target}-034.json").read_text(encoding="utf-8"))
+                self.assertEqual(new.pop("version"), "0.3.4")
+                self.assertEqual(old.pop("version"), "0.3.3")
+                self.assertEqual(new, old)
+                accepted = self.run_case(target, "removed-index-reused", package, "0.3.4")
+                self.assertTrue(accepted["ok"], accepted["message"])
+                rejected = self.run_case(target, package_version=wrong, input_observer_version="0.3.4")
+                self.assertFalse(rejected["ok"])
+                self.assertIn("imported native target differs", rejected["message"])
+
+    def test_action_witness_is_readonly_tracks_native_click_and_retained_identity(self):
+        for target, package in (("f200", "5.0.20001"), ("f210", "5.0.21001")):
+            with self.subTest(target=target):
+                result = self.run_case(target, package_version=package, input_observer_version="0.3.4")
+                self.assertTrue(result["ok"], result["message"])
+                self.assertTrue(result["readonly_witness"])
+                before, after, wrong = (result[k] for k in ("witness_before", "witness_after", "witness_wrong"))
+                self.assertEqual((before["actual_query_clicks"], after["actual_query_clicks"], after["actual_other_clicks"]), (0, 1, 0))
+                self.assertTrue(after["en_library_target"]["root_same"])
+                self.assertTrue(after["en_library_target"]["query_same"])
+                self.assertFalse(wrong["en_library_target"]["query_same"])
+                for field in ("root_valid", "parent_valid", "query_valid", "root_visible", "parent_visible", "query_visible", "root_enabled", "parent_enabled", "query_enabled", "opened_is_root"):
+                    self.assertTrue(after["en_library_target"][field], field)
+                self.assertEqual(after["en_library_target"]["query_type"], "textfield")
+                self.assertEqual(after["en_library_target"]["root_player_index"], 0)
+                for case, field in (("witness_parent_hidden", "parent_visible"), ("witness_parent_disabled", "parent_enabled"), ("witness_parent_invalid", "parent_valid")):
+                    self.assertFalse(result[case]["en_library_target"][field])
+                foreign = result["foreign_witness"]["en_foreign_target"]
+                self.assertTrue(foreign["parent_valid"] and foreign["parent_visible"] and foreign["parent_enabled"])
 
     def test_readonly_reports_expose_actual_library_and_foreign_input_state(self):
         for target in ("f200", "f210"):
