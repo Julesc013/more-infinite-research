@@ -1,0 +1,265 @@
+{
+  "kind": "AeroIndependentBaseStartupNumericalReviewV1",
+  "source_evidence_commit": "f7c6cf3767e14f00d562488b3fad3b71c39b4eee",
+  "input_container_sha256": "DDCCB574A7F4CBE44B86A02B4ECD05FCBF4ADC29A623545CB51379049E55C1FF",
+  "verified_original_records": [
+    {
+      "name": "result.json",
+      "bytes": 426931,
+      "sha256": "BEC328FDB1E521A6AEE17DB42ECC553FFF035AB9E2737E3E27B0E8DACC7CAD16"
+    },
+    {
+      "name": "terminal.json",
+      "bytes": 61291,
+      "sha256": "EE026811FA722CF10FECE63086E8554F3D82795ECC9A2ED4C277312A7E9C5AFD"
+    },
+    {
+      "name": "analysis.json",
+      "bytes": 10360,
+      "sha256": "67D3DE66046C1AA6839D653940141873765E078D19123A867C5149CD276C09FE"
+    },
+    {
+      "name": "root-readback.json",
+      "bytes": 127056,
+      "sha256": "757AE76A732FEF8CD930EA60F7904EB3337B3B661E53ABF9052A0EF77821DC92"
+    },
+    {
+      "name": "native-manifest.json",
+      "bytes": 79798,
+      "sha256": "57F8E49ACF50B0B2C7FCC89D79CCECB56AE01E08AD8634523CA4EE106E7FBB9C"
+    },
+    {
+      "name": "analysis-plan.json",
+      "bytes": 3328,
+      "sha256": "82A946EB13279B262FB39577B34B0C83C1E7B623E9B7CC7D1E96A57D5C95487C"
+    },
+    {
+      "name": "packet.json",
+      "bytes": 23060,
+      "sha256": "8384A1AD681AC7D064B89F1D260059A93BF994543ECA372E00E8F67BCF2DE47F"
+    }
+  ],
+  "verdict": "GO for the frozen C Base/F200 ordinary responsive-menu numerical component only",
+  "native_source": "7fdb1fa63fa6e70a0df437a57765475ba271e8da",
+  "candidate_zip_sha256": "6A66CF318AC908788DE24D2E3CD9D8F68421EB8AFDA4C113B2E3012FC701D64F",
+  "processes": 41,
+  "blocks": 12,
+  "schedule_matches_predeclared_packet": true,
+  "all_six_orders_twice": true,
+  "each_arm_each_position": 4,
+  "warmups_and_pilot_excluded_from_scored_blocks": true,
+  "all_resource_runs_passed": true,
+  "terminal_controls_restored_and_no_factorio": true,
+  "original_nominal_arithmetic_fully_reproduced": true,
+  "summaries": {
+    "t0": {
+      "n": 12,
+      "mean_seconds": 10.482306816666666,
+      "sample_sd_seconds": 0.6141736990972563,
+      "nominal_95_interval_seconds": [
+        10.092076834438126,
+        10.872536798895206
+      ],
+      "min_seconds": 10.0135635,
+      "max_seconds": 12.3532153,
+      "raw_seconds": [
+        10.5692183,
+        10.1919186,
+        10.1269273,
+        10.4204328,
+        12.3532153,
+        10.2114403,
+        10.4928457,
+        10.4112297,
+        10.3161609,
+        10.5147932,
+        10.0135635,
+        10.1659362
+      ]
+    },
+    "t4": {
+      "n": 12,
+      "mean_seconds": 11.211925658333334,
+      "sample_sd_seconds": 0.582720042624066,
+      "nominal_95_interval_seconds": [
+        10.841680510728283,
+        11.582170805938384
+      ],
+      "min_seconds": 10.7087462,
+      "max_seconds": 12.9569076,
+      "raw_seconds": [
+        11.2079351,
+        11.0176817,
+        11.2717424,
+        10.7348394,
+        11.1377222,
+        11.2307594,
+        10.7087462,
+        11.1955977,
+        11.0071022,
+        12.9569076,
+        11.2085733,
+        10.8655007
+      ]
+    },
+    "t5": {
+      "n": 12,
+      "mean_seconds": 10.442205883333333,
+      "sample_sd_seconds": 0.20824339820997423,
+      "nominal_95_interval_seconds": [
+        10.309893448427486,
+        10.57451831823918
+      ],
+      "min_seconds": 9.9852253,
+      "max_seconds": 10.6733314,
+      "raw_seconds": [
+        10.4518795,
+        10.4712938,
+        10.2513534,
+        9.9852253,
+        10.5346738,
+        10.6733314,
+        10.5444383,
+        10.673204,
+        10.5776858,
+        10.4250409,
+        10.1686423,
+        10.5497021
+      ]
+    },
+    "d4": {
+      "n": 12,
+      "mean_seconds": 0.7296188416666669,
+      "sample_sd_seconds": 0.8338419157698095,
+      "nominal_95_interval_seconds": [
+        0.1998173922549792,
+        1.2594202910783547
+      ],
+      "min_seconds": -1.2154930999999998,
+      "max_seconds": 2.4421143999999995,
+      "raw_seconds": [
+        0.638716800000001,
+        0.8257631000000014,
+        1.1448151000000006,
+        0.31440659999999987,
+        -1.2154930999999998,
+        1.0193191000000006,
+        0.21590050000000005,
+        0.7843680000000006,
+        0.6909413000000004,
+        2.4421143999999995,
+        1.1950097999999993,
+        0.6995644999999993
+      ]
+    },
+    "d5": {
+      "n": 12,
+      "mean_seconds": -0.04010093333333339,
+      "sample_sd_seconds": 0.6117719907353888,
+      "nominal_95_interval_seconds": [
+        -0.4288049325822252,
+        0.34860306591555845
+      ],
+      "min_seconds": -1.8185415000000003,
+      "max_seconds": 0.4618911000000008,
+      "raw_seconds": [
+        -0.11733879999999886,
+        0.2793752000000005,
+        0.1244260999999991,
+        -0.43520750000000064,
+        -1.8185415000000003,
+        0.4618911000000008,
+        0.05159259999999932,
+        0.2619743000000003,
+        0.2615248999999995,
+        -0.0897522999999989,
+        0.15507880000000007,
+        0.38376589999999844
+      ]
+    },
+    "direct": {
+      "n": 12,
+      "mean_seconds": -0.7697197750000003,
+      "sample_sd_seconds": 0.6115457848684783,
+      "nominal_95_interval_seconds": [
+        -1.1582800489289147,
+        -0.38115950107108587
+      ],
+      "min_seconds": -2.5318666999999984,
+      "max_seconds": -0.16430790000000073,
+      "raw_seconds": [
+        -0.7560555999999998,
+        -0.5463879000000009,
+        -1.0203890000000015,
+        -0.7496141000000005,
+        -0.6030484000000005,
+        -0.5574279999999998,
+        -0.16430790000000073,
+        -0.5223937000000003,
+        -0.4294164000000009,
+        -2.5318666999999984,
+        -1.0399309999999993,
+        -0.3157986000000008
+      ]
+    },
+    "q": {
+      "n": 12,
+      "mean_seconds": -0.4049103541666668,
+      "sample_sd_seconds": 0.44755281553768084,
+      "nominal_95_interval_seconds": [
+        -0.689273763915911,
+        -0.1205469444174227
+      ],
+      "min_seconds": -1.3108094999999986,
+      "max_seconds": 0.03398364999999881,
+      "raw_seconds": [
+        -0.43669719999999934,
+        -0.13350635000000022,
+        -0.4479814500000012,
+        -0.5924108000000006,
+        -1.2107949500000004,
+        -0.04776844999999952,
+        -0.0563576500000007,
+        -0.13020969999999998,
+        -0.08394575000000071,
+        -1.3108094999999986,
+        -0.4424260999999996,
+        0.03398364999999881
+      ]
+    }
+  },
+  "gates": {
+    "pilot": true,
+    "control_late_minus_early": true,
+    "positive_published_added_denominator": true,
+    "q_upper_at_most_zero": true
+  },
+  "pilot": {
+    "seconds": [
+      11.2748295,
+      11.1219931
+    ],
+    "absolute_difference_seconds": 0.15283639999999998,
+    "limit_seconds": 0.559920565
+  },
+  "baseline_halves": {
+    "early_mean_seconds": 10.645525433333333,
+    "late_mean_seconds": 10.3190882,
+    "late_minus_early_seconds": -0.3264372333333334
+  },
+  "interpretation": [
+    "Total startup means are10.4823s control,11.2119s published,10.4422s C. Direct C-minus-published mean is-.76972s, nominal95 interval[-1.15828,-.38116]s.",
+    "Published MIR-added mean .72962s has positive nominal95 interval[.19982,1.25942]s. C-added mean-.04010s interval[-.42880,.34860]s is uncertain around zero, not negative actual work or proof of zero overhead.",
+    "The predeclared50-percent q contrast upper nominal95 bound-.12055s meets the declared objective on this endpoint and these inputs. The105.496-percent ratio is only a noisy point estimate, with no declared ratio interval; avoid a precise percentage marketing claim.",
+    "All signed values/outliers remain: block5 has negative published-added time and block10 has a slow published launch; neither is removed. Control late-minus-early is-.32644s. Balanced order reduces order confounding but does not prove stationary independent errors; Student-t bounds remain nominal.",
+    "QPC endpoint includes observer/action/OCR response latency, with actor preheat/shutdown excluded. Same ordinary config/cache/observer and18 inherited input-binding warnings per process are part of this exact method, not ordinary-headless/data-dump timing."
+  ],
+  "limits": [
+    "Aero personally verifies the seven transported original JSON bodies and numerical/schedule/selection/dimension assertions, not all458 original local files or82 PNG images; those retain root757AE76A and independent TerraD338468D custody/visual verdict identities.",
+    "No guaranteed sampling coverage, hardware-general performance, engine-cold/reboot, save/gameplay/Library/memory/large-profile replay or global performance verdict.",
+    "No automatic transfer from frozen C to changed SIF correction or any differently bound package. Review actual consumed-input impact first.",
+    "Known five-row SIF paid-state preservation remains a separate publication-blocking native qualification gate."
+  ],
+  "performance_acceptance": "bounded-frozen-C-startup-component-only",
+  "release_qualification": false
+}
