@@ -10883,6 +10883,303 @@
           "references": 7,
           "scope": "Correct new Git-tag labels only. Original submitted commits, all127 commit/path/blob/hash references, authored decisions, original API freeze and remaining applicability/unknown-consumer obligations are retained."
         }
+      },
+      {
+        "subjects": [
+          "CONT-04",
+          "CONT-06"
+        ],
+        "reviewed_on": "2026-11-02",
+        "reviewed_against": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+        "scope": "Recipe productivity permission wrapper, Lua fixture and Python runner only. Three unique selected test blobs recur unchanged at eleven indexed releases v4.4.0 through v4.7.3; other selected trees do not list these paths. This does not disposition inter-release history, discussions or all product/override tests.",
+        "method": "Deduplicate the existing 91-tag object index by Git blob, inspect all three test sources and their independently pinned v4.2.2/v4.3.0 productivity declarations. Port behavioral assertions into the current Generator/collector path; do not execute or restore the retired compiler harness.",
+        "sources": [
+          {
+            "path": "tests/compiler/Test-MIRRecipeProductivityPermissions.ps1",
+            "references": [
+              {
+                "tag": "v4.4.0",
+                "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.4.1",
+                "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.4.2",
+                "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.5.0",
+                "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.5.1",
+                "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.5.2",
+                "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.6.0",
+                "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.7.0",
+                "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.7.1",
+                "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.7.2",
+                "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.7.3",
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              }
+            ],
+            "sha256": "45CDEF8D105707793D291F7327869AA66DC6FC2C74634845167865E48E17F285"
+          },
+          {
+            "path": "tests/compiler/recipe_productivity_permissions.lua",
+            "references": [
+              {
+                "tag": "v4.4.0",
+                "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.4.1",
+                "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.4.2",
+                "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.5.0",
+                "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.5.1",
+                "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.5.2",
+                "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.6.0",
+                "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.7.0",
+                "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.7.1",
+                "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.7.2",
+                "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.7.3",
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              }
+            ],
+            "sha256": "477A6925BED2A7B52A270352B45582620CDEAE5349526591AA636BD589EF5770"
+          },
+          {
+            "path": "tests/compiler/run_recipe_productivity_permissions_controls.py",
+            "references": [
+              {
+                "tag": "v4.4.0",
+                "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.4.1",
+                "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.4.2",
+                "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.5.0",
+                "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.5.1",
+                "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.5.2",
+                "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.6.0",
+                "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.7.0",
+                "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.7.1",
+                "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.7.2",
+                "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.7.3",
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              }
+            ],
+            "sha256": "0B7F9989CBB28A7C3A6C00DC8D9835D7BFD1FAB0369B51BD53C133624FCEA375"
+          }
+        ],
+        "original_declarations": [
+          {
+            "tag": "v4.2.2",
+            "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+            "path": "source/prototypes/streams/productivity.lua",
+            "blob": "893d515e4c2561790f2c8165ff6ed6c9eb3cf0df",
+            "sha256": "622090A88894EECEC068B8EEF8C3663BDDC737728ACD7A47EA36B6671BD902E6"
+          },
+          {
+            "tag": "v4.3.0",
+            "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+            "path": "source/prototypes/streams/productivity.lua",
+            "blob": "893d515e4c2561790f2c8165ff6ed6c9eb3cf0df",
+            "sha256": "622090A88894EECEC068B8EEF8C3663BDDC737728ACD7A47EA36B6671BD902E6"
+          }
+        ],
+        "groups": [
+          {
+            "subjects": [
+              "CONT-04",
+              "CONT-06"
+            ],
+            "disposition": "port",
+            "historical_paths": [
+              "tests/compiler/Test-MIRRecipeProductivityPermissions.ps1",
+              "tests/compiler/recipe_productivity_permissions.lua",
+              "tests/compiler/run_recipe_productivity_permissions_controls.py"
+            ],
+            "independent_expectation": "The published mining family emits burner/electric/big-drill effects at 0.20/0.10/0.05 and its named/pattern drill alternatives at 0.05, including explicitly denied or zero-cap recipes, without granting their upstream productivity permission or changing ore yield. Only the three authored Space Age permission rows (capture-robot-rocket, ice-platform, space-platform-foundation) grant permission when that catalogue is selected. Preserve unrelated fields and refuse a missing required recipe before partial writes.",
+            "current_implementation": [
+              "source/research/modern.lua",
+              "source/compatibility/modern_catalogue/space_age.lua",
+              "source/compatibility/product_bindings.lua",
+              "source/compatibility/product_targets.lua",
+              "source/research/product_target_extension.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_generator.py::test_mining_effects_preserve_published_denial_policy_without_granting_recipe_permissions",
+              "tests/test_generator.py::test_space_age_recipe_permissions_have_exact_scope_and_preflight_before_writes",
+              "tests/test_generator.py::test_full_modern_catalogue_is_lazy_bounded_and_declares_exact_owners",
+              "tests/test_product_target_extension.py::test_published_pattern_groups_preserve_weights_settings_and_explicit_routes",
+              "tests/test_product_targets.py::test_unsupported_shapes_and_explicit_productivity_denial_withhold_only_that_recipe"
+            ],
+            "original_evidence": [],
+            "remaining_executable_check": "On an admitted final-candidate profile, observe the affected recipe productivity permissions and physical drill/Space Age product output with upstream permission/cap settings retained. Review current consumed inputs against existing product/override native chains before reuse; execute affected cross-override and nondefault settings cases only. The synthetic se-core-miner-drill name tests a published pattern, not an installed Space Exploration closure or support for combining it with Space Age. Black Glass owns native admission/execution; no new native profile is invented by this host port.",
+            "owner": {
+              "reconciliation": "Aero",
+              "native": "Black Glass"
+            },
+            "limits": "Current player source already passes the ported boundaries; no product defect or correction is claimed. The two new controls use Base/Space Age selection in a Lua 5.2 host model with 2.1.23 mod labels, not either engine execution. Generic strict product rules continue rejecting denied recipes; the mining family retains its independently authored exception."
+          },
+          {
+            "subjects": [
+              "CONT-04",
+              "CONT-06"
+            ],
+            "disposition": "obsolete-implementation-only",
+            "historical_paths": [
+              "tests/compiler/Test-MIRRecipeProductivityPermissions.ps1",
+              "tests/compiler/recipe_productivity_permissions.lua",
+              "tests/compiler/run_recipe_productivity_permissions_controls.py"
+            ],
+            "independent_expectation": "A maintained host entrypoint must exercise the actual permission/effect behavior and reject the old unsupported implicit-only drill gate. Old private stream-registry/planner/module paths, exact assertion totals and report fields are not player behavior.",
+            "current_implementation": [
+              "tests/Test-MIR5HostControls.ps1"
+            ],
+            "current_host_controls": [
+              "tests/test_generator.py::test_mining_effects_preserve_published_denial_policy_without_granting_recipe_permissions",
+              "tests/test_generator.py::test_space_age_recipe_permissions_have_exact_scope_and_preflight_before_writes"
+            ],
+            "original_evidence": [],
+            "remaining_executable_check": "No retired compiler or generated receipt is restored or rerun. Keep the live host driver and the behavioral controls; native output acceptance remains in the retained group above.",
+            "owner": {
+              "reconciliation": "Aero",
+              "native": "Black Glass"
+            },
+            "limits": "The historical normal/expensive fixture locations are not copied into modern 2.x recipe schemas. No recipe-productivity feature is added to reduced historical targets by this disposition."
+          }
+        ],
+        "host_verification": {
+          "suite": "tests/test_generator.py",
+          "passed": 45,
+          "new_controls": 2,
+          "runtime": "lupa.lua52 from pinned mir421-lua-runtime",
+          "native_processes": 0
+        },
+        "negative_controls": {
+          "method": "Separate Lua runtimes with ephemeral module/rule mutations; tracked player source stays unchanged.",
+          "opponents": [
+            "reject-denied-drill-effects",
+            "grant-mining-permissions",
+            "write-permissions-before-preflight"
+          ],
+          "prior_controls_accept_each_opponent": 43,
+          "all_rejected_at_expected_boundary": true,
+          "limits": "Injected opponents establish control sensitivity; they are not observed defects in the current candidate."
+        },
+        "custody": "build/qualification/aero-recipe-permissions-r01/",
+        "remaining_executable_check": "On an admitted final-candidate profile, observe the affected recipe productivity permissions and physical drill/Space Age product output with upstream permission/cap settings retained. Review current consumed inputs against existing product/override native chains before reuse; execute affected cross-override and nondefault settings cases only. The synthetic se-core-miner-drill name tests a published pattern, not an installed Space Exploration closure or support for combining it with Space Age. Black Glass owns native admission/execution; no new native profile is invented by this host port.",
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false
       }
     ],
     "stable_coverage_review": {
