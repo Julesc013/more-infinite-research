@@ -1,0 +1,654 @@
+{
+  "kind": "MIRHistoricalFrontierCurrentOracleApplicabilityV1",
+  "reviewed_against": "44af24fa97bcfa5c506b5261d80065ffabb6d8ff",
+  "original_module_blob": "6089002bc362a42fb4c032b9103a6daf8a215648",
+  "scope": "The27 inherited F015/F016 frontier after-vectors and overlapping14 F016 restoration identities; original oracle-data provenance and current named host controls only.",
+  "original_snapshots": [
+    {
+      "target": "f013",
+      "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f013-direct422-r02\\work\\u-1738c4d8c6d64c1a\\userdata\\script-output\\mir-upgrade-full-state-upgrade.json",
+      "sha256": "82EBAABA878F17E0C9489265A8D0278C3990E2C01A9E609A7BE8885E3FBBE2D5",
+      "bytes": 272739,
+      "capture_metadata": {
+        "declared_from_version": "4.2.01302",
+        "declared_to_version": "4.4.01302",
+        "declared_engine_line": "0.13",
+        "stage": "upgrade",
+        "runtime_mod_versions_available": false,
+        "runtime_mir_version_in_original_payload": null
+      }
+    },
+    {
+      "target": "f014",
+      "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f014-direct422-r02\\work\\u-236bb1b1af224cbf\\userdata\\script-output\\mir-upgrade-full-state-upgrade.json",
+      "sha256": "C346F4A15E976D22393C10A1951AFE2D3AE33C142D36B0C6640B1ABA8403A847",
+      "bytes": 273927,
+      "capture_metadata": {
+        "declared_from_version": "4.2.01402",
+        "declared_to_version": "4.4.01402",
+        "declared_engine_line": "0.14",
+        "stage": "upgrade",
+        "runtime_mod_versions_available": false,
+        "runtime_mir_version_in_original_payload": null
+      }
+    },
+    {
+      "target": "f015",
+      "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f015-direct422-r01\\4.4.01502-upgrade-base-default-from-4.2.01502-full-state-upgrade.json",
+      "sha256": "5ACB802A1CDD7F8086C846178E9DDF9D359D417F0107006AB114624E9EB1BA42",
+      "bytes": 406321,
+      "capture_metadata": {
+        "declared_from_version": "4.2.01502",
+        "declared_to_version": "4.4.01502",
+        "declared_engine_line": "0.15",
+        "stage": "upgrade",
+        "runtime_mod_versions_available": false,
+        "runtime_mir_version_in_original_payload": null
+      }
+    },
+    {
+      "target": "f016",
+      "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f016-direct422-r02\\4.4.01602-upgrade-base-default-from-4.2.01602-full-state-upgrade.json",
+      "sha256": "2036786CB20F9B9FE728CB42468BA4C61E58A9840651A1099849B1A9B3F63E87",
+      "bytes": 416974,
+      "capture_metadata": {
+        "declared_from_version": "4.2.01602",
+        "declared_to_version": "4.4.01602",
+        "declared_engine_line": "0.16",
+        "stage": "upgrade",
+        "runtime_mod_versions_available": false,
+        "runtime_mir_version_in_original_payload": null
+      }
+    },
+    {
+      "target": "f017",
+      "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f017-published441-r02\\4.4.01702-upgrade-base-default-from-4.4.01701-full-state-upgrade.json",
+      "sha256": "E432FBE57BCC1A226D15CD1D337173CA1D8E72107D4DD58452016B7D33363830",
+      "bytes": 456469,
+      "capture_metadata": {
+        "declared_from_version": "4.4.01701",
+        "declared_to_version": "4.4.01702",
+        "declared_engine_line": "0.17",
+        "stage": "upgrade",
+        "runtime_mod_versions_available": false,
+        "runtime_mir_version_in_original_payload": null
+      }
+    },
+    {
+      "target": "f100",
+      "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\f100-upgrade-422\\4.4.10002-upgrade-base-default-from-4.2.10002-full-state-upgrade.json",
+      "sha256": "7CE16492153276E76D94419169E5DFA4D14A33E6DF7294ACB6E8B1221B7F5CA6",
+      "bytes": 403273,
+      "capture_metadata": {
+        "declared_from_version": "4.2.10002",
+        "declared_to_version": "4.4.10002",
+        "declared_engine_line": "1.0",
+        "stage": "upgrade",
+        "runtime_mod_versions_available": true,
+        "runtime_mir_version_in_original_payload": "4.4.10002"
+      }
+    },
+    {
+      "target": "f110",
+      "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\f110-upgrade-422\\4.4.11002-upgrade-base-default-from-4.2.11002-full-state-upgrade.json",
+      "sha256": "E61B752FB08FC385413C5614A49D813D4423FE0528F5D11272C84BAF80B5210A",
+      "bytes": 404028,
+      "capture_metadata": {
+        "declared_from_version": "4.2.11002",
+        "declared_to_version": "4.4.11002",
+        "declared_engine_line": "1.1",
+        "stage": "upgrade",
+        "runtime_mod_versions_available": true,
+        "runtime_mir_version_in_original_payload": "4.4.11002"
+      }
+    }
+  ],
+  "metadata_preservation": [
+    {
+      "path": "tests/fixtures/historical-direct-native-oracle.json",
+      "all_expected_technology_state_and_definition_values_unchanged": true,
+      "all_original_source_paths_hashes_forces_and_selections_unchanged": true,
+      "inverse_metadata_and_one_prose_token_equals_exact_original_bytes": true,
+      "original_sha256": "F2F5BDDCDEE62376DFED36AE7D0EBB3BEEFA98906F395EEC064C81A178466FDF",
+      "new_sha256": "212DDE3A00C7C21D5B0ADC774D36F5751DE6222A3E360F4061E7C7397B8D63A2",
+      "hash_scope": "These fixture JSON paths have Git text unset (-text): original/new working bytes and canonical Git bytes coincide, including their preserved CRLF. No newline normalization is applied.",
+      "canonical_git_before_sha256": "F2F5BDDCDEE62376DFED36AE7D0EBB3BEEFA98906F395EEC064C81A178466FDF",
+      "canonical_git_after_sha256": "212DDE3A00C7C21D5B0ADC774D36F5751DE6222A3E360F4061E7C7397B8D63A2"
+    },
+    {
+      "path": "tests/fixtures/historical-continuation-native-oracle.json",
+      "all_expected_technology_state_and_definition_values_unchanged": true,
+      "all_original_source_paths_hashes_forces_and_selections_unchanged": true,
+      "inverse_metadata_and_one_prose_token_equals_exact_original_bytes": true,
+      "original_sha256": "1BF69EC24E0F5CA90522D6B5F4A49DCC7E90125E492230C5874AF180D007C726",
+      "new_sha256": "BA72BF81AE8AA6880B0A44FC61D45E1DEB381389E53030C040F9320995894DE3",
+      "hash_scope": "These fixture JSON paths have Git text unset (-text): original/new working bytes and canonical Git bytes coincide, including their preserved CRLF. No newline normalization is applied.",
+      "canonical_git_before_sha256": "1BF69EC24E0F5CA90522D6B5F4A49DCC7E90125E492230C5874AF180D007C726",
+      "canonical_git_after_sha256": "BA72BF81AE8AA6880B0A44FC61D45E1DEB381389E53030C040F9320995894DE3"
+    }
+  ],
+  "source_attribution_correction": "Generic published4.7-era attribution was not supported by these actual payloads. They declare4.4.*02 destinations; onlyF100/F110 include runtime MIR version readback. The numeric expected definitions and original source identities are unchanged.",
+  "mappings": [
+    {
+      "target": "f015",
+      "technology": "braking-force-8",
+      "old_changed_fields": [
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-continuation-native-oracle.json",
+      "original_snapshot_sha256": "5ACB802A1CDD7F8086C846178E9DDF9D359D417F0107006AB114624E9EB1BA42",
+      "implementation": "source/research/historical_continuations.lua",
+      "current_control": "tests/test_historical_continuations.py::test_portable_native_characterization_matches_default_projection"
+    },
+    {
+      "target": "f015",
+      "technology": "inserter-capacity-bonus-8",
+      "old_changed_fields": [
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-continuation-native-oracle.json",
+      "original_snapshot_sha256": "5ACB802A1CDD7F8086C846178E9DDF9D359D417F0107006AB114624E9EB1BA42",
+      "implementation": "source/research/historical_continuations.lua",
+      "current_control": "tests/test_historical_continuations.py::test_portable_native_characterization_matches_default_projection"
+    },
+    {
+      "target": "f015",
+      "technology": "recipe-prod-research_character_crafting_speed-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "5ACB802A1CDD7F8086C846178E9DDF9D359D417F0107006AB114624E9EB1BA42",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f015",
+      "technology": "recipe-prod-research_character_mining_speed-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "5ACB802A1CDD7F8086C846178E9DDF9D359D417F0107006AB114624E9EB1BA42",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f015",
+      "technology": "recipe-prod-research_character_reach-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "5ACB802A1CDD7F8086C846178E9DDF9D359D417F0107006AB114624E9EB1BA42",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f015",
+      "technology": "recipe-prod-research_character_walking_speed-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "5ACB802A1CDD7F8086C846178E9DDF9D359D417F0107006AB114624E9EB1BA42",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f015",
+      "technology": "recipe-prod-research_electric_shooting_speed-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "5ACB802A1CDD7F8086C846178E9DDF9D359D417F0107006AB114624E9EB1BA42",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f015",
+      "technology": "recipe-prod-research_flamethrower_shooting_speed-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "5ACB802A1CDD7F8086C846178E9DDF9D359D417F0107006AB114624E9EB1BA42",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f015",
+      "technology": "recipe-prod-research_inventory_capacity-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "5ACB802A1CDD7F8086C846178E9DDF9D359D417F0107006AB114624E9EB1BA42",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f015",
+      "technology": "recipe-prod-research_robot_battery-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "5ACB802A1CDD7F8086C846178E9DDF9D359D417F0107006AB114624E9EB1BA42",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f015",
+      "technology": "recipe-prod-research_rocket_shooting_speed-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "5ACB802A1CDD7F8086C846178E9DDF9D359D417F0107006AB114624E9EB1BA42",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f015",
+      "technology": "research-speed-7",
+      "old_changed_fields": [
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-continuation-native-oracle.json",
+      "original_snapshot_sha256": "5ACB802A1CDD7F8086C846178E9DDF9D359D417F0107006AB114624E9EB1BA42",
+      "implementation": "source/research/historical_continuations.lua",
+      "current_control": "tests/test_historical_continuations.py::test_portable_native_characterization_matches_default_projection"
+    },
+    {
+      "target": "f015",
+      "technology": "worker-robots-storage-4",
+      "old_changed_fields": [
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-continuation-native-oracle.json",
+      "original_snapshot_sha256": "5ACB802A1CDD7F8086C846178E9DDF9D359D417F0107006AB114624E9EB1BA42",
+      "implementation": "source/research/historical_continuations.lua",
+      "current_control": "tests/test_historical_continuations.py::test_portable_native_characterization_matches_default_projection"
+    },
+    {
+      "target": "f016",
+      "technology": "braking-force-8",
+      "old_changed_fields": [
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-continuation-native-oracle.json",
+      "original_snapshot_sha256": "2036786CB20F9B9FE728CB42468BA4C61E58A9840651A1099849B1A9B3F63E87",
+      "implementation": "source/research/historical_continuations.lua",
+      "current_control": "tests/test_historical_continuations.py::test_portable_native_characterization_matches_default_projection"
+    },
+    {
+      "target": "f016",
+      "technology": "inserter-capacity-bonus-8",
+      "old_changed_fields": [
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-continuation-native-oracle.json",
+      "original_snapshot_sha256": "2036786CB20F9B9FE728CB42468BA4C61E58A9840651A1099849B1A9B3F63E87",
+      "implementation": "source/research/historical_continuations.lua",
+      "current_control": "tests/test_historical_continuations.py::test_portable_native_characterization_matches_default_projection"
+    },
+    {
+      "target": "f016",
+      "technology": "recipe-prod-research_character_crafting_speed-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "2036786CB20F9B9FE728CB42468BA4C61E58A9840651A1099849B1A9B3F63E87",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f016",
+      "technology": "recipe-prod-research_character_mining_speed-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "2036786CB20F9B9FE728CB42468BA4C61E58A9840651A1099849B1A9B3F63E87",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f016",
+      "technology": "recipe-prod-research_character_reach-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "2036786CB20F9B9FE728CB42468BA4C61E58A9840651A1099849B1A9B3F63E87",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f016",
+      "technology": "recipe-prod-research_character_walking_speed-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "2036786CB20F9B9FE728CB42468BA4C61E58A9840651A1099849B1A9B3F63E87",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f016",
+      "technology": "recipe-prod-research_electric_shooting_speed-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "2036786CB20F9B9FE728CB42468BA4C61E58A9840651A1099849B1A9B3F63E87",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f016",
+      "technology": "recipe-prod-research_flamethrower_shooting_speed-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "2036786CB20F9B9FE728CB42468BA4C61E58A9840651A1099849B1A9B3F63E87",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f016",
+      "technology": "recipe-prod-research_inventory_capacity-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "2036786CB20F9B9FE728CB42468BA4C61E58A9840651A1099849B1A9B3F63E87",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f016",
+      "technology": "recipe-prod-research_lab_productivity-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "2036786CB20F9B9FE728CB42468BA4C61E58A9840651A1099849B1A9B3F63E87",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f016",
+      "technology": "recipe-prod-research_robot_battery-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "2036786CB20F9B9FE728CB42468BA4C61E58A9840651A1099849B1A9B3F63E87",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f016",
+      "technology": "recipe-prod-research_rocket_shooting_speed-1",
+      "old_changed_fields": [
+        "ingredients",
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-direct-native-oracle.json",
+      "original_snapshot_sha256": "2036786CB20F9B9FE728CB42468BA4C61E58A9840651A1099849B1A9B3F63E87",
+      "implementation": "source/research/historical_direct.lua",
+      "current_control": "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle"
+    },
+    {
+      "target": "f016",
+      "technology": "research-speed-7",
+      "old_changed_fields": [
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-continuation-native-oracle.json",
+      "original_snapshot_sha256": "2036786CB20F9B9FE728CB42468BA4C61E58A9840651A1099849B1A9B3F63E87",
+      "implementation": "source/research/historical_continuations.lua",
+      "current_control": "tests/test_historical_continuations.py::test_portable_native_characterization_matches_default_projection"
+    },
+    {
+      "target": "f016",
+      "technology": "worker-robots-storage-4",
+      "old_changed_fields": [
+        "prerequisites"
+      ],
+      "all_after_vectors_equal_current_independent_oracle": true,
+      "oracle": "tests/fixtures/historical-continuation-native-oracle.json",
+      "original_snapshot_sha256": "2036786CB20F9B9FE728CB42468BA4C61E58A9840651A1099849B1A9B3F63E87",
+      "implementation": "source/research/historical_continuations.lua",
+      "current_control": "tests/test_historical_continuations.py::test_portable_native_characterization_matches_default_projection"
+    }
+  ],
+  "unique_target_identity_pairs": 27,
+  "overlapping_f016_restoration_pairs": 14,
+  "current_active_retired_module_consumers": 0,
+  "source_disposition": "Consolidate the valid preserved science/prerequisite expectations into the existing independent native-characterization controls. Retire the old transition-specific allowance/transport as active machinery; no imported table is a MIR5 repair policy.",
+  "limits": [
+    "The original4.2.0 before-capture provenance remains unverified; these after-vector matches do not fabricate or qualify that old transition.",
+    "The27 rows are13F015 plus14F016; the extra14 F016 restoration identities overlap, not another14 tests/routes.",
+    "Native-characterization and current host projection do not qualify current MIR5 gameplay, earned work, upgrades, saves, clients or all historical mod/settings closures.",
+    "Continue final consumed-input review and genuinely affected checks on the existing nine/seven/four selected migration queue; no every-patch campaign or full historical rerun."
+  ],
+  "native_execution": false,
+  "release_qualification": false,
+  "host_validation": {
+    "existing_controls": 39,
+    "groups": [
+      {
+        "path": "tests/test_historical_direct.py",
+        "controls": 6,
+        "exit_code": 0
+      },
+      {
+        "path": "tests/test_historical_continuations.py",
+        "controls": 7,
+        "exit_code": 0
+      },
+      {
+        "path": "tests/test_historical_transition_fixture.py",
+        "controls": 11,
+        "exit_code": 0
+      },
+      {
+        "path": "tests/test_f110_f200_transition_fixture.py",
+        "controls": 7,
+        "exit_code": 0
+      },
+      {
+        "path": "tests/test_published_f100_forward_fixture.py",
+        "controls": 8,
+        "exit_code": 0
+      }
+    ],
+    "lua": "5.2",
+    "lupa": "2.6",
+    "new_or_modified_executable_tests": 0,
+    "original_broken_frontiers_refused": 14,
+    "unmodified_oracle_control_observations": 2,
+    "note": "Host and in-memory oracle observations only; counts are not native runs or qualified routes."
+  },
+  "opposing_control_scope": {
+    "method": "Existing unmodified host test methods run in fresh pinned Lua states. An in-memory wrapper substitutes only the actual4.4.0 damaged prerequisite/science fields after pure construction; independently captured expected values are untouched.",
+    "original_bad_definition_source_sha256": "615C303A5C53DCE72AD0E1FA36FA38935264E3FBCBC55E79E009D355B071F973",
+    "cases": [
+      {
+        "role": "continuation",
+        "technology": "braking-force-8",
+        "changed_fields": [
+          "prerequisites"
+        ],
+        "expected_error": "prerequisites differ for braking-force-8"
+      },
+      {
+        "role": "continuation",
+        "technology": "inserter-capacity-bonus-8",
+        "changed_fields": [
+          "prerequisites"
+        ],
+        "expected_error": "prerequisites differ for inserter-capacity-bonus-8"
+      },
+      {
+        "role": "direct",
+        "technology": "recipe-prod-research_character_crafting_speed-1",
+        "changed_fields": [
+          "prerequisites"
+        ],
+        "expected_error": "prerequisites differ for recipe-prod-research_character_crafting_speed-1"
+      },
+      {
+        "role": "direct",
+        "technology": "recipe-prod-research_character_mining_speed-1",
+        "changed_fields": [
+          "prerequisites"
+        ],
+        "expected_error": "prerequisites differ for recipe-prod-research_character_mining_speed-1"
+      },
+      {
+        "role": "direct",
+        "technology": "recipe-prod-research_character_reach-1",
+        "changed_fields": [
+          "prerequisites"
+        ],
+        "expected_error": "prerequisites differ for recipe-prod-research_character_reach-1"
+      },
+      {
+        "role": "direct",
+        "technology": "recipe-prod-research_character_walking_speed-1",
+        "changed_fields": [
+          "prerequisites"
+        ],
+        "expected_error": "prerequisites differ for recipe-prod-research_character_walking_speed-1"
+      },
+      {
+        "role": "direct",
+        "technology": "recipe-prod-research_electric_shooting_speed-1",
+        "changed_fields": [
+          "prerequisites"
+        ],
+        "expected_error": "prerequisites differ for recipe-prod-research_electric_shooting_speed-1"
+      },
+      {
+        "role": "direct",
+        "technology": "recipe-prod-research_flamethrower_shooting_speed-1",
+        "changed_fields": [
+          "prerequisites"
+        ],
+        "expected_error": "prerequisites differ for recipe-prod-research_flamethrower_shooting_speed-1"
+      },
+      {
+        "role": "direct",
+        "technology": "recipe-prod-research_inventory_capacity-1",
+        "changed_fields": [
+          "prerequisites"
+        ],
+        "expected_error": "prerequisites differ for recipe-prod-research_inventory_capacity-1"
+      },
+      {
+        "role": "direct",
+        "technology": "recipe-prod-research_lab_productivity-1",
+        "changed_fields": [
+          "prerequisites"
+        ],
+        "expected_error": "prerequisites differ for recipe-prod-research_lab_productivity-1"
+      },
+      {
+        "role": "direct",
+        "technology": "recipe-prod-research_robot_battery-1",
+        "changed_fields": [
+          "prerequisites"
+        ],
+        "expected_error": "prerequisites differ for recipe-prod-research_robot_battery-1"
+      },
+      {
+        "role": "direct",
+        "technology": "recipe-prod-research_rocket_shooting_speed-1",
+        "changed_fields": [
+          "prerequisites"
+        ],
+        "expected_error": "prerequisites differ for recipe-prod-research_rocket_shooting_speed-1"
+      },
+      {
+        "role": "continuation",
+        "technology": "research-speed-7",
+        "changed_fields": [
+          "prerequisites"
+        ],
+        "expected_error": "prerequisites differ for research-speed-7"
+      },
+      {
+        "role": "continuation",
+        "technology": "worker-robots-storage-4",
+        "changed_fields": [
+          "prerequisites"
+        ],
+        "expected_error": "prerequisites differ for worker-robots-storage-4"
+      }
+    ]
+  },
+  "current_coverage_verdict": "The27 retained after-vector expectations are mapped to existing independent characterization/host controls; no missing current science/prerequisite expectation was found in this bounded slice. Current-candidate native applicability and broader profile/state coverage remain separate.",
+  "owner": "Aero source/expectation mapping and independent review; Black Glass integration/affected native execution",
+  "custody": "build/qualification/aero-historical-frontier-map-r01/",
+  "original_payload_capsule": {
+    "path": "spec/evidence/historical-frontier-original-capture-receipts-aero-r01.json.gz",
+    "bytes": 365294,
+    "sha256": "3B8C4734D51F31B0CD46749C9F79ECA42D46B2EF0F06C48F8412611129E35B53",
+    "files": 8,
+    "decoded_original_bytes": 3047758,
+    "all_original_sizes_hashes_decode_rechecked": true,
+    "no_path_extraction_needed": "Decode/hash/parse bodies in memory; original absolute locators grant no output path authority."
+  }
+}
