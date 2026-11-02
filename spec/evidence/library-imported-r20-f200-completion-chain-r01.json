@@ -1,0 +1,516 @@
+{
+  "schema": 1,
+  "kind": "MIRImportedR20F200NativeCompletionChainV1",
+  "status": "independent-GO-exact-unscored-imported-input-lifecycle",
+  "source": {
+    "public": "fce598a9af09e43536c90cff9cff15527d8fd676",
+    "public_checked_merge": "8f668713b15e5f97f8ab2d7e4446a0170ba10d78",
+    "private": "9bf61979c2fb6090d141c824275e5924c44f0d99",
+    "private_checked_merge": "894b4676986172ee0fe186e092abf2e78a789088",
+    "player_source": "b677ced0b1ae0d8bd9ae47eb6b272443faec6d63",
+    "player_tree": "e6497bde988908fb96fe00a16ee5ae1f51a5088f",
+    "player_version": "5.0.20001",
+    "player_sha256": "750ECA842134AFDDCC7C45B2B656510CA60F09940A2E82B21896AAE7E3D8C1BE",
+    "input_observer_version": "0.3.4",
+    "input_observer_sha256": "91E5B2C3BEF4D18932816204E57C5627F507708FE456DF2E349F6C263B50F7F9",
+    "engine": "2.0.77",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "observed": {
+    "phase": "delivered",
+    "actual_joins": 5,
+    "actual_text_events": 15,
+    "actual_query_clicks": 1,
+    "actual_other_clicks": 1,
+    "actual_library_closed_events": 2,
+    "actual_drag_events": 5,
+    "actual_effect_reset_events": 2,
+    "actual_removed_events": 1,
+    "private_queries": 48,
+    "en_index": 1,
+    "de_index": 2,
+    "en_name": "MIR5English",
+    "de_name": "MIR5Deutsch",
+    "load_observed": true,
+    "removal_observation": {
+      "removed_events": 1,
+      "remaining_player_valid": false,
+      "retained_de_root_valid": false,
+      "retained_de_query_valid": false
+    }
+  },
+  "execution": {
+    "native_allocations": 7,
+    "physical_actor_calls": 9,
+    "delivery_groups": 7,
+    "one_shot_advances": 15,
+    "capture_actors": 7,
+    "successful_owned_pngs": 5,
+    "requested_window": "1024x576",
+    "actual_window_and_lua_resolution": [
+      1280,
+      720
+    ],
+    "actual_display_scale": 0.75,
+    "fresh_target_witness_before_each_actor": true,
+    "actual_click_witness_before_text": true,
+    "root_viewed_all_five_pngs": true,
+    "independent_reviewer_viewed_all_five_pngs": true,
+    "rcon_first_probe": "empty; cause unestablished; fixed second read-only probe positive",
+    "bounded_capture_nulls": "Two English foreground_request_not_acquired observations retained, followed by bounded successful captures; no input/advance retry.",
+    "server_natural_exit_codes": "not established",
+    "factorio_zero": true,
+    "cleanup_errors": []
+  },
+  "saves": [
+    {
+      "path": "D:/Projects/Factorio/mir5-imported-each-action-r20-r01/build/tmp/imported-library-r20-r02-controller-f200/server/saves/mir5-library-native-input-restart.zip",
+      "bytes": 2655742,
+      "sha256": "6B9C921B04FE011B3668B8C0FA0B834B4C45081B011F9F6E2EDC04CB778D91E2",
+      "crc_members": 59,
+      "crc_bad_member": null
+    },
+    {
+      "path": "D:/Projects/Factorio/mir5-imported-each-action-r20-r01/build/tmp/imported-library-r20-r02-controller-f200/server/saves/mir5-library-native-input-complete.zip",
+      "bytes": 2654867,
+      "sha256": "A48080462F16117573A3CA1DCFE359FC97DE8A47D3C700686CCAF61852DCE6FE",
+      "crc_members": 59,
+      "crc_bad_member": null
+    }
+  ],
+  "save_limit": "Restart save was cold loaded by a new server and two new clients; final save CRC checked but not separately cold loaded.",
+  "custody": {
+    "native_files": 239,
+    "native_bytes": 23349411,
+    "native_local_locations": 3,
+    "packet_files": 43,
+    "packet_local_locations": 2,
+    "private_code_snapshots": 4,
+    "primary": "build/qualification/imported-library-r20-native-f200-complete-r01",
+    "root_readback_sha256": "4E8C220B789841F121E6A9A943E74F2790AE0D3F23F88E35AC947C3AB717B03B",
+    "terminal_sha256": "2C05660AC5635C8DB8D03FE38EC85DE859D6F6E0F2CE2B09FCD0078C5415F7C6",
+    "off_machine_backup_claim": false
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/library-imported-r20-f200-completion-receipts-r01.json.gz",
+    "bytes": 8103814,
+    "sha256": "A95BCCAD52F36AC268504CB1CA6AF8F4D03443083F058B93E5DA7FE3DC4DCF12",
+    "bodies": 217,
+    "includes_all_five_pngs": true,
+    "private_controller_source_excluded": true,
+    "omitted_payloads": [
+      {
+        "relative_path": "client-de/achievements-modded.dat",
+        "bytes": 4428,
+        "sha256": "836B5677D811843A1A0434B801E497477C2C9FE1E2224910C27DBEDFA8E21815",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "client-de/crop-cache.dat",
+        "bytes": 2412343,
+        "sha256": "D8F435DDE4485F473DFC762A6BE088A2E8E9B469FC895B2FD3DA584B4D15FC98",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "client-de/player-data.json",
+        "bytes": 12942,
+        "sha256": "EC170EA40EA2064686EF06B54A3EF953DE4DC940BA001171DF20FD112869D8BB",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "client-en/achievements-modded.dat",
+        "bytes": 4428,
+        "sha256": "836B5677D811843A1A0434B801E497477C2C9FE1E2224910C27DBEDFA8E21815",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "client-en/crop-cache.dat",
+        "bytes": 2412343,
+        "sha256": "D8F435DDE4485F473DFC762A6BE088A2E8E9B469FC895B2FD3DA584B4D15FC98",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "client-en/player-data.json",
+        "bytes": 12967,
+        "sha256": "88D7D1BE89F61B0C5DE02B5FFDF8F10C84A9B543A9A7D61C328F05CF9B77EB62",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "prior-archives-imported-library-native-input-f200/mir-fixture-mir5-active-mods-observer_0.1.0.zip.723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87.zip",
+        "bytes": 834,
+        "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "replacement-de/achievements-modded.dat",
+        "bytes": 4428,
+        "sha256": "836B5677D811843A1A0434B801E497477C2C9FE1E2224910C27DBEDFA8E21815",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "replacement-de/crop-cache.dat",
+        "bytes": 2412343,
+        "sha256": "D8F435DDE4485F473DFC762A6BE088A2E8E9B469FC895B2FD3DA584B4D15FC98",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "replacement-de/player-data.json",
+        "bytes": 13361,
+        "sha256": "B18E0843782B64FB155956FAC6FCDAD0D68723F01A150FEB36CA6E3FF40ADA73",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/.lock",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/player-data.json",
+        "bytes": 11449,
+        "sha256": "074D76F580A8EA20E7AE50566CE4F6FCCB1D74D1BC8FB3C4432F61888D5D1417",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/saves/mir5-imported-input-source.zip",
+        "bytes": 811812,
+        "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/saves/mir5-library-native-input-complete.zip",
+        "bytes": 2654867,
+        "sha256": "A48080462F16117573A3CA1DCFE359FC97DE8A47D3C700686CCAF61852DCE6FE",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/saves/mir5-library-native-input-restart.zip",
+        "bytes": 2655742,
+        "sha256": "6B9C921B04FE011B3668B8C0FA0B834B4C45081B011F9F6E2EDC04CB778D91E2",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/control.lua",
+        "bytes": 48,
+        "sha256": "70B2039F46EB0325D74A6219DD72186C6563DFD775884DD701DAA64E12A27BB0",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/description.json",
+        "bytes": 77,
+        "sha256": "58D1D56C3F826E3FD95EDF863738E02A6610DC8265DACD7387C29E5CB7BD2924",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/level-init.dat",
+        "bytes": 913367,
+        "sha256": "12D274A5271ACBD142EC9A6D1FF5A668D0F5700B6C6D312EBF01692C27BBD2FC",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/af/freeplay.cfg",
+        "bytes": 479,
+        "sha256": "5C75397938B451D81F0A60CFCE1394B7BF811A49F918DF3A13A04286C1A4A2B9",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/ar/freeplay.cfg",
+        "bytes": 2033,
+        "sha256": "D27CF17C687E703B519819F10D120264C0C24308B2002D4B7FA3B00DC6BDB957",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/be/freeplay.cfg",
+        "bytes": 3890,
+        "sha256": "95A940F01792CFDDE93C834EDE95B4A39B9E6445FD0FC45652E54E5992F3A0D2",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/bg/freeplay.cfg",
+        "bytes": 4245,
+        "sha256": "4AD98A947419AD3F8522E964FB9933DF7120C53A8C79BDFC1EF8F972D35B7823",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/ca/freeplay.cfg",
+        "bytes": 2588,
+        "sha256": "D022C13A515DCA9EAE7CEF033BC9078AB82CA7EE609DA71EFC6EC22873CA840B",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/cs/freeplay.cfg",
+        "bytes": 2507,
+        "sha256": "DBBB185A70A1550B1F4F05218A0343675FB083A5B1F167DD8CA2D3FCFCB5108E",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/da/freeplay.cfg",
+        "bytes": 2384,
+        "sha256": "9D534211425257F0D01C37B511E5225FE8D816DC24037691F32A83A9F04A3FF9",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/de/freeplay.cfg",
+        "bytes": 2819,
+        "sha256": "72C817B7FA422F927873C76ABA4AFF1DEC47EDE9F86B4F7AB07453968E675EA8",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/el/freeplay.cfg",
+        "bytes": 4369,
+        "sha256": "F36F7A4176277786BB314F77DE2A6C6BEC5A376FA28D659960996854681B5BFE",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/en/freeplay.cfg",
+        "bytes": 2377,
+        "sha256": "DB24B3B1BD935EFF42E27AB43E4D80F21B24C16E87B81940A860081587F3EBB3",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/eo/freeplay.cfg",
+        "bytes": 2298,
+        "sha256": "4E62446D4666ED89B8DC78DD9671B2796886A5E2CA864B1ABDFBB1E209F29516",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/es-ES/freeplay.cfg",
+        "bytes": 2391,
+        "sha256": "BFEEEF3CFCF05416F372AB5E2ECF0AA1ED6DE6246A5393FC6F5587684AF6E48F",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/et/freeplay.cfg",
+        "bytes": 2326,
+        "sha256": "2EA101678365BDFBA7874F2E70922A36B689A0C2B0D8C0AA2C40F28A20853404",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/eu/freeplay.cfg",
+        "bytes": 28,
+        "sha256": "F67D39BAC2F86656AA7FD2DB3752A08EE56392124B817C311DCCE396B6253E77",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/fa/freeplay.cfg",
+        "bytes": 37,
+        "sha256": "FC6E30ECB0E40EC88F8E273A7F3AB8AB2F28728B3B687EF0CD0317BC7EB16A41",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/fi/freeplay.cfg",
+        "bytes": 2602,
+        "sha256": "C055C2E580AB0606274ECCBE30BD0BCE5A996F7850515B773637BC6A731D1E1A",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/fr/freeplay.cfg",
+        "bytes": 2681,
+        "sha256": "A4730BEDD954CFB3792FAECA161E5D48272187698DD2B7D766615AE7FD4F2351",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/fy-NL/freeplay.cfg",
+        "bytes": 24,
+        "sha256": "16773FE4C5FD7953247E2C64FB0A6AB448B199525124A769A7F08280EC9D223A",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/ga-IE/freeplay.cfg",
+        "bytes": 26,
+        "sha256": "23F22A4E0D27E2809CE0C98AD13679DDF706E9B8DFC228519E0630C19CB77418",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/he/freeplay.cfg",
+        "bytes": 2974,
+        "sha256": "DE0DD8DB815B65E27182FBBE66823C41E8D5E5155385A1F4D8DDFEA5E8D6F8C1",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/hr/freeplay.cfg",
+        "bytes": 2480,
+        "sha256": "CE5100C802C8A8C9D90323E1CF4BED589A0BC1DEEC00074EFA9D8A475F5F80DE",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/hu/freeplay.cfg",
+        "bytes": 2540,
+        "sha256": "5775E703AC6D7110C49768D7B4D782F9947DDF175690DD4D97C51E536C8A2A34",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/id/freeplay.cfg",
+        "bytes": 2379,
+        "sha256": "F32B5E8B5F4FC4FB77C629B14BC55A2D07356AFECF142D3B960159F04369CF0E",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/is/freeplay.cfg",
+        "bytes": 29,
+        "sha256": "ACE69AC617CB0AC31D7FDD8FED9FD259E86E405B7FD0ACCB7EE4336B83DC9CD0",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/it/freeplay.cfg",
+        "bytes": 1803,
+        "sha256": "3BB66F69AE14DD0508F8317FAA5BEC9626487FF6CEF8793DB772FD22A844C933",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/ja/freeplay.cfg",
+        "bytes": 2787,
+        "sha256": "D3CCDFF6F02DCCF8859496BC68639837B50E17A688742EE806F0EBEB596E3A99",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/ka/freeplay.cfg",
+        "bytes": 87,
+        "sha256": "D6C2171FB36E43D3B232535672A4A9C9A94266A95DBC1507389B816E9F7FAECD",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/kk/freeplay.cfg",
+        "bytes": 35,
+        "sha256": "E5AC332A2BFECB45927A2B588D7C44CAA26A488A582173173243DC7198668633",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/ko/freeplay.cfg",
+        "bytes": 3136,
+        "sha256": "4F5DCA95940A4019D73A2D99CED9FA3C404994773093229C63C674F12921B10A",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/lt/freeplay.cfg",
+        "bytes": 2614,
+        "sha256": "A16B0D6C0518DB99204669241E575BA06C9713E03CA3738DAC8D88CBC68B33ED",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/lv/freeplay.cfg",
+        "bytes": 2431,
+        "sha256": "B4DC8C51524799A384776E62D028CA35057CF5F39DD00562DD7DC4CD6AA0DED4",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/nl/freeplay.cfg",
+        "bytes": 2510,
+        "sha256": "FFFE82C1D533E29577D171696D10247F0D3EBE265E3312C3FF2B7FD5F04EA46A",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/no/freeplay.cfg",
+        "bytes": 2415,
+        "sha256": "E2076ECC63BF65EE54DF603DE9F1C796CC1042A3B5C295D304C414487DE8C22C",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/pl/freeplay.cfg",
+        "bytes": 2479,
+        "sha256": "B6E4F9BCFBDC9E4BDFD5CB814FCED8CFB3E09DAFA11AF51107D1B9199A7F76C1",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/pt-BR/freeplay.cfg",
+        "bytes": 2524,
+        "sha256": "97F36CFEDCB255F866A0DF69F91E3A0F265DCCFF76D4DB055E5B21B3801BE8B8",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/pt-PT/freeplay.cfg",
+        "bytes": 2377,
+        "sha256": "07A411358841B6C25241F15B2B67475676B00E644DBDB61341C12F49540C9143",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/ro/freeplay.cfg",
+        "bytes": 2600,
+        "sha256": "A93DCFCE0B26C46B6A73353B3E41CE3861F53510E487AC8C0C14443C19B954B8",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/ru/freeplay.cfg",
+        "bytes": 3927,
+        "sha256": "DA53416F9F3FFD4CD478C5123A1F701E67C3F1CE9FC4B5DE1028A72C6A3D352F",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/sk/freeplay.cfg",
+        "bytes": 2409,
+        "sha256": "429AA376DFCDED3F116BAD2E07B9BDAEB7FAF9A88F77145D63A160517991DD8B",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/sl/freeplay.cfg",
+        "bytes": 27,
+        "sha256": "6B46D0408CDF0370951744AEB8ACCCDDEFB5A7675174C0784D77F1B59C77FE43",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/sr/freeplay.cfg",
+        "bytes": 30,
+        "sha256": "528B5312FA6427FE978AD61766ADD76BD8C0C4096E7C760D22EB0E1FD2E5A5DD",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/sv-SE/freeplay.cfg",
+        "bytes": 2369,
+        "sha256": "306163EEB1E6430EF7E2F8E9550EB1B53714A5FAE4D0EF88E2863750ECB44A41",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/th/freeplay.cfg",
+        "bytes": 5189,
+        "sha256": "F3EBF9ED3251231D2BE170CA2355A9F5645CAF53FEB663C4158A388C352982D4",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/tr/freeplay.cfg",
+        "bytes": 2504,
+        "sha256": "C73BFAE7C791086C73FBA0AE47C6EF8E9ABBB0262FD9523054A3BC255DB4262C",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/uk/freeplay.cfg",
+        "bytes": 3890,
+        "sha256": "EA33C57A772FDB89CFDD3E47BD42445FE336ABD292AA803F86C9544D3C2432F7",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/vi/freeplay.cfg",
+        "bytes": 3239,
+        "sha256": "CB9FDF7D1B227B446C9B264A244BF180DE8367EBD5879C54906C10A76B8E1297",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/zh-CN/freeplay.cfg",
+        "bytes": 2250,
+        "sha256": "5CF8BEEE3C248AB523B15848BDB5594B9E9965D1BF43F64796FAB01D4519A2C0",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      },
+      {
+        "relative_path": "server/temp/currently-playing/locale/zh-TW/freeplay.cfg",
+        "bytes": 2112,
+        "sha256": "0B83E2D7C9761A81A6784B0021F97C382C1946C4DEB4D4956EA7B6C3C29989A0",
+        "reason": "Full raw local custody retained; omit save/cache/player-data/scenario payload from selected public receipt capsule."
+      }
+    ]
+  },
+  "independent_native_review": {
+    "path": "build/qualification/r20-f200-native-result-review-r01/review.json",
+    "sha256": "CEE025428C5FFA195531E0295877B3F849292A2E1CA85A3AEE1C30FF97253C53",
+    "verdict": "scoped-GO-exact-native-case"
+  },
+  "limits": [
+    "Published501/F200 Base imported Library input/preservation/replacement/cold-rejoin only; SourceB502 and F210034 remain unqualified.",
+    "Oldr18/r02/r03 adverses and oldr19 NO-GO remain under their original inputs. The r03 modal/null-exit diagnostic is not relabelled.",
+    "Measured memory is sampled actor plus owned process trees within the reviewed root-exclusive scope, not a hard cap or whole-session outer governor.",
+    "Final save has CRC proof but no separate cold load. Seven original preservation observations agree; no new public-beta-successor, full UX/export, settings provenance or whole-product performance verdict follows.",
+    "Root key lookup initially used inspection_report for the foreign handoff; corrected to inventory_report before binding/receipt. This was a read-only parser error, with no input retry or native failure.",
+    "All actual selected receipt bytes are retained; omitted save/cache/player-data/scenario bodies remain fully hashed in three local custody locations."
+  ],
+  "native_execution": true,
+  "performance_acceptance": false,
+  "release_qualification": false
+}
