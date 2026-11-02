@@ -1248,6 +1248,73 @@ class LibraryTests(unittest.TestCase):
           assert(player.force.research_queue == queue and gear.level == level)
         ''')
 
+    def test_two_players_reject_malformed_hidden_replacements_without_changing_views_or_research(self):
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          boot()
+          local peer = {valid=true, index=2, name="Bob", locale="de", connected=true,
+            force=player.force, gui={screen=gui_container(nil)},
+            display_resolution=player.display_resolution, display_scale=1}
+          game.get_player = function(index) return index==1 and player or index==2 and peer or nil end
+
+          -- Preserve the old fixture's full active-force witness rather than
+          -- treating unchanged levels alone as unchanged native research.
+          gear.saved_progress, foreign.saved_progress = .125, .25
+          local function snapshot()
+            local force, parts = player.force, {}
+            local names = {}; for name in pairs(force.technologies) do names[#names+1]=name end
+            table.sort(names)
+            for _, name in ipairs(names) do
+              local tech=force.technologies[name]
+              for _, key in ipairs({"name","level","researched","enabled","visible_when_disabled","saved_progress"}) do
+                parts[#parts+1]=name..":"..key.."="..tostring(tech[key])
+              end
+            end
+            parts[#parts+1]="current="..force.current_research.name
+            parts[#parts+1]="progress="..force.research_progress
+            for index, tech in ipairs(force.research_queue) do parts[#parts+1]=index.."="..tech.name end
+            return table.concat(parts,"|")
+          end
+          local native_before = snapshot()
+          local root_a=library.open(player,{family="all",mode=1,hidden={gear.name},selected=foreign.name})
+          local root_b=library.open(peer,{family="all",mode=3,hidden={},selected=gear.name})
+          local function assert_views()
+            local a,b=storage.mir_library.players[1],storage.mir_library.players[2]
+            assert(a~=b and a.hidden~=b.hidden and a.mode==1 and b.mode==3,
+              "players sharing a force must retain distinct personal views and hidden tables")
+            assert(a.hidden[gear.name] and not a.hidden[foreign.name] and next(b.hidden)==nil,
+              "invalid replacement or another player's action changed personal hidden choices")
+            local ca,cb=research_content(root_a),research_content(root_b)
+            assert(#ca.mir_library_results.items==1
+              and ca.mir_library_results.items[1]==foreign.localised_name
+              and a.selected==foreign.name and ca.mir_library_actions.mir_library_hide.sprite=="utility/collapse",
+              "malformed hidden replacement changed the prior visible selection or action")
+            assert(#cb.mir_library_results.items==1
+              and cb.mir_library_results.items[1]==gear.localised_name
+              and b.selected==gear.name and cb.mir_library_actions.mir_library_hide.sprite=="utility/collapse")
+            assert(snapshot()==native_before,"Library personal views changed active native research")
+          end
+          assert_views()
+          -- These three literal invalid payloads come from the historical
+          -- personal-continuity fixture, independently of current validation.
+          for _, invalid in ipairs({{[2]=gear.name},{gear.name,gear.name},{"no-such-technology"}}) do
+            root_a=library.open(player,{hidden=invalid})
+            assert_views()
+          end
+
+          library.open(player,{hidden={}})
+          assert(next(storage.mir_library.players[1].hidden)==nil
+            and #research_content(root_a).mir_library_results.items==2,
+            "a valid empty replacement must actually clear the personal hidden list")
+          root_a=library.open(player,{hidden={gear.name},selected=foreign.name})
+          assert_views()
+          -- Host reconstruction is a control, not a real save/reload result.
+          library.on_load()
+          root_a=library.open(player); root_b=library.open(peer)
+          assert_views()
+        ''')
+
     def test_pure_prototype_constructor_preserves_published_shortcut_identity(self):
         self.lua.globals().prototype_source = (ROOT / "source/presentation/shortcut.lua").as_posix()
         self.lua.execute('''
