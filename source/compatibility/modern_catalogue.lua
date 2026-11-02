@@ -962,12 +962,23 @@ function M.select(active_mods, raw)
       end
     end
   end
+  -- The published 2.0/SIF correction kept these paid identities hidden. They
+  -- remain separate from public research/cap declarations, with exact recipe
+  -- vectors so broad product collection cannot add an unpaid scrap effect.
+  local sif_retained
+  if target.id == "f200" and type(active_mods) == "table"
+      and type(active_mods.base) == "string" and active_mods.base:match("^2%.0%.%d+$")
+      and type(active_mods["space-age"]) == "string" and active_mods["space-age"]:match("^2%.0%.%d+$")
+      and active_mods["space-is-fake"] == "1.0.60" then
+    sif_retained = require("compatibility.modern_catalogue.sif_retained").select(BASE.definitions, definitions)
+    for _, definition in ipairs(sif_retained) do exact_product_target_families[definition.family] = true end
+  end
   local bob_tech_materials = not bob_angel_f210 and require("compatibility.bob_tech_profile").applies(active_mods)
   return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods, raw),
     bob_tech_progression = not bob_angel_f210 and target.id == "f210" and type(active_mods) == "table" and active_mods.bobtech ~= nil
       and require("compatibility.modern_catalogue.bob_tech_progression").select(active_mods) or nil,
     native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
-    k2_imersite = k2so and k2so.imersite or false,
+    k2_imersite = k2so and k2so.imersite or false, sif_retained = sif_retained,
     k2_imersite_carriers = target.id == "f210" and k2_base,
     bob_angel = bob_angel, bob_angel_f200_combined = bob_angel_f200_combined,
     bob_core = bob_core, bob_plates_profile = bob_plates,

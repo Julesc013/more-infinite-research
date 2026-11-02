@@ -233,6 +233,13 @@ function M.technologies(selection, values)
   local out = {}
   for index = 1, #selection.definitions do out[#out + 1] = M.technology(selection.definitions[index], values) end
   for index = 1, #selection.continuations do out[#out + 1] = M.continuation(selection.continuations[index], values) end
+  for _, definition in ipairs(selection.sif_retained or {}) do
+    local retained = M.technology(definition, values)
+    -- Hidden only: keep native levels/effects and an existing queue entry,
+    -- without a new public research route or runtime cap owner.
+    retained.hidden = true
+    out[#out + 1] = retained
+  end
   if selection.k2_imersite then
     local staged = k2_imersite_technologies(values)
     for index = 1, #staged do out[#out + 1] = staged[index] end
@@ -354,6 +361,9 @@ function M.preflight_native_owner_patches(selection, raw, values)
     error("MIR native-owner preflight requires data.raw.technology", 2)
   end
   local patches = {}
+  if selection.sif_retained then
+    require("compatibility.modern_catalogue.sif_retained").preflight(selection.sif_retained, raw, selection.native_owners)
+  end
   for index = 1, #selection.native_owners do
     local definition = selection.native_owners[index]
     local stream = require_stream(values, definition.family)
