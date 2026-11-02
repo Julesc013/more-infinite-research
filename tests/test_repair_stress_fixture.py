@@ -128,10 +128,11 @@ function repair_stress_parse(path, mir, fixture, enabled, state)
   return {ok = ok, message = tostring(result), callbacks = callbacks, reads = reads, writes = writes}
 end
 
-function repair_stress_mode_guard(path, base, rails, quality, recycler, space, mir, fixture)
+function repair_stress_mode_guard(path, base, rails, quality, recycler, space, mir, fixture, selector)
   local callbacks = {}
   local active = {base = base, ['more-infinite-research'] = mir,
     ['mir-fixture-mir5-repair-stress'] = fixture}
+  if selector ~= nil then active['mir-fixture-mir5-repair-stress-active'] = selector end
   if rails ~= nil then active['elevated-rails'] = rails end
   if quality ~= nil then active.quality = quality end
   if recycler ~= nil then active.recycler = recycler end
@@ -179,7 +180,7 @@ function repair_stress_load(path)
   return {ok = ok, message = tostring(result), writes = writes}
 end
 
-function repair_stress_observer_opponent(path, opponent, active)
+function repair_stress_observer_opponent(path, opponent, active, mir)
   local callbacks, storage, reports, saves = {}, {}, {}, {}
   local next_unit, next_force = 0, 10
   local function make_force(name, index)
@@ -218,7 +219,7 @@ function repair_stress_observer_opponent(path, opponent, active)
   game.surfaces[1] = surface
   local active_mods = active and {
     base = '2.1.23', ['elevated-rails'] = '2.1.23', quality = '2.1.23', recycler = '2.1.23',
-    ['space-age'] = '2.1.23', ['more-infinite-research'] = '5.0.21000',
+    ['space-age'] = '2.1.23', ['more-infinite-research'] = mir or '5.0.21000',
     ['mir-fixture-mir5-repair-stress'] = '0.2.0',
     ['mir-fixture-mir5-repair-stress-active'] = '0.1.0'
   } or {
@@ -378,6 +379,46 @@ end
                 observed = guard(str(CONTROL), *args)
                 self.assertFalse(observed["ok"])
                 self.assertIn(phrase, observed["message"])
+
+    def test_501_active_exact_closure_and_refusals(self):
+        guard = self.lua.eval("repair_stress_mode_guard")
+        f210 = ("2.1.23",) * 5
+        admitted = guard(str(CONTROL), *f210, "5.0.21001", "0.2.0", "0.1.0")
+        self.assertIn("runtime setting is not enabled", admitted["message"])
+        for args in (
+            (*f210, "5.0.21001", "0.2.0", None),
+            (*f210, "5.0.21001", "0.2.0", "0.2.0"),
+            (*f210, "5.0.21001", "0.1.0", "0.1.0"),
+            (*f210, "5.0.21002", "0.2.0", "0.1.0"),
+            ("2.1.22", *f210[1:], "5.0.21001", "0.2.0", "0.1.0"),
+            ("2.1.23", "2.1.23", None, "2.1.23", "2.1.23", "5.0.21001", "0.2.0", "0.1.0"),
+        ):
+            with self.subTest(args=args):
+                result = guard(str(CONTROL), *args)
+                self.assertFalse(result["ok"])
+                self.assertNotIn("runtime setting is not enabled", result["message"])
+
+    def test_501_active_physical_start_and_exact_profile(self):
+        result = self.lua.eval("repair_stress_observer_opponent")(str(CONTROL), "active-start", True, "5.0.21001")
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual((1000, 128, 128, 744, 0, 1003),
+            (result["total"], result["player"], result["friendly"], result["overflow"], result["damage_before_load"], result["damage_after_start"]))
+        reports = [result["reports"][i] for i in range(1, len(result["reports"]) + 1)]
+        self.assertEqual(["prepared", "start"], [row["stage"] for row in reports])
+        self.assertTrue(reports[-1]["witnesses"]["pending_physical_work"])
+        old = json.loads((FIXTURE / "successor" / "info-f210.json").read_text(encoding="utf-8"))
+        new = json.loads((FIXTURE / "successor" / "info-f210-501.json").read_text(encoding="utf-8"))
+        old["description"] = new["description"]
+        old["dependencies"][-1] = "more-infinite-research = 5.0.21001"
+        self.assertEqual(old, new)
+        old = json.loads((PROFILE_ROOT / "runtime-current38c-repair-candidate-f210-2123.json").read_text(encoding="utf-8"))
+        new = json.loads((PROFILE_ROOT / "runtime-501-repair-candidate-f210-2123-r01.json").read_text(encoding="utf-8"))
+        old["scope"] = new["scope"]
+        old["mods"][6]["version"] = "5.0.21001"
+        del old["archive_sha256"]["more-infinite-research_5.0.21000.zip"]
+        old["archive_sha256"]["more-infinite-research_5.0.21001.zip"] = "C6C2470B438846484732E0E05D124DB31A1100C2F1AA0E770B327A4A6FBAFA5D"
+        self.assertEqual(old, new)
+        self.assertEqual("A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0", new["archive_sha256"]["mir-fixture-mir5-active-mods-observer_0.1.0.zip"])
 
     def test_native_shaped_settings_stage_precedes_runtime_setting_and_rejects_absence_or_drift(self):
         path = str(SETTINGS_UPDATE)

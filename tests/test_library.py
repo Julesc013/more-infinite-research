@@ -894,6 +894,59 @@ class LibraryTests(unittest.TestCase):
             "a retired production action must not sample or reopen the closed Library")
         ''')
 
+    def test_selected_live_productivity_limits_and_saturation_render_without_stale_values(self):
+        self.lua.execute('''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          boot()
+          gear.researched, gear.enabled = false, true
+          gear.level = 1
+          player.force.research_queue, player.force.current_research = {}, nil
+          gear.prototype.effects = {{type="change-recipe-productivity",recipe="gear",change=.1}}
+          local recipe = {valid=true,name="gear",localised_name="Gear",productivity_bonus=0,
+            prototype={maximum_productivity=3}}
+          player.force.recipes = {gear=recipe}
+          local function detail()
+            local root = library.open(player,{selected=gear.name})
+            return research_content(root)["mir_library_detail"]
+          end
+          local first = detail()
+          assert(first["mir_library_productivity_current_cap"]
+            and first["mir_library_productivity_current_cap"].caption[2] == "0"
+            and first["mir_library_productivity_current_cap"].caption[3] == "300",
+            "selected details must show the actual recipe bonus and maximum")
+          assert(first["mir_library_no_next_benefit"] == nil)
+          recipe.productivity_bonus = 3
+          local saturated = detail()
+          assert(saturated["mir_library_productivity_current_cap"].caption[2] == "300"
+            and saturated["mir_library_no_next_benefit"].caption[1] == "mir-browser.no-next-benefit")
+          gear.prototype.effects[2] = {type="change-recipe-productivity",recipe="other-gear",change=.2}
+          player.force.recipes["other-gear"] = {valid=true,name="other-gear",localised_name="Other gear",
+            productivity_bonus=1.5,prototype={maximum_productivity=5}}
+          recipe.productivity_bonus = .25
+          local mixed = detail()["mir_library_productivity_current_cap"].caption
+          assert(mixed[1] == "mir-browser.productivity-current-cap-range"
+            and mixed[2] == "25" and mixed[3] == "150" and mixed[4] == "300" and mixed[5] == "500")
+          recipe.productivity_bonus = 3
+          player.force.recipes["other-gear"].productivity_bonus = 5
+          gear.prototype.effects[3] = {type="unlock-recipe",recipe="another-benefit"}
+          assert(detail()["mir_library_no_next_benefit"] == nil,
+            "saturated recipe productivity must not deny other kinds of native benefit")
+          gear.prototype.effects = {{type="change-recipe-productivity",recipe="gear",change=.1}}
+          player.force.recipes.gear = nil
+          local missing = detail()
+          assert(missing["mir_library_live_detail_unavailable"].caption[1] == "mir-browser.live-detail-unavailable"
+            and missing["mir_library_productivity_current_cap"] == nil
+            and missing["mir_library_no_next_benefit"] == nil,
+            "missing live facts must replace stale numbers without claiming saturation")
+          player.force.recipes.gear = recipe
+          recipe.prototype.maximum_productivity = 1e308
+          assert(detail()["mir_library_live_detail_unavailable"] ~= nil,
+            "unrepresentable percentages must not display invented infinite limits")
+          assert(gear.level == 1 and gear.enabled and not gear.researched
+            and #player.force.research_queue == 0)
+        ''')
+
     def test_legacy_engine_prototype_collections_supply_library_recipe_and_item_names(self):
         self.lua.execute(r'''
           boot()
@@ -1212,7 +1265,10 @@ class LibraryTests(unittest.TestCase):
         required = {
             "availability", "availability-empty", "configuration-source", "count", "effective-values",
             "help", "help-summary", "productivity-increment", "queue-empty", "queue-tab",
-            "not-added",
+            "not-added", "productivity-current-cap", "productivity-current-cap-range",
+            "no-next-benefit", "live-detail-unavailable",
+            "report-options", "report-settings", "report-omissions", "report-preview", "report-select", "report-local",
+            "debug-refresh",
             "search-settings", "hide", "show", "show-hidden", "inspect-settings", "hide-tooltip",
             "show-tooltip", "layout-smaller",
             "layout-larger", "layout-reset",
@@ -2803,6 +2859,165 @@ class LibraryTests(unittest.TestCase):
         self.assertIn("on_library_tab_changed", bootstrap)
         self.assertIn("on_gui_selected_tab_changed", bootstrap)
 
+
+    def test_help_report_choices_are_owned_personal_retained_and_do_not_export_on_refresh(self):
+        self.lua.execute(r'''
+          local encodes,writes=0,{}
+          script={active_mods={base="2.1.23",["more-infinite-research"]="5.0.21001"}}
+          helpers={game_version="2.1.23",encode_string=function(text) encodes=encodes+1; return text end,
+            decode_string=function(text) return text end,json_to_table=function() return nil end,
+            write_file=function(path,data,append,index) writes[#writes+1]={path=path,data=data,index=index} end}
+          boot()
+          player.print=function() end
+          local root=library.open(player,{tab="help"})
+          local help=root.mir_library_tabs.mir_library_help_content
+          local settings_box,omissions_box=help.mir_library_report_settings,help.mir_library_report_omissions
+          assert(settings_box and settings_box.type=="checkbox" and settings_box.state==false)
+          assert(omissions_box and omissions_box.type=="checkbox" and omissions_box.state==false)
+          local preview=help.mir_library_report_preview
+          assert(preview and preview.read_only and preview.word_wrap and #writes==0 and encodes==0)
+          settings_box.state=true
+          library.on_gui_checked_state_changed({player_index=1,element=settings_box})
+          assert(storage.mir_library.players[1].report_settings==true and encodes==1 and #writes==0,
+            "report setting="..tostring(storage.mir_library.players[1].report_settings).." encodes="..encodes
+              .." writes="..#writes.." preview="..preview.text:sub(1,180))
+          omissions_box.state=true
+          library.on_gui_checked_state_changed({player_index=1,element=omissions_box})
+          assert(storage.mir_library.players[1].report_omissions==true and #writes==0)
+          local after_change=encodes
+          local text=preview.text
+          library.open(player,{tab="help"})
+          assert(help.mir_library_report_preview==preview and preview.text==text and encodes==after_change)
+          player.force.research_progress=.75
+          library.on_gui_click({player_index=1,element=help.mir_library_report_refresh})
+          assert(preview.text:find("Current research progress: 0.75",1,true))
+          assert(#writes==0 and encodes==after_change+1)
+          after_change=encodes
+          local foreign_root=gui_container(nil).add({name="mir_research_browser",tags={}})
+          local foreign_help=foreign_root.add({name="mir_library_tabs"}).add({name="mir_library_help_content"})
+          local foreign_box=foreign_help.add({name="mir_library_report_settings",type="checkbox",state=false})
+          library.on_gui_checked_state_changed({player_index=1,element=foreign_box})
+          library.on_gui_checked_state_changed({player_index=2,element=settings_box})
+          assert(storage.mir_library.players[1].report_settings==true and #writes==0 and encodes==after_change)
+          preview.focus=function() preview.focused=true end
+          preview.select_all=function() preview.selected_all=true end
+          library.on_gui_click({player_index=1,element=help.mir_library_report_select})
+          assert(preview.focused and preview.selected_all and #writes==0)
+          library.on_gui_click({player_index=1,element=help.mir_library_export_diagnostics})
+          assert(#writes==2 and writes[2].data==preview.text and writes[2].index==1)
+          library.close(player)
+          local closed_encodes=encodes
+          library.on_gui_checked_state_changed({player_index=1,element=settings_box})
+          assert(encodes==closed_encodes and #writes==2)
+          package.loaded["runtime.library"]=nil
+          library=require("runtime.library")
+          library.on_load()
+          root=library.open(player,{tab="help"})
+          help=root.mir_library_tabs.mir_library_help_content
+          assert(help.mir_library_report_settings.state and help.mir_library_report_omissions.state)
+        ''')
+
+    def test_report_choices_and_previews_stay_separate_for_players_sharing_a_force(self):
+        self.lua.execute(r'''
+          helpers={write_file=function() error("preview wrote a file") end,
+            encode_string=function() error("unchecked preview encoded settings") end}
+          boot()
+          local peer={valid=true,index=2,name="Bob",locale="de",connected=true,force=player.force,
+            gui={screen=gui_container(nil)},display_resolution=player.display_resolution,display_scale=1}
+          game.get_player=function(index) return index==1 and player or index==2 and peer or nil end
+          local first=library.open(player,{tab="help"}).mir_library_tabs.mir_library_help_content
+          local second=library.open(peer,{tab="help"}).mir_library_tabs.mir_library_help_content
+          first.mir_library_report_omissions.state=true
+          library.on_gui_checked_state_changed({player_index=1,element=first.mir_library_report_omissions})
+          assert(storage.mir_library.players[1].report_omissions==true)
+          assert(storage.mir_library.players[2].report_omissions==false)
+          assert(first.mir_library_report_preview.text:find("authored availability",1,true))
+          assert(not second.mir_library_report_preview.text:find("authored availability",1,true))
+          library.on_gui_checked_state_changed({player_index=2,element=first.mir_library_report_omissions})
+          assert(storage.mir_library.players[2].report_omissions==false)
+          assert(second.mir_library_report_omissions.state==false)
+          library.on_player_removed({player_index=2})
+          assert(storage.mir_library.players[2]==nil)
+        ''')
+
+    def test_existing_beta_help_pane_gains_report_controls_and_configuration_syncs_its_choices(self):
+        self.lua.execute(r'''
+          local encodes,writes=0,0
+          script={active_mods={base="2.1.23",["more-infinite-research"]="5.0.21001"}}
+          helpers={game_version="2.1.23",encode_string=function(text) encodes=encodes+1; return text end,
+            decode_string=function(text) return text end,json_to_table=function() return nil end,
+            write_file=function() writes=writes+1 end}
+          boot()
+          local root=library.open(player,{tab="help"})
+          local help=root.mir_library_tabs.mir_library_help_content
+          -- Exact published501 Help shape: two labels, export button and
+          -- privacy guidance. Its root/tab ownership already matches MIR5.
+          help.clear()
+          help.add({type="label",name="mir_library_help_summary"})
+          help.add({type="label",name="mir_library_help_queue"})
+          help.add({type="button",name="mir_library_export_diagnostics"})
+          help.add({type="label",name="mir_library_export_privacy"})
+          library.on_configuration_changed({})
+          library.on_native_refresh_tick()
+          assert(help.mir_library_report_settings and help.mir_library_report_omissions,
+            "existing beta Help did not gain the new controls")
+          assert(help.mir_library_report_preview and encodes==0 and writes==0)
+          storage.mir={research_browser={players={[1]={report_settings=true,report_omissions=true}}}}
+          storage.mir_library.players[1].report_settings=nil
+          storage.mir_library.players[1].report_omissions=nil
+          library.on_configuration_changed({})
+          library.on_native_refresh_tick()
+          assert(help.mir_library_report_settings.state and help.mir_library_report_omissions.state)
+          assert(encodes==1 and writes==0)
+          local preview=help.mir_library_report_preview
+          library.on_native_state_changed({force=player.force})
+          library.on_native_refresh_tick()
+          assert(encodes==1 and writes==0 and help.mir_library_report_preview==preview)
+        ''')
+
+    def test_removed_player_report_choices_are_not_resurrected_from_retained_legacy_history(self):
+        self.lua.execute(r'''
+          boot()
+          storage.mir={research_browser={players={[1]={search="old-account-private-query",
+            report_settings=true,report_omissions=true}}}}
+          library.on_configuration_changed({})
+          local preserved=storage.mir_library.legacy_browser.players[1]
+          assert(preserved.report_settings==true)
+          library.on_player_removed({player_index=1})
+          player.name="Different account"
+          library.on_configuration_changed({})
+          assert(storage.mir_library.players[1]==nil,"removed legacy player was imported again")
+          library.open(player)
+          assert(storage.mir_library.players[1].report_settings==false)
+          assert(storage.mir_library.players[1].report_omissions==false)
+          assert(storage.mir_library.players[1].query=="")
+          assert(storage.mir_library.legacy_browser.players[1]==preserved)
+          assert(preserved.search=="old-account-private-query" and preserved.report_settings==true)
+        ''')
+
+    def test_configuration_restores_legacy_report_choices_without_overwriting_current_choices(self):
+        self.lua.execute(r'''
+          boot()
+          storage.mir={research_browser={players={[1]={report_settings=false,report_omissions=true}}}}
+          library.on_configuration_changed({})
+          local view=storage.mir_library.players[1]
+          assert(view.report_settings==false and view.report_omissions==true)
+          view.report_settings=true
+          view.report_omissions=false
+          library.on_configuration_changed({})
+          assert(storage.mir_library.players[1].report_settings==true)
+          assert(storage.mir_library.players[1].report_omissions==false)
+          storage.mir=nil
+          view=storage.mir_library.players[1]
+          view.report_settings=nil
+          view.report_omissions=nil
+          library.on_configuration_changed({})
+          assert(storage.mir_library.players[1].report_settings==false)
+          assert(storage.mir_library.players[1].report_omissions==true)
+          local before=storage.mir_library.players[1]
+          library.on_load()
+          assert(storage.mir_library.players[1]==before and before.report_omissions==true)
+        ''')
 
     def test_support_exports_are_owned_local_and_inactive_on_research_views(self):
         def decode(text):

@@ -70,6 +70,39 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             self.assertEqual(digest, profile["archive_sha256"][root + ".zip"])
             self.assertEqual(digest, prepared["frozen_player_and_observer_archives"][root + ".zip"])
 
+    def test_r18_preparation_changes_only_the_f200_observer_input_epoch(self):
+        previous = json.loads((ROOT / "spec/evidence/library-native-input-imported110-prepared-blackglass-r05.json").read_text(encoding="utf-8"))
+        current = json.loads((ROOT / "spec/evidence/library-native-input-imported110-prepared-blackglass-r06.json").read_text(encoding="utf-8"))
+        self.assertEqual(current["profiles"][1], previous["profiles"][1])
+        self.assertEqual(current["player_source_commit"], previous["player_source_commit"])
+        self.assertEqual(current["player_tree"], previous["player_tree"])
+        self.assertEqual(current["changed_player_members"], [])
+        before, prepared = previous["profiles"][0], current["profiles"][0]
+        for field in ("protected_input_save", "owned_imported_fixture_members"):
+            self.assertEqual(prepared[field], before[field])
+        profile_bytes = subprocess.check_output(["git", "show", prepared["profile"]["source_revision"] + ":" + prepared["profile"]["source"]], cwd=ROOT)
+        self.assertEqual(len(profile_bytes), prepared["profile"]["bytes"])
+        self.assertEqual(hashlib.sha256(profile_bytes).hexdigest().upper(), prepared["profile"]["sha256"])
+        profile = json.loads(profile_bytes)
+        output = io.BytesIO()
+        with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_STORED) as archive:
+            for member in prepared["owned_input_observer_members"]:
+                data = subprocess.check_output(["git", "show", member["source_revision"] + ":" + member["source"]], cwd=ROOT)
+                self.assertEqual(len(data), member["bytes"])
+                self.assertEqual(hashlib.sha256(data).hexdigest().upper(), member["sha256"])
+                entry = zipfile.ZipInfo("mir-fixture-mir5-library-native-input_0.3.3/" + member["destination"], (1980, 1, 1, 0, 0, 0))
+                entry.create_system, entry.external_attr = 3, 0o100644 << 16
+                archive.writestr(entry, data)
+        archive_name = "mir-fixture-mir5-library-native-input_0.3.3.zip"
+        digest = hashlib.sha256(output.getvalue()).hexdigest().upper()
+        self.assertEqual(digest, profile["archive_sha256"][archive_name])
+        self.assertEqual(digest, prepared["frozen_player_and_observer_archives"][archive_name])
+        self.assertNotEqual(digest, before["frozen_player_and_observer_archives"][archive_name])
+        for name, checksum in before["frozen_player_and_observer_archives"].items():
+            if name != archive_name:
+                self.assertEqual(prepared["frozen_player_and_observer_archives"][name], checksum)
+        self.assertFalse(current["independent_removed_slot_oracle"]["actual_native_execution"])
+
     def test_input_metadata_keeps_required_versions_without_mir_runtime_order_edges(self):
         historical = "mir-fixture-mir5-migration-origin-f200-110-source"
         fixture = "mir-fixture-mir5-library-native-input"
@@ -780,7 +813,15 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertFalse(rejected["ok"])
                 self.assertIn("imported native target differs", rejected["message"])
 
-    def test_503_observer_allows_only_f210_removed_player_index_reuse(self):
+    def test_503_f200_observer_accepts_removed_player_index_reuse(self):
+        # Factorio 2.0 runtime-api.json LuaPlayer.index permits reuse after removal.
+        accepted = self.run_case("f200", "removed-index-reused", "5.0.20001", "0.3.3")
+        self.assertTrue(accepted["ok"], accepted["message"])
+        self.assertFalse(accepted["native_input_evidence"])
+        self.assertEqual(accepted["final"]["actual_joins"], 5)
+        self.assertEqual(accepted["final"]["removed_index"], accepted["final"]["de_index"])
+
+    def test_503_f210_observer_accepts_removed_player_index_reuse(self):
         accepted = self.run_case(
             "f210", "removed-index-reused", "5.0.21001", "0.3.3"
         )
@@ -791,17 +832,26 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             accepted["final"]["removed_index"], accepted["final"]["de_index"]
         )
 
-        # The old F210 observer and the F200 observer must keep rejecting the
-        # same collision. Reuse is enabled only by the exact new F210 identity.
+        # Older observer identities still reject the same collision.
         for target, package_version, observer_version in (
             ("f210", "5.0.21001", "0.3.2"),
-            ("f200", "5.0.20001", "0.3.3"),
+            ("f200", "5.0.20000", "0.3.0"),
         ):
             with self.subTest(target=target, observer_version=observer_version):
                 rejected = self.run_case(
                     target, "removed-index-reused", package_version, observer_version
                 )
                 self.assertFalse(rejected["ok"])
+                self.assertFalse(rejected["native_input_evidence"])
+
+    def test_503_f200_reuse_keeps_removal_and_identity_guards(self):
+        for opponent in ("removal-no-event", "removal-player-retained", "removal-root-retained",
+                         "removal-query-retained", "locale-never-ready", "unexpected-client-name",
+                         "replacement-index-reuses-en", "changed-restart-index", "duplicate-restart-role",
+                         "private-listed", "extra-mod", "missing-click-event", "native-effect-change"):
+            with self.subTest(opponent=opponent):
+                rejected = self.run_case("f200", opponent, "5.0.20001", "0.3.3")
+                self.assertFalse(rejected["ok"], rejected["message"])
                 self.assertFalse(rejected["native_input_evidence"])
 
     def test_503_observer_still_requires_exact_501_candidate_identity(self):

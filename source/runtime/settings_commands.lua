@@ -45,7 +45,9 @@ function M.write_export_file(filename, data, player_index)
   return true
 end
 
-function M.export(command)
+-- Build the exact ordinary export without messages or file writes. The Help
+-- preview reuses this capture only when inline settings are requested.
+function M.capture_export(command)
   command = command or {}
   local compact, filename = export_options(command.parameter)
   local effective = catalogue.effective_values(settings.startup, helpers)
@@ -63,7 +65,18 @@ function M.export(command)
     }
   })
   local encoded, err = codec.encode(profile, helpers)
-  if not encoded then reply(command, "MIR settings export failed: " .. tostring(err)); return end
+  if not encoded then return nil, err end
+  return encoded, filename, profile
+end
+
+function M.export(command)
+  command = command or {}
+  local compact = export_options(command.parameter)
+  local encoded, filename, profile = M.capture_export(command)
+  if not encoded then
+    reply(command, "MIR settings export failed: " .. tostring(filename))
+    return nil, filename
+  end
   local written, write_error = M.write_export_file(filename, encoded .. "\n", command.player_index)
   if not written then
     reply(command, "MIR settings export failed: " .. tostring(write_error) .. ".")

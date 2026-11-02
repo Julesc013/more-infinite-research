@@ -166,6 +166,7 @@ class BootstrapTests(unittest.TestCase):
               module.on_gui_text_changed = function(event) library_calls.text = event end
               module.on_gui_selected_tab_changed = function(event) library_calls.tab = event end
               module.on_gui_selection_state_changed = function(event) library_calls.selection = event end
+              module.on_gui_checked_state_changed = function(event) library_calls.checked = event end
               module.on_gui_click = function(event) library_calls.click = event end
               module.on_gui_location_changed = function(event) library_calls.location = event end
               module.on_gui_closed = function(event) library_calls.closed = event end
@@ -222,7 +223,8 @@ class BootstrapTests(unittest.TestCase):
               on_entity_damaged = 14, on_string_translated = 15,
               on_player_locale_changed = 16, on_player_changed_force = 17,
               on_player_joined_game = 18, on_research_reversed = 19,
-              on_technology_effects_reset = 20, on_gui_selected_tab_changed = 21, on_tick = 23
+              on_technology_effects_reset = 20, on_gui_selected_tab_changed = 21, on_tick = 23,
+              on_gui_checked_state_changed = 24
             }}
             known_technology = {valid = true, name = "recipe-prod-research_gears-1"}
             player = {valid = true, index = 1, frame = {valid = true},
@@ -370,6 +372,15 @@ class BootstrapTests(unittest.TestCase):
           player.force = original_force
           commands.registered["mir-research"].callback({player_index = 1})
           assert(library_calls.open.player == player and library_calls.open.options == nil)
+        ''')
+
+    def test_report_checkbox_event_has_one_bootstrap_registration_owner(self):
+        self.lua.execute('''
+          install_modules(false); install_runtime(); load_control()
+          local event={player_index=1,element={valid=true,name="mir_library_report_settings",state=true}}
+          assert(type(handlers.events[24])=="function")
+          handlers.events[24](event)
+          assert(library_calls.checked==event)
         ''')
 
     def test_unlimited_control_omits_only_cap_event_callbacks(self):
