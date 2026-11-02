@@ -702,7 +702,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 gui_type=opponent=="wrong-close-type" and 1 or 99,element=event_element}) end
               if opponent=="duplicate-close-event" then callbacks.events[5]({player_index=p.index,gui_type=99,element=root}) end
             end
-            local witness_before,witness_after,witness_wrong,readonly_witness
+            local witness_before,witness_after,witness_wrong,witness_parent_hidden,witness_parent_disabled,witness_parent_invalid,foreign_witness,readonly_witness
             local readonly_report,readonly_load,cold_calls_before,cold_calls_after,initial_report,missing_query_report,missing_query_readonly,opened_getter_report,opened_getter_readonly
             local ok,message=pcall(function()
               parse()
@@ -735,6 +735,10 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               click(en,query(en));witness_after=api().report()
               local saved=query(en);en.gui.screen[root_name].mir_library_filters.mir_library_query=element("textfield","replacement")
               witness_wrong=api().report();en.gui.screen[root_name].mir_library_filters.mir_library_query=saved
+              local filter=en.gui.screen[root_name].mir_library_filters
+              filter.visible=false;witness_parent_hidden=api().report();filter.visible=true
+              filter.enabled=false;witness_parent_disabled=api().report();filter.enabled=true
+              filter.valid=false;witness_parent_invalid=api().report();filter.valid=true
               type_text(en,"ge");step("prefix")
               if opponent~="short-refresh" then game.tick=game.tick+60 end
               step("refresh");type_text(en,"ars");step("suffix")
@@ -750,7 +754,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                end
               step("drag");key_close(en);step("escape");key_close(en);step("inventory")
               local other=en.gui.screen.mir5_input_other.mir5_input_other_query
-              click(en,other);type_text(en,"focus");step("foreign-prefix");game.tick=game.tick+60
+              click(en,other);foreign_witness=api().report();type_text(en,"focus");step("foreign-prefix");game.tick=game.tick+60
               step("foreign-refresh");type_text(en," kept");step("foreign-suffix")
               if opponent~="remove-connected" then de.connected=false;connected() end
               step("remove-de");de=join(opponent=="removed-index-reused" and 2 or (opponent=="replacement-index-reuses-en" and 1 or 3),"de");step("replacement");game.tick=game.tick+60;step("save")
@@ -769,6 +773,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             end)
             return {ok=ok,message=tostring(message),trace=trace,saves=game.saves,logs=logs,readonly_report=readonly_report,
               witness_before=witness_before,witness_after=witness_after,witness_wrong=witness_wrong,readonly_witness=readonly_witness,
+              witness_parent_hidden=witness_parent_hidden,witness_parent_disabled=witness_parent_disabled,witness_parent_invalid=witness_parent_invalid,foreign_witness=foreign_witness,
               initial_report=initial_report,missing_query_report=missing_query_report,missing_query_readonly=missing_query_readonly,
               opened_getter_report=opened_getter_report,opened_getter_readonly=opened_getter_readonly,
               readonly_load=readonly_load,resets=resets,calls=calls,cold_calls_before=cold_calls_before,cold_calls_after=cold_calls_after,
@@ -929,10 +934,14 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertTrue(after["en_library_target"]["root_same"])
                 self.assertTrue(after["en_library_target"]["query_same"])
                 self.assertFalse(wrong["en_library_target"]["query_same"])
-                for field in ("root_valid", "query_valid", "root_visible", "query_visible", "root_enabled", "query_enabled", "opened_is_root"):
+                for field in ("root_valid", "parent_valid", "query_valid", "root_visible", "parent_visible", "query_visible", "root_enabled", "parent_enabled", "query_enabled", "opened_is_root"):
                     self.assertTrue(after["en_library_target"][field], field)
                 self.assertEqual(after["en_library_target"]["query_type"], "textfield")
                 self.assertEqual(after["en_library_target"]["root_player_index"], 0)
+                for case, field in (("witness_parent_hidden", "parent_visible"), ("witness_parent_disabled", "parent_enabled"), ("witness_parent_invalid", "parent_valid")):
+                    self.assertFalse(result[case]["en_library_target"][field])
+                foreign = result["foreign_witness"]["en_foreign_target"]
+                self.assertTrue(foreign["parent_valid"] and foreign["parent_visible"] and foreign["parent_enabled"])
 
     def test_readonly_reports_expose_actual_library_and_foreign_input_state(self):
         for target in ("f200", "f210"):

@@ -206,12 +206,14 @@ end
 local function target_witness(p, root_ref, query_ref, root_name, query_name, filters_name)
   if not valid(p) then return false end
   local root=p.gui.screen[root_name]
-  local parent=valid(root) and (filters_name and root[filters_name] or root) or nil
+  local parent=nil
+  if valid(root) then if filters_name then parent=root[filters_name] else parent=root end end
   local query=valid(parent) and parent[query_name] or nil
   local _,_,opened,opened_available=observed_opened(p,root)
-  local rv,qv=valid(root)==true,valid(query)==true
+  local rv,pv,qv=valid(root)==true,valid(parent)==true,valid(query)==true
   return {root_same=rv and root==root_ref,query_same=qv and query==query_ref,
-    root_valid=rv,query_valid=qv,root_type=rv and root.type or false,
+    root_valid=rv,parent_valid=pv,query_valid=qv,parent_visible=pv and parent.visible==true or false,
+    parent_enabled=pv and parent.enabled==true or false,root_type=rv and root.type or false,
     query_type=qv and query.type or false,root_visible=rv and root.visible==true or false,
     query_visible=qv and query.visible==true or false,root_enabled=rv and root.enabled==true or false,
     query_enabled=qv and query.enabled==true or false,opened_is_root=rv and opened_available and opened==root or false,
