@@ -4,7 +4,7 @@
   "status": "historical-characterization-not-mir5-native-qualification",
   "limits": {
     "captured_fields_only": true,
-    "definition_source": "seven hash-verified published 4.7-era native full-state snapshots also cited by historical-direct-native-oracle.json",
+    "definition_source": "Seven hash-pinned original native full-state snapshots also cited by historical-direct-native-oracle.json; declared versions and available runtime MIR versions are recorded per capture, without relabelling them as a later package.",
     "f013_f014": "The two observed numeric continuations preserve their captured numeric units and do not prove formula, level, upgrade, or maximum fields.",
     "later_target_projection": "F015+ observations support the named emitted subset only; absent standard chains are not inferred.",
     "retained_disabled_identity": "MIR5 intentionally retains an enabled=false identity when a historical enabled=false or below-first finite-cap setting would have omitted it; this is an upgrade-preservation correction requiring future native upgrade qualification."
@@ -206,11 +206,19 @@
     {
       "target": "f013",
       "source": {
-        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "kind": "hash-verified-original-native-full-state-snapshot",
         "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f013-direct422-r02\\work\\u-1738c4d8c6d64c1a\\userdata\\script-output\\mir-upgrade-full-state-upgrade.json",
         "sha256": "82EBAABA878F17E0C9489265A8D0278C3990E2C01A9E609A7BE8885E3FBBE2D5",
         "force": "player",
-        "selection": "forces.player.technologies entries with one of six named base-continuation identities"
+        "selection": "forces.player.technologies entries with one of six named base-continuation identities",
+        "capture_metadata": {
+          "declared_from_version": "4.2.01302",
+          "declared_to_version": "4.4.01302",
+          "declared_engine_line": "0.13",
+          "stage": "upgrade",
+          "runtime_mod_versions_available": false,
+          "runtime_mir_version_in_original_payload": null
+        }
       },
       "technologies": [
         {
@@ -306,11 +314,19 @@
     {
       "target": "f014",
       "source": {
-        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "kind": "hash-verified-original-native-full-state-snapshot",
         "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f014-direct422-r02\\work\\u-236bb1b1af224cbf\\userdata\\script-output\\mir-upgrade-full-state-upgrade.json",
         "sha256": "C346F4A15E976D22393C10A1951AFE2D3AE33C142D36B0C6640B1ABA8403A847",
         "force": "player",
-        "selection": "forces.player.technologies entries with one of six named base-continuation identities"
+        "selection": "forces.player.technologies entries with one of six named base-continuation identities",
+        "capture_metadata": {
+          "declared_from_version": "4.2.01402",
+          "declared_to_version": "4.4.01402",
+          "declared_engine_line": "0.14",
+          "stage": "upgrade",
+          "runtime_mod_versions_available": false,
+          "runtime_mir_version_in_original_payload": null
+        }
       },
       "technologies": [
         {
@@ -406,11 +422,19 @@
     {
       "target": "f015",
       "source": {
-        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "kind": "hash-verified-original-native-full-state-snapshot",
         "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f015-direct422-r01\\4.4.01502-upgrade-base-default-from-4.2.01502-full-state-upgrade.json",
         "sha256": "5ACB802A1CDD7F8086C846178E9DDF9D359D417F0107006AB114624E9EB1BA42",
         "force": "player",
-        "selection": "forces.player.technologies entries with one of six named base-continuation identities"
+        "selection": "forces.player.technologies entries with one of six named base-continuation identities",
+        "capture_metadata": {
+          "declared_from_version": "4.2.01502",
+          "declared_to_version": "4.4.01502",
+          "declared_engine_line": "0.15",
+          "stage": "upgrade",
+          "runtime_mod_versions_available": false,
+          "runtime_mir_version_in_original_payload": null
+        }
       },
       "technologies": [
         {
@@ -640,11 +664,19 @@
     {
       "target": "f016",
       "source": {
-        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "kind": "hash-verified-original-native-full-state-snapshot",
         "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f016-direct422-r02\\4.4.01602-upgrade-base-default-from-4.2.01602-full-state-upgrade.json",
         "sha256": "2036786CB20F9B9FE728CB42468BA4C61E58A9840651A1099849B1A9B3F63E87",
         "force": "player",
-        "selection": "forces.player.technologies entries with one of six named base-continuation identities"
+        "selection": "forces.player.technologies entries with one of six named base-continuation identities",
+        "capture_metadata": {
+          "declared_from_version": "4.2.01602",
+          "declared_to_version": "4.4.01602",
+          "declared_engine_line": "0.16",
+          "stage": "upgrade",
+          "runtime_mod_versions_available": false,
+          "runtime_mir_version_in_original_payload": null
+        }
       },
       "technologies": [
         {
@@ -874,11 +906,19 @@
     {
       "target": "f017",
       "source": {
-        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "kind": "hash-verified-original-native-full-state-snapshot",
         "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f017-published441-r02\\4.4.01702-upgrade-base-default-from-4.4.01701-full-state-upgrade.json",
         "sha256": "E432FBE57BCC1A226D15CD1D337173CA1D8E72107D4DD58452016B7D33363830",
         "force": "player",
-        "selection": "forces.player.technologies entries with one of six named base-continuation identities"
+        "selection": "forces.player.technologies entries with one of six named base-continuation identities",
+        "capture_metadata": {
+          "declared_from_version": "4.4.01701",
+          "declared_to_version": "4.4.01702",
+          "declared_engine_line": "0.17",
+          "stage": "upgrade",
+          "runtime_mod_versions_available": false,
+          "runtime_mir_version_in_original_payload": null
+        }
       },
       "technologies": [
         {
@@ -1156,11 +1196,19 @@
     {
       "target": "f100",
       "source": {
-        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "kind": "hash-verified-original-native-full-state-snapshot",
         "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\f100-upgrade-422\\4.4.10002-upgrade-base-default-from-4.2.10002-full-state-upgrade.json",
         "sha256": "7CE16492153276E76D94419169E5DFA4D14A33E6DF7294ACB6E8B1221B7F5CA6",
         "force": "player",
-        "selection": "forces.player.technologies entries with one of six named base-continuation identities"
+        "selection": "forces.player.technologies entries with one of six named base-continuation identities",
+        "capture_metadata": {
+          "declared_from_version": "4.2.10002",
+          "declared_to_version": "4.4.10002",
+          "declared_engine_line": "1.0",
+          "stage": "upgrade",
+          "runtime_mod_versions_available": true,
+          "runtime_mir_version_in_original_payload": "4.4.10002"
+        }
       },
       "technologies": [
         {
@@ -1438,11 +1486,19 @@
     {
       "target": "f110",
       "source": {
-        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "kind": "hash-verified-original-native-full-state-snapshot",
         "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\f110-upgrade-422\\4.4.11002-upgrade-base-default-from-4.2.11002-full-state-upgrade.json",
         "sha256": "E61B752FB08FC385413C5614A49D813D4423FE0528F5D11272C84BAF80B5210A",
         "force": "player",
-        "selection": "forces.player.technologies entries with one of six named base-continuation identities"
+        "selection": "forces.player.technologies entries with one of six named base-continuation identities",
+        "capture_metadata": {
+          "declared_from_version": "4.2.11002",
+          "declared_to_version": "4.4.11002",
+          "declared_engine_line": "1.1",
+          "stage": "upgrade",
+          "runtime_mod_versions_available": true,
+          "runtime_mir_version_in_original_payload": "4.4.11002"
+        }
       },
       "technologies": [
         {

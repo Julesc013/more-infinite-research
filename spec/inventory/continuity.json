@@ -4180,6 +4180,21 @@
             }
           ],
           "limits": "CONT-11/13 remain partial; inventory_complete remains false. No source save, native process, fixture/controller, original result, request decision or support contract is changed. Full catalogue/settings/client/performance and final release verdicts are independent."
+        },
+        {
+          "id": "historical-frontier-current-oracle-coverage-2026-11-02",
+          "source": [
+            "source/research/historical_direct.lua",
+            "source/research/historical_continuations.lua",
+            "tests/fixtures/historical-direct-native-oracle.json",
+            "tests/fixtures/historical-continuation-native-oracle.json"
+          ],
+          "evidence": "spec/evidence/historical-frontier-current-oracle-applicability-aero-r01.json",
+          "scope": "All27 inherited F015/F016 frontier after-vectors (13plus14 target/identity pairs) match the existing independent native-characterization oracles and their current construction controls. The14 F016 restoration identities overlap that set; do not add them as independent obligations or native routes.",
+          "source_attribution": "Seven original raw source hashes are freshly read back. They declare4.4.*02 destinations; onlyF100/F110 contain runtime MIR version readback. Correct the generic4.7-era attribution while preserving every original path/hash/selection and all expected technology values. Declared older versions are not invented actual runtime readback.",
+          "verification": "Existing direct/continuation13 controls plus their3 consuming fixture groups pass with pinnedLua5.2/Lupa2.6. The two unmodified independent oracle controls pass;14 in-memory substitutions of the actual recorded F016 damaged prerequisite/science fields each fail their named independent assertion. No new executable test/player source changes.",
+          "disposition": "Consolidate valid current science/prerequisite expectations through existing oracles; retire the old transition-specific allowance module as active transport. There is no source/tests/tools consumer of that retired module in the current tree.",
+          "remaining": "Original4.2.0 before-capture provenance stays explicitly unverified and is not substituted or required as an invented new campaign. Preserve existing nine/seven/four selected route identities; review final-candidate consumed inputs and execute genuinely affected supported-profile/state checks. Host projection is not native qualification."
         }
       ],
       "test_subjects": [
@@ -7405,6 +7420,12 @@
           "evidence": "spec/inventory/migration-origins.json",
           "related_record": "CONT-11 selected-migration-queue-and-reduced-input-review-2026-11-02",
           "scope": "Use CONT-11 selected-migration-queue-and-reduced-input-review-2026-11-02 for the nine/seven/four named-route reconciliation, preserved five transition dispositions and bounded seven-edition package/science input review. The older adjacent-axis list below remains historical inventory, not an additional every-adjacent stable campaign or a substitute for the four published-origin journeys. Final affected package/native qualification remains open."
+        },
+        {
+          "id": "historical-frontier-current-oracle-attribution-2026-11-02",
+          "evidence": "spec/evidence/historical-frontier-current-oracle-applicability-aero-r01.json",
+          "related_record": "CONT-11 historical-frontier-current-oracle-coverage-2026-11-02",
+          "scope": "Use the exact seven original snapshot hashes and per-capture declared/available runtime version facts rather than a broad4.7-era label. Current27 F015/F016 after-vector expectations are covered by existing independent host projections; these snapshots do not become later-package or MIR5 native results. Final exact-package/profile/state obligations and experimental F018 limits remain unchanged."
         }
       ],
       "test_subjects": [
