@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "kind": "MIRImportedF200WindowGuardAdverseChainV1",
+  "status": "adverse-after-one-native-spawn-before-capture",
+  "source": {
+    "public": "ec00a0a575c39b573fb855cb34a91968defb2612",
+    "private": "b26614f96c368fc764860c4e6f61a519a146998a",
+    "private_checked_merge": "79ae2b96487859db6aae08ccd35b1d32c30c90fe",
+    "engine_version": "2.0.77",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "player_sha256": "750ECA842134AFDDCC7C45B2B656510CA60F09940A2E82B21896AAE7E3D8C1BE"
+  },
+  "observed": {
+    "actor_pid": 22300,
+    "native": {
+      "process_id": 5168,
+      "process_start_utc": "2026-11-02T01:21:59.7607388Z",
+      "executable": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "actual_native_processes": 1,
+    "terminal_native_counter": 0,
+    "counter_limit": "The terminal counter is assigned after a successful live guard. Original zero is retained; spawned.json proves one actual engine child.",
+    "error": "[mir-library-launch-path-argument]",
+    "guarded_actor_phases_completed": 0,
+    "capture_files": 0,
+    "desktop_inputs": 0,
+    "game_starts": 0,
+    "save_loads": 0,
+    "network_joins": 0,
+    "restored": true,
+    "factorio_zero": true,
+    "cleanup_errors": []
+  },
+  "root_custody": {
+    "primary": "build/qualification/f200-window-1024-guard-adverse-r01",
+    "files": 26,
+    "bytes": 408257,
+    "actual_locations": 2,
+    "readback_sha256": "DB85EEA65679F5D97D49B865C91173AEEB66F94398E0D8E86194947CC0114062"
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/library-imported-f200-window-guard-receipts-r01.json.gz",
+    "bytes": 17244,
+    "sha256": "BBA0F9A4A48B2DCB3A03A4B250374B5CE7A4A7103193F313523B696246C02D84",
+    "bodies": 9
+  },
+  "limits": [
+    "Independent source/packet readiness reviews and their HOST proofs are preserved preparation evidence; the actual composed callback failed, so they are not native acceptance.",
+    "The callback read outer actor Arguments instead of native arguments; the actual launch guard refused. Offline review also finds actor-launched Factorio conflicts with the existing direct-parent ownership rule. Neither guard is weakened.",
+    "The next correction keeps native ownership/custody in the parent and isolates blocking window observation in a governed attach-only actor, with actual composed-governor/guard negative controls before a fresh reviewed packet. No unchanged retry.",
+    "Existing c441 imported captures also block their custody parent and have no independent monitored wrapper. Earlier R05 actual functional observations remain under original identities; broader safe-execution applicability is unclosed.",
+    "No geometry result, lifecycle, performance, reporter closure or release qualification follows. No protected save was loaded or written."
+  ],
+  "native_execution": true,
+  "native_acceptance": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}
