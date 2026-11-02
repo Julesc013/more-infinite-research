@@ -158,7 +158,7 @@ source_of_truth_for:
 
 ## Support limits
 
-- When another mod already provides an infinite native research chain, MIR preserves that research. The Library explains when MIR's settings do not control it. Muria keeps its finite weapon-speed levels 7 and 8; MIR adds infinite research from level 9.
+- When another mod already provides an infinite native research chain, MIR preserves that research. The Library explains when MIR's settings do not control it. On Factorio 2.1, Muria keeps its finite weapon-speed levels 7 and 8; MIR adds infinite research from level 9.
 
 - Adding or removing Muria on a save that already uses MIR is refused because those changes replace different earned weapon-research identities. Keep the original save and restore its previous mod selection. Starting together, or installing MIR for the first time alongside Muria, is a different route; use the release notes for its tested scope.
 

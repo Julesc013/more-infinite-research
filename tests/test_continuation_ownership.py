@@ -288,6 +288,45 @@ class ContinuationOwnershipTests(unittest.TestCase):
           end
         ''')
 
+    def test_exclusive_muria_tail_custody_is_checked_before_cap_admission(self):
+        self.lua.execute('''
+          for _,creator in ipairs({"more-infinite-research","foreign-provider"}) do
+            local name="weapon-shooting-speed-9"
+            local prototype={name=name,enabled=true}
+            local native={name=name,valid=true,level=11,enabled=true,researched=false,
+              visible_when_disabled=false,saved_progress=.27,prototype=prototype}
+            local world={index=1,valid=true,technologies={[name]=native},research_queue={}}
+            local reads=0
+            script={active_mods={base="2.1.23",Muria="1.8.5"}}
+            prototypes={recipe={},technology={[name]=prototype},get_history=function(kind,id)
+              assert(kind=="technology" and id==name);reads=reads+1
+              return {created=creator,changed={"science-spread"}}
+            end}
+            game=setmetatable({}, {__index=function() error("custody check read game") end})
+            storage=setmetatable({}, {__newindex=function() error("custody check wrote state") end})
+            for _,module in ipairs({"research.catalogue","runtime.catalogue","runtime.lifecycle","runtime.configuration"}) do
+              package.loaded[module]=nil
+            end
+            local ok,catalogue=pcall(require,"runtime.catalogue")
+            assert(reads==1 and native.enabled and native.saved_progress==.27 and next(storage)==nil)
+            if creator=="foreign-provider" then
+              assert(not ok and tostring(catalogue):find("MIR creation custody for "..name,1,true),tostring(catalogue))
+            else
+              assert(ok and ids(catalogue.declared())[name] and not catalogue.externally_supplied_continuation(name))
+              local config=require("research.settings")
+              settings={startup={}}
+              for _,spec in ipairs(config.prototypes()) do settings.startup[spec.name]={value=spec.default_value} end
+              settings.startup["mir-max-level-weapon-shooting-speed"].value=10
+              local lifecycle=require("runtime.lifecycle")
+              game,storage={forces={[1]=world}},{}
+              assert(lifecycle.cap_limits(world)[name]==10)
+              lifecycle.on_init()
+              assert(not native.enabled and native.level==11 and native.saved_progress==.27)
+              assert(storage.mir_caps.owned_disabled[1][name])
+            end
+          end
+        ''')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)

@@ -28,6 +28,12 @@ if target.id == "f200" or target.id == "f210" then
           error("MIR runtime catalogue requires prototype creation history for " .. name, 2)
         end
         if history.created ~= "more-infinite-research" then
+          -- The exact Muria adapter's ninth level is not one of the six
+          -- yieldable shared tails. Unexpected final custody must refuse,
+          -- rather than admitting an unowned row to MIR's cap catalogue.
+          if name == "weapon-shooting-speed-9" then
+            error("MIR runtime catalogue requires MIR creation custody for weapon-shooting-speed-9", 2)
+          end
           foreign_technology_prototypes[name] = existing
         end
       end
