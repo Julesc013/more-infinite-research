@@ -8935,10 +8935,12 @@
             "current_host_controls": [
               "tests/test_settings_profile.py",
               "tests/test_settings_commands.py",
-              "tests/test_library_model.py"
+              "tests/test_library_model.py",
+              "tests/test_settings_profile.py::test_settings_queries_and_runtime_profile_facade_work_after_module_loading_closes",
+              "tests/test_settings_profile.py::test_settings_descriptors_remain_stable_after_caller_mutation_and_parse_closure"
             ],
             "original_evidence": [],
-            "remaining_executable_check": "Review current host coverage of catalogue immutability and callback-time availability; retain or port an independent rejection control if that expectation is missing. The old compiler-profile eager-use assertion itself needs no replacement.",
+            "remaining_executable_check": "The eight-control settings suite now directly covers parse-closed queries/runtime profile export/validation and detached descriptor stability; four ephemeral source opponents are rejected, while the six prior controls accept each opponent. This closes the selected host-port gap only. Preserve the retired compiler-profile transport/fingerprint as implementation history; qualify actual nondefault native settings/Library/API output, configuration/load/client behavior and exported files on the affected final candidate.",
             "owner": {
               "reconciliation": "Aero",
               "native": "Black Glass"
@@ -10993,6 +10995,93 @@
       "disposition": "port",
       "whole_historical_source_reconciliation_complete": false,
       "native_execution": false
+    },
+    "settings_catalogue_lifecycle_port_review": {
+      "reviewed_on": "2026-11-02",
+      "reviewed_against": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "subjects": [
+        "CONT-03",
+        "CONT-14"
+      ],
+      "disposition": "port",
+      "historical_sources": [
+        {
+          "path": "tests/runtime/Test-MIRSettingsCatalogueLifecycle.ps1",
+          "blob": "8c0f1671ee2edb665921a58dc4afa6c1de6fcf34",
+          "sha256": "32CB3920474292CCA7A9633B29C97FC8A28E3537C319501318E9EFDB6042D965",
+          "release_tags": [
+            "v4.4.0",
+            "v4.4.1",
+            "v4.4.2",
+            "v4.5.0",
+            "v4.5.1",
+            "v4.5.2",
+            "v4.6.0",
+            "v4.7.0",
+            "v4.7.1",
+            "v4.7.2",
+            "v4.7.3"
+          ]
+        },
+        {
+          "path": "tests/runtime/run_settings_catalogue_lifecycle_controls.py",
+          "blob": "401f5da14fc440762d02e8aa169d8e6590082e59",
+          "sha256": "EDB484EC842F6AB74777522D8E166E80541329C7A08F0AD0B99ACC4398377411",
+          "release_tags": [
+            "v4.4.0",
+            "v4.4.1",
+            "v4.4.2",
+            "v4.5.0",
+            "v4.5.1",
+            "v4.5.2",
+            "v4.6.0",
+            "v4.7.0",
+            "v4.7.1",
+            "v4.7.2",
+            "v4.7.3"
+          ]
+        }
+      ],
+      "deduplication": "Two unique blobs across eleven selected release tags v4.4.0 through v4.7.3. The two paths are absent from the other eighty selected tag trees. This does not cover inter-release removals or other helpers/discussions.",
+      "independent_expectation": "Original fixed_lifecycle closes require after control parsing, then reads the unchanged catalogue/spec/default/validation and runtime provider; old_shape_must_fail rejects a callback-time compiler-profile require. RUN-04/SET-04 retain usable runtime settings/profile consumers and one settings authority. The new mutation control strengthens the same catalogue-stability/read-only boundary; it is not described as an assertion present in the old runner.",
+      "implementation": [
+        "source/research/settings.lua",
+        "source/runtime/settings_profile.lua"
+      ],
+      "current_host_controls": [
+        "tests/test_settings_profile.py::test_settings_queries_and_runtime_profile_facade_work_after_module_loading_closes",
+        "tests/test_settings_profile.py::test_settings_descriptors_remain_stable_after_caller_mutation_and_parse_closure"
+      ],
+      "host_result": {
+        "suite": "tests/test_settings_profile.py",
+        "passed": 8,
+        "new_controls": 2,
+        "runtime": "lupa.lua52 from pinned mir421-lua-runtime",
+        "native_processes": 0
+      },
+      "negative_controls": {
+        "method": "Ephemeral preloaded source strings in separate Lua runtimes; no tracked player source edits.",
+        "all_rejected_at_expected_boundary": true,
+        "opponents": [
+          "callback-time-catalogue-import",
+          "shared-setting-spec",
+          "shared-standalone-prototype",
+          "callback-time-profile-import"
+        ],
+        "prior_controls_accept_each_opponent": 6,
+        "limits": "Injected opponents demonstrate sensitivity of the new controls, not an observed defect in current player source."
+      },
+      "obsolete_implementation_only": [
+        "Old compiler-profile eager-import source shape and retired provider runtime_settings_bindings transport.",
+        "Old fingerprint implementation; compare public descriptor data directly without restoring the compiler framework."
+      ],
+      "custody": "build/qualification/aero-settings-parse-lifecycle-r01/",
+      "remaining_executable_check": "The eight-control settings suite now directly covers parse-closed queries/runtime profile export/validation and detached descriptor stability; four ephemeral source opponents are rejected, while the six prior controls accept each opponent. This closes the selected host-port gap only. Preserve the retired compiler-profile transport/fingerprint as implementation history; qualify actual nondefault native settings/Library/API output, configuration/load/client behavior and exported files on the affected final candidate.",
+      "owner": "Aero owns this bounded historical/host mapping; Black Glass reviews/integrates and owns affected native qualification.",
+      "source_reconciliation_complete": false,
+      "test_intent_reconciliation_complete": false,
+      "native_execution": false,
+      "limits": "No player source/package, published migration, original request record, native result identity or release verdict changes. This is not complete settings, API, Library or VER-07 acceptance."
     }
   }
 }
