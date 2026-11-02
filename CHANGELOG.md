@@ -12,6 +12,10 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Preserve personal Library choices through player and configuration changes, and show when discovery information is limited or falls back to stable IDs.
 - Correct three Russian research names for cannon shells and thruster fuel and oxidizer productivity.
 
+### Bugfixes
+
+- Preserve previously earned low-density-structure, plastic, processing-unit, rocket-fuel and steel bonuses for affected Factorio 2.0 saves using Space Is Fake 1.0.60.
+
 ## [5.0.1] - 2026-11-01
 
 ### Changes

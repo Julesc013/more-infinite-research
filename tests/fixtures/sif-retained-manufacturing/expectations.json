@@ -1,0 +1,62 @@
+{
+  "kind": "MIRPublishedSIFPaidManufacturingExpectationsV1",
+  "authority": {
+    "published_archive": "more-infinite-research_4.7.20003.zip",
+    "archive_sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+    "member": "prototypes/mir/policy/owner_policy.lua",
+    "member_sha256": "ABBB5CA8BBB0ED6CF093EA869434FD196417010D47DCAAFE87D4599B70B079D1",
+    "hidden_field_source": "prototypes/mir/planner/stream_compiler/diagnostics.lua",
+    "hidden_field_source_sha256": "DA32D686307595AFF44D81C15013E0218DD613D38A9C49DF881148376AFB51E9",
+    "independent_state_oracle": "v4.7.3:tests/support/MIR421SpaceFakeUpgrade.lua",
+    "independent_state_oracle_blob": "f110e0916b95ef67e661e88939cd17237fc3592d",
+    "scope": "Published F200 Base2.0/SpaceAge/SIF1.0.60 retained hidden earned identities. Source constants only; this fixture does not claim native upgrade execution."
+  },
+  "rows": [
+    {
+      "family": "research_low_density_structure",
+      "id": "recipe-prod-research_low_density_structure-1",
+      "product": "low-density-structure",
+      "recipes": {
+        "casting-low-density-structure": "low-density-structure-productivity",
+        "low-density-structure": "low-density-structure-productivity",
+        "scrap-recycling": "scrap-recycling-productivity"
+      }
+    },
+    {
+      "family": "research_plastic",
+      "id": "recipe-prod-research_plastic-1",
+      "product": "plastic-bar",
+      "recipes": {
+        "bioplastic": "plastic-bar-productivity",
+        "plastic-bar": "plastic-bar-productivity"
+      }
+    },
+    {
+      "family": "research_processing_unit",
+      "id": "recipe-prod-research_processing_unit-1",
+      "product": "processing-unit",
+      "recipes": {
+        "processing-unit": "processing-unit-productivity"
+      }
+    },
+    {
+      "family": "research_rocket_fuel",
+      "id": "recipe-prod-research_rocket_fuel-1",
+      "product": "rocket-fuel",
+      "recipes": {
+        "ammonia-rocket-fuel": "rocket-fuel-productivity",
+        "rocket-fuel": "rocket-fuel-productivity",
+        "rocket-fuel-from-jelly": "rocket-fuel-productivity"
+      }
+    },
+    {
+      "family": "research_steel",
+      "id": "recipe-prod-research_steel-1",
+      "product": "steel-plate",
+      "recipes": {
+        "casting-steel": "steel-plate-productivity",
+        "steel-plate": "steel-plate-productivity"
+      }
+    }
+  ]
+}

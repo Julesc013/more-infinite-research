@@ -124,6 +124,7 @@ class PackTests(unittest.TestCase):
                 "compatibility/native_modded_continuations.lua",
                 "compatibility/atan_profile.lua",
                 "compatibility/modern_catalogue/space_age.lua",
+                "compatibility/modern_catalogue/sif_retained.lua",
                 "compatibility/modern_catalogue/k2so.lua",
             },
         )
