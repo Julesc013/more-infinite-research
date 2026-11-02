@@ -76,27 +76,30 @@
     },
     {
       "id": "raw-json-route",
-      "disposition": "port-needed-host-coverage",
+      "disposition": "ported-focused-host-controls",
       "original_expectation": "Valid empty rawJSON profile parses without compressed decode_string and preserves direct values.",
       "implementation": [
         "source/research/settings_profile.lua::decode"
       ],
-      "current_controls": [],
-      "remaining_executable_check": "Add focused empty/rawJSON host input and compressed-decoder call trap, using original expectation. Current source branch alone does not constitute tested coverage.",
+      "current_controls": [
+        "tests/test_settings_profile.py::test_raw_json_import_bypasses_compressed_decode_and_preserves_empty_zero_false"
+      ],
+      "remaining_executable_check": "Selected host gap closed with published-source expectation and rejecting source opponent. Actual native codec/exported files and current-candidate settings/lifecycle/client correspondence remain separate.",
       "owner": "Aero next bounded host unit"
     },
     {
       "id": "missing-helpers-and-recovery",
-      "disposition": "port-needed-host-coverage",
+      "disposition": "ported-focused-host-controls",
       "original_expectation": "Missing helpers preserves raw fallback; later available codec environment admits the same valid import. Malformed/missing profile also preserves raw fallback.",
       "implementation": [
         "source/research/settings.lua::decoded_import",
         "source/research/settings_profile.lua::decode"
       ],
       "current_controls": [
-        "tests/test_settings_profile.py::test_malformed_import_falls_back_without_executing_input"
+        "tests/test_settings_profile.py::test_malformed_import_falls_back_without_executing_input",
+        "tests/test_settings_profile.py::test_missing_profile_helpers_fall_back_and_fresh_resolution_recovers"
       ],
-      "remaining_executable_check": "Malformed-profile control does not prove absent-helper recovery. Add explicit nil/missing codec API and fresh-resolution recovery controls without restoring a mutable live getter.",
+      "remaining_executable_check": "Selected host gap closed with published-source expectation and rejecting source opponent. Actual native codec/exported files and current-candidate settings/lifecycle/client correspondence remain separate.",
       "owner": "Aero next bounded host unit"
     },
     {
@@ -113,14 +116,23 @@
     }
   ],
   "host_validation": {
-    "new_tests_run": false,
-    "basis": "Documentation-only source/tag/test-symbol reconciliation. Existing bfa full153 result retains its original identity and applies only to demonstrably unchanged consumed subsets.",
-    "selected_custody_controls": {
-      "path": "tests/test_historical_sources.py",
-      "methods": 5,
-      "passed": true
+    "new_tests_run": true,
+    "settings_profile_methods": 10,
+    "settings_profile_pass": true,
+    "selected_custody_methods": 5,
+    "selected_custody_pass": true,
+    "repository_check_passed": true,
+    "opponent_controls": {
+      "new_controls_reject_each": true,
+      "prior_eight_controls_accept_each": true,
+      "opponents": [
+        "route raw JSON through compressed decoder",
+        "cache missing-helper failure across later resolution"
+      ],
+      "result_sha256": "2de32f57adb6651410b5190b70598ac1b69df8793062bf759637bf7b7e91b9ed",
+      "limits": "Injected source opponents are control sensitivity, not an observed current product defect. Initial unavailable-loadstring wrapper error is preserved and never counted as rejection."
     },
-    "repository_check_passed": true
+    "native_execution": false
   },
   "source_reconciliation_complete": false,
   "test_intent_reconciliation_complete": false,

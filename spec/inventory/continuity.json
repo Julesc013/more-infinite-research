@@ -16018,14 +16018,14 @@
           },
           {
             "id": "raw-json-route",
-            "disposition": "port-needed-host-coverage",
-            "remaining_executable_check": "Add focused empty/rawJSON host input and compressed-decoder call trap, using original expectation. Current source branch alone does not constitute tested coverage.",
+            "disposition": "ported-focused-host-controls",
+            "remaining_executable_check": "Selected host gap closed with published-source expectation and rejecting source opponent. Actual native codec/exported files and current-candidate settings/lifecycle/client correspondence remain separate.",
             "owner": "Aero next bounded host unit"
           },
           {
             "id": "missing-helpers-and-recovery",
-            "disposition": "port-needed-host-coverage",
-            "remaining_executable_check": "Malformed-profile control does not prove absent-helper recovery. Add explicit nil/missing codec API and fresh-resolution recovery controls without restoring a mutable live getter.",
+            "disposition": "ported-focused-host-controls",
+            "remaining_executable_check": "Selected host gap closed with published-source expectation and rejecting source opponent. Actual native codec/exported files and current-candidate settings/lifecycle/client correspondence remain separate.",
             "owner": "Aero next bounded host unit"
           },
           {
