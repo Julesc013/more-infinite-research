@@ -284,7 +284,29 @@ def retained_projection(sections: dict[str, dict[str, str]]) -> dict[str, str]:
     return projection
 
 
+# Published 4.7.3 English keys, restricted to current native locale map and
+# current standalone declarations. Native descriptors supply one technology argument.
+NATIVE_SETTING_KEYS = (
+    "mir-enable-base-tech", "mir-cost-base", "mir-cost-linear-increment",
+    "mir-cost-growth", "mir-max-level", "mir-research-time", "mir-effect-per-level",
+)
+STANDALONE_SETTING_KEYS = (
+    "ips-require-space-gate", "mir-science-pack-ingredient-policy",
+    "mir-prefer-this-mod-for-competing-techs", "mir-use-installed-space-age-icons",
+)
+
+
 class LocaleCatalogueTests(unittest.TestCase):
+    def test_current_settings_have_english_names_descriptions_and_arguments(self) -> None:
+        english = parse_cfg(LOCALE_ROOT / "en" / "more-infinite-research.cfg")
+        for section in ("mod-setting-name", "mod-setting-description"):
+            for key in NATIVE_SETTING_KEYS + STANDALONE_SETTING_KEYS:
+                with self.subTest(section=section, key=key):
+                    value = english.get(section, {}).get(key, "")
+                    self.assertTrue(value.strip(), f"missing {section}.{key}")
+                    arguments = set(re.findall(r"__(\d+)__", value))
+                    self.assertEqual(arguments, {"1"} if key in NATIVE_SETTING_KEYS else set())
+
     def test_source_reference_coverage_is_finite_and_explicit(self) -> None:
         expected = {
             f"{section}.{key}"
