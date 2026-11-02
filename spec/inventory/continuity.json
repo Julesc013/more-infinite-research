@@ -8804,7 +8804,7 @@
         "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
       }
     ],
-    "next_bounded_work": "The selected35-body upgrade runner,17-body specialization helpers and seven imported Lua comparator/canonical/frontier bodies now have bounded source dispositions; preserve their independent review/integration and original author history. Finish unresolved registry/default/control/compatibility/inter-release and unknown-consumer groups plus any required original frontier snapshot custody, mapping actual delivered expectations without restoring retired machinery. Use the existing finite nine/seven/four migration queue and final consumed-input review. Exact published501 F200 r20 and F210 R05 observations retain their original scopes; frozen502 remains separately unqualified, including shared runtime catalogue/cap/API and beta-successor state. Black Glass owns complete exact packets, the native queue and current progress header; Aero owns historical/applicability/documentation and independent review.",
+    "next_bounded_work": "The selected35-body upgrade runner,17-body specialization helpers,seven imported Lua comparator/canonical/frontier bodies and six runtime-entry-point bodies now have bounded source dispositions; preserve their independent reviews, exact refs and original author history. Reconcile remaining generated-orchestration,registry/default,control-callback,compatibility/inter-release and unknown-consumer intent plus required original frontier snapshot custody without restoring retired machinery. Source counts and wrapper mappings do not close VER-07. Use the existing finite nine/seven/four migration queue and final consumed-input review; do not restart every-old-patch campaigns or unchanged completed cases. Exact published501 F200 R20 and F210 R05 observations retain their original scopes; frozen502 has only its recorded component verdicts, with shared runtime catalogue/cap/API,beta-successor and affected current-candidate scenarios still separately reviewed before dispatch. Black Glass owns complete exact packets,the native queue and current progress header; Aero owns historical/applicability/documentation and independent review. Preserve every completed/adverse execution identity.",
     "bounded_intent_reviews": [
       {
         "subjects": [
@@ -14973,6 +14973,368 @@
         },
         "custody": "build/qualification/aero-imported-upgrade-oracles-r01/",
         "qualification_limit": "Only the selected seven imported Lua bodies and their58 distinct bindings are source-dispositioned. This identifies a superseded historical fixture weakness, not a demonstrated current product defect. No original native receipt is changed or relabelled, no prior closed route is reopened merely by reading its source, and no502 native/save/client/performance or stable verdict follows. Full frontier snapshot custody, other source groups and applicable final-candidate coverage remain open.",
+        "native_execution": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-08",
+          "CONT-09",
+          "CONT-10",
+          "CONT-13",
+          "CONT-14"
+        ],
+        "reviewed_on": "2026-11-02",
+        "reviewed_against": "211fe76e5aa077c5c19bd4078c97866973c229a6",
+        "scope": "Four exact runtime entry-point locators and their six deduplicated immutable bodies, totaling2382bytes. This dispositions wrapper/stage registration intent only, not imported runtime orchestration, generated modules, other registry/default declarations, inter-release removals or historical native outcomes.",
+        "method": "Read every selected body; verify all144 original tag/commit/path bindings against immutable Git objects and retained remote tag refs. Compare current explicit bootstrap and reduced control adapter plus existing independently authored registration/lifecycle controls. Do not execute an old runner or infer an imported module behavior from its caller.",
+        "selected_paths": [
+          "control.lua",
+          "source/control.lua",
+          "prototypes/mir/stage/control.lua",
+          "source/prototypes/mir/stage/control.lua"
+        ],
+        "selected_tag_scope": 91,
+        "selected_commit_scope": 90,
+        "selected_blob_count": 6,
+        "retained_remote_tag_path_bindings": 142,
+        "distinct_retained_remote_tag_path_bindings": 141,
+        "immutable_commit_only_bindings": 2,
+        "reference_limits": [
+          "The original local v3.0.0 alias at70bb513f5b388ad23c4a5d46dfc945571c3b8217 supplies two commit-only references; it has no matching remote tag and is not described as publication. The distinct remote3.0.0 source is not substituted.",
+          "The original indexed v4.2.0 alias is resolved to retained v4.2.0-stable at the identical commit. Its one duplicate binding is consolidated below:144 original discovery rows become141 distinct remote-tag bindings plus2 commit-only bindings. Existing source-index receipts remain unchanged.",
+          "A retained tag/path binding proves the named Git source identity, not a historical native execution or arbitrary inter-release completeness."
+        ],
+        "selected_blob_variants": [
+          {
+            "blob": "e2aa90fa4bc0b96f9f6d6d667f6dd6f5a7265758",
+            "paths": [
+              "control.lua"
+            ],
+            "bytes": 46,
+            "sha256": "91EC8A63FFEC27AACDDC9F6EC841A64E782EA923214AC5FB37C367A716E4ACE9",
+            "references": [
+              "0.10.0:control.lua",
+              "0.11.0:control.lua",
+              "0.12.0:control.lua",
+              "0.6.0:control.lua",
+              "0.7.0:control.lua",
+              "0.8.0:control.lua",
+              "0.9.0:control.lua",
+              "1.3.0:control.lua",
+              "1.3.5:control.lua",
+              "1.3.9:control.lua",
+              "1.4.0:control.lua",
+              "1.4.5:control.lua",
+              "1.4.9:control.lua",
+              "1.5.0:control.lua",
+              "1.5.5:control.lua",
+              "1.5.9:control.lua",
+              "1.6.0:control.lua",
+              "1.6.5:control.lua",
+              "1.6.9:control.lua",
+              "1.7.0:control.lua",
+              "1.7.1:control.lua",
+              "1.7.5:control.lua",
+              "1.7.9:control.lua",
+              "1.8.0:control.lua",
+              "1.8.1:control.lua",
+              "1.8.2:control.lua",
+              "1.8.5:control.lua",
+              "1.8.9:control.lua",
+              "1.9.3:control.lua",
+              "1.9.4:control.lua",
+              "1.9.5:control.lua",
+              "1.9.9:control.lua",
+              "2.3.0:control.lua",
+              "2.3.5:control.lua",
+              "2.4.0:control.lua",
+              "2.4.5:control.lua",
+              "2.4.9:control.lua",
+              "2.5.0:control.lua",
+              "2.5.10:control.lua",
+              "2.5.11:control.lua",
+              "2.5.5:control.lua",
+              "2.5.9:control.lua",
+              "3.0.0:control.lua",
+              "3.0.5:control.lua",
+              "3.1.0:control.lua",
+              "3.1.1:control.lua",
+              "3.1.2:control.lua",
+              "3.1.5:control.lua",
+              "3.1.9:control.lua",
+              "3.2.0:control.lua",
+              "3.2.10:control.lua",
+              "3.2.11:control.lua",
+              "3.2.1:control.lua",
+              "3.2.2:control.lua",
+              "3.2.3:control.lua",
+              "3.2.5:control.lua",
+              "3.2.9:control.lua",
+              "70bb513f5b388ad23c4a5d46dfc945571c3b8217:control.lua",
+              "v4.0.0:control.lua",
+              "v4.1.0:control.lua"
+            ],
+            "disposition": "consolidate-registration-intent-retire-old-entrypoint-layout"
+          },
+          {
+            "blob": "94c9dc0cbe2c2bddfd967d8b95dcd2c16379b156",
+            "paths": [
+              "prototypes/mir/stage/control.lua",
+              "source/prototypes/mir/stage/control.lua"
+            ],
+            "bytes": 752,
+            "sha256": "F672C7C05F7AE0F916A08FF501DB841A2BB513B9358852BA641C9BB7DC04C0F3",
+            "references": [
+              "0.10.0:prototypes/mir/stage/control.lua",
+              "0.11.0:prototypes/mir/stage/control.lua",
+              "0.12.0:prototypes/mir/stage/control.lua",
+              "0.6.0:prototypes/mir/stage/control.lua",
+              "0.7.0:prototypes/mir/stage/control.lua",
+              "0.8.0:prototypes/mir/stage/control.lua",
+              "0.9.0:prototypes/mir/stage/control.lua",
+              "1.3.0:prototypes/mir/stage/control.lua",
+              "1.3.5:prototypes/mir/stage/control.lua",
+              "1.3.9:prototypes/mir/stage/control.lua",
+              "1.4.0:prototypes/mir/stage/control.lua",
+              "1.4.5:prototypes/mir/stage/control.lua",
+              "1.4.9:prototypes/mir/stage/control.lua",
+              "1.5.0:prototypes/mir/stage/control.lua",
+              "1.5.5:prototypes/mir/stage/control.lua",
+              "1.5.9:prototypes/mir/stage/control.lua",
+              "1.6.0:prototypes/mir/stage/control.lua",
+              "1.6.5:prototypes/mir/stage/control.lua",
+              "1.6.9:prototypes/mir/stage/control.lua",
+              "1.7.0:prototypes/mir/stage/control.lua",
+              "1.7.1:prototypes/mir/stage/control.lua",
+              "1.7.5:prototypes/mir/stage/control.lua",
+              "1.7.9:prototypes/mir/stage/control.lua",
+              "1.8.0:prototypes/mir/stage/control.lua",
+              "1.8.1:prototypes/mir/stage/control.lua",
+              "1.8.2:prototypes/mir/stage/control.lua",
+              "1.8.5:prototypes/mir/stage/control.lua",
+              "1.8.9:prototypes/mir/stage/control.lua",
+              "1.9.3:prototypes/mir/stage/control.lua",
+              "1.9.4:prototypes/mir/stage/control.lua",
+              "1.9.5:prototypes/mir/stage/control.lua",
+              "1.9.9:prototypes/mir/stage/control.lua",
+              "2.3.5:prototypes/mir/stage/control.lua",
+              "2.4.0:prototypes/mir/stage/control.lua",
+              "2.4.5:prototypes/mir/stage/control.lua",
+              "2.4.9:prototypes/mir/stage/control.lua",
+              "2.5.0:prototypes/mir/stage/control.lua",
+              "2.5.10:prototypes/mir/stage/control.lua",
+              "2.5.11:prototypes/mir/stage/control.lua",
+              "2.5.5:prototypes/mir/stage/control.lua",
+              "2.5.9:prototypes/mir/stage/control.lua",
+              "3.0.5:prototypes/mir/stage/control.lua",
+              "3.1.0:prototypes/mir/stage/control.lua",
+              "3.1.1:prototypes/mir/stage/control.lua",
+              "3.1.2:prototypes/mir/stage/control.lua",
+              "3.1.5:prototypes/mir/stage/control.lua",
+              "3.1.9:prototypes/mir/stage/control.lua",
+              "3.2.0:prototypes/mir/stage/control.lua",
+              "3.2.10:prototypes/mir/stage/control.lua",
+              "3.2.11:prototypes/mir/stage/control.lua",
+              "3.2.1:prototypes/mir/stage/control.lua",
+              "3.2.2:prototypes/mir/stage/control.lua",
+              "3.2.3:prototypes/mir/stage/control.lua",
+              "3.2.5:prototypes/mir/stage/control.lua",
+              "3.2.9:prototypes/mir/stage/control.lua",
+              "v4.0.0:prototypes/mir/stage/control.lua",
+              "v4.1.0:prototypes/mir/stage/control.lua",
+              "v4.2.0-stable:source/prototypes/mir/stage/control.lua",
+              "v4.2.1:source/prototypes/mir/stage/control.lua"
+            ],
+            "disposition": "consolidate-registration-intent-retire-old-entrypoint-layout"
+          },
+          {
+            "blob": "cb054c6beb77808d7a91e960c8c62907d4ce7344",
+            "paths": [
+              "control.lua"
+            ],
+            "bytes": 45,
+            "sha256": "20D025529C1A39F486F39652A4586370D876E22045030C79C2AFCF0D13B4E44D",
+            "references": [
+              "1.9.0:control.lua",
+              "1.9.1:control.lua",
+              "1.9.2:control.lua",
+              "2.0.5:control.lua",
+              "2.1.0:control.lua",
+              "2.1.5:control.lua",
+              "2.2.0:control.lua"
+            ],
+            "disposition": "consolidate-registration-intent-retire-old-entrypoint-layout"
+          },
+          {
+            "blob": "90158bc9c2d072b50fe5fc63df679af66e4fbbbd",
+            "paths": [
+              "prototypes/mir/stage/control.lua"
+            ],
+            "bytes": 482,
+            "sha256": "1FF4DED6F075B01D7A33462BF08495E9DF28A786BF8A518D1FF584AB408950DB",
+            "references": [
+              "2.3.0:prototypes/mir/stage/control.lua",
+              "3.0.0:prototypes/mir/stage/control.lua",
+              "70bb513f5b388ad23c4a5d46dfc945571c3b8217:prototypes/mir/stage/control.lua"
+            ],
+            "disposition": "consolidate-registration-intent-retire-old-entrypoint-layout"
+          },
+          {
+            "blob": "4797e2ff35ad64943b03c77a9d9e688c56801827",
+            "paths": [
+              "source/prototypes/mir/stage/control.lua"
+            ],
+            "bytes": 809,
+            "sha256": "AF3934244889FFBDA6B44A425240279D78EEDB093E1601D3C981B1FF832915B5",
+            "references": [
+              "v4.2.2:source/prototypes/mir/stage/control.lua",
+              "v4.3.0:source/prototypes/mir/stage/control.lua",
+              "v4.4.0:source/prototypes/mir/stage/control.lua",
+              "v4.4.1:source/prototypes/mir/stage/control.lua",
+              "v4.4.2:source/prototypes/mir/stage/control.lua",
+              "v4.5.0:source/prototypes/mir/stage/control.lua",
+              "v4.5.1:source/prototypes/mir/stage/control.lua",
+              "v4.5.2:source/prototypes/mir/stage/control.lua",
+              "v4.6.0:source/prototypes/mir/stage/control.lua",
+              "v4.7.0:source/prototypes/mir/stage/control.lua",
+              "v4.7.1:source/prototypes/mir/stage/control.lua",
+              "v4.7.2:source/prototypes/mir/stage/control.lua",
+              "v4.7.3:source/prototypes/mir/stage/control.lua"
+            ],
+            "disposition": "consolidate-registration-intent-retire-old-entrypoint-layout"
+          },
+          {
+            "blob": "156afee4152a7a5feb263230aa2ab25c99c21a87",
+            "paths": [
+              "source/control.lua"
+            ],
+            "bytes": 248,
+            "sha256": "17201196D4EB573265CE34C0599748ED78DF856EBFCB4229018C05C4E056C0C9",
+            "references": [
+              "v5.0.0:source/control.lua"
+            ],
+            "disposition": "consolidate-registration-intent-retire-old-entrypoint-layout"
+          }
+        ],
+        "groups": [
+          {
+            "id": "control-parse-registration-composition",
+            "disposition": "consolidate",
+            "independent_expectation": "The historical control roots invoke their named registration owner during control parsing. Old stage bodies explicitly refuse a missing script global and prototype data state. These are stage/composition boundaries, not proof that imported callbacks preserve any particular gameplay state.",
+            "historical_source": [
+              "e2aa90fa4bc0b96f9f6d6d667f6dd6f5a7265758",
+              "cb054c6beb77808d7a91e960c8c62907d4ce7344",
+              "90158bc9c2d072b50fe5fc63df679af66e4fbbbd",
+              "156afee4152a7a5feb263230aa2ab25c99c21a87"
+            ],
+            "current_requirement": [
+              "RUN-01",
+              "RUN-05",
+              "ARCH-08"
+            ],
+            "implementation": [
+              "source/control.lua",
+              "source/runtime/bootstrap.lua",
+              "source/data.lua"
+            ],
+            "host_controls": [
+              "tests/test_bootstrap.py:test_control_composes_lifecycle_library_api_legacy_interface_and_command",
+              "tests/test_bootstrap.py:test_bootstrap_has_no_late_module_loading_or_unconditional_tick_dispatch",
+              "tests/test_bootstrap.py:test_data_stage_emits_only_the_published_shortcut_identity"
+            ],
+            "decision": "Retain explicit runtime registration and independent prototype/control composition. The old prototypes.mir/control.scripted-techs import layout, target_line helper and exact guard error strings are obsolete implementation details; current controls do not claim to replay those old negative paths or all imported module behavior.",
+            "remaining_executable_check": "Use the existing exact-candidate native/client scenarios for actual engine lifecycle boundaries and any genuinely affected imports. Host composition is not a joining-client or native startup result.",
+            "owner": "Black Glass native queue; Aero independent consumed-input review"
+          },
+          {
+            "id": "library-and-settings-registration-independent-of-other-features",
+            "disposition": "consolidate",
+            "independent_expectation": "The earliest selected stage unconditionally registers scripted-techs and settings-profile modules. Later94c9dc0 gates scripted registration on scripted_techs or productivity_family_adoption, and4797e2ff additionally admits research_library; settings_profiles remains separately gated. Library registration must not disappear merely because unrelated scripted research/caps are disabled.",
+            "historical_source": [
+              "90158bc9c2d072b50fe5fc63df679af66e4fbbbd",
+              "94c9dc0cbe2c2bddfd967d8b95dcd2c16379b156",
+              "4797e2ff35ad64943b03c77a9d9e688c56801827"
+            ],
+            "current_requirement": [
+              "RUN-01",
+              "RUN-04"
+            ],
+            "implementation": [
+              "source/runtime/bootstrap.lua",
+              "source/runtime/settings_profile.lua",
+              "source/runtime/scripted_effects.lua"
+            ],
+            "host_controls": [
+              "tests/test_bootstrap.py:test_unlimited_control_omits_only_cap_event_callbacks",
+              "tests/test_bootstrap.py:test_unlimited_scripted_effects_register_and_route_force_lifecycle_events",
+              "tests/test_bootstrap.py:test_report_checkbox_event_has_one_bootstrap_registration_owner",
+              "tests/test_scripted_effects_lifecycle.py:test_force_reset_merge_and_retired_source_reconcile_without_cap_callbacks"
+            ],
+            "decision": "Consolidate actual feature-independent registration into the existing explicit owner. Do not port an old feature-name switch matrix or revive generated scripted_techs merely to preserve its layout. Current physical effects, settings provenance, saved-state and Library acceptance keep their existing separate obligations.",
+            "remaining_executable_check": "Complete current-candidate Library/settings and affected disabled-feature/save/client paths from the existing queue; no fresh native pass follows from these wrapper predicates.",
+            "owner": "Black Glass native queue; Aero independent expectations review"
+          },
+          {
+            "id": "target-subset-safe-runtime-entrypoints",
+            "disposition": "consolidate",
+            "independent_expectation": "Historical target feature gates avoid registering unavailable runtime functionality. Preserve supported subsets rather than copying modern event bindings into every historical package.",
+            "historical_source": [
+              "94c9dc0cbe2c2bddfd967d8b95dcd2c16379b156",
+              "4797e2ff35ad64943b03c77a9d9e688c56801827"
+            ],
+            "current_requirement": [
+              "TGT-01",
+              "TGT-03",
+              "API-01"
+            ],
+            "implementation": [
+              "source/adapters/reduced/control.lua",
+              "source/api/v1/runtime.lua",
+              "targets/editions.json",
+              "tools/package.py"
+            ],
+            "host_controls": [
+              "tests/test_target_adapters.py:test_reduced_control_registers_only_the_unified_api",
+              "tests/test_target_adapters.py:test_reduced_control_rejects_missing_or_colliding_interface_before_registration",
+              "tests/test_target_adapters.py:test_reduced_adapters_contain_no_library_or_event_maintenance"
+            ],
+            "decision": "The selected F013-F110 reduced control adapter exposes the bounded unified runtime API and excludes Library/scripted maintenance. F018 retains its experimental metadata/load-smoke-only limit; seven early data-only packages have no control entry point. This source mapping grants no additional native support.",
+            "remaining_executable_check": "Review final package target/adaptor inputs and reuse exact trusted same-edition evidence under original identities; run only affected stable target scenarios. Do not expand the F018 or early scope.",
+            "owner": "Black Glass native/delivery queue; Aero package/independent review"
+          }
+        ],
+        "unreviewed_dependencies": [
+          "The old control.scripted-techs/prototypes.mir.runtime.scripted_techs register bodies, generated orchestration/registry inputs and all invoked callback semantics are outside this four-locator pass. Existing mapped effect/settings/state source groups retain their actual scope; these wrappers do not close the rest.",
+          "Other control roots/path aliases, registry/default declarations, inter-release removal sources, request/discussion/attachment intent and unknown external consumers remain subject to VER-07 reconciliation."
+        ],
+        "host_validation": {
+          "plan_materialized": "tests/Test-MIR5HostControls.ps1 -Plan",
+          "lua_runtime": "Pinned Lua5.2 / Lupa2.6",
+          "controls": [
+            {
+              "path": "tests/test_bootstrap.py",
+              "tests": 23,
+              "exit_code": 0
+            },
+            {
+              "path": "tests/test_target_adapters.py",
+              "tests": 14,
+              "exit_code": 0
+            },
+            {
+              "path": "tests/test_scripted_effects_lifecycle.py",
+              "tests": 3,
+              "exit_code": 0
+            }
+          ],
+          "total": 40,
+          "new_or_modified_tests": false,
+          "scope": "Existing host-double registration, reduced adapter and lifecycle controls only; no historical runner or native execution."
+        },
+        "custody": "Primary build/qualification/aero-control-root-discovery-r01 retains all six exact Git bodies, original144-binding discovery, canonical remote/commit binding readback, materialized plan, host logs and byte-inverse preservation proof. This is local developer custody, not an off-machine backup claim.",
         "native_execution": false,
         "source_reconciliation_complete": false,
         "test_intent_reconciliation_complete": false,
