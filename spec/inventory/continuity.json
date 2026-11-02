@@ -469,7 +469,142 @@
       "remaining_implementation": [],
       "remaining_qualification": [
         "Qualify the remaining admitted cap identities and configuration/remove/readd boundaries; do not extrapolate the worker/gear result to untested owners."
-      ]
+      ],
+      "runtime_creator_cap_consumption_review": {
+        "reviewed_on": "2026-11-02",
+        "reviewed_against": "2e2035d2006edb6f75b3c4059d429fa9dc938c70",
+        "subjects": [
+          "CONT-03",
+          "CONT-07"
+        ],
+        "disposition": "port",
+        "scope": "Extend the existing historical cap invariant mapping to the actual completed-prototype runtime catalogue consumer; this is not a whole-harness/inter-release audit or native verdict.",
+        "historical_expectations": {
+          "references": [
+            {
+              "path": "tests/runtime/Test-MIR42F200SettingsCapTransition.ps1",
+              "references": [
+                {
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                  "blob": "4150e1173f2fe72d4b91c949d1cc4afc3402a5d3",
+                  "role": "published-4.7.3-reference"
+                },
+                {
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                  "blob": "4150e1173f2fe72d4b91c949d1cc4afc3402a5d3",
+                  "role": "4.2.1-adverse-history-comparator"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1",
+              "references": [
+                {
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                  "blob": "b3ec4ad75536b5a5f814233f1175eb3f37f34780",
+                  "role": "published-4.7.3-reference"
+                },
+                {
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                  "blob": "e976f4a083aeb423f896cd54474739f5811b49c8",
+                  "role": "4.2.1-adverse-history-comparator"
+                }
+              ]
+            }
+          ],
+          "assertions": [
+            "F200 Assert-State finite-cap/zero transition preserves earned level, prior foreign disablement and original visibility.",
+            "Multiforce Assert-MIR42State preserves per-force levels/enablement/visibility, queue/current progress and removed/reused force-index distinctions. Existing current controls retain its force-boundary coverage; no new native reuse result is claimed."
+          ],
+          "current_contracts": [
+            "SET-03",
+            "RUN-02",
+            "MIG-01"
+          ],
+          "native_profile_oracle": "Published v4.7.3 README research_plastic explicitly assigns covered Space Age recipes to native plastic-bar-productivity. Use this documented Base/Space-Age distinction to check fixture module lifetime; do not infer the expected difference from candidate output."
+        },
+        "implementation": [
+          "source/runtime/catalogue.lua",
+          "source/runtime/lifecycle.lua",
+          "source/runtime/caps.lua"
+        ],
+        "current_host_controls": [
+          "tests/test_lifecycle.py::test_completed_native_prototype_creators_control_braking_caps_and_owned_restoration",
+          "tests/test_lifecycle.py::test_fixture_boot_reconstructs_the_runtime_catalogue_for_a_changed_mod_configuration"
+        ],
+        "completed_prototype_contexts": {
+          "targets": [
+            "f200/2.0.77",
+            "f210/2.1.23"
+          ],
+          "mod_contexts": [
+            "Base",
+            "Space Age"
+          ],
+          "creator_contexts": [
+            "MIR-created",
+            "foreign-created"
+          ],
+          "initial_enablement": [
+            false,
+            true
+          ],
+          "host_combinations": 16,
+          "expectations": [
+            "Parse the completed collection without game/storage; cap MIR-created braking at10 while its native level11 and earned bonus remain unchanged.",
+            "Filter only the admitted over-cap queue entry; preserve unrelated current research/order/42% progress.",
+            "Do not cap the same-named foreign-created row or acquire rights to prior disablement.",
+            "On load do not read/write game/storage. On a fresh cap-zero configuration restore only MIR-owned enablement and original visibility.",
+            "Do not enumerate completed prototypes or query creator history again in callbacks."
+          ]
+        },
+        "fixture_correction": "The existing boot helper cleared the pure research catalogue but retained its runtime adapter closure. Reset runtime.catalogue for each simulated control stage; preserve all prior assertions. The new Base-to-Space-Age native-owner check fails without this reset.",
+        "host_result": {
+          "passed": 86,
+          "new_controls": 2,
+          "runtime": "Pinned Lupa2.6 lua52",
+          "native_processes": 0
+        },
+        "negative_controls": {
+          "published_package_members": [
+            {
+              "target": "f200",
+              "package": "more-infinite-research_5.0.20001.zip",
+              "sha256": "750ECA842134AFDDCC7C45B2B656510CA60F09940A2E82B21896AAE7E3D8C1BE",
+              "runtime_catalogue_sha256": "3809178C83136696ACF1CE4FAF1EE5C4AA53C95BD176E048D82769FC391B4A54"
+            },
+            {
+              "target": "f210",
+              "package": "more-infinite-research_5.0.21001.zip",
+              "sha256": "C6C2470B438846484732E0E05D124DB31A1100C2F1AA0E770B327A4A6FBAFA5D",
+              "runtime_catalogue_sha256": "3809178C83136696ACF1CE4FAF1EE5C4AA53C95BD176E048D82769FC391B4A54"
+            }
+          ],
+          "published_presence_adapter_result": "Eight MIR-created contexts lose the configured cap; the foreign-created contexts retain their original narrow behavior.",
+          "opponents": [
+            "published-presence-only-adapter",
+            "foreign-created-row-admitted",
+            "stale-runtime-wrapper-across-configurations"
+          ],
+          "rejected": 3,
+          "prior_lifecycle_controls_accept_each": 21
+        },
+        "preserved_trial_classification": [
+          "lifecycle-before-fixture-fix.log contains an initial new-test argument error: the mod table occupied the agriculture-cap parameter. It is not a product failure.",
+          "The initial science-row Base/Space-Age assumption was unsupported. The corrected oracle uses the published native-plastic contract; initial trials remain separate from fixture-native-owner-before-reset.log and final passing controls."
+        ],
+        "remaining_executable_check": [
+          "Black Glass must review #1549 creator classification through actual control parse and finite-cap/configuration/load behavior on the final modern packages. Record real prototype/history availability instead of treating the host model as native evidence.",
+          "Bind the affected braking-owner positive and foreign-collision checks to existing admitted native profiles/fixtures, preserving earned bonus, native queue/progress and zero restoration. Include affected current/detached investment when a public-beta cap that was ignored becomes enforced. This record invents no ready reporter configuration or executable packet.",
+          "Reuse earlier gear/worker/schema/force receipts only for matched consumed inputs, under their original identities. The creator adapter also feeds lifecycle declarations; do not classify #1549 as display-only or extrapolate its old worker/gear native evidence to braking.",
+          "All other CONT-07 admitted identities and configuration/removal/readdition boundaries retain their existing pending scope."
+        ],
+        "owner": "Aero owns this source/host/reconciliation unit; Black Glass independently reviews/integrates and owns native execution.",
+        "custody": "build/qualification/aero-cap-runtime-provenance-r01/",
+        "limits": "No player-source/target/version/original request changes, package rebuild, native execution or final-candidate/stable acceptance. Product correction is the existing #1549; this dependent unit strengthens its consumer verification.",
+        "native_execution": false,
+        "release_qualification": false
+      }
     },
     {
       "id": "CONT-08",
@@ -3918,6 +4053,133 @@
             "tests/test_package.py"
           ],
           "scope": "Published4.7.3 membership retains2.0.5 SHA07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2 and2.1.0 SHAF427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D on every target, while4.7.0 SHA0980B0B6F1675F6827A8E4151F778143EA74C9C6C3440CC2318129DBCE63C379 is F210-only. PR1040 restores that target selection without changing source JSON filenames or bytes; a new controller-bound nine-edition inventory/freeze is required and this records no native harm or migration pass."
+        },
+        {
+          "id": "selected-migration-queue-and-reduced-input-review-2026-11-02",
+          "source": [
+            "spec/inventory/migration-origins.json",
+            "spec/migrations.md",
+            "source/adapters/reduced",
+            "source/compatibility/science_bindings.lua",
+            "tools/package.py"
+          ],
+          "matrix_source_commit": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+          "matrix_blob": "e01f81ca03841699d6e11b0c982ef98aa360f50e",
+          "original_observation": "The existing execution matrix closes nine named same-edition4.7.3 routes, seven selected older-contract groups and four explicitly requested published-forward journeys at their recorded inputs. Its five named transition dispositions remain separately preserved and overlap some routes; do not add the counts as independent runs. Earlier CONT text that mentioned only seven4.7.2 mining chains or an entirely unrun F200-to-F210 journey was stale.",
+          "required_scope": "MIG-05 and the preserved28/29October decisions retain those named boundaries, protected originals and future5.x continuity. The matrix's permitted_limits explicitly excludes a blanket promise for unselected DLC/provider permutations and remove-save-readd. This review interprets the older all-adjacent inventory accordingly; it creates no new pass and does not waive a named failure or an actually admitted route.",
+          "reduced_input_review": {
+            "native_source_commit": "7a2f93224c846b86261b2da709f50ea683fc708d",
+            "original_freeze": "spec/evidence/current-assets-7a2f9322-root-readback.json",
+            "published501_source": "b677ced0b1ae0d8bd9ae47eb6b272443faec6d63",
+            "code_correction_source": "2e2035d2006edb6f75b3c4059d429fa9dc938c70",
+            "method": "Existing packager with exact --revision, separate fresh output custody, full ZIP SHA256 and every uncompressed member compared with the original freeze and anonymously downloaded501. The seven reconstructed7a2 ZIP hashes match the original freeze; reconstruction is not possession or regeneration of the original native saves.",
+            "rows": [
+              {
+                "target": "f013",
+                "reconstructed7a2_sha256": "4DB2D8848EBD2B4EECBF6D91CBEF8F69F5C31F634432496BB26AC40A3FC8964A",
+                "downloaded501_sha256": "A6DCCDA8DBAF38BFD8BD2B4386199C4F59CD16C6F5C98B6CC93C14BA43A8AF92",
+                "correction2e2035_matches_downloaded501": true,
+                "old_to501_changed_members": 54,
+                "base_science_selection_unchanged": true
+              },
+              {
+                "target": "f014",
+                "reconstructed7a2_sha256": "0A2BE7297D09DCCF084B8A10734651C1499FDE218FA3E2635873329F36250834",
+                "downloaded501_sha256": "DC1420891553E3C9CF0E8EEC6707BD06F305E46EBE374E2E6E21E4DF1F206053",
+                "correction2e2035_matches_downloaded501": true,
+                "old_to501_changed_members": 54,
+                "base_science_selection_unchanged": true
+              },
+              {
+                "target": "f015",
+                "reconstructed7a2_sha256": "37F7AC276460BC37C82D2426983B89D87393C22DFF8D39ECA17ACC7753F1480D",
+                "downloaded501_sha256": "3CB8B3C75CF3CDFEF97501BDF6AE7AF94B06DFDE5AA19207FBF33D2FC26E9FD5",
+                "correction2e2035_matches_downloaded501": true,
+                "old_to501_changed_members": 54,
+                "base_science_selection_unchanged": true
+              },
+              {
+                "target": "f016",
+                "reconstructed7a2_sha256": "35A8624065D3137E463EBC89DE21C06531F52F9E5E90632EC3C997CF52EEE839",
+                "downloaded501_sha256": "9B74CA6E26E1FCFDF9EBAE679B89DC380D6F49DAD5C3B155EF39CFAAC185785B",
+                "correction2e2035_matches_downloaded501": true,
+                "old_to501_changed_members": 54,
+                "base_science_selection_unchanged": true
+              },
+              {
+                "target": "f017",
+                "reconstructed7a2_sha256": "95228385A0862A807DB20A73F56CA0113693A1CDB3437410187303C598D784C7",
+                "downloaded501_sha256": "6A3580500811728BAD03293736CE22115E9C139CCF4D59D89E50EE22DEFA5210",
+                "correction2e2035_matches_downloaded501": true,
+                "old_to501_changed_members": 54,
+                "base_science_selection_unchanged": true
+              },
+              {
+                "target": "f100",
+                "reconstructed7a2_sha256": "6BAE382DBD0AEC7199474921887CFBAC61016B8BF5E8FB990656493A8A174B6C",
+                "downloaded501_sha256": "07D0C2C04DE31AE8A9FCB9CAB36BC282F8E7559A08B3A345860251FF9E2667D5",
+                "correction2e2035_matches_downloaded501": true,
+                "old_to501_changed_members": 54,
+                "base_science_selection_unchanged": true
+              },
+              {
+                "target": "f110",
+                "reconstructed7a2_sha256": "1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9",
+                "downloaded501_sha256": "BF56CE16F633C887B80B8F24F3662EA534253971515E0E95BE37C159DEA143AC",
+                "correction2e2035_matches_downloaded501": true,
+                "old_to501_changed_members": 54,
+                "base_science_selection_unchanged": true
+              }
+            ],
+            "changed_members": "Each edition changes54members: changelog, info, target module, compatibility/science_bindings.lua and50 Library locale files. Info differs only in version and target only in distribution_version; migration names/bytes and all other Lua members are unchanged. The science diff changes F210 K2SO phase selection/guards only; pinned Lupa2.6/lua52 comparisons of the complete M.select tables match for each reduced target's exact Base-only engine pin.",
+            "correction_exclusion": "runtime/catalogue.lua, runtime/bootstrap.lua and runtime/library.lua are absent from all seven reduced closures. Fresh2e2035 packages and the separate8aea Settings-search correction packages each match downloaded501 at private source5.0.1. These are separate branch readbacks, not an integrated or5.0.2 release freeze.",
+            "applicability": "No altered reduced player-state implementation input was identified for the original7a2 earned-effect/mining/queue/save observations in the Base-only named routes. Retain those observations under their original execution identities. Changed archive versions, package/locale parsing and public API version results require final exact-package review; this does not relabel old native executions501 or qualify unselected mod closures.",
+            "receipts": [
+              {
+                "path": "build/qualification/aero-migration-501-inputs-r01/historical-seven-member-comparison.json",
+                "sha256": "804B1EC08184F6BDB354FBB31C4C53875C20796BEBD6CDCBED1DDCE299C77F39"
+              },
+              {
+                "path": "build/qualification/aero-migration-501-inputs-r01/reduced-science-binding-readback.json",
+                "sha256": "E606F4F02F7191A4C9A8159D885B11CF600BF38E2BC5A625122F0D8271243830"
+              },
+              {
+                "path": "build/qualification/aero-migration-501-inputs-r01/reduced-metadata-and-migrations-readback.json",
+                "sha256": "C493C7EC1D6B162BE60B55800C4A986C99C6294D6B593F97FEF8B2736DA0AFB4"
+              },
+              {
+                "path": "build/qualification/aero-migration-501-inputs-r01/correction2e2035-reduced-byte-readback.json",
+                "sha256": "CFFFEC458AB389848550725F6066875D9781C67436B5C5AA327FDD0D9DAA431F"
+              },
+              {
+                "path": "build/qualification/aero-migration-501-inputs-r01/correction8aea-reduced-byte-readback.json",
+                "sha256": "1BD03359D3342B51B985B9D12A10B1A4E34F1F2AC348DF0D061609C53BD98D97"
+              }
+            ],
+            "reader_adverse": "The first science comparison imported the default lupa.lua_type, which does not recognize lua52 tables; cross-runtime object identity falsely rejected F013. The engine-specific lua52 reader corrects that local reader error. first-science-reader-refusal.json is retained; it is not a product or native failure.",
+            "native_processes": 0
+          },
+          "remaining_executable_work": [
+            {
+              "obligation": "Final seven reduced edition identities",
+              "independent_expectation": "Exact minimum engine, mod identity, cumulative migration names, API distribution version and package/tag/changelog codec agree.",
+              "next_check": "Review the exact integrated release freeze, its version-sensitive fixtures and archive/member deltas; reuse only unaffected original state observations and execute affected package/engine paths.",
+              "owner": "Aero package/applicability review; Black Glass native execution"
+            },
+            {
+              "obligation": "Modern named migration and ownership paths",
+              "independent_expectation": "Retain the named earned/current/queued/suspended/foreign-state and two-reload expectations; preserve MIR-created braking rows while excluding foreign-created collisions.",
+              "next_check": "Review final F200/F210 consumed inputs; qualify corrected runtime creation-history parsing, Library/cap membership and affected configuration/save/client paths. Current501/source-correction controls do not complete this native check.",
+              "owner": "Black Glass native queue; Aero independent expectations/review"
+            },
+            {
+              "obligation": "Public beta to corrected successor",
+              "independent_expectation": "Preserve actually earned personal/save state and legacy explicit/retained Settings search under protected5.0.0/5.0.1 source inputs.",
+              "next_check": "Select existing protected beta saves and affected exact candidate upgrade/reload/client/Library checks; no source-save recreation or invented provenance.",
+              "owner": "Black Glass packet/execution; Aero review"
+            }
+          ],
+          "limits": "CONT-11/13 remain partial; inventory_complete remains false. No source save, native process, fixture/controller, original result, request decision or support contract is changed. Full catalogue/settings/client/performance and final release verdicts are independent."
         }
       ],
       "test_subjects": [
@@ -3926,9 +4188,9 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Complete full relevant earned/current/queued catalogue-state and migration reconciliation beyond the seven passing bounded predecessor chains.",
-        "Qualify Imersite hidden carriers through removal/readdition and complete migration filename/state reconciliation.",
-        "Reconcile separate MIR-version, Factorio-version, Base/Space Age and modset-change migration axes for the exact named/popular profiles; existing same-engine predecessor tests do not cover the other axes."
+        "Apply the exact final-candidate consumed-input review to the named nine4.7.3 same-edition routes, seven selected older-contract groups, four published-forward journeys and five separately recorded transition dispositions; preserve each original scope, protected source and adverse identity.",
+        "Complete affected current catalogue/settings/ownership/save/client checks beyond the bounded named routes, including the corrected modern braking-creation boundary; direct Imersite/K2SE fixture-owned results do not establish arbitrary removal/readdition or foreign-rights repair.",
+        "Qualify affected public5.0.0/5.0.1-to-successor state and final package/API/version identities. Execute specifically admitted engine/DLC/provider changes only with their protected route/oracle; unselected permutations carry no blanket support claim."
       ]
     },
     {
@@ -7137,6 +7399,12 @@
             "The old packages have no unified more-infinite-research.api interface. Current v1 query API is additive; exact native API/client qualification remains pending."
           ],
           "limits": "No new gameplay, native/save/client/performance or all-target parity pass. F018 inherits the reduced F100 implementation; its active independent verification is package metadata and a basic0.18.47 native load smoke. Separate predecessor, modpack, client and performance campaigns remain best effort under the later maintainer decision. CONT-13 remains partial."
+        },
+        {
+          "id": "selected-migration-scope-current-inputs-2026-11-02",
+          "evidence": "spec/inventory/migration-origins.json",
+          "related_record": "CONT-11 selected-migration-queue-and-reduced-input-review-2026-11-02",
+          "scope": "Use CONT-11 selected-migration-queue-and-reduced-input-review-2026-11-02 for the nine/seven/four named-route reconciliation, preserved five transition dispositions and bounded seven-edition package/science input review. The older adjacent-axis list below remains historical inventory, not an additional every-adjacent stable campaign or a substitute for the four published-origin journeys. Final affected package/native qualification remains open."
         }
       ],
       "test_subjects": [
@@ -7145,48 +7413,59 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Run final current-package and affected native checks for the nine stable editions; apply the explicit metadata/load-smoke-only F018 and other best-effort support limits.",
-        "Prioritize exact current F2102.1.23 acceptance while preserving F2002.0.77 and all seven historical-edition obligations; report each tested subset and remaining gaps without relabelling earlier receipts.",
-        "Qualify actual game-version save hops and Base/Space Age transitions above; fresh worlds and same-engine MIR upgrades are separate evidence."
+        "Review final current-package identities and affected native checks for all nine stable editions, preserving the explicit experimental metadata/load-smoke-only F018 and early best-effort limits.",
+        "Prioritize final F2102.1.23 and F2002.0.77 acceptance while preserving the seven reduced obligations and original named-route evidence; no final candidate or release pass follows from a matching private package.",
+        "Close the affected named engine/provider/preference and public-beta-to-successor checks under the existing finite migration matrix. Unselected adjacent/DLC/provider axes remain unverified without a support claim, not additional campaigns or passed routes."
       ],
       "version_transition_coverage": {
-        "status": "not-established",
-        "distinction": "Existing historical published-MIR-to-MIR5 transitions use the same Factorio binary. They do not qualify any Factorio engine-version save hop.",
+        "status": "named-routes-closed-at-recorded-inputs-final-candidate-applicability-open",
+        "distinction": "Same-engine MIR upgrades, selected published-origin engine journeys and DLC/provider changes retain separate observations. The nine/seven/four selected boundaries and five named transition dispositions live in migration-origins.json; none grants arbitrary engine hops or DLC switches.",
         "adjacent_game_version_save_hops_required": [
           {
             "from": "0.13.20",
             "to": "0.14.23",
-            "status": "unrun-requires-supported-save-route-and-exact-profile"
+            "status": "unselected-adjacent-axis-unverified-no-blanket-support-claim",
+            "prior_inventory_status": "unrun-requires-supported-save-route-and-exact-profile"
           },
           {
             "from": "0.14.23",
             "to": "0.15.40",
-            "status": "unrun-requires-supported-save-route-and-exact-profile"
+            "status": "unselected-adjacent-axis-unverified-no-blanket-support-claim",
+            "prior_inventory_status": "unrun-requires-supported-save-route-and-exact-profile"
           },
           {
             "from": "0.15.40",
             "to": "0.16.51",
-            "status": "unrun-requires-supported-save-route-and-exact-profile"
+            "status": "unselected-adjacent-axis-unverified-no-blanket-support-claim",
+            "prior_inventory_status": "unrun-requires-supported-save-route-and-exact-profile"
           },
           {
             "from": "0.16.51",
             "to": "0.17.79",
-            "status": "unrun-requires-supported-save-route-and-exact-profile"
+            "status": "unselected-adjacent-axis-unverified-no-blanket-support-claim",
+            "prior_inventory_status": "unrun-requires-supported-save-route-and-exact-profile"
           },
           {
             "from": "0.17.79",
             "to": "1.0.0",
-            "status": "unrun-requires-supported-save-route-and-exact-profile"
+            "status": "unselected-adjacent-axis-unverified-no-blanket-support-claim",
+            "prior_inventory_status": "unrun-requires-supported-save-route-and-exact-profile"
           },
           {
             "from": "1.0.0",
             "to": "1.1.110",
-            "status": "unrun-requires-supported-save-route-and-exact-profile"
+            "status": "named-f100-f110-routes-closed-at-recorded-inputs-final-applicability-open",
+            "prior_inventory_status": "unrun-requires-supported-save-route-and-exact-profile",
+            "current_evidence": [
+              "spec/evidence/f100-f110-laser-native-chain-r03.json",
+              "spec/evidence/published473-f100-f110-native-chain-r01.json"
+            ],
+            "scope": "Keep the MIR5 laser-rename and direct published4.7.3-origin journeys distinct; neither qualifies arbitrary F100 saves or final changed inputs."
           },
           {
             "from": "1.1.110",
             "to": "2.0.77",
-            "status": "unrun-requires-supported-save-route-and-exact-profile",
+            "status": "named-published473-f110-f200-route-closed-at-recorded-inputs-final-applicability-open",
             "required_native_witness": {
               "technology": "inserter-capacity-bonus-8",
               "source_effects": [
@@ -7214,18 +7493,23 @@
                 "spec/inventory/modern-f200-470.json"
               ],
               "scope": "The tracked F110 historical capture and F200 published catalogue establish an actual engine effect-token replacement, not a missing MIR identity or a new native pass. Preserve earned source levels and the same technology ID, observe the expected F200 effective bulk-inserter contribution, save the candidate and verify two cold reloads. Do not restore the unsupported 1.1 effect token on2.0 or relabel same-engine MIR upgrades as this game-version transition."
-            }
+            },
+            "prior_inventory_status": "unrun-requires-supported-save-route-and-exact-profile",
+            "current_evidence": "spec/evidence/f110-f200-current7a2-native-chain-r01.json",
+            "scope": "The published-origin route preserves the recorded inserter2/stack-or-bulk4 witness and state under its actual D524/65FC/D3 inputs; no blanket MIR5-to-MIR5 engine-update claim."
           },
           {
             "from": "2.0.77",
             "to": "2.1.23",
-            "status": "exact-4.7.20003-source-and-corrected-F210-successor-prepared-native-unrun",
+            "status": "named-published473-f200-base-to-f210-base-closed-at-recorded-inputs-final-applicability-open",
             "profiles": [
               "tests/profiles/full-catalogue-cross-f200-f210-published-f200-2077.json",
               "tests/profiles/full-catalogue-cross-f200-f210-mir5-f210-2123.json"
             ],
             "fixture_code_commit": "3664d87b8e732be037bdb65167c13ee9d62f0a59",
-            "scope": "Prepared direct published4.7.20003 F200 Base to MIR5 F210 Base route only; this does not qualify MIR5-to-MIR5 game updates, other closures or any native save migration."
+            "scope": "The later actual named published4.7.20003 Base to MIR5 F2107a2/005D/8DC result supersedes this preparation-only pending description. Other closures, MIR5-to-MIR5 changes and final corrected inputs remain separate.",
+            "prior_inventory_status": "exact-4.7.20003-source-and-corrected-F210-successor-prepared-native-unrun",
+            "current_evidence": "spec/evidence/full-catalogue-473-f200-current7a2-native-chain-r01.json"
           }
         ],
         "official_mod_save_transitions_required": [
@@ -7233,30 +7517,36 @@
             "engine": "2.0.77",
             "from": "Base",
             "to": "Space Age",
-            "status": "unrun-requires-supported-route-and-state-oracle"
+            "status": "unselected-permutation-unverified-no-blanket-support-claim",
+            "prior_inventory_status": "unrun-requires-supported-route-and-state-oracle"
           },
           {
             "engine": "2.0.77",
             "from": "Space Age",
             "to": "Base",
-            "status": "unrun-requires-supported-route-and-state-oracle"
+            "status": "unselected-permutation-unverified-no-blanket-support-claim",
+            "prior_inventory_status": "unrun-requires-supported-route-and-state-oracle"
           },
           {
             "engine": "2.1.23",
             "from": "Base",
             "to": "Space Age",
-            "status": "unrun-requires-supported-route-and-state-oracle"
+            "status": "unselected-permutation-unverified-no-blanket-support-claim",
+            "prior_inventory_status": "unrun-requires-supported-route-and-state-oracle"
           },
           {
             "engine": "2.1.23",
             "from": "Space Age",
             "to": "Base",
-            "status": "unrun-requires-supported-route-and-state-oracle"
+            "status": "unselected-permutation-unverified-no-blanket-support-claim",
+            "prior_inventory_status": "unrun-requires-supported-route-and-state-oracle"
           }
         ],
         "per_edition_worlds": "Base on every delivered edition; Base and Space Age plus relevant independently enabled official capabilities on F200/F210. Expansion-only cases are inapplicable on historical engines, not passed there.",
-        "required_state": "Preserve original saves and check earned effects/levels, current and queued/suspended work, carriers, foreign state, native capability changes, save and two cold reloads at each accepted hop.",
-        "upstream_limits": "Use the actual supported stepping route. A demonstrated engine/upstream refusal preserves the source and requires an explicit supported/unsupported disposition; never relabel it as a passed upgrade."
+        "required_state": "For each selected/admitted route preserve original saves and check earned effects/levels, current and queued/suspended work, carriers, foreign state, native capability changes, save and two cold reloads; do not infer inverse transitions or arbitrary support from a named pass.",
+        "upstream_limits": "Use the actual supported stepping route. A demonstrated engine/upstream refusal preserves the source and requires an explicit supported/unsupported disposition; never relabel it as a passed upgrade.",
+        "selection_authority": "spec/migrations.md MIG-05; migration_execution_matrix.completion_queue_5_0_0.explicit_published_forward_routes_2026_10_29 and permitted_limits. Original request text and implementation interpretation remain distinct there.",
+        "historical_axis_list_disposition": "The following earlier *_required arrays are retained with their prior observations for custody, not as an additional all-adjacent/all-DLC release queue. Execute selected/admitted routes under the current matrix; an unrun axis is not passed."
       }
     },
     {
@@ -8780,10 +9070,12 @@
             "current_host_controls": [
               "tests/test_settings_profile.py",
               "tests/test_settings_commands.py",
-              "tests/test_library_model.py"
+              "tests/test_library_model.py",
+              "tests/test_settings_profile.py::test_settings_queries_and_runtime_profile_facade_work_after_module_loading_closes",
+              "tests/test_settings_profile.py::test_settings_descriptors_remain_stable_after_caller_mutation_and_parse_closure"
             ],
             "original_evidence": [],
-            "remaining_executable_check": "Review current host coverage of catalogue immutability and callback-time availability; retain or port an independent rejection control if that expectation is missing. The old compiler-profile eager-use assertion itself needs no replacement.",
+            "remaining_executable_check": "The eight-control settings suite now directly covers parse-closed queries/runtime profile export/validation and detached descriptor stability; four ephemeral source opponents are rejected, while the six prior controls accept each opponent. This closes the selected host-port gap only. Preserve the retired compiler-profile transport/fingerprint as implementation history; qualify actual nondefault native settings/Library/API output, configuration/load/client behavior and exported files on the affected final candidate.",
             "owner": {
               "reconciliation": "Aero",
               "native": "Black Glass"
@@ -10591,6 +10883,303 @@
           "references": 7,
           "scope": "Correct new Git-tag labels only. Original submitted commits, all127 commit/path/blob/hash references, authored decisions, original API freeze and remaining applicability/unknown-consumer obligations are retained."
         }
+      },
+      {
+        "subjects": [
+          "CONT-04",
+          "CONT-06"
+        ],
+        "reviewed_on": "2026-11-02",
+        "reviewed_against": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+        "scope": "Recipe productivity permission wrapper, Lua fixture and Python runner only. Three unique selected test blobs recur unchanged at eleven indexed releases v4.4.0 through v4.7.3; other selected trees do not list these paths. This does not disposition inter-release history, discussions or all product/override tests.",
+        "method": "Deduplicate the existing 91-tag object index by Git blob, inspect all three test sources and their independently pinned v4.2.2/v4.3.0 productivity declarations. Port behavioral assertions into the current Generator/collector path; do not execute or restore the retired compiler harness.",
+        "sources": [
+          {
+            "path": "tests/compiler/Test-MIRRecipeProductivityPermissions.ps1",
+            "references": [
+              {
+                "tag": "v4.4.0",
+                "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.4.1",
+                "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.4.2",
+                "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.5.0",
+                "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.5.1",
+                "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.5.2",
+                "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.6.0",
+                "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.7.0",
+                "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.7.1",
+                "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.7.2",
+                "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              },
+              {
+                "tag": "v4.7.3",
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "e8459d6f4d10f7f4896dfae9b9eef414025484e9"
+              }
+            ],
+            "sha256": "45CDEF8D105707793D291F7327869AA66DC6FC2C74634845167865E48E17F285"
+          },
+          {
+            "path": "tests/compiler/recipe_productivity_permissions.lua",
+            "references": [
+              {
+                "tag": "v4.4.0",
+                "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.4.1",
+                "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.4.2",
+                "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.5.0",
+                "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.5.1",
+                "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.5.2",
+                "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.6.0",
+                "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.7.0",
+                "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.7.1",
+                "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.7.2",
+                "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              },
+              {
+                "tag": "v4.7.3",
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "3d65d3c366ceb0677b043d6dd240350ed1e8aadc"
+              }
+            ],
+            "sha256": "477A6925BED2A7B52A270352B45582620CDEAE5349526591AA636BD589EF5770"
+          },
+          {
+            "path": "tests/compiler/run_recipe_productivity_permissions_controls.py",
+            "references": [
+              {
+                "tag": "v4.4.0",
+                "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.4.1",
+                "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.4.2",
+                "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.5.0",
+                "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.5.1",
+                "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.5.2",
+                "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.6.0",
+                "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.7.0",
+                "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.7.1",
+                "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.7.2",
+                "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              },
+              {
+                "tag": "v4.7.3",
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "blob": "a502c05016d2d56b9961c46b4441f1cf455aec78"
+              }
+            ],
+            "sha256": "0B7F9989CBB28A7C3A6C00DC8D9835D7BFD1FAB0369B51BD53C133624FCEA375"
+          }
+        ],
+        "original_declarations": [
+          {
+            "tag": "v4.2.2",
+            "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+            "path": "source/prototypes/streams/productivity.lua",
+            "blob": "893d515e4c2561790f2c8165ff6ed6c9eb3cf0df",
+            "sha256": "622090A88894EECEC068B8EEF8C3663BDDC737728ACD7A47EA36B6671BD902E6"
+          },
+          {
+            "tag": "v4.3.0",
+            "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+            "path": "source/prototypes/streams/productivity.lua",
+            "blob": "893d515e4c2561790f2c8165ff6ed6c9eb3cf0df",
+            "sha256": "622090A88894EECEC068B8EEF8C3663BDDC737728ACD7A47EA36B6671BD902E6"
+          }
+        ],
+        "groups": [
+          {
+            "subjects": [
+              "CONT-04",
+              "CONT-06"
+            ],
+            "disposition": "port",
+            "historical_paths": [
+              "tests/compiler/Test-MIRRecipeProductivityPermissions.ps1",
+              "tests/compiler/recipe_productivity_permissions.lua",
+              "tests/compiler/run_recipe_productivity_permissions_controls.py"
+            ],
+            "independent_expectation": "The published mining family emits burner/electric/big-drill effects at 0.20/0.10/0.05 and its named/pattern drill alternatives at 0.05, including explicitly denied or zero-cap recipes, without granting their upstream productivity permission or changing ore yield. Only the three authored Space Age permission rows (capture-robot-rocket, ice-platform, space-platform-foundation) grant permission when that catalogue is selected. Preserve unrelated fields and refuse a missing required recipe before partial writes.",
+            "current_implementation": [
+              "source/research/modern.lua",
+              "source/compatibility/modern_catalogue/space_age.lua",
+              "source/compatibility/product_bindings.lua",
+              "source/compatibility/product_targets.lua",
+              "source/research/product_target_extension.lua"
+            ],
+            "current_host_controls": [
+              "tests/test_generator.py::test_mining_effects_preserve_published_denial_policy_without_granting_recipe_permissions",
+              "tests/test_generator.py::test_space_age_recipe_permissions_have_exact_scope_and_preflight_before_writes",
+              "tests/test_generator.py::test_full_modern_catalogue_is_lazy_bounded_and_declares_exact_owners",
+              "tests/test_product_target_extension.py::test_published_pattern_groups_preserve_weights_settings_and_explicit_routes",
+              "tests/test_product_targets.py::test_unsupported_shapes_and_explicit_productivity_denial_withhold_only_that_recipe"
+            ],
+            "original_evidence": [],
+            "remaining_executable_check": "On an admitted final-candidate profile, observe the affected recipe productivity permissions and physical drill/Space Age product output with upstream permission/cap settings retained. Review current consumed inputs against existing product/override native chains before reuse; execute affected cross-override and nondefault settings cases only. The synthetic se-core-miner-drill name tests a published pattern, not an installed Space Exploration closure or support for combining it with Space Age. Black Glass owns native admission/execution; no new native profile is invented by this host port.",
+            "owner": {
+              "reconciliation": "Aero",
+              "native": "Black Glass"
+            },
+            "limits": "Current player source already passes the ported boundaries; no product defect or correction is claimed. The two new controls use Base/Space Age selection in a Lua 5.2 host model with 2.1.23 mod labels, not either engine execution. Generic strict product rules continue rejecting denied recipes; the mining family retains its independently authored exception."
+          },
+          {
+            "subjects": [
+              "CONT-04",
+              "CONT-06"
+            ],
+            "disposition": "obsolete-implementation-only",
+            "historical_paths": [
+              "tests/compiler/Test-MIRRecipeProductivityPermissions.ps1",
+              "tests/compiler/recipe_productivity_permissions.lua",
+              "tests/compiler/run_recipe_productivity_permissions_controls.py"
+            ],
+            "independent_expectation": "A maintained host entrypoint must exercise the actual permission/effect behavior and reject the old unsupported implicit-only drill gate. Old private stream-registry/planner/module paths, exact assertion totals and report fields are not player behavior.",
+            "current_implementation": [
+              "tests/Test-MIR5HostControls.ps1"
+            ],
+            "current_host_controls": [
+              "tests/test_generator.py::test_mining_effects_preserve_published_denial_policy_without_granting_recipe_permissions",
+              "tests/test_generator.py::test_space_age_recipe_permissions_have_exact_scope_and_preflight_before_writes"
+            ],
+            "original_evidence": [],
+            "remaining_executable_check": "No retired compiler or generated receipt is restored or rerun. Keep the live host driver and the behavioral controls; native output acceptance remains in the retained group above.",
+            "owner": {
+              "reconciliation": "Aero",
+              "native": "Black Glass"
+            },
+            "limits": "The historical normal/expensive fixture locations are not copied into modern 2.x recipe schemas. No recipe-productivity feature is added to reduced historical targets by this disposition."
+          }
+        ],
+        "host_verification": {
+          "suite": "tests/test_generator.py",
+          "passed": 45,
+          "new_controls": 2,
+          "runtime": "lupa.lua52 from pinned mir421-lua-runtime",
+          "native_processes": 0
+        },
+        "negative_controls": {
+          "method": "Separate Lua runtimes with ephemeral module/rule mutations; tracked player source stays unchanged.",
+          "opponents": [
+            "reject-denied-drill-effects",
+            "grant-mining-permissions",
+            "write-permissions-before-preflight"
+          ],
+          "prior_controls_accept_each_opponent": 43,
+          "all_rejected_at_expected_boundary": true,
+          "limits": "Injected opponents establish control sensitivity; they are not observed defects in the current candidate."
+        },
+        "custody": "build/qualification/aero-recipe-permissions-r01/",
+        "remaining_executable_check": "On an admitted final-candidate profile, observe the affected recipe productivity permissions and physical drill/Space Age product output with upstream permission/cap settings retained. Review current consumed inputs against existing product/override native chains before reuse; execute affected cross-override and nondefault settings cases only. The synthetic se-core-miner-drill name tests a published pattern, not an installed Space Exploration closure or support for combining it with Space Age. Black Glass owns native admission/execution; no new native profile is invented by this host port.",
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false
       }
     ],
     "stable_coverage_review": {
@@ -10837,6 +11426,100 @@
       "record": "subjects[CONT-10].report_options_restoration_review",
       "disposition": "port",
       "whole_historical_source_reconciliation_complete": false,
+      "native_execution": false
+    },
+    "settings_catalogue_lifecycle_port_review": {
+      "reviewed_on": "2026-11-02",
+      "reviewed_against": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "subjects": [
+        "CONT-03",
+        "CONT-14"
+      ],
+      "disposition": "port",
+      "historical_sources": [
+        {
+          "path": "tests/runtime/Test-MIRSettingsCatalogueLifecycle.ps1",
+          "blob": "8c0f1671ee2edb665921a58dc4afa6c1de6fcf34",
+          "sha256": "32CB3920474292CCA7A9633B29C97FC8A28E3537C319501318E9EFDB6042D965",
+          "release_tags": [
+            "v4.4.0",
+            "v4.4.1",
+            "v4.4.2",
+            "v4.5.0",
+            "v4.5.1",
+            "v4.5.2",
+            "v4.6.0",
+            "v4.7.0",
+            "v4.7.1",
+            "v4.7.2",
+            "v4.7.3"
+          ]
+        },
+        {
+          "path": "tests/runtime/run_settings_catalogue_lifecycle_controls.py",
+          "blob": "401f5da14fc440762d02e8aa169d8e6590082e59",
+          "sha256": "EDB484EC842F6AB74777522D8E166E80541329C7A08F0AD0B99ACC4398377411",
+          "release_tags": [
+            "v4.4.0",
+            "v4.4.1",
+            "v4.4.2",
+            "v4.5.0",
+            "v4.5.1",
+            "v4.5.2",
+            "v4.6.0",
+            "v4.7.0",
+            "v4.7.1",
+            "v4.7.2",
+            "v4.7.3"
+          ]
+        }
+      ],
+      "deduplication": "Two unique blobs across eleven selected release tags v4.4.0 through v4.7.3. The two paths are absent from the other eighty selected tag trees. This does not cover inter-release removals or other helpers/discussions.",
+      "independent_expectation": "Original fixed_lifecycle closes require after control parsing, then reads the unchanged catalogue/spec/default/validation and runtime provider; old_shape_must_fail rejects a callback-time compiler-profile require. RUN-04/SET-04 retain usable runtime settings/profile consumers and one settings authority. The new mutation control strengthens the same catalogue-stability/read-only boundary; it is not described as an assertion present in the old runner.",
+      "implementation": [
+        "source/research/settings.lua",
+        "source/runtime/settings_profile.lua"
+      ],
+      "current_host_controls": [
+        "tests/test_settings_profile.py::test_settings_queries_and_runtime_profile_facade_work_after_module_loading_closes",
+        "tests/test_settings_profile.py::test_settings_descriptors_remain_stable_after_caller_mutation_and_parse_closure"
+      ],
+      "host_result": {
+        "suite": "tests/test_settings_profile.py",
+        "passed": 8,
+        "new_controls": 2,
+        "runtime": "lupa.lua52 from pinned mir421-lua-runtime",
+        "native_processes": 0
+      },
+      "negative_controls": {
+        "method": "Ephemeral preloaded source strings in separate Lua runtimes; no tracked player source edits.",
+        "all_rejected_at_expected_boundary": true,
+        "opponents": [
+          "callback-time-catalogue-import",
+          "shared-setting-spec",
+          "shared-standalone-prototype",
+          "callback-time-profile-import"
+        ],
+        "prior_controls_accept_each_opponent": 6,
+        "limits": "Injected opponents demonstrate sensitivity of the new controls, not an observed defect in current player source."
+      },
+      "obsolete_implementation_only": [
+        "Old compiler-profile eager-import source shape and retired provider runtime_settings_bindings transport.",
+        "Old fingerprint implementation; compare public descriptor data directly without restoring the compiler framework."
+      ],
+      "custody": "build/qualification/aero-settings-parse-lifecycle-r01/",
+      "remaining_executable_check": "The eight-control settings suite now directly covers parse-closed queries/runtime profile export/validation and detached descriptor stability; four ephemeral source opponents are rejected, while the six prior controls accept each opponent. This closes the selected host-port gap only. Preserve the retired compiler-profile transport/fingerprint as implementation history; qualify actual nondefault native settings/Library/API output, configuration/load/client behavior and exported files on the affected final candidate.",
+      "owner": "Aero owns this bounded historical/host mapping; Black Glass reviews/integrates and owns affected native qualification.",
+      "source_reconciliation_complete": false,
+      "test_intent_reconciliation_complete": false,
+      "native_execution": false,
+      "limits": "No player source/package, published migration, original request record, native result identity or release verdict changes. This is not complete settings, API, Library or VER-07 acceptance."
+    },
+    "cap_runtime_consumer_review": {
+      "subject": "CONT-07",
+      "record": "subjects[CONT-07].runtime_creator_cap_consumption_review",
+      "disposition": "port",
+      "whole_source_reconciliation_complete": false,
       "native_execution": false
     }
   }

@@ -210,6 +210,83 @@ class SettingsProfileTests(unittest.TestCase):
           assert(invalid.valid == false and invalid.error == "profile string decoding failed")
         ''')
 
+    def test_settings_queries_and_runtime_profile_facade_work_after_module_loading_closes(self):
+        # Port the published settings-catalogue lifecycle regression without
+        # restoring its retired compiler-profile/provider transport.
+        self.lua.execute(r'''
+          local names, prototypes = config.registered_names(), config.prototypes()
+          settings.startup[config.import_setting_name].value = "MIRSET1:lifecycle"
+          decoded.lifecycle = {schema=1, settings={
+            ["ips-enable-research_gears"] = false,
+            ["ips-research-time-research_gears"] = 0,
+            ["ips-cost-base-research_gears"] = 777
+          }}
+          require = function(name) error("post-parse require: " .. tostring(name)) end
+          game = setmetatable({}, {__index=function() error("settings query read game") end})
+          storage = setmetatable({}, {__index=function() error("settings query read storage") end,
+            __newindex=function() error("settings query wrote storage") end})
+
+          local after_names, after_prototypes = config.registered_names(), config.prototypes()
+          assert(#after_names == #names and #after_prototypes == #prototypes)
+          for index, name in ipairs(names) do
+            assert(after_names[index] == name)
+            local spec = config.spec(name)
+            assert(spec.name == name and config.default_value(name) == spec.default_value)
+            assert(config.validate_value(name, spec.default_value))
+          end
+          local effective = config.effective_values(settings.startup, helpers)
+          assert(effective["ips-enable-research_gears"] == false)
+          assert(effective["ips-research-time-research_gears"] == 0)
+          assert(effective["ips-cost-base-research_gears"] == 777)
+          local status = facade.validate_string("MIRSET1:lifecycle")
+          assert(status.valid and status.recognized == 3 and status.invalid == 0 and status.unknown == 0)
+          local wire, err = facade.export_string({compact=false})
+          assert(not err and wire:sub(1,8) == "MIRSET1:")
+          assert(last_encoded:find('"ips-enable-research_gears":false',1,true))
+          assert(last_encoded:find('"ips-research-time-research_gears":0',1,true))
+          assert(last_encoded:find('"ips-cost-base-research_gears":777',1,true))
+          assert(settings.startup[config.import_setting_name].value == "MIRSET1:lifecycle")
+          assert(settings.startup["ips-enable-research_gears"].value == true)
+        ''')
+
+    def test_settings_descriptors_remain_stable_after_caller_mutation_and_parse_closure(self):
+        self.lua.execute(r'''
+          local function copy(value)
+            if type(value) ~= "table" then return value end
+            local result = {}
+            for key, child in pairs(value) do result[key] = copy(child) end
+            return result
+          end
+          local function same(actual, expected)
+            assert(type(actual) == type(expected), "descriptor type changed")
+            if type(expected) ~= "table" then assert(actual == expected, "descriptor value changed"); return end
+            for key, child in pairs(expected) do same(actual[key], child) end
+            for key in pairs(actual) do assert(expected[key] ~= nil, "descriptor gained a field") end
+          end
+          local function mutate(value)
+            for key, child in pairs(value) do
+              if type(child) == "table" then mutate(child)
+              elseif type(child) == "string" then value[key] = "caller-mutated"
+              elseif type(child) == "number" then value[key] = child + 1
+              elseif type(child) == "boolean" then value[key] = not child end
+            end
+          end
+          local names = copy(config.registered_names())
+          local prototypes = copy(config.prototypes())
+          local specs = {}
+          for _, name in ipairs(names) do specs[name] = copy(config.spec(name)) end
+          require = function(name) error("post-parse require: " .. tostring(name)) end
+          mutate(config.registered_names())
+          mutate(config.prototypes())
+          for _, name in ipairs(names) do mutate(config.spec(name)) end
+          same(config.registered_names(), names)
+          same(config.prototypes(), prototypes)
+          for _, name in ipairs(names) do
+            same(config.spec(name), specs[name])
+            assert(config.default_value(name) == specs[name].default_value)
+          end
+        ''')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
