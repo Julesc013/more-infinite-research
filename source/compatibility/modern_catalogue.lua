@@ -1061,13 +1061,59 @@ local function append_native_weapon_categories(row, raw)
   end
 end
 
-local PRESERVED_FOREIGN_CONTINUATIONS = { ["braking-force-8"] = true }
+-- These six optional extensions share native research names. Other authored
+-- research and private paid holders never receive skip-if-present authority.
+function M.continuation_names(active_mods)
+  local names = {}
+  for index, row in ipairs(CONTINUATIONS) do names[index] = row.id end
+  if target.id == "f210" and type(active_mods) == "table" and active_mods.Muria ~= nil then
+    names[#names + 1] = "weapon-shooting-speed-9"
+  end
+  return names
+end
+
+local function positive(value)
+  return type(value) == "number" and value == value and value > 0 and value < math.huge
+end
+
+local function existing_infinite_owner(row, technology)
+  if type(technology) ~= "table" or technology.type ~= "technology"
+      or technology.name ~= row.id or technology.max_level ~= "infinite" then return false end
+  if technology.level ~= nil and technology.level ~= row.level then return false end
+  local anchored = false
+  for _, name in ipairs(technology.prerequisites or {}) do
+    if name == row.predecessor then anchored = true end
+  end
+  if not anchored then return false end
+  local unit = technology.unit
+  if type(unit) ~= "table" or not positive(unit.time) or type(unit.ingredients) ~= "table"
+      or #unit.ingredients == 0 then return false end
+  if unit.count ~= nil then
+    if not positive(unit.count) or unit.count ~= math.floor(unit.count) or unit.count_formula ~= nil then return false end
+  elseif type(unit.count_formula) ~= "string" or unit.count_formula == "" then return false end
+  for _, ingredient in ipairs(unit.ingredients) do
+    if type(ingredient) ~= "table" or type(ingredient[1]) ~= "string" or ingredient[1] == ""
+        or not positive(ingredient[2]) or ingredient[2] ~= math.floor(ingredient[2]) then return false end
+  end
+  if type(technology.effects) ~= "table" then return false end
+  for _, expected in ipairs(row.effects) do
+    local found = false
+    for _, effect in ipairs(technology.effects) do
+      if type(effect) == "table" and effect.type == expected.type
+          and effect.ammo_category == expected.ammo_category and positive(effect.modifier) then found = true end
+    end
+    if not found then return false end
+  end
+  return true
+end
 
 function M.omit_existing_continuations(rows, technology_prototypes)
   if technology_prototypes == nil then return rows end
+  local shared = {}
+  for _, row in ipairs(CONTINUATIONS) do shared[row.id] = true end
   local retained = {}
   for _, row in ipairs(rows) do
-    if not (PRESERVED_FOREIGN_CONTINUATIONS[row.id] and technology_prototypes[row.id] ~= nil) then
+    if not (shared[row.id] and technology_prototypes[row.id] ~= nil) then
       retained[#retained + 1] = row
     end
   end
@@ -1076,12 +1122,6 @@ end
 
 function M.continuations(active_mods, raw)
   local rows = copy(CONTINUATIONS)
-  -- Preserve the reporter's existing train-braking continuation. Every other
-  -- same-name prototype still reaches Generator's duplicate rejection.
-  local existing_technologies = type(raw) == "table" and raw.technology
-  if type(existing_technologies) == "table" then
-    rows = M.omit_existing_continuations(rows, existing_technologies)
-  end
   local bob_angel_f210 = M.bob_angel_f210_profile(active_mods)
   local bob_angel_f200_combined = M.bob_angel_f200_combined_profile(active_mods)
   if M.is_bob_angel(active_mods) then
@@ -1168,6 +1208,22 @@ function M.continuations(active_mods, raw)
     if row.id == "weapon-shooting-speed-7" and M.is_ironclad(active_mods) then
       row.effects[#row.effects + 1] = require("compatibility.ironclad").continuation_effect()
     end
+    if row.id == "weapon-shooting-speed-7" and target.id == "f210"
+        and type(active_mods) == "table" and active_mods.Muria ~= nil then
+      require("compatibility.modern_catalogue.muria").weapon_continuation(row, raw)
+    end
+  end
+  -- Only meaningful, already-infinite native owners may replace these
+  -- optional extensions. Finite/malformed/unrelated collisions still reach
+  -- the unchanged Generator rejection. Runtime uses creation custody below
+  -- this admission boundary and never claims a foreign owner for caps.
+  local existing = type(raw) == "table" and raw.technology
+  if type(existing) == "table" then
+    local admitted = {}
+    for _, row in ipairs(rows) do
+      if existing_infinite_owner(row, existing[row.id]) then admitted[row.id] = true end
+    end
+    rows = M.omit_existing_continuations(rows, admitted)
   end
   if bob_angel_f200_combined or M.retains_bob_native_continuations(active_mods) then
     local retained = {}

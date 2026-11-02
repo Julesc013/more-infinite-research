@@ -221,7 +221,8 @@ function M.continuation(definition, values)
     level = definition.level, upgrade = true, hidden = false, max_level = "infinite", order = definition.order,
     prerequisites = continuation_prerequisites(definition), effects = continuation_effects(definition, stream),
     unit = {count_formula = continuation_formula(definition, stream), time = time,
-      ingredients = catalogue.science_ingredients(definition.science, definition.science_amounts)}
+      ingredients = definition.ingredients and copy(definition.ingredients)
+        or catalogue.science_ingredients(definition.science, definition.science_amounts)}
   }
   if definition.icon_size ~= nil then output.icon_size = definition.icon_size end
   if stream.enabled == false then output.enabled = false end
@@ -431,7 +432,7 @@ function M.apply_weapon_speed_overlap(selection, outputs, values)
   if next(categories) == nil then return end
   for index = 1, #outputs do
     local technology = outputs[index]
-    if technology.name == "weapon-shooting-speed-7" then
+    if technology.name == "weapon-shooting-speed-7" or technology.name == "weapon-shooting-speed-9" then
       local retained = {}
       for effect_index = 1, #technology.effects do
         local effect = technology.effects[effect_index]
