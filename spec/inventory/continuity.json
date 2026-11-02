@@ -8766,7 +8766,7 @@
           "PLAT-UI-01"
         ],
         "obligation": "Preserve explicit denials, engine exclusions and proposed UI scope as decisions, not missing implementation.",
-        "remaining": "Inspect original request decisions without rewriting IDs/text/status; a new acceptance decision would need explicit maintainer authority."
+        "remaining": "VEH-01/VEH-02 source/probe/report provenance and explicit nonadmission are reconciled in the bounded optional-runtime review below; original request IDs/text/decisions/status are unchanged. PIPE-01/PLAT-UI-01 and other original decision sources retain their own unresolved scope. A future acceptance decision requires maintainer authority; no experimental Car result becomes a delivered MIR5 service."
       },
       {
         "subjects": [
@@ -11562,7 +11562,7 @@
               "source/runtime/spoilage.lua",
               "source/runtime/spoilage_contribution.lua",
               "source/runtime/scripted_effects.lua",
-            "source/runtime/bootstrap.lua"
+              "source/runtime/bootstrap.lua"
             ],
             "host_controls": [
               "tests/test_spoilage.py::test_published_modifier_clamps_and_retirement_tolerance_remain_explicit",
@@ -11651,6 +11651,539 @@
         },
         "custody": "build/qualification/aero-global-runtime-intents-r01/",
         "qualification_limit": "This closes the selected two-module intent mapping and one current host coverage gap, not CONT-08/CONT-09 or VER-07 as a whole. No product discrepancy was demonstrated and no player source is changed. This is not native, literal mod/DLC removal, save/client, timing/memory, arbitrary-modpack or stable acceptance. Earlier records keep their actual identities and limitations.",
+        "native_execution": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-07",
+          "CONT-09",
+          "CONT-15"
+        ],
+        "reviewed_on": "2026-11-02",
+        "reviewed_against": "e8684eef60569f9b862e0663aaad99532e7defc0",
+        "parent_unit": "#1576; its original commit and exact-head CI remain preserved. This companion adds only the named lifecycle control and inventory disposition beyond that parent.",
+        "scope": "Six named optional/vehicle/native-worker test families across the retained91-tag index, four explicitly referenced original experimental reports, and only the two report-named unresolved source hashes. Other runtime roots, inter-release paths and proposed features are not declared reconciled.",
+        "method": "Deduplicate six tagged source bodies/84 retained tag references. Read the two native wrappers and their actual source/input guards. Recover exact earlier optional probe/harness bodies through a bounded four-blob search of only their known path aliases; no guessed version or newline normalization. Read native report scope/engine/source bindings before classifying evidence. Map delivered repair/cap invariants to current controls and retain proposal/nonadmission decisions without restoring experiments.",
+        "tag_commit_reference": "historical_preservation_audit.source_inventory.tag_commits",
+        "selected_tag_scope": 91,
+        "selected_tagged_blobs": 6,
+        "selected_tag_path_references": 84,
+        "selected_blob_variants": [
+          {
+            "blob": "353f0e7fe2a69621348474f4c7f16d2254c2913d",
+            "bytes": 4773,
+            "sha256": "25F467D2D54C8B62922066FF9DBBD35849381D2518F408738186D0139E799626",
+            "paths": [
+              "tests/runtime/Test-MIROptionalProbes.ps1"
+            ],
+            "tag_path_references": [
+              "v4.2.0-stable:tests/runtime/Test-MIROptionalProbes.ps1",
+              "v4.2.1:tests/runtime/Test-MIROptionalProbes.ps1",
+              "v4.2.2:tests/runtime/Test-MIROptionalProbes.ps1",
+              "v4.3.0:tests/runtime/Test-MIROptionalProbes.ps1",
+              "v4.4.0:tests/runtime/Test-MIROptionalProbes.ps1",
+              "v4.4.1:tests/runtime/Test-MIROptionalProbes.ps1",
+              "v4.4.2:tests/runtime/Test-MIROptionalProbes.ps1",
+              "v4.5.0:tests/runtime/Test-MIROptionalProbes.ps1",
+              "v4.5.1:tests/runtime/Test-MIROptionalProbes.ps1",
+              "v4.5.2:tests/runtime/Test-MIROptionalProbes.ps1",
+              "v4.6.0:tests/runtime/Test-MIROptionalProbes.ps1",
+              "v4.7.0:tests/runtime/Test-MIROptionalProbes.ps1",
+              "v4.7.1:tests/runtime/Test-MIROptionalProbes.ps1",
+              "v4.7.2:tests/runtime/Test-MIROptionalProbes.ps1",
+              "v4.7.3:tests/runtime/Test-MIROptionalProbes.ps1"
+            ],
+            "preserved_indexed_aliases": [
+              {
+                "indexed_tag": "v4.2.0",
+                "canonical_tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "path": "tests/runtime/Test-MIROptionalProbes.ps1"
+              }
+            ],
+            "intent_groups": [
+              "controlled-passive-repair",
+              "experimental-vehicle-nonadmission"
+            ],
+            "disposition": "retain-useful-expectations-and-archive-excluded-prototype-harness"
+          },
+          {
+            "blob": "fb7ad9ef78c49977f167db8f566aa0f93237673f",
+            "bytes": 9936,
+            "sha256": "6E0BAE1E67E2E0EACD99F5EAEA6EAA26324A0D4E5F5A36BEC3C1E35766C3D422",
+            "paths": [
+              "tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1"
+            ],
+            "tag_path_references": [
+              "v4.2.0-stable:tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+              "v4.2.1:tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+              "v4.2.2:tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+              "v4.3.0:tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+              "v4.4.0:tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+              "v4.4.1:tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+              "v4.4.2:tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+              "v4.5.0:tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+              "v4.5.1:tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+              "v4.5.2:tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+              "v4.6.0:tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+              "v4.7.0:tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+              "v4.7.1:tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+              "v4.7.2:tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+              "v4.7.3:tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1"
+            ],
+            "preserved_indexed_aliases": [
+              {
+                "indexed_tag": "v4.2.0",
+                "canonical_tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "path": "tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1"
+              }
+            ],
+            "intent_groups": [
+              "experimental-vehicle-nonadmission"
+            ],
+            "disposition": "retain-useful-expectations-and-archive-excluded-prototype-harness"
+          },
+          {
+            "blob": "8e8fa89f657ba3b2c9e459d1bff9872fb61f29fa",
+            "bytes": 12506,
+            "sha256": "1A40CCF9B9815C658ABB66B347A90E74378E2F5832CB8129670E39175C8EE8DD",
+            "paths": [
+              "tests/runtime/optional_runtime_probe.lua"
+            ],
+            "tag_path_references": [
+              "v4.2.0-stable:tests/runtime/optional_runtime_probe.lua",
+              "v4.2.1:tests/runtime/optional_runtime_probe.lua",
+              "v4.2.2:tests/runtime/optional_runtime_probe.lua",
+              "v4.3.0:tests/runtime/optional_runtime_probe.lua",
+              "v4.4.0:tests/runtime/optional_runtime_probe.lua",
+              "v4.4.1:tests/runtime/optional_runtime_probe.lua",
+              "v4.4.2:tests/runtime/optional_runtime_probe.lua",
+              "v4.5.0:tests/runtime/optional_runtime_probe.lua",
+              "v4.5.1:tests/runtime/optional_runtime_probe.lua",
+              "v4.5.2:tests/runtime/optional_runtime_probe.lua",
+              "v4.6.0:tests/runtime/optional_runtime_probe.lua",
+              "v4.7.0:tests/runtime/optional_runtime_probe.lua",
+              "v4.7.1:tests/runtime/optional_runtime_probe.lua",
+              "v4.7.2:tests/runtime/optional_runtime_probe.lua",
+              "v4.7.3:tests/runtime/optional_runtime_probe.lua"
+            ],
+            "preserved_indexed_aliases": [
+              {
+                "indexed_tag": "v4.2.0",
+                "canonical_tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "path": "tests/runtime/optional_runtime_probe.lua"
+              }
+            ],
+            "intent_groups": [
+              "controlled-passive-repair",
+              "experimental-vehicle-nonadmission"
+            ],
+            "disposition": "retain-useful-expectations-and-archive-excluded-prototype-harness"
+          },
+          {
+            "blob": "e303988ab1846ba967a5ca2e444b75123ce06f62",
+            "bytes": 3248,
+            "sha256": "6B19171C5CA359A7B5863D47A8A12DAB82133124B3497FBCEE10D898880CCE75",
+            "paths": [
+              "tests/runtime/optional_runtime_services.lua"
+            ],
+            "tag_path_references": [
+              "v4.2.0-stable:tests/runtime/optional_runtime_services.lua",
+              "v4.2.1:tests/runtime/optional_runtime_services.lua",
+              "v4.2.2:tests/runtime/optional_runtime_services.lua",
+              "v4.3.0:tests/runtime/optional_runtime_services.lua",
+              "v4.4.0:tests/runtime/optional_runtime_services.lua",
+              "v4.4.1:tests/runtime/optional_runtime_services.lua",
+              "v4.4.2:tests/runtime/optional_runtime_services.lua",
+              "v4.5.0:tests/runtime/optional_runtime_services.lua",
+              "v4.5.1:tests/runtime/optional_runtime_services.lua",
+              "v4.5.2:tests/runtime/optional_runtime_services.lua",
+              "v4.6.0:tests/runtime/optional_runtime_services.lua",
+              "v4.7.0:tests/runtime/optional_runtime_services.lua",
+              "v4.7.1:tests/runtime/optional_runtime_services.lua",
+              "v4.7.2:tests/runtime/optional_runtime_services.lua",
+              "v4.7.3:tests/runtime/optional_runtime_services.lua"
+            ],
+            "preserved_indexed_aliases": [
+              {
+                "indexed_tag": "v4.2.0",
+                "canonical_tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "path": "tests/runtime/optional_runtime_services.lua"
+              }
+            ],
+            "intent_groups": [
+              "experimental-vehicle-nonadmission"
+            ],
+            "disposition": "retain-useful-expectations-and-archive-excluded-prototype-harness"
+          },
+          {
+            "blob": "35b709ca5b102d8e4f33375aaf9f0cc008f75bce",
+            "bytes": 20132,
+            "sha256": "C5682FBA7068D6B31C0AD1FEF874D3DD86DB885CD5273082BD4CBA5B82C14915",
+            "paths": [
+              "tests/runtime/vehicle_economy_capabilities.lua"
+            ],
+            "tag_path_references": [
+              "v4.2.0-stable:tests/runtime/vehicle_economy_capabilities.lua",
+              "v4.2.1:tests/runtime/vehicle_economy_capabilities.lua",
+              "v4.2.2:tests/runtime/vehicle_economy_capabilities.lua",
+              "v4.3.0:tests/runtime/vehicle_economy_capabilities.lua",
+              "v4.4.0:tests/runtime/vehicle_economy_capabilities.lua",
+              "v4.4.1:tests/runtime/vehicle_economy_capabilities.lua",
+              "v4.4.2:tests/runtime/vehicle_economy_capabilities.lua",
+              "v4.5.0:tests/runtime/vehicle_economy_capabilities.lua",
+              "v4.5.1:tests/runtime/vehicle_economy_capabilities.lua",
+              "v4.5.2:tests/runtime/vehicle_economy_capabilities.lua",
+              "v4.6.0:tests/runtime/vehicle_economy_capabilities.lua",
+              "v4.7.0:tests/runtime/vehicle_economy_capabilities.lua",
+              "v4.7.1:tests/runtime/vehicle_economy_capabilities.lua",
+              "v4.7.2:tests/runtime/vehicle_economy_capabilities.lua",
+              "v4.7.3:tests/runtime/vehicle_economy_capabilities.lua"
+            ],
+            "preserved_indexed_aliases": [
+              {
+                "indexed_tag": "v4.2.0",
+                "canonical_tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "path": "tests/runtime/vehicle_economy_capabilities.lua"
+              }
+            ],
+            "intent_groups": [
+              "experimental-vehicle-nonadmission"
+            ],
+            "disposition": "retain-useful-expectations-and-archive-excluded-prototype-harness"
+          },
+          {
+            "blob": "f6ef3bb74414b68cb90d09edf7f1320c2091bf7a",
+            "bytes": 3939,
+            "sha256": "4BE3A55D365CBE2B831334B7C00ED0047BE6C7E0D47DBC034B3C3018BAC03901",
+            "paths": [
+              "tests/runtime/worker_robot_speed_cap.lua"
+            ],
+            "tag_path_references": [
+              "v4.4.2:tests/runtime/worker_robot_speed_cap.lua",
+              "v4.5.0:tests/runtime/worker_robot_speed_cap.lua",
+              "v4.5.1:tests/runtime/worker_robot_speed_cap.lua",
+              "v4.5.2:tests/runtime/worker_robot_speed_cap.lua",
+              "v4.6.0:tests/runtime/worker_robot_speed_cap.lua",
+              "v4.7.0:tests/runtime/worker_robot_speed_cap.lua",
+              "v4.7.1:tests/runtime/worker_robot_speed_cap.lua",
+              "v4.7.2:tests/runtime/worker_robot_speed_cap.lua",
+              "v4.7.3:tests/runtime/worker_robot_speed_cap.lua"
+            ],
+            "intent_groups": [
+              "named-worker-native-cap"
+            ],
+            "disposition": "retain-useful-expectations-and-archive-excluded-prototype-harness"
+          }
+        ],
+        "recovered_report_originals": [
+          {
+            "blob": "2fda86e228d11d4b7292eeb1a3ee40e2a8b17263",
+            "bytes": 4713,
+            "sha256": "CE42692BB78243BC81EC213B48C3ABD8A8E269C60EBA651377E6B409CEDD1FD8",
+            "commit_path_references": [
+              {
+                "commit": "fda8a1a1f83fbcb0a71cb396c7dec1819cef38e0",
+                "path": "tests/runtime/optional_runtime_probe.lua"
+              }
+            ]
+          },
+          {
+            "blob": "ce69b7ad9373f39cd87ae76f132ebcf9f504d6a4",
+            "bytes": 3866,
+            "sha256": "7E1E5916412A0DC61C387385727B10C4793C6F7BDF3B0AD5D0311A2E55547F30",
+            "commit_path_references": [
+              {
+                "commit": "fda8a1a1f83fbcb0a71cb396c7dec1819cef38e0",
+                "path": "tests/runtime/Test-MIROptionalProbes.ps1"
+              }
+            ]
+          }
+        ],
+        "recovery_limit": "Both earlier source hashes exist at fda8a1a1f83fbcb0a71cb396c7dec1819cef38e0 with the recorded paths. This proves matching immutable source bytes, not that fda8a1a1 was the original executing checkout. The later VEH-02 record explicitly labels its execution as an uncommitted, hash-bound harness snapshot.",
+        "original_experimental_reports": [
+          {
+            "ref": "v4.7.3:spec/programmes/evidence/community-2026-09-06/optional-2.1.json",
+            "sha256": "BD8739D68015C666A46C2BD559698548EE53AAA1B1346245B69C2D29D6FD434B",
+            "engine": "2.1.17",
+            "scope": "package-excluded-Car-and-maintenance-prototypes; no-multiplayer-or-save-migration-qualification",
+            "status": "passed",
+            "source_bindings": [
+              {
+                "field": "prototype_sha256",
+                "path": "tests/runtime/optional_runtime_services.lua",
+                "expected_sha256": "6B19171C5CA359A7B5863D47A8A12DAB82133124B3497FBCEE10D898880CCE75",
+                "latest_tag_blob": "e303988ab1846ba967a5ca2e444b75123ce06f62",
+                "latest_tag_body_matches_report": true,
+                "matched_original_blob": "e303988ab1846ba967a5ca2e444b75123ce06f62"
+              },
+              {
+                "field": "test_sha256",
+                "path": "tests/runtime/optional_runtime_probe.lua",
+                "expected_sha256": "CE42692BB78243BC81EC213B48C3ABD8A8E269C60EBA651377E6B409CEDD1FD8",
+                "latest_tag_blob": "8e8fa89f657ba3b2c9e459d1bff9872fb61f29fa",
+                "latest_tag_body_matches_report": false,
+                "recovered_original": {
+                  "blob": "2fda86e228d11d4b7292eeb1a3ee40e2a8b17263",
+                  "bytes": 4713,
+                  "sha256": "CE42692BB78243BC81EC213B48C3ABD8A8E269C60EBA651377E6B409CEDD1FD8",
+                  "commit_path_references": [
+                    {
+                      "commit": "fda8a1a1f83fbcb0a71cb396c7dec1819cef38e0",
+                      "path": "tests/runtime/optional_runtime_probe.lua"
+                    }
+                  ]
+                }
+              },
+              {
+                "field": "harness_sha256",
+                "path": "tests/runtime/Test-MIROptionalProbes.ps1",
+                "expected_sha256": "7E1E5916412A0DC61C387385727B10C4793C6F7BDF3B0AD5D0311A2E55547F30",
+                "latest_tag_blob": "353f0e7fe2a69621348474f4c7f16d2254c2913d",
+                "latest_tag_body_matches_report": false,
+                "recovered_original": {
+                  "blob": "ce69b7ad9373f39cd87ae76f132ebcf9f504d6a4",
+                  "bytes": 3866,
+                  "sha256": "7E1E5916412A0DC61C387385727B10C4793C6F7BDF3B0AD5D0311A2E55547F30",
+                  "commit_path_references": [
+                    {
+                      "commit": "fda8a1a1f83fbcb0a71cb396c7dec1819cef38e0",
+                      "path": "tests/runtime/Test-MIROptionalProbes.ps1"
+                    }
+                  ]
+                }
+              }
+            ],
+            "adoption_limit": "Original committed experiment/report only. Source bytes are independently bound by their recorded hashes; this does not prove the original checkout was clean, identify every consumed native input or establish current MIR5 package/service acceptance."
+          },
+          {
+            "ref": "v4.7.3:spec/programmes/evidence/community-2026-09-06/optional-2.0.json",
+            "sha256": "8DCC1B5D9C559A78B5AC203B15B85667CE8F773ED2B5A7818B5EBA1409104197",
+            "engine": "2.0.77",
+            "scope": "package-excluded-Car-and-maintenance-prototypes; no-multiplayer-or-save-migration-qualification",
+            "status": "passed",
+            "source_bindings": [
+              {
+                "field": "prototype_sha256",
+                "path": "tests/runtime/optional_runtime_services.lua",
+                "expected_sha256": "6B19171C5CA359A7B5863D47A8A12DAB82133124B3497FBCEE10D898880CCE75",
+                "latest_tag_blob": "e303988ab1846ba967a5ca2e444b75123ce06f62",
+                "latest_tag_body_matches_report": true,
+                "matched_original_blob": "e303988ab1846ba967a5ca2e444b75123ce06f62"
+              },
+              {
+                "field": "test_sha256",
+                "path": "tests/runtime/optional_runtime_probe.lua",
+                "expected_sha256": "CE42692BB78243BC81EC213B48C3ABD8A8E269C60EBA651377E6B409CEDD1FD8",
+                "latest_tag_blob": "8e8fa89f657ba3b2c9e459d1bff9872fb61f29fa",
+                "latest_tag_body_matches_report": false,
+                "recovered_original": {
+                  "blob": "2fda86e228d11d4b7292eeb1a3ee40e2a8b17263",
+                  "bytes": 4713,
+                  "sha256": "CE42692BB78243BC81EC213B48C3ABD8A8E269C60EBA651377E6B409CEDD1FD8",
+                  "commit_path_references": [
+                    {
+                      "commit": "fda8a1a1f83fbcb0a71cb396c7dec1819cef38e0",
+                      "path": "tests/runtime/optional_runtime_probe.lua"
+                    }
+                  ]
+                }
+              },
+              {
+                "field": "harness_sha256",
+                "path": "tests/runtime/Test-MIROptionalProbes.ps1",
+                "expected_sha256": "7E1E5916412A0DC61C387385727B10C4793C6F7BDF3B0AD5D0311A2E55547F30",
+                "latest_tag_blob": "353f0e7fe2a69621348474f4c7f16d2254c2913d",
+                "latest_tag_body_matches_report": false,
+                "recovered_original": {
+                  "blob": "ce69b7ad9373f39cd87ae76f132ebcf9f504d6a4",
+                  "bytes": 3866,
+                  "sha256": "7E1E5916412A0DC61C387385727B10C4793C6F7BDF3B0AD5D0311A2E55547F30",
+                  "commit_path_references": [
+                    {
+                      "commit": "fda8a1a1f83fbcb0a71cb396c7dec1819cef38e0",
+                      "path": "tests/runtime/Test-MIROptionalProbes.ps1"
+                    }
+                  ]
+                }
+              }
+            ],
+            "adoption_limit": "Original committed experiment/report only. Source bytes are independently bound by their recorded hashes; this does not prove the original checkout was clean, identify every consumed native input or establish current MIR5 package/service acceptance."
+          },
+          {
+            "ref": "v4.7.3:spec/programmes/evidence/community-2026-09-26/vehicle-economy-capabilities-f200.json",
+            "sha256": "1B4D974A2899E852A502D3BAF28BBD7852412912EF8DD46063B96D5DCF98D610",
+            "engine": "Version: 2.0.77 (build 84539, win64, full)\r\nVersion: 64\r\nMap input version: 1.0.0-0\r\nMap output version: 2.0.77-0",
+            "scope": "package-excluded-VEH-02-native-capability-probe; no-service-or-support-admission",
+            "status": "passed",
+            "source_bindings": [
+              {
+                "field": "fixture_sha256",
+                "path": "tests/runtime/vehicle_economy_capabilities.lua",
+                "expected_sha256": "C5682FBA7068D6B31C0AD1FEF874D3DD86DB885CD5273082BD4CBA5B82C14915",
+                "latest_tag_blob": "35b709ca5b102d8e4f33375aaf9f0cc008f75bce",
+                "latest_tag_body_matches_report": true,
+                "matched_original_blob": "35b709ca5b102d8e4f33375aaf9f0cc008f75bce"
+              },
+              {
+                "field": "car_control_sha256",
+                "path": "tests/runtime/optional_runtime_services.lua",
+                "expected_sha256": "6B19171C5CA359A7B5863D47A8A12DAB82133124B3497FBCEE10D898880CCE75",
+                "latest_tag_blob": "e303988ab1846ba967a5ca2e444b75123ce06f62",
+                "latest_tag_body_matches_report": true,
+                "matched_original_blob": "e303988ab1846ba967a5ca2e444b75123ce06f62"
+              },
+              {
+                "field": "harness_sha256",
+                "path": "tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+                "expected_sha256": "6E0BAE1E67E2E0EACD99F5EAEA6EAA26324A0D4E5F5A36BEC3C1E35766C3D422",
+                "latest_tag_blob": "fb7ad9ef78c49977f167db8f566aa0f93237673f",
+                "latest_tag_body_matches_report": true,
+                "matched_original_blob": "fb7ad9ef78c49977f167db8f566aa0f93237673f"
+              }
+            ],
+            "adoption_limit": "Original committed experiment/report only. Source bytes are independently bound by their recorded hashes; this does not prove the original checkout was clean, identify every consumed native input or establish current MIR5 package/service acceptance."
+          },
+          {
+            "ref": "v4.7.3:spec/programmes/evidence/community-2026-09-26/vehicle-economy-capabilities-f210.json",
+            "sha256": "1DEDD3DBB1C60A6F3EE9983C0726D58F0809CD7150A5955348A02D43FB9CD6C0",
+            "engine": "Version: 2.1.20 (build 87512, win64, steam)\r\nVersion: 64\r\nMap input version: 1.0.0-0\r\nMap output version: 2.1.20-4",
+            "scope": "package-excluded-VEH-02-native-capability-probe; no-service-or-support-admission",
+            "status": "passed",
+            "source_bindings": [
+              {
+                "field": "fixture_sha256",
+                "path": "tests/runtime/vehicle_economy_capabilities.lua",
+                "expected_sha256": "C5682FBA7068D6B31C0AD1FEF874D3DD86DB885CD5273082BD4CBA5B82C14915",
+                "latest_tag_blob": "35b709ca5b102d8e4f33375aaf9f0cc008f75bce",
+                "latest_tag_body_matches_report": true,
+                "matched_original_blob": "35b709ca5b102d8e4f33375aaf9f0cc008f75bce"
+              },
+              {
+                "field": "car_control_sha256",
+                "path": "tests/runtime/optional_runtime_services.lua",
+                "expected_sha256": "6B19171C5CA359A7B5863D47A8A12DAB82133124B3497FBCEE10D898880CCE75",
+                "latest_tag_blob": "e303988ab1846ba967a5ca2e444b75123ce06f62",
+                "latest_tag_body_matches_report": true,
+                "matched_original_blob": "e303988ab1846ba967a5ca2e444b75123ce06f62"
+              },
+              {
+                "field": "harness_sha256",
+                "path": "tests/runtime/Test-MIRVehicleEconomyCapabilities.ps1",
+                "expected_sha256": "6E0BAE1E67E2E0EACD99F5EAEA6EAA26324A0D4E5F5A36BEC3C1E35766C3D422",
+                "latest_tag_blob": "fb7ad9ef78c49977f167db8f566aa0f93237673f",
+                "latest_tag_body_matches_report": true,
+                "matched_original_blob": "fb7ad9ef78c49977f167db8f566aa0f93237673f"
+              }
+            ],
+            "adoption_limit": "Original committed experiment/report only. Source bytes are independently bound by their recorded hashes; this does not prove the original checkout was clean, identify every consumed native input or establish current MIR5 package/service acceptance."
+          }
+        ],
+        "groups": [
+          {
+            "id": "controlled-passive-repair",
+            "disposition": "consolidate-useful-expectations-preserve-execution-gap",
+            "independent_expectation": "The later optional probe adds calls into the actual old passive-repair body with native entity references but stubbed startup/state facades and manually supplied scalar ticks. Retain inert default/read-only load, quiet-time renewal without duplicate queue rows, one-health-per60-tick rate, current maximum clamp, foreign/invalid/full/surface/force cleanup, reciprocal friendship,256 capacity/eight-record service budget and disabled teardown. Prototype-only maintenance admission/cadence is not the delivered policy.",
+            "historical_blobs": [
+              "8e8fa89f657ba3b2c9e459d1bff9872fb61f29fa",
+              "353f0e7fe2a69621348474f4c7f16d2254c2913d",
+              "e303988ab1846ba967a5ca2e444b75123ce06f62"
+            ],
+            "implementation": [
+              "source/runtime/passive_repair.lua",
+              "source/runtime/bootstrap.lua"
+            ],
+            "host_controls": [
+              "tests/test_passive_repair.py::test_only_player_or_reciprocal_friend_walls_and_gates_are_accepted",
+              "tests/test_passive_repair.py::test_repeated_damage_postpones_without_duplicates_and_repairs_at_rate_one",
+              "tests/test_passive_repair.py::test_ordered_queue_observes_eight_entity_budget_and_keeps_remainder_first",
+              "tests/test_passive_repair.py::test_pending_queue_is_capped_at_256",
+              "tests/test_passive_repair.py::test_destroyed_force_changed_surface_changed_and_full_members_are_dropped",
+              "tests/test_passive_repair.py::test_disable_clears_state_readdition_is_fresh_and_on_load_is_read_only",
+              "tests/test_passive_repair.py::test_known_unversioned_bucket_shape_with_lua_entity_members_remains_usable",
+              "tests/test_passive_repair.py::test_fixed_relevant_burst_drains_without_scanning_unrelated_factory"
+            ],
+            "evidence_limit": "The earlier optional reports bind recovered probe2fda86e2/harnessce69b7ad, not the later tagged probe8e8fa89f/harness353f0e7f. The recovered probe does not import/call the delivered repair module; the later wrapper adds that copy/facade and passive_repair_sha256 field. Those two reports therefore cannot qualify the added repair assertions. Other named current native repair chains retain their own scope and are not relabelled as this probe execution.",
+            "existing_evidence_candidates": [
+              "spec/evidence/repair-current-native-chain.json",
+              "spec/evidence/repair501-single-marker-chain-r01.json"
+            ],
+            "remaining_executable_check": "Review final consumed input applicability and genuinely affected entity/force/surface/quality/save/client/removal boundaries through the existing native queue. This source/test-only mapping does not require rerunning the old optional prototype harness or imply saturated per-wall1HP-per-second throughput.",
+            "owner": "Aero mapping/host review; Black Glass native/runtime evidence"
+          },
+          {
+            "id": "named-worker-native-cap",
+            "disposition": "retain-and-port-missing-named-invariant",
+            "historical_blobs": [
+              "f6ef3bb74414b68cb90d09edf7f1320c2091bf7a"
+            ],
+            "independent_expectation": "For the admitted worker-robots-speed-6 tail with one0.65 native speed effect and worker-robots-speed-5 prerequisite, cap10 admits native level10 and drops only the repeated queued successor. At level11 disable future work without changing earned native bonuses; cap0 restores only MIR-owned enablement. The original synthetic force supplies aggregate7.15 as a preservation sentinel, not a bonus formula to reconstruct. Foreign disablement and ambiguous extra effect bindings remain protected. No old on_load mutation path is revived.",
+            "implementation": [
+              "source/runtime/caps.lua",
+              "source/runtime/lifecycle.lua",
+              "source/runtime/cap_admission.lua"
+            ],
+            "host_controls": [
+              "tests/test_lifecycle.py::test_published_worker_cap_boundary_preserves_earned_bonus_and_partial_work",
+              "tests/test_lifecycle.py::test_admitted_native_worker_tail_cap_is_per_force_and_restores_owned_state",
+              "tests/test_lifecycle.py::test_worker_tail_binding_change_discards_stale_enablement_right",
+              "tests/test_lifecycle.py::test_k2_worker_variant_is_lazy_owned_and_does_not_inherit_another_effects_rights"
+            ],
+            "new_control_scope": "Actual current control/bootstrap/lifecycle handlers, inclusive repeated queue, retained37% current progress and27% saved progress, earned aggregate7.15 across above-cap disablement and owned relaxation. The saved_progress double is supported by the pinned2.0.77 LuaTechnology API; this does not assert native earned-bonus arithmetic or qualify a save.",
+            "api_source": {
+              "url": "https://lua-api.factorio.com/2.0.77/runtime-api.json",
+              "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578",
+              "field": "LuaTechnology.saved_progress",
+              "fact": "Read/write double fraction in[0,1);0 means no saved progress."
+            },
+            "remaining_executable_check": "Final-candidate native worker cap/ownership/queue/progress and any affected legacy/provider/client/state transitions retain the existing CONT-07/CONT-11 limits. Exact admitted0.65 tail evidence does not qualify malformed or arbitrary provider tails; unchanged source is not a new native result.",
+            "owner": "Aero independent expectation/control; Black Glass native/state checks"
+          },
+          {
+            "id": "experimental-vehicle-nonadmission",
+            "disposition": "retain-original-proposal-and-scoped-capability-evidence",
+            "request_ids": [
+              "VEH-01",
+              "VEH-02"
+            ],
+            "historical_blobs": [
+              "e303988ab1846ba967a5ca2e444b75123ce06f62",
+              "35b709ca5b102d8e4f33375aaf9f0cc008f75bce",
+              "fb7ad9ef78c49977f167db8f566aa0f93237673f",
+              "2fda86e228d11d4b7292eeb1a3ee40e2a8b17263",
+              "ce69b7ad9373f39cd87ae76f132ebcf9f504d6a4"
+            ],
+            "independent_expectation": "Original request authority still says VEH-01 candidate-4.2/package-excluded-prototype-engine-verified and VEH-02 defer-provider/native-Car-setter-rejected-locomotive-spider. Experiments are explicitly outside player packages. Retain measured equal-route Car0.8 fuel ratio with matched motion and owned setter restoration, plus class-specific failure/unknown limits; do not turn source/test existence into a promised MIR5 service.",
+            "original_observation_scope": "Early optional reports are2.0.77 and2.1.17. Later VEH-02 reports are2.0.77 and2.1.20, not current2.1.23. Both retain the Car positive control. For locomotive/spider the initial combined modifier read fails with Entity is not car; no independent effectivity-only probe was performed, and the inspected base spider has no burner. This does not prove every future owner/native adapter impossible.",
+            "current_disposition": "No player implementation or new test is required to simulate an unadmitted proposal. Keep original IDs/text/decisions/status/qualifications verbatim. Original multiplayer/clone/quality/surface/save/provider/force obligations remain open before any future admission; do not add polling fuel refunds or universal vehicle claims.",
+            "remaining_executable_check": "No additional native campaign is introduced for these excluded proposals. Any future service needs an explicit admission decision and its original acceptance; this review grants none.",
+            "owner": "Maintainer request authority; Aero reconciliation only"
+          }
+        ],
+        "host_results": {
+          "runtime": "Pinned Lua5.2/Lupa2.6",
+          "lifecycle_controls": 24,
+          "passive_repair_controls": 9,
+          "total_selected": 33,
+          "new_worker_control": 1,
+          "deliberately_broken_worker_variants_detected": [
+            "inclusive queue off-by-one",
+            "inclusive disable off-by-one",
+            "valid current progress lost",
+            "earned bonus lost on disable",
+            "saved progress lost on disable",
+            "earned bonus lost on relaxation"
+          ]
+        },
+        "custody": "build/qualification/aero-optional-runtime-intents-r01/",
+        "qualification_limit": "Six tagged test families, two recovered original report-source bodies and their grouped obligations only. Other inter-release/runtime/consumer/crash/request sources and global VER-07 remain unresolved. New current control passes without a player source correction. No old runner/prototype framework/native campaign is restored, no source count is native acceptance, and original adverse/unknown scopes remain intact.",
         "native_execution": false,
         "source_reconciliation_complete": false,
         "test_intent_reconciliation_complete": false,
