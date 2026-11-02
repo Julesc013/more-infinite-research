@@ -260,7 +260,7 @@ script.on_configuration_changed(function()
         foreign_mining={source=state.foreign.foreign.enabled,entry=foreign_flag}}}
     state.phase="entry-boundary-pending"
     loaded,reported=false,false
-    return -- No full verification, API, fresh force or save before MIR config.
+    return -- No post-configuration verification, API, fresh force or save before MIR config.
   end
   -- Validate every preserved state before creating the independent fresh force.
   verify(state,false)
