@@ -48,7 +48,7 @@ class RetainedNativeFixtureTests(unittest.TestCase):
           function new_force(name)
             next_index=next_index+1
             local f={name=name,index=next_index,valid=true,technologies={},recipes={},research_queue={},
-              research_progress=0,research_queue_enabled=false,mining_drill_productivity_bonus=0,laboratory_speed_modifier=0}
+              research_progress=0,mining_drill_productivity_bonus=0,laboratory_speed_modifier=0}
             -- Independent vectors, not imported from the fixture or candidate.
             local rows={
               {"low_density_structure",{"casting-low-density-structure","low-density-structure","scrap-recycling"}},
@@ -82,6 +82,21 @@ class RetainedNativeFixtureTests(unittest.TestCase):
               if #f.research_queue==1 then f.current_research=value end
               return true
             end
+            -- Exact2.0.77 runtime-api.json SHA256594B4EC9: research_queue and
+            -- add_research exist, but LuaForce has no research_queue_enabled.
+            -- Reject absent engine members instead of inventing host support.
+            local supported={name=true,index=true,valid=true,technologies=true,recipes=true,
+              research_queue=true,current_research=true,research_progress=true,
+              mining_drill_productivity_bonus=true,laboratory_speed_modifier=true,
+              reset_technology_effects=true,add_research=true}
+            setmetatable(f,{
+              __index=function(_,key)
+                if not supported[key] then error("LuaForce doesn't contain key "..tostring(key)) end
+              end,
+              __newindex=function(value,key,item)
+                if not supported[key] then error("LuaForce doesn't contain key "..tostring(key)) end
+                rawset(value,key,item)
+              end})
             game.forces[name],game.forces[f.index]=f,f
             return f
           end
@@ -203,7 +218,7 @@ class RetainedNativeFixtureTests(unittest.TestCase):
             "local q=game.forces.player.research_queue;q[1],q[2]=q[2],q[1]",
             "game.forces.player.current_research=game.forces.player.research_queue[2]",
             "game.forces.player.research_progress=.43",
-            "game.forces.player.research_queue_enabled=false",
+            "game.forces.player.research_queue={};game.forces.player.current_research=nil",
             "game.forces['mir5-sif-retained-foreign'].technologies['mining-productivity-3'].enabled=true",
             "game.forces['mir5-sif-retained-foreign'].technologies['mining-productivity-3'].saved_progress=.28",
         ]
@@ -231,6 +246,24 @@ class RetainedNativeFixtureTests(unittest.TestCase):
                 self.load_control()
                 with self.assertRaises(LuaError): self.lua.execute("callbacks.config()")
                 self.assertEqual(1, self.lua.eval("#saves"))
+
+    def test_removed_force_queue_switch_read_and_write_are_rejected(self):
+        original = (FIXTURE / "shared/control.lua").read_text(encoding="utf-8")
+        opponents = [
+            original.replace("force.reset_technology_effects()",
+                             "force.reset_technology_effects();force.research_queue_enabled=true", 1),
+            original.replace("progress=force.research_progress,",
+                             "progress=force.research_progress,queue_enabled=force.research_queue_enabled,", 1),
+        ]
+        for broken in opponents:
+            with self.subTest():
+                self.assertNotEqual(original, broken)
+                self.setUp()
+                self.lua.execute(broken)
+                with self.assertRaisesRegex(LuaError, "LuaForce doesn't contain key research_queue_enabled"):
+                    self.lua.execute("callbacks.init()")
+                self.assertEqual(0, self.lua.eval("#saves"))
+                self.assertEqual("{}", self.storage())
 
     def test_wrong_closures_fresh_successor_and_hidden_queue_refusal_stop(self):
         for change in ["script.active_mods.base='2.0.76'", "script.active_mods['space-is-fake']='1.0.78'",
