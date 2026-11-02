@@ -9,6 +9,8 @@ $repo = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 
 $controls = @(
   [ordered]@{path='tests/test_generator.py';lua=$true},
+  [ordered]@{path='tests/test_continuation_ownership.py';lua=$true},
+  [ordered]@{path='tests/test_discovery_tree_compatibility.py';lua=$true},
   [ordered]@{path='tests/test_early_target_adapter.py';lua=$true},
   [ordered]@{path='tests/test_historical_direct.py';lua=$true},
   [ordered]@{path='tests/test_historical_continuations.py';lua=$true},
@@ -81,6 +83,7 @@ $controls = @(
   [ordered]@{path='tests/test_named_science_replacement_fixture.py';lua=$true},
   [ordered]@{path='tests/test_fresh_science_transition_fixture.py';lua=$true},
   [ordered]@{path='tests/test_sif_retained_manufacturing.py';lua=$true},
+  [ordered]@{path='tests/test_sif_retained_manufacturing_native.py';lua=$true},
   [ordered]@{path='tests/test_sif_science_retirement_fixture.py';lua=$true},
   [ordered]@{path='tests/test_cryogenic_native_fixture.py';lua=$true},
   [ordered]@{path='tests/test_cryogenic_gameplay_fixture.py';lua=$true},

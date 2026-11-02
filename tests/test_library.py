@@ -9,6 +9,36 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_discovery_queue_uses_anonymous_labels_without_changing_native_entries(self):
+        self.lua.execute('''
+          boot()
+          script={active_mods={base="2.1.23",discovery_tree="1.0.12"}}
+          package.preload["presentation.library_model"]=nil
+          package.loaded["presentation.library_model"],package.loaded["runtime.library"]=nil,nil
+          library=require("runtime.library")
+          local root=library.open(player,{tab="queue"})
+          local list=root["mir_library_tabs"]["mir_library_queue_content"]["mir_library_queue_list"]
+          assert(list.items[1][1]=="mir-browser.undiscovered-research")
+          assert(player.force.research_queue[1]==gear and player.force.current_research==gear
+            and player.force.research_progress==.5 and gear.enabled==false)
+          gear.enabled=true -- fresh upstream discovery observation
+          library.open(player,{tab="queue"})
+          list=root["mir_library_tabs"]["mir_library_queue_content"]["mir_library_queue_list"]
+          assert(list.items[1]==gear.localised_name)
+        ''')
+
+    def test_settings_explain_a_foreign_continuation_without_claiming_its_controls(self):
+        self.lua.execute('''
+          boot()
+          local runtime_catalogue=require("runtime.catalogue")
+          runtime_catalogue.externally_supplied_continuation=function(id) return id=="braking-force-8" end
+          local root=library.open(player,{tab="settings",settings_scope="research",settings_search="braking-force"})
+          local detail=root["mir_library_tabs"]["mir_library_settings_content"]
+            ["mir_library_settings_dynamic"]["mir_library_settings_detail"]
+          assert(detail["mir_library_settings_external"].caption[1]=="mir-browser.settings-external-owner")
+          assert(detail["mir_library_settings_external"].style.single_line==false)
+        ''')
+
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().player_root = (ROOT / "source").as_posix()

@@ -14,6 +14,7 @@ local diagnostics = helpers and type(helpers.write_file) == "function" and requi
 local passive_repair = require("runtime.passive_repair")
 local effective = require("runtime.configuration")
 local target = require("platform.target")
+local DISCOVERY_TREE = script and script.active_mods and script.active_mods.discovery_tree ~= nil
 local native_credits, legacy_module_credits, legacy_cannon_credits
 if target.recipe_productivity == true then
   native_credits = require("runtime.native_credits")
@@ -330,6 +331,17 @@ local function discard_absent_competing_productivity_state()
 end
 
 local function on_configuration_changed(event)
+  local changes = event and event.mod_changes
+  local muria = type(changes) == "table" and changes.Muria
+  local mir = type(changes) == "table" and changes["more-infinite-research"]
+  if target.id == "f210" and type(muria) == "table"
+      and ((muria.old_version ~= nil) ~= (muria.new_version ~= nil))
+      and (mir == nil or mir.old_version ~= nil) then
+    -- Finite foreign7/8 and MIR's infinite7/9 have different earned-effect
+    -- identities. After native prototype migration, old levels cannot be
+    -- inferred safely. Refuse before MIR writes state; keep the original save.
+    error("MIR cannot safely add or remove Muria on an existing MIR save; restore the previous mod selection and original save", 2)
+  end
   -- The first published-MIR4 preference transition has no durable old setting.
   -- This preflight must run before any lifecycle reconciler can write a level,
   -- ownership record, queue state, or disablement flag.
@@ -549,6 +561,18 @@ local function on_forces_merged(event)
   request_library_refresh(event)
 end
 
+local function on_discovery_queue_changed(event)
+  if lifecycle.caps_active() then lifecycle.on_discovery_tree_queue_changed(event) end
+  if competing_productivity and competing_productivity.active() then competing_productivity.on_discovery_tree_queue_changed(event) end
+  request_library_refresh(event)
+end
+
+local function on_discovery_setting_changed(event)
+  if lifecycle.caps_active() then lifecycle.on_discovery_tree_changed(event) end
+  if competing_productivity and competing_productivity.active() then competing_productivity.on_discovery_tree_changed(event) end
+  request_library_refresh(event)
+end
+
 local function bind_runtime_events(library_open)
   if library_events_scheduled == library_open then return end
   library_events_scheduled = library_open
@@ -594,7 +618,15 @@ local function bind_runtime_events(library_open)
       or competing_active or (scripted_effects and scripted_effects.events_active()) or library_open
     script.on_event(events.on_technology_effects_reset, active and on_technology_effects_reset or nil)
   end
-  if events.on_research_queued then script.on_event(events.on_research_queued, library_open and request_library_refresh or nil) end
+  if events.on_research_queued then
+    local handler = library_open and request_library_refresh or nil
+    if DISCOVERY_TREE and (lifecycle.caps_active() or competing_active or library_open) then handler = on_discovery_queue_changed end
+    script.on_event(events.on_research_queued, handler)
+  end
+  if events.on_runtime_mod_setting_changed and DISCOVERY_TREE then
+    script.on_event(events.on_runtime_mod_setting_changed,
+      (lifecycle.caps_active() or competing_active or library_open) and on_discovery_setting_changed or nil)
+  end
   if events.on_research_moved then script.on_event(events.on_research_moved, library_open and request_library_refresh or nil) end
 end
 
@@ -615,6 +647,7 @@ end
 
 function M.register()
   library.set_cap_provider(lifecycle.cap_limits)
+  if DISCOVERY_TREE then library.set_discovery_visibility_provider(lifecycle.discovery_visibility) end
 
   register_interface(API_INTERFACE, {
     get_version = runtime_api.get_version,

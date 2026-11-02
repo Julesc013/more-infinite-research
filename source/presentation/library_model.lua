@@ -174,6 +174,16 @@ local function technology_for(force, id)
   return native_read(native_read(force, "technologies"), id)
 end
 
+-- Discovery Tree uses per-force enabled state. The host may additionally
+-- supply its last observed discovery state for research MIR itself capped.
+-- Personal hidden/show-all filters never override this upstream restriction.
+function M.technology_visible(technology, id, context)
+  if type(context) ~= "table" or context.discovery_tree ~= true then return true end
+  if native_read(technology, "enabled") == true then return true end
+  local visible = context.discovery_visibility
+  return type(visible) == "table" and visible[id] == true
+end
+
 local function technology_name(technology)
   -- LuaForce.research_queue is an array of TechnologyID, which permits a
   -- technology object or its string prototype name.
@@ -509,7 +519,7 @@ function M.rows(force, catalogue, view, translations, context)
     -- technology can be unavailable on the current platform; that is not a
     -- synthetic "missing" row or an availability state.  Detail still
     -- reports technology_not_found for a direct selection.
-    if technology ~= nil and not private_credit(context, id) then
+    if technology ~= nil and not private_credit(context, id) and M.technology_visible(technology, id, context) then
       local row = row_for(force, by_id[id], id, technology, queue_count, queue_index, current, translations, context)
       row.hidden = normalized.hidden[id] == true
       if row_matches(row, normalized, technology) then selected[#selected + 1] = row end
@@ -583,7 +593,7 @@ function M.detail(force, catalogue, view, translations, context)
   local declared, by_id = declarations(catalogue)
   local queue_count, queue_index, current = queue_facts(force)
   local technology = technology_for(force, id)
-  if technology == nil then return nil, "technology_not_found" end
+  if technology == nil or not M.technology_visible(technology, id, context) then return nil, "technology_not_found" end
   local row = row_for(force, by_id[id], id, technology, queue_count, queue_index, current, translations, context)
   local effects, effects_complete = copy_effects(technology)
   local cost, ingredients_complete = copy_cost(technology)

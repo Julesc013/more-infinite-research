@@ -1329,7 +1329,12 @@ class GeneratorTests(unittest.TestCase):
     def test_existing_native_continuation_identity_is_preserved_without_mir_collision(self):
         self.lua.execute('''
           local environment = full_world({})
-          local foreign = {type="technology", name="braking-force-8", marker="owned-by-another-mod"}
+          -- An admitted owner supplies an actual infinite native continuation;
+          -- a same-name placeholder is no longer sufficient admission.
+          local foreign = {type="technology", name="braking-force-8", marker="owned-by-another-mod",
+            max_level="infinite", prerequisites={"braking-force-7"},
+            effects={{type="train-braking-force-bonus", modifier=.15}},
+            unit={count_formula="1000*2^(L-8)",time=60,ingredients={{"automation-science-pack",1}}}}
           environment.raw.technology[foreign.name] = foreign
           local selection = modern_catalogue.select({}, environment.raw)
           for _, row in ipairs(selection.continuations) do
@@ -1354,7 +1359,10 @@ class GeneratorTests(unittest.TestCase):
             and py_rows["research-speed-7"].order == "autotech-[000848]-[research-speed-6]",
             "a colliding Py continuation refused or changed the other selected adapter rows")
 
-          local warfare_foreign = {type="technology", name="braking-force-8", marker="foreign warfare owner"}
+          local warfare_foreign = {type="technology", name="braking-force-8", marker="foreign warfare owner",
+            max_level="infinite", prerequisites={"braking-force-7"},
+            effects={{type="train-braking-force-bonus", modifier=.15}},
+            unit={count_formula="1000*2^(L-8)",time=60,ingredients={{"automation-science-pack",1}}}}
           local warfare_rows = modern_catalogue.continuations({bobwarfare="1.2.0"},
             {technology={[warfare_foreign.name]=warfare_foreign}})
           local warfare_by_id = {}; for _, row in ipairs(warfare_rows) do warfare_by_id[row.id] = row end

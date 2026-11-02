@@ -17,6 +17,7 @@ local SCHEMA = 1
 local UINT32_MAX = 4294967295
 local PREFERENCE_SETTING = "mir-prefer-this-mod-for-competing-techs"
 local active_mods = script and script.active_mods or mods or {}
+local DISCOVERY_TREE = active_mods.discovery_tree ~= nil
 local ACTIVE = binding.active(active_mods, target)
 local CONTRACT = binding.select(active_mods, target)
 local ALL_BINDINGS = binding.bindings()
@@ -134,7 +135,13 @@ local function retire_unearned(force, current, item)
   local technology = force.technologies[item.id]
   if technology == nil or technology.enabled ~= true then return end
   local record = ensure_owned_record(current.owned_disabled, force.index, item.id)
-  if technology.visible_when_disabled ~= true then
+  if DISCOVERY_TREE then
+    record.discovery_enabled = true
+    if record.visible_when_disabled ~= nil then
+      technology.visible_when_disabled = record.visible_when_disabled
+      record.visible_when_disabled = nil
+    end
+  elseif technology.visible_when_disabled ~= true then
     if record.visible_when_disabled == nil then
       record.visible_when_disabled = technology.visible_when_disabled == true
     end
@@ -176,7 +183,7 @@ local function reconcile_item(force, current, item, limits, unearned, queued)
   end
 end
 
-local function reconcile_force(force, target_name)
+local function reconcile_force(force, target_name, discovery_observed)
   if not valid_force(force) then return end
   local selected_item = target_name and BINDING_BY_ID[target_name] or nil
   if target_name ~= nil and (selected_item == nil or CONTRACT_BINDING_BY_ID[target_name] == nil) then return end
@@ -198,7 +205,9 @@ local function reconcile_force(force, target_name)
     end
   end
   if next(limits) ~= nil then
-    local _, result = caps.reconcile(force, limits, current.owned_disabled)
+    local observation
+    if DISCOVERY_TREE then observation = discovery_observed == true end
+    local _, result = caps.reconcile(force, limits, current.owned_disabled, nil, nil, observation)
     if result.unresolved_current then
       error("MIR unsupported native research queue state for competing productivity: "
         .. result.unresolved_current, 2)
@@ -226,7 +235,7 @@ local function discard_unselected_rights(current)
   end
 end
 
-local function reconcile_all(clean_stale)
+local function reconcile_all(clean_stale, discovery_observed)
   local current = existing_state()
   if not CONTRACT then
     -- A provider removal, unsupported version, or unqualified EPR/fixed mix
@@ -236,7 +245,7 @@ local function reconcile_all(clean_stale)
   end
   if not game or not game.forces then return end
   if clean_stale and current then discard_unselected_rights(current) end
-  for _, force in pairs(game.forces) do reconcile_force(force) end
+  for _, force in pairs(game.forces) do reconcile_force(force, nil, discovery_observed) end
   discard_empty_state(existing_state())
 end
 
@@ -248,12 +257,13 @@ local function event_force(event)
   return nil
 end
 
-local function reconcile_event(event, research_only)
+local function reconcile_event(event, research_only, discovery_observed)
+  if DISCOVERY_TREE and discovery_observed then research_only = false end
   local force = event_force(event)
   if not force then return end
   local name = research_only and event and event.research and event.research.name or nil
   if research_only and type(name) ~= "string" then return end
-  reconcile_force(force, name)
+  reconcile_force(force, name, discovery_observed)
 end
 
 local function clear_force(index)
@@ -271,36 +281,36 @@ function M.active()
 end
 
 function M.on_init()
-  reconcile_all(false)
+  reconcile_all(false, true)
 end
 
 function M.on_configuration_changed()
-  reconcile_all(true)
+  reconcile_all(true, true)
 end
 
 function M.on_force_created(event)
   local force = event and event.force
   if valid_force(force) then clear_force(force.index) end
-  reconcile_event(event)
+  reconcile_event(event, false, true)
 end
 
 function M.on_force_reset(event)
   local force = event and event.force
   if valid_force(force) then clear_force(force.index) end
-  reconcile_event(event)
+  reconcile_event(event, false, true)
 end
 
 function M.on_forces_merged(event)
   clear_force(event and event.source_index)
-  reconcile_event(event)
+  reconcile_event(event, false, true)
 end
 
 function M.on_research_finished(event)
-  reconcile_event(event, true)
+  reconcile_event(event, true, true)
 end
 
 function M.on_research_reversed(event)
-  reconcile_event(event, true)
+  reconcile_event(event, true, true)
 end
 
 function M.on_technology_effects_reset(event)
@@ -312,7 +322,21 @@ function M.on_research_started(event)
 end
 
 function M.on_research_cancelled(event)
-  reconcile_event(event, true)
+  if not M.on_discovery_tree_queue_changed(event) then reconcile_event(event, true) end
+end
+
+function M.on_discovery_tree_queue_changed(event)
+  if not DISCOVERY_TREE then return false end
+  local option = settings and settings.global and settings.global["discovery-tree-consider-researched"]
+  if not option or (option.value ~= "queued" and option.value ~= "available-after-queue") then return false end
+  reconcile_event(event, false, true)
+  return true
+end
+
+function M.on_discovery_tree_changed(event)
+  if not DISCOVERY_TREE then return end
+  if event_force(event) then reconcile_event(event, false, true)
+  else reconcile_all(false, true) end
 end
 
 -- Parse-time registration owns the callbacks. This must not inspect storage or
