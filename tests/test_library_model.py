@@ -526,6 +526,97 @@ class LibraryModelTests(unittest.TestCase):
           assert(#hidden == 1 and hidden[1].hidden and hidden[1].status == "ready")
         ''')
 
+    def test_stable_secondary_recipe_ids_remain_searchable_without_translated_labels(self):
+        self.lua.execute('''
+          local id = "recipe-prod-research_gears-1"
+          local native = technology(id, {effects={
+            {type="change-recipe-productivity",recipe="primary-route",change=.1},
+            {type="change-recipe-productivity",recipe="secondary-stable-route",change=.1},
+            {type="unlock-recipe",recipe="alternate-unlock-route"}
+          }})
+          local queue = {native}
+          local force = {technologies={[id]=native},research_queue=queue,
+            current_research=native,research_progress=.37}
+          local declared = {{id=id,family="research_gears",recipe="primary-route"}}
+          local translated = {[id]="Friendly caption"..string.char(31)
+            .."Friendly primary Friendly secondary Friendly alternate"}
+          for _, labels in ipairs{{},translated} do
+            for _, search in ipairs{
+              "secondary-stable-route", "SECONDARY_STABLE_ROUTE", "alternate unlock route"
+            } do
+              local rows = model.rows(force,declared,{search=search},labels)
+              assert(#rows==1 and rows[1].id==id,
+                "raw affected recipe ID lost before/after translation: "..search)
+              assert(rows[1].recipe=="primary-route" and rows[1].recipe_targets==nil
+                and rows[1].effects==nil and rows[1].recipe_benefits==nil,
+                "search must not copy selected detail into every list row")
+            end
+          end
+          assert(force.research_queue==queue and #queue==1 and queue[1]==native
+            and force.current_research==native and force.research_progress==.37
+            and native.enabled and not native.researched and native.level==1,
+            "raw ID search changed native research state")
+        ''')
+
+    def test_raw_recipe_search_is_lazy_linear_and_independent_of_preview_limits(self):
+        self.lua.execute('''
+          local id = "recipe-prod-research_gears-1"
+          local actual = {}
+          for index=1,1050 do
+            actual[index] = setmetatable({type="laboratory-speed",modifier=.01}, {
+              __index=function(_,key) error("invalid modifier property: "..tostring(key)) end
+            })
+          end
+          for index=1,600 do
+            actual[#actual+1] = {type="change-recipe-productivity",
+              recipe="stable-route-"..index,change=.1}
+          end
+          local effect_reads, array_reads = 0, 0
+          local effects = setmetatable({}, {
+            __len=function() return #actual end,
+            __index=function(_,index) array_reads=array_reads+1; return actual[index] end
+          })
+          local native = technology(id)
+          native.prototype = setmetatable({max_level=4294967295,hidden=false}, {
+            __index=function(_,key)
+              if key=="effects" then effect_reads=effect_reads+1; return effects end
+              return nil
+            end
+          })
+          local queue = {native}
+          local force = {technologies=setmetatable({[id]=native}, {
+              __pairs=function() error("authored search enumerated the native catalogue") end
+            }),research_queue=queue,current_research=native,research_progress=.37,
+            recipes=setmetatable({}, {__index=function() error("search read a live recipe") end})}
+          local declared = {{id=id,family="research_gears",recipe="primary-route"}}
+          local function rows(view) return model.rows(force,declared,view,{}) end
+          assert(#rows({})==1 and #rows({search="primary route"})==1
+            and #rows({search=id})==1)
+          assert(#rows({search="stable route 600",mode=2})==0
+            and #rows({search="stable route 600",status=3})==0
+            and #rows({search="stable route 600",family="research_other"})==0
+            and #rows({search="stable route 600",hidden={[id]=true}})==0)
+          assert(effect_reads==0 and array_reads==0,
+            "empty, matching or filtered searches must avoid added effect work")
+          local selected = rows({search="stable route 600"})
+          assert(#selected==1 and selected[1].id==id,
+            "stable recipe ID search was truncated at a detail/localization preview limit")
+          assert(effect_reads==1 and array_reads==#actual,
+            "search must read the selected finite effect array once without copying detail")
+          local first = rows({search="stable route 1"})
+          assert(#first==1 and effect_reads==2 and array_reads==#actual+1051,
+            "raw ID search did not stop on its first match")
+          actual[#actual] = {type="laboratory-speed",recipe="unrelated-field"}
+          assert(#rows({search="unrelated field"})==0,
+            "a non-recipe native modifier supplied a searchable recipe field")
+          effects = setmetatable({}, {__len=function() error("invalid native array") end})
+          assert(#rows({search="stable route 600"})==0,
+            "an unavailable native effect array must not abort the Library")
+          assert(force.research_queue==queue and #queue==1 and queue[1]==native
+            and force.current_research==native and force.research_progress==.37
+            and native.enabled and not native.researched and native.level==1)
+        ''')
+
     def test_native_readiness_excludes_hidden_completed_disabled_and_trigger_research_without_losing_queues(self):
         self.lua.execute('''
           for _, engine in ipairs{"f200", "f210"} do
