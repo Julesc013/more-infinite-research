@@ -4180,6 +4180,21 @@
             }
           ],
           "limits": "CONT-11/13 remain partial; inventory_complete remains false. No source save, native process, fixture/controller, original result, request decision or support contract is changed. Full catalogue/settings/client/performance and final release verdicts are independent."
+        },
+        {
+          "id": "historical-frontier-current-oracle-coverage-2026-11-02",
+          "source": [
+            "source/research/historical_direct.lua",
+            "source/research/historical_continuations.lua",
+            "tests/fixtures/historical-direct-native-oracle.json",
+            "tests/fixtures/historical-continuation-native-oracle.json"
+          ],
+          "evidence": "spec/evidence/historical-frontier-current-oracle-applicability-aero-r01.json",
+          "scope": "All27 inherited F015/F016 frontier after-vectors (13plus14 target/identity pairs) match the existing independent native-characterization oracles and their current construction controls. The14 F016 restoration identities overlap that set; do not add them as independent obligations or native routes.",
+          "source_attribution": "Seven original raw source hashes are freshly read back. They declare4.4.*02 destinations; onlyF100/F110 contain runtime MIR version readback. Correct the generic4.7-era attribution while preserving every original path/hash/selection and all expected technology values. Declared older versions are not invented actual runtime readback.",
+          "verification": "Existing direct/continuation13 controls plus their3 consuming fixture groups pass with pinnedLua5.2/Lupa2.6. The two unmodified independent oracle controls pass;14 in-memory substitutions of the actual recorded F016 damaged prerequisite/science fields each fail their named independent assertion. No new executable test/player source changes.",
+          "disposition": "Consolidate valid current science/prerequisite expectations through existing oracles; retire the old transition-specific allowance module as active transport. There is no source/tests/tools consumer of that retired module in the current tree.",
+          "remaining": "Original4.2.0 before-capture provenance stays explicitly unverified and is not substituted or required as an invented new campaign. Preserve existing nine/seven/four selected route identities; review final-candidate consumed inputs and execute genuinely affected supported-profile/state checks. Host projection is not native qualification."
         }
       ],
       "test_subjects": [
@@ -7405,6 +7420,12 @@
           "evidence": "spec/inventory/migration-origins.json",
           "related_record": "CONT-11 selected-migration-queue-and-reduced-input-review-2026-11-02",
           "scope": "Use CONT-11 selected-migration-queue-and-reduced-input-review-2026-11-02 for the nine/seven/four named-route reconciliation, preserved five transition dispositions and bounded seven-edition package/science input review. The older adjacent-axis list below remains historical inventory, not an additional every-adjacent stable campaign or a substitute for the four published-origin journeys. Final affected package/native qualification remains open."
+        },
+        {
+          "id": "historical-frontier-current-oracle-attribution-2026-11-02",
+          "evidence": "spec/evidence/historical-frontier-current-oracle-applicability-aero-r01.json",
+          "related_record": "CONT-11 historical-frontier-current-oracle-coverage-2026-11-02",
+          "scope": "Use the exact seven original snapshot hashes and per-capture declared/available runtime version facts rather than a broad4.7-era label. Current27 F015/F016 after-vector expectations are covered by existing independent host projections; these snapshots do not become later-package or MIR5 native results. Final exact-package/profile/state obligations and experimental F018 limits remain unchanged."
         }
       ],
       "test_subjects": [
@@ -8783,7 +8804,7 @@
         "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
       }
     ],
-    "next_bounded_work": "Integrate independently reviewed pending historical author units. The generic upgrade caller and Classic/K2/Space Is Fake specialization helpers below are now mapped; reconcile imported complete-state/frontier/canonical-fixture assertions, the five-row older SIF earned-state coverage, registry/default/control/architecture/compatibility/inter-release and unknown-consumer groups without reviving retired machinery. Preserve the existing finite nine/seven/four migration selection and consumed-input applicability review. Black Glass owns coherent unpublished5.0.2 identity/freeze, affected successor/native queue and progress header. Exact packageA501/F200/034 r20 input/lifecycle has its completed independent native verdict and217-body public chain; original r19 NO-GO/033/adverse identities stay fixed. No unchanged completed campaign restarts and no packageA result becomes candidateB acceptance.",
+    "next_bounded_work": "The selected35-body upgrade runner,17-body specialization helpers and seven imported Lua comparator/canonical/frontier bodies now have bounded source dispositions; preserve their independent review/integration and original author history. Finish unresolved registry/default/control/compatibility/inter-release and unknown-consumer groups plus any required original frontier snapshot custody, mapping actual delivered expectations without restoring retired machinery. Use the existing finite nine/seven/four migration queue and final consumed-input review. Exact published501 F200 r20 and F210 R05 observations retain their original scopes; frozen502 remains separately unqualified, including shared runtime catalogue/cap/API and beta-successor state. Black Glass owns complete exact packets, the native queue and current progress header; Aero owns historical/applicability/documentation and independent review.",
     "bounded_intent_reviews": [
       {
         "subjects": [
@@ -14572,6 +14593,386 @@
         },
         "custody": "build/qualification/aero-upgrade-specializations-r01/",
         "qualification_limit": "Only the17 selected helper bodies and their54 original references are dispositioned. Imported generic comparator/frontier/canonical fixture bodies, other history groups and actual final-candidate source/profile/save/client/performance acceptance remain open. Original request records, old adverse/scoped results and selected migration routes remain unchanged. No current product defect is demonstrated merely by a historical oracle probe.",
+        "native_execution": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-07",
+          "CONT-08",
+          "CONT-11",
+          "CONT-12",
+          "CONT-13",
+          "VER-07"
+        ],
+        "reviewed_on": "2026-11-02",
+        "reviewed_against": "a01f37b3dfcdf4e2aa65e9f4672842e3dd250844",
+        "parent_review": {
+          "pr": 1587,
+          "head": "95330d5a7d691d9fb98583fd9f68cd7dbb095b1b",
+          "scope": "The separate17-body specialization-helper review remains independently reviewable; original author commits are preserved, not silently replaced by this imported Lua slice."
+        },
+        "scope": "Seven deduplicated imported canonical/comparator/frontier Lua bodies across four named paths and58 distinct published tag-path bindings. Source-intent disposition only; other imported helpers, original execution evidence, complete upstream frontier-observation custody, inter-release sources and final-candidate applicability remain separate.",
+        "method": "Read the complete F200 control and latest287-line F210/234-line historical modules, interpret the fixed literals in an empty Lua environment, and read every unique earlier line against the reviewed latest bodies. Equal-line plus changed-block reconstruction accounts for every original line. Call only the unmodified historical pure comparator through its verify closure for one valid and three opposing tuples per variant; no capture/verify callback, engine, archive library or current product execution.",
+        "selected_blob_count": 7,
+        "discovered_reference_occurrences": 60,
+        "distinct_retained_tag_references": 58,
+        "tag_commits": {
+          "v4.1.0": "3562377b520cccb071b97b3968946eae7024c950",
+          "v4.2.0-stable": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "v4.2.1": "27c4777c27b3287f18df02e200235a1870bac465",
+          "v4.2.2": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "v4.3.0": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "v4.4.0": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "v4.4.1": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "v4.4.2": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "v4.5.0": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "v4.5.1": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "v4.5.2": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "v4.6.0": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "v4.7.0": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "v4.7.1": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "v4.7.2": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "v4.7.3": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+        },
+        "reference_limits": [
+          "Two discovery occurrences consolidate the unpublished v4.2.0 alias with v4.2.0-stable at the same commit/path/blob. Both original60-row discovery and normalized intermediate records remain in primary custody; only58 distinct retained bindings are counted.",
+          "All seven raw blob lengths/SHA256 and58 exact commit/path/blob plus remote tag commit lookups pass. Source presence at a tag does not establish execution of that body at that tag."
+        ],
+        "selected_blob_variants": [
+          {
+            "blob": "eab0eef409edec8f9d5921fc3f911539516efb22",
+            "bytes": 2465,
+            "lines": 7,
+            "sha256": "61C5C0DE3EC10B77370EE836483E4E140E322829C60A251680043F5DAF70BDC7",
+            "paths": [
+              "fixtures/assert-upgrade-4-0-20000-to-4-1-20000/control.lua"
+            ],
+            "tag_path_references": [
+              "v4.1.0:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/control.lua",
+              "v4.2.0-stable:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/control.lua",
+              "v4.2.1:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/control.lua",
+              "v4.2.2:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/control.lua",
+              "v4.3.0:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/control.lua",
+              "v4.4.0:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/control.lua",
+              "v4.4.1:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/control.lua",
+              "v4.4.2:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/control.lua",
+              "v4.5.0:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/control.lua",
+              "v4.5.1:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/control.lua",
+              "v4.5.2:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/control.lua",
+              "v4.6.0:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/control.lua",
+              "v4.7.0:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/control.lua",
+              "v4.7.1:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/control.lua",
+              "v4.7.2:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/control.lua",
+              "v4.7.3:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/control.lua"
+            ],
+            "disposition": "consolidate",
+            "intent_groups": [
+              "modern-state-and-work",
+              "damage-and-execution-boundaries"
+            ],
+            "variant_decision": "The original F200 fixture is only mining-productivity-4 level5/current37-percent and source/configuration/save/reload markers. It has no full-state comparator and does not consume the separate46-row frontier file itself. Preserve its narrow subset expectation; use the stronger current independently sourced fixtures without retaining this old transport."
+          },
+          {
+            "blob": "5ece1783069f1badc1df5d626ccf733dd3b2499e",
+            "bytes": 5321,
+            "lines": 52,
+            "sha256": "CB6604770EE038C731BCE7E7704673E87EE076BDCEBE1DFFED9F398A22F35DE5",
+            "paths": [
+              "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua"
+            ],
+            "tag_path_references": [
+              "v4.1.0:fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua"
+            ],
+            "disposition": "consolidate",
+            "intent_groups": [
+              "modern-state-and-work",
+              "exact-frontier-exceptions",
+              "damage-and-execution-boundaries"
+            ],
+            "variant_decision": "The52-line single-subject sample expands through110-line single-force state to287-line all-existing-force/prototype/effect/settings/recipe/queue comparisons and separate source/upgrade/reload exports. Latest delivered expectation supersedes earlier omissions; aliases and repeated bodies are not extra tests. Original source seeds research by research_all_technologies and explicit levels/progress; this is not proof of ordinary paid native completions."
+          },
+          {
+            "blob": "09bbb93f12ad47f75a3a532ba73f569c54465965",
+            "bytes": 8425,
+            "lines": 110,
+            "sha256": "E861CFD7F8AA31FBC727E0D8026BE9988FFEBAF94A48500F0E663BDE71FAF820",
+            "paths": [
+              "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua"
+            ],
+            "tag_path_references": [
+              "v4.2.0-stable:fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua",
+              "v4.2.1:fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua"
+            ],
+            "disposition": "consolidate",
+            "intent_groups": [
+              "modern-state-and-work",
+              "exact-frontier-exceptions",
+              "damage-and-execution-boundaries"
+            ],
+            "variant_decision": "The52-line single-subject sample expands through110-line single-force state to287-line all-existing-force/prototype/effect/settings/recipe/queue comparisons and separate source/upgrade/reload exports. Latest delivered expectation supersedes earlier omissions; aliases and repeated bodies are not extra tests. Original source seeds research by research_all_technologies and explicit levels/progress; this is not proof of ordinary paid native completions."
+          },
+          {
+            "blob": "1486cfbb4382092866d4b902781b5ef457705181",
+            "bytes": 27703,
+            "lines": 5,
+            "sha256": "388830E64100B4F5B544519B339E9651B1B86D3F1170BBBC9BE60CF168D08E55",
+            "paths": [
+              "fixtures/assert-upgrade-4-0-20000-to-4-1-20000/mir422_reviewed_science_delta.lua"
+            ],
+            "tag_path_references": [
+              "v4.2.2:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/mir422_reviewed_science_delta.lua",
+              "v4.3.0:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/mir422_reviewed_science_delta.lua",
+              "v4.4.0:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/mir422_reviewed_science_delta.lua",
+              "v4.4.1:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/mir422_reviewed_science_delta.lua",
+              "v4.4.2:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/mir422_reviewed_science_delta.lua",
+              "v4.5.0:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/mir422_reviewed_science_delta.lua",
+              "v4.5.1:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/mir422_reviewed_science_delta.lua",
+              "v4.5.2:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/mir422_reviewed_science_delta.lua",
+              "v4.6.0:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/mir422_reviewed_science_delta.lua",
+              "v4.7.0:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/mir422_reviewed_science_delta.lua",
+              "v4.7.1:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/mir422_reviewed_science_delta.lua",
+              "v4.7.2:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/mir422_reviewed_science_delta.lua",
+              "v4.7.3:fixtures/assert-upgrade-4-0-20000-to-4-1-20000/mir422_reviewed_science_delta.lua"
+            ],
+            "disposition": "retain",
+            "intent_groups": [
+              "exact-frontier-exceptions"
+            ],
+            "variant_decision": "Preserve the fixed46 exact F200 before/after vectors as historical transition-specific oracle data. The reviewed SpaceFake helper injects its require/comparator into a composed complete F200 control only for the selected4.2 route, matching exact source/destination and whole remaining prototype. It is not a discovery rule, an unconditional F200-control assertion or an automatically inherited MIR5 allowance."
+          },
+          {
+            "blob": "2de61f8f6e32393d8719a6a690af36810fb9abb4",
+            "bytes": 17929,
+            "lines": 287,
+            "sha256": "68B9E6FA94224C2B7BDF6080D6BE7D5C84D9F41618CEE8E5E070F8CBCB5D1C76",
+            "paths": [
+              "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua"
+            ],
+            "tag_path_references": [
+              "v4.2.2:fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua",
+              "v4.3.0:fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua",
+              "v4.4.0:fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua",
+              "v4.4.1:fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua",
+              "v4.4.2:fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua",
+              "v4.5.0:fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua",
+              "v4.5.1:fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua",
+              "v4.5.2:fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua",
+              "v4.6.0:fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua",
+              "v4.7.0:fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua",
+              "v4.7.1:fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua",
+              "v4.7.2:fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua",
+              "v4.7.3:fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua"
+            ],
+            "disposition": "consolidate",
+            "intent_groups": [
+              "modern-state-and-work",
+              "exact-frontier-exceptions",
+              "damage-and-execution-boundaries"
+            ],
+            "variant_decision": "The52-line single-subject sample expands through110-line single-force state to287-line all-existing-force/prototype/effect/settings/recipe/queue comparisons and separate source/upgrade/reload exports. Latest delivered expectation supersedes earlier omissions; aliases and repeated bodies are not extra tests. Original source seeds research by research_all_technologies and explicit levels/progress; this is not proof of ordinary paid native completions."
+          },
+          {
+            "blob": "36675762ecce2b9c8ba4346f1dcefcf27bae9848",
+            "bytes": 23758,
+            "lines": 184,
+            "sha256": "BA7130A50AC5636F4564D2DE834E4B243DCB4EEFE539FB491E9605D04705112E",
+            "paths": [
+              "tests/support/MIR422HistoricalCompleteState.lua"
+            ],
+            "tag_path_references": [
+              "v4.2.2:tests/support/MIR422HistoricalCompleteState.lua",
+              "v4.3.0:tests/support/MIR422HistoricalCompleteState.lua",
+              "v4.4.0:tests/support/MIR422HistoricalCompleteState.lua",
+              "v4.4.1:tests/support/MIR422HistoricalCompleteState.lua"
+            ],
+            "disposition": "superseded",
+            "intent_groups": [
+              "historical-capabilities-and-state",
+              "exact-frontier-exceptions",
+              "damage-and-execution-boundaries"
+            ],
+            "variant_decision": "Preserve useful complete-state and capability intent through the later608900 module. The old frontier comparator admits an unrelated suffix00 source and ignores destination; original pure-function controls reproduce both overbroad admissions. Later exact tuple allowlists supersede that harness weakness. No old native result is retroactively rewritten and no current player defect is inferred."
+          },
+          {
+            "blob": "6089002bc362a42fb4c032b9103a6daf8a215648",
+            "bytes": 29851,
+            "lines": 234,
+            "sha256": "D50276E9B1468FB8676784775593EBD40B7EE97441ADBFDFD8D7A26E88D4A4BE",
+            "paths": [
+              "tests/support/MIR422HistoricalCompleteState.lua"
+            ],
+            "tag_path_references": [
+              "v4.4.2:tests/support/MIR422HistoricalCompleteState.lua",
+              "v4.5.0:tests/support/MIR422HistoricalCompleteState.lua",
+              "v4.5.1:tests/support/MIR422HistoricalCompleteState.lua",
+              "v4.5.2:tests/support/MIR422HistoricalCompleteState.lua",
+              "v4.6.0:tests/support/MIR422HistoricalCompleteState.lua",
+              "v4.7.0:tests/support/MIR422HistoricalCompleteState.lua",
+              "v4.7.1:tests/support/MIR422HistoricalCompleteState.lua",
+              "v4.7.2:tests/support/MIR422HistoricalCompleteState.lua",
+              "v4.7.3:tests/support/MIR422HistoricalCompleteState.lua"
+            ],
+            "disposition": "consolidate",
+            "intent_groups": [
+              "historical-capabilities-and-state",
+              "exact-frontier-exceptions",
+              "damage-and-execution-boundaries"
+            ],
+            "variant_decision": "Retain engine-capable state/definition/recipe/category/settings/queue expectations and exact transition-specific frontier guards. New unresearched technologies and zero-unearned newly exposed category bonuses are admitted; not every new force is rejected. Do not invent fields for older engines or restore this old capture/export module as a second framework."
+          }
+        ],
+        "review_custody": {
+          "source_bindings": {
+            "path": "source-bindings.json",
+            "sha256": "B13E8F588513528CCB4625180F1BEE543B58ACF9F52C48E20994D4BA1EF01FE3"
+          },
+          "variant_line_coverage": [
+            {
+              "earlier": "5ece1783069f1badc1df5d626ccf733dd3b2499e",
+              "latest": "2de61f8f6e32393d8719a6a690af36810fb9abb4",
+              "earlier_lines": 52,
+              "equal_latest_lines": 50,
+              "earlier_unique_lines": 2,
+              "all_lines_reconstructed": true
+            },
+            {
+              "earlier": "09bbb93f12ad47f75a3a532ba73f569c54465965",
+              "latest": "2de61f8f6e32393d8719a6a690af36810fb9abb4",
+              "earlier_lines": 110,
+              "equal_latest_lines": 102,
+              "earlier_unique_lines": 8,
+              "all_lines_reconstructed": true
+            },
+            {
+              "earlier": "36675762ecce2b9c8ba4346f1dcefcf27bae9848",
+              "latest": "6089002bc362a42fb4c032b9103a6daf8a215648",
+              "earlier_lines": 184,
+              "equal_latest_lines": 181,
+              "earlier_unique_lines": 3,
+              "all_lines_reconstructed": true
+            }
+          ],
+          "fixed_data_and_pure_comparator_probe": {
+            "path": "preparation-frontier-data-and-scope-observation.json",
+            "sha256": "4851F20DDCA7F4C2E61AF1B07BFC99DC7319846E9EB32AFB50160E2DA80B8B52"
+          }
+        },
+        "groups": [
+          {
+            "id": "modern-state-and-work",
+            "disposition": "consolidate",
+            "independent_expectation": "Retain existing technology identities, level/researched/enabled/visibility state, saved/current work, ordered queue, earned force/recipe effects and effective startup/imported settings. The later original additionally snapshots prototype order/hidden/Factoriopedia/max/prerequisites/science amounts/effects/cost/formula/energy across every existing force, and refuses newly researched additions. Its ordinary sample conserves completed work as old fraction times old unit count divided by new unit count within0..1; complete unchanged-cost snapshots require exact fractions. Authorized ownership/cost changes need their own independent oracle, not a blanket unchanged-percentage rule.",
+            "implementation": [
+              "source/migrations",
+              "source/runtime/bootstrap.lua",
+              "source/runtime/legacy_caps.lua",
+              "source/runtime/k2_imersite_migration.lua",
+              "source/research/settings.lua"
+            ],
+            "host_controls": [
+              "tests/test_full_catalogue_upgrade_fixture.py::test_exact_oracle_identity_effect_and_credit_closure",
+              "tests/test_full_catalogue_upgrade_f210_fixture.py::test_exact_independent_inventory_and_published_owner_closure",
+              "tests/test_full_catalogue_upgrade_f210_fixture.py::test_f210_473_source_snapshot_reaches_the_current_successor_unchanged",
+              "tests/test_migration_origins_successor_controls.py::test_control_preserves_the_actual_source_baseline_then_records_separate_f200_and_f210_labs"
+            ],
+            "applicable_evidence": [
+              "spec/evidence/full-catalogue-473-f200-current7a2-native-chain-r01.json",
+              "spec/evidence/full-catalogue-473-current7a2-native-chain-r01.json"
+            ],
+            "mapping_limit": "Current named fixtures independently map declared public/native-owner/credit rows, recipe/force effects and queued42-percent/paused27-percent work with an actual new lab/save/two cold reloads. Their accepted7a2 input identities remain fixed; source assertions and original synthetic seeding are not native passes. They do not prove arbitrary full historical prototype/settings/foreign-force closure or earned scripted Space Age rows.",
+            "remaining_executable_check": "Reconcile accepted current catalogue/settings/foreign-state evidence against any still-unmapped old full-state assertion. Apply VER-06 to exact candidate502 consumed inputs and protected selected route saves. Runtime catalogue now uses actual braking creation history and shared cap/API consumers, so unchanged migration/Generator files do not by themselves establish reuse. Qualify affected beta-to-successor state through Black Glass reviewed packets; no blanket every-patch rerun.",
+            "owner": "Aero expectation/applicability review; Black Glass exact native queue"
+          },
+          {
+            "id": "historical-capabilities-and-state",
+            "disposition": "consolidate",
+            "independent_expectation": "The original historical comparator preserves all pre-existing technologies and recipe enablement, earned force/ammo/gun/turret bonuses, settings and available queue/current/saved work with capabilities selected from the actual engine line. Factorio0.13/0.14 omit numeric levels/per-row saved work/settings;0.17+ adds queue and visibility;1.0/1.1 adds mod-version readback. New unresearched technologies and zero-unearned new category bonuses are allowed, while existing earned state and every pre-existing force remain protected.",
+            "implementation": [
+              "source/adapters/reduced",
+              "source/research/historical_direct.lua",
+              "source/research/historical_continuations.lua",
+              "source/migrations"
+            ],
+            "host_controls": [
+              "tests/test_historical_transition_fixture.py::test_published_to_mir5_mock_preserves_partial_progress_and_queue_until_real_successor_event",
+              "tests/test_historical_transition_fixture.py::test_completed_successor_configuration_reentry_is_observational_and_rejects_corruption",
+              "tests/test_historical_transition_fixture.py::test_data_final_preflight_rejects_wrong_authored_effect_before_acceleration"
+            ],
+            "applicable_evidence": [
+              "spec/evidence/historical-transition-013-016-chain.json",
+              "spec/evidence/historical-transition-017-100-110-chain.json",
+              "spec/evidence/historical-473-f016-7a2-native-chain-r01.json",
+              "spec/inventory/migration-origins.json"
+            ],
+            "mapping_limit": "Those exact named historical mining/effect/work/save/reload results are not full historical catalogue/settings/modpack/client qualification. Keep CONT-11 selected nine/seven/four routing and its original input review; do not reinterpret the older adjacent-axis inventory as another campaign. F018 source/test presence and its original optional transition controls do not expand its experimental load-smoke-only requirement.",
+            "remaining_executable_check": "Resolve materially relevant unmapped historical definition/settings/foreign-state expectations against accepted current independent sources and tests. Keep missing original source snapshots or unavailable fields explicitly unverified; run only genuinely affected admitted routes after final package review. Preserve original closed routes and actual engine limits.",
+            "owner": "Aero historical/coverage review; Black Glass affected native execution"
+          },
+          {
+            "id": "exact-frontier-exceptions",
+            "disposition": "retain",
+            "independent_expectation": "A historical definition exception is finite data bound to exact before/after fields and the exact source/destination route, leaving every other definition and earned-state field equal. F20046 fixed rows add chemical/production science to39, utility to5 personal rows and all three to2 lab/science rows, retaining existing ingredient amounts and prerequisites. Historical27 row/line records cover exact0.15/0.16 science/prerequisite frontiers; later14 F016 restoration vectors have only the two named4.4.0/4.4.1-to4.4.2 routes. F210 only admits its named three promethium corrections and exact added-setting defaults at the recorded transition.",
+            "implementation": [
+              "source/compatibility/science_bindings.lua",
+              "source/research/historical_direct.lua",
+              "source/research/historical_continuations.lua"
+            ],
+            "host_controls": [
+              "tests/test_full_catalogue_upgrade_fixture.py::test_stage_data_guard_accelerates_exact_gear_only",
+              "tests/test_full_catalogue_upgrade_f210_fixture.py::test_stage_data_guard_accelerates_only_exact_f210_gear",
+              "tests/test_historical_transition_fixture.py::test_data_final_preflight_accepts_each_pinned_cost_shape_before_acceleration"
+            ],
+            "original_caller": "v4.7.3:tests/support/MIR421SpaceFakeUpgrade.ps1 lines287-305 imports the F200 fixed table only into its composed selected4.2 control; its complete helper body is mapped separately in1587.",
+            "pure_controls": {
+              "original_variants": 2,
+              "scoped_positive_per_variant": 1,
+              "opposing_tuples_per_variant": 3,
+              "old_suffix00_wrong_source_admitted": true,
+              "old_unlisted_destination_admitted": true,
+              "later_exact_tuple_guards_refuse_both": true,
+              "both_refuse_unrelated_earned_level_drift": true
+            },
+            "variant_decision": "The old suffix-only comparator is superseded by the later exact tuple guard. Fixed literal inspection and pure probes do not authenticate the original independent snapshot/result provenance. These are original transition-specific oracle allowances, not a MIR5 repair policy or permission to change current expectations to match a candidate.",
+            "remaining_executable_check": "For any actually reused historical allowance, recover/review its independently observed original snapshot receipts and exact applicability first; name missing originals. Map delivered current science/definition expectations through existing inventories and accepted decisions. Do not copy old frontier tables into player source, infer expected values from502, or automatically rerun every old tuple.",
+            "owner": "Aero independent source/oracle reconciliation; Black Glass only if an affected native check is admitted"
+          },
+          {
+            "id": "damage-and-execution-boundaries",
+            "disposition": "obsolete-implementation-only",
+            "independent_expectation": "Source, upgrade and each cold reload keep distinct actual inputs/results. Preserve already-damaged saves and legitimate post-damage work without fabricating lost history. The original persisted-damage branch uses an actual intermediate4.2.1 state and captures newly seeded57-percent work; its external pre-damage evaluator is not product recovery state.",
+            "implementation": [
+              "tools/Invoke-NativeFixture.ps1",
+              "tools/lib/validation/NativeProbeCommon.ps1",
+              "tests/fixtures/full-catalogue-upgrade/shared/control.lua",
+              "tests/fixtures/historical-transition/control.lua"
+            ],
+            "host_controls": [
+              "tests/test_full_catalogue_upgrade_fixture.py::test_profiles_controls_and_native_boundaries_are_explicit",
+              "tests/test_full_catalogue_upgrade_f210_fixture.py::test_profiles_and_shared_staging_contract_are_explicit",
+              "tests/test_migration_origins_successor_controls.py::test_control_registers_configuration_lifecycle_without_work_at_parse_time"
+            ],
+            "variant_decision": "Retire old fixed fixture-version names, storage/global transport layout and hand-built snapshot/export/marker protocol as active machinery. Retain each original blob and valid preservation expectation. on_load/log/export labels alone prove neither fresh native process, save CRC, normal engine exit nor true read-only load; current stronger guarded runner boundaries remain binding.",
+            "remaining_executable_check": "Apply the already mapped runner/native custody checks to each reused accepted route. Keep original adverse/scoped-success identities and protected saves. No loss reconstruction, replaced original, old runner execution or new historical campaign follows from this source disposition.",
+            "owner": "Aero source/evidence review; Black Glass controller/native custody"
+          }
+        ],
+        "host_validation": {
+          "existing_selected_controls": 29,
+          "full_catalogue_f200": 5,
+          "full_catalogue_f210": 7,
+          "historical_transition": 11,
+          "modern_origin_successor": 6,
+          "lua": "5.2",
+          "lupa": "2.6",
+          "new_or_modified_tests": 0,
+          "native_execution": false
+        },
+        "custody": "build/qualification/aero-imported-upgrade-oracles-r01/",
+        "qualification_limit": "Only the selected seven imported Lua bodies and their58 distinct bindings are source-dispositioned. This identifies a superseded historical fixture weakness, not a demonstrated current product defect. No original native receipt is changed or relabelled, no prior closed route is reopened merely by reading its source, and no502 native/save/client/performance or stable verdict follows. Full frontier snapshot custody, other source groups and applicable final-candidate coverage remain open.",
         "native_execution": false,
         "source_reconciliation_complete": false,
         "test_intent_reconciliation_complete": false,
