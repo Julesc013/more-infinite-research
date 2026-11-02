@@ -8,7 +8,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 - Show current and maximum recipe productivity and whether the next research level can still help in selected Library details, without changing research queue behavior.
 - Search affected recipe IDs in the Library, including IDs without translated names.
-- Preview diagnostic reports in Help and choose whether to include settings and availability details before exporting locally.
+- Preview diagnostic reports in Debug and choose whether to include settings and availability details before exporting locally.
 - Preserve personal Library choices through player and configuration changes, and show when discovery information is limited or falls back to stable IDs.
 - Correct three Russian research names for cannon shells and thruster fuel and oxidizer productivity.
 
