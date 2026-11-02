@@ -10,7 +10,7 @@ end
 data:extend({{
   type = "technology",
   name = name,
-  icon = "__base__/graphics/technology/automation.png",
+  icon = "__base__/graphics/technology/automation-1.png",
   icon_size = 256,
   enabled = false,
   hidden = true,

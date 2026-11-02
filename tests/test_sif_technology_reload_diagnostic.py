@@ -64,6 +64,8 @@ class TechnologyReloadFixtureTests(unittest.TestCase):
           assert(extend_calls == 1)
           local row = assert(backing[sentinel])
           assert(row.type == "technology" and row.name == sentinel)
+          -- Exact Base 2.0.77 automation declaration, independent of this fixture.
+          assert(row.icon == "__base__/graphics/technology/automation-1.png" and row.icon_size == 256)
           assert(row.enabled == false and row.hidden == true and row.upgrade == false)
           assert(#row.effects == 0 and #row.prerequisites == 0)
           assert(row.unit.count == 1 and row.unit.time == 1)
