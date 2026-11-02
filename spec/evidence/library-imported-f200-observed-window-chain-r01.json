@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "kind": "MIRImportedF200ObservedGeometryAdverseChainV1",
+  "status": "measured-geometry-configuration-modal-and-exit-boundary-adverse",
+  "source": {
+    "public": "ec00a0a575c39b573fb855cb34a91968defb2612",
+    "private": "87275012455e54d075f692daf66584bbea5a07f7",
+    "private_checked_merge": "2304b8f6313c1ebdb0be25c83106e23c9651a0c7",
+    "engine": "2.0.77",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "player_version": "5.0.20001",
+    "player_sha256": "750ECA842134AFDDCC7C45B2B656510CA60F09940A2E82B21896AAE7E3D8C1BE"
+  },
+  "observed": {
+    "actual_native_processes": 1,
+    "native_pid": 20444,
+    "actor_pid": 17456,
+    "root_pid": 24120,
+    "requested_window": "1024x576",
+    "observed_capture": [
+      1280,
+      720
+    ],
+    "dpi": {
+      "window_handle": 10814992,
+      "window_context": 34,
+      "window_awareness": 2,
+      "window_dpi": 120,
+      "observer_initial_context": 18,
+      "observer_initial_awareness": 2,
+      "client_rectangles": [
+        {
+          "context": "unaware",
+          "awareness": 0,
+          "left": 0,
+          "top": 0,
+          "right": 1024,
+          "bottom": 576,
+          "width": 1024,
+          "height": 576
+        },
+        {
+          "context": "system",
+          "awareness": 1,
+          "left": 0,
+          "top": 0,
+          "right": 1280,
+          "bottom": 720,
+          "width": 1280,
+          "height": 720
+        },
+        {
+          "context": "per-monitor",
+          "awareness": 2,
+          "left": 0,
+          "top": 0,
+          "right": 1280,
+          "bottom": 720,
+          "width": 1280,
+          "height": 720
+        },
+        {
+          "context": "per-monitor-v2",
+          "awareness": 2,
+          "left": 0,
+          "top": 0,
+          "right": 1280,
+          "bottom": 720,
+          "width": 1280,
+          "height": 720
+        }
+      ],
+      "observer_context_restored": true
+    },
+    "actual_captured_frames": 1,
+    "capture_sha256": "29B06CDA0380F4A167B77E8C84BC290744D22DA61DA4485234DDC4F26969D960",
+    "native_exit_code": null,
+    "actor_error": "[imported-library-native-input] geometry native nonzero exit",
+    "terminal_error": "[mir-library-unowned-process]",
+    "image_review": "Root viewed actualPNG: Factorio startup configuration-reset confirmation, not responsive main menu. Geometry is measured only.",
+    "facts": "Native log records window closed and Goodbye; actor attached Process reports null exit code and parent live guard overlaps exit. Neither a zero native exit nor complete diagnostic acceptance is inferred.",
+    "restore_verified": true,
+    "factorio_zero": true,
+    "cleanup_errors": []
+  },
+  "custody": {
+    "path": "build/qualification/f200-window-1024-observed-exit-adverse-r01",
+    "files": 31,
+    "bytes": 5438157,
+    "actual_locations": 2,
+    "readback_sha256": "6C624CF04A2486A6431160573F5DA6F94C2227BB20EAC1BB7238483261DAED80"
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/library-imported-f200-observed-window-receipts-r01.json.gz",
+    "bytes": 2630665,
+    "sha256": "9DD56466107E4163C6318C180F5023C55F35742188AE24106536E0FB33E42974",
+    "bodies": 17,
+    "includes_exact_owned_png": true,
+    "excludes_private_controller_source": true
+  },
+  "independent_review": {
+    "sha256": "A24A48150C7FE2184EFE493AE5ECD505AFE6014E5B8BF6FDBD5E98F47B9B0EBA",
+    "verdict": "GO-for-scoped-observed-geometry-applicability-only",
+    "overall_r03": "adverse-unchanged"
+  },
+  "next_packet_review": {
+    "name": "r19",
+    "verdict": "NO-GO",
+    "native_launches": 0,
+    "review_sha256": "CDDC609FB8B2F5CBB57F115E5E52AA24C148BEBD20F6A3289849C7C4433A2709",
+    "blocker": "Fresh Lua/retained-target state guard missing between click and text actor calls."
+  },
+  "limits": [
+    "The exact PNG shows a configuration-reset confirmation, not a responsive menu; geometry only is observed.",
+    "The attached Process exit code is null. Its nonzero-exit error string does not establish an actual nonzero engine exit; native log records normal close/Goodbye.",
+    "Parent unowned-process guard at closure and attached-exit observation remain unresolved; no unchanged diagnostic retry is authorized by this record.",
+    "Private132 HOST/source review closes the earlier composed ownership/argument defect only within its reviewed preparation scope. It does not qualify r03, prior captures or the later each-action guard.",
+    "r19 never launched. Its independent NO-GO and complete-graph review limit remain; a correction requires exact-source controls, a new fixture/packet and fresh independent review.",
+    "No Library input/lifecycle, candidate-B, whole-product performance, beta/stable publication or responsive-menu acceptance follows."
+  ],
+  "native_execution": true,
+  "native_acceptance": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}

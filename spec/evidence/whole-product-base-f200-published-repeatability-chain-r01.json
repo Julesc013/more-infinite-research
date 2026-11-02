@@ -1,0 +1,461 @@
+{
+  "schema": 1,
+  "kind": "MIRPublishedBaseF200RepeatabilityNativeChainV1",
+  "status": "independently-reviewed-completed-unscored-published-only-diagnostic",
+  "execution_source": "c76daadd54224392f5582f6139bc0bd1550b369d",
+  "consumed_tool_source": "ac5376be2dcd85ca4dda57c7b973859dc4387ace",
+  "source_applicability": "Only version staging and inventory changed after ac; every consumed tool/input hash remained exact. No old native receipt is relabelled.",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "player": {
+    "version": "4.7.20003",
+    "sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+    "profile": "Base"
+  },
+  "packet_sha256": "0774F17C44658DEA9E8059B80C8D88D7A7FBDF2789B8FC7FE80786887E165024",
+  "complete_packet_review_sha256": "4AC8D046C524FA0D2678A699E3EAFA9E410A51254220608DA4E265691EBA8F77",
+  "actual_result_review_sha256": "16A4300F54412A25914A38D6AE0FCA1830643C4D04BB2056C8D54B9A97CEBCF2",
+  "root_readback_sha256": "18C7E189B5050823CFFD15796054FEF687B5E8CA5CCB9394AF06748F27CFCDAE",
+  "original_terminal_sha256": "A56884FC5E24AD63CC79B0EADD86BFCA3A278D55A29E148FE76092EFD829F25B",
+  "original_result_sha256": "4BFBD353AE6439C9ECBFE01D178D5FD394D798E74D2406A83928520CFC055E0C",
+  "actual_engine_allocations": 5,
+  "schedule": "Exactly one warmup and four fixed published-only observations; no retry, extension or candidate arm",
+  "observations": [
+    {
+      "ordinal": 1,
+      "phase": "repeatability-warmup",
+      "elapsed_seconds": 36.8233451,
+      "engine_process_id": 15556,
+      "engine_start_utc": "2026-11-02T06:09:16.7073955Z",
+      "engine_initialised_log_seconds": 34.824,
+      "actor_cleanup": "owned-process-closed",
+      "resource_terminal": {
+        "observed_at": "2026-11-02T06:09:53.8942247+00:00",
+        "phase": "completed",
+        "exit_code": 0,
+        "peak_working_set_bytes": 1820860416,
+        "peak_sampled_private_bytes": 3889852416,
+        "completion_predicate_observed": false
+      },
+      "observer_diagnostics": {
+        "schema": 1,
+        "capture_requests": 2,
+        "captured_frames": 2,
+        "no_main_window": 0,
+        "not_visible_or_minimized": 0,
+        "foreground_mismatch": 0,
+        "foreground_request_attempts": 0,
+        "foreground_request_refused": 0,
+        "foreground_request_not_acquired": 0,
+        "owned_peer_foreground_identity_refused": 0,
+        "owned_peer_foreground_foreign_refused": 0,
+        "owned_peer_foreground_desktop_refused": 0,
+        "owned_peer_foreground_attach_refused": 0,
+        "owned_peer_foreground_activation_refused": 0,
+        "owned_peer_foreground_detach_refused": 0,
+        "owned_peer_foreground_post_detach_not_target": 0,
+        "owned_peer_foreground_already_target_drift": 0,
+        "owned_peer_foreground_last": null,
+        "client_geometry_unavailable": 0,
+        "offscreen": 0,
+        "occluded": 0,
+        "last_occlusion": null,
+        "last_rejection": ""
+      },
+      "main_menu_png": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\whole-product-base-published-control-aero-r01\\runs\\01-repeatability-warmup-published-4.7\\responsive-menu-actor\\main-menu.png",
+      "settings_response_png": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\whole-product-base-published-control-aero-r01\\runs\\01-repeatability-warmup-published-4.7\\responsive-menu-actor\\settings-response.png"
+    },
+    {
+      "ordinal": 2,
+      "phase": "repeatability-observation",
+      "elapsed_seconds": 11.3238726,
+      "engine_process_id": 24420,
+      "engine_start_utc": "2026-11-02T06:09:56.7972781Z",
+      "engine_initialised_log_seconds": 9.283,
+      "actor_cleanup": "owned-process-closed",
+      "resource_terminal": {
+        "observed_at": "2026-11-02T06:10:08.4302993+00:00",
+        "phase": "completed",
+        "exit_code": 0,
+        "peak_working_set_bytes": 2151084032,
+        "peak_sampled_private_bytes": 4262563840,
+        "completion_predicate_observed": false
+      },
+      "observer_diagnostics": {
+        "schema": 1,
+        "capture_requests": 2,
+        "captured_frames": 2,
+        "no_main_window": 0,
+        "not_visible_or_minimized": 0,
+        "foreground_mismatch": 0,
+        "foreground_request_attempts": 0,
+        "foreground_request_refused": 0,
+        "foreground_request_not_acquired": 0,
+        "owned_peer_foreground_identity_refused": 0,
+        "owned_peer_foreground_foreign_refused": 0,
+        "owned_peer_foreground_desktop_refused": 0,
+        "owned_peer_foreground_attach_refused": 0,
+        "owned_peer_foreground_activation_refused": 0,
+        "owned_peer_foreground_detach_refused": 0,
+        "owned_peer_foreground_post_detach_not_target": 0,
+        "owned_peer_foreground_already_target_drift": 0,
+        "owned_peer_foreground_last": null,
+        "client_geometry_unavailable": 0,
+        "offscreen": 0,
+        "occluded": 0,
+        "last_occlusion": null,
+        "last_rejection": ""
+      },
+      "main_menu_png": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\whole-product-base-published-control-aero-r01\\runs\\02-repeatability-observation-published-4.7\\responsive-menu-actor\\main-menu.png",
+      "settings_response_png": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\whole-product-base-published-control-aero-r01\\runs\\02-repeatability-observation-published-4.7\\responsive-menu-actor\\settings-response.png"
+    },
+    {
+      "ordinal": 3,
+      "phase": "repeatability-observation",
+      "elapsed_seconds": 11.3051581,
+      "engine_process_id": 19700,
+      "engine_start_utc": "2026-11-02T06:10:11.1870902Z",
+      "engine_initialised_log_seconds": 9.193,
+      "actor_cleanup": "owned-process-closed",
+      "resource_terminal": {
+        "observed_at": "2026-11-02T06:10:22.8104787+00:00",
+        "phase": "completed",
+        "exit_code": 0,
+        "peak_working_set_bytes": 2277941248,
+        "peak_sampled_private_bytes": 4342099968,
+        "completion_predicate_observed": false
+      },
+      "observer_diagnostics": {
+        "schema": 1,
+        "capture_requests": 2,
+        "captured_frames": 2,
+        "no_main_window": 0,
+        "not_visible_or_minimized": 0,
+        "foreground_mismatch": 0,
+        "foreground_request_attempts": 0,
+        "foreground_request_refused": 0,
+        "foreground_request_not_acquired": 0,
+        "owned_peer_foreground_identity_refused": 0,
+        "owned_peer_foreground_foreign_refused": 0,
+        "owned_peer_foreground_desktop_refused": 0,
+        "owned_peer_foreground_attach_refused": 0,
+        "owned_peer_foreground_activation_refused": 0,
+        "owned_peer_foreground_detach_refused": 0,
+        "owned_peer_foreground_post_detach_not_target": 0,
+        "owned_peer_foreground_already_target_drift": 0,
+        "owned_peer_foreground_last": null,
+        "client_geometry_unavailable": 0,
+        "offscreen": 0,
+        "occluded": 0,
+        "last_occlusion": null,
+        "last_rejection": ""
+      },
+      "main_menu_png": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\whole-product-base-published-control-aero-r01\\runs\\03-repeatability-observation-published-4.7\\responsive-menu-actor\\main-menu.png",
+      "settings_response_png": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\whole-product-base-published-control-aero-r01\\runs\\03-repeatability-observation-published-4.7\\responsive-menu-actor\\settings-response.png"
+    },
+    {
+      "ordinal": 4,
+      "phase": "repeatability-observation",
+      "elapsed_seconds": 11.129625,
+      "engine_process_id": 4632,
+      "engine_start_utc": "2026-11-02T06:10:25.4847483Z",
+      "engine_initialised_log_seconds": 9.147,
+      "actor_cleanup": "owned-process-closed",
+      "resource_terminal": {
+        "observed_at": "2026-11-02T06:10:36.9120453+00:00",
+        "phase": "completed",
+        "exit_code": 0,
+        "peak_working_set_bytes": 2243059712,
+        "peak_sampled_private_bytes": 4380368896,
+        "completion_predicate_observed": false
+      },
+      "observer_diagnostics": {
+        "schema": 1,
+        "capture_requests": 2,
+        "captured_frames": 2,
+        "no_main_window": 0,
+        "not_visible_or_minimized": 0,
+        "foreground_mismatch": 0,
+        "foreground_request_attempts": 0,
+        "foreground_request_refused": 0,
+        "foreground_request_not_acquired": 0,
+        "owned_peer_foreground_identity_refused": 0,
+        "owned_peer_foreground_foreign_refused": 0,
+        "owned_peer_foreground_desktop_refused": 0,
+        "owned_peer_foreground_attach_refused": 0,
+        "owned_peer_foreground_activation_refused": 0,
+        "owned_peer_foreground_detach_refused": 0,
+        "owned_peer_foreground_post_detach_not_target": 0,
+        "owned_peer_foreground_already_target_drift": 0,
+        "owned_peer_foreground_last": null,
+        "client_geometry_unavailable": 0,
+        "offscreen": 0,
+        "occluded": 0,
+        "last_occlusion": null,
+        "last_rejection": ""
+      },
+      "main_menu_png": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\whole-product-base-published-control-aero-r01\\runs\\04-repeatability-observation-published-4.7\\responsive-menu-actor\\main-menu.png",
+      "settings_response_png": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\whole-product-base-published-control-aero-r01\\runs\\04-repeatability-observation-published-4.7\\responsive-menu-actor\\settings-response.png"
+    },
+    {
+      "ordinal": 5,
+      "phase": "repeatability-observation",
+      "elapsed_seconds": 10.9393995,
+      "engine_process_id": 26772,
+      "engine_start_utc": "2026-11-02T06:10:39.4893496Z",
+      "engine_initialised_log_seconds": 9.137,
+      "actor_cleanup": "owned-process-closed",
+      "resource_terminal": {
+        "observed_at": "2026-11-02T06:10:50.7493352+00:00",
+        "phase": "completed",
+        "exit_code": 0,
+        "peak_working_set_bytes": 2156621824,
+        "peak_sampled_private_bytes": 4362735616,
+        "completion_predicate_observed": false
+      },
+      "observer_diagnostics": {
+        "schema": 1,
+        "capture_requests": 2,
+        "captured_frames": 2,
+        "no_main_window": 0,
+        "not_visible_or_minimized": 0,
+        "foreground_mismatch": 0,
+        "foreground_request_attempts": 0,
+        "foreground_request_refused": 0,
+        "foreground_request_not_acquired": 0,
+        "owned_peer_foreground_identity_refused": 0,
+        "owned_peer_foreground_foreign_refused": 0,
+        "owned_peer_foreground_desktop_refused": 0,
+        "owned_peer_foreground_attach_refused": 0,
+        "owned_peer_foreground_activation_refused": 0,
+        "owned_peer_foreground_detach_refused": 0,
+        "owned_peer_foreground_post_detach_not_target": 0,
+        "owned_peer_foreground_already_target_drift": 0,
+        "owned_peer_foreground_last": null,
+        "client_geometry_unavailable": 0,
+        "offscreen": 0,
+        "occluded": 0,
+        "last_occlusion": null,
+        "last_rejection": ""
+      },
+      "main_menu_png": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\whole-product-base-published-control-aero-r01\\runs\\05-repeatability-observation-published-4.7\\responsive-menu-actor\\main-menu.png",
+      "settings_response_png": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\whole-product-base-published-control-aero-r01\\runs\\05-repeatability-observation-published-4.7\\responsive-menu-actor\\settings-response.png"
+    }
+  ],
+  "fixed_adjacent_pairs": [
+    {
+      "ordinals": [
+        2,
+        3
+      ],
+      "absolute_delta_seconds": 0.018714499999999745,
+      "mean_seconds": 11.31451535,
+      "relative_delta_percent": 0.1654025773185216,
+      "original_limit_seconds": 0.5657257675,
+      "within_original_contextual_tolerance": true
+    },
+    {
+      "ordinals": [
+        4,
+        5
+      ],
+      "absolute_delta_seconds": 0.19022550000000038,
+      "mean_seconds": 11.03451225,
+      "relative_delta_percent": 1.7239139863205133,
+      "original_limit_seconds": 0.5517256125000001,
+      "within_original_contextual_tolerance": true
+    }
+  ],
+  "pair_method": "Original max(0.5s,5percent of pair mean) contextual tolerance, as in existing analyzer; one declared warmup excluded and two fixed adjacent pairs retained; no sample selection/extension",
+  "resource_policy": {
+    "expected_peak_memory_mib": 9216,
+    "maximum_new_output_mib": 2048,
+    "per_launch_timeout_seconds": 300,
+    "admission_wait_seconds": 30
+  },
+  "restoration": {
+    "original_controls_and_selected_archives_actual_disk_rechecked": true,
+    "factorio_processes_after": 0,
+    "all_60_original_inputs_rehashed": true
+  },
+  "custody": [
+    {
+      "kind": "native",
+      "original": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\whole-product-base-published-control-aero-r01",
+      "copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\base-f200-published-repeatability-native-complete-r01\\native",
+      "count": 61,
+      "bytes": 144844752
+    },
+    {
+      "kind": "packet",
+      "original": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\base-f200-published-repeatability-packet-r02",
+      "copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\base-f200-published-repeatability-native-complete-r01\\packet",
+      "count": 6,
+      "bytes": 75328
+    },
+    {
+      "kind": "packet-review",
+      "original": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\base-f200-published-repeatability-packet-review-r02",
+      "copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\base-f200-published-repeatability-native-complete-r01\\packet-review",
+      "count": 9,
+      "bytes": 101120
+    }
+  ],
+  "root_activity_during_native": "Only tool-session output waits and chat status communication; no local builds/host suites/source reads/CI queries or competing native processes until original wrapper completed",
+  "receipt_capsule": {
+    "path": "spec/evidence/whole-product-base-f200-published-repeatability-receipts-r01.json.gz",
+    "bytes": 17583416,
+    "sha256": "2C3FD9D765DFC9356940ACB0B86F0035720352C7E02940ECB3619E5D1B0F1944",
+    "bodies": 105,
+    "scope": "Lossless selected packet/review/composition/native text plus final two endpoint PNGs; full native bytes are in two local custody locations"
+  },
+  "omitted_native_files": [
+    {
+      "relative_path": "runs/01-repeatability-warmup-published-4.7/config.ini",
+      "bytes": 66963,
+      "sha256": "432CEFB9111A12D93E54A512544AA95E05E3A4BFB1B678F87160A4C7BFA91F81",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "runs/01-repeatability-warmup-published-4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9392067,
+      "sha256": "250AF79386A3277C10712061D113E12A31E8722F01C6A6A5944F8FAC3E13348E",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "runs/01-repeatability-warmup-published-4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 9386640,
+      "sha256": "14C5F2A9DD5D253739FA2774E6ED28F3EEB91FD158E6B5B196687AFA32B2FC95",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "runs/01-repeatability-warmup-published-4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 9392067,
+      "sha256": "250AF79386A3277C10712061D113E12A31E8722F01C6A6A5944F8FAC3E13348E",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "runs/02-repeatability-observation-published-4.7/config.ini",
+      "bytes": 66963,
+      "sha256": "432CEFB9111A12D93E54A512544AA95E05E3A4BFB1B678F87160A4C7BFA91F81",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "runs/02-repeatability-observation-published-4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 10359035,
+      "sha256": "88E8448D56738317D0B1AB60E91BC3561B06FF07D63E3224C62F4697431371F0",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "runs/02-repeatability-observation-published-4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 10335836,
+      "sha256": "86568BF92776BAD8700F8C7D9240154E05751AF79EB91439D108EE12544C5477",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "runs/02-repeatability-observation-published-4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 10359035,
+      "sha256": "88E8448D56738317D0B1AB60E91BC3561B06FF07D63E3224C62F4697431371F0",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "runs/03-repeatability-observation-published-4.7/config.ini",
+      "bytes": 66963,
+      "sha256": "432CEFB9111A12D93E54A512544AA95E05E3A4BFB1B678F87160A4C7BFA91F81",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "runs/03-repeatability-observation-published-4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9759652,
+      "sha256": "338263D96D5EC9ED82095CA20BCD95B2D549EBEA93F558E4A7A4F7080663954E",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "runs/03-repeatability-observation-published-4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 9748078,
+      "sha256": "F94796E419876C954AA48E29FABB28AD0940C569A3A715A4B7F011E92156F70F",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "runs/03-repeatability-observation-published-4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 9759652,
+      "sha256": "338263D96D5EC9ED82095CA20BCD95B2D549EBEA93F558E4A7A4F7080663954E",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "runs/04-repeatability-observation-published-4.7/config.ini",
+      "bytes": 66963,
+      "sha256": "432CEFB9111A12D93E54A512544AA95E05E3A4BFB1B678F87160A4C7BFA91F81",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "runs/04-repeatability-observation-published-4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 9339669,
+      "sha256": "EA14D8F01BDDEA49125916F25ED8509BBFBAD0E6BA8912CC19CB3A4298668956",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "runs/04-repeatability-observation-published-4.7/responsive-menu-actor/main-menu.png",
+      "bytes": 9290275,
+      "sha256": "AD3C79969C41EAEA242FE3DF294012267B9870BB59C977269E4D693079B02EE6",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "runs/04-repeatability-observation-published-4.7/responsive-menu-actor/settings-response.png",
+      "bytes": 9339669,
+      "sha256": "EA14D8F01BDDEA49125916F25ED8509BBFBAD0E6BA8912CC19CB3A4298668956",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "runs/05-repeatability-observation-published-4.7/config.ini",
+      "bytes": 66963,
+      "sha256": "432CEFB9111A12D93E54A512544AA95E05E3A4BFB1B678F87160A4C7BFA91F81",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "runs/05-repeatability-observation-published-4.7/responsive-menu-actor/latest-owned-window.png",
+      "bytes": 8369169,
+      "sha256": "B9F51E4F7E964E39EDBB84B726AE1F1B1B2620565DF762DC2B1B35DBB4AA01B7",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "write-data/ordinary-menu-shared/achievements-modded.dat",
+      "bytes": 4428,
+      "sha256": "836B5677D811843A1A0434B801E497477C2C9FE1E2224910C27DBEDFA8E21815",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "write-data/ordinary-menu-shared/crop-cache.dat",
+      "bytes": 2412241,
+      "sha256": "4C867E345C32870A722FA032B36B876ED7F92BF983B480F887CC58F4CA069709",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "write-data/ordinary-menu-shared/factorio-current.log",
+      "bytes": 33047,
+      "sha256": "72E0A2A2F34DA3FA7689CDAFE07DD8446DFC7B4A36B2DAF364EECDE64D5472CD",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    },
+    {
+      "relative_path": "write-data/ordinary-menu-shared/player-data.json",
+      "bytes": 11043,
+      "sha256": "25616A1A5A13DAAB827A647DFD0033F139F9AE6AF83E73FBE656B4B838A79E37",
+      "reason": "Binary/config/player-data/cache body retained in both verified local native locations; public endpoint PNG selection is final main-menu/Settings only"
+    }
+  ],
+  "limits": [
+    "Diagnostic only, no candidate or performance acceptance",
+    "Same published473 Base2077 exact input only, no 502 transfer",
+    "Warmup36.823s retains its separate observation; no cause inferred",
+    "Completed resource exit0 refers to governed actors; engine natural exit codes are unproven",
+    "Two local custody locations, not an off-machine backup",
+    "No gameplay/save/client/export/heavy-cohort or stable verdict",
+    "Independent reviewer actually viewed all10 endpoint PNGs; capsule transports final2 only, other image identities remain in original/copy manifests",
+    "A pass of contextual same-version pairs is not comparison acceptance or a diagnosis of prior variance",
+    "First source-pin refusal and superseded exact packet NO-GO remain preserved; no guard was removed"
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}
