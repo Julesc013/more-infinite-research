@@ -8787,7 +8787,7 @@
           "PLAT-UI-01"
         ],
         "obligation": "Preserve explicit denials, engine exclusions and proposed UI scope as decisions, not missing implementation.",
-        "remaining": "VEH-01/VEH-02 source/probe/report provenance and explicit nonadmission are reconciled in the bounded optional-runtime review below; original request IDs/text/decisions/status are unchanged. PIPE-01/PLAT-UI-01 and other original decision sources retain their own unresolved scope. A future acceptance decision requires maintainer authority; no experimental Car result becomes a delivered MIR5 service."
+        "remaining": "VEH-01/VEH-02 source/probe/report provenance and explicit nonadmission are reconciled in the bounded optional-runtime review below. The bounded PIPE-01 review separately preserves its commit-4.2 decision, withheld admission and unaccepted rates; permission/economics qualification and original-input custody gaps remain open. This grouping does not reject or complete that request. PLAT-UI-01 and other original decision sources retain their own unresolved scope. Original request IDs/text/decisions/status are unchanged; no experimental Car result becomes a delivered MIR5 service."
       },
       {
         "subjects": [
@@ -16063,6 +16063,28 @@
         ],
         "remaining": "Black Glass observes actual corrected imported percentages/aliases, affected output/export/import/save/reload and performs final consumed-input review; independent review, CI and whole VER-07 remain open.",
         "native_execution": false,
+        "whole_source_reconciliation_complete": false
+      },
+      {
+        "reviewed_on": "2026-11-03",
+        "reviewed_against": "f5432c367bd8691bf478190c625a270b89923c39",
+        "subjects": [
+          "CONT-12",
+          "CONT-15",
+          "VER-07"
+        ],
+        "scope": "PIPE-01 only: three unchanged historical request-ledger bodies/17 original tag-path bindings, published 5.0.1 correspondence and bounded historical denial/non-claim records. No other material request, all-source reconciliation or current native qualification.",
+        "evidence": "spec/evidence/pipe-productivity-request-intent-aero-r01.json",
+        "dispositions": [
+          "retain the exact commit-4.2 request and withheld-explicit-productivity-denial status without changing the 87-request ledger",
+          "consolidate nine historical permission-denial rows while preserving their unbound-source/raw-custody limits",
+          "retain unaccepted rates and unfinished permission, weighted recycling, balance and owner/progression qualification",
+          "retain explicit PIPE-01 exclusions in unrelated tin diagnostics and keep pipeline-extent controls separate",
+          "record the original P1/archive custody limits and broken R2 locator without silently substituting related declarations"
+        ],
+        "remaining": "Original P1 paste/archive and exact R2 linked-read custody remain unverified. The existing request's admission/safety work remains open; this review grants no emitted family, rate, current profile or native pass. PLAT-UI-01, other request/source families, inter-release history and complete VER-07 remain outside this slice.",
+        "native_execution": false,
+        "request_decisions_changed": false,
         "whole_source_reconciliation_complete": false
       }
     ],
