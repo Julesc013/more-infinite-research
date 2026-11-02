@@ -1,0 +1,134 @@
+{
+  "kind": "MIRHistoricalStartupProfileDecodeIntentReviewV1",
+  "reviewed_on": "2026-11-03",
+  "reviewed_against": "30382cf3d3970b820e169193cb8bda1db3587ec4",
+  "subjects": [
+    "CONT-03",
+    "CONT-14"
+  ],
+  "scope": "Exactly one deduplicated historical fixture. Four explicit release bindings checked, not all tags containing the body or the entire settings audit.",
+  "original_source": {
+    "blob": "5c4ccb190d41ec3cf7baa545e08d346248f8ee92",
+    "bytes": 6342,
+    "sha256": "a888d8f9b9d352a4d374f0cf24fb2e1830430888cedd38221674ac38e4766d2c",
+    "bindings": [
+      {
+        "tag": "v4.2.1",
+        "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+        "path": "tests/compiler/startup_settings_decode_reuse.lua",
+        "blob": "5c4ccb190d41ec3cf7baa545e08d346248f8ee92"
+      },
+      {
+        "tag": "v4.3.0",
+        "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+        "path": "tests/compiler/startup_settings_decode_reuse.lua",
+        "blob": "5c4ccb190d41ec3cf7baa545e08d346248f8ee92"
+      },
+      {
+        "tag": "v4.6.0",
+        "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+        "path": "tests/compiler/startup_settings_decode_reuse.lua",
+        "blob": "5c4ccb190d41ec3cf7baa545e08d346248f8ee92"
+      },
+      {
+        "tag": "v4.7.3",
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "tests/compiler/startup_settings_decode_reuse.lua",
+        "blob": "5c4ccb190d41ec3cf7baa545e08d346248f8ee92"
+      }
+    ]
+  },
+  "contracts": [
+    "SET-01 precedence, restricted data import and once-per-active-feature resolution",
+    "VER-07 finite intent disposition; no old active framework restoration"
+  ],
+  "groups": [
+    {
+      "id": "profile-precedence-and-value-boundaries",
+      "disposition": "consolidate-existing-controls",
+      "original_expectation": "Valid imported 40/false overrides raw 5/true; unknown future 80 is unavailable, invalid known value falls back independently, zero/false retain their values and import transport cannot override itself.",
+      "implementation": [
+        "source/research/settings.lua::effective_values",
+        "source/research/settings_profile.lua::decode"
+      ],
+      "current_controls": [
+        "tests/test_settings_profile.py::test_import_precedence_uses_profile_validation_before_consumer_normalization",
+        "tests/test_settings_profile.py::test_runtime_facade_exports_effective_values_and_reports_read_only_counts",
+        "tests/test_settings_profile.py::test_codec_has_canonical_identity_and_strict_compact_option"
+      ],
+      "remaining_executable_check": "No duplicate host port for covered semantic boundaries. Actual nondefault native settings and exported-file/Library/API correspondence remain separate.",
+      "owner": "Aero mapping; Black Glass affected native"
+    },
+    {
+      "id": "one-runtime-resolution-and-new-environment",
+      "disposition": "consolidate-current-lifecycle-contract",
+      "original_expectation": "600 repeated reads reuse one decode/parse; changed input/environment must not retain stale values.",
+      "implementation": [
+        "source/runtime/configuration.lua",
+        "source/research/settings.lua::resolve"
+      ],
+      "current_controls": [
+        "tests/test_lifecycle.py::test_profile_cap_is_resolved_once_and_preserves_valid_current_progress"
+      ],
+      "variant_decision": "MIR5 resolves immutable runtime settings once at control parsing. Existing control checks repeated events without another decode and reboots the control environment with changed input, retaining 42 percent queue progress and releasing caps. Preserve this semantic intent without restoring the MIR4 per-lookup getter/cache.",
+      "remaining_executable_check": "Native configuration/load/client and measured overhead retain their original scopes.600 host reads are no performance benchmark.",
+      "owner": "Aero"
+    },
+    {
+      "id": "raw-json-route",
+      "disposition": "port-needed-host-coverage",
+      "original_expectation": "Valid empty rawJSON profile parses without compressed decode_string and preserves direct values.",
+      "implementation": [
+        "source/research/settings_profile.lua::decode"
+      ],
+      "current_controls": [],
+      "remaining_executable_check": "Add focused empty/rawJSON host input and compressed-decoder call trap, using original expectation. Current source branch alone does not constitute tested coverage.",
+      "owner": "Aero next bounded host unit"
+    },
+    {
+      "id": "missing-helpers-and-recovery",
+      "disposition": "port-needed-host-coverage",
+      "original_expectation": "Missing helpers preserves raw fallback; later available codec environment admits the same valid import. Malformed/missing profile also preserves raw fallback.",
+      "implementation": [
+        "source/research/settings.lua::decoded_import",
+        "source/research/settings_profile.lua::decode"
+      ],
+      "current_controls": [
+        "tests/test_settings_profile.py::test_malformed_import_falls_back_without_executing_input"
+      ],
+      "remaining_executable_check": "Malformed-profile control does not prove absent-helper recovery. Add explicit nil/missing codec API and fresh-resolution recovery controls without restoring a mutable live getter.",
+      "owner": "Aero next bounded host unit"
+    },
+    {
+      "id": "mutable-cache-fingerprint-harness",
+      "disposition": "superseded-implementation-retain-unresolved-boundary",
+      "original_expectation": "Helper identity/function changes invalidate cached decoding; changed registration/validation is rechecked; mutable nonstring input is converted with tostring anew.",
+      "variant_decision": "Specific cache identity/fingerprint assertions target the retired per-lookup reader. Startup/helper mutation inside one Factorio control instance is not current runtime settings-change authority. Retain validation and codec conversion at their real boundaries; nonstring public-consumer intent is not established merely by this mock.",
+      "current_controls": [
+        "tests/test_settings_profile.py::test_settings_descriptors_remain_stable_after_caller_mutation_and_parse_closure",
+        "tests/test_settings_profile.py::test_settings_queries_and_runtime_profile_facade_work_after_module_loading_closes"
+      ],
+      "remaining_executable_check": "No old framework/cache restoration. Determine whether any real public codec consumer requires the nonstring boundary before disposition; descriptor-copy controls do not silently cover that edge.",
+      "owner": "Aero contract/consumer audit"
+    }
+  ],
+  "host_validation": {
+    "new_tests_run": false,
+    "basis": "Documentation-only source/tag/test-symbol reconciliation. Existing bfa full153 result retains its original identity and applies only to demonstrably unchanged consumed subsets.",
+    "selected_custody_controls": {
+      "path": "tests/test_historical_sources.py",
+      "methods": 5,
+      "passed": true
+    },
+    "repository_check_passed": true
+  },
+  "source_reconciliation_complete": false,
+  "test_intent_reconciliation_complete": false,
+  "native_execution": false,
+  "release_qualification": false,
+  "limits": [
+    "Original fixture expressly denies native serialization/performance coverage.",
+    "Original 87 requests, global discovery and pending groups remain unchanged; no whole settings or VER07 verdict.",
+    "No player/tests/progress/changelog or frozenE changes."
+  ]
+}
