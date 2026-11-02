@@ -469,7 +469,142 @@
       "remaining_implementation": [],
       "remaining_qualification": [
         "Qualify the remaining admitted cap identities and configuration/remove/readd boundaries; do not extrapolate the worker/gear result to untested owners."
-      ]
+      ],
+      "runtime_creator_cap_consumption_review": {
+        "reviewed_on": "2026-11-02",
+        "reviewed_against": "2e2035d2006edb6f75b3c4059d429fa9dc938c70",
+        "subjects": [
+          "CONT-03",
+          "CONT-07"
+        ],
+        "disposition": "port",
+        "scope": "Extend the existing historical cap invariant mapping to the actual completed-prototype runtime catalogue consumer; this is not a whole-harness/inter-release audit or native verdict.",
+        "historical_expectations": {
+          "references": [
+            {
+              "path": "tests/runtime/Test-MIR42F200SettingsCapTransition.ps1",
+              "references": [
+                {
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                  "blob": "4150e1173f2fe72d4b91c949d1cc4afc3402a5d3",
+                  "role": "published-4.7.3-reference"
+                },
+                {
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                  "blob": "4150e1173f2fe72d4b91c949d1cc4afc3402a5d3",
+                  "role": "4.2.1-adverse-history-comparator"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1",
+              "references": [
+                {
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                  "blob": "b3ec4ad75536b5a5f814233f1175eb3f37f34780",
+                  "role": "published-4.7.3-reference"
+                },
+                {
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+                  "blob": "e976f4a083aeb423f896cd54474739f5811b49c8",
+                  "role": "4.2.1-adverse-history-comparator"
+                }
+              ]
+            }
+          ],
+          "assertions": [
+            "F200 Assert-State finite-cap/zero transition preserves earned level, prior foreign disablement and original visibility.",
+            "Multiforce Assert-MIR42State preserves per-force levels/enablement/visibility, queue/current progress and removed/reused force-index distinctions. Existing current controls retain its force-boundary coverage; no new native reuse result is claimed."
+          ],
+          "current_contracts": [
+            "SET-03",
+            "RUN-02",
+            "MIG-01"
+          ],
+          "native_profile_oracle": "Published v4.7.3 README research_plastic explicitly assigns covered Space Age recipes to native plastic-bar-productivity. Use this documented Base/Space-Age distinction to check fixture module lifetime; do not infer the expected difference from candidate output."
+        },
+        "implementation": [
+          "source/runtime/catalogue.lua",
+          "source/runtime/lifecycle.lua",
+          "source/runtime/caps.lua"
+        ],
+        "current_host_controls": [
+          "tests/test_lifecycle.py::test_completed_native_prototype_creators_control_braking_caps_and_owned_restoration",
+          "tests/test_lifecycle.py::test_fixture_boot_reconstructs_the_runtime_catalogue_for_a_changed_mod_configuration"
+        ],
+        "completed_prototype_contexts": {
+          "targets": [
+            "f200/2.0.77",
+            "f210/2.1.23"
+          ],
+          "mod_contexts": [
+            "Base",
+            "Space Age"
+          ],
+          "creator_contexts": [
+            "MIR-created",
+            "foreign-created"
+          ],
+          "initial_enablement": [
+            false,
+            true
+          ],
+          "host_combinations": 16,
+          "expectations": [
+            "Parse the completed collection without game/storage; cap MIR-created braking at10 while its native level11 and earned bonus remain unchanged.",
+            "Filter only the admitted over-cap queue entry; preserve unrelated current research/order/42% progress.",
+            "Do not cap the same-named foreign-created row or acquire rights to prior disablement.",
+            "On load do not read/write game/storage. On a fresh cap-zero configuration restore only MIR-owned enablement and original visibility.",
+            "Do not enumerate completed prototypes or query creator history again in callbacks."
+          ]
+        },
+        "fixture_correction": "The existing boot helper cleared the pure research catalogue but retained its runtime adapter closure. Reset runtime.catalogue for each simulated control stage; preserve all prior assertions. The new Base-to-Space-Age native-owner check fails without this reset.",
+        "host_result": {
+          "passed": 86,
+          "new_controls": 2,
+          "runtime": "Pinned Lupa2.6 lua52",
+          "native_processes": 0
+        },
+        "negative_controls": {
+          "published_package_members": [
+            {
+              "target": "f200",
+              "package": "more-infinite-research_5.0.20001.zip",
+              "sha256": "750ECA842134AFDDCC7C45B2B656510CA60F09940A2E82B21896AAE7E3D8C1BE",
+              "runtime_catalogue_sha256": "3809178C83136696ACF1CE4FAF1EE5C4AA53C95BD176E048D82769FC391B4A54"
+            },
+            {
+              "target": "f210",
+              "package": "more-infinite-research_5.0.21001.zip",
+              "sha256": "C6C2470B438846484732E0E05D124DB31A1100C2F1AA0E770B327A4A6FBAFA5D",
+              "runtime_catalogue_sha256": "3809178C83136696ACF1CE4FAF1EE5C4AA53C95BD176E048D82769FC391B4A54"
+            }
+          ],
+          "published_presence_adapter_result": "Eight MIR-created contexts lose the configured cap; the foreign-created contexts retain their original narrow behavior.",
+          "opponents": [
+            "published-presence-only-adapter",
+            "foreign-created-row-admitted",
+            "stale-runtime-wrapper-across-configurations"
+          ],
+          "rejected": 3,
+          "prior_lifecycle_controls_accept_each": 21
+        },
+        "preserved_trial_classification": [
+          "lifecycle-before-fixture-fix.log contains an initial new-test argument error: the mod table occupied the agriculture-cap parameter. It is not a product failure.",
+          "The initial science-row Base/Space-Age assumption was unsupported. The corrected oracle uses the published native-plastic contract; initial trials remain separate from fixture-native-owner-before-reset.log and final passing controls."
+        ],
+        "remaining_executable_check": [
+          "Black Glass must review #1549 creator classification through actual control parse and finite-cap/configuration/load behavior on the final modern packages. Record real prototype/history availability instead of treating the host model as native evidence.",
+          "Bind the affected braking-owner positive and foreign-collision checks to existing admitted native profiles/fixtures, preserving earned bonus, native queue/progress and zero restoration. Include affected current/detached investment when a public-beta cap that was ignored becomes enforced. This record invents no ready reporter configuration or executable packet.",
+          "Reuse earlier gear/worker/schema/force receipts only for matched consumed inputs, under their original identities. The creator adapter also feeds lifecycle declarations; do not classify #1549 as display-only or extrapolate its old worker/gear native evidence to braking.",
+          "All other CONT-07 admitted identities and configuration/removal/readdition boundaries retain their existing pending scope."
+        ],
+        "owner": "Aero owns this source/host/reconciliation unit; Black Glass independently reviews/integrates and owns native execution.",
+        "custody": "build/qualification/aero-cap-runtime-provenance-r01/",
+        "limits": "No player-source/target/version/original request changes, package rebuild, native execution or final-candidate/stable acceptance. Product correction is the existing #1549; this dependent unit strengthens its consumer verification.",
+        "native_execution": false,
+        "release_qualification": false
+      }
     },
     {
       "id": "CONT-08",
@@ -11082,6 +11217,13 @@
       "test_intent_reconciliation_complete": false,
       "native_execution": false,
       "limits": "No player source/package, published migration, original request record, native result identity or release verdict changes. This is not complete settings, API, Library or VER-07 acceptance."
+    },
+    "cap_runtime_consumer_review": {
+      "subject": "CONT-07",
+      "record": "subjects[CONT-07].runtime_creator_cap_consumption_review",
+      "disposition": "port",
+      "whole_source_reconciliation_complete": false,
+      "native_execution": false
     }
   }
 }

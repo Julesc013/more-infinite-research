@@ -1,5 +1,6 @@
 """Pure Lua 5.2 controls for MIR 5 lifecycle wiring, not native evidence."""
 import argparse
+import json
 from pathlib import Path
 import sys
 import unittest
@@ -87,9 +88,9 @@ class LifecycleTests(unittest.TestCase):
             logs = {}
             log = function(message) logs[#logs + 1] = message end
             game = {forces = forces, difficulty_settings = {spoil_time_modifier = 1}}
-            -- Factorio exposes `prototypes` only in game-available calls.
-            -- A false test value models control parsing before that surface
-            -- exists; an omitted value models an empty native collection.
+            -- A false value exercises an unavailable collection; omission
+            -- supplies an empty recipe collection. The separate provenance
+            -- control explicitly supplies completed technology prototypes.
             if recipe_caps == false then
               prototypes = nil
             else
@@ -120,6 +121,7 @@ class LifecycleTests(unittest.TestCase):
             package.loaded["control"] = nil
             package.loaded["runtime.bootstrap"] = nil
             package.loaded["runtime.library"] = nil
+            package.loaded["runtime.catalogue"] = nil
             package.loaded["runtime.lifecycle"] = nil
             package.loaded["runtime.configuration"] = nil
             -- Each boot models a fresh native control stage. Startup settings
@@ -130,6 +132,131 @@ class LifecycleTests(unittest.TestCase):
             control = require("control")
           end
         ''')
+
+    def test_fixture_boot_reconstructs_the_runtime_catalogue_for_a_changed_mod_configuration(self):
+        self.lua.execute(r'''
+          -- The authored catalogue/support contract assigns plastic to the
+          -- native plastic-bar-productivity owner specifically in Space Age.
+          local name="plastic-bar-productivity"
+          local function present()
+            for _,row in ipairs(require("runtime.catalogue").declared()) do
+              if row.id==name then return true end
+            end
+            return false
+          end
+          local world=force(1,{}, {},nil,nil)
+          boot({[1]=world},0,"",nil,nil,0,{base="2.1.23"},nil,nil,false)
+          assert(not present(),"Base fixture invented a Space Age native owner")
+          boot({[1]=world},0,"",nil,nil,0,{base="2.1.23",["space-age"]="2.1.23"},nil,nil,false)
+          assert(present(),"fixture reused the prior control state's Base catalogue")
+        ''')
+
+    def test_completed_native_prototype_creators_control_braking_caps_and_owned_restoration(self):
+        editions = json.loads((ROOT / "targets/editions.json").read_text(encoding="utf-8"))["targets"]
+        for target_id, engine in (("f200", "2.0.77"), ("f210", "2.1.23")):
+            for space_age in (False, True):
+                for creator in ("more-infinite-research", "foreign-owner"):
+                    for originally_enabled in (False, True):
+                        with self.subTest(target=target_id, space_age=space_age,
+                                          creator=creator, enabled=originally_enabled):
+                            self.setUp()
+                            target = {**editions[target_id], "id": target_id}
+                            self.lua.globals().selected_target = self.lua.table_from(target)
+                            self.lua.globals().selected_engine = engine
+                            self.lua.globals().selected_space_age = space_age
+                            self.lua.globals().selected_creator = creator
+                            self.lua.globals().originally_enabled = originally_enabled
+                            self.lua.execute(r'''
+                              package.loaded["platform.target"] = selected_target
+                              local name = "braking-force-8"
+                              local prototype_fields = {name=name, enabled=true, max_level=4294967295,
+                                effects={{type="train-braking-force-bonus",modifier=.1}}}
+                              local prototype = setmetatable({}, {__index=prototype_fields,
+                                __newindex=function() error("cap mutated a prototype") end})
+                              local native = {name=name,valid=true,level=11,researched=false,prototype=prototype}
+                              local braking = setmetatable({enabled=originally_enabled,visible_when_disabled=false},
+                                {__index=native,__newindex=function(_,key) error("cap wrote native research "..key) end})
+                              local current, other = technology("foreign-current",1,true), technology("foreign-other",1,true)
+                              local world = force(7,{[name]=braking,[current.name]=current,[other.name]=other},
+                                {current,braking,other},current,.42)
+                              native.force,current.force,other.force = world,world,world
+                              local world_meta = getmetatable(world)
+                              local old_read,old_write = world_meta.__index,world_meta.__newindex
+                              world_meta.__index=function(object,key)
+                                if key=="train_braking_force_bonus" then return .75 end
+                                return old_read(object,key)
+                              end
+                              world_meta.__newindex=function(object,key,value)
+                                if key=="train_braking_force_bonus" then error("cap rewrote earned bonus") end
+                                return old_write(object,key,value)
+                              end
+                              script={active_mods={base=selected_engine}}
+                              if selected_space_age then script.active_mods["space-age"]=selected_engine end
+                              mods=script.active_mods
+                              helpers={game_version=selected_engine}
+                              local saved={foreign_state={token="preserve"}}
+                              local raw_require=require
+                              local history_reads=0
+                              local function parse(limit)
+                                require=raw_require
+                                local modules={}
+                                for key in pairs(package.loaded) do
+                                  if key:match("^runtime%.") or key:match("^research%.") or key:match("^compatibility%.") then
+                                    modules[#modules+1]=key
+                                  end
+                                end
+                                for _,key in ipairs(modules) do package.loaded[key]=nil end
+                                settings={startup=startup_values(0,"",0)}
+                                settings.startup["mir-max-level-braking-force"]={value=limit}
+                                prototypes={recipe={},technology=setmetatable({[name]=prototype},
+                                  {__pairs=function() error("enumerated completed prototype map") end}),
+                                  get_history=function(kind,id)
+                                    assert(kind=="technology" and id==name)
+                                    history_reads=history_reads+1
+                                    return {created=selected_creator}
+                                  end}
+                                game,storage=nil,nil
+                                local lifecycle=require("runtime.lifecycle")
+                                assert(game==nil and storage==nil,"control parse initialized native/saved state")
+                                prototypes.get_history=function() error("callback read prototype provenance") end
+                                require=function(id) error("post-parse require: "..id) end
+                                game,storage={forces={[7]=world}},saved
+                                return lifecycle
+                              end
+                              local lifecycle=parse(10)
+                              local limits=lifecycle.cap_limits(world)
+                              if selected_creator=="more-infinite-research" then
+                                assert(limits[name]==10,"MIR-created continuation lost its configured cap")
+                              else assert(limits[name]==nil,"foreign-created continuation acquired a MIR cap") end
+                              assert(history_reads<=1,"unbounded creator lookups during control parse")
+                              lifecycle.on_init()
+                              local owned=selected_creator=="more-infinite-research"
+                              assert(braking.enabled==(not owned and originally_enabled))
+                              assert(braking.visible_when_disabled==owned)
+                              local queue=world.research_queue
+                              assert(#queue==(owned and 2 or 3) and queue[1]==current and queue[#queue]==other)
+                              assert(world.current_research==current and world.research_progress==.42 and world.cancelled==0)
+                              assert(braking.level==11 and braking.researched==false and world.train_braking_force_bonus==.75)
+                              local record=storage.mir_caps and storage.mir_caps.owned_disabled[7]
+                              if owned then assert(record[name].disabled==originally_enabled)
+                              else assert(record==nil or record[name]==nil) end
+                              local original_storage=storage
+                              game=setmetatable({}, {__index=function() error("load read game") end})
+                              storage=setmetatable({}, {__index=function() error("load read saved state") end,
+                                __newindex=function() error("load wrote saved state") end})
+                              lifecycle.on_load()
+                              assert(history_reads<=1)
+                              saved=original_storage
+                              lifecycle=parse(0)
+                              lifecycle.on_configuration_changed({})
+                              assert(history_reads<=2,"configuration callback rescanned provenance")
+                              assert(braking.enabled==originally_enabled and not braking.visible_when_disabled)
+                              assert(braking.level==11 and world.train_braking_force_bonus==.75)
+                              assert(world.current_research==current and world.research_progress==.42 and world.cancelled==0)
+                              assert(saved.foreign_state.token=="preserve")
+                              local remaining=saved.mir_caps and saved.mir_caps.owned_disabled[7]
+                              assert(remaining==nil or remaining[name]==nil,"uncap retained restoration rights")
+                            ''')
 
     def test_bob_angel_stages_use_named_effective_recipe_caps_without_losing_earned_levels(self):
         self.lua.execute('''
