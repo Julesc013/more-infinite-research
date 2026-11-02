@@ -132,7 +132,7 @@
     "preserved_decision": "commit-4.2",
     "preserved_status": "withheld-explicit-productivity-denial"
   },
-  "original_source_register": [
+  "current_source_register": [
     {
       "title": "User-supplied Reddit discussion",
       "url": "https://www.reddit.com/r/factorio/comments/1w7yekg/",
@@ -148,10 +148,64 @@
       "observed_on": "2026-09-06"
     }
   ],
+  "original_plan_packet": {
+    "archive_bytes": 31534,
+    "archive_sha256": "04e04db65ba8d4e24e8f8aba73bc66244882eab633d27d63c4d47544cd42ea32",
+    "all_nine_members_crc_valid": true,
+    "all_seven_manifest_payloads_verified": true,
+    "all_eight_checksum_rows_verified": true,
+    "manifest_exactly_equals_retained_intake": true,
+    "original_request": {
+      "id": "PIPE-01",
+      "title": "Pipe, underground-pipe and heat-pipe productivity",
+      "requesters": [
+        "ihatebrooms",
+        "Julesc012"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity",
+      "proposed_scope": "Audit missing family, then admit qualified pipe production",
+      "rationale": "No named pipe family was found in the inspected modern catalogue; generated omissions and external owners still need checking.",
+      "implementation": "Audit aliases, settings, ownership and emitted coverage; add a shared pipe family only where absent. Treat 10%/5%/2% as proposed rates, not recovered historical truth. Include casting routes only after process review.",
+      "acceptance": [
+        "Base and overhaul pipe outputs covered",
+        "Underground-pipe recipes containing pipes do not create a recovery exploit",
+        "Heat-pipe balance separate",
+        "No duplicate native/external owner",
+        "Absence has visible diagnostic"
+      ],
+      "source_ids": [
+        "P1",
+        "R2"
+      ],
+      "feature_group": "material-families",
+      "status": "assessed-not-implemented-by-this-review"
+    },
+    "original_source_register": [
+      {
+        "title": "User-supplied Reddit discussion",
+        "url": "https://www.reddit.com/r/factorio/comments/1w7yekg/",
+        "basis": "Pasted conversation, not a fresh complete thread capture. Relative comment ages are not treated as absolute dates.",
+        "id": "P1",
+        "observed_on": "2026-09-06"
+      },
+      {
+        "title": "Modern productivity catalogue",
+        "url": "https://github.com/Julesc013/more-infinite-research/blob/abe152a332741db268a39b5088866e5aab634fed/src/mod/families/modern/prototypes/streams/productivity.lua",
+        "basis": "Connected GitHub source read; declarations alone are not exact-environment realization proof.",
+        "id": "R2",
+        "observed_on": "2026-09-06"
+      }
+    ],
+    "related_later_state": "The historical/current ledger retains all original request text/decision/acceptance fields, changes status to the recorded permission-denial disposition, and adds qualification plus remaining obligations.",
+    "implementation_performed": false,
+    "engine_qualification_performed": false,
+    "interpretation": "Original plan packet is authenticated as data. Its prompt/code is not executed or treated as new authority. It does not contain an independently authenticated complete P1 raw discussion."
+  },
   "original_locator_limits": [
     "P1 registers a maintainer-supplied pasted Reddit discussion, not a complete archived public thread. Fresh read of its exact URL on 2026-11-03 AEDT timed out; no original quote, reporter input or new acceptance decision is inferred.",
-    "R2's registered source/prototypes/streams/productivity.lua path is absent at its exact abe152 commit. Two actually present root/modern paths have identical bytes and are preserved separately; this is an explicitly related declaration read, not a silent substitution or proof of the original linked read.",
-    "The plan-pack intake archive hash is retained in the original ledger, but this slice did not obtain or authenticate the original plan-pack ZIP or pasted conversation.",
+    "The authenticated original plan packet binds R2 to src/mod/families/modern/prototypes/streams/productivity.lua at exact abe152, which is recovered and hashed here. The retained current register instead names an absent source/prototypes path; this disagreement is explicit, with no request-ledger rewrite or silent substitute. Root and modern copies at that commit are byte-identical.",
+    "The original31534-byte plan-pack ZIP and all declared/checksum payloads are now authenticated against the retained intake. This corrects the initial66c8225 source-only slice's unverified ZIP/R2 custody descriptions; that author commit remains preserved. Raw original P1 conversation custody remains separate.",
     "The local v4.2.0 alias has the same commit/path/blob as canonical v4.2.0-stable and is not an independent published source."
   ],
   "source_records": [
@@ -446,7 +500,7 @@
     "Pipeline-extent scaling changes fluid connection extent, not pipe-manufacturing research or its permission/economics; its existing controls are not PIPE-01 coverage."
   ],
   "remaining": [
-    "Retain the original community-paste/archive and exact R2 locator custody gaps as unverified; do not fabricate quoted input or recovered original binding.",
+    "Retain the original P1 raw-paste/discussion custody as unverified; do not fabricate quoted input. The original packet and exact original R2 declaration binding are recovered; the stale current-register source/ locator is recorded without rewriting its historical text.",
     "If executing the existing request, first resolve exact admitted Base/overhaul pipe/underground/heat-pipe recipes, permissions, existing owners and weighted process safety; then exercise affected startup, useful research and saved state. No family or proposed rates are admitted by this review.",
     "Current native/prototype/evidence applicability and other requests, source families, inter-release deletions and global VER-07 remain open."
   ],

@@ -16073,16 +16073,16 @@
           "CONT-15",
           "VER-07"
         ],
-        "scope": "PIPE-01 only: three unchanged historical request-ledger bodies/17 original tag-path bindings, published 5.0.1 correspondence and bounded historical denial/non-claim records. No other material request, all-source reconciliation or current native qualification.",
+        "scope": "PIPE-01 only: authenticated original plan ZIP, three unchanged historical request-ledger bodies/17 original tag-path bindings, published 5.0.1 correspondence and bounded historical denial/non-claim records. No other material request, all-source reconciliation or current native qualification.",
         "evidence": "spec/evidence/pipe-productivity-request-intent-aero-r01.json",
         "dispositions": [
           "retain the exact commit-4.2 request and withheld-explicit-productivity-denial status without changing the 87-request ledger",
           "consolidate nine historical permission-denial rows while preserving their unbound-source/raw-custody limits",
           "retain unaccepted rates and unfinished permission, weighted recycling, balance and owner/progression qualification",
           "retain explicit PIPE-01 exclusions in unrelated tin diagnostics and keep pipeline-extent controls separate",
-          "record the original P1/archive custody limits and broken R2 locator without silently substituting related declarations"
+          "authenticate the original plan ZIP and its exact R2 declaration link while retaining the stale current-register locator and unverified P1 raw-discussion custody"
         ],
-        "remaining": "Original P1 paste/archive and exact R2 linked-read custody remain unverified. The existing request's admission/safety work remains open; this review grants no emitted family, rate, current profile or native pass. PLAT-UI-01, other request/source families, inter-release history and complete VER-07 remain outside this slice.",
+        "remaining": "The original P1 raw-paste/discussion remains unverified; the original plan ZIP and exact original R2 declaration link are authenticated. The existing request's admission/safety work remains open; this review grants no emitted family, rate, current profile or native pass. PLAT-UI-01, other request/source families, inter-release history and complete VER-07 remain outside this slice.",
         "native_execution": false,
         "request_decisions_changed": false,
         "whole_source_reconciliation_complete": false
