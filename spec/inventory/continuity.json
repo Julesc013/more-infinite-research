@@ -1141,6 +1141,1195 @@
           "package_applicability": "The two Library modules affect modern presentation; the50 restored locale members also occur in reduced packages, so those ZIP bytes change and are not called identical to501. Review exact private package members, locale parsing and the final public5.0.2 freeze separately. No source version, published byte, tag, direct library, fixture/controller or protected save changes here.",
           "remaining_native_check": "Black Glass observes selected current bonus/limit before and after an actual useful lab, saturated and mixed/disabled/cap cases, reopened/cold/client views and representative English/German geometry on the final F200/F210 candidate. Review old-edition locale/package parsing applicability and final candidate first-open/refresh/memory cost; source/host identity is not native acceptance.",
           "limits": "This checked-parent correction remains separate from frozen public501 packetA and still needs independent review/integration, exact-head CI and final affected native/package/performance qualification. All87 request decisions, other CONT subjects and broad audit flags remain unchanged; VER-07 and stable acceptance remain incomplete."
+        },
+        {
+          "id": "historical-library-personal-continuity-launcher-fixture-intents",
+          "reviewed_on": "2026-11-02",
+          "reviewed_against": "085471a3b0b1c02a5e71b039d28ea096d63f8495",
+          "scope": "Selected personal-state continuity launcher and all entries under its fixture directory:21 unique blobs/217 verified tag-path references, including six wrapper variants, one fixture control/data pair, marker code/metadata and both target dossiers. This is selected source-intent disposition, not a transitive historical dependency or VER-07 completion.",
+          "sources": [
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/configuration-marker/control.lua",
+              "blob": "a6cee3d67506f6e3dbb539c19da87b344b246619",
+              "role": "test_code",
+              "sha256": "78AB51AFF893EC801EE331537560527F13895CD3C1C1FE56D88727A28D3C3CF2",
+              "bytes": 93,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/configuration-marker/info-f200.json",
+              "blob": "45c385cf6614a87419b5d1030a0019d5a0b428aa",
+              "role": "test_input_or_fixture",
+              "sha256": "359AFE0718FC530873D55437846BB643DA4F928BB84609C39B476E4B15C8C634",
+              "bytes": 240,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/configuration-marker/info.json",
+              "blob": "2d8beb854425d71b070f180974c91e4550fcd9bd",
+              "role": "test_input_or_fixture",
+              "sha256": "2FC2283835EF58B6F82036EAE4F4095422C3778ADCC971EE7716233F9865E346",
+              "bytes": 241,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/control.lua",
+              "blob": "36da8affe804576752abf9c20b8926178562970f",
+              "role": "test_code",
+              "sha256": "57FC8DD71A713E5B773C2B579021A50959D35A5918A1988DA4D942C6BF35AB3E",
+              "bytes": 16376,
+              "lines": 173,
+              "references": [
+                {
+                  "tag": "v4.2.0",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/data.lua",
+              "blob": "f10ae7e202464fe87234770365dfde5b87a492ff",
+              "role": "test_code",
+              "sha256": "8616283E2C22272D893A931B22CB203DC3478A59AEBC05B4BC1457D19F35D3F8",
+              "bytes": 444,
+              "lines": 2,
+              "references": [
+                {
+                  "tag": "v4.2.0",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/info-f200.json",
+              "blob": "c92eae0a46d74192490e0b4e219ff078213e9708",
+              "role": "test_input_or_fixture",
+              "sha256": "5A4E479E77BB0F3335FC48723FDF9073CB3D582064C28C3134C70AFD9687D8BA",
+              "bytes": 260,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/info.json",
+              "blob": "9ac8c286b954f733c38017574c9c136af3565b76",
+              "role": "test_input_or_fixture",
+              "sha256": "E61CF1DB3E7A0731E349E7C045D5ACD92E89EACEFC15CBC65CFC47CE3B0C9E8D",
+              "bytes": 261,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/personal-state-continuity-dossier.json",
+              "blob": "603f54029491b22dd542641f0847c0d162264206",
+              "role": "test_input_or_fixture",
+              "sha256": "BF012E89C85CDE29D5F7AD4B3582898B4BE8C76EF31C7076C2E4D38E052B6CC2",
+              "bytes": 4170,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/personal-state-continuity-f200-dossier.json",
+              "blob": "0361be24f536c25a61660782397f380e9895ce57",
+              "role": "test_input_or_fixture",
+              "sha256": "12E036D84F2658C7E41EE859F0249A2C6BC5FF9D071516A0C4276808FC12A120",
+              "bytes": 4198,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/scripted-input-marker/control.lua",
+              "blob": "9df1e27299be23846e7ccd8386786ea86b74eb52",
+              "role": "test_code",
+              "sha256": "9CDF4ED38B973589CDF06BBE27DABA550F7957E5E620FEAA39996A1A7A079F4B",
+              "bytes": 92,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/scripted-input-marker/data.lua",
+              "blob": "90eb05223b1d0464b4fe6526567de71a1fd010a1",
+              "role": "test_code",
+              "sha256": "CDCFB9EF551FC4BE3C452BBEEDC755123FDA37FA3ABB17E8E7FD8EC797ABE2C9",
+              "bytes": 91,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/scripted-input-marker/info-f200.json",
+              "blob": "f42bda126d32f0cb386192092e9831592c9bd3ec",
+              "role": "test_input_or_fixture",
+              "sha256": "D35BA6BC0F400D1F6A84DB696E2A01FEE93D7BEB822EFD459E7F13F27137D737",
+              "bytes": 250,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+              "blob": "7f717889db684e537a8b70e8ca4fe8be17ae027a",
+              "role": "test_code",
+              "sha256": "3FF2E2F93E5CA4347811762874662FA18823C32882541E9DB19E6B4094B5838F",
+              "bytes": 53201,
+              "lines": 187,
+              "references": [
+                {
+                  "tag": "v4.2.0",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+              "blob": "a3cef77c164c5e94b1e25dba9655f3dfa255eed8",
+              "role": "test_code",
+              "sha256": "C2F7B49C68991DEB998104DF4348792A9B3F6B552C9A4C0096C3F9AEEFD5AF49",
+              "bytes": 59088,
+              "lines": 203,
+              "references": [
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+              "blob": "3059426e557cafcb84d43a15258e71638dd5aabd",
+              "role": "test_code",
+              "sha256": "2560E8A1A8899CB8CE3772962999F417C38B9C11404FBD03156175EA20D9BD6C",
+              "bytes": 59096,
+              "lines": 203,
+              "references": [
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+              "blob": "c356904bb04ad5515b30bcc36f61cd295fec5c7f",
+              "role": "test_code",
+              "sha256": "FA72A9D3AA6F81974DCB6112E6464AAB082A64D2F4CBB6EA2564EA7B999DABC2",
+              "bytes": 59180,
+              "lines": 203,
+              "references": [
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+              "blob": "deb54c5e7d8ac74645f233da36d8471a34f294a6",
+              "role": "test_code",
+              "sha256": "939E01718C10B016EA631876F43A6ECDA4A31E27F56BBECFBD2B8811BC38BC31",
+              "bytes": 59188,
+              "lines": 203,
+              "references": [
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/configuration-marker/data.lua",
+              "blob": "c391be30d676afda1e9cc19b443000844ba25141",
+              "role": "test_code",
+              "sha256": "CDB03F2680C858EDBACEA03812297EF0E8943C477C08BB73C9D2083388827A9E",
+              "bytes": 79,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/configuration-marker/info-f200.json",
+              "blob": "dee40cdb9b9d64042acc96e3699bfce336ea3ca0",
+              "role": "test_input_or_fixture",
+              "sha256": "5DDBA0AFF76EC74F3732F11A63FC44E528B19C82A5B6FE7F780296CC00DC6E86",
+              "bytes": 241,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/configuration-marker/info.json",
+              "blob": "c1082a8b953aec28b21ce97ac0d0cc8b54d40204",
+              "role": "test_input_or_fixture",
+              "sha256": "877F849A8E5C14B5D296903AD111CF7E17B2E92E27DA41948FAD4F1D8E7F0E74",
+              "bytes": 241,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+              "blob": "1791eca14a23b20eb45324040d365f334b2aa7a4",
+              "role": "test_code",
+              "sha256": "A9C5FA2B194BEACAA1667C47DF75A6E621CF6A711912F7025342535B176185A7",
+              "bytes": 60086,
+              "lines": 219,
+              "references": [
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            }
+          ],
+          "groups": [
+            {
+              "id": "strict-personal-hidden-replacement",
+              "disposition": "port",
+              "independent_expectation": "The two same-force players keep distinct personal views. A dense known-technology hidden list is a replacement and an empty list clears it; sparse {[2]=id}, duplicate {id,id} and unknown {no-such-technology} inputs leave the prior selected visibility/action unchanged. Clearing/restoring one player never changes the peer or shared native research.",
+              "current_implementation": [
+                "source/runtime/library.lua",
+                "source/presentation/library_model.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library.py::test_two_players_reject_malformed_hidden_replacements_without_changing_views_or_research",
+                "tests/test_library.py::test_historical_filter_order_hidden_page_and_selection_options_drive_real_library_state",
+                "tests/test_library.py::test_hide_show_and_restore_actions_are_personal_and_keep_native_research_unchanged"
+              ],
+              "remaining_executable_check": "Review applicability of existing exact native personal-view inputs to the final package, then observe affected real-client hidden replacement/clear/rejection behavior within the existing Library queue. This source/host control is not actual engine input or save qualification.",
+              "owner": "Aero: historical expectation/current host mapping; Black Glass: exact integrated candidate, remaining native cases and evidence applicability."
+            },
+            {
+              "id": "durable-views-and-active-force-invariance",
+              "disposition": "consolidate",
+              "independent_expectation": "The original initial/save-reload/configuration stages preserve both personal views and all active force technology enabled/researched/level/visible_when_disabled/saved_progress values, current research, progress and ordered queue. The original fixture explicitly seeds42% current progress. A real configuration stage requires the actual inert marker transition, not an ordinary reload labelled configuration.",
+              "current_implementation": [
+                "source/runtime/library.lua",
+                "source/runtime/library_translations.lua",
+                "tests/fixtures/library-multiplayer/control.lua",
+                "tests/fixtures/library-native-input/control.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library.py::test_default_closed_then_query_selection_location_native_navigation_and_reload_rebuild",
+                "tests/test_library.py::test_configuration_migrates_published_browser_view_without_dropping_later_fidelity_fields",
+                "tests/test_library.py::test_pending_translations_survive_locale_change_close_and_reload",
+                "tests/test_library_multiplayer_fixture.py::test_two_real_client_join_rejoin_and_restart_state_machine",
+                "tests/test_library_native_input_fixture.py::test_observer_rejects_missing_native_events_mutations_and_lost_cold_views"
+              ],
+              "applicable_evidence": "Existing native records retain their original package/controller/save/engine identities. The reported published501 F210 R05 imported lifecycle includes an actually cold-loaded restart save, but its final save is only CRC-valid and not separately reloaded. No affected correction-batchB or beta-to-successor result follows. Current observers protect named finite native inputs; they do not retroactively become the old all-active-technology witness.",
+              "remaining_executable_check": "Complete the existing exact package two-client save/restart and affected real configuration/published-beta-to-successor routes. Review consumed input and protected native-state scope explicitly; an inert configuration marker, missing full-active snapshot applicability, or final save not reloaded cannot be silently counted as passed. Keep each original result identity.",
+              "owner": "Aero: historical expectation/current host mapping; Black Glass: exact integrated candidate, remaining native cases and evidence applicability."
+            },
+            {
+              "id": "literal-mod-absence-and-readdition",
+              "disposition": "consolidate",
+              "independent_expectation": "Literal MIR removal records its absent owner interface and actual GUI presence; personal state is unavailable without its owner. Removal and re-add preserve fixture-owned technology/current/progress/queue facts only. Re-add observes the new native presentation; the old fixture deliberately does not promise arbitrary restoration of removed-owner personal state or full MIR-owned prototype invariance.",
+              "current_implementation": [
+                "spec/migrations.md",
+                "source/runtime/library.lua",
+                "tests/fixtures/library-native-input/control.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library.py::test_pre_player_removal_destroys_only_the_owned_library_before_player_state_is_retired",
+                "tests/test_library.py::test_removed_player_report_choices_are_not_resurrected_from_retained_legacy_history"
+              ],
+              "mapping_limit": "The mapped current controls cover player/GUI retirement and historical re-import isolation. Player removal/reused player index is a different event from removing the MIR mod. Those controls and the reported F210 R05 player lifecycle do not establish literal MIR-remove/save/re-add qualification.",
+              "remaining_executable_check": "Reconcile any required literal mod-removal/re-add cases with the existing admitted migration/ownership queue and exact inputs. Preserve original backups and compare only justified fixture/foreign state while MIR is absent. Record unavailable state honestly; never recommend a remove-save-readd cycle as an inverse migration.",
+              "owner": "Aero: historical expectation/current host mapping; Black Glass: exact integrated candidate, remaining native cases and evidence applicability."
+            },
+            {
+              "id": "physical-versus-scripted-input-and-authority",
+              "disposition": "consolidate",
+              "independent_expectation": "Two distinct connected identities on one force must each complete their required input/view boundary. Native mode waits for actual GUI click and expected text events; ScriptedFixture is expressly remote-open-only and makes no physical input claim. Remote opens, fixture existence, prepared inputs and host-shaped success are not native acceptance.",
+              "current_implementation": [
+                "tests/fixtures/library-native-input/control.lua",
+                "tools/Invoke-LibraryNativeInput.ps1"
+              ],
+              "current_host_controls": [
+                "tests/test_library_native_input_fixture.py::test_imported_probe_and_actual_event_observer_keep_the_declared_finite_sequence",
+                "tests/test_library_native_input_fixture.py::test_join_phase_and_retained_identity_are_required",
+                "tests/test_library_native_input_fixture.py::test_503_f200_reuse_keeps_removal_and_identity_guards"
+              ],
+              "historical_limits": "F210 dossier explicitly says physical two-client input was not established under the single Steam identity; F200 dossier says it was not established under Windows foreground policy. They are historical limits, not proof current attempts cannot execute. F200 pins2.0.77/D3; F210 uses the old policy resolver and cannot be inferred to be2.1.23. No original runtime result is created from these declarations.",
+              "remaining_executable_check": "Use the existing Black Glass exact runtime/actor/packet review and native execution queue. Keep per-action identity/foreground/geometry/state and actual event checks. Do not rerun an old scripted harness to substitute for current physical input or reintroduce a new approval gate.",
+              "owner": "Aero: historical expectation/current host mapping; Black Glass: exact integrated candidate, remaining native cases and evidence applicability."
+            },
+            {
+              "id": "old-runner-and-marker-disposition",
+              "disposition": "obsolete-implementation-only",
+              "independent_expectation": "Preserve exact package/source/engine selection, owned process stops, actual save completion, archive restoration, bounded resources and explicit unfinished stages. SourceVersion validation, package-number arithmetic, old GUI tags and controller mechanisms are implementation details rather than a requirement to retain the obsolete launcher.",
+              "current_implementation": [
+                "tests/fixtures/library-native-input/control.lua",
+                "tools/Invoke-LibraryNativeInput.ps1"
+              ],
+              "current_host_controls": [
+                "tests/test_library_native_input_fixture.py::test_observer_rejects_missing_native_events_mutations_and_lost_cold_views"
+              ],
+              "variant_review": "All six wrappers have identical seven selected result/view/force assertion functions. The older wrapper differs in candidate/profile/config composition, process governance and later loaded-selection log validation; intermediate variants change source-version/package mappings and presentation locators. The latest changes fixture metadata resolution, serial ScriptedFixture startup, save creation/log readback and configuration marker0.1.1 with a real data-stage prototype. Metadata/dossiers/code are included in the21-blob group; imported historical tools/validation dependencies and original run receipts are not claimed fully reviewed here.",
+              "remaining_executable_check": "Preserve all historical refs and adverse/results under their original identity; adopt existing reviewed current safeguards. The latest wrapper still accepts only source4.2.0 through4.4.2 with default4.2.1 even atv4.7.3, so it is not a generic current-candidate runner. Do not restore obsolete execution machinery or restart every old package. Transitive historical helper closure and execution evidence remain separate unresolved source/applicability work.",
+              "owner": "Aero: historical expectation/current host mapping; Black Glass: exact integrated candidate, remaining native cases and evidence applicability."
+            }
+          ],
+          "validation": {
+            "library_controls": 83,
+            "new_integrated_two_player_control_passes": true,
+            "semantic_in_memory_opponents_detected": 3,
+            "named_control_mappings_verified": 13,
+            "seven_assertion_functions_identical_across_six_wrappers": true,
+            "lua": "5.2",
+            "lupa": "2.6",
+            "exact_head_ci": "required after commit"
+          },
+          "custody": "build/qualification/aero-library-personal-continuity-r01/",
+          "native_execution": false,
+          "source_reconciliation_complete": false,
+          "test_intent_reconciliation_complete": false,
+          "release_qualification": false
         }
       ],
       "test_subjects": [
