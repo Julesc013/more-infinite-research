@@ -152,7 +152,7 @@
   "limits": [
     "Original fixture expressly denies native serialization/performance coverage.",
     "Original 87 requests, global discovery and pending groups remain unchanged; no whole settings or VER07 verdict.",
-    "No player/tests/progress/changelog or frozenE changes."
+    "No player/progress/changelog or frozenE changes."
   ],
   "supporting_published_codec": {
     "tag": "v4.7.3",
