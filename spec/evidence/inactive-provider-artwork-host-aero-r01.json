@@ -1,0 +1,188 @@
+{
+  "schema": 1,
+  "kind": "MIRInactiveProviderArtworkHostReviewV1",
+  "status": "source-host-controls-pass-native-qualification-open",
+  "reviewed_on": "2026-11-02",
+  "reviewed_against": "9f5120cdbdc23029254f1b5f0e639ae790f092a4",
+  "requirements": [
+    "RUN-04",
+    "TGT-03",
+    "CONT-03",
+    "CONT-10"
+  ],
+  "historical_sources": [
+    {
+      "ref": "v4.7.3:tests/runtime/browser_fixture_icons.lua",
+      "blob": "52924116bcda8a68cc96270c2b66039258c5c5f7",
+      "sha256": "4A03BF4B70CDA0CEDD212BBCA3BA43E59BB14FD67FB08455FC94AC47DFF6FB69",
+      "bytes": 2941,
+      "reviewed_scope": "Complete51-line fixture previously reviewed in discovery group."
+    },
+    {
+      "ref": "v4.7.3:source/prototypes/mir/presentation/icon_builder.lua",
+      "blob": "2405834af0605d933982d30d482b27e9036d3236",
+      "sha256": "9B2788BEC9B6C9E290C8A8D038BF3E6F3D86DBDB39BE1D5C237DCB94DB01099A",
+      "bytes": 10343,
+      "reviewed_scope": "required_mods_loaded policy only; not complete icon-builder review."
+    },
+    {
+      "ref": "v4.7.3:source/prototypes/mir/platform/factorio/mods.lua",
+      "blob": "2552ddd2c2ea846c81d72e4859af20c276e077a3",
+      "sha256": "BDD5803C4D11316829622B0EA94A63B8705FCAB25CA445EA7EAEC2A037AE0EAD",
+      "bytes": 454,
+      "reviewed_scope": "Complete small active-mods helper."
+    },
+    {
+      "ref": "v4.7.3:tests/runtime/Test-MIRResearchBrowser.ps1",
+      "blob": "c4e5c49e52d5cb98b76c7def0f2ed3a53bfb16ab",
+      "sha256": "2258345139D3EC1908651416231ADB094C0F778EEDD576EFC892F84D90BACAD4",
+      "bytes": 32617,
+      "reviewed_scope": "Get-MIRBrowserIconCase only; not complete wrapper/dependency review."
+    }
+  ],
+  "independent_expectation": "The original Defaults, RawOptIn, ImportedOptIn and RawOptInImportedOff cases preserve actual raw/imported precedence but cannot authorize image assets from inactive Space Age/elevated-rails providers. Both shortcut sizes use the base lab fallback. Scan all final technology/shortcut values for inactive-provider paths. An active provider still supplies its guaranteed shortcut artwork.",
+  "implementation": [
+    "source/settings.lua",
+    "source/data.lua",
+    "source/data-final-fixes.lua",
+    "source/presentation/shortcut.lua",
+    "source/research/settings.lua"
+  ],
+  "current_control": "tests/test_generator.py::test_inactive_provider_artwork_keeps_original_raw_and_imported_setting_cases",
+  "matrix": [
+    {
+      "effective": false,
+      "raw": false,
+      "shortcuts_scanned": 1,
+      "engine": "2.1.23",
+      "technologies_scanned": 107,
+      "inactive_provider_references": 0,
+      "active_shortcut_opponent_checked": true,
+      "target": "f210",
+      "strings_scanned": 1447,
+      "case": "Defaults",
+      "imported": null
+    },
+    {
+      "technologies_scanned": 107,
+      "strings_scanned": 1447,
+      "inactive_provider_references": 0,
+      "shortcuts_scanned": 1,
+      "effective": true,
+      "active_shortcut_opponent_checked": true,
+      "engine": "2.1.23",
+      "raw": true,
+      "target": "f210",
+      "case": "RawOptIn",
+      "imported": null
+    },
+    {
+      "shortcuts_scanned": 1,
+      "technologies_scanned": 107,
+      "engine": "2.1.23",
+      "active_shortcut_opponent_checked": true,
+      "inactive_provider_references": 0,
+      "strings_scanned": 1447,
+      "raw": false,
+      "target": "f210",
+      "effective": true,
+      "case": "ImportedOptIn",
+      "imported": true
+    },
+    {
+      "active_shortcut_opponent_checked": true,
+      "raw": true,
+      "effective": false,
+      "strings_scanned": 1447,
+      "target": "f210",
+      "shortcuts_scanned": 1,
+      "inactive_provider_references": 0,
+      "technologies_scanned": 107,
+      "engine": "2.1.23",
+      "case": "RawOptInImportedOff",
+      "imported": false
+    },
+    {
+      "active_shortcut_opponent_checked": true,
+      "shortcuts_scanned": 1,
+      "engine": "2.0.77",
+      "effective": false,
+      "target": "f200",
+      "technologies_scanned": 107,
+      "strings_scanned": 1447,
+      "raw": false,
+      "inactive_provider_references": 0,
+      "case": "Defaults",
+      "imported": null
+    },
+    {
+      "target": "f200",
+      "shortcuts_scanned": 1,
+      "effective": true,
+      "engine": "2.0.77",
+      "technologies_scanned": 107,
+      "inactive_provider_references": 0,
+      "strings_scanned": 1447,
+      "raw": true,
+      "active_shortcut_opponent_checked": true,
+      "case": "RawOptIn",
+      "imported": null
+    },
+    {
+      "effective": true,
+      "engine": "2.0.77",
+      "active_shortcut_opponent_checked": true,
+      "target": "f200",
+      "shortcuts_scanned": 1,
+      "inactive_provider_references": 0,
+      "strings_scanned": 1447,
+      "raw": false,
+      "technologies_scanned": 107,
+      "case": "ImportedOptIn",
+      "imported": true
+    },
+    {
+      "effective": false,
+      "inactive_provider_references": 0,
+      "target": "f200",
+      "technologies_scanned": 107,
+      "raw": true,
+      "strings_scanned": 1447,
+      "active_shortcut_opponent_checked": true,
+      "shortcuts_scanned": 1,
+      "engine": "2.0.77",
+      "case": "RawOptInImportedOff",
+      "imported": false
+    }
+  ],
+  "validation": {
+    "generator_controls": 46,
+    "matrix_cells": 8,
+    "deliberately_broken_variants_detected": 4,
+    "lua": "5.2",
+    "lupa": "2.6",
+    "required_exact_head_ci": "required after commit"
+  },
+  "input_fixture": {
+    "existing_helper": "tests/test_generator.py::full_world",
+    "science_source_oracle": "tests/fixtures/science-source-native-oracle.json",
+    "science_source_oracle_sha256": "D0DAA800825AF7236D941FCD3890436E7B49DCE00877B01D82F5A1322A2DD049",
+    "construction": "Existing explicit authored selection plus retained source-science projections; no new reporter configuration or dependency library.",
+    "helper_transport": "Controlled identity/decode native-helper double through the actual MIRSET1 codec/registered settings authority; not real engine compression/export/import files."
+  },
+  "remaining_executable_check": "Review exact final package/data input applicability for the existing Base native resource/render cases. Observe genuinely affected native artwork/load/render boundaries with original inputs; do not infer physical absence of DLC files from inactive mods. Existing native results keep their original identities. The current host fixture is not a complete native upstream-world dump or proof of arbitrary third-party final artwork.",
+  "scope_limits": [
+    "Host metadata selects F2102.1.23 and F2002.0.77 source capability branches; no actual executable runs.",
+    "All provided final technology/shortcut tables are scanned, including an unrelated foreign sentinel. This is not complete real-engine prototype/resource validation or catalogue parity.",
+    "Active-provider opposing checks run the actual data.lua shortcut entrypoint only, not an active-DLC final-stage campaign.",
+    "No player code, saved setting identity, published package/version/tag, original request/evidence or shared Library/inventory/progress file changes.",
+    "The incomplete-discovery warning and source integration remain under Black Glass ownership; no competing integration/native/publication occurs."
+  ],
+  "custody": "build/qualification/aero-inactive-artwork-r01/",
+  "native_execution": false,
+  "physical_installation_absence_established": false,
+  "source_reconciliation_complete": false,
+  "test_intent_reconciliation_complete": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}
