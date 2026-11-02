@@ -54,14 +54,14 @@
       "effective": false,
       "raw": false,
       "shortcuts_scanned": 1,
-      "engine": "2.1.23",
       "technologies_scanned": 107,
       "inactive_provider_references": 0,
       "active_shortcut_opponent_checked": true,
       "target": "f210",
       "strings_scanned": 1447,
       "case": "Defaults",
-      "imported": null
+      "imported": null,
+      "target_minimum_base": "2.1.23"
     },
     {
       "technologies_scanned": 107,
@@ -70,16 +70,15 @@
       "shortcuts_scanned": 1,
       "effective": true,
       "active_shortcut_opponent_checked": true,
-      "engine": "2.1.23",
       "raw": true,
       "target": "f210",
       "case": "RawOptIn",
-      "imported": null
+      "imported": null,
+      "target_minimum_base": "2.1.23"
     },
     {
       "shortcuts_scanned": 1,
       "technologies_scanned": 107,
-      "engine": "2.1.23",
       "active_shortcut_opponent_checked": true,
       "inactive_provider_references": 0,
       "strings_scanned": 1447,
@@ -87,7 +86,8 @@
       "target": "f210",
       "effective": true,
       "case": "ImportedOptIn",
-      "imported": true
+      "imported": true,
+      "target_minimum_base": "2.1.23"
     },
     {
       "active_shortcut_opponent_checked": true,
@@ -98,14 +98,13 @@
       "shortcuts_scanned": 1,
       "inactive_provider_references": 0,
       "technologies_scanned": 107,
-      "engine": "2.1.23",
       "case": "RawOptInImportedOff",
-      "imported": false
+      "imported": false,
+      "target_minimum_base": "2.1.23"
     },
     {
       "active_shortcut_opponent_checked": true,
       "shortcuts_scanned": 1,
-      "engine": "2.0.77",
       "effective": false,
       "target": "f200",
       "technologies_scanned": 107,
@@ -113,24 +112,24 @@
       "raw": false,
       "inactive_provider_references": 0,
       "case": "Defaults",
-      "imported": null
+      "imported": null,
+      "target_minimum_base": "2.0.77"
     },
     {
       "target": "f200",
       "shortcuts_scanned": 1,
       "effective": true,
-      "engine": "2.0.77",
       "technologies_scanned": 107,
       "inactive_provider_references": 0,
       "strings_scanned": 1447,
       "raw": true,
       "active_shortcut_opponent_checked": true,
       "case": "RawOptIn",
-      "imported": null
+      "imported": null,
+      "target_minimum_base": "2.0.77"
     },
     {
       "effective": true,
-      "engine": "2.0.77",
       "active_shortcut_opponent_checked": true,
       "target": "f200",
       "shortcuts_scanned": 1,
@@ -139,7 +138,8 @@
       "raw": false,
       "technologies_scanned": 107,
       "case": "ImportedOptIn",
-      "imported": true
+      "imported": true,
+      "target_minimum_base": "2.0.77"
     },
     {
       "effective": false,
@@ -150,9 +150,9 @@
       "strings_scanned": 1447,
       "active_shortcut_opponent_checked": true,
       "shortcuts_scanned": 1,
-      "engine": "2.0.77",
       "case": "RawOptInImportedOff",
-      "imported": false
+      "imported": false,
+      "target_minimum_base": "2.0.77"
     }
   ],
   "validation": {
@@ -184,5 +184,18 @@
   "source_reconciliation_complete": false,
   "test_intent_reconciliation_complete": false,
   "performance_acceptance": false,
-  "release_qualification": false
+  "release_qualification": false,
+  "integrated_followup": {
+    "accepted_base": "c53de3c95b83f20d889aa7fbb32b8966880b9c1a",
+    "original_artwork_commit": "7fed2f804db5af2376f748d6432d487786e78787",
+    "generator_controls": 46,
+    "all_eight_matrix_values_unchanged": true,
+    "four_opponents_detected_again": true,
+    "scope": "Normal accepted-dev merge; original source/host observation is retained and rechecked on the integrated source."
+  },
+  "owner": {
+    "historical_host_mapping": "Aero",
+    "independent_integration_and_native": "Black Glass"
+  },
+  "native_evidence_reused_as_current": false
 }
