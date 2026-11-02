@@ -1885,5 +1885,11 @@
     "Known SIF paid-manufacturing omission blocks publication; separate correction requires checked integration and exact protected-state native qualification. Any successor consumes an explicit source/input applicability review."
   ],
   "performance_acceptance": false,
-  "release_qualification": false
+  "release_qualification": false,
+  "aero_independent_numerical_review": {
+    "path": "spec/evidence/candidate502-base-f200-startup-numerical-review-aero-r01.json",
+    "bytes": 8938,
+    "sha256": "D8080C7FCEF2DD086ED6C35F04715992F32FE4263BA4CC6055DED996328C3311",
+    "scope": "Independent fixed-plan raw-record/numerical interpretation only; not a second full native/image-custody review or transfer to changed source."
+  }
 }
