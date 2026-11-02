@@ -112,7 +112,11 @@ end
 -- `imported_reenabled` is an optional configuration-local map of exact newly
 -- imported record identities. It authorizes only this new enabled -> disabled
 -- write, never replacing an existing negative or persisting the proof itself.
-function M.reconcile(force, limits, owned_disabled, targets, imported_reenabled)
+-- Discovery Tree updates enablement before MIR's event handler. A boolean
+-- sixth argument selects that integration: true is a fresh upstream update,
+-- false preserves the last observation on events upstream does not handle.
+-- Nil retains the ordinary cap ownership contract.
+function M.reconcile(force, limits, owned_disabled, targets, imported_reenabled, discovery_observed)
   local caps = checked_limits(limits)
   if type(owned_disabled) ~= "table" then
     error("MIR caps owned_disabled must be a table", 2)
@@ -147,6 +151,9 @@ function M.reconcile(force, limits, owned_disabled, targets, imported_reenabled)
       local record = owned and owned[name]
       local previously_observed = type(record) == "table"
       owned, record = ensure_record(owned_disabled, force.index, owned, name)
+      if discovery_observed ~= nil and (discovery_observed or record.discovery_enabled == nil) then
+        record.discovery_enabled = technology.enabled == true
+      end
       if record.disabled == nil then
         -- A visibility-only row normally retains its foreign baseline.
         -- Record the first baseline once: native resets/reconfiguration can
@@ -159,7 +166,12 @@ function M.reconcile(force, limits, owned_disabled, targets, imported_reenabled)
           and imported_reenabled[name] == record
         record.disabled = technology.enabled == true and (not previously_observed or first_import_write)
       end
-      if technology.visible_when_disabled ~= true then
+      if discovery_observed ~= nil and record.visible_when_disabled ~= nil then
+        -- Undo only MIR's earlier visibility write when this integration is
+        -- enabled. Discovery Tree owns when ordinary research is revealed.
+        technology.visible_when_disabled = record.visible_when_disabled
+        record.visible_when_disabled = nil
+      elseif discovery_observed == nil and technology.visible_when_disabled ~= true then
         if record.visible_when_disabled == nil then
           record.visible_when_disabled = technology.visible_when_disabled == true
         end
@@ -174,7 +186,14 @@ function M.reconcile(force, limits, owned_disabled, targets, imported_reenabled)
       if record.visible_when_disabled ~= nil then
         technology.visible_when_disabled = record.visible_when_disabled
       end
-      if record.disabled == true and technology.enabled ~= true then technology.enabled = true
+      if discovery_observed ~= nil then
+        -- The just-updated native state is authoritative. Do not reveal a
+        -- technology while releasing MIR's old cap ledger.
+      elseif record.discovery_enabled ~= nil then
+        -- After upstream removal, restore only the last actually observed
+        -- available state that MIR capped. Never reveal an unknown hidden row.
+        if record.discovery_enabled == true and technology.enabled ~= true then technology.enabled = true end
+      elseif record.disabled == true and technology.enabled ~= true then technology.enabled = true
       elseif record.disabled == false and technology.enabled ~= false then technology.enabled = false end
       owned[name] = nil
     end

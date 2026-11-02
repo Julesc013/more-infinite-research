@@ -204,6 +204,90 @@ class ContinuationOwnershipTests(unittest.TestCase):
           for _, name in ipairs(tail_names) do assert(calls[name] == 1, "creator lookup work " .. name) end
         ''')
 
+    def test_unqualified_muria_provider_changes_refuse_before_mir_state_writes(self):
+        import test_lifecycle as fixture
+        fixture.LuaRuntime = LuaRuntime
+        harness = fixture.LifecycleTests()
+        harness.setUp()
+        harness.lua.execute('''
+          local world=force(1,{}, {},nil,nil)
+          for _, change in ipairs({{new_version="1.8.5"},{old_version="1.8.5"}}) do
+            local saved=setmetatable({}, {__newindex=function() error("MIR wrote state before provider guard") end})
+            boot({[1]=world},0,"",saved,nil,0,{base="2.1.23"})
+            local ok,message=pcall(handlers.configuration,{mod_changes={Muria=change}})
+            assert(not ok and tostring(message):find("cannot safely add or remove Muria",1,true),tostring(message))
+            assert(next(saved)==nil and #world.research_queue==0)
+          end
+          -- Installing MIR for the first time beside an existing Muria world
+          -- does not replace a previous MIR-owned weapon identity.
+          boot({[1]=world},0,"",nil,nil,0,{base="2.1.23"})
+          handlers.configuration({mod_changes={Muria={new_version="1.8.5"},
+            ["more-infinite-research"]={new_version="5.0.21002"}}})
+        ''')
+
+    def test_all_six_foreign_creators_stay_out_of_real_cap_admission(self):
+        self.lua.execute('''
+          local settings_names={
+            ["braking-force-8"]="mir-max-level-braking-force",
+            ["inserter-capacity-bonus-8"]="mir-max-level-inserter-capacity-bonus",
+            ["laser-shooting-speed-8"]="mir-max-level-laser-shooting-speed",
+            ["research-speed-7"]="mir-max-level-research-speed",
+            ["weapon-shooting-speed-7"]="mir-max-level-weapon-shooting-speed",
+            ["worker-robots-storage-4"]="mir-max-level-worker-robots-storage",
+          }
+          local config=require("research.settings")
+          for _,name in ipairs(tail_names) do
+            for _,creator in ipairs({"more-infinite-research","foreign-provider"}) do
+              for _,enabled in ipairs({false,true}) do
+                script={active_mods={base="2.1.23"}}
+                settings={startup={}}
+                for _,spec in ipairs(config.prototypes()) do settings.startup[spec.name]={value=spec.default_value} end
+                settings.startup[settings_names[name]].value=10
+                local native={name=name,valid=true,level=11,enabled=enabled,researched=false,
+                  visible_when_disabled=false,saved_progress=.27,prototype={enabled=true}}
+                local current={name="foreign-current",valid=true}
+                local world={index=1,valid=true,technologies={[name]=native,[current.name]=current},
+                  research_queue={current,native},current_research=current,research_progress=.42}
+                current.force,native.force=world,world
+                local reads=0
+                prototypes={recipe={},technology=setmetatable({[name]=native.prototype},
+                  {__pairs=function() error("cap admission enumerated all prototypes") end}),
+                  get_history=function(kind,id)
+                    assert(kind=="technology" and id==name);reads=reads+1
+                    return {created=creator,changed={"science-spread","more-infinite-research"}}
+                  end}
+                game={forces={[1]=world}}
+                storage={mir_caps={schema=1,owned_disabled={[1]={[name]={disabled=true,visible_when_disabled=false}}}}}
+                for _,module in ipairs({"research.catalogue","runtime.catalogue","runtime.lifecycle","runtime.configuration"}) do
+                  package.loaded[module]=nil
+                end
+                local lifecycle=require("runtime.lifecycle")
+                local owned=creator=="more-infinite-research"
+                local limits=lifecycle.cap_limits(world)
+                assert((limits[name]~=nil)==owned,"incorrect cap ownership for "..name)
+                lifecycle.on_init()
+                assert(native.enabled==(not owned and enabled) and native.visible_when_disabled==owned)
+                assert(native.level==11 and native.saved_progress==.27 and not native.researched)
+                assert(#world.research_queue==(owned and 1 or 2) and world.research_queue[1]==current)
+                assert(world.current_research==current and world.research_progress==.42 and reads==1)
+                local records=storage.mir_caps and storage.mir_caps.owned_disabled[1]
+                if not owned then assert(records==nil or records[name]==nil,"stale restoration right survived") end
+              end
+            end
+          end
+        ''')
+
+    def test_unknown_creation_history_refuses_each_shared_identity(self):
+        self.lua.execute('''
+          for _,name in ipairs(tail_names) do
+            script={active_mods={base="2.1.23"}}
+            prototypes={technology={[name]={}},get_history=function() return {changed={"science-spread"}} end}
+            package.loaded["research.catalogue"],package.loaded["runtime.catalogue"]=nil,nil
+            local ok,message=pcall(require,"runtime.catalogue")
+            assert(not ok and tostring(message):find("creation history for "..name,1,true))
+          end
+        ''')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)

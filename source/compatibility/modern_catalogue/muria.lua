@@ -5,10 +5,11 @@ local function positive(value)
   return type(value) == "number" and value == value and value > 0 and value < math.huge
 end
 
-local function finite_stage(technologies, name, predecessor)
+local function finite_stage(technologies, name, predecessor, level)
   local technology = technologies[name]
   if type(technology) ~= "table" or technology.type ~= "technology" or technology.name ~= name
-      or technology.max_level == "infinite" or type(technology.unit) ~= "table" then
+      or (technology.max_level ~= nil and technology.max_level ~= level)
+      or (technology.level ~= nil and technology.level ~= level) or type(technology.unit) ~= "table" then
     error("MIR Muria weapon continuation requires the finite " .. name, 3)
   end
   local anchored = false
@@ -29,8 +30,8 @@ function M.weapon_continuation(row, raw)
   if raw == nil then return end
   local technologies = type(raw) == "table" and raw.technology
   if type(technologies) ~= "table" then error("MIR Muria weapon continuation requires native technologies", 2) end
-  local previous = finite_stage(technologies, "weapon-shooting-speed-7", "weapon-shooting-speed-6")
-  local last = finite_stage(technologies, "weapon-shooting-speed-8", "weapon-shooting-speed-7")
+  local previous = finite_stage(technologies, "weapon-shooting-speed-7", "weapon-shooting-speed-6", 7)
+  local last = finite_stage(technologies, "weapon-shooting-speed-8", "weapon-shooting-speed-7", 8)
   row.inheritance = {last_count=last.unit.count, previous_count=previous.unit.count, research_time=last.unit.time}
   if type(last.unit.ingredients) ~= "table" or #last.unit.ingredients == 0 or #last.unit.ingredients > 32 then
     error("MIR Muria weapon continuation requires a bounded native science vector", 2)

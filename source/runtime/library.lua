@@ -49,6 +49,8 @@ local LEGACY_SNAPSHOT_MAX_DEPTH = 8
 local LEGACY_SNAPSHOT_MAX_ENTRIES = 512
 local LEGACY_SNAPSHOT_MAX_STRING = 4096
 local cap_provider = nil
+local discovery_visibility_provider
+local DISCOVERY_TREE = script and script.active_mods and script.active_mods.discovery_tree ~= nil
 local TRANSLATION_SCHEMA = 1
 local TRANSLATION_MAINTENANCE_TICKS = 61
 local setting_groups_cache
@@ -724,9 +726,13 @@ end
 local function context_for(force)
   local context = {
     private_credit_ids = private_credit_ids,
+    discovery_tree = DISCOVERY_TREE == true,
     research_triggers_supported = target.id == "f200" or target.id == "f210",
     recipe_productivity_supported = target.recipe_productivity == true
   }
+  if DISCOVERY_TREE and type(discovery_visibility_provider) == "function" then
+    context.discovery_visibility = discovery_visibility_provider(force)
+  end
   if type(cap_provider) ~= "function" then return context end
   local ok, caps = pcall(cap_provider, force)
   if not ok or type(caps) ~= "table" then return context end
@@ -1398,6 +1404,8 @@ local function setting_catalogue()
     if decoded_ok and type(profile) == "table" and type(profile.settings) == "table" then imported = profile.settings end
   end
 
+  local controlled_families = {}
+  for _, declaration in ipairs(authored_declarations()) do controlled_families[declaration.family] = true end
   local groups, ordered = {}, {}
   for index, name in ipairs(names) do
     if type(name) ~= "string" or name == "" or by_name[name] then return nil end
@@ -1413,6 +1421,9 @@ local function setting_catalogue()
       if type(title) == "string" then title = {title} end
       group = {key = key, scope = scope, title = title or (prototypes[name] and prototypes[name].localised_name) or name,
         fields = {}, search = key .. " " .. name}
+      group.externally_supplied = stream and stream.native_continuation == true and not controlled_families[key]
+        and type(catalogue.externally_supplied_continuation) == "function"
+        and catalogue.externally_supplied_continuation(stream.continuation_id) or false
       groups[key], ordered[#ordered + 1] = group, group
     end
     local default = spec.default_value
@@ -1547,6 +1558,10 @@ local function update_settings_content(content, view, preserve_query, translatio
   end
   add(detail, {type = "label", name = PREFIX .. "settings_title", caption = selected.title})
   add(detail, {type = "label", name = PREFIX .. "settings_scope", caption = {"mir-browser.scope-startup"}})
+  if selected.externally_supplied then
+    local warning = add(detail, {type = "label", name = PREFIX .. "settings_external", caption = {"mir-browser.settings-external-owner"}})
+    if valid(warning) then warning.style.single_line = false end
+  end
   add(detail, {type = "label", name = PREFIX .. "settings_effective", caption = {"mir-browser.effective-values"}})
   for index, field in ipairs(selected.fields) do
     local name = PREFIX .. "setting_" .. index
@@ -1587,9 +1602,12 @@ local function update_queue_content(content, player, view)
   add(content, {type = "label", name = PREFIX .. "queue_guidance", caption = {"mir-browser.native-queue-guidance"}})
   add(content, {type = "button", name = PREFIX .. "queue_open_native", caption = {"mir-browser.open-research"}})
   local ids, items = queue_entries(player.force), {}
+  local context = DISCOVERY_TREE and context_for(player.force) or nil
   for index, id in ipairs(ids) do
     local technology = known_technology(player, id)
-    items[index] = technology and technology.localised_name or id
+    if DISCOVERY_TREE and not library_model.technology_visible(technology, id, context) then
+      items[index] = {"mir-browser.undiscovered-research"}
+    else items[index] = technology and technology.localised_name or id end
   end
   local selected_index = 0
   for index, id in ipairs(ids) do if id == view.selected then selected_index = index; break end end
@@ -1920,6 +1938,11 @@ function M.set_cap_provider(provider)
     error("MIR Library cap provider must be a function or nil", 2)
   end
   cap_provider = provider
+end
+
+function M.set_discovery_visibility_provider(provider)
+  if provider ~= nil and type(provider) ~= "function" then error("MIR discovery provider must be a function or nil", 2) end
+  discovery_visibility_provider = provider
 end
 
 function M.open(player, options)
@@ -2316,6 +2339,7 @@ function M.on_gui_click(event)
   if technologies == nil then return end
   local ok, technology = pcall(function() return technologies[selected] end)
   if not ok or not valid(technology) then return end
+  if DISCOVERY_TREE and not library_model.technology_visible(technology, selected, context_for(player.force)) then return end
   if destroy_frame(player, view) then discard_translation_cache(player.index) end
   if type(player.open_technology_gui) == "function" then player.open_technology_gui(technology) end
 end
