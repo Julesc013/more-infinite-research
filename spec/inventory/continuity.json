@@ -8783,7 +8783,7 @@
         "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
       }
     ],
-    "next_bounded_work": "Independently review/integrate the ready #1571 host unit and #1575 secondary raw-recipe-ID correction, keeping frozen501 native package A distinct from corrected candidate B. Before affected GUI dispatch/reuse, Black Glass must close the capture-composition/safe-execution hold and bind a fresh complete packet; the actual one-engine guard adverse remains preserved. Continue unresolved historical runtime/control/compatibility/inter-release/consumer groups and original reporter evidence. Final candidate and whole-product performance/application/state checks retain their actual owners and consumed-input limits; do not rewrite original receipts or share the progress header.",
+    "next_bounded_work": "Keep accepted #1571/#1575/#1576 integrations and ready #1578 original heads/receipts distinct from native package qualification. The selected runtime settings/state helpers below are now dispositioned; continue remaining registry/default/control/compatibility/inter-release and unknown-consumer groups. Black Glass owns the new exact034 runtime/action packet and complete independent review after the preserved r19 NO-GO; no old033 adverse/result is relabelled. Review final-candidate consumed inputs for the existing finite coverage rows and fixed-profile whole-product queue; do not restart completed unchanged smoke checks or share the progress header.",
     "bounded_intent_reviews": [
       {
         "subjects": [
@@ -12179,6 +12179,759 @@
         },
         "custody": "build/qualification/aero-optional-runtime-intents-r01/",
         "qualification_limit": "Six tagged test families, two recovered original report-source bodies and their grouped obligations only. Other inter-release/runtime/consumer/crash/request sources and global VER-07 remain unresolved. New current control passes without a player source correction. No old runner/prototype framework/native campaign is restored, no source count is native acceptance, and original adverse/unknown scopes remain intact.",
+        "native_execution": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-08",
+          "CONT-09",
+          "CONT-11",
+          "CONT-14"
+        ],
+        "reviewed_on": "2026-11-02",
+        "reviewed_against": "8f668713b15e5f97f8ab2d7e4446a0170ba10d78",
+        "scope": "Six named settings/state helper families and source/non-source aliases across the existing91-tag snapshot. Fourteen exact bodies have three finite behavior dispositions. Other helpers/registry/default declarations, tests, inter-release removals, external consumers, discussions and screenshots remain outside this slice.",
+        "method": "Deduplicate immutable blobs, read all six latest bodies and all eight earlier variant diffs. Verify392 retained remote tag/commit/path references and three explicit commit-only local-alias references. Exercise the three exact startup-reader bodies to distinguish the older false-loss bug from corrected behavior, then run existing current controls. No old framework, engine or native runner is restored.",
+        "selected_tag_scope": 91,
+        "selected_commit_scope": 90,
+        "selected_blob_count": 14,
+        "distinct_retained_tag_references": 392,
+        "distinct_commit_only_references": 3,
+        "reference_limits": [
+          "The preserved local v3.0.0 alias at70bb513f5b388ad23c4a5d46dfc945571c3b8217 has no matching remote tag; its three available helper bodies are cited by exact commit/path without claiming publication. The distinct remote3.0.0 tag is not substituted.",
+          "The indexed v4.2.0 alias maps to the retained v4.2.0-stable tag at the same commit; original source-index custody is unchanged."
+        ],
+        "selected_blob_variants": [
+          {
+            "blob": "06725ed82ab2898203ecfeea3847eb9a5955b7bb",
+            "paths": [
+              "prototypes/mir/runtime/settings_resolver.lua"
+            ],
+            "bytes": 1108,
+            "sha256": "838AA3E1C3B033A4DF86BC0603833B3CCDDBEA5AC2833F2F42A1E218F3A56776",
+            "tag_path_references": [
+              "0.10.0:prototypes/mir/runtime/settings_resolver.lua",
+              "0.11.0:prototypes/mir/runtime/settings_resolver.lua",
+              "0.12.0:prototypes/mir/runtime/settings_resolver.lua",
+              "0.6.0:prototypes/mir/runtime/settings_resolver.lua",
+              "0.7.0:prototypes/mir/runtime/settings_resolver.lua",
+              "0.8.0:prototypes/mir/runtime/settings_resolver.lua",
+              "0.9.0:prototypes/mir/runtime/settings_resolver.lua",
+              "1.8.2:prototypes/mir/runtime/settings_resolver.lua",
+              "1.8.5:prototypes/mir/runtime/settings_resolver.lua",
+              "1.8.9:prototypes/mir/runtime/settings_resolver.lua",
+              "1.9.4:prototypes/mir/runtime/settings_resolver.lua",
+              "1.9.5:prototypes/mir/runtime/settings_resolver.lua",
+              "1.9.9:prototypes/mir/runtime/settings_resolver.lua",
+              "2.3.5:prototypes/mir/runtime/settings_resolver.lua",
+              "2.4.0:prototypes/mir/runtime/settings_resolver.lua",
+              "2.4.5:prototypes/mir/runtime/settings_resolver.lua",
+              "2.4.9:prototypes/mir/runtime/settings_resolver.lua",
+              "3.0.5:prototypes/mir/runtime/settings_resolver.lua",
+              "3.1.0:prototypes/mir/runtime/settings_resolver.lua",
+              "3.1.1:prototypes/mir/runtime/settings_resolver.lua",
+              "3.1.2:prototypes/mir/runtime/settings_resolver.lua",
+              "3.1.5:prototypes/mir/runtime/settings_resolver.lua",
+              "3.1.9:prototypes/mir/runtime/settings_resolver.lua"
+            ],
+            "intent_groups": [
+              "default-and-runtime-value-resolution"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "1a84015b4c3ec36b856407649d33d12c83f17e0d",
+            "paths": [
+              "source/prototypes/mir/runtime/startup_settings.lua"
+            ],
+            "bytes": 987,
+            "sha256": "7326679D9ABD4216AA5B8697BE15454724AD89A706F9720945B4DF644FB44E3A",
+            "tag_path_references": [
+              "v4.2.0-stable:source/prototypes/mir/runtime/startup_settings.lua"
+            ],
+            "intent_groups": [
+              "effective-import-lifetime"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "21605e5c524d624ededb6ee9c8c07dcb1966b6eb",
+            "paths": [
+              "prototypes/mir/settings/resolver.lua",
+              "source/prototypes/mir/settings/resolver.lua"
+            ],
+            "bytes": 1358,
+            "sha256": "FE00D102D84029F498829E983F5D0E7D1A756CFFD875FBD5E6FF3662FFD13438",
+            "tag_path_references": [
+              "0.10.0:prototypes/mir/settings/resolver.lua",
+              "0.11.0:prototypes/mir/settings/resolver.lua",
+              "0.12.0:prototypes/mir/settings/resolver.lua",
+              "0.6.0:prototypes/mir/settings/resolver.lua",
+              "0.7.0:prototypes/mir/settings/resolver.lua",
+              "0.8.0:prototypes/mir/settings/resolver.lua",
+              "0.9.0:prototypes/mir/settings/resolver.lua",
+              "1.3.0:prototypes/mir/settings/resolver.lua",
+              "1.3.5:prototypes/mir/settings/resolver.lua",
+              "1.3.9:prototypes/mir/settings/resolver.lua",
+              "1.4.0:prototypes/mir/settings/resolver.lua",
+              "1.4.5:prototypes/mir/settings/resolver.lua",
+              "1.4.9:prototypes/mir/settings/resolver.lua",
+              "1.5.0:prototypes/mir/settings/resolver.lua",
+              "1.5.5:prototypes/mir/settings/resolver.lua",
+              "1.5.9:prototypes/mir/settings/resolver.lua",
+              "1.6.0:prototypes/mir/settings/resolver.lua",
+              "1.6.5:prototypes/mir/settings/resolver.lua",
+              "1.6.9:prototypes/mir/settings/resolver.lua",
+              "1.7.0:prototypes/mir/settings/resolver.lua",
+              "1.7.1:prototypes/mir/settings/resolver.lua",
+              "1.7.5:prototypes/mir/settings/resolver.lua",
+              "1.7.9:prototypes/mir/settings/resolver.lua",
+              "1.8.0:prototypes/mir/settings/resolver.lua",
+              "1.8.1:prototypes/mir/settings/resolver.lua",
+              "1.8.2:prototypes/mir/settings/resolver.lua",
+              "1.8.5:prototypes/mir/settings/resolver.lua",
+              "1.8.9:prototypes/mir/settings/resolver.lua",
+              "1.9.3:prototypes/mir/settings/resolver.lua",
+              "1.9.4:prototypes/mir/settings/resolver.lua",
+              "1.9.5:prototypes/mir/settings/resolver.lua",
+              "1.9.9:prototypes/mir/settings/resolver.lua",
+              "2.3.0:prototypes/mir/settings/resolver.lua",
+              "2.3.5:prototypes/mir/settings/resolver.lua",
+              "2.4.0:prototypes/mir/settings/resolver.lua",
+              "2.4.5:prototypes/mir/settings/resolver.lua",
+              "2.4.9:prototypes/mir/settings/resolver.lua",
+              "2.5.0:prototypes/mir/settings/resolver.lua",
+              "2.5.10:prototypes/mir/settings/resolver.lua",
+              "2.5.11:prototypes/mir/settings/resolver.lua",
+              "2.5.5:prototypes/mir/settings/resolver.lua",
+              "2.5.9:prototypes/mir/settings/resolver.lua",
+              "3.0.0:prototypes/mir/settings/resolver.lua",
+              "3.0.5:prototypes/mir/settings/resolver.lua",
+              "3.1.0:prototypes/mir/settings/resolver.lua",
+              "3.1.1:prototypes/mir/settings/resolver.lua",
+              "3.1.2:prototypes/mir/settings/resolver.lua",
+              "3.1.5:prototypes/mir/settings/resolver.lua",
+              "3.1.9:prototypes/mir/settings/resolver.lua",
+              "3.2.0:prototypes/mir/settings/resolver.lua",
+              "3.2.1:prototypes/mir/settings/resolver.lua",
+              "3.2.10:prototypes/mir/settings/resolver.lua",
+              "3.2.11:prototypes/mir/settings/resolver.lua",
+              "3.2.2:prototypes/mir/settings/resolver.lua",
+              "3.2.3:prototypes/mir/settings/resolver.lua",
+              "3.2.5:prototypes/mir/settings/resolver.lua",
+              "3.2.9:prototypes/mir/settings/resolver.lua",
+              "v4.0.0:prototypes/mir/settings/resolver.lua",
+              "v4.1.0:prototypes/mir/settings/resolver.lua",
+              "v4.2.0-stable:source/prototypes/mir/settings/resolver.lua",
+              "v4.2.1:source/prototypes/mir/settings/resolver.lua",
+              "v4.2.2:source/prototypes/mir/settings/resolver.lua",
+              "v4.3.0:source/prototypes/mir/settings/resolver.lua",
+              "v4.4.0:source/prototypes/mir/settings/resolver.lua",
+              "v4.4.1:source/prototypes/mir/settings/resolver.lua",
+              "v4.4.2:source/prototypes/mir/settings/resolver.lua",
+              "v4.5.0:source/prototypes/mir/settings/resolver.lua",
+              "v4.5.1:source/prototypes/mir/settings/resolver.lua",
+              "v4.5.2:source/prototypes/mir/settings/resolver.lua",
+              "v4.6.0:source/prototypes/mir/settings/resolver.lua",
+              "v4.7.0:source/prototypes/mir/settings/resolver.lua",
+              "v4.7.1:source/prototypes/mir/settings/resolver.lua",
+              "v4.7.2:source/prototypes/mir/settings/resolver.lua",
+              "v4.7.3:source/prototypes/mir/settings/resolver.lua"
+            ],
+            "commit_only_references": [
+              {
+                "commit": "70bb513f5b388ad23c4a5d46dfc945571c3b8217",
+                "path": "prototypes/mir/settings/resolver.lua",
+                "indexed_tag": "v3.0.0",
+                "ref_kind": "commit-only-local-alias-not-published"
+              }
+            ],
+            "intent_groups": [
+              "default-and-runtime-value-resolution"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "31f220dd993374a39123c6cc9f615a224956728a",
+            "paths": [
+              "source/prototypes/mir/settings/effective.lua"
+            ],
+            "bytes": 2992,
+            "sha256": "B4B552DEFBFB2934E810377CB08CCD0FC7166030A7076FC83BD11B06EA9BA660",
+            "tag_path_references": [
+              "v4.3.0:source/prototypes/mir/settings/effective.lua",
+              "v4.4.0:source/prototypes/mir/settings/effective.lua",
+              "v4.4.1:source/prototypes/mir/settings/effective.lua",
+              "v4.4.2:source/prototypes/mir/settings/effective.lua",
+              "v4.5.0:source/prototypes/mir/settings/effective.lua",
+              "v4.5.1:source/prototypes/mir/settings/effective.lua",
+              "v4.5.2:source/prototypes/mir/settings/effective.lua",
+              "v4.6.0:source/prototypes/mir/settings/effective.lua",
+              "v4.7.0:source/prototypes/mir/settings/effective.lua",
+              "v4.7.1:source/prototypes/mir/settings/effective.lua",
+              "v4.7.2:source/prototypes/mir/settings/effective.lua",
+              "v4.7.3:source/prototypes/mir/settings/effective.lua"
+            ],
+            "intent_groups": [
+              "effective-import-lifetime"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "3317dbb2c5cbff54d9511803e08c72da25479620",
+            "paths": [
+              "prototypes/mir/runtime/startup_settings.lua"
+            ],
+            "bytes": 966,
+            "sha256": "77B04FB969BD146AA0A67FAE37E649435EC627788CB1BD7FD72967C43D7376A0",
+            "tag_path_references": [
+              "2.5.0:prototypes/mir/runtime/startup_settings.lua",
+              "2.5.10:prototypes/mir/runtime/startup_settings.lua",
+              "2.5.11:prototypes/mir/runtime/startup_settings.lua",
+              "2.5.5:prototypes/mir/runtime/startup_settings.lua",
+              "2.5.9:prototypes/mir/runtime/startup_settings.lua",
+              "3.2.0:prototypes/mir/runtime/startup_settings.lua",
+              "3.2.1:prototypes/mir/runtime/startup_settings.lua",
+              "3.2.10:prototypes/mir/runtime/startup_settings.lua",
+              "3.2.11:prototypes/mir/runtime/startup_settings.lua",
+              "3.2.2:prototypes/mir/runtime/startup_settings.lua",
+              "3.2.3:prototypes/mir/runtime/startup_settings.lua",
+              "3.2.5:prototypes/mir/runtime/startup_settings.lua",
+              "3.2.9:prototypes/mir/runtime/startup_settings.lua",
+              "v4.0.0:prototypes/mir/runtime/startup_settings.lua",
+              "v4.1.0:prototypes/mir/runtime/startup_settings.lua"
+            ],
+            "intent_groups": [
+              "effective-import-lifetime"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Known older raw false-to-nil bug is not parity: its and/or accessor loses false; the retained later1a84015b and4af0495b accessors preserve false. All three preserve numeric0. Exact-source host readback confirms the distinction without running an old native harness."
+          },
+          {
+            "blob": "3fc719fb62944059b642335cf5f9407ef037d5db",
+            "paths": [
+              "prototypes/mir/settings/effective.lua"
+            ],
+            "bytes": 2072,
+            "sha256": "5BE887E70DA5A7758E66F7305B2872520FF66363BCE9E6DA2B17AE56C467E126",
+            "tag_path_references": [],
+            "commit_only_references": [
+              {
+                "commit": "70bb513f5b388ad23c4a5d46dfc945571c3b8217",
+                "path": "prototypes/mir/settings/effective.lua",
+                "indexed_tag": "v3.0.0",
+                "ref_kind": "commit-only-local-alias-not-published"
+              }
+            ],
+            "intent_groups": [
+              "effective-import-lifetime"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Older import acceptance checked only the raw fallback type. Later original a0a0b399/7736ba12/31f220dd uses the registered settings catalogue and adds invalid counts; preserve the later validation boundary, not the earlier permissive input bug."
+          },
+          {
+            "blob": "4af0495bcfb4adec0e6f7813ba87b6f0683a3e56",
+            "paths": [
+              "source/prototypes/mir/runtime/startup_settings.lua"
+            ],
+            "bytes": 1975,
+            "sha256": "4E6E6B19411130F0C2BC244400592407AD94EC12FBD27A986CE3C889AF0C1B37",
+            "tag_path_references": [
+              "v4.2.1:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.2.2:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.3.0:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.4.0:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.4.1:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.4.2:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.5.0:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.5.1:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.5.2:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.6.0:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.7.0:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.7.1:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.7.2:source/prototypes/mir/runtime/startup_settings.lua",
+              "v4.7.3:source/prototypes/mir/runtime/startup_settings.lua"
+            ],
+            "intent_groups": [
+              "effective-import-lifetime"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "75520dd8232506069d699acd28d1bf2dcaccd9f2",
+            "paths": [
+              "prototypes/mir/runtime/settings_resolver.lua",
+              "source/prototypes/mir/runtime/settings_resolver.lua"
+            ],
+            "bytes": 1110,
+            "sha256": "57122FB881A76C970ACE3591F5E418949FB8E3D4883CF386962CDC21F2EBB720",
+            "tag_path_references": [
+              "2.5.0:prototypes/mir/runtime/settings_resolver.lua",
+              "2.5.10:prototypes/mir/runtime/settings_resolver.lua",
+              "2.5.11:prototypes/mir/runtime/settings_resolver.lua",
+              "2.5.5:prototypes/mir/runtime/settings_resolver.lua",
+              "2.5.9:prototypes/mir/runtime/settings_resolver.lua",
+              "3.2.0:prototypes/mir/runtime/settings_resolver.lua",
+              "3.2.1:prototypes/mir/runtime/settings_resolver.lua",
+              "3.2.10:prototypes/mir/runtime/settings_resolver.lua",
+              "3.2.11:prototypes/mir/runtime/settings_resolver.lua",
+              "3.2.2:prototypes/mir/runtime/settings_resolver.lua",
+              "3.2.3:prototypes/mir/runtime/settings_resolver.lua",
+              "3.2.5:prototypes/mir/runtime/settings_resolver.lua",
+              "3.2.9:prototypes/mir/runtime/settings_resolver.lua",
+              "v4.0.0:prototypes/mir/runtime/settings_resolver.lua",
+              "v4.1.0:prototypes/mir/runtime/settings_resolver.lua",
+              "v4.2.0-stable:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.2.1:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.2.2:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.3.0:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.4.0:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.4.1:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.4.2:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.5.0:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.5.1:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.5.2:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.6.0:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.7.0:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.7.1:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.7.2:source/prototypes/mir/runtime/settings_resolver.lua",
+              "v4.7.3:source/prototypes/mir/runtime/settings_resolver.lua"
+            ],
+            "intent_groups": [
+              "default-and-runtime-value-resolution"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "7736ba122bd38d794c5c931ca1f686dede696116",
+            "paths": [
+              "prototypes/mir/settings/effective.lua",
+              "source/prototypes/mir/settings/effective.lua"
+            ],
+            "bytes": 2965,
+            "sha256": "4A50344CF38C88A3C8D80BEE25956F99421C5BDDE5AD91D862145863FECFF495",
+            "tag_path_references": [
+              "2.5.0:prototypes/mir/settings/effective.lua",
+              "2.5.10:prototypes/mir/settings/effective.lua",
+              "2.5.11:prototypes/mir/settings/effective.lua",
+              "2.5.5:prototypes/mir/settings/effective.lua",
+              "2.5.9:prototypes/mir/settings/effective.lua",
+              "3.2.0:prototypes/mir/settings/effective.lua",
+              "3.2.1:prototypes/mir/settings/effective.lua",
+              "3.2.10:prototypes/mir/settings/effective.lua",
+              "3.2.11:prototypes/mir/settings/effective.lua",
+              "3.2.2:prototypes/mir/settings/effective.lua",
+              "3.2.3:prototypes/mir/settings/effective.lua",
+              "3.2.5:prototypes/mir/settings/effective.lua",
+              "3.2.9:prototypes/mir/settings/effective.lua",
+              "v4.0.0:prototypes/mir/settings/effective.lua",
+              "v4.1.0:prototypes/mir/settings/effective.lua",
+              "v4.2.0-stable:source/prototypes/mir/settings/effective.lua",
+              "v4.2.1:source/prototypes/mir/settings/effective.lua",
+              "v4.2.2:source/prototypes/mir/settings/effective.lua"
+            ],
+            "intent_groups": [
+              "effective-import-lifetime"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "7808b54f0f331e644bfac646859d398d9b2afbc0",
+            "paths": [
+              "prototypes/mir/platform/factorio/runtime_state.lua",
+              "source/prototypes/mir/platform/factorio/runtime_state.lua"
+            ],
+            "bytes": 691,
+            "sha256": "2F36854B538F73291E8386BCFEFB708E9F96B2778DC350B54E22C11E38418706",
+            "tag_path_references": [
+              "0.10.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "0.11.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "0.12.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "0.6.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "0.7.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "0.8.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "0.9.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.3.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.3.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.3.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.4.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.4.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.4.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.5.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.5.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.5.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.6.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.6.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.6.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.7.1:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.7.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.7.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.8.2:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.8.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.8.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.9.4:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.9.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "1.9.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "2.3.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "2.4.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "2.4.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "2.4.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "2.5.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "2.5.10:prototypes/mir/platform/factorio/runtime_state.lua",
+              "2.5.11:prototypes/mir/platform/factorio/runtime_state.lua",
+              "2.5.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "2.5.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.0.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.1.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.1.1:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.1.2:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.1.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.1.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.2.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.2.1:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.2.10:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.2.11:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.2.2:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.2.3:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.2.5:prototypes/mir/platform/factorio/runtime_state.lua",
+              "3.2.9:prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.0.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.1.0:prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.2.0-stable:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.2.1:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.2.2:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.3.0:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.4.0:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.4.1:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.4.2:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.5.0:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.5.1:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.5.2:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.6.0:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.7.0:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.7.1:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.7.2:source/prototypes/mir/platform/factorio/runtime_state.lua",
+              "v4.7.3:source/prototypes/mir/platform/factorio/runtime_state.lua"
+            ],
+            "intent_groups": [
+              "saved-state-custody"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "a0a0b399517bd3cd2169979e439bc30170faf167",
+            "paths": [
+              "prototypes/mir/settings/effective.lua"
+            ],
+            "bytes": 1971,
+            "sha256": "A0BC5D97A3DBD65DA4C0199F5663A1B30FA116543917E673165E5B0150BDDC1A",
+            "tag_path_references": [
+              "0.10.0:prototypes/mir/settings/effective.lua",
+              "0.11.0:prototypes/mir/settings/effective.lua",
+              "0.12.0:prototypes/mir/settings/effective.lua",
+              "0.6.0:prototypes/mir/settings/effective.lua",
+              "0.7.0:prototypes/mir/settings/effective.lua",
+              "0.8.0:prototypes/mir/settings/effective.lua",
+              "0.9.0:prototypes/mir/settings/effective.lua",
+              "1.3.0:prototypes/mir/settings/effective.lua",
+              "1.3.5:prototypes/mir/settings/effective.lua",
+              "1.3.9:prototypes/mir/settings/effective.lua",
+              "1.4.0:prototypes/mir/settings/effective.lua",
+              "1.4.5:prototypes/mir/settings/effective.lua",
+              "1.4.9:prototypes/mir/settings/effective.lua",
+              "1.5.0:prototypes/mir/settings/effective.lua",
+              "1.5.5:prototypes/mir/settings/effective.lua",
+              "1.5.9:prototypes/mir/settings/effective.lua",
+              "1.6.0:prototypes/mir/settings/effective.lua",
+              "1.6.5:prototypes/mir/settings/effective.lua",
+              "1.6.9:prototypes/mir/settings/effective.lua",
+              "1.7.0:prototypes/mir/settings/effective.lua",
+              "1.7.1:prototypes/mir/settings/effective.lua",
+              "1.7.5:prototypes/mir/settings/effective.lua",
+              "1.7.9:prototypes/mir/settings/effective.lua",
+              "1.8.0:prototypes/mir/settings/effective.lua",
+              "1.8.1:prototypes/mir/settings/effective.lua",
+              "1.8.2:prototypes/mir/settings/effective.lua",
+              "1.8.5:prototypes/mir/settings/effective.lua",
+              "1.8.9:prototypes/mir/settings/effective.lua",
+              "1.9.3:prototypes/mir/settings/effective.lua",
+              "1.9.4:prototypes/mir/settings/effective.lua",
+              "1.9.5:prototypes/mir/settings/effective.lua",
+              "1.9.9:prototypes/mir/settings/effective.lua",
+              "2.3.0:prototypes/mir/settings/effective.lua",
+              "2.3.5:prototypes/mir/settings/effective.lua",
+              "2.4.0:prototypes/mir/settings/effective.lua",
+              "2.4.5:prototypes/mir/settings/effective.lua",
+              "2.4.9:prototypes/mir/settings/effective.lua",
+              "3.0.0:prototypes/mir/settings/effective.lua",
+              "3.0.5:prototypes/mir/settings/effective.lua",
+              "3.1.0:prototypes/mir/settings/effective.lua",
+              "3.1.1:prototypes/mir/settings/effective.lua",
+              "3.1.2:prototypes/mir/settings/effective.lua",
+              "3.1.5:prototypes/mir/settings/effective.lua",
+              "3.1.9:prototypes/mir/settings/effective.lua"
+            ],
+            "intent_groups": [
+              "effective-import-lifetime"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "a0de500543acb191faed464ce86b52d8cfceb179",
+            "paths": [
+              "prototypes/mir/runtime/state.lua"
+            ],
+            "bytes": 479,
+            "sha256": "F2604900B741522FD2DC9B71806EE20DA6CCF14DC53230D983C48AA32D334ACF",
+            "tag_path_references": [
+              "1.3.0:prototypes/mir/runtime/state.lua",
+              "1.3.5:prototypes/mir/runtime/state.lua",
+              "1.3.9:prototypes/mir/runtime/state.lua",
+              "1.4.0:prototypes/mir/runtime/state.lua",
+              "1.4.5:prototypes/mir/runtime/state.lua",
+              "1.4.9:prototypes/mir/runtime/state.lua",
+              "1.5.0:prototypes/mir/runtime/state.lua",
+              "1.5.5:prototypes/mir/runtime/state.lua",
+              "1.5.9:prototypes/mir/runtime/state.lua",
+              "1.6.0:prototypes/mir/runtime/state.lua",
+              "1.6.5:prototypes/mir/runtime/state.lua",
+              "1.6.9:prototypes/mir/runtime/state.lua",
+              "1.7.0:prototypes/mir/runtime/state.lua",
+              "1.7.1:prototypes/mir/runtime/state.lua",
+              "1.7.5:prototypes/mir/runtime/state.lua",
+              "1.7.9:prototypes/mir/runtime/state.lua",
+              "1.8.0:prototypes/mir/runtime/state.lua",
+              "1.8.1:prototypes/mir/runtime/state.lua",
+              "1.9.3:prototypes/mir/runtime/state.lua"
+            ],
+            "intent_groups": [
+              "saved-state-custody"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Older root helper preferred any global table before storage. Later original d1a0f0c/7808b54f explicitly selects the target backend. Preserve actual saved-state ownership per target; do not revive ambiguous cross-backend fallback."
+          },
+          {
+            "blob": "d1a0f0c003333a38dd5b6bff1b4ac09283c6b154",
+            "paths": [
+              "prototypes/mir/runtime/state.lua",
+              "source/prototypes/mir/runtime/state.lua"
+            ],
+            "bytes": 367,
+            "sha256": "72AE3AD63EDF56D4437CECEE68F6D0A62F7ED0F8F63F8C135FA9D55CFDB4D739",
+            "tag_path_references": [
+              "0.10.0:prototypes/mir/runtime/state.lua",
+              "0.11.0:prototypes/mir/runtime/state.lua",
+              "0.12.0:prototypes/mir/runtime/state.lua",
+              "0.6.0:prototypes/mir/runtime/state.lua",
+              "0.7.0:prototypes/mir/runtime/state.lua",
+              "0.8.0:prototypes/mir/runtime/state.lua",
+              "0.9.0:prototypes/mir/runtime/state.lua",
+              "1.8.2:prototypes/mir/runtime/state.lua",
+              "1.8.5:prototypes/mir/runtime/state.lua",
+              "1.8.9:prototypes/mir/runtime/state.lua",
+              "1.9.4:prototypes/mir/runtime/state.lua",
+              "1.9.5:prototypes/mir/runtime/state.lua",
+              "1.9.9:prototypes/mir/runtime/state.lua",
+              "2.3.5:prototypes/mir/runtime/state.lua",
+              "2.4.0:prototypes/mir/runtime/state.lua",
+              "2.4.5:prototypes/mir/runtime/state.lua",
+              "2.4.9:prototypes/mir/runtime/state.lua",
+              "2.5.0:prototypes/mir/runtime/state.lua",
+              "2.5.10:prototypes/mir/runtime/state.lua",
+              "2.5.11:prototypes/mir/runtime/state.lua",
+              "2.5.5:prototypes/mir/runtime/state.lua",
+              "2.5.9:prototypes/mir/runtime/state.lua",
+              "3.0.5:prototypes/mir/runtime/state.lua",
+              "3.1.0:prototypes/mir/runtime/state.lua",
+              "3.1.1:prototypes/mir/runtime/state.lua",
+              "3.1.2:prototypes/mir/runtime/state.lua",
+              "3.1.5:prototypes/mir/runtime/state.lua",
+              "3.1.9:prototypes/mir/runtime/state.lua",
+              "3.2.0:prototypes/mir/runtime/state.lua",
+              "3.2.1:prototypes/mir/runtime/state.lua",
+              "3.2.10:prototypes/mir/runtime/state.lua",
+              "3.2.11:prototypes/mir/runtime/state.lua",
+              "3.2.2:prototypes/mir/runtime/state.lua",
+              "3.2.3:prototypes/mir/runtime/state.lua",
+              "3.2.5:prototypes/mir/runtime/state.lua",
+              "3.2.9:prototypes/mir/runtime/state.lua",
+              "v4.0.0:prototypes/mir/runtime/state.lua",
+              "v4.1.0:prototypes/mir/runtime/state.lua",
+              "v4.2.0-stable:source/prototypes/mir/runtime/state.lua",
+              "v4.2.1:source/prototypes/mir/runtime/state.lua",
+              "v4.2.2:source/prototypes/mir/runtime/state.lua",
+              "v4.3.0:source/prototypes/mir/runtime/state.lua",
+              "v4.4.0:source/prototypes/mir/runtime/state.lua",
+              "v4.4.1:source/prototypes/mir/runtime/state.lua",
+              "v4.4.2:source/prototypes/mir/runtime/state.lua",
+              "v4.5.0:source/prototypes/mir/runtime/state.lua",
+              "v4.5.1:source/prototypes/mir/runtime/state.lua",
+              "v4.5.2:source/prototypes/mir/runtime/state.lua",
+              "v4.6.0:source/prototypes/mir/runtime/state.lua",
+              "v4.7.0:source/prototypes/mir/runtime/state.lua",
+              "v4.7.1:source/prototypes/mir/runtime/state.lua",
+              "v4.7.2:source/prototypes/mir/runtime/state.lua",
+              "v4.7.3:source/prototypes/mir/runtime/state.lua"
+            ],
+            "intent_groups": [
+              "saved-state-custody"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          },
+          {
+            "blob": "ece294604ebdcdebf1e97391bf4ddbdf2f838370",
+            "paths": [
+              "prototypes/mir/runtime/settings_resolver.lua"
+            ],
+            "bytes": 793,
+            "sha256": "DB82436254D6E30D823A9AB22E4A712371C4EEE03B397B234936925BC3A35926",
+            "tag_path_references": [
+              "1.3.0:prototypes/mir/runtime/settings_resolver.lua",
+              "1.3.5:prototypes/mir/runtime/settings_resolver.lua",
+              "1.3.9:prototypes/mir/runtime/settings_resolver.lua",
+              "1.4.0:prototypes/mir/runtime/settings_resolver.lua",
+              "1.4.5:prototypes/mir/runtime/settings_resolver.lua",
+              "1.4.9:prototypes/mir/runtime/settings_resolver.lua",
+              "1.5.0:prototypes/mir/runtime/settings_resolver.lua",
+              "1.5.5:prototypes/mir/runtime/settings_resolver.lua",
+              "1.5.9:prototypes/mir/runtime/settings_resolver.lua",
+              "1.6.0:prototypes/mir/runtime/settings_resolver.lua",
+              "1.6.5:prototypes/mir/runtime/settings_resolver.lua",
+              "1.6.9:prototypes/mir/runtime/settings_resolver.lua",
+              "1.7.0:prototypes/mir/runtime/settings_resolver.lua",
+              "1.7.1:prototypes/mir/runtime/settings_resolver.lua",
+              "1.7.5:prototypes/mir/runtime/settings_resolver.lua",
+              "1.7.9:prototypes/mir/runtime/settings_resolver.lua",
+              "1.8.0:prototypes/mir/runtime/settings_resolver.lua",
+              "1.8.1:prototypes/mir/runtime/settings_resolver.lua",
+              "1.9.3:prototypes/mir/runtime/settings_resolver.lua",
+              "2.3.0:prototypes/mir/runtime/settings_resolver.lua",
+              "3.0.0:prototypes/mir/runtime/settings_resolver.lua"
+            ],
+            "commit_only_references": [
+              {
+                "commit": "70bb513f5b388ad23c4a5d46dfc945571c3b8217",
+                "path": "prototypes/mir/runtime/settings_resolver.lua",
+                "indexed_tag": "v3.0.0",
+                "ref_kind": "commit-only-local-alias-not-published"
+              }
+            ],
+            "intent_groups": [
+              "default-and-runtime-value-resolution"
+            ],
+            "disposition": "consolidate-behavior-retire-obsolete-helper-layout",
+            "variant_decision": "Preserve the mapped public/effect/state behavior; source/non-source aliases, compiler context/fingerprint transport, import placement and single-current-decode cache are implementation history. Unknown consumers and other imported implementations retain their existing unresolved scopes."
+          }
+        ],
+        "groups": [
+          {
+            "id": "default-and-runtime-value-resolution",
+            "disposition": "consolidate",
+            "historical_blobs": [
+              "06725ed82ab2898203ecfeea3847eb9a5955b7bb",
+              "75520dd8232506069d699acd28d1bf2dcaccd9f2",
+              "ece294604ebdcdebf1e97391bf4ddbdf2f838370",
+              "21605e5c524d624ededb6ee9c8c07dcb1966b6eb"
+            ],
+            "independent_expectation": "Explicit stream/base defaults precede spec/shared/fallback defaults. A supplied false is distinct from absence; admitted percent settings become1+percent/100 and absent values use the authored canonical delta. Older resolver lacks the later configurable multiplier; preserve the latest delivered setting/effect boundary.",
+            "implementation": [
+              "source/research/settings.lua",
+              "source/runtime/configuration.lua",
+              "source/runtime/agriculture.lua",
+              "source/runtime/spoilage.lua"
+            ],
+            "host_controls": [
+              "tests/test_settings_profile.py::test_registered_settings_are_the_single_active_profile_authority",
+              "tests/test_settings_profile.py::test_import_precedence_uses_profile_validation_before_consumer_normalization",
+              "tests/test_agriculture.py",
+              "tests/test_spoilage.py"
+            ],
+            "remaining_executable_check": "Existing CONT-03/CONT-08 catalogue/default/allowed-value and affected nondefault native-effect checks remain. The helper-only fallback or negative clamp does not qualify a descriptor, malformed input, arbitrary provider or native profile. Review final consumed inputs rather than replaying unchanged helper mappings.",
+            "owner": "Aero mapping/applicability; Black Glass native execution"
+          },
+          {
+            "id": "effective-import-lifetime",
+            "disposition": "retain-corrected-behavior-retire-obsolete-transport",
+            "historical_blobs": [
+              "1a84015b4c3ec36b856407649d33d12c83f17e0d",
+              "3317dbb2c5cbff54d9511803e08c72da25479620",
+              "4af0495bcfb4adec0e6f7813ba87b6f0683a3e56",
+              "31f220dd993374a39123c6cc9f615a224956728a",
+              "3fc719fb62944059b642335cf5f9407ef037d5db",
+              "7736ba122bd38d794c5c931ca1f686dede696116",
+              "a0a0b399517bd3cd2169979e439bc30170faf167"
+            ],
+            "independent_expectation": "Read raw values without losing false/0. Only registered, actually present and catalogue-valid imported values override raw values; the import setting cannot import itself. Malformed profiles fall back with diagnosis. Queries/export retain effective values, useful recognized/invalid/unknown counts and caller-mutation isolation after control parsing closes. Do not persist a second settings authority.",
+            "implementation": [
+              "source/research/settings.lua",
+              "source/research/settings_profile.lua",
+              "source/runtime/configuration.lua",
+              "source/runtime/settings_profile.lua"
+            ],
+            "host_controls": [
+              "tests/test_settings_profile.py::test_import_precedence_uses_profile_validation_before_consumer_normalization",
+              "tests/test_settings_profile.py::test_malformed_import_falls_back_without_executing_input",
+              "tests/test_settings_profile.py::test_runtime_facade_exports_effective_values_and_reports_read_only_counts",
+              "tests/test_settings_profile.py::test_settings_queries_and_runtime_profile_facade_work_after_module_loading_closes",
+              "tests/test_settings_profile.py::test_settings_descriptors_remain_stable_after_caller_mutation_and_parse_closure"
+            ],
+            "variant_decision": "Compiler-context state views, settings-fingerprint snapshots and helper-identity cache invalidation are not a requirement to restore that architecture. Current owners resolve startup values once per loaded control instance; existing read-only facade resolves on request. Earlier false-loss/type-only-validation bugs stay contradicted. Unknown external/private-method consumers remain unresolved under CONT-14.",
+            "remaining_executable_check": "Qualify affected final-package import/provenance, actual full/compact export files and client/server lifecycle through the existing Library/settings queue. These host/source mappings do not accept file output or retire unknown API consumers.",
+            "owner": "Aero mapping/review; Black Glass native/output execution"
+          },
+          {
+            "id": "saved-state-custody",
+            "disposition": "retain-state-identity-retire-layout-only-helper",
+            "historical_blobs": [
+              "a0de500543acb191faed464ce86b52d8cfceb179",
+              "d1a0f0c003333a38dd5b6bff1b4ac09283c6b154",
+              "7808b54f0f331e644bfac646859d398d9b2afbc0"
+            ],
+            "independent_expectation": "Preserve the actual target saved-state backend and existing mir namespace/bucket identities, retaining unrelated foreign/historical fields. Modern Space Age effects consume their exact original unversioned buckets. Read-only loading must not initialize or mutate saved state. A reduced historical target exposes only its admitted API and no unavailable modern event maintenance.",
+            "implementation": [
+              "source/runtime/scripted_effects.lua",
+              "source/runtime/bootstrap.lua",
+              "source/adapters/reduced/control.lua",
+              "source/platform/target.lua"
+            ],
+            "host_controls": [
+              "tests/test_scripted_effects_lifecycle.py::test_imports_historical_buckets_and_uses_named_event_paths",
+              "tests/test_scripted_effects_lifecycle.py::test_disable_restores_only_our_matching_global_write_and_keeps_foreign_write",
+              "tests/test_scripted_effects_lifecycle.py::test_force_reset_merge_and_retired_source_reconcile_without_cap_callbacks",
+              "tests/test_target_adapters.py::test_reduced_control_registers_only_the_unified_api",
+              "tests/test_target_adapters.py::test_reduced_adapters_contain_no_library_or_event_maintenance"
+            ],
+            "variant_decision": "Do not import the old generic namespace/bucket initializer or opportunistically prefer global over storage. Preserve useful state/read-only semantics through current named owners and target capabilities; a global/storage locator alone proves no migration.",
+            "remaining_executable_check": "Existing selected migration/native global-contribution/removal-readdition/save/client routes and final-candidate applicability remain required. Host lifecycle and reduced-adapter controls are not native backend or historical save qualification.",
+            "owner": "Aero mapping/applicability; Black Glass native execution"
+          }
+        ],
+        "host_validation": {
+          "existing_selected_controls": 25,
+          "settings_profile": 8,
+          "scripted_effects_lifecycle": 3,
+          "target_adapters": 14,
+          "lua": "5.2",
+          "lupa": "2.6",
+          "new_or_modified_tests": 0,
+          "native_execution": false
+        },
+        "custody": "build/qualification/aero-runtime-helper-intents-r01/",
+        "qualification_limit": "Only the six selected helper source intents and their named current control mappings are reconciled. No demonstrated current product defect or new player source change. Global VER-07 and registry/default/catalogue/inter-release/external-consumer/native/output/performance/release gates remain open. Original results retain their original identities.",
         "native_execution": false,
         "source_reconciliation_complete": false,
         "test_intent_reconciliation_complete": false,
