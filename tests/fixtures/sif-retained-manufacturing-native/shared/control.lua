@@ -21,7 +21,7 @@ end
 local function stage()
   local version = script.active_mods[C.fixture]
   local source = version=="0.1.0"
-  if not source and version~="0.2.0" then fail("fixture version differs") end
+  if not source and version~="0.2.0" and version~="0.4.0" then fail("fixture version differs") end
   local expected = {base="2.0.77",["elevated-rails"]="2.0.77",quality="2.0.77",
     ["space-age"]="2.0.77",["space-is-fake"]="1.0.60",["cr-commons"]="1.0.27",
     [C.fixture]=version,["more-infinite-research"]=source and C.source or C.successor,
@@ -31,6 +31,43 @@ local function stage()
   end
   for name in pairs(script.active_mods) do if expected[name]==nil then fail("unexpected mod: " .. name) end end
   return source
+end
+local function entry_boundary_mode()
+  return script.active_mods[C.fixture]=="0.4.0"
+end
+local function require_early_order(order)
+  if type(order)~="string" then fail("entry boundary event order absent") end
+  local names, seen, fixture_index, mir_index = {}, {}, nil, nil
+  -- Exact2.0.77 returns the observed 'level -> mod -> mod' string. Refuse
+  -- ambiguous/missing tokens rather than infer order from metadata or names.
+  for name in (order .. " -> "):gmatch("(.-) %-> ") do
+    if name=="" or seen[name] or (name~="level" and script.active_mods[name]==nil) then
+      fail("entry boundary event order invalid")
+    end
+    names[#names+1],seen[name]=name,true
+    if name==C.fixture then fixture_index=#names end
+    if name=="more-infinite-research" then mir_index=#names end
+  end
+  if table.concat(names," -> ")~=order or not fixture_index or not mir_index or fixture_index>=mir_index then
+    fail("entry boundary must precede MIR configuration")
+  end
+end
+local function clone(value)
+  if type(value)~="table" then return value end
+  local out={};for key,item in pairs(value) do out[key]=clone(item) end;return out
+end
+local function expected_snapshots(state)
+  if not entry_boundary_mode() then return state.player,state.foreign end
+  local baseline=state.entry_boundary
+  if type(baseline)~="table" or type(baseline.player_processing_enabled)~="boolean"
+      or type(baseline.foreign_mining_enabled)~="boolean" then fail("fixed entry boundary absent") end
+  require_early_order(baseline.event_order)
+  local player,foreign=clone(state.player),clone(state.foreign)
+  -- Only the two independently demonstrated fields use the fixed pre-MIR
+  -- observation. Source witnesses and every other expectation stay unchanged.
+  player.technologies[id(C.rows[3])].enabled=baseline.player_processing_enabled
+  foreign.foreign.enabled=baseline.foreign_mining_enabled
+  return player,foreign
 end
 local function technology(force, name)
   local value = force and force.technologies[name]
@@ -89,9 +126,10 @@ end
 local function verify(state, successor)
   if type(state)~="table" or state.kind~="explicit-published-native-fixture-seed-not-lab-earned"
       or state.source_mir~=C.source then fail("published source witness absent") end
-  same(snapshot(game.forces.player),state.player,"player")
+  local expected_player,expected_foreign=expected_snapshots(state)
+  same(snapshot(game.forces.player),expected_player,"player")
   local foreign=game.forces[state.foreign_index]
-  same(snapshot(foreign),state.foreign,"foreign force")
+  same(snapshot(foreign),expected_foreign,"foreign force")
   zero_manufacturing(foreign)
   if successor then
     local fresh=game.forces[state.fresh_index]
@@ -103,14 +141,24 @@ local function verify(state, successor)
     -- states and leave the native queue/progress untouched.
     for _, row in ipairs(C.rows) do
       local value, reason=remote.call("more-infinite-research.api.v1","get_research",game.forces.player.index,id(row))
-      local before=state.player.technologies[id(row)]
+      local before=expected_player.technologies[id(row)]
       if type(value)~="table" or reason~=nil then fail("native API query absent: " .. id(row)) end
       for _, field in ipairs({"level","researched","enabled","saved_progress"}) do
         same(value[field],before[field],"API " .. id(row) .. "." .. field)
       end
     end
-    same(snapshot(game.forces.player),state.player,"after read-only API")
+    same(snapshot(game.forces.player),expected_player,"after read-only API")
   end
+end
+local function entry_marker(phase,state)
+  log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({case=C.case,stage=phase,status="passed",
+    witnesses={source_mir=C.source,successor_mir=C.successor,role="successor-entry-boundary-proposal",
+      source_kind=state.kind,source_actual_labs=0,successor_actual_labs=0,
+      source_snapshot=state.player,foreign_snapshot=state.foreign,entry_boundary=state.entry_boundary,
+      accepted_current={player=snapshot(game.forces.player),foreign=snapshot(game.forces[state.foreign_index])},
+      fresh_index=state.fresh_index,five_hidden_rows=true,exact_effect_counts={3,2,1,3,2},processing_unit_scrap=false,
+      actual_gui_input=false,hidden_library_enqueue_not_exercised=true,on_load_read_only=phase=="reload",
+      interpretation_review_required=true}}))
 end
 local function marker(phase,state,source)
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({case=C.case,stage=phase,status="passed",
@@ -170,6 +218,17 @@ script.on_configuration_changed(function()
   if stage() then fail("unexpected source configuration change") end
   local state=storage[KEY]
   if type(state)~="table" or state.phase~="source-complete" then fail("protected completed source required") end
+  if entry_boundary_mode() then
+    if state.entry_boundary~=nil then fail("entry boundary already captured") end
+    local order=script.get_event_order();require_early_order(order)
+    local player=technology(game.forces.player,id(C.rows[3])).enabled
+    local foreign=technology(game.forces[state.foreign_index],C.foreign).enabled
+    if type(player)~="boolean" or type(foreign)~="boolean" then fail("entry boundary flags are not boolean") end
+    state.entry_boundary={player_processing_enabled=player,foreign_mining_enabled=foreign,event_order=order}
+    state.phase="entry-boundary-pending"
+    loaded,reported=false,false
+    return -- No full verification, API, fresh force or save before MIR config.
+  end
   -- Validate every preserved state before creating the independent fresh force.
   verify(state,false)
   if game.forces[FRESH_FORCE] then fail("fresh successor force collision") end
@@ -182,6 +241,21 @@ script.on_event(defines.events.on_tick,function()
   if reported then return end
   local source=stage();local state=storage[KEY]
   if type(state)~="table" then fail("fixture state absent") end
+  if entry_boundary_mode() and state.phase=="entry-boundary-pending" then
+    -- First tick follows all configuration callbacks. Check preservation before
+    -- the one intentional fresh-force creation, then the ordinary API/save path.
+    verify(state,false)
+    if game.forces[FRESH_FORCE] then fail("fresh successor force collision") end
+    local fresh=game.create_force(FRESH_FORCE);zero_manufacturing(fresh)
+    state.fresh_index=fresh.index
+    verify(state,true)
+    state.phase="entry-boundary-complete"
+    entry_marker("initial",state);reported=true;game.server_save(SAVE)
+    return
+  elseif entry_boundary_mode() and loaded and state.phase=="entry-boundary-complete" then
+    verify(state,true);entry_marker("reload",state);reported=true
+    return
+  end
   if state.phase=="source-pending" or state.phase=="successor-pending" then
     if source~=(state.phase=="source-pending") then fail("pending stage differs") end
     verify(state,not source)
