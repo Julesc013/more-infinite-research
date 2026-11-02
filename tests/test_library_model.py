@@ -768,6 +768,57 @@ class LibraryModelTests(unittest.TestCase):
           assert(#rows == 1)
         ''')
 
+    def test_localization_deduplicates_namespaces_and_keeps_subject_work_and_parameter_bounds(self):
+        self.lua.execute(r'''
+          local localization = require("presentation.library_localization")
+          local technology = {name="discovery-metallurgy",localised_name="Metallurgie",prototype={effects={
+            {type="unlock-recipe",recipe="casting"},
+            {type="change-recipe-productivity",recipe="casting",change=.02}
+          }}}
+          local collections = {
+            recipe={casting={localised_name="Fonte raffinee",products={
+              {type="item",name="gold"},{type="fluid",name="gold"},{type="item",name="gold"}
+            }}},
+            item={gold={localised_name="Plaque doree"}},
+            fluid={gold={localised_name="Vapeur enrichie"}}
+          }
+          local function translate(value, depth)
+            depth=(depth or 0)+1
+            assert(depth<=20,"localization exceeded the historical engine nesting bound")
+            if type(value)=="string" then return value end
+            assert(type(value)=="table" and #value<=21,
+              "localization exceeded twenty parameters per LocalisedString node")
+            if value[1]=="?" then return translate(value[2],depth) end
+            assert(value[1]=="")
+            local parts={}; for index=2,#value do parts[#parts+1]=translate(value[index],depth) end
+            return table.concat(parts)
+          end
+          local payload,subjects,limited=localization.search_request(technology,collections)
+          assert(subjects==3 and not limited,
+            "duplicate recipe/product references must keep distinct item and fluid namespaces")
+          assert(translate(payload)=="Metallurgie\31Fonte raffinee\31Plaque doree\31Vapeur enrichie",
+            "recipe/material discovery lost identity, stable order or deduplication")
+
+          -- Literal bounds are recovered from the old discovery opponents,
+          -- rather than read from the candidate module to generate expectations.
+          local crowded={name="crowded",localised_name="Crowded",prototype={effects={}}}
+          local recipes={}
+          for index=1,129 do
+            local name="recipe-"..index
+            crowded.prototype.effects[index]={type="unlock-recipe",recipe=name}
+            recipes[name]={localised_name=name,products={}}
+          end
+          payload,subjects,limited=localization.search_request(crowded,{recipe=recipes})
+          assert(subjects==128 and limited,"discovery subject overflow must be bounded and disclosed")
+          local text=translate(payload)
+          assert(text:find("\31recipe-128",1,true) and not text:find("\31recipe-129",1,true))
+          crowded.prototype.effects={}
+          for index=1,1025 do crowded.prototype.effects[index]={type="nothing"} end
+          payload,subjects,limited=localization.search_request(crowded,{recipe={}})
+          assert(subjects==0 and limited and payload=="Crowded",
+            "irrelevant effects must not evade the finite prototype-work bound")
+        ''')
+
     def test_selected_detail_is_bounded_and_never_reuses_native_tables(self):
         self.lua.execute('''
           local id = "recipe-prod-research_gears-1"

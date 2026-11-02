@@ -77,6 +77,8 @@ local function valid_cache(cache)
     and cache.outstanding <= M.outstanding_limit
     and finite_integer(cache.resolved, 0) and finite_integer(cache.catalogue_count, 0)
     and finite_integer(cache.completed_since_refresh, 0) and finite_integer(cache.cached_bytes, 0)
+    and ((cache.discovery_subjects == nil and cache.discovery_limited == nil)
+      or (type(cache.discovery_subjects) == "table" and type(cache.discovery_limited) == "boolean"))
 end
 
 local function scope_is_current(cache, scope)
@@ -115,8 +117,19 @@ local function resolve(cache, key, label)
   cache.resolved_keys[key] = true
   cache.resolved = cache.resolved + 1
   cache.completed_since_refresh = cache.completed_since_refresh + 1
-  if type(label) == "string" and #label > 0 and #label <= M.translated_label_limit
-      and cache.cached_bytes + #label <= M.translated_name_byte_limit then
+  local retain = type(label) == "string" and #label > 0 and #label <= M.translated_label_limit
+    and cache.cached_bytes + #label <= M.translated_name_byte_limit
+  local subjects = type(cache.discovery_subjects) == "table" and cache.discovery_subjects[key] or nil
+  if subjects ~= nil then
+    local separators = 0
+    if retain then for _ in label:gmatch("\31") do separators = separators + 1 end end
+    if not finite_integer(subjects, 1) or not retain or label:sub(1, 1) == "\31" or separators < subjects then
+      -- A composed response needs its technology caption and every admitted
+      -- discovery field. Keep stable-ID fallback instead of a partial caption.
+      retain, cache.discovery_limited = false, true
+    end
+  end
+  if retain then
     cache.labels[key] = label
     cache.cached_bytes = cache.cached_bytes + #label
   end
@@ -249,7 +262,9 @@ function M.new(scope)
     completed_since_refresh = 0,
     refresh_pending = false,
     cached_bytes = 0,
-    fallbacks = 0
+    fallbacks = 0,
+    discovery_subjects = {},
+    discovery_limited = false
   }
 end
 
@@ -325,6 +340,8 @@ function M.prepare(cache, scope, ordered_ids)
   cache.refresh_pending = false
   cache.cached_bytes = 0
   cache.fallbacks = 0
+  cache.discovery_subjects = {}
+  cache.discovery_limited = false
   return true
 end
 
@@ -340,7 +357,11 @@ function M.dispatch(cache, scope, tick, request)
     local key = queue_key(cache)
     if key == nil then break end
     work = work + 1
-    local ok, request_id = pcall(request, key)
+    local ok, request_id, subjects, limited = pcall(request, key)
+    if type(cache.discovery_subjects) == "table" then
+      if finite_integer(subjects, 1) then cache.discovery_subjects[key] = subjects end
+      if limited == true then cache.discovery_limited = true end
+    end
     if ok and valid_request_id(request_id) and cache.pending_by_id[request_id] == nil then
       cache.pending_by_id[request_id] = {
         key = key,
@@ -418,6 +439,13 @@ function M.labels(cache, scope)
   return cache.labels
 end
 
+-- nil denotes an older working cache with no discovery coverage metadata.
+-- Its owner may renew derived work during a valid open, never during on_load.
+function M.discovery_limited(cache, scope)
+  if not scope_is_current(cache, scope) then return nil end
+  return cache.discovery_limited
+end
+
 function M.snapshot(cache, scope)
   if not scope_is_current(cache, scope) then return nil end
   return {
@@ -429,6 +457,7 @@ function M.snapshot(cache, scope)
       catalogue_count = cache.catalogue_count,
       cached_bytes = cache.cached_bytes,
       fallbacks = cache.fallbacks,
+      discovery_limited = cache.discovery_limited,
       refresh_pending = cache.refresh_pending == true
     }
   }

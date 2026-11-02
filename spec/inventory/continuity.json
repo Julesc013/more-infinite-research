@@ -1141,6 +1141,2400 @@
           "package_applicability": "The two Library modules affect modern presentation; the50 restored locale members also occur in reduced packages, so those ZIP bytes change and are not called identical to501. Review exact private package members, locale parsing and the final public5.0.2 freeze separately. No source version, published byte, tag, direct library, fixture/controller or protected save changes here.",
           "remaining_native_check": "Black Glass observes selected current bonus/limit before and after an actual useful lab, saturated and mixed/disabled/cap cases, reopened/cold/client views and representative English/German geometry on the final F200/F210 candidate. Review old-edition locale/package parsing applicability and final candidate first-open/refresh/memory cost; source/host identity is not native acceptance.",
           "limits": "This checked-parent correction remains separate from frozen public501 packetA and still needs independent review/integration, exact-head CI and final affected native/package/performance qualification. All87 request decisions, other CONT subjects and broad audit flags remain unchanged; VER-07 and stable acceptance remain incomplete."
+        },
+        {
+          "id": "historical-library-core-omissions-native-discovery-intents",
+          "reviewed_against": "085471a3b0b1c02a5e71b039d28ea096d63f8495",
+          "reviewed_on": "2026-11-02",
+          "scope": "Complete intent review of three selected regression files, three deduplicated blobs/46 verified tag-path references. Other browser harness/provider/fixture dependencies, inter-release changes and original discussions remain outside this slice; this is not VER-07 completion.",
+          "sources": [
+            {
+              "path": "tests/runtime/research_browser_core_regressions.lua",
+              "blob": "55be2847fae29855efac6a294887012827013eef",
+              "sha256": "BD13B530B5BACCAB14E74452F5884283FC8DAD58C90F79CF45B5F44D66C8171F",
+              "bytes": 9882,
+              "lines": 210,
+              "references": [
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_omissions.lua",
+              "blob": "0b6ff3eeabafb6c0bfb560fa87f68a9e6cc5807a",
+              "sha256": "341A843CA5E7DAECD04A370B162BB665B941C279C7A4FDA2C7244BBF89DBF5D4",
+              "bytes": 16491,
+              "lines": 261,
+              "references": [
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_native_discovery_regressions.lua",
+              "blob": "e0352ae042f5748d77a7bb2a6ac049e04d43496e",
+              "sha256": "1C031554D97CB7F87E20D0D5F86231B3DDED8A49A8876A2ECAC6E8A76CF2E1B3",
+              "bytes": 10797,
+              "lines": 162,
+              "references": [
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            }
+          ],
+          "groups": [
+            {
+              "id": "zero-direct-default-finite-imported-cap",
+              "disposition": "port",
+              "independent_expectation": "A valid zero maximum default/direct value remains the unbounded sentinel while an imported effective maximum10 selects a finite cap. Display the effective cap and preserve both raw/default provenance; neither zero nor finite imported values are invalidated by their difference.",
+              "current_implementation": [
+                "source/research/settings.lua",
+                "source/runtime/library.lua",
+                "source/presentation/library_model.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library.py::test_imported_finite_cap_keeps_zero_default_and_direct_provenance",
+                "tests/test_settings_profile.py::test_import_precedence_uses_profile_validation_before_consumer_normalization"
+              ],
+              "remaining_executable_check": "Final-package actual imported/direct cap and Settings provenance, configuration/reload and affected native cap lifecycle retain their existing required cases.",
+              "owner": "Aero: historical intent/current host mapping; Black Glass: integrated candidate and affected native execution."
+            },
+            {
+              "id": "sparse-lists-live-broad-recipe-details",
+              "disposition": "consolidate",
+              "independent_expectation": "List discovery does not require eager rich recipe reads. Selected detail refreshes actual level/productivity/limit facts, retains all70 validated recipe identities beyond a short preview, returns detached data and reports missing live facts as unavailable rather than zero or an invented gain.",
+              "current_implementation": [
+                "source/presentation/library_model.lua",
+                "source/runtime/library.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library_model.py::test_selected_productivity_details_refresh_live_recipes_without_eager_list_reads",
+                "tests/test_library_model.py::test_productivity_detail_missing_facts_and_budgets_never_invent_zero_or_a_gain",
+                "tests/test_library_model.py::test_live_productivity_facts_do_not_drop_recipes_beyond_the_short_effect_preview",
+                "tests/test_library_model.py::test_selected_detail_retains_bounded_affected_recipe_targets_beyond_effect_preview"
+              ],
+              "existing_record": "CONT-10.selected-live-recipe-productivity-detail-preservation",
+              "remaining_executable_check": "Qualify the accepted #1562 detail changes on the final frozen package, including broad-list scrolling and changed/missing live recipe facts. The old private64-row collection window is not a new UI pagination requirement.",
+              "owner": "Aero: historical intent/current host mapping; Black Glass: integrated candidate and affected native execution."
+            },
+            {
+              "id": "managed-absence-and-private-ownership",
+              "disposition": "consolidate",
+              "independent_expectation": "A skipped/absent declaration or disabled foreign technology is not evidence of a live MIR-owned research row. Retain actual live managed identities and keep absent availability explanations separate. Hidden earned-credit carriers remain private and cannot leak through list/detail/translation paths.",
+              "current_implementation": [
+                "source/runtime/catalogue.lua",
+                "source/presentation/library_model.lua",
+                "source/runtime/library.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library_model.py::test_absent_declared_technology_is_not_a_library_row_or_availability_placeholder",
+                "tests/test_library_model.py::test_availability_is_small_authored_detached_and_checks_only_the_named_lab_owner",
+                "tests/test_library_model.py::test_exact_private_credits_stay_out_of_library_views_and_detail",
+                "tests/test_library.py::test_private_credit_holders_stay_out_of_library_selection_translation_and_native_open"
+              ],
+              "remaining_executable_check": "Retain affected final-package availability, foreign-state and positive imported/private-credit native checks. An old admitted empty-effect provider row does not authorize exposing private carriers.",
+              "owner": "Aero: historical intent/current host mapping; Black Glass: integrated candidate and affected native execution."
+            },
+            {
+              "id": "controller-authority-and-configuration-lifetimes",
+              "disposition": "consolidate",
+              "independent_expectation": "Only registered owned settings/controller facts explain a cap; arbitrary same-valued names or foreign settings do not become bindings. Return copied values, refresh live facts and adopt changed startup/controller inputs at the actual configuration boundary.",
+              "current_implementation": [
+                "source/research/settings.lua",
+                "source/runtime/lifecycle.lua",
+                "source/runtime/library.lua",
+                "source/runtime/settings_profile.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_settings_profile.py::test_registered_settings_are_the_single_active_profile_authority",
+                "tests/test_settings_profile.py::test_runtime_facade_exports_effective_values_and_reports_read_only_counts",
+                "tests/test_library.py::test_availability_uses_parse_time_effective_streams_without_profile_resolution_on_refresh",
+                "tests/test_library.py::test_cap_provider_is_configured_without_force_extension_or_periodic_work"
+              ],
+              "additional_pending_control": "PR#1553, original1dbff0f1ae6ac820752eae8d3bbafebcf0a5941e, supplies a separate proposed settings-catalogue lifecycle regression; it is not treated as integrated by this review.",
+              "remaining_executable_check": "Complete affected startup import/configuration and saved Library/cap native paths. No new generic controller registry, private provider DTO or compiler ownership transport is restored.",
+              "owner": "Aero: historical intent/current host mapping; Black Glass: integrated candidate and affected native execution."
+            },
+            {
+              "id": "retired-private-enrichment-and-plan-sealing",
+              "disposition": "obsolete-implementation-only",
+              "independent_expectation": "Malformed/contradictory private envelopes, duplicate ownership and mutable cached data were rejected; these safety intentions remain. The old schema2 enrichment, public generation-plan fingerprint, one-fingerprint-per-epoch counter and generic provider/controller DTOs are retired implementation boundaries.",
+              "current_implementation": [
+                "source/runtime/catalogue.lua",
+                "source/presentation/library_model.lua",
+                "source/research/settings.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library_model.py::test_catalogue_is_complete_base_metadata_and_detached",
+                "tests/test_library_model.py::test_selected_detail_is_bounded_and_never_reuses_native_tables",
+                "tests/test_settings_profile.py::test_malformed_import_falls_back_without_executing_input"
+              ],
+              "remaining_executable_check": "Keep original Git records. Do not import the old compiler snapshot, schema validator or fingerprint/cache framework; final package ownership and public consumer applicability still require their existing evidence.",
+              "owner": "Aero: historical intent/current host mapping; Black Glass: integrated candidate and affected native execution."
+            },
+            {
+              "id": "detached-continuous-query-and-legacy-boundary",
+              "disposition": "consolidate",
+              "independent_expectation": "Expose a deterministically sorted detached collection without silently discarding later rows. Preserve useful old search/options and saved-state semantics while the accepted continuous-list UI supersedes visible pagination.",
+              "current_implementation": [
+                "source/presentation/library_model.lua",
+                "source/runtime/library.lua",
+                "source/runtime/bootstrap.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library_model.py::test_normalize_keeps_bounded_historical_page_and_sort_state",
+                "tests/test_library_model.py::test_retained_page_never_slices_or_reorders_the_continuous_library_rows",
+                "tests/test_library_model.py::test_explicit_external_and_all_views_scan_once_and_sort_deterministically",
+                "tests/test_library.py::test_legacy_remote_search_uses_selected_or_retained_tab_without_cross_query_writes"
+              ],
+              "historical_interface_readback": "v4.7.3 source/prototypes/mir/runtime/research_browser.lua registers only open on more-infinite-research-browser. The tested core.query/query_all/detail_recipe helpers are internal calls, not additional registered remote methods. The existing open option/bridge remains; this does not establish absence of computed/private external consumers.",
+              "remaining_executable_check": "Preserve unknown consumer reconciliation under CONT-14. Final native continuous scrolling, sorted/filter/selection behavior and legacy open handoff remain required; do not reinstate superseded visible page controls.",
+              "owner": "Aero: historical intent/current host mapping; Black Glass: integrated candidate and affected native execution."
+            },
+            {
+              "id": "full-localized-search-and-callback-identity",
+              "disposition": "port",
+              "independent_expectation": "A complete translation containing technology/recipe/item/fluid search terms beyond1KiB must reach the owned view. An unrelated ID, failed/truncated/malformed callback, stale locale/player scope or disconnected identity cannot establish the expected localized searches. Caption and secondary search text remain distinct; neither callbacks nor search mutate research or rebuild the owned window.",
+              "current_implementation": [
+                "source/presentation/library_localization.lua",
+                "source/runtime/library_translations.lua",
+                "source/runtime/library.lua",
+                "source/presentation/library_model.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library.py::test_full_translation_callback_keeps_late_recipe_item_and_fluid_search_terms",
+                "tests/test_library_translations.py::test_dispatch_label_and_catalogue_bounds",
+                "tests/test_library_translations.py::test_two_players_keep_separate_locale_labels",
+                "tests/test_library_translations.py::test_stale_locale_force_and_configuration_callbacks_only_release_slots",
+                "tests/test_library.py::test_translation_callback_checks_live_scope_and_discards_vanished_root",
+                "tests/test_library_model.py::test_localized_recipe_and_product_search_text_is_separate_from_the_caption"
+              ],
+              "remaining_executable_check": "Review consumed-input applicability and observe the genuinely affected final-package native callback/localized technology/recipe/item/fluid searches, long payloads and both clients. Current host flattening is not actual engine translation.",
+              "owner": "Aero: historical intent/current host mapping; Black Glass: integrated candidate and affected native execution."
+            },
+            {
+              "id": "old-native-witness-integrity",
+              "disposition": "consolidate",
+              "independent_expectation": "A host-shaped completion result is not a native result. Zero players is unexercised; selected identities cannot disappear; display settling is bounded; callback-only or GUI-only success is insufficient; ownership, force state and widget identity remain intact; each player must complete its own callback/search boundary.",
+              "current_implementation": [
+                "tests/fixtures/library-native/control.lua",
+                "tests/fixtures/library-native-input/control.lua",
+                "tools/Invoke-LibraryNativeInput.ps1"
+              ],
+              "current_host_controls": [
+                "tests/test_library_native_input_fixture.py::test_imported_probe_and_actual_event_observer_keep_the_declared_finite_sequence",
+                "tests/test_library_native_input_fixture.py::test_503_f200_reuse_keeps_removal_and_identity_guards",
+                "tests/test_library.py::test_foreign_or_replaced_same_named_lifecycle_events_preserve_the_live_owned_window"
+              ],
+              "remaining_executable_check": "Use the existing exact native queue and original receipt identities, not a replay of the retired witness merely to reproduce its protocol. Its simulated passed-native status and fixture2.0/2.1 category shape checks do not qualify current engine translation, physical input, two-client behavior, performance or release. Preserve old deadlines/limits in their original records.",
+              "owner": "Aero: historical intent/current host mapping; Black Glass: integrated candidate and affected native execution."
+            }
+          ],
+          "validation": {
+            "library_controls": 84,
+            "library_model_controls": 31,
+            "translation_queue_controls": 15,
+            "settings_profile_controls": 6,
+            "named_control_mappings_verified": 30,
+            "two_new_current_controls_pass": true,
+            "semantic_in_memory_opponents_detected": 2,
+            "lua": "5.2",
+            "lupa": "2.6",
+            "exact_head_ci": "required after commit"
+          },
+          "limits": [
+            "The merged #1562 source closes the previously identified host detail gap only; final native qualification remains open.",
+            "The previous original native/host records retain their exact identities. No old execution is labelled current by this mapping.",
+            "The initial new cap-control helper/model doubles were incomplete; their logs/draft are preserved, and completing the real codec/model changes no expected value.",
+            "No player code, package, original request/evidence body or progress header is changed."
+          ],
+          "custody": "build/qualification/aero-library-core-intents-r01/",
+          "native_execution": false,
+          "source_reconciliation_complete": false,
+          "test_intent_reconciliation_complete": false,
+          "release_qualification": false,
+          "source_reference_label_correction": {
+            "submitted_head": "880b89faa28df21a765c3ddc6bf37eafccae23fc",
+            "submitted_label": "v4.2.0",
+            "actual_retained_tag": "v4.2.0-stable",
+            "actual_commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+            "corrected_references": 2,
+            "original_indexed_locator_entries": 46,
+            "distinct_retained_tag_path_locators": 44,
+            "scope": "The original91-tag local index includes an unpublished alias alongside the retained stable tag. Keep every original locator entry and mark its submitted_tag where corrected; do not count canonicalized duplicate labels as independent sources. Commit/path/blob/hash tuples, original commits/raw index/receipts, authored expectations and all native limits remain unchanged. No remote or local Git tag is modified."
+          }
+        },
+        {
+          "id": "historical-library-personal-continuity-launcher-fixture-intents",
+          "reviewed_on": "2026-11-02",
+          "reviewed_against": "085471a3b0b1c02a5e71b039d28ea096d63f8495",
+          "scope": "Selected personal-state continuity launcher and all entries under its fixture directory:21 unique blobs/217 verified tag-path references, including six wrapper variants, one fixture control/data pair, marker code/metadata and both target dossiers. This is selected source-intent disposition, not a transitive historical dependency or VER-07 completion.",
+          "sources": [
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/configuration-marker/control.lua",
+              "blob": "a6cee3d67506f6e3dbb539c19da87b344b246619",
+              "role": "test_code",
+              "sha256": "78AB51AFF893EC801EE331537560527F13895CD3C1C1FE56D88727A28D3C3CF2",
+              "bytes": 93,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/configuration-marker/info-f200.json",
+              "blob": "45c385cf6614a87419b5d1030a0019d5a0b428aa",
+              "role": "test_input_or_fixture",
+              "sha256": "359AFE0718FC530873D55437846BB643DA4F928BB84609C39B476E4B15C8C634",
+              "bytes": 240,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/configuration-marker/info.json",
+              "blob": "2d8beb854425d71b070f180974c91e4550fcd9bd",
+              "role": "test_input_or_fixture",
+              "sha256": "2FC2283835EF58B6F82036EAE4F4095422C3778ADCC971EE7716233F9865E346",
+              "bytes": 241,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/control.lua",
+              "blob": "36da8affe804576752abf9c20b8926178562970f",
+              "role": "test_code",
+              "sha256": "57FC8DD71A713E5B773C2B579021A50959D35A5918A1988DA4D942C6BF35AB3E",
+              "bytes": 16376,
+              "lines": 173,
+              "references": [
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/data.lua",
+              "blob": "f10ae7e202464fe87234770365dfde5b87a492ff",
+              "role": "test_code",
+              "sha256": "8616283E2C22272D893A931B22CB203DC3478A59AEBC05B4BC1457D19F35D3F8",
+              "bytes": 444,
+              "lines": 2,
+              "references": [
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/info-f200.json",
+              "blob": "c92eae0a46d74192490e0b4e219ff078213e9708",
+              "role": "test_input_or_fixture",
+              "sha256": "5A4E479E77BB0F3335FC48723FDF9073CB3D582064C28C3134C70AFD9687D8BA",
+              "bytes": 260,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/info.json",
+              "blob": "9ac8c286b954f733c38017574c9c136af3565b76",
+              "role": "test_input_or_fixture",
+              "sha256": "E61CF1DB3E7A0731E349E7C045D5ACD92E89EACEFC15CBC65CFC47CE3B0C9E8D",
+              "bytes": 261,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/personal-state-continuity-dossier.json",
+              "blob": "603f54029491b22dd542641f0847c0d162264206",
+              "role": "test_input_or_fixture",
+              "sha256": "BF012E89C85CDE29D5F7AD4B3582898B4BE8C76EF31C7076C2E4D38E052B6CC2",
+              "bytes": 4170,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/personal-state-continuity-f200-dossier.json",
+              "blob": "0361be24f536c25a61660782397f380e9895ce57",
+              "role": "test_input_or_fixture",
+              "sha256": "12E036D84F2658C7E41EE859F0249A2C6BC5FF9D071516A0C4276808FC12A120",
+              "bytes": 4198,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/scripted-input-marker/control.lua",
+              "blob": "9df1e27299be23846e7ccd8386786ea86b74eb52",
+              "role": "test_code",
+              "sha256": "9CDF4ED38B973589CDF06BBE27DABA550F7957E5E620FEAA39996A1A7A079F4B",
+              "bytes": 92,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/scripted-input-marker/data.lua",
+              "blob": "90eb05223b1d0464b4fe6526567de71a1fd010a1",
+              "role": "test_code",
+              "sha256": "CDCFB9EF551FC4BE3C452BBEEDC755123FDA37FA3ABB17E8E7FD8EC797ABE2C9",
+              "bytes": 91,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/scripted-input-marker/info-f200.json",
+              "blob": "f42bda126d32f0cb386192092e9831592c9bd3ec",
+              "role": "test_input_or_fixture",
+              "sha256": "D35BA6BC0F400D1F6A84DB696E2A01FEE93D7BEB822EFD459E7F13F27137D737",
+              "bytes": 250,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                },
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+              "blob": "7f717889db684e537a8b70e8ca4fe8be17ae027a",
+              "role": "test_code",
+              "sha256": "3FF2E2F93E5CA4347811762874662FA18823C32882541E9DB19E6B4094B5838F",
+              "bytes": 53201,
+              "lines": 187,
+              "references": [
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+              "blob": "a3cef77c164c5e94b1e25dba9655f3dfa255eed8",
+              "role": "test_code",
+              "sha256": "C2F7B49C68991DEB998104DF4348792A9B3F6B552C9A4C0096C3F9AEEFD5AF49",
+              "bytes": 59088,
+              "lines": 203,
+              "references": [
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+              "blob": "3059426e557cafcb84d43a15258e71638dd5aabd",
+              "role": "test_code",
+              "sha256": "2560E8A1A8899CB8CE3772962999F417C38B9C11404FBD03156175EA20D9BD6C",
+              "bytes": 59096,
+              "lines": 203,
+              "references": [
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+              "blob": "c356904bb04ad5515b30bcc36f61cd295fec5c7f",
+              "role": "test_code",
+              "sha256": "FA72A9D3AA6F81974DCB6112E6464AAB082A64D2F4CBB6EA2564EA7B999DABC2",
+              "bytes": 59180,
+              "lines": 203,
+              "references": [
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+              "blob": "deb54c5e7d8ac74645f233da36d8471a34f294a6",
+              "role": "test_code",
+              "sha256": "939E01718C10B016EA631876F43A6ECDA4A31E27F56BBECFBD2B8811BC38BC31",
+              "bytes": 59188,
+              "lines": 203,
+              "references": [
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/configuration-marker/data.lua",
+              "blob": "c391be30d676afda1e9cc19b443000844ba25141",
+              "role": "test_code",
+              "sha256": "CDB03F2680C858EDBACEA03812297EF0E8943C477C08BB73C9D2083388827A9E",
+              "bytes": 79,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/configuration-marker/info-f200.json",
+              "blob": "dee40cdb9b9d64042acc96e3699bfce336ea3ca0",
+              "role": "test_input_or_fixture",
+              "sha256": "5DDBA0AFF76EC74F3732F11A63FC44E528B19C82A5B6FE7F780296CC00DC6E86",
+              "bytes": 241,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "fixtures/assert-browser-personal-state-continuity/configuration-marker/info.json",
+              "blob": "c1082a8b953aec28b21ce97ac0d0cc8b54d40204",
+              "role": "test_input_or_fixture",
+              "sha256": "877F849A8E5C14B5D296903AD111CF7E17B2E92E27DA41948FAD4F1D8E7F0E74",
+              "bytes": 241,
+              "lines": 1,
+              "references": [
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+              "blob": "1791eca14a23b20eb45324040d365f334b2aa7a4",
+              "role": "test_code",
+              "sha256": "A9C5FA2B194BEACAA1667C47DF75A6E621CF6A711912F7025342535B176185A7",
+              "bytes": 60086,
+              "lines": 219,
+              "references": [
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            }
+          ],
+          "groups": [
+            {
+              "id": "strict-personal-hidden-replacement",
+              "disposition": "port",
+              "independent_expectation": "The two same-force players keep distinct personal views. A dense known-technology hidden list is a replacement and an empty list clears it; sparse {[2]=id}, duplicate {id,id} and unknown {no-such-technology} inputs leave the prior selected visibility/action unchanged. Clearing/restoring one player never changes the peer or shared native research.",
+              "current_implementation": [
+                "source/runtime/library.lua",
+                "source/presentation/library_model.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library.py::test_two_players_reject_malformed_hidden_replacements_without_changing_views_or_research",
+                "tests/test_library.py::test_historical_filter_order_hidden_page_and_selection_options_drive_real_library_state",
+                "tests/test_library.py::test_hide_show_and_restore_actions_are_personal_and_keep_native_research_unchanged"
+              ],
+              "remaining_executable_check": "Review applicability of existing exact native personal-view inputs to the final package, then observe affected real-client hidden replacement/clear/rejection behavior within the existing Library queue. This source/host control is not actual engine input or save qualification.",
+              "owner": "Aero: historical expectation/current host mapping; Black Glass: exact integrated candidate, remaining native cases and evidence applicability."
+            },
+            {
+              "id": "durable-views-and-active-force-invariance",
+              "disposition": "consolidate",
+              "independent_expectation": "The original initial/save-reload/configuration stages preserve both personal views and all active force technology enabled/researched/level/visible_when_disabled/saved_progress values, current research, progress and ordered queue. The original fixture explicitly seeds42% current progress. A real configuration stage requires the actual inert marker transition, not an ordinary reload labelled configuration.",
+              "current_implementation": [
+                "source/runtime/library.lua",
+                "source/runtime/library_translations.lua",
+                "tests/fixtures/library-multiplayer/control.lua",
+                "tests/fixtures/library-native-input/control.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library.py::test_default_closed_then_query_selection_location_native_navigation_and_reload_rebuild",
+                "tests/test_library.py::test_configuration_migrates_published_browser_view_without_dropping_later_fidelity_fields",
+                "tests/test_library.py::test_pending_translations_survive_locale_change_close_and_reload",
+                "tests/test_library_multiplayer_fixture.py::test_two_real_client_join_rejoin_and_restart_state_machine",
+                "tests/test_library_native_input_fixture.py::test_observer_rejects_missing_native_events_mutations_and_lost_cold_views"
+              ],
+              "applicable_evidence": "Existing native records retain their original package/controller/save/engine identities. The reported published501 F210 R05 imported lifecycle includes an actually cold-loaded restart save, but its final save is only CRC-valid and not separately reloaded. No affected correction-batchB or beta-to-successor result follows. Current observers protect named finite native inputs; they do not retroactively become the old all-active-technology witness.",
+              "remaining_executable_check": "Complete the existing exact package two-client save/restart and affected real configuration/published-beta-to-successor routes. Review consumed input and protected native-state scope explicitly; an inert configuration marker, missing full-active snapshot applicability, or final save not reloaded cannot be silently counted as passed. Keep each original result identity.",
+              "owner": "Aero: historical expectation/current host mapping; Black Glass: exact integrated candidate, remaining native cases and evidence applicability."
+            },
+            {
+              "id": "literal-mod-absence-and-readdition",
+              "disposition": "consolidate",
+              "independent_expectation": "Literal MIR removal records its absent owner interface and actual GUI presence; personal state is unavailable without its owner. Removal and re-add preserve fixture-owned technology/current/progress/queue facts only. Re-add observes the new native presentation; the old fixture deliberately does not promise arbitrary restoration of removed-owner personal state or full MIR-owned prototype invariance.",
+              "current_implementation": [
+                "spec/migrations.md",
+                "source/runtime/library.lua",
+                "tests/fixtures/library-native-input/control.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library.py::test_pre_player_removal_destroys_only_the_owned_library_before_player_state_is_retired",
+                "tests/test_library.py::test_removed_player_report_choices_are_not_resurrected_from_retained_legacy_history"
+              ],
+              "mapping_limit": "The mapped current controls cover player/GUI retirement and historical re-import isolation. Player removal/reused player index is a different event from removing the MIR mod. Those controls and the reported F210 R05 player lifecycle do not establish literal MIR-remove/save/re-add qualification.",
+              "remaining_executable_check": "Reconcile any required literal mod-removal/re-add cases with the existing admitted migration/ownership queue and exact inputs. Preserve original backups and compare only justified fixture/foreign state while MIR is absent. Record unavailable state honestly; never recommend a remove-save-readd cycle as an inverse migration.",
+              "owner": "Aero: historical expectation/current host mapping; Black Glass: exact integrated candidate, remaining native cases and evidence applicability."
+            },
+            {
+              "id": "physical-versus-scripted-input-and-authority",
+              "disposition": "consolidate",
+              "independent_expectation": "Two distinct connected identities on one force must each complete their required input/view boundary. Native mode waits for actual GUI click and expected text events; ScriptedFixture is expressly remote-open-only and makes no physical input claim. Remote opens, fixture existence, prepared inputs and host-shaped success are not native acceptance.",
+              "current_implementation": [
+                "tests/fixtures/library-native-input/control.lua",
+                "tools/Invoke-LibraryNativeInput.ps1"
+              ],
+              "current_host_controls": [
+                "tests/test_library_native_input_fixture.py::test_imported_probe_and_actual_event_observer_keep_the_declared_finite_sequence",
+                "tests/test_library_native_input_fixture.py::test_join_phase_and_retained_identity_are_required",
+                "tests/test_library_native_input_fixture.py::test_503_f200_reuse_keeps_removal_and_identity_guards"
+              ],
+              "historical_limits": "F210 dossier explicitly says physical two-client input was not established under the single Steam identity; F200 dossier says it was not established under Windows foreground policy. They are historical limits, not proof current attempts cannot execute. F200 pins2.0.77/D3; F210 uses the old policy resolver and cannot be inferred to be2.1.23. No original runtime result is created from these declarations.",
+              "remaining_executable_check": "Use the existing Black Glass exact runtime/actor/packet review and native execution queue. Keep per-action identity/foreground/geometry/state and actual event checks. Do not rerun an old scripted harness to substitute for current physical input or reintroduce a new approval gate.",
+              "owner": "Aero: historical expectation/current host mapping; Black Glass: exact integrated candidate, remaining native cases and evidence applicability."
+            },
+            {
+              "id": "old-runner-and-marker-disposition",
+              "disposition": "obsolete-implementation-only",
+              "independent_expectation": "Preserve exact package/source/engine selection, owned process stops, actual save completion, archive restoration, bounded resources and explicit unfinished stages. SourceVersion validation, package-number arithmetic, old GUI tags and controller mechanisms are implementation details rather than a requirement to retain the obsolete launcher.",
+              "current_implementation": [
+                "tests/fixtures/library-native-input/control.lua",
+                "tools/Invoke-LibraryNativeInput.ps1"
+              ],
+              "current_host_controls": [
+                "tests/test_library_native_input_fixture.py::test_observer_rejects_missing_native_events_mutations_and_lost_cold_views"
+              ],
+              "variant_review": "All six wrappers have identical seven selected result/view/force assertion functions. The older wrapper differs in candidate/profile/config composition, process governance and later loaded-selection log validation; intermediate variants change source-version/package mappings and presentation locators. The latest changes fixture metadata resolution, serial ScriptedFixture startup, save creation/log readback and configuration marker0.1.1 with a real data-stage prototype. Metadata/dossiers/code are included in the21-blob group; imported historical tools/validation dependencies and original run receipts are not claimed fully reviewed here.",
+              "remaining_executable_check": "Preserve all historical refs and adverse/results under their original identity; adopt existing reviewed current safeguards. The latest wrapper still accepts only source4.2.0 through4.4.2 with default4.2.1 even atv4.7.3, so it is not a generic current-candidate runner. Do not restore obsolete execution machinery or restart every old package. Transitive historical helper closure and execution evidence remain separate unresolved source/applicability work.",
+              "owner": "Aero: historical expectation/current host mapping; Black Glass: exact integrated candidate, remaining native cases and evidence applicability."
+            }
+          ],
+          "validation": {
+            "library_controls": 83,
+            "new_integrated_two_player_control_passes": true,
+            "semantic_in_memory_opponents_detected": 3,
+            "named_control_mappings_verified": 13,
+            "seven_assertion_functions_identical_across_six_wrappers": true,
+            "lua": "5.2",
+            "lupa": "2.6",
+            "exact_head_ci": "required after commit"
+          },
+          "custody": "build/qualification/aero-library-personal-continuity-r01/",
+          "native_execution": false,
+          "source_reconciliation_complete": false,
+          "test_intent_reconciliation_complete": false,
+          "release_qualification": false,
+          "source_reference_label_correction": {
+            "submitted_head": "67ceeb63dba7c6a5d9279604b1b9078e5c33b7a2",
+            "submitted_label": "v4.2.0",
+            "actual_retained_tag": "v4.2.0-stable",
+            "actual_commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+            "corrected_references": 13,
+            "original_indexed_locator_entries": 217,
+            "distinct_retained_tag_path_locators": 204,
+            "scope": "The original91-tag local index includes an unpublished alias alongside the retained stable tag. Keep every original locator entry and mark its submitted_tag where corrected; do not count canonicalized duplicate labels as independent sources. Commit/path/blob/hash tuples, original commits/raw index/receipts, authored expectations and all native limits remain unchanged. No remote or local Git tag is modified."
+          }
+        },
+        {
+          "id": "historical-library-localized-discovery-intents-and-warning-gap",
+          "reviewed_on": "2026-11-02",
+          "reviewed_against": "06952a752b508808e5d2d5b757d55e524c9ee0ca",
+          "scope": "Complete selected source-intent review of7 deduplicated blobs/58 exact tag-path refs for discovery regressions/native witness and supporting fixture data/icons. Three additional exact v4.7.3 host/EN/DE narrow consumer witnesses establish the lost warning; their full file bodies are not claimed rereviewed. Native wrappers, transitive imported tools, historical executions and broader source reconciliation remain separate.",
+          "sources": [
+            {
+              "path": "tests/runtime/browser_fixture_data.lua",
+              "blob": "8edc28bbde9c998bcf372f4ebcd7faf5fa3650f4",
+              "sha256": "A2FBAFFABC6A7592A21B64BB5793D4B2603476E54E83EC5DAC29C2DA54F8C530",
+              "bytes": 923,
+              "lines": 6,
+              "references": [
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
+                },
+                {
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/browser_fixture_data.lua",
+              "blob": "0f91b822952f9e5095ec1788e98deb5ffe8d5f48",
+              "sha256": "4C77DDEF1F38662B5593D61A97B135389E62C232B70AAA8BCFD7BE6F9178B064",
+              "bytes": 2933,
+              "lines": 41,
+              "references": [
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/browser_fixture_icons.lua",
+              "blob": "52924116bcda8a68cc96270c2b66039258c5c5f7",
+              "sha256": "4A03BF4B70CDA0CEDD212BBCA3BA43E59BB14FD67FB08455FC94AC47DFF6FB69",
+              "bytes": 2941,
+              "lines": 51,
+              "references": [
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_discovery_regressions.lua",
+              "blob": "6fe2cf297fdb4598c0c5538c5f8cc220d3db5a7d",
+              "sha256": "2F3EFDC2C960047111FE2504280D4E58A86EBE50E10DD6C2D62984C5FEF8A0BC",
+              "bytes": 13683,
+              "lines": 217,
+              "references": [
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_native_discovery.lua",
+              "blob": "4ee15f0c9c5e2a05f9b7e6512f2d72e8f26f2635",
+              "sha256": "410ACA38E4499C071CADCCBD6C22CE5E53D13570AFF9422E925AD51C6A0E7243",
+              "bytes": 8593,
+              "lines": 147,
+              "references": [
+                {
+                  "tag": "v4.2.1",
+                  "commit": "27c4777c27b3287f18df02e200235a1870bac465"
+                },
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                },
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_discovery_regressions.lua",
+              "blob": "53991e1e41e1632c9b83ea81dc5d061c21d570de",
+              "sha256": "C41BDA90B90DFEDEB6F5BB864CF7F672A0BAA0138F74DC8212302BF92852CD02",
+              "bytes": 13759,
+              "lines": 218,
+              "references": [
+                {
+                  "tag": "v4.2.2",
+                  "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e"
+                },
+                {
+                  "tag": "v4.3.0",
+                  "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1"
+                }
+              ]
+            },
+            {
+              "path": "tests/runtime/research_browser_discovery_regressions.lua",
+              "blob": "b89b3ab219bcd54d3f698c9cc306e3607ad9f5b0",
+              "sha256": "34FD4C0389E87251A45B7C298DFCFC9FED0946CDEAF7ADD0BA97CDE4BC6E791A",
+              "bytes": 15371,
+              "lines": 242,
+              "references": [
+                {
+                  "tag": "v4.4.0",
+                  "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a"
+                },
+                {
+                  "tag": "v4.4.1",
+                  "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6"
+                },
+                {
+                  "tag": "v4.4.2",
+                  "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a"
+                },
+                {
+                  "tag": "v4.5.0",
+                  "commit": "3096e89a044d705828cbcda93ac05bd877535d12"
+                },
+                {
+                  "tag": "v4.5.1",
+                  "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4"
+                },
+                {
+                  "tag": "v4.5.2",
+                  "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d"
+                },
+                {
+                  "tag": "v4.6.0",
+                  "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b"
+                },
+                {
+                  "tag": "v4.7.0",
+                  "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11"
+                },
+                {
+                  "tag": "v4.7.1",
+                  "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d"
+                },
+                {
+                  "tag": "v4.7.2",
+                  "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+                },
+                {
+                  "tag": "v4.7.3",
+                  "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+                }
+              ]
+            }
+          ],
+          "additional_warning_consumer_witnesses": [
+            {
+              "ref": "v4.7.3:source/prototypes/mir/runtime/research_browser.lua",
+              "blob": "4c375e78aa53ae11a7c464f4ade8e1f370437da5",
+              "sha256": "FF0F10494B38753BD17609CA5FE8ABBFD8BF967D54C23F24CEFFECB4FCCF56C0",
+              "bytes": 96086,
+              "matches": [
+                {
+                  "line": 399,
+                  "text": "    indicator.tooltip = cache.discovery_limited and {\"mir-browser.discovery-limited\"} or nil"
+                }
+              ]
+            },
+            {
+              "ref": "v4.7.3:source/locale/de/more-infinite-research.cfg",
+              "blob": "b2ac5d71134fe2ad07ca349a40f0a55ed3688435",
+              "sha256": "5864A1357B7068B86AF8E5B9F9817C5EFF0DF17B5096CF2B6BAF504E9E2BAF36",
+              "bytes": 64431,
+              "matches": [
+                {
+                  "line": 498,
+                  "text": "discovery-limited=Einige Rezept- oder Materialnamen konnten nicht indiziert werden. Stabile Recherche- und Rezept-IDs bleiben durchsuchbar."
+                }
+              ]
+            },
+            {
+              "ref": "v4.7.3:source/locale/en/more-infinite-research.cfg",
+              "blob": "883df30cf39bc1473b4a9ad4cd6ae9788511e14f",
+              "sha256": "562CBF3044B05D65504EFC11BFAB3A781B1BFCAD288E30943335EE1D6351D379",
+              "bytes": 56348,
+              "matches": [
+                {
+                  "line": 507,
+                  "text": "discovery-limited=Some recipe or material names could not be indexed. Stable research and recipe IDs remain searchable."
+                }
+              ]
+            }
+          ],
+          "groups": [
+            {
+              "id": "associated-discovery-identities-and-caption",
+              "disposition": "consolidate",
+              "independent_expectation": "Localized recipe/item/fluid labels can discover a technology without becoming its displayed name or Name-order key. Stable-ID search remains available; personal hidden filters and per-player locale indexes remain isolated. Repeated recipe references and repeated item products deduplicate while item/fluid names with the same spelling remain distinct namespaces.",
+              "current_implementation": [
+                "source/presentation/library_localization.lua",
+                "source/presentation/library_model.lua",
+                "source/runtime/library.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library_model.py::test_localization_deduplicates_namespaces_and_keeps_subject_work_and_parameter_bounds",
+                "tests/test_library_model.py::test_localized_recipe_and_product_search_text_is_separate_from_the_caption",
+                "tests/test_library_translations.py::test_two_players_keep_separate_locale_labels"
+              ],
+              "remaining_executable_check": "Final-package actual localized searches and caption/Name-order/hidden behavior for the affected technology/recipe/item/fluid scope remain native checks. Existing host literal text and copied LocalisedString evaluation are not real engine translation.",
+              "owner": "Aero: recovered expectations, bounded correction/control preparation and independent applicability; Black Glass: integrated candidate and exact native queue."
+            },
+            {
+              "id": "bounded-payload-and-prototype-work",
+              "disposition": "port",
+              "independent_expectation": "The old crowded inputs cap discovery at128 subjects, disclose omitted subjects, reject unbounded work through1025 irrelevant effects and stay within twenty parameters per LocalisedString node and bounded nesting. A duplicate unlock/productivity recipe effect must not duplicate associated labels. Literal historical expectations must not be generated from candidate constants.",
+              "current_implementation": [
+                "source/presentation/library_localization.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library_model.py::test_localization_deduplicates_namespaces_and_keeps_subject_work_and_parameter_bounds",
+                "tests/test_library_model.py::test_search_localization_payload_contains_bounded_recipe_and_product_names"
+              ],
+              "remaining_executable_check": "Keep bounded construction controls and final native composition/callback applicability. The new host control directly proves namespace/order/deduplication and declared subject/work/node bounds, not real engine acceptance or complete discovery after a limit.",
+              "owner": "Aero: recovered expectations, bounded correction/control preparation and independent applicability; Black Glass: integrated candidate and exact native queue."
+            },
+            {
+              "id": "callback-lifetimes-and-request-accounting",
+              "disposition": "consolidate",
+              "independent_expectation": "Large valid callbacks retain secondary discovery text; malformed/oversized/stale callbacks cannot publish an invented index. Refused native requests cannot leave an untracked outstanding slot. Retry/fallback remains finite and deterministic; one player completing does not retire a peers outstanding native request. Already scheduled refresh must not be starved by later replies.",
+              "current_implementation": [
+                "source/runtime/library_translations.lua",
+                "source/runtime/library.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library_translations.py::test_dispatch_label_and_catalogue_bounds",
+                "tests/test_library_translations.py::test_expiry_retries_once_then_uses_stable_id_fallback",
+                "tests/test_library_translations.py::test_expired_requests_retry_in_stable_id_order_after_map_reconstruction",
+                "tests/test_library_translations.py::test_stale_locale_force_and_configuration_callbacks_only_release_slots",
+                "tests/test_library.py::test_pending_translations_survive_locale_change_close_and_reload",
+                "tests/test_library.py::test_translation_maintenance_orders_open_players_before_issuing_native_retries"
+              ],
+              "variant_review": "6fe2cf29 to53991e1 adds only the prototype-collection host double. The laterb89b3ab variant also verifies actual callback maintenance removal, retention while a peer has an issued request and final unsubscribe. The original old-schema/helper extraction mechanism may retire; its request/lifetime safety expectation does not.",
+              "remaining_executable_check": "Review final consumed translation/host source and affected client/cold-load inputs. The separately proposed #1564 integrated long-callback control is not labelled merged by this record. Actual transport-refusal and peer-pending host composition still need a precise current-path mapping before claiming every old handler assertion covered; visible incomplete-index feedback is the separate open group below.",
+              "owner": "Aero: recovered expectations, bounded correction/control preparation and independent applicability; Black Glass: integrated candidate and exact native queue."
+            },
+            {
+              "id": "incomplete-discovery-warning",
+              "disposition": "unresolved",
+              "independent_expectation": "Published v4.7.3 displays mir-browser.discovery-limited on its fixed result-count indicator after indexing settles when some recipe/material names could not be indexed. Stable research and recipe IDs remain searchable. Capping work cannot silently imply a complete localized index.",
+              "current_implementation": [
+                "source/presentation/library_localization.lua",
+                "source/runtime/library.lua",
+                "source/runtime/library_translations.lua",
+                "source/locale/en/mir-library.cfg",
+                "source/locale/de/mir-library.cfg"
+              ],
+              "current_host_controls": [],
+              "demonstrated_gap": "At reviewed06952a752, request_translation consumes only the first search_request return, discarding subjects/limited; the new construction control proves that the payload builder does report a limit. Current Library locales have no discovery-limited key. The old flag was player-visible, not merely obsolete cache machinery: v4.7.3 research_browser.lua blob4c375e78aa53ae11a7c464f4ade8e1f370437da5 line399 applies that tooltip. The exact EN/DE strings and hashes are retained as narrow consumer witnesses, not a claimed complete rereview of those files.",
+              "remaining_executable_check": "Claim a bounded successor correction for warning/metadata propagation, preserving presentation-only ownership, scope/locale/configuration and warm/cold request lifetimes. Add a focused negative control that fails this known missing-warning behavior and qualify affected final-package rendering. Do not close the obligation with payload/fixture existence or by deleting the warning expectation.",
+              "owner": "Aero: recovered expectations, bounded correction/control preparation and independent applicability; Black Glass: integrated candidate and exact native queue."
+            },
+            {
+              "id": "real-native-discovery-witness-and-fixture",
+              "disposition": "consolidate",
+              "independent_expectation": "The old native witness waits for real callbacks beyond1KiB and all three localized searches in the actual installed GUI while preserving root/search/filter identity and shared native research. Fixture data adds32 item products, one fluid and one recipe, making34 discovery subjects with terms absent from the technology name/stable IDs. No connected players is unexercised; callback-only or GUI-only success is insufficient.",
+              "current_implementation": [
+                "tests/fixtures/library-native/control.lua",
+                "tests/fixtures/library-native-input/control.lua",
+                "source/runtime/library.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library_native_input_fixture.py::test_observer_rejects_missing_native_events_mutations_and_lost_cold_views",
+                "tests/test_library.py::test_translation_callback_checks_live_scope_and_discards_vanished_root"
+              ],
+              "historical_limits": "The original witness has one shared600-tick deadline and waits for two unchanged display observations before establishing widget identity. Its success explicitly sets physical_input_qualified=false and two_client_multiplayer_qualified=false. Its engine-specific recipe category/categories spelling is fixture adaptation, not a new player Generator contract. Source existence and host simulation create no native result.",
+              "remaining_executable_check": "Use existing Black Glass exact-native queue and reviewed packet; independently review final consumed payload/fixture applicability. The current imported lifecycle result does not by itself prove the distinct long34-subject engine callback and three-search boundary. Preserve original identities and avoid restoring the retired witness merely to reproduce its protocol.",
+              "owner": "Aero: recovered expectations, bounded correction/control preparation and independent applicability; Black Glass: integrated candidate and exact native queue."
+            },
+            {
+              "id": "inactive-dlc-artwork-and-effective-setting-inputs",
+              "disposition": "unresolved",
+              "independent_expectation": "The old icon fixture observes exact raw/imported MIRSET1 effective precedence, requires inactive Space Age/elevated-rails providers, scans final technology/shortcut bodies for unavailable DLC paths and verifies both shortcut sizes use the base lab fallback. It expressly does not establish physical installation absence.",
+              "current_implementation": [
+                "source/presentation/shortcut.lua",
+                "source/research/historical_settings.lua",
+                "source/research/settings.lua"
+              ],
+              "current_host_controls": [
+                "tests/test_library.py::test_pure_prototype_constructor_preserves_published_shortcut_identity",
+                "tests/test_settings_profile.py::test_import_precedence_uses_profile_validation_before_consumer_normalization"
+              ],
+              "mapping_limit": "Current pure shortcut construction covers the active-provider/base fallback choice and both sizes. Generic settings-profile controls cover import precedence. They do not yet map the old explicit mir-use-installed-space-age-icons raw/imported matrix and whole final inactive-provider artwork scan. No broken user-setting effect or physically absent DLC installation is inferred solely from that incomplete mapping.",
+              "remaining_executable_check": "Reconcile exact accepted current profile/data evidence for the finite direct/imported icon-setting cases and final technology/shortcut scan. Retire old compiler-context imports only; preserve the resource/fallback and effective-input expectations. Run affected native resource/render checks only where current consumed-input review requires them.",
+              "owner": "Aero: recovered expectations, bounded correction/control preparation and independent applicability; Black Glass: integrated candidate and exact native queue."
+            }
+          ],
+          "validation": {
+            "model_controls": 32,
+            "semantic_in_memory_opponents_detected": 4,
+            "named_control_mappings_verified": 14,
+            "lua": "5.2",
+            "lupa": "2.6",
+            "exact_head_ci": "required after commit"
+          },
+          "open_obligations": [
+            "Restore the proven player-visible incomplete-discovery warning with current host and affected native controls.",
+            "Complete the exact icon-setting/inactive-provider final-output evidence mapping."
+          ],
+          "custody": "build/qualification/aero-library-discovery-intents-r01/",
+          "native_execution": false,
+          "source_reconciliation_complete": false,
+          "test_intent_reconciliation_complete": false,
+          "release_qualification": false,
+          "source_reference_label_correction": {
+            "submitted_head": "c082efd0243e08c858e100ca5f493f0b552bea83",
+            "submitted_label": "v4.2.0",
+            "actual_retained_tag": "v4.2.0-stable",
+            "actual_commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+            "corrected_references": 1,
+            "original_indexed_locator_entries": 58,
+            "distinct_retained_tag_path_locators": 57,
+            "scope": "The original91-tag local index includes an unpublished alias alongside the retained stable tag. Keep every original locator entry and mark its submitted_tag where corrected; do not count canonicalized duplicate labels as independent sources. Commit/path/blob/hash tuples, original commits/raw index/receipts, authored expectations and all native limits remain unchanged. No remote or local Git tag is modified."
+          }
+        },
+        {
+          "id": "localized-discovery-limit-warning-source-restoration",
+          "reviewed_on": "2026-11-02",
+          "reviewed_against": "06952a752b508808e5d2d5b757d55e524c9ee0ca",
+          "requirement": [
+            "RUN-02",
+            "RUN-04",
+            "CONT-10"
+          ],
+          "independent_expectation": "Published v4.7.3 research_browser.lua blob4c375e78aa53ae11a7c464f4ade8e1f370437da5 line399 attaches mir-browser.discovery-limited to the fixed result count after incomplete localized recipe/material discovery. The historical construction/callback opponents require honest subject/work/byte/transport/retry limits and raw-ID fallback for malformed composition; personal and native-research ownership remain intact.",
+          "historical_review_link": "PR1566/c082efd0243e08c858e100ca5f493f0b552bea83 records the7-blob/58-ref discovery group and three narrow host/EN/DE warning-consumer witnesses. Its open-gap statement is accurate at reviewed06952a752 and is preserved as that snapshot; this additive successor record closes source/host restoration only.",
+          "current_implementation": [
+            "source/runtime/library.lua",
+            "source/runtime/library_translations.lua"
+          ],
+          "changes": [
+            "The existing player-local working cache retains associated-subject counts and a scope-local discovery_limited boolean. The native issued-ID ledger fields are unchanged; no new general state/migration framework is introduced.",
+            "Payload construction limits survive the real host request boundary, including native transport refusal. Failed/malformed/partial/oversized or cache-byte-refused associated responses use raw-ID fallback and mark incomplete coverage. A first timeout retries; exhaustion marks the limitation. Stale callbacks release their original slots without labelling or warning another scope.",
+            "The existing result-count label receives the original localized tooltip in both split and narrow layouts. Root/query/filter identity, focus, player preferences and native research authority remain unchanged by this feedback.",
+            "An older metadata-free working cache is reconnected read-only during on_load, then renews derived work under a fresh scope during a valid open/render while retaining issued native slots. Settled current metadata survives cold load without duplicate requests. Unrecognized metadata remains preserved without another native request window.",
+            "Exactly one original authored discovery-limited key is restored in every one of50 Library locale files. Removing only that key reproduces each complete pre-edit file byte-for-byte."
+          ],
+          "locale_sources": [
+            {
+              "locale": "af",
+              "published_ref": "v4.7.3:source/locale/af/more-infinite-research.cfg",
+              "blob": "c2d2bc9ce8f6e487617fb99cf044e502660d7988"
+            },
+            {
+              "locale": "ar",
+              "published_ref": "v4.7.3:source/locale/ar/more-infinite-research.cfg",
+              "blob": "cebdfd7b8767981adce6387de4129158a486dd96"
+            },
+            {
+              "locale": "be",
+              "published_ref": "v4.7.3:source/locale/be/more-infinite-research.cfg",
+              "blob": "9f5f34268b87d5b6c5ddbd1df2b7aaa2cfdd3fd7"
+            },
+            {
+              "locale": "bg",
+              "published_ref": "v4.7.3:source/locale/bg/more-infinite-research.cfg",
+              "blob": "e48152aee63a75caa75b1b35040c9844826a16d1"
+            },
+            {
+              "locale": "ca",
+              "published_ref": "v4.7.3:source/locale/ca/more-infinite-research.cfg",
+              "blob": "fad8f5751d5a7c3808d265c5c5d4bbdf24d7b53e"
+            },
+            {
+              "locale": "cs",
+              "published_ref": "v4.7.3:source/locale/cs/more-infinite-research.cfg",
+              "blob": "fee373e250f950e3432c5f5ef6dfdeab18aea9ba"
+            },
+            {
+              "locale": "da",
+              "published_ref": "v4.7.3:source/locale/da/more-infinite-research.cfg",
+              "blob": "76deb8cfeeacc7e63bb5b4cc79b4bb66786ebcab"
+            },
+            {
+              "locale": "de",
+              "published_ref": "v4.7.3:source/locale/de/more-infinite-research.cfg",
+              "blob": "b2ac5d71134fe2ad07ca349a40f0a55ed3688435"
+            },
+            {
+              "locale": "el",
+              "published_ref": "v4.7.3:source/locale/el/more-infinite-research.cfg",
+              "blob": "b8716eca6e42e75cd2974bcaab4ba9d1baa8f0f9"
+            },
+            {
+              "locale": "en",
+              "published_ref": "v4.7.3:source/locale/en/more-infinite-research.cfg",
+              "blob": "883df30cf39bc1473b4a9ad4cd6ae9788511e14f"
+            },
+            {
+              "locale": "eo",
+              "published_ref": "v4.7.3:source/locale/eo/more-infinite-research.cfg",
+              "blob": "e2ae1026c9f74e043a5ef6e70404231b9d75b151"
+            },
+            {
+              "locale": "es-ES",
+              "published_ref": "v4.7.3:source/locale/es-ES/more-infinite-research.cfg",
+              "blob": "c445ef5726d5c6641ef11b01ac3409e27a6fd515"
+            },
+            {
+              "locale": "et",
+              "published_ref": "v4.7.3:source/locale/et/more-infinite-research.cfg",
+              "blob": "481f429563f9aede84b4170b941dddd7214769a5"
+            },
+            {
+              "locale": "eu",
+              "published_ref": "v4.7.3:source/locale/eu/more-infinite-research.cfg",
+              "blob": "d4cfa7de658a93186e26384628d3a1a7d42e51e9"
+            },
+            {
+              "locale": "fa",
+              "published_ref": "v4.7.3:source/locale/fa/more-infinite-research.cfg",
+              "blob": "ca229dc1d3c81c7670aa59143cbb3da240554e20"
+            },
+            {
+              "locale": "fi",
+              "published_ref": "v4.7.3:source/locale/fi/more-infinite-research.cfg",
+              "blob": "50348d8ee3d806f03e32faeac35d644bddd1b538"
+            },
+            {
+              "locale": "fil",
+              "published_ref": "v4.7.3:source/locale/fil/more-infinite-research.cfg",
+              "blob": "3ace04af2112e50f7980332e3a66c98ad53edf68"
+            },
+            {
+              "locale": "fr",
+              "published_ref": "v4.7.3:source/locale/fr/more-infinite-research.cfg",
+              "blob": "55a51aaf52d660f29ea18cb7e0ae5a8d8fceac06"
+            },
+            {
+              "locale": "fy-NL",
+              "published_ref": "v4.7.3:source/locale/fy-NL/more-infinite-research.cfg",
+              "blob": "efce41953fc137be2c657d13dc4996c0cff1d47f"
+            },
+            {
+              "locale": "ga-IE",
+              "published_ref": "v4.7.3:source/locale/ga-IE/more-infinite-research.cfg",
+              "blob": "cccbeb84bef33f00fe2b68eeb691e4b093609834"
+            },
+            {
+              "locale": "he",
+              "published_ref": "v4.7.3:source/locale/he/more-infinite-research.cfg",
+              "blob": "becc4ac12b860de10616ea9b9870599d85d4dda0"
+            },
+            {
+              "locale": "hr",
+              "published_ref": "v4.7.3:source/locale/hr/more-infinite-research.cfg",
+              "blob": "13915f2e21a5e85f8bf623801bf3d19bab726c11"
+            },
+            {
+              "locale": "hu",
+              "published_ref": "v4.7.3:source/locale/hu/more-infinite-research.cfg",
+              "blob": "8fc55b56a74d0c74c620159dc7d1354937c5ea52"
+            },
+            {
+              "locale": "id",
+              "published_ref": "v4.7.3:source/locale/id/more-infinite-research.cfg",
+              "blob": "b381d5956083b71fd1d4dd89ee16f2d7056c2211"
+            },
+            {
+              "locale": "is",
+              "published_ref": "v4.7.3:source/locale/is/more-infinite-research.cfg",
+              "blob": "9487134d9336694321f4359d59563d295475affc"
+            },
+            {
+              "locale": "it",
+              "published_ref": "v4.7.3:source/locale/it/more-infinite-research.cfg",
+              "blob": "5e54eef393a39192ccb14a1ee65b7fe8399dd606"
+            },
+            {
+              "locale": "ja",
+              "published_ref": "v4.7.3:source/locale/ja/more-infinite-research.cfg",
+              "blob": "85ea13a6ed5e2091bd33085306d5518d3059a6b3"
+            },
+            {
+              "locale": "ka",
+              "published_ref": "v4.7.3:source/locale/ka/more-infinite-research.cfg",
+              "blob": "1c592059ebe8c9cd3ba0e3ca653b9d857fdaac60"
+            },
+            {
+              "locale": "kk",
+              "published_ref": "v4.7.3:source/locale/kk/more-infinite-research.cfg",
+              "blob": "ca9a749a8081023c4de9b0ad013d4c7ee121c959"
+            },
+            {
+              "locale": "ko",
+              "published_ref": "v4.7.3:source/locale/ko/more-infinite-research.cfg",
+              "blob": "68b7c846b92876511deabe6b7bf5848195b902a9"
+            },
+            {
+              "locale": "lt",
+              "published_ref": "v4.7.3:source/locale/lt/more-infinite-research.cfg",
+              "blob": "7dd379eae3f90a50e47bfc36a1fd46edd7d7f36b"
+            },
+            {
+              "locale": "lv",
+              "published_ref": "v4.7.3:source/locale/lv/more-infinite-research.cfg",
+              "blob": "6801876221dcd6e132ad13d0ae873bcdbdc7448d"
+            },
+            {
+              "locale": "nl",
+              "published_ref": "v4.7.3:source/locale/nl/more-infinite-research.cfg",
+              "blob": "5364247d5ff03213c4f96748035bb91efce5ec38"
+            },
+            {
+              "locale": "no",
+              "published_ref": "v4.7.3:source/locale/no/more-infinite-research.cfg",
+              "blob": "6c685f1ae905a855fda9063a8c0acc7d128f35ef"
+            },
+            {
+              "locale": "pl",
+              "published_ref": "v4.7.3:source/locale/pl/more-infinite-research.cfg",
+              "blob": "bd3121171262d653c7a43dc5e2844a955ea1844a"
+            },
+            {
+              "locale": "pt-BR",
+              "published_ref": "v4.7.3:source/locale/pt-BR/more-infinite-research.cfg",
+              "blob": "15c9a2042a7686c61c16aa68fe583dd885990502"
+            },
+            {
+              "locale": "pt-PT",
+              "published_ref": "v4.7.3:source/locale/pt-PT/more-infinite-research.cfg",
+              "blob": "59d08fa5f7d96f48b2e89cd8ec2236c3c788db2f"
+            },
+            {
+              "locale": "ro",
+              "published_ref": "v4.7.3:source/locale/ro/more-infinite-research.cfg",
+              "blob": "a940c42d5f5402347c7698a0480bbf30c8af8a14"
+            },
+            {
+              "locale": "ru",
+              "published_ref": "v4.7.3:source/locale/ru/more-infinite-research.cfg",
+              "blob": "7706db5f40391baa1faf589b43ef8fa30541994c"
+            },
+            {
+              "locale": "sk",
+              "published_ref": "v4.7.3:source/locale/sk/more-infinite-research.cfg",
+              "blob": "46259e4c39c6385770d1cf3a1def2c76ec29cd50"
+            },
+            {
+              "locale": "sl",
+              "published_ref": "v4.7.3:source/locale/sl/more-infinite-research.cfg",
+              "blob": "1b26a6e70d3c85dd21a91f3a9c749a356363062c"
+            },
+            {
+              "locale": "sq",
+              "published_ref": "v4.7.3:source/locale/sq/more-infinite-research.cfg",
+              "blob": "f058f4ce42e8b3d9a3517b0b7d43a6a5177b77f7"
+            },
+            {
+              "locale": "sr",
+              "published_ref": "v4.7.3:source/locale/sr/more-infinite-research.cfg",
+              "blob": "dec2ccf2f7504e76e6eb69b347de4379d39fcc9b"
+            },
+            {
+              "locale": "sv-SE",
+              "published_ref": "v4.7.3:source/locale/sv-SE/more-infinite-research.cfg",
+              "blob": "aadd717dbf77e586156d9d0558a81e8c44430575"
+            },
+            {
+              "locale": "th",
+              "published_ref": "v4.7.3:source/locale/th/more-infinite-research.cfg",
+              "blob": "bffa29483fbfe215b4746a11419ba0c92dbfe0c0"
+            },
+            {
+              "locale": "tr",
+              "published_ref": "v4.7.3:source/locale/tr/more-infinite-research.cfg",
+              "blob": "2518f22363ef321bbe83f99ffcf87a98d288e595"
+            },
+            {
+              "locale": "uk",
+              "published_ref": "v4.7.3:source/locale/uk/more-infinite-research.cfg",
+              "blob": "5dc70494e9f4bd96cf1a96d4cadedb0d78ec3052"
+            },
+            {
+              "locale": "vi",
+              "published_ref": "v4.7.3:source/locale/vi/more-infinite-research.cfg",
+              "blob": "b8e67b14865801c238c0b53ce24c1484ded3f0cf"
+            },
+            {
+              "locale": "zh-CN",
+              "published_ref": "v4.7.3:source/locale/zh-CN/more-infinite-research.cfg",
+              "blob": "fe3375d8a68e801fec3450238ed81f00367c897e"
+            },
+            {
+              "locale": "zh-TW",
+              "published_ref": "v4.7.3:source/locale/zh-TW/more-infinite-research.cfg",
+              "blob": "d7d7ce1de92f60bda634e1ba7b2a4d8fcd421657"
+            }
+          ],
+          "current_host_controls": [
+            "tests/test_library.py::test_limited_discovery_warning_is_personal_retained_and_uses_the_existing_count",
+            "tests/test_library.py::test_actual_discovery_transport_and_callback_failures_warn_without_changing_research",
+            "tests/test_library.py::test_older_discovery_cache_renews_only_on_open_and_retains_issued_request_rights",
+            "tests/test_library.py::test_unknown_saved_discovery_metadata_is_preserved_without_another_native_window",
+            "tests/test_library_translations.py::test_discovery_limits_follow_payload_callback_and_cache_byte_boundaries",
+            "tests/test_library_translations.py::test_discovery_transport_timeout_and_stale_scope_preserve_request_accounting",
+            "tests/test_library_translations.py::test_legacy_discovery_metadata_is_read_only_until_explicit_work_renewal"
+          ],
+          "validation": {
+            "library_controls": 86,
+            "translation_controls": 18,
+            "selected_control_total": 104,
+            "exact_pre_fix_source_control_detected": true,
+            "in_memory_semantic_opponents_detected": 2,
+            "named_control_mappings_verified": 7,
+            "original_locale_bytes_preserved": 50,
+            "lua": "5.2",
+            "lupa": "2.6",
+            "exact_head_ci": "required after commit"
+          },
+          "remaining_executable_check": "Black Glass independently reviews and integrates the correction, freezes exact successor bytes and qualifies affected tooltip rendering and localized long/limited/failed discovery with client/locale/layout and cold/configuration/beta-to-successor inputs. Existing published501 native results retain their original identities; they do not qualify this changed source. First-open/search/refresh/memory and any shared startup impact need consumed-input performance review rather than blanket evidence reuse.",
+          "limits": [
+            "This is a source/host correction, not native rendering, real save/client acceptance or stable release.",
+            "The inactive-provider icon-setting matrix and remaining historical/transport/peer-pending source mappings retain their own dispositions.",
+            "No original request, earlier evidence, authored release version, published asset/tag, private controller/native fixture or shared progress header changes."
+          ],
+          "owner": "Aero: bounded successor correction and host/locale evidence; Black Glass: independent integration, frozen candidate and affected native/performance applicability.",
+          "custody": "build/qualification/aero-library-warning-r01/",
+          "native_execution": false,
+          "source_reconciliation_complete": false,
+          "test_intent_reconciliation_complete": false,
+          "release_qualification": false
         }
       ],
       "test_subjects": [

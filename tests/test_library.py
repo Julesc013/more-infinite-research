@@ -1248,6 +1248,210 @@ class LibraryTests(unittest.TestCase):
           assert(player.force.research_queue == queue and gear.level == level)
         ''')
 
+    def test_two_players_reject_malformed_hidden_replacements_without_changing_views_or_research(self):
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          boot()
+          local peer = {valid=true, index=2, name="Bob", locale="de", connected=true,
+            force=player.force, gui={screen=gui_container(nil)},
+            display_resolution=player.display_resolution, display_scale=1}
+          game.get_player = function(index) return index==1 and player or index==2 and peer or nil end
+
+          -- Preserve the old fixture's full active-force witness rather than
+          -- treating unchanged levels alone as unchanged native research.
+          gear.saved_progress, foreign.saved_progress = .125, .25
+          local function snapshot()
+            local force, parts = player.force, {}
+            local names = {}; for name in pairs(force.technologies) do names[#names+1]=name end
+            table.sort(names)
+            for _, name in ipairs(names) do
+              local tech=force.technologies[name]
+              for _, key in ipairs({"name","level","researched","enabled","visible_when_disabled","saved_progress"}) do
+                parts[#parts+1]=name..":"..key.."="..tostring(tech[key])
+              end
+            end
+            parts[#parts+1]="current="..force.current_research.name
+            parts[#parts+1]="progress="..force.research_progress
+            for index, tech in ipairs(force.research_queue) do parts[#parts+1]=index.."="..tech.name end
+            return table.concat(parts,"|")
+          end
+          local native_before = snapshot()
+          local root_a=library.open(player,{family="all",mode=1,hidden={gear.name},selected=foreign.name})
+          local root_b=library.open(peer,{family="all",mode=3,hidden={},selected=gear.name})
+          local function assert_views()
+            local a,b=storage.mir_library.players[1],storage.mir_library.players[2]
+            assert(a~=b and a.hidden~=b.hidden and a.mode==1 and b.mode==3,
+              "players sharing a force must retain distinct personal views and hidden tables")
+            assert(a.hidden[gear.name] and not a.hidden[foreign.name] and next(b.hidden)==nil,
+              "invalid replacement or another player's action changed personal hidden choices")
+            local ca,cb=research_content(root_a),research_content(root_b)
+            assert(#ca.mir_library_results.items==1
+              and ca.mir_library_results.items[1]==foreign.localised_name
+              and a.selected==foreign.name and ca.mir_library_actions.mir_library_hide.sprite=="utility/collapse",
+              "malformed hidden replacement changed the prior visible selection or action")
+            assert(#cb.mir_library_results.items==1
+              and cb.mir_library_results.items[1]==gear.localised_name
+              and b.selected==gear.name and cb.mir_library_actions.mir_library_hide.sprite=="utility/collapse")
+            assert(snapshot()==native_before,"Library personal views changed active native research")
+          end
+          assert_views()
+          -- These three literal invalid payloads come from the historical
+          -- personal-continuity fixture, independently of current validation.
+          for _, invalid in ipairs({{[2]=gear.name},{gear.name,gear.name},{"no-such-technology"}}) do
+            root_a=library.open(player,{hidden=invalid})
+            assert_views()
+          end
+
+          library.open(player,{hidden={}})
+          assert(next(storage.mir_library.players[1].hidden)==nil
+            and #research_content(root_a).mir_library_results.items==2,
+            "a valid empty replacement must actually clear the personal hidden list")
+          root_a=library.open(player,{hidden={gear.name},selected=foreign.name})
+          assert_views()
+          -- Host reconstruction is a control, not a real save/reload result.
+          library.on_load()
+          root_a=library.open(player); root_b=library.open(peer)
+          assert_views()
+        ''')
+
+    def test_limited_discovery_warning_is_personal_retained_and_uses_the_existing_count(self):
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          boot()
+          prototypes={recipe={},item={},fluid={}}
+          gear.prototype.effects={}
+          for index=1,129 do
+            local id="recipe-"..index
+            gear.prototype.effects[index]={type="unlock-recipe",recipe=id}
+            prototypes.recipe[id]={localised_name=id,products={}}
+          end
+          local queue,current,progress=player.force.research_queue,player.force.current_research,player.force.research_progress
+          local root=library.open(player,{selected=gear.name})
+          local query=root.mir_library_filters.mir_library_query
+          local function indicator(frame)
+            local content=research_content(frame)
+            return content.mir_library_count or content.mir_library_actions.mir_library_count
+          end
+          assert(indicator(root).tooltip and indicator(root).tooltip[1]=="mir-browser.discovery-limited",
+            "limited localized discovery must warn on the existing result count")
+          local request=player.translation_requests[1].id
+          local fields={gear.localised_name}; for index=1,128 do fields[#fields+1]="recipe-"..index end
+          library.on_string_translated{player_index=1,id=request,translated=true,result=table.concat(fields,"\31")}
+          assert(indicator(root).tooltip[1]=="mir-browser.discovery-limited")
+          assert(root==player.gui.screen.mir_research_browser and query==root.mir_library_filters.mir_library_query)
+
+          local peer={valid=true,index=2,name="Bob",locale="de",connected=true,force=player.force,
+            gui={screen=gui_container(nil)},display_resolution=player.display_resolution,display_scale=1}
+          game.get_player=function(index)return index==1 and player or index==2 and peer or nil end
+          local peer_root=library.open(peer,{family="external"})
+          assert(indicator(peer_root).tooltip==nil,"one player's bounded discovery warned an unrelated peer view")
+          local working=storage.mir_library.translations.working[1].cache
+          local epoch=storage.mir_library.translations.next_epoch
+          package.loaded["runtime.library"]=nil
+          library=require("runtime.library")
+          local available_game=game;game=nil;library.on_load();game=available_game
+          assert(storage.mir_library.translations.working[1].cache==working
+            and storage.mir_library.translations.next_epoch==epoch,
+            "cold-load reconnection changed durable discovery work")
+          root=library.open(player)
+          assert(#player.translation_requests==1 and indicator(root).tooltip[1]=="mir-browser.discovery-limited",
+            "cold-load lost settled discovery limits or issued duplicate requests")
+          player.display_resolution={width=480,height=400}
+          root=library.open(player)
+          assert(research_content(root).mir_library_actions.mir_library_count.tooltip[1]=="mir-browser.discovery-limited",
+            "narrow layout lost the count warning")
+          assert(indicator(peer_root).tooltip==nil)
+          library.close(player);gear.prototype.effects={}
+          root=library.open(player)
+          assert(indicator(root).tooltip==nil,"a new complete discovery scope kept an old warning")
+          assert(player.force.research_queue==queue and player.force.current_research==current
+            and player.force.research_progress==progress and gear.level==3 and gear.enabled==false)
+        ''')
+
+    def test_actual_discovery_transport_and_callback_failures_warn_without_changing_research(self):
+        self.lua.execute(r'''
+          for _,opponent in ipairs({"transport","failed-callback","partial-composition"}) do
+            boot()
+            prototypes={recipe={casting={localised_name="Casting",products={{type="item",name="gold"}}}},
+              item={gold={localised_name="Gold"}},fluid={}}
+            gear.prototype.effects={{type="unlock-recipe",recipe="casting"}}
+            if opponent=="transport" then player.request_translation=function()error("native transport refusal")end end
+            local queue,current,progress=player.force.research_queue,player.force.current_research,player.force.research_progress
+            local root=library.open(player)
+            if opponent~="transport" then
+              library.on_string_translated{player_index=1,id=player.translation_requests[1].id,
+                translated=opponent~="failed-callback",result="Gear\31Casting"}
+            end
+            local content=research_content(root)
+            local count=content.mir_library_count or content.mir_library_actions.mir_library_count
+            assert(count.tooltip and count.tooltip[1]=="mir-browser.discovery-limited",
+              "actual host lost discovery failure metadata: "..opponent)
+            local ledger=storage.mir_library.translations
+            assert(ledger.active[1]==nil and ledger.working[1].cache.labels[gear.name]==nil,
+              "failed discovery kept a native slot or published partial text")
+            assert(player.force.research_queue==queue and player.force.current_research==current
+              and player.force.research_progress==progress and gear.level==3 and gear.enabled==false)
+          end
+        ''')
+
+    def test_older_discovery_cache_renews_only_on_open_and_retains_issued_request_rights(self):
+        self.lua.execute(r'''
+          boot()
+          prototypes={recipe={casting={localised_name="Casting",products={}}},item={},fluid={}}
+          gear.prototype.effects={{type="unlock-recipe",recipe="casting"}}
+          local root=library.open(player)
+          local ledger=storage.mir_library.translations
+          local cache=ledger.working[1].cache
+          -- Exact pre-correction working-cache shape: the issued ledger has
+          -- no new fields, while derived work lacks discovery coverage data.
+          cache.discovery_subjects,cache.discovery_limited=nil,nil
+          local old_epoch,old_generation=ledger.next_epoch,cache.generation
+          local first=player.translation_requests[1].id
+          gear.prototype.effects={}
+          package.loaded["runtime.library"]=nil;library=require("runtime.library")
+          local available_game=game;game=nil;library.on_load();game=available_game
+          assert(cache.discovery_subjects==nil and cache.discovery_limited==nil
+            and cache.generation==old_generation and ledger.next_epoch==old_epoch
+            and #ledger.active[1].pending==1,"on_load migrated older discovery work")
+          root=library.open(player)
+          assert(ledger.next_epoch==old_epoch+1 and cache.generation==old_generation+1
+            and #player.translation_requests==2 and #ledger.active[1].pending==2,
+            "valid open did not renew derived coverage while retaining the old issued slot")
+          local allowed={request_id=true,key=true,scope=true,cache_generation=true,requested_tick=true}
+          for _,pending in ipairs(ledger.active[1].pending) do
+            local fields=0
+            for key in pairs(pending) do assert(allowed[key],"discovery metadata changed the issued-ID ledger");fields=fields+1 end
+            assert(fields==5)
+          end
+          library.on_string_translated{player_index=1,id=first,translated=true,result="invalid old composition"}
+          assert(#ledger.active[1].pending==1)
+          local content=research_content(root)
+          local count=content.mir_library_count or content.mir_library_actions.mir_library_count
+          assert(count.tooltip==nil,"an old-scope discovery callback contaminated the renewed view")
+          library.on_string_translated{player_index=1,id=player.translation_requests[2].id,
+            translated=true,result="Complete current caption"}
+          assert(ledger.active[1]==nil and cache.labels[gear.name]=="Complete current caption")
+        ''')
+
+    def test_unknown_saved_discovery_metadata_is_preserved_without_another_native_window(self):
+        self.lua.execute(r'''
+          boot()
+          library.open(player)
+          local ledger=storage.mir_library.translations
+          local saved=ledger.working[1]
+          saved.cache.discovery_limited="unknown-future-shape"
+          local pending,epoch=ledger.active[1],ledger.next_epoch
+          package.loaded["runtime.library"]=nil;library=require("runtime.library")
+          local available_game=game;game=nil;library.on_load();game=available_game
+          library.open(player)
+          assert(ledger.working[1]==saved and saved.cache.discovery_limited=="unknown-future-shape"
+            and ledger.active[1]==pending and ledger.next_epoch==epoch,
+            "unrecognized saved discovery metadata or its issued rights were replaced")
+          assert(#player.translation_requests==1,"unknown working metadata opened a second request window")
+        ''')
+
     def test_pure_prototype_constructor_preserves_published_shortcut_identity(self):
         self.lua.globals().prototype_source = (ROOT / "source/presentation/shortcut.lua").as_posix()
         self.lua.execute('''
@@ -1268,7 +1472,7 @@ class LibraryTests(unittest.TestCase):
             "not-added", "productivity-current-cap", "productivity-current-cap-range",
             "no-next-benefit", "live-detail-unavailable",
             "report-options", "report-settings", "report-omissions", "report-preview", "report-select", "report-local",
-            "debug-refresh",
+            "debug-refresh", "discovery-limited",
             "search-settings", "hide", "show", "show-hidden", "inspect-settings", "hide-tooltip",
             "show-tooltip", "layout-smaller",
             "layout-larger", "layout-reset",
@@ -1574,6 +1778,100 @@ class LibraryTests(unittest.TestCase):
           assert(listed[1] == "Eisenrad-Produktivität" or listed[2] == "Eisenrad-Produktivität",
             "the working gear LocalisedString regressed")
           assert(content["mir_library_detail"]["mir_library_detail_title"].caption == "Erzförderer-Produktivität")
+        ''')
+
+    def test_imported_finite_cap_keeps_zero_default_and_direct_provenance(self):
+        # Accepted zero/direct/effective case from historical portable-core
+        # blob 55be2847fae29855efac6a294887012827013eef.
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          boot()
+          local catalog = require("research.settings")
+          local name = "ips-max-level-research_gears"
+          assert(catalog.spec(name).default_value == 0)
+          helpers = {encode_string=function(value) return value end,
+            decode_string=function(value) return value end,
+            json_to_table=function(value)
+              assert(value == "finite-cap-profile")
+              return {schema=1, kind="mir-settings-profile", settings={[name]=10}}
+            end}
+          settings.startup[name] = {value=0}
+          settings.startup[catalog.import_setting_name] = {value="MIRSET1:finite-cap-profile"}
+          local effective = catalog.effective_values(settings.startup, helpers)
+          assert(effective[name] == 10, "valid zero direct/default cap blocked a finite imported value")
+          library.set_cap_provider(function(force)
+            assert(force == player.force)
+            return {[gear.name]=effective[name]}
+          end)
+          local root = library.open(player, {selected=gear.name})
+          local cap = research_content(root)["mir_library_detail"]["mir_library_detail_cap"]
+          assert(cap.caption[1] == "mir-browser.cap-finite" and cap.caption[2] == 10)
+          library.open(player, {tab="settings", settings_scope="research", settings_search="research_gears"})
+          local detail = root["mir_library_tabs"]["mir_library_settings_content"]
+            ["mir_library_settings_dynamic"]["mir_library_settings_detail"]
+          local value = detail["mir_library_setting_" .. catalog.spec(name).field_index .. "_value"]
+          assert(value.caption == "10" and value.tooltip[2][1] == "mir-browser.setting-unlimited"
+            and value.tooltip[3][1] == "mir-browser.setting-unlimited"
+            and value.tooltip[4][1] == "mir-browser.source-mirset1",
+            "finite imported cap lost its valid zero default/direct provenance")
+          assert(settings.startup[name].value == 0 and gear.level == 3 and gear.researched and not gear.enabled)
+        ''')
+
+    def test_full_translation_callback_keeps_late_recipe_item_and_fluid_search_terms(self):
+        # v4.7.3 research_browser_native_discovery_regressions.lua rejects the
+        # original 1 KiB callback truncation; this is host coverage, not native input.
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          boot()
+          player.locale = "de"
+          gear.localised_name = "Produktivitätsforschung"
+          gear.prototype.effects = {{type="unlock-recipe", recipe="broad-recipe"}}
+          prototypes = {
+            recipe = {["broad-recipe"] = {
+              localised_name=string.rep("Langes Rezept ", 100) .. "recipe-tail",
+              products={{type="item", name="broad-item"}, {type="fluid", name="broad-fluid"}}
+            }},
+            item = {["broad-item"] = {localised_name="item-tail"}},
+            fluid = {["broad-fluid"] = {localised_name="fluid-tail"}}
+          }
+          local function translated(value)
+            if type(value) == "string" then return value end
+            assert(type(value) == "table")
+            if value[1] == "?" then return translated(value[2]) end
+            assert(value[1] == "")
+            local parts = {}
+            for index=2,#value do parts[#parts+1] = translated(value[index]) end
+            return table.concat(parts)
+          end
+          local native_queue, current = player.force.research_queue, player.force.current_research
+          local root = library.open(player, {query="item-tail", selected=gear.name})
+          local query = root["mir_library_filters"]["mir_library_query"]
+          local request = player.translation_requests[1]
+          assert(#player.translation_requests == 1)
+          local payload = translated(request.localised)
+          for _, term in ipairs({"recipe-tail", "item-tail", "fluid-tail"}) do
+            assert(string.find(payload, term, 1, true) > 1024)
+          end
+          assert(#research_content(root)["mir_library_results"].items == 0)
+          library.on_string_translated({player_index=1, id=request.id+999, translated=true, result=payload})
+          assert(#research_content(root)["mir_library_results"].items == 0,
+            "an unrelated callback published localized search data")
+          library.on_string_translated({player_index=1, id=request.id, translated=true, result=payload})
+          for _, term in ipairs({"recipe-tail", "item-tail", "fluid-tail"}) do
+            query.text = term
+            library.on_gui_text_changed({player_index=1, element=query})
+            local listed = research_content(root)["mir_library_results"].items
+            assert(#listed == 1 and listed[1] == "Produktivitätsforschung",
+              "a late recipe/item/fluid term was lost through callback or refresh: " .. term)
+            assert(player.gui.screen["mir_research_browser"] == root and root.valid
+              and root["mir_library_filters"]["mir_library_query"] == query,
+              "localized search rebuilt the owned window or query control")
+          end
+          assert(player.force.research_queue == native_queue and player.force.current_research == current
+            and gear.level == 3 and gear.researched and not gear.enabled,
+            "localized search changed native research state")
         ''')
 
     def test_all_view_scans_native_identities_once_and_family_change_invalidates_unissued_work(self):
