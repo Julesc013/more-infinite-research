@@ -161,6 +161,52 @@ class SpoilageTests(unittest.TestCase):
           assert(state.effective_level == 2 and close(state.applied_multiplier, 1.21))
         ''')
 
+    def test_published_modifier_clamps_and_retirement_tolerance_remain_explicit(self):
+        self.lua.execute('''
+          -- All four retained published source variants clamp to .01..100
+          -- and use a 1e-6 comparison; this is default 1% research, not a new
+          -- foreign-contribution attribution rule.
+          local game, difficulty = mock_game(99, {alpha = force("alpha", 100)})
+          local state = spoilage.reconcile(game, {enabled=true,per_level_percent=1}, nil)
+          assert(difficulty.spoil_time_modifier==100 and state.baseline==99,
+            "published upper modifier clamp or original baseline was lost")
+          assert(close(state.applied_multiplier,100/99))
+          local writes = difficulty.writes
+          local cleared, stopped = spoilage.reconcile(game, {enabled=false}, state)
+          assert(cleared==nil and stopped.restored and difficulty.spoil_time_modifier==99
+            and difficulty.writes==writes+1,
+            "a clamped contribution must restore its original baseline once")
+
+          game, difficulty = mock_game(.01, {alpha = force("alpha", 2)})
+          local old_bucket = {baseline=.01,applied_multiplier=1.01,last_applied_value=.0101}
+          local rebased, facts = spoilage.reconcile(game,
+            {enabled=true,per_level_percent=1}, old_bucket)
+          assert(rebased==old_bucket and facts.external_write_ambiguous
+            and rebased.baseline==.01 and close(difficulty.spoil_time_modifier,.0101),
+            "published lower rebase clamp was lost")
+
+          assert(contribution.nearly_equal(1e-6,2e-6)
+            and not contribution.nearly_equal(1e-6,4e-6),
+            "published inclusive 1e-6 comparison changed")
+          for _, delta in ipairs{.5e-6,-.5e-6,2e-6,-2e-6} do
+            local current = 2.02+delta
+            game, difficulty = mock_game(current, {alpha = force("alpha", 2)})
+            old_bucket = {baseline=2,applied_multiplier=1.01,last_applied_value=2.02}
+            writes = difficulty.writes
+            cleared, stopped = spoilage.reconcile(game, {enabled=false}, old_bucket)
+            assert(cleared==nil and not stopped.active)
+            if math.abs(delta)<1e-6 then
+              assert(stopped.restored and not stopped.external_write_ambiguous
+                and difficulty.spoil_time_modifier==2 and difficulty.writes==writes+1,
+                "published near-own value should restore once")
+            else
+              assert(not stopped.restored and stopped.external_write_ambiguous
+                and difficulty.spoil_time_modifier==current and difficulty.writes==writes,
+                "an observed foreign value outside tolerance must stay untouched")
+            end
+          end
+        ''')
+
     def test_source_has_no_registration_settings_storage_or_retired_runtime_imports(self):
         source = (ROOT / "source/runtime/spoilage.lua").read_text(encoding="utf-8")
         self.assertEqual(source.count("require("), 1)

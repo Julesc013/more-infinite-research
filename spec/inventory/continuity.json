@@ -8677,14 +8677,16 @@
         ],
         "host_controls": [
           "tests/test_passive_repair.py",
-          "tests/test_spoilage.py"
+          "tests/test_spoilage.py",
+          "tests/test_agriculture.py",
+          "tests/test_scripted_effects_lifecycle.py"
         ],
         "evidence": [
           "spec/evidence/settings-repair-chain.json",
           "spec/evidence/repair-stress-native-chain.json",
           "spec/evidence/runtime-active-r06-observation-analysis-chain.json"
         ],
-        "remaining": "Keep each original native scope; qualify changed-package applicability and remaining removal/readd/large active scheduled-work boundaries rather than rebuilding a runtime framework."
+        "remaining": "The bounded spoilage/agriculture review below now maps the two selected historical effect-module families, retains existing controls and ports clamp/restoration-tolerance coverage. This does not finish other runtime roots, resolver/registry helpers or inter-release intent. Keep original native/performance identities; review final consumed inputs and qualify remaining global contribution, actual removal/readdition, save/client and large active-work boundaries through the existing Black Glass queue. A test-only mapping does not force an unchanged native replay."
       },
       {
         "subjects": [
@@ -8781,7 +8783,7 @@
         "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
       }
     ],
-    "next_bounded_work": "Complete actual r17 preparation/runtime/action/offline-composition packet readback when Black Glass transports the bound records;keep frozen501 execution distinct from the legacy-search correction. Continue unresolved historical Library/crash/compatibility/inter-release/consumer groups. Resolve current descriptions against exact existing verdicts without rewriting original receipts or sharing the progress header.",
+    "next_bounded_work": "Independently review/integrate the ready #1571 host unit and #1575 secondary raw-recipe-ID correction, keeping frozen501 native package A distinct from corrected candidate B. Before affected GUI dispatch/reuse, Black Glass must close the capture-composition/safe-execution hold and bind a fresh complete packet; the actual one-engine guard adverse remains preserved. Continue unresolved historical runtime/control/compatibility/inter-release/consumer groups and original reporter evidence. Final candidate and whole-product performance/application/state checks retain their actual owners and consumed-input limits; do not rewrite original receipts or share the progress header.",
     "bounded_intent_reviews": [
       {
         "subjects": [
@@ -11180,6 +11182,479 @@
         "source_reconciliation_complete": false,
         "test_intent_reconciliation_complete": false,
         "native_execution": false
+      },
+      {
+        "subjects": [
+          "CONT-08",
+          "CONT-09"
+        ],
+        "reviewed_on": "2026-11-02",
+        "reviewed_against": "607d9d1f4101ddc551e2090a941e102dbaded3b3",
+        "scope": "Two named historical spoilage/agriculture effect modules and their source/non-source path aliases across the existing91-tag snapshot. Eight distinct bodies have four grouped behavior dispositions, not eight native passes. Other runtime/control roots, settings-resolver implementations, inter-release removals, discussions and attachments are outside this slice.",
+        "method": "Deduplicate by immutable Git blob before semantic reading; inspect the two latest bodies and all six earlier diffs. Verify148 retained remote tag/path/commit bindings plus two explicit immutable-commit references. Run the same upper/lower-clamp and signed-tolerance observations through all four exact published spoilage bodies with only tiny settings/state/force adapters, then port the gap into the current existing host suite. No retired runtime framework or old native runner is restored.",
+        "tag_commit_reference": "historical_preservation_audit.source_inventory.tag_commits",
+        "selected_tag_scope": 91,
+        "selected_commit_scope": 90,
+        "selected_blob_count": 8,
+        "distinct_retained_tag_references": 148,
+        "distinct_commit_only_references": 2,
+        "missing_commit_inputs": [],
+        "reference_limits": [
+          "Preserve the original local source index. Its v4.2.0 alias resolves to the retained v4.2.0-stable tag with the same commit; two duplicate alias locators consolidate without altering original custody.",
+          "Local v3.0.0 at70bb513f5b388ad23c4a5d46dfc945571c3b8217 has no matching remote tag. The distinct remote3.0.0 object is8da631a6e5774af6d8804a49107a61a7964a5b2c. Preserve the local alias and use explicit commit/path for its two available sources; do not claim that alias was published or relabel it as remote3.0.0. Its publication provenance remains unresolved, not missing source bytes."
+        ],
+        "selected_blob_variants": [
+          {
+            "paths": [
+              "prototypes/mir/runtime/effects/agricultural_growth_speed.lua"
+            ],
+            "blob": "5288093812f5d507159fd1e7fc494a0a07014d79",
+            "bytes": 3747,
+            "sha256": "D98BFE622FA12018E4DDD1D7B6E2F1EE9D105A4453E0F7A8469BDBEDA944EF2E",
+            "tag_path_references": [
+              "2.3.5:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "3.0.5:prototypes/mir/runtime/effects/agricultural_growth_speed.lua"
+            ],
+            "disposition": "consolidate-equivalent-runtime-expectations",
+            "intent_groups": [
+              "native-planted-entity-mutation"
+            ],
+            "variant_decision": "Same native calculations; variants differ only in fixed1.01 versus delegated runtime multiplier, direct storage versus bucket access, optional logging and later scripted_techs feature metadata. Retain the default, setting and saved-state behavior; do not revive old module registration/storage machinery."
+          },
+          {
+            "paths": [
+              "prototypes/mir/runtime/effects/agricultural_growth_speed.lua"
+            ],
+            "blob": "752873e0ed3900a307d257fa44a9d60188c4f43f",
+            "bytes": 3557,
+            "sha256": "69566B58F3BC4A880BDE96EA3F93C73806DB4F2934DC1BCB72A26CAF36D749AF",
+            "tag_path_references": [
+              "2.3.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "3.0.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua"
+            ],
+            "commit_only_references": [
+              {
+                "commit": "70bb513f5b388ad23c4a5d46dfc945571c3b8217",
+                "path": "prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+                "indexed_tag": "v3.0.0",
+                "ref_kind": "commit-only-local-alias-not-published"
+              }
+            ],
+            "disposition": "consolidate-equivalent-runtime-expectations",
+            "intent_groups": [
+              "native-planted-entity-mutation"
+            ],
+            "variant_decision": "Same native calculations; variants differ only in fixed1.01 versus delegated runtime multiplier, direct storage versus bucket access, optional logging and later scripted_techs feature metadata. Retain the default, setting and saved-state behavior; do not revive old module registration/storage machinery."
+          },
+          {
+            "paths": [
+              "prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "source/prototypes/mir/runtime/effects/agricultural_growth_speed.lua"
+            ],
+            "blob": "8a448d415ea692f867c730ee76f65e74a65cd173",
+            "bytes": 3788,
+            "sha256": "5C87E41DAD5FA476BE1BCE7DED41654DAC02AA873D9DC4800457E89202A6F2C0",
+            "tag_path_references": [
+              "0.10.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "0.11.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "0.12.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "0.6.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "0.7.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "0.8.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "0.9.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.8.2:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.8.5:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.8.9:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.9.4:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.9.5:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.9.9:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "2.4.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "2.4.5:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "2.4.9:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "2.5.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "2.5.10:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "2.5.11:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "2.5.5:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "2.5.9:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "3.1.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "3.1.1:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "3.1.2:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "3.1.5:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "3.1.9:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "3.2.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "3.2.1:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "3.2.10:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "3.2.11:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "3.2.2:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "3.2.3:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "3.2.5:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "3.2.9:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "v4.0.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "v4.1.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "v4.2.0-stable:source/prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "v4.2.1:source/prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "v4.2.2:source/prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "v4.3.0:source/prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "v4.4.0:source/prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "v4.4.1:source/prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "v4.4.2:source/prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "v4.5.0:source/prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "v4.5.1:source/prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "v4.5.2:source/prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "v4.6.0:source/prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "v4.7.0:source/prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "v4.7.1:source/prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "v4.7.2:source/prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "v4.7.3:source/prototypes/mir/runtime/effects/agricultural_growth_speed.lua"
+            ],
+            "preserved_indexed_aliases": [
+              {
+                "indexed_tag": "v4.2.0",
+                "canonical_tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "path": "source/prototypes/mir/runtime/effects/agricultural_growth_speed.lua"
+              }
+            ],
+            "disposition": "consolidate-equivalent-runtime-expectations",
+            "intent_groups": [
+              "native-planted-entity-mutation"
+            ],
+            "variant_decision": "Same native calculations; variants differ only in fixed1.01 versus delegated runtime multiplier, direct storage versus bucket access, optional logging and later scripted_techs feature metadata. Retain the default, setting and saved-state behavior; do not revive old module registration/storage machinery."
+          },
+          {
+            "paths": [
+              "prototypes/mir/runtime/effects/spoilage_preservation.lua"
+            ],
+            "blob": "8db697f7cbcb861b7a3cae05f9249880caaef27c",
+            "bytes": 4184,
+            "sha256": "26B46C75055C94DBFF72F95B5CEBDE04C7F9E440C9DD3F54BD07DD5769FB31F7",
+            "tag_path_references": [
+              "2.3.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "3.0.0:prototypes/mir/runtime/effects/spoilage_preservation.lua"
+            ],
+            "commit_only_references": [
+              {
+                "commit": "70bb513f5b388ad23c4a5d46dfc945571c3b8217",
+                "path": "prototypes/mir/runtime/effects/spoilage_preservation.lua",
+                "indexed_tag": "v3.0.0",
+                "ref_kind": "commit-only-local-alias-not-published"
+              }
+            ],
+            "disposition": "consolidate-equivalent-runtime-expectations",
+            "intent_groups": [
+              "global-spoilage-policy",
+              "guarded-spoilage-contribution"
+            ],
+            "variant_decision": "Same native calculations; variants differ only in fixed1.01 versus delegated runtime multiplier, direct storage versus bucket access, optional logging and later scripted_techs feature metadata. Retain the default, setting and saved-state behavior; do not revive old module registration/storage machinery."
+          },
+          {
+            "paths": [
+              "prototypes/mir/runtime/effects/agricultural_growth_speed.lua"
+            ],
+            "blob": "9aac2889f666fa73e4d7cf4e7ff3d67336b5599f",
+            "bytes": 3511,
+            "sha256": "0D98142081ED8E24A9A667E7172EDD4DE3085D1270EC0F8D612ABDEE7D85EE8B",
+            "tag_path_references": [
+              "1.3.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.3.5:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.3.9:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.4.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.4.5:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.4.9:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.5.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.5.5:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.5.9:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.6.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.6.5:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.6.9:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.7.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.7.1:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.7.5:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.7.9:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.8.0:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.8.1:prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+              "1.9.3:prototypes/mir/runtime/effects/agricultural_growth_speed.lua"
+            ],
+            "disposition": "consolidate-equivalent-runtime-expectations",
+            "intent_groups": [
+              "native-planted-entity-mutation"
+            ],
+            "variant_decision": "Same native calculations; variants differ only in fixed1.01 versus delegated runtime multiplier, direct storage versus bucket access, optional logging and later scripted_techs feature metadata. Retain the default, setting and saved-state behavior; do not revive old module registration/storage machinery."
+          },
+          {
+            "paths": [
+              "prototypes/mir/runtime/effects/spoilage_preservation.lua"
+            ],
+            "blob": "a6f3dcf7a30e70602aaabe3b5109d7817a07f2fa",
+            "bytes": 4399,
+            "sha256": "02BA52F6DC0884402068E6E3CA1EDA68472C01C9D05C725FB9952A0D3AF8912B",
+            "tag_path_references": [
+              "2.3.5:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "3.0.5:prototypes/mir/runtime/effects/spoilage_preservation.lua"
+            ],
+            "disposition": "consolidate-equivalent-runtime-expectations",
+            "intent_groups": [
+              "global-spoilage-policy",
+              "guarded-spoilage-contribution"
+            ],
+            "variant_decision": "Same native calculations; variants differ only in fixed1.01 versus delegated runtime multiplier, direct storage versus bucket access, optional logging and later scripted_techs feature metadata. Retain the default, setting and saved-state behavior; do not revive old module registration/storage machinery."
+          },
+          {
+            "paths": [
+              "prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "source/prototypes/mir/runtime/effects/spoilage_preservation.lua"
+            ],
+            "blob": "befc848e204d62bf2c4f458878e10fde0d2bb6ac",
+            "bytes": 4440,
+            "sha256": "8973E17244AC389253B8CD06C5BBD694771995949767C95A6313D90B729BDBCC",
+            "tag_path_references": [
+              "0.10.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "0.11.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "0.12.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "0.6.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "0.7.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "0.8.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "0.9.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.8.2:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.8.5:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.8.9:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.9.4:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.9.5:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.9.9:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "2.4.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "2.4.5:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "2.4.9:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "2.5.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "2.5.10:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "2.5.11:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "2.5.5:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "2.5.9:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "3.1.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "3.1.1:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "3.1.2:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "3.1.5:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "3.1.9:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "3.2.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "3.2.1:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "3.2.10:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "3.2.11:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "3.2.2:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "3.2.3:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "3.2.5:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "3.2.9:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "v4.0.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "v4.1.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "v4.2.0-stable:source/prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "v4.2.1:source/prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "v4.2.2:source/prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "v4.3.0:source/prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "v4.4.0:source/prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "v4.4.1:source/prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "v4.4.2:source/prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "v4.5.0:source/prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "v4.5.1:source/prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "v4.5.2:source/prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "v4.6.0:source/prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "v4.7.0:source/prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "v4.7.1:source/prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "v4.7.2:source/prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "v4.7.3:source/prototypes/mir/runtime/effects/spoilage_preservation.lua"
+            ],
+            "preserved_indexed_aliases": [
+              {
+                "indexed_tag": "v4.2.0",
+                "canonical_tag": "v4.2.0-stable",
+                "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                "path": "source/prototypes/mir/runtime/effects/spoilage_preservation.lua"
+              }
+            ],
+            "disposition": "consolidate-equivalent-runtime-expectations",
+            "intent_groups": [
+              "global-spoilage-policy",
+              "guarded-spoilage-contribution"
+            ],
+            "variant_decision": "Same native calculations; variants differ only in fixed1.01 versus delegated runtime multiplier, direct storage versus bucket access, optional logging and later scripted_techs feature metadata. Retain the default, setting and saved-state behavior; do not revive old module registration/storage machinery."
+          },
+          {
+            "paths": [
+              "prototypes/mir/runtime/effects/spoilage_preservation.lua"
+            ],
+            "blob": "e20795bba2034ab37c4db617400348a2434f206e",
+            "bytes": 4146,
+            "sha256": "2E95705D293C7ACAEDD127289A2EC9A7E07366950E824FFB095116A38BD5242A",
+            "tag_path_references": [
+              "1.3.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.3.5:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.3.9:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.4.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.4.5:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.4.9:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.5.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.5.5:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.5.9:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.6.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.6.5:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.6.9:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.7.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.7.1:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.7.5:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.7.9:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.8.0:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.8.1:prototypes/mir/runtime/effects/spoilage_preservation.lua",
+              "1.9.3:prototypes/mir/runtime/effects/spoilage_preservation.lua"
+            ],
+            "disposition": "consolidate-equivalent-runtime-expectations",
+            "intent_groups": [
+              "global-spoilage-policy",
+              "guarded-spoilage-contribution"
+            ],
+            "variant_decision": "Same native calculations; variants differ only in fixed1.01 versus delegated runtime multiplier, direct storage versus bucket access, optional logging and later scripted_techs feature metadata. Retain the default, setting and saved-state behavior; do not revive old module registration/storage machinery."
+          }
+        ],
+        "native_api_range_sources": [
+          {
+            "version": "2.0.77",
+            "url": "https://lua-api.factorio.com/2.0.77/runtime-api.json",
+            "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578"
+          },
+          {
+            "version": "2.1.23",
+            "url": "https://lua-api.factorio.com/2.1.23/runtime-api.json",
+            "sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373"
+          }
+        ],
+        "native_api_range_fact": "Both pinned2.0.77/2.1.23 DifficultySettings contracts state spoil_time_modifier is in[0.01,100]. The new host cases use native-shaped current values inside that range; the lower-clamp case reaches an out-of-range intermediate baseline only through a legitimate external change and the old applied multiplier.",
+        "groups": [
+          {
+            "id": "global-spoilage-policy",
+            "disposition": "retain",
+            "historical_blobs": [
+              "8db697f7cbcb861b7a3cae05f9249880caaef27c",
+              "a6f3dcf7a30e70602aaabe3b5109d7817a07f2fa",
+              "befc848e204d62bf2c4f458878e10fde0d2bb6ac",
+              "e20795bba2034ab37c4db617400348a2434f206e"
+            ],
+            "independent_expectation": "The exact delivered technology identity contributes completed levels(level-1) to one global modifier. Use the highest eligible non-enemy/non-neutral force, not a sum or per-force difficulty setting; presence on any force is distinct from eligible contribution. Default per-level multiplier1.01 survives the later configurable resolver boundary.",
+            "implementation": [
+              "source/runtime/spoilage.lua",
+              "source/runtime/configuration.lua"
+            ],
+            "host_controls": [
+              "tests/test_spoilage.py::test_highest_eligible_level_is_global_not_per_force_or_enemy",
+              "tests/test_spoilage.py::test_known_published_bucket_shape_has_no_schema_and_remains_usable",
+              "tests/test_scripted_effects_lifecycle.py::test_imports_historical_buckets_and_uses_named_event_paths",
+              "tests/test_scripted_effects_lifecycle.py::test_force_reset_merge_and_retired_source_reconcile_without_cap_callbacks"
+            ],
+            "remaining_executable_check": "Review final-candidate consumed runtime/configuration/settings/native inputs against original observations, then qualify any genuinely affected highest-force shift, reversal/reset/merge and nondefault setting case. Multiple host forces are not multiplayer evidence.",
+            "owner": "Aero mapping/applicability; Black Glass native execution"
+          },
+          {
+            "id": "guarded-spoilage-contribution",
+            "disposition": "port-missing-boundary-and-retain-existing-controls",
+            "historical_blobs": [
+              "8db697f7cbcb861b7a3cae05f9249880caaef27c",
+              "a6f3dcf7a30e70602aaabe3b5109d7817a07f2fa",
+              "befc848e204d62bf2c4f458878e10fde0d2bb6ac",
+              "e20795bba2034ab37c4db617400348a2434f206e"
+            ],
+            "independent_expectation": "Retain baseline/applied_multiplier/last_applied_value/effective_level bucket meanings. Clamp native target and rebased baseline to0.01..100. On disable/missing technology, restore only an unchanged or within1e-6 own write; preserve an observed foreign value beyond tolerance. An aggregate rebase cannot identify independent writers. All four source variants give identical upper-clamp/restore, lower-rebase and four signed-tolerance observations with default1% settings.",
+            "implementation": [
+              "source/runtime/spoilage.lua",
+              "source/runtime/spoilage_contribution.lua",
+              "source/runtime/scripted_effects.lua",
+            "source/runtime/bootstrap.lua"
+            ],
+            "host_controls": [
+              "tests/test_spoilage.py::test_published_modifier_clamps_and_retirement_tolerance_remain_explicit",
+              "tests/test_spoilage.py::test_external_global_write_is_rebased_but_reported_as_ambiguous",
+              "tests/test_spoilage.py::test_disable_restores_once_then_readdition_captures_new_baseline",
+              "tests/test_spoilage.py::test_disable_never_overwrites_an_observed_foreign_value",
+              "tests/test_spoilage.py::test_unavailable_removal_property_retains_state_for_real_active_readdition",
+              "tests/test_scripted_effects_lifecycle.py::test_disable_restores_only_our_matching_global_write_and_keeps_foreign_write"
+            ],
+            "remaining_executable_check": "Existing host property-unavailability/readdition doubles are not literal DLC/mod removal evidence. Final-candidate native global contribution, range-boundary/foreign-write restoration and any affected removal/readdition/save/client route remain with the existing runtime/state queue. This test-only review changes no consumed player payload and does not restart unchanged campaigns.",
+            "owner": "Aero boundary control/review; Black Glass native/state checks"
+          },
+          {
+            "id": "native-planted-entity-mutation",
+            "disposition": "retain-and-consolidate",
+            "historical_blobs": [
+              "5288093812f5d507159fd1e7fc494a0a07014d79",
+              "752873e0ed3900a307d257fa44a9d60188c4f43f",
+              "8a448d415ea692f867c730ee76f65e74a65cd173",
+              "9aac2889f666fa73e4d7cf4e7ff3d67336b5599f"
+            ],
+            "independent_expectation": "Keep the exact technology and native planted event. A valid tower owns the force; otherwise use the plant force. Read current completed research at the event, not a stale stored force snapshot. Apply min(10,per_level^completed) only to that plant, using now+max(1,floor(remaining/multiplier)); already-grown, invalid or unreadable/unwritable entities are unchanged. Preserve useful unversioned force_multipliers data while keeping the event authoritative.",
+            "implementation": [
+              "source/runtime/agriculture.lua",
+              "source/runtime/scripted_effects.lua"
+            ],
+            "host_controls": [
+              "tests/test_agriculture.py::test_refresh_preserves_old_bucket_shape_and_snapshots_two_non_enemy_forces",
+              "tests/test_agriculture.py::test_tower_force_wins_and_invalid_tower_falls_back_to_plant_force",
+              "tests/test_agriculture.py::test_research_reversal_reads_current_force_not_a_stale_snapshot",
+              "tests/test_agriculture.py::test_fractional_remainder_uses_one_tick_minimum_and_multiplier_is_capped",
+              "tests/test_agriculture.py::test_invalid_plant_native_read_and_native_write_failures_do_not_escape_or_mutate",
+              "tests/test_agriculture.py::test_missing_research_does_not_read_or_write_the_plant",
+              "tests/test_agriculture.py::test_disabled_path_does_not_access_game_or_event_and_clears_existing_snapshot_once",
+              "tests/test_agriculture.py::test_active_bursts_do_one_useful_write_per_plant_without_world_or_catalogue_scan"
+            ],
+            "applicable_evidence_candidate": "spec/evidence/runtime-active-r06-observation-analysis-chain.json retains original b2cf4c2d/4F5BEE02/2.1.23-FE4 repair/agriculture comparison only. It is a candidate for consumed-input review, not a new current-source or spoilage result.",
+            "remaining_executable_check": "Review source/configuration/settings/engine/mod/save/fixture/controller/endpoint inputs before reusing the original active benchmark. Preserve its actual unequal-workload/equivalence limits. Final-candidate plant event/rate and affected burst/save/client/large-factory endpoints stay open; do not infer elapsed cost from host write counts or restart the old scale campaign solely for this mapping.",
+            "owner": "Aero expectation/evidence review; Black Glass native/performance queue"
+          },
+          {
+            "id": "runtime-adapters-and-lifecycle",
+            "disposition": "consolidate-implementation-boundaries",
+            "historical_blobs": [
+              "8db697f7cbcb861b7a3cae05f9249880caaef27c",
+              "a6f3dcf7a30e70602aaabe3b5109d7817a07f2fa",
+              "befc848e204d62bf2c4f458878e10fde0d2bb6ac",
+              "e20795bba2034ab37c4db617400348a2434f206e",
+              "5288093812f5d507159fd1e7fc494a0a07014d79",
+              "752873e0ed3900a307d257fa44a9d60188c4f43f",
+              "8a448d415ea692f867c730ee76f65e74a65cd173",
+              "9aac2889f666fa73e4d7cf4e7ff3d67336b5599f"
+            ],
+            "independent_expectation": "Retain delivered default/settings, known bucket identity and relevant init/config/research/reversal/effects-reset/plant outcomes. Direct storage versus bucket helpers, debug formatting and scripted_techs metadata are implementation boundaries, not reasons to restore the retired registry/framework. Current lifecycle ownership and capability gates must protect unsupported engines and inactive features; on_load stays read-only.",
+            "implementation": [
+              "source/runtime/bootstrap.lua",
+              "source/runtime/scripted_effects.lua",
+              "source/runtime/configuration.lua"
+            ],
+            "host_controls": [
+              "tests/test_scripted_effects_lifecycle.py",
+              "tests/test_bootstrap.py",
+              "tests/test_settings_profile.py"
+            ],
+            "remaining_executable_check": "Only the named known bucket/default/event shape is mapped here. Current CONT-03/CONT-11 and native client/capability boundaries retain their independent settings/state requirements; other old resolver/registry implementations and save histories are not declared reconciled.",
+            "owner": "Aero source/host mapping; Black Glass native coverage"
+          }
+        ],
+        "host_results": {
+          "runtime": "Pinned Lua5.2/Lupa2.6",
+          "spoilage_controls": 8,
+          "agriculture_controls": 9,
+          "scripted_effect_lifecycle_controls": 3,
+          "total_selected": 20,
+          "all_four_exact_published_spoilage_bodies_pass_named_boundary_observations": true,
+          "deliberately_broken_variants_detected": [
+            "upper clamp1000",
+            "lower rebase clamp0.001",
+            "tolerance1e-7",
+            "tolerance1e-5",
+            "exclusive tolerance",
+            "summed eligible force levels",
+            "agriculture cap100",
+            "round-up growth timing"
+          ]
+        },
+        "custody": "build/qualification/aero-global-runtime-intents-r01/",
+        "qualification_limit": "This closes the selected two-module intent mapping and one current host coverage gap, not CONT-08/CONT-09 or VER-07 as a whole. No product discrepancy was demonstrated and no player source is changed. This is not native, literal mod/DLC removal, save/client, timing/memory, arbitrary-modpack or stable acceptance. Earlier records keep their actual identities and limitations.",
+        "native_execution": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "release_qualification": false
       }
     ],
     "stable_coverage_review": {
