@@ -803,15 +803,16 @@ local function open_translation_cache(player, view)
   local same_live_scope = retained and retained.scope and retained.scope.locale == player.locale
     and retained.scope.force_index == (player.force and player.force.index)
 
-  if retained and same_live_scope and retained.family == family then
+  if retained and same_live_scope and retained.family == family
+      and translation_queue.discovery_limited(retained.cache, retained.scope) ~= nil then
     -- Ordered identities are local immutable presentation data. Reusing this
     -- record prevents a native catalogue traversal on every GUI render.
     return retained
   end
 
   if retained and same_live_scope then
-    -- Family selection changes the requester-visible catalogue. Retain engine
-    -- IDs already issued, but replace all unissued work under a fresh caller
+    -- Family selection or an older metadata-free cache renews derived work.
+    -- Retain engine IDs already issued, but replace unissued work under a fresh caller
     -- epoch so former responses cannot label the new view.
     local ids = ordered_translation_ids(player, family)
     local ledger = retained.ledger
@@ -893,6 +894,7 @@ end
 local function request_translation(player, key)
   if not valid(player) or player.connected ~= true
       or type(player.request_translation) ~= "function" then return nil end
+  local subjects, limited = 0, false
   local ok, request_id = pcall(function()
     local setting_name = type(key) == "string" and key:match("^" .. SETTING_TRANSLATION_PREFIX .. "(.+)$") or nil
     if setting_name then
@@ -911,10 +913,12 @@ local function request_translation(player, key)
       item = prototype_collection("item"),
       fluid = prototype_collection("fluid")
     }
-    local payload = library_localization.search_request(technology, collections) or technology.localised_name
+    local payload
+    payload, subjects, limited = library_localization.search_request(technology, collections)
+    payload = payload or technology.localised_name
     return player.request_translation(payload)
   end)
-  return ok and request_id or nil
+  return ok and request_id or nil, subjects, limited
 end
 
 local function dispatch_translations(player, record)
@@ -923,6 +927,17 @@ local function dispatch_translations(player, record)
     return request_translation(player, key)
   end)
   sync_issued_cache(record)
+end
+
+local function update_discovery_indicator(content, record)
+  local actions = valid(content) and content[PREFIX .. "actions"] or nil
+  local indicator = valid(content) and content[PREFIX .. "count"]
+    or (valid(actions) and actions[PREFIX .. "count"])
+  if valid(indicator) then
+    indicator.tooltip = type(record) == "table"
+      and translation_queue.discovery_limited(record.cache, record.scope) == true
+      and {"mir-browser.discovery-limited"} or nil
+  end
 end
 
 local function rows_for(player, view, context, labels)
@@ -1876,6 +1891,7 @@ local function render(player, view, context, preserve_query)
     local translations = open_translation_cache(player, view)
     update_research_content(content, player, view, context, translated_labels(translations))
     dispatch_translations(player, translations)
+    update_discovery_indicator(content, translations)
   elseif view.tab == "settings" then
     local translations = open_translation_cache(player, view)
     local labels = translated_labels(translations)

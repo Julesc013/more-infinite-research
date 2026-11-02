@@ -1248,6 +1248,143 @@ class LibraryTests(unittest.TestCase):
           assert(player.force.research_queue == queue and gear.level == level)
         ''')
 
+    def test_limited_discovery_warning_is_personal_retained_and_uses_the_existing_count(self):
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          boot()
+          prototypes={recipe={},item={},fluid={}}
+          gear.prototype.effects={}
+          for index=1,129 do
+            local id="recipe-"..index
+            gear.prototype.effects[index]={type="unlock-recipe",recipe=id}
+            prototypes.recipe[id]={localised_name=id,products={}}
+          end
+          local queue,current,progress=player.force.research_queue,player.force.current_research,player.force.research_progress
+          local root=library.open(player,{selected=gear.name})
+          local query=root.mir_library_filters.mir_library_query
+          local function indicator(frame)
+            local content=research_content(frame)
+            return content.mir_library_count or content.mir_library_actions.mir_library_count
+          end
+          assert(indicator(root).tooltip and indicator(root).tooltip[1]=="mir-browser.discovery-limited",
+            "limited localized discovery must warn on the existing result count")
+          local request=player.translation_requests[1].id
+          local fields={gear.localised_name}; for index=1,128 do fields[#fields+1]="recipe-"..index end
+          library.on_string_translated{player_index=1,id=request,translated=true,result=table.concat(fields,"\31")}
+          assert(indicator(root).tooltip[1]=="mir-browser.discovery-limited")
+          assert(root==player.gui.screen.mir_research_browser and query==root.mir_library_filters.mir_library_query)
+
+          local peer={valid=true,index=2,name="Bob",locale="de",connected=true,force=player.force,
+            gui={screen=gui_container(nil)},display_resolution=player.display_resolution,display_scale=1}
+          game.get_player=function(index)return index==1 and player or index==2 and peer or nil end
+          local peer_root=library.open(peer,{family="external"})
+          assert(indicator(peer_root).tooltip==nil,"one player's bounded discovery warned an unrelated peer view")
+          local working=storage.mir_library.translations.working[1].cache
+          local epoch=storage.mir_library.translations.next_epoch
+          package.loaded["runtime.library"]=nil
+          library=require("runtime.library")
+          local available_game=game;game=nil;library.on_load();game=available_game
+          assert(storage.mir_library.translations.working[1].cache==working
+            and storage.mir_library.translations.next_epoch==epoch,
+            "cold-load reconnection changed durable discovery work")
+          root=library.open(player)
+          assert(#player.translation_requests==1 and indicator(root).tooltip[1]=="mir-browser.discovery-limited",
+            "cold-load lost settled discovery limits or issued duplicate requests")
+          player.display_resolution={width=480,height=400}
+          root=library.open(player)
+          assert(research_content(root).mir_library_actions.mir_library_count.tooltip[1]=="mir-browser.discovery-limited",
+            "narrow layout lost the count warning")
+          assert(indicator(peer_root).tooltip==nil)
+          library.close(player);gear.prototype.effects={}
+          root=library.open(player)
+          assert(indicator(root).tooltip==nil,"a new complete discovery scope kept an old warning")
+          assert(player.force.research_queue==queue and player.force.current_research==current
+            and player.force.research_progress==progress and gear.level==3 and gear.enabled==false)
+        ''')
+
+    def test_actual_discovery_transport_and_callback_failures_warn_without_changing_research(self):
+        self.lua.execute(r'''
+          for _,opponent in ipairs({"transport","failed-callback","partial-composition"}) do
+            boot()
+            prototypes={recipe={casting={localised_name="Casting",products={{type="item",name="gold"}}}},
+              item={gold={localised_name="Gold"}},fluid={}}
+            gear.prototype.effects={{type="unlock-recipe",recipe="casting"}}
+            if opponent=="transport" then player.request_translation=function()error("native transport refusal")end end
+            local queue,current,progress=player.force.research_queue,player.force.current_research,player.force.research_progress
+            local root=library.open(player)
+            if opponent~="transport" then
+              library.on_string_translated{player_index=1,id=player.translation_requests[1].id,
+                translated=opponent~="failed-callback",result="Gear\31Casting"}
+            end
+            local content=research_content(root)
+            local count=content.mir_library_count or content.mir_library_actions.mir_library_count
+            assert(count.tooltip and count.tooltip[1]=="mir-browser.discovery-limited",
+              "actual host lost discovery failure metadata: "..opponent)
+            local ledger=storage.mir_library.translations
+            assert(ledger.active[1]==nil and ledger.working[1].cache.labels[gear.name]==nil,
+              "failed discovery kept a native slot or published partial text")
+            assert(player.force.research_queue==queue and player.force.current_research==current
+              and player.force.research_progress==progress and gear.level==3 and gear.enabled==false)
+          end
+        ''')
+
+    def test_older_discovery_cache_renews_only_on_open_and_retains_issued_request_rights(self):
+        self.lua.execute(r'''
+          boot()
+          prototypes={recipe={casting={localised_name="Casting",products={}}},item={},fluid={}}
+          gear.prototype.effects={{type="unlock-recipe",recipe="casting"}}
+          local root=library.open(player)
+          local ledger=storage.mir_library.translations
+          local cache=ledger.working[1].cache
+          -- Exact pre-correction working-cache shape: the issued ledger has
+          -- no new fields, while derived work lacks discovery coverage data.
+          cache.discovery_subjects,cache.discovery_limited=nil,nil
+          local old_epoch,old_generation=ledger.next_epoch,cache.generation
+          local first=player.translation_requests[1].id
+          gear.prototype.effects={}
+          package.loaded["runtime.library"]=nil;library=require("runtime.library")
+          local available_game=game;game=nil;library.on_load();game=available_game
+          assert(cache.discovery_subjects==nil and cache.discovery_limited==nil
+            and cache.generation==old_generation and ledger.next_epoch==old_epoch
+            and #ledger.active[1].pending==1,"on_load migrated older discovery work")
+          root=library.open(player)
+          assert(ledger.next_epoch==old_epoch+1 and cache.generation==old_generation+1
+            and #player.translation_requests==2 and #ledger.active[1].pending==2,
+            "valid open did not renew derived coverage while retaining the old issued slot")
+          local allowed={request_id=true,key=true,scope=true,cache_generation=true,requested_tick=true}
+          for _,pending in ipairs(ledger.active[1].pending) do
+            local fields=0
+            for key in pairs(pending) do assert(allowed[key],"discovery metadata changed the issued-ID ledger");fields=fields+1 end
+            assert(fields==5)
+          end
+          library.on_string_translated{player_index=1,id=first,translated=true,result="invalid old composition"}
+          assert(#ledger.active[1].pending==1)
+          local content=research_content(root)
+          local count=content.mir_library_count or content.mir_library_actions.mir_library_count
+          assert(count.tooltip==nil,"an old-scope discovery callback contaminated the renewed view")
+          library.on_string_translated{player_index=1,id=player.translation_requests[2].id,
+            translated=true,result="Complete current caption"}
+          assert(ledger.active[1]==nil and cache.labels[gear.name]=="Complete current caption")
+        ''')
+
+    def test_unknown_saved_discovery_metadata_is_preserved_without_another_native_window(self):
+        self.lua.execute(r'''
+          boot()
+          library.open(player)
+          local ledger=storage.mir_library.translations
+          local saved=ledger.working[1]
+          saved.cache.discovery_limited="unknown-future-shape"
+          local pending,epoch=ledger.active[1],ledger.next_epoch
+          package.loaded["runtime.library"]=nil;library=require("runtime.library")
+          local available_game=game;game=nil;library.on_load();game=available_game
+          library.open(player)
+          assert(ledger.working[1]==saved and saved.cache.discovery_limited=="unknown-future-shape"
+            and ledger.active[1]==pending and ledger.next_epoch==epoch,
+            "unrecognized saved discovery metadata or its issued rights were replaced")
+          assert(#player.translation_requests==1,"unknown working metadata opened a second request window")
+        ''')
+
     def test_pure_prototype_constructor_preserves_published_shortcut_identity(self):
         self.lua.globals().prototype_source = (ROOT / "source/presentation/shortcut.lua").as_posix()
         self.lua.execute('''
@@ -1268,7 +1405,7 @@ class LibraryTests(unittest.TestCase):
             "not-added", "productivity-current-cap", "productivity-current-cap-range",
             "no-next-benefit", "live-detail-unavailable",
             "report-options", "report-settings", "report-omissions", "report-preview", "report-select", "report-local",
-            "debug-refresh",
+            "debug-refresh", "discovery-limited",
             "search-settings", "hide", "show", "show-hidden", "inspect-settings", "hide-tooltip",
             "show-tooltip", "layout-smaller",
             "layout-larger", "layout-reset",
