@@ -268,7 +268,7 @@ class LibraryTests(unittest.TestCase):
             library = require("runtime.library")
           end
 
-          function route_native_events(reload_library, caps_active)
+          function route_native_events(reload_library, caps_active, extra_events)
             native_handlers, native_ticks = {events={}}, {}
             native_cap_completions = 0
             native_policy_reset_force = nil
@@ -291,6 +291,7 @@ class LibraryTests(unittest.TestCase):
               on_research_cancelled=4,on_research_reversed=5,on_research_queued=6,on_research_moved=7,
               on_technology_effects_reset=8,on_force_reset=9,on_forces_merged=10,
               on_player_left_game=11,on_player_joined_game=12,on_player_changed_force=13}}
+            for name,id in pairs(extra_events or {}) do defines.events[name]=id end
             remote = {interfaces={},add_interface=function(name,methods) remote.interfaces[name]=methods end}
             commands = {add_command=function() end}
             if reload_library then
@@ -1655,6 +1656,66 @@ class LibraryTests(unittest.TestCase):
           library.on_player_removed({player_index = 1})
           assert(storage.mir_library.players[1] == nil,
             "post-removal must retire the removed player's Library state")
+        ''')
+
+    def test_completed_or_closed_player_keeps_peer_translation_maintenance_until_its_reply(self):
+        self.lua.execute(r'''
+          for _,order in ipairs({"reply-first","close-first"}) do
+            boot()
+            local peer={valid=true,index=2,name="Bob",locale="de",connected=true,force=player.force,
+              gui={screen=gui_container(nil)},display_resolution=player.display_resolution,display_scale=1,
+              translation_requests={}}
+            peer.request_translation=function(payload)
+              peer.translation_requests[#peer.translation_requests+1]={id=202,localised=payload}
+              return 202
+            end
+            player.request_translation=function(payload)
+              player.translation_requests[#player.translation_requests+1]={id=101,localised=payload}
+              return 101
+            end
+            game.get_player=function(index)return index==1 and player or index==2 and peer or nil end
+            route_native_events(false,false,{on_string_translated=14})
+            local open=remote.interfaces["more-infinite-research-browser"].open
+            assert(open(1) and open(2))
+            local first=player.gui.screen.mir_research_browser
+            local second=peer.gui.screen.mir_research_browser
+            local query=second.mir_library_filters.mir_library_query
+            local queue,current,progress=player.force.research_queue,player.force.current_research,player.force.research_progress
+            local ledger=storage.mir_library.translations
+            local peer_cache=ledger.working[2].cache
+            local peer_pending=ledger.active[2].pending[1]
+            assert(peer_pending.request_id==202 and #player.translation_requests==1
+              and #peer.translation_requests==1)
+            local reply=native_handlers.events[14]
+            local close=native_handlers.events[defines.events.on_gui_closed]
+            local function first_reply()
+              reply{player_index=1,id=101,translated=true,result="First player caption"}
+            end
+            local function first_close()
+              close{player_index=1,element=first}
+            end
+            if order=="reply-first" then first_reply();first_close()
+            else first_close();first_reply() end
+
+            assert(library.subscription_needs() and native_ticks[library.translation_maintenance_ticks]~=nil,
+              "another player's issued translation must keep actual maintenance registered")
+            assert(not first.valid and player.gui.screen.mir_research_browser==nil
+              and ledger.active[1]==nil and ledger.working[1]==nil)
+            assert(second.valid and peer.gui.screen.mir_research_browser==second
+              and query==second.mir_library_filters.mir_library_query and query.text=="",
+              "completion/close replaced or edited the peer's owned view")
+            assert(ledger.working[2].cache==peer_cache and ledger.active[2].pending[1].request_id==202
+              and peer_cache.labels[gear.name]==nil and #peer.translation_requests==1,
+              "completion/close consumed or relabelled the peer's issued work")
+            reply{player_index=2,id=202,translated=true,result="Zahnrad des zweiten Spielers"}
+            assert(not library.subscription_needs() and native_ticks[library.translation_maintenance_ticks]==nil,
+              "the final peer callback must remove translation maintenance")
+            assert(ledger.active[2]==nil and peer_cache.labels[gear.name]=="Zahnrad des zweiten Spielers")
+            assert(research_content(second).mir_library_results.items[1]=="Zahnrad des zweiten Spielers"
+              and second==peer.gui.screen.mir_research_browser and query==second.mir_library_filters.mir_library_query)
+            assert(player.force.research_queue==queue and player.force.current_research==current
+              and player.force.research_progress==progress and gear.level==3 and gear.enabled==false)
+          end
         ''')
 
     def test_translation_dispatch_is_open_connected_only_and_closed_callbacks_only_release(self):
