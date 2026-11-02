@@ -3227,6 +3227,314 @@
             "distinct_retained_tag_path_locators": 57,
             "scope": "The original91-tag local index includes an unpublished alias alongside the retained stable tag. Keep every original locator entry and mark its submitted_tag where corrected; do not count canonicalized duplicate labels as independent sources. Commit/path/blob/hash tuples, original commits/raw index/receipts, authored expectations and all native limits remain unchanged. No remote or local Git tag is modified."
           }
+        },
+        {
+          "id": "localized-discovery-limit-warning-source-restoration",
+          "reviewed_on": "2026-11-02",
+          "reviewed_against": "06952a752b508808e5d2d5b757d55e524c9ee0ca",
+          "requirement": [
+            "RUN-02",
+            "RUN-04",
+            "CONT-10"
+          ],
+          "independent_expectation": "Published v4.7.3 research_browser.lua blob4c375e78aa53ae11a7c464f4ade8e1f370437da5 line399 attaches mir-browser.discovery-limited to the fixed result count after incomplete localized recipe/material discovery. The historical construction/callback opponents require honest subject/work/byte/transport/retry limits and raw-ID fallback for malformed composition; personal and native-research ownership remain intact.",
+          "historical_review_link": "PR1566/c082efd0243e08c858e100ca5f493f0b552bea83 records the7-blob/58-ref discovery group and three narrow host/EN/DE warning-consumer witnesses. Its open-gap statement is accurate at reviewed06952a752 and is preserved as that snapshot; this additive successor record closes source/host restoration only.",
+          "current_implementation": [
+            "source/runtime/library.lua",
+            "source/runtime/library_translations.lua"
+          ],
+          "changes": [
+            "The existing player-local working cache retains associated-subject counts and a scope-local discovery_limited boolean. The native issued-ID ledger fields are unchanged; no new general state/migration framework is introduced.",
+            "Payload construction limits survive the real host request boundary, including native transport refusal. Failed/malformed/partial/oversized or cache-byte-refused associated responses use raw-ID fallback and mark incomplete coverage. A first timeout retries; exhaustion marks the limitation. Stale callbacks release their original slots without labelling or warning another scope.",
+            "The existing result-count label receives the original localized tooltip in both split and narrow layouts. Root/query/filter identity, focus, player preferences and native research authority remain unchanged by this feedback.",
+            "An older metadata-free working cache is reconnected read-only during on_load, then renews derived work under a fresh scope during a valid open/render while retaining issued native slots. Settled current metadata survives cold load without duplicate requests. Unrecognized metadata remains preserved without another native request window.",
+            "Exactly one original authored discovery-limited key is restored in every one of50 Library locale files. Removing only that key reproduces each complete pre-edit file byte-for-byte."
+          ],
+          "locale_sources": [
+            {
+              "locale": "af",
+              "published_ref": "v4.7.3:source/locale/af/more-infinite-research.cfg",
+              "blob": "c2d2bc9ce8f6e487617fb99cf044e502660d7988"
+            },
+            {
+              "locale": "ar",
+              "published_ref": "v4.7.3:source/locale/ar/more-infinite-research.cfg",
+              "blob": "cebdfd7b8767981adce6387de4129158a486dd96"
+            },
+            {
+              "locale": "be",
+              "published_ref": "v4.7.3:source/locale/be/more-infinite-research.cfg",
+              "blob": "9f5f34268b87d5b6c5ddbd1df2b7aaa2cfdd3fd7"
+            },
+            {
+              "locale": "bg",
+              "published_ref": "v4.7.3:source/locale/bg/more-infinite-research.cfg",
+              "blob": "e48152aee63a75caa75b1b35040c9844826a16d1"
+            },
+            {
+              "locale": "ca",
+              "published_ref": "v4.7.3:source/locale/ca/more-infinite-research.cfg",
+              "blob": "fad8f5751d5a7c3808d265c5c5d4bbdf24d7b53e"
+            },
+            {
+              "locale": "cs",
+              "published_ref": "v4.7.3:source/locale/cs/more-infinite-research.cfg",
+              "blob": "fee373e250f950e3432c5f5ef6dfdeab18aea9ba"
+            },
+            {
+              "locale": "da",
+              "published_ref": "v4.7.3:source/locale/da/more-infinite-research.cfg",
+              "blob": "76deb8cfeeacc7e63bb5b4cc79b4bb66786ebcab"
+            },
+            {
+              "locale": "de",
+              "published_ref": "v4.7.3:source/locale/de/more-infinite-research.cfg",
+              "blob": "b2ac5d71134fe2ad07ca349a40f0a55ed3688435"
+            },
+            {
+              "locale": "el",
+              "published_ref": "v4.7.3:source/locale/el/more-infinite-research.cfg",
+              "blob": "b8716eca6e42e75cd2974bcaab4ba9d1baa8f0f9"
+            },
+            {
+              "locale": "en",
+              "published_ref": "v4.7.3:source/locale/en/more-infinite-research.cfg",
+              "blob": "883df30cf39bc1473b4a9ad4cd6ae9788511e14f"
+            },
+            {
+              "locale": "eo",
+              "published_ref": "v4.7.3:source/locale/eo/more-infinite-research.cfg",
+              "blob": "e2ae1026c9f74e043a5ef6e70404231b9d75b151"
+            },
+            {
+              "locale": "es-ES",
+              "published_ref": "v4.7.3:source/locale/es-ES/more-infinite-research.cfg",
+              "blob": "c445ef5726d5c6641ef11b01ac3409e27a6fd515"
+            },
+            {
+              "locale": "et",
+              "published_ref": "v4.7.3:source/locale/et/more-infinite-research.cfg",
+              "blob": "481f429563f9aede84b4170b941dddd7214769a5"
+            },
+            {
+              "locale": "eu",
+              "published_ref": "v4.7.3:source/locale/eu/more-infinite-research.cfg",
+              "blob": "d4cfa7de658a93186e26384628d3a1a7d42e51e9"
+            },
+            {
+              "locale": "fa",
+              "published_ref": "v4.7.3:source/locale/fa/more-infinite-research.cfg",
+              "blob": "ca229dc1d3c81c7670aa59143cbb3da240554e20"
+            },
+            {
+              "locale": "fi",
+              "published_ref": "v4.7.3:source/locale/fi/more-infinite-research.cfg",
+              "blob": "50348d8ee3d806f03e32faeac35d644bddd1b538"
+            },
+            {
+              "locale": "fil",
+              "published_ref": "v4.7.3:source/locale/fil/more-infinite-research.cfg",
+              "blob": "3ace04af2112e50f7980332e3a66c98ad53edf68"
+            },
+            {
+              "locale": "fr",
+              "published_ref": "v4.7.3:source/locale/fr/more-infinite-research.cfg",
+              "blob": "55a51aaf52d660f29ea18cb7e0ae5a8d8fceac06"
+            },
+            {
+              "locale": "fy-NL",
+              "published_ref": "v4.7.3:source/locale/fy-NL/more-infinite-research.cfg",
+              "blob": "efce41953fc137be2c657d13dc4996c0cff1d47f"
+            },
+            {
+              "locale": "ga-IE",
+              "published_ref": "v4.7.3:source/locale/ga-IE/more-infinite-research.cfg",
+              "blob": "cccbeb84bef33f00fe2b68eeb691e4b093609834"
+            },
+            {
+              "locale": "he",
+              "published_ref": "v4.7.3:source/locale/he/more-infinite-research.cfg",
+              "blob": "becc4ac12b860de10616ea9b9870599d85d4dda0"
+            },
+            {
+              "locale": "hr",
+              "published_ref": "v4.7.3:source/locale/hr/more-infinite-research.cfg",
+              "blob": "13915f2e21a5e85f8bf623801bf3d19bab726c11"
+            },
+            {
+              "locale": "hu",
+              "published_ref": "v4.7.3:source/locale/hu/more-infinite-research.cfg",
+              "blob": "8fc55b56a74d0c74c620159dc7d1354937c5ea52"
+            },
+            {
+              "locale": "id",
+              "published_ref": "v4.7.3:source/locale/id/more-infinite-research.cfg",
+              "blob": "b381d5956083b71fd1d4dd89ee16f2d7056c2211"
+            },
+            {
+              "locale": "is",
+              "published_ref": "v4.7.3:source/locale/is/more-infinite-research.cfg",
+              "blob": "9487134d9336694321f4359d59563d295475affc"
+            },
+            {
+              "locale": "it",
+              "published_ref": "v4.7.3:source/locale/it/more-infinite-research.cfg",
+              "blob": "5e54eef393a39192ccb14a1ee65b7fe8399dd606"
+            },
+            {
+              "locale": "ja",
+              "published_ref": "v4.7.3:source/locale/ja/more-infinite-research.cfg",
+              "blob": "85ea13a6ed5e2091bd33085306d5518d3059a6b3"
+            },
+            {
+              "locale": "ka",
+              "published_ref": "v4.7.3:source/locale/ka/more-infinite-research.cfg",
+              "blob": "1c592059ebe8c9cd3ba0e3ca653b9d857fdaac60"
+            },
+            {
+              "locale": "kk",
+              "published_ref": "v4.7.3:source/locale/kk/more-infinite-research.cfg",
+              "blob": "ca9a749a8081023c4de9b0ad013d4c7ee121c959"
+            },
+            {
+              "locale": "ko",
+              "published_ref": "v4.7.3:source/locale/ko/more-infinite-research.cfg",
+              "blob": "68b7c846b92876511deabe6b7bf5848195b902a9"
+            },
+            {
+              "locale": "lt",
+              "published_ref": "v4.7.3:source/locale/lt/more-infinite-research.cfg",
+              "blob": "7dd379eae3f90a50e47bfc36a1fd46edd7d7f36b"
+            },
+            {
+              "locale": "lv",
+              "published_ref": "v4.7.3:source/locale/lv/more-infinite-research.cfg",
+              "blob": "6801876221dcd6e132ad13d0ae873bcdbdc7448d"
+            },
+            {
+              "locale": "nl",
+              "published_ref": "v4.7.3:source/locale/nl/more-infinite-research.cfg",
+              "blob": "5364247d5ff03213c4f96748035bb91efce5ec38"
+            },
+            {
+              "locale": "no",
+              "published_ref": "v4.7.3:source/locale/no/more-infinite-research.cfg",
+              "blob": "6c685f1ae905a855fda9063a8c0acc7d128f35ef"
+            },
+            {
+              "locale": "pl",
+              "published_ref": "v4.7.3:source/locale/pl/more-infinite-research.cfg",
+              "blob": "bd3121171262d653c7a43dc5e2844a955ea1844a"
+            },
+            {
+              "locale": "pt-BR",
+              "published_ref": "v4.7.3:source/locale/pt-BR/more-infinite-research.cfg",
+              "blob": "15c9a2042a7686c61c16aa68fe583dd885990502"
+            },
+            {
+              "locale": "pt-PT",
+              "published_ref": "v4.7.3:source/locale/pt-PT/more-infinite-research.cfg",
+              "blob": "59d08fa5f7d96f48b2e89cd8ec2236c3c788db2f"
+            },
+            {
+              "locale": "ro",
+              "published_ref": "v4.7.3:source/locale/ro/more-infinite-research.cfg",
+              "blob": "a940c42d5f5402347c7698a0480bbf30c8af8a14"
+            },
+            {
+              "locale": "ru",
+              "published_ref": "v4.7.3:source/locale/ru/more-infinite-research.cfg",
+              "blob": "7706db5f40391baa1faf589b43ef8fa30541994c"
+            },
+            {
+              "locale": "sk",
+              "published_ref": "v4.7.3:source/locale/sk/more-infinite-research.cfg",
+              "blob": "46259e4c39c6385770d1cf3a1def2c76ec29cd50"
+            },
+            {
+              "locale": "sl",
+              "published_ref": "v4.7.3:source/locale/sl/more-infinite-research.cfg",
+              "blob": "1b26a6e70d3c85dd21a91f3a9c749a356363062c"
+            },
+            {
+              "locale": "sq",
+              "published_ref": "v4.7.3:source/locale/sq/more-infinite-research.cfg",
+              "blob": "f058f4ce42e8b3d9a3517b0b7d43a6a5177b77f7"
+            },
+            {
+              "locale": "sr",
+              "published_ref": "v4.7.3:source/locale/sr/more-infinite-research.cfg",
+              "blob": "dec2ccf2f7504e76e6eb69b347de4379d39fcc9b"
+            },
+            {
+              "locale": "sv-SE",
+              "published_ref": "v4.7.3:source/locale/sv-SE/more-infinite-research.cfg",
+              "blob": "aadd717dbf77e586156d9d0558a81e8c44430575"
+            },
+            {
+              "locale": "th",
+              "published_ref": "v4.7.3:source/locale/th/more-infinite-research.cfg",
+              "blob": "bffa29483fbfe215b4746a11419ba0c92dbfe0c0"
+            },
+            {
+              "locale": "tr",
+              "published_ref": "v4.7.3:source/locale/tr/more-infinite-research.cfg",
+              "blob": "2518f22363ef321bbe83f99ffcf87a98d288e595"
+            },
+            {
+              "locale": "uk",
+              "published_ref": "v4.7.3:source/locale/uk/more-infinite-research.cfg",
+              "blob": "5dc70494e9f4bd96cf1a96d4cadedb0d78ec3052"
+            },
+            {
+              "locale": "vi",
+              "published_ref": "v4.7.3:source/locale/vi/more-infinite-research.cfg",
+              "blob": "b8e67b14865801c238c0b53ce24c1484ded3f0cf"
+            },
+            {
+              "locale": "zh-CN",
+              "published_ref": "v4.7.3:source/locale/zh-CN/more-infinite-research.cfg",
+              "blob": "fe3375d8a68e801fec3450238ed81f00367c897e"
+            },
+            {
+              "locale": "zh-TW",
+              "published_ref": "v4.7.3:source/locale/zh-TW/more-infinite-research.cfg",
+              "blob": "d7d7ce1de92f60bda634e1ba7b2a4d8fcd421657"
+            }
+          ],
+          "current_host_controls": [
+            "tests/test_library.py::test_limited_discovery_warning_is_personal_retained_and_uses_the_existing_count",
+            "tests/test_library.py::test_actual_discovery_transport_and_callback_failures_warn_without_changing_research",
+            "tests/test_library.py::test_older_discovery_cache_renews_only_on_open_and_retains_issued_request_rights",
+            "tests/test_library.py::test_unknown_saved_discovery_metadata_is_preserved_without_another_native_window",
+            "tests/test_library_translations.py::test_discovery_limits_follow_payload_callback_and_cache_byte_boundaries",
+            "tests/test_library_translations.py::test_discovery_transport_timeout_and_stale_scope_preserve_request_accounting",
+            "tests/test_library_translations.py::test_legacy_discovery_metadata_is_read_only_until_explicit_work_renewal"
+          ],
+          "validation": {
+            "library_controls": 86,
+            "translation_controls": 18,
+            "selected_control_total": 104,
+            "exact_pre_fix_source_control_detected": true,
+            "in_memory_semantic_opponents_detected": 2,
+            "named_control_mappings_verified": 7,
+            "original_locale_bytes_preserved": 50,
+            "lua": "5.2",
+            "lupa": "2.6",
+            "exact_head_ci": "required after commit"
+          },
+          "remaining_executable_check": "Black Glass independently reviews and integrates the correction, freezes exact successor bytes and qualifies affected tooltip rendering and localized long/limited/failed discovery with client/locale/layout and cold/configuration/beta-to-successor inputs. Existing published501 native results retain their original identities; they do not qualify this changed source. First-open/search/refresh/memory and any shared startup impact need consumed-input performance review rather than blanket evidence reuse.",
+          "limits": [
+            "This is a source/host correction, not native rendering, real save/client acceptance or stable release.",
+            "The inactive-provider icon-setting matrix and remaining historical/transport/peer-pending source mappings retain their own dispositions.",
+            "No original request, earlier evidence, authored release version, published asset/tag, private controller/native fixture or shared progress header changes."
+          ],
+          "owner": "Aero: bounded successor correction and host/locale evidence; Black Glass: independent integration, frozen candidate and affected native/performance applicability.",
+          "custody": "build/qualification/aero-library-warning-r01/",
+          "native_execution": false,
+          "source_reconciliation_complete": false,
+          "test_intent_reconciliation_complete": false,
+          "release_qualification": false
         }
       ],
       "test_subjects": [
