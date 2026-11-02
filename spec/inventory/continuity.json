@@ -8804,7 +8804,7 @@
         "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
       }
     ],
-    "next_bounded_work": "The selected 35-body upgrade runner, 17-body specialization helpers, seven imported comparator/canonical/frontier bodies, six runtime entry-point bodies and 22 settings/registry/default bodies now have bounded source dispositions. Preserve independent review, exact refs, original author history and both adverse and subsequently supplied custody records. Reconcile remaining generated orchestration, effective/nondefault settings, control callbacks, compatibility/inter-release and unknown-consumer intent plus original frontier input provenance without restoring retired machinery. Source counts, wrapper mappings and declaration comparisons do not close VER-07 or native saved-state behavior. Use the existing finite nine/seven/four migration queue and final consumed-input review; do not restart every-old-patch campaigns or unchanged completed cases. Exact published 5.0.1 F200 R20 and F210 R05 observations retain their scopes. Frozen C has only its named component verdicts; changed source and package inputs, shared runtime catalogue/cap/API, beta-successor state and affected current-candidate scenarios need their own applicability review before dispatch. Black Glass owns exact packets, the native queue and current progress header; Aero owns historical/applicability/documentation work and independent review. Preserve every completed/adverse execution identity.",
+    "next_bounded_work": "The three named runtime-replay/private-runtime test families now have a bounded five-body/47-binding source-intent disposition, preserving their no-admission/no-public-support and repeated-predecessor-load limits. Imported verifiers/writers/helper implementations and original raw native receipt custody remain separate. The selected 35-body upgrade runner, 17-body specialization helpers, seven imported comparator/canonical/frontier bodies, six runtime entry-point bodies and 22 settings/registry/default bodies now have bounded source dispositions. Preserve independent review, exact refs, original author history and both adverse and subsequently supplied custody records. Reconcile remaining generated orchestration, effective/nondefault settings, control callbacks, compatibility/inter-release and unknown-consumer intent plus original frontier input provenance without restoring retired machinery. Source counts, wrapper mappings and declaration comparisons do not close VER-07 or native saved-state behavior. Use the existing finite nine/seven/four migration queue and final consumed-input review; do not restart every-old-patch campaigns or unchanged completed cases. Exact published 5.0.1 F200 R20 and F210 R05 observations retain their scopes. Frozen C has only its named component verdicts; changed source and package inputs, shared runtime catalogue/cap/API, beta-successor state and affected current-candidate scenarios need their own applicability review before dispatch. Black Glass owns exact packets, the native queue and current progress header; Aero owns historical/applicability/documentation work and independent review. Preserve every completed/adverse execution identity.",
     "bounded_intent_reviews": [
       {
         "subjects": [
@@ -16086,6 +16086,107 @@
         "native_execution": false,
         "request_decisions_changed": false,
         "whole_source_reconciliation_complete": false
+      },
+      {
+        "reviewed_on": "2026-11-03",
+        "reviewed_against": "551532d4dd458445b19ed42e4e8d4a22d9ba628a",
+        "subjects": [
+          "CONT-11",
+          "CONT-13",
+          "CONT-16",
+          "CONT-17",
+          "VER-07"
+        ],
+        "scope": "Three named runtime-replay/private-runtime test families and their path aliases only: five distinct bodies/64909bytes/47 live remote tag-path bindings from the retained91-tag index. Imported replay verifiers, authority writers, helper implementations, raw original native receipts, inter-release removals, attachments and other test families remain outside this slice.",
+        "method": "Read the unique F2D and Static bodies, latest private-runner body and complete earlier differences. Authenticate raw Git blob bytes, every commit/path binding and current remote tags. Do not execute historical PowerShell, native commands, cleanup or staging.",
+        "source_discovery": {
+          "index_sha256": "183AC3B7903A3B7E9E00192B88CF396357F3F1919AE8FB099B5C80004224EB1C",
+          "indexed_tags": 91,
+          "selected_bodies": 5,
+          "selected_body_bytes": 64909,
+          "distinct_remote_tag_path_bindings": 47,
+          "preserved_indexed_alias_bindings": 2,
+          "alias_policy": "The indexed local v4.2.0 references are retained but deduplicated into the same live v4.2.0-stable commit/path, never an extra published source."
+        },
+        "whole_source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_tests_run": false,
+        "release_qualification": false,
+        "evidence": "spec/evidence/historical-runtime-replay-private-intents-aero-r01.json",
+        "groups": [
+          {
+            "id": "exact-inputs-and-preserved-custody",
+            "disposition": "consolidate-existing-controls-and-retain-native-obligations",
+            "independent_expectation": "F2D checks exact2.0.77/D3,1.1.110/B7B4 and1.0.0/99F1 locks plus wrong-hash/version/build refusal, contained child-versus-sibling cleanup and retained input/evidence identities. The private historical runner checks exact engine/predecessor hashes, unique package-root metadata and candidate target/version; the static companion opposes timestamp normalization, metadata/hosting mismatches and shared mutable settings. These are input/custody obligations, not proof that any engine ran.",
+            "current_implementation": [
+              "tools/Invoke-NativeFixture.ps1",
+              "tools/package.py",
+              "tools/release.py",
+              "tests/historical_sources.py"
+            ],
+            "existing_host_controls": [
+              "tests/test_historical_sources.py::HistoricalSourceTests::test_does_not_read_a_current_worktree_file",
+              "tests/test_historical_sources.py::HistoricalSourceTests::test_rejects_changed_expected_bytes",
+              "tests/test_historical_sources.py::HistoricalSourceTests::test_missing_object_is_a_failure_without_worktree_or_network_fallback",
+              "tests/test_package.py::PackageTests::test_archive_identity_mismatch_is_refused_before_output",
+              "tests/test_release.py::ReleaseTests::test_verification_rejects_release_source_target_and_controller_identity_mutations"
+            ],
+            "remaining_executable_check": "Apply current exact-input/admission/restoration and original-timestamp custody controls to each actually affected packet; retain originals and separate natural exit, predicate stop, runner and product outcomes. Do not revive old cleanup/staging machinery or infer a current pass from the source mapping.",
+            "owner": "Aero source-intent review; Black Glass exact native packets and custody"
+          },
+          {
+            "id": "repeat-predecessor-load-is-not-successor-persistence",
+            "disposition": "retain-original-limited-claim-consolidate-stronger-current-migration-gate",
+            "independent_expectation": "All three historical private-runner variants create one predecessor save, then pass that same save to candidate-upgrade-load and candidate-repeat-load-1/-2. They assert exact package loading, map/hosting readiness and healthy logs. They do not write a completed candidate save, assert paid research/effects/queues/partial work, or observe that candidate save through two independent cold loads. Their own admission_status says private-proof-only-repeat-loads-do-not-satisfy-admission-reload-gate, and public_support_claim is false.",
+            "current_implementation": [
+              "spec/migrations.md",
+              "tests/fixtures/historical-transition/control.lua",
+              "tools/Invoke-NativeFixture.ps1"
+            ],
+            "existing_host_controls": [
+              "tests/test_historical_native_runner.py::HistoricalNativeFixtureControls::test_runner_keeps_historical_server_reloads_separate_from_the_modern_benchmark_vector",
+              "tests/test_historical_native_runner.py::HistoricalNativeFixtureControls::test_historical_save_completion_requires_a_closed_native_archive",
+              "tests/test_historical_transition_fixture.py::HistoricalTransitionFixtureControls::test_published_to_mir5_mock_preserves_partial_progress_and_queue_until_real_successor_event",
+              "tests/test_historical_transition_fixture.py::HistoricalTransitionFixtureControls::test_completed_successor_configuration_reentry_is_observational_and_rejects_corruption"
+            ],
+            "remaining_executable_check": "Use the existing finite migration queue and exact protected origin -> normal candidate -> saved candidate -> two independent cold loads with affected paid/effect/queue/progress/ownership witnesses. No every-old-patch restart, new historical campaign or weaker repeat-load substitute follows.",
+            "owner": "Black Glass executes affected named routes; Aero reviews expectations/applicability"
+          },
+          {
+            "id": "retired-private-staging-and-mocked-process-controls",
+            "disposition": "superseded-implementation-preserve-accepted-safety-intent",
+            "independent_expectation": "The final private runner is deliberately unreachable: an unconditional mir-native-obsolete-runner refusal precedes helpers, staging or engine calls. The static companion verifies this refusal, then extracts historical helper functions into controlled mocks: ten predecessor/candidate stages across0.13-0.17, hardlink-only immutable archives, distinct private settings files, a4MiB settings bound, absent settings, exact package/map/hosting predicates, and a supervised exit-1 only after the required proof. It reports zero Factorio processes. Earlier variants copied archives and used a direct process loop; the later variant adds resource governance, leases and no-overwrite evidence custody while retaining the limited load oracle.",
+            "current_implementation": [
+              "AGENTS.md",
+              "docs/development.md",
+              "tools/Invoke-NativeFixture.ps1"
+            ],
+            "existing_host_controls": [
+              "tests/test_historical_native_runner.py::HistoricalNativeFixtureControls::test_actual_owned_version_selector_covers_fresh_and_transition_old_engines",
+              "tests/test_historical_native_runner.py::HistoricalNativeFixtureControls::test_all_eight_profiles_select_only_exact_base_mir_and_shared_fixture",
+              "tests/test_historical_transition_fixture.py::HistoricalTransitionFixtureControls::test_transition_archive_guard_pins_stage_dependency_and_source_members"
+            ],
+            "remaining_executable_check": "No executable port is needed for the retired module names, staged-directory layout or hardlink-only requirement. Keep current direct-library and cross-checkout no-hardlink rules binding. Review the actual governed caller and library/control restoration for each new native packet; do not re-enable this historical runner.",
+            "owner": "Black Glass owns live controller/library composition; Aero retains bounded source disposition"
+          },
+          {
+            "id": "old-replay-authority-and-target-selection",
+            "disposition": "superseded-authority-layout-retain-identity-and-gate-separation",
+            "independent_expectation": "F2D checks a particular old runtime-replay CLI/coordinator/schema/authority layout, a four-target aggregate and a frozen F200 receipt hash. Its expected aggregate status is explicitly PASSED-NO-CUTOVER and its transition/publication/signing/sealing booleans remain false. The code separately expects an M41-F2E cutover programme record; it does not itself prove that record's underlying execution. Its F210 latest-installed-experimental selection is a historical input policy, not permission to change an engine during a current pinned campaign.",
+            "current_implementation": [
+              "spec/targets.md",
+              "spec/verification.md",
+              "docs/development.md",
+              "tools/release.py"
+            ],
+            "existing_host_controls": [
+              "tests/test_release.py::ReleaseTests::test_verification_rejects_missing_extra_changed_and_duplicate_assets",
+              "tests/test_release.py::ReleaseTests::test_verification_rejects_release_source_target_and_controller_identity_mutations"
+            ],
+            "remaining_executable_check": "None for obsolete schema/CLI/writer/count/old receipt-hash shapes. Final edition/native/package/delivery checks retain their existing current gates and supported-scope limits; do not restore an authority framework or silently expand private historical support.",
+            "owner": "Black Glass release coordinator; Aero independent artifact/claim review"
+          }
+        ]
       }
     ],
     "stable_coverage_review": {
