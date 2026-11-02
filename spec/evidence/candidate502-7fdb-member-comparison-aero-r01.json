@@ -1,0 +1,215 @@
+{
+  "kind": "MIRAero502IndependentBToCMemberComparisonV1",
+  "all20_file_identities_equal_black_glass_readback": true,
+  "all17_member_comparisons_equal_black_glass_readback": true,
+  "source_delta": [
+    "source/changelog.txt"
+  ],
+  "archives": [
+    {
+      "archive": "more-infinite-research_5.0.00602.zip",
+      "members": 10,
+      "old_sha256": "C88248D394B2204044E44968297801AAE256726E3ADDA2FE0DDC04E8BEBA5B91",
+      "new_sha256": "93B34BEF58CD97FACA9A7E3125B31F9DA2623E12A01893859811D4D747F764F6",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "exact_replacement": "Preview diagnostic reports in Help -> Preview diagnostic reports in Debug",
+      "all_other_members_identical": true,
+      "compressed_bytes_added": 3
+    },
+    {
+      "archive": "more-infinite-research_5.0.00702.zip",
+      "members": 10,
+      "old_sha256": "2948620831EF00DC92DFE4CFFB7BF63FFE99AAAD61428DC2CA05E1FEE208C3FE",
+      "new_sha256": "61A6F2C24E4E694B443D8393833452D65DA2665F0C51BAD28EB678365F8C82F5",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "exact_replacement": "Preview diagnostic reports in Help -> Preview diagnostic reports in Debug",
+      "all_other_members_identical": true,
+      "compressed_bytes_added": 3
+    },
+    {
+      "archive": "more-infinite-research_5.0.00802.zip",
+      "members": 10,
+      "old_sha256": "C5072BEF8A284EC518831C93B4F2625D67E8C66DCCAFC4A11ACA94F7861BE64E",
+      "new_sha256": "9BC74F9873CCB3CAB4CD496630F26F6D6582F543F72363818275C33EB50E13B0",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "exact_replacement": "Preview diagnostic reports in Help -> Preview diagnostic reports in Debug",
+      "all_other_members_identical": true,
+      "compressed_bytes_added": 3
+    },
+    {
+      "archive": "more-infinite-research_5.0.00902.zip",
+      "members": 10,
+      "old_sha256": "905806066FBF7E0BE5FB41928A2B0591494CAE3A91905853C14106C4467324FA",
+      "new_sha256": "D0638C4792C57DC0D29645CCDF35969257290580D1B2316225D11FC3B7164810",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "exact_replacement": "Preview diagnostic reports in Help -> Preview diagnostic reports in Debug",
+      "all_other_members_identical": true,
+      "compressed_bytes_added": 3
+    },
+    {
+      "archive": "more-infinite-research_5.0.01002.zip",
+      "members": 10,
+      "old_sha256": "765BDB66B33C825E07D34783707CBDC0CFB75227896B4011C42A0F4B5947B670",
+      "new_sha256": "6F2E4330A41CE7C52029FF5877FDFDBCB8C4F5EC6EFF8B6499775063F5093792",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "exact_replacement": "Preview diagnostic reports in Help -> Preview diagnostic reports in Debug",
+      "all_other_members_identical": true,
+      "compressed_bytes_added": 3
+    },
+    {
+      "archive": "more-infinite-research_5.0.01102.zip",
+      "members": 10,
+      "old_sha256": "B520E814753BA0FB4B5EDD191BD1A634D8273A5EC61248809112666311F3F3DE",
+      "new_sha256": "7D5E32590A8A0AFCF0FDB3596FE442EA4903B630930FE93F882126E01A0A6149",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "exact_replacement": "Preview diagnostic reports in Help -> Preview diagnostic reports in Debug",
+      "all_other_members_identical": true,
+      "compressed_bytes_added": 3
+    },
+    {
+      "archive": "more-infinite-research_5.0.01202.zip",
+      "members": 10,
+      "old_sha256": "C7CF899589ABAA2F2C6D43D7A09CC8CA7049ACCD0391081612C2EF6ED6BF02A8",
+      "new_sha256": "1A9E84826DB9972A4101D19129DB17F7EEFE513E655FA06AB7A63F9B669E9E79",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "exact_replacement": "Preview diagnostic reports in Help -> Preview diagnostic reports in Debug",
+      "all_other_members_identical": true,
+      "compressed_bytes_added": 3
+    },
+    {
+      "archive": "more-infinite-research_5.0.01302.zip",
+      "members": 127,
+      "old_sha256": "95A6B7121016AA254A0787FC71EF1AD8A610BE0482211C11451D8C436F84C68E",
+      "new_sha256": "D5C92C71F7CD6100BBD85E0F81BB643E25AD3CBE62D6BA6005325715F7E495AA",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "exact_replacement": "Preview diagnostic reports in Help -> Preview diagnostic reports in Debug",
+      "all_other_members_identical": true,
+      "compressed_bytes_added": 3
+    },
+    {
+      "archive": "more-infinite-research_5.0.01402.zip",
+      "members": 127,
+      "old_sha256": "CE75B22AB04E29F7452F519C45EA69688645E2C730AEAAA4B716597A6CEF1001",
+      "new_sha256": "8E39E6D427C7D3F707347B4DA83195942BEDF03AC25A87B73659DC4E21420424",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "exact_replacement": "Preview diagnostic reports in Help -> Preview diagnostic reports in Debug",
+      "all_other_members_identical": true,
+      "compressed_bytes_added": 3
+    },
+    {
+      "archive": "more-infinite-research_5.0.01502.zip",
+      "members": 127,
+      "old_sha256": "38E981EEB3B6CE03CE3408758D809FA86736CFB937D3445989EC8D99FB96E603",
+      "new_sha256": "589A12970C32AF5487A40F07687BCD4673E1716871BDB4C0CF667E13556851A7",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "exact_replacement": "Preview diagnostic reports in Help -> Preview diagnostic reports in Debug",
+      "all_other_members_identical": true,
+      "compressed_bytes_added": 3
+    },
+    {
+      "archive": "more-infinite-research_5.0.01602.zip",
+      "members": 127,
+      "old_sha256": "B9DDE70B676B9BFB773DAF6AEF65FBB61A1E095815F00F18FBFB38C8F8CA6FCC",
+      "new_sha256": "2FBB324A9DDC7FD687CE25B73A54F8C54A0EB00762582E482542000A9F0DB47C",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "exact_replacement": "Preview diagnostic reports in Help -> Preview diagnostic reports in Debug",
+      "all_other_members_identical": true,
+      "compressed_bytes_added": 3
+    },
+    {
+      "archive": "more-infinite-research_5.0.01702.zip",
+      "members": 127,
+      "old_sha256": "F0545C64391DD1964FA5440E9488E20589FEDAEB4A35E68BC7D8925D23B0D86A",
+      "new_sha256": "46BDB3A9700D8CC9643B02B28BFF4B4AA7298CA407D7DF3C176DA24CE8D1384F",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "exact_replacement": "Preview diagnostic reports in Help -> Preview diagnostic reports in Debug",
+      "all_other_members_identical": true,
+      "compressed_bytes_added": 3
+    },
+    {
+      "archive": "more-infinite-research_5.0.01802.zip",
+      "members": 127,
+      "old_sha256": "99144D4BEFB748F52F59C6975B895F6DAF8DC0914CD63AE9D4D836EECCA7C377",
+      "new_sha256": "63511C609D6F509E8553E938E7B0DAFF2274F1C42334F5CBADFDEAE4225B520E",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "exact_replacement": "Preview diagnostic reports in Help -> Preview diagnostic reports in Debug",
+      "all_other_members_identical": true,
+      "compressed_bytes_added": 3
+    },
+    {
+      "archive": "more-infinite-research_5.0.10002.zip",
+      "members": 127,
+      "old_sha256": "2A4BD66EB12DAC2BD5A486CAF2D60029CD8198480EFEA7C36C7E3802D588A6D1",
+      "new_sha256": "90664A973C3B740D8D39953550823F7679EB2DCA04788E1F26D326CD57CA0F14",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "exact_replacement": "Preview diagnostic reports in Help -> Preview diagnostic reports in Debug",
+      "all_other_members_identical": true,
+      "compressed_bytes_added": 3
+    },
+    {
+      "archive": "more-infinite-research_5.0.11002.zip",
+      "members": 128,
+      "old_sha256": "F2BCC7ED82F501583DCF8348542B7228F9F4D95CECD60CBD2B88748C333D8DF6",
+      "new_sha256": "9FECCF410A532896FAE0C6F839D5FB1A5C0158AAE0D43A18A64BF558E38541A7",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "exact_replacement": "Preview diagnostic reports in Help -> Preview diagnostic reports in Debug",
+      "all_other_members_identical": true,
+      "compressed_bytes_added": 3
+    },
+    {
+      "archive": "more-infinite-research_5.0.20002.zip",
+      "members": 225,
+      "old_sha256": "2113F85C4678580C75A6E88FDDD6F3A96506D6BAE5FE85B5BB7BE52C2B77E5B9",
+      "new_sha256": "6A66CF318AC908788DE24D2E3CD9D8F68421EB8AFDA4C113B2E3012FC701D64F",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "exact_replacement": "Preview diagnostic reports in Help -> Preview diagnostic reports in Debug",
+      "all_other_members_identical": true,
+      "compressed_bytes_added": 3
+    },
+    {
+      "archive": "more-infinite-research_5.0.21002.zip",
+      "members": 226,
+      "old_sha256": "1A28DF639F12DB1475CA259D96CA85A84E853921AD163F99F19C83CD2B048397",
+      "new_sha256": "AFDB1502FE4707D3DFDE4F22B2192EA1DF21F1D85A592E594E59587ECD6A4176",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "exact_replacement": "Preview diagnostic reports in Help -> Preview diagnostic reports in Debug",
+      "all_other_members_identical": true,
+      "compressed_bytes_added": 3
+    }
+  ],
+  "native_execution": false
+}
