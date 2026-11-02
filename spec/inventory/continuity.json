@@ -12136,8 +12136,8 @@
               "tests/test_lifecycle.py::test_worker_tail_binding_change_discards_stale_enablement_right",
               "tests/test_lifecycle.py::test_k2_worker_variant_is_lazy_owned_and_does_not_inherit_another_effects_rights"
             ],
-            "new_control_scope": "Actual current control/bootstrap/lifecycle handlers, inclusive repeated queue, retained37% current progress and27% saved progress, earned aggregate7.15 across above-cap disablement and owned relaxation. The saved_progress double is supported by the pinned2.0.77 LuaTechnology API; this does not assert native earned-bonus arithmetic or qualify a save.",
-            "api_source": {"url": "https://lua-api.factorio.com/2.0.77/runtime-api.json", "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578", "field": "LuaTechnology.saved_progress", "fact": "Read/write double fraction in[0,1);0 means no saved progress."},
+            "new_control_scope": "Actual current control/bootstrap/lifecycle handlers, inclusive repeated queue, retained37% valid current progress, earned aggregate7.15 and level11 across above-cap disablement and owned relaxation. The native queue setter can cancel current research; this host fixture does not model its saved-progress transition and imposes no saved-slot value after cancellation. This does not assert native earned-bonus arithmetic or qualify a save.",
+            "api_source": {"url": "https://lua-api.factorio.com/2.0.77/runtime-api.json", "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578", "field": "LuaForce.research_queue; LuaForce.research_progress", "fact": "Queue replacement with empty/nil cancels current research; current progress is a read/write double in[0,1]. The host control does not infer native saved-slot transitions."},
             "remaining_executable_check": "Final-candidate native worker cap/ownership/queue/progress and any affected legacy/provider/client/state transitions retain the existing CONT-07/CONT-11 limits. Exact admitted0.65 tail evidence does not qualify malformed or arbitrary provider tails; unchanged source is not a new native result.",
             "owner": "Aero independent expectation/control; Black Glass native/state checks"
           },
@@ -12173,7 +12173,7 @@
             "inclusive disable off-by-one",
             "valid current progress lost",
             "earned bonus lost on disable",
-            "saved progress lost on disable",
+            "earned level lost on disable",
             "earned bonus lost on relaxation"
           ]
         },
