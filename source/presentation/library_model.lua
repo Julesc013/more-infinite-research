@@ -418,7 +418,28 @@ local function mode_matches(row, mode)
   return row.finite == false
 end
 
-local function row_matches(row, view)
+-- Raw affected recipe IDs remain searchable before/without translation.
+-- Inspect only this eligible research's finite native array, lazily after a
+-- text miss. Detail previews and localized-subject limits must not truncate
+-- identity search; no recipe objects or live productivity values are needed.
+local function recipe_id_matches(technology, search)
+  local effects = native_read(native_read(technology, "prototype"), "effects")
+  if effects == nil then return false end
+  local ok, matched = pcall(function()
+    for index = 1, #effects do
+      local effect = effects[index]
+      local kind = native_read(effect, "type")
+      if kind == "unlock-recipe" or kind == "change-recipe-productivity" then
+        local id = bounded_string(native_read(effect, "recipe"), MAX_TEXT)
+        if id and matches(id, search) then return true end
+      end
+    end
+    return false
+  end)
+  return ok and matched == true
+end
+
+local function row_matches(row, view, technology)
   if not family_matches(row, view.family) or not status_matches(row, view.status)
     or not mode_matches(row, view.mode) then return false end
   if view.visibility == 1 and view.hidden[row.id] then return false end
@@ -426,6 +447,7 @@ local function row_matches(row, view)
   if view.search == "" then return true end
   return matches(row.id .. " " .. row.family .. " " .. row.name .. " " .. (row.search_text or "")
     .. " " .. (row.recipe or "") .. " " .. (row.locale_key or ""), view.search)
+    or recipe_id_matches(technology, view.search)
 end
 
 local function ordered(left, right, sort)
@@ -490,7 +512,7 @@ function M.rows(force, catalogue, view, translations, context)
     if technology ~= nil and not private_credit(context, id) then
       local row = row_for(force, by_id[id], id, technology, queue_count, queue_index, current, translations, context)
       row.hidden = normalized.hidden[id] == true
-      if row_matches(row, normalized) then selected[#selected + 1] = row end
+      if row_matches(row, normalized, technology) then selected[#selected + 1] = row end
     end
   end
   table.sort(selected, function(left, right) return ordered(left, right, normalized.sort) end)
