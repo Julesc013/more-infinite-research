@@ -1,0 +1,16 @@
+{
+  "name": "mir-fixture-mir5-sif-retained-manufacturing",
+  "version": "0.2.0",
+  "title": "MIR private SIF paid-state successor fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable exact-input fixture state, never a player package or lab-earned claim.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base = 2.0.77",
+    "space-age = 2.0.77",
+    "space-is-fake = 1.0.60",
+    "cr-commons = 1.0.27",
+    "more-infinite-research = 5.0.20002",
+    "mir-fixture-mir5-active-mods-observer = 0.1.0"
+  ]
+}
