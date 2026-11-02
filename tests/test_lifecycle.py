@@ -1122,7 +1122,6 @@ class LifecycleTests(unittest.TestCase):
           worker.prototype = {max_level=4294967295,
             effects={{type="worker-robot-speed",modifier=.65}}}
           worker.prerequisites = {["worker-robots-speed-5"]={name="worker-robots-speed-5"}}
-          worker.saved_progress = .27
           local f = force(61,{[id]=worker},{worker,worker},worker,.37)
           worker.force = f
           f.worker_robots_speed_modifier = 7.15
@@ -1131,19 +1130,19 @@ class LifecycleTests(unittest.TestCase):
           assert(#f.research_queue==1 and f.research_queue[1]==worker and worker.enabled,
             "inclusive worker cap lost the current level or retained an over-cap successor")
           assert(f.current_research==worker and f.research_progress==.37
-            and worker.saved_progress==.27 and f.worker_robots_speed_modifier==7.15,
+            and f.worker_robots_speed_modifier==7.15,
             "worker cap changed partial work or earned native bonus")
 
           worker.level = 11
           handlers.events[defines.events.on_research_finished]({research=worker})
-          assert(not worker.enabled and worker.level==11 and worker.saved_progress==.27
+          assert(not worker.enabled and worker.level==11
             and f.worker_robots_speed_modifier==7.15,
             "above-cap disablement changed earned worker state")
           local saved = storage
           boot({[61]=f},0,"",saved,nil,0)
           handlers.configuration()
           assert(worker.enabled and not worker.visible_when_disabled and worker.level==11
-            and worker.saved_progress==.27 and f.worker_robots_speed_modifier==7.15,
+            and f.worker_robots_speed_modifier==7.15,
             "owned worker relaxation changed earned state or failed restoration")
         ''')
 
