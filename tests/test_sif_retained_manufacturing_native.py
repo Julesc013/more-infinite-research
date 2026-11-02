@@ -241,6 +241,10 @@ class RetainedNativeFixtureTests(unittest.TestCase):
                     self.lua.execute("callbacks.tick()")
                     self.assertEqual(player, self.lua.eval("markers[2].witnesses.entry_boundary.player_processing_enabled"))
                     self.assertEqual(foreign, self.lua.eval("markers[2].witnesses.entry_boundary.foreign_mining_enabled"))
+                    self.assertEqual(player, self.lua.eval("markers[2].witnesses.entry_boundary.flag_deltas.player_processing.entry"))
+                    self.assertFalse(self.lua.eval("markers[2].witnesses.entry_boundary.flag_deltas.player_processing.source"))
+                    self.assertFalse(self.lua.eval("markers[2].witnesses.entry_boundary.flag_deltas.foreign_mining.source"))
+                    self.assertEqual(5, self.lua.eval("(function() local n=0;for _ in pairs(markers[2].witnesses.entry_boundary.player_prototypes) do n=n+1 end;return n end)()"))
                     self.assertEqual(2, self.lua.globals().create_calls)
                     self.lua.execute("guard_all_storage()")
                     self.cold(); self.cold()
@@ -263,7 +267,7 @@ class RetainedNativeFixtureTests(unittest.TestCase):
                         self.assertEqual(1, self.lua.eval("#saves"))
 
     def test_entry_boundary_refuses_bad_event_order_and_phase(self):
-        for order in (None, "", "level -> more-infinite-research", "level -> more-infinite-research -> mir-fixture-mir5-sif-retained-manufacturing", "level -> mir-fixture-mir5-sif-retained-manufacturing -> missing -> more-infinite-research"):
+        for order in (None, "", "level -> more-infinite-research", "level -> more-infinite-research -> mir-fixture-mir5-sif-retained-manufacturing", "level -> mir-fixture-mir5-sif-retained-manufacturing -> missing -> more-infinite-research", "level -> mir-fixture-mir5-sif-retained-manufacturing -> mir-fixture-mir5-sif-retained-manufacturing -> more-infinite-research"):
             with self.subTest(order=order):
                 self.setUp(); self.entry_setup(False, False)
                 self.lua.globals().script.event_order = order
@@ -274,6 +278,33 @@ class RetainedNativeFixtureTests(unittest.TestCase):
         self.setUp(); self.entry_setup(False, False)
         self.lua.execute("storage.mir5_sif_retained_manufacturing.phase='wrong'")
         with self.assertRaises(LuaError): self.lua.execute("callbacks.config()")
+
+    def test_entry_boundary_rejects_pre_mir_nonflag_drift_and_recapture(self):
+        mutations = [
+            "game.forces.player.technologies['recipe-prod-research_steel-1']=nil",
+            "game.forces.player.technologies['recipe-prod-research_steel-1'].level=7",
+            "game.forces.player.technologies['recipe-prod-research_rocket_fuel-1'].saved_progress=.41",
+            "game.forces.player.recipes['plastic-bar'].productivity_bonus=.3",
+            "game.forces.player.research_progress=.43",
+            "game.forces.player.research_queue[1]=game.forces.player.research_queue[2]",
+            "game.forces.player.technologies['recipe-prod-research_steel-1'].prototype.effects[1].change=.2",
+            "game.forces['mir5-sif-retained-foreign'].technologies['mining-productivity-3'].saved_progress=.28",
+        ]
+        for mutation in mutations:
+            with self.subTest(mutation=mutation):
+                self.setUp(); self.entry_setup(True, True)
+                self.lua.execute("engine_writing=true;" + mutation + ";engine_writing=false")
+                before = self.storage()
+                with self.assertRaises(LuaError): self.lua.execute("callbacks.config()")
+                self.assertEqual(before, self.storage())
+                self.assertEqual(1, self.lua.globals().create_calls)
+                self.assertEqual(0, self.lua.globals().api_calls)
+                self.assertEqual(1, self.lua.eval("#saves"))
+        self.setUp(); self.entry_setup(True, False); self.lua.execute("run_configuration()")
+        before = self.storage()
+        with self.assertRaises(LuaError): self.lua.execute("callbacks.config()")
+        self.assertEqual(before, self.storage())
+        self.assertEqual(1, self.lua.globals().create_calls)
 
     def test_entry_boundary_other_mutations_refused(self):
         mutations = [

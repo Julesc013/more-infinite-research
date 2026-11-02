@@ -113,6 +113,21 @@ local function snapshot(force)
   for _, value in ipairs(force.research_queue or {}) do out.queue[#out.queue+1]=value.name end
   return out
 end
+-- Capture the same finite prototype fields that assert_rows independently
+-- checks against the published contract. This is fixture-owned data only.
+local function prototype_snapshot(force)
+  assert_rows(force)
+  local out={}
+  for _,row in ipairs(C.rows) do
+    local prototype=technology(force,id(row)).prototype
+    local effects={}
+    for _,effect in pairs(prototype.effects or {}) do
+      effects[effect.recipe]={type=effect.type,recipe=effect.recipe,change=effect.change}
+    end
+    out[id(row)]={hidden=prototype.hidden,max_level=prototype.max_level,effects=effects}
+  end
+  return out
+end
 local function zero_manufacturing(force)
   assert_rows(force)
   for _, row in ipairs(C.rows) do
@@ -131,6 +146,10 @@ local function verify(state, successor)
   local foreign=game.forces[state.foreign_index]
   same(snapshot(foreign),expected_foreign,"foreign force")
   zero_manufacturing(foreign)
+  if entry_boundary_mode() then
+    same(prototype_snapshot(game.forces.player),state.entry_boundary.player_prototypes,"player entry prototypes")
+    same(prototype_snapshot(foreign),state.entry_boundary.foreign_prototypes,"foreign entry prototypes")
+  end
   if successor then
     local fresh=game.forces[state.fresh_index]
     if not fresh or fresh.name~=FRESH_FORCE then fail("fresh successor force absent") end
@@ -221,10 +240,24 @@ script.on_configuration_changed(function()
   if entry_boundary_mode() then
     if state.entry_boundary~=nil then fail("entry boundary already captured") end
     local order=script.get_event_order();require_early_order(order)
-    local player=technology(game.forces.player,id(C.rows[3])).enabled
-    local foreign=technology(game.forces[state.foreign_index],C.foreign).enabled
-    if type(player)~="boolean" or type(foreign)~="boolean" then fail("entry boundary flags are not boolean") end
-    state.entry_boundary={player_processing_enabled=player,foreign_mining_enabled=foreign,event_order=order}
+    local player=snapshot(game.forces.player)
+    local foreign_force=game.forces[state.foreign_index]
+    local foreign=snapshot(foreign_force)
+    local player_flag=player.technologies[id(C.rows[3])].enabled
+    local foreign_flag=foreign.foreign.enabled
+    if type(player_flag)~="boolean" or type(foreign_flag)~="boolean" then fail("entry boundary flags are not boolean") end
+    local expected_player,expected_foreign=clone(state.player),clone(state.foreign)
+    expected_player.technologies[id(C.rows[3])].enabled=player_flag
+    expected_foreign.foreign.enabled=foreign_flag
+    same(player,expected_player,"entry player vs source")
+    same(foreign,expected_foreign,"entry foreign vs source")
+    zero_manufacturing(foreign_force)
+    local player_prototypes=prototype_snapshot(game.forces.player)
+    local foreign_prototypes=prototype_snapshot(foreign_force)
+    state.entry_boundary={player_processing_enabled=player_flag,foreign_mining_enabled=foreign_flag,event_order=order,
+      player=player,foreign=foreign,player_prototypes=player_prototypes,foreign_prototypes=foreign_prototypes,
+      flag_deltas={player_processing={source=state.player.technologies[id(C.rows[3])].enabled,entry=player_flag},
+        foreign_mining={source=state.foreign.foreign.enabled,entry=foreign_flag}}}
     state.phase="entry-boundary-pending"
     loaded,reported=false,false
     return -- No full verification, API, fresh force or save before MIR config.
