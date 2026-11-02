@@ -2,6 +2,16 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.2] - Unreleased
+
+### Changes
+
+- Show current and maximum recipe productivity and whether the next research level can still help in selected Library details, without changing research queue behavior.
+- Search affected recipe IDs in the Library, including IDs without translated names.
+- Preview diagnostic reports in Help and choose whether to include settings and availability details before exporting locally.
+- Preserve personal Library choices through player and configuration changes, and show when discovery information is limited or falls back to stable IDs.
+- Correct three Russian research names for cannon shells and thruster fuel and oxidizer productivity.
+
 ## [5.0.1] - 2026-11-01
 
 ### Changes
