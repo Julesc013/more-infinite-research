@@ -251,6 +251,24 @@ class RetainedNativeFixtureTests(unittest.TestCase):
                     self.assertEqual(1, self.lua.globals().event_order_calls)
                     self.assertEqual(2, self.lua.globals().reset_calls)
 
+    def test_source_complete_entry_rejects_preexisting_baseline_without_recapture(self):
+        self.entry_setup(True, False)
+        self.lua.execute("""
+          assert(storage.mir5_sif_retained_manufacturing.phase=="source-complete")
+          storage.mir5_sif_retained_manufacturing.entry_boundary={
+            player_processing_enabled=false,foreign_mining_enabled=true,
+            event_order=script.event_order,original_marker="must remain untouched"}
+        """)
+        before = self.storage()
+        counts = self.lua.eval("{#saves,reset_calls,create_calls,api_calls,event_order_calls}")
+        original = [counts[n] for n in range(1, 6)]
+        with self.assertRaisesRegex(LuaError, "entry boundary already captured"):
+            self.lua.execute("run_configuration()")
+        self.assertEqual(before, self.storage())
+        self.assertEqual(original, [self.lua.eval("#saves"), self.lua.globals().reset_calls,
+                                    self.lua.globals().create_calls, self.lua.globals().api_calls,
+                                    self.lua.globals().event_order_calls])
+
     def test_entry_boundary_refuses_each_post_entry_flag_flip(self):
         for player in (False, True):
             for foreign in (False, True):
