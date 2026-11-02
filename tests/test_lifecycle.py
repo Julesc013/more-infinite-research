@@ -1112,6 +1112,41 @@ class LifecycleTests(unittest.TestCase):
             "malformed native tail was managed")
         ''')
 
+    def test_published_worker_cap_boundary_preserves_earned_bonus_and_partial_work(self):
+        self.lua.execute('''
+          -- The old worker control independently fixes the inclusive 10 cap,
+          -- repeated queued successor and earned 7.15 native bonus. General
+          -- cap controls do not replace this named native-owner boundary.
+          local id = "worker-robots-speed-6"
+          local worker = technology(id,10,true)
+          worker.prototype = {max_level=4294967295,
+            effects={{type="worker-robot-speed",modifier=.65}}}
+          worker.prerequisites = {["worker-robots-speed-5"]={name="worker-robots-speed-5"}}
+          worker.saved_progress = .27
+          local f = force(61,{[id]=worker},{worker,worker},worker,.37)
+          worker.force = f
+          f.worker_robots_speed_modifier = 7.15
+          boot({[61]=f},0,"",nil,nil,10)
+          handlers.init()
+          assert(#f.research_queue==1 and f.research_queue[1]==worker and worker.enabled,
+            "inclusive worker cap lost the current level or retained an over-cap successor")
+          assert(f.current_research==worker and f.research_progress==.37
+            and worker.saved_progress==.27 and f.worker_robots_speed_modifier==7.15,
+            "worker cap changed partial work or earned native bonus")
+
+          worker.level = 11
+          handlers.events[defines.events.on_research_finished]({research=worker})
+          assert(not worker.enabled and worker.level==11 and worker.saved_progress==.27
+            and f.worker_robots_speed_modifier==7.15,
+            "above-cap disablement changed earned worker state")
+          local saved = storage
+          boot({[61]=f},0,"",saved,nil,0)
+          handlers.configuration()
+          assert(worker.enabled and not worker.visible_when_disabled and worker.level==11
+            and worker.saved_progress==.27 and f.worker_robots_speed_modifier==7.15,
+            "owned worker relaxation changed earned state or failed restoration")
+        ''')
+
     def test_k2_worker_variant_is_lazy_owned_and_does_not_inherit_another_effects_rights(self):
         self.lua.execute('''
           local name = "worker-robots-speed-7"
