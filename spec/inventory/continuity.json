@@ -1156,8 +1156,9 @@
               "lines": 210,
               "references": [
                 {
-                  "tag": "v4.2.0",
-                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
                 },
                 {
                   "tag": "v4.2.0-stable",
@@ -1229,8 +1230,9 @@
               "lines": 261,
               "references": [
                 {
-                  "tag": "v4.2.0",
-                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61"
+                  "tag": "v4.2.0-stable",
+                  "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+                  "submitted_tag": "v4.2.0"
                 },
                 {
                   "tag": "v4.2.0-stable",
@@ -1530,7 +1532,17 @@
           "native_execution": false,
           "source_reconciliation_complete": false,
           "test_intent_reconciliation_complete": false,
-          "release_qualification": false
+          "release_qualification": false,
+          "source_reference_label_correction": {
+            "submitted_head": "880b89faa28df21a765c3ddc6bf37eafccae23fc",
+            "submitted_label": "v4.2.0",
+            "actual_retained_tag": "v4.2.0-stable",
+            "actual_commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+            "corrected_references": 2,
+            "original_indexed_locator_entries": 46,
+            "distinct_retained_tag_path_locators": 44,
+            "scope": "The original91-tag local index includes an unpublished alias alongside the retained stable tag. Keep every original locator entry and mark its submitted_tag where corrected; do not count canonicalized duplicate labels as independent sources. Commit/path/blob/hash tuples, original commits/raw index/receipts, authored expectations and all native limits remain unchanged. No remote or local Git tag is modified."
+          }
         }
       ],
       "test_subjects": [
