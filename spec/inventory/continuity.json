@@ -16041,6 +16041,29 @@
         "release_qualification": false,
         "selected_fixture_blob_count": 1,
         "supporting_codec_blob_count": 1
+      },
+      {
+        "reviewed_on": "2026-11-03",
+        "reviewed_against": "c837d0cab1eb7f4cc58106635e6fb2d99237491f",
+        "subjects": [
+          "CONT-03",
+          "CONT-07",
+          "CONT-13",
+          "CONT-14"
+        ],
+        "scope": "Exactly nine deduplicated profile round-trip fixture bodies/160 retained tag-path bindings, with74 canonical live remote tags and the explicit local v4.2.0 alias. Includes a demonstrated eight-setting numeric/three-alias portable-import correction, not complete settings/history/native acceptance.",
+        "evidence": "spec/evidence/settings-profile-roundtrip-intents-aero-r01.json",
+        "dispositions": [
+          "retain recognized effective/profile values and canonical full/compact behavior",
+          "port complete registered effect-default export and bound checks",
+          "restore independently published numeric/import-only alias admission without changing native dropdowns",
+          "consolidate reduced-target/localized continuation controls and retire fake unavailable-codec determinism",
+          "retain preview identities with their independently bounded unresolved outcome scope",
+          "consolidate the accepted startup-decode ports without reviving the getter/cache"
+        ],
+        "remaining": "Black Glass observes actual corrected imported percentages/aliases, affected output/export/import/save/reload and performs final consumed-input review; independent review, CI and whole VER-07 remain open.",
+        "native_execution": false,
+        "whole_source_reconciliation_complete": false
       }
     ],
     "stable_coverage_review": {

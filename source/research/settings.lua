@@ -155,9 +155,33 @@ end
 
 local function spec_for(name) return declaration_by_name[name] end
 local function finite_number(value) return type(value) == "number" and value == value and value < math.huge and value > -math.huge end
+-- Published portable profiles allow numeric percentages beyond the curated
+-- dropdown choices. These rules never change a native startup prototype.
+local profile_number_ranges = {
+  ["mir-pipeline-extent-multiplier"] = {0.1, 100000},
+  ["mir-prototype-productivity-cap"] = {0, 100000},
+  ["mir-prototype-efficiency-cap"] = {-99.99, 0},
+  ["mir-prototype-pollution-cap"] = {-99.99, 0},
+  ["mir-prototype-speed-floor"] = {-99.99, 0},
+  ["mir-prototype-speed-cap"] = {0, 100000},
+  ["mir-prototype-quality-cap"] = {0, 100000},
+  ["mir-recycling-return-chance"] = {0, 25},
+}
+local profile_legacy_values = {
+  ["mir-prototype-speed-cap"] = "bonus-100000",
+  ["mir-prototype-quality-cap"] = "bonus-100000",
+  ["mir-recycling-return-chance"] = "percent-25",
+}
 local function valid(spec, value, imported)
   if spec.type == "bool-setting" then return type(value) == "boolean" end
   if spec.type == "string-setting" then
+    if imported then
+      local range = profile_number_ranges[spec.name]
+      if type(value) == "number" and range then
+        return finite_number(value) and value >= range[1] and value <= range[2]
+      end
+      if type(value) == "string" and profile_legacy_values[spec.name] == value then return true end
+    end
     if type(value) ~= "string" then return false end
     if type(spec.allowed_values) ~= "table" then return true end
     for _, allowed in ipairs(spec.allowed_values) do if value == allowed then return true end end
@@ -231,6 +255,11 @@ function M.validate_value(name, value)
   local spec = spec_for(name)
   if not spec then return false, "unknown setting" end
   if valid(spec, value, true) then return true end
+  local range = spec.type == "string-setting" and profile_number_ranges[name]
+  if range and type(value) == "number" then
+    if not finite_number(value) then return false, "not finite" end
+    return false, value < range[1] and "below minimum" or "above maximum"
+  end
   local expected = spec.type == "bool-setting" and "boolean" or (spec.type == "string-setting" and "string" or "number")
   if type(value) ~= expected then return false, "wrong type" end
   if spec.type == "string-setting" then return false, "not an allowed value" end
@@ -259,8 +288,11 @@ function M.effective_values(startup, helpers, report)
   local imported, out = decoded_import(startup, helpers, report), {}
   for _, spec in ipairs(declarations) do
     local value = raw_value(startup, spec.name, spec.default_value)
-    if imported and startup and startup[spec.name] and imported[spec.name] ~= nil and valid(spec, imported[spec.name], true) then value = imported[spec.name] end
-    assert(valid(spec, value, false), "MIR invalid effective setting: " .. spec.name)
+    local from_import = false
+    if imported and startup and startup[spec.name] and imported[spec.name] ~= nil and valid(spec, imported[spec.name], true) then
+      value, from_import = imported[spec.name], true
+    end
+    assert(valid(spec, value, from_import), "MIR invalid effective setting: " .. spec.name)
     out[spec.name] = value
   end
   return out
