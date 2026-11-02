@@ -15991,6 +15991,56 @@
         "source_reconciliation_complete": false,
         "test_intent_reconciliation_complete": false,
         "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-14"
+        ],
+        "reviewed_on": "2026-11-03",
+        "reviewed_against": "30382cf3d3970b820e169193cb8bda1db3587ec4",
+        "scope": "Exactly one deduplicated historical fixture and one supporting published codec body. Four fixture release bindings and the v4.7.3 codec binding checked; no entire settings or external-consumer audit.",
+        "selected_blob_count": 2,
+        "explicit_remote_tag_bindings_checked": 4,
+        "evidence": "spec/evidence/startup-profile-decode-intents-aero-r01.json",
+        "groups": [
+          {
+            "id": "profile-precedence-and-value-boundaries",
+            "disposition": "consolidate-existing-controls",
+            "remaining_executable_check": "No duplicate host port for covered semantic boundaries. Actual nondefault native settings and exported-file/Library/API correspondence remain separate.",
+            "owner": "Aero mapping; Black Glass affected native"
+          },
+          {
+            "id": "one-runtime-resolution-and-new-environment",
+            "disposition": "consolidate-current-lifecycle-contract",
+            "remaining_executable_check": "Native configuration/load/client and measured overhead retain their original scopes.600 host reads are no performance benchmark.",
+            "owner": "Aero"
+          },
+          {
+            "id": "raw-json-route",
+            "disposition": "ported-focused-host-controls",
+            "remaining_executable_check": "Selected host gap closed with published-source expectation and rejecting source opponent. Actual native codec/exported files and current-candidate settings/lifecycle/client correspondence remain separate.",
+            "owner": "Aero next bounded host unit"
+          },
+          {
+            "id": "missing-helpers-and-recovery",
+            "disposition": "ported-focused-host-controls",
+            "remaining_executable_check": "Selected host gap closed with published-source expectation and rejecting source opponent. Actual native codec/exported files and current-candidate settings/lifecycle/client correspondence remain separate.",
+            "owner": "Aero next bounded host unit"
+          },
+          {
+            "id": "mutable-cache-fingerprint-harness",
+            "disposition": "superseded-getter-mechanism-port-codec-boundaries",
+            "remaining_executable_check": "Selected low-level host edge covered; no old getter/cache restoration. Actual independent old-consumer transition and native remote/client qualification remain open under CONT-14; this control grants no new nonstring remote-input support.",
+            "owner": "Aero contract/consumer audit"
+          }
+        ],
+        "native_execution_in_this_review": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "release_qualification": false,
+        "selected_fixture_blob_count": 1,
+        "supporting_codec_blob_count": 1
       }
     ],
     "stable_coverage_review": {

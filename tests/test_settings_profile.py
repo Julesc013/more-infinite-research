@@ -147,6 +147,99 @@ class SettingsProfileTests(unittest.TestCase):
           assert(reports[1] == "[more-infinite-research] Ignoring invalid MIR settings profile import")
         ''')
 
+    def test_raw_json_import_bypasses_compressed_decode_and_preserves_empty_zero_false(self):
+        # Published startup_settings_decode_reuse.lua, blob5c4ccb19: raw JSON
+        # bypasses compressed decoding; zero/false and empty profiles retain
+        # their meanings. These are controlled host codecs, not native timing.
+        self.lua.execute(r'''
+          local incoming = '{"schema":1,"settings":{"ips-enable-research_gears":false,"ips-research-time-research_gears":0}}'
+          local empty = '{"schema":1,"settings":{}}'
+          local parses = 0
+          helpers.decode_string = function(_) error("raw JSON reached compressed decoder") end
+          helpers.json_to_table = function(text)
+            parses = parses + 1
+            return decoded[text]
+          end
+          decoded[incoming] = {schema=1, settings={
+            ["ips-enable-research_gears"]=false, ["ips-research-time-research_gears"]=0
+          }}
+          decoded[empty] = {schema=1, settings={}}
+          settings.startup["ips-cost-base-research_gears"].value = 345
+          settings.startup[config.import_setting_name].value = incoming
+          local values = config.effective_values(settings.startup, helpers)
+          assert(values["ips-enable-research_gears"] == false)
+          assert(values["ips-research-time-research_gears"] == 0)
+          assert(values["ips-cost-base-research_gears"] == 345 and parses == 1)
+          settings.startup[config.import_setting_name].value = empty
+          values = config.effective_values(settings.startup, helpers)
+          assert(values["ips-enable-research_gears"] == true)
+          assert(values["ips-cost-base-research_gears"] == 345 and parses == 2)
+          assert(settings.startup[config.import_setting_name].value == empty)
+          assert(settings.startup["ips-enable-research_gears"].value == true)
+        ''')
+
+    def test_missing_profile_helpers_fall_back_and_fresh_resolution_recovers(self):
+        # The same published fixture requires raw fallback while helpers are
+        # absent, then valid import after availability changes. Do not restore
+        # the retired per-lookup cache or imply live startup settings mutation.
+        self.lua.execute(r'''
+          local incoming = "MIRSET1:recovery"
+          decoded.recovery = {schema=1, settings={
+            ["ips-cost-base-research_gears"]=777, ["ips-enable-research_gears"]=false
+          }}
+          settings.startup["ips-cost-base-research_gears"].value = 345
+          settings.startup[config.import_setting_name].value = incoming
+          local original = helpers
+          local partial = {
+            false, {},
+            {encode_string=original.encode_string, decode_string=original.decode_string},
+            {encode_string=original.encode_string, json_to_table=original.json_to_table},
+            {decode_string=original.decode_string, json_to_table=original.json_to_table}
+          }
+          local function fallback(api)
+            local errors = {}
+            local values = config.effective_values(settings.startup, api,
+              function(message) errors[#errors+1] = message end)
+            assert(values["ips-cost-base-research_gears"] == 345)
+            assert(values["ips-enable-research_gears"] == true)
+            assert(#errors == 1 and errors[1] ==
+              "[more-infinite-research] Ignoring invalid MIR settings profile import")
+          end
+          fallback(nil)
+          for _, api in ipairs(partial) do fallback(api) end
+          local values = config.effective_values(settings.startup, original)
+          assert(values["ips-cost-base-research_gears"] == 777)
+          assert(values["ips-enable-research_gears"] == false)
+          assert(settings.startup["ips-cost-base-research_gears"].value == 345)
+          assert(settings.startup[config.import_setting_name].value == incoming)
+        ''')
+
+    def test_codec_uses_fresh_text_conversion_and_current_supplied_helpers(self):
+        # Published fixture5c4ccb19 and codec54e96103 preserve tostring input
+        # and current helper results. This exercises the low-level host codec;
+        # it does not assert metatable transport across Factorio remote.call.
+        self.lua.execute(r'''
+          decoded.first = {schema=1, settings={cap=40, enabled=false}}
+          decoded.second = {schema=1, settings={cap=60, enabled=true}}
+          local text = "MIRSET1:first"
+          local input = setmetatable({}, {__tostring=function() return text end})
+          local profile = assert(codec.decode(input, helpers))
+          assert(profile.settings.cap == 40 and profile.settings.enabled == false)
+          text = "MIRSET1:second"
+          profile = assert(codec.decode(input, helpers))
+          assert(profile.settings.cap == 60 and profile.settings.enabled == true)
+          helpers.json_to_table = function(value)
+            if value == "first" then return {schema=1, settings={cap=80, enabled=false}} end
+            return {schema=1, settings={cap=70, enabled=true}}
+          end
+          profile = assert(codec.decode(input, helpers))
+          assert(profile.settings.cap == 70 and profile.settings.enabled == true)
+          helpers.decode_string = function(_) return "first" end
+          profile = assert(codec.decode(input, helpers))
+          assert(profile.settings.cap == 80 and profile.settings.enabled == false)
+          assert(text == "MIRSET1:second")
+        ''')
+
     def test_codec_has_canonical_identity_and_strict_compact_option(self):
         self.lua.execute(r'''
           local full = codec.current_profile({
