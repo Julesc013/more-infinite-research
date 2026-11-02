@@ -8804,7 +8804,7 @@
         "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
       }
     ],
-    "next_bounded_work": "The selected35-body upgrade runner,17-body specialization helpers,seven imported Lua comparator/canonical/frontier bodies and six runtime-entry-point bodies now have bounded source dispositions; preserve their independent reviews, exact refs and original author history. Reconcile remaining generated-orchestration,registry/default,control-callback,compatibility/inter-release and unknown-consumer intent plus required original frontier snapshot custody without restoring retired machinery. Source counts and wrapper mappings do not close VER-07. Use the existing finite nine/seven/four migration queue and final consumed-input review; do not restart every-old-patch campaigns or unchanged completed cases. Exact published501 F200 R20 and F210 R05 observations retain their original scopes; frozen502 has only its recorded component verdicts, with shared runtime catalogue/cap/API,beta-successor and affected current-candidate scenarios still separately reviewed before dispatch. Black Glass owns complete exact packets,the native queue and current progress header; Aero owns historical/applicability/documentation and independent review. Preserve every completed/adverse execution identity.",
+    "next_bounded_work": "The selected 35-body upgrade runner, 17-body specialization helpers, seven imported comparator/canonical/frontier bodies, six runtime entry-point bodies and 22 settings/registry/default bodies now have bounded source dispositions. Preserve independent review, exact refs, original author history and both adverse and subsequently supplied custody records. Reconcile remaining generated orchestration, effective/nondefault settings, control callbacks, compatibility/inter-release and unknown-consumer intent plus original frontier input provenance without restoring retired machinery. Source counts, wrapper mappings and declaration comparisons do not close VER-07 or native saved-state behavior. Use the existing finite nine/seven/four migration queue and final consumed-input review; do not restart every-old-patch campaigns or unchanged completed cases. Exact published 5.0.1 F200 R20 and F210 R05 observations retain their scopes. Frozen C has only its named component verdicts; changed source and package inputs, shared runtime catalogue/cap/API, beta-successor state and affected current-candidate scenarios need their own applicability review before dispatch. Black Glass owns exact packets, the native queue and current progress header; Aero owns historical/applicability/documentation work and independent review. Preserve every completed/adverse execution identity.",
     "bounded_intent_reviews": [
       {
         "subjects": [
@@ -15336,6 +15336,532 @@
         },
         "custody": "Primary build/qualification/aero-control-root-discovery-r01 retains all six exact Git bodies, original144-binding discovery, canonical remote/commit binding readback, materialized plan, host logs and byte-inverse preservation proof. This is local developer custody, not an off-machine backup claim.",
         "native_execution": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-05",
+          "CONT-13",
+          "CONT-16"
+        ],
+        "reviewed_on": "2026-11-02",
+        "reviewed_against": "2ac3bb33df8905bc109331b6b7cfaa0e69ab165d",
+        "scope": "Two exact historical settings registry/defaults families and source/non-source aliases:22 immutable bodies/150 source bindings. Reconcile actual setting/default/visibility/science/notice intent in five finite groups, not all imported constructors or global historical preservation.",
+        "method": "Deduplicate immutable source bodies before reading. Inspect the latest two tables and all20 earlier diffs; normalize registry globals by stable key to avoid insertion-order noise.545 repeated value changes reduce to92 unique exact key/value transitions. Latest historical data and the unchanged independently authored4.7.0 characterization supply expectations; candidate data is observed output only.",
+        "selected_tag_scope": 91,
+        "selected_commit_scope": 90,
+        "selected_blob_count": 22,
+        "retained_remote_tag_bindings": 148,
+        "immutable_commit_only_bindings": 2,
+        "reference_limits": [
+          "The local v3.0.0 alias at70bb513f5b388ad23c4a5d46dfc945571c3b8217 supplies two explicit commit-only references, not publication. Do not substitute the distinct remote3.0.0 source.",
+          "Indexed v4.2.0 resolves to retained v4.2.0-stable at the same commit; equal canonical references are deduplicated. Original discovery records remain preserved.",
+          "Earlier engine/target contexts keep their actual values and support limits. Later modern defaults are not a new obligation on early best-effort packages or unavailable reduced APIs."
+        ],
+        "selected_blob_variants": [
+          {
+            "blob": "04cb316c6c0c931f82f16ccac101f609cbec4751",
+            "paths": [
+              "prototypes/mir/settings/registry.lua"
+            ],
+            "bytes": 1599,
+            "sha256": "10A6F2AF7A35B400E934A42D3DB2EDFC838FDBD1CB486DDE3CF286B92C75B833",
+            "references": [
+              "70bb513f5b388ad23c4a5d46dfc945571c3b8217:prototypes/mir/settings/registry.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "0845b2ba2a426c1dd2db57b308c07c8f7119a4a9",
+            "paths": [
+              "prototypes/mir/settings/registry.lua"
+            ],
+            "bytes": 3157,
+            "sha256": "2BC7F6525A56A7550B5E90A06DA7DF3527F8A2FA86198BBEE5B32F6B646473AB",
+            "references": [
+              "0.10.0:prototypes/mir/settings/registry.lua",
+              "0.11.0:prototypes/mir/settings/registry.lua",
+              "0.12.0:prototypes/mir/settings/registry.lua",
+              "0.6.0:prototypes/mir/settings/registry.lua",
+              "0.7.0:prototypes/mir/settings/registry.lua",
+              "0.8.0:prototypes/mir/settings/registry.lua",
+              "0.9.0:prototypes/mir/settings/registry.lua",
+              "1.8.2:prototypes/mir/settings/registry.lua",
+              "1.9.4:prototypes/mir/settings/registry.lua",
+              "2.4.0:prototypes/mir/settings/registry.lua",
+              "2.4.5:prototypes/mir/settings/registry.lua",
+              "2.4.9:prototypes/mir/settings/registry.lua",
+              "2.5.0:prototypes/mir/settings/registry.lua",
+              "3.1.5:prototypes/mir/settings/registry.lua",
+              "3.1.9:prototypes/mir/settings/registry.lua",
+              "3.2.0:prototypes/mir/settings/registry.lua",
+              "3.2.1:prototypes/mir/settings/registry.lua",
+              "3.2.2:prototypes/mir/settings/registry.lua",
+              "3.2.3:prototypes/mir/settings/registry.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "19756cf05ccc45372a04a40a7d6324f33d7007d2",
+            "paths": [
+              "prototypes/mir/settings/defaults.lua"
+            ],
+            "bytes": 4014,
+            "sha256": "684B49ED46CB9F3149CFAA2D7BB7B4BA9D658C909DB26981C829599D1246395B",
+            "references": [
+              "1.5.0:prototypes/mir/settings/defaults.lua",
+              "1.6.0:prototypes/mir/settings/defaults.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "1e2eada50cd9de5876b7728801f81f5299c6a800",
+            "paths": [
+              "prototypes/mir/settings/defaults.lua"
+            ],
+            "bytes": 4002,
+            "sha256": "1C59EC01877C5CAD1204633EBF6AC1DF49A01AC068D59FD21490758679A8A04E",
+            "references": [
+              "1.3.5:prototypes/mir/settings/defaults.lua",
+              "1.3.9:prototypes/mir/settings/defaults.lua",
+              "1.4.5:prototypes/mir/settings/defaults.lua",
+              "1.4.9:prototypes/mir/settings/defaults.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "2eec565ba6fcf03029b1bef4d3efabc27596b117",
+            "paths": [
+              "prototypes/mir/settings/defaults.lua"
+            ],
+            "bytes": 4345,
+            "sha256": "230CE336A148C587D86D945796833262223C97B3946D944A46BA1F63A5B487C4",
+            "references": [
+              "1.8.0:prototypes/mir/settings/defaults.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "3534d16f4c4b9550fb08be02c06c843e1a5c46a7",
+            "paths": [
+              "prototypes/mir/settings/registry.lua"
+            ],
+            "bytes": 2847,
+            "sha256": "B5022E06E454C94BB0A353CCB3B9D191230A01260BB3AD61FF36BEBEF7162D4A",
+            "references": [
+              "3.1.0:prototypes/mir/settings/registry.lua",
+              "3.1.1:prototypes/mir/settings/registry.lua",
+              "3.1.2:prototypes/mir/settings/registry.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "37954af68df0eb601ae43121487a3691b9e77b4c",
+            "paths": [
+              "prototypes/mir/settings/defaults.lua"
+            ],
+            "bytes": 4106,
+            "sha256": "E09D33DD9594835B65042D70BBB07D82C94298FE85C4922EC3DAD5C7DC860345",
+            "references": [
+              "1.7.0:prototypes/mir/settings/defaults.lua",
+              "1.7.1:prototypes/mir/settings/defaults.lua",
+              "1.8.1:prototypes/mir/settings/defaults.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "4018680632bdb93fbefc0ed211b90045f9bfd4fc",
+            "paths": [
+              "prototypes/mir/settings/registry.lua",
+              "source/prototypes/mir/settings/registry.lua"
+            ],
+            "bytes": 3214,
+            "sha256": "ACD34FD2E41B524514B75E0BA0B97948766D5708BDF8B86B1ED553843033C442",
+            "references": [
+              "1.8.5:prototypes/mir/settings/registry.lua",
+              "1.8.9:prototypes/mir/settings/registry.lua",
+              "1.9.5:prototypes/mir/settings/registry.lua",
+              "1.9.9:prototypes/mir/settings/registry.lua",
+              "2.5.10:prototypes/mir/settings/registry.lua",
+              "2.5.11:prototypes/mir/settings/registry.lua",
+              "2.5.5:prototypes/mir/settings/registry.lua",
+              "2.5.9:prototypes/mir/settings/registry.lua",
+              "3.2.10:prototypes/mir/settings/registry.lua",
+              "3.2.11:prototypes/mir/settings/registry.lua",
+              "3.2.5:prototypes/mir/settings/registry.lua",
+              "3.2.9:prototypes/mir/settings/registry.lua",
+              "v4.0.0:prototypes/mir/settings/registry.lua",
+              "v4.1.0:prototypes/mir/settings/registry.lua",
+              "v4.2.0-stable:source/prototypes/mir/settings/registry.lua",
+              "v4.2.1:source/prototypes/mir/settings/registry.lua",
+              "v4.2.2:source/prototypes/mir/settings/registry.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "453df9189656dca43b13f4c0aa333fc2a1428874",
+            "paths": [
+              "prototypes/mir/settings/defaults.lua"
+            ],
+            "bytes": 5815,
+            "sha256": "A3F58FFC57FB95E452ED906B95B37C40313E4F78DAD27167464062760C6FE4FD",
+            "references": [
+              "2.5.0:prototypes/mir/settings/defaults.lua",
+              "3.2.0:prototypes/mir/settings/defaults.lua",
+              "3.2.1:prototypes/mir/settings/defaults.lua",
+              "3.2.2:prototypes/mir/settings/defaults.lua",
+              "3.2.3:prototypes/mir/settings/defaults.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "4e6c0640b233fec9160f09d29fc8d869a4597cb9",
+            "paths": [
+              "prototypes/mir/settings/registry.lua"
+            ],
+            "bytes": 2749,
+            "sha256": "969A87F5B2A74FA36EEF7E31A200E0BBF474FEECC09EC68E356E1DE926412406",
+            "references": [
+              "2.3.5:prototypes/mir/settings/registry.lua",
+              "3.0.5:prototypes/mir/settings/registry.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "4efd9a86fe0e60da5b840194194a420323538253",
+            "paths": [
+              "prototypes/mir/settings/defaults.lua"
+            ],
+            "bytes": 4958,
+            "sha256": "ECFDAAABBC04C95432EEA7D21B25075E09C60B7120A375F63BD6520011502EDC",
+            "references": [
+              "70bb513f5b388ad23c4a5d46dfc945571c3b8217:prototypes/mir/settings/defaults.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "73a703a21b06b1802915f3efc153ea5a992858fb",
+            "paths": [
+              "prototypes/mir/settings/registry.lua"
+            ],
+            "bytes": 2354,
+            "sha256": "5DC96C11C44D569BA6D9F00261BDC89B51730DF804A77C720D93D5BD16815A7C",
+            "references": [
+              "1.3.5:prototypes/mir/settings/registry.lua",
+              "1.3.9:prototypes/mir/settings/registry.lua",
+              "1.4.5:prototypes/mir/settings/registry.lua",
+              "1.4.9:prototypes/mir/settings/registry.lua",
+              "1.5.5:prototypes/mir/settings/registry.lua",
+              "1.5.9:prototypes/mir/settings/registry.lua",
+              "1.6.5:prototypes/mir/settings/registry.lua",
+              "1.6.9:prototypes/mir/settings/registry.lua",
+              "1.7.5:prototypes/mir/settings/registry.lua",
+              "1.7.9:prototypes/mir/settings/registry.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "7f20dabd7352d2d554d1db3afdd4f1870663ecf7",
+            "paths": [
+              "prototypes/mir/settings/defaults.lua"
+            ],
+            "bytes": 4261,
+            "sha256": "10566B348C4B24CDC8247F3D57D15A87582D17A16FA6DD0F9D5632C32F09C540",
+            "references": [
+              "1.9.3:prototypes/mir/settings/defaults.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "8f8d180924a867d1fc95ef3677e5e861f9c35c7c",
+            "paths": [
+              "prototypes/mir/settings/defaults.lua"
+            ],
+            "bytes": 4132,
+            "sha256": "2D4E20A36027A0E932187003879DA8C037DCE1BEF56047B153AD86DD93BB812C",
+            "references": [
+              "1.7.5:prototypes/mir/settings/defaults.lua",
+              "1.7.9:prototypes/mir/settings/defaults.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "95b96cf50093cd4eb522cec4f419b8f879ed69c5",
+            "paths": [
+              "prototypes/mir/settings/defaults.lua",
+              "source/prototypes/mir/settings/defaults.lua"
+            ],
+            "bytes": 5841,
+            "sha256": "7537E3792A07DE60C4591972925C65D208808C2329C432891FECE2528467AC63",
+            "references": [
+              "2.5.10:prototypes/mir/settings/defaults.lua",
+              "2.5.11:prototypes/mir/settings/defaults.lua",
+              "2.5.5:prototypes/mir/settings/defaults.lua",
+              "2.5.9:prototypes/mir/settings/defaults.lua",
+              "3.2.10:prototypes/mir/settings/defaults.lua",
+              "3.2.11:prototypes/mir/settings/defaults.lua",
+              "3.2.5:prototypes/mir/settings/defaults.lua",
+              "3.2.9:prototypes/mir/settings/defaults.lua",
+              "v4.0.0:prototypes/mir/settings/defaults.lua",
+              "v4.1.0:prototypes/mir/settings/defaults.lua",
+              "v4.2.0-stable:source/prototypes/mir/settings/defaults.lua",
+              "v4.2.1:source/prototypes/mir/settings/defaults.lua",
+              "v4.2.2:source/prototypes/mir/settings/defaults.lua",
+              "v4.3.0:source/prototypes/mir/settings/defaults.lua",
+              "v4.4.0:source/prototypes/mir/settings/defaults.lua",
+              "v4.4.1:source/prototypes/mir/settings/defaults.lua",
+              "v4.4.2:source/prototypes/mir/settings/defaults.lua",
+              "v4.5.0:source/prototypes/mir/settings/defaults.lua",
+              "v4.5.1:source/prototypes/mir/settings/defaults.lua",
+              "v4.5.2:source/prototypes/mir/settings/defaults.lua",
+              "v4.6.0:source/prototypes/mir/settings/defaults.lua",
+              "v4.7.0:source/prototypes/mir/settings/defaults.lua",
+              "v4.7.1:source/prototypes/mir/settings/defaults.lua",
+              "v4.7.2:source/prototypes/mir/settings/defaults.lua",
+              "v4.7.3:source/prototypes/mir/settings/defaults.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "a3ab4f17e5ed9d8ba043c581806269f594af528e",
+            "paths": [
+              "prototypes/mir/settings/defaults.lua"
+            ],
+            "bytes": 4254,
+            "sha256": "8457C7FEB271FE25C896BF9E0A84D350BE1B105BD10835AA001CF61DD0281D0F",
+            "references": [
+              "1.8.5:prototypes/mir/settings/defaults.lua",
+              "1.8.9:prototypes/mir/settings/defaults.lua",
+              "1.9.5:prototypes/mir/settings/defaults.lua",
+              "1.9.9:prototypes/mir/settings/defaults.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "d3dfb83d1635d7706f6764c71b23cd67150138e0",
+            "paths": [
+              "source/prototypes/mir/settings/registry.lua"
+            ],
+            "bytes": 3305,
+            "sha256": "860D7E6F613D9ECAE1D240C738C42A0F0E8BB485621BF96C5924146D65E34060",
+            "references": [
+              "v4.3.0:source/prototypes/mir/settings/registry.lua",
+              "v4.4.0:source/prototypes/mir/settings/registry.lua",
+              "v4.4.1:source/prototypes/mir/settings/registry.lua",
+              "v4.4.2:source/prototypes/mir/settings/registry.lua",
+              "v4.5.0:source/prototypes/mir/settings/registry.lua",
+              "v4.5.1:source/prototypes/mir/settings/registry.lua",
+              "v4.5.2:source/prototypes/mir/settings/registry.lua",
+              "v4.6.0:source/prototypes/mir/settings/registry.lua",
+              "v4.7.0:source/prototypes/mir/settings/registry.lua",
+              "v4.7.1:source/prototypes/mir/settings/registry.lua",
+              "v4.7.2:source/prototypes/mir/settings/registry.lua",
+              "v4.7.3:source/prototypes/mir/settings/registry.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "e28c42ed17b03b17943cd50e1af363c6bd06ccda",
+            "paths": [
+              "prototypes/mir/settings/defaults.lua"
+            ],
+            "bytes": 4040,
+            "sha256": "18668AC1CE6D8E75FF3448DC84B02FCF8583E70037B64818BF50E176E6C53C08",
+            "references": [
+              "1.5.5:prototypes/mir/settings/defaults.lua",
+              "1.5.9:prototypes/mir/settings/defaults.lua",
+              "1.6.5:prototypes/mir/settings/defaults.lua",
+              "1.6.9:prototypes/mir/settings/defaults.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "efb2ed07bfdef1976258938e223911c5c83f130a",
+            "paths": [
+              "prototypes/mir/settings/defaults.lua"
+            ],
+            "bytes": 5413,
+            "sha256": "E9133ABA322F748CBCF104D5C845CACEA514BFCD21A32FF494DEAEBBEAEC2F79",
+            "references": [
+              "0.10.0:prototypes/mir/settings/defaults.lua",
+              "0.11.0:prototypes/mir/settings/defaults.lua",
+              "0.12.0:prototypes/mir/settings/defaults.lua",
+              "0.6.0:prototypes/mir/settings/defaults.lua",
+              "0.7.0:prototypes/mir/settings/defaults.lua",
+              "0.8.0:prototypes/mir/settings/defaults.lua",
+              "0.9.0:prototypes/mir/settings/defaults.lua",
+              "2.3.0:prototypes/mir/settings/defaults.lua",
+              "2.3.5:prototypes/mir/settings/defaults.lua",
+              "2.4.0:prototypes/mir/settings/defaults.lua",
+              "2.4.5:prototypes/mir/settings/defaults.lua",
+              "2.4.9:prototypes/mir/settings/defaults.lua",
+              "3.0.0:prototypes/mir/settings/defaults.lua",
+              "3.0.5:prototypes/mir/settings/defaults.lua",
+              "3.1.0:prototypes/mir/settings/defaults.lua",
+              "3.1.1:prototypes/mir/settings/defaults.lua",
+              "3.1.2:prototypes/mir/settings/defaults.lua",
+              "3.1.5:prototypes/mir/settings/defaults.lua",
+              "3.1.9:prototypes/mir/settings/defaults.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "f4a40539d7c0096fd8c42faa454544cdfa9654d6",
+            "paths": [
+              "prototypes/mir/settings/defaults.lua"
+            ],
+            "bytes": 4228,
+            "sha256": "6AE0C64912C381BB237BADEF03169A01905A72E41EEDFBB88C1A836576DB34FA",
+            "references": [
+              "1.8.2:prototypes/mir/settings/defaults.lua",
+              "1.9.4:prototypes/mir/settings/defaults.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "f5acfb35a67e82e510a962286937489fdbcf3a80",
+            "paths": [
+              "prototypes/mir/settings/registry.lua"
+            ],
+            "bytes": 2297,
+            "sha256": "E520CB8ABAF210EB39B0D193B9C9B910D44DFFF87F25B9B544012C403AC982F1",
+            "references": [
+              "1.3.0:prototypes/mir/settings/registry.lua",
+              "1.4.0:prototypes/mir/settings/registry.lua",
+              "1.5.0:prototypes/mir/settings/registry.lua",
+              "1.6.0:prototypes/mir/settings/registry.lua",
+              "1.7.0:prototypes/mir/settings/registry.lua",
+              "1.7.1:prototypes/mir/settings/registry.lua",
+              "1.8.0:prototypes/mir/settings/registry.lua",
+              "1.8.1:prototypes/mir/settings/registry.lua",
+              "1.9.3:prototypes/mir/settings/registry.lua",
+              "2.3.0:prototypes/mir/settings/registry.lua",
+              "3.0.0:prototypes/mir/settings/registry.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          },
+          {
+            "blob": "fbd0642a127305b7c8e4ac40c30a46b39cc1918e",
+            "paths": [
+              "prototypes/mir/settings/defaults.lua"
+            ],
+            "bytes": 3976,
+            "sha256": "452A8F910A882B05F737ADD4B9F8A47BDDB6C009DC27A52D641FA2E89AFB573C",
+            "references": [
+              "1.3.0:prototypes/mir/settings/defaults.lua",
+              "1.4.0:prototypes/mir/settings/defaults.lua"
+            ],
+            "disposition": "consolidate-source-intent-retain-original-target-context"
+          }
+        ],
+        "groups": [
+          {
+            "id": "stable-settings-identities-constraints-and-lifetime",
+            "disposition": "consolidate",
+            "independent_expectation": "Retain stable setting IDs, all seven stream fields, native-chain sentinels, hidden availability without deleting identity, catalogue-valid profile imports and startup/data/runtime lifetime boundaries. Preserve false and zero distinctly from absence. Registry schema/rules and template evolution are data, not authority to restore an old compiler registry.",
+            "implementation": [
+              "source/research/settings.lua",
+              "source/research/settings_profile.lua",
+              "source/research/historical_settings.lua",
+              "source/runtime/configuration.lua"
+            ],
+            "controls": [
+              "tests/test_settings_profile.py",
+              "tests/test_settings_commands.py",
+              "tests/test_historical_continuations.py"
+            ],
+            "evidence": "spec/evidence/settings-registry-defaults-applicability-aero-r01.json",
+            "remaining_executable_check": "Complete affected configured import/export/native/save/client outcomes with exact final inputs. Existing host codec/declaration passes do not establish physical exported files or nondefault effects.",
+            "owner": "Aero expectation/applicability; Black Glass affected native/file/client execution"
+          },
+          {
+            "id": "actual-global-prototypes-and-compatibility-selectors",
+            "disposition": "retain-produced-surface-retire-unused-metadata-inference",
+            "independent_expectation": "The actual historical global constructor, not registry.global mode alone, supplies hidden/compiler and ordinary global rows. Retain hidden full/classic compatibility identity, automatic-preview/legacy selector limits, types/defaults/bounds/allowed values and startup lifetime. All26 registry keys plus the separately declared passive-repair/worker-cap globals are represented in the independent28-row baseline.",
+            "implementation": [
+              "source/research/historical_settings.lua",
+              "source/research/settings.lua",
+              "source/compatibility/automatic_productivity.lua"
+            ],
+            "controls": [
+              "tests/test_settings_profile.py:test_registered_settings_are_the_single_active_profile_authority",
+              "tests/test_settings_profile.py:test_import_precedence_uses_profile_validation_before_consumer_normalization"
+            ],
+            "evidence": "spec/evidence/settings-registry-defaults-applicability-aero-r01.json",
+            "applicable_result": "All196 selected declaration fields on28globals match the independent historical baseline in original B/F200/Base2.0.77 actual settings dump AF256909; original native result629E2935 is retained. F210 Base+SpaceAge host declarations match independently. This is scoped declared-prototype parity only.",
+            "remaining_executable_check": "Qualify effective configured behavior and affected contexts. Do not call B a C execution or infer another engine/profile, compiler-generated research, native UI or export acceptance.",
+            "owner": "Aero independent source/actual-dump comparison; Black Glass current native qualification"
+          },
+          {
+            "id": "authored-default-overrides-and-sentinels",
+            "disposition": "retain-latest-applicable-defaults-and-original-contexts",
+            "independent_expectation": "Preserve explicit per-stream/native overrides before definition/shared fallback, including growth/cost/time/linear values, zero-unlimited and native inherit semantics. Do not reintroduce an earlier modern disabled-spoilage or disabled-inserter value into the later enabled contract. Earlier target variants remain historical facts, not blanket bugs or current defaults.",
+            "implementation": [
+              "source/research/settings.lua",
+              "source/research/historical_settings.lua",
+              "source/research/modern.lua",
+              "source/compatibility/modern_catalogue.lua"
+            ],
+            "controls": [
+              "tests/test_settings_profile.py:test_direct_growth_ceiling_refuses_before_construction_and_keeps_native_zero_inheritance",
+              "tests/test_historical_continuations.py"
+            ],
+            "evidence": "spec/evidence/settings-registry-defaults-applicability-aero-r01.json",
+            "applicable_result": "All68 explicit numeric/boolean latest-default values match current F210 Base+SpaceAge host declarations. This does not infer every shared fallback, provider override or native effect.",
+            "remaining_executable_check": "Keep existing CONT-03 targeted nondefault/precedence cases and supported-profile applicability review. No automatic rerun of unchanged defaults or every historical patch.",
+            "owner": "Aero source mapping; Black Glass affected configured-output execution"
+          },
+          {
+            "id": "science-array-inheritance-and-target-context",
+            "disposition": "consolidate-accepted-policy-expectations",
+            "independent_expectation": "Later source tables distinguish inherited chain science, explicit add lists, all-science addition and native anchor/manifest identities. Old science names and earlier target-specific arrays do not override later accepted policy or exact engine/provider availability. No arbitrary profile is fabricated from these declarations.",
+            "implementation": [
+              "source/research/science.lua",
+              "source/research/modern.lua",
+              "source/compatibility/science_bindings.lua",
+              "source/compatibility/modern_catalogue.lua"
+            ],
+            "controls": [
+              "tests/test_science.py",
+              "tests/test_historical_continuations.py"
+            ],
+            "evidence": "spec/evidence/settings-registry-defaults-applicability-aero-r01.json",
+            "remaining_executable_check": "Use existing CONT-05 science/lab and named SIF/current-profile evidence under exact consumed inputs; run only affected composed outcomes. Unknown reporter closures and remaining nondefault/native profiles stay open.",
+            "owner": "Aero independent intent review; Black Glass admitted science/native queue"
+          },
+          {
+            "id": "risk-notices-presentation-and-identity-aliases",
+            "disposition": "retain-useful-notices-retire-layout-only-fields",
+            "independent_expectation": "Retain the meaningful agriculture/cargo/inserter warnings and technology/settings identities while data layout evolves. The latest inserter risk tooltip uses mod-setting-description.mir-note-inserter-capacity; current authored continuation descriptions and enabled-setting notes keep that key. Registry ordering hints, risk object layout and removed laser chain/generated-key transport are not public rename authority.",
+            "implementation": [
+              "source/compatibility/modern_catalogue.lua",
+              "source/research/historical_settings.lua",
+              "source/research/historical_direct_settings.lua",
+              "source/research/settings.lua"
+            ],
+            "controls": [
+              "tests/test_historical_direct.py:test_historical_settings_keep_exact_names_defaults_and_time_sentinel",
+              "tests/test_historical_continuations.py"
+            ],
+            "evidence": "spec/evidence/settings-registry-defaults-applicability-aero-r01.json",
+            "remaining_executable_check": "Preserve exact migration/laser identities and original accepted bridge evidence; review final-package warning/localization presentation and affected client/save cases. Source key presence is not rendered/native proof.",
+            "owner": "Aero source/package/independent review; Black Glass affected native presentation/state"
+          }
+        ],
+        "current_evidence": "spec/evidence/settings-registry-defaults-applicability-aero-r01.json",
+        "host_validation": {
+          "plan_materialized": true,
+          "lua": "5.2",
+          "lupa": "2.6",
+          "existing_controls": 60,
+          "modified_or_new_tests": 0
+        },
+        "custody": "Primary build/qualification/aero-settings-registry-defaults-preparation-r01 retains22 exact bodies,150 bindings, source/semantic diffs, all expected/observed rows, seven in-memory opponents, original wrong-query inspection receipt, host logs and byte-inverse proof.",
+        "qualification_limit": "This reconciles the two named source families and only the named B native global declarations. Other imports/default/catalogue/registry/inter-release/request/consumer sources, effective/native context outcomes and globalVER07 remain open. No player/test/controller change, new native run, fresh C admission, performance or release qualification.",
+        "native_execution_in_this_review": false,
         "source_reconciliation_complete": false,
         "test_intent_reconciliation_complete": false,
         "release_qualification": false
