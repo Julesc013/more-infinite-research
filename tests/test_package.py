@@ -124,6 +124,22 @@ class PackageTests(unittest.TestCase):
                             for dependency in expected_dependencies
                         ]
                     expected_dependencies.append(sif_ordering)
+                    # Actual Discovery runtime handlers must precede MIR's
+                    # bounded cap reconciliation. Keep the published inventory
+                    # intact and assert only the named new dependency.
+                    discovery_ordering = "? discovery_tree >= 1.0.10"
+                    self.assertNotIn(discovery_ordering, dependencies[target])
+                    offset = (expected_dependencies.index("(?) bobelectronics") + 1
+                              if target == "f210" else 1)
+                    expected_dependencies.insert(offset, discovery_ordering)
+                    if target == "f210":
+                        # Muria authors finite7/8; Muluna can finalize their
+                        # science. The explicit9 binding consumes both stages.
+                        muria_ordering = ["(?) Muria", "(?) planet-muluna"]
+                        for dependency in muria_ordering:
+                            self.assertNotIn(dependency, dependencies[target])
+                        offset = expected_dependencies.index("(?) Krastorio2-spaced-out") + 1
+                        expected_dependencies[offset:offset] = muria_ordering
                 self.assertEqual(info["factorio_version"], family)
                 self.assertEqual(info["dependencies"], expected_dependencies)
                 self.assertEqual(info["dependencies"][0], "base >= " + minimum)

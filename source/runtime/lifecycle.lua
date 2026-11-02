@@ -6,6 +6,7 @@ local legacy_caps = require("runtime.legacy_caps")
 local native_owners = require("research.native_owners")
 local cap_admission = require("runtime.cap_admission")
 local catalogue = require("runtime.catalogue")
+local DISCOVERY_TREE = script and script.active_mods and script.active_mods.discovery_tree ~= nil
 local platform_target = require("platform.target")
 
 local M = {}
@@ -338,6 +339,20 @@ function M.caps_active()
   return CAPS_ACTIVE
 end
 
+function M.discovery_visibility(force)
+  local visible = {}
+  if not DISCOVERY_TREE or not valid_force(force) then return visible end
+  local current = existing_state()
+  local owned = current and current.owned_disabled[force.index]
+  for name, record in pairs(owned or {}) do
+    if type(record) == "table" and record.discovery_enabled == true
+        and (DECLARATION_BY_ID[name] ~= nil or name == WORKER_TAIL_NAMES[1] or name == WORKER_TAIL_NAMES[2]) then
+      visible[name] = true
+    end
+  end
+  return visible
+end
+
 -- A cap record binds to a current authored identity. If a feature is disabled,
 -- an owner no longer matches its exact effect contract, or a worker tail is
 -- superseded, discard only MIR's future restoration right. This fails closed:
@@ -376,7 +391,8 @@ local function discard_unbound_ownership(force, owned_disabled, admitted, owner,
   return owned
 end
 
-local function reconcile_force(force, owned_disabled, selected_owner, owner_resolved, target_name, imported_reenabled)
+local function reconcile_force(force, owned_disabled, selected_owner, owner_resolved, target_name, imported_reenabled,
+    discovery_observed)
   if not valid_force(force) then return end
   local owned = type(owned_disabled) == "table" and owned_disabled[force.index] or nil
   local include_worker = has_worker_ownership(owned)
@@ -410,7 +426,9 @@ local function reconcile_force(force, owned_disabled, selected_owner, owner_reso
     end
   end
   local targets = target_name and {[target_name] = true} or nil
-  local _, result = caps.reconcile(force, limits, owned_disabled, targets, imported_reenabled)
+  local observation
+  if DISCOVERY_TREE then observation = discovery_observed == true end
+  local _, result = caps.reconcile(force, limits, owned_disabled, targets, imported_reenabled, observation)
   if result.unresolved_current then
     error("MIR unsupported native research queue state for over-cap current research: "
       .. result.unresolved_current, 2)
@@ -428,7 +446,7 @@ local function force_for_index(index)
   return nil
 end
 
-local function reconcile_all(clean_stale_forces, selected_owners, imported_reenabled)
+local function reconcile_all(clean_stale_forces, selected_owners, imported_reenabled, discovery_observed)
   if not game or not game.forces then return end
   -- Unlimited startup settings need no state unless a previous finite setting
   -- left an ownership transition that has to be restored exactly once, or an
@@ -453,7 +471,7 @@ local function reconcile_all(clean_stale_forces, selected_owners, imported_reena
     local owner = valid_force(force) and selected_owners and selected_owners[force.index] or nil
     if current then
       reconcile_force(force, owned_disabled, owner, selected_owners ~= nil, nil,
-        imported_reenabled and imported_reenabled[force.index])
+        imported_reenabled and imported_reenabled[force.index], discovery_observed)
     end
   end
   if current then discard_empty_state(current) end
@@ -621,7 +639,10 @@ local function event_force(event)
   return nil
 end
 
-local function reconcile_event(event, research_only)
+local function reconcile_event(event, research_only, discovery_observed)
+  -- One upstream discovery event can change every technology on its force.
+  -- Reconcile only MIR's bounded admitted rows, rather than just the finished ID.
+  if DISCOVERY_TREE and discovery_observed then research_only = false end
   local force = event_force(event)
   if not force then return end
   -- Named research callbacks need only cap reconciliation. Rare force/reset
@@ -638,7 +659,7 @@ local function reconcile_event(event, research_only)
   local research = event and event.research
   local name = research_only and research and research.name or nil
   if research_only and type(name) ~= "string" then return end
-  reconcile_force(force, current.owned_disabled, nil, false, name)
+  reconcile_force(force, current.owned_disabled, nil, false, name, nil, discovery_observed)
   discard_empty_state(current)
 end
 
@@ -651,37 +672,37 @@ local function clear_force(index)
 end
 
 function M.on_init()
-  reconcile_all(false)
+  reconcile_all(false, nil, nil, true)
 end
 
 function M.on_configuration_changed(event)
   local owners, imported_reenabled = import_legacy_caps_on_configuration(event)
-  reconcile_all(true, owners, imported_reenabled)
+  reconcile_all(true, owners, imported_reenabled, true)
 end
 
 function M.on_force_created(event)
   local force = event and event.force
   if valid_force(force) then clear_force(force.index) end
-  reconcile_event(event)
+  reconcile_event(event, false, true)
 end
 
 function M.on_force_reset(event)
   local force = event and event.force
   if valid_force(force) then clear_force(force.index) end
-  reconcile_event(event)
+  reconcile_event(event, false, true)
 end
 
 function M.on_forces_merged(event)
   clear_force(event and event.source_index)
-  reconcile_event(event)
+  reconcile_event(event, false, true)
 end
 
 function M.on_research_finished(event)
-  reconcile_event(event, true)
+  reconcile_event(event, true, true)
 end
 
 function M.on_research_reversed(event)
-  reconcile_event(event, true)
+  reconcile_event(event, true, true)
 end
 
 function M.on_technology_effects_reset(event)
@@ -693,7 +714,22 @@ function M.on_research_started(event)
 end
 
 function M.on_research_cancelled(event)
-  reconcile_event(event, true)
+  if not M.on_discovery_tree_queue_changed(event) then reconcile_event(event, true) end
+end
+
+function M.on_discovery_tree_queue_changed(event)
+  if not DISCOVERY_TREE then return false end
+  local setting = settings and settings.global and settings.global["discovery-tree-consider-researched"]
+  local mode = setting and setting.value
+  if mode ~= "queued" and mode ~= "available-after-queue" then return false end
+  reconcile_event(event, false, true)
+  return true
+end
+
+function M.on_discovery_tree_changed(event)
+  if not DISCOVERY_TREE then return end
+  if event_force(event) then reconcile_event(event, false, true)
+  else reconcile_all(false, nil, nil, true) end
 end
 
 -- There are no local bindings to reconstruct. The parse-time bootstrap owns
