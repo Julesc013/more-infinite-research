@@ -15999,8 +15999,8 @@
         ],
         "reviewed_on": "2026-11-03",
         "reviewed_against": "30382cf3d3970b820e169193cb8bda1db3587ec4",
-        "scope": "Exactly one deduplicated historical fixture. Four explicit release bindings checked, not all tags containing the body or the entire settings audit.",
-        "selected_blob_count": 1,
+        "scope": "Exactly one deduplicated historical fixture and one supporting published codec body. Four fixture release bindings and the v4.7.3 codec binding checked; no entire settings or external-consumer audit.",
+        "selected_blob_count": 2,
         "explicit_remote_tag_bindings_checked": 4,
         "evidence": "spec/evidence/startup-profile-decode-intents-aero-r01.json",
         "groups": [
@@ -16030,15 +16030,17 @@
           },
           {
             "id": "mutable-cache-fingerprint-harness",
-            "disposition": "superseded-implementation-retain-unresolved-boundary",
-            "remaining_executable_check": "No old framework/cache restoration. Determine whether any real public codec consumer requires the nonstring boundary before disposition; descriptor-copy controls do not silently cover that edge.",
+            "disposition": "superseded-getter-mechanism-port-codec-boundaries",
+            "remaining_executable_check": "Selected low-level host edge covered; no old getter/cache restoration. Actual independent old-consumer transition and native remote/client qualification remain open under CONT-14; this control grants no new nonstring remote-input support.",
             "owner": "Aero contract/consumer audit"
           }
         ],
         "native_execution_in_this_review": false,
         "source_reconciliation_complete": false,
         "test_intent_reconciliation_complete": false,
-        "release_qualification": false
+        "release_qualification": false,
+        "selected_fixture_blob_count": 1,
+        "supporting_codec_blob_count": 1
       }
     ],
     "stable_coverage_review": {

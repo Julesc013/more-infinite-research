@@ -6,7 +6,7 @@
     "CONT-03",
     "CONT-14"
   ],
-  "scope": "Exactly one deduplicated historical fixture. Four explicit release bindings checked, not all tags containing the body or the entire settings audit.",
+  "scope": "Exactly one deduplicated historical fixture and one supporting published codec body. Four fixture release bindings and the v4.7.3 codec binding checked; no entire settings or external-consumer audit.",
   "original_source": {
     "blob": "5c4ccb190d41ec3cf7baa545e08d346248f8ee92",
     "bytes": 6342,
@@ -104,20 +104,21 @@
     },
     {
       "id": "mutable-cache-fingerprint-harness",
-      "disposition": "superseded-implementation-retain-unresolved-boundary",
+      "disposition": "superseded-getter-mechanism-port-codec-boundaries",
       "original_expectation": "Helper identity/function changes invalidate cached decoding; changed registration/validation is rechecked; mutable nonstring input is converted with tostring anew.",
-      "variant_decision": "Specific cache identity/fingerprint assertions target the retired per-lookup reader. Startup/helper mutation inside one Factorio control instance is not current runtime settings-change authority. Retain validation and codec conversion at their real boundaries; nonstring public-consumer intent is not established merely by this mock.",
+      "variant_decision": "Retire the per-lookup cache/fingerprint architecture. Preserve its existing low-level codec expectations: fresh tostring conversion and current supplied JSON/decode helpers. The published codec and current direct facade both call this boundary; the new host control preserves its behavior without asserting mutable live startup settings or metatable transport through Factorio remote.call.",
       "current_controls": [
         "tests/test_settings_profile.py::test_settings_descriptors_remain_stable_after_caller_mutation_and_parse_closure",
-        "tests/test_settings_profile.py::test_settings_queries_and_runtime_profile_facade_work_after_module_loading_closes"
+        "tests/test_settings_profile.py::test_settings_queries_and_runtime_profile_facade_work_after_module_loading_closes",
+        "tests/test_settings_profile.py::test_codec_uses_fresh_text_conversion_and_current_supplied_helpers"
       ],
-      "remaining_executable_check": "No old framework/cache restoration. Determine whether any real public codec consumer requires the nonstring boundary before disposition; descriptor-copy controls do not silently cover that edge.",
+      "remaining_executable_check": "Selected low-level host edge covered; no old getter/cache restoration. Actual independent old-consumer transition and native remote/client qualification remain open under CONT-14; this control grants no new nonstring remote-input support.",
       "owner": "Aero contract/consumer audit"
     }
   ],
   "host_validation": {
     "new_tests_run": true,
-    "settings_profile_methods": 10,
+    "settings_profile_methods": 11,
     "settings_profile_pass": true,
     "selected_custody_methods": 5,
     "selected_custody_pass": true,
@@ -132,7 +133,17 @@
       "result_sha256": "2de32f57adb6651410b5190b70598ac1b69df8793062bf759637bf7b7e91b9ed",
       "limits": "Injected source opponents are control sensitivity, not an observed current product defect. Initial unavailable-loadstring wrapper error is preserved and never counted as rejection."
     },
-    "native_execution": false
+    "native_execution": false,
+    "fresh_codec_opponents": {
+      "new_control_rejects_both": true,
+      "prior_ten_accept_both": true,
+      "opponents": [
+        "cache by input object without fresh tostring",
+        "cache by converted text without current helper environment"
+      ],
+      "result_sha256": "df658482df2fe32d8ab31e64f4a2ddc9e492b204c191ce1312590bc768cb603f",
+      "native_execution": false
+    }
   },
   "source_reconciliation_complete": false,
   "test_intent_reconciliation_complete": false,
@@ -142,5 +153,14 @@
     "Original fixture expressly denies native serialization/performance coverage.",
     "Original 87 requests, global discovery and pending groups remain unchanged; no whole settings or VER07 verdict.",
     "No player/tests/progress/changelog or frozenE changes."
-  ]
+  ],
+  "supporting_published_codec": {
+    "tag": "v4.7.3",
+    "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+    "path": "source/prototypes/mir/settings/profile_codec.lua",
+    "blob": "1a5f4b32c54d472309e5abf355b005e97f000314",
+    "bytes": 7724,
+    "sha256": "54e9610324ae701fdf4cee657fabaf34e9b76d8973276449c42f80a0ba3dfdca",
+    "binding": "Raw immutable Git body equals selected published4.7.21003 archive member."
+  }
 }

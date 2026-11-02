@@ -214,6 +214,32 @@ class SettingsProfileTests(unittest.TestCase):
           assert(settings.startup[config.import_setting_name].value == incoming)
         ''')
 
+    def test_codec_uses_fresh_text_conversion_and_current_supplied_helpers(self):
+        # Published fixture5c4ccb19 and codec54e96103 preserve tostring input
+        # and current helper results. This exercises the low-level host codec;
+        # it does not assert metatable transport across Factorio remote.call.
+        self.lua.execute(r'''
+          decoded.first = {schema=1, settings={cap=40, enabled=false}}
+          decoded.second = {schema=1, settings={cap=60, enabled=true}}
+          local text = "MIRSET1:first"
+          local input = setmetatable({}, {__tostring=function() return text end})
+          local profile = assert(codec.decode(input, helpers))
+          assert(profile.settings.cap == 40 and profile.settings.enabled == false)
+          text = "MIRSET1:second"
+          profile = assert(codec.decode(input, helpers))
+          assert(profile.settings.cap == 60 and profile.settings.enabled == true)
+          helpers.json_to_table = function(value)
+            if value == "first" then return {schema=1, settings={cap=80, enabled=false}} end
+            return {schema=1, settings={cap=70, enabled=true}}
+          end
+          profile = assert(codec.decode(input, helpers))
+          assert(profile.settings.cap == 70 and profile.settings.enabled == true)
+          helpers.decode_string = function(_) return "first" end
+          profile = assert(codec.decode(input, helpers))
+          assert(profile.settings.cap == 80 and profile.settings.enabled == false)
+          assert(text == "MIRSET1:second")
+        ''')
+
     def test_codec_has_canonical_identity_and_strict_compact_option(self):
         self.lua.execute(r'''
           local full = codec.current_profile({
