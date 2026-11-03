@@ -8,6 +8,7 @@ local modern = require("compatibility.modern_catalogue")
 
 local foreign_technology_prototypes
 local native_adoptions
+local withheld_native_owners
 if target.id == "f200" or target.id == "f210" then
   local live_technologies
   if prototypes ~= nil and prototypes.technology ~= nil then
@@ -55,7 +56,7 @@ if target.id == "f200" or target.id == "f210" then
   local native_data = prototypes and prototypes.mod_data
   local adopted = native_data and native_data["more-infinite-research-native-adoptions"]
   if adopted ~= nil then
-    native_adoptions = require("research.native_adoption").read(adopted.data,
+    native_adoptions, withheld_native_owners = require("research.native_adoption").read(adopted.data,
       modern.native_owners(script and script.active_mods))
   end
 end
@@ -69,11 +70,11 @@ local M = {}
 -- shipped module; the real player module always supplies this preparation
 -- hook.
 if type(catalogue.prepare) == "function" then
-  catalogue.prepare(foreign_technology_prototypes)
+  catalogue.prepare(foreign_technology_prototypes, withheld_native_owners)
 end
 
 function M.declared()
-  local rows = catalogue.declared(foreign_technology_prototypes)
+  local rows = catalogue.declared(foreign_technology_prototypes, withheld_native_owners)
   if native_adoptions == nil or next(native_adoptions) == nil then return rows end
   for _, row in ipairs(rows) do
     local adoption = native_adoptions and native_adoptions[row.id]
@@ -82,6 +83,23 @@ function M.declared()
       for index, name in ipairs(adoption.recipes) do recipes[index] = name end
       row.native_adoption = {recipes=recipes, effect_change=adoption.effect_change,
         configured_change=adoption.configured_change}
+    end
+  end
+  return rows
+end
+
+-- Withholding new settings authority does not erase a proven earlier cap.
+-- These at-most-five exact declarations are solely for releasing existing
+-- ownership; they never enter the Library or the new-control catalogue.
+function M.restoration_only()
+  local rows = {}
+  if withheld_native_owners == nil or next(withheld_native_owners) == nil then return rows end
+  for _, owner in ipairs(modern.native_owners(script and script.active_mods)) do
+    if withheld_native_owners[owner.id] ~= nil then
+      rows[#rows + 1] = {id=owner.id, family=owner.family, cap_setting=owner.setting,
+        ownership_kind="nativeowner", native_owner_identity=owner.id,
+        native_admission=owner.admission,
+        legacy_binding={source="native-owner", operation="preserve_native_owner"}}
     end
   end
   return rows
