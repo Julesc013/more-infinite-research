@@ -26,6 +26,9 @@ class StartupTimingTests(unittest.TestCase):
 14.000 Factorio initialised
 """)
         self.assertEqual(row["approximate_loader_seconds"], .75)
+        self.assertEqual(row["approximate_settings_seconds"], .25)
+        self.assertEqual(row["approximate_data_final_fixes_seconds"], .5)
+        self.assertIsNone(row["approximate_data_updates_seconds"])
         self.assertEqual([x["seconds"] for x in row["approximate_loader_intervals"]], [.25, .5])
         self.assertIn("Checksum", row["approximate_loader_intervals"][-1]["end_boundary"])
         self.assertEqual(row["engine_initialised_seconds"], 14)
@@ -53,6 +56,8 @@ class StartupTimingTests(unittest.TestCase):
 """)
         self.assertIsNone(row["scoped_seconds"])
         self.assertIsNone(row["approximate_loader_seconds"])
+        self.assertEqual(row["loader_status"], "unavailable")
+        self.assertTrue(row["loader_warnings"])
         self.assertEqual(len(row["phases"]), 2)
         self.assertTrue(all(x["status"] == "incomplete" for x in row["phases"]))
         self.assertIsNone(row["post_mir_to_next_milestone"])

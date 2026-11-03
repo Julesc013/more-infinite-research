@@ -24,7 +24,7 @@ Run from the repository; output paths must be new and their parent directories m
 python -B tools/startup_timings.py --log path/to/factorio-current.log --run-id original-run --json startup-intervals.json --csv startup-intervals.csv
 ```
 
-Use `--expected-sha256` to require a retained log's exact identity. The reader hashes its input and never launches Factorio, changes settings or overwrites output. JSON contains named interval boundaries, source line numbers, nested phase detail and missing/adverse-boundary issues. CSV is a compact summary. Untimestamped output is unavailable; restarted clocks, duplicated phases, crossing pairs and missing ends prevent a scoped total. Nested phases are not added again to whole stages. The post-MIR interval requires a complete final-fixes stage and names its next engine boundary.
+Use `--expected-sha256` to require a retained log's exact identity. The reader hashes its input and never launches Factorio, changes settings or overwrites output. JSON contains named interval boundaries, source line numbers, nested phase detail and missing/adverse-boundary issues. CSV includes the six settings/data stage windows, total, missing-boundary warnings and original endpoint identities. Untimestamped output is unavailable; restarted clocks, duplicated phases, crossing pairs and missing ends prevent a scoped total. Nested phases are not added again to whole stages. The post-MIR interval requires a complete final-fixes stage and names its next engine boundary.
 
 Keep three metrics separate:
 

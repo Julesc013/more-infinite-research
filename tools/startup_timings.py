@@ -16,6 +16,7 @@ STAMP = re.compile(r"^\s*(\d+\.\d+)\s+(.*)$")
 LOADER = re.compile(r"^Loading mod(?: settings)? (\S+) (\S+) \(([^()]+\.lua)\)$")
 MARKER = re.compile(r"(?:^|: )\[MIR startup\] stage=([\w-]+) phase=([\w-]+) event=(begin|end|work)(?: |$)")
 MILESTONE = re.compile(r"^(?:Checksum (?:for|of) |Prototype list checksum:|Factorio initialised\b|Crop bitmaps\.|Loading sprites|Created an atlas bitmap)")
+STAGES = ("settings", "settings-updates", "settings-final-fixes", "data", "data-updates", "data-final-fixes")
 
 
 def digest(raw: bytes) -> str:
@@ -84,10 +85,18 @@ def analyze(raw: bytes, run_id: str) -> dict:
             post = dict(seconds=float(boundary[0] - last_stage_end[0]), boundary=boundary[1],
                         end_line=boundary[2], attribution="after MIR; not exclusive MIR work")
     initialized = [when for when, message, _ in entries if message == "Factorio initialised"]
-    return dict(run_id=run_id, log_bytes=len(raw), log_sha256=digest(raw),
+    stage_windows = {}
+    for stage in STAGES:
+        intervals = [r for r in loaders if r["stage"] == stage + ".lua"]
+        stage_windows["approximate_" + stage.replace("-", "_") + "_seconds"] = (
+            intervals[0]["seconds"] if len(intervals) == 1 else None)
+    return dict(stage_windows, run_id=run_id, log_bytes=len(raw), log_sha256=digest(raw),
                 clock="native-log elapsed seconds; separate from actor Stopwatch",
                 engine_initialised_seconds=float(initialized[0]) if len(initialized) == 1 and monotonic else None,
                 approximate_loader_intervals=loaders,
+                loader_status=("not-present" if not loaders else
+                               "approximate" if all(r["seconds"] is not None for r in loaders) else "unavailable"),
+                loader_warnings=["unavailable loader boundary: " + r["stage"] for r in loaders if r["seconds"] is None],
                 approximate_loader_seconds=round(sum(r["seconds"] for r in loaders), 9)
                 if loaders and all(r["seconds"] is not None for r in loaders) else None,
                 phases=phases,
@@ -214,6 +223,8 @@ CSV_FIELDS = ["run_id", "engine", "workload", "archive_version", "arm", "phase",
               "original_observation_kind",
               "original_first_menu_seconds", "original_confirmed_settings_seconds",
               "engine_initialised_seconds", "approximate_loader_seconds", "scoped_seconds", "scoped_status",
+              *["approximate_" + stage.replace("-", "_") + "_seconds" for stage in STAGES],
+              "loader_status", "loader_warnings", "issues",
               "longest_observed_checkpoint_gap_seconds", "log_bytes", "log_sha256", "original_log_path",
               "original_source_commit", "snapshot_sha256", "capsule_sha256", "cache_policy", "analysis_class"]
 
