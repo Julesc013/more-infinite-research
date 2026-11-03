@@ -144,7 +144,7 @@ end
 -- including recipes now earned through a native owner. Absence from today's
 -- public vector must not erase an already-earned signed credit route.
 if next(native_credit_targets) ~= nil then
-  for family, recipes in pairs(require("compatibility.modern_catalogue.sif_retained").paid_recipe_sets()) do
+  for family, recipes in pairs(require("research.native_credit_definitions").published_sif_paid_recipe_sets()) do
     local targets = native_credit_targets[family]
     if targets then
       for recipe in pairs(recipes) do

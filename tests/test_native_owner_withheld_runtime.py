@@ -265,6 +265,10 @@ class WithheldRuntimeTests(unittest.TestCase):
                     row.prototype=proto;row.force=world;world.technologies[name]=row
                   end
                   local credits=actual_data["more-infinite-research-native-adoptions"].data.credits
+                  for family in pairs(credits) do
+                    local main="recipe-prod-"..family.."-1"
+                    install(main,main==id and actual_generated and 3 or 1)
+                  end
                   for _,d in ipairs(require("research.native_credit_definitions").collected_descriptors(credits)) do
                     install(d.main_id,d.main_id==id and actual_generated and 3 or 1)
                     install(d.positive_id);install(d.negative_id)
