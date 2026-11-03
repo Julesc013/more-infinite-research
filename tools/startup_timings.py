@@ -253,7 +253,7 @@ def main() -> None:
             handle.write(output)
     if args.csv:
         with args.csv.open("x", encoding="utf-8", newline="") as handle:
-            writer = csv.DictWriter(handle, fieldnames=CSV_FIELDS, extrasaction="ignore")
+            writer = csv.DictWriter(handle, fieldnames=CSV_FIELDS, extrasaction="ignore", lineterminator="\n")
             writer.writeheader()
             writer.writerows(rows)
     if not args.json and not args.csv:
