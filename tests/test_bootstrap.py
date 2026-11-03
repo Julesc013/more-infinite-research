@@ -837,14 +837,19 @@ class BootstrapTests(unittest.TestCase):
             and storage.mir.historical_other == "keep" and handlers.nth[60] == nil)
         ''')
 
-    def test_data_stage_emits_only_the_published_shortcut_identity(self):
+    def test_data_stage_keeps_the_published_shortcut_and_private_native_admission(self):
         self.lua.execute('''
           local function capture(space_age)
             emitted = nil
             mods = space_age and {["space-age"] = "2.0.0"} or {}
             data = {extend = function(_, rows) emitted = rows end}
             assert(loadfile(data_source))()
-            assert(#emitted == 1)
+            assert(#emitted == (space_age and 2 or 1))
+            if space_age then
+              local private=emitted[2]
+              assert(private.type=="mod-data" and private.name=="more-infinite-research-native-adoptions")
+              assert(private.data.schema==1 and next(private.data.owners)==nil)
+            end
             return emitted[1]
           end
           local base = capture(false)
