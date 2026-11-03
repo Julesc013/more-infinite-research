@@ -408,6 +408,7 @@ class BobCoreMaterialTests(unittest.TestCase):
           end
           package.preload["research.modern"] = function()
             return {preflight_recipe_patches=function() end, preflight_native_owner_patches=function() return {} end,
+              native_owner_product_targets=function() return {} end, preflight_collected_native_owner_targets=function() end,
               technologies=function() return {} end, apply_weapon_speed_overlap=function() end,
               apply_native_owner_patches=function() end, apply_recipe_patches=function() end}
           end

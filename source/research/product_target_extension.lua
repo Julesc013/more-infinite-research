@@ -180,9 +180,24 @@ function M.extend(technologies, values, context)
       selected[family], streams[family], count = row, stream, count + 1
     end
   end
+  local native_selected, native_owned = {}, {}
+  for _, row in ipairs(context.native_owner_targets or {}) do
+    for _, effect in ipairs(row.effects) do
+      if effect.type == "change-recipe-productivity" and type(effect.recipe) == "string" then
+        local previous = native_owned[effect.recipe]
+        native_owned[effect.recipe] = previous == nil and row.family
+          or previous == row.family and previous or true
+      end
+    end
+    if row.active then
+      assert(selected[row.family] == nil, "MIR native-owner family also emitted " .. row.family)
+      selected[row.family], streams[row.family], native_selected[row.family] = row, values.streams[row.family], true
+      count = count + 1
+    end
+  end
   for family in pairs(replacement_families) do
     local technology = selected[family]
-    if technology then
+    if technology and not native_selected[family] then
       -- `technologies` is the detached generated output.  Replacing this one
       -- declared effect vector neither changes the input definitions nor starts
       -- another recipe pass.  A partial consumer may intentionally omit an
@@ -209,9 +224,10 @@ function M.extend(technologies, values, context)
   -- cache: this sole final-fixes call sees the current recipe tables.
   local bindings = require("compatibility.product_bindings")
   local rules = {}
-  local function admit(rows, exact)
+  local function admit(rows, exact, native)
     for _, row in ipairs(rows) do
-      if selected[row.family] and (exact or not exact_families[row.family]) and (not row.structural_fallback
+      if selected[row.family] and (native == true) == (native_selected[row.family] == true)
+        and (exact or not exact_families[row.family]) and (not row.structural_fallback
         or automatic) then
         rules[#rules + 1] = row
       end
@@ -219,6 +235,7 @@ function M.extend(technologies, values, context)
   end
   admit(bindings.base.bindings)
   if context.mods and context.mods["space-age"] then admit(bindings.space_age.bindings) end
+  admit(bindings.native_owner_bindings, true, true)
   local lab_count, input_count = 0, 0
   if selected.research_science_pack_productivity and not exact_families.research_science_pack_productivity then
     local rule
@@ -257,6 +274,47 @@ function M.extend(technologies, values, context)
   local collector = require("compatibility.product_targets")
   local result = collector.collect(context.raw.recipe, collector.prepare(rules, {raw=context.raw}))
   verify_required_targets(result, required_targets)
+  for _, row in ipairs(context.native_owner_targets or {}) do
+    if row.active then
+      local relevant, change, mixed = {}, nil, false
+      for _, recipe in ipairs(row.definition and row.definition.admission.recipes or {}) do relevant[recipe] = true end
+      for _, match in ipairs(result.by_family[row.family] or {}) do relevant[match.recipe] = true end
+      for _, effect in ipairs(row.effects) do
+        if effect.type == "change-recipe-productivity" and relevant[effect.recipe] then
+          local value = effect.change
+          if type(value) ~= "number" or value ~= value or value == math.huge or value == -math.huge
+            or change ~= nil and change ~= value then mixed = true end
+          change = value
+        end
+      end
+      -- Published default adoption inherits the owner's uniform relevant
+      -- change. Only an explicitly configured MIR effect overrides it.
+      row.effect_change = row.configured_effect and streams[row.family].effect_percent / 100
+        or not mixed and change or nil
+    end
+  end
+  local native_claims, new_native_claims = {}, {}
+  for recipe, family in pairs(native_owned) do native_claims[recipe] = family end
+  for _, row in ipairs(context.native_owner_targets or {}) do
+    if row.active then
+      for _, match in ipairs(result.by_family[row.family] or {}) do
+        if native_claims[match.recipe] == nil then
+          native_claims[match.recipe], new_native_claims[match.recipe] = row.family, row.family
+        end
+      end
+    end
+  end
+  -- Do not remove an already-emitted MIR effect to make a new native claim.
+  -- Such a previously paid overlap needs its own migration qualification.
+  for family, row in pairs(selected) do
+    if not native_selected[family] then
+      for _, effect in ipairs(row.effects) do
+        if effect.type == "change-recipe-productivity" and new_native_claims[effect.recipe] then
+          error("MIR native-owner target overlaps an existing MIR effect: " .. effect.recipe, 2)
+        end
+      end
+    end
+  end
   report.work = result.work
   report.work.modules = module_count
   report.work.labs, report.work.lab_inputs = lab_count, input_count
@@ -276,16 +334,24 @@ function M.extend(technologies, values, context)
         return left.product_name < right.product_name
       end)
     end
-    for _, effect in ipairs(effects) do seen[effect.recipe] = true end
+    for _, effect in ipairs(effects) do
+      if effect.type == "change-recipe-productivity" and type(effect.recipe) == "string" then seen[effect.recipe] = true end
+    end
     local added = false
     for _, row in ipairs(rows) do
       local key
       if write then key = family .. "\0" .. row.recipe .. "\0" .. row.product_type .. "\0" .. row.product_name end
-      if excluded_recipes[family] and excluded_recipes[family][row.recipe] then
+      if native_claims[row.recipe] ~= nil and native_claims[row.recipe] ~= family then
+        if write then dispositions[key] = "retained-native-owner" end
+      elseif excluded_recipes[family] and excluded_recipes[family][row.recipe] then
         if write then dispositions[key] = "withheld" end
       elseif not seen[row.recipe] then
+        if native_selected[family] and technology.effect_change == nil then
+          error("MIR native-owner preflight: no uniform relevant effect change for " .. family, 2)
+        end
         effects[#effects + 1] = {type="change-recipe-productivity", recipe=row.recipe,
-          change=streams[family].effect_percent * row.weight / 100}
+          change=native_selected[family] and technology.effect_change
+            or streams[family].effect_percent * row.weight / 100}
         seen[row.recipe], added = true, true
         report.extended_effects = report.extended_effects + 1
         if write then dispositions[key] = "added" end
@@ -293,6 +359,7 @@ function M.extend(technologies, values, context)
         dispositions[key] = "already-present"
       end
     end
+    if added and native_selected[family] then technology.extended = true end
     if added then report.families = report.families + 1 end
   end
   if write then

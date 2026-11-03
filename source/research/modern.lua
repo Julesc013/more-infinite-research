@@ -285,7 +285,7 @@ local function planned_owner_change(stream, definition)
     or (configured(stream, "research_time") and stream.research_time > 0)
 end
 
-local function named_owner_effects(owner, definition)
+local function named_owner_effects(owner, definition, inherited_change)
   local expected, admission = definition.expected, definition.admission
   if type(owner.effects) ~= "table" then owner_error(definition, "missing effects") end
   local found = {}
@@ -294,7 +294,7 @@ local function named_owner_effects(owner, definition)
   for index = 1, #admission.recipes do found[admission.recipes[index]] = 0 end
   for _, effect in ipairs(owner.effects) do
     if effect.type == admission.effect_type and found[effect.recipe] ~= nil then
-      if effect.change ~= expected.effect_change then
+      if effect.change ~= (inherited_change or expected.effect_change) then
         owner_error(definition, "unexpected effect change for " .. effect.recipe)
       end
       found[effect.recipe] = found[effect.recipe] + 1
@@ -379,6 +379,49 @@ function M.preflight_native_owner_patches(selection, raw, values)
     end
   end
   return patches
+end
+
+-- Detached effects for only the five authored Space Age native families.
+-- They share the ordinary product collector; none is submitted to creation.
+function M.native_owner_product_targets(selection, raw, values, patches, active_mods)
+  local out = {}
+  if not (active_mods and active_mods["space-age"]) then return out end
+  local definitions, existing, generated = {}, {}, {}
+  for _, definition in ipairs(selection.native_owners) do definitions[definition.family] = definition end
+  for _, definition in ipairs(selection.definitions) do generated[definition.family] = true end
+  for _, patch in ipairs(patches) do existing[patch.owner] = patch end
+  for _, binding in ipairs(require("compatibility.product_bindings").native_owner_bindings) do
+    local definition = definitions[binding.family]
+    -- An explicit overhaul may retain a generated owner for this family.
+    -- Its authored recipe policy takes precedence over ordinary native adoption.
+    if definition and definition.id == binding.owner and not generated[binding.family] then
+      local stream = require_stream(values, binding.family)
+      local owner = raw.technology[definition.id]
+      local patch = owner and existing[owner]
+      local effects = patch and patch.effects
+      if effects == nil then effects = copy(type(owner) == "table" and type(owner.effects) == "table" and owner.effects or {}) end
+      out[#out + 1] = {family=binding.family, definition=definition, owner=owner,
+        effects=effects, patch=patch, active=stream.enabled == true,
+        configured_effect=configured(stream, "effect_percent")}
+    end
+  end
+  return out
+end
+
+function M.preflight_collected_native_owner_targets(targets, patches)
+  for _, row in ipairs(targets or {}) do
+    if row.extended then
+      local definition, owner = row.definition, row.owner
+      if type(owner) ~= "table" then owner_error(definition, "missing technology") end
+      if owner.max_level ~= "infinite" then owner_error(definition, "native productivity owner is not infinite") end
+      if owner.enabled == false then owner_error(definition, "native productivity owner is disabled") end
+      -- Only effects are being appended here. Default inherited unit, flags,
+      -- prerequisites and unrelated effects retain their upstream values.
+      named_owner_effects(owner, definition, not row.patch and row.effect_change or nil)
+      if row.patch then row.patch.effects = row.effects
+      else patches[#patches + 1] = {owner=owner, effects=row.effects} end
+    end
+  end
 end
 
 function M.apply_native_owner_patches(patches)

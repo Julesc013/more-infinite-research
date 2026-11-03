@@ -122,6 +122,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_material_native_fixture.py",
             "tests/test_product_targets.py",
             "tests/test_product_target_extension.py",
+            "tests/test_native_family_product_targets.py",
             "tests/test_diagnostics.py",
             "tests/test_target_adapters.py",
             "tests/test_caps.py",

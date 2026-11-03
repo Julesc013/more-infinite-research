@@ -94,13 +94,17 @@ end
 -- Retain broad product targeting in one relevant recipe pass. This extends
 -- detached authored effects without discovering families or inspecting
 -- foreign research. Existing named routes and weights retain precedence.
+local native_owner_targets = modern and modern.native_owner_product_targets(
+  modern_selection, data.raw, values, native_owner_patches, mods)
 require("research.product_target_extension").extend(technologies, values, {raw=data.raw, mods=mods, log=log,
+  native_owner_targets=native_owner_targets,
   required_product_targets=modern_selection and modern_selection.required_product_targets,
   additional_product_bindings=modern_selection and modern_selection.additional_product_bindings,
   exact_product_bindings=modern_selection and modern_selection.exact_product_bindings,
   exact_product_target_families=modern_selection and modern_selection.exact_product_target_families,
   replacement_product_target_families=modern_selection and modern_selection.replacement_product_target_families,
   excluded_product_target_recipes=modern_selection and modern_selection.excluded_product_target_recipes})
+if modern then modern.preflight_collected_native_owner_targets(native_owner_targets, native_owner_patches) end
 
 if modern_selection and modern_selection.bob_angel_f200_combined then
   require("compatibility.modern_catalogue.bob_angel_f200_combined").apply_effect_order(technologies)
