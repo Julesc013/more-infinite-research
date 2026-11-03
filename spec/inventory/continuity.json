@@ -16370,6 +16370,99 @@
         },
         "native_execution": false,
         "inventory_complete": false
+      },
+      {
+        "subjects": [
+          "CONT-04",
+          "CONT-06",
+          "CONT-08",
+          "CONT-09",
+          "VER-07"
+        ],
+        "reviewed_against": "71f32c36a3b125684210e1509b28e896466da1c3",
+        "scope": "Eleven complete synthetic fixture/metadata/assertion bodies plus two complete capsule/policy data bodies; one large approved-delta body reviewed only for provenance and29 named Galore changed-field classifications; three exact v4.7.3 ownership helpers read for corroboration. No whole legacy compiler or delta estate is reconciled.",
+        "evidence": {
+          "path": "spec/evidence/historical-named-overlap-intent-aero-r01.json",
+          "sha256": "CB139A6BD8DEBE4B840C0A7499ABD8B306B57279719391648428D74553D5C545"
+        },
+        "dispositions": [
+          {
+            "id": "atan-ash-x-big-mining-drill-independent-v1",
+            "disposition": "retain-compose-expectations-port-only-under-current-admitted-inputs",
+            "obligation": "Synthetic ATAN ash technology recipe-prod-research_ash_separation-1 is infinite/upgrade, requires atan-ash-processing, grants0.05 only to exact atan-ash-seperation and is its sole infinite owner; all four ash sinks exist but have zero infinite productivity owners. Independent drill manufacture retains its own family and effect. Keep upstream spelling seperation.",
+            "current_implementation": [
+              "source/compatibility/atan_productivity.lua",
+              "source/compatibility/atan_profile.lua",
+              "source/research/atan_productivity.lua",
+              "source/compatibility/product_bindings.lua"
+            ],
+            "current_controls": [
+              "tests/test_atan_productivity.py::test_base_pure_definitions_and_selected_rows_match_independent_facts",
+              "tests/test_atan_productivity.py::test_space_age_pure_definitions_rows_and_settings_match_independent_facts",
+              "tests/test_atan_productivity.py::test_selected_definitions_are_detached_and_preserve_the_withheld_effect_boundary",
+              "tests/test_atan_productivity.py::test_space_age_outputs_are_detached_and_keep_denied_routes_outside_effects",
+              "tests/test_product_target_extension.py"
+            ],
+            "applicable_evidence": [
+              "tests/fixtures/atan-f200-captured-facts.json",
+              "spec/evidence/atan-gameplay-chain.json"
+            ],
+            "remaining_executable_check": "Add a current admitted-input composition control for ash plus drill manufacture and exact zero-cross-family/denied-route expectations. Review actual dependencies before any affected native extension; existing Base/SpaceAge F200 native results retain original scope and do not qualify this synthetic combination, physical output, F210 or final candidate.",
+            "owner": "Aero independent expectations/focused controls; Black Glass only affected exact native route"
+          },
+          {
+            "id": "space-age-x-big-mining-drill-targeted-v1",
+            "disposition": "retain-one-manufacturing-family-and-effect-owner-with-qualified-inputs",
+            "obligation": "Original standalone fixture clones electric-mining-drill to item/entity big-mining-drill and adds its productive recipe. Original assertion requires the mining-drill family effect0.05 on that recipe. The named graph/delta adds single-family/single-owner intent; the755-byte assertion alone does not count all owners or even reject two matching effects.",
+            "current_implementation": [
+              "source/compatibility/product_bindings.lua: mining-drill weight0.25 against retained20percent default",
+              "source/compatibility/modern_catalogue/space_age.lua: authored big-mining-drill scale0.25",
+              "source/research/product_target_extension.lua: per-family already-present recipe suppression"
+            ],
+            "current_controls": [
+              "tests/test_product_target_extension.py::test_published_pattern_groups_preserve_weights_settings_and_explicit_routes",
+              "tests/test_product_target_extension.py::test_base_and_active_space_age_literal_routes_extend_only_existing_generated_rows",
+              "tests/test_product_targets.py::test_group_order_deduplicates_one_recipe_without_losing_authored_weight"
+            ],
+            "applicable_evidence": [],
+            "remaining_executable_check": "Port exact default0.05 and nondefault scaling/single-owner composed controls. Existing generic pattern and per-family dedup controls are analogs, not this exact named campaign; no native result for this specific composition is inferred.",
+            "owner": "Aero controls/expectations; Black Glass affected admitted native composition"
+          },
+          {
+            "id": "space-age-x-space-age-galore-targeted-v1",
+            "disposition": "port-required-recovered-host-single-owner-gap-open",
+            "obligation": "Unchanged original Galore fixture uses coal5 as input, a fully productivity-ignored coal1 return with independent_probability0.10, productive carbon1 probability0.25 and sulfur1 probability0.50. Exact vgal-coal-crushing must have precisely one planned productivity owner: recipe-prod-research_carbon-1. Generic multi-output families are a separate contract and are not permission to waive this named rule.",
+            "current_implementation": [
+              "source/research/product_target_extension.lua",
+              "source/compatibility/product_bindings.lua",
+              "source/compatibility/product_targets.lua"
+            ],
+            "current_controls": [
+              "tests/test_product_targets.py::test_group_order_deduplicates_one_recipe_without_losing_authored_weight currently permits separate generic families",
+              "tests/test_product_target_extension.py presently lacks the named original single-carbon-owner case"
+            ],
+            "applicable_evidence": [
+              {
+                "path": "build/qualification/aero-named-overlap-original-intent-r01/galore-host-discrepancy.json",
+                "sha256": "4554B398DAD02C5D0382A49F2F15E600CC68D97BD67D385D4DDD7EE0E27CF948",
+                "status": "HOST-original-oracle-rejects-current-detached-extension",
+                "observed_owners": [
+                  "recipe-prod-research_carbon-1",
+                  "recipe-prod-research_sulfur-1"
+                ]
+              }
+            ],
+            "remaining_executable_check": "Prepare a separately reviewed named correction and regression control using the original oracle, with default/nondefault, absent/unproductive preferred family, unrelated multi-output and read-only foreign-state controls. Review affected already-paid502 sulfur/carbon state before removing any emitted effect; native source/candidate/save/two-reload applicability and actual upstream-valid Galore inputs remain open. No source fix, save repair or native conclusion is claimed by this evidence unit.",
+            "owner": "Aero scoped source/independent controls after explicit file ownership; Black Glass actual upstream/native/save qualification"
+          }
+        ],
+        "qualification_limit": "Fourteen deduplicated primary source identities/238bindings are inventoried; only13small primary bodies are fully read. The1.55MB delta is scoped provenance/classification, not complete semantic reconciliation. The known Galore host discrepancy remains open; no product/native/save qualification or public502 change.",
+        "owner": {
+          "reconciliation": "Aero",
+          "native": "Black Glass"
+        },
+        "native_execution": false,
+        "inventory_complete": false
       }
     ],
     "stable_coverage_review": {
