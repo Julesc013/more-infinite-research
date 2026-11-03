@@ -74,6 +74,23 @@ class NativeOwnerFallbackTests(unittest.TestCase):
                 packs = {ingredient[0] if isinstance(ingredient, list) else ingredient["name"] for ingredient in row["unit"]["ingredients"]}
                 self.assertEqual(BASE_SCIENCE | EXTRA_SCIENCE[family], packs)
 
+    def test_zero_native_time_uses_the_published_mir_default_for_its_own_paid_or_public_row(self):
+        # Published MIR stream time is 60. A zero native-owner inherit sentinel
+        # cannot be published as a literal zero on MIR's separate identity.
+        for family in fixture.OWNERS:
+            for uncovered in (False, True):
+                with self.subTest(family=family, uncovered=uncovered):
+                    case = self.boot(family, uncovered=uncovered, combined=True)
+                    case.owner(family).unit.time = 45.5
+                    case.lua.globals().settings.startup["ips-research-time-" + family].value = 0
+                    before = case.owner_rows()
+                    case.pipeline()
+                    own = case.lua.globals().data.raw.technology["recipe-prod-" + family + "-1"]
+                    self.assertEqual(60, own.unit.time)
+                    self.assertEqual(not uncovered, own.hidden is True)
+                    self.assertEqual(before, case.owner_rows(), "inheritance changed the foreign owner's unit")
+                    self.assertEqual(0, case.lua.globals().settings.startup["ips-research-time-" + family].value)
+
     def test_control_catalogue_distinguishes_withheld_native_and_actual_mir_route(self):
         family = "research_processing_unit"
         for uncovered in (False, True):
