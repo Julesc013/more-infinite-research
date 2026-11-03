@@ -192,6 +192,14 @@ function M.extend(technologies, values, context)
       selected[family], streams[family], count = row, stream, count + 1
     end
   end
+  local fallback_families = {}
+  for _, row in ipairs(context.native_owner_fallbacks or {}) do
+    local family, stream = eligible_family(row, values)
+    assert(family ~= nil and selected[family] == nil, "MIR duplicate or invalid native fallback family")
+    selected[family], streams[family], fallback_families[family] = row, stream, true
+    row.effects = {}
+    count = count + 1
+  end
   local native_selected, native_owned = {}, {}
   for _, row in ipairs(context.native_owner_targets or {}) do
     for _, effect in ipairs(row.effects) do
@@ -236,9 +244,10 @@ function M.extend(technologies, values, context)
   -- cache: this sole final-fixes call sees the current recipe tables.
   local bindings = require("compatibility.product_bindings")
   local rules = {}
-  local function admit(rows, exact, native)
+  local function admit(rows, exact, native, fallback)
     for _, row in ipairs(rows) do
       if selected[row.family] and (native == true) == (native_selected[row.family] == true)
+        and (fallback == true) == (fallback_families[row.family] == true)
         and (exact or not exact_families[row.family]) and (not row.structural_fallback
         or automatic) then
         rules[#rules + 1] = row
@@ -248,6 +257,7 @@ function M.extend(technologies, values, context)
   admit(bindings.base.bindings)
   if context.mods and context.mods["space-age"] then admit(bindings.space_age.bindings) end
   admit(bindings.native_owner_bindings, true, true)
+  admit(bindings.native_owner_bindings, true, false, true)
   local lab_count, input_count = 0, 0
   if selected.research_science_pack_productivity and not exact_families.research_science_pack_productivity then
     local rule
@@ -362,7 +372,7 @@ function M.extend(technologies, values, context)
     for _, row in ipairs(rows) do
       local key
       if write then key = family .. "\0" .. row.recipe .. "\0" .. row.product_type .. "\0" .. row.product_name end
-      if native_claims[row.recipe] ~= nil and native_claims[row.recipe] ~= family then
+      if native_claims[row.recipe] ~= nil and (native_claims[row.recipe] ~= family or fallback_families[family]) then
         if write then dispositions[key] = "retained-native-owner" end
       elseif excluded_recipes[family] and excluded_recipes[family][row.recipe] then
         if write then dispositions[key] = "withheld" end

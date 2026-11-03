@@ -1,8 +1,8 @@
 """Independent host controls for withheld native settings and proven cap release.
 
-Fake forces exercise real catalogue/lifecycle/caps code. The explicitly marked
-selection fixture isolates the parent's separate data-selection implementation;
-none of these controls qualifies native effects or save persistence.
+Fake forces exercise real catalogue/lifecycle/caps and selector code. The
+composed control also consumes actual data-stage output from a separate Lua
+state; none qualifies native effects or save persistence.
 """
 import argparse
 from pathlib import Path
@@ -10,6 +10,8 @@ import sys
 import unittest
 
 import test_lifecycle as fixture
+import test_generator as generator_fixture
+import test_native_owner_fallback as fallback_fixture
 
 
 class WithheldRuntimeTests(unittest.TestCase):
@@ -194,26 +196,14 @@ class WithheldRuntimeTests(unittest.TestCase):
 
     def test_selection_forwarding_cache_identity_detachment_and_fallback_rights(self):
         self.lua.execute(r'''
-          -- Synthetic future-selection boundary: only the explicitly supplied
-          -- definition stands in for parent's separately owned data selection.
+          -- Count calls around the real selector; no selection rows are faked.
           local modern=require("compatibility.modern_catalogue")
           local original=modern.select
           local calls,last_map=0,nil
           modern.select=function(active_mods,raw,withheld)
             calls,last_map=calls+1,withheld
             assert(raw==nil,"runtime guessed raw prototype facts")
-            local selected=original(active_mods,raw)
-            local definitions={}
-            for _,definition in ipairs(selected.definitions) do
-              if definition.family~="research_processing_unit" then definitions[#definitions+1]=definition end
-            end
-            local decision=withheld and withheld["processing-unit-productivity"]
-            if decision and decision.generated then
-              definitions[#definitions+1]={key="research_processing_unit",family="research_processing_unit",
-                order="p[research_processing_unit]",effects={{recipe="processing-unit"}}}
-            end
-            selected.definitions=definitions
-            return selected
+            return original(active_mods,raw,withheld)
           end
           local world=world_for(true)
           local data=metadata(true)
@@ -239,6 +229,44 @@ class WithheldRuntimeTests(unittest.TestCase):
           assert(runtime.restoration_only()[1].native_admission.recipes[1]~="tampered")
           modern.select=original
         ''')
+
+    def test_actual_data_stage_metadata_controls_only_the_emitted_fallback(self):
+        fallback_fixture.LuaRuntime = LuaRuntime
+        fallback_fixture.NativeOwnerFallbackTests.setUpClass()
+        for uncovered in (False, True):
+            with self.subTest(uncovered=uncovered):
+                self.setUp()
+                data_case = fallback_fixture.NativeOwnerFallbackTests().boot(
+                    "research_processing_unit", uncovered=uncovered, combined=True)
+                before = data_case.owner_rows()
+                data_case.pipeline()
+                self.assertEqual(before, data_case.owner_rows())
+                private = fallback_fixture.fixture.plain(data_case.lua.globals().data.raw[
+                    "mod-data"]["more-infinite-research-native-adoptions"].data)
+                self.lua.globals().actual_data = generator_fixture.lua_table(self.lua, {
+                    "more-infinite-research-native-adoptions": {"data": private}})
+                self.lua.globals().actual_generated = uncovered
+                self.lua.execute(r'''
+                  local world=world_for(true)
+                  local native=world.technologies["processing-unit-productivity"]
+                  world._queue={native};world.current_research=native
+                  local queued=world._queue
+                  local id="recipe-prod-research_processing_unit-1"
+                  if actual_generated then
+                    local row=technology(id,3,true);row.force=world;world.technologies[id]=row
+                  end
+                  local lifecycle,runtime=parse(world,actual_data)
+                  handlers.init()
+                  assert(native.enabled and native.level==3 and native.researched==false)
+                  assert(world._queue==queued and world.current_research==native and world.research_progress==.42)
+                  assert(lifecycle.cap_limits(world)[native.name]==nil)
+                  assert(not present(runtime.declared(),native.name))
+                  local generated=present(runtime.declared(),id)
+                  assert((generated~=nil)==actual_generated)
+                  if actual_generated then
+                    assert(lifecycle.cap_limits(world)[id]==2 and not world.technologies[id].enabled)
+                  else assert(lifecycle.cap_limits(world)[id]==nil) end
+                ''')
 
     def test_unknown_wrong_family_and_untyped_metadata_refuse(self):
         self.lua.execute(r'''

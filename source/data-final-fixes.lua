@@ -37,7 +37,7 @@ local technologies = {gear}
 local ordinary_profile = type(mods) == "table" and mods.Krastorio2 == nil
   and mods["Krastorio2-spaced-out"] == nil
 local modern_catalogue = require("compatibility.modern_catalogue")
-local modern, modern_selection, native_owner_patches
+local modern, modern_selection, native_owner_patches, withheld_native_owners
 if ordinary_profile or modern_catalogue.is_k2_base(mods) or modern_catalogue.is_k2so(mods) then
   modern = require("research.modern")
   modern_selection = modern_catalogue.select(mods, data.raw)
@@ -71,7 +71,7 @@ if ordinary_profile or modern_catalogue.is_k2_base(mods) or modern_catalogue.is_
   end
   -- Check every selected narrow patch before any intended technology write.
   modern.preflight_recipe_patches(modern_selection, data.raw)
-  native_owner_patches = modern.preflight_native_owner_patches(modern_selection, data.raw, values)
+  native_owner_patches, withheld_native_owners = modern.preflight_native_owner_patches(modern_selection, data.raw, values)
   local generated = modern.technologies(modern_selection, values)
   modern.apply_weapon_speed_overlap(modern_selection, generated, values)
   for index = 1, #generated do technologies[#technologies + 1] = generated[index] end
@@ -95,9 +95,18 @@ end
 -- detached authored effects without discovering families or inspecting
 -- foreign research. Existing named routes and weights retain precedence.
 local native_owner_targets = modern and modern.native_owner_product_targets(
-  modern_selection, data.raw, values, native_owner_patches, mods)
+  modern_selection, data.raw, values, native_owner_patches, mods, withheld_native_owners)
+local native_fallbacks, native_fallback_owners = {}, {}
+if modern then
+  for _, fallback in ipairs(modern_catalogue.native_owner_fallbacks(mods, withheld_native_owners)) do
+    local technology = modern.technology(fallback.definition, values)
+    native_fallbacks[#native_fallbacks + 1] = technology
+    native_fallback_owners[technology] = fallback.owner
+  end
+end
 require("research.product_target_extension").extend(technologies, values, {raw=data.raw, mods=mods, log=log,
   native_owner_targets=native_owner_targets,
+  native_owner_fallbacks=native_fallbacks,
   required_product_targets=modern_selection and modern_selection.required_product_targets,
   additional_product_bindings=modern_selection and modern_selection.additional_product_bindings,
   exact_product_bindings=modern_selection and modern_selection.exact_product_bindings,
@@ -105,7 +114,13 @@ require("research.product_target_extension").extend(technologies, values, {raw=d
   replacement_product_target_families=modern_selection and modern_selection.replacement_product_target_families,
   excluded_product_target_recipes=modern_selection and modern_selection.excluded_product_target_recipes})
 if modern then modern.preflight_collected_native_owner_targets(native_owner_targets, native_owner_patches) end
-local native_adoption_patch = modern and require("research.native_adoption").plan(data.raw, native_owner_targets)
+for _, fallback in ipairs(native_fallbacks) do
+  if #fallback.effects > 0 then
+    technologies[#technologies + 1] = fallback
+    withheld_native_owners[native_fallback_owners[fallback]].generated = true
+  end
+end
+local native_adoption_patch = modern and require("research.native_adoption").plan(data.raw, native_owner_targets, withheld_native_owners)
 
 if modern_selection and modern_selection.bob_angel_f200_combined then
   require("compatibility.modern_catalogue.bob_angel_f200_combined").apply_effect_order(technologies)
