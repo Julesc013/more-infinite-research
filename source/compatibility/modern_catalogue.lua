@@ -781,9 +781,9 @@ end
 
 -- Reuse the five authored Base identities and the independently retained
 -- Space Age science rules. This does not discover or rename a family.
-function M.native_owner_fallbacks(active_mods, withheld)
+function M.native_owner_fallbacks(active_mods, withheld, retain_all)
   local out = {}
-  if not active_space_age(active_mods) or withheld == nil or next(withheld) == nil then return out end
+  if not active_space_age(active_mods) or not retain_all and (withheld == nil or next(withheld) == nil) then return out end
   local science = {
     research_low_density_structure="science_automation_logistic_chemical_production_metallurgic",
     research_plastic="science_automation_logistic_chemical_production_agricultural",
@@ -793,7 +793,7 @@ function M.native_owner_fallbacks(active_mods, withheld)
   }
   local owners = {}
   for _, binding in ipairs(require("compatibility.product_bindings").native_owner_bindings) do
-    if withheld[binding.owner] then owners[binding.family] = binding.owner end
+    if retain_all or withheld[binding.owner] then owners[binding.family] = binding.owner end
   end
   for _, definition in ipairs(BASE.definitions) do
     local owner = owners[definition.family]

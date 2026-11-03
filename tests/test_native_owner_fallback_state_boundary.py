@@ -40,8 +40,41 @@ class FallbackStateBoundaryTests(unittest.TestCase):
                   end
                 ''')
                 destination.pipeline()
-                self.assertIsNotNone(destination.lua.globals().data.raw.technology[name],
+                retained = destination.lua.globals().data.raw.technology[name]
+                self.assertIsNotNone(retained,
                     "engine loading cannot preserve earned/partial/queued state for an omitted prior MIR identity")
+                self.assertIs(True, retained.hidden)
+                self.assertEqual(fallback.fixture.plain(source.lua.globals().data.raw.technology[name].effects),
+                                 fallback.fixture.plain(retained.effects))
+
+    def test_private_retention_does_not_grant_another_familys_prior_native_claim(self):
+        family = "research_steel"
+        def boot(*, clear_cost):
+            case = fallback.NativeOwnerFallbackTests().boot(family, uncovered=True, combined=True)
+            case.lua.execute('''
+              data.raw.recipe["multi-native"]={type="recipe",name="multi-native",category="crafting",
+                enabled=false,allow_productivity=true,
+                ingredients={{type="item",name="iron-plate",amount=5}},
+                results={{type="item",name="low-density-structure",amount=1},{type="item",name="steel-plate",amount=1}}}
+            ''')
+            if clear_cost:
+                case.lua.execute('''
+                  for _,row in ipairs(require("research.settings").prototypes()) do
+                    if row.name=="ips-cost-base-research_steel"
+                      or row.name=="ips-cost-linear-increment-research_steel"
+                      or row.name=="ips-cost-growth-research_steel" then
+                      settings.startup[row.name].value=row.default_value
+                    end
+                  end
+                ''')
+            case.pipeline()
+            return case
+        source, destination = boot(clear_cost=False), boot(clear_cost=True)
+        name = "recipe-prod-research_steel-1"
+        expected = [{"type": "change-recipe-productivity", "recipe": fallback.fixture.RECIPES[family], "change": .17}]
+        self.assertEqual(expected, fallback.fixture.plain(source.lua.globals().data.raw.technology[name].effects))
+        self.assertEqual(expected, fallback.fixture.plain(destination.lua.globals().data.raw.technology[name].effects),
+                         "a private holder must not grant unpaid effects for the earlier LDS-owned recipe")
 
     def test_sif_paid_identities_and_uncovered_fallback_can_compose(self):
         family = "research_processing_unit"

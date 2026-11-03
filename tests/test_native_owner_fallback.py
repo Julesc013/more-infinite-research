@@ -46,16 +46,20 @@ class NativeOwnerFallbackTests(unittest.TestCase):
                 lua.globals().settings.startup[key + family].value = value
         return case
 
-    def test_covered_only_preserves_native_without_a_duplicate_mir_identity(self):
-        # The original final-stage assertion explicitly requires nonbinding,
-        # polynomial retention and absent recipe-prod ID in this selection.
+    def test_covered_only_preserves_native_and_private_empty_paid_identity(self):
+        # Published fresh assertions required raw absence. MIG-01 additionally
+        # requires identity retention across paid configurations; an empty
+        # private holder grants neither a public route nor canonical effects.
         for family in fixture.OWNERS:
             with self.subTest(family=family):
                 case = self.boot(family, combined=True)
                 before = case.owner_rows()
                 case.pipeline()
                 self.assertEqual(before, case.owner_rows())
-                self.assertIsNone(case.lua.globals().data.raw.technology["recipe-prod-" + family + "-1"])
+                holder = case.lua.globals().data.raw.technology["recipe-prod-" + family + "-1"]
+                self.assertIsNotNone(holder)
+                self.assertIs(True, holder.hidden)
+                self.assertEqual(0, len(holder.effects))
 
     def test_uncovered_producer_uses_existing_mir_identity_and_original_science(self):
         for family in fixture.OWNERS:

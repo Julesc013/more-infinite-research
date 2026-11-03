@@ -96,17 +96,28 @@ end
 -- foreign research. Existing named routes and weights retain precedence.
 local native_owner_targets = modern and modern.native_owner_product_targets(
   modern_selection, data.raw, values, native_owner_patches, mods, withheld_native_owners)
-local native_fallbacks, native_fallback_owners = {}, {}
+local native_fallbacks, native_retained, native_preserved, native_fallback_owners = {}, {}, {}, {}
 if modern then
-  for _, fallback in ipairs(modern_catalogue.native_owner_fallbacks(mods, withheld_native_owners)) do
-    local technology = modern.technology(fallback.definition, values)
-    native_fallbacks[#native_fallbacks + 1] = technology
-    native_fallback_owners[technology] = fallback.owner
+  local native_families, emitted, sif_holders = {}, {}, {}
+  for _, row in ipairs(native_owner_targets) do native_families[row.family] = true end
+  for _, row in ipairs(modern_selection.definitions) do emitted[row.family] = true end
+  for _, row in ipairs(modern_selection.sif_retained or {}) do sif_holders[row.family] = true end
+  for _, fallback in ipairs(modern_catalogue.native_owner_fallbacks(mods, withheld_native_owners, true)) do
+    local family = fallback.definition.family
+    local unbound = withheld_native_owners[fallback.owner] ~= nil
+    if native_families[family] and not emitted[family] and (unbound or not sif_holders[family]) then
+      local technology = modern.technology(fallback.definition, values)
+      native_preserved[#native_preserved + 1] = technology
+      native_fallback_owners[technology] = fallback.owner
+      if unbound then native_fallbacks[#native_fallbacks + 1] = technology
+      else native_retained[family] = technology end
+    end
   end
 end
 require("research.product_target_extension").extend(technologies, values, {raw=data.raw, mods=mods, log=log,
   native_owner_targets=native_owner_targets,
   native_owner_fallbacks=native_fallbacks,
+  native_owner_retained=native_retained,
   required_product_targets=modern_selection and modern_selection.required_product_targets,
   additional_product_bindings=modern_selection and modern_selection.additional_product_bindings,
   exact_product_bindings=modern_selection and modern_selection.exact_product_bindings,
@@ -114,11 +125,11 @@ require("research.product_target_extension").extend(technologies, values, {raw=d
   replacement_product_target_families=modern_selection and modern_selection.replacement_product_target_families,
   excluded_product_target_recipes=modern_selection and modern_selection.excluded_product_target_recipes})
 if modern then modern.preflight_collected_native_owner_targets(native_owner_targets, native_owner_patches) end
-for _, fallback in ipairs(native_fallbacks) do
-  if #fallback.effects > 0 then
-    technologies[#technologies + 1] = fallback
-    withheld_native_owners[native_fallback_owners[fallback]].generated = true
-  end
+for _, fallback in ipairs(native_preserved) do
+  local unbound = withheld_native_owners[native_fallback_owners[fallback]]
+  if unbound and #fallback.effects > 0 then unbound.generated = true
+  else fallback.hidden = true end
+  technologies[#technologies + 1] = fallback
 end
 local native_adoption_patch = modern and require("research.native_adoption").plan(data.raw, native_owner_targets, withheld_native_owners)
 

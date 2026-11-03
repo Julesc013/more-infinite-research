@@ -206,6 +206,16 @@ local function static_rows(existing_technology_prototypes, withheld_native_owner
   for _, definition in ipairs(selected.sif_retained or {}) do
     runtime_private_credit_ids["recipe-prod-" .. definition.key .. "-1"] = true
   end
+  -- Same-profile cost binding can return to the native owner after this MIR
+  -- identity has earned work. Its private prototype is not a new public cap
+  -- or Library route. Explicitly selected generated definitions take priority.
+  local public_families = {}
+  for _, definition in ipairs(selected.definitions) do public_families[definition.family] = true end
+  for _, fallback in ipairs(modern_catalogue.native_owner_fallbacks(active_mods, withheld_native_owners, true)) do
+    if not public_families[fallback.definition.family] then
+      runtime_private_credit_ids["recipe-prod-" .. fallback.definition.key .. "-1"] = true
+    end
+  end
   for index = 1, #selected.definitions do
     local definition = selected.definitions[index]
     rows[#rows + 1] = generated_row("recipe-prod-" .. definition.key .. "-1", definition.family,

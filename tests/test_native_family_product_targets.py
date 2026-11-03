@@ -44,9 +44,10 @@ class NativeFamilyProductTargetTests(unittest.TestCase):
         oracle = read_published_source(ROOT,
             "fixtures/assert-vanilla-family-adoption/data-final-fixes.lua",
             "91EA8E7216095F4CF1905F859878392AEE0F2532F8FAA2779B572EC82FD72415").decode()
-        # Keep every original player assertion, including denials and absent
-        # duplicate MIR IDs. Retired schema4 report/signature metadata is not
-        # the player contract and is not restored into MIR5.
+        # Retain the original assertions verbatim as historical evidence.
+        # Current MIG-01 controls below distinguish a public earning owner
+        # from the same-ID private paid representation; historical raw absence
+        # cannot authorize dropping an earned identity during engine loading.
         assert oracle.count("local adoption_data =") == 1
         cls.player_oracle = oracle.split("local adoption_data =", 1)[0]
 
@@ -100,14 +101,41 @@ class NativeFamilyProductTargetTests(unittest.TestCase):
         return [row["change"] for row in plain(self.owner(family).effects)
                 if row.get("type") == "change-recipe-productivity" and row.get("recipe") == recipe]
 
-    def test_full_pipeline_passes_all_original_player_assertions(self):
+    def test_full_pipeline_preserves_public_owner_denials_and_private_paid_vectors(self):
         before = {n: plain(self.lua.globals().data.raw.recipe[n]) for n in RECIPES.values()}
         self.pipeline()
-        self.lua.execute(self.player_oracle)
+        all_rows = {name: plain(row) for name, row in self.lua.globals().data.raw.technology.items()}
+        private_ids = {"recipe-prod-" + family + "-1" for family in OWNERS}
+        def owners(recipe, *, public):
+            return sorted(name for name, row in all_rows.items()
+                if row.get("max_level") == "infinite"
+                and not (public and name in private_ids and row.get("hidden") is True)
+                and any(e.get("type") == "change-recipe-productivity" and e.get("recipe") == recipe
+                        for e in row.get("effects", [])))
+        for family, (owner, _) in OWNERS.items():
+            self.assertEqual([owner], owners(RECIPES[family], public=True))
+            retained = all_rows["recipe-prod-" + family + "-1"]
+            self.assertIs(True, retained["hidden"])
+            self.assertEqual([{"type": "change-recipe-productivity", "recipe": RECIPES[family], "change": .1}], retained["effects"])
+        for recipe in ("mir-fixture-no-productivity-rocket-fuel", "mir-fixture-scrap-copper-plate-recovery",
+                       "mir-fixture-scrap-iron-plate-recovery", "mir-fixture-scrap-steel-plate-recovery"):
+            self.assertEqual([], owners(recipe, public=False))
         self.assertEqual(1, self.lua.globals().data.writes)
         for family in OWNERS:
             self.assertEqual([.1], self.changes(family))
         self.assertEqual(before, {n: plain(self.lua.globals().data.raw.recipe[n]) for n in RECIPES.values()})
+        self.lua.execute('''
+          script={active_mods=mods};prototypes={technology={},mod_data={}}
+          local private=data.raw["mod-data"]["more-infinite-research-native-adoptions"]
+          prototypes.mod_data[private.name]={data=private.data}
+          package.loaded["research.catalogue"],package.loaded["runtime.catalogue"]=nil,nil
+          local runtime=require("runtime.catalogue")
+          private_ids=runtime.internal_credit_ids();public_rows=runtime.declared()
+        ''')
+        public = {r["id"] for r in plain(self.lua.globals().public_rows)}
+        for name in private_ids:
+            self.assertIs(True, self.lua.globals().private_ids[name])
+            self.assertNotIn(name, public)
 
     def test_nondefault_native_effects_extend_at_the_selected_value(self):
         for family in OWNERS:

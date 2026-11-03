@@ -201,7 +201,16 @@ function M.extend(technologies, values, context)
     count = count + 1
   end
   local native_selected, native_owned = {}, {}
+  local retained = context.native_owner_retained or {}
+  local inherited_claims = {}
   for _, row in ipairs(context.native_owner_targets or {}) do
+    -- These pre-patch claims determine only a private paid vector. Newly
+    -- adopted native targets must not erase an earlier MIR contribution.
+    for _, effect in ipairs(row.owner and row.owner.effects or {}) do
+      if effect.type == "change-recipe-productivity" and type(effect.recipe) == "string" then
+        inherited_claims[effect.recipe] = true
+      end
+    end
     for _, effect in ipairs(row.effects) do
       if effect.type == "change-recipe-productivity" and type(effect.recipe) == "string" then
         local previous = native_owned[effect.recipe]
@@ -209,7 +218,7 @@ function M.extend(technologies, values, context)
           or previous == row.family and previous or true
       end
     end
-    if row.active then
+    if row.active or retained[row.family] then
       assert(selected[row.family] == nil, "MIR native-owner family also emitted " .. row.family)
       selected[row.family], streams[row.family], native_selected[row.family] = row, values.streams[row.family], true
       count = count + 1
@@ -296,6 +305,16 @@ function M.extend(technologies, values, context)
   local collector = require("compatibility.product_targets")
   local result = collector.collect(context.raw.recipe, collector.prepare(rules, {raw=context.raw}))
   verify_required_targets(result, required_targets)
+  for family, technology in pairs(retained) do
+    local effects = {}
+    for _, match in ipairs(result.by_family[family] or {}) do
+      if not inherited_claims[match.recipe] then
+        effects[#effects + 1] = {type="change-recipe-productivity", recipe=match.recipe,
+          change=values.streams[family].effect_percent * match.weight / 100}
+      end
+    end
+    technology.effects = effects
+  end
   for _, row in ipairs(context.native_owner_targets or {}) do
     if row.active then
       local relevant, canonical, change, mixed = {}, {}, nil, false
@@ -374,6 +393,8 @@ function M.extend(technologies, values, context)
       if write then key = family .. "\0" .. row.recipe .. "\0" .. row.product_type .. "\0" .. row.product_name end
       if native_claims[row.recipe] ~= nil and (native_claims[row.recipe] ~= family or fallback_families[family]) then
         if write then dispositions[key] = "retained-native-owner" end
+      elseif native_selected[family] and technology.active ~= true then
+        if write then dispositions[key] = "withheld" end
       elseif excluded_recipes[family] and excluded_recipes[family][row.recipe] then
         if write then dispositions[key] = "withheld" end
       elseif not seen[row.recipe] then
