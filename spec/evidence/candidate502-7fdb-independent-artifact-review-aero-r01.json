@@ -1,0 +1,84 @@
+{
+  "kind": "MIRAero502CIndependentArtifactAndReuseReviewV1",
+  "observed_at_utc": "2026-11-02T09:14:20.034269+00:00",
+  "artifact_verdict": "GO-offline-exact-artifacts-only",
+  "source": {
+    "commit": "7fdb1fa63fa6e70a0df437a57765475ba271e8da",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21002",
+    "source_tree": "701e314ee50f19ac6cef02a1d4a598cca843eb0f",
+    "tree": "13f4ab65b4e2e2cf8a34225c669673197567eb98"
+  },
+  "candidate_version": "Unreleased5.0.2",
+  "inventory": {
+    "name": "MIR5ReleaseAssetInventoryV1.json",
+    "bytes": 212414,
+    "sha256": "24D0AA992E1D89D061D58813230A26322D536C90AD73C56D048A7F5D270FABA9"
+  },
+  "files": 20,
+  "archives": 17,
+  "bytes": 6729893,
+  "stable_editions": 9,
+  "experimental_f018": 1,
+  "early_best_effort": 7,
+  "custody": [
+    {
+      "path": "C:\\Projects\\Factorio\\mir5-aero-freeze\\candidate502-7fdb1fa63-r01",
+      "files": 20,
+      "bytes": 6729893,
+      "exact_hashes_match": true
+    },
+    {
+      "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\aero-candidate502-7fdb1fa63-r01",
+      "files": 20,
+      "bytes": 6729893,
+      "exact_hashes_match": true
+    }
+  ],
+  "independent_rebuild_complete_inventory_equals_root": true,
+  "all20_root_file_identities_match": true,
+  "every_archive_crc_member_path_hash_metadata_history_exclusion_label_checked": true,
+  "all17_B_to_C_member_sets_equal": true,
+  "only_changed_member": "changelog.txt",
+  "exact_word_change": "Help -> Debug",
+  "compressed_bytes_added_per_zip": 3,
+  "published501_17_zip_hashes_unchanged": true,
+  "version_or_tag_consumed": false,
+  "native_reuse_verdict": "GO-scoped-component-reuse-with-original-identity",
+  "original_native_result_sha256": "629E2935BCDC6BE633CB964D2745EA18702B88F270957EE2E032805ED0033FDA",
+  "reuse_limits": "Reuse only unchanged data/settings component observation under original B execution identity. Current C ZIP was not executed; exact C caller/preparation/profile/review binding is mandatory before next necessary C native scenario, which can establish C loader admission. No redundant dump required only for changelog prose. All other current-candidate qualification gates remain open.",
+  "records": [
+    {
+      "path": "artifact-audit.json",
+      "bytes": 40012,
+      "sha256": "88D21D301E8A263E842859D4D29018656FF34495473119B3572CDAC073418652"
+    },
+    {
+      "path": "independent-b-to-c-comparison.json",
+      "bytes": 9145,
+      "sha256": "87DFDDFED17FD821C421FC40AE6EB48E659700CD59AAAE33D8CF4CABDC44AF3B"
+    },
+    {
+      "path": "consumed-input-applicability.json",
+      "bytes": 5374,
+      "sha256": "B6830BA49629D82F9B69B51BAAE286A42299278274359E950216960CF3B8AC0C"
+    },
+    {
+      "path": "inspector-corrections.json",
+      "bytes": 848,
+      "sha256": "0CAF72CD3AB1CB260A35501BD68087205859866E69437D443722DAC1FD175480"
+    }
+  ],
+  "native_execution": false,
+  "fresh_C_native_admission": false,
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "public_assets_modified": false,
+  "limits": [
+    "Independent reconstructive readback, not fresh physical access to Black Glass custody or installed engine/dependencies.",
+    "77 original capsule bodies independently decoded/hash-verified in memory; original actual-result GO retained, not replaced or renamed.",
+    "No new player/controller/test/version/source edits; no local dist delivery replacement."
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "kind": "MIRAeroCandidate502ArtifactReviewV1",
+  "observed_utc": "2026-11-02T06:34:25.149583+00:00",
+  "verdict": "GO-exact-offline-package-integrity-only",
+  "source": {
+    "commit": "a2dcfae65a9dbe1c81bc0a8ce8ba933972c6048c",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21002",
+    "source_tree": "a4f79fbaa626653642670708794344f52d0c7e8c",
+    "tree": "d035c8b2265d29eaaef2c700070c678d89fc44cd"
+  },
+  "inventory_sha256": "5BE6CFCF30FD8E51837CB6FA5BC03778B5E0F12CCA534C4468C087A7F95921DD",
+  "independently_reconstructed_matches_black_glass_inventory": true,
+  "files": 20,
+  "bytes": 6729842,
+  "zip_count": 17,
+  "stable_editions": 9,
+  "experimental_f018_minimum": "0.18.47",
+  "early_best_effort": 7,
+  "all_archives_crc_and_all_members_verified": true,
+  "all_full_info_objects_equal_published501_except_patch": true,
+  "all_old_migration_names_and_bytes_preserved": true,
+  "all_old_native_changelog_history_suffixes_preserved": true,
+  "all17_requested_labels_verified": true,
+  "published501_original_zip_hashes_unchanged": true,
+  "offline_verifier_passed_on_primary_copy": true,
+  "controller": {
+    "package_tool": {
+      "path": "tools/package.py",
+      "sha256": "32bdbe5e0d8b776a57bc8df63dd536dd81aedf54141ac6ec6b1bef4044c90674"
+    },
+    "release_tool": {
+      "path": "tools/release.py",
+      "sha256": "e1e1af6a542bb3631c26e0ba31a87e075441f59fa989cfa188017938c2c6a2ec"
+    },
+    "runtime": {
+      "implementation": "cpython",
+      "version": [
+        3,
+        14,
+        7
+      ],
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    },
+    "zip_policy": {
+      "compression": "ZIP_DEFLATED",
+      "compresslevel": 9,
+      "member_create_system": 3,
+      "member_external_attr": 2175008768,
+      "member_timestamp": [
+        1980,
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "custody": [
+    {
+      "path": "C:\\Projects\\Factorio\\mir5-aero-freeze\\candidate502-a2dcfae65-r01",
+      "files": 20,
+      "bytes": 6729842,
+      "exact_hashes_match": true
+    },
+    {
+      "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\aero-candidate502-a2dcfae65-r01",
+      "files": 20,
+      "bytes": 6729842,
+      "exact_hashes_match": true
+    }
+  ],
+  "player_source_delta_count": 61,
+  "source_delta_breakdown": {
+    "version_history_metadata": 3,
+    "locale_files": 51,
+    "modern_library_runtime_files": 7
+  },
+  "edition_member_delta_counts": {
+    "f013": 54,
+    "f014": 54,
+    "f015": 54,
+    "f016": 54,
+    "f017": 54,
+    "f018": 54,
+    "f100": 54,
+    "f110": 54,
+    "f200": 61,
+    "f210": 61,
+    "f006": 2,
+    "f007": 2,
+    "f008": 2,
+    "f009": 2,
+    "f010": 2,
+    "f011": 2,
+    "f012": 2
+  },
+  "notes": [
+    "All17 member sets are unchanged from501; F200225/F210226 members have61 changed contents each. Eight reduced/F018 packages have54 changed contents (three identity/history fields plus51 locale files); seven early packages have two (info/changelog).",
+    "Exact complete inventory file hash5BE6CFCF binds the same source/controller/17 archive/member identities as Black Glass's retained candidate. Aero verified its own two physical local copies; no fresh physical read of Black Glass original/primary folders is claimed.",
+    "Both observer assumptions/refusals and their independently justified corrections are retained separately. They are not product or package failures."
+  ],
+  "limits": [
+    "Independent reconstructed exact artifacts; no fresh physical read of Black Glass original or primary directories. Matching complete inventory digest binds all17 declared archive/member identities.",
+    "Offline package integrity only. No native/client/save/performance or final stable qualification.",
+    "No published ZIPs, tags, asset bytes or dist delivery replaced; both Aero candidate sets are retained developer custody."
+  ],
+  "audit_sha256": "6482FFF44E35054217D835FEC55D254192F02FC8E156F3F03F62A86B447DC43E",
+  "native_execution": false,
+  "release_qualification": false
+}

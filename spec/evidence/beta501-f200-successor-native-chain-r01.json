@@ -1,0 +1,253 @@
+{
+  "schema": 1,
+  "kind": "MIRPublishedBeta501F200SuccessorNativeCompletionChainV1",
+  "status": "PASS-exact-instrumented-beta-origin-preservation",
+  "reviewed_on": "2026-11-03",
+  "scope": "Published 5.0.1 Base on Factorio 2.0.77 to frozen 5.0.2; three-force preservation, one successor save and two distinct read-only cold processes. Not rendered Library, useful-work, client or stable acceptance.",
+  "source": {
+    "original_beta_save_sha256": "A48080462F16117573A3CA1DCFE359FC97DE8A47D3C700686CCAF61852DCE6FE",
+    "published_beta_package_sha256": "750ECA842134AFDDCC7C45B2B656510CA60F09940A2E82B21896AAE7E3D8C1BE",
+    "source_version": "5.0.20001",
+    "source_case": "beta501-f200-preservation-r01",
+    "target_version": "5.0.20002",
+    "native_controller_commit": "551532d4dd458445b19ed42e4e8d4a22d9ba628a",
+    "native_player_tree": "ad1d05ebfd4e4bdb4948368f8c1d0714f9b8054b",
+    "native_target_package_sha256": "71F8EF8EE047BD3C93E216B9BAB81A85A241B95D8B3066FBB113ACD48491BFF2",
+    "engine_version": "2.0.77",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "accepted_source501": {
+    "verdict": "accepted-exact-source501-three-process-chain",
+    "result": {
+      "path": "D:\\Projects\\Factorio\\mir5-muria-discovery-science-native-551-r01\\build\\tmp\\beta501-f200-source-551-r01\\native\\result.json",
+      "exists": true,
+      "bytes": 455973,
+      "sha256": "A4A087219E28766265E4F80D0CFEF27C9415FF549E61A4E2D2948B912E9EFDDC"
+    },
+    "produced_save": {
+      "path": "D:\\Projects\\Factorio\\mir5-muria-discovery-science-native-551-r01\\build\\tmp\\beta501-f200-source-551-r01\\native\\write-data\\saves\\mir5-native-complete.zip",
+      "bytes": 2650701,
+      "sha256": "0C783E41265F9A0EF818E92B5B44435A4585329C06AC959FE988310CDFF3FBEA",
+      "crc_members": 59
+    },
+    "independent_review": {
+      "sha256": "3DBA179C42FC684D373D89EC2E777F7562F3EF5E16B8DF062798F78F04286863",
+      "url": "https://github.com/Julesc013/mir-native-worker/issues/137#issuecomment-6594686055",
+      "originals_commit": "1de9e720bd97c10683362b02a8faf8b407791c64",
+      "originals_gzip_sha256": "79565F0615247A5C808E257A1D879306833DE73A35A220AFED0926EE88FE20DF",
+      "originals_decoded_sha256": "747E7D65DF437705211E309732AF2C6C585DC75D733A97993B3923D524D4F6FB",
+      "root_readback_sha256": "5E943C0617C746AD30BB39BB73364DD8694F28AAFB14BFB393B6A14CFFFBF5DD"
+    },
+    "processes": [
+      {
+        "phase": "production",
+        "identity": {
+          "pid": 23784,
+          "started_utc": "2026-11-03T03:02:25+00:00",
+          "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+          "start_time_basis": "native engine log header local AEDT UTC+11, whole-second precision",
+          "windows_start_time_captured": false,
+          "first_resource_sample_utc": "2026-11-03T03:02:25.5133236+00:00"
+        },
+        "exit_code": -1,
+        "timed_out": false,
+        "completion_predicate_observed": true,
+        "ledger": {
+          "path": "D:\\Projects\\Factorio\\mir5-muria-discovery-science-native-551-r01\\build\\tmp\\beta501-f200-source-551-r01\\native\\process-1.resources.jsonl",
+          "bytes": 2634,
+          "sha256": "70290CA5011B5D445C2FEFDB389BB9369D7C6ACA4CBB6EF4DB4E4CA17B0FC0D9"
+        },
+        "log": {
+          "path": "D:\\Projects\\Factorio\\mir5-muria-discovery-science-native-551-r01\\build\\tmp\\beta501-f200-source-551-r01\\native\\production.factorio.log",
+          "bytes": 89858,
+          "sha256": "58E5A624B07B46D02D8A751371F38DD658E6C3542E308962E2D00496080B8BF0"
+        }
+      },
+      {
+        "phase": "reload-1",
+        "identity": {
+          "pid": 320,
+          "started_utc": "2026-11-03T03:02:30+00:00",
+          "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+          "start_time_basis": "native engine log header local AEDT UTC+11, whole-second precision",
+          "windows_start_time_captured": false,
+          "first_resource_sample_utc": "2026-11-03T03:02:30.3973503+00:00"
+        },
+        "exit_code": 0,
+        "timed_out": false,
+        "completion_predicate_observed": false,
+        "ledger": {
+          "path": "D:\\Projects\\Factorio\\mir5-muria-discovery-science-native-551-r01\\build\\tmp\\beta501-f200-source-551-r01\\native\\process-2.resources.jsonl",
+          "bytes": 1992,
+          "sha256": "523215E937872407A2F08460DFE04387AE1DAFF738A4D7C0E25E540DAF2FD264"
+        },
+        "log": {
+          "path": "D:\\Projects\\Factorio\\mir5-muria-discovery-science-native-551-r01\\build\\tmp\\beta501-f200-source-551-r01\\native\\reload-1.factorio.log",
+          "bytes": 87993,
+          "sha256": "15298886FCAFA25761A0A865B893C43AE79AC47647F48B6F71E149C571D9864D"
+        }
+      },
+      {
+        "phase": "reload-2",
+        "identity": {
+          "pid": 23428,
+          "started_utc": "2026-11-03T03:02:33+00:00",
+          "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+          "start_time_basis": "native engine log header local AEDT UTC+11, whole-second precision",
+          "windows_start_time_captured": false,
+          "first_resource_sample_utc": "2026-11-03T03:02:33.6238153+00:00"
+        },
+        "exit_code": 0,
+        "timed_out": false,
+        "completion_predicate_observed": false,
+        "ledger": {
+          "path": "D:\\Projects\\Factorio\\mir5-muria-discovery-science-native-551-r01\\build\\tmp\\beta501-f200-source-551-r01\\native\\process-3.resources.jsonl",
+          "bytes": 2008,
+          "sha256": "D9133B96B97B1E4EDAE0836449463BD74A26E5B87DF0E6FDB4DD7E16B797D9F1"
+        },
+        "log": {
+          "path": "D:\\Projects\\Factorio\\mir5-muria-discovery-science-native-551-r01\\build\\tmp\\beta501-f200-source-551-r01\\native\\reload-2.factorio.log",
+          "bytes": 87993,
+          "sha256": "31815C912272CEBC7B6AD68C5C13629918D2A6330F17C3FF85FA33F35590EB1D"
+        }
+      }
+    ],
+    "findings": [
+      "All46 original bodies, all10 original887 dispatch-review bodies, exact D72 manifest and9ECA real composition authenticate. Actual455973-byte resultA4A08721 binds admitted80534 source-only caller,551 controller,published501/750E,2.0.77/D3,fa5 original fixture/profile and actual5mod closure. Root physical engine is bound by its prelaunch/current file checks and actual logs; Aero did not rehash that external engine binary.",
+      "Three distinct PIDs23784/320/23428 and ordered original log/resource identities show expected predicate-stopped production and two natural-exit readonly cold processes without timeout. Exact Windows StartTime was not captured. started_utc fields explicitly use the original engine-local header converted from AEDT at whole-second precision; first resource sample UTC is separately preserved. They are not invented precise OS timestamps.",
+      "Three-force native/source baselines match exactly through production/save/both colds:35 technology rows and71 recipe observations per force, retained four private holders, module bonuses~.11,player gear3/~.2,battery.1,mining0,foreign two-item queue/.42 and detached.27. Delivered observer counters, two named English/German persisted query/sort/tab/filter/location/detail scalar projections and startup snapshots also remain exact. No baseline recapture.",
+      "New instrumented published501 save0C783E41/2650701B/59CRC has the actual Factorio save root/members and remains byte-identical across the two cold reads. OriginalA480 is recorded unchanged before/after. The Source501 world is accepted as an instrumented preservation origin, not candidate502.",
+      "Every native log retains a separate passing historical migration case plus one unique expected beta source phase marker. The same-production historical reload-labelled marker is preserved and is not an extra cold process. The original passive-reader all-markers-one refusal was reported by Root but its raw reader body is outside this46-body intake; no new adverse-body authentication or native retry is claimed.",
+      "Correction to dispatch note887: public InputSave actual composition/native arguments load protected originalA480 directly, not a separate seed copy. The informational production template refers to seed; actual runtime/log provenance is explicit here and matches the E1 direct InputSave contract. Original/source bytes remain unchanged and the new save uses a separate path. Preserve the original887 receipt; fix future informational templates without relabelling this actual chain.",
+      "Restored direct-library controls/two original controls/17 MIR archive records and exact observer backups authenticate. Temporary source package/fixture removal preserves prior inventory. Keeper archive references with original_path aliases identify byte-identical reviewed custody, not the removed temporary library files. Materialize reviewed-packet.json exactly at its declared primary-custody path before running the unchanged E1 structural verifier."
+    ],
+    "limits": [
+      "Only exact instrumented published501 Base2.0.77 preservation with the retained Gear count1/time1 override is accepted. Original historical/source labs are retained from earlier work; zero new_labs/research/reset fields describe no observer requests, not measured global event counts or new useful-work/ordinary-price proof.",
+      "Headless persisted GUI scalar projections do not directly expose private MIR selected-ID/storage, render a Library, send inputs, reconnect clients or establish multiplayer behavior. Original full R20 input scope is not relabelled current.",
+      "This independently accepted source receipt alone does not enroll itself or admit candidate502, a target runtime packet, GUIr04, publication or stable. Root must authenticate the original review body through existing GitHub records, retain exact packet/result/receipt identities, run E1 file/protocol verification on actual Root locators, commit one exact intake, then prepare and separately review the target.",
+      "Aero executed no native process, GUI actor, library activation or target. No new physical Root-path read is implied; directly received bytes and retained Root assertions remain distinguishable. Original E04/host/native/GUI failures and all published bytes stay intact."
+    ]
+  },
+  "accepted_successor502": {
+    "verdict": "accepted-exact-source501-to-target502-three-process-preservation-chain",
+    "result": {
+      "path": "D:\\Projects\\Factorio\\mir5-muria-discovery-science-native-551-r01\\build\\tmp\\beta502-f200-target-551-r01\\native\\result.json",
+      "exists": true,
+      "bytes": 455962,
+      "sha256": "B97260A79D0275A1F279D4CBEA2CB40501F90B89EE57F66A9420222270C10EA9"
+    },
+    "produced_save": {
+      "path": "D:\\Projects\\Factorio\\mir5-muria-discovery-science-native-551-r01\\build\\tmp\\beta502-f200-target-551-r01\\native\\write-data\\saves\\mir5-native-complete.zip",
+      "bytes": 2650699,
+      "sha256": "1EE0AFE92459A42E04C3A44F5E9BD51315F0C096A1C8CCFBBE76AD32A90FD085",
+      "crc_members": 59
+    },
+    "independent_review": {
+      "sha256": "3414F31E42123D1EA9D5AB09F684FE4A9C42253AEC5DFD8D2027A37101C25DB9",
+      "url": "https://github.com/Julesc013/mir-native-worker/issues/137#issuecomment-6595504926",
+      "originals_commit": "4329075a599a67ef4f755a54836a7b1dc96cf400",
+      "originals_gzip_sha256": "29C89F671591C0BA7961D0677B62D086EA905D23F6597D345B8214E021B9601B",
+      "originals_decoded_sha256": "AF87BDBD0D4C475A75BEA7A11C444C27BFAEE0482828B0CB8162F14E166A3798",
+      "root_readback_sha256": "E8134B133460B6992EA0DBE97446051C2B928C74188BE44C1D44E357409D5322"
+    },
+    "processes": [
+      {
+        "phase": "production",
+        "identity": {
+          "pid": 30100,
+          "engine_header_start_utc": "2026-11-03T04:19:04+00:00",
+          "start_time_basis": "engine local AEDT header, whole-second precision; not OS StartTime",
+          "first_resource_sample_utc": "2026-11-03T04:19:04.0494825+00:00",
+          "windows_start_time_captured": false
+        },
+        "exit_code": -1,
+        "timed_out": false,
+        "completion_predicate_observed": true,
+        "ledger": {
+          "path": "D:\\Projects\\Factorio\\mir5-muria-discovery-science-native-551-r01\\build\\tmp\\beta502-f200-target-551-r01\\native\\process-1.resources.jsonl",
+          "bytes": 2626,
+          "sha256": "7115850D7F528863952ED9EF880DC45DBD0219C3F09AFA0DA6D3E8F63725BF6E"
+        },
+        "log": {
+          "path": "D:\\Projects\\Factorio\\mir5-muria-discovery-science-native-551-r01\\build\\tmp\\beta502-f200-target-551-r01\\native\\production.factorio.log",
+          "bytes": 89824,
+          "sha256": "3DE2C2D1AF298ABC5BBFAB8AD2B74EC9E8ABEC1E016060995982FCAD354883E9"
+        }
+      },
+      {
+        "phase": "reload-1",
+        "identity": {
+          "pid": 21940,
+          "engine_header_start_utc": "2026-11-03T04:19:10+00:00",
+          "start_time_basis": "engine local AEDT header, whole-second precision; not OS StartTime",
+          "first_resource_sample_utc": "2026-11-03T04:19:10.1683369+00:00",
+          "windows_start_time_captured": false
+        },
+        "exit_code": 0,
+        "timed_out": false,
+        "completion_predicate_observed": false,
+        "ledger": {
+          "path": "D:\\Projects\\Factorio\\mir5-muria-discovery-science-native-551-r01\\build\\tmp\\beta502-f200-target-551-r01\\native\\process-2.resources.jsonl",
+          "bytes": 2006,
+          "sha256": "239DD70D38A95D1FF448E76A0DF56EAC11F87B8838CDF47DB43AA2242648EFDC"
+        },
+        "log": {
+          "path": "D:\\Projects\\Factorio\\mir5-muria-discovery-science-native-551-r01\\build\\tmp\\beta502-f200-target-551-r01\\native\\reload-1.factorio.log",
+          "bytes": 87993,
+          "sha256": "052356373F13F99C43304650F51CD32B57673D777F8FFCF27F1A0BE145AEBA71"
+        }
+      },
+      {
+        "phase": "reload-2",
+        "identity": {
+          "pid": 24008,
+          "engine_header_start_utc": "2026-11-03T04:19:13+00:00",
+          "start_time_basis": "engine local AEDT header, whole-second precision; not OS StartTime",
+          "first_resource_sample_utc": "2026-11-03T04:19:13.4928474+00:00",
+          "windows_start_time_captured": false
+        },
+        "exit_code": 0,
+        "timed_out": false,
+        "completion_predicate_observed": false,
+        "ledger": {
+          "path": "D:\\Projects\\Factorio\\mir5-muria-discovery-science-native-551-r01\\build\\tmp\\beta502-f200-target-551-r01\\native\\process-3.resources.jsonl",
+          "bytes": 2008,
+          "sha256": "16BA4B90F4793CD8F9B060EC1AFBEE2C8C33042861DB5E53F31B72122F357185"
+        },
+        "log": {
+          "path": "D:\\Projects\\Factorio\\mir5-muria-discovery-science-native-551-r01\\build\\tmp\\beta502-f200-target-551-r01\\native\\reload-2.factorio.log",
+          "bytes": 87993,
+          "sha256": "5E1AA5C4E4233D559B237B59C8BCE5E2022D8DDEFE31DEE2B868430DB97AF9F0"
+        }
+      }
+    ],
+    "findings": [
+      "All42 original bodies, all6 original1F826 dispatch review bodies, C888 inputs and6D9157 real zero-engine composition authenticate. Exact C21F caller/551 controller/F20071F8/2.0.77D3/five-mod closure and target fixture/profile bindings agree with admitted170-body packet. External Root engine is pinned by original prelaunch checks and actual logs; Aero did not physically rehash it.",
+      "Three distinct actual PIDs30100/21940/24008 show expected predicate-stopped production and two natural exit0 readonly cold processes with no timeout. Original arguments load qualified instrumented501save0C directly, write separate target1EE0, then benchmark that target for one tick/run twice. Header whole-second AEDT conversion and separate first resource samples are retained; no precise OS StartTime is invented.",
+      "Production and both target colds exactly equal accepted3DB source in all serialized native/source-native/startup/observer/personal fields: three forces,35 technology rows and71 recipe observations each; private module/cannon holders and bonuses, gear3/~.2,battery.1,foreign two-item queue/.42, detached.27 and delivered English/German personal scalar projections persist. Target role/version502/phase delivered pass without source-baseline recapture.",
+      "New target1EE0 save2650699B passes all59 ZIP member CRCs and remains unchanged through two distinct cold reads. Protected qualified source0C is recorded unchanged; original R20A480 is not the target runtime input. The fixture retains its original source_origin string naming the original R20 ancestor, with exact qualified runtime input independently explicit.",
+      "Each log retains one target beta phase marker plus a separate unchanged historical migration reload marker. The latter is not another physical cold process or newly earned historical lab. Two controls/17 pre-existing MIR archives and observer backups/restoration attestations authenticate, with no dependency copy/link/extraction.",
+      "Actual native identity remains551/71F8. Independent package review15F07E485C37B81BFA08595D7AFDA6AD6CC7C37FB74D44F6D5A1DFB8835A6D22 supports final30120/B921 applicability solely because all player ZIP contents differ only in changelog date/help-note bytes. Do not relabel these native results as a final-package run."
+    ],
+    "limits": [
+      "Bounded published501-to502 Base2.0.77 preservation only. Fixed Gear count1/time1 fixture override remains. Zero observer-request counters are not measured global events or proof of new useful work/ordinary-price research.",
+      "Headless persisted personal scalar projections do not read private MIR selected-ID/storage or establish rendered Library, real controls, export files, clients or multiplayer. Original R20 physical input scope remains separately identified. GUIr03 adverse/r04 platform capture limitation remains open.",
+      "This closes the exact affected beta-origin preservation chain; it does not close provider transitions, all compatibility profiles, whole-product performance, independent final release/download delivery or stable acceptance. Prior adverse receipts and all published bytes remain preserved.",
+      "Aero performed independent received-byte/log/protocol review only: no native/GUI/library activation or new physical read of external Root paths."
+    ]
+  },
+  "target_dispatch": {
+    "input_manifest_sha256": "C888793A01C0D9523265FBDBEB5038BC66F59F7F4AC7529B0EB2232E5EB59BA9",
+    "composition_sha256": "6D915713C4FF1E1C2CA6E10B347AF68B87B926DFF98FCB54FFC73A11981CC215",
+    "review_sha256": "1F8260FFD974F44DFB22EC76EC7545F9DFA903DA0E604C3D3D04E2D2730F2AAA"
+  },
+  "final_package_applicability": {
+    "independent_review_sha256": "15F07E485C37B81BFA08595D7AFDA6AD6CC7C37FB74D44F6D5A1DFB8835A6D22",
+    "review_url": "https://github.com/Julesc013/more-infinite-research/pull/1625#issuecomment-6595099905",
+    "final_player_tree": "35d83ebe891a1d108e7f68ad288f81fb29f225c1",
+    "final_f200_package_sha256": "30120C52D9A18ED7454CF501F17BD48CE06D2B77AA0ED12E888405BA93E298C1",
+    "basis": "All corresponding ZIP members except changelog.txt are byte-identical; only release date and English-help release-note text differ. Native source/package identities above are not relabelled."
+  },
+  "stable_qualification": false,
+  "release_qualification": false
+}

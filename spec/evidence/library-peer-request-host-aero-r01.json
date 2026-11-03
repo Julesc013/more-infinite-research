@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryPeerRequestHostReviewV1",
+  "status": "host-composition-control-passes-native-client-scope-open",
+  "reviewed_on": "2026-11-02",
+  "reviewed_against": "c53de3c95b83f20d889aa7fbb32b8966880b9c1a",
+  "requirements": [
+    "RUN-02",
+    "RUN-04",
+    "CONT-10"
+  ],
+  "historical_expectation": {
+    "ref": "v4.7.3:tests/runtime/research_browser_discovery_regressions.lua",
+    "blob": "b89b3ab219bcd54d3f698c9cc306e3607ad9f5b0",
+    "sha256": "34FD4C0389E87251A45B7C298DFCFC9FED0946CDEAF7ADD0BA97CDE4BC6E791A",
+    "reviewed_scope": "Previously reviewed discovery group; the late variant requires maintenance to remain while another player has an issued translation and to unregister after the final peer completes.",
+    "scope_limit": "This record maps those retained peer/request ownership assertions, not every old harness/provider or native-client requirement."
+  },
+  "api_sources": [
+    {
+      "url": "https://lua-api.factorio.com/2.0.77/runtime-api.json",
+      "version": "2.0.77",
+      "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578",
+      "request_id_type": "uint32",
+      "request_id_semantics": "Unique request identifier; this control uses distinct IDs101/202 and makes no assertion that the engine allocator collides."
+    },
+    {
+      "url": "https://lua-api.factorio.com/2.1.23/runtime-api.json",
+      "version": "2.1.23",
+      "sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373",
+      "request_id_type": "uint32",
+      "request_id_semantics": "Unique request identifier; this control uses distinct IDs101/202 and makes no assertion that the engine allocator collides."
+    }
+  ],
+  "current_control": "tests/test_library.py::test_completed_or_closed_player_keeps_peer_translation_maintenance_until_its_reply",
+  "implementation": [
+    "source/runtime/library.lua",
+    "source/runtime/library_translations.lua",
+    "source/runtime/bootstrap.lua"
+  ],
+  "observed_host_scope": {
+    "same_force_player_doubles": 2,
+    "separate_locales": [
+      "en",
+      "de"
+    ],
+    "unique_request_ids": [
+      101,
+      202
+    ],
+    "orders": [
+      "reply-first",
+      "close-first"
+    ],
+    "actual_composition_boundaries": [
+      "public legacy-browser remote open",
+      "registered GUI-close handler",
+      "registered translation callback",
+      "real maintenance registration and final removal"
+    ],
+    "peer_root_query_labels_and_pending_identity_retained": true,
+    "native_research_queue_current_progress_levels_enablement_unchanged": true
+  },
+  "validation": {
+    "library_controls": 90,
+    "deliberately_broken_variants_detected": 2,
+    "broken_classes": [
+      "getter inspects only player1 and loses the peer",
+      "getter keeps maintenance after all issued work completes"
+    ],
+    "lua": "5.2",
+    "lupa": "2.6",
+    "required_exact_head_ci": "required after commit"
+  },
+  "fixture_change": "The existing event-routing fixture accepts an optional extra-event definition; all prior two-argument callers keep their original event set. This registers translation callbacks once through the actual bootstrap rather than replacing production handlers with a callback double.",
+  "remaining_executable_check": "Review consumed final-package/controller/client inputs and qualify genuinely affected two-real-client callback/locale/join/rejoin/cold-state behavior in the existing Black Glass queue. This host case is not native multiplayer or proof of capture governance. Existing observed results keep original inputs and limits.",
+  "limits": [
+    "Two host player/GUI doubles on one force are not actual connected clients or gameplay evidence.",
+    "The pinned API describes unique request IDs; this does not fabricate engine collision behavior.",
+    "No source/library protocol, issued-ID ledger, player data, archived package/version/tag, original request/evidence or shared progress/inventory record changes.",
+    "The separate capture-governance/applicability hold remains binding before GUI dispatch or evidence reuse."
+  ],
+  "custody": "build/qualification/aero-inactive-artwork-r01/",
+  "native_execution": false,
+  "source_reconciliation_complete": false,
+  "test_intent_reconciliation_complete": false,
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "owner": {
+    "historical_host_mapping": "Aero",
+    "independent_integration_and_native": "Black Glass"
+  },
+  "native_evidence_reused_as_current": false
+}

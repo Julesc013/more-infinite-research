@@ -1,0 +1,242 @@
+{
+  "schema": 1,
+  "kind": "MIRImportedLibraryR17AdverseChainV1",
+  "status": "partial-real-input-observed; replacement-lifecycle-blocked-by-live-selection-guard",
+  "public_input_source": "5fe35fd870c27bd4a75f12c591d86e9c7bba718d",
+  "private_controller_source": "1d013ea42e2f09021cf1ecdad45246e819710fcb",
+  "player_source": "b677ced0b1ae0d8bd9ae47eb6b272443faec6d63",
+  "candidate_f210_sha256": "C6C2470B438846484732E0E05D124DB31A1100C2F1AA0E770B327A4A6FBAFA5D",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "geometry_attempt": {
+    "root_readback": {
+      "kind": "MIRImportedLibraryGeometryAdverseRootReadbackV1",
+      "status": "adverse-before-actor-binding",
+      "terminal_sha256": "BADB0F7B7E06D9BAAFB5C52A9EB0E64DE605298C21DA6E1BB2D212A82A30A3EC",
+      "preparation_sha256": "60A90E5F1FE1B67D304DDE726A28FDEE8C402181E72232260137798AF62E50B7",
+      "runtime_sha256": "A7AF8F1BF25A27ED47AEDCF259E830311695C09186AFAE9ACB85C7868E6D8BBE",
+      "native_members": 85,
+      "native_bytes": 8099869,
+      "controller_members": 4,
+      "controller_bytes": 23409,
+      "primary_files": 105,
+      "primary_bytes": 8229561,
+      "source_copy_primary_verified": true,
+      "saved_input_crc_entries": 55,
+      "saved_input_and_controls_unchanged": true,
+      "factorio_zero": true,
+      "actual_processes": 3,
+      "actual_client_joins": 2,
+      "actual_private_queries": 16,
+      "actual_actor_inputs": 0,
+      "actual_resets": 0,
+      "actual_removed_players": 0,
+      "new_saves": 0,
+      "phase": "text-prefix",
+      "last_report_transport": {
+        "path": "D:/Projects/Factorio/mir5-blackglass-r15-runtime-r01/build/tmp/imported-library-r17-native-r01-f210/server/factorio-current.log.report.rcon-261e577173a94b699a2bf711d69a3e9d.json",
+        "bytes": 4662,
+        "sha256": "AAA0A1B44BBAA3D7B8A7CFDC56F12E62EFBD6BF0C17FFA073463E603A740040F"
+      },
+      "native_geometry": {
+        "en": {
+          "location": {
+            "x": 0,
+            "y": 0
+          },
+          "style_maximal_width": 682,
+          "display_scale": 0.75,
+          "display_resolution": {
+            "width": 1024,
+            "height": 576
+          }
+        },
+        "de": {
+          "location": {
+            "x": 256,
+            "y": 36
+          },
+          "style_maximal_width": 682,
+          "display_scale": 0.75,
+          "display_resolution": {
+            "width": 1024,
+            "height": 576
+          }
+        }
+      },
+      "png": {
+        "role": "client-de",
+        "width": 1024,
+        "height": 576,
+        "sha256": "ECB8B63F173DAE0A439E2FA9C4736707BEB6491BDB81874E5112B13FAAF3D834"
+      },
+      "native_acceptance": false,
+      "performance_acceptance": false,
+      "release_qualification": false
+    },
+    "classification": "Requested1024x576 produced1024x576; the fixed1280x720 owned-capture gate refused before actor input. No scaling cause is inferred.",
+    "native_lifecycle_acceptance": false
+  },
+  "selection_attempt": {
+    "root_readback": {
+      "kind": "MIRImportedSelectionAdverseRootReadbackV1",
+      "status": "adverse-before-replacement-spawn",
+      "terminal_sha256": "FF5D224EDB07123DE06228EAB6ED61A9B21CA1015D62530678708853DB23ED5B",
+      "preparation_sha256": "60A90E5F1FE1B67D304DDE726A28FDEE8C402181E72232260137798AF62E50B7",
+      "runtime_sha256": "81871DE2A4A2AB619A06440AF385B5DDC2212577D7E9A8753AC93C1E5A3A1161",
+      "actual_process_allocations": 3,
+      "native_members": 144,
+      "native_bytes": 12660320,
+      "controller_members": 4,
+      "primary_files": 182,
+      "primary_bytes": 12834865,
+      "source_copy_primary_verified": true,
+      "saved_input_crc_entries": 55,
+      "saved_input_and_controls_unchanged": true,
+      "terminal_factorio_zero": true,
+      "cleanup_errors": [],
+      "error": "[mir-library-live-selection]",
+      "last_report": {
+        "relative_path": "server/factorio-current.log.remove-de.rcon-56ffa34bcb64419eb71847abab204c17.json",
+        "bytes": 5390,
+        "sha256": "11F6A093EC39ABD94501C8554BAFDE02D9BD578284296774F04EFDCCC5BD1C81"
+      },
+      "replacement_clients_started": 0,
+      "new_saves_created": 0,
+      "selection_at_refusal_retained": false,
+      "native_lifecycle_acceptance": false,
+      "performance_acceptance": false,
+      "scope": "Partial real actor/lifecycle observations only. Last raw report retained unchanged; strict selection guard stopped replacement prelaunch. Refusal body absent, cause not yet established."
+    },
+    "last_report_phase": "replacement",
+    "last_report_tick": 487581,
+    "actual_report_counters": {
+      "actual_joins": 2,
+      "actual_text_events": 15,
+      "actual_library_closed_events": 2,
+      "actual_library_close_observations": [
+        {
+          "phase": "escape",
+          "armed_phase": "escape",
+          "player_index": 1,
+          "player_lookup_ok": true,
+          "player_name": "MIR5English",
+          "armed_player_index": 1,
+          "ordinal": 1,
+          "tick": 270403,
+          "gui_type": 16,
+          "expected_gui_type": 16,
+          "element_present": true,
+          "element_type": "userdata",
+          "element_name": "mir_research_browser",
+          "accepted": true,
+          "element_valid": true,
+          "same_root": true
+        },
+        {
+          "phase": "inventory",
+          "armed_phase": "inventory",
+          "player_index": 1,
+          "player_lookup_ok": true,
+          "player_name": "MIR5English",
+          "armed_player_index": 1,
+          "ordinal": 2,
+          "tick": 271419,
+          "gui_type": 16,
+          "expected_gui_type": 16,
+          "element_present": true,
+          "element_type": "userdata",
+          "element_name": "mir_research_browser",
+          "accepted": true,
+          "element_valid": true,
+          "same_root": true
+        }
+      ],
+      "actual_drag_events": 5,
+      "actual_effect_reset_events": 2,
+      "actual_removed_events": 1
+    },
+    "actor_result_bodies": 9,
+    "classification": "Real EN text/focus, drag, Escape/inventory close and foreign-state input reached replacement. Shared selection guard refused before replacement client spawn. No replacement/restart/new-save result.",
+    "selection_at_original_refusal_retained": false,
+    "native_lifecycle_acceptance": false
+  },
+  "bounded_exit_probe": {
+    "private_source": "9708cf3852ed0eaf66a1e522cebd47b07f9b9544",
+    "script": {
+      "path": "D:/Projects/Factorio/mir-native-worker-imported-selection-exit-r01/Invoke-ImportedSelectionExitProbe.ps1",
+      "bytes": 9578,
+      "sha256": "609A79BFE50087EA7A9CDF2969FA3A5150407F7D4A1DF96D58BA070ECEB34CE5"
+    },
+    "result": {
+      "bytes": 6683,
+      "sha256": "D6E4B13F4EA24DE534F2DB2A794349D4FE79B23041F811624B90EB87713690B8"
+    },
+    "status": "diagnostic-completed",
+    "actual_processes": 1,
+    "exit_code": 0,
+    "natural_exit": true,
+    "forced_stop": false,
+    "snapshots": [
+      {
+        "path": "D:/Projects/Factorio/mir5-blackglass-r15-runtime-r01/build/tmp/imported-selection-exit-probe-r01/before-launch.mod-list.json",
+        "bytes": 43116,
+        "sha256": "37E990149EC62B29089284F4422FD5DB684D6BEB264270CB85FDDE57BB48A332",
+        "phase": "before-launch",
+        "exists": true,
+        "observed_utc": "2026-11-01T21:37:43.0001427Z"
+      },
+      {
+        "path": "D:/Projects/Factorio/mir5-blackglass-r15-runtime-r01/build/tmp/imported-selection-exit-probe-r01/post-start-before-guard.mod-list.json",
+        "bytes": 43116,
+        "sha256": "37E990149EC62B29089284F4422FD5DB684D6BEB264270CB85FDDE57BB48A332",
+        "phase": "post-start-before-guard",
+        "exists": true,
+        "observed_utc": "2026-11-01T21:37:43.3243789Z"
+      },
+      {
+        "path": "D:/Projects/Factorio/mir5-blackglass-r15-runtime-r01/build/tmp/imported-selection-exit-probe-r01/initialized.mod-list.json",
+        "bytes": 43116,
+        "sha256": "37E990149EC62B29089284F4422FD5DB684D6BEB264270CB85FDDE57BB48A332",
+        "phase": "initialized",
+        "exists": true,
+        "observed_utc": "2026-11-01T21:37:56.2273603Z"
+      },
+      {
+        "path": "D:/Projects/Factorio/mir5-blackglass-r15-runtime-r01/build/tmp/imported-selection-exit-probe-r01/after-exit-before-restoration.mod-list.json",
+        "bytes": 43533,
+        "sha256": "0B1607D0355560AF87EA9ED5446E7191D628A87258973CF5E129952658B4DC49",
+        "phase": "after-exit-before-restoration",
+        "exists": true,
+        "observed_utc": "2026-11-01T21:37:57.0828936Z"
+      }
+    ],
+    "restored": true,
+    "factorio_zero": true,
+    "observation": "Exact same555 names/enabled booleans; normal exit removed all five enabled version fields. Initial and initialized bytes match. The after-exit body is retained before restoration.",
+    "limit": "One menu initialization/normal-exit diagnostic establishes a guard-refusal mechanism, not the missing R02 refusal body or native lifecycle/performance acceptance."
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/library-imported-r17-adverse-receipts-r01.json.gz",
+    "bytes": 119249,
+    "sha256": "83EEE4CF9C505DD7563A86785D2F2B379F1529F797ABFF11FEF2B4F57D966E41",
+    "bodies": 53
+  },
+  "primary_custody": [
+    "build/qualification/imported-library-r17-native-geometry-adverse-r01",
+    "build/qualification/imported-library-r17-native-selection-adverse-r01",
+    "build/qualification/imported-selection-exit-probe-r01"
+  ],
+  "next_action": "Review/integrate PR1558 unique-numeric-latest normalization through exact-head checks, bind its exact helper bytes in a distinct fresh packet, complete offline/independent review, then execute only the affected lifecycle. Keep unrelated whole-product work moving.",
+  "limits": [
+    "Original terminal native_execution pending-ledger fields remain unchanged; actual process allocations independently establish three engines in each lifecycle attempt.",
+    "Screenshots remain in primary custody with exact hashes bound by native handoffs; this capsule retains receipt bodies, not PNG image bytes or credential-bearing log headers.",
+    "Static packet/model review is preparation. Partial actual input is not complete Library, save/client lifecycle, export or performance acceptance.",
+    "The probe is normally governed and timed for resource control only; its elapsed time is not a startup or responsive-menu performance sample.",
+    "Fresh independent adverse-chain/capsule review is required before integration."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}

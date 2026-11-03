@@ -2,6 +2,27 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.2] - 2026-11-03
+
+### Changes
+
+- Show current and maximum recipe productivity and whether the next research level can still help in selected Library details, without changing research queue behavior.
+- Search affected recipe IDs in the Library, including IDs without translated names.
+- Preview diagnostic reports in Debug and choose whether to include settings and availability details before exporting locally.
+- Preserve personal Library choices through player and configuration changes, and show when discovery information is limited or falls back to stable IDs.
+- Correct three Russian research names for cannon shells and thruster fuel and oxidizer productivity.
+- Respect Discovery Tree's research visibility in Library lists, selected details, queue labels and native research navigation.
+
+### Bugfixes
+
+- Preserve previously earned low-density-structure, plastic, processing-unit, rocket-fuel and steel bonuses for affected Factorio 2.0 saves using Space Is Fake 1.0.60.
+- Avoid duplicate weapon-speed research with Muria while preserving its finite technologies and adding the intended continuation.
+- Leave compatible infinite native research supplied by another mod under that mod's control.
+- Refuse unsafe addition or removal of Muria on an existing MIR save before changing MIR's saved state.
+- Keep private Space Is Fake and Krastorio recovery research out of ordinary Library views.
+- Restore custom percentages and older accepted values in imported pipeline and prototype-limit settings profiles.
+- Restore English setting names and help text.
+
 ## [5.0.1] - 2026-11-01
 
 ### Changes

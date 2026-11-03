@@ -1,0 +1,678 @@
+{
+  "schema": 1,
+  "kind": "mir5-published501-performance-input-applicability-aero-review",
+  "status": "bounded-input-review-no-new-native-acceptance",
+  "review_date": "2026-11-02",
+  "review_source": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+  "scope": "Review of the named existing performance chains against the actual published v5.0.1 F200/F210 ZIPs. This is endpoint-specific applicability, not an exhaustive new history inventory, a changed benchmark plan, or a native result.",
+  "candidate": {
+    "canonical_tag": "v5.0.1",
+    "source_commit": "b677ced0b1ae0d8bd9ae47eb6b272443faec6d63",
+    "source_version": "5.0.1",
+    "player_source_equal_to_review_source": true,
+    "packages": [
+      {
+        "target": "f200",
+        "filename": "more-infinite-research_5.0.20001.zip",
+        "bytes": 744248,
+        "sha256": "750ECA842134AFDDCC7C45B2B656510CA60F09940A2E82B21896AAE7E3D8C1BE",
+        "package_version": "5.0.20001",
+        "factorio_version": "2.0",
+        "minimum_base_dependency": "base >= 2.0.77",
+        "selected_shared_members_verified": 14
+      },
+      {
+        "target": "f210",
+        "filename": "more-infinite-research_5.0.21001.zip",
+        "bytes": 744631,
+        "sha256": "C6C2470B438846484732E0E05D124DB31A1100C2F1AA0E770B327A4A6FBAFA5D",
+        "package_version": "5.0.21001",
+        "factorio_version": "2.1",
+        "minimum_base_dependency": "base >= 2.1.23",
+        "selected_shared_members_verified": 14
+      }
+    ],
+    "download_custody": "Primary checkout build/qualification/aero-stable-recovery-r01/download-labels/v5.0.1; previous anonymous before/after SHA256 verification is retained. This review rehashes these same local downloaded ZIPs and compares selected shared members to raw canonical Git."
+  },
+  "method": {
+    "source_comparison": "Raw git show bytes at exact immutable revisions; missing earlier members are recorded absent rather than treated as equal. No newline normalization. Package source mapping is checked for the selected shared members, not generated target metadata.",
+    "original_evidence": "Reference hashes below are raw committed JSON blob SHA256 at review_source. No old result, source identity, threshold, status, capsule or observation is rewritten. Existing independent arithmetic reviews are adopted, not counted again as new scores.",
+    "source_count_limit": "Identical leaf functions preserve their bounded algorithm facts. They do not establish elapsed-process, saved-world, callback-composition or retained-memory equivalence."
+  },
+  "selected_shared_source": [
+    {
+      "path": "source/research/generator.lua",
+      "current_bytes": 5491,
+      "current_sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526",
+      "matches_both_downloaded_501_packages": true,
+      "prior_inputs": {
+        "active_runtime_and_38c_menu": {
+          "revision": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+          "present": true,
+          "bytes": 5491,
+          "sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526",
+          "equal_to_501": true
+        },
+        "earlier_whole_product_source_review": {
+          "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+          "present": true,
+          "bytes": 5491,
+          "sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526",
+          "equal_to_501": true
+        }
+      }
+    },
+    {
+      "path": "source/runtime/passive_repair.lua",
+      "current_bytes": 8942,
+      "current_sha256": "372C916BD649E7B0D2F27C75F91DDCDA9D04E822C697CFF6DA5AF1A64AB05EB9",
+      "matches_both_downloaded_501_packages": true,
+      "prior_inputs": {
+        "active_runtime_and_38c_menu": {
+          "revision": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+          "present": true,
+          "bytes": 8942,
+          "sha256": "372C916BD649E7B0D2F27C75F91DDCDA9D04E822C697CFF6DA5AF1A64AB05EB9",
+          "equal_to_501": true
+        },
+        "earlier_whole_product_source_review": {
+          "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+          "present": true,
+          "bytes": 8942,
+          "sha256": "372C916BD649E7B0D2F27C75F91DDCDA9D04E822C697CFF6DA5AF1A64AB05EB9",
+          "equal_to_501": true
+        }
+      }
+    },
+    {
+      "path": "source/runtime/agriculture.lua",
+      "current_bytes": 5652,
+      "current_sha256": "F0DCA2B45C38A099CC92F91ED2BF6F59F3437C183F67B0B8FA6C9AA64F6376FA",
+      "matches_both_downloaded_501_packages": true,
+      "prior_inputs": {
+        "active_runtime_and_38c_menu": {
+          "revision": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+          "present": true,
+          "bytes": 5652,
+          "sha256": "F0DCA2B45C38A099CC92F91ED2BF6F59F3437C183F67B0B8FA6C9AA64F6376FA",
+          "equal_to_501": true
+        },
+        "earlier_whole_product_source_review": {
+          "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+          "present": true,
+          "bytes": 5652,
+          "sha256": "F0DCA2B45C38A099CC92F91ED2BF6F59F3437C183F67B0B8FA6C9AA64F6376FA",
+          "equal_to_501": true
+        }
+      }
+    },
+    {
+      "path": "source/runtime/spoilage.lua",
+      "current_bytes": 5031,
+      "current_sha256": "92EB26A9AB6143C16A115A3838818C9BAB5644D362B3D2C8F06C223B8FA3EC7D",
+      "matches_both_downloaded_501_packages": true,
+      "prior_inputs": {
+        "active_runtime_and_38c_menu": {
+          "revision": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+          "present": true,
+          "bytes": 5031,
+          "sha256": "92EB26A9AB6143C16A115A3838818C9BAB5644D362B3D2C8F06C223B8FA3EC7D",
+          "equal_to_501": true
+        },
+        "earlier_whole_product_source_review": {
+          "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+          "present": true,
+          "bytes": 5031,
+          "sha256": "92EB26A9AB6143C16A115A3838818C9BAB5644D362B3D2C8F06C223B8FA3EC7D",
+          "equal_to_501": true
+        }
+      }
+    },
+    {
+      "path": "source/runtime/scripted_effects.lua",
+      "current_bytes": 5620,
+      "current_sha256": "A4018142388F74050D51BF2E324A93972F4791363CDF72618478F7D03C3C271A",
+      "matches_both_downloaded_501_packages": true,
+      "prior_inputs": {
+        "active_runtime_and_38c_menu": {
+          "revision": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+          "present": true,
+          "bytes": 5620,
+          "sha256": "A4018142388F74050D51BF2E324A93972F4791363CDF72618478F7D03C3C271A",
+          "equal_to_501": true
+        },
+        "earlier_whole_product_source_review": {
+          "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+          "present": true,
+          "bytes": 5620,
+          "sha256": "A4018142388F74050D51BF2E324A93972F4791363CDF72618478F7D03C3C271A",
+          "equal_to_501": true
+        }
+      }
+    },
+    {
+      "path": "source/data-final-fixes.lua",
+      "current_bytes": 13849,
+      "current_sha256": "9046EC538420178BBBD9926B6D7FD0B4E83E2798A576C3B0D6F69CC37CA4F543",
+      "matches_both_downloaded_501_packages": true,
+      "prior_inputs": {
+        "active_runtime_and_38c_menu": {
+          "revision": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+          "present": true,
+          "bytes": 13443,
+          "sha256": "F907FA9EE1EFEBEAAE57D915FFB49C62B322CF8A13B540D9BDB0B4C95539B758",
+          "equal_to_501": false
+        },
+        "earlier_whole_product_source_review": {
+          "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+          "present": true,
+          "bytes": 13443,
+          "sha256": "F907FA9EE1EFEBEAAE57D915FFB49C62B322CF8A13B540D9BDB0B4C95539B758",
+          "equal_to_501": false
+        }
+      }
+    },
+    {
+      "path": "source/compatibility/modern_catalogue.lua",
+      "current_bytes": 63049,
+      "current_sha256": "2A549C129DB4EAD52A83A46D45E90957B7E95589787B4402945D6521D1D20745",
+      "matches_both_downloaded_501_packages": true,
+      "prior_inputs": {
+        "active_runtime_and_38c_menu": {
+          "revision": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+          "present": true,
+          "bytes": 59250,
+          "sha256": "DCA31A41B34A2A7CE8A59E1206E6D71AD2CDB9637B0094ABEDDDDA959C05B89F",
+          "equal_to_501": false
+        },
+        "earlier_whole_product_source_review": {
+          "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+          "present": true,
+          "bytes": 59250,
+          "sha256": "DCA31A41B34A2A7CE8A59E1206E6D71AD2CDB9637B0094ABEDDDDA959C05B89F",
+          "equal_to_501": false
+        }
+      }
+    },
+    {
+      "path": "source/compatibility/science_bindings.lua",
+      "current_bytes": 19304,
+      "current_sha256": "8FBB2F3D48A3C36917A8E413E0F91535B294FB879906805304D8FF4BB61D8DF4",
+      "matches_both_downloaded_501_packages": true,
+      "prior_inputs": {
+        "active_runtime_and_38c_menu": {
+          "revision": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+          "present": true,
+          "bytes": 19364,
+          "sha256": "A892A27C1E00B748957CDB5AF5095756E5323874330F59342E383F34559B3CA4",
+          "equal_to_501": false
+        },
+        "earlier_whole_product_source_review": {
+          "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+          "present": true,
+          "bytes": 19364,
+          "sha256": "A892A27C1E00B748957CDB5AF5095756E5323874330F59342E383F34559B3CA4",
+          "equal_to_501": false
+        }
+      }
+    },
+    {
+      "path": "source/research/catalogue.lua",
+      "current_bytes": 14428,
+      "current_sha256": "1F53785C93D2C8F1FC73F2EE365F847D343ACFF9C3ABF01E69BC9B2A5E77E05D",
+      "matches_both_downloaded_501_packages": true,
+      "prior_inputs": {
+        "active_runtime_and_38c_menu": {
+          "revision": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+          "present": true,
+          "bytes": 13752,
+          "sha256": "EACCBED9C41C08FE8236991FC92F7AED78B1CCD3D7BFBDD6729487342BA8CA2C",
+          "equal_to_501": false
+        },
+        "earlier_whole_product_source_review": {
+          "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+          "present": true,
+          "bytes": 13752,
+          "sha256": "EACCBED9C41C08FE8236991FC92F7AED78B1CCD3D7BFBDD6729487342BA8CA2C",
+          "equal_to_501": false
+        }
+      }
+    },
+    {
+      "path": "source/runtime/bootstrap.lua",
+      "current_bytes": 28990,
+      "current_sha256": "2F4444488CE1143F391CC4FA682467DD8A2309DA2155F2C0BAE1A86DFA66D967",
+      "matches_both_downloaded_501_packages": true,
+      "prior_inputs": {
+        "active_runtime_and_38c_menu": {
+          "revision": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+          "present": true,
+          "bytes": 28235,
+          "sha256": "9082E729CAC88C38182576DE88B5B2C378ECD0333339BAAE0A93DAD0DDFB8EDB",
+          "equal_to_501": false
+        },
+        "earlier_whole_product_source_review": {
+          "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+          "present": true,
+          "bytes": 28748,
+          "sha256": "B414F06BBAEF3CFD43CE2E591020CFD3410C0581E869CECD0DEC265AD9790219",
+          "equal_to_501": false
+        }
+      }
+    },
+    {
+      "path": "source/runtime/catalogue.lua",
+      "current_bytes": 1217,
+      "current_sha256": "3809178C83136696ACF1CE4FAF1EE5C4AA53C95BD176E048D82769FC391B4A54",
+      "matches_both_downloaded_501_packages": true,
+      "prior_inputs": {
+        "active_runtime_and_38c_menu": {
+          "revision": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+          "present": false,
+          "bytes": null,
+          "sha256": null,
+          "equal_to_501": false
+        },
+        "earlier_whole_product_source_review": {
+          "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+          "present": false,
+          "bytes": null,
+          "sha256": null,
+          "equal_to_501": false
+        }
+      }
+    },
+    {
+      "path": "source/runtime/library.lua",
+      "current_bytes": 111854,
+      "current_sha256": "519725FDAD8FB3D90CF52281B0F98F66E3448FB037D8CAB11E7C5DA3ECCCCA1B",
+      "matches_both_downloaded_501_packages": true,
+      "prior_inputs": {
+        "active_runtime_and_38c_menu": {
+          "revision": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+          "present": true,
+          "bytes": 86998,
+          "sha256": "24A7CC1A0D501BEDA5533FD19385B087D5FEB50629706B97CC12E723219E3EBB",
+          "equal_to_501": false
+        },
+        "earlier_whole_product_source_review": {
+          "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+          "present": true,
+          "bytes": 91137,
+          "sha256": "19C0BBF4B88B5DE6A63C0D4D5CBAA4FBDF2389D9278449F08F5D8D56FBAC55A5",
+          "equal_to_501": false
+        }
+      }
+    },
+    {
+      "path": "source/runtime/diagnostics.lua",
+      "current_bytes": 4759,
+      "current_sha256": "E2AEE356BF7FFF836A0930BC688E5206E5746BD2AE1544860F780F95BE24083F",
+      "matches_both_downloaded_501_packages": true,
+      "prior_inputs": {
+        "active_runtime_and_38c_menu": {
+          "revision": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+          "present": false,
+          "bytes": null,
+          "sha256": null,
+          "equal_to_501": false
+        },
+        "earlier_whole_product_source_review": {
+          "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+          "present": true,
+          "bytes": 4759,
+          "sha256": "E2AEE356BF7FFF836A0930BC688E5206E5746BD2AE1544860F780F95BE24083F",
+          "equal_to_501": true
+        }
+      }
+    },
+    {
+      "path": "source/runtime/lifecycle.lua",
+      "current_bytes": 30842,
+      "current_sha256": "ADF596AECCF992579DAE1774469642352BA7EE91701F43C6CAC003BCEF7CAB90",
+      "matches_both_downloaded_501_packages": true,
+      "prior_inputs": {
+        "active_runtime_and_38c_menu": {
+          "revision": "b3bbd8d37b37bfee2e258b3e8a2f223dcf3860b3",
+          "present": true,
+          "bytes": 30843,
+          "sha256": "60A06504D5627DE232417DBC6FF569B94523A2C654DDA7AE375FD51F85BD815C",
+          "equal_to_501": false
+        },
+        "earlier_whole_product_source_review": {
+          "revision": "42032477d45ced683e72736a4fe30a7a3195b995",
+          "present": true,
+          "bytes": 30843,
+          "sha256": "60A06504D5627DE232417DBC6FF569B94523A2C654DDA7AE375FD51F85BD815C",
+          "equal_to_501": false
+        }
+      }
+    }
+  ],
+  "reuse_decisions": [
+    {
+      "obligation": "PERF-01/02/05/06 bounded deterministic work",
+      "reusable_scope": "The five identical shared modules listed below, under the earlier exact host inputs and limits. Three narrow existing current-source work-shape controls also pass.",
+      "unchanged_paths": [
+        "source/research/generator.lua",
+        "source/runtime/passive_repair.lua",
+        "source/runtime/agriculture.lua",
+        "source/runtime/spoilage.lua",
+        "source/runtime/scripted_effects.lua"
+      ],
+      "limit": "No source/count result is a native elapsed-time, backlog-delay, large-active-factory or whole-product memory verdict."
+    },
+    {
+      "obligation": "PERF-03/04 responsive-menu startup",
+      "retained_original": "The accepted38C/B6/replay single-profile result remains accepted for its original05F278 F210 cohort only. Published total mean30.9252331375s versus candidate28.3224201375s; the candidate MIR-added interval spans zero.",
+      "current_applicability": "Shared modern_catalogue selection/continuation preflight changed, including a new finite selector call and named existing-continuation filtering. These paths are consumed by data-final-fixes. Startup applicability to5.0.1 therefore remains unresolved; identical Generator code is insufficient. Runtime-only Library edits alone would not imply menu retesting.",
+      "limit": "Do not transfer the old50-percent criterion or a greater-than100-percent ratio into a5.0.1 claim, or interpret signed uncertainty as zero physical work."
+    },
+    {
+      "obligation": "PERF-04 active runtime and process memory",
+      "retained_original": "The68-launch38C comparison against actual published4.7.21002 retains its16warmups/52scores and original16 median comparisons. It is not a4.7.3 comparator.",
+      "current_applicability": "The four scripted leaf modules are identical, but bootstrap now imports a runtime-catalogue adapter/diagnostics and changed Library/lifecycle callbacks. Data selection also changed. Existing micro-workload time/process-memory results are not automatically current whole-process equivalence. Review exact affected callback/data/save inputs before choosing bounded successor checks.",
+      "limit": "Adopt the existing maxima/useful-work review rather than rerunning arithmetic. Do not claim native per-entity one-health-per-second under saturation from the fixed8-per60/256 policy."
+    },
+    {
+      "obligation": "PERF-04 Library/save/load/retained memory",
+      "retained_original": "All six diagnostic sessions and five failed memory controls remain. Both sides of the failed A/A controls are the published predecessor; the final candidate session is functional observation only.",
+      "current_applicability": "Changed Library/layout/model/locales, runtime catalogue, bootstrap, diagnostics and lifecycle are shared inputs to these endpoints. A valid matched-output final candidate comparison remains open.",
+      "limit": "Do not diagnose a MIR regression from predecessor-versus-itself controls, replace retained endpoints with lifetime peaks, change tolerances, or count cosmetic/fixture success as acceptance."
+    }
+  ],
+  "active_runtime_binding": {
+    "status": "historical-patch00-inputs-not-ready-for501",
+    "classification": "Expected exact historical campaign pins, not a newly demonstrated product defect. No native attempt was made.",
+    "files": [
+      {
+        "path": "tests/profiles/runtime-current38c-repair-candidate-f210-2123.json",
+        "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+        "bytes": 1779,
+        "git_blob_sha256": "033DA4B8CEA2A3DF859F1C3261D77D8068DC16E630E3120F1DF0C1A6D9A7209E"
+      },
+      {
+        "path": "tests/profiles/runtime-current38c-agriculture-candidate-defaults-128-f210-2123.json",
+        "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+        "bytes": 2108,
+        "git_blob_sha256": "9DF8DFA4466D0C08C9B9194D8C41D66DC25A789E4A08E0B30AC7970C86226314"
+      },
+      {
+        "path": "tests/fixtures/repair-stress/successor/info.json",
+        "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+        "bytes": 343,
+        "git_blob_sha256": "5A468239AB361691B0BC290480C3B10CFDE5BAC9C5768E8E2EC898AC13E5C07E"
+      },
+      {
+        "path": "tests/fixtures/repair-stress/successor/info-f210.json",
+        "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+        "bytes": 430,
+        "git_blob_sha256": "A8795707F4E806065D017A738B49C61743BA0C7CEDD2C62C4843595AAD16D143"
+      },
+      {
+        "path": "tests/fixtures/repair-stress/control.lua",
+        "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+        "bytes": 18020,
+        "git_blob_sha256": "521D75CBE29B65257E02921B13A3DFF227FE291F9406F6F41F366D4750AF86C7"
+      },
+      {
+        "path": "tests/fixtures/agriculture-scale/arm-candidate-defaults/info.json",
+        "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+        "bytes": 462,
+        "git_blob_sha256": "67AFB46C38F1E92D07DA343C5FE3A34DA26CC93DF93EBBE7D4A28BA4CC94FA10"
+      },
+      {
+        "path": "tests/fixtures/agriculture-scale/core/control.lua",
+        "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+        "bytes": 27148,
+        "git_blob_sha256": "A77890C76B13D622B9990274EEB28577767C1A776B9F773EDB9A5C31727F6816"
+      }
+    ],
+    "observed_constraints": [
+      "Both selected current38c candidate profiles bind5.0.21000 and archive38C84, not the downloaded5.0.21001/C6C247.",
+      "Repair successor metadata requires exact5.0.20000 or5.0.21000; runtime mode permits only the named patch00 or published4.7.2 tuples.",
+      "Agriculture Defaults selector metadata and runtime ARMS/assert_startup_contract bind exact5.0.21000. A changed profile/hash alone cannot admit5.0.21001.",
+      "The historical active selector supports F210 Space Age only; it does not establish six-cohort active-factory coverage."
+    ],
+    "remaining": "Native owner selects exact successor scope first. Any delegated rebind must align profile, metadata and all data/settings/runtime guards, prove admitted and rejected tuples offline, preserve historical inputs/results, and receive complete exact packet review before Factorio starts."
+  },
+  "fixed_heavy_profiles": [
+    {
+      "path": "tests/profiles/bob-angel-full-space-age-f200-2077.json",
+      "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "bytes": 7511,
+      "git_blob_sha256": "61CBE6299DD2708079EA80FB3871AC980C6FF7281DD126C61B3126A7FF294857"
+    },
+    {
+      "path": "tests/profiles/bob-angel-full-space-age-standalone-f210-2123.json",
+      "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "bytes": 8020,
+      "git_blob_sha256": "05F2786E896B1F28C2E4239134BA370B0C2BCF6CCB1384E03999FB0E89C8B980"
+    }
+  ],
+  "six_cohort_menu_disposition": [
+    {
+      "cohort": "Base",
+      "target": "f200",
+      "engine": {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "original_record": "spec/evidence/whole-product-base-f200-menu-adverse-native-chain-r01.json",
+      "original_status": "preserved-unaccepted-comparisons",
+      "retained_disposition": "No accepted startup scores: original R03 drift controls fail. The existing Aero phase diagnosis retains observer-response uncertainty and prepares a bounded same-published diagnostic.",
+      "next_menu_check": "Resolve the existing failed control mechanism/conditions with its retained diagnostic; no unchanged full comparison retry or threshold relaxation.",
+      "native_owner": "Black Glass",
+      "independent_review_owner": "Aero",
+      "current_501_performance_qualified": false
+    },
+    {
+      "cohort": "Base",
+      "target": "f210",
+      "engine": {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "original_record": "spec/evidence/whole-product-base-f210-menu-native-chain-r03.json",
+      "original_status": "valid-complete-base-fresh-process-as-shipped-dataset",
+      "retained_disposition": "Valid original 38-observation as-shipped dataset using candidate B637/5.0.21000 from source42032477; no equal-work attribution or high-cost percentage criterion.",
+      "next_menu_check": "Review changed consumed data-stage inputs for a separately frozen candidate comparison; preserve the valid earlier dataset and avoid repeating the optional historical MIR1-5/reboot campaign.",
+      "native_owner": "Black Glass",
+      "independent_review_owner": "Aero",
+      "current_501_performance_qualified": false
+    },
+    {
+      "cohort": "Space Age",
+      "target": "f200",
+      "engine": {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "original_record": "spec/evidence/whole-product-space-age-f200-admission-native-chain-r02.json",
+      "original_status": "passed-data-stage-admission-only",
+      "retained_disposition": "Four unscored data-stage admissions only, candidate7CAC/5.0.20000. No responsive-menu score.",
+      "next_menu_check": "Bind exact current package/profile/observer/config and controlled menu comparison; data dumps cannot close a graphical endpoint.",
+      "native_owner": "Black Glass",
+      "independent_review_owner": "Aero",
+      "current_501_performance_qualified": false
+    },
+    {
+      "cohort": "Space Age",
+      "target": "f210",
+      "engine": {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "original_record": "spec/evidence/whole-product-space-age-f210-menu-adverse-native-chain-r01.json",
+      "original_status": "failed-published-aa-before-scoring",
+      "retained_disposition": "Four warmups and two same-published controls; failed A/A before ordinal7, zero scored observations.",
+      "next_menu_check": "Diagnose the retained failed published control before a changed, reviewed full comparison. Preserve original thresholds and failed observations.",
+      "native_owner": "Black Glass",
+      "independent_review_owner": "Aero",
+      "current_501_performance_qualified": false
+    },
+    {
+      "cohort": "Fixed Bob/Angel Space Age",
+      "target": "f200",
+      "engine": {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "original_record": "spec/evidence/heavy-space-age-f200-current-native-chain-r03.json",
+      "original_status": "passed-scoped-native-prototype-settings-readback-original-declaration-failures-retained",
+      "retained_disposition": "Corrected candidate8C93 passes exact prototype/settings admission at profile61CBE. Earlier settings-load failure remains in its adverse chain; no menu score.",
+      "next_menu_check": "Use the fixed61CBE upstream-valid cohort and independent vectors, review current consumed paths, then bind menu and active-factory cases without borrowing F210 expectations.",
+      "native_owner": "Black Glass",
+      "independent_review_owner": "Aero",
+      "current_501_performance_qualified": false
+    },
+    {
+      "cohort": "Fixed Bob/Angel Space Age",
+      "target": "f210",
+      "engine": {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "original_record": "spec/evidence/whole-product-heavy-space-age-f210-menu-controller-loss-chain-r05.json",
+      "original_status": "thirty-eight-observations-recovered-original-controller-completion-unproven-adverse",
+      "retained_disposition": "Latest whole-product R05 recovers38 observations but original normal controller completion is unproven: all remain adverse. R04 prefix/resource refusals remain distinct. Separately accepted38C/B6/replay startup evidence retains its exact old package/profile identity.",
+      "next_menu_check": "Resolve controlled dispatch lifetime and actual host resource admission offline; prepare a separately frozen successor only after review. Do not reconstruct terminal proof, pool prefixes or substitute another heavy profile.",
+      "native_owner": "Black Glass",
+      "independent_review_owner": "Aero",
+      "current_501_performance_qualified": false
+    }
+  ],
+  "remaining_endpoints_for_each_applicable_cohort": [
+    "Full process-to-observed-responsive-menu startup under exact engine/profile/settings/config/observer and declared same-host controls; no log-initialized substitution.",
+    "Equivalent large ACTIVE factory: save loading, settled native-only/closed Library, enabled scripted effects, event spikes and useful output/throughput with backlog size/age/completion latency.",
+    "Open Library first-open/search/input/churn and retained/peak memory across declared save/load/client cycles; normal scored logging separate from diagnostics."
+  ],
+  "dispatch_discipline": {
+    "active_and_prepared": "Black Glass maintains one active and one prepared native assignment in the existing worklist. This readback does not infer live process state or declare a packet ready.",
+    "unrelated_ready_work": "A blocked GUI packet does not consume the entire native queue. Advance a separately reviewed ready performance case; after repeated same-class preparation failures, fix composition offline before retry.",
+    "release_gate": "No6-cohort verdict is waived. Reuse exact matching old inputs only after consumed-input review; unresolved shared-path impact stays open. No automatic rerun of every historical version, informational MIR1-5 table or reboot campaign."
+  },
+  "validation": {
+    "selected_existing_controls": [
+      {
+        "path": "tests/test_passive_repair.py",
+        "class": "PassiveRepairTests",
+        "method": "test_fixed_relevant_burst_drains_without_scanning_unrelated_factory"
+      },
+      {
+        "path": "tests/test_agriculture.py",
+        "class": "AgricultureTests",
+        "method": "test_active_bursts_do_one_useful_write_per_plant_without_world_or_catalogue_scan"
+      },
+      {
+        "path": "tests/test_bootstrap.py",
+        "class": "BootstrapTests",
+        "method": "test_settled_native_only_world_has_no_periodic_work_after_view_cycles_and_reload"
+      }
+    ],
+    "passed": 3,
+    "runtime": "Explicit existing Lupa2.6 lupa.lua52 at primary build/tmp/mir421-lua-runtime; host plan inspected before selection.",
+    "scope": "Host/double work shape only. The settled bootstrap control at this source checks nth-tick work; pending separately reviewed #1543 adds ordinary on_tick opposition.",
+    "local_receipt": "build/qualification/aero-performance-inputs-r01/work-shape-controls.json",
+    "selected_package_shared_member_matches": 28,
+    "all_prior_record_hashes_retained": true
+  },
+  "reviewed_existing_records": [
+    {
+      "path": "spec/evidence/whole-product-runtime-work-aero-r01.json",
+      "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "bytes": 9895,
+      "git_blob_sha256": "D956AA5820B5A5AC4BD2E2A4A4137174FCFB9D8D99CF1D0114700913F9875A27"
+    },
+    {
+      "path": "spec/evidence/runtime-current38c-complete-native-chain-r01.json",
+      "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "bytes": 8629,
+      "git_blob_sha256": "8353045BC60BEBCFA6F3DE072FB600EF3CF93AE610BE80C8C194D99F701D45C0"
+    },
+    {
+      "path": "spec/evidence/runtime-current38c-maxima-useful-work-aero-r01.json",
+      "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "bytes": 46877,
+      "git_blob_sha256": "876B7ADF38A8FE2863E1509C36723DE37C792046A305C20F438C4616F04F6980"
+    },
+    {
+      "path": "spec/evidence/f210-current38c-menu-native-chain-r01.json",
+      "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "bytes": 181314,
+      "git_blob_sha256": "4EE86E3B24891D8C499A601F91AB0211CF1EED3E6BFAE454C0F0F30C8DDB1918"
+    },
+    {
+      "path": "spec/evidence/whole-product-base-f200-menu-adverse-native-chain-r01.json",
+      "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "bytes": 7852,
+      "git_blob_sha256": "0AD0A5F17FA9BD111EA0C6FF5E9DEADDA65F3A7BB9A0C1DB6C721641A8DB76E5"
+    },
+    {
+      "path": "spec/evidence/whole-product-base-f200-r03-phase-aero-r01.json",
+      "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "bytes": 47033,
+      "git_blob_sha256": "69CDC95230A16CD4437D7E0BABBA430D1C3BA715CD16674A8E01B3AB4C1BDBB5"
+    },
+    {
+      "path": "spec/evidence/whole-product-base-f210-menu-native-chain-r03.json",
+      "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "bytes": 22192,
+      "git_blob_sha256": "7C5B8A1821E79F8796BCCD6A89B899B76E96D38C24B218B82116F9F96559E4B4"
+    },
+    {
+      "path": "spec/evidence/whole-product-space-age-f200-admission-native-chain-r02.json",
+      "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "bytes": 7665,
+      "git_blob_sha256": "D55BC4105F4FBACC18534674ACEBABDFEF29A03C3A668438C646B571F61D7D0A"
+    },
+    {
+      "path": "spec/evidence/whole-product-space-age-f210-menu-adverse-native-chain-r01.json",
+      "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "bytes": 7040,
+      "git_blob_sha256": "0C67E78BADC22EFA2CAD050ED8CBBE7630434945EF726CDEF0E898B7F8871813"
+    },
+    {
+      "path": "spec/evidence/whole-product-heavy-space-age-f200-data-adverse-chain-r01.json",
+      "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "bytes": 11237,
+      "git_blob_sha256": "05B2B7C327A24B203B27CC9AE9B868CD9158F20DDADCE6394CD7F7E72073ADA9"
+    },
+    {
+      "path": "spec/evidence/heavy-space-age-f200-current-native-chain-r03.json",
+      "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "bytes": 19244,
+      "git_blob_sha256": "B7698AEECABA365680952BDBCFAEB0982D0BD1087885B885622470E8CC863B96"
+    },
+    {
+      "path": "spec/evidence/whole-product-heavy-space-age-f210-admission-native-chain-r01.json",
+      "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "bytes": 12125,
+      "git_blob_sha256": "03590D457455D7C7E80097032704175D25555ACA50D36EA1DA8F9C36479CA384"
+    },
+    {
+      "path": "spec/evidence/whole-product-heavy-space-age-f210-menu-adverse-chain-r04.json",
+      "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "bytes": 23299,
+      "git_blob_sha256": "B0D45CCACADA50EFC6C89677B7893C8F6B83C4EAD5BB6F3452FBA7800B8056B2"
+    },
+    {
+      "path": "spec/evidence/whole-product-heavy-space-age-f210-menu-controller-loss-chain-r05.json",
+      "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "bytes": 42947,
+      "git_blob_sha256": "096B639F7BBFAFD3F0C78F10EB6E50D99A4CF3307C2B30E86EC024CE097BE49F"
+    },
+    {
+      "path": "spec/evidence/library-repeatability-diagnostic-r02-native-chain.json",
+      "git_revision": "3755e98a2ab660bfbad721e7bfe38b48169a6c70",
+      "bytes": 12600,
+      "git_blob_sha256": "3BEC98BA396776D952767188429F0BAF6C549955336DDE78ABBE00C86339D591"
+    }
+  ],
+  "new_native_processes": 0,
+  "new_native_scores": 0,
+  "player_source_changed": false,
+  "old_evidence_changed": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}

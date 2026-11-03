@@ -1,0 +1,603 @@
+{
+  "schema": 1,
+  "kind": "MIRMuriaDiscoveryScienceNativeCompletionChainV1",
+  "status": "PASS-exact-reduced-default-and-controlled-research-save-two-cold-cases",
+  "reviewed_on": "2026-11-03",
+  "source": {
+    "player_commit": "551532d4dd458445b19ed42e4e8d4a22d9ba628a",
+    "player_tree": "ad1d05ebfd4e4bdb4948368f8c1d0714f9b8054b",
+    "player_version": "5.0.21002",
+    "player_sha256": "F5634E6ED9E2A627962E4F382FB386711F73B052E42F314506252FFBF357346A",
+    "engine": "2.1.23",
+    "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "private_repository": "Julesc013/mir-native-worker",
+    "private_fixture_commit": "cd6aee16bf7acee194859af8d91896acd4298211",
+    "private_controller_commit": "eb0863256f5f637ab5b86694834b8719b8d7fc30",
+    "caller_sha256": "32DF4D139FEB3B8655AC8A1B8B114008874557E63BE2557DF7EFE4F1CB1D0034",
+    "input_manifest_sha256": "B23C7AC81BAEB518FFEA1378CFE20A2C8E5D03D20682E3A2C59E7E2988AB07C6",
+    "dispatch_review_sha256": "F8DB9EB312AAA3F19FE858DE253B0F6EC94531ED23F16BF67AC68FC0167C6C58",
+    "profiles": {
+      "upstream": {
+        "schema": 1,
+        "kind": "private-muria-discovery-science-upstream",
+        "target": "f210",
+        "factorio_line": "2.1",
+        "engine": {
+          "version": "2.1.23",
+          "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+        },
+        "settings_mode": "Defaults",
+        "mods": [
+          {
+            "name": "base",
+            "version": "2.1.23",
+            "enabled": true
+          },
+          {
+            "name": "elevated-rails",
+            "version": "2.1.23",
+            "enabled": true
+          },
+          {
+            "name": "quality",
+            "version": "2.1.23",
+            "enabled": true
+          },
+          {
+            "name": "recycler",
+            "version": "2.1.23",
+            "enabled": true
+          },
+          {
+            "name": "space-age",
+            "version": "2.1.23",
+            "enabled": true
+          },
+          {
+            "name": "Muria",
+            "version": "1.9.5",
+            "enabled": true
+          },
+          {
+            "name": "Muria-Graphics",
+            "version": "1.8.0",
+            "enabled": true
+          },
+          {
+            "name": "PlanetsLib",
+            "version": "1.26.1",
+            "enabled": true
+          },
+          {
+            "name": "discovery_tree",
+            "version": "1.0.12",
+            "enabled": true
+          },
+          {
+            "name": "science-spread",
+            "version": "0.9.2",
+            "enabled": true
+          },
+          {
+            "name": "mir-fixture-muria-discovery-science",
+            "version": "0.1.0",
+            "enabled": true
+          },
+          {
+            "name": "mir-fixture-mir5-active-mods-observer",
+            "version": "0.1.0",
+            "enabled": true
+          }
+        ],
+        "archive_sha256": {
+          "Muria_1.9.5.zip": "48759BF484D7F7A0DFF31E551B23F0BC2C175AAFDCA14DF1EA513FFD68554514",
+          "Muria-Graphics_1.8.0.zip": "82C741E281E0F9E0507ED759F8DDBA1B56ACAC444C35A76F662173F693659580",
+          "PlanetsLib_1.26.1.zip": "7D1803FD927A46AE8660C5792306520F161F639937F64B1ADE9331C3AB610A2B",
+          "discovery_tree_1.0.12.zip": "3175AFDB7AD023D226105A7678E4B46686A3FC19FE27AECFFB7EACB28D696BAB",
+          "science-spread_0.9.2.zip": "39A2F6B489F19270A09A9715123E19977246408AFA912AD8857B9B1EF5FADD27",
+          "mir-fixture-muria-discovery-science_0.1.0.zip": "0880E8661E36384FACA037C2D12E1EDCE79CB8CE7D4728425822E55683D04A5B",
+          "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+        },
+        "scope": "Reporter-derived small default closure"
+      },
+      "default": {
+        "schema": 1,
+        "kind": "private-muria-discovery-science-default",
+        "target": "f210",
+        "factorio_line": "2.1",
+        "engine": {
+          "version": "2.1.23",
+          "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+        },
+        "settings_mode": "Defaults",
+        "mods": [
+          {
+            "name": "base",
+            "version": "2.1.23",
+            "enabled": true
+          },
+          {
+            "name": "elevated-rails",
+            "version": "2.1.23",
+            "enabled": true
+          },
+          {
+            "name": "quality",
+            "version": "2.1.23",
+            "enabled": true
+          },
+          {
+            "name": "recycler",
+            "version": "2.1.23",
+            "enabled": true
+          },
+          {
+            "name": "space-age",
+            "version": "2.1.23",
+            "enabled": true
+          },
+          {
+            "name": "Muria",
+            "version": "1.9.5",
+            "enabled": true
+          },
+          {
+            "name": "Muria-Graphics",
+            "version": "1.8.0",
+            "enabled": true
+          },
+          {
+            "name": "PlanetsLib",
+            "version": "1.26.1",
+            "enabled": true
+          },
+          {
+            "name": "discovery_tree",
+            "version": "1.0.12",
+            "enabled": true
+          },
+          {
+            "name": "science-spread",
+            "version": "0.9.2",
+            "enabled": true
+          },
+          {
+            "name": "mir-fixture-muria-discovery-science",
+            "version": "0.1.0",
+            "enabled": true
+          },
+          {
+            "name": "more-infinite-research",
+            "version": "5.0.21002",
+            "enabled": true
+          },
+          {
+            "name": "mir-fixture-mir5-active-mods-observer",
+            "version": "0.1.0",
+            "enabled": true
+          }
+        ],
+        "archive_sha256": {
+          "Muria_1.9.5.zip": "48759BF484D7F7A0DFF31E551B23F0BC2C175AAFDCA14DF1EA513FFD68554514",
+          "Muria-Graphics_1.8.0.zip": "82C741E281E0F9E0507ED759F8DDBA1B56ACAC444C35A76F662173F693659580",
+          "PlanetsLib_1.26.1.zip": "7D1803FD927A46AE8660C5792306520F161F639937F64B1ADE9331C3AB610A2B",
+          "discovery_tree_1.0.12.zip": "3175AFDB7AD023D226105A7678E4B46686A3FC19FE27AECFFB7EACB28D696BAB",
+          "science-spread_0.9.2.zip": "39A2F6B489F19270A09A9715123E19977246408AFA912AD8857B9B1EF5FADD27",
+          "mir-fixture-muria-discovery-science_0.1.0.zip": "064DE9A9C6D9C4303A08533B482299B592920109899CBEF04618C5F1F6D06CA5",
+          "more-infinite-research_5.0.21002.zip": "F5634E6ED9E2A627962E4F382FB386711F73B052E42F314506252FFBF357346A",
+          "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+        },
+        "scope": "Reporter-derived small default closure"
+      },
+      "controlled-rule": {
+        "schema": 1,
+        "kind": "private-muria-discovery-science-controlled-rule",
+        "target": "f210",
+        "factorio_line": "2.1",
+        "engine": {
+          "version": "2.1.23",
+          "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+        },
+        "settings_mode": "Defaults",
+        "mods": [
+          {
+            "name": "base",
+            "version": "2.1.23",
+            "enabled": true
+          },
+          {
+            "name": "elevated-rails",
+            "version": "2.1.23",
+            "enabled": true
+          },
+          {
+            "name": "quality",
+            "version": "2.1.23",
+            "enabled": true
+          },
+          {
+            "name": "recycler",
+            "version": "2.1.23",
+            "enabled": true
+          },
+          {
+            "name": "space-age",
+            "version": "2.1.23",
+            "enabled": true
+          },
+          {
+            "name": "Muria",
+            "version": "1.9.5",
+            "enabled": true
+          },
+          {
+            "name": "Muria-Graphics",
+            "version": "1.8.0",
+            "enabled": true
+          },
+          {
+            "name": "PlanetsLib",
+            "version": "1.26.1",
+            "enabled": true
+          },
+          {
+            "name": "discovery_tree",
+            "version": "1.0.12",
+            "enabled": true
+          },
+          {
+            "name": "science-spread",
+            "version": "0.9.2",
+            "enabled": true
+          },
+          {
+            "name": "mir-fixture-muria-discovery-science",
+            "version": "0.1.0",
+            "enabled": true
+          },
+          {
+            "name": "more-infinite-research",
+            "version": "5.0.21002",
+            "enabled": true
+          },
+          {
+            "name": "mir-fixture-mir5-active-mods-observer",
+            "version": "0.1.0",
+            "enabled": true
+          }
+        ],
+        "archive_sha256": {
+          "Muria_1.9.5.zip": "48759BF484D7F7A0DFF31E551B23F0BC2C175AAFDCA14DF1EA513FFD68554514",
+          "Muria-Graphics_1.8.0.zip": "82C741E281E0F9E0507ED759F8DDBA1B56ACAC444C35A76F662173F693659580",
+          "PlanetsLib_1.26.1.zip": "7D1803FD927A46AE8660C5792306520F161F639937F64B1ADE9331C3AB610A2B",
+          "discovery_tree_1.0.12.zip": "3175AFDB7AD023D226105A7678E4B46686A3FC19FE27AECFFB7EACB28D696BAB",
+          "science-spread_0.9.2.zip": "39A2F6B489F19270A09A9715123E19977246408AFA912AD8857B9B1EF5FADD27",
+          "mir-fixture-muria-discovery-science_0.1.0.zip": "84FD63D2C01ACA46DD091FC1568E02829A5A335BFBA000F7FAC7D06CEC71C323",
+          "more-infinite-research_5.0.21002.zip": "F5634E6ED9E2A627962E4F382FB386711F73B052E42F314506252FFBF357346A",
+          "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+        },
+        "scope": "EXPLICIT owned native7 API rule; default Discovery mode; not reporter rules"
+      }
+    }
+  },
+  "outcomes": {
+    "upstream": {
+      "result_sha256": "F8EA5C2E35D55D584AA73E85470ECC1CFDCFF318D12237DFCD767831FCD6F787",
+      "readback_sha256": "52248985564B3BF30DAC3949CBC4A73B127FDD73ABB18F41BFBF3AAB1D4FDCD3",
+      "runs": [
+        {
+          "pid": 6608,
+          "exit_code": 0,
+          "predicate": false,
+          "duration_seconds": 6.712513
+        }
+      ],
+      "archives": [
+        {
+          "name": "seed.zip",
+          "bytes": 761752,
+          "sha256": "F2C85F97509695AD764A78640C64425850E79CA77E59FF15D7F8569FE2FF64D3",
+          "crc_members": 55
+        }
+      ],
+      "scope": "upstream load-only"
+    },
+    "default": {
+      "result_sha256": "ADB72EE2D283E83E949864E606BD7658FBC36E05E703093D2D5DE4D12A741FD1",
+      "readback_sha256": "0271F8907E5368A09C702F42F3EC1E2F762775A579A6444218BBF60663E0A3C3",
+      "runs": [
+        {
+          "pid": 23672,
+          "exit_code": 0,
+          "predicate": false,
+          "duration_seconds": 3.657446
+        },
+        {
+          "pid": 31640,
+          "exit_code": -1,
+          "predicate": true,
+          "duration_seconds": 18.566903
+        },
+        {
+          "pid": 21208,
+          "exit_code": 0,
+          "predicate": false,
+          "duration_seconds": 2.150386
+        },
+        {
+          "pid": 30480,
+          "exit_code": 0,
+          "predicate": false,
+          "duration_seconds": 2.157221
+        }
+      ],
+      "archives": [
+        {
+          "name": "seed.zip",
+          "bytes": 596050,
+          "sha256": "F49E97DD241248D2DAFEF952BF8BB983C756EE681D5C6D78D1FE72FDE493578E",
+          "crc_members": 55
+        },
+        {
+          "name": "mir5-native-complete.zip",
+          "bytes": 607078,
+          "sha256": "0A8BE653BDA49A201042EC197FFB1F69784AAF9537B7BA1B18752FD10DB366CF",
+          "crc_members": 55
+        }
+      ],
+      "observations": {
+        "prices": [
+          1537,
+          2306
+        ],
+        "partial9": 0.0001807272464396732,
+        "partial10": 0.030114676688831075,
+        "expected_final_work": 6606.444444444444,
+        "ledger_work": 6606.444444444444,
+        "ledger_frames": 14787,
+        "numeric_science": {
+          "automation-science-pack": {
+            "raw8": 5000,
+            "raw9": 1537,
+            "effective8": 4999.999999999843,
+            "effective9": 1536.999999997587,
+            "final_raw": 6607,
+            "final_stored": 0.5555555564345415,
+            "final_effective": 6606.444444441773
+          },
+          "logistic-science-pack": {
+            "raw8": 5000,
+            "raw9": 1537,
+            "effective8": 4999.999999999843,
+            "effective9": 1536.999999997587,
+            "final_raw": 6607,
+            "final_stored": 0.5555555564345415,
+            "final_effective": 6606.444444441773
+          },
+          "military-science-pack": {
+            "raw8": 5000,
+            "raw9": 1537,
+            "effective8": 4999.999999999843,
+            "effective9": 1536.999999997587,
+            "final_raw": 6607,
+            "final_stored": 0.5555555564345415,
+            "final_effective": 6606.444444441773
+          },
+          "chemical-science-pack": {
+            "raw8": 5000,
+            "raw9": 1537,
+            "effective8": 4999.999999999843,
+            "effective9": 1536.999999997587,
+            "final_raw": 6607,
+            "final_stored": 0.5555555564345415,
+            "final_effective": 6606.444444441773
+          },
+          "utility-science-pack": {
+            "raw8": 5000,
+            "raw9": 1537,
+            "effective8": 4999.999999999843,
+            "effective9": 1536.999999997587,
+            "final_raw": 6607,
+            "final_stored": 0.5555555564345415,
+            "final_effective": 6606.444444441773
+          },
+          "space-science-pack": {
+            "raw8": 5000,
+            "raw9": 1537,
+            "effective8": 4999.999999999843,
+            "effective9": 1536.999999997587,
+            "final_raw": 6607,
+            "final_stored": 0.5555555564345415,
+            "final_effective": 6606.444444441773
+          },
+          "acidworking-science-pack": {
+            "raw8": 5125,
+            "raw9": 1612,
+            "effective8": 4999.999999999999,
+            "effective9": 1536.999999997587,
+            "final_raw": 6810,
+            "final_stored": 0.34916666754566084,
+            "final_effective": 6606.44444444193
+          }
+        },
+        "ordinary_discovery_reveal": true,
+        "queue_and_foreign_state_preserved": true,
+        "extra_same_production_reload_label_is_not_counted_as_cold": true,
+        "actual_distinct_cold_pids": [
+          21208,
+          30480
+        ]
+      }
+    },
+    "controlled-rule": {
+      "result_sha256": "77F8DD57775FD21104E8AA7608597D91C37E98264CBE26E0D1E0187FEF914CD8",
+      "readback_sha256": "BF5C211143FDF47D24D3E06F082C9794CF78E7A94BF94657722F5BF54D6FE1C5",
+      "runs": [
+        {
+          "pid": 22972,
+          "exit_code": 0,
+          "predicate": false,
+          "duration_seconds": 3.810693
+        },
+        {
+          "pid": 30548,
+          "exit_code": -1,
+          "predicate": true,
+          "duration_seconds": 18.488401
+        },
+        {
+          "pid": 26336,
+          "exit_code": 0,
+          "predicate": false,
+          "duration_seconds": 2.160976
+        },
+        {
+          "pid": 18372,
+          "exit_code": 0,
+          "predicate": false,
+          "duration_seconds": 2.122615
+        }
+      ],
+      "archives": [
+        {
+          "name": "seed.zip",
+          "bytes": 902896,
+          "sha256": "08C0B1D3F4A7C47232887923C33AEFCB9FC6A651A4DBEB6771716E4050B9E518",
+          "crc_members": 56
+        },
+        {
+          "name": "mir5-native-complete.zip",
+          "bytes": 911254,
+          "sha256": "605FEDA6DF9B48AB994544383A71578BDBDDB34BE5F9045A5D352CDEFD511E61",
+          "crc_members": 56
+        }
+      ],
+      "observations": {
+        "prices": [
+          1537,
+          2306
+        ],
+        "partial9": 0.0001807272464396732,
+        "partial10": 0.030114676688831075,
+        "expected_final_work": 6606.444444444444,
+        "ledger_work": 6606.444444444444,
+        "ledger_frames": 14787,
+        "numeric_science": {
+          "automation-science-pack": {
+            "raw8": 5000,
+            "raw9": 1537,
+            "effective8": 4999.999999999843,
+            "effective9": 1536.999999997587,
+            "final_raw": 6607,
+            "final_stored": 0.5555555564345415,
+            "final_effective": 6606.444444441773
+          },
+          "logistic-science-pack": {
+            "raw8": 5000,
+            "raw9": 1537,
+            "effective8": 4999.999999999843,
+            "effective9": 1536.999999997587,
+            "final_raw": 6607,
+            "final_stored": 0.5555555564345415,
+            "final_effective": 6606.444444441773
+          },
+          "military-science-pack": {
+            "raw8": 5000,
+            "raw9": 1537,
+            "effective8": 4999.999999999843,
+            "effective9": 1536.999999997587,
+            "final_raw": 6607,
+            "final_stored": 0.5555555564345415,
+            "final_effective": 6606.444444441773
+          },
+          "chemical-science-pack": {
+            "raw8": 5000,
+            "raw9": 1537,
+            "effective8": 4999.999999999843,
+            "effective9": 1536.999999997587,
+            "final_raw": 6607,
+            "final_stored": 0.5555555564345415,
+            "final_effective": 6606.444444441773
+          },
+          "production-science-pack": {
+            "raw8": 5000,
+            "raw9": 1537,
+            "effective8": 4999.999999999843,
+            "effective9": 1536.999999997587,
+            "final_raw": 6607,
+            "final_stored": 0.5555555564345415,
+            "final_effective": 6606.444444441773
+          },
+          "utility-science-pack": {
+            "raw8": 5000,
+            "raw9": 1537,
+            "effective8": 4999.999999999843,
+            "effective9": 1536.999999997587,
+            "final_raw": 6607,
+            "final_stored": 0.5555555564345415,
+            "final_effective": 6606.444444441773
+          },
+          "space-science-pack": {
+            "raw8": 5000,
+            "raw9": 1537,
+            "effective8": 4999.999999999843,
+            "effective9": 1536.999999997587,
+            "final_raw": 6607,
+            "final_stored": 0.5555555564345415,
+            "final_effective": 6606.444444441773
+          },
+          "acidworking-science-pack": {
+            "raw8": 5125,
+            "raw9": 1612,
+            "effective8": 4999.999999999999,
+            "effective9": 1536.999999997587,
+            "final_raw": 6810,
+            "final_stored": 0.34916666754566084,
+            "final_effective": 6606.44444444193
+          }
+        },
+        "ordinary_discovery_reveal": true,
+        "queue_and_foreign_state_preserved": true,
+        "extra_same_production_reload_label_is_not_counted_as_cold": true,
+        "actual_distinct_cold_pids": [
+          26336,
+          18372
+        ]
+      }
+    }
+  },
+  "independent_review": {
+    "sha256": "93FDBDCA8F5A7D345AC676E8E0D455CC64CD324CEB7C0BC0DB7BF8C947268EA3",
+    "public": "https://github.com/Julesc013/more-infinite-research/pull/1544#issuecomment-6593119056",
+    "original_bodies": 5,
+    "capsule_sha256": "F9E0C579BDF6FDCF00AD09AFABDA8D37C5C53294B86D727F93AD3A3864FB66EA"
+  },
+  "custody": {
+    "actual_bodies": 76,
+    "gzip_sha256": "458E6710FBFAA1389369E721E3D944CB8E1D3052575505BA2D6F4B0EA8667092",
+    "decoded_sha256": "D6C93EDCC694D3D90790DAC7D13A78A0FEAE26B88B4DA4B76A0BB4FA5C8F3AA5",
+    "private_commit": "eb0863256f5f637ab5b86694834b8719b8d7fc30",
+    "private_path": "evidence/muria-ledger-actual-r01/original-bodies.json.gz",
+    "root_readback_sha256": "9D5B3D162F8378B58269E50614061215AADB51E0F3295FD9610B3A3379821E58",
+    "primary": "build/qualification/muria-discovery-science-ledger-actual-r02"
+  },
+  "observations": [
+    "Exact admitted32DF/B23/F8DB/cd6 ordinary551/F210F563/8DC execution and original10 review bodies authenticate, including profiles/owned archives/observer/config/real composition. All9 distinct native PIDs and typed expected terminals bind, no timeout. Upstream is load-only; default and controlled each create/production/save/two physical cold processes.",
+    "Both actual candidate cases earn finite8 and MIR9 once using real labs, compare native1537/2306 prices to independent reference, show ordinary Discovery reveal, retain queue/positive partial9/partial10 and foreign5/.27/false/false, and preserve earned declared gun effects without cannon/rocket duplication. Controlled Production Science is observed in final data and actually accounted for through useful research, not merely an admitted dependency.",
+    "Source-grounded passed strict per-frame assertions cover14787 frames in each case. Independently recomputed both logged terminal checkpoint frame balances and cumulative/final identities; raw acid5125/1612 differs from effective~5000/~1537 while final work6606.444444444444 includes partial10. Full per-frame raw history is not supplied or claimed independently replayed. No tolerance or candidate-data expectation change.",
+    "All five seed/successor archives pass CRC and Root copy identities; saved successors and actual separate cold witnesses retain snapshots and unchanged bytes. Same-production extra reload-labelled marker is preserved and explicitly excluded from physical cold count. It is a fixture local-flag labeling limitation, not an extra restart or substitute cold.",
+    "Controller records original two controls/17 MIR archives and observer backup restoration; all64 actual primary-copy bodies match reported counts/bytes. Aero authenticates received original bodies/recorded assertions, not a new physical read of Black Glass paths. No engine, source recreation or candidate modification by Aero."
+  ],
+  "limits": [
+    "Only exact reduced pinned Muria1.9.5/DiscoveryTree1.0.12/ScienceSpread0.9.2 profiles and default/owned-controlled-rule behavior are accepted. This is not exact reporter564-version/settings reproduction, arbitrary-mod compatibility or a general engine science/rounding law.",
+    "Actual finite7/ancestors and controlled Production prerequisite were seeded, not lab-earned. Native8/9 and positive partial10 were earned. Discovery None/reset, GUI/Library, finite caps/private holders, provider changes, existing-save upgrade/public-beta successor, multiplayer and performance remain separate.",
+    "Old68B and all prelaunch/earlier native failures remain failed under original identities. Current success supplies a corrected independent-oracle result; it does not erase that failure, prove a product cause for it or waive other known save-safety obligations.",
+    "Whole release, exact final-source/package/docs/delivery and stable acceptance remain open. Process durations are functional scenario costs, not benchmarks."
+  ],
+  "retained_adverse": {
+    "result_sha256": "68B4F31A94062AA4696A73802B8AB87C037CEE8AD88024316B2BBCEE07A65A64",
+    "status": "FAILED; original actual acid count was not logged and is not inferred from the corrected run"
+  },
+  "release_qualification": false,
+  "stable_qualification": false
+}

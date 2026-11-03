@@ -14,6 +14,11 @@ local MAX_RECIPE_TARGETS = 512
 local MAX_NATIVE_EFFECT_SCAN = 1024
 local INFINITE_MAX_LEVEL = 4294967295
 local SEARCH_LABEL_SEPARATOR = "\31"
+local PRODUCTIVITY_HEADROOM_EPSILON = 0.000000001
+
+local function finite_number(value)
+  return type(value) == "number" and value == value and value > -math.huge and value < math.huge
+end
 
 local function finite_integer(value)
   return type(value) == "number" and value == value and value > -math.huge
@@ -169,6 +174,16 @@ local function technology_for(force, id)
   return native_read(native_read(force, "technologies"), id)
 end
 
+-- Discovery Tree uses per-force enabled state. The host may additionally
+-- supply its last observed discovery state for research MIR itself capped.
+-- Personal hidden/show-all filters never override this upstream restriction.
+function M.technology_visible(technology, id, context)
+  if type(context) ~= "table" or context.discovery_tree ~= true then return true end
+  if native_read(technology, "enabled") == true then return true end
+  local visible = context.discovery_visibility
+  return type(visible) == "table" and visible[id] == true
+end
+
 local function technology_name(technology)
   -- LuaForce.research_queue is an array of TechnologyID, which permits a
   -- technology object or its string prototype name.
@@ -211,7 +226,7 @@ end
 local function prerequisite_facts(technology)
   if technology == nil then return {}, false, true end
   local prerequisites = native_read(technology, "prerequisites")
-  local names, ready = {}, native_read(technology, "enabled") ~= false
+  local names, ready = {}, native_read(technology, "enabled") == true
   if prerequisites == nil then return names, ready, true end
   local complete = true
   local ok = pcall(function()
@@ -266,6 +281,13 @@ local function row_for(force, declaration, id, technology, queue_count, queue_in
   local is_current = current == id
   local researched = native_read(technology, "researched") == true
   local enabled = native_read(technology, "enabled") == true
+  local prototype = native_read(technology, "prototype")
+  local native_hidden = native_read(prototype, "hidden") == true
+  -- Only the host's explicit engine capability admits this modern field.
+  -- Historical prototypes must never be probed for research_trigger.
+  local triggered = type(context) == "table" and context.research_triggers_supported == true
+    and native_read(prototype, "research_trigger") ~= nil
+  ready = ready and enabled and not researched and not native_hidden and not triggered
   local visible = native_read(technology, "visible_when_disabled") == true
   local native_order = bounded_string(native_read(technology, "order"), MAX_TEXT)
     or (declaration and declaration.native_order) or ""
@@ -302,6 +324,8 @@ local function row_for(force, declaration, id, technology, queue_count, queue_in
   }
   if technology == nil then row.status = "missing"
   elseif queued_count > 0 or is_current then row.status = "queued"
+  elseif researched then row.status = "complete"
+  elseif not enabled then row.status = "disabled"
   elseif ready then row.status = "ready"
   else row.status = "locked" end
   return row
@@ -333,6 +357,59 @@ local function wants_native_catalogue(family)
   return family == "all" or family == "external"
 end
 
+-- Read only the selected authored research's named productive recipes. Lists
+-- never call this helper, and no native object or derived cache is retained.
+local function recipe_benefits(force, technology, row, context)
+  if type(context) ~= "table" or context.recipe_productivity_supported ~= true then
+    return nil, "unsupported"
+  end
+  local effects = native_read(native_read(technology, "prototype"), "effects")
+  local ids, changes, complete, only_productivity = {}, {}, true, true
+  local ok = pcall(function()
+    for index, effect in ipairs(effects or {}) do
+      if index > MAX_NATIVE_EFFECT_SCAN then complete = false; return end
+      if native_read(effect, "type") == "change-recipe-productivity" then
+        local id = bounded_string(native_read(effect, "recipe"), MAX_TEXT)
+        local change = native_read(effect, "change")
+        if not id or id == "" or not finite_number(change) then complete = false; return end
+        if changes[id] == nil then
+          ids[#ids + 1], changes[id] = id, 0
+        end
+        changes[id] = changes[id] + change
+        if not finite_number(changes[id]) then complete = false; return end
+      else
+        only_productivity = false
+      end
+    end
+  end)
+  if not ok or not complete then return nil, "unavailable" end
+  if #ids == 0 then return nil, "not-applicable" end
+
+  local eligible = row.enabled and not row.researched
+  if eligible then
+    if not finite_integer(row.current_level) or row.current_level < 1
+        or not finite_integer(row.max_level) or row.max_level < 1 then return nil, "unavailable" end
+    eligible = row.current_level <= row.max_level and (row.cap == nil or row.current_level <= row.cap)
+  end
+  local recipes, result, any_benefit = native_read(force, "recipes"), {}, false
+  for _, id in ipairs(ids) do
+    local recipe = native_read(recipes, id)
+    local current = native_read(recipe, "productivity_bonus")
+    local maximum = native_read(native_read(recipe, "prototype"), "maximum_productivity")
+    if native_read(recipe, "valid") ~= true or not finite_number(current) or current < 0
+        or not finite_number(maximum) or maximum < 0 then return nil, "unavailable" end
+    -- Preserve the published headroom boundary; it is not an estimate of
+    -- machine throughput, module bonuses or future native queue behavior.
+    local useful = eligible and changes[id] > 0 and current < maximum - PRODUCTIVITY_HEADROOM_EPSILON
+    result[#result + 1] = {
+      recipe_id = id, effect_change = changes[id], current_productivity_bonus = current,
+      maximum_productivity = maximum, next_level_has_effective_benefit = useful
+    }
+    any_benefit = any_benefit or useful
+  end
+  return result, "available", eligible, any_benefit, only_productivity
+end
+
 local function family_matches(row, family)
   if family == "all" then return true end
   if family == "mir" then return row.family ~= "external" end
@@ -341,8 +418,8 @@ end
 
 local function status_matches(row, status)
   if status == 1 then return true end
-  if status == 2 then return row.status == "ready" end
-  if status == 3 then return row.status == "locked" end
+  if status == 2 then return row.ready == true end
+  if status == 3 then return row.status ~= "missing" and row.ready ~= true and row.researched ~= true end
   return row.status == "queued" end
 
 local function mode_matches(row, mode)
@@ -351,7 +428,28 @@ local function mode_matches(row, mode)
   return row.finite == false
 end
 
-local function row_matches(row, view)
+-- Raw affected recipe IDs remain searchable before/without translation.
+-- Inspect only this eligible research's finite native array, lazily after a
+-- text miss. Detail previews and localized-subject limits must not truncate
+-- identity search; no recipe objects or live productivity values are needed.
+local function recipe_id_matches(technology, search)
+  local effects = native_read(native_read(technology, "prototype"), "effects")
+  if effects == nil then return false end
+  local ok, matched = pcall(function()
+    for index = 1, #effects do
+      local effect = effects[index]
+      local kind = native_read(effect, "type")
+      if kind == "unlock-recipe" or kind == "change-recipe-productivity" then
+        local id = bounded_string(native_read(effect, "recipe"), MAX_TEXT)
+        if id and matches(id, search) then return true end
+      end
+    end
+    return false
+  end)
+  return ok and matched == true
+end
+
+local function row_matches(row, view, technology)
   if not family_matches(row, view.family) or not status_matches(row, view.status)
     or not mode_matches(row, view.mode) then return false end
   if view.visibility == 1 and view.hidden[row.id] then return false end
@@ -359,6 +457,7 @@ local function row_matches(row, view)
   if view.search == "" then return true end
   return matches(row.id .. " " .. row.family .. " " .. row.name .. " " .. (row.search_text or "")
     .. " " .. (row.recipe or "") .. " " .. (row.locale_key or ""), view.search)
+    or recipe_id_matches(technology, view.search)
 end
 
 local function ordered(left, right, sort)
@@ -420,10 +519,10 @@ function M.rows(force, catalogue, view, translations, context)
     -- technology can be unavailable on the current platform; that is not a
     -- synthetic "missing" row or an availability state.  Detail still
     -- reports technology_not_found for a direct selection.
-    if technology ~= nil and not private_credit(context, id) then
+    if technology ~= nil and not private_credit(context, id) and M.technology_visible(technology, id, context) then
       local row = row_for(force, by_id[id], id, technology, queue_count, queue_index, current, translations, context)
       row.hidden = normalized.hidden[id] == true
-      if row_matches(row, normalized) then selected[#selected + 1] = row end
+      if row_matches(row, normalized, technology) then selected[#selected + 1] = row end
     end
   end
   table.sort(selected, function(left, right) return ordered(left, right, normalized.sort) end)
@@ -494,13 +593,18 @@ function M.detail(force, catalogue, view, translations, context)
   local declared, by_id = declarations(catalogue)
   local queue_count, queue_index, current = queue_facts(force)
   local technology = technology_for(force, id)
-  if technology == nil then return nil, "technology_not_found" end
+  if technology == nil or not M.technology_visible(technology, id, context) then return nil, "technology_not_found" end
   local row = row_for(force, by_id[id], id, technology, queue_count, queue_index, current, translations, context)
   local effects, effects_complete = copy_effects(technology)
   local cost, ingredients_complete = copy_cost(technology)
   row.effects, row.effects_complete = effects, effects_complete
   row.cost, row.ingredients_complete = cost, ingredients_complete
   row.recipe_targets, row.recipe_targets_complete = copy_recipe_targets(technology)
+  if by_id[id] ~= nil then
+    row.recipe_benefits, row.recipe_benefits_state, row.next_level_eligible,
+      row.next_level_has_effective_benefit, row.recipe_benefits_only_effects =
+      recipe_benefits(force, technology, row, context)
+  end
   return row
 end
 

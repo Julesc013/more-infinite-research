@@ -49,6 +49,8 @@ local LEGACY_SNAPSHOT_MAX_DEPTH = 8
 local LEGACY_SNAPSHOT_MAX_ENTRIES = 512
 local LEGACY_SNAPSHOT_MAX_STRING = 4096
 local cap_provider = nil
+local discovery_visibility_provider
+local DISCOVERY_TREE = script and script.active_mods and script.active_mods.discovery_tree ~= nil
 local TRANSLATION_SCHEMA = 1
 local TRANSLATION_MAINTENANCE_TICKS = 61
 local setting_groups_cache
@@ -309,6 +311,8 @@ local function local_view(raw)
     settings_scope = raw.settings_scope,
     settings_query = text(raw.settings_query),
     setting_selected = technology_id(raw.setting_selected),
+    report_settings = raw.report_settings == true,
+    report_omissions = raw.report_omissions == true,
     open = raw.open == true,
     refresh_pending = raw.refresh_pending == true,
     location = location(raw.location),
@@ -631,10 +635,25 @@ local function legacy_view_as_private(value)
     settings_scope = value.settings_scope,
     settings_query = value.settings_search,
     setting_selected = value.setting_selection,
+    report_settings = value.report_settings,
+    report_omissions = value.report_omissions,
     location = value.location,
     geometry = value.geometry,
     scroll = value.scroll
   })
+end
+
+local function carry_report_choices(view, historical)
+  if type(view) ~= "table" or type(historical) ~= "table" then return end
+  for _, field in ipairs({"report_settings", "report_omissions"}) do
+    if view[field] == nil and type(historical[field]) == "boolean" then view[field] = historical[field] end
+  end
+end
+
+local function legacy_player_retired(state, index)
+  local preserved = state and state.legacy_browser
+  local retired = type(preserved) == "table" and preserved.retired_players or nil
+  return type(retired) == "table" and retired[index] == true
 end
 
 local function named_root(player)
@@ -705,7 +724,15 @@ local function model_view(view)
 end
 
 local function context_for(force)
-  local context = {private_credit_ids = private_credit_ids}
+  local context = {
+    private_credit_ids = private_credit_ids,
+    discovery_tree = DISCOVERY_TREE == true,
+    research_triggers_supported = target.id == "f200" or target.id == "f210",
+    recipe_productivity_supported = target.recipe_productivity == true
+  }
+  if DISCOVERY_TREE and type(discovery_visibility_provider) == "function" then
+    context.discovery_visibility = discovery_visibility_provider(force)
+  end
   if type(cap_provider) ~= "function" then return context end
   local ok, caps = pcall(cap_provider, force)
   if not ok or type(caps) ~= "table" then return context end
@@ -782,15 +809,16 @@ local function open_translation_cache(player, view)
   local same_live_scope = retained and retained.scope and retained.scope.locale == player.locale
     and retained.scope.force_index == (player.force and player.force.index)
 
-  if retained and same_live_scope and retained.family == family then
+  if retained and same_live_scope and retained.family == family
+      and translation_queue.discovery_limited(retained.cache, retained.scope) ~= nil then
     -- Ordered identities are local immutable presentation data. Reusing this
     -- record prevents a native catalogue traversal on every GUI render.
     return retained
   end
 
   if retained and same_live_scope then
-    -- Family selection changes the requester-visible catalogue. Retain engine
-    -- IDs already issued, but replace all unissued work under a fresh caller
+    -- Family selection or an older metadata-free cache renews derived work.
+    -- Retain engine IDs already issued, but replace unissued work under a fresh caller
     -- epoch so former responses cannot label the new view.
     local ids = ordered_translation_ids(player, family)
     local ledger = retained.ledger
@@ -872,6 +900,7 @@ end
 local function request_translation(player, key)
   if not valid(player) or player.connected ~= true
       or type(player.request_translation) ~= "function" then return nil end
+  local subjects, limited = 0, false
   local ok, request_id = pcall(function()
     local setting_name = type(key) == "string" and key:match("^" .. SETTING_TRANSLATION_PREFIX .. "(.+)$") or nil
     if setting_name then
@@ -890,10 +919,12 @@ local function request_translation(player, key)
       item = prototype_collection("item"),
       fluid = prototype_collection("fluid")
     }
-    local payload = library_localization.search_request(technology, collections) or technology.localised_name
+    local payload
+    payload, subjects, limited = library_localization.search_request(technology, collections)
+    payload = payload or technology.localised_name
     return player.request_translation(payload)
   end)
-  return ok and request_id or nil
+  return ok and request_id or nil, subjects, limited
 end
 
 local function dispatch_translations(player, record)
@@ -902,6 +933,17 @@ local function dispatch_translations(player, record)
     return request_translation(player, key)
   end)
   sync_issued_cache(record)
+end
+
+local function update_discovery_indicator(content, record)
+  local actions = valid(content) and content[PREFIX .. "actions"] or nil
+  local indicator = valid(content) and content[PREFIX .. "count"]
+    or (valid(actions) and actions[PREFIX .. "count"])
+  if valid(indicator) then
+    indicator.tooltip = type(record) == "table"
+      and translation_queue.discovery_limited(record.cache, record.scope) == true
+      and {"mir-browser.discovery-limited"} or nil
+  end
 end
 
 local function rows_for(player, view, context, labels)
@@ -1076,6 +1118,43 @@ local function research_seconds(cost)
   return cost.time or cost[2] or "?"
 end
 
+local function add_recipe_benefits(parent, detail)
+  if type(detail) ~= "table" then return end
+  if detail.recipe_benefits_state == "unavailable" then
+    add(parent, {type = "label", name = PREFIX .. "live_detail_unavailable",
+      caption = {"mir-browser.live-detail-unavailable"}})
+    return
+  end
+  local benefits = detail.recipe_benefits
+  if detail.recipe_benefits_state ~= "available" or type(benefits) ~= "table" or #benefits == 0 then return end
+  local current_min, current_max = benefits[1].current_productivity_bonus, benefits[1].current_productivity_bonus
+  local maximum_min, maximum_max = benefits[1].maximum_productivity, benefits[1].maximum_productivity
+  for index = 2, #benefits do
+    local benefit = benefits[index]
+    current_min = math.min(current_min, benefit.current_productivity_bonus)
+    current_max = math.max(current_max, benefit.current_productivity_bonus)
+    maximum_min = math.min(maximum_min, benefit.maximum_productivity)
+    maximum_max = math.max(maximum_max, benefit.maximum_productivity)
+  end
+  if current_max * 100 == math.huge or maximum_max * 100 == math.huge then
+    add(parent, {type = "label", name = PREFIX .. "live_detail_unavailable",
+      caption = {"mir-browser.live-detail-unavailable"}})
+    return
+  end
+  local low, high = string.format("%.6g", current_min * 100), string.format("%.6g", current_max * 100)
+  local cap_low, cap_high = string.format("%.6g", maximum_min * 100), string.format("%.6g", maximum_max * 100)
+  local caption = low == high and cap_low == cap_high
+    and {"mir-browser.productivity-current-cap", low, cap_low}
+    or {"mir-browser.productivity-current-cap-range", low, high, cap_low, cap_high}
+  add(parent, {type = "label", name = PREFIX .. "productivity_current_cap", caption = caption})
+  -- The authored message covers all MIR benefit; mixed native effects may
+  -- still grant something beyond recipe productivity.
+  if detail.next_level_has_effective_benefit == false and detail.recipe_benefits_only_effects == true then
+    add(parent, {type = "label", name = PREFIX .. "no_next_benefit",
+      caption = {"mir-browser.no-next-benefit", #benefits}})
+  end
+end
+
 local function detail_lines(parent, row, detail, player)
   if not row then
     add(parent, {type = "label", name = PREFIX .. "detail_empty", caption = {"mir-browser.no-results"}})
@@ -1096,6 +1175,8 @@ local function detail_lines(parent, row, detail, player)
   local context = add(parent, {type = "flow", name = PREFIX .. "detail_context", direction = "vertical"})
   local status_key = {
     ready = "mir-browser.status-ready",
+    complete = "mir-browser.status-complete",
+    disabled = "mir-browser.status-disabled",
     locked = "mir-browser.status-locked",
     queued = "mir-browser.status-queued",
     missing = "mir-browser.status-missing"
@@ -1167,6 +1248,7 @@ local function detail_lines(parent, row, detail, player)
       add(parent, {type = "label", name = PREFIX .. "effect_" .. index, caption = text_value})
     end
   end
+  add_recipe_benefits(parent, detail)
   local recipe_rows = affected_recipe_rows(player, detail)
   if #recipe_rows > 0 then
     local recipe_heading = add(parent, {type = "label", name = PREFIX .. "detail_affected_recipes",
@@ -1322,6 +1404,8 @@ local function setting_catalogue()
     if decoded_ok and type(profile) == "table" and type(profile.settings) == "table" then imported = profile.settings end
   end
 
+  local controlled_families = {}
+  for _, declaration in ipairs(authored_declarations()) do controlled_families[declaration.family] = true end
   local groups, ordered = {}, {}
   for index, name in ipairs(names) do
     if type(name) ~= "string" or name == "" or by_name[name] then return nil end
@@ -1337,6 +1421,9 @@ local function setting_catalogue()
       if type(title) == "string" then title = {title} end
       group = {key = key, scope = scope, title = title or (prototypes[name] and prototypes[name].localised_name) or name,
         fields = {}, search = key .. " " .. name}
+      group.externally_supplied = stream and stream.native_continuation == true and not controlled_families[key]
+        and type(catalogue.externally_supplied_continuation) == "function"
+        and catalogue.externally_supplied_continuation(stream.continuation_id) or false
       groups[key], ordered[#ordered + 1] = group, group
     end
     local default = spec.default_value
@@ -1471,6 +1558,10 @@ local function update_settings_content(content, view, preserve_query, translatio
   end
   add(detail, {type = "label", name = PREFIX .. "settings_title", caption = selected.title})
   add(detail, {type = "label", name = PREFIX .. "settings_scope", caption = {"mir-browser.scope-startup"}})
+  if selected.externally_supplied then
+    local warning = add(detail, {type = "label", name = PREFIX .. "settings_external", caption = {"mir-browser.settings-external-owner"}})
+    if valid(warning) then warning.style.single_line = false end
+  end
   add(detail, {type = "label", name = PREFIX .. "settings_effective", caption = {"mir-browser.effective-values"}})
   for index, field in ipairs(selected.fields) do
     local name = PREFIX .. "setting_" .. index
@@ -1511,9 +1602,12 @@ local function update_queue_content(content, player, view)
   add(content, {type = "label", name = PREFIX .. "queue_guidance", caption = {"mir-browser.native-queue-guidance"}})
   add(content, {type = "button", name = PREFIX .. "queue_open_native", caption = {"mir-browser.open-research"}})
   local ids, items = queue_entries(player.force), {}
+  local context = DISCOVERY_TREE and context_for(player.force) or nil
   for index, id in ipairs(ids) do
     local technology = known_technology(player, id)
-    items[index] = technology and technology.localised_name or id
+    if DISCOVERY_TREE and not library_model.technology_visible(technology, id, context) then
+      items[index] = {"mir-browser.undiscovered-research"}
+    else items[index] = technology and technology.localised_name or id end
   end
   local selected_index = 0
   for index, id in ipairs(ids) do if id == view.selected then selected_index = index; break end end
@@ -1545,12 +1639,61 @@ local function update_availability_content(content, player, view)
   end
 end
 
-local function update_help_content(content)
+local function report_options(player, view)
+  local rows
+  if view.report_omissions then
+    local active_mods = script and script.active_mods or mods or {}
+    local streams = type(effective_configuration) == "table" and effective_configuration.streams or nil
+    rows = availability.rows(active_mods, target, player.force, nil, streams)
+  end
+  return {report_settings = view.report_settings, report_omissions = view.report_omissions, availability_rows = rows}
+end
+
+local function update_report_preview(content, player, view)
+  local preview = content and content[PREFIX .. "report_preview"]
+  if not valid(preview) then return end
+  local result, err = diagnostics.preview(player.index, view.selected, report_options(player, view))
+  preview.text = result or ("Diagnostic preview unavailable: " .. tostring(err))
+end
+
+local function update_help_content(content, player, view)
   if not valid(content) then return end
+  -- Keep the preview as a snapshot. Research/translation refreshes must not
+  -- repeatedly encode hundreds of settings or replace a player's selection.
+  local settings_box, omissions_box = content[PREFIX .. "report_settings"], content[PREFIX .. "report_omissions"]
+  local preview = content[PREFIX .. "report_preview"]
+  local complete_help = valid(content[PREFIX .. "help_summary"]) and (not diagnostics or (
+    valid(settings_box) and settings_box.type == "checkbox" and valid(omissions_box) and omissions_box.type == "checkbox"
+    and valid(preview) and preview.type == "text-box" and valid(content[PREFIX .. "report_select"])
+    and valid(content[PREFIX .. "report_refresh"])))
+  if complete_help then
+    if diagnostics and (settings_box.state ~= view.report_settings or omissions_box.state ~= view.report_omissions) then
+      settings_box.state, omissions_box.state = view.report_settings, view.report_omissions
+      update_report_preview(content, player, view)
+    end
+    return
+  end
   content.clear()
   add(content, {type = "label", name = PREFIX .. "help_summary", caption = {"mir-browser.help-summary"}})
   add(content, {type = "label", name = PREFIX .. "help_queue", caption = {"mir-browser.native-queue-guidance"}})
   if diagnostics then
+    add(content, {type = "label", name = PREFIX .. "report_options", caption = {"mir-browser.report-options"}})
+    for _, option in ipairs({"report_settings", "report_omissions"}) do
+      add(content, {type = "checkbox", name = PREFIX .. option, state = view[option],
+        caption = {"mir-browser." .. option:gsub("_", "-")}})
+    end
+    local preview = add(content, {type = "text-box", name = PREFIX .. "report_preview", text = "",
+      tooltip = {"mir-browser.report-preview"}})
+    preview.read_only, preview.word_wrap = true, true
+    if preview.style then
+      preview.style.maximal_width, preview.style.height = 650, 160
+      preview.style.horizontally_stretchable = true
+    end
+    add(content, {type = "button", name = PREFIX .. "report_select", caption = {"mir-browser.report-select"}})
+    add(content, {type = "button", name = PREFIX .. "report_refresh", caption = {"mir-browser.debug-refresh"}})
+    local local_only = add(content, {type = "label", name = PREFIX .. "report_local", caption = {"mir-browser.report-local"}})
+    if local_only.style then local_only.style.single_line = false; local_only.style.maximal_width = 650 end
+    update_report_preview(content, player, view)
     add(content, {type = "button", name = PREFIX .. "export_diagnostics", caption = {"mir-browser.export-diagnostics"},
       tooltip = {"mir-browser.export-diagnostics-tooltip"}})
     local guidance = add(content, {type = "label", name = PREFIX .. "export_privacy", caption = {"mir-browser.export-sharing-guidance"}})
@@ -1766,6 +1909,7 @@ local function render(player, view, context, preserve_query)
     local translations = open_translation_cache(player, view)
     update_research_content(content, player, view, context, translated_labels(translations))
     dispatch_translations(player, translations)
+    update_discovery_indicator(content, translations)
   elseif view.tab == "settings" then
     local translations = open_translation_cache(player, view)
     local labels = translated_labels(translations)
@@ -1778,7 +1922,7 @@ local function render(player, view, context, preserve_query)
     if view.tab == "queue" then
       update_queue_content(content, player, view)
     else
-      update_help_content(content)
+      update_help_content(content, player, view)
     end
   end
   set_shortcut(player, true)
@@ -1796,6 +1940,11 @@ function M.set_cap_provider(provider)
   cap_provider = provider
 end
 
+function M.set_discovery_visibility_provider(provider)
+  if provider ~= nil and type(provider) ~= "function" then error("MIR discovery provider must be a function or nil", 2) end
+  discovery_visibility_provider = provider
+end
+
 function M.open(player, options)
   if not valid(player) or player.connected ~= true or type(player.index) ~= "number" then return nil end
   local existing = named_root(player)
@@ -1810,6 +1959,16 @@ function M.open(player, options)
   end
   if options.settings_scope == "research" or options.settings_scope == "options" then
     view.settings_scope, view.setting_selected = options.settings_scope, nil
+  end
+  -- The shipped remote browser's search follows its selected or retained tab.
+  -- Keep the explicit internal query fields independent from this legacy input.
+  if type(options.search) == "string" then
+    if view.tab == "settings" then
+      view.settings_query, view.setting_selected = text(options.search), nil
+    else
+      view.query = text(options.search)
+    end
+    reset_page = true
   end
   if type(options.settings_search) == "string" then
     view.settings_query, view.setting_selected = text(options.settings_search), nil
@@ -1904,6 +2063,20 @@ function M.on_gui_selected_tab_changed(event)
   if view.tab == tab then return end
   view.tab = tab
   render(player, view)
+end
+
+function M.on_gui_checked_state_changed(event)
+  local element = event and event.element
+  if not valid(element) or element.type ~= "checkbox" then return end
+  local field = element.name == PREFIX .. "report_settings" and "report_settings"
+    or element.name == PREFIX .. "report_omissions" and "report_omissions" or nil
+  if not diagnostics or not field then return end
+  local player = player_for(event and event.player_index)
+  if not player or type(element.state) ~= "boolean" then return end
+  if not owns_element(player, element, {element.name, PREFIX .. "help_content", PREFIX .. "tabs", ROOT}) then return end
+  local view = view_for(player.index)
+  view[field] = element.state
+  update_report_preview(element.parent, player, view)
 end
 
 function M.on_gui_selection_state_changed(event)
@@ -2048,8 +2221,24 @@ function M.on_gui_click(event)
       element.name, PREFIX .. "help_content", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
-    local encoded = diagnostics.export(player.index, view.selected)
+    local encoded, _, report = diagnostics.export(player.index, view.selected, report_options(player, view))
+    if report and valid(element.parent[PREFIX .. "report_preview"]) then
+      element.parent[PREFIX .. "report_preview"].text = report
+    end
     show_export_profile(element.parent, encoded)
+    return
+  end
+  if diagnostics and (element.name == PREFIX .. "report_select" or element.name == PREFIX .. "report_refresh") then
+    if not owns_element(player, element, {element.name, PREFIX .. "help_content", PREFIX .. "tabs", ROOT}) then return end
+    if element.name == PREFIX .. "report_refresh" then
+      update_report_preview(element.parent, player, view_for(player.index))
+      return
+    end
+    local preview = element.parent[PREFIX .. "report_preview"]
+    if valid(preview) then
+      if type(preview.focus) == "function" then preview.focus() end
+      if type(preview.select_all) == "function" then preview.select_all() end
+    end
     return
   end
   if element.name == PREFIX .. "production_check" then
@@ -2150,6 +2339,7 @@ function M.on_gui_click(event)
   if technologies == nil then return end
   local ok, technology = pcall(function() return technologies[selected] end)
   if not ok or not valid(technology) then return end
+  if DISCOVERY_TREE and not library_model.technology_visible(technology, selected, context_for(player.force)) then return end
   if destroy_frame(player, view) then discard_translation_cache(player.index) end
   if type(player.open_technology_gui) == "function" then player.open_technology_gui(technology) end
 end
@@ -2385,6 +2575,13 @@ function M.on_player_removed(event)
   if not state then return end
   local index = event.player_index
   state.players[index] = nil
+  local preserved = state.legacy_browser
+  if type(preserved) == "table" and type(preserved.players) == "table" and preserved.players[index] ~= nil then
+    -- Preserve original history, but never import its personal choices into a
+    -- different account that later receives the same native player index.
+    if type(preserved.retired_players) ~= "table" then preserved.retired_players = {} end
+    preserved.retired_players[index] = true
+  end
   discard_translation_cache(index)
   local ledger = existing_translation_ledger(state)
   if not ledger then return end
@@ -2470,7 +2667,7 @@ function M.on_configuration_changed()
     local candidates = {}
     for index, historical_view in pairs(legacy_players) do
       local normalized_index = player_index(index)
-      if normalized_index and type(historical_view) == "table" then
+      if normalized_index and type(historical_view) == "table" and not legacy_player_retired(existing_state(), normalized_index) then
         candidates[#candidates + 1] = {index = normalized_index, view = historical_view}
       end
     end
@@ -2500,6 +2697,8 @@ function M.on_configuration_changed()
         end
         if type(state.players[index]) ~= "table" then
           state.players[index] = legacy_view_as_private(historical_view)
+        else
+          carry_report_choices(state.players[index], historical_view)
         end
       end
 
@@ -2523,6 +2722,10 @@ function M.on_configuration_changed()
   if current then
     for index, view in pairs(current.players) do
       if type(view) == "table" then
+        local snapshots = type(current.legacy_browser) == "table" and current.legacy_browser.players or nil
+        if not legacy_player_retired(current, index) then
+          carry_report_choices(view, type(snapshots) == "table" and snapshots[index] or nil)
+        end
         local player = player_for(index)
         view.open = player ~= nil and player.connected == true and valid(owned_root(player))
         view.refresh_pending = view.open

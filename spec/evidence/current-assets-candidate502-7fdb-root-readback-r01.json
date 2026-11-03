@@ -1,0 +1,285 @@
+{
+  "kind": "MIR502CandidateOfflineArtifactReadbackV1",
+  "source": {
+    "commit": "7fdb1fa63fa6e70a0df437a57765475ba271e8da",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21002",
+    "source_tree": "701e314ee50f19ac6cef02a1d4a598cca843eb0f",
+    "tree": "13f4ab65b4e2e2cf8a34225c669673197567eb98"
+  },
+  "release_identity": {
+    "source_label": "source5.0.2",
+    "source_version": "5.0.2",
+    "tag": "v5.0.2",
+    "title": "MIR 5.0.2"
+  },
+  "external_freeze": "D:\\Projects\\Factorio\\mir5-freeze\\candidate502-7fdb1fa63-root-r01",
+  "primary_custody": "D:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\assets\\candidate502-7fdb1fa63-root-r01",
+  "files": [
+    {
+      "name": "MIR5ReleaseAssetInventoryV1.json",
+      "bytes": 212414,
+      "sha256": "24D0AA992E1D89D061D58813230A26322D536C90AD73C56D048A7F5D270FABA9"
+    },
+    {
+      "name": "more-infinite-research_5.0.00602.zip",
+      "bytes": 136842,
+      "sha256": "93B34BEF58CD97FACA9A7E3125B31F9DA2623E12A01893859811D4D747F764F6"
+    },
+    {
+      "name": "more-infinite-research_5.0.00702.zip",
+      "bytes": 136841,
+      "sha256": "61A6F2C24E4E694B443D8393833452D65DA2665F0C51BAD28EB678365F8C82F5"
+    },
+    {
+      "name": "more-infinite-research_5.0.00802.zip",
+      "bytes": 136840,
+      "sha256": "9BC74F9873CCB3CAB4CD496630F26F6D6582F543F72363818275C33EB50E13B0"
+    },
+    {
+      "name": "more-infinite-research_5.0.00902.zip",
+      "bytes": 136841,
+      "sha256": "D0638C4792C57DC0D29645CCDF35969257290580D1B2316225D11FC3B7164810"
+    },
+    {
+      "name": "more-infinite-research_5.0.01002.zip",
+      "bytes": 136841,
+      "sha256": "6F2E4330A41CE7C52029FF5877FDFDBCB8C4F5EC6EFF8B6499775063F5093792"
+    },
+    {
+      "name": "more-infinite-research_5.0.01102.zip",
+      "bytes": 136842,
+      "sha256": "7D5E32590A8A0AFCF0FDB3596FE442EA4903B630930FE93F882126E01A0A6149"
+    },
+    {
+      "name": "more-infinite-research_5.0.01202.zip",
+      "bytes": 136843,
+      "sha256": "1A9E84826DB9972A4101D19129DB17F7EEFE513E655FA06AB7A63F9B669E9E79"
+    },
+    {
+      "name": "more-infinite-research_5.0.01302.zip",
+      "bytes": 503071,
+      "sha256": "D5C92C71F7CD6100BBD85E0F81BB643E25AD3CBE62D6BA6005325715F7E495AA"
+    },
+    {
+      "name": "more-infinite-research_5.0.01402.zip",
+      "bytes": 503074,
+      "sha256": "8E39E6D427C7D3F707347B4DA83195942BEDF03AC25A87B73659DC4E21420424"
+    },
+    {
+      "name": "more-infinite-research_5.0.01502.zip",
+      "bytes": 503073,
+      "sha256": "589A12970C32AF5487A40F07687BCD4673E1716871BDB4C0CF667E13556851A7"
+    },
+    {
+      "name": "more-infinite-research_5.0.01602.zip",
+      "bytes": 503074,
+      "sha256": "2FBB324A9DDC7FD687CE25B73A54F8C54A0EB00762582E482542000A9F0DB47C"
+    },
+    {
+      "name": "more-infinite-research_5.0.01702.zip",
+      "bytes": 503074,
+      "sha256": "46BDB3A9700D8CC9643B02B28BFF4B4AA7298CA407D7DF3C176DA24CE8D1384F"
+    },
+    {
+      "name": "more-infinite-research_5.0.01802.zip",
+      "bytes": 503076,
+      "sha256": "63511C609D6F509E8553E938E7B0DAFF2274F1C42334F5CBADFDEAE4225B520E"
+    },
+    {
+      "name": "more-infinite-research_5.0.10002.zip",
+      "bytes": 503066,
+      "sha256": "90664A973C3B740D8D39953550823F7679EB2DCA04788E1F26D326CD57CA0F14"
+    },
+    {
+      "name": "more-infinite-research_5.0.11002.zip",
+      "bytes": 503377,
+      "sha256": "9FECCF410A532896FAE0C6F839D5FB1A5C0158AAE0D43A18A64BF558E38541A7"
+    },
+    {
+      "name": "more-infinite-research_5.0.20002.zip",
+      "bytes": 766285,
+      "sha256": "6A66CF318AC908788DE24D2E3CD9D8F68421EB8AFDA4C113B2E3012FC701D64F"
+    },
+    {
+      "name": "more-infinite-research_5.0.21002.zip",
+      "bytes": 766668,
+      "sha256": "AFDB1502FE4707D3DFDE4F22B2192EA1DF21F1D85A592E594E59587ECD6A4176"
+    },
+    {
+      "name": "SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "37B9D6425CFC3A6CBE79B854225EB7567DC5BE0325E89A4891571A8DACA76D4B"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "1A1CCEEBDEBD63801CE83F7B30CA002D3E7299B0B670C8EB2BED146BE8BDEF08"
+    }
+  ],
+  "total_bytes": 6729893,
+  "archives": [
+    {
+      "target": "f013",
+      "filename": "more-infinite-research_5.0.01302.zip",
+      "bytes": 503071,
+      "sha256": "D5C92C71F7CD6100BBD85E0F81BB643E25AD3CBE62D6BA6005325715F7E495AA",
+      "members": 127,
+      "minimum_base": "0.13.20",
+      "label": "MIR 5.0.2 for Factorio 0.13.20 (zip)"
+    },
+    {
+      "target": "f014",
+      "filename": "more-infinite-research_5.0.01402.zip",
+      "bytes": 503074,
+      "sha256": "8E39E6D427C7D3F707347B4DA83195942BEDF03AC25A87B73659DC4E21420424",
+      "members": 127,
+      "minimum_base": "0.14.23",
+      "label": "MIR 5.0.2 for Factorio 0.14.23 (zip)"
+    },
+    {
+      "target": "f015",
+      "filename": "more-infinite-research_5.0.01502.zip",
+      "bytes": 503073,
+      "sha256": "589A12970C32AF5487A40F07687BCD4673E1716871BDB4C0CF667E13556851A7",
+      "members": 127,
+      "minimum_base": "0.15.40",
+      "label": "MIR 5.0.2 for Factorio 0.15.40 (zip)"
+    },
+    {
+      "target": "f016",
+      "filename": "more-infinite-research_5.0.01602.zip",
+      "bytes": 503074,
+      "sha256": "2FBB324A9DDC7FD687CE25B73A54F8C54A0EB00762582E482542000A9F0DB47C",
+      "members": 127,
+      "minimum_base": "0.16.51",
+      "label": "MIR 5.0.2 for Factorio 0.16.51 (zip)"
+    },
+    {
+      "target": "f017",
+      "filename": "more-infinite-research_5.0.01702.zip",
+      "bytes": 503074,
+      "sha256": "46BDB3A9700D8CC9643B02B28BFF4B4AA7298CA407D7DF3C176DA24CE8D1384F",
+      "members": 127,
+      "minimum_base": "0.17.79",
+      "label": "MIR 5.0.2 for Factorio 0.17.79 (zip)"
+    },
+    {
+      "target": "f018",
+      "filename": "more-infinite-research_5.0.01802.zip",
+      "bytes": 503076,
+      "sha256": "63511C609D6F509E8553E938E7B0DAFF2274F1C42334F5CBADFDEAE4225B520E",
+      "members": 127,
+      "minimum_base": "0.18.47",
+      "label": "MIR 5.0.2 for Factorio 0.18.47 (zip)"
+    },
+    {
+      "target": "f100",
+      "filename": "more-infinite-research_5.0.10002.zip",
+      "bytes": 503066,
+      "sha256": "90664A973C3B740D8D39953550823F7679EB2DCA04788E1F26D326CD57CA0F14",
+      "members": 127,
+      "minimum_base": "1.0.0",
+      "label": "MIR 5.0.2 for Factorio 1.0.0 (zip)"
+    },
+    {
+      "target": "f110",
+      "filename": "more-infinite-research_5.0.11002.zip",
+      "bytes": 503377,
+      "sha256": "9FECCF410A532896FAE0C6F839D5FB1A5C0158AAE0D43A18A64BF558E38541A7",
+      "members": 128,
+      "minimum_base": "1.1.110",
+      "label": "MIR 5.0.2 for Factorio 1.1.110 (zip)"
+    },
+    {
+      "target": "f200",
+      "filename": "more-infinite-research_5.0.20002.zip",
+      "bytes": 766285,
+      "sha256": "6A66CF318AC908788DE24D2E3CD9D8F68421EB8AFDA4C113B2E3012FC701D64F",
+      "members": 225,
+      "minimum_base": "2.0.77",
+      "label": "MIR 5.0.2 for Factorio 2.0.77 (zip)"
+    },
+    {
+      "target": "f210",
+      "filename": "more-infinite-research_5.0.21002.zip",
+      "bytes": 766668,
+      "sha256": "AFDB1502FE4707D3DFDE4F22B2192EA1DF21F1D85A592E594E59587ECD6A4176",
+      "members": 226,
+      "minimum_base": "2.1.23",
+      "label": "MIR 5.0.2 for Factorio 2.1.23 (zip)"
+    },
+    {
+      "target": "f006",
+      "filename": "more-infinite-research_5.0.00602.zip",
+      "bytes": 136842,
+      "sha256": "93B34BEF58CD97FACA9A7E3125B31F9DA2623E12A01893859811D4D747F764F6",
+      "members": 10,
+      "minimum_base": "0.6.4",
+      "label": "MIR 5.0.2 for Factorio 0.6.4 (zip)"
+    },
+    {
+      "target": "f007",
+      "filename": "more-infinite-research_5.0.00702.zip",
+      "bytes": 136841,
+      "sha256": "61A6F2C24E4E694B443D8393833452D65DA2665F0C51BAD28EB678365F8C82F5",
+      "members": 10,
+      "minimum_base": "0.7.5",
+      "label": "MIR 5.0.2 for Factorio 0.7.5 (zip)"
+    },
+    {
+      "target": "f008",
+      "filename": "more-infinite-research_5.0.00802.zip",
+      "bytes": 136840,
+      "sha256": "9BC74F9873CCB3CAB4CD496630F26F6D6582F543F72363818275C33EB50E13B0",
+      "members": 10,
+      "minimum_base": "0.8.8",
+      "label": "MIR 5.0.2 for Factorio 0.8.8 (zip)"
+    },
+    {
+      "target": "f009",
+      "filename": "more-infinite-research_5.0.00902.zip",
+      "bytes": 136841,
+      "sha256": "D0638C4792C57DC0D29645CCDF35969257290580D1B2316225D11FC3B7164810",
+      "members": 10,
+      "minimum_base": "0.9.8",
+      "label": "MIR 5.0.2 for Factorio 0.9.8 (zip)"
+    },
+    {
+      "target": "f010",
+      "filename": "more-infinite-research_5.0.01002.zip",
+      "bytes": 136841,
+      "sha256": "6F2E4330A41CE7C52029FF5877FDFDBCB8C4F5EC6EFF8B6499775063F5093792",
+      "members": 10,
+      "minimum_base": "0.10.12",
+      "label": "MIR 5.0.2 for Factorio 0.10.12 (zip)"
+    },
+    {
+      "target": "f011",
+      "filename": "more-infinite-research_5.0.01102.zip",
+      "bytes": 136842,
+      "sha256": "7D5E32590A8A0AFCF0FDB3596FE442EA4903B630930FE93F882126E01A0A6149",
+      "members": 10,
+      "minimum_base": "0.11.22",
+      "label": "MIR 5.0.2 for Factorio 0.11.22 (zip)"
+    },
+    {
+      "target": "f012",
+      "filename": "more-infinite-research_5.0.01202.zip",
+      "bytes": 136843,
+      "sha256": "1A9E84826DB9972A4101D19129DB17F7EEFE513E655FA06AB7A63F9B669E9E79",
+      "members": 10,
+      "minimum_base": "0.12.35",
+      "label": "MIR 5.0.2 for Factorio 0.12.35 (zip)"
+    }
+  ],
+  "rebuild_verification": "tools/release.py --verify passed; log retained",
+  "every_member_read_crc_and_inventory_hash_verified": true,
+  "full_metadata_matches_published_501_except_patch": true,
+  "published_501_archives_rehashed_unchanged": 17,
+  "native_execution": false,
+  "independent_artifact_review": "pending Aero",
+  "qualification": "Offline Unreleased candidate only; no maturity/tag/publication/delivery or native acceptance; F018 stays experimental and early editions best effort, as required outside display labels by TGT-04"
+}

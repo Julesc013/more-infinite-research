@@ -1,0 +1,199 @@
+{
+  "schema": 1,
+  "kind": "MIRRepair501SingleUnscoredMarkerChainV1",
+  "status": "completed-exact501-f210-space-age-unscored-component-observation",
+  "corrected_root_readback": {
+    "kind": "MIRRepair501SingleMarkerRootReadbackV1",
+    "status": "completed-exact501-f210-space-age-unscored-component-observation",
+    "terminal": {
+      "path": "D:/Projects/Factorio/mir5-library-availability-integrate-r01/build/tmp/repair501-single-marker-native-r03/single-marker-terminal.json",
+      "bytes": 36870,
+      "sha256": "0313E547872BF792365B1A1C46B138C14A577FB751EC16D3CB8593FBD2490F8E"
+    },
+    "preparation": {
+      "path": "D:/Projects/Factorio/mir5-library-availability-integrate-r01/build/qualification/repair501-single-marker-r03-controller/preparation.json",
+      "bytes": 19455,
+      "sha256": "1898E5B6413389153ABF059DFE6D695D67E65055949B89065D911F59FCBF14C6"
+    },
+    "player_source": "b677ced0b1ae0d8bd9ae47eb6b272443faec6d63",
+    "player_tree": "e6497bde988908fb96fe00a16ee5ae1f51a5088f",
+    "public_head": "8288108d36ae830392a42c99de0caf648412e139",
+    "private_head": "0dd529675a894dfc226c2f297377036c2b878415",
+    "custody": {
+      "packet": {
+        "files": 11,
+        "bytes": 805289
+      },
+      "native": {
+        "files": 22,
+        "bytes": 1975010
+      }
+    },
+    "actual_engine_processes": 2,
+    "workload": {
+      "total_walls": 1000,
+      "first_capacity": 256,
+      "overflow": 744,
+      "initial_changed": 256,
+      "reactivation_changed": 8,
+      "updates": 25000
+    },
+    "seed": {
+      "path": "D:/Projects/Factorio/mir5-library-availability-integrate-r01/build/tmp/repair501-single-marker-native-r03/seed/write-data/saves/mir5-native-active.zip",
+      "bytes": 896356,
+      "sha256": "40891015787918DF24B863AD5D4D84523ABAAC70BA83BC3420D3DC2362C0EA9C",
+      "crc_entries": 56
+    },
+    "owned_benchmark_seed": {
+      "path": "D:/Projects/Factorio/mir5-library-availability-integrate-r01/build/tmp/repair501-single-marker-native-r03/marker-pilot/input/fresh-owned-active-seed.zip",
+      "bytes": 896356,
+      "sha256": "40891015787918DF24B863AD5D4D84523ABAAC70BA83BC3420D3DC2362C0EA9C",
+      "crc_entries": 56
+    },
+    "source_and_owned_seed_unchanged": true,
+    "original_player_copies_unchanged": true,
+    "original_controls_restored": true,
+    "owned_archives_restored": [
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21001.zip",
+        "action": "removed-temporary"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+        "action": "unchanged"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-repair-stress-active_0.1.0.zip",
+        "action": "restored-prior"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-repair-stress_0.2.0.zip",
+        "action": "restored-prior"
+      }
+    ],
+    "factorio_zero": true,
+    "cleanup_errors": [],
+    "independent_native_result_review": "pending",
+    "performance_acceptance": false,
+    "release_qualification": false,
+    "limits": [
+      "One exact published501 F210 SpaceAge repair component only; the actual original controls/source copies/terminal and raw useful-work/memory/time records retain their identities.",
+      "The two native processes are one --create preparation and one25000-update benchmark; source/copy/primary manifests verify all retained output bytes. No GUI actions or cold-client lifecycle were performed.",
+      "No eight-arm aggregate, paired/non-regression score, full startup/large-factory/Library/retained-memory/six-cohort or changed-dev-candidate verdict follows. Diagnostic elapsed/peak values are not a performance acceptance score."
+    ],
+    "source_and_primary_copy_verified": true,
+    "custody_locations": {
+      "packet": {
+        "original": "D:/Projects/Factorio/mir5-library-availability-integrate-r01/build/qualification/repair501-single-marker-r03-controller",
+        "primary": "D:/Projects/Factorio/more-infinite-research/build/qualification/repair501-single-marker-native-complete-r01/packet"
+      },
+      "native": {
+        "original": "D:/Projects/Factorio/mir5-library-availability-integrate-r01/build/tmp/repair501-single-marker-native-r03",
+        "primary": "D:/Projects/Factorio/more-infinite-research/build/qualification/repair501-single-marker-native-complete-r01/native"
+      }
+    },
+    "correction": {
+      "original_record": {
+        "path": "build/qualification/repair501-single-marker-native-complete-r01/root-readback.json",
+        "bytes": 3516,
+        "sha256": "73118E25A92F51FFC0843F15FE914AC2E88D1C8891D1440340E7CCE9B55D013F"
+      },
+      "scope": "The original label implied three custody locations. There are two actual locations per tree: original output and primary copy. The pre-copy and post-copy source manifests refer to the same original directory. No intermediate copy is claimed."
+    }
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/repair501-single-marker-receipts-r01.json.gz",
+    "bytes": 47598,
+    "sha256": "7292E2F7E0141DAEDE97F457919A7E6BE4A3FF2D59CAFFE81FF455F58E7B4759",
+    "bodies": 14
+  },
+  "actual_native_review": {
+    "primary_path": "build/qualification/repair501-native-result-review-r01/review.json",
+    "bytes": 21695,
+    "sha256": "D7A08B66BD27E7FFB9D6F49176B62CC56F8DA37529372FB5901CAA74ABED6273",
+    "verdict": "GO for exact declared unscored component observation only"
+  },
+  "protocol": {
+    "total_walls": 1000,
+    "first_capacity": 256,
+    "overflow": 744,
+    "player_and_reciprocal_friendly_split": [
+      128,
+      128
+    ],
+    "service_budget": 8,
+    "updates": 25000
+  },
+  "observed_start": {
+    "kind": "repair-stress",
+    "stage": "start",
+    "status": "pending",
+    "case": "repair-stress-f210",
+    "witnesses": {
+      "total_eligible_walls": 1000,
+      "first_capacity_walls": 256,
+      "eligible_overflow_walls": 744,
+      "first_capacity_player_walls": 128,
+      "first_capacity_reciprocal_friend_walls": 128,
+      "quiet_ticks": 600,
+      "service_ticks": 60,
+      "repair_amount": 1,
+      "native_damage_api": "LuaEntity.damage",
+      "native_damage_type": "electric",
+      "pending_physical_work": true,
+      "initial_changed": 0,
+      "reactivation_changed": 0,
+      "performance_qualified": false,
+      "runtime_elapsed_qualified": false
+    }
+  },
+  "observed_complete": {
+    "kind": "repair-stress",
+    "stage": "complete",
+    "status": "passed",
+    "case": "repair-stress-f210",
+    "witnesses": {
+      "total_eligible_walls": 1000,
+      "first_capacity_walls": 256,
+      "eligible_overflow_walls": 744,
+      "first_capacity_player_walls": 128,
+      "first_capacity_reciprocal_friend_walls": 128,
+      "quiet_ticks": 600,
+      "service_ticks": 60,
+      "repair_amount": 1,
+      "native_damage_api": "LuaEntity.damage",
+      "native_damage_type": "electric",
+      "pending_physical_work": false,
+      "initial_changed": 256,
+      "reactivation_changed": 8,
+      "performance_qualified": false,
+      "runtime_elapsed_qualified": false
+    }
+  },
+  "native_process_costs_seconds": {
+    "seed_create": 20.128493,
+    "single_marker_process": 5.082243
+  },
+  "diagnostic_updates": {
+    "updates": 25000,
+    "total_milliseconds": 3181.474,
+    "average_milliseconds_per_tick": 0.127,
+    "minimum_milliseconds_per_tick": 0.026,
+    "maximum_milliseconds_per_tick": 15.689
+  },
+  "scope": {
+    "native_seed_and_useful_markers": true,
+    "performance_acceptance": false,
+    "eight_arm_aggregate": false,
+    "paired_score": false,
+    "whole_product": false,
+    "changed_candidate": false,
+    "release": false
+  },
+  "limits": [
+    "Two verified physical custody locations per tree: original packet/native output and primary copies. The earlier three-location label is explicitly corrected in additive root-readback-r02; original record retained.",
+    "Raw seed result and terminal remain distinct. Seventeen embedded seed timestamp strings normalize UTC to equivalent+11:00 instants; byte identity is not claimed between those two JSON records.",
+    "OS peak, sampler maxima and governor metrics retain separate meanings. Unscored timings/peaks are not paired speedup, non-regression or whole-product acceptance.",
+    "No eight-arm aggregate,68-launch schedule, cold-client/reload/Library, six-cohort startup/factory/useful-work/retained-memory or candidateB verdict follows. Earlier campaign inputs/results remain unchanged."
+  ]
+}

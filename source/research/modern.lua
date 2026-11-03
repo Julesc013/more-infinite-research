@@ -221,7 +221,8 @@ function M.continuation(definition, values)
     level = definition.level, upgrade = true, hidden = false, max_level = "infinite", order = definition.order,
     prerequisites = continuation_prerequisites(definition), effects = continuation_effects(definition, stream),
     unit = {count_formula = continuation_formula(definition, stream), time = time,
-      ingredients = catalogue.science_ingredients(definition.science, definition.science_amounts)}
+      ingredients = definition.ingredients and copy(definition.ingredients)
+        or catalogue.science_ingredients(definition.science, definition.science_amounts)}
   }
   if definition.icon_size ~= nil then output.icon_size = definition.icon_size end
   if stream.enabled == false then output.enabled = false end
@@ -233,6 +234,13 @@ function M.technologies(selection, values)
   local out = {}
   for index = 1, #selection.definitions do out[#out + 1] = M.technology(selection.definitions[index], values) end
   for index = 1, #selection.continuations do out[#out + 1] = M.continuation(selection.continuations[index], values) end
+  for _, definition in ipairs(selection.sif_retained or {}) do
+    local retained = M.technology(definition, values)
+    -- Hidden only: keep native levels/effects and an existing queue entry,
+    -- without a new public research route or runtime cap owner.
+    retained.hidden = true
+    out[#out + 1] = retained
+  end
   if selection.k2_imersite then
     local staged = k2_imersite_technologies(values)
     for index = 1, #staged do out[#out + 1] = staged[index] end
@@ -354,6 +362,9 @@ function M.preflight_native_owner_patches(selection, raw, values)
     error("MIR native-owner preflight requires data.raw.technology", 2)
   end
   local patches = {}
+  if selection.sif_retained then
+    require("compatibility.modern_catalogue.sif_retained").preflight(selection.sif_retained, raw, selection.native_owners)
+  end
   for index = 1, #selection.native_owners do
     local definition = selection.native_owners[index]
     local stream = require_stream(values, definition.family)
@@ -421,7 +432,7 @@ function M.apply_weapon_speed_overlap(selection, outputs, values)
   if next(categories) == nil then return end
   for index = 1, #outputs do
     local technology = outputs[index]
-    if technology.name == "weapon-shooting-speed-7" then
+    if technology.name == "weapon-shooting-speed-7" or technology.name == "weapon-shooting-speed-9" then
       local retained = {}
       for effect_index = 1, #technology.effects do
         local effect = technology.effects[effect_index]

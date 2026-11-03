@@ -133,6 +133,55 @@ class SettingsCommandsTests(unittest.TestCase):
           assert(settings.startup["ips-enable-research_gears"].value == false)
         ''')
 
+    def test_report_preview_is_read_only_and_inline_choices_preserve_the_full_export(self):
+        self.lua.execute('''
+          local diagnostics=require("runtime.diagnostics")
+          settings.startup["ips-enable-research_gears"].value=false
+          settings.startup["ips-max-level-research_gears"].value=0
+          player.force={name="fixture-force",index=7,technologies={}}
+          local encode,encodes=helpers.encode_string,0
+          helpers.encode_string=function(text) encodes=encodes+1; return encode(text) end
+          local choices={report_settings=false,report_omissions=true,availability_rows={
+            {family="fixture-family",reason="fixture-reason",status="not-added"}}}
+          require=function(name) error("post-parse require: "..name) end
+          local preview=diagnostics.preview(1,nil,choices)
+          assert(type(preview)=="string" and #writes==0 and #messages==0 and encodes==0)
+          assert(preview:find("fixture-family: fixture-reason",1,true))
+          assert(preview:find("authored availability",1,true))
+          assert(not preview:find("MIRSET1 profile:",1,true))
+          local encoded,filename,report=diagnostics.export(1,nil,choices)
+          assert(encoded and #writes==2 and encodes==1)
+          assert(writes[1].data==encoded.."\\n" and writes[1].path==filename)
+          assert(writes[2].data==report and writes[2].player_index==1)
+          assert(report:find("script-output/"..filename,1,true))
+          assert(report:find("omitted by personal choice",1,true))
+          assert(not report:find("MIRSET1 profile:",1,true))
+          choices.report_settings=true
+          preview=diagnostics.preview(1,nil,choices)
+          assert(encodes==2 and #writes==2)
+          if #encoded<=32768 then
+            assert(preview:find('"ips-enable-research_gears":false',1,true))
+            assert(preview:find('"ips-max-level-research_gears":0',1,true))
+          else assert(preview:find("omitted here",1,true)) end
+          assert(settings.startup["ips-enable-research_gears"].value==false)
+          assert(settings.startup["ips-max-level-research_gears"].value==0)
+        ''')
+
+    def test_report_preview_bounds_availability_and_reports_capture_failure_without_writes(self):
+        self.lua.execute('''
+          local diagnostics=require("runtime.diagnostics")
+          local rows={}
+          for i=1,300 do rows[i]={family="family-"..i,reason="reason-"..i} end
+          local preview=diagnostics.preview(1,nil,{report_omissions=true,availability_rows=rows})
+          assert(#preview<=65536 and preview:find("family-250: reason-250",1,true))
+          assert(not preview:find("family-251:",1,true) and preview:find("omitted after 250",1,true))
+          assert(#writes==0 and #messages==0)
+          helpers.encode_string=function() error("encoding refused") end
+          local failed,reason=diagnostics.preview(1,nil,{report_settings=true})
+          assert(failed==nil and type(reason)=="string")
+          assert(#writes==0 and #messages==0)
+        ''')
+
     def test_diagnostics_are_bounded_local_overwrites_with_exact_false_state(self):
         self.lua.execute('''
           player.index=1

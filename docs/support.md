@@ -5,7 +5,7 @@ applies_to: "MIR players and upgrades"
 audience: player
 doc_type: guide
 owner: mir-maintainers
-last_reviewed: 2026-10-31
+last_reviewed: 2026-11-03
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -19,6 +19,8 @@ source_of_truth_for:
 ## Candidate editions
 
 - Choose the package for the Factorio version you actually run. Do not choose another package because its number is larger.
+
+- MIR 5 and later player ZIP downloads use **MIR x.x.x for Factorio x.x.x (zip)**. The first version is MIR's release; the Factorio version is that archive's declared minimum. Best-effort builds retain the limits below.
 
 | Factorio family | Minimum version | Player-facing scope |
 | --- | --- | --- |
@@ -87,6 +89,8 @@ source_of_truth_for:
 
 - MIR preserves earned levels when a cap later limits future work. It only reverses a disablement it recorded itself; another mod can independently change a technology's availability. Hidden supporting technologies can preserve historical investments and should not be removed as cosmetic clutter.
 
+- On Factorio 2.0.77, an update that adds technologies can re-enable script-disabled research with no recorded owner. Check any research locks you rely on when testing the upgrade on a copied save; MIR cannot reconstruct the missing ownership.
+
 - Use the Research Library on Factorio 2.0 and 2.1 to inspect research, queues, settings and availability. Search, filters and language preferences are personal. The Library uses Factorio's built-in research queue; it is not a second research planner.
 
 ## Observed same-edition upgrade cases
@@ -148,12 +152,19 @@ source_of_truth_for:
 - Exporting and checking a profile never applies settings or changes research. Profiles do not back up other mods, map settings or research.
 
 - **Export Diagnostics** or `/mir-diagnostics-export` replaces the latest support report at `script-output/more-infinite-research/mir.log` and exports the full settings profile.
+- In Library **Debug**, **Startup settings** and **Omission reasons** choose the preview/report sections for your player. Omission reasons cover the current authored Availability facts. **Refresh observations** updates the snapshot and **Select text to copy** selects it; neither writes files. **Export Diagnostics** always writes the full settings profile separately, even when its inline report section is unchecked.
 - Attach `factorio-current.log` separately for startup or crash problems; MIR cannot copy the engine log.
 - File-write errors leave gameplay unchanged. A partial export may still leave its already-written settings file.
 
 - Exports stay local and are never uploaded automatically. Review them before sharing: settings metadata can include your player name, and engine logs can include usernames and local paths.
 
 ## Support limits
+
+- When another mod already provides an infinite native research chain, MIR preserves that research. The Library explains when MIR's settings do not control it. On Factorio 2.1, Muria keeps its finite weapon-speed levels 7 and 8; MIR adds infinite research from level 9.
+
+- Adding or removing Muria on a save that already uses MIR is refused because those changes replace different earned weapon-research identities. Keep the original save and restore its previous mod selection. Starting together, or installing MIR for the first time alongside Muria, is a different route; use the release notes for its tested scope.
+
+- With Discovery Tree, ordinary Library lists, search, details and queue labels follow each force's discovery state. Private earned-research holders stay internal. Before removing Discovery Tree, follow its own instructions: select **None** and turn off its essential-tech option. MIR does not reveal all hidden research on removal.
 
 - MIR does not claim universal modpack support. Results apply to their actual Factorio version, MIR package, mod set, settings, save and action. A safe outcome may be a workaround, a request for a reproducible save, a documented limitation or a refusal to change ambiguous saved state.
 

@@ -9,6 +9,8 @@ $repo = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 
 $controls = @(
   [ordered]@{path='tests/test_generator.py';lua=$true},
+  [ordered]@{path='tests/test_continuation_ownership.py';lua=$true},
+  [ordered]@{path='tests/test_discovery_tree_compatibility.py';lua=$true},
   [ordered]@{path='tests/test_early_target_adapter.py';lua=$true},
   [ordered]@{path='tests/test_historical_direct.py';lua=$true},
   [ordered]@{path='tests/test_historical_continuations.py';lua=$true},
@@ -80,6 +82,9 @@ $controls = @(
   [ordered]@{path='tests/test_science.py';lua=$true},
   [ordered]@{path='tests/test_named_science_replacement_fixture.py';lua=$true},
   [ordered]@{path='tests/test_fresh_science_transition_fixture.py';lua=$true},
+  [ordered]@{path='tests/test_sif_retained_manufacturing.py';lua=$true},
+  [ordered]@{path='tests/test_sif_retained_manufacturing_native.py';lua=$true},
+  [ordered]@{path='tests/test_sif_technology_reload_diagnostic.py';lua=$true},
   [ordered]@{path='tests/test_sif_science_retirement_fixture.py';lua=$true},
   [ordered]@{path='tests/test_cryogenic_native_fixture.py';lua=$true},
   [ordered]@{path='tests/test_cryogenic_gameplay_fixture.py';lua=$true},
@@ -137,6 +142,7 @@ $controls = @(
   [ordered]@{path='tests/test_properties.py';lua=$true},
   [ordered]@{path='tests/test_replay.py';lua=$true},
   [ordered]@{path='tests/test_locale_catalogue.py';lua=$false},
+  [ordered]@{path='tests/test_dependency_declarations.py';lua=$false},
   [ordered]@{path='tests/test_library_native_input.py';lua=$false},
   [ordered]@{path='tests/test_library_profile_reader.py';lua=$false},
   [ordered]@{path='tests/test_f110_f200_runner.py';lua=$false},

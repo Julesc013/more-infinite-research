@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryStableRecipeIdSearchHostReviewV1",
+  "status": "demonstrated-source-gap-corrected-host-controls-pass-native-scope-open",
+  "reviewed_on": "2026-11-02",
+  "reviewed_against": "607d9d1f4101ddc551e2090a941e102dbaded3b3",
+  "requirements": ["RUN-04", "CONT-10", "VER-07"],
+  "historical_expectations": [
+    {
+      "ref": "v4.7.3:source/prototypes/mir/runtime/research_browser_core.lua",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "blob": "bf33867aac4a69ef47e99d57c1f6db08bb108ed8",
+      "sha256": "DDE3318580A3C24177BC3A924556126C29CB97087F18A0940958B9FBE7DF77F4",
+      "scope": "selected_rows searches raw affected recipe_ids independently of translated discovery and rich selected detail. Schema2 admits sorted sparse IDs with at most300000 aggregate recipe entries; it does not impose current detail/localization preview limits."
+    },
+    {
+      "ref": "v4.7.3:tests/runtime/research_browser_core_regressions.lua",
+      "blob": "55be2847fae29855efac6a294887012827013eef",
+      "sha256": "BD13B530B5BACCAB14E74452F5884283FC8DAD58C90F79CF45B5F44D66C8171F",
+      "scope": "The retained sparse-catalogue assertion requires managed family/cap/secondary recipe search without claiming rich detail; its earlier review remains preserved."
+    }
+  ],
+  "demonstrated_gap": {
+    "model_sha256": "C9723FB514C289006697A060D49D2A8241DB149F240B9859F4A14079C1C78A6A",
+    "old_secondary_id_matches": 1,
+    "old_600th_sparse_id_matches": 1,
+    "accepted_model_secondary_matches_without_translation": 0,
+    "accepted_model_secondary_matches_with_friendly_translation": 0,
+    "accepted_model_primary_recipe_matches": 1,
+    "classification": "Product search regression in the accepted model, demonstrated on explicit host objects; no engine run or native failure is asserted."
+  },
+  "implementation": {
+    "path": "source/presentation/library_model.lua",
+    "sha256": "A3D14EB3F9AE900A080A3875D946945CB8DF7B3F36D3E478AF436B83A33D7929",
+    "behavior": "After identity/text search misses on an eligible row, inspect that technology's native unlock-recipe/change-recipe-productivity effects for a matching raw ID. Keep existing search normalization, filters and private-credit exclusion.",
+    "work_bound": "At most the already-filtered technology's actual finite effect-array length, stopping on the first match. Empty, matching and rejected queries add no effect-array reads. No global recipe/prototype scan, selected-detail copying, live recipe/productivity read, generated snapshot, cache or recurring event work is introduced.",
+    "text_bound": "Raw IDs retain the historical1024-byte string bound and existing160-byte query limit. The16-effect detail preview,128 localized-subject budget,512 selected targets and1024-entry detail scan do not truncate identity search.",
+    "native_array_contract": "Pinned official2.0.77/2.1.23 runtime APIs both declare LuaTechnologyPrototype.effects as a nonoptional array of TechnologyModifier. These API facts constrain the adapter; they are not native execution evidence."
+  },
+  "api_sources": [
+    {"url": "https://lua-api.factorio.com/2.0.77/runtime-api.json", "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578"},
+    {"url": "https://lua-api.factorio.com/2.1.23/runtime-api.json", "sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373"}
+  ],
+  "controls": {
+    "file": "tests/test_library_model.py",
+    "sha256": "262BA477669C55C66AF62D29F4D48145BB361643FF4FE38A06A5FE5DDD2B09D3",
+    "added": [
+      "test_stable_secondary_recipe_ids_remain_searchable_without_translated_labels",
+      "test_raw_recipe_search_is_lazy_linear_and_independent_of_preview_limits"
+    ],
+    "scope": "Actual model on explicit native-shaped host doubles: productive and unlock IDs, absent/friendly translated labels, case/separator normalization,1050 irrelevant native modifiers followed by600 recipes, exact linear/early-stop read counts, lazy empty/matching/filter behavior, variant field safety and unavailable-array refusal. Queue/current/progress/level/enabled state stays unchanged; list rows gain no selected-detail records.",
+    "selected_results": {"library_model": 34, "library": 89, "library_translations": 18, "total": 141},
+    "runtime": "Pinned Lua5.2 / Lupa2.6",
+    "negative_controls": [
+      "Exact accepted607 model loses the secondary raw ID",
+      "Artificial16-effect scan loses the late ID",
+      "Artificial128-effect scan loses the late ID",
+      "Artificial512-effect scan loses the late ID",
+      "Artificial1024-effect scan loses the late ID",
+      "Productivity-only matching loses unlock-recipe IDs",
+      "Eager matching adds effect reads to empty/matching/filtered queries",
+      "Accepting arbitrary modifier recipe fields creates an unrelated match"
+    ],
+    "adverse_disposition": "Initial host authoring mistakenly used the queued-status filter to reject an explicitly queued row. It failed, was retained as model-controls-r01.log and corrected to the existing locked-status filter. No product expectation was relaxed; model-controls-r02.log passes."
+  },
+  "custody": "build/qualification/aero-library-recipe-search-r01/",
+  "native_execution": false,
+  "release_qualification": false,
+  "remaining": "Independent review and required exact-head CI; affected final-candidate Library input/search and response-cost qualification, including a large active catalogue. Current host read counts do not establish native timing, rendering, multiplayer, saved-state, whole-product performance or stable acceptance. Existing native observations keep their original package identities; no published bytes or version change."
+}

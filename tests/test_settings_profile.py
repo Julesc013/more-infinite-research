@@ -1,5 +1,6 @@
 """MIRSET1 settings-profile host controls (Lua 5.2; not native evidence)."""
 import argparse
+import json
 from pathlib import Path
 import sys
 import unittest
@@ -147,6 +148,99 @@ class SettingsProfileTests(unittest.TestCase):
           assert(reports[1] == "[more-infinite-research] Ignoring invalid MIR settings profile import")
         ''')
 
+    def test_raw_json_import_bypasses_compressed_decode_and_preserves_empty_zero_false(self):
+        # Published startup_settings_decode_reuse.lua, blob5c4ccb19: raw JSON
+        # bypasses compressed decoding; zero/false and empty profiles retain
+        # their meanings. These are controlled host codecs, not native timing.
+        self.lua.execute(r'''
+          local incoming = '{"schema":1,"settings":{"ips-enable-research_gears":false,"ips-research-time-research_gears":0}}'
+          local empty = '{"schema":1,"settings":{}}'
+          local parses = 0
+          helpers.decode_string = function(_) error("raw JSON reached compressed decoder") end
+          helpers.json_to_table = function(text)
+            parses = parses + 1
+            return decoded[text]
+          end
+          decoded[incoming] = {schema=1, settings={
+            ["ips-enable-research_gears"]=false, ["ips-research-time-research_gears"]=0
+          }}
+          decoded[empty] = {schema=1, settings={}}
+          settings.startup["ips-cost-base-research_gears"].value = 345
+          settings.startup[config.import_setting_name].value = incoming
+          local values = config.effective_values(settings.startup, helpers)
+          assert(values["ips-enable-research_gears"] == false)
+          assert(values["ips-research-time-research_gears"] == 0)
+          assert(values["ips-cost-base-research_gears"] == 345 and parses == 1)
+          settings.startup[config.import_setting_name].value = empty
+          values = config.effective_values(settings.startup, helpers)
+          assert(values["ips-enable-research_gears"] == true)
+          assert(values["ips-cost-base-research_gears"] == 345 and parses == 2)
+          assert(settings.startup[config.import_setting_name].value == empty)
+          assert(settings.startup["ips-enable-research_gears"].value == true)
+        ''')
+
+    def test_missing_profile_helpers_fall_back_and_fresh_resolution_recovers(self):
+        # The same published fixture requires raw fallback while helpers are
+        # absent, then valid import after availability changes. Do not restore
+        # the retired per-lookup cache or imply live startup settings mutation.
+        self.lua.execute(r'''
+          local incoming = "MIRSET1:recovery"
+          decoded.recovery = {schema=1, settings={
+            ["ips-cost-base-research_gears"]=777, ["ips-enable-research_gears"]=false
+          }}
+          settings.startup["ips-cost-base-research_gears"].value = 345
+          settings.startup[config.import_setting_name].value = incoming
+          local original = helpers
+          local partial = {
+            false, {},
+            {encode_string=original.encode_string, decode_string=original.decode_string},
+            {encode_string=original.encode_string, json_to_table=original.json_to_table},
+            {decode_string=original.decode_string, json_to_table=original.json_to_table}
+          }
+          local function fallback(api)
+            local errors = {}
+            local values = config.effective_values(settings.startup, api,
+              function(message) errors[#errors+1] = message end)
+            assert(values["ips-cost-base-research_gears"] == 345)
+            assert(values["ips-enable-research_gears"] == true)
+            assert(#errors == 1 and errors[1] ==
+              "[more-infinite-research] Ignoring invalid MIR settings profile import")
+          end
+          fallback(nil)
+          for _, api in ipairs(partial) do fallback(api) end
+          local values = config.effective_values(settings.startup, original)
+          assert(values["ips-cost-base-research_gears"] == 777)
+          assert(values["ips-enable-research_gears"] == false)
+          assert(settings.startup["ips-cost-base-research_gears"].value == 345)
+          assert(settings.startup[config.import_setting_name].value == incoming)
+        ''')
+
+    def test_codec_uses_fresh_text_conversion_and_current_supplied_helpers(self):
+        # Published fixture5c4ccb19 and codec54e96103 preserve tostring input
+        # and current helper results. This exercises the low-level host codec;
+        # it does not assert metatable transport across Factorio remote.call.
+        self.lua.execute(r'''
+          decoded.first = {schema=1, settings={cap=40, enabled=false}}
+          decoded.second = {schema=1, settings={cap=60, enabled=true}}
+          local text = "MIRSET1:first"
+          local input = setmetatable({}, {__tostring=function() return text end})
+          local profile = assert(codec.decode(input, helpers))
+          assert(profile.settings.cap == 40 and profile.settings.enabled == false)
+          text = "MIRSET1:second"
+          profile = assert(codec.decode(input, helpers))
+          assert(profile.settings.cap == 60 and profile.settings.enabled == true)
+          helpers.json_to_table = function(value)
+            if value == "first" then return {schema=1, settings={cap=80, enabled=false}} end
+            return {schema=1, settings={cap=70, enabled=true}}
+          end
+          profile = assert(codec.decode(input, helpers))
+          assert(profile.settings.cap == 70 and profile.settings.enabled == true)
+          helpers.decode_string = function(_) return "first" end
+          profile = assert(codec.decode(input, helpers))
+          assert(profile.settings.cap == 80 and profile.settings.enabled == false)
+          assert(text == "MIRSET1:second")
+        ''')
+
     def test_codec_has_canonical_identity_and_strict_compact_option(self):
         self.lua.execute(r'''
           local full = codec.current_profile({
@@ -182,6 +276,135 @@ class SettingsProfileTests(unittest.TestCase):
           assert(profile == nil and decode_error == "unsupported profile format")
         ''')
 
+    def test_all_registered_effect_defaults_export_in_full_and_disappear_in_compact(self):
+        # Published round-trip fixture635deae0 tests the entire effect-setting
+        # surface, independently of any serializer's selected examples/counts.
+        self.lua.execute(r'''
+          expected_effect_defaults = {}
+          for _, spec in ipairs(config.prototypes()) do
+            if spec.name:find("^ips%-effect%-per%-level%-") or spec.name:find("^mir%-effect%-per%-level%-") then
+              assert(spec.type == "int-setting" or spec.type == "double-setting")
+              assert(config.validate_value(spec.name, spec.default_value))
+              if spec.minimum_value ~= nil then
+                assert(not config.validate_value(spec.name, spec.minimum_value - 1))
+              end
+              if spec.maximum_value ~= nil then
+                assert(not config.validate_value(spec.name, spec.maximum_value + 1))
+              end
+              expected_effect_defaults[spec.name] = spec.default_value
+            end
+          end
+          full_effect_wire = assert(facade.export_string({compact=false}))
+          compact_effect_wire = assert(facade.export_string({compact=true}))
+        ''')
+        expected = dict(self.lua.globals().expected_effect_defaults.items())
+        self.assertIn("ips-effect-per-level-research_gears", expected)
+        self.assertIn("mir-effect-per-level-weapon-shooting-speed", expected)
+        for mode in ["full", "compact"]:
+            wire = self.lua.globals()[mode + "_effect_wire"]
+            self.assertTrue(wire.startswith("MIRSET1:"))
+            profile = json.loads(wire[len("MIRSET1:"):])
+            self.assertEqual(profile["metadata"]["export_mode"], mode)
+            settings_values = profile["settings"]
+            # The empty Lua table encodes as []; this port checks zero
+            # settings, as the published fixture does, not object spelling.
+            if isinstance(settings_values, list):
+                self.assertEqual(settings_values, [])
+                settings_values = {}
+            self.assertIsInstance(settings_values, dict)
+            effects = {name: value for name, value in settings_values.items()
+                       if name.startswith(("ips-effect-per-level-", "mir-effect-per-level-"))}
+            self.assertEqual(effects, expected if mode == "full" else {})
+
+    def test_published_numeric_dropdown_imports_reach_effects_and_export_without_raw_writes(self):
+        # Independent inputs/ranges from published4.7.3's profile catalogue
+        # and round-trip fixture635deae0, not native dropdown values.
+        self.lua.execute(r'''
+          portable_values = {
+            ["mir-pipeline-extent-multiplier"]=123.45,
+            ["mir-prototype-productivity-cap"]=4321.5,
+            ["mir-prototype-efficiency-cap"]=-83.25,
+            ["mir-prototype-pollution-cap"]=-91.125,
+            ["mir-prototype-speed-floor"]=-75.5,
+            ["mir-prototype-speed-cap"]=1234.5,
+            ["mir-prototype-quality-cap"]=678.9,
+            ["mir-recycling-return-chance"]=12.34,
+          }
+          for name,value in pairs(portable_values) do
+            local ok,why=config.validate_value(name,value)
+            assert(ok,name..": "..tostring(why))
+            assert(config.spec(name).type=="string-setting")
+          end
+          decoded.portable={schema=1,settings=portable_values}
+          settings.startup[config.import_setting_name].value="MIRSET1:portable"
+          local status=facade.validate_string("MIRSET1:portable")
+          assert(status.valid and status.recognized==8 and status.invalid==0 and status.unknown==0)
+          local values=config.resolve(settings.startup,helpers)
+          for name,value in pairs(portable_values) do
+            assert(values.options[name]==value)
+            assert(settings.startup[name].value==config.default_value(name))
+          end
+          local raw={recipe={ordinary={maximum_productivity=1}},
+            ["assembling-machine"]={a={effect_receiver={foreign=7}}},
+            pipe={p={fluid_box={max_pipeline_extent=100}}}}
+          require("overrides.prototype_limits").apply(raw,values.options)
+          require("overrides.pipeline_extent").apply(raw,values.options["mir-pipeline-extent-multiplier"])
+          local receiver=raw["assembling-machine"].a.effect_receiver
+          assert(math.abs(raw.recipe.ordinary.maximum_productivity-43.215)<1e-12)
+          assert(math.abs(receiver.consumption_limits.low+.8325)<1e-12)
+          assert(math.abs(receiver.pollution_limits.low+.91125)<1e-12)
+          assert(receiver.speed_limits.low==-.755 and receiver.speed_limits.high==12.345)
+          assert(receiver.quality_limits.high==6.789 and receiver.foreign==7)
+          assert(raw.pipe.p.fluid_box.max_pipeline_extent==123)
+          portable_wire=assert(facade.export_string({compact=false}))
+          assert(settings.startup[config.import_setting_name].value=="MIRSET1:portable")
+        ''')
+        exported = json.loads(self.lua.globals().portable_wire[len("MIRSET1:"):])["settings"]
+        for name, value in self.lua.globals().portable_values.items():
+            self.assertEqual(exported[name], value)
+
+    def test_published_import_only_boundaries_and_aliases_do_not_expand_dropdowns(self):
+        self.lua.execute(r'''
+          local ranges={
+            {"mir-pipeline-extent-multiplier",.1,100000},
+            {"mir-prototype-productivity-cap",0,100000},
+            {"mir-prototype-efficiency-cap",-99.99,0},
+            {"mir-prototype-pollution-cap",-99.99,0},
+            {"mir-prototype-speed-floor",-99.99,0},
+            {"mir-prototype-speed-cap",0,100000},
+            {"mir-prototype-quality-cap",0,100000},
+            {"mir-recycling-return-chance",0,25},
+          }
+          for _,row in ipairs(ranges) do
+            assert(config.validate_value(row[1],row[2]) and config.validate_value(row[1],row[3]))
+            for _,bad in ipairs({row[2]-.01,row[3]+.01,true,{},0/0,math.huge,-math.huge}) do
+              assert(not config.validate_value(row[1],bad),row[1].." accepted invalid import")
+            end
+          end
+          assert(not config.validate_value("mir-science-pack-ingredient-policy",12.34))
+          assert(not config.validate_value("not-an-authored-setting",12.34))
+          local aliases={
+            ["mir-prototype-speed-cap"]="bonus-100000",
+            ["mir-prototype-quality-cap"]="bonus-100000",
+            ["mir-recycling-return-chance"]="percent-25",
+          }
+          for name,value in pairs(aliases) do
+            assert(config.validate_value(name,value))
+            for _,visible in ipairs(config.spec(name).allowed_values) do assert(visible~=value) end
+          end
+          decoded.aliases={schema=1,settings=aliases}
+          settings.startup[config.import_setting_name].value="MIRSET1:aliases"
+          local effective=config.effective_values(settings.startup,helpers)
+          for name,value in pairs(aliases) do assert(effective[name]==value) end
+          decoded.invalid={schema=1,settings={["mir-recycling-return-chance"]=25.1}}
+          settings.startup[config.import_setting_name].value="MIRSET1:invalid"
+          effective=config.effective_values(settings.startup,helpers)
+          assert(effective["mir-recycling-return-chance"]==config.default_value("mir-recycling-return-chance"))
+          settings.startup[config.import_setting_name].value=""
+          settings.startup["mir-pipeline-extent-multiplier"].value=123.45
+          assert(not pcall(config.effective_values,settings.startup,helpers),"raw dropdown admitted a numeric import")
+        ''')
+
     def test_runtime_facade_exports_effective_values_and_reports_read_only_counts(self):
         self.lua.execute(r'''
           settings.startup[config.import_setting_name].value = "MIRSET1:effective"
@@ -208,6 +431,83 @@ class SettingsProfileTests(unittest.TestCase):
           assert(status.import_setting == config.import_setting_name)
           local invalid = facade.validate_string("MIRSET1:bad-decode")
           assert(invalid.valid == false and invalid.error == "profile string decoding failed")
+        ''')
+
+    def test_settings_queries_and_runtime_profile_facade_work_after_module_loading_closes(self):
+        # Port the published settings-catalogue lifecycle regression without
+        # restoring its retired compiler-profile/provider transport.
+        self.lua.execute(r'''
+          local names, prototypes = config.registered_names(), config.prototypes()
+          settings.startup[config.import_setting_name].value = "MIRSET1:lifecycle"
+          decoded.lifecycle = {schema=1, settings={
+            ["ips-enable-research_gears"] = false,
+            ["ips-research-time-research_gears"] = 0,
+            ["ips-cost-base-research_gears"] = 777
+          }}
+          require = function(name) error("post-parse require: " .. tostring(name)) end
+          game = setmetatable({}, {__index=function() error("settings query read game") end})
+          storage = setmetatable({}, {__index=function() error("settings query read storage") end,
+            __newindex=function() error("settings query wrote storage") end})
+
+          local after_names, after_prototypes = config.registered_names(), config.prototypes()
+          assert(#after_names == #names and #after_prototypes == #prototypes)
+          for index, name in ipairs(names) do
+            assert(after_names[index] == name)
+            local spec = config.spec(name)
+            assert(spec.name == name and config.default_value(name) == spec.default_value)
+            assert(config.validate_value(name, spec.default_value))
+          end
+          local effective = config.effective_values(settings.startup, helpers)
+          assert(effective["ips-enable-research_gears"] == false)
+          assert(effective["ips-research-time-research_gears"] == 0)
+          assert(effective["ips-cost-base-research_gears"] == 777)
+          local status = facade.validate_string("MIRSET1:lifecycle")
+          assert(status.valid and status.recognized == 3 and status.invalid == 0 and status.unknown == 0)
+          local wire, err = facade.export_string({compact=false})
+          assert(not err and wire:sub(1,8) == "MIRSET1:")
+          assert(last_encoded:find('"ips-enable-research_gears":false',1,true))
+          assert(last_encoded:find('"ips-research-time-research_gears":0',1,true))
+          assert(last_encoded:find('"ips-cost-base-research_gears":777',1,true))
+          assert(settings.startup[config.import_setting_name].value == "MIRSET1:lifecycle")
+          assert(settings.startup["ips-enable-research_gears"].value == true)
+        ''')
+
+    def test_settings_descriptors_remain_stable_after_caller_mutation_and_parse_closure(self):
+        self.lua.execute(r'''
+          local function copy(value)
+            if type(value) ~= "table" then return value end
+            local result = {}
+            for key, child in pairs(value) do result[key] = copy(child) end
+            return result
+          end
+          local function same(actual, expected)
+            assert(type(actual) == type(expected), "descriptor type changed")
+            if type(expected) ~= "table" then assert(actual == expected, "descriptor value changed"); return end
+            for key, child in pairs(expected) do same(actual[key], child) end
+            for key in pairs(actual) do assert(expected[key] ~= nil, "descriptor gained a field") end
+          end
+          local function mutate(value)
+            for key, child in pairs(value) do
+              if type(child) == "table" then mutate(child)
+              elseif type(child) == "string" then value[key] = "caller-mutated"
+              elseif type(child) == "number" then value[key] = child + 1
+              elseif type(child) == "boolean" then value[key] = not child end
+            end
+          end
+          local names = copy(config.registered_names())
+          local prototypes = copy(config.prototypes())
+          local specs = {}
+          for _, name in ipairs(names) do specs[name] = copy(config.spec(name)) end
+          require = function(name) error("post-parse require: " .. tostring(name)) end
+          mutate(config.registered_names())
+          mutate(config.prototypes())
+          for _, name in ipairs(names) do mutate(config.spec(name)) end
+          same(config.registered_names(), names)
+          same(config.prototypes(), prototypes)
+          for _, name in ipairs(names) do
+            same(config.spec(name), specs[name])
+            assert(config.default_value(name) == specs[name].default_value)
+          end
         ''')
 
 

@@ -21,8 +21,13 @@ class LibraryModelTests(unittest.TestCase):
 
     def test_runtime_catalogue_passes_foreign_technology_map_to_pure_declarations(self):
         self.lua.execute('''
-          script, mods = {active_mods={base="2.1.23"}}, nil
-          prototypes = {technology={ ["braking-force-8"]={owner="foreign"} }}
+          script, mods = {active_mods={base="2.1.23", foreign="1.0.0",
+            ["more-infinite-research"]="5.0.21001"}}, nil
+          prototypes = {technology={ ["braking-force-8"]={owner="foreign"} },
+            get_history=function(kind, name)
+              assert(kind == "technology" and name == "braking-force-8")
+              return {created="foreign", changed={"more-infinite-research"}}
+            end}
           package.loaded["research.catalogue"] = nil
           package.loaded["runtime.catalogue"] = nil
           local catalogue = require("runtime.catalogue")
@@ -100,7 +105,7 @@ class LibraryModelTests(unittest.TestCase):
               visible_when_disabled = options.visible_when_disabled == true,
               order = options.order or "p[research_gears]",
               prerequisites = prerequisite,
-              prototype = {max_level = options.max_level or 4294967295, effects = effects},
+              prototype = {max_level = options.max_level or 4294967295, effects = effects, hidden = false},
               research_unit_count = options.count or 8000,
               research_unit_count_formula = options.count_formula,
               research_unit_energy = options.energy or 60,
@@ -143,13 +148,15 @@ class LibraryModelTests(unittest.TestCase):
             expected[descriptor.id] = true
           end
           expected[require("research.legacy_cannon_credit_definitions").descriptor().id] = true
+          expected["mir-k2-imersite-staged-state-1"] = true
+          expected["mir-k2-imersite-continuation-state-4"] = true
           local first, second = catalogue.internal_credit_ids(), catalogue.internal_credit_ids()
           local count = 0
           for id, value in pairs(first) do
             assert(value == true and expected[id] == true, "unexpected private credit identity: " .. tostring(id))
             count = count + 1
           end
-          assert(count == 4)
+          assert(count == 6)
           for id in pairs(expected) do assert(first[id] == true and second[id] == true) end
           local changed = "mir-legacy-module-credit-speed-module"
           first[changed] = false
@@ -442,6 +449,8 @@ class LibraryModelTests(unittest.TestCase):
             "mir-legacy-module-credit-productivity-module",
             "mir-legacy-module-credit-efficiency-module",
             "mir-legacy-cannon-credit-rocket-shooting-speed",
+            "mir-k2-imersite-staged-state-1",
+            "mir-k2-imersite-continuation-state-4",
           }
           local technologies = {[gear_id] = gear, [foreign.name] = foreign}
           for index, id in ipairs(ids) do
@@ -521,6 +530,289 @@ class LibraryModelTests(unittest.TestCase):
           assert(#hidden == 1 and hidden[1].hidden and hidden[1].status == "ready")
         ''')
 
+    def test_stable_secondary_recipe_ids_remain_searchable_without_translated_labels(self):
+        self.lua.execute('''
+          local id = "recipe-prod-research_gears-1"
+          local native = technology(id, {effects={
+            {type="change-recipe-productivity",recipe="primary-route",change=.1},
+            {type="change-recipe-productivity",recipe="secondary-stable-route",change=.1},
+            {type="unlock-recipe",recipe="alternate-unlock-route"}
+          }})
+          local queue = {native}
+          local force = {technologies={[id]=native},research_queue=queue,
+            current_research=native,research_progress=.37}
+          local declared = {{id=id,family="research_gears",recipe="primary-route"}}
+          local translated = {[id]="Friendly caption"..string.char(31)
+            .."Friendly primary Friendly secondary Friendly alternate"}
+          for _, labels in ipairs{{},translated} do
+            for _, search in ipairs{
+              "secondary-stable-route", "SECONDARY_STABLE_ROUTE", "alternate unlock route"
+            } do
+              local rows = model.rows(force,declared,{search=search},labels)
+              assert(#rows==1 and rows[1].id==id,
+                "raw affected recipe ID lost before/after translation: "..search)
+              assert(rows[1].recipe=="primary-route" and rows[1].recipe_targets==nil
+                and rows[1].effects==nil and rows[1].recipe_benefits==nil,
+                "search must not copy selected detail into every list row")
+            end
+          end
+          assert(force.research_queue==queue and #queue==1 and queue[1]==native
+            and force.current_research==native and force.research_progress==.37
+            and native.enabled and not native.researched and native.level==1,
+            "raw ID search changed native research state")
+        ''')
+
+    def test_raw_recipe_search_is_lazy_linear_and_independent_of_preview_limits(self):
+        self.lua.execute('''
+          local id = "recipe-prod-research_gears-1"
+          local actual = {}
+          for index=1,1050 do
+            actual[index] = setmetatable({type="laboratory-speed",modifier=.01}, {
+              __index=function(_,key) error("invalid modifier property: "..tostring(key)) end
+            })
+          end
+          for index=1,600 do
+            actual[#actual+1] = {type="change-recipe-productivity",
+              recipe="stable-route-"..index,change=.1}
+          end
+          local effect_reads, array_reads = 0, 0
+          local effects = setmetatable({}, {
+            __len=function() return #actual end,
+            __index=function(_,index) array_reads=array_reads+1; return actual[index] end
+          })
+          local native = technology(id)
+          native.prototype = setmetatable({max_level=4294967295,hidden=false}, {
+            __index=function(_,key)
+              if key=="effects" then effect_reads=effect_reads+1; return effects end
+              return nil
+            end
+          })
+          local queue = {native}
+          local force = {technologies=setmetatable({[id]=native}, {
+              __pairs=function() error("authored search enumerated the native catalogue") end
+            }),research_queue=queue,current_research=native,research_progress=.37,
+            recipes=setmetatable({}, {__index=function() error("search read a live recipe") end})}
+          local declared = {{id=id,family="research_gears",recipe="primary-route"}}
+          local function rows(view) return model.rows(force,declared,view,{}) end
+          assert(#rows({})==1 and #rows({search="primary route"})==1
+            and #rows({search=id})==1)
+          assert(#rows({search="stable route 600",mode=2})==0
+            and #rows({search="stable route 600",status=3})==0
+            and #rows({search="stable route 600",family="research_other"})==0
+            and #rows({search="stable route 600",hidden={[id]=true}})==0)
+          assert(effect_reads==0 and array_reads==0,
+            "empty, matching or filtered searches must avoid added effect work")
+          local selected = rows({search="stable route 600"})
+          assert(#selected==1 and selected[1].id==id,
+            "stable recipe ID search was truncated at a detail/localization preview limit")
+          assert(effect_reads==1 and array_reads==#actual,
+            "search must read the selected finite effect array once without copying detail")
+          local first = rows({search="stable route 1"})
+          assert(#first==1 and effect_reads==2 and array_reads==#actual+1051,
+            "raw ID search did not stop on its first match")
+          actual[#actual] = {type="laboratory-speed",recipe="unrelated-field"}
+          assert(#rows({search="unrelated field"})==0,
+            "a non-recipe native modifier supplied a searchable recipe field")
+          effects = setmetatable({}, {__len=function() error("invalid native array") end})
+          assert(#rows({search="stable route 600"})==0,
+            "an unavailable native effect array must not abort the Library")
+          assert(force.research_queue==queue and #queue==1 and queue[1]==native
+            and force.current_research==native and force.research_progress==.37
+            and native.enabled and not native.researched and native.level==1)
+        ''')
+
+    def test_native_readiness_excludes_hidden_completed_disabled_and_trigger_research_without_losing_queues(self):
+        self.lua.execute('''
+          for _, engine in ipairs{"f200", "f210"} do
+            for _, case in ipairs{
+              {name="ordinary", ready=true, status="ready"},
+              {name="disabled", enabled=false, status="disabled", locked=true},
+              {name="completed", researched=true, status="complete"},
+              {name="hidden", hidden=true, status="locked", locked=true},
+              {name="trigger", trigger=true, status="locked", locked=true},
+              {name="prerequisite", prerequisite=false, status="locked", locked=true},
+              {name="queued", queued=true, ready=true, status="queued"},
+              {name="hidden-queued", hidden=true, queued=true, status="queued", locked=true},
+            } do
+              local id = engine .. "-" .. case.name
+              local native = technology(id, {enabled=case.enabled, researched=case.researched,
+                prerequisites={gate={name="gate", researched=case.prerequisite ~= false}}})
+              native.prototype.hidden = case.hidden == true
+              native.prototype.research_trigger = case.trigger
+                and {type="craft-item", item="iron-plate", count=1} or nil
+              local queue = case.queued and {native} or {}
+              local force = {technologies={[id]=native}, research_queue=queue, research_progress=.42}
+              local context = {research_triggers_supported=true}
+              local rows = model.rows(force, {}, {family="all"}, {}, context)
+              assert(#rows == 1 and rows[1].id == id,
+                "hidden and completed native research must remain inspectable")
+              assert(rows[1].ready == (case.ready == true) and rows[1].status == case.status,
+                "Library readiness must follow native enabled, completed, hidden and trigger state: " .. id)
+              local ready = model.rows(force, {}, {family="all", status=2}, {}, context)
+              local locked = model.rows(force, {}, {family="all", status=3}, {}, context)
+              local queued = model.rows(force, {}, {family="all", status=4}, {}, context)
+              assert(#ready == (case.ready and 1 or 0), "Ready filter admitted unavailable research: " .. id)
+              assert(#locked == (case.locked and 1 or 0), "Locked filter lost native availability: " .. id)
+              assert(#queued == (case.queued and 1 or 0), "Queue inspection changed: " .. id)
+              local detail = assert(model.detail(force, {}, {selected=id}, {}, context))
+              assert(detail.status == case.status and detail.ready == (case.ready == true))
+              assert(force.research_queue == queue and force.research_progress == .42
+                and native.enabled == (case.enabled ~= false) and native.researched == (case.researched == true)
+                and native.prototype.hidden == (case.hidden == true),
+                "readiness inspection must preserve native research and queued state")
+            end
+          end
+        ''')
+
+    def test_legacy_readiness_never_reads_a_modern_trigger_property(self):
+        self.lua.execute('''
+          local id = "legacy-visible"
+          local native = technology(id)
+          local trigger_reads = 0
+          native.prototype.hidden = false
+          setmetatable(native.prototype, {__index=function(_, key)
+            if key == "research_trigger" then trigger_reads = trigger_reads + 1 end
+            error("unsupported legacy prototype property: " .. tostring(key))
+          end})
+          local force = {technologies={[id]=native}, research_queue={}}
+          local rows = model.rows(force, {}, {family="all", status=2}, {}, {research_triggers_supported=false})
+          assert(#rows == 1 and rows[1].ready and trigger_reads == 0,
+            "legacy availability must not probe an unsupported research_trigger property")
+        ''')
+
+    def test_selected_productivity_details_refresh_live_recipes_without_eager_list_reads(self):
+        self.lua.execute('''
+          local id, recipe_id = "recipe-prod-research_gears-1", "iron-gear-wheel"
+          local native = technology(id, {effects={
+            {type="change-recipe-productivity", recipe=recipe_id, change=.1},
+            {type="change-recipe-productivity", recipe=recipe_id, change=.2},
+            {type="unlock-recipe", recipe="unrelated-unlock"}
+          }})
+          local recipe = {valid=true, productivity_bonus=0, prototype={maximum_productivity=3}}
+          local reads = 0
+          local force = {technologies={[id]=native}, research_queue={}, recipes=setmetatable({}, {
+            __index=function(_, name) reads=reads+1; assert(name==recipe_id); return recipe end,
+            __pairs=function() error("detail enumerated recipes") end
+          })}
+          local declared = {{id=id, family="research_gears"}}
+          local context = {recipe_productivity_supported=true}
+          assert(#model.rows(force, declared, {}, {}, context) == 1 and reads == 0,
+            "ordinary Library lists must not inspect live recipe productivity")
+          local first = assert(model.detail(force, declared, {selected=id}, {}, context))
+          assert(first.recipe_benefits_state == "available" and #first.recipe_benefits == 1,
+            "selected MIR detail must restore live recipe benefit facts")
+          local benefit = first.recipe_benefits[1]
+          assert(reads == 1 and benefit.recipe_id == recipe_id and math.abs(benefit.effect_change-.3)<1e-12
+            and benefit.current_productivity_bonus == 0 and benefit.maximum_productivity == 3
+            and first.next_level_eligible == true and first.next_level_has_effective_benefit == true)
+          first.recipe_benefits[1].recipe_id = "forged"
+          recipe.productivity_bonus = 3
+          local second = assert(model.detail(force, declared, {selected=id}, {}, context))
+          assert(second.recipe_benefits[1].recipe_id == recipe_id
+            and second.recipe_benefits[1].current_productivity_bonus == 3
+            and second.next_level_has_effective_benefit == false and reads == 2,
+            "reopening selected detail must observe saturation without retaining or mutating native facts")
+          assert(native.level == 1 and native.enabled and not native.researched and #force.research_queue == 0)
+          assert(first.recipe_benefits[1].current_productivity_bonus == 0)
+        ''')
+
+    def test_productivity_detail_missing_facts_and_budgets_never_invent_zero_or_a_gain(self):
+        self.lua.execute('''
+          local id, recipe_id = "recipe-prod-research_gears-1", "gear"
+          local native = technology(id, {effects={{type="change-recipe-productivity",recipe=recipe_id,change=.1}}})
+          local recipe = {valid=true,productivity_bonus=0,prototype={maximum_productivity=3}}
+          local reads = 0
+          local force = {technologies={[id]=native},research_queue={},recipes=setmetatable({}, {
+            __index=function() reads=reads+1; return recipe end
+          })}
+          local declared = {{id=id,family="research_gears"}}
+          local function detail(context) return assert(model.detail(force,declared,{selected=id},{},context)) end
+          local unsupported = detail({recipe_productivity_supported=false})
+          assert(unsupported.recipe_benefits == nil and reads == 0,
+            "unsupported engines must not read recipe productivity fields")
+          local foreign = assert(model.detail(force,{}, {selected=id},{},{recipe_productivity_supported=true}))
+          assert(foreign.recipe_benefits == nil and reads == 0,
+            "undeclared foreign research must not gain MIR benefit claims")
+          for _, bad in ipairs{false,-1,math.huge,0/0,"0"} do
+            recipe.productivity_bonus = bad
+            local missing = detail({recipe_productivity_supported=true})
+            assert(missing.recipe_benefits_state == "unavailable" and missing.recipe_benefits == nil
+              and missing.next_level_has_effective_benefit == nil,
+              "unverified live facts must remain unavailable rather than become zero or a saturation claim")
+          end
+          recipe.productivity_bonus, recipe.valid = 0, false
+          assert(detail({recipe_productivity_supported=true}).recipe_benefits_state == "unavailable")
+          recipe.valid = true; recipe.prototype.maximum_productivity = nil
+          assert(detail({recipe_productivity_supported=true}).recipe_benefits_state == "unavailable")
+          recipe = nil
+          assert(detail({recipe_productivity_supported=true}).recipe_benefits_state == "unavailable")
+          native.prototype.effects = {{type="unlock-recipe",recipe="not-productive"}}
+          local before = reads
+          assert(detail({recipe_productivity_supported=true}).recipe_benefits == nil and reads == before)
+          local effects = {}
+          for index=1,1025 do effects[index]={type="change-recipe-productivity",recipe="many-"..index,change=.1} end
+          native.prototype.effects = effects
+          local bounded = detail({recipe_productivity_supported=true})
+          assert(bounded.recipe_benefits_state == "unavailable" and reads == before,
+            "oversized selected effects must refuse before any live recipe reads or aggregate benefit claim")
+          effects = {}
+          for index=1,1025 do effects[index]={type="change-recipe-productivity",recipe=recipe_id,change=.1} end
+          native.prototype.effects = effects
+          assert(detail({recipe_productivity_supported=true}).recipe_benefits_state == "unavailable"
+            and reads == before, "duplicate recipe identities cannot bypass the native effect scan bound")
+        ''')
+
+    def test_live_productivity_facts_do_not_drop_recipes_beyond_the_short_effect_preview(self):
+        self.lua.execute('''
+          local id = "recipe-prod-research_gears-1"
+          local effects, recipes = {}, {}
+          for index=1,600 do
+            local recipe_id = "gear-" .. index
+            effects[index] = {type="change-recipe-productivity",recipe=recipe_id,change=.1}
+            recipes[recipe_id] = {valid=true,productivity_bonus=index==600 and 0 or 3,
+              prototype={maximum_productivity=3}}
+          end
+          local native = technology(id,{effects=effects})
+          local detail = assert(model.detail({technologies={[id]=native},research_queue={},recipes=recipes},
+            {{id=id,family="research_gears"}},{selected=id},{},{recipe_productivity_supported=true}))
+          assert(#detail.effects == 16 and #detail.recipe_targets == 512 and #detail.recipe_benefits == 600
+            and detail.next_level_has_effective_benefit == true,
+            "a useful recipe beyond the effect preview must prevent a false no-benefit claim")
+        ''')
+
+    def test_productivity_headroom_retains_absolute_cap_and_native_final_level_boundaries(self):
+        self.lua.execute('''
+          local id = "recipe-prod-research_gears-1"
+          local native = technology(id, {level=2,max_level=2,effects={
+            {type="change-recipe-productivity",recipe="gear",change=.1}
+          }})
+          local recipe = {valid=true,productivity_bonus=0,prototype={maximum_productivity=3}}
+          local force = {technologies={[id]=native},research_queue={},recipes={gear=recipe}}
+          local declared = {{id=id,family="research_gears"}}
+          local context = {recipe_productivity_supported=true,cap_provider=function()return {[id]=2}end}
+          local function detail() return assert(model.detail(force,declared,{selected=id},{},context)) end
+          assert(detail().next_level_has_effective_benefit == true,
+            "the final selected native level remains researchable at the inclusive cap")
+          native.level = 3
+          assert(detail().next_level_eligible == false and detail().next_level_has_effective_benefit == false)
+          native.level = 2; native.enabled = false
+          assert(detail().next_level_has_effective_benefit == false)
+          native.enabled = true; native.researched = true
+          assert(detail().next_level_has_effective_benefit == false)
+          native.researched = false
+          recipe.productivity_bonus = 3-2e-9
+          assert(detail().next_level_has_effective_benefit == true)
+          recipe.productivity_bonus = 3-.5e-9
+          assert(detail().next_level_has_effective_benefit == false,
+            "retain the independently published1e-9 headroom boundary")
+          recipe.productivity_bonus = 4
+          assert(detail().recipe_benefits[1].current_productivity_bonus == 4
+            and detail().next_level_has_effective_benefit == false)
+          context.cap_provider = nil; native.level = 3
+          assert(detail().next_level_eligible == false,
+            "absence of a MIR cap must not override the finite native maximum")
+        ''')
+
     def test_localized_recipe_and_product_search_text_is_separate_from_the_caption(self):
         self.lua.execute('''
           local id = "recipe-prod-research_gears-1"
@@ -569,6 +861,57 @@ class LibraryModelTests(unittest.TestCase):
           }, research_queue={}}, {{id="recipe-prod-research_gears-1",family="research_gears"}},
             {search="localized-product"}, {["recipe-prod-research_gears-1"]="Gear research\\31Localized recipe\\31Localized product"})
           assert(#rows == 1)
+        ''')
+
+    def test_localization_deduplicates_namespaces_and_keeps_subject_work_and_parameter_bounds(self):
+        self.lua.execute(r'''
+          local localization = require("presentation.library_localization")
+          local technology = {name="discovery-metallurgy",localised_name="Metallurgie",prototype={effects={
+            {type="unlock-recipe",recipe="casting"},
+            {type="change-recipe-productivity",recipe="casting",change=.02}
+          }}}
+          local collections = {
+            recipe={casting={localised_name="Fonte raffinee",products={
+              {type="item",name="gold"},{type="fluid",name="gold"},{type="item",name="gold"}
+            }}},
+            item={gold={localised_name="Plaque doree"}},
+            fluid={gold={localised_name="Vapeur enrichie"}}
+          }
+          local function translate(value, depth)
+            depth=(depth or 0)+1
+            assert(depth<=20,"localization exceeded the historical engine nesting bound")
+            if type(value)=="string" then return value end
+            assert(type(value)=="table" and #value<=21,
+              "localization exceeded twenty parameters per LocalisedString node")
+            if value[1]=="?" then return translate(value[2],depth) end
+            assert(value[1]=="")
+            local parts={}; for index=2,#value do parts[#parts+1]=translate(value[index],depth) end
+            return table.concat(parts)
+          end
+          local payload,subjects,limited=localization.search_request(technology,collections)
+          assert(subjects==3 and not limited,
+            "duplicate recipe/product references must keep distinct item and fluid namespaces")
+          assert(translate(payload)=="Metallurgie\31Fonte raffinee\31Plaque doree\31Vapeur enrichie",
+            "recipe/material discovery lost identity, stable order or deduplication")
+
+          -- Literal bounds are recovered from the old discovery opponents,
+          -- rather than read from the candidate module to generate expectations.
+          local crowded={name="crowded",localised_name="Crowded",prototype={effects={}}}
+          local recipes={}
+          for index=1,129 do
+            local name="recipe-"..index
+            crowded.prototype.effects[index]={type="unlock-recipe",recipe=name}
+            recipes[name]={localised_name=name,products={}}
+          end
+          payload,subjects,limited=localization.search_request(crowded,{recipe=recipes})
+          assert(subjects==128 and limited,"discovery subject overflow must be bounded and disclosed")
+          local text=translate(payload)
+          assert(text:find("\31recipe-128",1,true) and not text:find("\31recipe-129",1,true))
+          crowded.prototype.effects={}
+          for index=1,1025 do crowded.prototype.effects[index]={type="nothing"} end
+          payload,subjects,limited=localization.search_request(crowded,{recipe={}})
+          assert(subjects==0 and limited and payload=="Crowded",
+            "irrelevant effects must not evade the finite prototype-work bound")
         ''')
 
     def test_selected_detail_is_bounded_and_never_reuses_native_tables(self):
@@ -624,7 +967,7 @@ class LibraryModelTests(unittest.TestCase):
           local ingredient = hostile({name = "automation-science-pack", amount = 1}, "ResearchIngredient")
           local effect = hostile({type = "change-recipe-productivity", recipe = "iron-gear-wheel", change = .1}, "TechnologyModifier")
           local prerequisite = hostile({name = "automation", researched = true}, "LuaTechnology prerequisite")
-          local prototype = hostile({max_level = 4294967295, effects = {effect}}, "LuaTechnologyPrototype")
+          local prototype = hostile({max_level = 4294967295, effects = {effect}, hidden = false}, "LuaTechnologyPrototype")
           local gear = hostile({
             name = id, level = 6, researched = false, enabled = true,
             visible_when_disabled = false, order = "p[research_gears]",
