@@ -16333,7 +16333,7 @@
         "scope": "Four deduplicated K2 owned-speed sentinel test/wrapper bodies,26693 bytes,16 live tag/path bindings acrossv4.7.0-v4.7.3. Test-companion protocol intent only;no engine or original native-custody audit.",
         "evidence": {
           "path": "spec/evidence/historical-k2-owned-sentinel-intent-aero-r01.json",
-          "sha256": "B6D8592E0D49B0E2991F5AF2B3815537E308590FFFBC130A3F56D64BB1115D89"
+          "sha256": "C63A53684ECC528EABD13407F1F51280A8E5606C2C66753DEE9A3BA51A0258E4"
         },
         "dispositions": [
           {
@@ -16346,13 +16346,13 @@
             "limits": "Historical+.125/.05/.08 are companion inputs,not MIR defaults or a generic foreign-effect repair contract."
           },
           {
-            "disposition": "retain",
-            "obligation": "Whole-chunk lexical export and boolean LuaRemote method markers must match real fixture assumptions. Predecessor on_load plus configuration/unsaved ticks is not a physical cold reload;save-pending state precedes the single save request.",
+            "disposition": "retain-contract-supersede-retired-fixture-mechanisms",
+            "obligation": "Preserve meaningful fixture admission and distinguish actual saved successor/cold processes from predecessor on_load and unsaved configuration ticks. Original whole-chunk lexical/boolean remote/save-pending expectations remain historical evidence; the mapped controls are analogs, not implementations of the last two mechanisms.",
             "current_controls": [
               "tests/test_k2_imersite_transition_fixture.py",
               "tests/test_k2se_imersite_carrier_fixture.py"
             ],
-            "limits": "Fresh host chunks model distinct load contexts only. Existing direct38C native evidence remains scoped to its original source/profile/save/process identities;this source disposition does not transfer it to final551."
+            "limits": "Boolean method-marker admission belongs to the retired private companion and is superseded, without waiving active API consumer requirements. Current K2 successor uses volatile pending then persists complete state before saving, not a persisted save-pending phase; that retired state machine is superseded. Neither is covered by mapped current controls. Fresh host chunks model distinct load contexts only. Existing direct38C native evidence retains original identities; no transfer to final551."
           },
           {
             "disposition": "obsolete-implementation-only",
