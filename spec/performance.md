@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-31
+last_reviewed: 2026-11-04
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -63,3 +63,11 @@ Optimizations earn admission with a concrete consumer, invariant, measured benef
 `PERF-06` — Operation counts for a fixed diagnostic input are reproducible; elapsed seconds and peak process memory are not expected to be identical. Never use a profiler or wall clock to decide gameplay work. Keep production and instrumented packages separate in receipts. Apply [Determinism](determinism.md) and test extra unrelated recipes, more selected output, more players/forces and more scheduled entities as different scaling axes.
 
 A bounded collector may need a measured local canonical sort. Report it rather than falsely calling every operation worst-case linear. Direct exact-binding generation remains proportional to consumed definition/reference/output size under expected native table lookup costs. Source line count alone neither proves this bound nor guarantees low latency.
+
+## Offline startup attribution
+
+`PERF-03` and `PERF-06` keep three separate measurements: external process-to-observed-responsive-menu time; the matched MIR-added difference against a valid no-MIR comparator; and native-log elapsed intervals around MIR's measured work. Scoped intervals can include synchronous engine calls, allocation, garbage collection and scheduling. Downstream engine/other-mod work is not wholly attributable to MIR's Lua regions. Never subtract the native log clock from the actor's Stopwatch clock or infer overhead from an unscored dump/load duration.
+
+The maintainer's 2026-11-03 timing addition begins with bounded offline analysis of retained logs, preserving each original campaign/package/cache policy and failed or missing endpoint. Loader-message-to-next-loader/engine-boundary windows are explicitly approximate, can include bookkeeping and do not expose unobserved internal function durations. Sum only non-overlapping scoped intervals; never add whole stages to their nested phases. A missing end is incomplete/unavailable, never zero. Keep the longest observed checkpoint gap within each MIR stage separate from the interval after its final completed stage to the next named engine milestone. Neither establishes a deadlock or exclusive CPU cost; rounded millisecond timestamps do not establish millisecond accuracy or zero work.
+
+If those logs identify a worthwhile unexplained interval, the native owner may add minimal paired `log()` markers in a separate diagnostic copy during an already-needed slow/failing reproduction. Preserve normal acceptance timing separately and verify unchanged prototype output. No extra scan for a denominator, per-entry dump, invented progress percentage, sleep/yield, loading-bar simulation, settings system, historical relaunch campaign or universal hardware predictor. Runtime profiling and the existing support snapshot remain separate. Logging-on/off overhead is unmeasured without an applicable native comparison and adds no new stable gate. [Startup diagnostics](../docs/startup-diagnostics.md) documents the reader and retained extraction.
