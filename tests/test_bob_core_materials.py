@@ -404,6 +404,7 @@ class BobCoreMaterialTests(unittest.TestCase):
           package.preload["compatibility.modern_catalogue"] = function()
             return {is_k2_base=function() return false end, is_k2so=function() return false end,
               retains_bob_native_continuations=function() return false end,
+              native_owner_fallbacks=function() return {} end,
               select=function() return {bob_angel=false, definitions={}, continuations={}} end}
           end
           package.preload["research.modern"] = function()
@@ -414,7 +415,12 @@ class BobCoreMaterialTests(unittest.TestCase):
           end
           package.preload["research.product_target_extension"] = function() return {extend=function() end} end
           package.preload["research.science"] = function() return {apply_family=function() end} end
-          package.preload["research.native_credit_definitions"] = function() return {append=function() end} end
+          package.preload["research.native_credit_definitions"] = function()
+            return {append=function() end, collected_descriptors=function(groups)
+              assert(next(groups)==nil,"isolated material hook unexpectedly collected native families")
+              return {}
+            end}
+          end
           require("data-final-fixes")
         ''')
         emitted = {row["name"] for row in _plain(lua.globals().data["installed"])}
