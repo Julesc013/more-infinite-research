@@ -16246,6 +16246,79 @@
             "owner": "Black Glass candidate/native/publication custody; Aero independent package and claims review"
           }
         ]
+      },
+      {
+        "reviewed_on": "2026-11-03",
+        "reviewed_against": "d09ba8fb991ebc18ae6f1059a829a8f408a53082",
+        "subjects": [
+          "CONT-03",
+          "CONT-08",
+          "CONT-11",
+          "VER-07"
+        ],
+        "scope": "Only the two deduplicated assert-scripted-runtime-lifecycle fixture bodies and supporting4.7.3 campaign effect-override binding.222 verified live tag/path bindings across51 tags plus2 retained indexed v4.2.0 aliases; target copies with identical blobs are aliases, not additional behaviors or engine qualification. Other campaign/runtime fixtures and original native receipts remain outside this slice.",
+        "method": "Read full two immutable fixture bodies and named consumer calls without executing historical commands. Authenticate Git blobs and all commit/path/live-tag bindings; deduplicate mirrored target paths. Port valid independent nondefault lifecycle expectations around the retired fixture setup, preserving actual current ownership/save limits.",
+        "source_discovery": {
+          "index_sha256": "183AC3B7903A3B7E9E00192B88CF396357F3F1919AE8FB099B5C80004224EB1C",
+          "indexed_tags": 91,
+          "selected_bodies": 2,
+          "selected_body_bytes": 5248,
+          "distinct_remote_tag_path_bindings": 222,
+          "distinct_live_tags": 51,
+          "preserved_indexed_alias_bindings": 2,
+          "context_consumer": {
+            "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+            "path": "tools/lib/validation/runner/DefaultCampaign03.ps1",
+            "blob": "d96e1d08c5042d69636dbef6926e8f7a09f91232",
+            "bytes": 19668,
+            "sha256": "2547BDDFAF82A4A68523AB8B287F159B0827F68CD1C6FDAFD7806CD793B8289D",
+            "scope": "Three named scripted lifecycle/disable/reenable calls and explicit effect override2 only; not disposition of other campaigns."
+          }
+        },
+        "whole_source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_tests_run": false,
+        "release_qualification": false,
+        "evidence": "spec/evidence/historical-scripted-lifecycle-intent-aero-r01.json",
+        "groups": [
+          {
+            "id": "nondefault-spoilage-lifecycle",
+            "disposition": "port-independent-expectations-and-consolidate-existing-controls",
+            "independent_expectation": "The historical fixture uses exact spoilage technology identity, completed levels=level-1, multiplier1.02 and tolerance1e-6. The pinned4.7.3 DefaultCampaign03 consumer explicitly selects effect-per-level2 for lifecycle/disable/reenable cases; this is a nondefault override, not a change to the delivered1% default. It checks3->1->0 completed levels, highest secondary-force level4, post-merge contribution, aggregate external-write rebase by1.5, and configuration disable/reenable restoration. Its level setter/reset calls are fixture setup, not lab-earned research.",
+            "current_implementation": [
+              "source/runtime/scripted_effects.lua",
+              "source/runtime/spoilage.lua",
+              "source/runtime/spoilage_contribution.lua",
+              "source/runtime/configuration.lua",
+              "source/research/settings/space_age_scripted.lua"
+            ],
+            "existing_host_controls": [
+              "tests/test_scripted_effects_lifecycle.py::ScriptedEffectsLifecycleTests::test_nondefault_spoilage_lifecycle_keeps_scaling_reversal_and_external_baseline",
+              "tests/test_scripted_effects_lifecycle.py::ScriptedEffectsLifecycleTests::test_disable_restores_only_our_matching_global_write_and_keeps_foreign_write",
+              "tests/test_spoilage.py::SpoilageTests::test_highest_eligible_level_is_global_not_per_force_or_enemy",
+              "tests/test_spoilage.py::SpoilageTests::test_external_global_write_is_rebased_but_reported_as_ambiguous"
+            ],
+            "remaining_executable_check": "The new host port uses real current settings/configuration/lifecycle modules and independent2% expectations. Final candidate native nondefault settings, effects-reset delivery, actual force-merge research semantics, configuration/foreign-write ownership and real saved-state/client outcomes retain the existing affected runtime queue and applicability review. Host force tables and aggregate rebase cannot establish native merge delivery or independent-writer attribution.",
+            "owner": "Aero historical/host coverage; Black Glass affected native inputs and execution"
+          },
+          {
+            "id": "retention-label-and-runtime-only-fixture",
+            "disposition": "preserve-original-limited-claim-and-consolidate-stronger-save-gate",
+            "independent_expectation": "The data.lua body is intentionally empty runtime-only fixture code. The control has no on_load handler: on_init sets pending_reload_proof=true and its next on_tick can emit retention proof without a cold load. Configuration callbacks separately inspect retained fixture state. Source contains useful lifecycle assertions but its tick label alone proves no physical save/reload, successor archive or client behavior.",
+            "current_implementation": [
+              "spec/runtime.md",
+              "spec/migrations.md",
+              "tools/Invoke-NativeFixture.ps1",
+              "tests/fixtures/scripted-effects-native/control.lua",
+              "tests/fixtures/scripted-effects-toggle/control.lua"
+            ],
+            "existing_host_controls": [
+              "tests/test_scripted_effects_lifecycle.py::ScriptedEffectsLifecycleTests::test_imports_historical_buckets_and_uses_named_event_paths"
+            ],
+            "remaining_executable_check": "No port of the empty data stage or old tick/log retention label. Actual saved successor closure, unchanged-byte cold observations and independent native witness interpretation remain required on affected inputs. The new host boot/on_load check is explicitly a module-level simulation, not native save evidence; no broad historical rerun follows.",
+            "owner": "Aero source-claim/applicability review; Black Glass exact native save/client queue"
+          }
+        ]
       }
     ],
     "stable_coverage_review": {

@@ -85,6 +85,71 @@ class ScriptedEffectsLifecycleTests(unittest.TestCase):
           runtime.on_load()
         ''')
 
+    def test_nondefault_spoilage_lifecycle_keeps_scaling_reversal_and_external_baseline(self):
+        # Published lifecycle fixture 81c828f9 uses a 2% campaign override,
+        # not the 1% default. Port its expectations through the current
+        # settings/configuration owner; force tables are host inputs only.
+        self.lua.execute(r'''
+          local name = "recipe-prod-research_spoilage_preservation-1"
+          local startup = active_defaults()
+          startup["ips-effect-per-level-research_spoilage_preservation"].value = 2
+          local player = {valid = true, name = "player", technologies = {[name] = {level = 4}}}
+          local saved = {mir = {unrelated = "keep"}}
+          local world = {forces = {player = player}, difficulty_settings = {spoil_time_modifier = 2}}
+          local runtime = boot(startup, saved, world)
+          local function expect(value, message)
+            assert(math.abs(world.difficulty_settings.spoil_time_modifier - value) < .000001, message)
+          end
+          runtime.on_init()
+          expect(2 * 1.02 ^ 3, "nondefault three-level application")
+
+          player.technologies[name].level = 2
+          runtime.on_technology_effects_reset()
+          expect(2 * 1.02, "nondefault level reversal")
+          player.technologies[name].level = 1
+          runtime.on_technology_effects_reset()
+          expect(2, "nondefault zero-level restoration")
+
+          local secondary = {valid = true, name = "secondary", technologies = {[name] = {level = 5}}}
+          world.forces.secondary = secondary
+          runtime.on_force_created({force = secondary})
+          expect(2 * 1.02 ^ 4, "nondefault highest-force contribution")
+          -- Model only the post-merge force snapshot. This does not prove
+          -- Factorio's research-level merge or event delivery.
+          player.technologies[name].level = 5
+          secondary.valid = false
+          world.forces.secondary = nil
+          runtime.on_forces_merged({source_index = 42, destination = player})
+          expect(2 * 1.02 ^ 4, "nondefault post-merge contribution")
+
+          world.difficulty_settings.spoil_time_modifier = 3 * 1.02 ^ 4
+          runtime.on_technology_effects_reset()
+          expect(3 * 1.02 ^ 4, "nondefault external aggregate rebase")
+          assert(math.abs(saved.mir.spoilage_preservation.baseline - 3) < .000001)
+          runtime = boot(startup, saved, world)
+          runtime.on_load()
+          expect(3 * 1.02 ^ 4, "host reload must not reapply contribution")
+          runtime.on_configuration_changed()
+          expect(3 * 1.02 ^ 4, "nondefault configuration must retain contribution")
+
+          startup["ips-enable-research_spoilage_preservation"].value = false
+          runtime = boot(startup, saved, world)
+          runtime.on_configuration_changed()
+          expect(3, "nondefault disable must restore rebased contribution")
+          assert(saved.mir.spoilage_preservation == nil and saved.mir.unrelated == "keep")
+
+          world.difficulty_settings.spoil_time_modifier = 3.7
+          player.technologies[name].level = 3
+          startup["ips-enable-research_spoilage_preservation"].value = true
+          runtime = boot(startup, saved, world)
+          runtime.on_configuration_changed()
+          expect(3.7 * 1.02 ^ 2, "nondefault reenable must capture current baseline")
+          player.technologies[name].level = 1
+          runtime.on_technology_effects_reset()
+          expect(3.7, "nondefault reenabled zero-level restoration")
+          assert(saved.mir.unrelated == "keep")
+        ''')
+
     def test_disable_restores_only_our_matching_global_write_and_keeps_foreign_write(self):
         self.lua.execute(r'''
           local startup = active_defaults()
