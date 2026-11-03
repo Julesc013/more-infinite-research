@@ -316,12 +316,27 @@ local function preflight_owner(owner, definition, stream)
   local cost_changed = configured(stream, "base_cost") or configured(stream, "linear_increment")
     or configured(stream, "growth_factor")
   local cost_style
+  local withheld = false
   if cost_changed then
     -- Preserve the delivered bounded family admission instead of requiring
     -- one Base balance literal. Inherited/effect/time-only paths stay lazy.
+    if owner.unit.count ~= nil and (owner.unit.count_formula ~= nil or not finite(owner.unit.count)
+        or owner.unit.count <= 0 or owner.unit.count % 1 ~= 0) then
+      owner_error(definition, "invalid inherited count")
+    end
+    if owner.unit.count == nil and (type(owner.unit.count_formula) ~= "string"
+        or not owner.unit.count_formula:find("%S")) then
+      owner_error(definition, "missing inherited cost")
+    end
     cost_style = require("compatibility.native_owner_cost").classify(owner.unit)
     if cost_style == nil then
-      owner_error(definition, "unexpected count formula")
+      -- The old binding withheld the entire patch when a requested cost
+      -- override could not classify this upstream expression. Preserve it;
+      -- only these five authored native families have a fallback policy.
+      for _, binding in ipairs(require("compatibility.product_bindings").native_owner_bindings) do
+        if definition.id == binding.owner and definition.family == binding.family then withheld = true; break end
+      end
+      if not withheld then owner_error(definition, "unexpected count formula") end
     end
   elseif owner.unit.count ~= nil then
     if owner.unit.count_formula ~= nil or not finite(owner.unit.count)
@@ -335,7 +350,7 @@ local function preflight_owner(owner, definition, stream)
     owner_error(definition, "invalid inherited research time")
   end
   named_owner_effects(owner, definition)
-  return cost_style
+  return cost_style, withheld
 end
 
 local function owner_unit_plan(owner, definition, stream, cost_style)
@@ -383,7 +398,7 @@ function M.preflight_native_owner_patches(selection, raw, values)
   if type(selection) ~= "table" or type(raw) ~= "table" or type(raw.technology) ~= "table" then
     error("MIR native-owner preflight requires data.raw.technology", 2)
   end
-  local patches = {}
+  local patches, withheld = {}, {}
   if selection.sif_retained then
     require("compatibility.modern_catalogue.sif_retained").preflight(selection.sif_retained, raw, selection.native_owners)
   end
@@ -392,20 +407,24 @@ function M.preflight_native_owner_patches(selection, raw, values)
     local stream = require_stream(values, definition.family)
     if planned_owner_change(stream, definition) then
       local owner = raw.technology[definition.id]
-      local cost_style = preflight_owner(owner, definition, stream)
-      patches[#patches + 1] = {
-        owner = owner,
-        unit = owner_unit_plan(owner, definition, stream, cost_style),
-        effects = owner_effect_plan(owner, definition, stream),
-      }
+      local cost_style, unbound = preflight_owner(owner, definition, stream)
+      if unbound then
+        withheld[definition.id] = {family=definition.family, generated=false}
+      else
+        patches[#patches + 1] = {
+          owner = owner,
+          unit = owner_unit_plan(owner, definition, stream, cost_style),
+          effects = owner_effect_plan(owner, definition, stream),
+        }
+      end
     end
   end
-  return patches
+  return patches, withheld
 end
 
 -- Detached effects for only the five authored Space Age native families.
 -- They share the ordinary product collector; none is submitted to creation.
-function M.native_owner_product_targets(selection, raw, values, patches, active_mods)
+function M.native_owner_product_targets(selection, raw, values, patches, active_mods, withheld)
   local out = {}
   if not (active_mods and active_mods["space-age"]) then return out end
   local definitions, existing, generated = {}, {}, {}
@@ -423,7 +442,7 @@ function M.native_owner_product_targets(selection, raw, values, patches, active_
       local effects = patch and patch.effects
       if effects == nil then effects = copy(type(owner) == "table" and type(owner.effects) == "table" and owner.effects or {}) end
       out[#out + 1] = {family=binding.family, definition=definition, owner=owner,
-        effects=effects, patch=patch, active=stream.enabled == true,
+        effects=effects, patch=patch, active=stream.enabled == true and not (withheld and withheld[definition.id]),
         configured_effect=configured(stream, "effect_percent")}
     end
   end

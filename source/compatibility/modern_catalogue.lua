@@ -779,7 +779,34 @@ function M.science_ingredients(key, amounts)
   return out
 end
 
-function M.select(active_mods, raw)
+-- Reuse the five authored Base identities and the independently retained
+-- Space Age science rules. This does not discover or rename a family.
+function M.native_owner_fallbacks(active_mods, withheld)
+  local out = {}
+  if not active_space_age(active_mods) or withheld == nil or next(withheld) == nil then return out end
+  local science = {
+    research_low_density_structure="science_automation_logistic_chemical_production_metallurgic",
+    research_plastic="science_automation_logistic_chemical_production_agricultural",
+    research_processing_unit="science_automation_logistic_chemical_production_electromagnetic",
+    research_rocket_fuel="science_automation_logistic_chemical_production_agricultural",
+    research_steel="science_automation_logistic_chemical_production",
+  }
+  local owners = {}
+  for _, binding in ipairs(require("compatibility.product_bindings").native_owner_bindings) do
+    if withheld[binding.owner] then owners[binding.family] = binding.owner end
+  end
+  for _, definition in ipairs(BASE.definitions) do
+    local owner = owners[definition.family]
+    if owner then
+      local detached = copy(definition)
+      detached.science = science[definition.family]
+      out[#out + 1] = {owner=owner, definition=detached}
+    end
+  end
+  return out
+end
+
+function M.select(active_mods, raw, withheld)
   local definitions = copy_definitions(BASE.definitions)
   local recipe_patches = {}
   local profile, k2so = "base", nil
@@ -965,6 +992,13 @@ function M.select(active_mods, raw)
   -- The published 2.0/SIF correction kept these paid identities hidden. They
   -- remain separate from public research/cap declarations, with exact recipe
   -- vectors so broad product collection cannot add an unpaid scrap effect.
+  -- Runtime receives only the already validated emitted/no-emission result.
+  -- Data preparation collects detached fallback candidates separately first.
+  for _, fallback in ipairs(M.native_owner_fallbacks(active_mods, withheld)) do
+    if withheld[fallback.owner].generated == true then
+      definitions[#definitions + 1] = fallback.definition
+    end
+  end
   local sif_retained
   if target.id == "f200" and type(active_mods) == "table"
       and type(active_mods.base) == "string" and active_mods.base:match("^2%.0%.%d+$")

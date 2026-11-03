@@ -83,6 +83,9 @@ class NativeOwnerFallbackTests(unittest.TestCase):
                   prototypes={technology={},mod_data={}}
                   local private=data.raw["mod-data"]["more-infinite-research-native-adoptions"]
                   prototypes.mod_data[private.name]={data=private.data}
+                  -- Factorio parses control in a fresh Lua state. The host
+                  -- harness has already imported this module in settings.
+                  package.loaded["research.catalogue"]=nil
                   package.loaded["runtime.catalogue"]=nil
                   control_rows=require("runtime.catalogue").declared()
                 ''')
