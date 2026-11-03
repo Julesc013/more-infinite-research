@@ -444,6 +444,11 @@
     },
     {
       "id": "CONT-07",
+      "secretas_continuation_current_disposition_r01": {
+        "evidence": "spec/evidence/historical-secretas-current-disposition-aero-r01.json",
+        "scope": "Accepted1640 source/host correction and independently accepted upstream-only native baseline; original recovery/failure record preserved. Published/corrected native comparison, useful research, paid/partial/queue/save/two-cold and provider-refusal verdicts remain open.",
+        "status": "source-host-accepted-upstream-only-native-accepted-candidate-state-open"
+      },
       "historical_incident_originals_recovery_r01": {
         "evidence": "spec/evidence/historical-missing-originals-recovery-aero-r01.json",
         "scope": "Actual issue/comment/screenshot recovery, unmerged private-index disposition and exact retained-input Secretas continuation host failure; no native completion.",
