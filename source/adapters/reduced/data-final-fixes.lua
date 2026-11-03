@@ -1,4 +1,5 @@
 -- Final-fixes adapter for a target's delivered historical direct technologies.
+local startup_trace = require("startup_diagnostics").start("data-final-fixes")
 local target = require("platform.target")
 local generator = require("research.generator")
 local historical_direct = require("research.historical_direct")
@@ -15,14 +16,23 @@ function M.apply()
   end
   local current_settings = rawget(_G, "settings")
   local startup = type(current_settings) == "table" and current_settings.startup or nil
+  startup_trace.phase("settings", "begin")
   local values = historical_settings.resolve(target.id, startup)
+  startup_trace.phase("settings", "end")
+  startup_trace.phase("catalogue", "begin")
   local technologies = historical_direct.technologies(target.id, values, stage.raw)
   local continuations = historical_continuations.technologies(target.id, values, stage.raw)
   for index = 1, #continuations do technologies[#technologies + 1] = continuations[index] end
+  startup_trace.phase("catalogue", "end")
+  startup_trace.phase("science", "begin")
   require("research.science").apply_family(technologies, nil, {
     options=values.options, raw=stage.raw, target=target, mods=rawget(_G, "mods"), log=rawget(_G, "log"),
   })
+  startup_trace.phase("science", "end")
+  startup_trace.phase("publication", "begin")
   generator.install(technologies, stage)
+  startup_trace.phase("publication", "end")
+  startup_trace.phase("stage", "end")
 end
 
 return M

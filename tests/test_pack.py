@@ -89,6 +89,7 @@ class PackTests(unittest.TestCase):
             {path.relative_to(PLAYER).as_posix() for path in closure},
             {
                 "settings.lua",
+                "startup_diagnostics.lua",
                 "research/settings.lua",
                 "research/settings_profile.lua",
                 "research/historical_settings.lua",

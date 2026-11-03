@@ -1,4 +1,5 @@
 -- Settings-stage adapter for the delivered historical direct technologies.
+local startup_trace = require("startup_diagnostics").start("settings")
 local target = require("platform.target")
 local historical_settings = require("research.historical_direct_settings")
 
@@ -11,6 +12,7 @@ function M.apply()
     error("MIR reduced settings adapter requires data:extend", 2)
   end
   stage:extend(historical_settings.prototypes(target.id))
+  startup_trace.phase("stage", "end")
 end
 
 return M

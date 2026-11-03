@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-31
+last_reviewed: 2026-11-04
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -63,3 +63,13 @@ Optimizations earn admission with a concrete consumer, invariant, measured benef
 `PERF-06` — Operation counts for a fixed diagnostic input are reproducible; elapsed seconds and peak process memory are not expected to be identical. Never use a profiler or wall clock to decide gameplay work. Keep production and instrumented packages separate in receipts. Apply [Determinism](determinism.md) and test extra unrelated recipes, more selected output, more players/forces and more scheduled entities as different scaling axes.
 
 A bounded collector may need a measured local canonical sort. Report it rather than falsely calling every operation worst-case linear. Direct exact-binding generation remains proportional to consumed definition/reference/output size under expected native table lookup costs. Source line count alone neither proves this bound nor guarantees low latency.
+
+## Startup observability
+
+`PERF-03` and `PERF-06` keep three separate measurements: external process-to-observed-responsive-menu time; the matched MIR-added difference against a valid no-MIR comparator; and native-log elapsed intervals around MIR's own measured work. Scoped intervals can include synchronous engine calls, allocation, garbage collection and scheduling. Downstream engine/other-mod work is not wholly attributable to MIR's Lua regions. Never subtract the native log clock from the actor's Stopwatch clock or infer overhead from an unscored dump/load duration.
+
+The maintainer's 2026-11-03 startup-observability addition permits a small fixed set of ordinary phase checkpoints and opt-in bounded work counters using the existing generation-report option. Keep counters on work already performed: no extra scan for a denominator, per-entry dump, percentage invention, sleep/yield, new settings system or loading-bar simulation. Logging never decides research output, and ordinary/detailed output must remain identical. The engine owns its loading UI; these markers do not promise that it repaints during a Lua call. Runtime profiling stays separate.
+
+Use the retained logs first. Loader-message-to-next-loader/engine-boundary windows are explicitly approximate, can include bookkeeping and do not expose unobserved internal function durations. Sum only non-overlapping scoped intervals; never add whole stages to their nested phases. A missing end is incomplete/unavailable, never zero. Report the longest observed gap within each MIR stage separately from the interval after MIR's final completed stage to the next named engine milestone; neither establishes a deadlock or exclusive CPU cost. Rounded millisecond timestamps do not establish millisecond accuracy or zero work.
+
+Keep each original campaign/package/cache policy and failed or missing endpoint. No retrospective relabelling as current acceptance, repeated historical launch programme or universal hardware predictor. Logging-on/off elapsed overhead remains unmeasured until an applicable native comparison exists; that diagnostic measurement adds no new stable gate and does not replace existing ordinary-package performance acceptance. [Startup diagnostics](../docs/startup-diagnostics.md) documents the bounded reader and retained extraction.

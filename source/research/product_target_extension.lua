@@ -281,7 +281,7 @@ function M.extend(technologies, values, context)
   end
 
   local collector = require("compatibility.product_targets")
-  local result = collector.collect(context.raw.recipe, collector.prepare(rules, {raw=context.raw}))
+  local result = collector.collect(context.raw.recipe, collector.prepare(rules, {raw=context.raw}), context.progress)
   verify_required_targets(result, required_targets)
   for _, row in ipairs(context.native_owner_targets or {}) do
     if row.active then

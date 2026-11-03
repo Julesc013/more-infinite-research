@@ -5,7 +5,7 @@ applies_to: "MIR players and upgrades"
 audience: player
 doc_type: guide
 owner: mir-maintainers
-last_reviewed: 2026-11-03
+last_reviewed: 2026-11-04
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -154,6 +154,8 @@ source_of_truth_for:
 - **Export Diagnostics** or `/mir-diagnostics-export` replaces the latest support report at `script-output/more-infinite-research/mir.log` and exports the full settings profile.
 - In Library **Debug**, **Startup settings** and **Omission reasons** choose the preview/report sections for your player. Omission reasons cover the current authored Availability facts. **Refresh observations** updates the snapshot and **Select text to copy** selects it; neither writes files. **Export Diagnostics** always writes the full settings profile separately, even when its inline report section is unchecked.
 - Attach `factorio-current.log` separately for startup or crash problems; MIR cannot copy the engine log.
+- Startup checkpoints in the engine log identify MIR's settings, construction, recipe targeting, publication and override phases. For a slow-loading investigation, the existing **Debug: generation report** startup option adds at most eight intermediate recipe-count checkpoints and one final count on the existing collection pass. Turn it off again after capturing the problem; the separate recipe-match debug option can produce much more output.
+- These messages do not add a progress bar to Factorio's loading screen or estimate time remaining. `mir.log` remains the latest support snapshot. The [startup diagnostics guide](startup-diagnostics.md) explains the separate timing measurements and offline reader.
 - File-write errors leave gameplay unchanged. A partial export may still leave its already-written settings file.
 
 - Exports stay local and are never uploaded automatically. Review them before sharing: settings metadata can include your player name, and engine logs can include usernames and local paths.

@@ -441,7 +441,7 @@ end
 -- Visit each recipe and product entry once. `recipes` is the current
 -- data-stage recipe map; it is never changed. `context` must be the result of
 -- prepare() for this same data-stage phase.
-function M.collect(recipes, context)
+function M.collect(recipes, context, progress)
   if type(recipes) ~= "table" then error("MIR product targets requires a recipe map", 2) end
   if type(context) ~= "table" or context.schema ~= 1 or type(context.interested) ~= "table" then
     error("MIR product targets requires a prepared context", 2)
@@ -492,6 +492,9 @@ function M.collect(recipes, context)
           targets[#targets + 1] = target
         end
       end
+      if type(progress) == "function" and work.recipes % 4096 == 0 then
+        pcall(progress, work.recipes, work.matches, #targets, false)
+      end
     end
   end
   table.sort(targets, function(left, right)
@@ -507,6 +510,7 @@ function M.collect(recipes, context)
     if rows == nil then rows = {}; by_family[target.family] = rows end
     rows[#rows + 1] = copy_target(target)
   end
+  if type(progress) == "function" then pcall(progress, work.recipes, work.matches, #targets, true) end
   return {schema = 1, targets = targets, by_family = by_family, work = work}
 end
 

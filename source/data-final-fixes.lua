@@ -1,3 +1,5 @@
+local startup_trace = require("startup_diagnostics").start("data-final-fixes")
+startup_trace.phase("settings-and-repairs", "begin")
 -- Preserve the two delivered exact-version loader repairs independently of
 -- research construction. Inactive profiles never import the override body.
 if type(mods) == "table" and type(mods.base) == "string" and mods.base:match("^2%.1%.")
@@ -17,6 +19,8 @@ end
 
 local configuration = require("research.settings")
 local values = configuration.resolve(settings.startup, helpers, log)
+startup_trace.phase("settings-and-repairs", "end")
+startup_trace.phase("catalogue", "begin")
 local productivity = require("research.productivity")
 local generator = require("research.generator")
 
@@ -94,9 +98,12 @@ end
 -- Retain broad product targeting in one relevant recipe pass. This extends
 -- detached authored effects without discovering families or inspecting
 -- foreign research. Existing named routes and weights retain precedence.
+startup_trace.phase("catalogue", "end")
+startup_trace.phase("recipe-targets", "begin")
 local native_owner_targets = modern and modern.native_owner_product_targets(
   modern_selection, data.raw, values, native_owner_patches, mods)
 require("research.product_target_extension").extend(technologies, values, {raw=data.raw, mods=mods, log=log,
+  progress=values.options["mir-debug-generation-report"] == true and startup_trace.progress or nil,
   native_owner_targets=native_owner_targets,
   required_product_targets=modern_selection and modern_selection.required_product_targets,
   additional_product_bindings=modern_selection and modern_selection.additional_product_bindings,
@@ -106,6 +113,8 @@ require("research.product_target_extension").extend(technologies, values, {raw=d
   excluded_product_target_recipes=modern_selection and modern_selection.excluded_product_target_recipes})
 if modern then modern.preflight_collected_native_owner_targets(native_owner_targets, native_owner_patches) end
 local native_adoption_patch = modern and require("research.native_adoption").plan(data.raw, native_owner_targets)
+startup_trace.phase("recipe-targets", "end")
+startup_trace.phase("materials-and-science", "begin")
 
 if modern_selection and modern_selection.bob_angel_f200_combined then
   require("compatibility.modern_catalogue.bob_angel_f200_combined").apply_effect_order(technologies)
@@ -223,12 +232,16 @@ for _, technology in ipairs(technologies) do
   if count > 0 and retained == 0 then technology.enabled = false end
 end
 
+startup_trace.phase("materials-and-science", "end")
+startup_trace.phase("publication", "begin")
 generator.install(technologies, data)
 if modern then
   modern.apply_native_owner_patches(native_owner_patches)
   require("research.native_adoption").apply(native_adoption_patch)
   modern.apply_recipe_patches(modern_selection, data.raw)
 end
+startup_trace.phase("publication", "end")
+startup_trace.phase("overrides", "begin")
 
 -- These independent prototype limits are opt-in. Test effective post-import
 -- values before importing their body, so the normal data stage does not build
@@ -269,3 +282,5 @@ end
 if values.unrestricted_modules == true then
   require("overrides.module_permissions").apply(data.raw, true)
 end
+startup_trace.phase("overrides", "end")
+startup_trace.phase("stage", "end")
