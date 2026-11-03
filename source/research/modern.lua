@@ -307,16 +307,32 @@ local function named_owner_effects(owner, definition, inherited_change)
   end
 end
 
-local function preflight_owner(owner, definition)
+local function preflight_owner(owner, definition, stream)
   local expected = definition.expected
   if type(owner) ~= "table" then owner_error(definition, "missing technology") end
   if owner.enabled ~= expected.enabled then owner_error(definition, "unexpected enabled state") end
   if owner.max_level ~= expected.max_level then owner_error(definition, "unexpected max level") end
   if type(owner.unit) ~= "table" then owner_error(definition, "missing unit") end
-  if owner.unit.count ~= nil or owner.unit.count_formula ~= expected.count_formula then
-    owner_error(definition, "unexpected count formula")
+  local cost_changed = configured(stream, "base_cost") or configured(stream, "linear_increment")
+    or configured(stream, "growth_factor")
+  if cost_changed then
+    -- Replacing a native cost still needs the separately reviewed cost-model
+    -- boundary. Effect/time tuning must not require an untouched cost to have
+    -- Base's literal balance or a formula MIR knows how to replace.
+    if owner.unit.count ~= nil or owner.unit.count_formula ~= expected.count_formula then
+      owner_error(definition, "unexpected count formula")
+    end
+  elseif owner.unit.count ~= nil then
+    if owner.unit.count_formula ~= nil or not finite(owner.unit.count)
+        or owner.unit.count <= 0 or owner.unit.count % 1 ~= 0 then
+      owner_error(definition, "invalid inherited count")
+    end
+  elseif type(owner.unit.count_formula) ~= "string" or not owner.unit.count_formula:find("%S") then
+    owner_error(definition, "missing inherited cost")
   end
-  if owner.unit.time ~= expected.research_time then owner_error(definition, "unexpected research time") end
+  if not finite(owner.unit.time) or owner.unit.time < 0 then
+    owner_error(definition, "invalid inherited research time")
+  end
   named_owner_effects(owner, definition)
 end
 
@@ -370,7 +386,7 @@ function M.preflight_native_owner_patches(selection, raw, values)
     local stream = require_stream(values, definition.family)
     if planned_owner_change(stream, definition) then
       local owner = raw.technology[definition.id]
-      preflight_owner(owner, definition)
+      preflight_owner(owner, definition, stream)
       patches[#patches + 1] = {
         owner = owner,
         unit = owner_unit_plan(owner, definition, stream),
