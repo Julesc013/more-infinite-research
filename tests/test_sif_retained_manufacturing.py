@@ -57,6 +57,57 @@ class SIFRetainedManufacturingTests(unittest.TestCase):
             return self.lua.table_from([self.table(item) for item in value])
         return value
 
+    def test_native_target_composition_preserves_every_hidden_paid_vector(self):
+        self.lua.execute('''
+          local before_raw=clone(raw)
+          local rows,selection,patches=build(raw)
+          local before_rows=clone(rows)
+          local targets=modern.native_owner_product_targets(selection,raw,values,patches,mods)
+          require("research.product_target_extension").extend(rows,values,{
+            raw=raw,mods=mods,native_owner_targets=targets,
+            exact_product_target_families=selection.exact_product_target_families})
+          for index,row in ipairs(rows) do
+            if row.hidden==true then
+              assert(same(row,before_rows[index]),"native collection changed a paid hidden holder")
+            end
+          end
+          assert(same(raw,before_raw),"composition changed upstream input before publication")
+        ''')
+
+    def test_hidden_holders_do_not_withhold_legitimate_uncovered_native_recipe(self):
+        self.lua.execute('''
+          raw.recipe["independent-processing"]={type="recipe",name="independent-processing",
+            category="crafting",enabled=false,allow_productivity=true,
+            ingredients={{type="item",name="plastic-bar",amount=1}},
+            results={{type="item",name="processing-unit",amount=1}}}
+          local before_raw=clone(raw)
+          local rows,selection,patches=build(raw)
+          local before_rows=clone(rows)
+          local targets=modern.native_owner_product_targets(selection,raw,values,patches,mods)
+          require("research.product_target_extension").extend(rows,values,{
+            raw=raw,mods=mods,native_owner_targets=targets,
+            exact_product_target_families=selection.exact_product_target_families})
+          modern.preflight_collected_native_owner_targets(targets,patches)
+          local matched=0
+          for _,patch in ipairs(patches) do
+            if patch.owner.name=="processing-unit-productivity" then
+              for _,effect in ipairs(patch.effects) do
+                if effect.type=="change-recipe-productivity" and effect.recipe=="independent-processing" then
+                  assert(effect.change==.1,"native adoption did not inherit the original change")
+                  matched=matched+1
+                end
+              end
+            end
+          end
+          assert(matched==1,"valid uncovered producer was not adopted exactly once")
+          for index,row in ipairs(rows) do
+            if row.hidden==true then
+              assert(same(row,before_rows[index]),"uncovered producer changed a paid hidden holder")
+            end
+          end
+          assert(same(raw,before_raw),"detached native adoption changed upstream input")
+        ''')
+
     @staticmethod
     def raw_inputs():
         recipes, owners = {}, {}
