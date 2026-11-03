@@ -440,6 +440,11 @@
     },
     {
       "id": "CONT-07",
+      "historical_incident_originals_recovery_r01": {
+        "evidence": "spec/evidence/historical-missing-originals-recovery-aero-r01.json",
+        "scope": "Actual issue/comment/screenshot recovery, unmerged private-index disposition and exact retained-input Secretas continuation host failure; no native completion.",
+        "status": "partial-secretas-correction-and-original-inputs-open"
+      },
       "category": "caps",
       "subject": "Earned-above-cap, queue/progress and foreign disablement",
       "status": "partial",
