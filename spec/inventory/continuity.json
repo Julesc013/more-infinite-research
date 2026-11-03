@@ -16319,6 +16319,57 @@
             "owner": "Aero source-claim/applicability review; Black Glass exact native save/client queue"
           }
         ]
+      },
+      {
+        "subjects": [
+          "CONT-07",
+          "CONT-08",
+          "CONT-11",
+          "CONT-14",
+          "CONT-17",
+          "VER-07"
+        ],
+        "reviewed_against": "f93f7f006cc92519ddde19f0c8239807d9f31820",
+        "scope": "Four deduplicated K2 owned-speed sentinel test/wrapper bodies,26693 bytes,16 live tag/path bindings acrossv4.7.0-v4.7.3. Test-companion protocol intent only;no engine or original native-custody audit.",
+        "evidence": {
+          "path": "spec/evidence/historical-k2-owned-sentinel-intent-aero-r01.json",
+          "sha256": "B6D8592E0D49B0E2991F5AF2B3815537E308590FFFBC130A3F56D64BB1115D89"
+        },
+        "dispositions": [
+          {
+            "disposition": "consolidate",
+            "obligation": "Declared test-owner contribution restores once only under exact known force/target/baseline;unknown aggregate,duplicate capture or later destructive write refuses without masking native state.",
+            "current_controls": [
+              "tests/test_scripted_effects_lifecycle.py",
+              "tests/test_k2se_imersite_carrier_fixture.py"
+            ],
+            "limits": "Historical+.125/.05/.08 are companion inputs,not MIR defaults or a generic foreign-effect repair contract."
+          },
+          {
+            "disposition": "retain",
+            "obligation": "Whole-chunk lexical export and boolean LuaRemote method markers must match real fixture assumptions. Predecessor on_load plus configuration/unsaved ticks is not a physical cold reload;save-pending state precedes the single save request.",
+            "current_controls": [
+              "tests/test_k2_imersite_transition_fixture.py",
+              "tests/test_k2se_imersite_carrier_fixture.py"
+            ],
+            "limits": "Fresh host chunks model distinct load contexts only. Existing direct38C native evidence remains scoped to its original source/profile/save/process identities;this source disposition does not transfer it to final551."
+          },
+          {
+            "disposition": "obsolete-implementation-only",
+            "obligation": "Retain explicit pinned-Lua/provenance/non-native scope through existing tooling;do not restore retired public selector escape,private companion or historical wrapper/runner paths.",
+            "current_implementation": [
+              "tests/Test-MIR5HostControls.ps1",
+              "docs/development.md"
+            ]
+          }
+        ],
+        "remaining_executable_check": "Review affected final consumed inputs for existing finite named routes and use actual protected save/PID/ledger/marker observations. Preserve missing-source and adverse identities;no new campaign or unchanged replay is required by this test-only mapping.",
+        "owner": {
+          "reconciliation": "Aero",
+          "native": "Black Glass"
+        },
+        "native_execution": false,
+        "inventory_complete": false
       }
     ],
     "stable_coverage_review": {
