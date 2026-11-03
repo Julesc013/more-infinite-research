@@ -57,6 +57,8 @@ for _, row in ipairs(DESCRIPTORS) do
 end
 local SIF_RECIPES = next(COLLECTED_BY_MAIN) ~= nil
   and definitions.published_sif_paid_recipe_sets() or nil
+local BETA_BASE_RECIPES = next(COLLECTED_BY_MAIN) ~= nil
+  and require("research.native_credit_contracts").published_beta_base_paid_recipe_sets() or nil
 local pending_active = false
 
 local function close(left, right)
@@ -357,14 +359,23 @@ local function legacy_family_context(event)
   local sif_change = type(changes) == "table" and changes["space-is-fake"]
   local previous_sif = type(sif_change) == "table" and sif_change.old_version == "1.0.60"
     or sif_change == nil and active["space-is-fake"] == "1.0.60"
-  local unchanged = valid and event.mod_startup_settings_changed == false
-    and (old == "4.7.20002" or old == "4.7.20003" or old == "4.7.21002" or old == "4.7.21003")
-  if unchanged then
+  local same_inputs = valid and event.mod_startup_settings_changed == false
+  if same_inputs then
     for name, change in pairs(changes) do
-      if name ~= MIR_MOD and type(change) == "table" and change.old_version ~= change.new_version then unchanged = false end
+      if name ~= MIR_MOD and type(change) == "table" and change.old_version ~= change.new_version then same_inputs = false end
     end
   end
-  return {unchanged=unchanged, sif502=old == "5.0.20002" and previous_sif,
+  local unchanged = same_inputs
+    and (old == "4.7.20002" or old == "4.7.20003" or old == "4.7.21002" or old == "4.7.21003")
+  -- Only the reviewed plain Base closure is admitted here. Other profiles,
+  -- provider changes and startup changes still require their own old mask.
+  local beta_base = same_inputs and type(active.base) == "string" and (
+    active.base:match("^2%.0%.%d+$") and (old == "5.0.20000" or old == "5.0.20001" or old == "5.0.20002")
+    or active.base:match("^2%.1%.%d+$") and (old == "5.0.21000" or old == "5.0.21001" or old == "5.0.21002"))
+  if beta_base then
+    for name in pairs(active) do if name ~= "base" and name ~= MIR_MOD then beta_base = false end end
+  end
+  return {unchanged=unchanged, beta_base=beta_base, sif502=old == "5.0.20002" and previous_sif,
     sif473=unchanged and previous_sif and (old == "4.7.20002" or old == "4.7.20003")}
 end
 
@@ -446,7 +457,7 @@ function M.preflight_family_transition(event, fresh, selected_force)
         end
       end
       local observations = family_observations(force)
-      local complete_sif_checked = false
+      local complete_sif_checked, complete_base_checked = false, false
       for _, observation in ipairs(observations) do
         local descriptor = observation.descriptor
         local key, family = descriptor.key, descriptor.family
@@ -486,6 +497,17 @@ function M.preflight_family_transition(event, fresh, selected_force)
               complete_sif_checked = true
             end
             prior_included = SIF_RECIPES[family][descriptor.recipe] == true
+          elseif context.beta_base and not observation.private then
+            if not complete_base_checked then
+              for old_family, recipes in pairs(BETA_BASE_RECIPES) do
+                if force.technologies[FAMILY_IDS[old_family]] == nil then family_failure("missing published Base paid identity") end
+                for recipe in pairs(recipes) do
+                  if COLLECTED_BY_KEY[old_family .. "\0" .. recipe] == nil then family_failure("missing published Base credit route") end
+                end
+              end
+              complete_base_checked = true
+            end
+            prior_included = BETA_BASE_RECIPES[family][descriptor.recipe] == true
           elseif context.unchanged and not observation.private then prior_included = observation.included
           else family_failure("unknown first paid mask; upgrade once with original mods/startup unchanged and save before changing ownership") end
           payable, pending = prior_included, queued[descriptor.main_id] or 0
