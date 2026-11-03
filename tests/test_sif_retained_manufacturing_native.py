@@ -68,6 +68,7 @@ class RetainedNativeFixtureTests(unittest.TestCase):
             f.technologies["mining-productivity-3"]={name="mining-productivity-3",valid=true,level=3,
               researched=false,enabled=true,saved_progress=0,prerequisites={},prototype={hidden=false}}
             function f.reset_technology_effects()
+              if native_read_only then error("successor reset is forbidden") end
               reset_calls=reset_calls+1
               -- Oppose the observed published source reset/reconciliation:
               -- source R03 captured true despite earlier false assignments.
@@ -81,6 +82,7 @@ class RetainedNativeFixtureTests(unittest.TestCase):
               f.mining_drill_productivity_bonus=(f.technologies["mining-productivity-3"].level-3)*.1
             end
             function f.add_research(name)
+              if native_read_only then error("successor research/queue write is forbidden") end
               local value=f.technologies[name]
               if not value or not value.enabled or (refuse_hidden_queue and value.prototype.hidden) then return false end
               f.research_queue[#f.research_queue+1]=value
@@ -122,6 +124,66 @@ class RetainedNativeFixtureTests(unittest.TestCase):
             script.active_mods["mir-fixture-mir5-sif-retained-manufacturing"]="0.2.0"
           end
         ''')
+        self.lua.execute('''
+          script.event_order="level -> mir-fixture-mir5-sif-retained-manufacturing -> space-is-fake -> more-infinite-research"
+          event_order_calls=0
+          function script.get_event_order() event_order_calls=event_order_calls+1;return script.event_order end
+          local proxies,backing={},{}
+          local function readonly(value)
+            if type(value)~="table" or backing[value] then return value end
+            if proxies[value] then return proxies[value] end
+            local proxy={};proxies[value]=proxy;backing[proxy]=value
+            return setmetatable(proxy,{
+              __index=function(_,key) return readonly(value[key]) end,
+              __newindex=function(_,key,item)
+                if engine_writing then value[key]=item else error("native/source witness write forbidden: "..tostring(key)) end
+              end,
+              __len=function() return #value end,
+              __pairs=function() return function(_,key) local k,v=next(value,key);return k,readonly(v) end,nil,nil end,
+              __ipairs=function() return function(_,index) index=index+1;if value[index]~=nil then return index,readonly(value[index]) end end,nil,0 end})
+          end
+          function guard_force(f)
+            local p=readonly(f);game.forces[f.name],game.forces[f.index]=p,p;return p
+          end
+          function guard_natives()
+            native_read_only=true
+            guard_force(game.forces.player);guard_force(game.forces['mir5-sif-retained-foreign'])
+          end
+          function guard_source_witnesses()
+            local s=storage.mir5_sif_retained_manufacturing
+            s.player=readonly(s.player);s.foreign=readonly(s.foreign)
+          end
+          function guard_all_storage() storage=readonly(storage) end
+          function engine_flags(player,foreign)
+            engine_writing=true
+            game.forces.player.technologies['recipe-prod-research_processing_unit-1'].enabled=player
+            game.forces['mir5-sif-retained-foreign'].technologies['mining-productivity-3'].enabled=foreign
+            engine_writing=false
+          end
+          function run_configuration()
+            callback_phase="configuration";mir_config_seen=false
+            for name in (script.event_order.." -> "):gmatch("(.-) %-> ") do
+              if name=="mir-fixture-mir5-sif-retained-manufacturing" then callbacks.config()
+              elseif name=="more-infinite-research" then
+                if mir_callback then mir_callback() end;mir_config_seen=true
+              end
+            end
+            callback_phase="after-configuration"
+          end
+          local create,save,query=game.create_force,game.server_save,remote.call
+          local function after_config()
+            if script.active_mods['mir-fixture-mir5-sif-retained-manufacturing']=='0.4.0' then
+              assert(callback_phase=="after-configuration" and mir_config_seen,"fresh/API/save before all configuration callbacks")
+            end
+          end
+          game.create_force=function(name) after_config();local f=create(name);return native_read_only and guard_force(f) or f end
+          game.server_save=function(name) after_config();return save(name) end
+          remote.call=function(...) after_config();return query(...) end
+          function observable(value)
+            if type(value)~="table" then return value end
+            local out={};for k,v in pairs(value) do out[k]=observable(v) end;return out
+          end
+        ''')
         self.load_control()
 
     def load_control(self):
@@ -132,7 +194,7 @@ class RetainedNativeFixtureTests(unittest.TestCase):
             if hasattr(value, "items"):
                 return {str(k): plain(v) for k, v in value.items()}
             return value
-        return json.dumps(plain(self.lua.globals().storage), sort_keys=True)
+        return json.dumps(plain(self.lua.globals().observable(self.lua.globals().storage)), sort_keys=True)
 
     def source(self):
         self.lua.execute("callbacks.init(); callbacks.tick()")
@@ -154,6 +216,132 @@ class RetainedNativeFixtureTests(unittest.TestCase):
         self.assertEqual(before, self.storage())
         self.assertEqual(original[:3], [self.lua.eval("#saves"), self.lua.globals().reset_calls,
                                         self.lua.globals().create_calls])
+
+    def entry_setup(self, player, foreign):
+        self.source()
+        self.lua.execute("switch_successor();script.active_mods['mir-fixture-mir5-sif-retained-manufacturing']='0.4.0'")
+        self.load_control()
+        self.lua.execute("guard_natives();guard_source_witnesses()")
+        self.lua.globals().engine_flags(player, foreign)
+
+    def test_entry_boundary_all_boolean_combinations_and_read_only_colds(self):
+        info = json.loads((FIXTURE / "successor-entry-boundary/info.json").read_bytes())
+        self.assertEqual((NAME, "0.4.0"), (info["name"], info["version"]))
+        self.assertEqual(["base >= 2.0.77", "space-age >= 2.0.77"], info["dependencies"])
+        for player in (False, True):
+            for foreign in (False, True):
+                with self.subTest(player=player, foreign=foreign):
+                    self.setUp(); self.entry_setup(player, foreign)
+                    self.lua.execute("run_configuration()")
+                    self.assertEqual(1, self.lua.globals().create_calls)
+                    self.assertEqual(0, self.lua.globals().api_calls)
+                    self.assertEqual(1, self.lua.eval("#saves"))
+                    self.assertFalse(self.lua.eval("storage.mir5_sif_retained_manufacturing.player.technologies['recipe-prod-research_processing_unit-1'].enabled"))
+                    self.assertFalse(self.lua.eval("storage.mir5_sif_retained_manufacturing.foreign.foreign.enabled"))
+                    self.lua.execute("callbacks.tick()")
+                    self.assertEqual(player, self.lua.eval("markers[2].witnesses.entry_boundary.player_processing_enabled"))
+                    self.assertEqual(foreign, self.lua.eval("markers[2].witnesses.entry_boundary.foreign_mining_enabled"))
+                    self.assertEqual(player, self.lua.eval("markers[2].witnesses.entry_boundary.flag_deltas.player_processing.entry"))
+                    self.assertFalse(self.lua.eval("markers[2].witnesses.entry_boundary.flag_deltas.player_processing.source"))
+                    self.assertFalse(self.lua.eval("markers[2].witnesses.entry_boundary.flag_deltas.foreign_mining.source"))
+                    self.assertEqual(5, self.lua.eval("(function() local n=0;for _ in pairs(markers[2].witnesses.entry_boundary.player_prototypes) do n=n+1 end;return n end)()"))
+                    self.assertEqual(2, self.lua.globals().create_calls)
+                    self.lua.execute("guard_all_storage()")
+                    self.cold(); self.cold()
+                    self.assertEqual(1, self.lua.globals().event_order_calls)
+                    self.assertEqual(2, self.lua.globals().reset_calls)
+
+    def test_source_complete_entry_rejects_preexisting_baseline_without_recapture(self):
+        self.entry_setup(True, False)
+        self.lua.execute("""
+          assert(storage.mir5_sif_retained_manufacturing.phase=="source-complete")
+          storage.mir5_sif_retained_manufacturing.entry_boundary={
+            player_processing_enabled=false,foreign_mining_enabled=true,
+            event_order=script.event_order,original_marker="must remain untouched"}
+        """)
+        before = self.storage()
+        counts = self.lua.eval("{#saves,reset_calls,create_calls,api_calls,event_order_calls}")
+        original = [counts[n] for n in range(1, 6)]
+        with self.assertRaisesRegex(LuaError, "entry boundary already captured"):
+            self.lua.execute("run_configuration()")
+        self.assertEqual(before, self.storage())
+        self.assertEqual(original, [self.lua.eval("#saves"), self.lua.globals().reset_calls,
+                                    self.lua.globals().create_calls, self.lua.globals().api_calls,
+                                    self.lua.globals().event_order_calls])
+
+    def test_entry_boundary_refuses_each_post_entry_flag_flip(self):
+        for player in (False, True):
+            for foreign in (False, True):
+                for which in ("player", "foreign"):
+                    with self.subTest(player=player, foreign=foreign, which=which):
+                        self.setUp(); self.entry_setup(player, foreign)
+                        self.lua.execute("run_configuration()")
+                        self.lua.globals().engine_flags(not player if which == "player" else player,
+                                                        not foreign if which == "foreign" else foreign)
+                        before = self.storage()
+                        with self.assertRaises(LuaError): self.lua.execute("callbacks.tick()")
+                        self.assertEqual(before, self.storage())
+                        self.assertEqual(1, self.lua.globals().create_calls)
+                        self.assertEqual(1, self.lua.eval("#saves"))
+
+    def test_entry_boundary_refuses_bad_event_order_and_phase(self):
+        for order in (None, "", "level -> more-infinite-research", "level -> more-infinite-research -> mir-fixture-mir5-sif-retained-manufacturing", "level -> mir-fixture-mir5-sif-retained-manufacturing -> missing -> more-infinite-research", "level -> mir-fixture-mir5-sif-retained-manufacturing -> mir-fixture-mir5-sif-retained-manufacturing -> more-infinite-research"):
+            with self.subTest(order=order):
+                self.setUp(); self.entry_setup(False, False)
+                self.lua.globals().script.event_order = order
+                before = self.storage()
+                with self.assertRaises(LuaError): self.lua.execute("callbacks.config()")
+                self.assertEqual(before, self.storage())
+                self.assertEqual(1, self.lua.globals().create_calls)
+        self.setUp(); self.entry_setup(False, False)
+        self.lua.execute("storage.mir5_sif_retained_manufacturing.phase='wrong'")
+        with self.assertRaises(LuaError): self.lua.execute("callbacks.config()")
+
+    def test_entry_boundary_rejects_pre_mir_nonflag_drift_and_recapture(self):
+        mutations = [
+            "game.forces.player.technologies['recipe-prod-research_steel-1']=nil",
+            "game.forces.player.technologies['recipe-prod-research_steel-1'].level=7",
+            "game.forces.player.technologies['recipe-prod-research_rocket_fuel-1'].saved_progress=.41",
+            "game.forces.player.recipes['plastic-bar'].productivity_bonus=.3",
+            "game.forces.player.research_progress=.43",
+            "game.forces.player.research_queue[1]=game.forces.player.research_queue[2]",
+            "game.forces.player.technologies['recipe-prod-research_steel-1'].prototype.effects[1].change=.2",
+            "game.forces['mir5-sif-retained-foreign'].technologies['mining-productivity-3'].saved_progress=.28",
+        ]
+        for mutation in mutations:
+            with self.subTest(mutation=mutation):
+                self.setUp(); self.entry_setup(True, True)
+                self.lua.execute("engine_writing=true;" + mutation + ";engine_writing=false")
+                before = self.storage()
+                with self.assertRaises(LuaError): self.lua.execute("callbacks.config()")
+                self.assertEqual(before, self.storage())
+                self.assertEqual(1, self.lua.globals().create_calls)
+                self.assertEqual(0, self.lua.globals().api_calls)
+                self.assertEqual(1, self.lua.eval("#saves"))
+        self.setUp(); self.entry_setup(True, False); self.lua.execute("run_configuration()")
+        before = self.storage()
+        with self.assertRaises(LuaError): self.lua.execute("callbacks.config()")
+        self.assertEqual(before, self.storage())
+        self.assertEqual(1, self.lua.globals().create_calls)
+
+    def test_entry_boundary_other_mutations_refused(self):
+        mutations = [
+            "game.forces.player.technologies['recipe-prod-research_steel-1']=nil",
+            "game.forces.player.technologies['recipe-prod-research_steel-1'].level=7",
+            "game.forces.player.technologies['recipe-prod-research_rocket_fuel-1'].saved_progress=.41",
+            "game.forces.player.recipes['plastic-bar'].productivity_bonus=.3",
+            "game.forces.player.research_progress=.43",
+            "game.forces.player.research_queue[1]=game.forces.player.research_queue[2]",
+            "game.forces['mir5-sif-retained-foreign'].technologies['mining-productivity-3'].saved_progress=.28",
+        ]
+        for mutation in mutations:
+            with self.subTest(mutation=mutation):
+                self.setUp(); self.entry_setup(True, True); self.lua.execute("run_configuration()")
+                self.lua.execute("engine_writing=true;" + mutation + ";engine_writing=false")
+                before = self.storage()
+                with self.assertRaises(LuaError): self.lua.execute("callbacks.tick()")
+                self.assertEqual(before, self.storage())
+                self.assertEqual(1, self.lua.globals().create_calls)
 
     def test_independent_contract_roles_and_exact_profiles(self):
         contract = self.lua.eval('require("contract")')
