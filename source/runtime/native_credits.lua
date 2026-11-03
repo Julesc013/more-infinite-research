@@ -468,7 +468,13 @@ function M.preflight_family_transition(event, fresh, selected_force)
           prior_included, payable, pending = false, false, 0
         else
           if not fresh and observation.offset ~= 0 then family_failure("first baseline has unproven native credit") end
-          if fresh or observation.completed == 0 then prior_included = observation.included
+          local main = force.technologies[descriptor.main_id]
+          local invested_private = observation.private and ((queued[descriptor.main_id] or 0) > 0
+            or type(main.saved_progress) == "number" and main.saved_progress > 0)
+          -- Zero earned levels do not prove the absence of original queued or
+          -- detached work. Known source contracts must resolve that old mask;
+          -- an unknown first investment cannot baseline from the new output.
+          if fresh or observation.completed == 0 and not invested_private then prior_included = observation.included
           elseif context.sif502 or context.sif473 and observation.private then
             if not complete_sif_checked then
               for old_family, recipes in pairs(SIF_RECIPES) do
