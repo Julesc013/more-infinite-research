@@ -1,9 +1,9 @@
-"""MIG-01 data-boundary counterexamples for the unfinished fallback draft.
+"""MIG-01 controls for the recovered fallback data-boundary failures.
 
 These expose identity/startup gaps before native earned/partial/queue tests.
 They do not emulate engine persistence or prescribe a credit implementation.
-The known failures deliberately remain outside the accepted host plan until
-the complete state policy is implemented and independently reviewed.
+Original red receipts remain preserved. These are host boundary controls,
+not engine persistence, pending-work or release-acceptance evidence.
 """
 import argparse
 from pathlib import Path

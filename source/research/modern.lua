@@ -245,6 +245,11 @@ function M.technologies(selection, values)
     retained.hidden = true
     out[#out + 1] = retained
   end
+  for _, definition in ipairs(selection.native_paid or {}) do
+    local retained = M.technology(definition, values)
+    retained.hidden, retained.effects = true, {}
+    out[#out + 1] = retained
+  end
   if selection.k2_imersite then
     local staged = k2_imersite_technologies(values)
     for index = 1, #staged do out[#out + 1] = staged[index] end

@@ -129,6 +129,7 @@ local translation_maintenance_callback
 local reconcile_translations
 local reconcile_library_events
 local library_events_scheduled
+local credit_events_scheduled
 local library_refresh_scheduled
 local browser_families = {all = true, external = true, mir = true}
 for _, declaration in ipairs(catalogue.declared()) do
@@ -353,14 +354,18 @@ local function on_configuration_changed(event)
   -- The first published-MIR4 preference transition has no durable old setting.
   -- This preflight must run before any lifecycle reconciler can write a level,
   -- ownership record, queue state, or disablement flag.
+  local family_credit_plan
   if native_credits then
     native_credits.preflight_legacy_preference_transition(event, relevant_competing_provider_transition(event))
+    if native_credits.preflight_family_transition then
+      family_credit_plan = native_credits.preflight_family_transition(event)
+    end
   end
   local module_credit_plan = legacy_module_credits and legacy_module_credits.preflight(event)
   local cannon_credit_plan = legacy_cannon_credits and legacy_cannon_credits.preflight(event)
   reconcile_imersite()
   lifecycle.on_configuration_changed(event)
-  if native_credits then native_credits.on_configuration_changed(event) end
+  if native_credits then native_credits.on_configuration_changed(event, family_credit_plan) end
   if competing_productivity then
     competing_productivity.on_configuration_changed(event)
   else
@@ -487,6 +492,8 @@ local function request_library_refresh(event)
 end
 
 local function on_research_finished(event)
+  if native_credits and native_credits.on_research_finished
+      and native_credits.on_research_finished(event) then reconcile_library_events() end
   if lifecycle.caps_active() then lifecycle.on_research_finished(event) end
   if competing_productivity then competing_productivity.on_research_finished(event) end
   if scripted_effects then scripted_effects.on_research_finished(event) end
@@ -517,6 +524,8 @@ local function on_research_started(event)
 end
 
 local function on_research_cancelled(event)
+  if native_credits and native_credits.on_research_cancelled
+      and native_credits.on_research_cancelled(event) then reconcile_library_events() end
   if lifecycle.caps_active() then lifecycle.on_research_cancelled(event) end
   if competing_productivity then competing_productivity.on_research_cancelled(event) end
   request_library_refresh(event)
@@ -534,6 +543,7 @@ local function on_force_created(event)
   lifecycle.on_force_created(event)
   if competing_productivity then competing_productivity.on_force_created(event) end
   if scripted_effects then scripted_effects.on_force_created(event) end
+  reconcile_library_events()
   request_library_refresh(event)
 end
 
@@ -543,6 +553,7 @@ local function on_force_reset(event)
   lifecycle.on_force_reset(event)
   if competing_productivity then competing_productivity.on_force_reset(event) end
   if scripted_effects then scripted_effects.on_force_reset(event) end
+  reconcile_library_events()
   request_library_refresh(event)
 end
 
@@ -566,6 +577,7 @@ local function on_forces_merged(event)
   if legacy_cannon_credits and event and event.destination then
     legacy_cannon_credits.on_technology_effects_reset({force=event.destination})
   end
+  reconcile_library_events()
   request_library_refresh(event)
 end
 
@@ -582,8 +594,11 @@ local function on_discovery_setting_changed(event)
 end
 
 local function bind_runtime_events(library_open)
-  if library_events_scheduled == library_open then return end
+  local credit_pending = native_credits and native_credits.needs_research_events
+    and native_credits.needs_research_events() or false
+  if library_events_scheduled == library_open and credit_events_scheduled == credit_pending then return end
   library_events_scheduled = library_open
+  credit_events_scheduled = credit_pending
   local events = defines and defines.events or {}
   local competing_active = competing_productivity and competing_productivity.active()
   local force_lifecycle_active = lifecycle.caps_active()
@@ -610,11 +625,11 @@ local function bind_runtime_events(library_open)
     script.on_event(events.on_research_started, active and on_research_started or nil)
   end
   if events.on_research_cancelled then
-    local active = lifecycle.caps_active() or competing_active or library_open
+    local active = lifecycle.caps_active() or competing_active or library_open or credit_pending
     script.on_event(events.on_research_cancelled, active and on_research_cancelled or nil)
   end
   if events.on_research_finished then
-    local active = lifecycle.caps_active() or competing_active or (scripted_effects and scripted_effects.events_active()) or library_open
+    local active = lifecycle.caps_active() or competing_active or (scripted_effects and scripted_effects.events_active()) or library_open or credit_pending
     script.on_event(events.on_research_finished, active and on_research_finished or nil)
   end
   if events.on_research_reversed then
@@ -679,6 +694,7 @@ function M.register()
   schedule_repair(false)
   schedule_translations(false)
   library_events_scheduled = nil
+  credit_events_scheduled = nil
   bind_runtime_events(false)
   script.on_nth_tick(library.native_refresh_ticks, nil)
   library_refresh_scheduled = false

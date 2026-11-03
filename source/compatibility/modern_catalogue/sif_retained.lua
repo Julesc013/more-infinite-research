@@ -22,6 +22,18 @@ local CONTRACTS = {
   }},
 }
 
+-- The exact published five-identity source is also the authority for its
+-- first native-credit baseline. Return names only, never prototype mutations.
+function M.paid_recipe_sets()
+  local out = {}
+  for _, contract in ipairs(CONTRACTS) do
+    local recipes = {}
+    for _, route in ipairs(contract.recipes) do recipes[route[1]] = true end
+    out[contract.key] = recipes
+  end
+  return out
+end
+
 local function copy(value)
   if type(value) ~= "table" then return value end
   local out = {}

@@ -1007,12 +1007,26 @@ function M.select(active_mods, raw, withheld)
     sif_retained = require("compatibility.modern_catalogue.sif_retained").select(BASE.definitions, definitions)
     for _, definition in ipairs(sif_retained) do exact_product_target_families[definition.family] = true end
   end
+  -- Keep the five historical MIR identities even when ordinary Space Age
+  -- adoption owns all new earning. Empty private vectors are accounted for
+  -- by per-force recipe credits; they must not guess a previous paid mask.
+  local native_paid, present, all_native = {}, {}, {}
+  for _, definition in ipairs(definitions) do present[definition.family] = true end
+  for _, definition in ipairs(sif_retained or {}) do present[definition.family] = true end
+  if active_space_age(active_mods) then
+    for _, binding in ipairs(require("compatibility.product_bindings").native_owner_bindings) do
+      all_native[binding.owner] = {family=binding.family, generated=false}
+    end
+    for _, fallback in ipairs(M.native_owner_fallbacks(active_mods, all_native)) do
+      if not present[fallback.definition.family] then native_paid[#native_paid + 1] = fallback.definition end
+    end
+  end
   local bob_tech_materials = not bob_angel_f210 and require("compatibility.bob_tech_profile").applies(active_mods)
   return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods, raw),
     bob_tech_progression = not bob_angel_f210 and target.id == "f210" and type(active_mods) == "table" and active_mods.bobtech ~= nil
       and require("compatibility.modern_catalogue.bob_tech_progression").select(active_mods) or nil,
     native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
-    k2_imersite = k2so and k2so.imersite or false, sif_retained = sif_retained,
+    k2_imersite = k2so and k2so.imersite or false, sif_retained = sif_retained, native_paid = native_paid,
     k2_imersite_carriers = target.id == "f210" and k2_base,
     bob_angel = bob_angel, bob_angel_f200_combined = bob_angel_f200_combined,
     bob_core = bob_core, bob_plates_profile = bob_plates,

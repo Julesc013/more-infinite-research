@@ -215,6 +215,16 @@ function M.extend(technologies, values, context)
       count = count + 1
     end
   end
+  -- A disabled/private family still needs a complete current recipient set
+  -- for paid-state continuity. Reuse this recipe pass without granting that
+  -- family a new public effect or native-owner mutation.
+  local credit_only = {}
+  for family in pairs(context.native_credit_targets or {}) do
+    if selected[family] == nil then
+      selected[family], streams[family], credit_only[family] = {effects={}}, values.streams[family], true
+      count = count + 1
+    end
+  end
   for family in pairs(replacement_families) do
     local technology = selected[family]
     if technology and not native_selected[family] then
@@ -247,6 +257,7 @@ function M.extend(technologies, values, context)
   local function admit(rows, exact, native, fallback)
     for _, row in ipairs(rows) do
       if selected[row.family] and (native == true) == (native_selected[row.family] == true)
+        and not credit_only[row.family]
         and (fallback == true) == (fallback_families[row.family] == true)
         and (exact or not exact_families[row.family]) and (not row.structural_fallback
         or automatic) then
@@ -258,6 +269,9 @@ function M.extend(technologies, values, context)
   if context.mods and context.mods["space-age"] then admit(bindings.space_age.bindings) end
   admit(bindings.native_owner_bindings, true, true)
   admit(bindings.native_owner_bindings, true, false, true)
+  for _, binding in ipairs(bindings.native_owner_bindings) do
+    if credit_only[binding.family] then rules[#rules + 1] = binding end
+  end
   local lab_count, input_count = 0, 0
   if selected.research_science_pack_productivity and not exact_families.research_science_pack_productivity then
     local rule
@@ -370,9 +384,13 @@ function M.extend(technologies, values, context)
     end
     local added = false
     for _, row in ipairs(rows) do
+      local credit = context.native_credit_targets and context.native_credit_targets[family]
+      if credit then credit[row.recipe] = streams[family].effect_percent * row.weight / 100 end
       local key
       if write then key = family .. "\0" .. row.recipe .. "\0" .. row.product_type .. "\0" .. row.product_name end
-      if native_claims[row.recipe] ~= nil and (native_claims[row.recipe] ~= family or fallback_families[family]) then
+      if credit_only[family] then
+        if write then dispositions[key] = "private-paid-metadata" end
+      elseif native_claims[row.recipe] ~= nil and (native_claims[row.recipe] ~= family or fallback_families[family]) then
         if write then dispositions[key] = "retained-native-owner" end
       elseif excluded_recipes[family] and excluded_recipes[family][row.recipe] then
         if write then dispositions[key] = "withheld" end
