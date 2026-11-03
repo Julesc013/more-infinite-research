@@ -1830,6 +1830,10 @@ class GeneratorTests(unittest.TestCase):
           package.preload["research.scripted_effects"] = function()
             error("base data stage loaded a Space Age technology body")
           end
+          package.loaded["compatibility.modern_catalogue.sif_retained"] = nil
+          package.preload["compatibility.modern_catalogue.sif_retained"] = function()
+            error("base data stage loaded the inactive SIF adapter")
+          end
           package.loaded["overrides.prototype_limits"] = nil
           package.preload["overrides.prototype_limits"] = function()
             error("default data stage loaded prototype limits")
@@ -1837,11 +1841,13 @@ class GeneratorTests(unittest.TestCase):
           local ok, message = pcall(dofile, data_final_path)
           package.preload["compatibility.space_age_scripted_effects"] = nil
           package.preload["research.scripted_effects"] = nil
+          package.preload["compatibility.modern_catalogue.sif_retained"] = nil
           package.preload["overrides.prototype_limits"] = nil
           assert(ok, message)
           assert(environment.writes == 1 and #environment.emitted == 78+10)
           assert(package.loaded["compatibility.space_age_scripted_effects"] == nil)
           assert(package.loaded["research.scripted_effects"] == nil)
+          assert(package.loaded["compatibility.modern_catalogue.sif_retained"] == nil)
           assert(package.loaded["overrides.prototype_limits"] == nil)
         ''')
 

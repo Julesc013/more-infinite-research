@@ -301,6 +301,70 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
           end
         ''')
 
+    def test_empty_first_paid_group_cannot_invent_a_complete_old_mask(self):
+        self.lua.execute(r'''
+          local family,id="research_steel","recipe-prod-research_steel-1"
+          local original=GROUPS
+          for _,kind in ipairs({"earned","queued","detached-partial"}) do
+            storage={};game.forces={};GROUPS=original;reload_credits()
+            local force=make_collected_force(1,kind=="earned" and 8 or 1,{},true)
+            local main=force.technologies[id]
+            if kind=="queued" then force.research_queue={main};force.current_research=main
+            elseif kind=="detached-partial" then main.saved_progress=.27 end
+            GROUPS={[family]={}};reload_credits()
+            local ok,message=pcall(native_credits.on_configuration_changed,{mod_startup_settings_changed=true,
+              mod_changes={["more-infinite-research"]={old_version="4.7.21003",new_version="5.0.21003"}}})
+            assert(not ok and tostring(message):find("native family",1,true),"empty first group fabricated "..kind.." mask")
+            assert(storage.mir_native_credits==nil,"empty-group refusal wrote a baseline")
+            for _,state in pairs(force._states) do assert(state.writes.level==0 and state.writes.enabled==0) end
+          end
+        ''')
+
+    def test_empty_group_still_requires_the_named_main_and_its_creation_history(self):
+        self.lua.execute(r'''
+          local family,id="research_steel","recipe-prod-research_steel-1"
+          local force=make_collected_force(1,1,{},true)
+          GROUPS={[family]={}};foreign_creation=id
+          local ok,message=pcall(reload_credits)
+          assert(not ok and tostring(message):find("creation custody",1,true),"empty group bypassed main custody")
+          foreign_creation=nil;reload_credits();force.technologies[id]=nil
+          ok,message=pcall(native_credits.on_configuration_changed,{})
+          assert(not ok and tostring(message):find("native family",1,true),"empty group ignored a missing main")
+          assert(storage.mir_native_credits==nil)
+        ''')
+
+    def test_credit_parse_does_not_import_the_inactive_sif_adapter(self):
+        self.lua.execute(r'''
+          local name="compatibility.modern_catalogue.sif_retained"
+          package.loaded[name]=nil;package.preload[name]=function()error("inactive SIF adapter imported")end
+          reload_credits()
+          assert(package.loaded[name]==nil)
+          local definitions=require("research.native_credit_definitions")
+          local first=definitions.published_sif_contracts()
+          first[1].recipes[1][1]="tampered"
+          assert(definitions.published_sif_contracts()[1].recipes[1][1]=="casting-low-density-structure")
+          local sets=definitions.published_sif_paid_recipe_sets();sets.research_steel["steel-plate"]=nil
+          assert(definitions.published_sif_paid_recipe_sets().research_steel["steel-plate"])
+        ''')
+
+    def test_configuration_counts_the_native_queue_once_per_force_not_per_recipe(self):
+        self.lua.execute(r'''
+          local family,id="research_steel","recipe-prod-research_steel-1"
+          local force=make_collected_force(1,8,{[key(family,"alternate-steel")]=true})
+          local main=force.technologies[id]
+          native_credits.on_init()
+          local scans=0
+          force.research_queue=setmetatable({main,main,force.technologies.foreign},{__ipairs=function(values)
+            scans=scans+1
+            return function(rows,index)index=index+1;if rows[index] then return index,rows[index] end end,values,0
+          end})
+          force.current_research=main;set_mask(force,{},true)
+          native_credits.on_configuration_changed()
+          assert(scans==1,"native queue was scanned once for every recipe")
+          assert(record(force,family,"alternate-steel").pending==2)
+          no_foreign_write(force)
+        ''')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)

@@ -67,7 +67,7 @@ class SecretasContinuationTests(unittest.TestCase):
           local startup={}
           for _,spec in ipairs(config.prototypes()) do startup[spec.name]={value=spec.default_value} end
           for name,value in pairs(selected_changes) do startup[name].value=value end
-          settings,data,helpers,log={startup=startup},full_world(mods),nil,function() end
+          settings,data,helpers,log={startup=startup},full_world(mods,true),nil,function() end
           for name,row in pairs(finite_rows) do data.raw.technology[name]=row end
           data.raw.tool["golden-science-pack"]={}
           data.raw.lab.fixture.inputs[#data.raw.lab.fixture.inputs+1]="golden-science-pack"

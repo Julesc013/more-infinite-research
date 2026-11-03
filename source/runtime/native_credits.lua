@@ -1,6 +1,6 @@
 -- Bounded reconciliation for the explicit native-credit carrier pairs.
 --
--- The descriptor list is the sole authority for rows this module reads or
+-- The five-family and descriptor declarations own the rows this module reads or
 -- writes.  It intentionally does not inspect recipe bonuses, reset technology
 -- effects. Native levels carry signed credit. Only previously queued private
 -- manufacturing work needs a temporary completion/cancellation subscription.
@@ -29,27 +29,34 @@ local FAMILY_IDS = {
   research_plastic="recipe-prod-research_plastic-1", research_processing_unit="recipe-prod-research_processing_unit-1",
   research_rocket_fuel="recipe-prod-research_rocket_fuel-1", research_steel="recipe-prod-research_steel-1",
 }
+local function require_creation_history(name)
+  if history_seen[name] then return end
+  if not prototypes or type(prototypes.get_history) ~= "function" then
+    error("MIR native family credit requires prototype creation history", 2)
+  end
+  local history = prototypes.get_history("technology", name)
+  if type(history) ~= "table" or history.created ~= MIR_MOD then
+    error("MIR native family credit requires MIR creation custody for " .. name, 2)
+  end
+  history_seen[name] = true
+end
+for family in pairs(groups or {}) do
+  local name = FAMILY_IDS[family]
+  COLLECTED_BY_MAIN[name] = {}
+  require_creation_history(name)
+end
 for _, row in ipairs(DESCRIPTORS) do
   if row.collected then
     COLLECTED_BY_KEY[row.key] = row
     COLLECTED_BY_MAIN[row.main_id] = COLLECTED_BY_MAIN[row.main_id] or {}
     COLLECTED_BY_MAIN[row.main_id][#COLLECTED_BY_MAIN[row.main_id] + 1] = row
-    if not prototypes or type(prototypes.get_history) ~= "function" then
-      error("MIR native family credit requires prototype creation history", 2)
-    end
     for _, name in ipairs({row.main_id, row.positive_id, row.negative_id}) do
-      if not history_seen[name] then
-        local history = prototypes.get_history("technology", name)
-        if type(history) ~= "table" or history.created ~= MIR_MOD then
-          error("MIR native family credit requires MIR creation custody for " .. name, 2)
-        end
-        history_seen[name] = true
-      end
+      require_creation_history(name)
     end
   end
 end
 local SIF_RECIPES = next(COLLECTED_BY_MAIN) ~= nil
-  and require("compatibility.modern_catalogue.sif_retained").paid_recipe_sets() or nil
+  and definitions.published_sif_paid_recipe_sets() or nil
 local pending_active = false
 
 local function close(left, right)
@@ -307,13 +314,15 @@ local function family_failure(message)
   error("MIR native family credit: " .. message, 3)
 end
 
-local function queued_count(force, name)
-  local count = 0
+local function queued_counts(force)
+  local counts = {}
   for _, technology in ipairs(force.research_queue or {}) do
-    if technology.name == name then count = count + 1 end
+    local name = technology.name
+    if COLLECTED_BY_MAIN[name] ~= nil then counts[name] = (counts[name] or 0) + 1 end
   end
-  if count == 0 and force.current_research and force.current_research.name == name then count = 1 end
-  return count
+  local current = force.current_research
+  if current and COLLECTED_BY_MAIN[current.name] ~= nil and counts[current.name] == nil then counts[current.name] = 1 end
+  return counts
 end
 
 local function family_histories(current, index)
@@ -394,6 +403,23 @@ function M.preflight_family_transition(event, fresh, selected_force)
       local records = not fresh and current and current.forces[force.index] or {}
       validate_records(records)
       local histories = family_histories(not fresh and current or nil, force.index)
+      local queued = queued_counts(force)
+      for family, recipes in pairs(groups or {}) do
+        if #recipes == 0 then
+          local id = FAMILY_IDS[family]
+          local main = force.technologies and force.technologies[id]
+          local prototype = main and main.prototype
+          local completed = completed_infinite(main)
+          if main == nil or main.name ~= id or prototype == nil or prototype.name ~= id
+              or prototype.level ~= 1 or prototype.max_level ~= UINT32_MAX or completed == nil then
+            family_failure("empty family has an absent or invalid named main")
+          end
+          if not fresh and histories[family] == nil and (completed > 0 or (queued[id] or 0) > 0
+              or type(main.saved_progress) == "number" and main.saved_progress > 0) then
+            family_failure("empty first family has unproven paid or invested work; restore previous inputs and original save")
+          end
+        end
+      end
       local plan = {force=force, rows={}, retire={}, histories={}}
       for family in pairs(groups or {}) do plan.histories[family] = {schema=1, recipes={}} end
       for family, history in pairs(histories) do
@@ -434,8 +460,8 @@ function M.preflight_family_transition(event, fresh, selected_force)
           prior_included = record.included
           payable = record.included
           if record.private and record.pending > 0 then payable = record.payable end
-          pending = record.private and math.min(record.pending, queued_count(force, descriptor.main_id))
-            or queued_count(force, descriptor.main_id)
+          pending = record.private and math.min(record.pending, queued[descriptor.main_id] or 0)
+            or (queued[descriptor.main_id] or 0)
         elseif history then
           if history.recipes[descriptor.recipe] then family_failure("missing record in complete previous mask") end
           if observation.offset ~= 0 then family_failure("new recipe has unproven native credit") end
@@ -456,7 +482,7 @@ function M.preflight_family_transition(event, fresh, selected_force)
             prior_included = SIF_RECIPES[family][descriptor.recipe] == true
           elseif context.unchanged and not observation.private then prior_included = observation.included
           else family_failure("unknown first paid mask; upgrade once with original mods/startup unchanged and save before changing ownership") end
-          payable, pending = prior_included, queued_count(force, descriptor.main_id)
+          payable, pending = prior_included, queued[descriptor.main_id] or 0
         end
         local offset = observation.offset + ((prior_included and 1 or 0) - (observation.included and 1 or 0)) * observation.completed
         if not integer(offset) or math.abs(offset) >= UINT32_MAX then family_failure("credit exceeds native level range") end
