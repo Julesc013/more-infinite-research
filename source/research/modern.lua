@@ -95,6 +95,10 @@ end
 
 function M.technology(definition, values)
   local stream = require_stream(values, definition.family)
+  local time = stream.research_time
+  -- Zero inherits a native owner's time. This separate MIR identity keeps
+  -- its authored default rather than publishing that sentinel to Factorio.
+  if time == 0 then time = definition.tuning and definition.tuning.research_time end
   local output = {
     type = "technology", name = "recipe-prod-" .. definition.key .. "-1",
     icons = icons(definition), localised_name = copy(definition.localised_name),
@@ -103,7 +107,7 @@ function M.technology(definition, values)
     prerequisites = generated_prerequisites(definition), effects = normal_effects(definition, stream, values.options),
     unit = {
       count_formula = productivity.cost(stream.base_cost, stream.linear_increment, stream.growth_factor),
-      time = stream.research_time, ingredients = catalogue.science_ingredients(definition.science)
+      time = time, ingredients = catalogue.science_ingredients(definition.science)
     }
   }
   if stream.enabled == false or definition.available == false then output.enabled = false end

@@ -15,6 +15,11 @@ MODS = {"base": "2.1.23", "space-age": "2.1.23"}
 
 
 class NativeOwnerCapAdoptionTests(unittest.TestCase):
+    @staticmethod
+    def emitted_mir_technologies(case):
+        return {row["name"]: row for row in data_fixture.plain(case.lua.globals().data.emitted)
+                if row["type"] == "technology"}
+
     @classmethod
     def setUpClass(cls):
         data_fixture.LuaRuntime, data_fixture.LuaError = LuaRuntime, LuaError
@@ -37,16 +42,13 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
         case.pipeline()
         # Runtime consumes the same MIR-created paid mains and signed holders
         # emitted by the real preceding stage, not only the foreign owners.
-        self.emitted_mir_rows = {
-            row["name"]: row for row in data_fixture.plain(case.lua.globals().data.emitted)
-            if row["type"] == "technology"
-        }
+        self.emitted_mir_rows = self.emitted_mir_technologies(case)
         group = case.lua.globals().data.raw["mod-data"]
         record = group[MOD_DATA] if group is not None else None
         metadata = data_fixture.plain(record.data) if record is not None else {"schema": 1, "owners": {}}
         return before, case.owner_rows(), metadata
 
-    def runtime(self, owners, metadata, *, enabled=True):
+    def runtime(self, owners, metadata, *, enabled=True, emitted_mir_rows=None):
         lifecycle_fixture.LuaRuntime = LuaRuntime
         harness = lifecycle_fixture.LifecycleTests()
         harness.setUp()
@@ -58,7 +60,8 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
             technology.prototype = data_fixture.generator_fixture.lua_table(lua, {
                 "effects": row["effects"], "max_level": 4294967295, "enabled": True})
             technologies[name] = technology
-        for name, row in self.emitted_mir_rows.items():
+        emitted = self.emitted_mir_rows if emitted_mir_rows is None else emitted_mir_rows
+        for name, row in emitted.items():
             self.assertIsNone(technologies[name], "MIR transport collided with a foreign owner")
             prototype = deepcopy(row)
             prototype.setdefault("level", 1)
@@ -67,7 +70,7 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
             technology.prototype = data_fixture.generator_fixture.lua_table(lua, prototype)
             technologies[name] = technology
         lua.globals().mir_created = data_fixture.generator_fixture.lua_table(lua, {
-            name: True for name in self.emitted_mir_rows})
+            name: True for name in emitted})
         lua.execute('''
           function native_history(kind,name)
             assert(kind=="technology" and mir_created[name],"unexpected creation-history query")
