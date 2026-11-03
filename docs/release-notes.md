@@ -1,23 +1,25 @@
 ---
-title: "MIR 5.0.1 beta release notes"
-status: current
-applies_to: "MIR 5.0.1 GitHub prerelease"
+title: "MIR 5.0.2 beta release notes"
+status: draft
+applies_to: "MIR 5.0.2 GitHub prerelease"
 audience: player
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-02
+last_reviewed: 2026-11-03
 supersedes: []
 superseded_by: []
 source_of_truth_for:
-  - mir-501-release-note-draft
+  - mir-502-release-note-draft
 ---
 
-- **MIR 5.0.1 beta:** startup compatibility fixes and the restored Research Library layout. GitHub prerelease; not a stable release.
-- **Startup fixes:** avoid failures with compatible Ironclad mortar-speed changes, Krastorio 2: Spaced Out patch updates within the reviewed major/minor version lines, and train-braking research already provided by another mod.
-- **Research Library:** restore side-by-side research and details at normal widths, a readable narrow layout, size/reset controls, retained window position, localized names and details, and responsive search and filters.
-- **Performance:** the startup comparisons in the [MIR 5.0.0 beta notes](https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.0) describe that release only. No new startup, large-factory, or memory measurements are claimed for 5.0.1.
-- **Beta limits:** full in-game Library input, saved-view lifecycle, and export-file checks remain unfinished. Large active-factory performance and retained-memory testing remain open. The exact mod archives and complete player configuration for the reported startup failures were not available for reproduction.
-- **Before upgrading:** back up your save and test a copy with the same mods and settings. Follow the [upgrade guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.1/docs/support.md#first-upgrade).
-- **Downloads:** choose the archive labelled for your Factorio version; each label states its minimum version. Factorio 0.18.47 is experimental, best effort and available only on GitHub. Its qualification scope is package metadata and an in-game load/crash check; the in-game check is unverified.
+- **MIR 5.0.2 beta:** cumulative compatibility, saved-research and Research Library fixes. GitHub prerelease; stable qualification remains unfinished.
+- **Compatibility:** avoid the duplicate weapon-speed research reported with Muria, retain its finite research, and preserve compatible infinite native research supplied by other mods. Refuse unsafe Muria addition or removal on an existing MIR save before changing MIR's saved state.
+- **Discovery Tree:** respect research discovery in Library lists, details, queue labels and native research navigation. Keep private recovery research internal.
+- **Saved research:** restore five historically paid manufacturing bonuses for affected Factorio 2.0 saves using Space Is Fake 1.0.60. Retain the published upgrade guidance, including the observed limitation for externally disabled research.
+- **Library and settings:** show current and maximum recipe productivity, search recipe IDs, preview diagnostic exports, retain personal choices, restore older accepted imported settings values and English setting help, and correct three Russian research names.
+- **Configurations checked:** selected Muria 1.9.5, Discovery Tree 1.0.12 and Science Spread 0.9.2 combinations on Factorio 2.1.23 completed affected research and save/reload checks. This does not establish compatibility with every mod combination or the reporter's entire mod list.
+- **Beta limits:** full in-game Library input, saved-view/client lifecycle and actual export-file checks remain unfinished. Discovery Tree's None/reset interaction and its Library display still need visual verification. Whole-product large-factory performance and retained-memory testing remain open; no new general performance claim is made.
+- **Before upgrading:** back up your save and test a copy with the same mods and settings. Follow the [upgrade guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.2/docs/support.md#first-upgrade).
+- **Downloads:** choose the archive labelled for your Factorio version; each label states its minimum version. Factorio 0.18.47 is experimental, best effort and GitHub-only; its in-game load/crash check remains unverified.
 - **Early downloads (Factorio 0.6–0.12):** finite Base research with fixed defaults only; no MIR runtime effects, mod settings, Research Library, runtime API or save migrations. These builds remain best effort and untested in-game. Unzip the Factorio 0.6–0.8 downloads into the mods folder.
-- **Bug reports:** include Factorio and MIR versions, the complete mod list, settings, the current log, and a reproducible save where possible. See [support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.1/SUPPORT.md).
+- **Bug reports:** include Factorio and MIR versions, the complete mod list, settings, the current log and a reproducible save where possible. See [support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.2/SUPPORT.md).

@@ -1,5 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 5.0.2
+Date: 2026-11-03
 
   Changes:
 
@@ -22,6 +23,7 @@ Version: 5.0.2
     - Refuse unsafe addition or removal of Muria on an existing MIR save before changing MIR's saved state.
     - Keep private Space Is Fake and Krastorio recovery research out of ordinary Library views.
     - Restore custom percentages and older accepted values in imported pipeline and prototype-limit settings profiles.
+    - Restore English setting names and help text.
 
 ---------------------------------------------------------------------------------------------------
 Version: 5.0.1
