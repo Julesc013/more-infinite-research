@@ -1063,11 +1063,19 @@ end
 
 -- These six optional extensions share native research names. Other authored
 -- research and private paid holders never receive skip-if-present authority.
+function M.has_secretas(active_mods)
+  return (target.id == "f200" or target.id == "f210")
+    and type(active_mods) == "table" and active_mods.secretas ~= nil
+end
+
 function M.continuation_names(active_mods)
   local names = {}
   for index, row in ipairs(CONTINUATIONS) do names[index] = row.id end
   if target.id == "f210" and type(active_mods) == "table" and active_mods.Muria ~= nil then
     names[#names + 1] = "weapon-shooting-speed-9"
+  end
+  if M.has_secretas(active_mods) then
+    for level = 5, 9 do names[#names + 1] = "worker-robots-storage-" .. level end
   end
   return names
 end
@@ -1111,6 +1119,7 @@ function M.omit_existing_continuations(rows, technology_prototypes)
   if technology_prototypes == nil then return rows end
   local shared = {}
   for _, row in ipairs(CONTINUATIONS) do shared[row.id] = true end
+  shared["worker-robots-storage-9"] = true
   local retained = {}
   for _, row in ipairs(rows) do
     if not (shared[row.id] and technology_prototypes[row.id] ~= nil) then
@@ -1122,6 +1131,7 @@ end
 
 function M.continuations(active_mods, raw)
   local rows = copy(CONTINUATIONS)
+  local secretas_external = false
   local bob_angel_f210 = M.bob_angel_f210_profile(active_mods)
   local bob_angel_f200_combined = M.bob_angel_f200_combined_profile(active_mods)
   if M.is_bob_angel(active_mods) then
@@ -1212,6 +1222,22 @@ function M.continuations(active_mods, raw)
         and type(active_mods) == "table" and active_mods.Muria ~= nil then
       require("compatibility.modern_catalogue.muria").weapon_continuation(row, raw)
     end
+    if row.id == "worker-robots-storage-4" and M.has_secretas(active_mods) then
+      -- Only this named finite route receives a later identity. A meaningful
+      -- existing infinite owner anywhere on its six known stages wins instead;
+      -- this is not suffix discovery or permission to skip unrelated clashes.
+      local existing = type(raw) == "table" and raw.technology
+      if type(existing) == "table" then
+        local candidate = copy(row)
+        for level = 4, 9 do
+          candidate.id, candidate.level = "worker-robots-storage-" .. level, level
+          candidate.predecessor = "worker-robots-storage-" .. (level - 1)
+          if existing_infinite_owner(candidate, existing[candidate.id]) then secretas_external = true end
+        end
+      end
+      require("compatibility.modern_catalogue.secretas").worker_continuation(row,
+        not secretas_external and raw or nil)
+    end
   end
   -- Only meaningful, already-infinite native owners may replace these
   -- optional extensions. Finite/malformed/unrelated collisions still reach
@@ -1220,6 +1246,7 @@ function M.continuations(active_mods, raw)
   local existing = type(raw) == "table" and raw.technology
   if type(existing) == "table" then
     local admitted = {}
+    if secretas_external then admitted["worker-robots-storage-9"] = true end
     for _, row in ipairs(rows) do
       if existing_infinite_owner(row, existing[row.id]) then admitted[row.id] = true end
     end

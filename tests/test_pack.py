@@ -126,6 +126,7 @@ class PackTests(unittest.TestCase):
                 "compatibility/modern_catalogue/space_age.lua",
                 "compatibility/modern_catalogue/sif_retained.lua",
                 "compatibility/modern_catalogue/muria.lua",
+                "compatibility/modern_catalogue/secretas.lua",
                 "compatibility/modern_catalogue/k2so.lua",
             },
         )

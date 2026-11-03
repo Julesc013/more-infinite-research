@@ -39,6 +39,18 @@ if target.id == "f200" or target.id == "f210" then
         end
       end
     end
+    if modern.has_secretas(script and script.active_mods)
+        and live_technologies["worker-robots-storage-9"] == nil then
+      -- Data-stage admission may yield to a qualified earlier infinite stage.
+      -- Record the delegated setting identity only when MIR9 is absent: a
+      -- later foreign edit must never remove custody of an existing MIR9.
+      for level = 4, 8 do
+        local foreign = foreign_technology_prototypes["worker-robots-storage-" .. level]
+        if foreign ~= nil and foreign.max_level == 4294967295 then
+          foreign_technology_prototypes["worker-robots-storage-9"] = true
+        end
+      end
+    end
   end
   local native_data = prototypes and prototypes.mod_data
   local adopted = native_data and native_data["more-infinite-research-native-adoptions"]
