@@ -46,4 +46,18 @@ function M.published_sif_paid_recipe_sets()
   return out
 end
 
+-- Published 5.0.0-5.0.2 F200/F210 plain Base public families. These are old
+-- earning rights, independent of today's selected effects or extra recipes.
+local PUBLISHED_BETA_BASE_RECIPES = {
+  research_low_density_structure="low-density-structure",
+  research_plastic="plastic-bar", research_processing_unit="processing-unit",
+  research_rocket_fuel="rocket-fuel", research_steel="steel-plate",
+}
+
+function M.published_beta_base_paid_recipe_sets()
+  local out = {}
+  for family, recipe in pairs(PUBLISHED_BETA_BASE_RECIPES) do out[family] = {[recipe]=true} end
+  return out
+end
+
 return M

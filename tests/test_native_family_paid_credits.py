@@ -187,6 +187,86 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
           end end
         ''')
 
+    def _plain_beta_base(self, edition="f210", extra=False):
+        # These five one-recipe public masks are independently retained in all
+        # six published 5.0.0-5.0.2 Base ZIP observations (18 controlled cases).
+        recipes = {"research_low_density_structure": "low-density-structure",
+                   "research_plastic": "plastic-bar", "research_processing_unit": "processing-unit",
+                   "research_rocket_fuel": "rocket-fuel", "research_steel": "steel-plate"}
+        self.lua.globals().base_edition = edition
+        self.lua.execute('GROUPS={};published_base_mask={}')
+        for family, recipe in recipes.items():
+            self.lua.globals().base_family = family
+            self.lua.globals().base_recipe = recipe
+            self.lua.execute('''
+              GROUPS[base_family]={{recipe=base_recipe,change=base_family=="research_steel" and .17 or .1}}
+              published_base_mask[key(base_family,base_recipe)]=true
+            ''')
+        if extra:
+            self.lua.execute('''
+              GROUPS.research_steel[2]={recipe="new-unpaid-steel",change=.17}
+              published_base_mask[key("research_steel","new-unpaid-steel")]=true
+            ''')
+        self.lua.execute('''
+          local f200=base_edition=="f200"
+          BASE_ACTIVE={base=f200 and "2.0.77" or "2.1.23",
+            ["more-infinite-research"]=f200 and "5.0.20003" or "5.0.21003"}
+          reload_credits(BASE_ACTIVE,base_edition)
+        ''')
+
+    def test_plain_base_six_published_beta_origins_keep_original_paid_masks_and_work(self):
+        for edition, prefix in (("f200", "5.0.200"), ("f210", "5.0.210")):
+            for patch in ("00", "01", "02"):
+                with self.subTest(edition=edition, patch=patch):
+                    self.setUp()
+                    self._plain_beta_base(edition, extra=True)
+                    self.lua.globals().old_base_beta = prefix + patch
+                    self.lua.execute('''
+                      local force=make_collected_force(1,8,published_base_mask,false)
+                      local main=force.technologies["recipe-prod-research_steel-1"]
+                      main.saved_progress=.27;force.research_queue={main,force.technologies.foreign}
+                      force.current_research=main;local queue=force.research_queue
+                      native_credits.on_configuration_changed({mod_startup_settings_changed=false,
+                        mod_changes={["more-infinite-research"]={old_version=old_base_beta,
+                          new_version=BASE_ACTIVE["more-infinite-research"]}}})
+                      for family,recipes in pairs(GROUPS) do
+                        close(own_contribution(force,family,recipes[1].recipe),7*recipes[1].change)
+                        assert(record(force,family,recipes[1].recipe).included==true)
+                      end
+                      close(own_contribution(force,"research_steel","new-unpaid-steel"),0)
+                      assert(record(force,"research_steel","new-unpaid-steel").offset==-7,
+                        "new candidate output was mistaken for the historical paid mask")
+                      assert(force.research_queue==queue and force.current_research==main
+                        and main.saved_progress==.27 and force.research_progress==.42)
+                      no_foreign_write(force)
+                    ''')
+
+    def test_plain_beta_base_reader_refuses_changed_unknown_or_foreign_inputs_before_writes(self):
+        for opponent in ("startup", "added-provider", "removed-provider", "engine-change",
+                         "unknown-beta", "wrong-edition", "private-main", "incomplete-old-mask"):
+            with self.subTest(opponent=opponent):
+                self.setUp()
+                self._plain_beta_base()
+                self.lua.globals().opponent = opponent
+                self.lua.execute('''
+                  local changes={["more-infinite-research"]={old_version="5.0.21002",new_version="5.0.21003"}}
+                  local changed=opponent=="startup"
+                  if opponent=="added-provider" then BASE_ACTIVE.foreign="1.0.0" end
+                  if opponent=="removed-provider" then changes.foreign={old_version="1.0.0"} end
+                  if opponent=="engine-change" then changes.base={old_version="2.1.22",new_version="2.1.23"} end
+                  if opponent=="unknown-beta" then changes["more-infinite-research"].old_version="5.0.21003" end
+                  if opponent=="wrong-edition" then changes["more-infinite-research"].old_version="5.0.20002" end
+                  if opponent=="incomplete-old-mask" then GROUPS.research_plastic=nil end
+                  reload_credits(BASE_ACTIVE,"f210")
+                  local force=make_collected_force(1,8,published_base_mask,opponent=="private-main")
+                  local ok,message=pcall(native_credits.on_configuration_changed,
+                    {mod_startup_settings_changed=changed,mod_changes=changes})
+                  assert(not ok and tostring(message):find("native family",1,true),"unsafe baseline admitted")
+                  assert(storage.mir_native_credits==nil,"refusal allocated a baseline")
+                  for _,state in pairs(force._states) do assert(state.writes.level==0 and state.writes.enabled==0) end
+                  no_foreign_write(force)
+                ''')
+
     def _add_published_sif_recipients(self):
         # The production boundary requires all five published identities and
         # eleven recipes, independently authored in the preserved SIF fixture.
@@ -395,6 +475,11 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
           assert(definitions.published_sif_contracts()[1].recipes[1][1]=="casting-low-density-structure")
           local sets=definitions.published_sif_paid_recipe_sets();sets.research_steel["steel-plate"]=nil
           assert(definitions.published_sif_paid_recipe_sets().research_steel["steel-plate"])
+          local contracts=require("research.native_credit_contracts")
+          local base=contracts.published_beta_base_paid_recipe_sets()
+          base.research_steel["steel-plate"]=nil;base.research_plastic=nil
+          local again=contracts.published_beta_base_paid_recipe_sets()
+          assert(again.research_steel["steel-plate"] and again.research_plastic["plastic-bar"])
         ''')
 
     def test_configuration_counts_the_native_queue_once_per_force_not_per_recipe(self):
