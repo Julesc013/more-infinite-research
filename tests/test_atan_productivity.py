@@ -335,6 +335,52 @@ class AtanProductivityTests(unittest.TestCase):
         self.assertEqual(0.05, rows[1]["effects"][0]["change"])
         self.assertIs(False, rows[1]["enabled"])
 
+    def test_captured_atan_rows_compose_with_drill_manufacture_without_changing_each_other(self):
+        # Published fixture assertions 5c738fb5/49ab9a29 keep ash at +0.05
+        # and drill manufacture at +0.05 (20% stream x one-quarter weight).
+        # Use the admitted captured F200 ATAN rows, including automation-3,
+        # rather than transplanting the obsolete synthetic ATAN prerequisite.
+        # This is a detached host composition, not upstream/native admission.
+        for variant in ("base", "space_age"):
+            for percent, expected_drill in ((20, .05), (40, .10)):
+                with self.subTest(variant=variant, drill_percent=percent):
+                    raw, values = self.raw_fixture(variant), self.values(variant)
+                    if percent == 40:
+                        values["streams"]["research_ash_separation"]["effect_percent"] = 7
+                    rows = self.emitted_rows(variant, raw=raw, values=values)
+                    before_atan = _plain(rows)
+                    values["streams"]["research_mining_drill"] = _lua_value(
+                        self.lua, {"effect_percent": percent})
+                    raw["item"]["big-mining-drill"] = self.lua.table()
+                    raw["recipe"]["big-mining-drill"] = _lua_value(self.lua, {
+                        "category": "crafting", "enabled": True, "allow_productivity": True,
+                        "ingredients": [{"type": "item", "name": "electric-mining-drill", "amount": 1},
+                                        {"type": "item", "name": "steel-plate", "amount": 10}],
+                        "results": [{"type": "item", "name": "big-mining-drill", "amount": 1}],
+                    })
+                    before_raw = _plain(raw)
+                    self.lua.globals().composed_rows = rows
+                    self.lua.globals().composed_raw = raw
+                    self.lua.globals().composed_values = values
+                    self.lua.globals().composed_mods = self.active_mods(variant)
+                    self.lua.execute('''
+                      table.insert(composed_rows, {
+                        name="recipe-prod-research_mining_drill-1", order="p[research_mining_drill]",
+                        effects={{type="change-recipe-productivity",recipe="electric-mining-drill",change=.1}}
+                      })
+                      require("research.product_target_extension").extend(composed_rows, composed_values,
+                        {raw=composed_raw,mods=composed_mods})
+                    ''')
+                    actual = _plain(rows)
+                    self.assertEqual(before_atan, actual[:2])
+                    self.assertEqual(before_raw, _plain(raw))
+                    self.assertEqual(3, len(actual))
+                    owners = [(row["name"], effect["change"]) for row in actual
+                              for effect in row["effects"] if effect.get("recipe") == "big-mining-drill"]
+                    self.assertEqual([("recipe-prod-research_mining_drill-1", expected_drill)], owners)
+                    self.assertFalse(any(effect.get("recipe") == "atan-ash-seperation"
+                                         for effect in actual[2]["effects"]))
+
     def test_f200_gates_do_not_load_inactive_bodies_or_admit_f210(self):
         self.lua.execute("f210()")
         self.assertEqual(0, len(self.select()))
