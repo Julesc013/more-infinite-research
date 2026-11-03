@@ -1,0 +1,158 @@
+{
+  "kind": "MIRHistoricalControlExecutorIntentReviewV1",
+  "reviewed_on": "2026-11-03",
+  "created_utc": "2026-11-03T01:04:44.127647+00:00",
+  "reviewed_against": "a6a9ef1a5355b7b4e816ec0fb2d89021c9800111",
+  "subjects": [
+    "CONT-17",
+    "VER-07"
+  ],
+  "scope": "One named Test-MIR4ControlExecutorDecompositionM4202.ps1 family only: one unique8814-byte Git body,16 current remote tag/path bindings and one preserved local v4.2.0 alias. Imported helpers/facade/executor modules, authority writers, original receipts and their underlying behavior remain separate unreconciled sources unless covered elsewhere.",
+  "method": "Read the full unique PowerShell body without executing it. Authenticate its Git blob and every original commit/path; compare live remote annotated/lightweight tag targets, deduplicating the local v4.2.0 alias into the same v4.2.0-stable source. Map assertions to independent current contracts without inferring player expectations from the candidate.",
+  "source_discovery": {
+    "index_sha256": "183AC3B7903A3B7E9E00192B88CF396357F3F1919AE8FB099B5C80004224EB1C",
+    "indexed_tags": 91,
+    "selected_bodies": 1,
+    "selected_body_bytes": 8814,
+    "distinct_remote_tag_path_bindings": 16,
+    "preserved_indexed_alias_bindings": 1
+  },
+  "historical_sources": [
+    {
+      "path": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1",
+      "blob": "6fed4343dc31309c2dace70ad13058b9efd45eec",
+      "bytes": 8814,
+      "sha256": "8723EAD95E8E538EA4815DDCBD32696AD801F17DEB94D336CBE2E8EE4709615B",
+      "original_tag_path_bindings": [
+        {
+          "tag": "v4.1.0",
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1"
+        }
+      ],
+      "preserved_indexed_aliases": [
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1"
+        }
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "id": "retired-control-executor-shape-and-receipts",
+      "disposition": "superseded-implementation",
+      "independent_expectation": "The historical wrapper validates a decomposition receipt/schema and predecessor hash, six specifically named ordered PowerShell modules, at most400 lines per module,27 AST-discovered function names with an exact projection hash, a function-free facade at most80 lines and its first-two-line setup hash. It dots that facade, invokes one exact-path-set smoke example and checks the old command-inventory digest/count85/no unknown or duplicate keys. If a supply-chain successor exists it validates its schema/predecessor and frozen source hash/function-count28. These assertions bind a retired tooling refactor, not research construction, save preservation or native game behavior.",
+      "current_implementation": [
+        "spec/repository.md",
+        "docs/development.md",
+        "tools/check_repository.py",
+        "tests/Test-MIR5HostControls.ps1"
+      ],
+      "existing_host_controls": [],
+      "remaining_executable_check": "No port or rerun for the old module names/order/counts/line caps, facade/setup hash, receipt schemas or command inventory shape. Current repository checks and affected native-tooling controls own present source validity; this wrapper does not supply semantic verification of any imported executor/helper implementation.",
+      "owner": "Aero historical source-intent disposition; current tooling owners retain affected verification"
+    },
+    {
+      "id": "package-custody-and-no-transition-authority",
+      "disposition": "consolidate-existing-obligations",
+      "independent_expectation": "The wrapper captures a canonical package-source fingerprint before tooling work, requires an accepted package-source succession with no package-visible delta, then requires the fingerprint unchanged. It requires every transition_gate property false and emits package_visible=false, executor_semantics_changed=false and release_transition_authority=false. Its semantic-contract flags are assertions about a receipt, not observations that runtime/performance/package measurements were executed or remained behaviorally equivalent.",
+      "current_implementation": [
+        "AGENTS.md",
+        "spec/repository.md",
+        "spec/verification.md",
+        "tools/package.py",
+        "tools/release.py"
+      ],
+      "existing_host_controls": [
+        "tests/test_package.py::PackageTests::test_committed_build_ignores_dirty_untracked_and_line_ending_worktree_bytes",
+        "tests/test_package.py::PackageTests::test_committed_target_record_is_frozen_with_the_player_source_and_refuses_dirty_metadata",
+        "tests/test_release.py::ReleaseTests::test_verification_rejects_release_source_target_and_controller_identity_mutations",
+        "tests/test_release.py::ReleaseTests::test_verification_rejects_missing_extra_changed_and_duplicate_assets"
+      ],
+      "remaining_executable_check": "Retain actual affected-player member/hash applicability, frozen source/package/controller identities, independent review, required CI and checked publication/download gates. No static receipt or wrapper status grants release authority or closes runtime/performance/native obligations. No new native campaign follows solely from disposition of this implementation-only wrapper.",
+      "owner": "Black Glass candidate/native/publication custody; Aero independent package and claims review"
+    }
+  ],
+  "whole_source_reconciliation_complete": false,
+  "test_intent_reconciliation_complete": false,
+  "native_tests_run": false,
+  "release_qualification": false,
+  "remaining": "This disposes only the selected wrapper source intent. It neither retires delivered behavior nor establishes the semantic content of imported implementations, truth of historical receipt flags, current host passes, native gameplay/performance/save equivalence or release readiness. Whole VER-07, existing87 request records and missing originals retain their previous status."
+}
