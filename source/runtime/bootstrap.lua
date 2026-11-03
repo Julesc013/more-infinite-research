@@ -334,6 +334,14 @@ local function on_configuration_changed(event)
   local changes = event and event.mod_changes
   local muria = type(changes) == "table" and changes.Muria
   local mir = type(changes) == "table" and changes["more-infinite-research"]
+  local secretas = type(changes) == "table" and changes.secretas
+  if (target.id == "f200" or target.id == "f210") and type(secretas) == "table"
+      and ((secretas.old_version ~= nil) ~= (secretas.new_version ~= nil))
+      and (mir == nil or mir.old_version ~= nil) then
+    -- Foreign finite4..8 and MIR's infinite4/9 represent different paid
+    -- identities. Do not guess their former levels after prototype migration.
+    error("MIR cannot safely add or remove Secretas on an existing MIR save; restore the previous mod selection and original save", 2)
+  end
   if target.id == "f210" and type(muria) == "table"
       and ((muria.old_version ~= nil) ~= (muria.new_version ~= nil))
       and (mir == nil or mir.old_version ~= nil) then

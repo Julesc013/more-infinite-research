@@ -40,6 +40,7 @@ class HostControlsTests(unittest.TestCase):
         self.assertEqual(paths, [
             "tests/test_generator.py",
             "tests/test_continuation_ownership.py",
+            "tests/test_secretas_continuation.py",
             "tests/test_discovery_tree_compatibility.py",
             "tests/test_early_target_adapter.py",
             "tests/test_historical_direct.py",
