@@ -1,6 +1,7 @@
 """Real data-to-control cap boundary for admitted native recipes; host only."""
 import argparse
 from copy import deepcopy
+import json
 from pathlib import Path
 import sys
 import unittest
@@ -34,6 +35,12 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
             if configured_effect is not None:
                 case.lua.globals().settings.startup["ips-effect-per-level-" + family].value = configured_effect
         case.pipeline()
+        # Runtime consumes the same MIR-created paid mains and signed holders
+        # emitted by the real preceding stage, not only the foreign owners.
+        self.emitted_mir_rows = {
+            row["name"]: row for row in data_fixture.plain(case.lua.globals().data.emitted)
+            if row["type"] == "technology"
+        }
         group = case.lua.globals().data.raw["mod-data"]
         record = group[MOD_DATA] if group is not None else None
         metadata = data_fixture.plain(record.data) if record is not None else {"schema": 1, "owners": {}}
@@ -51,6 +58,22 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
             technology.prototype = data_fixture.generator_fixture.lua_table(lua, {
                 "effects": row["effects"], "max_level": 4294967295, "enabled": True})
             technologies[name] = technology
+        for name, row in self.emitted_mir_rows.items():
+            self.assertIsNone(technologies[name], "MIR transport collided with a foreign owner")
+            prototype = deepcopy(row)
+            prototype.setdefault("level", 1)
+            if prototype.get("max_level") == "infinite": prototype["max_level"] = 4294967295
+            technology = lua.globals().technology(name, prototype["level"], prototype.get("enabled", True))
+            technology.prototype = data_fixture.generator_fixture.lua_table(lua, prototype)
+            technologies[name] = technology
+        lua.globals().mir_created = data_fixture.generator_fixture.lua_table(lua, {
+            name: True for name in self.emitted_mir_rows})
+        lua.execute('''
+          function native_history(kind,name)
+            assert(kind=="technology" and mir_created[name],"unexpected creation-history query")
+            return {created="more-infinite-research"}
+          end
+        ''')
         lua.globals().world = lua.globals().force(41, technologies, lua.table(), None, None)
         lua.globals().world.foreign_state = "preserve"
         lua.globals().active_mods = data_fixture.generator_fixture.lua_table(lua, MODS)
@@ -64,8 +87,23 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
         lua.globals().extra_settings = data_fixture.generator_fixture.lua_table(lua, extra)
         lua.globals().retained_storage = storage
         lua.execute('''
-          boot({[41]=world},0,"",retained_storage,nil,0,active_mods,nil,extra_settings,{},native_data)
+          boot({[41]=world},0,"",retained_storage,nil,0,active_mods,nil,extra_settings,{},native_data,native_history)
         ''')
+
+    def test_paid_runtime_transport_requires_mir_creation_and_named_holders(self):
+        _, owners, metadata = self.stage()
+        for invalid in ("missing-history", "foreign-creator", "missing-main"):
+            with self.subTest(invalid=invalid):
+                lua = self.runtime(owners, metadata)
+                if invalid == "missing-history": lua.globals().native_history = None
+                elif invalid == "foreign-creator":
+                    lua.execute('native_history=function() return {created="space-age"} end')
+                else:
+                    lua.globals().world.technologies["recipe-prod-research_steel-1"] = None
+                with self.assertRaisesRegex(LuaError, "MIR native family"):
+                    self.boot(lua, 2)
+                    lua.globals().handlers.init()
+                self.assertIsNone(lua.globals().storage.mir_native_credits)
 
     def test_actual_admitted_five_owners_keep_cap_two_and_owned_disable_rights(self):
         for configured, inherited in ((None, None), (20, None), (None, .23)):
@@ -198,16 +236,40 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
         for name, _ in data_fixture.OWNERS.values():
             self.assertFalse(lua.globals().world.technologies[name].enabled)
 
-    def test_base_data_and_control_do_not_import_the_inactive_bridge(self):
+    def test_earlier_base_data_and_control_do_not_import_the_inactive_bridge(self):
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        lua.globals().player_root = (ROOT / "source").as_posix()
+        target = json.loads((ROOT / "targets/editions.json").read_text())["targets"]["f110"]
+        lua.globals().selected_target = data_fixture.generator_fixture.lua_table(lua, {**target, "id": "f110"})
+        lua.execute('''
+          package.path=player_root.."/?.lua;"..player_root.."/?/init.lua";package.cpath=""
+          package.loaded["platform.target"]=selected_target
+          package.preload["research.native_adoption"]=function() error("inactive bridge imported") end
+          mods={base=selected_target.minimum_base};script={active_mods=mods};settings={startup={}};log=function() end
+          data={extend=function(_,rows) assert(#rows==1 and rows[1].type=="shortcut") end}
+          dofile(player_root.."/data.lua")
+          assert(#require("runtime.catalogue").declared()>0)
+        ''')
+
+    def test_modern_base_paid_transport_grants_no_native_owner_adoption(self):
         lua = LuaRuntime(unpack_returned_tuples=True)
         lua.globals().player_root = (ROOT / "source").as_posix()
         lua.execute('''
           package.path=player_root.."/?.lua;"..player_root.."/?/init.lua";package.cpath=""
-          package.preload["research.native_adoption"]=function() error("inactive bridge imported") end
+          package.preload["research.generator"]=function() error("runtime imported Generator") end
           mods={base="2.1.23"};script={active_mods=mods};settings={startup={}};log=function() end
-          data={extend=function(_,rows) assert(#rows==1 and rows[1].type=="shortcut") end}
+          local record
+          data={extend=function(_,rows)
+            assert(#rows==2 and rows[1].type=="shortcut" and rows[2].type=="mod-data")
+            record=rows[2]
+          end}
           dofile(player_root.."/data.lua")
-          assert(#require("runtime.catalogue").declared()>0)
+          assert(record.name=="more-infinite-research-native-adoptions" and record.data.schema==1)
+          assert(next(record.data.owners)==nil and next(record.data.withheld)==nil and next(record.data.credits)==nil)
+          prototypes={mod_data={[record.name]=record}}
+          local catalogue=require("runtime.catalogue")
+          assert(#catalogue.declared()>0 and next(catalogue.native_credit_groups())==nil)
+          for _,row in ipairs(catalogue.declared()) do assert(row.ownership_kind~="nativeowner") end
         ''')
 
 
