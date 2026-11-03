@@ -5,7 +5,7 @@ applies_to: Pinned F200 and F210 diagnostic inputs
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-10-30
+last_reviewed: 2026-11-03
 supersedes: []
 superseded_by: []
 source_of_truth_for:

@@ -137,7 +137,7 @@ local function inventory(tick)
     observed={visited_entries=visited, processed_entries=processed, invalid_entries=invalid, aliases=aliases,
       unique_valid_observed_lower_bound=unique}, surfaces=rows, complete=not overflow, overflow=overflow,
     activity_observed=false, performance_acceptance=false, large_factory_qualified=false,
-    gameplay_acceptance=false, save_acceptance=false, release_qualification=false, stable_acceptance=false}
+    gameplay_acceptance=false, save_preservation_acceptance=false, release_qualification=false, stable_acceptance=false}
   local text = helpers.table_to_json(report)
   if type(text) ~= "string" or #PREFIX + #"INVENTORY " + #text > 2097152 then fail("inventory report byte bound exceeded") end
   script.on_event(defines.events.on_tick, nil)
