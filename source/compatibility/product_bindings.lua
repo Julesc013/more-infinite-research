@@ -158,4 +158,21 @@ function M.module_tier_bindings(modules)
   return out, visited
 end
 
+-- The five delivered Space Age families keep their established native owner.
+-- Declaration order is the historical lexical family order for a new recipe
+-- matching several of these families; an existing native effect wins first.
+M.native_owner_bindings = {
+  {family="research_low_density_structure", owner="low-density-structure-productivity", weight=1,
+    products={{type="item",name="low-density-structure"}}, require_productivity_permission=true},
+  {family="research_plastic", owner="plastic-bar-productivity", weight=1,
+    products={{type="item",name="plastic-bar"}}, require_productivity_permission=true},
+  {family="research_processing_unit", owner="processing-unit-productivity", weight=1,
+    products={{type="item",name="processing-unit"}}, require_productivity_permission=true},
+  {family="research_rocket_fuel", owner="rocket-fuel-productivity", weight=1,
+    products={{type="item",name="rocket-fuel"}}, require_productivity_permission=true},
+  {family="research_steel", owner="steel-plate-productivity", weight=1,
+    products={{type="item",name="steel-plate"}}, require_productivity_permission=true,
+    exclude_ingredient_patterns={"scrap"}},
+}
+
 return M

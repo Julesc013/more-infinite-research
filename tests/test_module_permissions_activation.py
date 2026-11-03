@@ -141,6 +141,13 @@ class ModulePermissionsActivationTests(unittest.TestCase):
                 assert(selection.native_owners == nil and prototypes == raw)
                 return {}
               end,
+              native_owner_product_targets = function(selection, prototypes)
+                assert(selection.native_owners == nil and prototypes == raw)
+                return {}
+              end,
+              preflight_collected_native_owner_targets = function(targets, patches)
+                assert(#targets == 0 and #patches == 0)
+              end,
               technologies = function(selection) assert(#selection.definitions == 0); return {} end,
               apply_weapon_speed_overlap = function(selection, generated)
                 assert(#selection.definitions == 0 and #generated == 0)

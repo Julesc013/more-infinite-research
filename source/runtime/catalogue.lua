@@ -7,6 +7,7 @@ local target = require("platform.target")
 local modern = require("compatibility.modern_catalogue")
 
 local foreign_technology_prototypes
+local native_adoptions
 if target.id == "f200" or target.id == "f210" then
   local live_technologies
   if prototypes ~= nil and prototypes.technology ~= nil then
@@ -39,6 +40,12 @@ if target.id == "f200" or target.id == "f210" then
       end
     end
   end
+  local native_data = prototypes and prototypes.mod_data
+  local adopted = native_data and native_data["more-infinite-research-native-adoptions"]
+  if adopted ~= nil then
+    native_adoptions = require("research.native_adoption").read(adopted.data,
+      modern.native_owners(script and script.active_mods))
+  end
 end
 
 local M = {}
@@ -54,7 +61,18 @@ if type(catalogue.prepare) == "function" then
 end
 
 function M.declared()
-  return catalogue.declared(foreign_technology_prototypes)
+  local rows = catalogue.declared(foreign_technology_prototypes)
+  if native_adoptions == nil or next(native_adoptions) == nil then return rows end
+  for _, row in ipairs(rows) do
+    local adoption = native_adoptions and native_adoptions[row.id]
+    if adoption and row.ownership_kind == "nativeowner" then
+      local recipes = {}
+      for index, name in ipairs(adoption.recipes) do recipes[index] = name end
+      row.native_adoption = {recipes=recipes, effect_change=adoption.effect_change,
+        configured_change=adoption.configured_change}
+    end
+  end
+  return rows
 end
 
 function M.internal_credit_ids()

@@ -116,7 +116,7 @@ local function copy_rule(rule, ordinal)
   end
 
   for _, field in ipairs({"include_hidden", "include_recycling", "allow_shared_input_output",
-    "reject_explicit_productivity_denial"}) do
+    "reject_explicit_productivity_denial", "require_productivity_permission"}) do
     if rule[field] ~= nil and type(rule[field]) ~= "boolean" then
       error("MIR product targets requires boolean " .. field, 3)
     end
@@ -138,6 +138,7 @@ local function copy_rule(rule, ordinal)
     include_recycling = rule.include_recycling == true,
     allow_shared_input_output = rule.allow_shared_input_output == true,
     reject_explicit_productivity_denial = rule.reject_explicit_productivity_denial == true,
+    require_productivity_permission = rule.require_productivity_permission == true,
   }
 end
 
@@ -378,6 +379,7 @@ local function recipe_blocked(recipe_name, summary, rule)
   if summary.recycling and not rule.include_recycling then return true end
   if summary.shared_productive and not rule.allow_shared_input_output then return true end
   if rule.reject_explicit_productivity_denial and summary.productivity_denied then return true end
+  if rule.require_productivity_permission and not summary.productivity_allowed then return true end
   for ingredient_name in pairs(summary.ingredient_names) do
     if name_matches(ingredient_name, rule.exclude_ingredient_patterns) then return true end
   end
@@ -389,7 +391,7 @@ local function inspect_recipe(recipe, context, work)
   local rows = variants(recipe)
   if rows == nil or #rows == 0 then return nil end
   local summary = {ingredient_names = {}, matches = {}, hidden = false, recycling = false,
-    shared_productive = false, productivity_denied = false}
+    shared_productive = false, productivity_denied = false, productivity_allowed = true}
   for _, row in ipairs(rows) do
     local definition = row.definition
     local ingredients, results = entries(definition, "ingredients"), entries(definition, "results")
@@ -401,6 +403,10 @@ local function inspect_recipe(recipe, context, work)
     if inherited(recipe, definition, "allow_productivity") == false
       or inherited(recipe, definition, "maximum_productivity") == 0 then
       summary.productivity_denied = true
+    end
+    if inherited(recipe, definition, "allow_productivity") ~= true
+      or inherited(recipe, definition, "maximum_productivity") == 0 then
+      summary.productivity_allowed = false
     end
     local inputs = {}
     for _, ingredient in ipairs(ingredients) do

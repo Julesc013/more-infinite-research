@@ -208,11 +208,24 @@ class K2NativeSpaceAgeTests(unittest.TestCase):
         self.assertIn("recipe-prod-research_gears-1", rows)
         self.assertGreater(_plain(lua.globals().publications), 0)
 
-    def test_native_owner_preflight_uses_upstream_named_rows_without_default_mutation(self):
+    def test_native_owner_preflight_keeps_upstream_rows_and_adopts_two_productive_fuel_routes(self):
         original = {name: deepcopy(self.raw["technology"][name]) for name in NATIVE_OWNERS}
+        expected = deepcopy(original)
+        # The published five-family native-owner contract adopts every allowed
+        # producer of its fixed item product. These two q062 upstream recipes
+        # explicitly allow productivity and produce item rocket-fuel; do not
+        # infer this expectation from the candidate's selected effects.
+        fuel_recipes = ("kr-rocket-fuel-with-ammonia", "kr-rocket-fuel-with-hydrogen-chloride")
+        for name in fuel_recipes:
+            recipe = self.raw["recipe"][name]
+            self.assertIs(True, recipe["allow_productivity"])
+            self.assertEqual([{"type": "item", "name": "rocket-fuel", "amount": 1}], recipe["results"])
+            self.assertFalse(any(row["name"] == "rocket-fuel" for row in recipe["ingredients"]))
+            expected["rocket-fuel-productivity"]["effects"].append(
+                {"type": "change-recipe-productivity", "recipe": name, "change": .1})
         lua = self.stage()
         final_raw = _plain(lua.globals().data)["raw"]["technology"]
-        self.assertEqual(original, {name: final_raw[name] for name in NATIVE_OWNERS})
+        self.assertEqual(expected, {name: final_raw[name] for name in NATIVE_OWNERS})
         configured = self.stage(startup={"ips-effect-per-level-research_steel": {"value": 17}})
         configured_raw = _plain(configured.globals().data)["raw"]["technology"]
         effects = configured_raw["steel-plate-productivity"]["effects"]
