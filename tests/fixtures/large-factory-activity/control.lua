@@ -71,9 +71,9 @@ local function setting_scope(values)
   table.sort(rows, function(a, b) return a.name < b.name end)
   return rows
 end
-local function emit_settings(tick)
+local function emit_settings(tick, startup)
   local report = {schema = 1, kind = "MIRLargeFactoryEffectiveSettingsV1", tick = tick,
-    startup = setting_scope(settings.startup), runtime_global = setting_scope(settings.global),
+    startup = setting_scope(startup), runtime_global = setting_scope(settings.global),
     original_saved_settings_observed = false, per_player_settings_observed = false}
   local text = helpers.table_to_json(report)
   if type(text) ~= "string" or #PREFIX + #"SETTINGS " + #text > MAX_SETTINGS_BYTES then
@@ -105,6 +105,45 @@ local function snapshot(surface)
   end
   return row
 end
+local function inventory(tick)
+  local rows, seen = {}, {}
+  local visited, processed, invalid, aliases, unique = 0, 0, 0, 0, 0
+  local overflow = false
+  for _, surface in pairs(game.surfaces) do
+    visited = visited + 1
+    if visited > 1024 then overflow = "iteration-bound"; break end
+    processed = processed + 1
+    if not surface.valid then invalid = invalid + 1
+    else
+      local index, name = surface.index, surface.name
+      if type(index) ~= "number" or index ~= index or index % 1 ~= 0 or index < 0 or index > 4294967295 then
+        fail("invalid surface index")
+      end
+      if type(name) ~= "string" or #name == 0 or #name > 4096 then fail("invalid surface name") end
+      if seen[index] then
+        if seen[index] ~= name then fail("conflicting surface identity") end
+        aliases = aliases + 1
+      else
+        unique = unique + 1
+        if unique > 256 then overflow = "unique-surface-bound"; break end
+        seen[index] = name
+        rows[#rows + 1] = {index=index, name=name}
+      end
+    end
+  end
+  table.sort(rows, function(a, b) return a.index < b.index end)
+  local report = {schema=1, kind="MIRLargeFactoryInputInventoryV1", mode="inventory-only", tick=tick,
+    metadata=metadata, bounds={unique_surfaces=256, entries=1024, name_bytes=4096, serialized_bytes=2097152},
+    observed={visited_entries=visited, processed_entries=processed, invalid_entries=invalid, aliases=aliases,
+      unique_valid_observed_lower_bound=unique}, surfaces=rows, complete=not overflow, overflow=overflow,
+    activity_observed=false, performance_acceptance=false, large_factory_qualified=false,
+    gameplay_acceptance=false, save_preservation_acceptance=false, release_qualification=false, stable_acceptance=false}
+  local text = helpers.table_to_json(report)
+  if type(text) ~= "string" or #PREFIX + #"INVENTORY " + #text > 2097152 then fail("inventory report byte bound exceeded") end
+  script.on_event(defines.events.on_tick, nil)
+  first_tick, first_rows, sampled, selected_surfaces, selected_force, metadata = nil, nil, nil, nil, nil, nil
+  log(PREFIX .. "INVENTORY " .. text)
+end
 local function begin(tick)
   local base = script.active_mods.base
   if base ~= "2.0.77" and base ~= "2.1.23" then fail("requires pinned 2.0.77 or 2.1.23") end
@@ -121,6 +160,14 @@ local function begin(tick)
   table.sort(mods, function(a, b) return a.name < b.name end)
   metadata = {base_version = base, mir_version = script.active_mods["more-infinite-research"] or false,
     mods = mods, force_index = selected_force.index, force_name = selected_force.name}
+  local startup = settings.startup
+  local mode = startup["mir5-large-factory-inventory-only"]
+  if type(mode) ~= "table" or type(mode.value) ~= "boolean" then fail("invalid inventory mode setting") end
+  if mode.value then
+    emit_settings(tick, startup)
+    inventory(tick)
+    return
+  end
   selected_surfaces, first_rows, sampled = surfaces(), {}, {}
   for _, surface in ipairs(selected_surfaces) do
     first_rows[#first_rows + 1] = snapshot(surface)
@@ -132,7 +179,7 @@ local function begin(tick)
     end
   end
   first_tick = tick
-  emit_settings(tick)
+  emit_settings(tick, startup)
   emit("START", {schema = 1, first_tick = tick, window_ticks = WINDOW,
     surfaces = #selected_surfaces, sampled_machines = #sampled, performance_acceptance = false})
 end
