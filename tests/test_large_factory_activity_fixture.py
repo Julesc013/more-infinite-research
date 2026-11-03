@@ -59,7 +59,7 @@ function activity_fixture(path, base, surface_count)
   local mods = {base=base}
   local native_game = readonly({surfaces=world, forces=readonly({player=force})})
   local setting_rows = {startup={alpha={value=true}, color={value={r=0.25,g=0.5,b=0.75,a=1}}, str={value="original"}},
-    global={number={value=12.5}, disabled={value=false}}}
+    global={number={value=12.5}, disabled={value=false}, indexed={value={0.1,0.2,0.3,0.4}}, empty={value={}}, partial={value={a=0.5}}}}
   local function protected(value)
     if type(value) ~= "table" then return value end
     return setmetatable({}, {
@@ -226,10 +226,20 @@ end
             global_ = {row.name: row.value for row in report.runtime_global.values()}
             self.assertEqual(startup["alpha"], True)
             self.assertEqual(startup["str"], "original")
-            self.assertEqual(startup["color"].r, 0.25)
-            self.assertEqual(global_, {"number": 12.5, "disabled": False})
+            self.assertEqual([row.name for row in report.startup.values()], ["alpha", "color", "str"])
+            self.assertEqual([row.name for row in report.runtime_global.values()],
+                             ["disabled", "empty", "indexed", "number", "partial"])
+            self.assertEqual({k: startup["color"][k] for k in ("r", "g", "b", "a")},
+                             {"r": 0.25, "g": 0.5, "b": 0.75, "a": 1})
+            self.assertEqual(global_["number"], 12.5)
+            self.assertFalse(global_["disabled"])
+            self.assertEqual([global_["indexed"][i] for i in range(1, 5)], [0.1, 0.2, 0.3, 0.4])
+            self.assertEqual(len(global_["empty"]), 0)
+            self.assertEqual(global_["partial"].a, 0.5)
             x.setting_rows.startup.color.value.r = 0.9
+            x.setting_rows["global"].indexed.value[2] = 0.8
             self.assertEqual(startup["color"].r, 0.25)
+            self.assertEqual(global_["indexed"][2], 0.2)
             self.assertEqual(x.reads.settings, 2)
             x.tick(43)
             self.assertEqual(x.reads.settings, 2)
@@ -243,7 +253,7 @@ end
             self.assertEqual(x.reads.settings, 6)
 
     def test_settings_bounds_and_malformed_values_refuse(self):
-        for case in ("name", "count", "string", "nonfinite", "unsupported", "missing", "color", "size"):
+        for case in ("name", "count", "string", "nonfinite", "unsupported", "missing", "color", "unknown_color_key", "mixed_color_keys", "size"):
             with self.subTest(case=case):
                 x = self.fixture()
                 if case == "name": x.setting_rows.startup["x" * 257] = self.lua.table_from({"value": True})
@@ -254,6 +264,8 @@ end
                 if case == "unsupported": x.setting_rows.startup.alpha.value = self.lua.eval("function() end")
                 if case == "missing": x.setting_rows.startup.alpha.value = None
                 if case == "color": x.setting_rows.startup.color.value.r = float("nan")
+                if case == "unknown_color_key": x.setting_rows.startup.color.value.unknown = 0.5
+                if case == "mixed_color_keys": x.setting_rows.startup.color.value[1] = 0.5
                 if case == "size": x.source.oversize_settings = True
                 x.callbacks.init()
                 with self.assertRaises(LuaError): x.tick(1)
