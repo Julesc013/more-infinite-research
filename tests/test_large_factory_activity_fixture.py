@@ -13,6 +13,13 @@ class ActivityFixtureTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.execute(r'''
+function set_lazy_world(world, size)
+  local surface = world[1]
+  setmetatable(world, {__pairs=function()
+    local n=0
+    return function() n=n+1; if n<=size then return n, surface end end
+  end})
+end
 function activity_fixture(path, base, surface_count)
   local callbacks, reports, logs, reads = {}, {}, {}, {counts=0, flows=0, samples=0, settings=0}
   local source = {production=100, products=7, valid=true, engine=base, blocked=false}
@@ -58,7 +65,7 @@ function activity_fixture(path, base, surface_count)
   world.nauvis = world[1]
   local mods = {base=base}
   local native_game = readonly({surfaces=world, forces=readonly({player=force})})
-  local setting_rows = {startup={alpha={value=true}, color={value={r=0.25,g=0.5,b=0.75,a=1}}, str={value="original"}},
+  local setting_rows = {startup={["mir5-large-factory-inventory-only"]={value=false}, alpha={value=true}, color={value={r=0.25,g=0.5,b=0.75,a=1}}, str={value="original"}},
     global={number={value=12.5}, disabled={value=false}, indexed={value={0.1,0.2,0.3,0.4}}, empty={value={}}, partial={value={a=0.5}}}}
   local function protected(value)
     if type(value) ~= "table" then return value end
@@ -90,7 +97,7 @@ function activity_fixture(path, base, surface_count)
     end})},
     helpers={table_to_json=function(report)
       reports[#reports+1] = report
-      return source.oversize_settings and string.rep("x", 262145) or (source.oversize and string.rep("x", 65537) or "{}")
+      return source.oversize_inventory and report.kind == "MIRLargeFactoryInputInventoryV1" and string.rep("x", 2097153) or source.oversize_settings and string.rep("x", 262145) or (source.oversize and string.rep("x", 65537) or "{}")
     end},
     log=function(message) logs[#logs+1] = message end}
   env._G=env
@@ -103,7 +110,7 @@ function activity_fixture(path, base, surface_count)
     return _G[key]
   end})
   assert(loadfile(path, "t", env))()
-  return {callbacks=callbacks, reports=reports, logs=logs, reads=reads, source=source, mods=mods, setting_rows=setting_rows,
+  return {callbacks=callbacks, reports=reports, logs=logs, reads=reads, source=source, mods=mods, setting_rows=setting_rows, world=world,
     tick=function(value) if callbacks.tick then callbacks.tick{tick=value} end end}
 end
 ''')
@@ -226,7 +233,7 @@ end
             global_ = {row.name: row.value for row in report.runtime_global.values()}
             self.assertEqual(startup["alpha"], True)
             self.assertEqual(startup["str"], "original")
-            self.assertEqual([row.name for row in report.startup.values()], ["alpha", "color", "str"])
+            self.assertEqual([row.name for row in report.startup.values()], ["alpha", "color", "mir5-large-factory-inventory-only", "str"])
             self.assertEqual([row.name for row in report.runtime_global.values()],
                              ["disabled", "empty", "indexed", "number", "partial"])
             self.assertEqual({k: startup["color"][k] for k in ("r", "g", "b", "a")},
@@ -271,12 +278,77 @@ end
                 with self.assertRaises(LuaError): x.tick(1)
                 self.assertFalse(any("SETTINGS" in x.logs[i] for i in range(1, len(x.logs)+1)))
 
+    def inventory(self, surfaces=1):
+        x = self.fixture(surfaces=surfaces)
+        x.setting_rows.startup["mir5-large-factory-inventory-only"].value = True
+        return x
+
+    def test_inventory_bounds_and_one_shot(self):
+        for count, complete, reason, retained in ((33, True, False, 33), (256, True, False, 256),
+                                                   (257, False, "unique-surface-bound", 256)):
+            x = self.inventory(count)
+            x.source.blocked = True
+            x.callbacks.init()
+            x.source.blocked = False
+            x.tick(7)
+            report = x.reports[2]
+            self.assertEqual(report.complete, complete)
+            self.assertEqual(report.overflow, reason)
+            self.assertEqual(len(report.surfaces), retained)
+            self.assertEqual(report.observed.unique_valid_observed_lower_bound, count)
+            self.assertEqual([r.index for r in report.surfaces.values()], list(range(1, retained + 1)))
+            self.assertEqual((x.reads.counts, x.reads.flows, x.reads.samples, x.reads.settings), (0, 0, 0, 2))
+            self.assertIsNone(x.callbacks.tick)
+            x.callbacks.load()
+            x.tick(8)
+            self.assertEqual(len(x.logs), 4)
+
+    def test_inventory_iteration_and_invalid_entries(self):
+        for size in (1024, 1025):
+            x = self.inventory()
+            # Lazy iterator supplies aliases and does not construct a large native world.
+            self.lua.globals().set_lazy_world(x.world, size)
+            x.callbacks.init()
+            x.tick(1)
+            report = x.reports[2]
+            self.assertEqual(report.complete, size == 1024)
+            self.assertEqual(report.observed.visited_entries, size)
+            self.assertEqual(report.observed.processed_entries, min(size, 1024))
+            self.assertEqual(report.observed.aliases, min(size, 1024) - 1)
+        x = self.inventory()
+        x.world.invalid = self.lua.table_from({"valid": False})
+        x.callbacks.init(); x.tick(1)
+        self.assertEqual(x.reports[2].observed.invalid_entries, 1)
+
+    def test_inventory_refuses_invalid_inputs(self):
+        for case in ("missing", "mode", "index", "name", "conflict", "size"):
+            with self.subTest(case=case):
+                x = self.inventory()
+                if case == "missing": x.setting_rows.startup["mir5-large-factory-inventory-only"] = None
+                if case == "mode": x.setting_rows.startup["mir5-large-factory-inventory-only"].value = 1
+                if case == "index": x.world[2] = self.lua.table_from({"valid": True, "index": -1, "name": "bad"})
+                if case == "name": x.world[2] = self.lua.table_from({"valid": True, "index": 2, "name": "x" * 4097})
+                if case == "conflict": x.world[2] = self.lua.table_from({"valid": True, "index": 1, "name": "other"})
+                if case == "size": x.source.oversize_inventory = True
+                x.callbacks.init()
+                with self.assertRaises(LuaError): x.tick(1)
+                self.assertFalse(any("INVENTORY" in x.logs[i] for i in range(1, len(x.logs)+1)))
+
+    def test_setting_prototype_and_opt_in_patch(self):
+        self.lua.execute("data={raw={['bool-setting']={}}, extend=function(self, rows) for _, row in ipairs(rows) do self.raw[row.type][row.name]=row end end}")
+        self.lua.execute((FIXTURE / "settings.lua").read_text())
+        row = self.lua.globals().data.raw["bool-setting"]["mir5-large-factory-inventory-only"]
+        self.assertEqual((row.type, row.setting_type, row.default_value), ("bool-setting", "startup", False))
+        self.lua.execute((FIXTURE / "inventory-settings-updates.lua").read_text())
+        self.assertTrue(row.default_value)
+        with self.assertRaises(LuaError): self.lua.execute((FIXTURE / "inventory-settings-updates.lua").read_text())
+
     def test_metadata_selects_pinned_engines_without_player_source(self):
         for family, engine in (("2.0", "2.0.77"), ("2.1", "2.1.23")):
             metadata = json.loads((FIXTURE / f"info-f{200 if family == '2.0' else 210}.json").read_text())
             self.assertEqual(metadata["factorio_version"], family)
             self.assertEqual(metadata["dependencies"], [f"base = {engine}", "? more-infinite-research"])
-        self.assertEqual({p.name for p in FIXTURE.iterdir()}, {"control.lua", "info-f200.json", "info-f210.json", "README.md"})
+        self.assertEqual({p.name for p in FIXTURE.iterdir()}, {"control.lua", "settings.lua", "inventory-settings-updates.lua", "info-f200.json", "info-f210.json", "README.md"})
 
 
 if __name__ == "__main__":
