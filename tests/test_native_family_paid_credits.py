@@ -187,7 +187,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
           end end
         ''')
 
-    def test_exact_502_sif_origin_preserves_only_its_authored_canonical_mask(self):
+    def _add_published_sif_recipients(self):
         # The production boundary requires all five published identities and
         # eleven recipes, independently authored in the preserved SIF fixture.
         published = json.loads((Path(__file__).parent / "fixtures" /
@@ -201,6 +201,9 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                 self.lua.execute(f'''local rows=GROUPS[{family}];local seen=false
                   for _,row in ipairs(rows) do if row.recipe=={name} then seen=true end end
                   if not seen then rows[#rows+1]={{recipe={name},change={scalar}}} end''')
+
+    def test_exact_502_sif_origin_preserves_only_its_authored_canonical_mask(self):
+        self._add_published_sif_recipients()
         self.lua.execute(r'''
           reload_credits({base="2.0.77",["space-age"]="2.0.77",["space-is-fake"]="1.0.60",
             ["more-infinite-research"]="5.0.20003"},"f200")
@@ -213,6 +216,53 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
           close(own_contribution(force,family,"alternate-steel"),0)
           close(own_contribution(force,family,"multi-native"),0)
           assert(record(force,family,"steel-plate").included==false)
+          no_foreign_write(force)
+        ''')
+
+    def test_unknown_zero_completed_private_investment_cannot_invent_a_baseline(self):
+        for kind in ("queued", "detached-partial"):
+            with self.subTest(kind=kind):
+                self.setUp()
+                self.lua.globals().investment_kind = kind
+                self.lua.execute(r'''
+                  local id="recipe-prod-research_steel-1"
+                  local force=make_collected_force(1,1,{},true)
+                  local main=force.technologies[id]
+                  if investment_kind=="queued" then force.research_queue={main};force.current_research=main
+                  else main.saved_progress=.27 end
+                  local ok,message=pcall(native_credits.on_configuration_changed,{mod_startup_settings_changed=true,
+                    mod_changes={["more-infinite-research"]={old_version="4.7.21003",new_version="5.0.21003"}}})
+                  assert(not ok and tostring(message):find("native family",1,true),"zero completed discarded original investment")
+                  assert(storage.mir_native_credits==nil,"unknown invested baseline wrote storage")
+                  for _,state in pairs(force._states) do assert(state.writes.level==0 and state.writes.enabled==0) end
+                  assert(main.saved_progress==(investment_kind=="detached-partial" and .27 or nil))
+                  no_foreign_write(force)
+                ''')
+
+    def test_known_502_sif_zero_completed_queue_keeps_its_canonical_right(self):
+        self._add_published_sif_recipients()
+        self.lua.execute(r'''
+          reload_credits({base="2.0.77",["space-age"]="2.0.77",["space-is-fake"]="1.0.60",
+            ["more-infinite-research"]="5.0.20003"},"f200")
+          local family,id="research_steel","recipe-prod-research_steel-1"
+          local force=make_collected_force(1,1,{},true)
+          local main=force.technologies[id]
+          force.research_queue={main,main,force.technologies.foreign};force.current_research=main
+          local queue=force.research_queue
+          native_credits.on_configuration_changed({mod_startup_settings_changed=true,
+            mod_changes={["more-infinite-research"]={old_version="5.0.20002",new_version="5.0.20003"}}})
+          assert(record(force,family,"steel-plate").payable==true,"known first queue lost canonical reward")
+          assert(record(force,family,"steel-plate").pending==2 and native_credits.needs_research_events())
+          for completed=1,2 do
+            advance(force,id,completed,true);native_credits.on_research_finished({research=main})
+            close(own_contribution(force,family,"steel-plate"),completed*.17)
+            close(own_contribution(force,family,"casting-steel"),completed*.17)
+            close(own_contribution(force,family,"alternate-steel"),0)
+          end
+          advance(force,id,3,true);native_credits.on_research_finished({research=main})
+          close(own_contribution(force,family,"steel-plate"),2*.17)
+          assert(not native_credits.needs_research_events())
+          assert(force.research_queue==queue and force.current_research==main and force.research_progress==.42)
           no_foreign_write(force)
         ''')
 
