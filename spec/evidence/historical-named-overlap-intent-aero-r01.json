@@ -14,8 +14,7 @@
   "scope": "Eleven complete synthetic fixture/metadata/assertion bodies plus two complete capsule/policy data bodies; one large approved-delta body reviewed only for provenance and29 named Galore changed-field classifications; three exact v4.7.3 ownership helpers read for corroboration. No whole legacy compiler or delta estate is reconciled.",
   "source_count": 14,
   "source_bytes": 1566555,
-  "live_tag_path_bindings": 238,
-  "unique_tags": 17,
+  "live_tag_path_bindings": 224,
   "fully_read_primary_bodies": 13,
   "fully_read_primary_bytes": 13857,
   "sources": [
@@ -30,7 +29,8 @@
         {
           "tag": "v4.2.0",
           "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
-          "path": ".mir/compatibility-capsules.json"
+          "path": ".mir/compatibility-capsules.json",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
         },
         {
           "tag": "v4.2.0-stable",
@@ -123,7 +123,8 @@
         {
           "tag": "v4.2.0",
           "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
-          "path": ".mir/mod-interaction-policy.json"
+          "path": ".mir/mod-interaction-policy.json",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
         },
         {
           "tag": "v4.2.0-stable",
@@ -216,7 +217,8 @@
         {
           "tag": "v4.2.0",
           "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
-          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json"
+          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
         },
         {
           "tag": "v4.2.0-stable",
@@ -309,7 +311,8 @@
         {
           "tag": "v4.2.0",
           "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
-          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua"
+          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
         },
         {
           "tag": "v4.2.0-stable",
@@ -402,7 +405,8 @@
         {
           "tag": "v4.2.0",
           "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
-          "path": "fixtures/assert-atan-ash-separation/info.json"
+          "path": "fixtures/assert-atan-ash-separation/info.json",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
         },
         {
           "tag": "v4.2.0-stable",
@@ -495,7 +499,8 @@
         {
           "tag": "v4.2.0",
           "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
-          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua"
+          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
         },
         {
           "tag": "v4.2.0-stable",
@@ -588,7 +593,8 @@
         {
           "tag": "v4.2.0",
           "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
-          "path": "fixtures/assert-big-mining-drill-productivity/info.json"
+          "path": "fixtures/assert-big-mining-drill-productivity/info.json",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
         },
         {
           "tag": "v4.2.0-stable",
@@ -681,7 +687,8 @@
         {
           "tag": "v4.2.0",
           "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
-          "path": "fixtures/atan-ash/data.lua"
+          "path": "fixtures/atan-ash/data.lua",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
         },
         {
           "tag": "v4.2.0-stable",
@@ -774,7 +781,8 @@
         {
           "tag": "v4.2.0",
           "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
-          "path": "fixtures/atan-ash/info.json"
+          "path": "fixtures/atan-ash/info.json",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
         },
         {
           "tag": "v4.2.0-stable",
@@ -867,7 +875,8 @@
         {
           "tag": "v4.2.0",
           "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
-          "path": "fixtures/big-mining-drill/data.lua"
+          "path": "fixtures/big-mining-drill/data.lua",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
         },
         {
           "tag": "v4.2.0-stable",
@@ -960,7 +969,8 @@
         {
           "tag": "v4.2.0",
           "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
-          "path": "fixtures/big-mining-drill/info.json"
+          "path": "fixtures/big-mining-drill/info.json",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
         },
         {
           "tag": "v4.2.0-stable",
@@ -1053,7 +1063,8 @@
         {
           "tag": "v4.2.0",
           "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
-          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua"
+          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
         },
         {
           "tag": "v4.2.0-stable",
@@ -1146,7 +1157,8 @@
         {
           "tag": "v4.2.0",
           "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
-          "path": "fixtures/space-age-galore-overlap/data.lua"
+          "path": "fixtures/space-age-galore-overlap/data.lua",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
         },
         {
           "tag": "v4.2.0-stable",
@@ -1239,7 +1251,8 @@
         {
           "tag": "v4.2.0",
           "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
-          "path": "fixtures/space-age-galore-overlap/info.json"
+          "path": "fixtures/space-age-galore-overlap/info.json",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
         },
         {
           "tag": "v4.2.0-stable",
@@ -1525,5 +1538,40 @@
   "test_intent_reconciliation_complete": false,
   "native_execution": false,
   "release_qualification": false,
-  "stable_qualification": false
+  "stable_qualification": false,
+  "source_tag_labels": 17,
+  "live_tags": 16,
+  "retained_local_alias_bindings": 14,
+  "tag_provenance_correction": {
+    "observed_utc": "2026-11-03T07:49:01.711610+00:00",
+    "original_author_commit": "01767a9c76e0a2e18e1cae1bf913b285d403b084",
+    "original_evidence_sha256": "CB139A6BD8DEBE4B840C0A7499ABD8B306B57279719391648428D74553D5C545",
+    "live_tag_names": [
+      "v4.1.0",
+      "v4.2.0-stable",
+      "v4.2.1",
+      "v4.2.2",
+      "v4.3.0",
+      "v4.4.0",
+      "v4.4.1",
+      "v4.4.2",
+      "v4.5.0",
+      "v4.5.1",
+      "v4.5.2",
+      "v4.6.0",
+      "v4.7.0",
+      "v4.7.1",
+      "v4.7.2",
+      "v4.7.3"
+    ],
+    "retained_alias": {
+      "label": "v4.2.0",
+      "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+      "bindings": 14,
+      "remote_canonical_numeric_ref_present": false,
+      "live_historical_stable_label": "v4.2.0-stable"
+    },
+    "raw_remote_observation_sha256": "706C2432D9F8CE282C6AEC3F83D2A6737F9A4B3EAF9313A75194280547127A32",
+    "correction": "The original record incorrectly called238 local label/path bindings live. Preserve all238 source bindings but distinguish224live bindings/16tags from14retained local numeric aliases. No tag is created or moved; source Git blobs and semantic observations remain unchanged."
+  }
 }
