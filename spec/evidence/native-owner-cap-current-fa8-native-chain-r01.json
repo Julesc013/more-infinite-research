@@ -1,0 +1,566 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentNativeOwnerCapOrderChainV1",
+  "status": "canonical-and-permutation-pass-relaxation-fails-foreign-disablement",
+  "candidate": {
+    "source_commit": "fa8aae3eeff46caa2ae679712c3e53d01684506d",
+    "player_tree": "75e5cea1075d9c9f75b858abfe0ed3246b3f8010",
+    "archive_sha256": "DA037A34ADBC295B76054211086C98FA359C02D97DEA0D58B874671C7F99823F",
+    "archive_bytes": 784297,
+    "package_version": "5.0.21002",
+    "publication": "Private current bytes; distinct from immutable published5.0.2. Not a changed-version5.0.3 route."
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "original_source": {
+    "existing_chain": "spec/evidence/native-owner-cap-baseline-58f-native-chain.json",
+    "fixture_source_commit": "09a66acc9c613617f95074f23f3fd9a4aab4765b",
+    "result_sha256": "E6903CAF232E691B9E05E57B2D0F4D073038C2E1A7BB7B67BFB12EC1D5C54FF4",
+    "save_sha256": "C804033F523F3C4E91CE2E8E92E84B7568E53E3830C39A7663EBFC2C611EB843",
+    "initial_witness": {
+      "fixture_stage": "0.0.1",
+      "cap": 0,
+      "effect_order": [
+        "steel-plate",
+        "casting-steel"
+      ],
+      "actual_lab_completions": 0,
+      "native_state_seeded": true,
+      "player_level": 2,
+      "player_saved_progress": 0.27,
+      "player_enabled": true,
+      "foreign_enabled": false,
+      "foreign_queue_progress": 0.42000000000000004,
+      "on_load_read_only": false
+    },
+    "replayed": false
+  },
+  "fixture_port": {
+    "first_commit": "ec949779ab55ff61947b2ac067fc4289cca60d7e",
+    "canonical_projection_commit": "9428c4093af1591c065f11b6f592cb6432bff266",
+    "remaining_projection_commit": "9243319efb36f7234f80121848765114b2768f95",
+    "original_lua_metadata_bodies": 19,
+    "mir_version_literal_substitutions": 6,
+    "assertions_changed": false,
+    "selected_original_host_controls_passed": 10,
+    "scope": "Version/IO-only port and exact shared-blob packaging aliases; old metadata/profile-byte controls retain original scope."
+  },
+  "stages": [
+    {
+      "stage": "canonical",
+      "native_status": "passed-private-native-fixture",
+      "native_qualified": true,
+      "selected_mods": [
+        {
+          "name": "base",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "elevated-rails",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "quality",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "recycler",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "space-age",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "mir-fixture-mir5-active-mods-observer",
+          "version": "0.1.0",
+          "enabled": true
+        },
+        {
+          "name": "more-infinite-research",
+          "version": "5.0.21002",
+          "enabled": true
+        },
+        {
+          "name": "mir-fixture-mir5-native-owner-cap-order",
+          "version": "0.1.0",
+          "enabled": true
+        }
+      ],
+      "input_save_sha256": "C804033F523F3C4E91CE2E8E92E84B7568E53E3830C39A7663EBFC2C611EB843",
+      "source_result_sha256": "E6903CAF232E691B9E05E57B2D0F4D073038C2E1A7BB7B67BFB12EC1D5C54FF4",
+      "result_sha256": "352424C7B7EACCDCF4CE60DB74F271C0E6A141BEAE40E3CB0CD10BB3403BDF81",
+      "fixture_commit": "9428c4093af1591c065f11b6f592cb6432bff266",
+      "fixture_sha256": "2737554790332655E402C8D0BBDA357EB5E5D058A1184A8A8C35FB0BDF707AB2",
+      "caller_sha256": "2EE3B4399BBCC93D3EFAE0E1A94488A0B2E811DC9291F32149161169C8DAB5D4",
+      "manifest_sha256": "722AA616AA35F9E3998B06AD5C34D8FF1E962785E22514095862C4A204BA2E01",
+      "composition_sha256": "1909DA3FC4C27A811E95C05C0BC7653B15B5FE1E838BE90F9C04E21020C20408",
+      "source_provenance_sha256": "67CD46F8E0B6E64D01EF7A2E9020F63F6BB896AFA6D1E9BCEBCF8CFEF9CEAEF3",
+      "dispatch_review_sha256": "E2977C7610913F9FF4977F0E43AFE0BE9663D6076D4F741B8ACBFFACFEB867C7",
+      "independent_actual_review_sha256": "65A748FA32B7494E2C6CE74FCAC3252E4159ACF9EEF5DB0E9F9F8AD449189E56",
+      "root_review_adoption_sha256": "23D0DB37AE257303F117B42C6363E00AE871271CE2D954DB25172D9C900210C0",
+      "processes": [
+        {
+          "pid": 11740,
+          "ledger_rows": 23,
+          "exit_code": -1,
+          "timed_out": false,
+          "completion_predicate_observed": true
+        },
+        {
+          "pid": 1764,
+          "ledger_rows": 4,
+          "exit_code": 0,
+          "timed_out": false,
+          "completion_predicate_observed": false
+        },
+        {
+          "pid": 23948,
+          "ledger_rows": 4,
+          "exit_code": 0,
+          "timed_out": false,
+          "completion_predicate_observed": false
+        }
+      ],
+      "input_save_unchanged": true,
+      "all_controls_and_17_prior_mir_and_three_owned_archives_restored": true,
+      "initial_witness": {
+        "fixture_stage": "0.1.0",
+        "cap": 1,
+        "effect_order": [
+          "steel-plate",
+          "casting-steel"
+        ],
+        "actual_lab_completions": 0,
+        "native_state_seeded": true,
+        "player_level": 2,
+        "player_saved_progress": 0.27,
+        "player_enabled": false,
+        "foreign_enabled": false,
+        "foreign_queue_progress": 0.42000000000000004,
+        "on_load_read_only": false
+      },
+      "cold_witnesses": [
+        {
+          "fixture_stage": "0.1.0",
+          "cap": 1,
+          "effect_order": [
+            "steel-plate",
+            "casting-steel"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": false,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": true
+        },
+        {
+          "fixture_stage": "0.1.0",
+          "cap": 1,
+          "effect_order": [
+            "steel-plate",
+            "casting-steel"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": false,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": true
+        }
+      ],
+      "completed_save_sha256": "39DAF4ED4988DC89E174D29E6F4DC8A826EA16D4BC8A446B90EEE2E9FEAF6B6B",
+      "cold_save_bytes_unchanged": true,
+      "independent_review_kind": "accepted-exact-native-result"
+    },
+    {
+      "stage": "permuted",
+      "native_status": "passed-private-native-fixture",
+      "native_qualified": true,
+      "selected_mods": [
+        {
+          "name": "base",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "elevated-rails",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "quality",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "recycler",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "space-age",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "mir-fixture-mir5-active-mods-observer",
+          "version": "0.1.0",
+          "enabled": true
+        },
+        {
+          "name": "more-infinite-research",
+          "version": "5.0.21002",
+          "enabled": true
+        },
+        {
+          "name": "mir-fixture-mir5-native-owner-cap-order",
+          "version": "0.2.0",
+          "enabled": true
+        }
+      ],
+      "input_save_sha256": "39DAF4ED4988DC89E174D29E6F4DC8A826EA16D4BC8A446B90EEE2E9FEAF6B6B",
+      "source_result_sha256": "352424C7B7EACCDCF4CE60DB74F271C0E6A141BEAE40E3CB0CD10BB3403BDF81",
+      "result_sha256": "D98F29F3611860BDB6F962B6E691CEFC379061257A8F326BC58407A14989CC7B",
+      "fixture_commit": "9243319efb36f7234f80121848765114b2768f95",
+      "fixture_sha256": "C775264EDF923AD482E43CD7A43D98ECE742CF01D9562AF6C6414BBB557A6442",
+      "caller_sha256": "3CAD95667F6CAC061F0D95378B6B38E1D403F89BE3BA763A93710C1C5FD5A9F6",
+      "manifest_sha256": "8D32AB25A43C2498E00DA00B8A92CA5B06A4D2E3DE87DF9CF6F962D8EBD9BEC1",
+      "composition_sha256": "DCCF05EE635CF6EA8A2D0A97D43FEF8D7804D551D3909A3D32AA88CD593108BD",
+      "source_provenance_sha256": "CC73571061B200C08598F037FA3D81134CA96877697ABB9C686F7959D1120154",
+      "dispatch_review_sha256": "CFF5218B3E0BC14415047E872D8954C85ED9B1E693D90A42E60B48A0F1D8D217",
+      "independent_actual_review_sha256": "0DE17E53876CBF330337C909A4F238500FB4EFAB76354AC378EAC19ED17F2E21",
+      "root_review_adoption_sha256": "3FA4E0AF82B5D8D8CC4C911B25A2CF8C15A7CCF9499D27D147D02F91CD362886",
+      "processes": [
+        {
+          "pid": 4172,
+          "ledger_rows": 11,
+          "exit_code": -1,
+          "timed_out": false,
+          "completion_predicate_observed": true
+        },
+        {
+          "pid": 30048,
+          "ledger_rows": 4,
+          "exit_code": 0,
+          "timed_out": false,
+          "completion_predicate_observed": false
+        },
+        {
+          "pid": 31524,
+          "ledger_rows": 4,
+          "exit_code": 0,
+          "timed_out": false,
+          "completion_predicate_observed": false
+        }
+      ],
+      "input_save_unchanged": true,
+      "all_controls_and_17_prior_mir_and_three_owned_archives_restored": true,
+      "initial_witness": {
+        "fixture_stage": "0.2.0",
+        "cap": 1,
+        "effect_order": [
+          "casting-steel",
+          "steel-plate"
+        ],
+        "actual_lab_completions": 0,
+        "native_state_seeded": true,
+        "player_level": 2,
+        "player_saved_progress": 0.27,
+        "player_enabled": false,
+        "foreign_enabled": false,
+        "foreign_queue_progress": 0.42000000000000004,
+        "on_load_read_only": false
+      },
+      "cold_witnesses": [
+        {
+          "fixture_stage": "0.2.0",
+          "cap": 1,
+          "effect_order": [
+            "casting-steel",
+            "steel-plate"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": false,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": true
+        },
+        {
+          "fixture_stage": "0.2.0",
+          "cap": 1,
+          "effect_order": [
+            "casting-steel",
+            "steel-plate"
+          ],
+          "actual_lab_completions": 0,
+          "native_state_seeded": true,
+          "player_level": 2,
+          "player_saved_progress": 0.27,
+          "player_enabled": false,
+          "foreign_enabled": false,
+          "foreign_queue_progress": 0.42000000000000004,
+          "on_load_read_only": true
+        }
+      ],
+      "completed_save_sha256": "883BD011EB30D15E55A362280A247FA15F71846EF3AEF41EB913571901DE8818",
+      "cold_save_bytes_unchanged": true,
+      "independent_review_kind": "accepted-exact-native-result"
+    },
+    {
+      "stage": "relaxed",
+      "native_status": "failed",
+      "native_qualified": false,
+      "selected_mods": [
+        {
+          "name": "base",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "elevated-rails",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "quality",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "recycler",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "space-age",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "mir-fixture-mir5-active-mods-observer",
+          "version": "0.1.0",
+          "enabled": true
+        },
+        {
+          "name": "more-infinite-research",
+          "version": "5.0.21002",
+          "enabled": true
+        },
+        {
+          "name": "mir-fixture-mir5-native-owner-cap-order",
+          "version": "0.3.0",
+          "enabled": true
+        }
+      ],
+      "input_save_sha256": "883BD011EB30D15E55A362280A247FA15F71846EF3AEF41EB913571901DE8818",
+      "source_result_sha256": "D98F29F3611860BDB6F962B6E691CEFC379061257A8F326BC58407A14989CC7B",
+      "result_sha256": "421DB970A77B13F325AA4AA3174E0741D1B69CE72224D98A34E82221C6D6709E",
+      "fixture_commit": "9243319efb36f7234f80121848765114b2768f95",
+      "fixture_sha256": "18C49FE4C9DC1CEF1E941FA299BACBF9C1D7AB5E5C1C45D475FC1A869A9017B6",
+      "caller_sha256": "CE05928420541515E9442D725A0219B6B395F3DE0625B214D8C18D54E4E60D09",
+      "manifest_sha256": "9EA228E63D35B6C115103DC9478AC222EA5BEE9A14615FCBA4DAC2E38698B9AF",
+      "composition_sha256": "4BB789444E97E4E7FF155651EA67A3E55767B70C3771AE78352AFCDC5156B712",
+      "source_provenance_sha256": "287A5B6953E317C511BD8D77FE652C5962E55B8027643905F8774E4DD50F1503",
+      "dispatch_review_sha256": "E990134C6156A8DDDB7652228A00E03F2C0542ADCAC202370FA1997574589ABF",
+      "independent_actual_review_sha256": "DC73F00028FE0D9799BFF52D7ABE56BF12F057973C04C47B6D1550BC5E58AA98",
+      "root_review_adoption_sha256": "5D881B615FAD62A4D74EB13E2319D7C90C06B8052F6E247B57AA557077CE7440",
+      "processes": [
+        {
+          "pid": 25320,
+          "ledger_rows": 4,
+          "exit_code": 1,
+          "timed_out": false,
+          "completion_predicate_observed": false
+        }
+      ],
+      "input_save_unchanged": true,
+      "all_controls_and_17_prior_mir_and_three_owned_archives_restored": true,
+      "independent_review_kind": "accepted-adverse-classification-only",
+      "source_witness": {
+        "fixture_stage": "0.2.0",
+        "cap": 1,
+        "effect_order": [
+          "casting-steel",
+          "steel-plate"
+        ],
+        "actual_lab_completions": 0,
+        "native_state_seeded": true,
+        "player_level": 2,
+        "player_saved_progress": 0.27,
+        "player_enabled": false,
+        "foreign_enabled": false,
+        "foreign_queue_progress": 0.42000000000000004,
+        "on_load_read_only": false
+      },
+      "observed_foreign_state": {
+        "level": 2,
+        "researched": false,
+        "enabled": true,
+        "maximum": 4294967295
+      },
+      "expected_foreign_enabled": false,
+      "exact_diagnostic": "[mir5-native-owner-cap-order] relaxed foreign foreign native state differs: level=2, researched=false, enabled=true, maximum=4294967295",
+      "raw_log_sha256": "CF417918C90ABA858744593AFCFFAD2D422EE4B4176AE5092EDBBD1ED40F2F6D",
+      "initial_passed_marker": false,
+      "successor_save": false,
+      "cold_processes": 0,
+      "writer_identified": false,
+      "unchanged_retry": false,
+      "success_reader_executed": false
+    }
+  ],
+  "complete_private_originals": [
+    {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "c7eb6ced73153dab95803590fcbe35c555b2fedb",
+      "path": "evidence/native-cap-current-canonical-inputs-r01/original-bodies.json.gz",
+      "records": 124,
+      "gzip_bytes": 321000,
+      "gzip_sha256": "A2AE0F0618DDC61180F2971E904E05B9A25B3C71FBFF2003BBDB330ED23C13BE",
+      "decoded_bytes": 1257526,
+      "decoded_sha256": "6FB7ACA8D90CC75E3044DB6D7DCE2161CA09D9D74A6023B092130D96126C02F0"
+    },
+    {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "87e8a5bb10ceaf80d6ede90444ea1927f7fb0e85",
+      "path": "evidence/native-cap-current-canonical-actual-r01/original-bodies.json.gz",
+      "records": 43,
+      "gzip_bytes": 92655,
+      "gzip_sha256": "8056ABC732CC5384B47AD5DC86723D63CA48B5AD71A06F6160F6DC2012F97E18",
+      "decoded_bytes": 460165,
+      "decoded_sha256": "20102E8D2D261CE7FADBD27C388535534AE3AC5D278D0770114F6C4A3C6EDB52"
+    },
+    {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "af1db398c7d54f7fe0fe7e06b3607548a1bebcde",
+      "path": "evidence/native-cap-current-canonical-independent-actual-r01/original-bodies.json.gz",
+      "records": 7,
+      "gzip_bytes": 38258,
+      "gzip_sha256": "A7CC81A1E9773C66FB6AC10CF6BB4E8A80D67F9E636E00CDBB8257D40D2F6D22",
+      "decoded_bytes": 121793,
+      "decoded_sha256": "609DADDC05F2EF60A3AC4A0511C397CCD2D2FE0654846A72BD7DA608A6100208"
+    },
+    {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "0c64728c46522210f61313f4e58f71026d450034",
+      "path": "evidence/native-cap-current-permuted-inputs-r01/original-bodies.json.gz",
+      "records": 77,
+      "gzip_bytes": 263196,
+      "gzip_sha256": "129C717A316ADD12B2B0132A90C172F75D1EE022D11F9EAB2AFF8F89ACCED1C1",
+      "decoded_bytes": 1024754,
+      "decoded_sha256": "D3131D021BA416617ED5A5DF2839FCCDBB4A2A27A37F45435BE81722ED9559C7"
+    },
+    {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "182039f21c926c5d74ecfc77af53a25898a1df5b",
+      "path": "evidence/native-cap-current-permuted-actual-r01/original-bodies.json.gz",
+      "records": 45,
+      "gzip_bytes": 91959,
+      "gzip_sha256": "C6BF4561062DD80837C81691459549314BDE77B0A1A379658E0093176A04D167",
+      "decoded_bytes": 422783,
+      "decoded_sha256": "CF4E249DE4ABA632D167C82934248D304D0F73120F3A2A2A57D1586CCF4472C5"
+    },
+    {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "be150fd41b08802eca82d319413c9208acbb8cef",
+      "path": "evidence/native-cap-current-permuted-independent-actual-review-r01/original-bodies.json.gz",
+      "records": 8,
+      "gzip_bytes": 40695,
+      "gzip_sha256": "8835A5A6C3A3A4823296B4276479C734BA7FB06DC27241BE72446BDE43569113",
+      "decoded_bytes": 151654,
+      "decoded_sha256": "25E845CC08B50B4271B6A4124F1E2285AACD9CAEBFE149629C64393085D330CC"
+    },
+    {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "2f13dc430531c769f8000f0d0eceb546c918b9a3",
+      "path": "evidence/native-cap-current-relaxed-inputs-r01/original-bodies.json.gz",
+      "records": 80,
+      "gzip_bytes": 266455,
+      "gzip_sha256": "5EC6533A9DD9FD9ECE504FFEF8DD3D8182D00D59DDC07CF11D503117BA41D46F",
+      "decoded_bytes": 1052977,
+      "decoded_sha256": "8C82234AEC3B852ADB1E5254A7F2494E2BD13A8309CEE6D3BB7F85318674821E"
+    },
+    {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "3655f73da91a9ca062462468fd5ebfc9964d0d95",
+      "path": "evidence/native-cap-current-relaxed-adverse-r01/original-bodies.json.gz",
+      "records": 39,
+      "gzip_bytes": 80447,
+      "gzip_sha256": "E16D6DB21D154813AD0243E9EC5286E5ED1EF41474493A67C0D6E5CC9B51AFDE",
+      "decoded_bytes": 323726,
+      "decoded_sha256": "7E972F4AFABCA66D5C99073E871E1FC201AC2D9131F665FE7910425EBF890209"
+    },
+    {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "5f69c6bf66e5a98180849a37d621c5af70c21930",
+      "path": "evidence/native-cap-current-relaxed-independent-adverse-review-r01/original-bodies.json.gz",
+      "records": 8,
+      "gzip_bytes": 50149,
+      "gzip_sha256": "69F2362E68D0DB30C2143DA1D3C25F8030C2F6A3698BD7D0F2FC47BB068F1360",
+      "decoded_bytes": 183186,
+      "decoded_sha256": "EE3D5138CC3A4F7C7BAECF6F533951D937BEFBC57B4C009D158F7CCE7ADA6149"
+    }
+  ],
+  "primary_save_custody": {
+    "receipt": "build/qualification/native-cap-current-protected-saves-r01/primary-copy-readback.json",
+    "receipt_sha256": "EE19FB2754BD947D1927DF13F559CE978B55219D8E98065F29288071F9177DD8",
+    "copies": [
+      {
+        "role": "original-uncapped",
+        "primary_relative_path": "build/qualification/native-cap-current-protected-saves-r01/C804033F523F3C4E91CE2E8E92E84B7568E53E3830C39A7663EBFC2C611EB843/mir5-native-complete.zip",
+        "bytes": 568597,
+        "sha256": "C804033F523F3C4E91CE2E8E92E84B7568E53E3830C39A7663EBFC2C611EB843",
+        "crc_members": 55
+      },
+      {
+        "role": "current-canonical",
+        "primary_relative_path": "build/qualification/native-cap-current-protected-saves-r01/39DAF4ED4988DC89E174D29E6F4DC8A826EA16D4BC8A446B90EEE2E9FEAF6B6B/mir5-native-complete.zip",
+        "bytes": 568984,
+        "sha256": "39DAF4ED4988DC89E174D29E6F4DC8A826EA16D4BC8A446B90EEE2E9FEAF6B6B",
+        "crc_members": 55
+      },
+      {
+        "role": "current-permuted",
+        "primary_relative_path": "build/qualification/native-cap-current-protected-saves-r01/883BD011EB30D15E55A362280A247FA15F71846EF3AEF41EB913571901DE8818/mir5-native-complete.zip",
+        "bytes": 569037,
+        "sha256": "883BD011EB30D15E55A362280A247FA15F71846EF3AEF41EB913571901DE8818",
+        "crc_members": 55
+      }
+    ],
+    "original_native_input_locators_unchanged": true
+  },
+  "interpretation": [
+    "Canonical and permutation preserve observed foreignfalse while capped; they do not prove the sign or absence of unobserved saved ownership records. Cap0 relaxation fails the independently required foreignfalse baseline.",
+    "The failure is an actual native state expectation failure, not a timeout or a substituted host pass. Its fixture stack identifies the observation, not the writer. No SIF entry-state exception applies.",
+    "Raw source dictionaries retain0.42000000000000004. Earlier rounded source-summary metadata is excluded as a raw oracle; original reports remain unchanged.",
+    "Exact executed fixture assertions cover native0.1 bonuses, visibility, queue identity and prior-phase state in successful legs; no separate unlogged numeric snapshot is invented. Failed-leg control flow is not a complete positive-right pass."
+  ],
+  "retained_adverses": [
+    "Original09a/E3/58F source, setup and historical adverses retain their existing exact identities.",
+    "Root and independent reader/header/diff/quoting mistakes and preservation-helper schema refusal are retained separately. None caused a new Factorio run, changed the fixture or waived the failed foreign state."
+  ],
+  "limits": [
+    "Explicit seeded level2 research, zero new labs and default costs. Not lab-earned work, custom native costs, broad modpack or saved ownership-storage audit.",
+    "Not published5.0.2-to-changed-version continuity, current sourceB credit/fallback work, UI/Library/client/multiplayer, performance, release or stable acceptance."
+  ],
+  "next_work": "Keep421D and all original saves. Source owner investigates entry/admission/record/callback ordering, adds a focused failing negative control, and supplies a reviewed correction. Declare and independently admit affected exact native requalification; do not retry unchanged or normalize the required foreignfalse away.",
+  "aggregate_native_qualification": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}
