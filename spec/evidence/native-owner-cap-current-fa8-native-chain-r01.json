@@ -3,6 +3,7 @@
   "kind": "MIR5CurrentNativeOwnerCapOrderChainV1",
   "status": "canonical-and-permutation-pass-relaxation-fails-foreign-disablement",
   "candidate": {
+    "repository": "Julesc013/more-infinite-research",
     "source_commit": "fa8aae3eeff46caa2ae679712c3e53d01684506d",
     "player_tree": "75e5cea1075d9c9f75b858abfe0ed3246b3f8010",
     "archive_sha256": "DA037A34ADBC295B76054211086C98FA359C02D97DEA0D58B874671C7F99823F",
@@ -15,6 +16,7 @@
     "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
   },
   "original_source": {
+    "repository": "Julesc013/more-infinite-research",
     "existing_chain": "spec/evidence/native-owner-cap-baseline-58f-native-chain.json",
     "fixture_source_commit": "09a66acc9c613617f95074f23f3fd9a4aab4765b",
     "result_sha256": "E6903CAF232E691B9E05E57B2D0F4D073038C2E1A7BB7B67BFB12EC1D5C54FF4",
@@ -38,6 +40,7 @@
     "replayed": false
   },
   "fixture_port": {
+    "repository": "Julesc013/mir-native-worker",
     "first_commit": "ec949779ab55ff61947b2ac067fc4289cca60d7e",
     "canonical_projection_commit": "9428c4093af1591c065f11b6f592cb6432bff266",
     "remaining_projection_commit": "9243319efb36f7234f80121848765114b2768f95",
