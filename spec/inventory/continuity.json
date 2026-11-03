@@ -281,10 +281,20 @@
         "settings",
         "import_export"
       ],
-      "remaining_implementation": [],
+      "historical_native_owner_settings_reconciliation_r01": {
+        "evidence": "spec/evidence/historical-native-owner-settings-intent-aero-r01.json",
+        "scope": "Twelve deduplicated original bodies at two published tags; finite native settings/cost/fallback/work obligations, original21-case host gaps and proposed correction remain distinct.",
+        "status": "partial-no-native-completion"
+      },
+      "remaining_implementation": [
+        "Recover native independent-field tuning with fixed, linear and unrecognized inherited costs; current strict baseline preflight gaps are recorded in historical-native-owner-settings-intent-aero-r01.",
+        "Restore safe recognized native cost-trio projection and resolve unsafe unrecognized replacement/fallback outcomes from independent original expectations.",
+        "Review and qualify proposed native matching-route tuning and data/control cap continuity in PR1634; host green does not close paid-state/native acceptance."
+      ],
       "remaining_qualification": [
         "Run nondefault effective-setting and profile-precedence cases where output or runtime behavior changes.",
-        "Retain the compiler, automatic-preview and inactive-artwork negative scopes as dispositions; do not recover a compiler or inspect disabled provider files."
+        "Retain the compiler, automatic-preview and inactive-artwork negative scopes as dispositions; do not recover a compiler or inspect disabled provider files.",
+        "Qualify changed native costs using pre-MIR and post-MIR engine research-unit work, foreign give-item/recipe state, caps/restore rights, successor save and two cold reloads; reuse only applicable exact inputs."
       ]
     },
     {
