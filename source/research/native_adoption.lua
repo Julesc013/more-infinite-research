@@ -1,7 +1,16 @@
--- Only additional recipes MIR appended or explicitly tuned on its five
--- declared native owners cross the data/control boundary. This is not
+-- Additional recipes MIR appended or explicitly tuned on its five declared
+-- native owners and explicit nonbinding settings decisions cross this boundary.
+-- Nonbinding decisions grant no new prototype mutation authority. This is not
 -- saved history, an inferred owner list, or permission to accept extra effects.
 local M = {prototype_name="more-infinite-research-native-adoptions"}
+
+local NATIVE_FAMILIES = {
+  ["low-density-structure-productivity"]="research_low_density_structure",
+  ["plastic-bar-productivity"]="research_plastic",
+  ["processing-unit-productivity"]="research_processing_unit",
+  ["rocket-fuel-productivity"]="research_rocket_fuel",
+  ["steel-plate-productivity"]="research_steel",
+}
 
 local function fail(message) error("MIR native adoption data: " .. message, 3) end
 local function finite(value)
@@ -9,10 +18,27 @@ local function finite(value)
 end
 
 function M.prototype()
-  return {type="mod-data", name=M.prototype_name, data={schema=1, owners={}}}
+  return {type="mod-data", name=M.prototype_name, data={schema=1, owners={}, withheld={}}}
 end
 
-function M.plan(raw, targets)
+local function withheld_rows(value, allowed)
+  if value == nil then return {} end
+  if type(value) ~= "table" then fail("invalid withheld native settings") end
+  local out = {}
+  for name, row in pairs(value) do
+    if type(name) ~= "string" or type(row) ~= "table" or allowed[name] == nil
+        or row.family ~= allowed[name] or type(row.generated) ~= "boolean" then
+      fail("invalid withheld native owner")
+    end
+    for key in pairs(row) do
+      if key ~= "family" and key ~= "generated" then fail("unknown withheld owner field") end
+    end
+    out[name] = {family=row.family, generated=row.generated}
+  end
+  return out
+end
+
+function M.plan(raw, targets, withheld)
   local owners = {}
   for _, row in ipairs(targets or {}) do
     if row.extended then
@@ -23,21 +49,30 @@ function M.plan(raw, targets)
         configured_change=row.configured_effect and row.effect_change or false}
     end
   end
-  if next(owners) == nil then return nil end
+  local withheld_settings = withheld_rows(withheld, NATIVE_FAMILIES)
+  for name in pairs(withheld_settings) do
+    if owners[name] ~= nil then fail("native owner is both adopted and withheld") end
+  end
+  if next(owners) == nil and next(withheld_settings) == nil then return nil end
   local prototype = raw["mod-data"] and raw["mod-data"][M.prototype_name]
   if type(prototype) ~= "table" or prototype.type ~= "mod-data" or prototype.name ~= M.prototype_name
       or type(prototype.data) ~= "table" or prototype.data.schema ~= 1
-      or type(prototype.data.owners) ~= "table" or next(prototype.data.owners) ~= nil then
+      or type(prototype.data.owners) ~= "table" or next(prototype.data.owners) ~= nil
+      or prototype.data.withheld ~= nil and (type(prototype.data.withheld) ~= "table"
+        or next(prototype.data.withheld) ~= nil) then
     fail("missing or changed private prototype")
   end
   for key in pairs(prototype.data) do
-    if key ~= "schema" and key ~= "owners" then fail("changed private prototype data") end
+    if key ~= "schema" and key ~= "owners" and key ~= "withheld" then fail("changed private prototype data") end
   end
-  return {prototype=prototype, owners=owners}
+  return {prototype=prototype, owners=owners, withheld=withheld_settings}
 end
 
 function M.apply(patch)
-  if patch then patch.prototype.data.owners = patch.owners end
+  if patch then
+    patch.prototype.data.owners = patch.owners
+    patch.prototype.data.withheld = patch.withheld
+  end
 end
 
 -- Called once by the control adapter with the one named LuaModData.data and
@@ -46,11 +81,17 @@ function M.read(value, definitions)
   if type(value) ~= "table" or value.schema ~= 1 or type(value.owners) ~= "table" then
     fail("invalid control data")
   end
-  for key in pairs(value) do if key ~= "schema" and key ~= "owners" then fail("unknown control field") end end
+  for key in pairs(value) do
+    if key ~= "schema" and key ~= "owners" and key ~= "withheld" then fail("unknown control field") end
+  end
   local allowed, out = {}, {}
-  for _, definition in ipairs(definitions) do allowed[definition.id] = true end
+  local families = {}
+  for _, definition in ipairs(definitions) do
+    allowed[definition.id], families[definition.id] = true, definition.family
+  end
+  local withheld = withheld_rows(value.withheld, families)
   for name, row in pairs(value.owners) do
-    if allowed[name] ~= true or type(row) ~= "table" or not finite(row.effect_change)
+    if allowed[name] ~= true or withheld[name] ~= nil or type(row) ~= "table" or not finite(row.effect_change)
         or row.configured_change ~= false and not finite(row.configured_change)
         or type(row.recipes) ~= "table" or #row.recipes == 0 then
       fail("invalid declared owner")
@@ -71,7 +112,7 @@ function M.read(value, definitions)
     if count ~= #row.recipes then fail("sparse admitted recipes") end
     out[name] = {recipes=recipes, effect_change=row.effect_change, configured_change=row.configured_change}
   end
-  return out
+  return out, withheld
 end
 
 return M
