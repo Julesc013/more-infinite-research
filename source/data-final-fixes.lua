@@ -105,6 +105,7 @@ require("research.product_target_extension").extend(technologies, values, {raw=d
   replacement_product_target_families=modern_selection and modern_selection.replacement_product_target_families,
   excluded_product_target_recipes=modern_selection and modern_selection.excluded_product_target_recipes})
 if modern then modern.preflight_collected_native_owner_targets(native_owner_targets, native_owner_patches) end
+local native_adoption_patch = modern and require("research.native_adoption").plan(data.raw, native_owner_targets)
 
 if modern_selection and modern_selection.bob_angel_f200_combined then
   require("compatibility.modern_catalogue.bob_angel_f200_combined").apply_effect_order(technologies)
@@ -225,6 +226,7 @@ end
 generator.install(technologies, data)
 if modern then
   modern.apply_native_owner_patches(native_owner_patches)
+  require("research.native_adoption").apply(native_adoption_patch)
   modern.apply_recipe_patches(modern_selection, data.raw)
 end
 

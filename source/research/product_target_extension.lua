@@ -140,6 +140,15 @@ local function verify_required_targets(result, required)
   end
 end
 
+local function admit_native_recipe(row, recipe)
+  row.admitted_recipes = row.admitted_recipes or {}
+  row.admitted_recipe_set = row.admitted_recipe_set or {}
+  if not row.admitted_recipe_set[recipe] then
+    row.admitted_recipe_set[recipe] = true
+    row.admitted_recipes[#row.admitted_recipes + 1] = recipe
+  end
+end
+
 -- Preserve the authored science family's dynamic lab-input targets. This
 -- collects only typed products; the existing recipe pass still selects every
 -- producer and applies its ordinary yield, denial and recycling safeguards.
@@ -276,11 +285,20 @@ function M.extend(technologies, values, context)
   verify_required_targets(result, required_targets)
   for _, row in ipairs(context.native_owner_targets or {}) do
     if row.active then
-      local relevant, change, mixed = {}, nil, false
-      for _, recipe in ipairs(row.definition and row.definition.admission.recipes or {}) do relevant[recipe] = true end
+      local relevant, canonical, change, mixed = {}, {}, nil, false
+      for _, recipe in ipairs(row.definition and row.definition.admission.recipes or {}) do
+        relevant[recipe], canonical[recipe] = true, true
+      end
       for _, match in ipairs(result.by_family[row.family] or {}) do relevant[match.recipe] = true end
       for _, effect in ipairs(row.effects) do
         if effect.type == "change-recipe-productivity" and relevant[effect.recipe] then
+          if row.configured_effect then
+            effect.change = streams[row.family].effect_percent / 100
+            if not canonical[effect.recipe] then
+              admit_native_recipe(row, effect.recipe)
+              row.extended = true
+            end
+          end
           local value = effect.change
           if type(value) ~= "number" or value ~= value or value == math.huge or value == -math.huge
             or change ~= nil and change ~= value then mixed = true end
@@ -352,6 +370,9 @@ function M.extend(technologies, values, context)
         effects[#effects + 1] = {type="change-recipe-productivity", recipe=row.recipe,
           change=native_selected[family] and technology.effect_change
             or streams[family].effect_percent * row.weight / 100}
+        if native_selected[family] then
+          admit_native_recipe(technology, row.recipe)
+        end
         seen[row.recipe], added = true, true
         report.extended_effects = report.extended_effects + 1
         if write then dispositions[key] = "added" end

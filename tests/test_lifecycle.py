@@ -68,7 +68,7 @@ class LifecycleTests(unittest.TestCase):
           end
 
           function boot(forces, raw_cap, profile, saved_storage, retained_handlers, worker_cap, active_mods,
-              agriculture_cap, extra_caps, recipe_caps)
+              agriculture_cap, extra_caps, recipe_caps, native_mod_data)
             storage = saved_storage or {}
             settings = {startup = startup_values(raw_cap, profile, worker_cap)}
             if agriculture_cap ~= nil then
@@ -94,7 +94,7 @@ class LifecycleTests(unittest.TestCase):
             if recipe_caps == false then
               prototypes = nil
             else
-              prototypes = {recipe = recipe_caps or {}}
+              prototypes = {recipe = recipe_caps or {}, mod_data = native_mod_data}
             end
             mods = active_mods or {}
             handlers = retained_handlers or {events = {}}

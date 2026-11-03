@@ -83,6 +83,7 @@ class NativeFamilyProductTargetTests(unittest.TestCase):
                 "unit": {"count_formula": "1.5^L*1000", "time": 60},
             })
         self.lua.execute(self.producer)
+        self.lua.execute('dofile(player_root.."/data.lua")')
         self.lua.execute("data.writes,data.emitted=0,nil")
 
     def pipeline(self):
@@ -139,14 +140,14 @@ class NativeFamilyProductTargetTests(unittest.TestCase):
         self.lua.execute('data.raw.technology["steel-plate-productivity"].effects[3].foreign.keep=false')
         self.assertEqual(before["effects"], plain(self.lua.globals().retained_effects))
 
-    def test_existing_native_recipe_owner_wins_without_duplicate_or_retuning(self):
+    def test_existing_native_recipe_owner_is_tuned_once_in_the_declared_product_scope(self):
         self.lua.execute('''
           local effects=data.raw.technology["steel-plate-productivity"].effects
           effects[#effects+1]={type="change-recipe-productivity",recipe="mir-fixture-adopt-steel-plate",change=.33}
         ''')
         self.lua.globals().settings.startup["ips-effect-per-level-research_steel"].value = 20
         self.pipeline()
-        self.assertEqual([.33], self.changes("research_steel"))
+        self.assertEqual([.2], self.changes("research_steel"))
 
     def test_disabled_native_family_keeps_upstream_effects_without_new_adoption(self):
         before = plain(self.owner("research_steel"))

@@ -93,6 +93,7 @@ $controls = @(
   [ordered]@{path='tests/test_product_targets.py';lua=$true},
   [ordered]@{path='tests/test_product_target_extension.py';lua=$true},
   [ordered]@{path='tests/test_native_family_product_targets.py';lua=$true},
+  [ordered]@{path='tests/test_native_owner_cap_adoption.py';lua=$true},
   [ordered]@{path='tests/test_diagnostics.py';lua=$true},
   [ordered]@{path='tests/test_target_adapters.py';lua=$true},
   [ordered]@{path='tests/test_caps.py';lua=$true},
