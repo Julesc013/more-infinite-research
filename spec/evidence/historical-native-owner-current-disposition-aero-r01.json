@@ -4,8 +4,16 @@
   "status": "source-host-completion-with-native-and-implementation-gaps",
   "requirement": "VER-07",
   "subject": "CONT-03",
-  "observed_dev": "190ee06feea6258ad5eaeb9b03965dfc4708eff4",
-  "player_tree": "f7d7c6dc806ebd8348de4975f92b47922cccf39d",
+  "observed_dev": "57c2c9f6e6e162c37362e7258d0f1ad9d41ab10c",
+  "player_tree": "c8b56b6c621c4ab401f8c02c97301a20c3195dca",
+  "previous_disposition": {
+    "commit": "57c2c9f6e6e162c37362e7258d0f1ad9d41ab10c",
+    "path": "spec/evidence/historical-native-owner-current-disposition-aero-r01.json",
+    "sha256": "045867D3588F983FE4EA32838881365E01BDF08F0DBC4B97A642DAF574A2C4A5",
+    "original_observed_dev": "190ee06feea6258ad5eaeb9b03965dfc4708eff4",
+    "original_player_tree": "f7d7c6dc806ebd8348de4975f92b47922cccf39d",
+    "preserved_as_observed": true
+  },
   "independent_expectations": {
     "record": "spec/evidence/historical-native-owner-settings-intent-aero-r01.json",
     "preserved_as_observed": true,
@@ -58,17 +66,44 @@
       "remaining_check": "Native F200/F210 affected existing paid research and useful recipe effects, default/explicit tuning, cap changes and restoration ownership, partial/queue state, protected save and two cold reloads.",
       "owner": "Black Glass native; Aero expectations and independent review",
       "status": "source-host-accepted-native-unverified"
-    }
-  ],
-  "remaining_implementation": [
+    },
     {
       "original_obligation_index": 2,
       "obligation": "Project the configured cost trio on recognized native fixed/linear/exponential/hybrid models.",
       "expectation": "Retain the independently recovered cost semantics and numeric/formula field distinction; do not replace the historical scope with only the current Base literal.",
-      "status": "implementation-gap",
-      "next_check": "Bounded recognized-cost admission and independent output/boundary-level assertions, followed by affected native paid-work qualification.",
-      "owner": "Aero source and expectations; Black Glass native"
-    },
+      "accepted_source": {
+        "pr": 1645,
+        "author": "e7cadb1e491ee07ce99a327132e9559e683c9436",
+        "merge": "5a3666314092f760a671745234a31c3bff9fb184",
+        "independent_review_sha256": "FA8562D6633C386AC322E10E8032265538874C745420AE2AEA32B14955972E68",
+        "independent_sol_review_sha256": "5EFA314425F7E9F7671BE7C91DDF194B16FF8B947116EF3414FC06388C17B1ED",
+        "review": "https://github.com/Julesc013/more-infinite-research/pull/1645#issuecomment-6606831254"
+      },
+      "implementation": "The five authored native productivity owners lazily admit bounded recognized inherited cost families before replacement. A selected cost field projects the complete effective base/increment/growth tuple. Numeric fixed counts stay numeric for a fixed configured tuple; formula inputs stay formula-shaped. Defaults and effect/time-only paths preserve inherited costs without importing the classifier. Detached all-before-write plans and strict Generator duplicate protection remain unchanged.",
+      "host_evidence": {
+        "control": "tests/test_native_owner_costs.py",
+        "author_groups": 8,
+        "independent_groups": 6,
+        "original_oracles": "Seven complete pure published modules are byte-identical at4.7.2/4.7.3; the host-only oracle retains their original hashes. No historical planner/model/fingerprint framework is loaded by the player package.",
+        "opponents": "The unchanged parent rejects four of five recognized input cases in the focused real-pipeline control. Mixed fields, malformed or over-budget grammar and late refusal preserve their opposing assertions; those are not native results.",
+        "exact_head_ci": "All four required checks attached to e7cadb1e pass. The complete host job tested synthetic merge34e04da55497fe7ec32ef36efe4b3357b58ddf1d over f40018d387a6b0f408f9fb0b457bf0917610cc3d and passed160 groups.",
+        "author_originals": {
+          "repository": "Julesc013/mir-native-worker",
+          "commit": "5ea4146ac3179fac9e2ded34d33103b7041ea9d6",
+          "path": "evidence/aero-native-owner-costs-r01/original-bodies.json.gz",
+          "bytes": 322787,
+          "sha256": "58E1409E6DFF08D2BBC180811572268625F3621B0929DBDBFC1C37645BE7C1B9",
+          "decoded_bytes": 1435181,
+          "decoded_sha256": "33BFB26A2D633622DCFD1F364F06FF5DC2360CCE79B46AAA8D3C0BA559CB9EFA"
+        }
+      },
+      "advisory": "COST-ARITH-01 remains open: inherited unary-before-power host classification is not an independently observed engine MathExpression equivalence oracle. The accepted admission fully replaces a recognized curve; no general engine-arithmetic claim follows.",
+      "remaining_check": "Native affected F200/F210 cost/research output, engine-normalized pre/post paid work, partial/current/queued state, foreign state, caps/restoration and protected successor save/two cold reloads. Unknown replacement/fallback and unsupported shapes remain separate implementation obligations below.",
+      "owner": "Black Glass native; Aero expectations and independent review",
+      "status": "source-host-accepted-native-unverified"
+    }
+  ],
+  "remaining_implementation": [
     {
       "original_obligation_index": 3,
       "obligation": "Withhold unsafe unrecognized replacement while preserving the native owner; resolve final fallback output separately.",
@@ -94,7 +129,7 @@
     "owner": "Black Glass execution; Aero oracle and independent review"
   },
   "limits": [
-    "This is a current disposition of two accepted source/host corrections, not a new test execution or native verdict.",
+    "This is a current disposition of three accepted source/host corrections, not a new test execution or native verdict.",
     "The original intent record, adverse receipts, source commits and all87 original request records remain unchanged.",
     "CONT03 remains partial and inventory_complete remains false. No other subject, published package, release claim, support scope or historical campaign is closed.",
     "Observed dev is an exact source snapshot. Later commits require consumed-input applicability review rather than transfer by commit age."
