@@ -315,11 +315,12 @@ local function preflight_owner(owner, definition, stream)
   if type(owner.unit) ~= "table" then owner_error(definition, "missing unit") end
   local cost_changed = configured(stream, "base_cost") or configured(stream, "linear_increment")
     or configured(stream, "growth_factor")
+  local cost_style
   if cost_changed then
-    -- Replacing a native cost still needs the separately reviewed cost-model
-    -- boundary. Effect/time tuning must not require an untouched cost to have
-    -- Base's literal balance or a formula MIR knows how to replace.
-    if owner.unit.count ~= nil or owner.unit.count_formula ~= expected.count_formula then
+    -- Preserve the delivered bounded family admission instead of requiring
+    -- one Base balance literal. Inherited/effect/time-only paths stay lazy.
+    cost_style = require("compatibility.native_owner_cost").classify(owner.unit)
+    if cost_style == nil then
       owner_error(definition, "unexpected count formula")
     end
   elseif owner.unit.count ~= nil then
@@ -334,9 +335,10 @@ local function preflight_owner(owner, definition, stream)
     owner_error(definition, "invalid inherited research time")
   end
   named_owner_effects(owner, definition)
+  return cost_style
 end
 
-local function owner_unit_plan(owner, definition, stream)
+local function owner_unit_plan(owner, definition, stream, cost_style)
   local expected = definition.expected
   local cost_changed = configured(stream, "base_cost") or configured(stream, "linear_increment")
     or configured(stream, "growth_factor")
@@ -346,8 +348,12 @@ local function owner_unit_plan(owner, definition, stream)
   if cost_changed then
     -- Published native-owner binding treats the cost controls as one tuple:
     -- when any member changes, all three effective setting values take over.
-    unit.count, unit.count_formula = nil,
-      productivity.cost(stream.base_cost, stream.linear_increment, stream.growth_factor)
+    if cost_style == "fixed-count" and stream.linear_increment == 0 and stream.growth_factor == 1 then
+      unit.count, unit.count_formula = stream.base_cost, nil
+    else
+      unit.count, unit.count_formula = nil,
+        productivity.cost(stream.base_cost, stream.linear_increment, stream.growth_factor)
+    end
   end
   if time_changed then unit.time = stream.research_time end
   return unit
@@ -386,10 +392,10 @@ function M.preflight_native_owner_patches(selection, raw, values)
     local stream = require_stream(values, definition.family)
     if planned_owner_change(stream, definition) then
       local owner = raw.technology[definition.id]
-      preflight_owner(owner, definition, stream)
+      local cost_style = preflight_owner(owner, definition, stream)
       patches[#patches + 1] = {
         owner = owner,
-        unit = owner_unit_plan(owner, definition, stream),
+        unit = owner_unit_plan(owner, definition, stream, cost_style),
         effects = owner_effect_plan(owner, definition, stream),
       }
     end
