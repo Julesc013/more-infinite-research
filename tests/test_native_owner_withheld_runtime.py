@@ -53,13 +53,13 @@ class WithheldRuntimeTests(unittest.TestCase):
             for _,native in pairs(technologies) do native.force=world end
             return world
           end
-          function parse(world,data,saved,configured_effect)
+          function parse(world,data,saved,configured_effect,history)
             local settings={}
             for _,row in ipairs(owner_rows) do
               settings["ips-max-level-"..row[2]]=2
               if configured_effect then settings["ips-effect-per-level-"..row[2]]=configured_effect end
             end
-            boot({[41]=world},0,"",saved,nil,0,active,nil,settings,{},data)
+            boot({[41]=world},0,"",saved,nil,0,active,nil,settings,{},data,history)
             return require("runtime.lifecycle"),require("runtime.catalogue")
           end
           function present(rows,name)
@@ -246,16 +246,33 @@ class WithheldRuntimeTests(unittest.TestCase):
                 self.lua.globals().actual_data = generator_fixture.lua_table(self.lua, {
                     "more-infinite-research-native-adoptions": {"data": private}})
                 self.lua.globals().actual_generated = uncovered
+                self.lua.globals().actual_technologies = generator_fixture.lua_table(self.lua,
+                    fallback_fixture.fixture.plain(data_case.lua.globals().data.raw.technology))
                 self.lua.execute(r'''
                   local world=world_for(true)
                   local native=world.technologies["processing-unit-productivity"]
                   world._queue={native};world.current_research=native
                   local queued=world._queue
                   local id="recipe-prod-research_processing_unit-1"
-                  if actual_generated then
-                    local row=technology(id,3,true);row.force=world;world.technologies[id]=row
+                  -- Materialize the actual emitted MIR definitions rather
+                  -- than inventing a partial post-data control-stage world.
+                  local function install(name,level)
+                    if world.technologies[name] then return end
+                    local proto=actual_technologies[name];assert(proto,"missing actual source "..name)
+                    proto.level=1;proto.max_level=4294967295
+                    if proto.enabled==nil then proto.enabled=true end
+                    local row=technology(name,level or 1,proto.enabled)
+                    row.prototype=proto;row.force=world;world.technologies[name]=row
                   end
-                  local lifecycle,runtime=parse(world,actual_data)
+                  local credits=actual_data["more-infinite-research-native-adoptions"].data.credits
+                  for _,d in ipairs(require("research.native_credit_definitions").collected_descriptors(credits)) do
+                    install(d.main_id,d.main_id==id and actual_generated and 3 or 1)
+                    install(d.positive_id);install(d.negative_id)
+                  end
+                  local lifecycle,runtime=parse(world,actual_data,nil,17,function(_,name)
+                    assert(actual_technologies[name],"creation claim lacks actual source")
+                    return {created="more-infinite-research"}
+                  end)
                   handlers.init()
                   assert(native.enabled and native.level==3 and native.researched==false)
                   assert(world._queue==queued and world.current_research==native and world.research_progress==.42)
@@ -264,7 +281,8 @@ class WithheldRuntimeTests(unittest.TestCase):
                   local generated=present(runtime.declared(),id)
                   assert((generated~=nil)==actual_generated)
                   if actual_generated then
-                    assert(lifecycle.cap_limits(world)[id]==2 and not world.technologies[id].enabled)
+                    assert(lifecycle.cap_limits(world)[id]==2,"fallback limit="..tostring(lifecycle.cap_limits(world)[id]))
+                    assert(not world.technologies[id].enabled,"fallback was not capped")
                   else assert(lifecycle.cap_limits(world)[id]==nil) end
                 ''')
 

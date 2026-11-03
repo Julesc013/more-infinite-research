@@ -206,6 +206,9 @@ local function static_rows(existing_technology_prototypes, withheld_native_owner
   for _, definition in ipairs(selected.sif_retained or {}) do
     runtime_private_credit_ids["recipe-prod-" .. definition.key .. "-1"] = true
   end
+  for _, definition in ipairs(selected.native_paid or {}) do
+    runtime_private_credit_ids["recipe-prod-" .. definition.key .. "-1"] = true
+  end
   for index = 1, #selected.definitions do
     local definition = selected.definitions[index]
     rows[#rows + 1] = generated_row("recipe-prod-" .. definition.key .. "-1", definition.family,

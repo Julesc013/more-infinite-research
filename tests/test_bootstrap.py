@@ -452,6 +452,40 @@ class BootstrapTests(unittest.TestCase):
           for _, id in ipairs({1, 2, 3, 4, 5, 6, 19, 20}) do assert(handlers.events[id] == nil) end
         ''')
 
+    def test_family_credit_preflight_refuses_before_any_configuration_write(self):
+        self.lua.execute('''
+          install_modules(false,false,false,true);install_runtime();load_control()
+          require("runtime.native_credits").preflight_family_transition=function(event)
+            assert(event.token==42);error("unknown first paid recipe mask")
+          end
+          local ok,message=pcall(handlers.configuration,{token=42,mod_changes={}})
+          assert(not ok and tostring(message):find("unknown first paid recipe mask",1,true))
+          assert(lifecycle_calls.configuration==nil and credit_calls.on_configuration_changed==nil
+            and library_calls.configuration==nil and module_credit_calls.preflight==nil
+            and cannon_credit_calls.preflight==nil)
+        ''')
+
+    def test_only_pending_private_work_binds_completion_and_cancellation(self):
+        self.lua.execute('''
+          install_modules(false,false,false,true);install_runtime();load_control()
+          local credits=require("runtime.native_credits");local pending=true;local seen
+          credits.needs_research_events=function()return pending end
+          credits.on_research_finished=function(event)seen=event;pending=false;return true end
+          credits.on_research_cancelled=function(event)seen=event;pending=false;return true end
+          handlers.init()
+          assert(type(handlers.events[4])=="function" and type(handlers.events[6])=="function")
+          assert(handlers.events[5]==nil and handlers.events[19]==nil)
+          local done={research={name="private-old-work"}}
+          handlers.events[4](done)
+          assert(seen==done and handlers.events[4]==nil and handlers.events[6]==nil)
+          pending=true;handlers.load()
+          assert(type(handlers.events[4])=="function" and type(handlers.events[6])=="function")
+          local cancelled={research={old=1}}
+          handlers.events[6](cancelled)
+          assert(seen==cancelled and handlers.events[4]==nil and handlers.events[6]==nil)
+          assert(handlers.nth[60]==nil and handlers.nth[61]==nil)
+        ''')
+
     def test_module_credit_preflight_precedes_all_configuration_writes(self):
         self.lua.execute('''
           install_modules(false, false, false, true); install_runtime(); load_control()
@@ -844,11 +878,11 @@ class BootstrapTests(unittest.TestCase):
             mods = space_age and {["space-age"] = "2.0.0"} or {}
             data = {extend = function(_, rows) emitted = rows end}
             assert(loadfile(data_source))()
-            assert(#emitted == (space_age and 2 or 1))
-            if space_age then
+            assert(#emitted == 2)
+            do
               local private=emitted[2]
               assert(private.type=="mod-data" and private.name=="more-infinite-research-native-adoptions")
-              assert(private.data.schema==1 and next(private.data.owners)==nil)
+              assert(private.data.schema==1 and next(private.data.owners)==nil and next(private.data.credits)==nil)
             end
             return emitted[1]
           end

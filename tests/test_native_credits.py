@@ -484,7 +484,9 @@ class NativeCreditRuntimeTests(unittest.TestCase):
         source = (PLAYER / "runtime/native_credits.lua").read_text(encoding="utf-8")
         self.assertIn('require("research.native_credit_definitions")', source)
         self.assertNotIn("Generator", source)
-        self.assertNotIn("on_research", source)
+        # The original twelve pairs require no research subscription. The
+        # five-family extension subscribes only for owed private queued work.
+        self.lua.execute("assert(not native_credits.needs_research_events())")
         self.assertNotIn("on_tick", source)
         self.assertNotIn("reset_technology_effects", source)
         self.assertNotIn("productivity_bonus", source)

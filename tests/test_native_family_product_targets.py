@@ -44,9 +44,9 @@ class NativeFamilyProductTargetTests(unittest.TestCase):
         oracle = read_published_source(ROOT,
             "fixtures/assert-vanilla-family-adoption/data-final-fixes.lua",
             "91EA8E7216095F4CF1905F859878392AEE0F2532F8FAA2779B572EC82FD72415").decode()
-        # Keep every original player assertion, including denials and absent
-        # duplicate MIR IDs. Retired schema4 report/signature metadata is not
-        # the player contract and is not restored into MIR5.
+        # Preserve the original raw-absence oracle verbatim. Current MIG-01
+        # controls distinguish public earning from private paid identities:
+        # raw absence cannot preserve earned/partial/queued work on upgrade.
         assert oracle.count("local adoption_data =") == 1
         cls.player_oracle = oracle.split("local adoption_data =", 1)[0]
 
@@ -100,10 +100,30 @@ class NativeFamilyProductTargetTests(unittest.TestCase):
         return [row["change"] for row in plain(self.owner(family).effects)
                 if row.get("type") == "change-recipe-productivity" and row.get("recipe") == recipe]
 
-    def test_full_pipeline_passes_all_original_player_assertions(self):
+    def test_full_pipeline_preserves_public_owner_denials_and_private_paid_identities(self):
         before = {n: plain(self.lua.globals().data.raw.recipe[n]) for n in RECIPES.values()}
         self.pipeline()
-        self.lua.execute(self.player_oracle)
+        all_rows = {name: plain(row) for name, row in self.lua.globals().data.raw.technology.items()}
+        def owners(recipe, *, public):
+            return sorted(name for name, row in all_rows.items()
+                if row.get("max_level") == "infinite" and not (public and row.get("hidden") is True)
+                and any(e.get("type") == "change-recipe-productivity" and e.get("recipe") == recipe
+                        for e in row.get("effects", [])))
+        for family, (owner, _) in OWNERS.items():
+            self.assertEqual([owner], owners(RECIPES[family], public=True))
+            retained = all_rows["recipe-prod-" + family + "-1"]
+            self.assertIs(True, retained["hidden"])
+            self.assertEqual({}, retained["effects"])
+            for direction, scalar in (("positive", .1), ("negative", -.1)):
+                carrier = all_rows[f"mir-native-credit-{family}-{RECIPES[family]}-{direction}"]
+                self.assertIs(True, carrier["hidden"])
+                self.assertIs(False, carrier["enabled"])
+                self.assertIs(False, carrier["visible_when_disabled"])
+                self.assertEqual([{"type":"change-recipe-productivity", "recipe":RECIPES[family],
+                                  "change":scalar}], carrier["effects"])
+        for recipe in ("mir-fixture-no-productivity-rocket-fuel", "mir-fixture-scrap-copper-plate-recovery",
+                       "mir-fixture-scrap-iron-plate-recovery", "mir-fixture-scrap-steel-plate-recovery"):
+            self.assertEqual([], owners(recipe, public=False))
         self.assertEqual(1, self.lua.globals().data.writes)
         for family in OWNERS:
             self.assertEqual([.1], self.changes(family))
@@ -194,7 +214,7 @@ class NativeFamilyProductTargetTests(unittest.TestCase):
 
     def test_known_native_overlap_uses_one_collector_and_existing_owner_precedence(self):
         self.lua.execute('''
-          data.raw.recipe["multi-native"]={category="crafting",enabled=false,allow_productivity=true,
+          data.raw.recipe["multi-native"]={type="recipe",name="multi-native",category="crafting",enabled=false,allow_productivity=true,
             ingredients={{type="item",name="iron-plate",amount=5}},
             results={{type="item",name="low-density-structure",amount=1},
               {type="item",name="steel-plate",amount=1},{type="item",name="copper-plate",amount=1}}}
@@ -215,7 +235,7 @@ class NativeFamilyProductTargetTests(unittest.TestCase):
             with self.subTest(steel_enabled=enabled):
                 self.boot()
                 self.lua.execute('''
-                  data.raw.recipe["existing-native"]={category="crafting",enabled=false,allow_productivity=true,
+                  data.raw.recipe["existing-native"]={type="recipe",name="existing-native",category="crafting",enabled=false,allow_productivity=true,
                     ingredients={{type="item",name="iron-plate",amount=5}},
                     results={{type="item",name="low-density-structure",amount=1},
                       {type="item",name="steel-plate",amount=1}}}
