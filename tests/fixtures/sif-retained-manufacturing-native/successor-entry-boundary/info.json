@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-sif-retained-manufacturing",
+  "version": "0.4.0",
+  "title": "MIR SIF entry-boundary successor proposal (not armed)",
+  "author": "MIR maintainers",
+  "description": "Test-only proposed pre-MIR enabled-state baseline; requires independent interpretation and complete native packet review.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.77",
+    "space-age >= 2.0.77"
+  ]
+}

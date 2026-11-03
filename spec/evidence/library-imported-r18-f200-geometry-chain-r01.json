@@ -1,0 +1,156 @@
+{
+  "schema": 1,
+  "kind": "MIRImportedF200GeometryAdverseChainV1",
+  "status": "adverse-before-actor-input",
+  "root_readback": {
+    "kind": "MIRImportedF200GeometryAdverseRootReadbackV1",
+    "status": "adverse-before-actor-input",
+    "terminal_sha256": "8115CD5A574FAEA8C1F8338673FB1A726C74EA2D460DE3E86693E89D802EEABE",
+    "preparation_sha256": "D08DBD9F7C8EB929EF96709991B809A289C991C5C96617D091E422CDB9490FDE",
+    "runtime_sha256": "8223E9698A719240CE304585D32252DBCF837271730F13895135B16AFAB9F343",
+    "actual_process_allocations": 3,
+    "actual_client_joins": 2,
+    "actual_actor_actions": 0,
+    "requested_window": "1280x720",
+    "observed_client_geometry": [
+      1600,
+      900
+    ],
+    "native_members": 86,
+    "native_bytes": 9304267,
+    "controller_members": 4,
+    "primary_packet_files": 107,
+    "primary_packet_bytes": 9441655,
+    "source_copy_primary_verified": true,
+    "protected_inputs": [
+      {
+        "target": "f200",
+        "role": "protected_original",
+        "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+        "crc_entries": 55
+      },
+      {
+        "target": "f200",
+        "role": "protected_copy",
+        "sha256": "029AA881F739457047B1E8318FA9A77508B28112757176B64CD0C3C31530638C",
+        "crc_entries": 55
+      },
+      {
+        "target": "f210",
+        "role": "protected_original",
+        "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+        "crc_entries": 55
+      },
+      {
+        "target": "f210",
+        "role": "protected_copy",
+        "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C",
+        "crc_entries": 55
+      }
+    ],
+    "original_controls_restored": true,
+    "post_run_owned_configs": [
+      {
+        "role": "server",
+        "expected": {
+          "path": "D:/Projects/Factorio/mir5-imported-f200-r18-r01/build/tmp/imported-library-r18-r01-controller-f200-inputs/server.ini",
+          "bytes": 274,
+          "sha256": "FEBC39E1992DADA8413CA386B09ED337BA6DC08CA6841CFE207D7A879C824E3F"
+        },
+        "actual": {
+          "path": "D:/Projects/Factorio/mir5-imported-f200-r18-r01/build/tmp/imported-library-r18-r01-controller-f200-inputs/server.ini",
+          "bytes": 274,
+          "sha256": "FEBC39E1992DADA8413CA386B09ED337BA6DC08CA6841CFE207D7A879C824E3F"
+        },
+        "changed": false
+      },
+      {
+        "role": "client-en",
+        "expected": {
+          "path": "D:/Projects/Factorio/mir5-imported-f200-r18-r01/build/tmp/imported-library-r18-r01-controller-f200-inputs/client-en.ini",
+          "bytes": 332,
+          "sha256": "99E96E06BB32EC60D4668CC572A4A41078578900CE369A940CEB39A1CC92B011"
+        },
+        "actual": {
+          "path": "D:/Projects/Factorio/mir5-imported-f200-r18-r01/build/tmp/imported-library-r18-r01-controller-f200-inputs/client-en.ini",
+          "bytes": 332,
+          "sha256": "99E96E06BB32EC60D4668CC572A4A41078578900CE369A940CEB39A1CC92B011"
+        },
+        "changed": false
+      },
+      {
+        "role": "client-de",
+        "expected": {
+          "path": "D:/Projects/Factorio/mir5-imported-f200-r18-r01/build/tmp/imported-library-r18-r01-controller-f200-inputs/client-de.ini",
+          "bytes": 332,
+          "sha256": "82245DBFA6209DD3EC85155BEA7C88CE566C523F3698AA4CD5E52D49CB99EB2F"
+        },
+        "actual": {
+          "path": "D:/Projects/Factorio/mir5-imported-f200-r18-r01/build/tmp/imported-library-r18-r01-controller-f200-inputs/client-de.ini",
+          "bytes": 332,
+          "sha256": "82245DBFA6209DD3EC85155BEA7C88CE566C523F3698AA4CD5E52D49CB99EB2F"
+        },
+        "changed": false
+      },
+      {
+        "role": "replacement",
+        "expected": {
+          "path": "D:/Projects/Factorio/mir5-imported-f200-r18-r01/build/tmp/imported-library-r18-r01-controller-f200-inputs/replacement-de.ini",
+          "bytes": 337,
+          "sha256": "C150F625A26DB1E22C48DD73F0534B87CF26125977EF9578232BB7122275091F"
+        },
+        "actual": {
+          "path": "D:/Projects/Factorio/mir5-imported-f200-r18-r01/build/tmp/imported-library-r18-r01-controller-f200-inputs/replacement-de.ini",
+          "bytes": 337,
+          "sha256": "C150F625A26DB1E22C48DD73F0534B87CF26125977EF9578232BB7122275091F"
+        },
+        "changed": false
+      }
+    ],
+    "factorio_zero": true,
+    "cleanup_errors": [],
+    "native_lifecycle_acceptance": false,
+    "performance_acceptance": false,
+    "release_qualification": false,
+    "next_action": "No unchanged retry. Inspect exact engine/window composition offline and review any distinct changed diagnostic before another GUI dispatch; advance unrelated ready native work.",
+    "limits": [
+      "The 1.25 size ratio alone does not establish the cause. No input, removal/replacement or new restart/final save occurred. Original terminal pending-ledger field is retained; actual allocation receipts prove three engines."
+    ],
+    "last_raw_report": "native-captures/server/factorio-current.log.report.rcon-f6f38c8d120347939ab1476cc1b6f2f0.json",
+    "last_phase": "text-prefix",
+    "actual_report_counters": {
+      "actual_joins": 2,
+      "actual_text_events": 0,
+      "actual_library_closed_events": 0,
+      "actual_library_close_observations": {},
+      "actual_drag_events": 0,
+      "actual_effect_reset_events": 0,
+      "actual_removed_events": 0
+    }
+  },
+  "receipt_capsule": {
+    "path": "spec/evidence/library-imported-r18-f200-geometry-receipts-r01.json.gz",
+    "bytes": 38969,
+    "sha256": "EAD85E8D9A0936D1F9CD93B4FC4FE7DA49BD7B8DA471B7185BF171631694C7A0",
+    "bodies": 19
+  },
+  "actual_native_review": {
+    "primary_path": "build/qualification/r18-f200-geometry-review-r01/review.json",
+    "bytes": 3770,
+    "sha256": "826020B22F880CE3D4A99B4A71446485551131752307F93D2507D10040138A92",
+    "verdict": "adverse scope/custody confirmed; no F200 lifecycle acceptance"
+  },
+  "screenshot": {
+    "primary_path": "build/qualification/imported-library-r18-native-f200-geometry-adverse-r01/native-captures/client-de/inspection.png",
+    "bytes": 2460637,
+    "sha256": "DF9EB71B80AC23320E7BAD1E1BE734F3408C7B4C66C0F69C219D15144B173695"
+  },
+  "limits": [
+    "Requested1280x720 produced actual1600x900 in both native client reports and the owned DE PNG; the exact1280x720 guard stopped before all actor input.",
+    "Actual three allocations/two joins/16 private queries are observations, not removal/replacement/restart/export or complete Library acceptance.",
+    "The1.25ratio does not establish a cause. Exact engine help supports window-size; both engine manifests declare PerMonitorV2. No display/registry/compatibility setting was changed.",
+    "No unchanged retry. A separately reviewed one-engine geometry diagnostic precedes any changed F200 lifecycle packet; unrelated native work advances."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}

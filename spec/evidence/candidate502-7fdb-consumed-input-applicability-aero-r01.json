@@ -1,0 +1,110 @@
+{
+  "kind": "MIRAero502BToCConsumedInputApplicabilityV1",
+  "verdict": "GO-scoped-component-reuse-with-original-identity",
+  "original_native_result_sha256": "629E2935BCDC6BE633CB964D2745EA18702B88F270957EE2E032805ED0033FDA",
+  "original_player_sha256": "2113F85C4678580C75A6E88FDDD6F3A96506D6BAE5FE85B5BB7BE52C2B77E5B9",
+  "current_f200_sha256": "6A66CF318AC908788DE24D2E3CD9D8F68421EB8AFDA4C113B2E3012FC701D64F",
+  "native_capsule": {
+    "bodies": 77,
+    "decoded_bytes": 14447385,
+    "sha256": "2C11B09D023CE4791EE546358C4A95C508A479DE61B20C3FC7A0ACC45A91973F",
+    "all_body_hashes_verified": true,
+    "decoded_in_memory_only": true
+  },
+  "original_result_readback": {
+    "terminal_actual_result_equal": true,
+    "natural_exit_zero_no_timeout": true,
+    "original_actual_resource_runs": 1,
+    "original_ledger_records": 4,
+    "loaded_selection": [
+      "base@2.0.77",
+      "mir-fixture-mir5-active-mods-observer@0.1.0",
+      "more-infinite-research@5.0.20002"
+    ],
+    "dumps": [
+      {
+        "path": "write-data/script-output/data-raw-dump.json",
+        "bytes": 13379856,
+        "sha256": "4E75AC09EC59E3A77EB2EEF9D58B1EC39D28A361D11445CA5B0F6CA49C36B75A",
+        "complete_json_parse": true,
+        "top_level_keys": 224
+      },
+      {
+        "path": "write-data/script-output/mod-settings-dump.json",
+        "bytes": 741217,
+        "sha256": "AF2569096906BB8B20AE0B0978B080F6438A40DBB58D95DD7DB519633207A48D",
+        "complete_json_parse": true,
+        "top_level_keys": 4
+      }
+    ],
+    "native_data_only_scope_preserved": true
+  },
+  "harness": [
+    {
+      "path": "tools/Invoke-PrototypeCapture.ps1",
+      "bytes": 16206,
+      "sha256": "7ABE4FBFABBDF06A12AA51408352F1FEB9AB1E9929C25F21672BADF23A4A9F23",
+      "unchanged": true
+    },
+    {
+      "path": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
+      "bytes": 27662,
+      "sha256": "D069C014D74E883C249928E812A258E2A2CB34AFE499219CB46A513345C2EC34",
+      "unchanged": true
+    },
+    {
+      "path": "tools/lib/validation/NativeProbeResources.ps1",
+      "bytes": 13233,
+      "sha256": "A34BD5FE79466B3EDA96F46EC132562192E6A70280901381C8AF560E7AB23328",
+      "unchanged": true
+    },
+    {
+      "path": "tools/lib/compatibility/LibraryActivation.ps1",
+      "bytes": 36007,
+      "sha256": "DAA42F32D91F2E90B0B907004BFF5D236EA25E42A77AE11515FBCDF4F538B549",
+      "unchanged": true
+    }
+  ],
+  "consumed_inputs": [
+    {
+      "input": "data/settings implementation, platform, info and dependency declaration",
+      "disposition": "unchanged-reusable-component-evidence",
+      "basis": "All224 non-changelog F200 members, including every Lua, info, locale, migration and asset byte, independently equal B. Source tree has only changelog member delta."
+    },
+    {
+      "input": "engine, Base installation, observer, Defaults settings, profile and original endpoint",
+      "disposition": "retain-original-result-inputs",
+      "basis": "Original D3BCFCA4 engine, FE566A0B Base info, 723D1E77 observer, 181D1983 profile and --dump-data-only result remain fixed historical identities; no fresh local measurement or assertion about current installed bytes."
+    },
+    {
+      "input": "public harness and supporting governor/library activation",
+      "disposition": "unchanged",
+      "basis": "All four original recorded controller hashes match both44af and7fdb Git bodies. No new native execution required to compare these immutable bytes."
+    },
+    {
+      "input": "ZIP container/changelog and exact caller admission binding",
+      "disposition": "new-candidate-binding-required-before-dispatch",
+      "basis": "F200 changes2113F85C/766282B to6A66CF31/766285B. Existing private caller explicitly pins2113F85C. Its old preparation/composition/review cannot admit C. Changelog can be read by the engine; original B success is not proof C was loaded."
+    },
+    {
+      "input": "prototype/settings content component",
+      "disposition": "GO-for-reuse-with-original-identity",
+      "basis": "The one-word valid changelog prose replacement changes no data/settings executable or declared inputs. Reuse original dump observation for unchanged data/settings component under result629E2935; no new correctness/parity verdict inferred from its existence."
+    },
+    {
+      "input": "next affected C Library/beta-successor or other ready native scenario",
+      "disposition": "bind-and-review-current-C-packet",
+      "basis": "Use exact C ZIP/hash with preserved engine/dependency/settings/fixture/endpoint identities and live safeguards. The next necessary C scenario can also establish actual C loader admission; no additional identical dump run is required solely by this prose change."
+    },
+    {
+      "input": "menu, runtime, GUI, save/client, beta-successor, performance, full parity and stable verdicts",
+      "disposition": "remain-open",
+      "basis": "Neither the B data-stage process nor this offline C comparison supplies those endpoints. No2.192s timing/menu/memory qualification or transfer to another engine/profile/edition."
+    }
+  ],
+  "fresh_C_native_admission": false,
+  "blanket_native_transfer": false,
+  "native_execution": false,
+  "performance_acceptance": false,
+  "release_qualification": false
+}

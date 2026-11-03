@@ -1,0 +1,135 @@
+{
+  "schema": 1,
+  "kind": "MIRSIFEntryBoundaryNativeCompletionChainV1",
+  "status": "independent-PASS-exact-bounded-paid-state-publication-safety-case",
+  "reviewed_on": "2026-11-03",
+  "source": {
+    "player_commit": "551532d4dd458445b19ed42e4e8d4a22d9ba628a",
+    "player_tree": "ad1d05ebfd4e4bdb4948368f8c1d0714f9b8054b",
+    "fixture_commit": "02902e720f799c6143d366eb7d58ccc576642076",
+    "fixture_version": "0.4.0",
+    "fixture_sha256": "EAEB70FD3E85FBC5DA6718EF0D97F8E5667E7CEC9D8649DCB9723177D0716646",
+    "candidate_version": "5.0.20002",
+    "candidate_sha256": "71F8EF8EE047BD3C93E216B9BAB81A85A241B95D8B3066FBB113ACD48491BFF2",
+    "engine": "2.0.77",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "profile_sha256": "CAB9FAAD4D66B98F88F4EA0EFDD8ACC7FACE49C27E054ECEA411162C4B8674F0",
+    "input_manifest_sha256": "475DF7AF7A47A1D57B5EF4FB8D2F7BD6BDEF6851BC671286BB9E6E63E4AD1F96",
+    "caller_sha256": "B80A2B9D22CB7CD0679CA8114D2528125DB5B62584E1DDD79229FB507C02D6E8",
+    "composition_sha256": "75426B99EE72852390F370F4BEE239C58A570EEED4E6602045CE548336523A2E",
+    "source_eligibility_sha256": "D6660D26CB651AAD8879740F625A89B6529A761572211C3D41CEBA7A5D14A512",
+    "dispatch_review_sha256": "022F77C0DEAB0557D481CCC2782CEBD8B8CE57E1B74D32A12C751A6D5F194E14"
+  },
+  "actual": {
+    "result_sha256": "AC692668A3A0CDB5822D586B409531EA6C275191875392C1B6894B2394026380",
+    "controller_readback_sha256": "EB37A7C3713A3E0D3B1171E68FBD3F1477DA6D77C28BE14F0E4E56658FA293DD",
+    "root_readback_sha256": "BDBD63CB0AA40C339580DE71D06E514144B0203C355762B622E077C398BC8B72",
+    "runs": [
+      {
+        "pid": 27944,
+        "exit_code": -1,
+        "predicate": true,
+        "duration_seconds": 14.743012
+      },
+      {
+        "pid": 15344,
+        "exit_code": 0,
+        "predicate": false,
+        "duration_seconds": 2.163172
+      },
+      {
+        "pid": 26432,
+        "exit_code": 0,
+        "predicate": false,
+        "duration_seconds": 2.143877
+      }
+    ],
+    "source": {
+      "sha256": "7E27C53726DCD56D07A91AA35C68DB6CCA9D5118C3D3164C31786A92C588B8D8",
+      "bytes": 826968,
+      "crc_members": 56,
+      "unchanged": true
+    },
+    "successor": {
+      "sha256": "1312CB103A6B8701DA4576B5A8E42F0EEC1E61F035C2EA23ACF378E7DC2148D1",
+      "bytes": 828524,
+      "crc_members": 56,
+      "two_read_only_colds": true,
+      "cold_save_byte_identical": true
+    },
+    "paid_levels": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "paid_partials": [
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5
+    ],
+    "recipe_bonuses": {
+      "casting-low-density-structure": 0.10000000149011612,
+      "low-density-structure": 0.10000000149011612,
+      "scrap-recycling": 0.10000000149011612,
+      "bioplastic": 0.20000000298023224,
+      "plastic-bar": 0.20000000298023224,
+      "processing-unit": 0.30000001192092896,
+      "ammonia-rocket-fuel": 0.4000000059604645,
+      "rocket-fuel": 0.4000000059604645,
+      "rocket-fuel-from-jelly": 0.4000000059604645,
+      "casting-steel": 0.5,
+      "steel-plate": 0.5
+    },
+    "queue": [
+      "mining-productivity-3",
+      "recipe-prod-research_plastic-1"
+    ],
+    "progress": 0.42000000000000004,
+    "source_to_entry": {
+      "player_processing": {
+        "source": false,
+        "entry": true
+      },
+      "foreign_mining": {
+        "source": false,
+        "entry": true
+      }
+    },
+    "event_order": "level -> mir-fixture-mir5-sif-retained-manufacturing -> space-is-fake -> more-infinite-research",
+    "fresh_force_and_hidden_prototype_and_API": "Passed unchanged fixture assertions; no invented extra numeric witnesses",
+    "new_labs": 0,
+    "controls_and_archives_restored": true
+  },
+  "independent_review": {
+    "sha256": "7719669FA5BEF93296F1E29F60FA741B014D2FE21FCD3CD0589736736DAFE9C4",
+    "public": "https://github.com/Julesc013/more-infinite-research/pull/1544#issuecomment-6592524543",
+    "original_review_bodies": 5,
+    "review_capsule_sha256": "4DA9A73DF856F01EB6F517D4F7451617F0737795699545DE92343AF6D14D5D91",
+    "verdict": "PASS-bounded-paid-state-publication-safety-case"
+  },
+  "custody": {
+    "private_repository": "Julesc013/mir-native-worker",
+    "actual_commit": "7dfc64c8a490903e58905763f1e6754918250940",
+    "actual_path": "evidence/sif-entry-boundary-actual-r01/original-bodies.json.gz",
+    "actual_bodies": 37,
+    "actual_gzip_sha256": "158D8DD18B6283DD2417C82DFA0F3F3663675FA3C97C7320A3CC7C0404851ED7",
+    "actual_decoded_sha256": "55337A98D0186E1DD69E7A98C8CB3FFFC8F719F87E647BC56473CDC7D8A88786",
+    "primary": "build/qualification/sif-entry-boundary-actual-r01",
+    "primary_review": "build/qualification/sif-entry-boundary-actual-r01/aero-originals/review.json"
+  },
+  "adverse": {
+    "result_sha256": "A4FBE659B4649F5B468E8816BB48A2893336ABD8B55020821D6A55D1D089C143",
+    "status": "FAILED; preserved with all previous adverse receipts"
+  },
+  "limits": [
+    "Closes only the affected restored-five-identity SIF paid-state publication safety obligation for exact frozen551/F200 inputs and eligibilityD666. This is not whole release GO or stable acceptance.",
+    "Does not claim original false enablement preserved, all MIR durable bookkeeping absent, binary storage decoded, an internal writer identified or eligibility for any different save/qualified positive or foreign-negative ownership.",
+    "Source was an explicit native fixture seed, not lab-earned. No useful lab work, GUI/Library hidden enqueue, multiplayer, performance or other save routes are closed. Original A4 and all prior adverse attempts remain failed/preserved."
+  ],
+  "release_qualification": false,
+  "stable_qualification": false
+}

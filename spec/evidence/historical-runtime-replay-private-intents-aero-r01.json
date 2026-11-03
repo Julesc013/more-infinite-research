@@ -1,0 +1,458 @@
+{
+  "kind": "MIRHistoricalRuntimeReplayPrivateIntentReviewV1",
+  "reviewed_on": "2026-11-03",
+  "created_utc": "2026-11-02T22:35:14.695628+00:00",
+  "reviewed_against": "551532d4dd458445b19ed42e4e8d4a22d9ba628a",
+  "subjects": [
+    "CONT-11",
+    "CONT-13",
+    "CONT-16",
+    "CONT-17",
+    "VER-07"
+  ],
+  "scope": "Three named runtime-replay/private-runtime test families and their path aliases only: five distinct bodies/64909bytes/47 live remote tag-path bindings from the retained91-tag index. Imported replay verifiers, authority writers, helper implementations, raw original native receipts, inter-release removals, attachments and other test families remain outside this slice.",
+  "method": "Read the unique F2D and Static bodies, latest private-runner body and complete earlier differences. Authenticate raw Git blob bytes, every commit/path binding and current remote tags. Do not execute historical PowerShell, native commands, cleanup or staging.",
+  "source_discovery": {
+    "index_sha256": "183AC3B7903A3B7E9E00192B88CF396357F3F1919AE8FB099B5C80004224EB1C",
+    "indexed_tags": 91,
+    "selected_bodies": 5,
+    "selected_body_bytes": 64909,
+    "distinct_remote_tag_path_bindings": 47,
+    "preserved_indexed_alias_bindings": 2,
+    "alias_policy": "The indexed local v4.2.0 references are retained but deduplicated into the same live v4.2.0-stable commit/path, never an extra published source."
+  },
+  "sources": [
+    {
+      "blob": "05bcad71d9c8dbbea2ec77cb8cebd12ec4e66446",
+      "bytes": 12424,
+      "sha256": "D77BF3B88F2BD5191D0E600B42D1C2D5561DAC257B8B7452C6F7FEC01B820681",
+      "paths": [
+        "validation/tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1"
+      ],
+      "locators": [
+        {
+          "commit": "5ca449820bdfa5595ca03686f32c74904c46daf3",
+          "path": "validation/tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+          "tag": "v4.0.0"
+        }
+      ],
+      "preserved_aliases": []
+    },
+    {
+      "blob": "06c9583c9d4decc84c50c39a8fb66feedc8dcadb",
+      "bytes": 12128,
+      "sha256": "BE6A61CE18202734A09E45F091D88D162310FD864AE1843B34335C5C8B73BA7B",
+      "paths": [
+        "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1"
+      ],
+      "locators": [
+        {
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+          "tag": "v4.1.0"
+        },
+        {
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+          "tag": "v4.2.0-stable"
+        },
+        {
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+          "tag": "v4.2.1"
+        },
+        {
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+          "tag": "v4.2.2"
+        },
+        {
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+          "tag": "v4.3.0"
+        },
+        {
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+          "tag": "v4.4.0"
+        },
+        {
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+          "tag": "v4.4.1"
+        },
+        {
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+          "tag": "v4.4.2"
+        },
+        {
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+          "tag": "v4.5.0"
+        },
+        {
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+          "tag": "v4.5.1"
+        },
+        {
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+          "tag": "v4.5.2"
+        },
+        {
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+          "tag": "v4.6.0"
+        },
+        {
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+          "tag": "v4.7.0"
+        },
+        {
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+          "tag": "v4.7.1"
+        },
+        {
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+          "tag": "v4.7.2"
+        },
+        {
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+          "tag": "v4.7.3"
+        }
+      ],
+      "preserved_aliases": [
+        {
+          "indexed_tag": "v4.2.0",
+          "canonical_tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1"
+        }
+      ]
+    },
+    {
+      "blob": "2a696233b021b00264cf8f73aaf2d5f72286a21f",
+      "bytes": 12454,
+      "sha256": "A7968E833E450A97B235F31D8B1BADCE94A9B1484139A258A56A5403885300A5",
+      "paths": [
+        "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1"
+      ],
+      "locators": [
+        {
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+          "tag": "v4.1.0"
+        },
+        {
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+          "tag": "v4.2.0-stable"
+        }
+      ],
+      "preserved_aliases": [
+        {
+          "indexed_tag": "v4.2.0",
+          "canonical_tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1"
+        }
+      ]
+    },
+    {
+      "blob": "c224c8ecb3b86abcaa359b1fa88dc18803aca5b2",
+      "bytes": 15064,
+      "sha256": "FDABAC453483E53CD30E96A9060A790042B79116DA67457659932A32D0ED56BE",
+      "paths": [
+        "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1"
+      ],
+      "locators": [
+        {
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+          "tag": "v4.2.1"
+        },
+        {
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+          "tag": "v4.2.2"
+        },
+        {
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+          "tag": "v4.3.0"
+        },
+        {
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+          "tag": "v4.4.0"
+        },
+        {
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+          "tag": "v4.4.1"
+        },
+        {
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+          "tag": "v4.4.2"
+        },
+        {
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+          "tag": "v4.5.0"
+        },
+        {
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+          "tag": "v4.5.1"
+        },
+        {
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+          "tag": "v4.5.2"
+        },
+        {
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+          "tag": "v4.6.0"
+        },
+        {
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+          "tag": "v4.7.0"
+        },
+        {
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+          "tag": "v4.7.1"
+        },
+        {
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+          "tag": "v4.7.2"
+        },
+        {
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+          "tag": "v4.7.3"
+        }
+      ],
+      "preserved_aliases": []
+    },
+    {
+      "blob": "5d7cfa6b8a901f0170faed9285558bc79f3e8e19",
+      "bytes": 12839,
+      "sha256": "259487826DC18B65D861E42D8CD61DBFDAD7E47E1E78C62618F70F5C165D2883",
+      "paths": [
+        "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1"
+      ],
+      "locators": [
+        {
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+          "tag": "v4.2.1"
+        },
+        {
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+          "tag": "v4.2.2"
+        },
+        {
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+          "tag": "v4.3.0"
+        },
+        {
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+          "tag": "v4.4.0"
+        },
+        {
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+          "tag": "v4.4.1"
+        },
+        {
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+          "tag": "v4.4.2"
+        },
+        {
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+          "tag": "v4.5.0"
+        },
+        {
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+          "tag": "v4.5.1"
+        },
+        {
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+          "tag": "v4.5.2"
+        },
+        {
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+          "tag": "v4.6.0"
+        },
+        {
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+          "tag": "v4.7.0"
+        },
+        {
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+          "tag": "v4.7.1"
+        },
+        {
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+          "tag": "v4.7.2"
+        },
+        {
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tests/runtime/Test-MIR4HistoricalPrivateRuntimeStatic.ps1",
+          "tag": "v4.7.3"
+        }
+      ],
+      "preserved_aliases": []
+    }
+  ],
+  "variant_notes": [
+    "05bcad71 ->2a696233 changes only the executable marker and validation/tests relocation default; no behavioral oracle change.",
+    "2a696233 ->c224c8ec adds the unconditional retired-runner stop, governed leased-input/resource/settings/evidence handling and string-preserving authority read. The predecessor/upgrade/two-repeat-load sequence and explicit no-admission/no-public-support scope are retained.",
+    "06c9583c and5d7cfa6b are distinct F2D/static-control source families. Neither source existence nor old passed/complete receipt fields prove actual native acceptance."
+  ],
+  "groups": [
+    {
+      "id": "exact-inputs-and-preserved-custody",
+      "subjects": [
+        "CONT-11",
+        "CONT-13",
+        "CONT-17"
+      ],
+      "disposition": "consolidate-existing-controls-and-retain-native-obligations",
+      "independent_expectation": "F2D checks exact2.0.77/D3,1.1.110/B7B4 and1.0.0/99F1 locks plus wrong-hash/version/build refusal, contained child-versus-sibling cleanup and retained input/evidence identities. The private historical runner checks exact engine/predecessor hashes, unique package-root metadata and candidate target/version; the static companion opposes timestamp normalization, metadata/hosting mismatches and shared mutable settings. These are input/custody obligations, not proof that any engine ran.",
+      "historical_sources": [
+        "06c9583c9d4decc84c50c39a8fb66feedc8dcadb",
+        "c224c8ecb3b86abcaa359b1fa88dc18803aca5b2",
+        "5d7cfa6b8a901f0170faed9285558bc79f3e8e19"
+      ],
+      "current_implementation": [
+        "tools/Invoke-NativeFixture.ps1",
+        "tools/package.py",
+        "tools/release.py",
+        "tests/historical_sources.py"
+      ],
+      "existing_host_controls": [
+        "tests/test_historical_sources.py::HistoricalSourceTests::test_does_not_read_a_current_worktree_file",
+        "tests/test_historical_sources.py::HistoricalSourceTests::test_rejects_changed_expected_bytes",
+        "tests/test_historical_sources.py::HistoricalSourceTests::test_missing_object_is_a_failure_without_worktree_or_network_fallback",
+        "tests/test_package.py::PackageTests::test_archive_identity_mismatch_is_refused_before_output",
+        "tests/test_release.py::ReleaseTests::test_verification_rejects_release_source_target_and_controller_identity_mutations"
+      ],
+      "applicable_evidence": "These five historical bodies and authenticated47 tag/path bindings are source evidence. Exact-input preservation is also required by REPO/VER/MIG contracts; no old authority receipt, static mock assertion count or current model review supplies native qualification.",
+      "remaining_executable_check": "Apply current exact-input/admission/restoration and original-timestamp custody controls to each actually affected packet; retain originals and separate natural exit, predicate stop, runner and product outcomes. Do not revive old cleanup/staging machinery or infer a current pass from the source mapping.",
+      "owner": "Aero source-intent review; Black Glass exact native packets and custody"
+    },
+    {
+      "id": "repeat-predecessor-load-is-not-successor-persistence",
+      "subjects": [
+        "CONT-11",
+        "CONT-13",
+        "CONT-17"
+      ],
+      "disposition": "retain-original-limited-claim-consolidate-stronger-current-migration-gate",
+      "independent_expectation": "All three historical private-runner variants create one predecessor save, then pass that same save to candidate-upgrade-load and candidate-repeat-load-1/-2. They assert exact package loading, map/hosting readiness and healthy logs. They do not write a completed candidate save, assert paid research/effects/queues/partial work, or observe that candidate save through two independent cold loads. Their own admission_status says private-proof-only-repeat-loads-do-not-satisfy-admission-reload-gate, and public_support_claim is false.",
+      "historical_sources": [
+        "05bcad71d9c8dbbea2ec77cb8cebd12ec4e66446",
+        "2a696233b021b00264cf8f73aaf2d5f72286a21f",
+        "c224c8ecb3b86abcaa359b1fa88dc18803aca5b2"
+      ],
+      "current_implementation": [
+        "spec/migrations.md",
+        "tests/fixtures/historical-transition/control.lua",
+        "tools/Invoke-NativeFixture.ps1"
+      ],
+      "existing_host_controls": [
+        "tests/test_historical_native_runner.py::HistoricalNativeFixtureControls::test_runner_keeps_historical_server_reloads_separate_from_the_modern_benchmark_vector",
+        "tests/test_historical_native_runner.py::HistoricalNativeFixtureControls::test_historical_save_completion_requires_a_closed_native_archive",
+        "tests/test_historical_transition_fixture.py::HistoricalTransitionFixtureControls::test_published_to_mir5_mock_preserves_partial_progress_and_queue_until_real_successor_event",
+        "tests/test_historical_transition_fixture.py::HistoricalTransitionFixtureControls::test_completed_successor_configuration_reentry_is_observational_and_rejects_corruption"
+      ],
+      "applicable_evidence": "MIG-03 and the existing exact nine same-edition4.7.3 routes, seven selected older-contract groups and four forward journeys own current qualification. Preserve each original result and affected consumed-input review. This record neither reauthenticates those native chains nor upgrades an old private load receipt.",
+      "remaining_executable_check": "Use the existing finite migration queue and exact protected origin -> normal candidate -> saved candidate -> two independent cold loads with affected paid/effect/queue/progress/ownership witnesses. No every-old-patch restart, new historical campaign or weaker repeat-load substitute follows.",
+      "owner": "Black Glass executes affected named routes; Aero reviews expectations/applicability"
+    },
+    {
+      "id": "retired-private-staging-and-mocked-process-controls",
+      "subjects": [
+        "CONT-13",
+        "CONT-17"
+      ],
+      "disposition": "superseded-implementation-preserve-accepted-safety-intent",
+      "independent_expectation": "The final private runner is deliberately unreachable: an unconditional mir-native-obsolete-runner refusal precedes helpers, staging or engine calls. The static companion verifies this refusal, then extracts historical helper functions into controlled mocks: ten predecessor/candidate stages across0.13-0.17, hardlink-only immutable archives, distinct private settings files, a4MiB settings bound, absent settings, exact package/map/hosting predicates, and a supervised exit-1 only after the required proof. It reports zero Factorio processes. Earlier variants copied archives and used a direct process loop; the later variant adds resource governance, leases and no-overwrite evidence custody while retaining the limited load oracle.",
+      "historical_sources": [
+        "c224c8ecb3b86abcaa359b1fa88dc18803aca5b2",
+        "5d7cfa6b8a901f0170faed9285558bc79f3e8e19"
+      ],
+      "current_implementation": [
+        "AGENTS.md",
+        "docs/development.md",
+        "tools/Invoke-NativeFixture.ps1"
+      ],
+      "existing_host_controls": [
+        "tests/test_historical_native_runner.py::HistoricalNativeFixtureControls::test_actual_owned_version_selector_covers_fresh_and_transition_old_engines",
+        "tests/test_historical_native_runner.py::HistoricalNativeFixtureControls::test_all_eight_profiles_select_only_exact_base_mir_and_shared_fixture",
+        "tests/test_historical_transition_fixture.py::HistoricalTransitionFixtureControls::test_transition_archive_guard_pins_stage_dependency_and_source_members"
+      ],
+      "applicable_evidence": "The current direct-library policy supersedes these staged archive directories and the old native runner. Preserve immutable inputs, private mutable controls, exact process ownership, bounded resources, guarded restoration and all adverse receipts. A mocked actor/status is host evidence only.",
+      "remaining_executable_check": "No executable port is needed for the retired module names, staged-directory layout or hardlink-only requirement. Keep current direct-library and cross-checkout no-hardlink rules binding. Review the actual governed caller and library/control restoration for each new native packet; do not re-enable this historical runner.",
+      "owner": "Black Glass owns live controller/library composition; Aero retains bounded source disposition"
+    },
+    {
+      "id": "old-replay-authority-and-target-selection",
+      "subjects": [
+        "CONT-11",
+        "CONT-13",
+        "CONT-16",
+        "CONT-17"
+      ],
+      "disposition": "superseded-authority-layout-retain-identity-and-gate-separation",
+      "independent_expectation": "F2D checks a particular old runtime-replay CLI/coordinator/schema/authority layout, a four-target aggregate and a frozen F200 receipt hash. Its expected aggregate status is explicitly PASSED-NO-CUTOVER and its transition/publication/signing/sealing booleans remain false. The code separately expects an M41-F2E cutover programme record; it does not itself prove that record's underlying execution. Its F210 latest-installed-experimental selection is a historical input policy, not permission to change an engine during a current pinned campaign.",
+      "historical_sources": [
+        "06c9583c9d4decc84c50c39a8fb66feedc8dcadb"
+      ],
+      "current_implementation": [
+        "spec/targets.md",
+        "spec/verification.md",
+        "docs/development.md",
+        "tools/release.py"
+      ],
+      "existing_host_controls": [
+        "tests/test_release.py::ReleaseTests::test_verification_rejects_missing_extra_changed_and_duplicate_assets",
+        "tests/test_release.py::ReleaseTests::test_verification_rejects_release_source_target_and_controller_identity_mutations"
+      ],
+      "applicable_evidence": "Preserve exact historical refs and authority/evidence separation. Current nine stable editions, explicitly experimental F018/early builds, checked promotion, administration probes and exact artifact/download gates come from current maintainer/spec authority. Old complete booleans are not current acceptance or publication authority.",
+      "remaining_executable_check": "None for obsolete schema/CLI/writer/count/old receipt-hash shapes. Final edition/native/package/delivery checks retain their existing current gates and supported-scope limits; do not restore an authority framework or silently expand private historical support.",
+      "owner": "Black Glass release coordinator; Aero independent artifact/claim review"
+    }
+  ],
+  "changes_to_player_or_tests": false,
+  "native_tests_run": false,
+  "historical_tests_executed": false,
+  "historical_receipts_relabelled": false,
+  "whole_source_reconciliation_complete": false,
+  "test_intent_reconciliation_complete": false,
+  "release_qualification": false,
+  "remaining": "This closes source-intent disposition for these five bodies only. Retain raw native/caller/receipt custody gaps and final-candidate migration/package/support obligations in the existing records; current normal SIF and useful compatibility/save checks are not replaced by historical wrapper review."
+}

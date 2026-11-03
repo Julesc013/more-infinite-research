@@ -1,6 +1,7 @@
 """Independent input-observer controls with native-shaped doubles, not native input evidence."""
 import argparse
 import hashlib
+import io
 import json
 from pathlib import Path
 import subprocess
@@ -23,6 +24,145 @@ def plain(value):
 
 
 class LibraryNativeInputFixtureControls(unittest.TestCase):
+    def test_imported_preservation_501_metadata_changes_only_the_exact_mir_dependency(self):
+        directory = ROOT / "tests/fixtures/migration-origins/f200-110-successor"
+        for target, engine, player in [("f200", "2.0.77", "5.0.20001"), ("f210", "2.1.23", "5.0.21001")]:
+            with self.subTest(target=target):
+                old = json.loads((directory / f"info-{target}-source-defaults.json").read_text())
+                new = json.loads((directory / f"info-{target}-source-defaults-501.json").read_text())
+                expected = dict(old, dependencies=[f"base = {engine}", f"more-infinite-research = {player}"])
+                self.assertEqual(new, expected)
+                self.assertNotEqual(old["dependencies"], expected["dependencies"])
+                self.assertEqual(new["name"], "mir-fixture-mir5-migration-origin-f200-110-source")
+                self.assertEqual(new["version"], "0.3.0" if target == "f200" else "0.4.0")
+
+    def test_r16_r17_profiles_reconstruct_exact_preservation_archives(self):
+        records = [json.loads((ROOT / f"spec/evidence/library-native-input-imported110-prepared-blackglass-r{number:02}.json").read_text()) for number in (4, 5)]
+        for record, prepared in [(record, prepared) for record in records for prepared in record["profiles"]]:
+            profile = json.loads((ROOT / prepared["profile"]["source"]).read_text())
+            historical = next(row for row in profile["mods"] if row["name"] == "mir-fixture-mir5-migration-origin-f200-110-source")
+            root = historical["name"] + "_" + historical["version"]
+            output = io.BytesIO()
+            members = prepared["owned_imported_fixture_members"]
+            self.assertEqual([member["destination"] for member in members], ["control.lua", "catalogue.lua", "data-final-fixes.lua", "settings-updates.lua", "info.json"])
+            with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_STORED) as archive:
+                for member in members:
+                    data = subprocess.check_output(["git", "show", member["source_revision"] + ":" + member["source"]], cwd=ROOT)
+                    self.assertEqual(len(data), member["bytes"])
+                    self.assertEqual(hashlib.sha256(data).hexdigest().upper(), member["sha256"])
+                    if member["destination"] != "info.json":
+                        original_revision = "dc3bb5899bac55396fd865fb2a504ce213b07bec"
+                        if "fixture_guard_source" in record and member["destination"] in {"control.lua", "data-final-fixes.lua", "settings-updates.lua"}:
+                            self.assertEqual(record["fixture_guard_source"], "9c6f952aaf2fea0348a910016c3a2c3c4e3937ef")
+                            original_revision = record["fixture_guard_source"]
+                        original = subprocess.check_output(["git", "show", original_revision + ":" + member["source"]], cwd=ROOT)
+                        self.assertEqual(data, original)
+                    else:
+                        info = json.loads(data)
+                        player = next(row for row in profile["mods"] if row["name"] == "more-infinite-research")
+                        self.assertEqual(info["dependencies"], ["base = " + profile["engine"]["version"], "more-infinite-research = " + player["version"]])
+                    entry = zipfile.ZipInfo(root + "/" + member["destination"], date_time=(1980, 1, 1, 0, 0, 0))
+                    entry.create_system = 3
+                    entry.external_attr = 0o100644 << 16
+                    entry.compress_type = zipfile.ZIP_STORED
+                    archive.writestr(entry, data)
+            digest = hashlib.sha256(output.getvalue()).hexdigest().upper()
+            self.assertEqual(digest, profile["archive_sha256"][root + ".zip"])
+            self.assertEqual(digest, prepared["frozen_player_and_observer_archives"][root + ".zip"])
+
+    def test_r18_preparation_changes_only_the_f200_observer_input_epoch(self):
+        previous = json.loads((ROOT / "spec/evidence/library-native-input-imported110-prepared-blackglass-r05.json").read_text(encoding="utf-8"))
+        current = json.loads((ROOT / "spec/evidence/library-native-input-imported110-prepared-blackglass-r06.json").read_text(encoding="utf-8"))
+        self.assertEqual(current["profiles"][1], previous["profiles"][1])
+        self.assertEqual(current["player_source_commit"], previous["player_source_commit"])
+        self.assertEqual(current["player_tree"], previous["player_tree"])
+        self.assertEqual(current["changed_player_members"], [])
+        before, prepared = previous["profiles"][0], current["profiles"][0]
+        for field in ("protected_input_save", "owned_imported_fixture_members"):
+            self.assertEqual(prepared[field], before[field])
+        profile_bytes = subprocess.check_output(["git", "show", prepared["profile"]["source_revision"] + ":" + prepared["profile"]["source"]], cwd=ROOT)
+        self.assertEqual(len(profile_bytes), prepared["profile"]["bytes"])
+        self.assertEqual(hashlib.sha256(profile_bytes).hexdigest().upper(), prepared["profile"]["sha256"])
+        profile = json.loads(profile_bytes)
+        output = io.BytesIO()
+        with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_STORED) as archive:
+            for member in prepared["owned_input_observer_members"]:
+                data = subprocess.check_output(["git", "show", member["source_revision"] + ":" + member["source"]], cwd=ROOT)
+                self.assertEqual(len(data), member["bytes"])
+                self.assertEqual(hashlib.sha256(data).hexdigest().upper(), member["sha256"])
+                entry = zipfile.ZipInfo("mir-fixture-mir5-library-native-input_0.3.3/" + member["destination"], (1980, 1, 1, 0, 0, 0))
+                entry.create_system, entry.external_attr = 3, 0o100644 << 16
+                archive.writestr(entry, data)
+        archive_name = "mir-fixture-mir5-library-native-input_0.3.3.zip"
+        digest = hashlib.sha256(output.getvalue()).hexdigest().upper()
+        self.assertEqual(digest, profile["archive_sha256"][archive_name])
+        self.assertEqual(digest, prepared["frozen_player_and_observer_archives"][archive_name])
+        self.assertNotEqual(digest, before["frozen_player_and_observer_archives"][archive_name])
+        for name, checksum in before["frozen_player_and_observer_archives"].items():
+            if name != archive_name:
+                self.assertEqual(prepared["frozen_player_and_observer_archives"][name], checksum)
+        self.assertFalse(current["independent_removed_slot_oracle"]["actual_native_execution"])
+
+    def test_r20_witness_inputs_keep_published_player_saves_and_exact_archive_identity(self):
+        previous = json.loads((ROOT / "spec/evidence/library-native-input-imported110-prepared-blackglass-r06.json").read_text())
+        current = json.loads((ROOT / "spec/evidence/library-native-input-imported110-prepared-blackglass-r07.json").read_text())
+        self.assertEqual(current["status"], "public-observer-and-actor-prepared-private-caller-not-yet-bound")
+        self.assertEqual(current["source_commit"], "61393d0a0e83a86edd9c1443c102e6a5e1168fba")
+        for field in ("player_source_commit", "player_tree", "public_helper_pins", "fixture_guard_source"):
+            self.assertEqual(current[field], previous[field])
+        self.assertEqual(current["changed_player_members"], [])
+        self.assertFalse(current["performance_acceptance"])
+        self.assertFalse(current["release_qualification"])
+        self.assertFalse(current["independent_action_target_oracle"]["native_execution"])
+        expected = {
+            "f200": ("2.0.77", "5.0.20001", "1024x576", "91E5B2C3BEF4D18932816204E57C5627F507708FE456DF2E349F6C263B50F7F9"),
+            "f210": ("2.1.23", "5.0.21001", "1280x720", "CC201B3C73BDC9A632864059C1E9112C2F588C20DACBD42E8B9AB1F1421152B4"),
+        }
+        archive_name = "mir-fixture-mir5-library-native-input_0.3.4.zip"
+        for before, prepared in zip(previous["profiles"], current["profiles"], strict=True):
+            with self.subTest(target=prepared["target"]):
+                self.assertEqual(prepared["target"], before["target"])
+                for field in ("protected_input_save", "owned_imported_fixture_members"):
+                    self.assertEqual(prepared[field], before[field])
+                reference = prepared["profile"]
+                raw = subprocess.check_output(["git", "show", reference["source_revision"] + ":" + reference["source"]], cwd=ROOT)
+                self.assertEqual(len(raw), reference["bytes"])
+                self.assertEqual(hashlib.sha256(raw).hexdigest().upper(), reference["sha256"])
+                self.assertEqual(raw, (ROOT / reference["source"]).read_bytes())
+                profile = json.loads(raw)
+                engine, player, requested, checksum = expected[prepared["target"]]
+                mods = {m["name"]: m["version"] for m in profile["mods"] if m["enabled"]}
+                self.assertEqual(mods["base"], engine)
+                self.assertEqual(mods["more-infinite-research"], player)
+                self.assertEqual(mods["mir-fixture-mir5-library-native-input"], "0.3.4")
+                self.assertEqual(profile["display"]["requested_window"], requested)
+                self.assertEqual(profile["display"]["actual_owned_client_geometry_required"], [1280, 720])
+                self.assertTrue(profile["native_action_target_witness"]["fresh_report_before_each_actor"])
+                self.assertTrue(profile["native_action_target_witness"]["actual_native_click_event_before_text"])
+                self.assertFalse(profile["native_action_target_witness"]["focus_getter_claimed"])
+                output = io.BytesIO()
+                with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_STORED) as archive:
+                    for member in prepared["owned_input_observer_members"]:
+                        self.assertEqual(member["source_revision"], current["source_commit"])
+                        data = subprocess.check_output(["git", "show", member["source_revision"] + ":" + member["source"]], cwd=ROOT)
+                        self.assertEqual(len(data), member["bytes"])
+                        self.assertEqual(hashlib.sha256(data).hexdigest().upper(), member["sha256"])
+                        entry = zipfile.ZipInfo("mir-fixture-mir5-library-native-input_0.3.4/" + member["destination"], (1980, 1, 1, 0, 0, 0))
+                        entry.create_system, entry.external_attr = 3, 0o100644 << 16
+                        archive.writestr(entry, data)
+                self.assertEqual(hashlib.sha256(output.getvalue()).hexdigest().upper(), checksum)
+                with zipfile.ZipFile(io.BytesIO(output.getvalue())) as archive:
+                    self.assertIsNone(archive.testzip())
+                    info = json.loads(archive.read("mir-fixture-mir5-library-native-input_0.3.4/info.json"))
+                    self.assertEqual(info["version"], "0.3.4")
+                    self.assertIn("base = " + engine, info["dependencies"])
+                    self.assertIn("~ more-infinite-research = " + player, info["dependencies"])
+                self.assertEqual(profile["archive_sha256"][archive_name], checksum)
+                self.assertEqual(prepared["frozen_player_and_observer_archives"][archive_name], checksum)
+                for name, digest in before["frozen_player_and_observer_archives"].items():
+                    if name != "mir-fixture-mir5-library-native-input_0.3.3.zip":
+                        self.assertEqual(prepared["frozen_player_and_observer_archives"][name], digest)
+
     def test_input_metadata_keeps_required_versions_without_mir_runtime_order_edges(self):
         historical = "mir-fixture-mir5-migration-origin-f200-110-source"
         fixture = "mir-fixture-mir5-library-native-input"
@@ -106,6 +246,152 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                     check=False,
                 )
                 self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+
+    def test_501_f210_profile_pins_the_public_beta_and_distinct_observer(self):
+        profile_path = ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r14.json"
+        info_path = FIXTURE / "info-input-identity-f210-501.json"
+        profile = json.loads(profile_path.read_text(encoding="utf-8"))
+        info = json.loads(info_path.read_text(encoding="utf-8"))
+        historical = "mir-fixture-mir5-migration-origin-f200-110-source"
+        fixture = "mir-fixture-mir5-library-native-input"
+
+        self.assertEqual(profile["kind"], "mir5-library-native-input-imported110-native-selection")
+        self.assertEqual(profile["target"], "f210")
+        self.assertEqual(profile["engine"], {
+            "version": "2.1.23",
+            "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        })
+        self.assertEqual(profile["protected_input_save"]["sha256"],
+                         "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C")
+        self.assertEqual(info["name"], fixture)
+        self.assertEqual(info["version"], "0.3.2")
+        self.assertEqual(info["factorio_version"], "2.1")
+        self.assertEqual(info["dependencies"], [
+            "base = 2.1.23",
+            "~ more-infinite-research = 5.0.21001",
+            f"~ {historical} = 0.4.0",
+        ])
+        self.assertEqual(
+            [(row["name"], row["version"], row["enabled"]) for row in profile["mods"]],
+            [
+                ("base", "2.1.23", True),
+                ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+                ("more-infinite-research", "5.0.21001", True),
+                (historical, "0.4.0", True),
+                (fixture, "0.3.2", True),
+            ],
+        )
+        self.assertEqual(
+            profile["archive_sha256"]["more-infinite-research_5.0.21001.zip"],
+            "C6C2470B438846484732E0E05D124DB31A1100C2F1AA0E770B327A4A6FBAFA5D",
+        )
+        control_path = FIXTURE / "control.lua"
+        # Keep the .3.2 archive bound to the immutable source used when r14
+        # was prepared; the current observer advances independently.
+        r14_source_revision = "4fadd571dfddc93d8ac9f3482b7105d09c9fa4a7"
+        control_bytes = subprocess.check_output(
+            ["git", "show", f"{r14_source_revision}:tests/fixtures/library-native-input/control.lua"], cwd=ROOT
+        )
+        info_bytes = subprocess.check_output(
+            ["git", "show", f"{r14_source_revision}:tests/fixtures/library-native-input/info-input-identity-f210-501.json"],
+            cwd=ROOT,
+        )
+        self.assertIn(b'observer_version=="0.3.2"', control_bytes)
+        archive_bytes = io.BytesIO()
+        archive_name = f"{info['name']}_{info['version']}"
+        with zipfile.ZipFile(archive_bytes, "w", compression=zipfile.ZIP_STORED) as archive:
+            for destination, contents in (("control.lua", control_bytes), ("info.json", info_bytes)):
+                entry = zipfile.ZipInfo(f"{archive_name}/{destination}", date_time=(1980, 1, 1, 0, 0, 0))
+                entry.create_system = 3
+                entry.external_attr = 0o100644 << 16
+                entry.compress_type = zipfile.ZIP_STORED
+                archive.writestr(entry, contents)
+        self.assertEqual(len(archive_bytes.getvalue()), 31225)
+        self.assertEqual(
+            hashlib.sha256(archive_bytes.getvalue()).hexdigest().upper(),
+            profile["archive_sha256"][f"{archive_name}.zip"],
+        )
+        self.assertEqual(
+            profile["archive_sha256"][f"{archive_name}.zip"],
+            "1A6CBB6E285402CB0EDEF3B461E5CFE70965B9882541594ECC42D4A563DE7C2C",
+        )
+
+        old = json.loads((ROOT / "tests/profiles/library-native-input-imported110-f210-2123-r13.json").read_text(encoding="utf-8"))
+        self.assertEqual(old["mods"][2]["version"], "5.0.21000")
+        self.assertEqual(old["mods"][4]["version"], "0.3.0")
+
+    def test_503_r15_profiles_reconstruct_the_exact_observer_archives(self):
+        record = json.loads(
+            (ROOT / "spec/evidence/library-native-input-observer-r15-prepared.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(record["kind"], "MIRLibraryNativeInputObserverPreparedV1")
+        self.assertEqual(record["status"], "exact r15 observer, archive and profile closure prepared; native execution pending")
+        source_revision = record["source"]["commit"]
+        self.assertEqual(len(source_revision), 40)
+
+        def raw_git_bytes(member):
+            return subprocess.check_output(
+                ["git", "show", f"{member['source_revision']}:{member['source']}"], cwd=ROOT
+            )
+
+        for prepared in record["profiles_and_archives"]:
+            target = prepared["target"]
+            with self.subTest(target=target):
+                profile_record = prepared["profile"]
+                profile_bytes = (ROOT / profile_record["path"]).read_bytes()
+                self.assertEqual(len(profile_bytes), profile_record["bytes"])
+                self.assertEqual(hashlib.sha256(profile_bytes).hexdigest().upper(), profile_record["sha256"])
+                profile = json.loads(profile_bytes)
+                self.assertEqual(profile["target"], target)
+                self.assertEqual(profile["engine"], prepared["engine"])
+                self.assertEqual(profile["protected_input_save"], prepared["protected_input_save"])
+                observer_rows = [row for row in profile["mods"] if row["name"] == "mir-fixture-mir5-library-native-input"]
+                self.assertEqual([(row["version"], row["enabled"]) for row in observer_rows], [("0.3.3", True)])
+                player_rows = [row for row in profile["mods"] if row["name"] == "more-infinite-research"]
+                self.assertEqual(len(player_rows), 1)
+                self.assertEqual(
+                    profile["archive_sha256"][prepared["player_package"]["name"]],
+                    prepared["player_package"]["sha256"],
+                )
+                self.assertEqual(len(prepared["archive"]["members"]), 2)
+                self.assertTrue(all(row["source_revision"] == source_revision for row in prepared["archive"]["members"]))
+
+                member_bytes = {row["destination"]: raw_git_bytes(row) for row in prepared["archive"]["members"]}
+                for member in prepared["archive"]["members"]:
+                    contents = member_bytes[member["destination"]]
+                    self.assertEqual(len(contents), member["bytes"])
+                    self.assertEqual(hashlib.sha256(contents).hexdigest().upper(), member["sha256"])
+                info = json.loads(member_bytes["info.json"])
+                self.assertEqual(info["name"], "mir-fixture-mir5-library-native-input")
+                self.assertEqual(info["version"], "0.3.3")
+                self.assertEqual(info["factorio_version"], prepared["factorio_line"])
+                historical_rows = [row for row in profile["mods"] if row["name"] == "mir-fixture-mir5-migration-origin-f200-110-source"]
+                self.assertEqual(len(historical_rows), 1)
+                self.assertEqual(info["dependencies"], [
+                    f"base = {prepared['engine']['version']}",
+                    f"~ more-infinite-research = {player_rows[0]['version']}",
+                    f"~ {historical_rows[0]['name']} = {historical_rows[0]['version']}",
+                ])
+
+                archive_record = prepared["archive"]
+                archive_name = archive_record["name"]
+                fixture_root = archive_record["root"]
+                archive_bytes = io.BytesIO()
+                with zipfile.ZipFile(archive_bytes, "w", compression=zipfile.ZIP_STORED) as archive:
+                    for member in prepared["archive"]["members"]:
+                        entry = zipfile.ZipInfo(
+                            f"{fixture_root}/{member['destination']}", date_time=(1980, 1, 1, 0, 0, 0)
+                        )
+                        entry.create_system = 3
+                        entry.external_attr = 0o100644 << 16
+                        entry.compress_type = zipfile.ZIP_STORED
+                        archive.writestr(entry, member_bytes[member["destination"]])
+                rebuilt = archive_bytes.getvalue()
+                digest = hashlib.sha256(rebuilt).hexdigest().upper()
+                self.assertEqual(len(rebuilt), archive_record["bytes"])
+                self.assertEqual(digest, archive_record["sha256"])
+                self.assertEqual(profile["archive_sha256"][archive_name], digest)
+                self.assertEqual(archive_name, "mir-fixture-mir5-library-native-input_0.3.3.zip")
 
     def test_order_neutral_input_archives_use_the_canonical_two_member_policy(self):
         record = json.loads(
@@ -262,7 +548,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         self.lua.globals().historical_path = (ROOT / "tests/fixtures/migration-origins/f200-110-successor/catalogue.lua").as_posix()
         self.lua.globals().fingerprint = lambda value: json.dumps(plain(value), sort_keys=True)
         self.lua.execute(r'''
-          function run_input_observer(target,opponent)
+          function run_input_observer(target,opponent,package_version,input_observer_version)
             local historical=assert(loadfile(historical_path))()
             local events={on_player_joined_game=1,on_gui_text_changed=2,on_gui_click=3,on_gui_location_changed=4,
               on_gui_closed=5,on_technology_effects_reset=6,on_player_removed=7}
@@ -320,7 +606,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                   else dimensions[key]=value end
                 end,
               })
-              local node={valid=true,type=kind,name=name,style=style}
+              local node={valid=true,type=kind,name=name,style=style,visible=true,enabled=true,player_index=0}
               node.add=function(spec)
                 local child=element(spec.type,spec.name);child.text=spec.text;node[spec.name]=child;return child
               end
@@ -431,9 +717,10 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               end
             end
             local base=target=="f200" and "2.0.77" or "2.1.23"
-            local active={base=base,["more-infinite-research"]=target=="f200" and "5.0.20000" or "5.0.21000",
+            local active={base=base,["more-infinite-research"]=package_version or (target=="f200" and "5.0.20000" or "5.0.21000"),
               [historical.fixture]=target=="f200" and "0.3.0" or "0.4.0",
-              ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]="0.3.0"}
+              ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
+              ["mir-fixture-mir5-library-native-input"]=input_observer_version or "0.3.0"}
             local env={game=game,storage=store,defines={events=events,gui_type={custom=99},controllers={character=7,cutscene=11}},log=function(message)logs[#logs+1]=message end,
               helpers={table_to_json=function()return "{}"end},
               require=function(name)assert(name=="__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue");return historical end,
@@ -475,6 +762,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 gui_type=opponent=="wrong-close-type" and 1 or 99,element=event_element}) end
               if opponent=="duplicate-close-event" then callbacks.events[5]({player_index=p.index,gui_type=99,element=root}) end
             end
+            local witness_before,witness_after,witness_wrong,witness_parent_hidden,witness_parent_disabled,witness_parent_invalid,foreign_witness,readonly_witness
             local readonly_report,readonly_load,cold_calls_before,cold_calls_after,initial_report,missing_query_report,missing_query_readonly,opened_getter_report,opened_getter_readonly
             local ok,message=pcall(function()
               parse()
@@ -503,7 +791,15 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 local root=en.gui.screen[root_name];root.location={x=265,y=24}
                 callbacks.events[4]({player_index=en.index,element=root})
               end
-              click(en,query(en));type_text(en,"ge");step("prefix")
+              local before_witness=fingerprint(store);witness_before=api().report();readonly_witness=before_witness==fingerprint(store)
+              click(en,query(en));witness_after=api().report()
+              local saved=query(en);en.gui.screen[root_name].mir_library_filters.mir_library_query=element("textfield","replacement")
+              witness_wrong=api().report();en.gui.screen[root_name].mir_library_filters.mir_library_query=saved
+              local filter=en.gui.screen[root_name].mir_library_filters
+              filter.visible=false;witness_parent_hidden=api().report();filter.visible=true
+              filter.enabled=false;witness_parent_disabled=api().report();filter.enabled=true
+              filter.valid=false;witness_parent_invalid=api().report();filter.valid=true
+              type_text(en,"ge");step("prefix")
               if opponent~="short-refresh" then game.tick=game.tick+60 end
               step("refresh");type_text(en,"ars");step("suffix")
               local root=en.gui.screen[root_name];root.location={x=root.location.x-30,y=root.location.y}
@@ -518,17 +814,17 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                end
               step("drag");key_close(en);step("escape");key_close(en);step("inventory")
               local other=en.gui.screen.mir5_input_other.mir5_input_other_query
-              click(en,other);type_text(en,"focus");step("foreign-prefix");game.tick=game.tick+60
+              click(en,other);foreign_witness=api().report();type_text(en,"focus");step("foreign-prefix");game.tick=game.tick+60
               step("foreign-refresh");type_text(en," kept");step("foreign-suffix")
               if opponent~="remove-connected" then de.connected=false;connected() end
-              step("remove-de");de=join(opponent=="removed-index-reused" and 2 or 3,"de");step("replacement");game.tick=game.tick+60;step("save")
+              step("remove-de");de=join(opponent=="removed-index-reused" and 2 or (opponent=="replacement-index-reuses-en" and 1 or 3),"de");step("replacement");game.tick=game.tick+60;step("save")
               en.connected=false;de.connected=false;connected()
               for _,p in pairs(game.players) do for _,node in pairs(p.gui.screen) do invalidate(node) end;p.gui.screen=element("screen","screen") end
               parse();before=fingerprint(store);callbacks.load();readonly_load=before==fingerprint(store)
               -- Native-shaped MIR join restoration, not an observer open call.
               build(en,memory[en.index]);build(de,memory[de.index]);join(opponent=="changed-restart-index" and 4 or 0,"en")
               if opponent=="duplicate-restart-role" then join(0,"en") end
-              join(3,"de")
+              join(opponent=="removed-index-reused" and 2 or 3,"de")
               if opponent=="cold-lost-query" then query(en).text="wrong" end
               if opponent=="cold-lost-location" then en.gui.screen[root_name].location={x=999,y=100} end
               cold_calls_before=calls
@@ -536,6 +832,8 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               game.tick=game.tick+60;step("complete-save")
             end)
             return {ok=ok,message=tostring(message),trace=trace,saves=game.saves,logs=logs,readonly_report=readonly_report,
+              witness_before=witness_before,witness_after=witness_after,witness_wrong=witness_wrong,readonly_witness=readonly_witness,
+              witness_parent_hidden=witness_parent_hidden,witness_parent_disabled=witness_parent_disabled,witness_parent_invalid=witness_parent_invalid,foreign_witness=foreign_witness,
               initial_report=initial_report,missing_query_report=missing_query_report,missing_query_readonly=missing_query_readonly,
               opened_getter_report=opened_getter_report,opened_getter_readonly=opened_getter_readonly,
               readonly_load=readonly_load,resets=resets,calls=calls,cold_calls_before=cold_calls_before,cold_calls_after=cold_calls_after,
@@ -543,8 +841,8 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
           end
         ''')
 
-    def run_case(self, target="f210", opponent=None):
-        return plain(self.lua.globals().run_input_observer(target, opponent))
+    def run_case(self, target="f210", opponent=None, package_version=None, input_observer_version=None):
+        return plain(self.lua.globals().run_input_observer(target, opponent, package_version, input_observer_version))
 
     def test_imported_probe_and_actual_event_observer_keep_the_declared_finite_sequence(self):
         for target in ("f200", "f210"):
@@ -568,6 +866,78 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertFalse(final["fixture_seeds_credit"])
                 self.assertTrue(final["load_observed"])
                 self.assertEqual(final["en_geometry"]["location"], {"x": 170, "y": 100})
+
+    def test_501_f210_observer_accepts_only_its_exact_candidate_identity(self):
+        accepted = self.run_case("f210", package_version="5.0.21001", input_observer_version="0.3.2")
+        self.assertTrue(accepted["ok"], accepted["message"])
+        self.assertEqual(accepted["final"]["phase"], "delivered")
+        for target, package_version, observer_version in (
+            ("f210", "5.0.21000", "0.3.2"),
+            ("f210", "5.0.21002", "0.3.2"),
+            ("f200", "5.0.20001", "0.3.2"),
+            ("f210", "5.0.21001", "0.3.0"),
+        ):
+            with self.subTest(target=target, package_version=package_version, observer_version=observer_version):
+                rejected = self.run_case(
+                    target, package_version=package_version, input_observer_version=observer_version
+                )
+                self.assertFalse(rejected["ok"])
+                self.assertIn("imported native target differs", rejected["message"])
+
+    def test_503_f200_observer_accepts_removed_player_index_reuse(self):
+        # Factorio 2.0 runtime-api.json LuaPlayer.index permits reuse after removal.
+        accepted = self.run_case("f200", "removed-index-reused", "5.0.20001", "0.3.3")
+        self.assertTrue(accepted["ok"], accepted["message"])
+        self.assertFalse(accepted["native_input_evidence"])
+        self.assertEqual(accepted["final"]["actual_joins"], 5)
+        self.assertEqual(accepted["final"]["removed_index"], accepted["final"]["de_index"])
+
+    def test_503_f210_observer_accepts_removed_player_index_reuse(self):
+        accepted = self.run_case(
+            "f210", "removed-index-reused", "5.0.21001", "0.3.3"
+        )
+        self.assertTrue(accepted["ok"], accepted["message"])
+        self.assertFalse(accepted["native_input_evidence"])
+        self.assertEqual(accepted["final"]["actual_joins"], 5)
+        self.assertEqual(
+            accepted["final"]["removed_index"], accepted["final"]["de_index"]
+        )
+
+        # Older observer identities still reject the same collision.
+        for target, package_version, observer_version in (
+            ("f210", "5.0.21001", "0.3.2"),
+            ("f200", "5.0.20000", "0.3.0"),
+        ):
+            with self.subTest(target=target, observer_version=observer_version):
+                rejected = self.run_case(
+                    target, "removed-index-reused", package_version, observer_version
+                )
+                self.assertFalse(rejected["ok"])
+                self.assertFalse(rejected["native_input_evidence"])
+
+    def test_503_f200_reuse_keeps_removal_and_identity_guards(self):
+        for opponent in ("removal-no-event", "removal-player-retained", "removal-root-retained",
+                         "removal-query-retained", "locale-never-ready", "unexpected-client-name",
+                         "replacement-index-reuses-en", "changed-restart-index", "duplicate-restart-role",
+                         "private-listed", "extra-mod", "missing-click-event", "native-effect-change"):
+            with self.subTest(opponent=opponent):
+                rejected = self.run_case("f200", opponent, "5.0.20001", "0.3.3")
+                self.assertFalse(rejected["ok"], rejected["message"])
+                self.assertFalse(rejected["native_input_evidence"])
+
+    def test_503_observer_still_requires_exact_501_candidate_identity(self):
+        for target, package_version in (
+            ("f200", "5.0.20000"),
+            ("f200", "5.0.20002"),
+            ("f210", "5.0.21000"),
+            ("f210", "5.0.21002"),
+        ):
+            with self.subTest(target=target, package_version=package_version):
+                rejected = self.run_case(
+                    target, package_version=package_version, input_observer_version="0.3.3"
+                )
+                self.assertFalse(rejected["ok"])
+                self.assertIn("imported native target differs", rejected["message"])
 
     def test_remove_de_records_each_native_operand_before_the_unchanged_compound_refusal(self):
         cases = {
@@ -597,6 +967,41 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                         f"retained_de_root_valid={str(expected['retained_de_root_valid']).lower()} "
                         f"retained_de_query_valid={str(expected['retained_de_query_valid']).lower()}",
                     )
+
+    def test_034_is_exactly_scoped_and_preserves_removed_index_reuse(self):
+        for target, package, wrong in (("f200", "5.0.20001", "5.0.20000"), ("f210", "5.0.21001", "5.0.21000")):
+            with self.subTest(target=target):
+                directory = ROOT / "tests/fixtures/library-native-input"
+                old = json.loads((directory / f"info-input-identity-{target}-033.json").read_text(encoding="utf-8"))
+                new = json.loads((directory / f"info-input-identity-{target}-034.json").read_text(encoding="utf-8"))
+                self.assertEqual(new.pop("version"), "0.3.4")
+                self.assertEqual(old.pop("version"), "0.3.3")
+                self.assertEqual(new, old)
+                accepted = self.run_case(target, "removed-index-reused", package, "0.3.4")
+                self.assertTrue(accepted["ok"], accepted["message"])
+                rejected = self.run_case(target, package_version=wrong, input_observer_version="0.3.4")
+                self.assertFalse(rejected["ok"])
+                self.assertIn("imported native target differs", rejected["message"])
+
+    def test_action_witness_is_readonly_tracks_native_click_and_retained_identity(self):
+        for target, package in (("f200", "5.0.20001"), ("f210", "5.0.21001")):
+            with self.subTest(target=target):
+                result = self.run_case(target, package_version=package, input_observer_version="0.3.4")
+                self.assertTrue(result["ok"], result["message"])
+                self.assertTrue(result["readonly_witness"])
+                before, after, wrong = (result[k] for k in ("witness_before", "witness_after", "witness_wrong"))
+                self.assertEqual((before["actual_query_clicks"], after["actual_query_clicks"], after["actual_other_clicks"]), (0, 1, 0))
+                self.assertTrue(after["en_library_target"]["root_same"])
+                self.assertTrue(after["en_library_target"]["query_same"])
+                self.assertFalse(wrong["en_library_target"]["query_same"])
+                for field in ("root_valid", "parent_valid", "query_valid", "root_visible", "parent_visible", "query_visible", "root_enabled", "parent_enabled", "query_enabled", "opened_is_root"):
+                    self.assertTrue(after["en_library_target"][field], field)
+                self.assertEqual(after["en_library_target"]["query_type"], "textfield")
+                self.assertEqual(after["en_library_target"]["root_player_index"], 0)
+                for case, field in (("witness_parent_hidden", "parent_visible"), ("witness_parent_disabled", "parent_enabled"), ("witness_parent_invalid", "parent_valid")):
+                    self.assertFalse(result[case]["en_library_target"][field])
+                foreign = result["foreign_witness"]["en_foreign_target"]
+                self.assertTrue(foreign["parent_valid"] and foreign["parent_visible"] and foreign["parent_enabled"])
 
     def test_readonly_reports_expose_actual_library_and_foreign_input_state(self):
         for target in ("f200", "f210"):
@@ -810,7 +1215,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
 
     def test_join_phase_and_retained_identity_are_required(self):
         for target in ("f200", "f210"):
-            for opponent in ("duplicate-initial-join", "join-during-input", "removed-index-reused",
+            for opponent in ("duplicate-initial-join", "join-during-input", "removed-index-reused", "replacement-index-reuses-en",
                              "changed-restart-index", "duplicate-restart-role"):
                 with self.subTest(target=target, opponent=opponent):
                     result = self.run_case(target, opponent)

@@ -1,0 +1,511 @@
+{
+  "kind": "MIRHistoricalPipeProductivityRequestIntentReviewV1",
+  "reviewed_against": "f5432c367bd8691bf478190c625a270b89923c39",
+  "subjects": [
+    "CONT-12",
+    "CONT-15",
+    "VER-07"
+  ],
+  "request_id": "PIPE-01",
+  "scope": "One request's preserved declaration, source locators and historical qualification/non-claim records. No all-material, inter-release, original-community-thread or current-native closure.",
+  "disposition": "Consolidate the unchanged request and recorded withheld admission; retain its open qualification obligations. Do not classify its requested implementation as delivered or erase its commit-4.2 decision.",
+  "request_ledger": {
+    "path": "spec/programmes/community-requests.json",
+    "unchanged_request_sha256": "ae60e1a5f914fae409af0260542d07f6f9792f953f6e6cf8f25b768a41e42360",
+    "request_count": 87,
+    "historical_unique_ledger_bodies": 3,
+    "original_tag_path_bindings": 17,
+    "bindings": [
+      {
+        "tag": "v4.2.0",
+        "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+        "path": "spec/programmes/community-requests.json",
+        "blob": "694ec1fb5be5c2f88169aab94e0aab4f06da05f7"
+      },
+      {
+        "tag": "v4.2.0-stable",
+        "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+        "path": "spec/programmes/community-requests.json",
+        "blob": "694ec1fb5be5c2f88169aab94e0aab4f06da05f7"
+      },
+      {
+        "tag": "v4.2.1",
+        "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+        "path": "spec/programmes/community-requests.json",
+        "blob": "403fb5d0f7babd89d66ee4ccf7fa174436ea2272"
+      },
+      {
+        "tag": "v4.2.2",
+        "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+        "path": "spec/programmes/community-requests.json",
+        "blob": "403fb5d0f7babd89d66ee4ccf7fa174436ea2272"
+      },
+      {
+        "tag": "v4.3.0",
+        "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+        "path": "spec/programmes/community-requests.json",
+        "blob": "403fb5d0f7babd89d66ee4ccf7fa174436ea2272"
+      },
+      {
+        "tag": "v4.4.0",
+        "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+        "path": "spec/programmes/community-requests.json",
+        "blob": "403fb5d0f7babd89d66ee4ccf7fa174436ea2272"
+      },
+      {
+        "tag": "v4.4.1",
+        "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+        "path": "spec/programmes/community-requests.json",
+        "blob": "403fb5d0f7babd89d66ee4ccf7fa174436ea2272"
+      },
+      {
+        "tag": "v4.4.2",
+        "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+        "path": "spec/programmes/community-requests.json",
+        "blob": "403fb5d0f7babd89d66ee4ccf7fa174436ea2272"
+      },
+      {
+        "tag": "v4.5.0",
+        "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+        "path": "spec/programmes/community-requests.json",
+        "blob": "403fb5d0f7babd89d66ee4ccf7fa174436ea2272"
+      },
+      {
+        "tag": "v4.5.1",
+        "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+        "path": "spec/programmes/community-requests.json",
+        "blob": "403fb5d0f7babd89d66ee4ccf7fa174436ea2272"
+      },
+      {
+        "tag": "v4.5.2",
+        "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+        "path": "spec/programmes/community-requests.json",
+        "blob": "403fb5d0f7babd89d66ee4ccf7fa174436ea2272"
+      },
+      {
+        "tag": "v4.6.0",
+        "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+        "path": "spec/programmes/community-requests.json",
+        "blob": "403fb5d0f7babd89d66ee4ccf7fa174436ea2272"
+      },
+      {
+        "tag": "v4.7.0",
+        "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+        "path": "spec/programmes/community-requests.json",
+        "blob": "403fb5d0f7babd89d66ee4ccf7fa174436ea2272"
+      },
+      {
+        "tag": "v4.7.1",
+        "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+        "path": "spec/programmes/community-requests.json",
+        "blob": "403fb5d0f7babd89d66ee4ccf7fa174436ea2272"
+      },
+      {
+        "tag": "v4.7.2",
+        "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+        "path": "spec/programmes/community-requests.json",
+        "blob": "403fb5d0f7babd89d66ee4ccf7fa174436ea2272"
+      },
+      {
+        "tag": "v4.7.3",
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "spec/programmes/community-requests.json",
+        "blob": "403fb5d0f7babd89d66ee4ccf7fa174436ea2272"
+      },
+      {
+        "tag": "v5.0.0",
+        "commit": "7e77f203859ab9384208c2c673983b1ffea44d2f",
+        "path": "spec/programmes/community-requests.json",
+        "blob": "36a4b3c1d6305778f02d03867c02bcb3a8770072"
+      }
+    ],
+    "current_request_exactly_equals_all_three_historical_bodies": true,
+    "canonical_index_remote_tags_checked": 16,
+    "supplemental_current_beta_binding": {
+      "commit": "b677ced0b1ae0d8bd9ae47eb6b272443faec6d63",
+      "path": "spec/programmes/community-requests.json",
+      "blob": "36a4b3c1d6305778f02d03867c02bcb3a8770072",
+      "bytes": 232168,
+      "sha256": "ff29fd80ccf90e984226f2302c72d6079ef7bc775e4954000411cffca50606fc"
+    },
+    "current_request_exactly_equals_published_v501": true,
+    "preserved_decision": "commit-4.2",
+    "preserved_status": "withheld-explicit-productivity-denial"
+  },
+  "current_source_register": [
+    {
+      "title": "User-supplied Reddit discussion",
+      "url": "https://www.reddit.com/r/factorio/comments/1w7yekg/",
+      "basis": "Pasted conversation, not a fresh complete thread capture. Relative comment ages are not treated as absolute dates.",
+      "id": "P1",
+      "observed_on": "2026-09-06"
+    },
+    {
+      "title": "Modern productivity catalogue",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/abe152a332741db268a39b5088866e5aab634fed/source/prototypes/streams/productivity.lua",
+      "basis": "Connected GitHub source read; declarations alone are not exact-environment realization proof.",
+      "id": "R2",
+      "observed_on": "2026-09-06"
+    }
+  ],
+  "original_plan_packet": {
+    "archive_bytes": 31534,
+    "archive_sha256": "04e04db65ba8d4e24e8f8aba73bc66244882eab633d27d63c4d47544cd42ea32",
+    "all_nine_members_crc_valid": true,
+    "all_seven_manifest_payloads_verified": true,
+    "all_eight_checksum_rows_verified": true,
+    "manifest_exactly_equals_retained_intake": true,
+    "original_request": {
+      "id": "PIPE-01",
+      "title": "Pipe, underground-pipe and heat-pipe productivity",
+      "requesters": [
+        "ihatebrooms",
+        "Julesc012"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity",
+      "proposed_scope": "Audit missing family, then admit qualified pipe production",
+      "rationale": "No named pipe family was found in the inspected modern catalogue; generated omissions and external owners still need checking.",
+      "implementation": "Audit aliases, settings, ownership and emitted coverage; add a shared pipe family only where absent. Treat 10%/5%/2% as proposed rates, not recovered historical truth. Include casting routes only after process review.",
+      "acceptance": [
+        "Base and overhaul pipe outputs covered",
+        "Underground-pipe recipes containing pipes do not create a recovery exploit",
+        "Heat-pipe balance separate",
+        "No duplicate native/external owner",
+        "Absence has visible diagnostic"
+      ],
+      "source_ids": [
+        "P1",
+        "R2"
+      ],
+      "feature_group": "material-families",
+      "status": "assessed-not-implemented-by-this-review"
+    },
+    "original_source_register": [
+      {
+        "title": "User-supplied Reddit discussion",
+        "url": "https://www.reddit.com/r/factorio/comments/1w7yekg/",
+        "basis": "Pasted conversation, not a fresh complete thread capture. Relative comment ages are not treated as absolute dates.",
+        "id": "P1",
+        "observed_on": "2026-09-06"
+      },
+      {
+        "title": "Modern productivity catalogue",
+        "url": "https://github.com/Julesc013/more-infinite-research/blob/abe152a332741db268a39b5088866e5aab634fed/src/mod/families/modern/prototypes/streams/productivity.lua",
+        "basis": "Connected GitHub source read; declarations alone are not exact-environment realization proof.",
+        "id": "R2",
+        "observed_on": "2026-09-06"
+      }
+    ],
+    "related_later_state": "The historical/current ledger retains all original request text/decision/acceptance fields, changes status to the recorded permission-denial disposition, and adds qualification plus remaining obligations.",
+    "implementation_performed": false,
+    "engine_qualification_performed": false,
+    "interpretation": "Original plan packet is authenticated as data. Its prompt/code is not executed or treated as new authority. It does not contain an independently authenticated complete P1 raw discussion."
+  },
+  "original_locator_limits": [
+    "P1 registers a maintainer-supplied pasted Reddit discussion, not a complete archived public thread. Fresh read of its exact URL on 2026-11-03 AEDT timed out; no original quote, reporter input or new acceptance decision is inferred.",
+    "The authenticated original plan packet binds R2 to src/mod/families/modern/prototypes/streams/productivity.lua at exact abe152, which is recovered and hashed here. The retained current register instead names an absent source/prototypes path; this disagreement is explicit, with no request-ledger rewrite or silent substitute. Root and modern copies at that commit are byte-identical.",
+    "The original31534-byte plan-pack ZIP and all declared/checksum payloads are now authenticated against the retained intake. This corrects the initial66c8225 source-only slice's unverified ZIP/R2 custody descriptions; that author commit remains preserved. Raw original P1 conversation custody remains separate.",
+    "The local v4.2.0 alias has the same commit/path/blob as canonical v4.2.0-stable and is not an independent published source."
+  ],
+  "source_records": [
+    {
+      "commit": "7e77f203859ab9384208c2c673983b1ffea44d2f",
+      "path": "spec/programmes/community-requests.json",
+      "blob": "36a4b3c1d6305778f02d03867c02bcb3a8770072",
+      "bytes": 232168,
+      "sha256": "ff29fd80ccf90e984226f2302c72d6079ef7bc775e4954000411cffca50606fc"
+    },
+    {
+      "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+      "path": "spec/programmes/community-requests.json",
+      "blob": "403fb5d0f7babd89d66ee4ccf7fa174436ea2272",
+      "bytes": 179871,
+      "sha256": "bfea3860459fca18b4197fb0e3cd9608823c9fb774f483b386b9dfd9127f21d7"
+    },
+    {
+      "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+      "path": "spec/programmes/community-requests.json",
+      "blob": "694ec1fb5be5c2f88169aab94e0aab4f06da05f7",
+      "bytes": 175598,
+      "sha256": "7a8e6a1d8552c13169ca8551070ac399e3cc3573846d115598ffad08c842c48f"
+    },
+    {
+      "commit": "b677ced0b1ae0d8bd9ae47eb6b272443faec6d63",
+      "path": "spec/programmes/community-requests.json",
+      "blob": "36a4b3c1d6305778f02d03867c02bcb3a8770072",
+      "bytes": 232168,
+      "sha256": "ff29fd80ccf90e984226f2302c72d6079ef7bc775e4954000411cffca50606fc"
+    },
+    {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "spec/programmes/evidence/community-2026-09-06/outcomes.json",
+      "blob": "1d1670295c94700573f49dbb6199f9ec8d23d388",
+      "bytes": 54677,
+      "sha256": "7d7a93d8bda5a7d93161ef89cca5cb6b6eaaadce4d63fabc826b6d37ed70e3ae"
+    },
+    {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "spec/programmes/evidence/community-2026-09-06/material-guard.json",
+      "blob": "79fd0b0b09952259868c01fc94858396df0bebe6",
+      "bytes": 743,
+      "sha256": "ce6d68cb17fd2937adaa7d189b69cdb2bd92f4b8f1aa8a76c1a3677da568c710"
+    },
+    {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "spec/programmes/mir4-4x-operating-programme-v1.json",
+      "blob": "c3114786ea9cd969cf3c2bbf4de9a2198c2f3c00",
+      "bytes": 39560,
+      "sha256": "ddfba9e15914d04809c2825e93e8fa426e7b416d9ea45717f8cdacc3493eac94"
+    },
+    {
+      "commit": "abe152a332741db268a39b5088866e5aab634fed",
+      "path": "prototypes/streams/productivity.lua",
+      "blob": "e613af11e7ef0caed3700b2138b457a0cd6f6f82",
+      "bytes": 25894,
+      "sha256": "3f53c3c408be8d1425e9c3ac44bbf6d5240556b2ced4ad8b4a2ccd382a6196eb"
+    },
+    {
+      "commit": "abe152a332741db268a39b5088866e5aab634fed",
+      "path": "src/mod/families/modern/prototypes/streams/productivity.lua",
+      "blob": "e613af11e7ef0caed3700b2138b457a0cd6f6f82",
+      "bytes": 25894,
+      "sha256": "3f53c3c408be8d1425e9c3ac44bbf6d5240556b2ced4ad8b4a2ccd382a6196eb"
+    },
+    {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "tests/runtime/Test-MIRAngelTinFinalStateAudit.ps1",
+      "blob": "fb4bb00a5fa34c0b3124247a4b1de21ac3ffb0ad",
+      "bytes": 16756,
+      "sha256": "cf3fde70e3344ee7d39d4f18f5d2f2cd81976947a3c8693b3cf2482cb8c20bb8"
+    },
+    {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "tests/runtime/Test-MIRBobAngelTinRouteSafety.ps1",
+      "blob": "2d10603de0e5c1aa5ed3e4175aeeab2303083ecf",
+      "bytes": 29229,
+      "sha256": "99fd5c9763d87a42593800f91535d4b884e97af20c30a6fe09416680799d3580"
+    }
+  ],
+  "historical_recorded_outcomes": {
+    "source": {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "spec/programmes/evidence/community-2026-09-06/outcomes.json",
+      "blob": "1d1670295c94700573f49dbb6199f9ec8d23d388",
+      "bytes": 54677,
+      "sha256": "7d7a93d8bda5a7d93161ef89cca5cb6b6eaaadce4d63fabc826b6d37ed70e3ae"
+    },
+    "campaigns": [
+      {
+        "scenario": "bob-core-suite",
+        "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+        "source_commit_binding": "unbound-source-files-bound-separately",
+        "scope": "exact-final-package-load-and-audit; source-commit-unbound; no-affected-save-or-weighted-process-qualification",
+        "rows": [
+          {
+            "schema": "1",
+            "kind": "coverage_recipe",
+            "category": "safe_skip",
+            "key": "heat-pipe",
+            "owners": "",
+            "productivity_eligible": "false",
+            "reason": "recipe_productivity_not_allowed",
+            "recipe": "heat-pipe",
+            "status": "safe_skip",
+            "visible": "true"
+          },
+          {
+            "schema": "1",
+            "kind": "coverage_recipe",
+            "category": "safe_skip",
+            "key": "pipe",
+            "owners": "",
+            "productivity_eligible": "false",
+            "reason": "recipe_productivity_not_allowed",
+            "recipe": "pipe",
+            "status": "safe_skip",
+            "visible": "true"
+          },
+          {
+            "schema": "1",
+            "kind": "coverage_recipe",
+            "category": "safe_skip",
+            "key": "pipe-to-ground",
+            "owners": "",
+            "productivity_eligible": "false",
+            "reason": "recipe_productivity_not_allowed",
+            "recipe": "pipe-to-ground",
+            "status": "safe_skip",
+            "visible": "true"
+          }
+        ]
+      },
+      {
+        "scenario": "krastorio2-spaced-out",
+        "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+        "source_commit_binding": "unbound-source-files-bound-separately",
+        "scope": "exact-final-package-load-and-audit; source-commit-unbound; no-affected-save-or-weighted-process-qualification",
+        "rows": [
+          {
+            "schema": "1",
+            "kind": "coverage_recipe",
+            "category": "safe_skip",
+            "key": "heat-pipe",
+            "owners": "",
+            "productivity_eligible": "false",
+            "reason": "recipe_productivity_not_allowed",
+            "recipe": "heat-pipe",
+            "status": "safe_skip",
+            "visible": "true"
+          },
+          {
+            "schema": "1",
+            "kind": "coverage_recipe",
+            "category": "safe_skip",
+            "key": "pipe",
+            "owners": "",
+            "productivity_eligible": "false",
+            "reason": "recipe_productivity_not_allowed",
+            "recipe": "pipe",
+            "status": "safe_skip",
+            "visible": "true"
+          },
+          {
+            "schema": "1",
+            "kind": "coverage_recipe",
+            "category": "safe_skip",
+            "key": "pipe-to-ground",
+            "owners": "",
+            "productivity_eligible": "false",
+            "reason": "recipe_productivity_not_allowed",
+            "recipe": "pipe-to-ground",
+            "status": "safe_skip",
+            "visible": "true"
+          }
+        ]
+      },
+      {
+        "scenario": "krastorio2",
+        "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+        "source_commit_binding": "unbound-source-files-bound-separately",
+        "scope": "exact-final-package-load-and-audit; source-commit-unbound; no-affected-save-or-weighted-process-qualification",
+        "rows": [
+          {
+            "schema": "1",
+            "kind": "coverage_recipe",
+            "category": "safe_skip",
+            "key": "heat-pipe",
+            "owners": "",
+            "productivity_eligible": "false",
+            "reason": "recipe_productivity_not_allowed",
+            "recipe": "heat-pipe",
+            "status": "safe_skip",
+            "visible": "true"
+          },
+          {
+            "schema": "1",
+            "kind": "coverage_recipe",
+            "category": "safe_skip",
+            "key": "pipe",
+            "owners": "",
+            "productivity_eligible": "false",
+            "reason": "recipe_productivity_not_allowed",
+            "recipe": "pipe",
+            "status": "safe_skip",
+            "visible": "true"
+          },
+          {
+            "schema": "1",
+            "kind": "coverage_recipe",
+            "category": "safe_skip",
+            "key": "pipe-to-ground",
+            "owners": "",
+            "productivity_eligible": "false",
+            "reason": "recipe_productivity_not_allowed",
+            "recipe": "pipe-to-ground",
+            "status": "safe_skip",
+            "visible": "true"
+          }
+        ]
+      }
+    ],
+    "interpretation": "Nine recorded rows in three selected profiles deny recipe productivity; those rows are not emitted pipe research, a Base-only result or current MIR5/native acceptance.",
+    "custody_limit": "The retained outcomes bind package/raw-result hashes but explicitly leave the source commit unbound. Raw campaign logs/results and original dependency closure were not recovered or replayed by this slice."
+  },
+  "guard_record": {
+    "source": {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "spec/programmes/evidence/community-2026-09-06/material-guard.json",
+      "blob": "79fd0b0b09952259868c01fc94858396df0bebe6",
+      "bytes": 743,
+      "sha256": "ce6d68cb17fd2937adaa7d189b69cdb2bd92f4b8f1aa8a76c1a3677da568c710"
+    },
+    "record": {
+      "status": "passed",
+      "scope": "controlled-material-process-guard-not-whole-ecosystem-proof",
+      "assertions": 12,
+      "engine_version": "Version: 2.1.17 (build 87315, win64, steam)\r\nVersion: 64\r\nMap input version: 1.0.0-0\r\nMap output version: 2.1.17-0",
+      "engine_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8",
+      "test_sha256": "A0B29B12892E5DDCFC6AE8B93E1DC4F495A2EA3D69B0755654249D31EF27121E",
+      "modules": [
+        {
+          "sha256": "99E25349BF5AEFE17A97A3397CED8549428939AED626B01BB0B26FC13EB49E0C",
+          "path": "src/mod/families/modern/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua"
+        }
+      ],
+      "log_sha256": "EA85529E4967D382D6A16BF50D09473FC9D9DCDB96B1409DB3F29A3E7EFD14C7"
+    },
+    "interpretation": "Twelve recorded controlled process-guard assertions do not prove weighted recycling economics for pipe/underground/heat-pipe routes or every ecosystem. This slice did not recover its raw log/test or relabel it current."
+  },
+  "task_record": {
+    "source": {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "spec/programmes/mir4-4x-operating-programme-v1.json",
+      "blob": "c3114786ea9cd969cf3c2bbf4de9a2198c2f3c00",
+      "bytes": 39560,
+      "sha256": "ddfba9e15914d04809c2825e93e8fa426e7b416d9ea45717f8cdacc3493eac94"
+    },
+    "record": {
+      "id": "A17",
+      "title": "Qualify pipe manufacturing and early material progression",
+      "programme_mapping": [
+        "M43-00"
+      ],
+      "depends_on": [
+        "A03",
+        "A05",
+        "A06"
+      ],
+      "owner_domain": "material-progression",
+      "requests": [
+        "PIPE-01",
+        "PROG-01"
+      ],
+      "acceptance": [
+        "Audit existing recipe owners before adding families",
+        "Exact safe manufacturing routes and effective caps",
+        "Finite early tiers and later infinite continuation preserve published identities and completed bonuses"
+      ],
+      "state": "active",
+      "evidence": [
+        "spec/programmes/evidence/community-2026-09-06/outcomes.json"
+      ]
+    },
+    "interpretation": "A17 remains active; a recorded load or permission denial does not close its admission/progression acceptance."
+  },
+  "independent_expectations": [
+    "Keep exact request ID, requester names, text, commit-4.2 decision and withheld status; 10%/5%/2% remains an unaccepted rate proposal.",
+    "Admission needs explicit recipe permission, actual weighted recycling/recovery/catalyst economics, separate heat-pipe balance, science/progression and one effective owner. A conservative graph guard or diagnostic load alone does not prove these.",
+    "The tin route/final-state sources explicitly exclude PIPE-01; their unrelated qualification cannot be reused as pipe-family evidence.",
+    "Pipeline-extent scaling changes fluid connection extent, not pipe-manufacturing research or its permission/economics; its existing controls are not PIPE-01 coverage."
+  ],
+  "remaining": [
+    "Retain the original P1 raw-paste/discussion custody as unverified; do not fabricate quoted input. The original packet and exact original R2 declaration binding are recovered; the stale current-register source/ locator is recorded without rewriting its historical text.",
+    "If executing the existing request, first resolve exact admitted Base/overhaul pipe/underground/heat-pipe recipes, permissions, existing owners and weighted process safety; then exercise affected startup, useful research and saved state. No family or proposed rates are admitted by this review.",
+    "Current native/prototype/evidence applicability and other requests, source families, inter-release deletions and global VER-07 remain open."
+  ],
+  "native_execution": false,
+  "request_decisions_changed": false,
+  "player_source_changed": false,
+  "inventory_complete": false
+}

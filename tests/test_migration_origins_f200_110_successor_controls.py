@@ -550,7 +550,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self.lua.globals().legacy_module_definitions_path = LEGACY_MODULE_DEFINITIONS.as_posix()
         self.lua.globals().legacy_module_runtime_path = LEGACY_MODULE_RUNTIME.as_posix()
         self.lua.execute(r'''
-          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus, reset_drops_module_bonus, saved_battery_token, current_recipe_scalar, duplicate_current_recipe, foreign_saved, foreign_queue_progress, foreign_current_saved, foreign_current_technology, recipe_snapshot_variant, direct_recipe_scalar, duplicate_direct_recipe, completed_configuration)
+          function migration_origin_110_successor_lifecycle(target, source_fixture_name, active_wrapper_name, catalogue_fixture_name, legacy_module_bonus, reset_drops_module_bonus, saved_battery_token, current_recipe_scalar, duplicate_current_recipe, foreign_saved, foreign_queue_progress, foreign_current_saved, foreign_current_technology, recipe_snapshot_variant, direct_recipe_scalar, duplicate_direct_recipe, completed_configuration, initial_identity)
             local callbacks={events={}}
             local env={storage={},logs={},created_labs=0,saved=false,
               script={active_mods={},on_configuration_changed=function(fn) callbacks.configuration=fn end,
@@ -765,6 +765,9 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
             local module_runtime=env.require("runtime.legacy_module_credits")
             assert(module_runtime.on_configuration_changed({mod_changes={
               ["more-infinite-research"]={old_version="1.1.0",new_version=env.script.active_mods["more-infinite-research"]}}})==true)
+            if initial_identity then
+              for key,value in pairs(initial_identity) do env.script.active_mods[key]=value end
+            end
             local function alter_current_module_shape(force)
               local effects=force.technologies["recipe-prod-research_modules-1"].prototype.effects
               if current_recipe_scalar~=nil then
@@ -809,7 +812,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 elseif completed_configuration=="incomplete" then successor.phase="await-observation"
                 elseif completed_configuration=="unknown-phase" then successor.phase="unknown"
                 elseif completed_configuration=="delta" then successor.candidate_delta=.2
-                elseif completed_configuration=="target-version" then env.script.active_mods["more-infinite-research"]="5.0.21001" end
+                elseif completed_configuration=="target-version" then env.script.active_mods["more-infinite-research"]="5.0.21002" end
                 local before={labs=env.created_labs,adds=player.add_calls,resets=player.reset_calls,order=#order,
                   direct=player.technologies[catalogue.direct].level,bonus=player.recipes[catalogue.gear_recipe].productivity_bonus}
                 callbacks.configuration({mod_changes={["mir-fixture-mir5-imported-library"]={new_version="0.1.0"}}})
@@ -856,6 +859,34 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 and storage_by_mod[active_wrapper_name][catalogue.storage_key].successors~=nil}
           end
         ''')
+    def test_501_exact_source_default_identities_at_all_three_stages(self):
+        fixture = "mir-fixture-mir5-migration-origin-f200-110-source"
+        observer = "mir-fixture-mir5-active-mods-observer"
+        raw = {"bool-setting": {
+            "ips-require-space-gate": {"type": "bool-setting", "name": "ips-require-space-gate", "default_value": False},
+            "ips-enable-research_inventory_capacity": {"type": "bool-setting", "name": "ips-enable-research_inventory_capacity", "default_value": True},
+            "ips-enable-research_modules": {"type": "bool-setting", "name": "ips-enable-research_modules", "default_value": True},
+        }}
+        self._install_lifecycle_model()
+        run = self.lua.eval("migration_origin_110_successor_lifecycle")
+        for target, base, version, cohort in (("f200_source_defaults", "2.0.77", "5.0.20001", "0.3.0"),
+                                               ("f210_source_defaults", "2.1.23", "5.0.21001", "0.4.0")):
+            mods = {"base": base, "more-infinite-research": version, fixture: cohort, observer: "0.1.0"}
+            opponents = [dict(mods, base="2.9.99"), dict(mods, **{"more-infinite-research": version[:-1] + "2"}),
+                         dict(mods, **{fixture: "0.5.0"}), dict(mods, **{observer: "0.2.0"})]
+            for label, identity, accepted in [("exact", mods, True)] + [("opponent", m, False) for m in opponents]:
+                with self.subTest(target=target, label=label, identity=identity):
+                    settings_result = self.run_settings_update(copy.deepcopy(raw), identity)
+                    # The settings stage does not depend on the observer.
+                    self.assertEqual(accepted or identity[observer] != "0.1.0", settings_result["ok"], settings_result["message"])
+                    data_result = self.run_data(self.candidate_raw(), identity, self.source_settings())
+                    self.assertEqual(accepted, data_result["ok"], data_result["message"])
+                    runtime_result = py(run(target, fixture, fixture, *([None] * 14), lua(self.lua, identity)))
+                    self.assertEqual(accepted, runtime_result["ok"], runtime_result["message"])
+                    if accepted:
+                        self.assertEqual((1, 1, 1), (runtime_result["created_labs"], runtime_result["player_add_calls"], runtime_result["player_reset_calls"]))
+                        self.assertEqual({"after_first_reload": 2, "after_ordinary_tick": 2, "after_second_reload": 3}, runtime_result["marker_counts"])
+
     def test_control_preserves_the_independent_source_snapshot_through_one_real_candidate_lab_and_reload(self):
         """Exercise the real fixture lifecycle, including the non-earned direct row.
 

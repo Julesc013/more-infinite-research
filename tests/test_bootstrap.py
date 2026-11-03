@@ -166,6 +166,7 @@ class BootstrapTests(unittest.TestCase):
               module.on_gui_text_changed = function(event) library_calls.text = event end
               module.on_gui_selected_tab_changed = function(event) library_calls.tab = event end
               module.on_gui_selection_state_changed = function(event) library_calls.selection = event end
+              module.on_gui_checked_state_changed = function(event) library_calls.checked = event end
               module.on_gui_click = function(event) library_calls.click = event end
               module.on_gui_location_changed = function(event) library_calls.location = event end
               module.on_gui_closed = function(event) library_calls.closed = event end
@@ -222,7 +223,8 @@ class BootstrapTests(unittest.TestCase):
               on_entity_damaged = 14, on_string_translated = 15,
               on_player_locale_changed = 16, on_player_changed_force = 17,
               on_player_joined_game = 18, on_research_reversed = 19,
-              on_technology_effects_reset = 20, on_gui_selected_tab_changed = 21
+              on_technology_effects_reset = 20, on_gui_selected_tab_changed = 21, on_tick = 23,
+              on_gui_checked_state_changed = 24
             }}
             known_technology = {valid = true, name = "recipe-prod-research_gears-1"}
             player = {valid = true, index = 1, frame = {valid = true},
@@ -324,12 +326,19 @@ class BootstrapTests(unittest.TestCase):
           local hidden = {known_technology.name}
           assert(browser.open(1, {search = "gear", family = "mir", selected = known_technology.name,
             status = 4, mode = 3, sort = "name-desc", page = 7, hidden = hidden}))
-          assert(library_calls.open.player == player and library_calls.open.options.query == "gear")
+          assert(library_calls.open.player == player and library_calls.open.options.search == "gear"
+            and library_calls.open.options.query == nil,
+            "legacy search must reach the Library without the bridge choosing a query field")
           assert(library_calls.open.options.family == "mir"
             and library_calls.open.options.selected == known_technology.name
             and library_calls.open.options.status == 4 and library_calls.open.options.mode == 3
             and library_calls.open.options.sort == "name-desc"
             and library_calls.open.options.page == 7 and library_calls.open.options.hidden == hidden)
+          assert(browser.open(1, {tab = "settings", settings_scope = "options", search = "repair"}))
+          assert(library_calls.open.options.tab == "settings"
+            and library_calls.open.options.settings_scope == "options"
+            and library_calls.open.options.search == "repair" and library_calls.open.options.query == nil,
+            "legacy Settings search and scope must reach the Library together")
           assert(browser.open(1, {family = "research_gears", visibility = 2}))
           assert(library_calls.open.options.family == "research_gears"
             and library_calls.open.options.visibility == 2)
@@ -365,6 +374,15 @@ class BootstrapTests(unittest.TestCase):
           assert(library_calls.open.player == player and library_calls.open.options == nil)
         ''')
 
+    def test_report_checkbox_event_has_one_bootstrap_registration_owner(self):
+        self.lua.execute('''
+          install_modules(false); install_runtime(); load_control()
+          local event={player_index=1,element={valid=true,name="mir_library_report_settings",state=true}}
+          assert(type(handlers.events[24])=="function")
+          handlers.events[24](event)
+          assert(library_calls.checked==event)
+        ''')
+
     def test_unlimited_control_omits_only_cap_event_callbacks(self):
         self.lua.execute('''
           install_modules(false); install_runtime(); load_control()
@@ -390,7 +408,9 @@ class BootstrapTests(unittest.TestCase):
           end
           game=setmetatable({}, {__index=function()error("idle/reload world access")end,
             __newindex=function()error("idle/reload world write")end})
+          assert(handlers.events[defines.events.on_tick]==nil, "settled server has an ordinary on_tick handler")
           handlers.load()
+          assert(handlers.events[defines.events.on_tick]==nil, "on_load added an ordinary on_tick handler")
           assert(next(handlers.nth)==nil)
           for _,id in ipairs({4,5,6,19,20})do assert(handlers.events[id]==nil)end
           assert(storage.mir==nil)
@@ -794,7 +814,10 @@ class BootstrapTests(unittest.TestCase):
           local bucket = {queue = queue, members = members, scheduled = false, unknown = "keep"}
           storage.mir = {passive_repair = bucket, historical_other = "keep"}
           game = setmetatable({}, {__index = function() error("on_load accessed game") end})
+          local saved_metatable = getmetatable(storage)
+          setmetatable(storage, {__newindex = function() error("on_load wrote a saved root key") end})
           handlers.load()
+          setmetatable(storage, saved_metatable)
           assert(type(handlers.nth[60]) == "function")
           assert(storage.mir.passive_repair == bucket and bucket.queue == queue and bucket.members == members)
           assert(bucket.scheduled == false and bucket.unknown == "keep" and storage.mir.historical_other == "keep")

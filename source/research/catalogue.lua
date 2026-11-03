@@ -13,6 +13,8 @@ local INTERNAL_CREDIT_IDS = {
   ["mir-legacy-module-credit-productivity-module"] = true,
   ["mir-legacy-module-credit-efficiency-module"] = true,
   ["mir-legacy-cannon-credit-rocket-shooting-speed"] = true,
+  ["mir-k2-imersite-staged-state-1"] = true,
+  ["mir-k2-imersite-continuation-state-4"] = true,
 }
 
 function M.gear_id() return GEAR_ID end
@@ -40,12 +42,13 @@ local function copy(value, seen)
   seen[value] = nil
   return out
 end
+local runtime_private_credit_ids = INTERNAL_CREDIT_IDS
 
 -- These detached historical holders preserve earned effects during one-time
 -- recovery. They are not authored Library research rows or foreign catalogue
 -- entries. Return a copy so callers cannot alter this identity boundary.
 function M.internal_credit_ids()
-  return copy(INTERNAL_CREDIT_IDS)
+  return copy(runtime_private_credit_ids)
 end
 
 local function stream_settings(family)
@@ -174,6 +177,7 @@ local function py_material_rows()
 end
 
 local function static_rows(existing_technology_prototypes)
+  runtime_private_credit_ids = copy(INTERNAL_CREDIT_IDS)
   local rows = {generated_row(GEAR_ID, "research_gears", "p[research_gears]",
     "technology-name.more-infinite-research.research_gears", "iron-gear-wheel")}
   for _, row in ipairs(bob_tech_rows()) do rows[#rows + 1] = row end
@@ -196,6 +200,11 @@ local function static_rows(existing_technology_prototypes)
         "p[research_spoilage_preservation]", "technology-name.more-infinite-research.research_spoilage_preservation")
     end
     return rows
+  end
+  -- These normal public identities become private paid holders only in the
+  -- exact selected SIF profile. Never hide their ordinary research elsewhere.
+  for _, definition in ipairs(selected.sif_retained or {}) do
+    runtime_private_credit_ids["recipe-prod-" .. definition.key .. "-1"] = true
   end
   for index = 1, #selected.definitions do
     local definition = selected.definitions[index]

@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-30
+last_reviewed: 2026-11-02
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -20,7 +20,9 @@ source_of_truth_for:
 
 Before retiring a real externally consumed old contract, record its consumers, preserved fields, explicit converter/adapter or documented major-version transition. Unconsumed previews retain their history and unresolved status without their platform being copied into the player mod. No new parallel `mep/` subsystem.
 
-This file freezes **MIR API 1.0.0** for the pending MIR5 release. The [scoped qualification decision](evidence/api1-documented-subset-qualification-r01.json) reconciles actual F2002.0.77/D3 and F2102.1.23/8DC present-MIR boundary, physical/save and client evidence, exact original absence guards and combined host admission budgets. MIR5 remains unreleased; this contract decision does not grant whole-product acceptance. The new native interface uses `api/v1/` and `more-infinite-research.api.v1`; this major-version boundary is independent of the product staging directory. It does not reuse the old `MIR4ApiResponseV1` wire contract. The supplied earlier pack's unversioned candidate paths are superseded before implementation; no deployed consumer compatibility is asserted. Product `5.0.0`, API `1.0`, target engine and SDK versions are distinct. Additive compatible capability changes can increment an API minor; changed meaning/removal requires a major transition. Preserve existing externally consumed identifiers where their audit establishes an obligation.
+This file freezes **MIR API 1.0.0** for MIR5. The [scoped qualification decision](evidence/api1-documented-subset-qualification-r01.json) reconciles actual F2002.0.77/D3 and F2102.1.23/8DC present-MIR boundary, physical/save and client evidence, exact original absence guards and combined host admission budgets. MIR5 betas are published; stable whole-product acceptance remains incomplete. The decision retains its original source, package and execution identities. Review the final candidate's consumed inputs before reusing those results; run affected documented methods and closures without restarting an unchanged API campaign.
+
+The native interface uses `api/v1/` and `more-infinite-research.api.v1`; this major-version boundary is independent of the product staging directory. It does not reuse the old `MIR4ApiResponseV1` wire contract. The supplied earlier pack's unversioned candidate paths are superseded before implementation; no deployed consumer compatibility is asserted. Product `5.0.0`, API `1.0`, target engine and SDK versions are distinct. Additive compatible capability changes can increment an API minor; changed meaning/removal requires a major transition. Preserve existing externally consumed identifiers where their audit establishes an obligation.
 
 ## Two surfaces, native settings
 

@@ -357,6 +357,77 @@ class LibraryTranslationTests(unittest.TestCase):
           assert(cache.labels == labels and cache.pending_by_id == pending and cache.ids == ids)
         ''')
 
+    def test_discovery_limits_follow_payload_callback_and_cache_byte_boundaries(self):
+        self.lua.execute(r'''
+          local active=scope(1,"en",1,0)
+          local complete=prepared(1,"en",1,0,{"gear"})
+          translations.dispatch(complete,active,0,function()return 11,2,false end)
+          translations.complete(complete,active,11,"Gear\31Recipe\31Material")
+          assert(not translations.discovery_limited(complete,active)
+            and translations.labels(complete,active).gear=="Gear\31Recipe\31Material")
+
+          for _,opponent in ipairs({"builder-limit","failed","malformed","empty-caption","partial","oversized","cache-bytes"}) do
+            local cache=prepared(1,"en",1,0,{"gear"})
+            translations.dispatch(cache,active,0,function()return 12,2,opponent=="builder-limit" end)
+            local label="Gear\31Recipe\31Material"
+            if opponent=="failed" then label=nil
+            elseif opponent=="malformed" then label="invalid composed response"
+            elseif opponent=="empty-caption" then label="\31Recipe\31Material"
+            elseif opponent=="partial" then label="Gear\31Recipe"
+            elseif opponent=="oversized" then label=label..string.rep("x",32769)
+            elseif opponent=="cache-bytes" then cache.cached_bytes=translations.translated_name_byte_limit end
+            assert(translations.complete(cache,active,12,label).published)
+            assert(translations.discovery_limited(cache,active),"lost incomplete discovery: "..opponent)
+            if opponent~="builder-limit" then
+              assert(translations.labels(cache,active).gear==nil,"invalid discovery must use stable-ID fallback")
+            end
+            assert(not translations.needs_maintenance(cache))
+          end
+        ''')
+
+    def test_discovery_transport_timeout_and_stale_scope_preserve_request_accounting(self):
+        self.lua.execute(r'''
+          local active=scope(1,"en",1,0)
+          local refused=prepared(1,"en",1,0,{"gear"})
+          local report=translations.dispatch(refused,active,0,function()return nil,2,false end)
+          assert(report.issued==0 and report.settled==1 and translations.discovery_limited(refused,active))
+          assert(not translations.needs_maintenance(refused))
+
+          local cache=prepared(1,"en",1,0,{"gear"})
+          translations.dispatch(cache,active,0,function()return 11,1,false end)
+          translations.maintain(cache,active,1800)
+          assert(not translations.discovery_limited(cache,active),"first timeout prematurely declares permanent loss")
+          translations.dispatch(cache,active,1800,function()return 12,1,false end)
+          translations.maintain(cache,active,3600)
+          assert(translations.discovery_limited(cache,active) and not translations.needs_maintenance(cache))
+
+          local pending=prepared(1,"en",1,0,{"gear"})
+          translations.dispatch(pending,active,0,function()return 21,2,true end)
+          local changed=scope(1,"de",1,1)
+          assert(translations.prepare(pending,changed,{"gear"}))
+          assert(not translations.discovery_limited(pending,changed) and translations.needs_maintenance(pending))
+          local reply=translations.complete(pending,changed,21,"invalid old composition")
+          assert(reply.released and not reply.published and not translations.discovery_limited(pending,changed))
+          assert(not translations.needs_maintenance(pending))
+        ''')
+
+    def test_legacy_discovery_metadata_is_read_only_until_explicit_work_renewal(self):
+        self.lua.execute(r'''
+          local active=scope(1,"en",1,0)
+          local cache=prepared(1,"en",1,0,{"gear"})
+          translations.dispatch(cache,active,0,function()return 11 end)
+          cache.discovery_subjects,cache.discovery_limited=nil,nil
+          assert(translations.discovery_limited(cache,active)==nil and translations.needs_maintenance(cache))
+          assert(cache.discovery_subjects==nil and cache.discovery_limited==nil,
+            "a read-only metadata observation repaired older work")
+          assert(translations.prepare(cache,scope(1,"en",1,1),{"gear"}))
+          assert(type(cache.discovery_subjects)=="table" and cache.discovery_limited==false
+            and translations.needs_maintenance(cache))
+          cache.discovery_limited="unknown-future-shape"
+          assert(translations.labels(cache,cache.scope)==nil,
+            "unknown discovery metadata was silently accepted as current")
+        ''')
+
     def test_component_has_no_runtime_registration_or_host_imports(self):
         source = (ROOT / "source/runtime/library_translations.lua").read_text(encoding="utf-8")
         for forbidden in ("require(", "game.", "storage[", "script.", "remote.", "on_event("):

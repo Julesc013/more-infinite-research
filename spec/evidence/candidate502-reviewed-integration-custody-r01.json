@@ -1,0 +1,265 @@
+{
+  "schema": 1,
+  "kind": "MIRCandidate502ReviewedIntegrationCustodyV1",
+  "preceding_integration_head": "9b45ed4511d7515de9ae8250e43fab3cac956ecd",
+  "preceding_tree": "c7acc1b3eadfd268bb0fa263c8f2fb0692eaebb6",
+  "player_tree": "3031c3d866d860d72f007bef5ff1e8555313a6e5",
+  "integration_method": "Normal local merge commits preserve all original author commits; final canonical integration requires independent cumulative review, fresh exact-head checks and remote tree readback. No reset,rebase,force-push or old-source inventory replacement.",
+  "source_correction": {
+    "original_head": "8900dac5bc88defbb8a12b3d088042453925f657",
+    "corrected_head": "0b56ad4888ef818f36b51e30d10eb92306b31103",
+    "corrected_tree": "efe7666a1dab0984ebb0987ed9666dd4bf57d7b8",
+    "original_failure_run": 41432463935,
+    "failure_log_sha256": "1CB7E189011C77DFF9F7F9810B299D6403B1F62925545843168D6E10B16CB20D",
+    "correction": "Only add the exact pure sif_retained.lua member to the settings-stage closure set; inverse line removal reproduces the preceding test blob and source tree remains3031c3d8.",
+    "passing_exact_head_full_run": 41435502279,
+    "required_checks": [
+      "branch-policy",
+      "verification-plan",
+      "native-tooling-controls",
+      "host-controls"
+    ],
+    "native_acceptance": false
+  },
+  "records": {
+    "runtime_additive_resolution": {
+      "original_primary_path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate502-startup-runtime-integration-r01\\readback.json",
+      "bytes": 1047,
+      "sha256": "F0D674425F012EA9A5099B3D3FA5A38CAA87C83DC9016AF08B597E62A234B72C",
+      "record": {
+        "kind": "MIRRuntimeIntentAdditiveIntegrationProofV1",
+        "preceding_head": "a6624edad19be8b2c6f82283aebae702e8ef2ffd",
+        "author_head": "5aa08cd216ff81e4ec25cd1a16479b040a488932",
+        "common_base": "211fe76e5aa077c5c19bd4078c97866973c229a6",
+        "preceding_bytes": 846201,
+        "preceding_sha256": "9AF4A2C2A39F8AD1B95618238259156949E3A3CA1AC294C3820FFE666E6730AE",
+        "author_sha256": "866F89193779D9DEC4821F79D769C72B105AE7CF1D3FC736D982F69E0FDF3D49",
+        "merged_sha256": "F104F2C694AA846E876D8A33C55EA244F9A8946293BD734570C33D5AF0EC5487",
+        "prior_reviews": 10,
+        "adopted_reviews": 1,
+        "total_reviews": 11,
+        "author_stanza_byte_sha256": "6E7B603A2F5A7FA2399CAD3D3F508490D2BDC71A8AD0D67EFE4A2FF210451B7F",
+        "author_adopted_object_equal": true,
+        "inverse_byte_equal": true,
+        "only_semantic_changes": [
+          "Append exact independently reviewed runtime entry-point stanza.",
+          "Consolidate only the routing scalar without closing global requirements."
+        ],
+        "all_other_inventory_bytes_unchanged": true,
+        "no_source_or_progress_change": true
+      }
+    },
+    "settings_additive_resolution": {
+      "original_primary_path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate502-startup-settings-integration-r01\\readback.json",
+      "bytes": 986,
+      "sha256": "D56D51ECCB98B777DAD929CF00BFE2899602E876CE91F707EB1931F4D838FC2D",
+      "record": {
+        "kind": "MIRSettingsIntentAdditiveIntegrationProofV1",
+        "preceding_head": "ec496756ddf4cb79d3cce03dbba829c19c191e88",
+        "author_head": "ba42e4d2ae37670a1bc7dc5470120684dcbc0a8b",
+        "common_base": "2ac3bb33df8905bc109331b6b7cfaa0e69ab165d",
+        "preceding_sha256": "F104F2C694AA846E876D8A33C55EA244F9A8946293BD734570C33D5AF0EC5487",
+        "author_sha256": "85CF50CA77FD7B4B07234E60BABFED3E3A24BC4AC5EED1971DEEB4DAFA6AB060",
+        "merged_sha256": "EDC8B652387DA308F80469C335BCBD721D1588907FA2D0C7BB86F8F8F300FCFC",
+        "prior_reviews": 11,
+        "adopted_reviews": 1,
+        "total_reviews": 12,
+        "author_stanza_byte_sha256": "8F7FD00211518006274BCB29AAF2B458CD305C56C4B6ED92079EE70BAD0B2E14",
+        "author_adopted_object_equal": true,
+        "inverse_byte_equal": true,
+        "all_other_inventory_bytes_unchanged": true,
+        "only_semantic_changes": [
+          "Append exact reviewed settings/default record.",
+          "Update only the routing scalar while retaining remaining context/native/provenance requirements."
+        ]
+      }
+    },
+    "runtime_independent_review": {
+      "original_primary_path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime-entrypoint-intents-independent-review-r01\\review.json",
+      "bytes": 4194,
+      "sha256": "39C216597FB32D59F5DA197557EAFEF9B8DBC42D39F7F3E433FA49A8FA5B437E",
+      "record": {
+        "review": "Independent bounded historical runtime entry-point source and documentary review, PR 1598",
+        "verdict": "GO",
+        "base": "211fe76e5aa077c5c19bd4078c97866973c229a6",
+        "head": "5aa08cd216ff81e4ec25cd1a16479b040a488932",
+        "tree": "7c41a373611e1801cf98deec377a9eb1251969dd",
+        "findings": [],
+        "scope_and_preservation": "Only spec/inventory/continuity.json differs: 363 additions and one deletion. Raw line comparison finds one routing-line replacement and one 362-line insertion; all other bytes survive. Inverse removal of the new bounded review and restoration of the old routing value reproduces every previous parsed inventory object. Player, tests, controllers, version, progress header, request ledger and tracked published artifacts are unchanged. Generated orchestration, registry/default/inter-release, unknown consumers and global VER-07 remain explicitly open.",
+        "historical_provenance": "Read all six immutable bodies, independently verified their Git blob sizes and SHA256 values, totaling 2382 bytes, and resolved all 143 distinct recorded ref/path bindings to the stated blobs. All 82 distinct recorded remote tags match live origin tag commits, including annotated-tag peeling; the two 70bb513f5b388ad23c4a5d46dfc945571c3b8217 references are explicit commit-only bindings and origin has no v3.0.0 tag. Origin v4.2.0-stable resolves to 6d19c874ea7d026d297865b96aa1b2b0916e9e61 and has no v4.2.0 tag. The author reports 144 original discovery rows with one alias duplicate; the original local discovery receipt is unavailable, so that occurrence count is not independently observed. A Git source binding does not prove historical execution.",
+        "independent_expectations": [
+          "Control-stage composition: historical root e2aa90fa invokes the stage run method; cb054c6b directly registers scripted-techs; stage wrappers 90158bc9, 94c9dc0 and 4797e2ff reject absent script and prototype data state before registering their respective owners. The v5 source root 156afee4 calls bootstrap.register at parse time. Current source/control.lua and bootstrap compose explicit registration; cited host-control methods exist. These wrappers do not prove the behavior of imported callbacks, gameplay or a native joining client.",
+          "Library/settings independence: earliest selected stage 90158bc9 registers scripted-tech and settings-profile modules unconditionally; 94c9dc0 gates scripted-tech on either scripted-tech or productivity-family adoption and separately gates settings profiles; 4797e2ff adds research_library as an independent scripted registration reason. Current bootstrap imports Library and settings owners and has distinct registration and feature-conditional scripted handling; cited unlimited-cap, report-checkbox and lifecycle controls exist. Library/settings behavior and actual disabled-feature/save/client scenarios remain separate native obligations.",
+          "Target subsets: historical target-line gates limit functionality rather than proving arbitrary old-engine feature behavior. Current reduced control adapter explicitly registers only the bounded unified API and checks missing/colliding interface handling; cited reduced adapter controls and edition/package owners exist. No extension of F018 experimental or early data-only support follows. Retire old stage/import plumbing, not delivered registration intent, and do not import old generated machinery into player source."
+        ],
+        "limits": "The author reports 40 existing Lua 5.2/Lupa 2.6 controls (23 bootstrap, 14 target, 3 scripted lifecycle); the author receipt directory was unavailable locally and those results were not independently observed. Exact-head PR checks show all four completed successfully. No test, historical runner, build or native execution was performed. Static source and host-control mapping is not proof of game lifecycle, saved state, client or release acceptance. Source reconciliation, other history groups, candidate native gates and global VER-07 remain open; no canonical integration is claimed.",
+        "health": "Development health advisory exit 0 before output; 134581 MiB free; build scan and worktree/branch inventories truncated. No cleanup performed."
+      }
+    },
+    "settings_original_custody_no_go": {
+      "original_primary_path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\settings-defaults-independent-review-r01\\review.json",
+      "bytes": 4717,
+      "sha256": "A7498FA65A461CA30B347BB793459FCA8DA18AE5C4DB8491FD46786364AA3D63",
+      "record": {
+        "kind": "MIRSettingsDefaultsIndependentDocumentationReviewV1",
+        "reviewed_utc": "2026-11-02T11:13:01.044256+00:00",
+        "selected_model": "gpt-6.1-terra",
+        "selected_effort": "high",
+        "actual_backend_id": "unavailable",
+        "base": "2ac3bb33df8905bc109331b6b7cfaa0e69ab165d",
+        "head": "4b68f0ab5197144859ff83d969743e11f3bf9f63",
+        "verdict": "NO-GO pending accessible original preparation custody for the claimed semantic transition, current host, negative-control and host-test evidence. This is an evidence/custody finding, not a discovered settings product defect.",
+        "changed_files": [
+          {
+            "path": "spec/inventory/continuity.json",
+            "sha256": "85CF50CA77FD7B4B07234E60BABFED3E3A24BC4AC5EED1971DEEB4DAFA6AB060"
+          },
+          {
+            "path": "spec/evidence/settings-registry-defaults-applicability-aero-r01.json",
+            "sha256": "217C1D998A660526001B0A5BE8663949DFD56EE5D17F798EAB43D846FA939E45"
+          }
+        ],
+        "verified": {
+          "inventory_preservation": "Recursive comparison found all preexisting dictionaries, scalar values and list elements preserved, including all 17 subject objects and original request ledger fields; one bounded review appended. This check does not independently review every historical request outside the unchanged inventory.",
+          "historical_sources": "Independently hashed all 22 selected Git blobs, checked their bytes and SHA256 and resolved every one of 150 exact listed references to the recorded blob; 84,907 total bytes. The 20 declared per-comparison counts sum to 545. Five groups are explicit. The 92 deduplicated transitions are claimed but not independently auditable from these aggregate counts.",
+          "authored_explicit_defaults": "All 68 scalar expected values checked directly against the original 95b96cf50093cd4eb522cec4f419b8f879ed69c5 Lua source table; values agree. The 68 recorded host observed values equal expected, but their underlying host observations are unavailable at the cited primary preparation path and were not independently reconstructed.",
+          "independent_baseline": "SHA256 EAD937D768F6B697EE998B0364A14E92DECF59EAF25075B14D0FBDF4374FDC28; all 28 historical seven-field vectors match this independent baseline. Nine recorded implementation producer bodies resolve identically at v4.7.0 and v4.7.3; metadata body differs as stated.",
+          "original_B": "Original native/write-data/script-output/mod-settings-dump.json is 741217 bytes SHA256 AF2569096906BB8B20AE0B0978B080F6438A40DBB58D95DD7DB519633207A48D; independent parse confirms all 28 original_B vectors agree exactly with the actual dump and historical baseline across 196 fields, comparing omitted hidden to false only for visibility semantics and preserving raw vectors; bool false is distinct from numeric zero. Tracked candidate502-f200-base-prototype-chain-r01.json identifies that dump, B source/player, and original review 629E2935BCDC6BE633CB964D2745EA18702B88F270957EE2E032805ED0033FDA. No new process or C execution inferred.",
+          "C_reuse": "Tracked candidate502-7fdb-consumed-input-applicability-aero-r01.json hashes B6830BA49629D82F9B69B51BAAE286A42299278274359E950216960CF3B8AC0C, explicitly scopes reuse and disclaims new C admission. Reviewed head source tree is 701e314ee50f19ac6cef02a1d4a598cca843eb0f.",
+          "qualification_limits": "Both proposed files explicitly keep configured nondefaults/effective precedence, import/export physical files, save/client, other target contexts, broader historical sources and global VER-07 open; they disclaim new native execution and performance/release acceptance. Source intent and settings presence are not gameplay evidence."
+        },
+        "unresolved": [
+          "The inventory asserts primary build/qualification/aero-settings-registry-defaults-preparation-r01 retains semantic diffs, 92 transitions, expected/observed host rows, seven in-memory opponents, host logs and inverse proof. That directory is absent in the primary checkout; the submitted evidence has aggregate counts, summary vectors and asserted controls but not those underlying records. Without their original bytes the claimed deduplication, seven opponent outcomes, 60 host-test executions and current host actual vectors remain unverified by this reviewer.",
+          "Obtain existing preparation custody, identify its actual machine-specific location, and verify exact file SHA256 and size before resuming review. Do not relabel counts, fixtures or a previously admitted B component as stable/native acceptance.",
+          "No tests, CI polling, native execution, package, build, or source edits were performed. Root separately requested the original custody from Aero; this record does not assume that request has succeeded."
+        ]
+      }
+    },
+    "settings_resumed_independent_review": {
+      "original_primary_path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\settings-defaults-independent-review-r02\\review.json",
+      "bytes": 4259,
+      "sha256": "B30E12B73C3CB4DCECCE669D94D2DAF1E65D89EE32741B85F3AF0BA47DD84330",
+      "record": {
+        "kind": "MIRSettingsDefaultsIndependentReviewResumptionV1",
+        "reviewed_utc": "2026-11-02T11:32:33.112311+00:00",
+        "selected_model": "gpt-6.1-terra",
+        "selected_effort": "high",
+        "actual_backend_id": "unavailable",
+        "verdict": "GO for the bounded historical settings intent and original B declared-prototype evidence at the exact reviewed head; not a whole-product, new native, performance or release qualification.",
+        "head": "ba42e4d2ae37670a1bc7dc5470120684dcbc0a8b",
+        "head_tree": "0bc5db52f8905974f08d2341d53eba7f7d2f5355",
+        "parent": "4b68f0ab5197144859ff83d969743e11f3bf9f63",
+        "source_tree_both": "701e314ee50f19ac6cef02a1d4a598cca843eb0f",
+        "delta": "One added spec/evidence/settings-registry-defaults-preparation-aero-r01.json.gz only. Existing inventory and evidence content unchanged; no player source changes.",
+        "previous_review": "A7498FA65A461CA30B347BB793459FCA8DA18AE5C4DB8491FD46786364AA3D63 remains unchanged; reuse its exact 150 binding/22 body/68 authored scalar/196 B native field/nine producer/preserved inventory checks.",
+        "capsule": {
+          "sha256": "9850528086018DE76CFCA97B86DDEAA8DF441E4B3DC76BF5F2B8E86B5C7FB15E",
+          "bytes": 382092,
+          "decoded_bodies": 54,
+          "decoded_bytes": 1540184,
+          "checks": "Strict base64 decode, unique safe names, every size and SHA256 verified; all 22 Lua bodies byte-equal local Git blobs. Original records extracted as inspection aids under bodies; source machine Aero15X and its preparation path are stated in capsule."
+        },
+        "reconciliation": {
+          "semantic": "Independently grouped all 545 reported exact structured change records from 20 earlier-to-latest comparisons into 92 unique canonical key/value changes; reconstructed earlier-blob sets match every supplied deduplicated row, and 20 counts match published evidence. The underlying Lua body-to-data extraction is the author-recorded comparison, not re-executed or independently regenerated here.",
+          "settings_rows": "All 68 supplied host observation rows match the published explicit-default rows and all 28 seven-field original baseline, host and B-native vectors match the published rows. Prior A749 independently compared the historical source scalar values and B native actual dump, while the host vectors remain retained author observations, not new independent host execution.",
+          "opponents": "Seven original recorded in-memory mutation outcomes match published rows. Independently applying each mutation to copied original B vector and type-aware comparison reproduces its exact intended field failure, including false versus numeric zero and missing-hidden versus false only. This is a bounded arithmetic/data replay, not a host or native test.",
+          "controls": "Four supplied original test log bodies report OK and 8, 10, 7, 35 tests, matching 60 and selected-host-results reported exit zero. Logs and recorded result are author evidence; no tests were re-executed or exit codes independently observed.",
+          "inspector": "Original spec-query observation with 28 mismatches is retained beside corrected prototypes-boundary observation with zero mismatches, along with explicit boundary correction. This adverse record is not erased or relabeled as a native run.",
+          "identity": "Published evidence body matches the supplied prepared evidence byte for byte; source 257565 host/profile and original B 629E/AF256909 references are retained. The original scoped B-to-C applicability does not claim fresh C loader admission."
+        },
+        "limits": [
+          "Claims apply to named settings families and observed declarations under exact named input/profile; source-history data deduplication is not independent acceptance.",
+          "Nondefault/effective import precedence, exports, save/client, supported target contexts, science and composed effects require affected evidence; full historical VER-07 and release gates remain open.",
+          "No host test, CI polling, native execution, source build or package was run. Exact-head CI is outside this review and root owns its readback.",
+          "Preparation directory locator refers to Aero15X; this primary checkout preserves the newly supplied capsule and extracted review copies, not a claim the original Aero path exists here."
+        ]
+      }
+    },
+    "sif_original_source_review": {
+      "original_primary_path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate502-sif-source-independent-review-r01\\independent-sol-high-review.json",
+      "bytes": 2310,
+      "sha256": "3D017490354FD67DC81E33531324273471A99CB42D241CD392E5C147BF62BD9C",
+      "record": {
+        "kind": "MIRSIFPaidRetentionIndependentSourceReviewV1",
+        "verdict": "GO-bounded-source-integration-only",
+        "reviewer_task": "/root/sif_retention_independent_review",
+        "reviewer_independent_from_author": true,
+        "explicit_assignment_model": "gpt-6.1-sol",
+        "explicit_assignment_effort": "high",
+        "runtime_model_identifier_exposed": false,
+        "fork_turns": "none",
+        "serialization": "Parent serializes the completed fresh read-only reviewer messages; reviewer made no file writes.",
+        "pr": 1601,
+        "head": "8900dac5bc88defbb8a12b3d088042453925f657",
+        "tree": "9ba3132fa2229f31deb29362f540bbcb809d8d59",
+        "player_tree": "3031c3d866d860d72f007bef5ff1e8555313a6e5",
+        "base": "2ac3bb33df8905bc109331b6b7cfaa0e69ab165d",
+        "blocking_findings": [],
+        "verified": [
+          "Clean exact source/head/tree and nine-file bounded diff.",
+          "Actual published473F200 archive/member hashes and independent historical state oracle; eleven recipe effects3/2/1/3/2, processing-unit scrap excluded.",
+          "Lazy exact-context selection; pure bounded binding/recipe/native-owner preflight before emission.",
+          "Existing emitter hidden-only retention, exact product-target family exclusion, no public cap/Library admission or visible alternate route.",
+          "Existing Generator duplicate collision controls; no runtime/API/migration/final-fixes edits.",
+          "Private F200 ZIP920C68BD/768809B matches changed reviewed source members; no developer directories."
+        ],
+        "remaining_native_requirements": [
+          "Exact affected engine/mod closure and qualified package binding.",
+          "Protected original five earned levels/effects, enabled state, detached work, plastic queue/order/current progress.",
+          "No processing-unit scrap reward; fresh-force zero rewards and no new selectable research route.",
+          "Successor save and two independent unchanged-byte cold reloads; affected disablement/tuning where claimed."
+        ],
+        "test_limit": "The new host build() stops before full data-final-fixes/science/Generator pipeline. Host pass is not native upgrade safety.",
+        "reviewer_tests_or_builds": false,
+        "reviewer_ci_polling": false,
+        "reviewer_native_execution": false,
+        "reviewer_writes": false,
+        "required_exact_head_ci": "pending-live-readback",
+        "release_qualification": false
+      }
+    },
+    "startup_cumulative_review_original": {
+      "original_primary_path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate502-startup-public-evidence-independent-review-r01\\review.json",
+      "bytes": 4177,
+      "sha256": "D79B400D63541BD9046CF1C134EB4439AC82384D6862E950578245B7F1921146",
+      "record": {
+        "kind": "MIRCandidate502StartupPublicEvidenceIndependentReviewV1",
+        "reviewed_utc": "2026-11-02T11:21:10.988249+00:00",
+        "selected_model": "gpt-6.1-terra",
+        "selected_effort": "high",
+        "actual_backend_id": "unavailable",
+        "verdict": "GO for exact-head bounded startup evidence and progress-table change, with stated scope and minor wording suggestion. No global performance, successor-candidate, stable or release GO.",
+        "base": "2ac3bb33df8905bc109331b6b7cfaa0e69ab165d",
+        "head": "a6624edad19be8b2c6f82283aebae702e8ef2ffd",
+        "tree": "4a1e31b8a51e8c32abce61c32f188bd3b3064e21",
+        "changed_files": [
+          "docs/progress.md",
+          "spec/evidence/candidate502-base-f200-startup-chain-r01.json",
+          "spec/evidence/candidate502-base-f200-startup-receipts-r01.json.gz",
+          "spec/evidence/candidate502-base-f200-startup-numerical-inputs-r01.json.gz"
+        ],
+        "checks": {
+          "committed_source": "Compared all three evidence files in task worktree bytewise to exact Git head objects; Git source tree of candidate C matches 701e314ee50f19ac6cef02a1d4a598cca843eb0f. The private checked-merge object is not locally resolvable in the inspected public and private worktrees; its chain attribution remains a recorded reference rather than a newly verified remote merge.",
+          "receipt_capsule": "SHA256 D5400ECAA748A5389110A417A6A46F0A9371A5E71B72921BF4129BC65E242A38, 22032389 bytes. Decoded all 408 unique bodies, 29385321 bytes, strict base64; all body sizes and SHA256 pass, each matches its corresponding original in primary custody, including two separately mapped prior-preparation files. 337 native-output files included: all 335 non-PNG and run 41 main-menu/settings-response originals. The other 121 native-output originals are PNG; omitted paths and hashes match all local retained original files, with no unmatched native paths. Complete original/copy equality was independently checked in preserved D338 review.",
+          "numerical_capsule": "SHA256 DDCCB574A7F4CBE44B86A02B4ECD05FCBF4ADC29A623545CB51379049E55C1FF, 146491 bytes. All seven records decode to byte-identical primary originals and match each declared size/hash: raw result, terminal, analysis, root readback, native manifest, predeclared plan and packet.",
+          "chain": "41 actual process records equal root-readback records, restoration controls equal its six records, full analysis equals original analysis, peak sampled private equals maximum recorded process peak 4509016064, original actual review SHA D338468DCB46057ED5AAF1B5EF930C5B00A4F33658E13742B4154D3AE981938C and visual text match exactly. All 41 warning vectors have 18 entries; preserved review found same warnings and no Error. The original review is not rewritten.",
+          "progress_history": "Git-normalized bytes before the current table and all bytes following it exactly equal base; retained historical tail SHA256 9F9A46A6F9CE2509E6D59AB1C941CE2070BE1507540109043DF8E7AB3E26DEBC (442315 bytes).",
+          "scope": "The frozen plan arithmetic and D338 review sustain only the nominal paired 50 percent target for C Base F200 2.0.77 startup under stated assumptions. Source, engine, observer, outliers, negative control trend, observer cost, warnings and 82 endpoint derivative-coverage limits are retained. The chain disclaims precise ratio, negative cost, equivalence, global performance and release; future SIF-corrected source requires its own applicability and qualification."
+        },
+        "minor_clarity": "Progress says all signed samples/outliers; durations are not cryptographically signed and signed paired contrasts differ from raw durations. Consider all samples and outliers. This does not block evidence review.",
+        "limits": [
+          "Independent review did not re-execute native, host, build, package, CI, or tests and does not independently verify remote merge/CI status.",
+          "The 121 omitted PNG bodies are locally retained, with hashes publicly listed; only two final-candidate originals are included in the public capsule.",
+          "Other cohorts, larger-profile same-output replay, gameplay/save/Library/memory, SIF-corrected successor native qualification and publication gates remain open."
+        ]
+      }
+    }
+  },
+  "limits": [
+    "C startup and original B data-stage observations retain original source/package/result identities. Changed player3031c3d8 requires explicit input applicability review and affected native qualification.",
+    "These bounded historical source/declaration dispositions do not complete VER-07,effective/nondefault settings,save/client or unknown-consumer coverage.",
+    "SIF paid-state/partial/queue/bonus/fresh-force/source-successor-save/two-cold evidence is still required before publication.",
+    "No changed public package,tag,release or artifact-byte replacement occurs."
+  ],
+  "release_qualification": false
+}

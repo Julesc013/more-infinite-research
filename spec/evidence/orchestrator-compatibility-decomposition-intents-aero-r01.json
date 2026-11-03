@@ -1,0 +1,387 @@
+{
+  "schema": 1,
+  "kind": "MIR5HistoricalOrchestratorCompatibilityDecompositionIntentReviewV1",
+  "reviewed_on": "2026-11-02",
+  "reviewed_against": "b1040585018be31868a150d70bae580c62836b24",
+  "player_tree": "3031c3d866d860d72f007bef5ff1e8555313a6e5",
+  "source_kind": "Authored historical tooling/compiler tests, not actual published-package observations",
+  "selected_blob_count": 5,
+  "selected_source_bytes": 65136,
+  "original_discovery_locators": 34,
+  "canonical_remote_source_bindings": 32,
+  "duplicate_v420_alias_bindings": 2,
+  "source_scope": "Exactly two orchestrator-decomposition bodies and three compatibility-audit-decomposition bodies from the existing discovery; no whole historical audit or all dependency/receipt intent closure.",
+  "method": "Read each distinct body through latest-body plus complete earlier differences. Verify raw blob bytes and every commit/path binding, then read live remote tags. Preserve v4.2.0 original aliases but deduplicate them into the exact v4.2.0-stable commit/path source. Separate obsolete physical framework criteria from surviving player/output/package/evidence obligations; never derive an expectation from the candidate.",
+  "sources": [
+    {
+      "blob": "20d58abce47daf2942cf9ec498193ac11431de0a",
+      "bytes": 8245,
+      "sha256": "3BBA8209DB5099575202EBB73831B4F0ECFEC00D83EB5E83DE9CD33B8E341320",
+      "family": "Test-MIR4CompilerOrchestratorDecompositionM4202.ps1",
+      "canonical_remote_bindings": [
+        {
+          "tag": "v4.1.0",
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1"
+        }
+      ],
+      "deduplicated_original_aliases": []
+    },
+    {
+      "blob": "285f44279f4cb944c1b95af50f746023c79ca132",
+      "bytes": 18207,
+      "sha256": "B7B1292C703A78A59411FEFA57B8142D2BBD6EE1E50842010A486EAE3D0740FD",
+      "family": "Test-MIR4CompatibilityAuditDecompositionM4202.ps1",
+      "canonical_remote_bindings": [
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1"
+        }
+      ],
+      "deduplicated_original_aliases": []
+    },
+    {
+      "blob": "5e5baf24983931f8d5e8634bef6f8899d3a172f5",
+      "bytes": 16431,
+      "sha256": "E6B6D80C988F619B6827F738B4DD970DB03C00B0494CFCFA871723195F7329A7",
+      "family": "Test-MIR4CompatibilityAuditDecompositionM4202.ps1",
+      "canonical_remote_bindings": [
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1"
+        }
+      ],
+      "deduplicated_original_aliases": [
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1"
+        }
+      ]
+    },
+    {
+      "blob": "aa00d2532539e7705184b4886ce10e33eaea0e87",
+      "bytes": 13252,
+      "sha256": "2FCABE76EABA33752853996ABCA8755B37C2030D52E3F59DB928B04DC5688DB1",
+      "family": "Test-MIR4CompatibilityAuditDecompositionM4202.ps1",
+      "canonical_remote_bindings": [
+        {
+          "tag": "v4.1.0",
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": "tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1"
+        }
+      ],
+      "deduplicated_original_aliases": []
+    },
+    {
+      "blob": "e032aa81a067de85292e70dde054cac7f334bf18",
+      "bytes": 9001,
+      "sha256": "70F920E9CEBE1742F1927E330F981B02C1C747215F2A4687E0E103FEBF4C45EA",
+      "family": "Test-MIR4CompilerOrchestratorDecompositionM4202.ps1",
+      "canonical_remote_bindings": [
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1"
+        }
+      ],
+      "deduplicated_original_aliases": [
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1"
+        }
+      ]
+    }
+  ],
+  "historical_epochs": [
+    {
+      "purpose": "Compiler decomposition introduction/receipt",
+      "commit": "337d60ffe6e9dd1c5493b17c4d4b278c16881e2d"
+    },
+    {
+      "purpose": "Original compatibility modules/facade contract",
+      "commit": "184c8583fb3460b83aea562a177ac8f690ad5c60"
+    },
+    {
+      "purpose": "A04K2 module/inventory evolution, source identity only",
+      "commit": "4c4078adf2572585bbbbb332f16420b35b9220b9"
+    }
+  ],
+  "groups": [
+    {
+      "id": "retired-decomposition-shapes",
+      "disposition": "superseded-active-structure-retain-exact-historical-source",
+      "obligation": "Preserve accepted behavior without restoring superseded compiler/tooling architecture.",
+      "independent_expectation": "Historical tests require a compiler facade plus four named responsibility modules, six ordered PowerShell compatibility modules/35 functions, explicit old manifest counts441 and legacy authority/evolved-binding paths, facade/module line bounds and modern entry delta26/legacy delta0. These identify MIR4 decomposition snapshots, not player identities or a new MIR5 source layout.",
+      "variant_decision": "Compiler20d58 hard-codes src/mod/families.modern and441bindings; e032 follows canonical source/capability target scope and verifies old line/size shapes through epoch337d60 rather than rejecting subsequent accepted additions. Preserve both variants and their actual epochs; do not transplant either module/count bound into MIR5.",
+      "implementation": [
+        "spec/architecture.md",
+        "source/research/generator.lua",
+        "source/compatibility/modern_catalogue.lua"
+      ],
+      "host_controls": [],
+      "applicable_evidence": "The five exact original test bodies are source evidence only. No old receipt boolean is a current native result.",
+      "remaining_executable_check": "None for the obsolete physical module/authority/count constraints. Continue independent delivered behavior and unresolved original consumer/native obligations under existing CONT/VER records.",
+      "owner": "Aero source-intent reconciliation; Black Glass owns any separately affected native route"
+    },
+    {
+      "id": "finite-preflight-deterministic-publication",
+      "disposition": "consolidate-existing-independent-controls",
+      "obligation": "Keep detached deterministic native construction, bounded preflight, one intended publication and preserved historical output semantics.",
+      "independent_expectation": "Original orchestrator contracts separate compile/phase/contract/publish responsibilities and declare preserved semantics/plans/mutation journals/historical baseline. Preserve useful semantic expectations through the current contracts; the old serialized plan/journal framework is superseded, and neither old receipt truth nor candidate-derived values can define parity.",
+      "implementation": [
+        "spec/generator.md",
+        "spec/compatibility.md",
+        "source/research/generator.lua",
+        "source/data-final-fixes.lua"
+      ],
+      "host_controls": [
+        "tests/test_generator.py::test_valid_family_forward_reference_and_one_write",
+        "tests/test_generator.py::test_all_family_failures_precede_first_write",
+        "tests/test_generator.py::test_unrelated_world_growth_is_not_traversed",
+        "tests/test_generator.py::test_data_final_full_published_technology_output_matches_oracle",
+        "tests/test_generator.py::test_f200_complete_technology_output_matches_its_own_published_oracle"
+      ],
+      "applicable_evidence": "Existing current independent published-output and opposing preflight controls; original exact-head integrated CI41438416187 at a0e73c04/tree9b6a6605 remains its own host result, not a new native execution.",
+      "remaining_executable_check": "No new executable obligation is introduced by retiring the old module layout. Final candidate supported-profile/native output, physical effects and affected SIF paid-state qualification retain their existing open scope; uncertain original expectations remain unresolved rather than inferred from MIR5.",
+      "owner": "Aero mapping and expectation review; Black Glass final exact-input native qualification"
+    },
+    {
+      "id": "deterministic-package-and-player-firewall",
+      "disposition": "retain-and-consolidate",
+      "obligation": "Produce reproducible selected packages with coherent frozen input identity and no developer/tooling leakage.",
+      "independent_expectation": "Original tests compare two archive hashes for each named target, retain baseline/declared-delta distinctions, preserve source fingerprints and insist tooling decomposition has no package-visible changes. Exact old archive hashes/entry deltas remain historical facts; current nine stable and separately labelled experimental packages follow current target/version/support contracts.",
+      "implementation": [
+        "tools/package.py",
+        "spec/targets.md",
+        "AGENTS.md"
+      ],
+      "host_controls": [
+        "tests/test_package.py::test_reproducible_members_and_fixture_version",
+        "tests/test_package.py::test_committed_build_ignores_dirty_untracked_and_line_ending_worktree_bytes",
+        "tests/test_package.py::test_archive_identity_mismatch_is_refused_before_output",
+        "tests/test_package.py::test_selected_editions_have_one_actual_import_closure_and_exact_codec",
+        "tests/test_pack.py::test_player_package_admits_only_native_files_and_all_locale_assets"
+      ],
+      "applicable_evidence": "Existing source-bound package controls and independently frozen package inventories retain their exact original refs. The corrected player3031c3d8 is not qualified by relabelling the earlier C inventory or startup observation.",
+      "remaining_executable_check": "Independently freeze/verify the final exact package set, metadata/version/root/changelog/assets/support floors and public downloads under existing release gates. Do not recreate old manifest/receipt infrastructure or force historical archive equality where accepted behavior changed.",
+      "owner": "Aero independent package review; Black Glass candidate/public delivery"
+    },
+    {
+      "id": "retired-compatibility-audit-cli-and-scenarios",
+      "disposition": "superseded-tooling-preserve-claims-and-safety-intent",
+      "obligation": "Do not let a tooling refactor create compatibility support, mutate player packages or acquire release authority.",
+      "independent_expectation": "Original compatibility audit smoke is Offline/MaxCandidates0 with empty-cache counts allzero; it checks ordered source/scenario/result collation and unchanged compatibility/stream claims, with every release transition flagfalse. The35-function parameter surface is this retired PowerShell tool, not a player runtime/API consumer contract.",
+      "variant_decision": "aa00 pins current decomposition/module/command inventory state.5e5 adds A04K2 historical closure evolution.285f moves old A04 modules/inventory and original parameter contract to exact historical commits, accepts subsequent current structure and changes old Copy/Hardlink/Symlink choices to Hardlink. Current standing rules instead use exact direct archive selections with no external hardlinks/copies; do not restore any old library population mode or infer K2 acceptance from source assertions.",
+      "implementation": [
+        "tools/Invoke-NativeFixture.ps1",
+        "docs/development.md",
+        "spec/verification.md",
+        "spec/compatibility.md"
+      ],
+      "host_controls": [
+        "tests/test_native_fixture_modes.py::test_absent_full_and_create_modes_refuse_any_mir_selection_or_hash",
+        "tests/test_pack.py::test_runtime_closure_never_imports_the_generator",
+        "tests/test_pack.py::test_settings_stage_closure_is_data_only"
+      ],
+      "applicable_evidence": "Existing current runner/phase/package guards retain their actual tests and native receipts separately. None of the five old tests was executed or restored here.",
+      "remaining_executable_check": "Use only admitted exact profile/controller inputs and original evidence for still-open supported compatibility cases. This disposition neither restarts all old audit scenarios nor closes unknown reporters/consumers or A04 native scope.",
+      "owner": "Aero historical disposition; Black Glass exact queue/dispatch"
+    },
+    {
+      "id": "original-evidence-and-transition-authority",
+      "disposition": "retain-source-identities-current-verification-controls",
+      "obligation": "Preserve historical receipts and refuse to turn static source or stale runtime metadata into present acceptance/publication.",
+      "independent_expectation": "Old compiler proof names latest-installed-official-2.1-experimental/current-reviewed and forbids cross-patch reuse, but explicitly records raw_log_retained=false with four evidence files and false transition gates. Current acceptance needs actual pinned consumed inputs and original retained results; that old proof is no exact-engine/current-native or release verdict. Later accepted implementations cannot silently replace the bytes of a historical decomposition receipt.",
+      "implementation": [
+        "spec/verification.md",
+        "docs/progress.md",
+        "tools/commands/release/Test-MIRGitHubAdministration.ps1"
+      ],
+      "host_controls": [],
+      "applicable_evidence": "Immutable historical test refs/epochs remain discoverable. Current original adverse, scoped-success, complete-packet review and native custody chains remain independent and unmodified.",
+      "remaining_executable_check": "Preserve/review original consumed inputs for any evidence actually reused, and complete existing stable verdicts and checked GitHub delivery. Missing old logs/engines/reporter inputs remain unverified; no reconstructed success or new historical campaign follows.",
+      "owner": "Aero independent applicability/verdict; Black Glass checked integration/native/publication"
+    }
+  ],
+  "current_host_control_sources": [
+    {
+      "path": "tests/test_generator.py",
+      "git_blob": "fda7c4e9f8473f84e7a4549765520a0ef22c95a1",
+      "bytes": 133694,
+      "sha256": "1C92356E075E4F183B449E071FA584D2B45BB75675385A6E00980A9A07B0186A"
+    },
+    {
+      "path": "tests/test_native_fixture_modes.py",
+      "git_blob": "78a928df3b705f0d53e072323cdc9b70648b4d0f",
+      "bytes": 4521,
+      "sha256": "345EEA49BBA2119264DA8197F77D8B7E6C7D955D40037AEC4B03CCC027E6DD64"
+    },
+    {
+      "path": "tests/test_pack.py",
+      "git_blob": "7d09067403840a5bce6af6e2d4b81665820078ff",
+      "bytes": 7537,
+      "sha256": "E5A8F1532DD5E1256FBDD573E188F7F69F3ED7E19B337466BFE3DF05255792D9"
+    },
+    {
+      "path": "tests/test_package.py",
+      "git_blob": "bf50de5b908cf476807ff40cd7fdb0713d34706c",
+      "bytes": 35323,
+      "sha256": "48A058631453F2D784F89CF3D0AF9C9EE6D7585CD06005D3D34E87618E8E40B8"
+    }
+  ],
+  "host_validation": {
+    "new_tests_added": false,
+    "old_framework_executed": false,
+    "host_tests_rerun_in_this_review": false,
+    "basis": "Source and contract reconciliation only. Existing integrated full CI keeps a0e73c04/9b6a6605 original identity. New documentation/inventory requires repository/whitespace and ordinary exact-head CI.",
+    "native_execution": false
+  },
+  "reference_correction": "Initial strict live-tag inspection refused missing local alias v4.2.0. No test/engine ran. Exact matching v4.2.0-stable remote/source already exists for both bodies; canonical binding deduplication resolves the alias without fabricating a tag or new source. Original aliases/inspection receipt remain in Aero primary preparation.",
+  "limits": [
+    "Five selected source dispositions do not close all compiler, compatibility, orchestration, settings, registry, A04, inter-release or consumer histories.",
+    "No global inventory_complete, source_reconciliation_complete or test_intent_reconciliation_complete change. All87 original request records/decisions remain unchanged.",
+    "No product implementation, fixture/controller, source version, support scope, archive, original native result, protected save or release-state changes.",
+    "No current native/package/performance result follows from an old static receipt asserting preserved semantics."
+  ],
+  "native_execution": false,
+  "release_qualification": false
+}

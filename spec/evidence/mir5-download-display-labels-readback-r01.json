@@ -1,0 +1,355 @@
+{
+  "schema": 1,
+  "kind": "MIRPublishedDownloadDisplayLabelReadbackV1",
+  "reviewed_on": "2026-11-01",
+  "scope": "Published MIR5+ player ZIP display metadata; no package/source/tag/maturity or acceptance change",
+  "requested_format": "MIR MAJOR.MINOR.PATCH for Factorio x.y.z (zip)",
+  "maintainer_decision": {
+    "source": "Direct live maintainer message in the Aero Codex goal thread 01a1971a-6d6d-7ec0-aa6c-714cdf19314d, 2026-11-01 AEDT",
+    "verbatim_request": "also, we need to go back and edit the vanity fo our MIR 5 releases, for all MIR 5+ releases and downloads mod dists files downloads should have the display nameof the format \"MIR x.x.x for Factorio x.x.x (zip)\"",
+    "public_custody": "https://github.com/Julesc013/more-infinite-research/pull/1539#issuecomment-6558562402",
+    "implementation_interpretation_not_verbatim": "Use the requested complete format for every existing and future MIR5+ player ZIP display label, without qualifier suffixes. Retain the full beta, experimental/best-effort, extraction and qualification disclosures in release notes and inventory support fields. This supersedes earlier per-label presentation wording and changes no support or acceptance scope."
+  },
+  "source_version_and_minimum": "Each label was derived from its canonical release tag and the anonymously downloaded ZIP info.json base dependency, with the distribution codec independently checked.",
+  "local_custody": "build/qualification/aero-stable-recovery-r01/download-labels",
+  "releases": [
+    {
+      "tag": "v5.0.1",
+      "release_id": 430311801,
+      "prerelease": true,
+      "public_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.1",
+      "zip_display_labels": [
+        {
+          "asset_id": 697074259,
+          "name": "more-infinite-research_5.0.00601.zip",
+          "label": "MIR 5.0.1 for Factorio 0.6.4 (zip)",
+          "bytes": 136637,
+          "sha256": "fa096a099b9821fb1e767038075b720c216ef6de30f430005f776b098accb3c0"
+        },
+        {
+          "asset_id": 697074261,
+          "name": "more-infinite-research_5.0.00701.zip",
+          "label": "MIR 5.0.1 for Factorio 0.7.5 (zip)",
+          "bytes": 136637,
+          "sha256": "a196620958f916e59c42562f3431795a28c7ea1959079729858133f8fcc3c90f"
+        },
+        {
+          "asset_id": 697074262,
+          "name": "more-infinite-research_5.0.00801.zip",
+          "label": "MIR 5.0.1 for Factorio 0.8.8 (zip)",
+          "bytes": 136636,
+          "sha256": "a167e8fa436b72f83ee73cdb71d6f4fad7e0563541d469ae53219874c9727f54"
+        },
+        {
+          "asset_id": 697074288,
+          "name": "more-infinite-research_5.0.00901.zip",
+          "label": "MIR 5.0.1 for Factorio 0.9.8 (zip)",
+          "bytes": 136637,
+          "sha256": "216072f187e7c5288da05ff39f2dfa8db38c59b7adf246b66d9cc25d3bc2b6dd"
+        },
+        {
+          "asset_id": 697074274,
+          "name": "more-infinite-research_5.0.01001.zip",
+          "label": "MIR 5.0.1 for Factorio 0.10.12 (zip)",
+          "bytes": 136637,
+          "sha256": "7c0196ff1f4c1d5d0550e315c8cf72b3253368c01d982a6ce4580f2559c8ed78"
+        },
+        {
+          "asset_id": 697074277,
+          "name": "more-infinite-research_5.0.01101.zip",
+          "label": "MIR 5.0.1 for Factorio 0.11.22 (zip)",
+          "bytes": 136637,
+          "sha256": "7e770d2251ea70dbcde14cf81af8410838a9ab53d08facce048875d7d1769a21"
+        },
+        {
+          "asset_id": 697074282,
+          "name": "more-infinite-research_5.0.01201.zip",
+          "label": "MIR 5.0.1 for Factorio 0.12.35 (zip)",
+          "bytes": 136640,
+          "sha256": "7a7620e1fe65d8c4379738a750f411a3814993dcdde5958437d35742b551b9d8"
+        },
+        {
+          "asset_id": 697074156,
+          "name": "more-infinite-research_5.0.01301.zip",
+          "label": "MIR 5.0.1 for Factorio 0.13.20 (zip)",
+          "bytes": 485374,
+          "sha256": "a6dccda8dbaf38bfd8bd2b4386199c4f59cd16c6f5c98b6cc93c14ba43a8af92"
+        },
+        {
+          "asset_id": 697074157,
+          "name": "more-infinite-research_5.0.01401.zip",
+          "label": "MIR 5.0.1 for Factorio 0.14.23 (zip)",
+          "bytes": 485377,
+          "sha256": "dc1420891553e3c9cf0e8eec6707bd06f305e46ebe374e2e6e21e4df1f206053"
+        },
+        {
+          "asset_id": 697074159,
+          "name": "more-infinite-research_5.0.01501.zip",
+          "label": "MIR 5.0.1 for Factorio 0.15.40 (zip)",
+          "bytes": 485375,
+          "sha256": "3cb8b3c75cf3cdfef97501bdf6ae7af94b06dfde5aa19207fbf33d2fc26e9fd5"
+        },
+        {
+          "asset_id": 697074163,
+          "name": "more-infinite-research_5.0.01601.zip",
+          "label": "MIR 5.0.1 for Factorio 0.16.51 (zip)",
+          "bytes": 485376,
+          "sha256": "9b74ca6e26e1fcfdf9ebae679b89dc380d6f49dad5c3b155ef39cfaac185785b"
+        },
+        {
+          "asset_id": 697074160,
+          "name": "more-infinite-research_5.0.01701.zip",
+          "label": "MIR 5.0.1 for Factorio 0.17.79 (zip)",
+          "bytes": 485376,
+          "sha256": "6a3580500811728bad03293736ce22115e9c139ccf4d59d89e50ee22defa5210"
+        },
+        {
+          "asset_id": 697074219,
+          "name": "more-infinite-research_5.0.01801.zip",
+          "label": "MIR 5.0.1 for Factorio 0.18.47 (zip)",
+          "bytes": 485377,
+          "sha256": "0822aa1423d158aa6e191b0e98fc9e727492d1c2365be3851822b4223a9a5c4b"
+        },
+        {
+          "asset_id": 697074221,
+          "name": "more-infinite-research_5.0.10001.zip",
+          "label": "MIR 5.0.1 for Factorio 1.0.0 (zip)",
+          "bytes": 485369,
+          "sha256": "07d0c2c04de31ae8a9fcb9cab36bc282f8e7559a08b3a345860251ff9e2667d5"
+        },
+        {
+          "asset_id": 697074227,
+          "name": "more-infinite-research_5.0.11001.zip",
+          "label": "MIR 5.0.1 for Factorio 1.1.110 (zip)",
+          "bytes": 485679,
+          "sha256": "bf56ce16f633c887b80b8f24f3662ea534253971515e0e95be37c159dea143ac"
+        },
+        {
+          "asset_id": 697074231,
+          "name": "more-infinite-research_5.0.20001.zip",
+          "label": "MIR 5.0.1 for Factorio 2.0.77 (zip)",
+          "bytes": 744248,
+          "sha256": "750eca842134afddcc7c45b2b656510ca60f09940a2e82b21896aae7e3d8c1be"
+        },
+        {
+          "asset_id": 697074234,
+          "name": "more-infinite-research_5.0.21001.zip",
+          "label": "MIR 5.0.1 for Factorio 2.1.23 (zip)",
+          "bytes": 744631,
+          "sha256": "c6c2470b438846484732e0e05d124db31a1100c2f1aa0e770b327a4a6fbafa5d"
+        }
+      ],
+      "support_limits": "Existing beta/experimental/best-effort disclosures retained in release notes; extraction instructions now explicitly say to unzip Factorio 0.6-0.8 downloads into the mods folder."
+    },
+    {
+      "tag": "v5.0.0",
+      "release_id": 429799579,
+      "prerelease": true,
+      "public_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.0",
+      "zip_display_labels": [
+        {
+          "asset_id": 694772021,
+          "name": "more-infinite-research_5.0.00600.zip",
+          "label": "MIR 5.0.0 for Factorio 0.6.4 (zip)",
+          "bytes": 136281,
+          "sha256": "c3f87169987dbedbe8ce45ddb5fbf29ec22f3337694fc08140864ae2c8163b77"
+        },
+        {
+          "asset_id": 694772081,
+          "name": "more-infinite-research_5.0.00700.zip",
+          "label": "MIR 5.0.0 for Factorio 0.7.5 (zip)",
+          "bytes": 136281,
+          "sha256": "181d35b002c6bb2c4edbbcd09b2e8651ccfddc2b9a64bcc6fe95a5a7556162dc"
+        },
+        {
+          "asset_id": 694772153,
+          "name": "more-infinite-research_5.0.00800.zip",
+          "label": "MIR 5.0.0 for Factorio 0.8.8 (zip)",
+          "bytes": 136279,
+          "sha256": "6ce07ddd09e29d044e0a152a75abf105a21dc94bbff3d2f45cdfef6d370ad7d6"
+        },
+        {
+          "asset_id": 694772227,
+          "name": "more-infinite-research_5.0.00900.zip",
+          "label": "MIR 5.0.0 for Factorio 0.9.8 (zip)",
+          "bytes": 136281,
+          "sha256": "c87394b7de0798aa1762082618e7f9e33e78291fc4b2c6000d2067907b44d569"
+        },
+        {
+          "asset_id": 694772296,
+          "name": "more-infinite-research_5.0.01000.zip",
+          "label": "MIR 5.0.0 for Factorio 0.10.12 (zip)",
+          "bytes": 136281,
+          "sha256": "0527d3a39fd53db39761c7c32b988319a5e90dcbf005ba995f55b0283ce99546"
+        },
+        {
+          "asset_id": 694772360,
+          "name": "more-infinite-research_5.0.01100.zip",
+          "label": "MIR 5.0.0 for Factorio 0.11.22 (zip)",
+          "bytes": 136281,
+          "sha256": "4eec5a2e6e2fb97c4775d4581924af0e479486f9dec45c43bf56b4aca45f4131"
+        },
+        {
+          "asset_id": 694772395,
+          "name": "more-infinite-research_5.0.01200.zip",
+          "label": "MIR 5.0.0 for Factorio 0.12.35 (zip)",
+          "bytes": 136283,
+          "sha256": "6f93a7c617e598e9581c72fb6c5260dcf3501b779b0e6b371c6160ccec5ce4a6"
+        },
+        {
+          "asset_id": 694771261,
+          "name": "more-infinite-research_5.0.01300.zip",
+          "label": "MIR 5.0.0 for Factorio 0.13.20 (zip)",
+          "bytes": 454826,
+          "sha256": "ed6b2372f2c12c7e57c4465b8900daf2742b80c0eaa0f2a4cd14fae2853a7849"
+        },
+        {
+          "asset_id": 694771342,
+          "name": "more-infinite-research_5.0.01400.zip",
+          "label": "MIR 5.0.0 for Factorio 0.14.23 (zip)",
+          "bytes": 454828,
+          "sha256": "dc2b03ec0b26779e78a8f7ab1fe64973b6a95066f2ce292f0efd929c0496cd24"
+        },
+        {
+          "asset_id": 694771426,
+          "name": "more-infinite-research_5.0.01500.zip",
+          "label": "MIR 5.0.0 for Factorio 0.15.40 (zip)",
+          "bytes": 454827,
+          "sha256": "7df127ad392ffea0ec94f0c3da6cd5ff7689a0842ed621d16d0023a7a2993205"
+        },
+        {
+          "asset_id": 694771518,
+          "name": "more-infinite-research_5.0.01600.zip",
+          "label": "MIR 5.0.0 for Factorio 0.16.51 (zip)",
+          "bytes": 454829,
+          "sha256": "24848b1012e5ed7c31f8ce51d6a396afa5bf0d716ee58518aecbb1581b9b3cbe"
+        },
+        {
+          "asset_id": 694771601,
+          "name": "more-infinite-research_5.0.01700.zip",
+          "label": "MIR 5.0.0 for Factorio 0.17.79 (zip)",
+          "bytes": 454828,
+          "sha256": "3741c93095050391cbff45ff9faa0155bf270d594e7f84e1f4633ee57780459b"
+        },
+        {
+          "asset_id": 694771672,
+          "name": "more-infinite-research_5.0.01800.zip",
+          "label": "MIR 5.0.0 for Factorio 0.18.47 (zip)",
+          "bytes": 454829,
+          "sha256": "0d29be4a7ae95a88a216d289a25156dc763f6401563bc505f0d1ed2c769f76b8"
+        },
+        {
+          "asset_id": 694771708,
+          "name": "more-infinite-research_5.0.10000.zip",
+          "label": "MIR 5.0.0 for Factorio 1.0.0 (zip)",
+          "bytes": 454820,
+          "sha256": "9c42310c4ff0e8885b3c5d4ed13b35923520081b33679dee5e03284b7aaeed6c"
+        },
+        {
+          "asset_id": 694771763,
+          "name": "more-infinite-research_5.0.11000.zip",
+          "label": "MIR 5.0.0 for Factorio 1.1.110 (zip)",
+          "bytes": 455131,
+          "sha256": "2388cb60ebbbffe3e660fca55fcbba68cdea60d1d56ed6fda78b35dccdb1aeb3"
+        },
+        {
+          "asset_id": 694771816,
+          "name": "more-infinite-research_5.0.20000.zip",
+          "label": "MIR 5.0.0 for Factorio 2.0.77 (zip)",
+          "bytes": 704588,
+          "sha256": "54650cb19c3bae3c2dd7fe8d728a3fe8104648c8e99b68e14cbfc3f92a0ab3a9"
+        },
+        {
+          "asset_id": 694771890,
+          "name": "more-infinite-research_5.0.21000.zip",
+          "label": "MIR 5.0.0 for Factorio 2.1.23 (zip)",
+          "bytes": 704972,
+          "sha256": "b49d7bbb99ea51c7a90af9f72dde5d5c0120f80e492fce0917d96d4159c32407"
+        }
+      ],
+      "support_limits": "Existing beta/experimental/best-effort disclosures retained in release notes; extraction instructions now explicitly say to unzip Factorio 0.6-0.8 downloads into the mods folder."
+    }
+  ],
+  "anonymous_assets_verified_before": 38,
+  "anonymous_assets_verified_after": 38,
+  "filenames_ids_urls_bytes_tags_maturity_unchanged": true,
+  "native_execution": false,
+  "release_qualification": false,
+  "custody_records": [
+    {
+      "path": "before.json",
+      "sha256": "18CBDE80223128CCE155F1539D5952B1C7D25A70BE21AAC9BDA7A0CA20D6245D"
+    },
+    {
+      "path": "plan.json",
+      "sha256": "80C2627C11262FE15C7A628764C0769594314B8FFC81CA586095019C6218B386"
+    },
+    {
+      "path": "edits.jsonl",
+      "sha256": "14B199FD5A701BBF2AA16395E7CAE54DC830E918FD1E24580005346DC4AF91B2"
+    },
+    {
+      "path": "anonymous-downloads-after.json",
+      "sha256": "15CAC2C6B283DE879B1D8A5DB8F6647DDBF7343B0C083912D9DC233EA31D2AE1"
+    },
+    {
+      "path": "after.json",
+      "sha256": "4A940D23BAF531767AE5BC36264494998D966B22F7AC8C81C9153CFED55B50A4"
+    },
+    {
+      "path": "result.json",
+      "sha256": "30E40E19608306DD8DC7634B6476451AD134782635C712E093011E7048F58174"
+    },
+    {
+      "path": "response-decoding-adverse.json",
+      "sha256": "2DA3896674C4E690495D5E703213EF372C8D6B9E47C3DE7B1712201060BE4F38"
+    }
+  ],
+  "public_note_scope_followup": {
+    "reviewed_on": "2026-11-02",
+    "review": "https://github.com/Julesc013/more-infinite-research/pull/1539#issuecomment-6558634361",
+    "scope": "After the original label/byte readback, both release bodies explicitly retain the experimental/best-effort/GitHub-only Factorio 0.18.47 limit and metadata/load-crash-check scope. The in-game check remains unverified. Labels, assets, tags and maturity are unchanged.",
+    "local_custody": "build/qualification/aero-stable-recovery-r01/download-labels/scope-followup.json",
+    "custody_sha256": "EAA6AA9C079917DB5A96DFBA4631BCCD5820AEE21C74329105C8D5E63E9D8877",
+    "releases": [
+      {
+        "release_id": 430311801,
+        "tag": "v5.0.1",
+        "before_body_sha256": "BAF0CBC8FF2B38954213BA3B8F034FCE4625E1FB5F9EA672D1AF07E288B27AEE",
+        "after_body_sha256": "51463C02EC65ED4197044450A91113F9BD29E8195947F2254E2B6E8889764CC6",
+        "all_asset_identity_label_and_digest_fields_unchanged": true
+      },
+      {
+        "release_id": 429799579,
+        "tag": "v5.0.0",
+        "before_body_sha256": "D584173A9CC6A446C2B1B245140CAF193A32278024B7D7C3E0F34EBDFE1647FD",
+        "after_body_sha256": "9D14B3940B4D22955DFB07DC853A9C19B8A323CE154C9D73BA5164705162796A",
+        "all_asset_identity_label_and_digest_fields_unchanged": true
+      }
+    ]
+  },
+  "early_subset_disclosure_2026_11_02": {
+    "kind": "MIRExistingBetaEarlySubsetDisclosureMaintenanceV1",
+    "observed_at_utc": "2026-11-01T22:25:29.769199+00:00",
+    "request": "https://github.com/Julesc013/more-infinite-research/pull/1539#issuecomment-6564205730",
+    "request_description": "Black Glass requested the explicit finite-only/no-runtime/settings/Library/migrations disclosure in existing5.0.1 notes and matching authored text; original request comment is retained separately in this custody.",
+    "release_id": 430311801,
+    "tag": "v5.0.1",
+    "title": "MIR 5.0.1",
+    "prerelease": true,
+    "body_before_sha256": "51463C02EC65ED4197044450A91113F9BD29E8195947F2254E2B6E8889764CC6",
+    "body_after_sha256": "349771E2FAA56DFB19881E8BE59693F1D295AB48D81F1C1FB5A1D702FDEC5C59",
+    "early_subset_statement": "- **Early downloads (Factorio 0.6\u20130.12):** finite Base research with fixed defaults only; no MIR runtime effects, mod settings, Research Library, runtime API or save migrations. These builds remain best effort and untested in-game. Unzip the Factorio 0.6\u20130.8 downloads into the mods folder.",
+    "f018_experimental_unverified_and_beta_limits_retained": true,
+    "asset_identity_label_name_url_size_digest_state_unchanged": true,
+    "local_dist_asset_digests_verified": 19,
+    "local_release_notes_match_live_body": true,
+    "local_upload_text_matches_authored": true,
+    "asset_mutations": 0,
+    "release_creation_or_maturity_change": false,
+    "native_execution": false,
+    "local_authoring_adverse": "Initial local writes changed LF to CRLF; preserved refusal and prepared files, restored LF before live maintenance. No published body/asset was changed by that failed local authoring check.",
+    "custody": "build/qualification/aero-501-early-disclosure-r01/",
+    "scope": "Current support disclosure only; original anonymous asset download results retain their identities. No new package, engine observation, performance or stable verdict."
+  }
+}

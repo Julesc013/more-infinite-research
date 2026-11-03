@@ -140,10 +140,10 @@ class TargetAdapterTests(unittest.TestCase):
           package.loaded["__more-infinite-research__.api.v1.data"] = nil
           local selected = require("platform.target")
           assert(selected.id == "f210" and selected.factorio_version == "2.1")
-          assert(selected.minimum_base == "2.1.23" and selected.distribution_version == "5.0.21001")
+          assert(selected.minimum_base == "2.1.23" and selected.distribution_version == "5.0.21002")
           assert(not selected.reduced and selected.research_levels and selected.recipe_productivity)
           local api = require("__more-infinite-research__.api.v1.data")
-          assert(api.get_version().product == "5.0.21001")
+          assert(api.get_version().product == "5.0.21002")
           assert(api.get_capabilities().technology_creation and api.get_capabilities().recipe_productivity)
         ''')
 

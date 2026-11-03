@@ -39,6 +39,8 @@ class HostControlsTests(unittest.TestCase):
         paths = [row["path"] for row in controls]
         self.assertEqual(paths, [
             "tests/test_generator.py",
+            "tests/test_continuation_ownership.py",
+            "tests/test_discovery_tree_compatibility.py",
             "tests/test_early_target_adapter.py",
             "tests/test_historical_direct.py",
             "tests/test_historical_continuations.py",
@@ -110,6 +112,9 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_science.py",
             "tests/test_named_science_replacement_fixture.py",
             "tests/test_fresh_science_transition_fixture.py",
+            "tests/test_sif_retained_manufacturing.py",
+            "tests/test_sif_retained_manufacturing_native.py",
+            "tests/test_sif_technology_reload_diagnostic.py",
             "tests/test_sif_science_retirement_fixture.py",
             "tests/test_cryogenic_native_fixture.py",
             "tests/test_cryogenic_gameplay_fixture.py",
@@ -234,13 +239,25 @@ class HostControlsTests(unittest.TestCase):
             for profile in declaration["profiles"]:
                 if profile["mode"] == "input":
                     input_revisions.update(member["source_revision"] for member in profile["owned_fixture"]["members"])
+        observer_record = json.loads(
+            (ROOT / "spec/evidence/library-native-input-observer-r15-prepared.json").read_text(encoding="utf-8")
+        )
+        observer_revisions = {observer_record["source"]["commit"]}
+        observer_revisions.update(
+            member["source_revision"]
+            for prepared in observer_record["profiles_and_archives"]
+            for member in prepared["archive"]["members"]
+        )
         for job in ("verification-plan", "host-controls"):
             self.assertIn(required_fetch, jobs[job], job)
             for revision in input_revisions:
                 self.assertRegex(revision, r"^[0-9a-f]{40}$")
                 self.assertIn("git fetch --no-tags --depth=1 origin " + revision, jobs[job], (job, revision))
+            for revision in observer_revisions:
+                self.assertRegex(revision, r"^[0-9a-f]{40}$")
+                self.assertIn("git fetch --no-tags --depth=1 origin " + revision, jobs[job], (job, revision))
         self.assertIn("actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1", workflow)
-        self.assertIn("actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065", workflow)
+        self.assertIn("actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0", workflow)
         self.assertIn("python-version: '3.14'", workflow)
         self.assertIn("lupa==2.6 --hash=sha256:b74f944fe46c421e25d0f8692aef1e842192f6f7f68034201382ac440ef9ea67", workflow)
         self.assertIn("lua52.cp314-win_amd64.pyd", workflow)
@@ -261,8 +278,8 @@ class HostControlsTests(unittest.TestCase):
         self.assertIn("driver = [ordered]@{ path = $driver; sha256 = $driverHash }", workflow)
         self.assertIn("controls = $controls", workflow)
         self.assertIn("Get-FileHash -LiteralPath $outputPath -Algorithm SHA256", workflow)
-        self.assertIn("actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a", workflow)
-        self.assertIn("actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c", workflow)
+        self.assertIn("actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9", workflow)
+        self.assertIn("actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333", workflow)
         self.assertIn("needs.verification-plan.outputs.plan_sha256", workflow)
         self.assertIn("Bound MIR5 host plan does not describe this checkout.", workflow)
         self.assertIn("Bound MIR5 host driver hash differs.", workflow)

@@ -1,0 +1,174 @@
+{
+  "schema": 1,
+  "kind": "MIR502F200BasePrototypeNativeChainV1",
+  "status": "independently-reviewed-completed-data-stage-admission-only",
+  "source_refs": {
+    "public": "44af24fa97bcfa5c506b5261d80065ffabb6d8ff",
+    "private": "ab0a3af8873b19854a28c0db2b083791c83a8461",
+    "private_merged": "c62f1f93441e474e306a04e8b8c4c2826dc7eb9b",
+    "candidate": "a2dcfae65a9dbe1c81bc0a8ce8ba933972c6048c"
+  },
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "player": {
+    "version": "5.0.20002",
+    "bytes": 766282,
+    "sha256": "2113F85C4678580C75A6E88FDDD6F3A96506D6BAE5FE85B5BB7BE52C2B77E5B9"
+  },
+  "preparation_sha256": "4F0E90B48A2D5B00099B58B85BB13B2EACF9FB2DF080914DA7F70C40BF89B617",
+  "caller_sha256": "0E1797442FDF10029EEC3D534F908EA640975EC5CAF2BB3480207EEC303D320D",
+  "composition_sha256": "76F907E6868124609F99BC06477CAC94EC2DA40EE755F56ACBF20B8AD6255B67",
+  "complete_packet_review_sha256": "8CB94B7D07E4F20D8FCC70CE0314D3DEE221CB85B5C0167BEFFBD730AAD6435F",
+  "actual_result_review_sha256": "629E2935BCDC6BE633CB964D2745EA18702B88F270957EE2E032805ED0033FDA",
+  "root_readback_sha256": "FCC0C5827BB699124779D8B19D2507BD3A8499AC51B861D5196500E2339D657D",
+  "terminal_sha256": "2671B36D88DEEF19AE9BF652009639FB1B747D6BA9B231D1529C5DFE47A55909",
+  "actual_engine_allocations": 1,
+  "loaded_selection": [
+    "base@2.0.77",
+    "mir-fixture-mir5-active-mods-observer@0.1.0",
+    "more-infinite-research@5.0.20002"
+  ],
+  "dumps": {
+    "data_raw": {
+      "path": "write-data/script-output/data-raw-dump.json",
+      "bytes": 13379856,
+      "sha256": "4E75AC09EC59E3A77EB2EEF9D58B1EC39D28A361D11445CA5B0F6CA49C36B75A"
+    },
+    "mod_settings": {
+      "path": "write-data/script-output/mod-settings-dump.json",
+      "bytes": 741217,
+      "sha256": "AF2569096906BB8B20AE0B0978B080F6438A40DBB58D95DD7DB519633207A48D"
+    }
+  },
+  "process_result": {
+    "status": "passed",
+    "exit_code": 0,
+    "timed_out": false,
+    "passed": true,
+    "completion_predicate_observed": false,
+    "duration_seconds": 2.192072,
+    "peak_working_set_bytes": 146477056,
+    "peak_sampled_private_bytes": 139243520,
+    "admission": {
+      "observed_at": "2026-11-02T08:39:43.3868333+00:00",
+      "memory": {
+        "total_bytes": 34045980672,
+        "free_bytes": 19144114176,
+        "committed_bytes": 18637537280,
+        "commit_limit_bytes": 41293737984
+      },
+      "work_volume": {
+        "name": "D:\\",
+        "free_bytes": 142061502464,
+        "total_bytes": 1500099112960
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 206960836608,
+        "total_bytes": 599395090432
+      }
+    },
+    "duration_measurement": {
+      "scope": "direct-native-executable-start-to-exit",
+      "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+      "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+    },
+    "admission_wait": {
+      "phase": "prototype-capture-engine",
+      "admission_wait_seconds": 30,
+      "status": "admitted-without-wait",
+      "attempt_count": 2,
+      "refusal_count": 0,
+      "elapsed_seconds": 0.097,
+      "first_refusal": null,
+      "last_refusal": null,
+      "last_error": null,
+      "started_at": "2026-11-02T08:39:43.2901214+00:00",
+      "deadline_at": "2026-11-02T08:40:13.2901214+00:00",
+      "admission": {
+        "observed_at": "2026-11-02T08:39:43.3868333+00:00",
+        "memory": {
+          "total_bytes": 34045980672,
+          "free_bytes": 19144114176,
+          "committed_bytes": 18637537280,
+          "commit_limit_bytes": 41293737984
+        },
+        "work_volume": {
+          "name": "D:\\",
+          "free_bytes": 142061502464,
+          "total_bytes": 1500099112960
+        },
+        "system_volume": {
+          "name": "C:\\",
+          "free_bytes": 206960836608,
+          "total_bytes": 599395090432
+        }
+      }
+    }
+  },
+  "actual_resource_ledger_records": 4,
+  "custody": [
+    {
+      "name": "native",
+      "source": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\candidate502-f200-base-prototype-r07",
+      "copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate502-f200-prototype-native-complete-r01\\native",
+      "files": 9,
+      "bytes": 14148828
+    },
+    {
+      "name": "packet",
+      "source": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate502-f200-prototype-packet-r07",
+      "copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate502-f200-prototype-native-complete-r01\\packet",
+      "files": 13,
+      "bytes": 94304
+    },
+    {
+      "name": "independent-packet-no-go",
+      "source": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate502-f200-prototype-independent-review-r01",
+      "copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate502-f200-prototype-native-complete-r01\\independent-packet-no-go",
+      "files": 3,
+      "bytes": 26247
+    },
+    {
+      "name": "independent-packet-go",
+      "source": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate502-f200-prototype-independent-review-r02",
+      "copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate502-f200-prototype-native-complete-r01\\independent-packet-go",
+      "files": 3,
+      "bytes": 32094
+    }
+  ],
+  "restoration": {
+    "all_six_original_states_rehashed": true,
+    "candidate_archive_absent": true,
+    "controls_restored": true,
+    "factorio_processes_after": 0
+  },
+  "adverse_history": [
+    "Retained r06 packet independent NO-GO A30EDADA: required settings dump optional, guidance caller hash stale; new committed caller and fresh r07 close both findings without editing old records.",
+    "First output-control malformed JSON wording failure retained separately; corrected r02 actual-function controls pass all8; four r07 packet refusal controls pass.",
+    "Original offline r01 script-scope failure remains in primary custody and is not native execution."
+  ],
+  "receipt_capsule": {
+    "path": "spec/evidence/candidate502-f200-base-prototype-receipts-r01.json.gz",
+    "bytes": 1442950,
+    "sha256": "2C11B09D023CE4791EE546358C4A95C508A479DE61B20C3FC7A0ACC45A91973F",
+    "bodies": 77,
+    "decoded_bytes": 14447385,
+    "scope": "Every one of the9native files, exact r07/r06 packet bodies, both packet verdicts, actual-result GO, four caller/input snapshots, root readbacks and actual-function controls. Original/copy local native custody retained."
+  },
+  "limits": [
+    "Exact Base2.0.77/MIR5.0.20002 data-stage admission only. No complete prototype-parity or catalogue-correctness analysis.",
+    "No menu/world/save/physical gameplay/GUI/client/Library/performance/stable/release qualification.",
+    "2.192072sec is one native data-process duration; no matched comparison, responsive endpoint or performance acceptance.",
+    "Only this new review folder written; original execution and custody evidence remain unchanged.",
+    "No fresh native parity/correctness analysis or transfer of any501 receipt to502.",
+    "All26 duplicate-mod Info notices, preliminary5.0.20000 discovery and exact final5.0.20002 selection remain in raw logs; no Error/Warning lines, stderr empty.",
+    "2.192072s is data-process start-to-exit only. No startup-to-responsive-menu or comparison sample.",
+    "Resource policy is the existing4096MiB sampled watchdog/512MiB output/240sec/30sec admission, not a hard allocation cap.",
+    "CurrentB artifacts remain immutable. A future corrected changelog-containing freeze has different ZIP identities and needs affected-input/artifact readback."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false
+}

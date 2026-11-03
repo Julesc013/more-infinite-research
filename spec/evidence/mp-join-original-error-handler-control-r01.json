@@ -1,0 +1,134 @@
+{
+  "schema": 1,
+  "kind": "MIRMPJoinOriginalErrorAndHandlerControlV1",
+  "reviewed_on": "2026-11-02",
+  "request_id": "MP-JOIN-01",
+  "source_id": "P-MP-JOIN-2026-10-25",
+  "status": "original-error-class-recovered-and-focused-host-opponent-rejected; exact reporter route remains unqualified",
+  "original_screenshot": {
+    "url": "https://i.imgur.com/Blc0VpG.png",
+    "local_custody": "build/qualification/aero-mp-join-original-review-r01/Blc0VpG.png",
+    "bytes": 66210,
+    "sha256": "51C49563DEA52E9B1CC1B0B51984DD4FB05FDA5E8F05E96940291439DC063C2D",
+    "width": 932,
+    "height": 453,
+    "http_status": 200,
+    "content_type": "image/png",
+    "observation": "Direct anonymous PNG download and visual reading succeeded; the web text capture still could not access it.",
+    "exact_error_signature": "The following mod event handlers are not identical between you and the server",
+    "named_mod": "mod-more-infinite-research",
+    "meaning": "The dialog refuses the join because the client and server have different registered handlers, labels that class as save/load unsafe and asks for the log.",
+    "not_shown": [
+      "stack trace",
+      "Factorio version",
+      "MIR before/after versions or archive hashes",
+      "complete mods/settings",
+      "affected save",
+      "client versions"
+    ]
+  },
+  "historical_source": {
+    "fix_commit": "03bc43ea1212782ee7efa2d0dc0b637237650141",
+    "pull_request": "https://github.com/Julesc013/more-infinite-research/pull/650",
+    "references": [
+      {
+        "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+        "path": "source/prototypes/mir/runtime/compiler_profile_notice.lua",
+        "blob": "9456351817c0d1e82df13ed05f8a68527252922d",
+        "role": "published-broken-handler-source"
+      },
+      {
+        "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+        "path": "source/prototypes/mir/runtime/compiler_profile_notice.lua",
+        "blob": "c70e5c9c5008969b69d0c1ff5d10c9ae11f27443",
+        "role": "published-hotfix-source"
+      },
+      {
+        "commit": "03bc43ea1212782ee7efa2d0dc0b637237650141",
+        "path": "tests/runtime/classic_profile_notice.lua",
+        "blob": "a5a296c5cc689a695fc16c788f150a57ba0f884d",
+        "role": "independent-historical-CPN-01-through-CPN-07-assertions"
+      }
+    ],
+    "independent_expectation": "Historical CPN-02/03 characterizes a load-only ordinary tick subscription as the opposing saved-server/joining-client mismatch; CPN-06/07 requires the fixed load callback to preserve handler registration without game/profile reads or messages.",
+    "disposition": "Port the observable handler reconstruction and read-only load obligation. The retired compiler-profile notice, notification DTO and coordinator are obsolete implementation-only; do not restore them.",
+    "qualification_limit": "The screenshot error class is consistent with this historical fix; it does not establish which package caused the reporter case or prove that fix resolved it."
+  },
+  "current_mapping": {
+    "requirements": [
+      "RUN-01",
+      "RUN-02",
+      "RUN-05",
+      "VER-02",
+      "VER-07"
+    ],
+    "implementation": [
+      "source/runtime/bootstrap.lua",
+      "source/runtime/library.lua",
+      "source/runtime/passive_repair.lua"
+    ],
+    "host_controls": [
+      "tests/test_bootstrap.py::test_settled_native_only_world_has_no_periodic_work_after_view_cycles_and_reload",
+      "tests/test_bootstrap.py::test_repair_load_reconnects_without_save_writes_or_game_access_and_disable_clears"
+    ],
+    "original_native_representatives": [
+      "spec/evidence/library-f200-native-names-private-native-chain-r01.json",
+      "spec/evidence/library-f210-native-names-private-native-chain-r01.json"
+    ],
+    "native_limit": "These real-client/restart chains retain their own exact packages and scenarios; no exact reporter reproduction or current-candidate applicability is asserted."
+  },
+  "host_negative_control": {
+    "kind": "MIRMPJoinKnownHandlerMismatchHostControlV1",
+    "source_commit": "a79145266b9cc5a4b108310e94817e9e0f9c6fb7",
+    "bootstrap_raw_git_sha256": "2F4444488CE1143F391CC4FA682467DD8A2309DA2155F2C0BAE1A86DFA66D967",
+    "test_selector": "tests/test_bootstrap.py::BootstrapTests.test_settled_native_only_world_has_no_periodic_work_after_view_cycles_and_reload",
+    "runtime": {
+      "lupa": "2.6",
+      "lua": "lua52",
+      "directory": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir421-lua-runtime"
+    },
+    "current": {
+      "selected_control_passed": true,
+      "full_bootstrap_controls": 22,
+      "full_bootstrap_passed": true
+    },
+    "original_control_accepted_faithful_opponent": true,
+    "opponent": {
+      "change": "Insert one ordinary on_tick subscription exclusively in on_load; all other source bytes and host-double behavior remain unchanged.",
+      "in_memory_only": true,
+      "host_on_tick_enum_present": true,
+      "rejected": true,
+      "failure": {
+        "type": "LuaError",
+        "message": "[string \"<python>\"]:18: on_load added an ordinary on_tick handler\nstack traceback:\n\t[string \"<python>\"]:18: in main chunk\n\t[C]: in function 'assert'"
+      }
+    },
+    "player_files_changed": false,
+    "native_execution": false,
+    "reporter_reproduced": false,
+    "release_qualification": false,
+    "host_test_source_lf_sha256": "5E68145941FF46DC0C158D5C726F878719BDF4387ABCDE5932794A2232A34320"
+  },
+  "custody_records": [
+    {
+      "path": "initial-opponent-refusal.json",
+      "sha256": "D437BA9B5D3B009AC5BF6DB29C8FCCFF3C6653D3A8F120E246F0F53A4F83EEC7"
+    },
+    {
+      "path": "original-control-gap.json",
+      "sha256": "9BBD61DB9D7531B5136C07E8AAF8D25E4833ECD95B2B2FF9683026E20AF2318A"
+    },
+    {
+      "path": "negative-control.json",
+      "sha256": "DE9E99FFE896D2697FC14781F7A4EEED38EF42C814D99FC6BE121F49AA386C07"
+    }
+  ],
+  "remaining": [
+    "Recover the original log/stack, exact source/successor archives, engines, mod/settings closure, save and client versions before closing the exact reporter route.",
+    "Review consumed-input applicability and complete affected genuine distinct-client join/rejoin, saved-host restart and handler/owned-state preservation on the selected candidate.",
+    "Keep the historical request, original capture-limit assessment and status unchanged; this is additive input recovery and a focused host regression control."
+  ],
+  "native_execution": false,
+  "reporter_reproduced": false,
+  "release_qualification": false
+}

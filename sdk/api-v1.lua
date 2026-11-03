@@ -8,7 +8,7 @@
 ---@class MIRApiVersion
 ---@field major integer @1 for this documented surface.
 ---@field minor integer @0 for this documented surface.
----@field product string @Current product metadata: "5.0.21000".
+---@field product string @Selected edition's distribution version; negotiate compatibility through API version and capabilities.
 
 ---@class MIRDataCapabilities
 ---@field technology_creation boolean @Implemented only on F200/F210.

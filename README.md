@@ -6,7 +6,7 @@
 
 - Repeatable research for production, logistics, combat, character bonuses and robots, with extra research for Space Age and supported modded production chains.
 - Startup settings let you enable, disable, cap and rebalance research. Optional overrides adjust supported productivity, module, recycling and other native limits.
-- **MIR 5.0.0 community beta:** GitHub only. Performance and advanced Library checks remain in progress. [Beta downloads](https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.0) · [Upgrade and support guide](docs/support.md) · [MIR 4.7.3 predecessor](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.7.3).
+- **MIR 5 community beta:** GitHub only. Performance and advanced Library checks remain in progress. [Beta downloads](https://github.com/Julesc013/more-infinite-research/releases) · [Upgrade and support guide](docs/support.md) · [MIR 4.7.3 predecessor](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.7.3).
 - **Choose your Factorio version:** Factorio 2.1 is the primary target, with separate downloads for older supported versions. Use the [version and feature table](docs/support.md#candidate-editions). Factorio 0.18 and 0.6–0.12 builds are experimental/best effort. GitHub betas stay off the Mod Portal; stable Portal releases use the same tested ZIPs.
 - **Before upgrading:** preserve the original save and matching mods/settings, then follow the [upgrade instructions](docs/support.md#first-upgrade). Research erased during the 4.2.1 incident requires the [recovery procedure](docs/support.md#recovery-from-the-421-incident) and an older backup.
 - **Settings sharing:** on Factorio 2.0/2.1, the Library exports full or compact settings as a copyable string or text file. Full profiles are recommended for support; they do not back up other mods, the map or research.
@@ -203,7 +203,7 @@ The first generated level is the anchor. A zero additive increment with multipli
 | Max level | `0` (infinite) |
 | Research unit time | `60` seconds |
 
-**Base-technology extensions** use the same formula, but their first generated level starts after the vanilla chain. A setting value of **`0`** for base cost, exponential multiplier, or research unit time means *derive this from the vanilla chain*. Additive cost per level defaults to `0`.
+**Base-technology extensions** start after the existing native chain. Their positive base-cost setting is a **level-1 coefficient**. If the first continuation starts at level `N`, its initial formula value is `base_cost * exponential_multiplier^(N - 1)`. Later levels apply the additive increment and exponential multiplier from that anchor. Setting base cost, exponential multiplier, or research unit time to **`0`** inherits the corresponding native-chain behavior; a modded native chain can supply that baseline. Additive cost per level defaults to `0`.
 
 If a positive base-extension max level is below the first generated continuation level, MIR **skips that extension** instead of creating an impossible capped technology.
 
@@ -478,7 +478,7 @@ Every base extension receives:
 | Setting pattern | Type | Meaning |
 | --- | --- | --- |
 | `mir-enable-<technology>` | bool | Enables or disables the infinite continuation. |
-| `mir-cost-base-<technology>` | int, min `0` | `0` derives the exact cost of the first MIR continuation level from the vanilla chain; positive values override that first-level cost. |
+| `mir-cost-base-<technology>` | int, min `0` | Level-1 cost coefficient. `0` inherits it from the native chain; a positive value is multiplied by growth raised to `first_continuation_level - 1` to obtain the first continuation's formula value. |
 | `mir-cost-linear-increment-<technology>` | int, min `0` | Research units added per continuation level before exponential multiplication. `0` means no additive growth. |
 | `mir-cost-growth-<technology>` | double, min `0` | `0` derives the exponential multiplier from the vanilla chain; positive values override it. The stable ID is unchanged. |
 | `mir-max-level-<technology>` | int, min `0` | `0` means infinite; positive values cap the generated continuation. |
@@ -679,7 +679,9 @@ For current MIR5 work, inspect the ordered verification plan and run the narrowe
 .\tests\Test-MIR5HostControls.ps1 -Plan
 python -B tools/check_repository.py
 .\tests\Test-MIR5HostControls.ps1 -LuaRuntimeDir <pinned-Lua-runtime-directory>
-python -B tools/package.py --source source --target f210 --revision <full-commit> --output build/packages/more-infinite-research_5.0.21000.zip
+$mirBuildRevision = '<full-commit>'
+$mirBuildVersion = (git show "${mirBuildRevision}:source/info.json" | ConvertFrom-Json).version
+python -B tools/package.py --source source --target f210 --revision $mirBuildRevision --output "build/packages/more-infinite-research_$mirBuildVersion.zip"
 ```
 
 Host checks and package construction do not publish or qualify gameplay. Follow the [release procedure](docs/development.md#github-publication-after-a-reviewed-verdict) after the acceptance gates for the declared release maturity pass. The first community beta may disclose unfinished performance testing; stable releases require complete applicable performance acceptance.

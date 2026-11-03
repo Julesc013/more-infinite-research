@@ -5,12 +5,12 @@ applies_to: "MIR API1.0"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-10-30
+last_reviewed: 2026-11-03
 ---
 
 # MIR API 1.0 SDK (unreleased)
 
-This is developer material for the [frozen documented MIR API1.0 subset](../spec/evidence/api1-documented-subset-qualification-r01.json), pending MIR5 release. It is not loaded by the player package. The scoped decision reconciles both modern native boundaries, physical/save cases, actual client evidence, exact absence guards and host admission budgets; whole-product acceptance and publication remain separate. The [optional-absence native chain](../spec/evidence/api-optional-absence-chain.json) proves CreateOnly loading without MIR, without a save or gameplay claim.
+This is developer material for the [frozen documented MIR API1.0 subset](../spec/evidence/api1-documented-subset-qualification-r01.json), with its recorded inputs and qualification limits. It is not loaded by the player package. The scoped decision reconciles both modern native boundaries, physical/save cases, actual client evidence, exact absence guards and host admission budgets; whole-product stable acceptance and final released-candidate verification remain separate. The [optional-absence native chain](../spec/evidence/api-optional-absence-chain.json) proves CreateOnly loading without MIR, without a save or gameplay claim.
 
 The [canonical draft3 qualification](../spec/evidence/api-canonical-native-chain.json) binds the restricted API to exact source `554c5af3`: F200 independent consumers pass actual effects, physical production, save and two cold reloads; F210 independent namespace consumers pass CreateOnly loading. The F200 fixture completes research with native setters, without a laboratory claim. The final aggregate records later modern N1/N2 and client applicability; this older chain keeps its original inputs and limits.
 
@@ -67,6 +67,6 @@ Current MIR 5 control source collision-checks and registers both historical name
 
 The browser bridge maps historical `search` to the current `query` and accepts `family`, `status`, `sort`, `selected`, `hidden`, and integral `page` from 1 through 30000. It verifies a selected technology against the player's native force before passing it to the Library and retains the boolean open result. The current bridge also accepts `mode`, `tab`, `settings_scope`, `settings_search` and `visibility`; Library host controls cover their current mapping. Rendered joined-client behavior still requires native qualification. The bridged `page` is a saved continuous UI position, and neither historical nor current `open` supplies a remote row/page response envelope; pagination equivalence has not been established.
 
-No identified independent old consumer exists within the pinned source and archive search scope. The required and optional `examples/` trees are current MIR 5 public usage examples, not evidence of a previous consumer. MIR4 API-preview response fields and MEP envelope fields are developer-only historical preview shapes: MIR 5 neither emits nor imports them. The normative V0 removal obligation remains open and still requires accepted independent-consumer migration evidence plus an explicit later-release decision; this bridge does not satisfy or amend either gate.
+No identified independent old consumer exists within the pinned source and archive search scope. The required and optional `examples/` trees are current MIR 5 public usage examples, not evidence of a previous consumer. MIR4 API-preview response fields and MEP envelope fields are developer-only historical preview shapes: MIR 5 neither emits nor imports them. Both historical runtime interfaces remain registered. Before retiring a real externally consumed old contract, [API-01](../spec/api.md) requires recording its consumers and preserved fields, with an explicit converter/adapter or documented major-version transition. The existing bridges and current examples do not prove an old consumer has migrated; that qualification remains separate.
 
 Read the [normative API contract](../spec/api.md) for lifecycle and future-extension rules. The alpha and beta fixtures above remain the canonical current conformance consumers.
