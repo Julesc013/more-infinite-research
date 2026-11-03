@@ -164,6 +164,49 @@ class ProductTargetExtensionTests(unittest.TestCase):
             .. "change-recipe-productivity:c-electric-furnace:0.05000")
         ''')
 
+    def test_historical_big_drill_has_one_default_or_scaled_effect_with_space_age_seed(self):
+        # Published synthetic fixture/assertion e0c91c62/49ab9a29: one
+        # big-mining-drill manufacture effect +0.05 at the 20% default.
+        # Space Age already authors that route; extension must not add it twice.
+        self.lua.execute(r'''
+          for _, case in ipairs({{20,.05},{40,.10}}) do
+            local percent,expected=case[1],case[2]
+            for _, space_age in ipairs({false,true}) do
+              local effects={productivity("burner-mining-drill",percent/100),
+                productivity("electric-mining-drill",percent*.5/100)}
+              if space_age then effects[#effects+1]=productivity("big-mining-drill",expected) end
+              local drill=generated("research_mining_drill",effects)
+              local foreign={name="foreign-unrelated",effects={productivity("other",.33)}}
+              local raw=raw_with_recipes({
+                ["big-mining-drill"]=recipe({{"electric-mining-drill",1},{"steel-plate",10}},
+                  {product("item","big-mining-drill")}, {category="crafting",enabled=true,allow_productivity=true}),
+                ["fluid-homonym"]=recipe({}, {product("fluid","big-mining-drill")})})
+              raw.item={["big-mining-drill"]={place_result="big-mining-drill"}}
+              local before_raw=frozen_copy(raw.recipe)..frozen_copy(raw.item)
+              local before_foreign=frozen_copy(foreign)
+              local rows={drill,foreign}
+              local result=extension.extend(rows,{streams={research_mining_drill={effect_percent=percent}}},
+                {raw=raw,mods=space_age and {["space-age"]="2.1.23"} or {}})
+              local owners,count={},0
+              for _,row in ipairs(rows) do
+                for _,effect in ipairs(row.effects) do
+                  if effect.type=="change-recipe-productivity" and effect.recipe=="big-mining-drill" then
+                    count=count+1;owners[#owners+1]=row.name
+                    assert(effect.change==expected,"historical big-drill effect changed")
+                  end
+                  assert(effect.recipe~="fluid-homonym")
+                end
+              end
+              assert(count==1 and owners[1]=="recipe-prod-research_mining_drill-1",
+                "big drill must have exactly one manufacturing effect owner")
+              assert(#drill.effects==3 and #rows==2)
+              assert(result.extended_effects==(space_age and 0 or 1))
+              assert(frozen_copy(raw.recipe)..frozen_copy(raw.item)==before_raw)
+              assert(frozen_copy(foreign)==before_foreign)
+            end
+          end
+        ''')
+
     def test_exclusions_typed_homonyms_and_unsupported_literal_routes_do_not_widen_productivity(self):
         self.lua.execute(r'''
           local gear = generated("research_gears", {productivity("iron-gear-wheel", .10)})

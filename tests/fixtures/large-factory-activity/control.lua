@@ -5,6 +5,10 @@ local MAX_SURFACES = 32
 local SAMPLE_PER_SURFACE = 256
 local MAX_MODS = 128
 local MAX_REPORT_BYTES = 65536
+local MAX_SETTINGS_BYTES = 262144
+local MAX_SETTINGS_PER_SCOPE = 2048
+local MAX_SETTING_NAME_BYTES = 256
+local MAX_SETTING_STRING_BYTES = 4096
 local PREFIX = "[MIR5_LARGE_FACTORY_ACTIVITY] "
 local TYPES = {"assembling-machine", "furnace", "mining-drill", "lab", "inserter",
   "transport-belt", "locomotive", "roboport", "agricultural-tower"}
@@ -24,6 +28,58 @@ local function emit(kind, report)
   local text = helpers.table_to_json(report)
   if type(text) ~= "string" or #text > MAX_REPORT_BYTES then fail("report byte bound exceeded") end
   log(PREFIX .. kind .. " " .. text)
+end
+-- Copy only the documented ModSetting scalar/Color union, never native objects.
+local function setting_value(value)
+  local kind = type(value)
+  if kind == "boolean" then return value end
+  if kind == "string" then
+    if #value > MAX_SETTING_STRING_BYTES then fail("setting string bound exceeded") end
+    return value
+  end
+  if kind == "number" then
+    if value ~= value or value == math.huge or value == -math.huge then fail("nonfinite setting") end
+    return value
+  end
+  if kind ~= "table" then fail("unsupported setting value") end
+  local result, mode, count = {}, nil, 0
+  for key, channel in pairs(value) do
+    local named = key == "r" or key == "g" or key == "b" or key == "a"
+    local indexed = type(key) == "number" and key % 1 == 0 and key >= 1 and key <= 4
+    if not named and not indexed then fail("malformed Color key") end
+    local next_mode = named and "named" or "indexed"
+    if mode and mode ~= next_mode then fail("mixed Color representation") end
+    mode, count = next_mode, count + 1
+    if type(channel) ~= "number" or channel ~= channel or channel < 0 or channel > 255 then
+      fail("malformed Color channel")
+    end
+    result[key] = channel
+  end
+  if mode == "indexed" and (count < 3 or count > 4 or result[1] == nil or result[2] == nil or result[3] == nil) then
+    fail("malformed Color array")
+  end
+  return result
+end
+local function setting_scope(values)
+  local rows = {}
+  for name, setting in pairs(values) do
+    if type(name) ~= "string" or #name == 0 or #name > MAX_SETTING_NAME_BYTES then fail("setting name bound exceeded") end
+    if type(setting) ~= "table" or setting.value == nil then fail("malformed ModSetting") end
+    rows[#rows + 1] = {name = name, value = setting_value(setting.value)}
+    if #rows > MAX_SETTINGS_PER_SCOPE then fail("setting count bound exceeded") end
+  end
+  table.sort(rows, function(a, b) return a.name < b.name end)
+  return rows
+end
+local function emit_settings(tick)
+  local report = {schema = 1, kind = "MIRLargeFactoryEffectiveSettingsV1", tick = tick,
+    startup = setting_scope(settings.startup), runtime_global = setting_scope(settings.global),
+    original_saved_settings_observed = false, per_player_settings_observed = false}
+  local text = helpers.table_to_json(report)
+  if type(text) ~= "string" or #PREFIX + #"SETTINGS " + #text > MAX_SETTINGS_BYTES then
+    fail("settings report byte bound exceeded")
+  end
+  log(PREFIX .. "SETTINGS " .. text)
 end
 local function surfaces()
   local values, seen = {}, {}
@@ -76,6 +132,7 @@ local function begin(tick)
     end
   end
   first_tick = tick
+  emit_settings(tick)
   emit("START", {schema = 1, first_tick = tick, window_ticks = WINDOW,
     surfaces = #selected_surfaces, sampled_machines = #sampled, performance_acceptance = false})
 end

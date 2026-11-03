@@ -14,7 +14,7 @@ class ActivityFixtureTests(unittest.TestCase):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.execute(r'''
 function activity_fixture(path, base, surface_count)
-  local callbacks, reports, logs, reads = {}, {}, {}, {counts=0, flows=0, samples=0}
+  local callbacks, reports, logs, reads = {}, {}, {}, {counts=0, flows=0, samples=0, settings=0}
   local source = {production=100, products=7, valid=true, engine=base, blocked=false}
   local function readonly(backing)
     return setmetatable({}, {__index=backing,
@@ -58,6 +58,26 @@ function activity_fixture(path, base, surface_count)
   world.nauvis = world[1]
   local mods = {base=base}
   local native_game = readonly({surfaces=world, forces=readonly({player=force})})
+  local setting_rows = {startup={alpha={value=true}, color={value={r=0.25,g=0.5,b=0.75,a=1}}, str={value="original"}},
+    global={number={value=12.5}, disabled={value=false}, indexed={value={0.1,0.2,0.3,0.4}}, empty={value={}}, partial={value={a=0.5}}}}
+  local function protected(value)
+    if type(value) ~= "table" then return value end
+    return setmetatable({}, {
+      __index=function(_, key) return protected(value[key]) end,
+      __newindex=function() error("native settings mutation") end,
+      __pairs=function()
+        local key
+        return function()
+          key = next(value, key)
+          if key ~= nil then return key, protected(value[key]) end
+        end
+      end})
+  end
+  local native_settings = readonly(setmetatable({}, {__index=function(_, key)
+    assert(not source.blocked, "illegal settings access")
+    reads.settings = reads.settings + 1
+    return protected(setting_rows[key])
+  end}))
   local env = {script={active_mods=mods,
     on_init=function(fn) callbacks.init=fn end,
     on_load=function(fn) callbacks.load=fn end,
@@ -70,19 +90,20 @@ function activity_fixture(path, base, surface_count)
     end})},
     helpers={table_to_json=function(report)
       reports[#reports+1] = report
-      return source.oversize and string.rep("x", 65537) or "{}"
+      return source.oversize_settings and string.rep("x", 262145) or (source.oversize and string.rep("x", 65537) or "{}")
     end},
     log=function(message) logs[#logs+1] = message end}
   env._G=env
   setmetatable(env, {__index=function(_, key)
     if key == "game" then assert(not source.blocked, "illegal game access"); return native_game end
-    if key == "storage" or key == "global" or key == "settings" or key == "require" then
+    if key == "settings" then return native_settings end
+    if key == "storage" or key == "global" or key == "require" then
       error("forbidden access: " .. key)
     end
     return _G[key]
   end})
   assert(loadfile(path, "t", env))()
-  return {callbacks=callbacks, reports=reports, logs=logs, reads=reads, source=source, mods=mods,
+  return {callbacks=callbacks, reports=reports, logs=logs, reads=reads, source=source, mods=mods, setting_rows=setting_rows,
     tick=function(value) if callbacks.tick then callbacks.tick{tick=value} end end}
 end
 ''')
@@ -95,11 +116,11 @@ end
         instance.tick(100)
         for tick in range(101, 700):
             instance.tick(tick)
-        self.assertEqual(len(instance.logs), 1)
+        self.assertEqual(len(instance.logs), 2)
         instance.tick(700)
         self.assertIsNone(instance.callbacks.tick)
-        self.assertEqual(len(instance.logs), 2)
-        return instance.reports[2]
+        self.assertEqual(len(instance.logs), 3)
+        return instance.reports[3]
 
     def test_progress_is_observed_without_mutating_native_objects(self):
         for base in ("2.0.77", "2.1.23"):
@@ -109,7 +130,7 @@ end
                 x.tick(100)
                 x.source.production, x.source.products = 103, 9
                 x.tick(700)
-                report = x.reports[2]
+                report = x.reports[3]
                 self.assertTrue(report.activity_observed)
                 self.assertEqual(report.positive_normal_item_input_delta, 90)
                 self.assertEqual(report.sampled_products_finished_delta, 4)
@@ -140,11 +161,11 @@ end
         x.source.blocked = False
         x.tick(100)
         x.tick(700)
-        self.assertEqual(len(x.logs), 2)
+        self.assertEqual(len(x.logs), 3)
         x.callbacks.load()
         x.tick(800)
         x.tick(1400)
-        self.assertEqual(len(x.logs), 4)
+        self.assertEqual(len(x.logs), 6)
 
     def test_counter_decrease_and_invalidated_machine_are_not_progress(self):
         x = self.fixture()
@@ -152,15 +173,15 @@ end
         x.tick(1)
         x.source.production, x.source.products = 90, 2
         x.tick(601)
-        self.assertFalse(x.reports[2].activity_observed)
-        self.assertEqual(x.reports[2].normal_item_counter_decreases, 15)
-        self.assertEqual(x.reports[2].sampled_product_counter_decreases, 1)
+        self.assertFalse(x.reports[3].activity_observed)
+        self.assertEqual(x.reports[3].normal_item_counter_decreases, 15)
+        self.assertEqual(x.reports[3].sampled_product_counter_decreases, 1)
         x.callbacks.load()
         x.tick(700)
         x.source.valid = False
         x.tick(1300)
-        self.assertEqual(x.reports[4].invalidated_sampled_machines, 1)
-        self.assertFalse(x.reports[4].activity_observed)
+        self.assertEqual(x.reports[6].invalidated_sampled_machines, 1)
+        self.assertFalse(x.reports[6].activity_observed)
 
     def test_missing_item_is_explicitly_outside_production_sample(self):
         x = self.fixture()
@@ -187,6 +208,68 @@ end
                     if case == "endpoint":
                         x.tick(701)
                 self.assertFalse(any("COMPLETE" in x.logs[i] for i in range(1, len(x.logs)+1)))
+
+    def test_effective_settings_once_on_first_update_and_detached(self):
+        for base in ("2.0.77", "2.1.23"):
+            x = self.fixture(base)
+            x.source.blocked = True
+            x.callbacks.init()
+            self.assertEqual(x.reads.settings, 0)
+            x.source.blocked = False
+            x.tick(42)
+            report = x.reports[1]
+            self.assertEqual(report.kind, "MIRLargeFactoryEffectiveSettingsV1")
+            self.assertEqual(report.tick, 42)
+            self.assertFalse(report.original_saved_settings_observed)
+            self.assertFalse(report.per_player_settings_observed)
+            startup = {row.name: row.value for row in report.startup.values()}
+            global_ = {row.name: row.value for row in report.runtime_global.values()}
+            self.assertEqual(startup["alpha"], True)
+            self.assertEqual(startup["str"], "original")
+            self.assertEqual([row.name for row in report.startup.values()], ["alpha", "color", "str"])
+            self.assertEqual([row.name for row in report.runtime_global.values()],
+                             ["disabled", "empty", "indexed", "number", "partial"])
+            self.assertEqual({k: startup["color"][k] for k in ("r", "g", "b", "a")},
+                             {"r": 0.25, "g": 0.5, "b": 0.75, "a": 1})
+            self.assertEqual(global_["number"], 12.5)
+            self.assertFalse(global_["disabled"])
+            self.assertEqual([global_["indexed"][i] for i in range(1, 5)], [0.1, 0.2, 0.3, 0.4])
+            self.assertEqual(len(global_["empty"]), 0)
+            self.assertEqual(global_["partial"].a, 0.5)
+            x.setting_rows.startup.color.value.r = 0.9
+            x.setting_rows["global"].indexed.value[2] = 0.8
+            self.assertEqual(startup["color"].r, 0.25)
+            self.assertEqual(global_["indexed"][2], 0.2)
+            self.assertEqual(x.reads.settings, 2)
+            x.tick(43)
+            self.assertEqual(x.reads.settings, 2)
+            x.tick(642)
+            x.callbacks.configuration()
+            x.tick(700)
+            self.assertEqual(x.reads.settings, 4)
+            self.assertEqual(x.reports[4].startup[2].value.r, 0.9)
+            x.callbacks.load()
+            x.tick(701)
+            self.assertEqual(x.reads.settings, 6)
+
+    def test_settings_bounds_and_malformed_values_refuse(self):
+        for case in ("name", "count", "string", "nonfinite", "unsupported", "missing", "color", "unknown_color_key", "mixed_color_keys", "size"):
+            with self.subTest(case=case):
+                x = self.fixture()
+                if case == "name": x.setting_rows.startup["x" * 257] = self.lua.table_from({"value": True})
+                if case == "count":
+                    for i in range(2049): x.setting_rows.startup[str(i)] = self.lua.table_from({"value": True})
+                if case == "string": x.setting_rows.startup.str.value = "x" * 4097
+                if case == "nonfinite": x.setting_rows["global"].number.value = float("inf")
+                if case == "unsupported": x.setting_rows.startup.alpha.value = self.lua.eval("function() end")
+                if case == "missing": x.setting_rows.startup.alpha.value = None
+                if case == "color": x.setting_rows.startup.color.value.r = float("nan")
+                if case == "unknown_color_key": x.setting_rows.startup.color.value.unknown = 0.5
+                if case == "mixed_color_keys": x.setting_rows.startup.color.value[1] = 0.5
+                if case == "size": x.source.oversize_settings = True
+                x.callbacks.init()
+                with self.assertRaises(LuaError): x.tick(1)
+                self.assertFalse(any("SETTINGS" in x.logs[i] for i in range(1, len(x.logs)+1)))
 
     def test_metadata_selects_pinned_engines_without_player_source(self):
         for family, engine in (("2.0", "2.0.77"), ("2.1", "2.1.23")):
