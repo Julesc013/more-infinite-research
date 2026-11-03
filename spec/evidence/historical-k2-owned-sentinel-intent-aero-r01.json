@@ -1,0 +1,290 @@
+{
+  "schema": 1,
+  "kind": "MIRAeroK2OwnedSpeedSentinelHistoricalIntentReviewV1",
+  "status": "bounded-four-body-source-intent-reconciled-no-native-verdict",
+  "reviewed_against": "f93f7f006cc92519ddde19f0c8239807d9f31820",
+  "player_tree": "ad1d05ebfd4e4bdb4948368f8c1d0714f9b8054b",
+  "source_count": 4,
+  "source_bytes": 26693,
+  "live_tag_path_bindings": 16,
+  "live_tags": 4,
+  "alias_or_missing_bindings": [],
+  "sources": [
+    {
+      "blob": "9b8272c82201ea26ad4128e5ba89d02154ef415d",
+      "bytes": 2070,
+      "sha256": "F0D97914EE16438E887A5EC90E4E26ABE53FE1140E104A3A7065DB2EE2BB2031",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "tests/runtime/Test-MIRK2OwnedSpeedSentinelControls.ps1"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "tests/runtime/Test-MIRK2OwnedSpeedSentinelControls.ps1"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "tests/runtime/Test-MIRK2OwnedSpeedSentinelControls.ps1"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tests/runtime/Test-MIRK2OwnedSpeedSentinelControls.ps1"
+        }
+      ]
+    },
+    {
+      "blob": "c78fa35f9630c8a5865685a08ddd8a292bcb2b11",
+      "bytes": 6971,
+      "sha256": "6835DC6D8D6898804AB6AD3297C6C1A142CB3428334FDF7DFE8EC0F996ADE69D",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "tests/runtime/k2_owned_speed_sentinel_controls.lua"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "tests/runtime/k2_owned_speed_sentinel_controls.lua"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "tests/runtime/k2_owned_speed_sentinel_controls.lua"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tests/runtime/k2_owned_speed_sentinel_controls.lua"
+        }
+      ]
+    },
+    {
+      "blob": "8dd35087dd1130966ea75f64faa33860c6fa6d2d",
+      "bytes": 14679,
+      "sha256": "77A96F33E6EADB2F9AFE6DD9F6B388D56C0F3E8F77905579CA2C90180386E044",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "tests/runtime/k2_owned_speed_sentinel_fixture_controls.lua"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "tests/runtime/k2_owned_speed_sentinel_fixture_controls.lua"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "tests/runtime/k2_owned_speed_sentinel_fixture_controls.lua"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tests/runtime/k2_owned_speed_sentinel_fixture_controls.lua"
+        }
+      ]
+    },
+    {
+      "blob": "c2f1fdd08d5ae2e34b4e1062f5346406cda3452a",
+      "bytes": 2973,
+      "sha256": "49A302EE865DC3557759A3A29A10DD83B3550DB4162236FB7099B94BBBF62C84",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "tests/runtime/run_k2_owned_speed_sentinel_controls.py"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "tests/runtime/run_k2_owned_speed_sentinel_controls.py"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "tests/runtime/run_k2_owned_speed_sentinel_controls.py"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tests/runtime/run_k2_owned_speed_sentinel_controls.py"
+        }
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "subjects": [
+        "CONT-07",
+        "CONT-08",
+        "CONT-11"
+      ],
+      "disposition": "consolidate-fixture-protocol-with-existing-ownership-controls",
+      "historical_paths": [
+        "tests/runtime/k2_owned_speed_sentinel_controls.lua"
+      ],
+      "independent_expectation": "A test companion owns exactly its captured +0.125 contribution above a known0.05 baseline. Restore only that declared contribution on the exact target/force after the known prototype reset; repeated callbacks are idempotent. Duplicate capture/force names, already-retained contribution, unknown aggregate0.08, wrong target4.7.21001 and a later destructive write refuse without masking the native value. This is not authority to infer or repair opaque third-party totals.",
+      "anchors": {
+        "capture": [
+          54
+        ],
+        "late_reset": [
+          79
+        ],
+        "unknown": [
+          99
+        ],
+        "order": [
+          108
+        ]
+      },
+      "current_controls": [
+        {
+          "path": "tests/test_scripted_effects_lifecycle.py",
+          "methods": [
+            "test_disable_restores_only_our_matching_global_write_and_keeps_foreign_write"
+          ]
+        },
+        {
+          "path": "tests/test_k2se_imersite_carrier_fixture.py",
+          "methods": [
+            "test_fixture_owner_refuses_unknown_source_or_native_drift_before_native_writes",
+            "test_repeated_owner_and_mir_reenablement_cannot_be_hidden_by_the_fixture",
+            "test_cold_load_does_not_reassert_foreign_locks"
+          ]
+        }
+      ],
+      "limits": "These current controls retain analogous ownership/refusal obligations with their own independently declared data. Their flag/global-effect cases do not implement the retired +0.125 sentinel or prove its original callback order. No new player speed feature or generic repair is required by this test-only companion."
+    },
+    {
+      "subjects": [
+        "CONT-11",
+        "CONT-14",
+        "CONT-17"
+      ],
+      "disposition": "retain-source-fixture-admission-and-cold-process-distinction",
+      "historical_paths": [
+        "tests/runtime/k2_owned_speed_sentinel_fixture_controls.lua"
+      ],
+      "independent_expectation": "Load the entire actual fixture chunk so the exporter retains its lexical companion binding. Model LuaRemote.interfaces as boolean method markers and invoke methods through remote.call; a false marker must reject even if private dispatch still has a function. Source initialization must bind each exact force. A predecessor on_load before target configuration cannot mark an unsaved upgrade tick as a cold reload. Persist upgrade-verified -> save-pending before the single named save request; repeat ticks cannot save or emit reload again. Separate fresh control chunks may each observe the saved target once, but that host model does not prove native processes or engine migration.",
+      "anchors": {
+        "whole_chunk": [
+          153
+        ],
+        "not_engine": [
+          2
+        ],
+        "presave": [
+          259
+        ],
+        "boolean": [
+          289
+        ]
+      },
+      "current_controls": [
+        {
+          "path": "tests/test_k2_imersite_transition_fixture.py",
+          "methods": [
+            "test_controls_register_without_game_or_storage_reads_and_keep_native_boundaries",
+            "test_successor_refuses_changed_or_mixed_source_witnesses_before_lab_or_research_writes",
+            "test_failed_native_readback_reports_values_without_repair_or_successor_writes",
+            "test_held_public_flags_control_defers_server_save_and_requires_preserved_unqueued_flags"
+          ]
+        },
+        {
+          "path": "tests/test_k2se_imersite_carrier_fixture.py",
+          "methods": [
+            "test_controls_register_without_game_or_storage_reads_and_on_load_is_read_only",
+            "test_successor_still_refuses_lost_investment_before_writes"
+          ]
+        }
+      ],
+      "applicable_evidence": [
+        {
+          "path": "spec/evidence/k2-direct-current38c-native-chain-r01.json",
+          "scope": "Recorded matching-cost direct K2SO route at its original playerfbb7/candidate38C and protected538B, one new lab, saved993E and two physical colds. Its own limits exclude arbitrary carrier repair, K2SE, ordinary tuning, clients, performance and final release. This read-only source audit does not reauthenticate its raw capsule or relabel it current."
+        }
+      ],
+      "current_controls_scope": "The mapped controls are analogs for read-only registration, source admission, preservation and load/process boundaries. They do not exercise LuaRemote.interfaces boolean method markers or the retired fixture's persisted upgrade-verified -> save-pending protocol. Neither mechanism is claimed implemented by these controls.",
+      "retired_mechanism_dispositions": [
+        {
+          "mechanism": "LuaRemote.interfaces boolean marker admission for the private K2 owned-speed companion",
+          "disposition": "superseded-private-companion-protocol",
+          "reason": "The retired fixture's companion lookup and dispatch are not present in the current player source or mapped K2 fixtures. Current K2 transition controls exercise direct fixture callbacks and contain no replacement claim for that companion interface. Its boolean-versus-private-function negative remains valid evidence about the original harness; it is not a player behavior to restore or an implemented current control.",
+          "retained_obligation": "Any new or reused remote consumer must obey the real engine interface representation and invoke through remote.call under spec/api.md. Retain the original false-marker refusal if this companion is ever deliberately reused. This disposition waives no active public API or independently required consumer check.",
+          "remaining_executable_check": "None for the retired companion identity. Do not resurrect its interface or claim boolean-marker coverage from the mapped K2 analogs.",
+          "owner": "Aero historical reconciliation; any future consumer owner"
+        },
+        {
+          "mechanism": "Persisted upgrade-verified -> save-pending phase before the retired fixture's save request",
+          "disposition": "superseded-private-fixture-state-machine",
+          "reason": "The current K2 successor fixture uses a volatile pending flag for configuration scheduling, writes completed_tail and phase=complete before its one server_save request, and admits a reload witness only from that completed saved state. It does not persist the retired save-pending phase. The original pre-save phase protocol is a fixture implementation choice, not a required player save identity or a covered current transition.",
+          "current_implementation": {
+            "path": "tests/fixtures/k2-imersite-transition/successor/control.lua",
+            "anchors": [
+              13,
+              171,
+              184,
+              194,
+              210
+            ]
+          },
+          "retained_obligation": "Never count predecessor on_load or an unsaved configuration tick as a physical cold reload. Preserve meaningful source admission, earned state, one completed successor save and separately identified read-only cold processes with original native witnesses. Host analogs and complete-state source inspection alone do not establish those native outcomes.",
+          "remaining_executable_check": "Use the existing finite migration queue's affected consumed-input review and exact native save/PID/ledger observations; no additional persisted-pending fixture or new native campaign is required solely to restore the retired mechanism.",
+          "owner": "Black Glass exact native route; Aero independent review"
+        }
+      ],
+      "remaining": "The two retired companion-specific mechanisms are explicitly superseded above, not represented as current coverage. Review final candidate consumed source/package/save/controller/engine/profile inputs for the existing named migration queue; use actual PID/save/ledger/native witnesses. Missing or synthetic receipts remain unqualified. Do not count fresh host chunks or extra same-process reload labels as distinct cold processes. No automatic native replay follows from this source-only disposition.",
+      "limits": "Imported sentinel/full fixture implementation and MIR421K2Upgrade selector have their own separate source reviews. The four test/wrapper bodies are reconciled here; this is not a complete transitive implementation or native-custody audit."
+    },
+    {
+      "subjects": [
+        "CONT-11",
+        "CONT-17"
+      ],
+      "disposition": "obsolete-implementation-only-transport-consolidated",
+      "historical_paths": [
+        "tests/runtime/Test-MIRK2OwnedSpeedSentinelControls.ps1",
+        "tests/runtime/run_k2_owned_speed_sentinel_controls.py"
+      ],
+      "independent_expectation": "The wrapper forbids a public PersistentFixtureNames selection escape, requires the private exact-fixture selector, rejects other fixture names, and validates a non-native receipt. The runner pins explicit lupa.lua52 and hashes both actual fixture/control chunks and both expectation chunks, records separate assertion groups, and explicitly excludes engine callback-order/prototype-migration/opaque-effect proof.",
+      "anchors": {
+        "private_selector": [
+          10
+        ],
+        "pinned_lua": [
+          26
+        ],
+        "scope": [
+          45
+        ]
+      },
+      "current_implementation": [
+        "tests/Test-MIR5HostControls.ps1",
+        "docs/development.md"
+      ],
+      "remaining": "Keep explicit pinned runtimes and ordinary receipt provenance in the existing tooling. The retired wrapper paths, historical runtime-directory default and internal selector name are not supported player identities or new active commands.",
+      "limits": "No old runner, companion, source-copy estate or framework is restored. No assertion count is reported passed by this audit."
+    }
+  ],
+  "new_player_defect_demonstrated": false,
+  "tests_added": [],
+  "tests_executed": false,
+  "historical_runner_executed": false,
+  "native_execution": false,
+  "inventory_complete": false,
+  "release_qualification": false,
+  "stable_qualification": false,
+  "limits": [
+    "Source-intent disposition only; mapped current methods were read, not rerun in this slice. No current expectation is inferred from the candidate.",
+    "The historical0.125/0.05/0.08 numbers are test-companion inputs, not product defaults, new settings or a generic effect-reset oracle.",
+    "No original request text/status, tracked inventory, source, fixture, progress or release file changed by this read-only custody unit. A later reviewed inventory append must preserve all other fields and the missing-original obligations."
+  ]
+}
