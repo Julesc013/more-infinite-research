@@ -5,7 +5,7 @@ applies_to: "MIR players and upgrades"
 audience: player
 doc_type: guide
 owner: mir-maintainers
-last_reviewed: 2026-11-03
+last_reviewed: 2026-11-04
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -173,3 +173,4 @@ source_of_truth_for:
 - Performance testing for the first beta is unfinished. Earlier observations belong only to their recorded packages, engines and workloads; do not expect a particular startup, memory or factory-performance improvement from a different setup or final package.
 
 - Whole-game startup, save loading, Library use and factory simulation are separate measurements. A successful load, a smaller package or one quick scenario is not a general performance result. See the release notes for known limits. Detailed test records are in [developer progress](progress.md).
+- For startup investigations, keep total responsive-menu time, matched added delay and approximate stage intervals separate. The [offline timing guide](startup-diagnostics.md) explains what retained engine logs can show. `mir.log` remains a support snapshot; attach the engine log separately. Internal checkpoints, when needed for a diagnostic reproduction, do not provide a loading-screen progress bar or a reliable time-remaining estimate.

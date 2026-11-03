@@ -196,6 +196,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_menu_comparison_analysis.py",
             "tests/test_runtime_benchmark_analysis.py",
             "tests/test_pack.py",
+            "tests/test_startup_timings.py",
             "tests/test_host_controls.py",
             "tools/check_repository.py",
         ])
