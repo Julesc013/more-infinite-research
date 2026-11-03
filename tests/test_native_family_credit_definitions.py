@@ -1,5 +1,6 @@
 """Collected carrier construction only; host controls, never save evidence."""
 import argparse
+import json
 from pathlib import Path
 import sys
 import unittest
@@ -8,6 +9,34 @@ import test_native_credit_definitions as fixed_fixture
 
 
 class NativeFamilyCreditDefinitionTests(unittest.TestCase):
+    def test_settings_stage_never_imports_credit_construction_or_recipe_collection(self):
+        root = Path(__file__).resolve().parents[1]
+        editions = json.loads((root / "targets/editions.json").read_bytes())["targets"]
+        for edition, version, sif in (("f200", "2.0.77", True), ("f210", "2.1.23", False)):
+            with self.subTest(edition=edition):
+                lua = LuaRuntime(unpack_returned_tuples=True)
+                lua.globals().player_root = (root / "source").as_posix()
+                lua.globals().selected_target = lua.table_from({
+                    **{key: value for key, value in editions[edition].items()
+                       if isinstance(value, (str, int, bool))}, "id": edition})
+                mods = {"base": version, "space-age": version}
+                if sif: mods.update({"space-is-fake": "1.0.60", "cr-commons": "1.0.27"})
+                lua.globals().mods = lua.table_from(mods)
+                lua.execute('''
+                  package.path=player_root.."/?.lua;"..player_root.."/?/init.lua";package.cpath=""
+                  package.loaded["platform.target"]=selected_target
+                  package.preload["research.native_credit_definitions"]=function() error("settings imported carrier construction") end
+                  package.preload["compatibility.product_bindings"]=function() error("settings imported recipe collection") end
+                  package.preload["research.generator"]=function() error("settings imported Generator") end
+                  local seen={}
+                  data={extend=function(_,rows)
+                    assert(#rows>0)
+                    for _,row in ipairs(rows) do assert(row.type:match("%-setting$") and not seen[row.name]);seen[row.name]=true end
+                  end}
+                  dofile(player_root.."/settings.lua")
+                  assert(seen["ips-max-level-research_steel"] and seen["ips-research-time-research_steel"])
+                ''')
+
     def setUp(self):
         fixed_fixture.LuaRuntime = LuaRuntime
         harness = fixed_fixture.NativeCreditDefinitionTests()

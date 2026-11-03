@@ -792,8 +792,10 @@ function M.native_owner_fallbacks(active_mods, withheld)
     research_steel="science_automation_logistic_chemical_production",
   }
   local owners = {}
-  for _, binding in ipairs(require("compatibility.product_bindings").native_owner_bindings) do
-    if withheld[binding.owner] then owners[binding.family] = binding.owner end
+  -- Paid identities span all five Space Age families even when a profile
+  -- adopts fewer public native owners (K2SO has no native steel owner).
+  for _, owner in ipairs(require("compatibility.modern_catalogue.space_age").native_owners) do
+    if science[owner.family] and withheld[owner.id] then owners[owner.family] = owner.id end
   end
   for _, definition in ipairs(BASE.definitions) do
     local owner = owners[definition.family]
@@ -1014,8 +1016,8 @@ function M.select(active_mods, raw, withheld)
   for _, definition in ipairs(definitions) do present[definition.family] = true end
   for _, definition in ipairs(sif_retained or {}) do present[definition.family] = true end
   if active_space_age(active_mods) then
-    for _, binding in ipairs(require("compatibility.product_bindings").native_owner_bindings) do
-      all_native[binding.owner] = {family=binding.family, generated=false}
+    for _, owner in ipairs(require("compatibility.modern_catalogue.space_age").native_owners) do
+      all_native[owner.id] = {family=owner.family, generated=false}
     end
     for _, fallback in ipairs(M.native_owner_fallbacks(active_mods, all_native)) do
       if not present[fallback.definition.family] then native_paid[#native_paid + 1] = fallback.definition end

@@ -1,11 +1,12 @@
 -- Published F200/SIF1.0.60 paid identities. Selection and preflight are pure;
 -- research.modern alone emits the detached hidden technologies.
 local M = {}
-local CONTRACTS = require("research.native_credit_definitions").published_sif_contracts()
+local CREDIT_CONTRACTS = require("research.native_credit_contracts")
+local CONTRACTS = CREDIT_CONTRACTS.published_sif_contracts()
 
 -- The exact published five-identity source is also the authority for its
 -- first native-credit baseline. Return names only, never prototype mutations.
-M.paid_recipe_sets = require("research.native_credit_definitions").published_sif_paid_recipe_sets
+M.paid_recipe_sets = CREDIT_CONTRACTS.published_sif_paid_recipe_sets
 
 local function copy(value)
   if type(value) ~= "table" then return value end
