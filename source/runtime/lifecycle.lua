@@ -106,11 +106,21 @@ for index = 1, #DECLARATIONS do
     STATIC_GENERATED_BY_ID[row.id] = row
   end
 end
+-- Metadata only nominates these bounded declarations. A live exact prototype
+-- and an existing caps ledger are still required before any flag is restored.
+local RESTORATION_BY_ID = {}
+local RESTORATION_DECLARATIONS = type(catalogue.restoration_only) == "function" and catalogue.restoration_only() or {}
+local LEGACY_RESTORATION_DECLARATIONS = {}
+for index, declaration in ipairs(DECLARATIONS) do LEGACY_RESTORATION_DECLARATIONS[index] = declaration end
+for _, declaration in ipairs(RESTORATION_DECLARATIONS) do
+  RESTORATION_BY_ID[declaration.id] = {declaration=declaration}
+  LEGACY_RESTORATION_DECLARATIONS[#LEGACY_RESTORATION_DECLARATIONS + 1] = declaration
+end
 -- Default target authority comes from package materialization, never saved
 -- state. Current F200 declarations admit settings-derived V3; other targets
 -- retain ordinary transported V3 admission. The one-time reader below may
 -- additionally consider exact published F200 predecessor tuples.
-local LEGACY_ALLOWLIST = legacy_caps.allowlist(DECLARATIONS, platform_target.id)
+local LEGACY_ALLOWLIST = legacy_caps.allowlist(LEGACY_RESTORATION_DECLARATIONS, platform_target.id)
 -- Actual info.json versions from the hash-checked structured MIR4 F200 ZIPs.
 -- RC/stable4.2 F200 share a value. Exact F2104.2 metadata is4.2.21000;
 -- the earlier contradictory archive observation is retained with a correction.
@@ -299,6 +309,9 @@ local function full_limits_for(force, include_worker, selected_owner, owner_reso
         limits[name], admitted[name] = effective_limit(row), true
       end
     end
+    for name, row in pairs(RESTORATION_BY_ID) do
+      if native_owner_admitted(force, row) then admitted[name] = true end
+    end
     if WORKER_ROBOT_SPEED_LIMIT > 0 or include_worker then
       local owner = selected_owner
       if not owner_resolved then owner = worker_owner(force) end
@@ -391,15 +404,36 @@ local function discard_unbound_ownership(force, owned_disabled, admitted, owner,
   return owned
 end
 
+local function restore_withheld_caps(force, owned_disabled, target_name, discovery_observed)
+  local owned = type(owned_disabled) == "table" and owned_disabled[force.index] or nil
+  if type(owned) ~= "table" then return end
+  local release = {}
+  for name, row in pairs(RESTORATION_BY_ID) do
+    if (target_name == nil or target_name == name) and type(owned[name]) == "table"
+        and native_owner_admitted(force, row) then
+      -- caps.reconcile visits supplied limits only. Zero here releases this
+      -- existing ledger; no zero entry is exposed as a selected/new cap.
+      release[name] = 0
+    end
+  end
+  if next(release) ~= nil then
+    caps.reconcile(force, release, owned_disabled, nil, nil, discovery_observed)
+  end
+end
+
 local function reconcile_force(force, owned_disabled, selected_owner, owner_resolved, target_name, imported_reenabled,
     discovery_observed)
   if not valid_force(force) then return end
   local owned = type(owned_disabled) == "table" and owned_disabled[force.index] or nil
   local include_worker = has_worker_ownership(owned)
+  local observation
+  if DISCOVERY_TREE then observation = discovery_observed == true end
   local limits, admitted, owner
   if target_name then
     limits, admitted, owner = event_limits_for(force, target_name, include_worker)
     if limits == nil then
+      restore_withheld_caps(force, owned_disabled, target_name, observation)
+      owned = type(owned_disabled) == "table" and owned_disabled[force.index] or nil
       if type(owned_disabled) == "table" and owned and owned[target_name] ~= nil
           and not retained_authored_prototype_disablement(force, target_name) then
         owned[target_name] = nil
@@ -426,9 +460,8 @@ local function reconcile_force(force, owned_disabled, selected_owner, owner_reso
     end
   end
   local targets = target_name and {[target_name] = true} or nil
-  local observation
-  if DISCOVERY_TREE then observation = discovery_observed == true end
   local _, result = caps.reconcile(force, limits, owned_disabled, targets, imported_reenabled, observation)
+  if target_name == nil then restore_withheld_caps(force, owned_disabled, nil, observation) end
   if result.unresolved_current then
     error("MIR unsupported native research queue state for over-cap current research: "
       .. result.unresolved_current, 2)
@@ -515,6 +548,16 @@ local function legacy_candidates(force, worker_name, direct_f200_hop)
       if candidate then
         candidate.admitted = true
         candidates[#candidates + 1] = candidate
+      end
+    end
+  end
+  if not direct_f200_hop then
+    for _, declaration in ipairs(RESTORATION_DECLARATIONS) do
+      local name = declaration.id
+      local row = RESTORATION_BY_ID[name]
+      if native_owner_admitted(force, row) then
+        candidates[#candidates + 1] = {name=name, setting=declaration.cap_setting,
+          source=declaration.legacy_binding.source, operation=declaration.legacy_binding.operation, admitted=true}
       end
     end
   end
