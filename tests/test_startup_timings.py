@@ -81,6 +81,37 @@ class StartupTimingTests(unittest.TestCase):
         self.assertIn("rounded zero", row["limits"][0])
         self.assertIsNone(parse("[MIR startup] stage=data phase=stage event=begin")["scoped_seconds"])
 
+    def test_closed_stage_work_cannot_create_a_checkpoint_gap(self):
+        row = parse("""1.000 [MIR startup] stage=data-final-fixes phase=stage event=begin
+2.000 [MIR startup] stage=data-final-fixes phase=stage event=end
+100.000 [MIR startup] stage=data-final-fixes phase=recipes event=work recipes=4096
+""")
+        self.assertIsNone(row["scoped_seconds"])
+        self.assertIsNone(row["longest_observed_checkpoint_gap_seconds"])
+        self.assertTrue(any("work outside" in issue for issue in row["issues"]))
+
+    def test_different_lifecycle_stages_cannot_nest(self):
+        row = parse("""1.000 [MIR startup] stage=settings phase=stage event=begin
+2.000 [MIR startup] stage=data-final-fixes phase=stage event=begin
+3.000 [MIR startup] stage=data-final-fixes phase=stage event=end
+4.000 [MIR startup] stage=settings phase=stage event=end
+5.000 Checksum of base: 1
+""")
+        self.assertIsNone(row["scoped_seconds"])
+        self.assertIsNone(row["longest_observed_checkpoint_gap_seconds"])
+        self.assertIsNone(row["post_mir_to_next_milestone"])
+        self.assertTrue(any("cross-stage" in issue for issue in row["issues"]))
+
+    def test_recompressed_snapshot_bodies_must_match_declared_capsule_pin(self):
+        root = Path(__file__).resolve().parents[1] / "spec/evidence"
+        with tempfile.TemporaryDirectory() as folder:
+            capsule = Path(folder) / "recompressed.gz"
+            original = (root / "mir5-beta-00-startup-snapshot-bodies-r01.json.gz").read_bytes()
+            capsule.write_bytes(gzip.compress(gzip.decompress(original), compresslevel=1, mtime=7))
+            self.assertNotEqual(digest(original), digest(capsule.read_bytes()))
+            with self.assertRaisesRegex(ValueError, "snapshot capsule identity mismatch"):
+                snapshot_rows(root / "mir5-beta-00-startup-snapshot-r01.json", capsule)
+
     def test_original_snapshot_keeps_all39_logs_missing_menus_and_identities(self):
         root = Path(__file__).resolve().parents[1] / "spec/evidence"
         rows = snapshot_rows(root / "mir5-beta-00-startup-snapshot-r01.json",
@@ -103,15 +134,19 @@ class StartupTimingTests(unittest.TestCase):
             row = dict(arm="mir5", archive_version="5.0.21000", raw_log=ref, engine_initialised_log_seconds=1)
             group = dict(cohort="original", engine="2.1.23", workload="synthetic", observation_kind="control", rows=[row])
             snapshot = dict(source_commit="original-control", groups=[group])
-            (root / "snapshot.json").write_text(json.dumps(snapshot))
-            (root / "bodies.gz").write_bytes(gzip.compress(json.dumps({"bodies": {"one.log": body}}).encode()))
+            def write_capsule():
+                raw_capsule = gzip.compress(json.dumps({"bodies": {"one.log": body}}).encode())
+                snapshot["capsule"] = dict(bytes=len(raw_capsule), sha256=digest(raw_capsule))
+                (root / "bodies.gz").write_bytes(raw_capsule)
+                (root / "snapshot.json").write_text(json.dumps(snapshot))
+            write_capsule()
             self.assertEqual(len(snapshot_rows(root / "snapshot.json", root / "bodies.gz")), 1)
             body["sha256"] = "0" * 64
-            (root / "bodies.gz").write_bytes(gzip.compress(json.dumps({"bodies": {"one.log": body}}).encode()))
+            write_capsule()
             with self.assertRaisesRegex(ValueError, "identity mismatch"):
                 snapshot_rows(root / "snapshot.json", root / "bodies.gz")
             body["sha256"] = ref["sha256"]
-            (root / "bodies.gz").write_bytes(gzip.compress(json.dumps({"bodies": {"one.log": body}}).encode()))
+            write_capsule()
             group["rows"].append(row)
             (root / "snapshot.json").write_text(json.dumps(snapshot))
             with self.assertRaisesRegex(ValueError, "duplicate run"):

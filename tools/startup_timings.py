@@ -50,6 +50,11 @@ def analyze(raw: bytes, run_id: str) -> dict:
         if not mark:
             continue
         stage, phase, event = mark.groups()
+        if event == "work" and (not stack or stack[-1][0][0] != stage):
+            issues.append("work outside active stage: " + stage + "/" + phase)
+            continue
+        if event == "begin" and stack and stack[-1][0][0] != stage:
+            issues.append("cross-stage nesting: " + stage)
         checkpoints.setdefault(stage, []).append(when)
         key = (stage, phase)
         if event == "work":
@@ -113,6 +118,9 @@ def snapshot_rows(snapshot_path: Path, capsule_path: Path) -> list[dict]:
     """Re-extract the existing exploratory snapshot without changing its identities."""
     snapshot_raw, capsule_raw = snapshot_path.read_bytes(), capsule_path.read_bytes()
     snapshot = json.loads(snapshot_raw)
+    pin = snapshot["capsule"]
+    if len(capsule_raw) != pin["bytes"] or digest(capsule_raw) != pin["sha256"]:
+        raise ValueError("snapshot capsule identity mismatch")
     bodies = json.loads(gzip.decompress(capsule_raw))["bodies"]
     def original(ref):
         row = bodies[ref["path"]]

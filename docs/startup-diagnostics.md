@@ -70,9 +70,9 @@ python -B tools/startup_timings.py --comparison spec/evidence/candidate502-base-
 python -B tools/startup_timings.py --comparison spec/evidence/f210-current38c-menu-native-chain-r01.json --bodies spec/evidence/f210-current38c-menu-native-receipts-r01.json.gz --json heavy-intervals.json --csv heavy-intervals.csv
 ```
 
-These are the original campaign endpoints and nominal95% intervals, rounded for readability. Added delay is the paired candidate-minus-no-MIR difference; its sign is preserved. Loader windows are a separate descriptive average over the same scored runs and have no causal interpretation:
+These are the original campaign endpoints and nominal95% intervals, rounded for readability. The actor endpoint was the confirmed responsive Settings screen after a harmless MainMenu click. Added delay is the paired candidate-minus-no-MIR difference; its sign is preserved. Loader windows are a separate descriptive average over the same scored runs and have no causal interpretation:
 
-| Original campaign | Scored runs per arm | No-MIR responsive menu | MIR4 responsive menu | Candidate responsive menu | Candidate added delay and nominal95% interval | MIR4/candidate approximate loader windows |
+| Original campaign | Scored runs per arm | No-MIR Settings response | MIR4 Settings response | Candidate Settings response | Candidate added delay and nominal95% interval | MIR4/candidate approximate loader windows |
 | --- | ---: | ---: | ---: | ---: | --- | --- |
 | 2.0.77 Base | 12 | 10.482s | 11.212s | 10.442s | −0.040s [−0.429,+0.349] | 0.715s /0.078s |
 | 2.1.23 heavy Space Age | 8 | 28.695s | 30.925s | 28.322s | −0.373s [−0.905,+0.159] | 2.833s /0.287s |
