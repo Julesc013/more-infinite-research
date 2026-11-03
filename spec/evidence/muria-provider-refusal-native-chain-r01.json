@@ -1,0 +1,186 @@
+{
+  "schema": 1,
+  "kind": "MIRMuriaProviderRefusalNativeCompletionChainV1",
+  "status": "ACCEPTED-exact-player-safe-refusal-endpoints-with-controller-adverses-retained",
+  "reviewed_on": "2026-11-03",
+  "scope": "Unsafe provider changes refuse with original/protected save bytes preserved and no successor save. Neither case qualifies a successful provider change or all transient upstream in-memory state.",
+  "native_source": {
+    "commit": "551532d4dd458445b19ed42e4e8d4a22d9ba628a",
+    "player_tree": "ad1d05ebfd4e4bdb4948368f8c1d0714f9b8054b",
+    "version": "5.0.21002",
+    "package_sha256": "F5634E6ED9E2A627962E4F382FB386711F73B052E42F314506252FFBF357346A",
+    "engine_version": "2.1.23",
+    "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "bootstrap_sha256": "E095B5E26EDB5B38340B11EF12A4E28BADB284F3DE8B1804A0AC4138DB9824A8",
+    "harness_sha256": "D6605620A24BA839111AD306BE0A6D645835AEC63A7420D40B70B5BC4580524A",
+    "governor_sha256": "B811A1548A6D789F2A7E618999D5087C70E0151E751CCF4C51635D54E6BF04ED"
+  },
+  "remove": {
+    "verdict": "accepted-exact-native-removal-refusal-original-controller-reader-adverse-retained",
+    "role": "remove",
+    "result_sha256": "B066C23FFD9DA1B98978EDB81C7A08C7D073C8E5CE54D80F7B8049A1169CC77E",
+    "root_readback_sha256": "6A30979C6373BC4F2E1DF1D4D6CA028837B796D7D8DAD5F42A937D7B85C6329A",
+    "private_originals_commit": "9f85ede4e2e51a535d7f0383640b93b5ce9f445b",
+    "originals_gzip_sha256": "7BF3C6CD91CA352035058448A74CABD9E56BDE3105182260BC2D7DD3F68F11D7",
+    "originals_decoded_sha256": "3AB00911CCBC0C1F4D50686A276C4936FEBBEF5EDE06570BE6A01ABDC9174509",
+    "original_caller_sha256": "A2DC95B6A02A314B9631F5CE519B6B6FFB235BFDD1FD990228DE561582FDB785",
+    "original_dispatch_review_sha256": "53D9BFA8A53432EC7DC14FC0F307A985DD236CD49C3458C0C0708BFD6E221A39",
+    "independent_review": {
+      "sha256": "39D288B6BF0D7CD800459A4A7A959A75CD10C6836660F68798DC75296ACB708A",
+      "url": "https://github.com/Julesc013/mir-native-worker/issues/137#issuecomment-6596013880"
+    },
+    "source": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\muria-discovery-science-ledger-actual-r02\\default\\native\\write-data\\saves\\mir5-native-complete.zip",
+      "exists": true,
+      "bytes": 607078,
+      "sha256": "0A8BE653BDA49A201042EC197FFB1F69784AAF9537B7BA1B18752FD10DB366CF"
+    },
+    "source_crc_members": 55,
+    "native_pid": 21044,
+    "resource_rows": 10,
+    "natural_exit_code": 1,
+    "natural_exit_code_observed": true,
+    "timed_out": false,
+    "actual_loaded_selection": [
+      "Muria-Graphics@1.8.0",
+      "PlanetsLib@1.26.1",
+      "base@2.1.23",
+      "discovery_tree@1.0.12",
+      "elevated-rails@2.1.23",
+      "mir-fixture-mir5-active-mods-observer@0.1.0",
+      "more-infinite-research@5.0.21002",
+      "quality@2.1.23",
+      "recycler@2.1.23",
+      "science-spread@0.9.2",
+      "space-age@2.1.23"
+    ],
+    "independent_policy": null,
+    "findings": [
+      "All35 raw originals and all7 original provider dispatch reviewer bodies authenticate against accepted64packet/53D9/A2/64514/892C. Actual frozen551/F563/8DC2.1.23/config/protectedExecute-copy and11mod closure agree. Actual11 excludesMuria; source0A8BE and both protected copies607078B/55CRC remain unchanged, original controls17MIR/observerbackups restore, no successsave/cold exists.",
+      "PID21044 has10 original resource rows ending interrupted/natural exit1/no timeout/no resource-admission error. Governor source reaches this exact process-exit error only after actual process exit; it is not an allowed nonzero result, predicate success, timeout or fabricated fixture pass. Raw native B066 result remains failed and outer custody retains exact same-line-reader error.",
+      "Each independent native/stdout stream has exactly one contiguous MIR on_configuration_changed event, whole restore-original-save diagnostic, stack traceback/error frame and pinned bootstrap343/callback333 frame. Full actual F563 source uses error(message,2) at343 before lifecycle/credit writes; the native callback format separates message and frame. It cannot satisfy the admitted same-line regex. My earlier dispatch review accepted that incorrect synthetic format assumption; this independent format correction preserves the product expectation.",
+      "Exact c4e14226 proposed caller differs from originalA2 only inside the reader after normalizing newline transport. New strict event/message/frame block must be complete and unique in BOTH stdout and native log; wrong event/mod/guard/callback, partial/duplicate messages, duplicateevent/frame, unrelated mention, wrongstdout, wrongexit, timeout, resourcefailure and multiplePIDs reject. Aero ran these14 actual-log opponents independently. Unchanged original log is old-reader RED/corrected-reader GREEN without executing a native process.",
+      "This separately accepts the observed bounded product safe-refusal endpoint while retaining the original controller/native error receipts, all hashes and originals. It does not rewrite B066/53D9/A2 or manufacture a successful transition/save. An unchanged removal replay is unnecessary; a later changed caller/ADD packet needs fresh exact dispatch review.",
+      "Raw direct-library duplicate-version INFO lines are retained, including Muria1.8.5+1.9.5 and other unselected names. Root recorded bothMuria archive identities; this removal actually loaded noMuria. This is not blanket single-version-library compliance or qualification of other candidates. Before ADD, preserve the obsoleteMuria archive with exact locator/hash custody outside its active direct library and bind actual1.9.5 in a fresh packet; no broad cleanup is required here."
+    ],
+    "limits": [
+      "Removal plus the required fixture omission is a combined transition. Exact guarded startup refusal/protected original only; no successful provider removal, gameplay, save-reload, API/client/GUI/credits/performance result.",
+      "External Root engine and original-path restoration are bound by received actual logs/receipts and prior reviewed file checks; Aero did not physically read those Root files. Record start precision as original engine header/resource samples; no fabricated OS StartTime or native benchmark duration.",
+      "Prepare proposal changes only r01\u2192r02 output locators. Its new caller and any library disposition change still require one complete actual composition/manifest/role review before ADD. OldADD B000 review cannot admit changed inputs. No new removal execution is requested by this review.",
+      "Native551/F563 identity remains, finalB921 applicability only via15F. No publication/stable/ModPortal authority; broader stable and final delivery gates remain."
+    ],
+    "original_controller_adverse_retained": true
+  },
+  "add": {
+    "verdict": "accepted-exact-native-safe-addition-refusal-runner-adverse-and-natural-exit-unverified-retained",
+    "role": "add",
+    "result_sha256": "80E07652FA9716180936D612C44AB4C8BDE0C3977C81BDACA24BFD44E5299547",
+    "root_readback_sha256": "A1C7E68592CE2C6EEB68772E333033B06E9DD83BE16B0F61834747D276786C08",
+    "private_originals_commit": "7af1d7b1979a2cc6e84a2da47cf54e633e10e2ec",
+    "originals_gzip_sha256": "130E4A199B4BFAB1BD61B081905FEBB7FAE2A77996DE438EEF70CA5A637FBAFA",
+    "originals_decoded_sha256": "C49DA64ED1C8C6CA02D83C1A2C2CE2C264EB7981B3141DF5C9DC99345FD20A53",
+    "original_caller_sha256": "4CB13CFE3BD6429237C942E2D44384851D391646BD4985A802A571AC9C46C3AF",
+    "original_dispatch_review_sha256": "B7193CC4FCC6B39B6382F07CA2C32BB7C6CFF5D0ADCD3D86B61F86589622F988",
+    "independent_review": {
+      "sha256": "98B5A4F3C9ED088027621A60DBBDA97BECE6D3537585587D87D5D2BA46C729F3",
+      "url": "https://github.com/Julesc013/mir-native-worker/issues/137#issuecomment-6596232884"
+    },
+    "source": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\migration-origin-110-current-7a2-r03-controller\\native-f210\\write-data\\saves\\mir5-native-complete.zip",
+      "exists": true,
+      "bytes": 814068,
+      "sha256": "8DCFC16FF929766D2E5CFEC4F7BC81367A9632CEB4B39558E40330FA43BD7F0C"
+    },
+    "source_crc_members": 55,
+    "native_pid": 24940,
+    "resource_rows": 4,
+    "natural_exit_code": null,
+    "natural_exit_code_observed": false,
+    "timed_out": false,
+    "actual_loaded_selection": [
+      "Muria-Graphics@1.8.0",
+      "Muria@1.9.5",
+      "PlanetsLib@1.26.1",
+      "base@2.1.23",
+      "elevated-rails@2.1.23",
+      "mir-fixture-mir5-active-mods-observer@0.1.0",
+      "more-infinite-research@5.0.21002",
+      "quality@2.1.23",
+      "recycler@2.1.23",
+      "space-age@2.1.23"
+    ],
+    "independent_policy": {
+      "player_support_path": "docs/support.md",
+      "player_support_sha256": "A65DDADAA58DE75CA79AD581568DBB533122838848F99227998D60D331F4DE4C",
+      "independent_host_path": "tests/test_continuation_ownership.py",
+      "independent_host_sha256": "A4D50CAB239A60FFCB70738F8C66BFE75306D1FD265B6A2BF8509FF154739B92",
+      "focused_host_test": "test_unqualified_muria_provider_changes_refuse_before_mir_state_writes",
+      "focused_host_result": "PASS-on-pinned-lupa.lua52; supplementary host evidence only",
+      "actual_bootstrap_sha256": "E095B5E26EDB5B38340B11EF12A4E28BADB284F3DE8B1804A0AC4138DB9824A8",
+      "frozen_harness_sha256": "D6605620A24BA839111AD306BE0A6D645835AEC63A7420D40B70B5BC4580524A",
+      "frozen_governor_sha256": "B811A1548A6D789F2A7E618999D5087C70E0151E751CCF4C51635D54E6BF04ED",
+      "reason": "Product obligation is exact unsafe-provider-change refusal before MIR state reconciliation with original save preserved. No player contract requires a naturally observed process exit code. Original B719 dispatch/test additionally required natural1, which remains NOT MET/UNVERIFIED. Separate native endpoint assessment does not rewrite that planned-test outcome."
+    },
+    "findings": [
+      "All35 original bodies and all8 original B719 dispatch review bodies authenticate: actual80E07652/8581B, RootA1C7E685, exact4CB/65717/D349, frozen551/F563/8DC/ten-mod closure/config/InputSave copy. Original/copy8DCFC814068B/55CRC, two controls17MIR and observer backups/restoration verify. No success save, cold or fixture pass is created.",
+      "One actualPID24940/4resource rows ends interrupted/fatal native production diagnostic, no timeout/resource-admission failure. Both native/stdout retain exactly one complete MIR on_configuration_changed event, whole restore-original-save diagnostic and pinned bootstrap343/callback333 error frame. F563 actual source proves this guard precedes MIR lifecycle/credit reconciliation. Native initialization then reports failed/closed/Goodbye, but no original exit code exists.",
+      "Original frozen public production predicate deliberately throws on fatal native log text before recording a completed process result. Governor catch can stop the owned process and records no ExitCode. Therefore B719 naturalexit1 is NOT MET/UNVERIFIED, and raw80E/result/custody/4CB/B719 remain adverse. Goodbye is not proof of a natural exit code. No replacement status or changed harness is manufactured.",
+      "Separate player safety endpoint is satisfied by exact observed intended guard, independently declared before-MIR-writes policy and protected-original/no-save outcome. Existing authored support and independent host guard test require refusal and no MIR writes, not an exit-code measurement. The older frozen direct-refusal verifier already distinguishes process-exit from fatal-production interruption; that is supporting runner policy, not automatic admission to its different F100 route. Aero reran only the existing focused preflight/no-state-write host expectation on pinned Lua52; host evidence does not replace this actual native observation.",
+      "This closes the exact bounded safe-addition-refusal product obligation while retaining the planned test/controller failure and unverified natural-exit endpoint. No source/research/numeric tolerance was changed or dropped. A repeat solely to obtain natural1 would exercise the unchanged process/predicate race without resolving a player safety uncertainty, so no unchanged native replay is required for this product endpoint.",
+      "Actual ADD combines Base\u2192SpaceAge/Muria/mandatory dependencies and MIR5.0.21000\u2192502 while removing prior fixture. Engine/SpaceAge/Muria migrations ran before the MIR callback, so no claim that all transient in-memory upstream state was unchanged. The original and protected input bytes remain unchanged and no new save persists those transitions. ActiveMuria is exact1.9.5; the original185 locator disposition is separate from r01 removal environment.",
+      "Root disclosed an earlier missing review.json locator command before execute-copy/output/native, corrected to received review-add.json, then exactly one native process. That disclosure is a tool-output transcription, not original tool-envelope custody. It is not a hidden native retry. All original adverse identities and source bytes remain discoverable."
+    ],
+    "limits": [
+      "Natural process exit1 and full dispatch/controller completion remain UNVERIFIED/ADVERSE, not waived or passed. The accepted claim is the narrower exact intended MIR guard/protected-input/no-save endpoint. Final release evidence must state that distinction explicitly.",
+      "No successful provider addition, migration, earned-state survival after addition, new useful research/save/reload, GUI/client, throughput, memory or whole-product performance verdict. Broader stable acceptance stays open.",
+      "No new physical Root engine/library/keeper read by Aero; received bytes and retained Root checks remain distinct. Native551/F563 identities stay; finalB921 applicability only via15F. Final source/docs/requiredCI/main-tag/admin/stage/download/dist checks still precede publication."
+    ],
+    "original_controller_adverse_retained": true
+  },
+  "adverse_disposition": {
+    "remove": "Original A2 same-line log reader rejects the actual callback format; B066 and its failed wrapper remain unchanged. Strict event/whole-message/pinned-frame reader plus 14 negative controls correct only that format assumption. Separate independent39D288 accepts the observed product refusal; no replay.",
+    "add": "Original B719/4CB planned natural-exit test is NOT MET/UNVERIFIED and 80E remains failed. The existing fatal-production predicate interrupts before completed ExitCode metadata. Separate independent98B5 accepts only the previously specified player guard/protected-original/no-save endpoint. Goodbye is not natural-exit proof; no blanket all-controller-pass claim.",
+    "native_replay": false,
+    "source_or_numeric_tolerance_change": false
+  },
+  "obsolete_input_custody": {
+    "receipt_path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\muria185-original-input-custody-r01\\custody.json",
+    "receipt_sha256": "CDE79FB63CEE08DB89A5AA0A95A874B1F872B0DAD6BDE5FA892EEC7B693DC29D",
+    "disposition": {
+      "kind": "MIRSupersededDependencyInputCustodyV1",
+      "observed_utc": "2026-11-03T05:00:53.0489658+00:00",
+      "original_locator": "D:\\Projects\\Factorio\\testmods\\2.1\\Muria_1.8.5.zip",
+      "original_state": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\Muria_1.8.5.zip",
+        "bytes": 369278,
+        "sha256": "F1A6E5195C907EBCC4ADCBCC67CF77FA73D592A40E5A553C955C218643A827B5"
+      },
+      "preserved_original": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\muria185-original-input-custody-r01\\Muria_1.8.5.zip",
+        "exists": true,
+        "bytes": 369278,
+        "sha256": "F1A6E5195C907EBCC4ADCBCC67CF77FA73D592A40E5A553C955C218643A827B5"
+      },
+      "selected_current": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\Muria_1.9.5.zip",
+        "exists": true,
+        "bytes": 370903,
+        "sha256": "48759BF484D7F7A0DFF31E551B23F0BC2C175AAFDCA14DF1EA513FFD68554514"
+      },
+      "operation": "one-file same-volume move under idle direct-library lease; no deletion/copy/extraction/links",
+      "previous_actual_scope": "Original r01 removal inventory/warning/result remain unchanged under original identities; obsolete locator maps to this exact keeper",
+      "future_scope": "Fresh r02 campaign has one current Muria archive; do not relabel r01 environment",
+      "backup_coverage": "One local original keeper hash-verified here; additional copies not reverified by this operation",
+      "publication": false
+    },
+    "scope": "Original removal duplicate-version INFO lines remain; the later bounded one-file preservation move changes only future input location. No whole-library cleanup or old-result environment relabel."
+  },
+  "final_package_applicability": {
+    "independent_review_sha256": "15F07E485C37B81BFA08595D7AFDA6AD6CC7C37FB74D44F6D5A1DFB8835A6D22",
+    "url": "https://github.com/Julesc013/more-infinite-research/pull/1625#issuecomment-6595099905",
+    "final_f210_sha256": "B9215107B4E4F3A472DE718C2FA5572BD6A0734D710D986BB0A65B6F472BEC3F",
+    "basis": "Only changelog date/help-note member differences from frozen551/F563; original native identities remain unchanged."
+  },
+  "release_qualification": false,
+  "stable_qualification": false
+}
