@@ -16187,6 +16187,65 @@
             "owner": "Black Glass release coordinator; Aero independent artifact/claim review"
           }
         ]
+      },
+      {
+        "reviewed_on": "2026-11-03",
+        "reviewed_against": "a6a9ef1a5355b7b4e816ec0fb2d89021c9800111",
+        "subjects": [
+          "CONT-17",
+          "VER-07"
+        ],
+        "scope": "One named Test-MIR4ControlExecutorDecompositionM4202.ps1 family only: one unique8814-byte Git body,16 current remote tag/path bindings and one preserved local v4.2.0 alias. Imported helpers/facade/executor modules, authority writers, original receipts and their underlying behavior remain separate unreconciled sources unless covered elsewhere.",
+        "method": "Read the full unique PowerShell body without executing it. Authenticate its Git blob and every original commit/path; compare live remote annotated/lightweight tag targets, deduplicating the local v4.2.0 alias into the same v4.2.0-stable source. Map assertions to independent current contracts without inferring player expectations from the candidate.",
+        "source_discovery": {
+          "index_sha256": "183AC3B7903A3B7E9E00192B88CF396357F3F1919AE8FB099B5C80004224EB1C",
+          "indexed_tags": 91,
+          "selected_bodies": 1,
+          "selected_body_bytes": 8814,
+          "distinct_remote_tag_path_bindings": 16,
+          "preserved_indexed_alias_bindings": 1
+        },
+        "whole_source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_tests_run": false,
+        "release_qualification": false,
+        "evidence": "spec/evidence/historical-control-executor-intent-aero-r01.json",
+        "groups": [
+          {
+            "id": "retired-control-executor-shape-and-receipts",
+            "disposition": "superseded-implementation",
+            "independent_expectation": "The historical wrapper validates a decomposition receipt/schema and predecessor hash, six specifically named ordered PowerShell modules, at most400 lines per module,27 AST-discovered function names with an exact projection hash, a function-free facade at most80 lines and its first-two-line setup hash. It dots that facade, invokes one exact-path-set smoke example and checks the old command-inventory digest/count85/no unknown or duplicate keys. If a supply-chain successor exists it validates its schema/predecessor and frozen source hash/function-count28. These assertions bind a retired tooling refactor, not research construction, save preservation or native game behavior.",
+            "current_implementation": [
+              "spec/repository.md",
+              "docs/development.md",
+              "tools/check_repository.py",
+              "tests/Test-MIR5HostControls.ps1"
+            ],
+            "existing_host_controls": [],
+            "remaining_executable_check": "No port or rerun for the old module names/order/counts/line caps, facade/setup hash, receipt schemas or command inventory shape. Current repository checks and affected native-tooling controls own present source validity; this wrapper does not supply semantic verification of any imported executor/helper implementation.",
+            "owner": "Aero historical source-intent disposition; current tooling owners retain affected verification"
+          },
+          {
+            "id": "package-custody-and-no-transition-authority",
+            "disposition": "consolidate-existing-obligations",
+            "independent_expectation": "The wrapper captures a canonical package-source fingerprint before tooling work, requires an accepted package-source succession with no package-visible delta, then requires the fingerprint unchanged. It requires every transition_gate property false and emits package_visible=false, executor_semantics_changed=false and release_transition_authority=false. Its semantic-contract flags are assertions about a receipt, not observations that runtime/performance/package measurements were executed or remained behaviorally equivalent.",
+            "current_implementation": [
+              "AGENTS.md",
+              "spec/repository.md",
+              "spec/verification.md",
+              "tools/package.py",
+              "tools/release.py"
+            ],
+            "existing_host_controls": [
+              "tests/test_package.py::PackageTests::test_committed_build_ignores_dirty_untracked_and_line_ending_worktree_bytes",
+              "tests/test_package.py::PackageTests::test_committed_target_record_is_frozen_with_the_player_source_and_refuses_dirty_metadata",
+              "tests/test_release.py::ReleaseTests::test_verification_rejects_release_source_target_and_controller_identity_mutations",
+              "tests/test_release.py::ReleaseTests::test_verification_rejects_missing_extra_changed_and_duplicate_assets"
+            ],
+            "remaining_executable_check": "Retain actual affected-player member/hash applicability, frozen source/package/controller identities, independent review, required CI and checked publication/download gates. No static receipt or wrapper status grants release authority or closes runtime/performance/native obligations. No new native campaign follows solely from disposition of this implementation-only wrapper.",
+            "owner": "Black Glass candidate/native/publication custody; Aero independent package and claims review"
+          }
+        ]
       }
     ],
     "stable_coverage_review": {
