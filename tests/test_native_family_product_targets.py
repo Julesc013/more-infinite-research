@@ -63,7 +63,7 @@ class NativeFamilyProductTargetTests(unittest.TestCase):
           package.loaded["research.settings"]=nil
           local config=require("research.settings");local startup={}
           for _,row in ipairs(config.prototypes()) do startup[row.name]={value=row.default_value} end
-          settings,data,helpers,log={startup=startup},full_world(mods),nil,function() end
+          settings,data,helpers,log={startup=startup},full_world(mods,true),nil,function() end
           function data:extend(rows)
             self.writes=self.writes+1;self.emitted=rows
             for _,row in ipairs(rows) do

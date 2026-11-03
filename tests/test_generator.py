@@ -332,7 +332,7 @@ class GeneratorTests(unittest.TestCase):
             local out = {}; for key, child in pairs(value) do out[key] = source_copy(child) end
             return out
           end
-          function full_world(active_mods)
+          function full_world(active_mods, before_data_stage)
             local tools, technologies, recipes = {}, {}, {}
             local function add_technology(name) if name then technologies[name] = technologies[name] or {} end end
             local function add_science(key)
@@ -381,7 +381,20 @@ class GeneratorTests(unittest.TestCase):
             for name in pairs(tools) do lab_inputs[#lab_inputs + 1] = name end
             table.sort(lab_inputs)
             local items = source_copy(sources.item); items.spoilage = {}
+            for name, recipe in pairs(recipes) do
+              if recipe.type == nil then recipe.type = "recipe" end
+              if recipe.name == nil then recipe.name = name end
+            end
+            -- Most controls enter directly at final-fixes. Supply data.lua's
+            -- prior private transport, without counting it as Generator
+            -- publication. Real data-stage controls request a pre-data world.
+            local private
+            if before_data_stage ~= true then
+              private = {["more-infinite-research-native-adoptions"]={type="mod-data",
+                name="more-infinite-research-native-adoptions",data={schema=1,owners={},withheld={},credits={}}}}
+            end
             return {raw = {technology = technologies, tool = tools, item = items, recipe = recipes,
+              ["mod-data"] = private,
               ["ammo-category"] = {["cannon-shell"] = {}},
               lab = {fixture = {inputs=lab_inputs}}}, writes = 0,
               extend = function(self, values) self.writes = self.writes + 1; self.emitted = values end}
