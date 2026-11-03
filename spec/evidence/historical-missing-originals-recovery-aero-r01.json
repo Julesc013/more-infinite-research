@@ -1,0 +1,302 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalMissingOriginalsRecoveryV1",
+  "status": "partial-originals-recovered-and-new-secretas-host-gap",
+  "requirement": "VER-07",
+  "subjects": [
+    "CONT-02",
+    "CONT-07",
+    "CONT-15",
+    "CONT-17"
+  ],
+  "base_dev": "da48702a5d86c94fb8c4bffd2fce87853e00f3e8",
+  "sources": {
+    "621-issue.json": {
+      "bytes": 10356,
+      "sha256": "9EC1C590EB81DE47766A598E68C3B13A6A1BE2660736BEA6180C8DE90AAC657C"
+    },
+    "621-comments.json": {
+      "bytes": 13993,
+      "sha256": "48F9E11521FB28E8041A7672C78BA2F3FEFC459AA48B108156CF780719CF1513"
+    },
+    "446-issue.json": {
+      "bytes": 5629,
+      "sha256": "AAFED796E1297BEF919EB6E35459B12B37BF64EAB15E9DBD18F97CC228C44899"
+    },
+    "344-issue.json": {
+      "bytes": 3610,
+      "sha256": "ADE03ADE8B1BFB884802306FE44FA65E4AC0366268BF90F6E65A49495A79514F"
+    },
+    "344-pr.json": {
+      "bytes": 18503,
+      "sha256": "BD3737B8108FEABC89ED3FC6798A2A746D922222F318A3DDCA89E3EAB8C826C8"
+    },
+    "344-source-identities.json": {
+      "bytes": 526,
+      "sha256": "3E533EB8A589F6BE50BE88F3AB96CC40321684A94CEAB5A117C2360EED4E0189"
+    },
+    "344-local-custody-locators.json": {
+      "bytes": 1364,
+      "sha256": "E01D7D043D97A67CE1649FC1FA6A3B372B430710818A64417CB9A96BBBC251E3"
+    },
+    "344-tag-containment.json": {
+      "bytes": 105,
+      "sha256": "0A39470DFEAB5D320A494844179BCE28A89BA4DE4658261C2A451FFAF7A87B07"
+    },
+    "image-recovery.json": {
+      "bytes": 1083,
+      "sha256": "C1595F369004E2C09E6D7BFC674E3F27A2AC9CF0AA777D964FD5E75FCB13F864"
+    },
+    "secretas-inputs.json": {
+      "bytes": 1523,
+      "sha256": "8304FD219E59DCE0537673DC0659C0FD572030D0F519CCE4A89B2A35347E9072"
+    },
+    "secretas-host-observation.json": {
+      "bytes": 22299,
+      "sha256": "FE03F5F2C677F47D234E1ACF1F1CAD6845C73612B108EBA1321DF0FBD49D0CE2"
+    }
+  },
+  "report621": {
+    "url": "https://github.com/Julesc013/more-infinite-research/issues/621",
+    "original_comments": [
+      6093681747,
+      6094715929
+    ],
+    "images": [
+      {
+        "name": "621-removed-technologies",
+        "url": "https://i.imgur.com/vVOy0or.png",
+        "observed_utc": "2026-11-03T10:52:57.114884+00:00",
+        "status": 200,
+        "content_type": "image/png",
+        "bytes": 236007,
+        "sha256": "37C628F12C8F0D6B4016F8736352496DD176817DCDF562F732640A3EEF0D357F",
+        "width": 652,
+        "height": 1265
+      },
+      {
+        "name": "621-productivity-search",
+        "url": "https://i.imgur.com/upy0dni.png",
+        "observed_utc": "2026-11-03T10:52:57.116000+00:00",
+        "status": 200,
+        "content_type": "image/png",
+        "bytes": 149799,
+        "sha256": "40BA200A654CC82BCA713A2918890BEC73A762BE9CF378476F3D81DC4E26E905",
+        "width": 652,
+        "height": 356
+      }
+    ],
+    "fully_legible_visible_removed_ids": [
+      "braking-force-8",
+      "laser-shooting-speed-8",
+      "research-speed-7",
+      "weapon-shooting-speed-7",
+      "worker-robots-storage-4",
+      "recipe-prod-research_advanced_circuit-1",
+      "recipe-prod-research_agricultural_growth_speed-1",
+      "recipe-prod-research_artificial_soil-1",
+      "recipe-prod-research_bacteria_cultivation-1",
+      "recipe-prod-research_batteries-1",
+      "recipe-prod-research_belts-1",
+      "recipe-prod-research_bioflux-1",
+      "recipe-prod-research_breeding-1",
+      "recipe-prod-research_bullets-1",
+      "recipe-prod-research_cannon_shooting_speed-1",
+      "recipe-prod-research_capture_robot_rockets-1",
+      "recipe-prod-research_carbon-1",
+      "recipe-prod-research_carbon_fiber-1",
+      "recipe-prod-research_cargo_bay_unloading_distance-1",
+      "recipe-prod-research_cargo_landing_pad_count-1",
+      "recipe-prod-research_character_crafting_speed-1",
+      "recipe-prod-research_character_mining_speed-1",
+      "recipe-prod-research_character_reach-1",
+      "recipe-prod-research_character_walking_speed-1",
+      "recipe-prod-research_concrete-1",
+      "recipe-prod-research_copper-1",
+      "recipe-prod-research_copper_cable-1",
+      "recipe-prod-research_electric_energy-1",
+      "recipe-prod-research_electric_engine-1",
+      "recipe-prod-research_electric_shooting_speed-1",
+      "recipe-prod-research_electronic_circuit-1",
+      "recipe-prod-research_engine-1",
+      "recipe-prod-research_explosives-1",
+      "recipe-prod-research_flamethrower_shooting_speed-1",
+      "recipe-prod-research_flying_robot_frame-1",
+      "recipe-prod-research_furnace-1"
+    ],
+    "screenshot_interpretation": [
+      "First image is a scrollable Removed technologies table:36fully legible identities plus clipped/unseen remainder. The right-hand1 has no independently established earned-level meaning.",
+      "Second image is a productivity-filtered technology browser with cards but no readable complete identity/tooltips or configuration. It is not a complete missing-catalogue map.",
+      "Neither image supplies exact engine/MIR archive/mod versions/startup settings or a pre-damage/save history. No root cause or automatic lost-level recovery follows."
+    ],
+    "independent_obligations": [
+      "Preserve legitimate applicable technology definitions and complete state; restore definitions before runtime recovery. Compare full selected-catalogue identities/effects/science/prerequisites rather than a count.",
+      "Any lost-history recovery must consume genuine surviving records; keep independent pre-damage expectation outside MIR. Preserve later progress and foreign disablement, avoid duplicate effects, and review direct-path pending migration filenames.",
+      "Secretas finite4..8 must retain their effects/progression and receive a useful MIR infinite9 under the original supported uncapped conditions; preserve queued/fractional work and reloads."
+    ],
+    "existing_implementation_and_evidence": [
+      "Current authored continuations and runtime ownership/caps: source/compatibility/modern_catalogue.lua, source/research/modern.lua, source/runtime/catalogue.lua and source/runtime/lifecycle.lua. These pointers do not prove the missing reporter tuple.",
+      "Existing exact full-catalogue-upgrade-chain.json and beta501-f200-successor-native-chain-r01.json retain their original scoped input/state verdicts; neither becomes an exact jivaii reconstruction."
+    ],
+    "remaining": "Original reporter package/engine/mod/settings/pre-damage state remains unknown. New Secretas host failure below requires source correction and affected actual native/state qualification, not a new every-old-patch programme."
+  },
+  "report446": {
+    "url": "https://github.com/Julesc013/more-infinite-research/issues/446",
+    "kind": "historical-maintenance-queue-not-current-acceptance",
+    "disposition": "Preserve the three community-report groups, original missing reporter versions and existing request IDs. Old controlled implementation counts/deadlines and unfinished UI/performance/integration rows are not MIR5 native or current-candidate verdicts. Use existing CONT/request mappings; do not recreate the old programme or silently waive a delivered behavior.",
+    "remaining": "Exact original report configurations remain unknown where the issue says so. Current applicable source/function/save/client/performance obligations retain their existing tests and pending scope."
+  },
+  "proposal344": {
+    "url": "https://github.com/Julesc013/more-infinite-research/pull/344",
+    "state_observed": "open-unmerged",
+    "head": "a0f0b569ab5379030d3c0a07c37268cdc7e390a5",
+    "base": "ba71d7813e2226cb9f391e5e8de6c1e9e00b9d8c",
+    "source_files": [
+      {
+        "path": ".mir/releases/governance/mir4/MIR42-Historical-Local-Evidence-IndexV1.json",
+        "bytes": 13727,
+        "sha256": "BDC147F2E0D96197440E2D71C78028CED39A620A6DA43F1DD3EF3261475B1130",
+        "blob": "b0a9c0bb2591b6ab58965075021209f123c2005a"
+      },
+      {
+        "path": "tests/release/Test-MIR42HistoricalPublicAdmissionLocalEvidenceIndex.ps1",
+        "bytes": 15806,
+        "sha256": "F2F492210CC8836D0E1EFA4602D22410FC06C323C885BA77BAC431A6D82B6F0B",
+        "blob": "18bb9f5f034442fc6ccdfa380a3cc250499d4690"
+      }
+    ],
+    "source_status": "local-private-evidence-index-not-public-admission",
+    "availability": "local-private-handoff-only-not-durable",
+    "independent_review": "blocked-until-content-addressed-governed-evidence-capsule",
+    "transition_gate": {
+      "public_admission": false,
+      "source_freeze": false,
+      "production_signing": false,
+      "technical_seal": false,
+      "promotion_to_main": false,
+      "tagging": false,
+      "github_publication": false,
+      "mod_portal_publication": false
+    },
+    "targets": [
+      "f017",
+      "f016",
+      "f015",
+      "f014",
+      "f013"
+    ],
+    "local_tag_containment": {
+      "proposal": "a0f0b569ab5379030d3c0a07c37268cdc7e390a5",
+      "local_tags_containing_proposal": []
+    },
+    "named_aero_custody": [
+      {
+        "kind": "evidence_root",
+        "relative_path": "build/handoff/mir42-saturday-candidate/playtest-nine-private/evidence/historical-4.2-v1",
+        "absolute_path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\handoff\\mir42-saturday-candidate\\playtest-nine-private\\evidence\\historical-4.2-v1",
+        "exists": false
+      },
+      {
+        "kind": "package_root",
+        "relative_path": "build/handoff/mir42-saturday-candidate/playtest-nine-private",
+        "absolute_path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\handoff\\mir42-saturday-candidate\\playtest-nine-private",
+        "exists": false
+      },
+      {
+        "kind": "copy_verification",
+        "relative_path": "build/handoff/mir42-saturday-candidate/playtest-nine-private/COPY-VERIFICATION.json",
+        "absolute_path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\handoff\\mir42-saturday-candidate\\playtest-nine-private\\COPY-VERIFICATION.json",
+        "exists": false
+      },
+      {
+        "kind": "evidence_manifest",
+        "relative_path": "build/handoff/mir42-saturday-candidate/playtest-nine-private/evidence/historical-4.2-v1/CUSTODY-VERIFICATION.json",
+        "absolute_path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\handoff\\mir42-saturday-candidate\\playtest-nine-private\\evidence\\historical-4.2-v1\\CUSTODY-VERIFICATION.json",
+        "exists": false
+      }
+    ],
+    "disposition": "This is an unmerged proposal for a private index. Its source/index hashes and recorded claims do not supply the missing native receipts, candidate ZIPs, source saves or independent governed review. All authority flags remain false. The verifier was read, never executed or restored into MIR5.",
+    "remaining": "Aero named locators are absent; Black Glass custody remains unverified. Recover exact original bodies before any reuse of these old private claims. Their absence does not authorize fabricated passes or automatically reinstate an obsolete admission framework/campaign."
+  },
+  "secretas": {
+    "status": "host-demonstrated-unfixed-continuation-collision",
+    "actual_archives": [
+      {
+        "engine_family_locator": "2.1",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\secretas_1.0.37.zip",
+        "bytes": 74903043,
+        "sha256": "92A4210E4A914F3F8850CAFDD328C061A6B25937DB543F3042B0A7C7F95F201C",
+        "members": [
+          {
+            "member": "secretas/settings.lua",
+            "bytes": 1114,
+            "sha256": "3E35DF737911302D894BFA324820F40B9ECEDFF2BDD4150133EA8BF9FF1A7FEA"
+          },
+          {
+            "member": "secretas/info.json",
+            "bytes": 549,
+            "sha256": "8349001699A8024B672886BECC0EE2CC938928D5F439AED10AA360ECB2839DFE"
+          },
+          {
+            "member": "secretas/prototypes/technology.lua",
+            "bytes": 25594,
+            "sha256": "0073FC1A5D0DE72348CA1D0AEA67B97C3EB84607DA2978BA33B98B3270425426"
+          }
+        ]
+      },
+      {
+        "engine_family_locator": "2.0",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.0\\secretas_1.0.33.zip",
+        "bytes": 71038034,
+        "sha256": "C5C8F83433B56D80682819BDDBAF1D85F56433A834AE4FB0F1F28371F8C3A290",
+        "members": [
+          {
+            "member": "secretas/settings.lua",
+            "bytes": 1114,
+            "sha256": "3E35DF737911302D894BFA324820F40B9ECEDFF2BDD4150133EA8BF9FF1A7FEA"
+          },
+          {
+            "member": "secretas/info.json",
+            "bytes": 548,
+            "sha256": "D93009801965C4785D70D51C52C5BA737D7CAA81B57AED186682CC13F1CC3861"
+          },
+          {
+            "member": "secretas/prototypes/technology.lua",
+            "bytes": 25512,
+            "sha256": "BEF84B51D9C5FD2121967517862C7B82F05A98DC891B3F824919C2E41C670229"
+          }
+        ]
+      }
+    ],
+    "published_expectation": {
+      "ref": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "fixtures/assert-secretas-finite-continuation-hotfix/control.lua",
+      "sha256": "B1868A92B32D7F5BE4D2470AAD53139CEC65A182030F3A55D01E49456F238703",
+      "meaning": "The unchanged pure technologies() oracle requires preserved finite7/8, infinite9 following8, and golden/promethium science. Old profile/save callbacks and the mocked award controls are not native acceptance here."
+    },
+    "observation": {
+      "path": "build/qualification/aero-missing-originals-recovery-r01/secretas-host-observation.json",
+      "sha256": "FE03F5F2C677F47D234E1ACF1F1CAD6845C73612B108EBA1321DF0FBD49D0CE2",
+      "head": "da48702a5d86c94fb8c4bffd2fce87853e00f3e8",
+      "player_tree": "127805988ca3c92ffb7fac7739b13797975d422a",
+      "cases": 2,
+      "result": "Both exact upstream technology/settings sources load in the bounded host scaffold. Current canonical F210 selector still chooses worker-robots-storage-4; unchanged Generator rejects its actual existing upstream4 before writes. Original published pure oracle rejects absent9, and an independent explicit9 reference passes the shape assertion."
+    },
+    "harness_adverses": [
+      "Initial host reader omitted an actual upstream setting and refused before observation. Original script/error preserved; corrected harness executes actual settings.lua defaults rather than inventing reporter settings.",
+      "Second reader projected unrelated trigger-only technologies with no unit into the narrow runtime oracle and refused. Original script/error preserved; corrected runtime projection includes only the five named finite storage stages. Full upstream data table remains unchanged for selector/Generator."
+    ],
+    "remaining": [
+      "Implement the bounded named finite-tail9 data/runtime/settings/cap/Library identity consistently; preserve external4..8 and strict Generator duplicate protection. Do not add a general suffix/discovery solver.",
+      "Review already-earned/partial/queued level9 preservation from actual supported published input and5.0.2 provider-add/remove boundaries. Do not silently replace an earned MIR4 with external finite4 or claim new provider transitions safe.",
+      "Run the exact current F2001.0.33 and F2101.0.37 package/dependency/science/useful-effect/save/two-cold cases using existing infrastructure and independent oracles. Current host projection of1.0.33 is not an F200 native/package result."
+    ],
+    "owner": "Aero source/independent expectations; Black Glass native/integration"
+  },
+  "limits": [
+    "No player/controller/package/version/tag/release or original request text/decision changed in this recovery record.",
+    "No native execution or acceptance, repaired player save, current performance, complete historical inventory or stable verdict.",
+    "Recovered screenshot/source intent does not establish the exact reporter setup or engine-native behavior. Existing successful journeys keep their original scopes and identities."
+  ]
+}
