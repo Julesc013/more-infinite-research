@@ -52,8 +52,15 @@
     "transport_limit": "All complete small actual/controller/admission/log/ledger/proof bodies retained. Unchanged108MB staged save remains in full primary/local custody with exact hashes, not Git transport."
   },
   "independent_actual_result_review": {
-    "status": "pending",
-    "requested": "https://github.com/Julesc013/mir-native-worker/issues/137#issuecomment-6598908174"
+    "status": "confirmed-adverse",
+    "review_sha256": "BEEB22E8AF9BFC4DC713C22140B0ED02FA66FEF7CFBCFDF7B065B6626142B9EB",
+    "original_bodies": 5,
+    "gzip_bytes": 9613,
+    "gzip_sha256": "A105E400CBA9EB1E4617E8F7B813A9258A1D353F07C90B6C31E2BD0BF8ADE3B4",
+    "decoded_bytes": 30465,
+    "decoded_sha256": "ADF705CE58D02B3B38108ABDDC9DD006A4C3C1D55B8D39C7B0388B767456A188",
+    "review": "https://github.com/Julesc013/mir-native-worker/issues/137#issuecomment-6599037363",
+    "observation_limit": "Fixture code deduplicates surface.index; encountering a33rd unique valid surface is a source-based lower-bound inference. Total/names/index inventory remains absent. Failed lease terminal semantics and original null caller count remain unchanged."
   },
   "classification": "The selected NoMIR observer refused its surface enumeration bound during first on_tick. It has no actual total/name/unique-surface inventory; do not invent one. This is a fixture/input-binding adverse, not evidence of a MIR product crash.",
   "next_work": "Independent actual-result review; reconcile protected-world surface inventory and settings-only observability offline where possible, or prepare a separately reviewed diagnostic. Keep the normal32-surface guard; no unchanged retry, automatic bound increase, world/mod deletion or claim that stopped scans fixed the older live failure. Advance the unrelated five-family native input work.",
