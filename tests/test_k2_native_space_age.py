@@ -86,7 +86,11 @@ class K2NativeSpaceAgeTests(unittest.TestCase):
     def stage(self, *, startup=None, mods=None):
         lua = LuaRuntime(unpack_returned_tuples=True)
         lua.globals().player_root = SOURCE_ROOT.as_posix()
-        lua.globals().captured_raw = _lua_value(lua, deepcopy(self.raw))
+        raw = deepcopy(self.raw)
+        for name, recipe in raw["recipe"].items():
+            recipe.setdefault("type", "recipe")
+            recipe.setdefault("name", name)
+        lua.globals().captured_raw = _lua_value(lua, raw)
         lua.globals().active_mods = _lua_value(lua, deepcopy(mods or self.mods))
         lua.globals().startup_values = _lua_value(lua, startup or {})
         lua.execute(r'''
