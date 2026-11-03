@@ -52,6 +52,9 @@ end
 
 local function eligible_family(row, values)
   if type(row) ~= "table" or type(row.name) ~= "string" then return nil end
+  -- Hidden preservation holders carry paid effects, not a public collection
+  -- route. Keep their fixed vectors separate from a live native owner.
+  if row.hidden == true then return nil end
   local family = row.name:match("^recipe%-prod%-(.+)%-1$")
   if family == nil or type(row.effects) ~= "table" or #row.effects == 0 then return nil end
   for _, effect in ipairs(row.effects) do
