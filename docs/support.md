@@ -5,7 +5,7 @@ applies_to: "MIR players and upgrades"
 audience: player
 doc_type: guide
 owner: mir-maintainers
-last_reviewed: 2026-11-02
+last_reviewed: 2026-11-03
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -88,6 +88,8 @@ source_of_truth_for:
 - Recorded same-edition cases cover retained research, effects, partial work and reload behavior for the normal Factorio families. The observed 2.1 cases include Base and selected Space Age content; the observed 2.0 cases include Base and a selected provider/preference boundary. Earlier editions have narrower historical state coverage. Treat a different modpack, setting, provider or DLC change as its own case.
 
 - MIR preserves earned levels when a cap later limits future work. It only reverses a disablement it recorded itself; another mod can independently change a technology's availability. Hidden supporting technologies can preserve historical investments and should not be removed as cosmetic clutter.
+
+- On Factorio 2.0.77, an update that adds technologies can re-enable script-disabled research with no recorded owner. Check any research locks you rely on when testing the upgrade on a copied save; MIR cannot reconstruct the missing ownership.
 
 - Use the Research Library on Factorio 2.0 and 2.1 to inspect research, queues, settings and availability. Search, filters and language preferences are personal. The Library uses Factorio's built-in research queue; it is not a second research planner.
 
