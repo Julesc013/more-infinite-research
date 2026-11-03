@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "kind": "MIRFoundationR03ActualAdverseChainV1",
+  "status": "ADVERSE-fixture-input-surface-bound-before-settings-activity",
+  "checkpoint_date": "2026-11-03",
+  "private_repository": "Julesc013/mir-native-worker",
+  "private_commit": "6c1482ccfece1e989e82ea5c1cc10a71dc133e52",
+  "exact_packet_sha256": "F00CB864E93FE3CFE8DA7DB83A86B78B7082B66E50E095DA6580E09E71EEDBB2",
+  "dispatch_admission_sha256": "D8A1C2840C630646BA9A26995A246F92A48FBB61BDC616B81684756C9B78D0D8",
+  "independent_dispatch_review_sha256": "F5B4619B1CA92659F369590B7B2FD4E10BC64ACBB8370F38644459EECF26179E",
+  "prior_composition_chain": "spec/evidence/foundation-settings-r03-composition-chain-r01.json",
+  "actual_terminal": {
+    "path": "D:\\Projects\\Factorio\\mir-native-worker-foundation-settings-r03\\build\\foundation-settings-r03-frozen-helper-inputs\\execute-record\\terminal.json",
+    "bytes": 23293,
+    "sha256": "54F0EB2914052B382AF3D184389852B0FEFD623D965DF15BEEFA53E60469E322"
+  },
+  "root_readback_sha256": "C83BF8F5D9BEAEFCD136838EC3C21FE5A9919573AFF9EFC3198F0722903BE640",
+  "physical_factorio_processes": 1,
+  "pid": 29764,
+  "native_exit_code": 1,
+  "timed_out": false,
+  "process_started_utc": "2026-11-03T08:18:39.0874620+00:00",
+  "terminal_observed_utc": "2026-11-03T08:19:10.0349277+00:00",
+  "diagnostic": "[mir5-large-factory-activity] surface bound exceeded; declare a different input",
+  "marker_counts": {
+    "SETTINGS": 0,
+    "START": 0,
+    "COMPLETE": 0
+  },
+  "original_governor_terminal": {
+    "observed_at": "2026-11-03T08:19:10.0349277+00:00",
+    "phase": "interrupted",
+    "timed_out": false,
+    "error": "[mir441-process-exit] 1",
+    "resource_admission": null,
+    "peak_working_set_bytes": 4875759616,
+    "peak_sampled_private_bytes": 4977160192
+  },
+  "original_controller_process_count": null,
+  "restoration_verified": true,
+  "protected_inputs_and_copy_hashes_unchanged": true,
+  "new_save_files": 0,
+  "primary_actual_custody": "build/qualification/foundation-settings-r03-actual-native-r01",
+  "complete_originals": {
+    "path": "evidence/foundation-settings-r03-actual-adverse-r01/original-bodies.json.gz",
+    "records": 30,
+    "gzip_bytes": 88395,
+    "gzip_sha256": "B7AC2950AD9514E7985486B91DD383D477E8BF9F7030325A2E3C15B8EDF1B66B",
+    "decoded_bytes": 291691,
+    "decoded_sha256": "8A39C4FE699ABCC6D56251C17115268A2C2569FB51C68698CE45A2A9AB26D3FB",
+    "remote_readback_verified": true,
+    "transport_limit": "All complete small actual/controller/admission/log/ledger/proof bodies retained. Unchanged108MB staged save remains in full primary/local custody with exact hashes, not Git transport."
+  },
+  "independent_actual_result_review": {
+    "status": "confirmed-adverse",
+    "review_sha256": "BEEB22E8AF9BFC4DC713C22140B0ED02FA66FEF7CFBCFDF7B065B6626142B9EB",
+    "original_bodies": 5,
+    "gzip_bytes": 9613,
+    "gzip_sha256": "A105E400CBA9EB1E4617E8F7B813A9258A1D353F07C90B6C31E2BD0BF8ADE3B4",
+    "decoded_bytes": 30465,
+    "decoded_sha256": "ADF705CE58D02B3B38108ABDDC9DD006A4C3C1D55B8D39C7B0388B767456A188",
+    "review": "https://github.com/Julesc013/mir-native-worker/issues/137#issuecomment-6599037363",
+    "observation_limit": "Fixture code deduplicates surface.index; encountering a33rd unique valid surface is a source-based lower-bound inference. Total/names/index inventory remains absent. Failed lease terminal semantics and original null caller count remain unchanged."
+  },
+  "classification": "The selected NoMIR observer refused its surface enumeration bound during first on_tick. It has no actual total/name/unique-surface inventory; do not invent one. This is a fixture/input-binding adverse, not evidence of a MIR product crash.",
+  "next_work": "Independent actual-result review; reconcile protected-world surface inventory and settings-only observability offline where possible, or prepare a separately reviewed diagnostic. Keep the normal32-surface guard; no unchanged retry, automatic bound increase, world/mod deletion or claim that stopped scans fixed the older live failure. Advance the unrelated five-family native input work.",
+  "measured_cost_limits": "The roughly31-second native process interval ends in a fixture refusal and is not scored startup/load/runtime cost. Recent exact integrated4230 host-suite job125788431124 ran11min24sec for the bound controls (07:38:28-07:49:52 UTC),12min10sec for the job (07:37:46-07:49:56 UTC). These observations do not predict remaining GUI/input/active-work qualification.",
+  "schedule": "Stable7-8November review remains conditional on surface/input repair, unavailable GUI capture, historical/source/save/API obligations and actual whole-product evidence; no verified stable completion date.",
+  "preserved_adverses": [
+    "R01memory plus secondary custody failure and R02liveoutputscan remain distinct original results.",
+    "GUI/editor/Downloads captures remain separate timeouts with unknown cause."
+  ],
+  "limits": [
+    "No SETTINGS/START/COMPLETE witness, activity, natural-zero benchmark or original/per-player setting determination.",
+    "The governor retains interrupted/process-exit1. Controller process count is null because the process adapter threw; the separate one-PID ledger proves physical execution. Original fields are not rewritten.",
+    "Sampled peak/memory and roughly31-second process interval are diagnostic receipts, not scored performance or startup acceptance.",
+    "R01 memory/secondary custody and R02 live output-scan adverses stay separate. This run passed neither retroactively nor by changing their identities.",
+    "Selected NoMIR case; no inference of a MIR product crash.",
+    "No exact total/name/unique-surface inventory was emitted; do not infer one or silently raise the normal32-entry activity bound."
+  ],
+  "performance_acceptance": false,
+  "gameplay_acceptance": false,
+  "save_preservation_acceptance": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}
