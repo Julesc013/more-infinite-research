@@ -1,0 +1,394 @@
+{
+  "schema": 1,
+  "kind": "MIRFoundationR04AcceptedInputInventoryChainV1",
+  "status": "accepted-bounded-one-tick-complete-input-inventory-only",
+  "checkpoint_date": "2026-11-03",
+  "private_repository": "Julesc013/mir-native-worker",
+  "private_commit": "c49da3797ae8ef72557deb2dbb747a7b4769b8fc",
+  "packet_sha256": "85E0F834FF38EAC39BF859533A69FA26AE761D378715EE1E7AC50430847DB46B",
+  "caller_sha256": "331D41E0BC80DF971DF95DD7B3DFD9A6CB0F186C44A725FC64476C9B8522991B",
+  "reader_sha256": "986C25347F958DB64A2DAB1AA752F1496EF78C3967BC7F3FB60FA6E790523DD4",
+  "source_inputs": {
+    "public_helper_commit": "71f32c36a3b125684210e1509b28e896466da1c3",
+    "fixture_commit": "d606f3836c6699ef6b229b6b73baf6036e71f193",
+    "fixture_source_review_sha256": "705FE370DEF88D07D18626868156E01537DBF80161A6AB3BC6AF5F1BEDCDE289",
+    "observer_four_member_zip_sha256": "5F05E6DE8864AB3DCA0A95DA68D65502C565A8A462DF6D25546AF727E3FFF372",
+    "profile_sha256": "70CF473AEB76D8AE9E58FDD09B9F78DB86742AF70618C29C56B3CE9491BFD758",
+    "engine": "2.0.77",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "whole_world_sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA",
+    "mods": {
+      "official": 4,
+      "third_party": 31,
+      "owned_observer": 1,
+      "total": 36,
+      "mir_selected": false
+    },
+    "settings_mode": "Defaults plus fixture-owned inventory opt-in; no upstream setting write"
+  },
+  "actual_composition": {
+    "terminal_sha256": "C864FE424B7242373ECD267460F615AD9F502BD29F994977B3CB72BE635985E7",
+    "bytes": 21296,
+    "suppressed_boundaries": 1,
+    "engine_processes": 0,
+    "exception": null,
+    "restoration_verified": true
+  },
+  "independent_dispatch": {
+    "review_sha256": "57537C653241051C559F6CE77D7524276014C090D91A72F4F483F6523A0C4C2B",
+    "actual_typed_admission_sha256": "C54E4B022A2A523FA9A805A79FE1F16CBCE2FC61B6A8FE90587D4FFC9B71CBE9",
+    "comment": "https://github.com/Julesc013/mir-native-worker/issues/137#issuecomment-6600911020",
+    "original_bodies": 11,
+    "gzip_sha256": "7006B564829248C4DA294DFEDF96A3FE873DDB46980BEBF72BFE15A0C8907964"
+  },
+  "actual_native": {
+    "terminal": {
+      "path": "D:\\Projects\\Factorio\\mir-native-worker-foundation-inventory-r04\\build\\foundation-input-inventory-r04-prepared-inputs\\execute-record\\terminal.json",
+      "bytes": 26196,
+      "sha256": "998B19C03341E6E1C5A2B3DCE4B42D6F3A8BD7677CC195B50633CBD406471692"
+    },
+    "root_readback_sha256": "E7B076C4A8CBF442614D48321C26A46C68B9763F7FC399DCAE1807AFC9467634",
+    "physical_factorio_processes": 1,
+    "pid": 28276,
+    "native_exit_code": 0,
+    "timed_out": false,
+    "completion_predicate_observed": false,
+    "resource_ledger_rows": 27,
+    "benchmark": {
+      "ticks": 1,
+      "runs": 1,
+      "sanitize": true,
+      "scored": false
+    },
+    "marker_counts": {
+      "settings": 1,
+      "inventory": 1,
+      "start": 0,
+      "complete": 0
+    },
+    "tick": 169628853,
+    "inventory": {
+      "complete": true,
+      "overflow": false,
+      "observed": {
+        "visited_entries": 57,
+        "processed_entries": 57,
+        "invalid_entries": 0,
+        "aliases": 0,
+        "unique_valid_observed_lower_bound": 57
+      },
+      "surface_rows": [
+        {
+          "index": 1,
+          "name": "nauvis"
+        },
+        {
+          "index": 2,
+          "name": "platform-1"
+        },
+        {
+          "index": 3,
+          "name": "platform-2"
+        },
+        {
+          "index": 4,
+          "name": "platform-3"
+        },
+        {
+          "index": 5,
+          "name": "platform-4"
+        },
+        {
+          "index": 6,
+          "name": "platform-5"
+        },
+        {
+          "index": 7,
+          "name": "vulcanus"
+        },
+        {
+          "index": 8,
+          "name": "platform-6"
+        },
+        {
+          "index": 9,
+          "name": "platform-7"
+        },
+        {
+          "index": 10,
+          "name": "platform-8"
+        },
+        {
+          "index": 11,
+          "name": "gleba"
+        },
+        {
+          "index": 12,
+          "name": "fulgora"
+        },
+        {
+          "index": 13,
+          "name": "platform-9"
+        },
+        {
+          "index": 14,
+          "name": "platform-10"
+        },
+        {
+          "index": 15,
+          "name": "platform-11"
+        },
+        {
+          "index": 16,
+          "name": "platform-12"
+        },
+        {
+          "index": 17,
+          "name": "platform-13"
+        },
+        {
+          "index": 18,
+          "name": "platform-14"
+        },
+        {
+          "index": 19,
+          "name": "platform-15"
+        },
+        {
+          "index": 20,
+          "name": "platform-16"
+        },
+        {
+          "index": 21,
+          "name": "platform-17"
+        },
+        {
+          "index": 22,
+          "name": "platform-18"
+        },
+        {
+          "index": 23,
+          "name": "platform-19"
+        },
+        {
+          "index": 25,
+          "name": "platform-21"
+        },
+        {
+          "index": 26,
+          "name": "platform-22"
+        },
+        {
+          "index": 27,
+          "name": "platform-23"
+        },
+        {
+          "index": 28,
+          "name": "platform-24"
+        },
+        {
+          "index": 29,
+          "name": "platform-25"
+        },
+        {
+          "index": 30,
+          "name": "platform-26"
+        },
+        {
+          "index": 31,
+          "name": "platform-27"
+        },
+        {
+          "index": 32,
+          "name": "platform-28"
+        },
+        {
+          "index": 33,
+          "name": "platform-29"
+        },
+        {
+          "index": 34,
+          "name": "platform-30"
+        },
+        {
+          "index": 35,
+          "name": "platform-31"
+        },
+        {
+          "index": 36,
+          "name": "platform-32"
+        },
+        {
+          "index": 37,
+          "name": "platform-33"
+        },
+        {
+          "index": 38,
+          "name": "platform-34"
+        },
+        {
+          "index": 39,
+          "name": "platform-35"
+        },
+        {
+          "index": 40,
+          "name": "platform-36"
+        },
+        {
+          "index": 41,
+          "name": "platform-37"
+        },
+        {
+          "index": 42,
+          "name": "platform-38"
+        },
+        {
+          "index": 43,
+          "name": "platform-39"
+        },
+        {
+          "index": 44,
+          "name": "platform-40"
+        },
+        {
+          "index": 45,
+          "name": "platform-41"
+        },
+        {
+          "index": 46,
+          "name": "platform-42"
+        },
+        {
+          "index": 47,
+          "name": "platform-43"
+        },
+        {
+          "index": 48,
+          "name": "platform-44"
+        },
+        {
+          "index": 49,
+          "name": "platform-45"
+        },
+        {
+          "index": 50,
+          "name": "platform-46"
+        },
+        {
+          "index": 51,
+          "name": "platform-47"
+        },
+        {
+          "index": 52,
+          "name": "platform-48"
+        },
+        {
+          "index": 53,
+          "name": "platform-49"
+        },
+        {
+          "index": 54,
+          "name": "platform-50"
+        },
+        {
+          "index": 55,
+          "name": "platform-51"
+        },
+        {
+          "index": 56,
+          "name": "platform-52"
+        },
+        {
+          "index": 57,
+          "name": "platform-53"
+        },
+        {
+          "index": 58,
+          "name": "aquilo"
+        }
+      ]
+    },
+    "effective_settings": {
+      "startup_count": 95,
+      "runtime_global_count": 197,
+      "original_saved": "unverified",
+      "per_player": "unobserved",
+      "historical_inheritance": "unverified"
+    },
+    "restoration_verified": true,
+    "controls_before_after_identical": true,
+    "protected_source_copies_and_stage_hashes_unchanged": true,
+    "distinct_protected_identities": 4,
+    "lease": "completed/pass",
+    "new_save_files": 0
+  },
+  "complete_actual_originals": {
+    "path": "evidence/foundation-input-inventory-r04/actual-r01/original-bodies.json.gz",
+    "records": 38,
+    "gzip_bytes": 168712,
+    "gzip_sha256": "211FE6ED70F14616723F21B5947D3E8624F4FACDCAF1CECEEBBBF2FDAF21F613",
+    "decoded_bytes": 543697,
+    "decoded_sha256": "97DEAEAD5761CBC871C8B750B11827F9A796288795C0A04EC512EC5E52E83CF0",
+    "actual_remote_download_bytes_equal": true,
+    "primary_full_actual": "build/qualification/foundation-input-inventory-r04-actual-native-r01/actual",
+    "transport_limit": "All38 complete non-save actual/dispatch original bodies transported. The unchanged108MB world remains an ordinary full primary/local custody copy, not an Aero physical-read claim."
+  },
+  "independent_actual_review": {
+    "status": "accepted-bounded-input-inventory-only",
+    "review_sha256": "DAE88FEFD008EB11BE7EDB1417DD3B0E3EDAEC87222520F06BBAE1023FFB0539",
+    "comment": "https://github.com/Julesc013/mir-native-worker/issues/137#issuecomment-6601314021",
+    "original_bodies": 5,
+    "gzip_bytes": 16950,
+    "gzip_sha256": "D7C54204FC6EA28769E3690378C619C7FA36A9A75DCA18C76B04080703036162",
+    "decoded_bytes": 70218,
+    "decoded_sha256": "0C24A035CC206ACBB3F3C9A9B97944C9855E71C3D05E6179EE3186AD7C42FE8E",
+    "reparse": "Exact reviewed pure reader recomputes all SETTINGS/INVENTORY payload fields; only independent local log locator differs."
+  },
+  "prior_adverse": "spec/evidence/foundation-settings-r03-actual-adverse-chain-r01.json",
+  "preserved_adverses": [
+    "R01 memory/secondary custody, R02 live-output-scan, R03 first-update32-surface refusal, and GUI captures retain their original failed/unverified identities.",
+    "Root first post-native reader expected JSON immediately after the prefix; the unchanged actual protocol includes SETTINGS/INVENTORY kind tokens. Original reader and disposition retained before correction; no native replay or result mutation."
+  ],
+  "capture_diagnostic_r04": {
+    "status": "two-read-only-channel-timeouts",
+    "records": [
+      {
+        "path": "build/qualification/capture-readonly-diagnostic-r04/first.json",
+        "bytes": 457,
+        "sha256": "AB1552769060F772CFB2415175509273B74FBE23DC0693A2EB588CDA6F27B3F2",
+        "started_utc": "2026-11-03T10:33:05.895Z",
+        "completed_utc": "2026-11-03T10:33:11.182Z",
+        "error": "Error: window capture timed out: timed out waiting on channel"
+      },
+      {
+        "path": "build/qualification/capture-readonly-diagnostic-r04/recovery.json",
+        "bytes": 517,
+        "sha256": "6A5C175A407A1BA0E6008E8214A27E20199B803DB3133A6D27D2D1DF5E38C4E9",
+        "started_utc": "2026-11-03T10:33:21.483Z",
+        "completed_utc": "2026-11-03T10:33:26.778Z",
+        "error": "Error: window capture timed out: timed out waiting on channel"
+      }
+    ],
+    "activation": false,
+    "input_actions": 0,
+    "factorio_processes": 0,
+    "cause": "unknown; no lock-state or product-cause inference"
+  },
+  "next_executable_work": "Declare and independently review the exact whole57-surface activity method and bounded outputs before a new packet/composition/dispatch. Preserve normal32 behavior, all world/mod inputs and useful-work requirements; no silent subset or blanket guard increase. Advance the separate reviewed product/cost/save work.",
+  "measured_cost_limits": "The26.223056second direct-native start-to-exit interval and sampled memory are unscored diagnostics, not responsive-menu, load, gameplay or performance acceptance. Hosted suites recently take roughly8-12minutes; these observations do not predict the remaining stable critical path.",
+  "schedule": "The7-8November stable review remains conditional on Library capture/input/client/export, historical/profile/API/save applicability, source corrections and actual whole-product endpoints; no verified completion date.",
+  "limits": [
+    "57 actual identities/names are complete only for the selected one-tick NoMIR input. Index24 is absent; do not infer contiguous identities.",
+    "Effective95startup/197runtime-global values are not original saved/per-player settings or verified historical inheritance.",
+    "No entity/production/machine sampling, START/COMPLETE activity markers, throughput/backlogs/spikes or whole-factory activity acceptance.",
+    "This later inventory does not retroactively supply an observed R03 total or make that failed normal32-surface attempt pass.",
+    "Private input diagnostics do not qualify MIR product research/effects, paid-state, saves/reloads, multiplayer/client, responsive menu, release or stable."
+  ],
+  "activity_observed": false,
+  "large_factory_qualified": false,
+  "performance_acceptance": false,
+  "gameplay_acceptance": false,
+  "save_preservation_acceptance": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}
