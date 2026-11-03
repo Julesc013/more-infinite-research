@@ -1,0 +1,1334 @@
+{
+  "schema": 1,
+  "kind": "K2SOCrushingIndustryMaterialHostInputsV1",
+  "archives": {
+    "crushing_industry": {
+      "name": "crushing-industry_0.6.4.zip",
+      "bytes": 8831625,
+      "sha256": "F5116AEBF5342A035E949ADAEE47B8D45FB00AFD73D59CA8D005E02929D4FB24"
+    },
+    "fdsl": {
+      "name": "fdsl_0.5.0.zip",
+      "bytes": 50630,
+      "sha256": "342F7D7CFF7ED3F4CE98FFF0C49758F25BD19A0DE831F0EFAFFC357A8DFCD285"
+    }
+  },
+  "original_k2_native_facts_sha256": "27D997DB8DC1EB57ACCE2B577E4FD5291AA92EEBADF559C9050AEDD419BE014F",
+  "source_members": {
+    "crushing-industry_0.6.4/prototypes/glass.lua": "7D9D7898014AE301A8237B7399A92FA8C74D0650837ACCE53E2315A68E13B58F",
+    "fdsl_0.5.0/lib/recipe.lua": "5D1FA441D5B219CD4BE836FC5D5BE15D9173F382770E62EA2D183539B9808059",
+    "fdsl_0.5.0/lib/assert.lua": "9B76B8CE393ADF2CAC60108F714F9C20F3968C603D5F86D1930BCED3BA781E4C",
+    "fdsl_0.5.0/lib/shared.lua": "87569AA9C6A0BB4B0894D766AB16B265E64DF25916303663B2651530B2129202",
+    "crushing-industry_0.6.4/prototypes/compat/k2-final-fixes.lua": "069C02D534C81226FA2818386EACF97A20455911F02BA9CA7611B67E3AC5CD7F",
+    "fdsl_0.5.0/lib/technology.lua": "CB8DBA99D03E8F69D494FB856C7FDBC351E187F206828BEF7A52BA38406795EE"
+  },
+  "cases": [
+    {
+      "k2": false,
+      "glass": false,
+      "raw": {
+        "item": {
+          "kr-rare-metals": {
+            "type": "item",
+            "name": "kr-rare-metals",
+            "icon": "__Krastorio2Assets__/icons/items/rare-metals.png"
+          },
+          "sand": {
+            "type": "item",
+            "name": "sand"
+          },
+          "chemical-science-pack": {
+            "type": "item",
+            "name": "chemical-science-pack"
+          },
+          "kr-glass": {
+            "type": "item",
+            "name": "kr-glass",
+            "icon": "__Krastorio2Assets__/icons/items/glass.png"
+          },
+          "kr-sand": {
+            "type": "item",
+            "name": "kr-sand"
+          },
+          "kr-silicon": {
+            "type": "item",
+            "name": "kr-silicon",
+            "icon": "__Krastorio2Assets__/icons/items/silicon.png"
+          },
+          "automation-science-pack": {
+            "type": "item",
+            "name": "automation-science-pack"
+          },
+          "logistic-science-pack": {
+            "type": "item",
+            "name": "logistic-science-pack"
+          }
+        },
+        "technology": {
+          "kr-silicon-processing": {
+            "type": "technology",
+            "effects": [
+              {
+                "type": "unlock-recipe",
+                "recipe": "kr-silicon"
+              }
+            ],
+            "prerequisites": [
+              "kr-fluids-chemistry",
+              "automation-2"
+            ],
+            "name": "kr-silicon-processing"
+          },
+          "steam-power": {
+            "type": "technology",
+            "effects": {},
+            "name": "steam-power"
+          },
+          "electronics": {
+            "type": "technology",
+            "effects": {},
+            "name": "electronics"
+          },
+          "automation-2": {
+            "type": "technology",
+            "name": "automation-2"
+          },
+          "logistic-science-pack": {
+            "type": "technology",
+            "name": "logistic-science-pack"
+          },
+          "kr-rare-metal-processing": {
+            "type": "technology",
+            "effects": [
+              {
+                "type": "unlock-recipe",
+                "recipe": "kr-rare-metals"
+              }
+            ],
+            "prerequisites": [
+              "kr-rare-metal-mining"
+            ],
+            "name": "kr-rare-metal-processing"
+          },
+          "kr-enriched-ores": {
+            "type": "technology",
+            "effects": [
+              {
+                "type": "unlock-recipe",
+                "recipe": "kr-rare-metals-from-enriched-rare-metals"
+              }
+            ],
+            "prerequisites": [
+              "kr-advanced-chemistry"
+            ],
+            "name": "kr-enriched-ores"
+          },
+          "kr-fluids-chemistry": {
+            "type": "technology",
+            "name": "kr-fluids-chemistry"
+          },
+          "chemical-science-pack": {
+            "type": "technology",
+            "name": "chemical-science-pack"
+          },
+          "kr-advanced-chemistry": {
+            "type": "technology",
+            "name": "kr-advanced-chemistry"
+          },
+          "kr-rare-metal-mining": {
+            "type": "technology",
+            "name": "kr-rare-metal-mining"
+          },
+          "automation-science-pack": {
+            "type": "technology",
+            "name": "automation-science-pack"
+          },
+          "kr-stone-processing": {
+            "type": "technology",
+            "effects": [
+              {
+                "type": "unlock-recipe",
+                "recipe": "kr-glass"
+              },
+              {
+                "type": "unlock-recipe",
+                "recipe": "kr-sand"
+              }
+            ],
+            "prerequisites": [
+              "kr-crusher"
+            ],
+            "name": "kr-stone-processing"
+          },
+          "kr-crusher": {
+            "type": "technology",
+            "name": "kr-crusher"
+          }
+        },
+        "recipe": {
+          "kr-rare-metals": {
+            "enabled": false,
+            "allow_productivity": true,
+            "results": [
+              {
+                "type": "item",
+                "amount": 1,
+                "name": "kr-rare-metals"
+              }
+            ],
+            "type": "recipe",
+            "ingredients": [
+              {
+                "type": "item",
+                "amount": 2,
+                "name": "kr-rare-metal-ore"
+              }
+            ],
+            "name": "kr-rare-metals"
+          },
+          "kr-glass": {
+            "enabled": false,
+            "allow_productivity": true,
+            "results": [
+              {
+                "type": "item",
+                "amount": 8,
+                "name": "kr-glass"
+              }
+            ],
+            "type": "recipe",
+            "ingredients": [
+              {
+                "type": "item",
+                "amount": 16,
+                "name": "kr-sand"
+              }
+            ],
+            "name": "kr-glass"
+          },
+          "kr-rare-metals-from-enriched-rare-metals": {
+            "enabled": false,
+            "allow_productivity": true,
+            "results": [
+              {
+                "type": "item",
+                "amount": 1,
+                "name": "kr-rare-metals"
+              }
+            ],
+            "type": "recipe",
+            "ingredients": [
+              {
+                "type": "item",
+                "amount": 1,
+                "name": "kr-enriched-rare-metals"
+              }
+            ],
+            "name": "kr-rare-metals-from-enriched-rare-metals"
+          },
+          "sand": {
+            "type": "recipe",
+            "results": {},
+            "ingredients": {},
+            "name": "sand"
+          },
+          "kr-silicon": {
+            "enabled": false,
+            "allow_productivity": true,
+            "results": [
+              {
+                "type": "item",
+                "amount": 9,
+                "name": "kr-silicon"
+              }
+            ],
+            "type": "recipe",
+            "ingredients": [
+              {
+                "type": "item",
+                "amount": 18,
+                "name": "kr-quartz"
+              }
+            ],
+            "name": "kr-silicon"
+          },
+          "kr-sand": {
+            "type": "recipe",
+            "results": {},
+            "ingredients": {},
+            "name": "kr-sand"
+          }
+        }
+      },
+      "mods": {
+        "fdsl": "0.5.0",
+        "crushing-industry": "0.6.4",
+        "k2so-assets": "1.0.7",
+        "base": "2.1.23",
+        "Krastorio2Assets": "2.1.0",
+        "Krastorio2-spaced-out": "2.0.19",
+        "space-age": "2.1.23",
+        "Krastorio2": "2.1.4"
+      },
+      "startup": {
+        "crushing-industry-k2": {
+          "value": false
+        },
+        "crushing-industry-glass": {
+          "value": false
+        },
+        "crushing-industry-byproducts": {
+          "value": false
+        }
+      }
+    },
+    {
+      "k2": false,
+      "glass": true,
+      "raw": {
+        "fluid": {
+          "molten-glass": {
+            "name": "molten-glass",
+            "type": "fluid",
+            "icon": "__crushing-industry__/graphics/icons/fluid/molten-glass.png",
+            "max_temperature": 2000,
+            "auto_barrel": false,
+            "base_color": [
+              0.4,
+              0.6,
+              0.83
+            ],
+            "default_temperature": 1500,
+            "flow_color": [
+              0.5,
+              0.78,
+              0.93
+            ],
+            "heat_capacity": "0.01kJ",
+            "order": "b[new-fluid]-b[vulcanus]-g[molten-glass]",
+            "subgroup": "fluid"
+          }
+        },
+        "recipe": {
+          "sand": {
+            "name": "sand",
+            "ingredients": {},
+            "results": {},
+            "type": "recipe"
+          },
+          "kr-silicon": {
+            "name": "kr-silicon",
+            "results": [
+              {
+                "name": "kr-silicon",
+                "amount": 9,
+                "type": "item"
+              }
+            ],
+            "type": "recipe",
+            "enabled": false,
+            "ingredients": [
+              {
+                "name": "kr-quartz",
+                "amount": 18,
+                "type": "item"
+              }
+            ],
+            "allow_productivity": true
+          },
+          "glass": {
+            "name": "glass",
+            "type": "recipe",
+            "enabled": false,
+            "results": [
+              {
+                "name": "glass",
+                "amount": 2,
+                "type": "item"
+              }
+            ],
+            "ingredients": [
+              {
+                "name": "sand",
+                "amount": 5,
+                "type": "item"
+              }
+            ],
+            "auto_recycle": false,
+            "energy_required": 6.4,
+            "allow_productivity": true,
+            "categories": [
+              "smelting"
+            ]
+          },
+          "casting-glass": {
+            "name": "casting-glass",
+            "type": "recipe",
+            "icon": "__crushing-industry__/graphics/icons/casting-glass.png",
+            "allow_decomposition": false,
+            "order": "b[casting]-c[x-glass]",
+            "ingredients": [
+              {
+                "name": "molten-glass",
+                "fluidbox_multiplier": 10,
+                "amount": 20,
+                "type": "fluid"
+              }
+            ],
+            "results": [
+              {
+                "name": "glass",
+                "amount": 2,
+                "type": "item"
+              }
+            ],
+            "auto_recycle": false,
+            "allow_productivity": true,
+            "enabled": false,
+            "energy_required": 6.4,
+            "subgroup": "vulcanus-processes",
+            "categories": [
+              "metallurgy"
+            ]
+          },
+          "molten-glass": {
+            "name": "molten-glass",
+            "type": "recipe",
+            "icon": "__crushing-industry__/graphics/icons/sand-melting.png",
+            "subgroup": "vulcanus-processes",
+            "order": "a[melting]-d[molten-glass]",
+            "ingredients": [
+              {
+                "name": "sand",
+                "amount": 75,
+                "type": "item"
+              },
+              {
+                "name": "calcite",
+                "amount": 1,
+                "type": "item"
+              }
+            ],
+            "results": [
+              {
+                "name": "molten-glass",
+                "amount": 250,
+                "type": "fluid"
+              }
+            ],
+            "auto_recycle": false,
+            "allow_productivity": true,
+            "enabled": false,
+            "energy_required": 32,
+            "main_product": "molten-glass",
+            "categories": [
+              "metallurgy"
+            ]
+          },
+          "kr-rare-metals": {
+            "name": "kr-rare-metals",
+            "results": [
+              {
+                "name": "kr-rare-metals",
+                "amount": 1,
+                "type": "item"
+              }
+            ],
+            "type": "recipe",
+            "enabled": false,
+            "ingredients": [
+              {
+                "name": "kr-rare-metal-ore",
+                "amount": 2,
+                "type": "item"
+              }
+            ],
+            "allow_productivity": true
+          },
+          "kr-sand": {
+            "name": "kr-sand",
+            "ingredients": {},
+            "results": {},
+            "type": "recipe"
+          },
+          "kr-glass": {
+            "name": "kr-glass",
+            "results": [
+              {
+                "name": "kr-glass",
+                "amount": 8,
+                "type": "item"
+              }
+            ],
+            "type": "recipe",
+            "enabled": false,
+            "ingredients": [
+              {
+                "name": "kr-sand",
+                "amount": 16,
+                "type": "item"
+              }
+            ],
+            "allow_productivity": true
+          },
+          "kr-rare-metals-from-enriched-rare-metals": {
+            "name": "kr-rare-metals-from-enriched-rare-metals",
+            "results": [
+              {
+                "name": "kr-rare-metals",
+                "amount": 1,
+                "type": "item"
+              }
+            ],
+            "type": "recipe",
+            "enabled": false,
+            "ingredients": [
+              {
+                "name": "kr-enriched-rare-metals",
+                "amount": 1,
+                "type": "item"
+              }
+            ],
+            "allow_productivity": true
+          }
+        },
+        "technology": {
+          "automation-science-pack": {
+            "name": "automation-science-pack",
+            "type": "technology"
+          },
+          "logistic-science-pack": {
+            "name": "logistic-science-pack",
+            "type": "technology"
+          },
+          "kr-silicon-processing": {
+            "name": "kr-silicon-processing",
+            "prerequisites": [
+              "kr-fluids-chemistry",
+              "automation-2"
+            ],
+            "type": "technology",
+            "effects": [
+              {
+                "recipe": "kr-silicon",
+                "type": "unlock-recipe"
+              }
+            ]
+          },
+          "kr-rare-metal-mining": {
+            "name": "kr-rare-metal-mining",
+            "type": "technology"
+          },
+          "kr-stone-processing": {
+            "name": "kr-stone-processing",
+            "prerequisites": [
+              "kr-crusher"
+            ],
+            "type": "technology",
+            "effects": [
+              {
+                "recipe": "kr-glass",
+                "type": "unlock-recipe"
+              },
+              {
+                "recipe": "kr-sand",
+                "type": "unlock-recipe"
+              }
+            ]
+          },
+          "kr-enriched-ores": {
+            "name": "kr-enriched-ores",
+            "prerequisites": [
+              "kr-advanced-chemistry"
+            ],
+            "type": "technology",
+            "effects": [
+              {
+                "recipe": "kr-rare-metals-from-enriched-rare-metals",
+                "type": "unlock-recipe"
+              }
+            ]
+          },
+          "kr-advanced-chemistry": {
+            "name": "kr-advanced-chemistry",
+            "type": "technology"
+          },
+          "kr-rare-metal-processing": {
+            "name": "kr-rare-metal-processing",
+            "prerequisites": [
+              "kr-rare-metal-mining"
+            ],
+            "type": "technology",
+            "effects": [
+              {
+                "recipe": "kr-rare-metals",
+                "type": "unlock-recipe"
+              }
+            ]
+          },
+          "electronics": {
+            "name": "electronics",
+            "effects": {},
+            "type": "technology"
+          },
+          "kr-crusher": {
+            "name": "kr-crusher",
+            "type": "technology"
+          },
+          "automation-2": {
+            "name": "automation-2",
+            "type": "technology"
+          },
+          "chemical-science-pack": {
+            "name": "chemical-science-pack",
+            "type": "technology"
+          },
+          "steam-power": {
+            "name": "steam-power",
+            "effects": {},
+            "type": "technology"
+          },
+          "kr-fluids-chemistry": {
+            "name": "kr-fluids-chemistry",
+            "type": "technology"
+          }
+        },
+        "item": {
+          "kr-sand": {
+            "name": "kr-sand",
+            "type": "item"
+          },
+          "kr-silicon": {
+            "icon": "__Krastorio2Assets__/icons/items/silicon.png",
+            "name": "kr-silicon",
+            "type": "item"
+          },
+          "kr-glass": {
+            "icon": "__Krastorio2Assets__/icons/items/glass.png",
+            "name": "kr-glass",
+            "type": "item"
+          },
+          "glass": {
+            "name": "glass",
+            "random_tint_color": [
+              0.85,
+              1,
+              0.85,
+              0.85
+            ],
+            "weight": 1000,
+            "type": "item",
+            "icon": "__crushing-industry__/graphics/icons/glass.png",
+            "stack_size": 100,
+            "order": "a[smelting]-d[glass]",
+            "subgroup": "raw-material"
+          },
+          "kr-rare-metals": {
+            "icon": "__Krastorio2Assets__/icons/items/rare-metals.png",
+            "name": "kr-rare-metals",
+            "type": "item"
+          },
+          "automation-science-pack": {
+            "name": "automation-science-pack",
+            "type": "item"
+          },
+          "chemical-science-pack": {
+            "name": "chemical-science-pack",
+            "type": "item"
+          },
+          "logistic-science-pack": {
+            "name": "logistic-science-pack",
+            "type": "item"
+          },
+          "sand": {
+            "name": "sand",
+            "type": "item"
+          }
+        }
+      },
+      "mods": {
+        "fdsl": "0.5.0",
+        "Krastorio2-spaced-out": "2.0.19",
+        "crushing-industry": "0.6.4",
+        "base": "2.1.23",
+        "Krastorio2": "2.1.4",
+        "k2so-assets": "1.0.7",
+        "space-age": "2.1.23",
+        "Krastorio2Assets": "2.1.0"
+      },
+      "startup": {
+        "crushing-industry-k2": {
+          "value": false
+        },
+        "crushing-industry-glass": {
+          "value": true
+        },
+        "crushing-industry-byproducts": {
+          "value": false
+        }
+      }
+    },
+    {
+      "k2": true,
+      "glass": false,
+      "raw": {
+        "item": {
+          "logistic-science-pack": {
+            "type": "item",
+            "name": "logistic-science-pack"
+          },
+          "sand": {
+            "type": "item",
+            "name": "sand"
+          },
+          "automation-science-pack": {
+            "type": "item",
+            "name": "automation-science-pack"
+          },
+          "kr-sand": {
+            "hidden": true,
+            "name": "kr-sand",
+            "type": "item"
+          },
+          "chemical-science-pack": {
+            "type": "item",
+            "name": "chemical-science-pack"
+          },
+          "kr-glass": {
+            "icon": "__Krastorio2Assets__/icons/items/glass.png",
+            "type": "item",
+            "name": "kr-glass"
+          },
+          "kr-rare-metals": {
+            "icon": "__Krastorio2Assets__/icons/items/rare-metals.png",
+            "type": "item",
+            "name": "kr-rare-metals"
+          },
+          "kr-silicon": {
+            "icon": "__Krastorio2Assets__/icons/items/silicon.png",
+            "type": "item",
+            "name": "kr-silicon"
+          }
+        },
+        "recipe": {
+          "kr-glass": {
+            "enabled": false,
+            "results": [
+              {
+                "name": "kr-glass",
+                "type": "item",
+                "amount": 8
+              }
+            ],
+            "name": "kr-glass",
+            "ingredients": [
+              {
+                "name": "sand",
+                "type": "item",
+                "amount": 16
+              }
+            ],
+            "type": "recipe",
+            "allow_productivity": true
+          },
+          "sand": {
+            "ingredients": {},
+            "name": "sand",
+            "type": "recipe",
+            "results": {}
+          },
+          "kr-rare-metals-from-enriched-rare-metals": {
+            "enabled": false,
+            "results": [
+              {
+                "name": "kr-rare-metals",
+                "type": "item",
+                "amount": 1
+              }
+            ],
+            "name": "kr-rare-metals-from-enriched-rare-metals",
+            "ingredients": [
+              {
+                "name": "kr-enriched-rare-metals",
+                "type": "item",
+                "amount": 1
+              }
+            ],
+            "type": "recipe",
+            "allow_productivity": true
+          },
+          "kr-sand": {
+            "enabled": true,
+            "results": {},
+            "hidden": true,
+            "name": "kr-sand",
+            "type": "recipe",
+            "ingredients": {}
+          },
+          "kr-rare-metals": {
+            "enabled": false,
+            "results": [
+              {
+                "name": "kr-rare-metals",
+                "type": "item",
+                "amount": 1
+              }
+            ],
+            "name": "kr-rare-metals",
+            "ingredients": [
+              {
+                "name": "kr-rare-metal-ore",
+                "type": "item",
+                "amount": 2
+              }
+            ],
+            "type": "recipe",
+            "allow_productivity": true
+          },
+          "kr-silicon": {
+            "enabled": false,
+            "results": [
+              {
+                "name": "kr-silicon",
+                "type": "item",
+                "amount": 9
+              }
+            ],
+            "name": "kr-silicon",
+            "ingredients": [
+              {
+                "name": "kr-quartz",
+                "type": "item",
+                "amount": 18
+              }
+            ],
+            "type": "recipe",
+            "allow_productivity": true
+          }
+        },
+        "technology": {
+          "kr-rare-metal-processing": {
+            "name": "kr-rare-metal-processing",
+            "prerequisites": [
+              "kr-rare-metal-mining"
+            ],
+            "type": "technology",
+            "effects": [
+              {
+                "type": "unlock-recipe",
+                "recipe": "kr-rare-metals"
+              }
+            ]
+          },
+          "automation-science-pack": {
+            "type": "technology",
+            "name": "automation-science-pack"
+          },
+          "kr-crusher": {
+            "type": "technology",
+            "name": "kr-crusher"
+          },
+          "steam-power": {
+            "name": "steam-power",
+            "type": "technology",
+            "effects": {}
+          },
+          "kr-advanced-chemistry": {
+            "type": "technology",
+            "name": "kr-advanced-chemistry"
+          },
+          "electronics": {
+            "name": "electronics",
+            "type": "technology",
+            "effects": {}
+          },
+          "logistic-science-pack": {
+            "type": "technology",
+            "name": "logistic-science-pack"
+          },
+          "automation-2": {
+            "type": "technology",
+            "name": "automation-2"
+          },
+          "kr-rare-metal-mining": {
+            "type": "technology",
+            "name": "kr-rare-metal-mining"
+          },
+          "kr-stone-processing": {
+            "name": "kr-stone-processing",
+            "prerequisites": [
+              "kr-crusher"
+            ],
+            "type": "technology",
+            "effects": [
+              {
+                "type": "unlock-recipe",
+                "recipe": "kr-glass"
+              },
+              {
+                "type": "unlock-recipe",
+                "recipe": "sand"
+              }
+            ]
+          },
+          "chemical-science-pack": {
+            "type": "technology",
+            "name": "chemical-science-pack"
+          },
+          "kr-fluids-chemistry": {
+            "type": "technology",
+            "name": "kr-fluids-chemistry"
+          },
+          "kr-enriched-ores": {
+            "name": "kr-enriched-ores",
+            "prerequisites": [
+              "kr-advanced-chemistry"
+            ],
+            "type": "technology",
+            "effects": [
+              {
+                "type": "unlock-recipe",
+                "recipe": "kr-rare-metals-from-enriched-rare-metals"
+              }
+            ]
+          },
+          "kr-silicon-processing": {
+            "name": "kr-silicon-processing",
+            "prerequisites": [
+              "kr-fluids-chemistry",
+              "automation-2"
+            ],
+            "type": "technology",
+            "effects": [
+              {
+                "type": "unlock-recipe",
+                "recipe": "kr-silicon"
+              }
+            ]
+          }
+        }
+      },
+      "mods": {
+        "fdsl": "0.5.0",
+        "base": "2.1.23",
+        "crushing-industry": "0.6.4",
+        "space-age": "2.1.23",
+        "Krastorio2Assets": "2.1.0",
+        "k2so-assets": "1.0.7",
+        "Krastorio2-spaced-out": "2.0.19",
+        "Krastorio2": "2.1.4"
+      },
+      "startup": {
+        "crushing-industry-k2": {
+          "value": true
+        },
+        "crushing-industry-byproducts": {
+          "value": false
+        },
+        "crushing-industry-glass": {
+          "value": false
+        }
+      }
+    },
+    {
+      "k2": true,
+      "glass": true,
+      "raw": {
+        "recipe": {
+          "kr-glass": {
+            "allow_productivity": true,
+            "type": "recipe",
+            "enabled": true,
+            "results": [
+              {
+                "name": "glass",
+                "type": "item",
+                "amount": 8
+              }
+            ],
+            "name": "kr-glass",
+            "ingredients": [
+              {
+                "name": "sand",
+                "type": "item",
+                "amount": 16
+              }
+            ],
+            "hidden": true
+          },
+          "casting-glass": {
+            "name": "casting-glass",
+            "type": "recipe",
+            "allow_decomposition": false,
+            "categories": [
+              "metallurgy"
+            ],
+            "ingredients": [
+              {
+                "name": "molten-glass",
+                "type": "fluid",
+                "fluidbox_multiplier": 10,
+                "amount": 20
+              }
+            ],
+            "allow_productivity": true,
+            "energy_required": 6.4,
+            "icon": "__crushing-industry__/graphics/icons/casting-glass.png",
+            "enabled": false,
+            "results": [
+              {
+                "name": "glass",
+                "type": "item",
+                "amount": 2
+              }
+            ],
+            "auto_recycle": false,
+            "subgroup": "vulcanus-processes",
+            "order": "b[casting]-c[x-glass]"
+          },
+          "kr-silicon": {
+            "allow_productivity": true,
+            "type": "recipe",
+            "enabled": false,
+            "results": [
+              {
+                "name": "kr-silicon",
+                "type": "item",
+                "amount": 9
+              }
+            ],
+            "ingredients": [
+              {
+                "name": "kr-quartz",
+                "type": "item",
+                "amount": 18
+              }
+            ],
+            "name": "kr-silicon"
+          },
+          "kr-rare-metals": {
+            "allow_productivity": true,
+            "type": "recipe",
+            "enabled": false,
+            "results": [
+              {
+                "name": "kr-rare-metals",
+                "type": "item",
+                "amount": 1
+              }
+            ],
+            "ingredients": [
+              {
+                "name": "kr-rare-metal-ore",
+                "type": "item",
+                "amount": 2
+              }
+            ],
+            "name": "kr-rare-metals"
+          },
+          "kr-rare-metals-from-enriched-rare-metals": {
+            "allow_productivity": true,
+            "type": "recipe",
+            "enabled": false,
+            "results": [
+              {
+                "name": "kr-rare-metals",
+                "type": "item",
+                "amount": 1
+              }
+            ],
+            "ingredients": [
+              {
+                "name": "kr-enriched-rare-metals",
+                "type": "item",
+                "amount": 1
+              }
+            ],
+            "name": "kr-rare-metals-from-enriched-rare-metals"
+          },
+          "molten-glass": {
+            "name": "molten-glass",
+            "type": "recipe",
+            "main_product": "molten-glass",
+            "categories": [
+              "metallurgy"
+            ],
+            "energy_required": 32,
+            "allow_productivity": true,
+            "ingredients": [
+              {
+                "name": "sand",
+                "type": "item",
+                "amount": 75
+              },
+              {
+                "name": "calcite",
+                "type": "item",
+                "amount": 1
+              }
+            ],
+            "icon": "__crushing-industry__/graphics/icons/sand-melting.png",
+            "enabled": false,
+            "results": [
+              {
+                "name": "molten-glass",
+                "type": "fluid",
+                "amount": 250
+              }
+            ],
+            "auto_recycle": false,
+            "subgroup": "vulcanus-processes",
+            "order": "a[melting]-d[molten-glass]"
+          },
+          "sand": {
+            "name": "sand",
+            "type": "recipe",
+            "ingredients": {},
+            "results": {}
+          },
+          "glass": {
+            "name": "glass",
+            "type": "recipe",
+            "categories": [
+              "smelting"
+            ],
+            "hidden": false,
+            "allow_productivity": true,
+            "enabled": false,
+            "results": [
+              {
+                "name": "glass",
+                "type": "item",
+                "amount": 2
+              }
+            ],
+            "energy_required": 6.4,
+            "ingredients": [
+              {
+                "name": "sand",
+                "type": "item",
+                "amount": 5
+              }
+            ],
+            "auto_recycle": false
+          },
+          "kr-sand": {
+            "name": "kr-sand",
+            "type": "recipe",
+            "enabled": true,
+            "results": {},
+            "ingredients": {},
+            "hidden": true
+          }
+        },
+        "item": {
+          "logistic-science-pack": {
+            "name": "logistic-science-pack",
+            "type": "item"
+          },
+          "kr-glass": {
+            "name": "kr-glass",
+            "type": "item",
+            "icon": "__Krastorio2Assets__/icons/items/glass.png",
+            "hidden": true
+          },
+          "kr-silicon": {
+            "name": "kr-silicon",
+            "type": "item",
+            "icon": "__Krastorio2Assets__/icons/items/silicon.png"
+          },
+          "kr-rare-metals": {
+            "name": "kr-rare-metals",
+            "type": "item",
+            "icon": "__Krastorio2Assets__/icons/items/rare-metals.png"
+          },
+          "glass": {
+            "name": "glass",
+            "type": "item",
+            "hidden": false,
+            "weight": 1000,
+            "stack_size": 100,
+            "order": "a[smelting]-d[glass]",
+            "random_tint_color": [
+              0.85,
+              1,
+              0.85,
+              0.85
+            ],
+            "subgroup": "raw-material",
+            "icon": "__crushing-industry__/graphics/icons/glass.png"
+          },
+          "sand": {
+            "name": "sand",
+            "type": "item"
+          },
+          "automation-science-pack": {
+            "name": "automation-science-pack",
+            "type": "item"
+          },
+          "kr-sand": {
+            "name": "kr-sand",
+            "type": "item",
+            "hidden": true
+          },
+          "chemical-science-pack": {
+            "name": "chemical-science-pack",
+            "type": "item"
+          }
+        },
+        "fluid": {
+          "molten-glass": {
+            "name": "molten-glass",
+            "type": "fluid",
+            "default_temperature": 1500,
+            "flow_color": [
+              0.5,
+              0.78,
+              0.93
+            ],
+            "heat_capacity": "0.01kJ",
+            "icon": "__crushing-industry__/graphics/icons/fluid/molten-glass.png",
+            "max_temperature": 2000,
+            "auto_barrel": false,
+            "base_color": [
+              0.4,
+              0.6,
+              0.83
+            ],
+            "subgroup": "fluid",
+            "order": "b[new-fluid]-b[vulcanus]-g[molten-glass]"
+          }
+        },
+        "technology": {
+          "logistic-science-pack": {
+            "name": "logistic-science-pack",
+            "type": "technology"
+          },
+          "automation-2": {
+            "name": "automation-2",
+            "type": "technology"
+          },
+          "kr-stone-processing": {
+            "prerequisites": [
+              "kr-crusher"
+            ],
+            "type": "technology",
+            "name": "kr-stone-processing",
+            "effects": [
+              {
+                "recipe": "glass",
+                "type": "unlock-recipe"
+              },
+              {
+                "recipe": "sand",
+                "type": "unlock-recipe"
+              }
+            ]
+          },
+          "kr-rare-metal-processing": {
+            "prerequisites": [
+              "kr-rare-metal-mining"
+            ],
+            "type": "technology",
+            "name": "kr-rare-metal-processing",
+            "effects": [
+              {
+                "recipe": "kr-rare-metals",
+                "type": "unlock-recipe"
+              }
+            ]
+          },
+          "electronics": {
+            "name": "electronics",
+            "type": "technology",
+            "effects": {}
+          },
+          "steam-power": {
+            "name": "steam-power",
+            "type": "technology",
+            "effects": {}
+          },
+          "kr-fluids-chemistry": {
+            "name": "kr-fluids-chemistry",
+            "type": "technology"
+          },
+          "kr-crusher": {
+            "name": "kr-crusher",
+            "type": "technology"
+          },
+          "kr-advanced-chemistry": {
+            "name": "kr-advanced-chemistry",
+            "type": "technology"
+          },
+          "kr-rare-metal-mining": {
+            "name": "kr-rare-metal-mining",
+            "type": "technology"
+          },
+          "kr-enriched-ores": {
+            "prerequisites": [
+              "kr-advanced-chemistry"
+            ],
+            "type": "technology",
+            "name": "kr-enriched-ores",
+            "effects": [
+              {
+                "recipe": "kr-rare-metals-from-enriched-rare-metals",
+                "type": "unlock-recipe"
+              }
+            ]
+          },
+          "automation-science-pack": {
+            "name": "automation-science-pack",
+            "type": "technology"
+          },
+          "kr-silicon-processing": {
+            "prerequisites": [
+              "kr-fluids-chemistry",
+              "automation-2"
+            ],
+            "type": "technology",
+            "name": "kr-silicon-processing",
+            "effects": [
+              {
+                "recipe": "kr-silicon",
+                "type": "unlock-recipe"
+              }
+            ]
+          },
+          "chemical-science-pack": {
+            "name": "chemical-science-pack",
+            "type": "technology"
+          }
+        }
+      },
+      "mods": {
+        "Krastorio2Assets": "2.1.0",
+        "fdsl": "0.5.0",
+        "space-age": "2.1.23",
+        "crushing-industry": "0.6.4",
+        "Krastorio2-spaced-out": "2.0.19",
+        "Krastorio2": "2.1.4",
+        "k2so-assets": "1.0.7",
+        "base": "2.1.23"
+      },
+      "startup": {
+        "crushing-industry-k2": {
+          "value": true
+        },
+        "crushing-industry-glass": {
+          "value": true
+        },
+        "crushing-industry-byproducts": {
+          "value": false
+        }
+      }
+    }
+  ],
+  "limits": [
+    "Minimal independent K2 host context, not a complete native game or reporter installation.",
+    "Actual CI glass/compat and FDSL modules executed directly from ZIPs. Empty sand/owner scaffolds only satisfy unrelated named calls.",
+    "Base sound/tint modules are empty presentation stubs. No native acceptance or archive extraction."
+  ],
+  "native_execution": false,
+  "exact_reporter_reproduction": false
+}

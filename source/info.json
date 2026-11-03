@@ -22,6 +22,7 @@
     "(?) pypostprocessing",
     "(?) space-exploration",
     "? space-age >= 2.1.23",
-    "? space-is-fake"
+    "? space-is-fake",
+    "? crushing-industry"
   ]
 }

@@ -140,6 +140,11 @@ class PackageTests(unittest.TestCase):
                             self.assertNotIn(dependency, dependencies[target])
                         offset = expected_dependencies.index("(?) Krastorio2-spaced-out") + 1
                         expected_dependencies[offset:offset] = muria_ordering
+                        # Consume Crushing Industry's final glass/sand and
+                        # unlock replacement before binding native rewards.
+                        crushing_ordering = "? crushing-industry"
+                        self.assertNotIn(crushing_ordering, dependencies[target])
+                        expected_dependencies.append(crushing_ordering)
                 self.assertEqual(info["factorio_version"], family)
                 self.assertEqual(info["dependencies"], expected_dependencies)
                 self.assertEqual(info["dependencies"][0], "base >= " + minimum)
