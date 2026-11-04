@@ -371,20 +371,24 @@ local function legacy_family_context(event)
     and (old == "4.7.20002" or old == "4.7.20003" or old == "4.7.21002" or old == "4.7.21003")
   local plain_base = true
   for name in pairs(active) do if name ~= "base" and name ~= MIR_MOD then plain_base = false end end
+  local f200_destination = type(active[MIR_MOD]) == "string" and active[MIR_MOD]:match("^5%.0%.200%d%d$") ~= nil
   local f210_destination = type(active[MIR_MOD]) == "string" and active[MIR_MOD]:match("^5%.0%.210%d%d$") ~= nil
   local m4_base = false
   if plain_base and (old == "4.7.20003" or old == "4.7.21003") then
     -- These published Base origins have a known five-recipe paid mask, not
-    -- today's collected output. The protected hop is exactly 2.0.77->2.1.23;
-    -- another engine patch needs its own route review, not an open-ended >=.
+    -- today's collected output. Admit their reviewed same-engine routes and
+    -- exact 2.0.77->2.1.23 hop; other engines need their own route review.
     local base_change = changes.base
+    local same_f200 = old == "4.7.20003" and f200_destination and active.base == "2.0.77"
+      and same_inputs and (base_change == nil or type(base_change) == "table"
+        and base_change.old_version == "2.0.77" and base_change.new_version == "2.0.77")
     local exact_hop = old == "4.7.20003" and type(base_change) == "table"
       and base_change.old_version == "2.0.77" and base_change.new_version == "2.1.23"
     local same_engine = old == "4.7.21003" and same_inputs and (base_change == nil
       or type(base_change) == "table" and base_change.old_version == "2.1.23" and base_change.new_version == "2.1.23")
-    m4_base = valid and f210_destination and active.base == "2.1.23"
+    m4_base = valid and (same_f200 or f210_destination and active.base == "2.1.23"
+      and (same_engine or exact_hop))
       and event.mod_startup_settings_changed == false
-      and (same_engine or exact_hop)
     for name in pairs(changes) do
       if name ~= MIR_MOD and name ~= "base" then m4_base = false end
     end
