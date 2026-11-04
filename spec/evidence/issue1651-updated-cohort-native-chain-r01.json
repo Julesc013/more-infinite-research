@@ -1,0 +1,287 @@
+{
+  "schema": 1,
+  "kind": "MIRIssue1651UpdatedCohortNativeChainV1",
+  "status": "independently-accepted-data-stage-and-named-material-prototypes-only",
+  "issue": 1651,
+  "candidate_source_commit": "f6756b90ea952b3b7a46a2452137a92661cefa7a",
+  "candidate_player_tree": "58480faa995eab995cc0a3ad2cddbbdd0e5e0c04",
+  "candidate_package": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\issue1651-current-f675-r03\\more-infinite-research_5.0.21002.zip",
+    "bytes": 785058,
+    "sha256": "FAC8C68ADC35F44204983D751FC8DD1016C2503D0ECB08CD8C0BC68C6BDDA724"
+  },
+  "harness_source_commit": "fa8aae3eeff46caa2ae679712c3e53d01684506d",
+  "engine": {
+    "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "bytes": 49373136,
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "engine_version": "2.1.23",
+  "settings_mode": "Defaults",
+  "published_release_bytes_unchanged": true,
+  "published_comparison": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.2\\more-infinite-research_5.0.21002.zip",
+    "bytes": 775201,
+    "sha256": "B9215107B4E4F3A472DE718C2FA5572BD6A0734D710D986BB0A65B6F472BEC3F"
+  },
+  "small_selection": {
+    "upstream_names": 14,
+    "MIR_names": 15,
+    "profile_sha256": "9E4F455377A56B87FBE84BC02E13EEC5EA6D4CFF5CB15217D69AFB86E1747AAF",
+    "reporter_names_supplied": 564,
+    "reporter_versions_settings_unknown": true,
+    "exact_reporter_reconstruction": false
+  },
+  "updated_official_inputs": [
+    {
+      "name": "crushing-industry_0.6.9.zip",
+      "bytes": 8831980,
+      "sha1": "62b6dd33a82ad57430bf08545011b8f781cd4019",
+      "sha256": "262C7BBBBA443F040D49B4223B059877EA455A62E1AE98B1D0BAD58DB448A0FE",
+      "zip_members": 121,
+      "full_crc": true,
+      "official_download": "/download/crushing-industry/6ad06bfd835338305b984a16"
+    },
+    {
+      "name": "fdsl_0.5.5.zip",
+      "bytes": 53737,
+      "sha1": "194780c8ea0a08f02b8d948d79a5b3ed9ba59f36",
+      "sha256": "771169EC4DB68393074CEDE5480EFA618F61D223596CA111DEB9E0996684AAB7",
+      "zip_members": 14,
+      "full_crc": true,
+      "official_download": "/download/fdsl/6ae8c92f1f9199fcc5cd703c"
+    }
+  ],
+  "manifest_sha256": "754803718773EEECE0A9E866736D6CA0F1C33B42ACD9C8F44CE49DD63A5B4D9A",
+  "caller_sha256": "98108C6E5C5A324D849B6C9D4971CD6B884D210CB157C78B20B17739B6E01174",
+  "arms": {
+    "upstream": {
+      "result": {
+        "path": "D:\\Projects\\Factorio\\mir5-cap-current-fa8-r01\\build\\tmp\\issue1651-startup-comparison-r03\\native\\upstream\\result.json",
+        "bytes": 20690,
+        "sha256": "ABC88E4A684C2DC1F95258A77169B5FCA2C3466C3208895C15431C6089535EAF"
+      },
+      "pid": 31636,
+      "resource_rows": 6,
+      "natural_exit": 0,
+      "timeout": false,
+      "observer_selection": [
+        "Krastorio2-spaced-out@2.0.19",
+        "Krastorio2@2.1.4",
+        "Krastorio2Assets@2.1.0",
+        "Krastorio2MenuSimulations@2.1.0",
+        "base@2.1.23",
+        "crushing-industry@0.6.9",
+        "elevated-rails@2.1.23",
+        "fdsl@0.5.5",
+        "flib@0.17.2",
+        "k2so-assets@1.0.7",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23"
+      ],
+      "prior_mir_archives": 17
+    },
+    "published502": {
+      "result": {
+        "path": "D:\\Projects\\Factorio\\mir5-cap-current-fa8-r01\\build\\tmp\\issue1651-startup-comparison-r03\\native\\published502\\result.json",
+        "bytes": 17523,
+        "sha256": "363C8BEA11BA3E552DFB166C33AE22AE159C44E047CF23D85D3C6ECA812E4543"
+      },
+      "pid": 4008,
+      "resource_rows": 4,
+      "natural_exit": 1,
+      "timeout": false,
+      "observer_selection": [
+        "Krastorio2-spaced-out@2.0.19",
+        "Krastorio2@2.1.4",
+        "Krastorio2Assets@2.1.0",
+        "Krastorio2MenuSimulations@2.1.0",
+        "base@2.1.23",
+        "crushing-industry@0.6.9",
+        "elevated-rails@2.1.23",
+        "fdsl@0.5.5",
+        "flib@0.17.2",
+        "k2so-assets@1.0.7",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@5.0.21002",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23"
+      ],
+      "prior_mir_archives": 17
+    },
+    "corrected": {
+      "result": {
+        "path": "D:\\Projects\\Factorio\\mir5-cap-current-fa8-r01\\build\\tmp\\issue1651-startup-comparison-r03\\native\\corrected\\result.json",
+        "bytes": 21854,
+        "sha256": "12C5FFD9CA1D39EE574061AF734903F3F451BCD728C576ABCDE34DDF4666FA79"
+      },
+      "pid": 26708,
+      "resource_rows": 6,
+      "natural_exit": 0,
+      "timeout": false,
+      "observer_selection": [
+        "Krastorio2-spaced-out@2.0.19",
+        "Krastorio2@2.1.4",
+        "Krastorio2Assets@2.1.0",
+        "Krastorio2MenuSimulations@2.1.0",
+        "base@2.1.23",
+        "crushing-industry@0.6.9",
+        "elevated-rails@2.1.23",
+        "fdsl@0.5.5",
+        "flib@0.17.2",
+        "k2so-assets@1.0.7",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@5.0.21002",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23"
+      ],
+      "prior_mir_archives": 17
+    }
+  },
+  "predeclared_intent": {
+    "ref": "4b138ceabb70ff0ef6fde83e13eb32dc9446dee7",
+    "path": "evidence/issue1651-updated-input-complete-packet-r03/readback-intent.json",
+    "sha256": "012604F3962E15019ED3D025C2B33F795C67B318DC0229389B7213313AB98E36"
+  },
+  "native_readback": {
+    "foreign_recipe_full_objects_equal": 5,
+    "foreign_owner_full_objects_equal": 4,
+    "foreign_object_names": {
+      "recipe": [
+        "kr-rare-metals",
+        "kr-rare-metals-from-enriched-rare-metals",
+        "kr-silicon",
+        "kr-glass",
+        "glass"
+      ],
+      "technology": [
+        "kr-rare-metal-processing",
+        "kr-enriched-ores",
+        "kr-silicon-processing",
+        "kr-stone-processing"
+      ]
+    },
+    "common_upstream_setting_rows_equal": 26,
+    "glass_technology": {
+      "name": "recipe-prod-research_material_glass-1",
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "kr-glass",
+          "change": 0.02
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "glass",
+          "change": 0.02
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "kr-stone-processing"
+      ],
+      "science": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack"
+      ],
+      "level": 1,
+      "max_level": 3,
+      "count_formula": "200*2^(L-1)",
+      "time": 30
+    },
+    "ordinary_route_rows": {
+      "kr-glass": {
+        "ingredients": [
+          {
+            "type": "item",
+            "name": "sand",
+            "amount": 16
+          }
+        ],
+        "results": [
+          {
+            "type": "item",
+            "name": "glass",
+            "amount": 8
+          }
+        ]
+      },
+      "glass": {
+        "ingredients": [
+          {
+            "type": "item",
+            "name": "sand",
+            "amount": 5
+          }
+        ],
+        "results": [
+          {
+            "type": "item",
+            "name": "glass",
+            "amount": 2
+          }
+        ]
+      }
+    },
+    "root_reader_opponents_rejected": 9,
+    "root_readback_sha256": "24243F44D292D832EB903E5699333A26F9C5EE29CCFDB17987BAF051D2173D8D"
+  },
+  "independent_actual_review": {
+    "repository": "Julesc013/mir-native-worker",
+    "ref": "731b3dac44f6332d5485454bebb40f0fa453bad1",
+    "path": "evidence/aero-issue1651-native-r03-actual-review-r01/glass-r03-actual-parent-review-r01.json",
+    "sha256": "C6149C24DA24EA972D6727078B884538A997B8BBBFFA266ABD5A6E5D009CC2AC",
+    "status": "ACCEPT-exact-data-stage-and-named-material-prototypes-only",
+    "independent_projection_opponents_rejected": 9
+  },
+  "raw_custody": {
+    "repository": "Julesc013/mir-native-worker",
+    "ref": "1f7838cd71374ecfcec61ef93ba21aeb7d80dacc",
+    "path": "evidence/issue1651-updated-input-native-r03",
+    "original_records": 49,
+    "native_files": 26,
+    "native_bytes": 70387126,
+    "gzip_bytes": 6753858,
+    "gzip_sha256": "9CC07580EFBEDCEA2BFC017451EA8201D5D5B60A8406BFB48E4D7B643128A47B",
+    "decoded_bytes": 93989893,
+    "decoded_sha256": "624B6741268274996B2877C6E7FE99ABE7E14518292E7FF9E8A5C2C2857C7B8A",
+    "actual_remote_and_all_member_readback": true
+  },
+  "restoration": {
+    "bound_inputs_unchanged": 54,
+    "original_controls_restored": 2,
+    "prior_MIR_archives_restored": 17,
+    "native_machine_receipts_independently_reviewed": true,
+    "independent_Aero_D_filesystem_rehash_claimed": false
+  },
+  "prior_adverse": {
+    "result_sha256": "6D01F0C32A00C38FE0872BBE18FE85E9A5B02A2D0281DCB00DEB472462B23722",
+    "crushing_industry_version": "0.6.4",
+    "fdsl_version": "0.5.0",
+    "outcome": "No-MIR natural exit1 on removed ItemPrototype.fuel_category; both MIR arms remained unstarted.",
+    "original_failure_retained": true
+  },
+  "claims": {
+    "reported_guard_reproduced": true,
+    "corrected_native_data_load": true,
+    "named_material_data_and_foreign_prototypes": true,
+    "useful_research": false,
+    "earned_state_upgrade": false,
+    "performance": false,
+    "client_multiplayer": false,
+    "release_qualification": false
+  },
+  "limits": [
+    "Default14/15-name reduction only; not the full564-name installation.",
+    "Exact source/package/harness identities remain original; current807ee has equal player58480 but is not relabelled as this native source.",
+    "No old paid/new replacement entitlement, save upgrade, useful gameplay, performance, clients or release verdict follows from this data-stage record.",
+    "The distinct fresh accelerated material case has its own exact identity and limits."
+  ]
+}
