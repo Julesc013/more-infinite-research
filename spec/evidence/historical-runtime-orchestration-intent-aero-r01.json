@@ -1,0 +1,507 @@
+{
+  "kind": "MIRHistoricalRuntimeOrchestrationIntentReview",
+  "reviewed_on": "2026-11-05",
+  "subjects": [
+    "CONT-03",
+    "CONT-07",
+    "CONT-08",
+    "CONT-09",
+    "CONT-10",
+    "CONT-11",
+    "CONT-14",
+    "VER-07"
+  ],
+  "reviewed_against": "e56f4590c4a13328d3f875c7ce75b82dd0e25154",
+  "scope": "Five exact historical runtime orchestration paths,17 deduplicated complete Git bodies and115 retained tag/path bindings across83 indexed names. This reviews dispatcher composition and its guards, not all imported feature implementations or original native executions.",
+  "method": "Read three complete bases and all fourteen complete reconstructing diffs; authenticate every original blob and actual remote tag bindings. Recover expectations from original code before current output. Run focused failing/passing controls with pinned Lua5.2; do not run or restore the retired dispatcher.",
+  "paths": [
+    "control/scripted-techs.lua",
+    "prototypes/mir/runtime/scripted_techs.lua",
+    "source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
+    "source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
+    "source/adapters/runtime-capabilities/disabled-scripted-techs.lua"
+  ],
+  "selected_tag_inventory": 91,
+  "selected_tag_names": 83,
+  "selected_blob_count": 17,
+  "selected_body_bytes": 49591,
+  "retained_bindings": 115,
+  "live_tag_bindings": 111,
+  "local_aliases": [
+    {
+      "indexed_tag": "v3.0.0",
+      "indexed_commit": "70bb513f5b388ad23c4a5d46dfc945571c3b8217",
+      "path": "prototypes/mir/runtime/scripted_techs.lua",
+      "remote_named_commit": null,
+      "canonical_published_tag": null,
+      "git_blob": "c091cb07cffab9d603a4535f23fd268969aba879"
+    },
+    {
+      "indexed_tag": "v4.2.0",
+      "indexed_commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+      "path": "source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
+      "remote_named_commit": null,
+      "canonical_published_tag": "v4.2.0-stable",
+      "git_blob": "680d3665921ce2e1ec7aaf948717b81934524849"
+    },
+    {
+      "indexed_tag": "v4.2.0",
+      "indexed_commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+      "path": "source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
+      "remote_named_commit": null,
+      "canonical_published_tag": "v4.2.0-stable",
+      "git_blob": "449e841b47a5f996cf7883bb2c9a982fc7ad248a"
+    },
+    {
+      "indexed_tag": "v4.2.0",
+      "indexed_commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+      "path": "source/adapters/runtime-capabilities/disabled-scripted-techs.lua",
+      "remote_named_commit": null,
+      "canonical_published_tag": "v4.2.0-stable",
+      "git_blob": "208bcc0f296dcc8c0da18bbfeb2878b256f4721d"
+    }
+  ],
+  "sources": [
+    {
+      "blob": "09d7a0c0c1cbd46b764022517d2794d76a66e3db",
+      "bytes": 2536,
+      "sha256": "796EEACD4E50D575520EA4DBDE1E1F55E61618858B962DAE588FE6E3AFAC2E8C",
+      "paths": [
+        "prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "references": [
+        "2.5.0:prototypes/mir/runtime/scripted_techs.lua",
+        "2.5.5:prototypes/mir/runtime/scripted_techs.lua",
+        "2.5.9:prototypes/mir/runtime/scripted_techs.lua",
+        "3.2.0:prototypes/mir/runtime/scripted_techs.lua",
+        "3.2.1:prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "disposition": "consolidate-named-event-and-lifecycle-obligations"
+    },
+    {
+      "blob": "17da4e0ae16ba52d8688656826b3746ac23d969a",
+      "bytes": 2659,
+      "sha256": "5713D5C4BB57B106B35F81BF30F713303F33717532A32E3160981966B8EF2848",
+      "paths": [
+        "prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "references": [
+        "3.2.2:prototypes/mir/runtime/scripted_techs.lua",
+        "3.2.3:prototypes/mir/runtime/scripted_techs.lua",
+        "3.2.5:prototypes/mir/runtime/scripted_techs.lua",
+        "3.2.9:prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "disposition": "consolidate-named-event-and-lifecycle-obligations"
+    },
+    {
+      "blob": "208bcc0f296dcc8c0da18bbfeb2878b256f4721d",
+      "bytes": 400,
+      "sha256": "18477C06CD8FB884DC0369133854989178283E3BE8FBB20C3BF0EA2534657109",
+      "paths": [
+        "source/adapters/runtime-capabilities/disabled-scripted-techs.lua"
+      ],
+      "references": [
+        "v4.2.0:source/adapters/runtime-capabilities/disabled-scripted-techs.lua",
+        "v4.2.0-stable:source/adapters/runtime-capabilities/disabled-scripted-techs.lua",
+        "v4.2.1:source/adapters/runtime-capabilities/disabled-scripted-techs.lua",
+        "v4.2.2:source/adapters/runtime-capabilities/disabled-scripted-techs.lua",
+        "v4.3.0:source/adapters/runtime-capabilities/disabled-scripted-techs.lua",
+        "v4.4.0:source/adapters/runtime-capabilities/disabled-scripted-techs.lua",
+        "v4.4.1:source/adapters/runtime-capabilities/disabled-scripted-techs.lua",
+        "v4.4.2:source/adapters/runtime-capabilities/disabled-scripted-techs.lua",
+        "v4.5.0:source/adapters/runtime-capabilities/disabled-scripted-techs.lua",
+        "v4.5.1:source/adapters/runtime-capabilities/disabled-scripted-techs.lua",
+        "v4.5.2:source/adapters/runtime-capabilities/disabled-scripted-techs.lua",
+        "v4.6.0:source/adapters/runtime-capabilities/disabled-scripted-techs.lua",
+        "v4.7.0:source/adapters/runtime-capabilities/disabled-scripted-techs.lua",
+        "v4.7.1:source/adapters/runtime-capabilities/disabled-scripted-techs.lua",
+        "v4.7.2:source/adapters/runtime-capabilities/disabled-scripted-techs.lua",
+        "v4.7.3:source/adapters/runtime-capabilities/disabled-scripted-techs.lua"
+      ],
+      "disposition": "retire-exact-disabled-shim-retain-target-subset"
+    },
+    {
+      "blob": "2b5aeaea706785bf80c3c8279128c808e85ee742",
+      "bytes": 3161,
+      "sha256": "964849B4BCBE567E1165E943C26FED1B82840F160629E4613AE2DFF2F38A6A0F",
+      "paths": [
+        "prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "references": [
+        "3.2.10:prototypes/mir/runtime/scripted_techs.lua",
+        "3.2.11:prototypes/mir/runtime/scripted_techs.lua",
+        "v4.0.0:prototypes/mir/runtime/scripted_techs.lua",
+        "v4.1.0:prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "disposition": "consolidate-named-event-and-lifecycle-obligations"
+    },
+    {
+      "blob": "2c6ddfc8ddc5ca7e51c0f8ba16b1e64786fbaf2e",
+      "bytes": 3743,
+      "sha256": "E3968B0627DCFBC14F5B94D66CD5EB9C9094985E2F9CB0736F49F22E2606FE22",
+      "paths": [
+        "source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "references": [
+        "v4.4.2:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.5.0:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.5.1:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.5.2:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.6.0:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.7.0:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.7.1:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.7.2:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.7.3:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "disposition": "consolidate-named-event-and-lifecycle-obligations"
+    },
+    {
+      "blob": "449e841b47a5f996cf7883bb2c9a982fc7ad248a",
+      "bytes": 3618,
+      "sha256": "B2AE0CF5899AF011C22CD369745E04D466317BF886C6A381ABD40223A5BE3F51",
+      "paths": [
+        "source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "references": [
+        "v4.2.0:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.2.0-stable:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.2.1:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "disposition": "consolidate-named-event-and-lifecycle-obligations"
+    },
+    {
+      "blob": "5953af9af32489ac67313226fbfb9a222f2d6101",
+      "bytes": 4020,
+      "sha256": "A6707469B87F253252CE1BD11B24B6AAFF3D0B80BD5EF35DA433D8610C1669EE",
+      "paths": [
+        "source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "references": [
+        "v4.3.0:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.4.0:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.4.1:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "disposition": "consolidate-named-event-and-lifecycle-obligations"
+    },
+    {
+      "blob": "680d3665921ce2e1ec7aaf948717b81934524849",
+      "bytes": 3495,
+      "sha256": "C749D362FB627D4C5C4860575EDA5327995D162834C135E4FA53D5A8B0857FBF",
+      "paths": [
+        "source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "references": [
+        "v4.2.0:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.2.0-stable:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.2.1:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "disposition": "consolidate-named-event-and-lifecycle-obligations"
+    },
+    {
+      "blob": "6b4454c1093e5e54289f9d37cf086be834b26d70",
+      "bytes": 3038,
+      "sha256": "9D13EB146360FC896D06315EC066B637BA2EA4DC7D32CCE35E3192224B42A9A9",
+      "paths": [
+        "prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "references": [
+        "2.5.10:prototypes/mir/runtime/scripted_techs.lua",
+        "2.5.11:prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "disposition": "consolidate-named-event-and-lifecycle-obligations"
+    },
+    {
+      "blob": "9e5558df07db232dea0c59bda5da3e3f1840e328",
+      "bytes": 2534,
+      "sha256": "27B6EC3183F9F36158D214A32C3CEF7C3F9DB70C71FA6A3A7BF4FCEE0903BA1C",
+      "paths": [
+        "prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "references": [
+        "0.10.0:prototypes/mir/runtime/scripted_techs.lua",
+        "0.11.0:prototypes/mir/runtime/scripted_techs.lua",
+        "0.12.0:prototypes/mir/runtime/scripted_techs.lua",
+        "0.6.0:prototypes/mir/runtime/scripted_techs.lua",
+        "0.7.0:prototypes/mir/runtime/scripted_techs.lua",
+        "0.8.0:prototypes/mir/runtime/scripted_techs.lua",
+        "0.9.0:prototypes/mir/runtime/scripted_techs.lua",
+        "1.8.2:prototypes/mir/runtime/scripted_techs.lua",
+        "1.8.5:prototypes/mir/runtime/scripted_techs.lua",
+        "1.8.9:prototypes/mir/runtime/scripted_techs.lua",
+        "1.9.4:prototypes/mir/runtime/scripted_techs.lua",
+        "1.9.5:prototypes/mir/runtime/scripted_techs.lua",
+        "1.9.9:prototypes/mir/runtime/scripted_techs.lua",
+        "2.4.0:prototypes/mir/runtime/scripted_techs.lua",
+        "2.4.5:prototypes/mir/runtime/scripted_techs.lua",
+        "2.4.9:prototypes/mir/runtime/scripted_techs.lua",
+        "3.1.0:prototypes/mir/runtime/scripted_techs.lua",
+        "3.1.1:prototypes/mir/runtime/scripted_techs.lua",
+        "3.1.2:prototypes/mir/runtime/scripted_techs.lua",
+        "3.1.5:prototypes/mir/runtime/scripted_techs.lua",
+        "3.1.9:prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "disposition": "consolidate-named-event-and-lifecycle-obligations"
+    },
+    {
+      "blob": "ab8eeec2de387f80440206c809ceae8d46da65c2",
+      "bytes": 2089,
+      "sha256": "2EB97EBC063F8D26BD37F842D63F84F7DFA11BB14EFAF065D9E62C943CE134A0",
+      "paths": [
+        "control/scripted-techs.lua"
+      ],
+      "references": [
+        "1.9.0:control/scripted-techs.lua",
+        "2.0.5:control/scripted-techs.lua"
+      ],
+      "disposition": "consolidate-named-event-and-lifecycle-obligations"
+    },
+    {
+      "blob": "b004fc69b5c86b5175cf75fa4b958ebaaa5779d5",
+      "bytes": 2206,
+      "sha256": "A8F2888551C77FABA6DAA1F6CCBAB88912BF1AE44660D10363738B2943058233",
+      "paths": [
+        "control/scripted-techs.lua"
+      ],
+      "references": [
+        "1.9.1:control/scripted-techs.lua",
+        "1.9.2:control/scripted-techs.lua",
+        "2.1.0:control/scripted-techs.lua",
+        "2.1.5:control/scripted-techs.lua",
+        "2.2.0:control/scripted-techs.lua"
+      ],
+      "disposition": "consolidate-named-event-and-lifecycle-obligations"
+    },
+    {
+      "blob": "c091cb07cffab9d603a4535f23fd268969aba879",
+      "bytes": 2306,
+      "sha256": "A3527F86537A19D30260D96196D4897655010270D27BD505F4F6646A7902E3F8",
+      "paths": [
+        "prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "references": [
+        "2.3.0:prototypes/mir/runtime/scripted_techs.lua",
+        "3.0.0:prototypes/mir/runtime/scripted_techs.lua",
+        "v3.0.0:prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "disposition": "consolidate-named-event-and-lifecycle-obligations"
+    },
+    {
+      "blob": "c441a455c688f6ceddac9d38e86eb5ffbc129df5",
+      "bytes": 2282,
+      "sha256": "0803100DFAEC6CD6DA305D45D3E16EA76D68448BAAE24195CDD9B45DEA555C04",
+      "paths": [
+        "prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "references": [
+        "1.3.0:prototypes/mir/runtime/scripted_techs.lua",
+        "1.3.5:prototypes/mir/runtime/scripted_techs.lua",
+        "1.3.9:prototypes/mir/runtime/scripted_techs.lua",
+        "1.4.0:prototypes/mir/runtime/scripted_techs.lua",
+        "1.4.5:prototypes/mir/runtime/scripted_techs.lua",
+        "1.4.9:prototypes/mir/runtime/scripted_techs.lua",
+        "1.5.0:prototypes/mir/runtime/scripted_techs.lua",
+        "1.5.5:prototypes/mir/runtime/scripted_techs.lua",
+        "1.5.9:prototypes/mir/runtime/scripted_techs.lua",
+        "1.6.0:prototypes/mir/runtime/scripted_techs.lua",
+        "1.6.5:prototypes/mir/runtime/scripted_techs.lua",
+        "1.6.9:prototypes/mir/runtime/scripted_techs.lua",
+        "1.7.0:prototypes/mir/runtime/scripted_techs.lua",
+        "1.7.1:prototypes/mir/runtime/scripted_techs.lua",
+        "1.7.5:prototypes/mir/runtime/scripted_techs.lua",
+        "1.7.9:prototypes/mir/runtime/scripted_techs.lua",
+        "1.8.0:prototypes/mir/runtime/scripted_techs.lua",
+        "1.8.1:prototypes/mir/runtime/scripted_techs.lua",
+        "1.9.3:prototypes/mir/runtime/scripted_techs.lua",
+        "2.3.5:prototypes/mir/runtime/scripted_techs.lua",
+        "3.0.5:prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "disposition": "consolidate-named-event-and-lifecycle-obligations"
+    },
+    {
+      "blob": "e67b92f3060594a0a3b52be77ddb718e680a1a3d",
+      "bytes": 3742,
+      "sha256": "B74AF45D6F69F9E7C9B77C22C7AEE546103D62D05E122CF32C211E300E0D3B03",
+      "paths": [
+        "source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "references": [
+        "v4.2.2:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "disposition": "consolidate-named-event-and-lifecycle-obligations"
+    },
+    {
+      "blob": "f1020959c1b1d861ff4a07437a1ea01da0460253",
+      "bytes": 3865,
+      "sha256": "E4812434404D3213079B7D21EC5006ECA3C766E90111AA2A344E74932B780559",
+      "paths": [
+        "source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "references": [
+        "v4.2.2:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.4.2:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.5.0:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.5.1:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.5.2:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.6.0:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.7.0:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.7.1:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.7.2:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.7.3:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "disposition": "consolidate-named-event-and-lifecycle-obligations"
+    },
+    {
+      "blob": "f6c159299cffc27af27e4d08b843394c8ea83466",
+      "bytes": 3897,
+      "sha256": "27D5630DC888DE6C2A6940AA875EF9E9FA861AF216FC840C725AEAEB5F18D389",
+      "paths": [
+        "source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "references": [
+        "v4.3.0:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.4.0:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
+        "v4.4.1:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua"
+      ],
+      "disposition": "consolidate-named-event-and-lifecycle-obligations"
+    }
+  ],
+  "groups": [
+    {
+      "id": "research-event-validity-and-routing",
+      "disposition": "port-recovered-guard",
+      "independent_expectation": "All sixteen active historical bodies reject missing/invalid research before feature dispatch. Named technology filters and later generic cap callbacks retain valid finished/reversed/queued routing; cancellation arrays are a separate modern API shape.",
+      "implementation": [
+        "source/runtime/bootstrap.lua"
+      ],
+      "controls": [
+        "tests/test_bootstrap.py::test_missing_or_invalid_research_does_not_enter_runtime_consumers",
+        "tests/test_bootstrap.py::test_queued_research_guard_preserves_valid_library_and_discovery_dispatch",
+        "tests/test_bootstrap.py::test_control_composes_lifecycle_library_api_legacy_interface_and_command",
+        "tests/test_bootstrap.py::test_only_pending_private_work_binds_completion_and_cancellation"
+      ],
+      "actual_change": "The new tripwire first fails on research.name access in the unguarded completion callback. Extended controls also expose started/queued routing. Restore missing/invalid guards for finished/reversed/started/queued before any consumer. The queued wrapper keeps the existing Library and optional DiscoveryTree paths and subscription condition. Cancellation handling is unchanged.",
+      "remaining": "Native engine/client invocation of these invalid-handle cases is unverified; no community crash or engine cause is attributed. Root reviews consumed-input applicability and affected final-candidate lifecycle checks."
+    },
+    {
+      "id": "force-and-effect-lifecycle",
+      "disposition": "consolidate-existing-named-owners",
+      "independent_expectation": "Later historical orchestration adds force creation, force merge and then force reset alongside effects reset and planted-seed handling. Each active feature must retain its required events independently of unrelated caps or closed Library views.",
+      "implementation": [
+        "source/runtime/bootstrap.lua",
+        "source/runtime/lifecycle.lua",
+        "source/runtime/scripted_effects.lua",
+        "source/runtime/native_credits.lua"
+      ],
+      "controls": [
+        "tests/test_bootstrap.py::test_unlimited_scripted_effects_register_and_route_force_lifecycle_events",
+        "tests/test_bootstrap.py::test_native_credit_lifecycle_survives_provider_absence_without_research_callbacks",
+        "tests/test_scripted_effects_lifecycle.py"
+      ],
+      "remaining": "Registration intent does not qualify the imported feature bodies or native force/reset/merge semantics. Existing paid-state components retain original identities; next weapon/Galore transitions and stable applicability remain open."
+    },
+    {
+      "id": "parse-load-and-target-subsets",
+      "disposition": "retain-lifetime-and-capabilities-retire-dispatcher-layout",
+      "independent_expectation": "Modules are imported while control parses; later adapters register repair/Library and reconnect only their local work on load. Positive target requirements and a disabled Factorio1 shim restrict unavailable functionality; the exact requires_features table or disabled error string is not a new public API.",
+      "implementation": [
+        "source/runtime/bootstrap.lua",
+        "source/runtime/scripted_effects.lua",
+        "source/adapters/reduced/control.lua",
+        "source/platform/target.lua"
+      ],
+      "controls": [
+        "tests/test_bootstrap.py::test_bootstrap_has_no_late_module_loading_or_unconditional_tick_dispatch",
+        "tests/test_bootstrap.py::test_repair_load_reconnects_without_save_writes_or_game_access_and_disable_clears",
+        "tests/test_bootstrap.py::test_settled_native_only_world_has_no_periodic_work_after_view_cycles_and_reload",
+        "tests/test_target_adapters.py::test_reduced_adapters_contain_no_library_or_event_maintenance"
+      ],
+      "remaining": "Do not restore the old feature-array dispatcher, unconditional empty scripted_techs allocation or disabled shim. Keep saved historical/foreign fields. Actual joining-client, save and target-native acceptance remain separate."
+    },
+    {
+      "id": "settings-diagnostics-and-private-feature-imports",
+      "disposition": "consolidate-useful-boundaries-retain-imported-body-gaps",
+      "independent_expectation": "Earlier debug reads evolve from raw startup to effective/startup settings, preserving explicit boolean opt-in. Orchestration membership alone does not establish the behavior of productivity adoption, maximum caps, discovery recovery, compiler notices, repair or the browser.",
+      "implementation": [
+        "source/runtime/configuration.lua",
+        "source/runtime/scripted_effects.lua",
+        "source/runtime/passive_repair.lua",
+        "source/runtime/library.lua",
+        "spec/inventory/continuity.json"
+      ],
+      "controls": [
+        "tests/test_bootstrap.py::test_diagnostic_headers_run_only_on_init_and_configuration"
+      ],
+      "remaining": "Reuse the bounded settings/state, effect, cap and discovery-consumer reconciliations at their actual scopes. Compiler-profile notice and other imported helper semantics not previously mapped remain unresolved; this pass does not retire them merely because the dispatcher is replaced. Native diagnostics, output and performance keep separate verdicts."
+    }
+  ],
+  "official_reference": {
+    "url": "https://lua-api.factorio.com/latest/classes/LuaTechnology.html#valid",
+    "observed_documentation_version": "2.1.24",
+    "observed_on": "2026-11-05",
+    "scope": "Official validity guidance corroborates the original guard; this is not execution on that engine. Exact2.1.23 documentation URL was unavailable."
+  },
+  "host_validation": {
+    "plan": "tests/Test-MIR5HostControls.ps1 -Plan materialized as JSON",
+    "lua_backend": "lupa.lua52",
+    "pinned_backend_sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899",
+    "current_focused_tests": 41,
+    "selected_controls": [
+      "tests/test_bootstrap.py",
+      "tests/test_scripted_effects_lifecycle.py",
+      "tests/test_discovery_tree_compatibility.py"
+    ],
+    "logs": [
+      {
+        "name": "bootstrap-before-fix",
+        "tests": 27,
+        "passed": false,
+        "sha256": "6B012329AAE4742715DEF9C4A7DF84F5AC1356569086AFFED6AE038E2011981C"
+      },
+      {
+        "name": "bootstrap-extended-before-fix",
+        "tests": 28,
+        "passed": false,
+        "sha256": "58D74FABE9A2C48B82D89DBD2F0E9FD92894B896D9E8863F4A8AD6D01135B1C0"
+      },
+      {
+        "name": "bootstrap-final",
+        "tests": 28,
+        "passed": false,
+        "sha256": "813502929ADA903046323CB6F0BA8836AD1160378F8D186942B1CB047AD97957"
+      },
+      {
+        "name": "bootstrap-final-r02",
+        "tests": 28,
+        "passed": true,
+        "sha256": "33B5EAC04824A06702076843AA794AE1301654AB787D79767F003D50C5D2DED4"
+      },
+      {
+        "name": "scripted-effects",
+        "tests": 4,
+        "passed": true,
+        "sha256": "B3899116717C888AF694F61D1457D8BAD6B9B76D7A58E56F14649A27CEB28BC9"
+      },
+      {
+        "name": "discovery-tree",
+        "tests": 9,
+        "passed": true,
+        "sha256": "6165B308272ACB17B112DDCEE7745CACA5AE795DF9222A5549B8162F74E67814"
+      }
+    ],
+    "adverse_disposition": "Original guard failures remain failed. The first full queued control then exposed a missing DiscoveryTree setter in the isolated Library double; add that existing hook only, then all28 bootstrap controls pass. No production source guard or oracle was weakened.",
+    "native_execution": false,
+    "old_dispatcher_executed": false
+  },
+  "custody": {
+    "primary": "build/qualification/aero-current-review-custody-r01/runtime-orchestration-intent-r01-*",
+    "index_sha256": "9DF15CCF15DDC515F3C432FE8ECC6CC4CEDBDE1623EC16CAF58AF5E2C03699A4",
+    "gzip_sha256": "D23E54DC54FDCC423DB53837490CEAE5AAD81DF9DD0CEF489E55DEB2D5A6C53D",
+    "decoded_sha256": "94E7BDEC6FA90B9B2AF36F99AC7CCCE83DB170D244ACEEA4B774F7FFFAB0DE68",
+    "remote_tag_readback_sha256": "362E66E287DCE206AEE4D74884796B92DA56011F89E1F8D3EA0482CCE5055A6A"
+  },
+  "source_reconciliation_complete": false,
+  "test_intent_reconciliation_complete": false,
+  "native_execution": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}

@@ -154,6 +154,7 @@ class BootstrapTests(unittest.TestCase):
               module.native_refresh_ticks = 1
               module.native_subscription_needs = function() return false, false end
               module.set_cap_provider = function(provider) library_calls.provider = provider end
+              module.set_discovery_visibility_provider = function(provider) library_calls.visibility_provider = provider end
               module.subscription_needs = function() return library_pending == true end
               module.open = function(player, options)
                 library_calls.open = {player = player, options = options}
@@ -372,6 +373,72 @@ class BootstrapTests(unittest.TestCase):
           player.force = original_force
           commands.registered["mir-research"].callback({player_index = 1})
           assert(library_calls.open.player == player and library_calls.open.options == nil)
+        ''')
+
+    def test_missing_or_invalid_research_does_not_enter_runtime_consumers(self):
+        self.lua.execute('''
+          install_modules(true, false, true, true)
+          install_runtime(nil, {['space-age'] = '2.1.23'})
+          load_control()
+          local entered = 0
+          local function invalid_dispatch(event)
+            entered = entered + 1
+            -- A real invalid LuaTechnology permits valid, but accessing its
+            -- other properties can fail. The original dispatcher rejected it
+            -- before any feature callback; consumers must never be entered.
+            if event and event.research then return event.research.name end
+          end
+          for _, name in ipairs({'runtime.lifecycle', 'runtime.scripted_effects',
+              'runtime.native_credits'}) do
+            local module = package.loaded[name]
+            module.on_research_finished = invalid_dispatch
+            module.on_research_reversed = invalid_dispatch
+            module.on_research_started = invalid_dispatch
+          end
+          local invalid = setmetatable({valid = false}, {
+            __index = function(_, key) error('invalid research property: ' .. key) end
+          })
+          for _, id in ipairs({4, 19, 5}) do
+            local callback = assert(handlers.events[id])
+            callback(nil)
+            callback({})
+            callback({research = invalid})
+          end
+          assert(entered == 0, 'missing/invalid research reached a runtime consumer')
+        ''')
+
+    def test_queued_research_guard_preserves_valid_library_and_discovery_dispatch(self):
+        self.lua.execute('''
+          for _, discovery in ipairs({false, true}) do
+            install_modules(true)
+            install_runtime(nil, discovery and {discovery_tree = '1.0.12'} or {})
+            defines.events.on_research_queued = 25
+            load_control()
+            local browser = require('runtime.library')
+            browser.native_subscription_needs = function() return true, false end
+            local queued = 0
+            browser.on_native_state_changed = function(event)
+              assert(event.research == known_technology)
+              queued = queued + 1
+            end
+            local discovered = 0
+            require('runtime.lifecycle').on_discovery_tree_queue_changed = function(event)
+              assert(event.research == known_technology)
+              discovered = discovered + 1
+            end
+            handlers.init()
+            local invalid = setmetatable({valid = false}, {
+              __index = function(_, key) error('invalid queued research property: ' .. key) end
+            })
+            local callback = assert(handlers.events[25])
+            callback(nil)
+            callback({})
+            callback({research = invalid})
+            assert(queued == 0 and discovered == 0)
+            callback({research = known_technology})
+            assert(queued == 1 and discovered == (discovery and 1 or 0),
+              'valid queued research lost its existing view/discovery route')
+          end
         ''')
 
     def test_report_checkbox_event_has_one_bootstrap_registration_owner(self):
