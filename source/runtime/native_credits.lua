@@ -57,7 +57,9 @@ for _, row in ipairs(DESCRIPTORS) do
 end
 local SIF_RECIPES = next(COLLECTED_BY_MAIN) ~= nil
   and definitions.published_sif_paid_recipe_sets() or nil
-local BETA_BASE_RECIPES = next(COLLECTED_BY_MAIN) ~= nil
+-- The exact published MIR4 Base origins below share this five-recipe vector
+-- with the published Base betas (independent modern-f200/f210-470 captures).
+local PUBLISHED_BASE_RECIPES = next(COLLECTED_BY_MAIN) ~= nil
   and require("research.native_credit_contracts").published_beta_base_paid_recipe_sets() or nil
 local pending_active = false
 
@@ -367,6 +369,29 @@ local function legacy_family_context(event)
   end
   local unchanged = same_inputs
     and (old == "4.7.20002" or old == "4.7.20003" or old == "4.7.21002" or old == "4.7.21003")
+  local plain_base = true
+  for name in pairs(active) do if name ~= "base" and name ~= MIR_MOD then plain_base = false end end
+  local f210_destination = type(active[MIR_MOD]) == "string" and active[MIR_MOD]:match("^5%.0%.210%d%d$") ~= nil
+  local m4_base = false
+  if plain_base and (old == "4.7.20003" or old == "4.7.21003") then
+    -- These published Base origins have a known five-recipe paid mask, not
+    -- today's collected output. The protected hop is exactly 2.0.77->2.1.23;
+    -- another engine patch needs its own route review, not an open-ended >=.
+    local base_change = changes.base
+    local exact_hop = old == "4.7.20003" and type(base_change) == "table"
+      and base_change.old_version == "2.0.77" and base_change.new_version == "2.1.23"
+    local same_engine = old == "4.7.21003" and same_inputs and (base_change == nil
+      or type(base_change) == "table" and base_change.old_version == "2.1.23" and base_change.new_version == "2.1.23")
+    m4_base = valid and f210_destination and active.base == "2.1.23"
+      and event.mod_startup_settings_changed == false
+      and (same_engine or exact_hop)
+    for name in pairs(changes) do
+      if name ~= MIR_MOD and name ~= "base" then m4_base = false end
+    end
+    -- A missing hop event or unreviewed F210 engine must not fall through to
+    -- the generic unchanged-input reader and fabricate an old Base mask.
+    if f210_destination or type(active.base) == "string" and active.base:match("^2%.1%.") then unchanged = false end
+  end
   -- Only the reviewed plain Base closure is admitted here. Other profiles,
   -- provider changes and startup changes still require their own old mask.
   local beta_base = same_inputs and type(active.base) == "string" and (
@@ -375,7 +400,7 @@ local function legacy_family_context(event)
   if beta_base then
     for name in pairs(active) do if name ~= "base" and name ~= MIR_MOD then beta_base = false end end
   end
-  return {unchanged=unchanged, beta_base=beta_base, sif502=old == "5.0.20002" and previous_sif,
+  return {unchanged=unchanged, beta_base=beta_base, m4_base=m4_base, sif502=old == "5.0.20002" and previous_sif,
     sif473=unchanged and previous_sif and (old == "4.7.20002" or old == "4.7.20003")}
 end
 
@@ -497,9 +522,9 @@ function M.preflight_family_transition(event, fresh, selected_force)
               complete_sif_checked = true
             end
             prior_included = SIF_RECIPES[family][descriptor.recipe] == true
-          elseif context.beta_base and not observation.private then
+          elseif (context.beta_base or context.m4_base) and not observation.private then
             if not complete_base_checked then
-              for old_family, recipes in pairs(BETA_BASE_RECIPES) do
+              for old_family, recipes in pairs(PUBLISHED_BASE_RECIPES) do
                 if force.technologies[FAMILY_IDS[old_family]] == nil then family_failure("missing published Base paid identity") end
                 for recipe in pairs(recipes) do
                   if COLLECTED_BY_KEY[old_family .. "\0" .. recipe] == nil then family_failure("missing published Base credit route") end
@@ -507,7 +532,7 @@ function M.preflight_family_transition(event, fresh, selected_force)
               end
               complete_base_checked = true
             end
-            prior_included = BETA_BASE_RECIPES[family][descriptor.recipe] == true
+            prior_included = PUBLISHED_BASE_RECIPES[family][descriptor.recipe] == true
           elseif context.unchanged and not observation.private then prior_included = observation.included
           else family_failure("unknown first paid mask; upgrade once with original mods/startup unchanged and save before changing ownership") end
           payable, pending = prior_included, queued[descriptor.main_id] or 0
