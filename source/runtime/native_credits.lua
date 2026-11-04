@@ -708,7 +708,10 @@ end
 function M.on_forces_merged(event)
   local destination = event and event.destination
   if not valid_force(destination) then return end
-  local plans = M.preflight_family_transition(nil, true, destination)
+  -- Native merging retains destination research and bonuses, discarding the
+  -- source's. Validate its existing family history before either ledger is
+  -- cleared; pending private work keeps its original payable decision.
+  local plans = M.preflight_family_transition(nil, false, destination)
   clear_force(event and event.source_index)
   clear_force(destination.index)
   reconcile_force(destination)

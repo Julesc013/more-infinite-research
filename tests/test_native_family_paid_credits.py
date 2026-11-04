@@ -501,6 +501,117 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
         ''')
 
 
+    def test_force_merge_retains_destination_rights_and_discards_source_research(self):
+        # LuaGameScript.merge_forces retains destination technologies/bonuses;
+        # it does not combine source research. Native engine runs remain required.
+        cases = [(kind, earned) for kind in ("empty", "earned", "signed", "queued", "partial", "cancelled")
+                 for earned in (0, 7)]
+        for source_kind, earned in cases:
+            with self.subTest(source=source_kind, destination_earned=earned):
+                self.setUp()
+                self._add_published_sif_recipients()
+                self.lua.globals().source_kind = source_kind
+                self.lua.globals().destination_earned = earned
+                self.lua.execute('''
+                  reload_credits({base="2.0.77",["space-age"]="2.0.77",["space-is-fake"]="1.0.60",
+                    ["more-infinite-research"]="5.0.20003"},"f200")
+                  local family,id="research_steel","recipe-prod-research_steel-1"
+                  local destination=make_collected_force(1,destination_earned+1,{},true)
+                  local source=make_collected_force(17,source_kind=="earned" and 8 or 1,{},true)
+                  local main,source_main=destination.technologies[id],source.technologies[id]
+                  destination.research_queue={main,main,destination.technologies.foreign}
+                  destination.current_research=main;main.saved_progress=.27
+                  if source_kind=="queued" then source.research_queue={source_main};source.current_research=source_main end
+                  if source_kind=="partial" then source_main.saved_progress=.19 end
+                  native_credits.on_configuration_changed({mod_startup_settings_changed=true,
+                    mod_changes={["more-infinite-research"]={old_version="5.0.20002",new_version="5.0.20003"}}})
+                  if source_kind=="signed" then
+                    for _,d in ipairs(native_credit_definitions.collected_descriptors(GROUPS)) do
+                      if d.family==family and d.recipe=="steel-plate" then
+                        source._states[d.positive_id].level=6;source._states[d.negative_id].level=4
+                        record(source,family,"steel-plate").offset=2
+                      end
+                    end
+                  end
+                  assert(record(destination,family,"steel-plate").payable==true)
+                  assert(record(destination,family,"alternate-steel").payable==false)
+                  local queue=destination.research_queue
+                  local order={};for i,t in ipairs(queue) do order[i]=t.name end
+                  local source_index=source.index
+                  game.forces[source_index]=nil;source.valid=false -- native post-merge invalidation
+                  native_credits.on_forces_merged({source_index=source_index,destination=destination})
+                  assert(storage.mir_native_credits.forces[source_index]==nil
+                    and storage.mir_native_credits.families[source_index]==nil,"source history survived native destruction")
+                  assert(record(destination,family,"steel-plate").payable==true
+                    and record(destination,family,"steel-plate").pending==2,"destination pending right was reset")
+                  assert(record(destination,family,"alternate-steel").payable==false
+                    and record(destination,family,"alternate-steel").pending==2,"literal-false right was changed")
+                  assert(native_credits.needs_research_events())
+                  native_credits.on_load();assert(native_credits.needs_research_events(),"load lost pending subscription")
+                  close(own_contribution(destination,family,"steel-plate"),destination_earned*.17)
+                  local completions=2
+                  if source_kind=="cancelled" then
+                    native_credits.on_research_cancelled({force=destination,research={[id]=1}})
+                    completions=1
+                    assert(record(destination,family,"steel-plate").pending==1)
+                  end
+                  for completed=1,completions do
+                    advance(destination,id,destination_earned+completed,true);native_credits.on_research_finished({research=main})
+                    close(own_contribution(destination,family,"steel-plate"),(destination_earned+completed)*.17)
+                    close(own_contribution(destination,family,"casting-steel"),(destination_earned+completed)*.17)
+                    close(own_contribution(destination,family,"alternate-steel"),0)
+                  end
+                  assert(not native_credits.needs_research_events())
+                  advance(destination,id,destination_earned+completions+1,true);native_credits.on_research_finished({research=main})
+                  close(own_contribution(destination,family,"steel-plate"),(destination_earned+completions)*.17)
+                  assert(destination.research_queue==queue and #queue==#order)
+                  for i,t in ipairs(queue) do assert(t.name==order[i],"destination queue order changed") end
+                  assert(destination.current_research==main and destination.research_progress==.42 and main.saved_progress==.27)
+                  no_foreign_write(destination)
+                ''')
+
+    def test_force_merge_refuses_inconsistent_destination_before_any_mir_write(self):
+        for broken in ("offset", "record", "history", "completed"):
+            with self.subTest(broken=broken):
+                self.setUp()
+                self._add_published_sif_recipients()
+                self.lua.globals().broken = broken
+                self.lua.execute('''
+                  reload_credits({base="2.0.77",["space-age"]="2.0.77",["space-is-fake"]="1.0.60",
+                    ["more-infinite-research"]="5.0.20003"},"f200")
+                  local family,id="research_steel","recipe-prod-research_steel-1"
+                  local destination=make_collected_force(1,1,{},true)
+                  local source=make_collected_force(17,1,{},true)
+                  local main=destination.technologies[id]
+                  destination.research_queue={main};destination.current_research=main
+                  native_credits.on_configuration_changed({mod_startup_settings_changed=true,
+                    mod_changes={["more-infinite-research"]={old_version="5.0.20002",new_version="5.0.20003"}}})
+                  local state=storage.mir_native_credits
+                  if broken=="offset" then record(destination,family,"steel-plate").offset=7 end
+                  if broken=="record" then state.forces[1][key(family,"steel-plate")]=nil end
+                  if broken=="history" then state.families[1][family]=nil end
+                  if broken=="completed" then record(destination,family,"steel-plate").completed=1 end
+                  local before={}
+                  for index,force in ipairs({destination,source}) do
+                    before[index]={}
+                    for name,s in pairs(force._states) do before[index][name]={s.writes.level,s.writes.enabled} end
+                  end
+                  local destination_records,source_records=state.forces[1],state.forces[17]
+                  local history=state.families[1]
+                  local ok,message=pcall(native_credits.on_forces_merged,{source_index=17,destination=destination})
+                  assert(not ok and tostring(message):find("native family",1,true),"inconsistent destination admitted")
+                  assert(state.forces[1]==destination_records and state.forces[17]==source_records
+                    and state.families[1]==history,"refusal cleared existing history")
+                  for index,force in ipairs({destination,source}) do
+                    for name,s in pairs(force._states) do
+                      assert(s.writes.level==before[index][name][1] and s.writes.enabled==before[index][name][2],
+                        "late merge refusal mutated native state")
+                    end
+                  end
+                  no_foreign_write(destination)
+                ''')
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--lua-runtime-dir", type=Path, required=True)
