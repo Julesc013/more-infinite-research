@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR5Weapon504FirstEntryNativeChainV1",
-  "status": "root-observed-pass-independent-result-review-pending",
+  "status": "independently-accepted-bounded-state-save-two-colds",
   "scope": "One qualified foreign infinite weapon7 owner on Base2.1.23; seeded published503 paid-state upgrade to exact frozen504B, save and two read-only colds; zero labs.",
   "published_source": {
     "tag": "v5.0.3",
@@ -134,8 +134,16 @@
     "dependency_library_copied_or_linked": false
   },
   "independent_result_review": {
-    "status": "pending-after-result-review",
-    "routine_native_preapproval_required": false
+    "status": "passed-after-result-review",
+    "repository": "Julesc013/mir-native-worker",
+    "commit": "8ddc0f15451145374ac0783858fdcc6546596c4f",
+    "directory": "evidence/aero-weapon504-first-entry-result-review-r01",
+    "review_sha256": "5B0349B972DD3F5B6F2B4198554751E84F860268B957A9D99971A9325B04D7FE",
+    "original_records_verified": 215,
+    "distinct_native_pids_verified": 12,
+    "independent_reader_mutations_rejected": 5,
+    "routine_native_preapproval_required": false,
+    "limits": "Seeded Base2.1.23 fully-covered weapon preservation only; zero labs and no Galore/Tesla/GUI/performance/release verdict."
   },
   "remaining": [
     "Actual useful lab completion of retained owed work and exclusion of new redundant future work",
