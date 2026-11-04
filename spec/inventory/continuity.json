@@ -16536,6 +16536,30 @@
         "test_intent_reconciliation_complete": false,
         "native_execution": false,
         "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-01",
+          "CONT-02",
+          "CONT-03",
+          "CONT-05",
+          "CONT-12",
+          "CONT-15",
+          "VER-07"
+        ],
+        "reviewed_against": "807ee2537fd6f431d6944ac26c11fcda1dc76565",
+        "scope": "One complete static A20 script and its two complete final direct fixtures, three unique bodies/48 exact tag bindings. Across all91 inventoried refs, these three named paths additionally discover eight older fixture bodies/105 bindings; they are metadata-only and remain unresolved. No old compiler, original assertion harness or native execution.",
+        "evidence": {
+          "path": "spec/evidence/historical-native-effect-a20-consumer-intent-aero-r01.json",
+          "sha256": "45767767DB79A2641AF7195DD7B6022304B8E0DDA6A0EE8B71733C0BD10A6D07"
+        },
+        "disposition": "Retain final foreign positive-owner suppression, per-identity useful coverage and numbered-name custody. Isolated original expectation rejects current host rocket/cannon output with a positive foreign owner even after numbered99 removal; no full original fixture or native pass. Older eight fixture variants remain metadata-only.",
+        "remaining_executable_check": "Independently review current supported-profile applicability and correct the admitted native-owner consumer without a global discovery solver or fixture-name binding. Port focused positive/disabled/zero/unreachable/partial mixed-category controls from original semantics. Review existing paid research and actual named provider before affected native/save/reload qualification. Existing MIR5 paid dedicated weapon identities/effects must be preserved if a corrected ownership decision changes emission; do not simply omit already-researched rows or reuse the unrelated five-recipe SourceB masks.",
+        "owner": "Aero recovered expectations/scoped correction and independent review; Black Glass affected exact native/save qualification",
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false,
+        "release_qualification": false
       }
     ],
     "stable_coverage_review": {
