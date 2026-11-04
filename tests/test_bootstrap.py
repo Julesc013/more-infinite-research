@@ -465,6 +465,30 @@ class BootstrapTests(unittest.TestCase):
             and cannon_credit_calls.preflight==nil)
         ''')
 
+    def test_real_same_engine_unknown_paid_mask_refuses_before_configuration_writes(self):
+        import test_native_family_paid_credits as paid_fixture
+        paid_fixture.LuaRuntime = LuaRuntime
+        for opponent in ("mir-fixture-observer", "ExpandedProductivityResearch", "space-age"):
+            with self.subTest(opponent=opponent):
+                case = paid_fixture.NativeFamilyPaidCreditsTests()
+                case.setUp()
+                case._same_engine_unknown_paid_mask(opponent)
+                self.setUp(case.lua)
+                self.lua.execute('''
+                  local real_credits=native_credits
+                  install_modules(true,false,true,true);install_runtime(nil,BASE_ACTIVE);game.forces={}
+                  package.preload["runtime.native_credits"]=function()return real_credits end
+                  load_control()
+                  local registrations=0
+                  script.on_event=function()registrations=registrations+1 end
+                  script.on_nth_tick=function()registrations=registrations+1 end
+                  assert_unknown_mask_refuses(handlers.configuration)
+                  assert(lifecycle_calls.configuration==nil and library_calls.configuration==nil
+                    and module_credit_calls.preflight==nil and cannon_credit_calls.preflight==nil
+                    and scripted_calls.configuration==nil and registrations==0,
+                    "bootstrap wrote cap/force/control state before real credit refusal")
+                ''')
+
     def test_only_pending_private_work_binds_completion_and_cancellation(self):
         self.lua.execute('''
           install_modules(false,false,false,true);install_runtime();load_control()

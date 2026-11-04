@@ -388,9 +388,6 @@ local function legacy_family_context(event)
     for name in pairs(changes) do
       if name ~= MIR_MOD and name ~= "base" then m4_base = false end
     end
-    -- A missing hop event or unreviewed F210 engine must not fall through to
-    -- the generic unchanged-input reader and fabricate an old Base mask.
-    if f210_destination or type(active.base) == "string" and active.base:match("^2%.1%.") then unchanged = false end
   end
   -- Only the reviewed plain Base closure is admitted here. Other profiles,
   -- provider changes and startup changes still require their own old mask.
@@ -400,7 +397,7 @@ local function legacy_family_context(event)
   if beta_base then
     for name in pairs(active) do if name ~= "base" and name ~= MIR_MOD then beta_base = false end end
   end
-  return {unchanged=unchanged, beta_base=beta_base, m4_base=m4_base, sif502=old == "5.0.20002" and previous_sif,
+  return {beta_base=beta_base, m4_base=m4_base, sif502=old == "5.0.20002" and previous_sif,
     sif473=unchanged and previous_sif and (old == "4.7.20002" or old == "4.7.20003")}
 end
 
@@ -533,8 +530,10 @@ function M.preflight_family_transition(event, fresh, selected_force)
               complete_base_checked = true
             end
             prior_included = PUBLISHED_BASE_RECIPES[family][descriptor.recipe] == true
-          elseif context.unchanged and not observation.private then prior_included = observation.included
-          else family_failure("unknown first paid mask; upgrade once with original mods/startup unchanged and save before changing ownership") end
+          -- Unchanged engine/mod/settings inputs do not prove that a new MIR
+          -- version emitted the old recipe mask. Only the known source masks
+          -- above or a complete saved ledger can establish prior paid rights.
+          else family_failure("unknown first paid mask; restore original save and inputs; an independently known historical mask is required") end
           payable, pending = prior_included, queued[descriptor.main_id] or 0
         end
         local offset = observation.offset + ((prior_included and 1 or 0) - (observation.included and 1 or 0)) * observation.completed
