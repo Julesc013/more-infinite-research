@@ -1,0 +1,306 @@
+{
+  "schema": 1,
+  "kind": "MIRCrushingMaterialFreshNativeChainV1",
+  "status": "independently-accepted-fresh-accelerated-native-research-save-two-colds-only",
+  "issue": 1651,
+  "candidate_source_commit": "f6756b90ea952b3b7a46a2452137a92661cefa7a",
+  "candidate_player_tree": "58480faa995eab995cc0a3ad2cddbbdd0e5e0c04",
+  "candidate_package": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\issue1651-current-f675-r03\\more-infinite-research_5.0.21002.zip",
+    "bytes": 785058,
+    "sha256": "FAC8C68ADC35F44204983D751FC8DD1016C2503D0ECB08CD8C0BC68C6BDDA724"
+  },
+  "harness_source_commit": "fa8aae3eeff46caa2ae679712c3e53d01684506d",
+  "engine": {
+    "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "bytes": 49373136,
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "engine_version": "2.1.23",
+  "settings_mode": "Defaults",
+  "published_release_bytes_unchanged": true,
+  "fixture": {
+    "source_commit": "719dd2ed1a1e64c5e171ef80c6b9ed90661eb03d",
+    "source_path": "fixtures/native-material-crushing-r01/probe",
+    "package": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\crushing-material-native-inputs-r01\\mir-fixture-mir5-materials_0.2.0.zip",
+      "exists": true,
+      "bytes": 4829,
+      "sha256": "18DAE70CC3138C0984C256604FEDA92A81FE8A63D0A3413710186DF4E02455D8"
+    },
+    "profile_sha256": "C5D37AACFCE4AA8F67550557C1E8B480850FADB66A526E44DD79FCD5382955C2",
+    "selected_names": 16,
+    "baseline": "Original f675 tests/fixtures/materials and prior separate one-route native evidence remain unchanged; this port adds the specifically qualified replacement glass reward."
+  },
+  "admission": {
+    "repository": "Julesc013/mir-native-worker",
+    "ref": "cc01d9781f18b66020b0cb68d5b85c69c2d1de9e",
+    "scope_path": "evidence/crushing-material-independent-review-r01/scope-review.json",
+    "scope_sha256": "B5930DD29599DE61019A080FFD2823FCD8F3BFEE7B535779BC7014E88829F1E5",
+    "dispatch_path": "evidence/crushing-material-independent-review-r01/dispatch-review.json",
+    "dispatch_sha256": "B68ABF380D7E7C06C0E50CDE7F4B6ED0EB136439490C0C104A9DCF53ECA3FCDA",
+    "caller_sha256": "2FB255448C1F254E39AF9016E54884C557DA87F05D6AA7810B898B185A4FD97A",
+    "manifest_sha256": "1035B9A921F8D84B765E105A3A7DA15BC054B8EA019019C072FCB53ADDB3B3F2",
+    "composition_sha256": "A0594463A97DFDEB49BD0BF715558D1EC6DF71FAFB7B3191D5995C4DC7B36295",
+    "fixture_host_methods": 7,
+    "caller_opponents": 6,
+    "lua52_sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899"
+  },
+  "result": {
+    "path": "D:\\Projects\\Factorio\\mir5-cap-current-fa8-r01\\build\\tmp\\crushing-material-native-r01\\native\\result.json",
+    "bytes": 50115,
+    "sha256": "509FC1EDC6FDF057824CED7F72682F9924BCF3277B384FDBA5A80586E9EDAF7E"
+  },
+  "stages": [
+    {
+      "stage": "create",
+      "pid": 6368,
+      "resource_rows": 6,
+      "exit_code": 0,
+      "completion_predicate_observed": false,
+      "timeout": false,
+      "ledger": {
+        "path": "D:\\Projects\\Factorio\\mir5-cap-current-fa8-r01\\build\\tmp\\crushing-material-native-r01\\native\\process-1.resources.jsonl",
+        "bytes": 3219,
+        "sha256": "458EE500817A636B5E04D5B690808D15C0943E226C2844395D52FDF848BC33E9"
+      },
+      "log": {
+        "path": "D:\\Projects\\Factorio\\mir5-cap-current-fa8-r01\\build\\tmp\\crushing-material-native-r01\\native\\create.factorio.log",
+        "bytes": 13938,
+        "sha256": "3DAA116DDC01C05E51D18711788021D1BA245689C68B6EBE5BAAA166A4C3483C"
+      },
+      "duration_seconds_unscored": 4.245917
+    },
+    {
+      "stage": "production",
+      "pid": 31480,
+      "resource_rows": 5,
+      "exit_code": -1,
+      "completion_predicate_observed": true,
+      "timeout": false,
+      "ledger": {
+        "path": "D:\\Projects\\Factorio\\mir5-cap-current-fa8-r01\\build\\tmp\\crushing-material-native-r01\\native\\process-2.resources.jsonl",
+        "bytes": 2630,
+        "sha256": "1EF0D3F05E9295FACAAEF8F3D44354D70D6AFC42716E7D0B69166713987FA3D4"
+      },
+      "log": {
+        "path": "D:\\Projects\\Factorio\\mir5-cap-current-fa8-r01\\build\\tmp\\crushing-material-native-r01\\native\\production.factorio.log",
+        "bytes": 16069,
+        "sha256": "7D24BD84CFFCCBCAD9BE7402164584DE6C3BD4B9588C7335A009B6B94DDEEA63"
+      },
+      "duration_seconds_unscored": 3.526693
+    },
+    {
+      "stage": "reload-1",
+      "pid": 24288,
+      "resource_rows": 5,
+      "exit_code": 0,
+      "completion_predicate_observed": false,
+      "timeout": false,
+      "ledger": {
+        "path": "D:\\Projects\\Factorio\\mir5-cap-current-fa8-r01\\build\\tmp\\crushing-material-native-r01\\native\\process-3.resources.jsonl",
+        "bytes": 2610,
+        "sha256": "6B9596E1280EC527E66561E52825388D66C360790CF17C005CE55C95C5ED8DD1"
+      },
+      "log": {
+        "path": "D:\\Projects\\Factorio\\mir5-cap-current-fa8-r01\\build\\tmp\\crushing-material-native-r01\\native\\reload-1.factorio.log",
+        "bytes": 14985,
+        "sha256": "80D886C265C252FBACFA95DE212B932979BBD0DD5A0F6166164C5635C0C18534"
+      },
+      "duration_seconds_unscored": 2.495187
+    },
+    {
+      "stage": "reload-2",
+      "pid": 27408,
+      "resource_rows": 5,
+      "exit_code": 0,
+      "completion_predicate_observed": false,
+      "timeout": false,
+      "ledger": {
+        "path": "D:\\Projects\\Factorio\\mir5-cap-current-fa8-r01\\build\\tmp\\crushing-material-native-r01\\native\\process-4.resources.jsonl",
+        "bytes": 2614,
+        "sha256": "E4142BEEB351C363B5E4EB2BBBFB329EE687E6DE0C5D22847AE9E815CB8298CD"
+      },
+      "log": {
+        "path": "D:\\Projects\\Factorio\\mir5-cap-current-fa8-r01\\build\\tmp\\crushing-material-native-r01\\native\\reload-2.factorio.log",
+        "bytes": 14985,
+        "sha256": "457792F91044CA5D04A8BBE062E2C9992EAC8BFC67BFCCB14600F23D1B457D16"
+      },
+      "duration_seconds_unscored": 2.319816
+    }
+  ],
+  "prototype_checksum": 2404742907,
+  "observed_witnesses": [
+    {
+      "case": "materials",
+      "stage": "initial",
+      "status": "passed",
+      "witnesses": {
+        "profile": "k2so-crushing-industry-default",
+        "glass_routes": [
+          "kr-glass",
+          "glass"
+        ],
+        "native_productivity_recipe_count": 5,
+        "technology_ids": [
+          "recipe-prod-research_material_rare_metals-1",
+          "recipe-prod-research_material_silicon-1",
+          "recipe-prod-research_material_glass-1"
+        ],
+        "finite_levels_per_family": 3,
+        "actual_lab_completions": 9,
+        "native_recipe_productivity_per_recipe": 0.06,
+        "native_effect_per_completed_level": 0.02,
+        "science_consumed": {
+          "automation": 9,
+          "logistic": 9,
+          "chemical": 6
+        },
+        "native_laboratory_productivity": 0,
+        "foreign_force_preserved": true,
+        "fixture_accelerates_count_formula_and_time": true,
+        "ordinary_tuning_qualified": false,
+        "physical_productivity_observed": false,
+        "on_load_read_only": false,
+        "gameplay_scope": "disposable-native-k2so-crushing-materials-only"
+      }
+    },
+    {
+      "case": "materials",
+      "stage": "reload",
+      "status": "passed",
+      "witnesses": {
+        "profile": "k2so-crushing-industry-default",
+        "glass_routes": [
+          "kr-glass",
+          "glass"
+        ],
+        "native_productivity_recipe_count": 5,
+        "technology_ids": [
+          "recipe-prod-research_material_rare_metals-1",
+          "recipe-prod-research_material_silicon-1",
+          "recipe-prod-research_material_glass-1"
+        ],
+        "finite_levels_per_family": 3,
+        "actual_lab_completions": 9,
+        "native_recipe_productivity_per_recipe": 0.06,
+        "native_effect_per_completed_level": 0.02,
+        "science_consumed": {
+          "automation": 9,
+          "logistic": 9,
+          "chemical": 6
+        },
+        "native_laboratory_productivity": 0,
+        "foreign_force_preserved": true,
+        "fixture_accelerates_count_formula_and_time": true,
+        "ordinary_tuning_qualified": false,
+        "physical_productivity_observed": false,
+        "on_load_read_only": true,
+        "gameplay_scope": "disposable-native-k2so-crushing-materials-only"
+      }
+    },
+    {
+      "case": "materials",
+      "stage": "reload",
+      "status": "passed",
+      "witnesses": {
+        "profile": "k2so-crushing-industry-default",
+        "glass_routes": [
+          "kr-glass",
+          "glass"
+        ],
+        "native_productivity_recipe_count": 5,
+        "technology_ids": [
+          "recipe-prod-research_material_rare_metals-1",
+          "recipe-prod-research_material_silicon-1",
+          "recipe-prod-research_material_glass-1"
+        ],
+        "finite_levels_per_family": 3,
+        "actual_lab_completions": 9,
+        "native_recipe_productivity_per_recipe": 0.06,
+        "native_effect_per_completed_level": 0.02,
+        "science_consumed": {
+          "automation": 9,
+          "logistic": 9,
+          "chemical": 6
+        },
+        "native_laboratory_productivity": 0,
+        "foreign_force_preserved": true,
+        "fixture_accelerates_count_formula_and_time": true,
+        "ordinary_tuning_qualified": false,
+        "physical_productivity_observed": false,
+        "on_load_read_only": true,
+        "gameplay_scope": "disposable-native-k2so-crushing-materials-only"
+      }
+    }
+  ],
+  "saves": [
+    {
+      "path": "D:\\Projects\\Factorio\\mir5-cap-current-fa8-r01\\build\\tmp\\crushing-material-native-r01\\native\\write-data\\saves\\seed.zip",
+      "bytes": 888212,
+      "sha256": "6F91AB52C95B6CBE1978E37B9B17FB700F3252AC47EB7980C4DD9E05C829E8F4",
+      "crc_members": 56
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\mir5-cap-current-fa8-r01\\build\\tmp\\crushing-material-native-r01\\native\\write-data\\saves\\mir5-native-complete.zip",
+      "bytes": 893985,
+      "sha256": "ECE4EDA83D23E5DBDBB8CCED6B5328F93EF64846F9826BD2856978E8405508E0",
+      "crc_members": 56
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\crushing-material-native-protected-successor-r01\\mir5-native-complete.zip",
+      "bytes": 893985,
+      "sha256": "ECE4EDA83D23E5DBDBB8CCED6B5328F93EF64846F9826BD2856978E8405508E0",
+      "crc_members": 56
+    }
+  ],
+  "root_readback_sha256": "0B6D5740C9DFA0FD146B810AFDAFF12D5C613AB07ED841E05E0EEFCEDD8CE0EA",
+  "raw_custody": {
+    "repository": "Julesc013/mir-native-worker",
+    "ref": "0446a89eb4c10d0191c857d2e3641f052baac977",
+    "path": "evidence/crushing-material-native-actual-r01",
+    "original_records": 33,
+    "native_files": 22,
+    "native_bytes": 1952860,
+    "gzip_bytes": 2793937,
+    "gzip_sha256": "6974C4ADEA7A2B53D03CC9986866B4E856374AEE54C2A22AD7E4EDA1B5A67CA0",
+    "decoded_bytes": 3885171,
+    "decoded_sha256": "F35787E0E35F212A7F96AD3AB6829CABCB44BF1E13EF1D6C98C73BD72F18BDE2",
+    "actual_remote_and_all_member_readback": true
+  },
+  "restoration": {
+    "bound_inputs_unchanged": 57,
+    "original_controls_restored": 2,
+    "prior_MIR_archives_restored": 17,
+    "source_dirty": false
+  },
+  "independent_actual_review": {
+    "status": "ACCEPT-fresh-accelerated-native-research-save-two-colds-only",
+    "repository": "Julesc013/mir-native-worker",
+    "ref": "cc72d3eed943fd78f23125eee2daae371ce74b0f",
+    "path": "evidence/aero-material-native-actual-and-paid-policy-r01/actual-independent-review.json",
+    "sha256": "2E629B581730288EDF51794B7940781D7A7304050B874DE9828B602B829CD5DA",
+    "scope": "Actual33 original bodies and22 native files independently verified; one real powered lab, nine completions, science/bonus/foreign-state witnesses, protected successor and two distinct cold reloads. No previous-paid-state or next-source-version acceptance."
+  },
+  "remaining_paid_state_expectation": {
+    "status": "independent-expectation-not-native-acceptance",
+    "repository": "Julesc013/mir-native-worker",
+    "ref": "cc72d3eed943fd78f23125eee2daae371ce74b0f",
+    "path": "evidence/aero-material-native-actual-and-paid-policy-r01/finite-paid-expectation.json",
+    "sha256": "F90F6F7191910BC2149D8B6E6781D3BDB99C7990088A2653451BE7B28BBEBA95",
+    "scope": "Actual published502 without the replacement provider to a real503 version event with qualified CI0.6.9/FDSL0.5.5: earned finite levels0/1/2/3 retain0/.02/.04/.06 on both glass routes, exact recorded partial/current/queue state, other earned effects and unpaid foreign state. No extra tier, double grant or repeat grant on two cold reloads. SourceB five-family masks are separate absent actual consumed-path coupling."
+  },
+  "fixture_interventions": [
+    "Seven named prerequisite technologies explicitly researched.",
+    "One real lab supplied and powered;32 packs per science.",
+    "Only unit count formula/time accelerated after strict ordinary default preflight.",
+    "game.speed16."
+  ],
+  "limits": [
+    "Fresh disposable accelerated scenario with nine real lab completions, science9/9/6, five+.06 native recipe bonuses, foreign force and save/two read-only colds.",
+    "Both kr-glass and glass rewards are observed; physical manufacture is not measured.",
+    "This private5.0.21002 result is not a real next-source503 version event or existing-beta upgrade.",
+    "Oldpaid/new replacement entitlement, partial/queued investment, SourceB369/a29, ordinary tuning/performance, client/multiplayer and release/stable qualification remain outside this case."
+  ],
+  "release_qualification": false
+}
