@@ -1894,6 +1894,66 @@ class GeneratorTests(unittest.TestCase):
                   assert(not ok and data.writes == 0, "invalid native owner reached publication")
                 ''')
 
+    def test_saved_classic_and_full_select_the_same_complete_native_output(self):
+        # Published 4.7.3 SCP-01..08/10..11 supersede the earlier reduced
+        # compiler branch. Retain its serialized alias and complete output;
+        # no legacy planner, compiler or registry may enter either stage.
+        captures = {}
+        for edition in ("f200", "f210"):
+            for selection in (None, "full", "classic"):
+                with self.subTest(edition=edition, selection=selection):
+                    self.setUp()
+                    self.lua.globals().classic_bridge_edition = edition
+                    self.lua.globals().classic_bridge_selection = selection
+                    self.lua.globals().classic_bridge_data_path = (ROOT / "source/data.lua").as_posix()
+                    self.lua.execute('''
+                      local target = require("platform.target")
+                      if classic_bridge_edition == "f200" then
+                        target.id, target.factorio_version, target.minimum_base = "f200", "2.0", "2.0.77"
+                        target.cargo_research, target.receiver_limits, target.recipe_probability = false, false, "probability"
+                      end
+                      package.loaded["research.settings"] = nil
+                      config = require("research.settings")
+                      local bridge
+                      for _, spec in ipairs(config.prototypes()) do
+                        if spec.name == "mir-compiler-profile" then bridge = spec end
+                      end
+                      assert(bridge and bridge.type == "string-setting" and bridge.setting_type == "startup"
+                        and bridge.default_value == "full" and bridge.hidden == true
+                        and #bridge.allowed_values == 2 and bridge.allowed_values[1] == "full"
+                        and bridge.allowed_values[2] == "classic", "saved compiler-profile bridge changed")
+                      local retired = {"prototypes.mir.pipeline.classic_compiler", "prototypes.mir.pipeline.commands",
+                        "prototypes.mir.planner.classic.plan", "prototypes.mir.planner.compiler",
+                        "prototypes.mir.streams.registry"}
+                      for _, name in ipairs(retired) do
+                        package.preload[name] = function() error("retired compiler/registry imported", 0) end
+                      end
+                      mods = {base = target.minimum_base}
+                      settings, data, helpers, log = {startup = defaults()}, full_world(mods), nil, function() end
+                      settings.startup["mir-compiler-profile"] = classic_bridge_selection
+                        and {value=classic_bridge_selection} or nil
+                      dofile(classic_bridge_data_path)
+                      classic_bridge_data_rows = data.emitted
+                      local shortcuts = 0
+                      for _, row in ipairs(data.emitted) do
+                        if row.type == "shortcut" then
+                          shortcuts = shortcuts + 1
+                          assert(row.name == "mir-research-browser" and row.icon == "__base__/graphics/icons/lab.png")
+                        end
+                      end
+                      assert(shortcuts == 1, "published Library shortcut absent")
+                      data.writes, data.emitted = 0, nil
+                      dofile(data_final_path)
+                      assert(data.writes == 1, "final native catalogue needs one publication")
+                      for _, name in ipairs(retired) do assert(package.loaded[name] == nil) end
+                    ''')
+                    captures[(edition, selection)] = {
+                        "data": plain_lua(self.lua.globals().classic_bridge_data_rows),
+                        "final": plain_lua(self.lua.globals().data.emitted),
+                    }
+            self.assertEqual(captures[(edition, None)], captures[(edition, "full")])
+            self.assertEqual(captures[(edition, "classic")], captures[(edition, "full")])
+
     def test_data_final_full_published_technology_output_matches_oracle(self):
         expected_profiles = {
             profile["id"]: {

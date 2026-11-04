@@ -8828,7 +8828,7 @@
         "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
       }
     ],
-    "next_bounded_work": "The three named runtime-replay/private-runtime test families now have a bounded five-body/47-binding source-intent disposition, preserving their no-admission/no-public-support and repeated-predecessor-load limits. Imported verifiers/writers/helper implementations and original raw native receipt custody remain separate. The selected 35-body upgrade runner, 17-body specialization helpers, seven imported comparator/canonical/frontier bodies, six runtime entry-point bodies and 22 settings/registry/default bodies now have bounded source dispositions. Preserve independent review, exact refs, original author history and both adverse and subsequently supplied custody records. Reconcile remaining generated orchestration, effective/nondefault settings, control callbacks, compatibility/inter-release and unknown-consumer intent plus original frontier input provenance without restoring retired machinery. Source counts, wrapper mappings and declaration comparisons do not close VER-07 or native saved-state behavior. Use the existing finite nine/seven/four migration queue and final consumed-input review; do not restart every-old-patch campaigns or unchanged completed cases. Exact published 5.0.1 F200 R20 and F210 R05 observations retain their scopes. Frozen C has only its named component verdicts; changed source and package inputs, shared runtime catalogue/cap/API, beta-successor state and affected current-candidate scenarios need their own applicability review before dispatch. Black Glass owns exact packets, the native queue and current progress header; Aero owns historical/applicability/documentation work and independent review. Preserve every completed/adverse execution identity.",
+    "next_bounded_work": "The three named runtime-replay/private-runtime test families now have a bounded five-body/47-binding source-intent disposition, preserving their no-admission/no-public-support and repeated-predecessor-load limits. Imported verifiers/writers/helper implementations and original raw native receipt custody remain separate. The selected 35-body upgrade runner, 17-body specialization helpers, seven imported comparator/canonical/frontier bodies, six runtime entry-point bodies and 22 settings/registry/default bodies now have bounded source dispositions. Preserve independent review, exact refs, original author history and both adverse and subsequently supplied custody records. Reconcile remaining generated orchestration, effective/nondefault settings, control callbacks, compatibility/inter-release and unknown-consumer intent plus original frontier input provenance without restoring retired machinery. Source counts, wrapper mappings and declaration comparisons do not close VER-07 or native saved-state behavior. Use the existing finite nine/seven/four migration queue and final consumed-input review; do not restart every-old-patch campaigns or unchanged completed cases. Exact published 5.0.1 F200 R20 and F210 R05 observations retain their scopes. Frozen C has only its named component verdicts; changed source and package inputs, shared runtime catalogue/cap/API, beta-successor state and affected current-candidate scenarios need their own applicability review before dispatch. Black Glass owns exact packets, the native queue and current progress header; Aero owns historical/applicability/documentation work and independent review. Preserve every completed/adverse execution identity. The three named Classic-routing test/runner families now have a six-body/36-binding source-intent disposition and modern alias controls; their earlier reduced-route requirements remain superseded by the final published single-path policy. Native saved-selection applicability and all other unresolved groups remain separate.",
     "bounded_intent_reviews": [
       {
         "subjects": [
@@ -12182,7 +12182,12 @@
               "tests/test_lifecycle.py::test_k2_worker_variant_is_lazy_owned_and_does_not_inherit_another_effects_rights"
             ],
             "new_control_scope": "Actual current control/bootstrap/lifecycle handlers, inclusive repeated queue, retained37% valid current progress, earned aggregate7.15 and level11 across above-cap disablement and owned relaxation. The native queue setter can cancel current research; this host fixture does not model its saved-progress transition and imposes no saved-slot value after cancellation. This does not assert native earned-bonus arithmetic or qualify a save.",
-            "api_source": {"url": "https://lua-api.factorio.com/2.0.77/runtime-api.json", "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578", "field": "LuaForce.research_queue; LuaForce.research_progress", "fact": "Queue replacement with empty/nil cancels current research; current progress is a read/write double in[0,1]. The host control does not infer native saved-slot transitions."},
+            "api_source": {
+              "url": "https://lua-api.factorio.com/2.0.77/runtime-api.json",
+              "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578",
+              "field": "LuaForce.research_queue; LuaForce.research_progress",
+              "fact": "Queue replacement with empty/nil cancels current research; current progress is a read/write double in[0,1]. The host control does not infer native saved-slot transitions."
+            },
             "remaining_executable_check": "Final-candidate native worker cap/ownership/queue/progress and any affected legacy/provider/client/state transitions retain the existing CONT-07/CONT-11 limits. Exact admitted0.65 tail evidence does not qualify malformed or arbitrary provider tails; unchanged source is not a new native result.",
             "owner": "Aero independent expectation/control; Black Glass native/state checks"
           },
@@ -16487,6 +16492,28 @@
         },
         "native_execution": false,
         "inventory_complete": false
+      },
+      {
+        "reviewed_on": "2026-11-04",
+        "reviewed_against": "a5ce3009f6edd8ba0332cd111211dfe6f52b905d",
+        "subjects": [
+          "CONT-01",
+          "CONT-03",
+          "CONT-10",
+          "CONT-13"
+        ],
+        "scope": "Three named compiler-routing test/runner paths, six deduplicated complete bodies and36 exact tag/path bindings in the existing91-tag inventory. A fourth candidate alias path has no indexed bindings. Earlier body plus complete wrapper/runner diffs and the full final three bodies were inspected; no old compiler or native run occurred.",
+        "method": "Metadata first; preserve the older16-assertion two-compiler contract and final11-assertion single-path correction as different policies. Verify exact published4.7.3 bridge members and absence of retired implementation. Retain valid behavior in current native construction without importing old planners or projecting their receipts.",
+        "evidence": {
+          "path": "spec/evidence/historical-classic-serialization-routing-intent-aero-r01.json",
+          "sha256": "FCC419891301259753C45517FE7237F0C3F1B84C205D4786FC21B3915F2E3167"
+        },
+        "disposition": "Port saved full/classic/absent equivalence into current Generator controls; consolidate shortcut and historical declaration checks. Preserve the older16-assertion reduced-route contract as superseded by published4.7.3 single-path11-assertion policy.",
+        "remaining_executable_check": "Review actual saved startup-selection applicability on an existing affected upgrade route. Do not fabricate an original Classic save, replay unchanged journeys, or treat this host alias comparison as native saved-state/client/performance evidence. Other unreviewed source groups, inter-release history and original receipt custody remain open.",
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false,
+        "release_qualification": false
       }
     ],
     "stable_coverage_review": {
