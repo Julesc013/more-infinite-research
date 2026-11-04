@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIRCandidate503NativeUpgradeComponentsV1",
-  "status": "root-observed-components-final-independent-applicability-and-release-review-required",
+  "status": "accepted-scoped-components-under-original-identities-for-published503-prerelease",
   "candidate_author": "246b2354529190dbd0395bd9fde0fc5eb63de0b6",
   "candidate_player_tree": "8489d53e7202ce29962e364110ccb36cc261c8cc",
   "candidate_archives": {
@@ -137,5 +137,18 @@
     "status": "analysis-not-native-relabel-or-final-release-verdict",
     "observation": "EF-to-C exact default Base F200/F210 and SIF F200 selector/construction outputs match, runtime files unchanged; ordinary Space Age private holder science is affected. Original execution identities stay fixed."
   },
-  "limits": "Explicit seeded and bounded native endpoints, not full historical catalogue/client/physical-output/ordinary-cost/performance or stable acceptance. Public5.0.0/5.0.1/5.0.2 unchanged. Separate weapon and Galore corrections excluded. Final independent consumed-input applicability, package identity, required CI and checked publication remain necessary."
+  "limits": "Explicit seeded and bounded native endpoints, not full historical catalogue/client/physical-output/ordinary-cost/performance or stable acceptance. Public5.0.0/5.0.1/5.0.2 unchanged. Separate weapon and Galore corrections excluded. Final independent consumed-input applicability, package identity, required CI and checked publication remain necessary.",
+  "final_scoped_prerelease_review": {
+    "repository": "Julesc013/mir-native-worker",
+    "comment_id": 6632717222,
+    "comment_sha256": "37912266666B440111116177BA9A7AA4B1AD622578F257010C16019DDAB5BAA5",
+    "frozen_author": "fbe4e4d9f6fb43a9bbcc3c4fea38b92bb6242eb5",
+    "package_review_commit": "c7082498ede0331140947e13eeea121fb05c950d",
+    "native_review_commits": [
+      "1716877b3a0879fae6d570d20dbb209e47170498",
+      "039fa75511a97e619d0cc420a0f102379448eaec"
+    ],
+    "publication_record": "candidate503-github-prerelease-delivery-chain-r01.json",
+    "stable_acceptance": false
+  }
 }
