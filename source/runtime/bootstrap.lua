@@ -492,6 +492,7 @@ local function request_library_refresh(event)
 end
 
 local function on_research_finished(event)
+  if not (event and event.research) or event.research.valid == false then return end
   if native_credits and native_credits.on_research_finished
       and native_credits.on_research_finished(event) then reconcile_library_events() end
   if lifecycle.caps_active() then lifecycle.on_research_finished(event) end
@@ -501,6 +502,7 @@ local function on_research_finished(event)
 end
 
 local function on_research_reversed(event)
+  if not (event and event.research) or event.research.valid == false then return end
   if lifecycle.caps_active() then lifecycle.on_research_reversed(event) end
   if competing_productivity then competing_productivity.on_research_reversed(event) end
   if scripted_effects then scripted_effects.on_research_reversed(event) end
@@ -518,6 +520,7 @@ local function on_technology_effects_reset(event)
 end
 
 local function on_research_started(event)
+  if not (event and event.research) or event.research.valid == false then return end
   if lifecycle.caps_active() then lifecycle.on_research_started(event) end
   if competing_productivity then competing_productivity.on_research_started(event) end
   request_library_refresh(event)
@@ -581,9 +584,12 @@ local function on_forces_merged(event)
   request_library_refresh(event)
 end
 
-local function on_discovery_queue_changed(event)
-  if lifecycle.caps_active() then lifecycle.on_discovery_tree_queue_changed(event) end
-  if competing_productivity and competing_productivity.active() then competing_productivity.on_discovery_tree_queue_changed(event) end
+local function on_research_queued(event)
+  if not (event and event.research) or event.research.valid == false then return end
+  if DISCOVERY_TREE then
+    if lifecycle.caps_active() then lifecycle.on_discovery_tree_queue_changed(event) end
+    if competing_productivity and competing_productivity.active() then competing_productivity.on_discovery_tree_queue_changed(event) end
+  end
   request_library_refresh(event)
 end
 
@@ -642,9 +648,8 @@ local function bind_runtime_events(library_open)
     script.on_event(events.on_technology_effects_reset, active and on_technology_effects_reset or nil)
   end
   if events.on_research_queued then
-    local handler = library_open and request_library_refresh or nil
-    if DISCOVERY_TREE and (lifecycle.caps_active() or competing_active or library_open) then handler = on_discovery_queue_changed end
-    script.on_event(events.on_research_queued, handler)
+    local active = library_open or (DISCOVERY_TREE and (lifecycle.caps_active() or competing_active))
+    script.on_event(events.on_research_queued, active and on_research_queued or nil)
   end
   if events.on_runtime_mod_setting_changed and DISCOVERY_TREE then
     script.on_event(events.on_runtime_mod_setting_changed,
