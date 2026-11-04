@@ -16,6 +16,9 @@ local INTERNAL_CREDIT_IDS = {
   ["mir-k2-imersite-staged-state-1"] = true,
   ["mir-k2-imersite-continuation-state-4"] = true,
 }
+for name in pairs(require("research.native_gun_credit_definitions").private_ids()) do
+  INTERNAL_CREDIT_IDS[name] = true
+end
 
 function M.gear_id() return GEAR_ID end
 

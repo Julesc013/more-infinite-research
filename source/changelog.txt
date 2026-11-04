@@ -6,6 +6,8 @@ Date: 2026-11-05
 
     - Avoid redundant future weapon-speed upgrades when qualified native research already covers every effect, while retaining
       earned bonuses.
+    - Preserve paid electric and Tesla speed bonuses separately when another mod covers only part of their shared research, while
+      keeping useful uncovered research available.
     - Avoid duplicate future productivity for Galore coal crushing while retaining earned sulfur bonuses and other sulfur research
       effects.
     - Avoid errors when a research event refers to a technology that is missing or no longer valid.

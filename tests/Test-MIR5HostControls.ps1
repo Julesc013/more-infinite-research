@@ -72,6 +72,8 @@ $controls = @(
   [ordered]@{path='tests/test_automatic_families.py';lua=$true},
   [ordered]@{path='tests/test_competing_productivity.py';lua=$true},
   [ordered]@{path='tests/test_native_credit_definitions.py';lua=$true},
+  [ordered]@{path='tests/test_native_gun_credit_definitions.py';lua=$true},
+  [ordered]@{path='tests/test_native_gun_credits.py';lua=$true},
   [ordered]@{path='tests/test_native_family_credit_definitions.py';lua=$true},
   [ordered]@{path='tests/test_native_credits.py';lua=$true},
   [ordered]@{path='tests/test_native_family_paid_credits.py';lua=$true},

@@ -150,13 +150,17 @@ class LibraryModelTests(unittest.TestCase):
           expected[require("research.legacy_cannon_credit_definitions").descriptor().id] = true
           expected["mir-k2-imersite-staged-state-1"] = true
           expected["mir-k2-imersite-continuation-state-4"] = true
+          expected["mir-native-credit-research_electric_shooting_speed-electric-positive"] = true
+          expected["zz-mir-native-credit-research_electric_shooting_speed-electric-negative"] = true
+          expected["mir-native-credit-research_electric_shooting_speed-tesla-positive"] = true
+          expected["zz-mir-native-credit-research_electric_shooting_speed-tesla-negative"] = true
           local first, second = catalogue.internal_credit_ids(), catalogue.internal_credit_ids()
           local count = 0
           for id, value in pairs(first) do
             assert(value == true and expected[id] == true, "unexpected private credit identity: " .. tostring(id))
             count = count + 1
           end
-          assert(count == 6)
+          assert(count == 10)
           for id in pairs(expected) do assert(first[id] == true and second[id] == true) end
           local changed = "mir-legacy-module-credit-speed-module"
           first[changed] = false

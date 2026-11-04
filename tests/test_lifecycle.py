@@ -486,6 +486,38 @@ class LifecycleTests(unittest.TestCase):
           end
         ''')
 
+    def test_retired_mixed_gun_readmission_restores_only_lifecycle_owned_disablement(self):
+        self.lua.execute('''
+          for _,baseline in ipairs({true,false}) do
+            local name="recipe-prod-research_electric_shooting_speed-1"
+            local paid=technology(name,4,baseline);paid.saved_progress=.27
+            paid.prototype.effects={};paid.prototype.enabled=false
+            local f=force(48,{[name]=paid},{paid},paid,.42);paid.force=f
+            boot({[48]=f},0,"",nil,nil,0,{["space-age"]="2.0.0"},nil,
+              {["ips-max-level-research_electric_shooting_speed"]=0})
+            handlers.init();local saved=storage
+            assert(not paid.enabled)
+            if baseline then assert(saved.mir_caps.owned_disabled[48][name].disabled)
+            else assert(saved.mir_caps==nil) end
+            boot({[48]=f},0,"",saved,nil,0,{["space-age"]="2.0.0"},nil,
+              {["ips-max-level-research_electric_shooting_speed"]=0})
+            handlers.configuration()
+            assert(not paid.enabled)
+            if baseline then assert(storage.mir_caps.owned_disabled[48][name].disabled)
+            else assert(storage.mir_caps==nil) end
+            paid.prototype.enabled=true
+            paid.prototype.effects={{type="gun-speed",ammo_category="tesla",modifier=.1}}
+            handlers.configuration()
+            assert(paid.enabled==baseline and storage.mir_caps==nil,
+              "readmission enabled="..tostring(paid.enabled).." baseline="..tostring(baseline).." ledger="..tostring(storage.mir_caps))
+            assert(paid.level==4 and paid.saved_progress==.27 and f.current_research==paid
+              and f.research_queue[1]==paid and f.research_progress==.42 and f.cancelled==0,
+              "work: level="..tostring(paid.level).." saved="..tostring(paid.saved_progress)
+                .." current="..tostring(f.current_research==paid).." queue="..tostring(f.research_queue[1]==paid)
+                .." progress="..tostring(f.research_progress).." cancelled="..tostring(f.cancelled))
+          end
+        ''')
+
     def test_unlimited_disabled_prototype_survives_effects_reset_and_force_boundaries(self):
         self.lua.execute('''
           local name = "recipe-prod-research_gears-1"

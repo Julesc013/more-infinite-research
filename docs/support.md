@@ -87,6 +87,8 @@ source_of_truth_for:
 
 - MIR 5 betas may still offer dedicated weapon-speed research when another mod supplies infinite research for the same bonus. The competing-research preference does not resolve every overlap yet. This remains open for stable qualification; it is not a reason to delete research or its earned effects from a save.
 
+- The next candidate separates electric and Tesla bonuses when a qualified native research owner covers only one category. Earned bonuses and useful remaining research must survive; its affected in-game qualification is still open. If a first upgrade cannot establish the old paid category selection, keep the original save and mod/settings selection rather than attempting to repair research levels manually.
+
 ### Same-edition and historical upgrades
 
 - Recorded same-edition cases cover retained research, effects, partial work and reload behavior for the normal Factorio families. The observed 2.1 cases include Base and selected Space Age content; the observed 2.0 cases include Base and a selected provider/preference boundary. Earlier editions have narrower historical state coverage. Treat a different modpack, setting, provider or DLC change as its own case.

@@ -28,6 +28,7 @@ class BootstrapTests(unittest.TestCase):
             credit_calls = {}
             module_credit_calls = {}
             cannon_credit_calls = {}
+            gun_credit_calls = {}
             configuration_order = {}
             package.preload["platform.target"] = function()
               local target = dofile(player_root .. "/platform/target.lua")
@@ -89,6 +90,32 @@ class BootstrapTests(unittest.TestCase):
                   cannon_credit_calls.reset = event
                 end
               }
+            end
+            package.preload["runtime.native_gun_credits"] = function()
+              local module = {
+                preflight = function(event)
+                  gun_credit_calls.preflight = event
+                  table.insert(configuration_order, "gun-credit-preflight")
+                  if GUN_CREDIT_PREFLIGHT_ERROR then error(GUN_CREDIT_PREFLIGHT_ERROR) end
+                  return {gun_snapshot=true}
+                end,
+                needs_research_events = function() return GUN_PENDING == true end,
+                on_research_finished = function(event)
+                  gun_credit_calls.finished=event;GUN_PENDING=false;return true
+                end,
+                on_research_cancelled = function(event)
+                  gun_credit_calls.cancelled=event;GUN_PENDING=false;return true
+                end,
+              }
+              for _,name in ipairs({"on_init","on_configuration_changed","on_load",
+                  "on_force_created","on_force_reset","on_forces_merged","on_technology_effects_reset"}) do
+                local callback=name
+                module[callback]=function(event,plan)
+                  gun_credit_calls[callback]=(gun_credit_calls[callback] or 0)+1
+                  if callback=="on_configuration_changed" then gun_credit_calls.plan=plan end
+                end
+              end
+              return module
             end
             lifecycle_calls = {}
             library_calls = {}
@@ -240,6 +267,7 @@ class BootstrapTests(unittest.TestCase):
             package.loaded["runtime.native_credits"] = nil
             package.loaded["runtime.legacy_module_credits"] = nil
             package.loaded["runtime.legacy_cannon_credits"] = nil
+            package.loaded["runtime.native_gun_credits"] = nil
             package.loaded["runtime.configuration"] = nil
             package.loaded["runtime.lifecycle"] = nil
             package.loaded["runtime.scripted_effects"] = nil
@@ -250,6 +278,46 @@ class BootstrapTests(unittest.TestCase):
             package.loaded["research.settings"] = nil
             return require("control")
           end
+        ''')
+
+    def test_gun_credit_preflight_runs_before_every_configuration_writer(self):
+        self.lua.execute('''
+          install_modules(false,false,false,true)
+          install_runtime(nil,{["space-age"]="2.0.0"});load_control()
+          GUN_CREDIT_PREFLIGHT_ERROR="gun paid mask unknown"
+          local ok,message=pcall(handlers.configuration,{marker="original-event"})
+          assert(not ok and tostring(message):find("gun paid mask unknown",1,true))
+          assert(lifecycle_calls.configuration==nil and credit_calls.on_configuration_changed==nil)
+          assert(module_credit_calls.plan==nil and cannon_credit_calls.plan==nil)
+          GUN_CREDIT_PREFLIGHT_ERROR=nil
+          handlers.configuration({marker="original-event"})
+          assert(configuration_order[4]=="gun-credit-preflight")
+          assert(gun_credit_calls.plan.gun_snapshot and gun_credit_calls.on_configuration_changed==1)
+        ''')
+
+    def test_gun_pending_callbacks_reconstruct_and_release_without_native_recurring_work(self):
+        self.lua.execute('''
+          install_modules(false,false,false,true)
+          install_runtime(nil,{["space-age"]="2.0.0"});load_control()
+          handlers.init()
+          assert(handlers.events[defines.events.on_research_finished]==nil)
+          assert(handlers.events[defines.events.on_research_cancelled]==nil)
+          GUN_PENDING=true;handlers.load()
+          assert(type(handlers.events[defines.events.on_research_finished])=="function")
+          assert(type(handlers.events[defines.events.on_research_cancelled])=="function")
+          local event={research=known_technology}
+          handlers.events[defines.events.on_research_finished](event)
+          assert(gun_credit_calls.finished==event)
+          assert(handlers.events[defines.events.on_research_finished]==nil)
+          assert(handlers.events[defines.events.on_research_cancelled]==nil)
+          assert(next(handlers.nth)==nil and handlers.events[defines.events.on_tick]==nil)
+        ''')
+
+    def test_gun_lifecycle_is_absent_from_base_only_control(self):
+        self.lua.execute('''
+          install_modules(false,false,false,true);install_runtime();load_control()
+          handlers.init();handlers.configuration({});handlers.load()
+          assert(next(gun_credit_calls)==nil and package.loaded["runtime.native_gun_credits"]==nil)
         ''')
 
     def test_control_composes_lifecycle_library_api_legacy_interface_and_command(self):

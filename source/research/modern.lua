@@ -540,10 +540,9 @@ function M.apply_weapon_speed_overlap(selection, outputs, values)
 end
 
 -- Only owners already admitted for the two authored shared weapon tails can
--- withhold a dedicated stream here. Preserve its entire paid effect vector;
--- a mixed stream with an uncovered effect stays available pending its separate
--- preservation treatment. No foreign prototype is changed and no unrelated
--- research is inspected.
+-- withhold a dedicated stream here. The sole authored electric/tesla pair
+-- preserves paid categories through explicit native holders; other wholly
+-- covered streams retain their complete earned vector and stop future work.
 function M.retain_external_weapon_coverage(selection, outputs, science_context)
   local covered = {}
   for name, owner in pairs(selection.external_continuations or {}) do
@@ -563,11 +562,24 @@ function M.retain_external_weapon_coverage(selection, outputs, science_context)
       end
     end
   end
-  if next(covered) == nil then return end
   local generated = {}
   for _, row in ipairs(outputs) do generated[row.name] = row end
+  local electric_full
   for _, definition in ipairs(selection.definitions) do
     local row = generated["recipe-prod-" .. definition.key .. "-1"]
+    if definition.family == "research_electric_shooting_speed" and row and #row.effects == 2
+        and science_context.target.recipe_productivity == true
+        and type(science_context.mods) == "table" and science_context.mods["space-age"] ~= nil then
+      -- Keep the exact pre-selection vector and the shared resolved unit.
+      -- The constructor detaches all four rows after science selection.
+      electric_full = {type=row.type, name=row.name, effects=row.effects, unit=row.unit}
+      local retained = {}
+      for _, effect in ipairs(row.effects) do
+        if not covered[effect.ammo_category] then retained[#retained + 1] = effect end
+      end
+      row.effects = retained
+      if #retained == 0 then row.enabled = false end
+    end
     if weapon_overlap_families[definition.family] and row and row.enabled ~= false then
       local fully_covered = #row.effects > 0
       for _, effect in ipairs(row.effects) do
@@ -577,6 +589,7 @@ function M.retain_external_weapon_coverage(selection, outputs, science_context)
       if fully_covered then row.enabled = false end
     end
   end
+  return electric_full
 end
 
 local function preflight_patch_recipe_names(selection, raw)
