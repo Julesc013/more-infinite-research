@@ -8,6 +8,7 @@ Date: 2026-11-05
       earned bonuses.
     - Avoid duplicate future productivity for Galore coal crushing while retaining earned sulfur bonuses and other sulfur research
       effects.
+    - Avoid errors when a research event refers to a technology that is missing or no longer valid.
 
 ---------------------------------------------------------------------------------------------------
 Version: 5.0.3

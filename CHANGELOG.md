@@ -8,6 +8,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 - Avoid redundant future weapon-speed upgrades when qualified native research already covers every effect, while retaining earned bonuses.
 - Avoid duplicate future productivity for Galore coal crushing while retaining earned sulfur bonuses and other sulfur research effects.
+- Avoid errors when a research event refers to a technology that is missing or no longer valid.
 
 ## [5.0.3] - 2026-11-04
 
