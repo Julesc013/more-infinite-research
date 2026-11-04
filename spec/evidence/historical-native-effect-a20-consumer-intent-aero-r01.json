@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIRHistoricalNativeEffectA20ConsumerIntentAeroV1",
-  "status": "bounded-final-source-intent-with-host-consumer-discrepancy",
+  "status": "bounded-final-and-earlier-fixture-intent-with-host-consumer-discrepancy",
   "reviewed_against": "807ee2537fd6f431d6944ac26c11fcda1dc76565",
   "player_tree": "58480faa995eab995cc0a3ad2cddbbdd0e5e0c04",
   "subjects": [
@@ -485,7 +485,9 @@
       "sha256": "7D23D6FF826892B83D2303ADEA65F7EDBB1E922597A4F2374FFE8BDEE491091E",
       "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
       "tag_bindings": 12,
-      "semantic_review": "metadata-only; unresolved"
+      "original_semantic_review_r01": "metadata-only; unresolved",
+      "semantic_review": "resolved for source intent in earlier_fixture_reconciliation_r02; no host/native acceptance",
+      "disposition_group": "registry-policy-versus-mutation-import"
     },
     {
       "blob": "4f34c93de71a9e9527cb4ed6000b4ec7b31b9ad6",
@@ -493,7 +495,9 @@
       "sha256": "151813D229FEC3884637F44FA35A7088906AC2985CF5F251F1B486E9E32B0FE2",
       "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
       "tag_bindings": 15,
-      "semantic_review": "metadata-only; unresolved"
+      "original_semantic_review_r01": "metadata-only; unresolved",
+      "semantic_review": "resolved for source intent in earlier_fixture_reconciliation_r02; no host/native acceptance",
+      "disposition_group": "isolated-compiler-context-replay"
     },
     {
       "blob": "55e848cbd94af9af78271d50e24e0fa2e56c0823",
@@ -501,7 +505,9 @@
       "sha256": "5534E1154C34740F70D1D4FC1FF1431D83A6EF36FC533513095EA2CA0DCEB0A1",
       "path": "fixtures/weapon-speed-external-owner/data.lua",
       "tag_bindings": 32,
-      "semantic_review": "metadata-only; unresolved"
+      "original_semantic_review_r01": "metadata-only; unresolved",
+      "semantic_review": "resolved for source intent in earlier_fixture_reconciliation_r02; no host/native acceptance",
+      "disposition_group": "external-owner-setup-and-target-spelling"
     },
     {
       "blob": "6ae049bda062010f85dffff1c003aadcf5bb6e25",
@@ -509,7 +515,9 @@
       "sha256": "A39070B7BC4DDA6FAE6B3B5F7B37114DD3F2E774C44B0DA6C7EAEC5EA297A404",
       "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
       "tag_bindings": 16,
-      "semantic_review": "metadata-only; unresolved"
+      "original_semantic_review_r01": "metadata-only; unresolved",
+      "semantic_review": "resolved for source intent in earlier_fixture_reconciliation_r02; no host/native acceptance",
+      "disposition_group": "early-unconditional-overlap-and-mandatory-emission"
     },
     {
       "blob": "d67a933ba20723943124845b5ee724ecba0125cd",
@@ -517,7 +525,9 @@
       "sha256": "2709DC8A3198AA36510B1FE10A61ADA526B01EF5C6E98C1034431E236F038F32",
       "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
       "tag_bindings": 5,
-      "semantic_review": "metadata-only; unresolved"
+      "original_semantic_review_r01": "metadata-only; unresolved",
+      "semantic_review": "resolved for source intent in earlier_fixture_reconciliation_r02; no host/native acceptance",
+      "disposition_group": "registry-policy-versus-mutation-import"
     },
     {
       "blob": "e36c8a19379e7dd935907bd609a28f2b17bf0fc2",
@@ -525,7 +535,9 @@
       "sha256": "FEC9E12890DC33746440156C0CE90AFA55659BA19B4EA5F1E7CE9CE63F772659",
       "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
       "tag_bindings": 13,
-      "semantic_review": "metadata-only; unresolved"
+      "original_semantic_review_r01": "metadata-only; unresolved",
+      "semantic_review": "resolved for source intent in earlier_fixture_reconciliation_r02; no host/native acceptance",
+      "disposition_group": "early-unconditional-overlap-and-mandatory-emission"
     },
     {
       "blob": "e466e740ce72f3a48175458c551775c8c8fe5411",
@@ -533,7 +545,9 @@
       "sha256": "02B8D1F7808F82B72C0BD17070BEDBED1DBC2F8E7CF4BEDC3460EE9244197CE7",
       "path": "fixtures/weapon-speed-external-owner/data.lua",
       "tag_bindings": 6,
-      "semantic_review": "metadata-only; unresolved"
+      "original_semantic_review_r01": "metadata-only; unresolved",
+      "semantic_review": "resolved for source intent in earlier_fixture_reconciliation_r02; no host/native acceptance",
+      "disposition_group": "external-owner-setup-and-target-spelling"
     },
     {
       "blob": "f37fbf62f39f6304e8730ab04b18be56a8290517",
@@ -541,7 +555,9 @@
       "sha256": "F544FB69E0FDD161925F73155859B6200C9B54035A2C4CFB8BBB1EEFF5A6B299",
       "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
       "tag_bindings": 6,
-      "semantic_review": "metadata-only; unresolved"
+      "original_semantic_review_r01": "metadata-only; unresolved",
+      "semantic_review": "resolved for source intent in earlier_fixture_reconciliation_r02; no host/native acceptance",
+      "disposition_group": "standalone-science-and-exact-owner"
     }
   ],
   "complete_metadata_custody": {
@@ -569,5 +585,218 @@
     "sha256": "AF341C2E667B290536A0EEE403511DC04A56726F986C5D5A0E6542F3D88028F6",
     "verdict": "supported-bounded-host-logical-discrepancy",
     "limits": "Original complete assertion/A20 not executed; baseline/disabled are complementary isolated eligibility controls. Synthetic host seed, no native/support-completeness verdict."
+  },
+  "earlier_fixture_reconciliation_r02": {
+    "reviewed_against": "8fcac651ec259fe3b78a2a16cd742b0352c5cf53",
+    "player_tree": "58480faa995eab995cc0a3ad2cddbbdd0e5e0c04",
+    "scope": "The eight previously metadata-only direct fixture bodies:41139bytes,105 exact commit/path bindings across67 indexed tag names.104 bindings match live remote tags; retained local-only v3.0.0 names a different commit from public3.0.0 and is not a published alias claim. Together with r01 this accounts for all11 bodies/153 indexed bindings at the three named A20 paths; imported helpers, inter-release/discussion/native evidence and other paths remain outside scope.",
+    "prior_review": {
+      "commit": "8fcac651ec259fe3b78a2a16cd742b0352c5cf53",
+      "path": "spec/evidence/historical-native-effect-a20-consumer-intent-aero-r01.json",
+      "sha256": "45767767DB79A2641AF7195DD7B6022304B8E0DDA6A0EE8B71733C0BD10A6D07"
+    },
+    "independent_final_comparator": {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "safety_blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+      "external_blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+      "scope": "Published4.7.3 final fixture assertions supersede earlier exact0.1/unconditional-always and mandatory-dedicated assumptions; current candidate is not the expectation oracle."
+    },
+    "bodies": [
+      {
+        "blob": "38da8e7fe8cd07c6da54570f17fade4bc35bcc7b",
+        "bytes": 7729,
+        "sha256": "7D23D6FF826892B83D2303ADEA65F7EDBB1E922597A4F2374FFE8BDEE491091E",
+        "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+        "tag_bindings": 12,
+        "lines": 205,
+        "disposition_group": "registry-policy-versus-mutation-import",
+        "read_method": "Complete body or complete already-read-base plus all changed hunks; exact original bytes retained"
+      },
+      {
+        "blob": "4f34c93de71a9e9527cb4ed6000b4ec7b31b9ad6",
+        "bytes": 9693,
+        "sha256": "151813D229FEC3884637F44FA35A7088906AC2985CF5F251F1B486E9E32B0FE2",
+        "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+        "tag_bindings": 15,
+        "lines": 244,
+        "disposition_group": "isolated-compiler-context-replay",
+        "read_method": "Complete body or complete already-read-base plus all changed hunks; exact original bytes retained"
+      },
+      {
+        "blob": "55e848cbd94af9af78271d50e24e0fa2e56c0823",
+        "bytes": 2323,
+        "sha256": "5534E1154C34740F70D1D4FC1FF1431D83A6EF36FC533513095EA2CA0DCEB0A1",
+        "path": "fixtures/weapon-speed-external-owner/data.lua",
+        "tag_bindings": 32,
+        "lines": 57,
+        "disposition_group": "external-owner-setup-and-target-spelling",
+        "read_method": "Complete body or complete already-read-base plus all changed hunks; exact original bytes retained"
+      },
+      {
+        "blob": "6ae049bda062010f85dffff1c003aadcf5bb6e25",
+        "bytes": 2295,
+        "sha256": "A39070B7BC4DDA6FAE6B3B5F7B37114DD3F2E774C44B0DA6C7EAEC5EA297A404",
+        "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+        "tag_bindings": 16,
+        "lines": 65,
+        "disposition_group": "early-unconditional-overlap-and-mandatory-emission",
+        "read_method": "Complete body or complete already-read-base plus all changed hunks; exact original bytes retained"
+      },
+      {
+        "blob": "d67a933ba20723943124845b5ee724ecba0125cd",
+        "bytes": 7713,
+        "sha256": "2709DC8A3198AA36510B1FE10A61ADA526B01EF5C6E98C1034431E236F038F32",
+        "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+        "tag_bindings": 5,
+        "lines": 205,
+        "disposition_group": "registry-policy-versus-mutation-import",
+        "read_method": "Complete body or complete already-read-base plus all changed hunks; exact original bytes retained"
+      },
+      {
+        "blob": "e36c8a19379e7dd935907bd609a28f2b17bf0fc2",
+        "bytes": 1091,
+        "sha256": "FEC9E12890DC33746440156C0CE90AFA55659BA19B4EA5F1E7CE9CE63F772659",
+        "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+        "tag_bindings": 13,
+        "lines": 32,
+        "disposition_group": "early-unconditional-overlap-and-mandatory-emission",
+        "read_method": "Complete body or complete already-read-base plus all changed hunks; exact original bytes retained"
+      },
+      {
+        "blob": "e466e740ce72f3a48175458c551775c8c8fe5411",
+        "bytes": 2635,
+        "sha256": "02B8D1F7808F82B72C0BD17070BEDBED1DBC2F8E7CF4BEDC3460EE9244197CE7",
+        "path": "fixtures/weapon-speed-external-owner/data.lua",
+        "tag_bindings": 6,
+        "lines": 62,
+        "disposition_group": "external-owner-setup-and-target-spelling",
+        "read_method": "Complete body or complete already-read-base plus all changed hunks; exact original bytes retained"
+      },
+      {
+        "blob": "f37fbf62f39f6304e8730ab04b18be56a8290517",
+        "bytes": 7660,
+        "sha256": "F544FB69E0FDD161925F73155859B6200C9B54035A2C4CFB8BBB1EEFF5A6B299",
+        "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+        "tag_bindings": 6,
+        "lines": 195,
+        "disposition_group": "standalone-science-and-exact-owner",
+        "read_method": "Complete body or complete already-read-base plus all changed hunks; exact original bytes retained"
+      }
+    ],
+    "groups": [
+      {
+        "id": "early-unconditional-overlap-and-mandatory-emission",
+        "blobs": [
+          "e36c8a19379e7dd935907bd609a28f2b17bf0fc2",
+          "6ae049bda062010f85dffff1c003aadcf5bb6e25"
+        ],
+        "source_lines": {
+          "e36c8a19": "12-32",
+          "6ae049bd": "19-65"
+        },
+        "independent_expectation": "Finite vanilla weapon-shooting-speed-5/6 retain cannon-shell. An emitted dedicated row retains its authored prerequisite gate: rocketry; tank/tanks plus weapon-shooting-speed-5; flamethrower; discharge-defense-equipment.",
+        "disposition": "retain-finite-and-emitted-prerequisite-obligations; supersede-unconditional-generated-overlap-and-mandatory-all-four-rows",
+        "reason": "These early assertions choose any numbered formula technology via pairs, strip both categories unconditionally, and the later of these two requires all four dedicated rows. The complete published4.7.3 fixture instead checks actual replacement coverage and permits dedicated absence under qualified external ownership. Number shape/formula is not current MIR custody.",
+        "current_mapping": [
+          "source/research/modern.lua:apply_weapon_speed_overlap edits only submitted7/9 output",
+          "tests/test_generator.py::GeneratorTests::test_weapon_speed_overlap_requires_an_enabled_positive_direct_replacement",
+          "tests/test_generator.py::GeneratorTests::test_data_final_full_published_technology_output_matches_oracle"
+        ],
+        "remaining": "Keep explicit finite5/6 and emitted-prerequisite negative controls in the affected ownership correction; a whole-output oracle is complementary and does not alone prove raw foreign nonmutation."
+      },
+      {
+        "id": "standalone-science-and-exact-owner",
+        "blobs": [
+          "f37fbf62f39f6304e8730ab04b18be56a8290517"
+        ],
+        "source_lines": {
+          "f37fbf62": "30-108,124-154,176-195"
+        },
+        "independent_expectation": "An enabled infinite owner needs science accepted by a lab and an available enabled/unlocked production route. Preference false plus qualified external coverage suppresses MIR dedicated rocket/cannon rows; a numbered foreign technology is protected from cleanup.",
+        "disposition": "retain-science-and-consumer-boundaries; supersede-exact0.1-and-always-without-coverage; retire-inline-test-scanning-implementation",
+        "reason": "The final published assertion accepts a positive effect identity rather than exact0.1 and requires replacement coverage even for always mode. Its owner setup still uses0.1; no non0.1 native observation is inferred. Zero MIR generic continuation is permitted only with the named already-infinite rejection witness. The earlier inline recipe scan is test implementation, not a mandate to restore a graph solver.",
+        "current_mapping": [
+          "existing positive-owner host discrepancy D27B6B22",
+          "tests/test_continuation_ownership.py::ContinuationOwnershipTests::test_each_existing_foreign_infinite_owner_is_preserved"
+        ],
+        "remaining": "The existing positive-owner consumer gap remains open; disabled/nonpositive/unreachable and partly covered identities require independent controls and applicable native/provider/save observations."
+      },
+      {
+        "id": "registry-policy-versus-mutation-import",
+        "blobs": [
+          "d67a933ba20723943124845b5ee724ecba0125cd",
+          "38da8e7fe8cd07c6da54570f17fade4bc35bcc7b"
+        ],
+        "source_lines": {
+          "d67a933b": "5-7,102-139,161-205",
+          "38da8e7f": "5-7,102-139,161-205"
+        },
+        "independent_expectation": "Cleanup acts on generated owned identities; rerunning it must leave a transient foreign weapon-shooting-speed-99 rocket/cannon effect intact. The counterexample is removed before final engine prototype validation.",
+        "disposition": "consolidate-shared-semantic-body; obsolete-private-registry-import-and-apply-spelling",
+        "reason": "The complete two-body diff changes only the policy-versus-mutation import and apply call. Their cross-mod fallback inspects numbered prototypes for assertions and the transient mutation challenge executes only when the imported registry is visible. This conditional fixture branch is not proof it ran natively.",
+        "current_mapping": [
+          "source/research/modern.lua: submitted output boundary",
+          "tests/test_continuation_ownership.py::ContinuationOwnershipTests::test_foreign_creator_remains_external_after_later_modifications"
+        ],
+        "remaining": "Port a direct raw-foreign nonmutation opponent without restoring old modules. Retain original host gap and do not use transient99 as an upstream-valid final native selection."
+      },
+      {
+        "id": "isolated-compiler-context-replay",
+        "blobs": [
+          "4f34c93de71a9e9527cb4ed6000b4ec7b31b9ad6"
+        ],
+        "source_lines": {
+          "4f34c93d": "5-12,53-90,113-169,197-244"
+        },
+        "independent_expectation": "A closed production context must not be mistaken for authority to mutate foreign prototypes. Test-only replay restores known emitted names inside an isolated context before the transient foreign cleanup challenge.",
+        "disposition": "obsolete-implementation-only-context-artifact-and-replay-mechanism; retain-custody-and-coverage-obligations",
+        "reason": "This fixture reads old public-plan/internal-evidence ModData, collects emitted/base-continuation names, and conditionally replays them in a fresh SAFE context. These are retired harness interfaces; their spelling/visibility is not a player API commitment. Its exact0.1/unconditional always expectations are superseded by the final published fixture.",
+        "current_mapping": [
+          "source/research/generator.lua: strict submitted batch boundary",
+          "source/research/modern.lua:apply_weapon_speed_overlap"
+        ],
+        "remaining": "Imported compiler/registry/coverage/mutation modules and their own assertions remain outside this eight-body slice except where separately reconciled. No legacy runtime or fixture execution is claimed."
+      },
+      {
+        "id": "external-owner-setup-and-target-spelling",
+        "blobs": [
+          "55e848cbd94af9af78271d50e24e0fa2e56c0823",
+          "e466e740ce72f3a48175458c551775c8c8fe5411"
+        ],
+        "source_lines": {
+          "55e848cb": "1-57",
+          "e466e740": "1-62"
+        },
+        "independent_expectation": "The hidden infinite fixture owner carries rocket/cannon effects and copies enablement/science from its selected source; setup alone does not prove qualification. The negative science pack is deliberately accepted by all labs while its recipe remains disabled/unlocked nowhere; lab admission alone must not qualify that owner.",
+        "disposition": "consolidate-fixture-construction; supersede-hardcoded-tank-with-target-alternative; retain-science-negative-and-foreign-numbered-custody",
+        "reason": "e466 selects tank/tanks and adds numbered99 before MIR compilation;55e hardcodes tank and lacks that counterexample. The final published external fixture adds positive-modifier and finite/disabled/zero challenges. Native validity of these historical bodies is not inferred from their existence or from an earlier/final body.",
+        "current_mapping": [
+          "existing literal independent A20 host seed and numbered99-removal opponent",
+          "tests/test_generator.py::GeneratorTests::test_weapon_speed_overlap_requires_an_enabled_positive_direct_replacement"
+        ],
+        "remaining": "Use actual target-native prerequisites and a qualified provider when exercising real research/save transitions; keep finite/disabled/zero/science-unreachable expectations separate from synthetic setup."
+      }
+    ],
+    "binding_readback": {
+      "path": "native-effect-a20-early-remote-binding-readback-r01.json",
+      "sha256": "9510CADC01E9130268E2200DCABFFA037C48F34890584E5F2680C29CA4EDFE41",
+      "exact_commit_path_bindings": 105,
+      "live_remote_bindings": 104,
+      "local_only_ref": {
+        "tag": "v3.0.0",
+        "commit": "70bb513f5b388ad23c4a5d46dfc945571c3b8217",
+        "currently_published": false,
+        "public_numeric_tag": "3.0.0",
+        "public_numeric_commit": "8da631a6e5774af6d8804a49107a61a7964a5b2c",
+        "same_commit": false,
+        "not_assumed_alias": true
+      }
+    },
+    "conclusion": "No additional product correction is established by these eight source bodies. They consolidate the existing consumer/finite/prerequisite/science/custody obligations and explicitly prevent restoring superseded tests. The existing final-fixture positive-owner host discrepancy and paid-state review remain open.",
+    "selected_body_intent_review_complete": true,
+    "whole_historical_inventory_complete": false,
+    "native_execution": false,
+    "host_execution": false,
+    "release_qualification": false
   }
 }
