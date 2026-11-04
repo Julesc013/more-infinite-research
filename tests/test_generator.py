@@ -1353,9 +1353,12 @@ class GeneratorTests(unittest.TestCase):
 
     def _weapon_coverage_world(self):
         self.lua.execute('''
-          function weapon_coverage_case(rocket, cannon, enabled, ingredients, blocked, mode)
-            mods={base="2.1.23"}; settings={startup=defaults()}; helpers=nil; log=function() end
-            settings.startup["mir-prefer-this-mod-for-competing-techs"].value=false
+          function weapon_coverage_case(rocket, cannon, enabled, ingredients, blocked, mode, debug, prefer)
+            local messages={}
+            mods={base="2.1.23"}; settings={startup=defaults()}; helpers=nil
+            log=function(message)messages[#messages+1]=message end
+            settings.startup["mir-debug-generation-report"].value=debug==true
+            settings.startup["mir-prefer-this-mod-for-competing-techs"].value=prefer==true
             settings.startup["mir-adjust-vanilla-weapon-speed-techs"].value=mode or "only-when-dedicated-tech-enabled"
             data=full_world(mods)
             local unit={count=100,time=30,ingredients={{"automation-science-pack",1}}}
@@ -1397,7 +1400,7 @@ class GeneratorTests(unittest.TestCase):
               assert(row.effects[1].type=="gun-speed" and row.effects[1].ammo_category==category
                 and row.effects[1].modifier==.1,"changed earned native bonus")
             end
-            return rocket_row,cannon_row,foreign
+            return rocket_row,cannon_row,foreign,messages
           end
         ''')
 
@@ -1410,6 +1413,8 @@ class GeneratorTests(unittest.TestCase):
           assert(rocket.enabled==false and cannon.enabled~=false,"per-category coverage suppressed useful research")
           rocket,cannon=weapon_coverage_case(.1,.1,true,nil,false,"off")
           assert(rocket.enabled==false and cannon.enabled==false,"off granted custody of a foreign owner")
+          rocket,cannon=weapon_coverage_case(.1,.1,true,nil,false,nil,false,true)
+          assert(rocket.enabled==false and cannon.enabled==false,"preference granted custody of a foreign owner")
         ''')
 
     def test_unusable_foreign_weapon_coverage_does_not_withhold_mir_research(self):
@@ -1426,6 +1431,23 @@ class GeneratorTests(unittest.TestCase):
           rocket,cannon=weapon_coverage_case(.1,.1,true,nil,true)
           assert(rocket.enabled~=false and cannon.enabled~=false,"disabled prerequisite suppressed MIR")
           data=nil
+        ''')
+
+    def test_covered_weapon_generation_report_matches_final_disablement(self):
+        self._weapon_coverage_world()
+        self.lua.execute('''
+          local _,_,_,messages=weapon_coverage_case(.1,.1,true,nil,false,nil,true)
+          for _,family in ipairs({"rocket","cannon"})do
+            local prefix="[more-infinite-research] recipe-prod-research_"..family.."_shooting_speed-1: "
+            local found=0
+            for _,message in ipairs(messages)do
+              if message:sub(1,#prefix)==prefix then
+                assert(message:sub(#prefix+1,#prefix+8)=="disabled","generation report describes stale availability")
+                found=found+1
+              end
+            end
+            assert(found==1,"missing or duplicate final generation report")
+          end
         ''')
 
     def test_partial_mixed_weapon_coverage_retains_every_paid_effect(self):
