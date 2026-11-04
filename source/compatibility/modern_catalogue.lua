@@ -1024,7 +1024,9 @@ function M.select(active_mods, raw, withheld)
     end
   end
   local bob_tech_materials = not bob_angel_f210 and require("compatibility.bob_tech_profile").applies(active_mods)
-  return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods, raw),
+  local continuations, external_continuations = M.continuations(active_mods, raw)
+  return {profile = profile, definitions = supported_definitions(definitions), continuations = continuations,
+    external_continuations = external_continuations,
     bob_tech_progression = not bob_angel_f210 and target.id == "f210" and type(active_mods) == "table" and active_mods.bobtech ~= nil
       and require("compatibility.modern_catalogue.bob_tech_progression").select(active_mods) or nil,
     native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
@@ -1294,11 +1296,11 @@ function M.continuations(active_mods, raw)
   -- the unchanged Generator rejection. Runtime uses creation custody below
   -- this admission boundary and never claims a foreign owner for caps.
   local existing = type(raw) == "table" and raw.technology
+  local admitted = {}
   if type(existing) == "table" then
-    local admitted = {}
     if secretas_external then admitted["worker-robots-storage-9"] = true end
     for _, row in ipairs(rows) do
-      if existing_infinite_owner(row, existing[row.id]) then admitted[row.id] = true end
+      if existing_infinite_owner(row, existing[row.id]) then admitted[row.id] = existing[row.id] end
     end
     rows = M.omit_existing_continuations(rows, admitted)
   end
@@ -1309,9 +1311,9 @@ function M.continuations(active_mods, raw)
         retained[#retained + 1] = row
       end
     end
-    return retained
+    return retained, admitted
   end
-  return rows
+  return rows, admitted
 end
 
 function M.native_owners(active_mods)

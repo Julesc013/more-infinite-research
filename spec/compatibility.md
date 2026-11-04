@@ -16,6 +16,8 @@ source_of_truth_for:
 
 `COMP-01` — Compatibility supplies explicit variants, exact target bindings and meaningful field checks. The Generator does not know ecosystem names. Adding an adapter must not introduce a whole-modpack fingerprint or another inference engine.
 
+For an admitted external `weapon-shooting-speed-7` or `laser-shooting-speed-8`, count only finite positive native gun-speed coverage from an enabled infinite owner whose unchanged science vector has current authored source support and one accepting lab; a missing or disabled direct prerequisite grants no coverage. Do not discover arbitrary foreign owners or recursively prove their progression. A fully covered dedicated MIR stream retains its historical identity, level boundary, cost and complete earned-effect vector with future research disabled, including across cap relaxation and force/reset boundaries. Partial mixed-category coverage still requires preservation of the covered paid contribution and useful uncovered progression; disabling the entire mixed stream or deleting an earned effect does not satisfy that obligation. Preserve all foreign fields and keep unrelated/internal duplicate protection strict.
+
 ## Three binding paths
 
 1. **Exact:** named recipe, owner, prerequisites and science vector. Prefer this when it preserves the existing effect coverage.
