@@ -539,6 +539,46 @@ function M.apply_weapon_speed_overlap(selection, outputs, values)
   end
 end
 
+-- Only owners already admitted for the two authored shared weapon tails can
+-- withhold a dedicated stream here. Preserve its entire paid effect vector;
+-- a mixed stream with an uncovered effect stays available pending its separate
+-- preservation treatment. No foreign prototype is changed and no unrelated
+-- research is inspected.
+function M.retain_external_weapon_coverage(selection, outputs, science_context)
+  local covered = {}
+  for name, owner in pairs(selection.external_continuations or {}) do
+    if (name == "weapon-shooting-speed-7" or name == "laser-shooting-speed-8")
+        and require("research.science").existing_research_inputs_supported(owner, science_context) then
+      local totals, valid = {}, true
+      for _, effect in ipairs(owner.effects) do
+        if effect.type == "gun-speed" and type(effect.ammo_category) == "string" then
+          if not finite(effect.modifier) then valid = false; break end
+          totals[effect.ammo_category] = (totals[effect.ammo_category] or 0) + effect.modifier
+        end
+      end
+      if valid then
+        for category, value in pairs(totals) do
+          if finite(value) and value > 0 then covered[category] = true end
+        end
+      end
+    end
+  end
+  if next(covered) == nil then return end
+  local generated = {}
+  for _, row in ipairs(outputs) do generated[row.name] = row end
+  for _, definition in ipairs(selection.definitions) do
+    local row = generated["recipe-prod-" .. definition.key .. "-1"]
+    if weapon_overlap_families[definition.family] and row and row.enabled ~= false then
+      local fully_covered = #row.effects > 0
+      for _, effect in ipairs(row.effects) do
+        if effect.type ~= "gun-speed" or not finite(effect.modifier) or effect.modifier <= 0
+            or not covered[effect.ammo_category] then fully_covered = false; break end
+      end
+      if fully_covered then row.enabled = false end
+    end
+  end
+end
+
 local function preflight_patch_recipe_names(selection, raw)
   if type(selection) ~= "table" or type(raw) ~= "table" or type(raw.recipe) ~= "table" then
     error("MIR modern recipe patch preflight requires data.raw.recipe", 2)
