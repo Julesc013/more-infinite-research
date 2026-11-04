@@ -261,9 +261,67 @@
           "scope": "Original nine material lab completions/two cold reloads; predecessor upgrade explicitly false"
         }
       ],
-      "remaining_executable_check": "Map the accepted exact early/both-late/adversarial science cases and actual progressed predecessor/successor/two-cold input closure to K2-01 before closing it. Reuse unchanged consumed inputs under original identities; execute only uncovered required boundaries. Recover named synthesis receipts from historical custody if needed; their canonical ledger paths are absent in this checkout.",
+      "remaining_executable_check": "Map accepted exact early/both-late/adversarial science cases and actual progressed predecessor/successor/two-cold input closure to existing K2-01 before closing it. Reuse unchanged consumed inputs under original identities; execute only uncovered required boundaries. Four named reports are now recovered from preserved Git,but none establishes a current predecessor upgrade.",
       "owner": "Aero mapping/expectation review; Black Glass chooses and runs any missing native case.",
-      "limits": "No automatic fixture port,exact-reporter claim or current-candidate/native-upgrade pass from old names or generic cap/material tests."
+      "limits": "No automatic fixture port,exact-reporter claim or current-candidate/native-upgrade pass from old names or generic cap/material tests.",
+      "recovered_historical_reports": {
+        "records": [
+          {
+            "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+            "path": "spec/programmes/evidence/synthesis-2026-09-06/k2-science-reloads.json",
+            "blob": "fa6a051af41f382635c5a0e4313d3ee78db2f23b",
+            "bytes": 660,
+            "sha256": "A18BCC9D6F97801BDD4DC406BE06FF788893CCDB95950181517DCAC9A98D7BBC"
+          },
+          {
+            "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+            "path": "spec/programmes/evidence/synthesis-2026-09-06/science-modules.json",
+            "blob": "1b2fda97662d1e281f2a21781f937c48d467c277",
+            "bytes": 1882,
+            "sha256": "46B70D67E436838BF913D4AEF4337EE4432464BEEB894EDEBB1402A864CCF544"
+          },
+          {
+            "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+            "path": "spec/programmes/evidence/synthesis-2026-09-10/a04-k2-science/MIR4-A04-K2-Science-ClosureV1.json",
+            "blob": "4897b9ef1fe6454e940ca07bf030afbec82b0c8f",
+            "bytes": 11660,
+            "sha256": "D5AAE0EE1873B2F0D162CEE022D649457A2AC1EE0A0EE678BF5AE7A5C5A54F5B"
+          },
+          {
+            "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+            "path": "spec/programmes/evidence/synthesis-2026-09-10/a04-k2-science/MIR4-A04-K2-Science-Runtime-ProofV1.json",
+            "blob": "e3c3604393a46db4c992376e5c4a75d47da9e3b3",
+            "bytes": 10590,
+            "sha256": "6452547780D69CE8933914B039B7C4374546ABAC868CDCEA68CE0968A83B47E9"
+          }
+        ],
+        "original_statuses": [
+          "passed",
+          "passed",
+          "passed",
+          "passed"
+        ],
+        "original_scopes": {
+          "september6_reload": "exact-locked-load-final-stream-science-and-two-save-reloads",
+          "september6_modules": "controlled-modules-not-real-k2-qualification"
+        },
+        "a04": {
+          "candidate_archive_sha256": "99C020CBA2800179FF2D76EE35F58B27A97CF2A7D89993CFFE06403DC140090E",
+          "source_commit": "aed35814232d1ebf629f980ac98869c3e8336903",
+          "engine_version": "2.1.17.87315",
+          "engine_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8",
+          "exact_fixture_raw_hashes_match": true,
+          "save_sha256": "A197C9994747084E5B893F3739FED2E834B755D4DDFBF7A7D4C562FFCD0BEAF9",
+          "recorded_reload_count": 2,
+          "recorded_reload_exit_codes": [
+            0,
+            0
+          ],
+          "recorded_save_byte_identical": true
+        },
+        "interpretation": "The four exact reports are recovered from preserved v4.7.3 Git,without restoring generated receipts into active paths. A04 binds the inspected seeded fixture and records two unchanged-save reloads on2.1.17/K2 2.1.2/K2SO2.0.13/MIR4.2.21000. The earlier short reload report carries hashes/counts but does not establish a predecessor upgrade. Controlled33 assertions explicitly disclaim real-K2 qualification.",
+        "limits": "Report fields and exact actor binding are reviewed here; large historical raw logs/save bodies have not been independently reopened. Original passed labels remain original-scope records,not a new native pass or current-candidate upgrade result."
+      }
     },
     {
       "disposition": "retain-bounded-reproduction-intent-reject-contradictory-harness-detail",
