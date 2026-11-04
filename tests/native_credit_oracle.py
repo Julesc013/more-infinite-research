@@ -36,32 +36,22 @@ NATIVE_FAMILY_RECIPES = {
     "research_rocket_fuel": ("ammonia-rocket-fuel", "rocket-fuel", "rocket-fuel-from-jelly"),
     "research_steel": ("casting-steel", "steel-plate"),
 }
-NATIVE_FAMILY_EXTRA_SCIENCE = {
-    "research_low_density_structure": "metallurgic-science-pack",
-    "research_plastic": "agricultural-science-pack",
-    "research_processing_unit": "electromagnetic-science-pack",
-    "research_rocket_fuel": "agricultural-science-pack",
-    "research_steel": None,
-}
 
 
 def native_family_preservation_rows(published_base_rows):
     """Exact empty private rows from the immutable published Base definitions.
 
-    The Space Age science additions follow the independently retained 4.7.3
-    science-selector fallback contract, also checked in the fallback controls.
+    Preserve the original invested unit/prerequisites field-for-field. Planet
+    sciences belong to new public fallback work, not these historical holders.
     This consumes no candidate definition, metadata or recipe-match result.
     """
     expected = {}
-    for family, extra in NATIVE_FAMILY_EXTRA_SCIENCE.items():
+    for family in NATIVE_FAMILY_RECIPES:
         name = "recipe-prod-" + family + "-1"
         row = deepcopy(published_base_rows[name])
         if row.get("hidden") is True or row["max_level"] != "infinite" or row["level"] != 1:
             raise AssertionError("published native-family reference changed")
         row["hidden"], row["effects"] = True, []
-        if extra:
-            row["unit"]["ingredients"].append([extra, 1])
-            row["prerequisites"].append(extra)
         expected[name] = row
     return expected
 
