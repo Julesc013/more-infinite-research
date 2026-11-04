@@ -65,9 +65,22 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
             self.assertIsNone(technologies[name], "MIR transport collided with a foreign owner")
             prototype = deepcopy(row)
             prototype.setdefault("level", 1)
+            prototype.setdefault("enabled", True)
             if prototype.get("max_level") == "infinite": prototype["max_level"] = 4294967295
             technology = lua.globals().technology(name, prototype["level"], prototype.get("enabled", True))
             technology.prototype = data_fixture.generator_fixture.lua_table(lua, prototype)
+            # Transport the actual runtime API shape. A data-stage omitted
+            # enabled default is exposed as true, unit.time is in ticks, and
+            # native research ingredients use named fields rather than pairs.
+            unit = prototype.get("unit", {})
+            if "count" in unit:
+                technology.research_unit_count = unit["count"]
+            elif unit.get("count_formula") == "1":
+                technology.research_unit_count = 1
+            technology.research_unit_energy = unit["time"] * 60
+            technology.research_unit_ingredients = data_fixture.generator_fixture.lua_table(lua, [
+                {"name": ingredient[0], "amount": ingredient[1]}
+                for ingredient in unit["ingredients"]])
             technologies[name] = technology
         lua.globals().mir_created = data_fixture.generator_fixture.lua_table(lua, {
             name: True for name in emitted})
