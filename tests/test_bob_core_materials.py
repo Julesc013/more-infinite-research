@@ -418,7 +418,9 @@ class BobCoreMaterialTests(unittest.TestCase):
               end,
               apply_native_owner_patches=function() end, apply_recipe_patches=function() end}
           end
-          package.preload["research.product_target_extension"] = function() return {extend=function() end} end
+          package.preload["research.product_target_extension"] = function()
+            return {extend=function() end, retain_galore_carbon_owner=function() return false end}
+          end
           package.preload["research.science"] = function()
             return {prepare=function(environment)
               assert(environment.raw==fixture_raw)
