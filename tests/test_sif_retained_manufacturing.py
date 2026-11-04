@@ -290,6 +290,29 @@ class SIFRetainedManufacturingTests(unittest.TestCase):
                   assert(same(raw, before), "failed binding check changed foreign prototypes")
                 ''')
 
+    def test_zero_native_time_keeps_valid_paid_holders_and_the_foreign_inherited_time(self):
+        self.lua.execute('''
+          for _,owner in pairs(raw.technology) do owner.unit.time=45.5 end
+          local before=clone(raw)
+          local baseline=build(raw)
+          local by_id={}
+          for _,row in ipairs(baseline) do by_id[row.name]=row end
+          local startup={}
+          for _,expected in ipairs(expectations) do startup["ips-research-time-"..expected.family]={value=0} end
+          values=require("research.settings").resolve(startup)
+          local rows=build(raw)
+          local count=0
+          for _,row in ipairs(rows) do
+            if row.hidden==true then
+              assert(row.unit.time==60,"zero native inheritance published invalid MIR paid time")
+              assert(same(row,by_id[row.name]),"inheritance changed the paid identity's default fields/effects")
+              count=count+1
+            end
+          end
+          assert(count==5 and same(raw,before),"inheritance changed a foreign native owner")
+          for _,expected in ipairs(expectations) do assert(values.streams[expected.family].research_time==0) end
+        ''')
+
     def test_each_selection_is_detached_and_nondefault_tuning_uses_the_existing_setting(self):
         self.lua.execute('''
           local first = catalogue.select(mods)

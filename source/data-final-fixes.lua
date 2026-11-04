@@ -178,7 +178,7 @@ if modern_selection and modern_selection.bob_angel_f200_combined then
 end
 
 if modern_catalogue.is_k2so(mods) then
-  local materials = require("compatibility.material_catalogue").technologies(values, data.raw, mods)
+  local materials = require("compatibility.material_catalogue").technologies(values, data.raw, mods, settings and settings.startup)
   for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
 end
 
