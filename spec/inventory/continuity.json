@@ -16514,6 +16514,28 @@
         "test_intent_reconciliation_complete": false,
         "native_execution": false,
         "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-02",
+          "CONT-03",
+          "CONT-05",
+          "CONT-07",
+          "CONT-12",
+          "VER-07"
+        ],
+        "reviewed_against": "807ee2537fd6f431d6944ac26c11fcda1dc76565",
+        "scope": "Two named test/runner paths in the existing91-tag inventory:14 bindings to four unique blobs. One2408-byte seven-assertion fixture is completely reviewed; three wrapper bodies are inspected ONLY for ownership invocation/inclusion/count reporting. No old compiler, wrapper or native execution.",
+        "evidence": {
+          "path": "spec/evidence/historical-startup-owner-qualification-intent-aero-r01.json",
+          "sha256": "14D39E9B3BBF5DB0DB3A613BCCFD9A081CADA6CB54C9BCF3920BFB70FCD60D43"
+        },
+        "disposition": "Account for all seven original assertions; consolidate applicable finite owner safety controls while retaining matching unresolved-science, disabled researchability and actual direct-effect/weapon-speed consumer obligations as unresolved. Retire only the generic compiler harness.",
+        "remaining_executable_check": "Reconcile the named direct-effect coverage/weapon-speed consumers and their preserved settings before making a parity verdict. Matching unresolved science and disabled researchability remain explicit original-oracle obligations. Continue other unresolved effective-settings/control/inter-release/receipt provenance groups without rereading all5058 blobs or rerunning every old release.",
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false,
+        "release_qualification": false
       }
     ],
     "stable_coverage_review": {
