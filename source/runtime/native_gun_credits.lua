@@ -33,18 +33,7 @@ local function mask(value)
   end
 end
 
-local function state()
-  local value = storage and storage[KEY]
-  if value ~= nil and (type(value) ~= "table" or value.schema ~= 1 or type(value.forces) ~= "table") then
-    refuse("unsupported saved schema")
-  end
-  return value
-end
-
-local function record_for(force)
-  local value = state()
-  local record = value and value.forces[force.index]
-  if record == nil then return nil end
+local function validate_record(record)
   if type(record) ~= "table" or not integer(record.pending) or not integer(record.completed)
       or type(record.positive) ~= "table" or type(record.negative) ~= "table" then refuse("invalid saved counts") end
   mask(record.included); mask(record.payable)
@@ -53,7 +42,27 @@ local function record_for(force)
       refuse("invalid saved holder counts")
     end
   end
-  return record
+end
+
+local function state()
+  local value = storage and storage[KEY]
+  if value ~= nil then
+    if type(value) ~= "table" or value.schema ~= 1 or type(value.forces) ~= "table" then
+      refuse("unsupported saved schema")
+    end
+    -- Even an inactive force bucket can affect subscription reconstruction.
+    -- Validate the entire finite saved force ledger before any holder writes.
+    for index, record in pairs(value.forces) do
+      if not integer(index) or index < 1 then refuse("invalid saved force index") end
+      validate_record(record)
+    end
+  end
+  return value
+end
+
+local function record_for(force)
+  local value = state()
+  return value and value.forces[force.index]
 end
 
 local function refresh_pending()

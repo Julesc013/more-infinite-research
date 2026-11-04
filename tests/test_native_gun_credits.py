@@ -276,6 +276,17 @@ class NativeGunCreditTests(unittest.TestCase):
           credit.on_force_reset({force=f});expect(f,0,0)
         ''')
 
+    def test_inactive_corrupt_force_record_refuses_before_any_holder_write(self):
+        self.lua.execute('''
+          local f=make_force(1,3,false,true)
+          storage.mir_native_gun_credits={schema=1,forces={[99]={}}}
+          local saved=copy(storage)
+          rejected(function() configure(known_event()) end)
+          assert(f.technologies[names.electric.positive].level==1,
+            "corrupt inactive force was discovered after native holder write")
+          assert(same(saved,storage),"corrupt saved state was partially changed")
+        ''')
+
     def test_corrupt_ledger_and_holder_ranges_refuse_without_state_repair(self):
         self.lua.execute('''
           local f=make_force(1,3,false,true);configure(known_event())
