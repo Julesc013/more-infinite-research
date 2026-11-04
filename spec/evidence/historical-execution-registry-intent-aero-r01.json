@@ -661,7 +661,7 @@
     },
     {
       "disposition": "obsolete-implementation-only",
-      "independent_expectation": "Registry scenario/assertion IDs are unique; declared scenarios appear in batches exactly once; saved environment signatures match their templates; each batch has one template and includes only batchable scenarios; metrics match the registry contents.",
+      "independent_expectation": "Registry scenario/assertion IDs are unique and registry scenario count matches catalog declaration count. Generated construction derives rows from selected declarations; the assertion separately requires every registry scenario in batches exactly once. Saved environment signatures match their templates; each batch has one template, multi-scenario batches include only batchable scenarios, and metrics match registry contents.",
       "current_implementation": [
         "spec/verification.md",
         "spec/determinism.md",
