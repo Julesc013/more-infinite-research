@@ -75,8 +75,10 @@ class ContinuationOwnershipTests(unittest.TestCase):
             local foreign = foreign_tail(name)
             local effects, unit, prerequisites = foreign.effects, foreign.unit, foreign.prerequisites
             local modifier = effects[1].modifier
-            local selected = ids(modern.continuations({}, {technology={[name]=foreign}}))
+            local rows, owners = modern.continuations({}, {technology={[name]=foreign}})
+            local selected = ids(rows)
             assert(not selected[name], "MIR retained foreign infinite tail " .. name)
+            assert(owners[name] == foreign, "lost the admitted external owner for bounded coverage")
             for _, other in ipairs(tail_names) do
               if other ~= name then assert(selected[other], "lost unrelated tail " .. other) end
             end

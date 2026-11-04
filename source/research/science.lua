@@ -984,6 +984,37 @@ function M.validate_source_contract(raw, contract, expected_pack)
   return validate_source_contract(raw or {}, contract, expected_pack)
 end
 
+-- A named external owner cannot suppress MIR research just because its table
+-- exists. Check its unchanged vector against current authored pack sources and
+-- one accepting lab, using the family's existing stage-local view. Unknown
+-- packs and disabled/missing direct prerequisites do not confer coverage. This
+-- neither changes foreign research nor traverses its prerequisite graph.
+function M.existing_research_inputs_supported(technology, context)
+  if type(technology) ~= "table" or technology.enabled == false
+      or type(technology.unit) ~= "table" or type(technology.unit.ingredients) ~= "table" then return false end
+  local source = technology.unit.ingredients
+  local ingredients = copy_ingredients(source)
+  if ingredients == nil or #ingredients == 0 then return false end
+  local entries = 0
+  for key in pairs(source) do
+    if type(key) ~= "number" or key < 1 or key > #source or key % 1 ~= 0 then return false end
+    entries = entries + 1
+  end
+  if entries ~= #source then return false end
+  local selected = selected_binding(context)
+  for _, row in ipairs(ingredients) do
+    local contract = selected.source_contracts and selected.source_contracts[row[1]]
+    if not item_exists(context.raw, row[1]) or not validate_source_contract(context.raw, contract, row[1]) then
+      return false
+    end
+  end
+  for _, name in ipairs(technology.prerequisites or {}) do
+    local prerequisite = (context.raw.technology or {})[name]
+    if type(prerequisite) ~= "table" or prerequisite.enabled == false then return false end
+  end
+  return lab_decision(context, collector(context), ingredients, {}, {}, "skip").kind == "full"
+end
+
 -- Apply to a single owned, detached technology before Generator publication.
 -- `binding` may be `conditions_for(family)` extended by a known caller-owned
 -- finite mod progression table. `preserve_identity` is reserved for a hidden

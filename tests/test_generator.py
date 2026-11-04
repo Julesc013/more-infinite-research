@@ -1351,6 +1351,107 @@ class GeneratorTests(unittest.TestCase):
           end
         ''')
 
+    def _weapon_coverage_world(self):
+        self.lua.execute('''
+          function weapon_coverage_case(rocket, cannon, enabled, ingredients, blocked, mode)
+            mods={base="2.1.23"}; settings={startup=defaults()}; helpers=nil; log=function() end
+            settings.startup["mir-prefer-this-mod-for-competing-techs"].value=false
+            settings.startup["mir-adjust-vanilla-weapon-speed-techs"].value=mode or "only-when-dedicated-tech-enabled"
+            data=full_world(mods)
+            local unit={count=100,time=30,ingredients={{"automation-science-pack",1}}}
+            local prerequisite={type="technology",name="weapon-shooting-speed-6",enabled=not blocked,
+              prerequisites={},effects={},unit=unit}
+            data.raw.technology[prerequisite.name]=prerequisite
+            data.raw.recipe["automation-science-pack"]={type="recipe",name="automation-science-pack",enabled=true,
+              ingredients={},results={{type="item",name="automation-science-pack",amount=1}}}
+            local foreign={type="technology",name="weapon-shooting-speed-7",level=7,max_level="infinite",enabled=enabled,
+              icon="__base__/graphics/technology/weapon-shooting-speed-3.png",icon_size=256,
+              prerequisites={prerequisite.name},unit={count=100,time=30,ingredients=ingredients or unit.ingredients},
+              effects={{type="gun-speed",ammo_category="bullet",modifier=.4},
+                {type="gun-speed",ammo_category="shotgun-shell",modifier=.4},
+                {type="gun-speed",ammo_category="rocket",modifier=rocket},
+                {type="gun-speed",ammo_category="cannon-shell",modifier=cannon}}}
+            data.raw.technology[foreign.name]=foreign
+            local function serialize(value)
+              if type(value)~="table" then return tostring(value) end
+              local keys={};for key in pairs(value)do keys[#keys+1]=key end
+              table.sort(keys,function(a,b)return tostring(a)<tostring(b)end)
+              local out={};for _,key in ipairs(keys)do out[#out+1]=tostring(key)..":"..serialize(value[key])end
+              return "{"..table.concat(out,",").."}"
+            end
+            local before=serialize(foreign)
+            data.writes=0
+            data.extend=function(self,rows)
+              self.writes=self.writes+1;self.emitted=rows
+              for _,row in ipairs(rows)do self.raw[row.type]=self.raw[row.type] or {};self.raw[row.type][row.name]=row end
+            end
+            dofile(data_final_path)
+            assert(data.writes==1 and serialize(foreign)==before,"changed foreign owner or publication count")
+            local rows={};for _,row in ipairs(data.emitted)do rows[row.name]=row end
+            assert(not rows[foreign.name],"emitted colliding shared tail")
+            local rocket_row=assert(rows["recipe-prod-research_rocket_shooting_speed-1"])
+            local cannon_row=assert(rows["recipe-prod-research_cannon_shooting_speed-1"])
+            for category,row in pairs({rocket=rocket_row,["cannon-shell"]=cannon_row})do
+              assert(row.level==1 and row.max_level=="infinite" and #row.effects==1,
+                "removed or reshaped historical paid identity")
+              assert(row.effects[1].type=="gun-speed" and row.effects[1].ammo_category==category
+                and row.effects[1].modifier==.1,"changed earned native bonus")
+            end
+            return rocket_row,cannon_row,foreign
+          end
+        ''')
+
+    def test_foreign_weapon_coverage_preserves_paid_rows_and_withholds_only_covered_future_work(self):
+        self._weapon_coverage_world()
+        self.lua.execute('''
+          local rocket,cannon=weapon_coverage_case(.1,.1,true)
+          assert(rocket.enabled==false and cannon.enabled==false,"covered MIR future research remains enabled")
+          rocket,cannon=weapon_coverage_case(.1,0,true)
+          assert(rocket.enabled==false and cannon.enabled~=false,"per-category coverage suppressed useful research")
+          rocket,cannon=weapon_coverage_case(.1,.1,true,nil,false,"off")
+          assert(rocket.enabled==false and cannon.enabled==false,"off granted custody of a foreign owner")
+        ''')
+
+    def test_unusable_foreign_weapon_coverage_does_not_withhold_mir_research(self):
+        # Install the shared literal input helper without relying on candidate
+        # output as an oracle. Each case below opposes a reason to yield.
+        self._weapon_coverage_world()
+        self.lua.execute('''
+          for _,case in ipairs({{0,0,true},{.1,.1,false},{-.1,-.1,true}})do
+            local rocket,cannon=weapon_coverage_case(case[1],case[2],case[3])
+            assert(rocket.enabled~=false and cannon.enabled~=false,"nonpositive/disabled owner suppressed MIR")
+          end
+          local rocket,cannon=weapon_coverage_case(.1,.1,true,{{"unknown-pack",1}})
+          assert(rocket.enabled~=false and cannon.enabled~=false,"unproven science suppressed MIR")
+          rocket,cannon=weapon_coverage_case(.1,.1,true,nil,true)
+          assert(rocket.enabled~=false and cannon.enabled~=false,"disabled prerequisite suppressed MIR")
+          data=nil
+        ''')
+
+    def test_partial_mixed_weapon_coverage_retains_every_paid_effect(self):
+        self.lua.execute('''
+          local raw=full_world({}).raw
+          local owner={type="technology",name="laser-shooting-speed-8",enabled=true,
+            prerequisites={},unit={count=100,time=30,ingredients={{"automation-science-pack",1}}},
+            effects={{type="gun-speed",ammo_category="laser",modifier=.4},
+              {type="gun-speed",ammo_category="tesla",modifier=.5}}}
+          local row={name="recipe-prod-research_electric_shooting_speed-1",level=1,max_level="infinite",
+            effects={{type="gun-speed",ammo_category="tesla",modifier=.1},
+              {type="gun-speed",ammo_category="electric",modifier=.1}}}
+          local effects=row.effects
+          local selection={definitions={{key="research_electric_shooting_speed",family="research_electric_shooting_speed"}},
+            external_continuations={[owner.name]=owner}}
+          local context=require("research.science").prepare{raw=raw,target=require("platform.target"),mods={}}
+          modern.retain_external_weapon_coverage(selection,{row},context)
+          assert(row.enabled~=false and row.effects==effects and #effects==2
+            and effects[1].modifier==.1 and effects[2].modifier==.1,
+            "partial coverage discarded paid Tesla bonus or useful electric progression")
+          owner.effects[#owner.effects+1]={type="gun-speed",ammo_category="electric",modifier=.2}
+          modern.retain_external_weapon_coverage(selection,{row},context)
+          assert(row.enabled==false and row.effects==effects and #effects==2,
+            "full coverage removed paid effects instead of withholding future work")
+        ''')
+
     def test_existing_native_continuation_identity_is_preserved_without_mir_collision(self):
         self.lua.execute('''
           local environment = full_world({})

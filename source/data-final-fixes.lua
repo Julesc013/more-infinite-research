@@ -216,9 +216,10 @@ end
 
 -- One lab/science view serves this complete owned catalogue. Native owners
 -- and foreign research are outside this detached publication boundary.
-require("research.science").apply_family(technologies, nil, {
+local _, science_context = require("research.science").apply_family(technologies, nil, {
   options=values.options, raw=data.raw, target=require("platform.target"), mods=mods, log=log,
 })
+if modern_selection then modern.retain_external_weapon_coverage(modern_selection, technologies, science_context) end
 if require("platform.target").id == "f200" and type(mods) == "table"
     and (mods.ExpandedProductivityResearch or mods["plates-n-circuit-productivity"]
       or mods.Science_packs_productivity or mods["bioflux-productivity"] or mods["fish-productivity"]

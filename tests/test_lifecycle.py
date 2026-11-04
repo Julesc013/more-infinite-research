@@ -447,6 +447,45 @@ class LifecycleTests(unittest.TestCase):
             "unlimited agricultural setting did not restore only its own cap transition")
         ''')
 
+    def test_covered_weapon_rows_keep_paid_work_and_cap_ownership_through_readmission(self):
+        self.lua.execute('''
+          for _,baseline in ipairs({true,false})do
+            local name="recipe-prod-research_rocket_shooting_speed-1"
+            local paid=technology(name,4,baseline)
+            paid.saved_progress=.27
+            paid.prototype.effects={{type="gun-speed",ammo_category="rocket",modifier=.1}}
+            local effects=paid.prototype.effects
+            local foreign=technology("foreign-research",2,false)
+            local queue={paid,foreign}
+            local f=force(47,{[name]=paid,[foreign.name]=foreign},queue,paid,.42)
+            paid.force,foreign.force=f,f
+            boot({[47]=f},0,"",nil,nil,0,nil,nil,
+              {["ips-max-level-research_rocket_shooting_speed"]=3})
+            handlers.init()
+            local saved=storage
+            assert(not paid.enabled and saved.mir_caps.owned_disabled[47][name].disabled==baseline)
+            -- A later data stage retains this exact paid vector but delegates
+            -- future research to its admitted external owner. Native resets
+            -- can re-enable the row before MIR's configuration callback.
+            paid.prototype.enabled,paid.enabled=false,true
+            f._queue,f.current_research,f.research_progress=queue,paid,.42
+            boot({[47]=f},0,"",saved,nil,0,nil,nil,
+              {["ips-max-level-research_rocket_shooting_speed"]=0})
+            handlers.configuration()
+            assert(not paid.enabled and paid.level==4 and paid.saved_progress==.27
+              and paid.prototype.effects==effects and effects[1].modifier==.1,
+              "coverage changed paid levels/effects/partial work")
+            assert(f.research_queue==queue and f.current_research==paid and f.research_progress==.42
+              and not foreign.enabled and f.cancelled==0,"coverage rewrote existing or foreign queue")
+            assert(storage.mir_caps.owned_disabled[47][name].disabled==baseline,
+              "coverage promoted or discarded prior cap ownership")
+            paid.prototype.enabled=true
+            handlers.configuration()
+            assert(paid.enabled==baseline and storage.mir_caps==nil,
+              "readmission restored a foreign right or lost MIR's own right")
+          end
+        ''')
+
     def test_unlimited_disabled_prototype_survives_effects_reset_and_force_boundaries(self):
         self.lua.execute('''
           local name = "recipe-prod-research_gears-1"

@@ -130,6 +130,40 @@ class ScienceTests(unittest.TestCase):
           end
         ''')
 
+    def test_external_owner_inputs_require_authored_sources_and_one_accepting_lab_without_mutation(self):
+        self.lua.execute(r'''
+          local raw=install_sources(raw_with({"automation-science-pack","logistic-science-pack"},
+            {red={"automation-science-pack"},green={"logistic-science-pack"}}),false)
+          raw.technology["native-gate"]={name="native-gate",enabled=true}
+          local owner=technology({{"automation-science-pack",1},{"logistic-science-pack",2}},{"native-gate"})
+          local unit,ingredients,prerequisites=owner.unit,owner.unit.ingredients,owner.prerequisites
+          local function context()return science.prepare{raw=raw,target={id="f210"},mods={}}end
+          assert(not science.existing_research_inputs_supported(owner,context()),"union of labs admitted owner")
+          raw.lab.full={name="full",inputs={"automation-science-pack","logistic-science-pack"}}
+          local shared=context()
+          assert(science.existing_research_inputs_supported(owner,shared))
+          local visits=shared.lab_visits
+          assert(science.existing_research_inputs_supported(owner,shared) and shared.lab_visits==visits,
+            "repeated owner collected labs again")
+          assert(shared.fresh_recipe_visits==0 and shared.fresh_technology_visits==0,
+            "external owner initiated discovery")
+          raw.technology["native-gate"].enabled=false
+          assert(not science.existing_research_inputs_supported(owner,context()),"disabled direct prerequisite admitted")
+          raw.technology["native-gate"].enabled=true
+          raw.recipe["logistic-science-pack"]=nil
+          assert(not science.existing_research_inputs_supported(owner,context()),"missing science source admitted")
+          owner.unit.ingredients={{"unknown-pack",1}}
+          local unknown=context()
+          assert(not science.existing_research_inputs_supported(owner,unknown)
+            and unknown.fresh_recipe_visits==0 and unknown.fresh_technology_visits==0,
+            "unknown foreign science initiated discovery")
+          owner.unit.ingredients=ingredients
+          assert(owner.unit==unit and owner.prerequisites==prerequisites and #ingredients==2
+            and ingredients[1][1]=="automation-science-pack" and ingredients[2][2]==2
+            and unit.count_formula=="100*1.5^(L-1)" and unit.time==60,
+            "input check rewrote foreign science/cost/prerequisites")
+        ''')
+
     def test_generation_report_names_each_owned_outcome_only_when_enabled(self):
         self.lua.execute(r'''
           local messages, options = {}, {["mir-lab-incompatibility-policy"]="skip"}
