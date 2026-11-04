@@ -16611,6 +16611,31 @@
         "test_intent_reconciliation_complete": false,
         "native_execution": false,
         "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-07",
+          "CONT-08",
+          "CONT-09",
+          "CONT-10",
+          "CONT-11",
+          "CONT-14",
+          "VER-07"
+        ],
+        "reviewed_against": "e56f4590c4a13328d3f875c7ce75b82dd0e25154",
+        "scope": "Five exact historical runtime orchestration paths,17 deduplicated complete Git bodies and115 retained tag/path bindings across83 indexed names. This reviews dispatcher composition and its guards, not all imported feature implementations or original native executions.",
+        "evidence": {
+          "path": "spec/evidence/historical-runtime-orchestration-intent-aero-r01.json",
+          "sha256": "FFC222B7FC1F2DB0C7E706A2141F0B501BACBA42C2ECFEFE1D5B268EB487A3D1"
+        },
+        "disposition": "Port recovered missing/invalid single-research event guards; consolidate named force/load/target/settings routing without restoring the dispatcher. Keep imported-body and native/client gaps explicit.",
+        "remaining_executable_check": "Apply the accepted correction only to a reviewed next candidate; Root owns affected native/client checks and applicability. Remaining imported feature bodies, inter-release/discussion inputs and global historical inventory remain unresolved.",
+        "owner": "Aero source correction/intent review; Black Glass native/integration/publication",
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false,
+        "release_qualification": false
       }
     ],
     "stable_coverage_review": {
