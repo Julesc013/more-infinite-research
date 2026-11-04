@@ -24,9 +24,8 @@ local function descriptor(family, main_id, recipe)
   }
 end
 
--- These twelve recipe-level identities are the complete union of the verified
--- partial MIR replacement rows. They deliberately name no provider: the
--- carriers preserve an MIR recipe contribution after that provider disappears.
+-- The twelve partial replacement rows and one recovered named Galore overlap.
+-- Carriers preserve paid contributions, independently of future public owners.
 local DESCRIPTORS = {
   descriptor("research_copper", "recipe-prod-research_copper-1", "copper-plate"),
   descriptor("research_iron", "recipe-prod-research_iron-1", "iron-plate"),
@@ -40,6 +39,7 @@ local DESCRIPTORS = {
   descriptor("research_breeding", "recipe-prod-research_breeding-1", "pentapod-egg"),
   descriptor("research_concrete", "recipe-prod-research_concrete-1", "stone-brick"),
   descriptor("research_sulfuric_acid_productivity", "recipe-prod-research_sulfuric_acid_productivity-1", "sulfuric-acid"),
+  descriptor("research_sulfur", "recipe-prod-research_sulfur-1", "vgal-coal-crushing"),
 }
 
 local function finite_positive(value)

@@ -92,17 +92,24 @@ function M.apply(patch)
     patch.prototype.data.owners = patch.owners
     patch.prototype.data.withheld = patch.withheld
     patch.prototype.data.credits = patch.credits
+    if patch.galore_sulfur_retired ~= nil then
+      patch.prototype.data.galore_sulfur_retired = patch.galore_sulfur_retired
+    end
   end
 end
 
 -- Called once by the control adapter with the one named LuaModData.data and
 -- the authored native definitions. No force or recipe collection is inspected.
-function M.read(value, definitions)
+function M.read(value, definitions, retirement_facts)
   if type(value) ~= "table" or value.schema ~= 1 or type(value.owners) ~= "table" then
     fail("invalid control data")
   end
   for key in pairs(value) do
-    if key ~= "schema" and key ~= "owners" and key ~= "withheld" and key ~= "credits" then fail("unknown control field") end
+    if key ~= "schema" and key ~= "owners" and key ~= "withheld" and key ~= "credits"
+        and key ~= "galore_sulfur_retired" then fail("unknown control field") end
+  end
+  if value.galore_sulfur_retired ~= nil and type(value.galore_sulfur_retired) ~= "boolean" then
+    fail("invalid named Galore retirement")
   end
   local allowed, out = {}, {}
   local families = {}
@@ -132,7 +139,9 @@ function M.read(value, definitions)
     if count ~= #row.recipes then fail("sparse admitted recipes") end
     out[name] = {recipes=recipes, effect_change=row.effect_change, configured_change=row.configured_change}
   end
-  return out, withheld, M.credit_groups(value.credits)
+  local credits = M.credit_groups(value.credits)
+  if retirement_facts ~= nil then retirement_facts.galore_sulfur_retired = value.galore_sulfur_retired == true end
+  return out, withheld, credits
 end
 
 return M
