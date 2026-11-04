@@ -405,6 +405,43 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                       end
                     ''')
 
+    def _same_engine_unknown_paid_mask(self, opponent):
+        self._published_m4_base("f210")
+        self.lua.globals().unchanged_mod = opponent
+        self.lua.execute('''
+          BASE_ACTIVE[unchanged_mod]="1.0.0"
+          if unchanged_mod=="space-age" then BASE_ACTIVE[unchanged_mod]="2.1.23" end
+          reload_credits(BASE_ACTIVE,"f210")
+          same_engine_event={mod_startup_settings_changed=false,
+            mod_changes={["more-infinite-research"]={old_version="4.7.21003",new_version="5.0.21003"}}}
+          function assert_unknown_mask_refuses(callback)
+            local fresh=make_collected_force(1,1,{},false)
+            local force=make_collected_force(2,8,published_base_mask,false)
+            local main=force.technologies["recipe-prod-research_steel-1"]
+            main.saved_progress=.27;force.research_queue={main,force.technologies.foreign}
+            force.current_research=main;local queue=force.research_queue
+            local ok,message=pcall(callback,same_engine_event)
+            assert(not ok and tostring(message):find("unknown first paid mask",1,true),
+              "unchanged "..unchanged_mod.." fabricated a first paid mask: "..tostring(message))
+            assert(next(storage)==nil,"refusal wrote MIR storage")
+            for _,f in ipairs({fresh,force}) do
+              for _,state in pairs(f._states) do
+                assert(state.writes.level==0 and state.writes.enabled==0,"refusal mutated native state")
+              end
+              no_foreign_write(f)
+            end
+            assert(force.research_queue==queue and force.current_research==main
+              and main.saved_progress==.27 and force.research_progress==.42,"refusal changed invested work")
+          end
+        ''')
+
+    def test_same_engine_unchanged_mods_cannot_prove_a_first_paid_mask(self):
+        for opponent in ("mir-fixture-observer", "ExpandedProductivityResearch", "space-age"):
+            with self.subTest(opponent=opponent):
+                self.setUp()
+                self._same_engine_unknown_paid_mask(opponent)
+                self.lua.execute('assert_unknown_mask_refuses(native_credits.preflight_family_transition)')
+
     def _add_published_sif_recipients(self):
         # The production boundary requires all five published identities and
         # eleven recipes, independently authored in the preserved SIF fixture.
