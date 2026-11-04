@@ -83,6 +83,10 @@ source_of_truth_for:
 
 - MIR can refuse this first upgrade when it cannot determine a safe productivity preference. Do not remove a provider or change settings merely to force an upgrade through.
 
+### Overlapping weapon-speed research
+
+- MIR 5 betas may still offer dedicated weapon-speed research when another mod supplies infinite research for the same bonus. The competing-research preference does not resolve every overlap yet. This remains open for stable qualification; it is not a reason to delete research or its earned effects from a save.
+
 ### Same-edition and historical upgrades
 
 - Recorded same-edition cases cover retained research, effects, partial work and reload behavior for the normal Factorio families. The observed 2.1 cases include Base and selected Space Age content; the observed 2.0 cases include Base and a selected provider/preference boundary. Earlier editions have narrower historical state coverage. Treat a different modpack, setting, provider or DLC change as its own case.
