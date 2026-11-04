@@ -264,7 +264,7 @@ class K2BaseCatalogueTests(unittest.TestCase):
         subset = cls.facts["captured_native_subset"]
         raw = {
             "technology": {name: {} for name in subset["native_technology_names"]},
-            "recipe": {name: {} for name in subset["native_recipe_names"]},
+            "recipe": {name: {"type":"recipe", "name":name} for name in subset["native_recipe_names"]},
             "ammo-category": {"cannon-shell": {}},
             "tool": {name: {} for name in cls.facts["standard_science"]},
             "lab": {cls.facts["advanced_lab"]["name"]: {"inputs": cls.facts["advanced_lab"]["inputs"]}},
@@ -273,6 +273,7 @@ class K2BaseCatalogueTests(unittest.TestCase):
         }
         for row in subset["recipe_product_fields"]:
             raw["recipe"][row["recipe"]] = {
+                "type":"recipe", "name":row["recipe"],
                 "results": [{"type": "item", "name": row["product"], "amount": row["amount"]}]
             }
         for row in subset["item_place_results"]:
@@ -302,6 +303,7 @@ class K2BaseCatalogueTests(unittest.TestCase):
         raw = self._captured_raw_subset()
         gear = self.f210_facts["gear"]
         raw["recipe"][gear["recipe"]] = {
+            "type":"recipe", "name":gear["recipe"],
             "ingredients": gear["ingredients"],
             "results": gear["results"],
         }
@@ -315,7 +317,13 @@ class K2BaseCatalogueTests(unittest.TestCase):
     def _run_f210_pipeline(self, case, active_mods=None):
         profile = json.loads(reference_path(case["profile"]).read_text(encoding="utf-8"))
         mods = active_mods or {row["name"]: row["version"] for row in profile["mods"] if row["enabled"]}
-        self.lua.globals().captured_raw = _lua_value(self.lua, self._f210_pipeline_raw(case))
+        raw = self._f210_pipeline_raw(case)
+        # The compact native facts omit intrinsic prototype identities; actual
+        # data.raw entries include them before MIR's data-stage boundary.
+        for name, recipe in raw["recipe"].items():
+            recipe.setdefault("type", "recipe")
+            recipe.setdefault("name", name)
+        self.lua.globals().captured_raw = _lua_value(self.lua, raw)
         self.lua.globals().captured_mods = _lua_value(self.lua, mods)
         self.lua.execute(r'''
           f210()
@@ -325,6 +333,7 @@ class K2BaseCatalogueTests(unittest.TestCase):
           log = function() end
           emitted = {}
           data = {raw = captured_raw}
+          data.raw.shortcut=data.raw.shortcut or {};data.raw["mod-data"]=data.raw["mod-data"] or {}
           function data:extend(rows)
             for _, row in ipairs(rows) do
               assert(type(self.raw[row.type]) == "table", "unknown output type " .. tostring(row.type))
@@ -333,6 +342,8 @@ class K2BaseCatalogueTests(unittest.TestCase):
               emitted[#emitted + 1] = row.name
             end
           end
+          assert(loadfile(player_root .. "/data.lua"))()
+          emitted={}
           assert(loadfile(player_root .. "/data-final-fixes.lua"))()
         ''')
         return _plain(self.lua.globals().data.raw), mods
@@ -378,6 +389,7 @@ class K2BaseCatalogueTests(unittest.TestCase):
           log = function() end
           emitted = {}
           data = {raw = captured_raw}
+          data.raw.shortcut=data.raw.shortcut or {};data.raw["mod-data"]=data.raw["mod-data"] or {}
           function data:extend(rows)
             for _, row in ipairs(rows) do
               assert(type(self.raw[row.type]) == "table", "unknown output type " .. tostring(row.type))
@@ -386,6 +398,8 @@ class K2BaseCatalogueTests(unittest.TestCase):
               emitted[#emitted + 1] = row.name
             end
           end
+          assert(loadfile(player_root .. "/data.lua"))()
+          emitted={}
           assert(loadfile(player_root .. "/data-final-fixes.lua"))()
         ''')
 

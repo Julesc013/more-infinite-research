@@ -1,0 +1,140 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalNativeOwnerCurrentDispositionV1",
+  "status": "source-host-completion-with-native-and-implementation-gaps",
+  "requirement": "VER-07",
+  "subject": "CONT-03",
+  "observed_dev": "57c2c9f6e6e162c37362e7258d0f1ad9d41ab10c",
+  "player_tree": "c8b56b6c621c4ab401f8c02c97301a20c3195dca",
+  "previous_disposition": {
+    "commit": "57c2c9f6e6e162c37362e7258d0f1ad9d41ab10c",
+    "path": "spec/evidence/historical-native-owner-current-disposition-aero-r01.json",
+    "sha256": "045867D3588F983FE4EA32838881365E01BDF08F0DBC4B97A642DAF574A2C4A5",
+    "original_observed_dev": "190ee06feea6258ad5eaeb9b03965dfc4708eff4",
+    "original_player_tree": "f7d7c6dc806ebd8348de4975f92b47922cccf39d",
+    "preserved_as_observed": true
+  },
+  "independent_expectations": {
+    "record": "spec/evidence/historical-native-owner-settings-intent-aero-r01.json",
+    "preserved_as_observed": true,
+    "source": "Twelve original bodies bound to published4.7.2/4.7.3, including the fixed/linear/unrecognized cost mutations, native settings assertions and progress observers.",
+    "old_host_observation": "The b74321-case observation and unchanged8d-path analysis remain historical failures/gaps; their original result identities are not updated to a current pass."
+  },
+  "source_host_completed": [
+    {
+      "obligation": "Tune effect/time without requiring the inherited cost to equal Base balance.",
+      "original_obligation_index": 1,
+      "accepted_source": {
+        "pr": 1637,
+        "author": "fffe56e9454e2223d5dc68841330d628ad0f17e1",
+        "review_head": "992f7c65989db87f788a8c9e045e87c0392d49c4",
+        "merge": "190ee06feea6258ad5eaeb9b03965dfc4708eff4",
+        "independent_review_sha256": "B710BE71EC68E2E47FCFCCAB5E69E6769233352FE3E6BF558B338A87A1F11DCE",
+        "review": "https://github.com/Julesc013/more-infinite-research/pull/1637#issuecomment-6602080654"
+      },
+      "implementation": "source/research/modern.lua separates cost/time checks by selected field: inherited fixed count, linear/opaque formula and actual time survive unrelated effect/time tuning. Explicit positive time is copied onto a detached unit. The named effect-shape guard and strict cost-replacement boundary remain.",
+      "host_evidence": {
+        "control": "tests/test_native_owner_field_tuning.py",
+        "groups": 8,
+        "evidence_sha256": "5DCF5E16509AD9A54DB3101795CE80AE7F22FBC618BA066A245D541A814AE0E8",
+        "opponents": "Original8d fixed/linear/opaque tuning failures and the broad-unit-guard opponent remain retained separately.",
+        "exact_head_ci": "All four required checks pass on992f7c65, including full158-group host controls."
+      },
+      "remaining_check": "Native affected F200/F210 research-unit work, effects, partial/queued and paid state, owned caps/restoration, protected successor save and two cold reloads. Select scenarios by consumed paths; neither host output nor a standard-cost older save result qualifies changed costs.",
+      "owner": "Black Glass native; Aero expectations and independent review",
+      "status": "source-host-accepted-native-unverified"
+    },
+    {
+      "obligation": "Explicit family effect tuning includes existing matching product routes, with exact data/control cap custody.",
+      "original_obligation_index": 4,
+      "accepted_source": {
+        "pr": 1634,
+        "review_head": "8d8238b312fab6e0036c89b731a90231e39a6070",
+        "merge": "624f6a9c33af70dd92b8806b992c576557ee76fb",
+        "independent_review_sha256": "FF222ECA9FAF28C0D7FF36D0B565031919A3B47FDB2B7C5944F5B729B3B6CDB8"
+      },
+      "implementation": "The five named native recipe-productivity owners adopt eligible additional matching recipes. Explicit tuning updates an existing matching route once; default adoption keeps the accepted uniform native change. One private ModData record carries the admitted recipe/effect tuple into exact cap admission, without claiming unrelated foreign recipes or restoration rights.",
+      "host_evidence": {
+        "controls": [
+          "tests/test_native_family_product_targets.py",
+          "tests/test_native_owner_cap_adoption.py"
+        ],
+        "groups": [13, 10],
+        "opponents": "Original b743 matching-route discrepancy and CBC8 cap/restoration regression remain failed original observations; d34/8d correction results are separate.",
+        "exact_head_ci": "All four required checks pass on8d8238b3, including full157-group host controls."
+      },
+      "remaining_check": "Native F200/F210 affected existing paid research and useful recipe effects, default/explicit tuning, cap changes and restoration ownership, partial/queue state, protected save and two cold reloads.",
+      "owner": "Black Glass native; Aero expectations and independent review",
+      "status": "source-host-accepted-native-unverified"
+    },
+    {
+      "original_obligation_index": 2,
+      "obligation": "Project the configured cost trio on recognized native fixed/linear/exponential/hybrid models.",
+      "expectation": "Retain the independently recovered cost semantics and numeric/formula field distinction; do not replace the historical scope with only the current Base literal.",
+      "accepted_source": {
+        "pr": 1645,
+        "author": "e7cadb1e491ee07ce99a327132e9559e683c9436",
+        "merge": "5a3666314092f760a671745234a31c3bff9fb184",
+        "independent_review_sha256": "FA8562D6633C386AC322E10E8032265538874C745420AE2AEA32B14955972E68",
+        "independent_sol_review_sha256": "5EFA314425F7E9F7671BE7C91DDF194B16FF8B947116EF3414FC06388C17B1ED",
+        "review": "https://github.com/Julesc013/more-infinite-research/pull/1645#issuecomment-6606831254"
+      },
+      "implementation": "The five authored native productivity owners lazily admit bounded recognized inherited cost families before replacement. A selected cost field projects the complete effective base/increment/growth tuple. Numeric fixed counts stay numeric for a fixed configured tuple; formula inputs stay formula-shaped. Defaults and effect/time-only paths preserve inherited costs without importing the classifier. Detached all-before-write plans and strict Generator duplicate protection remain unchanged.",
+      "host_evidence": {
+        "control": "tests/test_native_owner_costs.py",
+        "author_groups": 8,
+        "independent_groups": 6,
+        "original_oracles": "Seven complete pure published modules are byte-identical at4.7.2/4.7.3; the host-only oracle retains their original hashes. No historical planner/model/fingerprint framework is loaded by the player package.",
+        "opponents": "The unchanged parent rejects four of five recognized input cases in the focused real-pipeline control. Mixed fields, malformed or over-budget grammar and late refusal preserve their opposing assertions; those are not native results.",
+        "exact_head_ci": "All four required checks attached to e7cadb1e pass. The complete host job tested synthetic merge34e04da55497fe7ec32ef36efe4b3357b58ddf1d over f40018d387a6b0f408f9fb0b457bf0917610cc3d and passed160 groups.",
+        "author_originals": {
+          "repository": "Julesc013/mir-native-worker",
+          "commit": "5ea4146ac3179fac9e2ded34d33103b7041ea9d6",
+          "path": "evidence/aero-native-owner-costs-r01/original-bodies.json.gz",
+          "bytes": 322787,
+          "sha256": "58E1409E6DFF08D2BBC180811572268625F3621B0929DBDBFC1C37645BE7C1B9",
+          "decoded_bytes": 1435181,
+          "decoded_sha256": "33BFB26A2D633622DCFD1F364F06FF5DC2360CCE79B46AAA8D3C0BA559CB9EFA"
+        }
+      },
+      "advisory": "COST-ARITH-01 remains open: inherited unary-before-power host classification is not an independently observed engine MathExpression equivalence oracle. The accepted admission fully replaces a recognized curve; no general engine-arithmetic claim follows.",
+      "remaining_check": "Native affected F200/F210 cost/research output, engine-normalized pre/post paid work, partial/current/queued state, foreign state, caps/restoration and protected successor save/two cold reloads. Unknown replacement/fallback and unsupported shapes remain separate implementation obligations below.",
+      "owner": "Black Glass native; Aero expectations and independent review",
+      "status": "source-host-accepted-native-unverified"
+    }
+  ],
+  "remaining_implementation": [
+    {
+      "original_obligation_index": 3,
+      "obligation": "Withhold unsafe unrecognized replacement while preserving the native owner; resolve final fallback output separately.",
+      "expectation": "The original isolated settings-only fixture expects safe nonbinding and an unchanged polynomial. The old caller may construct a fallback only under its ordinary recipe/prerequisite constraints; no universal skip/rename or guaranteed successful fallback follows.",
+      "status": "unresolved-safe-outcome-boundary",
+      "next_check": "Port the isolated original expectation and establish the finite final-output/identity obligations before changing production behavior.",
+      "owner": "Aero reconciliation and source; Black Glass native"
+    },
+    {
+      "original_obligation_index": 5,
+      "obligation": "Resolve remaining native-owner eligibility/fallback and unsupported upstream effect-shape outcomes.",
+      "expectation": "Preserve the recovered final player behavior where supported; an old planner return or current refusal does not by itself define that behavior. Keep named safe ownership and all-before-write boundaries.",
+      "status": "unresolved-final-player-outcome",
+      "next_check": "Use the recovered original caller/output and affected exact native inputs. Do not restore the global solver, swallow exceptions or invent replacement identities.",
+      "owner": "Aero reconciliation and source; Black Glass native"
+    }
+  ],
+  "remaining_native_obligation": {
+    "original_obligation_index": 6,
+    "obligation": "Preserve Factorio-normalized paid work and foreign state when native costs/settings change.",
+    "expectation": "Observe pre-MIR and post-MIR engine counts/fractions and useful research; preserve earned units, identity, foreign recipes/inventory, caps, queue and cold state without reapplying bonuses.",
+    "status": "native-unverified",
+    "owner": "Black Glass execution; Aero oracle and independent review"
+  },
+  "limits": [
+    "This is a current disposition of three accepted source/host corrections, not a new test execution or native verdict.",
+    "The original intent record, adverse receipts, source commits and all87 original request records remain unchanged.",
+    "CONT03 remains partial and inventory_complete remains false. No other subject, published package, release claim, support scope or historical campaign is closed.",
+    "Observed dev is an exact source snapshot. Later commits require consumed-input applicability review rather than transfer by commit age."
+  ],
+  "native_execution": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}

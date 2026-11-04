@@ -5,7 +5,7 @@ applies_to: "MIR players and upgrades"
 audience: player
 doc_type: guide
 owner: mir-maintainers
-last_reviewed: 2026-11-03
+last_reviewed: 2026-11-04
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -38,7 +38,7 @@ source_of_truth_for:
 
 - Factorio 0.13 and 0.14 cannot show later numeric infinite-research levels. Factorio 0.13 through 0.16 have no built-in research queue.
 
-- The first MIR 5 beta is GitHub-only; it is not the stable release. Its normal edition packages remain subject to the stated release and support limits.
+- MIR 5 community betas are GitHub-only and have not completed stable qualification. Use each release's notes for its tested scope and remaining limits.
 
 ## Additional best-effort historical builds
 
@@ -82,6 +82,10 @@ source_of_truth_for:
 4. Only then change the provider, preference, settings or Factorio version.
 
 - MIR can refuse this first upgrade when it cannot determine a safe productivity preference. Do not remove a provider or change settings merely to force an upgrade through.
+
+### Overlapping weapon-speed research
+
+- MIR 5 betas may still offer dedicated weapon-speed research when another mod supplies infinite research for the same bonus. The competing-research preference does not resolve every overlap yet. This remains open for stable qualification; it is not a reason to delete research or its earned effects from a save.
 
 ### Same-edition and historical upgrades
 
@@ -160,6 +164,8 @@ source_of_truth_for:
 
 ## Support limits
 
+- On Factorio 2.1.23, MIR 5.0.2 can stop at `MIR5 K2SO material catalogue: kr-glass changed` with Krastorio 2: Spaced Out and Crushing Industry. A correction is being qualified for the next release; affected earned-research upgrades remain under test. Keep the original save and matching mods/settings, and follow [issue #1651](https://github.com/Julesc013/more-infinite-research/issues/1651) for updates.
+
 - When another mod already provides an infinite native research chain, MIR preserves that research. The Library explains when MIR's settings do not control it. On Factorio 2.1, Muria keeps its finite weapon-speed levels 7 and 8; MIR adds infinite research from level 9.
 
 - Adding or removing Muria on a save that already uses MIR is refused because those changes replace different earned weapon-research identities. Keep the original save and restore its previous mod selection. Starting together, or installing MIR for the first time alongside Muria, is a different route; use the release notes for its tested scope.
@@ -170,6 +176,7 @@ source_of_truth_for:
 
 ## Performance claims
 
-- Performance testing for the first beta is unfinished. Earlier observations belong only to their recorded packages, engines and workloads; do not expect a particular startup, memory or factory-performance improvement from a different setup or final package.
+- Whole-product performance qualification for MIR 5 is unfinished. Earlier observations belong only to their recorded packages, engines and workloads; do not expect a particular startup, memory or factory-performance improvement from a different setup or final package.
 
 - Whole-game startup, save loading, Library use and factory simulation are separate measurements. A successful load, a smaller package or one quick scenario is not a general performance result. See the release notes for known limits. Detailed test records are in [developer progress](progress.md).
+- For startup investigations, keep total responsive-menu time, matched added delay and approximate stage intervals separate. The [offline timing guide](startup-diagnostics.md) explains what retained engine logs can show. `mir.log` remains a support snapshot; attach the engine log separately. Internal checkpoints, when needed for a diagnostic reproduction, do not provide a loading-screen progress bar or a reliable time-remaining estimate.

@@ -1,0 +1,302 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalStartupOwnerQualificationIntentAeroV1",
+  "status": "bounded-source-intent-disposition-with-consumer-gaps-open",
+  "reviewed_against": "807ee2537fd6f431d6944ac26c11fcda1dc76565",
+  "player_tree": "58480faa995eab995cc0a3ad2cddbbdd0e5e0c04",
+  "subjects": [
+    "CONT-02",
+    "CONT-03",
+    "CONT-05",
+    "CONT-07",
+    "CONT-12"
+  ],
+  "requirements": [
+    "ARCH-03",
+    "COMP-01",
+    "SET-01",
+    "VER-07"
+  ],
+  "scope": "Two named test/runner paths in the existing91-tag inventory:14 bindings to four unique blobs. One2408-byte seven-assertion fixture is completely reviewed; three wrapper bodies are inspected ONLY for ownership invocation/inclusion/count reporting. No old compiler, wrapper or native execution.",
+  "method": "Metadata first; deduplicate exact tag/blob identities; recover expectations from the original fixture and corroborating original private consumers. Current controls are mapped with exact scope limits and are not used to redefine the oracle.",
+  "source_index": {
+    "tag_scope": 91,
+    "selected_bindings": 14,
+    "unique_fixture_bodies": 1,
+    "unique_partially_reviewed_wrapper_bodies": 3,
+    "counts": {
+      "tests/compiler/startup_ownership.lua": {
+        "bindings": 3,
+        "unique_bodies": 1
+      },
+      "tests/compiler/run_approved_pack_bindings_controls.py": {
+        "bindings": 11,
+        "unique_bodies": 3
+      }
+    }
+  },
+  "historical_bodies": [
+    {
+      "blob": "1bab5da1c1d794676e35292e9ef5f219076d0971",
+      "bytes": 2408,
+      "sha256": "343071AF70785795D2C6FF94EFCD96B3F6469202495364814BA8AC8267A72B83",
+      "bindings": [
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "tests/compiler/startup_ownership.lua",
+          "blob": "1bab5da1c1d794676e35292e9ef5f219076d0971",
+          "bytes": 2408
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "tests/compiler/startup_ownership.lua",
+          "blob": "1bab5da1c1d794676e35292e9ef5f219076d0971",
+          "bytes": 2408
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tests/compiler/startup_ownership.lua",
+          "blob": "1bab5da1c1d794676e35292e9ef5f219076d0971",
+          "bytes": 2408
+        }
+      ],
+      "review_scope": "complete seven-assertion fixture",
+      "complete_semantic_body_review": true,
+      "ownership_fixture_referenced": false
+    },
+    {
+      "blob": "2a57bc034e6fe4b5721a76b3cb2375d03b92d7a7",
+      "bytes": 14656,
+      "sha256": "44D701466FD5E8C998683159BC1099B078D57451534A749944F9E73001991A7F",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "tests/compiler/run_approved_pack_bindings_controls.py",
+          "blob": "2a57bc034e6fe4b5721a76b3cb2375d03b92d7a7",
+          "bytes": 14656
+        }
+      ],
+      "review_scope": "ownership invocation, fixture inclusion and reported assertion count only; other wrapper behavior remains outside this audit",
+      "complete_semantic_body_review": false,
+      "ownership_fixture_referenced": false
+    },
+    {
+      "blob": "610c83ed285bd479b350bcc7ab28ca7fd886946f",
+      "bytes": 15387,
+      "sha256": "3D48E4760346609AC6C66E2E26DEEC922D5DC857C5E2C211B3E98626A27E779B",
+      "bindings": [
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "tests/compiler/run_approved_pack_bindings_controls.py",
+          "blob": "610c83ed285bd479b350bcc7ab28ca7fd886946f",
+          "bytes": 15387
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "tests/compiler/run_approved_pack_bindings_controls.py",
+          "blob": "610c83ed285bd479b350bcc7ab28ca7fd886946f",
+          "bytes": 15387
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tests/compiler/run_approved_pack_bindings_controls.py",
+          "blob": "610c83ed285bd479b350bcc7ab28ca7fd886946f",
+          "bytes": 15387
+        }
+      ],
+      "review_scope": "ownership invocation, fixture inclusion and reported assertion count only; other wrapper behavior remains outside this audit",
+      "complete_semantic_body_review": false,
+      "ownership_fixture_referenced": true
+    },
+    {
+      "blob": "a687cf98c7a77b282d8fb21314aad2e7c53baa06",
+      "bytes": 4627,
+      "sha256": "4B72800FE5D2F3C7914FA6099983075B7C5EFF1859FB611284DC6A0A027C7C27",
+      "bindings": [
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "tests/compiler/run_approved_pack_bindings_controls.py",
+          "blob": "a687cf98c7a77b282d8fb21314aad2e7c53baa06",
+          "bytes": 4627
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "tests/compiler/run_approved_pack_bindings_controls.py",
+          "blob": "a687cf98c7a77b282d8fb21314aad2e7c53baa06",
+          "bytes": 4627
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "tests/compiler/run_approved_pack_bindings_controls.py",
+          "blob": "a687cf98c7a77b282d8fb21314aad2e7c53baa06",
+          "bytes": 4627
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "tests/compiler/run_approved_pack_bindings_controls.py",
+          "blob": "a687cf98c7a77b282d8fb21314aad2e7c53baa06",
+          "bytes": 4627
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "tests/compiler/run_approved_pack_bindings_controls.py",
+          "blob": "a687cf98c7a77b282d8fb21314aad2e7c53baa06",
+          "bytes": 4627
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "tests/compiler/run_approved_pack_bindings_controls.py",
+          "blob": "a687cf98c7a77b282d8fb21314aad2e7c53baa06",
+          "bytes": 4627
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "tests/compiler/run_approved_pack_bindings_controls.py",
+          "blob": "a687cf98c7a77b282d8fb21314aad2e7c53baa06",
+          "bytes": 4627
+        }
+      ],
+      "review_scope": "ownership invocation, fixture inclusion and reported assertion count only; other wrapper behavior remains outside this audit",
+      "complete_semantic_body_review": false,
+      "ownership_fixture_referenced": false
+    }
+  ],
+  "corroborating_original_sources": [
+    {
+      "ref": "v4.7.3",
+      "path": "source/prototypes/mir/policy/native_effect_coverage.lua",
+      "blob": "81f989087f3000390fc3c450144af30e90f4bc1f",
+      "bytes": 10874,
+      "sha256": "4D7A22262A9E36C126848A7A88F8DEC1D63BAFE8C5B79AA8CB4AAD1D7A40FD1A",
+      "review_scope": "lines1-150 and180-267: qualification and three helper consumer calls; unreviewed remaining policy is not reconciled"
+    },
+    {
+      "ref": "v4.7.3",
+      "path": "source/prototypes/mir/policy/weapon_speed.lua",
+      "blob": "54431729a770513fcb66a89deec907767489ebde",
+      "bytes": 3137,
+      "sha256": "50533F3EC3026F2E18C53E350206083F0BD15ED18E491129D4D602D978A16B11",
+      "review_scope": "complete83-line consumer read for corroboration; weapon overlap/settings behavior is not qualified by this fixture audit"
+    }
+  ],
+  "dispositions": [
+    {
+      "id": "unrelated-unresolved-owner-isolation",
+      "original_assertions": [
+        1,
+        2
+      ],
+      "independent_expectation": "An unrelated unresolved infinite technology with mining productivity does not enter identity or exact qualification for laboratory-speed0.1, and its science error is never evaluated.",
+      "disposition": "consolidate-safety-intent-in-bounded-selected-owner-controls",
+      "implementation": [
+        "source/research/native_owners.lua: two named worker-speed candidates only",
+        "source/compatibility/modern_catalogue.lua: finite authored continuation identities"
+      ],
+      "controls": [
+        "tests/test_native_owners.py::NativeOwnersTests::test_unrelated_growth_is_never_examined_or_mutated",
+        "tests/test_continuation_ownership.py::ContinuationOwnershipTests::test_each_existing_foreign_infinite_owner_is_preserved"
+      ],
+      "evidence_limit": "These current controls cover finite selected owner boundaries, not a port of the general laboratory-speed identity/exact search.",
+      "remaining_executable_check": "Map each remaining delivered competing-owner consumer to its authored supported integration and retain unrelated unresolved-input isolation there; do not introduce a technology-world scan.",
+      "owner": "Aero intent/controls; Black Glass only affected native integration"
+    },
+    {
+      "id": "matching-unresolved-owner-failure",
+      "original_assertions": [
+        3,
+        4
+      ],
+      "independent_expectation": "A genuinely matching foreign-infinite-61 must preserve its unresolved-owner-binding error for both identity and exact queries; unrelated-input isolation must not swallow a selected owner failure.",
+      "disposition": "retain-original-expectation-consumer-port-unresolved",
+      "implementation": [
+        "source/compatibility/modern_catalogue.lua: existing_infinite_owner checks local named fields, not arbitrary science reachability",
+        "source/research/modern.lua: selected native-owner field preflight before publication"
+      ],
+      "controls": [
+        "tests/test_native_owner_costs.py::NativeOwnerCostTests::test_late_unknown_cost_refuses_without_any_owner_write",
+        "tests/test_native_owner_field_tuning.py::NativeOwnerFieldTuningTests::test_malformed_inherited_cost_and_time_refuse_before_any_publication_or_patch"
+      ],
+      "evidence_limit": "Cost/time refusal controls are safety analogs only. They do not prove the original matching unresolved-science condition; no test result is relabelled.",
+      "remaining_executable_check": "Identify the applicable delivered matching-owner/science consumer, then add an independently expected selected-owner unresolved-science negative control that cannot pass by dropping the family or swallowing the error. Resolve any conflict with the finite authored integration contract explicitly.",
+      "owner": "Aero bounded consumer/expectation reconciliation and correction; Black Glass affected exact native case"
+    },
+    {
+      "id": "matching-reachable-owner-retention",
+      "original_assertions": [
+        5,
+        6
+      ],
+      "independent_expectation": "After science qualification succeeds, identity and exact queries both retain foreign-infinite-61 as owner.",
+      "disposition": "consolidate-named-owner-retention-with-generic-consumers-still-open",
+      "implementation": [
+        "source/research/native_owners.lua",
+        "source/compatibility/modern_catalogue.lua: existing_infinite_owner and omit_existing_continuations",
+        "source/runtime/catalogue.lua: bounded continuation creator custody"
+      ],
+      "controls": [
+        "tests/test_native_owners.py::NativeOwnersTests::test_data_capture_shape_admits_current_six_tail",
+        "tests/test_continuation_ownership.py::ContinuationOwnershipTests::test_each_existing_foreign_infinite_owner_is_preserved",
+        "tests/test_continuation_ownership.py::ContinuationOwnershipTests::test_foreign_creator_remains_external_after_later_modifications"
+      ],
+      "evidence_limit": "Existing controls retain the recognized worker tail and six shared continuation identities, including foreign field/cap custody. They do not prove all arbitrary foreign identity/effect owners or full weapon-overlap settings semantics.",
+      "remaining_executable_check": "Finish actual direct-effect/weapon-overlap consumer mapping and affected supported-profile checks. Reuse original native receipts only after exact consumed-input applicability review.",
+      "owner": "Aero source/expectations; Black Glass applicable native state/effects"
+    },
+    {
+      "id": "disabled-owner-is-not-researchable-coverage",
+      "original_assertions": [
+        7
+      ],
+      "independent_expectation": "With foreign-infinite-61.enabled=false, neither exact nor identity query supplies researchable coverage.",
+      "disposition": "retain-original-expectation-current-consumer-semantics-unresolved",
+      "implementation": [
+        "source/compatibility/modern_catalogue.lua: named owner identity selection currently does not test enabled",
+        "source/runtime/caps.lua: separate enablement restoration custody"
+      ],
+      "controls": [
+        "tests/test_continuation_ownership.py::ContinuationOwnershipTests::test_all_six_foreign_creators_stay_out_of_real_cap_admission",
+        "tests/test_native_owner_cap_adoption.py::NativeOwnerCapAdoptionTests::test_cold_control_load_preserves_the_saved_restore_right_without_writes"
+      ],
+      "evidence_limit": "Preserving a disabled foreign prototype and declining MIR cap custody is not proof that disabled research supplies usable progression. Named ownership, researchability and MIR restoration rights are distinct predicates. Do not add an enabled check or waive the historical expectation from candidate behavior alone.",
+      "remaining_executable_check": "Trace applicable competing-owner preference and weapon-speed adjustment consumers, then exercise a named supported disabled foreign owner versus reachable owner with independent progression/effect expectations. Preserve foreign disablement and existing paid research. Keep original cap421DB970 and sourcefalse-through-entry failures unqualified under their own identities.",
+      "owner": "Aero consumer/contract reconciliation; Black Glass exact affected gameplay/save evidence"
+    }
+  ],
+  "retired_machinery": {
+    "disposition": "retire-implementation-only-preserve-delivered-semantics",
+    "details": "Compiler Context and global sorted identity/exact owner lookup are private implementation mechanisms, not a reason to restore the retired pipeline. Original private helper calls also fed direct-effect coverage and weapon-speed adjustment; this audit does not close those consumer behaviors or declare them superseded. No public API or complete legacy consumer inventory is claimed."
+  },
+  "validation": {
+    "source_assertions_accounted_for": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "historical_code_executed": false,
+    "new_host_behavior_executed": false,
+    "native_execution": false,
+    "release_qualification": false,
+    "inventory_complete": false,
+    "source_reconciliation_complete": false,
+    "test_intent_reconciliation_complete": false
+  },
+  "next_bounded_work": "Reconcile the named direct-effect coverage/weapon-speed consumers and their preserved settings before making a parity verdict. Matching unresolved science and disabled researchability remain explicit original-oracle obligations. Continue other unresolved effective-settings/control/inter-release/receipt provenance groups without rereading all5058 blobs or rerunning every old release."
+}

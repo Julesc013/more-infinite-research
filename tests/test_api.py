@@ -13,6 +13,9 @@ API_MODULE = "__more-infinite-research__.api.v1.data"
 class ApiTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
+        self.lua.globals().declared_product_version = json.loads(
+            (ROOT / "source/info.json").read_text(encoding="utf-8")
+        )["version"]
         self.lua.globals().player_root = (ROOT / "source").as_posix()
         self.lua.execute('''
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
@@ -63,7 +66,7 @@ class ApiTests(unittest.TestCase):
         ''')
 
     def fresh(self):
-        self.lua.execute("data = world(); mods = {[\"more-infinite-research\"] = \"5.0.21002\"}")
+        self.lua.execute('data = world(); mods = {["more-infinite-research"] = declared_product_version}')
 
     def fresh_f200(self):
         self.lua.execute('''
@@ -86,7 +89,7 @@ class ApiTests(unittest.TestCase):
         self.fresh()
         self.lua.execute('''
           local version = api.get_version()
-          assert(version.major == 1 and version.minor == 0 and version.product == "5.0.21002")
+          assert(version.major == 1 and version.minor == 0 and version.product == declared_product_version)
           version.major = 99
           assert(api.get_version().major == 1)
           local capabilities = api.get_capabilities()
@@ -126,7 +129,7 @@ class ApiTests(unittest.TestCase):
             package.loaded["__more-infinite-research__/platform/target"] = nil
             package.loaded["__more-infinite-research__.api.v1.data"] = nil
             local external_api = require("__more-infinite-research__.api.v1.data")
-            assert(external_api.get_version().product == "5.0.21002",
+            assert(external_api.get_version().product == declared_product_version,
               "external API consumed " .. consumer .. "'s private target metadata")
             assert(external_api.get_capabilities().recipe_productivity)
             local name = "mir-api-namespace-" .. consumer

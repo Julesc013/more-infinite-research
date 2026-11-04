@@ -1,0 +1,258 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalNativeOwnerSettingsIntentReconciliationV1",
+  "status": "partial-independent-intents-and-host-gaps",
+  "requirement": "VER-07",
+  "subjects": [
+    "CONT-02",
+    "CONT-03",
+    "CONT-04",
+    "CONT-07"
+  ],
+  "base_dev": "c7233b8abe05116a070d32bb9c60fdf2d9c68e90",
+  "sources": {
+    "fixtures/assert-native-owner-settings/data-final-fixes.lua": {
+      "ref": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "blob": "a47cc17c6e34e115684ffa92afb6471bf48d254c",
+      "bytes": 9599,
+      "sha256": "B43AF63E70E7FA576ABFB08C1AC2DEE7F26F527097A9601D7482FC7B606D1F55",
+      "same_at_published_v472": true
+    },
+    "fixtures/assert-native-owner-settings/control.lua": {
+      "ref": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "blob": "eb06c084b60d1cc42e3e6058d360293cd951f8bc",
+      "bytes": 4720,
+      "sha256": "B46D97C851A102EE44093F5345E86F24ABC8FCF232B0C0FD02F62EC6D86CB092",
+      "same_at_published_v472": true
+    },
+    "fixtures/native-owner-settings-source/data-updates.lua": {
+      "ref": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "blob": "7128fce898bdb0a3a38728efc3f76164d8cdf7d1",
+      "bytes": 330,
+      "sha256": "0E09998994F6A65740A2EAF83D1C86381C4197E7219C6D5B3D33344034CE208D",
+      "same_at_published_v472": true
+    },
+    "fixtures/native-owner-fixed-count/data-updates.lua": {
+      "ref": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "blob": "304c550ad81d3d7a06ef0a30b39eece3161ebc83",
+      "bytes": 238,
+      "sha256": "15CD878E1543466DD0AC486F812357DBF44658C01DAA55A945E80A29D19FA802",
+      "same_at_published_v472": true
+    },
+    "fixtures/native-owner-linear-formula/data-updates.lua": {
+      "ref": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "blob": "f880105d083a5c6da676eeca58bd50e0713d8c56",
+      "bytes": 259,
+      "sha256": "390582877D7D1D97B3CFF51E67E89EC227FC003D01AB729B12246A9257F5FB85",
+      "same_at_published_v472": true
+    },
+    "fixtures/native-owner-unrecognized-formula/data-updates.lua": {
+      "ref": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "blob": "820e7ee6b95d0221b2a14f05431dca417e16c180",
+      "bytes": 261,
+      "sha256": "49C2A0D9C5F2EDB8BE216EA283C9C2AAC49502B67DDD37E15BFFDABE0D1C3C8B",
+      "same_at_published_v472": true
+    },
+    "source/prototypes/mir/planner/native_owner_binding.lua": {
+      "ref": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "blob": "fa16d18ba3f721516ebbc3857444e58fb53ca39a",
+      "bytes": 10099,
+      "sha256": "067C47A7AD5415924DFF543733BA4B120035D796A407D0567B519278BBD3ED2C",
+      "same_at_published_v472": true
+    },
+    "source/prototypes/mir/domain/native_owner/cost_model.lua": {
+      "ref": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "blob": "dffd1f34ee5c76be8098ab38b45537f65dc460f5",
+      "bytes": 4464,
+      "sha256": "A74598753DD9E990BC23291010901ACE499725363967FB41E374CDCA34B37CE9",
+      "same_at_published_v472": true
+    },
+    "tests/compiler/Test-MIRNativeOwnerCostModels.ps1": {
+      "ref": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "blob": "abebe32f6e8bb354bb91c52bcbf2de77388b5f46",
+      "bytes": 9187,
+      "sha256": "48EB2B5671EC8B0F8A3DCFE8EC823BDA544ECAB91B7FAC45CE8EB7DAA7943BBF",
+      "same_at_published_v472": true
+    },
+    ".mir/native-owner-cost-models.json": {
+      "ref": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "blob": "c6416ba157581162ffb40b317829606a28cd8a35",
+      "bytes": 2834,
+      "sha256": "61611F4CD0397CA918C0881A3CD4B8083907C5248702280749698BC8E041BB84",
+      "same_at_published_v472": true
+    },
+    "fixtures/assert-native-owner-progress/control.lua": {
+      "ref": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "blob": "669c96521b8bd7e53f6efc8f19363be7c0cf6332",
+      "bytes": 8454,
+      "sha256": "5A49062A28FA57AA6E119F1AE9CC3D5A797FC8507F4C10B8476EDC21B9DA64D1",
+      "same_at_published_v472": true
+    },
+    "fixtures/native-owner-settings-source/control.lua": {
+      "ref": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "blob": "8da40d99c1472d77b8a4bbf97e25cabd5ba1a2e8",
+      "bytes": 2879,
+      "sha256": "B7D24E9948A0D57D253655B4FBE44E479B43717BCC88FC0EBB7F71A4F86B4C41",
+      "same_at_published_v472": true
+    }
+  },
+  "source_inventory": {
+    "unique_complete_bodies": 12,
+    "live_tag_labels": 2,
+    "live_path_bindings": 24,
+    "live_peeled_targets": {
+      "refs/tags/v4.7.2": "0b1e67113ac0df056b3bfbbcdea870016837f8ee",
+      "refs/tags/v4.7.2^{}": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+      "refs/tags/v4.7.3": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+      "refs/tags/v4.7.3^{}": "8643cc91bc915e008556a5315dbb0a743247e7ab"
+    },
+    "remote_proof_sha256": "F8D8981068014D39D753A6399A44DCCEEDF37454651ABEDDB1009391CA4A0274"
+  },
+  "obligations": [
+    {
+      "subject": "CONT-03",
+      "obligation": "Preserve the final native cost snapshot at default settings.",
+      "expectation": "Keep numeric count1000, linear1000+250*(L-1), unrecognized1000+100*L^2 or native1.5^L*1000 unchanged; preserve unrelated effects. MIR catalogue defaults8000/0/2 are not a command to replace native1500/0/1.5.",
+      "authority": [
+        ".mir/native-owner-cost-models.json:default_policy",
+        "fixtures/assert-native-owner-settings/data-final-fixes.lua:recognized_fixed/recognized_linear/unrecognized branches"
+      ],
+      "implementation": "Default path keeps owner unit fields; proposed recipe adoption is a separate additive effect patch.",
+      "evidence": "Four corresponding synthetic default cases meet the player expectation onb743; no engine observation.",
+      "remaining_check": "Affected exact F200/F210 native snapshots and selected settings/save applicability on accepted candidate.",
+      "owner": "Aero source/expectations; Black Glass native",
+      "status": "host-covered-native-unverified"
+    },
+    {
+      "subject": "CONT-03",
+      "obligation": "Tune effect/time without requiring the inherited cost to equal Base balance.",
+      "expectation": "With fixed/linear/unrecognized inherited cost, effect17 and/or time31 applies only the selected field while retaining numeric/formula identity and the bullet.07 unrelated effect.",
+      "authority": [
+        "fixtures/assert-native-owner-settings/data-final-fixes.lua:cost_changed/time_changed/effect_changed",
+        "source/prototypes/mir/domain/native_owner/cost_model.lua:configure-no-overrides",
+        "source/prototypes/mir/planner/native_owner_binding.lua:build_plan"
+      ],
+      "implementation": "Current preflight_owner checks count_formula and time for every nondefault patch, so legitimate independent-field changes refuse before publication.",
+      "evidence": "Nine controlled effect/time combinations refuse with unexpected count formula onb743. The relevant early preflight/plan bodies are byte-identical through8d8238b3, so these unchanged-path gaps remain applicable; this is not relabelled native evidence.",
+      "remaining_check": "Correct per-field admission from independent cost/native contracts, retain all-before-write and unrelated-field controls, then observe useful research and saved work on exact native inputs.",
+      "owner": "Aero source/host; Black Glass native",
+      "status": "implementation-gap"
+    },
+    {
+      "subject": "CONT-03",
+      "obligation": "Project the complete configured cost trio on recognized native cost models.",
+      "expectation": "Fixed-count and recognized linear input accept the visible200/3/1.25 tuple, producing(200+3*(L-1))*1.25^(L-1) without retaining unit.count; unrelated fields survive. Actual fixed/linear/exponential/hybrid scope remains the original cost-model contract.",
+      "authority": [
+        "tests/compiler/Test-MIRNativeOwnerCostModels.ps1:costTrioIsAtomic",
+        "source/prototypes/mir/domain/native_owner/cost_model.lua:configure",
+        "fixtures/assert-native-owner-settings/data-final-fixes.lua:configured formula branch"
+      ],
+      "implementation": "The ordinary native formula case passes; fixed-count and linear input are rejected by the baseline literal guard.",
+      "evidence": "Two controlled recognized-model overrides refuse onb743; native-formula override passes. Same early guard through8d8238b3.",
+      "remaining_check": "Restore safe recognized-model admission without a planner/framework; independently check numeric versus formula output, boundary/high-level engine costs and paid-unit preservation.",
+      "owner": "Aero source/host; Black Glass native",
+      "status": "implementation-gap"
+    },
+    {
+      "subject": "CONT-03",
+      "obligation": "Withhold unsafe unrecognized cost replacement while preserving the native owner.",
+      "expectation": "Original unrecognized-formula cost request has no admitted binding and preserves its polynomial rather than substituting a guessed curve. The original settings fixture expects safe nonbinding; this is separate from original fallback behavior when other eligible producers exist.",
+      "authority": [
+        "fixtures/assert-native-owner-settings/data-final-fixes.lua:safely_rejected",
+        "source/prototypes/mir/domain/native_owner/cost_model.lua:unrecognized_cost_formula",
+        "source/prototypes/mir/planner/native_owner_binding.lua:rejected plan"
+      ],
+      "implementation": "Current baseline literal preflight aborts instead of reproducing the original safe-withholding route.",
+      "evidence": "Combined synthetic alternate-recipe case refuses before raw writes. It is not an exact installed old settings-only reproduction; no claim that every fallback must load follows.",
+      "remaining_check": "Port the isolated original settings-only refusal/retention expectation and resolve any generated fallback identity/ownership implications before implementing. No exception swallowing or duplicate bypass.",
+      "owner": "Aero expectation/source; Black Glass native",
+      "status": "unresolved-safe-outcome-boundary"
+    },
+    {
+      "subject": "CONT-03",
+      "obligation": "Explicit family effect tuning includes existing matching product routes.",
+      "expectation": "With configured20, an existing permitted matching-product .33 effect becomes .2 exactly once; unrelated bullet .07 and unlock effects remain. Default unconfigured adoption inherits a uniform relevant upstream change.",
+      "authority": [
+        "source/prototypes/mir/planner/native_owner_binding.lua:relevant_effects/build_plan",
+        "fixtures/assert-native-owner-settings/data-final-fixes.lua:relevant effects"
+      ],
+      "implementation": "b743 retains .33; follow-up8d8238b3/d34 applies explicit tuning and carries its admitted recipe into exact runtime caps.",
+      "evidence": "Original b743 host discrepancy retained B74A4ACA. Proposed8d data13 and cap10 source-to-control controls pass, including this retuning; independent source/native review still required.",
+      "remaining_check": "Independent review plus existing-paid affected native research/effects, caps/restore rights, save and cold reload. Do not interpret an older green .33-characterization as a correct historical oracle.",
+      "owner": "Aero source; Black Glass independent/native",
+      "status": "proposed-correction-host-pass-not-accepted"
+    },
+    {
+      "subject": "CONT-02",
+      "obligation": "Resolve old native-owner eligibility/fallback outcomes without restoring global researchability.",
+      "expectation": "Original plan rejects missing/non-infinite/unreachable owners or mixed relevant effect changes and returns bounded fallback buckets/reasons. That implementation return is evidence, not proof of final player identities or permission to invent successors.",
+      "authority": [
+        "source/prototypes/mir/planner/native_owner_binding.lua:owner_is_reachable/common_change/M.plan"
+      ],
+      "implementation": "Five-owner correction deliberately refuses unsupported current owner shapes and does not restore old global science/progression solver.",
+      "evidence": "Complete original source read; no independent final-output/native oracle has yet closed the fallback group.",
+      "remaining_check": "Recover the finite original caller/output or actual selected fixture facts; classify accepted behavior versus old bug/unsupported input, then implement only the necessary named rule. Never auto-skip or rename research.",
+      "owner": "Aero reconciliation/ambiguous source; Black Glass native",
+      "status": "unresolved-final-player-outcome"
+    },
+    {
+      "subject": "CONT-07",
+      "obligation": "Preserve Factorio-normalized paid work and foreign state when native costs/settings change.",
+      "expectation": "At native level5, retain completed research units: clamp(old_fraction*old_engine_unit_count/current_engine_unit_count,0,1), observed before MIR callback and after it. Preserve level/current identity, foreign disabled recipe and independently available give-item inventory; keep cap/queue/cold state. The original observer expects Factorio to normalize before MIR.",
+      "authority": [
+        "fixtures/assert-native-owner-progress/control.lua:configuration-changed proof",
+        "fixtures/native-owner-settings-source/control.lua:pre-MIR snapshot"
+      ],
+      "implementation": "Existing native caps/lifecycle and exact safety chains cover named earlier inputs; no current changed-cost native result is asserted here.",
+      "evidence": "Original16-helper matrix/digest/budget tests are source/ABI checks, not sixteen native journeys. Existing standard-cost routes cannot be promoted to changed-cost coverage from this source review.",
+      "remaining_check": "One coherent affected source/successor scenario with independent early-entry native unit counts and actual after-state, plus save/two cold reloads; use existing valid routes where consumed inputs match. No paid-bonus reapplication or unnecessary runtime converter.",
+      "owner": "Aero oracle/applicability; Black Glass native",
+      "status": "native-qualification-open"
+    }
+  ],
+  "host_observation": {
+    "path": "build/qualification/aero-native-owner-settings-intent-r01/observation.json",
+    "bytes": 50885,
+    "sha256": "B74A4ACABB3D8BA5789DECEA52258DC48D68CDD926E3D8CE846AB2C59845D632",
+    "head": "b7434f776a7fec1f8fc93a6aaa3c72d008c50cf2",
+    "controlled_cases": 21,
+    "met": 8,
+    "unmet": 13,
+    "meaning": "Thirteen unmet cases are one scoped native-cost admission class plus the matching-route tuning defect, not thirteen unique product bugs or native failures."
+  },
+  "retired_and_uncertain": [
+    {
+      "source": "fixtures/assert-native-owner-settings/data-final-fixes.lua",
+      "disposition": "Retain player value/owner/foreign-field assertions; schema4/mod-data signature/fingerprint/binding-count assertions are retired representation checks and cannot be imposed on MIR5."
+    },
+    {
+      "source": "tests/compiler/Test-MIRNativeOwnerCostModels.ps1",
+      "disposition": "Static regex/ABI presence checks do not establish engine acceptance. Mapping/default/sentinel/cost-trio/player work obligations remain; no old compiler/model/receipt estate is restored."
+    },
+    {
+      "source": "fixtures/assert-native-owner-progress/control.lua",
+      "disposition": "Retain native pre-MIR and post-MIR research-unit/foreign-state assertions. Sixteen internal descriptor conversions, semantic-digest and budget checks are helper machinery, not sixteen new mandatory engine campaigns."
+    },
+    {
+      "source": "source/prototypes/mir/domain/native_owner/cost_model.lua",
+      "disposition": "A newly fixed curve from fixed-count input retains numeric unit.count in source, while a generic fixture formula branch is not independently adequate for every tuple. Preserve numeric/formula distinction under SET-02 and use the actual source branch plus native evaluated-cost checks; do not blindly port the generic string assertion."
+    }
+  ],
+  "limits": [
+    "No player/fixture/controller/package/version/tag mutation or engine execution in this record.",
+    "Current proposed8d source controls are not independent acceptance or native/save qualification; original b743 CBC8 cap failure and d34 host failure remain preserved.",
+    "No complete historical/native-owner/stable verdict, whole-history reread, arbitrary-modpack support or new request ledger."
+  ]
+}

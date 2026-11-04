@@ -5,6 +5,10 @@ local MAX_SURFACES = 32
 local SAMPLE_PER_SURFACE = 256
 local MAX_MODS = 128
 local MAX_REPORT_BYTES = 65536
+local MAX_SETTINGS_BYTES = 262144
+local MAX_SETTINGS_PER_SCOPE = 2048
+local MAX_SETTING_NAME_BYTES = 256
+local MAX_SETTING_STRING_BYTES = 4096
 local PREFIX = "[MIR5_LARGE_FACTORY_ACTIVITY] "
 local TYPES = {"assembling-machine", "furnace", "mining-drill", "lab", "inserter",
   "transport-belt", "locomotive", "roboport", "agricultural-tower"}
@@ -24,6 +28,58 @@ local function emit(kind, report)
   local text = helpers.table_to_json(report)
   if type(text) ~= "string" or #text > MAX_REPORT_BYTES then fail("report byte bound exceeded") end
   log(PREFIX .. kind .. " " .. text)
+end
+-- Copy only the documented ModSetting scalar/Color union, never native objects.
+local function setting_value(value)
+  local kind = type(value)
+  if kind == "boolean" then return value end
+  if kind == "string" then
+    if #value > MAX_SETTING_STRING_BYTES then fail("setting string bound exceeded") end
+    return value
+  end
+  if kind == "number" then
+    if value ~= value or value == math.huge or value == -math.huge then fail("nonfinite setting") end
+    return value
+  end
+  if kind ~= "table" then fail("unsupported setting value") end
+  local result, mode, count = {}, nil, 0
+  for key, channel in pairs(value) do
+    local named = key == "r" or key == "g" or key == "b" or key == "a"
+    local indexed = type(key) == "number" and key % 1 == 0 and key >= 1 and key <= 4
+    if not named and not indexed then fail("malformed Color key") end
+    local next_mode = named and "named" or "indexed"
+    if mode and mode ~= next_mode then fail("mixed Color representation") end
+    mode, count = next_mode, count + 1
+    if type(channel) ~= "number" or channel ~= channel or channel < 0 or channel > 255 then
+      fail("malformed Color channel")
+    end
+    result[key] = channel
+  end
+  if mode == "indexed" and (count < 3 or count > 4 or result[1] == nil or result[2] == nil or result[3] == nil) then
+    fail("malformed Color array")
+  end
+  return result
+end
+local function setting_scope(values)
+  local rows = {}
+  for name, setting in pairs(values) do
+    if type(name) ~= "string" or #name == 0 or #name > MAX_SETTING_NAME_BYTES then fail("setting name bound exceeded") end
+    if type(setting) ~= "table" or setting.value == nil then fail("malformed ModSetting") end
+    rows[#rows + 1] = {name = name, value = setting_value(setting.value)}
+    if #rows > MAX_SETTINGS_PER_SCOPE then fail("setting count bound exceeded") end
+  end
+  table.sort(rows, function(a, b) return a.name < b.name end)
+  return rows
+end
+local function emit_settings(tick, startup)
+  local report = {schema = 1, kind = "MIRLargeFactoryEffectiveSettingsV1", tick = tick,
+    startup = setting_scope(startup), runtime_global = setting_scope(settings.global),
+    original_saved_settings_observed = false, per_player_settings_observed = false}
+  local text = helpers.table_to_json(report)
+  if type(text) ~= "string" or #PREFIX + #"SETTINGS " + #text > MAX_SETTINGS_BYTES then
+    fail("settings report byte bound exceeded")
+  end
+  log(PREFIX .. "SETTINGS " .. text)
 end
 local function surfaces()
   local values, seen = {}, {}
@@ -49,6 +105,45 @@ local function snapshot(surface)
   end
   return row
 end
+local function inventory(tick)
+  local rows, seen = {}, {}
+  local visited, processed, invalid, aliases, unique = 0, 0, 0, 0, 0
+  local overflow = false
+  for _, surface in pairs(game.surfaces) do
+    visited = visited + 1
+    if visited > 1024 then overflow = "iteration-bound"; break end
+    processed = processed + 1
+    if not surface.valid then invalid = invalid + 1
+    else
+      local index, name = surface.index, surface.name
+      if type(index) ~= "number" or index ~= index or index % 1 ~= 0 or index < 0 or index > 4294967295 then
+        fail("invalid surface index")
+      end
+      if type(name) ~= "string" or #name == 0 or #name > 4096 then fail("invalid surface name") end
+      if seen[index] then
+        if seen[index] ~= name then fail("conflicting surface identity") end
+        aliases = aliases + 1
+      else
+        unique = unique + 1
+        if unique > 256 then overflow = "unique-surface-bound"; break end
+        seen[index] = name
+        rows[#rows + 1] = {index=index, name=name}
+      end
+    end
+  end
+  table.sort(rows, function(a, b) return a.index < b.index end)
+  local report = {schema=1, kind="MIRLargeFactoryInputInventoryV1", mode="inventory-only", tick=tick,
+    metadata=metadata, bounds={unique_surfaces=256, entries=1024, name_bytes=4096, serialized_bytes=2097152},
+    observed={visited_entries=visited, processed_entries=processed, invalid_entries=invalid, aliases=aliases,
+      unique_valid_observed_lower_bound=unique}, surfaces=rows, complete=not overflow, overflow=overflow,
+    activity_observed=false, performance_acceptance=false, large_factory_qualified=false,
+    gameplay_acceptance=false, save_preservation_acceptance=false, release_qualification=false, stable_acceptance=false}
+  local text = helpers.table_to_json(report)
+  if type(text) ~= "string" or #PREFIX + #"INVENTORY " + #text > 2097152 then fail("inventory report byte bound exceeded") end
+  script.on_event(defines.events.on_tick, nil)
+  first_tick, first_rows, sampled, selected_surfaces, selected_force, metadata = nil, nil, nil, nil, nil, nil
+  log(PREFIX .. "INVENTORY " .. text)
+end
 local function begin(tick)
   local base = script.active_mods.base
   if base ~= "2.0.77" and base ~= "2.1.23" then fail("requires pinned 2.0.77 or 2.1.23") end
@@ -65,6 +160,14 @@ local function begin(tick)
   table.sort(mods, function(a, b) return a.name < b.name end)
   metadata = {base_version = base, mir_version = script.active_mods["more-infinite-research"] or false,
     mods = mods, force_index = selected_force.index, force_name = selected_force.name}
+  local startup = settings.startup
+  local mode = startup["mir5-large-factory-inventory-only"]
+  if type(mode) ~= "table" or type(mode.value) ~= "boolean" then fail("invalid inventory mode setting") end
+  if mode.value then
+    emit_settings(tick, startup)
+    inventory(tick)
+    return
+  end
   selected_surfaces, first_rows, sampled = surfaces(), {}, {}
   for _, surface in ipairs(selected_surfaces) do
     first_rows[#first_rows + 1] = snapshot(surface)
@@ -76,6 +179,7 @@ local function begin(tick)
     end
   end
   first_tick = tick
+  emit_settings(tick, startup)
   emit("START", {schema = 1, first_tick = tick, window_ticks = WINDOW,
     surfaces = #selected_surfaces, sampled_machines = #sampled, performance_acceptance = false})
 end

@@ -85,6 +85,9 @@ class SdkTests(unittest.TestCase):
 
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
+        self.lua.globals().declared_product_version = json.loads(
+            (PLAYER_ROOT / "info.json").read_text(encoding="utf-8")
+        )["version"]
         self.lua.globals().player_root = PLAYER_ROOT.as_posix()
         self.lua.globals().data_source = (PLAYER_ROOT / "api/v1/data.lua").as_posix()
         self.lua.globals().runtime_source = (PLAYER_ROOT / "api/v1/runtime.lua").as_posix()
@@ -155,7 +158,7 @@ class SdkTests(unittest.TestCase):
 
     def fresh_data_stage(self):
         self.lua.execute(
-            'data = sdk_world(); mods = {["more-infinite-research"] = "5.0.21002"}; '
+            'data = sdk_world(); mods = {["more-infinite-research"] = declared_product_version}; '
             'package.loaded["__more-infinite-research__.api.v1.data"] = nil'
         )
 
@@ -205,7 +208,7 @@ class SdkTests(unittest.TestCase):
         self.lua.execute(r'''
           local api = require("__more-infinite-research__.api.v1.data")
           local version = api.get_version()
-          assert(version.major == 1 and version.minor == 0 and version.product == "5.0.21002")
+          assert(version.major == 1 and version.minor == 0 and version.product == declared_product_version)
           version.major = 99
           assert(api.get_version().major == 1)
 

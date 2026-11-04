@@ -2,6 +2,18 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.3] - 2026-11-04
+
+### Bugfixes
+
+- Keep Krastorio 2: Spaced Out glass research loading when Crushing Industry replaces the glass recipe, without changing either mod's recipes.
+- Preserve Secretas's finite worker-robot storage research and continue from level 9 with its inherited science and effects.
+- Apply research cost and time settings to compatible native productivity research; retain separate MIR research when the native progression cannot represent those settings safely.
+- Preserve recipe-specific earned bonuses, unfinished research and queued work when native research ownership changes, including existing destination-force bonuses during force merges.
+- Preserve affected Space Is Fake research when selecting native productivity research or inheriting research time.
+- Preserve independently known paid research from earlier plain Base betas and supported 4.7.3 upgrades; refuse unknown prior ownership before changing saved research state.
+- Improve Russian research and setting names, descriptions and percentage explanations.
+
 ## [5.0.2] - 2026-11-03
 
 ### Changes

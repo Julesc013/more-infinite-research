@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 import recover_modern_catalogue as catalogue
 from test_k2_base_catalogue import _lua_value, _plain
-from native_credit_oracle import NATIVE_CREDIT_DEFAULT_SCALAR, NATIVE_CREDIT_DESCRIPTORS, native_credit_carrier_rows, legacy_cannon_credit_rows, legacy_module_credit_rows, verified_public_rows
+from native_credit_oracle import NATIVE_CREDIT_DEFAULT_SCALAR, NATIVE_CREDIT_DESCRIPTORS, NATIVE_FAMILY_RECIPES, native_credit_carrier_rows, legacy_cannon_credit_rows, legacy_module_credit_rows, verified_public_rows
 
 SETTINGS_INTENT = ROOT / "spec/inventory/bob-angel-f200-intent-r03.json"
 SETTINGS_INTENT_SHA256 = "1D200906E8996F4049009EE6761E73C88FFC70824BC838496786A32EF927207C"
@@ -108,12 +108,16 @@ class BobAngelCatalogueTests(unittest.TestCase):
         public_review = [row for row in reviewed if not row["name"].startswith("mir-native-credit-")]
         catalogue._apply_reviewed(cls.expected_data, public_review, "data")
         cls.expected_data = repair_base_literal_name_presentation(cls.expected_data)
+        # r02 remains an immutable twenty-carrier historical intent. Verify
+        # it separately before adding the independently derived family pairs.
+        original_credits = native_credit_carrier_rows(
+            cls.expected_data["technology"], cls.inputs["raw"]["recipe"], family_recipes={})
         credits = native_credit_carrier_rows(cls.expected_data["technology"], cls.inputs["raw"]["recipe"])
         credit_review = {row["name"]: row["expected_candidate"] for row in reviewed
                          if row["name"].startswith("mir-native-credit-")}
-        if len(reviewed) != 27 or len(public_review) != 7 or len(credits) != 20:
+        if len(reviewed) != 27 or len(public_review) != 7 or len(original_credits) != 20:
             raise AssertionError("Bob/Angel intent requires seven public dispositions and twenty exact dormant carriers")
-        if not catalogue._same(credit_review, credits):
+        if not catalogue._same(credit_review, original_credits):
             raise AssertionError("Bob/Angel native comparison credit descriptors differ from independent published routes")
         for family, main_id, recipe in NATIVE_CREDIT_DESCRIPTORS:
             if main_id in cls.expected_data["technology"] and recipe in cls.inputs["raw"]["recipe"]:
@@ -122,8 +126,21 @@ class BobAngelCatalogueTests(unittest.TestCase):
                     raise AssertionError("Credit scalar lacks its independent captured setting default: " + family)
         cls.expected_complete_data = deepcopy(cls.expected_data)
         catalogue._apply_reviewed(cls.expected_complete_data, reviewed, "data")
+        cls.expected_complete_data["technology"].update(credits)
         cls.expected_complete_data["technology"].update(legacy_module_credit_rows(cls.inputs["raw"]["recipe"]))
         cls.expected_complete_data["technology"].update(legacy_cannon_credit_rows(cls.expected_data["technology"]))
+        families = {}
+        for family in NATIVE_FAMILY_RECIPES:
+            main = cls.expected_data["technology"].get("recipe-prod-" + family + "-1")
+            if main:
+                families[family] = sorted([
+                    {"recipe": effect["recipe"], "change": effect["change"]}
+                    for effect in main["effects"] if effect["type"] == "change-recipe-productivity"
+                ], key=lambda row: row["recipe"])
+        cls.expected_complete_data["mod-data"] = {"more-infinite-research-native-adoptions": {
+            "type": "mod-data", "name": "more-infinite-research-native-adoptions",
+            "data": {"schema": 1, "owners": {}, "withheld": {}, "credits": families},
+        }}
         cls.mods = {row["name"]: row["version"] for row in json.loads(
             (ROOT / "tests/profiles/bob-angel-f200-2077.json").read_text())["mods"] if row["enabled"]}
 
@@ -131,7 +148,11 @@ class BobAngelCatalogueTests(unittest.TestCase):
         lua = LuaRuntime(unpack_returned_tuples=True)
         lua.globals().player_root = (ROOT / "source").as_posix()
         lua.globals().mods = _lua_value(lua, self.mods)
-        lua.globals().captured_raw = _lua_value(lua, deepcopy(self.inputs["raw"]))
+        raw = deepcopy(self.inputs["raw"])
+        for name, recipe in raw["recipe"].items():
+            recipe.setdefault("type", "recipe")
+            recipe.setdefault("name", name)
+        lua.globals().captured_raw = _lua_value(lua, raw)
         lua.execute(r'''
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"; package.cpath = ""
           local target = require("platform.target")
@@ -175,6 +196,10 @@ class BobAngelCatalogueTests(unittest.TestCase):
         actual = _plain(lua.globals().data.raw)
         for kind, rows in self.inputs["raw"].items():
             for name, row in rows.items():
+                row = deepcopy(row)
+                if kind == "recipe":
+                    row.setdefault("type", "recipe")
+                    row.setdefault("name", name)
                 self.assertTrue(catalogue._same(row, actual[kind][name]), f"foreign {kind}/{name} changed")
         self.assertEqual(lua.globals().publications, 2)  # shortcut, one complete technology publication
         declared = _plain(lua.execute('return require("research.catalogue").declared()'))

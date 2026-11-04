@@ -281,10 +281,24 @@
         "settings",
         "import_export"
       ],
-      "remaining_implementation": [],
+      "historical_native_owner_settings_reconciliation_r01": {
+        "evidence": "spec/evidence/historical-native-owner-settings-intent-aero-r01.json",
+        "scope": "Twelve deduplicated original bodies at two published tags; finite native settings/cost/fallback/work obligations, original21-case host gaps and proposed correction remain distinct.",
+        "status": "partial-no-native-completion"
+      },
+      "remaining_implementation": [
+        "Resolve unsafe unrecognized replacement/fallback outcomes from independent original expectations; recognized fixed/linear/exponential/hybrid cost projection is source/host-accepted in1645 and still needs affected native paid-work qualification.",
+        "Resolve remaining native-owner eligibility/fallback and unsupported upstream effect-shape outcomes from recovered original final-player expectations; do not restore the global solver or invent replacement identities."
+      ],
+      "native_owner_source_host_disposition_r02": {
+        "evidence": "spec/evidence/historical-native-owner-current-disposition-aero-r01.json",
+        "scope": "Accepted1634 matching-route/cap custody,1637 independent-field tuning and1645 recognized-cost projection close those source/host gaps; original1636/b743/8d/e7-parent observations remain immutable, unsupported/unknown outcomes remain unresolved and all affected native paid-work/save qualification stays open.",
+        "status": "source-host-accepted-native-unverified"
+      },
       "remaining_qualification": [
         "Run nondefault effective-setting and profile-precedence cases where output or runtime behavior changes.",
-        "Retain the compiler, automatic-preview and inactive-artwork negative scopes as dispositions; do not recover a compiler or inspect disabled provider files."
+        "Retain the compiler, automatic-preview and inactive-artwork negative scopes as dispositions; do not recover a compiler or inspect disabled provider files.",
+        "Qualify changed native costs using pre-MIR and post-MIR engine research-unit work, foreign give-item/recipe state, caps/restore rights, successor save and two cold reloads; reuse only applicable exact inputs."
       ]
     },
     {
@@ -430,6 +444,16 @@
     },
     {
       "id": "CONT-07",
+      "secretas_continuation_current_disposition_r01": {
+        "evidence": "spec/evidence/historical-secretas-current-disposition-aero-r01.json",
+        "scope": "Accepted1640 source/host correction and independently accepted upstream-only native baseline; original recovery/failure record preserved. Published/corrected native comparison, useful research, paid/partial/queue/save/two-cold and provider-refusal verdicts remain open.",
+        "status": "source-host-accepted-upstream-only-native-accepted-candidate-state-open"
+      },
+      "historical_incident_originals_recovery_r01": {
+        "evidence": "spec/evidence/historical-missing-originals-recovery-aero-r01.json",
+        "scope": "Actual issue/comment/screenshot recovery, unmerged private-index disposition and exact retained-input Secretas continuation host failure; no native completion.",
+        "status": "partial-secretas-correction-and-original-inputs-open"
+      },
       "category": "caps",
       "subject": "Earned-above-cap, queue/progress and foreign disablement",
       "status": "partial",
@@ -8367,6 +8391,21 @@
           ],
           "evidence": "spec/evidence/library-multiplayer-qualified-chain.json",
           "scope": "English/German rendered Library views are observed in the limited two-client F200 scenario."
+        },
+        {
+          "id": "russian-fork389-current-key-port",
+          "source": [
+            "source/locale/ru/more-infinite-research.cfg"
+          ],
+          "historical_documentation": {
+            "repository": "AstardGrimoire/more-infinite-research",
+            "commit": "389a8b848145a89713be32b658c80113565246b4",
+            "path": "locale/ru/more-infinite-research.cfg",
+            "author": "AstardGrimotre"
+          },
+          "evidence": "spec/evidence/historical-russian-fork389-disposition-aero-r01.json",
+          "evidence_sha256": "A271B88ACB3708C9AFE1DD481E0FAD49C40438759FEB216DAB4812A23BC75A0B",
+          "scope": "All33 contributed pairs have a bounded disposition:11 already covered,4 ported,11 adapted to current meaning/formatting,7 retired or rejected. Fifteen Russian entries change, including five missing current setting names; current placeholders/bounded-effect caveats retained. Original author commit remains on a preserved canonical branch. Other locale/UI/package acceptance remains open."
         }
       ],
       "test_subjects": [
@@ -8804,7 +8843,7 @@
         "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
       }
     ],
-    "next_bounded_work": "The three named runtime-replay/private-runtime test families now have a bounded five-body/47-binding source-intent disposition, preserving their no-admission/no-public-support and repeated-predecessor-load limits. Imported verifiers/writers/helper implementations and original raw native receipt custody remain separate. The selected 35-body upgrade runner, 17-body specialization helpers, seven imported comparator/canonical/frontier bodies, six runtime entry-point bodies and 22 settings/registry/default bodies now have bounded source dispositions. Preserve independent review, exact refs, original author history and both adverse and subsequently supplied custody records. Reconcile remaining generated orchestration, effective/nondefault settings, control callbacks, compatibility/inter-release and unknown-consumer intent plus original frontier input provenance without restoring retired machinery. Source counts, wrapper mappings and declaration comparisons do not close VER-07 or native saved-state behavior. Use the existing finite nine/seven/four migration queue and final consumed-input review; do not restart every-old-patch campaigns or unchanged completed cases. Exact published 5.0.1 F200 R20 and F210 R05 observations retain their scopes. Frozen C has only its named component verdicts; changed source and package inputs, shared runtime catalogue/cap/API, beta-successor state and affected current-candidate scenarios need their own applicability review before dispatch. Black Glass owns exact packets, the native queue and current progress header; Aero owns historical/applicability/documentation work and independent review. Preserve every completed/adverse execution identity.",
+    "next_bounded_work": "The three named runtime-replay/private-runtime test families now have a bounded five-body/47-binding source-intent disposition, preserving their no-admission/no-public-support and repeated-predecessor-load limits. Imported verifiers/writers/helper implementations and original raw native receipt custody remain separate. The selected 35-body upgrade runner, 17-body specialization helpers, seven imported comparator/canonical/frontier bodies, six runtime entry-point bodies and 22 settings/registry/default bodies now have bounded source dispositions. Preserve independent review, exact refs, original author history and both adverse and subsequently supplied custody records. Reconcile remaining generated orchestration, effective/nondefault settings, control callbacks, compatibility/inter-release and unknown-consumer intent plus original frontier input provenance without restoring retired machinery. Source counts, wrapper mappings and declaration comparisons do not close VER-07 or native saved-state behavior. Use the existing finite nine/seven/four migration queue and final consumed-input review; do not restart every-old-patch campaigns or unchanged completed cases. Exact published 5.0.1 F200 R20 and F210 R05 observations retain their scopes. Frozen C has only its named component verdicts; changed source and package inputs, shared runtime catalogue/cap/API, beta-successor state and affected current-candidate scenarios need their own applicability review before dispatch. Black Glass owns exact packets, the native queue and current progress header; Aero owns historical/applicability/documentation work and independent review. Preserve every completed/adverse execution identity. The three named Classic-routing test/runner families now have a six-body/36-binding source-intent disposition and modern alias controls; their earlier reduced-route requirements remain superseded by the final published single-path policy. Native saved-selection applicability and all other unresolved groups remain separate.",
     "bounded_intent_reviews": [
       {
         "subjects": [
@@ -11583,7 +11622,7 @@
               "source/runtime/spoilage.lua",
               "source/runtime/spoilage_contribution.lua",
               "source/runtime/scripted_effects.lua",
-            "source/runtime/bootstrap.lua"
+              "source/runtime/bootstrap.lua"
             ],
             "host_controls": [
               "tests/test_spoilage.py::test_published_modifier_clamps_and_retirement_tolerance_remain_explicit",
@@ -12158,7 +12197,12 @@
               "tests/test_lifecycle.py::test_k2_worker_variant_is_lazy_owned_and_does_not_inherit_another_effects_rights"
             ],
             "new_control_scope": "Actual current control/bootstrap/lifecycle handlers, inclusive repeated queue, retained37% valid current progress, earned aggregate7.15 and level11 across above-cap disablement and owned relaxation. The native queue setter can cancel current research; this host fixture does not model its saved-progress transition and imposes no saved-slot value after cancellation. This does not assert native earned-bonus arithmetic or qualify a save.",
-            "api_source": {"url": "https://lua-api.factorio.com/2.0.77/runtime-api.json", "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578", "field": "LuaForce.research_queue; LuaForce.research_progress", "fact": "Queue replacement with empty/nil cancels current research; current progress is a read/write double in[0,1]. The host control does not infer native saved-slot transitions."},
+            "api_source": {
+              "url": "https://lua-api.factorio.com/2.0.77/runtime-api.json",
+              "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578",
+              "field": "LuaForce.research_queue; LuaForce.research_progress",
+              "fact": "Queue replacement with empty/nil cancels current research; current progress is a read/write double in[0,1]. The host control does not infer native saved-slot transitions."
+            },
             "remaining_executable_check": "Final-candidate native worker cap/ownership/queue/progress and any affected legacy/provider/client/state transitions retain the existing CONT-07/CONT-11 limits. Exact admitted0.65 tail evidence does not qualify malformed or arbitrary provider tails; unchanged source is not a new native result.",
             "owner": "Aero independent expectation/control; Black Glass native/state checks"
           },
@@ -16370,6 +16414,182 @@
         },
         "native_execution": false,
         "inventory_complete": false
+      },
+      {
+        "subjects": [
+          "CONT-04",
+          "CONT-06",
+          "CONT-08",
+          "CONT-09",
+          "VER-07"
+        ],
+        "reviewed_against": "71f32c36a3b125684210e1509b28e896466da1c3",
+        "scope": "Eleven complete synthetic fixture/metadata/assertion bodies plus two complete capsule/policy data bodies; one large approved-delta body reviewed only for provenance and29 named Galore changed-field classifications; three exact v4.7.3 ownership helpers read for corroboration. No whole legacy compiler or delta estate is reconciled.",
+        "evidence": {
+          "path": "spec/evidence/historical-named-overlap-intent-aero-r01.json",
+          "sha256": "6BA4D42139DB36AEA3644D0187E9087AC10A8AC1DF84263FF06DF905E0C4AA07"
+        },
+        "dispositions": [
+          {
+            "id": "atan-ash-x-big-mining-drill-independent-v1",
+            "disposition": "retain-compose-expectations-port-only-under-current-admitted-inputs",
+            "obligation": "Synthetic ATAN ash technology recipe-prod-research_ash_separation-1 is infinite/upgrade, requires atan-ash-processing, grants0.05 only to exact atan-ash-seperation and is its sole infinite owner; all four ash sinks exist but have zero infinite productivity owners. Independent drill manufacture retains its own family and effect. Keep upstream spelling seperation.",
+            "current_implementation": [
+              "source/compatibility/atan_productivity.lua",
+              "source/compatibility/atan_profile.lua",
+              "source/research/atan_productivity.lua",
+              "source/compatibility/product_bindings.lua"
+            ],
+            "current_controls": [
+              "tests/test_atan_productivity.py::test_base_pure_definitions_and_selected_rows_match_independent_facts",
+              "tests/test_atan_productivity.py::test_space_age_pure_definitions_rows_and_settings_match_independent_facts",
+              "tests/test_atan_productivity.py::test_selected_definitions_are_detached_and_preserve_the_withheld_effect_boundary",
+              "tests/test_atan_productivity.py::test_space_age_outputs_are_detached_and_keep_denied_routes_outside_effects",
+              "tests/test_product_target_extension.py"
+            ],
+            "applicable_evidence": [
+              "tests/fixtures/atan-f200-captured-facts.json",
+              "spec/evidence/atan-gameplay-chain.json"
+            ],
+            "remaining_executable_check": "Add a current admitted-input composition control for ash plus drill manufacture and exact zero-cross-family/denied-route expectations. Review actual dependencies before any affected native extension; existing Base/SpaceAge F200 native results retain original scope and do not qualify this synthetic combination, physical output, F210 or final candidate.",
+            "owner": "Aero independent expectations/focused controls; Black Glass only affected exact native route"
+          },
+          {
+            "id": "space-age-x-big-mining-drill-targeted-v1",
+            "disposition": "retain-one-manufacturing-family-and-effect-owner-with-qualified-inputs",
+            "obligation": "Original standalone fixture clones electric-mining-drill to item/entity big-mining-drill and adds its productive recipe. Original assertion requires the mining-drill family effect0.05 on that recipe. The named graph/delta adds single-family/single-owner intent; the755-byte assertion alone does not count all owners or even reject two matching effects.",
+            "current_implementation": [
+              "source/compatibility/product_bindings.lua: mining-drill weight0.25 against retained20percent default",
+              "source/compatibility/modern_catalogue/space_age.lua: authored big-mining-drill scale0.25",
+              "source/research/product_target_extension.lua: per-family already-present recipe suppression"
+            ],
+            "current_controls": [
+              "tests/test_product_target_extension.py::test_published_pattern_groups_preserve_weights_settings_and_explicit_routes",
+              "tests/test_product_target_extension.py::test_base_and_active_space_age_literal_routes_extend_only_existing_generated_rows",
+              "tests/test_product_targets.py::test_group_order_deduplicates_one_recipe_without_losing_authored_weight"
+            ],
+            "applicable_evidence": [],
+            "remaining_executable_check": "Port exact default0.05 and nondefault scaling/single-owner composed controls. Existing generic pattern and per-family dedup controls are analogs, not this exact named campaign; no native result for this specific composition is inferred.",
+            "owner": "Aero controls/expectations; Black Glass affected admitted native composition"
+          },
+          {
+            "id": "space-age-x-space-age-galore-targeted-v1",
+            "disposition": "port-required-recovered-host-single-owner-gap-open",
+            "obligation": "Unchanged original Galore fixture uses coal5 as input, a fully productivity-ignored coal1 return with independent_probability0.10, productive carbon1 probability0.25 and sulfur1 probability0.50. Exact vgal-coal-crushing must have precisely one planned productivity owner: recipe-prod-research_carbon-1. Generic multi-output families are a separate contract and are not permission to waive this named rule.",
+            "current_implementation": [
+              "source/research/product_target_extension.lua",
+              "source/compatibility/product_bindings.lua",
+              "source/compatibility/product_targets.lua"
+            ],
+            "current_controls": [
+              "tests/test_product_targets.py::test_group_order_deduplicates_one_recipe_without_losing_authored_weight currently permits separate generic families",
+              "tests/test_product_target_extension.py presently lacks the named original single-carbon-owner case"
+            ],
+            "applicable_evidence": [
+              {
+                "path": "build/qualification/aero-named-overlap-original-intent-r01/galore-host-discrepancy.json",
+                "sha256": "4554B398DAD02C5D0382A49F2F15E600CC68D97BD67D385D4DDD7EE0E27CF948",
+                "status": "HOST-original-oracle-rejects-current-detached-extension",
+                "observed_owners": [
+                  "recipe-prod-research_carbon-1",
+                  "recipe-prod-research_sulfur-1"
+                ]
+              }
+            ],
+            "remaining_executable_check": "Prepare a separately reviewed named correction and regression control using the original oracle, with default/nondefault, absent/unproductive preferred family, unrelated multi-output and read-only foreign-state controls. Review affected already-paid502 sulfur/carbon state before removing any emitted effect; native source/candidate/save/two-reload applicability and actual upstream-valid Galore inputs remain open. No source fix, save repair or native conclusion is claimed by this evidence unit.",
+            "owner": "Aero scoped source/independent controls after explicit file ownership; Black Glass actual upstream/native/save qualification"
+          }
+        ],
+        "qualification_limit": "Fourteen deduplicated primary source identities have238retained tag-label/path bindings:224live bindings across16remote tags plus14preserved local v4.2.0 aliases. Only13small primary bodies are fully read. The1.55MB delta is scoped provenance/classification, not complete semantic reconciliation. The known Galore host discrepancy remains open; no product/native/save qualification or public502 change.",
+        "owner": {
+          "reconciliation": "Aero",
+          "native": "Black Glass"
+        },
+        "native_execution": false,
+        "inventory_complete": false
+      },
+      {
+        "reviewed_on": "2026-11-04",
+        "reviewed_against": "a5ce3009f6edd8ba0332cd111211dfe6f52b905d",
+        "subjects": [
+          "CONT-01",
+          "CONT-03",
+          "CONT-10",
+          "CONT-13"
+        ],
+        "scope": "Three named compiler-routing test/runner paths, six deduplicated complete bodies and36 exact tag/path bindings in the existing91-tag inventory. A fourth candidate alias path has no indexed bindings. Earlier body plus complete wrapper/runner diffs and the full final three bodies were inspected; no old compiler or native run occurred.",
+        "method": "Metadata first; preserve the older16-assertion two-compiler contract and final11-assertion single-path correction as different policies. Verify exact published4.7.3 bridge members and absence of retired implementation. Retain valid behavior in current native construction without importing old planners or projecting their receipts.",
+        "evidence": {
+          "path": "spec/evidence/historical-classic-serialization-routing-intent-aero-r01.json",
+          "sha256": "FCC419891301259753C45517FE7237F0C3F1B84C205D4786FC21B3915F2E3167"
+        },
+        "disposition": "Port saved full/classic/absent equivalence into current Generator controls; consolidate shortcut and historical declaration checks. Preserve the older16-assertion reduced-route contract as superseded by published4.7.3 single-path11-assertion policy.",
+        "remaining_executable_check": "Review actual saved startup-selection applicability on an existing affected upgrade route. Do not fabricate an original Classic save, replay unchanged journeys, or treat this host alias comparison as native saved-state/client/performance evidence. Other unreviewed source groups, inter-release history and original receipt custody remain open.",
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false,
+        "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-02",
+          "CONT-03",
+          "CONT-05",
+          "CONT-07",
+          "CONT-12",
+          "VER-07"
+        ],
+        "reviewed_against": "807ee2537fd6f431d6944ac26c11fcda1dc76565",
+        "scope": "Two named test/runner paths in the existing91-tag inventory:14 bindings to four unique blobs. One2408-byte seven-assertion fixture is completely reviewed; three wrapper bodies are inspected ONLY for ownership invocation/inclusion/count reporting. No old compiler, wrapper or native execution.",
+        "evidence": {
+          "path": "spec/evidence/historical-startup-owner-qualification-intent-aero-r01.json",
+          "sha256": "14D39E9B3BBF5DB0DB3A613BCCFD9A081CADA6CB54C9BCF3920BFB70FCD60D43"
+        },
+        "disposition": "Account for all seven original assertions; consolidate applicable finite owner safety controls while retaining matching unresolved-science, disabled researchability and actual direct-effect/weapon-speed consumer obligations as unresolved. Retire only the generic compiler harness.",
+        "remaining_executable_check": "Reconcile the named direct-effect coverage/weapon-speed consumers and their preserved settings before making a parity verdict. Matching unresolved science and disabled researchability remain explicit original-oracle obligations. Continue other unresolved effective-settings/control/inter-release/receipt provenance groups without rereading all5058 blobs or rerunning every old release.",
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false,
+        "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-01",
+          "CONT-02",
+          "CONT-03",
+          "CONT-05",
+          "CONT-12",
+          "CONT-15",
+          "VER-07"
+        ],
+        "reviewed_against": "8fcac651ec259fe3b78a2a16cd742b0352c5cf53",
+        "scope": "The eight previously metadata-only direct fixture bodies:41139bytes,105 exact commit/path bindings across67 indexed tag names.104 bindings match live remote tags; retained local-only v3.0.0 names a different commit from public3.0.0 and is not a published alias claim. Together with r01 this accounts for all11 bodies/153 indexed bindings at the three named A20 paths; imported helpers, inter-release/discussion/native evidence and other paths remain outside scope.",
+        "evidence": {
+          "path": "spec/evidence/historical-native-effect-a20-consumer-intent-aero-r01.json",
+          "sha256": "8B6E11BD469DF8AA5B85F356AB6BE632F158D6EB13B594CDF0C810B5112FA168"
+        },
+        "disposition": "Retain final foreign positive-owner suppression, per-identity useful coverage, finite5/6 and emitted-prerequisite protection, science qualification and numbered-name custody. Eight earlier fixture variants are source-reconciled in five groups; exact0.1 ownership, unconditional always stripping, mandatory-all-four emission and old private context/registry interfaces are superseded or implementation-only. The existing isolated final expectation still rejects current positive-owner host output; no new product, native or release verdict.",
+        "remaining_executable_check": "Independently review current supported-profile applicability and correct the admitted native-owner consumer without a global discovery solver or fixture-name binding. Port focused positive/disabled/zero/unreachable/partial mixed-category controls from original semantics. Review existing paid research and actual named provider before affected native/save/reload qualification. Existing MIR5 paid dedicated weapon identities/effects must be preserved if a corrected ownership decision changes emission; do not simply omit already-researched rows or reuse the unrelated five-recipe SourceB masks.",
+        "owner": "Aero recovered expectations/scoped correction and independent review; Black Glass affected exact native/save qualification",
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false,
+        "release_qualification": false,
+        "original_r01": {
+          "commit": "8fcac651ec259fe3b78a2a16cd742b0352c5cf53",
+          "path": "spec/evidence/historical-native-effect-a20-consumer-intent-aero-r01.json",
+          "sha256": "45767767DB79A2641AF7195DD7B6022304B8E0DDA6A0EE8B71733C0BD10A6D07"
+        },
+        "paid_identity_and_current_consumer_followup": {
+          "record": "paid_identity_and_current503_followup_r03",
+          "source_commit": "ef9728979d3d3173811f84bcc02bb73dfe532cf2",
+          "player_tree": "86c29707650643d6d50e0dd4f2be032b546fdf82",
+          "current_host_probe_sha256": "A372842C52629A450845B55707DDC17A714D2E3225D02958376B3868B0C7176E",
+          "disposition": "Port no-redundant future progression with paid-ID/effect/investment preservation; retain original absence rejection and require a documented current representation plus coupled runtime/Library/cap and affected native checks. No production correction or supported-provider/native verdict.",
+          "coverage_rows": 5,
+          "representation_accepted": false,
+          "native_execution": false
+        }
       }
     ],
     "stable_coverage_review": {

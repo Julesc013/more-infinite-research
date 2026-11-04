@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "kind": "MIRCandidate503NativeUpgradeComponentsV1",
+  "status": "root-observed-components-final-independent-applicability-and-release-review-required",
+  "candidate_author": "246b2354529190dbd0395bd9fde0fc5eb63de0b6",
+  "candidate_player_tree": "8489d53e7202ce29962e364110ccb36cc261c8cc",
+  "candidate_archives": {
+    "f200": "CBB7F57E882952995CB71383623A66DE5116F0844724E2654AACD59718CD571A",
+    "f210": "C622AC3A73603E7C127FA8168D12C5D878D52646226EC74190E70164D6E0D227"
+  },
+  "original_EF_author": "ef9728979d3d3173811f84bcc02bb73dfe532cf2",
+  "original_EF_player_tree": "86c29707650643d6d50e0dd4f2be032b546fdf82",
+  "private_repository": "Julesc013/mir-native-worker",
+  "components": [
+    {
+      "boundary": "published502-to-EF503-plain-Base-five-paid-families",
+      "originals_commit": "018a2fcef072ccda95507a9d9d2773dc71f9f2a2",
+      "originals_path": "evidence/sourceb-base-published502-503-native-chain-r01",
+      "accepted_processes": 6,
+      "independent_review_commit": "587c8ab504441682c5caf95d2648f9502c3df2a2",
+      "independent_review_sha256": "1276F5FA728E695440C8D83EF3A7CD0D100E970BF8D2D84A7EC107FF2A7DF7DC"
+    },
+    {
+      "boundary": "published473-to-EF503-SIF-five-hidden-paid-identities",
+      "originals_commit": "096e7d2fa77c14505cb33c5dd5fcf36ee8c11c16",
+      "originals_path": "evidence/sif-real503-native-chain-r02",
+      "accepted_processes": 3,
+      "independent_review_commit": "0361fea66b23ec63bdb6d8aa89fdd8f082346b3c",
+      "independent_review_sha256": "15B252657BFD2F159FF5A6A534C72F7F07222D49E1CF54CD9CD915B51562604E",
+      "limit": "Two eligible original-false flags are already true before MIR configuration. Original false-state preservation and internal writer remain unproved."
+    },
+    {
+      "boundary": "published473-to-EF503-plain-Base-five-first-paid-families",
+      "originals_commit": "c1072002b9685f8163d6e2934de18593d69d6537",
+      "originals_path": "evidence/sourceb-published473-base-native-chain-r01",
+      "accepted_processes": 6,
+      "independent_review_commit": "69ec24fa1b079640fe740d1df1a7323224f42d89",
+      "independent_review_sha256": "E386579EE71F49C186569679CFBD6C26E867B33A8C49A9ABC8098DA6B12ED744"
+    },
+    {
+      "boundary": "EF503-controlled-cap-canonical-permutation-relaxation",
+      "originals_commit": "50539673302199482ce6c9a9490fe322bc75c401",
+      "originals_path": "evidence/cap-real503-native-chain-r01",
+      "accepted_processes": 9,
+      "independent_review_commit": "3c25da6b1b2a3c5431dc3e942174ca868644f811",
+      "independent_review_sha256": "2BB40E98731545672C28CD27F3F55C39BB8E9F70202E2A3C5CDDD5C7BF35E121",
+      "limit": "Explicit one-time foreign-negative policy, later pass-through. Original false-through-entry and first-ledger/writer uncertainty remain; original no-policy failure stays failed."
+    },
+    {
+      "boundary": "published502-SIF-to-EF503-distinct-invested-force-ledger",
+      "originals_commit": "001a5ac90a868647ab88665f5f2779afc1cb1518",
+      "originals_path": "evidence/force-merge-native-adverse-chain-r01",
+      "accepted_processes": 6,
+      "independent_review_commit": "b2be8aeff18c58bd7cca4345a7395345b76a35ed",
+      "independent_review_sha256": "37CC137370112CB9289395CDE9EE43680F0F1286A1E52998D98839353FA6E10D",
+      "limit": "The later EF provider-removal queue loss and three diagnostic/fixture refusals remain failed. No EF merge/completion pass."
+    },
+    {
+      "boundary": "C503-provider-removal-actual-force-merge-and-owed-private-completion",
+      "originals_commit": "f09d0a3cf69f052485526b204e6da74e66c27d46",
+      "originals_path": "evidence/force-c246-native-chain-r01",
+      "originals": 179,
+      "originals_gzip_sha256": "80AD3CB4ECF2A2D2F70EA2D46727E59B9C90613D260B65B94EF95E356CF18ADD",
+      "originals_decoded_sha256": "1925448AC70D5AB0F4BFD7A44F7600A6B603C1F3EDF45B411712095F3C784565",
+      "root_readback_sha256": "05FAE18DADAE4AB1413B34F8E4C29782EE554F4F35DCC47BB972A6F61C6283E6",
+      "root_pass_processes": 6,
+      "retained_failed_attempts": 2,
+      "independent_review": "ACCEPTED bounded C provider-removal/actual merge/owed private lab/save/two-cold components",
+      "observations": "Invested queue/partials/bonuses survive provider removal and real merge. One by_script=false plastic completion plus exactly two named scripted positive carriers grants both owed recipe deltas; save and two readonly colds at each endpoint.",
+      "limit": "Merged force index is reused. Original invalid/name-absent check precedes fresh creation; later alias-valid witness does not identify original survival.",
+      "independent_review_commit": "1716877b3a0879fae6d570d20dbb209e47170498",
+      "independent_review_path": "evidence/aero-c246-affected-native-actual-reviews-r01/force-merge-private-lab-review.json",
+      "independent_review_sha256": "CD2E19AB85AF2CB78FF66F3DC76E039CA026CF38481D737658C9F28AD14D911E"
+    },
+    {
+      "boundary": "published502-K2SO-to-C503-Crushing-Industry-paid-state-and-native-glass-work",
+      "originals_commit": "63997d430de232df0243f980a9a6f0fcaf05ee51",
+      "originals_path": "evidence/k2so-paid-native-chain-r01",
+      "originals": 283,
+      "originals_gzip_sha256": "114423E6C1C6014C3E3E4ADA030FA928A0CFE2AFA3DD192275DCC9EB697284DB",
+      "originals_decoded_sha256": "1CA3BAF04C1F1B63CB7DACF953CEF258BF5B725AA329400C2163DA6EEDDB7E65",
+      "root_readback_sha256": "A2E9FD70EAB47886819FE709F9DDFDEEC5D7F1B264F1274C82E5CE0D5315138B",
+      "root_pass_processes": 9,
+      "retained_failed_attempts": 3,
+      "independent_review": "ACCEPTED bounded accelerated paid-material upgrade/lab/save/two-cold components; direct crafting overrides explicitly not preserved",
+      "observations": "13-to15 mods add CI0.6.9/FDSL0.5.5 on2.1.23. Three finite material identities retain two paid levels/.04,currentglass42percent/queuedsilicon27percent and foreign control. One actual final glass lab yields both glass recipes/.06 and siliconcurrent27percent; save/two readonly colds at all three endpoints.",
+      "limit": "Direct crafting .125/.25 is already zero at the first level configuration callback, before MIR configuration. New-mod on_init timing and cause are unassigned. Exact witnessed configuration-order/zero entry baseline is preserved afterward; historical direct overrides are not claimed. Same independently default-validated accelerated helper throughout.",
+      "independent_review_commit": "1716877b3a0879fae6d570d20dbb209e47170498",
+      "independent_review_path": "evidence/aero-c246-affected-native-actual-reviews-r01/k2so-paid-review.json",
+      "independent_review_sha256": "FACF94F72BA6E44A63CB427420F075A33929DF239A1C2F1EC3245C665890EAC1"
+    },
+    {
+      "boundary": "C503-actual-technology-effects-reset-on-earned-private-state",
+      "originals_commit": "c1803a0d2def8cef6a7d99f12df10f251885a72b",
+      "originals_path": "evidence/private-effects-reset-native-chain-r01",
+      "originals": 56,
+      "root_readback_sha256": "C839CE1C742DD5A16B1C09B80953BD7AC58C290AD60E755F17D6B43B18DEFCF6",
+      "accepted_processes": 3,
+      "new_lab_completions": 0,
+      "independent_review": "ACCEPTED one actual reset_technology_effects plus save/two readonly colds on earned C private research",
+      "independent_review_commit": "1716877b3a0879fae6d570d20dbb209e47170498",
+      "independent_review_path": "evidence/aero-c246-affected-native-actual-reviews-r01/private-effects-reset-review.json",
+      "independent_review_sha256": "12F6FD447673EB1F9730D4669BF1D73864FBE9AA3DAC5B0CD34EF6B4A556D6D7",
+      "limit": "reset_technology_effects only, not LuaForce.reset/all-settings; earlier one lab completion is carried."
+    },
+    {
+      "boundary": "C503-configured-native-cost-time-effect-with-foreign-reward",
+      "originals_commit": "e52d444ef16928231fd96e21ed769fe21d7e06a1",
+      "originals_path": "evidence/native-owner-settings-native-chain-r01",
+      "originals": 87,
+      "originals_gzip_sha256": "A857442842BAF054708304F91DB697D44E7CC0EF9948CF2848533ECEF52A60AD",
+      "originals_decoded_sha256": "0CFFB48A0798C11DED24E819402E2A675DCD41BBAE1E913B11AAE0D706C0FA5E",
+      "root_readback_sha256": "652E1B79FA1E9BAF524A5E365F1625928E81D52AD758E4F3D4F654EDC7951FC4",
+      "root_pass_processes": 3,
+      "retained_failed_attempts": 1,
+      "independent_review": "pending",
+      "limit": "Fresh bounded2.1.23 settings/foreign-owner branch, real lab/save/two colds, no post-MIR cost/time acceleration. Not oldsave/all-settings/physical/performance or stable."
+    },
+    {
+      "boundary": "C503-unknown-native-cost-with-uncovered-public-residual-research",
+      "originals_commit": "89eb3ed6494b230f863add899addd8f6dc166e5e",
+      "originals_path": "evidence/native-owner-fallback-native-chain-r01",
+      "originals": 90,
+      "originals_gzip_sha256": "14E79FEE7C94BE91AB07D6250CC0A4656B790145D57307C088994C5C330DBA51",
+      "originals_decoded_sha256": "B2FED9B6E9113901CD6A569538B3346994242454BE2C59436E76457928DE2D7A",
+      "root_readback_sha256": "411F2F00C6E955E32FC8317DF4FC4245E7D789302BCAF693E7048115606E6DA4",
+      "root_pass_processes": 3,
+      "retained_failed_attempts": 1,
+      "independent_review": "pending",
+      "limit": "Fresh bounded2.1.23 settings/foreign-owner branch, real lab/save/two colds, no post-MIR cost/time acceleration. Not oldsave/all-settings/physical/performance or stable."
+    }
+  ],
+  "consumed_scope_analysis": {
+    "commit": "dfeef45685acd3153012f823b5a4a0348a63b3e0",
+    "path": "evidence/aero-pending-private-consumed-scope-r01",
+    "report_sha256_prefix": "63A31033",
+    "status": "analysis-not-native-relabel-or-final-release-verdict",
+    "observation": "EF-to-C exact default Base F200/F210 and SIF F200 selector/construction outputs match, runtime files unchanged; ordinary Space Age private holder science is affected. Original execution identities stay fixed."
+  },
+  "limits": "Explicit seeded and bounded native endpoints, not full historical catalogue/client/physical-output/ordinary-cost/performance or stable acceptance. Public5.0.0/5.0.1/5.0.2 unchanged. Separate weapon and Galore corrections excluded. Final independent consumed-input applicability, package identity, required CI and checked publication remain necessary."
+}

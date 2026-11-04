@@ -7,8 +7,10 @@ import sys
 import unittest
 
 from native_credit_oracle import (
+    NATIVE_FAMILY_RECIPES,
     captured_public_productivity_recipes,
     current_native_credit_rows as native_credit_carrier_rows,
+    native_family_preservation_rows,
     split_public_and_native_credit_rows,
 )
 
@@ -332,7 +334,7 @@ class GeneratorTests(unittest.TestCase):
             local out = {}; for key, child in pairs(value) do out[key] = source_copy(child) end
             return out
           end
-          function full_world(active_mods)
+          function full_world(active_mods, before_data_stage)
             local tools, technologies, recipes = {}, {}, {}
             local function add_technology(name) if name then technologies[name] = technologies[name] or {} end end
             local function add_science(key)
@@ -381,7 +383,20 @@ class GeneratorTests(unittest.TestCase):
             for name in pairs(tools) do lab_inputs[#lab_inputs + 1] = name end
             table.sort(lab_inputs)
             local items = source_copy(sources.item); items.spoilage = {}
+            for name, recipe in pairs(recipes) do
+              if recipe.type == nil then recipe.type = "recipe" end
+              if recipe.name == nil then recipe.name = name end
+            end
+            -- Most controls enter directly at final-fixes. Supply data.lua's
+            -- prior private transport, without counting it as Generator
+            -- publication. Real data-stage controls request a pre-data world.
+            local private
+            if before_data_stage ~= true then
+              private = {["more-infinite-research-native-adoptions"]={type="mod-data",
+                name="more-infinite-research-native-adoptions",data={schema=1,owners={},withheld={},credits={}}}}
+            end
             return {raw = {technology = technologies, tool = tools, item = items, recipe = recipes,
+              ["mod-data"] = private,
               ["ammo-category"] = {["cannon-shell"] = {}},
               lab = {fixture = {inputs=lab_inputs}}}, writes = 0,
               extend = function(self, values) self.writes = self.writes + 1; self.emitted = values end}
@@ -467,7 +482,7 @@ class GeneratorTests(unittest.TestCase):
                       mods,script={base=art_engine},nil
                       package.loaded["research.settings"]=nil
                       config=require("research.settings")
-                      data=full_world(mods)
+                      data=full_world(mods,true)
                       data.raw.shortcut={}
                       data.raw.technology["foreign-art-sentinel"]={type="technology",name="foreign-art-sentinel",
                         icons={{icon="__base__/graphics/icons/stone.png",icon_size=64}}}
@@ -521,6 +536,8 @@ class GeneratorTests(unittest.TestCase):
                       -- Oppose a blanket DLC ban using the real data-stage
                       -- entrypoint. This is not an active-DLC final-stage run.
                       mods["space-age"]=art_engine
+                      local stage_extend=data.extend
+                      data=full_world(mods,true);data.extend=stage_extend
                       data.raw.shortcut={}
                       dofile(player_root.."/data.lua")
                       local active=data.raw.shortcut["mir-research-browser"]
@@ -599,7 +616,10 @@ class GeneratorTests(unittest.TestCase):
     def test_data_stage_defers_inactive_binding_and_preflights_active_profile(self):
         self.lua.execute('''
           local ok, message, environment = disabled_data_final()
-          assert(ok, message); assert(environment.writes == 1 and #environment.emitted == 99 and environment.emitted[1].enabled == false)
+          -- This selected-source scaffold has no native-owner recipes, so
+          -- only five empty private mains are added here. Full owner/recipe
+          -- fixtures independently cover the eleven canonical signed pairs.
+          assert(ok, message); assert(environment.writes == 1 and #environment.emitted == 99+5 and environment.emitted[1].enabled == false)
           ok, message, environment = missing_active_space_age_binding()
           assert(not ok and tostring(message):find("missing required recipe casting-iron-gear-wheel", 1, true), tostring(message))
           assert(environment.writes == 0, "active binding wrote before named preflight")
@@ -639,7 +659,12 @@ class GeneratorTests(unittest.TestCase):
             and #space.continuations == 6 and #space.recipe_patches == 3)
           local outputs = modern.technologies(space, config.resolve(defaults()))
           local present = {}; for _, row in ipairs(outputs) do present[row.name] = row end
-          assert(#outputs == 68 and present["recipe-prod-research_low_density_structure-1"] == nil)
+          assert(#outputs == 68+5,"native private main cardinality")
+          for _, family in ipairs({"research_low_density_structure","research_plastic","research_processing_unit",
+              "research_rocket_fuel","research_steel"}) do
+            local paid=present["recipe-prod-"..family.."-1"]
+            assert(paid and paid.hidden==true and #paid.effects==0,"private identity became public earning")
+          end
           assert(present["recipe-prod-research_artificial_soil-1"].effects[3].change == .05)
           assert(present["research-speed-7"].prerequisites[1] == "research-speed-5")
           local recipes = {['capture-robot-rocket'] = {}, ['ice-platform'] = {}, ['space-platform-foundation'] = {}}
@@ -1153,7 +1178,7 @@ class GeneratorTests(unittest.TestCase):
           data.raw.lab = setmetatable({}, {__pairs=function()
             reads = reads + 1; return next,labs,nil
           end})
-          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 78)
+          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 78+10)
           -- The retained science-pack family uses its existing bounded
           -- lab-input product binding plus the policy pass: no foreign
           -- technology read is introduced.
@@ -1184,7 +1209,7 @@ class GeneratorTests(unittest.TestCase):
           data.raw.lab = {restricted={inputs={"automation-science-pack"}}}
           local foreign = {enabled=true,foreign=77}
           data.raw.technology["foreign"] = foreign
-          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 78)
+          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 78+10)
           for _, row in ipairs(data.emitted) do assert(row.enabled == false and #row.unit.ingredients > 0) end
           assert(data.raw.technology.foreign == foreign and foreign.enabled and foreign.foreign == 77)
         ''')
@@ -1562,7 +1587,7 @@ class GeneratorTests(unittest.TestCase):
           end
           assert(material_count == 3, "K2SO runtime catalogue material identity/count")
           local rows = modern.technologies(selected, values)
-          assert(#rows == 72)
+          assert(#rows == 72+5,"K2SO native private main cardinality")
           local by_id = {}; for _, row in ipairs(rows) do by_id[row.name] = row end
           local early = by_id["recipe-prod-research_material_imersite-1"]
           local continuation = by_id["recipe-prod-research_material_imersite-4"]
@@ -1589,17 +1614,17 @@ class GeneratorTests(unittest.TestCase):
             and continuation_holder.effects[1].recipe == "kr-imersite-powder" and continuation_holder.effects[1].change == .02)
           local environment = full_world(k2mods)
           generator.install(rows, environment)
-          assert(environment.writes == 1 and #environment.emitted == 72)
+          assert(environment.writes == 1 and #environment.emitted == 72+5)
           environment = full_world(k2mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 106)
+          assert(environment.writes == 1 and #environment.emitted == 106+5)
           local final_ids, final_count = {}, 0
           for _, row in ipairs(environment.emitted) do
             assert(final_ids[row.name] == nil, "duplicate generated K2SO technology " .. row.name)
             final_ids[row.name], final_count = row, final_count + 1
           end
-          assert(final_count == 106)
+          assert(final_count == 106+5)
           assert(final_ids["recipe-prod-research_gears-1"] and final_ids["recipe-prod-research_agricultural_growth_speed-1"]
             and final_ids["recipe-prod-research_spoilage_preservation-1"] and final_ids["recipe-prod-research_material_imersite-4"])
           assert(final_ids["recipe-prod-research_material_rare_metals-1"]
@@ -1805,6 +1830,10 @@ class GeneratorTests(unittest.TestCase):
           package.preload["research.scripted_effects"] = function()
             error("base data stage loaded a Space Age technology body")
           end
+          package.loaded["compatibility.modern_catalogue.sif_retained"] = nil
+          package.preload["compatibility.modern_catalogue.sif_retained"] = function()
+            error("base data stage loaded the inactive SIF adapter")
+          end
           package.loaded["overrides.prototype_limits"] = nil
           package.preload["overrides.prototype_limits"] = function()
             error("default data stage loaded prototype limits")
@@ -1812,11 +1841,13 @@ class GeneratorTests(unittest.TestCase):
           local ok, message = pcall(dofile, data_final_path)
           package.preload["compatibility.space_age_scripted_effects"] = nil
           package.preload["research.scripted_effects"] = nil
+          package.preload["compatibility.modern_catalogue.sif_retained"] = nil
           package.preload["overrides.prototype_limits"] = nil
           assert(ok, message)
-          assert(environment.writes == 1 and #environment.emitted == 78)
+          assert(environment.writes == 1 and #environment.emitted == 78+10)
           assert(package.loaded["compatibility.space_age_scripted_effects"] == nil)
           assert(package.loaded["research.scripted_effects"] == nil)
+          assert(package.loaded["compatibility.modern_catalogue.sif_retained"] == nil)
           assert(package.loaded["overrides.prototype_limits"] == nil)
         ''')
 
@@ -1894,6 +1925,66 @@ class GeneratorTests(unittest.TestCase):
                   assert(not ok and data.writes == 0, "invalid native owner reached publication")
                 ''')
 
+    def test_saved_classic_and_full_select_the_same_complete_native_output(self):
+        # Published 4.7.3 SCP-01..08/10..11 supersede the earlier reduced
+        # compiler branch. Retain its serialized alias and complete output;
+        # no legacy planner, compiler or registry may enter either stage.
+        captures = {}
+        for edition in ("f200", "f210"):
+            for selection in (None, "full", "classic"):
+                with self.subTest(edition=edition, selection=selection):
+                    self.setUp()
+                    self.lua.globals().classic_bridge_edition = edition
+                    self.lua.globals().classic_bridge_selection = selection
+                    self.lua.globals().classic_bridge_data_path = (ROOT / "source/data.lua").as_posix()
+                    self.lua.execute('''
+                      local target = require("platform.target")
+                      if classic_bridge_edition == "f200" then
+                        target.id, target.factorio_version, target.minimum_base = "f200", "2.0", "2.0.77"
+                        target.cargo_research, target.receiver_limits, target.recipe_probability = false, false, "probability"
+                      end
+                      package.loaded["research.settings"] = nil
+                      config = require("research.settings")
+                      local bridge
+                      for _, spec in ipairs(config.prototypes()) do
+                        if spec.name == "mir-compiler-profile" then bridge = spec end
+                      end
+                      assert(bridge and bridge.type == "string-setting" and bridge.setting_type == "startup"
+                        and bridge.default_value == "full" and bridge.hidden == true
+                        and #bridge.allowed_values == 2 and bridge.allowed_values[1] == "full"
+                        and bridge.allowed_values[2] == "classic", "saved compiler-profile bridge changed")
+                      local retired = {"prototypes.mir.pipeline.classic_compiler", "prototypes.mir.pipeline.commands",
+                        "prototypes.mir.planner.classic.plan", "prototypes.mir.planner.compiler",
+                        "prototypes.mir.streams.registry"}
+                      for _, name in ipairs(retired) do
+                        package.preload[name] = function() error("retired compiler/registry imported", 0) end
+                      end
+                      mods = {base = target.minimum_base}
+                      settings, data, helpers, log = {startup = defaults()}, full_world(mods), nil, function() end
+                      settings.startup["mir-compiler-profile"] = classic_bridge_selection
+                        and {value=classic_bridge_selection} or nil
+                      dofile(classic_bridge_data_path)
+                      classic_bridge_data_rows = data.emitted
+                      local shortcuts = 0
+                      for _, row in ipairs(data.emitted) do
+                        if row.type == "shortcut" then
+                          shortcuts = shortcuts + 1
+                          assert(row.name == "mir-research-browser" and row.icon == "__base__/graphics/icons/lab.png")
+                        end
+                      end
+                      assert(shortcuts == 1, "published Library shortcut absent")
+                      data.writes, data.emitted = 0, nil
+                      dofile(data_final_path)
+                      assert(data.writes == 1, "final native catalogue needs one publication")
+                      for _, name in ipairs(retired) do assert(package.loaded[name] == nil) end
+                    ''')
+                    captures[(edition, selection)] = {
+                        "data": plain_lua(self.lua.globals().classic_bridge_data_rows),
+                        "final": plain_lua(self.lua.globals().data.emitted),
+                    }
+            self.assertEqual(captures[(edition, None)], captures[(edition, "full")])
+            self.assertEqual(captures[(edition, "classic")], captures[(edition, "full")])
+
     def test_data_final_full_published_technology_output_matches_oracle(self):
         expected_profiles = {
             profile["id"]: {
@@ -1922,6 +2013,7 @@ class GeneratorTests(unittest.TestCase):
             self.lua.execute('''
               mods = published_mods
               settings, data, helpers, log = {startup = defaults()}, full_world(mods), nil, function() end
+              published_input_recipes={};for name in pairs(data.raw.recipe) do published_input_recipes[name]=true end
               assert(dofile(data_final_path) == nil)
               published_emitted, published_raw = data.emitted, data.raw
             ''')
@@ -1953,11 +2045,19 @@ class GeneratorTests(unittest.TestCase):
                     len(emitted), len(actual),
                     "K2SO output contains a duplicate technology ID; full expected rows must not hide it",
                 )
-            actual_public, actual_credit = split_public_and_native_credit_rows(actual)
+            private = native_family_preservation_rows(expected_profiles["base-f210"]) if profile != "base-f210" else {}
+            actual_public, actual_credit = split_public_and_native_credit_rows(actual, private)
             self.assertEqual(actual_public, expected, profile)
+            available = captured_public_productivity_recipes(expected)
+            family_recipes = None
+            if private:
+                inputs = set(self.lua.globals().published_input_recipes.keys())
+                family_recipes = {family: [recipe for recipe in recipes if recipe in inputs]
+                                  for family, recipes in NATIVE_FAMILY_RECIPES.items()}
+                available |= {recipe for recipes in family_recipes.values() for recipe in recipes}
             expected_credit = native_credit_carrier_rows(
-                expected, captured_public_productivity_recipes(expected)
-            )
+                expected | private, available, family_recipes
+            ) | private
             self.assertEqual(actual_credit, expected_credit, profile)
             self.assertEqual(set(actual), set(expected) | set(expected_credit), profile)
             expected_patches = patch_profiles[profile]
@@ -1971,7 +2071,7 @@ class GeneratorTests(unittest.TestCase):
                 self.assertEqual(patch["changed_paths"], ["allow_productivity"], profile)
                 self.assertEqual(
                     plain_lua(self.lua.globals().published_raw.recipe[patch["name"]]),
-                    {"allow_productivity": True},
+                    {"type":"recipe", "name":patch["name"], "allow_productivity": True},
                     f"{profile}:{patch['name']}",
                 )
 
@@ -1981,6 +2081,11 @@ class GeneratorTests(unittest.TestCase):
           target.id, target.factorio_version, target.minimum_base = "f200", "2.0", "2.0.77"
           target.cargo_research, target.receiver_limits, target.recipe_probability = false, false, "probability"
         ''')
+        base_reference = {
+            row["name"]: host_row(row["row"])
+            for row in next(p for p in F200_MODERN_ORACLE["profiles"] if p["id"] == "base-f200")["published_output"]["data"]["additions"]
+            if row["type"] == "technology"
+        }
         for profile in F200_MODERN_ORACLE["profiles"]:
             active_mods = {"base": "2.0.77"}
             if profile["id"] == "space-age-f200":
@@ -1991,6 +2096,7 @@ class GeneratorTests(unittest.TestCase):
               package.loaded["research.settings"] = nil
               config = require("research.settings")
               settings, data, helpers, log = {startup = defaults()}, full_world(mods), nil, function() end
+              published_input_recipes={};for name in pairs(data.raw.recipe) do published_input_recipes[name]=true end
               assert(dofile(data_final_path) == nil)
             ''')
             expected = repaired_base_literal_name_rows({
@@ -1998,11 +2104,19 @@ class GeneratorTests(unittest.TestCase):
                 for row in profile["published_output"]["data"]["additions"] if row["type"] == "technology"
             })
             actual = {row["name"]: plain_lua(row) for row in self.lua.globals().data.emitted.values()}
-            actual_public, actual_credit = split_public_and_native_credit_rows(actual)
+            private = native_family_preservation_rows(base_reference) if profile["id"] != "base-f200" else {}
+            actual_public, actual_credit = split_public_and_native_credit_rows(actual, private)
             self.assertEqual(actual_public, expected, profile["id"])
+            available = captured_public_productivity_recipes(expected)
+            family_recipes = None
+            if private:
+                inputs = set(self.lua.globals().published_input_recipes.keys())
+                family_recipes = {family: [recipe for recipe in recipes if recipe in inputs]
+                                  for family, recipes in NATIVE_FAMILY_RECIPES.items()}
+                available |= {recipe for recipes in family_recipes.values() for recipe in recipes}
             expected_credit = native_credit_carrier_rows(
-                expected, captured_public_productivity_recipes(expected)
-            )
+                expected | private, available, family_recipes
+            ) | private
             self.assertEqual(actual_credit, expected_credit, profile["id"])
             self.assertEqual(set(actual), set(expected) | set(expected_credit), profile["id"])
 
@@ -2071,7 +2185,7 @@ class GeneratorTests(unittest.TestCase):
           settings, mods, data, helpers, log = {startup = startup}, {}, environment, nil, function() end
           package.loaded["overrides.prototype_limits"] = nil
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 78)
+          assert(environment.writes == 1 and #environment.emitted == 78+10)
           assert(package.loaded["overrides.prototype_limits"] ~= nil)
           assert(environment.raw["fixture-receiver"].zero.energy_usage == "1W")
         ''')
@@ -2087,7 +2201,7 @@ class GeneratorTests(unittest.TestCase):
           local environment = full_world(mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 99)
+          assert(environment.writes == 1 and #environment.emitted == 99+5)
           local ids = {}
           for _, row in ipairs(environment.emitted) do ids[row.name] = row end
           assert(ids["recipe-prod-research_gears-1"] ~= nil)

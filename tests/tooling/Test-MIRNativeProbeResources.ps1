@@ -319,12 +319,41 @@ while(-not(Test-Path -LiteralPath $Ready -PathType Leaf)){
     $callbackRows=@(Get-Content -LiteralPath (Join-Path $callbackFailureRoot 'resources.jsonl')|ForEach-Object {$_|ConvertFrom-Json -Depth 12})
     Assert-Probe ($callbackRows[-1].phase-ceq'interrupted'-and$callbackRows[-1].error.Contains('[mir5-native-probe-callback-failure]')) 'benchmark-callback-failure-ledger'
     Refuses-Probe {Invoke-MIRNativeProbeProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','exit 7') -TimeoutSeconds 20} '[mir441-process-exit] 7'
+    $nonzeroRun=$context.runs[$context.runs.Count-1]
+    if($nonzeroRun.status-cne'failed'){
+      Write-Host ('Natural nonzero original receipt: '+($nonzeroRun|ConvertTo-Json -Depth 12 -Compress))
+      Write-Host ('Natural nonzero original ledger: '+((Get-Content -LiteralPath $nonzeroRun.ledger)-join"`n"))
+    }
+    Assert-Probe ($nonzeroRun.status-ceq'failed'-and$null-ne$nonzeroRun.PSObject.Properties['result']) 'natural-nonzero-result'
+    Assert-Probe ($nonzeroRun.result.exit_code-eq7-and$nonzeroRun.result.status-ceq'failed'-and-not$nonzeroRun.result.passed-and-not$nonzeroRun.result.timed_out-and-not$nonzeroRun.result.completion_predicate_observed) 'natural-nonzero-still-refused'
+    $nonzeroRows=@(Get-Content -LiteralPath $nonzeroRun.ledger|ForEach-Object {$_|ConvertFrom-Json -Depth 12})
+    Assert-Probe ($nonzeroRows[-1].phase-ceq'completed'-and$nonzeroRows[-1].exit_code-eq7-and-not$nonzeroRows[-1].completion_predicate_observed-and@($nonzeroRows|Where-Object {$null-ne$_.PSObject.Properties['phase']-and$_.phase-ceq'interrupted'}).Count-eq0) 'natural-nonzero-completed-ledger'
+    $nonzeroPids=@($nonzeroRows|Where-Object {$null-ne$_.PSObject.Properties['process']}|ForEach-Object {$_.process.id}|Select-Object -Unique)
+    Assert-Probe ($nonzeroPids.Count-eq1-and$nonzeroPids[0]-gt0-and$null-eq(Get-Process -Id $nonzeroPids[0] -ErrorAction SilentlyContinue)) 'natural-nonzero-owned-pid-exited'
+    $interruptionError=''
+    try{Invoke-MIRNativeProbeProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Seconds 3') -TimeoutSeconds 20 -CompletionPredicate {throw '[mir5-native-probe-controlled-interruption]'}|Out-Null}catch{$interruptionError=$_.Exception.Message}
+    $interruptionRun=$context.runs[$context.runs.Count-1]
+    $interruptionRows=@(Get-Content -LiteralPath $interruptionRun.ledger|ForEach-Object {$_|ConvertFrom-Json -Depth 12})
+    Assert-Probe ($interruptionError.Contains('[mir5-native-probe-controlled-interruption]')-and$interruptionRun.status-ceq'interrupted'-and$null-eq$interruptionRun.PSObject.Properties['result']) 'unrelated-interruption-no-natural-result'
+    Assert-Probe ($interruptionRows[-1].phase-ceq'interrupted'-and-not$interruptionRows[-1].timed_out) 'unrelated-interruption-ledger'
+    # A callback error cannot manufacture the governor's natural-exit receipt.
+    Refuses-Probe {Invoke-MIRNativeProbeProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Seconds 3') -TimeoutSeconds 20 -CompletionPredicate {
+      $fake=[InvalidOperationException]::new('[mir441-process-exit] 7')
+      $fake.Data['mir441_process_result']=[pscustomobject]@{status='failed';exit_code=7;passed=$false;timed_out=$false;completion_predicate_observed=$false}
+      throw $fake
+    }} '[mir441-process-exit] 7'
+    $counterfeitRun=$context.runs[$context.runs.Count-1]
+    Assert-Probe ($counterfeitRun.status-ceq'interrupted'-and$null-eq$counterfeitRun.PSObject.Properties['result']) 'callback-cannot-forge-natural-result'
+    $counterfeitRows=@(Get-Content -LiteralPath $counterfeitRun.ledger|ForEach-Object {$_|ConvertFrom-Json -Depth 12})
+    Assert-Probe ($counterfeitRows[-1].phase-ceq'interrupted'-and-not$counterfeitRows[-1].timed_out) 'callback-counterfeit-ledger'
     $timeoutError=''
     try {Invoke-MIRNativeProbeProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Seconds 3') -TimeoutSeconds 1|Out-Null}catch{$timeoutError=$_.Exception.Message}
     Assert-Probe ($timeoutError.Contains('[mir441-process-timeout]')) 'timeout-refusal'
     $timeoutLedger=Join-Path $context.root ('process-'+$context.process_index+'.resources.jsonl')
     $timeoutRows=@(Get-Content -LiteralPath $timeoutLedger|ForEach-Object {$_|ConvertFrom-Json -Depth 12})
     Assert-Probe ($timeoutRows.Count-gt0-and$timeoutRows[-1].phase-ceq'interrupted'-and[bool]$timeoutRows[-1].timed_out) 'timeout-ledger'
+    $timeoutRun=$context.runs[$context.runs.Count-1]
+    Assert-Probe ($timeoutRun.status-ceq'interrupted'-and$null-eq$timeoutRun.PSObject.Properties['result']) 'timeout-no-natural-result'
     $factorioRecord=Invoke-MIRNativeProbeFactorioProcess -Context $context -FilePath $child -Arguments @('-NoProfile','-Command','[Console]::Out.Write($env:SteamAppId+"/"+$env:SteamGameId)') -TimeoutSeconds 20 -AdmissionWaitSeconds 1 -AdmissionPhase 'native-probe-control'
     $text=Get-Content -Raw -LiteralPath $factorioRecord.stdout
     Assert-Probe ($text-ceq'427520/427520'-and$factorioRecord.result.duration_measurement.scope-ceq'direct-native-executable-start-to-exit'-and$factorioRecord.admission_wait.phase-ceq'native-probe-control'-and$factorioRecord.admission_wait.status-ceq'admitted-without-wait'-and$factorioRecord.admission_wait.attempt_count-ge1) 'factorio-actor-admission-wait'

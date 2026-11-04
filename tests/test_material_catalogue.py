@@ -1,5 +1,7 @@
 """Pure checks for the bounded K2SO material technology constructor."""
 import argparse
+from copy import deepcopy
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -8,6 +10,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 CONTINUATIONS = ROOT / "spec/inventory/k2so-material-continuations.json"
 FACTS = json.loads((ROOT / "spec/inventory/k2so-material-facts.json").read_text(encoding="utf-8"))
+CRUSHING_INPUTS = ROOT / "tests/fixtures/k2so-crushing-industry-inputs.json"
 
 
 def lua_table(lua, value):
@@ -111,10 +114,100 @@ class MaterialCatalogueTests(unittest.TestCase):
             "effects": [{"type": "unlock-recipe", "recipe": recipe}],
         }
 
-    def rows(self, values=None, raw=None, active_mods=None):
+    def rows(self, values=None, raw=None, active_mods=None, upstream_startup=None):
         return self.catalogue["technologies"](
-            values or self.values(), raw or self.raw_fixture(), active_mods or self.active_mods()
+            values or self.values(), raw or self.raw_fixture(), active_mods or self.active_mods(), upstream_startup
         )
+
+    def crushing_inputs(self):
+        self.assertEqual("0E42103B8E2E42B833131D792AA55319B97E5F7761AC947608C3736767A63427",
+                         hashlib.sha256(CRUSHING_INPUTS.read_bytes()).hexdigest().upper())
+        data = json.loads(CRUSHING_INPUTS.read_bytes())
+        self.assertEqual("K2SOCrushingIndustryMaterialHostInputsV1", data["kind"])
+        self.assertEqual("F5116AEBF5342A035E949ADAEE47B8D45FB00AFD73D59CA8D005E02929D4FB24",
+                         data["archives"]["crushing_industry"]["sha256"])
+        self.assertEqual(4, len(data["cases"]))
+        return data["cases"]
+
+    def test_crushing_industry_keeps_paid_glass_and_adds_the_replacement_route(self):
+        original = _plain(self.rows())
+        for case in self.crushing_inputs():
+            with self.subTest(k2=case["k2"], glass=case["glass"]):
+                raw = lua_table(self.lua, case["raw"])
+                before = _plain(raw)
+                rows = _plain(self.rows(raw=raw, active_mods=lua_table(self.lua, case["mods"]),
+                                        upstream_startup=lua_table(self.lua, case["startup"])))
+                self.assertEqual(3, len(rows))
+                glass = next(row for row in rows if row["name"] == "recipe-prod-research_material_glass-1")
+                recipes = ["kr-glass", "glass"] if case["k2"] and case["glass"] else ["kr-glass"]
+                self.assertEqual([{"type": "change-recipe-productivity", "recipe": recipe, "change": .02}
+                                  for recipe in recipes], glass["effects"])
+                self.assertEqual(["automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+                                  "kr-stone-processing"], glass["prerequisites"])
+                self.assertEqual((1, 3, "200*2^(L-1)", 30),
+                                 (glass["level"], glass["max_level"], glass["unit"]["count_formula"], glass["unit"]["time"]))
+                self.assertEqual(before, _plain(raw), "MIR changed foreign recipe or enablement state")
+        self.assertEqual(original, _plain(self.rows()), "profile binding modified the shared original definitions")
+
+    def test_retained_crushing_recipe_enablement_and_visibility_stay_foreign(self):
+        case = next(row for row in self.crushing_inputs() if row["k2"] and row["glass"])
+        for enabled, hidden in ((False, True), (True, False), (None, None)):
+            with self.subTest(enabled=enabled, hidden=hidden):
+                raw = deepcopy(case["raw"])
+                old = raw["recipe"]["kr-glass"]
+                for key, value in (("enabled", enabled), ("hidden", hidden)):
+                    if value is None: old.pop(key, None)
+                    else: old[key] = value
+                value = lua_table(self.lua, raw)
+                self.rows(raw=value, active_mods=lua_table(self.lua, case["mods"]),
+                          upstream_startup=lua_table(self.lua, case["startup"]))
+                self.assertEqual(raw, _plain(value))
+
+    def test_crushing_glass_accepts_the_known_nulls_item_standardization(self):
+        for case in self.crushing_inputs():
+            if not case["k2"]:
+                continue
+            with self.subTest(glass=case["glass"]):
+                # Null's item.replace_all changes item references, while its
+                # technology helper leaves recipe unlock names unchanged.
+                raw = deepcopy(case["raw"])
+                for recipe in raw["recipe"].values():
+                    for field in ("ingredients", "results"):
+                        for entry in recipe.get(field, []):
+                            entry["name"] = {"sand": "kr-sand", "glass": "kr-glass"}.get(entry["name"], entry["name"])
+                mods = {**case["mods"], "nulls-k2so-tweaks": "2.3.2"}
+                rows = _plain(self.rows(raw=lua_table(self.lua, raw), active_mods=lua_table(self.lua, mods),
+                                        upstream_startup=lua_table(self.lua, case["startup"])))
+                glass = next(row for row in rows if row["name"] == "recipe-prod-research_material_glass-1")
+                self.assertEqual(["kr-glass", "glass"] if case["glass"] else ["kr-glass"],
+                                 [effect["recipe"] for effect in glass["effects"]])
+
+    def test_crushing_glass_retains_structural_and_owner_refusals(self):
+        case = next(row for row in self.crushing_inputs() if row["k2"] and row["glass"])
+        for changed in ("productivity", "wrong-output", "extra-output", "probability", "missing-unlock", "lost-paid-route"):
+            with self.subTest(changed=changed):
+                raw = deepcopy(case["raw"])
+                if changed == "productivity": raw["recipe"]["glass"]["allow_productivity"] = False
+                elif changed == "wrong-output": raw["recipe"]["glass"]["results"][0]["name"] = "steel-plate"
+                elif changed == "extra-output": raw["recipe"]["glass"]["results"].append({"type":"item", "name":"stone", "amount":1})
+                elif changed == "probability": raw["recipe"]["glass"]["results"][0]["probability"] = .5
+                elif changed == "missing-unlock": raw["technology"]["kr-stone-processing"]["effects"] = []
+                else: raw["recipe"].pop("kr-glass")
+                with self.assertRaisesRegex(Exception, "K2SO material catalogue"):
+                    self.rows(raw=lua_table(self.lua, raw), active_mods=lua_table(self.lua, case["mods"]),
+                              upstream_startup=lua_table(self.lua, case["startup"]))
+
+    def test_crushing_aliases_need_the_actual_selected_provider_and_settings(self):
+        case = next(row for row in self.crushing_inputs() if row["k2"] and row["glass"])
+        for changed in ("absent-provider", "disabled-integration", "missing-setting"):
+            with self.subTest(changed=changed):
+                mods, startup = deepcopy(case["mods"]), deepcopy(case["startup"])
+                if changed == "absent-provider": mods.pop("crushing-industry")
+                elif changed == "disabled-integration": startup["crushing-industry-k2"]["value"] = False
+                else: startup.pop("crushing-industry-glass")
+                with self.assertRaisesRegex(Exception, "K2SO material catalogue"):
+                    self.rows(raw=lua_table(self.lua, case["raw"]), active_mods=lua_table(self.lua, mods),
+                              upstream_startup=lua_table(self.lua, startup))
 
     def test_authors_the_three_current_k2so_early_materials(self):
         rows = self.rows()
