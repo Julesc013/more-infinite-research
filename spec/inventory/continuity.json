@@ -16659,6 +16659,24 @@
         "source_reconciliation_complete": false,
         "native_execution": false,
         "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-13",
+          "CONT-17"
+        ],
+        "reviewed_on": "2026-11-05",
+        "reviewed_against": "5fc18fa0aa1162cdef73b4eabf7ffbd9193e8a8a",
+        "scope": "Ten complete wrapper bodies at ninety exact bindings in the existing91-tag map; latest direct registry helper assertions and an explicit eleven-body manifest frontier. No old framework or native campaign is restored.",
+        "evidence": "spec/evidence/historical-execution-registry-intent-aero-r01.json",
+        "result": "Consolidate path aliases; retire implementation-only registry/count/AST/context machinery; retain source/input/target binding and failed-check propagation; leave all eleven manifest/scenario bodies and unreviewed transitive helpers explicit.",
+        "reviewed_wrapper_blobs": 10,
+        "verified_wrapper_bindings": 90,
+        "manifest_frontier_blobs": 11,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false,
+        "release_qualification": false
       }
     ],
     "stable_coverage_review": {
