@@ -130,5 +130,259 @@
   ],
   "native_execution": false,
   "reporter_reproduced": false,
-  "release_qualification": false
+  "release_qualification": false,
+  "published_notice_family_followup_r02": {
+    "reviewed_on": "2026-11-05",
+    "scope": "Four queried exact paths across existing91-tag inventory:6complete bodies/29865bytes and9live tag/path bindings, only v4.3.0/v4.4.0/v4.4.1. One noncanonical alias has no binding. This closes the named notice helper/test/runner intent slice, not all runtime imports/inter-release or original reporter reproduction.",
+    "selected_body_intent_review_complete": true,
+    "initial_error_record_preserved": true,
+    "source_index": {
+      "paths": [
+        "source/prototypes/mir/runtime/compiler_profile_notice.lua",
+        "prototypes/mir/runtime/compiler_profile_notice.lua",
+        "tests/runtime/classic_profile_notice.lua",
+        "tests/runtime/run_classic_profile_notice_controls.py"
+      ],
+      "unique_bodies": 6,
+      "complete_body_bytes": 29865,
+      "tag_path_bindings": 9,
+      "all_selected_tag_commits_live_equal": true,
+      "bodies": [
+        {
+          "blob": "9456351817c0d1e82df13ed05f8a68527252922d",
+          "bytes": 2961,
+          "sha256": "35F9B6C4E003D5E3F771AE319C5682F5C122E07DBB8E7183D22D236B4C0C503D",
+          "paths": [
+            "source/prototypes/mir/runtime/compiler_profile_notice.lua"
+          ],
+          "bindings": [
+            {
+              "tag": "v4.3.0",
+              "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+              "path": "source/prototypes/mir/runtime/compiler_profile_notice.lua",
+              "blob": "9456351817c0d1e82df13ed05f8a68527252922d",
+              "remote_tag_commit_equal": true
+            },
+            {
+              "tag": "v4.4.0",
+              "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+              "path": "source/prototypes/mir/runtime/compiler_profile_notice.lua",
+              "blob": "9456351817c0d1e82df13ed05f8a68527252922d",
+              "remote_tag_commit_equal": true
+            }
+          ]
+        },
+        {
+          "blob": "ec8e4425ae5d33606910b4996b7f057022ec16ed",
+          "bytes": 9128,
+          "sha256": "582D09A14D9F9BD527E1D81A9C4EA5E69CD0F0CB83C0AF9A636E0EF2EC11D2BC",
+          "paths": [
+            "tests/runtime/classic_profile_notice.lua"
+          ],
+          "bindings": [
+            {
+              "tag": "v4.3.0",
+              "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+              "path": "tests/runtime/classic_profile_notice.lua",
+              "blob": "ec8e4425ae5d33606910b4996b7f057022ec16ed",
+              "remote_tag_commit_equal": true
+            },
+            {
+              "tag": "v4.4.0",
+              "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+              "path": "tests/runtime/classic_profile_notice.lua",
+              "blob": "ec8e4425ae5d33606910b4996b7f057022ec16ed",
+              "remote_tag_commit_equal": true
+            }
+          ]
+        },
+        {
+          "blob": "49cc76c6d31e975f9ad39d6f956beee579d878ed",
+          "bytes": 3221,
+          "sha256": "3B5567E1D557507F656A69F6D98CE802A23C514922C8F0D711C57976701652E4",
+          "paths": [
+            "tests/runtime/run_classic_profile_notice_controls.py"
+          ],
+          "bindings": [
+            {
+              "tag": "v4.3.0",
+              "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+              "path": "tests/runtime/run_classic_profile_notice_controls.py",
+              "blob": "49cc76c6d31e975f9ad39d6f956beee579d878ed",
+              "remote_tag_commit_equal": true
+            },
+            {
+              "tag": "v4.4.0",
+              "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+              "path": "tests/runtime/run_classic_profile_notice_controls.py",
+              "blob": "49cc76c6d31e975f9ad39d6f956beee579d878ed",
+              "remote_tag_commit_equal": true
+            }
+          ]
+        },
+        {
+          "blob": "c70e5c9c5008969b69d0c1ff5d10c9ae11f27443",
+          "bytes": 2200,
+          "sha256": "8CF1227C0591C0E51E4F29617F9B55DC1F886A46C62CBB5DEAD875986980AB46",
+          "paths": [
+            "source/prototypes/mir/runtime/compiler_profile_notice.lua"
+          ],
+          "bindings": [
+            {
+              "tag": "v4.4.1",
+              "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+              "path": "source/prototypes/mir/runtime/compiler_profile_notice.lua",
+              "blob": "c70e5c9c5008969b69d0c1ff5d10c9ae11f27443",
+              "remote_tag_commit_equal": true
+            }
+          ]
+        },
+        {
+          "blob": "a5a296c5cc689a695fc16c788f150a57ba0f884d",
+          "bytes": 9535,
+          "sha256": "9191B291E72321A1CC85B2AA90BEA9E590AE060D11468C0E5C0F4A742E060F20",
+          "paths": [
+            "tests/runtime/classic_profile_notice.lua"
+          ],
+          "bindings": [
+            {
+              "tag": "v4.4.1",
+              "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+              "path": "tests/runtime/classic_profile_notice.lua",
+              "blob": "a5a296c5cc689a695fc16c788f150a57ba0f884d",
+              "remote_tag_commit_equal": true
+            }
+          ]
+        },
+        {
+          "blob": "bafa8e9ee0d8ec36ac789c6097fbcf16ce58d9ab",
+          "bytes": 2820,
+          "sha256": "BB126979C095D22A61F73295916155E7B7DAF967C9EE5924CC35714F96CD5297",
+          "paths": [
+            "tests/runtime/run_classic_profile_notice_controls.py"
+          ],
+          "bindings": [
+            {
+              "tag": "v4.4.1",
+              "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+              "path": "tests/runtime/run_classic_profile_notice_controls.py",
+              "blob": "bafa8e9ee0d8ec36ac789c6097fbcf16ce58d9ab",
+              "remote_tag_commit_equal": true
+            }
+          ]
+        }
+      ]
+    },
+    "supporting_profile": {
+      "tag": "v4.4.1",
+      "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+      "path": "source/prototypes/mir/settings/compiler_profile.lua",
+      "blob": "f2020ef97d543384902485b49cce8e20b76c3047",
+      "bytes": 1593,
+      "sha256": "DA3588F025AC6B6A29906B7B1D315E7E2481A98B966040A36FCC5AC181334FE4",
+      "complete_supporting_body_read": true
+    },
+    "dispositions": [
+      {
+        "id": "load-handler-reconstruction",
+        "original": "Early CPN02/03 and its on_load-only one-shot subscription; published4.4.1 CPN01\u201303/06\u201307 reverses that behavior and preserves server/client handler sets.",
+        "disposition": "retain-corrected-handler-parity; supersede-early-one-shot-notice-subscription",
+        "current": "Existing bootstrap settled-world/reload handler and repair read-only load controls, with original MP-JOIN opponent and exact4B hosted execution.",
+        "remaining": "Actual affected joining-client/rejoin/saved-host restart on final candidate and exact reporter closure remain unqualified."
+      },
+      {
+        "id": "saved-classic-alias-and-research-preservation",
+        "original": "Early notice warns of reduced Classic output. Published4.4.1 actual compiler-profile module makes both serialized values Full and hides the compatibility setting; final CPN04\u201307 expects silence and parity for2.0/2.1.",
+        "disposition": "retain-hidden-identity-and-complete-output-alias; supersede-reduced-mode-warning",
+        "current": "source/research/historical_settings.lua preserves the hidden setting/values; Generator saved classic/full complete data+final-output control remains exact between1c94 and49bb.",
+        "remaining": "Actual saved-input/upgrade applicability uses affected existing routes; no fabricated original Classic save or wholesale migration replay."
+      },
+      {
+        "id": "private-notice-captions-and-upgrade-warning",
+        "original": "Early CPN01/04\u201309 checks connected valid players, old-version caption and no stale Full warning; final CPN08 only injects a private Classic provider to characterize retained dead-path notifications.",
+        "disposition": "obsolete-implementation-only-for-retired-private-notice; preserve-original-characterization",
+        "current": "Published final Full normalization makes this ordinary notice path silent; current player support/upgrade guidance retains backup instructions. No public MIR API method or current reduced compiler is created by this synthetic fixture.",
+        "remaining": "Unknown external/private consumers remain under the existing global API audit; no broad consumer-completeness verdict follows."
+      },
+      {
+        "id": "coordinator-composition",
+        "original": "Early CPN10/11 requires notice and browser lifecycle delegation. Final CPN09/10 runs real notice with the Full alias and requires a coordinator lifecycle without extra tick registration.",
+        "disposition": "consolidate-existing-lifecycle-and-closed-load-controls; retire-old-module-array-layout",
+        "current": "Existing runtime orchestration review covers actual adapter composition; current bootstrap preserves parse-time imports, Library/repair lifecycle and no ordinary load-only tick.",
+        "remaining": "Imported feature bodies and actual client/target-native behavior retain separate evidence and unresolved scopes."
+      },
+      {
+        "id": "runner-and-locale-assurance",
+        "original": "Early Python runner binds five files and reduced-scope warning locale plus a one-shot source lint; final runner binds four files, enforces no script.on_event and Full alias, and changes minimum fixture assertion count13->24.",
+        "disposition": "obsolete-implementation-only-runner/old-warning-strings/counts; retain-actual-input-identity",
+        "current": "Current exact source/control hashes and package/CI inputs replace the retired runner. Old runners were read in full and not executed or installed.",
+        "remaining": "A source/hash/count check is not native save/client or performance evidence; global historical inventory remains incomplete."
+      }
+    ],
+    "current_input_bindings": [
+      {
+        "path": "source/runtime/bootstrap.lua",
+        "raw_git_sha256": "B7779EAEACBD943759559D526BB08E0B6B7ECC0A24EDBB16B376A0E0F0EE88A0",
+        "equal_original_guard_author_frozen4B_and_current49bb": true
+      },
+      {
+        "path": "tests/test_bootstrap.py",
+        "raw_git_sha256": "04FA3BC12B384CDFDA1A28409A43DBA3709EBD93576C4DB9B4E7FDFA530C5F1D",
+        "equal_original_guard_author_frozen4B_and_current49bb": true
+      },
+      {
+        "path": "tests/test_generator.py::test_saved_classic_and_full_select_the_same_complete_native_output",
+        "method_sha256": "AC7A7F19F444AAA398F5E71F1E42D2A9B458ABAACDC633C4843F71C1877EE87B",
+        "equal_frozen4B_and54_control_author": true
+      }
+    ],
+    "current_hosted_evidence": {
+      "source": "1c94e56db5e91771f604dc9b9cfb0fd457105b32",
+      "job_id": 126737201357,
+      "url": "https://github.com/Julesc013/more-infinite-research/actions/runs/41876310144/job/126737201357",
+      "transport": "MCP decoded log text; saved LF normalization is explicit, not an original transport-byte digest",
+      "local_log_sha256": "DC2C43746B79C781909E9EC0BE789568F480B83618E63633EA6F8222E6D77BB3",
+      "selected_methods": [
+        {
+          "method": "test_settled_native_only_world_has_no_periodic_work_after_view_cycles_and_reload",
+          "status": "passed-in-exact1c94-hosted-log",
+          "line": "2026-11-04T17:23:07.5413570Z test_settled_native_only_world_has_no_periodic_work_after_view_cycles_and_reload (__main__.BootstrapTests.test_settled_native_only_world_has_no_periodic_work_after_view_cycles_and_reload) ... ok"
+        },
+        {
+          "method": "test_repair_load_reconnects_without_save_writes_or_game_access_and_disable_clears",
+          "status": "passed-in-exact1c94-hosted-log",
+          "line": "2026-11-04T17:23:07.5166734Z test_repair_load_reconnects_without_save_writes_or_game_access_and_disable_clears (__main__.BootstrapTests.test_repair_load_reconnects_without_save_writes_or_game_access_and_disable_clears) ... ok"
+        },
+        {
+          "method": "test_saved_classic_and_full_select_the_same_complete_native_output",
+          "status": "passed-in-exact1c94-hosted-log",
+          "line": "2026-11-04T17:20:24.7326990Z test_saved_classic_and_full_select_the_same_complete_native_output (__main__.GeneratorTests.test_saved_classic_and_full_select_the_same_complete_native_output) ... ok"
+        }
+      ]
+    },
+    "custody": {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "6d8b140d1fcca1370da6a9cc4724ca9d7a50d640",
+      "directory": "evidence/aero-compiler-notice-six-body-review-r01",
+      "review_sha256": "82233105B8ADBFA20F51D7B64F08BF70149DF6EFA8E00163C5AF02885AA5091E",
+      "gzip_sha256": "E3A2E3A53FDBC2EDF29900994AFB2153736DCE8F07E04F706343C94A80E9F7C2",
+      "decoded_sha256": "BB63C6BFC7B128461ED2DB92CA2D7FF45746AAFFEC3E358A9F2D401BE64005AA",
+      "actual_remote_readback": true
+    },
+    "conclusion": "No additional product correction is established by these6selected bodies. Retain corrected read-only load/handler parity and hidden saved Classic alias; supersede old reduced-profile/one-shot warnings without restoring the old private notice/compiler. Existing exact current-host methods cover these obligations. Actual reporter reproduction and final-candidate distinct-client checks remain open.",
+    "limits": [
+      "No new product correction is established by this six-body slice. The already recovered MP handler bug remains corrected under existing controls; no old runner/compiler/notice is restored.",
+      "Original MP-JOIN screenshot establishes an error class only; source/save/mod/settings/client inputs and actual affected final-candidate client route still need their real evidence.",
+      "Original old host assertions were read, not re-executed; no native engine, save, client, package or performance observation is created by this review.",
+      "Whole historical inventory, source and test-intent reconciliation and stable acceptance remain incomplete."
+    ],
+    "old_harness_executed": false,
+    "new_host_or_native_execution": false,
+    "player_source_changes": false,
+    "whole_historical_inventory_complete": false,
+    "source_reconciliation_complete": false,
+    "test_intent_reconciliation_complete": false,
+    "release_qualification": false,
+    "stable_acceptance": false
+  }
 }
