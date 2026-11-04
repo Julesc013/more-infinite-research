@@ -172,6 +172,9 @@ class ModulePermissionsActivationTests(unittest.TestCase):
               apply_weapon_speed_overlap = function(selection, generated)
                 assert(#selection.definitions == 0 and #generated == 0)
               end,
+              retain_external_weapon_coverage = function(selection, generated, context)
+                assert(#selection.definitions == 0 and context.raw == raw)
+              end,
               apply_native_owner_patches = function(patches) assert(#patches == 0) end,
               apply_recipe_patches = function(selection, prototypes)
                 assert(selection.recipe_patches[1] == nil and prototypes == raw)
