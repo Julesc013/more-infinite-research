@@ -139,6 +139,25 @@ class NativeGunCreditTests(unittest.TestCase):
           end
         ''')
 
+    def test_published_beta_masks_are_bounded_on_both_modern_engine_families(self):
+        self.lua.execute('''
+          local target=require("platform.target")
+          for _,family in ipairs({{"f200","2.0.77","200"},{"f210","2.1.23","210"}}) do
+            target.id=family[1];target.distribution_version="5.0."..family[3].."04"
+            script.active_mods.base=family[2]
+            script.active_mods["more-infinite-research"]=target.distribution_version
+            for patch=0,3 do
+              storage={};game.forces={}
+              local f=make_force(1,4,false,true)
+              configure({mod_startup_settings_changed=false,mod_changes={
+                ["more-infinite-research"]={old_version="5.0."..family[3].."0"..patch,
+                  new_version=target.distribution_version}}})
+              expect(f,.68,.68)
+              assert(not credit.needs_research_events())
+            end
+          end
+        ''')
+
     def test_repeated_provider_removal_readmission_retuning_and_zero_scalar(self):
         self.lua.execute('''
           local f=make_force(1,4,false,true)
