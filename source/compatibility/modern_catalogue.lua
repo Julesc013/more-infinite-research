@@ -1024,7 +1024,8 @@ function M.select(active_mods, raw, withheld)
     end
   end
   local bob_tech_materials = not bob_angel_f210 and require("compatibility.bob_tech_profile").applies(active_mods)
-  local continuations, external_continuations = M.continuations(active_mods, raw)
+  local external_continuations = {}
+  local continuations = M.continuations(active_mods, raw, external_continuations)
   return {profile = profile, definitions = supported_definitions(definitions), continuations = continuations,
     external_continuations = external_continuations,
     bob_tech_progression = not bob_angel_f210 and target.id == "f210" and type(active_mods) == "table" and active_mods.bobtech ~= nil
@@ -1181,7 +1182,7 @@ function M.omit_existing_continuations(rows, technology_prototypes)
   return retained
 end
 
-function M.continuations(active_mods, raw)
+function M.continuations(active_mods, raw, external_continuations)
   local rows = copy(CONTINUATIONS)
   local secretas_external = false
   local bob_angel_f210 = M.bob_angel_f210_profile(active_mods)
@@ -1304,6 +1305,13 @@ function M.continuations(active_mods, raw)
     end
     rows = M.omit_existing_continuations(rows, admitted)
   end
+  -- The optional caller-owned output keeps the longstanding single array
+  -- return intact, including Python/Lua consumers of this private selector.
+  if external_continuations ~= nil then
+    for name, owner in pairs(admitted) do
+      if type(owner) == "table" then external_continuations[name] = owner end
+    end
+  end
   if bob_angel_f200_combined or M.retains_bob_native_continuations(active_mods) then
     local retained = {}
     for _, row in ipairs(rows) do
@@ -1311,9 +1319,9 @@ function M.continuations(active_mods, raw)
         retained[#retained + 1] = row
       end
     end
-    return retained, admitted
+    return retained
   end
-  return rows, admitted
+  return rows
 end
 
 function M.native_owners(active_mods)

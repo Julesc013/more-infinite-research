@@ -1140,8 +1140,10 @@ function M.apply(technology, binding, context)
   return {enabled = technology.enabled ~= false, reason = "lab-reduced", ingredients = best, prerequisites = prerequisites}
 end
 
-function M.apply_family(rows, family_bindings, environment)
-  local context, reports = M.prepare(environment), {}
+-- A caller may share a prepared view with its earlier read-only owner check
+-- in this same immutable phase; ordinary callers still get a fresh context.
+function M.apply_family(rows, family_bindings, environment, prepared_context)
+  local context, reports = prepared_context or M.prepare(environment), {}
   for index, row in ipairs(rows or {}) do
     local binding
     if type(family_bindings) == "table" then
