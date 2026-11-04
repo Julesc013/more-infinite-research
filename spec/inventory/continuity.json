@@ -16677,6 +16677,28 @@
         "test_intent_reconciliation_complete": false,
         "native_execution": false,
         "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-05",
+          "CONT-07",
+          "CONT-12",
+          "CONT-13",
+          "CONT-15",
+          "CONT-17"
+        ],
+        "reviewed_on": "2026-11-05",
+        "reviewed_against": "44e2d731ae54262290c250b71b5c8a335e5cb6d3",
+        "scope": "Eleven complete historical manifest-test bodies at174 existing bindings; the two named K2SO/Corrundum declarations and the exact two-member A04 actor. No obsolete runner restoration or new native execution.",
+        "evidence": "spec/evidence/historical-scenario-manifest-intents-aero-r01.json",
+        "result": "Dispose11 direct manifest-test bodies; consolidate retired harness structure,retain K2-01 science/progress coverage and diagnostic Corrundum nine-cap13 intent,and preserve the absent audit row and ineffective null-array count check. Both product qualification mappings remain open.",
+        "reviewed_manifest_blobs": 11,
+        "verified_manifest_bindings": 174,
+        "reviewed_k2_fixture_blobs": 2,
+        "source_body_intent_disposition_complete": true,
+        "product_qualification_complete": false,
+        "native_execution": false,
+        "release_qualification": false
       }
     ],
     "stable_coverage_review": {
