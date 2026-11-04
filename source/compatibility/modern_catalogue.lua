@@ -1017,10 +1017,14 @@ function M.select(active_mods, raw, withheld)
   for _, definition in ipairs(sif_retained or {}) do present[definition.family] = true end
   if active_space_age(active_mods) then
     for _, owner in ipairs(require("compatibility.modern_catalogue.space_age").native_owners) do
-      all_native[owner.id] = {family=owner.family, generated=false}
+      all_native[owner.family] = true
     end
-    for _, fallback in ipairs(M.native_owner_fallbacks(active_mods, all_native)) do
-      if not present[fallback.definition.family] then native_paid[#native_paid + 1] = fallback.definition end
+    -- These hidden holders preserve historical Base/SIF investment. Public
+    -- fallback sciences can add planet prerequisites and invalidate its queue.
+    for _, definition in ipairs(BASE.definitions) do
+      if all_native[definition.family] and not present[definition.family] then
+        native_paid[#native_paid + 1] = copy(definition)
+      end
     end
   end
   local bob_tech_materials = not bob_angel_f210 and require("compatibility.bob_tech_profile").applies(active_mods)
