@@ -1,0 +1,497 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalClassicSerializationRoutingIntentAeroV1",
+  "status": "bounded-source-intent-and-host-port-not-native-acceptance",
+  "reviewed_against": "a5ce3009f6edd8ba0332cd111211dfe6f52b905d",
+  "player_tree": "58480faa995eab995cc0a3ad2cddbbdd0e5e0c04",
+  "subjects": [
+    "CONT-01",
+    "CONT-03",
+    "CONT-10",
+    "CONT-13"
+  ],
+  "requirements": [
+    "SET-01",
+    "ARCH-01",
+    "ARCH-03",
+    "VER-07"
+  ],
+  "scope": "Three named compiler-routing test/runner paths, six deduplicated complete bodies and36 exact tag/path bindings in the existing91-tag inventory. A fourth candidate alias path has no indexed bindings. Earlier body plus complete wrapper/runner diffs and the full final three bodies were inspected; no old compiler or native run occurred.",
+  "method": "Metadata first; preserve the older16-assertion two-compiler contract and final11-assertion single-path correction as different policies. Verify exact published4.7.3 bridge members and absence of retired implementation. Retain valid behavior in current native construction without importing old planners or projecting their receipts.",
+  "source_index": {
+    "tag_scope": 91,
+    "unique_selected_bodies": 6,
+    "selected_bindings": 36,
+    "paths": [
+      "tests/compiler/classic_profile_routing.lua",
+      "tests/compiler/Test-MIRClassicProfileRouting.ps1",
+      "tests/compiler/run_classic_profile_routing_controls.py",
+      "tests/Test-MIRClassicProfileRouting.ps1"
+    ],
+    "tag_labels": [
+      "v4.3.0",
+      "v4.4.0",
+      "v4.4.1",
+      "v4.4.2",
+      "v4.5.0",
+      "v4.5.1",
+      "v4.5.2",
+      "v4.6.0",
+      "v4.7.0",
+      "v4.7.1",
+      "v4.7.2",
+      "v4.7.3"
+    ]
+  },
+  "historical_bodies": [
+    {
+      "blob": "02ec26e09ba9131b628925929e58c56fb3841c9f",
+      "bytes": 2832,
+      "sha256": "5D16FCDDF70590A1CBD39FF956FF5C0459DC04CF8910772631AE4EB6325D4914",
+      "bindings": [
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "tests/compiler/run_classic_profile_routing_controls.py",
+          "blob": "02ec26e09ba9131b628925929e58c56fb3841c9f",
+          "bytes": 2832
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "tests/compiler/run_classic_profile_routing_controls.py",
+          "blob": "02ec26e09ba9131b628925929e58c56fb3841c9f",
+          "bytes": 2832
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "tests/compiler/run_classic_profile_routing_controls.py",
+          "blob": "02ec26e09ba9131b628925929e58c56fb3841c9f",
+          "bytes": 2832
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "tests/compiler/run_classic_profile_routing_controls.py",
+          "blob": "02ec26e09ba9131b628925929e58c56fb3841c9f",
+          "bytes": 2832
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "tests/compiler/run_classic_profile_routing_controls.py",
+          "blob": "02ec26e09ba9131b628925929e58c56fb3841c9f",
+          "bytes": 2832
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "tests/compiler/run_classic_profile_routing_controls.py",
+          "blob": "02ec26e09ba9131b628925929e58c56fb3841c9f",
+          "bytes": 2832
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "tests/compiler/run_classic_profile_routing_controls.py",
+          "blob": "02ec26e09ba9131b628925929e58c56fb3841c9f",
+          "bytes": 2832
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "tests/compiler/run_classic_profile_routing_controls.py",
+          "blob": "02ec26e09ba9131b628925929e58c56fb3841c9f",
+          "bytes": 2832
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "tests/compiler/run_classic_profile_routing_controls.py",
+          "blob": "02ec26e09ba9131b628925929e58c56fb3841c9f",
+          "bytes": 2832
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "tests/compiler/run_classic_profile_routing_controls.py",
+          "blob": "02ec26e09ba9131b628925929e58c56fb3841c9f",
+          "bytes": 2832
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tests/compiler/run_classic_profile_routing_controls.py",
+          "blob": "02ec26e09ba9131b628925929e58c56fb3841c9f",
+          "bytes": 2832
+        }
+      ]
+    },
+    {
+      "blob": "49ea535d7e00f02e921286f3fc59a092c7450fd3",
+      "bytes": 1822,
+      "sha256": "23DBEB5B0303C1657583524F6A3AEEC45A8E6D878CBD3CBB2B2BA7EA6810E878",
+      "bindings": [
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "tests/compiler/Test-MIRClassicProfileRouting.ps1",
+          "blob": "49ea535d7e00f02e921286f3fc59a092c7450fd3",
+          "bytes": 1822
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "tests/compiler/Test-MIRClassicProfileRouting.ps1",
+          "blob": "49ea535d7e00f02e921286f3fc59a092c7450fd3",
+          "bytes": 1822
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "tests/compiler/Test-MIRClassicProfileRouting.ps1",
+          "blob": "49ea535d7e00f02e921286f3fc59a092c7450fd3",
+          "bytes": 1822
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "tests/compiler/Test-MIRClassicProfileRouting.ps1",
+          "blob": "49ea535d7e00f02e921286f3fc59a092c7450fd3",
+          "bytes": 1822
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "tests/compiler/Test-MIRClassicProfileRouting.ps1",
+          "blob": "49ea535d7e00f02e921286f3fc59a092c7450fd3",
+          "bytes": 1822
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "tests/compiler/Test-MIRClassicProfileRouting.ps1",
+          "blob": "49ea535d7e00f02e921286f3fc59a092c7450fd3",
+          "bytes": 1822
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "tests/compiler/Test-MIRClassicProfileRouting.ps1",
+          "blob": "49ea535d7e00f02e921286f3fc59a092c7450fd3",
+          "bytes": 1822
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "tests/compiler/Test-MIRClassicProfileRouting.ps1",
+          "blob": "49ea535d7e00f02e921286f3fc59a092c7450fd3",
+          "bytes": 1822
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "tests/compiler/Test-MIRClassicProfileRouting.ps1",
+          "blob": "49ea535d7e00f02e921286f3fc59a092c7450fd3",
+          "bytes": 1822
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "tests/compiler/Test-MIRClassicProfileRouting.ps1",
+          "blob": "49ea535d7e00f02e921286f3fc59a092c7450fd3",
+          "bytes": 1822
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tests/compiler/Test-MIRClassicProfileRouting.ps1",
+          "blob": "49ea535d7e00f02e921286f3fc59a092c7450fd3",
+          "bytes": 1822
+        }
+      ]
+    },
+    {
+      "blob": "7167e289a6a84ef5474c1f8bc8796fe865701dcc",
+      "bytes": 11978,
+      "sha256": "71B03BBC54669AE1ED4908E8569182EBC7E7E78C4985731B8682DF24DD5BE1B0",
+      "bindings": [
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "tests/compiler/classic_profile_routing.lua",
+          "blob": "7167e289a6a84ef5474c1f8bc8796fe865701dcc",
+          "bytes": 11978
+        }
+      ]
+    },
+    {
+      "blob": "78607899f39c8807a1b338935ffa14bab7dbd040",
+      "bytes": 3273,
+      "sha256": "AB3928F64A3F3C794384385BD019986CC3F6A5771840798E6AA06CD9040840A4",
+      "bindings": [
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "tests/compiler/run_classic_profile_routing_controls.py",
+          "blob": "78607899f39c8807a1b338935ffa14bab7dbd040",
+          "bytes": 3273
+        }
+      ]
+    },
+    {
+      "blob": "af73e8157728787d707cca1d73175a5e8886e73c",
+      "bytes": 5069,
+      "sha256": "7C30F9C1911DF8A45A53FF43B3D54C31C023A46D2C56409C443B297B63CD10EC",
+      "bindings": [
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "tests/compiler/classic_profile_routing.lua",
+          "blob": "af73e8157728787d707cca1d73175a5e8886e73c",
+          "bytes": 5069
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "tests/compiler/classic_profile_routing.lua",
+          "blob": "af73e8157728787d707cca1d73175a5e8886e73c",
+          "bytes": 5069
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "tests/compiler/classic_profile_routing.lua",
+          "blob": "af73e8157728787d707cca1d73175a5e8886e73c",
+          "bytes": 5069
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "tests/compiler/classic_profile_routing.lua",
+          "blob": "af73e8157728787d707cca1d73175a5e8886e73c",
+          "bytes": 5069
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "tests/compiler/classic_profile_routing.lua",
+          "blob": "af73e8157728787d707cca1d73175a5e8886e73c",
+          "bytes": 5069
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "tests/compiler/classic_profile_routing.lua",
+          "blob": "af73e8157728787d707cca1d73175a5e8886e73c",
+          "bytes": 5069
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "tests/compiler/classic_profile_routing.lua",
+          "blob": "af73e8157728787d707cca1d73175a5e8886e73c",
+          "bytes": 5069
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "tests/compiler/classic_profile_routing.lua",
+          "blob": "af73e8157728787d707cca1d73175a5e8886e73c",
+          "bytes": 5069
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "tests/compiler/classic_profile_routing.lua",
+          "blob": "af73e8157728787d707cca1d73175a5e8886e73c",
+          "bytes": 5069
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "tests/compiler/classic_profile_routing.lua",
+          "blob": "af73e8157728787d707cca1d73175a5e8886e73c",
+          "bytes": 5069
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tests/compiler/classic_profile_routing.lua",
+          "blob": "af73e8157728787d707cca1d73175a5e8886e73c",
+          "bytes": 5069
+        }
+      ]
+    },
+    {
+      "blob": "e5ae5992c65bb1ad348da464e604598632a15eb7",
+      "bytes": 1944,
+      "sha256": "0334FDEF6D861526AE1203A8C77DCB696D69AC2B385CBA8D013A08DA6960AF6B",
+      "bindings": [
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "tests/compiler/Test-MIRClassicProfileRouting.ps1",
+          "blob": "e5ae5992c65bb1ad348da464e604598632a15eb7",
+          "bytes": 1944
+        }
+      ]
+    }
+  ],
+  "policy_change": {
+    "earlier_release_commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+    "earlier_lua_blob": "7167e289a6a84ef5474c1f8bc8796fe865701dcc",
+    "earlier_assertions": 16,
+    "final_single_path_commit": "c88f9a44cf78e06a1929556b5c079b64edd117aa",
+    "final_lua_blob": "af73e8157728787d707cca1d73175a5e8886e73c",
+    "final_assertions": 11,
+    "final_published_tag": "v4.7.3",
+    "decision": "Saved classic remains an accepted hidden serialization and executes the sole complete path. The reduced planner/compiler, five-row profile receipts and profile-specific transport/operation counts are superseded by the final published policy, not missing features to restore."
+  },
+  "published_archives": [
+    {
+      "archive": "more-infinite-research_4.7.20003.zip",
+      "sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+      "bridge_member": "prototypes/mir/settings/compiler_profile.lua",
+      "bridge_member_sha256": "DA3588F025AC6B6A29906B7B1D315E7E2481A98B966040A36FCC5AC181334FE4",
+      "retired_three_members_absent": true
+    },
+    {
+      "archive": "more-infinite-research_4.7.21003.zip",
+      "sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+      "bridge_member": "prototypes/mir/settings/compiler_profile.lua",
+      "bridge_member_sha256": "DA3588F025AC6B6A29906B7B1D315E7E2481A98B966040A36FCC5AC181334FE4",
+      "retired_three_members_absent": true
+    }
+  ],
+  "obligations": [
+    {
+      "original": [
+        "SCP-01",
+        "SCP-02",
+        "SCP-03",
+        "SCP-04",
+        "SCP-06",
+        "SCP-07",
+        "SCP-08"
+      ],
+      "disposition": "retain-and-port",
+      "independent_expectation": "Absent, full and saved classic preserve one complete output path; hidden startup identity/default/two serialized values remain exact; no retired compiler loads.",
+      "implementation": [
+        "source/research/historical_settings.lua",
+        "source/data-final-fixes.lua"
+      ],
+      "controls": [
+        "tests/test_generator.py::GeneratorTests.test_saved_classic_and_full_select_the_same_complete_native_output",
+        "tests/test_generator.py::GeneratorTests.test_data_final_full_published_technology_output_matches_oracle",
+        "tests/test_generator.py::GeneratorTests.test_f200_complete_technology_output_matches_its_own_published_oracle"
+      ]
+    },
+    {
+      "original": [
+        "SCP-05"
+      ],
+      "disposition": "consolidate",
+      "independent_expectation": "A historical target keeps its declared complete subset rather than selecting the retired Classic compiler.",
+      "implementation": [
+        "source/platform/target.lua",
+        "source/research/historical_direct.lua",
+        "source/research/historical_settings.lua"
+      ],
+      "controls": [
+        "tests/test_historical_direct.py",
+        "tests/test_pack.py"
+      ],
+      "limit": "The old test used an0.18 target stub; it was never a native historical-engine result. This new explicit equivalence port exercisesF200/F210 only."
+    },
+    {
+      "original": [
+        "SCP-09"
+      ],
+      "disposition": "superseded-implementation-detail",
+      "independent_expectation": "Unsupported serialization cannot select another compiler. Preserve the exact declared full/classic allowed set.",
+      "implementation": [
+        "source/research/historical_settings.lua"
+      ],
+      "controls": [
+        "tests/test_historical_direct.py::HistoricalDirectTests.test_historical_settings_keep_exact_names_defaults_and_time_sentinel",
+        "tests/test_generator.py::GeneratorTests.test_saved_classic_and_full_select_the_same_complete_native_output"
+      ],
+      "limit": "The removed Lua profile.get custom exception/dispatch is not restored. Invalid raw engine-setting behavior is unobserved here; no native rejection claim follows."
+    },
+    {
+      "original": [
+        "SCP-10",
+        "SCP-11"
+      ],
+      "disposition": "retain-and-consolidate",
+      "independent_expectation": "Published Library shortcut identity/Base icon remain, without a retired stream registry import.",
+      "implementation": [
+        "source/data.lua",
+        "source/presentation/shortcut.lua"
+      ],
+      "controls": [
+        "tests/test_generator.py::GeneratorTests.test_saved_classic_and_full_select_the_same_complete_native_output",
+        "tests/test_library.py::LibraryTests.test_pure_prototype_constructor_preserves_published_shortcut_identity"
+      ],
+      "limit": "Exactly one shortcut is retained, not the old assumption that the entire data stage has only one prototype; unrelated native metadata remains allowed."
+    },
+    {
+      "original": [
+        "CPR-01",
+        "CPR-02",
+        "CPR-03",
+        "CPR-12",
+        "CPR-13",
+        "CPR-14",
+        "CPR-15",
+        "CPR-16"
+      ],
+      "disposition": "superseded",
+      "independent_expectation": "Retain original reduced-core/TransformationPlan/MutationJournal/profile-transport evidence as history. Final publishedSCP behavior replaces it.",
+      "replacement": "Final single-path policy above; do not restore the retired compiler or assurance transport."
+    }
+  ],
+  "host_result": {
+    "generator_tests": 49,
+    "explicit_alias_target_cases": 6,
+    "targets": [
+      "f200",
+      "f210"
+    ],
+    "selections": [
+      "absent",
+      "full",
+      "classic"
+    ],
+    "complete_data_and_final_output_equal": true,
+    "negative_opponents": [
+      {
+        "edition": "f200",
+        "rejected": true,
+        "failures": 1,
+        "errors": 0,
+        "raw_log": "classic-routing-reduced-opponent-f200-r01.log",
+        "sha256": "5358459BDC540339741706C6FAFFD56BFA87F56DF9BBFC0D41E2D0A3E7762F0A"
+      },
+      {
+        "edition": "f210",
+        "rejected": true,
+        "failures": 1,
+        "errors": 0,
+        "raw_log": "classic-routing-reduced-opponent-f210-r01.log",
+        "sha256": "9D883EDD5F6AA57D2E10BD73E78A55A5F5C96D8A9C4D3D2A21066C82E88A4EE1"
+      }
+    ],
+    "negative_limit": "Only the legacy classic selection in the chosen target omits modern authored research; normal output remains unchanged. This calibrates the historical omitted-research failure class, not execution of the retired compiler.",
+    "test_source_blob": "333ab536d43ba8adf8a4392676e462fa0639f9c8",
+    "raw_log_sha256": "081EC5DA943C9C2F99E1D4E1758F1E51CF4939CD3FCCD57ACD7D7E27207582AF"
+  },
+  "remaining_executable_check": "Review actual saved startup-selection applicability on an existing affected upgrade route. Do not fabricate an original Classic save, replay unchanged journeys, or treat this host alias comparison as native saved-state/client/performance evidence. Other unreviewed source groups, inter-release history and original receipt custody remain open.",
+  "owner": "Aero source-intent/independent review; Black Glass exact native applicability/queue",
+  "source_reconciliation_complete": false,
+  "test_intent_reconciliation_complete": false,
+  "native_execution": false,
+  "release_qualification": false
+}
