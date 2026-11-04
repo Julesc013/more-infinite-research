@@ -5,7 +5,7 @@ applies_to: "MIR players and upgrades"
 audience: player
 doc_type: guide
 owner: mir-maintainers
-last_reviewed: 2026-11-04
+last_reviewed: 2026-11-05
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -164,7 +164,7 @@ source_of_truth_for:
 
 ## Support limits
 
-- On Factorio 2.1.23, MIR 5.0.2 can stop at `MIR5 K2SO material catalogue: kr-glass changed` with Krastorio 2: Spaced Out and Crushing Industry. A correction is being qualified for the next release; affected earned-research upgrades remain under test. Keep the original save and matching mods/settings, and follow [issue #1651](https://github.com/Julesc013/more-infinite-research/issues/1651) for updates.
+- On Factorio 2.1.23, MIR 5.0.2 can stop at `MIR5 K2SO material catalogue: kr-glass changed` with Krastorio 2: Spaced Out and Crushing Industry. [MIR 5.0.3](https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.3) fixes the [reported failure](https://github.com/Julesc013/more-infinite-research/issues/1651) in the tested reduced selection. The reporter's complete 564-name mod selection remains unverified; keep the original save and matching mods/settings when upgrading.
 
 - When another mod already provides an infinite native research chain, MIR preserves that research. The Library explains when MIR's settings do not control it. On Factorio 2.1, Muria keeps its finite weapon-speed levels 7 and 8; MIR adds infinite research from level 9.
 
