@@ -99,7 +99,7 @@
     },
     "observations": [
       "48 owned stock biolab clones, only name/speed300 changed; normal16000 public sulfur cost, time and five science inputs.",
-      "Real by_script=false completion tick2322 consumes4608 packs each, within explicit inventory/buffer bound; seven remaining sulfur recipe bonuses increase once.",
+      "Real by_script=false completion tick2322 records inventory count loss4608 packs each within its explicit buffered-pack bound; exact durability is unavailable on2.0; seven remaining sulfur recipe bonuses increase once.",
       "Already-paid coal stays.5 and positive/negative holders2/1 fixed; carbon5 becomes current at retained19percent; complete other force/queue/partial/prototype/foreign state unchanged.",
       "Own labs stop immediately; next tick, save and two read-only cold loads retain full state and stopped inventories/energy."
     ],
@@ -110,7 +110,7 @@
     ]
   },
   "retained_weapon_current_lab": {
-    "status": "native-pass-independent-after-result-review-pending",
+    "status": "independently-accepted-one-retained-disabled-rocket-completion-save-two-colds",
     "fixture_commit": "8a97e2900c05112cd58506707c83bf09d683b9f2",
     "fixture_sha256": "E6036BE4B9349C8652B5E40CC02746B1516EFAD1471DF127712AC9A177A51D21",
     "engine": "2.1.23",
@@ -148,7 +148,14 @@
     "limits": [
       "One rocket completion only; queued cannon is retained, not completed.",
       "Synthetic lab speed/entities/items/energy; no mixed Tesla, natural manufacturing, performance or final release acceptance."
-    ]
+    ],
+    "review": {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "975edbaf3757849f59e5bfb23bc8196d89e4d4c3",
+      "path": "evidence/aero-weapon504-retained-current-lab-review-r01/review.json",
+      "sha256": "ACC70C47FCF8995E7161287BDAA448186B33C135E2CB018A61FC8E8C41F08747",
+      "exact_remote_bytes_read_back": true
+    }
   },
   "signed_gun_primitive_adverse": {
     "status": "independently-confirmed-NOT-QUALIFIED",
