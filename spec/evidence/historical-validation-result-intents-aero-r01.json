@@ -1,0 +1,696 @@
+{
+  "kind": "MIRHistoricalValidationResultIntentDispositionV1",
+  "reviewed_on": "2026-11-05",
+  "reviewed_against": "efaa3859db1e72c57f53ef281b50c3c2ca7808ea",
+  "subjects": [
+    "CONT-03",
+    "CONT-08",
+    "CONT-10",
+    "CONT-12",
+    "CONT-15",
+    "CONT-17",
+    "VER-07"
+  ],
+  "scope": "Only the two named historical test families:14 complete deduplicated Git bodies/151488bytes and195 retained tag/path bindings in the existing91-tag index. Direct imported helpers,old generated records and invoked scenarios are not silently included.",
+  "source_inventory": "spec/inventory/continuity.json#historical_preservation_audit.source_inventory",
+  "counts": {
+    "indexed_tags": 91,
+    "unique_bodies": 14,
+    "raw_bytes": 151488,
+    "retained_bindings": 195,
+    "live_remote_bindings": 192,
+    "live_remote_tags": 68,
+    "explicit_local_alias_bindings": 3,
+    "forwarding_bodies": 2,
+    "substantive_bodies": 12
+  },
+  "remote_binding_limit": "Threev4.2.0 references retain the original local alias commit6d19c874,also named by the publishedv4.2.0-stable tag. No remotev4.2.0 tag is claimed or created.",
+  "sources": [
+    {
+      "blob": "c16e536e9e96d72494e57bbd9225b7c58a5c6739",
+      "sha256": "70DDCBD8CC21DC6B4D91AD20E55A907B989375648C7ACE4356B7F53D76077CB8",
+      "bytes": 5936,
+      "tag_path_references": {
+        "scripts/Test-MIRValidationResults.ps1": [
+          "0.10.0",
+          "0.11.0",
+          "0.12.0",
+          "0.6.0",
+          "0.7.0",
+          "0.8.0",
+          "0.9.0",
+          "1.3.0",
+          "1.3.5",
+          "1.3.9",
+          "1.4.0",
+          "1.4.5",
+          "1.4.9",
+          "1.5.0",
+          "1.5.5",
+          "1.5.9",
+          "1.6.0",
+          "1.6.5",
+          "1.6.9",
+          "1.7.1",
+          "1.7.5",
+          "1.7.9",
+          "1.8.2",
+          "1.8.5",
+          "1.8.9",
+          "1.9.4",
+          "1.9.5",
+          "1.9.9",
+          "2.4.0",
+          "2.4.5",
+          "2.4.9",
+          "3.1.0",
+          "3.1.1",
+          "3.1.2",
+          "3.1.5",
+          "3.1.9",
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3"
+        ],
+        ".mir/target-lines/0.10.0/scripts/Test-MIRValidationResults.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/0.11.0/scripts/Test-MIRValidationResults.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/0.12.0/scripts/Test-MIRValidationResults.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/0.6.0/scripts/Test-MIRValidationResults.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/0.7.0/scripts/Test-MIRValidationResults.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/0.8.0/scripts/Test-MIRValidationResults.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/0.9.0/scripts/Test-MIRValidationResults.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/1.3.0/scripts/Test-MIRValidationResults.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/1.4.0/scripts/Test-MIRValidationResults.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/1.5.0/scripts/Test-MIRValidationResults.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/1.6.0/scripts/Test-MIRValidationResults.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/1.7.1/scripts/Test-MIRValidationResults.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/1.8.2/scripts/Test-MIRValidationResults.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/1.9.4/scripts/Test-MIRValidationResults.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/2.4.5/scripts/Test-MIRValidationResults.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/2.4.9/scripts/Test-MIRValidationResults.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/3.1.9/scripts/Test-MIRValidationResults.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ]
+      },
+      "disposition": "grouped-assertion-intents-reconciled",
+      "intent_groups": [
+        "retired-recorder-and-asserted-runner-boundaries"
+      ]
+    },
+    {
+      "blob": "f666f529413eb2dd8b207936430275f7c939e1d6",
+      "sha256": "7255F80C99DADBF8BB03073AC502579EFFD84C261DC2C7AE9AF74AB0E337FB6F",
+      "bytes": 4071,
+      "tag_path_references": {
+        "scripts/Test-MIRValidationResults.ps1": [
+          "2.3.5",
+          "3.0.5"
+        ]
+      },
+      "disposition": "grouped-assertion-intents-reconciled",
+      "intent_groups": [
+        "retired-recorder-and-asserted-runner-boundaries"
+      ]
+    },
+    {
+      "blob": "77fbdcca65f3ef31f3c3e62190b799398ed2e49f",
+      "sha256": "32A41E7B422154294234A46BACF503F19DFFEF94DD9FAAAFFBD99F2C2F8D5D27",
+      "bytes": 9530,
+      "tag_path_references": {
+        "scripts/Test-MIRValidationResults.ps1": [
+          "2.5.0",
+          "2.5.5",
+          "2.5.9"
+        ]
+      },
+      "disposition": "grouped-assertion-intents-reconciled",
+      "intent_groups": [
+        "retired-recorder-and-asserted-runner-boundaries"
+      ]
+    },
+    {
+      "blob": "b28acc9b837157b7e8c2f227461d43a4b5843e97",
+      "sha256": "249454636323B8A9D4FA431C7CBD4E5A28CF8135C017A12B1AA08657EA3B5926",
+      "bytes": 9636,
+      "tag_path_references": {
+        "scripts/Test-MIRValidationResults.ps1": [
+          "2.5.10",
+          "2.5.11"
+        ]
+      },
+      "disposition": "grouped-assertion-intents-reconciled",
+      "intent_groups": [
+        "retired-recorder-and-asserted-runner-boundaries"
+      ]
+    },
+    {
+      "blob": "dfb4ef911cc7d83cf21567727c2309b8ff35ab78",
+      "sha256": "A71022E776B94CCE87A963C0FA35F2009D5C543929A9C55EF06B7AD58AC22F01",
+      "bytes": 13623,
+      "tag_path_references": {
+        "validation/tests/tooling/Test-MIRValidationResults.ps1": [
+          "2.5.10",
+          "2.5.11",
+          "3.2.10"
+        ]
+      },
+      "disposition": "grouped-assertion-intents-reconciled",
+      "intent_groups": [
+        "retired-recorder-and-asserted-runner-boundaries"
+      ]
+    },
+    {
+      "blob": "3fed0687ff984e9c3fbb6e98457d5ecade9e4659",
+      "sha256": "B39EC1AB48AE93EC722110ED32F99362B9E757C59284C0D9CB8663AEECB69AE8",
+      "bytes": 283,
+      "tag_path_references": {
+        "scripts/Test-MIRValidationResults.ps1": [
+          "3.2.10",
+          "3.2.11",
+          "3.2.5",
+          "3.2.9",
+          "v4.0.0"
+        ]
+      },
+      "disposition": "consolidate-forwarding-alias",
+      "intent_groups": [
+        "legacy-forwarder"
+      ]
+    },
+    {
+      "blob": "0a9930207c1b8761aabf73e26d29b2aa59dd770e",
+      "sha256": "199B910E08E6984CDA540A1FF96DB4B911DF134902562DD46A6F8E8D4C63DD9B",
+      "bytes": 13827,
+      "tag_path_references": {
+        "validation/tests/tooling/Test-MIRValidationResults.ps1": [
+          "3.2.11",
+          "v4.0.0"
+        ]
+      },
+      "disposition": "grouped-assertion-intents-reconciled",
+      "intent_groups": [
+        "retired-recorder-and-asserted-runner-boundaries"
+      ]
+    },
+    {
+      "blob": "80dfd7058d31798d3eeec580bbb19fd33044f1cf",
+      "sha256": "8665905FEB3A60C748C776E9161CB4FC322D027DE4579EDED1829E7C67C7FD25",
+      "bytes": 6230,
+      "tag_path_references": {
+        "validation/tests/tooling/Test-MIRValidationResults.ps1": [
+          "3.2.5"
+        ]
+      },
+      "disposition": "grouped-assertion-intents-reconciled",
+      "intent_groups": [
+        "retired-recorder-and-asserted-runner-boundaries"
+      ]
+    },
+    {
+      "blob": "2257fd3fe4f8bf6a3d9deff5b469901fc7c79ace",
+      "sha256": "FAADE3D102D9627EF0BF998237DF80213ED33641E8E8774238F6F73F296498A4",
+      "bytes": 8756,
+      "tag_path_references": {
+        "validation/tests/tooling/Test-MIRValidationResults.ps1": [
+          "3.2.9"
+        ]
+      },
+      "disposition": "grouped-assertion-intents-reconciled",
+      "intent_groups": [
+        "retired-recorder-and-asserted-runner-boundaries"
+      ]
+    },
+    {
+      "blob": "bb5ee540ca93f06579a90082e3842f12bcc88f3e",
+      "sha256": "4F22A00C3F9E51E7DA0F6BCE55FB65E0285DE3D08C4AA8E3267EB4FCAD340314",
+      "bytes": 272,
+      "tag_path_references": {
+        "scripts/Test-MIRValidationResults.ps1": [
+          "v4.1.0",
+          "v4.2.0",
+          "v4.2.0-stable",
+          "v4.2.1",
+          "v4.2.2",
+          "v4.3.0",
+          "v4.4.0",
+          "v4.4.1",
+          "v4.4.2",
+          "v4.5.0",
+          "v4.5.1",
+          "v4.5.2",
+          "v4.6.0",
+          "v4.7.0",
+          "v4.7.1",
+          "v4.7.2",
+          "v4.7.3"
+        ]
+      },
+      "disposition": "consolidate-forwarding-alias",
+      "intent_groups": [
+        "legacy-forwarder"
+      ]
+    },
+    {
+      "blob": "1bd4e169183a69a60c4cb5978ca35113ead44b92",
+      "sha256": "6BB1FEDFF9E6C9E6BB4896F20468EB83740F03E30DB05D8CC81A148B3116451F",
+      "bytes": 27396,
+      "tag_path_references": {
+        "tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1": [
+          "v4.1.0"
+        ]
+      },
+      "disposition": "grouped-assertion-intents-reconciled",
+      "intent_groups": [
+        "retired-decomposition-and-custody-boundaries"
+      ]
+    },
+    {
+      "blob": "3693ff6d1fc45c8790e22c4016638c457dc6be79",
+      "sha256": "3B5815EC5663399F99ADEBE2E7373B3824471901B9F859137F797601E53C2468",
+      "bytes": 13843,
+      "tag_path_references": {
+        "tests/tooling/Test-MIRValidationResults.ps1": [
+          "v4.1.0",
+          "v4.2.0",
+          "v4.2.0-stable"
+        ]
+      },
+      "disposition": "grouped-assertion-intents-reconciled",
+      "intent_groups": [
+        "retired-recorder-and-asserted-runner-boundaries"
+      ]
+    },
+    {
+      "blob": "ccca932a0160cea359ee335c562faccb0d0e0064",
+      "sha256": "32DBEB006060A7A0749E11832B3AC2FC4AF5615929D71DFC43C2D74655D0CF35",
+      "bytes": 24062,
+      "tag_path_references": {
+        "tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1": [
+          "v4.2.0",
+          "v4.2.0-stable",
+          "v4.2.1",
+          "v4.2.2",
+          "v4.3.0",
+          "v4.4.0",
+          "v4.4.1",
+          "v4.4.2",
+          "v4.5.0",
+          "v4.5.1",
+          "v4.5.2",
+          "v4.6.0",
+          "v4.7.0",
+          "v4.7.1",
+          "v4.7.2",
+          "v4.7.3"
+        ]
+      },
+      "disposition": "grouped-assertion-intents-reconciled",
+      "intent_groups": [
+        "retired-decomposition-and-custody-boundaries"
+      ]
+    },
+    {
+      "blob": "48770c32b86feda736c3b2f0079fe4e1f4ccf364",
+      "sha256": "9FA13B24E32CAAF557250AFC671A888396C37FB22ED4EB8DDAE127092F91FDC2",
+      "bytes": 14023,
+      "tag_path_references": {
+        "tests/tooling/Test-MIRValidationResults.ps1": [
+          "v4.2.1",
+          "v4.2.2",
+          "v4.3.0",
+          "v4.4.0",
+          "v4.4.1",
+          "v4.4.2",
+          "v4.5.0",
+          "v4.5.1",
+          "v4.5.2",
+          "v4.6.0",
+          "v4.7.0",
+          "v4.7.1",
+          "v4.7.2",
+          "v4.7.3"
+        ]
+      },
+      "disposition": "grouped-assertion-intents-reconciled",
+      "intent_groups": [
+        "retired-recorder-and-asserted-runner-boundaries"
+      ]
+    }
+  ],
+  "assertion_dispositions": [
+    {
+      "obligation": "Keep actual source/package/engine/profile identity and distinguish passed,incomplete,running,failed and unexecuted work.",
+      "original": [
+        {
+          "blob": "48770c32b86feda736c3b2f0079fe4e1f4ccf364",
+          "path": "tests/tooling/Test-MIRValidationResults.ps1",
+          "lines": "176-220,232-236"
+        },
+        {
+          "blob": "c16e536e9e96d72494e57bbd9225b7c58a5c6739",
+          "path": "scripts/Test-MIRValidationResults.ps1",
+          "lines": "40-100"
+        }
+      ],
+      "disposition": "consolidate",
+      "independent_expectation": "A missing required scenario or interrupted/failed execution cannot become a completed native result; provenance must identify the inputs actually consumed. Historical recorder schema2 and a literal scenario-group table are implementation details,not player behavior.",
+      "implementation": [
+        "tests/Test-MIR5HostControls.ps1",
+        "tests/test_host_controls.py",
+        "tools/lib/validation/NativeProbeCommon.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "spec/verification.md"
+      ],
+      "applicable_evidence": [
+        "spec/evidence/candidate504-weapon-first-entry-native-r01.json",
+        "spec/evidence/candidate504-galore-weapon-useful-work-r01.json"
+      ],
+      "remaining_executable_check": "Retain exact current named native/controller/save/endpoint readback and final publication checks. No old result-recorder execution is needed for this classification.",
+      "owner": "Black Glass executes routine native work; Aero independently reviews resulting evidence"
+    },
+    {
+      "obligation": "A green runtime label with no relevant observations is insufficient; preserve failures and failure context.",
+      "original": [
+        {
+          "blob": "77fbdcca65f3ef31f3c3e62190b799398ed2e49f",
+          "path": "scripts/Test-MIRValidationResults.ps1",
+          "lines": "154-169"
+        },
+        {
+          "blob": "48770c32b86feda736c3b2f0079fe4e1f4ccf364",
+          "path": "tests/tooling/Test-MIRValidationResults.ps1",
+          "lines": "223-236"
+        }
+      ],
+      "disposition": "consolidate",
+      "independent_expectation": "The old tests deliberately reject zero executed assertions and write a structured failure packet. This retains the need for meaningful observed semantics,not a new requirement to recover an assertion counter or use a total as acceptance.",
+      "implementation": [
+        "spec/verification.md",
+        "docs/development.md",
+        "tests/test_host_controls.py",
+        "tools/lib/validation/NativeProbeResources.ps1"
+      ],
+      "applicable_evidence": [
+        "spec/evidence/candidate504-weapon-first-entry-native-r01.json"
+      ],
+      "remaining_executable_check": "Verify actual native markers and independent expected state in each affected case. Preparation and counts alone remain insufficient; preserve each genuine failed attempt.",
+      "owner": "Black Glass execution; Aero independent result verdict"
+    },
+    {
+      "obligation": "Read shared native logs while their exact scenario still owns them; preserve bounded scratch paths,process ownership,atomic owned outputs and archive/settings restoration.",
+      "original": [
+        {
+          "blob": "48770c32b86feda736c3b2f0079fe4e1f4ccf364",
+          "path": "tests/tooling/Test-MIRValidationResults.ps1",
+          "lines": "16-38,111-143"
+        }
+      ],
+      "disposition": "consolidate",
+      "independent_expectation": "The historical ATAN invocation/log ordering and generated-userdata/textual-function checks protect input and observation custody. Retain that purpose using current guarded roots and owned process/library transactions; literal old paths/functions need no restoration.",
+      "implementation": [
+        "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
+        "tools/lib/validation/ResourceGovernor.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tests/tooling/Test-MIRDirectLibraryStartupMeasurement.ps1",
+        "tests/tooling/Test-MIRNativeProbeResources.ps1"
+      ],
+      "applicable_evidence": [
+        "spec/evidence/foundation-input-inventory-r04-native-chain-r01.json"
+      ],
+      "remaining_executable_check": "Use current exact profile/packet/config/output/process proofs and verify restoration after actual runs. Any particular unreviewed imported helper or old native result retains its own scope.",
+      "owner": "Black Glass owns native composition/repair/dispatch; Aero after-result review"
+    },
+    {
+      "obligation": "A scripted feature whose research is absent or disabled must retire only its own contribution and preserve foreign state.",
+      "original": [
+        {
+          "blob": "48770c32b86feda736c3b2f0079fe4e1f4ccf364",
+          "path": "tests/tooling/Test-MIRValidationResults.ps1",
+          "lines": "39-41"
+        }
+      ],
+      "disposition": "consolidate-current-semantic-controls",
+      "independent_expectation": "The old wrapper only searches for the disabled-data-stage spoilage skip diagnostic in the runner. Preserve safe omitted-technology handling; do not turn its exact log text or omission shape into a current player requirement.",
+      "implementation": [
+        "source/runtime/scripted_effects.lua",
+        "source/runtime/spoilage.lua",
+        "source/runtime/spoilage_contribution.lua",
+        "source/runtime/bootstrap.lua"
+      ],
+      "host_controls": [
+        {
+          "path": "tests/test_scripted_effects_lifecycle.py",
+          "tests": [
+            "test_disable_restores_only_our_matching_global_write_and_keeps_foreign_write",
+            "test_force_reset_merge_and_retired_source_reconcile_without_cap_callbacks"
+          ]
+        },
+        {
+          "path": "tests/test_spoilage.py",
+          "tests": [
+            "test_disable_never_overwrites_an_observed_foreign_value",
+            "test_unavailable_removal_property_retains_state_for_real_active_readdition"
+          ]
+        }
+      ],
+      "source_reason": "scripted_effects.on_configuration_changed calls spoilage.reconcile. Disabled config retires before force discovery; enabled-but-missing technology retires with reason missing-technology. Existing lifecycle controls omit that technology in disabled forces and later remove the last technology during force merge,checking contribution removal and unchanged unrelated state. No new production defect is demonstrated.",
+      "remaining_executable_check": "Existing affected native feature/provider-removal/save/client applicability remains separate. This source/test mapping creates no new native pass or requirement for the retired diagnostic string.",
+      "owner": "Aero intent review; Black Glass applicable native results"
+    },
+    {
+      "obligation": "Retain separately declared K2 science-phase and native-owner cost/effect obligations.",
+      "original": [
+        {
+          "blob": "48770c32b86feda736c3b2f0079fe4e1f4ccf364",
+          "path": "tests/tooling/Test-MIRValidationResults.ps1",
+          "lines": "43-75"
+        }
+      ],
+      "disposition": "consolidate-existing-subjects",
+      "independent_expectation": "Literal runner invocation and schema4 signature text show that those named scenarios were required by the old facade; they do not prove their gameplay or establish schema4 as a player API.",
+      "implementation": [
+        "source/research/k2_materials.lua",
+        "source/research/science.lua",
+        "source/research/native_owners.lua"
+      ],
+      "applicable_evidence": [
+        "spec/evidence/historical-scenario-manifest-intents-aero-r01.json",
+        "spec/evidence/historical-native-owner-settings-intent-aero-r01.json"
+      ],
+      "remaining_executable_check": "Keep original K2-01 and affected native-owner work/save obligations at their existing scopes. The earlier manifest/owner reviews own their exact expectations and known limits; no duplicate campaign or new request ID.",
+      "owner": "Aero reconciles existing K2/owner records; Black Glass executes affected native work"
+    },
+    {
+      "obligation": "Finite construction and measured resource growth remain required; do not recover the retired compiler stress graph.",
+      "original": [
+        {
+          "blob": "48770c32b86feda736c3b2f0079fe4e1f4ccf364",
+          "path": "tests/tooling/Test-MIRValidationResults.ps1",
+          "lines": "77-110"
+        }
+      ],
+      "disposition": "obsolete-implementation-only-with-retained-resource-purpose",
+      "independent_expectation": "100000 stress operations,25000-member SCCs,exact compiler operation payload shape and explicit temporary graph reclamation describe the old graph implementation. They are not current technology counts or a reason to restore a compiler. Current finite preflight/resource and whole-product performance contracts remain binding.",
+      "implementation": [
+        "source/research/generator.lua",
+        "tests/test_generator.py",
+        "spec/architecture.md",
+        "spec/performance.md",
+        "tools/lib/validation/ResourceGovernor.ps1"
+      ],
+      "remaining_executable_check": "Complete the existing current-candidate workload/resource/performance verdicts. No automatic rerun/port of the retired synthetic compiler graph is justified by this source classification.",
+      "owner": "Black Glass native measurements; Aero independent method/result review"
+    },
+    {
+      "obligation": "Preserve package separation and prevent a tooling preview or historical receipt from acquiring release authority.",
+      "original": [
+        {
+          "blob": "ccca932a0160cea359ee335c562faccb0d0e0064",
+          "path": "tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1",
+          "lines": "17-58,68-228"
+        },
+        {
+          "blob": "1bd4e169183a69a60c4cb5978ca35113ead44b92",
+          "path": "tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1",
+          "lines": "17-57,253-267"
+        }
+      ],
+      "disposition": "obsolete-implementation-only-with-retained-authority-boundaries",
+      "independent_expectation": "Receipt chains,facade parameter/line limits,21 module counts,135/7/4/4 registry counts,command digests,reconstructed file hashes and historical status strings are retired framework structure. Retain the explicit no-player-package-mutation/no-release-authority purpose through current source/package checks and checked release policy. Equality to HEAD proves file consistency,not independent semantic correctness.",
+      "implementation": [
+        "AGENTS.md",
+        "spec/repository.md",
+        "spec/targets.md",
+        "tools/package.py",
+        "tests/test_package.py",
+        "tests/test_host_controls.py"
+      ],
+      "remaining_executable_check": "Current exact package/inventory/publication checks remain required. Do not restore updater scripts,decomposition receipts,legacy validator or count-based run planning.",
+      "owner": "Aero package review; Black Glass checked integration/publication"
+    }
+  ],
+  "variant_dispositions": [
+    {
+      "blobs": [
+        "3fed0687ff984e9c3fbb6e98457d5ecade9e4659",
+        "bb5ee540ca93f06579a90082e3842f12bcc88f3e"
+      ],
+      "decision": "Forward to their canonical test path with PSBoundParameters; aliases are not additional substantive tests."
+    },
+    {
+      "blobs": [
+        "f666f529413eb2dd8b207936430275f7c939e1d6",
+        "c16e536e9e96d72494e57bbd9225b7c58a5c6739"
+      ],
+      "decision": "Basic recorder,classification and registry variants; retain provenance/incomplete/missing-scenario purpose without the retired output schema."
+    },
+    {
+      "blobs": [
+        "77fbdcca65f3ef31f3c3e62190b799398ed2e49f",
+        "b28acc9b837157b7e8c2f227461d43a4b5843e97"
+      ],
+      "decision": "Add zero-assertion/structured-failure checks; mock capability profiles and registry-row counts are tooling detail,not additional supported engines or product passes."
+    },
+    {
+      "blobs": [
+        "80dfd7058d31798d3eeec580bbb19fd33044f1cf",
+        "2257fd3fe4f8bf6a3d9deff5b469901fc7c79ace",
+        "dfb4ef911cc7d83cf21567727c2309b8ff35ab78",
+        "0a9930207c1b8761aabf73e26d29b2aa59dd770e",
+        "3693ff6d1fc45c8790e22c4016638c457dc6be79",
+        "48770c32b86feda736c3b2f0079fe4e1f4ccf364"
+      ],
+      "decision": "Canonical-root/runner-shape/bounded-output variants consolidate into the named assertion groups above. The final extra upgrade-manifest call is an explicit helper frontier,not a native pass or a claim that its body was reviewed here."
+    },
+    {
+      "blobs": [
+        "1bd4e169183a69a60c4cb5978ca35113ead44b92",
+        "ccca932a0160cea359ee335c562faccb0d0e0064"
+      ],
+      "decision": "Earlier static receipt/module values evolve to live facade/module parsing and historical reconstruction; both remain old decomposition/custody tests with explicit package/release firewalls. Retain no exact module count,line ceiling,registry cardinality or updater authority."
+    }
+  ],
+  "unreviewed_direct_frontier": [
+    "tools/lib/validation/ScenarioGroups.ps1",
+    "tools/lib/validation/ResultAggregation.ps1",
+    "tools/lib/validation/ScenarioRegistry.ps1",
+    "tests/tooling/Test-MIRUpgradeManifest.ps1",
+    "Imported validation facade,atomic process/settings helpers,bootstrap/package-succession/command-inventory bodies and referenced old receipt/schema chains; this slice reviews only assertions about them,not all transitive implementation or original runs."
+  ],
+  "source_body_intent_disposition_complete": true,
+  "product_qualification_complete": false,
+  "global_inventory_complete": false,
+  "validation": {
+    "raw_source_and_bindings": "14 complete Git blobs and195 original refs checked;192 current remote matches plus3 explicit local aliases",
+    "current_host_controls": "mapped,not newly run for this documentation-only disposition",
+    "native_execution": false,
+    "release_qualification": false,
+    "stable_acceptance": false
+  },
+  "limits": [
+    "No player/test/request-ledger/progress-header/native-controller/target or published-byte change.",
+    "The finite historical recorder/decomposition family is reconciled; all5058 sources,inter-release discussions and missing originals are not declared complete.",
+    "Routine native preparation/repair/dispatch remains autonomous; this record creates no prospective review gate."
+  ]
+}

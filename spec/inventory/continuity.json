@@ -16699,6 +16699,30 @@
         "product_qualification_complete": false,
         "native_execution": false,
         "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-08",
+          "CONT-10",
+          "CONT-12",
+          "CONT-15",
+          "CONT-17",
+          "VER-07"
+        ],
+        "reviewed_against": "efaa3859db1e72c57f53ef281b50c3c2ca7808ea",
+        "scope": "Two named historical validation-result/runner test families;14 complete bodies/151488bytes,195 retained bindings,192 live remote matches and3 explicit local aliases. Direct helper bodies remain a separate frontier.",
+        "evidence": {
+          "path": "spec/evidence/historical-validation-result-intents-aero-r01.json",
+          "sha256": "11966B559C3331E667E7EEE7210065B981B94F336A933133B2E0CED5407966E0"
+        },
+        "disposition": "Consolidate provenance/incomplete/failure/nonempty-observation and omitted-spoilage safety intents; retain named K2/native-owner/resource/package/release boundaries. Retire only forwarding,recorder-schema,registry/module/receipt/compiler-graph implementation details.",
+        "remaining_executable_check": "Existing affected native and final-package obligations retain their original CONT/request owners and exact result identities. Resolve direct helper/frontier and remaining historical/inter-release sources without rerunning retired machinery.",
+        "owner": "Aero historical/independent review; Black Glass routine native/integration/publication",
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false,
+        "release_qualification": false
       }
     ],
     "stable_coverage_review": {
