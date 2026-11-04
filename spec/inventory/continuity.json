@@ -16637,6 +16637,28 @@
         "test_intent_reconciliation_complete": false,
         "native_execution": false,
         "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-17",
+          "VER-07"
+        ],
+        "reviewed_against": "8cc778283f7df67ca60b1acbd6f1ec8080e9ee45",
+        "scope": "Five complete historical dependency-declaration test/wrapper bodies and174 original tag/path bindings; six parser cases, not graph or native compatibility.",
+        "evidence": "spec/evidence/historical-dependency-resolver-intent-aero-r01.json",
+        "disposition": "consolidate-existing-six-literal-control-retire-path-only-wrappers",
+        "independent_expectation": "Preserve names with spaces, ordinary/hidden optional/recommended/no-order/incompatible kinds and exact requiredness. Wrapper movement does not erase the independent six-row assertion.",
+        "current_implementation": [
+          "tools/lib/compatibility/ModPortal.ps1::ConvertFrom-MIRDependencyString",
+          "tools/lib/compatibility/LibraryActivation.ps1::Assert-MIRLibraryDependencies"
+        ],
+        "current_host_controls": [
+          "tests/test_dependency_declarations.py::DependencyDeclarationControls.test_historical_names_kinds_and_required_flags"
+        ],
+        "remaining_executable_check": "Retain the existing declaration control and distinct native/profile applicability. This family supplies no version-resolution, acquisition, full helper or gameplay verdict; no unchanged native rerun is required by its documentation reconciliation.",
+        "source_reconciliation_complete": false,
+        "native_execution": false,
+        "release_qualification": false
       }
     ],
     "stable_coverage_review": {
