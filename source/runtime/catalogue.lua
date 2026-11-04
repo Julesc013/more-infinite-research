@@ -10,6 +10,7 @@ local foreign_technology_prototypes
 local native_adoptions
 local withheld_native_owners
 local native_credit_groups
+local retirement_facts = {}
 if target.id == "f200" or target.id == "f210" then
   local live_technologies
   if prototypes ~= nil and prototypes.technology ~= nil then
@@ -58,7 +59,7 @@ if target.id == "f200" or target.id == "f210" then
   local adopted = native_data and native_data["more-infinite-research-native-adoptions"]
   if adopted ~= nil then
     native_adoptions, withheld_native_owners, native_credit_groups = require("research.native_adoption").read(adopted.data,
-      modern.native_owners(script and script.active_mods))
+      modern.native_owners(script and script.active_mods), retirement_facts)
   end
 end
 
@@ -66,6 +67,10 @@ local M = {}
 
 function M.native_credit_groups()
   return require("research.native_adoption").credit_groups(native_credit_groups)
+end
+
+function M.galore_sulfur_retired()
+  return retirement_facts.galore_sulfur_retired == true
 end
 
 -- Select and retain the bounded authored rows during control parsing, before

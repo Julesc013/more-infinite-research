@@ -23,6 +23,10 @@ local PUBLISHED_F200_M4_VERSIONS = {
 }
 local groups = type(catalogue.native_credit_groups) == "function" and catalogue.native_credit_groups() or nil
 local DESCRIPTORS = definitions.descriptors(groups)
+local GALORE_DESCRIPTOR
+for _, row in ipairs(DESCRIPTORS) do
+  if row.family == "research_sulfur" and row.recipe == "vgal-coal-crushing" then GALORE_DESCRIPTOR = row end
+end
 local COLLECTED_BY_KEY, COLLECTED_BY_MAIN, history_seen = {}, {}, {}
 local FAMILY_IDS = {
   research_low_density_structure="recipe-prod-research_low_density_structure-1",
@@ -270,7 +274,7 @@ local function apply_offset(observation, offset)
   set_level_and_disable(observation.negative, 1 + negative)
 end
 
-local function reconcile_force(force)
+local function reconcile_force(force, galore_baselines)
   if not valid_force(force) then return end
   local existing = records_for(force, false)
   -- Validate all stored values before any native write.  It is legitimate for
@@ -293,10 +297,19 @@ local function reconcile_force(force)
     if record == nil then
       -- MIR4 did not persist the prior preference.  Current inclusion and
       -- native carrier levels are the only honest first-upgrade baseline.
-      records[observation.descriptor.recipe] = {
+      local prior = galore_baselines and galore_baselines[force.index]
+      local offset = observation.offset
+      if observation.descriptor == GALORE_DESCRIPTOR and prior ~= nil then
+        offset = offset + ((prior and 1 or 0) - (observation.included and 1 or 0)) * observation.completed
+      end
+      record = {
         included = observation.included,
-        offset = observation.offset,
+        offset = offset,
       }
+      records[observation.descriptor.recipe] = record
+      if offset ~= observation.offset then
+        plans[#plans + 1] = {observation=observation, record=record, offset=offset}
+      end
     else
       local old_included = record.included and 1 or 0
       local new_included = observation.included and 1 or 0
@@ -398,11 +411,53 @@ local function legacy_family_context(event)
   local beta_base = same_inputs and type(active.base) == "string" and (
     active.base:match("^2%.0%.%d+$") and (old == "5.0.20000" or old == "5.0.20001" or old == "5.0.20002")
     or active.base:match("^2%.1%.%d+$") and (old == "5.0.21000" or old == "5.0.21001" or old == "5.0.21002"))
+  -- The frozen pre-correction5.0.3 also has the broad sulfur binding. Valid
+  -- corrected saves already have the named record and never use this reader.
+  local beta_unchanged = beta_base or same_inputs and type(active.base) == "string" and (
+    active.base:match("^2%.0%.%d+$") and old == "5.0.20003"
+    or active.base:match("^2%.1%.%d+$") and old == "5.0.21003")
   if beta_base then
     for name in pairs(active) do if name ~= "base" and name ~= MIR_MOD then beta_base = false end end
   end
-  return {beta_base=beta_base, m4_base=m4_base, sif502=old == "5.0.20002" and previous_sif,
+  return {beta_base=beta_base, beta_unchanged=beta_unchanged, m4_base=m4_base, sif502=old == "5.0.20002" and previous_sif,
     sif473=unchanged and previous_sif and (old == "4.7.20002" or old == "4.7.20003")}
+end
+
+-- The published betas' unchanged literal product binding included sulfur
+-- before this named retirement. A data-stage retirement fact records that
+-- exact removal; it is not a baseline for MIR4 or changed provider/settings.
+local function preflight_galore(context, fresh, selected_force)
+  if not GALORE_DESCRIPTOR then return nil end
+  local baselines
+  local forces = selected_force and {[selected_force.index]=selected_force} or game and game.forces or {}
+  for _, force in pairs(forces) do
+    if valid_force(force) then
+      local observation = inspect_with_mask(force, GALORE_DESCRIPTOR)
+      if observation then
+        local records = not fresh and records_for(force, false) or nil
+        validate_records(records)
+        local record = records and records[GALORE_DESCRIPTOR.recipe]
+        if record then
+          if record.offset ~= observation.offset then family_failure("Galore saved offset differs from native carriers") end
+        else
+          if observation.offset ~= 0 then family_failure("Galore first baseline has unproven native credit") end
+          local prior = observation.included
+          if not fresh and observation.completed > 0 then
+            if not context.beta_unchanged then
+              family_failure("unknown first paid Galore mask; restore original save and inputs; a known source mask is required")
+            end
+            local retired = type(catalogue.galore_sulfur_retired) == "function" and catalogue.galore_sulfur_retired()
+            prior = observation.included or retired == true
+          end
+          local wanted = ((prior and 1 or 0) - (observation.included and 1 or 0)) * observation.completed
+          if not integer(wanted) or math.abs(wanted) >= UINT32_MAX then family_failure("Galore credit exceeds native levels") end
+          baselines = baselines or {}
+          baselines[force.index] = prior
+        end
+      end
+    end
+  end
+  return baselines
 end
 
 local function refresh_pending()
@@ -431,9 +486,10 @@ function M.needs_research_events() return pending_active end
 -- an isolated schema-shaped record is not that proof.
 function M.preflight_family_transition(event, fresh, selected_force)
   local current = existing_state()
-  if next(COLLECTED_BY_MAIN) == nil and (groups == nil or next(groups) == nil)
-      and (not current or current.families == nil) then return {} end
   local context, plans = legacy_family_context(event), {}
+  plans.galore_baselines = preflight_galore(context, fresh, selected_force)
+  if next(COLLECTED_BY_MAIN) == nil and (groups == nil or next(groups) == nil)
+      and (not current or current.families == nil) then return plans end
   local forces = selected_force and {[selected_force.index]=selected_force} or game and game.forces or {}
   for _, force in pairs(forces) do
     if valid_force(force) then
@@ -648,13 +704,13 @@ local function disable_exact_carriers(force)
   end
 end
 
-local function reconcile_all()
+local function reconcile_all(galore_baselines)
   -- Factorio exposes this collection as LuaCustomTable userdata, not a plain
   -- Lua table. Its supported pairs iterator is the force lifecycle boundary.
   if not game or not game.forces then return end
   -- This iterates only Factorio's force lifecycle collection.  Technology and
   -- prototype access stays direct and descriptor-named in inspect_with_mask.
-  for _, force in pairs(game.forces) do reconcile_force(force) end
+  for _, force in pairs(game.forces) do reconcile_force(force, galore_baselines) end
 end
 
 local function published_m4_startup_change(event)
@@ -703,13 +759,13 @@ end
 
 function M.on_init()
   local plans = M.preflight_family_transition(nil, true)
-  reconcile_all()
+  reconcile_all(plans.galore_baselines)
   apply_family_plans(plans)
 end
 
 function M.on_configuration_changed(event, plans)
   plans = plans or M.preflight_family_transition(event)
-  reconcile_all()
+  reconcile_all(plans.galore_baselines)
   apply_family_plans(plans)
 end
 
@@ -718,7 +774,7 @@ function M.on_force_created(event)
   if not valid_force(force) then return end
   local plans = M.preflight_family_transition(nil, true, force)
   clear_force(force.index)
-  reconcile_force(force)
+  reconcile_force(force, plans.galore_baselines)
   apply_family_plans(plans)
   disable_exact_carriers(force)
 end
@@ -728,7 +784,7 @@ function M.on_force_reset(event)
   if not valid_force(force) then return end
   local plans = M.preflight_family_transition(nil, true, force)
   clear_force(force.index)
-  reconcile_force(force)
+  reconcile_force(force, plans.galore_baselines)
   apply_family_plans(plans)
   disable_exact_carriers(force)
 end
@@ -742,7 +798,7 @@ function M.on_forces_merged(event)
   local plans = M.preflight_family_transition(nil, false, destination)
   clear_force(event and event.source_index)
   clear_force(destination.index)
-  reconcile_force(destination)
+  reconcile_force(destination, plans.galore_baselines)
   apply_family_plans(plans)
   disable_exact_carriers(destination)
 end

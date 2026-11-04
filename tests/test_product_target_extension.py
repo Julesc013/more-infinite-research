@@ -3,12 +3,22 @@ import argparse
 from pathlib import Path
 import sys
 import unittest
+from historical_sources import read_published_source
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAYER = ROOT / "source"
 
 
 class ProductTargetExtensionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.galore_producer = read_published_source(ROOT,
+            "fixtures/space-age-galore-overlap/data.lua",
+            "9BD30B996DDF4169674C00D7565220E1B251E584BBC3ECAFD1CDFFA8058BE00E").decode()
+        cls.galore_oracle = read_published_source(ROOT,
+            "fixtures/space-age-galore-overlap/data-final-fixes.lua",
+            "B458F44E50023570113BF4C0E2764DA1015F0104E5C4C5E012F001BA210919DF").decode()
+
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().player_root = PLAYER.as_posix()
@@ -616,6 +626,74 @@ class ProductTargetExtensionTests(unittest.TestCase):
           assert(result.extended_effects==2 and #row.effects==3)
           assert(row.effects[2].recipe=='cooling' and row.effects[2].change==.15)
           assert(row.effects[3].recipe=='producer' and row.effects[3].change==.15)
+        ''')
+
+    def galore_rows(self):
+        self.lua.globals().galore_producer = self.galore_producer
+        self.lua.globals().galore_oracle = self.galore_oracle
+        self.lua.execute('''
+          local recipes={}
+          data={raw={recipe=recipes,technology={}},extend=function(self,rows)
+            for _,row in ipairs(rows) do self.raw[row.type][row.name]=row end
+          end}
+          assert(load(galore_producer))()
+          carbon=generated("research_carbon",{productivity("carbonic-asteroid-crushing",.10)})
+          sulfur=generated("research_sulfur",{productivity("sulfur",.17)})
+          owned={carbon,sulfur}
+          before_recipe=frozen_copy(data.raw.recipe)
+          extension.extend(owned,{streams={research_carbon={effect_percent=10},research_sulfur={effect_percent=17}}},
+            {raw=data.raw,mods={["space-age"]="2.1.23"}})
+          for _,row in ipairs(owned) do data.raw.technology[row.name]=row end
+        ''')
+
+    def test_galore_original_single_owner_oracle_and_unrelated_effects(self):
+        self.galore_rows()
+        self.lua.execute('''
+          -- The unmodified historical oracle rejects the old two-owner output.
+          if type(extension.retain_galore_carbon_owner)=="function" then
+            assert(extension.retain_galore_carbon_owner(owned)==true)
+          end
+          assert(load(galore_oracle))()
+          assert(#sulfur.effects==1 and sulfur.effects[1].recipe=="sulfur" and sulfur.effects[1].change==.17)
+          assert(frozen_copy(data.raw.recipe)==before_recipe,"foreign recipe changed")
+          assert(extension.retain_galore_carbon_owner(owned)==false,"retirement repeated")
+        ''')
+
+    def test_galore_unavailable_carbon_keeps_useful_sulfur_and_ordinary_multioutput(self):
+        for condition in ("disabled", "hidden", "absent", "unproductive"):
+            with self.subTest(condition=condition):
+                self.setUp()
+                self.galore_rows()
+                self.lua.globals().condition = condition
+                self.lua.execute('''
+                  if condition=="disabled" then carbon.enabled=false
+                  elseif condition=="hidden" then carbon.hidden=true
+                  elseif condition=="absent" then owned={sulfur}
+                  else
+                    for _,e in ipairs(carbon.effects) do if e.recipe=="vgal-coal-crushing" then e.change=0 end end
+                  end
+                  local prior=frozen_copy(sulfur)
+                  assert(extension.retain_galore_carbon_owner(owned)==false)
+                  assert(frozen_copy(sulfur)==prior,"useful sulfur target lost")
+                ''')
+        self.setUp()
+        self.galore_rows()
+        self.lua.execute('''
+          carbon.effects[#carbon.effects+1]=productivity("unrelated-multi-output",.13)
+          sulfur.effects[#sulfur.effects+1]=productivity("unrelated-multi-output",.17)
+          assert(extension.retain_galore_carbon_owner(owned)==true)
+          assert(carbon.effects[#carbon.effects].recipe=="unrelated-multi-output")
+          assert(sulfur.effects[#sulfur.effects].recipe=="unrelated-multi-output")
+        ''')
+
+    def test_galore_internal_duplicates_still_refuse_before_mutation(self):
+        self.galore_rows()
+        self.lua.execute('''
+          sulfur.effects[#sulfur.effects+1]=productivity("vgal-coal-crushing",.17)
+          local prior=frozen_copy(owned)
+          local ok,message=pcall(extension.retain_galore_carbon_owner,owned)
+          assert(not ok and tostring(message):find("Galore",1,true),"duplicate was silently discarded")
+          assert(frozen_copy(owned)==prior,"duplicate refusal mutated output")
         ''')
 
     def test_inactive_space_age_and_literal_families_do_not_read_pattern_classes(self):

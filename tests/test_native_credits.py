@@ -20,6 +20,11 @@ class NativeCreditRuntimeTests(unittest.TestCase):
           native_credit_definitions = require("research.native_credit_definitions")
           native_credits = require("runtime.native_credits")
           descriptors = native_credit_definitions.descriptors()
+          -- These default worlds contain the original twelve recipes, not
+          -- Galore's optional recipe. Its explicit controls opt in below.
+          for i=#descriptors,1,-1 do
+            if descriptors[i].recipe=="vgal-coal-crushing" then table.remove(descriptors,i) end
+          end
           UINT32_MAX = 4294967295
 
           function make_technology(name, prototype, level, researched, enabled)
@@ -131,6 +136,114 @@ class NativeCreditRuntimeTests(unittest.TestCase):
             local descriptor = descriptor_for(recipe)
             return force.technologies[direction == "positive" and descriptor.positive_id or descriptor.negative_id]
           end
+        ''')
+
+    def galore_force(self, included=False, retired=True):
+        self.lua.globals().galore_included = included
+        self.lua.globals().galore_retired = retired
+        self.lua.execute('''
+          for _,d in ipairs(native_credit_definitions.descriptors()) do
+            if d.recipe=="vgal-coal-crushing" then descriptors[#descriptors+1]=d;galore=d end
+          end
+          assert(galore)
+          require("runtime.catalogue").galore_sulfur_retired=function()return galore_retired end
+          script={active_mods={base="2.1.23",["space-age"]="2.1.23",
+            ["fixture-galore-producer"]="0.1.0",["more-infinite-research"]="5.0.21003"}}
+          f=make_force(1,{[galore.recipe]=galore_included},{[galore.main_id]=8},nil,{[galore.recipe]=.17})
+          game.forces[1]=f
+          t=f.technologies[galore.main_id]
+          t.saved_progress=.27;f.research_queue={t};f.current_research=t;f.research_progress=.42
+          beta_event={mod_startup_settings_changed=false,
+            mod_changes={["more-infinite-research"]={old_version="5.0.21002",new_version="5.0.21003"}}}
+        ''')
+
+    def test_galore_beta_paid_credit_preserves_queue_and_stops_future_sulfur_gain(self):
+        self.galore_force()
+        self.lua.execute('''
+          local queue=f.research_queue
+          native_credits.on_configuration_changed(beta_event)
+          local record=ledger(f,galore.recipe)
+          assert(record.included==false and record.offset==7)
+          assert(holder(f,galore.recipe,"positive").level==8)
+          assert(holder(f,galore.recipe,"positive").prototype.effects[1].change==.17)
+          assert(f.research_queue==queue and f.current_research==t and f.research_progress==.42 and t.saved_progress==.27)
+          local writes=f._states[galore.positive_id].writes.level
+          native_credits.on_configuration_changed()
+          assert(f._states[galore.positive_id].writes.level==writes)
+          -- The queued sulfur work keeps its investment, but future coal
+          -- gains belong to carbon. A new sulfur completion earns no credit.
+          f._states[galore.main_id].level=9
+          native_credits.on_configuration_changed()
+          assert(ledger(f,galore.recipe).offset==7 and holder(f,galore.recipe,"positive").level==8)
+          assert(not native_credits.needs_research_events(),"public correction added a queue subscriber")
+          assert(f.external_bonus==17.25 and f.reset_calls==0)
+        ''')
+
+    def test_galore_no_retirement_does_not_invent_an_old_sulfur_effect(self):
+        self.galore_force(False,False)
+        self.lua.execute('''
+          native_credits.on_configuration_changed(beta_event)
+          assert(ledger(f,galore.recipe).offset==0 and holder(f,galore.recipe,"positive").level==1)
+        ''')
+
+    def test_galore_pre_correction_503_to_next_release_has_the_same_paid_reader(self):
+        self.galore_force()
+        self.lua.execute('''
+          script.active_mods["more-infinite-research"]="5.0.21004"
+          beta_event.mod_changes["more-infinite-research"]={old_version="5.0.21003",new_version="5.0.21004"}
+          native_credits.on_configuration_changed(beta_event)
+          assert(ledger(f,galore.recipe).offset==7 and holder(f,galore.recipe,"positive").level==8)
+        ''')
+
+    def test_galore_prior_and_later_sulfur_ownership_keep_exact_signed_credit(self):
+        self.galore_force(True,False)
+        self.lua.execute('''
+          native_credits.on_configuration_changed(beta_event)
+          assert(ledger(f,galore.recipe).offset==0)
+          set_included(f,galore.recipe,false)
+          native_credits.on_configuration_changed()
+          assert(ledger(f,galore.recipe).offset==7)
+          f._states[galore.main_id].level=10
+          set_included(f,galore.recipe,true)
+          native_credits.on_configuration_changed()
+          assert(ledger(f,galore.recipe).offset==-2 and holder(f,galore.recipe,"negative").level==3)
+          assert(f.research_progress==.42 and t.saved_progress==.27)
+        ''')
+
+    def test_galore_unknown_first_mask_refuses_all_writes(self):
+        for change in ("startup", "provider", "unknown-origin", "cross-edition"):
+            with self.subTest(change=change):
+                self.setUp()
+                self.galore_force()
+                self.lua.globals().opponent=change
+                self.lua.execute('''
+                  if opponent=="startup" then beta_event.mod_startup_settings_changed=true
+                  elseif opponent=="provider" then beta_event.mod_changes["fixture-galore-producer"]={old_version="0.0.1",new_version="0.1.0"}
+                  elseif opponent=="unknown-origin" then beta_event.mod_changes["more-infinite-research"].old_version="4.7.21003"
+                  else beta_event.mod_changes["more-infinite-research"].old_version="5.0.20002" end
+                  local ok,message=pcall(native_credits.on_configuration_changed,beta_event)
+                  assert(not ok and tostring(message):find("Galore mask",1,true),"unknown paid mask admitted")
+                  assert(storage.mir_native_credits==nil)
+                  for _,s in pairs(f._states) do assert(s.writes.level==0 and s.writes.enabled==0) end
+                ''')
+
+    def test_galore_merge_keeps_destination_credit_and_readonly_load(self):
+        self.galore_force()
+        self.lua.execute('''
+          native_credits.on_configuration_changed(beta_event)
+          local source=make_force(2,{}, {[galore.main_id]=4},nil,{[galore.recipe]=.17})
+          game.forces[2]=source
+          native_credits.on_configuration_changed(beta_event)
+          set_included(source,galore.recipe,false);native_credits.on_configuration_changed()
+          assert(ledger(source,galore.recipe).offset==3 and ledger(f,galore.recipe).offset==7)
+          game.forces[2]=nil;source.valid=false
+          native_credits.on_forces_merged({destination=f,source_index=2})
+          assert(storage.mir_native_credits.forces[2]==nil)
+          assert(ledger(f,galore.recipe).offset==7 and holder(f,galore.recipe,"positive").level==8)
+          local writes=f._states[galore.positive_id].writes.level
+          native_credits.on_load()
+          assert(ledger(f,galore.recipe).offset==7 and f._states[galore.positive_id].writes.level==writes)
+          assert(f.research_progress==.42 and t.saved_progress==.27)
         ''')
 
     def test_true_completed_level_one_to_false_writes_one_positive_credit_and_keeps_native_setter_hidden(self):

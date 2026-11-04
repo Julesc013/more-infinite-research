@@ -63,6 +63,7 @@ class NativeCreditDefinitionTests(unittest.TestCase):
             {"research_breeding", "recipe-prod-research_breeding-1", "pentapod-egg"},
             {"research_concrete", "recipe-prod-research_concrete-1", "stone-brick"},
             {"research_sulfuric_acid_productivity", "recipe-prod-research_sulfuric_acid_productivity-1", "sulfuric-acid"},
+            {"research_sulfur", "recipe-prod-research_sulfur-1", "vgal-coal-crushing"},
           }
 
           function values(percent)
@@ -100,7 +101,7 @@ class NativeCreditDefinitionTests(unittest.TestCase):
           end
         ''')
 
-    def test_exact_twelve_descriptors_emit_twenty_four_isolated_native_carriers(self):
+    def test_exact_thirteen_descriptors_emit_twenty_six_isolated_native_carriers(self):
         self.lua.execute(r'''
           local descriptors = credit.descriptors()
           assert(#descriptors == #expected)
@@ -115,14 +116,14 @@ class NativeCreditDefinitionTests(unittest.TestCase):
             main_rows[row.main_id] = true
           end
           local main_count = 0; for _ in pairs(main_rows) do main_count = main_count + 1 end
-          assert(main_count == 9)
+          assert(main_count == 10)
           descriptors[1].recipe = "corrupted"
           assert(credit.descriptors()[1].recipe == "copper-plate", "descriptor export leaked mutable state")
 
           local technologies, raw = inputs()
           local original_count, original_effect = #technologies, technologies[1].effects[1].change
           local added = credit.append(technologies, raw, values(10), {recipe_productivity=true})
-          assert(#added == 24 and #technologies == original_count + 24)
+          assert(#added == 26 and #technologies == original_count + 26)
           assert(technologies[1].effects[1].change == original_effect and raw.recipe["copper-plate"].name == "copper-plate")
           local names = rows_by_name(added)
           for _, descriptor in ipairs(credit.descriptors()) do
@@ -158,7 +159,7 @@ class NativeCreditDefinitionTests(unittest.TestCase):
           technologies, raw = inputs("recipe-prod-research_concrete-1", "firearm-magazine")
           rows = credit.append(technologies, raw, values(10), {recipe_productivity=true})
           by_name = rows_by_name(rows)
-          assert(#rows == 20)
+          assert(#rows == 22)
           assert(by_name["mir-native-credit-research_concrete-stone-brick-positive"] == nil)
           assert(by_name["mir-native-credit-research_bullets-firearm-magazine-positive"] == nil)
           assert(by_name["mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-positive"] ~= nil)
