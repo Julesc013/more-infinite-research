@@ -1,4 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.4
+Date: 2026-11-05
+
+  Bugfixes:
+
+    - Avoid redundant future weapon-speed upgrades when qualified native research already covers every effect, while retaining
+      earned bonuses.
+    - Avoid duplicate future productivity for Galore coal crushing while retaining earned sulfur bonuses and other sulfur research
+      effects.
+    - Avoid errors when a research event refers to a technology that is missing or no longer valid.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.3
 Date: 2026-11-04
 

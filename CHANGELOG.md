@@ -2,6 +2,14 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.4] - 2026-11-05
+
+### Bugfixes
+
+- Avoid redundant future weapon-speed upgrades when qualified native research already covers every effect, while retaining earned bonuses.
+- Avoid duplicate future productivity for Galore coal crushing while retaining earned sulfur bonuses and other sulfur research effects.
+- Avoid errors when a research event refers to a technology that is missing or no longer valid.
+
 ## [5.0.3] - 2026-11-04
 
 ### Bugfixes
