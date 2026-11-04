@@ -1,0 +1,223 @@
+{
+  "schema": 1,
+  "kind": "MIRSIFZeroTimeInheritanceNativeCompletionChainV1",
+  "status": "independent-PASS-exact-four-arm-data-stage-only",
+  "reviewed_on": "2026-11-04",
+  "scope": "The five retained SIF manufacturing identities accept valid zero research-time inheritance without changing their published default definitions or current native-owner definitions. Controlled startup defaults only; no save/gameplay/import/client/performance/release verdict.",
+  "source": {
+    "player_commit": "f6756b90ea952b3b7a46a2452137a92661cefa7a",
+    "player_tree": "58480faa995eab995cc0a3ad2cddbbdd0e5e0c04",
+    "private_caller_commit": "19552c0f0e6999aaf9ec8d3eae4de08118a67bfd",
+    "private_fixture_commit": "1740d24d413d24393377e57f4193755ed0309b32",
+    "input_manifest_sha256": "4B6B6DB9A106166C73498FE65C3CB64D591D9AA670E4BB0271637693987E1F90",
+    "caller_sha256": "E1687C7FA8C94232BBFAF701BC2C67EB7398D3324F78D37D3D8120AE6CC9F9E4",
+    "published_tag": "v5.0.2",
+    "published_package": {
+      "bytes": 774803,
+      "sha256": "30120C52D9A18ED7454CF501F17BD48CE06D2B77AA0ED12E888405BA93E298C1"
+    },
+    "private_test_package": {
+      "bytes": 784646,
+      "sha256": "07A62C8276EB5F63FFBE2E98D4194E72A1E15177B6C67929F8010207C06A8967"
+    },
+    "distribution_version": "5.0.20002",
+    "private_bytes_not_publicly_released": true,
+    "engine": "2.0.77",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "loaded_selection": [
+      "base@2.0.77",
+      "cr-commons@1.0.27",
+      "elevated-rails@2.0.77",
+      "mir-fixture-mir5-active-mods-observer@0.1.0",
+      "mir-fixture-mir5-sif-retained-manufacturing@0.4.0",
+      "more-infinite-research@5.0.20002",
+      "quality@2.0.77",
+      "space-age@2.0.77",
+      "space-is-fake@1.0.60"
+    ],
+    "default_profile_sha256": "37BF7B6D2E45C5534D82F3DC97EF69ED1AFE46ED5F4E820EDAE0C1D9F6773348",
+    "controlled_profile_sha256": "1C9A1C8D414E7A65BB1E9D04ECFDC371372AF8DD065437955F4E645BC7AA4BE5"
+  },
+  "expectation": {
+    "retained_contract": "spec/evidence/sif-entry-boundary-native-chain-r01.json",
+    "fixture_facts": "tests/fixtures/sif-retained-manufacturing/expectations.json",
+    "fixture_facts_sha256": "63FE049D111147EC6269D93371B3482EA60F4601A709E4D3EA37BF7B8F38AA3C",
+    "source": "Retained published 4.7.3 paid identities and eleven recipe rights, reviewed independently before candidate dispatch. Actual published5.0.2 default rows are the complete-object comparison baseline.",
+    "actual_zero_guard": "[MIR_SIF_ZERO_TIME_INPUT] ips-research-time-research_low_density_structure=0;ips-research-time-research_plastic=0;ips-research-time-research_processing_unit=0;ips-research-time-research_rocket_fuel=0;ips-research-time-research_steel=0",
+    "five_rows": [
+      {
+        "family": "research_low_density_structure",
+        "id": "recipe-prod-research_low_density_structure-1",
+        "product": "low-density-structure",
+        "recipes": {
+          "casting-low-density-structure": "low-density-structure-productivity",
+          "low-density-structure": "low-density-structure-productivity",
+          "scrap-recycling": "scrap-recycling-productivity"
+        }
+      },
+      {
+        "family": "research_plastic",
+        "id": "recipe-prod-research_plastic-1",
+        "product": "plastic-bar",
+        "recipes": {
+          "bioplastic": "plastic-bar-productivity",
+          "plastic-bar": "plastic-bar-productivity"
+        }
+      },
+      {
+        "family": "research_processing_unit",
+        "id": "recipe-prod-research_processing_unit-1",
+        "product": "processing-unit",
+        "recipes": {
+          "processing-unit": "processing-unit-productivity"
+        }
+      },
+      {
+        "family": "research_rocket_fuel",
+        "id": "recipe-prod-research_rocket_fuel-1",
+        "product": "rocket-fuel",
+        "recipes": {
+          "ammonia-rocket-fuel": "rocket-fuel-productivity",
+          "rocket-fuel": "rocket-fuel-productivity",
+          "rocket-fuel-from-jelly": "rocket-fuel-productivity"
+        }
+      },
+      {
+        "family": "research_steel",
+        "id": "recipe-prod-research_steel-1",
+        "product": "steel-plate",
+        "recipes": {
+          "casting-steel": "steel-plate-productivity",
+          "steel-plate": "steel-plate-productivity"
+        }
+      }
+    ],
+    "required_holder_time": 60,
+    "required_holder_hidden": true,
+    "required_productivity_per_recipe": 0.1,
+    "native_owner_ids": [
+      "low-density-structure-productivity",
+      "plastic-bar-productivity",
+      "processing-unit-productivity",
+      "rocket-fuel-productivity",
+      "scrap-recycling-productivity",
+      "steel-plate-productivity"
+    ]
+  },
+  "actual": {
+    "arms": [
+      {
+        "role": "published-default",
+        "result_sha256": "555422E70C7171DC766E9B8805749D0226186A9EC22E8918068466D616C4424D",
+        "native_pid": 31576,
+        "ledger_rows": 21,
+        "natural_exit": 0,
+        "actual_zero_marker": 0,
+        "profile_sha256": "37BF7B6D2E45C5534D82F3DC97EF69ED1AFE46ED5F4E820EDAE0C1D9F6773348",
+        "mir_sha256": "30120C52D9A18ED7454CF501F17BD48CE06D2B77AA0ED12E888405BA93E298C1",
+        "raw_log_sha256": "D8353B9CD365A01396E6BF941CE3A591E79FDF249AE48D96FFEE1D394FCD506E",
+        "dump_sha256": "EF3D35585909EDF7E20DACA64D0EDDA41047E655518AF2CF6D8AED0599C25060",
+        "restoration_receipts_verified": true
+      },
+      {
+        "role": "corrected-default",
+        "result_sha256": "9039D25267FB9166467387099ECD2711AAAC010D5FCF735E8131611376E43333",
+        "native_pid": 26116,
+        "ledger_rows": 6,
+        "natural_exit": 0,
+        "actual_zero_marker": 0,
+        "profile_sha256": "37BF7B6D2E45C5534D82F3DC97EF69ED1AFE46ED5F4E820EDAE0C1D9F6773348",
+        "mir_sha256": "07A62C8276EB5F63FFBE2E98D4194E72A1E15177B6C67929F8010207C06A8967",
+        "raw_log_sha256": "B373D0DCCB3389566D9E7DC82CB3448738F80DE2455B39C4163C2134AF8DC62F",
+        "dump_sha256": "766CC5158280B53660CF95452CE7772C3264F8331844CC3986C1457E304E9545",
+        "restoration_receipts_verified": true
+      },
+      {
+        "role": "published-zero",
+        "result_sha256": "C6502B33FFC434F4C8D8B29F7EF2D21DEBAAEA395341A8A8A1E016799D9D9AE6",
+        "native_pid": 17592,
+        "ledger_rows": 4,
+        "natural_exit": 1,
+        "actual_zero_marker": 1,
+        "profile_sha256": "1C9A1C8D414E7A65BB1E9D04ECFDC371372AF8DD065437955F4E645BC7AA4BE5",
+        "mir_sha256": "30120C52D9A18ED7454CF501F17BD48CE06D2B77AA0ED12E888405BA93E298C1",
+        "raw_log_sha256": "586AC86AC3E97324723D1A080DA75EC6DE7F4514CAFC612E1FE287BF2468ECAE",
+        "dump_sha256": null,
+        "restoration_receipts_verified": true
+      },
+      {
+        "role": "corrected-zero",
+        "result_sha256": "BA8E82FE4FCAD2312C5CE66089B6CAC312A9C5C1741F98CD8672C73240F0ED91",
+        "native_pid": 32716,
+        "ledger_rows": 6,
+        "natural_exit": 0,
+        "actual_zero_marker": 1,
+        "profile_sha256": "1C9A1C8D414E7A65BB1E9D04ECFDC371372AF8DD065437955F4E645BC7AA4BE5",
+        "mir_sha256": "07A62C8276EB5F63FFBE2E98D4194E72A1E15177B6C67929F8010207C06A8967",
+        "raw_log_sha256": "E232BA3C52A51B32055AE2A1F892C31D199DBA6AEDDEB47E0027B1B0A27394B1",
+        "dump_sha256": "766CC5158280B53660CF95452CE7772C3264F8331844CC3986C1457E304E9545",
+        "restoration_receipts_verified": true
+      }
+    ],
+    "natural_exits": [
+      0,
+      0,
+      1,
+      0
+    ],
+    "published_zero_failure": "MIR technology preflight: recipe-prod-research_low_density_structure-1 has invalid research time",
+    "complete_five_holder_objects_equal_published_defaults": true,
+    "eleven_recipe_rights_preserved": true,
+    "six_corrected_native_owner_objects_equal_defaults": true,
+    "complete_corrected_default_and_zero_data_dumps_equal": true,
+    "actual_numeric_zero_marker_in_both_zero_logs": true,
+    "native_files": 35,
+    "native_bytes": 87464056,
+    "root_readback_sha256": "AEA6AA233FC4317383C6DEBC16DE178F7B4159C5B5CFE85F620FCEE183AAD6CC",
+    "controls_and_archives_restored": true,
+    "bound_input_rehash_verified": true,
+    "terminal_factorio_processes": 0,
+    "output_saves": 0
+  },
+  "independent_review": {
+    "private_commit": "737e3fe45a62bd813946c620277c99b98102f066",
+    "path": "evidence/aero-sif-zero-r03-actual-review-r01/native-review.json",
+    "sha256": "890F52221AB865F62C4116E20A9C32C8C3277DCB8EFED7521BC69B43E68D2944",
+    "status": "ACCEPT-exact-four-arm-data-stage-only",
+    "dispatch_review_commit": "e428e3bf30477007275f1a705c07f8e457af9202",
+    "actual_bodies_verified": 67
+  },
+  "custody": {
+    "private_repository": "Julesc013/mir-native-worker",
+    "input_packet_commit": "cb7b63d5b65470bcd3e6be17b7d5f744040bef87",
+    "actual_commit": "fd689915756e9cb64b9c4da4acbd3cd8164e64bb",
+    "path": "evidence/sif-zero-time-native-r03/original-bodies.json.gz",
+    "records": 67,
+    "gzip_bytes": 8247234,
+    "gzip_sha256": "C546121DF4AE01C40BE73A2E2E35EC36D2704A9DF05FF44C47E5A0707B27AD05",
+    "decoded_bytes": 116791285,
+    "decoded_sha256": "90D4B33DE6B4BE9C0F78461AF292D166038C20D9356940F6B54B0C351B5155A8",
+    "actual_remote_blob_and_all_members_verified": true,
+    "complete_native_dumps_logs_ledgers_settings_configs_and_terminals_retained": true
+  },
+  "reader_adverses": {
+    "root": "The first inline collector treated PowerShell Get-Process absence exit1 as a reader error. An explicit successful zero-count readback completed against the unchanged native bodies.",
+    "root_receipt_sha256": "CDD3F4CED4914637564279AE5447CD9B6D97985729B2D99BF77245C17C436EA0",
+    "independent": "The independent reader initially expected a failed ledger phase for natural exit1; only that classification was corrected to completed termination while retaining exact exit/failure assertions.",
+    "native_replay": false,
+    "original_native_identities_unchanged": true
+  },
+  "limits": {
+    "actual_zero_input_method": "Five fixture-controlled startup prototype defaults plus a data-stage guard of the effective numeric-zero values. This is not user-profile/import provenance.",
+    "settings_dump": "Setting prototype definitions, not effective startup values; the actual-input marker supplies the effective-value observation.",
+    "save_preservation": false,
+    "gameplay": false,
+    "clients": false,
+    "user_import_settings": false,
+    "performance": false,
+    "durations_are_unscored": true,
+    "published_502_to_changed_successor": false,
+    "release_qualification": false,
+    "other_source_or_package_bytes_require_consumed_input_applicability_review": true
+  }
+}
