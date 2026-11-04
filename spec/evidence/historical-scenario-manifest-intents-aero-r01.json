@@ -324,17 +324,6 @@
       },
       "independent_expectation": "Nine authored family cap settings are13 with effective named caps13 and no cap conflict. Preserve the intended native/dedicated ownership boundary and earned/current/queued state under current contracts; MIR4 log strings are diagnostic evidence,not a new public API.",
       "historical_envelope": "Corrundum1.0.47 +PlanetsLib1.19.5,Factorio2.1.14,Space Age; original claim is diagnostic-only and explicitly excludes the removed ambient-sound repair from current-source claims.",
-      "preserved_contradiction": {
-        "test_blob": "cdbc573920ed3526bc0f50d17e7f3c2749865200",
-        "test_line": 238,
-        "test_requires_audit_rows": 1,
-        "actual_named_declarations_audit_rows": 0,
-        "checked_declarations": [
-          "v4.2.0",
-          "v4.7.3"
-        ],
-        "disposition": "Do not invent the absent row or claim this stale test/declaration pair passed. The row-count contradiction is a historical harness defect,not a demonstrated MIR5 player defect."
-      },
       "current_implementation": [
         "source/research/catalogue.lua",
         "source/research/native_adoption.lua",
@@ -425,7 +414,20 @@
       },
       "remaining_executable_check": "Determine applicability of the exact historical cap report/decision and nine current cap bindings before selecting one bounded check. Verify upstream validity on a named installed engine/profile first; do not reintroduce the removed ambient-sound mutation or invent old-engine/reporter state. Archive availability is confirmed,while original-engine/evidence applicability remains unverified.",
       "owner": "Aero obligation/input/source mapping; Black Glass native queue and result owner.",
-      "limits": "No current native Corrundum cap13 pass,upstream compatibility verdict,ambient repair promise or new request authority is inferred."
+      "limits": "No current native Corrundum cap13 pass,upstream compatibility verdict,ambient repair promise or new request authority is inferred.",
+      "ineffective_historical_count_check": {
+        "test_blob": "cdbc573920ed3526bc0f50d17e7f3c2749865200",
+        "test_line": 238,
+        "count_expression": "@($corrundumScenario[0].expected_plan.required_audit_rows).Count -ne 1",
+        "declared_audit_rows_present": false,
+        "checked_declarations": [
+          "v4.2.0",
+          "v4.7.3"
+        ],
+        "missing_property_array_count": 1,
+        "observation": "In the original non-strict script context,PowerShell wraps the missing property null value as a one-element array. Its count-only predicate therefore accepts the absent row; it proves neither row presence nor content.",
+        "disposition": "Retire the ineffective historical count check. Preserve that both declarations omit a row; do not invent its value,claim this makes the pair fail,or infer a native/historical-script pass from this local expression check."
+      }
     }
   ],
   "source_body_intent_disposition_complete": true,
@@ -435,7 +437,8 @@
     "repository": "Julesc013/mir-native-worker",
     "commit": "d21fb02a6228a84eb690d30e7f7709c851030ad2",
     "path": "evidence/aero-historical-manifest-frontier-extraction-r01/review.json",
-    "sha256": "D05FE385003F4D8FB47C0C81C7C543F44587A6BE9435519934F5743EF87C5D80"
+    "sha256": "D05FE385003F4D8FB47C0C81C7C543F44587A6BE9435519934F5743EF87C5D80",
+    "interpretation_correction": "Original D05FE385 extraction called the absent row a contradiction. This record corrects that interpretation using actual PowerShell null-array semantics; the original private bytes remain preserved as superseded on this point."
   },
   "validation": {
     "raw_source_checks": "passed",
