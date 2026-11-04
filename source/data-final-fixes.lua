@@ -37,7 +37,7 @@ local technologies = {gear}
 local ordinary_profile = type(mods) == "table" and mods.Krastorio2 == nil
   and mods["Krastorio2-spaced-out"] == nil
 local modern_catalogue = require("compatibility.modern_catalogue")
-local modern, modern_selection, native_owner_patches
+local modern, modern_selection, native_owner_patches, withheld_native_owners
 if ordinary_profile or modern_catalogue.is_k2_base(mods) or modern_catalogue.is_k2so(mods) then
   modern = require("research.modern")
   modern_selection = modern_catalogue.select(mods, data.raw)
@@ -71,7 +71,7 @@ if ordinary_profile or modern_catalogue.is_k2_base(mods) or modern_catalogue.is_
   end
   -- Check every selected narrow patch before any intended technology write.
   modern.preflight_recipe_patches(modern_selection, data.raw)
-  native_owner_patches = modern.preflight_native_owner_patches(modern_selection, data.raw, values)
+  native_owner_patches, withheld_native_owners = modern.preflight_native_owner_patches(modern_selection, data.raw, values)
   local generated = modern.technologies(modern_selection, values)
   modern.apply_weapon_speed_overlap(modern_selection, generated, values)
   for index = 1, #generated do technologies[#technologies + 1] = generated[index] end
@@ -95,9 +95,29 @@ end
 -- detached authored effects without discovering families or inspecting
 -- foreign research. Existing named routes and weights retain precedence.
 local native_owner_targets = modern and modern.native_owner_product_targets(
-  modern_selection, data.raw, values, native_owner_patches, mods)
+  modern_selection, data.raw, values, native_owner_patches, mods, withheld_native_owners)
+local native_fallbacks, native_fallback_owners = {}, {}
+if modern then
+  for _, fallback in ipairs(modern_catalogue.native_owner_fallbacks(mods, withheld_native_owners)) do
+    local technology = modern.technology(fallback.definition, values)
+    native_fallbacks[#native_fallbacks + 1] = technology
+    native_fallback_owners[technology] = fallback.owner
+  end
+end
+local native_credit_targets, native_credit_ids = {}, {}
+if modern and (prerequisite_target.id == "f200" or prerequisite_target.id == "f210") then
+  for _, binding in ipairs(require("compatibility.product_bindings").native_owner_bindings) do
+    native_credit_ids["recipe-prod-" .. binding.family .. "-1"] = binding.family
+  end
+  for _, technology in ipairs(technologies) do
+    local family = native_credit_ids[technology.name]
+    if family then native_credit_targets[family] = {} end
+  end
+end
 require("research.product_target_extension").extend(technologies, values, {raw=data.raw, mods=mods, log=log,
   native_owner_targets=native_owner_targets,
+  native_owner_fallbacks=native_fallbacks,
+  native_credit_targets=native_credit_targets,
   required_product_targets=modern_selection and modern_selection.required_product_targets,
   additional_product_bindings=modern_selection and modern_selection.additional_product_bindings,
   exact_product_bindings=modern_selection and modern_selection.exact_product_bindings,
@@ -105,7 +125,53 @@ require("research.product_target_extension").extend(technologies, values, {raw=d
   replacement_product_target_families=modern_selection and modern_selection.replacement_product_target_families,
   excluded_product_target_recipes=modern_selection and modern_selection.excluded_product_target_recipes})
 if modern then modern.preflight_collected_native_owner_targets(native_owner_targets, native_owner_patches) end
-local native_adoption_patch = modern and require("research.native_adoption").plan(data.raw, native_owner_targets)
+for _, fallback in ipairs(native_fallbacks) do
+  if #fallback.effects > 0 then
+    -- Replace this same identity's detached private holder with the public
+    -- uncovered route. Runtime credits preserve its prior per-recipe mask.
+    local replaced = false
+    for index, technology in ipairs(technologies) do
+      if technology.name == fallback.name and technology.hidden == true then
+        technologies[index], replaced = fallback, true
+        break
+      end
+    end
+    if not replaced then technologies[#technologies + 1] = fallback end
+    withheld_native_owners[native_fallback_owners[fallback]].generated = true
+  end
+end
+-- Preserve the finite canonical SIF routes alongside all current matches,
+-- including recipes now earned through a native owner. Absence from today's
+-- public vector must not erase an already-earned signed credit route.
+if next(native_credit_targets) ~= nil then
+  for family, recipes in pairs(require("research.native_credit_definitions").published_sif_paid_recipe_sets()) do
+    local targets = native_credit_targets[family]
+    if targets then
+      for recipe in pairs(recipes) do
+        if data.raw.recipe[recipe] then targets[recipe] = values.streams[family].effect_percent / 100 end
+      end
+    end
+  end
+  for _, technology in ipairs(technologies) do
+    local targets = native_credit_targets[native_credit_ids[technology.name]]
+    if targets then
+      for _, effect in ipairs(technology.effects or {}) do
+        if effect.type == "change-recipe-productivity" and data.raw.recipe[effect.recipe] then
+          targets[effect.recipe] = effect.change
+        end
+      end
+    end
+  end
+end
+local native_credit_groups = {}
+for family, targets in pairs(native_credit_targets) do
+  local rows = {}
+  for recipe, change in pairs(targets) do rows[#rows + 1] = {recipe=recipe, change=change} end
+  table.sort(rows, function(left, right) return left.recipe < right.recipe end)
+  native_credit_groups[family] = rows
+end
+local native_adoption_patch = modern and require("research.native_adoption").plan(
+  data.raw, native_owner_targets, withheld_native_owners, native_credit_groups)
 
 if modern_selection and modern_selection.bob_angel_f200_combined then
   require("compatibility.modern_catalogue.bob_angel_f200_combined").apply_effect_order(technologies)
@@ -165,7 +231,7 @@ end
 -- Stable native credit holders preserve already-earned partial overlaps when
 -- a provider or its ownership preference changes. They are explicit authored
 -- rows, independent of whether the provider is currently installed.
-require("research.native_credit_definitions").append(technologies, data.raw, values, require("platform.target"))
+require("research.native_credit_definitions").append(technologies, data.raw, values, require("platform.target"), native_credit_groups)
 
 -- Fixed native holders retain MIR1.1's already-earned extra module effects.
 -- A removed optional recipe cannot make its hidden holder a startup failure.

@@ -176,7 +176,7 @@ local function py_material_rows()
   return rows
 end
 
-local function static_rows(existing_technology_prototypes)
+local function static_rows(existing_technology_prototypes, withheld_native_owners)
   runtime_private_credit_ids = copy(INTERNAL_CREDIT_IDS)
   local rows = {generated_row(GEAR_ID, "research_gears", "p[research_gears]",
     "technology-name.more-infinite-research.research_gears", "iron-gear-wheel")}
@@ -186,7 +186,7 @@ local function static_rows(existing_technology_prototypes)
   for _, row in ipairs(material_rows(modern_catalogue.angel_material_definitions(active_mods))) do rows[#rows + 1] = row end
   local selected
   if ordinary_profile or k2_base_profile or k2so_profile then
-    selected = modern_catalogue.select(active_mods)
+    selected = modern_catalogue.select(active_mods, nil, withheld_native_owners)
     if existing_technology_prototypes ~= nil then
       selected.continuations = modern_catalogue.omit_existing_continuations(
         selected.continuations, existing_technology_prototypes)
@@ -204,6 +204,9 @@ local function static_rows(existing_technology_prototypes)
   -- These normal public identities become private paid holders only in the
   -- exact selected SIF profile. Never hide their ordinary research elsewhere.
   for _, definition in ipairs(selected.sif_retained or {}) do
+    runtime_private_credit_ids["recipe-prod-" .. definition.key .. "-1"] = true
+  end
+  for _, definition in ipairs(selected.native_paid or {}) do
     runtime_private_credit_ids["recipe-prod-" .. definition.key .. "-1"] = true
   end
   for index = 1, #selected.definitions do
@@ -266,10 +269,12 @@ local function static_rows(existing_technology_prototypes)
   end
   if space_age_active then
     for _, owner in ipairs(modern_catalogue.native_owners(active_mods)) do
-      rows[#rows + 1] = {id=owner.id, family=owner.family, progression=1, native_order="", setting="ips-enable-" .. owner.family,
-        cap_setting=owner.setting, settings=stream_settings(owner.family), ownership_kind="nativeowner",
-        native_owner_identity=owner.id, native_admission=copy(owner.admission),
-        legacy_binding={source="native-owner", operation="preserve_native_owner"}}
+      if not withheld_native_owners or withheld_native_owners[owner.id] == nil then
+        rows[#rows + 1] = {id=owner.id, family=owner.family, progression=1, native_order="", setting="ips-enable-" .. owner.family,
+          cap_setting=owner.setting, settings=stream_settings(owner.family), ownership_kind="nativeowner",
+          native_owner_identity=owner.id, native_admission=copy(owner.admission),
+          legacy_binding={source="native-owner", operation="preserve_native_owner"}}
+      end
     end
   end
   return rows
@@ -282,21 +287,24 @@ end
 -- not need to construct runtime metadata before their own local preflights.
 local runtime_rows
 local runtime_rows_source
+local runtime_rows_withheld
 
-local function prepare_rows(existing_technology_prototypes)
-  if runtime_rows == nil or runtime_rows_source ~= existing_technology_prototypes then
+local function prepare_rows(existing_technology_prototypes, withheld_native_owners)
+  if runtime_rows == nil or runtime_rows_source ~= existing_technology_prototypes
+      or runtime_rows_withheld ~= withheld_native_owners then
     runtime_rows_source = existing_technology_prototypes
-    runtime_rows = static_rows(existing_technology_prototypes)
+    runtime_rows_withheld = withheld_native_owners
+    runtime_rows = static_rows(existing_technology_prototypes, withheld_native_owners)
   end
   return runtime_rows
 end
 
-function M.prepare(existing_technology_prototypes)
-  prepare_rows(existing_technology_prototypes)
+function M.prepare(existing_technology_prototypes, withheld_native_owners)
+  prepare_rows(existing_technology_prototypes, withheld_native_owners)
 end
 
-function M.declared(existing_technology_prototypes)
-  local rows = prepare_rows(existing_technology_prototypes)
+function M.declared(existing_technology_prototypes, withheld_native_owners)
+  local rows = prepare_rows(existing_technology_prototypes, withheld_native_owners)
   local out = {}
   for index = 1, #rows do out[index] = copy(rows[index]) end
   return out

@@ -1,26 +1,12 @@
 -- Published F200/SIF1.0.60 paid identities. Selection and preflight are pure;
 -- research.modern alone emits the detached hidden technologies.
 local M = {}
-local CONTRACTS = {
-  {key="research_low_density_structure", product="low-density-structure", recipes={
-    {"casting-low-density-structure", "low-density-structure-productivity"},
-    {"low-density-structure", "low-density-structure-productivity"},
-    {"scrap-recycling", "scrap-recycling-productivity"},
-  }},
-  {key="research_plastic", product="plastic-bar", recipes={
-    {"bioplastic", "plastic-bar-productivity"}, {"plastic-bar", "plastic-bar-productivity"},
-  }},
-  {key="research_processing_unit", product="processing-unit", recipes={
-    {"processing-unit", "processing-unit-productivity"},
-  }},
-  {key="research_rocket_fuel", product="rocket-fuel", recipes={
-    {"ammonia-rocket-fuel", "rocket-fuel-productivity"},
-    {"rocket-fuel", "rocket-fuel-productivity"}, {"rocket-fuel-from-jelly", "rocket-fuel-productivity"},
-  }},
-  {key="research_steel", product="steel-plate", recipes={
-    {"casting-steel", "steel-plate-productivity"}, {"steel-plate", "steel-plate-productivity"},
-  }},
-}
+local CREDIT_CONTRACTS = require("research.native_credit_contracts")
+local CONTRACTS = CREDIT_CONTRACTS.published_sif_contracts()
+
+-- The exact published five-identity source is also the authority for its
+-- first native-credit baseline. Return names only, never prototype mutations.
+M.paid_recipe_sets = CREDIT_CONTRACTS.published_sif_paid_recipe_sets
 
 local function copy(value)
   if type(value) ~= "table" then return value end

@@ -109,7 +109,11 @@ class PyF210PipelineTests(unittest.TestCase):
         context = self.context["cases"][case]
         lua = LuaRuntime(unpack_returned_tuples=True)
         lua.globals().player_root = SOURCE_ROOT.as_posix()
-        lua.globals().captured_raw = _lua_value(lua, deepcopy(context["raw"]))
+        raw = deepcopy(context["raw"])
+        for name, recipe in raw["recipe"].items():
+            recipe.setdefault("type", "recipe")
+            recipe.setdefault("name", name)
+        lua.globals().captured_raw = _lua_value(lua, raw)
         lua.globals().active_mods = _lua_value(lua, deepcopy(context["selection"]))
         lua.globals().startup_values = _lua_value(lua, startup or {})
         lua.execute(r'''

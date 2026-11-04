@@ -7,6 +7,7 @@ credit holders field-for-field.
 """
 
 import math
+from copy import deepcopy
 
 NATIVE_CREDIT_DESCRIPTORS = (
     ("research_copper", "recipe-prod-research_copper-1", "copper-plate"),
@@ -25,8 +26,47 @@ NATIVE_CREDIT_DESCRIPTORS = (
 NATIVE_CREDIT_DEFAULT_SCALAR = 0.1
 NATIVE_CREDIT_ICON = "__base__/graphics/technology/automation-1.png"
 
+# The eleven paid routes are independently preserved by the published SIF
+# fixture. Ordinary Space Age uses the same five IDs as empty private holders;
+# a saved force's mask, rather than this data vector, determines its credit.
+NATIVE_FAMILY_RECIPES = {
+    "research_low_density_structure": ("casting-low-density-structure", "low-density-structure", "scrap-recycling"),
+    "research_plastic": ("bioplastic", "plastic-bar"),
+    "research_processing_unit": ("processing-unit",),
+    "research_rocket_fuel": ("ammonia-rocket-fuel", "rocket-fuel", "rocket-fuel-from-jelly"),
+    "research_steel": ("casting-steel", "steel-plate"),
+}
+NATIVE_FAMILY_EXTRA_SCIENCE = {
+    "research_low_density_structure": "metallurgic-science-pack",
+    "research_plastic": "agricultural-science-pack",
+    "research_processing_unit": "electromagnetic-science-pack",
+    "research_rocket_fuel": "agricultural-science-pack",
+    "research_steel": None,
+}
 
-def native_credit_carrier_rows(public_rows, captured_recipes):
+
+def native_family_preservation_rows(published_base_rows):
+    """Exact empty private rows from the immutable published Base definitions.
+
+    The Space Age science additions follow the independently retained 4.7.3
+    science-selector fallback contract, also checked in the fallback controls.
+    This consumes no candidate definition, metadata or recipe-match result.
+    """
+    expected = {}
+    for family, extra in NATIVE_FAMILY_EXTRA_SCIENCE.items():
+        name = "recipe-prod-" + family + "-1"
+        row = deepcopy(published_base_rows[name])
+        if row.get("hidden") is True or row["max_level"] != "infinite" or row["level"] != 1:
+            raise AssertionError("published native-family reference changed")
+        row["hidden"], row["effects"] = True, []
+        if extra:
+            row["unit"]["ingredients"].append([extra, 1])
+            row["prerequisites"].append(extra)
+        expected[name] = row
+    return expected
+
+
+def native_credit_carrier_rows(public_rows, captured_recipes, family_recipes=None):
     """Build exact dormant pairs for the finite named mains and present recipes.
 
     A foreign provider or recipe replacement can exclude a named recipe from
@@ -35,7 +75,20 @@ def native_credit_carrier_rows(public_rows, captured_recipes):
     A present effect must retain its exact default scalar and unique shape.
     """
     expected = {}
-    for family, main_id, recipe in NATIVE_CREDIT_DESCRIPTORS:
+    descriptors = list(NATIVE_CREDIT_DESCRIPTORS)
+    # Existing callers retain the immutable public row as their expectation.
+    # A private Space Age case supplies its explicitly authored recipient set.
+    if family_recipes is None:
+        family_recipes = {family: [effect["recipe"] for effect in public_rows.get(
+            "recipe-prod-" + family + "-1", {}).get("effects", [])
+            if effect.get("type") == "change-recipe-productivity"]
+            for family in NATIVE_FAMILY_RECIPES}
+    for family, recipes in family_recipes.items():
+        if family not in NATIVE_FAMILY_RECIPES:
+            raise AssertionError("unreviewed native-family credit namespace")
+        for recipe in recipes:
+            descriptors.append((family, "recipe-prod-" + family + "-1", recipe))
+    for family, main_id, recipe in descriptors:
         main = public_rows.get(main_id)
         if main is None or recipe not in captured_recipes:
             continue
@@ -144,8 +197,8 @@ def legacy_cannon_credit_rows(public_rows):
     }
 
 
-def current_native_credit_rows(public_rows, captured_recipes):
-    return {**native_credit_carrier_rows(public_rows, captured_recipes),
+def current_native_credit_rows(public_rows, captured_recipes, family_recipes=None):
+    return {**native_credit_carrier_rows(public_rows, captured_recipes, family_recipes),
             **(legacy_module_credit_rows(captured_recipes)
                if "recipe-prod-research_modules-1" in public_rows else {}),
             **legacy_cannon_credit_rows(public_rows)}
@@ -161,11 +214,11 @@ def captured_public_productivity_recipes(public_rows):
     }
 
 
-def split_public_and_native_credit_rows(rows):
+def split_public_and_native_credit_rows(rows, private_main_ids=()):
     """Partition outputs without accepting unknown carrier identities."""
     public, credit = {}, {}
     for name, row in rows.items():
-        destination = credit if name.startswith((
+        destination = credit if name in private_main_ids or name.startswith((
             "mir-native-credit-", "mir-legacy-module-credit-", "mir-legacy-cannon-credit-")) else public
         destination[name] = row
     return public, credit

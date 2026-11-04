@@ -153,15 +153,20 @@ class NativeOwnerCostTests(unittest.TestCase):
                 for owner in self.case.owner_rows().values():
                     self.assertEqual(owner["unit"]["count_formula"], "1000+100*L^2")
 
-    def test_late_unknown_cost_refuses_without_any_owner_write(self):
+    def test_late_unknown_cost_withholds_only_that_owner(self):
         self.configure(1000)
         self.case.owner("research_steel").unit.count = None
         self.case.owner("research_steel").unit.count_formula = "1000+100*L^2"
         before = self.case.owner_rows()
-        with self.assertRaisesRegex(LuaError, "unexpected count formula"):
-            self.case.pipeline()
-        self.assertEqual(before, self.case.owner_rows())
-        self.assertEqual(self.lua.globals().data.writes, 0)
+        self.case.pipeline()
+        after = self.case.owner_rows()
+        self.assertEqual(before["research_steel"], after["research_steel"])
+        for family in fixture.OWNERS:
+            if family != "research_steel":
+                self.assertEqual("(200+3*(L-1))*1.25^(L-1)", after[family]["unit"]["count_formula"])
+        self.assertEqual(1, self.lua.globals().data.writes)
+        private = self.lua.globals().data.raw["mod-data"]["more-infinite-research-native-adoptions"].data
+        self.assertTrue(private.withheld["steel-plate-productivity"].generated)
 
 
 if __name__ == "__main__":

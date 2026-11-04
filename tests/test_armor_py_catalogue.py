@@ -238,6 +238,13 @@ class ArmorPyCatalogueTests(unittest.TestCase):
           target.distribution_version, target.cargo_research = "5.0.20000", false
           target.recipe_probability, target.productivity_ignores_stats, target.receiver_limits = "probability", true, false
           data = {raw=fixture_raw, writes=0}
+          function data:extend(rows)
+            for _,row in ipairs(rows) do
+              self.raw[row.type]=self.raw[row.type] or {}
+              assert(self.raw[row.type][row.name]==nil,"duplicate prior-stage prototype "..row.name)
+              self.raw[row.type][row.name]=row
+            end
+          end
           settings, helpers, log = {startup={}}, {}, function() end
           package.preload["research.settings"] = function()
             return {resolve=function() return fixture_values end, default_value=function() return nil end}
@@ -249,7 +256,9 @@ class ArmorPyCatalogueTests(unittest.TestCase):
           package.preload["research.generator"] = function()
             return {install=function(rows, stage) stage.writes = stage.writes + 1; stage.installed = rows end}
           end
-          package.preload["research.native_credit_definitions"] = function() return {append=function() end} end
+          -- Keep the real transport/descriptor boundary. Only carrier output
+          -- is outside this focused material/publication-order control.
+          require("research.native_credit_definitions").append=function() end
           -- The continuation adapter has its own named-predecessor harness.
           -- This data-final boundary check only proves its selected preflight
           -- remains before the single publication write.
@@ -262,6 +271,7 @@ class ArmorPyCatalogueTests(unittest.TestCase):
               end,
             }
           end
+          require("data")
           require("data-final-fixes")
         ''')
         return (

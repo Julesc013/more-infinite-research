@@ -176,7 +176,8 @@ class NativeOwnerFieldTuningTests(unittest.TestCase):
                 case.pipeline()
                 metadata = data_fixture.plain(case.lua.globals().data.raw["mod-data"][cap_fixture.MOD_DATA].data)
                 harness = cap_fixture.NativeOwnerCapAdoptionTests()
-                lua = harness.runtime(case.owner_rows(), metadata)
+                lua = harness.runtime(case.owner_rows(), metadata,
+                                      emitted_mir_rows=harness.emitted_mir_technologies(case))
                 harness.boot(lua, 2)
                 lua.globals().handlers.init()
                 retained = data_fixture.plain(lua.globals().storage)

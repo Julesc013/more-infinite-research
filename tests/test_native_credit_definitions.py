@@ -2,6 +2,7 @@
 import argparse
 import os
 from pathlib import Path
+import re
 import sys
 import unittest
 
@@ -210,7 +211,13 @@ class NativeCreditDefinitionTests(unittest.TestCase):
         self.assertIn(NATIVE_CREDIT_ICON, modern)
         self.assertNotIn("__base__/graphics/technology/automation.png", source)
         self.assertNotIn("__base__/graphics/technology/automation.png", modern)
-        self.assertNotIn("require(", source)
+        self.assertEqual(re.findall(r'require\("([^"]+)"\)', source),
+                         ["research.native_credit_contracts"])
+        contracts = (PLAYER / "research/native_credit_contracts.lua").read_text(encoding="utf-8")
+        self.assertNotIn("require(", contracts)
+        self.assertNotIn("data.raw", contracts)
+        self.assertNotIn("raw.recipe", contracts)
+        self.assertNotIn("raw.technology", contracts)
         self.assertNotIn("pairs(raw.recipe)", source)
         self.assertNotIn("ipairs(raw.recipe)", source)
         self.assertNotIn("raw.technology", source)

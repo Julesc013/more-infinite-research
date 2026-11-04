@@ -779,7 +779,36 @@ function M.science_ingredients(key, amounts)
   return out
 end
 
-function M.select(active_mods, raw)
+-- Reuse the five authored Base identities and the independently retained
+-- Space Age science rules. This does not discover or rename a family.
+function M.native_owner_fallbacks(active_mods, withheld)
+  local out = {}
+  if not active_space_age(active_mods) or withheld == nil or next(withheld) == nil then return out end
+  local science = {
+    research_low_density_structure="science_automation_logistic_chemical_production_metallurgic",
+    research_plastic="science_automation_logistic_chemical_production_agricultural",
+    research_processing_unit="science_automation_logistic_chemical_production_electromagnetic",
+    research_rocket_fuel="science_automation_logistic_chemical_production_agricultural",
+    research_steel="science_automation_logistic_chemical_production",
+  }
+  local owners = {}
+  -- Paid identities span all five Space Age families even when a profile
+  -- adopts fewer public native owners (K2SO has no native steel owner).
+  for _, owner in ipairs(require("compatibility.modern_catalogue.space_age").native_owners) do
+    if science[owner.family] and withheld[owner.id] then owners[owner.family] = owner.id end
+  end
+  for _, definition in ipairs(BASE.definitions) do
+    local owner = owners[definition.family]
+    if owner then
+      local detached = copy(definition)
+      detached.science = science[definition.family]
+      out[#out + 1] = {owner=owner, definition=detached}
+    end
+  end
+  return out
+end
+
+function M.select(active_mods, raw, withheld)
   local definitions = copy_definitions(BASE.definitions)
   local recipe_patches = {}
   local profile, k2so = "base", nil
@@ -965,6 +994,13 @@ function M.select(active_mods, raw)
   -- The published 2.0/SIF correction kept these paid identities hidden. They
   -- remain separate from public research/cap declarations, with exact recipe
   -- vectors so broad product collection cannot add an unpaid scrap effect.
+  -- Runtime receives only the already validated emitted/no-emission result.
+  -- Data preparation collects detached fallback candidates separately first.
+  for _, fallback in ipairs(M.native_owner_fallbacks(active_mods, withheld)) do
+    if withheld[fallback.owner].generated == true then
+      definitions[#definitions + 1] = fallback.definition
+    end
+  end
   local sif_retained
   if target.id == "f200" and type(active_mods) == "table"
       and type(active_mods.base) == "string" and active_mods.base:match("^2%.0%.%d+$")
@@ -973,12 +1009,26 @@ function M.select(active_mods, raw)
     sif_retained = require("compatibility.modern_catalogue.sif_retained").select(BASE.definitions, definitions)
     for _, definition in ipairs(sif_retained) do exact_product_target_families[definition.family] = true end
   end
+  -- Keep the five historical MIR identities even when ordinary Space Age
+  -- adoption owns all new earning. Empty private vectors are accounted for
+  -- by per-force recipe credits; they must not guess a previous paid mask.
+  local native_paid, present, all_native = {}, {}, {}
+  for _, definition in ipairs(definitions) do present[definition.family] = true end
+  for _, definition in ipairs(sif_retained or {}) do present[definition.family] = true end
+  if active_space_age(active_mods) then
+    for _, owner in ipairs(require("compatibility.modern_catalogue.space_age").native_owners) do
+      all_native[owner.id] = {family=owner.family, generated=false}
+    end
+    for _, fallback in ipairs(M.native_owner_fallbacks(active_mods, all_native)) do
+      if not present[fallback.definition.family] then native_paid[#native_paid + 1] = fallback.definition end
+    end
+  end
   local bob_tech_materials = not bob_angel_f210 and require("compatibility.bob_tech_profile").applies(active_mods)
   return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods, raw),
     bob_tech_progression = not bob_angel_f210 and target.id == "f210" and type(active_mods) == "table" and active_mods.bobtech ~= nil
       and require("compatibility.modern_catalogue.bob_tech_progression").select(active_mods) or nil,
     native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
-    k2_imersite = k2so and k2so.imersite or false, sif_retained = sif_retained,
+    k2_imersite = k2so and k2so.imersite or false, sif_retained = sif_retained, native_paid = native_paid,
     k2_imersite_carriers = target.id == "f210" and k2_base,
     bob_angel = bob_angel, bob_angel_f200_combined = bob_angel_f200_combined,
     bob_core = bob_core, bob_plates_profile = bob_plates,
