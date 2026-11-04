@@ -324,7 +324,7 @@
       }
     },
     {
-      "disposition": "retain-bounded-reproduction-intent-reject-contradictory-harness-detail",
+      "disposition": "retain-bounded-reproduction-intent-retire-ineffective-count-check",
       "original_test_lines": [
         224,
         240
