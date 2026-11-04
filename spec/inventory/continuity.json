@@ -8843,7 +8843,7 @@
         "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
       }
     ],
-    "next_bounded_work": "Use stable_coverage_review for the finite current obligations and owner split. Black Glass prepares, repairs and executes routine native work without prospective Aero dispatch sign-off; Aero independently reviews expectations, actual results and the final candidate/delivery. Preserve accepted503 component and original nine/seven/four migration identities under consumed-input review. Complete the separate weapon/Galore correction batch and unresolved partial-category ownership, actual Library/client/export/DiscoveryTree reset observations and whole-product performance; no known failure is silently waived. Historical source reconciliation still needs remaining effective/nondefault settings, generated orchestration, registry/resolver/control callbacks, compatibility/inter-release and unknown-consumer intent plus original frontier inputs. The24 bounded reviews dispose selected intentions, not all5058 blobs or the entire stable scope; inventory_complete remains false. Do not restore retired machinery, reconstruct every old source save or repeat unchanged completed campaigns.",
+    "next_bounded_work": "Use stable_coverage_review for the finite current obligations and owner split. Black Glass prepares, repairs and executes routine native work without prospective Aero dispatch sign-off; Aero independently reviews expectations, actual results and the final candidate/delivery. Preserve accepted503 component and original nine/seven/four migration identities under consumed-input review. Complete the separate weapon/Galore correction batch and unresolved partial-category ownership, actual Library/client/export/DiscoveryTree reset observations and whole-product performance; no known failure is silently waived. Historical source reconciliation still needs remaining effective/nondefault settings, generated orchestration, registry/resolver/control callbacks, compatibility/inter-release and unknown-consumer intent plus original frontier inputs. The bounded reviews dispose selected intentions, not all5058 blobs or the entire stable scope; inventory_complete remains false. Do not restore retired machinery, reconstruct every old source save or repeat unchanged completed campaigns.",
     "bounded_intent_reviews": [
       {
         "subjects": [
@@ -16590,6 +16590,27 @@
           "representation_accepted": false,
           "native_execution": false
         }
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-10",
+          "CONT-13",
+          "CONT-14"
+        ],
+        "reviewed_against": "36ae7b79d677a0970f7ede531d5a9aa76a9f5191",
+        "scope": "Four exact paths,19 unique bodies/218788bytes and147 retained bindings from existing91-tag inventory;143 live tag matches/four explicit local-alias refs. Original4.7.3 two-fixture/two-profile host replay and four negative controls, not a native campaign.",
+        "evidence": {
+          "path": "spec/evidence/historical-hidden-setting-visibility-intent-aero-r01.json",
+          "sha256": "211C08554E59687F7EF74AA7EAFAE449DE4A1696C21AED7EFC9AD5F8B700D43E"
+        },
+        "disposition": "Retain hidden-but-readable/false-zero/default/target visibility and Base absence; consolidate profile/legacy API/limits/presentation semantics with existing exact controls; supersede older breeding hiding by final published policy; retire only exact-helper/generated-doc implementation lint.",
+        "remaining_executable_check": "Existing native settings/Library/export/client and consumed-input applicability remain open where not independently qualified. Imported helper implementations and all other historical groups stay separate.",
+        "owner": "Aero; Black Glass owns routine affected native execution",
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false,
+        "release_qualification": false
       }
     ],
     "stable_coverage_review": {
@@ -16815,7 +16836,7 @@
             "spec/programmes/community-requests.json"
           ],
           "applicable_evidence": [],
-          "remaining_executable_check": "Use the existing deduplicated source groups and24 bounded intent reviews to reconcile remaining effective/nondefault settings, generated orchestration, registry/resolver/control callbacks, compatibility/inter-release removals and unknown-consumer expectations. Pair each recovered accepted behavior with implementation and focused opposition/remaining native checks. Keep inventory_complete=false, all87 original request records/decisions and missing discussions/attachments/reporter inputs explicit; neither blob counts nor representative fixtures establish completeness.",
+          "remaining_executable_check": "Use the existing deduplicated source groups and the bounded intent reviews to reconcile remaining effective/nondefault settings, generated orchestration, registry/resolver/control callbacks, compatibility/inter-release removals and unknown-consumer expectations. Pair each recovered accepted behavior with implementation and focused opposition/remaining native checks. Keep inventory_complete=false, all87 original request records/decisions and missing discussions/attachments/reporter inputs explicit; neither blob counts nor representative fixtures establish completeness.",
           "owner": "Aero",
           "independent_review": "Aero",
           "status": "open: bounded source-intent dispositions exist; complete historical preservation remains unproved"

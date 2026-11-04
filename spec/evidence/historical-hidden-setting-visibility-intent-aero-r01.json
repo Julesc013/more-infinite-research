@@ -1,0 +1,574 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalHiddenSettingVisibilityIntentReviewV1",
+  "status": "bounded-selected-source-intents-dispositioned-not-stable-acceptance",
+  "subjects": [
+    "CONT-03",
+    "CONT-10",
+    "CONT-13",
+    "CONT-14"
+  ],
+  "reviewed_against": "36ae7b79d677a0970f7ede531d5a9aa76a9f5191",
+  "candidate_player_tree": "8489d53e7202ce29962e364110ccb36cc261c8cc",
+  "scope": "Exactly the hidden-setting readability data/settings fixture paths, the SettingsVisibility wrapper and its direct validation-path alias in the existing91-tag discovery. No whole historical/settings/GUI/native audit.",
+  "source_inventory": {
+    "selected_tag_inventory": 91,
+    "selected_paths": [
+      "fixtures/assert-hidden-setting-readability/data-final-fixes.lua",
+      "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua",
+      "tests/compiler/Test-MIRSettingsVisibility.ps1",
+      "validation/tests/compiler/Test-MIRSettingsVisibility.ps1"
+    ],
+    "selected_bindings": 147,
+    "unique_blobs": 19,
+    "unique_source_bytes": 218788,
+    "binding_index_sha256": "B278DE83E6E5566F5A5C2351B1A8E0780E178A7A9AF4B00AAE6889504A043C8A",
+    "original_body_gzip_sha256": "94FE77425E61732CCC05B0294C2ACC30BB50E71AD87673AFCAC64464C30965A6",
+    "original_body_decoded_sha256": "DD3B82AA16B96BB5E8874349ABC8028A3D5BA0B2B6B958B088FBEF8AC72068F0",
+    "raw_snapshot_custody": {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "334cc386593c7f9220f9c6881d2edcc32f68a46f",
+      "path": "evidence/aero-hidden-settings-visibility-originals-r01/original-bodies.json.gz"
+    }
+  },
+  "remote_binding_readback": {
+    "exact": 143,
+    "retained_local_alias_references": [
+      {
+        "tag": "v3.0.0",
+        "commit": "70bb513f5b388ad23c4a5d46dfc945571c3b8217",
+        "path": "fixtures/assert-hidden-setting-readability/data-final-fixes.lua",
+        "mode": "100644",
+        "git_blob": "ce4b4eee879883c390606524801109a70731e700",
+        "bytes": 1855,
+        "sha256": "a7aae71eb283a8d5c2180feceb253272c843a2882c40b953eb3bb2857fd794db",
+        "remote_commit": null,
+        "status": "missing-local-alias"
+      },
+      {
+        "tag": "v4.2.0",
+        "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+        "path": "fixtures/assert-hidden-setting-readability/data-final-fixes.lua",
+        "mode": "100644",
+        "git_blob": "bfb112b558b50d9f3eab9d0a39ced83e329f09a2",
+        "bytes": 5270,
+        "sha256": "e5f515d0dea6cb93dbbb76d6a26d53dd8944ae973bab8351e06649c38e2d26ab",
+        "remote_commit": null,
+        "status": "missing-local-alias"
+      },
+      {
+        "tag": "v4.2.0",
+        "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+        "path": "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua",
+        "mode": "100644",
+        "git_blob": "2058f8e8532df29faccab312c3c676794d93c51c",
+        "bytes": 2617,
+        "sha256": "3e963840125eb25c392da03cc15b116c42964caedb408a45d067474c12498096",
+        "remote_commit": null,
+        "status": "missing-local-alias"
+      },
+      {
+        "tag": "v4.2.0",
+        "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+        "path": "tests/compiler/Test-MIRSettingsVisibility.ps1",
+        "mode": "100644",
+        "git_blob": "870a60587522fa2100d1a58da35c9aa6ba2bc4bc",
+        "bytes": 34783,
+        "sha256": "cbf66544af9daba66984d44407c706de8468c782542636729a7734d036822b7f",
+        "remote_commit": null,
+        "status": "missing-local-alias"
+      }
+    ],
+    "remote_refs_sha256": "5FFC949F27BD94671DE42F149C0D2E0930D68751964F3937872D6B0EE1A507B5",
+    "note": "Local v3.0.0 is not the separately published numeric3.0.0 at8da631a6e5774af6d8804a49107a61a7964a5b2c; no equal-source/publication claim follows. Local v4.2.0 aliases the retained actual v4.2.0-stable commit6d19c874. Original local refs/bodies are preserved."
+  },
+  "sources": [
+    {
+      "git_blob": "0489c4078412de08f286e3906ec6501fb0c74869",
+      "bytes": 31568,
+      "sha256": "3E2ECD7020A4A185E19A1C09D12E0B899513F14F576A19D3EFE127DC32032072",
+      "paths": [
+        "validation/tests/compiler/Test-MIRSettingsVisibility.ps1"
+      ],
+      "binding_count": 5,
+      "tag_names": [
+        "3.2.10",
+        "3.2.11",
+        "3.2.5",
+        "3.2.9",
+        "v4.0.0"
+      ]
+    },
+    {
+      "git_blob": "0dd82164ac2c472be649e0dbe26403510e2249d3",
+      "bytes": 4699,
+      "sha256": "A64B36A5C0D7D97406767F2FB7485F0AD48FACD1A089A593534C30C788DB4489",
+      "paths": [
+        "fixtures/assert-hidden-setting-readability/data-final-fixes.lua"
+      ],
+      "binding_count": 1,
+      "tag_names": [
+        "2.4.9"
+      ]
+    },
+    {
+      "git_blob": "2058f8e8532df29faccab312c3c676794d93c51c",
+      "bytes": 2617,
+      "sha256": "3E963840125EB25C392DA03CC15B116C42964CAEDB408A45D067474C12498096",
+      "paths": [
+        "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua"
+      ],
+      "binding_count": 16,
+      "tag_names": [
+        "v4.2.0",
+        "v4.2.0-stable",
+        "v4.2.1",
+        "v4.2.2",
+        "v4.3.0",
+        "v4.4.0",
+        "v4.4.1",
+        "v4.4.2",
+        "v4.5.0",
+        "v4.5.1",
+        "v4.5.2",
+        "v4.6.0",
+        "v4.7.0",
+        "v4.7.1",
+        "v4.7.2",
+        "v4.7.3"
+      ]
+    },
+    {
+      "git_blob": "24e2a28dd4149344df79d057844f4033d5c5c448",
+      "bytes": 4151,
+      "sha256": "BD05F2FAD6078253D3CF0466149629C0F9BB8AF05C73097813DAB47CCBCA3B4D",
+      "paths": [
+        "fixtures/assert-hidden-setting-readability/data-final-fixes.lua"
+      ],
+      "binding_count": 21,
+      "tag_names": [
+        "1.3.0",
+        "1.3.5",
+        "1.3.9",
+        "1.4.0",
+        "1.4.5",
+        "1.4.9",
+        "1.5.0",
+        "1.5.5",
+        "1.5.9",
+        "1.6.0",
+        "1.6.5",
+        "1.6.9",
+        "1.7.0",
+        "1.7.1",
+        "1.7.5",
+        "1.7.9",
+        "1.8.0",
+        "1.8.1",
+        "1.9.3",
+        "3.0.0",
+        "3.0.5"
+      ]
+    },
+    {
+      "git_blob": "41c1c83c8439f5945ec40028966bdd44b05c45c4",
+      "bytes": 2529,
+      "sha256": "FCD09897C59442AA4396C6816B0EF246A484C9A8914ED4F1635FD4030B9E4299",
+      "paths": [
+        "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua"
+      ],
+      "binding_count": 3,
+      "tag_names": [
+        "2.4.0",
+        "2.4.5",
+        "2.4.9"
+      ]
+    },
+    {
+      "git_blob": "49efe995b167fe2c5cae03c03cd373d938c7fe1e",
+      "bytes": 2502,
+      "sha256": "F34E35A0B21290417663FB8C22AF79593BBA9DBF8ED26576FC0687C810ACF3AC",
+      "paths": [
+        "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua"
+      ],
+      "binding_count": 7,
+      "tag_names": [
+        "3.2.10",
+        "3.2.11",
+        "3.2.3",
+        "3.2.5",
+        "3.2.9",
+        "v4.0.0",
+        "v4.1.0"
+      ]
+    },
+    {
+      "git_blob": "5b32caffa9b36574983a7734f8b4f9db30e7b16d",
+      "bytes": 2021,
+      "sha256": "9DD833F5E7C37036931FCA0FA3E47987F282800CDB2AE4BF010D6EBAD4392B5F",
+      "paths": [
+        "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua"
+      ],
+      "binding_count": 15,
+      "tag_names": [
+        "0.10.0",
+        "0.11.0",
+        "0.12.0",
+        "0.6.0",
+        "0.7.0",
+        "0.8.0",
+        "0.9.0",
+        "1.8.2",
+        "1.8.5",
+        "1.8.9",
+        "1.9.4",
+        "1.9.5",
+        "1.9.9",
+        "3.1.5",
+        "3.1.9"
+      ]
+    },
+    {
+      "git_blob": "6e75ca82518b25ab557fb5697427aafe65d1af15",
+      "bytes": 4457,
+      "sha256": "54ABE84417BCD6D6B2DEAF9103C65B01D5968FFF704E24862C23C98C24206405",
+      "paths": [
+        "fixtures/assert-hidden-setting-readability/data-final-fixes.lua"
+      ],
+      "binding_count": 3,
+      "tag_names": [
+        "3.1.0",
+        "3.1.1",
+        "3.1.2"
+      ]
+    },
+    {
+      "git_blob": "72d429689249072bec2e7631f25fc6b33be4da72",
+      "bytes": 4663,
+      "sha256": "E882018A3C07E847CE6D543CD1328FAC8799A99FD7F656416CBED9F7C1752003",
+      "paths": [
+        "fixtures/assert-hidden-setting-readability/data-final-fixes.lua"
+      ],
+      "binding_count": 2,
+      "tag_names": [
+        "2.3.0",
+        "2.3.5"
+      ]
+    },
+    {
+      "git_blob": "842afb8c47aab5819a0c4f805c93d908e374261d",
+      "bytes": 4679,
+      "sha256": "D7D691985F96C9D987F7D599FF96A59380EFB363FC781D0044F801D69A05403F",
+      "paths": [
+        "fixtures/assert-hidden-setting-readability/data-final-fixes.lua"
+      ],
+      "binding_count": 17,
+      "tag_names": [
+        "0.10.0",
+        "0.11.0",
+        "0.12.0",
+        "0.6.0",
+        "0.7.0",
+        "0.8.0",
+        "0.9.0",
+        "1.8.2",
+        "1.8.5",
+        "1.8.9",
+        "1.9.4",
+        "1.9.5",
+        "1.9.9",
+        "2.4.0",
+        "2.4.5",
+        "3.1.5",
+        "3.1.9"
+      ]
+    },
+    {
+      "git_blob": "870a60587522fa2100d1a58da35c9aa6ba2bc4bc",
+      "bytes": 34783,
+      "sha256": "CBF66544AF9DABA66984D44407C706DE8468C782542636729A7734D036822B7F",
+      "paths": [
+        "tests/compiler/Test-MIRSettingsVisibility.ps1"
+      ],
+      "binding_count": 4,
+      "tag_names": [
+        "v4.2.0",
+        "v4.2.0-stable",
+        "v4.2.1",
+        "v4.2.2"
+      ]
+    },
+    {
+      "git_blob": "95d185fa8e9b7de91d43d122672c77e238b21e3e",
+      "bytes": 34776,
+      "sha256": "A94EC8871415937FCDDD122B42048672D4E1C7EEC663B1BF203C465A79D85711",
+      "paths": [
+        "tests/compiler/Test-MIRSettingsVisibility.ps1"
+      ],
+      "binding_count": 1,
+      "tag_names": [
+        "v4.3.0"
+      ]
+    },
+    {
+      "git_blob": "ad7b00d7a0df611627d85c68df900be30d6cf091",
+      "bytes": 3243,
+      "sha256": "C61690EE70742DB9AABAEE0A203D71C06447FBEF5CF9AF06EE89C7B59F9E1382",
+      "paths": [
+        "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua"
+      ],
+      "binding_count": 5,
+      "tag_names": [
+        "2.5.0",
+        "2.5.10",
+        "2.5.11",
+        "2.5.5",
+        "2.5.9"
+      ]
+    },
+    {
+      "git_blob": "bf0d797791be1192939b46c7a2e71088c8961aaa",
+      "bytes": 31669,
+      "sha256": "F0623BD9D0F20135B9AF67D9A660D02D6F4771F42974A66476621F8923D2A43F",
+      "paths": [
+        "tests/compiler/Test-MIRSettingsVisibility.ps1"
+      ],
+      "binding_count": 1,
+      "tag_names": [
+        "v4.1.0"
+      ]
+    },
+    {
+      "git_blob": "bfb112b558b50d9f3eab9d0a39ced83e329f09a2",
+      "bytes": 5270,
+      "sha256": "E5F515D0DEA6CB93DBBB76D6A26D53DD8944AE973BAB8351E06649C38E2D26AB",
+      "paths": [
+        "fixtures/assert-hidden-setting-readability/data-final-fixes.lua"
+      ],
+      "binding_count": 28,
+      "tag_names": [
+        "2.5.0",
+        "2.5.10",
+        "2.5.11",
+        "2.5.5",
+        "2.5.9",
+        "3.2.10",
+        "3.2.11",
+        "3.2.3",
+        "3.2.5",
+        "3.2.9",
+        "v4.0.0",
+        "v4.1.0",
+        "v4.2.0",
+        "v4.2.0-stable",
+        "v4.2.1",
+        "v4.2.2",
+        "v4.3.0",
+        "v4.4.0",
+        "v4.4.1",
+        "v4.4.2",
+        "v4.5.0",
+        "v4.5.1",
+        "v4.5.2",
+        "v4.6.0",
+        "v4.7.0",
+        "v4.7.1",
+        "v4.7.2",
+        "v4.7.3"
+      ]
+    },
+    {
+      "git_blob": "c522fdefb974d820a80b6c13fe90359ab58500a9",
+      "bytes": 35580,
+      "sha256": "105047680093D45F6CB2BA0C22E73C35157BDFF0E9744FEB8D52DD40E82EB2CA",
+      "paths": [
+        "tests/compiler/Test-MIRSettingsVisibility.ps1"
+      ],
+      "binding_count": 11,
+      "tag_names": [
+        "v4.4.0",
+        "v4.4.1",
+        "v4.4.2",
+        "v4.5.0",
+        "v4.5.1",
+        "v4.5.2",
+        "v4.6.0",
+        "v4.7.0",
+        "v4.7.1",
+        "v4.7.2",
+        "v4.7.3"
+      ]
+    },
+    {
+      "git_blob": "ce4b4eee879883c390606524801109a70731e700",
+      "bytes": 1855,
+      "sha256": "A7AAE71EB283A8D5C2180FECEB253272C843A2882C40B953EB3BB2857FD794DB",
+      "paths": [
+        "fixtures/assert-hidden-setting-readability/data-final-fixes.lua"
+      ],
+      "binding_count": 1,
+      "tag_names": [
+        "v3.0.0"
+      ]
+    },
+    {
+      "git_blob": "e3344a10992075fc4cba1af2f80b9274296bd09e",
+      "bytes": 5247,
+      "sha256": "9ECDE47D319674A9E4B2E45B8C5DEB1CB49A476BB9A1D76682DE925FBC785097",
+      "paths": [
+        "fixtures/assert-hidden-setting-readability/data-final-fixes.lua"
+      ],
+      "binding_count": 3,
+      "tag_names": [
+        "3.2.0",
+        "3.2.1",
+        "3.2.2"
+      ]
+    },
+    {
+      "git_blob": "f21eee665b57f60ddfc016ca96e07f04867e4314",
+      "bytes": 2479,
+      "sha256": "6D7EE63F132F021BD0FA4FEF8A41795791E65EB2D7B7E77133C97849DCD3675D",
+      "paths": [
+        "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua"
+      ],
+      "binding_count": 3,
+      "tag_names": [
+        "3.2.0",
+        "3.2.1",
+        "3.2.2"
+      ]
+    }
+  ],
+  "disposition_groups": [
+    {
+      "name": "registered-readable-hidden-values",
+      "disposition": "retain",
+      "original_expectation": "Registered startup settings remain readable even when hidden; missing settings or nil values fail. The final fixture tests four retained automatic controls, named ordinary research settings where registered, and six native continuation groups. Hidden is not deletion and false/zero is not missing.",
+      "implementation": [
+        "source/research/settings.lua",
+        "source/research/historical_settings.lua"
+      ],
+      "controls": [
+        "tests/test_generator.py::test_full_published_setting_output_matches_oracle_with_explicit_growth_safety_cap",
+        "tests/test_settings_profile.py::test_registered_settings_are_the_single_active_profile_authority",
+        "tests/test_settings_profile.py::test_raw_json_import_bypasses_compressed_decode_and_preserves_empty_zero_false"
+      ],
+      "current_evidence": "The two unchanged published4.7.3 Lua fixtures pass on current Base and SpaceAge F210 host worlds; false hidden-auto-lab and zero native-worker base cost remain exact. Four wrong-hidden/nil-value controls fail the original assertions. This is host evidence, not an engine result."
+    },
+    {
+      "name": "profile-and-target-visibility",
+      "disposition": "consolidate",
+      "original_expectation": "Experimental automatic-family tuning stays hidden; named official SpaceAge settings are hidden without the DLC and visible with it. Supported hidden settings remain registered. The selected earlier2.0 variants omit the two unavailable cargo-effect families rather than fabricating them. Final published4.2/4.7 policy keeps breeding tuning visible and enabled by default, superseding its earlier DLC-conditional hiding; capture-robot and nutrients defaults remain enabled independently of current generation availability.",
+      "implementation": [
+        "source/research/historical_settings.lua",
+        "source/research/settings.lua",
+        "source/compatibility/modern_catalogue.lua",
+        "source/platform/target.lua"
+      ],
+      "controls": [
+        "tests/test_generator.py::test_full_published_setting_output_matches_oracle_with_explicit_growth_safety_cap",
+        "tests/test_modern_targets.py::test_f200_keeps_875_settings_and_supported_nondefault_values",
+        "tests/test_historical_direct.py::test_historical_settings_keep_exact_names_defaults_and_time_sentinel"
+      ],
+      "current_evidence": "The current complete three-profile published-setting oracle matches all actual declaration fields, with only its separately reviewed planner-target retirement/growth bound. The new original-fixture probe executes two F210 profiles only; earlier2.0 and historical-target fixture bodies are source dispositions, not newly executed/native passes."
+    },
+    {
+      "name": "effective-values-profile-transport-and-legacy-settings-api",
+      "disposition": "consolidate",
+      "original_expectation": "Imported values are validated effective overrides; false/zero are not replaced by truthy defaults and startup values are not mutated. Deterministic full/compact MIRSET1 exports exclude their import setting, keep bounded validation and write only requested local script output. Preserve the existing settings interface and commands within their documented scope.",
+      "implementation": [
+        "source/research/settings.lua",
+        "source/research/settings_profile.lua",
+        "source/runtime/settings_profile.lua",
+        "source/runtime/bootstrap.lua"
+      ],
+      "controls": [
+        "tests/test_settings_profile.py::test_import_precedence_uses_profile_validation_before_consumer_normalization",
+        "tests/test_settings_profile.py::test_codec_has_canonical_identity_and_strict_compact_option",
+        "tests/test_settings_profile.py::test_all_registered_effect_defaults_export_in_full_and_disappear_in_compact",
+        "tests/test_settings_commands.py",
+        "tests/test_bootstrap.py"
+      ],
+      "current_evidence": "Reuse the existing settings-profile-roundtrip intent record and controls rather than count the same obligation twice. The legacy more-infinite-research-settings bridge remains in bootstrap; it is not retired because the MIR5 API is unified. Actual UI import/export files, independent-client targeting and changed current native API boundaries remain separately open."
+    },
+    {
+      "name": "authored-presentation-defaults-and-prototype-limits",
+      "disposition": "consolidate",
+      "original_expectation": "Default enablement and attention/risk presentation are distinct. Keep stable setting IDs, useful grouping/order/tooltips and explicit startup-only limits: engine-default by default, separate energy/pollution controls, opt-in power floor, no fake divider settings and no forced hidden values.",
+      "implementation": [
+        "source/research/historical_settings.lua",
+        "source/research/settings.lua",
+        "source/overrides/prototype_limits.lua",
+        "README.md"
+      ],
+      "controls": [
+        "tests/test_generator.py::test_full_published_setting_output_matches_oracle_with_explicit_growth_safety_cap",
+        "tests/test_prototype_limits.py",
+        "tests/test_settings_profile.py::test_settings_descriptors_remain_stable_after_caller_mutation_and_parse_closure"
+      ],
+      "current_evidence": "Complete serialized-setting comparison retains captured order/localized names/descriptions/defaults, not merely declaration counts. This does not prove rendered attention markers, localization, native settings input or all nondefault gameplay effects; preserve those checks in the existing settings/Library queue."
+    },
+    {
+      "name": "base-only-no-spaceage-generation",
+      "disposition": "retain",
+      "original_expectation": "The final readability fixture also refuses named SpaceAge-only technologies on Base-only inputs. Setting visibility/default enablement alone does not authorize construction of those technologies.",
+      "implementation": [
+        "source/compatibility/modern_catalogue.lua",
+        "source/data-final-fixes.lua"
+      ],
+      "controls": [
+        "tests/test_generator.py",
+        "tests/test_modern_targets.py"
+      ],
+      "current_evidence": "The unchanged published data-final fixture observes the actual emitted current rows installed into a host-only raw-table publication projection; it passes the Base absence assertion. No whole native catalogue, arbitrary provider or physical-output verdict follows."
+    },
+    {
+      "name": "retired-exact-helper-and-generated-document-lint",
+      "disposition": "obsolete-implementation-only",
+      "original_expectation": "The wrapper names old compiler/schema/descriptor/stage-builder/CurrentTargetPackage helpers and generated documentation markers. Their implementation addresses and generated-estate markers are not player behavior. Preserve policy purity, input custody, default-value immutability and authored useful documentation behind those checks.",
+      "implementation": [
+        "source/research/settings.lua",
+        "tools/package.py",
+        "tools/release.py",
+        "docs/development.md"
+      ],
+      "controls": [
+        "tests/test_pack.py",
+        "tools/check_repository.py"
+      ],
+      "current_evidence": "MIR5 uses the canonical source/target package and existing strict controls. Do not restore the MIR4 compiler, .mir schema/target snapshots, generated docs, or obsolete wrapper to satisfy source-text snippets. Imported helper implementation bodies and original native receipt custody are outside this selected19-body review, not implicitly dispositioned."
+    }
+  ],
+  "current_host_probe": {
+    "path": "evidence/aero-hidden-settings-visibility-originals-r01/host-probe.json",
+    "commit": "334cc386593c7f9220f9c6881d2edcc32f68a46f",
+    "sha256": "02D015561D93526A0315C8D42E8E0E76ECEE2F520CC363BF4A23ED771B016EF8",
+    "original_fixture_profiles": 2,
+    "original_fixture_bodies_executed": 2,
+    "negative_controls": 4,
+    "existing_complete_setting_oracle_profiles": [
+      "base-f210",
+      "space-age-f210",
+      "k2so-f210"
+    ],
+    "native_execution": false
+  },
+  "overlapping_prior_review": "spec/evidence/settings-profile-roundtrip-intents-aero-r01.json",
+  "selected_source_disposition_complete": true,
+  "remaining_executable_checks": [
+    "Keep current native hidden-setting/false-zero/effective-value observations, actual rendered settings/Library input, export files and independent-client lifecycle separate; use final consumed-input review without restarting unchanged completed components.",
+    "Retain current prototype-limit/cap/profile/API native scopes and adverse receipts. Current host serialization does not qualify every nondefault value, historical target or upstream configuration.",
+    "Reconcile remaining historical setting/control/registry/resolver/generated-orchestration/inter-release/unknown-consumer groups and missing original discussions/attachments through existing CONT/VER-07 records."
+  ],
+  "not_reviewed": [
+    ".mir/target-lines generated snapshot paths, which are not direct source aliases",
+    "Imported old wrapper-helper implementations and every generated documentation body",
+    "Historical native engines, saves, GUI/client or new physical/performance runs"
+  ],
+  "inventory_complete": false,
+  "source_reconciliation_complete": false,
+  "test_intent_reconciliation_complete": false,
+  "native_execution": false,
+  "release_qualification": false
+}
