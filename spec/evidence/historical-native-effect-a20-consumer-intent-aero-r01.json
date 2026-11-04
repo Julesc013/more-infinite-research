@@ -798,5 +798,271 @@
     "native_execution": false,
     "host_execution": false,
     "release_qualification": false
+  },
+  "paid_identity_and_current503_followup_r03": {
+    "status": "bounded-current-consumer-and-paid-identity-review-not-implementation",
+    "reviewed_on": "2026-11-04",
+    "finite_coverage": [
+      {
+        "obligation": "Positive foreign per-identity coverage under preferenceFalse",
+        "expectation": "Preserve full foreign owner; no redundant covered MIR future increment; keep paid MIR identity/effects/investment",
+        "implementation": "Shared-tail preservation exists; dedicated-stream decision missing",
+        "evidence": "Current503 positive-both and positive-rocket-only host mismatches, plus original5156 synthetic owner rejection and independent761D semantics",
+        "remaining": "Document current representation; correct admitted finite provider policy and add opposing host controls; actual provider fresh/paid/save/two-cold checks",
+        "owner": "Aero source/expectations; Black Glass native"
+      },
+      {
+        "obligation": "Disabled, zero/nonpositive, finite or unreachable foreign research",
+        "expectation": "Does not count as useful external coverage; retain legitimate MIR progression and foreign state",
+        "implementation": "Dedicated rows currently retained; no new useful-owner resolver demonstrated",
+        "evidence": "Current503 disabled/zero host controls only; historical finite/unreachable semantics from child",
+        "remaining": "Independent finite/unreachable/nonfinite source controls and actual supported-provider applicability; do not infer researchability from table presence",
+        "owner": "Aero bounded source and expectations"
+      },
+      {
+        "obligation": "Partial mixed-category research",
+        "expectation": "Retain useful uncovered progression while preserving every earned covered contribution and stable IDs",
+        "implementation": "SE authored tesla/electric multi-effect row exists; no A20 preservation port implemented",
+        "evidence": "Original per-identity partial policy and current SE source",
+        "remaining": "Choose exact partial representation/earned compensation; fresh and invested source/current/queue/cold controls",
+        "owner": "Aero engineering decision and independent review; Black Glass affected native"
+      },
+      {
+        "obligation": "Finite5/6, positive replacement and foreign custody",
+        "expectation": "Do not strip paid finite native effects; off inert; other modes require actual enabled positive owner; do not mutate foreign rows",
+        "implementation": "Current overlap only writes emitted MIR7/9; foreign bound unchanged in all four new cases",
+        "evidence": "Historical oracle and current method source; current existing positive-MIR overlap controls keep their identities",
+        "remaining": "Port any additional distinct helper/setting boundaries; retain original numbered99 custody as a temporary synthetic counterexample, not valid native profile",
+        "owner": "Aero host/source review"
+      },
+      {
+        "obligation": "Caps, settings, Library and beta-successor state",
+        "expectation": "Foreign ownership and MIR availability decisions remain consistent; earned effective bonuses and partial/current/queue/foreign state persist",
+        "implementation": "Existing runtime creation custody excludes foreign7 from caps but does not decide dedicated MIR rocket/cannon availability",
+        "evidence": "Current runtime catalogue/caps source; no A20 native/save result",
+        "remaining": "Reviewed exact affected502-to-successor input, original protected save and native effects/save/two-cold/client observations; do not reuse SourceB recipe-only evidence",
+        "owner": "Aero independent expectations; Black Glass exact native packet"
+      }
+    ],
+    "original_oracle": {
+      "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "sha256": "3B37DF4CD7B2431F2F0BA51B5525AA3B5C6C78E3451C026980FDB99082A08ADE",
+      "literal_predicate": "Both covered MIR rocket/cannon prototypes must be absent. Retained disabled/hidden rows fail that original predicate; it has not been relabelled passing.",
+      "semantic_intent": "With preferenceFalse, qualifying enabled positive infinite coverage is resolved independently per effect identity. Preserve useful uncovered categories in a mixed stream; disabled, nonpositive, finite or unreachable foreign research does not establish useful coverage."
+    },
+    "preservation_port": {
+      "authority": [
+        "MIG-01",
+        "MIG-03",
+        "GEN-07"
+      ],
+      "requirement": "Current MIR5 paid identity/effect/investment preservation outranks historical omission implementation. Data stage cannot inspect whether this save researched a row. A concrete reviewed availability/preservation representation and separately named expectations are required before source correction can qualify.",
+      "permission": "Standing implementation authority permits this engineering decision; no extra routine user permission is inherently required.",
+      "representation_accepted": false,
+      "limits": [
+        "A retained disabled row is one unqualified option; do not report it as an unchanged original absence-assertion pass.",
+        "Existing positive cap-ledger restoration can enable a retained row; data/runtime/Library/settings decisions must agree.",
+        "The authored Space Exploration electric row has tesla/electric effects; partial coverage must preserve the earned removed component.",
+        "Existing five-recipe SourceB masks do not authorize a weapon compensation policy."
+      ]
+    },
+    "current_host_probe": {
+      "source_commit": "ef9728979d3d3173811f84bcc02bb73dfe532cf2",
+      "player_tree": "86c29707650643d6d50e0dd4f2be032b546fdf82",
+      "record_sha256": "A372842C52629A450845B55707DDC17A714D2E3225D02958376B3868B0C7176E",
+      "lua_binary_sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899",
+      "input": "Literal valid-shape already-existing shared weapon-shooting-speed-7, infinite with finite named predecessor6, direct red-science source and independently authored category values. No transient99 or fixture-specific foreign name. full_world availability remains partly candidate-derived.",
+      "cases": [
+        {
+          "case": "positive-both",
+          "legacy_per_identity_no_redundant_future_expected": {
+            "rocket": false,
+            "cannon": false
+          },
+          "current_dedicated_enabled": {
+            "rocket": true,
+            "cannon": true
+          },
+          "no_redundant_future_expectation_matches": false,
+          "foreign_unchanged": true,
+          "existing_named_tail_preserved_not_emitted": true,
+          "publication_writes": 1
+        },
+        {
+          "case": "zero-both",
+          "legacy_per_identity_no_redundant_future_expected": {
+            "rocket": true,
+            "cannon": true
+          },
+          "current_dedicated_enabled": {
+            "rocket": true,
+            "cannon": true
+          },
+          "no_redundant_future_expectation_matches": true,
+          "foreign_unchanged": true,
+          "existing_named_tail_preserved_not_emitted": true,
+          "publication_writes": 1
+        },
+        {
+          "case": "positive-rocket-only",
+          "legacy_per_identity_no_redundant_future_expected": {
+            "rocket": false,
+            "cannon": true
+          },
+          "current_dedicated_enabled": {
+            "rocket": true,
+            "cannon": true
+          },
+          "no_redundant_future_expectation_matches": false,
+          "foreign_unchanged": true,
+          "existing_named_tail_preserved_not_emitted": true,
+          "publication_writes": 1
+        },
+        {
+          "case": "disabled-both",
+          "legacy_per_identity_no_redundant_future_expected": {
+            "rocket": true,
+            "cannon": true
+          },
+          "current_dedicated_enabled": {
+            "rocket": true,
+            "cannon": true
+          },
+          "no_redundant_future_expectation_matches": true,
+          "foreign_unchanged": true,
+          "existing_named_tail_preserved_not_emitted": true,
+          "publication_writes": 1
+        }
+      ],
+      "result": "The existing shared-tail selector correctly preserves the foreign row, while both dedicated MIR rows remain enabled. Positive-both and positive-rocket-only expose the unresolved per-identity future-progression discrepancy. Zero and disabled cases match only their complementary data-state expectations; no whole original fixture, researchability or native pass is claimed.",
+      "native_execution": false
+    },
+    "historical_semantic_sources": [
+      {
+        "role": "final_assertion",
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+        "blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+        "bytes": 11776,
+        "sha256": "3B37DF4CD7B2431F2F0BA51B5525AA3B5C6C78E3451C026980FDB99082A08ADE"
+      },
+      {
+        "role": "external_fixture",
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "fixtures/weapon-speed-external-owner/data.lua",
+        "blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+        "bytes": 3942,
+        "sha256": "51750C67227BD3B07D7C43B3AC8F03A28B0D6F3BA6E9383E5A3CE2C38D171416"
+      },
+      {
+        "role": "static_a20",
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+        "blob": "6084a493d8adb360b3f3db5252b8d317ce595fca",
+        "bytes": 10969,
+        "sha256": "F0F8A625271E978F14885AAC1F94D0CD4A033D70852235ED55BD81B71E76CC2D"
+      },
+      {
+        "role": "coverage_policy",
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "source/prototypes/mir/policy/native_effect_coverage.lua",
+        "blob": "81f989087f3000390fc3c450144af30e90f4bc1f",
+        "bytes": 10874,
+        "sha256": "4D7A22262A9E36C126848A7A88F8DEC1D63BAFE8C5B79AA8CB4AAD1D7A40FD1A"
+      },
+      {
+        "role": "stream_qualifier",
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "source/prototypes/mir/planner/stream_compiler/qualify.lua",
+        "blob": "51cb0f946d40db42009fa26ea109b6a1ca25084c",
+        "bytes": 12787,
+        "sha256": "685B9010626BDF852F71E03C2D6B5C418FB17C37308E93F0BFD7DB8497F25363"
+      },
+      {
+        "role": "overlap_policy",
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "source/prototypes/mir/policy/weapon_speed.lua",
+        "blob": "54431729a770513fcb66a89deec907767489ebde",
+        "bytes": 3137,
+        "sha256": "50533F3EC3026F2E18C53E350206083F0BD15ED18E491129D4D602D978A16B11"
+      },
+      {
+        "role": "effect_contracts",
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "source/prototypes/mir/settings/effect_contracts.lua",
+        "blob": "a7a894545e8a28b2f5061ca12298a07f043afa5a",
+        "bytes": 4851,
+        "sha256": "3784AE76B5AAB7E9E331E3D10D50EB475C8ACA6436B602634E0041DE65EA9825"
+      },
+      {
+        "role": "effect_metadata",
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "source/prototypes/mir/domain/effects/metadata.lua",
+        "blob": "5c22ff8172de27a365c9710651a8a3e6042e5937",
+        "bytes": 1818,
+        "sha256": "687AA9B942CCF4BF46F446CE8F1122AB5B4B6F8CE8DFEBF284899389BD15D936"
+      },
+      {
+        "role": "science_delegate",
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "source/prototypes/mir/capabilities/science_integration/science_packs.lua",
+        "blob": "85720bf87fbb5a366362c5b1a7a5a430a62a6831",
+        "bytes": 6320,
+        "sha256": "FB24B4398E73FD2B284F62E34947B02B78F422A98799E3A29E38EFADFA9D5BFE"
+      }
+    ],
+    "source_segment_review": [
+      {
+        "path": "source/research/modern.lua",
+        "start": "local function positive_weapon_categories",
+        "end_exclusive": "-- This intentionally operates",
+        "published502_sha256": "35FA21935035A05A0F5D55340E1AD3A61E22AF90127D9C76D8AD4B78BC45214E",
+        "current503_sha256": "35FA21935035A05A0F5D55340E1AD3A61E22AF90127D9C76D8AD4B78BC45214E",
+        "exact_raw_git_segment_equal": true
+      },
+      {
+        "path": "source/research/modern.lua",
+        "start": "function M.apply_weapon_speed_overlap",
+        "end_exclusive": "local function preflight_patch_recipe_names",
+        "published502_sha256": "9011E0EA3BA0B57CAF5B55D118354EBD2735D8968E68C1172E139F6FAADAEEEF",
+        "current503_sha256": "9011E0EA3BA0B57CAF5B55D118354EBD2735D8968E68C1172E139F6FAADAEEEF",
+        "exact_raw_git_segment_equal": true
+      },
+      {
+        "path": "source/compatibility/modern_catalogue.lua",
+        "start": "local function existing_infinite_owner",
+        "end_exclusive": "function M.omit_existing_continuations",
+        "published502_sha256": "D9FD4201B93659FE46F05CB2943E127FA315872EF7A1BDDF7BA82D617DC588FE",
+        "current503_sha256": "D9FD4201B93659FE46F05CB2943E127FA315872EF7A1BDDF7BA82D617DC588FE",
+        "exact_raw_git_segment_equal": true
+      },
+      {
+        "path": "source/compatibility/modern_catalogue.lua",
+        "start": "local function append_native_weapon_categories",
+        "end_exclusive": "function M.continuation_names",
+        "published502_sha256": "05FC079B9E3B191008087263F1FFB245C51BA8062DF8A28CDAEFBC963B41362E",
+        "current503_sha256": "10052BB2A9970488262C38934DEB2938A365C21ECCC29E15CE945CED75250CE7",
+        "exact_raw_git_segment_equal": false
+      }
+    ],
+    "custody": {
+      "private_repository": "Julesc013/mir-native-worker",
+      "commit": "fd4d134b1d7c765b3e837eb86c9ce1316fd2d887",
+      "path": "evidence/aero-a20-current503-paid-consumer-review-r01",
+      "originals": 23,
+      "gzip_sha256": "A60D8620C4CCB76700512B1F69CCD1AD580CC175DC34DF9C58F16FC09B961466",
+      "decoded_sha256": "04BF22F8F0465A6908FCD91EC120070F0CB624F62939F2C2E4D641692A54FC60",
+      "parent_review_sha256": "627DDA5D782F0F2973AE8867BE9CFB2EE106E0755432C501E0E5D526F50FBB27",
+      "independent_original_oracle_review_sha256": "761D18C1CDE82A20ED969AC49103ED98ECDE52396270DF20CEB41167688C4830",
+      "reviewed_source_bindings": "Nine exact original fixture/policy/qualification/metadata/contract bodies support bounded owner semantics only. Earlier11-fixture-body/153-binding counts remain unchanged; imported/inter-release/native reconciliation remains incomplete.",
+      "adverse": "Initial probe reader counted the Plan envelope instead of its166 controls; original script/error retained, no Lua/native ran in that failed invocation. Corrected reader reused the successful original Plan."
+    },
+    "source_changes": false,
+    "whole_historical_inventory_complete": false,
+    "source_reconciliation_complete": false,
+    "test_intent_reconciliation_complete": false,
+    "native_execution": false,
+    "release_qualification": false
   }
 }
