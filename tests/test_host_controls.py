@@ -102,6 +102,8 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_automatic_families.py",
             "tests/test_competing_productivity.py",
             "tests/test_native_credit_definitions.py",
+            "tests/test_native_gun_credit_definitions.py",
+            "tests/test_native_gun_credits.py",
             "tests/test_native_family_credit_definitions.py",
             "tests/test_native_credits.py",
             "tests/test_native_family_paid_credits.py",

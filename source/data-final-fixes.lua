@@ -221,8 +221,20 @@ local science_environment = {
   options=values.options, raw=data.raw, target=require("platform.target"), mods=mods, log=log,
 }
 local science_context = science.prepare(science_environment)
-if modern_selection then modern.retain_external_weapon_coverage(modern_selection, technologies, science_context) end
+local electric_full
+if modern_selection then electric_full = modern.retain_external_weapon_coverage(modern_selection, technologies, science_context) end
 science.apply_family(technologies, nil, science_environment, science_context)
+if electric_full then
+  for _, technology in ipairs(technologies) do
+    if technology.name == electric_full.name then
+      electric_full.unit = technology.unit
+      for _, holder in ipairs(require("research.native_gun_credit_definitions").technologies(electric_full, technology)) do
+        technologies[#technologies + 1] = holder
+      end
+      break
+    end
+  end
+end
 if require("platform.target").id == "f200" and type(mods) == "table"
     and (mods.ExpandedProductivityResearch or mods["plates-n-circuit-productivity"]
       or mods.Science_packs_productivity or mods["bioflux-productivity"] or mods["fish-productivity"]

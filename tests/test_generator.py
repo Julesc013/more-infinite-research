@@ -617,9 +617,9 @@ class GeneratorTests(unittest.TestCase):
         self.lua.execute('''
           local ok, message, environment = disabled_data_final()
           -- This selected-source scaffold has no native-owner recipes, so
-          -- only five empty private mains are added here. Full owner/recipe
+          -- five empty private mains and four mixed gun holders are added. Full owner/recipe
           -- fixtures independently cover the eleven canonical signed pairs.
-          assert(ok, message); assert(environment.writes == 1 and #environment.emitted == 99+5 and environment.emitted[1].enabled == false)
+          assert(ok, message); assert(environment.writes == 1 and #environment.emitted == 99+5+4 and environment.emitted[1].enabled == false)
           ok, message, environment = missing_active_space_age_binding()
           assert(not ok and tostring(message):find("missing required recipe casting-iron-gear-wheel", 1, true), tostring(message))
           assert(environment.writes == 0, "active binding wrote before named preflight")
@@ -1509,28 +1509,37 @@ class GeneratorTests(unittest.TestCase):
           end
         ''')
 
-    def test_partial_mixed_weapon_coverage_retains_every_paid_effect(self):
+    def test_partial_mixed_weapon_coverage_keeps_paid_holders_and_uncovered_progression(self):
         self.lua.execute('''
           local raw=full_world({}).raw
           local owner={type="technology",name="laser-shooting-speed-8",enabled=true,
             prerequisites={},unit={count=100,time=30,ingredients={{"automation-science-pack",1}}},
             effects={{type="gun-speed",ammo_category="laser",modifier=.4},
               {type="gun-speed",ammo_category="tesla",modifier=.5}}}
-          local row={name="recipe-prod-research_electric_shooting_speed-1",level=1,max_level="infinite",
+          local row={type="technology",name="recipe-prod-research_electric_shooting_speed-1",level=1,max_level="infinite",
+            unit={count=100,time=30,ingredients={{"automation-science-pack",1}}},
             effects={{type="gun-speed",ammo_category="tesla",modifier=.1},
               {type="gun-speed",ammo_category="electric",modifier=.1}}}
           local effects=row.effects
           local selection={definitions={{key="research_electric_shooting_speed",family="research_electric_shooting_speed"}},
             external_continuations={[owner.name]=owner}}
-          local context=require("research.science").prepare{raw=raw,target=require("platform.target"),mods={}}
-          modern.retain_external_weapon_coverage(selection,{row},context)
-          assert(row.enabled~=false and row.effects==effects and #effects==2
+          local context=require("research.science").prepare{raw=raw,target=require("platform.target"),mods={["space-age"]="2.0.0"}}
+          local full=modern.retain_external_weapon_coverage(selection,{row},context)
+          assert(row.enabled~=false and #row.effects==1 and row.effects[1].ammo_category=="electric"
+            and full.effects==effects and #effects==2
             and effects[1].modifier==.1 and effects[2].modifier==.1,
-            "partial coverage discarded paid Tesla bonus or useful electric progression")
+            "partial coverage lost its complete paid vector or uncovered progression")
+          local holders=require("research.native_gun_credit_definitions").technologies(full,row)
+          assert(#holders==4 and holders[3].effects[1].modifier==.1 and holders[4].effects[1].modifier==0)
+          assert(holders[1].effects[1].modifier==.1 and holders[2].effects[1].modifier==-.1)
+          -- A data phase always starts from the authored full vector.
+          row.effects=effects
           owner.effects[#owner.effects+1]={type="gun-speed",ammo_category="electric",modifier=.2}
-          modern.retain_external_weapon_coverage(selection,{row},context)
-          assert(row.enabled==false and row.effects==effects and #effects==2,
-            "full coverage removed paid effects instead of withholding future work")
+          full=modern.retain_external_weapon_coverage(selection,{row},context)
+          assert(row.enabled==false and #row.effects==0 and full.effects==effects and #effects==2,
+            "full coverage lost its retained paid vector")
+          holders=require("research.native_gun_credit_definitions").technologies(full,row)
+          assert(holders[2].effects[1].modifier==0 and holders[4].effects[1].modifier==0)
         ''')
 
     def test_existing_native_continuation_identity_is_preserved_without_mir_collision(self):
@@ -1800,13 +1809,13 @@ class GeneratorTests(unittest.TestCase):
           environment = full_world(k2mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 106+5)
+          assert(environment.writes == 1 and #environment.emitted == 106+5+4)
           local final_ids, final_count = {}, 0
           for _, row in ipairs(environment.emitted) do
             assert(final_ids[row.name] == nil, "duplicate generated K2SO technology " .. row.name)
             final_ids[row.name], final_count = row, final_count + 1
           end
-          assert(final_count == 106+5)
+          assert(final_count == 106+5+4)
           assert(final_ids["recipe-prod-research_gears-1"] and final_ids["recipe-prod-research_agricultural_growth_speed-1"]
             and final_ids["recipe-prod-research_spoilage_preservation-1"] and final_ids["recipe-prod-research_material_imersite-4"])
           assert(final_ids["recipe-prod-research_material_rare_metals-1"]
@@ -2383,7 +2392,7 @@ class GeneratorTests(unittest.TestCase):
           local environment = full_world(mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 99+5)
+          assert(environment.writes == 1 and #environment.emitted == 99+5+4)
           local ids = {}
           for _, row in ipairs(environment.emitted) do ids[row.name] = row end
           assert(ids["recipe-prod-research_gears-1"] ~= nil)
