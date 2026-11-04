@@ -1,0 +1,573 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalNativeEffectA20ConsumerIntentAeroV1",
+  "status": "bounded-final-source-intent-with-host-consumer-discrepancy",
+  "reviewed_against": "807ee2537fd6f431d6944ac26c11fcda1dc76565",
+  "player_tree": "58480faa995eab995cc0a3ad2cddbbdd0e5e0c04",
+  "subjects": [
+    "CONT-01",
+    "CONT-02",
+    "CONT-03",
+    "CONT-05",
+    "CONT-12",
+    "CONT-15"
+  ],
+  "requirements": [
+    "ARCH-01",
+    "ARCH-03",
+    "COMP-01",
+    "SET-01",
+    "VER-07"
+  ],
+  "original_request_ids": [
+    "NATIVE-01",
+    "STACK-02"
+  ],
+  "scope": "One complete static A20 script and its two complete final direct fixtures, three unique bodies/48 exact tag bindings. Across all91 inventoried refs, these three named paths additionally discover eight older fixture bodies/105 bindings; they are metadata-only and remain unresolved. No old compiler, original assertion harness or native execution.",
+  "source_index": {
+    "tag_scope": 91,
+    "queried_paths": [
+      "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+      "tests/Test-MIR4NativeEffectCoverageA20.ps1",
+      "fixtures/weapon-speed-external-owner/data.lua",
+      "fixtures/assert-weapon-speed-safety/data-final-fixes.lua"
+    ],
+    "total_discovered_bindings": 153,
+    "complete_review_bodies": 3,
+    "complete_review_bindings": 48,
+    "metadata_only_bodies": 8,
+    "metadata_only_bindings": 105
+  },
+  "historical_bodies": [
+    {
+      "blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+      "bytes": 3942,
+      "sha256": "51750C67227BD3B07D7C43B3AC8F03A28B0D6F3BA6E9383E5A3CE2C38D171416",
+      "bindings": [
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/weapon-speed-external-owner/data.lua",
+          "blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+          "bytes": 3942
+        },
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/weapon-speed-external-owner/data.lua",
+          "blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+          "bytes": 3942
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "fixtures/weapon-speed-external-owner/data.lua",
+          "blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+          "bytes": 3942
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "fixtures/weapon-speed-external-owner/data.lua",
+          "blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+          "bytes": 3942
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "fixtures/weapon-speed-external-owner/data.lua",
+          "blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+          "bytes": 3942
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "fixtures/weapon-speed-external-owner/data.lua",
+          "blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+          "bytes": 3942
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "fixtures/weapon-speed-external-owner/data.lua",
+          "blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+          "bytes": 3942
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "fixtures/weapon-speed-external-owner/data.lua",
+          "blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+          "bytes": 3942
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "fixtures/weapon-speed-external-owner/data.lua",
+          "blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+          "bytes": 3942
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "fixtures/weapon-speed-external-owner/data.lua",
+          "blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+          "bytes": 3942
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "fixtures/weapon-speed-external-owner/data.lua",
+          "blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+          "bytes": 3942
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "fixtures/weapon-speed-external-owner/data.lua",
+          "blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+          "bytes": 3942
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/weapon-speed-external-owner/data.lua",
+          "blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+          "bytes": 3942
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/weapon-speed-external-owner/data.lua",
+          "blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+          "bytes": 3942
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/weapon-speed-external-owner/data.lua",
+          "blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+          "bytes": 3942
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/weapon-speed-external-owner/data.lua",
+          "blob": "577eaf30c3d40cfeb957adb7a5f53b3a62c7db01",
+          "bytes": 3942
+        }
+      ],
+      "semantic_review": "complete selected final body",
+      "native_result": false
+    },
+    {
+      "blob": "6084a493d8adb360b3f3db5252b8d317ce595fca",
+      "bytes": 10969,
+      "sha256": "F0F8A625271E978F14885AAC1F94D0CD4A033D70852235ED55BD81B71E76CC2D",
+      "bindings": [
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+          "blob": "6084a493d8adb360b3f3db5252b8d317ce595fca",
+          "bytes": 10969
+        },
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+          "blob": "6084a493d8adb360b3f3db5252b8d317ce595fca",
+          "bytes": 10969
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+          "blob": "6084a493d8adb360b3f3db5252b8d317ce595fca",
+          "bytes": 10969
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+          "blob": "6084a493d8adb360b3f3db5252b8d317ce595fca",
+          "bytes": 10969
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+          "blob": "6084a493d8adb360b3f3db5252b8d317ce595fca",
+          "bytes": 10969
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+          "blob": "6084a493d8adb360b3f3db5252b8d317ce595fca",
+          "bytes": 10969
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+          "blob": "6084a493d8adb360b3f3db5252b8d317ce595fca",
+          "bytes": 10969
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+          "blob": "6084a493d8adb360b3f3db5252b8d317ce595fca",
+          "bytes": 10969
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+          "blob": "6084a493d8adb360b3f3db5252b8d317ce595fca",
+          "bytes": 10969
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+          "blob": "6084a493d8adb360b3f3db5252b8d317ce595fca",
+          "bytes": 10969
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+          "blob": "6084a493d8adb360b3f3db5252b8d317ce595fca",
+          "bytes": 10969
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+          "blob": "6084a493d8adb360b3f3db5252b8d317ce595fca",
+          "bytes": 10969
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+          "blob": "6084a493d8adb360b3f3db5252b8d317ce595fca",
+          "bytes": 10969
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+          "blob": "6084a493d8adb360b3f3db5252b8d317ce595fca",
+          "bytes": 10969
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+          "blob": "6084a493d8adb360b3f3db5252b8d317ce595fca",
+          "bytes": 10969
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+          "blob": "6084a493d8adb360b3f3db5252b8d317ce595fca",
+          "bytes": 10969
+        }
+      ],
+      "semantic_review": "complete selected final body",
+      "native_result": false
+    },
+    {
+      "blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+      "bytes": 11776,
+      "sha256": "3B37DF4CD7B2431F2F0BA51B5525AA3B5C6C78E3451C026980FDB99082A08ADE",
+      "bindings": [
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+          "blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+          "bytes": 11776
+        },
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+          "blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+          "bytes": 11776
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+          "blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+          "bytes": 11776
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+          "blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+          "bytes": 11776
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+          "blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+          "bytes": 11776
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+          "blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+          "bytes": 11776
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+          "blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+          "bytes": 11776
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+          "blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+          "bytes": 11776
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+          "blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+          "bytes": 11776
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+          "blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+          "bytes": 11776
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+          "blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+          "bytes": 11776
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+          "blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+          "bytes": 11776
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+          "blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+          "bytes": 11776
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+          "blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+          "bytes": 11776
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+          "blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+          "bytes": 11776
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+          "blob": "b5a80b733153efd0bebb307fcee26b8f0c74ac91",
+          "bytes": 11776
+        }
+      ],
+      "semantic_review": "complete selected final body",
+      "native_result": false
+    }
+  ],
+  "dispositions": [
+    {
+      "id": "foreign-positive-weapon-owner-suppression",
+      "independent_expectation": "With preference=false, a reachable positive infinite non-MIR owner for rocket and cannon replaces those corresponding dedicated MIR research rows; no duplicate useful effect owner. Preserve the foreign prototype.",
+      "original_basis": "Final assert-weapon-speed-safety external_owner branch and original native_effect_coverage.resolve_direct_effect_ownership; not current output.",
+      "current_implementation": [
+        "source/research/modern.lua: direct construction plus apply_weapon_speed_overlap only removes categories from a constructed MIR continuation",
+        "source/data-final-fixes.lua: existing competing provider adapter is F200 and named recipe-productivity providers",
+        "source/compatibility/modern_catalogue.lua: finite authored family selection"
+      ],
+      "current_controls": [
+        "tests/test_generator.py::GeneratorTests::test_weapon_speed_overlap_requires_an_enabled_positive_direct_replacement",
+        "tests/test_continuation_ownership.py::ContinuationOwnershipTests::test_each_existing_foreign_infinite_owner_is_preserved"
+      ],
+      "observed_evidence": {
+        "path": "build/qualification/aero-current-review-custody-r01/native-effect-a20-host-probe-r02.json",
+        "sha256": "D27B6B222F1A96256042CA68224D199CDD2A532BBC0A52D250282D5F5DAF186D",
+        "classification": "HOST isolated original expectation rejects current positive-owner output with and without numbered99; complementary baseline/disabled controls agree. Full original fixture not executed."
+      },
+      "disposition": "retain-original-obligation-host-consumer-gap-open",
+      "remaining_executable_check": "Independently review current supported-profile applicability and correct the admitted native-owner consumer without a global discovery solver or fixture-name binding. Port focused positive/disabled/zero/unreachable/partial mixed-category controls from original semantics. Review existing paid research and actual named provider before affected native/save/reload qualification. Existing MIR5 paid dedicated weapon identities/effects must be preserved if a corrected ownership decision changes emission; do not simply omit already-researched rows or reuse the unrelated five-recipe SourceB masks.",
+      "owner": "Aero independent source/expectation correction; Black Glass qualified profile/state/native execution"
+    },
+    {
+      "id": "weapon-overlap-needs-real-positive-replacement",
+      "independent_expectation": "Off preserves categories. Other modes remove a generic continuation category only for an actual enabled positive replacement; always alone is not authority. Existing finite5/6 cannon effects remain. Mixed Tesla/electric coverage is decided per identity, preserving an unowned useful category.",
+      "current_controls": [
+        "tests/test_generator.py::GeneratorTests::test_weapon_speed_overlap_requires_an_enabled_positive_direct_replacement",
+        "tests/test_generator.py::GeneratorTests::test_data_final_full_published_technology_output_matches_oracle"
+      ],
+      "disposition": "consolidate-covered-bounded-mode-controls-retain-mixed-foreign-consumer-checks",
+      "limits": "Default captured-row and positive MIR-output controls do not prove foreign-owner suppression, finite5/6 mutation safety or partly covered foreign mixed categories.",
+      "remaining_executable_check": "Add independent finite-predecessor and mixed foreign Tesla/electric controls at applicable authored integration boundaries; no candidate-derived oracle."
+    },
+    {
+      "id": "numbered-name-is-not-mir-custody",
+      "independent_expectation": "A preexisting weapon-shooting-speed-99 is foreign despite its numbered name. MIR cleanup cannot strip its positive categories. Original fixture removes this synthetic counterexample before final engine validation, so its presence never demonstrates a valid native final prototype graph.",
+      "current_implementation": [
+        "source/research/modern.lua: overlap edits only submitted constructed7/9 rows",
+        "source/runtime/catalogue.lua: explicit shared-tail creator history"
+      ],
+      "current_controls": [
+        "tests/test_continuation_ownership.py::ContinuationOwnershipTests::test_foreign_creator_remains_external_after_later_modifications"
+      ],
+      "disposition": "retain-custody-invariant-consolidate-creator-boundary-with-exact-counterexample-unported",
+      "remaining_executable_check": "Port named-counterexample mutation protection into a host-only submitted-output/raw-foreign split. Native coverage uses a genuinely upstream-valid provider identity, not synthetic99 left after an infinite tail."
+    },
+    {
+      "id": "unqualified-sightings-and-legacy-diagnostics",
+      "independent_expectation": "Finite, disabled, zero/nonpositive and science-unreachable foreign sightings do not qualify as positive researchable owner coverage. Static diagnostics are not cap/conservation, physical output or native confidence. Existing NATIVE-01/STACK-02 decisions retain their original IDs and status.",
+      "disposition": "retain-semantic-negative-controls-retire-private-diagnostic-spelling-and-package-harness-only",
+      "limits": "A20 checks source snippets and bound four-target package bytes; it explicitly reports engine_execution=not-run and public_qualification_claim=not-made. This audit does not review the complete capability registry, index builder or their public consumers.",
+      "remaining_executable_check": "Reconcile applicable native capability and mixed-identity consumer controls, actual source package correspondence and original exact native receipts. Keep unresolved disabled/science expectations from1661; do not use this static body as proof."
+    },
+    {
+      "id": "historical-four-target-byte-bindings",
+      "independent_expectation": "The original A20 binds actual source/output bytes for F100,F110,F200,F210 and shared private semantics; aliases or strings alone are not generated-package evidence.",
+      "disposition": "consolidate-current-package-identity-controls-retire-old-target-package-planner",
+      "remaining_executable_check": "Use current target/package checks and affected actual edition outputs. Preserve exact old refs; this source audit does not qualify all nine stable or early editions."
+    }
+  ],
+  "host_probe_scope_clarification": {
+    "path": "native-effect-a20-host-probe-scope-clarification-r01.json",
+    "sha256": "E1DDE21B25D1E655D119153B3D8830615C89FBC7D0C4485D50CA3D3B34A71A48",
+    "original_assertion_executed": false,
+    "source_world_partly_candidate_derived": true,
+    "independent_literal_seed": true,
+    "numbered_counterexample_removal_control": true
+  },
+  "retired_imports": "Old compiler_context, generated_registry, weapon_speed mutation, public-plan/evidence ModData and CurrentTargetPackage imports are preserved in Git; do not restore them into player source to run the old fixture. No delivered semantic obligation is retired merely because those imports are obsolete.",
+  "native_execution": false,
+  "release_qualification": false,
+  "inventory_complete": false,
+  "source_reconciliation_complete": false,
+  "test_intent_reconciliation_complete": false,
+  "metadata_only_sources": [
+    {
+      "blob": "38da8e7fe8cd07c6da54570f17fade4bc35bcc7b",
+      "bytes": 7729,
+      "sha256": "7D23D6FF826892B83D2303ADEA65F7EDBB1E922597A4F2374FFE8BDEE491091E",
+      "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+      "tag_bindings": 12,
+      "semantic_review": "metadata-only; unresolved"
+    },
+    {
+      "blob": "4f34c93de71a9e9527cb4ed6000b4ec7b31b9ad6",
+      "bytes": 9693,
+      "sha256": "151813D229FEC3884637F44FA35A7088906AC2985CF5F251F1B486E9E32B0FE2",
+      "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+      "tag_bindings": 15,
+      "semantic_review": "metadata-only; unresolved"
+    },
+    {
+      "blob": "55e848cbd94af9af78271d50e24e0fa2e56c0823",
+      "bytes": 2323,
+      "sha256": "5534E1154C34740F70D1D4FC1FF1431D83A6EF36FC533513095EA2CA0DCEB0A1",
+      "path": "fixtures/weapon-speed-external-owner/data.lua",
+      "tag_bindings": 32,
+      "semantic_review": "metadata-only; unresolved"
+    },
+    {
+      "blob": "6ae049bda062010f85dffff1c003aadcf5bb6e25",
+      "bytes": 2295,
+      "sha256": "A39070B7BC4DDA6FAE6B3B5F7B37114DD3F2E774C44B0DA6C7EAEC5EA297A404",
+      "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+      "tag_bindings": 16,
+      "semantic_review": "metadata-only; unresolved"
+    },
+    {
+      "blob": "d67a933ba20723943124845b5ee724ecba0125cd",
+      "bytes": 7713,
+      "sha256": "2709DC8A3198AA36510B1FE10A61ADA526B01EF5C6E98C1034431E236F038F32",
+      "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+      "tag_bindings": 5,
+      "semantic_review": "metadata-only; unresolved"
+    },
+    {
+      "blob": "e36c8a19379e7dd935907bd609a28f2b17bf0fc2",
+      "bytes": 1091,
+      "sha256": "FEC9E12890DC33746440156C0CE90AFA55659BA19B4EA5F1E7CE9CE63F772659",
+      "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+      "tag_bindings": 13,
+      "semantic_review": "metadata-only; unresolved"
+    },
+    {
+      "blob": "e466e740ce72f3a48175458c551775c8c8fe5411",
+      "bytes": 2635,
+      "sha256": "02B8D1F7808F82B72C0BD17070BEDBED1DBC2F8E7CF4BEDC3460EE9244197CE7",
+      "path": "fixtures/weapon-speed-external-owner/data.lua",
+      "tag_bindings": 6,
+      "semantic_review": "metadata-only; unresolved"
+    },
+    {
+      "blob": "f37fbf62f39f6304e8730ab04b18be56a8290517",
+      "bytes": 7660,
+      "sha256": "F544FB69E0FDD161925F73155859B6200C9B54035A2C4CFB8BBB1EEFF5A6B299",
+      "path": "fixtures/assert-weapon-speed-safety/data-final-fixes.lua",
+      "tag_bindings": 6,
+      "semantic_review": "metadata-only; unresolved"
+    }
+  ],
+  "complete_metadata_custody": {
+    "scope": "Exact metadata for all153bindings is preserved separately; no semantic completeness implied.",
+    "files": [
+      {
+        "path": "native-effect-a20-tag-bindings-r01.json",
+        "sha256": "7C99EEDDF67F5A1C5A6B6201FBE2FD64D9CC06333B7319589AE70319E2B19045"
+      },
+      {
+        "path": "native-effect-a20-fixture-tag-bindings-r01.json",
+        "sha256": "A1256AC38146DCE3AFD5DCADBAC89D48B523B18AF2141BFF1652A8D5CB10596C"
+      }
+    ]
+  },
+  "applicability_review": {
+    "author_base": "d4dfddc739161608559238e590183797a4ff390d",
+    "original_probe_base": "807ee2537fd6f431d6944ac26c11fcda1dc76565",
+    "player_tree_equal": "58480faa995eab995cc0a3ad2cddbbdd0e5e0c04",
+    "changed_source_test_tool_paths": [],
+    "no_new_execution_or_relabelling": true
+  },
+  "independent_finding_review": {
+    "path": "native-effect-a20-independent-finding-review-r01.json",
+    "sha256": "AF341C2E667B290536A0EEE403511DC04A56726F986C5D5A0E6542F3D88028F6",
+    "verdict": "supported-bounded-host-logical-discrepancy",
+    "limits": "Original complete assertion/A20 not executed; baseline/disabled are complementary isolated eligibility controls. Synthetic host seed, no native/support-completeness verdict."
+  }
+}
