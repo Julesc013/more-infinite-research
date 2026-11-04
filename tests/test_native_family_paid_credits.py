@@ -10,6 +10,7 @@ import sys
 import unittest
 
 import test_native_credits as fixture
+import test_bootstrap as bootstrap_fixture
 
 
 class NativeFamilyPaidCreditsTests(unittest.TestCase):
@@ -266,6 +267,143 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                   for _,state in pairs(force._states) do assert(state.writes.level==0 and state.writes.enabled==0) end
                   no_foreign_write(force)
                 ''')
+
+    def _published_m4_base(self, origin="f200"):
+        # Read preserved published observations, never today's declarations.
+        # The protected 4.7.20003 Base hop retains these five public identities;
+        # modern-f210-470 independently records the same one-recipe Base mask.
+        inventory = json.loads((Path(__file__).resolve().parents[1] / "spec" / "inventory" /
+                                ("modern-" + origin + "-470.json")).read_text())
+        profile = next(p for p in inventory["profiles"] if p["id"] == "base-" + origin)
+        families = ("low_density_structure", "plastic", "processing_unit", "rocket_fuel", "steel")
+        additions = profile["published_output"]["data"]["additions"]
+        self.lua.execute('GROUPS={};published_base_mask={}')
+        for family in families:
+            row = next(r["row"] for r in additions if r["type"] == "technology"
+                       and r["name"] == "recipe-prod-research_" + family + "-1")
+            self.assertEqual(len(row["effects"]), 1)
+            effect = row["effects"][0]
+            self.assertEqual(effect["type"], "change-recipe-productivity")
+            self.lua.globals().base_family = "research_" + family
+            self.lua.globals().base_recipe = effect["recipe"]
+            self.lua.globals().base_change = effect["change"]
+            self.lua.execute('''
+              GROUPS[base_family]={{recipe=base_recipe,change=base_change}}
+              published_base_mask[key(base_family,base_recipe)]=true
+            ''')
+        self.lua.execute('''
+          GROUPS.research_steel[2]={recipe="new-unpaid-steel",change=.1}
+          published_base_mask[key("research_steel","new-unpaid-steel")]=true
+          BASE_ACTIVE={base="2.1.23",["more-infinite-research"]="5.0.21003"}
+          reload_credits(BASE_ACTIVE,"f210")
+        ''')
+
+    def test_published_m4_base_same_engine_and_exact_hop_preserve_only_old_paid_mask(self):
+        for origin, destination in (("f210", "5.0.21003"), ("f200", "5.0.21003"), ("f200", "5.0.21004")):
+            with self.subTest(origin=origin, destination=destination):
+                self.setUp()
+                self._published_m4_base(origin)
+                self.lua.globals().cross_engine = origin == "f200"
+                self.lua.globals().destination = destination
+                self.lua.execute('''
+                  BASE_ACTIVE["more-infinite-research"]=destination;reload_credits(BASE_ACTIVE,"f210")
+                  local force=make_collected_force(1,8,published_base_mask,false)
+                  local main=force.technologies["recipe-prod-research_steel-1"]
+                  main.saved_progress=.27;force.research_queue={main,force.technologies.foreign}
+                  force.current_research=main;local queue=force.research_queue
+                  local changes={["more-infinite-research"]={old_version=cross_engine and "4.7.20003" or "4.7.21003",
+                    new_version=destination}}
+                  if cross_engine then changes.base={old_version="2.0.77",new_version="2.1.23"} end
+                  native_credits.on_configuration_changed({mod_startup_settings_changed=false,mod_changes=changes})
+                  for family,recipes in pairs(GROUPS) do
+                    close(own_contribution(force,family,recipes[1].recipe),7*recipes[1].change)
+                    assert(record(force,family,recipes[1].recipe).offset==0)
+                  end
+                  close(own_contribution(force,"research_steel","new-unpaid-steel"),0)
+                  assert(record(force,"research_steel","new-unpaid-steel").offset==-7,
+                    "current output fabricated old earning rights")
+                  assert(force.research_queue==queue and force.current_research==main
+                    and main.saved_progress==.27 and force.research_progress==.42)
+                  no_foreign_write(force)
+                ''')
+
+    def test_published_m4_base_hop_refuses_unproven_inputs_before_all_mir_writes(self):
+        opponents = ("startup", "unknown-startup", "added-provider", "unchanged-provider", "removed-provider",
+                     "observer", "unknown-origin", "wrong-destination", "wrong-current-version", "missing-engine",
+                     "other-source-patch", "older-destination-patch", "future-destination-patch", "future-engine",
+                     "wrong-active-engine", "future-minor", "same-engine-future-patch", "inconsistent-same-engine",
+                     "private-main", "incomplete-old-mask")
+        for full_bootstrap in (False, True):
+            for opponent in opponents:
+                with self.subTest(bootstrap=full_bootstrap, opponent=opponent):
+                    self.setUp()
+                    self._published_m4_base()
+                    if full_bootstrap:
+                        bootstrap_fixture.BootstrapTests().setUp(self.lua)
+                        self.lua.execute('''
+                          local real_credits=native_credits
+                          install_modules(false,false,false,true);install_runtime(nil,BASE_ACTIVE);game.forces={}
+                          package.preload["runtime.native_credits"]=function()return real_credits end
+                          load_control()
+                        ''')
+                    self.lua.globals().opponent = opponent
+                    self.lua.globals().full_bootstrap = full_bootstrap
+                    self.lua.execute('''
+                      local changes={base={old_version="2.0.77",new_version="2.1.23"},
+                        ["more-infinite-research"]={old_version="4.7.20003",new_version="5.0.21003"}}
+                      local changed=false
+                      if opponent=="startup" then changed=true end
+                      if opponent=="unknown-startup" then changed=nil end
+                      if opponent=="added-provider" or opponent=="unchanged-provider" then
+                        BASE_ACTIVE.ExpandedProductivityResearch="1.0.0"
+                      end
+                      if opponent=="added-provider" then changes.ExpandedProductivityResearch={new_version="1.0.0"} end
+                      if opponent=="removed-provider" then changes.ExpandedProductivityResearch={old_version="1.0.0"} end
+                      if opponent=="observer" then BASE_ACTIVE["mir-fixture-observer"]="0.1.0" end
+                      if opponent=="unknown-origin" then changes["more-infinite-research"].old_version="4.7.20004" end
+                      if opponent=="wrong-destination" then changes["more-infinite-research"].new_version="5.0.21004" end
+                      if opponent=="wrong-current-version" then
+                        BASE_ACTIVE["more-infinite-research"]="5.0.20003"
+                        changes["more-infinite-research"].new_version="5.0.20003"
+                      end
+                      if opponent=="missing-engine" then changes.base=nil end
+                      if opponent=="other-source-patch" then changes.base.old_version="2.0.76" end
+                      if opponent=="older-destination-patch" then changes.base.new_version="2.1.22";BASE_ACTIVE.base="2.1.22" end
+                      if opponent=="future-destination-patch" then changes.base.new_version="2.1.24";BASE_ACTIVE.base="2.1.24" end
+                      if opponent=="future-engine" then changes.base.new_version="2.2.0";BASE_ACTIVE.base="2.2.0" end
+                      if opponent=="wrong-active-engine" then BASE_ACTIVE.base="2.1.24" end
+                      if opponent=="future-minor" then
+                        BASE_ACTIVE["more-infinite-research"]="5.1.21000"
+                        changes["more-infinite-research"].new_version="5.1.21000"
+                      end
+                      if opponent=="same-engine-future-patch" then
+                        changes["more-infinite-research"].old_version="4.7.21003"
+                        changes.base=nil;BASE_ACTIVE.base="2.1.24"
+                      end
+                      if opponent=="inconsistent-same-engine" then
+                        changes["more-infinite-research"].old_version="4.7.21003"
+                        changes.base.old_version="2.0.77";changes.base.new_version="2.0.77"
+                      end
+                      if opponent=="incomplete-old-mask" then GROUPS.research_plastic=nil end
+                      reload_credits(BASE_ACTIVE,"f210")
+                      local fresh=make_collected_force(1,1,{},false)
+                      local force=make_collected_force(2,8,published_base_mask,opponent=="private-main")
+                      local event={mod_startup_settings_changed=changed,mod_changes=changes}
+                      local callback=full_bootstrap and handlers.configuration or native_credits.on_configuration_changed
+                      local ok,message=pcall(callback,event)
+                      assert(not ok and tostring(message):find("native family",1,true),"unproven hop admitted: "..opponent)
+                      assert(next(storage)==nil,"refusal wrote MIR storage")
+                      for _,f in ipairs({fresh,force}) do
+                        for _,state in pairs(f._states) do assert(state.writes.level==0 and state.writes.enabled==0,
+                          "refusal mutated native state") end
+                        no_foreign_write(f)
+                      end
+                      if full_bootstrap then
+                        assert(lifecycle_calls.configuration==nil and library_calls.configuration==nil
+                          and module_credit_calls.preflight==nil and cannon_credit_calls.preflight==nil
+                          and scripted_calls.configuration==nil,"bootstrap wrote before real credit refusal")
+                      end
+                    ''')
 
     def _add_published_sif_recipients(self):
         # The production boundary requires all five published identities and

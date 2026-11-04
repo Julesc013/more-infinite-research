@@ -12,8 +12,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class BootstrapTests(unittest.TestCase):
-    def setUp(self):
-        self.lua = LuaRuntime(unpack_returned_tuples=True)
+    def setUp(self, lua=None):
+        self.lua = lua if lua is not None else LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().player_root = (ROOT / "source").as_posix()
         self.lua.globals().data_source = (ROOT / "source/data.lua").as_posix()
         self.lua.execute(r'''
