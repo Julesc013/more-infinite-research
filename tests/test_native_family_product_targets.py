@@ -110,6 +110,38 @@ class NativeFamilyProductTargetTests(unittest.TestCase):
             "private paid custody changed public fallback science")
         ''')
 
+    def test_galore_one_public_owner_has_two_exact_private_paid_holders(self):
+        producer = read_published_source(ROOT, "fixtures/space-age-galore-overlap/data.lua",
+            "9BD30B996DDF4169674C00D7565220E1B251E584BBC3ECAFD1CDFFA8058BE00E").decode()
+        oracle = read_published_source(ROOT, "fixtures/space-age-galore-overlap/data-final-fixes.lua",
+            "B458F44E50023570113BF4C0E2764DA1015F0104E5C4C5E012F001BA210919DF").decode()
+        self.lua.execute(producer)
+        before = plain(self.lua.globals().data.raw.recipe["vgal-coal-crushing"])
+        self.lua.globals().settings.startup["ips-effect-per-level-research_sulfur"].value = 17
+        self.lua.execute("data.writes,data.emitted=0,nil")
+        self.pipeline()
+        self.assertEqual(before, plain(self.lua.globals().data.raw.recipe["vgal-coal-crushing"]))
+        self.lua.globals().galore_oracle = oracle
+        self.lua.execute('''
+          local ids={}
+          for _,direction in ipairs({"positive","negative"}) do
+            local name="mir-native-credit-research_sulfur-vgal-coal-crushing-"..direction
+            ids[name]=true
+            local row=data.raw.technology[name]
+            assert(row and row.hidden==true and row.enabled==false and #row.effects==1)
+            assert(row.effects[1].recipe=="vgal-coal-crushing")
+            assert(row.effects[1].change==(direction=="positive" and .17 or -.17))
+          end
+          -- MIG-01 requires earned private credit. Apply the unchanged original
+          -- planned-owner oracle to the forward-earning projection, excluding
+          -- only these two independently asserted dormant signed holders.
+          local original=data.raw.technology;local forward={}
+          for name,row in pairs(original) do if not ids[name] then forward[name]=row end end
+          data.raw.technology=forward;assert(load(galore_oracle))();data.raw.technology=original
+          assert(data.raw["mod-data"]["more-infinite-research-native-adoptions"].data.galore_sulfur_retired==true)
+          assert(data.writes==1,"correction added a publication")
+        ''')
+
     def owner(self, family):
         return self.lua.globals().data.raw.technology[OWNERS[family][0]]
 

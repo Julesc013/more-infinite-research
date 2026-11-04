@@ -3,6 +3,41 @@
 -- progression, science and existing effects remain with their authors.
 local M = {}
 
+-- One recovered named overlap, after science admission. Preserve every other
+-- multi-output route and all of sulfur's other effects/identity/progression.
+function M.retain_galore_carbon_owner(technologies)
+  local carbon, sulfur
+  for _, row in ipairs(technologies) do
+    if row.name == "recipe-prod-research_carbon-1" then
+      if carbon then error("MIR Galore duplicate carbon identity", 2) end
+      carbon = row
+    elseif row.name == "recipe-prod-research_sulfur-1" then
+      if sulfur then error("MIR Galore duplicate sulfur identity", 2) end
+      sulfur = row
+    end
+  end
+  local function match(row)
+    local found, ordinal
+    for index, effect in ipairs(row and row.effects or {}) do
+      if effect.recipe == "vgal-coal-crushing" then
+        if found then error("MIR Galore duplicate named recipe effect", 3) end
+        if effect.type ~= "change-recipe-productivity" or type(effect.change) ~= "number"
+            or effect.change ~= effect.change or math.abs(effect.change) == math.huge then
+          error("MIR Galore invalid named recipe effect", 3)
+        end
+        found, ordinal = effect, index
+      end
+    end
+    return found, ordinal
+  end
+  local preferred = match(carbon)
+  local redundant, ordinal = match(sulfur)
+  if not carbon or carbon.enabled == false or carbon.hidden == true
+      or not preferred or preferred.change <= 0 or not redundant or redundant.change <= 0 then return false end
+  table.remove(sulfur.effects, ordinal)
+  return true
+end
+
 local function diagnostic_writer(values, context)
   local options = values and values.options
   if type(options) ~= "table" or options["mir-debug-recipe-matches"] ~= true then return nil end

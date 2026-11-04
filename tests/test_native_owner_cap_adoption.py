@@ -218,6 +218,27 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
                 with self.assertRaisesRegex(LuaError, "MIR native adoption data"):
                     self.boot(vm, 2)
 
+    def test_named_galore_retirement_is_validated_without_changing_read_return_shape(self):
+        _, owners, metadata = self.stage()
+        metadata["galore_sulfur_retired"] = True
+        lua = self.runtime(owners, metadata)
+        self.boot(lua,2)
+        self.assertIs(True,lua.execute('return require("runtime.catalogue").galore_sulfur_retired()'))
+        lua.execute('''
+          local facts={}
+          local payload=prototypes.mod_data["more-infinite-research-native-adoptions"].data
+          local definitions=require("compatibility.modern_catalogue").native_owners(script.active_mods)
+          assert(select("#",require("research.native_adoption").read(payload,definitions,facts))==3)
+          assert(facts.galore_sulfur_retired==true)
+        ''')
+        for invalid in ("true", 1, {}):
+            with self.subTest(invalid=invalid):
+                malformed=deepcopy(metadata)
+                malformed["galore_sulfur_retired"]=invalid
+                vm=self.runtime(owners,malformed)
+                with self.assertRaisesRegex(LuaError,"MIR native adoption data"):
+                    self.boot(vm,2)
+
     def test_selected_effect_setting_must_match_the_data_stage_selection(self):
         _, owners, metadata = self.stage(configured_effect=20)
         lua = self.runtime(owners, metadata)

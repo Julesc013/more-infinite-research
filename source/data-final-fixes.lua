@@ -235,6 +235,10 @@ end
 -- Stable native credit holders preserve already-earned partial overlaps when
 -- a provider or its ownership preference changes. They are explicit authored
 -- rows, independent of whether the provider is currently installed.
+if modern and require("research.product_target_extension").retain_galore_carbon_owner(technologies) then
+  if not native_adoption_patch then error("MIR Galore missing private admission facts", 0) end
+  native_adoption_patch.galore_sulfur_retired = true
+end
 require("research.native_credit_definitions").append(technologies, data.raw, values, require("platform.target"), native_credit_groups)
 
 -- Fixed native holders retain MIR1.1's already-earned extra module effects.
