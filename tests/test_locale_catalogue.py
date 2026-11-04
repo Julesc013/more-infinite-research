@@ -138,6 +138,48 @@ ACCEPTED_POST_B6_CORRECTIONS = {
         'technology-name.more-infinite-research.research_thruster_oxidizer_productivity': (
             'Продуктивность окислителя для ускорителя', 'Производительность двигателя окислителя',
         ),
+        # Additional contributor wording independently reconciled in CONT-16
+        # (semantic review 3E5BB8AC). Preserve the original B6 projection below.
+        'technology-name.more-infinite-research.research_agricultural_growth_speed': (
+            'Скорость роста растений', 'Скорость роста сельского хозяйства',
+        ),
+        'technology-name.more-infinite-research.research_lab_productivity': (
+            'Продуктивность лабораторий', 'Продуктивность исследований',
+        ),
+        'technology-name.more-infinite-research.research_lubricant_productivity': (
+            'Продуктивность смазочной жидкости', 'Производительность смазки',
+        ),
+        'technology-name.more-infinite-research.research_oil_cracking_productivity': (
+            'Продуктивность крекинга нефтепродуктов', 'Производительность крекинга нефти',
+        ),
+        'technology-name.more-infinite-research.research_oil_processing_productivity': (
+            'Продуктивность переработки нефти', 'Производительность нефтепереработки',
+        ),
+        'technology-name.more-infinite-research.research_sulfuric_acid_productivity': (
+            'Продуктивность серной кислоты', 'Производительность серной кислоты',
+        ),
+        'technology-description.more-infinite-research.spoilage_preservation': (
+            'Увеличивает глобальный модификатор времени порчи посредством ограниченного скриптового эффекта. '
+            'Существующие портящиеся предметы могут сохранять текущие сроки порчи до проверки в игре.',
+            'Увеличивает глобальный модификатор времени порчи посредством ограниченного скриптового эффекта. '
+            'Существующие портимые предметы могут сохранять текущие сроки порчи до тех пор, пока не будут проверены в игре.',
+        ),
+        'technology-description.more-infinite-research.agricultural_growth_speed': (
+            'Сокращает оставшееся время роста недавно посаженных сельскохозяйственными башнями растений '
+            'посредством ограниченного скриптового эффекта.',
+            'Сокращает оставшееся время роста недавно посаженных сельскохозяйственных башенных растений '
+            'за счет ограниченного скриптового эффекта.',
+        ),
+        'technology-description.more-infinite-research.electric_shooting_speed': (
+            'Увеличивает скорость стрельбы электрического оружия. В базовой игре это влияет на электроразрядную защиту; '
+            'со Space Age это также влияет на оружие Теслы, если доступна категория боеприпасов Теслы.',
+            'Увеличивает скорость стрельбы из электрического оружия. В ванили это влияет на защиту от разряда; '
+            'в Space Age это также влияет на оружие Tesla, если доступна категория боеприпасов Tesla.',
+        ),
+        'modifier-description.more-infinite-research.agricultural_growth_speed': (
+            'Скорость роста растений: +__1__% за уровень.',
+            'Скорость роста сельского хозяйства: +__1__% за уровень.',
+        ),
     },
 }
 
