@@ -11622,7 +11622,7 @@
               "source/runtime/spoilage.lua",
               "source/runtime/spoilage_contribution.lua",
               "source/runtime/scripted_effects.lua",
-            "source/runtime/bootstrap.lua"
+              "source/runtime/bootstrap.lua"
             ],
             "host_controls": [
               "tests/test_spoilage.py::test_published_modifier_clamps_and_retirement_tolerance_remain_explicit",
@@ -16562,19 +16562,24 @@
           "CONT-15",
           "VER-07"
         ],
-        "reviewed_against": "807ee2537fd6f431d6944ac26c11fcda1dc76565",
-        "scope": "One complete static A20 script and its two complete final direct fixtures, three unique bodies/48 exact tag bindings. Across all91 inventoried refs, these three named paths additionally discover eight older fixture bodies/105 bindings; they are metadata-only and remain unresolved. No old compiler, original assertion harness or native execution.",
+        "reviewed_against": "8fcac651ec259fe3b78a2a16cd742b0352c5cf53",
+        "scope": "The eight previously metadata-only direct fixture bodies:41139bytes,105 exact commit/path bindings across67 indexed tag names.104 bindings match live remote tags; retained local-only v3.0.0 names a different commit from public3.0.0 and is not a published alias claim. Together with r01 this accounts for all11 bodies/153 indexed bindings at the three named A20 paths; imported helpers, inter-release/discussion/native evidence and other paths remain outside scope.",
         "evidence": {
           "path": "spec/evidence/historical-native-effect-a20-consumer-intent-aero-r01.json",
-          "sha256": "45767767DB79A2641AF7195DD7B6022304B8E0DDA6A0EE8B71733C0BD10A6D07"
+          "sha256": "05332CB9B137DD3E84CA7EED9F9BA3EC820B92D2EE6894193E15C658EC42FB9C"
         },
-        "disposition": "Retain final foreign positive-owner suppression, per-identity useful coverage and numbered-name custody. Isolated original expectation rejects current host rocket/cannon output with a positive foreign owner even after numbered99 removal; no full original fixture or native pass. Older eight fixture variants remain metadata-only.",
+        "disposition": "Retain final foreign positive-owner suppression, per-identity useful coverage, finite5/6 and emitted-prerequisite protection, science qualification and numbered-name custody. Eight earlier fixture variants are source-reconciled in five groups; exact0.1 ownership, unconditional always stripping, mandatory-all-four emission and old private context/registry interfaces are superseded or implementation-only. The existing isolated final expectation still rejects current positive-owner host output; no new product, native or release verdict.",
         "remaining_executable_check": "Independently review current supported-profile applicability and correct the admitted native-owner consumer without a global discovery solver or fixture-name binding. Port focused positive/disabled/zero/unreachable/partial mixed-category controls from original semantics. Review existing paid research and actual named provider before affected native/save/reload qualification. Existing MIR5 paid dedicated weapon identities/effects must be preserved if a corrected ownership decision changes emission; do not simply omit already-researched rows or reuse the unrelated five-recipe SourceB masks.",
         "owner": "Aero recovered expectations/scoped correction and independent review; Black Glass affected exact native/save qualification",
         "source_reconciliation_complete": false,
         "test_intent_reconciliation_complete": false,
         "native_execution": false,
-        "release_qualification": false
+        "release_qualification": false,
+        "original_r01": {
+          "commit": "8fcac651ec259fe3b78a2a16cd742b0352c5cf53",
+          "path": "spec/evidence/historical-native-effect-a20-consumer-intent-aero-r01.json",
+          "sha256": "45767767DB79A2641AF7195DD7B6022304B8E0DDA6A0EE8B71733C0BD10A6D07"
+        }
       }
     ],
     "stable_coverage_review": {
