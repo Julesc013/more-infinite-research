@@ -1,0 +1,453 @@
+{
+  "kind": "HistoricalScenarioManifestIntentReconciliation",
+  "reviewed_on": "2026-11-05",
+  "reviewed_against": "44e2d731ae54262290c250b71b5c8a335e5cb6d3",
+  "subjects": [
+    "CONT-05",
+    "CONT-07",
+    "CONT-12",
+    "CONT-13",
+    "CONT-15",
+    "CONT-17"
+  ],
+  "request_ids": [
+    "K2-01"
+  ],
+  "scope": "Eleven complete historical manifest-test bodies at174 existing bindings; the two named K2SO/Corrundum declarations and the exact two-member A04 actor. No obsolete runner restoration or new native execution.",
+  "method": "Mechanical raw Git/blob/hash checks, bounded read-only Luna extraction and parent inspection. All requirements below come from original tests/declarations/request text; current candidate output is not an oracle.",
+  "manifest_test_sources": {
+    "inventory": "spec/evidence/historical-execution-registry-intent-aero-r01.json:manifest_frontier",
+    "selected_tags": 91,
+    "blobs": 11,
+    "tag_path_bindings": 174,
+    "raw_bytes": 76267,
+    "reviewed_blobs": [
+      "92299ed12283e4713bf5022b6709e764d3907598",
+      "2b24105dbfacbb34b019d76b92175d20e9cc737a",
+      "6805ad5bbc6319209a55824762d894e879fa8a92",
+      "55ab6cd95ed069c6a89201decb61525c9e310ec7",
+      "2a518b081bfac6e532d44b7542765e3fa2b6aa0b",
+      "3bad6164f1e8c9a77bcf101acea8d976a55d733b",
+      "879d5c29d717b202c3bc9ad86dfb94a7d8f05766",
+      "e56d6400aae150bfa275632f4570b8cb3734310a",
+      "b6ec2f2b5b1565eb7dffa5e96e82d662b0338553",
+      "0129e3dccb965b91c92159da91a1cc5d54a3e2cb",
+      "cdbc573920ed3526bc0f50d17e7f3c2749865200"
+    ],
+    "all_bodies_read": true,
+    "forwarding_wrapper_blobs": 2,
+    "substantive_blobs": 9,
+    "latest_substantive_blob": "cdbc573920ed3526bc0f50d17e7f3c2749865200",
+    "latest_representative": {
+      "tag": "v4.2.0",
+      "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+      "path": "tests/compatibility/Test-MIRScenarioManifests.ps1"
+    },
+    "reference_commit_map": "spec/inventory/continuity.json:historical_preservation_audit.source_inventory.tag_commits"
+  },
+  "original_declarations": [
+    {
+      "tag": "v4.2.0",
+      "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+      "path": "validation/scenarios/local-2.1.json",
+      "blob": "057d34ee15b05375a19b3e2b17bc6b0e6c93ac5d",
+      "bytes": 25474,
+      "sha256": "804F64AECB4662D37F759EB79518DCFA0AE490BF07C708457CB049FE6D81F45C"
+    },
+    {
+      "tag": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "validation/scenarios/local-2.1.json",
+      "blob": "78f8409b91aba443117244ffa47297156a1652e3",
+      "bytes": 25487,
+      "sha256": "43DFF8674040F3D7F5E2690CB0DCF3F0F4FE6B61B66B29B2E88CBA9AFB11B5F9"
+    }
+  ],
+  "original_k2_fixture": [
+    {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "fixtures/assert-k2-science-progressed-reload-a04/control.lua",
+      "blob": "2c4c2274f13de83b4d5eba0b6c40be77c95473c6",
+      "bytes": 3875,
+      "sha256": "45404B2511DF6CCD8AA70C07CF917EC6F11612E0B24480E48D820B6097A9B68F",
+      "identical_at_tags": [
+        "v4.2.0",
+        "v4.2.0-stable",
+        "v4.2.1",
+        "v4.2.2",
+        "v4.3.0",
+        "v4.4.0",
+        "v4.4.1",
+        "v4.4.2",
+        "v4.5.0",
+        "v4.5.1",
+        "v4.5.2",
+        "v4.6.0",
+        "v4.7.0",
+        "v4.7.1",
+        "v4.7.2",
+        "v4.7.3"
+      ]
+    },
+    {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "fixtures/assert-k2-science-progressed-reload-a04/info.json",
+      "blob": "d84184412282070e4755fbd7c9e4a47474a52f1d",
+      "bytes": 467,
+      "sha256": "0EDFDEE33646C654840CED59FD024253F01A5A887A0649552CE2A40ABE6135C6",
+      "identical_at_tags": [
+        "v4.2.0",
+        "v4.2.0-stable",
+        "v4.2.1",
+        "v4.2.2",
+        "v4.3.0",
+        "v4.4.0",
+        "v4.4.1",
+        "v4.4.2",
+        "v4.5.0",
+        "v4.5.1",
+        "v4.5.2",
+        "v4.6.0",
+        "v4.7.0",
+        "v4.7.1",
+        "v4.7.2",
+        "v4.7.3"
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "disposition": "consolidate-and-retire-implementation-only-structure",
+      "original_expectation": "Unique named scenarios, restricted engine targets, well-formed settings/science/log expectations and bounded runtime metadata. Private manifest selection stays exclusive; defaults include manual and engine-line inputs. Legacy forwarding paths preserve their bound arguments.",
+      "original_details": [
+        "Schema2,claim/group/root/setup labels and exact registry/profile/helper paths are retired representation details.",
+        "Latest lines202-222 oppose string/above-two reload counts,nonpositive duration,nonarray or escaping fixture paths,and malformed/empty reload fragments.",
+        "Earlier settings override and English-locale checks protect reproducible setup; obsolete command ordering and drive roots do not define player behavior."
+      ],
+      "current_implementation": [
+        "tests/Test-MIR5HostControls.ps1",
+        "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/lib/validation/NativeProbeCommon.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1"
+      ],
+      "controls": [
+        "tests/test_host_controls.py",
+        "tests/test_historical_native_runner.py",
+        "tests/tooling/Test-MIRImmutableInputStaging.ps1",
+        "tests/tooling/Test-MIRNativeProbeResources.ps1"
+      ],
+      "remaining_executable_check": "No historical wrapper/schema platform rerun. Continue exact current source/archive/settings/save/path binding in each actual case; transitive legacy runtime-contract implementations remain outside this bounded semantic disposition.",
+      "limits": "Structural validation and correct declared expectations do not demonstrate execution,native reloads or gameplay."
+    },
+    {
+      "disposition": "retain-mapped-existing-open-request",
+      "request_id": "K2-01",
+      "original_test_lines": [
+        182,
+        200
+      ],
+      "original_scenario": {
+        "name": "local-2-1-krastorio-spaced-out",
+        "targets": [
+          "2.1"
+        ],
+        "kind": "modpack-load",
+        "group": "compatibility-campaign",
+        "setup": {
+          "mode": "local-library",
+          "include_space_age": true,
+          "offline": true,
+          "exact_mir_archive": true
+        },
+        "roots": [
+          "Krastorio2-spaced-out",
+          "xy-k2so-enhancements-nulls-fork"
+        ],
+        "settings": {},
+        "runtime_fixtures": [
+          "fixtures/assert-k2-science-progressed-reload-a04"
+        ],
+        "required_reload_count": 2,
+        "max_reload_duration_seconds": 300,
+        "expected_plan": {
+          "mode": "load-only",
+          "required_result": "passed",
+          "maximum_dependency_failures": 0,
+          "required_stream_science": {
+            "research_advanced_circuit": [
+              "automation-science-pack",
+              "logistic-science-pack",
+              "chemical-science-pack",
+              "production-science-pack",
+              "electromagnetic-science-pack"
+            ],
+            "research_belts": [
+              "production-science-pack",
+              "space-science-pack"
+            ]
+          },
+          "forbidden_stream_science": {
+            "research_advanced_circuit": [
+              "kr-basic-tech-card"
+            ],
+            "research_belts": [
+              "kr-basic-tech-card",
+              "automation-science-pack",
+              "logistic-science-pack",
+              "military-science-pack",
+              "chemical-science-pack"
+            ]
+          },
+          "required_reload_log_fragments": [
+            "[MIR4_A04_K2_PROGRESS] stage=reload technology=recipe-prod-research_advanced_circuit-1 progress=0.42"
+          ]
+        },
+        "timeout_seconds": 900,
+        "claim_level": "partial-support",
+        "notes": "Local Krastorio 2 Spaced Out stack. The exact archive must load after K2SO finalizes its science and lab graph, and the representative advanced-circuit stream must retain red, green, blue, purple, and electromagnetic science. The local library must include Krastorio2 assets and all required companions."
+      },
+      "independent_expectation": {
+        "early": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "electromagnetic-science-pack"
+        ],
+        "late": [
+          "production-science-pack",
+          "space-science-pack"
+        ],
+        "forbidden": {
+          "research_advanced_circuit": [
+            "kr-basic-tech-card"
+          ],
+          "research_belts": [
+            "kr-basic-tech-card",
+            "automation-science-pack",
+            "logistic-science-pack",
+            "military-science-pack",
+            "chemical-science-pack"
+          ]
+        },
+        "seeded_progress": 0.42,
+        "legacy_epsilon": 1e-06,
+        "declared_cold_reloads": 2
+      },
+      "fixture_boundary": "Exact actor lines69-84 enable all prototypes,recursively complete prerequisites,cancel any current work,reset/queue one advanced-circuit identity and seed42percent. On-load only sets a local pending flag; first-tick lines86-92 assert the seed/science/current/single-entry queue and fixture storage. No paid lab work or predecessor upgrade is established. Preserve original tolerance and lock; never apply this actor to a production save or silently retarget it.",
+      "stronger_existing_request": "K2-01 already requires early and both late phases,adversarial lab reduction,and nonzero-progress upgrade/two reloads. Seeded A04 cold reloads alone do not satisfy that upgrade requirement; retain original ledger IDs/text/decision and its open qualification status.",
+      "current_implementation": [
+        "source/research/science.lua",
+        "source/compatibility/science_bindings.lua",
+        "source/compatibility/modern_catalogue/k2so.lua",
+        "source/compatibility/modern_catalogue/space_age.lua"
+      ],
+      "controls": [
+        "tests/test_generator.py::test_approved_profile_bindings_match_frozen_full_native_rows",
+        "tests/test_science.py::test_exact_k2so_phase_binding_normalizes_selected_policy_and_preserves_a_phase_trigger",
+        "tests/test_science.py::test_required_and_phase_science_survive_reduction_or_disable_before_publication"
+      ],
+      "supporting_evidence": [
+        {
+          "path": "spec/evidence/modern-k2so-comparison.json",
+          "scope": "Original complete intended data/settings equality only"
+        },
+        {
+          "path": "spec/evidence/science-k2so-f210-native.json",
+          "scope": "Original data-stage dump only; save/gameplay explicitly false"
+        },
+        {
+          "path": "spec/evidence/k2so-material-native-chain.json",
+          "scope": "Original nine material lab completions/two cold reloads; predecessor upgrade explicitly false"
+        }
+      ],
+      "remaining_executable_check": "Map the accepted exact early/both-late/adversarial science cases and actual progressed predecessor/successor/two-cold input closure to K2-01 before closing it. Reuse unchanged consumed inputs under original identities; execute only uncovered required boundaries. Recover named synthesis receipts from historical custody if needed; their canonical ledger paths are absent in this checkout.",
+      "owner": "Aero mapping/expectation review; Black Glass chooses and runs any missing native case.",
+      "limits": "No automatic fixture port,exact-reporter claim or current-candidate/native-upgrade pass from old names or generic cap/material tests."
+    },
+    {
+      "disposition": "retain-bounded-reproduction-intent-reject-contradictory-harness-detail",
+      "original_test_lines": [
+        224,
+        240
+      ],
+      "original_scenario": {
+        "name": "local-2-1-corrundum-maxcap-13",
+        "targets": [
+          "2.1"
+        ],
+        "kind": "modpack-load",
+        "group": "compatibility-campaign",
+        "setup": {
+          "mode": "local-library",
+          "include_space_age": true,
+          "offline": true,
+          "exact_mir_archive": true
+        },
+        "roots": [
+          "PlanetsLib",
+          "corrundum"
+        ],
+        "settings": {
+          "ips-max-level-research_processing_unit": 13,
+          "ips-max-level-research_rocket_fuel": 13,
+          "ips-max-level-research_plastic": 13,
+          "ips-max-level-research_steel": 13,
+          "ips-max-level-research_low_density_structure": 13,
+          "ips-max-level-research_lubricant_productivity": 13,
+          "ips-max-level-research_sulfur": 13,
+          "ips-max-level-research_modules": 13,
+          "mir-max-level-braking-force": 13
+        },
+        "expected_plan": {
+          "mode": "load-only",
+          "required_result": "passed",
+          "maximum_dependency_failures": 0,
+          "required_log_fragments": [
+            "Maximum-level state force=player technology=braking-force-8 selected-cap=13 effective-cap=13 prototype-max=4294967295",
+            "Maximum-level state force=player technology=low-density-structure-productivity selected-cap=13 effective-cap=13 prototype-max=4294967295",
+            "Maximum-level state force=player technology=plastic-bar-productivity selected-cap=13 effective-cap=13 prototype-max=4294967295",
+            "Maximum-level state force=player technology=processing-unit-productivity selected-cap=13 effective-cap=13 prototype-max=4294967295",
+            "Maximum-level state force=player technology=recipe-prod-research_lubricant_productivity-1 selected-cap=13 effective-cap=13 prototype-max=4294967295",
+            "Maximum-level state force=player technology=recipe-prod-research_modules-1 selected-cap=13 effective-cap=13 prototype-max=4294967295",
+            "Maximum-level state force=player technology=recipe-prod-research_sulfur-1 selected-cap=13 effective-cap=13 prototype-max=4294967295",
+            "Maximum-level state force=player technology=rocket-fuel-productivity selected-cap=13 effective-cap=13 prototype-max=4294967295",
+            "Maximum-level state force=player technology=steel-plate-productivity selected-cap=13 effective-cap=13 prototype-max=4294967295"
+          ],
+          "forbidden_log_fragments": [
+            "Maximum-level conflict"
+          ]
+        },
+        "timeout_seconds": 900,
+        "claim_level": "diagnostic-only",
+        "notes": "Historical Corrundum 1.0.47 and PlanetsLib 1.19.5 maximum-cap-13 reproduction envelope on Factorio 2.1.14. The removed ambient-sound repair is not a current-source claim."
+      },
+      "independent_expectation": "Nine authored family cap settings are13 with effective named caps13 and no cap conflict. Preserve the intended native/dedicated ownership boundary and earned/current/queued state under current contracts; MIR4 log strings are diagnostic evidence,not a new public API.",
+      "historical_envelope": "Corrundum1.0.47 +PlanetsLib1.19.5,Factorio2.1.14,Space Age; original claim is diagnostic-only and explicitly excludes the removed ambient-sound repair from current-source claims.",
+      "preserved_contradiction": {
+        "test_blob": "cdbc573920ed3526bc0f50d17e7f3c2749865200",
+        "test_line": 238,
+        "test_requires_audit_rows": 1,
+        "actual_named_declarations_audit_rows": 0,
+        "checked_declarations": [
+          "v4.2.0",
+          "v4.7.3"
+        ],
+        "disposition": "Do not invent the absent row or claim this stale test/declaration pair passed. The row-count contradiction is a historical harness defect,not a demonstrated MIR5 player defect."
+      },
+      "current_implementation": [
+        "source/research/catalogue.lua",
+        "source/research/native_adoption.lua",
+        "source/runtime/lifecycle.lua",
+        "source/runtime/caps.lua"
+      ],
+      "controls": [
+        "tests/test_caps.py::test_earned_above_cap_disables_without_changing_earned_state",
+        "tests/test_caps.py::test_queue_filter_preserves_order_and_unrelated_current_progress",
+        "tests/test_native_owner_cap_adoption.py::test_actual_admitted_five_owners_keep_cap_two_and_owned_disable_rights",
+        "tests/test_native_owner_cap_adoption.py::test_foreign_pre_disabled_owner_never_gains_a_restore_right"
+      ],
+      "controls_scope": "These are current generic cap/owner controls with their actual inputs; none is an actual Corrundum cap13 result.",
+      "local_input_inventory": {
+        "status": "read-only archive metadata/hash observation,not native activation",
+        "observed_on": "2026-11-05",
+        "archives": [
+          {
+            "archive": "corrundum_1.0.47.zip",
+            "bytes": 91910320,
+            "sha256": "969A92DE8AE509A9C57C6E94CB1232F9E840E26F340663DDBD1101E1C0932E13",
+            "internal_name": "corrundum",
+            "internal_version": "1.0.47",
+            "factorio_version": "2.1",
+            "metadata_member": "corrundum/info.json",
+            "metadata_sha256": "505B4BA3D63F2C229C34C46E406FE63EFE0A79DE19CB53CAC610B768BA2B8833",
+            "dependencies": [
+              "base >= 2.1",
+              "space-age >= 2.1",
+              "? mineral-chemistry >= 1.0.0"
+            ]
+          },
+          {
+            "archive": "corrundum_1.0.49.zip",
+            "bytes": 91910708,
+            "sha256": "A7F9087094B607F7C37179C0B0694E09FA1525D66DD7E4A08B59C0661EC0F6FE",
+            "internal_name": "corrundum",
+            "internal_version": "1.0.49",
+            "factorio_version": "2.1",
+            "metadata_member": "corrundum/info.json",
+            "metadata_sha256": "622C66BB78ECF5F1D45AD022208EA9CF493B89A86CE3870A7A5C7B0C4C6EE502",
+            "dependencies": [
+              "base >= 2.1",
+              "space-age >= 2.1",
+              "? mineral-chemistry >= 1.0.0"
+            ]
+          },
+          {
+            "archive": "PlanetsLib_1.19.5.zip",
+            "bytes": 1105676,
+            "sha256": "21FECA0A902B5B21B92DC17A65B5B3A3E08499E6A59FF9D7FF57ADF530004A93",
+            "internal_name": "PlanetsLib",
+            "internal_version": "1.19.5",
+            "factorio_version": "2.1",
+            "metadata_member": "PlanetsLib_1.19.5/info.json",
+            "metadata_sha256": "0D49854FD469D2AF12FF08E83A072E5E9F1E9BCDF5945525D2A2FB26549DC405",
+            "dependencies": [
+              "base >= 2.1.7",
+              "? space-age >= 2.1.7",
+              "? quality >= 2.1.7",
+              "? recycler >= 2.1.7",
+              "? PlanetsLibTiers",
+              "(?) Cosmic-Social-Distancing >= 1.0.2",
+              "! MT-lib"
+            ]
+          },
+          {
+            "archive": "PlanetsLib_1.26.1.zip",
+            "bytes": 1228794,
+            "sha256": "7D1803FD927A46AE8660C5792306520F161F639937F64B1ADE9331C3AB610A2B",
+            "internal_name": "PlanetsLib",
+            "internal_version": "1.26.1",
+            "factorio_version": "2.1",
+            "metadata_member": "PlanetsLib_1.26.1/info.json",
+            "metadata_sha256": "C9357FFAF32859CA3A835B0A83F6F32CCB252D32CD5A39AF5889CBAEB9C4A4DC",
+            "dependencies": [
+              "base >= 2.1.13",
+              "? space-age >= 2.1.7",
+              "? quality >= 2.1.7",
+              "? recycler >= 2.1.7",
+              "? PlanetsLibTiers",
+              "(?) Cosmic-Social-Distancing >= 1.0.2",
+              "! MT-lib"
+            ]
+          }
+        ],
+        "dependency_payloads_copied": false
+      },
+      "remaining_executable_check": "Determine applicability of the exact historical cap report/decision and nine current cap bindings before selecting one bounded check. Verify upstream validity on a named installed engine/profile first; do not reintroduce the removed ambient-sound mutation or invent old-engine/reporter state. Archive availability is confirmed,while original-engine/evidence applicability remains unverified.",
+      "owner": "Aero obligation/input/source mapping; Black Glass native queue and result owner.",
+      "limits": "No current native Corrundum cap13 pass,upstream compatibility verdict,ambient repair promise or new request authority is inferred."
+    }
+  ],
+  "source_body_intent_disposition_complete": true,
+  "product_qualification_complete": false,
+  "global_inventory_complete": false,
+  "preserved_private_extraction": {
+    "repository": "Julesc013/mir-native-worker",
+    "commit": "d21fb02a6228a84eb690d30e7f7709c851030ad2",
+    "path": "evidence/aero-historical-manifest-frontier-extraction-r01/review.json",
+    "sha256": "D05FE385003F4D8FB47C0C81C7C543F44587A6BE9435519934F5743EF87C5D80"
+  },
+  "validation": {
+    "raw_source_checks": "passed",
+    "current_controls": "mapped,not newly executed for this docs-only unit",
+    "repository_checks": "passed tools/check_repository.py; whitespace/append-only/source-ledger checks pass",
+    "native_execution": false,
+    "release_qualification": false,
+    "stable_acceptance": false
+  },
+  "limits": [
+    "No player source,test,request-ledger,progress header,native controller or published bytes change.",
+    "The11 direct test bodies now have bounded dispositions; no deeper retired runtime-contract platform or global VER-07 completion is claimed.",
+    "Routine native preparation/repair/dispatch remains autonomous to Black Glass; these mappings create no prospective Aero approval gate."
+  ]
+}
