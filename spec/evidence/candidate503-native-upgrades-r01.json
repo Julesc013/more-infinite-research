@@ -65,9 +65,12 @@
       "root_readback_sha256": "05FAE18DADAE4AB1413B34F8E4C29782EE554F4F35DCC47BB972A6F61C6283E6",
       "root_pass_processes": 6,
       "retained_failed_attempts": 2,
-      "independent_review": "pending",
+      "independent_review": "ACCEPTED bounded C provider-removal/actual merge/owed private lab/save/two-cold components",
       "observations": "Invested queue/partials/bonuses survive provider removal and real merge. One by_script=false plastic completion plus exactly two named scripted positive carriers grants both owed recipe deltas; save and two readonly colds at each endpoint.",
-      "limit": "Merged force index is reused. Original invalid/name-absent check precedes fresh creation; later alias-valid witness does not identify original survival."
+      "limit": "Merged force index is reused. Original invalid/name-absent check precedes fresh creation; later alias-valid witness does not identify original survival.",
+      "independent_review_commit": "1716877b3a0879fae6d570d20dbb209e47170498",
+      "independent_review_path": "evidence/aero-c246-affected-native-actual-reviews-r01/force-merge-private-lab-review.json",
+      "independent_review_sha256": "CD2E19AB85AF2CB78FF66F3DC76E039CA026CF38481D737658C9F28AD14D911E"
     },
     {
       "boundary": "published502-K2SO-to-C503-Crushing-Industry-paid-state-and-native-glass-work",
@@ -79,9 +82,52 @@
       "root_readback_sha256": "A2E9FD70EAB47886819FE709F9DDFDEEC5D7F1B264F1274C82E5CE0D5315138B",
       "root_pass_processes": 9,
       "retained_failed_attempts": 3,
-      "independent_review": "pending",
+      "independent_review": "ACCEPTED bounded accelerated paid-material upgrade/lab/save/two-cold components; direct crafting overrides explicitly not preserved",
       "observations": "13-to15 mods add CI0.6.9/FDSL0.5.5 on2.1.23. Three finite material identities retain two paid levels/.04,currentglass42percent/queuedsilicon27percent and foreign control. One actual final glass lab yields both glass recipes/.06 and siliconcurrent27percent; save/two readonly colds at all three endpoints.",
-      "limit": "Source direct crafting .125/.25 is already zero before every mod callback. Exact witnessed order/zero baseline alone is admitted and preserved afterward; historical direct overrides not claimed. Same independently default-validated accelerated helper throughout."
+      "limit": "Direct crafting .125/.25 is already zero at the first level configuration callback, before MIR configuration. New-mod on_init timing and cause are unassigned. Exact witnessed configuration-order/zero entry baseline is preserved afterward; historical direct overrides are not claimed. Same independently default-validated accelerated helper throughout.",
+      "independent_review_commit": "1716877b3a0879fae6d570d20dbb209e47170498",
+      "independent_review_path": "evidence/aero-c246-affected-native-actual-reviews-r01/k2so-paid-review.json",
+      "independent_review_sha256": "FACF94F72BA6E44A63CB427420F075A33929DF239A1C2F1EC3245C665890EAC1"
+    },
+    {
+      "boundary": "C503-actual-technology-effects-reset-on-earned-private-state",
+      "originals_commit": "c1803a0d2def8cef6a7d99f12df10f251885a72b",
+      "originals_path": "evidence/private-effects-reset-native-chain-r01",
+      "originals": 56,
+      "root_readback_sha256": "C839CE1C742DD5A16B1C09B80953BD7AC58C290AD60E755F17D6B43B18DEFCF6",
+      "accepted_processes": 3,
+      "new_lab_completions": 0,
+      "independent_review": "ACCEPTED one actual reset_technology_effects plus save/two readonly colds on earned C private research",
+      "independent_review_commit": "1716877b3a0879fae6d570d20dbb209e47170498",
+      "independent_review_path": "evidence/aero-c246-affected-native-actual-reviews-r01/private-effects-reset-review.json",
+      "independent_review_sha256": "12F6FD447673EB1F9730D4669BF1D73864FBE9AA3DAC5B0CD34EF6B4A556D6D7",
+      "limit": "reset_technology_effects only, not LuaForce.reset/all-settings; earlier one lab completion is carried."
+    },
+    {
+      "boundary": "C503-configured-native-cost-time-effect-with-foreign-reward",
+      "originals_commit": "e52d444ef16928231fd96e21ed769fe21d7e06a1",
+      "originals_path": "evidence/native-owner-settings-native-chain-r01",
+      "originals": 87,
+      "originals_gzip_sha256": "A857442842BAF054708304F91DB697D44E7CC0EF9948CF2848533ECEF52A60AD",
+      "originals_decoded_sha256": "0CFFB48A0798C11DED24E819402E2A675DCD41BBAE1E913B11AAE0D706C0FA5E",
+      "root_readback_sha256": "652E1B79FA1E9BAF524A5E365F1625928E81D52AD758E4F3D4F654EDC7951FC4",
+      "root_pass_processes": 3,
+      "retained_failed_attempts": 1,
+      "independent_review": "pending",
+      "limit": "Fresh bounded2.1.23 settings/foreign-owner branch, real lab/save/two colds, no post-MIR cost/time acceleration. Not oldsave/all-settings/physical/performance or stable."
+    },
+    {
+      "boundary": "C503-unknown-native-cost-with-uncovered-public-residual-research",
+      "originals_commit": "89eb3ed6494b230f863add899addd8f6dc166e5e",
+      "originals_path": "evidence/native-owner-fallback-native-chain-r01",
+      "originals": 90,
+      "originals_gzip_sha256": "14E79FEE7C94BE91AB07D6250CC0A4656B790145D57307C088994C5C330DBA51",
+      "originals_decoded_sha256": "B2FED9B6E9113901CD6A569538B3346994242454BE2C59436E76457928DE2D7A",
+      "root_readback_sha256": "411F2F00C6E955E32FC8317DF4FC4245E7D789302BCAF693E7048115606E6DA4",
+      "root_pass_processes": 3,
+      "retained_failed_attempts": 1,
+      "independent_review": "pending",
+      "limit": "Fresh bounded2.1.23 settings/foreign-owner branch, real lab/save/two colds, no post-MIR cost/time acceleration. Not oldsave/all-settings/physical/performance or stable."
     }
   ],
   "consumed_scope_analysis": {
