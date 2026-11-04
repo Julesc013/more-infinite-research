@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "kind": "MIR5Weapon504FirstEntryNativeChainV1",
+  "status": "root-observed-pass-independent-result-review-pending",
+  "scope": "One qualified foreign infinite weapon7 owner on Base2.1.23; seeded published503 paid-state upgrade to exact frozen504B, save and two read-only colds; zero labs.",
+  "published_source": {
+    "tag": "v5.0.3",
+    "source_commit": "fbe4e4d9f6fb43a9bbcc3c4fea38b92bb6242eb5",
+    "archive": "more-infinite-research_5.0.21003.zip",
+    "sha256": "C622AC3A73603E7C127FA8168D12C5D878D52646226EC74190E70164D6E0D227"
+  },
+  "target": {
+    "source_commit": "1c94e56db5e91771f604dc9b9cfb0fd457105b32",
+    "player_tree": "4087086154ae1424650c93161ad950e78215fb85",
+    "integrated_dev": "abf6105348e3d19c8f353b8fd1026e2505e846d1",
+    "integrated_entire_tree": "1608d255b56238fd09bd38114d3494702b52ed37",
+    "archive": "more-infinite-research_5.0.21004.zip",
+    "sha256": "CA80B5817C4587EB608B997436C419592892EAEDE6F5A9F7846EEBC55C23B8F8",
+    "unpublished": true,
+    "integrated_player_tree_verified_equal": true
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "fixture": {
+    "repository": "Julesc013/mir-native-worker",
+    "commit": "4619916b0ecb0b411c636493e80aa8da7d5df5ea",
+    "version": "0.1.0",
+    "sha256": "F24E08B752FCE79C94F719FD57D419949652983334AAB09A59BC0B855220EF35",
+    "same_archive_across_first_upgrade": true,
+    "settings": "Defaults; actual event startup-settings-changed false",
+    "selection": [
+      "base2.1.23",
+      "more-infinite-research5.0.21003 then5.0.21004",
+      "mir-fixture-weapon504-first-entry0.1.0"
+    ]
+  },
+  "originals": {
+    "repository": "Julesc013/mir-native-worker",
+    "commit": "1a10fce3372385c9033fef10265555b0ac00e87c",
+    "directory": "evidence/weapon504-first-entry-native-r01",
+    "text_bodies": 215,
+    "gzip_sha256": "E46FE586440603B66892CFE6B6548D169B9F2EAFB268B561ADDE2C9228C07E1A",
+    "decoded_sha256": "799774AEBE1DC7A22CB3837F3946BF4112BEF913BABA16079C2F65B7EEB223B7",
+    "root_readback_sha256": "A4CE0E09FD42F6626CD777C496CE4463854630D539829B1DDBDD821CD3D8F957",
+    "exact_remote_blobs_verified": true,
+    "raw_logs_included": true,
+    "complete_local_original_copy_members_rehashed": true,
+    "local_custody": "build/qualification/weapon504-first-entry-native-chain-r01"
+  },
+  "native_processes": {
+    "actual_total": 12,
+    "distinct_pids": 12,
+    "final_unchanged_fixture_chain": 6,
+    "earlier_successful_source": 3,
+    "preserved_fixture_adverse": 3,
+    "final_source_case": "weapon504-source-r04",
+    "final_target_case": "weapon504-target-r02",
+    "production_exit": "Supervised exit-1 only after observed marker, Saving finished and closed-save existence; completion predicate true.",
+    "cold_exits": [
+      0,
+      0
+    ],
+    "timed_out": false
+  },
+  "closed_saves": {
+    "final_source": {
+      "bytes": 672107,
+      "sha256": "2ADB68CE920C45E3BC644F1608FBB08BB2A1956639E295DE229706A0179501C6"
+    },
+    "final_target": {
+      "bytes": 672644,
+      "sha256": "07B50580B65BB588C7C16B05D18D944C53103E9F295F070C4FB474105FFD3517"
+    },
+    "earlier_source_preserved": {
+      "bytes": 566773,
+      "sha256": "65AE196F6EFC351CFDD1DA2113F5DD8B1D1039FE49AEDEDB809D14853A5B16A3"
+    },
+    "protected_predecessor_and_readonly_cold_hashes_unchanged": true
+  },
+  "observations": [
+    "Earliest ordinary-fixture configuration callback follows MIR by dependency; full snapshot occurs before target fixture storage/game writes.",
+    "Actual configuration event contains only MIR5.0.21003 to5.0.21004; startup settings unchanged.",
+    "Both paid forces retain dedicated rocket level3 and cannon level4 and complete four-category gun-speed vectors.",
+    "Opposite current/queue ordering survives, with current42percent/38percent, queued19percent and detached foreign27percent work.",
+    "Candidate dedicated future research is disabled; current, queued and paid state remain preserved.",
+    "Foreign owner level9,effects,costs,science and prerequisites remain unchanged.",
+    "Unearned/foreign-disabled force retains zero earned bonuses and its original foreign enablement/visibility.",
+    "First strictly later tick, target save and both read-only colds preserve the same values without queue/level/bonus reseeding."
+  ],
+  "preserved_adverse": [
+    {
+      "case": "weapon504-source-r01",
+      "classification": "fixture-runtime-shape",
+      "failure": "Runtime TechnologyModifier has mandatory hidden=false absent from raw prototype expectation.",
+      "disposition": "Confirmed installed runtime/prototype API contracts; require explicit false and retain hidden=true rejection."
+    },
+    {
+      "case": "weapon504-source-r02",
+      "classification": "fixture-runtime-order",
+      "failure": "Native science array order differs from raw declaration order.",
+      "disposition": "Exact named pack/amount/count/duplicate checks replace irrelevant positional equality; no science or tolerance changed."
+    },
+    {
+      "case": "weapon504-target-r01",
+      "classification": "fixture-event-sequence",
+      "failure": "Earliest state passed, then first on_tick shared configuration tick.",
+      "disposition": "Read-only defer until strictly later tick; rebuild source so identical corrected fixture spans real upgrade."
+    }
+  ],
+  "host_controls": {
+    "final_methods": 11,
+    "lua": "pinned Lua5.2",
+    "source_expectations": "Original503 archive SHA checked; original direct definitions loaded in memory. Candidate output is not the oracle.",
+    "negative_cases": [
+      "lost current/queue/order/partial",
+      "lost category-specific paid vectors/levels",
+      "changed foreign enablement/visibility/effects",
+      "earned bonus on unearned force",
+      "wrong mod/settings transition",
+      "removed LuaForce queue flag read/write",
+      "wrong/duplicate/missing science or amount",
+      "hidden runtime effect",
+      "same-tick write or next-tick state loss"
+    ],
+    "tolerance": 1e-08,
+    "tolerance_changed": false
+  },
+  "custody": {
+    "all_controls_archives_restored": true,
+    "original_predecessors_preserved": true,
+    "factorio_count_after": 0,
+    "dependency_library_copied_or_linked": false
+  },
+  "independent_result_review": {
+    "status": "pending-after-result-review",
+    "routine_native_preapproval_required": false
+  },
+  "remaining": [
+    "Actual useful lab completion of retained owed work and exclusion of new redundant future work",
+    "Galore paid sulfur/carbon first-upgrade and useful-work case",
+    "Partial Tesla/electric representation and affected state",
+    "All other applicable current-candidate release and stable gates"
+  ],
+  "release_qualified": false,
+  "stable_qualified": false,
+  "performance_qualified": false
+}
