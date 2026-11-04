@@ -8391,6 +8391,21 @@
           ],
           "evidence": "spec/evidence/library-multiplayer-qualified-chain.json",
           "scope": "English/German rendered Library views are observed in the limited two-client F200 scenario."
+        },
+        {
+          "id": "russian-fork389-current-key-port",
+          "source": [
+            "source/locale/ru/more-infinite-research.cfg"
+          ],
+          "historical_documentation": {
+            "repository": "AstardGrimoire/more-infinite-research",
+            "commit": "389a8b848145a89713be32b658c80113565246b4",
+            "path": "locale/ru/more-infinite-research.cfg",
+            "author": "AstardGrimotre"
+          },
+          "evidence": "spec/evidence/historical-russian-fork389-disposition-aero-r01.json",
+          "evidence_sha256": "A271B88ACB3708C9AFE1DD481E0FAD49C40438759FEB216DAB4812A23BC75A0B",
+          "scope": "All33 contributed pairs have a bounded disposition:11 already covered,4 ported,11 adapted to current meaning/formatting,7 retired or rejected. Fifteen Russian entries change, including five missing current setting names; current placeholders/bounded-effect caveats retained. Original author commit remains on a preserved canonical branch. Other locale/UI/package acceptance remains open."
         }
       ],
       "test_subjects": [
