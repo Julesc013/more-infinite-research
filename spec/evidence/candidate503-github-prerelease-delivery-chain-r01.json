@@ -422,17 +422,22 @@
     "published_bytes_replaced": false
   },
   "independent_actual_delivery_review": {
-    "status": "PASS-independent-anonymous19-downloads-final-publisher-custody-review-pending",
+    "status": "PASS-verified-prerelease-publication-public-downloads-and-both-delivery-records",
     "repository": "Julesc013/mir-native-worker",
-    "anonymous_comment_id": 6634075531,
-    "notes_and_custody_intake_comment_id": 6634271388,
-    "anonymous_files": 19,
+    "commit": "4069ff9f17f51f9ce425950f21a220331f44c763",
+    "path": "evidence/aero-candidate503-published-delivery-review-r01/review.json",
+    "sha256": "BADF15E9FF1B8E336A1CD99D00651713D24F235BBB90CE3A896A333BD4B8D0F9",
+    "publisher_original_custody_review_sha256": "143A881F683FA161148D1F27BF26BC3FEC005479EB75278AB54385AE42250F8C",
+    "public_metadata_review_sha256": "14E36CD873666659FD1952DF89FE9B9006D25AF45FD76D3293FF592E55C2B9C1",
+    "public_files": 19,
     "anonymous_bytes": 6593838,
-    "source_and_payload_changes": false,
-    "retained_reader_adverse": "The first reader expected alternate checksum display-label wording. The two vanity-label expectations were corrected under the integrity-file policy; a fresh strict anonymous read passed all19 with unchanged ZIPs/public objects. Original reader failure and received ZIPs are retained by the reviewer.",
-    "scope": "Independent actual public payloads/tag/labels/notes are verified. Final publisher-original receipt review remains separately in progress; no physical access to the publisher disk is claimed."
+    "aero_physical_files": 21,
+    "prior_assets_unchanged": 57,
+    "mir5_zip_labels_verified": 68,
+    "scope": "Final independent source/tag/artifact/notes/maturity/prior-preservation, publisher64-original receipt and own physical-delivery verdict. Root disk is reviewed through transported original bytes/receipts, not remote physical access.",
+    "retained_reader_adverses": "Checksum display-label and local CRLF/committed-LF comparison failures remain retained. Corrected readers pass with no public object or player-byte change."
   },
-  "remaining": "Stable Library input/export/personal/client lifecycle, historical and supported-profile parity, affected saved-state obligations, weapon/Galore follow-on corrections and whole-product performance remain open. GUI capture timeout cause is unknown. No Mod Portal upload or stable acceptance.",
+  "remaining": "Stable Library input/export/personal/client lifecycle, historical and supported-profile parity, affected saved-state obligations, weapon/Galore follow-on qualification and whole-product performance remain open. GUI capture timeout cause is unknown. No Mod Portal upload or stable acceptance.",
   "stable_qualification": false,
   "mod_portal_upload": false
 }
