@@ -65,9 +65,22 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
             self.assertIsNone(technologies[name], "MIR transport collided with a foreign owner")
             prototype = deepcopy(row)
             prototype.setdefault("level", 1)
+            prototype.setdefault("enabled", True)
             if prototype.get("max_level") == "infinite": prototype["max_level"] = 4294967295
             technology = lua.globals().technology(name, prototype["level"], prototype.get("enabled", True))
             technology.prototype = data_fixture.generator_fixture.lua_table(lua, prototype)
+            # Transport the actual runtime API shape. A data-stage omitted
+            # enabled default is exposed as true, unit.time is in ticks, and
+            # native research ingredients use named fields rather than pairs.
+            unit = prototype.get("unit", {})
+            if "count" in unit:
+                technology.research_unit_count = unit["count"]
+            elif unit.get("count_formula") == "1":
+                technology.research_unit_count = 1
+            technology.research_unit_energy = unit["time"] * 60
+            technology.research_unit_ingredients = data_fixture.generator_fixture.lua_table(lua, [
+                {"name": ingredient[0], "amount": ingredient[1]}
+                for ingredient in unit["ingredients"]])
             technologies[name] = technology
         lua.globals().mir_created = data_fixture.generator_fixture.lua_table(lua, {
             name: True for name in emitted})
@@ -217,6 +230,27 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
                 vm = self.runtime(owners, invalid)
                 with self.assertRaisesRegex(LuaError, "MIR native adoption data"):
                     self.boot(vm, 2)
+
+    def test_named_galore_retirement_is_validated_without_changing_read_return_shape(self):
+        _, owners, metadata = self.stage()
+        metadata["galore_sulfur_retired"] = True
+        lua = self.runtime(owners, metadata)
+        self.boot(lua,2)
+        self.assertIs(True,lua.execute('return require("runtime.catalogue").galore_sulfur_retired()'))
+        lua.execute('''
+          local facts={}
+          local payload=prototypes.mod_data["more-infinite-research-native-adoptions"].data
+          local definitions=require("compatibility.modern_catalogue").native_owners(script.active_mods)
+          assert(select("#",require("research.native_adoption").read(payload,definitions,facts))==3)
+          assert(facts.galore_sulfur_retired==true)
+        ''')
+        for invalid in ("true", 1, {}):
+            with self.subTest(invalid=invalid):
+                malformed=deepcopy(metadata)
+                malformed["galore_sulfur_retired"]=invalid
+                vm=self.runtime(owners,malformed)
+                with self.assertRaisesRegex(LuaError,"MIR native adoption data"):
+                    self.boot(vm,2)
 
     def test_selected_effect_setting_must_match_the_data_stage_selection(self):
         _, owners, metadata = self.stage(configured_effect=20)

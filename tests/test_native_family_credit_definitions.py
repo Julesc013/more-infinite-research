@@ -137,10 +137,10 @@ class NativeFamilyCreditDefinitionTests(unittest.TestCase):
           assert(raw.recipe['shared-route'].foreign_field=="preserve" and groups[families[1]][1].change==.0001)
         ''')
 
-    def test_fixed_twelve_descriptor_and_carrier_outputs_stay_exact_with_no_groups(self):
+    def test_fixed_thirteen_descriptor_and_carrier_outputs_stay_exact_with_no_groups(self):
         self.lua.execute(r'''
           local baseline=credit.descriptors()
-          assert(#baseline==12 and #credit.descriptors({})==12)
+          assert(#baseline==13 and #credit.descriptors({})==13)
           for index,wanted in ipairs(expected) do
             local row=baseline[index]
             local keys=0;for _ in pairs(row) do keys=keys+1 end
@@ -150,10 +150,10 @@ class NativeFamilyCreditDefinitionTests(unittest.TestCase):
           local a,raw_a=inputs();local b,raw_b=inputs()
           local emitted_a=credit.append(a,raw_a,values(2.5),{recipe_productivity=true})
           local emitted_b=credit.append(b,raw_b,values(2.5),{recipe_productivity=true},{})
-          assert(#emitted_a==24 and same(emitted_a,emitted_b) and same(a,b))
+          assert(#emitted_a==26 and same(emitted_a,emitted_b) and same(a,b))
           local groups=groups_for_all();local combined=credit.descriptors(groups)
-          assert(#combined==17)
-          for index=1,12 do assert(same(combined[index],baseline[index])) end
+          assert(#combined==18)
+          for index=1,13 do assert(same(combined[index],baseline[index])) end
         ''')
 
     def test_malformed_maps_arrays_values_metatables_aliases_and_cycles_refuse(self):

@@ -397,6 +397,7 @@ class BobCoreMaterialTests(unittest.TestCase):
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
           data = {raw=fixture_raw}
+          local science_context = {}
           settings, helpers, log = {startup={}}, {}, function() end
           package.preload["research.settings"] = function() return {resolve=function() return fixture_values end, default_value=function() return nil end} end
           package.preload["research.productivity"] = function() return {gears=function() return {type="technology", name="fixture-gears", unit={time=1, ingredients={{"automation-science-pack", 1}}}} end} end
@@ -411,10 +412,23 @@ class BobCoreMaterialTests(unittest.TestCase):
             return {preflight_recipe_patches=function() end, preflight_native_owner_patches=function() return {} end,
               native_owner_product_targets=function() return {} end, preflight_collected_native_owner_targets=function() end,
               technologies=function() return {} end, apply_weapon_speed_overlap=function() end,
+              retain_external_weapon_coverage=function(selection, rows, context)
+                assert(#selection.definitions==0 and context==science_context)
+                context.ownership_checked=true
+              end,
               apply_native_owner_patches=function() end, apply_recipe_patches=function() end}
           end
-          package.preload["research.product_target_extension"] = function() return {extend=function() end} end
-          package.preload["research.science"] = function() return {apply_family=function() end} end
+          package.preload["research.product_target_extension"] = function()
+            return {extend=function() end, retain_galore_carbon_owner=function() return false end}
+          end
+          package.preload["research.science"] = function()
+            return {prepare=function(environment)
+              assert(environment.raw==fixture_raw)
+              science_context.environment=environment;return science_context
+            end,apply_family=function(rows, bindings, environment, context)
+              assert(context==science_context and context.environment==environment and context.ownership_checked==true)
+            end}
+          end
           package.preload["research.native_credit_definitions"] = function()
             return {append=function() end, collected_descriptors=function(groups)
               assert(next(groups)==nil,"isolated material hook unexpectedly collected native families")

@@ -24,10 +24,11 @@ end
 local spoilage_contribution = require("runtime.spoilage_contribution")
 local repair_config = {enabled = effective.passive_repair_enabled == true}
 -- The Space Age lifecycle body is absent from base-only control stages.
-local scripted_effects
+local scripted_effects, native_gun_credits
 local active_mods = script and script.active_mods or mods or {}
 if type(active_mods) == "table" and active_mods["space-age"] ~= nil then
   scripted_effects = require("runtime.scripted_effects")
+  if target.recipe_productivity == true then native_gun_credits = require("runtime.native_gun_credits") end
 end
 -- A bounded foreign-owner adapter is needed only while its named provider is
 -- present. It owns no module discovery and is imported before callbacks.
@@ -309,6 +310,7 @@ local function on_init()
   initialize_imersite()
   lifecycle.on_init()
   if native_credits then native_credits.on_init() end
+  if native_gun_credits then native_gun_credits.on_init() end
   if competing_productivity then competing_productivity.on_init() end
   if scripted_effects then scripted_effects.on_init() end
   library.on_init()
@@ -363,6 +365,7 @@ local function on_configuration_changed(event)
   end
   local module_credit_plan = legacy_module_credits and legacy_module_credits.preflight(event)
   local cannon_credit_plan = legacy_cannon_credits and legacy_cannon_credits.preflight(event)
+  local gun_credit_plan = native_gun_credits and native_gun_credits.preflight(event)
   reconcile_imersite()
   lifecycle.on_configuration_changed(event)
   if native_credits then native_credits.on_configuration_changed(event, family_credit_plan) end
@@ -389,6 +392,7 @@ local function on_configuration_changed(event)
   end
   if legacy_module_credits then legacy_module_credits.apply(module_credit_plan) end
   if legacy_cannon_credits then legacy_cannon_credits.apply(cannon_credit_plan) end
+  if native_gun_credits then native_gun_credits.on_configuration_changed(event, gun_credit_plan) end
   library.on_configuration_changed(event)
   reconcile_repair()
   reconcile_translations()
@@ -398,6 +402,7 @@ end
 local function on_load()
   lifecycle.on_load()
   if native_credits then native_credits.on_load() end
+  if native_gun_credits then native_gun_credits.on_load() end
   if competing_productivity then competing_productivity.on_load() end
   if scripted_effects then scripted_effects.on_load() end
   library.on_load()
@@ -492,8 +497,10 @@ local function request_library_refresh(event)
 end
 
 local function on_research_finished(event)
+  if not (event and event.research) or event.research.valid == false then return end
   if native_credits and native_credits.on_research_finished
       and native_credits.on_research_finished(event) then reconcile_library_events() end
+  if native_gun_credits and native_gun_credits.on_research_finished(event) then reconcile_library_events() end
   if lifecycle.caps_active() then lifecycle.on_research_finished(event) end
   if competing_productivity then competing_productivity.on_research_finished(event) end
   if scripted_effects then scripted_effects.on_research_finished(event) end
@@ -501,6 +508,7 @@ local function on_research_finished(event)
 end
 
 local function on_research_reversed(event)
+  if not (event and event.research) or event.research.valid == false then return end
   if lifecycle.caps_active() then lifecycle.on_research_reversed(event) end
   if competing_productivity then competing_productivity.on_research_reversed(event) end
   if scripted_effects then scripted_effects.on_research_reversed(event) end
@@ -514,10 +522,12 @@ local function on_technology_effects_reset(event)
   if scripted_effects then scripted_effects.on_technology_effects_reset(event) end
   if legacy_module_credits then legacy_module_credits.on_technology_effects_reset(event) end
   if legacy_cannon_credits then legacy_cannon_credits.on_technology_effects_reset(event) end
+  if native_gun_credits then native_gun_credits.on_technology_effects_reset(event) end
   request_library_refresh(event)
 end
 
 local function on_research_started(event)
+  if not (event and event.research) or event.research.valid == false then return end
   if lifecycle.caps_active() then lifecycle.on_research_started(event) end
   if competing_productivity then competing_productivity.on_research_started(event) end
   request_library_refresh(event)
@@ -526,6 +536,7 @@ end
 local function on_research_cancelled(event)
   if native_credits and native_credits.on_research_cancelled
       and native_credits.on_research_cancelled(event) then reconcile_library_events() end
+  if native_gun_credits and native_gun_credits.on_research_cancelled(event) then reconcile_library_events() end
   if lifecycle.caps_active() then lifecycle.on_research_cancelled(event) end
   if competing_productivity then competing_productivity.on_research_cancelled(event) end
   request_library_refresh(event)
@@ -538,6 +549,7 @@ end
 local function on_force_created(event)
   if event and event.force then initialize_imersite(event.force) end
   if native_credits then native_credits.on_force_created(event) end
+  if native_gun_credits then native_gun_credits.on_force_created(event) end
   -- Authored prototype disablement may retain restoration rights even when
   -- all caps are unlimited. Clear those rights at existing force boundaries.
   lifecycle.on_force_created(event)
@@ -550,6 +562,7 @@ end
 local function on_force_reset(event)
   if event and event.force then initialize_imersite(event.force) end
   if native_credits then native_credits.on_force_reset(event) end
+  if native_gun_credits then native_gun_credits.on_force_reset(event) end
   lifecycle.on_force_reset(event)
   if competing_productivity then competing_productivity.on_force_reset(event) end
   if scripted_effects then scripted_effects.on_force_reset(event) end
@@ -559,6 +572,7 @@ end
 
 local function on_forces_merged(event)
   if native_credits then native_credits.on_forces_merged(event) end
+  if native_gun_credits then native_gun_credits.on_forces_merged(event) end
   if imersite and event and event.destination then
     local state = imersite_state()
     if state then
@@ -581,9 +595,12 @@ local function on_forces_merged(event)
   request_library_refresh(event)
 end
 
-local function on_discovery_queue_changed(event)
-  if lifecycle.caps_active() then lifecycle.on_discovery_tree_queue_changed(event) end
-  if competing_productivity and competing_productivity.active() then competing_productivity.on_discovery_tree_queue_changed(event) end
+local function on_research_queued(event)
+  if not (event and event.research) or event.research.valid == false then return end
+  if DISCOVERY_TREE then
+    if lifecycle.caps_active() then lifecycle.on_discovery_tree_queue_changed(event) end
+    if competing_productivity and competing_productivity.active() then competing_productivity.on_discovery_tree_queue_changed(event) end
+  end
   request_library_refresh(event)
 end
 
@@ -596,6 +613,7 @@ end
 local function bind_runtime_events(library_open)
   local credit_pending = native_credits and native_credits.needs_research_events
     and native_credits.needs_research_events() or false
+  credit_pending = credit_pending or (native_gun_credits and native_gun_credits.needs_research_events() or false)
   if library_events_scheduled == library_open and credit_events_scheduled == credit_pending then return end
   library_events_scheduled = library_open
   credit_events_scheduled = credit_pending
@@ -603,6 +621,7 @@ local function bind_runtime_events(library_open)
   local competing_active = competing_productivity and competing_productivity.active()
   local force_lifecycle_active = lifecycle.caps_active()
     or native_credits ~= nil
+    or native_gun_credits ~= nil
     or competing_active
     or (scripted_effects and scripted_effects.events_active())
     or imersite ~= nil
@@ -637,14 +656,13 @@ local function bind_runtime_events(library_open)
     script.on_event(events.on_research_reversed, active and on_research_reversed or nil)
   end
   if events.on_technology_effects_reset then
-    local active = lifecycle.caps_active() or native_credits ~= nil
+    local active = lifecycle.caps_active() or native_credits ~= nil or native_gun_credits ~= nil
       or competing_active or (scripted_effects and scripted_effects.events_active()) or library_open
     script.on_event(events.on_technology_effects_reset, active and on_technology_effects_reset or nil)
   end
   if events.on_research_queued then
-    local handler = library_open and request_library_refresh or nil
-    if DISCOVERY_TREE and (lifecycle.caps_active() or competing_active or library_open) then handler = on_discovery_queue_changed end
-    script.on_event(events.on_research_queued, handler)
+    local active = library_open or (DISCOVERY_TREE and (lifecycle.caps_active() or competing_active))
+    script.on_event(events.on_research_queued, active and on_research_queued or nil)
   end
   if events.on_runtime_mod_setting_changed and DISCOVERY_TREE then
     script.on_event(events.on_runtime_mod_setting_changed,

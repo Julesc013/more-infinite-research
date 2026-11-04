@@ -1,0 +1,487 @@
+{
+  "kind": "MIR504MixedGunNativeComponentIndexV1",
+  "reviewed_on": "2026-11-05",
+  "source": {
+    "author": "026f6a3965a2d51e1dffa9782f3a8b2bea78b6a5",
+    "integrated": "efaa3859db1e72c57f53ef281b50c3c2ca7808ea",
+    "player_tree": "a2ba6eeaf06292cd90b7d7c5a687cf96cf84529f",
+    "source_review_sha256": "159A3C52B06ED250EF50216E4F7304B3616E7E51C57E298C8FAD565631683FB4"
+  },
+  "modern_archives": {
+    "f200": "34F14D93A1262F32B45EBAB40B1C640B8B8FBE41B718492227024649E9E75268",
+    "f210": "154707C40ED772A09387BF4FB673D337796FFBCEAF1C3C57EA7DB9C3F608E922"
+  },
+  "prior_accepted_components": [
+    {
+      "scope": "Actual published503 first entry on2.1.23; paid2/3,current/queue/partials,save/two colds",
+      "review": "C0B878632AC37DB866B56704E1E326FAC1879602E7B88AAD8ED8D4C0FBF0D510",
+      "commit": "9a590fba76a55bac8c1fff7f00c9999b838f0ee3",
+      "path": "evidence/aero-mixed504-first-entry-review-r01/review.json"
+    },
+    {
+      "scope": "One actual uncovered-electric native lab completion on2.1.23,save/two colds; synthetic stock lab clones/energy",
+      "review": "E49BDC279C84C56CBA07EE604F6F00F975E63DBBA9C2AA236C0503C99552B3F0",
+      "commit": "a7dfca29fd16d3e1fa4b72becdc6a8d1922ffbb8",
+      "path": "evidence/aero-mixed504-electric-lab-review-r01/review.json"
+    }
+  ],
+  "original_provider_adverse": {
+    "source_save": "8751A847A92F4FB0E52843D79C59EB97437153DA7B6A88FA9F2ADD934F371EF0",
+    "whole_provider_claim": "FAILED/UNQUALIFIED; no rescore",
+    "review": "ACCE5889AFA0840EB985AA4F19C84F316716CC0686BDEA0597D499141F1B9D1B",
+    "commit": "a404370796976b43c2f162007ff4a2164b6ae511",
+    "path": "evidence/aero-mixed504-provider-adverse-component-review-r01/review.json",
+    "accepted_scope": "Pre-callback loss localization and bounded diagnostic reset/readmission/destination merge/reused-index fresh force/paid-force reset,save/two colds only",
+    "preconditions": "Original paid forces lack replacement-owner laser6/utility/space prerequisites; owner changes400->2306units,1800->7200ticks and one->six sciences. No product callback defect established."
+  },
+  "valid_source_batch": {
+    "repository": "Julesc013/mir-native-worker",
+    "commit": "fcabf23318c4448e2b4b697f5bd6e34462ce017b",
+    "path": "evidence/mixed-gun504-valid-provider-native-r01",
+    "manifest_sha256": "8685967F71EA60D7D4F5E44BD6EA1B038323513442803EED3E224F1623F83F6D",
+    "gzip_sha256": "DF057400A7B5A5B77BD83055D8748664AD3ABEB04C78159D29B211B29316A846",
+    "decoded_sha256": "6834CFA0CA88E4F95B844CE724A0F512E1C23AED5EE4FBA7818C7875FD9BB84B",
+    "root_readback_sha256": "C50B75D7C82FA71F735D1927F14D2C067F5397D8A0EC74F6BE2410D57009969A",
+    "remote_three_file_readback": "byte-equal, internal root/decoded hashes verified",
+    "text_bodies": 532,
+    "binary_locators": 56,
+    "actual_processes": 35,
+    "successful_processes": 33,
+    "failed_fixture_processes": 2,
+    "cases": [
+      {
+        "case": "f200-first-entry-r01",
+        "status": "observed-valid-source-provider-save-two-colds",
+        "actual_pids": [
+          25432,
+          3216,
+          22012
+        ],
+        "fixture_commit": "b087edfa7825d2b9468830fffce99a00aea5860f",
+        "fixture_sha256": "D468EEEB406DE345F730F3D60F7E028C68DDE8A4EFBC0E0E940E9755FCDCD38C",
+        "caller": {
+          "commit": "335cc4541300afe4d7a402049b1e8d9d85b28319",
+          "path": "Invoke-MixedGun504ValidProviderR01.ps1",
+          "sha256": "BF0F9470E27C6D156E68C1415D67272DBCFD2ABC98E467FD9DF537C00E29D099"
+        },
+        "source_save_sha256": "DCA71AB2F58383957EF4FFD2A78C79038630AADBE08CC3CC3B561C8ACF364933",
+        "output_save_sha256": "F935B08A39F0407E5B0ED75EED4FB9340B7C299EA5BD6DBC3EB2E4CE3BC09711",
+        "marker_sequences": [
+          [
+            "target-entry",
+            "target-next-tick",
+            "target-ready"
+          ],
+          [
+            "cold-ready"
+          ],
+          [
+            "cold-ready"
+          ]
+        ],
+        "failure": null
+      },
+      {
+        "case": "f200-lab-r01",
+        "status": "failed",
+        "actual_pids": [
+          31888
+        ],
+        "fixture_commit": "b733658b695ae16d1e6b341d1023b1ea23663c6a",
+        "fixture_sha256": "10AFEC0A38708994730300185FB4D42C272B5A64C2F4138253C16927D2BBD8C7",
+        "caller": {
+          "commit": "29bdf94f174c828f9597ed55b4c6a95525bc7877",
+          "path": "Invoke-MixedGun504ValidProviderR01.ps1",
+          "sha256": "3B53B74E2138556DCA83C84A2B6AF22A8F8EBB2D188C8307415CF6C67A026917"
+        },
+        "source_save_sha256": "F935B08A39F0407E5B0ED75EED4FB9340B7C299EA5BD6DBC3EB2E4CE3BC09711",
+        "output_save_sha256": null,
+        "marker_sequences": [],
+        "failure": "[mixed-gun504-first-entry] fatal native diagnostic"
+      },
+      {
+        "case": "f200-lab-r02",
+        "status": "observed-valid-source-provider-save-two-colds",
+        "actual_pids": [
+          4380,
+          29840,
+          20988
+        ],
+        "fixture_commit": "23d4e35ea5dcd3afc5a2a95965c2954a1acffd90",
+        "fixture_sha256": "A72A8AAFD02ED4D9BF40241A50AF21D4D76BBA8F953B9C2032B2CEDB707B2AA5",
+        "caller": {
+          "commit": "f834a0f77dd4b7d95c178b568ad30b82aff60834",
+          "path": "Invoke-MixedGun504ValidProviderR01.ps1",
+          "sha256": "AD7D443FC523E2CEE51EBB1E5D928CEDF6695358BD7898C4FD8F6A69F4D381B3"
+        },
+        "source_save_sha256": "F935B08A39F0407E5B0ED75EED4FB9340B7C299EA5BD6DBC3EB2E4CE3BC09711",
+        "output_save_sha256": "44BBA872D4E55ADEF8114D9CB04FD4E46B304B6B2D2960BD28EB87486756338F",
+        "marker_sequences": [
+          [
+            "target-entry",
+            "lab-started",
+            "lab-completed",
+            "target-ready"
+          ],
+          [
+            "cold-ready"
+          ],
+          [
+            "cold-ready"
+          ]
+        ],
+        "failure": null
+      },
+      {
+        "case": "f200-readmit-r01",
+        "status": "observed-valid-source-provider-save-two-colds",
+        "actual_pids": [
+          32136,
+          23076,
+          31480
+        ],
+        "fixture_commit": "b087edfa7825d2b9468830fffce99a00aea5860f",
+        "fixture_sha256": "040DACDCA8B73412FF882CB943763FE1C24BF495F54843E143A65B2379C946B4",
+        "caller": {
+          "commit": "335cc4541300afe4d7a402049b1e8d9d85b28319",
+          "path": "Invoke-MixedGun504ValidProviderR01.ps1",
+          "sha256": "BF0F9470E27C6D156E68C1415D67272DBCFD2ABC98E467FD9DF537C00E29D099"
+        },
+        "source_save_sha256": "5DB718C7B9130334EEF0AF8EE34F35B30B471D7E0B401D924C9B623400F15DCF",
+        "output_save_sha256": "21535AB6E49CBB895833F2CB9DBC43BE1F56E40E0AEE8F60E8E406CC2ED85045",
+        "marker_sequences": [
+          [
+            "target-entry",
+            "target-next-tick",
+            "forces-merged",
+            "target-ready"
+          ],
+          [
+            "cold-ready"
+          ],
+          [
+            "cold-ready"
+          ]
+        ],
+        "failure": null
+      },
+      {
+        "case": "f200-readmit-r02",
+        "status": "observed-valid-source-provider-save-two-colds",
+        "actual_pids": [
+          30416,
+          11112,
+          33376
+        ],
+        "fixture_commit": "23d4e35ea5dcd3afc5a2a95965c2954a1acffd90",
+        "fixture_sha256": "C936CE3598CD835AC0A7C7EE25358C04ABFF3A55268404B3AC3B276F5C8EB149",
+        "caller": {
+          "commit": "f834a0f77dd4b7d95c178b568ad30b82aff60834",
+          "path": "Invoke-MixedGun504ValidProviderR01.ps1",
+          "sha256": "AD7D443FC523E2CEE51EBB1E5D928CEDF6695358BD7898C4FD8F6A69F4D381B3"
+        },
+        "source_save_sha256": "55E58EBB2F41A1E2A0732E4D681FF17EA71F20984F040266785597D5D6506205",
+        "output_save_sha256": "3869C84F017A34ACC626DFA7BD8C2269AE92267B4A295C8AC6E148B248B507CD",
+        "marker_sequences": [
+          [
+            "target-entry",
+            "target-next-tick",
+            "forces-merged",
+            "target-ready"
+          ],
+          [
+            "cold-ready"
+          ],
+          [
+            "cold-ready"
+          ]
+        ],
+        "failure": null
+      },
+      {
+        "case": "f200-remove-r01",
+        "status": "observed-valid-source-provider-save-two-colds",
+        "actual_pids": [
+          14728,
+          33716,
+          16248
+        ],
+        "fixture_commit": "b087edfa7825d2b9468830fffce99a00aea5860f",
+        "fixture_sha256": "283BA27D931F67B19D29C5788D3A23C7B072FC27F4BD5A814547427AA9501B45",
+        "caller": {
+          "commit": "335cc4541300afe4d7a402049b1e8d9d85b28319",
+          "path": "Invoke-MixedGun504ValidProviderR01.ps1",
+          "sha256": "BF0F9470E27C6D156E68C1415D67272DBCFD2ABC98E467FD9DF537C00E29D099"
+        },
+        "source_save_sha256": "F935B08A39F0407E5B0ED75EED4FB9340B7C299EA5BD6DBC3EB2E4CE3BC09711",
+        "output_save_sha256": "5DB718C7B9130334EEF0AF8EE34F35B30B471D7E0B401D924C9B623400F15DCF",
+        "marker_sequences": [
+          [
+            "target-entry",
+            "target-next-tick",
+            "effects-reset",
+            "target-ready"
+          ],
+          [
+            "cold-ready"
+          ],
+          [
+            "cold-ready"
+          ]
+        ],
+        "failure": null
+      },
+      {
+        "case": "f200-remove-r02",
+        "status": "observed-valid-source-provider-save-two-colds",
+        "actual_pids": [
+          28164,
+          6872,
+          2668
+        ],
+        "fixture_commit": "23d4e35ea5dcd3afc5a2a95965c2954a1acffd90",
+        "fixture_sha256": "2124933CA371DC5ADAD48EA38AF0EE99AA106B86F6DCEC141D057514AE7332BB",
+        "caller": {
+          "commit": "f834a0f77dd4b7d95c178b568ad30b82aff60834",
+          "path": "Invoke-MixedGun504ValidProviderR01.ps1",
+          "sha256": "AD7D443FC523E2CEE51EBB1E5D928CEDF6695358BD7898C4FD8F6A69F4D381B3"
+        },
+        "source_save_sha256": "44BBA872D4E55ADEF8114D9CB04FD4E46B304B6B2D2960BD28EB87486756338F",
+        "output_save_sha256": "55E58EBB2F41A1E2A0732E4D681FF17EA71F20984F040266785597D5D6506205",
+        "marker_sequences": [
+          [
+            "target-entry",
+            "target-next-tick",
+            "effects-reset",
+            "target-ready"
+          ],
+          [
+            "cold-ready"
+          ],
+          [
+            "cold-ready"
+          ]
+        ],
+        "failure": null
+      },
+      {
+        "case": "f200-source-r01",
+        "status": "observed-valid-source-provider-save-two-colds",
+        "actual_pids": [
+          31412,
+          3788,
+          33252
+        ],
+        "fixture_commit": "b087edfa7825d2b9468830fffce99a00aea5860f",
+        "fixture_sha256": "D468EEEB406DE345F730F3D60F7E028C68DDE8A4EFBC0E0E940E9755FCDCD38C",
+        "caller": {
+          "commit": "335cc4541300afe4d7a402049b1e8d9d85b28319",
+          "path": "Invoke-MixedGun504ValidProviderR01.ps1",
+          "sha256": "BF0F9470E27C6D156E68C1415D67272DBCFD2ABC98E467FD9DF537C00E29D099"
+        },
+        "source_save_sha256": null,
+        "output_save_sha256": "DCA71AB2F58383957EF4FFD2A78C79038630AADBE08CC3CC3B561C8ACF364933",
+        "marker_sequences": [
+          [
+            "source-ready"
+          ],
+          [
+            "cold-ready"
+          ],
+          [
+            "cold-ready"
+          ]
+        ],
+        "failure": null
+      },
+      {
+        "case": "f210-first-entry-r01",
+        "status": "observed-valid-source-provider-save-two-colds",
+        "actual_pids": [
+          20244,
+          28096,
+          30780
+        ],
+        "fixture_commit": "471cbe4f0d2079642487e20e1447d94cc620e934",
+        "fixture_sha256": "4B2D4C6AB45594D2ACA995C23EFEDD0A6A3446025CA010648E1011BD88944855",
+        "caller": {
+          "commit": "3e4ae4f87583043f800c85d386dda5f878cba261",
+          "path": "Invoke-MixedGun504ValidProviderR01.ps1",
+          "sha256": "7746C0025BFF4034E84BFAFE1CA22ECF1C32B9EFF16379A5EACD1D445A9E8812"
+        },
+        "source_save_sha256": "908B8428F6DEBE9E5C4D0B5FFAEC3E7F1F475696B83BA704FFB36ADB16B62ED1",
+        "output_save_sha256": "E5B97DE774FAF920EB368A7EA7FCB4E009549027C45B9F31B86D073509840B2B",
+        "marker_sequences": [
+          [
+            "target-entry",
+            "target-next-tick",
+            "target-ready"
+          ],
+          [
+            "cold-ready"
+          ],
+          [
+            "cold-ready"
+          ]
+        ],
+        "failure": null
+      },
+      {
+        "case": "f210-readmit-r01",
+        "status": "observed-valid-source-provider-save-two-colds",
+        "actual_pids": [
+          14380,
+          25676,
+          24616
+        ],
+        "fixture_commit": "b087edfa7825d2b9468830fffce99a00aea5860f",
+        "fixture_sha256": "14421B3AF79380CB5878330ED4329F79AB865BBFCF73A1B427555A07C39D8967",
+        "caller": {
+          "commit": "335cc4541300afe4d7a402049b1e8d9d85b28319",
+          "path": "Invoke-MixedGun504ValidProviderR01.ps1",
+          "sha256": "BF0F9470E27C6D156E68C1415D67272DBCFD2ABC98E467FD9DF537C00E29D099"
+        },
+        "source_save_sha256": "9F45B155A2B786E9EC7AFB465757970A24E9729CDB42FCBB914CBEDF68A30A78",
+        "output_save_sha256": "67CA1B7066A342848E5072B7A738E15F221950C7F6606F203263F913D3FF296E",
+        "marker_sequences": [
+          [
+            "target-entry",
+            "target-next-tick",
+            "forces-merged",
+            "target-ready"
+          ],
+          [
+            "cold-ready"
+          ],
+          [
+            "cold-ready"
+          ]
+        ],
+        "failure": null
+      },
+      {
+        "case": "f210-remove-r01",
+        "status": "failed",
+        "actual_pids": [
+          3328
+        ],
+        "fixture_commit": "471cbe4f0d2079642487e20e1447d94cc620e934",
+        "fixture_sha256": "C2BEB8ED083F42B9A279D57711726D515AC43EBEFA4FB5BA4E3659486A85BE2E",
+        "caller": {
+          "commit": "3e4ae4f87583043f800c85d386dda5f878cba261",
+          "path": "Invoke-MixedGun504ValidProviderR01.ps1",
+          "sha256": "7746C0025BFF4034E84BFAFE1CA22ECF1C32B9EFF16379A5EACD1D445A9E8812"
+        },
+        "source_save_sha256": "E5B97DE774FAF920EB368A7EA7FCB4E009549027C45B9F31B86D073509840B2B",
+        "output_save_sha256": null,
+        "marker_sequences": [],
+        "failure": "[mir441-process-exit] 1"
+      },
+      {
+        "case": "f210-remove-r02",
+        "status": "observed-valid-source-provider-save-two-colds",
+        "actual_pids": [
+          22872,
+          21696,
+          32024
+        ],
+        "fixture_commit": "b087edfa7825d2b9468830fffce99a00aea5860f",
+        "fixture_sha256": "D5596FF6B6BCC37FA3078875BD0F8EE855C1E6192607AF617B755E6C10AAF96B",
+        "caller": {
+          "commit": "335cc4541300afe4d7a402049b1e8d9d85b28319",
+          "path": "Invoke-MixedGun504ValidProviderR01.ps1",
+          "sha256": "BF0F9470E27C6D156E68C1415D67272DBCFD2ABC98E467FD9DF537C00E29D099"
+        },
+        "source_save_sha256": "E5B97DE774FAF920EB368A7EA7FCB4E009549027C45B9F31B86D073509840B2B",
+        "output_save_sha256": "9F45B155A2B786E9EC7AFB465757970A24E9729CDB42FCBB914CBEDF68A30A78",
+        "marker_sequences": [
+          [
+            "target-entry",
+            "target-next-tick",
+            "effects-reset",
+            "target-ready"
+          ],
+          [
+            "cold-ready"
+          ],
+          [
+            "cold-ready"
+          ]
+        ],
+        "failure": null
+      },
+      {
+        "case": "f210-source-r01",
+        "status": "observed-valid-source-provider-save-two-colds",
+        "actual_pids": [
+          1876,
+          31596,
+          5396
+        ],
+        "fixture_commit": "471cbe4f0d2079642487e20e1447d94cc620e934",
+        "fixture_sha256": "4B2D4C6AB45594D2ACA995C23EFEDD0A6A3446025CA010648E1011BD88944855",
+        "caller": {
+          "commit": "3e4ae4f87583043f800c85d386dda5f878cba261",
+          "path": "Invoke-MixedGun504ValidProviderR01.ps1",
+          "sha256": "7746C0025BFF4034E84BFAFE1CA22ECF1C32B9EFF16379A5EACD1D445A9E8812"
+        },
+        "source_save_sha256": null,
+        "output_save_sha256": "908B8428F6DEBE9E5C4D0B5FFAEC3E7F1F475696B83BA704FFB36ADB16B62ED1",
+        "marker_sequences": [
+          [
+            "source-ready"
+          ],
+          [
+            "cold-ready"
+          ],
+          [
+            "cold-ready"
+          ]
+        ],
+        "failure": null
+      }
+    ],
+    "independent_after_result_review": {
+      "verdict": "accepted-scoped-native-components",
+      "sha256": "F77AAFE3394EB6AB92B6BE39A4BF2E5C6BFD0D4EDF65D8DD7B305A8E5E681A43",
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "dfa7a25e00f6c173d4a089b16f5290288adfe939",
+      "path": "evidence/aero-mixed504-valid-provider-review-r01/review.json",
+      "raw_success_markers": 58,
+      "git_input_readbacks": 67,
+      "fixture_members": 59,
+      "caller_preparer_versions": 8,
+      "limits": "Selected component acceptance only; no arbitrary provider-change,API/client/GUI/performance/all-edition native or stable verdict"
+    }
+  },
+  "observations": [
+    "Both2.1.23/2.0.77 published503 source saves have explicit finite replacement prerequisites,paid2/3 forces,unearned foreign-disabled control,current/queued/detached work. Source and candidate first entry each save/two cold loads.",
+    "Provider removal/effects reset/return/actual destination-preserving merge pass on both engines,each save/two cold loads. Current and queued owner work preserve76units: .19*400=.03295750216825672*2306; return restores.19. No science/time equivalence is claimed.",
+    "Additional2.0 real-lab path completes electric4 at tick1881/by_script=false using four stock lab clones speed60,normal202units/3600ticks and six one-time science supplies/energy. Electric.3->.4 while Tesla1.3 stays unchanged; native next queue resumes at.19.",
+    "F200 inventory-count loss124 per science falls within the independently declared four-pack buffer bound around125.24 work; unavailable stored-durability getter is never called. This is not exact measured science consumption.",
+    "The resulting valid asymmetric4electric/3Tesla save survives nonzero negativeTesla1 provider removal/effects reset,return/actual destination-history-preserving merge and every save/two-cold boundary.",
+    "Two actual fixture failures remain failed: removed-owner negative-effect assertion before save load,and per-lab energy-history initialization before any completion. Corrected narrow controls reject known broken behavior. An earlier unsupported-API inspection failed with zero native processes.",
+    "Original ca34 wrapper CRLF normalization and premature three-file readback claim are retained in primary adverse custody; fcab corrects only wrapper serialization/hash. Lossless gzip/native originals never changed."
+  ],
+  "packages": {
+    "independent_all17_review_sha256": "2C3D4BA1E87A9783F0D5F39FC8C929D144EB5199A6BC57BDBAA658CB79F1DA65",
+    "review_commit": "178d822f7e9a8e890fde1f072da2d2750e7267a8",
+    "review_path": "evidence/aero-package026f-all-edition-review-r01/review.json",
+    "integrated_inventory": "7F1245AB8A749A1AA3B700EE67374C2FD4EA1495F3190D550C022A12397E7789",
+    "root_all17": "Composed and verified from integrated efaa; every ZIP hash/size equals independent026f correspondence; modern2 byte-equal native inputs",
+    "earlier15": "Only source changelog differs from the prior independently reviewed4B packages; all other selected Lua/locale/metadata/migration/adapter bytes unchanged. Original evidence is retained under its original identity."
+  },
+  "costs": {
+    "completed_process_intervals_seconds": 116.512822,
+    "successful_processes": 33,
+    "scope": "Scheduling observation only; preparation,failed intervals,custody and review excluded; not performance evidence"
+  },
+  "limits": [
+    "Seeded disposable paid histories and synthetic stock lab work; no original player save mutated.",
+    "No arbitrary provider/prerequisite/science/cost interchangeability or automatic fraction preservation.",
+    "Final combined candidate/applicability review,integrated CI and checked publication remain required.",
+    "No Library real-input/client,multiplayer,physical manufacturing,whole-product performance,all-profile or stable verdict."
+  ],
+  "release_qualification": false,
+  "stable_acceptance": false
+}
