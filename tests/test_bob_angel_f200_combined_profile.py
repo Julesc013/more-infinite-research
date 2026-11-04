@@ -464,7 +464,7 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
         self.assertEqual(plain(lua.globals().fixture_logs),
                          ["[MIR_ARMOR_ACTIVATION] bob-mech-armor-plate enabled=true"])
 
-    def test_actual_shape_adds_only_the_conditional_cannon_holder(self):
+    def test_actual_shape_adds_conditional_cannon_beside_four_mixed_gun_holders(self):
         reference = json.loads((ROOT / "tests/fixtures/bob-angel-f200-conditional-cannon-native-reference-r01.json").read_text(encoding="utf-8"))
         self.assertEqual(canonical_sha256(reference["old_Base_B_cannon_row"]), reference["old_Base_B_cannon_canonical_sha256"])
         raw = deepcopy(self.context["raw"])
@@ -474,14 +474,21 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
         public = {name: row["row"] for name, row in self.oracle["technology"]["added"].items()}
         self.assertIn("recipe-prod-research_rocket_shooting_speed-1", public)
         original_private = current_native_credit_rows(public, set(raw["recipe"]), family_recipes={})
-        self.assertEqual(len(original_private), 28)
-        self.assertEqual(set(original_private), SEPARATE_CARRIER_IDS | {"mir-legacy-cannon-credit-rocket-shooting-speed"})
+        gun_holders = {
+            "mir-native-credit-research_electric_shooting_speed-electric-positive",
+            "zz-mir-native-credit-research_electric_shooting_speed-electric-negative",
+            "mir-native-credit-research_electric_shooting_speed-tesla-positive",
+            "zz-mir-native-credit-research_electric_shooting_speed-tesla-negative",
+        }
+        self.assertEqual(len(original_private), 32)
+        self.assertEqual(set(original_private), SEPARATE_CARRIER_IDS | gun_holders
+                         | {"mir-legacy-cannon-credit-rocket-shooting-speed"})
         self.assert_private_rows(emitted, public, raw)
         cannon = "mir-legacy-cannon-credit-rocket-shooting-speed"
         self.assertEqual(emitted[cannon], reference["old_Base_B_cannon_row"])
 
-        # The existing compact context remains a valid 27-holder case. The
-        # extra holder also needs its selected public rocket stream.
+        # The conditional cannon holder still needs its selected public
+        # rocket stream; the other recipe/gun holders do not authorize it.
         without_rocket = [deepcopy(row) for name, row in public.items()
                           if name != "recipe-prod-research_rocket_shooting_speed-1"]
         append_without_rocket = lua.eval("function(rows, raw) require('research.legacy_cannon_credit_definitions').append(rows, require('platform.target'), raw); return rows end")
