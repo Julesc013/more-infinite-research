@@ -323,7 +323,7 @@ function Invoke-MIR441MonitoredProcess {
   $null=Resolve-MIR441RecoveryScratchPath -Path $lockPath
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $lockPath)|Out-Null
   try{$lock=[IO.File]::Open($lockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{throw '[mir441-resource-heavy-job-active]'}
-  $process=$null;$streams=@();$copies=@();$children=@();$temp=Join-Path $work ('temp-'+[guid]::NewGuid().ToString('N'));$peak=0L;$privatePeak=0L;$started=$null;$timer=$null;$timedOut=$false;$completionObserved=$false
+  $process=$null;$streams=@();$copies=@();$children=@();$temp=Join-Path $work ('temp-'+[guid]::NewGuid().ToString('N'));$peak=0L;$privatePeak=0L;$started=$null;$timer=$null;$timedOut=$false;$completionObserved=$false;$naturalExitFailure=$null
   try{
     # Check again under the lock, before any job output or worker is allocated.
     if($null -ne $PreStartAdmissionWait){
@@ -374,18 +374,29 @@ function Invoke-MIR441MonitoredProcess {
     Stop-MIR441OwnedProcess -Process $process -Children $children
     foreach($copy in $copies){$null=$copy.GetAwaiter().GetResult()}
     $process.Refresh();$peak=[Math]::Max($peak,[int64]$process.PeakWorkingSet64)
-    if($process.ExitCode-ne0-and-not$AllowNonZeroExit-and-not$completionObserved){throw "[mir441-process-exit] $($process.ExitCode)"}
     $passed=$completionObserved-or$process.ExitCode-eq0
     Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='completed';exit_code=$process.ExitCode;peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;completion_predicate_observed=$completionObserved}) -Path $ledger -Append
     # Native process timestamps keep watchdog sampling overhead out of engine timing.
     $completed=[pscustomobject][ordered]@{status=$(if($passed){'passed'}else{'failed'});exit_code=$process.ExitCode;timed_out=$false;passed=$passed;completion_predicate_observed=$completionObserved;duration_seconds=[Math]::Round(($process.ExitTime-$process.StartTime).TotalSeconds,6);peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak;admission=$admission}
     if($null -ne $PreStartAdmissionWait){$completed|Add-Member -NotePropertyName admission_wait -NotePropertyValue $PreStartAdmissionWait}
+    if($process.ExitCode-ne0-and-not$AllowNonZeroExit-and-not$completionObserved){
+      # Preserve the observed terminal before the same strict nonzero refusal.
+      # Callers can retain this failed result without treating it as a timeout.
+      $naturalExitFailure=[InvalidOperationException]::new("[mir441-process-exit] $($process.ExitCode)")
+      $naturalExitFailure.Data['mir441_process_result']=$completed
+      throw $naturalExitFailure
+    }
     return $completed
   }catch{
     $failure=$_
+    $isNaturalExitFailure=[object]::ReferenceEquals($failure.Exception,$naturalExitFailure)
+    # A callback or unrelated failure cannot supply this reserved terminal.
+    if(-not$isNaturalExitFailure){$failure.Exception.Data.Remove('mir441_process_result')}
     if($null-ne$process){try{$tree=Get-MIR441OwnedProcessTree -Process $process -StartedUtc $started;$children=@($children+$tree.children)}catch{}}
     Stop-MIR441OwnedProcess -Process $process -Children $children
-    Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='interrupted';timed_out=$timedOut;error=$failure.Exception.Message;resource_admission=$failure.Exception.Data['mir441_resource_admission'];peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak}) -Path $ledger -Append
+    if(-not$isNaturalExitFailure){
+      Write-MIR441Json -Value ([ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');phase='interrupted';timed_out=$timedOut;error=$failure.Exception.Message;resource_admission=$failure.Exception.Data['mir441_resource_admission'];peak_working_set_bytes=$peak;peak_sampled_private_bytes=$privatePeak}) -Path $ledger -Append
+    }
     throw $failure
   }finally{
     try{Stop-MIR441OwnedProcess -Process $process -Children $children}finally{

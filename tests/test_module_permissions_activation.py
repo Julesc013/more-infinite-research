@@ -49,7 +49,10 @@ class ModulePermissionsActivationTests(unittest.TestCase):
               add_science(definition.science)
               for _, name in ipairs(definition.prerequisites) do add_technology(name) end
               for _, effect in ipairs(definition.effects) do
-                if effect.recipe then recipe[effect.recipe] = {} end
+                if effect.recipe then
+                  recipe[effect.recipe]=recipe[effect.recipe] or {}
+                  recipe[effect.recipe].type,recipe[effect.recipe].name="recipe",effect.recipe
+                end
               end
             end
             for _, continuation in ipairs(selected.continuations) do
@@ -77,8 +80,22 @@ class ModulePermissionsActivationTests(unittest.TestCase):
               extend = function(self, prototypes)
                 self.writes = self.writes + 1
                 self.emitted = prototypes
+                for _,row in ipairs(prototypes) do
+                  if row.type=="mod-data" then
+                    self.raw["mod-data"]=self.raw["mod-data"] or {}
+                    assert(self.raw["mod-data"][row.name]==nil,"duplicate private metadata")
+                    self.raw["mod-data"][row.name]=row
+                  end
+                end
               end
             }
+          end
+
+          function run_preceding_data_stage()
+            dofile(player_root.."/data.lua")
+            assert(data.writes==1 and #data.emitted==2 and data.emitted[1].type=="shortcut"
+              and data.emitted[2].type=="mod-data")
+            data.writes,data.emitted=0,nil
           end
 
           function run_final_fixes()
@@ -127,6 +144,9 @@ class ModulePermissionsActivationTests(unittest.TestCase):
             end, retains_bob_native_continuations = function(active_mods)
               assert(active_mods == mods)
               return false
+            end, native_owner_fallbacks = function(active_mods,withheld)
+              assert(active_mods==mods and (withheld==nil or next(withheld)==nil))
+              return {}
             end, select = function(active_mods)
               assert(active_mods == mods)
               return {definitions = {}, continuations = {}, recipe_patches = {}}
@@ -140,6 +160,13 @@ class ModulePermissionsActivationTests(unittest.TestCase):
               preflight_native_owner_patches = function(selection, prototypes)
                 assert(selection.native_owners == nil and prototypes == raw)
                 return {}
+              end,
+              native_owner_product_targets = function(selection, prototypes)
+                assert(selection.native_owners == nil and prototypes == raw)
+                return {}
+              end,
+              preflight_collected_native_owner_targets = function(targets, patches)
+                assert(#targets == 0 and #patches == 0)
               end,
               technologies = function(selection) assert(#selection.definitions == 0); return {} end,
               apply_weapon_speed_overlap = function(selection, generated)
@@ -174,6 +201,7 @@ class ModulePermissionsActivationTests(unittest.TestCase):
           settings.startup["mir-unrestricted-modules"].value = true
           helpers, log = nil, nil
           data = complete_world()
+          run_preceding_data_stage()
 
           run_final_fixes()
 
@@ -210,6 +238,7 @@ class ModulePermissionsActivationTests(unittest.TestCase):
           log = nil
           assert(config.resolve(settings.startup, helpers).unrestricted_modules == true)
           data = complete_world()
+          run_preceding_data_stage()
 
           run_final_fixes()
 

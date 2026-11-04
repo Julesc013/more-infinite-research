@@ -1,0 +1,321 @@
+{
+  "schema": 1,
+  "kind": "MIRFoundationWholeWorldActivityIndependentReviewV1",
+  "decision": "ACCEPT_EXACT_NO_MIR_ACTIVITY_DIAGNOSTIC_ONLY",
+  "recorded_on": "2026-11-04",
+  "requirements": [
+    "PERF-03",
+    "PERF-06",
+    "VER-06"
+  ],
+  "scope": "One unscored upstream Foundation activity diagnostic; no MIR package or performance qualification.",
+  "input": {
+    "engine": {
+      "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+      "bytes": 43530192,
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "version": "2.0.77",
+      "factorio_line": "2.0"
+    },
+    "protected_world": {
+      "bytes": 108548262,
+      "sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA"
+    },
+    "profile": {
+      "path": "D:\\Projects\\Factorio\\mir5-secretas-helper-5a31-r03\\build\\tmp\\foundation-whole-world-activity-r08-prepared-r01\\profile.json",
+      "bytes": 7752,
+      "sha256": "EF0164049736EE89F292B7AC61ADBAACB1E2DB43B099D0BA013793A40E0F33FF"
+    },
+    "expected_metadata": {
+      "base_version": "2.0.77",
+      "mir_version": false,
+      "force_index": 1,
+      "force_name": "player",
+      "mods": [
+        {
+          "name": "Bottleneck",
+          "version": "0.12.1"
+        },
+        {
+          "name": "Brighter-Lamps",
+          "version": "2.0.0"
+        },
+        {
+          "name": "EditorExtensions",
+          "version": "2.5.2"
+        },
+        {
+          "name": "FactorySearch",
+          "version": "1.14.3"
+        },
+        {
+          "name": "GUI_Unifyer",
+          "version": "2.0.1"
+        },
+        {
+          "name": "Honk",
+          "version": "5.1.1"
+        },
+        {
+          "name": "Kux-CoreLib",
+          "version": "3.17.8"
+        },
+        {
+          "name": "Kux-ZoomRunning",
+          "version": "3.3.2"
+        },
+        {
+          "name": "MaxRateCalculator",
+          "version": "200.0.53"
+        },
+        {
+          "name": "Milestones",
+          "version": "1.4.7"
+        },
+        {
+          "name": "ModuleInserterEx",
+          "version": "7.4.1"
+        },
+        {
+          "name": "OilOutpostPlanner",
+          "version": "1.6.10"
+        },
+        {
+          "name": "RateCalculator",
+          "version": "3.3.8"
+        },
+        {
+          "name": "Shortcuts-ick",
+          "version": "2.0.7"
+        },
+        {
+          "name": "VehicleSnap",
+          "version": "2.0.3"
+        },
+        {
+          "name": "YARM",
+          "version": "1.0.5"
+        },
+        {
+          "name": "base",
+          "version": "2.0.77"
+        },
+        {
+          "name": "bullet-trails",
+          "version": "0.7.1"
+        },
+        {
+          "name": "car-finder",
+          "version": "2.0.0"
+        },
+        {
+          "name": "electric_pole_free_light",
+          "version": "0.0.3"
+        },
+        {
+          "name": "elevated-rails",
+          "version": "2.0.77"
+        },
+        {
+          "name": "even-distribution",
+          "version": "2.0.2"
+        },
+        {
+          "name": "factoryplanner",
+          "version": "2.0.50"
+        },
+        {
+          "name": "far-reach",
+          "version": "2.0.2"
+        },
+        {
+          "name": "flib",
+          "version": "0.16.5"
+        },
+        {
+          "name": "fluid_permutations_fixed",
+          "version": "0.6.0"
+        },
+        {
+          "name": "inventory-repair",
+          "version": "20.0.3"
+        },
+        {
+          "name": "light-overhaul",
+          "version": "0.2.2"
+        },
+        {
+          "name": "lightorio",
+          "version": "2.0.1"
+        },
+        {
+          "name": "mining-patch-planner",
+          "version": "1.7.19"
+        },
+        {
+          "name": "mir-fixture-mir5-large-factory-activity",
+          "version": "0.1.0"
+        },
+        {
+          "name": "quality",
+          "version": "2.0.77"
+        },
+        {
+          "name": "space-age",
+          "version": "2.0.77"
+        },
+        {
+          "name": "squeak-through-2",
+          "version": "0.1.5"
+        },
+        {
+          "name": "stdlib2",
+          "version": "2.0.1"
+        },
+        {
+          "name": "tree_collision",
+          "version": "2.0.0"
+        }
+      ]
+    },
+    "settings": {
+      "requested_library_mode": "Defaults",
+      "required_observer_startup": {
+        "name": "mir5-large-factory-inventory-only",
+        "value": false
+      },
+      "original_saved": "unverified",
+      "per_player": "unobserved",
+      "historical_inheritance": "unverified"
+    }
+  },
+  "execution": {
+    "source_revision": "c9d685f1dd4f304a5f6fabbd430b0d94fea9b4b9",
+    "helper_revision": "5a31ba5dde566c54b28092370478a80029e2fb69",
+    "packet_sha256": "1D855EE2FD0521E7AEC1394BB5E091DF0FAA10C613F0CCEAF78C8A1A7029C394",
+    "caller_sha256": "41CFD4C86570E4192DF832AACEFB1EC2E8F9F1025595D8B39D9771545A25910C",
+    "reader_sha256": "6701D7EB40020BA87EBE5FEAB5371D91746F3F1833B6E2297ACC641E4F24BD0E",
+    "admission_sha256": "179FDE0B89FAA983AB31785165EFE46A1BAB18988F55858B9372231F73B270DE",
+    "process": {
+      "pid": 32304,
+      "natural_exit": 0,
+      "ledger_rows": 89,
+      "sampled_ledger_rows": 88,
+      "timeout": false,
+      "completion_predicate": false,
+      "exact_singleton_object_matches_terminal_and_result": true,
+      "physical_exit_callback_and_log_context_match": true
+    },
+    "raw_log": {
+      "bytes": 87007,
+      "sha256": "6A4FB959A7992A82744000525ACE2DA80FCD77DCE855139222684C87A1386663",
+      "source_path": "D:\\Projects\\Factorio\\mir5-secretas-helper-5a31-r03\\build\\tmp\\foundation-whole-world-activity-r08-prepared-r01-native\\write-data\\factorio-current.log"
+    },
+    "terminal_sha256": "641EDE2D13EE6B4618CDCE0E2A3DED6F75E690157CB0E9AFE1864D0CB1DE88B7",
+    "result_sha256": "CD8D5E9ECED678DAD795FA5E96300A9E5D67F0E5C8A12F98960F255214FFE815"
+  },
+  "observation": {
+    "benchmark_updates": 601,
+    "observed_ticks": 600,
+    "first_tick": 169628853,
+    "final_tick": 169629453,
+    "surfaces": 57,
+    "last_surface": 58,
+    "last_surface_name": "aquilo",
+    "absent_index": 24,
+    "selected_mods": 36,
+    "mir_absent": true,
+    "sampled_machines": 1918,
+    "sampled_machines_with_counter_progress": 275,
+    "sampled_products_finished_counter_increments": 4006,
+    "item_columns": 15,
+    "available_columns": 15,
+    "typed_item_cells_checked": 855,
+    "positive_normal_item_input_delta": 5899,
+    "counter_decreases": 0,
+    "entity_totals": {
+      "assembling-machine": 9862,
+      "furnace": 3205,
+      "mining-drill": 1619,
+      "lab": 325,
+      "inserter": 49419,
+      "transport-belt": 174433,
+      "locomotive": 284,
+      "roboport": 3681,
+      "agricultural-tower": 37
+    },
+    "startup_setting_rows": 95,
+    "runtime_global_setting_rows": 197,
+    "requested_library_settings": "Defaults",
+    "original_saved_setting_provenance": false,
+    "per_player_setting_provenance": false
+  },
+  "independent_review": {
+    "review_sha256": "F02CFEC4173880E1ED58440A08B0F9A8F8BEA02EB5ACBB77BD7952DF8D26004F",
+    "parent_readback_sha256": "5095B03D3A065CAFF353AAD863EBAD1156E5517F3BA82456AE5798F9EA08EACF",
+    "strict_reader_reproduction": {
+      "reader_sha256": "0780860174B10FC12055B5F9E5951FEAF646338CC712C29E66455C6D36D5EF0E",
+      "io_local_result": "reader-reproduced-io-local.json",
+      "comparison": "reader-reproduction-comparison.json",
+      "opponents_refused": 19,
+      "original_context_bytes_retained": true,
+      "original_result_not_relabelled": true
+    },
+    "typed_cell_audit_sha256": "8FB968ED16BB73DE2F09EF3C6CB5FAA63D0B00EE693929850DAD5B9940D08EA4",
+    "item_sum_scope": "All855 supplied typed integer cells independently summed; machine275/4006 are validated observer aggregates, not per-entity trace resummation."
+  },
+  "custody": {
+    "repository": "Julesc013/mir-native-worker",
+    "native_originals": {
+      "commit": "65c75030fcc79f96f6a8033a90bf44a7b046ad70",
+      "path": "evidence/foundation-whole-world-activity-r08/actual-native-r01/original-bodies.json.gz",
+      "members": 50,
+      "bytes": 181237,
+      "sha256": "234A41CE95BB6D590A88ED495E2663DADE28E93F20671B73D0BDDCD4A48A6675",
+      "decoded_bytes": 1557665,
+      "decoded_sha256": "9DECF23EB6678C6EBBA261A287F981412FF80B57A13F63872DF61E1E3E736A5F"
+    },
+    "independent_originals": {
+      "commit": "588606bb92fe99133f29200812040bf4ae61d237",
+      "path": "evidence/aero-foundation-r08-actual-review-r01/review-originals.json.gz",
+      "members": 32,
+      "bytes": 617181,
+      "sha256": "3251579606CF7BE104CBB2EB2785AE8B549278867FEEDE918DBEB84B5D8A991A",
+      "decoded_bytes": 3062942,
+      "decoded_sha256": "53033E918A792CEDD4950376E99AC2479FE8E82F2A85DD046D1B917D2D22161C"
+    },
+    "actual_remote_bytes_verified": true
+  },
+  "restoration": {
+    "recorded_controls_and_observer_equal": true,
+    "recorded_distinct_protected_identities": 4,
+    "recorded_forcecopy_hashes_equal": true,
+    "execution_machine_payloads_rehashed_by_independent_reviewer": false
+  },
+  "adverses": [
+    "Initial actual-result reader assumed governed_runs was an array. Exact original/corrected readers retained; actual singleton object equals both terminal.native and result.native. No engine or oracle change.",
+    "Original initial-reader failure stdout/stderr is not among supplied50 bodies; it was not reconstructed.",
+    "Earlier prestart-wait reader assumption and source/import/Plan adverses retain their original separate custody."
+  ],
+  "limits": [
+    "This accepts one observed NoMIR diagnostic window only. Bounded native-order machine samples are not a whole-factory estimate; named production counters are not all activity. No rates or performance inference.",
+    "Machine progress275/completion4006 are observed observer aggregates with strict accounting checks, not a separately recorded per-entity trace. Item counter sum5899 is independently recomputed over all855 supplied cells.",
+    "Original saves, staged save/native-custody save transports, actual engine/dependency archives and execution-machine control payloads are deliberately absent from capsule. Receipt consistency is not a fresh independent physical filesystem verification.",
+    "No retained raw Get-Process response proves post-run no-engine state; Root reports that check. Complete retained output inventory contains no new write-data ZIP/save, but this does not qualify save preservation or hidden external side effects.",
+    "Current real-user identity/idle/head/resource/source-freshness observations are recorded through dispatch/preflight/helper receipts and frozen source checks, not independently re-observed on Black Glass by Aero.",
+    "No Factorio/native replay, library/profile/save/engine mutation, binary dependency/save copy, full host suite or unchanged native job requested.",
+    "No MIR candidate, research/save/two-cold, responsive-menu/performance/non-regression, large-factory acceptance, release or stable qualification. Benchmark times/peaks and observer overhead remain unscored."
+  ],
+  "acceptance": {
+    "activity_observed": true,
+    "mir_candidate": false,
+    "large_factory_qualified": false,
+    "save_preservation": false,
+    "gameplay": false,
+    "performance": false,
+    "responsive_menu": false,
+    "release": false,
+    "stable": false
+  },
+  "next_work": "Prepare a separately reviewed exact candidate/comparator activity and performance assignment from this upstream-valid observed input. Retain matched settings/workload and unscored observer overhead; this review grants no further Execute admission."
+}

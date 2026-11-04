@@ -16,7 +16,10 @@ from pathlib import Path
 import sys
 import unittest
 
-from native_credit_oracle import current_native_credit_rows
+from native_credit_oracle import (
+    NATIVE_FAMILY_RECIPES, current_native_credit_rows,
+    native_family_preservation_rows,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -146,6 +149,46 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
             for row in json.loads((ROOT / "tests/profiles/bob-angel-f200-2077.json").read_text(encoding="utf-8"))["mods"]
             if row["enabled"]
         }
+        # Preserve the immutable combined public contract. Missing native
+        # family IDs use the separately published Base rows and the retained
+        # Space Age science additions, never the candidate's emitted rows.
+        inventory = json.loads((ROOT / "spec/inventory/modern-f200-470.json").read_text(encoding="utf-8"))
+        base = next(profile for profile in inventory["profiles"] if profile["id"] == "base-f200")
+        base_rows = {row["name"]: row["row"] for row in base["published_output"]["data"]["additions"]
+                     if row["type"] == "technology"}
+        public_names = set(cls.oracle["technology"]["added"])
+        cls.private_mains = {name: row for name, row in native_family_preservation_rows(base_rows).items()
+                             if name not in public_names}
+        if set(cls.private_mains) != {
+            "recipe-prod-research_low_density_structure-1", "recipe-prod-research_processing_unit-1",
+            "recipe-prod-research_rocket_fuel-1",
+        }:
+            raise AssertionError("combined public/native identity disposition changed")
+        # This file's Lua transport represents an empty table as a mapping.
+        for row in cls.private_mains.values():
+            row["effects"] = {}
+
+    def expected_private_rows(self, public, raw):
+        families = {}
+        for family, canonical in NATIVE_FAMILY_RECIPES.items():
+            recipes = set(canonical)
+            main = public.get("recipe-prod-" + family + "-1", {})
+            recipes.update(effect["recipe"] for effect in main.get("effects", [])
+                           if effect["type"] == "change-recipe-productivity")
+            families[family] = sorted(recipes & set(raw["recipe"]))
+        rows = {**public, **self.private_mains}
+        credits = current_native_credit_rows(rows, raw["recipe"], family_recipes=families)
+        if "cannon-shell" not in raw.get("ammo-category", {}):
+            credits.pop("mir-legacy-cannon-credit-rocket-shooting-speed", None)
+        return {**self.private_mains, **credits}
+
+    def assert_private_rows(self, emitted, public, raw):
+        expected = self.expected_private_rows(public, raw)
+        # Keep the former descriptor boundary as an explicit subset. New
+        # identities must additionally match complete independent definitions.
+        self.assertTrue(SEPARATE_CARRIER_IDS <= set(expected))
+        self.assertEqual(set(emitted), set(public) | set(expected))
+        self.assertEqual({name: emitted[name] for name in expected}, expected)
 
     def data_final_stage(self, raw=None, mods=None, expect_failure=False):
         raw = deepcopy(self.context["raw"] if raw is None else raw)
@@ -359,7 +402,7 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
         public = {name: emitted[name] for name in expected}
         self.assertEqual(set(public), set(expected))
         self.assertEqual(public, expected)
-        self.assertEqual(set(emitted) - set(expected), SEPARATE_CARRIER_IDS)
+        self.assert_private_rows(emitted, expected, self.context["raw"])
         self.assertEqual(lua.globals().technology_publications, 1)
         self.assertNotIn("recipe-prod-research_oil_cracking_productivity-1", public)
         self.assertFalse(any("material_" in name for name in public))
@@ -387,7 +430,7 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
                 lua = self.data_final_stage(raw=raw)
                 emitted = plain(lua.globals().emitted)
                 self.assertEqual({name: emitted[name] for name in expected}, expected)
-                self.assertEqual(set(emitted), set(expected) | SEPARATE_CARRIER_IDS)
+                self.assert_private_rows(emitted, expected, raw)
                 self.assertEqual(lua.globals().technology_publications, 1)
                 self.assertEqual(plain(lua.globals().data.raw.recipe["bob-mech-armor-plate"]),
                                  plain(lua_value(lua, before_recipe)))
@@ -430,10 +473,10 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
         emitted = plain(lua.globals().emitted)
         public = {name: row["row"] for name, row in self.oracle["technology"]["added"].items()}
         self.assertIn("recipe-prod-research_rocket_shooting_speed-1", public)
-        expected_private = current_native_credit_rows(public, set(raw["recipe"]))
-        self.assertEqual(len(expected_private), 28)
-        self.assertEqual(set(emitted), set(public) | set(expected_private))
-        self.assertEqual({name: emitted[name] for name in expected_private}, expected_private)
+        original_private = current_native_credit_rows(public, set(raw["recipe"]), family_recipes={})
+        self.assertEqual(len(original_private), 28)
+        self.assertEqual(set(original_private), SEPARATE_CARRIER_IDS | {"mir-legacy-cannon-credit-rocket-shooting-speed"})
+        self.assert_private_rows(emitted, public, raw)
         cannon = "mir-legacy-cannon-credit-rocket-shooting-speed"
         self.assertEqual(emitted[cannon], reference["old_Base_B_cannon_row"])
 

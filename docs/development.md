@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-11-02
+last_reviewed: 2026-11-04
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -27,6 +27,10 @@ Use neutral names for new output batches: `build/host-gate` for hosted control o
 ## Start with a bounded task
 
 Read root agent instructions, the [specification index](../spec/README.md), and the one or two relevant contracts. Inspect current `git status`, exact source and active jobs once. Preserve dirty/untracked work and unique receipts. Do not reset to a historical planning commit.
+
+Keep task worktrees together under the existing `.task-builds` directory beside the primary checkout, using short leaf names where native path limits require them. Reuse an idle clean task worktree when its ownership permits. Store new retained evidence and candidate packages under the primary checkout's `build/qualification` and `build/packages`; accepted delivery belongs in `dist`. Avoid loose task or output directories beside the primary checkout.
+
+After a reviewed merge and exact remote readback, remove a completed clean disposable worktree only after preserving its unique ignored outputs and authored commits. Retain dirty work and active inputs. When consolidating inactive folders, record the old and new locations and verify the retained bytes; preserve original receipts with their original paths.
 
 A useful task packet is short:
 
@@ -69,7 +73,7 @@ After verified MIR5 publication and local delivery, continue authorized bug fixe
 
 For a local replacement build, keep the official mod name `more-infinite-research`. Factorio selects one enabled version of a named mod, so this is an upgrade-style replacement of the installed MIR rather than a side-by-side installation. That identity deliberately keeps the packaged `__more-infinite-research__` imports, existing settings, technologies, migration history and draft API consumers pointed at the local build.
 
-For MIR5 development, start from dev: main remains the published release until qualified promotion. A local build needs the existing Python packager, not release credentials or Factorio archives. Clone, branch from dev, make the bounded source change, and build a selected ordinary edition into a new directory outside the checkout:
+For MIR5 development, start from dev: main remains the published release until qualified promotion. A local build needs the existing Python packager, not release credentials or Factorio archives. Clone, branch from dev, make the bounded source change, and build a selected ordinary edition under `build/packages/local`:
 
 ```powershell
 git clone https://github.com/Julesc013/more-infinite-research.git
@@ -77,13 +81,13 @@ cd more-infinite-research
 git switch dev
 git switch -c fix/my-bounded-change
 $mirLocalVersion = (Get-Content -LiteralPath source/info.json -Raw | ConvertFrom-Json).version
-python tools/package.py --source source --target f210 --output "../mir-local/more-infinite-research_$mirLocalVersion.zip"
+python tools/package.py --source source --target f210 --output "build/packages/local/more-infinite-research_$mirLocalVersion.zip"
 ```
 
 `--target` selects an implemented edition and derives its numeric version from `source/info.json`; it is not native qualification. For a one-off same-name package without target adaptation, use a valid five-digit distribution version and a matching output filename:
 
 ```powershell
-python tools/package.py --source source --version 5.0.21000 --output ../mir-local/more-infinite-research_5.0.21000.zip
+python tools/package.py --source source --version 5.0.21000 --output build/packages/local/more-infinite-research_5.0.21000.zip
 ```
 
 `--version` and `--target` are intentionally mutually exclusive. `--version` retains the source target's CCC edition codec while changing `info.json`, the generated changelog and the runtime API product version together for a same-edition local package; selecting a different CCC requires `--target` adaptation. To change a selected edition's local version or ordinary presentation metadata, edit the working-tree `source/info.json` while retaining the official name, then use `--target`; the target packager derives the selected edition's version, Factorio line and minimum Base dependency from that source codec and the tracked target record. Do not use `tools/release.py` for this: it freezes the official source-release identity across the retained editions and rejects a private mod name or invalid source codec. The F006–F012 best-effort data-only path separately regenerates its finite metadata, so it is not a private-branding path.

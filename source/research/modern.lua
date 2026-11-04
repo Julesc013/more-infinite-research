@@ -95,6 +95,10 @@ end
 
 function M.technology(definition, values)
   local stream = require_stream(values, definition.family)
+  local time = stream.research_time
+  -- Zero inherits a native owner's time. This separate MIR identity keeps
+  -- its authored default rather than publishing that sentinel to Factorio.
+  if time == 0 then time = definition.tuning and definition.tuning.research_time end
   local output = {
     type = "technology", name = "recipe-prod-" .. definition.key .. "-1",
     icons = icons(definition), localised_name = copy(definition.localised_name),
@@ -103,7 +107,7 @@ function M.technology(definition, values)
     prerequisites = generated_prerequisites(definition), effects = normal_effects(definition, stream, values.options),
     unit = {
       count_formula = productivity.cost(stream.base_cost, stream.linear_increment, stream.growth_factor),
-      time = stream.research_time, ingredients = catalogue.science_ingredients(definition.science)
+      time = time, ingredients = catalogue.science_ingredients(definition.science)
     }
   }
   if stream.enabled == false or definition.available == false then output.enabled = false end
@@ -241,6 +245,11 @@ function M.technologies(selection, values)
     retained.hidden = true
     out[#out + 1] = retained
   end
+  for _, definition in ipairs(selection.native_paid or {}) do
+    local retained = M.technology(definition, values)
+    retained.hidden, retained.effects = true, {}
+    out[#out + 1] = retained
+  end
   if selection.k2_imersite then
     local staged = k2_imersite_technologies(values)
     for index = 1, #staged do out[#out + 1] = staged[index] end
@@ -285,7 +294,7 @@ local function planned_owner_change(stream, definition)
     or (configured(stream, "research_time") and stream.research_time > 0)
 end
 
-local function named_owner_effects(owner, definition)
+local function named_owner_effects(owner, definition, inherited_change)
   local expected, admission = definition.expected, definition.admission
   if type(owner.effects) ~= "table" then owner_error(definition, "missing effects") end
   local found = {}
@@ -294,7 +303,7 @@ local function named_owner_effects(owner, definition)
   for index = 1, #admission.recipes do found[admission.recipes[index]] = 0 end
   for _, effect in ipairs(owner.effects) do
     if effect.type == admission.effect_type and found[effect.recipe] ~= nil then
-      if effect.change ~= expected.effect_change then
+      if effect.change ~= (inherited_change or expected.effect_change) then
         owner_error(definition, "unexpected effect change for " .. effect.recipe)
       end
       found[effect.recipe] = found[effect.recipe] + 1
@@ -307,20 +316,53 @@ local function named_owner_effects(owner, definition)
   end
 end
 
-local function preflight_owner(owner, definition)
+local function preflight_owner(owner, definition, stream)
   local expected = definition.expected
   if type(owner) ~= "table" then owner_error(definition, "missing technology") end
   if owner.enabled ~= expected.enabled then owner_error(definition, "unexpected enabled state") end
   if owner.max_level ~= expected.max_level then owner_error(definition, "unexpected max level") end
   if type(owner.unit) ~= "table" then owner_error(definition, "missing unit") end
-  if owner.unit.count ~= nil or owner.unit.count_formula ~= expected.count_formula then
-    owner_error(definition, "unexpected count formula")
+  local cost_changed = configured(stream, "base_cost") or configured(stream, "linear_increment")
+    or configured(stream, "growth_factor")
+  local cost_style
+  local withheld = false
+  if cost_changed then
+    -- Preserve the delivered bounded family admission instead of requiring
+    -- one Base balance literal. Inherited/effect/time-only paths stay lazy.
+    if owner.unit.count ~= nil and (owner.unit.count_formula ~= nil or not finite(owner.unit.count)
+        or owner.unit.count <= 0 or owner.unit.count % 1 ~= 0) then
+      owner_error(definition, "invalid inherited count")
+    end
+    if owner.unit.count == nil and (type(owner.unit.count_formula) ~= "string"
+        or not owner.unit.count_formula:find("%S")) then
+      owner_error(definition, "missing inherited cost")
+    end
+    cost_style = require("compatibility.native_owner_cost").classify(owner.unit)
+    if cost_style == nil then
+      -- The old binding withheld the entire patch when a requested cost
+      -- override could not classify this upstream expression. Preserve it;
+      -- only these five authored native families have a fallback policy.
+      for _, binding in ipairs(require("compatibility.product_bindings").native_owner_bindings) do
+        if definition.id == binding.owner and definition.family == binding.family then withheld = true; break end
+      end
+      if not withheld then owner_error(definition, "unexpected count formula") end
+    end
+  elseif owner.unit.count ~= nil then
+    if owner.unit.count_formula ~= nil or not finite(owner.unit.count)
+        or owner.unit.count <= 0 or owner.unit.count % 1 ~= 0 then
+      owner_error(definition, "invalid inherited count")
+    end
+  elseif type(owner.unit.count_formula) ~= "string" or not owner.unit.count_formula:find("%S") then
+    owner_error(definition, "missing inherited cost")
   end
-  if owner.unit.time ~= expected.research_time then owner_error(definition, "unexpected research time") end
+  if not finite(owner.unit.time) or owner.unit.time < 0 then
+    owner_error(definition, "invalid inherited research time")
+  end
   named_owner_effects(owner, definition)
+  return cost_style, withheld
 end
 
-local function owner_unit_plan(owner, definition, stream)
+local function owner_unit_plan(owner, definition, stream, cost_style)
   local expected = definition.expected
   local cost_changed = configured(stream, "base_cost") or configured(stream, "linear_increment")
     or configured(stream, "growth_factor")
@@ -330,8 +372,12 @@ local function owner_unit_plan(owner, definition, stream)
   if cost_changed then
     -- Published native-owner binding treats the cost controls as one tuple:
     -- when any member changes, all three effective setting values take over.
-    unit.count, unit.count_formula = nil,
-      productivity.cost(stream.base_cost, stream.linear_increment, stream.growth_factor)
+    if cost_style == "fixed-count" and stream.linear_increment == 0 and stream.growth_factor == 1 then
+      unit.count, unit.count_formula = stream.base_cost, nil
+    else
+      unit.count, unit.count_formula = nil,
+        productivity.cost(stream.base_cost, stream.linear_increment, stream.growth_factor)
+    end
   end
   if time_changed then unit.time = stream.research_time end
   return unit
@@ -361,7 +407,7 @@ function M.preflight_native_owner_patches(selection, raw, values)
   if type(selection) ~= "table" or type(raw) ~= "table" or type(raw.technology) ~= "table" then
     error("MIR native-owner preflight requires data.raw.technology", 2)
   end
-  local patches = {}
+  local patches, withheld = {}, {}
   if selection.sif_retained then
     require("compatibility.modern_catalogue.sif_retained").preflight(selection.sif_retained, raw, selection.native_owners)
   end
@@ -370,15 +416,62 @@ function M.preflight_native_owner_patches(selection, raw, values)
     local stream = require_stream(values, definition.family)
     if planned_owner_change(stream, definition) then
       local owner = raw.technology[definition.id]
-      preflight_owner(owner, definition)
-      patches[#patches + 1] = {
-        owner = owner,
-        unit = owner_unit_plan(owner, definition, stream),
-        effects = owner_effect_plan(owner, definition, stream),
-      }
+      local cost_style, unbound = preflight_owner(owner, definition, stream)
+      if unbound then
+        withheld[definition.id] = {family=definition.family, generated=false}
+      else
+        patches[#patches + 1] = {
+          owner = owner,
+          unit = owner_unit_plan(owner, definition, stream, cost_style),
+          effects = owner_effect_plan(owner, definition, stream),
+        }
+      end
     end
   end
-  return patches
+  return patches, withheld
+end
+
+-- Detached effects for only the five authored Space Age native families.
+-- They share the ordinary product collector; none is submitted to creation.
+function M.native_owner_product_targets(selection, raw, values, patches, active_mods, withheld)
+  local out = {}
+  if not (active_mods and active_mods["space-age"]) then return out end
+  local definitions, existing, generated = {}, {}, {}
+  for _, definition in ipairs(selection.native_owners) do definitions[definition.family] = definition end
+  for _, definition in ipairs(selection.definitions) do generated[definition.family] = true end
+  for _, patch in ipairs(patches) do existing[patch.owner] = patch end
+  for _, binding in ipairs(require("compatibility.product_bindings").native_owner_bindings) do
+    local definition = definitions[binding.family]
+    -- An explicit overhaul may retain a generated owner for this family.
+    -- Its authored recipe policy takes precedence over ordinary native adoption.
+    if definition and definition.id == binding.owner and not generated[binding.family] then
+      local stream = require_stream(values, binding.family)
+      local owner = raw.technology[definition.id]
+      local patch = owner and existing[owner]
+      local effects = patch and patch.effects
+      if effects == nil then effects = copy(type(owner) == "table" and type(owner.effects) == "table" and owner.effects or {}) end
+      out[#out + 1] = {family=binding.family, definition=definition, owner=owner,
+        effects=effects, patch=patch, active=stream.enabled == true and not (withheld and withheld[definition.id]),
+        configured_effect=configured(stream, "effect_percent")}
+    end
+  end
+  return out
+end
+
+function M.preflight_collected_native_owner_targets(targets, patches)
+  for _, row in ipairs(targets or {}) do
+    if row.extended then
+      local definition, owner = row.definition, row.owner
+      if type(owner) ~= "table" then owner_error(definition, "missing technology") end
+      if owner.max_level ~= "infinite" then owner_error(definition, "native productivity owner is not infinite") end
+      if owner.enabled == false then owner_error(definition, "native productivity owner is disabled") end
+      -- Only effects are being appended here. Default inherited unit, flags,
+      -- prerequisites and unrelated effects retain their upstream values.
+      named_owner_effects(owner, definition, not row.patch and row.effect_change or nil)
+      if row.patch then row.patch.effects = row.effects
+      else patches[#patches + 1] = {owner=owner, effects=row.effects} end
+    end
+  end
 end
 
 function M.apply_native_owner_patches(patches)

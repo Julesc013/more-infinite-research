@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 import sys
 import unittest
-from native_credit_oracle import legacy_cannon_credit_rows, legacy_module_credit_rows
+from native_credit_oracle import legacy_cannon_credit_rows, legacy_module_credit_rows, native_credit_carrier_rows
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -78,7 +78,11 @@ class SpaceExplorationPipelineTests(unittest.TestCase):
         context = self.context["cases"][case]
         lua = LuaRuntime(unpack_returned_tuples=True)
         lua.globals().player_root = SOURCE_ROOT.as_posix()
-        lua.globals().captured_raw = _lua_value(lua, deepcopy(context["raw"]))
+        raw = deepcopy(context["raw"])
+        for name, recipe in raw["recipe"].items():
+            recipe.setdefault("type", "recipe")
+            recipe.setdefault("name", name)
+        lua.globals().captured_raw = _lua_value(lua, raw)
         lua.globals().active_mods = _lua_value(lua, deepcopy(context["selection"] if mods is None else mods))
         lua.globals().startup_values = _lua_value(lua, startup or {})
         lua.execute(r'''
@@ -140,7 +144,10 @@ class SpaceExplorationPipelineTests(unittest.TestCase):
         self.assertEqual(legacy_names if case == "k2se" else set(), set(legacy), case)
         self.assertTrue(all(row["hidden"] is True and row["enabled"] is True for row in legacy.values()))
         self.assertEqual(set(public), set(expected), case)
-        self.assertEqual(20, len(carriers), case)
+        # The original twenty routes remain exact. Five-family credit routes
+        # follow the immutable published public effects, not candidate output.
+        self.assertEqual(native_credit_carrier_rows(
+            expected, self.context["cases"][case]["raw"]["recipe"]), carriers, case)
         self.assertTrue(all(row.get("hidden") is True and row.get("enabled") is False for row in carriers.values()))
         for name, expected_row in expected.items():
             actual_contract = _technology_contract(public[name])

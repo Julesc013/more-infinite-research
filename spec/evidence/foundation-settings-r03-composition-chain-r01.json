@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "kind": "MIRFoundationSettingsCompositionChainV1",
+  "status": "real-zero-engine-composition-passed-native-execute-not-admitted",
+  "checkpoint_date": "2026-11-03",
+  "scope": "One prepared current-world effective-settings and activity diagnostic; not whole-product qualification",
+  "public_source": {
+    "base_dev": "4230bb7f8d63dad07b6b8d355663b37dde28e4b9",
+    "player_tree": "35d83ebe891a1d108e7f68ad288f81fb29f225c1",
+    "published_main": "53c5075e94936ea71ab4cbad7a900612eacea67a",
+    "published_release": "v5.0.2",
+    "published_bytes_changed": false,
+    "fixture_author": "d4b1e29cafe327bb4658e587669070cdad4bb00a",
+    "fixture_control_sha256": "BF30514577397A84DCA246A83B712054DA185B8C62AFB1444611BA00CE113D53",
+    "fixture_source_review_sha256": "8955B2925204635FE74F1CE157606669CF7E960D814FB2C3F1034728CEEA915D",
+    "fixture_review": "https://github.com/Julesc013/more-infinite-research/pull/1631#issuecomment-6597543877"
+  },
+  "private_packet": {
+    "repository": "Julesc013/mir-native-worker",
+    "branch": "test/foundation-settings-r03",
+    "author_commit": "7439c3923d2a1aa48835e7785596c2c4509cf888",
+    "composition_custody_commit": "7708fb6a44ff8b98b2f7d94b79e456b75827f1d1",
+    "packet_bytes": 23601,
+    "packet_sha256": "F00CB864E93FE3CFE8DA7DB83A86B78B7082B66E50E095DA6580E09E71EEDBB2",
+    "caller_sha256": "FD301F8E03CE90DA8330097B6DACD342509F9F2F67E2D0ACAFE39A40FA0AB53A",
+    "reader_sha256": "EC8410F044464C046A762C39E11649B65658403BD8A7449687DD57595F9E8304",
+    "frozen_helper_commit": "71f32c36a3b125684210e1509b28e896466da1c3",
+    "source_settings_scope": "Current 2.0.55/35-mod header, selected 2.0.77 engine and 36-mod NoMIR observer profile; fourteen declared available-version updates. Requested Defaults is not an original saved-settings observation.",
+    "retained_offline_controls": "15 Python parser/guard and 25 isolated PowerShell typed-admission/natural-exit controls passed; prepared Plan passed. These are not native observations.",
+    "review_request": "https://github.com/Julesc013/mir-native-worker/issues/137#issuecomment-6597965376"
+  },
+  "actual_composition": {
+    "mode": "Compose",
+    "status": "composition-boundary-suppressed",
+    "terminal_bytes": 21204,
+    "terminal_sha256": "736B887681C2E204A58C8055C5165E97ACEAD537E92DECACFC6B13E9B0D1F9D1",
+    "root_compose_only_admission_sha256": "685464AA0798D64DD9BC229B2EE3625B87ECD80CC3ABA1AB8A6A64D828836F5C",
+    "root_readback_sha256": "0E750AB0277F21EA457E766C540C1398786EF4E8497769374A28FE733A5A9621",
+    "suppressed_process_boundaries": 1,
+    "factorio_processes": 0,
+    "exception": null,
+    "restoration_verified": true,
+    "protected_source_sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA",
+    "protected_source_bytes": 108548262,
+    "protected_original_and_owned_copies_unchanged": true,
+    "ordinary_source_owned_and_staged_file_identities_distinct": true,
+    "boundary": "Real governed resource/output/staging/config/observer/profile/launch composition; only the existing Invoke-MIRNativeProbeProcess boundary suppressed. Separate native output remains unused."
+  },
+  "complete_original_custody": {
+    "path": "evidence/foundation-settings-r03-composition-r01/original-bodies.json.gz",
+    "records": 58,
+    "gzip_bytes": 276538,
+    "gzip_sha256": "43BF76A1EAA5A0816FFC5E429443BAB1675B74FDEC175D45C7BE9672A3167FEC",
+    "decoded_bytes": 1055197,
+    "decoded_sha256": "C47E0B6C80A2AEA9A4DD45086B47735E908605AD20178C00F125B3A1CED6CCEB",
+    "remote_readback_verified": true,
+    "primary_materialized_location": "build/qualification/foundation-settings-r03-composition-r01",
+    "transport_limit": "Complete code/profile/observer/config/lease/receipts/helper/raw-Git/adverse bodies are retained. Engine, dependency ZIP and protected-save binaries remain verified local locators and are not transported in this Git packet. Full current hashes/lengths and prior/current-header provenance are supplied; this is not independent physical remote access to those binary inputs."
+  },
+  "preserved_adverses": [
+    "R01 memory admission refusal: zero native processes.",
+    "R02 live output-scan-incomplete refusal: original 48-file/2030.782-ms observation remains adverse. Stopped-tree scans and this Compose pass neither explain its cause nor authorize unchanged retries.",
+    "Earlier GUI campaigns and editor capture failures remain adverse. A fresh read-only Downloads capture also timed out at 07:35:22-07:35:27 UTC with zero Factorio/activation/input/images; this is a returned API error, not proof of an OS/backend cause."
+  ],
+  "next_executable_work": "Authenticate Aero's independent typed Execute GO for this exact packet/caller/reader and actual Compose terminal, recheck idle/input/resource guards, then run one separately governed natural-zero benchmark with SETTINGS/START/COMPLETE witnesses. Stop and classify any unexpected state; retain full actual receipts and independent result review.",
+  "limits": [
+    "No R03 Factorio process, native benchmark or settings/activity result has run at this checkpoint.",
+    "SETTINGS would observe current effective startup/runtime-global values only; original saved/per-player settings and historical inheritance remain unverified.",
+    "A 600-tick bounded activity window and 3600-tick sanitized benchmark are diagnostic. They do not establish whole-factory throughput, spike behavior, retained memory or normal scored runtime.",
+    "PR1632 drill/ATAN controls merged after bounded independent review and four exact-head checks. The historical Galore two-owner discrepancy and already-paid 5.0.2 state obligations remain open.",
+    "Current issue/PR/fork intake is retained separately in private 3f7ff793 evidence/post502-overlap-community-review-r01 (114 bodies, gzip 2EFB5F2A). Missing-original records remain unresolved; the authored Russian fork suggestion awaits independent current-key/meaning disposition."
+  ],
+  "native_execution_admitted": false,
+  "native_execution": false,
+  "performance_acceptance": false,
+  "gameplay_acceptance": false,
+  "save_preservation_acceptance": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}

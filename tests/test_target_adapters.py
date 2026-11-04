@@ -134,16 +134,19 @@ class TargetAdapterTests(unittest.TestCase):
         ''')
 
     def test_default_target_preserves_f210_api_metadata_and_capabilities(self):
+        self.lua.globals().declared_product_version = json.loads(
+            (ROOT / "source/info.json").read_text(encoding="utf-8")
+        )["version"]
         self.lua.execute(r'''
           package.preload["platform.target"] = nil
           package.loaded["platform.target"] = nil
           package.loaded["__more-infinite-research__.api.v1.data"] = nil
           local selected = require("platform.target")
           assert(selected.id == "f210" and selected.factorio_version == "2.1")
-          assert(selected.minimum_base == "2.1.23" and selected.distribution_version == "5.0.21002")
+          assert(selected.minimum_base == "2.1.23" and selected.distribution_version == declared_product_version)
           assert(not selected.reduced and selected.research_levels and selected.recipe_productivity)
           local api = require("__more-infinite-research__.api.v1.data")
-          assert(api.get_version().product == "5.0.21002")
+          assert(api.get_version().product == declared_product_version)
           assert(api.get_capabilities().technology_creation and api.get_capabilities().recipe_productivity)
         ''')
 

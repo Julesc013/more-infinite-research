@@ -37,15 +37,31 @@ local function declared_contract(declaration)
     if type(recipe) ~= "string" or recipe == "" or recipes[recipe] then return nil end
     recipes[recipe] = true
   end
+  local adoption = declaration.native_adoption
+  if adoption ~= nil then
+    if type(adoption) ~= "table" or type(adoption.recipes) ~= "table" or #adoption.recipes == 0 then return nil end
+    for _, recipe in ipairs(adoption.recipes) do
+      if type(recipe) ~= "string" or recipe == "" or recipes[recipe] then return nil end
+      recipes[recipe] = true
+    end
+  end
   -- Native productivity effects are semantically recipe-keyed. Retain every
   -- authored recipe exactly once, but do not turn a presentation-only array
   -- permutation into loss of a proven cap-restoration right.
-  return recipes, #admission.recipes
+  return recipes, #admission.recipes + (adoption and #adoption.recipes or 0)
 end
 
 function M.admits_native_owner(lookup, declaration, configured_change)
   if type(lookup) ~= "function" then return false end
   local change = configured_change == nil and 0.1 or configured_change
+  local adoption
+  if type(declaration) == "table" then adoption = declaration.native_adoption end
+  if adoption ~= nil then
+    local selected = configured_change
+    if selected == nil then selected = false end
+    if type(adoption) ~= "table" or adoption.configured_change ~= selected then return false end
+    change = adoption.effect_change
+  end
   if type(change) ~= "number" or change ~= change or change <= 0 or change == math.huge then return false end
   local recipes, recipe_count = declared_contract(declaration)
   if recipes == nil then return false end

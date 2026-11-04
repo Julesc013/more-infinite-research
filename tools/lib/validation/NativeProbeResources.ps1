@@ -154,8 +154,20 @@ function Invoke-MIRNativeProbeProcess {
     $result=Invoke-MIR441MonitoredProcess @governorArguments
     $null=Get-MIRNativeProbeRemainingOutputBytes -Context $Context
   } catch {
-    $Context.runs.Add([pscustomobject]@{index=$Context.process_index;status='interrupted';ledger=($prefix+'.resources.jsonl');stdout=($prefix+'.stdout.txt');stderr=($prefix+'.stderr.txt');error=$_.Exception.Message})
-    throw
+    $failure=$_
+    $entry=[ordered]@{index=$Context.process_index;status='interrupted';ledger=($prefix+'.resources.jsonl');stdout=($prefix+'.stdout.txt');stderr=($prefix+'.stderr.txt');error=$failure.Exception.Message}
+    $terminal=$failure.Exception.Data['mir441_process_result']
+    if($terminal-is[pscustomobject]-and
+      @('status','exit_code','passed','timed_out','completion_predicate_observed'|Where-Object {$null-eq$terminal.PSObject.Properties[$_]}).Count-eq0-and
+      $terminal.status-ceq'failed'-and$terminal.exit_code-is[int]-and$terminal.exit_code-ne0-and
+      $terminal.passed-is[bool]-and-not$terminal.passed-and$terminal.timed_out-is[bool]-and-not$terminal.timed_out-and
+      $terminal.completion_predicate_observed-is[bool]-and-not$terminal.completion_predicate_observed-and
+      $failure.Exception.Message-ceq("[mir441-process-exit] "+$terminal.exit_code)){
+      $entry.status='failed'
+      $entry.result=$terminal
+    }
+    $Context.runs.Add([pscustomobject]$entry)
+    throw $failure
   }
   $completed=[pscustomobject]@{index=$Context.process_index;status='passed';ledger=($prefix+'.resources.jsonl');stdout=($prefix+'.stdout.txt');stderr=($prefix+'.stderr.txt');result=$result}
   $waitProperty=$result.PSObject.Properties['admission_wait']

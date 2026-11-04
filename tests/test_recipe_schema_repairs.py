@@ -107,7 +107,9 @@ class RecipeSchemaRepairTests(unittest.TestCase):
                   environment.raw.recipe["atan-ash-seperation"] = recipe
                   settings,mods,data,helpers,log={startup=defaults()},{base="2.1.23"},environment,nil,function() end
                   if selected then mods["atan-ash"]="2.2.1" else mods["atan-ash"]="2.2.2" end
-                  assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 78)
+                  -- Five published Base recipe families add ten signed
+                  -- holders to the original 54 public/24 private rows.
+                  assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 78+10)
                   local science_pack_productivity
                   for _, row in ipairs(environment.emitted) do
                     if row.name == "recipe-prod-research_science_pack_productivity-1" then

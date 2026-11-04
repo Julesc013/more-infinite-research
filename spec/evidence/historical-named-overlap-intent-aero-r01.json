@@ -1,0 +1,1577 @@
+{
+  "schema": 1,
+  "kind": "MIRAeroHistoricalNamedOverlapOriginalIntentReviewV1",
+  "status": "bounded-original-fixture-policy-intent-review-with-open-named-host-gap",
+  "reviewed_against": "71f32c36a3b125684210e1509b28e896466da1c3",
+  "player_tree": "35d83ebe891a1d108e7f68ad288f81fb29f225c1",
+  "subjects": [
+    "CONT-04",
+    "CONT-06",
+    "CONT-08",
+    "CONT-09",
+    "VER-07"
+  ],
+  "scope": "Eleven complete synthetic fixture/metadata/assertion bodies plus two complete capsule/policy data bodies; one large approved-delta body reviewed only for provenance and29 named Galore changed-field classifications; three exact v4.7.3 ownership helpers read for corroboration. No whole legacy compiler or delta estate is reconciled.",
+  "source_count": 14,
+  "source_bytes": 1566555,
+  "live_tag_path_bindings": 224,
+  "fully_read_primary_bodies": 13,
+  "fully_read_primary_bytes": 13857,
+  "sources": [
+    {
+      "blob": "66f6bdde979905900e40407e254435821c033de8",
+      "bindings": [
+        {
+          "tag": "v4.1.0",
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": ".mir/compatibility-capsules.json"
+        },
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": ".mir/compatibility-capsules.json",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
+        },
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": ".mir/compatibility-capsules.json"
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": ".mir/compatibility-capsules.json"
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": ".mir/compatibility-capsules.json"
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": ".mir/compatibility-capsules.json"
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": ".mir/compatibility-capsules.json"
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": ".mir/compatibility-capsules.json"
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": ".mir/compatibility-capsules.json"
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": ".mir/compatibility-capsules.json"
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": ".mir/compatibility-capsules.json"
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": ".mir/compatibility-capsules.json"
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": ".mir/compatibility-capsules.json"
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": ".mir/compatibility-capsules.json"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": ".mir/compatibility-capsules.json"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": ".mir/compatibility-capsules.json"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": ".mir/compatibility-capsules.json"
+        }
+      ],
+      "bytes": 2764,
+      "sha256": "E86118D7CF53D5AD6006AEED4F29F0261E4AFC8544838B314084B66367D3E164",
+      "semantic_review_scope": "Full original body read; synthetic test metadata and independent assertions distinguished from upstream/native evidence."
+    },
+    {
+      "blob": "7b6081ced2b5ab3ef4f3a7a4aa958929a43db3c5",
+      "bindings": [
+        {
+          "tag": "v4.1.0",
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": ".mir/mod-interaction-policy.json"
+        },
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": ".mir/mod-interaction-policy.json",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
+        },
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": ".mir/mod-interaction-policy.json"
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": ".mir/mod-interaction-policy.json"
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": ".mir/mod-interaction-policy.json"
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": ".mir/mod-interaction-policy.json"
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": ".mir/mod-interaction-policy.json"
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": ".mir/mod-interaction-policy.json"
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": ".mir/mod-interaction-policy.json"
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": ".mir/mod-interaction-policy.json"
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": ".mir/mod-interaction-policy.json"
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": ".mir/mod-interaction-policy.json"
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": ".mir/mod-interaction-policy.json"
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": ".mir/mod-interaction-policy.json"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": ".mir/mod-interaction-policy.json"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": ".mir/mod-interaction-policy.json"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": ".mir/mod-interaction-policy.json"
+        }
+      ],
+      "bytes": 944,
+      "sha256": "E787B9ABA0D80960DDE985314C7051EA815887D8641F8722B43165427822852B",
+      "semantic_review_scope": "Full original body read; synthetic test metadata and independent assertions distinguished from upstream/native evidence."
+    },
+    {
+      "blob": "6941fda30dd53adc3267bf5dd85bfe2cfa1c96b9",
+      "bindings": [
+        {
+          "tag": "v4.1.0",
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json"
+        },
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
+        },
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json"
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json"
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json"
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json"
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json"
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json"
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json"
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json"
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json"
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json"
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json"
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": ".mir/releases/deltas/3.1.9-to-3.2.0.json"
+        }
+      ],
+      "bytes": 1552698,
+      "sha256": "4C094C650CDD5C34905A77A1A57A068F8163FAC596854EDA0AFFA084C41C5735",
+      "semantic_review_scope": "Provenance/header and29 named Galore changed-field classifications only; not all221 differences, unchanged technology witnesses or original execution receipts."
+    },
+    {
+      "blob": "5c738fb57a0f1f485f4dd520605c390d7252ecb2",
+      "bindings": [
+        {
+          "tag": "v4.1.0",
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
+        },
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/assert-atan-ash-separation/data-final-fixes.lua"
+        }
+      ],
+      "bytes": 2679,
+      "sha256": "9707D776161F83D6CFC86889535A6FFDAC5BB3F6CED77C62D9519FAC9386DEEE",
+      "semantic_review_scope": "Full original body read; synthetic test metadata and independent assertions distinguished from upstream/native evidence."
+    },
+    {
+      "blob": "9672995239ae806acaa6a9cab772413d9719cc72",
+      "bindings": [
+        {
+          "tag": "v4.1.0",
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": "fixtures/assert-atan-ash-separation/info.json"
+        },
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/assert-atan-ash-separation/info.json",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
+        },
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/assert-atan-ash-separation/info.json"
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "fixtures/assert-atan-ash-separation/info.json"
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "fixtures/assert-atan-ash-separation/info.json"
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "fixtures/assert-atan-ash-separation/info.json"
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "fixtures/assert-atan-ash-separation/info.json"
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "fixtures/assert-atan-ash-separation/info.json"
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "fixtures/assert-atan-ash-separation/info.json"
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "fixtures/assert-atan-ash-separation/info.json"
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "fixtures/assert-atan-ash-separation/info.json"
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "fixtures/assert-atan-ash-separation/info.json"
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "fixtures/assert-atan-ash-separation/info.json"
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/assert-atan-ash-separation/info.json"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/assert-atan-ash-separation/info.json"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/assert-atan-ash-separation/info.json"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/assert-atan-ash-separation/info.json"
+        }
+      ],
+      "bytes": 387,
+      "sha256": "F61783D75F7501FAE6BA32F925475F425BCFD41B9F5398B42BC9FB33F80AAFD6",
+      "semantic_review_scope": "Full original body read; synthetic test metadata and independent assertions distinguished from upstream/native evidence."
+    },
+    {
+      "blob": "49ab9a29c15b2cf9ffdd1e8e525cb4fcadc16eb5",
+      "bindings": [
+        {
+          "tag": "v4.1.0",
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
+        },
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/assert-big-mining-drill-productivity/data-final-fixes.lua"
+        }
+      ],
+      "bytes": 755,
+      "sha256": "4D7DA6CCE1598C1866C917BC195D8A087B5418FA342C291ECBF0C5081ACB53D1",
+      "semantic_review_scope": "Full original body read; synthetic test metadata and independent assertions distinguished from upstream/native evidence."
+    },
+    {
+      "blob": "d714ed02a69a18e4c560624da669d4de09fd8155",
+      "bindings": [
+        {
+          "tag": "v4.1.0",
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": "fixtures/assert-big-mining-drill-productivity/info.json"
+        },
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/assert-big-mining-drill-productivity/info.json",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
+        },
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/assert-big-mining-drill-productivity/info.json"
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "fixtures/assert-big-mining-drill-productivity/info.json"
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "fixtures/assert-big-mining-drill-productivity/info.json"
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "fixtures/assert-big-mining-drill-productivity/info.json"
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "fixtures/assert-big-mining-drill-productivity/info.json"
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "fixtures/assert-big-mining-drill-productivity/info.json"
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "fixtures/assert-big-mining-drill-productivity/info.json"
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "fixtures/assert-big-mining-drill-productivity/info.json"
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "fixtures/assert-big-mining-drill-productivity/info.json"
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "fixtures/assert-big-mining-drill-productivity/info.json"
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "fixtures/assert-big-mining-drill-productivity/info.json"
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/assert-big-mining-drill-productivity/info.json"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/assert-big-mining-drill-productivity/info.json"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/assert-big-mining-drill-productivity/info.json"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/assert-big-mining-drill-productivity/info.json"
+        }
+      ],
+      "bytes": 426,
+      "sha256": "541ABF6DDDDF8EFCF5D9D2CDF34FDD5F9CF59F0DD153DBF06E51DE4059F2CA78",
+      "semantic_review_scope": "Full original body read; synthetic test metadata and independent assertions distinguished from upstream/native evidence."
+    },
+    {
+      "blob": "034589c3f83532132f5295b5d947148366c06b74",
+      "bindings": [
+        {
+          "tag": "v4.1.0",
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": "fixtures/atan-ash/data.lua"
+        },
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/atan-ash/data.lua",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
+        },
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/atan-ash/data.lua"
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "fixtures/atan-ash/data.lua"
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "fixtures/atan-ash/data.lua"
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "fixtures/atan-ash/data.lua"
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "fixtures/atan-ash/data.lua"
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "fixtures/atan-ash/data.lua"
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "fixtures/atan-ash/data.lua"
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "fixtures/atan-ash/data.lua"
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "fixtures/atan-ash/data.lua"
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "fixtures/atan-ash/data.lua"
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "fixtures/atan-ash/data.lua"
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/atan-ash/data.lua"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/atan-ash/data.lua"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/atan-ash/data.lua"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/atan-ash/data.lua"
+        }
+      ],
+      "bytes": 2477,
+      "sha256": "14BF78AF15874026B2907E702D72425C678B045254C6D716847B95415CF6756B",
+      "semantic_review_scope": "Full original body read; synthetic test metadata and independent assertions distinguished from upstream/native evidence."
+    },
+    {
+      "blob": "53a1879d2b4932154a4f8619d2ecc2ba6c5ef51d",
+      "bindings": [
+        {
+          "tag": "v4.1.0",
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": "fixtures/atan-ash/info.json"
+        },
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/atan-ash/info.json",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
+        },
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/atan-ash/info.json"
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "fixtures/atan-ash/info.json"
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "fixtures/atan-ash/info.json"
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "fixtures/atan-ash/info.json"
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "fixtures/atan-ash/info.json"
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "fixtures/atan-ash/info.json"
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "fixtures/atan-ash/info.json"
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "fixtures/atan-ash/info.json"
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "fixtures/atan-ash/info.json"
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "fixtures/atan-ash/info.json"
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "fixtures/atan-ash/info.json"
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/atan-ash/info.json"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/atan-ash/info.json"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/atan-ash/info.json"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/atan-ash/info.json"
+        }
+      ],
+      "bytes": 291,
+      "sha256": "F2C4F6F8861753A9A4B0979E0E86E123BCB783123117CDE4C7A8248472392B76",
+      "semantic_review_scope": "Full original body read; synthetic test metadata and independent assertions distinguished from upstream/native evidence."
+    },
+    {
+      "blob": "e0c91c62880e56b6acc32db5874cf46cf1662529",
+      "bindings": [
+        {
+          "tag": "v4.1.0",
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": "fixtures/big-mining-drill/data.lua"
+        },
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/big-mining-drill/data.lua",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
+        },
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/big-mining-drill/data.lua"
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "fixtures/big-mining-drill/data.lua"
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "fixtures/big-mining-drill/data.lua"
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "fixtures/big-mining-drill/data.lua"
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "fixtures/big-mining-drill/data.lua"
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "fixtures/big-mining-drill/data.lua"
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "fixtures/big-mining-drill/data.lua"
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "fixtures/big-mining-drill/data.lua"
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "fixtures/big-mining-drill/data.lua"
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "fixtures/big-mining-drill/data.lua"
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "fixtures/big-mining-drill/data.lua"
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/big-mining-drill/data.lua"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/big-mining-drill/data.lua"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/big-mining-drill/data.lua"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/big-mining-drill/data.lua"
+        }
+      ],
+      "bytes": 1103,
+      "sha256": "52F08E0C5BC5735C182EC863433F5B830736A229D0053C60679B1A501BC8D0D7",
+      "semantic_review_scope": "Full original body read; synthetic test metadata and independent assertions distinguished from upstream/native evidence."
+    },
+    {
+      "blob": "eb6dc9e784b09f713c26dbb2dbd0d3e58698dfca",
+      "bindings": [
+        {
+          "tag": "v4.1.0",
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": "fixtures/big-mining-drill/info.json"
+        },
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/big-mining-drill/info.json",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
+        },
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/big-mining-drill/info.json"
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "fixtures/big-mining-drill/info.json"
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "fixtures/big-mining-drill/info.json"
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "fixtures/big-mining-drill/info.json"
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "fixtures/big-mining-drill/info.json"
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "fixtures/big-mining-drill/info.json"
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "fixtures/big-mining-drill/info.json"
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "fixtures/big-mining-drill/info.json"
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "fixtures/big-mining-drill/info.json"
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "fixtures/big-mining-drill/info.json"
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "fixtures/big-mining-drill/info.json"
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/big-mining-drill/info.json"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/big-mining-drill/info.json"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/big-mining-drill/info.json"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/big-mining-drill/info.json"
+        }
+      ],
+      "bytes": 341,
+      "sha256": "48ED35712DA26CF60370EF1DDDA9AF76B8094C11537DC6394B1A0AE3D416460C",
+      "semantic_review_scope": "Full original body read; synthetic test metadata and independent assertions distinguished from upstream/native evidence."
+    },
+    {
+      "blob": "4d92c97610d30ac8baa42428610f3f846bde7753",
+      "bindings": [
+        {
+          "tag": "v4.1.0",
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
+        },
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/space-age-galore-overlap/data-final-fixes.lua"
+        }
+      ],
+      "bytes": 720,
+      "sha256": "B458F44E50023570113BF4C0E2764DA1015F0104E5C4C5E012F001BA210919DF",
+      "semantic_review_scope": "Full original body read; synthetic test metadata and independent assertions distinguished from upstream/native evidence."
+    },
+    {
+      "blob": "27c8d4472bd74be60c2abc244f90907059b2b43a",
+      "bindings": [
+        {
+          "tag": "v4.1.0",
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": "fixtures/space-age-galore-overlap/data.lua"
+        },
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/space-age-galore-overlap/data.lua",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
+        },
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/space-age-galore-overlap/data.lua"
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "fixtures/space-age-galore-overlap/data.lua"
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "fixtures/space-age-galore-overlap/data.lua"
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "fixtures/space-age-galore-overlap/data.lua"
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "fixtures/space-age-galore-overlap/data.lua"
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "fixtures/space-age-galore-overlap/data.lua"
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "fixtures/space-age-galore-overlap/data.lua"
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "fixtures/space-age-galore-overlap/data.lua"
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "fixtures/space-age-galore-overlap/data.lua"
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "fixtures/space-age-galore-overlap/data.lua"
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "fixtures/space-age-galore-overlap/data.lua"
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/space-age-galore-overlap/data.lua"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/space-age-galore-overlap/data.lua"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/space-age-galore-overlap/data.lua"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/space-age-galore-overlap/data.lua"
+        }
+      ],
+      "bytes": 583,
+      "sha256": "9BD30B996DDF4169674C00D7565220E1B251E584BBC3ECAFD1CDFFA8058BE00E",
+      "semantic_review_scope": "Full original body read; synthetic test metadata and independent assertions distinguished from upstream/native evidence."
+    },
+    {
+      "blob": "5d0687a78c6711135b4c862b57ade0e0de601ffe",
+      "bindings": [
+        {
+          "tag": "v4.1.0",
+          "commit": "3562377b520cccb071b97b3968946eae7024c950",
+          "path": "fixtures/space-age-galore-overlap/info.json"
+        },
+        {
+          "tag": "v4.2.0",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/space-age-galore-overlap/info.json",
+          "ref_disposition": "retained-local-numeric-alias-not-a-live-remote-tag"
+        },
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "fixtures/space-age-galore-overlap/info.json"
+        },
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "fixtures/space-age-galore-overlap/info.json"
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "fixtures/space-age-galore-overlap/info.json"
+        },
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "fixtures/space-age-galore-overlap/info.json"
+        },
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "fixtures/space-age-galore-overlap/info.json"
+        },
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "fixtures/space-age-galore-overlap/info.json"
+        },
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "fixtures/space-age-galore-overlap/info.json"
+        },
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "fixtures/space-age-galore-overlap/info.json"
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "fixtures/space-age-galore-overlap/info.json"
+        },
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "fixtures/space-age-galore-overlap/info.json"
+        },
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "fixtures/space-age-galore-overlap/info.json"
+        },
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/space-age-galore-overlap/info.json"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/space-age-galore-overlap/info.json"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/space-age-galore-overlap/info.json"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/space-age-galore-overlap/info.json"
+        }
+      ],
+      "bytes": 387,
+      "sha256": "FC0758FA7360FC2CB382ED8B88F6D1FC17E88DA203C21F8C1822FC7A94D898E3",
+      "semantic_review_scope": "Full original body read; synthetic test metadata and independent assertions distinguished from upstream/native evidence."
+    }
+  ],
+  "supplemental_ownership_sources": [
+    {
+      "path": "source/prototypes/mir/planner/effect_ownership/facts.lua",
+      "tag": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "blob": "c5e0d3fe31d03932f854620f4a86588d9328589c",
+      "bytes": 6418,
+      "sha256": "51F8108DCDE74564501C08490C946AE1AC1AC04D5393811D277F3C5E45B80956",
+      "scope": "Full body read as narrowly named ownership-rule corroboration only; imported planner/authority/emit closure and all other claims are not reconciled."
+    },
+    {
+      "path": "source/prototypes/mir/planner/effect_ownership/resolution.lua",
+      "tag": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "blob": "58c51eabb2abaccda3b5ab117162de021211796f",
+      "bytes": 3986,
+      "sha256": "E33118C4BADBF5549A59FB045046E2C8E973772CA600E28AA35D228FF7827EB0",
+      "scope": "Full body read as narrowly named ownership-rule corroboration only; imported planner/authority/emit closure and all other claims are not reconciled."
+    },
+    {
+      "path": "source/prototypes/mir/planner/stream_compiler/ownership.lua",
+      "tag": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "blob": "07431f2c805e0f4584fb8ab930af25d6c00d4857",
+      "bytes": 2178,
+      "sha256": "A49CCA3200EDDDC9BCFBADDB431D331D7A691C3BEAA7DB7B3518EA737524C448",
+      "scope": "Full body read as narrowly named ownership-rule corroboration only; imported planner/authority/emit closure and all other claims are not reconciled."
+    }
+  ],
+  "prior_graph_review": {
+    "original_review_sha256": "A12CAE5A141019BA23241D917CA9CD7C80BB931F609095C8E96160FD792BE1A7",
+    "original_review_comment": "https://github.com/Julesc013/more-infinite-research/pull/1627#issuecomment-6596640907",
+    "scope": "Three complete graph/campaign/delta-policy source bodies,9130bytes/51bindings; semantic named cases retained and generated graph machinery superseded."
+  },
+  "obligations": [
+    {
+      "id": "atan-ash-x-big-mining-drill-independent-v1",
+      "disposition": "retain-compose-expectations-port-only-under-current-admitted-inputs",
+      "original_expectation": "Synthetic ATAN ash technology recipe-prod-research_ash_separation-1 is infinite/upgrade, requires atan-ash-processing, grants0.05 only to exact atan-ash-seperation and is its sole infinite owner; all four ash sinks exist but have zero infinite productivity owners. Independent drill manufacture retains its own family and effect. Keep upstream spelling seperation.",
+      "original_inputs": "Four fixture/assertion metadata files declare synthetic version0.1.0 and Factorio2.1. ATAN needs Base>=2.1; drill needs Base>=2.1.8. These names are mir-fixture-atan-ash/mir-fixture-big-mining-drill, not pinned actual upstream archives. The capsule exact_mods strings contain no versions/settings/engine hashes. Single-mod qualification does not prove composition.",
+      "variant_decision": "Port identity/effect/exclusion/independent-family intent; do not transplant obsolete synthetic prerequisite into the actual F200 tuple. Independent published F200 captured facts use automation-3 with production science/time90 and0.05, plus clean-filter native owners under atan-air-scrubbing0.2.8/atan-ash2.2.1. The F210 synthetic fixture does not establish current F210 ATAN admission.",
+      "implementation": [
+        "source/compatibility/atan_productivity.lua",
+        "source/compatibility/atan_profile.lua",
+        "source/research/atan_productivity.lua",
+        "source/compatibility/product_bindings.lua"
+      ],
+      "controls": [
+        "tests/test_atan_productivity.py::test_base_pure_definitions_and_selected_rows_match_independent_facts",
+        "tests/test_atan_productivity.py::test_space_age_pure_definitions_rows_and_settings_match_independent_facts",
+        "tests/test_atan_productivity.py::test_selected_definitions_are_detached_and_preserve_the_withheld_effect_boundary",
+        "tests/test_atan_productivity.py::test_space_age_outputs_are_detached_and_keep_denied_routes_outside_effects",
+        "tests/test_product_target_extension.py"
+      ],
+      "applicable_evidence": [
+        "tests/fixtures/atan-f200-captured-facts.json",
+        "spec/evidence/atan-gameplay-chain.json"
+      ],
+      "remaining_executable_check": "Add a current admitted-input composition control for ash plus drill manufacture and exact zero-cross-family/denied-route expectations. Review actual dependencies before any affected native extension; existing Base/SpaceAge F200 native results retain original scope and do not qualify this synthetic combination, physical output, F210 or final candidate.",
+      "owner": "Aero independent expectations/focused controls; Black Glass only affected exact native route"
+    },
+    {
+      "id": "space-age-x-big-mining-drill-targeted-v1",
+      "disposition": "retain-one-manufacturing-family-and-effect-owner-with-qualified-inputs",
+      "original_expectation": "Original standalone fixture clones electric-mining-drill to item/entity big-mining-drill and adds its productive recipe. Original assertion requires the mining-drill family effect0.05 on that recipe. The named graph/delta adds single-family/single-owner intent; the755-byte assertion alone does not count all owners or even reject two matching effects.",
+      "original_inputs": "Synthetic fixture0.1.0 declares Factorio2.1/Base>=2.1.8. It defines big-mining-drill unconditionally and does not depend on SpaceAge. Do not assume this fixture can be combined unchanged with an engine/DLC already defining those identities; validate actual dependency/order/prototype composition first. No exact upstream big-mining-drill archive/version or complete campaign process receipt is supplied by these declarations.",
+      "implementation": [
+        "source/compatibility/product_bindings.lua: mining-drill weight0.25 against retained20percent default",
+        "source/compatibility/modern_catalogue/space_age.lua: authored big-mining-drill scale0.25",
+        "source/research/product_target_extension.lua: per-family already-present recipe suppression"
+      ],
+      "controls": [
+        "tests/test_product_target_extension.py::test_published_pattern_groups_preserve_weights_settings_and_explicit_routes",
+        "tests/test_product_target_extension.py::test_base_and_active_space_age_literal_routes_extend_only_existing_generated_rows",
+        "tests/test_product_targets.py::test_group_order_deduplicates_one_recipe_without_losing_authored_weight"
+      ],
+      "applicable_evidence": [],
+      "remaining_executable_check": "Port exact default0.05 and nondefault scaling/single-owner composed controls. Existing generic pattern and per-family dedup controls are analogs, not this exact named campaign; no native result for this specific composition is inferred.",
+      "owner": "Aero controls/expectations; Black Glass affected admitted native composition"
+    },
+    {
+      "id": "space-age-x-space-age-galore-targeted-v1",
+      "disposition": "port-required-recovered-host-single-owner-gap-open",
+      "original_expectation": "Unchanged original Galore fixture uses coal5 as input, a fully productivity-ignored coal1 return with independent_probability0.10, productive carbon1 probability0.25 and sulfur1 probability0.50. Exact vgal-coal-crushing must have precisely one planned productivity owner: recipe-prod-research_carbon-1. Generic multi-output families are a separate contract and are not permission to waive this named rule.",
+      "original_inputs": "Synthetic fixture0.1.0 declares Factorio2.1/Base>=2.1.8, SpaceAge>=2.0.0 and MIR; no actual space-age-galore mod is required by its own metadata. Its three files do not pin an exact Factorio build, dependency ZIPs, settings or a real Galore version.",
+      "corroboration": "Published v4.7.3 resolver selects one claim per effect identity; facts.claim_less prefers explicit priority, adopted owner, fixed stream then lexical stream key. Carbon wins the default named carbon/sulfur pair. This corroborates the unchanged original assertion, not authority to restore the global planner, rewrite foreign prototypes or change generic multi-output behavior.",
+      "implementation": [
+        "source/research/product_target_extension.lua",
+        "source/compatibility/product_bindings.lua",
+        "source/compatibility/product_targets.lua"
+      ],
+      "controls": [
+        "tests/test_product_targets.py::test_group_order_deduplicates_one_recipe_without_losing_authored_weight currently permits separate generic families",
+        "tests/test_product_target_extension.py presently lacks the named original single-carbon-owner case"
+      ],
+      "applicable_evidence": [
+        {
+          "path": "build/qualification/aero-named-overlap-original-intent-r01/galore-host-discrepancy.json",
+          "sha256": "4554B398DAD02C5D0382A49F2F15E600CC68D97BD67D385D4DDD7EE0E27CF948",
+          "status": "HOST-original-oracle-rejects-current-detached-extension",
+          "observed_owners": [
+            "recipe-prod-research_carbon-1",
+            "recipe-prod-research_sulfur-1"
+          ]
+        }
+      ],
+      "excluded_evidence": "spec/evidence/severe-galore-f200-phase-native-chain-r02.json is explicitly an unscored reduced startup proxy, not this ownership, semantic, gameplay or performance acceptance. The historical approved delta changes steel/diagnostic/version fields, not complete unchanged carbon/sulfur definitions.",
+      "remaining_executable_check": "Prepare a separately reviewed named correction and regression control using the original oracle, with default/nondefault, absent/unproductive preferred family, unrelated multi-output and read-only foreign-state controls. Review affected already-paid502 sulfur/carbon state before removing any emitted effect; native source/candidate/save/two-reload applicability and actual upstream-valid Galore inputs remain open. No source fix, save repair or native conclusion is claimed by this evidence unit.",
+      "owner": "Aero scoped source/independent controls after explicit file ownership; Black Glass actual upstream/native/save qualification"
+    }
+  ],
+  "historical_delta_scope": {
+    "blob": "6941fda30dd53adc3267bf5dd85bfe2cfa1c96b9",
+    "bytes": 1552698,
+    "baseline": {
+      "version": "3.1.9",
+      "source_commit": "79df29b50ea9b855b8665d6c9a3d8295806acde0",
+      "archive_sha256": "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD",
+      "package_content_sha256": "1D905CD5F394C3ABFC2ABEFFEB0249AC9D8D5C5FC4ADA0F5A5BA368B17548229"
+    },
+    "current": {
+      "version": "3.2.0",
+      "source_commit": "0448ceb8d3992082718e2df83bd6a42c56955636",
+      "package_source_commit": "0448ceb8d3992082718e2df83bd6a42c56955636",
+      "archive_sha256": "4646277AC8FBC67D453EAAAEE13C3167630AD94BFE490AD08D592844B6D7B38D",
+      "package_content_sha256": "10BB848EA5899873C42CDF29F676806BC8BE282C2A4BFC09CE760E72331714A7"
+    },
+    "exporter": {
+      "fixture": "fixtures/export-approved-delta",
+      "script": "scripts/Export-MIRApprovedDelta.ps1",
+      "qualification_source_commit": "d47db1643ba44a59b83036f0e673918bc8b72325",
+      "producer_sha256": "2E04B07BB5618C9C9C5B88668669C0F52CBCBCCDC3FCC40D37DE728FCAA572AA",
+      "factorio_binary_version": "2.1.11.86962",
+      "scenarios": [
+        "approved-delta-automatic-family-controls",
+        "approved-delta-base",
+        "approved-delta-base-continuations",
+        "approved-delta-compat-atan",
+        "approved-delta-compat-space-age-galore",
+        "approved-delta-native-owner-adoption",
+        "approved-delta-space-age"
+      ]
+    },
+    "named_scenario_fields": [
+      "scenarios.approved-delta-compat-space-age-galore.active_mods.more-infinite-research",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-compiler-evidence",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-compiler-evidence-internal",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-coverage-report-internal",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-coverage-report.contract_shape.fields.coverage_fingerprint",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-coverage-report.contract_shape.fields.coverage_report_schema",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-coverage-report.contract_shape.fields.fingerprint",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-coverage-report.contract_shape.fields.public_fingerprint",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-coverage-report.contract_shape.fields.rows",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-coverage-report.data_type",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-generation-plan-internal",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-generation-plan.contract_shape.fields.generation_plan_schema",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-generation-plan.contract_shape.fields.kind",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-generation-plan.contract_shape.fields.public_fingerprint",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-generation-plan.contract_shape.fields.rows.value_shapes",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-generation-plan.contract_shape.fields.source_fingerprint",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-generation-plan.contract_shape.fields.source_fingerprints",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-generation-plan.data_type",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-generation-plan.schema",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-technology-catalog",
+      "scenarios.approved-delta-compat-space-age-galore.mod_data_contracts.more-infinite-research-technology-catalog-internal",
+      "scenarios.approved-delta-compat-space-age-galore.settings.ips-cost-base-research_steel",
+      "scenarios.approved-delta-compat-space-age-galore.settings.ips-cost-growth-research_steel",
+      "scenarios.approved-delta-compat-space-age-galore.settings.ips-effect-per-level-research_steel",
+      "scenarios.approved-delta-compat-space-age-galore.settings.ips-enable-research_steel",
+      "scenarios.approved-delta-compat-space-age-galore.settings.ips-max-level-research_steel",
+      "scenarios.approved-delta-compat-space-age-galore.settings.ips-research-time-research_steel",
+      "scenarios.approved-delta-compat-space-age-galore.technologies.steel-plate-productivity",
+      "scenarios.approved-delta-compat-space-age-galore.technology_ids"
+    ],
+    "limitations": "Delta source is1,552,698bytes with221 differences, not a complete prototype snapshot. Its29 named Galore differences change active MIR version,20 diagnostic contracts,6 steel settings,steel technology andtechnology IDs. It does not prove unchanged Galore carbon/sulfur vectors, all native inputs, in-game behavior or current compatibility; other192 differences and imported exporter/receipts are outside this slice."
+  },
+  "current_host_observations": {
+    "plan": "tests/Test-MIR5HostControls.ps1 -Plan",
+    "runtime": "explicit build/tmp/mir421-lua-runtime / lupa.lua52",
+    "current_product_target_controls": 18,
+    "current_extension_controls": 16,
+    "result": "PASS-existing34-controls; named original Galore oracle separately rejects current extension and remains open",
+    "probe_script_sha256": "A73C2C9EDDEE5A23EA316D64E1443E6B9C1763DEDB06E49FF17471849FAB5F3B",
+    "discrepancy_sha256": "4554B398DAD02C5D0382A49F2F15E600CC68D97BD67D385D4DDD7EE0E27CF948",
+    "limitation": "Host-only detached extension; exact original synthetic fixture and oracle, not full current data pipeline or installed native profile."
+  },
+  "superseded": [
+    "Retired generated graph/capsule hash/schema/cardinality machinery and pair enumeration are not player behavior or new dependencies.",
+    "Retired global effect resolver is corroborating source only. Keep the current local Generator strict and one relevant recipe pass; no global ownership framework, every-pair campaign or arbitrary prototype rewriting.",
+    "Synthetic mir-fixture names are not actual upstream archive pins; fixture existence and historical approved labels supply no native acceptance."
+  ],
+  "finite_remaining": [
+    "Three named composition/ownership controls with independent expectations as specified above",
+    "Named Galore source correction plus affected already-earned save-safety review, without changing generic multi-output semantics",
+    "Exact dependency-valid input/version/settings and affected native applicability review for any claimed composition"
+  ],
+  "player_files_changed": false,
+  "request_decisions_changed": false,
+  "whole_historical_source_reconciliation_complete": false,
+  "source_reconciliation_complete": false,
+  "test_intent_reconciliation_complete": false,
+  "native_execution": false,
+  "release_qualification": false,
+  "stable_qualification": false,
+  "source_tag_labels": 17,
+  "live_tags": 16,
+  "retained_local_alias_bindings": 14,
+  "tag_provenance_correction": {
+    "observed_utc": "2026-11-03T07:49:01.711610+00:00",
+    "original_author_commit": "01767a9c76e0a2e18e1cae1bf913b285d403b084",
+    "original_evidence_sha256": "CB139A6BD8DEBE4B840C0A7499ABD8B306B57279719391648428D74553D5C545",
+    "live_tag_names": [
+      "v4.1.0",
+      "v4.2.0-stable",
+      "v4.2.1",
+      "v4.2.2",
+      "v4.3.0",
+      "v4.4.0",
+      "v4.4.1",
+      "v4.4.2",
+      "v4.5.0",
+      "v4.5.1",
+      "v4.5.2",
+      "v4.6.0",
+      "v4.7.0",
+      "v4.7.1",
+      "v4.7.2",
+      "v4.7.3"
+    ],
+    "retained_alias": {
+      "label": "v4.2.0",
+      "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+      "bindings": 14,
+      "remote_canonical_numeric_ref_present": false,
+      "live_historical_stable_label": "v4.2.0-stable"
+    },
+    "raw_remote_observation_sha256": "706C2432D9F8CE282C6AEC3F83D2A6737F9A4B3EAF9313A75194280547127A32",
+    "correction": "The original record incorrectly called238 local label/path bindings live. Preserve all238 source bindings but distinguish224live bindings/16tags from14retained local numeric aliases. No tag is created or moved; source Git blobs and semantic observations remain unchanged."
+  }
+}

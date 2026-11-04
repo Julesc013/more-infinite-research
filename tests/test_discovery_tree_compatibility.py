@@ -126,23 +126,32 @@ class DiscoveryTreeCompatibilityTests(unittest.TestCase):
           assert(lifecycle.discovery_visibility(world)[native.name]==nil)
         ''')
 
-    def test_sif_paid_holders_are_private_only_in_the_profile_that_emits_them(self):
+    def test_paid_holders_remain_private_except_for_a_real_public_fallback(self):
         self.lua.execute('''
           local names={"research_low_density_structure","research_plastic","research_processing_unit",
             "research_rocket_fuel","research_steel"}
           local target=require("platform.target")
-          target.id,target.factorio_version,target.minimum_base="f200","2.0","2.0.77"
-          for _, sif in ipairs({false,true}) do
-            script={active_mods={base="2.0.77",["space-age"]="2.0.77"}}
-            if sif then script.active_mods["space-is-fake"]="1.0.60" end
+          for _,case in ipairs({{space=true},{space=true,sif=true},{space=false},
+              {space=true,f210=true},{space=true,fallback=true}}) do
+            local engine=case.f210 and "2.1.23" or "2.0.77"
+            target.id,target.factorio_version,target.minimum_base=case.f210 and "f210" or "f200",
+              case.f210 and "2.1" or "2.0",engine
+            script={active_mods={base=engine}};prototypes=nil
+            if case.space then script.active_mods["space-age"]=engine end
+            if case.sif then script.active_mods["space-is-fake"]="1.0.60" end
+            if case.fallback then
+              prototypes={mod_data={["more-infinite-research-native-adoptions"]={data={schema=1,owners={},
+                withheld={["steel-plate-productivity"]={family="research_steel",generated=true}}}}}}
+            end
             package.loaded["research.catalogue"],package.loaded["runtime.catalogue"]=nil,nil
             local catalogue=require("runtime.catalogue")
             local private=catalogue.internal_credit_ids()
             assert(private["mir-k2-imersite-staged-state-1"] and private["mir-k2-imersite-continuation-state-4"])
             for _, family in ipairs(names) do
               local id="recipe-prod-"..family.."-1"
-              assert((private[id]==true)==sif,"incorrect private profile for "..id)
-              if sif then
+              local is_private=case.space and not(case.fallback and family=="research_steel")
+              assert((private[id]==true)==is_private,"incorrect private profile for "..id)
+              if is_private then
                 local holder={name=id,enabled=true,level=3,researched=false}
                 local world={technologies={[id]=holder},research_queue={}}
                 for _, discovery in ipairs({false,true}) do
@@ -151,6 +160,10 @@ class DiscoveryTreeCompatibilityTests(unittest.TestCase):
                   assert(model.detail(world,{}, {selected=id},{},facts)==nil)
                   assert(holder.level==3 and holder.enabled)
                 end
+              else
+                local declared=false
+                for _,row in ipairs(catalogue.declared()) do if row.id==id then declared=true end end
+                assert(declared,"public MIR research was hidden by a blanket family rule")
               end
             end
           end

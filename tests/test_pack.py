@@ -93,6 +93,7 @@ class PackTests(unittest.TestCase):
                 "research/settings_profile.lua",
                 "research/historical_settings.lua",
                 "research/native_direct_definitions.lua",
+                "research/native_credit_contracts.lua",
                 "platform/target.lua",
                 "compatibility/modern_catalogue.lua",
                 "compatibility/modern_catalogue/base.lua",
@@ -126,10 +127,13 @@ class PackTests(unittest.TestCase):
                 "compatibility/modern_catalogue/space_age.lua",
                 "compatibility/modern_catalogue/sif_retained.lua",
                 "compatibility/modern_catalogue/muria.lua",
+                "compatibility/modern_catalogue/secretas.lua",
                 "compatibility/modern_catalogue/k2so.lua",
             },
         )
         self.assertNotIn(PLAYER / "research/generator.lua", closure)
+        self.assertNotIn(PLAYER / "research/native_credit_definitions.lua", closure)
+        self.assertNotIn(PLAYER / "compatibility/product_bindings.lua", closure)
         self.assertFalse(any("runtime" in path.parts or "api" in path.parts for path in closure))
 
     def test_runtime_closure_never_imports_the_generator(self):

@@ -68,7 +68,7 @@ class LifecycleTests(unittest.TestCase):
           end
 
           function boot(forces, raw_cap, profile, saved_storage, retained_handlers, worker_cap, active_mods,
-              agriculture_cap, extra_caps, recipe_caps)
+              agriculture_cap, extra_caps, recipe_caps, native_mod_data, native_prototype_history)
             storage = saved_storage or {}
             settings = {startup = startup_values(raw_cap, profile, worker_cap)}
             if agriculture_cap ~= nil then
@@ -94,7 +94,7 @@ class LifecycleTests(unittest.TestCase):
             if recipe_caps == false then
               prototypes = nil
             else
-              prototypes = {recipe = recipe_caps or {}}
+              prototypes = {recipe = recipe_caps or {}, mod_data = native_mod_data, get_history = native_prototype_history}
             end
             mods = active_mods or {}
             handlers = retained_handlers or {events = {}}
@@ -124,6 +124,7 @@ class LifecycleTests(unittest.TestCase):
             package.loaded["runtime.catalogue"] = nil
             package.loaded["runtime.lifecycle"] = nil
             package.loaded["runtime.configuration"] = nil
+            package.loaded["runtime.native_credits"] = nil
             -- Each boot models a fresh native control stage. Startup settings
             -- capture that stage's mod profile; do not reuse a Base instance
             -- while testing a subsequent K2 stage in the same host Lua VM.

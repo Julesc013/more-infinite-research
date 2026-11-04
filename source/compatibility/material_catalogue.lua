@@ -42,23 +42,61 @@ local function ordinary_rows(actual, expected, product)
   return true
 end
 
+local function startup_boolean(startup, name)
+  local row = type(startup) == "table" and startup[name]
+  if type(row) ~= "table" or type(row.value) ~= "boolean" then
+    fail(name .. " effective startup setting is unavailable")
+  end
+  return row.value
+end
+
+-- Crushing Industry moves the ordinary unlock but retains the old recipe for
+-- existing factories. Keep both native rewards; never unhide or enable either
+-- recipe. Null's item standardization changes item names, not these recipe IDs.
+local function bound_definition(definition, raw, active_mods, startup)
+  if definition.key ~= "research_material_glass" or not active_mods["crushing-industry"] then return definition end
+  if not startup_boolean(startup, "crushing-industry-k2") then return definition end
+  local glass = startup_boolean(startup, "crushing-industry-glass")
+  local previous = type(raw) == "table" and type(raw.recipe) == "table" and raw.recipe["kr-glass"]
+  local sand_name, glass_name = "sand", glass and "glass" or "kr-glass"
+  if active_mods["nulls-k2so-tweaks"] and type(previous) == "table" then
+    local ingredient = type(previous.ingredients) == "table" and previous.ingredients[1]
+    local product = type(previous.results) == "table" and previous.results[1]
+    if type(ingredient) == "table" and ingredient.name == "kr-sand" then sand_name = "kr-sand" end
+    if type(product) == "table" and product.name == "kr-glass" then glass_name = "kr-glass" end
+  end
+  local output = {}
+  for key, value in pairs(definition) do output[key] = value end
+  output.routes = {{recipe="kr-glass", owner="kr-stone-processing",
+    ingredients={{type="item", name=sand_name, amount=16}},
+    results={{type="item", name=glass_name, amount=8}}}}
+  if glass then
+    output.routes[1].retained = true
+    output.routes[1].unlock_recipe = "glass"
+    output.routes[2] = {recipe="glass", owner="kr-stone-processing",
+      ingredients={{type="item", name=sand_name, amount=5}},
+      results={{type="item", name=glass_name, amount=2}}}
+  end
+  return output
+end
+
 local function validate_raw(raw, definition)
   if type(raw) ~= "table" or type(raw.recipe) ~= "table" or type(raw.technology) ~= "table" then
     fail("named K2SO raw prototypes are unavailable")
   end
   for _, route in ipairs(definition.routes) do
     local recipe = raw.recipe[route.recipe]
-    if type(recipe) ~= "table" or recipe.enabled ~= false or recipe.allow_productivity ~= true
+    local enabled = type(recipe) == "table" and recipe.enabled
+    local enabled_valid = route.retained and (enabled == nil or type(enabled) == "boolean") or enabled == false
+    if type(recipe) ~= "table" or not enabled_valid or recipe.allow_productivity ~= true
       or not ordinary_rows(recipe.ingredients, route.ingredients)
       or not ordinary_rows(recipe.results, route.results, true) then fail(route.recipe .. " changed") end
     local owner = raw.technology[route.owner]
     local unlock = false
     for _, effect in ipairs(type(owner) == "table" and owner.effects or {}) do
-      if effect.recipe == route.recipe then
-        if effect.type == "unlock-recipe" then unlock = true end
-        if effect.type == "change-recipe-productivity" then
-          fail(route.owner .. " already supplies productivity for " .. route.recipe)
-        end
+      if effect.recipe == (route.unlock_recipe or route.recipe) and effect.type == "unlock-recipe" then unlock = true end
+      if effect.recipe == route.recipe and effect.type == "change-recipe-productivity" then
+        fail(route.owner .. " already supplies productivity for " .. route.recipe)
       end
     end
     if not unlock then fail(route.owner .. " no longer owns " .. route.recipe) end
@@ -126,19 +164,20 @@ local function technology(definition, stream)
   return output
 end
 
-function M.technologies(values, raw, active_mods)
+function M.technologies(values, raw, active_mods, upstream_startup)
   if not catalogue.is_k2so(active_mods) then
     return {}
   end
 
-  local streams = {}
+  local streams, bindings = {}, {}
   for index, definition in ipairs(DEFINITIONS) do
-    validate_raw(raw, definition)
+    bindings[index] = bound_definition(definition, raw, active_mods, upstream_startup)
+    validate_raw(raw, bindings[index])
     streams[index] = stream_for(values, definition)
   end
 
   local output = {}
-  for index, definition in ipairs(DEFINITIONS) do output[index] = technology(definition, streams[index]) end
+  for index, definition in ipairs(bindings) do output[index] = technology(definition, streams[index]) end
   return output
 end
 
