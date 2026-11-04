@@ -89,6 +89,27 @@ class NativeFamilyProductTargetTests(unittest.TestCase):
     def pipeline(self):
         self.lua.execute("dofile(data_final_path)")
 
+    def test_private_plastic_holder_keeps_historical_science_without_changing_public_fallback(self):
+        self.pipeline()
+        holder = self.lua.globals().data.raw.technology["recipe-prod-research_plastic-1"]
+        expected = ["automation-science-pack", "logistic-science-pack",
+                    "chemical-science-pack", "production-science-pack"]
+        # The published Base/SIF plastic identity requires these four packs.
+        # A private holder preserves invested work; it must not acquire the
+        # agricultural prerequisite belonging to new public Space Age work.
+        self.assertIs(True, holder.hidden)
+        self.assertEqual(expected, plain(holder.prerequisites))
+        self.assertEqual([[name, 1] for name in expected], plain(holder.unit.ingredients))
+        self.lua.execute('''
+          local catalogue=require("compatibility.modern_catalogue")
+          local fallbacks=catalogue.native_owner_fallbacks(mods,
+            {["plastic-bar-productivity"]={generated=false}})
+          assert(#fallbacks==1 and fallbacks[1].definition.family=="research_plastic")
+          assert(fallbacks[1].definition.science==
+            "science_automation_logistic_chemical_production_agricultural",
+            "private paid custody changed public fallback science")
+        ''')
+
     def owner(self, family):
         return self.lua.globals().data.raw.technology[OWNERS[family][0]]
 
