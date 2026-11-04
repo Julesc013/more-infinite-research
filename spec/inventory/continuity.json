@@ -16563,13 +16563,13 @@
           "VER-07"
         ],
         "reviewed_against": "8fcac651ec259fe3b78a2a16cd742b0352c5cf53",
-        "scope": "The eight previously metadata-only direct fixture bodies:41139bytes,105 exact commit/path bindings across67 indexed tag names.104 bindings match live remote tags; retained local-only v3.0.0 names a different commit from public3.0.0 and is not a published alias claim. Together with r01 this accounts for all11 bodies/153 indexed bindings at the three named A20 paths; imported helpers, inter-release/discussion/native evidence and other paths remain outside scope.",
+        "scope": "The original final A20 script/two fixtures and eight earlier fixture bodies are completely read in the retained initial/r02 slices:11 distinct bodies and153 tag/path bindings across91 inventoried refs. Imported modules, original native executions, inter-release sources and complete historical coverage remain separate. Current4B disposition below preserves the original host discrepancy and earlier observations under their actual identities.",
         "evidence": {
           "path": "spec/evidence/historical-native-effect-a20-consumer-intent-aero-r01.json",
-          "sha256": "8B6E11BD469DF8AA5B85F356AB6BE632F158D6EB13B594CDF0C810B5112FA168"
+          "sha256": "F6B4C7E8090DDAFE44E42497ABDF6E3A3813575189B1FB052F7A7AA9A6422AE1"
         },
-        "disposition": "Retain final foreign positive-owner suppression, per-identity useful coverage, finite5/6 and emitted-prerequisite protection, science qualification and numbered-name custody. Eight earlier fixture variants are source-reconciled in five groups; exact0.1 ownership, unconditional always stripping, mandatory-all-four emission and old private context/registry interfaces are superseded or implementation-only. The existing isolated final expectation still rejects current positive-owner host output; no new product, native or release verdict.",
-        "remaining_executable_check": "Independently review current supported-profile applicability and correct the admitted native-owner consumer without a global discovery solver or fixture-name binding. Port focused positive/disabled/zero/unreachable/partial mixed-category controls from original semantics. Review existing paid research and actual named provider before affected native/save/reload qualification. Existing MIR5 paid dedicated weapon identities/effects must be preserved if a corrected ownership decision changes emission; do not simply omit already-researched rows or reuse the unrelated five-recipe SourceB masks.",
+        "disposition": "Retain original ownership/finite/science/custody obligations;11 selected source bodies are intent-reviewed. Current4B closes fully-covered future work plus named seeded paid-state preservation; new direct5/6/99 nonmutation control closes that host port. Partial Tesla/electric future overlap, useful lab completion and other affected ownership transitions remain explicit.",
+        "remaining_executable_check": "Use current504_disposition_r04 for the finite expectation/implementation/evidence/remaining-check/owner mapping. Preserve original failed probes and native identities. Complete partial mixed-category ownership without paid/owed loss, actual useful lab work and applicable provider/settings/merge scenarios; synthetic99 is host-only. Imported/inter-release/discussion source reconciliation and all other stable gates remain open. Black Glass executes routine tests directly; no prospective Aero sign-off.",
         "owner": "Aero recovered expectations/scoped correction and independent review; Black Glass affected exact native/save qualification",
         "source_reconciliation_complete": false,
         "test_intent_reconciliation_complete": false,
@@ -16589,7 +16589,8 @@
           "coverage_rows": 5,
           "representation_accepted": false,
           "native_execution": false
-        }
+        },
+        "current504_followup": "current504_disposition_r04"
       },
       {
         "subjects": [

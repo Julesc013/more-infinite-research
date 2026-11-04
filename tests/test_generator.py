@@ -1351,6 +1351,65 @@ class GeneratorTests(unittest.TestCase):
           end
         ''')
 
+    def test_weapon_overlap_preserves_finite_and_numbered_foreign_prototypes(self):
+        # Original A20 protects finite5/6 and its transient numbered99 owner.
+        # This is a host custody counterexample, not a valid native modpack.
+        self.lua.execute('''
+          local function clone(value)
+            if type(value) ~= "table" then return value end
+            local out = {}; for key, child in pairs(value) do out[key] = clone(child) end
+            return out
+          end
+          local function same(expected, actual, path)
+            assert(type(expected) == type(actual), path .. " changed type")
+            if type(expected) == "table" then
+              for key, value in pairs(expected) do same(value, actual[key], path .. "." .. tostring(key)) end
+              for key in pairs(actual) do assert(expected[key] ~= nil, path .. " added " .. tostring(key)) end
+            else assert(expected == actual, path .. " changed value") end
+          end
+          for _, mode in ipairs({"off", "only-when-dedicated-tech-enabled", "always"}) do
+            for _, prefer in ipairs({false, true}) do
+              mods = {base="2.1.23"}; settings = {startup=defaults()}
+              settings.startup["mir-adjust-vanilla-weapon-speed-techs"].value = mode
+              settings.startup["mir-prefer-this-mod-for-competing-techs"].value = prefer
+              helpers, log = nil, function() end
+              data = full_world(mods)
+              local rows, originals, references = {}, {}, {}
+              for _, level in ipairs({5, 6, 99}) do
+                local name = "weapon-shooting-speed-" .. level
+                local row = {type="technology", name=name, enabled=true,
+                  max_level=level == 99 and "infinite" or level,
+                  prerequisites={"weapon-shooting-speed-" .. (level-1)},
+                  unit={count_formula="123*2^(L-1)", time=37,
+                    ingredients={{"automation-science-pack", 2}}},
+                  effects={{type="gun-speed", ammo_category="rocket", modifier=.21},
+                    {type="gun-speed", ammo_category="cannon-shell", modifier=.37},
+                    {type="gun-speed", ammo_category="bullet", modifier=.43}},
+                  foreign_marker={level=level, values={false, 0, "untouched"}}}
+                data.raw.technology[name], rows[name], originals[name] = row, row, clone(row)
+                references[name] = {effects=row.effects, unit=row.unit, prerequisites=row.prerequisites}
+              end
+              data.writes = 0
+              data.extend = function(self, output)
+                self.writes = self.writes + 1; self.emitted = output
+                for _, row in ipairs(output) do
+                  self.raw[row.type] = self.raw[row.type] or {}; self.raw[row.type][row.name] = row
+                end
+              end
+              dofile(data_final_path)
+              assert(data.writes == 1, "changed publication count")
+              for name, row in pairs(rows) do
+                assert(data.raw.technology[name] == row, "replaced foreign prototype " .. name)
+                local original = references[name]
+                assert(row.effects == original.effects and row.unit == original.unit
+                  and row.prerequisites == original.prerequisites, "replaced foreign fields " .. name)
+                same(originals[name], row, "foreign " .. name)
+              end
+            end
+          end
+          data, mods, settings, helpers, log = nil, nil, nil, nil, nil
+        ''')
+
     def _weapon_coverage_world(self):
         self.lua.execute('''
           function weapon_coverage_case(rocket, cannon, enabled, ingredients, blocked, mode, debug, prefer)
