@@ -92,6 +92,16 @@ function Assert-MultiplayerFixtureSelection {
     }
     [ordered]@{
       fixture_case='library-multiplayer';target='f210-standalone'
+      kind='mir5-library-current504-standalone-f210-native-selection';factorio_line='2.1';base='2.1.23'
+      engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';mir='5.0.21004';build_version=87750
+      mir_archive_sha256='154707C40ED772A09387BF4FB673D337796FFBCEAF1C3C57EA7DB9C3F608E922'
+      observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
+      fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.21004.zip','mir-fixture-mir5-library-multiplayer_0.1.0.zip')
+      session_expected_peak_memory_mib=7168;standalone_f210=$true
+    }
+    [ordered]@{
+      fixture_case='library-multiplayer';target='f210-standalone'
       kind='mir5-library-api-consumers-standalone-f210-native-selection';factorio_line='2.1';base='2.1.23'
       engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';mir='5.0.21000';build_version=87750
       observer_sha256='A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0'
@@ -442,8 +452,10 @@ function New-StandaloneF210LibraryFixtureSourceProjection {
     [Parameter(Mandatory)][string]$OutputRoot,
     [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$SourceRevision,
     [switch]$SpaceAgeLibrary,
-    [switch]$PrivateCreditChecks
+    [switch]$PrivateCreditChecks,
+    [ValidateSet('5.0.21000','5.0.21004')][string]$MIRVersion='5.0.21000'
   )
+  Assert-Session ($MIRVersion-cne'5.0.21004' -or (-not$SpaceAgeLibrary-and-not$PrivateCreditChecks)) 'current504 projection admits only the four-mod Base fixture'
   # The checked-in fixture retains F200 metadata and its developer README.
   # Every F210 route stages precisely three runtime members. The selected
   # metadata is the only Base/Space Age distinction; it is copied unchanged.
@@ -478,14 +490,24 @@ function New-StandaloneF210LibraryFixtureSourceProjection {
     'settings-updates.lua'='settings-updates.lua'
     'info.json'=$metadata
   }
+  $metadataBytes=Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member $metadata
+  if($MIRVersion-ceq'5.0.21004'){
+    # Keep the selected fixture's independent Lua protocol unchanged. Only its
+    # exact player dependency changes; prior metadata remains byte-identical.
+    $metadataText=[Text.Encoding]::UTF8.GetString($metadataBytes)
+    Assert-Session ([regex]::Matches($metadataText,[regex]::Escape('more-infinite-research = 5.0.21000')).Count-eq1) 'current504 dependency projection differs'
+    $metadataBytes=[Text.UTF8Encoding]::new($false).GetBytes($metadataText.Replace('more-infinite-research = 5.0.21000','more-infinite-research = 5.0.21004'))
+  }
   foreach($entry in $bindings.GetEnumerator()){
-    [IO.File]::WriteAllBytes((Join-Path $stage $entry.Key),(Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member $entry.Value))
+    $bytes=if($entry.Key-ceq'info.json'){$metadataBytes}else{Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member $entry.Value}
+    [IO.File]::WriteAllBytes((Join-Path $stage $entry.Key),$bytes)
   }
   $stageNames=@(Get-ChildItem -LiteralPath $stage -Recurse -File|ForEach-Object {[IO.Path]::GetRelativePath($stage,$_.FullName).Replace('\','/')})
   $runtimeNames=@($bindings.Keys|Sort-Object)
   Assert-Session ($stageNames.Count-eq$runtimeNames.Count-and ((@($stageNames|Sort-Object)-join '|')-ceq($runtimeNames-join '|'))) 'standalone F210 fixture projection members differ'
   foreach($entry in $bindings.GetEnumerator()){
-    $expected=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData((Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member $entry.Value)))
+    $bytes=if($entry.Key-ceq'info.json'){$metadataBytes}else{Get-StandaloneF210NativeFixtureRawGitMemberBytes -RepoRoot $RepoRoot -SourceRevision $SourceRevision -FixtureDirectory 'library-multiplayer' -Member $entry.Value}
+    $expected=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
     Assert-Session ((Get-FileHash -LiteralPath (Join-Path $stage $entry.Key) -Algorithm SHA256).Hash.ToUpperInvariant()-ceq$expected) "standalone F210 fixture projection bytes differ: $($entry.Key)"
   }
   $selectedCanonicalMembers=@($bindings.Values|Sort-Object -Unique)
@@ -769,7 +791,7 @@ if($standaloneF210){
   $standaloneFixtureSourceRevision=Resolve-StandaloneF210ApiConsumerSourceRevision -RepoRoot $repo
   # Standalone Base and Space Age retain their 0.1.0/0.2.0 metadata; only the
   # two explicit private-credit selections stage the common 0.3.0 metadata.
-  $standaloneLibraryFixture=if($positivePrivateStateChecks){New-LibraryPositiveFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -Target 'f210'}else{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -SourceRevision $standaloneFixtureSourceRevision -SpaceAgeLibrary:$spaceAgeLibrary -PrivateCreditChecks:$privateCreditChecks}
+  $standaloneLibraryFixture=if($positivePrivateStateChecks){New-LibraryPositiveFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -Target 'f210'}else{New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot $output -SourceRevision $standaloneFixtureSourceRevision -SpaceAgeLibrary:$spaceAgeLibrary -PrivateCreditChecks:$privateCreditChecks -MIRVersion $target.mir}
   $standaloneObserver=New-StandaloneIdentityObserverSourceProjection -RepoRoot $repo -ArchiveLibrary $library -OutputRoot $output -SourceRevision $standaloneFixtureSourceRevision -ExpectedArchiveSha256 ([string]$target.observer_sha256)
   if($target.PSObject.Properties['api_client_consumers']-and$target.api_client_consumers-eq$true){
     $apiConsumerSourceRevision=$standaloneFixtureSourceRevision

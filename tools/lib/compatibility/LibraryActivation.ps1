@@ -59,19 +59,23 @@ function Write-MIRLibraryControl {
 function Restore-MIRLibraryControls {
   param([string]$LibraryDirectory,$Journal)
   if($Journal.kind -cne 'MIRDirectLibraryActivationV1' -or $Journal.library -cne $LibraryDirectory){throw '[mir-library-recovery-identity]'}
-  # Validate both backups before restoring either. Paths are fixed, not supplied
-  # by the journal. Restoration is repeatable if interrupted halfway through.
+  # Validate every backup before restoring controls or owned archive names.
+  # Old V1 journals did not own legacy JSON: leave that possibly foreign file
+  # untouched unless its fixed optional row is present. Paths never come from
+  # the journal. Restoration is repeatable if interrupted halfway through.
+  $names=@('mod-list.json','mod-settings.dat')
+  if($Journal.controls.Contains('mod-settings.json')){$names+='mod-settings.json'}
   $decoded=@{}
-  foreach($name in @('mod-list.json','mod-settings.dat')){
+  foreach($name in $names){
     $row=$Journal.controls[$name]
-    if($null -eq $row -or $row.exists -isnot [bool]){throw '[mir-library-recovery-control]'}
-    $bytes=[Convert]::FromBase64String([string]$row.bytes)
+    if($null -eq $row -or $row.exists -isnot [bool] -or $row.bytes -isnot [string] -or $row.sha256 -isnot [string]){throw '[mir-library-recovery-control]'}
+    try{$bytes=[Convert]::FromBase64String($row.bytes)}catch{throw '[mir-library-recovery-control]'}
     if($bytes.Length -gt 4MB -or ($row.exists -and [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes)) -cne $row.sha256) -or
       (-not $row.exists -and ($bytes.Length -ne 0 -or $row.sha256 -ne ''))){throw '[mir-library-recovery-hash]'}
     $decoded[$name]=$bytes
   }
   Restore-MIRLibraryOwnedArchiveVisibility -LibraryDirectory $LibraryDirectory -Journal $Journal
-  foreach($name in @('mod-list.json','mod-settings.dat')){Write-MIRLibraryControl -Path (Join-Path $LibraryDirectory $name) -Bytes $decoded[$name] -Absent:(-not $Journal.controls[$name].exists)}
+  foreach($name in $names){Write-MIRLibraryControl -Path (Join-Path $LibraryDirectory $name) -Bytes $decoded[$name] -Absent:(-not $Journal.controls[$name].exists)}
 }
 
 function Assert-MIRLibraryOwnedArchiveCheckout {
@@ -285,12 +289,20 @@ function Start-MIRLibraryActivation {
       if($chosen.Count){[ordered]@{name=$name;enabled=$true;version=$chosen[0].version}}else{[ordered]@{name=$name;enabled=$false}}
     })
     $activeBytes=[Text.UTF8Encoding]::new($false).GetBytes((@{mods=$activeRows}|ConvertTo-Json -Depth 8))
-    $controls=@{};foreach($name in @('mod-list.json','mod-settings.dat')){$controls[$name]=Read-MIRLibraryControl (Join-Path $library $name)}
-    $journal=[ordered]@{kind='MIRDirectLibraryActivationV1';library=$library;owner_pid=$PID;owner_started_utc=(Get-Process -Id $PID).StartTime.ToUniversalTime().ToString('o');controls=$controls;archive_visibility_id=$visibilityId;owned_archive_visibility=$visibility}
-    Write-MIRLibraryControl -Path $journalPath -Bytes ([Text.UTF8Encoding]::new($false).GetBytes(($journal|ConvertTo-Json -Depth 8)))
+    $controls=@{};foreach($name in @('mod-list.json','mod-settings.dat','mod-settings.json')){$controls[$name]=Read-MIRLibraryControl (Join-Path $library $name)}
+    $preparedJournal=[ordered]@{kind='MIRDirectLibraryActivationV1';library=$library;owner_pid=$PID;owner_started_utc=(Get-Process -Id $PID).StartTime.ToUniversalTime().ToString('o');controls=$controls;archive_visibility_id=$visibilityId;owned_archive_visibility=$visibility}
+    $journalBytes=[Text.UTF8Encoding]::new($false).GetBytes(($preparedJournal|ConvertTo-Json -Depth 8))
+    # Three individually valid backups must still fit the existing recovery
+    # reader's aggregate bound. Refuse before assigning a live transaction.
+    if($journalBytes.Length-gt12MB){throw '[mir-library-recovery-size]'}
+    $journal=$preparedJournal
+    Write-MIRLibraryControl -Path $journalPath -Bytes $journalBytes
     foreach($row in $visibility){[IO.File]::Move((Join-Path $library $row.original_name),(Join-Path $library $row.hidden_name),$false)}
     if($visibility.Count){$inventory=@(Get-MIRLibraryInventory -LibraryDirectory $library -EngineDataDirectory $EngineDataDirectory)}
     Write-MIRLibraryControl -Path (Join-Path $library 'mod-list.json') -Bytes $activeBytes
+    # Prevent legacy JSON fallback in Defaults and in the existing binary File
+    # mode. File still pins only mod-settings.dat; this adds no legacy File API.
+    Write-MIRLibraryControl -Path (Join-Path $library 'mod-settings.json') -Absent
     if($null -eq $settings){Write-MIRLibraryControl -Path (Join-Path $library 'mod-settings.dat') -Absent}else{Write-MIRLibraryControl -Path (Join-Path $library 'mod-settings.dat') -Bytes ([Convert]::FromBase64String($settings.bytes))}
     return [pscustomobject]@{library=$library;engine_data=(Resolve-Path -LiteralPath $EngineDataDirectory).Path;lock=$lock;handles=$handles;journal=$journal;selected=$selected.ToArray();inventory=$inventory;mod_list_bytes=$activeBytes;profile_sha256=$profile.sha256;closed=$false}
   }catch{

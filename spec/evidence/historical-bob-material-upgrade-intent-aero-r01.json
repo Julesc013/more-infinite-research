@@ -1,0 +1,203 @@
+{
+  "schema": 1,
+  "kind": "HistoricalBobAngelMaterialAdditionIntentReviewV1",
+  "reviewed_on": "2026-11-05",
+  "reviewed_against": "0373cc44d13d48717469f54c05b9f4d786d71bc4",
+  "scope": "The eight independently fixed material additions in the full460 branch of one historical upgrade-oracle writer, plus its routing/preservation boundary. This is not the entire imported helper family, historical upgrade campaign or current native parity verdict.",
+  "original_sources": [
+    {
+      "tag": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+      "blob": "4c287439ed3751f4c30b78266a8cb1ce9493cb63",
+      "sha256": "DD5EECFCECFC5148ABFEBB916DA8EC9C09091A4FBE3D26FC1D2211BC9ABDD6F2",
+      "selected_lines": "2351-2440",
+      "intent": "The caller insists on the original named aluminium/gold/tin/titanium additions and excludes unrelated prior-minor allowances; these source-string checks alone do not establish native preservation."
+    },
+    {
+      "tag": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "tests/support/MIR421SpaceFakeUpgrade.ps1",
+      "blob": "f7f335074dea8f7a8cf9fb55a81902590ad151ee",
+      "bytes": 92201,
+      "sha256": "6D6839D7EA1E2E3F62A5235BB483243FD8A78694D005A1323AE45B76DF245546",
+      "function": "Set-MIR423F200BobAngelCompleteStateUpgradeOracle",
+      "function_lines": "953-1256",
+      "selected_contract_lines": "987-1085",
+      "shared_boundary_lines": "953-986,1232-1256",
+      "actual_remote_bytes_equal": true
+    }
+  ],
+  "independent_expectations": [
+    {
+      "material": "aluminium",
+      "identities": [
+        "recipe-prod-research_material_aluminium-1",
+        "recipe-prod-research_material_aluminium-4"
+      ],
+      "recipes": [
+        "angels-plate-aluminium",
+        "angels-plate-aluminium-2"
+      ],
+      "early_science": [
+        "automation-science-pack",
+        "logistic-science-pack"
+      ]
+    },
+    {
+      "material": "gold",
+      "identities": [
+        "recipe-prod-research_material_gold-1",
+        "recipe-prod-research_material_gold-4"
+      ],
+      "recipes": [
+        "angels-plate-gold",
+        "angels-plate-gold-2",
+        "angels-wire-gold-2"
+      ],
+      "early_science": [
+        "automation-science-pack",
+        "logistic-science-pack"
+      ]
+    },
+    {
+      "material": "tin",
+      "identities": [
+        "recipe-prod-research_material_tin-1",
+        "recipe-prod-research_material_tin-4"
+      ],
+      "recipes": [
+        "angels-plate-tin",
+        "angels-plate-tin-2"
+      ],
+      "early_science": [
+        "automation-science-pack"
+      ]
+    },
+    {
+      "material": "titanium",
+      "identities": [
+        "recipe-prod-research_material_titanium-1",
+        "recipe-prod-research_material_titanium-4"
+      ],
+      "recipes": [
+        "angels-plate-titanium",
+        "angels-plate-titanium-2"
+      ],
+      "early_science": [
+        "automation-science-pack",
+        "logistic-science-pack"
+      ]
+    }
+  ],
+  "shared_original_contract": {
+    "effect_each": 0.02,
+    "early_level": 1,
+    "early_max_level": 3,
+    "early_formula": "200*2^(L-1)",
+    "tail_level": 4,
+    "historical_tail_max_level": 150,
+    "tail_formula": "1600+200*(L-4)",
+    "unit_time_seconds": 30,
+    "native_snapshot_unit_energy_ticks": 1800,
+    "tail_extra_science": "utility-science-pack",
+    "prerequisites": "Named material smelting-1/casting-2 owners plus each required science; tail additionally requires its early technology.",
+    "new_state": "Declared initial level, unresearched, enabled, hidden=false, hidden_in_factoriopedia=false, visible_when_disabled=false and no saved progress; no unreviewed or missing addition in this selected old upgrade."
+  },
+  "published_crosscheck": {
+    "inventory": "spec/inventory/bob-angel-f200-472.json",
+    "inventory_sha256": "3AD7EA25EC20DD47AC55425E0C6ECAB204808C6BDAA43F7A7DBB93495CF992AC",
+    "published_version": "4.7.20002",
+    "selected_rows": 8,
+    "all_selected_policy_fields_match": true,
+    "comparison_sha256": "6EA9B8AD482AB60CACC00C1FFB554CF8AEED4A8A1FC3BD3B72F16189D1D81F34",
+    "normalization": "Original native snapshot compares normalized prerequisites and energy ticks; raw rows retain authored prerequisites and 30-second unit time. No output is rewritten.",
+    "excluded": "Raw added rows do not prove new earned-state/default-hidden observations; these remain separate state/native checks."
+  },
+  "dispositions": [
+    {
+      "obligation": "Named identities, two stages, recipe effects, Tin science exception, costs/time/order and prerequisites",
+      "decision": "retain and consolidate",
+      "implementation": [
+        "source/research/bob_angel_materials.lua",
+        "source/research/material_stages.lua",
+        "source/compatibility/bob_angel_materials.lua"
+      ],
+      "independent_controls": [
+        "tests/test_bob_angel_materials.py:test_independent_published_rows_are_emitted_once_with_only_reviewed_tail_difference",
+        "tests/test_bob_angel_materials.py:test_changed_settings_preserve_the_staged_cost_and_effect_contract"
+      ],
+      "coverage": "Existing constructor control compares all ten independently captured published material rows, encompassing these eight. Named recipe/owner/ingredient/effect mutation controls reject changed bindings. No duplicate test or replacement oracle is introduced."
+    },
+    {
+      "obligation": "Historical finite150 tail, earned-above-cap state and configurable useful headroom",
+      "decision": "retain historical predecessor facts; preserve existing explicit MIR5 policy difference",
+      "implementation": [
+        "source/research/bob_angel_materials.lua",
+        "source/research/material_stages.lua",
+        "source/runtime/caps.lua"
+      ],
+      "policy_references": [
+        "https://github.com/Julesc013/more-infinite-research/pull/787",
+        "spec/settings.md#disablement-and-caps",
+        "spec/evidence/bob-angel-boundary-qualified-chain.json"
+      ],
+      "coverage": "The published oracle still requires150; tests change only the five enumerated tails to infinite. Existing MIR5 effective caps respect the named recipe ceiling and settings while retaining earned effects. The original native boundary result at source784be139 checks seeded finite150 -> next151/bonus3, effect3%/cap2/earned4.5 and effect1%/cap40/earned1.5, each with two cold reloads; this is not150 lab completions or a new current-package execution."
+    },
+    {
+      "obligation": "Fresh additions must not award research; existing progress, queue, bonuses and foreign state survive",
+      "decision": "retain applicable state contract, separate from raw prototype comparison",
+      "implementation": [
+        "source/control.lua",
+        "source/runtime/caps.lua",
+        "source/runtime/lifecycle.lua"
+      ],
+      "independent_controls": [
+        "tests/fixtures/bob-angel-continuity",
+        "tests/test_bob_angel_native_fixture.py",
+        "tests/test_bob_angel_prototype_caps.py"
+      ],
+      "coverage": "Existing selected native records retain their original identities. Current consumed-input and affected ownership/state applicability remain under the already open migration/profile verdict; this review does not close them."
+    },
+    {
+      "obligation": "Old fixture versions, exact writer anchors and source-string forwarding",
+      "decision": "retire implementation mechanics; retain selected-input and no-unearned-state purposes",
+      "implementation": [
+        "tools/Invoke-NativeFixture.ps1",
+        "spec/migrations.md",
+        "spec/verification.md"
+      ],
+      "coverage": "Do not restore the obsolete PowerShell oracle generator or every historical release pair. The eight-addition whitelist belongs to the old4.5.2 ->4.6.0 route; it is not a ban on independently approved MIR5 additions or private preservation identities."
+    }
+  ],
+  "existing_native_evidence": [
+    {
+      "path": "spec/evidence/bob-angel-f200-native-chain.json",
+      "scope": "Original exact no-BobTech F200 data/settings comparison; retain original source/package/profile identity and limits."
+    },
+    {
+      "path": "spec/evidence/bob-angel-boundary-qualified-chain.json",
+      "source": "784be1397047b08844b3788cc4abd1a39765dc33",
+      "run": 39993575130,
+      "scope": "Original five-family seeded-boundary/effective-cap/save/two-cold component; no physical smelting or current-candidate claim."
+    }
+  ],
+  "remaining": {
+    "obligation": "Current supported-profile and affected saved-state verdicts consume actual package/source/settings/engine/fixture inputs. Reuse only after the existing applicability review; retain original boundaries.",
+    "owner": "Aero historical/source/result review; Black Glass autonomous native execution and integration.",
+    "new_native_campaign_required_by_this_review": false,
+    "new_product_defect_established": false
+  },
+  "limits": [
+    "Only selected full460 material branch and shared writer boundaries are dispositioned; the other full442Direct native/weapon additions and imported generic full-state implementation are not newly reconciled here.",
+    "The old full470 no-new-technology rule was specific to its performance-only release. Preserve its no-invented-earned-state purpose without imposing its historical exact technology set on the MIR5 rewrite.",
+    "The 13-archive no-BobTech F200 material profile does not establish BobTech, Space Age, F210 or arbitrary provider-switch support.",
+    "No original native result is repeated or relabelled; historical inventory and stable acceptance remain incomplete."
+  ],
+  "selected_intent_reconciliation_complete": true,
+  "source_reconciliation_complete": false,
+  "native_tests_run": false,
+  "current_package_native_qualification": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}
