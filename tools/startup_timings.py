@@ -165,13 +165,23 @@ def snapshot_rows(snapshot_path: Path, capsule_path: Path) -> list[dict]:
 
 
 def comparison_rows(chain_path: Path, capsule_path: Path) -> list[dict]:
-    """Read the two existing Base/heavy comparison formats; no new experiment."""
+    """Read retained comparison formats; no new experiment or acceptance verdict."""
     chain_raw, capsule_raw = chain_path.read_bytes(), capsule_path.read_bytes()
     chain = json.loads(chain_raw)
-    pin = chain["receipt_capsule"]
-    if len(capsule_raw) != pin["bytes"] or digest(capsule_raw) != pin["sha256"]:
-        raise ValueError("comparison capsule identity mismatch")
-    capsule = json.loads(gzip.decompress(capsule_raw))
+    current_base = chain["kind"] == "MIRCurrentBaseResponsiveMenuObservationsV1"
+    if current_base:
+        # This custody format pins the encoded file as well as the decoded JSON.
+        if digest(capsule_raw) != chain["custody"]["capsule_sha256"]:
+            raise ValueError("comparison capsule identity mismatch")
+        payload = gzip.decompress(base64.b64decode(b"".join(capsule_raw.split()), validate=True))
+        if digest(payload) != chain["custody"]["decoded_payload_sha256"]:
+            raise ValueError("decoded comparison payload identity mismatch")
+    else:
+        pin = chain["receipt_capsule"]
+        if len(capsule_raw) != pin["bytes"] or digest(capsule_raw) != pin["sha256"]:
+            raise ValueError("comparison capsule identity mismatch")
+        payload = gzip.decompress(capsule_raw)
+    capsule = json.loads(payload)
     members = capsule.get("files", capsule.get("records"))
     bodies = {r["path"]: r for r in members}
     if len(bodies) != len(members):
@@ -183,7 +193,32 @@ def comparison_rows(chain_path: Path, capsule_path: Path) -> list[dict]:
         if len(raw) != row["bytes"] or digest(raw) != row["sha256"]:
             raise ValueError("comparison body identity mismatch: " + path)
         return raw
-    if chain["kind"] == "MIRCandidate502BaseF200StartupCompletionChainV1":
+    if current_base:
+        source, engine, workload = chain["source"]["player_source"], chain["inputs"]["engine"], "Base"
+        # The accepted case has a separate per-run log; the shared latest log
+        # and the earlier failed cohort are deliberately not selected.
+        prefix = "native/menu-base-foreground-r01-controller/"
+        result_raw = original(prefix + "result.json")
+        packet_raw = original("qualification/menu-base-foreground-r01-controller/packet.json")
+        pins = chain["execution"]
+        if digest(result_raw) != pins["result_sha256"] or digest(packet_raw) != pins["packet_sha256"]:
+            raise ValueError("original result/packet identity mismatch")
+        result, packet = json.loads(result_raw), json.loads(packet_raw)
+        plans = [r["plan"] for r in result["samples"]]
+        if (result["packet_sha256"] != pins["packet_sha256"]
+                or plans != packet["schedule"] or plans != result["schedule"]
+                or len(plans) != pins["native_launches"]):
+            raise ValueError("original comparison schedule differs")
+        if (result["inputs"]["engine"]["sha256"] != chain["inputs"]["engine_sha256"]
+                or result["inputs"]["engine"]["base_version"] != engine
+                or packet["candidate_source"]["commit"] != source
+                or packet["candidate_source"]["player_tree"] != chain["source"]["player_tree"]):
+            raise ValueError("original engine/source differs")
+        observations = [(r["plan"], r["observation"],
+                         prefix + r["observation"]["run_relative_path"] + "/factorio.log",
+                         prefix + r["observation"]["responsive_menu_actor"]["path"])
+                        for r in result["samples"]]
+    elif chain["kind"] == "MIRCandidate502BaseF200StartupCompletionChainV1":
         source, engine, workload = chain["candidate"]["source"], chain["engine"]["version"], "Base"
         prefix = "native-output/native/"
         result = original(prefix + "result.json")
@@ -214,6 +249,14 @@ def comparison_rows(chain_path: Path, capsule_path: Path) -> list[dict]:
                     and m[1] == "more-infinite-research"}
         if len(versions) > 1:
             raise ValueError("multiple loaded MIR versions: " + run_id)
+        if current_base:
+            expected = {"control-without-mir": None,
+                        "published-mir4.7": chain["source"]["published_version"],
+                        "candidate-mir5": chain["source"]["candidate_version"]}[plan["arm"]]
+            if versions != ({expected} if expected else set()):
+                raise ValueError("original loaded MIR version differs: " + run_id)
+            if digest(original(actor_path)) != observation["responsive_menu_actor"]["sha256"]:
+                raise ValueError("original actor identity differs: " + run_id)
         row = analyze(raw, run_id)
         row.update(engine=engine, workload=workload, archive_version=next(iter(versions), None),
                    arm=plan["arm"], phase=plan["phase"], block=plan["block"],
@@ -242,8 +285,8 @@ def main() -> None:
     choice = parser.add_mutually_exclusive_group(required=True)
     choice.add_argument("--log", type=Path)
     choice.add_argument("--snapshot", type=Path)
-    choice.add_argument("--comparison", type=Path, help="existing Base/heavy comparison chain")
-    parser.add_argument("--bodies", type=Path, help="retained snapshot body capsule")
+    choice.add_argument("--comparison", type=Path, help="retained Base/heavy comparison chain or current Base index")
+    parser.add_argument("--bodies", type=Path, help="retained body capsule, with encoding pinned by its index")
     parser.add_argument("--run-id")
     parser.add_argument("--expected-sha256")
     parser.add_argument("--json", type=Path)
