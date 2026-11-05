@@ -326,7 +326,8 @@ local function source_contracts(target, has_space_age, mods)
     if target.id == "f210" then
       -- Retain the authored 2.1 Space Age trigger-output representative. This
       -- is one named alternative, not discovery of arbitrary pack producers.
-      space_source = {kind = "alternatives", pack = "space-science-pack", alternatives = {
+      space_source = {kind = "alternatives", pack = "space-science-pack",
+        direct_recipe_replacement = true, alternatives = {
         space_source,
         {kind = "trigger-output", pack = "space-science-pack", recipe = "space-science-pack",
           owner = "space-science-pack", payload = "satellite", owner_prerequisites = {"rocket-silo"},

@@ -1072,9 +1072,11 @@ class ScienceTests(unittest.TestCase):
                 options={["mir-science-pack-ingredient-policy"]="space"}})
               return row, science.apply(row, {}, context), context
             end
-            local native, native_result = apply()
+            local native, native_result, native_context = apply()
             assert(native_result.enabled and names(native.unit.ingredients)
               == "automation-science-pack:2,space-science-pack:1")
+            assert(native_context.direct_replacement_recipe_visits == 0
+              and native_context.direct_replacement_technology_visits == 0)
 
             local recipe = raw.recipe["space-science-pack"]
             recipe.enabled, recipe.result, recipe.result_count = false, nil, nil
@@ -1099,6 +1101,9 @@ class ScienceTests(unittest.TestCase):
               assert(names(row.unit.ingredients) == "automation-science-pack:2,space-science-pack:1")
               assert(same(row.prerequisites, {"space-science-pack"}),
                 "declared science owner's progression gate was lost")
+              assert(context.direct_replacement_recipe_visits == 0
+                and context.direct_replacement_technology_visits == 0,
+                "valid declared source initiated replacement discovery")
             else
               assert(not result.enabled and result.reason:find("invalid-science-source:", 1, true) == 1,
                 "malformed declared source was accepted: " .. mutation)
@@ -1114,6 +1119,48 @@ class ScienceTests(unittest.TestCase):
         for mutation in ("valid", "payload", "recipe", "trigger", "prerequisite", "disabled"):
             with self.subTest(mutation=mutation):
                 verify(self.lua_value(oracle["profiles"]["space-age-f210"]["raw"]), mutation)
+
+    def test_space_age_white_source_keeps_its_direct_replacement_opt_in(self):
+        # Preserve the independently retained 4.7.3 named-source replacement
+        # rule when that source now has two explicit authored alternatives.
+        self.lua.execute(r'''
+          local selected = bindings.select({id="f210"}, {["space-age"]="2.1.23"})
+          local function run(valid)
+            local raw = raw_with(selected.official, {whole=selected.official})
+            install_sources(raw, true, "f210")
+            raw.technology["authored-gate"] = {}
+            local owner = raw.technology["space-science-pack"]
+            local trigger, effects = owner.research_trigger, owner.effects
+            raw.recipe["space-science-pack"] = nil
+            local replacement = {enabled=true, results={
+              {type=valid and "item" or "fluid", name="space-science-pack", amount=1}}}
+            raw.recipe["z-direct-space-replacement"] = replacement
+            local row = technology({{"automation-science-pack", 7}}, {"authored-gate"})
+            local context = science.prepare({raw=raw, target={id="f210"},
+              mods={["space-age"]="2.1.23"},
+              options={["mir-science-pack-ingredient-policy"]="space"}})
+            local result = science.apply(row, {}, context)
+            if valid then
+              assert(result.enabled and names(row.unit.ingredients)
+                == "automation-science-pack:7,space-science-pack:1",
+                "known direct white-science replacement was lost: " .. result.reason)
+              assert(same(row.prerequisites, {"authored-gate"}),
+                "initially available replacement retained the failed named owner's gate")
+            else
+              assert(not result.enabled, "a fluid replacement was admitted as lab science")
+            end
+            local recipes = 0
+            for _ in pairs(raw.recipe) do recipes = recipes + 1 end
+            assert(context.direct_replacement_recipe_visits == recipes,
+              "direct replacement did not use its existing single bounded collection")
+            assert(raw.recipe["z-direct-space-replacement"] == replacement
+              and raw.technology["space-science-pack"] == owner
+              and owner.research_trigger == trigger and owner.effects == effects,
+              "direct replacement changed the foreign source")
+          end
+          run(true)
+          run(false)
+        ''')
 
     def test_explicit_trigger_recipe_remains_a_strict_optional_contract(self):
         self.lua.execute(r'''
