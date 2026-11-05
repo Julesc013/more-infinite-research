@@ -8627,7 +8627,7 @@
     "request_ledger": {
       "path": "spec/programmes/community-requests.json",
       "record_count": 87,
-      "rows_with_additive_mir5_route_disposition": 35,
+      "rows_with_additive_mir5_route_disposition": 38,
       "qualification_limit": "Original IDs, requests, decisions, statuses and adverse evidence remain unchanged. A source-route mapping is not adequate evidence of accepted interaction or final-package behavior; proposed/rejected/withheld requests do not become promises."
     },
     "historical_sources": {
@@ -8870,7 +8870,7 @@
         "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
       }
     ],
-    "next_bounded_work": "Use stable_coverage_review as the finite current routing: finish the reported fixed Library comparison and actual input/lifecycle/export/Discovery Tree decisions, while Aero closes request/route/API/settings applicability and source-preservation decisions. Each row names existing inputs and readiness. Preserve all35 completed source-intent dispositions and87 original requests; source counts, retired helper mechanics and synthetic versions do not create another audit/native approval ladder. No known failure is waived and no missing reporter/private input is fabricated. Black Glass prepares, repairs and executes its own routine tests; Aero reviews source, actual results and release claims independently.",
+    "next_bounded_work": "Use stable_coverage_review as the finite current routing: finish the reported fixed Library comparison and actual input/lifecycle/export/Discovery Tree decisions, while Aero closes request/route/API/settings applicability and source-preservation decisions. Each row names existing inputs and readiness. Preserve completed source-intent dispositions and87 original requests; source counts, retired helper mechanics and synthetic versions do not create another audit/native approval ladder. No known failure is waived and no missing reporter/private input is fabricated. Black Glass prepares, repairs and executes its own routine tests; Aero reviews source, actual results and release claims independently.",
     "bounded_intent_reviews": [
       {
         "subjects": [
@@ -16897,6 +16897,53 @@
         "test_intent_reconciliation_complete": false,
         "native_execution": false,
         "release_qualification": false
+      },
+      {
+        "reviewed_on": "2026-11-05",
+        "reviewed_against": "92e5da419c036e2fc7f4d8644a436aed5df904ea",
+        "subjects": [
+          "CONT-02",
+          "CONT-03",
+          "CONT-06",
+          "CONT-10",
+          "CONT-15",
+          "VER-07"
+        ],
+        "request_ids": [
+          "FLUID-01",
+          "NATIVE-01",
+          "PLAT-UI-01"
+        ],
+        "scope": "Three existing requests only. Four selected published ledger bindings (canonical4.2.0-stable,with its local4.2.0 alias) deduplicate to three Git blobs; all12 original request projections agree with current retained fields. This maps delivered controls and finite acceptance without rewriting87original decisions or declaring native completion.",
+        "independent_inputs": {
+          "record": "Julesc013/mir-native-worker@0fc3c0558df084cf6c445aec59418bcdba935d64:evidence/aero-existing-request-source-inputs-r01/inputs.json",
+          "sha256": "3B742DCE69276D6479AA1082D6715C32F545A1EF0D2E3BA650436C5314E0DC08",
+          "original_tag_refs": [
+            "v4.2.0-stable",
+            "v4.2.1",
+            "v4.7.3",
+            "v5.0.0"
+          ],
+          "original_R4": "f458598732e9583a9d086032ebfbe9ffb747d130:prototypes/mir/pipeline/extent.lua",
+          "original_R3": "abe152a332741db268a39b5088866e5aab634fed:src/mod/families/modern/prototypes/streams/direct-effects.lua",
+          "pinned_engine_APIs": [
+            "2.0.77",
+            "2.1.23"
+          ],
+          "original_raw_P1_discussion": "unverified,not reconstructed",
+          "local_tag_alias": "v4.2.0 equals canonical v4.2.0-stable; not a separate publication"
+        },
+        "dispositions": [
+          "FLUID-01 existing multiplier/default/no-op remains distinct from PIPE-01; current zero correction has host proof/native network work remains. README corrects the dropdown list and explains minimum connected extent.",
+          "NATIVE-01 original ownership/category expectations map to current policy and named504 native state/useful-lab results; arbitrary categories,profiles,firing saturation and consumption remain bounded obligations.",
+          "PLAT-UI-01 embedded host/query/personal state/translations/native handoff map to source/host/scoped rendered evidence; actual input/client/export/performance still required. Optional companion/hooks and full-tree proposals retain original conditional status."
+        ],
+        "remaining": "Use the existing stable coverage rows and request-specific remaining_executable_check fields. No new every-version/native campaign,approval ladder,product feature or duplicate research owner is admitted. All prior35source-intent reviews,original87requests and failed/native result identities remain unchanged.",
+        "native_execution": false,
+        "request_decisions_changed": false,
+        "player_source_changed": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false
       }
     ],
     "stable_coverage_review": {
