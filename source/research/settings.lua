@@ -21,6 +21,8 @@ local angel_f210_profile = modern_catalogue.angel_f210_profile(active_mods)
 local py_profile = require("compatibility.py_profile")
 local atan_active = (active_mods["atan-air-scrubbing"] or active_mods["atan-ash"])
   and require("compatibility.atan_profile").select(active_mods, require("platform.target")) ~= nil
+local ric_profile = type(active_mods["real-industrial-chemistry"]) == "string"
+  and require("platform.target").id == "f210" and require("integrations.ric.profile") or nil
 local native_owner_families = {}
 for _, owner in ipairs(modern_catalogue.native_owners(active_mods)) do native_owner_families[owner.family] = true end
 
@@ -85,6 +87,7 @@ for _, historical_stream in ipairs(historical.streams) do
       if py_profile.setting_visible(historical_stream.key, active_mods) then field.hidden = nil end
       if atan_active and (historical_stream.key == "research_air_scrubbing_clean_filter"
         or historical_stream.key == "research_ash_separation") then field.hidden = nil end
+      if ric_profile and historical_stream.key == ric_profile.family then field.hidden = nil end
       fields[index] = field
     end
     streams[#streams + 1] = {

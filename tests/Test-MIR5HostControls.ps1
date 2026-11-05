@@ -11,6 +11,7 @@ $controls = @(
   [ordered]@{path='tests/test_generator.py';lua=$true},
   [ordered]@{path='tests/test_continuation_ownership.py';lua=$true},
   [ordered]@{path='tests/test_secretas_continuation.py';lua=$true},
+  [ordered]@{path='tests/test_ric_marine.py';lua=$true},
   [ordered]@{path='tests/test_discovery_tree_compatibility.py';lua=$true},
   [ordered]@{path='tests/test_early_target_adapter.py';lua=$true},
   [ordered]@{path='tests/test_historical_direct.py';lua=$true},

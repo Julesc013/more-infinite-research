@@ -187,6 +187,12 @@ local function static_rows(existing_technology_prototypes, withheld_native_owner
   for _, row in ipairs(bob_core_rows()) do rows[#rows + 1] = row end
   for _, row in ipairs(bob_plates_rows()) do rows[#rows + 1] = row end
   for _, row in ipairs(material_rows(modern_catalogue.angel_material_definitions(active_mods))) do rows[#rows + 1] = row end
+  if target.id == "f210" and type(active_mods["real-industrial-chemistry"]) == "string" then
+    local ric = require("integrations.ric.profile")
+    if ric.is_marine(settings and settings.startup) then
+      rows[#rows + 1] = generated_row(ric.id, ric.family, ric.order, nil, ric.recipe)
+    end
+  end
   local selected
   if ordinary_profile or k2_base_profile or k2so_profile then
     selected = modern_catalogue.select(active_mods, nil, withheld_native_owners)
