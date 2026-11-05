@@ -321,8 +321,19 @@ local function source_contracts(target, has_space_age, mods)
   if has_space_age then
     -- Space Age replaces the Base satellite trigger with an explicit recipe
     -- unlock after the asteroid-collector trigger.
-    put("space-science-pack", recipe_unlock("space-science-pack", "space-science-pack",
-      {"space-platform"}, {type = "build-entity", entity = "asteroid-collector"}, direct_replacement))
+    local space_source = recipe_unlock("space-science-pack", "space-science-pack",
+      {"space-platform"}, {type = "build-entity", entity = "asteroid-collector"}, direct_replacement)
+    if target.id == "f210" then
+      -- Retain the authored 2.1 Space Age trigger-output representative. This
+      -- is one named alternative, not discovery of arbitrary pack producers.
+      space_source = {kind = "alternatives", pack = "space-science-pack", alternatives = {
+        space_source,
+        {kind = "trigger-output", pack = "space-science-pack", recipe = "space-science-pack",
+          owner = "space-science-pack", payload = "satellite", owner_prerequisites = {"rocket-silo"},
+          owner_trigger = {type = "send-item-to-orbit", item = "satellite"}}
+      }}
+    end
+    put("space-science-pack", space_source)
     for _, pack in ipairs(SPACE_AGE) do put(pack, recipe_unlock(pack, pack, nil, nil, direct_replacement)) end
     put("cryogenic-science-pack", recipe_unlock("cryogenic-science-pack", "cryogenic-science-pack",
       {"cryogenic-plant"}, {type = "craft-item", item = "cryogenic-plant"}, direct_replacement))
