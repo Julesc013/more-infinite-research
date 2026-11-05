@@ -43,6 +43,7 @@ $controls = @(
   [ordered]@{path='tests/test_bob_tech_materials.py';lua=$true},
   [ordered]@{path='tests/test_bob_tech_gameplay_fixture.py';lua=$true},
   [ordered]@{path='tests/test_bob_core_materials.py';lua=$true},
+  [ordered]@{path='tests/test_bob_material_preservation_fixture.py';lua=$true},
   [ordered]@{path='tests/test_bob_plates_f210_facts.py';lua=$true},
   [ordered]@{path='tests/test_bob_plates_f210_materials.py';lua=$true},
   [ordered]@{path='tests/test_bob_plates_f210_pipeline.py';lua=$true},
