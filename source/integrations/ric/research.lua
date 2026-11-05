@@ -87,7 +87,7 @@ local function binding(raw)
   end
 end
 
-function M.technologies(values, raw, active_mods, startup)
+function M.technologies(values, raw, active_mods, startup, return_context)
   if not profile.applies(active_mods, target) then return {} end
   local mode = type(startup) == "table" and startup["ric-world-mode"]
   if type(mode) ~= "table" or (mode.value ~= "marine" and mode.value ~= "continental") then
@@ -95,7 +95,7 @@ function M.technologies(values, raw, active_mods, startup)
   end
   if mode.value == "continental" then return {} end
   local icon, icon_size = binding(raw)
-  return_paths.validate(raw)
+  return_paths.validate(raw, return_context and return_context())
   local stream = values and values.streams and values.streams[profile.family]
   if type(stream) ~= "table" or type(stream.enabled) ~= "boolean" then fail("resolved settings are unavailable") end
   local time = stream.research_time == 0 and 30 or stream.research_time

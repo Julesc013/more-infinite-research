@@ -182,10 +182,22 @@ if modern_catalogue.is_k2so(mods) then
   for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
 end
 
+-- Only selected RIC/lead consumers request this index. Their constructors below
+-- read recipes and return detached technologies; no recipe writes occur in this
+-- window, so both can share one preparation without a module-global cache.
+local material_return_context
+local function selected_material_return_context()
+  if material_return_context == nil then
+    material_return_context = require("compatibility.material_returns").prepare(data.raw)
+  end
+  return material_return_context
+end
+
 if prerequisite_target.id == "f210" and type(mods) == "table" and mods["real-industrial-chemistry"] then
   local ric_mode = settings and settings.startup and settings.startup["ric-world-mode"]
   if not ric_mode or ric_mode.value ~= "continental" then
-    local ric = require("integrations.ric.research").technologies(values, data.raw, mods, settings and settings.startup)
+    local ric = require("integrations.ric.research").technologies(
+      values, data.raw, mods, settings and settings.startup, selected_material_return_context)
     for index = 1, #ric do technologies[#technologies + 1] = ric[index] end
   end
 end
@@ -218,7 +230,8 @@ if require("compatibility.bob_core_profile").applies(mods) then
 end
 
 if modern_selection and modern_selection.bob_plates_profile then
-  local materials = require("compatibility.bob_plates_materials").technologies(values, data.raw, mods)
+  local materials = require("compatibility.bob_plates_materials").technologies(
+    values, data.raw, mods, selected_material_return_context)
   for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
 end
 

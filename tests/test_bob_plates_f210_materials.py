@@ -320,6 +320,60 @@ class BobPlatesF210MaterialsTests(unittest.TestCase):
         self.assertFalse(ok)
         self.assertIn("carbon changed", error)
 
+    def _reject_return(self, case, raw, route):
+        lua = self.lua()
+        definitions = _plain(lua.globals().bob_plates_data.material_definitions("base" if case=="q097" else "space-age"))
+        lua.globals().captured_raw = _lua_value(lua, raw)
+        before = _plain(lua.globals().captured_raw)
+        lua.globals().captured_values = _lua_value(lua, _stream_values(row["key"] for row in definitions))
+        lua.globals().captured_mods = _lua_value(lua, _mod_map(self.facts["cases"][case]["profile"]["selection_without_mir"]))
+        ok, error = lua.execute('return pcall(function() return bob_plates.technologies(captured_values,captured_raw,captured_mods) end)')
+        self.assertFalse(ok, "published process-return condition must reject the changed route")
+        self.assertIn("return path", error)
+        self.assertIn(route, error)
+        self.assertEqual(before, _plain(lua.globals().captured_raw))
+
+    def test_lead_outside_selector_returns_reject_each_named_route(self):
+        for case in ("q097", "q098"):
+            for hidden in (False, True):
+                with self.subTest(case=case, hidden=hidden):
+                    raw = self.raw_from_context(case)
+                    raw["recipe"]["test-return"] = {"type":"recipe", "name":"test-return",
+                        "ingredients":[{"type":"item","name":"bob-lead-plate","amount":1}],
+                        "results":[{"type":"item","name":"bob-lead-ore","amount":1}],
+                        "enabled":not hidden,"hidden":hidden,"allow_productivity":False}
+                    self._reject_return(case, raw, "bob-lead-plate")
+        raw = self.raw_from_context("q097")
+        raw["recipe"]["test-return"] = {"ingredients":[["bob-lead-plate",1]],
+            "results":[{"name":"bob-lead-oxide","amount":1}]}
+        self._reject_return("q097", raw, "bob-lead-plate-2")
+
+    def test_lead_native_and_multistep_typed_returns_remain_process_edges(self):
+        raw = self.raw_from_context("q097")
+        raw["recipe"]["test-fluid"] = {"ingredients":[["bob-lead-plate",1]],
+            "results":[{"type":"fluid","name":"test-bridge","amount":1}]}
+        raw["recipe"]["test-reclaim"] = {"ingredients":[{"type":"fluid","name":"test-bridge","amount":1}],
+            "results":[{"name":"bob-lead-ore","amount":1}]}
+        self._reject_return("q097", raw, "bob-lead-plate")
+        raw = self.raw_from_context("q097")
+        raw["item"]["bob-lead-plate"].update(spoil_result="bob-lead-ore",spoil_ticks=60)
+        self._reject_return("q097", raw, "bob-lead-plate")
+        raw = self.raw_from_context("q097")
+        raw["item"]["bob-lead-plate"].update(burnt_result="bob-lead-ore",fuel_value="1MJ")
+        self._reject_return("q097", raw, "bob-lead-plate")
+
+    def test_lead_dead_returns_typed_aliases_and_unrelated_cycles_stay_admissible(self):
+        for result in ({"name":"bob-lead-ore","amount":1,"independent_probability":0},
+                       {"type":"fluid","name":"bob-lead-ore","amount":1},
+                       {"name":"harmless","amount":1}):
+            with self.subTest(result=result):
+                raw = self.raw_from_context("q097")
+                raw["recipe"]["test-return"] = {"ingredients":[["bob-lead-plate",1]],"results":[result]}
+                raw["recipe"]["test-cycle"] = {"ingredients":[["harmless",1]],"results":[{"name":"bob-lead-plate","amount":1}]}
+                _, actual = self.technologies("q097", raw=raw)
+                _, expected = self.technologies("q097")
+                self.assertEqual(expected, actual)
+
     def test_nondefault_tuning_is_rendered_after_preflight_and_definition_copies_are_fresh(self):
         lua = self.lua()
         first = _plain(lua.execute("return bob_plates_data.material_definitions('base')"))

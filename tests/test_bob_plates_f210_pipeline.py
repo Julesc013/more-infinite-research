@@ -94,7 +94,7 @@ class BobPlatesF210PipelineTests(unittest.TestCase):
         if cls.facts.get("schema") != "MIR5BobPlatesF210CapturedFactsV1":
             raise AssertionError("Bob Plates published facts schema changed")
 
-    def stage(self, case, startup_overrides=None, raw_override=None, mods_override=None):
+    def stage(self, case, startup_overrides=None, raw_override=None, mods_override=None, before_final=None):
         context = self.context["cases"][case]
         raw = deepcopy(raw_override if raw_override is not None else context["raw"])
         mods = deepcopy(mods_override if mods_override is not None else {
@@ -106,6 +106,7 @@ class BobPlatesF210PipelineTests(unittest.TestCase):
         lua.globals().captured_raw = _lua_value(lua, raw)
         lua.globals().active_mods = _lua_value(lua, mods)
         lua.globals().startup_overrides = _lua_value(lua, startup_overrides)
+        lua.globals().before_final = before_final
         lua.execute(r'''
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
@@ -137,10 +138,47 @@ class BobPlatesF210PipelineTests(unittest.TestCase):
           end
           settings = {startup = startup}
           assert(loadfile(player_root .. "/data.lua"))()
+          if before_final then assert(load(before_final))() end
           assert(loadfile(player_root .. "/data-final-fixes.lua"))()
           declared = require("research.catalogue").declared()
         ''')
         return lua
+
+    def test_process_return_refuses_before_any_technology_publication(self):
+        self.stage("q097", before_final=r'''
+          data.raw.recipe["test-lead-return"]={type="recipe",name="test-lead-return",
+            ingredients={{type="item",name="bob-lead-plate",amount=1}},
+            results={{type="item",name="bob-lead-ore",amount=1}}}
+          local extend=data.extend
+          data.extend=function() error("technology publication reached before return refusal") end
+          local ok,message=pcall(function() assert(loadfile(player_root.."/data-final-fixes.lua"))() end)
+          assert(not ok and message:find("return path",1,true),message)
+          assert(technology_writes==0)
+          data.extend=extend
+          data.raw.recipe["test-lead-return"]=nil
+        ''')
+
+    def test_active_bob_and_ric_share_one_lazy_ingredient_index(self):
+        lua = self.stage("q097", before_final=r'''
+          mods["real-industrial-chemistry"]="0.35.8"
+          settings.startup["ric-world-mode"]={value="marine"}
+          data.raw.item["ric-coke"]={type="item",name="ric-coke",icon=data.raw.item["bob-lead-plate"].icon,icon_size=64}
+          data.raw.item["ric-ash"]={type="item",name="ric-ash"}
+          data.raw.recipe["ric-carbonise-marine-biomass"]={type="recipe",name="ric-carbonise-marine-biomass",
+            allow_productivity=true,ingredients={{type="item",name="ric-dried-marine-biomass",amount=6}},
+            results={{type="item",name="ric-coke",amount=3},{type="item",name="ric-ash",amount=1}}}
+          data.raw.technology["ric-coking"]={type="technology",name="ric-coking",
+            unit={count=35,time=15,ingredients={{"automation-science-pack",1}}},
+            effects={{type="unlock-recipe",recipe="ric-carbonise-marine-biomass"}}}
+          local guard=require("compatibility.material_returns")
+          local prepare=guard.prepare
+          ingredient_indexes=0
+          guard.prepare=function(raw) ingredient_indexes=ingredient_indexes+1;return prepare(raw) end
+        ''')
+        # Synthetic composition verifies work/dispatch, not upstream compatibility.
+        self.assertEqual(1, lua.globals().ingredient_indexes)
+        self.assertIsNotNone(lua.globals().emitted["recipe-prod-research_material_ric_coke-1"])
+        self.assertIsNotNone(lua.globals().emitted["recipe-prod-research_material_lead-1"])
 
     def _expected_rows(self, case):
         return self.facts["cases"][case]["published_rows"]
@@ -285,6 +323,7 @@ class BobPlatesF210PipelineTests(unittest.TestCase):
         lua = self.stage("q097", raw_override=raw, mods_override=mods)
         emitted = _plain(lua.globals().emitted)
         self.assertTrue(set(self._expected_rows("q097")).isdisjoint(emitted), emitted.keys())
+        lua.execute('assert(package.loaded["compatibility.material_returns"]==nil)')
 
     def test_named_route_drift_refuses_before_any_technology_publication(self):
         for case, route in (("q097", "bob-aluminium-plate"), ("q098", "bob-gold-plate")):

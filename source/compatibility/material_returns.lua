@@ -1,11 +1,11 @@
--- The published Marine route requires no process return from coke or ash to
--- dried biomass. This is a conservative reachability check, not a factory or
--- profitability solver: any ingredient can lead to its own variant's outputs.
+-- A bounded typed return proof for already-selected F210 material routes.
+-- Callers own identities, route admission and publication. Any ingredient can
+-- lead to its own variant's outputs; this is not a factory/profitability solver.
 local items = require("compatibility.product_targets")
 local M = {}
 
 local function fail(message)
-  error("MIR RIC Marine carbonisation return path: " .. message, 3)
+  error("MIR material return path: " .. message, 3)
 end
 
 local function finite_nonnegative(value)
@@ -71,7 +71,7 @@ local function fuel_is_zero(value)
   return number ~= nil and tonumber(number) == 0
 end
 
-function M.validate(raw)
+function M.prepare(raw)
   -- One ingredient index, with references to individual effective variants.
   -- No ingredient x output graph: a reached variant's outputs expand once.
   local consumers = {}
@@ -92,17 +92,34 @@ function M.validate(raw)
       index(recipe)
     end
   end
+  return {raw=raw, consumers=consumers}
+end
 
+-- The phase-local ingredient index is reused only while its recipes remain
+-- unchanged. No global cache or persistent state can grant admission later.
+function M.validate(raw, products, ingredients, context, label)
+  local destinations = {}
+  for _, ingredient in ipairs(entries({ingredients=ingredients}, "ingredients")) do
+    destinations[identity(ingredient)] = true
+  end
+  if next(destinations) == nil then return end
+  context = context or M.prepare(raw)
+  if type(context) ~= "table" or context.raw ~= raw or type(context.consumers) ~= "table" then
+    fail("the ingredient index belongs to another input")
+  end
+  local consumers = context.consumers
   local queue, reached, expanded = {}, {}, {}
   local function enqueue(key, kind, name)
-    if key == "item:ric-dried-marine-biomass" then fail("a process returns to dried marine biomass") end
+    if destinations[key] then fail((label or "selected route") .. " returns to " .. kind .. ":" .. name) end
     if not reached[key] then
       reached[key] = true
       queue[#queue + 1] = {key=key, kind=kind, name=name}
     end
   end
-  enqueue("item:ric-coke", "item", "ric-coke")
-  enqueue("item:ric-ash", "item", "ric-ash")
+  for _, product in ipairs(entries({results=products}, "results")) do
+    local key, kind, name = identity(product)
+    if not definitely_zero(product) then enqueue(key, kind, name) end
+  end
   local next_node = 1
   while next_node <= #queue do
     local node = queue[next_node]
