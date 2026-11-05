@@ -279,15 +279,15 @@ try {
     $liveControls=@{};foreach($name in @('mod-list.json','mod-settings.dat','mod-settings.json')){$liveControls[$name]=Read-MIRLibraryControl (Join-Path $legacy $name)}
     foreach($bad in @('null','boolean','base64','bytes-type','hash-type','hash','absent-bytes','size')){
       $journal=$activation.journal|ConvertTo-Json -Depth 12|ConvertFrom-Json -AsHashtable
-      $row=@{exists=$true;bytes=[Convert]::ToBase64String($originalLegacyJson);sha256=$jsonOriginalHash};$error='[mir-library-recovery-control]'
+      $row=@{exists=$true;bytes=[Convert]::ToBase64String($originalLegacyJson);sha256=$jsonOriginalHash};$expectedRecoveryError='[mir-library-recovery-control]'
       switch($bad){
         'null'{$row=$null};'boolean'{$row.exists='true'};'base64'{$row.bytes='not-base64!'};'bytes-type'{$row.bytes=42};'hash-type'{$row.sha256=42}
-        'hash'{$row.sha256='0'*64;$error='[mir-library-recovery-hash]'}
-        'absent-bytes'{$row.exists=$false;$row.sha256='';$error='[mir-library-recovery-hash]'}
-        'size'{$large=[byte[]]::new(4MB+1);$row.bytes=[Convert]::ToBase64String($large);$row.sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($large));$error='[mir-library-recovery-hash]'}
+        'hash'{$row.sha256='0'*64;$expectedRecoveryError='[mir-library-recovery-hash]'}
+        'absent-bytes'{$row.exists=$false;$row.sha256='';$expectedRecoveryError='[mir-library-recovery-hash]'}
+        'size'{$large=[byte[]]::new(4MB+1);$row.bytes=[Convert]::ToBase64String($large);$row.sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($large));$expectedRecoveryError='[mir-library-recovery-hash]'}
       }
       $journal.controls['mod-settings.json']=$row
-      Refuses-Library {Restore-MIRLibraryControls -LibraryDirectory $legacy -Journal $journal} $error
+      Refuses-Library {Restore-MIRLibraryControls -LibraryDirectory $legacy -Journal $journal} $expectedRecoveryError
       Assert-Library (-not(Test-Path -LiteralPath $alternate)-and(Test-Path -LiteralPath $hidden[0].FullName)-and(Get-MIRImmutableInputSha256 $hidden[0].FullName)-ceq$originals[$alternate].sha256) ('legacy-json-'+$bad+'-rejects-before-archive-rename')
       foreach($name in $liveControls.Keys){$actual=Read-MIRLibraryControl (Join-Path $legacy $name);Assert-Library (($actual|ConvertTo-Json -Compress)-ceq($liveControls[$name]|ConvertTo-Json -Compress)) ('legacy-json-'+$bad+'-rejects-before-control-write')}
     }
