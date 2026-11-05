@@ -220,6 +220,15 @@ local function prepare_native_ground(surface, state)
   if radius > 8 then fail("authored agriculture scale grid exceeded its generation bound") end
   surface.request_to_generate_chunks(center, radius)
   surface.force_generate_chunk_requests()
+  -- Soil alone does not remove generated nests/rocks that block native planting.
+  -- Clear only the authored crop footprints in this fresh disposable fixture,
+  -- before creating the towers or saving any pending benchmark work.
+  for _, position in ipairs(positions) do
+    local area = {{position.x - 5, position.y - 5}, {position.x + 6, position.y + 6}}
+    for _, entity in pairs(surface.find_entities_filtered{area = area}) do
+      if entity.valid and not entity.destroy() then fail("native ground blocker could not be removed") end
+    end
+  end
   surface.set_tiles(tiles)
   state.generated_chunk_radius, state.native_soil_tiles = radius, #tiles
 end

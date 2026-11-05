@@ -261,15 +261,29 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             end
             local towers, chests, next_unit, seed_inserts = {}, {}, 100, 0
             local surface = {generated=0, tile_count=0}
+            local ground_cleared = false
             surface.get_property=function(name) assert(name == "pressure"); return 1000 end
             surface.request_to_generate_chunks=function(center, radius)
               surface.generated, surface.generated_center = radius, center
             end
             surface.force_generate_chunk_requests=function() surface.generated_complete=true end
+            surface.find_entities_filtered=function(query)
+              assert(surface.generated_complete and query.area, "clear only generated authored ground")
+              assert(query.area[2][1] - query.area[1][1] == 11 and query.area[2][2] - query.area[1][2] == 11,
+                "clear only the authored crop footprint")
+              if ground_cleared then return {} end
+              local blocker = {valid=true}
+              blocker.destroy=function()
+                if opponent == "blocked-ground" then return false end
+                blocker.valid=false;ground_cleared=true;return true
+              end
+              return {blocker}
+            end
             surface.set_tiles=function(tiles) surface.tile_count=#tiles end
             surface.create_entity=function(row)
               if row.name == "lab" then return lab end
               if row.name == "agricultural-tower" then
+                assert(ground_cleared, "native ground blocker must be removed before tower creation")
                 next_unit=next_unit+1
                 local input = {}
                 input.insert=function(seed)
@@ -968,7 +982,7 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             with self.subTest(version=version, active=active, arm=arm):
                 result = run(str(CORE / "control.lua"), 1, "", arm, True, active, version)
                 self.assertFalse(result["ok"])
-        for opponent in ("settings-policy", "settings-gate", "wrong-timing", "wrong-force", "lost-tower", "load-repair", "lost-consumption", "active-early-event"):
+        for opponent in ("settings-policy", "settings-gate", "wrong-timing", "wrong-force", "lost-tower", "load-repair", "lost-consumption", "active-early-event", "blocked-ground"):
             with self.subTest(opponent=opponent):
                 result = run(str(CORE / "control.lua"), 1, opponent, "candidate-defaults", True, True, "5.0.21005")
                 self.assertFalse(result["ok"])

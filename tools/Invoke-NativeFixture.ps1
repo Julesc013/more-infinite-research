@@ -54,9 +54,9 @@ function Get-FixtureSha([string]$Path) {
 }
 function Get-FixtureCreateArguments([string]$Seed,[string]$Case,[bool]$OnlyCreate) {
   $arguments=@('--create',$Seed)
-  # The paired Library experiment needs an explicit common terrain input.
-  # Other fresh fixtures retain their existing creation arguments.
-  if($OnlyCreate -and $Case -ceq 'library-paired-browser') {
+  # Matched disposable workloads share a declared terrain seed. Active source
+  # preparation also uses this path before its pending-work save is written.
+  if(($OnlyCreate -and $Case -ceq 'library-paired-browser') -or $Case -cin @('repair-stress-active','agriculture-scale-active')) {
     $arguments+=@('--map-gen-seed','424242')
   }
   return $arguments
