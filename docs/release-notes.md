@@ -1,25 +1,28 @@
 ---
-title: "MIR 5.0.5 beta release notes"
+title: "MIR 5.0.6 beta release notes"
 status: current
-applies_to: "MIR 5.0.5 GitHub prerelease"
+applies_to: "MIR 5.0.6 GitHub prerelease"
 audience: player
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-05
+last_reviewed: 2026-11-06
 supersedes: []
 superseded_by: []
 source_of_truth_for:
-  - mir-505-release-notes
+  - mir-506-release-notes
 ---
 
-This beta restores Space-policy research for a supported satellite-launch science source and corrects a German Library label.
+This beta prevents unsafe Bob material research from consuming more science while preserving earned bonuses and unfinished work.
 
-- Keep research available on Factorio 2.1 with Space Age when the declared satellite-launch source supplies space science, while retaining its science gate.
-- Correct the German Research Library sorting label.
+- Keep Bob material research unavailable when a recipe can return its own ingredients. On Factorio 2.1, remove that research from the active queue while retaining its partial progress and earned bonuses; eligible research continues normally.
+- Restore conditional Marine coke research for Real Industrial Chemistry without changing its research owner or recipes.
+- Preserve zero fluid-box extents when applying the pipeline-extent setting.
 
 Use the ZIP matching your Factorio version. The modern packages require Factorio 2.0.77 or 2.1.23 respectively. Back up your save before updating and keep the previous package available.
 
-Focused Factorio 2.1.23 Space Age checks preserve earned gear bonuses, unfinished research, queued work and detached progress when updating from 5.0.4. Both the ordinary and controlled satellite-source cases complete another lab level, save and pass two cold reloads. These checks do not qualify physical satellite/science production or an entire modpack.
+Focused Factorio 2.1.23 full-Bob/Space Age checks start with bonuses earned in published 5.0.5, preserve paid and partial research through unavailability, and exercise a controlled recipe return. Eligible research and three new Tin levels complete normally; the configured cap, foreign force state, save and two cold reloads pass. These checks do not qualify physical Tin production, arbitrary provider changes or an entire modpack.
+
+Real Industrial Chemistry runtime/save compatibility remains unverified: the available 0.35.8 archive fails upstream on Factorio 2.1.23 even without MIR, and 0.36.1 has not been natively checked.
 
 This is a GitHub prerelease. Full Library interaction/client acceptance, historical reconciliation and whole-product performance qualification remain unfinished. Provider changes with unmet prerequisites remain unqualified; retain the original save and mod selection for those transitions.
 
