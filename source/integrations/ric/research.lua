@@ -3,6 +3,7 @@
 local profile = require("integrations.ric.profile")
 local cost = require("research.cost")
 local target = require("platform.target")
+local return_paths = require("integrations.ric.return_paths")
 local M = {}
 local OVERLAY = "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png"
 
@@ -15,7 +16,7 @@ local function positive(value)
 end
 
 -- Quantities remain upstream-owned. Only this ordinary typed input/output set
--- is admitted; returns, ranges, catalysts and probabilistic variants are separate.
+-- is admitted; the separate bounded check retains the no-return condition.
 local function ordinary_entries(actual, names, product)
   if type(actual) ~= "table" or #actual ~= #names then return false end
   local expected, seen = {}, {}
@@ -44,7 +45,9 @@ local function binding(raw)
   local items = type(raw) == "table" and raw.item
   local recipe = type(recipes) == "table" and recipes[profile.recipe]
   if type(recipe) ~= "table" or recipe.name ~= profile.recipe or recipe.type ~= "recipe"
+      or recipe.normal ~= nil or recipe.expensive ~= nil
       or recipe.hidden == true or recipe.allow_productivity ~= true
+      or (recipe.maximum_productivity ~= nil and not positive(recipe.maximum_productivity))
       or not ordinary_entries(recipe.ingredients, {"ric-dried-marine-biomass"})
       or not ordinary_entries(recipe.results, {"ric-coke", "ric-ash"}, true) then
     fail("the named forward recipe is absent or has unsupported inputs/outputs")
@@ -92,6 +95,7 @@ function M.technologies(values, raw, active_mods, startup)
   end
   if mode.value == "continental" then return {} end
   local icon, icon_size = binding(raw)
+  return_paths.validate(raw)
   local stream = values and values.streams and values.streams[profile.family]
   if type(stream) ~= "table" or type(stream.enabled) ~= "boolean" then fail("resolved settings are unavailable") end
   local time = stream.research_time == 0 and 30 or stream.research_time

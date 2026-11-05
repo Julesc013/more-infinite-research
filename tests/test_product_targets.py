@@ -58,6 +58,19 @@ class ProductTargetTests(unittest.TestCase):
           end
         ''')
 
+    def test_named_item_lookup_returns_original_subclass_without_fluid_aliases(self):
+        self.lua.execute(r'''
+          for _,kind in ipairs({'item','tool','ammo','armor','item-with-tags','space-platform-starter-pack'}) do
+            local prototype={type=kind,name='same-name',spoil_ticks=60}
+            local raw={[kind]={['same-name']=prototype},fluid={['same-name']={name='same-name'}}}
+            assert(targets.item_prototype(raw,'same-name')==prototype)
+            assert(targets.item_exists(raw,'same-name')==true)
+            assert(targets.item_exists(raw,'absent')==false)
+          end
+          assert(targets.item_prototype({fluid={water={name='water'}}},'water')==nil)
+          assert(targets.item_exists({item={water=false}},'water')==false)
+        ''')
+
     def test_typed_lookup_preserves_weights_and_target_order(self):
         self.lua.execute(r'''
           local context = targets.prepare({

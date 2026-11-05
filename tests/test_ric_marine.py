@@ -35,6 +35,9 @@ class RicMarineTests(unittest.TestCase):
         # recipe, identity, effect, unique-owner, withheld-route and unlock checks.
         first, last = original.index("local transport ="), original.index("local function amount(")
         cls.original_oracle = original[:first] + original[last:]
+        cls.original_result_semantics = read_published_source(ROOT,
+            "source/prototypes/mir/domain/facts/recipe_semantics.lua",
+            "90AD546D217DF361376BA28E96225A6B8B6AF9AEFB7CF00DB8B0A71DDADD248F").decode()
 
     def stage(self, mode="marine", provider=True, target="f210", changes=None):
         scaffold.LuaRuntime = LuaRuntime
@@ -207,6 +210,7 @@ class RicMarineTests(unittest.TestCase):
             'data.raw.recipe["'+RECIPE+'"].results[1].probability=.5',
             'data.raw.recipe["'+RECIPE+'"].results[1].ignored_by_productivity=1',
             'data.raw.recipe["'+RECIPE+'"].results[2]=nil',
+            'data.raw.recipe["'+RECIPE+'"].normal={ingredients={},results={}}',
             'data.raw.technology["ric-coking"].effects={}',
             'data.raw.technology["ric-coking"].unit.ingredients[1][1]="future-science-pack"',
             'data.raw.item["ric-coke"]=nil',
@@ -292,6 +296,163 @@ class RicMarineTests(unittest.TestCase):
           require("runtime.lifecycle").on_configuration_changed({})
           assert(not tech.enabled and tech.level==4 and tech.saved_progress==.27)
         ''')
+
+    def return_stage(self, script):
+        lua = self.stage()
+        lua.execute('''
+          function return_recipe(name, ingredients, results, fields)
+            local recipe={type="recipe",name=name,ingredients=ingredients,results=results}
+            for key,value in pairs(fields or {}) do recipe[key]=value end
+            data.raw.recipe[name]=recipe
+          end
+        ''')
+        lua.execute(script)
+        return lua
+
+    def test_any_recipe_or_native_return_path_refuses_before_publication(self):
+        cases = [
+            'return_recipe("return",{{"ric-coke",1}},{{name="ric-dried-marine-biomass",amount=1}})',
+            '''return_recipe("first",{{"ric-coke",1}},{{type="fluid",name="bridge",amount=1}})
+               return_recipe("second",{{type="fluid",name="bridge",amount=1}},{{name="ric-dried-marine-biomass",amount=1}})''',
+            'data.raw.item["ric-ash"].spoil_result="ric-dried-marine-biomass";data.raw.item["ric-ash"].spoil_ticks=60',
+            'data.raw.item["ric-coke"].burnt_result="ric-dried-marine-biomass";data.raw.item["ric-coke"].fuel_value="1MJ"',
+            'data.raw.item["ric-coke"].burnt_result="ric-dried-marine-biomass";data.raw.item["ric-coke"].fuel_value={}',
+            '''return_recipe("first",{{"ric-coke",1}},{{name="bridge",amount=1}})
+               data.raw.tool=data.raw.tool or {}
+               data.raw.tool.bridge={type="tool",name="bridge",spoil_result="ric-dried-marine-biomass",spoil_ticks=60}''',
+            '''return_recipe("return",{{"ric-coke",1},{"unavailable-coingredient",1}},
+                 {{name="ric-dried-marine-biomass",amount=1,independent_probability=.001,ignored_by_productivity=1}},
+                 {hidden=true,enabled=false,allow_productivity=false,category="recycling"})''',
+            '''return_recipe("return",{{"ric-coke",1}},{{name="ric-dried-marine-biomass",amount=0,extra_count_fraction=.5}})''',
+            '''return_recipe("return",{{"ric-coke",1}},{{name="ric-dried-marine-biomass",amount=1,probability=0}})''',
+            '''return_recipe("return",{{"ric-coke",1}},{{name="ric-dried-marine-biomass",amount=1,independent_probability=0,probability=1}})''',
+            '''return_recipe("return",{{"ric-coke",1}},{{name="ric-dried-marine-biomass",amount_min=1,amount_max=0}})''',
+            '''return_recipe("return",{{"ric-coke",1}},{{name="ric-dried-marine-biomass",amount=1,shared_probability="unknown"}})''',
+        ]
+        for script in cases:
+            with self.subTest(script=script):
+                lua = self.return_stage(script)
+                with self.assertRaisesRegex(LuaError, "return path"):
+                    self.pipeline(lua)
+                self.assertEqual(0, lua.globals().data.writes)
+
+    def test_only_proven_dead_results_can_remove_a_return_edge(self):
+        dead = [
+            {"name": "ric-dried-marine-biomass", "amount": 1, "independent_probability": 0},
+            {"name": "ric-dried-marine-biomass", "amount": 1, "shared_probability": {"min": .3, "max": .3}},
+            {"name": "ric-dried-marine-biomass", "amount": 0},
+            {"name": "ric-dried-marine-biomass", "amount_min": 0, "amount_max": 0},
+            {"name": "ric-dried-marine-biomass", "amount": 0, "amount_min": 2, "amount_max": 4},
+        ]
+        for result in dead:
+            with self.subTest(result=result):
+                lua = self.stage()
+                lua.globals().selected_result = scaffold.lua_table(lua, result)
+                old = lua.execute(self.original_result_semantics)
+                profile = scaffold.lua_table(lua, {"prototype_shapes": {"product_probability_fields": [
+                    "independent_probability", "shared_probability", "extra_count_fraction"]}})
+                self.assertTrue(old.result_is_definitely_zero(lua.globals().selected_result, profile))
+                lua.execute('''data.raw.recipe["dead-return"]={ingredients={{"ric-coke",1}},results={selected_result}}''')
+                self.pipeline(lua)
+                lua.execute(self.original_oracle)
+
+    def test_zero_native_edges_typed_names_and_unrelated_cycles_remain_admissible(self):
+        cases = [
+            'data.raw.item["ric-ash"].spoil_result="ric-dried-marine-biomass";data.raw.item["ric-ash"].spoil_ticks=0',
+            'data.raw.item["ric-coke"].burnt_result="ric-dried-marine-biomass"',
+            'data.raw.item["ric-coke"].burnt_result="ric-dried-marine-biomass";data.raw.item["ric-coke"].fuel_value="0MJ"',
+            'return_recipe("typed",{{"ric-coke",1}},{{type="fluid",name="ric-dried-marine-biomass",amount=1}})',
+            '''return_recipe("first",{{"ric-coke",1}},{{name="bridge",amount=1}})
+               return_recipe("cycle",{{"bridge",1}},{{name="ric-coke",amount=1}})''',
+        ]
+        for script in cases:
+            with self.subTest(script=script):
+                lua = self.return_stage(script)
+                self.pipeline(lua)
+                lua.execute(self.original_oracle)
+
+    def test_variant_inputs_never_borrow_other_variant_outputs(self):
+        lua = self.return_stage('''data.raw.recipe.variants={
+          normal={ingredients={{"ric-coke",1}},results={{name="harmless",amount=1}}},
+          expensive={ingredients={{"unrelated",1}},results={{name="ric-dried-marine-biomass",amount=1}}}}
+        ''')
+        self.pipeline(lua)
+        lua.execute(self.original_oracle)
+        lua = self.return_stage('''data.raw.recipe.variants={
+          normal={ingredients={{"ric-coke",1}},result="ric-dried-marine-biomass",result_count=1},
+          expensive={ingredients={{"unrelated",1}},results={{name="harmless",amount=1}}}}
+        ''')
+        with self.assertRaisesRegex(LuaError, "return path"):
+            self.pipeline(lua)
+        self.assertEqual(0, lua.globals().data.writes)
+
+    def test_explicit_zero_productivity_cap_is_not_admitted(self):
+        lua = self.stage()
+        lua.execute('data.raw.recipe["ric-carbonise-marine-biomass"].maximum_productivity=0')
+        with self.assertRaisesRegex(LuaError, "MIR RIC Marine"):
+            self.pipeline(lua)
+        self.assertEqual(0, lua.globals().data.writes)
+
+    def test_reached_variants_expand_once_and_unrelated_outputs_are_not_examined(self):
+        lua = self.stage()
+        lua.execute('''
+          local reads=0
+          local ingredients={{"ric-coke",1},{"ric-ash",1}}
+          for index=1,500 do
+            ingredients[#ingredients+1]={"bridge-"..index,1}
+            data.raw.recipe["produce-"..index]={ingredients={{"ric-coke",1}},
+              results={{name="bridge-"..index,amount=1}}}
+            data.raw.recipe["unrelated-"..index]=setmetatable({ingredients={{"unrelated-"..index,1}}},
+              {__index=function(_,key) if key=="results" then error("unrelated outputs expanded") end end})
+          end
+          data.raw.recipe.shared=setmetatable({ingredients=ingredients},{__index=function(_,key)
+            if key=="results" then reads=reads+1;return {{name="ric-coke",amount=1}} end
+          end})
+          require("integrations.ric.return_paths").validate(data.raw)
+          assert(reads==1,"each reached variant must expand once")
+          -- An iterative long chain, including a harmless return cycle, has a
+          -- fixed instruction budget. No machine-time or production telemetry.
+          for index=1,3000 do
+            data.raw.recipe["chain-"..index]={ingredients={{index==1 and "ric-coke" or "chain-"..(index-1),1}},
+              results={{name=index==3000 and "ric-coke" or "chain-"..index,amount=1}}}
+          end
+          local hooks=0
+          debug.sethook(function() hooks=hooks+1;assert(hooks<1500,"return proof work exceeded bound") end,"",10000)
+          require("integrations.ric.return_paths").validate(data.raw)
+          debug.sethook()
+          assert(reads==2)
+        ''')
+
+    def test_recipe_order_does_not_change_return_or_admission(self):
+        for reverse in (False, True):
+            for returns in (False, True):
+                with self.subTest(reverse=reverse, returns=returns):
+                    lua = self.stage()
+                    lua.globals().reverse_order, lua.globals().has_return = reverse, returns
+                    lua.execute('''
+                      local rows={
+                        {"one",{ingredients={{"ric-coke",1}},results={{name="bridge",amount=1}}}},
+                        {"two",{ingredients={{"bridge",1}},results={{name=has_return and "ric-dried-marine-biomass" or "ric-coke",amount=1}}}}}
+                      for index=1,#rows do
+                        local row=rows[reverse_order and (#rows-index+1) or index]
+                        data.raw.recipe[row[1]]=row[2]
+                      end
+                    ''')
+                    if returns:
+                        with self.assertRaisesRegex(LuaError, "return path"):
+                            self.pipeline(lua)
+                        self.assertEqual(0, lua.globals().data.writes)
+                    else:
+                        self.pipeline(lua)
+                        lua.execute(self.original_oracle)
+
+    def test_reached_unrepresentable_results_cannot_grant_a_proof(self):
+        for results in ('{[1]={name="harmless",amount=1},[3]={name="ric-dried-marine-biomass",amount=1}}',
+                        '{"ric-dried-marine-biomass"}', '{["named"]={name="ric-dried-marine-biomass",amount=1}}'):
+            lua = self.return_stage('data.raw.recipe.unsupported={ingredients={{"ric-coke",1}},results='+results+'}')
+            with self.assertRaisesRegex(LuaError, "return path"):
+                self.pipeline(lua)
+            self.assertEqual(0, lua.globals().data.writes)
 
 
 if __name__ == "__main__":
