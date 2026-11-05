@@ -17044,18 +17044,20 @@
             "spec/evidence/candidate503-native-upgrades-r01.json",
             "spec/evidence/candidate504-mixed-gun-native-r01.json",
             "Julesc013/mir-native-worker@017a40be8ed5f97d92e876cb6f4d259a92cdb47e:evidence/aero-historical473-current504-applicability-r01/source-applicability.json (9C3C8D07)",
-            "9b8e34592ac5eafb5b9719705ddce31ca3fc62e1:evidence/aero-candidate505-source-native-review-r01/native-review.json"
+            "9b8e34592ac5eafb5b9719705ddce31ca3fc62e1:evidence/aero-candidate505-source-native-review-r01/native-review.json",
+            "spec/evidence/historical473-current505-applicability-r01.json"
           ],
-          "remaining_executable_check": "Finish505 source/member and current state applicability against the existing migration-origin inventory: nine473 same-edition routes, seven older-contract groups and four forward journeys stay distinct. Retain bounded9C3C8D07 reuse for seven earlier stable-edition473 routes without confusing them with seven older MIR-contract groups. Actual504-to505 stock/representative satellite science upgrade is already accepted; do not recreate its predecessor. Name any remaining changed identity/owner/settings path and its existing route before native execution; preserve original failures, missing inputs and ambiguous locks.",
+          "remaining_executable_check": "Published505 reviewFC930CC9 supports the seven earlier-stable-edition473 same-edition preservation routes and the separate publishedF100-to-F110 journey under original native identities. Finish consumed-input decisions for modernF200/F210473 routes,other three forward journeys and the seven older MIR-contract groups,which are different sets. Existing504-to505 stock/representative satellite science upgrade remains accepted;do not recreate its predecessor. Name each genuinely changed identity/owner/settings path and existing route before an affected native check;preserve adverse receipts,missing inputs and ambiguous locks. Locale/current-load/rendering,whole-edition and final-candidate acceptance remain separate.",
           "owner": "Aero; Black Glass executes affected checks",
           "independent_review": "Aero",
-          "status": "partial: named prior routes and5.0.4 components remain scoped; actual5.0.4-to5.0.5 stock/representative satellite-source science work passes its earned/unfinished/queued-state and two-cold checks; full stable-candidate coverage remains unproved",
-          "readiness": "current-candidate route applicability review ready; execute only identified affected routes",
+          "status": "partial:505 earlier-seven473 and F100-to-F110 preservation applicability accepted; original modern/older-contract/science/state components retain their exact scopes; complete stable-candidate coverage remains unproved",
+          "readiness": "earlier-seven473/F100-F110505 preservation input review complete; modern/older-contract decisions remain ready",
           "next_work_inputs": [
             "spec/inventory/migration-origins.json",
             "spec/evidence/candidate503-native-upgrades-r01.json",
             "spec/evidence/candidate504-mixed-gun-native-r01.json",
-            "spec/evidence/candidate505-science-upgrade-native-r01.json"
+            "spec/evidence/candidate505-science-upgrade-native-r01.json",
+            "spec/evidence/historical473-current505-applicability-r01.json"
           ]
         },
         {
