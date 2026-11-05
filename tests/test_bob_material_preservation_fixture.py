@@ -87,6 +87,50 @@ class PreservationTests(unittest.TestCase):
         with self.assertRaisesRegex(Exception, "force_enabled=false prototype_enabled=false"):
             self.check(actual, expected)
 
+    def unavailable_pair(self):
+        source = source_snapshot()
+        source.update(current="recipe-prod-research_material_bronze-4",
+                      queue=["recipe-prod-research_material_bronze-4", "recipe-prod-research_material_bronze-4", "automation"],
+                      probe_saved=0.13, probe_researched=False, bronze_saved=0.42)
+        actual = deepcopy(source)
+        actual.update(current="automation", queue=["automation"], progress=0.13)
+        return source, actual
+
+    def test_cap_style_cancellation_keeps_paid_partial_and_eligible_work(self):
+        source, actual = self.unavailable_pair()
+        self.control.assert_unavailable(self.table(actual), self.table(source), 0, True)
+        actual["progress"] = 0.23
+        self.control.assert_unavailable(self.table(actual), self.table(source), 0, False)
+        actual.update(current=False, queue=[], progress=0, probe_researched=True)
+        self.control.assert_unavailable(self.table(actual), self.table(source), 1, False)
+
+    def test_old_disabled_current_and_both_queued_entries_still_fail(self):
+        source, actual = self.unavailable_pair()
+        actual.update(current=source["current"], queue=source["queue"], progress=0.43)
+        with self.assertRaisesRegex(Exception, "unavailable queue was not safely cancelled"):
+            self.control.assert_unavailable(self.table(actual), self.table(source), 0, False)
+
+    def test_cancelled_work_loss_and_leak_into_eligible_research_fail(self):
+        source, actual = self.unavailable_pair()
+        for field, value, message in (("bronze_saved", 0, "cancelled or detached work was lost"),
+                                      ("lead_saved", 0, "cancelled or detached work was lost"),
+                                      ("progress", 0.42, "cancelled work leaked"),
+                                      ("progress", 0, "eligible unfinished work was lost")):
+            opponent = deepcopy(actual)
+            opponent[field] = value
+            with self.subTest(field=field, value=value), self.assertRaisesRegex(Exception, message):
+                self.control.assert_unavailable(self.table(opponent), self.table(source), 0, True)
+
+    def test_mode_specific_check_cannot_accept_missing_source_or_paid_effect(self):
+        source, actual = self.unavailable_pair()
+        del source["probe_saved"]
+        with self.assertRaisesRegex(Exception, "source lacks independently observed"):
+            self.control.assert_unavailable(self.table(actual), self.table(source), 0, True)
+        source, actual = self.unavailable_pair()
+        actual["bonuses"]["bob-bronze-alloy"] = 0
+        with self.assertRaisesRegex(Exception, "earned recipe effect changed"):
+            self.control.assert_unavailable(self.table(actual), self.table(source), 0, True)
+
     def raw(self, stage):
         technologies = {}
         for key, recipe in zip(FAMILIES, RECIPES):

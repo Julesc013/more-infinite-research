@@ -32,7 +32,8 @@ end
 local function snapshot(force)
   local result = {technologies={}, bonuses={}, current=force.current_research and force.current_research.name or false,
     queue=names(force.research_queue), progress=force.research_progress,
-    lead_saved=tech(force, LEAD).saved_progress}
+    lead_saved=tech(force, LEAD).saved_progress, bronze_saved=tech(force, BRONZE).saved_progress,
+    probe_saved=tech(force, PROBE).saved_progress, probe_researched=tech(force, PROBE).researched}
   for _, key in ipairs(FAMILIES) do
     for _, suffix in ipairs{"1", "4"} do
       local id = "recipe-prod-research_material_" .. key .. "-" .. suffix
@@ -63,16 +64,62 @@ function M.assert_preserved(actual, expected, label, exact_enabled)
       .. " queue=" .. table.concat(expected.queue, ","))
   end
   for i, id in ipairs(expected.queue) do if actual.queue[i] ~= id then fail(label .. " queue order changed") end end
+  for _, key in ipairs{"bronze_saved", "probe_saved"} do
+    if expected[key] ~= nil and not near(actual[key], expected[key]) then fail(label .. " saved work changed: " .. key) end
+  end
+  if expected.probe_researched ~= nil and actual.probe_researched ~= expected.probe_researched then
+    fail(label .. " eligible completion changed")
+  end
+  if exact_enabled then
+    for id, before in pairs(expected.technologies) do
+      local after = actual.technologies[id]
+      if not after or after.enabled ~= before.enabled then fail(label .. " saved enablement changed: " .. id) end
+    end
+  end
+  M.assert_paid(actual, expected, label)
+end
+
+function M.assert_paid(actual, expected, label)
   for id, before in pairs(expected.technologies) do
     local after = actual.technologies[id]
     if not after or after.level ~= before.level or after.researched ~= before.researched then
       fail(label .. " paid native level changed: " .. id)
     end
-    if exact_enabled and after.enabled ~= before.enabled then fail(label .. " saved enablement changed: " .. id) end
   end
   for recipe, before in pairs(expected.bonuses) do
     if not near(actual.bonuses[recipe], before) then fail(label .. " earned recipe effect changed: " .. recipe) end
   end
+end
+
+-- Existing cap policy deliberately cancels unavailable queue entries. Native
+-- saved work, paid effects and the eligible remainder are the preservation
+-- boundary; leaving disabled Bronze current would let a powered lab progress.
+function M.assert_unavailable(actual, source, eligible_finished, at_entry)
+  M.assert_paid(actual, source, "unavailable player")
+  if type(source.probe_saved) ~= "number" then fail("source lacks independently observed eligible work") end
+  local expected_queue = {}
+  for _, id in ipairs(source.queue) do
+    if id == PROBE then expected_queue[#expected_queue+1] = id
+    elseif id ~= BRONZE then fail("source has an unexpected queued research") end
+  end
+  if eligible_finished == 1 then table.remove(expected_queue, 1)
+  elseif eligible_finished ~= 0 then fail("unexpected eligible completion count") end
+  local expected_current = expected_queue[1] or false
+  if actual.current ~= expected_current or #actual.queue ~= #expected_queue then
+    fail("unavailable queue was not safely cancelled; current=" .. tostring(actual.current)
+      .. " queue=" .. table.concat(actual.queue, ","))
+  end
+  for i, id in ipairs(expected_queue) do if actual.queue[i] ~= id then fail("eligible queue order changed") end end
+  if not near(actual.bronze_saved, source.progress) or not near(actual.lead_saved, source.lead_saved) then
+    fail("cancelled or detached work was lost")
+  end
+  if eligible_finished == 0 then
+    if actual.probe_researched ~= source.probe_researched
+        or type(actual.progress) ~= "number" or actual.progress < source.probe_saved - 0.000001 or actual.progress >= 1 then
+      fail("eligible unfinished work was lost")
+    end
+    if at_entry and not near(actual.progress, source.probe_saved) then fail("cancelled work leaked into eligible research") end
+  elseif actual.probe_researched ~= true then fail("eligible completion was not retained") end
 end
 
 local function closure(stage)
@@ -179,13 +226,21 @@ function M.apply(stage)
     end
     local prior = stage == "unavailable" and "source" or "unavailable"
     if not state or state.phase ~= "complete" or state.stage ~= prior then fail("missing exact previous fixture stage") end
-    M.assert_preserved(snapshot(game.forces.player), state.final, "configuration player")
+    if stage == "unavailable" then
+      M.assert_unavailable(snapshot(game.forces.player), state.source, 0, true)
+      state.eligible_finished = 0
+    else
+      M.assert_preserved(snapshot(game.forces.player), state.final, "configuration player")
+    end
     M.assert_preserved(snapshot(game.forces[state.foreign_index]), state.foreign_final, "configuration foreign")
     state.phase, state.stage, state.started = "observe-transition", stage, game.tick
     flags(game.forces.player, stage, false)
     flags(game.forces[state.foreign_index], stage, true)
     if stage == "readmitted" then
       if tech(game.forces.player, TIN).enabled ~= true then fail("qualified cap right was not readmitted") end
+      local before = snapshot(game.forces.player)
+      state.readmitted_probe_saved = before.current == PROBE and before.progress or before.probe_saved
+      state.readmitted_probe_researched = before.probe_researched
       game.forces.player.research_queue = {tech(game.forces.player, TIN), tech(game.forces.player, TIN),
         tech(game.forces.player, TIN), tech(game.forces.player, TIN)}
       state.phase, state.finished = "useful-research", 0
@@ -199,6 +254,11 @@ function M.apply(stage)
   script.on_event(defines.events.on_research_finished, function(event)
     local state = storage[KEY]
     if not state or not event.research or event.research.force ~= game.forces.player then return end
+    if state.stage == "unavailable" and state.phase == "observe-transition" and event.research.name == PROBE then
+      state.eligible_finished = state.eligible_finished + 1
+      if state.eligible_finished > 1 then fail("unexpected repeated eligible completion") end
+      return
+    end
     if state.phase ~= "useful-research" or event.research.name ~= TIN then fail("unexpected native lab completion") end
     state.finished = state.finished + 1
     if state.finished > 3 then fail("research passed the finite cap7") end
@@ -228,15 +288,16 @@ function M.apply(stage)
       if not inv.is_empty() then return end
       M.set_lab_running(entity, false)
       local player = game.forces.player
-      if player.current_research.name ~= BRONZE or not near(player.research_progress, 0.42)
-          or #player.research_queue ~= 3 or player.research_queue[2].name ~= BRONZE then
+      if not player.current_research or player.current_research.name ~= BRONZE or not near(player.research_progress, 0.42)
+          or #player.research_queue ~= 3 or player.research_queue[1].name ~= BRONZE
+          or player.research_queue[2].name ~= BRONZE or player.research_queue[3].name ~= PROBE then
         fail("42 actual consumed science sets/repeated queue were not observed")
       end
       state.source = snapshot(player)
       state.foreign_source = snapshot(game.forces[state.foreign_index])
       finish(state)
     elseif state.phase == "observe-transition" then
-      M.assert_preserved(snapshot(game.forces.player), state.source, "unavailable player")
+      M.assert_unavailable(snapshot(game.forces.player), state.source, state.eligible_finished, false)
       M.assert_preserved(snapshot(game.forces[state.foreign_index]), state.foreign_source, "unavailable foreign")
       flags(game.forces.player, stage, false); flags(game.forces[state.foreign_index], stage, true)
       if game.tick - state.started == 20 then
@@ -256,6 +317,10 @@ function M.apply(stage)
       end
       if not near(tech(player, BRONZE).saved_progress, 0.42)
           or not near(tech(player, LEAD).saved_progress, 0.27) then fail("readmission lost paused work") end
+      if not near(tech(player, PROBE).saved_progress, state.readmitted_probe_saved)
+          or tech(player, PROBE).researched ~= state.readmitted_probe_researched then
+        fail("readmission changed eligible research work")
+      end
       M.assert_preserved(snapshot(game.forces[state.foreign_index]), state.foreign_source, "readmitted foreign")
       finish(state)
     end
