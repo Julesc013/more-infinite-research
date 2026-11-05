@@ -2,6 +2,14 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.6] - Unreleased
+
+### Bugfixes
+
+- Keep unsafe Bob material productivity research unavailable when its recipes can return their own ingredients, while retaining existing research and earned effects.
+- Restore conditional Marine coke research for Real Industrial Chemistry without overriding its research owner or recipes.
+- Preserve zero fluid-box extents when applying the pipeline-extent setting.
+
 ## [5.0.5] - 2026-11-05
 
 ### Bugfixes

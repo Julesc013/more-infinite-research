@@ -430,6 +430,14 @@
           "id": "atan-base-space-age-native-labs",
           "evidence": "spec/evidence/atan-gameplay-chain.json",
           "scope": "Exact F200 Base/Space Age shared filter and ash actual labs, queue state and two cold reloads; no physical output/F210 claim."
+        },
+        {
+          "id": "historical-pipeline-extent-source-intent",
+          "evidence": "spec/evidence/historical-pipeline-extent-intents-aero-r01.json",
+          "source": [
+            "source/overrides/pipeline_extent.lua"
+          ],
+          "scope": "One published fixture body at166 original commit:path references retains setting/default, rounding/extent and shared-box expectations through existing current controls. Its metadata is2.1/base2.1.8; copied historical directory names do not establish old-engine support. Existing e282 native640/960/480 observations keep their original package/engine and data-stage scope; no fluid-flow, new native or final-candidate verdict follows."
         }
       ],
       "test_subjects": [
@@ -4380,6 +4388,11 @@
           "id": "q006-independent-full-data-current-applicability",
           "evidence": "spec/evidence/q006-independent-current-data-aero-r01.json",
           "scope": "Aero independently reproduces all13 transported full-Bob/Space-Age records:746 published technology identities retained,738 exact,eight explicit effect-order/presentation differences,39 separately classified additions and1022 retained settings. Relevant data-path function bodies,target transforms and packager remain unchanged through playerfbb7/current38C. Original575e/A8/FE4/profile47A538 execution retains its identity;this closes only the captured technology/settings comparison and scoped current data applicability. Eleven public additions,three presentation differences,changed runtime and other profiles keep their separate physical/save/client obligations."
+        },
+        {
+          "id": "historical-tin-route-physical-persistence-intents",
+          "evidence": "spec/evidence/historical-tin-behavior-intents-aero-r01.json",
+          "scope": "Retain Bob-only physical/cap/seeded-state purposes; consolidate combined no-emission diagnostics and separate Angel-only scope. Retire obsolete wrapper mechanics. No new Tin emission,physical result or native migration pass."
         }
       ],
       "test_subjects": [
@@ -4394,7 +4407,7 @@
         "Observe remaining exact admitted integrations and setting interactions; Bob/Angel physical125%/400% recipe-cap output is already qualified at its recorded source.",
         "Complete the explicit named/popular individual and dependency-valid combined campaign above. Current F210 input profiles now pin AAI, six BZ components and combinations, full Py, K2/SE/K2SE, full Bob/Angel and IR4; input availability does not qualify native, gameplay or migration outcomes.",
         "Complete full-suite Py and broad Bob/Angel coverage separately from the existing narrow selections, with actual useful effects and migration/state outcomes.",
-        "Freeze current accepted player tree31e5a218d or its reviewed successor, then qualify the centrally emitted F210 Bob Plates individual Base/Space Age and full-Bob Base routes with exact new-package research/effect and protected save/reload witnesses. C563 does not contain these fixes."
+        "Qualify genuinely affected current Bob material research/effect,physical output and protected saved-state boundaries on the accepted successor, using the exact applicable existing controls and original evidence. The historical Tin reconciliation below keeps Bob-only,combined F210,F200 and named BobTech tuples separate. Existing packages/results retain their original source/engine/settings identities; no stale31e5a218d freeze or complete old-campaign restart is required."
       ],
       "qualification_campaign": {
         "status": "required-broad-coverage-incomplete",
@@ -16960,6 +16973,41 @@
           "sha256": "EA58EED5226A0FB1B2BA34A2CF07DAE647F21214F68F7EF0389CFE0C4DE364D6"
         },
         "disposition": "Consolidate recovered621/446 originals; map15 preserved requests,retain unqualified/probe states and expose the named RIC source/host gap without inventing ecosystem acceptance.",
+        "original_request_fields_preserved": true,
+        "native_tests_run": false,
+        "stable_acceptance": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-07",
+          "CONT-12",
+          "VER-07"
+        ],
+        "reviewed_on": "2026-11-06",
+        "reviewed_against": "1810ebfe90e5b6b644a224303eb05524ed8eea05",
+        "scope": "Five selected Bob-only/combined Tin test families plus the distinct Angel-only final-state sibling; complete earliest/latest wrapper bodies and changed assertion spans,24 consumed fixture files. Not all Tin history or native/profile acceptance.",
+        "evidence": {
+          "path": "spec/evidence/historical-tin-behavior-intents-aero-r01.json",
+          "sha256": "C1A2686B72FA63C4758D210594BC4698BB31854FB9DEC2F285CD5BF035BB93A8"
+        },
+        "disposition": "Retain physical Tin and cap/current/queue/serialization purposes; preserve distinct profile nonadmission and frontier limits; retire only obsolete staging/lease/custody mechanics.",
+        "remaining_executable_check": "Use existing admitted current-profile physical/state/settings cases and exact consumed-input review. Original literal Tin outputs have no recovered raw result; keep that oracle boundary explicit and do not derive changed tolerances from candidate output. No extra packet approval or every-old-patch campaign.",
+        "native_execution": false,
+        "player_source_changed": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-06"
+        ],
+        "reviewed_on": "2026-11-06",
+        "reviewed_against": "764e8d19945e0f01a04f28a287e1a279199d08db",
+        "scope": "One deduplicated assert-pipeline-extent fixture, original emission/metadata and166 source bindings; no complete override or native acceptance claim.",
+        "evidence": "spec/evidence/historical-pipeline-extent-intents-aero-r01.json",
+        "disposition": "Retain useful parsing/scaling/shared-box assertions through current controls, preserve reviewed native-default/zero corrections, and retire only obsolete fixture-text/dispatcher plumbing. Local-onlyv3.0.0/v4.2.0 remain explicit; no tag is changed. No new product defect, campaign or replay of unchanged cases is inferred.",
         "original_request_fields_preserved": true,
         "native_tests_run": false,
         "stable_acceptance": false
