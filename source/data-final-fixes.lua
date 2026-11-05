@@ -182,6 +182,14 @@ if modern_catalogue.is_k2so(mods) then
   for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
 end
 
+if prerequisite_target.id == "f210" and type(mods) == "table" and mods["real-industrial-chemistry"] then
+  local ric_mode = settings and settings.startup and settings.startup["ric-world-mode"]
+  if not ric_mode or ric_mode.value ~= "continental" then
+    local ric = require("integrations.ric.research").technologies(values, data.raw, mods, settings and settings.startup)
+    for index = 1, #ric do technologies[#technologies + 1] = ric[index] end
+  end
+end
+
 if modern_selection and modern_selection.bob_angel then
   local materials = require("compatibility.bob_angel_materials").technologies(values, data.raw, mods)
   for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
