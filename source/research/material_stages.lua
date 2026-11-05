@@ -81,4 +81,12 @@ function M.technology(definition, stage, stream, fail)
   return output
 end
 
+-- Call only for an owned detached technology. Keep its earned native effect
+-- vector and progression while withholding future research in this recipe set.
+function M.retain_disabled(technology)
+  technology.enabled = false
+  technology.localised_description = {"", technology.localised_description, "\n",
+    {"technology-description.more-infinite-research.material_process_unavailable"}}
+end
+
 return M

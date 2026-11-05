@@ -78,6 +78,21 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             end
             return old
           end
+          -- Exact generated-stream V3 tuple for a retained Bob material ID.
+          -- This proves only the cap restoration right, not recipe feasibility.
+          function material_legacy(name, family, index)
+            local setting = "ips-max-level-" .. family
+            local key = table.concat({name,setting,"generated-stream","emit"}, "\\0")
+            return {policy_version=3,managed_technologies={
+              [name]={technology=name,setting=setting,source="generated-stream",operation="emit",
+                policy_transport="transported-v3",ownership_kind="transported-v3",legacy=false,
+                selected=2,binding_fingerprint="mir32-1234abcd"}},
+              disabled_by_cap={[index]={[name]={policy_version=3,force_index=index,cap=2,
+                binding_fingerprint="mir32-1234abcd",ownership_key=key,
+                ownership_kind="transported-v3",enabled_before_cap=true}}},
+              visibility_by_cap={[index]={[name]={policy_version=3,force_index=index,
+                ownership_key=key,ownership_kind="transported-v3",value=false}}}}
+          end
           -- Public policy-v1 retained only its exact managed tuple, a true
           -- disable marker, and (in the later 09eb cohort) an optional
           -- visibility boolean.  This helper is intentionally not a full
@@ -166,6 +181,13 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             local streams = {}
             for _, row in ipairs(require("research.catalogue").declared()) do
               local value = {enabled = options.enabled ~= false, max_level = options.limit or 0}
+              if row.productivity_ceiling ~= nil then
+                value.effect_percent = 2
+                prototypes = prototypes or {recipe={}}
+                for _, name in ipairs(row.productivity_recipes) do
+                  prototypes.recipe[name] = {maximum_productivity=3}
+                end
+              end
               if row.family == "research_agricultural_growth_speed" and options.agriculture then
                 value = options.agriculture
               elseif row.family == "research_spoilage_preservation" and options.spoilage then
@@ -1214,6 +1236,63 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
           assert(ordinary.enabled and not ordinary.visible_when_disabled)
           assert(storage.mir_caps.legacy_caps_checked
             and next(storage.mir_caps.owned_disabled) == nil)
+        ''')
+
+    def test_unavailable_material_keeps_exact_v3_cap_right_dormant_until_readmission(self):
+        self.lua.execute('''
+          local name, family = "recipe-prod-research_material_bronze-1", "research_material_bronze"
+          local selected = {base="2.1.23",['space-age']="2.1.23",boblibrary="3.0.1",
+            bobores="3.0.0",bobplates="3.0.2",bobelectronics="3.0.0",bobtech="3.0.1"}
+          local item = technology(name)
+          item.prototype.enabled, item.saved_progress = false, .27
+          local f = force(1, {[name]=item})
+          local old = material_legacy(name,family,1)
+          boot({[1]=f},old,nil,{active_mods=selected})
+          lifecycle.on_configuration_changed()
+          local owned = storage.mir_caps.owned_disabled[1]
+          assert(owned and owned[name] and owned[name].disabled==true,
+            "exact material cap right was discarded while unavailable")
+          assert(not item.enabled and item.level==3 and item.saved_progress==.27 and f.research_progress==.42)
+          local saved = storage.mir_caps
+          lifecycle.on_technology_effects_reset({force=f})
+          assert(not item.enabled and saved.owned_disabled[1][name].disabled)
+
+          item.prototype.enabled = true
+          boot({[1]=f},old,saved,{active_mods=selected})
+          lifecycle.on_configuration_changed()
+          assert(item.enabled and not item.visible_when_disabled and item.level==3 and item.saved_progress==.27)
+          assert(storage.mir_caps.legacy_caps_checked and next(storage.mir_caps.owned_disabled)==nil)
+          assert(old.disabled_by_cap[1][name].enabled_before_cap==true)
+        ''')
+
+    def test_unavailable_material_does_not_create_negative_or_foreign_legacy_rights(self):
+        self.lua.execute('''
+          local name, family = "recipe-prod-research_material_bronze-1", "research_material_bronze"
+          local selected = {base="2.1.23",['space-age']="2.1.23",boblibrary="3.0.1",
+            bobores="3.0.0",bobplates="3.0.2",bobelectronics="3.0.0",bobtech="3.0.1"}
+          for _, kind in ipairs({"negative","missing","wrong-binding","current-foreign"}) do
+            local item = technology(name)
+            item.prototype.enabled = false
+            local f = force(1,{[name]=item})
+            local old = material_legacy(name,family,1)
+            local current
+            if kind=="negative" then old.disabled_by_cap[1][name].enabled_before_cap=false end
+            if kind=="missing" then old.disabled_by_cap[1][name]=nil end
+            if kind=="wrong-binding" then old.managed_technologies[name].operation="other" end
+            if kind=="current-foreign" then
+              current={schema=1,owned_disabled={[1]={[name]={disabled=false}}}}
+            end
+            boot({[1]=f},old,current,{active_mods=selected})
+            lifecycle.on_configuration_changed()
+            local saved=storage.mir_caps
+            assert(not item.enabled)
+            local owned=saved.owned_disabled[1]
+            assert(not owned or not owned[name] or owned[name].disabled~=true,kind)
+            item.prototype.enabled=true
+            boot({[1]=f},old,saved,{active_mods=selected})
+            lifecycle.on_configuration_changed()
+            assert(not item.enabled,"foreign enablement right manufactured: "..kind)
+          end
         ''')
 
     def test_scripted_families_import_their_exact_rights_and_a_disabled_family_cannot_reclaim_them(self):

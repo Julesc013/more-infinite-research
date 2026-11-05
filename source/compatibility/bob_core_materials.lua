@@ -58,18 +58,21 @@ function M.technologies(values, raw, active_mods, return_context)
   end
   local returns = require("compatibility.material_returns")
   local context = return_context and return_context() or returns.prepare(raw)
+  local unavailable = {}
   for _, definition in ipairs(DEFINITIONS) do
-    for _, route in ipairs(definition.routes) do
-      local recipe = raw.recipe[route.recipe]
-      returns.validate(raw, recipe.results, recipe.ingredients, context, route.recipe)
-    end
+    unavailable[definition.key] = routes.return_reason(raw, definition, context, fail) ~= nil
   end
   local output = {}
   for index, definition in ipairs(DEFINITIONS) do
     local stream = streams[index]
-    output[#output + 1] = stages.technology(definition, definition.early, stream, fail)
+    local early = stages.technology(definition, definition.early, stream, fail)
     local continuation = stages.technology(definition, definition.continuation, stream, fail)
     continuation.localised_description = continuation_description(definition, stream)
+    if unavailable[definition.key] then
+      stages.retain_disabled(early)
+      stages.retain_disabled(continuation)
+    end
+    output[#output + 1] = early
     output[#output + 1] = continuation
   end
   return output
