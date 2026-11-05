@@ -213,6 +213,72 @@ class CapsTests(unittest.TestCase):
             "a named reconciliation changed another family")
         ''')
 
+    def test_unavailable_entries_cancel_into_native_saved_work_without_a_queue_journal(self):
+        self.lua.execute('''
+          for _, progress in ipairs({0, .42, .999999}) do
+            local bronze = technology("bronze", 5, false)
+            local tin = technology("tin", 5, false)
+            local lead = technology("lead", 5, true)
+            local first, second = technology("automation", 1, true), technology("other", 1, true)
+            bronze.saved_progress, tin.saved_progress, lead.saved_progress = 0, .17, .27
+            local f = force(1, {bronze=bronze,tin=tin,lead=lead,automation=first,other=second},
+              {bronze,bronze,first,tin,second}, bronze, progress)
+            f.research_enabled = true
+            f.disable_research = function() error("force-wide research pause") end
+            f.enable_research = function() error("force-wide research switch") end
+            local result = caps.remove_unavailable_from_queue(f, {bronze=true,tin=true})
+            assert(result.queue_changed and result.removed_current == "bronze")
+            assert(f.current_research == first and f.research_progress == 0,
+              "cancelled investment must not transfer to unrelated current research")
+            assert(#f.research_queue == 2 and f.research_queue[1] == first and f.research_queue[2] == second)
+            assert(bronze.saved_progress == progress and lead.saved_progress == .27 and tin.saved_progress == .17)
+            assert(bronze.level == 5 and not bronze.researched and not bronze.enabled and f.research_enabled)
+            assert(f.worker_robots_speed_modifier == 7.15)
+            result = caps.remove_unavailable_from_queue(f, {bronze=true,tin=true})
+            assert(not result.queue_changed and bronze.saved_progress == progress)
+          end
+        ''')
+
+    def test_unavailable_future_entry_keeps_eligible_current_order_and_progress(self):
+        self.lua.execute('''
+          local current, bronze, last = technology("current",1,true), technology("bronze",5,false),
+            technology("last",1,true)
+          current.saved_progress, bronze.saved_progress = .12, .27
+          local f = force(1, {current=current,bronze=bronze,last=last}, {current,bronze,last}, current, .31)
+          local result = caps.remove_unavailable_from_queue(f, {bronze=true})
+          assert(result.queue_changed and result.removed_current == nil)
+          assert(f.current_research == current and f.research_progress == .31)
+          assert(current.saved_progress == .12 and bronze.saved_progress == .27)
+          assert(#f.research_queue == 2 and f.research_queue[1] == current and f.research_queue[2] == last)
+          assert(not caps.remove_unavailable_from_queue(f, {}).queue_changed)
+        ''')
+
+    def test_native_dropping_an_unselected_queue_entry_cannot_be_reported_preserved(self):
+        self.lua.execute('''
+          local bronze, foreign = technology("bronze",5,false), technology("foreign",1,false)
+          local f = force(1, {bronze=bronze,foreign=foreign}, {bronze,foreign}, bronze, .42)
+          local native_set = getmetatable(f).__newindex
+          getmetatable(f).__newindex = function(self, key, value)
+            if key == "research_queue" then value = {} end
+            native_set(self, key, value)
+          end
+          local ok, message = pcall(caps.remove_unavailable_from_queue, f, {bronze=true})
+          assert(not ok and tostring(message):find("dropped unselected research",1,true))
+          assert(foreign.level == 1 and not foreign.enabled and not foreign.researched)
+        ''')
+
+    def test_unrepresentable_current_work_refuses_before_queue_cancellation(self):
+        self.lua.execute('''
+          for _, progress in ipairs({-1, 1, math.huge, 0/0}) do
+            local bronze = technology("bronze",5,false)
+            local original = {bronze}
+            local f = force(1, {bronze=bronze}, original, bronze, progress)
+            local ok, message = pcall(caps.remove_unavailable_from_queue, f, {bronze=true})
+            assert(not ok and tostring(message):find("cannot preserve",1,true))
+            assert(f.research_queue == original and f.current_research == bronze and bronze.level == 5)
+          end
+        ''')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)

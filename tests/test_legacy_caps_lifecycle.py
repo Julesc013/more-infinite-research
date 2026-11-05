@@ -1,6 +1,7 @@
 """Host-only controls for one-shot historical cap restoration; not save evidence."""
 import argparse
 from pathlib import Path
+import subprocess
 import sys
 import unittest
 
@@ -24,6 +25,30 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
           function force(index, technologies)
             return {index = index, valid = true, technologies = technologies,
               research_queue = {}, research_progress = .42}
+          end
+          function modern_queued_force(index, technologies, queue, current, progress, drop_disabled)
+            local f = {index=index,valid=true,technologies=technologies,_queue=queue,
+              current_research=current,research_progress=progress,research_enabled=true,
+              recipes={bronze={productivity_bonus=.08},lead={productivity_bonus=.08}},queue_writes=0}
+            f.disable_research=function() error("force-global pause is not this correction") end
+            f.enable_research=function() error("force-global switch is not this correction") end
+            return setmetatable(f, {__index=function(self,key)
+              if key=="research_queue" then return rawget(self,"_queue") end
+            end, __newindex=function(self,key,value)
+              if key~="research_queue" then rawset(self,key,value);return end
+              if drop_disabled then
+                local accepted={}
+                for _,technology in ipairs(value) do
+                  if technology.enabled then accepted[#accepted+1]=technology end
+                end
+                value=accepted
+              end
+              rawset(self,"queue_writes",self.queue_writes+1)
+              rawset(self,"_queue",value)
+              rawset(self,"current_research",value[1])
+              -- Deliberately provide no automatic saved-work guarantee.
+              rawset(self,"research_progress",value[1] and 0 or nil)
+            end})
           end
           function worker(name)
             local result = technology(name)
@@ -1293,6 +1318,89 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             lifecycle.on_configuration_changed()
             assert(not item.enabled,"foreign enablement right manufactured: "..kind)
           end
+        ''')
+
+    def test_actual_unavailable_work_regression_uses_native_saved_progress_and_preserves_foreign_state(self):
+        baseline = "6560ba2bf2c088d94a3273b60d8237aa2fcc914b"
+        for corrected in (False, True):
+            with self.subTest(corrected=corrected):
+                self.setUp()
+                self.lua.globals().corrected = corrected
+                for module in ("caps", "lifecycle"):
+                    self.lua.globals()["baseline_" + module] = subprocess.check_output(
+                        ["git", "show", f"{baseline}:source/runtime/{module}.lua"], cwd=ROOT
+                    ).decode("utf-8")
+                self.lua.execute('''
+                  local bronze_name = "recipe-prod-research_material_bronze-4"
+                  local lead_name = "recipe-prod-research_material_lead-4"
+                  local tin_name = "recipe-prod-research_material_tin-4"
+                  local bronze, lead, automation, tin = technology(bronze_name), technology(lead_name),
+                    technology("automation"), technology(tin_name)
+                  bronze.level, bronze.enabled, bronze.saved_progress = 5, true, 0
+                  bronze.prototype.enabled = false
+                  lead.level, lead.enabled, lead.saved_progress = 5, true, .27
+                  automation.level, automation.enabled, automation.saved_progress = 1, true, 0
+                  tin.level, tin.saved_progress, tin.prototype.enabled = 4, .17, false
+                  local player = modern_queued_force(1,{[bronze_name]=bronze,[lead_name]=lead,
+                    automation=automation},{bronze,bronze,automation},bronze,.42)
+                  local probe = technology("automation");probe.level,probe.enabled=1,true
+                  local foreign_lead=technology(lead_name);foreign_lead.saved_progress=.17
+                  local foreign = modern_queued_force(2,{automation=probe,[tin_name]=tin,[lead_name]=foreign_lead},
+                    {probe},probe,.31)
+                  local selected={base="2.1.23",['space-age']="2.1.23",boblibrary="3.0.1",
+                    bobores="3.0.0",bobplates="3.0.2",bobelectronics="3.0.1",bobtech="3.0.0",
+                    bobassembly="3.0.2",bobenemies="3.0.1",bobequipment="3.0.0",bobgreenhouse="3.0.1",
+                    bobinserters="3.0.0",boblogistics="3.0.2",bobmining="3.0.2",bobmodules="3.0.1",
+                    bobpower="3.0.1",bobrevamp="3.0.1",bobvehicleequipment="3.0.0",bobwarfare="3.0.2"}
+                  boot({[1]=player,[2]=foreign},nil,nil,{active_mods=selected})
+                  if not corrected then
+                    package.loaded["runtime.caps"] = assert(load(baseline_caps,"0CB9-caps","t",_G))()
+                    lifecycle = assert(load(baseline_lifecycle,"0CB9-lifecycle","t",_G))()
+                  end
+                  lifecycle.on_configuration_changed()
+                  -- Actual8DC diagnostic: enabled=false alone does not stop
+                  -- already-current native lab work. One more set adds .01.
+                  if player.current_research then player.research_progress=player.research_progress+.01 end
+                  if corrected then
+                    assert(player.current_research==automation and player.research_progress==.01)
+                    assert(#player.research_queue==1 and player.research_queue[1]==automation)
+                    assert(bronze.saved_progress==.42 and lead.saved_progress==.27)
+                    lifecycle.on_technology_effects_reset({force=player})
+                    assert(bronze.saved_progress==.42 and lead.saved_progress==.27)
+                    assert(storage.mir_caps.owned_disabled[1][bronze_name].disabled==true)
+                  else
+                    assert(player.current_research==bronze and math.abs(player.research_progress-.43)<1e-12,
+                      "the exact old source must reproduce the native42-to43 failure")
+                    assert(#player.research_queue==3 and bronze.saved_progress==0)
+                  end
+                  assert(not bronze.enabled and bronze.level==5 and not bronze.researched)
+                  assert(player.recipes.bronze.productivity_bonus==.08 and player.recipes.lead.productivity_bonus==.08)
+                  assert(foreign.current_research==probe and foreign.research_progress==.31
+                    and #foreign.research_queue==1 and foreign.research_queue[1]==probe)
+                  assert(not tin.enabled and tin.saved_progress==.17 and foreign_lead.saved_progress==.17)
+                  assert(player.research_enabled and foreign.research_enabled)
+                  assert(storage.mir.unrelated.keep)
+                ''')
+
+    def test_unavailable_investment_is_saved_before_another_cap_rewrites_the_queue(self):
+        self.lua.execute('''
+          local name="recipe-prod-research_material_bronze-4"
+          local bronze=technology(name)
+          bronze.level,bronze.enabled,bronze.saved_progress,bronze.prototype.enabled=5,true,0,false
+          local capped=worker("worker-robots-speed-6");capped.level,capped.enabled=11,true
+          local eligible=technology("automation");eligible.level,eligible.enabled=1,true
+          local f=modern_queued_force(1,{[name]=bronze,[capped.name]=capped,automation=eligible},
+            {bronze,bronze,capped,eligible},bronze,.42,true)
+          local selected={base="2.1.23",['space-age']="2.1.23",boblibrary="3.0.1",
+            bobores="3.0.0",bobplates="3.0.2",bobelectronics="3.0.1",bobtech="3.0.0"}
+          boot({[1]=f},nil,nil,{active_mods=selected,worker_limit=10})
+          lifecycle.on_configuration_changed()
+          assert(bronze.saved_progress==.42,
+            "a cap rewrite dropped the disabled current before its investment was saved")
+          assert(f.queue_writes==2 and f.current_research==eligible and f.research_progress==0)
+          assert(#f.research_queue==1 and f.research_queue[1]==eligible)
+          assert(not bronze.enabled and bronze.level==5 and not capped.enabled and capped.level==11)
+          assert(f.recipes.bronze.productivity_bonus==.08 and f.research_enabled)
         ''')
 
     def test_scripted_families_import_their_exact_rights_and_a_disabled_family_cannot_reclaim_them(self):

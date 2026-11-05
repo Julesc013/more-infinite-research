@@ -460,6 +460,7 @@ class BobCoreMaterialTests(unittest.TestCase):
         declared = _plain(runtime.execute('return require("research.catalogue").declared()'))
         for row in declared:
             self.assertEqual(row["id"] in set(self.expected_ids()), row.get("retain_unavailable_cap_right", False))
+            self.assertEqual(row["id"] in set(self.expected_ids()), row.get("cancel_queued_when_unavailable", False))
         declared_by_id = {row["id"]: row for row in declared}
         expected_ids = self.expected_ids()
         self.assertEqual(expected_ids, [row["id"] for row in declared if row["id"] in set(expected_ids)])
