@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "kind": "mir5-ric-marine-context",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "real-industrial-chemistry",
+      "version": "0.35.8",
+      "enabled": true
+    },
+    {
+      "name": "forgeworks-core",
+      "version": "0.3.1",
+      "enabled": true
+    },
+    {
+      "name": "angelsrefininggraphics",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "angelssmeltinggraphics",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "angelspetrochemgraphics",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "pyhightechgraphics",
+      "version": "3.1.0",
+      "enabled": true
+    },
+    {
+      "name": "pyalternativeenergygraphics",
+      "version": "3.1.0",
+      "enabled": true
+    },
+    {
+      "name": "pycoalprocessinggraphics",
+      "version": "3.1.0",
+      "enabled": true
+    },
+    {
+      "name": "pyfusionenergygraphics",
+      "version": "3.1.0",
+      "enabled": true
+    },
+    {
+      "name": "pyraworesgraphics",
+      "version": "3.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-ric-marine-context",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "real-industrial-chemistry_0.35.8.zip": "82108D668EA334ED71006D91A58D32D1229AF191CEF719E213AFFE5E9D26AA2F",
+    "forgeworks-core_0.3.1.zip": "1566C523C460C42E693764ECA2490C0D7C76A44E54C247D7C47092A839FD90CF",
+    "angelsrefininggraphics_2.1.0.zip": "79F373BC628F619EDE3B1875827172390D2C3F5EAB56310F6F1572C4553CB6EF",
+    "angelssmeltinggraphics_2.1.0.zip": "EBEF8D1F6F13F84B242DF295CE9FAB9618ED90B4C52852A0B4345908A88D5D35",
+    "angelspetrochemgraphics_2.1.0.zip": "DECDC2FCD5BBBDEF70784943C142C30FAA7294B98E814296C5D44D09A9DE4790",
+    "pyhightechgraphics_3.1.0.zip": "41DC5876271A3D2C4A84081BEE4C9536A0C9C9A63FD7C4C75A522727E37AC903",
+    "pyalternativeenergygraphics_3.1.0.zip": "30E97A4EFDFECA62D0ABB24F8C95770038337F984823AE0885136CAC7D4BA88C",
+    "pycoalprocessinggraphics_3.1.0.zip": "FBFC18F0F5374EC9AA8670308A280DE3C40F83AA547C5752ACCE7B7B96736563",
+    "pyfusionenergygraphics_3.1.0.zip": "918216B066269F1119E9D6EF9F1E87835C2B4B7F868DAC7ACD3BBBD156D34454",
+    "pyraworesgraphics_3.1.0.zip": "A360A0B6367D38FB41AAE7A6ACF956EAFBCAA01AF81914F756FD50212DDF6519",
+    "mir-fixture-mir5-ric-marine-context_0.1.0.zip": "2B2378060B258991DB17266F0D0A8A85AF5B188BD735E9850021E48EEEDA2D2C",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "0C09026A8171161E51FEA5CC3EA762CC3B3774389041A6A15DF11EDC3FB8E428"
+  },
+  "case": "ric-marine-context",
+  "consumer_markers": [
+    "MIR5_RIC_CONTEXT"
+  ],
+  "scope": "Available RIC0.35.8 Marine/nauvis-only full installed context without MIR. Observe actual startup/native recipe facts; no research grant,emission compatibility,paid-state or0.36.1 equivalence claim."
+}
