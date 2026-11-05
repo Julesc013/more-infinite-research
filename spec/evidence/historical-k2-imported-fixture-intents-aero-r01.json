@@ -1,0 +1,687 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalK2ImportedFixtureIntentReviewV1",
+  "reviewed_on": "2026-11-05",
+  "reviewed_against": "9e6ecc87ba875c76921a1ce90c4962ce31e649d1",
+  "player_tree": "41d36ed8db131404692d5c054da3c87f7b54aecb",
+  "scope": "Latest470 K2 full-state fixture, companion sentinel and two profiles; separately identified older six-body context. Direct source-intent review only; no current result relabelled.",
+  "input_inventory_sha256": "B7A5F00C589A3E5D529A6A25DF18297ADC7B8981AFE33C4CFF67CD5336FF27E1",
+  "source_count": 13,
+  "latest_selected_source_count": 7,
+  "older_context_source_count": 6,
+  "live_tag_path_bindings": 52,
+  "sources": [
+    {
+      "git_blob": "8430d8ad76e4e61e3e9f2860343d167a27d2ef4a",
+      "bytes": 29214,
+      "sha256": "81F88F1484872094552BE674B4685AC0D70E8D7FFE1FC7AFC484E9B7194189DA",
+      "raw_encoding": "UTF-8; raw Git blob bytes preserved; line endings not normalized",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/control.lua",
+          "tag_object": "82d5a7279ddc236b31539d84f8ea1b0dba904956",
+          "tree": "903cb2b99531bdc9fdf65fcddbdf786a18c88ec1"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/control.lua",
+          "tag_object": "dfaced5d79e2261b3f73805d4a36388837ce4813",
+          "tree": "95a9faae65c8aa43b1ee28ce476edcc031bcd6ec"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/control.lua",
+          "tag_object": "0b1e67113ac0df056b3bfbbcdea870016837f8ee",
+          "tree": "7780dc4dbcb534e92ff337e3aebab62d2e5305e5"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/control.lua",
+          "tag_object": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+          "tree": "7dc6f1f1140ce763d848605eaffc645a5310871b"
+        }
+      ],
+      "body_encoding_note": "Decoded UTF-8 representation of exact raw Git blob; JSON escaping preserves CR/LF bytes on re-encoding.",
+      "selection_class": "latest-4.7.0-full-state-lane-selected",
+      "selection_role": "latest-selected"
+    },
+    {
+      "git_blob": "1724189d03e5d3d3068d811685d1e6e5ed49112a",
+      "bytes": 281,
+      "sha256": "4F1F61824307B068BD71167BA3EE3500CF9F5265D49A42C1D53E5BFB0C39A07C",
+      "raw_encoding": "UTF-8; raw Git blob bytes preserved; line endings not normalized",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/data-final-fixes.lua",
+          "tag_object": "82d5a7279ddc236b31539d84f8ea1b0dba904956",
+          "tree": "903cb2b99531bdc9fdf65fcddbdf786a18c88ec1"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/data-final-fixes.lua",
+          "tag_object": "dfaced5d79e2261b3f73805d4a36388837ce4813",
+          "tree": "95a9faae65c8aa43b1ee28ce476edcc031bcd6ec"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/data-final-fixes.lua",
+          "tag_object": "0b1e67113ac0df056b3bfbbcdea870016837f8ee",
+          "tree": "7780dc4dbcb534e92ff337e3aebab62d2e5305e5"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/data-final-fixes.lua",
+          "tag_object": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+          "tree": "7dc6f1f1140ce763d848605eaffc645a5310871b"
+        }
+      ],
+      "body_encoding_note": "Decoded UTF-8 representation of exact raw Git blob; JSON escaping preserves CR/LF bytes on re-encoding.",
+      "selection_class": "latest-4.7.0-full-state-lane-selected",
+      "selection_role": "latest-selected"
+    },
+    {
+      "git_blob": "4ecc86489fffbef3e87b3e4e9faf7186072de8a3",
+      "bytes": 344,
+      "sha256": "256B34E5A7EDE1F979C0E53FDDDE1F73F50903EBD6CB398FCBE027F3351E7C81",
+      "raw_encoding": "UTF-8; raw Git blob bytes preserved; line endings not normalized",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/info.json",
+          "tag_object": "82d5a7279ddc236b31539d84f8ea1b0dba904956",
+          "tree": "903cb2b99531bdc9fdf65fcddbdf786a18c88ec1"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/info.json",
+          "tag_object": "dfaced5d79e2261b3f73805d4a36388837ce4813",
+          "tree": "95a9faae65c8aa43b1ee28ce476edcc031bcd6ec"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/info.json",
+          "tag_object": "0b1e67113ac0df056b3bfbbcdea870016837f8ee",
+          "tree": "7780dc4dbcb534e92ff337e3aebab62d2e5305e5"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/info.json",
+          "tag_object": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+          "tree": "7dc6f1f1140ce763d848605eaffc645a5310871b"
+        }
+      ],
+      "body_encoding_note": "Decoded UTF-8 representation of exact raw Git blob; JSON escaping preserves CR/LF bytes on re-encoding.",
+      "selection_class": "latest-4.7.0-full-state-lane-selected",
+      "selection_role": "latest-selected"
+    },
+    {
+      "git_blob": "4a9d4d81dba651f919fb50e1f76f5c6fa0370b38",
+      "bytes": 7850,
+      "sha256": "C41C7D80BF734CA4071685B3B9148027C5FD4C6E4554ACBF40B5751CB334C118",
+      "raw_encoding": "UTF-8; raw Git blob bytes preserved; line endings not normalized",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/assert-k2-213-imersite-continuation/control.lua",
+          "tag_object": "82d5a7279ddc236b31539d84f8ea1b0dba904956",
+          "tree": "903cb2b99531bdc9fdf65fcddbdf786a18c88ec1"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/assert-k2-213-imersite-continuation/control.lua",
+          "tag_object": "dfaced5d79e2261b3f73805d4a36388837ce4813",
+          "tree": "95a9faae65c8aa43b1ee28ce476edcc031bcd6ec"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/assert-k2-213-imersite-continuation/control.lua",
+          "tag_object": "0b1e67113ac0df056b3bfbbcdea870016837f8ee",
+          "tree": "7780dc4dbcb534e92ff337e3aebab62d2e5305e5"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/assert-k2-213-imersite-continuation/control.lua",
+          "tag_object": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+          "tree": "7dc6f1f1140ce763d848605eaffc645a5310871b"
+        }
+      ],
+      "body_encoding_note": "Decoded UTF-8 representation of exact raw Git blob; JSON escaping preserves CR/LF bytes on re-encoding.",
+      "selection_class": "preserved-older-helper-context-not-consumed-by-latest-full-state-lane",
+      "selection_role": "older-context-only"
+    },
+    {
+      "git_blob": "34535c0e3d01298aea60e222e92cc425bf1c97de",
+      "bytes": 2613,
+      "sha256": "12579B151D3891D79C08308D4B878ECC3D2C71AB78AAA4C0800D9C0AAD68AE92",
+      "raw_encoding": "UTF-8; raw Git blob bytes preserved; line endings not normalized",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/assert-k2-213-imersite-continuation/data-final-fixes.lua",
+          "tag_object": "82d5a7279ddc236b31539d84f8ea1b0dba904956",
+          "tree": "903cb2b99531bdc9fdf65fcddbdf786a18c88ec1"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/assert-k2-213-imersite-continuation/data-final-fixes.lua",
+          "tag_object": "dfaced5d79e2261b3f73805d4a36388837ce4813",
+          "tree": "95a9faae65c8aa43b1ee28ce476edcc031bcd6ec"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/assert-k2-213-imersite-continuation/data-final-fixes.lua",
+          "tag_object": "0b1e67113ac0df056b3bfbbcdea870016837f8ee",
+          "tree": "7780dc4dbcb534e92ff337e3aebab62d2e5305e5"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/assert-k2-213-imersite-continuation/data-final-fixes.lua",
+          "tag_object": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+          "tree": "7dc6f1f1140ce763d848605eaffc645a5310871b"
+        }
+      ],
+      "body_encoding_note": "Decoded UTF-8 representation of exact raw Git blob; JSON escaping preserves CR/LF bytes on re-encoding.",
+      "selection_class": "preserved-older-helper-context-not-consumed-by-latest-full-state-lane",
+      "selection_role": "older-context-only"
+    },
+    {
+      "git_blob": "ed46bba96fff737567e08047482fb16c3f07f8dd",
+      "bytes": 358,
+      "sha256": "BB318EF7E83F505621E3A7A8CA751AA4252F1734465F243E24C24560D140C157",
+      "raw_encoding": "UTF-8; raw Git blob bytes preserved; line endings not normalized",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/assert-k2-213-imersite-continuation/info.json",
+          "tag_object": "82d5a7279ddc236b31539d84f8ea1b0dba904956",
+          "tree": "903cb2b99531bdc9fdf65fcddbdf786a18c88ec1"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/assert-k2-213-imersite-continuation/info.json",
+          "tag_object": "dfaced5d79e2261b3f73805d4a36388837ce4813",
+          "tree": "95a9faae65c8aa43b1ee28ce476edcc031bcd6ec"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/assert-k2-213-imersite-continuation/info.json",
+          "tag_object": "0b1e67113ac0df056b3bfbbcdea870016837f8ee",
+          "tree": "7780dc4dbcb534e92ff337e3aebab62d2e5305e5"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/assert-k2-213-imersite-continuation/info.json",
+          "tag_object": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+          "tree": "7dc6f1f1140ce763d848605eaffc645a5310871b"
+        }
+      ],
+      "body_encoding_note": "Decoded UTF-8 representation of exact raw Git blob; JSON escaping preserves CR/LF bytes on re-encoding.",
+      "selection_class": "preserved-older-helper-context-not-consumed-by-latest-full-state-lane",
+      "selection_role": "older-context-only"
+    },
+    {
+      "git_blob": "37d8fb359f5575ef4451ac0929fa021ae9acc8b6",
+      "bytes": 252,
+      "sha256": "8F8E87E7F4E11E65F07E06BA524C121B1DB1F1D9B9BFCDA0BE2976467BEDBA4F",
+      "raw_encoding": "UTF-8; raw Git blob bytes preserved; line endings not normalized",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/assert-k2-213-imersite-continuation/settings-updates.lua",
+          "tag_object": "82d5a7279ddc236b31539d84f8ea1b0dba904956",
+          "tree": "903cb2b99531bdc9fdf65fcddbdf786a18c88ec1"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/assert-k2-213-imersite-continuation/settings-updates.lua",
+          "tag_object": "dfaced5d79e2261b3f73805d4a36388837ce4813",
+          "tree": "95a9faae65c8aa43b1ee28ce476edcc031bcd6ec"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/assert-k2-213-imersite-continuation/settings-updates.lua",
+          "tag_object": "0b1e67113ac0df056b3bfbbcdea870016837f8ee",
+          "tree": "7780dc4dbcb534e92ff337e3aebab62d2e5305e5"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/assert-k2-213-imersite-continuation/settings-updates.lua",
+          "tag_object": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+          "tree": "7dc6f1f1140ce763d848605eaffc645a5310871b"
+        }
+      ],
+      "body_encoding_note": "Decoded UTF-8 representation of exact raw Git blob; JSON escaping preserves CR/LF bytes on re-encoding.",
+      "selection_class": "preserved-older-helper-context-not-consumed-by-latest-full-state-lane",
+      "selection_role": "older-context-only"
+    },
+    {
+      "git_blob": "08953b8f0235561537481551e474268624f161da",
+      "bytes": 8571,
+      "sha256": "A07D99D2E66545A4E983290F8E197DA9FC84FEF6E7277183F0025F451F16B053",
+      "raw_encoding": "UTF-8; raw Git blob bytes preserved; line endings not normalized",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/assert-k2-213-imersite-continuation-migration/control.lua",
+          "tag_object": "82d5a7279ddc236b31539d84f8ea1b0dba904956",
+          "tree": "903cb2b99531bdc9fdf65fcddbdf786a18c88ec1"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/assert-k2-213-imersite-continuation-migration/control.lua",
+          "tag_object": "dfaced5d79e2261b3f73805d4a36388837ce4813",
+          "tree": "95a9faae65c8aa43b1ee28ce476edcc031bcd6ec"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/assert-k2-213-imersite-continuation-migration/control.lua",
+          "tag_object": "0b1e67113ac0df056b3bfbbcdea870016837f8ee",
+          "tree": "7780dc4dbcb534e92ff337e3aebab62d2e5305e5"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/assert-k2-213-imersite-continuation-migration/control.lua",
+          "tag_object": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+          "tree": "7dc6f1f1140ce763d848605eaffc645a5310871b"
+        }
+      ],
+      "body_encoding_note": "Decoded UTF-8 representation of exact raw Git blob; JSON escaping preserves CR/LF bytes on re-encoding.",
+      "selection_class": "preserved-older-helper-context-not-consumed-by-latest-full-state-lane",
+      "selection_role": "older-context-only"
+    },
+    {
+      "git_blob": "0f381d9bc6faf64c14fc20dbdc2c128d38d4151b",
+      "bytes": 377,
+      "sha256": "8B9BDFB9D01D371D5D8D9C905F202E9F41E62B07FA0464284847E2702515209A",
+      "raw_encoding": "UTF-8; raw Git blob bytes preserved; line endings not normalized",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/assert-k2-213-imersite-continuation-migration/info.json",
+          "tag_object": "82d5a7279ddc236b31539d84f8ea1b0dba904956",
+          "tree": "903cb2b99531bdc9fdf65fcddbdf786a18c88ec1"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/assert-k2-213-imersite-continuation-migration/info.json",
+          "tag_object": "dfaced5d79e2261b3f73805d4a36388837ce4813",
+          "tree": "95a9faae65c8aa43b1ee28ce476edcc031bcd6ec"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/assert-k2-213-imersite-continuation-migration/info.json",
+          "tag_object": "0b1e67113ac0df056b3bfbbcdea870016837f8ee",
+          "tree": "7780dc4dbcb534e92ff337e3aebab62d2e5305e5"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/assert-k2-213-imersite-continuation-migration/info.json",
+          "tag_object": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+          "tree": "7dc6f1f1140ce763d848605eaffc645a5310871b"
+        }
+      ],
+      "body_encoding_note": "Decoded UTF-8 representation of exact raw Git blob; JSON escaping preserves CR/LF bytes on re-encoding.",
+      "selection_class": "preserved-older-helper-context-not-consumed-by-latest-full-state-lane",
+      "selection_role": "older-context-only"
+    },
+    {
+      "git_blob": "b28820deebfc973125e029b2834263eb777f16bc",
+      "bytes": 6169,
+      "sha256": "B8E2D280C0DE75C3EB0A0289911461439B6B10CF6F24C40497CA39CB5AFB3F87",
+      "raw_encoding": "UTF-8; raw Git blob bytes preserved; line endings not normalized",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/aaa-mir47-owned-speed-sentinel/control.lua",
+          "tag_object": "82d5a7279ddc236b31539d84f8ea1b0dba904956",
+          "tree": "903cb2b99531bdc9fdf65fcddbdf786a18c88ec1"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/aaa-mir47-owned-speed-sentinel/control.lua",
+          "tag_object": "dfaced5d79e2261b3f73805d4a36388837ce4813",
+          "tree": "95a9faae65c8aa43b1ee28ce476edcc031bcd6ec"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/aaa-mir47-owned-speed-sentinel/control.lua",
+          "tag_object": "0b1e67113ac0df056b3bfbbcdea870016837f8ee",
+          "tree": "7780dc4dbcb534e92ff337e3aebab62d2e5305e5"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/aaa-mir47-owned-speed-sentinel/control.lua",
+          "tag_object": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+          "tree": "7dc6f1f1140ce763d848605eaffc645a5310871b"
+        }
+      ],
+      "body_encoding_note": "Decoded UTF-8 representation of exact raw Git blob; JSON escaping preserves CR/LF bytes on re-encoding.",
+      "selection_class": "latest-4.7.0-full-state-lane-selected",
+      "selection_role": "latest-selected"
+    },
+    {
+      "git_blob": "2fd4ea803b362315f7ae09cc6e877e5fc6d14175",
+      "bytes": 239,
+      "sha256": "56ADD111B20A76C8B52947FD496AAA670EED7534969C5C70C5F68C6C753C1742",
+      "raw_encoding": "UTF-8; raw Git blob bytes preserved; line endings not normalized",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/aaa-mir47-owned-speed-sentinel/info.json",
+          "tag_object": "82d5a7279ddc236b31539d84f8ea1b0dba904956",
+          "tree": "903cb2b99531bdc9fdf65fcddbdf786a18c88ec1"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/aaa-mir47-owned-speed-sentinel/info.json",
+          "tag_object": "dfaced5d79e2261b3f73805d4a36388837ce4813",
+          "tree": "95a9faae65c8aa43b1ee28ce476edcc031bcd6ec"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/aaa-mir47-owned-speed-sentinel/info.json",
+          "tag_object": "0b1e67113ac0df056b3bfbbcdea870016837f8ee",
+          "tree": "7780dc4dbcb534e92ff337e3aebab62d2e5305e5"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/aaa-mir47-owned-speed-sentinel/info.json",
+          "tag_object": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+          "tree": "7dc6f1f1140ce763d848605eaffc645a5310871b"
+        }
+      ],
+      "body_encoding_note": "Decoded UTF-8 representation of exact raw Git blob; JSON escaping preserves CR/LF bytes on re-encoding.",
+      "selection_class": "latest-4.7.0-full-state-lane-selected",
+      "selection_role": "latest-selected"
+    },
+    {
+      "git_blob": "1301187871180bd05baed51aa543bc2702337c22",
+      "bytes": 2106,
+      "sha256": "106AB7A6BAEEDE8090CFBAC91CA3C3B7B8D8D470EB63AAEB14FC39ADB9D397A4",
+      "raw_encoding": "UTF-8; raw Git blob bytes preserved; line endings not normalized",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/run-profiles/k2-214-imersite-f210-470.json",
+          "tag_object": "82d5a7279ddc236b31539d84f8ea1b0dba904956",
+          "tree": "903cb2b99531bdc9fdf65fcddbdf786a18c88ec1"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/run-profiles/k2-214-imersite-f210-470.json",
+          "tag_object": "dfaced5d79e2261b3f73805d4a36388837ce4813",
+          "tree": "95a9faae65c8aa43b1ee28ce476edcc031bcd6ec"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/run-profiles/k2-214-imersite-f210-470.json",
+          "tag_object": "0b1e67113ac0df056b3bfbbcdea870016837f8ee",
+          "tree": "7780dc4dbcb534e92ff337e3aebab62d2e5305e5"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/run-profiles/k2-214-imersite-f210-470.json",
+          "tag_object": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+          "tree": "7dc6f1f1140ce763d848605eaffc645a5310871b"
+        }
+      ],
+      "body_encoding_note": "Decoded UTF-8 representation of exact raw Git blob; JSON escaping preserves CR/LF bytes on re-encoding.",
+      "selection_class": "latest-4.7.0-full-state-lane-selected",
+      "selection_role": "latest-selected"
+    },
+    {
+      "git_blob": "11e018a88ed1fdb5fb53215c8ac2f8617557e6e4",
+      "bytes": 2107,
+      "sha256": "DC6EE665BDE9D734CF325F1C91902914CE6D6EB79038C1F6A4D7A52425E2F788",
+      "raw_encoding": "UTF-8; raw Git blob bytes preserved; line endings not normalized",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "fixtures/run-profiles/k2-214-imersite-f210-470-2123.json",
+          "tag_object": "82d5a7279ddc236b31539d84f8ea1b0dba904956",
+          "tree": "903cb2b99531bdc9fdf65fcddbdf786a18c88ec1"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "fixtures/run-profiles/k2-214-imersite-f210-470-2123.json",
+          "tag_object": "dfaced5d79e2261b3f73805d4a36388837ce4813",
+          "tree": "95a9faae65c8aa43b1ee28ce476edcc031bcd6ec"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "fixtures/run-profiles/k2-214-imersite-f210-470-2123.json",
+          "tag_object": "0b1e67113ac0df056b3bfbbcdea870016837f8ee",
+          "tree": "7780dc4dbcb534e92ff337e3aebab62d2e5305e5"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "fixtures/run-profiles/k2-214-imersite-f210-470-2123.json",
+          "tag_object": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+          "tree": "7dc6f1f1140ce763d848605eaffc645a5310871b"
+        }
+      ],
+      "body_encoding_note": "Decoded UTF-8 representation of exact raw Git blob; JSON escaping preserves CR/LF bytes on re-encoding.",
+      "selection_class": "latest-4.7.0-full-state-lane-selected",
+      "selection_role": "latest-selected"
+    }
+  ],
+  "latest_selector_partition": {
+    "selection_basis": [
+      "tests/support/MIR421K2Upgrade.ps1:52-62",
+      "tests/support/MIR421K2Upgrade.ps1:74-82",
+      "tests/runtime/Test-MIRUpgrade.ps1:609-617",
+      "tests/runtime/Test-MIRUpgrade.ps1:1287-1290"
+    ],
+    "latest_selected_paths": [
+      "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/control.lua",
+      "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/data-final-fixes.lua",
+      "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/info.json",
+      "fixtures/aaa-mir47-owned-speed-sentinel/control.lua",
+      "fixtures/aaa-mir47-owned-speed-sentinel/info.json",
+      "fixtures/run-profiles/k2-214-imersite-f210-470.json",
+      "fixtures/run-profiles/k2-214-imersite-f210-470-2123.json"
+    ],
+    "latest_selected_source_count": 7,
+    "older_context_paths_not_consumed_by_latest_lane": [
+      "fixtures/assert-k2-213-imersite-continuation/control.lua",
+      "fixtures/assert-k2-213-imersite-continuation/data-final-fixes.lua",
+      "fixtures/assert-k2-213-imersite-continuation/info.json",
+      "fixtures/assert-k2-213-imersite-continuation/settings-updates.lua",
+      "fixtures/assert-k2-213-imersite-continuation-migration/control.lua",
+      "fixtures/assert-k2-213-imersite-continuation-migration/info.json"
+    ],
+    "older_context_source_count": 6,
+    "replacement_rule": "The selected full-state fixture path is copied to $stagedFixture. Profile validation requires the coexisting fresh-game continuation fixture identity, but lines 53-54 explicitly exclude that fixture and replace it with the staged upgrade fixture. The older migration fixture directory is not referenced by the latest specialization; its staged migration body comes from the selected upgrade fixture."
+  },
+  "groups": [
+    {
+      "id": "k2-declared-powder-and-crystal-ownership",
+      "original": "Full-state control184-236; older continuation data-final-fixes22-53",
+      "expectation": "MIR powder effect is2% per level. Native crystal research remains its separate10% owner. No MIR powder row or private holder acquires crystal effects. Public early domain is levels1-3; an admitted unlimited continuation starts at4 and requires the finite stage.",
+      "implementation": [
+        "source/research/k2_imersite.lua",
+        "source/research/modern.lua",
+        "source/runtime/k2_imersite_migration.lua"
+      ],
+      "controls": [
+        "tests/test_k2_imersite_migration.py",
+        "tests/test_k2_imersite_transition_fixture.py"
+      ],
+      "disposition": "retain named identities, distinct effect ownership and progression; apply declared current cap policy rather than assuming source cap0"
+    },
+    {
+      "id": "k2-paid-current-and-queued-work",
+      "original": "Full-state control276-306,405-445,499-526",
+      "expectation": "Original synthetic completed0,2,3,7 cases keep powder completed*0.02, crystal0.10 and current42% work. Cases below3 retain the early queue; cases at/above3 complete only the finite stage and transfer the next-level/queue to4 or8 without extra awards. Current/queued/detached work and actual protected source remain distinct.",
+      "implementation": [
+        "source/runtime/k2_imersite_migration.lua::plan",
+        "source/runtime/k2_imersite_migration.lua::reconcile_force"
+      ],
+      "controls": [
+        "tests/test_k2_imersite_migration.py::test_all_released_boundary_levels_map_without_awarding_credit",
+        "tests/test_k2_imersite_migration.py::test_handoff_keeps_bonus_offset_progress_and_consumes_only_holders",
+        "tests/test_k2_imersite_migration.py::test_detached_work_handoff_never_sets_force_progress_without_current_research"
+      ],
+      "disposition": "retain independently authored state invariants; old direct level/progress setters are synthetic fixture setup, not earned-lab evidence"
+    },
+    {
+      "id": "k2-private-holders-and-failed-handoff",
+      "original": "Full-state control217-235,367-403",
+      "expectation": "The two named private carriers remain hidden/non-enqueueable; a completed handoff clears their duplicate earned work, saved progress and queue/current presence. The original oracle explicitly compares the early holder investment descriptor with the prior public early unit at367-374/393. It does not invoke that descriptor comparison for the continuation holder; any such assurance requires separate applicable evidence. Unknown/conflicting state must not be consumed to obtain a pass.",
+      "implementation": [
+        "source/research/k2_imersite.lua::carriers",
+        "source/runtime/k2_imersite_migration.lua::reconcile_force",
+        "source/runtime/library.lua"
+      ],
+      "controls": [
+        "tests/test_k2_imersite_migration.py::test_queue_refusal_rolls_back_named_states_and_retains_carrier_credit",
+        "tests/test_k2_imersite_migration.py::test_malformed_or_conflicting_sources_fail_before_consumption"
+      ],
+      "disposition": "retain named preservation and refusal; use current transactional handoff rather than restoring old compiled holder construction"
+    },
+    {
+      "id": "k2-full-state-and-owned-foreign-effects",
+      "original": "Full-state control83-163,238-275,377-403,447-486",
+      "expectation": "Preserve the captured technology states/definitions, recipe bonuses, listed23 force modifiers, startup settings and every captured force queue/current/progress except an independently justified named change. The external owned-speed sentinel captures0.125 over its own baseline and restores only its own recorded contribution exactly once; it is not an opaque universal modifier reset.",
+      "implementation": [
+        "source/runtime/k2_imersite_migration.lua",
+        "source/runtime/lifecycle.lua"
+      ],
+      "controls": [
+        "tests/test_k2_imersite_migration.py",
+        "tests/test_scripted_effects_lifecycle.py"
+      ],
+      "reused_review": "spec/evidence/historical-k2-owned-sentinel-intent-aero-r01.json",
+      "disposition": "retain independently bounded snapshots/foreign ownership; old recorder and marker syntax have no new player API authority"
+    },
+    {
+      "id": "k2-reviewed-v7-science-delta",
+      "original": "Full-state control308-364,377-390",
+      "expectation": "The historical comparator permits only the explicitly enumerated25 technology identities to remove named early-science ingredients/prerequisites when the independently declared late-science source exists; it otherwise rejects definition/state changes or unapproved additions. This is not an allowance learned from candidate output.",
+      "implementation": [
+        "source/research/science.lua",
+        "source/compatibility/science_bindings.lua"
+      ],
+      "controls": [
+        "tests/test_science.py"
+      ],
+      "disposition": "retain original named science/default intent; exact current-candidate profile and full definition-output mapping remains a separate unresolved applicability check"
+    },
+    {
+      "id": "k2-cold-reload-and-observed-failure",
+      "original": "Full-state control532-573",
+      "expectation": "Retain distinct source, observed-before-check, verified upgrade, requested successor save and actual cold reload stages. Upgrade-time on_load is not a cold pass. Local on_load flags defer assertions and save work to a tick; a failed observation remains failed.",
+      "implementation": [
+        "tests/fixtures/k2-imersite-transition",
+        "tools/Invoke-NativeFixture.ps1"
+      ],
+      "controls": [
+        "tests/test_k2_imersite_transition_fixture.py"
+      ],
+      "disposition": "retain lifecycle meaning; retire private old marker/save filenames without relabelling original receipts"
+    },
+    {
+      "id": "k2-exact-inputs-cap-and-staged-fixtures",
+      "original": "Helper28-69,111-156; full-state control53-69; both retained470 profile JSONs",
+      "expectation": "Keep explicit cap0 distinct from inherited/default finite cap3. Two admitted exact lanes are2.1.22/D8C745FD with fixture4700 and2.1.23/FE4A1DA3 with derived4701. The latter Steam hash is not standalone8DC3979B. Profile fresh fixture0.1.9/.10 is excluded/replaced by the staged full-state fixture, not consumed as raw old0.1.4. Derived pins are not separately published source blobs.",
+      "implementation": [
+        "tests/profiles",
+        "tools/Invoke-NativeFixture.ps1"
+      ],
+      "controls": [
+        "tests/test_k2_imersite_transition_fixture.py::test_exact_profiles_pin_the_three_stage_k2so_closure",
+        "tests/test_k2_imersite_transition_fixture.py::test_predecessor_cap_refuses_unknown_default_before_fixture_mutation"
+      ],
+      "disposition": "retire old staging/transport implementation; retain exact consumed source/settings/profile/engine closure and actual result identities"
+    },
+    {
+      "id": "k2-older-physical-crusher-context",
+      "original": "Older continuation control32-85,88-106,113-166; older migration control33-118",
+      "expectation": "The older2.1.3/K2SO2.0.13 context seeds completed4/next5, powder0.08, crystal0.10 and42% queued work. Under the asserted deterministic3ore recipe,300ore yields324powder and324sand versus an unresearched force yielding300each. Native crushers retain native recipe/speed and no modules/beacons; energy/ingredients are supplied. The older migration case retains copper next3/42% and cap0 versuscap3 separately.",
+      "implementation": [
+        "source/research/k2_imersite.lua",
+        "source/runtime/k2_imersite_migration.lua"
+      ],
+      "controls": [
+        "tests/test_k2_imersite_transition_fixture.py",
+        "tests/test_k2_imersite_migration.py"
+      ],
+      "disposition": "retain the physical-output and cap/foreign-work obligations in their exact older context; not a consumed fixture or observed result of the latest470 full-state lane",
+      "remaining": "Review original actual archives/settings/results and current upstream recipe applicability before reusing that physical output or proposing a current counterpart; no new native claim here"
+    }
+  ],
+  "scope_corrections": [
+    "R01 mislabelled annotated tags as source commits and omitted raw bodies; preserved as preliminary.",
+    "R02 corrects tag identities and captures exact bytes; its fresh fixture co-installation attribution is superseded by R03 actual replacement selection.",
+    "R03 correctly separates7 latest selected bodies from6 older-context bodies. Source3/7 older fixtures are not consumed by the latest full-state lane.",
+    "Independent Terra review corrects R01 descriptor attribution: old source367-374/393 compares only the early holder descriptor. Both-holder flags/effects/cleared-state checks217-235 remain separate. Original R01 stays preserved; no native result changes."
+  ],
+  "remaining_frontiers": [
+    "Original actual saved/package/settings/mod/engine bodies and current consumed-input applicability remain distinct from source intent.",
+    "Exact current K2 profile science/definition-output delta and conditional older physical-output reuse require actual evidence mapping; this review adds no beta release gate.",
+    "Other original helper/test/fixture bodies and global VER-07/87 preserved requests remain open. Retain the selected nine same-edition/seven older-contract/four forward journeys; no every-old-patch campaign."
+  ],
+  "new_product_defect_demonstrated": false,
+  "source_intent_review_complete_for_latest_selected_bodies": true,
+  "all_k2_transitive_history_complete": false,
+  "historical_inventory_complete": false,
+  "tests_added": false,
+  "tests_rerun": false,
+  "native_execution": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}
