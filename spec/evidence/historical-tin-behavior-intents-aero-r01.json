@@ -1,0 +1,231 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalTinBehaviorIntentReconciliationV1",
+  "reviewed_on": "2026-11-06",
+  "requirements": [
+    "VER-07",
+    "CONT-03",
+    "CONT-07",
+    "CONT-12"
+  ],
+  "reviewed_against": "1810ebfe90e5b6b644a224303eb05524ed8eea05",
+  "scope": "Five selected Bob-only/combined Tin test families plus the distinct Angel-only final-state sibling; complete earliest/latest wrapper bodies and changed assertion spans,24 consumed fixture files. Not all Tin history or native/profile acceptance.",
+  "historical_source": {
+    "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+    "earliest_canonical_tag": "v4.2.0-stable",
+    "earliest_commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+    "local_v420_alias_preserved": true,
+    "retained_tag_refs": 91,
+    "selected_tag_path_bindings": 96,
+    "wrapper_bodies": 12,
+    "fixture_paths": 24,
+    "unique_source_bodies": 36,
+    "source_bytes": 400645,
+    "all_remote_tags_newly_verified": false,
+    "inter_release_history_complete": false
+  },
+  "sources": [
+    {
+      "path": "tests/runtime/Test-MIRBobAngelTinRouteSafety.ps1",
+      "variants": [
+        {
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "blob": "a5652600382d8eb0d2a02ff4aa2cc77b66aa9504"
+        },
+        {
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "blob": "2d10603de0e5c1aa5ed3e4175aeeab2303083ecf"
+        }
+      ],
+      "assertion_lines": "40-41 non-claims/producer IDs; 83-90 three productive and three recovery producers; 134-143 dossier, exact target/closure/classification/fail-closed; 160 log assertions."
+    },
+    {
+      "path": "tests/runtime/Test-MIRBobTinPersistedState.ps1",
+      "variants": [
+        {
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "blob": "22ca031150e239286fadf1e71441a54a831304a7"
+        },
+        {
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "blob": "4b7a23de457069c47cc4218fd9dba0b469ef4f8f"
+        }
+      ],
+      "assertion_lines": "39-51 dossier anchor/cap/state/serial cycles; 53-56 data/state observations and drift controls; 80-84 seeded fixture/save mechanics."
+    },
+    {
+      "path": "tests/runtime/Test-MIRBobTinProductionGain.ps1",
+      "variants": [
+        {
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "blob": "df8f7bd71f2e38369645239d5eba4ebd61e15f30"
+        },
+        {
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "blob": "92507bd21db44e63bb83fbcf929cdca84527f550"
+        }
+      ],
+      "assertion_lines": "27, 35-37 expected outputs/data/runtime/drift; 54-62 exact route/owner/cap/physical outcomes; 95-96 create and runtime observation."
+    },
+    {
+      "path": "tests/runtime/Test-MIRBobTinProgressionFrontier.ps1",
+      "variants": [
+        {
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "blob": "fed2e32437bc04a259be492f9f0d9a248a523731"
+        },
+        {
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "blob": "5701c6fe500788c315aac6f03744cdc1863cf944"
+        }
+      ],
+      "assertion_lines": "47-63 exact dossier anchor/cap/frontier/companion and drift controls; 99-105 settings/runtime observation."
+    },
+    {
+      "path": "tests/runtime/Test-MIRBobAngelTinFinalStateAudit.ps1",
+      "variants": [
+        {
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "blob": "984b5663e266dfcdb2d20c3affbf26bf8f956873"
+        },
+        {
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "blob": "f37ecb085856a05c81e16e26dbf60a85b5f21a71"
+        }
+      ],
+      "assertion_lines": "63-77 exact combined identity/raw recipes/producers/route graph/productivity/science-lab frontier; 90 log assertions."
+    },
+    {
+      "path": "tests/runtime/Test-MIRAngelTinFinalStateAudit.ps1",
+      "variants": [
+        {
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "blob": "edd3b205ebc7344e3e6d5c1b47930f6af551974b"
+        },
+        {
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "blob": "fb4bb00a5fa34c0b3124247a4b1de21ac3ffb0ad"
+        }
+      ],
+      "assertion_lines": "59-67 distinct Angel-only no-Bob transformations/acquisition/productivity/frontier assertions."
+    }
+  ],
+  "exact_originals": {
+    "private_custody": "Julesc013/scratchpad@a40d85596695ae990ee27d7776004e4906281f17:evidence/aero-bob-tin-historical-intents-r01/",
+    "extraction": "extraction.json",
+    "extraction_sha256": "9E1EAE747805C03E5826A07A7192F489CDDD7F636F59476DD8DD862845602C17",
+    "source_manifest": "source-manifest.json",
+    "source_body_capsule": "bob-tin-original-source-bodies-r01.json.gz inside receipts.json.gz",
+    "source_body_capsule_sha256": "F27F77A7DC4ED5E323321861388DF49420C33F5385458D288482534259C8BCC3",
+    "decoded_source_sha256": "0329A767F4C51A163241AC28592C2B84DBB54FB0B6CF9EB9B4BA4FFFF03A5414"
+  },
+  "existing_evidence": [
+    {
+      "path": "spec/evidence/bob-angel-materials-lab-native-chain.json",
+      "scope": "F200 five-family20 actual labs/native bonus/save/two cold reloads; physical_smelting_output=false."
+    },
+    {
+      "path": "spec/evidence/bob-angel-boundary-qualified-chain.json",
+      "scope": "F200 seeded finite150-to-next151/settings/save/two cold; no150-lab or generic foreign-disable-preservation claim."
+    },
+    {
+      "path": "spec/evidence/bob-angel-physical-caps-chain.json",
+      "scope": "F200 actual copper-tungsten crafts at125/400 prototype caps; no physical Tin result."
+    },
+    {
+      "path": "spec/evidence/pipe-productivity-request-intent-aero-r01.json",
+      "scope": "Reuse its existing Tin-versus-PIPE-01 separation; no pipe feature or new admission."
+    }
+  ],
+  "groups": [
+    {
+      "id": "bob-only-tin-physical-output",
+      "disposition": "retain",
+      "original": "The2.1.17 Bob-only fixture seeds native research separately for levels0..3, then crafts100 Tin ore in a real stone furnace and drains output. Declared integer outputs are100/102/104/106; raw cap2 is overridden by imported cap3. It does not earn those levels through labs.",
+      "current": [
+        "source/research/bob_plates_materials.lua",
+        "source/research/bob_core_materials.lua",
+        "source/compatibility/bob_plates_materials.lua",
+        "source/compatibility/bob_core_materials.lua"
+      ],
+      "controls": [
+        "tests/test_bob_plates_f210_pipeline.py",
+        "tests/test_bob_core_materials.py"
+      ],
+      "remaining": "On an admitted current Bob-only profile, observe the unchanged recipe, native earned bonus, actual Tin input/output and production remainder. Preserve the original integer oracle; missing original raw Tin results and the separate F200 Cu/W float case do not prove or refute it. Resolve any changed-engine numerical expectation from independent engine/published evidence before scoring, never by accepting candidate output."
+    },
+    {
+      "id": "tin-cap-frontier-and-continuation",
+      "disposition": "consolidate",
+      "original": "The selected import produces effective cap3 over raw2. Its no-level4 assertion requires a present infinite technology to reject further research under that cap. The frontier records actual item/tool, producer, prerequisite and lab inputs; it is a prototype snapshot, not played reachability or permission to emit a companion.",
+      "current": [
+        "source/research/settings_profile.lua",
+        "source/research/bob_plates_materials.lua",
+        "source/research/bob_core_materials.lua",
+        "source/research/bob_tech_materials.lua",
+        "source/runtime/lifecycle.lua"
+      ],
+      "controls": [
+        "tests/test_settings_profile.py",
+        "tests/test_bob_core_materials.py",
+        "tests/test_bob_plates_f210_pipeline.py",
+        "tests/test_bob_tech_materials.py",
+        "tests/test_lifecycle.py"
+      ],
+      "remaining": "Keep the original cap and progression purpose with the current staged representation. Bob Core and individual Bob Plates have separate early/Tin4 stages; the named BobTech+Angel tuple withholds Tin4. Qualify actual selected settings/research boundaries without deleting continuations or inferring uncapped/provider support from the cap3 case."
+    },
+    {
+      "id": "tin-seeded-current-queue-serialization",
+      "disposition": "consolidate",
+      "original": "The Bob-only fixture seeds two completed levels, next level3, current/sole queued Tin and42% work; its native effect gives4% recipe bonus. Two serialized save/reload generations must retain that bounded state. It enables all test-force technologies during setup and provides no paid-science, foreign-force or migration proof.",
+      "current": [
+        "source/runtime/lifecycle.lua",
+        "source/runtime/caps.lua",
+        "source/runtime/legacy_caps.lua"
+      ],
+      "controls": [
+        "tests/test_lifecycle.py",
+        "tests/test_legacy_caps_lifecycle.py"
+      ],
+      "remaining": "Use the existing affected current/queued/detached/paid/cap/foreign/save/two-cold queue and protected inputs. The accepted F200 five-family labs and seeded150-to151 components include Tin but retain their original packages, engines and limits; they are not this older F210 run. Do not copy blanket enablement into a current ownership/preservation fixture or restart every historical patch."
+    },
+    {
+      "id": "combined-tin-route-diagnostics",
+      "disposition": "consolidate",
+      "original": "Combined Bob+Angel diagnostics identify three productive final-Tin transformations and three excluded recovery structures. Their conservative return certificate marks the productive paths unsafe; the observed compiler message has no matching Tin recipe. These sources do not promise a Tin owner or emission. Angel-only final-state source is a separate profile.",
+      "current": [
+        "source/compatibility/modern_catalogue/bob_angel_f210.lua",
+        "source/compatibility/bob_angel_materials.lua"
+      ],
+      "controls": [
+        "tests/test_bob_angel_f210_pipeline.py",
+        "tests/test_bob_angel_materials.py"
+      ],
+      "remaining": "Retain independent q009/q010 B6 non-emission in its exact F210 combined tuple. F200 no-BobTech Tin emission, the named BobTech+Angel finite tuple and Bob-only routes remain separate. No new blanket combined-Tin emission, global graph solver or PIPE-01 admission follows."
+    },
+    {
+      "id": "retired-tin-runner-mechanics",
+      "disposition": "obsolete-implementation-only",
+      "original": "The earliest selected wrappers can reach native staging; later wrappers add an obsolete-runner throw before staging or launch. Selected assertion spans are unchanged; later lease/materialization/custody mechanics do not define new gameplay.",
+      "current": [
+        "tools/Invoke-NativeFixture.ps1",
+        "docs/development.md"
+      ],
+      "controls": [],
+      "remaining": "Keep exact original bodies and safeguards; use the existing guarded direct-library runner for genuinely affected cases. Neither old source presence nor wrapper markers prove a native pass. Imported general helpers and other Tin siblings remain separately unresolved."
+    }
+  ],
+  "controls_scope": "Existing control mappings only. No new host/native run or result rescoring in this source-intent reconciliation.",
+  "limits": [
+    "Original source expectations and observed results remain distinct. No retired runner is executed or restored.",
+    "No emitted identity,science/effect,cost,setting,API,save schema,migration,engine or package is changed.",
+    "Remaining profile/current-candidate applicability,physical Tin outcome,paid/current/foreign state,client/performance and final release verdicts stay open.",
+    "This creates no prospective Aero packet approval,additional historical campaign or blanket ecosystem claim. Original87 request fields and decisions remain unchanged."
+  ],
+  "native_execution": false,
+  "player_source_changed": false,
+  "source_reconciliation_complete": false,
+  "test_intent_reconciliation_complete": false,
+  "inventory_complete": false,
+  "release_qualification": false
+}
