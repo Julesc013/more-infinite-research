@@ -53,7 +53,11 @@ end
 function M.assert_preserved(actual, expected, label, exact_enabled)
   if actual.current ~= expected.current or #actual.queue ~= #expected.queue
       or not near(actual.progress, expected.progress) or not near(actual.lead_saved, expected.lead_saved) then
-    fail(label .. " current/queued/detached work changed")
+    fail(label .. " current/queued/detached work changed; actual current=" .. tostring(actual.current)
+      .. " progress=" .. tostring(actual.progress) .. " detached=" .. tostring(actual.lead_saved)
+      .. " queue=" .. table.concat(actual.queue, ",") .. "; expected current=" .. tostring(expected.current)
+      .. " progress=" .. tostring(expected.progress) .. " detached=" .. tostring(expected.lead_saved)
+      .. " queue=" .. table.concat(expected.queue, ","))
   end
   for i, id in ipairs(expected.queue) do if actual.queue[i] ~= id then fail(label .. " queue order changed") end end
   for id, before in pairs(expected.technologies) do
