@@ -1236,7 +1236,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $tokens=$null;$errors=$null
           $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
           if($errors.Count){throw $errors[0].Message}
-          foreach($name in @('Test-LibraryInteger','Assert-PairedBrowserInteger','Assert-PairedBrowserBoolean','Get-PairedBrowserStageMarker','Wait-PairedBrowserClientCompletion')) {
+          foreach($name in @('Test-LibraryInteger','Assert-PairedBrowserInteger','Assert-PairedBrowserBoolean','Get-PairedBrowserStageMarker','Wait-PairedBrowserClientCompletion','Start-Clients')) {
             $nodes=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq$name},$true))
             if($nodes.Count-ne1){throw "missing or ambiguous function:$name"}
             Invoke-Expression $nodes[0].Extent.Text
@@ -1251,22 +1251,30 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             $folder=Join-Path $env:MIR_TEST_CLIENT_ROOT $name
             [IO.Directory]::CreateDirectory($folder)|Out-Null
             [IO.File]::WriteAllText((Join-Path $folder 'factorio-current.log'),'post-refresh-start')
-            [pscustomobject]@{name=$name;write_data=$folder}
+            [pscustomobject]@{name=('MIR5'+$name);locale=$name;write_data=$folder;config='unused.ini';port=1}
           })
+          $serverWriteData=$env:MIR_TEST_CLIENT_ROOT
+          [IO.File]::WriteAllText((Join-Path $serverWriteData 'factorio-current.log'),'host-completed')
+          $library='unused';$serverPort=1;$clientGraphics=@();$apiClientConsumers=$false
+          $fixtureCase='library-paired-browser';$markerPrefix='MIR5_LIBRARY_PAIRED_BROWSER'
+          function Start-Native([string]$Name,[string[]]$Arguments){[pscustomobject]@{name=$Name}}
           $polls=@{}
           function Wait-For([string]$Description,[scriptblock]$Predicate) {
-            $peer=@($clients|Where-Object {$Description-ceq("paired Browser "+$_.name+" completed marker")})
+            if($Description.StartsWith('native join of ')){return $true}
+            $peer=@($actors|Where-Object {$Description-ceq("paired Browser "+$_.name+" completed marker")})
             if($peer.Count-ne1){throw 'completion target differs'}
             for($i=1;$i-le3;$i++) {
               $polls[$peer[0].name]=$i
               $value=&$Predicate $null
               if($null-ne$value){return $value}
-              if($i-eq2){[IO.File]::WriteAllText((Join-Path $peer[0].write_data 'factorio-current.log'),$line)}
+              if($i-eq2){[IO.File]::WriteAllText($peer[0].native_log_path,$line)}
             }
             throw 'peer completion was not observed'
           }
-          Wait-PairedBrowserClientCompletion $clients 'published'
-          if($polls.Count-ne2-or$polls.en-ne3-or$polls.de-ne3){throw 'a peer was completed from host or another peer state'}
+          $actors=@(Start-Clients 'restart')
+          if($actors.Count-ne2-or$actors[0].native_log_path-cne(Join-Path $clients[0].write_data 'factorio-current.log')){throw 'launched record lost its own native-log binding'}
+          Wait-PairedBrowserClientCompletion $actors 'published'
+          if($polls.Count-ne2-or$polls['client-restart-en']-ne3-or$polls['client-restart-de']-ne3){throw 'a peer was completed from host or another peer state'}
           # The new wait retains the existing marker's strict ownership oracle.
           foreach($mode in @('wrong-joins','wrong-arm','duplicate')) {
             $bad=$complete|ConvertTo-Json|ConvertFrom-Json -AsHashtable
@@ -1274,9 +1282,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             if($mode-ceq'wrong-arm'){$bad.arm='mir5'}
             $badLine='[MIR5_LIBRARY_PAIRED_BROWSER] '+($bad|ConvertTo-Json -Compress)+"`n"
             if($mode-ceq'duplicate'){$badLine+=$badLine}
-            [IO.File]::WriteAllText((Join-Path $clients[0].write_data 'factorio-current.log'),$badLine)
+            [IO.File]::WriteAllText($actors[0].native_log_path,$badLine)
             $caught=$false
-            try{Wait-PairedBrowserClientCompletion $clients 'published'}catch{
+            try{Wait-PairedBrowserClientCompletion $actors 'published'}catch{
               $caught=$_.Exception.Message-cmatch 'join_events differs|arm differs|marker is duplicated'
             }
             if(-not$caught){throw "invalid peer completion was admitted:$mode"}
