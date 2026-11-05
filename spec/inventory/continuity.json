@@ -8627,7 +8627,7 @@
     "request_ledger": {
       "path": "spec/programmes/community-requests.json",
       "record_count": 87,
-      "rows_with_additive_mir5_route_disposition": 38,
+      "rows_with_additive_mir5_route_disposition": 53,
       "qualification_limit": "Original IDs, requests, decisions, statuses and adverse evidence remain unchanged. A source-route mapping is not adequate evidence of accepted interaction or final-package behavior; proposed/rejected/withheld requests do not become promises."
     },
     "historical_sources": {
@@ -16944,6 +16944,25 @@
         "player_source_changed": false,
         "source_reconciliation_complete": false,
         "test_intent_reconciliation_complete": false
+      },
+      {
+        "subjects": [
+          "CONT-07",
+          "CONT-12",
+          "CONT-15",
+          "VER-07"
+        ],
+        "reviewed_on": "2026-11-06",
+        "reviewed_against": "5e71ed7061ba5def5eec0027b0c11d42e6ec2ec8",
+        "scope": "Reuse recovered621/446 originals; reconcile15 existing progression/OmniAB/RIC requests and one named RIC historical-source/current-host discrepancy. No broad ecosystem or stable verdict.",
+        "evidence": {
+          "path": "spec/evidence/historical-reported-upgrade-obligations-r01.json",
+          "sha256": "EA58EED5226A0FB1B2BA34A2CF07DAE647F21214F68F7EF0389CFE0C4DE364D6"
+        },
+        "disposition": "Consolidate recovered621/446 originals; map15 preserved requests,retain unqualified/probe states and expose the named RIC source/host gap without inventing ecosystem acceptance.",
+        "original_request_fields_preserved": true,
+        "native_tests_run": false,
+        "stable_acceptance": false
       }
     ],
     "stable_coverage_review": {
@@ -17257,9 +17276,10 @@
             "spec/evidence/historical-upgrade-manifest-test-intents-aero-r01.json",
             "spec/evidence/historical-k2-imported-fixture-intents-aero-r01.json",
             "spec/evidence/historical-complete-state-comparator-intents-aero-r01.json",
-            "b6c603f654025013546f9ccfeb8b0a677824d64e:evidence/aero-finite-stable-coverage-r01/source-correspondence.json"
+            "b6c603f654025013546f9ccfeb8b0a677824d64e:evidence/aero-finite-stable-coverage-r01/source-correspondence.json",
+            "spec/evidence/historical-reported-upgrade-obligations-r01.json"
           ],
-          "remaining_executable_check": "Retain all35 accepted source-intent dispositions and complete normal source review of PR1711. The imported F200 authored Base frontier now matches46 original rows/92 fields through real modern+gear constructors; this closes that source-mapping question only. Next decide the87 request records by their original acceptance/status and delivered-source evidence, including currently unmapped progression/OmniAB/RIC commitments; retain unimplemented/deferred/rejected/proposed states without waiver or invented support. Reconcile the named migration/inter-release fixes and known legacy consumers against existing origin/API rows. Keep issues621/446, unadopted PR344 private-custody limits and missing reporter originals explicit. No detailed5058-blob file was located in bounded Aero searches; that is not proof of global absence or completeness. Do not turn each retired helper or synthetic version tuple into another audit/native gate.",
+          "remaining_executable_check": "Retain the existing bounded source-intent reviews and53 additive request routes; all87 original request decisions/statuses remain unchanged. PROG-01 is partly implemented by named authored stages, OAB-01..06 remain unqualified beyond shared routes/prepared selection, and RIC-01..08 retain their actual intake/probe/withheld/current-host-gap distinctions. Resolve the named Marine coke identity against actual published predecessor emission and affected earned-state preservation before claiming a correction; no broad RIC support or every-old-patch campaign follows. Reuse recovered621/446 originals and the accepted Secretas source/host correction, while keeping its candidate/useful-work/save/provider checks and unknown reporter inputs explicit. Continue the unreviewed historical frontier, original request decisions, other migration/API applicability and unadopted PR344 private-custody limits. The missing detailed5058-blob file is not proof of absence or completeness; do not turn each retired helper into a native gate.",
           "owner": "Aero",
           "independent_review": "Aero",
           "status": "open: bounded source-intent dispositions exist; complete historical preservation remains unproved",
