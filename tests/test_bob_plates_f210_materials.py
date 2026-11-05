@@ -330,7 +330,7 @@ class BobPlatesF210MaterialsTests(unittest.TestCase):
         ok, error = lua.execute('return pcall(function() return bob_plates.technologies(captured_values,captured_raw,captured_mods) end)')
         self.assertFalse(ok, "published process-return condition must reject the changed route")
         self.assertIn("return path", error)
-        self.assertIn(route, error)
+        self.assertIn(route + " returns to ", error)
         self.assertEqual(before, _plain(lua.globals().captured_raw))
 
     def test_lead_outside_selector_returns_reject_each_named_route(self):
