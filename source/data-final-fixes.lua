@@ -225,7 +225,8 @@ end
 -- named routes are separate from the BobTech-plus-Angel material adapter;
 -- neither profile derives routes from the other.
 if require("compatibility.bob_core_profile").applies(mods) then
-  local materials = require("compatibility.bob_core_materials").technologies(values, data.raw, mods)
+  local materials = require("compatibility.bob_core_materials").technologies(
+    values, data.raw, mods, selected_material_return_context)
   for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
 end
 

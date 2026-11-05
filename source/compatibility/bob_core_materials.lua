@@ -1,7 +1,7 @@
 -- Exact F210 no-Angel Bob Core material constructor.  It validates the seven
 -- named routes and declared prerequisite references before returning fourteen
--- detached MIR technologies.  It does not search recipe, owner, or science
--- graphs.
+-- detached MIR technologies. The process-return check shares one ingredient
+-- index; it does not discover owners or science progression.
 local stages = require("research.material_stages")
 local DEFINITIONS = require("research.bob_core_materials")
 local routes = require("compatibility.material_routes")
@@ -49,12 +49,20 @@ local function continuation_description(definition, stream)
 end
 
 
-function M.technologies(values, raw, active_mods)
+function M.technologies(values, raw, active_mods, return_context)
   if not M.applies(active_mods) then return {} end
   local streams = {}
   for index, definition in ipairs(DEFINITIONS) do
     routes.preflight(raw, definition, fail)
     streams[index] = stream_for(values, definition)
+  end
+  local returns = require("compatibility.material_returns")
+  local context = return_context and return_context() or returns.prepare(raw)
+  for _, definition in ipairs(DEFINITIONS) do
+    for _, route in ipairs(definition.routes) do
+      local recipe = raw.recipe[route.recipe]
+      returns.validate(raw, recipe.results, recipe.ingredients, context, route.recipe)
+    end
   end
   local output = {}
   for index, definition in ipairs(DEFINITIONS) do
