@@ -356,6 +356,7 @@ class LocaleCatalogueTests(unittest.TestCase):
             for key in keys
         }
         expected.add(f"technology-name.{NEW_ENGLISH_ONLY_KEY}")
+        expected.add("technology-description.more-infinite-research.material_process_unavailable")
         self.assertEqual(active_source_references(), expected)
 
     def test_all_locales_restore_the_pinned_b6_projection_without_duplicates(self) -> None:

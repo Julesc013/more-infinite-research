@@ -125,6 +125,109 @@ class BobCoreMaterialTests(unittest.TestCase):
         return [stage["id"] for family in self.facts["families"]
                 for stage in (family["early"], family["continuation"])]
 
+    def _hold_return(self, raw, family, values=None):
+        expected = _plain(self.rows(values=values))
+        for row in expected:
+            if row["name"] in {family["early"]["id"], family["continuation"]["id"]}:
+                row["enabled"] = False
+                row["localised_description"] = ["", row["localised_description"], "\n",
+                    ["technology-description.more-infinite-research.material_process_unavailable"]]
+        before = _plain(raw)
+        self.assertEqual(expected, _plain(self.rows(values=values, raw=raw)))
+        self.assertEqual(before, _plain(raw))
+
+    def test_each_published_core_material_retains_its_effects_on_a_process_return(self):
+        # These seven no-Angel bindings inherit the published material_family
+        # process rule. The Angel-specific route exceptions do not select.
+        probes = 0
+        for family in self.facts["families"]:
+            for route in family["routes"]:
+                for ingredient in route["ingredients"]:
+                    for product in route["results"]:
+                        for hidden in (False, True):
+                            with self.subTest(family=family["key"], input=ingredient["name"], hidden=hidden):
+                                raw = self.raw_fixture()
+                                raw["recipe"]["test-material-return"] = _lua_value(self.lua, {
+                                    "ingredients": [{"type": product.get("type", "item"),
+                                                     "name": product["name"], "amount": 1}],
+                                    "results": [{"type": ingredient.get("type", "item"),
+                                                 "name": ingredient["name"], "amount": 1}],
+                                    "enabled": not hidden, "hidden": hidden, "allow_productivity": False,
+                                })
+                                self._hold_return(raw, family)
+                            probes += 1
+        self.assertEqual(26, probes)
+
+    def test_disabled_core_material_keeps_the_process_return_condition(self):
+        raw = self.raw_fixture()
+        raw["recipe"]["test-material-return"] = _lua_value(self.lua, {
+            "ingredients": [{"name": "bob-bronze-alloy", "amount": 1}],
+            "results": [{"name": "copper-plate", "amount": 1}],
+        })
+        values = self.values()
+        for family in self.facts["families"]:
+            values["streams"][family["key"]]["enabled"] = False
+        family = next(row for row in self.facts["families"] if row["key"] == "research_material_bronze")
+        self._hold_return(raw, family, values)
+
+    def test_full_q006_retains_five_unavailable_pairs_and_safe_tin_lead(self):
+        import test_bob_warfare_f210_pipeline as pipeline
+        pipeline.LuaRuntime = LuaRuntime
+        pipeline.BobWarfareF210PipelineTests.setUpClass()
+        lua = pipeline.BobWarfareF210PipelineTests("runTest").stage("q006")
+        rows = _plain(lua.globals().emitted)
+        unavailable = {"research_material_bronze", "research_material_gunmetal", "research_material_invar",
+                       "research_material_nitinol", "research_material_copper_tungsten"}
+        for family in self.facts["families"]:
+            for stage in (family["early"], family["continuation"]):
+                row = rows[stage["id"]]
+                self.assertEqual(family["key"] not in unavailable, row.get("enabled", True))
+                self.assertEqual([{"type": "change-recipe-productivity", "recipe": route["recipe"], "change": .02}
+                                  for route in family["routes"]], row["effects"])
+                self.assertEqual(stage["max_level"], row["max_level"])
+        self.assertEqual(1, lua.globals().technology_publications)
+
+    def test_core_reuses_the_composition_owned_return_index(self):
+        raw = self.raw_fixture()
+        proof = self.lua.execute('return require("compatibility.material_returns")')
+        context = proof["prepare"](raw)
+        self.lua.globals().shared_return_context = context
+        self.lua.globals().return_context_requests = 0
+        provider = self.lua.eval(r'''function()
+          return_context_requests = return_context_requests + 1
+          return shared_return_context
+        end''')
+        proof["prepare"] = self.lua.eval('function() error("repeated recipe index") end')
+        rows = self.catalogue["technologies"](self.values(), raw, self.active_mods(), provider)
+        self.assertEqual(self.expected_ids(), [row["name"] for row in _plain(rows)])
+        self.assertEqual(1, self.lua.globals().return_context_requests)
+
+    def test_optional_return_result_keeps_required_and_malformed_inputs_strict(self):
+        proof = self.lua.execute('return require("compatibility.material_returns")')
+        raw = self.raw_fixture()
+        raw["recipe"]["test-return"] = _lua_value(self.lua, {
+            "ingredients": [{"name": "bob-tin-plate", "amount": 1}],
+            "results": [{"name": "bob-tin-ore", "amount": 1}],
+        })
+        recipe = raw["recipe"]["bob-tin-plate"]
+        context = proof["prepare"](raw)
+        before = _plain(raw)
+        args = (raw, recipe["results"], recipe["ingredients"], context, "bob-tin-plate")
+        self.assertEqual("bob-tin-plate returns to item:bob-tin-ore", proof["find_return"](*args))
+        with self.assertRaisesRegex(Exception, "MIR material return path: bob-tin-plate returns to item:bob-tin-ore"):
+            proof["validate"](*args)
+        self.assertEqual(before, _plain(raw))
+
+        other = self.raw_fixture()
+        with self.assertRaisesRegex(Exception, "belongs to another input"):
+            proof["find_return"](other, recipe["results"], recipe["ingredients"], context, "bob-tin-plate")
+        other["recipe"]["test-malformed"] = _lua_value(self.lua, {
+            "ingredients": [{"name": "bob-tin-plate", "amount": 1}],
+            "results": [{"amount": 1}],
+        })
+        with self.assertRaisesRegex(Exception, "unsupported process identity"):
+            self.rows(raw=other)
+
     def test_complete_independent_catalogue_matches_all_fourteen_rows_and_named_routes(self):
         rows = _plain(self.rows())
         self.assertEqual(self.expected_ids(), [row["name"] for row in rows])
@@ -211,12 +314,22 @@ class BobCoreMaterialTests(unittest.TestCase):
         bounded = {row["name"]: row for row in _plain(self.rows(values=values))}
         self.assertEqual("70", bounded["recipe-prod-research_material_lead-4"]["localised_description"][-1])
 
-    def test_named_preflight_rejects_safety_drift_without_scanning_raw_tables(self):
+    def test_named_preflight_and_single_return_index_reject_safety_drift(self):
         poison = self.lua.eval('function(value) return setmetatable(value, {__pairs=function() error("global scan") end}) end')
+        # The retained process rule needs one ingredient index. It does not
+        # authorize a recipe pass per family or any technology-world scan.
+        self.lua.globals().recipe_index_visits = 0
+        counted = self.lua.eval(r'''function(value)
+          return setmetatable(value, {__pairs=function(rows)
+            recipe_index_visits = recipe_index_visits + 1
+            return next, rows, nil
+          end})
+        end''')
         raw = self.raw_fixture()
-        raw["recipe"] = poison(raw["recipe"])
+        raw["recipe"] = counted(raw["recipe"])
         raw["technology"] = poison(raw["technology"])
         self.assertEqual(14, len(self.rows(raw=raw)))
+        self.assertEqual(1, self.lua.globals().recipe_index_visits)
 
         explicit_default = self.raw_fixture()
         explicit_default["recipe"]["bob-tin-plate"]["enabled"] = True
@@ -345,6 +458,8 @@ class BobCoreMaterialTests(unittest.TestCase):
           target.id, target.factorio_version, target.minimum_base = "f210", "2.1", "2.1.23"
         ''')
         declared = _plain(runtime.execute('return require("research.catalogue").declared()'))
+        for row in declared:
+            self.assertEqual(row["id"] in set(self.expected_ids()), row.get("retain_unavailable_cap_right", False))
         declared_by_id = {row["id"]: row for row in declared}
         expected_ids = self.expected_ids()
         self.assertEqual(expected_ids, [row["id"] for row in declared if row["id"] in set(expected_ids)])
@@ -439,6 +554,26 @@ class BobCoreMaterialTests(unittest.TestCase):
         ''')
         emitted = {row["name"] for row in _plain(lua.globals().data["installed"])}
         self.assertTrue(set(self.expected_ids()) <= emitted)
+        lua.execute(r'''
+          data.installed = nil
+          fixture_raw.recipe["test-material-return"] = {
+            ingredients={{name="bob-bronze-alloy",amount=1}},
+            results={{name="copper-plate",amount=1}},
+            enabled=false,hidden=true,allow_productivity=false,
+          }
+          package.loaded["data-final-fixes"] = nil
+          local ok, message = pcall(require, "data-final-fixes")
+          assert(ok,tostring(message))
+          local held = 0
+          for _, row in ipairs(data.installed) do
+            if row.name=="recipe-prod-research_material_bronze-1" or row.name=="recipe-prod-research_material_bronze-4" then
+              assert(row.enabled==false and #row.effects==1 and row.effects[1].recipe=="bob-bronze-alloy"
+                and row.effects[1].change==.02)
+              held=held+1
+            end
+          end
+          assert(held==2,"Both unavailable identities and their earned native effects must survive")
+        ''')
 
 
 if __name__ == "__main__":

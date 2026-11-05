@@ -143,26 +143,30 @@ end
 function M.technologies(values, raw, active_mods, return_context)
   local profile = M.preflight(raw, active_mods)
   if profile == nil then return {} end
-  -- The published lead declaration has no reviewed F210 return exception.
-  -- Validate each named route before returning either historical paid stage;
-  -- one bad route refuses the configuration rather than erasing an identity.
+  -- These individual-Bob material routes retain their process-return guard;
+  -- the separately reviewed Angel and historical Aluminium locks do not apply.
+  -- Classify every route before constructing either historical paid stage.
+  -- Wholly unavailable families keep their complete earned effect vectors.
   local material_definitions = definitions.material_definitions(profile)
-  for _, definition in ipairs(material_definitions) do
-    if definition.key == "research_material_lead" then
-      local returns = require("compatibility.material_returns")
-      local context = return_context and return_context() or returns.prepare(raw)
-      for _, route in ipairs(definition.routes) do
-        local recipe = raw.recipe[route.recipe]
-        returns.validate(raw, recipe.results, recipe.ingredients, context, route.recipe)
-      end
+  local unavailable = {}
+  if #material_definitions > 0 then
+    local returns = require("compatibility.material_returns")
+    local context = return_context and return_context() or returns.prepare(raw)
+    for _, definition in ipairs(material_definitions) do
+      unavailable[definition.key] = material_routes.return_reason(raw, definition, context, fail) ~= nil
     end
   end
   local output = {}
   for _, definition in ipairs(material_definitions) do
     local stream = stream_for(values, definition)
-    output[#output + 1] = stages.technology(definition, definition.early, stream, fail)
+    local early = stages.technology(definition, definition.early, stream, fail)
     local continuation = stages.technology(definition, definition.continuation, stream, fail)
     continuation.localised_description = stages.continuation_description(definition, stream)
+    if unavailable[definition.key] then
+      stages.retain_disabled(early)
+      stages.retain_disabled(continuation)
+    end
+    output[#output + 1] = early
     output[#output + 1] = continuation
   end
   return output
