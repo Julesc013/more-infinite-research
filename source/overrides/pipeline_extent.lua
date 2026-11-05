@@ -31,7 +31,12 @@ function M.apply(raw, value)
     if type(box) ~= "table" or boxes[box] then return end
     boxes[box] = true
     local extent = tonumber(box.max_pipeline_extent) or default_extent
-    box.max_pipeline_extent = math.max(1, math.min(MAX_EXTENT, math.floor(extent * multiplier + 0.5)))
+    -- A valid native zero scales to zero; only positive extents need the floor.
+    if extent == 0 then
+      box.max_pipeline_extent = 0
+    else
+      box.max_pipeline_extent = math.max(1, math.min(MAX_EXTENT, math.floor(extent * multiplier + 0.5)))
+    end
     count = count + 1
   end
   local pending = {raw}
