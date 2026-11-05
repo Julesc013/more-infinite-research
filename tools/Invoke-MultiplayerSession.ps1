@@ -720,6 +720,17 @@ function Get-PairedBrowserStageMarker([string]$Text, [string]$Stage, [string]$Ex
   Assert-PairedBrowserBoolean $row.performance_acceptance $false 'performance_acceptance' $Stage
   return $row
 }
+function Wait-PairedBrowserClientCompletion([object[]]$Clients, [string]$ExpectedArm) {
+  foreach ($client in $Clients) {
+    $clientLogPath = Join-Path $client.write_data 'factorio-current.log'
+    # The host can finish a simulation tick before either client reaches it.
+    # Observe each owned peer's completion before ending its memory window.
+    [void](Wait-For ("paired Browser $($client.name) completed marker") {
+      param($ignored)
+      Get-PairedBrowserStageMarker (Read-LogText $clientLogPath) 'completed' $ExpectedArm
+    })
+  }
+}
 function Get-PairedBrowserProfilerMarkers([string]$Text, [string[]]$ExpectedActions) {
   $allowed = @('first_open','search','refresh','reopen')
   $rows = [Collections.Generic.List[object]]::new()
@@ -1069,7 +1080,11 @@ try {
     }
     $screenshots = @($captures.files)
     Assert-Session ($screenshots.Count -eq 12) 'paired Browser final screenshot inventory differs'
-    foreach ($client in $activeClients) { Stop-Record $client }
+    Wait-PairedBrowserClientCompletion $activeClients $pairedArm
+    foreach ($client in $activeClients) {
+      Stop-Record $client
+      Assert-Session ($null -ne (Get-PairedBrowserStageMarker (Read-LogText $client.stdout) 'completed' $pairedArm)) 'closed paired Browser client transcript lacks completion'
+    }
     $activeClients = @()
     Stop-Record $server
     $server = $null
