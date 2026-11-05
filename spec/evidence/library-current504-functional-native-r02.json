@@ -1,0 +1,133 @@
+{
+  "schema": 1,
+  "kind": "MIR504LibraryFunctionalNativeObservedComponentsV1",
+  "reviewed_on": "2026-11-05",
+  "status": "canonical-native-functional-component-pass-outer-caller-failed-result-locator",
+  "player_release": "v5.0.4",
+  "player_tree": "a2ba6eeaf06292cd90b7d7c5a687cf96cf84529f",
+  "public_fixture_source": "932db633197e2892ed17a2b12a6f51b4cfd3627c",
+  "private_execution_source": "4e7965f296dd94e263d612080408e12ed88ab903",
+  "packet_sha256": "C9AC6CE53181541AFACC6B383EF83DB2A3B82F62D80BF2A2083957DA5E53823B",
+  "profile": "tests/profiles/library-current504-standalone-f210-2123.json",
+  "profile_sha256": "BF32AA3A5E31A9C936B2DE3D7484CDC926A9D7BCA3223EA7F9E85D6281A8E9D6",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "player_sha256": "154707C40ED772A09387BF4FB673D337796FFBCEAF1C3C57EA7DB9C3F608E922",
+  "selected_mods": [
+    "base@2.1.23",
+    "more-infinite-research@5.0.21004",
+    "mir-fixture-mir5-active-mods-observer@0.1.0",
+    "mir-fixture-mir5-library-multiplayer@0.1.0"
+  ],
+  "canonical_native": {
+    "status": "passed-private-two-client-fixture",
+    "result_sha256": "C81A6FC272D06C70F24EDFB0BE1D4C0CBF74E2728EF0CCE9C3F2DB579E8F745D",
+    "process_startups": 9,
+    "actual_join_events": 6,
+    "real_lab_completions": 2,
+    "lab_completions_by_script": false,
+    "screenshot_count": 10,
+    "locales": [
+      "en",
+      "de"
+    ],
+    "image_dimensions": [
+      1280,
+      720
+    ],
+    "rejoin": true,
+    "saved_host_restart": true,
+    "on_load_read_only": true,
+    "protected_seed_unchanged": true,
+    "original_library_restoration_verified": true,
+    "original_library_inventory_rows": 719
+  },
+  "original_adverses": [
+    {
+      "id": "r01-offline-prepare",
+      "status": "failed",
+      "native_processes": 0,
+      "reason": "Private composition lacked the canonical immutable-input helper; preserved before fresh r02."
+    },
+    {
+      "id": "r02-outer-caller",
+      "status": "failed",
+      "terminal_sha256": "C8E7842AFA25141713ABB005AEA162DF89A520395EE1876C9E077626B6981A4B",
+      "reason": "After canonical completion it looked for output/result.json instead of governed session/result.json.",
+      "restoration_verified": true,
+      "correction_commit": "218949512321e8b68dd9be3825b1fd25ba249808",
+      "correction_scope": "Two result locators only; no old-result rewrite, native rerun or overall wrapper pass."
+    }
+  ],
+  "observations": {
+    "kind": "LibraryCurrent504VisualReadbackV1",
+    "actual_images_inspected": 10,
+    "stages": [
+      "availability",
+      "initial",
+      "settled",
+      "rejoin",
+      "restart"
+    ],
+    "locales": [
+      "en",
+      "de"
+    ],
+    "size": [
+      1280,
+      720
+    ],
+    "observations": [
+      "All ten actual PNGs decode and were inspected individually.",
+      "Research split list/details, icons, headings and chosen query/selection remain visible after rejoin and host restart.",
+      "Base Availability messages correctly name the absent Space Age features in both languages.",
+      "Long German detail text continues below the viewport with a visible vertical scrollbar; scrolling was not exercised.",
+      "German sorting label displays Bestellen, a likely context mistranslation; independent localization disposition remains open."
+    ],
+    "limitations": [
+      "Only Research and Availability views at one size/scale.",
+      "No real mouse/keyboard, dropdown, continuous scroll, Settings/Queue/Help/export-file or imported-credit claim.",
+      "No comparative timing/memory or whole-product/stable acceptance."
+    ]
+  },
+  "custody": {
+    "repository": "Julesc013/mir-native-worker",
+    "commit": "04a38e788218b3ee4d4e2f37b824b25ba51c7a25",
+    "directory": "evidence/library-current504-functional-r02",
+    "manifest_sha256": "6235604114D58245BDD6320D03F0A1DF113766ADD2F882A4EDEA680D6AF39B19",
+    "corpus": {
+      "path": "original-bodies.json.gz",
+      "bytes": 306895,
+      "sha256": "04E50753D24F5BE59F5AB0A55F18B6F64DC5C5B4478FF0612DA4C64E8AEACAEE",
+      "decoded_sha256": "9F1BD1A02538686238A7CC51B33CE019E7FE0E8DD4B4EB3967C1D58B1AEAFCE2"
+    },
+    "text_and_review_projection_records": 224,
+    "redacted_localhost_spec_projections": 1,
+    "protected_binary_and_secret_locators": 20,
+    "transported_original_PNGs": 10,
+    "actual_remote_files_read_back": 12,
+    "exact_primary_native_copy_files": 216,
+    "primary": "build/qualification/library-current504-native-r02",
+    "secret_originals": "Protected locally; redacted spec projection is explicitly not the original body."
+  },
+  "source_review": {
+    "pr": 1700,
+    "author": "932db633197e2892ed17a2b12a6f51b4cfd3627c",
+    "acceptance": "https://github.com/Julesc013/more-infinite-research/pull/1700#issuecomment-6649446437",
+    "checked_merge": "0373cc44d13d48717469f54c05b9f4d786d71bc4"
+  },
+  "independent_actual_component_review": "pending",
+  "scheduling_intervals": {
+    "create_seconds": 6.342442,
+    "governed_session_tree_seconds": 121.816601,
+    "meaning": "Scheduling only; the session is one governed wrapper owning eight engine instances, not a sum of individual startup measurements."
+  },
+  "actual_mouse_keyboard_acceptance": false,
+  "ordinary_tuning_qualified": false,
+  "imported_credit_qualified": false,
+  "whole_library_acceptance": false,
+  "performance_acceptance": false,
+  "stable_acceptance": false
+}
