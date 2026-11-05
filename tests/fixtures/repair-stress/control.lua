@@ -52,6 +52,7 @@ local function mode()
   if f210 and mir == "4.7.21002" and fixture == "0.1.0" then return "f210-published-4.7.21002", "repair-stress-f210", selected_active ~= nil end
   if f210 and mir == "5.0.21000" and fixture == "0.2.0" then return "f210-mir5-5.0.21000", "repair-stress-f210", selected_active ~= nil end
   if f210 and mir == "5.0.21001" and fixture == "0.2.0" and selected_active == "0.1.0" then return "f210-mir5-5.0.21001", "repair-stress-f210", true end
+  if f210 and mir == "5.0.21005" and fixture == "0.2.0" and selected_active == "0.1.0" then return "f210-mir5-5.0.21005", "repair-stress-f210", true end
   fail("fixture requires target-matched published or MIR5 identity")
 end
 

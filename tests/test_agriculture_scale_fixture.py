@@ -212,7 +212,7 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             return {ok=ok,message=tostring(result),reads=reads,callbacks=callbacks}
           end
 
-          function scale_runtime(path, tier, opponent, arm, matched, active_seed)
+          function scale_runtime(path, tier, opponent, arm, matched, active_seed, mir_version)
             arm = arm or "legacy"
             local candidate_packs = {
               "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
@@ -304,7 +304,7 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             end
             local active = {
               base="2.1.23", ["space-age"]="2.1.23",
-              ["more-infinite-research"] = arm == "published" and "4.7.21002" or "5.0.21000",
+              ["more-infinite-research"] = mir_version or (arm == "published" and "4.7.21002" or "5.0.21000"),
               ["mir-fixture-mir5-agriculture-scale"]="0.1.0"
             }
             if arm == "candidate" or arm == "published" or arm == "candidate-defaults" then
@@ -943,6 +943,35 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
         unpaired = run(str(CORE / "control.lua"), 1, "", "legacy", False, True)
         self.assertFalse(unpaired["ok"])
         self.assertIn("requires the paired selector", unpaired["message"])
+
+    def test_505_active_defaults_retains_the_independent_physical_workload(self):
+        run = self.lua.eval("scale_runtime")
+        for tier in (1, 32, 128):
+            with self.subTest(tier=tier):
+                result = run(str(CORE / "control.lua"), tier, "", "candidate-defaults", True, True, "5.0.21005")
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual(2, result["state"]["research_finished"])
+                self.assertEqual(2 * tier, result["seed_inserts"])
+                self.assertEqual(2 * tier, result["state"]["planted_events"])
+                reports = list(plain(result["reports"]).values())
+                self.assertEqual(["prepared", "start", "complete", "initial", "reload"], [row["stage"] for row in reports])
+                witness = reports[-1]["witnesses"]
+                self.assertEqual(PUBLISHED_SCIENCE, list(witness["science_contract"]["packs"].values()))
+                self.assertEqual(17645, witness["trained_remaining_ticks"])
+                self.assertEqual(18000, witness["foreign_remaining_ticks"])
+                self.assertTrue(witness["cold_reload_witness"])
+                self.assertTrue(witness["on_load_read_only"])
+        for version, active, arm in (("5.0.21004", True, "candidate-defaults"),
+                                      ("5.0.21006", True, "candidate-defaults"),
+                                      ("5.0.21005", False, "candidate-defaults"),
+                                      ("5.0.21005", True, "candidate")):
+            with self.subTest(version=version, active=active, arm=arm):
+                result = run(str(CORE / "control.lua"), 1, "", arm, True, active, version)
+                self.assertFalse(result["ok"])
+        for opponent in ("settings-policy", "settings-gate", "wrong-timing", "wrong-force", "lost-tower", "load-repair", "lost-consumption", "active-early-event"):
+            with self.subTest(opponent=opponent):
+                result = run(str(CORE / "control.lua"), 1, opponent, "candidate-defaults", True, True, "5.0.21005")
+                self.assertFalse(result["ok"])
 
     def test_exact_f210_api_declares_the_fixture_runtime_surface(self):
         api_path = f210_runtime_api_path()
