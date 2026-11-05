@@ -37,7 +37,8 @@ local function snapshot(force)
     for _, suffix in ipairs{"1", "4"} do
       local id = "recipe-prod-research_material_" .. key .. "-" .. suffix
       local value = tech(force, id)
-      result.technologies[id] = {level=value.level, researched=value.researched, enabled=value.enabled}
+      result.technologies[id] = {level=value.level, researched=value.researched, enabled=value.enabled,
+        prototype_enabled=value.prototype.enabled}
     end
   end
   for _, recipe in ipairs(RECIPES) do
@@ -53,8 +54,10 @@ end
 function M.assert_preserved(actual, expected, label, exact_enabled)
   if actual.current ~= expected.current or #actual.queue ~= #expected.queue
       or not near(actual.progress, expected.progress) or not near(actual.lead_saved, expected.lead_saved) then
+    local current = actual.technologies[actual.current] or {}
     fail(label .. " current/queued/detached work changed; actual current=" .. tostring(actual.current)
       .. " progress=" .. tostring(actual.progress) .. " detached=" .. tostring(actual.lead_saved)
+      .. " force_enabled=" .. tostring(current.enabled) .. " prototype_enabled=" .. tostring(current.prototype_enabled)
       .. " queue=" .. table.concat(actual.queue, ",") .. "; expected current=" .. tostring(expected.current)
       .. " progress=" .. tostring(expected.progress) .. " detached=" .. tostring(expected.lead_saved)
       .. " queue=" .. table.concat(expected.queue, ","))

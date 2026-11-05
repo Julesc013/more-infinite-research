@@ -78,6 +78,15 @@ class PreservationTests(unittest.TestCase):
                 with self.assertRaisesRegex(Exception, "work changed|queue order changed"):
                     self.check(actual, expected)
 
+    def test_progress_failure_reports_force_and_prototype_flags_at_failure_time(self):
+        expected = source_snapshot()
+        expected["current"] = "paid-bronze"
+        actual = deepcopy(expected)
+        actual["progress"] = 0.43
+        actual["technologies"]["paid-bronze"].update(enabled=False, prototype_enabled=False)
+        with self.assertRaisesRegex(Exception, "force_enabled=false prototype_enabled=false"):
+            self.check(actual, expected)
+
     def raw(self, stage):
         technologies = {}
         for key, recipe in zip(FAMILIES, RECIPES):
