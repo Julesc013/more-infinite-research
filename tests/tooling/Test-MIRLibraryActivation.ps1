@@ -112,6 +112,85 @@ try {
   } finally {if($null-ne$activation-and-not$activation.closed){$completion=Complete-MIRLibraryActivation -Activation $activation}}
   Assert-Library ($completion.status-ceq'restored-direct-library-controls'-and-not(Test-Path -LiteralPath (Join-Path $library '.mir-active-profile.json'))) 'completion'
   Assert-Library ((Get-Content -Raw -LiteralPath (Join-Path $library 'mod-list.json'))-ceq$originalList-and([IO.File]::ReadAllBytes((Join-Path $library 'mod-settings.dat'))-join',')-ceq($originalSettings-join',')) 'restoration'
+  # Emulate the observed legacy engine writer in the disposable library only.
+  # The same removal control fails against a bounded pre-JSON restore opponent.
+  $legacyJson=Join-Path $library 'mod-settings.json'
+  function Test-GeneratedLegacySettingsRemoval {
+    $owned=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes $hashes
+    try{[IO.File]::WriteAllText($legacyJson,'{"engine-generated":true}',[Text.UTF8Encoding]::new($false))}
+    finally{$null=Complete-MIRLibraryActivation -Activation $owned}
+    return -not(Test-Path -LiteralPath $legacyJson)
+  }
+  $restoreBody=${function:Restore-MIRLibraryControls}
+  $jsonAdmission="if(`$Journal.controls.Contains('mod-settings.json')){`$names+='mod-settings.json'}"
+  $opponentBody=$restoreBody.ToString()
+  Assert-Library ([regex]::Matches($opponentBody,[regex]::Escape($jsonAdmission)).Count-eq1) 'legacy-json-opponent-one-optional-row-admission'
+  try{
+    # Remove only optional JSON ownership; all old two-control validation,
+    # archive guards and restoration still execute. No old checkout is loaded.
+    Set-Item Function:Restore-MIRLibraryControls ([scriptblock]::Create($opponentBody.Replace($jsonAdmission,'')))
+    Assert-Library (-not(Test-GeneratedLegacySettingsRemoval)) 'legacy-json-controlled-old-restore-leaves-generated-file'
+  }finally{Set-Item Function:Restore-MIRLibraryControls $restoreBody;[IO.File]::Delete($legacyJson)}
+  Assert-Library (Test-GeneratedLegacySettingsRemoval) 'legacy-json-new-restore-removes-generated-file'
+  $originalLegacyJson=[Text.UTF8Encoding]::new($false).GetBytes("{`"startup`":{`"sentinel`":`"original`"}}`r`n")
+  [IO.File]::WriteAllBytes($legacyJson,$originalLegacyJson)
+  $jsonOriginalHash=Get-MIRImmutableInputSha256 $legacyJson
+  foreach($settingsMode in @('Defaults','File')){
+    $settingsArguments=@{}
+    if($settingsMode-ceq'File'){
+      $settingsInput=Join-Path $root 'supplied-settings.dat';[IO.File]::WriteAllBytes($settingsInput,[byte[]](9,8,7))
+      $settingsArguments=@{SettingsMode='File';SettingsPath=$settingsInput;SettingsSha256=Get-MIRImmutableInputSha256 $settingsInput}
+    }
+    $owned=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes $hashes @settingsArguments
+    try{
+      Assert-Library ($owned.journal.controls.Contains('mod-settings.json')-and-not(Test-Path -LiteralPath $legacyJson)) ('legacy-json-'+$settingsMode+'-quarantines-original')
+      if($settingsMode-ceq'Defaults'){Assert-Library (-not(Test-Path -LiteralPath (Join-Path $library 'mod-settings.dat'))) 'legacy-json-defaults-removes-both-formats'}
+      else{Assert-Library ((Get-MIRImmutableInputSha256 (Join-Path $library 'mod-settings.dat'))-ceq(Get-MIRImmutableInputSha256 $settingsInput)) 'legacy-json-file-still-pins-binary-settings'}
+      [IO.File]::WriteAllText($legacyJson,'{"engine-replaced":true}',[Text.UTF8Encoding]::new($false))
+    }finally{$null=Complete-MIRLibraryActivation -Activation $owned}
+    Assert-Library ((Get-MIRImmutableInputSha256 $legacyJson)-ceq$jsonOriginalHash) ('legacy-json-'+$settingsMode+'-restores-exact-original-bytes')
+  }
+  # Fail after live JSON removal, then exercise the real activation catch.
+  $controlWriter=${function:Write-MIRLibraryControl};$script:failLegacyDatRemoval=$true
+  function Write-MIRLibraryControl {
+    param([string]$Path,[byte[]]$Bytes,[switch]$Absent)
+    if($script:failLegacyDatRemoval-and$Absent-and(Split-Path -Leaf $Path)-ceq'mod-settings.dat'){$script:failLegacyDatRemoval=$false;throw '[controlled-legacy-json-activation-failure]'}
+    & $controlWriter @PSBoundParameters
+  }
+  try{Refuses-Library {Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes $hashes} '[controlled-legacy-json-activation-failure]'}
+  finally{Set-Item Function:Write-MIRLibraryControl $controlWriter}
+  Assert-Library ((Get-MIRImmutableInputSha256 $legacyJson)-ceq$jsonOriginalHash-and-not(Test-Path -LiteralPath (Join-Path $library '.mir-active-profile.json'))) 'legacy-json-activation-failure-restores-original'
+  # Abandon only this disposable activation's handles to emulate interrupted
+  # ownership, then let Start recover the durable journal before a new launch.
+  $abandoned=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes $hashes
+  $recoveryJournal=$abandoned.journal|ConvertTo-Json -Depth 12|ConvertFrom-Json -AsHashtable
+  foreach($handle in $abandoned.handles){$handle.Dispose()};$abandoned.lock.Dispose();$abandoned.closed=$true
+  $recoveryJournal.owner_pid=[int]::MaxValue;$recoveryJournal.owner_started_utc='2000-01-01T00:00:00Z'
+  [IO.File]::WriteAllText((Join-Path $library '.mir-active-profile.json'),($recoveryJournal|ConvertTo-Json -Depth 12),[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($legacyJson,'{"interrupted-engine":true}',[Text.UTF8Encoding]::new($false))
+  $recovered=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes $hashes
+  try{Assert-Library ($recovered.journal.controls['mod-settings.json'].sha256-ceq$jsonOriginalHash-and-not(Test-Path -LiteralPath $legacyJson)) 'legacy-json-recovery-restores-original-before-next-defaults'}
+  finally{$null=Complete-MIRLibraryActivation -Activation $recovered}
+  Assert-Library ((Get-MIRImmutableInputSha256 $legacyJson)-ceq$jsonOriginalHash) 'legacy-json-recovery-completes-with-exact-original'
+  $oldJournal=$recoveryJournal|ConvertTo-Json -Depth 12|ConvertFrom-Json -AsHashtable
+  $oldJournal.controls.Remove('mod-settings.json')
+  [IO.File]::WriteAllText($legacyJson,'{"foreign-to-old-journal":true}',[Text.UTF8Encoding]::new($false))
+  $foreignHash=Get-MIRImmutableInputSha256 $legacyJson;$foreignTicks=(Get-Item -LiteralPath $legacyJson).LastWriteTimeUtc.Ticks
+  Restore-MIRLibraryControls -LibraryDirectory $library -Journal $oldJournal
+  Assert-Library ((Get-MIRImmutableInputSha256 $legacyJson)-ceq$foreignHash-and(Get-Item -LiteralPath $legacyJson).LastWriteTimeUtc.Ticks-eq$foreignTicks) 'legacy-json-old-two-control-journal-preserves-foreign-file'
+  [IO.File]::Delete($legacyJson)
+  # Individually bounded backups must not create a journal larger than the
+  # unchanged recovery reader can consume. Reject before any control write.
+  $budgetLibrary=Join-Path $root 'aggregate-control-budget';[void][IO.Directory]::CreateDirectory($budgetLibrary)
+  $budgetArchive=New-TestArchive $budgetLibrary 'controlled' '1.0.0'
+  $budgetBefore=@{};$budgetBytes=[byte[]]::new(3MB)
+  foreach($name in @('mod-list.json','mod-settings.dat','mod-settings.json')){
+    $path=Join-Path $budgetLibrary $name;[IO.File]::WriteAllBytes($path,$budgetBytes)
+    $budgetBefore[$path]=@{hash=Get-MIRImmutableInputSha256 $path;ticks=(Get-Item -LiteralPath $path).LastWriteTimeUtc.Ticks}
+  }
+  Refuses-Library {Start-MIRLibraryActivation -LibraryDirectory $budgetLibrary -EngineDataDirectory $data -ProfilePath $profile -ArchiveHashes @{([IO.Path]::GetFileName($budgetArchive))=(Get-MIRImmutableInputSha256 $budgetArchive)}} '[mir-library-recovery-size]'
+  foreach($path in $budgetBefore.Keys){Assert-Library ((Get-MIRImmutableInputSha256 $path)-ceq$budgetBefore[$path].hash-and(Get-Item -LiteralPath $path).LastWriteTimeUtc.Ticks-eq$budgetBefore[$path].ticks) 'legacy-json-aggregate-budget-refuses-before-control-write'}
+  Assert-Library (-not(Test-Path -LiteralPath (Join-Path $budgetLibrary '.mir-active-profile.json'))) 'legacy-json-aggregate-budget-refuses-before-live-journal'
   # Native 2.1.23 normal exit preserves names/booleans but removes enabled
   # versions. Exercise the real guard with host-only owned-process doubles.
   # Independent versions deliberately distinguish numeric from lexical order.
@@ -194,6 +273,24 @@ try {
     foreach($path in @($chosen,$dependency,$otherDependency)){
       Assert-Library ((Get-MIRImmutableInputSha256 $path)-ceq$originals[$path].sha256-and(Get-MIRImmutableInputFileIdentity $path)-ceq$originals[$path].identity) 'selected-and-dependency-archives-untouched'
     }
+    # All optional JSON backup checks must precede every control write and the
+    # existing owned-archive visibility restore, including the real hidden ZIP.
+    [IO.File]::WriteAllText((Join-Path $legacy 'mod-settings.json'),'{"live":true}',[Text.UTF8Encoding]::new($false))
+    $liveControls=@{};foreach($name in @('mod-list.json','mod-settings.dat','mod-settings.json')){$liveControls[$name]=Read-MIRLibraryControl (Join-Path $legacy $name)}
+    foreach($bad in @('null','boolean','base64','bytes-type','hash-type','hash','absent-bytes','size')){
+      $journal=$activation.journal|ConvertTo-Json -Depth 12|ConvertFrom-Json -AsHashtable
+      $row=@{exists=$true;bytes=[Convert]::ToBase64String($originalLegacyJson);sha256=$jsonOriginalHash};$error='[mir-library-recovery-control]'
+      switch($bad){
+        'null'{$row=$null};'boolean'{$row.exists='true'};'base64'{$row.bytes='not-base64!'};'bytes-type'{$row.bytes=42};'hash-type'{$row.sha256=42}
+        'hash'{$row.sha256='0'*64;$error='[mir-library-recovery-hash]'}
+        'absent-bytes'{$row.exists=$false;$row.sha256='';$error='[mir-library-recovery-hash]'}
+        'size'{$large=[byte[]]::new(4MB+1);$row.bytes=[Convert]::ToBase64String($large);$row.sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($large));$error='[mir-library-recovery-hash]'}
+      }
+      $journal.controls['mod-settings.json']=$row
+      Refuses-Library {Restore-MIRLibraryControls -LibraryDirectory $legacy -Journal $journal} $error
+      Assert-Library (-not(Test-Path -LiteralPath $alternate)-and(Test-Path -LiteralPath $hidden[0].FullName)-and(Get-MIRImmutableInputSha256 $hidden[0].FullName)-ceq$originals[$alternate].sha256) ('legacy-json-'+$bad+'-rejects-before-archive-rename')
+      foreach($name in $liveControls.Keys){$actual=Read-MIRLibraryControl (Join-Path $legacy $name);Assert-Library (($actual|ConvertTo-Json -Compress)-ceq($liveControls[$name]|ConvertTo-Json -Compress)) ('legacy-json-'+$bad+'-rejects-before-control-write')}
+    }
   }finally{if($null-ne$activation-and-not$activation.closed){$completion=Complete-MIRLibraryActivation -Activation $activation}}
   foreach($path in $originals.Keys){
     Assert-Library ((Get-MIRImmutableInputSha256 $path)-ceq$originals[$path].sha256-and(Get-MIRImmutableInputFileIdentity $path)-ceq$originals[$path].identity) 'legacy-original-identity-and-bytes-restored'
@@ -266,7 +363,7 @@ try {
   $preflightDependency=New-TestArchive -Library $preflightLibrary -Name 'controlled' -Version '1.0.0' -Payload '-- same-version repack'
   Refuses-Library {Start-MIRLibraryActivation -LibraryDirectory $preflightLibrary -EngineDataDirectory $preflightData -ProfilePath $preflightProfile -ArchiveHashes $capturedHashes -SettingsMode Defaults} '[mir-library-hash-mismatch]'
   Assert-NativeFixturePreflightControlsAbsent -Library $preflightLibrary -Output $preflightOutput
-  [pscustomobject]@{status='passed';checks=$checks;native_execution=$false;package_materialization=$false}|ConvertTo-Json -Compress
+  [pscustomobject]@{status='passed';checks=$checks;native_execution=$false;package_materialization=$false;controlled_pre_json_restore_leaves_generated_json=$true}|ConvertTo-Json -Compress
 } finally {
   if(Test-Path -LiteralPath $root){Remove-MIR441ContainedTree -AdmittedRoot (Join-Path $repo 'build/tmp') -Path $root}
 }
