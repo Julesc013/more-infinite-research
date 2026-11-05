@@ -8843,7 +8843,7 @@
         "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
       }
     ],
-    "next_bounded_work": "Use stable_coverage_review for the finite current obligations and owner split. Black Glass selects, prepares, repairs and executes routine native work without prospective Aero packet approval; Aero independently reviews source, expectations, actual results and final delivery. Preserve accepted 5.0.4 weapon/Galore/mixed-ownership and package/delivery components, the bounded Foundation mean-update result and original nine/seven/four migration identities under consumed-input review. Close actual remaining Library/client/export/Discovery Tree reset, supported-profile/API/state and whole-product performance requirements. Historical reconciliation retains 33 bounded reviews while remaining original assertion/transitive, effective-setting, compatibility/inter-release and unknown-consumer sources stay incomplete. No known failure is waived, prior result relabelled, every-old-patch campaign restarted or retired framework restored.",
+    "next_bounded_work": "Use stable_coverage_review for the finite current obligations and owner split. Black Glass selects, prepares, repairs and executes routine native work without prospective Aero packet approval; Aero independently reviews source, expectations, actual results and final delivery. Preserve accepted 5.0.4 weapon/Galore/mixed-ownership and package/delivery components, the bounded Foundation mean-update result and original nine/seven/four migration identities under consumed-input review. Close actual remaining Library/client/export/Discovery Tree reset, supported-profile/API/state and whole-product performance requirements. Historical reconciliation retains 34 bounded reviews while remaining original assertion/transitive, effective-setting, compatibility/inter-release and unknown-consumer sources stay incomplete. No known failure is waived, prior result relabelled, every-old-patch campaign restarted or retired framework restored.",
     "bounded_intent_reviews": [
       {
         "subjects": [
@@ -16794,6 +16794,36 @@
         "test_intent_reconciliation_complete": false,
         "native_execution": false,
         "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-07",
+          "CONT-12",
+          "CONT-13",
+          "VER-07",
+          "MIG-01"
+        ],
+        "reviewed_on": "2026-11-05",
+        "reviewed_against": "9e6ecc87ba875c76921a1ce90c4962ce31e649d1",
+        "scope": "Seven latest selected K2 full-state/sentinel/profile bodies, plus six explicitly older-context bodies at13 immutable blobs/52 retained tag-path bindings. The profile fresh fixture is replaced before execution. Source intent only; no old/current native result relabelled.",
+        "evidence": {
+          "path": "spec/evidence/historical-k2-imported-fixture-intents-aero-r01.json",
+          "sha256": "FB28CA81F357CE2AE79926D5FC53E17C8FF14CA06B8DD3758D16EF35D3529512"
+        },
+        "disposition": "Retain2% powder versus10% native crystal ownership,0/2/3/7 earned boundaries and42% current work, private carriers, full captured state, owned foreign delta and actual save/cold-stage distinction. Keep both admitted engine/profile lanes, explicit0cap/default3 distinction and conditional older crusher-output expectation. Attribute old descriptor comparison only to the early holder, not both.",
+        "independent_review": {
+          "path": "9e7eec1819b02c76b3449bf7c525165a1e605238:evidence/aero-historical-k2-imported-fixture-review-r01/review.json",
+          "sha256": "FF76D25057DC7A40C47A3FA8E95584CB69FC35BDC0EB056A2E961887082A661F"
+        },
+        "remaining_executable_check": "Review original actual inputs/results and current consumed-input applicability for profile science/definition deltas and older physical crusher-output reuse. Continue other historical/transitive/effective-setting/consumer obligations without a new beta gate or every-old-patch campaign.",
+        "owner": "Aero historical/source review; Black Glass autonomous affected native/integration/publication",
+        "source_body_intent_reconciliation_complete_for_latest_selected": true,
+        "all_k2_history_complete": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false,
+        "release_qualification": false
       }
     ],
     "stable_coverage_review": {
@@ -17031,9 +17061,10 @@
           "applicable_evidence": [
             "spec/evidence/historical-validation-result-intents-aero-r01.json",
             "spec/evidence/historical-validation-helper-intents-aero-r01.json",
-            "spec/evidence/historical-upgrade-manifest-test-intents-aero-r01.json"
+            "spec/evidence/historical-upgrade-manifest-test-intents-aero-r01.json",
+            "spec/evidence/historical-k2-imported-fixture-intents-aero-r01.json"
           ],
-          "remaining_executable_check": "Retain the33 bounded intent reviews with their exact scopes. The direct upgrade-manifest test family is dispositioned through10 immutable bodies/14 retained bindings,22 latest intent groups and158 earlier changed lines; imported helpers,fixture semantics and actual native outcomes remain separate. Continue remaining original assertion/transitive,effective/nondefault-setting,compatibility/inter-release and unresolved consumer/source work. Map recovered accepted behavior to implementation,independent opposing controls and genuinely affected checks. Keep inventory_complete=false,all87 original request records/decisions,unresolved issues621/446 and PR344,missing originals and reporter configurations explicit; counts and representative fixtures are not global completeness.",
+          "remaining_executable_check": "Retain the34 bounded intent reviews with their exact scopes. The direct upgrade-manifest test family is dispositioned through10 immutable bodies/14 retained bindings,22 latest intent groups and158 earlier changed lines; The selected K2 fixture/sentinel/profile source intents are separately mapped, with six older-context bodies kept distinct from actual latest-lane inputs. Other imported helpers,fixture semantics and actual native outcomes remain separate. Continue remaining original assertion/transitive,effective/nondefault-setting,compatibility/inter-release and unresolved consumer/source work. Map recovered accepted behavior to implementation,independent opposing controls and genuinely affected checks. Keep inventory_complete=false,all87 original request records/decisions,unresolved issues621/446 and PR344,missing originals and reporter configurations explicit; counts and representative fixtures are not global completeness.",
           "owner": "Aero",
           "independent_review": "Aero",
           "status": "open: bounded source-intent dispositions exist; complete historical preservation remains unproved"
