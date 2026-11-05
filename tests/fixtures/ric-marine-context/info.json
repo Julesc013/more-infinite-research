@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-ric-marine-context",
+  "version": "0.1.0",
+  "title": "MIR RIC Marine context observation",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "real-industrial-chemistry >= 0.35.8",
+    "? more-infinite-research"
+  ]
+}

@@ -210,6 +210,8 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
               ["mir-fixture-mir5-library-paired-browser-arm-" .. arm]="0.1.0"
             }
             if opponent == "wrong-closure" then active.intruder = "1.0.0" end
+            if opponent == "retained-published505" then active["more-infinite-research"] = "5.0.20005" end
+            if opponent == "retained-unreviewed506" then active["more-infinite-research"] = "5.0.20006" end
 
             local env = {
               script = {
@@ -555,6 +557,20 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 self.assertEqual(result["save_ticks"]["mir5-native-complete"], ticks[-1])
                 self.assertTrue(all(row["native_snapshot_unchanged"] for row in markers))
                 self.assertEqual(result["load_writes"], 0)
+
+    def test_published505_retains_the_fixed_protocol_and_refuses_an_unreviewed_successor(self):
+        result = self.runtime_result("mir5", "retained-published505")
+        self.assertTrue(result["ok"], result["message"])
+        markers = [row for row in result["markers"] if row.get("window_ticks") is not None]
+        ticks = [row["tick"] for row in markers]
+        self.assertEqual([ticks[1]-ticks[0], ticks[2]-ticks[1], ticks[3]-ticks[2]], [600, 960, 600])
+        self.assertEqual(len(result["calls"]), 72)
+        self.assertEqual(len(result["screenshots"]), 12)
+        self.assertEqual(result["load_writes"], 0)
+        self.assertTrue(all(row["native_snapshot_unchanged"] for row in markers))
+        refused = self.runtime_result("mir5", "retained-unreviewed506")
+        self.assertFalse(refused["ok"])
+        self.assertIn("active-mod closure differs", refused["message"])
 
     def test_retained_refresh_rejects_bad_setting_native_mutation_and_lost_final_view(self):
         for arm in ARMS:

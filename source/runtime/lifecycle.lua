@@ -298,6 +298,30 @@ local function reconcile_authored_prototype_disablement(force, owned_disabled, i
   return false
 end
 
+local function cancel_unavailable_research(force)
+  -- Native technology.saved_progress is the modern saved-work surface. Older
+  -- engine adapters retain their existing cap/queue behavior.
+  if platform_target.factorio_version ~= "2.0" and platform_target.factorio_version ~= "2.1" then return end
+  if not valid_force(force) then return end
+  local unavailable
+  local function inspect(technology)
+    local name = technology and technology.name
+    local row = name and DECLARATION_BY_ID[name]
+    if row and row.ownership_kind == "authored_generated"
+        and row.declaration.cancel_queued_when_unavailable == true
+        and authored_generated_prototype_disabled(force, row) then
+      unavailable = unavailable or {}
+      unavailable[name] = true
+    end
+  end
+  -- Inspect actual queued/current identities, not every force technology or
+  -- the authored catalogue on each research event. Force-only disablement is
+  -- not a prototype-policy decision and gives no authority to cancel it.
+  inspect(force.current_research)
+  for _, technology in ipairs(force.research_queue or {}) do inspect(technology) end
+  if unavailable then caps.remove_unavailable_from_queue(force, unavailable) end
+end
+
 local function full_limits_for(force, include_worker, selected_owner, owner_resolved)
   local limits, admitted = {}, {}
   if valid_force(force) then
@@ -501,6 +525,9 @@ local function reconcile_all(clean_stale_forces, selected_owners, imported_reena
       reconcile_authored_prototype_disablement(force, owned_disabled,
         imported_reenabled and imported_reenabled[force.index])
     end
+    -- Preserve unavailable current investment before any cap reconciliation
+    -- can rewrite the same native queue and drop its now-disabled head.
+    cancel_unavailable_research(force)
     local owner = valid_force(force) and selected_owners and selected_owners[force.index] or nil
     if current then
       reconcile_force(force, owned_disabled, owner, selected_owners ~= nil, nil,
@@ -526,6 +553,12 @@ local function legacy_candidates(force, worker_name, direct_f200_hop)
     if row.enabled then
       if row.ownership_kind == "authored_generated" then
         admitted = authored_generated_admitted(force, row)
+        if not admitted and row.declaration.retain_unavailable_cap_right == true then
+          -- The named Bob material stages can retain an unchanged effect
+          -- vector unavailable. Decode an exact old cap right while dormant;
+          -- this marker creates no right and cannot enable a disabled default.
+          admitted = authored_generated_prototype_disabled(force, row) ~= nil
+        end
       else
         admitted = native_owner_admitted(force, row)
       end
@@ -533,8 +566,8 @@ local function legacy_candidates(force, worker_name, direct_f200_hop)
         and authored_generated_prototype_disabled(force, row) ~= nil then
       -- A user-disabled family retains this authored identity with a disabled
       -- prototype. Keep only an already-proven V3 cap right until a later
-      -- enabled configuration can reconcile it; science/lab policy-disabled
-      -- rows remain in the enabled branch and are not deferred here.
+      -- enabled configuration can reconcile it; other policy-disabled rows
+      -- remain in the enabled branch and are not deferred here.
       admitted = true
     end
     if admitted then
@@ -688,6 +721,7 @@ local function reconcile_event(event, research_only, discovery_observed)
   if DISCOVERY_TREE and discovery_observed then research_only = false end
   local force = event_force(event)
   if not force then return end
+  cancel_unavailable_research(force)
   -- Named research callbacks need only cap reconciliation. Rare force/reset
   -- events also enforce authored disabled prototypes, even without a finite
   -- cap or prior ledger. Allocate only when an actual policy write is needed.

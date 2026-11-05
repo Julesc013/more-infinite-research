@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "kind": "mir5-library-paired-browser-f200-native-selection",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "4.7.20002",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-library-paired-browser",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-library-paired-browser-arm-published",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "more-infinite-research_4.7.20002.zip": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+    "mir-fixture-mir5-library-paired-browser_0.1.0.zip": "DF5CCFE162A39C98D55AF6F07FF927D0C6B2AD16EB2C6C323677319E1332290D",
+    "mir-fixture-mir5-library-paired-browser-arm-published_0.1.0.zip": "0D4447BC343D7D26FC2546F003F0A3933859B76831720D4F71C07730E5D83532"
+  },
+  "scope": "Exact published5.0.5 retained-Library protocol preparation; fixed424242, All scope,600/960/600 ticks,32 refreshes per client. No observed result or performance verdict."
+}

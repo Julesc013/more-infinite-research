@@ -1222,6 +1222,117 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_paired_shutdown_waits_for_both_client_completions_after_the_host(self):
+        source = SESSION.read_text(encoding='utf-8')
+        host_done = source.index("$completed = Wait-For 'paired Browser completed marker'")
+        wait = source.index('Wait-PairedBrowserClientCompletion $activeClients $pairedArm', host_done)
+        stop = source.index('Stop-Record $client', wait)
+        self.assertLess(host_done, wait)
+        self.assertLess(wait, stop)
+        self.assertIn('closed paired Browser client transcript lacks completion', source[stop:])
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          foreach($name in @('Test-LibraryInteger','Assert-PairedBrowserInteger','Assert-PairedBrowserBoolean','Get-PairedBrowserStageMarker','Wait-PairedBrowserClientCompletion','Start-Clients')) {
+            $nodes=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq$name},$true))
+            if($nodes.Count-ne1){throw "missing or ambiguous function:$name"}
+            Invoke-Expression $nodes[0].Extent.Text
+          }
+          function Read-LogText([string]$Path){[IO.File]::ReadAllText($Path)}
+          $complete=[ordered]@{schema=1;case='library-paired-browser';stage='completed';status='passed';arm='published';requested_family='all';native_family_verified=$false;join_events=4;action_call_count=2;screenshot_calls=12;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false}
+          $line=' 62.000 Script @fixture.lua: [MIR5_LIBRARY_PAIRED_BROWSER] '+($complete|ConvertTo-Json -Compress)+"`n"
+          # A completed host with two peers still at post-refresh-start must
+          # not suffice. Each peer supplies its own completion on poll three.
+          $hostCompleted=$line
+          $clients=@(foreach($name in @('en','de')){
+            $folder=Join-Path $env:MIR_TEST_CLIENT_ROOT $name
+            [IO.Directory]::CreateDirectory($folder)|Out-Null
+            [IO.File]::WriteAllText((Join-Path $folder 'factorio-current.log'),'post-refresh-start')
+            [pscustomobject]@{name=('MIR5'+$name);locale=$name;write_data=$folder;config='unused.ini';port=1}
+          })
+          $serverWriteData=$env:MIR_TEST_CLIENT_ROOT
+          [IO.File]::WriteAllText((Join-Path $serverWriteData 'factorio-current.log'),'host-completed')
+          $library='unused';$serverPort=1;$clientGraphics=@();$apiClientConsumers=$false
+          $fixtureCase='library-paired-browser';$markerPrefix='MIR5_LIBRARY_PAIRED_BROWSER'
+          function Start-Native([string]$Name,[string[]]$Arguments){[pscustomobject]@{name=$Name}}
+          $polls=@{}
+          function Wait-For([string]$Description,[scriptblock]$Predicate) {
+            if($Description.StartsWith('native join of ')){return $true}
+            $peer=@($actors|Where-Object {$Description-ceq("paired Browser "+$_.name+" completed marker")})
+            if($peer.Count-ne1){throw 'completion target differs'}
+            for($i=1;$i-le3;$i++) {
+              $polls[$peer[0].name]=$i
+              $value=&$Predicate $null
+              if($null-ne$value){return $value}
+              if($i-eq2){[IO.File]::WriteAllText($peer[0].native_log_path,$line)}
+            }
+            throw 'peer completion was not observed'
+          }
+          $actors=@(Start-Clients 'restart')
+          if($actors.Count-ne2-or$actors[0].native_log_path-cne(Join-Path $clients[0].write_data 'factorio-current.log')){throw 'launched record lost its own native-log binding'}
+          Wait-PairedBrowserClientCompletion $actors 'published'
+          if($polls.Count-ne2-or$polls['client-restart-en']-ne3-or$polls['client-restart-de']-ne3){throw 'a peer was completed from host or another peer state'}
+          # The new wait retains the existing marker's strict ownership oracle.
+          foreach($mode in @('wrong-joins','wrong-arm','duplicate')) {
+            $bad=$complete|ConvertTo-Json|ConvertFrom-Json -AsHashtable
+            if($mode-ceq'wrong-joins'){$bad.join_events=3}
+            if($mode-ceq'wrong-arm'){$bad.arm='mir5'}
+            $badLine='[MIR5_LIBRARY_PAIRED_BROWSER] '+($bad|ConvertTo-Json -Compress)+"`n"
+            if($mode-ceq'duplicate'){$badLine+=$badLine}
+            [IO.File]::WriteAllText($actors[0].native_log_path,$badLine)
+            $caught=$false
+            try{Wait-PairedBrowserClientCompletion $actors 'published'}catch{
+              $caught=$_.Exception.Message-cmatch 'join_events differs|arm differs|marker is duplicated'
+            }
+            if(-not$caught){throw "invalid peer completion was admitted:$mode"}
+          }
+        '''
+        with tempfile.TemporaryDirectory(prefix='mir-peer-completion-', dir=ROOT/'build/tmp') as work:
+            self.assertTrue(Path(work).resolve().is_relative_to((ROOT/'build/tmp').resolve()))
+            result = subprocess.run(
+                ['pwsh','-NoLogo','-NoProfile','-NonInteractive','-Command',script], cwd=ROOT,
+                env={**os.environ,'MIR_TEST_SESSION':str(SESSION),'MIR_TEST_CLIENT_ROOT':work},
+                capture_output=True,text=True,check=False,
+            )
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+
+    def test_paired_wrapper_admits_exact_published505_and_refuses_changed_inputs(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $node=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq'Assert-MultiplayerFixtureSelection'},$true))
+          if($node.Count-ne1){throw 'selection function differs'}
+          Invoke-Expression $node[0].Extent.Text
+          function Profile {Get-Content -LiteralPath $env:MIR_TEST_505_PROFILE -Raw|ConvertFrom-Json -AsHashtable}
+          $engine='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B'
+          $mir='764CE505DF162C2D95E9218C0B7684AB4811940F8B43698FCE681DEA71AB284D'
+          $target=Assert-MultiplayerFixtureSelection (Profile) $engine 'library-paired-browser' $mir 8192
+          if($target.mir-cne'5.0.20005'){throw 'published505 was not selected'}
+          function Refuse($profile,$actualEngine=$engine,$expected=$mir) {
+            try{Assert-MultiplayerFixtureSelection $profile $actualEngine 'library-paired-browser' $expected 8192|Out-Null}catch{return}
+            throw 'changed published505 input was admitted'
+          }
+          $bad=Profile;$bad.mods[2].version='5.0.20006';Refuse $bad
+          $bad=Profile;$bad.archive_sha256['more-infinite-research_5.0.20005.zip']='0'*64;Refuse $bad
+          Refuse (Profile) ('0'*64)
+          Refuse (Profile) $engine ('0'*64)
+          $bad=Profile;$bad.mods[4].name='mir-fixture-mir5-library-paired-browser-arm-published';Refuse $bad
+          $bad=Profile;$bad.mods[0].version='2.1.23';Refuse $bad
+        '''
+        result = subprocess.run(
+            ['pwsh', '-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script],
+            cwd=ROOT, env={**os.environ, 'MIR_TEST_WRAPPER':str(WRAPPER),
+                           'MIR_TEST_505_PROFILE':str(ROOT/'tests/profiles/library-retained-current505-f200-2077.json')},
+            capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_multiplayer_wrapper_admits_only_the_exact_current_standalone_space_age_api_client_profile_before_admission(self):
         script = r'''
           $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
@@ -4158,6 +4269,10 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             return [pscustomobject]@{files=@(1..$count|ForEach-Object {Join-Path $output ("paired-capture-"+$_.ToString()+'.png')})}
           }
           function Invoke-LoopbackRconKicks {param($Port,$Password)}
+          function Wait-PairedBrowserClientCompletion($Clients,[string]$ExpectedArm){
+            if($Clients.Count-ne2-or$ExpectedArm-cne'published'){throw 'paired peer wait target differs'}
+            $script:peerCompletionObserved=$true
+          }
           $script:memoryWrites=0;$script:memoryReasons=[Collections.Generic.List[string]]::new()
           function Set-MIROwnedProcessMemoryIncomplete {param($Sampler,[string]$Reason)$script:memoryReasons.Add($Reason)}
           function Write-MIROwnedProcessMemoryObservationReceipt {
@@ -4206,12 +4321,15 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               $ordinal++
               $name=if($locale-ceq'en'){'MIR5English'}else{'MIR5Deutsch'}
               [IO.File]::AppendAllText((Join-Path $serverWriteData 'factorio-current.log'),"[MIR5_LIBRARY_PAIRED_BROWSER_JOIN] $name $ordinal`n",[Text.UTF8Encoding]::new($false))
-              $record=[pscustomobject]@{name="client-$Phase-$locale";closed=$false}
+              $stdout=Join-Path $output ("client-$Phase-$locale.stdout.log")
+              [IO.File]::WriteAllText($stdout,'[MIR5_LIBRARY_PAIRED_BROWSER] stage=completed arm=published')
+              $record=[pscustomobject]@{name="client-$Phase-$locale";closed=$false;stdout=$stdout}
               $script:records.Add($record);$record
             }
           }
           function Stop-Record($Record){
             $script:stops.Add($Record.name)
+            if($fixtureCase-ceq'library-paired-browser'-and$script:mode-in@('success','appended-phase','cleanup')-and$Record.name-like'client-restart-*'-and-not$script:peerCompletionObserved){throw 'paired client stopped before peer wait'}
             if(Test-Path -LiteralPath $script:sessionPath){throw 'success receipt preceded teardown'}
             if($Record.name -like 'server-*' -and @($script:records|Where-Object {
                 $_.name -like 'client-*' -and -not $_.closed}).Count){
@@ -4250,7 +4368,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               $script:records=[Collections.Generic.List[object]]::new()
               $script:stops=[Collections.Generic.List[string]]::new()
               $sessionFailure=$null;$result=$null;$server=$null;$activeClients=@()
-              $script:memoryWrites=0;$script:memoryReasons.Clear()
+              $script:memoryWrites=0;$script:memoryReasons.Clear();$script:peerCompletionObserved=$false
               $processMemorySampler=if($fixtureCase -cin @('library-multiplayer','library-paired-browser')){[pscustomobject]@{}}else{$null}
               $processMemoryObservationPath=if($fixtureCase -cin @('library-multiplayer','library-paired-browser')){Join-Path $output 'process-memory-observations.json'}else{$null}
               $serverWriteData=$output;$workroot=$output;$engine='unused';$seed='seed';$restartSave='restart';$finalSave='final'

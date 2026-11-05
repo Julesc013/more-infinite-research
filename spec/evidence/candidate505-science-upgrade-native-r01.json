@@ -1,0 +1,142 @@
+{
+  "schema": 1,
+  "kind": "MIR505ScienceUpgradeNativeComponentIndexV1",
+  "reviewed_on": "2026-11-05",
+  "status": "ACCEPT-scoped-actual-upgrade-components-not-stable",
+  "actual_native_source": "f0ca34d69adb1f3596b888437b94073722f722a7",
+  "private_source": "19f67cd45a0bd7acb3360cbcd53512c5223ceca8",
+  "player_tree": "41d36ed8db131404692d5c054da3c87f7b54aecb",
+  "final_package_source": "0700a3d6cf1a2ac41579e90484eab3a8cad2739d",
+  "host_only_followup": "20d8138bc0decdf5ec19618ec864ca02aafd0e10",
+  "final_notes_only_followup": "0700a3d6cf1a2ac41579e90484eab3a8cad2739d",
+  "subsequent_player_tree_identical": true,
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "packet_sha256": "03C65278548169AC52DEF1938003B2F1BCAA8988B4392257BC1D563706993EB9",
+  "independent_expectations": [
+    "Published Space Age two-gear-route capture retained in tests/test_generator.py; both effects0.10.",
+    "v4.7.3:fixtures/assert-trigger-output-science-f210-470 named white-science payload/trigger relation.",
+    "MIG-01 paid/current/queued/detached state; existing canonical saved-source and two-cold-reload protocol."
+  ],
+  "cases": [
+    {
+      "id": "published504",
+      "result_sha256": "756A96393782B67BC27A2C77085B8DEBACF876E51B4FE74BA0F6B7BA884E4B0D",
+      "mir_archive_sha256": "154707C40ED772A09387BF4FB673D337796FFBCEAF1C3C57EA7DB9C3F608E922",
+      "initial_witnesses": {
+        "source_mir": "5.0.21004",
+        "current_mir": "5.0.21004",
+        "fixture": "0.1.0",
+        "source_actual_lab_completions": 1,
+        "successor_actual_lab_completions": 0,
+        "source_partial": 0.21666666666666665,
+        "current_progress": 0.21666666666666665,
+        "queue": "recipe-prod-research_gears-1|mir-science-upgrade-queued",
+        "next_level": 2,
+        "gear_bonus": 0.1,
+        "casting_gear_bonus": 0.1,
+        "detached_progress": 0.27,
+        "on_load_read_only": false
+      },
+      "cold_reloads": 2,
+      "all_completed_save_bytes_unchanged": true,
+      "process_instances": 4
+    },
+    {
+      "id": "stock505",
+      "result_sha256": "7EA2EBCA4EF0689FE52A4483BF2AFEABD1613D64E28C1C87BE30BB297F251C76",
+      "mir_archive_sha256": "3537810989FCD72232AF4597B28C699D83AE0E9B77FDAF42AF57A01E29B65E6A",
+      "initial_witnesses": {
+        "source_mir": "5.0.21004",
+        "current_mir": "5.0.21005",
+        "fixture": "0.1.0",
+        "source_actual_lab_completions": 1,
+        "successor_actual_lab_completions": 1,
+        "source_partial": 0.21666666666666665,
+        "current_progress": 0,
+        "queue": "mir-science-upgrade-queued",
+        "next_level": 3,
+        "gear_bonus": 0.2,
+        "casting_gear_bonus": 0.2,
+        "detached_progress": 0.27,
+        "on_load_read_only": false
+      },
+      "cold_reloads": 2,
+      "all_completed_save_bytes_unchanged": true,
+      "process_instances": 3
+    },
+    {
+      "id": "trigger505",
+      "result_sha256": "3B2714F538F8C5753EFDDCCF50DDF8D372456E72BEA31B1945B0BEC1ECA027C8",
+      "mir_archive_sha256": "3537810989FCD72232AF4597B28C699D83AE0E9B77FDAF42AF57A01E29B65E6A",
+      "initial_witnesses": {
+        "source_mir": "5.0.21004",
+        "current_mir": "5.0.21005",
+        "fixture": "0.2.0",
+        "source_actual_lab_completions": 1,
+        "successor_actual_lab_completions": 1,
+        "source_partial": 0.21666666666666665,
+        "current_progress": 0,
+        "queue": "mir-science-upgrade-queued",
+        "next_level": 3,
+        "gear_bonus": 0.2,
+        "casting_gear_bonus": 0.2,
+        "detached_progress": 0.27,
+        "on_load_read_only": false
+      },
+      "cold_reloads": 2,
+      "all_completed_save_bytes_unchanged": true,
+      "process_instances": 3
+    }
+  ],
+  "source_save": {
+    "path": "D:\\Projects\\Factorio\\.task-builds\\mixed504-release-index-r01\\build\\tmp\\candidate505-science-upgrade-r02\\published504\\write-data\\saves\\mir5-native-complete.zip",
+    "sha256": "0CBFDB1F1ED2A97854FF2F58FAC6BEA891E77E8A4BE9B1CD27C88BFC6ED96FF3",
+    "bytes": 498529
+  },
+  "source_save_unchanged_in_both_successors": true,
+  "actual_source_lab_completions": 1,
+  "new_successor_lab_completions": 2,
+  "accepted_process_instances": 10,
+  "natural_exit_zero": 7,
+  "supervised_completion_predicate_stops": 3,
+  "original_failed_process_instances": 1,
+  "original_failure": "r01 data-stage fixture wrongly expected the one-recipe Base subset; no source save. Corrected from independent published Space Age two-route capture; original stays failed.",
+  "original_failed_host_control": "Initial f0ca hosted job retained. Positive gun-credit fixture destination was stale; production guard unchanged.",
+  "fixture_opposition_controls": 19,
+  "restoration_verified": true,
+  "original_library_entries": 719,
+  "custody": {
+    "repository": "Julesc013/mir-native-worker",
+    "commit": "32a1e1c91081d09a53d168a5b9552d0be5406024",
+    "path": "evidence/science-upgrade505-native-r02",
+    "tracked_lf_manifest_sha256": "6C6E2630F342518206A70D74866F4C94FBF1B4D67F7218D3CFAFA3BE2B45BD8E",
+    "original_crlf_manifest_sha256": "95EBD1D6E110075774943236659992BFCB38C771687B653B29590A1E6DE1D92E",
+    "exact_original_manifest_gzip_sha256": "92E2103A909D88DF08E64F23554B7E2E5C7E9C24C5BCFE215C46500AA8C3B2D9",
+    "line_ending_disposition": "Tracked LF index and losslessly retained CRLF original have equal JSON content; identities are not interchangeable.",
+    "gzip_sha256": "3FE3E7FD5F6D0697DDEFF45A75CA91C0C5D4FE7D2D10CBE81C8E68CE3D5911D3",
+    "decoded_sha256": "1DFBF17225D838C79F14E35FD4A4EA6AF92C6DC6DE59095955C7FE5FF667520F",
+    "original_text_records": 137,
+    "binary_locators": 10,
+    "primary_native_file_pairs": 68
+  },
+  "independent_review": {
+    "commit": "9b8e34592ac5eafb5b9719705ddce31ca3fc62e1",
+    "path": "evidence/aero-candidate505-source-native-review-r01/native-review.json",
+    "sha256": "6525F79D9873189875CFA91F4B020F7040958BA795D4A459839C9BB98C068526",
+    "verdict": "ACCEPT bounded actual science-upgrade components"
+  },
+  "native_intervals_seconds_scheduling_only": 22.751895,
+  "limits": [
+    "Synthetic typed upstream relation and accelerated five-pack biolab witnesses; physical satellite/science production is not established.",
+    "One paid gear level plus actual21.6667% next-level work; queued and detached identities are fixture-owned external technologies, not every modpack.",
+    "One exact Base/Space Age2.1.23 closure and candidate35378109, not all profiles/engines, every predecessor or an aggregate API/Library/performance verdict.",
+    "Actual native source remains f0ca; follow-up20d8 changes only host tests and has the identical41d36ed8 player tree. No fresh execution is implied.",
+    "Original r01 failure remains failed. Independent result review and release gates are separate; no stable acceptance."
+  ],
+  "physical_acquisition_qualified": false,
+  "performance_acceptance": false,
+  "stable_acceptance": false
+}

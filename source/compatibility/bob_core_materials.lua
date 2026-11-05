@@ -1,7 +1,7 @@
 -- Exact F210 no-Angel Bob Core material constructor.  It validates the seven
 -- named routes and declared prerequisite references before returning fourteen
--- detached MIR technologies.  It does not search recipe, owner, or science
--- graphs.
+-- detached MIR technologies. The process-return check shares one ingredient
+-- index; it does not discover owners or science progression.
 local stages = require("research.material_stages")
 local DEFINITIONS = require("research.bob_core_materials")
 local routes = require("compatibility.material_routes")
@@ -49,19 +49,30 @@ local function continuation_description(definition, stream)
 end
 
 
-function M.technologies(values, raw, active_mods)
+function M.technologies(values, raw, active_mods, return_context)
   if not M.applies(active_mods) then return {} end
   local streams = {}
   for index, definition in ipairs(DEFINITIONS) do
     routes.preflight(raw, definition, fail)
     streams[index] = stream_for(values, definition)
   end
+  local returns = require("compatibility.material_returns")
+  local context = return_context and return_context() or returns.prepare(raw)
+  local unavailable = {}
+  for _, definition in ipairs(DEFINITIONS) do
+    unavailable[definition.key] = routes.return_reason(raw, definition, context, fail) ~= nil
+  end
   local output = {}
   for index, definition in ipairs(DEFINITIONS) do
     local stream = streams[index]
-    output[#output + 1] = stages.technology(definition, definition.early, stream, fail)
+    local early = stages.technology(definition, definition.early, stream, fail)
     local continuation = stages.technology(definition, definition.continuation, stream, fail)
     continuation.localised_description = continuation_description(definition, stream)
+    if unavailable[definition.key] then
+      stages.retain_disabled(early)
+      stages.retain_disabled(continuation)
+    end
+    output[#output + 1] = early
     output[#output + 1] = continuation
   end
   return output

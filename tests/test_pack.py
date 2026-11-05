@@ -95,6 +95,7 @@ class PackTests(unittest.TestCase):
                 "research/native_direct_definitions.lua",
                 "research/native_credit_contracts.lua",
                 "platform/target.lua",
+                "integrations/ric/profile.lua",
                 "compatibility/modern_catalogue.lua",
                 "compatibility/modern_catalogue/base.lua",
                 "compatibility/modern_catalogue/k2_base.lua",
@@ -134,6 +135,9 @@ class PackTests(unittest.TestCase):
         self.assertNotIn(PLAYER / "research/generator.lua", closure)
         self.assertNotIn(PLAYER / "research/native_credit_definitions.lua", closure)
         self.assertNotIn(PLAYER / "compatibility/product_bindings.lua", closure)
+        self.assertNotIn(PLAYER / "integrations/ric/research.lua", closure)
+        self.assertNotIn(PLAYER / "integrations/ric/return_paths.lua", closure)
+        self.assertNotIn(PLAYER / "compatibility/material_returns.lua", closure)
         self.assertFalse(any("runtime" in path.parts or "api" in path.parts for path in closure))
 
     def test_runtime_closure_never_imports_the_generator(self):
@@ -144,6 +148,9 @@ class PackTests(unittest.TestCase):
         self.assertIn("runtime/spoilage_contribution.lua", relative)
         self.assertNotIn("research/generator.lua", relative)
         self.assertNotIn("api/v1/data.lua", relative)
+        self.assertNotIn("integrations/ric/research.lua", relative)
+        self.assertNotIn("integrations/ric/return_paths.lua", relative)
+        self.assertNotIn("compatibility/material_returns.lua", relative)
 
     def test_player_imports_cannot_route_to_mir4(self):
         for path in PLAYER.rglob("*.lua"):

@@ -21,6 +21,7 @@ local PUBLISHED_SCIENCE = {
 local ARMS = {
   ["candidate-mir5"] = {name = "candidate-mir5", version = "5.0.21000", science = CANDIDATE_SCIENCE},
   ["candidate-defaults-mir5"] = {name = "candidate-defaults-mir5", version = "5.0.21000", science = PUBLISHED_SCIENCE},
+  ["candidate-defaults-mir5-505"] = {name = "candidate-defaults-mir5", version = "5.0.21005", science = PUBLISHED_SCIENCE},
   ["published-4.7.21002"] = {name = "published-4.7.21002", version = "4.7.21002", science = PUBLISHED_SCIENCE}
 }
 local TIERS = { [1] = true, [32] = true, [128] = true }
@@ -55,6 +56,16 @@ local function tier()
   value = value and value.value
   if not TIERS[value] then fail("fixture did not select an authored agriculture scale tier") end
   return value
+end
+
+local function authored_arm(name)
+  -- Exact current-package binding only for the existing matched active Defaults
+  -- workload. Its independently captured science and physical oracle stay fixed.
+  if name == "candidate-defaults-mir5" and script.active_mods["more-infinite-research"] == "5.0.21005"
+    and script.active_mods[ACTIVE] == "0.1.0" then
+    return ARMS["candidate-defaults-mir5-505"]
+  end
+  return ARMS[name]
 end
 
 local function selected_arm(value)
@@ -93,8 +104,8 @@ local function selected_arm(value)
     for _, name in pairs(SELECTOR_FOR_TIER) do
       if script.active_mods[name] ~= nil then fail("paired agriculture fixture cannot combine a scale tier selector") end
     end
-    return ARMS[candidate and "candidate-mir5" or defaults and "candidate-defaults-mir5"
-      or "published-4.7.21002"], true, active ~= nil
+    return authored_arm(candidate and "candidate-mir5" or defaults and "candidate-defaults-mir5"
+      or "published-4.7.21002"), true, active ~= nil
   end
   if candidate or defaults or published or active ~= nil then
     fail("agriculture arm selector requires the paired selector")
@@ -113,7 +124,7 @@ local function selected_arm(value)
 end
 
 local function state_arm(state)
-  local arm = ARMS[state.arm]
+  local arm = authored_arm(state.arm)
   if not arm then fail("fixture state has no recognized agriculture arm") end
   return arm
 end
@@ -209,6 +220,15 @@ local function prepare_native_ground(surface, state)
   if radius > 8 then fail("authored agriculture scale grid exceeded its generation bound") end
   surface.request_to_generate_chunks(center, radius)
   surface.force_generate_chunk_requests()
+  -- Soil alone does not remove generated nests/rocks that block native planting.
+  -- Clear only the authored crop footprints in this fresh disposable fixture,
+  -- before creating the towers or saving any pending benchmark work.
+  for _, position in ipairs(positions) do
+    local area = {{position.x - 5, position.y - 5}, {position.x + 6, position.y + 6}}
+    for _, entity in pairs(surface.find_entities_filtered{area = area}) do
+      if entity.valid and not entity.destroy() then fail("native ground blocker could not be removed") end
+    end
+  end
   surface.set_tiles(tiles)
   state.generated_chunk_radius, state.native_soil_tiles = radius, #tiles
 end

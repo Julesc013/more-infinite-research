@@ -2728,6 +2728,18 @@
               "sha256": "21A60F7375C33E284BBCC66898AD145D340A28F848A4319698AEF82C794E3BB1"
             },
             "next_action": "Reuse the named result under its original execution identity. Review any separately required catalogue/settings/runtime coverage; do not rerun for a newer documentation commit."
+          },
+          "published_5_0_5_applicability": {
+            "status": "applicable-named-preservation-semantics-not-new-native",
+            "evidence": "spec/evidence/historical473-current505-applicability-r01.json",
+            "evidence_sha256": "FC930CC9D1F23CE3FC93FF28170B544F0C3DAD5B4624357A790D9977A35DBE2F",
+            "actual_published505_archive": {
+              "name": "more-infinite-research_5.0.01305.zip",
+              "sha256": "1C00259F40843D147FDBB1DA2F3BC0BCCC334478A63F10561E96711BEEFFCFA4",
+              "bytes": 505619
+            },
+            "original_result_identity_retained": true,
+            "current_locale_or_rendering_or_load_qualification": false
           }
         },
         {
@@ -2749,6 +2761,18 @@
               "sha256": "21A60F7375C33E284BBCC66898AD145D340A28F848A4319698AEF82C794E3BB1"
             },
             "next_action": "Reuse the named result under its original execution identity. Review any separately required catalogue/settings/runtime coverage; do not rerun for a newer documentation commit."
+          },
+          "published_5_0_5_applicability": {
+            "status": "applicable-named-preservation-semantics-not-new-native",
+            "evidence": "spec/evidence/historical473-current505-applicability-r01.json",
+            "evidence_sha256": "FC930CC9D1F23CE3FC93FF28170B544F0C3DAD5B4624357A790D9977A35DBE2F",
+            "actual_published505_archive": {
+              "name": "more-infinite-research_5.0.01405.zip",
+              "sha256": "FF27ACAAB0F6FCF1285F9E75316BBBE2948A06F2681EAFECFBF6B590713ABA86",
+              "bytes": 505622
+            },
+            "original_result_identity_retained": true,
+            "current_locale_or_rendering_or_load_qualification": false
           }
         },
         {
@@ -2767,6 +2791,18 @@
             },
             "applicability": "Native successor already uses current7a2/player505 and this exact archive.",
             "next_action": "Reuse the named result under its original execution identity. Review any separately required catalogue/settings/runtime coverage; do not rerun for a newer documentation commit."
+          },
+          "published_5_0_5_applicability": {
+            "status": "applicable-named-preservation-semantics-not-new-native",
+            "evidence": "spec/evidence/historical473-current505-applicability-r01.json",
+            "evidence_sha256": "FC930CC9D1F23CE3FC93FF28170B544F0C3DAD5B4624357A790D9977A35DBE2F",
+            "actual_published505_archive": {
+              "name": "more-infinite-research_5.0.01505.zip",
+              "sha256": "071872BAE0A42CF33046F7995EF68BA2F04B33537FB70EDAF94D83654CCC5F0C",
+              "bytes": 505620
+            },
+            "original_result_identity_retained": true,
+            "current_locale_or_rendering_or_load_qualification": false
           }
         },
         {
@@ -2785,6 +2821,18 @@
             },
             "applicability": "Native successor already uses current7a2/player505 and this exact archive.",
             "next_action": "Reuse the named result under its original execution identity. Review any separately required catalogue/settings/runtime coverage; do not rerun for a newer documentation commit."
+          },
+          "published_5_0_5_applicability": {
+            "status": "applicable-named-preservation-semantics-not-new-native",
+            "evidence": "spec/evidence/historical473-current505-applicability-r01.json",
+            "evidence_sha256": "FC930CC9D1F23CE3FC93FF28170B544F0C3DAD5B4624357A790D9977A35DBE2F",
+            "actual_published505_archive": {
+              "name": "more-infinite-research_5.0.01605.zip",
+              "sha256": "8B651C1D599AF91B352E8865CE8DBFA464FE4F459C9A9A2B4FACF89A7E995807",
+              "bytes": 505620
+            },
+            "original_result_identity_retained": true,
+            "current_locale_or_rendering_or_load_qualification": false
           }
         },
         {
@@ -2813,6 +2861,18 @@
               "sha256": "8FB420F70AC828312664AF1EB3388E04996C9571B2A538474E3B343248865B31"
             },
             "applicability": "Actual same-edition current7a2/player505 native execution; no relabelling of the retained4.7.2 source chain."
+          },
+          "published_5_0_5_applicability": {
+            "status": "applicable-named-preservation-semantics-not-new-native",
+            "evidence": "spec/evidence/historical473-current505-applicability-r01.json",
+            "evidence_sha256": "FC930CC9D1F23CE3FC93FF28170B544F0C3DAD5B4624357A790D9977A35DBE2F",
+            "actual_published505_archive": {
+              "name": "more-infinite-research_5.0.01705.zip",
+              "sha256": "3EEDF60622CC9F0CAC88B3F20A1FFE5E47CA5E4BCAAC22C4D6843F41E08679D0",
+              "bytes": 505622
+            },
+            "original_result_identity_retained": true,
+            "current_locale_or_rendering_or_load_qualification": false
           }
         },
         {
@@ -2841,6 +2901,18 @@
               "sha256": "8FB420F70AC828312664AF1EB3388E04996C9571B2A538474E3B343248865B31"
             },
             "applicability": "Actual same-edition current7a2/player505 native execution; no relabelling of the retained4.7.2 source chain."
+          },
+          "published_5_0_5_applicability": {
+            "status": "applicable-named-preservation-semantics-not-new-native",
+            "evidence": "spec/evidence/historical473-current505-applicability-r01.json",
+            "evidence_sha256": "FC930CC9D1F23CE3FC93FF28170B544F0C3DAD5B4624357A790D9977A35DBE2F",
+            "actual_published505_archive": {
+              "name": "more-infinite-research_5.0.10005.zip",
+              "sha256": "9EB1E990922BDAE7F9266C865EAF17F97E11C779522A016E64686E5F8BDD65E6",
+              "bytes": 505614
+            },
+            "original_result_identity_retained": true,
+            "current_locale_or_rendering_or_load_qualification": false
           }
         },
         {
@@ -2867,6 +2939,18 @@
               "path": "spec/evidence/f110-473-current7a2-native-chain-r01.json",
               "sha256": "C1EAC174C79F5DD2F10843769F683F66A3416CBBCE1B7D1A9CA4812DC2B8039B"
             }
+          },
+          "published_5_0_5_applicability": {
+            "status": "applicable-named-preservation-semantics-not-new-native",
+            "evidence": "spec/evidence/historical473-current505-applicability-r01.json",
+            "evidence_sha256": "FC930CC9D1F23CE3FC93FF28170B544F0C3DAD5B4624357A790D9977A35DBE2F",
+            "actual_published505_archive": {
+              "name": "more-infinite-research_5.0.11005.zip",
+              "sha256": "8A8A272F2651BB039DD3D530F50E736C0762DB46EFAF64A5E37EC165A7AE3927",
+              "bytes": 505925
+            },
+            "original_result_identity_retained": true,
+            "current_locale_or_rendering_or_load_qualification": false
           }
         },
         {
@@ -4100,7 +4184,20 @@
                 "bytes": 9769,
                 "sha256": "F8AC8F7A74DD6A92AEEC42830D4B9CE018460C1615CBC11D7CC3A439F73888A3"
               }
-            ]
+            ],
+            "published_5_0_5_applicability": {
+              "status": "applicable-original-F100-F110-preservation-not-new-native",
+              "evidence": "spec/evidence/historical473-current505-applicability-r01.json",
+              "evidence_sha256": "FC930CC9D1F23CE3FC93FF28170B544F0C3DAD5B4624357A790D9977A35DBE2F",
+              "original_candidate_sha256": "2508F539998F4DABBB3F71DA0226F4AB70BD95C5572AD2D8531E63F6A673926A",
+              "published505_destination": {
+                "name": "more-infinite-research_5.0.11005.zip",
+                "sha256": "8A8A272F2651BB039DD3D530F50E736C0762DB46EFAF64A5E37EC165A7AE3927",
+                "bytes": 505925
+              },
+              "original_protected_source_and_native_results_retained": true,
+              "other_forward_routes_not_qualified_by_this_review": true
+            }
           },
           {
             "origin": "published4.7.3 F100",

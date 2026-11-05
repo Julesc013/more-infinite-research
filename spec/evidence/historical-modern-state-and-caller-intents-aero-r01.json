@@ -1,0 +1,326 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalCompleteStateCallerAndModernTemplateIntentReviewV1",
+  "reviewed_on": "2026-11-05",
+  "reviewed_against": "8e38a27c2c040dc142aaca687561ea1620c73739",
+  "player_tree": "41d36ed8db131404692d5c054da3c87f7b54aecb",
+  "scope": "Five named fixture-caller adapters at21 unique function spans in12 preserved whole helper bodies, plus all three immutable modern complete-state template bodies. Other helper functions and separately imported science-delta data remain separate.",
+  "source_inventory": {
+    "file": "historical-caller-allowance-source-inventory-r01.json",
+    "sha256": "595DA29241E9395AFCD941C73CA9DCF02E990ADEC65300D8B485658AF72F6C8C",
+    "selected_published_tag_refs": 15,
+    "present_path_bindings": 14,
+    "whole_git_bodies": 12,
+    "selected_function_spans": 21,
+    "absent_path_at": "v4.2.0-stable"
+  },
+  "groups": [
+    {
+      "id": "new-setting-default-envelope",
+      "source_function": "Set-MIR423F210HistoricalSettingDefaultOracle",
+      "latest_lines": "188-214",
+      "independent_expectation": "Only the disposable4.2.21000-to4.2.21003 copy widens the old default-setting guard. The imported template enumerates18 material-family names and seven defaults (enable=true,effect2%,cap0,time30,base200,growth2,linear0); these are allowable newly added settings, never permission to change an existing value or an unlisted setting. Active target/mod-specific availability remains independently selected.",
+      "disposition": "Consolidate exact setting/default/precedence preservation under SET-01/SET-04; retire private text-replacement transport. The imported family table and complete modern comparator remain separate source frontiers.",
+      "implementation": [
+        "source/research/settings.lua",
+        "source/research/settings_profile.lua",
+        "source/runtime/settings_profile.lua"
+      ],
+      "controls": [
+        "tests/test_settings_profile.py::test_registered_settings_are_the_single_active_profile_authority",
+        "tests/test_settings_profile.py::test_import_precedence_uses_profile_validation_before_consumer_normalization",
+        "tests/test_settings_profile.py::test_published_import_only_boundaries_and_aliases_do_not_expand_dropdowns"
+      ]
+    },
+    {
+      "id": "inherited-promethium-delta-binding",
+      "source_function": "Set-MIR423F210InheritedPromethiumDefinitionDelta",
+      "latest_lines": "216-231",
+      "independent_expectation": "Only the disposable4.2.21001-to4.2.21003 fixture changes the inherited-Promethium allowance guard. The imported template permits adding exactly one Promethium prerequisite and one amount1 science ingredient to research-speed-7, cargo-bay unloading-distance and cargo-landing-pad-count, only when those inputs were absent. All other prototype fields compare unchanged; another name or from/to receives no allowance.",
+      "disposition": "Retain the exact approved science/prerequisite change and all unaffected fields where applicable; no general relaxation for another predecessor or MIR5. Retire this private version substitution.",
+      "implementation": [
+        "source/research/science.lua",
+        "source/compatibility/modern_catalogue.lua"
+      ],
+      "controls": [
+        "tests/test_science.py",
+        "tests/test_modern_targets.py"
+      ]
+    },
+    {
+      "id": "f200-base-complete-state-adaptation",
+      "source_function": "Set-MIR422F200CompleteStateUpgradeOracle",
+      "latest_lines": "233-307",
+      "independent_expectation": "Use the modern complete-state template for admitted Factorio2.0 tuples, substitute the declared from/to, remove three explicitly Space-Age-only incident checks, and select mining-productivity-4 level5 instead of the template's Base iron witness. This does not remove the template's complete captured-state comparisons. For the old4.2.20000 frontier only, compare exact independently supplied before science/prerequisites and replace only those fields; other prototype fields still compare.",
+      "disposition": "Consolidate engine/DLC-specific expectations and original source/upgrade/reload custody. Keep the imported complete-state template, independent reviewed-science table and actual original results distinct; no new player support or native pass follows.",
+      "implementation": [
+        "tools/Invoke-NativeFixture.ps1",
+        "tests/fixtures/full-catalogue-upgrade",
+        "source/compatibility/historical_continuations.lua"
+      ],
+      "controls": [
+        "tests/test_full_catalogue_upgrade_fixture.py::test_exact_oracle_identity_effect_and_credit_closure",
+        "tests/test_full_catalogue_upgrade_fixture.py::test_profiles_controls_and_native_boundaries_are_explicit"
+      ]
+    },
+    {
+      "id": "historical-capture-and-reload-hooks",
+      "source_function": "Set-MIR422HistoricalCompleteStateUpgradeOracle",
+      "latest_lines": "476-504",
+      "independent_expectation": "Select only the declared1.1/1.0/0.17/0.16/0.15/0.14/0.13 line, capture after the source setup and verify at successor entry and reload.1.0/1.1 defer verification from load setup to the next tick; earlier fixture routes call the named phase in their retained-state check. Copy the exact raw comparator separately. Hooks do not themselves prove closed saves, distinct native processes or complete dependency inputs.",
+      "disposition": "Consolidate source-first, load-read-only and distinct-stage obligations; retire historical string anchors/old namespace transport. Retain the separately reviewed raw comparator and actual origin identities.",
+      "implementation": [
+        "tools/Invoke-NativeFixture.ps1",
+        "tests/fixtures/historical-native",
+        "source/adapters/reduced/control.lua"
+      ],
+      "controls": [
+        "tests/test_historical_transition_fixture.py::test_published_to_mir5_mock_preserves_partial_progress_and_queue_until_real_successor_event",
+        "tests/test_historical_transition_fixture.py::test_completed_successor_configuration_reentry_is_observational_and_rejects_corruption",
+        "tests/test_historical_native_runner.py::test_control_and_on_load_do_not_need_game_or_runtime_active_mods"
+      ]
+    },
+    {
+      "id": "full-selector-and-cap-default-only-allowance",
+      "source_function": "Set-MIR430FullCompilerProfileUpgradeAllowance",
+      "latest_lines": "506-605",
+      "independent_expectation": "The historical raw-comparator branch permits only a newly absent-to-full mir-compiler-profile entry while every other settings/effects/queue/current-progress field compares unchanged. It refuses an already present Classic value or an unrelated addition/change. The modern template branch declares full and, only for the named later destinations, worker-robot speed cap0 as allowable added defaults; it keeps mandatory source/upgrade/reload hooks and exact optional Base binding. This is not authority to overwrite existing settings.",
+      "disposition": "Retire the obsolete Full/Classic compiler selector and private source-text rewrite. Preserve the active worker-robot cap ID/zero meaning and accepted player setting precedence/earned-state semantics through the current lightweight catalogue/runtime. Do not reintroduce a compiler profile or relax current comparisons to copy an old fixture exception.",
+      "implementation": [
+        "source/research/settings.lua",
+        "source/research/historical_settings.lua",
+        "source/runtime/legacy_caps.lua",
+        "spec/settings.md"
+      ],
+      "controls": [
+        "tests/test_settings_profile.py::test_registered_settings_are_the_single_active_profile_authority",
+        "tests/test_settings_profile.py::test_settings_queries_and_runtime_profile_facade_work_after_module_loading_closes",
+        "tests/test_legacy_caps.py"
+      ]
+    },
+    {
+      "id": "exact-route-and-private-copy-custody",
+      "source_function": "Selected five caller adapters together",
+      "latest_lines": "188-307,476-605",
+      "independent_expectation": "Finite actual target/from/to guards and expected anchors bind the private fixture copy; unsupported tuples or missing anchors refuse. Later source variants add named route guards and added-default lists, not automatic support for an arbitrary future version. A synthetically admitted tuple is not proof of a published archive or a completed native route.",
+      "disposition": "Consolidate exact consumed inputs and failure preservation in current existing runner/profiles; retire old route enumeration and scratch implementation. Do not restart every old patch or add prospective Aero dispatch approval.",
+      "implementation": [
+        "tools/Invoke-NativeFixture.ps1",
+        "tests/profiles",
+        "spec/migrations.md",
+        "spec/verification.md"
+      ],
+      "controls": [
+        "tests/test_historical_transition_fixture.py::test_transition_archive_guard_pins_stage_dependency_and_source_members",
+        "tests/test_historical_native_runner.py::test_runner_keeps_historical_server_reloads_separate_from_the_modern_benchmark_vector"
+      ]
+    },
+    {
+      "id": "five-original-archetypes-and-paid-work",
+      "source_function": "Imported modern template",
+      "latest_lines": "1-21,204-214,225-258",
+      "independent_expectation": "Retain the Base iron-level3, Space Age native low-density-level4/absolute-cap5, named automatic assembler-level3, inserter-capacity-level8 and removed-source-recipe archetypes with exact actual MIR/DLC/source-mod guards. Source seeds research synthetically, queues its selected technology and sets42% progress. Successor preserves the level/current research and count-normalized completed work, clamped0..1; the sample science comparison checks names, not amounts. Removal must not retain the missing recipe or an effect targeting it.",
+      "disposition": "Consolidate accepted identity, effect, cap, partial-work and removal obligations in current existing origin/ownership fixtures. Retire arbitrary automatic generation and the old finite sample protocol; preserve previously accepted named research under current authored definitions. This synthetic seed does not prove an actual lab, physical manufacture or arbitrary mod removal.",
+      "implementation": [
+        "source/research/catalogue.lua",
+        "source/runtime/native_credits.lua",
+        "source/runtime/native_gun_credits.lua",
+        "spec/migrations.md"
+      ],
+      "controls": [
+        "tests/test_full_catalogue_upgrade_fixture.py",
+        "tests/test_native_credits.py",
+        "tests/test_native_gun_credits.py",
+        "tests/test_historical_transition_fixture.py"
+      ]
+    },
+    {
+      "id": "modern-captured-state-and-full-gate",
+      "source_function": "Imported modern template",
+      "latest_lines": "23-101,139-182,184-201,215-221,259-265",
+      "independent_expectation": "The complete-state branch is gated by exact archetype/from/to or an explicit reviewed caller transformation; it is not automatically active for all five archetypes. Latest capture retains every captured technology level/researched/enabled/visibility/saved-work and listed definition fields; all prior recipes productivity,24 named numeric force fields, startup settings, queue order/current research/progress, and all prior forces. Numeric equality uses1e-6. The original52-line version lacks this branch; the110-line version adds only player-force technology/recipe/queue comparison.",
+      "disposition": "Retain every applicable saved-state field and independently justified delta, preserve older proof scopes, and use current engine-specific fixtures. Do not call the list exhaustive for arbitrary mod state: it omits ammo/gun/turret category bonuses, recipe enablement, research-queue enablement and personal/scripted state. The separately reconciled historical raw comparator has different capabilities.",
+      "implementation": [
+        "tests/fixtures/full-catalogue-upgrade",
+        "source/runtime/native_credits.lua",
+        "source/runtime/native_gun_credits.lua",
+        "source/runtime/library.lua"
+      ],
+      "controls": [
+        "tests/test_full_catalogue_upgrade_fixture.py::test_exact_oracle_identity_effect_and_credit_closure",
+        "tests/test_full_catalogue_upgrade_fixture.py::test_controls_register_without_game_or_storage_reads",
+        "tests/test_native_gun_credits.py"
+      ]
+    },
+    {
+      "id": "persisted-damage-and-external-evaluator-boundary",
+      "source_function": "Imported modern template",
+      "latest_lines": "3-4,216-219,225-247,269-276",
+      "independent_expectation": "When a caller explicitly enables the damage probe, the intermediate published4.2.21001 phase changes unfinished work to57%, captures the damaged world after that change and saves it. A later repair requires that damage phase. Product recovery must not consult a pre-damage evaluator snapshot; erased earned research cannot be inferred merely from this fixture. The unmodified template leaves persisted_damage_probe=false.",
+      "disposition": "Retain honest known-loss limits and independent evaluator custody; retire old private damage flags/save names. Current paid-credit recovery requires surviving source/owner evidence and cannot invent missing originals.",
+      "implementation": [
+        "source/runtime/native_credits.lua",
+        "source/runtime/native_gun_credits.lua",
+        "spec/migrations.md"
+      ],
+      "controls": [
+        "tests/test_native_credits.py",
+        "tests/test_native_gun_credits.py"
+      ]
+    },
+    {
+      "id": "modern-new-state-and-cold-reload-proof-limits",
+      "source_function": "Imported modern template",
+      "latest_lines": "179-201,262-287",
+      "independent_expectation": "Export exact source/observed-before-check/accepted-upgrade/reload stage identities and actual active-mod versions. Check old forces/recipes and reject a newly researched technology, but this old boolean test alone does not reject a new unresearched infinite technology already at level9 or an added force/recipe. on_load logs only; the later on_tick performs complete verification when its gate is active. A reload marker or first post-upgrade tick does not itself prove two separate cold processes.",
+      "disposition": "Consolidate genuinely separate source/save/cold-process and no-unearned-state obligations in current runners; retain raw observation/failure identities. Do not infer a current player defect from the old oracle limitation or blanket-reject independently justified private paid-credit holders.",
+      "implementation": [
+        "tools/Invoke-NativeFixture.ps1",
+        "tests/fixtures/full-catalogue-upgrade",
+        "tests/fixtures/historical-native"
+      ],
+      "controls": [
+        "tests/test_full_catalogue_upgrade_fixture.py::test_profiles_controls_and_native_boundaries_are_explicit",
+        "tests/test_historical_transition_fixture.py::test_transition_archive_guard_pins_stage_dependency_and_source_members",
+        "tests/test_historical_native_runner.py::test_runner_keeps_historical_server_reloads_separate_from_the_modern_benchmark_vector"
+      ]
+    }
+  ],
+  "variant_dispositions": [
+    {
+      "functions": "Two F210 guard adapters and historical capture adapter",
+      "decision": "One identical selected body each across retained tag contexts; consolidate once."
+    },
+    {
+      "functions": "Eleven F200 complete-state adapters",
+      "decision": "Earliest fixed destination becomes an explicit route parameter; later variants add finite routes and Full/cap default allowances. The normalized reviewed-frontier Lua body is identical across all11; it replaces only exact prerequisites/science and compares every other prototype field."
+    },
+    {
+      "functions": "Seven Full-selector adapters",
+      "decision": "Broaden only explicitly named target/from/to and Base snapshot bindings, source/destination gate anchors and the declared added-default list. The raw-comparator settings exception suffix is identical in all7."
+    },
+    {
+      "functions": "Three complete modern template bodies",
+      "decision": "52-line single-profile baseline becomes110-line player-force technology/recipe/queue state, then287-line all-prior-force definition/effect/settings/current-work and explicit allowed-delta coverage. Earlier narrow receipts retain their original proof limits; the later body does not retroactively strengthen them."
+    }
+  ],
+  "mechanical_source_correspondence": {
+    "whole_original_blob_sha1_sha256_and_lengths_verified": true,
+    "all_selected_span_bytes_match_whole_git_body": true,
+    "all_11_frontier_lua_bodies_equal_after_one_literal_destination_placeholder_substitution": true,
+    "all_7_raw_settings_exception_suffixes_equal": true,
+    "native_processes": 0,
+    "historical_runner_executed": false,
+    "all_3_modern_template_original_blob_identities_verified": true
+  },
+  "remaining_frontiers": [
+    "The separately imported F200 reviewed-science-delta table retains its original exact source/applicability boundary; this unit reviews how the caller uses it, not all of its rows or original native receipts.",
+    "Other functions in MIR421SpaceFakeUpgrade.ps1, profile-specific transformations, actual original save/mod/settings/engine/result custody and current native applicability remain separately scoped.",
+    "Retain all remaining historical/inter-release/consumer/request obligations, accepted nine same-edition/seven older-contract/four forward journeys and original failures; no old framework, new approval gate or automatic every-patch campaign."
+  ],
+  "selected_five_caller_adapter_intent_complete": true,
+  "whole_helper_source_reconciled": false,
+  "all_imported_oracles_complete": false,
+  "historical_inventory_complete": false,
+  "new_current_product_defect_demonstrated": false,
+  "native_execution": false,
+  "release_qualification": false,
+  "stable_acceptance": false,
+  "template_source_inventory": {
+    "file": "historical-modern-state-template-source-inventory-r01.json",
+    "sha256": "5A0FC7E949D267D554C7442C59256DABABD9F3B24D4747E627F9B763E89E2DA0",
+    "selected_published_tag_refs": 17,
+    "present_path_bindings": 16,
+    "unique_git_bodies": 3,
+    "absent_path_at": "v4.0.0"
+  },
+  "template_sources": [
+    {
+      "blob": "5ece1783069f1badc1df5d626ccf733dd3b2499e",
+      "sha256": "CB6604770EE038C731BCE7E7704673E87EE076BDCEBE1DFFED9F398A22F35DE5",
+      "bytes": 5321,
+      "line_count": 52
+    },
+    {
+      "blob": "09bbb93f12ad47f75a3a532ba73f569c54465965",
+      "sha256": "E861CFD7F8AA31FBC727E0D8026BE9988FFEBAF94A48500F0E663BDE71FAF820",
+      "bytes": 8425,
+      "line_count": 110
+    },
+    {
+      "blob": "2de61f8f6e32393d8719a6a690af36810fb9abb4",
+      "sha256": "68B9E6FA94224C2B7BDF6080D6BE7D5C84D9F41618CEE8E5E070F8CBCB5D1C76",
+      "bytes": 17929,
+      "line_count": 287
+    }
+  ],
+  "template_defaults": {
+    "families": [
+      "glycerol",
+      "hydrochloric_acid",
+      "hydrofluoric_acid",
+      "nitric_acid",
+      "py_acid_gas",
+      "py_earth_flower_sample",
+      "py_earth_generic_sample",
+      "py_earth_jute_sample",
+      "py_earth_palmtree_sample",
+      "py_earth_potato_sample",
+      "py_earth_shroom_sample",
+      "py_earth_sunflower_sample",
+      "py_earth_tropical_tree_sample",
+      "py_earth_venus_fly_sample",
+      "py_glycerol",
+      "py_log",
+      "py_treated_wood",
+      "py_wood"
+    ],
+    "allowable_new_values": {
+      "enable": true,
+      "effect-per-level": 2,
+      "max-level": 0,
+      "research-time": 30,
+      "cost-base": 200,
+      "cost-growth": 2,
+      "cost-linear-increment": 0
+    },
+    "actual_current_profile_or_native_verdict": false
+  },
+  "all_three_modern_template_body_intents_complete": true,
+  "source_custody": {
+    "commit": "f7b7ec051d0b619089ad11e9dec46695c3a5e6fe",
+    "repository": "Julesc013/mir-native-worker",
+    "directory": "evidence/aero-historical-state-callers-template-review-r01",
+    "full_index": {
+      "file": "index.json",
+      "sha256": "9C1105988ACF0DA8AA11D8E4CEC39DD7CFA1E9165F7BDD7FFA43976E03F17EB4"
+    },
+    "original_source_inputs": {
+      "file": "original-source-inputs.json.gz",
+      "sha256": "B4032EE17012EE28A0A223D57896B4933ADC2A8FE16E911BB96B0FF672F879F2"
+    },
+    "caller_inventory": "caller-source-inventory.json",
+    "template_inventory": "template-source-inventory.json",
+    "actual_remote_bytes_verified": true
+  },
+  "original_latest_sources": [
+    {
+      "repository": "Julesc013/more-infinite-research",
+      "tag": "v4.7.3",
+      "plain_tag_object": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+      "peeled_commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "tests/support/MIR421SpaceFakeUpgrade.ps1",
+      "blob": "f7f335074dea8f7a8cf9fb55a81902590ad151ee",
+      "scope": "Five selected adapters only, not every function in the preserved helper."
+    },
+    {
+      "repository": "Julesc013/more-infinite-research",
+      "tag": "v4.7.3",
+      "plain_tag_object": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+      "peeled_commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua",
+      "blob": "2de61f8f6e32393d8719a6a690af36810fb9abb4",
+      "scope": "Whole raw modern template; caller substitutions remain explicitly scoped."
+    }
+  ]
+}

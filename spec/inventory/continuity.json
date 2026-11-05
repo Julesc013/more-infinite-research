@@ -430,6 +430,14 @@
           "id": "atan-base-space-age-native-labs",
           "evidence": "spec/evidence/atan-gameplay-chain.json",
           "scope": "Exact F200 Base/Space Age shared filter and ash actual labs, queue state and two cold reloads; no physical output/F210 claim."
+        },
+        {
+          "id": "historical-pipeline-extent-source-intent",
+          "evidence": "spec/evidence/historical-pipeline-extent-intents-aero-r01.json",
+          "source": [
+            "source/overrides/pipeline_extent.lua"
+          ],
+          "scope": "One published fixture body at166 original commit:path references retains setting/default, rounding/extent and shared-box expectations through existing current controls. Its metadata is2.1/base2.1.8; copied historical directory names do not establish old-engine support. Existing e282 native640/960/480 observations keep their original package/engine and data-stage scope; no fluid-flow, new native or final-candidate verdict follows."
         }
       ],
       "test_subjects": [
@@ -4380,6 +4388,11 @@
           "id": "q006-independent-full-data-current-applicability",
           "evidence": "spec/evidence/q006-independent-current-data-aero-r01.json",
           "scope": "Aero independently reproduces all13 transported full-Bob/Space-Age records:746 published technology identities retained,738 exact,eight explicit effect-order/presentation differences,39 separately classified additions and1022 retained settings. Relevant data-path function bodies,target transforms and packager remain unchanged through playerfbb7/current38C. Original575e/A8/FE4/profile47A538 execution retains its identity;this closes only the captured technology/settings comparison and scoped current data applicability. Eleven public additions,three presentation differences,changed runtime and other profiles keep their separate physical/save/client obligations."
+        },
+        {
+          "id": "historical-tin-route-physical-persistence-intents",
+          "evidence": "spec/evidence/historical-tin-behavior-intents-aero-r01.json",
+          "scope": "Retain Bob-only physical/cap/seeded-state purposes; consolidate combined no-emission diagnostics and separate Angel-only scope. Retire obsolete wrapper mechanics. No new Tin emission,physical result or native migration pass."
         }
       ],
       "test_subjects": [
@@ -4394,7 +4407,7 @@
         "Observe remaining exact admitted integrations and setting interactions; Bob/Angel physical125%/400% recipe-cap output is already qualified at its recorded source.",
         "Complete the explicit named/popular individual and dependency-valid combined campaign above. Current F210 input profiles now pin AAI, six BZ components and combinations, full Py, K2/SE/K2SE, full Bob/Angel and IR4; input availability does not qualify native, gameplay or migration outcomes.",
         "Complete full-suite Py and broad Bob/Angel coverage separately from the existing narrow selections, with actual useful effects and migration/state outcomes.",
-        "Freeze current accepted player tree31e5a218d or its reviewed successor, then qualify the centrally emitted F210 Bob Plates individual Base/Space Age and full-Bob Base routes with exact new-package research/effect and protected save/reload witnesses. C563 does not contain these fixes."
+        "Qualify genuinely affected current Bob material research/effect,physical output and protected saved-state boundaries on the accepted successor, using the exact applicable existing controls and original evidence. The historical Tin reconciliation below keeps Bob-only,combined F210,F200 and named BobTech tuples separate. Existing packages/results retain their original source/engine/settings identities; no stale31e5a218d freeze or complete old-campaign restart is required."
       ],
       "qualification_campaign": {
         "status": "required-broad-coverage-incomplete",
@@ -8465,11 +8478,38 @@
     "scope": "Reconcile this named science-binding delta explicitly. Older broad comparisons retain their exact predecessor/package/source scope; reuse requires a reviewed unaffected-input argument, not relabelling as4.7.3 execution."
   },
   "current_candidate": {
-    "source": "575e418c72eff2970fa5f6274956f6e8944d4e19",
-    "player_tree": "5ba53a8514b4641c749e91c0a68f32521fb3fee7",
-    "offline_package_evidence": "spec/evidence/current-assets-575e418c-root-readback.json",
+    "source": "5d173925bce29ad8917346897706a0fcee4553e4",
+    "source_tag": "v5.0.5",
+    "source_version": "5.0.5",
+    "player_tree": "41d36ed8db131404692d5c054da3c87f7b54aecb",
+    "whole_tree": "ac706768218335701a9d24b2515e832590b991f5",
+    "public_release_id": 434857344,
+    "public_release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.5",
+    "package_review": {
+      "path": "2b910b36a300b52c316f2fdf1f3763689096e272:evidence/aero-candidate505-final-package-review-r01/review.json",
+      "sha256": "56B5A66AD494579200B1E0D3DA55D5ED32ADCBEA71DD082EFADE2F72C04AFB01"
+    },
+    "delivery_review": {
+      "path": "ddb249894034d3043e04162c06f29c60cb080603:evidence/aero-public505-final-delivery-review-r01/review.json",
+      "sha256": "2CD8E1E254DD7B2CA80F1A638C2EDA9CEE09B0BE316F4DC99AC7FDF955FC27D6"
+    },
+    "prerelease_delivery_verified": true,
     "native_qualification_complete": false,
-    "release_qualification": false
+    "release_qualification": false,
+    "stable_qualification": false,
+    "scope": "Qualified public beta delivery component; whole stable acceptance remains incomplete and earlier result identities remain unchanged.",
+    "previous_context": {
+      "source": "575e418c72eff2970fa5f6274956f6e8944d4e19",
+      "player_tree": "5ba53a8514b4641c749e91c0a68f32521fb3fee7",
+      "offline_package_evidence": "spec/evidence/current-assets-575e418c-root-readback.json",
+      "native_qualification_complete": false,
+      "release_qualification": false
+    },
+    "delivery_component_review": {
+      "path": "1911645fe01cc830f1921b7cabed9f1bcd4511e7:evidence/aero-public505-actual-delivery-review-r01/review.json",
+      "sha256": "C4A92DA3DEFB25A1C607B9A1B7937C39A0AD71F61D1C9B752B80F920378E3D59"
+    },
+    "prerelease_publication_and_delivery_accepted": true
   },
   "reference_path_policy": "Current source lookup pointers below use existing canonical paths. Removed MIR4 implementation locators are pinned under historical_source to the original recovery baseline; removed documentation pointers retain an explicit evidence_revision or historical_documentation commit. These source/doc lookups do not relabel historical execution identities or native scopes.",
   "historical_preservation_audit": {
@@ -8600,7 +8640,7 @@
     "request_ledger": {
       "path": "spec/programmes/community-requests.json",
       "record_count": 87,
-      "rows_with_additive_mir5_route_disposition": 35,
+      "rows_with_additive_mir5_route_disposition": 53,
       "qualification_limit": "Original IDs, requests, decisions, statuses and adverse evidence remain unchanged. A source-route mapping is not adequate evidence of accepted interaction or final-package behavior; proposed/rejected/withheld requests do not become promises."
     },
     "historical_sources": {
@@ -8843,7 +8883,7 @@
         "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
       }
     ],
-    "next_bounded_work": "Use stable_coverage_review for the finite current obligations and owner split. Black Glass selects, prepares, repairs and executes routine native work without prospective Aero packet approval; Aero independently reviews source, expectations, actual results and final delivery. Preserve accepted 5.0.4 weapon/Galore/mixed-ownership and package/delivery components, the bounded Foundation mean-update result and original nine/seven/four migration identities under consumed-input review. Close actual remaining Library/client/export/Discovery Tree reset, supported-profile/API/state and whole-product performance requirements. Historical reconciliation retains 32 bounded reviews while remaining original assertion/transitive, effective-setting, compatibility/inter-release and unknown-consumer sources stay incomplete. No known failure is waived, prior result relabelled, every-old-patch campaign restarted or retired framework restored.",
+    "next_bounded_work": "Use stable_coverage_review as the finite current routing: finish the reported fixed Library comparison and actual input/lifecycle/export/Discovery Tree decisions, while Aero closes request/route/API/settings applicability and source-preservation decisions. Each row names existing inputs and readiness. Preserve completed source-intent dispositions and87 original requests; source counts, retired helper mechanics and synthetic versions do not create another audit/native approval ladder. No known failure is waived and no missing reporter/private input is fabricated. Black Glass prepares, repairs and executes its own routine tests; Aero reviews source, actual results and release claims independently.",
     "bounded_intent_reviews": [
       {
         "subjects": [
@@ -16768,12 +16808,215 @@
         "test_intent_reconciliation_complete": false,
         "native_execution": false,
         "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-05",
+          "CONT-07",
+          "CONT-12",
+          "CONT-13",
+          "CONT-17",
+          "VER-07"
+        ],
+        "reviewed_on": "2026-11-05",
+        "reviewed_against": "4181024f12bf745b56f670b842b40c3d1a7d9237",
+        "scope": "Direct Test-MIRUpgradeManifest.ps1 test-body family at the ten immutable bodies/fourteen retained published tag-path bindings in the existing inventory. Imported helper/fixture implementations, original native outcomes and other historical/inter-release paths remain separate.",
+        "evidence": {
+          "path": "spec/evidence/historical-upgrade-manifest-test-intents-aero-r01.json",
+          "sha256": "8BDF4972AB544CDDB16B4AD29727FC409F5C1EBC129377115BFB4E8A444DC653"
+        },
+        "disposition": "Reconcile22 latest intent groups and every earlier changed span across10 direct test bodies/14 retained bindings. Retain exact-input,state/profile,snapshot and safeguard purposes; retire manifest/AST/fixture-version/compiler mechanics. Preserve synthetic future-version distinctions and imported/native frontiers.",
+        "remaining_executable_check": "Continue imported oracle/fixture/effective-setting and other historical/inter-release obligations under the existing finite worklist. No automatic old-runner restoration, every-patch/native campaign, product fix or stable verdict follows.",
+        "owner": "Aero historical/independent review; Black Glass autonomous native/integration/publication",
+        "source_body_intent_reconciliation_complete": true,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false,
+        "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-07",
+          "CONT-12",
+          "CONT-13",
+          "VER-07",
+          "MIG-01"
+        ],
+        "reviewed_on": "2026-11-05",
+        "reviewed_against": "9e6ecc87ba875c76921a1ce90c4962ce31e649d1",
+        "scope": "Seven latest selected K2 full-state/sentinel/profile bodies, plus six explicitly older-context bodies at13 immutable blobs/52 retained tag-path bindings. The profile fresh fixture is replaced before execution. Source intent only; no old/current native result relabelled.",
+        "evidence": {
+          "path": "spec/evidence/historical-k2-imported-fixture-intents-aero-r01.json",
+          "sha256": "FB28CA81F357CE2AE79926D5FC53E17C8FF14CA06B8DD3758D16EF35D3529512"
+        },
+        "disposition": "Retain2% powder versus10% native crystal ownership,0/2/3/7 earned boundaries and42% current work, private carriers, full captured state, owned foreign delta and actual save/cold-stage distinction. Keep both admitted engine/profile lanes, explicit0cap/default3 distinction and conditional older crusher-output expectation. Attribute old descriptor comparison only to the early holder, not both.",
+        "independent_review": {
+          "path": "9e7eec1819b02c76b3449bf7c525165a1e605238:evidence/aero-historical-k2-imported-fixture-review-r01/review.json",
+          "sha256": "FF76D25057DC7A40C47A3FA8E95584CB69FC35BDC0EB056A2E961887082A661F"
+        },
+        "remaining_executable_check": "Review original actual inputs/results and current consumed-input applicability for profile science/definition deltas and older physical crusher-output reuse. Continue other historical/transitive/effective-setting/consumer obligations without a new beta gate or every-old-patch campaign.",
+        "owner": "Aero historical/source review; Black Glass autonomous affected native/integration/publication",
+        "source_body_intent_reconciliation_complete_for_latest_selected": true,
+        "all_k2_history_complete": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false,
+        "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-07",
+          "CONT-12",
+          "CONT-13",
+          "VER-07",
+          "MIG-01"
+        ],
+        "reviewed_on": "2026-11-05",
+        "reviewed_against": "5a03e72545af50300971a5a1cb4e1e15443891ba",
+        "scope": "Raw historical complete-state comparator at two immutable bodies/13 published tag-path bindings, eight intent groups. Caller specializations and actual current native outcomes remain separate.",
+        "evidence": {
+          "path": "spec/evidence/historical-complete-state-comparator-intents-aero-r01.json",
+          "sha256": "9796998A32C93B492DBA58E8A6CF964B4D1F89A56484B38064234D806E2DD623"
+        },
+        "disposition": "Retain capability-specific native/technology/recipe-availability state, paid category and foreign contributions, current/detached/queued work, independently fixed frontier vectors and exact source/destination allowances. Retire old recorder transport and suffix-only selection. The old added-technology boolean check does not prove initial/earned levels; do not infer a product defect or blanket-reject legitimate paid-credit holders.",
+        "independent_review": {
+          "path": "2215ad99e912d5ca7f28fb00265fa6c269bb2a4e:evidence/aero-historical-raw-complete-state-review-r01/review.json",
+          "sha256": "CA0E9BC6D5BFCD4BBEB03115B0EB095F9BABEDFA0B973AA3A713F2E7518C3CD5"
+        },
+        "original_input_custody": {
+          "path": "2215ad99e912d5ca7f28fb00265fa6c269bb2a4e:evidence/aero-historical-raw-complete-state-review-r01/original-review-inputs.json.gz",
+          "sha256": "A020B1258CF51D8F7C5F61EDCBDEE5155A67D660882EEF0E4A8FA1CE872170DC"
+        },
+        "exact_host_commands": {
+          "path": "55c14d41fd069d74a86e5bde305fc8cd76c4d877:evidence/aero-historical-raw-complete-state-review-r01/exact-host-commands.json",
+          "sha256": "54E21D7A2A688A648A60E9ACE43D61CD83920B5D470027D092464F1C78E57975"
+        },
+        "host_observations": {
+          "original_only_synthetic_controls": 14,
+          "current_authored_frontier_field_comparisons": 60,
+          "contextual_frontier_cases": 41,
+          "unique_engine_name_rows": 27,
+          "native_processes": 0,
+          "limits": "Pure Lua/source correspondence only. The original compound shell command retained an auxiliary missing-path search error after the completed fourteen-control report; no native/save/current full-catalogue verdict or historical result rescoring."
+        },
+        "remaining_executable_check": "Review caller-injected profile/default allowances, other imported/modern full-state helpers and actual saved engine/package/mod/settings applicability. Retain the named nine/seven/four journeys and original failures; this source unit creates no routine packet-approval gate or every-old-patch campaign.",
+        "owner": "Aero historical/source review; Black Glass autonomous affected native/integration/publication",
+        "raw_source_body_intent_complete": true,
+        "all_imported_or_specialized_oracles_complete": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false,
+        "release_qualification": false
+      },
+      {
+        "reviewed_on": "2026-11-05",
+        "reviewed_against": "92e5da419c036e2fc7f4d8644a436aed5df904ea",
+        "subjects": [
+          "CONT-02",
+          "CONT-03",
+          "CONT-06",
+          "CONT-10",
+          "CONT-15",
+          "VER-07"
+        ],
+        "request_ids": [
+          "FLUID-01",
+          "NATIVE-01",
+          "PLAT-UI-01"
+        ],
+        "scope": "Three existing requests only. Four selected published ledger bindings (canonical4.2.0-stable,with its local4.2.0 alias) deduplicate to three Git blobs; all12 original request projections agree with current retained fields. This maps delivered controls and finite acceptance without rewriting87original decisions or declaring native completion.",
+        "independent_inputs": {
+          "record": "Julesc013/mir-native-worker@0fc3c0558df084cf6c445aec59418bcdba935d64:evidence/aero-existing-request-source-inputs-r01/inputs.json",
+          "sha256": "3B742DCE69276D6479AA1082D6715C32F545A1EF0D2E3BA650436C5314E0DC08",
+          "original_tag_refs": [
+            "v4.2.0-stable",
+            "v4.2.1",
+            "v4.7.3",
+            "v5.0.0"
+          ],
+          "original_R4": "f458598732e9583a9d086032ebfbe9ffb747d130:prototypes/mir/pipeline/extent.lua",
+          "original_R3": "abe152a332741db268a39b5088866e5aab634fed:src/mod/families/modern/prototypes/streams/direct-effects.lua",
+          "pinned_engine_APIs": [
+            "2.0.77",
+            "2.1.23"
+          ],
+          "original_raw_P1_discussion": "unverified,not reconstructed",
+          "local_tag_alias": "v4.2.0 equals canonical v4.2.0-stable; not a separate publication"
+        },
+        "dispositions": [
+          "FLUID-01 existing multiplier/default/no-op remains distinct from PIPE-01; current zero correction has host proof/native network work remains. README corrects the dropdown list and explains minimum connected extent.",
+          "NATIVE-01 original ownership/category expectations map to current policy and named504 native state/useful-lab results; arbitrary categories,profiles,firing saturation and consumption remain bounded obligations.",
+          "PLAT-UI-01 embedded host/query/personal state/translations/native handoff map to source/host/scoped rendered evidence; actual input/client/export/performance still required. Optional companion/hooks and full-tree proposals retain original conditional status."
+        ],
+        "remaining": "Use the existing stable coverage rows and request-specific remaining_executable_check fields. No new every-version/native campaign,approval ladder,product feature or duplicate research owner is admitted. All prior35source-intent reviews,original87requests and failed/native result identities remain unchanged.",
+        "native_execution": false,
+        "request_decisions_changed": false,
+        "player_source_changed": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false
+      },
+      {
+        "subjects": [
+          "CONT-07",
+          "CONT-12",
+          "CONT-15",
+          "VER-07"
+        ],
+        "reviewed_on": "2026-11-06",
+        "reviewed_against": "5e71ed7061ba5def5eec0027b0c11d42e6ec2ec8",
+        "scope": "Reuse recovered621/446 originals; reconcile15 existing progression/OmniAB/RIC requests and one named RIC historical-source/current-host discrepancy. No broad ecosystem or stable verdict.",
+        "evidence": {
+          "path": "spec/evidence/historical-reported-upgrade-obligations-r01.json",
+          "sha256": "EA58EED5226A0FB1B2BA34A2CF07DAE647F21214F68F7EF0389CFE0C4DE364D6"
+        },
+        "disposition": "Consolidate recovered621/446 originals; map15 preserved requests,retain unqualified/probe states and expose the named RIC source/host gap without inventing ecosystem acceptance.",
+        "original_request_fields_preserved": true,
+        "native_tests_run": false,
+        "stable_acceptance": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-07",
+          "CONT-12",
+          "VER-07"
+        ],
+        "reviewed_on": "2026-11-06",
+        "reviewed_against": "1810ebfe90e5b6b644a224303eb05524ed8eea05",
+        "scope": "Five selected Bob-only/combined Tin test families plus the distinct Angel-only final-state sibling; complete earliest/latest wrapper bodies and changed assertion spans,24 consumed fixture files. Not all Tin history or native/profile acceptance.",
+        "evidence": {
+          "path": "spec/evidence/historical-tin-behavior-intents-aero-r01.json",
+          "sha256": "C1A2686B72FA63C4758D210594BC4698BB31854FB9DEC2F285CD5BF035BB93A8"
+        },
+        "disposition": "Retain physical Tin and cap/current/queue/serialization purposes; preserve distinct profile nonadmission and frontier limits; retire only obsolete staging/lease/custody mechanics.",
+        "remaining_executable_check": "Use existing admitted current-profile physical/state/settings cases and exact consumed-input review. Original literal Tin outputs have no recovered raw result; keep that oracle boundary explicit and do not derive changed tolerances from candidate output. No extra packet approval or every-old-patch campaign.",
+        "native_execution": false,
+        "player_source_changed": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-06"
+        ],
+        "reviewed_on": "2026-11-06",
+        "reviewed_against": "764e8d19945e0f01a04f28a287e1a279199d08db",
+        "scope": "One deduplicated assert-pipeline-extent fixture, original emission/metadata and166 source bindings; no complete override or native acceptance claim.",
+        "evidence": "spec/evidence/historical-pipeline-extent-intents-aero-r01.json",
+        "disposition": "Retain useful parsing/scaling/shared-box assertions through current controls, preserve reviewed native-default/zero corrections, and retire only obsolete fixture-text/dispatcher plumbing. Local-onlyv3.0.0/v4.2.0 remain explicit; no tag is changed. No new product defect, campaign or replay of unchanged cases is inferred.",
+        "original_request_fields_preserved": true,
+        "native_tests_run": false,
+        "stable_acceptance": false
       }
     ],
     "stable_coverage_review": {
-      "reviewed_against": "12eae25e24ca6600cd3cc6ed4a48d93cd8e7b472",
-      "public_candidate": "Published 5.0.4 GitHub prerelease, player a2ba6eeaf06292cd90b7d7c5a687cf96cf84529f; release 434617359 and main 401d89f67cf71c8fb3ed7a025eff18f0a9d99a28. Actual delivery is independently accepted by review 5C49A325. Stable qualification remains incomplete; earlier native results retain their original identities and actual consumed-input limits.",
-      "scope": "Current routing of the existing CONT and release obligations, not a second request ledger, complete historical-source disposition or blanket candidate qualification. Exact earlier execution identities and limits remain authoritative; the CONT-10 acceptance_rows retain their nine UI areas. Existing accepted components are not reopened merely because a later source revision exists.",
+      "reviewed_against": "db17b49b081f03dddcad25c5c0bc4086aee352a5",
+      "public_candidate": "Published5.0.5 GitHub prerelease, main5d173925bce29ad8917346897706a0fcee4553e4/player41d36ed8db131404692d5c054da3c87f7b54aecb; release434857344 and canonical tag29ab8e81806559fc7a34b26fc276a825face3ff2. Independent package56B5A66A and final publication/delivery2CD8E1E2 are accepted, including actual publisher originals and both primary deliveries. Earlier public componentC4A92DA3 remains preserved under its original partial-review identity. Stable qualification remains incomplete; no prior native execution is relabelled.",
+      "scope": "Finite routing for the twelve known stable coverage decisions, with exact existing case inputs, readiness and independent expectations. This is not a dispatch controller, a native result or a complete historical-source inventory.",
       "rows": [
         {
           "subjects": [
@@ -16786,12 +17029,19 @@
             "source/presentation/library_model.lua"
           ],
           "applicable_evidence": [
-            "spec/evidence/library-cont10-layout-negative-control-r01.json"
+            "spec/evidence/library-cont10-layout-negative-control-r01.json",
+            "spec/evidence/library-current504-functional-native-r02.json"
           ],
-          "remaining_executable_check": "Supported screenshot requests time out even on Explorer while a separate text-only Explorer accessibility read succeeds; cause remains unknown and neither is Factorio UI acceptance. Use a changed, bounded supported capture/input diagnostic before the affected Research/Availability/Queue/Settings/Help controls at representative sizes/scales and English/German text. Keep original timeouts and live identity/focus/geometry/state safeguards. The native owner selects and repairs this directly; no prospective Aero dispatch approval or unchanged retry.",
+          "remaining_executable_check": "Use the existing library-native-input fixtures/profiles for a current505 action sequence covering Research, Availability, Queue, Settings and Help; observe typing, filters/dropdowns/checkboxes, scrolling, split/narrow layout, size/reset and native handoff at representative scale and English/German. Native game PNGs and accepted504 images exist; the supported OS screenshot route previously timed out, so repair/test only the needed live capture/input composition instead of treating all rendering as unavailable. Keep identity/focus/geometry/state guards and stop on unexpected state; no Aero dispatch approval.",
           "owner": "Black Glass",
           "independent_review": "Aero",
-          "status": "open: host layout opposition and bounded earlier render evidence do not close real-input/all-view acceptance"
+          "status": "open: host layout opposition and bounded earlier render evidence do not close real-input/all-view acceptance",
+          "readiness": "current-package and guarded-action binding needed; actual input remains unverified",
+          "next_work_inputs": [
+            "tests/fixtures/library-native-input/control.lua",
+            "tests/profiles/library-native-input-imported110-f210-2123-r15.json",
+            "tests/profiles/library-native-input-imported110-f200-2077-r15.json"
+          ]
         },
         {
           "subjects": [
@@ -16806,10 +17056,15 @@
             "spec/evidence/library-native-input-observer-r15-prepared.json",
             "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
           ],
-          "remaining_executable_check": "Black Glass binds the selected frozen player/profile/runtime/action inputs, exercises the real dispatcher composition offline and runs or repairs the bounded imported lifecycle assignment autonomously. Adopt matching in-progress work rather than recreating an observer. Preserve live identity/focus/geometry safeguards and name/phase/reference retirement when indices are reused. Aero independently reviews the observed result and final candidate; preparation is not a result.",
+          "remaining_executable_check": "Adopt the prepared imported1.1 observer and protected7a2 successor. Bind the selected505 package, engine/profile, runtime and real action inputs through the existing dispatcher, then observe paid private credits, hidden-action refusal, distinct clients, typing/drag/both close events, foreign focus, removal/replacement and save/restart/read-only load. Retire phases/references by identity when player indices are reused. Preparation and direct callback invocation do not count as native input; no new observer or packet countersignature is required.",
           "owner": "Black Glass",
           "independent_review": "Aero",
-          "status": "open: actual imported personal/input lifecycle remains separate from routine dispatch preparation"
+          "status": "open: actual imported personal/input lifecycle remains separate from routine dispatch preparation",
+          "readiness": "existing protected source and observer; current505 runtime/action binding needed",
+          "next_work_inputs": [
+            "spec/evidence/library-native-input-observer-r15-prepared.json",
+            "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json"
+          ]
         },
         {
           "subjects": [
@@ -16823,10 +17078,15 @@
             "source/research/settings_profile.lua"
           ],
           "applicable_evidence": [],
-          "remaining_executable_check": "Complete the reviewed export/import and requesting-player/server file checks with actual UI input, malformed/read-only/write-failure controls and lifecycle. Preserve failed export/controller attempts; do not classify them as product passes.",
+          "remaining_executable_check": "Prepare the existing library-support-exports imported110 profiles for the chosen505 input case. Verify raw/default/effective provenance and false/zero, full/compact MIRSET1 meaning, actual requesting-client/server files, malformed import, read-only/write failure and relevant save/reload. Combine compatible observations with the existing Library session; preserve original failed controller/export results and do not report an absent file as a pass.",
           "owner": "Black Glass",
           "independent_review": "Aero",
-          "status": "open; original evidence is not relabelled as current"
+          "status": "open; original evidence is not relabelled as current",
+          "readiness": "existing export profiles need current505 binding; actual files remain unqualified",
+          "next_work_inputs": [
+            "tests/profiles/library-support-exports-imported110-f210-2123-r04.json",
+            "tests/profiles/library-support-exports-imported110-f200-2077-r04.json"
+          ]
         },
         {
           "subjects": [
@@ -16840,12 +17100,19 @@
           ],
           "applicable_evidence": [
             "spec/inventory/library-baseline.json",
-            "spec/evidence/beta501-f200-successor-native-chain-r01.json"
+            "spec/evidence/beta501-f200-successor-native-chain-r01.json",
+            "spec/evidence/library-current504-functional-native-r02.json"
           ],
-          "remaining_executable_check": "Retain the protected published5.0.1 headless source/successor result and its persisted English/German personal scalars under their original inputs; do not reseed or rerun that completed component by default. Complete affected rendered personal-view, independent-client locale/translation, removal/replacement, save/reopen and read-only-load observations on the selected candidate. The imported1.1 credit case and headless scalar persistence are distinct scopes.",
+          "remaining_executable_check": "Reuse the accepted504 Library joins/labs/rendered component and501 headless personal scalars only within their original scope; close affected505 rendered personal state, independent client locale/translation, root/player removal, reopen/save and read-only load through the existing Library case. Separately bind Discovery Tree1.0.12 visibility/reset behavior from the actual reduced integration inputs; observe hidden-to-discovered and disabled/reset modes without exposing private credits. The historical discovery-recovery fixture is a Vulcanus migration case and is not a Discovery Tree test.",
           "owner": "Black Glass",
           "independent_review": "Aero",
-          "status": "partial: earlier published-beta persisted scalars observed; rendered personal/client lifecycle and final applicability remain open"
+          "status": "partial: earlier published-beta persisted scalars observed; rendered personal/client lifecycle and final applicability remain open",
+          "readiness": "partial504 rendering/client evidence and reported505 preflight; Tree reset needs its own exact binding",
+          "next_work_inputs": [
+            "spec/evidence/library-current504-functional-native-r02.json",
+            "spec/evidence/beta501-f200-successor-native-chain-r01.json",
+            "tests/test_discovery_tree_compatibility.py"
+          ]
         },
         {
           "subjects": [
@@ -16864,10 +17131,17 @@
             "spec/evidence/candidate503-native-upgrades-r01.json",
             "spec/evidence/candidate504-mixed-gun-native-r01.json"
           ],
-          "remaining_executable_check": "Retain accepted cap1/effect-permutation/cap0 and configured native cost/time/reward/unknown-cost residual-fallback observations under their original inputs. Current 5.0.4 has separately accepted valid-source mixed electric/Tesla first-entry/removal/reset/return/merge and useful-lab state observations (F77AAFE3); the original 8751A847 full-provider and signed-gun arithmetic failures remain failed. Reconcile other unresolved effective/nondefault setting and ownership boundaries through affected checks only. No arbitrary provider-change or original false-through-entry guarantee, guessed internal writer or unchanged cap-campaign restart follows.",
+          "remaining_executable_check": "Decide505 applicability of the named cap1/effect-permutation/cap0, configured cost/time/reward/residual-fallback and504 mixed-gun first-entry/removal/reset/return/merge components from consumed source/settings/save inputs. Run only a demonstrated changed boundary; keep original8751A847 full-provider and signed-arithmetic failures adverse and arbitrary provider transitions unqualified. Observe actual Settings provenance/import controls in the Library case above rather than reopening every old cap fixture.",
           "owner": "Aero; Black Glass executes native checks",
           "independent_review": "Aero",
-          "status": "partial: named controlled caps and selected nondefault native workloads accepted; broader settings/ownership limits remain explicit"
+          "status": "partial: named controlled caps and selected nondefault native workloads accepted; broader settings/ownership limits remain explicit",
+          "readiness": "source/input applicability decision ready; no new blanket cap campaign",
+          "next_work_inputs": [
+            "spec/evidence/f200-positive-cap-qualified-chain.json",
+            "spec/evidence/candidate503-native-upgrades-r01.json",
+            "spec/evidence/candidate504-mixed-gun-native-r01.json",
+            "tests/test_settings_profile.py"
+          ]
         },
         {
           "subjects": [
@@ -16883,12 +17157,22 @@
             "spec/inventory/migration-origins.json",
             "spec/evidence/candidate503-native-upgrades-r01.json",
             "spec/evidence/candidate504-mixed-gun-native-r01.json",
-            "Julesc013/mir-native-worker@017a40be8ed5f97d92e876cb6f4d259a92cdb47e:evidence/aero-historical473-current504-applicability-r01/source-applicability.json (9C3C8D07)"
+            "Julesc013/mir-native-worker@017a40be8ed5f97d92e876cb6f4d259a92cdb47e:evidence/aero-historical473-current504-applicability-r01/source-applicability.json (9C3C8D07)",
+            "9b8e34592ac5eafb5b9719705ddce31ca3fc62e1:evidence/aero-candidate505-source-native-review-r01/native-review.json",
+            "spec/evidence/historical473-current505-applicability-r01.json"
           ],
-          "remaining_executable_check": "Keep the nine 4.7.3 same-edition routes, seven selected older MIR-contract groups and four forward journeys distinct, under their original inputs. The accepted 5.0.4 prerelease review retains applicable 5.0.3 recipe/paid-state components and adds current mixed-gun ownership boundaries. Separate source/member review 9C3C8D07 accepts bounded reuse for seven earlier stable-edition 4.7.3 routes (0.13-1.1), not seven older MIR-contract groups and not a fresh 5.0.4 native execution. Complete genuinely affected current-candidate state/ownership applicability and remaining named closures; preserve ambiguous locks, missing originals and explicit support limits. Do not restart completed source saves or every old patch.",
+          "remaining_executable_check": "Published505 reviewFC930CC9 supports the seven earlier-stable-edition473 same-edition preservation routes and the separate publishedF100-to-F110 journey under original native identities. Finish consumed-input decisions for modernF200/F210473 routes,other three forward journeys and the seven older MIR-contract groups,which are different sets. Existing504-to505 stock/representative satellite science upgrade remains accepted;do not recreate its predecessor. Name each genuinely changed identity/owner/settings path and existing route before an affected native check;preserve adverse receipts,missing inputs and ambiguous locks. Locale/current-load/rendering,whole-edition and final-candidate acceptance remain separate.",
           "owner": "Aero; Black Glass executes affected checks",
           "independent_review": "Aero",
-          "status": "partial: named prior routes, affected 5.0.4 components and bounded earlier-edition source applicability accepted; complete stable-candidate coverage remains unproved"
+          "status": "partial:505 earlier-seven473 and F100-to-F110 preservation applicability accepted; original modern/older-contract/science/state components retain their exact scopes; complete stable-candidate coverage remains unproved",
+          "readiness": "earlier-seven473/F100-F110505 preservation input review complete; modern/older-contract decisions remain ready",
+          "next_work_inputs": [
+            "spec/inventory/migration-origins.json",
+            "spec/evidence/candidate503-native-upgrades-r01.json",
+            "spec/evidence/candidate504-mixed-gun-native-r01.json",
+            "spec/evidence/candidate505-science-upgrade-native-r01.json",
+            "spec/evidence/historical473-current505-applicability-r01.json"
+          ]
         },
         {
           "subjects": [
@@ -16911,12 +17195,20 @@
             "spec/evidence/historical-native-effect-a20-consumer-intent-aero-r01.json",
             "spec/evidence/candidate504-weapon-first-entry-native-r01.json",
             "spec/evidence/candidate504-galore-weapon-useful-work-r01.json",
-            "spec/evidence/candidate504-mixed-gun-native-r01.json"
+            "spec/evidence/candidate504-mixed-gun-native-r01.json",
+            "9b8e34592ac5eafb5b9719705ddce31ca3fc62e1:evidence/aero-candidate505-source-native-review-r01/native-review.json"
           ],
-          "remaining_executable_check": "Retain accepted reduced K2SO/Crushing Industry and Muria/Discovery Tree/Science Spread components at their actual profiles. The weapon/Galore corrections and partial mixed electric/Tesla ownership correction are released in 5.0.4, with accepted paid-state/future earning, first-entry, removal/reset/return, force-merge and useful-lab/save/reload observations within the named component indexes. Original signed arithmetic and full-provider failures remain adverse; arbitrary provider transitions are not qualified. Driku supplied 564 enabled names without exact versions/settings; full reporter reproduction and physical manufacturing remain unverified. Close other named supported-profile science/settings/API/useful-output gaps and current edition subsets through the existing queue; no new broad compatibility claim follows.",
+          "remaining_executable_check": "Resolve supported-profile scope against original request decisions and the named K2SO/Crushing Industry, Muria/Discovery Tree/Science Spread, Galore and mixed-gun components; run only an uncovered required behavior/useful-output boundary. DLC-01 still needs honest graphical absent-DLC versus installed-but-disabled coverage with exact inputs; do not mutate Steam or manufacture an original environment. Driku supplied564 enabled names without versions/settings, so exact full-reporter reconstruction remains unverified while reduced results retain their scope. Requested/unimplemented ecosystem work is not silently claimed supported or converted into a universal-modpack test.",
           "owner": "Aero; Black Glass owns native queue",
           "independent_review": "Aero",
-          "status": "partial: named 5.0.4 weapon/Galore/mixed-ownership corrections qualified and delivered; other supported-profile and original reporter limits remain open"
+          "status": "partial: named5.0.4 compatibility corrections and bounded5.0.5 Space-policy science-source correction qualified; other supported-profile and original reporter limits remain open",
+          "readiness": "named supported-profile decisions ready; exact reporter environments remain incomplete",
+          "next_work_inputs": [
+            "spec/programmes/community-requests.json",
+            "spec/evidence/candidate504-galore-weapon-useful-work-r01.json",
+            "spec/evidence/candidate504-mixed-gun-native-r01.json",
+            "spec/evidence/candidate505-science-upgrade-native-r01.json"
+          ]
         },
         {
           "subjects": [
@@ -16941,12 +17233,20 @@
             "spec/evidence/library-diagnostic-r02-aero-independent-review-r01.json",
             "spec/evidence/foundation-f200-whole-world-activity-r08-independent-review-aero-r01.json",
             "https://github.com/Julesc013/more-infinite-research/blob/aa8eabfd33228de5e6d3c4c27744fbb50464c1f3/spec/evidence/foundation504-normal-comparison-r01.json",
-            "Julesc013/mir-native-worker@c45ba6f168b28a8c6234daf62f4f034daab4a00f:evidence/aero-foundation504-normal-result-review-r01/review.json (6950973F)"
+            "Julesc013/mir-native-worker@c45ba6f168b28a8c6234daf62f4f034daab4a00f:evidence/aero-foundation504-normal-result-review-r01/review.json (6950973F)",
+            "https://github.com/Julesc013/mir-native-worker/pull/137#issuecomment-6654277233",
+            "https://github.com/Julesc013/mir-native-worker/pull/137#issuecomment-6654821985"
           ],
-          "remaining_executable_check": "Keep earlier accepted responsive-menu components under original package/engine/workload identities and review current applicability. Current 5.0.4 Foundation activity independently matches bounded NoMIR projection 490A7B07 (review FCE764CF). A separate observer-free 18-process normal comparison passes the predeclared +1 ms mean-update non-regression margin (review 6950973F): six pairs, B-A -0.02333 ms, 95% t interval [-0.20562,+0.15895] ms. This is one default-settings factory on 2.0.77; min/max, wall time and OS/sampled memory are descriptive. Complete the required responsive-menu improvement, load, spikes, useful scripted work/throughput/backlog, Library closed/open and retained-memory endpoints on pinned Base/Space Age/heavy profiles. Preserve original failures, calibration, admission refusals and all samples; no new speedup, negative overhead, relaxed tolerance or informational/reboot rerun is claimed.",
+          "remaining_executable_check": "Independently review originals from07431FDE r02: Root reports four data-valid sessions (two warmups/two identical4.7.20002 controls), full restoration and zero remaining Factorio processes. The fixed38-endpoint A/A gate9DB77444 stops on German Library reopen:36.3499 versus20.1254ms, absolute16.2245ms above5ms allowance; both are reference observations despite generic published/candidate field labels. No scored MIR5 pair or performance verdict follows. Verify source/workload/stage/state equivalence and the original samples before deciding a changed diagnostic or method; preserve tolerances and25EAA failure. Advance ready settings/export or active-runtime work meanwhile. Whole-product responsive-menu/load/spikes/useful-work/backlog/Library/memory endpoints remain open on pinned Base/SpaceAge/heavy2.0/2.1 profiles; earlier Foundation6950973F and menu components retain original scopes.",
           "owner": "Black Glass",
           "independent_review": "Aero",
-          "status": "partial: one current factory mean-update non-regression component accepted; complete whole-product performance and non-regression remain unqualified"
+          "status": "partial: bounded Foundation mean-update component accepted; current505 Library comparison stops at identical-reference A/A repeatability before scoring; full performance remains unqualified",
+          "readiness": "Root reports07431FDE terminal: identical-reference A/A fails one repeatability endpoint; no scored MIR5 pair",
+          "next_work_inputs": [
+            "https://github.com/Julesc013/mir-native-worker/pull/137#issuecomment-6654277233",
+            "spec/evidence/foundation504-normal-comparison-r01.json",
+            "spec/performance.md"
+          ]
         },
         {
           "subjects": [
@@ -16961,12 +17261,20 @@
           "applicable_evidence": [
             "spec/evidence/api-production-current7b0-aero-applicability-r01.json",
             "spec/evidence/api1-documented-subset-qualification-r01.json",
-            "Julesc013/mir-native-worker@cf7c985564851526a39f97034b1ba20aa3827421:evidence/aero-final504-combined-review-r01 (API consumed-input review DECD1A0A)"
+            "Julesc013/mir-native-worker@cf7c985564851526a39f97034b1ba20aa3827421:evidence/aero-final504-combined-review-r01 (API consumed-input review DECD1A0A)",
+            "spec/evidence/api-current505-consumed-input-applicability-r01.json"
           ],
-          "remaining_executable_check": "Retain the documented API1.0 freeze and legacy bridges under original inputs. Current 5.0.4 consumed-input review DECD1A0A accepts unchanged documented protocol/modules, registration and original consumer-fixture scope; actual current force state is supplied by separately accepted affected native scenarios. Existing packaged-host version getters keep their own identities, and old native version strings are never relabelled as 5.0.4. Changed legacy-tab-aware Settings search, independent native research/query state, client and unknown/computed/external consumers retain their actual open limits. Review genuinely changed consumer/ownership/target/engine/save/endpoint inputs and execute only affected methods; no blanket current client or historical API verdict follows.",
+          "remaining_executable_check": "505 consumed-input review2BB0F394 closes the documented protocol/version delta: exact API/Generator/control/complete bootstrap bytes,13 original consumer files and both modern package members match accepted504 except the product literal; all four actual packaged Lua52 metadata getters pass. Retain original native identities and current saved-state results under their separate scopes. Execute the explicit/retained Settings-tab legacy search with independent native research/query state in the actual Library case, and review genuinely changed future inputs before reuse. Unknown/computed/external consumers remain unknown; do not restart the whole API matrix or relabel old native version strings.",
           "owner": "Aero; Black Glass executes affected checks",
           "independent_review": "Aero",
-          "status": "partial: documented subset and bounded 5.0.4 protocol/consumed-input reuse accepted; remaining search/client/consumer scopes stay open"
+          "status": "partial: documented subset and bounded505 protocol/consumed-input reuse accepted; four packaged version host checks pass; remaining search/client/consumer scopes stay open",
+          "readiness": "505 documented protocol/version review complete; actual legacy Settings search remains open",
+          "next_work_inputs": [
+            "spec/evidence/api1-documented-subset-qualification-r01.json",
+            "spec/evidence/api-production-current7b0-aero-applicability-r01.json",
+            "tests/test_api_boundary_fixture.py",
+            "spec/evidence/api-current505-consumed-input-applicability-r01.json"
+          ]
         },
         {
           "subjects": [
@@ -16985,12 +17293,22 @@
           "applicable_evidence": [
             "spec/evidence/candidate503-native-upgrades-r01.json",
             "https://github.com/Julesc013/more-infinite-research/pull/1664#issuecomment-6632717829",
-            "https://github.com/Julesc013/more-infinite-research/blob/aa8eabfd33228de5e6d3c4c27744fbb50464c1f3/spec/evidence/candidate504-github-prerelease-delivery-chain-r01.json"
+            "https://github.com/Julesc013/more-infinite-research/blob/aa8eabfd33228de5e6d3c4c27744fbb50464c1f3/spec/evidence/candidate504-github-prerelease-delivery-chain-r01.json",
+            "2b910b36a300b52c316f2fdf1f3763689096e272:evidence/aero-candidate505-final-package-review-r01/review.json",
+            "1911645fe01cc830f1921b7cabed9f1bcd4511e7:evidence/aero-public505-actual-delivery-review-r01/review.json",
+            "ddb249894034d3043e04162c06f29c60cb080603:evidence/aero-public505-final-delivery-review-r01/review.json"
           ],
-          "remaining_executable_check": "Retain accepted 5.0.4 correspondence 2C3D4BA1 and delivery review 5C49A325: all 17 ZIPs/two sums, roots/info/changelog/source-tag-FFFPP/Base floors, exact modern native package bytes, no developer payloads, ZIP CRCs and both 21-file local deliveries. All 85 MIR5 ZIP asset labels match the requested display format; prior four releases and 76 assets retain their bytes. These package/delivery facts do not close each stable edition current native subset; the native owner runs affected current archive/catalogue/useful-lab checks without repeating unchanged historical preservation. Preserve F018/0.18.47 experimental and early best-effort limits. Review changed candidate/edition/docs inputs for stable; unchanged qualified bytes may be promoted, changed public bytes require 5.0.5.",
+          "remaining_executable_check": "Keep accepted505 package review56B5A66A and final delivery2CD8E1E2 closed:17 ZIPs/two sums,1554 CRC-checked members, both21-file local deliveries, correct labels and all prior published bytes. Reconcile README/support/API/upgrade claims with completed edition/profile/UI/performance verdicts, preserving authored content and F018/early limits. Review genuinely changed package inputs only; unchanged qualified bytes may be promoted, changed public player bytes require506.",
           "owner": "Aero; Black Glass freezes candidate",
           "independent_review": "Aero",
-          "status": "partial: 5.0.4 all-edition package identity and actual delivery accepted; final stable native/support consistency remains separate"
+          "status": "partial:5.0.5 all-edition package identity and final publication/anonymous/local delivery accepted; each stable edition native/support verdict remains separately scoped",
+          "readiness": "505 package/delivery identity accepted; stable support/edition claims still need final verdict",
+          "next_work_inputs": [
+            "README.md",
+            "docs/support.md",
+            "targets/editions.json",
+            "spec/evidence/candidate505-github-prerelease-delivery-chain-r01.json"
+          ]
         },
         {
           "subjects": [
@@ -17004,12 +17322,27 @@
           ],
           "applicable_evidence": [
             "spec/evidence/historical-validation-result-intents-aero-r01.json",
-            "spec/evidence/historical-validation-helper-intents-aero-r01.json"
+            "spec/evidence/historical-validation-helper-intents-aero-r01.json",
+            "spec/evidence/historical-upgrade-manifest-test-intents-aero-r01.json",
+            "spec/evidence/historical-k2-imported-fixture-intents-aero-r01.json",
+            "spec/evidence/historical-complete-state-comparator-intents-aero-r01.json",
+            "b6c603f654025013546f9ccfeb8b0a677824d64e:evidence/aero-finite-stable-coverage-r01/source-correspondence.json",
+            "spec/evidence/historical-reported-upgrade-obligations-r01.json",
+            "https://github.com/Julesc013/more-infinite-research/pull/1724"
           ],
-          "remaining_executable_check": "Retain the 31 bounded intent reviews, including integrated result/runner and helper dispositions, with their exact scopes. Next inspect remaining original assertion families and their transitive inputs, effective/nondefault settings, compatibility/inter-release removals and unresolved consumer/source groups. The upgrade-manifest extraction inventories 10 bodies at 14 verified remote bindings and traces one original full-state oracle, but does not finish that family. Map recovered accepted behavior to implementation, independent opposing controls and genuinely remaining native checks. Keep inventory_complete=false, all 87 original request records/decisions, unresolved issues621/446 and PR344, missing originals and reporter configurations explicit; counts and representative fixtures are not global completeness.",
+          "remaining_executable_check": "All87 original requests have additive routing, including the34 deferred/rejected/excluded/conditional/document/intake decisions reconciled below. Preserve every original field/status/qualification; routing does not implement or qualify the requests. Named RIC Marine source correction is merged through PR1724; available0.35.8 still fails upstream engine validation, so useful-work and earned-state checks need actually compatible inputs. Continue unresolved source/test-intent and named-profile/API/settings applicability; no recovered request is silently waived or expanded into a new feature programme.",
           "owner": "Aero",
           "independent_review": "Aero",
-          "status": "open: bounded source-intent dispositions exist; complete historical preservation remains unproved"
+          "status": "All87 original request decisions are explicitly routed; historical source/test-intent, implementation and native qualification remain incomplete",
+          "readiness": "Deferred/rejected/excluded scope is recorded; applicable delivered behavior and active unresolved requests retain their own checks",
+          "next_work_inputs": [
+            "spec/programmes/community-requests.json",
+            "spec/inventory/migration-origins.json",
+            "https://github.com/Julesc013/more-infinite-research/pull/1711",
+            "https://github.com/Julesc013/more-infinite-research/issues/621",
+            "https://github.com/Julesc013/more-infinite-research/issues/446",
+            "https://github.com/Julesc013/more-infinite-research/pull/344"
+          ]
         },
         {
           "subjects": [
@@ -17024,19 +17357,42 @@
           "applicable_evidence": [
             "spec/evidence/candidate503-native-upgrades-r01.json",
             "https://github.com/Julesc013/more-infinite-research/pull/1664#issuecomment-6632717829",
-            "https://github.com/Julesc013/more-infinite-research/blob/aa8eabfd33228de5e6d3c4c27744fbb50464c1f3/spec/evidence/candidate504-github-prerelease-delivery-chain-r01.json"
+            "https://github.com/Julesc013/more-infinite-research/blob/aa8eabfd33228de5e6d3c4c27744fbb50464c1f3/spec/evidence/candidate504-github-prerelease-delivery-chain-r01.json",
+            "2b910b36a300b52c316f2fdf1f3763689096e272:evidence/aero-candidate505-final-package-review-r01/review.json",
+            "1911645fe01cc830f1921b7cabed9f1bcd4511e7:evidence/aero-public505-actual-delivery-review-r01/review.json",
+            "ddb249894034d3043e04162c06f29c60cb080603:evidence/aero-public505-final-delivery-review-r01/review.json"
           ],
-          "remaining_executable_check": "The 5.0.4 prerelease publication/delivery sequence is complete: exact checked main/tag promotion, fresh administration and distinct immutability probes, one 19-asset draft/publication, anonymous downloads, unchanged prior objects and both clean synchronized local deliveries are independently accepted by 5C49A325. Preserve that result rather than scheduling it again. Stable GO still requires all applicable verdicts on one candidate and independent claims review; then qualify unchanged-byte promotion or 5.0.5 for changed public bytes with normal publication safeguards. Black Glass owns integration/publication autonomously; agent publication remains GitHub-only and the maintainer handles Mod Portal.",
+          "remaining_executable_check": "Retain the independently accepted505 checked main/tag promotion, fresh administration/distinct immutability probes,19-asset publication, anonymous downloads, unchanged prior objects and both local deliveries; do not schedule that beta delivery again. StableGO requires all applicable rows on one candidate and independent claims review. Black Glass then promotes unchanged qualified bytes or publishes506 for changed player bytes through existing checks/probes; Aero verifies claims/downloads. GitHub-only agent publication continues and the maintainer handles Portal.",
           "owner": "Black Glass; Aero independently verifies delivery",
           "independent_review": "Aero",
-          "status": "partial: 5.0.4 prerelease promotion/publication/delivery accepted; full stable GO remains open"
+          "status": "partial:5.0.5 checked promotion/publication/delivery independently accepted; full stable GO remains open",
+          "readiness": "stable GO waits for applicable verdicts;505 beta delivery already complete",
+          "next_work_inputs": [
+            "spec/verification.md",
+            "tools/commands/release/Test-MIRGitHubAdministration.ps1",
+            "spec/evidence/candidate505-github-prerelease-delivery-chain-r01.json"
+          ]
         }
       ],
-      "verdict": "NOT-READY for stable: Library input/export/personal/client and Discovery Tree reset, remaining historical/profile/API/state and whole-product performance verdicts remain. The 5.0.4 prerelease correction, package and delivery components are accepted within their exact scopes; the fresh normal factory comparison adds one bounded mean-update non-regression component only.",
+      "verdict": "NOT-READY for stable: Library input/export/personal/client and Discovery Tree reset, remaining historical/profile/API/state and whole-product performance verdicts remain. The5.0.5 correction/source/package and actual delivery components are accepted within their named scope; the affected science transition retains actualf0ca native source and does not relabel earlier5.0.4 ownership, rendering or normal factory results.",
       "native_execution": false,
       "release_qualification": false,
       "reviewed_on": "2026-11-05",
-      "native_execution_policy": "The maintainer authorizes Black Glass to prepare, repair and run routine native assignments without prospective Aero packet or dispatch sign-off. Keep exact input custody, protected saves, process/resource safeguards and restoration. Aero supplies independent expectations and scoped corrections, then reviews actual results and the final candidate/release; completed source or host controls are not native acceptance."
+      "native_execution_policy": "The maintainer authorizes Black Glass to prepare, repair and run routine native assignments without prospective Aero packet or dispatch sign-off. Keep exact input custody, protected saves, process/resource safeguards and restoration. Aero supplies independent expectations and scoped corrections, then reviews actual results and the final candidate/release; completed source or host controls are not native acceptance.",
+      "previous_routing_source": "12eae25e24ca6600cd3cc6ed4a48d93cd8e7b472",
+      "prior_publication_context": {
+        "source_release": "5.0.4",
+        "public_candidate": "Published 5.0.4 GitHub prerelease, player a2ba6eeaf06292cd90b7d7c5a687cf96cf84529f; release 434617359 and main 401d89f67cf71c8fb3ed7a025eff18f0a9d99a28. Actual delivery is independently accepted by review 5C49A325. Stable qualification remains incomplete; earlier native results retain their original identities and actual consumed-input limits.",
+        "package_delivery_routing": "Retain accepted 5.0.4 correspondence 2C3D4BA1 and delivery review 5C49A325: all 17 ZIPs/two sums, roots/info/changelog/source-tag-FFFPP/Base floors, exact modern native package bytes, no developer payloads, ZIP CRCs and both 21-file local deliveries. All 85 MIR5 ZIP asset labels match the requested display format; prior four releases and 76 assets retain their bytes. These package/delivery facts do not close each stable edition current native subset; the native owner runs affected current archive/catalogue/useful-lab checks without repeating unchanged historical preservation. Preserve F018/0.18.47 experimental and early best-effort limits. Review changed candidate/edition/docs inputs for stable; unchanged qualified bytes may be promoted, changed public bytes require 5.0.5.",
+        "publication_routing": "The 5.0.4 prerelease publication/delivery sequence is complete: exact checked main/tag promotion, fresh administration and distinct immutability probes, one 19-asset draft/publication, anonymous downloads, unchanged prior objects and both clean synchronized local deliveries are independently accepted by 5C49A325. Preserve that result rather than scheduling it again. Stable GO still requires all applicable verdicts on one candidate and independent claims review; then qualify unchanged-byte promotion or 5.0.5 for changed public bytes with normal publication safeguards. Black Glass owns integration/publication autonomously; agent publication remains GitHub-only and the maintainer handles Mod Portal."
+      },
+      "work_order": "Black Glass reviews the stopped retained-Library calibration and advances one ready settings/export or active-runtime assignment; another retained run requires a changed evidence-based diagnosis/method with fixed acceptance criteria. It prepares and runs routine work autonomously. Aero concurrently reviews actual originals, original-request applicability, route/API/settings consumed-input decisions and support copy. Missing reporter/private evidence remains explicitly unverified; no invented inputs or old-campaign restart.",
+      "bounded_source_correspondence": {
+        "path": "b6c603f654025013546f9ccfeb8b0a677824d64e:evidence/aero-finite-stable-coverage-r01/source-correspondence.json",
+        "sha256": "8BF8D1CC9F08CB4B311B3C66D31E65D31FF969AF6D43088AACEAA6FB5AB3BD0B",
+        "scope": "All46 original F200 Base science/prerequisite rows match92 current authored modern+gear constructor fields under default settings. This does not qualify final science policy, a native process, an upgrade/save or another profile.",
+        "native_execution": false
+      }
     },
     "report_options_restoration_review": {
       "subject": "CONT-10",
@@ -17131,6 +17487,193 @@
       "test_intent_reconciliation_complete": false,
       "native_execution": false,
       "limits": "No player source/package, published migration, original request record, native result identity or release verdict changes. This is not complete settings, API, Library or VER-07 acceptance."
+    },
+    "remaining_request_disposition_review": {
+      "reviewed_on": "2026-11-06",
+      "reviewed_against": "8b4786e238a382478e02bdba35b182e6b214850d",
+      "subjects": [
+        "CONT-15",
+        "VER-07"
+      ],
+      "request_ids": [
+        "PIPE-01",
+        "FLUID-02",
+        "WEAPON-01",
+        "VEH-01",
+        "VEH-02",
+        "FUEL-01",
+        "ROCKET-01",
+        "ROCKET-02",
+        "SPACE-01",
+        "QUAL-01",
+        "QUAL-02",
+        "URAN-01",
+        "STACK-01",
+        "STACK-02",
+        "HEALTH-01",
+        "HEALTH-02",
+        "REPAIR-01",
+        "LOG-01",
+        "SLOW-01",
+        "CRAFT-01",
+        "TREE-01",
+        "MACHINE-01",
+        "MACHINE-02",
+        "MACHINE-03",
+        "MODE-01",
+        "MODE-02",
+        "PACK-01",
+        "DEV-01",
+        "ECO-AAI",
+        "ECO-BZ",
+        "ECO-SE",
+        "ECO-IR3",
+        "ECO-IR4",
+        "ECO-PLANETS"
+      ],
+      "scope": "The34 previously unrouted original requests only. Preserve the original decision/acceptance and map existing implementation or explicit nonadmission; this completes ledger routing, not historical/native/stable qualification.",
+      "original_ledger_bindings": [
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "spec/programmes/community-requests.json",
+          "sha256": "7A8E6A1D8552C13169CA8551070AC399E3CC3573846D115598FFAD08C842C48F",
+          "selected_original_rows_equal": true
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "spec/programmes/community-requests.json",
+          "sha256": "BFEA3860459FCA18B4197FB0E3CD9608823C9FB774F483B386B9DFD9127F21D7",
+          "selected_original_rows_equal": true
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "spec/programmes/community-requests.json",
+          "sha256": "BFEA3860459FCA18B4197FB0E3CD9608823C9FB774F483B386B9DFD9127F21D7",
+          "selected_original_rows_equal": true
+        }
+      ],
+      "original_category_counts": {
+        "conditional": 1,
+        "deferred": 20,
+        "document-only": 1,
+        "intake/ecosystem": 7,
+        "outside-core": 1,
+        "package-excluded": 1,
+        "rejected": 2,
+        "withheld": 1
+      },
+      "request_count": 87,
+      "routed_before": 53,
+      "routed_after": 87,
+      "selected_original_decisions_reconciled": true,
+      "selected_implementation_qualification_complete": false,
+      "reused_reviews": [
+        "spec/evidence/pipe-productivity-request-intent-aero-r01.json",
+        "historical_preservation_audit.bounded_intent_reviews[5].groups[experimental-vehicle-nonadmission]"
+      ],
+      "dispositions": [
+        {
+          "ids": [
+            "STACK-02"
+          ],
+          "original_category": "conditional",
+          "disposition": "STACK-02 remains conditional/unqualified; no default cap increase or above-four claim."
+        },
+        {
+          "ids": [
+            "FLUID-02",
+            "WEAPON-01",
+            "VEH-02",
+            "FUEL-01",
+            "ROCKET-01",
+            "ROCKET-02",
+            "SPACE-01",
+            "QUAL-01",
+            "QUAL-02",
+            "URAN-01",
+            "STACK-01",
+            "HEALTH-01",
+            "HEALTH-02",
+            "REPAIR-01",
+            "LOG-01",
+            "SLOW-01",
+            "CRAFT-01",
+            "MACHINE-01",
+            "MACHINE-02",
+            "MACHINE-03"
+          ],
+          "original_category": "deferred",
+          "disposition": "Retain original deferrals; VEH-02 additionally retains its existing excluded capability observations."
+        },
+        {
+          "ids": [
+            "DEV-01"
+          ],
+          "original_category": "document-only",
+          "disposition": "DEV-01 maps current contributor/build/PR guidance; no gameplay gate."
+        },
+        {
+          "ids": [
+            "TREE-01",
+            "ECO-AAI",
+            "ECO-BZ",
+            "ECO-SE",
+            "ECO-IR3",
+            "ECO-IR4",
+            "ECO-PLANETS"
+          ],
+          "original_category": "intake/ecosystem",
+          "disposition": "Retain original owner-specific intake and six ecosystem scopes, named results and unresolved subsets."
+        },
+        {
+          "ids": [
+            "MODE-02"
+          ],
+          "original_category": "outside-core",
+          "disposition": "Retain the original outside-core decision."
+        },
+        {
+          "ids": [
+            "VEH-01"
+          ],
+          "original_category": "package-excluded",
+          "disposition": "VEH-01 remains an excluded prototype with scoped original engine observations."
+        },
+        {
+          "ids": [
+            "MODE-01",
+            "PACK-01"
+          ],
+          "original_category": "rejected",
+          "disposition": "Retain rejected default/required-split decisions; no new implementation obligation."
+        },
+        {
+          "ids": [
+            "PIPE-01"
+          ],
+          "original_category": "withheld",
+          "disposition": "PIPE-01 remains commit-4.2 and withheld; permission/economics/owner/progression work remains open."
+        }
+      ],
+      "source_and_evidence_scope": "Current source pointers are implementation surfaces or expressly unresolved subsets, not evidence of every ecosystem. Existing captures/results retain original package/engine/settings identities; no current applicability or native pass is inferred.",
+      "contributor_guidance": {
+        "path": "CONTRIBUTING.md",
+        "sha256": "315C6511B14E00966EB74F194B6B775B93F88E978EB0DEA714080733A549699F",
+        "change": "Replace obsolete main/release4.0 routing, phase-engine/fingerprint requirements and broken publication anchor with actual dev/build/feature/PR/release journeys. Preserve full authored README and separate official release controls."
+      },
+      "remaining": [
+        "All87 original requests now have explicit routing; none of the34 original statuses or qualification lists is changed.",
+        "Deferred/rejected/excluded/conditional requests keep their original acceptance and admission limits; no new native campaigns or feature promises are manufactured.",
+        "Named AAI/BZ/SE/planet subsets still need current consumed-input and genuinely affected gameplay/state/client verdicts; IR3 scope remains unresolved and recorded IR4 inputs fail upstream.",
+        "Continue the historical source/test-intent gaps and actual Library/profile/API/state/performance/release work. inventory_complete remains false."
+      ],
+      "native_execution": false,
+      "player_source_changed": false,
+      "request_decisions_changed": false,
+      "inventory_complete": false
     },
     "cap_runtime_consumer_review": {
       "subject": "CONT-07",

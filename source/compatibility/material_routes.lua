@@ -96,4 +96,21 @@ function M.preflight(raw, definition, fail)
   end
 end
 
+-- The selected family either keeps its full future effect vector or retains
+-- that entire vector unavailable. A partial vector needs explicit earned-state
+-- preservation; do not silently drop an unsafe effect or useful safe research.
+function M.return_reason(raw, definition, context, fail)
+  local returns = require("compatibility.material_returns")
+  local count, first = 0, nil
+  for _, route in ipairs(definition.routes) do
+    local recipe = raw.recipe[route.recipe]
+    local reason = returns.find_return(raw, recipe.results, recipe.ingredients, context, route.recipe)
+    if reason then count, first = count + 1, first or reason end
+  end
+  if count > 0 and count < #definition.routes then
+    fail("mixed material return paths for " .. definition.key .. ": " .. first)
+  end
+  return first
+end
+
 return M

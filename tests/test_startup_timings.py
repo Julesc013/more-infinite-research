@@ -177,6 +177,97 @@ class StartupTimingTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertEqual(log.read_bytes(), raw)
 
+    def test_current_base_index_preserves_phases_clocks_and_refuses_changed_inputs(self):
+        # A deliberately small independent corpus exercises the actual encoded
+        # custody format without needing the private native archive in CI.
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            prefix = "native/menu-base-foreground-r01-controller/"
+            files, samples = {}, []
+            source = dict(player_source="original-source", player_tree="original-tree",
+                          candidate_version="5.0.21005", published_version="4.7.21003")
+            engine = dict(sha256="original-engine", base_version="2.1.23")
+            plans = [("warmup", "candidate-mir5"), ("published-aa", "published-mir4.7"),
+                     ("published-aa", "published-mir4.7"), ("latin-comparison", "control-without-mir"),
+                     ("latin-comparison", "published-mir4.7"), ("latin-comparison", "candidate-mir5")]
+            for ordinal, (phase, arm) in enumerate(plans, 1):
+                leaf = "runs/" + str(ordinal)
+                version = {"candidate-mir5": "5.0.21005", "published-mir4.7": "4.7.21003",
+                           "control-without-mir": None}[arm]
+                header = f"1.000 Loading mod more-infinite-research {version} (data-final-fixes.lua)\n"
+                files[prefix + leaf + "/factorio.log"] = (
+                    (header if version else "") + "1.250 Checksum of base: 1\n4.000 Factorio initialised\n").encode()
+                actor_path = leaf + "/responsive-menu-actor/actor-result.json"
+                files[prefix + actor_path] = json.dumps(dict(observation=dict(
+                    status="owned-menu-settings-response-observed", first_render_observed_seconds=10 + ordinal,
+                    confirmed_response_seconds=11 + ordinal))).encode()
+                samples.append(dict(plan=dict(ordinal=ordinal, arm=arm, phase=phase,
+                                              block=1 if phase == "latin-comparison" else 0),
+                                    observation=dict(run_relative_path=leaf, elapsed_seconds=11 + ordinal,
+                                                     responsive_menu_actor=dict(path=actor_path,
+                                                                                sha256=digest(files[prefix + actor_path])))))
+            schedule = [r["plan"] for r in samples]
+            packet = dict(schedule=schedule, candidate_source=dict(commit="original-source", player_tree="original-tree"))
+            result = dict(samples=samples, schedule=schedule, inputs=dict(engine=engine))
+            chain = dict(kind="MIRCurrentBaseResponsiveMenuObservationsV1", source=source,
+                         inputs=dict(engine="2.1.23", engine_sha256="original-engine"))
+
+            def write():
+                packet_raw = json.dumps(packet).encode()
+                result["packet_sha256"] = digest(packet_raw)
+                files[prefix + "result.json"] = json.dumps(result).encode()
+                files["qualification/menu-base-foreground-r01-controller/packet.json"] = packet_raw
+                records = [dict(path=p, bytes=len(raw), sha256=digest(raw), base64=base64.b64encode(raw).decode())
+                           for p, raw in files.items()]
+                payload = json.dumps(dict(files=records)).encode()
+                encoded = base64.b64encode(gzip.compress(payload, mtime=0)) + b"\n"
+                chain["custody"] = dict(capsule_sha256=digest(encoded), decoded_payload_sha256=digest(payload))
+                chain["execution"] = dict(native_launches=len(samples), packet_sha256=digest(packet_raw),
+                                          result_sha256=digest(files[prefix + "result.json"]))
+                (root / "bodies.gz.b64").write_bytes(encoded)
+                (root / "index.json").write_text(json.dumps(chain))
+
+            def read():
+                return comparison_rows(root / "index.json", root / "bodies.gz.b64")
+
+            write()
+            rows = read()
+            self.assertEqual([r["phase"] for r in rows], [p[0] for p in plans])
+            self.assertEqual([r["original_confirmed_settings_seconds"] for r in rows], list(range(12, 18)))
+            self.assertTrue(all(r["engine_initialised_seconds"] == 4 for r in rows))
+            self.assertTrue(all(r["scoped_seconds"] is None for r in rows))
+            self.assertEqual(rows[3]["loader_status"], "not-present")
+            self.assertEqual(rows[-1]["approximate_loader_seconds"], .25)
+            self.assertEqual(rows[-1]["archive_version"], "5.0.21005")
+            # Even re-encoded/re-pinned bodies cannot hide a changed original
+            # actor endpoint, schedule, source binding or loaded version.
+            samples[-1]["observation"]["elapsed_seconds"] = 99
+            write()
+            with self.assertRaisesRegex(ValueError, "actor endpoint differs"):
+                read()
+            samples[-1]["observation"]["elapsed_seconds"] = 17
+            result["schedule"] = schedule[:-1]
+            write()
+            with self.assertRaisesRegex(ValueError, "schedule differs"):
+                read()
+            result["schedule"] = schedule
+            packet["candidate_source"]["commit"] = "different-source"
+            write()
+            with self.assertRaisesRegex(ValueError, "engine/source differs"):
+                read()
+            packet["candidate_source"]["commit"] = "original-source"
+            files[prefix + "runs/6/factorio.log"] = files[prefix + "runs/6/factorio.log"].replace(b"5.0.21005", b"5.0.21004")
+            write()
+            with self.assertRaisesRegex(ValueError, "loaded MIR version differs"):
+                read()
+            chain["custody"]["decoded_payload_sha256"] = "0" * 64
+            (root / "index.json").write_text(json.dumps(chain))
+            with self.assertRaisesRegex(ValueError, "decoded comparison payload identity mismatch"):
+                read()
+            (root / "bodies.gz.b64").write_bytes(b"changed capsule")
+            with self.assertRaisesRegex(ValueError, "capsule identity mismatch"):
+                read()
+
 
 if __name__ == "__main__":
     unittest.main()

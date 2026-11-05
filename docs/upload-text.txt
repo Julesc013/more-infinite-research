@@ -1,9 +1,9 @@
-GitHub prerelease: MIR 5.0.4
+GitHub prerelease: MIR 5.0.6
 
-No Mod Portal upload is authorized for this prerelease. The maintainer handles Portal publication of qualified stable packages, using the identical tested GitHub ZIPs.
+The maintainer handles Mod Portal publication of qualified stable packages, using the identical tested GitHub ZIPs. This prerelease is GitHub-only.
 
-Changes: preserve earned weapon, electric/Tesla and sulfur bonuses when compatible native research takes ownership; avoid redundant future upgrades; handle invalid research events safely.
+Changes: prevent unsafe Bob material research from consuming science while preserving earned and partial work; restore conditional Marine coke research; preserve zero pipeline extents.
 
-Modern engine inputs: Factorio 2.0.77 and 2.1.23. Library interaction/client and whole-product performance acceptance remain open. Factorio 0.18.47 and early builds remain experimental/best effort.
+Modern engine minima: Factorio 2.0.77 and 2.1.23. The affected 5.0.5-to-5.0.6 full-Bob/Space Age component preserves paid and partial work, permits eligible research and controlled Tin readmission, stops at the configured cap, and passes save/two-reload checks on 2.1.23. Physical Tin production, arbitrary providers and full modpack coverage remain unqualified. Real Industrial Chemistry runtime/save compatibility is unverified: 0.35.8 fails upstream on 2.1.23 without MIR; 0.36.1 has not been natively checked.
 
-Early 0.6–0.12 ZIPs require extraction into the game's mods folder and contain a fixed finite subset without runtime features, settings, Library UI or migrations; they are not natively qualified. Factorio 0.18.47 is experimental/best effort; its native startup/crash smoke remains unverified. Provider changes with unmet prerequisites remain unqualified; retain the original save/mod selection.
+Full Library interaction/client acceptance, historical reconciliation and whole-product performance remain open. Provider changes with unmet prerequisites remain unqualified; retain the original save/mod selection. Factorio 0.18.47 and early builds remain experimental/best effort. Early 0.6–0.12 ZIPs require extraction and contain a fixed finite subset without runtime, settings, Library UI or migrations; native qualification is absent.

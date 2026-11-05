@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Analyze one complete, explicitly selected active-runtime benchmark cohort.
 
-The reader admits only the frozen R06 and current38C F210 cohorts. It checks the
+The reader admits only the frozen R06, current38C and current505-ground F210 cohorts. It checks the
 immutable plan/result inputs, active-save and marker-pilot custody, then
 reports the predeclared median limits and the descriptive 128-minus-1 values.
 It neither prepares inputs nor launches Factorio, and it makes no release,
@@ -46,6 +46,7 @@ ACTIVE_PREREQUISITES_CAPSULE = "spec/evidence/runtime-active-r06-physical-native
 ACTIVE_PREREQUISITES_CAPSULE_SHA256 = "23466064A3C2E376A93FAFD9D5772038186BF4FB5D993E56953F5B145AD5FE88"
 ASSET_ROOT = "D:/Projects/Factorio/mir5-current-assets-b2cf4c2d-r01"
 CANDIDATE_BYTES = 553767
+CANDIDATE_LEAF = "more-infinite-research_5.0.21000.zip"
 ANALYSIS_STATUS = "complete-predeclared-r06-analysis"
 REPAIR_PROFILE_PREFIX = "tests/profiles/repair-stress-active-"
 AGRICULTURE_PROFILE_PREFIX = "tests/profiles/agriculture-active-matched-"
@@ -56,7 +57,7 @@ _R06_BINDINGS = {name: globals()[name] for name in (
     "SOURCE", "SOURCE_TREE", "ENGINE_SHA256", "CANDIDATE_SHA256", "INVENTORY_SHA256",
     "INVENTORY_CONTENT_SHA256", "ACTIVE_SEED_CAPTURE_SHA256", "MARKER_PILOT_SHA256",
     "ACTIVE_PREREQUISITES_CAPSULE", "ACTIVE_PREREQUISITES_CAPSULE_SHA256",
-    "ASSET_ROOT", "CANDIDATE_BYTES", "ANALYSIS_STATUS", "REPAIR_PROFILE_PREFIX", "AGRICULTURE_PROFILE_PREFIX",
+    "ASSET_ROOT", "CANDIDATE_BYTES", "CANDIDATE_LEAF", "ANALYSIS_STATUS", "REPAIR_PROFILE_PREFIX", "AGRICULTURE_PROFILE_PREFIX",
 )}
 _CURRENT38C_BINDINGS = {
     "KIND": "MIR5RuntimeBenchmarkActiveCurrent38CAnalysisV1",
@@ -77,9 +78,42 @@ _CURRENT38C_BINDINGS = {
     "ACTIVE_PREREQUISITES_CAPSULE_SHA256": "621918B6B2382DF2A382ECD0E289EE1EB060436A265A743E4D409C465CE839F1",
     "ASSET_ROOT": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\fbb7-all17-r01",
     "CANDIDATE_BYTES": 692759,
+    "CANDIDATE_LEAF": "more-infinite-research_5.0.21000.zip",
     "ANALYSIS_STATUS": "complete-predeclared-current38c-analysis",
     "REPAIR_PROFILE_PREFIX": "tests/profiles/runtime-current38c-repair-",
     "AGRICULTURE_PROFILE_PREFIX": "tests/profiles/runtime-current38c-agriculture-",
+}
+_CURRENT505_GROUND_BINDINGS = {
+    **_CURRENT38C_BINDINGS,
+    "KIND": "MIR505GroundActiveRuntimeAnalysisV1",
+    "PLAN_PATH": "spec/evidence/runtime505-active-plan-r02.json",
+    "PLAN_SHA256": "5F73A850827290FE760E7C04B3F60C991E3205B08043D046852DB968A267212C",
+    "PLAN_REVISION": "848cc35300777ad952b0486135f2460c584e0d4e",
+    "PLAN_SOURCE": "23ab190b0037dfb0c9765df94f951300b5a05a16",
+    "PLAN_TREE": "f1f989d42add1cb033d103a871dcdee6d9167e20",
+    "SOURCE": "0700a3d6cf1a2ac41579e90484eab3a8cad2739d",
+    "SOURCE_TREE": "41d36ed8db131404692d5c054da3c87f7b54aecb",
+    "CANDIDATE_SHA256": "3537810989FCD72232AF4597B28C699D83AE0E9B77FDAF42AF57A01E29B65E6A",
+    "INVENTORY_SHA256": "388F9B1DEF4F2E8EB43D01E5F5A4A976457B43A797D6189E064D4442F23DEB31",
+    "INVENTORY_CONTENT_SHA256": "76CC1B995A6A33915A0FAFDA8EC2504B7755ABFA448D61D58C034C4D0DB06D6C",
+    "ACTIVE_SEED_CAPTURE_SHA256": "A449FF36E95491F7D3F4ED24217BCCED193F1E5E73D5A123DB581DB86363FFD6",
+    "MARKER_PILOT_SHA256": "4AD021E596B64752FBBA16BC3A66BC271BEF3D16DD95D1833976F57B0F4A3DE6",
+    "ACTIVE_PREREQUISITES_CAPSULE": "spec/evidence/runtime505-ground-physical-native-receipts-r02.json.gz",
+    "ACTIVE_PREREQUISITES_CAPSULE_SHA256": "A049ADFABCD2144BF7DC12AA659CF9D5C930F1B601D689583E970F71752C85DC",
+    "ASSET_ROOT": "D:/Projects/Factorio/more-infinite-research/build/packages/candidate505-0700-final-freeze-r01",
+    "CANDIDATE_BYTES": 805471,
+    "CANDIDATE_LEAF": "more-infinite-research_5.0.21005.zip",
+    "ANALYSIS_STATUS": "complete-predeclared-current505-ground-analysis",
+    "REPAIR_PROFILE_PREFIX": "tests/profiles/runtime505-repair-",
+    "AGRICULTURE_PROFILE_PREFIX": "tests/profiles/runtime505-agriculture-",
+}
+_CURRENT505_GROUND_PROFILE_ALIASES = {
+    "tests/profiles/runtime-current38c-repair-published-f210-2123.json": "tests/profiles/runtime505-repair-published-f210-2123.json",
+    "tests/profiles/runtime505-repair-candidate-f210-2123-r01.json": "tests/profiles/runtime505-repair-candidate-f210-2123.json",
+    **{f"tests/profiles/runtime-current38c-agriculture-published-{tier}-f210-2123.json":
+       f"tests/profiles/runtime505-agriculture-published-{tier}-f210-2123.json" for tier in (1, 32, 128)},
+    **{f"tests/profiles/runtime505-agriculture-candidate-defaults-{tier}-f210-2123-r01.json":
+       f"tests/profiles/runtime505-agriculture-candidate-defaults-{tier}-f210-2123.json" for tier in (1, 32, 128)},
 }
 MAX_PLAN_BYTES = 1024 * 1024
 MAX_ACTIVE_PREREQUISITES_CAPSULE_BYTES = 128 * 1024
@@ -108,9 +142,10 @@ class RuntimeBenchmarkAnalysisError(ValueError):
 
 def select_cohort(cohort: str) -> None:
     """Choose an explicit frozen tuple before reading any plan or result."""
-    if cohort not in ("r06", "current38c"):
+    if cohort not in ("r06", "current38c", "current505-ground"):
         raise RuntimeBenchmarkAnalysisError("unknown frozen runtime cohort")
-    globals().update(_R06_BINDINGS if cohort == "r06" else _CURRENT38C_BINDINGS)
+    globals().update(_R06_BINDINGS if cohort == "r06" else
+                     _CURRENT38C_BINDINGS if cohort == "current38c" else _CURRENT505_GROUND_BINDINGS)
 
 
 def _reject_duplicate_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -341,6 +376,17 @@ def _expect_hash(actual: Any, expected: Any, label: str) -> str:
     return actual_hash
 
 
+def _profile_identity_path(path: str) -> str:
+    # Only classify the eight frozen mixed-generation names. Stored paths and
+    # hashes remain original; no synthetic alias enters evidence or file lookup.
+    if KIND != _CURRENT505_GROUND_BINDINGS["KIND"]:
+        return path
+    try:
+        return _CURRENT505_GROUND_PROFILE_ALIASES[path]
+    except KeyError as error:
+        raise RuntimeBenchmarkAnalysisError("current505 frozen profile identity differs") from error
+
+
 def _profiles(plan: dict[str, Any]) -> dict[tuple[str, int, str], dict[str, str]]:
     contract = _mapping(plan.get("active_fixture_contract"), "active fixture contract")
     repair = _mapping(contract.get("repair"), "repair fixture contract")
@@ -353,7 +399,7 @@ def _profiles(plan: dict[str, Any]) -> dict[tuple[str, int, str], dict[str, str]
         row = _mapping(entry, "repair profile")
         path = _string(row.get("path"), "repair profile path")
         candidate_label = "mir5" if REPAIR_PROFILE_PREFIX == _R06_BINDINGS["REPAIR_PROFILE_PREFIX"] else "candidate"
-        match = re.fullmatch(re.escape(REPAIR_PROFILE_PREFIX) + r"(published|" + candidate_label + r")-f210-2123\.json", path)
+        match = re.fullmatch(re.escape(REPAIR_PROFILE_PREFIX) + r"(published|" + candidate_label + r")-f210-2123\.json", _profile_identity_path(path))
         if match is None:
             raise RuntimeBenchmarkAnalysisError("repair profile arm differs")
         arm = "published" if match.group(1) == "published" else "candidate"
@@ -368,7 +414,7 @@ def _profiles(plan: dict[str, Any]) -> dict[tuple[str, int, str], dict[str, str]
     for entry in agriculture_profiles:
         row = _mapping(entry, "agriculture profile")
         path = _string(row.get("path"), "agriculture profile path")
-        match = expression.search(path)
+        match = expression.search(_profile_identity_path(path))
         if match is None:
             raise RuntimeBenchmarkAnalysisError("agriculture profile identity differs")
         key = ("agriculture-active", int(match.group(2)), match.group(1))
@@ -412,7 +458,7 @@ def _validate_plan(plan: dict[str, Any], plan_sha256: str) -> dict[str, Any]:
     _expect_hash(candidate.get("asset_inventory_file_sha256"), INVENTORY_SHA256, "candidate inventory SHA-256")
     _expect_hash(candidate.get("asset_inventory_content_sha256"), INVENTORY_CONTENT_SHA256, "candidate inventory content SHA-256")
     candidate_archive = _mapping(candidate.get("f210_archive"), "candidate F210 archive")
-    _same(_string(candidate_archive.get("name"), "candidate archive name"), "more-infinite-research_5.0.21000.zip", "candidate archive name")
+    _same(_string(candidate_archive.get("name"), "candidate archive name"), CANDIDATE_LEAF, "candidate archive name")
     _same(_integer(candidate_archive.get("bytes"), "candidate archive bytes", minimum=1), CANDIDATE_BYTES, "candidate archive bytes")
     _expect_hash(candidate_archive.get("sha256"), CANDIDATE_SHA256, "candidate archive SHA-256")
     published = _mapping(plan.get("published"), "published")
@@ -878,7 +924,7 @@ def _validate_sample(
     _staged_profile_path(profile.get("path"), expected_profile["path"], "observation profile path")
     _expect_hash(profile.get("sha256"), expected_profile["sha256"], "observation profile SHA-256")
     archives = _archive_closure(row.get("archives"), "observation archives")
-    selected_leaf = "more-infinite-research_4.7.21002.zip" if schedule["arm"] == "published" else "more-infinite-research_5.0.21000.zip"
+    selected_leaf = "more-infinite-research_4.7.21002.zip" if schedule["arm"] == "published" else CANDIDATE_LEAF
     selected_hash = PUBLISHED_SHA256 if schedule["arm"] == "published" else CANDIDATE_SHA256
     _expect_hash(archives.get(selected_leaf), selected_hash, "observation player archive SHA-256")
     seed = _mapping(row.get("seed"), "observation seed")
@@ -1199,7 +1245,7 @@ def _write_output(path: Path, document: dict[str, Any]) -> None:
 
 def parse_arguments(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--cohort", choices=("r06", "current38c"), default="r06")
+    parser.add_argument("--cohort", choices=("r06", "current38c", "current505-ground"), default="r06")
     parser.add_argument("--raw-plan", required=True, type=Path)
     parser.add_argument("--expected-plan-sha256", required=True)
     parser.add_argument("--result", required=True, type=Path)
