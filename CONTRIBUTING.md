@@ -1,71 +1,65 @@
+---
+title: "Contributing to MIR"
+status: current
+applies_to: "MIR development"
+audience: contributor
+doc_type: guide
+owner: mir-maintainers
+last_reviewed: 2026-11-06
+supersedes: []
+superseded_by: []
+source_of_truth_for:
+  - mir-contributor-entrypoint
+---
+
 # Contributing
 
-MIR uses authored native research with a small deterministic Generator and explicit bounded compatibility bindings. Contributions are welcome when they preserve exact target identity, one writer per fact, one authorized emitter, and evidence-bound claims.
+MIR development happens on `dev`. Start with a small fix or improvement, check the affected behavior and open a pull request against `dev`.
 
-## Branch routing
+## Build or change a feature
 
-- Target protected `dev` for next-minor or next-major implementation, architecture, preview, shadow, target, and release-engine work.
-- Target protected `main` for bounded corrections to the latest accepted stable line, repository-governance maintenance, and exact qualified promotions from `dev`.
-- Use a short-lived branch and a pull request. Do not leave completed work only in a local branch.
-- Use `release/4.0` only for admitted 4.0.x player corrections. Bind stable-line, current-main, and dev implementations with one finding identity and explicit forward-port dispositions.
-- Historical and backport branches change only under their explicit terminal programme.
+The [development guide](docs/development.md#build-a-local-zip) gives the local ZIP command and prerequisites. Building a ZIP needs Git and Python, without Factorio, release credentials, a private worker or a paid AI service.
 
-After a PR merges, fetch and read back the exact protected target branch, complete every required forward-port or promotion disposition, leave the active local branch clean and equal to its remote, and remove the local topic branch. `main` and `dev` may intentionally have different trees while next-release work is active.
+Use the [source responsibility map](docs/architecture.md#where-to-change-a-feature) to find the feature. Read [AGENTS.md](AGENTS.md) and the relevant [contract](spec/README.md#task-routing), then change the owning source and its affected tests or documentation. Player code lives in `source/`; keep developer tools and test output outside player ZIPs.
 
-## Authority and maturity
+Preserve published technology and setting IDs, API paths, saved-state keys and migration filenames. Keep the authored README and release history. A file move can change package imports even when its Lua behavior is unchanged.
 
-Every change must identify its maturity: stable, preview, shadow, experimental, or omitted. Preview and shadow code may be complete and executable without gaining player mutation, signing, publication, or support authority.
+Use a task branch from current `dev`. Maintenance of an older published MIR version starts from its exact tag on a separate branch; see [branch routing](docs/development.md#development-line-and-maintenance-branches). `main` contains the published product.
 
-- Compatibility policy describes decisions; it never mutates prototypes.
-- Only the admitted emitter creates or mutates generated technologies.
-- Every generated technology has a stable authored identity and checked native definition. Preserve published manifest facts where historical continuity depends on them; MIR5 does not recreate the retired compiler's global stream registry.
-- Every public compatibility claim names fixture or exact load-check evidence.
-- Target behavior needs an explicit disposition and target-local proof.
-- Update each fact's owning source, specification or target record and its affected checks. Do not restore retired generated MIR4 assurance manifests as new current dependencies.
+## Check the change
 
-See [Governance](GOVERNANCE.md), [Extension Protocol](docs/api.md), and [the module boundaries](docs/architecture.md).
-
-## Development workflow
-
-1. Start next-minor or next-major work from clean `origin/dev`; start a latest-stable correction from `origin/main`; start a 4.0.x correction from `origin/release/4.0`.
-2. Read the task-specific authorities listed in `AGENTS.md`.
-3. Make one bounded change and classify its package visibility.
-4. Materialize or inspect the exact verification plan.
-5. Run the selected narrow checks, then the broader profile required by the risk.
-6. Update the current spec/docs/target records together; preserve pinned historical generated receipts without editing them.
-7. Open a PR, complete required branch checks and affected qualification, merge, and read back the protected branch.
-
-Current MIR5 commands are in [Development](docs/development.md). Inspect the explicit host plan before running the selected controls:
+Inspect the current host plan before choosing checks:
 
 ```powershell
 .\tests\Test-MIR5HostControls.ps1 -Plan
 python -B tools/check_repository.py
 ```
 
-Use an explicit pinned Lua runtime for the complete host driver. These checks do not launch Factorio or establish native/release acceptance. Current documentation uses front matter and one logical source line per paragraph; obsolete MIR4 generated indexes remain pinned history.
+Run the narrow controls relevant to the change first. The [test guide](docs/development.md#test-selection) explains the full host driver and its pinned Lua runtime. Host checks do not launch Factorio or prove gameplay, save, client or performance behavior; report those limits when they matter.
 
-Use the current Factorio 2.1 Steam engine only for F210. Use the preserved Factorio 2.0 installation for F200. Do not retarget Steam depots for historical testing.
+For native tests, use the matching installed engine and coordinate with the active test owner so two jobs do not compete. Preserve original saves, selected mod archives and settings. Do not retarget Steam for historical engines. Current commands and custody rules are in the development guide.
 
-## Pull-request evidence
+Keep unique work, failed observations and existing output under the documented retained locations. In particular, `build/qualification` contains evidence and saves; it is not a disposable build directory.
 
-A PR should state:
+## Open a pull request
 
-- exact base commit and tree;
-- writable paths and authorities changed;
-- maturity and player-package visibility;
-- proof obligations and verification-plan identity;
-- package-source fingerprint result;
-- rollback or compensation boundary;
-- remaining human, credential, or external-service blockers.
+Explain:
 
-Release-changing PRs additionally require the phase-engine receipt and independent evidence specified by [the release runbook](docs/development.md#github-publication-after-acceptance).
+- What changed and why.
+- Which checks ran and what they showed.
+- Any affected compatibility, settings or save behavior.
+- Anything still unverified.
 
-## Changelog and player copy
+Link the relevant issue or historical decision when there is one. Preserve independent expectations rather than changing a test just to accept the new output. The [PR template](.github/PULL_REQUEST_TEMPLATE.md) provides the same short checklist.
 
-Write package-facing text for players. Keep `changelog.txt` lines at or below 132 characters. Record shipped behavior, settings, compatibility, and migration effects; omit abandoned experiments and internal candidate churn.
+Commit and push a reviewable unit. Ordinary development integration uses the repository's required checks and standing maintainer authorization. Preserve other contributors' work and original commits; never reset, force-push or rebase shared work to synchronize it.
 
-## Human and agent contributions
+Maintainers set player goals and support decisions; human and agent contributions use the same review and check requirements. Codex and other coding assistants are optional. Source, specifications, guides and request decisions are authored records; packages, manifests and the rendered changelog are generated by their existing tools. A generated record or an assistant's agreement does not establish gameplay or release acceptance.
 
-Maintainers specify player outcomes, review implementation and decide which exact evidence supports public release claims. Agents may implement, test and integrate authorized development work under AGENTS.md. The programme and its request ledger are editable authorities; queues, indexes, dashboards, package bindings and evidence projections are regenerated by their owning tools. A generated record is not independent proof.
+For a release-history change, edit `CHANGELOG.md` and run `python -B tools/changelog.py --write`; commit its rendered `source/changelog.txt` together. Write player-facing notes about actual behavior and support limits.
 
-Contributors can edit Lua and repository records, run the selected verification plan and focused tests, and submit ordinary pull requests without a paid AI service. Routine dev integration follows enforced checks. Main promotion and public releases retain their separate policy and human acceptance requirements.
+## Official releases
+
+Official publication follows the [release procedure](docs/development.md#github-publication-after-a-reviewed-verdict), including its candidate, package, upgrade-safety, review and delivery checks. A local build or green host run does not establish release readiness. MIR5 stable acceptance remains separate from a GitHub prerelease.
+
+The integration owner coordinates main promotion and GitHub publication. The maintainer handles Mod Portal delivery. Published package bytes and tags stay preserved.
