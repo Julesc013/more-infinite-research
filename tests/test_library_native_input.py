@@ -282,6 +282,49 @@ public static class MIRLibraryInputNative {
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("zero desktop input", result.stdout)
 
+    def test_single_owned_menu_foreground_refusal_stops_with_identity_without_desktop_input(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_OWNED_MENU,[ref]$null,[ref]$null)
+          foreach($name in @('New-MIROwnedMenuObserverDiagnostics','Add-MIROwnedMenuRejection','Request-MIROwnedMenuForeground','Get-MIROwnedMenuWindow')){
+            $node=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq$name},$true))
+            if($node.Count-ne1){throw 'owned foreground helper missing'}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $process=[Diagnostics.Process]::GetCurrentProcess();$start=$process.StartTime.ToUniversalTime()
+          $script:foreground=[IntPtr]99;$script:setCalls=0;$script:mode='refused';$script:visible=$true
+          function Get-MIROwnedMenuMainWindowHandle {param($Process)return [IntPtr]42}
+          function Get-MIROwnedMenuWindowProcessId {param([IntPtr]$Handle)if($Handle-eq[IntPtr]42){return [uint32]$process.Id};return [uint32]17}
+          function Test-MIROwnedMenuWindowHandle {param([IntPtr]$Handle)return $true}
+          function Test-MIROwnedMenuWindowVisible {param([IntPtr]$Handle)return $script:visible}
+          function Test-MIROwnedMenuWindowIconic {param([IntPtr]$Handle)return $false}
+          function Get-MIROwnedMenuForegroundHandle {return $script:foreground}
+          function Set-MIROwnedMenuForegroundHandle {param([IntPtr]$Handle)$script:setCalls++;if($script:mode-ceq'refused'){return $false};if($script:mode-ceq'acquired'){$script:foreground=$Handle};return $true}
+          foreach($mode in @('refused','not-acquired')){
+            $script:mode=$mode;$script:foreground=[IntPtr]99;$script:setCalls=0;$diagnostics=New-MIROwnedMenuObserverDiagnostics;$failure=''
+            try{$null=Get-MIROwnedMenuWindow -Process $process -ExpectedStartUtc $start -Diagnostics $diagnostics -AttemptForeground}catch{$failure=$_.Exception.Message}
+            $expected=if($mode-ceq'refused'){'[mir-menu-foreground-request-refused]'}else{'[mir-menu-foreground-request-not-acquired]'}
+            if($failure-cne$expected-or$script:setCalls-ne1){throw ('foreground failure did not stop immediately after one request: '+$mode+':'+$failure)}
+            $last=$diagnostics.foreground_request_last
+            if($last.before.handle-ne99-or$last.before.process_id-ne17-or$last.after.handle-ne99-or$last.after.process_id-ne17-or$last.target.handle-ne42-or$last.target.process_id-ne$process.Id-or$last.target.start_utc-cne$start.ToString('o')){throw 'bounded foreground/target identity differs'}
+            if($last.status-cne$mode-or$diagnostics.foreground_request_attempts-ne1-or$diagnostics.foreground_mismatch-ne0){throw 'foreground refusal was retried or reduced to polling'}
+          }
+          $script:mode='acquired';$script:foreground=[IntPtr]99;$script:setCalls=0;$diagnostics=New-MIROwnedMenuObserverDiagnostics
+          if(-not(Request-MIROwnedMenuForeground -Process $process -ExpectedStartUtc $start -Handle ([IntPtr]42) -Diagnostics $diagnostics)-or$script:setCalls-ne1-or$diagnostics.foreground_request_last.status-cne'acquired'-or$diagnostics.foreground_request_last.after.process_id-ne$process.Id){throw 'ordinary acquired foreground changed'}
+          $script:foreground=[IntPtr]99;$script:setCalls=0;$diagnostics=New-MIROwnedMenuObserverDiagnostics;$failure=''
+          try{$null=Request-MIROwnedMenuForeground -Process $process -ExpectedStartUtc $start.AddSeconds(-1) -Handle ([IntPtr]42) -Diagnostics $diagnostics}catch{$failure=$_.Exception.Message}
+          if($failure-cne'[mir-menu-owned-process-identity]'-or$script:setCalls-ne0){throw 'stale identity reached foreground request'}
+          $script:visible=$false;$diagnostics=New-MIROwnedMenuObserverDiagnostics
+          if(Request-MIROwnedMenuForeground -Process $process -ExpectedStartUtc $start -Handle ([IntPtr]42) -Diagnostics $diagnostics){throw 'not-visible transition was acquired'}
+          if($script:setCalls-ne0-or$diagnostics.not_visible_or_minimized-ne1-or$diagnostics.foreground_request_attempts-ne0){throw 'not-visible transition tried activation'}
+          'PASS one-shot refusal stops promptly with bounded identity;success and identity guards preserved;zero desktop input'
+        '''
+        result = subprocess.run(["pwsh", "-NoProfile", "-Command", script], cwd=ROOT,
+                                env={**os.environ, "MIR_OWNED_MENU": str(ROOT / "tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1")},
+                                capture_output=True, text=True, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("zero desktop input", result.stdout)
+
     def test_owned_peer_foreground_request_is_one_shot_owned_and_always_detaches_without_desktop_input(self):
         script = r'''
           $ErrorActionPreference='Stop';Set-StrictMode -Version Latest

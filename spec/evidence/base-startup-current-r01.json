@@ -1,0 +1,188 @@
+{
+  "schema": 1,
+  "kind": "MIRCurrentBaseResponsiveMenuObservationsV1",
+  "status": "accepted-bounded-observations-controls-and-restoration-only",
+  "reviewed_on": "2026-11-06",
+  "source": {
+    "player_source": "8494593d5a3c1ccd656fbee5169259e8d1efa418",
+    "player_tree": "d75315b6df75dcc88329f13685bab0477c2ecbe6",
+    "public_helper_source": "fe6bdcaffae51db46b5fe140979820e08b0ca8e4",
+    "integrated_helper_source": "9a4a907ded63191dcf539e9783ffdd34f9c4d837",
+    "integration_tree_equal_to_checked_source": true,
+    "private_source": "41a0deff5b01ca0b71034928ca45ceaa0f6c73c3",
+    "candidate_archive": "FAAA07142430E59E2103BEC6BA158A3878C7F9DD5FE0201C35B6BF40E9814D58",
+    "candidate_version": "5.0.21005",
+    "candidate_scope": "Internal source849 test package, distinct from the published5.0.5 ZIP; public bytes unchanged.",
+    "published_archive": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+    "published_version": "4.7.21003"
+  },
+  "inputs": {
+    "engine": "2.1.23",
+    "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "selection": "Base plus the identical active-mods observer in every arm",
+    "profile_sha256": "17F85ED968A396F08E9F874DCB382F039756E2B220E28A26DDE4513DDF898B7C",
+    "profile_scope": "Locally authored explicit standalone-engine selection; original tracked Base binary pin is not relabelled.",
+    "observer_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "ordinary_config_sha256": "DA9A92AB9047EBD9F9640B34DC9EF6C084801DF85B8F75B1A490E786F40DD510",
+    "ordinary_player_data_sha256": "285ED61F8778CFF44FA173F8EDCC5E417F4DF8C1019A3DDD02814729CEE56EF9",
+    "cache_policy": {
+      "class": "declared-fresh-process-not-reboot-cold",
+      "selected_zip_hashes_read_before_process_launch": true,
+      "automatic_cache_clearing": false,
+      "reboot_performed": false
+    }
+  },
+  "execution": {
+    "native_launches": 32,
+    "warmups": 3,
+    "published_aa_launches": 2,
+    "scored_launches": 27,
+    "paired_blocks": 9,
+    "complete_png_streams": 96,
+    "all_unique_process_start_identities": true,
+    "all_loaded_selections_verified": true,
+    "restoration_verified": true,
+    "factorio_remaining": 0,
+    "packet_sha256": "250D8291CBBDA747B6DFB4211A474FB9B93287FCD561C9136B2AE525348C2E92",
+    "result_sha256": "6407314A2D65042527BA48A8A66DCBC8DC16A3AFA823F321000256C9BF0E6031",
+    "analysis_sha256": "2877B3DEA5D0768FBA3A182D1C4449DE418806346126222F0FBC9379B9969C0B"
+  },
+  "controls": {
+    "published_aa": {
+      "values_seconds": [
+        11.0590538,
+        10.8267195
+      ],
+      "difference_seconds": 0.23233429999999977,
+      "allowance_seconds": 0.5471443324999999,
+      "within_declared_allowance": true
+    },
+    "drift": {
+      "control-without-mir": {
+        "cycle_medians_seconds": [
+          10.1837278,
+          10.4442663,
+          10.2161182
+        ],
+        "spread_seconds": 0.2605385000000009,
+        "within_seconds": true
+      },
+      "published-mir4.7": {
+        "cycle_medians_seconds": [
+          10.8961655,
+          11.0755668,
+          11.1035405
+        ],
+        "spread_seconds": 0.20737499999999898,
+        "within_seconds": true
+      },
+      "candidate-mir5": {
+        "cycle_medians_seconds": [
+          10.4459417,
+          10.3079188,
+          10.3696582
+        ],
+        "spread_seconds": 0.13802290000000106,
+        "within_seconds": true
+      }
+    },
+    "extensions": 0
+  },
+  "observed_seconds": {
+    "medians": {
+      "control-without-mir": 10.2676265,
+      "published-mir4.7": 11.0755668,
+      "candidate-mir5": 10.3696582
+    },
+    "paired_summaries": {
+      "d4_seconds": {
+        "count": 9,
+        "minimum_seconds": 0.4758925999999999,
+        "median_seconds": 0.7521342999999998,
+        "maximum_seconds": 2.1197595000000007,
+        "median_absolute_deviation_seconds": 0.14433089999999993,
+        "median_interval": {
+          "lower_seconds": 0.5870565999999986,
+          "upper_seconds": 0.8964651999999997,
+          "conditional_coverage": 0.9609375,
+          "method": "nine-block-order-statistics-2-and-8",
+          "assumption": "independent blocks with a common continuous median; not established by this reader"
+        }
+      },
+      "d5_seconds": {
+        "count": 9,
+        "minimum_seconds": -0.43297010000000036,
+        "median_seconds": 0.15353999999999957,
+        "maximum_seconds": 0.47737430000000103,
+        "median_absolute_deviation_seconds": 0.10867390000000121,
+        "median_interval": {
+          "lower_seconds": -0.2338837999999992,
+          "upper_seconds": 0.2622139000000008,
+          "conditional_coverage": 0.9609375,
+          "method": "nine-block-order-statistics-2-and-8",
+          "assumption": "independent blocks with a common continuous median; not established by this reader"
+        }
+      },
+      "candidate_minus_published_seconds": {
+        "count": 9,
+        "minimum_seconds": -1.6423851999999997,
+        "median_seconds": -0.7429252000000002,
+        "maximum_seconds": -0.41785249999999863,
+        "median_absolute_deviation_seconds": 0.16593750000000007,
+        "median_interval": {
+          "lower_seconds": -0.9088627000000002,
+          "upper_seconds": -0.4373364999999989,
+          "conditional_coverage": 0.9609375,
+          "method": "nine-block-order-statistics-2-and-8",
+          "assumption": "independent blocks with a common continuous median; not established by this reader"
+        }
+      },
+      "half_added_time_contrast_seconds": {
+        "count": 9,
+        "minimum_seconds": -0.6709164000000003,
+        "median_seconds": -0.29817104999999966,
+        "maximum_seconds": -0.08756129999999906,
+        "median_absolute_deviation_seconds": 0.17384685000000033,
+        "median_interval": {
+          "lower_seconds": -0.5825054499999993,
+          "upper_seconds": -0.12432419999999933,
+          "conditional_coverage": 0.9609375,
+          "method": "nine-block-order-statistics-2-and-8",
+          "assumption": "independent blocks with a common continuous median; not established by this reader"
+        }
+      }
+    },
+    "interval_scope": "Conditional median intervals and spread describe nine fixed blocks; temporal independence is not proven and no equivalence or release verdict follows."
+  },
+  "review": {
+    "source_and_result_sha256": "AD0EF2F67094549A59200F235A7F77C172F6DB1303F0987A13798B367C7E3BCA",
+    "evidence_sha256": "AD4123EDFD649B0D4D3A210B0462C8C2F4D28F661A2765294A65850BBDD9C654",
+    "focused_controls": 6,
+    "syntax_errors": 0,
+    "required_exact_head_checks": 4
+  },
+  "custody": {
+    "repository": "Julesc013/scratchpad",
+    "commit": "f9835ee7c80ab955bb4f0c4c663e1deb54297e8c",
+    "path": "projects/mir/runs/current-startup-r01",
+    "exact_small_files": 467,
+    "capsule_sha256": "AE8F4CA1826A53B063A2D41D711A663A054752F090630D59C9190A839788D974",
+    "decoded_payload_sha256": "E6022083AEAE73AA0ECA15943956BC675FFE95DE50B99A46C281FE06BB9F66D6",
+    "remote_git_blobs_verified": 6,
+    "large_raw_scope": "Hash-verified primary and local C artifacts; no off-machine backup claim for every large raw image/dump."
+  },
+  "limits": [
+    "Every successful native foreground-request count is zero: refusal behavior is host-covered and no native exercise/permission/causal-success claim follows.",
+    "Original6717 one-warmup/foreground-refusal attempt remains adverse and unpooled; heavyCA60 is unexecuted.",
+    "Base is a separate required baseline, not a reduced heavy result. Heavy and Space Age responsive-menu qualification remain open.",
+    "High-cost MIR-added percentage objective is inapplicable to this Base cohort. Equal work and whole-product/stable acceptance remain unestablished."
+  ],
+  "scheduling": {
+    "sum_owned_engine_cycles_seconds": 351.7326444,
+    "first_engine_launch_to_last_cleanup_seconds": 450.9425319,
+    "scope": "Observed Base batch cost, includes inter-run preparation. Not an estimate of unmeasured remaining endpoints."
+  },
+  "performance_acceptance": false,
+  "equal_work_established": false,
+  "release_qualification": false
+}

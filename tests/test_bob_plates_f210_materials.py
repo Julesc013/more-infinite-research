@@ -320,18 +320,88 @@ class BobPlatesF210MaterialsTests(unittest.TestCase):
         self.assertFalse(ok)
         self.assertIn("carbon changed", error)
 
-    def _reject_return(self, case, raw, route):
+    def _reject_return(self, case, raw, route, values=None):
         lua = self.lua()
         definitions = _plain(lua.globals().bob_plates_data.material_definitions("base" if case=="q097" else "space-age"))
         lua.globals().captured_raw = _lua_value(lua, raw)
         before = _plain(lua.globals().captured_raw)
-        lua.globals().captured_values = _lua_value(lua, _stream_values(row["key"] for row in definitions))
+        lua.globals().captured_values = _lua_value(lua, values if values is not None else _stream_values(row["key"] for row in definitions))
         lua.globals().captured_mods = _lua_value(lua, _mod_map(self.facts["cases"][case]["profile"]["selection_without_mir"]))
         ok, error = lua.execute('return pcall(function() return bob_plates.technologies(captured_values,captured_raw,captured_mods) end)')
         self.assertFalse(ok, "published process-return condition must reject the changed route")
         self.assertIn("return path", error)
         self.assertIn(route + " returns to ", error)
         self.assertEqual(before, _plain(lua.globals().captured_raw))
+
+    def _hold_return(self, case, raw, family, values=None):
+        # The independent catalogue controls establish the baseline fields;
+        # this comparison protects all of them while the policy changes only
+        # availability and its player explanation, retaining earned effects.
+        _, baseline = self.technologies(case, values=values)
+        expected = deepcopy(baseline)
+        ids = {name for name in self.facts["cases"][case]["published_rows"]
+               if name.startswith("recipe-prod-" + family + "-")}
+        self.assertEqual(2, len(ids))
+        for name in ids:
+            row = expected[name]
+            row["enabled"] = False
+            row["localised_description"] = ["", row["localised_description"], "\n",
+                ["technology-description.more-infinite-research.material_process_unavailable"]]
+        before = deepcopy(raw)
+        lua, rows = self.technologies(case, values=values, raw=raw)
+        self.assertEqual(expected, rows)
+        self.assertEqual(_plain(_lua_value(lua, before)), _plain(lua.globals().captured_raw))
+
+    def test_published_bob_returns_preserve_wholly_unavailable_or_refuse_partial_routes(self):
+        # The published material_family declaration requires an acyclic
+        # process for every selected family, not just Lead. The captured
+        # individual-Bob cases do not select the separate Angel exceptions;
+        # the old Aluminium lock names 2.1.17/Space Age/Bob Plates3.0.1.
+        # Expectations below come from published rows and upstream routes.
+        probes = 0
+        for case in ("q097", "q098"):
+            original = self.raw_from_context(case)
+            published = self.facts["cases"][case]["published_rows"]
+            for name, row in sorted(published.items()):
+                if "_material_" not in name or not name.endswith("-1"):
+                    continue
+                for effect in row["effects"]:
+                    route = effect["recipe"]
+                    recipe = original["recipe"][route]
+                    for ingredient in recipe["ingredients"]:
+                        for product in recipe["results"]:
+                            for hidden in (False, True):
+                                with self.subTest(case=case, family=name, route=route,
+                                                 ingredient=ingredient["name"], hidden=hidden):
+                                    raw = deepcopy(original)
+                                    raw["recipe"]["test-material-return"] = {
+                                        "ingredients": [{"type": product.get("type", "item"),
+                                                         "name": product["name"], "amount": 1}],
+                                        "results": [{"type": ingredient.get("type", "item"),
+                                                     "name": ingredient["name"], "amount": 1}],
+                                        "enabled": not hidden, "hidden": hidden, "allow_productivity": False,
+                                    }
+                                    family = name.removeprefix("recipe-prod-").removesuffix("-1")
+                                    if case == "q097" and family == "research_material_lead":
+                                        self._reject_return(case, raw, route)
+                                    else:
+                                        self._hold_return(case, raw, family)
+                                probes += 1
+        self.assertEqual(88, probes)
+
+    def test_disabled_materials_keep_the_process_return_condition(self):
+        raw = self.raw_from_context("q097")
+        raw["recipe"]["test-material-return"] = {
+            "ingredients": [{"name": "bob-brass-alloy", "amount": 1}],
+            "results": [{"name": "copper-plate", "amount": 1}],
+        }
+        published = self.facts["cases"]["q097"]["published_rows"]
+        keys = {name.removeprefix("recipe-prod-").removesuffix("-1")
+                for name in published if "_material_" in name and name.endswith("-1")}
+        values = _stream_values(keys)
+        for stream in values["streams"].values():
+            stream["enabled"] = False
+        self._hold_return("q097", raw, "research_material_brass", values)
 
     def test_lead_outside_selector_returns_reject_each_named_route(self):
         for case in ("q097", "q098"):
@@ -342,7 +412,10 @@ class BobPlatesF210MaterialsTests(unittest.TestCase):
                         "ingredients":[{"type":"item","name":"bob-lead-plate","amount":1}],
                         "results":[{"type":"item","name":"bob-lead-ore","amount":1}],
                         "enabled":not hidden,"hidden":hidden,"allow_productivity":False}
-                    self._reject_return(case, raw, "bob-lead-plate")
+                    if case == "q097":
+                        self._reject_return(case, raw, "bob-lead-plate")
+                    else:
+                        self._hold_return(case, raw, "research_material_lead")
         raw = self.raw_from_context("q097")
         raw["recipe"]["test-return"] = {"ingredients":[["bob-lead-plate",1]],
             "results":[{"name":"bob-lead-oxide","amount":1}]}

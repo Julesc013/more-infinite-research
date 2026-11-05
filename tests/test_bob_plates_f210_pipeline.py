@@ -144,11 +144,11 @@ class BobPlatesF210PipelineTests(unittest.TestCase):
         ''')
         return lua
 
-    def test_process_return_refuses_before_any_technology_publication(self):
+    def test_mixed_process_return_refuses_before_any_technology_publication(self):
         self.stage("q097", before_final=r'''
           data.raw.recipe["test-lead-return"]={type="recipe",name="test-lead-return",
             ingredients={{type="item",name="bob-lead-plate",amount=1}},
-            results={{type="item",name="bob-lead-ore",amount=1}}}
+            results={{type="item",name="bob-lead-oxide",amount=1}}}
           local extend=data.extend
           data.extend=function() error("technology publication reached before return refusal") end
           local ok,message=pcall(function() assert(loadfile(player_root.."/data-final-fixes.lua"))() end)
@@ -158,6 +158,21 @@ class BobPlatesF210PipelineTests(unittest.TestCase):
           data.raw.recipe["test-lead-return"]=nil
         ''')
 
+    def test_wholly_returning_lead_retains_both_stages_and_all_native_effects(self):
+        lua = self.stage("q097", before_final=r'''
+          -- This complete captured context also converts ore to oxide, so
+          -- returning plate to ore makes both authored lead routes unavailable.
+          data.raw.recipe["test-lead-return"]={type="recipe",name="test-lead-return",
+            ingredients={{type="item",name="bob-lead-plate",amount=1}},
+            results={{type="item",name="bob-lead-ore",amount=1}}}
+        ''')
+        for name in ("recipe-prod-research_material_lead-1", "recipe-prod-research_material_lead-4"):
+            row = _plain(lua.globals().emitted[name])
+            self.assertFalse(row["enabled"])
+            self.assertEqual([
+                {"type": "change-recipe-productivity", "recipe": "bob-lead-plate", "change": .02},
+                {"type": "change-recipe-productivity", "recipe": "bob-lead-plate-2", "change": .02},
+            ], row["effects"])
     def test_active_bob_and_ric_share_one_lazy_ingredient_index(self):
         lua = self.stage("q097", before_final=r'''
           mods["real-industrial-chemistry"]="0.35.8"

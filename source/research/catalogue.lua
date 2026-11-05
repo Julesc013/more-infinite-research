@@ -141,7 +141,7 @@ local function bob_tech_rows()
   return rows
 end
 
-local function material_rows(definitions)
+local function material_rows(definitions, retain_unavailable_cap_right)
   local rows = {}
   for _, definition in ipairs(definitions) do
     for _, stage in ipairs({definition.early, definition.continuation}) do
@@ -150,6 +150,7 @@ local function material_rows(definitions)
       row.progression = stage.first_level or 1
       row.productivity_ceiling = definition.productivity_ceiling
       row.productivity_recipes = named_productivity_recipes(definition.routes)
+      if retain_unavailable_cap_right then row.retain_unavailable_cap_right = true end
       rows[#rows + 1] = row
     end
   end
@@ -158,12 +159,12 @@ end
 
 local function bob_core_rows()
   if not bob_core_active then return {} end
-  return material_rows(require("research.bob_core_materials"))
+  return material_rows(require("research.bob_core_materials"), true)
 end
 
 local function bob_plates_rows()
   if bob_plates_profile == nil then return {} end
-  return material_rows(require("research.bob_plates_materials").material_definitions(bob_plates_profile))
+  return material_rows(require("research.bob_plates_materials").material_definitions(bob_plates_profile), true)
 end
 
 local function py_material_rows()

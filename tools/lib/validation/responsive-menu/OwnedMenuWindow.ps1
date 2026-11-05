@@ -50,6 +50,7 @@ function New-MIROwnedMenuObserverDiagnostics {
     foreground_request_attempts=0
     foreground_request_refused=0
     foreground_request_not_acquired=0
+    foreground_request_last=$null
     owned_peer_foreground_identity_refused=0
     owned_peer_foreground_foreign_refused=0
     owned_peer_foreground_desktop_refused=0
@@ -279,14 +280,31 @@ function Request-MIROwnedMenuForeground {
     return $false
   }
   $Diagnostics.foreground_request_attempts=[int]$Diagnostics.foreground_request_attempts+1
-  if (-not(Set-MIROwnedMenuForegroundHandle $Handle)) {
+  $before=Get-MIROwnedMenuForegroundHandle
+  $request=[ordered]@{
+    target=[ordered]@{handle=$Handle.ToInt64();process_id=$Process.Id;start_utc=$ExpectedStartUtc.ToString('o')}
+    before=[ordered]@{handle=$before.ToInt64();process_id=$(if($before-eq[IntPtr]::Zero){0}else{Get-MIROwnedMenuWindowProcessId $before})}
+    after=$null;set_foreground=$false;status='requested'
+  }
+  $Diagnostics.foreground_request_last=$request
+  $requested=Set-MIROwnedMenuForegroundHandle $Handle
+  $after=Get-MIROwnedMenuForegroundHandle
+  $request.set_foreground=[bool]$requested
+  $request.after=[ordered]@{handle=$after.ToInt64();process_id=$(if($after-eq[IntPtr]::Zero){0}else{Get-MIROwnedMenuWindowProcessId $after})}
+  # A refused one-shot request cannot recover by polling the same foreground
+  # mismatch until the launch timeout. Retain the bounded window identities
+  # and stop; do not retry activation or attach to a foreign input thread.
+  if (-not$requested) {
     Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'foreground_request_refused'
-    return $false
+    $request.status='refused'
+    throw '[mir-menu-foreground-request-refused]'
   }
-  if ((Get-MIROwnedMenuForegroundHandle) -ne $Handle) {
+  if ($after-ne$Handle-or$request.after.process_id-ne$Process.Id) {
     Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'foreground_request_not_acquired'
-    return $false
+    $request.status='not-acquired'
+    throw '[mir-menu-foreground-request-not-acquired]'
   }
+  $request.status='acquired'
   return $true
 }
 

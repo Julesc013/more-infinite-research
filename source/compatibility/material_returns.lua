@@ -97,7 +97,7 @@ end
 
 -- The phase-local ingredient index is reused only while its recipes remain
 -- unchanged. No global cache or persistent state can grant admission later.
-function M.validate(raw, products, ingredients, context, label)
+function M.find_return(raw, products, ingredients, context, label)
   local destinations = {}
   for _, ingredient in ipairs(entries({ingredients=ingredients}, "ingredients")) do
     destinations[identity(ingredient)] = true
@@ -109,8 +109,13 @@ function M.validate(raw, products, ingredients, context, label)
   end
   local consumers = context.consumers
   local queue, reached, expanded = {}, {}, {}
+  local reason
   local function enqueue(key, kind, name)
-    if destinations[key] then fail((label or "selected route") .. " returns to " .. kind .. ":" .. name) end
+    if reason then return end
+    if destinations[key] then
+      reason = (label or "selected route") .. " returns to " .. kind .. ":" .. name
+      return
+    end
     if not reached[key] then
       reached[key] = true
       queue[#queue + 1] = {key=key, kind=kind, name=name}
@@ -121,7 +126,7 @@ function M.validate(raw, products, ingredients, context, label)
     if not definitely_zero(product) then enqueue(key, kind, name) end
   end
   local next_node = 1
-  while next_node <= #queue do
+  while next_node <= #queue and reason == nil do
     local node = queue[next_node]
     next_node = next_node + 1
     for _, definition in ipairs(consumers[node.key] or {}) do
@@ -145,6 +150,14 @@ function M.validate(raw, products, ingredients, context, label)
       end
     end
   end
+  return reason
+end
+
+-- Required routes such as RIC keep strict rejection. Optional family admission
+-- can inspect a real return without catching malformed-input or context errors.
+function M.validate(raw, products, ingredients, context, label)
+  local reason = M.find_return(raw, products, ingredients, context, label)
+  if reason then fail(reason) end
 end
 
 return M
