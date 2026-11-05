@@ -8843,7 +8843,7 @@
         "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
       }
     ],
-    "next_bounded_work": "Use stable_coverage_review for the finite current obligations and owner split. Black Glass selects, prepares, repairs and executes routine native work without prospective Aero packet approval; Aero independently reviews source, expectations, actual results and final delivery. Preserve accepted 5.0.4 weapon/Galore/mixed-ownership and package/delivery components, the bounded Foundation mean-update result and original nine/seven/four migration identities under consumed-input review. Close actual remaining Library/client/export/Discovery Tree reset, supported-profile/API/state and whole-product performance requirements. Historical reconciliation retains 31 bounded reviews while remaining original assertion/transitive, effective-setting, compatibility/inter-release and unknown-consumer sources stay incomplete. No known failure is waived, prior result relabelled, every-old-patch campaign restarted or retired framework restored.",
+    "next_bounded_work": "Use stable_coverage_review for the finite current obligations and owner split. Black Glass selects, prepares, repairs and executes routine native work without prospective Aero packet approval; Aero independently reviews source, expectations, actual results and final delivery. Preserve accepted 5.0.4 weapon/Galore/mixed-ownership and package/delivery components, the bounded Foundation mean-update result and original nine/seven/four migration identities under consumed-input review. Close actual remaining Library/client/export/Discovery Tree reset, supported-profile/API/state and whole-product performance requirements. Historical reconciliation retains 32 bounded reviews while remaining original assertion/transitive, effective-setting, compatibility/inter-release and unknown-consumer sources stay incomplete. No known failure is waived, prior result relabelled, every-old-patch campaign restarted or retired framework restored.",
     "bounded_intent_reviews": [
       {
         "subjects": [
@@ -16740,6 +16740,30 @@
         "disposition": "Retire registry/group/recorder wire mechanics while retaining completeness,failure/provenance,consumed-input and declared-support purposes in existing controls. No additional player behavior is inferred from metadata helpers.",
         "remaining_executable_check": "Keep actual scenario assertions,manifest/caller bodies,remaining historical sources and current native/profile/client/performance verdicts at their existing scopes. No obsolete runner restoration or unchanged native rerun.",
         "owner": "Aero historical/independent review; Black Glass autonomous native/integration/publication",
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false,
+        "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-05",
+          "CONT-07",
+          "CONT-12",
+          "CONT-13",
+          "VER-07"
+        ],
+        "reviewed_on": "2026-11-05",
+        "reviewed_against": "0373cc44d13d48717469f54c05b9f4d786d71bc4",
+        "scope": "The eight independently fixed material additions in the full460 branch of one historical upgrade-oracle writer, plus its routing/preservation boundary. This is not the entire imported helper family, historical upgrade campaign or current native parity verdict.",
+        "evidence": {
+          "path": "spec/evidence/historical-bob-material-upgrade-intent-aero-r01.json",
+          "sha256": "EDD3BDBB14834EB282C64533A7C4D151D1FA7056C3A40A20E337C31501D738F6"
+        },
+        "disposition": "Retain the eight named material identities/effects/stages/Tin science and settings/state purposes; all eight match the independent published capture. Preserve historical150 versus the existing reviewed MIR5 effective-cap difference; retire only obsolete writer/version mechanics.",
+        "remaining_executable_check": "Existing supported-profile/current consumed-input and affected saved-state verdicts remain open; this source review creates no additional historical campaign or native pass.",
+        "owner": "Aero historical/independent review; Black Glass autonomous native/integration/publication",
+        "selected_intent_reconciliation_complete": true,
         "source_reconciliation_complete": false,
         "test_intent_reconciliation_complete": false,
         "native_execution": false,
