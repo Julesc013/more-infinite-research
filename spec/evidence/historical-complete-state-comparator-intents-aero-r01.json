@@ -1,0 +1,276 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalCompleteStateRawComparatorIntentReviewV1",
+  "reviewed_on": "2026-11-05",
+  "reviewed_against": "5a03e72545af50300971a5a1cb4e1e15443891ba",
+  "player_tree": "41d36ed8db131404692d5c054da3c87f7b54aecb",
+  "scope": "One raw pre-2.0 comparator helper family at two immutable bodies and13 selected published tag/path bindings. Caller specializations, other fixtures and actual current native outcomes remain separate.",
+  "inventory_sha256": "73AFF4844A8950913B9A9FAE23E49F1F1FF52C1D7D37107DBA20EB6201E1B8F6",
+  "sources": [
+    {
+      "blob": "36675762ecce2b9c8ba4346f1dcefcf27bae9848",
+      "git_sha1": "36675762ecce2b9c8ba4346f1dcefcf27bae9848",
+      "sha256": "BA7130A50AC5636F4564D2DE834E4B243DCB4EEFE539FB491E9605D04705112E",
+      "bytes": 23758,
+      "line_count": 184,
+      "encoding": "UTF-8 exact Git blob bytes; no newline normalization",
+      "bindings": [
+        {
+          "tag": "v4.2.2",
+          "plain_tag_object": "02933ff20fa64e48277285fbc15c1bdcbfadfe9b",
+          "peeled_commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "source_tree": "a4364a9268352f690c0d4b5670870d818c3312e6",
+          "path": "tests/support/MIR422HistoricalCompleteState.lua"
+        },
+        {
+          "tag": "v4.3.0",
+          "plain_tag_object": "1f35059b7ee54e75570d833f072aa74d2cef73c7",
+          "peeled_commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "source_tree": "bb6c3df2bc76cbd9da000432e4a0ecf6dd6a585e",
+          "path": "tests/support/MIR422HistoricalCompleteState.lua"
+        },
+        {
+          "tag": "v4.4.0",
+          "plain_tag_object": "d5261873f4e7c922735d732d8defbef13acda1b1",
+          "peeled_commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "source_tree": "fe63974c649ddba389da5979ba94a59bffdd5e72",
+          "path": "tests/support/MIR422HistoricalCompleteState.lua"
+        },
+        {
+          "tag": "v4.4.1",
+          "plain_tag_object": "cbc3f3a9f763f2f26895d8c1d172009e94339c2a",
+          "peeled_commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "source_tree": "3ffbf5fbb6cbe4639de3b0146ff9b29b360ef825",
+          "path": "tests/support/MIR422HistoricalCompleteState.lua"
+        }
+      ]
+    },
+    {
+      "blob": "6089002bc362a42fb4c032b9103a6daf8a215648",
+      "git_sha1": "6089002bc362a42fb4c032b9103a6daf8a215648",
+      "sha256": "D50276E9B1468FB8676784775593EBD40B7EE97441ADBFDFD8D7A26E88D4A4BE",
+      "bytes": 29851,
+      "line_count": 234,
+      "encoding": "UTF-8 exact Git blob bytes; no newline normalization",
+      "bindings": [
+        {
+          "tag": "v4.4.2",
+          "plain_tag_object": "0b6cd75a17efea030e94b4f4b6a7866ba52163a9",
+          "peeled_commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "source_tree": "95bb20196cc4195375acefeacc727e6a5370af21",
+          "path": "tests/support/MIR422HistoricalCompleteState.lua"
+        },
+        {
+          "tag": "v4.5.0",
+          "plain_tag_object": "e4c511c240c3483b4421b82444fa8404b8f5db97",
+          "peeled_commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "source_tree": "c316b77c93a1d5251fd58405339053831a43faa4",
+          "path": "tests/support/MIR422HistoricalCompleteState.lua"
+        },
+        {
+          "tag": "v4.5.1",
+          "plain_tag_object": "7e45e6c9732d03a7989f963016dc2c7cb2961705",
+          "peeled_commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "source_tree": "0e4723efd3d720942ef42935a62a2676c6860b6c",
+          "path": "tests/support/MIR422HistoricalCompleteState.lua"
+        },
+        {
+          "tag": "v4.5.2",
+          "plain_tag_object": "4d3a2d03e05056b5e577cd6089bbb47325d0363c",
+          "peeled_commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "source_tree": "46e1787363671e1209b819dcc0b5360fc9433fc1",
+          "path": "tests/support/MIR422HistoricalCompleteState.lua"
+        },
+        {
+          "tag": "v4.6.0",
+          "plain_tag_object": "cd67ea9b93415819444c2bdf7f25873a0b906c6c",
+          "peeled_commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "source_tree": "da6bafdd17c6246c90edad3fef7a6ba6166ac920",
+          "path": "tests/support/MIR422HistoricalCompleteState.lua"
+        },
+        {
+          "tag": "v4.7.0",
+          "plain_tag_object": "82d5a7279ddc236b31539d84f8ea1b0dba904956",
+          "peeled_commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "source_tree": "903cb2b99531bdc9fdf65fcddbdf786a18c88ec1",
+          "path": "tests/support/MIR422HistoricalCompleteState.lua"
+        },
+        {
+          "tag": "v4.7.1",
+          "plain_tag_object": "dfaced5d79e2261b3f73805d4a36388837ce4813",
+          "peeled_commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "source_tree": "95a9faae65c8aa43b1ee28ce476edcc031bcd6ec",
+          "path": "tests/support/MIR422HistoricalCompleteState.lua"
+        },
+        {
+          "tag": "v4.7.2",
+          "plain_tag_object": "0b1e67113ac0df056b3bfbbcdea870016837f8ee",
+          "peeled_commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "source_tree": "7780dc4dbcb534e92ff337e3aebab62d2e5305e5",
+          "path": "tests/support/MIR422HistoricalCompleteState.lua"
+        },
+        {
+          "tag": "v4.7.3",
+          "plain_tag_object": "70fd661931e2e9cb453f5dac72ca71c6822dc6a3",
+          "peeled_commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "source_tree": "7dc6f1f1140ce763d848605eaffc645a5310871b",
+          "path": "tests/support/MIR422HistoricalCompleteState.lua"
+        }
+      ]
+    }
+  ],
+  "earlier_body_disposition": "All differences are the old suffix-based frontier selection and its call signature, replaced by explicitly scoped transition tables plus14 F016 restoration vectors. All other earlier lines equal the latest raw body.",
+  "groups": [
+    {
+      "id": "engine-specific-capture-scope",
+      "source_lines": "122-190",
+      "expectation": "Common16 force modifiers are captured.0.15 adds robot battery,mining productivity and braking;0.16+ adds laboratory productivity,robot lifetime and artillery range.0.13/0.14 omit level/saved-progress/max/formula/startup-setting fields;0.17/1.0/1.1 enable queue/visibility capture; only1.0/1.1 capture runtime active versions. Recipe fields here are enabled flags, never recipe-productivity output.",
+      "implementation": [
+        "source/platform/target.lua",
+        "source/adapters/reduced",
+        "source/compatibility/historical_direct.lua",
+        "source/compatibility/historical_continuations.lua"
+      ],
+      "controls": [
+        "tests/test_historical_direct.py",
+        "tests/test_historical_continuations.py",
+        "tests/test_historical_transition_fixture.py"
+      ],
+      "disposition": "retain capability-specific accepted behavior; retire private old recorder. The raw factory is not qualification for unselected0.18 or early best-effort engines."
+    },
+    {
+      "id": "existing-technology-and-native-state",
+      "source_lines": "138-180,206-227",
+      "expectation": "Every captured prior force/technology retains its researched/enabled state, applicable current level and detached work, captured definition fields and recipe availability. Exact order,science amounts,prerequisites,effects and count/time/formula remain compared unless an independently authored named frontier delta applies. Numeric comparison tolerance is1e-6.",
+      "implementation": [
+        "source/compatibility/historical_direct.lua",
+        "source/compatibility/historical_continuations.lua",
+        "source/research/historical_direct.lua",
+        "source/research/historical_continuations.lua",
+        "source/migrations"
+      ],
+      "controls": [
+        "tests/test_historical_direct.py::test_historical_characterization_matches_portable_native_oracle",
+        "tests/test_historical_continuations.py::test_portable_native_characterization_matches_default_projection",
+        "tests/test_historical_transition_fixture.py"
+      ],
+      "disposition": "retain original identities/paid effects and justified work/definition changes. Current source correspondence is not a saved-state result, nor a blanket requirement for obsolete compiler representation."
+    },
+    {
+      "id": "earned-category-and-foreign-effects",
+      "source_lines": "5-36,162-170,222-226",
+      "expectation": "Capture declared native force fields and ammo/gun/turret categories referenced by technology effects. Preserve prior category values; newly exposed categories may be numeric zero only. The collector does not enumerate unreferenced categories or every possible force property.",
+      "implementation": [
+        "source/adapters/reduced",
+        "source/runtime/native_credits.lua",
+        "source/runtime/native_gun_credits.lua"
+      ],
+      "controls": [
+        "tests/test_historical_transition_fixture.py",
+        "tests/test_native_credits.py",
+        "tests/test_native_gun_credits.py"
+      ],
+      "disposition": "retain independent category/foreign contribution preservation, without pretending this historical collector proves all arbitrary mod state. Original zero-category acceptance is intentional; nonzero additions reject."
+    },
+    {
+      "id": "startup-settings-and-queued-work",
+      "source_lines": "173-179,225-226",
+      "expectation": "Where the original engine exposes them, retain all captured startup values, exact queue order/enabled flag,current research and fractional progress. Detached saved work is separate from current force progress. Original module does not capture per-player Library views/map settings or infer cost-normalized work after an unreviewed price change.",
+      "implementation": [
+        "source/adapters/reduced",
+        "source/runtime/legacy_caps.lua",
+        "source/runtime/settings_profile.lua"
+      ],
+      "controls": [
+        "tests/test_historical_transition_fixture.py",
+        "tests/test_f110_f200_transition_fixture.py",
+        "tests/test_settings_profile.py"
+      ],
+      "disposition": "retain actual selected state/settings contracts; port unsupported API access by capability rather than running old code on modern engines."
+    },
+    {
+      "id": "independent-frontier-vectors",
+      "source_lines": "38-101,212",
+      "expectation": "Original published421 corrections contain13 F015 and14 F016 named rows. The additional14 F016440/441-to442 restoration cases compare their independently fixed before/after prerequisite vectors. Every other field remains equal. Current authored contracts match these41 context-specific vector cases through60 science/prerequisite field comparisons.",
+      "implementation": [
+        "source/compatibility/historical_direct.lua",
+        "source/compatibility/historical_continuations.lua"
+      ],
+      "controls": [
+        "tests/test_historical_direct.py",
+        "tests/test_historical_continuations.py"
+      ],
+      "disposition": "retain independently authored vectors.41 is context cases, not41 unique technologies: there are27 engine-line/name rows across the two baseline maps, with14 separately scoped F016 restoration cases.",
+      "correspondence": {
+        "path": "historical-complete-state-current-frontier-correspondence-r01.json",
+        "sha256": "EE76469024F5C53076F9950342250D7859A1EC6240912D65118C615CFB82136D",
+        "field_comparisons": 60
+      }
+    },
+    {
+      "id": "exact-predecessor-and-destination-allowances",
+      "source_lines": "42-101; earlier42-43/162",
+      "expectation": "Latest module permits only eight declared destinations from4.2.01500, eight from4.2.01600 and two explicit4.4.01600/01601-to01602 restoration tuples. An unrelated field or wrong pair rejects. Earlier raw helper admitted frontier rows from source suffix00 without a complete pair; preserve the actual historical lane/caller binding, not that overbroad helper behavior.",
+      "implementation": [
+        "tools/Invoke-NativeFixture.ps1",
+        "tests/profiles",
+        "tests/fixtures/historical-native"
+      ],
+      "controls": [
+        "tests/test_historical_transition_fixture.py",
+        "tests/test_historical_native_runner.py"
+      ],
+      "disposition": "retire suffix-based allowance selection and old staging implementation. Neither18 declared tuples nor13 retained source-tag references are18/13 native passes or a new every-old-patch campaign."
+    },
+    {
+      "id": "source-capture-and-observed-upgrade-stages",
+      "source_lines": "185-230",
+      "expectation": "Capture a source expectation once under exact from/to identity. Export original source, observed target before assertion and accepted named stage separately. For1.0/1.1 require active MIR source/destination version; other exact engine/package/dependency/profile binding remains the caller responsibility. The helper itself does not prove distinct process starts,cold reloads or input save custody.",
+      "implementation": [
+        "tools/Invoke-NativeFixture.ps1",
+        "tests/fixtures/historical-native",
+        "tests/fixtures/full-catalogue-upgrade"
+      ],
+      "controls": [
+        "tests/test_historical_transition_fixture.py",
+        "tests/test_full_catalogue_upgrade_fixture.py"
+      ],
+      "disposition": "retain original failure and process/save/input identities; retire old JSON serialization/marker/global namespace as transport. An export or passed host stand-in is not native acceptance."
+    },
+    {
+      "id": "new-state-proof-limit",
+      "source_lines": "215-217; prior-force and recipe loops206-220",
+      "expectation": "For added technologies this old oracle checks researched only; it accepts a synthetic new unresearched infinite row at next level9. It also compares prior forces/recipes rather than asserting every added force/recipe. These limits must not become proof of zero new earned state.",
+      "implementation": [
+        "source/runtime/native_credits.lua",
+        "source/runtime/native_gun_credits.lua",
+        "tests/fixtures/full-catalogue-upgrade/shared/control.lua::assert_credits"
+      ],
+      "controls": [
+        "tests/test_native_credits.py",
+        "tests/test_native_gun_credits.py",
+        "tests/test_full_catalogue_upgrade_fixture.py"
+      ],
+      "disposition": "retain no-unearned-reward purpose with independently proven source/owner/initial-level or credit mapping. A higher new private holder level can be legitimate only under independently recovered paid-credit obligations; do not blanket-reject holders or infer a current product defect from the synthetic old-oracle limitation."
+    }
+  ],
+  "original_oracle_experiment": {
+    "path": "historical-complete-state-original-oracle-observation-r01.json",
+    "sha256": "57535E6B61072F7E553A9D29F908F863CA4C57CA687821F999EE1609F3BBA528",
+    "controls": 14,
+    "native_execution": false
+  },
+  "remaining_frontiers": [
+    "Caller-injected Full/profile/default allowances and actual saved package/mod/settings/engine bodies need their own applicability review; raw body reconciliation does not close them.",
+    "Modern full-state control and remaining historical/inter-release/consumer/request sources remain independently scoped.",
+    "Keep existing nine same-edition/seven older-contract/four forward journeys and original failure identities; do not restore the retired framework or start every old patch."
+  ],
+  "raw_source_body_intent_complete": true,
+  "all_imported_or_specialized_oracles_complete": false,
+  "historical_inventory_complete": false,
+  "new_current_product_defect_demonstrated": false,
+  "native_execution": false,
+  "current_saved_state_qualification": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}
