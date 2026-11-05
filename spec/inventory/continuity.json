@@ -8870,7 +8870,7 @@
         "remaining": "Representative fixtures do not supply reporter mod/settings/save identity. Keep the original unresolved scope and actual missing-input reason; do not invent a substitute reproduction."
       }
     ],
-    "next_bounded_work": "Use stable_coverage_review for the finite current obligations and owner split. Black Glass selects, prepares, repairs and executes routine native work without prospective Aero packet approval; Aero independently reviews source, expectations, actual results and final delivery. Preserve accepted 5.0.4 weapon/Galore/mixed-ownership and package/delivery components, the bounded Foundation mean-update result and original nine/seven/four migration identities under consumed-input review. Close actual remaining Library/client/export/Discovery Tree reset, supported-profile/API/state and whole-product performance requirements. Historical reconciliation retains 34 bounded reviews while remaining original assertion/transitive, effective-setting, compatibility/inter-release and unknown-consumer sources stay incomplete. No known failure is waived, prior result relabelled, every-old-patch campaign restarted or retired framework restored.",
+    "next_bounded_work": "Use stable_coverage_review for the finite current obligations and owner split. Black Glass selects, prepares, repairs and executes routine native work without prospective Aero packet approval; Aero independently reviews source, expectations, actual results and final delivery. Preserve accepted 5.0.4 weapon/Galore/mixed-ownership and package/delivery components, the bounded Foundation mean-update result and original nine/seven/four migration identities under consumed-input review. Close actual remaining Library/client/export/Discovery Tree reset, supported-profile/API/state and whole-product performance requirements. Historical reconciliation retains 35 bounded reviews while remaining original assertion/transitive, effective-setting, compatibility/inter-release and unknown-consumer sources stay incomplete. No known failure is waived, prior result relabelled, every-old-patch campaign restarted or retired framework restored.",
     "bounded_intent_reviews": [
       {
         "subjects": [
@@ -16851,6 +16851,52 @@
         "test_intent_reconciliation_complete": false,
         "native_execution": false,
         "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-07",
+          "CONT-12",
+          "CONT-13",
+          "VER-07",
+          "MIG-01"
+        ],
+        "reviewed_on": "2026-11-05",
+        "reviewed_against": "5a03e72545af50300971a5a1cb4e1e15443891ba",
+        "scope": "Raw historical complete-state comparator at two immutable bodies/13 published tag-path bindings, eight intent groups. Caller specializations and actual current native outcomes remain separate.",
+        "evidence": {
+          "path": "spec/evidence/historical-complete-state-comparator-intents-aero-r01.json",
+          "sha256": "9796998A32C93B492DBA58E8A6CF964B4D1F89A56484B38064234D806E2DD623"
+        },
+        "disposition": "Retain capability-specific native/technology/recipe-availability state, paid category and foreign contributions, current/detached/queued work, independently fixed frontier vectors and exact source/destination allowances. Retire old recorder transport and suffix-only selection. The old added-technology boolean check does not prove initial/earned levels; do not infer a product defect or blanket-reject legitimate paid-credit holders.",
+        "independent_review": {
+          "path": "2215ad99e912d5ca7f28fb00265fa6c269bb2a4e:evidence/aero-historical-raw-complete-state-review-r01/review.json",
+          "sha256": "CA0E9BC6D5BFCD4BBEB03115B0EB095F9BABEDFA0B973AA3A713F2E7518C3CD5"
+        },
+        "original_input_custody": {
+          "path": "2215ad99e912d5ca7f28fb00265fa6c269bb2a4e:evidence/aero-historical-raw-complete-state-review-r01/original-review-inputs.json.gz",
+          "sha256": "A020B1258CF51D8F7C5F61EDCBDEE5155A67D660882EEF0E4A8FA1CE872170DC"
+        },
+        "exact_host_commands": {
+          "path": "55c14d41fd069d74a86e5bde305fc8cd76c4d877:evidence/aero-historical-raw-complete-state-review-r01/exact-host-commands.json",
+          "sha256": "54E21D7A2A688A648A60E9ACE43D61CD83920B5D470027D092464F1C78E57975"
+        },
+        "host_observations": {
+          "original_only_synthetic_controls": 14,
+          "current_authored_frontier_field_comparisons": 60,
+          "contextual_frontier_cases": 41,
+          "unique_engine_name_rows": 27,
+          "native_processes": 0,
+          "limits": "Pure Lua/source correspondence only. The original compound shell command retained an auxiliary missing-path search error after the completed fourteen-control report; no native/save/current full-catalogue verdict or historical result rescoring."
+        },
+        "remaining_executable_check": "Review caller-injected profile/default allowances, other imported/modern full-state helpers and actual saved engine/package/mod/settings applicability. Retain the named nine/seven/four journeys and original failures; this source unit creates no routine packet-approval gate or every-old-patch campaign.",
+        "owner": "Aero historical/source review; Black Glass autonomous affected native/integration/publication",
+        "raw_source_body_intent_complete": true,
+        "all_imported_or_specialized_oracles_complete": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false,
+        "release_qualification": false
       }
     ],
     "stable_coverage_review": {
@@ -17094,9 +17140,10 @@
             "spec/evidence/historical-validation-result-intents-aero-r01.json",
             "spec/evidence/historical-validation-helper-intents-aero-r01.json",
             "spec/evidence/historical-upgrade-manifest-test-intents-aero-r01.json",
-            "spec/evidence/historical-k2-imported-fixture-intents-aero-r01.json"
+            "spec/evidence/historical-k2-imported-fixture-intents-aero-r01.json",
+            "spec/evidence/historical-complete-state-comparator-intents-aero-r01.json"
           ],
-          "remaining_executable_check": "Retain the34 bounded intent reviews with their exact scopes. The direct upgrade-manifest test family is dispositioned through10 immutable bodies/14 retained bindings,22 latest intent groups and158 earlier changed lines; The selected K2 fixture/sentinel/profile source intents are separately mapped, with six older-context bodies kept distinct from actual latest-lane inputs. Other imported helpers,fixture semantics and actual native outcomes remain separate. Continue remaining original assertion/transitive,effective/nondefault-setting,compatibility/inter-release and unresolved consumer/source work. Map recovered accepted behavior to implementation,independent opposing controls and genuinely affected checks. Keep inventory_complete=false,all87 original request records/decisions,unresolved issues621/446 and PR344,missing originals and reporter configurations explicit; counts and representative fixtures are not global completeness.",
+          "remaining_executable_check": "Retain the35 bounded intent reviews with their exact scopes. The direct upgrade-manifest test family is dispositioned through10 immutable bodies/14 retained bindings,22 latest intent groups and158 earlier changed lines; The selected K2 fixture/sentinel/profile source intents are separately mapped, with six older-context bodies kept distinct from actual latest-lane inputs. The raw complete-state comparator is mapped at two bodies/13 bindings with its capability, frontier and added-state proof limits explicit; caller specializations, other imported helpers, modern full-state semantics and actual native outcomes remain separate. Continue remaining original assertion/transitive,effective/nondefault-setting,compatibility/inter-release and unresolved consumer/source work. Map recovered accepted behavior to implementation,independent opposing controls and genuinely affected checks. Keep inventory_complete=false,all87 original request records/decisions,unresolved issues621/446 and PR344,missing originals and reporter configurations explicit; counts and representative fixtures are not global completeness.",
           "owner": "Aero",
           "independent_review": "Aero",
           "status": "open: bounded source-intent dispositions exist; complete historical preservation remains unproved"
