@@ -140,11 +140,25 @@ function M.product_definitions(active_mods)
   return profile and definitions.product_definitions(profile) or {}
 end
 
-function M.technologies(values, raw, active_mods)
+function M.technologies(values, raw, active_mods, return_context)
   local profile = M.preflight(raw, active_mods)
   if profile == nil then return {} end
+  -- The published lead declaration has no reviewed F210 return exception.
+  -- Validate each named route before returning either historical paid stage;
+  -- one bad route refuses the configuration rather than erasing an identity.
+  local material_definitions = definitions.material_definitions(profile)
+  for _, definition in ipairs(material_definitions) do
+    if definition.key == "research_material_lead" then
+      local returns = require("compatibility.material_returns")
+      local context = return_context and return_context() or returns.prepare(raw)
+      for _, route in ipairs(definition.routes) do
+        local recipe = raw.recipe[route.recipe]
+        returns.validate(raw, recipe.results, recipe.ingredients, context, route.recipe)
+      end
+    end
+  end
   local output = {}
-  for _, definition in ipairs(definitions.material_definitions(profile)) do
+  for _, definition in ipairs(material_definitions) do
     local stream = stream_for(values, definition)
     output[#output + 1] = stages.technology(definition, definition.early, stream, fail)
     local continuation = stages.technology(definition, definition.continuation, stream, fail)
