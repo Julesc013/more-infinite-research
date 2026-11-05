@@ -1,4 +1,4 @@
-"""Independent controls for the two frozen active-runtime benchmark cohorts."""
+"""Independent controls for the explicitly frozen active-runtime benchmark cohorts."""
 from __future__ import annotations
 
 import copy
@@ -746,6 +746,53 @@ class Current38CRuntimeBenchmarkAnalysisTests(unittest.TestCase):
         with self.assertRaisesRegex(MODULE.RuntimeBenchmarkAnalysisError, "unknown frozen"):
             MODULE.select_cohort("latest")
         self.assertEqual(MODULE.PLAN_SHA256, previous)
+
+
+class Current505GroundRuntimeBenchmarkAnalysisTests(unittest.TestCase):
+    def setUp(self) -> None:
+        MODULE.select_cohort("current505-ground")
+
+    def tearDown(self) -> None:
+        MODULE.select_cohort("r06")
+
+    def test_exact_current_ground_plan_and_original_physical_receipts_are_admitted(self) -> None:
+        raw = (ROOT / "spec/evidence/runtime505-active-plan-r02.json").read_bytes()
+        plan = json.loads(raw)
+        MODULE._validate_plan(plan, _hash(raw))
+        profiles = MODULE._profiles(plan)
+        self.assertEqual(len(profiles), 8)
+        expected_paths = {row["path"] for group in plan["active_fixture_contract"].values() for row in group["profiles"]}
+        self.assertEqual({row["path"] for row in profiles.values()}, expected_paths)
+        capture, pilot = MODULE._frozen_active_prerequisites()
+        self.assertEqual(len(capture["captures"]), 8)
+        self.assertEqual(len(pilot["observations"]), 8)
+        self.assertEqual(pilot["schedule_launches"], 0)
+        self.assertEqual(MODULE.CANDIDATE_LEAF, "more-infinite-research_5.0.21005.zip")
+        self.assertFalse(pilot["performance_acceptance"])
+
+    def test_other_plan_package_or_profile_identities_cannot_be_relabelled_current505(self) -> None:
+        for name in ("runtime-benchmark-active-plan-r06.json", "runtime-current38c-active-plan-r01.json", "runtime505-active-plan-r01.json"):
+            with self.subTest(name=name):
+                raw = (ROOT / "spec/evidence" / name).read_bytes()
+                with self.assertRaises(MODULE.RuntimeBenchmarkAnalysisError):
+                    MODULE._validate_plan(json.loads(raw), _hash(raw))
+        raw = (ROOT / "spec/evidence/runtime505-active-plan-r02.json").read_bytes()
+        plan = json.loads(raw)
+        plan["candidate"]["f210_archive"]["name"] = "more-infinite-research_5.0.21000.zip"
+        with self.assertRaisesRegex(MODULE.RuntimeBenchmarkAnalysisError, "archive name"):
+            MODULE._validate_plan(plan, _hash(raw))
+        plan = json.loads(raw)
+        plan["active_fixture_contract"]["agriculture"]["profiles"][0]["path"] = "tests/profiles/runtime505-agriculture-published-128-f210-2123.json"
+        with self.assertRaisesRegex(MODULE.RuntimeBenchmarkAnalysisError, "profile identity"):
+            MODULE._profiles(plan)
+
+    def test_old_cohort_selection_restores_its_original_package_identity(self) -> None:
+        MODULE.select_cohort("current38c")
+        self.assertEqual(MODULE.CANDIDATE_LEAF, "more-infinite-research_5.0.21000.zip")
+        MODULE.select_cohort("current505-ground")
+        self.assertEqual(MODULE.CANDIDATE_LEAF, "more-infinite-research_5.0.21005.zip")
+        MODULE.select_cohort("r06")
+        self.assertEqual(MODULE.CANDIDATE_LEAF, "more-infinite-research_5.0.21000.zip")
 
 
 if __name__ == "__main__":
