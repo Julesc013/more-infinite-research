@@ -17159,19 +17159,21 @@
             "spec/evidence/candidate504-mixed-gun-native-r01.json",
             "Julesc013/mir-native-worker@017a40be8ed5f97d92e876cb6f4d259a92cdb47e:evidence/aero-historical473-current504-applicability-r01/source-applicability.json (9C3C8D07)",
             "9b8e34592ac5eafb5b9719705ddce31ca3fc62e1:evidence/aero-candidate505-source-native-review-r01/native-review.json",
-            "spec/evidence/historical473-current505-applicability-r01.json"
+            "spec/evidence/historical473-current505-applicability-r01.json",
+            "spec/evidence/historical473-forward-current506-applicability-r01.json"
           ],
-          "remaining_executable_check": "Published505 reviewFC930CC9 supports the seven earlier-stable-edition473 same-edition preservation routes and the separate publishedF100-to-F110 journey under original native identities. Finish consumed-input decisions for modernF200/F210473 routes,other three forward journeys and the seven older MIR-contract groups,which are different sets. Existing504-to505 stock/representative satellite science upgrade remains accepted;do not recreate its predecessor. Name each genuinely changed identity/owner/settings path and existing route before an affected native check;preserve adverse receipts,missing inputs and ambiguous locks. Locale/current-load/rendering,whole-edition and final-candidate acceptance remain separate.",
+          "remaining_executable_check": "Retain published505 reviewFC930CC9 for the seven earlier stable same-edition473 routes and separate F100-to-F110 journey. The current506 forward review accepts bounded F100-to-F210 and F110-to-F210 preservation reuse with their original native identities. The F200-to-F210 C563 pass remains historical; its changed first-paid-family admission still needs a matching published4.7.20003/Base2.0.77 source and independently known paid mask through the supported2.1.23 closure, saved successor and two cold reloads. Do not whitelist fixture mods, substitute the same-engine F210 c107 source or infer the mask from candidate output. Finish modern same-edition and seven older MIR-contract applicability decisions as distinct sets. Preserve accepted science components, adverse receipts, missing inputs and ambiguous locks; execute genuinely affected checks only. Complete current-candidate/profile/client/performance acceptance remains open.",
           "owner": "Aero; Black Glass executes affected checks",
           "independent_review": "Aero",
-          "status": "partial:505 earlier-seven473 and F100-to-F110 preservation applicability accepted; original modern/older-contract/science/state components retain their exact scopes; complete stable-candidate coverage remains unproved",
-          "readiness": "earlier-seven473/F100-F110505 preservation input review complete; modern/older-contract decisions remain ready",
+          "status": "partial: earlier-seven473/F100-F110505 and two1.x-to-F210506 bounded preservation applicability accepted; current F200 paid cross-engine boundary, modern same-edition and older-contract decisions remain open",
+          "readiness": "two1.x forward preservation decisions complete; matching F200 paid-transition inputs and modern/older-contract decisions remain next",
           "next_work_inputs": [
             "spec/inventory/migration-origins.json",
             "spec/evidence/candidate503-native-upgrades-r01.json",
             "spec/evidence/candidate504-mixed-gun-native-r01.json",
             "spec/evidence/candidate505-science-upgrade-native-r01.json",
-            "spec/evidence/historical473-current505-applicability-r01.json"
+            "spec/evidence/historical473-current505-applicability-r01.json",
+            "spec/evidence/historical473-forward-current506-applicability-r01.json"
           ]
         },
         {
