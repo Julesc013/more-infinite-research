@@ -413,6 +413,30 @@ class PrototypeLimitsTests(unittest.TestCase):
           assert(shorter["utility-constants"].default.default_pipeline_extent == 128)
         ''')
 
+    def test_pipeline_extent_preserves_native_zero_and_the_positive_extent_floor(self):
+        self.lua.execute('''
+          local pipeline = require("overrides.pipeline_extent")
+          -- Both selected native APIs admit zero for this uint32 field.
+          -- Scaling must preserve it, rather than applying the positive floor.
+          for _, case in ipairs({{"25", 1}, {"150", 6}, {"1000", 40}, {0.1, 1}}) do
+            local zero = {max_pipeline_extent=0, foreign="preserve"}
+            local inherited, positive = {}, {max_pipeline_extent=4}
+            local constants = {default_pipeline_extent=0, foreign="untouched"}
+            local raw = {
+              ["utility-constants"]={default=constants},
+              pipe={a={fluid_box=zero}},
+              machine={b={fluid_boxes={zero, inherited, positive}}},
+            }
+            assert(pipeline.apply(raw, case[1]) == 3, "shared zero box must be visited once")
+            assert(zero.max_pipeline_extent == 0, "explicit native zero extent must remain zero")
+            local effective_inherited = inherited.max_pipeline_extent or constants.default_pipeline_extent
+            assert(effective_inherited == 0, "inherited native zero extent must remain zero")
+            assert(positive.max_pipeline_extent == case[2], "positive extent floor or scaling changed")
+            assert(zero.foreign == "preserve" and constants.foreign == "untouched")
+            assert(constants.default_pipeline_extent == 0, "native default must not be rewritten")
+          end
+        ''')
+
     def test_pipeline_extent_scales_every_delivered_box_field_once_with_rounding_and_bounds(self):
         self.lua.execute('''
           local pipeline = require("overrides.pipeline_extent")

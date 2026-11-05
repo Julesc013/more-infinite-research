@@ -1,0 +1,16 @@
+{
+  "name": "mir-fixture-mir5-bob-material-preservation",
+  "version": "0.1.0",
+  "title": "MIR Bob material preservation source fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable exact F210 full-Bob paid-state transition; no product or performance qualification.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "space-age = 2.1.23",
+    "bobplates = 3.0.2",
+    "bobtech = 3.0.0",
+    "boblogistics = 3.0.2",
+    "more-infinite-research = 5.0.21005"
+  ]
+}

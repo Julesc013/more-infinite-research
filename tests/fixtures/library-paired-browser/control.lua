@@ -94,6 +94,11 @@ local function selected_arm()
   local key = setting and setting.value
   local arm = ARMS[key]
   if arm == nil then fail("fixture arm selector is absent or invalid") end
+  -- The public 5.0.5 package uses the same public Library actions and native
+  -- preservation oracle. Admit its exact identity without changing old inputs.
+  if key == "mir5" and script.active_mods["more-infinite-research"] == "5.0.20005" then
+    return {key = arm.key, mir_version = "5.0.20005", selector = arm.selector, shape = arm.shape}
+  end
   return arm
 end
 

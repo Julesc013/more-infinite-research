@@ -420,6 +420,27 @@ end
         self.assertEqual(old, new)
         self.assertEqual("A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0", new["archive_sha256"]["mir-fixture-mir5-active-mods-observer_0.1.0.zip"])
 
+    def test_505_active_requires_exact_identity_and_preserves_pending_damage(self):
+        guard = self.lua.eval("repair_stress_mode_guard")
+        f210 = ("2.1.23",) * 5
+        admitted = guard(str(CONTROL), *f210, "5.0.21005", "0.2.0", "0.1.0")
+        self.assertIn("runtime setting is not enabled", admitted["message"])
+        for version, fixture, active in (("5.0.21004", "0.2.0", "0.1.0"),
+                                          ("5.0.21006", "0.2.0", "0.1.0"),
+                                          ("5.0.21005", "0.1.0", "0.1.0"),
+                                          ("5.0.21005", "0.2.0", None),
+                                          ("5.0.21005", "0.2.0", "0.2.0")):
+            result = guard(str(CONTROL), *f210, version, fixture, active)
+            self.assertFalse(result["ok"])
+            self.assertNotIn("runtime setting is not enabled", result["message"])
+        result = self.lua.eval("repair_stress_observer_opponent")(str(CONTROL), "active-start", True, "5.0.21005")
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual((1000, 128, 128, 744, 0, 1003),
+                         (result["total"], result["player"], result["friendly"], result["overflow"], result["damage_before_load"], result["damage_after_start"]))
+        reports = [result["reports"][i] for i in range(1, len(result["reports"]) + 1)]
+        self.assertEqual(["prepared", "start"], [row["stage"] for row in reports])
+        self.assertTrue(reports[-1]["witnesses"]["pending_physical_work"])
+
     def test_native_shaped_settings_stage_precedes_runtime_setting_and_rejects_absence_or_drift(self):
         path = str(SETTINGS_UPDATE)
         selected = self.lua.eval("repair_stress_settings")(path, True, False)

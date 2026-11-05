@@ -1,0 +1,333 @@
+{
+  "schema": 1,
+  "kind": "MIRApiCurrent505ConsumedInputApplicabilityV1",
+  "status": "accepted-bounded-unchanged-protocol-reuse-new-product-host-readback",
+  "prior_accepted_review": {
+    "repository": "Julesc013/mir-native-worker",
+    "commit": "cf7c985564851526a39f97034b1ba20aa3827421",
+    "path": "evidence/aero-final504-combined-review-r01",
+    "review_sha256": "DECD1A0A26110489ACAE2725F94788E9579B99F9FAB6C8DBC0DE42EF817D4060",
+    "source": "026f6a3965a2d51e1dffa9782f3a8b2bea78b6a5"
+  },
+  "original_qualification": {
+    "path": "spec/evidence/api1-documented-subset-qualification-r01.json",
+    "source": "42032477d45ced683e72736a4fe30a7a3195b995",
+    "identities_retained": true
+  },
+  "published505_source": "5d173925bce29ad8917346897706a0fcee4553e4",
+  "published505_player_tree": "41d36ed8db131404692d5c054da3c87f7b54aecb",
+  "review_dev": "92e5da419c036e2fc7f4d8644a436aed5df904ea",
+  "unchanged_source": [
+    {
+      "path": "source/api/v1/data.lua",
+      "bytes": 12993,
+      "sha256": "9CCDD2B5FFBE14156D002F50ECEB9799F70124CADA0A0A3767D84CA242413FA5",
+      "equal_accepted504_and_published505_and_review_dev": true
+    },
+    {
+      "path": "source/api/v1/runtime.lua",
+      "bytes": 3663,
+      "sha256": "5FA121E602EF99CC67DAE4C1E17C5334A8FB26BBEF97F00BF0AE9AE242D9C873",
+      "equal_accepted504_and_published505_and_review_dev": true
+    },
+    {
+      "path": "source/research/generator.lua",
+      "bytes": 5491,
+      "sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526",
+      "equal_accepted504_and_published505_and_review_dev": true
+    },
+    {
+      "path": "source/control.lua",
+      "bytes": 248,
+      "sha256": "17201196D4EB573265CE34C0599748ED78DF856EBFCB4229018C05C4E056C0C9",
+      "equal_accepted504_and_published505_and_review_dev": true
+    },
+    {
+      "path": "source/runtime/bootstrap.lua",
+      "bytes": 34103,
+      "sha256": "7DB9F5C114217B80BAC4851202EB60C9AB9BE915B4845D73FA03CF4C43B9B64A",
+      "equal_accepted504_and_published505_and_review_dev": true
+    },
+    {
+      "path": "spec/api.md",
+      "bytes": 14313,
+      "sha256": "61302263D266E82D5E154EEA438D768DBB34E88E27BD4A9AD68A2710880D24C3",
+      "equal_accepted504_and_published505_and_review_dev": true
+    }
+  ],
+  "closed_import_edges": {
+    "api/v1/data.lua": [
+      "__more-infinite-research__/research/generator",
+      "__more-infinite-research__/platform/target"
+    ],
+    "api/v1/runtime.lua": [
+      "platform.target"
+    ],
+    "research/generator.lua": []
+  },
+  "packages": [
+    {
+      "target": "f200",
+      "published504_sha256": "34F14D93A1262F32B45EBAB40B1C640B8B8FBE41B718492227024649E9E75268",
+      "published505_sha256": "764CE505DF162C2D95E9218C0B7684AB4811940F8B43698FCE681DEA71AB284D",
+      "members": [
+        {
+          "path": "api/v1/data.lua",
+          "published504_exact_member": "more-infinite-research_5.0.20004/api/v1/data.lua",
+          "published505_exact_member": "more-infinite-research_5.0.20005/api/v1/data.lua",
+          "bytes": 12993,
+          "sha256": "9CCDD2B5FFBE14156D002F50ECEB9799F70124CADA0A0A3767D84CA242413FA5",
+          "equal_accepted504": true
+        },
+        {
+          "path": "api/v1/runtime.lua",
+          "published504_exact_member": "more-infinite-research_5.0.20004/api/v1/runtime.lua",
+          "published505_exact_member": "more-infinite-research_5.0.20005/api/v1/runtime.lua",
+          "bytes": 3663,
+          "sha256": "5FA121E602EF99CC67DAE4C1E17C5334A8FB26BBEF97F00BF0AE9AE242D9C873",
+          "equal_accepted504": true
+        },
+        {
+          "path": "research/generator.lua",
+          "published504_exact_member": "more-infinite-research_5.0.20004/research/generator.lua",
+          "published505_exact_member": "more-infinite-research_5.0.20005/research/generator.lua",
+          "bytes": 5491,
+          "sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526",
+          "equal_accepted504": true
+        },
+        {
+          "path": "thumbnail.png",
+          "published504_exact_member": "more-infinite-research_5.0.20004/thumbnail.png",
+          "published505_exact_member": "more-infinite-research_5.0.20005/thumbnail.png",
+          "bytes": 90975,
+          "sha256": "65FDEC0B0B30967B0EDBC3B340D87B01D6A2E6D971A731734673023C02331FAB",
+          "equal_accepted504": true
+        },
+        {
+          "path": "control.lua",
+          "published504_exact_member": "more-infinite-research_5.0.20004/control.lua",
+          "published505_exact_member": "more-infinite-research_5.0.20005/control.lua",
+          "bytes": 248,
+          "sha256": "17201196D4EB573265CE34C0599748ED78DF856EBFCB4229018C05C4E056C0C9",
+          "equal_accepted504": true
+        },
+        {
+          "path": "runtime/bootstrap.lua",
+          "published504_exact_member": "more-infinite-research_5.0.20004/runtime/bootstrap.lua",
+          "published505_exact_member": "more-infinite-research_5.0.20005/runtime/bootstrap.lua",
+          "bytes": 34103,
+          "sha256": "7DB9F5C114217B80BAC4851202EB60C9AB9BE915B4845D73FA03CF4C43B9B64A",
+          "equal_accepted504": true
+        }
+      ],
+      "target_metadata": {
+        "published504_exact_member": "more-infinite-research_5.0.20004/platform/target.lua",
+        "published505_exact_member": "more-infinite-research_5.0.20005/platform/target.lua",
+        "old_sha256": "C21CD577D36E63B7EAF092A3EB8AF7F56BB27D911BAD1941C32D06489C42ED21",
+        "new_sha256": "47F512BC9BB98F3143E52327B2711203983F9723644880DD6C150CC66908796B",
+        "only_distribution_version_literal_changed": true
+      }
+    },
+    {
+      "target": "f210",
+      "published504_sha256": "154707C40ED772A09387BF4FB673D337796FFBCEAF1C3C57EA7DB9C3F608E922",
+      "published505_sha256": "3537810989FCD72232AF4597B28C699D83AE0E9B77FDAF42AF57A01E29B65E6A",
+      "members": [
+        {
+          "path": "api/v1/data.lua",
+          "published504_exact_member": "more-infinite-research_5.0.21004/api/v1/data.lua",
+          "published505_exact_member": "more-infinite-research_5.0.21005/api/v1/data.lua",
+          "bytes": 12993,
+          "sha256": "9CCDD2B5FFBE14156D002F50ECEB9799F70124CADA0A0A3767D84CA242413FA5",
+          "equal_accepted504": true
+        },
+        {
+          "path": "api/v1/runtime.lua",
+          "published504_exact_member": "more-infinite-research_5.0.21004/api/v1/runtime.lua",
+          "published505_exact_member": "more-infinite-research_5.0.21005/api/v1/runtime.lua",
+          "bytes": 3663,
+          "sha256": "5FA121E602EF99CC67DAE4C1E17C5334A8FB26BBEF97F00BF0AE9AE242D9C873",
+          "equal_accepted504": true
+        },
+        {
+          "path": "research/generator.lua",
+          "published504_exact_member": "more-infinite-research_5.0.21004/research/generator.lua",
+          "published505_exact_member": "more-infinite-research_5.0.21005/research/generator.lua",
+          "bytes": 5491,
+          "sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526",
+          "equal_accepted504": true
+        },
+        {
+          "path": "thumbnail.png",
+          "published504_exact_member": "more-infinite-research_5.0.21004/thumbnail.png",
+          "published505_exact_member": "more-infinite-research_5.0.21005/thumbnail.png",
+          "bytes": 90975,
+          "sha256": "65FDEC0B0B30967B0EDBC3B340D87B01D6A2E6D971A731734673023C02331FAB",
+          "equal_accepted504": true
+        },
+        {
+          "path": "control.lua",
+          "published504_exact_member": "more-infinite-research_5.0.21004/control.lua",
+          "published505_exact_member": "more-infinite-research_5.0.21005/control.lua",
+          "bytes": 248,
+          "sha256": "17201196D4EB573265CE34C0599748ED78DF856EBFCB4229018C05C4E056C0C9",
+          "equal_accepted504": true
+        },
+        {
+          "path": "runtime/bootstrap.lua",
+          "published504_exact_member": "more-infinite-research_5.0.21004/runtime/bootstrap.lua",
+          "published505_exact_member": "more-infinite-research_5.0.21005/runtime/bootstrap.lua",
+          "bytes": 34103,
+          "sha256": "7DB9F5C114217B80BAC4851202EB60C9AB9BE915B4845D73FA03CF4C43B9B64A",
+          "equal_accepted504": true
+        }
+      ],
+      "target_metadata": {
+        "published504_exact_member": "more-infinite-research_5.0.21004/platform/target.lua",
+        "published505_exact_member": "more-infinite-research_5.0.21005/platform/target.lua",
+        "old_sha256": "6925A5417FCEF1081158FE7354E03F7708869141B9541F59067AE0ACB2A4F589",
+        "new_sha256": "21B13AE984B9E2378FB349DF13B29CC826B0ABA586434B3C82584FD2A6FBF639",
+        "only_distribution_version_literal_changed": true
+      }
+    }
+  ],
+  "packaged_metadata_host_checks": [
+    {
+      "target": "f200",
+      "surface": "data",
+      "product": "5.0.20005",
+      "api_major": 1,
+      "api_minor": 0,
+      "detached_result": true,
+      "status": "passed-packaged-Lua52-host-only"
+    },
+    {
+      "target": "f200",
+      "surface": "runtime",
+      "product": "5.0.20005",
+      "api_major": 1,
+      "api_minor": 0,
+      "detached_result": true,
+      "status": "passed-packaged-Lua52-host-only"
+    },
+    {
+      "target": "f210",
+      "surface": "data",
+      "product": "5.0.21005",
+      "api_major": 1,
+      "api_minor": 0,
+      "detached_result": true,
+      "status": "passed-packaged-Lua52-host-only"
+    },
+    {
+      "target": "f210",
+      "surface": "runtime",
+      "product": "5.0.21005",
+      "api_major": 1,
+      "api_minor": 0,
+      "detached_result": true,
+      "status": "passed-packaged-Lua52-host-only"
+    }
+  ],
+  "pinned_host_runtime": {
+    "lua": "5.2",
+    "module_sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899"
+  },
+  "unchanged_original_consumer_fixture_files": [
+    {
+      "path": "tests/fixtures/api-alpha/control.lua",
+      "sha256": "8C5531606C96A1B93DD7B2E72C46F239866FC1EB161728BCFD66635B9592C8DB",
+      "bytes": 4989
+    },
+    {
+      "path": "tests/fixtures/api-alpha/data.lua",
+      "sha256": "EF8BF389DF2694649EBF70B2F94C00E964D0AAA43AD72CC6A930B85203E41881",
+      "bytes": 736
+    },
+    {
+      "path": "tests/fixtures/api-alpha/graphics/icon.png",
+      "sha256": "AAEB6587D7BB7F5332AF05DAB446DF3DB3B100C0776E45FA078DE2A574DABB3D",
+      "bytes": 137
+    },
+    {
+      "path": "tests/fixtures/api-alpha/info-f200.json",
+      "sha256": "8F1C8AD42C31C9FD3230E4446E0622D31B2780AAA8B3ED1C262CB0EA9E1D60CE",
+      "bytes": 375
+    },
+    {
+      "path": "tests/fixtures/api-alpha/info.json",
+      "sha256": "CC8C9254B536C16B44A6F9E7B4B63250F1477C5ADAF2337C1A401A8E459DCF7F",
+      "bytes": 375
+    },
+    {
+      "path": "tests/fixtures/api-beta-production/control.lua",
+      "sha256": "CFAF0D288CD51BF03BCF88D09468858A5DD11AC52EF6E4216673EE2AF306B5CF",
+      "bytes": 14105
+    },
+    {
+      "path": "tests/fixtures/api-beta-production/info-f200.json",
+      "sha256": "FCBDBA570B4CD4485B60E930633AD9A52503159195B3BA0D92A73CF127233A71",
+      "bytes": 432
+    },
+    {
+      "path": "tests/fixtures/api-beta-production/info.json",
+      "sha256": "2DDBF822E5C06774BCBEB88F0341026E4EB152D0A468EAF6DC061C17060FCB46",
+      "bytes": 432
+    },
+    {
+      "path": "tests/fixtures/api-beta/control.lua",
+      "sha256": "81994E94DE86BFBB303160196A3E6EA99A00FD527A552763E7F6EDC18FF8F729",
+      "bytes": 4428
+    },
+    {
+      "path": "tests/fixtures/api-beta/data-final-fixes.lua",
+      "sha256": "66502AB391A50F57D30150CDE9BDAEBE42ACDC2101A75AC15E54D9D8AC27B2B4",
+      "bytes": 952
+    },
+    {
+      "path": "tests/fixtures/api-beta/graphics/icon.png",
+      "sha256": "530F9250623036693D3E5A79F830B9C8A6D61E727C92219FD6A28EE62A424CCE",
+      "bytes": 137
+    },
+    {
+      "path": "tests/fixtures/api-beta/info-f200.json",
+      "sha256": "40DA274C7B3A907BD9CB52561FB651D12A104BCDFA5DC28F2862C8EF9445E055",
+      "bytes": 380
+    },
+    {
+      "path": "tests/fixtures/api-beta/info.json",
+      "sha256": "5C2611225712DFD0B89B77DDCB13267F48AD5E6592BE535282C82015E8DB486C",
+      "bytes": 380
+    }
+  ],
+  "applicability": [
+    {
+      "method": "add_technology/add_technologies/add_productivity",
+      "decision": "Retain original bounded numeric-definition/native-effect and consumer evidence at its exact original engine/fixture/package identities. Unchanged API,Generator,target capability flags,icon and13consumer files justify protocol reuse; this is not a new505 native or arbitrary-modpack pass."
+    },
+    {
+      "method": "get_capabilities/get_research",
+      "decision": "Retain original native status schema and query semantics. The complete bootstrap,control entrypoint and pure target-based API implementation are byte-identical to accepted026f/504. No catalogue,credit ledger or MIR storage is read by the query. Affected current research/save state retains its separate505 native evidence; no API client call is invented."
+    },
+    {
+      "method": "get_version",
+      "decision": "Four actual packaged505 data/runtime Lua52 getters pass with20005/21005 and API1.0. Old00000/00004 native or host strings retain their actual identities. These four new checks are host-only."
+    },
+    {
+      "method": "optional absence",
+      "decision": "Keep exact original F200/D3 and F210/FE4 absence identities; no new8DC absence run is implied."
+    },
+    {
+      "method": "legacy Browser/Settings search and actual clients",
+      "decision": "Still require explicit and retained Settings-tab legacy search with independent native research/query state in the actual current Library case. API equivalence and scripted retained-window completion do not qualify this older interface or all client behavior."
+    }
+  ],
+  "surrounding_change": "505 changes selected science binding,Library German text and release metadata. The accepted504 API/Generator,control and complete bootstrap bytes are unchanged. Later dev92e5 pipeline-zero correction is outside this API closure and outside published505; no new package is built or relabelled.",
+  "native_execution": false,
+  "new_host_checks": 4,
+  "old_evidence_relabelled": false,
+  "player_source_changes": false,
+  "whole_api_or_historical_matrix_restarted": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}

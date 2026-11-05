@@ -720,6 +720,17 @@ function Get-PairedBrowserStageMarker([string]$Text, [string]$Stage, [string]$Ex
   Assert-PairedBrowserBoolean $row.performance_acceptance $false 'performance_acceptance' $Stage
   return $row
 }
+function Wait-PairedBrowserClientCompletion([object[]]$Clients, [string]$ExpectedArm) {
+  foreach ($client in $Clients) {
+    $clientLogPath = $client.native_log_path
+    # The host can finish a simulation tick before either client reaches it.
+    # Observe each owned peer's completion before ending its memory window.
+    [void](Wait-For ("paired Browser $($client.name) completed marker") {
+      param($ignored)
+      Get-PairedBrowserStageMarker (Read-LogText $clientLogPath) 'completed' $ExpectedArm
+    })
+  }
+}
 function Get-PairedBrowserProfilerMarkers([string]$Text, [string[]]$ExpectedActions) {
   $allowed = @('first_open','search','refresh','reopen')
   $rows = [Collections.Generic.List[object]]::new()
@@ -983,6 +994,7 @@ function Start-Clients([string]$Phase) {
     $clientLogBaselines[[string]$client.name]=Read-LogText $clientLogPath
     $serverLogBefore=Read-LogText (Join-Path $serverWriteData 'factorio-current.log')
     $actor=Start-Native ("client-$Phase-$($client.locale)") (@('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$client.port)+$clientGraphics)
+    $actor | Add-Member -NotePropertyName native_log_path -NotePropertyValue $clientLogPath
     $started.Add($actor)
     # Each native startup writes the shared library's settings cache. Wait
     # until the first real join proves those startup writes finished before
@@ -1069,7 +1081,11 @@ try {
     }
     $screenshots = @($captures.files)
     Assert-Session ($screenshots.Count -eq 12) 'paired Browser final screenshot inventory differs'
-    foreach ($client in $activeClients) { Stop-Record $client }
+    Wait-PairedBrowserClientCompletion $activeClients $pairedArm
+    foreach ($client in $activeClients) {
+      Stop-Record $client
+      Assert-Session ($null -ne (Get-PairedBrowserStageMarker (Read-LogText $client.stdout) 'completed' $pairedArm)) 'closed paired Browser client transcript lacks completion'
+    }
     $activeClients = @()
     Stop-Record $server
     $server = $null

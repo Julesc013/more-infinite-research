@@ -1,0 +1,526 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalReportedUpgradeObligationsReviewV1",
+  "reviewed_on": "2026-11-06",
+  "reviewed_against": "5e71ed7061ba5def5eec0027b0c11d42e6ec2ec8",
+  "player_tree": "e6f1df44390a5d88cd8dce524c43e3b15ee2b81d",
+  "scope": "Reuse recovered621/446 originals; reconcile15 existing progression/OmniAB/RIC requests and one named RIC historical-source/current-host discrepancy. No broad ecosystem or stable verdict.",
+  "requirements": [
+    "VER-07",
+    "CONT-07",
+    "CONT-12",
+    "CONT-15"
+  ],
+  "original_report_dispositions": [
+    {
+      "issue": 621,
+      "existing_recovery": "spec/evidence/historical-missing-originals-recovery-aero-r01.json",
+      "current_secretas_disposition": "spec/evidence/historical-secretas-current-disposition-aero-r01.json",
+      "result": "Originals/screenshots already recovered. Preserve missing reporter package/engine/mod/settings/save limits. Named Secretas source/host correction exists; current candidate useful-work/state/provider qualifications remain separate. Original4.2 emergency deadlines are historical, not a new MIR5 deadline."
+    },
+    {
+      "issue": 446,
+      "result": "Historical maintenance queue, not a current native verdict. Retain its original requested groups and missing reporter inputs. The15 selected underlying request rows retain their exact text/decisions/statuses across three original release refs."
+    }
+  ],
+  "original_ledger_bindings": [
+    {
+      "tag": "v4.2.0-stable",
+      "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+      "path": "spec/programmes/community-requests.json",
+      "sha256": "7A8E6A1D8552C13169CA8551070AC399E3CC3573846D115598FFAD08C842C48F",
+      "selected_rows_equal_current_originals": true
+    },
+    {
+      "tag": "v4.2.2",
+      "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+      "path": "spec/programmes/community-requests.json",
+      "sha256": "BFEA3860459FCA18B4197FB0E3CD9608823C9FB774F483B386B9DFD9127F21D7",
+      "selected_rows_equal_current_originals": true
+    },
+    {
+      "tag": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "spec/programmes/community-requests.json",
+      "sha256": "BFEA3860459FCA18B4197FB0E3CD9608823C9FB774F483B386B9DFD9127F21D7",
+      "selected_rows_equal_current_originals": true
+    }
+  ],
+  "request_routes": [
+    {
+      "id": "PROG-01",
+      "original_decision": "commit-4.2",
+      "original_status": "requested-not-qualified",
+      "route": {
+        "state": "partial-authored-finite-progression-not-whole-request-qualified",
+        "current_source": [
+          "source/research/material_stages.lua",
+          "source/research/bob_core_materials.lua",
+          "source/research/bob_tech_materials.lua",
+          "source/runtime/library_production.lua"
+        ],
+        "evidence": [
+          "spec/evidence/historical-reported-upgrade-obligations-r01.json",
+          "spec/evidence/bob-core-f210-reference-native-chain.json",
+          "spec/evidence/bob-tech-f210-gameplay-native-chain.json"
+        ],
+        "scope": "Authored early finite material stages and later continuations exist for named Bob/Angel profiles. Existing native observations retain their original profiles. The read-only on-demand Library science-flow snapshot is not proof of the proposed opt-in production load-check view or meaningful costs at every tier.",
+        "remaining_executable_check": "Match each claimed material/progression subset to its independently captured frontier and affected saved-state result. Retain unimplemented or unqualified request parts, including the proposed view, explicitly; do not invent a dummy science sink.",
+        "owner": "Aero source/expectations; Black Glass native/integration",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved. Source/intake mapping is not native or stable acceptance."
+        ]
+      }
+    },
+    {
+      "id": "OAB-01",
+      "original_decision": "commit-4.2-qualified-subsets",
+      "original_status": "requested-not-qualified",
+      "route": {
+        "state": "historical-selection-prepared-not-native-qualified",
+        "current_source": [
+          "source/compatibility/modern_catalogue.lua",
+          "source/compatibility/product_bindings.lua",
+          "source/compatibility/product_targets.lua"
+        ],
+        "evidence": [
+          "spec/evidence/historical-reported-upgrade-obligations-r01.json"
+        ],
+        "scope": "The preserved 46-mod F200 selection is explicitly acquired-exact-selection-not-native-qualified; an archive pin is not a passing installed subset.",
+        "remaining_executable_check": "Validate one actual dependency-valid subset with fixed inputs before any claim; preserve conflict exclusions and graphics/gameplay distinctions.",
+        "owner": "Aero source/expectations; Black Glass native/integration",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved. Source/intake mapping is not native or stable acceptance."
+        ]
+      }
+    },
+    {
+      "id": "OAB-02",
+      "original_decision": "commit-4.2",
+      "original_status": "requested-not-qualified",
+      "route": {
+        "state": "shared-material-bindings-present-omni-ownership-unqualified",
+        "current_source": [
+          "source/compatibility/modern_catalogue.lua",
+          "source/compatibility/product_bindings.lua",
+          "source/compatibility/product_targets.lua"
+        ],
+        "evidence": [
+          "spec/evidence/historical-reported-upgrade-obligations-r01.json"
+        ],
+        "scope": "Shared Bob/Angel families and bounded product targeting exist; this is not an OmniAB ownership or alias verdict.",
+        "remaining_executable_check": "Observe final recipe/product identities and one effective research owner in the selected subset; compare bonuses and preserve existing state.",
+        "owner": "Aero source/expectations; Black Glass native/integration",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved. Source/intake mapping is not native or stable acceptance."
+        ]
+      }
+    },
+    {
+      "id": "OAB-03",
+      "original_decision": "commit-4.2",
+      "original_status": "requested-not-qualified",
+      "route": {
+        "state": "requested-rescue-route-policy-unqualified",
+        "current_source": [
+          "source/compatibility/modern_catalogue.lua",
+          "source/compatibility/product_bindings.lua",
+          "source/compatibility/product_targets.lua"
+        ],
+        "evidence": [
+          "spec/evidence/historical-reported-upgrade-obligations-r01.json"
+        ],
+        "scope": "Ordinary/rescue/conversion route roles and maximum-bonus economics are not proved by generic recipe matching.",
+        "remaining_executable_check": "Classify the actual selected rescue/ordinary routes independently and demonstrate reachable early/late progression and useful output before admission.",
+        "owner": "Aero source/expectations; Black Glass native/integration",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved. Source/intake mapping is not native or stable acceptance."
+        ]
+      }
+    },
+    {
+      "id": "OAB-04",
+      "original_decision": "commit-4.2",
+      "original_status": "requested-not-qualified",
+      "route": {
+        "state": "requested-upstream-lifecycle-preservation-unqualified",
+        "current_source": [
+          "source/compatibility/modern_catalogue.lua",
+          "source/compatibility/product_bindings.lua",
+          "source/compatibility/product_targets.lua"
+        ],
+        "evidence": [
+          "spec/evidence/historical-reported-upgrade-obligations-r01.json"
+        ],
+        "scope": "Extraction-tier retirement and machine recipe/content state remain upstream-owned; no MIR-specific qualified transition is established here.",
+        "remaining_executable_check": "Observe an actual affected tier change and protected save/reload; verify MIR does not acquire upstream tier state.",
+        "owner": "Aero source/expectations; Black Glass native/integration",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved. Source/intake mapping is not native or stable acceptance."
+        ]
+      }
+    },
+    {
+      "id": "OAB-05",
+      "original_decision": "commit-4.2-policy",
+      "original_status": "requested-not-qualified",
+      "route": {
+        "state": "reversible-process-policy-retained-no-general-admission",
+        "current_source": [
+          "source/compatibility/modern_catalogue.lua",
+          "source/compatibility/product_bindings.lua",
+          "source/compatibility/product_targets.lua"
+        ],
+        "evidence": [
+          "spec/evidence/historical-reported-upgrade-obligations-r01.json"
+        ],
+        "scope": "The original conservative compression/reverse-route decision remains. Recipe permission or a matching product alone does not qualify a reversible process.",
+        "remaining_executable_check": "For any proposed route, bind the actual process and maximum bonus before admission; retain unqualified routes rather than create a global solver.",
+        "owner": "Aero source/expectations; Black Glass native/integration",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved. Source/intake mapping is not native or stable acceptance."
+        ]
+      }
+    },
+    {
+      "id": "OAB-06",
+      "original_decision": "commit-4.2-qualified-subsets",
+      "original_status": "requested-not-qualified",
+      "route": {
+        "state": "requested-starting-location-matrix-unqualified",
+        "current_source": [
+          "source/compatibility/modern_catalogue.lua",
+          "source/compatibility/product_bindings.lua",
+          "source/compatibility/product_targets.lua"
+        ],
+        "evidence": [
+          "spec/evidence/historical-reported-upgrade-obligations-r01.json"
+        ],
+        "scope": "The prepared ordinary F200 selection does not qualify alternative starts or planet combinations.",
+        "remaining_executable_check": "Name each actually claimed start/planet subset and its progression, lab and rescue-route checks. No universal combination claim follows.",
+        "owner": "Aero source/expectations; Black Glass native/integration",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved. Source/intake mapping is not native or stable acceptance."
+        ]
+      }
+    },
+    {
+      "id": "RIC-01",
+      "original_decision": "commit-4.2-qualified-subsets",
+      "original_status": "requested-not-qualified",
+      "route": {
+        "state": "partial-actual-provider-intake-not-native-qualified",
+        "current_source": [
+          "source/compatibility/modern_catalogue.lua",
+          "source/research/catalogue.lua",
+          "source/runtime/catalogue.lua"
+        ],
+        "evidence": [
+          "spec/evidence/historical-reported-upgrade-obligations-r01.json"
+        ],
+        "scope": "Actual read-only RIC0.35.8 metadata identifies real-industrial-chemistry and its graphics/framework dependencies. This archive is not the old0.36.1 observation or a dependency-valid native run.",
+        "remaining_executable_check": "Use the actual engine/provider/dependency/settings closure; separate graphics packages from gameplay owners. Missing exact originals remain explicit without blocking first evaluation of available compatible inputs.",
+        "owner": "Aero source/expectations; Black Glass native/integration",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved. Source/intake mapping is not native or stable acceptance."
+        ]
+      }
+    },
+    {
+      "id": "RIC-02",
+      "original_decision": "commit-4.2",
+      "original_status": "requested-not-qualified",
+      "route": {
+        "state": "known-mode-inputs-without-current-ric-qualification",
+        "current_source": [
+          "source/compatibility/modern_catalogue.lua",
+          "source/research/catalogue.lua",
+          "source/runtime/catalogue.lua"
+        ],
+        "evidence": [
+          "spec/evidence/historical-reported-upgrade-obligations-r01.json"
+        ],
+        "scope": "The actual archive declares independent ric-world-mode and ric-progression-mode startup settings; no current RIC-specific lab/progression qualification is established.",
+        "remaining_executable_check": "Observe the materially claimed geography/progression modes and any AAI lab handoff with actual science/research/save results.",
+        "owner": "Aero source/expectations; Black Glass native/integration",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved. Source/intake mapping is not native or stable acceptance."
+        ]
+      }
+    },
+    {
+      "id": "RIC-03",
+      "original_decision": "commit-4.2",
+      "original_status": "requested-not-qualified",
+      "route": {
+        "state": "historical-named-route-with-current-host-discrepancy",
+        "current_source": [
+          "source/compatibility/modern_catalogue.lua",
+          "source/research/catalogue.lua",
+          "source/runtime/catalogue.lua"
+        ],
+        "evidence": [
+          "spec/evidence/historical-reported-upgrade-obligations-r01.json"
+        ],
+        "scope": "Published4.7.3 source declares the Marine coke identity and preserves an earlier development-only+2% observation. Current e6f1 source has no named RIC coke row in the narrow actual-recipe projection; the preserved historical data oracle rejects it. No broad RIC compatibility or exact published4.7.3 native result is inferred.",
+        "remaining_executable_check": "Establish actual published predecessor emission/earned state using retained originals or available compatible inputs. Resolve the named identity, reward, cost/science/cap and saved-state obligation consistently; run affected useful research and save/two-cold checks before a correction claim.",
+        "owner": "Aero source/expectations; Black Glass native/integration",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved. Source/intake mapping is not native or stable acceptance."
+        ]
+      }
+    },
+    {
+      "id": "RIC-04",
+      "original_decision": "commit-4.2-policy-with-route-gates",
+      "original_status": "requested-not-qualified",
+      "route": {
+        "state": "historical-withheld-route-policy-not-general-chemistry-support",
+        "current_source": [
+          "source/compatibility/modern_catalogue.lua",
+          "source/research/catalogue.lua",
+          "source/runtime/catalogue.lua"
+        ],
+        "evidence": [
+          "spec/evidence/historical-reported-upgrade-obligations-r01.json"
+        ],
+        "scope": "The original Marine fixture withholds sixteen named return-path routes while observing one forward carbonisation route. That is no blanket certificate for ordinary or closed-loop chemistry.",
+        "remaining_executable_check": "Retain those exclusions; assess each additional actual process independently, including returns/probabilities/maximum bonus, waste and emergency sinks.",
+        "owner": "Aero source/expectations; Black Glass native/integration",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved. Source/intake mapping is not native or stable acceptance."
+        ]
+      }
+    },
+    {
+      "id": "RIC-05",
+      "original_decision": "commit-4.2-policy-with-route-gates",
+      "original_status": "requested-not-qualified",
+      "route": {
+        "state": "requested-openpit-owner-classification-unqualified",
+        "current_source": [
+          "source/compatibility/modern_catalogue.lua",
+          "source/research/catalogue.lua",
+          "source/runtime/catalogue.lua"
+        ],
+        "evidence": [
+          "spec/evidence/historical-reported-upgrade-obligations-r01.json"
+        ],
+        "scope": "No RIC-specific resource/survey/token lifecycle qualification is established by the one carbonisation observation or generic mining research.",
+        "remaining_executable_check": "Identify actual production resources versus survey/state tokens and verify upstream deposit ownership before applying an effect.",
+        "owner": "Aero source/expectations; Black Glass native/integration",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved. Source/intake mapping is not native or stable acceptance."
+        ]
+      }
+    },
+    {
+      "id": "RIC-06",
+      "original_decision": "commit-4.2",
+      "original_status": "requested-not-qualified",
+      "route": {
+        "state": "requested-aai-ric-coexistence-unqualified",
+        "current_source": [
+          "source/compatibility/modern_catalogue.lua",
+          "source/research/catalogue.lua",
+          "source/runtime/catalogue.lua"
+        ],
+        "evidence": [
+          "spec/evidence/historical-reported-upgrade-obligations-r01.json"
+        ],
+        "scope": "Shared AAI bindings do not establish RIC final-owner aliases or a reachable AAI/RIC laboratory transition.",
+        "remaining_executable_check": "Use the final actual recipes/labs, check alias uniqueness and affected saved research under that selected combination.",
+        "owner": "Aero source/expectations; Black Glass native/integration",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved. Source/intake mapping is not native or stable acceptance."
+        ]
+      }
+    },
+    {
+      "id": "RIC-07",
+      "original_decision": "probe-4.2-not-promised",
+      "original_status": "requested-not-qualified",
+      "route": {
+        "state": "probe-not-promised-or-admitted",
+        "current_source": [
+          "source/compatibility/modern_catalogue.lua",
+          "source/research/catalogue.lua",
+          "source/runtime/catalogue.lua"
+        ],
+        "evidence": [
+          "spec/evidence/historical-reported-upgrade-obligations-r01.json"
+        ],
+        "scope": "The original decision is probe-4.2-not-promised. It does not promise general boiler/heating efficiency or admit a utility effect.",
+        "remaining_executable_check": "Only investigate a named writable effect with measured useful output if this optional probe is selected; preserve unsupported capability outcomes as such.",
+        "owner": "Aero source/expectations; Black Glass native/integration",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved. Source/intake mapping is not native or stable acceptance."
+        ]
+      }
+    },
+    {
+      "id": "RIC-08",
+      "original_decision": "commit-4.2",
+      "original_status": "requested-not-qualified",
+      "route": {
+        "state": "shared-library-present-ric-coverage-unqualified",
+        "current_source": [
+          "source/presentation/library_model.lua",
+          "source/runtime/library.lua",
+          "source/runtime/library_production.lua"
+        ],
+        "evidence": [
+          "spec/evidence/historical-reported-upgrade-obligations-r01.json"
+        ],
+        "scope": "The Library has generic recipe/owner/science/productivity information; absent named RIC coverage cannot be presented as a qualified RIC explanation or benefit.",
+        "remaining_executable_check": "When a RIC route is admitted, verify the corresponding in-game recipe/owner/science/cap/omission and next-level benefit with that actual package.",
+        "owner": "Aero source/expectations; Black Glass native/integration",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved. Source/intake mapping is not native or stable acceptance."
+        ]
+      }
+    }
+  ],
+  "omni_prepared_profile": {
+    "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+    "path": "fixtures/run-profiles/mir430-startup-omni-bob-angel-46-f200.json",
+    "sha256": "E8563CBAD2EAA79694ABF7C7A18FE74820F785FC75131A94B3A077F5B438298B",
+    "status": "acquired-exact-selection-not-native-qualified",
+    "selected_mods": 46,
+    "native_qualification": false
+  },
+  "ric_observation": {
+    "kind": "RICMarineHistoricalOracleCurrentSourceObservationV1",
+    "source": "5e71ed7061ba5def5eec0027b0c11d42e6ec2ec8",
+    "player_tree": "e6f1df44390a5d88cd8dce524c43e3b15ee2b81d",
+    "originals": [
+      {
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "fixtures/assert-ric-marine-carbonisation/data-final-fixes.lua",
+        "blob": "cde311e9fd19659bcdeff45ec9973c725c4a9bfe",
+        "sha256": "E07E54579732539B6A133724C6AA7105F6F1AB445002AB71AAAFC3546359F60B",
+        "bytes": 4536,
+        "local": "ric-original-data-final-fixes.lua"
+      },
+      {
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "fixtures/assert-ric-marine-carbonisation/control.lua",
+        "blob": "92e06526086009816334ba28c3c23987ee8c86b0",
+        "sha256": "2588634416A4F9B7F7B52DB9D694C84A4784A7106F45F662D1FDA694A534F0D7",
+        "bytes": 2230,
+        "local": "ric-original-runtime-control.lua"
+      },
+      {
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "docs/compatibility/targets/ric-marine-carbonisation-observation.md",
+        "blob": "af73d559593155a7b5012ff5b7dabc3879137819",
+        "sha256": "6DBDFDEB0B4CA5592F361F493E7C95408E80FC81EC449E71DF9441B35040424F",
+        "bytes": 1936,
+        "local": "ric-original-ric-marine-carbonisation-observation.md"
+      },
+      {
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "source/prototypes/streams/productivity.lua",
+        "blob": "50cabb703b3a50521c9529e0b9287e32d45ba4af",
+        "sha256": "EA66B64C03943A99B877847FD6E3903A099C83AB0333A441A29957C1C2142853",
+        "bytes": 79342,
+        "local": "ric-original-productivity.lua"
+      }
+    ],
+    "ported_oracle": {
+      "local": "ric-ported-pure-data-oracle-r02.lua",
+      "sha256": "B41B8CD1D072C23408F7831412A7878465CB016DFBEB089E1A8BEE99C681E2D0",
+      "only_removed_boundary": "Retired MIR4 mod-data maximum-level-policy schema3 binding assertion; original recipe, identity, effect, unique-owner, withheld-route and coking-unlock assertions retained"
+    },
+    "upstream_archive": {
+      "locator": "C:\\Projects\\Factorio\\testmods\\2.1\\real-industrial-chemistry_0.35.8.zip",
+      "version": "0.35.8",
+      "sha256": "82108D668EA334ED71006D91A58D32D1229AF191CEF719E213AFFE5E9D26AA2F",
+      "members": [
+        {
+          "member": "info.json",
+          "sha256": "7EF0E069FEF82E6D376B794CD1A15F843B5F29C745C1DFF2EB166991BD4A8B2D",
+          "bytes": 1074,
+          "local": "ric0358-info.json"
+        },
+        {
+          "member": "settings.lua",
+          "sha256": "6AA5378AA0433B5081F8234B63B09C53D5D1A5F12E3AADDC6DA8B575E072FE2C",
+          "bytes": 664,
+          "local": "ric0358-settings.lua"
+        },
+        {
+          "member": "prototypes/recipes/marine-industry.lua",
+          "sha256": "517D8910A8509575BFC8FDEA4AC54E1F5123D4CB0AB6EDA1114D459BB6A3202C",
+          "bytes": 41901,
+          "local": "ric0358-prototypes-recipes-marine-industry.lua"
+        },
+        {
+          "member": "prototypes/technology/marine-industry.lua",
+          "sha256": "E8F25A5BEAFC6E80A53F7916AE38D53BFF8DC1FD3012802E92439B3CF75D5CD0",
+          "bytes": 14042,
+          "local": "ric0358-prototypes-technology-marine-industry.lua"
+        },
+        {
+          "member": "prototypes/technology/early-metallurgy-technology.lua",
+          "sha256": "23B1A6F750C3B3E1F8C424896DBC1FFDC983EB9CC00E88BFD3754F1E82800A71",
+          "bytes": 31360,
+          "local": "ric0358-prototypes-technology-early-metallurgy-technology.lua"
+        }
+      ]
+    },
+    "runtime": {
+      "lua": "Lua 5.2",
+      "module": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir421-lua-runtime\\lupa\\lua52.cp314-win_amd64.pyd",
+      "sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899"
+    },
+    "rows": [
+      {
+        "mode": "marine",
+        "current_published_oracle": "reject",
+        "source_technology_present": false,
+        "writes": 1,
+        "error": "[string \"<python>\"]:5: MIR RIC Marine carbonisation: MIR owner must retain the lossless infinite prototype\nstack traceback:\n\t[string \"<python>\"]:23: in main chunk\n\t[string \"<python>\"]:5: in function 'fail'\n\t[C]: in function 'error'",
+        "independent_literal_reference": "pass",
+        "wrong_reward_opponent": "reject"
+      },
+      {
+        "mode": "continental",
+        "current_published_oracle": "pass",
+        "source_technology_present": false,
+        "writes": 1
+      }
+    ],
+    "limits": [
+      "Original r01 projected coking prerequisite as a science technology; r02 corrects the direct ore-processing/automation chain from the captured upstream source. Original script/result are preserved; no native run was made.",
+      "Host projection of one actual upstream recipe and its direct unlock; not a complete RIC prototype environment or exact native reproduction.",
+      "Original development observation used RIC0.36.1 and engine2.1.20; this available archive is0.35.8. No source/history equivalence is assumed.",
+      "Literal reference is an opposing expectation control, not a product implementation or native result.",
+      "The preserved original runtime fixture used a scripted research grant, not useful-lab work.",
+      "No new player source, setting, fixture, package, native run, save or publication is created."
+    ]
+  },
+  "original_packet_limit": "The P3 source register points to dist/roadmap-expansion-2026-09-07/MASTER_PLAN.md. That exact local path was absent; the full packet is not claimed recovered in this review. The existing preserved request ledger is the decision source; no new wording is attributed to the maintainer.",
+  "limits": [
+    "Source declarations and a development-only recorded native observation do not prove full published RIC/OmniAB support.",
+    "RIC material_family uses the historical stable-unreleased marker; retain that fact and determine actual applicable publication/emission before claiming a lost delivered feature.",
+    "The corrected r02 host projection retains r01 and corrects its coking prerequisite to the actual upstream ore-processing/automation chain; no native retry or product change occurred.",
+    "All87 original request fields and earlier38 MIR5 routes are preserved. Only15 additive dispositions are new.",
+    "No source/fixture/controller, package, migration filename, setting identity, public version, original evidence or publication changes.",
+    "Unknown reporter histories and unreviewed source groups remain unresolved; no remaining required failure is waived."
+  ],
+  "native_execution": false,
+  "inventory_complete": false,
+  "stable_acceptance": false,
+  "source_custody": {
+    "repository": "Julesc013/scratchpad",
+    "repository_id": 1431086607,
+    "commit": "6a55d1224eb0f08ec312a4ffec48af69ab094a5b",
+    "path": "evidence/aero-reported-upgrade-obligations-r01/original-inputs.json.gz",
+    "sha256": "EC63CB649CD591C193505F3263A848120B138D5068C44BB20986D9D026089854",
+    "decoded_sha256": "F7F692A8C88DC47535F75263F91D3B6A63EA85C426488984970F7E53CDC5649E",
+    "records": 19,
+    "third_party_archive_and_sources_not_redistributed": true,
+    "scope": "Original MIR Git bodies, normalized public reports, three original ledgers, prepared profile, host scripts/ported oracle/results, plan and health; third-party source bytes stay in the read-only local library/custody with recorded hashes."
+  }
+}

@@ -12,12 +12,16 @@ local item_types = {
   "upgrade-item", "spidertron-remote", "rail-planner", "space-platform-starter-pack"
 }
 
--- Named membership only: lab inputs can use any concrete ItemPrototype class.
-function M.item_exists(raw, name)
+-- Named lookup only: inputs and native conversion facts can use any concrete
+-- ItemPrototype class. The returned upstream table remains caller-read-only.
+function M.item_prototype(raw, name)
   for _, kind in ipairs(item_types) do
-    if type(raw[kind]) == "table" and type(raw[kind][name]) == "table" then return true end
+    if type(raw[kind]) == "table" and type(raw[kind][name]) == "table" then return raw[kind][name] end
   end
-  return false
+end
+
+function M.item_exists(raw, name)
+  return M.item_prototype(raw, name) ~= nil
 end
 
 local function finite(value)

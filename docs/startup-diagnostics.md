@@ -5,7 +5,7 @@ applies_to: "MIR development and support diagnostics"
 audience: developer
 doc_type: guide
 owner: mir-maintainers
-last_reviewed: 2026-11-04
+last_reviewed: 2026-11-06
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -80,6 +80,28 @@ These are the original campaign endpoints and nominal95% intervals, rounded for 
 The Base candidate is source`7fdb1fa63fa6e70a0df437a57765475ba271e8da`, ZIP`6A66CF318AC908788DE24D2E3CD9D8F68421EB8AFDA4C113B2E3012FC701D64F`, not the published5.0.2 ZIP. The earlier heavy candidate is source`992c76ee24caf2d723b469c3db760cbebdf35eeb`; its chain retains the exact archive/profile/engine/settings/controller identities. These are separate experiments, with different candidate packages and declared policies. The original [Base numerical review](../spec/evidence/candidate502-base-f200-startup-numerical-review-aero-r01.json) and heavy chain retain the sampling assumptions, spread, pilot/control checks and limits; the offline extraction neither requalifies them nor transfers their verdicts to another package.
 
 Both candidate-added intervals span zero. A negative point estimate does not establish negative overhead, and no improvement percentage is calculated from that unresolved denominator. The smaller loader windows are evidence about where elapsed time was observed, while startup effects after MIR's stage can remain outside those windows. The absence of internal boundaries prevents attributing final-fixes time to recipe collection versus science, Generator work or other functions. No worthwhile internal bottleneck has been identified by these logs alone; further markers are conditional on an already-needed reproduction.
+
+## Current Base comparison
+
+The [32-row extraction](../spec/evidence/startup-phase-current-base-aero-r01.csv) adds the separate [2.1.23 Base comparison](../spec/evidence/base-startup-current-r01.json), bringing the retained extraction to150 logs. It preserves three warmups, two published A/A observations and27 scored observations in nine fixed blocks. Its candidate is the internal source`8494593d5a3c1ccd656fbee5169259e8d1efa418` package, ZIP`FAAA07142430E59E2103BEC6BA158A3878C7F9DD5FE0201C35B6BF40E9814D58`, with version5.0.21005. It is distinct from the published5.0.5 ZIP and later source corrections. The earlier failed warmup and shared latest-log copy are not pooled into these32 observations.
+
+Use the exact retained encoded capsule from private repository`Julesc013/scratchpad`, commit`f9835ee7c80ab955bb4f0c4c663e1deb54297e8c`, directory`projects/mir/runs/current-startup-r01`, as `--bodies`. The public index pins the encoded file and decoded JSON separately. The reader verifies those identities, each consumed original body, the packet/result hashes, unchanged schedule, source/engine, loaded MIR versions and original actor endpoints. It does not fetch private material or require private access for ordinary local ZIP builds.
+
+```powershell
+python -B tools/startup_timings.py --comparison spec/evidence/base-startup-current-r01.json --bodies path/to/exact-receipts.json.gz.b64 --json current-base-intervals.json --csv current-base-intervals.csv
+```
+
+The external actor medians and descriptive native loader averages below use only the nine scored runs per arm. They remain different clocks and measurements:
+
+| Arm | Responsive Settings median | Mean approximate MIR loader windows | Mean approximate MIR final-fixes window |
+| --- | ---: | ---: | ---: |
+| No MIR | 10.268s | Not present | Not present |
+| MIR4.7.3 | 11.076s | 0.744s | 0.693s |
+| Internal MIR5 candidate | 10.370s | 0.086s | 0.058s |
+
+The original paired median candidate-added estimate is+0.154s, with conditional order-statistic interval[−0.234,+0.262]s; candidate-minus-published is−0.743s, interval[−0.909,−0.437]s. These describe nine fixed blocks. The nominal96.09% coverage assumes independent blocks with a common continuous median; temporal independence is not established. Preserve the original spread, A/A/drift controls and no-extension decision in the index. An unresolved added-time estimate does not justify an overhead percentage or equivalence claim.
+
+All32 logs lack paired internal markers: scoped time, checkpoint gaps and post-MIR scoped attribution remain unavailable. These are fresh processes with shared campaign cache context, selected ZIP hashes read before launch, no automatic cache clearing and no reboot. No new engine was launched for this extraction. Base is a separate baseline, not a heavy-profile substitute; equal useful work, whole-product performance, later-candidate applicability and stable acceptance remain open. The small loader windows alone identify no worthwhile internal bottleneck and do not justify another instrumentation campaign.
 
 ## Conditional diagnostic markers
 

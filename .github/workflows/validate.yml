@@ -72,6 +72,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact patch01 preservation metadata-source fetch failed.' }
           git fetch --no-tags --depth=1 origin 9c6f952aaf2fea0348a910016c3a2c3c4e3937ef
           if ($LASTEXITCODE -ne 0) { throw 'Exact patch01 preservation guard-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 6560ba2bf2c088d94a3273b60d8237aa2fcc914b
+          if ($LASTEXITCODE -ne 0) { throw 'Exact unavailable-research native-regression source fetch failed.' }
       - id: bind
         name: Bind the exact ordered host-control plan
         shell: pwsh
@@ -185,6 +187,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Exact patch01 preservation metadata-source fetch failed.' }
           git fetch --no-tags --depth=1 origin 9c6f952aaf2fea0348a910016c3a2c3c4e3937ef
           if ($LASTEXITCODE -ne 0) { throw 'Exact patch01 preservation guard-source fetch failed.' }
+          git fetch --no-tags --depth=1 origin 6560ba2bf2c088d94a3273b60d8237aa2fcc914b
+          if ($LASTEXITCODE -ne 0) { throw 'Exact unavailable-research native-regression source fetch failed.' }
       - name: Restore the bound host-control plan
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
         with:

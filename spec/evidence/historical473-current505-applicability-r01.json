@@ -1,0 +1,769 @@
+{
+  "schema": 1,
+  "kind": "MIRHistorical473Current505ConsumedInputApplicabilityV1",
+  "status": "accepted-bounded-seven-earlier-same-edition-and-one-F100-F110-forward-preservation-reuse",
+  "published505": {
+    "release_id": 434857344,
+    "source": "5d173925bce29ad8917346897706a0fcee4553e4",
+    "player_tree": "41d36ed8db131404692d5c054da3c87f7b54aecb",
+    "delivery_evidence": "spec/evidence/candidate505-github-prerelease-delivery-chain-r01.json",
+    "delivery_evidence_sha256": "AC2E729632BFD309394A30B921D9DF94A712009A69F6B52F1B244686D87A5357"
+  },
+  "accepted504_basis": {
+    "review_sha256": "9C3C8D07734F61FD89481193DA0F51BFDA5CD3D85676B2D679793E4A825B30AF",
+    "private_commit": "017a40be8ed5f97d92e876cb6f4d259a92cdb47e",
+    "private_path": "evidence/aero-historical473-current504-applicability-r01/source-applicability.json",
+    "source": "12eae25e24ca6600cd3cc6ed4a48d93cd8e7b472",
+    "member_comparison_sha256": "AA68B233009BB394E600FDC3311A5957A39E74574139F95F479F3ADECE67F3F2"
+  },
+  "scope_rule": "Seven earlier stable edition same-edition473 routes and one separately named published F100\u2192F110 journey. These are not the seven older-contract groups,and no F018/early best-effort scope is added.",
+  "science_binding_delta": {
+    "old_sha256": "8FBB2F3D48A3C36917A8E413E0F91535B294FB879906805304D8FF4BB61D8DF4",
+    "new_sha256": "A6AC3DB76DEE3EF3CD267F64DAAE7E655940158F390483BAF76033B94B2891EE",
+    "exact_single_block_replacement_restores_complete_old_module": true,
+    "semantic_boundary": "Only has_space_age source contract changes,with the new alternative inside target.id==f210. None of the seven reduced target IDs selects it; their accepted Base contexts have no Space Age. Existing pre504 science/binding reasoning remains at9C3C8D07.",
+    "other_code_changed": false
+  },
+  "same_edition_routes": [
+    {
+      "target": "f013",
+      "scope": "Original named published473 same-edition preservation only; no current native observation.",
+      "published504": {
+        "name": "more-infinite-research_5.0.01304.zip",
+        "sha256": "CFD99C41B96785E6D9B4D93E967C9B67352C86B5E56B92F432ACB876EC77ECFB",
+        "bytes": 505427
+      },
+      "published505": {
+        "name": "more-infinite-research_5.0.01305.zip",
+        "sha256": "1C00259F40843D147FDBB1DA2F3BC0BCCC334478A63F10561E96711BEEFFCFA4",
+        "bytes": 505619
+      },
+      "members": 127,
+      "unchanged_members": 122,
+      "unchanged_gameplay_Lua_files": 19,
+      "unchanged_migration_names": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json"
+      ],
+      "changed": [
+        {
+          "path": "changelog.txt",
+          "old_bytes": 132940,
+          "old_sha256": "AD0FB70E54D31DB4E3382792DE3D15EC7E6BD86EEF3F6CE3B50E10C72FA68068",
+          "new_bytes": 133289,
+          "new_sha256": "30178F727546A507C7D30DC4097ECAF4CC96418DCE4F416863831C98FEECBE10"
+        },
+        {
+          "path": "compatibility/science_bindings.lua",
+          "old_bytes": 19304,
+          "old_sha256": "8FBB2F3D48A3C36917A8E413E0F91535B294FB879906805304D8FF4BB61D8DF4",
+          "new_bytes": 19976,
+          "new_sha256": "A6AC3DB76DEE3EF3CD267F64DAAE7E655940158F390483BAF76033B94B2891EE"
+        },
+        {
+          "path": "info.json",
+          "old_bytes": 334,
+          "old_sha256": "5E7500F62833FCBDB9C025641C7B6E6029E10455DA0ED0ABDC76BD04AA65254B",
+          "new_bytes": 334,
+          "new_sha256": "EBACAB22212C59E93C58AC34AB9A5976C8B80CC8CA1F708D9838A9CA3FDF4915"
+        },
+        {
+          "path": "locale/de/mir-library.cfg",
+          "old_bytes": 7615,
+          "old_sha256": "2CB6C8D3B0F2D9D28143107BA827E82401FB113CEF525C2BDACB82F39DCBFECB",
+          "new_bytes": 7616,
+          "new_sha256": "6ECA9B07DC7F226B30C4E730AD499AAFA73D4059F6343F0E7FC9C13CF7F12502"
+        },
+        {
+          "path": "platform/target.lua",
+          "old_bytes": 400,
+          "old_sha256": "BEF0CF8D129A69E787FDB3F0135F9F8ADF499505F1103AD87B8DE8B9B721FD61",
+          "new_bytes": 400,
+          "new_sha256": "0790CCD5D23BCA9472803D858EBA95AF27D964870AD538EF1C3FCB1D9DD09DA0"
+        }
+      ],
+      "original_evidence": {
+        "original_native": {
+          "path": "build/qualification/historical-473-f013-mir5-successor-r01/native-output/result.json",
+          "bytes": 35168,
+          "sha256": "7F1CE114BCB2B6483A96DF34B83FEBBAF33FE3827DD57B3E59C3B43DDE8CE77B",
+          "original_archive_sha256": "C4E36AE31F5ED4F6F521FB389968C124C0178927B549409AAD8DAEE6D8CD8455",
+          "original_status": "passed-private-native-fixture",
+          "original_case": "historical-transition",
+          "engine": {
+            "path": "D:\\Games\\Factorio\\0.13\\bin\\x64\\factorio.exe",
+            "sha256": "F12C0DF5A5EF0D72F50A24BD76E077DFC9CBEAB4B31EE9EF0951A4A9C086B856",
+            "file_version": "",
+            "product_version": "",
+            "base_version": "0.13.20"
+          },
+          "profile": {
+            "path": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\tests\\profiles\\historical-transition-mir5-f013.json",
+            "sha256": "11E529ABE241F753A889A48AB5C1AC2A6C7E6FF83D7E0F4114DBFE1847AFD30C"
+          },
+          "fixtures": [
+            {
+              "sha256": "62394115A8B0E1443834F9FFBB4C3745EEB3AF6CFA71F10CC7A38B0AF9445345",
+              "source": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f013-mir5-successor-r01\\fixture-source",
+              "archive": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f013-mir5-successor-r01\\flat-library\\mir-fixture-mir5-historical-transition_0.1.0.zip"
+            }
+          ],
+          "original_harness_sha256": "B9E4685187C4B172FBF16D4359FFCB320C99F443643B6F16E0861AF9E8641489",
+          "original_native_probe_sha256": "77725C06B12BFC1CF26D92E70CE566B3342811EBE5ED8B12BA1F0A675D9B704E",
+          "original_input_save": {
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\historical-473-f013-owned-inputs-r05\\native-output\\write-data\\saves\\mir5-native-complete.zip",
+            "sha256": "B9E2B660907C758412D473675AC1FCFA03879BB3132333469FE95FE48F8FF9EC"
+          },
+          "cold_reloads": 2
+        }
+      },
+      "verdict": "applicable-named-preservation-semantics-with-original-identities",
+      "native_execution": false,
+      "current_locale_or_rendering_or_load_qualification": false
+    },
+    {
+      "target": "f014",
+      "scope": "Original named published473 same-edition preservation only; no current native observation.",
+      "published504": {
+        "name": "more-infinite-research_5.0.01404.zip",
+        "sha256": "BE2D0924CA5FC0AB70B8E0F30DD830923C387E5DCCA769A4B9F37B30F6BEB205",
+        "bytes": 505430
+      },
+      "published505": {
+        "name": "more-infinite-research_5.0.01405.zip",
+        "sha256": "FF27ACAAB0F6FCF1285F9E75316BBBE2948A06F2681EAFECFBF6B590713ABA86",
+        "bytes": 505622
+      },
+      "members": 127,
+      "unchanged_members": 122,
+      "unchanged_gameplay_Lua_files": 19,
+      "unchanged_migration_names": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json"
+      ],
+      "changed": [
+        {
+          "path": "changelog.txt",
+          "old_bytes": 132940,
+          "old_sha256": "AD0FB70E54D31DB4E3382792DE3D15EC7E6BD86EEF3F6CE3B50E10C72FA68068",
+          "new_bytes": 133289,
+          "new_sha256": "30178F727546A507C7D30DC4097ECAF4CC96418DCE4F416863831C98FEECBE10"
+        },
+        {
+          "path": "compatibility/science_bindings.lua",
+          "old_bytes": 19304,
+          "old_sha256": "8FBB2F3D48A3C36917A8E413E0F91535B294FB879906805304D8FF4BB61D8DF4",
+          "new_bytes": 19976,
+          "new_sha256": "A6AC3DB76DEE3EF3CD267F64DAAE7E655940158F390483BAF76033B94B2891EE"
+        },
+        {
+          "path": "info.json",
+          "old_bytes": 334,
+          "old_sha256": "B21C6618D7E6996ED7352AFFD66D97FBEDB88E793985BEFB7346C7B3C2FD1794",
+          "new_bytes": 334,
+          "new_sha256": "25225133AA8D5DE1A44DA7EDEF72AD40DE0D142980F2218B1D7945360F503E99"
+        },
+        {
+          "path": "locale/de/mir-library.cfg",
+          "old_bytes": 7615,
+          "old_sha256": "2CB6C8D3B0F2D9D28143107BA827E82401FB113CEF525C2BDACB82F39DCBFECB",
+          "new_bytes": 7616,
+          "new_sha256": "6ECA9B07DC7F226B30C4E730AD499AAFA73D4059F6343F0E7FC9C13CF7F12502"
+        },
+        {
+          "path": "platform/target.lua",
+          "old_bytes": 400,
+          "old_sha256": "07C43B77A1656EE519954733BE26ACA768EA900F539D3C57ED74AB57EEBDDB28",
+          "new_bytes": 400,
+          "new_sha256": "B167DB1F3E688B65A21C17A49A12E340D9D20CFEEA62017F7E991500C620BF13"
+        }
+      ],
+      "original_evidence": {
+        "original_native": {
+          "path": "build/qualification/historical-473-f014-mir5-successor-r01/native-output/native-output/result.json",
+          "bytes": 35262,
+          "sha256": "FB47B8EBB6FE7DADD439A462DA3F8D0EC9DE3B5307F75E477F9C6A795ED8EF99",
+          "original_archive_sha256": "E276483E6E51B67915881DEBAAD7EE15A8DE4C0F764A570A8B415C354067B0A4",
+          "original_status": "passed-private-native-fixture",
+          "original_case": "historical-transition",
+          "engine": {
+            "path": "D:\\Games\\Factorio\\0.14\\bin\\x64\\factorio.exe",
+            "sha256": "A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F",
+            "file_version": "0.14.23.25374",
+            "product_version": "0.14.23",
+            "base_version": "0.14.23"
+          },
+          "profile": {
+            "sha256": "354D6449177C1C9C7446387C639E980BC17EB986EBE0BA8F4E491931C7A9D219",
+            "path": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\tests\\profiles\\historical-transition-mir5-f014.json"
+          },
+          "fixtures": [
+            {
+              "source": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f014-mir5-successor-r01\\fixture-source",
+              "archive": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f014-mir5-successor-r01\\flat-library\\mir-fixture-mir5-historical-transition_0.1.0.zip",
+              "sha256": "44114C5F2F0F70A3207245A3490EB3C9472BD1641707803B232F28E85B278017"
+            }
+          ],
+          "original_harness_sha256": "B9E4685187C4B172FBF16D4359FFCB320C99F443643B6F16E0861AF9E8641489",
+          "original_native_probe_sha256": "77725C06B12BFC1CF26D92E70CE566B3342811EBE5ED8B12BA1F0A675D9B704E",
+          "original_input_save": {
+            "sha256": "A4DB5ACD358BA2A8DA40D8BA84D19F0C88D84A26B0FA19BBF9303D907FC172C8",
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\historical-473-f014-owned-inputs-r01\\native-output\\native-output\\write-data\\saves\\mir5-native-complete.zip"
+          },
+          "cold_reloads": 2
+        }
+      },
+      "verdict": "applicable-named-preservation-semantics-with-original-identities",
+      "native_execution": false,
+      "current_locale_or_rendering_or_load_qualification": false
+    },
+    {
+      "target": "f015",
+      "scope": "Original named published473 same-edition preservation only; no current native observation.",
+      "published504": {
+        "name": "more-infinite-research_5.0.01504.zip",
+        "sha256": "8B7861A879A4BE2FC6C37E71BED5DC90AD15CA53F6ACBBA1C1EEF98F60E65BAD",
+        "bytes": 505428
+      },
+      "published505": {
+        "name": "more-infinite-research_5.0.01505.zip",
+        "sha256": "071872BAE0A42CF33046F7995EF68BA2F04B33537FB70EDAF94D83654CCC5F0C",
+        "bytes": 505620
+      },
+      "members": 127,
+      "unchanged_members": 122,
+      "unchanged_gameplay_Lua_files": 19,
+      "unchanged_migration_names": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json"
+      ],
+      "changed": [
+        {
+          "path": "changelog.txt",
+          "old_bytes": 132940,
+          "old_sha256": "AD0FB70E54D31DB4E3382792DE3D15EC7E6BD86EEF3F6CE3B50E10C72FA68068",
+          "new_bytes": 133289,
+          "new_sha256": "30178F727546A507C7D30DC4097ECAF4CC96418DCE4F416863831C98FEECBE10"
+        },
+        {
+          "path": "compatibility/science_bindings.lua",
+          "old_bytes": 19304,
+          "old_sha256": "8FBB2F3D48A3C36917A8E413E0F91535B294FB879906805304D8FF4BB61D8DF4",
+          "new_bytes": 19976,
+          "new_sha256": "A6AC3DB76DEE3EF3CD267F64DAAE7E655940158F390483BAF76033B94B2891EE"
+        },
+        {
+          "path": "info.json",
+          "old_bytes": 334,
+          "old_sha256": "5E3DCBD2CDEFB0BA0FDB32E9855A85F9D5FEF849F447752F47DD38C438633D02",
+          "new_bytes": 334,
+          "new_sha256": "D23DC134FBAB90AE04788E59AB74BEB759AFACC2BE6986296CDF29A93DA0CD93"
+        },
+        {
+          "path": "locale/de/mir-library.cfg",
+          "old_bytes": 7615,
+          "old_sha256": "2CB6C8D3B0F2D9D28143107BA827E82401FB113CEF525C2BDACB82F39DCBFECB",
+          "new_bytes": 7616,
+          "new_sha256": "6ECA9B07DC7F226B30C4E730AD499AAFA73D4059F6343F0E7FC9C13CF7F12502"
+        },
+        {
+          "path": "platform/target.lua",
+          "old_bytes": 399,
+          "old_sha256": "FF2F1CBDF0BEEC1F44A422C13A60FEBB7D5E71A2757588E3E5026D5C71246249",
+          "new_bytes": 399,
+          "new_sha256": "5949A4A7663E4270D44DF74E581BDD76A445EFF0C8A8D960B0CF5FEDB4319214"
+        }
+      ],
+      "original_evidence": {
+        "original_native": {
+          "path": "build/qualification/historical-473-f015-575e-r02/successor-7a2-r02/native-output/result.json",
+          "bytes": 35356,
+          "sha256": "EA46A3A76CE0030140B71B32DF330CF634909E9A452B8A00BF6B18201ED104E7",
+          "original_archive_sha256": "37F7AC276460BC37C82D2426983B89D87393C22DFF8D39ECA17ACC7753F1480D",
+          "original_status": "passed-private-native-fixture",
+          "original_case": "historical-transition",
+          "engine": {
+            "path": "D:\\Games\\Factorio\\0.15\\bin\\x64\\factorio.exe",
+            "sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6",
+            "file_version": "0.15.40.30950",
+            "product_version": "0.15.40",
+            "base_version": "0.15.40"
+          },
+          "profile": {
+            "sha256": "D5C25C98261C5AFA2F22589FFCB85C6A9C114EF14C00A5B028C960552A345D87",
+            "path": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f015-successor-7a2-r02\\profile.json"
+          },
+          "fixtures": [
+            {
+              "archive": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f015-successor-7a2-r02\\flat-library\\mir-fixture-mir5-historical-transition_0.1.0.zip",
+              "sha256": "DA2DDAE5B5518648A89A31B41F5D6A6B5F5C16248941FA46E51339B60EC3B884",
+              "source": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f015-successor-7a2-r02\\fixture-source"
+            }
+          ],
+          "original_harness_sha256": "B9E4685187C4B172FBF16D4359FFCB320C99F443643B6F16E0861AF9E8641489",
+          "original_native_probe_sha256": "77725C06B12BFC1CF26D92E70CE566B3342811EBE5ED8B12BA1F0A675D9B704E",
+          "original_input_save": {
+            "sha256": "BD280C04FC61F0F9CC9D52A6EB2A628DD2FFBDC28BC5197F152EFBE3400AD253",
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\historical-473-f015-575e-r02\\published-source\\native-output\\write-data\\saves\\mir5-native-complete.zip"
+          },
+          "cold_reloads": 2
+        }
+      },
+      "verdict": "applicable-named-preservation-semantics-with-original-identities",
+      "native_execution": false,
+      "current_locale_or_rendering_or_load_qualification": false
+    },
+    {
+      "target": "f016",
+      "scope": "Original named published473 same-edition preservation only; no current native observation.",
+      "published504": {
+        "name": "more-infinite-research_5.0.01604.zip",
+        "sha256": "1477ABCB5AB136A2E955801625F6406A682E270478092C98266BEBEC21E4A12B",
+        "bytes": 505430
+      },
+      "published505": {
+        "name": "more-infinite-research_5.0.01605.zip",
+        "sha256": "8B651C1D599AF91B352E8865CE8DBFA464FE4F459C9A9A2B4FACF89A7E995807",
+        "bytes": 505620
+      },
+      "members": 127,
+      "unchanged_members": 122,
+      "unchanged_gameplay_Lua_files": 19,
+      "unchanged_migration_names": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json"
+      ],
+      "changed": [
+        {
+          "path": "changelog.txt",
+          "old_bytes": 132940,
+          "old_sha256": "AD0FB70E54D31DB4E3382792DE3D15EC7E6BD86EEF3F6CE3B50E10C72FA68068",
+          "new_bytes": 133289,
+          "new_sha256": "30178F727546A507C7D30DC4097ECAF4CC96418DCE4F416863831C98FEECBE10"
+        },
+        {
+          "path": "compatibility/science_bindings.lua",
+          "old_bytes": 19304,
+          "old_sha256": "8FBB2F3D48A3C36917A8E413E0F91535B294FB879906805304D8FF4BB61D8DF4",
+          "new_bytes": 19976,
+          "new_sha256": "A6AC3DB76DEE3EF3CD267F64DAAE7E655940158F390483BAF76033B94B2891EE"
+        },
+        {
+          "path": "info.json",
+          "old_bytes": 334,
+          "old_sha256": "DD719773C1650D4D6E851090D9ED57C70C0EC66A904121021E7474393F5FE942",
+          "new_bytes": 334,
+          "new_sha256": "28172F7BC966D615E7A02FDA5371B608950AB2AB5312374314369EB507175C94"
+        },
+        {
+          "path": "locale/de/mir-library.cfg",
+          "old_bytes": 7615,
+          "old_sha256": "2CB6C8D3B0F2D9D28143107BA827E82401FB113CEF525C2BDACB82F39DCBFECB",
+          "new_bytes": 7616,
+          "new_sha256": "6ECA9B07DC7F226B30C4E730AD499AAFA73D4059F6343F0E7FC9C13CF7F12502"
+        },
+        {
+          "path": "platform/target.lua",
+          "old_bytes": 399,
+          "old_sha256": "7462410469935C8333C1A6B33C3BB9CF95BF3B9D569B4BAD45DD7B604DD20045",
+          "new_bytes": 399,
+          "new_sha256": "D7FC4D5EA180DCBECA3DD5C9E8AF82A2EBF37435AF3BE5A0602E9636B01F479A"
+        }
+      ],
+      "original_evidence": {
+        "original_native": {
+          "path": "build/qualification/historical-473-f016-7a2-r01/successor/native-output/result.json",
+          "bytes": 35359,
+          "sha256": "A1CE6B645AE19B1EC772A0A7F8105CD6A14D2E4C8F06803438AA3714B755BE29",
+          "original_archive_sha256": "35A8624065D3137E463EBC89DE21C06531F52F9E5E90632EC3C997CF52EEE839",
+          "original_status": "passed-private-native-fixture",
+          "original_case": "historical-transition",
+          "engine": {
+            "path": "D:\\Games\\Factorio\\0.16\\bin\\x64\\factorio.exe",
+            "sha256": "ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966",
+            "file_version": "0.16.51.36654",
+            "product_version": "0.16.51",
+            "base_version": "0.16.51"
+          },
+          "profile": {
+            "sha256": "2D6D453A1575477223D70154AEE3C4340B5B58D8732E7E6034340387B43FF587",
+            "path": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f016-successor-7a2-r01\\profile.json"
+          },
+          "fixtures": [
+            {
+              "archive": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f016-successor-7a2-r01\\flat-library\\mir-fixture-mir5-historical-transition_0.1.0.zip",
+              "source": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f016-successor-7a2-r01\\fixture-source",
+              "sha256": "8E379524F98B68C56913997353AE6C569AB6948A2C0CD3FFE16FA878C1445390"
+            }
+          ],
+          "original_harness_sha256": "B9E4685187C4B172FBF16D4359FFCB320C99F443643B6F16E0861AF9E8641489",
+          "original_native_probe_sha256": "77725C06B12BFC1CF26D92E70CE566B3342811EBE5ED8B12BA1F0A675D9B704E",
+          "original_input_save": {
+            "sha256": "00BE9F2D6C0B3FF2B91C7C8B6585B0A15EAF3F9071CED21B91556B969B6BC75C",
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\historical-473-f016-7a2-r01\\published-source\\native-output\\write-data\\saves\\mir5-native-complete.zip"
+          },
+          "cold_reloads": 2
+        }
+      },
+      "verdict": "applicable-named-preservation-semantics-with-original-identities",
+      "native_execution": false,
+      "current_locale_or_rendering_or_load_qualification": false
+    },
+    {
+      "target": "f017",
+      "scope": "Original named published473 same-edition preservation only; no current native observation.",
+      "published504": {
+        "name": "more-infinite-research_5.0.01704.zip",
+        "sha256": "915466A6512E4ED51C5F90A0D7275EDFB29277FF20D63B9F1CDEEC95C3F47268",
+        "bytes": 505430
+      },
+      "published505": {
+        "name": "more-infinite-research_5.0.01705.zip",
+        "sha256": "3EEDF60622CC9F0CAC88B3F20A1FFE5E47CA5E4BCAAC22C4D6843F41E08679D0",
+        "bytes": 505622
+      },
+      "members": 127,
+      "unchanged_members": 122,
+      "unchanged_gameplay_Lua_files": 19,
+      "unchanged_migration_names": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json"
+      ],
+      "changed": [
+        {
+          "path": "changelog.txt",
+          "old_bytes": 132940,
+          "old_sha256": "AD0FB70E54D31DB4E3382792DE3D15EC7E6BD86EEF3F6CE3B50E10C72FA68068",
+          "new_bytes": 133289,
+          "new_sha256": "30178F727546A507C7D30DC4097ECAF4CC96418DCE4F416863831C98FEECBE10"
+        },
+        {
+          "path": "compatibility/science_bindings.lua",
+          "old_bytes": 19304,
+          "old_sha256": "8FBB2F3D48A3C36917A8E413E0F91535B294FB879906805304D8FF4BB61D8DF4",
+          "new_bytes": 19976,
+          "new_sha256": "A6AC3DB76DEE3EF3CD267F64DAAE7E655940158F390483BAF76033B94B2891EE"
+        },
+        {
+          "path": "info.json",
+          "old_bytes": 334,
+          "old_sha256": "80F09733E204DD4968D7690CAB16BB0A0D72ECA70382B3B940F8D1EA07C0E22B",
+          "new_bytes": 334,
+          "new_sha256": "1F264F60A05F2714BB7A5FA0F3F8125BE160C6C756C7FDE051DDA350DFB8C118"
+        },
+        {
+          "path": "locale/de/mir-library.cfg",
+          "old_bytes": 7615,
+          "old_sha256": "2CB6C8D3B0F2D9D28143107BA827E82401FB113CEF525C2BDACB82F39DCBFECB",
+          "new_bytes": 7616,
+          "new_sha256": "6ECA9B07DC7F226B30C4E730AD499AAFA73D4059F6343F0E7FC9C13CF7F12502"
+        },
+        {
+          "path": "platform/target.lua",
+          "old_bytes": 399,
+          "old_sha256": "076D4332E22A69C68A92227394CC1C43A2BF3B62F892823880C0DF33FB91A229",
+          "new_bytes": 399,
+          "new_sha256": "AC22316966CBB6C5508437452DE309A9C5B25D8FC47F4C0C9DDE2BDB617912B6"
+        }
+      ],
+      "original_evidence": {
+        "original_native": {
+          "path": "build/qualification/historical-473-f017-7a2-r02-controller/native-mir5/result.json",
+          "bytes": 34884,
+          "sha256": "95D79923CD7CB86D2DBE0A412720CF120F5FD07C19C163B32F50A3202E574D68",
+          "original_archive_sha256": "95228385A0862A807DB20A73F56CA0113693A1CDB3437410187303C598D784C7",
+          "original_status": "passed-private-native-fixture",
+          "original_case": "historical-transition",
+          "engine": {
+            "path": "D:\\Games\\Factorio\\0.17\\bin\\x64\\factorio.exe",
+            "sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06",
+            "file_version": "0.17.79.47865",
+            "product_version": "0.17.79",
+            "base_version": "0.17.79"
+          },
+          "profile": {
+            "sha256": "390A2C2914A013BC8A4CCC60668AB3D4DCD7643400B99F2C77EEC9000A4EB166",
+            "path": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\tests\\profiles\\historical-transition-mir5-f017.json"
+          },
+          "fixtures": [
+            {
+              "sha256": "AD692BA7D26A43FE4EC0A5A5699991B42DCF7AF5E2CD4CED829210B519144F47",
+              "source": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f017-7a2-r02-inputs\\mir5\\source",
+              "archive": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f017-7a2-r02-inputs\\mir5\\library\\mir-fixture-mir5-historical-transition_0.1.0.zip"
+            }
+          ],
+          "original_harness_sha256": "C87C5778E320471F84A2A5B0B6AFF12B083C2E1BF7D0E8B977CEEDE351261233",
+          "original_native_probe_sha256": "A34BD5FE79466B3EDA96F46EC132562192E6A70280901381C8AF560E7AB23328",
+          "original_input_save": {
+            "sha256": "B3F45A935B2D3541653D601AE73905F0AB0F7C4350E180FA543D2E8027FC4617",
+            "path": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\tmp\\historical-473-f017-published-7a2-r02\\write-data\\saves\\mir5-native-complete.zip"
+          },
+          "cold_reloads": 2
+        }
+      },
+      "verdict": "applicable-named-preservation-semantics-with-original-identities",
+      "native_execution": false,
+      "current_locale_or_rendering_or_load_qualification": false
+    },
+    {
+      "target": "f100",
+      "scope": "Original named published473 same-edition preservation only; no current native observation.",
+      "published504": {
+        "name": "more-infinite-research_5.0.10004.zip",
+        "sha256": "3AB5634361DB6D0872B864AD67EAF4FBC6E476336C672499E8DAAE0A9F4D556E",
+        "bytes": 505422
+      },
+      "published505": {
+        "name": "more-infinite-research_5.0.10005.zip",
+        "sha256": "9EB1E990922BDAE7F9266C865EAF17F97E11C779522A016E64686E5F8BDD65E6",
+        "bytes": 505614
+      },
+      "members": 127,
+      "unchanged_members": 122,
+      "unchanged_gameplay_Lua_files": 19,
+      "unchanged_migration_names": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json"
+      ],
+      "changed": [
+        {
+          "path": "changelog.txt",
+          "old_bytes": 132940,
+          "old_sha256": "AD0FB70E54D31DB4E3382792DE3D15EC7E6BD86EEF3F6CE3B50E10C72FA68068",
+          "new_bytes": 133289,
+          "new_sha256": "30178F727546A507C7D30DC4097ECAF4CC96418DCE4F416863831C98FEECBE10"
+        },
+        {
+          "path": "compatibility/science_bindings.lua",
+          "old_bytes": 19304,
+          "old_sha256": "8FBB2F3D48A3C36917A8E413E0F91535B294FB879906805304D8FF4BB61D8DF4",
+          "new_bytes": 19976,
+          "new_sha256": "A6AC3DB76DEE3EF3CD267F64DAAE7E655940158F390483BAF76033B94B2891EE"
+        },
+        {
+          "path": "info.json",
+          "old_bytes": 331,
+          "old_sha256": "1AEFC735E0F0DF5A15D1064394E0F5339C1D1EE3348C05485FF53431DEE60C84",
+          "new_bytes": 331,
+          "new_sha256": "F9AFD283F604898A502F10B4DF11DF6B3F0F99ED0B47F240A5C2FA0F2778B049"
+        },
+        {
+          "path": "locale/de/mir-library.cfg",
+          "old_bytes": 7615,
+          "old_sha256": "2CB6C8D3B0F2D9D28143107BA827E82401FB113CEF525C2BDACB82F39DCBFECB",
+          "new_bytes": 7616,
+          "new_sha256": "6ECA9B07DC7F226B30C4E730AD499AAFA73D4059F6343F0E7FC9C13CF7F12502"
+        },
+        {
+          "path": "platform/target.lua",
+          "old_bytes": 396,
+          "old_sha256": "0A505F85A63C4BEB43E6FFC2C8BD599CDF79AC5DC72651F92891EC24D924BF3C",
+          "new_bytes": 396,
+          "new_sha256": "909C3AF13EB085FF848905D7974B1FACEB3FB73B62D4204A99AD7CCC1715BE1F"
+        }
+      ],
+      "original_evidence": {
+        "original_native": {
+          "path": "build/qualification/historical-473-f100-7a2-r01-controller/native-mir5/result.json",
+          "bytes": 34876,
+          "sha256": "DDC272038CD83808FB5AE969E6B928D1042855D3CB63040DF5BA13FE28B2D35E",
+          "original_archive_sha256": "6BAE382DBD0AEC7199474921887CFBAC61016B8BF5E8FB990656493A8A174B6C",
+          "original_status": "passed-private-native-fixture",
+          "original_case": "historical-transition",
+          "engine": {
+            "path": "D:\\Games\\Factorio\\1.0\\bin\\x64\\factorio.exe",
+            "sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70",
+            "file_version": "1.0.0.54889",
+            "product_version": "1.0.0",
+            "base_version": "1.0.0"
+          },
+          "profile": {
+            "path": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\tests\\profiles\\historical-transition-mir5-f100.json",
+            "sha256": "E5548AD48D3AB1CC16617E452C6DAD96C1A65B0630B78CF66B6B224C9DF5E666"
+          },
+          "fixtures": [
+            {
+              "sha256": "ED7153A978ED22D9D2BF6878C92C097B951225AA1D3F5D2C17AF7C6DC91BA830",
+              "source": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f100-7a2-r01-inputs\\mir5\\source",
+              "archive": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\qualification\\historical-473-f100-7a2-r01-inputs\\mir5\\library\\mir-fixture-mir5-historical-transition_0.1.0.zip"
+            }
+          ],
+          "original_harness_sha256": "C87C5778E320471F84A2A5B0B6AFF12B083C2E1BF7D0E8B977CEEDE351261233",
+          "original_native_probe_sha256": "A34BD5FE79466B3EDA96F46EC132562192E6A70280901381C8AF560E7AB23328",
+          "original_input_save": {
+            "path": "D:\\Projects\\Factorio\\mir5-migration-origin-120-source-evidence-r06\\build\\tmp\\historical-473-f100-published-7a2-r01\\write-data\\saves\\mir5-native-complete.zip",
+            "sha256": "219EF20F63B4A85FA2386BD50A81228B28F006D9731F24E069A657BB13F45811"
+          },
+          "cold_reloads": 2
+        }
+      },
+      "verdict": "applicable-named-preservation-semantics-with-original-identities",
+      "native_execution": false,
+      "current_locale_or_rendering_or_load_qualification": false
+    },
+    {
+      "target": "f110",
+      "scope": "Original named published473 same-edition preservation only; no current native observation.",
+      "published504": {
+        "name": "more-infinite-research_5.0.11004.zip",
+        "sha256": "40F9A415E9CEB0EF156DAC87D3112B038FD8A5628317BB3896FEE898CCFF4181",
+        "bytes": 505733
+      },
+      "published505": {
+        "name": "more-infinite-research_5.0.11005.zip",
+        "sha256": "8A8A272F2651BB039DD3D530F50E736C0762DB46EFAF64A5E37EC165A7AE3927",
+        "bytes": 505925
+      },
+      "members": 128,
+      "unchanged_members": 123,
+      "unchanged_gameplay_Lua_files": 19,
+      "unchanged_migration_names": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json",
+        "migrations/more-infinite-research_5.0.11000.json"
+      ],
+      "changed": [
+        {
+          "path": "changelog.txt",
+          "old_bytes": 132940,
+          "old_sha256": "AD0FB70E54D31DB4E3382792DE3D15EC7E6BD86EEF3F6CE3B50E10C72FA68068",
+          "new_bytes": 133289,
+          "new_sha256": "30178F727546A507C7D30DC4097ECAF4CC96418DCE4F416863831C98FEECBE10"
+        },
+        {
+          "path": "compatibility/science_bindings.lua",
+          "old_bytes": 19304,
+          "old_sha256": "8FBB2F3D48A3C36917A8E413E0F91535B294FB879906805304D8FF4BB61D8DF4",
+          "new_bytes": 19976,
+          "new_sha256": "A6AC3DB76DEE3EF3CD267F64DAAE7E655940158F390483BAF76033B94B2891EE"
+        },
+        {
+          "path": "info.json",
+          "old_bytes": 333,
+          "old_sha256": "ECD07F790E126D2560DD187095B76F0E417A9DC76D888B5C1B67ED3F84276B4F",
+          "new_bytes": 333,
+          "new_sha256": "BC02D9E9C89DB7932F725EDFD9C068496C1C760426412D9FAF28A5084F0AF90C"
+        },
+        {
+          "path": "locale/de/mir-library.cfg",
+          "old_bytes": 7615,
+          "old_sha256": "2CB6C8D3B0F2D9D28143107BA827E82401FB113CEF525C2BDACB82F39DCBFECB",
+          "new_bytes": 7616,
+          "new_sha256": "6ECA9B07DC7F226B30C4E730AD499AAFA73D4059F6343F0E7FC9C13CF7F12502"
+        },
+        {
+          "path": "platform/target.lua",
+          "old_bytes": 398,
+          "old_sha256": "8AAE9F108675CD406112DC82E8AD38D3754BCDC9D597F30DAF90ED02BEE6BE2C",
+          "new_bytes": 398,
+          "new_sha256": "30451F0BE3B4A075907256B7BA7AF87266250879A2A935905C76916CC1228F55"
+        }
+      ],
+      "original_evidence": {
+        "original_native": {
+          "path": "build/qualification/f110-473-current7a2-r01-controller/native-output/result.json",
+          "bytes": 32892,
+          "sha256": "13C0F3618F7BC64A8541AC1699F9D26B5CE0CB14EB91C21DB319369372FADE1E",
+          "original_archive_sha256": "1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9",
+          "original_status": "passed-private-native-fixture",
+          "original_case": "f110-f200-transition",
+          "engine": {
+            "path": "D:\\Games\\Factorio\\1.1\\bin\\x64\\factorio.exe",
+            "sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+            "file_version": "1.1.110.62357",
+            "product_version": "1.1.110",
+            "base_version": "1.1.110"
+          },
+          "profile": {
+            "sha256": "EFF8363309F4B95924C1E31ED617C44EA5CF3209C1FF10825E308FA15D69FCF0",
+            "path": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\tests\\profiles\\f110-473-current-successor-11110.json"
+          },
+          "fixtures": [
+            {
+              "source": "D:\\Projects\\Factorio\\mir5-legacy-cannon-credit-r01\\build\\qualification\\f110-473-current7a2-r01-inputs\\fixture",
+              "archive": "D:\\Projects\\Factorio\\testmods\\1.1\\mir-fixture-mir5-f110-f200-transition_0.3.0.zip",
+              "sha256": "5D265E1FC24BA77806D7CF57AD6A6EEDD90EBDAA060575835E62EBA932E458F2"
+            }
+          ],
+          "original_harness_sha256": "891C5D182BA684B0931E79CD6D88EB43234636A8693A2920BF7FF39E5AC57262",
+          "original_native_probe_sha256": "A34BD5FE79466B3EDA96F46EC132562192E6A70280901381C8AF560E7AB23328",
+          "original_input_save": {
+            "sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
+            "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\mir5\\recovery-historical\\f110-f200-transition-published-f110-source-r05\\native-output\\write-data\\saves\\mir5-native-complete.zip"
+          },
+          "cold_reloads": 2
+        }
+      },
+      "verdict": "applicable-named-preservation-semantics-with-original-identities",
+      "native_execution": false,
+      "current_locale_or_rendering_or_load_qualification": false
+    }
+  ],
+  "published_F100_F110_forward": {
+    "route": "published473 F100 to MIR5 F110",
+    "original_chain": "spec/evidence/published473-f100-f110-native-chain-r01.json",
+    "original_chain_sha256": "F8AC8F7A74DD6A92AEEC42830D4B9CE018460C1615CBC11D7CC3A439F73888A3",
+    "original_candidate_sha256": "2508F539998F4DABBB3F71DA0226F4AB70BD95C5572AD2D8531E63F6A673926A",
+    "actual_retained_archive_reverified": true,
+    "trusted7a2_bridge_archive_sha256": "1C3D982CD048D3C83BF75108F1F9AC769CE0DC833A2DE056CDE16EF8AE2925A9",
+    "original_candidate_vs_trusted7a2_changed": [
+      "changelog.txt",
+      "locale/de/mir-library.cfg",
+      "locale/en/mir-library.cfg"
+    ],
+    "all_gameplay_Lua_and_migrations_identical_to_trusted7a2": true,
+    "source_save_and_original_colds_retained": true,
+    "applicability": "Original23-row/laser2.2/inserter2-stack4/42percent-27percent/foreign-disablement/new-mining-lab/save-two-cold semantics remain supporting evidence for505 F110. The7a2\u2192504 review and504\u2192505 branch/member proof form explicit input correspondence,not transitive native execution or current strings/load/GUI qualification.",
+    "native_execution": false
+  },
+  "migrations": {
+    "names_by_target": {
+      "f013": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json"
+      ],
+      "f014": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json"
+      ],
+      "f015": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json"
+      ],
+      "f016": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json"
+      ],
+      "f017": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json"
+      ],
+      "f100": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json"
+      ],
+      "f110": [
+        "migrations/more-infinite-research_2.0.5.json",
+        "migrations/more-infinite-research_2.1.0.json",
+        "migrations/more-infinite-research_5.0.11000.json"
+      ]
+    },
+    "all_each_target_filenames_and_bytes_unchanged": true,
+    "scope": "Compare each edition with its own accepted predecessor. F110 additionally retains migrations/more-infinite-research_5.0.11000.json; do not require identical migration sets across engine capabilities."
+  },
+  "retained_limits": [
+    "Every original engine,source save,fixture,controller,cold result,adverse and scope keeps its actual identity; no archive is relabelled a505 native result.",
+    "Metadata source/distribution versions and changelog change. German rendering/current locale/native-load observation remain separate; other locale changes between7a2/B and504 retain the prior explicit limits.",
+    "Seven earlier stable-edition473 routes are not seven older MIR-contract groups. Modern F200/F210473 routes,remaining three forward journeys,seven older-contract groups and complete edition/catalogue/runtime/API/client qualification remain separate.",
+    "The actual504\u2192505 stock/representative satellite science save checks remain accepted under their recorded modern inputs; no predecessor recreation is requested.",
+    "Later dev pipeline-zero correction is not included in published505 bytes; future changed editions require their own applicability review."
+  ],
+  "next_work": "Retain these eight named preservation-route correspondences. Resolve modern/older-contract changed inputs separately and run only genuinely affected boundaries through Black Glass. Do not repeat unchanged old-patch or whole migration campaigns.",
+  "native_execution": false,
+  "host_suite_executed": false,
+  "old_results_relabelled": false,
+  "full_catalogue_qualification": false,
+  "performance_qualification": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}

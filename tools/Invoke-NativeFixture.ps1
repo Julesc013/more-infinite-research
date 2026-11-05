@@ -54,9 +54,9 @@ function Get-FixtureSha([string]$Path) {
 }
 function Get-FixtureCreateArguments([string]$Seed,[string]$Case,[bool]$OnlyCreate) {
   $arguments=@('--create',$Seed)
-  # The paired Library experiment needs an explicit common terrain input.
-  # Other fresh fixtures retain their existing creation arguments.
-  if($OnlyCreate -and $Case -ceq 'library-paired-browser') {
+  # Matched disposable workloads share a declared terrain seed. Active source
+  # preparation also uses this path before its pending-work save is written.
+  if(($OnlyCreate -and $Case -ceq 'library-paired-browser') -or $Case -cin @('repair-stress-active','agriculture-scale-active')) {
     $arguments+=@('--map-gen-seed','424242')
   }
   return $arguments
@@ -354,7 +354,7 @@ function Assert-ActiveFixtureSelection([string]$Kind,[object[]]$ProfileRows,[obj
   Assert-Fixture ($selected.Count -eq 1 -and [string]$selected[0].version -ceq '0.1.0') 'active seed selector differs'
   $baseFixture=if($Kind -ceq 'repair-stress'){'mir-fixture-mir5-repair-stress'}else{'mir-fixture-mir5-agriculture-scale'}
   $expectedBaseVersion=if($Kind -ceq 'repair-stress'){
-    if([string]$MirRows[0].version -ceq '4.7.21002'){'0.1.0'}elseif([string]$MirRows[0].version -ceq '5.0.21000' -or [string]$MirRows[0].version -ceq '5.0.21001'){'0.2.0'}else{''}
+    if([string]$MirRows[0].version -ceq '4.7.21002'){'0.1.0'}elseif([string]$MirRows[0].version -cin @('5.0.21000','5.0.21001','5.0.21005')){'0.2.0'}else{''}
   }else{'0.1.0'}
   Assert-Fixture (-not [string]::IsNullOrWhiteSpace($expectedBaseVersion)) 'active repair MIR role is unsupported'
   Assert-Fixture (@($ProfileRows | Where-Object {[string]$_.name -ceq $baseFixture -and [bool]$_.enabled -and [string]$_.version -ceq $expectedBaseVersion}).Count -eq 1) 'active seed base fixture differs'
