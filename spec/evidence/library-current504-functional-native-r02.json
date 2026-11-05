@@ -87,7 +87,7 @@
       "German sorting label displays Bestellen, a likely context mistranslation; independent localization disposition remains open."
     ],
     "limitations": [
-      "Only Research and Availability views at one size/scale.",
+      "Only Research and Availability at one rendered size; no independent desktop geometry or GUI-scale measurement.",
       "No real mouse/keyboard, dropdown, continuous scroll, Settings/Queue/Help/export-file or imported-credit claim.",
       "No comparative timing/memory or whole-product/stable acceptance."
     ]
@@ -118,7 +118,16 @@
     "acceptance": "https://github.com/Julesc013/more-infinite-research/pull/1700#issuecomment-6649446437",
     "checked_merge": "0373cc44d13d48717469f54c05b9f4d786d71bc4"
   },
-  "independent_actual_component_review": "pending",
+  "independent_actual_component_review": {
+    "status": "accepted-named-canonical-component-original-outer-failure-retained",
+    "repository": "Julesc013/mir-native-worker",
+    "commit": "9e96f2c1f381d81b77e838fe11fe03c63cdaa428",
+    "path": "evidence/aero-library-current504-independent-review-r01/review.json",
+    "sha256": "3746EE3E598E726C82641CA5C3DB8905F15B5516AD465A085AB5C3B324DCFA15",
+    "visual_review_path": "evidence/aero-library-current504-independent-review-r01/visual-review.json",
+    "visual_review_sha256": "AC8276CF75E38B24AF0B2A315C6A674421C762FD473C8FB4295E6825D0785EF6",
+    "actual_remote_bytes_verified": true
+  },
   "scheduling_intervals": {
     "create_seconds": 6.342442,
     "governed_session_tree_seconds": 121.816601,
