@@ -13,11 +13,23 @@ local PROBE = "automation"
 local FAMILIES = {"tin", "lead", "bronze", "gunmetal", "invar", "nitinol", "copper_tungsten"}
 local RECIPES = {"bob-tin-plate", "bob-lead-plate", "bob-bronze-alloy", "bob-gunmetal-alloy",
   "bob-invar-alloy", "bob-nitinol-alloy", "bob-copper-tungsten-alloy"}
+local SCIENCE = {"automation-science-pack", "space-science-pack"}
 local STAGES = {source={fixture="0.1.0", mir="5.0.21005", cap=4},
   unavailable={fixture="0.2.0", mir="5.0.21006", cap=7},
   readmitted={fixture="0.3.0", mir="5.0.21006", cap=7}}
 local loaded, logged = false, false
-local function fail(message) error("[mir5-bob-material-preservation] " .. message) end
+local snapshot, diagnosing
+local function fail(message)
+  if not diagnosing and snapshot and game and helpers and log and game.forces and game.forces.player then
+    diagnosing = true
+    local ok, current = pcall(snapshot, game.forces.player)
+    local state = storage and storage[KEY]
+    pcall(function() log("[MIR5_NATIVE_FIXTURE] DIAGNOSTIC " .. helpers.table_to_json{
+      case=CASE, status="failed", message=message, stage=state and state.stage,
+      phase=state and state.phase, current=ok and current or nil, snapshot_error=not ok and tostring(current) or nil}) end)
+  end
+  error("[mir5-bob-material-preservation] " .. message)
+end
 local function near(a, b) return type(a) == "number" and type(b) == "number" and math.abs(a-b) < 0.000001 end
 local function tech(force, name)
   local value = force.technologies[name]
@@ -29,7 +41,7 @@ local function names(queue)
   for i, value in ipairs(queue or {}) do result[i] = value.name end
   return result
 end
-local function snapshot(force)
+snapshot = function(force)
   local result = {technologies={}, bonuses={}, current=force.current_research and force.current_research.name or false,
     queue=names(force.research_queue), progress=force.research_progress,
     lead_saved=tech(force, LEAD).saved_progress, bronze_saved=tech(force, BRONZE).saved_progress,
@@ -148,13 +160,40 @@ function M.set_lab_running(entity, running)
   entity.disabled_by_script = not running
   entity.energy = running and 1000000000 or 0
 end
-local function fill(state, count)
+function M.refill_science(state)
+  local _, inv = lab(state)
+  for _, name in ipairs(SCIENCE) do
+    local remaining = state.science_remaining[name]
+    if remaining > 0 then
+      local inserted = inv.insert{name=name, count=remaining}
+      if type(inserted) ~= "number" or inserted < 0 or inserted > remaining or inserted % 1 ~= 0 then
+        fail("invalid owned inventory insertion count")
+      end
+      state.science_remaining[name] = remaining - inserted
+    end
+  end
+end
+function M.fill_science(state, count)
   local entity, inv = lab(state)
+  if type(count) ~= "number" or count < 1 or count > 400 or count % 1 ~= 0 then fail("science budget differs") end
   inv.clear()
-  for _, name in ipairs{"automation-science-pack", "space-science-pack"} do
-    if inv.insert{name=name, count=count} ~= count then fail("owned lab rejected science") end
+  state.science_remaining = {}
+  for _, name in ipairs(SCIENCE) do state.science_remaining[name] = count end
+  M.refill_science(state)
+  for _, name in ipairs(SCIENCE) do
+    if state.science_remaining[name] == count then fail("owned lab rejected initial " .. name) end
   end
   M.set_lab_running(entity, true)
+end
+function M.append_tin_research(force, before)
+  for index=1,4 do
+    local accepted = force.add_research(TIN)
+    if index <= 3 and accepted ~= true then fail("native useful Tin queue was rejected") end
+  end
+  if before.current == PROBE and (not force.current_research or force.current_research.name ~= PROBE
+      or not near(force.research_progress, before.progress)) then
+    fail("append changed eligible current work")
+  end
 end
 local function flags(force, stage, foreign)
   for _, key in ipairs(FAMILIES) do
@@ -173,6 +212,7 @@ local function marker(kind, state)
     witnesses={stage=state.stage, paid_families=7, source_completed_levels=28,
       source_partial_science_sets=42, repeated_queue=true, detached_progress=0.27,
       native_reset_observed=state.reset_done == true, useful_readmitted_labs=state.finished or 0,
+      readmitted_eligible_completions=state.readmitted_eligible_finished or 0,
       source_paid_bonuses=state.source.bonuses, current=snapshot(game.forces.player),
       foreign=snapshot(game.forces[state.foreign_index]), ordinary_tuning_qualified=false}})
 end
@@ -208,7 +248,7 @@ local function setup_source(state)
   if tech(player, PROBE).researched then fail("source unrelated probe already researched") end
   player.research_queue = {tech(player, BRONZE), tech(player, BRONZE), tech(player, PROBE)}
   state.phase, state.started = "earn-partial", game.tick
-  fill(state, 42)
+  M.fill_science(state, 42)
   game.speed = 16
 end
 
@@ -241,13 +281,14 @@ function M.apply(stage)
       local before = snapshot(game.forces.player)
       state.readmitted_probe_saved = before.current == PROBE and before.progress or before.probe_saved
       state.readmitted_probe_researched = before.probe_researched
-      game.forces.player.research_queue = {tech(game.forces.player, TIN), tech(game.forces.player, TIN),
-        tech(game.forces.player, TIN), tech(game.forces.player, TIN)}
+      state.readmitted_probe_should_complete = before.current == PROBE and not before.probe_researched
+      state.readmitted_eligible_finished = 0
+      M.append_tin_research(game.forces.player, before)
       state.phase, state.finished = "useful-research", 0
-      fill(state, 400)
+      M.fill_science(state, 400)
     else
       -- An available current research would consume these and change42%.
-      fill(state, 2)
+      M.fill_science(state, 2)
     end
   end)
   script.on_load(function() loaded, logged = true, false end)
@@ -257,6 +298,13 @@ function M.apply(stage)
     if state.stage == "unavailable" and state.phase == "observe-transition" and event.research.name == PROBE then
       state.eligible_finished = state.eligible_finished + 1
       if state.eligible_finished > 1 then fail("unexpected repeated eligible completion") end
+      return
+    end
+    if state.stage == "readmitted" and state.phase == "useful-research" and event.research.name == PROBE then
+      state.readmitted_eligible_finished = state.readmitted_eligible_finished + 1
+      if not state.readmitted_probe_should_complete or state.readmitted_eligible_finished ~= 1 then
+        fail("unexpected readmitted eligible completion")
+      end
       return
     end
     if state.phase ~= "useful-research" or event.research.name ~= TIN then fail("unexpected native lab completion") end
@@ -284,6 +332,9 @@ function M.apply(stage)
     if game.tick - state.started > 3600 then fail("bounded fixture did not finish") end
     local entity, inv = lab(state)
     entity.energy = 1000000000
+    if state.phase == "earn-partial" or state.phase == "observe-transition" or state.phase == "useful-research" then
+      M.refill_science(state)
+    end
     if state.phase == "earn-partial" then
       if not inv.is_empty() then return end
       M.set_lab_running(entity, false)
@@ -317,9 +368,13 @@ function M.apply(stage)
       end
       if not near(tech(player, BRONZE).saved_progress, 0.42)
           or not near(tech(player, LEAD).saved_progress, 0.27) then fail("readmission lost paused work") end
-      if not near(tech(player, PROBE).saved_progress, state.readmitted_probe_saved)
+      if state.readmitted_probe_should_complete then
+        if state.readmitted_eligible_finished ~= 1 or tech(player, PROBE).researched ~= true then
+          fail("readmission did not finish eligible research")
+        end
+      elseif not near(tech(player, PROBE).saved_progress, state.readmitted_probe_saved)
           or tech(player, PROBE).researched ~= state.readmitted_probe_researched then
-        fail("readmission changed eligible research work")
+        fail("readmission changed inactive eligible research work")
       end
       M.assert_preserved(snapshot(game.forces[state.foreign_index]), state.foreign_source, "readmitted foreign")
       finish(state)

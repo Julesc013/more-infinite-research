@@ -206,6 +206,66 @@ class PreservationTests(unittest.TestCase):
             self.assertEqual(entity.active, running)
             self.assertEqual(entity.energy, 1000000000 if running else 0)
 
+    def test_finite_science_supply_refills_real_slot_capacity_without_inventing_packs(self):
+        exercise = self.lua.execute('''return function(module, capacity)
+          defines={inventory={lab_input=1}}
+          local stock, delivered={},{}
+          local inventory={clear=function() stock={} end,insert=function(stack)
+            local accepted=math.min(stack.count,capacity-(stock[stack.name] or 0))
+            stock[stack.name]=(stock[stack.name] or 0)+accepted
+            delivered[stack.name]=(delivered[stack.name] or 0)+accepted
+            return accepted end}
+          local state={lab={valid=true,get_inventory=function()return inventory end}}
+          module.fill_science(state,400)
+          for _,name in ipairs{"automation-science-pack","space-science-pack"} do
+            assert(stock[name]==capacity and state.science_remaining[name]==400-capacity)
+          end
+          module.refill_science(state) -- Full slots must not spend the remainder.
+          for cycle=1,40 do
+            for name,count in pairs(stock) do stock[name]=math.max(0,count-10) end
+            module.refill_science(state)
+          end
+          for name,total in pairs(delivered) do
+            assert(total==400 and state.science_remaining[name]==0)
+          end
+          assert(state.lab.disabled_by_script==false)
+        end''')
+        for capacity in (50, 100, 200):
+            with self.subTest(capacity=capacity):
+                exercise(self.control, capacity)
+
+    def test_rejected_initial_science_and_invalid_budget_do_not_start_lab(self):
+        rejected = self.lua.execute('''return function(module,count)
+          defines={inventory={lab_input=1}}
+          local state={lab={valid=true,disabled_by_script=true,get_inventory=function()
+            return {clear=function()end,insert=function()return 0 end} end}}
+          module.fill_science(state,count)
+        end''')
+        for count in (0, 401, 1.5):
+            with self.subTest(count=count), self.assertRaisesRegex(Exception, "science budget differs"):
+                rejected(self.control, count)
+        with self.assertRaisesRegex(Exception, "rejected initial"):
+            rejected(self.control, 400)
+
+    def test_tin_append_preserves_eligible_queue_order_and_progress(self):
+        exercise = self.lua.execute('''return function(module, mode)
+          local queue={{name="automation"}}
+          local force={current_research=queue[1],research_progress=0.20,research_queue=queue}
+          force.add_research=function(id)
+            if mode=="reject" then return false end
+            queue[#queue+1]={name=id}
+            if mode=="corrupt" then force.research_progress=0 end
+            return true
+          end
+          module.append_tin_research(force,{current="automation",progress=0.20})
+          assert(#queue==5 and queue[1].name=="automation" and force.research_progress==0.20)
+          for i=2,5 do assert(queue[i].name=="recipe-prod-research_material_tin-4") end
+        end''')
+        exercise(self.control, "append")
+        for mode, message in (("reject", "queue was rejected"), ("corrupt", "changed eligible")):
+            with self.subTest(mode=mode), self.assertRaisesRegex(Exception, message):
+                exercise(self.control, mode)
+
     def test_source_setup_uses_native_shaped_2123_objects_without_removed_force_methods(self):
         prepare = self.lua.execute('''return function(module, mods)
           local TIN="recipe-prod-research_material_tin-4"
