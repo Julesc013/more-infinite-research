@@ -153,6 +153,72 @@ class PreservationTests(unittest.TestCase):
             self.assertEqual(entity.active, running)
             self.assertEqual(entity.energy, 1000000000 if running else 0)
 
+    def test_source_setup_uses_native_shaped_2123_objects_without_removed_force_methods(self):
+        prepare = self.lua.execute('''return function(module, mods)
+          local TIN="recipe-prod-research_material_tin-4"
+          local LEAD="recipe-prod-research_material_lead-4"
+          local BRONZE="recipe-prod-research_material_bronze-4"
+          local keys={"tin","lead","bronze","gunmetal","invar","nitinol","copper_tungsten"}
+          local recipes={"bob-tin-plate","bob-lead-plate","bob-bronze-alloy","bob-gunmetal-alloy",
+            "bob-invar-alloy","bob-nitinol-alloy","bob-copper-tungsten-alloy"}
+          local function strict(values, label)
+            return setmetatable(values,{__index=function(_,key) error(label.." has no native member "..key) end})
+          end
+          local function force(paid)
+            local technologies={automation={name="automation",valid=true,researched=false},
+              ["automation-science-pack"]={name="automation-science-pack",valid=true,researched=false}}
+            local rs={}
+            for i,key in ipairs(keys) do
+              for _,suffix in ipairs{"1","4"} do
+                local name="recipe-prod-research_material_"..key.."-"..suffix
+                technologies[name]={name=name,valid=true,level=paid and 5 or 4,researched=false,
+                  saved_progress=0,enabled=name~=TIN}
+              end
+              rs[recipes[i]]={productivity_bonus=paid and 0.08 or 0}
+            end
+            local f
+            f=strict({technologies=technologies,recipes=rs,index=paid and 1 or 2,
+              get_spawn_position=function() return {0,0} end,
+              add_research=function(id) f.current_research=technologies[id];return true end},"LuaForce")
+            return f
+          end
+          local inventory={clear=function() end,insert=function(stack)return stack.count end}
+          local function entity()
+            local state={valid=true,disabled_by_script=false,energy=0,get_inventory=function()return inventory end}
+            return setmetatable({}, {__index=function(_,key)
+              if key=="active" then return not state.disabled_by_script end
+              if state[key]==nil then error("LuaEntity has no native member "..key) end
+              return state[key] end,
+              __newindex=function(_,key,value)
+                if key~="disabled_by_script" and key~="energy" then error("read only native attribute") end
+                state[key]=value end})
+          end
+          local player,foreign=force(true),force(false)
+          local old_lab,new_lab=entity(),entity()
+          storage={}
+          defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}}
+          local callbacks={}
+          script={active_mods=mods,on_init=function(f)callbacks.init=f end,
+            on_configuration_changed=function(f)callbacks.config=f end,
+            on_load=function(f)callbacks.load=f end,on_event=function(e,f)callbacks[e]=f end}
+          settings={startup={["ips-max-level-research_material_tin"]={value=4},
+            ["mir-settings-profile-import"]={value=""}}}
+          game={tick=7453,forces={player=player},create_force=function()return foreign end,
+            surfaces={{find_entities_filtered=function()return {old_lab} end,
+              create_entity=function()return new_lab end}}}
+          module.apply("source")
+          callbacks.init();callbacks[1]()
+          assert(storage.bob_material_preservation.phase=="earn-partial")
+          assert(player.technologies[LEAD].saved_progress==0.27)
+          assert(foreign.technologies[LEAD].saved_progress==0.17)
+          assert(old_lab.disabled_by_script and not new_lab.disabled_by_script)
+          assert(#player.research_queue==3 and player.research_queue[1].name==BRONZE
+            and player.research_queue[2].name==BRONZE)
+        end''')
+        profile = json.loads((ROOT / "tests/profiles/bob-material-preservation-source-f210-2123.json").read_text(encoding="utf-8"))
+        mods = {row["name"]: row["version"] for row in profile["mods"]}
+        prepare(self.control, self.table(mods))
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)

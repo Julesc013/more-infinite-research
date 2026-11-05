@@ -32,7 +32,7 @@ end
 local function snapshot(force)
   local result = {technologies={}, bonuses={}, current=force.current_research and force.current_research.name or false,
     queue=names(force.research_queue), progress=force.research_progress,
-    lead_saved=force.get_saved_technology_progress(LEAD)}
+    lead_saved=tech(force, LEAD).saved_progress}
   for _, key in ipairs(FAMILIES) do
     for _, suffix in ipairs{"1", "4"} do
       local id = "recipe-prod-research_material_" .. key .. "-" .. suffix
@@ -141,12 +141,12 @@ local function setup_source(state)
   local old_labs = surface.find_entities_filtered{position=player.get_spawn_position(surface), name="lab", force=player}
   if #old_labs ~= 1 then fail("exact disposable predecessor lab was not found") end
   M.set_lab_running(old_labs[1], false)
-  player.set_saved_technology_progress(LEAD, 0.27)
+  tech(player, LEAD).saved_progress = 0.27
   local foreign = game.create_force("mir5-bob-material-preservation-foreign")
   tech(foreign, "automation-science-pack").researched = true
   if not foreign.add_research(PROBE) then fail("foreign probe rejected") end
   foreign.research_progress = 0.31
-  foreign.set_saved_technology_progress(LEAD, 0.17)
+  tech(foreign, LEAD).saved_progress = 0.17
   tech(foreign, TIN).enabled = false
   state.foreign_index = foreign.index
   state.lab = surface.create_entity{name=LAB, position={12, 0}, force=player}
@@ -247,8 +247,8 @@ function M.apply(stage)
           fail("readmission paid/useful effect differs: " .. recipe)
         end
       end
-      if not near(player.get_saved_technology_progress(BRONZE), 0.42)
-          or not near(player.get_saved_technology_progress(LEAD), 0.27) then fail("readmission lost paused work") end
+      if not near(tech(player, BRONZE).saved_progress, 0.42)
+          or not near(tech(player, LEAD).saved_progress, 0.27) then fail("readmission lost paused work") end
       M.assert_preserved(snapshot(game.forces[state.foreign_index]), state.foreign_source, "readmitted foreign")
       finish(state)
     end
