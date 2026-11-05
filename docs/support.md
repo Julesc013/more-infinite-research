@@ -85,9 +85,9 @@ source_of_truth_for:
 
 ### Overlapping weapon-speed research
 
-- MIR 5 betas may still offer dedicated weapon-speed research when another mod supplies infinite research for the same bonus. The competing-research preference does not resolve every overlap yet. This remains open for stable qualification; it is not a reason to delete research or its earned effects from a save.
+- Published MIR 5.0.0–5.0.3 betas may still offer dedicated weapon-speed research when another mod supplies infinite research for the same bonus. The competing-research preference does not resolve every overlap yet. This remains open for stable qualification; it is not a reason to delete research or its earned effects from a save.
 
-- The next candidate separates electric and Tesla bonuses when a qualified native research owner covers only one category. Earned bonuses and useful remaining research must survive; its affected in-game qualification is still open. If a first upgrade cannot establish the old paid category selection, keep the original save and mod/settings selection rather than attempting to repair research levels manually.
+- The 5.0.4 candidate separates electric and Tesla bonuses when a qualified native research owner covers only one category. Focused checks on Factorio 2.0.77 and 2.1.23 preserve earned bonuses, current and queued research work, provider removal/return, effects reset, force merges and save/reload state. Changed science/time vectors and arbitrary mod combinations remain outside that claim. If a first upgrade cannot establish the old paid category selection, keep the original save and mod/settings selection rather than attempting to repair research levels manually.
 
 ### Same-edition and historical upgrades
 
