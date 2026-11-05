@@ -16723,6 +16723,27 @@
         "test_intent_reconciliation_complete": false,
         "native_execution": false,
         "release_qualification": false
+      },
+      {
+        "subjects": [
+          "CONT-07",
+          "CONT-13",
+          "CONT-17",
+          "VER-07"
+        ],
+        "reviewed_against": "9d1e8679c58a0d2506d76cbce5f47b28e4a9e9ac",
+        "scope": "Three historical validation helpers;11 complete bodies/54745bytes,526 exact bindings with520 remote matches and6 retained local aliases. All three canonical alias destinations included.",
+        "evidence": {
+          "path": "spec/evidence/historical-validation-helper-intents-aero-r01.json",
+          "sha256": "A8FA8105C59F578A997E13D31E4BF84AB4F054E4ED9CB58B899D0E82E778391C"
+        },
+        "disposition": "Retire registry/group/recorder wire mechanics while retaining completeness,failure/provenance,consumed-input and declared-support purposes in existing controls. No additional player behavior is inferred from metadata helpers.",
+        "remaining_executable_check": "Keep actual scenario assertions,manifest/caller bodies,remaining historical sources and current native/profile/client/performance verdicts at their existing scopes. No obsolete runner restoration or unchanged native rerun.",
+        "owner": "Aero historical/independent review; Black Glass autonomous native/integration/publication",
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "native_execution": false,
+        "release_qualification": false
       }
     ],
     "stable_coverage_review": {
