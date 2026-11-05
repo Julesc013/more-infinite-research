@@ -1,0 +1,416 @@
+{
+  "kind": "MIRHistoricalValidationHelperIntentReviewV1",
+  "reviewed_on": "2026-11-05",
+  "reviewed_against": "9d1e8679c58a0d2506d76cbce5f47b28e4a9e9ac",
+  "subjects": [
+    "CONT-07",
+    "CONT-13",
+    "CONT-17",
+    "VER-07"
+  ],
+  "scope": "Three named historical validation helpers only:11 deduplicated complete bodies/54745bytes,526 original bindings across69 names in the existing91-tag index. These are runner implementation,not the scenario assertions or native results.",
+  "source_inventory": {
+    "path": "spec/inventory/continuity.json",
+    "indexed_tags": 91,
+    "extraction_sha256": "2982A4B3E18D639DD9F60800F826F7A65A407F45B96273C567E515453DFBEBBB",
+    "binding_readback_sha256": "8E36D198AEABC318B690DBA1130ABD76085B17919F6E39C5F4D0F238D63DD0D6"
+  },
+  "counts": {
+    "complete_bodies": 11,
+    "raw_bytes": 54745,
+    "original_bindings": 526,
+    "remote_tag_names": 68,
+    "matching_remote_bindings": 520,
+    "preserved_local_alias_bindings": 6,
+    "forwarding_alias_bodies": 3
+  },
+  "remote_binding_limit": "v4.2.0 is an explicit retained local alias of the preserved v4.2.0-stable commit6d19c874; six bindings use that original local name. The other68 actual tag names/520 bindings match current remote commit identities. No invented v-prefixes or republished tags.",
+  "sources": [
+    {
+      "blob": "4916279b4dd2d19709ed730971ad7a001332b007",
+      "bytes": 10901,
+      "sha256": "0509AD6CF96A5DD2FA74E02B96919B57D577139267B1E0C5C2F74C1B71612E3D",
+      "lines": 265,
+      "bindings": 152,
+      "tags": 67,
+      "representative": {
+        "tag": "v4.7.3",
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "tools/lib/validation/ResultAggregation.ps1",
+        "blob": "4916279b4dd2d19709ed730971ad7a001332b007"
+      }
+    },
+    {
+      "blob": "d666c277ba29a228ba073e1c6428f9afad44f691",
+      "bytes": 1311,
+      "sha256": "C24A5884534C4C47ECB26CEB31480E156AB922C6015E42B697E57A56803664D2",
+      "lines": 44,
+      "bindings": 117,
+      "tags": 42,
+      "representative": {
+        "tag": "0.10.0",
+        "commit": "3377f835243c0cf9e7d2c2e76641c2c471341975",
+        "path": "scripts/validation/ScenarioGroups.ps1",
+        "blob": "d666c277ba29a228ba073e1c6428f9afad44f691"
+      }
+    },
+    {
+      "blob": "11d6539f3e596d00f4d52ccdaa040a0e186aa05b",
+      "bytes": 5572,
+      "sha256": "57BF1CDABB3196C10CEEB409E80F40103B1ECD55867BC3967F440322E2C4C996",
+      "lines": 142,
+      "bindings": 126,
+      "tags": 41,
+      "representative": {
+        "tag": "0.10.0",
+        "commit": "3377f835243c0cf9e7d2c2e76641c2c471341975",
+        "path": "scripts/validation/ScenarioRegistry.ps1",
+        "blob": "11d6539f3e596d00f4d52ccdaa040a0e186aa05b"
+      }
+    },
+    {
+      "blob": "906b81e1138bd4d213d774e420dd6a84411d1796",
+      "bytes": 9302,
+      "sha256": "B01A28A76A2FD27AA24D0BC80400569E52760D6F18CE072DB75E61031AF56870",
+      "lines": 238,
+      "bindings": 2,
+      "tags": 2,
+      "representative": {
+        "tag": "2.3.5",
+        "commit": "9eabc5439d3743be10c6f76d5ee36d9804a60f25",
+        "path": "scripts/validation/ResultAggregation.ps1",
+        "blob": "906b81e1138bd4d213d774e420dd6a84411d1796"
+      }
+    },
+    {
+      "blob": "ac250950dcf25f8fbfe46c0ddee832d474519785",
+      "bytes": 1350,
+      "sha256": "56F50E3F91D1B1C9F117F363EE1A3B0E0927E5D35EAC670F6246DB1D908AE590",
+      "lines": 44,
+      "bindings": 37,
+      "tags": 32,
+      "representative": {
+        "tag": "v4.7.3",
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "tools/lib/validation/ScenarioGroups.ps1",
+        "blob": "ac250950dcf25f8fbfe46c0ddee832d474519785"
+      }
+    },
+    {
+      "blob": "6e4c487f70bfcbf05164c7180707e5dfa4c1937a",
+      "bytes": 6412,
+      "sha256": "6EDCE6091DF734F0DB6138043EB2657A4D6A1FB68CD17EFEADBDABDAFC2BD6FD",
+      "lines": 169,
+      "bindings": 2,
+      "tags": 2,
+      "representative": {
+        "tag": "2.5.0",
+        "commit": "bea21b068fb38dc26479b619454e50d5b4cf4793",
+        "path": "scripts/validation/ScenarioRegistry.ps1",
+        "blob": "6e4c487f70bfcbf05164c7180707e5dfa4c1937a"
+      }
+    },
+    {
+      "blob": "a7e7ad42347afa21ab84314db6b165cab548a318",
+      "bytes": 13519,
+      "sha256": "5A587679459F5B617FA10259E80D9A52852C153ECFAF3F4D2561C5D5214269D8",
+      "lines": 325,
+      "bindings": 3,
+      "tags": 3,
+      "representative": {
+        "tag": "2.5.10",
+        "commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+        "path": "scripts/validation/ScenarioRegistry.ps1",
+        "blob": "a7e7ad42347afa21ab84314db6b165cab548a318"
+      }
+    },
+    {
+      "blob": "746dfa31d67e11c0d7b60b4b7b713cb6c18b5697",
+      "bytes": 149,
+      "sha256": "50C52C239027D55B46E13C3C0A3551731BD28C30C4192776CF3097F05A24CE4E",
+      "lines": 2,
+      "bindings": 22,
+      "tags": 22,
+      "representative": {
+        "tag": "v4.7.3",
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "scripts/validation/ResultAggregation.ps1",
+        "blob": "746dfa31d67e11c0d7b60b4b7b713cb6c18b5697"
+      }
+    },
+    {
+      "blob": "0a800166e38e7e482d9fd31df5e30306674b3db1",
+      "bytes": 146,
+      "sha256": "6F7BAB16A2DB724AADFF8F56EA7A827A200BA2022827412B85CB2EB6C110832C",
+      "lines": 2,
+      "bindings": 22,
+      "tags": 22,
+      "representative": {
+        "tag": "v4.7.3",
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "scripts/validation/ScenarioGroups.ps1",
+        "blob": "0a800166e38e7e482d9fd31df5e30306674b3db1"
+      }
+    },
+    {
+      "blob": "fe51600bd507d6d783d0c8b02e28e250b452ef91",
+      "bytes": 148,
+      "sha256": "9EFEFAE01C267259D92066118A1D3E9BEBDFC978880959168735447326ABE208",
+      "lines": 2,
+      "bindings": 22,
+      "tags": 22,
+      "representative": {
+        "tag": "v4.7.3",
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "scripts/validation/ScenarioRegistry.ps1",
+        "blob": "fe51600bd507d6d783d0c8b02e28e250b452ef91"
+      }
+    },
+    {
+      "blob": "19bf83861b35ef7e62bc4c39ce21e64eda142418",
+      "bytes": 5935,
+      "sha256": "C57D9B78018382667FB2E0F196DB5E09A1846D9F48E672433DF98BF4671B63C4",
+      "lines": 154,
+      "bindings": 21,
+      "tags": 21,
+      "representative": {
+        "tag": "v4.7.3",
+        "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+        "path": "tools/lib/validation/ScenarioRegistry.ps1",
+        "blob": "19bf83861b35ef7e62bc4c39ce21e64eda142418"
+      }
+    }
+  ],
+  "intent_dispositions": [
+    {
+      "obligation": "Required observations remain complete and failures remain failures.",
+      "original": [
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tools/lib/validation/ResultAggregation.ps1",
+          "blob": "4916279b4dd2d19709ed730971ad7a001332b007",
+          "lines": "8-49,69-119,168-188,223-265"
+        }
+      ],
+      "independent_expectation": "The legacy recorder retains prepared/running/incomplete/failed states and refuses missing,duplicate or nonpassing expected scenarios and unmet required groups. Its later non-gate assertion-count/failure-packet additions prevent a nominal success record from substituting for actual observations. The exact record schema,numeric assertion field and packet filenames are tooling details,not player APIs.",
+      "disposition": "consolidate-retained-verification-purpose; retire-legacy-result-schema",
+      "current_mapping": [
+        {
+          "path": "tests/Test-MIR5HostControls.ps1",
+          "purpose": "Explicit full ordered control list; missing files or nonzero process exits fail; output explicitly denies native/release qualification."
+        },
+        {
+          "path": "tools/Invoke-NativeFixture.ps1",
+          "purpose": "Read-FixtureResult and applicable consumer witnesses bind actual stages. Full runs require completed save and two cold reloads before passed-private-native-fixture; catches/restoration failures remain failed and retained."
+        },
+        {
+          "path": "tests/test_capture_controls.py",
+          "controls": [
+            "test_broad_native_receipts_preserve_failures_and_data_only_scope",
+            "test_native_fixture_active_marker_reader_rejects_wrong_or_ambiguous_markers"
+          ]
+        },
+        {
+          "path": "spec/verification.md",
+          "purpose": "Separate native/gameplay/save/client/performance/release scopes; unavailable/refused/unrun are not passes."
+        }
+      ],
+      "limits": "These are source/control mappings,not a new test execution or proof that every historical caller has nonempty observations. Do not add a replacement generic assertion-count registry.",
+      "remaining_executable_check": "Existing current-candidate functional/native/save/client/performance verdicts remain required at their recorded scopes. No unchanged historical runner replay.",
+      "owner": "Aero intent/result review; Black Glass autonomous native execution"
+    },
+    {
+      "obligation": "Bind declared input identity to the input actually consumed.",
+      "original": [
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tools/lib/validation/ResultAggregation.ps1",
+          "blob": "4916279b4dd2d19709ed730971ad7a001332b007",
+          "lines": "8-49"
+        },
+        {
+          "tag": "2.5.10",
+          "commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+          "path": "scripts/validation/ScenarioRegistry.ps1",
+          "blob": "a7e7ad42347afa21ab84314db6b165cab548a318",
+          "lines": "80-198"
+        }
+      ],
+      "independent_expectation": "Later historical registry helpers compare actual invocation fixture,surface and settings with declarations using canonical values; result records retain source/package/profile/engine provenance. A declaration alone is not evidence that its bytes or settings were consumed.",
+      "disposition": "consolidate-current-exact-input-controls; retire-old-canonicalizer-and-wire-fields",
+      "current_mapping": [
+        {
+          "path": "tools/Invoke-NativeFixture.ps1",
+          "purpose": "Pinned engine/profile/archive/fixture/save inputs and actual stage witnesses; source save remains byte-identical."
+        },
+        {
+          "path": "tools/lib/validation/ImmutableInputStaging.ps1",
+          "purpose": "Existing immutable selected-input verification,not an imported registry."
+        },
+        {
+          "path": "tests/test_capture_controls.py",
+          "controls": [
+            "test_capture_archive_gate_retains_version_and_immutable_identity_rejections",
+            "test_native_fixture_observer_binding_rejects_missing_unselected_and_unverified_inputs"
+          ]
+        },
+        {
+          "path": "tests/test_host_controls.py",
+          "controls": [
+            "test_workflow_binds_and_reads_back_the_exact_plan_before_controls_run"
+          ]
+        }
+      ],
+      "remaining_executable_check": "Review actual consumed-input applicability and each native result separately; no equality is inferred solely from a profile or helper count.",
+      "owner": "Black Glass inputs/dispatch; Aero independent applicability review"
+    },
+    {
+      "obligation": "Scenario grouping and filtering do not create or waive acceptance.",
+      "original": [
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tools/lib/validation/ScenarioGroups.ps1",
+          "blob": "ac250950dcf25f8fbfe46c0ddee832d474519785",
+          "lines": "1-44"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tools/lib/validation/ScenarioRegistry.ps1",
+          "blob": "19bf83861b35ef7e62bc4c39ce21e64eda142418",
+          "lines": "1-154"
+        },
+        {
+          "tag": "2.5.10",
+          "commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+          "path": "scripts/validation/ScenarioRegistry.ps1",
+          "blob": "a7e7ad42347afa21ab84314db6b165cab548a318",
+          "lines": "236-261,304-325"
+        }
+      ],
+      "independent_expectation": "Legacy helpers validate schema3 required fields/kinds/source modes,nonempty assertion declarations and unique names; resolve exactly one scenario; select by name/group/tag while retaining mandatory gate rows. A matching label or selected declaration supplies neither the scenario assertion nor a pass. The Space Exploration recipe-removal name is a classification delta,not its original gameplay contract.",
+      "disposition": "retire-legacy-registry-classification; preserve-required-scope-and-specific-scenario-links",
+      "current_mapping": [
+        {
+          "path": "tests/test_host_controls.py",
+          "controls": [
+            "test_wrapper_has_one_explicit_current_host_control_plan",
+            "test_workflow_runs_the_full_host_gate_for_every_dev_main_change"
+          ]
+        },
+        {
+          "path": "spec/evidence/historical-scenario-manifest-intents-aero-r01.json",
+          "purpose": "Prior named declaration/actor dispositions remain separate; no implicit replay or inferred assertion."
+        },
+        {
+          "path": "spec/compatibility.md",
+          "purpose": "CONT-07 compatibility obligations retain their actual source/fixture/result boundary."
+        },
+        {
+          "path": "spec/verification.md",
+          "purpose": "Required tests selected by affected consumed inputs and stable verdicts,not retired group names or registry cardinality."
+        }
+      ],
+      "limits": "The JSON scenario manifest and each called fixture/assertion are outside this helper-body review. Preserve their existing reviewed or unresolved dispositions.",
+      "remaining_executable_check": "Finish remaining applicable source/fixture/assertion and inter-release reconciliation; retain separately recorded native cases. No all-scenario campaign is created by retiring a selector.",
+      "owner": "Aero historical coverage; Black Glass current native queue"
+    },
+    {
+      "obligation": "Supported engine capabilities and actual support limits stay explicit.",
+      "original": [
+        {
+          "tag": "2.5.0",
+          "commit": "bea21b068fb38dc26479b619454e50d5b4cf4793",
+          "path": "scripts/validation/ScenarioRegistry.ps1",
+          "blob": "6e4c487f70bfcbf05164c7180707e5dfa4c1937a",
+          "lines": "80-105"
+        },
+        {
+          "tag": "2.5.10",
+          "commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+          "path": "scripts/validation/ScenarioRegistry.ps1",
+          "blob": "a7e7ad42347afa21ab84314db6b165cab548a318",
+          "lines": "236-261"
+        }
+      ],
+      "independent_expectation": "Two historical registry variants select records using target capability flags. Those old flag names and filtered record counts are runner implementation; they neither admit arbitrary engines nor establish a native pass.",
+      "disposition": "consolidate-current-target-contract; retire-legacy-capability-selector",
+      "current_mapping": [
+        {
+          "path": "targets/editions.json",
+          "purpose": "Current declared normal-edition records."
+        },
+        {
+          "path": "targets/early-editions.json",
+          "purpose": "Separately limited historical cohort."
+        },
+        {
+          "path": "spec/targets.md",
+          "purpose": "Nine stable editions; F018 experimental/best effort; early finite/data-only limits and exact qualified engine requirements."
+        }
+      ],
+      "remaining_executable_check": "Retain exact supported-profile and package/native qualification obligations. No expansion of experimental/early scope and no inference that filtered legacy scenarios passed.",
+      "owner": "Aero target/package review; Black Glass actual native qualification"
+    }
+  ],
+  "variant_dispositions": [
+    {
+      "blobs": [
+        "906b81e1138bd4d213d774e420dd6a84411d1796",
+        "4916279b4dd2d19709ed730971ad7a001332b007"
+      ],
+      "decision": "Earlier recorder evolves to richer source/profile/engine fingerprints,non-gate assertion counts and failure packets. Consolidate evidence completeness/failure/provenance purposes; do not revive schema2 output or a global recorder."
+    },
+    {
+      "blobs": [
+        "d666c277ba29a228ba073e1c6428f9afad44f691",
+        "ac250950dcf25f8fbfe46c0ddee832d474519785"
+      ],
+      "decision": "The only grouping delta adds the Space Exploration recipe-removal scenario name. Retire grouping mechanics; the actual recipe-removal assertions retain their separate applicable source boundary."
+    },
+    {
+      "blobs": [
+        "11d6539f3e596d00f4d52ccdaa040a0e186aa05b",
+        "6e4c487f70bfcbf05164c7180707e5dfa4c1937a",
+        "a7e7ad42347afa21ab84314db6b165cab548a318",
+        "19bf83861b35ef7e62bc4c39ce21e64eda142418"
+      ],
+      "decision": "Four registry bodies retain declarative validation/selection; two add capabilities and one adds invocation matching/canonicalization. Latest canonical body omits those latter functions. Do not claim that every variant or current native runner implements identical old wire behavior."
+    },
+    {
+      "blobs": [
+        "746dfa31d67e11c0d7b60b4b7b713cb6c18b5697",
+        "0a800166e38e7e482d9fd31df5e30306674b3db1",
+        "fe51600bd507d6d783d0c8b02e28e250b452ef91"
+      ],
+      "decision": "Three two-line scripts/validation aliases dot-source their tools/lib/validation canonical bodies. All three destination bodies are included among these11; no missing destination helper or additional substantive suite is invented."
+    }
+  ],
+  "unreviewed_direct_frontier": [
+    "JSON scenario manifest bodies consumed by the historical registry; only previously recorded declarations/tests have their existing scoped review.",
+    "Historical callers and actual fixture/assertion implementations beyond separately recorded reviews; these helpers do not prove their expected player behavior.",
+    "Test-MIRUpgradeManifest.ps1 and the remaining imported facade/process/settings/bootstrap/package-succession/command-inventory and receipt/schema groups identified in the prior validation-result review."
+  ],
+  "source_body_intent_disposition_complete": true,
+  "product_qualification_complete": false,
+  "global_inventory_complete": false,
+  "validation": {
+    "complete_git_bodies": 11,
+    "original_bindings": 526,
+    "remote_matches": 520,
+    "preserved_local_aliases": 6,
+    "current_controls": "mapped,not newly run for documentation-only disposition",
+    "native_execution": false,
+    "release_qualification": false,
+    "stable_acceptance": false
+  },
+  "limits": [
+    "No player/test/request-ledger/progress-header/native-controller/target/published-byte change.",
+    "This closes only the three named helper-body frontier; it does not close the entire historical or current acceptance programme.",
+    "An initial extraction incorrectly described two included canonical bodies as missing; corrected exact inventory bindings above establish all three destinations. No product/oracle/input was changed.",
+    "Routine native selection,preparation,repair and dispatch remain autonomous; no prospective reviewer approval is added."
+  ]
+}

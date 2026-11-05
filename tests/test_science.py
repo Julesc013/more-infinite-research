@@ -1003,7 +1003,10 @@ class ScienceTests(unittest.TestCase):
           age.technology["space-science-pack"].research_trigger.entity = "wrong-collector"
           row = technology({{"A",2}})
           result = science.apply(row, {}, science.prepare(age_env))
-          assert(not result.enabled and result.reason == "invalid-science-source:space-science-pack:owner-trigger:space-science-pack")
+          -- The normal route rejects the collector; the declared launch route
+          -- rejects this owner's absent rocket-silo prerequisite first.
+          assert(not result.enabled and result.reason == "invalid-science-source:space-science-pack:"
+            .. "no-complete-alternative:owner-trigger:space-science-pack,owner-prerequisites:space-science-pack")
           age.technology["space-science-pack"].research_trigger.entity = "asteroid-collector"
 
           age_env.options = { ["mir-science-pack-ingredient-policy"]="configured" }
@@ -1053,6 +1056,111 @@ class ScienceTests(unittest.TestCase):
                self.lua_value({}), False)
         verify(self.lua_value(profiles["space-age-f210"]["raw"]), self.lua_value({"id": "f210"}),
                self.lua_value({"space-age": "2.1.23"}), True)
+
+    def test_space_age_keeps_the_historical_declared_satellite_source(self):
+        # Original expectation: v4.7.3 / v4.7.0, fixtures/
+        # assert-trigger-output-science-f210-470/{data-updates,data-final-fixes}.lua.
+        # This is the declared source relation, not a native acquisition claim.
+        oracle = json.loads(NATIVE_SOURCE_ORACLE.read_text(encoding="utf-8"))
+        verify = self.lua.eval(r'''
+          function(raw, mutation)
+            raw.lab = {oracle={inputs={"automation-science-pack", "space-science-pack"}}}
+            local function apply()
+              local row = technology({{"automation-science-pack", 2}})
+              local context = science.prepare({raw=raw, target={id="f210"},
+                mods={["space-age"]="2.1.23"},
+                options={["mir-science-pack-ingredient-policy"]="space"}})
+              return row, science.apply(row, {}, context), context
+            end
+            local native, native_result, native_context = apply()
+            assert(native_result.enabled and names(native.unit.ingredients)
+              == "automation-science-pack:2,space-science-pack:1")
+            assert(native_context.direct_replacement_recipe_visits == 0
+              and native_context.direct_replacement_technology_visits == 0)
+
+            local recipe = raw.recipe["space-science-pack"]
+            recipe.enabled, recipe.result, recipe.result_count = false, nil, nil
+            recipe.results = {{type="item", name="space-science-pack", amount=1}}
+            raw.item = raw.item or {}
+            raw.item.satellite = {type="item", name="satellite", rocket_launch_products={
+              {type="item", name="space-science-pack", amount=1000}}}
+            local owner = raw.technology["space-science-pack"]
+            owner.unit = nil
+            owner.research_trigger = {type="send-item-to-orbit", item="satellite"}
+            owner.prerequisites, owner.effects = {"rocket-silo"}, {}
+            if mutation == "payload" then raw.item.satellite.rocket_launch_products[1].amount = 0
+            elseif mutation == "recipe" then recipe.results[1].name = "unrelated-product"
+            elseif mutation == "trigger" then owner.research_trigger.item = "unrelated-payload"
+            elseif mutation == "prerequisite" then owner.prerequisites = {"unrelated-gate"}
+            elseif mutation == "disabled" then owner.enabled = false end
+            local trigger, effects, prerequisites, products = owner.research_trigger,
+              owner.effects, owner.prerequisites, recipe.results
+            local row, result, context = apply()
+            if mutation == "valid" then
+              assert(result.enabled, "declared historical Space Age source rejected: " .. result.reason)
+              assert(names(row.unit.ingredients) == "automation-science-pack:2,space-science-pack:1")
+              assert(same(row.prerequisites, {"space-science-pack"}),
+                "declared science owner's progression gate was lost")
+              assert(context.direct_replacement_recipe_visits == 0
+                and context.direct_replacement_technology_visits == 0,
+                "valid declared source initiated replacement discovery")
+            else
+              assert(not result.enabled and result.reason:find("invalid-science-source:", 1, true) == 1,
+                "malformed declared source was accepted: " .. mutation)
+            end
+            assert(context.fresh_recipe_visits == 0 and context.fresh_technology_visits == 0,
+              "declared source initiated a global acquisition search")
+            assert(raw.technology["space-science-pack"] == owner and owner.unit == nil
+              and owner.research_trigger == trigger and owner.effects == effects
+              and owner.prerequisites == prerequisites and recipe.results == products,
+              "source selection rewrote foreign prototypes")
+          end
+        ''')
+        for mutation in ("valid", "payload", "recipe", "trigger", "prerequisite", "disabled"):
+            with self.subTest(mutation=mutation):
+                verify(self.lua_value(oracle["profiles"]["space-age-f210"]["raw"]), mutation)
+
+    def test_space_age_white_source_keeps_its_direct_replacement_opt_in(self):
+        # Preserve the independently retained 4.7.3 named-source replacement
+        # rule when that source now has two explicit authored alternatives.
+        self.lua.execute(r'''
+          local selected = bindings.select({id="f210"}, {["space-age"]="2.1.23"})
+          local function run(valid)
+            local raw = raw_with(selected.official, {whole=selected.official})
+            install_sources(raw, true, "f210")
+            raw.technology["authored-gate"] = {}
+            local owner = raw.technology["space-science-pack"]
+            local trigger, effects = owner.research_trigger, owner.effects
+            raw.recipe["space-science-pack"] = nil
+            local replacement = {enabled=true, results={
+              {type=valid and "item" or "fluid", name="space-science-pack", amount=1}}}
+            raw.recipe["z-direct-space-replacement"] = replacement
+            local row = technology({{"automation-science-pack", 7}}, {"authored-gate"})
+            local context = science.prepare({raw=raw, target={id="f210"},
+              mods={["space-age"]="2.1.23"},
+              options={["mir-science-pack-ingredient-policy"]="space"}})
+            local result = science.apply(row, {}, context)
+            if valid then
+              assert(result.enabled and names(row.unit.ingredients)
+                == "automation-science-pack:7,space-science-pack:1",
+                "known direct white-science replacement was lost: " .. result.reason)
+              assert(same(row.prerequisites, {"authored-gate"}),
+                "initially available replacement retained the failed named owner's gate")
+            else
+              assert(not result.enabled, "a fluid replacement was admitted as lab science")
+            end
+            local recipes = 0
+            for _ in pairs(raw.recipe) do recipes = recipes + 1 end
+            assert(context.direct_replacement_recipe_visits == recipes,
+              "direct replacement did not use its existing single bounded collection")
+            assert(raw.recipe["z-direct-space-replacement"] == replacement
+              and raw.technology["space-science-pack"] == owner
+              and owner.research_trigger == trigger and owner.effects == effects,
+              "direct replacement changed the foreign source")
+          end
+          run(true)
+          run(false)
+        ''')
 
     def test_explicit_trigger_recipe_remains_a_strict_optional_contract(self):
         self.lua.execute(r'''

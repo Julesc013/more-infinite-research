@@ -1,7 +1,7 @@
 ---
-title: "MIR 5.0.3 beta release notes"
-status: draft
-applies_to: "MIR 5.0.3 GitHub prerelease"
+title: "MIR 5.0.5 beta release notes"
+status: current
+applies_to: "MIR 5.0.5 GitHub prerelease"
 audience: player
 doc_type: reference
 owner: mir-maintainers
@@ -9,18 +9,18 @@ last_reviewed: 2026-11-05
 supersedes: []
 superseded_by: []
 source_of_truth_for:
-  - mir-503-release-note-draft
+  - mir-505-release-notes
 ---
 
-- **MIR 5.0.3 beta:** cumulative compatibility and saved-research corrections, including the completed 5.0.2 work. GitHub prerelease; stable qualification remains unfinished.
-- **Glass compatibility:** keep Krastorio 2: Spaced Out research loading when Crushing Industry replaces its glass recipe. Preserve earned bonuses on both glass recipes, partial work and the research queue through the checked upgrade.
-- **Research ownership and settings:** apply cost and time settings to compatible native productivity research; retain separate MIR research when native progression cannot safely represent those settings. Preserve recipe-specific earned bonuses and unfinished work when ownership changes, including destination-force history during force merges.
-- **Space Is Fake:** preserve affected paid manufacturing research and inherited-time settings. Keep the historical science requirements on private recovery research so provider removal does not discard queued work.
-- **Other corrections:** retain Secretas's finite worker-robot storage research and continue from level 9 with inherited science and effects; improve Russian research and setting wording, including percentage explanations.
-- **Configurations checked:** selected Base upgrades from published 4.7.3 and 5.0.2, and Space Is Fake 1.0.60 saved-research transitions on Factorio 2.0.77/2.1.23. The reduced Krastorio 2: Spaced Out 2.0.19 + Crushing Industry 0.6.9/FDSL 0.5.5 case includes paid-state preservation, real glass research and two cold reloads. Some cases seed earned state or accelerate research; they do not establish ordinary research costs, physical production, every mod combination or the reporter's complete installation.
-- **Upgrade limits:** retain the documented limits for externally disabled research. These checks do not qualify arbitrary scripted force overrides. Unknown prior ownership is refused before MIR changes its saved research state; keep your original save.
-- **Beta limits:** some external weapon-speed research can overlap dedicated MIR research; this remains under investigation. Full Library input, exports, saved-view/client lifecycle and Discovery Tree's None/reset visual behavior remain unfinished. Historical coverage and whole-product factory performance/retained-memory testing remain open; no general performance improvement is claimed.
-- **Before upgrading:** back up your save and test a copy with the same mods and settings. Follow the [upgrade guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.3/docs/support.md#first-upgrade).
-- **Downloads:** choose the archive labelled for your Factorio version; each label states its minimum version. Factorio 0.18.47 is experimental, best effort and GitHub-only; its in-game load/crash check remains unverified.
-- **Early downloads (Factorio 0.6–0.12):** finite Base research with fixed defaults only; no MIR runtime effects, mod settings, Research Library, runtime API or save migrations. These builds remain best effort and untested in-game. Unzip the Factorio 0.6–0.8 downloads into the mods folder.
-- **Bug reports:** include Factorio and MIR versions, the complete mod list, settings, the current log and a reproducible save where possible. See [support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.3/SUPPORT.md).
+This beta restores Space-policy research for a supported satellite-launch science source and corrects a German Library label.
+
+- Keep research available on Factorio 2.1 with Space Age when the declared satellite-launch source supplies space science, while retaining its science gate.
+- Correct the German Research Library sorting label.
+
+Use the ZIP matching your Factorio version. The modern packages require Factorio 2.0.77 or 2.1.23 respectively. Back up your save before updating and keep the previous package available.
+
+Focused Factorio 2.1.23 Space Age checks preserve earned gear bonuses, unfinished research, queued work and detached progress when updating from 5.0.4. Both the ordinary and controlled satellite-source cases complete another lab level, save and pass two cold reloads. These checks do not qualify physical satellite/science production or an entire modpack.
+
+This is a GitHub prerelease. Full Library interaction/client acceptance, historical reconciliation and whole-product performance qualification remain unfinished. Provider changes with unmet prerequisites remain unqualified; retain the original save and mod selection for those transitions.
+
+The Factorio 0.18.47 package remains experimental/best effort; its native startup/crash smoke remains unverified. Early 0.6–0.12 packages are best effort and not natively qualified: extract their ZIP into that game's mods folder. They provide a fixed finite research subset without runtime features, settings, Library UI or migrations.

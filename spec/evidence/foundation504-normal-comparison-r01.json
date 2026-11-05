@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "kind": "MIR504FoundationNormalComparisonObservedPointV1",
+  "status": "Root-observed-predeclared-bounded-mean-nonregression-pass; independent-result-review-separate",
+  "reviewed_on": "2026-11-05",
+  "source": {
+    "player_release": "v5.0.4",
+    "frozen_author": "12eae25e24ca6600cd3cc6ed4a48d93cd8e7b472",
+    "player_tree": "a2ba6eeaf06292cd90b7d7c5a687cf96cf84529f",
+    "controller": "e3925def0e840b53a027c92d0eefb8b72301a844",
+    "package_sha256": "34F14D93A1262F32B45EBAB40B1C640B8B8FBE41B718492227024649E9E75268",
+    "engine": "2.0.77",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "protected_save_sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA"
+  },
+  "collection": {
+    "physical_process_instances": 18,
+    "unique_numeric_PIDs": 17,
+    "distinct_owned_process_start_identities": 18,
+    "NoMIR_AA_pairs": 3,
+    "matched_AB_pairs": 6,
+    "selected_rows_A": 35,
+    "selected_rows_B": 36,
+    "upstream_archive_rows": 31,
+    "benchmark_updates_per_process": 601,
+    "diagnostic_observer_loaded": false,
+    "automatic_retries": 0,
+    "extensions": 0,
+    "samples_excluded": 0,
+    "library_and_protected_input_restoration_verified": true
+  },
+  "analysis": {
+    "predeclaration_sha256": "292882E109F56170994A87E3AF6BEA22969078A1B6E70A6C38692967244376B6",
+    "calibration": {
+      "adjacent_AA_differences_ms": [
+        0.07699999999999996,
+        -0.22300000000000075,
+        -0.16300000000000026
+      ],
+      "limit_ms": 1.0,
+      "passed": true
+    },
+    "pairs": [
+      {
+        "pair": 1,
+        "A_mean_ms": 7.859,
+        "B_mean_ms": 7.86,
+        "difference_ms": 0.001000000000000334
+      },
+      {
+        "pair": 2,
+        "A_mean_ms": 7.948,
+        "B_mean_ms": 7.884,
+        "difference_ms": -0.06400000000000006
+      },
+      {
+        "pair": 3,
+        "A_mean_ms": 8.191,
+        "B_mean_ms": 7.865,
+        "difference_ms": -0.3260000000000005
+      },
+      {
+        "pair": 4,
+        "A_mean_ms": 7.904,
+        "B_mean_ms": 7.922,
+        "difference_ms": 0.017999999999999794
+      },
+      {
+        "pair": 5,
+        "A_mean_ms": 7.94,
+        "B_mean_ms": 7.964,
+        "difference_ms": 0.02400000000000002
+      },
+      {
+        "pair": 6,
+        "A_mean_ms": 7.849,
+        "B_mean_ms": 8.056,
+        "difference_ms": 0.20699999999999896
+      }
+    ],
+    "paired_mean_difference_ms": -0.023333333333333577,
+    "paired_sample_stdev_ms": 0.17369820570940459,
+    "confidence": {
+      "method": "two-sided95% Student-t,df5",
+      "critical": 2.570581835636314,
+      "lower_ms": -0.20561842099076688,
+      "upper_ms": 0.15895175432409975,
+      "assumptions": "normal paired errors; six pairs remain a small sample"
+    },
+    "practical_limit_ms": 1.0,
+    "NoMIR_AB_mean_ms": 7.9485,
+    "MIR504_AB_mean_ms": 7.925166666666667,
+    "completed_native_interval_sum_seconds": 562.458627
+  },
+  "workload_applicability": {
+    "independent_expected_projection_sha256": "490A7B07EC7765D25FD218CCE3156DD2E9F448CD52E7548B78F57BAC3753DB11",
+    "separate_activity_review_sha256": "FCE764CFC891CA4E1340535CB7B9D97083F841FDE6A785F4E9DD80B07C92B6FB",
+    "scope": "Separate observer-enabled NoMIR/current504 diagnostic exactly matches all57surface/600elapsed-tick bounded normal-item/machine projection cells. Normal runs remove only the observer from each exact role closure; this is not every product/quality/force/backlog or scripted-work equivalence."
+  },
+  "custody": {
+    "repository": "Julesc013/mir-native-worker",
+    "commit": "9d8b1f204da96a3c2beb9daa237cc04df1cfe75c",
+    "path": "evidence/foundation504-normal-comparison-r01",
+    "original_text_bodies": 255,
+    "binary_locators": 36,
+    "manifest_sha256": "BB18B5E2BF1BFC72E384677B088BD26240A486BFEF201A8BE2E71F081D16CE37",
+    "gzip_sha256": "22FA922FE8FC132CFDAB2C7ABF52C64BDAB7918401A962FA1CA4A1F4A2851DDC",
+    "decoded_sha256": "A1FA3EE91B7D1FD48043B075968D40703A1279F2CCFB782D5B5C895262701AD8",
+    "actual_remote_blobs_verified": true,
+    "save_payloads_transported": false
+  },
+  "limitations": [
+    "One physical factory/engine/default-settings workload; no all-modpack or all-edition inference.",
+    "No-MIR is the comparator,not a4.7.3 substantial-startup-improvement comparison.",
+    "No process-to-responsive-menu,save-load separation,Library open/closed state,active scripted throughput/backlog,event-spike or retained-memory acceptance.",
+    "No MIR-added percentage if denominator is unresolved/nonpositive; direct absolute time differences only.",
+    "A601-update benchmark is not an interactive60UPS promise or complete stable performance verdict.",
+    "Min/max,process duration and OS/sampled memory remain descriptive; no retained-memory or spike verdict.",
+    "Independent after-result review remains separate. All18 raw runs retained, no retries/extensions/exclusions."
+  ],
+  "whole_product_performance_qualified": false,
+  "stable_acceptance": false
+}

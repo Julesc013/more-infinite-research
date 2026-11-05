@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.5
+Date: 2026-11-05
+
+  Bugfixes:
+
+    - Keep Space-policy research available on Factorio 2.1 with Space Age when a supported satellite launch source supplies space
+      science.
+    - Correct the German Research Library sorting label.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.4
 Date: 2026-11-05
 

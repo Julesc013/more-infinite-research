@@ -1010,6 +1010,15 @@ local TARGETS = {
 
 local function closure()
   local target = TARGETS[script.active_mods.base]
+  local current504 = script.active_mods.base == "2.1.23"
+    and script.active_mods["more-infinite-research"] == "5.0.21004"
+  if current504 then
+    target = {label="F210", mir_version="5.0.21004"}
+    if script.active_mods["mir-fixture-mir5-library-multiplayer"] ~= "0.1.0"
+        or space_age_library() or standalone_identity_discovery() then
+      fail("current504 admits only the four-mod Base Library closure")
+    end
+  end
   if target == nil then
     fail("unsupported native Library target base " .. tostring(script.active_mods.base))
   end
@@ -1030,7 +1039,7 @@ local function closure()
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
     ["mir-fixture-mir5-library-multiplayer"]=fixture_version}
   local closures = private_credit and {} or {allowed}
-  if target.label == "F210" or private_credit then
+  if (target.label == "F210" and not current504) or private_credit then
     closures[#closures + 1] = {
       base=script.active_mods.base, ["more-infinite-research"]=target.mir_version,
       ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
