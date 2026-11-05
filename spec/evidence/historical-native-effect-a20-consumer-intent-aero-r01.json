@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIRHistoricalNativeEffectA20ConsumerIntentAeroV1",
-  "status": "bounded-final-and-earlier-fixture-intent-with-host-consumer-discrepancy",
+  "status": "selected-eleven-body-intent-reconciled; bounded504-weapon-source-and-native-state-disposition; mixed-coverage-and-global-gates-open",
   "reviewed_against": "807ee2537fd6f431d6944ac26c11fcda1dc76565",
   "player_tree": "58480faa995eab995cc0a3ad2cddbbdd0e5e0c04",
   "subjects": [
@@ -23,7 +23,7 @@
     "NATIVE-01",
     "STACK-02"
   ],
-  "scope": "One complete static A20 script and its two complete final direct fixtures, three unique bodies/48 exact tag bindings. Across all91 inventoried refs, these three named paths additionally discover eight older fixture bodies/105 bindings; they are metadata-only and remain unresolved. No old compiler, original assertion harness or native execution.",
+  "scope": "The original final A20 script/two fixtures and eight earlier fixture bodies are completely read in the retained initial/r02 slices:11 distinct bodies and153 tag/path bindings across91 inventoried refs. Imported modules, original native executions, inter-release sources and complete historical coverage remain separate. Current4B disposition below preserves the original host discrepancy and earlier observations under their actual identities.",
   "source_index": {
     "tag_scope": 91,
     "queried_paths": [
@@ -33,10 +33,10 @@
       "fixtures/assert-weapon-speed-safety/data-final-fixes.lua"
     ],
     "total_discovered_bindings": 153,
-    "complete_review_bodies": 3,
-    "complete_review_bindings": 48,
-    "metadata_only_bodies": 8,
-    "metadata_only_bindings": 105
+    "complete_review_bodies": 11,
+    "complete_review_bindings": 153,
+    "metadata_only_bodies": 0,
+    "metadata_only_bindings": 0
   },
   "historical_bodies": [
     {
@@ -435,7 +435,10 @@
       ],
       "disposition": "consolidate-covered-bounded-mode-controls-retain-mixed-foreign-consumer-checks",
       "limits": "Default captured-row and positive MIR-output controls do not prove foreign-owner suppression, finite5/6 mutation safety or partly covered foreign mixed categories.",
-      "remaining_executable_check": "Add independent finite-predecessor and mixed foreign Tesla/electric controls at applicable authored integration boundaries; no candidate-derived oracle."
+      "remaining_executable_check": "Add independent finite-predecessor and mixed foreign Tesla/electric controls at applicable authored integration boundaries; no candidate-derived oracle.",
+      "current504_host_controls": [
+        "tests/test_generator.py::GeneratorTests::test_weapon_overlap_preserves_finite_and_numbered_foreign_prototypes"
+      ]
     },
     {
       "id": "numbered-name-is-not-mir-custody",
@@ -448,7 +451,10 @@
         "tests/test_continuation_ownership.py::ContinuationOwnershipTests::test_foreign_creator_remains_external_after_later_modifications"
       ],
       "disposition": "retain-custody-invariant-consolidate-creator-boundary-with-exact-counterexample-unported",
-      "remaining_executable_check": "Port named-counterexample mutation protection into a host-only submitted-output/raw-foreign split. Native coverage uses a genuinely upstream-valid provider identity, not synthetic99 left after an infinite tail."
+      "remaining_executable_check": "Port named-counterexample mutation protection into a host-only submitted-output/raw-foreign split. Native coverage uses a genuinely upstream-valid provider identity, not synthetic99 left after an infinite tail.",
+      "current504_host_controls": [
+        "tests/test_generator.py::GeneratorTests::test_weapon_overlap_preserves_finite_and_numbered_foreign_prototypes"
+      ]
     },
     {
       "id": "unqualified-sightings-and-legacy-diagnostics",
@@ -478,7 +484,7 @@
   "inventory_complete": false,
   "source_reconciliation_complete": false,
   "test_intent_reconciliation_complete": false,
-  "metadata_only_sources": [
+  "initial_metadata_only_sources": [
     {
       "blob": "38da8e7fe8cd07c6da54570f17fade4bc35bcc7b",
       "bytes": 7729,
@@ -1064,5 +1070,114 @@
     "test_intent_reconciliation_complete": false,
     "native_execution": false,
     "release_qualification": false
+  },
+  "initial_review_scope": "One complete static A20 script and its two complete final direct fixtures, three unique bodies/48 exact tag bindings. Across all91 inventoried refs, these three named paths additionally discover eight older fixture bodies/105 bindings; they are metadata-only and remain unresolved. No old compiler, original assertion harness or native execution.",
+  "initial_source_index": {
+    "tag_scope": 91,
+    "queried_paths": [
+      "tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1",
+      "tests/Test-MIR4NativeEffectCoverageA20.ps1",
+      "fixtures/weapon-speed-external-owner/data.lua",
+      "fixtures/assert-weapon-speed-safety/data-final-fixes.lua"
+    ],
+    "total_discovered_bindings": 153,
+    "complete_review_bodies": 3,
+    "complete_review_bindings": 48,
+    "metadata_only_bodies": 8,
+    "metadata_only_bindings": 105
+  },
+  "current504_disposition_r04": {
+    "reviewed_on": "2026-11-05",
+    "integrated_dev": "abf6105348e3d19c8f353b8fd1026e2505e846d1",
+    "frozen_player_source": "1c94e56db5e91771f604dc9b9cfb0fd457105b32",
+    "player_tree": "4087086154ae1424650c93161ad950e78215fb85",
+    "interpretation": "Initial dispositions/probes apply to their original807/d4/current503 snapshots; this follow-up supersedes their pending descriptions only where the exact current evidence below applies. Earlier failures and all original bodies remain unchanged.",
+    "finite_coverage": [
+      {
+        "obligation": "Qualified fully-covered foreign weapon owner",
+        "independent_expectation": "Yield future duplicate work while retaining existing public MIR IDs/effect vectors and all paid/current/queued/partial state; preserve foreign research.",
+        "implementation": "source/research/modern.lua:retain_external_weapon_coverage and bounded selector/science admission, integrated through1678/1679.",
+        "evidence": "Exact4B host positive/disabled/nonpositive/science/prerequisite controls; actual published503-to4B Base2.1.23 result5B0349B9.",
+        "status": "source/host plus named seeded-state upgrade/save/two-colds pass; broader native/provider gameplay remains separate",
+        "remaining": "Actual useful lab completion and other affected supported-profile/ownership/provider/settings transitions, selected by consumed inputs.",
+        "owner": "Black Glass native; Aero source/results review"
+      },
+      {
+        "obligation": "Finite5/6 and numbered foreign prototype custody",
+        "independent_expectation": "No cleanup of raw foreign weapon identities, including a numbered99 counterexample; preserve all fields and existing table custody.",
+        "implementation": "Existing submitted-output-only apply_weapon_speed_overlap; no player correction in this unit.",
+        "evidence": "tests/test_generator.py::GeneratorTests::test_weapon_overlap_preserves_finite_and_numbered_foreign_prototypes; three independent5/6/99 broad-mutation opponents rejected, each accepted by prior overlap control; Generator54pass.",
+        "status": "selected recovered host-port gap closed",
+        "remaining": "Synthetic99 is host-only and not an upstream-valid final native selection. This assertion is not a new native finite-prototype verdict.",
+        "owner": "Aero regression; Black Glass actual native profiles"
+      },
+      {
+        "obligation": "Unusable owner is not replacement authority",
+        "independent_expectation": "Finite/disabled/nonpositive or unproved science/prerequisite sightings cannot remove useful MIR research; Generator still rejects real duplicates.",
+        "implementation": "Existing bounded owner eligibility and strict Generator preflight.",
+        "evidence": "Integrated Generator tests for unusable foreign coverage and continuation-ownership controls; retain original executions and applicability.",
+        "status": "named host coverage present; do not infer all upstream recipes/settings are qualified",
+        "remaining": "Affected actual provider/science/gameplay scenarios where no matching native evidence exists.",
+        "owner": "Aero expectations; Black Glass execution"
+      },
+      {
+        "obligation": "Partly covered Space Age Tesla/electric research",
+        "independent_expectation": "Keep uncovered useful progression without redundant future covered-category earning; preserve all paid/owed/current/queued/partial/foreign state.",
+        "implementation": "Current4B retains the full mixed vector unless every effect is covered. This protects old paid effects but does not resolve the partial future overlap.",
+        "evidence": "Existing mixed-row host control documents current preservation; separate investigation62058B29, not an implementation or acceptance verdict.",
+        "status": "OPEN product/preservation correction",
+        "remaining": "Resolve source mask/scalar and owed-work semantics; establish actual signed gun-holder arithmetic and earliest mixed effect-change behavior before implementing the bounded correction. No new prospective Aero dispatch approval.",
+        "owner": "Aero bounded source/expectation correction; Black Glass native"
+      },
+      {
+        "obligation": "Paid work executes and owner transitions conserve state",
+        "independent_expectation": "Retained current/queued work must remain useful; provider readmission/retuning/force merge must preserve proved earned state and destination history without fabricated credits.",
+        "implementation": "This4B whole-row path preserves IDs/effects and withholds future availability; the partial signed representation is not implemented.",
+        "evidence": "5B0349B9 has zero labs and changes only MIR503->504, with unchanged startup settings and one fixed foreign owner.",
+        "status": "named state boundary pass; useful completion and other changed boundaries OPEN",
+        "remaining": "Run real labs and genuinely affected provider/settings/merge routes; do not extrapolate the seeded Base pass or restart every completed historical route.",
+        "owner": "Black Glass exact native queue; Aero independent review"
+      },
+      {
+        "obligation": "Actual edition bytes and historical input disposition",
+        "independent_expectation": "Retain original tag/source/output identities; current package membership and target limits must match exact delivered editions.",
+        "implementation": "Shared canonical source and existing target packager; original historical framework is not restored.",
+        "evidence": "Independent all17 exact1c94 rebuild F5494E07, inventoryD19BB1F7; original package/applicability7c2 and historical body identities retained.",
+        "status": "4B package identity passes; global historical/native/stable completeness remains false",
+        "remaining": "Final integrated candidate applicability, required CI/promotion/delivery and all applicable stable verdicts.",
+        "owner": "Black Glass freeze/publication; Aero independent review"
+      }
+    ],
+    "new_host_port": {
+      "method": "tests/test_generator.py::GeneratorTests::test_weapon_overlap_preserves_finite_and_numbered_foreign_prototypes",
+      "controls_sha256": "0E0F7D4B448123B56C97C96B43F20BBB1F9D4A2120E14B1B8572AAFE1DCAE732",
+      "opponents": 3,
+      "prior_single_control_accepts_each_opponent": true,
+      "full_generator_controls": 54,
+      "host_result_sha256": "9D3F33991AFC747E24618AAEBC39382425DA4F504EAB6774038CA327AA453586",
+      "lua_binary_sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899"
+    },
+    "native_component": {
+      "private_repository": "Julesc013/mir-native-worker",
+      "commit": "8ddc0f15451145374ac0783858fdcc6546596c4f",
+      "path": "evidence/aero-weapon504-first-entry-result-review-r01/review.json",
+      "sha256": "5B0349B972DD3F5B6F2B4198554751E84F860268B957A9D99971A9325B04D7FE",
+      "original_chain_commit": "1a10fce3372385c9033fef10265555b0ac00e87c",
+      "actual_lab_completions": 0,
+      "scope": "PASS-bounded-Base2123-fully-covered-weapon-paid-state-upgrade-save-two-colds"
+    },
+    "partial_policy_investigation": {
+      "private_commit": "8ddc0f15451145374ac0783858fdcc6546596c4f",
+      "path": "evidence/aero-weapon504-first-entry-result-review-r01/partial-weapon-coverage-policy.json",
+      "sha256": "62058B29E01A9AE54DD193CFBEB86B158002849C9E5EE0AB76FCBF38BA0A6C34",
+      "verdict": "source facts and explicit gaps only"
+    },
+    "player_source_changes": false,
+    "native_execution_by_this_host_port": false,
+    "whole_historical_inventory_complete": false,
+    "source_reconciliation_complete": false,
+    "test_intent_reconciliation_complete": false,
+    "release_qualification": false,
+    "stable_acceptance": false
   }
 }

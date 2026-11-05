@@ -216,9 +216,25 @@ end
 
 -- One lab/science view serves this complete owned catalogue. Native owners
 -- and foreign research are outside this detached publication boundary.
-require("research.science").apply_family(technologies, nil, {
+local science = require("research.science")
+local science_environment = {
   options=values.options, raw=data.raw, target=require("platform.target"), mods=mods, log=log,
-})
+}
+local science_context = science.prepare(science_environment)
+local electric_full
+if modern_selection then electric_full = modern.retain_external_weapon_coverage(modern_selection, technologies, science_context) end
+science.apply_family(technologies, nil, science_environment, science_context)
+if electric_full then
+  for _, technology in ipairs(technologies) do
+    if technology.name == electric_full.name then
+      electric_full.unit = technology.unit
+      for _, holder in ipairs(require("research.native_gun_credit_definitions").technologies(electric_full, technology)) do
+        technologies[#technologies + 1] = holder
+      end
+      break
+    end
+  end
+end
 if require("platform.target").id == "f200" and type(mods) == "table"
     and (mods.ExpandedProductivityResearch or mods["plates-n-circuit-productivity"]
       or mods.Science_packs_productivity or mods["bioflux-productivity"] or mods["fish-productivity"]
@@ -231,6 +247,10 @@ end
 -- Stable native credit holders preserve already-earned partial overlaps when
 -- a provider or its ownership preference changes. They are explicit authored
 -- rows, independent of whether the provider is currently installed.
+if modern and require("research.product_target_extension").retain_galore_carbon_owner(technologies) then
+  if not native_adoption_patch then error("MIR Galore missing private admission facts", 0) end
+  native_adoption_patch.galore_sulfur_retired = true
+end
 require("research.native_credit_definitions").append(technologies, data.raw, values, require("platform.target"), native_credit_groups)
 
 -- Fixed native holders retain MIR1.1's already-earned extra module effects.

@@ -1,0 +1,219 @@
+{
+  "schema": 1,
+  "kind": "MIR504GaloreWeaponUsefulWorkEvidenceV1",
+  "scope": "Separate original Galore data/state and actual public sulfur work, retained disabled weapon current work, and rejected signed-gun reset proposal. A pass in one component does not qualify another.",
+  "candidate": {
+    "source_commit": "1c94e56db5e91771f604dc9b9cfb0fd457105b32",
+    "player_tree": "4087086154ae1424650c93161ad950e78215fb85",
+    "integrated_source": "abf6105348e3d19c8f353b8fd1026e2505e846d1",
+    "f200_archive_sha256": "7F45E45ADA18F68F192A355A7CEE538708EB69E2D0F6D709964915E6134A8095",
+    "f210_archive_sha256": "CA80B5817C4587EB608B997436C419592892EAEDE6F5A9F7846EEBC55C23B8F8",
+    "unpublished": true,
+    "applicability": "These exact frozen inputs retain their original identities. Later documentation/test-only integration at9db3276 has the same player tree, but is not a new native result or final release freeze."
+  },
+  "galore_data_and_first_entry": {
+    "status": "independently-accepted-bounded-data-paid-state-save-two-colds",
+    "engine": "2.0.77",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "selection": [
+      "base2.0.77",
+      "quality2.0.77",
+      "elevated-rails2.0.77",
+      "space-age2.0.77",
+      "galore_lib2.2.0",
+      "vanilla_galore_continued1.4.2",
+      "space_age_galore1.6.3",
+      "MIR5.0.20003 then5.0.20004",
+      "ordinary first-entry fixture0.1.0"
+    ],
+    "originals": {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "11b75bd8756328ebce0bca342119df7706b2deea",
+      "directory": "evidence/galore504-first-entry-native-r01",
+      "text_bodies": 193,
+      "gzip_sha256": "8176D493C93618B09A8FEE072EC81005F66B11C0CF7E47C9EEEB301657C3879B",
+      "decoded_sha256": "2743105A8D2E853CFEBE0AA6113D1B196BE9FCDAD0EE83057BA197C110514134",
+      "root_readback_sha256": "F4D60511F2FDFEECE96F5F10FB33113640B01733AF0BB38AB007EA8591D4BCDF",
+      "all_logs_included": true,
+      "exact_remote_bytes_read_back": true,
+      "primary_custody": "build/qualification/galore504-first-entry-native-chain-r01"
+    },
+    "review": {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "168493333bddb7f6bef8df6cb6d82a09867039fc",
+      "path": "evidence/aero-galore504-first-entry-result-review-r01/review.json",
+      "sha256": "87FA2DC20EFE5BEECB12146BD35D821D7C664474C89E6B59446EF91400ECF362",
+      "exact_remote_bytes_read_back": true
+    },
+    "actual_processes": 11,
+    "final_state_processes": 6,
+    "data_arms": [
+      "actual upstream without MIR",
+      "actual published5.0.20003",
+      "exact frozen5.0.20004"
+    ],
+    "observations": [
+      "Both complete relevant raw technology rows match except removal of sulfur coal effect; carbon entire row and other sulfur fields unchanged.",
+      "Actual published503 source retains full17-recipe paid vector, coal.5 on both paid forces, sulfur/carbon2/5, opposite current42/38percent and ordered queues.",
+      "Earliest candidate callback before actor writes, strictly later tick, save and two colds preserve queued19percent, detached27percent, foreign23percent, unearned controls and hidden signed credits.",
+      "No target reseeding or lab work occurs in this state component."
+    ],
+    "protected_saves": {
+      "source": "EC51CDE2657E4AC0522BF77C7431BD541AC9A724853DC5D730C54115B7AC0D66",
+      "target": "A985A969D032C7D64C516D48AB86397D0A4940F0D2106BFF5FD7A100C3A5D5E7"
+    },
+    "limits": [
+      "No physical manufacturing, readmission, force merge, useful labs or performance claim.",
+      "Full source/candidate raw dumps and binary saves remain native custody; reviewer does not claim their binary download or full original-program replay."
+    ]
+  },
+  "galore_public_sulfur_lab": {
+    "status": "independently-accepted-one-real-completion-save-two-colds",
+    "fixture_commit": "19ae445cdf856101c1006b2782836d27645b6579",
+    "fixture_sha256": "D71809A8D6EEC50944A0E80755B95768E4560D6730E74B7DFE95CEB7851C8626",
+    "originals": {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "87ada551d7789ed475643f3af19dfa2046559faf",
+      "directory": "evidence/galore504-owed-lab-native-r01",
+      "text_bodies": 133,
+      "gzip_sha256": "CDCBA52872130CD008334C70ECE815E472809038E945653DBB401B257CEDFFC9",
+      "decoded_sha256": "BB3C7CB9977796E1B52723D35F1B14D88EBA093E4D125CAC571F463235752A5C",
+      "root_readback_sha256": "4F5C68B4798AD526E45B6BA9FB19B9FED4171F29B13E44100D0BBE1523E90CEC",
+      "all_logs_included": true,
+      "exact_remote_bytes_read_back": true,
+      "primary_custody": "build/qualification/galore504-owed-lab-native-chain-r01"
+    },
+    "review": {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "d73e7e1d265088b3871b5b2f3884085807328dfe",
+      "path": "evidence/aero-galore504-public-sulfur-lab-review-r01/review.json",
+      "sha256": "3BDDCD1E59EB8AC96CF9CEFBB7251C79600E78C3BD91A8E58398734F33D7BE30",
+      "exact_remote_bytes_read_back": true
+    },
+    "actual_processes": 5,
+    "final_processes": 3,
+    "source_save": "A985A969D032C7D64C516D48AB86397D0A4940F0D2106BFF5FD7A100C3A5D5E7",
+    "target_save": {
+      "sha256": "7F17C4A1C887F39A4CB970B4DB0A59F3428A975CACBCE247746241003E4D2AC2",
+      "bytes": 912189
+    },
+    "observations": [
+      "48 owned stock biolab clones, only name/speed300 changed; normal16000 public sulfur cost, time and five science inputs.",
+      "Real by_script=false completion tick2322 records inventory count loss4608 packs each within its explicit buffered-pack bound; exact durability is unavailable on2.0; seven remaining sulfur recipe bonuses increase once.",
+      "Already-paid coal stays.5 and positive/negative holders2/1 fixed; carbon5 becomes current at retained19percent; complete other force/queue/partial/prototype/foreign state unchanged.",
+      "Own labs stop immediately; next tick, save and two read-only cold loads retain full state and stopped inventories/energy."
+    ],
+    "independent_oracle": "Pre-existing spec/compatibility.md and original accepted PR1672 appoint carbon future coal owner. Retained PUBLIC sulfur work does not inherit retired coal; private pending old-term policy is distinct.",
+    "limits": [
+      "One public sulfur completion; carbon queued work is retained but not completed.",
+      "Synthetic terrain/entities/items/speed/energy, no natural manufacturing, performance, readmission, merge or release verdict."
+    ]
+  },
+  "retained_weapon_current_lab": {
+    "status": "independently-accepted-one-retained-disabled-rocket-completion-save-two-colds",
+    "fixture_commit": "8a97e2900c05112cd58506707c83bf09d683b9f2",
+    "fixture_sha256": "E6036BE4B9349C8652B5E40CC02746B1516EFAD1471DF127712AC9A177A51D21",
+    "engine": "2.1.23",
+    "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "selection": [
+      "Base2.1.23",
+      "MIR5.0.21004",
+      "same-name ordinary fixture0.1.0-to0.2.0"
+    ],
+    "originals": {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "e07bcd527afbc663e40f029b02d8e3b63db9071c",
+      "directory": "evidence/weapon504-real-lab-native-r01",
+      "text_bodies": 92,
+      "gzip_sha256": "28229BA217E2FC5E2D2568461F937B3FE38D113EBC4AD58BF107E207DCAE1071",
+      "decoded_sha256": "FF4CA461E3163071DC6178C49AC385CAC46FA619BAF3F2DFE9E53AD5AEE5E2D6",
+      "root_readback_sha256": "85E9C8D982844C2F4361C0854414617D6147C4DA83DEC3188B0FBCAFA4490FC8",
+      "all_logs_included": true,
+      "exact_remote_bytes_read_back": true,
+      "primary_custody": "build/qualification/weapon504-real-lab-native-chain-r01"
+    },
+    "actual_processes": 4,
+    "final_processes": 3,
+    "source_save": "07B50580B65BB588C7C16B05D18D944C53103E9F295F070C4FB474105FFD3517",
+    "target_save": {
+      "sha256": "0C6589A50861CC1B374A8F0F5FF572C31BF2136AC36BDF734F4877D9E8C255D9",
+      "bytes": 683014
+    },
+    "observations": [
+      "Retained disabled Rocket3 current42percent physically completes by_script=false at tick1177 using four stock Base lab clones speed60; normal135 cost/time and five sciences unchanged.",
+      "80 drawn minus1.700000000001386 buffered gives78.29999999999862 useful units eachscience; full authored rocket+.1 exactly once, other four-category vector unchanged.",
+      "Cannon4 advances to sole current at retained19percent while future dedicated availability remains disabled; other paid/unearned force and foreign9/detached27percent state unchanged.",
+      "Strictly later tick, save and two read-only cold loads retain full poststate and stopped labs; no research/queue/bonus repair."
+    ],
+    "limits": [
+      "One rocket completion only; queued cannon is retained, not completed.",
+      "Synthetic lab speed/entities/items/energy; no mixed Tesla, natural manufacturing, performance or final release acceptance."
+    ],
+    "review": {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "975edbaf3757849f59e5bfb23bc8196d89e4d4c3",
+      "path": "evidence/aero-weapon504-retained-current-lab-review-r01/review.json",
+      "sha256": "ACC70C47FCF8995E7161287BDAA448186B33C135E2CB018A61FC8E8C41F08747",
+      "exact_remote_bytes_read_back": true
+    }
+  },
+  "signed_gun_primitive_adverse": {
+    "status": "independently-confirmed-NOT-QUALIFIED",
+    "originals": {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "d0f54f3ee24810f0882f1bfbb1c7142f93c3dbd4",
+      "directory": "evidence/gun-credit-primitives-native-r01",
+      "text_bodies": 99,
+      "gzip_sha256": "6B21A85A82D917CA7E2CBE42F0054FB34BE3B32396708DF36C624401EB047F09",
+      "decoded_sha256": "ABCCE95B425FE979830B90AA2E6A0EAC694D30B409CEC42BB6B497121EAFD7A9",
+      "root_readback_sha256": "5BB814CB10D42C55E980B7E6C0D65AD86ED3869D3A3482FD48F2B58991ECF8E8",
+      "all_logs_included": true,
+      "exact_remote_bytes_read_back": true,
+      "primary_custody": "build/qualification/gun-credit-primitives-native-chain-r01"
+    },
+    "review": {
+      "repository": "Julesc013/mir-native-worker",
+      "commit": "036a2125e438627e80647d8b94cc8121ca79503b",
+      "path": "evidence/aero-gun-credit-primitives-native-review-r01/review.json",
+      "sha256": "8DD9E72A732B03ECB56528DA9A5ED58295673ED70E1483B8217E363721775867",
+      "exact_remote_bytes_read_back": true
+    },
+    "actual_processes": 3,
+    "independent_expected_reset": {
+      "rocket": 0.63,
+      "cannon-shell": 0.63
+    },
+    "actual_reset": {
+      "rocket": 0.6300000000000001,
+      "cannon-shell": 0.97
+    },
+    "observations": [
+      "Initial, positive, signed and external-native arithmetic pass; effects reset loses cannon negative2*.17=.34 despite retained holder levels.",
+      "Same exact prototype/control rows and arithmetic fail with MIR disabled and only Base+fixture loaded; reset snapshot is before four-owned availability suppression.",
+      "Native reset invalidates custom availability. Original fixture flag refusal, reset-aware arithmetic refusal and NoMIR refusal all remain failed; no completed save/colds."
+    ],
+    "disposition": "Do not adopt the proposed four signed gun holders for mixed Tesla/electric preservation. Engine clamping/order cause remains inference; this exact counterexample is independent of MIR runtime.",
+    "limits": [
+      "No product source change, expected-value/level/bonus repair, tolerance relaxation or new acceptance.",
+      "Existing positive gun and signed recipe evidence retain their own distinct scope."
+    ]
+  },
+  "preserved_fixture_adverses": [
+    "Galore source missing metallurgic science and unsupported2.0 runtime effect.hidden; both original failures retained.",
+    "Galore lab-r01 wrong stock biolab grid; r02 wrongly imported private pending coal terms into public sulfur. Independent approved policy corrects only oracle; originals remain failed.",
+    "Weapon lab-r01 required source witness during runtime callback. Corrected parse-time loading plus old-failing host tripwire; original failure retained."
+  ],
+  "shared_controls": {
+    "equality_comparator": "unchanged absolute difference<1e-8",
+    "guards": "Exact original saves, process ownership, resource admission, small direct libraries and prior controls/archives restored; Factorio0 after every terminal case.",
+    "raw_logs": "All original .log/.stdout/.stderr bodies are retained with exact hashes; local original/copy binary saves verified.",
+    "meaning": "Host models, fixtures and result indexes do not substitute for the native observations or independent release verdict."
+  },
+  "remaining": [
+    "Mixed Tesla/electric paid-vector preservation representation and affected old-mask/current/queue/provider/merge checks.",
+    "Other required supported-profile/state/API/historical, Library input/export/client and whole-product performance verdicts.",
+    "Final accepted release source/package freeze, exact required checks, independent release review and checked publication."
+  ],
+  "release_qualification": false,
+  "stable_acceptance": false
+}

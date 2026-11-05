@@ -617,9 +617,9 @@ class GeneratorTests(unittest.TestCase):
         self.lua.execute('''
           local ok, message, environment = disabled_data_final()
           -- This selected-source scaffold has no native-owner recipes, so
-          -- only five empty private mains are added here. Full owner/recipe
+          -- five empty private mains and four mixed gun holders are added. Full owner/recipe
           -- fixtures independently cover the eleven canonical signed pairs.
-          assert(ok, message); assert(environment.writes == 1 and #environment.emitted == 99+5 and environment.emitted[1].enabled == false)
+          assert(ok, message); assert(environment.writes == 1 and #environment.emitted == 99+5+4 and environment.emitted[1].enabled == false)
           ok, message, environment = missing_active_space_age_binding()
           assert(not ok and tostring(message):find("missing required recipe casting-iron-gear-wheel", 1, true), tostring(message))
           assert(environment.writes == 0, "active binding wrote before named preflight")
@@ -1351,6 +1351,197 @@ class GeneratorTests(unittest.TestCase):
           end
         ''')
 
+    def test_weapon_overlap_preserves_finite_and_numbered_foreign_prototypes(self):
+        # Original A20 protects finite5/6 and its transient numbered99 owner.
+        # This is a host custody counterexample, not a valid native modpack.
+        self.lua.execute('''
+          local function clone(value)
+            if type(value) ~= "table" then return value end
+            local out = {}; for key, child in pairs(value) do out[key] = clone(child) end
+            return out
+          end
+          local function same(expected, actual, path)
+            assert(type(expected) == type(actual), path .. " changed type")
+            if type(expected) == "table" then
+              for key, value in pairs(expected) do same(value, actual[key], path .. "." .. tostring(key)) end
+              for key in pairs(actual) do assert(expected[key] ~= nil, path .. " added " .. tostring(key)) end
+            else assert(expected == actual, path .. " changed value") end
+          end
+          for _, mode in ipairs({"off", "only-when-dedicated-tech-enabled", "always"}) do
+            for _, prefer in ipairs({false, true}) do
+              mods = {base="2.1.23"}; settings = {startup=defaults()}
+              settings.startup["mir-adjust-vanilla-weapon-speed-techs"].value = mode
+              settings.startup["mir-prefer-this-mod-for-competing-techs"].value = prefer
+              helpers, log = nil, function() end
+              data = full_world(mods)
+              local rows, originals, references = {}, {}, {}
+              for _, level in ipairs({5, 6, 99}) do
+                local name = "weapon-shooting-speed-" .. level
+                local row = {type="technology", name=name, enabled=true,
+                  max_level=level == 99 and "infinite" or level,
+                  prerequisites={"weapon-shooting-speed-" .. (level-1)},
+                  unit={count_formula="123*2^(L-1)", time=37,
+                    ingredients={{"automation-science-pack", 2}}},
+                  effects={{type="gun-speed", ammo_category="rocket", modifier=.21},
+                    {type="gun-speed", ammo_category="cannon-shell", modifier=.37},
+                    {type="gun-speed", ammo_category="bullet", modifier=.43}},
+                  foreign_marker={level=level, values={false, 0, "untouched"}}}
+                data.raw.technology[name], rows[name], originals[name] = row, row, clone(row)
+                references[name] = {effects=row.effects, unit=row.unit, prerequisites=row.prerequisites}
+              end
+              data.writes = 0
+              data.extend = function(self, output)
+                self.writes = self.writes + 1; self.emitted = output
+                for _, row in ipairs(output) do
+                  self.raw[row.type] = self.raw[row.type] or {}; self.raw[row.type][row.name] = row
+                end
+              end
+              dofile(data_final_path)
+              assert(data.writes == 1, "changed publication count")
+              for name, row in pairs(rows) do
+                assert(data.raw.technology[name] == row, "replaced foreign prototype " .. name)
+                local original = references[name]
+                assert(row.effects == original.effects and row.unit == original.unit
+                  and row.prerequisites == original.prerequisites, "replaced foreign fields " .. name)
+                same(originals[name], row, "foreign " .. name)
+              end
+            end
+          end
+          data, mods, settings, helpers, log = nil, nil, nil, nil, nil
+        ''')
+
+    def _weapon_coverage_world(self):
+        self.lua.execute('''
+          function weapon_coverage_case(rocket, cannon, enabled, ingredients, blocked, mode, debug, prefer)
+            local messages={}
+            mods={base="2.1.23"}; settings={startup=defaults()}; helpers=nil
+            log=function(message)messages[#messages+1]=message end
+            settings.startup["mir-debug-generation-report"].value=debug==true
+            settings.startup["mir-prefer-this-mod-for-competing-techs"].value=prefer==true
+            settings.startup["mir-adjust-vanilla-weapon-speed-techs"].value=mode or "only-when-dedicated-tech-enabled"
+            data=full_world(mods)
+            local unit={count=100,time=30,ingredients={{"automation-science-pack",1}}}
+            local prerequisite={type="technology",name="weapon-shooting-speed-6",enabled=not blocked,
+              prerequisites={},effects={},unit=unit}
+            data.raw.technology[prerequisite.name]=prerequisite
+            data.raw.recipe["automation-science-pack"]={type="recipe",name="automation-science-pack",enabled=true,
+              ingredients={},results={{type="item",name="automation-science-pack",amount=1}}}
+            local foreign={type="technology",name="weapon-shooting-speed-7",level=7,max_level="infinite",enabled=enabled,
+              icon="__base__/graphics/technology/weapon-shooting-speed-3.png",icon_size=256,
+              prerequisites={prerequisite.name},unit={count=100,time=30,ingredients=ingredients or unit.ingredients},
+              effects={{type="gun-speed",ammo_category="bullet",modifier=.4},
+                {type="gun-speed",ammo_category="shotgun-shell",modifier=.4},
+                {type="gun-speed",ammo_category="rocket",modifier=rocket},
+                {type="gun-speed",ammo_category="cannon-shell",modifier=cannon}}}
+            data.raw.technology[foreign.name]=foreign
+            local function serialize(value)
+              if type(value)~="table" then return tostring(value) end
+              local keys={};for key in pairs(value)do keys[#keys+1]=key end
+              table.sort(keys,function(a,b)return tostring(a)<tostring(b)end)
+              local out={};for _,key in ipairs(keys)do out[#out+1]=tostring(key)..":"..serialize(value[key])end
+              return "{"..table.concat(out,",").."}"
+            end
+            local before=serialize(foreign)
+            data.writes=0
+            data.extend=function(self,rows)
+              self.writes=self.writes+1;self.emitted=rows
+              for _,row in ipairs(rows)do self.raw[row.type]=self.raw[row.type] or {};self.raw[row.type][row.name]=row end
+            end
+            dofile(data_final_path)
+            assert(data.writes==1 and serialize(foreign)==before,"changed foreign owner or publication count")
+            local rows={};for _,row in ipairs(data.emitted)do rows[row.name]=row end
+            assert(not rows[foreign.name],"emitted colliding shared tail")
+            local rocket_row=assert(rows["recipe-prod-research_rocket_shooting_speed-1"])
+            local cannon_row=assert(rows["recipe-prod-research_cannon_shooting_speed-1"])
+            for category,row in pairs({rocket=rocket_row,["cannon-shell"]=cannon_row})do
+              assert(row.level==1 and row.max_level=="infinite" and #row.effects==1,
+                "removed or reshaped historical paid identity")
+              assert(row.effects[1].type=="gun-speed" and row.effects[1].ammo_category==category
+                and row.effects[1].modifier==.1,"changed earned native bonus")
+            end
+            return rocket_row,cannon_row,foreign,messages
+          end
+        ''')
+
+    def test_foreign_weapon_coverage_preserves_paid_rows_and_withholds_only_covered_future_work(self):
+        self._weapon_coverage_world()
+        self.lua.execute('''
+          local rocket,cannon=weapon_coverage_case(.1,.1,true)
+          assert(rocket.enabled==false and cannon.enabled==false,"covered MIR future research remains enabled")
+          rocket,cannon=weapon_coverage_case(.1,0,true)
+          assert(rocket.enabled==false and cannon.enabled~=false,"per-category coverage suppressed useful research")
+          rocket,cannon=weapon_coverage_case(.1,.1,true,nil,false,"off")
+          assert(rocket.enabled==false and cannon.enabled==false,"off granted custody of a foreign owner")
+          rocket,cannon=weapon_coverage_case(.1,.1,true,nil,false,nil,false,true)
+          assert(rocket.enabled==false and cannon.enabled==false,"preference granted custody of a foreign owner")
+        ''')
+
+    def test_unusable_foreign_weapon_coverage_does_not_withhold_mir_research(self):
+        # Install the shared literal input helper without relying on candidate
+        # output as an oracle. Each case below opposes a reason to yield.
+        self._weapon_coverage_world()
+        self.lua.execute('''
+          for _,case in ipairs({{0,0,true},{.1,.1,false},{-.1,-.1,true}})do
+            local rocket,cannon=weapon_coverage_case(case[1],case[2],case[3])
+            assert(rocket.enabled~=false and cannon.enabled~=false,"nonpositive/disabled owner suppressed MIR")
+          end
+          local rocket,cannon=weapon_coverage_case(.1,.1,true,{{"unknown-pack",1}})
+          assert(rocket.enabled~=false and cannon.enabled~=false,"unproven science suppressed MIR")
+          rocket,cannon=weapon_coverage_case(.1,.1,true,nil,true)
+          assert(rocket.enabled~=false and cannon.enabled~=false,"disabled prerequisite suppressed MIR")
+          data=nil
+        ''')
+
+    def test_covered_weapon_generation_report_matches_final_disablement(self):
+        self._weapon_coverage_world()
+        self.lua.execute('''
+          local _,_,_,messages=weapon_coverage_case(.1,.1,true,nil,false,nil,true)
+          for _,family in ipairs({"rocket","cannon"})do
+            local prefix="[more-infinite-research] recipe-prod-research_"..family.."_shooting_speed-1: "
+            local found=0
+            for _,message in ipairs(messages)do
+              if message:sub(1,#prefix)==prefix then
+                assert(message:sub(#prefix+1,#prefix+8)=="disabled","generation report describes stale availability")
+                found=found+1
+              end
+            end
+            assert(found==1,"missing or duplicate final generation report")
+          end
+        ''')
+
+    def test_partial_mixed_weapon_coverage_keeps_paid_holders_and_uncovered_progression(self):
+        self.lua.execute('''
+          local raw=full_world({}).raw
+          local owner={type="technology",name="laser-shooting-speed-8",enabled=true,
+            prerequisites={},unit={count=100,time=30,ingredients={{"automation-science-pack",1}}},
+            effects={{type="gun-speed",ammo_category="laser",modifier=.4},
+              {type="gun-speed",ammo_category="tesla",modifier=.5}}}
+          local row={type="technology",name="recipe-prod-research_electric_shooting_speed-1",level=1,max_level="infinite",
+            unit={count=100,time=30,ingredients={{"automation-science-pack",1}}},
+            effects={{type="gun-speed",ammo_category="tesla",modifier=.1},
+              {type="gun-speed",ammo_category="electric",modifier=.1}}}
+          local effects=row.effects
+          local selection={definitions={{key="research_electric_shooting_speed",family="research_electric_shooting_speed"}},
+            external_continuations={[owner.name]=owner}}
+          local context=require("research.science").prepare{raw=raw,target=require("platform.target"),mods={["space-age"]="2.0.0"}}
+          local full=modern.retain_external_weapon_coverage(selection,{row},context)
+          assert(row.enabled~=false and #row.effects==1 and row.effects[1].ammo_category=="electric"
+            and full.effects==effects and #effects==2
+            and effects[1].modifier==.1 and effects[2].modifier==.1,
+            "partial coverage lost its complete paid vector or uncovered progression")
+          local holders=require("research.native_gun_credit_definitions").technologies(full,row)
+          assert(#holders==4 and holders[3].effects[1].modifier==.1 and holders[4].effects[1].modifier==0)
+          assert(holders[1].effects[1].modifier==.1 and holders[2].effects[1].modifier==-.1)
+          -- A data phase always starts from the authored full vector.
+          row.effects=effects
+          owner.effects[#owner.effects+1]={type="gun-speed",ammo_category="electric",modifier=.2}
+          full=modern.retain_external_weapon_coverage(selection,{row},context)
+          assert(row.enabled==false and #row.effects==0 and full.effects==effects and #effects==2,
+            "full coverage lost its retained paid vector")
+          holders=require("research.native_gun_credit_definitions").technologies(full,row)
+          assert(holders[2].effects[1].modifier==0 and holders[4].effects[1].modifier==0)
+        ''')
+
     def test_existing_native_continuation_identity_is_preserved_without_mir_collision(self):
         self.lua.execute('''
           local environment = full_world({})
@@ -1618,13 +1809,13 @@ class GeneratorTests(unittest.TestCase):
           environment = full_world(k2mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 106+5)
+          assert(environment.writes == 1 and #environment.emitted == 106+5+4)
           local final_ids, final_count = {}, 0
           for _, row in ipairs(environment.emitted) do
             assert(final_ids[row.name] == nil, "duplicate generated K2SO technology " .. row.name)
             final_ids[row.name], final_count = row, final_count + 1
           end
-          assert(final_count == 106+5)
+          assert(final_count == 106+5+4)
           assert(final_ids["recipe-prod-research_gears-1"] and final_ids["recipe-prod-research_agricultural_growth_speed-1"]
             and final_ids["recipe-prod-research_spoilage_preservation-1"] and final_ids["recipe-prod-research_material_imersite-4"])
           assert(final_ids["recipe-prod-research_material_rare_metals-1"]
@@ -2201,7 +2392,7 @@ class GeneratorTests(unittest.TestCase):
           local environment = full_world(mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 99+5)
+          assert(environment.writes == 1 and #environment.emitted == 99+5+4)
           local ids = {}
           for _, row in ipairs(environment.emitted) do ids[row.name] = row end
           assert(ids["recipe-prod-research_gears-1"] ~= nil)

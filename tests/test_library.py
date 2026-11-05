@@ -2004,7 +2004,11 @@ class LibraryTests(unittest.TestCase):
             "mir-legacy-module-credit-speed-module",
             "mir-legacy-module-credit-productivity-module",
             "mir-legacy-module-credit-efficiency-module",
-            "mir-legacy-cannon-credit-rocket-shooting-speed"
+            "mir-legacy-cannon-credit-rocket-shooting-speed",
+            "mir-native-credit-research_electric_shooting_speed-electric-positive",
+            "zz-mir-native-credit-research_electric_shooting_speed-electric-negative",
+            "mir-native-credit-research_electric_shooting_speed-tesla-positive",
+            "zz-mir-native-credit-research_electric_shooting_speed-tesla-negative"
           }
           library_private_credit_ids = {}
           for _, id in ipairs(credits) do library_private_credit_ids[id] = true end

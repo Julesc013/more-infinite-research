@@ -1,0 +1,226 @@
+{
+  "kind": "MIRHistoricalDependencyDeclarationIntentReviewV1",
+  "reviewed_on": "2026-11-05",
+  "reviewed_against": "8cc778283f7df67ca60b1acbd6f1ec8080e9ee45",
+  "subjects": [
+    "CONT-17",
+    "VER-07"
+  ],
+  "scope": "The complete five-body Test-MIRDependencyResolver.ps1 family: three six-case assertion bodies and two path-only wrappers,174 original tag/path bindings. The name does not establish dependency-graph resolution or player compatibility.",
+  "method": "Read every deduplicated original body; authenticate complete Git bytes and every original commit/path. Verify all live remote tags, retaining the local v4.2.0 alias separately. Follow the imported parser function, compare early/published/current implementations, and map the six independent literals to the existing current control.",
+  "source_discovery": {
+    "index_sha256": "183AC3B7903A3B7E9E00192B88CF396357F3F1919AE8FB099B5C80004224EB1C",
+    "selected_bodies": 5,
+    "selected_body_bytes": 4953,
+    "retained_original_bindings": 174,
+    "live_remote_bindings": 172,
+    "local_alias_bindings": 2,
+    "complete_bindings_sha256": "E6269864191E8E7022A0B0746395DFF82C6E4A5E474E517715FD935FEDBD2182"
+  },
+  "sources": [
+    {
+      "blob": "2b010a981c5e1271beff3fb688766214b106924c",
+      "bytes": 1239,
+      "sha256": "8B173FE3A672687997E9552435F48FEDB7FEDC31D9518916010C825AB054CA0E",
+      "original_tag_path_bindings": 130,
+      "distinct_paths": [
+        ".mir/target-lines/0.10.0/scripts/Test-MIRDependencyResolver.ps1",
+        ".mir/target-lines/0.11.0/scripts/Test-MIRDependencyResolver.ps1",
+        ".mir/target-lines/0.12.0/scripts/Test-MIRDependencyResolver.ps1",
+        ".mir/target-lines/0.6.0/scripts/Test-MIRDependencyResolver.ps1",
+        ".mir/target-lines/0.7.0/scripts/Test-MIRDependencyResolver.ps1",
+        ".mir/target-lines/0.8.0/scripts/Test-MIRDependencyResolver.ps1",
+        ".mir/target-lines/0.9.0/scripts/Test-MIRDependencyResolver.ps1",
+        ".mir/target-lines/1.3.0/scripts/Test-MIRDependencyResolver.ps1",
+        ".mir/target-lines/1.4.0/scripts/Test-MIRDependencyResolver.ps1",
+        ".mir/target-lines/1.5.0/scripts/Test-MIRDependencyResolver.ps1",
+        ".mir/target-lines/1.6.0/scripts/Test-MIRDependencyResolver.ps1",
+        ".mir/target-lines/1.7.1/scripts/Test-MIRDependencyResolver.ps1",
+        ".mir/target-lines/1.8.2/scripts/Test-MIRDependencyResolver.ps1",
+        ".mir/target-lines/1.9.4/scripts/Test-MIRDependencyResolver.ps1",
+        ".mir/target-lines/2.4.5/scripts/Test-MIRDependencyResolver.ps1",
+        ".mir/target-lines/2.4.9/scripts/Test-MIRDependencyResolver.ps1",
+        ".mir/target-lines/3.1.9/scripts/Test-MIRDependencyResolver.ps1",
+        "scripts/Test-MIRDependencyResolver.ps1"
+      ],
+      "representative": {
+        "tag": "0.10.0",
+        "commit": "3377f835243c0cf9e7d2c2e76641c2c471341975",
+        "path": "scripts/Test-MIRDependencyResolver.ps1"
+      },
+      "disposition": "retain-six-dependency-declaration-cases"
+    },
+    {
+      "blob": "50b882ffb08d93ecf07a50f38a93619381b7614c",
+      "bytes": 308,
+      "sha256": "2F8D4BB20275EB2CA2A5703B3811BB232908EB5A3E3867DBA4C04AAE7CC2BC81",
+      "original_tag_path_bindings": 5,
+      "distinct_paths": [
+        "scripts/Test-MIRDependencyResolver.ps1"
+      ],
+      "representative": {
+        "tag": "3.2.10",
+        "commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6",
+        "path": "scripts/Test-MIRDependencyResolver.ps1"
+      },
+      "disposition": "consolidate-path-only-wrapper"
+    },
+    {
+      "blob": "6bdaa154a530ad5fcda9d09e0c71acad434c37f0",
+      "bytes": 297,
+      "sha256": "68939C67C4968F23457E5C77BC3B72E6349E8FE1144BC5242BA09DA7EB48EF0F",
+      "original_tag_path_bindings": 17,
+      "distinct_paths": [
+        "scripts/Test-MIRDependencyResolver.ps1"
+      ],
+      "representative": {
+        "tag": "v4.1.0",
+        "commit": "3562377b520cccb071b97b3968946eae7024c950",
+        "path": "scripts/Test-MIRDependencyResolver.ps1"
+      },
+      "disposition": "consolidate-path-only-wrapper"
+    },
+    {
+      "blob": "b7bcbbc71a5cd6ee8ef94f29fbd23177ba0149cf",
+      "bytes": 1568,
+      "sha256": "92408F92599325B22CABA23C127D65541E187C793951060E8A0D3E86D3305FCE",
+      "original_tag_path_bindings": 17,
+      "distinct_paths": [
+        "tests/compatibility/Test-MIRDependencyResolver.ps1"
+      ],
+      "representative": {
+        "tag": "v4.1.0",
+        "commit": "3562377b520cccb071b97b3968946eae7024c950",
+        "path": "tests/compatibility/Test-MIRDependencyResolver.ps1"
+      },
+      "disposition": "retain-six-dependency-declaration-cases"
+    },
+    {
+      "blob": "ed881319b651b662240786ca0b2cb35558ae841d",
+      "bytes": 1541,
+      "sha256": "47B139FB7AFF1A19EF422AAF129C7FA27536653C0D9AFDC7EC54E03DC1E9D359",
+      "original_tag_path_bindings": 5,
+      "distinct_paths": [
+        "validation/tests/compatibility/Test-MIRDependencyResolver.ps1"
+      ],
+      "representative": {
+        "tag": "3.2.10",
+        "commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6",
+        "path": "validation/tests/compatibility/Test-MIRDependencyResolver.ps1"
+      },
+      "disposition": "retain-six-dependency-declaration-cases"
+    }
+  ],
+  "independent_cases": [
+    {
+      "raw": "base >= 2.1.0",
+      "name": "base",
+      "kind": "required",
+      "required": true
+    },
+    {
+      "raw": "Flare Stack >= 4.0.0",
+      "name": "Flare Stack",
+      "kind": "required",
+      "required": true
+    },
+    {
+      "raw": "(?) PlutoniumEnergy",
+      "name": "PlutoniumEnergy",
+      "kind": "hidden_optional",
+      "required": false
+    },
+    {
+      "raw": "+ Space Exploration >= 0.6.0",
+      "name": "Space Exploration",
+      "kind": "recommended",
+      "required": false
+    },
+    {
+      "raw": "~ no-order helper",
+      "name": "no-order helper",
+      "kind": "no_order",
+      "required": true
+    },
+    {
+      "raw": "! incompatible mod <= 2.0.0",
+      "name": "incompatible mod",
+      "kind": "incompatible",
+      "required": false
+    }
+  ],
+  "consumed_helper_boundary": {
+    "function": "ConvertFrom-MIRDependencyString",
+    "normalized_function_sha256": "B2FD3C90F24D89A98377CF103A3B2D46E754298BED8F07D67C50EF1BD5D23910",
+    "early_source": {
+      "commit": "12a5683c2aaed745f35e1261b437930a9a1476bc",
+      "path": "scripts/MIRCompatAudit/ModPortal.ps1",
+      "sha256": "A16344F66A9124C0792614AAD83702603D4C0AD4FE977392C73710B745E74B08"
+    },
+    "published_source": {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "tools/lib/compatibility/ModPortal.ps1",
+      "sha256": "A16344F66A9124C0792614AAD83702603D4C0AD4FE977392C73710B745E74B08"
+    },
+    "current_path": "tools/lib/compatibility/ModPortal.ps1",
+    "current_file_sha256": "A16344F66A9124C0792614AAD83702603D4C0AD4FE977392C73710B745E74B08",
+    "parser_function_identical": true,
+    "scope": "Only the parser function and its six literal assertions are semantically reconciled here. Other network/download/version-selection functions in the preserved complete support files are not claimed reviewed."
+  },
+  "groups": [
+    {
+      "id": "names-kinds-and-requiredness",
+      "disposition": "consolidate-existing-independent-control",
+      "independent_expectation": "Keep mod names containing spaces intact, classify declaration markers, and retain requiredness for ordinary and no-order dependencies. The old tests do not execute declarations or resolve a dependency graph.",
+      "implementation": [
+        "tools/lib/compatibility/ModPortal.ps1::ConvertFrom-MIRDependencyString"
+      ],
+      "controls": [
+        "tests/test_dependency_declarations.py::DependencyDeclarationControls.test_historical_names_kinds_and_required_flags"
+      ],
+      "correspondence": "All six original raw/name/kind/required tuples occur literally in the current CASES table, with one unittest checking every row. The parser function is normalized-byte identical across the earliest selected source, published4.7.3 and current source.",
+      "current_consumer": "tools/lib/compatibility/LibraryActivation.ps1::Assert-MIRLibraryDependencies consumes name/kind/required. Its additional constraint syntax, selected-archive version and incompatibility checks have separate current controls; six metadata cases alone do not qualify them.",
+      "remaining": "Preserve current parser and declaration controls. New native results are required only for changed consumed native inputs; this metadata-only reconciliation does not require an unchanged campaign replay."
+    },
+    {
+      "id": "wrapper-and-path-movement",
+      "disposition": "supersede-path-wrappers-retain-assertions",
+      "independent_expectation": "Wrapper relocation must not erase the canonical assertion body. The two legacy bodies forward unchanged bound parameters to validation/tests and later tests; the other two canonical assertion variants retain the original six rows.",
+      "implementation": [
+        "tests/test_dependency_declarations.py",
+        "tests/Test-MIR5HostControls.ps1"
+      ],
+      "remaining": "Do not restore scripts/validation wrappers, historical target-line trees or obsolete assurance machinery. Preserve their exact original Git/tag/path identities and original results separately."
+    }
+  ],
+  "host_validation": {
+    "plan_path": "tests/Test-MIR5HostControls.ps1 -Plan",
+    "plan_sha256": "A04F6DA9F0658549AF7813D09AA5EFDAF00FF24242AF59CECEE387C5369E15E7",
+    "selected_command": "python -B tests/test_dependency_declarations.py",
+    "selected_control_count": 1,
+    "literal_cases": 6,
+    "status": "PASS",
+    "log_sha256": "5D2806C900DCC29C5D0E7908B46C63C44915FD09F37CF6FA2827D67A76B40592",
+    "duration_seconds": 0.529,
+    "new_controls_added": false,
+    "lua_required": false,
+    "native_execution": false
+  },
+  "custody": {
+    "primary_path": "build/qualification/aero-current-review-custody-r01/",
+    "original_capsule": "dependency-intent-originals-r01.json.gz",
+    "gzip_sha256": "F22E417F6676EB1F5198787D1163746F0ECC237853DF9A61D9BDFDEA742838DD",
+    "decoded_sha256": "3FD5B9D0D025042391A2C92D9D3D512B06FB3F5239222089C89E755BF871B1AA",
+    "complete_bindings": "dependency-intent-bindings-r01.json"
+  },
+  "limits": [
+    "This disposes the five selected test bodies and the bounded parser-function consumer only, not the complete imported ModPortal helper, dependency selection, downloads, version solving or Factorio compatibility.",
+    "No network request, dependency archive acquisition, Factorio run or old harness execution occurs in the selected control. The read-only Git tag probe is source authentication.",
+    "Current archive/profile/native-result applicability, all original adverse identities, the87 request records and whole VER-07 completeness remain separate."
+  ],
+  "source_reconciliation_complete": false,
+  "test_intent_reconciliation_complete": false,
+  "native_execution": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}

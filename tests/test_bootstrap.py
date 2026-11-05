@@ -28,6 +28,7 @@ class BootstrapTests(unittest.TestCase):
             credit_calls = {}
             module_credit_calls = {}
             cannon_credit_calls = {}
+            gun_credit_calls = {}
             configuration_order = {}
             package.preload["platform.target"] = function()
               local target = dofile(player_root .. "/platform/target.lua")
@@ -89,6 +90,32 @@ class BootstrapTests(unittest.TestCase):
                   cannon_credit_calls.reset = event
                 end
               }
+            end
+            package.preload["runtime.native_gun_credits"] = function()
+              local module = {
+                preflight = function(event)
+                  gun_credit_calls.preflight = event
+                  table.insert(configuration_order, "gun-credit-preflight")
+                  if GUN_CREDIT_PREFLIGHT_ERROR then error(GUN_CREDIT_PREFLIGHT_ERROR) end
+                  return {gun_snapshot=true}
+                end,
+                needs_research_events = function() return GUN_PENDING == true end,
+                on_research_finished = function(event)
+                  gun_credit_calls.finished=event;GUN_PENDING=false;return true
+                end,
+                on_research_cancelled = function(event)
+                  gun_credit_calls.cancelled=event;GUN_PENDING=false;return true
+                end,
+              }
+              for _,name in ipairs({"on_init","on_configuration_changed","on_load",
+                  "on_force_created","on_force_reset","on_forces_merged","on_technology_effects_reset"}) do
+                local callback=name
+                module[callback]=function(event,plan)
+                  gun_credit_calls[callback]=(gun_credit_calls[callback] or 0)+1
+                  if callback=="on_configuration_changed" then gun_credit_calls.plan=plan end
+                end
+              end
+              return module
             end
             lifecycle_calls = {}
             library_calls = {}
@@ -154,6 +181,7 @@ class BootstrapTests(unittest.TestCase):
               module.native_refresh_ticks = 1
               module.native_subscription_needs = function() return false, false end
               module.set_cap_provider = function(provider) library_calls.provider = provider end
+              module.set_discovery_visibility_provider = function(provider) library_calls.visibility_provider = provider end
               module.subscription_needs = function() return library_pending == true end
               module.open = function(player, options)
                 library_calls.open = {player = player, options = options}
@@ -239,6 +267,7 @@ class BootstrapTests(unittest.TestCase):
             package.loaded["runtime.native_credits"] = nil
             package.loaded["runtime.legacy_module_credits"] = nil
             package.loaded["runtime.legacy_cannon_credits"] = nil
+            package.loaded["runtime.native_gun_credits"] = nil
             package.loaded["runtime.configuration"] = nil
             package.loaded["runtime.lifecycle"] = nil
             package.loaded["runtime.scripted_effects"] = nil
@@ -249,6 +278,46 @@ class BootstrapTests(unittest.TestCase):
             package.loaded["research.settings"] = nil
             return require("control")
           end
+        ''')
+
+    def test_gun_credit_preflight_runs_before_every_configuration_writer(self):
+        self.lua.execute('''
+          install_modules(false,false,false,true)
+          install_runtime(nil,{["space-age"]="2.0.0"});load_control()
+          GUN_CREDIT_PREFLIGHT_ERROR="gun paid mask unknown"
+          local ok,message=pcall(handlers.configuration,{marker="original-event"})
+          assert(not ok and tostring(message):find("gun paid mask unknown",1,true))
+          assert(lifecycle_calls.configuration==nil and credit_calls.on_configuration_changed==nil)
+          assert(module_credit_calls.plan==nil and cannon_credit_calls.plan==nil)
+          GUN_CREDIT_PREFLIGHT_ERROR=nil
+          handlers.configuration({marker="original-event"})
+          assert(configuration_order[4]=="gun-credit-preflight")
+          assert(gun_credit_calls.plan.gun_snapshot and gun_credit_calls.on_configuration_changed==1)
+        ''')
+
+    def test_gun_pending_callbacks_reconstruct_and_release_without_native_recurring_work(self):
+        self.lua.execute('''
+          install_modules(false,false,false,true)
+          install_runtime(nil,{["space-age"]="2.0.0"});load_control()
+          handlers.init()
+          assert(handlers.events[defines.events.on_research_finished]==nil)
+          assert(handlers.events[defines.events.on_research_cancelled]==nil)
+          GUN_PENDING=true;handlers.load()
+          assert(type(handlers.events[defines.events.on_research_finished])=="function")
+          assert(type(handlers.events[defines.events.on_research_cancelled])=="function")
+          local event={research=known_technology}
+          handlers.events[defines.events.on_research_finished](event)
+          assert(gun_credit_calls.finished==event)
+          assert(handlers.events[defines.events.on_research_finished]==nil)
+          assert(handlers.events[defines.events.on_research_cancelled]==nil)
+          assert(next(handlers.nth)==nil and handlers.events[defines.events.on_tick]==nil)
+        ''')
+
+    def test_gun_lifecycle_is_absent_from_base_only_control(self):
+        self.lua.execute('''
+          install_modules(false,false,false,true);install_runtime();load_control()
+          handlers.init();handlers.configuration({});handlers.load()
+          assert(next(gun_credit_calls)==nil and package.loaded["runtime.native_gun_credits"]==nil)
         ''')
 
     def test_control_composes_lifecycle_library_api_legacy_interface_and_command(self):
@@ -372,6 +441,72 @@ class BootstrapTests(unittest.TestCase):
           player.force = original_force
           commands.registered["mir-research"].callback({player_index = 1})
           assert(library_calls.open.player == player and library_calls.open.options == nil)
+        ''')
+
+    def test_missing_or_invalid_research_does_not_enter_runtime_consumers(self):
+        self.lua.execute('''
+          install_modules(true, false, true, true)
+          install_runtime(nil, {['space-age'] = '2.1.23'})
+          load_control()
+          local entered = 0
+          local function invalid_dispatch(event)
+            entered = entered + 1
+            -- A real invalid LuaTechnology permits valid, but accessing its
+            -- other properties can fail. The original dispatcher rejected it
+            -- before any feature callback; consumers must never be entered.
+            if event and event.research then return event.research.name end
+          end
+          for _, name in ipairs({'runtime.lifecycle', 'runtime.scripted_effects',
+              'runtime.native_credits'}) do
+            local module = package.loaded[name]
+            module.on_research_finished = invalid_dispatch
+            module.on_research_reversed = invalid_dispatch
+            module.on_research_started = invalid_dispatch
+          end
+          local invalid = setmetatable({valid = false}, {
+            __index = function(_, key) error('invalid research property: ' .. key) end
+          })
+          for _, id in ipairs({4, 19, 5}) do
+            local callback = assert(handlers.events[id])
+            callback(nil)
+            callback({})
+            callback({research = invalid})
+          end
+          assert(entered == 0, 'missing/invalid research reached a runtime consumer')
+        ''')
+
+    def test_queued_research_guard_preserves_valid_library_and_discovery_dispatch(self):
+        self.lua.execute('''
+          for _, discovery in ipairs({false, true}) do
+            install_modules(true)
+            install_runtime(nil, discovery and {discovery_tree = '1.0.12'} or {})
+            defines.events.on_research_queued = 25
+            load_control()
+            local browser = require('runtime.library')
+            browser.native_subscription_needs = function() return true, false end
+            local queued = 0
+            browser.on_native_state_changed = function(event)
+              assert(event.research == known_technology)
+              queued = queued + 1
+            end
+            local discovered = 0
+            require('runtime.lifecycle').on_discovery_tree_queue_changed = function(event)
+              assert(event.research == known_technology)
+              discovered = discovered + 1
+            end
+            handlers.init()
+            local invalid = setmetatable({valid = false}, {
+              __index = function(_, key) error('invalid queued research property: ' .. key) end
+            })
+            local callback = assert(handlers.events[25])
+            callback(nil)
+            callback({})
+            callback({research = invalid})
+            assert(queued == 0 and discovered == 0)
+            callback({research = known_technology})
+            assert(queued == 1 and discovered == (discovery and 1 or 0),
+              'valid queued research lost its existing view/discovery route')
+          end
         ''')
 
     def test_report_checkbox_event_has_one_bootstrap_registration_owner(self):

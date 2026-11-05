@@ -1,0 +1,738 @@
+{
+  "kind": "HistoricalExecutionRegistryWrapperIntentReconciliation",
+  "reviewed_on": "2026-11-05",
+  "reviewed_against": "5fc18fa0aa1162cdef73b4eabf7ffbd9193e8a8a",
+  "subjects": [
+    "CONT-13",
+    "CONT-17"
+  ],
+  "scope": "Ten complete wrapper bodies at ninety exact bindings in the existing91-tag map; latest direct registry helper assertions and an explicit eleven-body manifest frontier. No old framework or native campaign is restored.",
+  "method": "Mechanical tree/blob extraction verifies exact raw Git bytes; all ten wrapper bodies are read and deduplicated by actual blob identity. Expectations come from those original assertions, not MIR5 output.",
+  "source_inventory": {
+    "selected_tags": 91,
+    "wrapper_blobs": 10,
+    "wrapper_bindings": 90,
+    "execution_wrapper_blobs": 5,
+    "context_wrapper_blobs": 5,
+    "manifest_frontier_blobs": 11,
+    "all_named_bindings": 264,
+    "scope_complete": false
+  },
+  "historical_sources": [
+    {
+      "blob": "0928de9cb702d3348335946973c43b1a03d2a4ee",
+      "bytes": 403,
+      "sha256": "91A6625877CC5A18638E3383C4AD9263ED830716EBD6EF5AC39A7D6D5AC01879",
+      "body_utf8": "param(\n  [Parameter(Mandatory)][string]$ContextPath,\n  [Parameter(Mandatory)][string]$SourceRepoRoot,\n  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot \"..\")).Path\n)\n\n# MIR-L4-LEGACY-TEST-WRAPPER: retained for historical commands only.\n$canonicalTest = Join-Path $PSScriptRoot \"../validation/tests/tooling/Test-MIRContextExecutionRegistry.ps1\"\n& $canonicalTest @PSBoundParameters",
+      "representative": {
+        "tag": "3.2.10",
+        "commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6",
+        "path": "scripts/Test-MIRContextExecutionRegistry.ps1"
+      },
+      "tag_path_references": {
+        "scripts/Test-MIRContextExecutionRegistry.ps1": [
+          "3.2.10",
+          "3.2.11",
+          "3.2.5",
+          "3.2.9",
+          "v4.0.0"
+        ]
+      }
+    },
+    {
+      "blob": "d245a390807f5c0eb4262b902ed7c722782e0de8",
+      "bytes": 301,
+      "sha256": "7CAFCAE26B56D351FF3E60E572C933081716BD13D0268F951715C76019F62A90",
+      "body_utf8": "param(\n  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot \"..\")).Path\n)\n\n# MIR-L4-LEGACY-TEST-WRAPPER: retained for historical commands only.\n$canonicalTest = Join-Path $PSScriptRoot \"../validation/tests/tooling/Test-MIRExecutionRegistry.ps1\"\n& $canonicalTest @PSBoundParameters",
+      "representative": {
+        "tag": "3.2.10",
+        "commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6",
+        "path": "scripts/Test-MIRExecutionRegistry.ps1"
+      },
+      "tag_path_references": {
+        "scripts/Test-MIRExecutionRegistry.ps1": [
+          "3.2.10",
+          "3.2.11",
+          "3.2.5",
+          "3.2.9",
+          "v4.0.0"
+        ]
+      }
+    },
+    {
+      "blob": "0749bf33bf37a5ec788f4aff0be44aae7dd26a14",
+      "bytes": 2457,
+      "sha256": "9C189B088670D44BF32C17F4797E249317415D6F834F835E522D87D84A79F1C4",
+      "body_utf8": "param(\n  [Parameter(Mandatory)][string]$ContextPath,\n  [Parameter(Mandatory)][string]$SourceRepoRoot,\n  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot \"../../..\")).Path\n)\n# Canonical validation scripts live three levels below the repository root.\n# Keep the former scripts/ base explicit while tooling internals complete L5.\n$MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot \"../../..\")).Path\n$MirLegacyScriptRoot = Join-Path $MirRepoRoot \"scripts\"\n\n$ErrorActionPreference = \"Stop\"\n$repo = (Resolve-Path -LiteralPath $RepoRoot).Path\n$source = (Resolve-Path -LiteralPath $SourceRepoRoot).Path\nforeach ($module in @(\"Core\", \"Records\", \"Planner\", \"Scenario\", \"Observation\", \"Evidence\", \"Views\", \"Context\")) {\n  . (Join-Path $repo \"tools/lib/control/$module.ps1\")\n}\n$context = Assert-MIRCPVerificationContext -Path $ContextPath\n$manifest = Get-Content -Raw -LiteralPath (Join-Path $context.path \"context-manifest.json\") | ConvertFrom-Json\n$controlLock = Get-Content -Raw -LiteralPath (Join-Path $context.path \"control-plane-lock.json\") | ConvertFrom-Json\n$sourceCommit = ([string](& git -C $source rev-parse HEAD)).Trim()\n$sourceTree = ([string](& git -C $source rev-parse \"HEAD^{tree}\")).Trim()\n$sourceWorktreeSha256 = Get-MIRCPTrackedWorktreeSha256 -SourceRepoRoot $source\nif ($LASTEXITCODE -ne 0 -or $sourceCommit -ne [string]$controlLock.scenario_source_commit -or\n    $sourceTree -ne [string]$controlLock.scenario_source_tree -or $sourceWorktreeSha256 -ne [string]$controlLock.scenario_source_worktree_sha256) {\n  throw \"Scenario registry source does not match the immutable context qualification-source lock.\"\n}\n$registry = Get-Content -Raw -LiteralPath (Join-Path $context.path \"expanded-scenarios.json\") | ConvertFrom-Json\nif ([string]$registry.target -ne [string]$manifest.target) { throw \"Context registry target does not match its immutable manifest.\" }\n$result = Assert-MIRCPExecutionRegistry -Registry $registry -RepoRoot $source\n& (Join-Path $PSHOME \"pwsh\") -NoProfile -File (Join-Path $source \"validation/tests/compatibility/Test-MIRScenarioManifests.ps1\") -RepoRoot $source\nif ($LASTEXITCODE -ne 0) { throw \"Exact-source scenario manifest validation failed with exit code $LASTEXITCODE.\" }\nWrite-Host \"[ok] context registry binds source $sourceCommit and covers $($result.scenarios) scenarios, $($result.assertions) assertions, and $($result.batches) exact environments for target $($manifest.target).\"\n",
+      "representative": {
+        "tag": "3.2.10",
+        "commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6",
+        "path": "validation/tests/tooling/Test-MIRContextExecutionRegistry.ps1"
+      },
+      "tag_path_references": {
+        "validation/tests/tooling/Test-MIRContextExecutionRegistry.ps1": [
+          "3.2.10",
+          "3.2.11",
+          "3.2.5",
+          "3.2.9",
+          "v4.0.0"
+        ]
+      }
+    },
+    {
+      "blob": "532135ab42146bd26ead72a4c750fa758d071486",
+      "bytes": 1298,
+      "sha256": "B48E7F046D74BCB0EBB2BC54A8771C4179EFA976B053BE53C8CA083ED5C4193A",
+      "body_utf8": "param(\n  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot \"../../..\")).Path\n)\n# Canonical validation scripts live three levels below the repository root.\n# Keep the former scripts/ base explicit while tooling internals complete L5.\n$MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot \"../../..\")).Path\n$MirLegacyScriptRoot = Join-Path $MirRepoRoot \"scripts\"\n\n$ErrorActionPreference = \"Stop\"\n$repo = (Resolve-Path -LiteralPath $RepoRoot).Path\n. (Join-Path $repo \"tools/lib/control/Core.ps1\")\n. (Join-Path $repo \"tools/lib/control/Scenario.ps1\")\n\n$registry = Update-MIRCPExecutionRegistry -Target \"2.1\" -RepoRoot $repo -Check\n$result = Assert-MIRCPExecutionRegistry -Registry $registry -RepoRoot $repo\n& (Join-Path $PSHOME \"pwsh\") -NoProfile -File (Join-Path $repo \"validation/tests/compatibility/Test-MIRScenarioManifests.ps1\") -RepoRoot $repo\nif ($LASTEXITCODE -ne 0) { throw \"Legacy scenario manifest validation failed with exit code $LASTEXITCODE.\" }\nWrite-Host \"[ok] execution registry covers $($result.scenarios) scenarios and $($result.assertions) assertions in $($result.batches) exact-environment batches; $($result.avoided_factorio_launches) Factorio launches are safely avoided and $($result.isolated_fallbacks) unresolved scenarios remain isolated.\"\n",
+      "representative": {
+        "tag": "3.2.10",
+        "commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6",
+        "path": "validation/tests/tooling/Test-MIRExecutionRegistry.ps1"
+      },
+      "tag_path_references": {
+        "validation/tests/tooling/Test-MIRExecutionRegistry.ps1": [
+          "3.2.10",
+          "3.2.11",
+          "3.2.5",
+          "3.2.9",
+          "v4.0.0"
+        ]
+      }
+    },
+    {
+      "blob": "93fb79a51c39865502b59c82163f052c049720fe",
+      "bytes": 2139,
+      "sha256": "0E1EC9C75A8D8E87A6546009CA3A441A2AFA63650144ACB71EFD3BD0FCE6FCA4",
+      "body_utf8": "param(\n  [Parameter(Mandatory)][string]$ContextPath,\n  [Parameter(Mandatory)][string]$SourceRepoRoot,\n  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot \"..\")).Path\n)\n\n$ErrorActionPreference = \"Stop\"\n$repo = (Resolve-Path -LiteralPath $RepoRoot).Path\n$source = (Resolve-Path -LiteralPath $SourceRepoRoot).Path\nforeach ($module in @(\"Core\", \"Records\", \"Planner\", \"Scenario\", \"Observation\", \"Evidence\", \"Views\", \"Context\")) {\n  . (Join-Path $repo \"scripts/MIRControlPlane/$module.ps1\")\n}\n$context = Assert-MIRCPVerificationContext -Path $ContextPath\n$manifest = Get-Content -Raw -LiteralPath (Join-Path $context.path \"context-manifest.json\") | ConvertFrom-Json\n$controlLock = Get-Content -Raw -LiteralPath (Join-Path $context.path \"control-plane-lock.json\") | ConvertFrom-Json\n$sourceCommit = ([string](& git -C $source rev-parse HEAD)).Trim()\n$sourceTree = ([string](& git -C $source rev-parse \"HEAD^{tree}\")).Trim()\n$sourceWorktreeSha256 = Get-MIRCPTrackedWorktreeSha256 -SourceRepoRoot $source\nif ($LASTEXITCODE -ne 0 -or $sourceCommit -ne [string]$controlLock.scenario_source_commit -or\n    $sourceTree -ne [string]$controlLock.scenario_source_tree -or $sourceWorktreeSha256 -ne [string]$controlLock.scenario_source_worktree_sha256) {\n  throw \"Scenario registry source does not match the immutable context qualification-source lock.\"\n}\n$registry = Get-Content -Raw -LiteralPath (Join-Path $context.path \"expanded-scenarios.json\") | ConvertFrom-Json\nif ([string]$registry.target -ne [string]$manifest.target) { throw \"Context registry target does not match its immutable manifest.\" }\n$result = Assert-MIRCPExecutionRegistry -Registry $registry -RepoRoot $source\n& (Join-Path $PSHOME \"pwsh\") -NoProfile -File (Join-Path $source \"scripts/Test-MIRScenarioManifests.ps1\") -RepoRoot $source\nif ($LASTEXITCODE -ne 0) { throw \"Exact-source scenario manifest validation failed with exit code $LASTEXITCODE.\" }\nWrite-Host \"[ok] context registry binds source $sourceCommit and covers $($result.scenarios) scenarios, $($result.assertions) assertions, and $($result.batches) exact environments for target $($manifest.target).\"\n",
+      "representative": {
+        "tag": "3.2.3",
+        "commit": "1abe07573cde814c3cacf6153b5ae64dee4038ba",
+        "path": "scripts/Test-MIRContextExecutionRegistry.ps1"
+      },
+      "tag_path_references": {
+        "scripts/Test-MIRContextExecutionRegistry.ps1": [
+          "3.2.3"
+        ]
+      }
+    },
+    {
+      "blob": "f02affcce9eb4c0ce973fd54154970357fc3dd01",
+      "bytes": 986,
+      "sha256": "A2FB5A226E2EF369B665537AA7C5C78A29D1C65495115D83A47DD893327D0B17",
+      "body_utf8": "param(\n  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot \"..\")).Path\n)\n\n$ErrorActionPreference = \"Stop\"\n$repo = (Resolve-Path -LiteralPath $RepoRoot).Path\n. (Join-Path $repo \"scripts/MIRControlPlane/Core.ps1\")\n. (Join-Path $repo \"scripts/MIRControlPlane/Scenario.ps1\")\n\n$registry = Update-MIRCPExecutionRegistry -Target \"2.1\" -RepoRoot $repo -Check\n$result = Assert-MIRCPExecutionRegistry -Registry $registry -RepoRoot $repo\n& (Join-Path $PSHOME \"pwsh\") -NoProfile -File (Join-Path $repo \"scripts/Test-MIRScenarioManifests.ps1\") -RepoRoot $repo\nif ($LASTEXITCODE -ne 0) { throw \"Legacy scenario manifest validation failed with exit code $LASTEXITCODE.\" }\nWrite-Host \"[ok] execution registry covers $($result.scenarios) scenarios and $($result.assertions) assertions in $($result.batches) exact-environment batches; $($result.avoided_factorio_launches) Factorio launches are safely avoided and $($result.isolated_fallbacks) unresolved scenarios remain isolated.\"\n",
+      "representative": {
+        "tag": "3.2.3",
+        "commit": "1abe07573cde814c3cacf6153b5ae64dee4038ba",
+        "path": "scripts/Test-MIRExecutionRegistry.ps1"
+      },
+      "tag_path_references": {
+        "scripts/Test-MIRExecutionRegistry.ps1": [
+          "3.2.3"
+        ]
+      }
+    },
+    {
+      "blob": "c987bb8a778f003f13dac505879f30494fb4189c",
+      "bytes": 392,
+      "sha256": "CD1C2E9CE4EC00C4782BFA217F20339041458D9E51D279C2D9F39B1A81F43CEE",
+      "body_utf8": "param(\n  [Parameter(Mandatory)][string]$ContextPath,\n  [Parameter(Mandatory)][string]$SourceRepoRoot,\n  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot \"..\")).Path\n)\n\n# MIR-L4-LEGACY-TEST-WRAPPER: retained for historical commands only.\n$canonicalTest = Join-Path $PSScriptRoot \"../tests/tooling/Test-MIRContextExecutionRegistry.ps1\"\n& $canonicalTest @PSBoundParameters",
+      "representative": {
+        "tag": "v4.1.0",
+        "commit": "3562377b520cccb071b97b3968946eae7024c950",
+        "path": "scripts/Test-MIRContextExecutionRegistry.ps1"
+      },
+      "tag_path_references": {
+        "scripts/Test-MIRContextExecutionRegistry.ps1": [
+          "v4.1.0",
+          "v4.2.0",
+          "v4.2.0-stable",
+          "v4.2.1",
+          "v4.2.2",
+          "v4.3.0",
+          "v4.4.0",
+          "v4.4.1",
+          "v4.4.2",
+          "v4.5.0",
+          "v4.5.1",
+          "v4.5.2",
+          "v4.6.0",
+          "v4.7.0",
+          "v4.7.1",
+          "v4.7.2",
+          "v4.7.3"
+        ]
+      }
+    },
+    {
+      "blob": "ec9c65449b5127e1f57138ef70c4a7b6fcbcd4c0",
+      "bytes": 290,
+      "sha256": "4F4E4DF9F52802306153AEC0E332EB89D7120639E0E7D754C67A31BA9C577A78",
+      "body_utf8": "param(\n  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot \"..\")).Path\n)\n\n# MIR-L4-LEGACY-TEST-WRAPPER: retained for historical commands only.\n$canonicalTest = Join-Path $PSScriptRoot \"../tests/tooling/Test-MIRExecutionRegistry.ps1\"\n& $canonicalTest @PSBoundParameters",
+      "representative": {
+        "tag": "v4.1.0",
+        "commit": "3562377b520cccb071b97b3968946eae7024c950",
+        "path": "scripts/Test-MIRExecutionRegistry.ps1"
+      },
+      "tag_path_references": {
+        "scripts/Test-MIRExecutionRegistry.ps1": [
+          "v4.1.0",
+          "v4.2.0",
+          "v4.2.0-stable",
+          "v4.2.1",
+          "v4.2.2",
+          "v4.3.0",
+          "v4.4.0",
+          "v4.4.1",
+          "v4.4.2",
+          "v4.5.0",
+          "v4.5.1",
+          "v4.5.2",
+          "v4.6.0",
+          "v4.7.0",
+          "v4.7.1",
+          "v4.7.2",
+          "v4.7.3"
+        ]
+      }
+    },
+    {
+      "blob": "2baf49e44fe96a891ffa8684303f83dca59a24a4",
+      "bytes": 2473,
+      "sha256": "EB1B2A6BFE91B51B0F9216AEFC2E64F8A12D8927F7D6A23021E460C45FDAE0A7",
+      "body_utf8": "# MIR4-CANONICAL-EXECUTABLE-TEST\nparam(\n  [Parameter(Mandatory)][string]$ContextPath,\n  [Parameter(Mandatory)][string]$SourceRepoRoot,\n  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot \"../..\")).Path\n)\n# Canonical validation scripts live three levels below the repository root.\n# Keep the former scripts/ base explicit while tooling internals complete L5.\n$MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot \"../..\")).Path\n$MirLegacyScriptRoot = Join-Path $MirRepoRoot \"scripts\"\n\n$ErrorActionPreference = \"Stop\"\n$repo = (Resolve-Path -LiteralPath $RepoRoot).Path\n$source = (Resolve-Path -LiteralPath $SourceRepoRoot).Path\nforeach ($module in @(\"Core\", \"Records\", \"Planner\", \"Scenario\", \"Observation\", \"Evidence\", \"Views\", \"Context\")) {\n  . (Join-Path $repo \"tools/lib/control/$module.ps1\")\n}\n$context = Assert-MIRCPVerificationContext -Path $ContextPath\n$manifest = Get-Content -Raw -LiteralPath (Join-Path $context.path \"context-manifest.json\") | ConvertFrom-Json\n$controlLock = Get-Content -Raw -LiteralPath (Join-Path $context.path \"control-plane-lock.json\") | ConvertFrom-Json\n$sourceCommit = ([string](& git -C $source rev-parse HEAD)).Trim()\n$sourceTree = ([string](& git -C $source rev-parse \"HEAD^{tree}\")).Trim()\n$sourceWorktreeSha256 = Get-MIRCPTrackedWorktreeSha256 -SourceRepoRoot $source\nif ($LASTEXITCODE -ne 0 -or $sourceCommit -ne [string]$controlLock.scenario_source_commit -or\n    $sourceTree -ne [string]$controlLock.scenario_source_tree -or $sourceWorktreeSha256 -ne [string]$controlLock.scenario_source_worktree_sha256) {\n  throw \"Scenario registry source does not match the immutable context qualification-source lock.\"\n}\n$registry = Get-Content -Raw -LiteralPath (Join-Path $context.path \"expanded-scenarios.json\") | ConvertFrom-Json\nif ([string]$registry.target -ne [string]$manifest.target) { throw \"Context registry target does not match its immutable manifest.\" }\n$result = Assert-MIRCPExecutionRegistry -Registry $registry -RepoRoot $source\n& (Join-Path $PSHOME \"pwsh\") -NoProfile -File (Join-Path $source \"tests/compatibility/Test-MIRScenarioManifests.ps1\") -RepoRoot $source\nif ($LASTEXITCODE -ne 0) { throw \"Exact-source scenario manifest validation failed with exit code $LASTEXITCODE.\" }\nWrite-Host \"[ok] context registry binds source $sourceCommit and covers $($result.scenarios) scenarios, $($result.assertions) assertions, and $($result.batches) exact environments for target $($manifest.target).\"\n",
+      "representative": {
+        "tag": "v4.1.0",
+        "commit": "3562377b520cccb071b97b3968946eae7024c950",
+        "path": "tests/tooling/Test-MIRContextExecutionRegistry.ps1"
+      },
+      "tag_path_references": {
+        "tests/tooling/Test-MIRContextExecutionRegistry.ps1": [
+          "v4.1.0",
+          "v4.2.0",
+          "v4.2.0-stable",
+          "v4.2.1",
+          "v4.2.2",
+          "v4.3.0",
+          "v4.4.0",
+          "v4.4.1",
+          "v4.4.2",
+          "v4.5.0",
+          "v4.5.1",
+          "v4.5.2",
+          "v4.6.0",
+          "v4.7.0",
+          "v4.7.1",
+          "v4.7.2",
+          "v4.7.3"
+        ]
+      }
+    },
+    {
+      "blob": "620393ee39b370bd297d5142742595fac37fba70",
+      "bytes": 1314,
+      "sha256": "9BFFB88E4C4A9790E1FC7FCCBC86DD3F2329B233FE8DA8A653D70215D6B6E2E1",
+      "body_utf8": "# MIR4-CANONICAL-EXECUTABLE-TEST\nparam(\n  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot \"../..\")).Path\n)\n# Canonical validation scripts live three levels below the repository root.\n# Keep the former scripts/ base explicit while tooling internals complete L5.\n$MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot \"../..\")).Path\n$MirLegacyScriptRoot = Join-Path $MirRepoRoot \"scripts\"\n\n$ErrorActionPreference = \"Stop\"\n$repo = (Resolve-Path -LiteralPath $RepoRoot).Path\n. (Join-Path $repo \"tools/lib/control/Core.ps1\")\n. (Join-Path $repo \"tools/lib/control/Scenario.ps1\")\n\n$registry = Update-MIRCPExecutionRegistry -Target \"2.1\" -RepoRoot $repo -Check\n$result = Assert-MIRCPExecutionRegistry -Registry $registry -RepoRoot $repo\n& (Join-Path $PSHOME \"pwsh\") -NoProfile -File (Join-Path $repo \"tests/compatibility/Test-MIRScenarioManifests.ps1\") -RepoRoot $repo\nif ($LASTEXITCODE -ne 0) { throw \"Legacy scenario manifest validation failed with exit code $LASTEXITCODE.\" }\nWrite-Host \"[ok] execution registry covers $($result.scenarios) scenarios and $($result.assertions) assertions in $($result.batches) exact-environment batches; $($result.avoided_factorio_launches) Factorio launches are safely avoided and $($result.isolated_fallbacks) unresolved scenarios remain isolated.\"\n",
+      "representative": {
+        "tag": "v4.1.0",
+        "commit": "3562377b520cccb071b97b3968946eae7024c950",
+        "path": "tests/tooling/Test-MIRExecutionRegistry.ps1"
+      },
+      "tag_path_references": {
+        "tests/tooling/Test-MIRExecutionRegistry.ps1": [
+          "v4.1.0",
+          "v4.2.0",
+          "v4.2.0-stable",
+          "v4.2.1",
+          "v4.2.2",
+          "v4.3.0",
+          "v4.4.0",
+          "v4.4.1",
+          "v4.4.2",
+          "v4.5.0",
+          "v4.5.1",
+          "v4.5.2",
+          "v4.6.0",
+          "v4.7.0",
+          "v4.7.1",
+          "v4.7.2",
+          "v4.7.3"
+        ]
+      }
+    }
+  ],
+  "direct_helper_references": [
+    {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "tools/lib/control/Scenario.ps1",
+      "blob": "ba89dd985436977c7dad4cfcd960980af3195c4f",
+      "bytes": 16341,
+      "sha256": "1828FD916EFD1FDCC5374E317F096C070A0DB2BC8735800EB97FB650FF9A2863"
+    },
+    {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "tests/compatibility/Test-MIRScenarioManifests.ps1",
+      "blob": "cdbc573920ed3526bc0f50d17e7f3c2749865200",
+      "bytes": 18579,
+      "sha256": "4F5DD1DE3086CC69F3EB56CC434442851A138A3D428CDD5510AFE8A274B5F266"
+    }
+  ],
+  "reviewed_helper_functions": [
+    "New-MIRCPExecutionRegistry",
+    "Assert-MIRCPExecutionRegistry",
+    "Update-MIRCPExecutionRegistry"
+  ],
+  "manifest_frontier": [
+    {
+      "blob": "92299ed12283e4713bf5022b6709e764d3907598",
+      "bytes": 3658,
+      "sha256": "A4222108556283CE162F6E6967AD552E9D81925CDCCC2840E8DC316DA1AB2603",
+      "representative": {
+        "tag": "0.10.0",
+        "commit": "3377f835243c0cf9e7d2c2e76641c2c471341975",
+        "path": "scripts/Test-MIRScenarioManifests.ps1"
+      },
+      "tag_path_references": {
+        ".mir/target-lines/0.10.0/scripts/Test-MIRScenarioManifests.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/0.11.0/scripts/Test-MIRScenarioManifests.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/0.12.0/scripts/Test-MIRScenarioManifests.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/0.6.0/scripts/Test-MIRScenarioManifests.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/0.7.0/scripts/Test-MIRScenarioManifests.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/0.8.0/scripts/Test-MIRScenarioManifests.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/0.9.0/scripts/Test-MIRScenarioManifests.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/1.3.0/scripts/Test-MIRScenarioManifests.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/1.4.0/scripts/Test-MIRScenarioManifests.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/1.5.0/scripts/Test-MIRScenarioManifests.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/1.6.0/scripts/Test-MIRScenarioManifests.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/1.7.1/scripts/Test-MIRScenarioManifests.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/1.8.2/scripts/Test-MIRScenarioManifests.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/1.9.4/scripts/Test-MIRScenarioManifests.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/2.4.5/scripts/Test-MIRScenarioManifests.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        ".mir/target-lines/3.1.9/scripts/Test-MIRScenarioManifests.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        "scripts/Test-MIRScenarioManifests.ps1": [
+          "0.10.0",
+          "0.11.0",
+          "0.12.0",
+          "0.6.0",
+          "0.7.0",
+          "0.8.0",
+          "0.9.0",
+          "1.3.0",
+          "1.3.5",
+          "1.3.9",
+          "1.4.0",
+          "1.4.5",
+          "1.4.9",
+          "1.5.0",
+          "1.5.5",
+          "1.5.9",
+          "1.6.0",
+          "1.6.5",
+          "1.6.9",
+          "1.7.1",
+          "1.7.5",
+          "1.7.9",
+          "1.8.2",
+          "1.8.5",
+          "1.8.9",
+          "1.9.4",
+          "1.9.5",
+          "1.9.9",
+          "2.4.0",
+          "2.4.5",
+          "3.1.0",
+          "3.1.1",
+          "3.1.2",
+          "3.1.5",
+          "3.1.9"
+        ]
+      }
+    },
+    {
+      "blob": "2b24105dbfacbb34b019d76b92175d20e9cc737a",
+      "bytes": 4582,
+      "sha256": "3449BDFD6C83B22997B695CCB5CB6D630E3701483484A560A07185A677DAD7FF",
+      "representative": {
+        "tag": "2.4.9",
+        "commit": "7ebe93029695bbf809a15a14c6540530738a9e62",
+        "path": "scripts/Test-MIRScenarioManifests.ps1"
+      },
+      "tag_path_references": {
+        ".mir/target-lines/2.4.9/scripts/Test-MIRScenarioManifests.ps1": [
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3",
+          "3.2.5"
+        ],
+        "scripts/Test-MIRScenarioManifests.ps1": [
+          "2.4.9"
+        ]
+      }
+    },
+    {
+      "blob": "6805ad5bbc6319209a55824762d894e879fa8a92",
+      "bytes": 4422,
+      "sha256": "8D42DBB6D1BF3D9AE1E1666E5D1F72502D47639F037A4CA1FEEFCB8C80170002",
+      "representative": {
+        "tag": "2.5.0",
+        "commit": "bea21b068fb38dc26479b619454e50d5b4cf4793",
+        "path": "scripts/Test-MIRScenarioManifests.ps1"
+      },
+      "tag_path_references": {
+        "scripts/Test-MIRScenarioManifests.ps1": [
+          "2.5.0",
+          "2.5.10",
+          "2.5.11",
+          "2.5.5",
+          "2.5.9",
+          "3.2.0",
+          "3.2.1",
+          "3.2.2",
+          "3.2.3"
+        ]
+      }
+    },
+    {
+      "blob": "55ab6cd95ed069c6a89201decb61525c9e310ec7",
+      "bytes": 289,
+      "sha256": "923A8283A9B33CD1E09B710CAAD5DD7FF0A5C9F8427B5D4402DBF4ACC8362241",
+      "representative": {
+        "tag": "3.2.10",
+        "commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6",
+        "path": "scripts/Test-MIRScenarioManifests.ps1"
+      },
+      "tag_path_references": {
+        "scripts/Test-MIRScenarioManifests.ps1": [
+          "3.2.10",
+          "3.2.11",
+          "3.2.5",
+          "3.2.9",
+          "v4.0.0"
+        ]
+      }
+    },
+    {
+      "blob": "2a518b081bfac6e532d44b7542765e3fa2b6aa0b",
+      "bytes": 7781,
+      "sha256": "F73993C3DAA700591846B8C4A007F0FAFBAF3A204AF646C08D2F3ACAB5BF505B",
+      "representative": {
+        "tag": "3.2.10",
+        "commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6",
+        "path": "validation/tests/compatibility/Test-MIRScenarioManifests.ps1"
+      },
+      "tag_path_references": {
+        "validation/tests/compatibility/Test-MIRScenarioManifests.ps1": [
+          "3.2.10",
+          "3.2.11"
+        ]
+      }
+    },
+    {
+      "blob": "3bad6164f1e8c9a77bcf101acea8d976a55d733b",
+      "bytes": 5753,
+      "sha256": "8DF1CE099E2C12C36A20DD6C3D9A1690F5607EDA3D00A8B9CF783A52A7192574",
+      "representative": {
+        "tag": "3.2.5",
+        "commit": "62fddd86b51db7c0238731815d15ca26a4b45857",
+        "path": "validation/tests/compatibility/Test-MIRScenarioManifests.ps1"
+      },
+      "tag_path_references": {
+        "validation/tests/compatibility/Test-MIRScenarioManifests.ps1": [
+          "3.2.5"
+        ]
+      }
+    },
+    {
+      "blob": "879d5c29d717b202c3bc9ad86dfb94a7d8f05766",
+      "bytes": 6526,
+      "sha256": "E4E68DF3974C41685B30CFB8DD3909A8480D36C20A7F83F140485E901EBC78A9",
+      "representative": {
+        "tag": "3.2.9",
+        "commit": "a60230a0695d2dd8fd1e727744614e746cda0bd8",
+        "path": "validation/tests/compatibility/Test-MIRScenarioManifests.ps1"
+      },
+      "tag_path_references": {
+        "validation/tests/compatibility/Test-MIRScenarioManifests.ps1": [
+          "3.2.9"
+        ]
+      }
+    },
+    {
+      "blob": "e56d6400aae150bfa275632f4570b8cb3734310a",
+      "bytes": 12075,
+      "sha256": "FBCBC6855B81F5FED3A248A0A9CCBFB60C5C290C16ADA0996A07278E6866E55D",
+      "representative": {
+        "tag": "v4.0.0",
+        "commit": "5ca449820bdfa5595ca03686f32c74904c46daf3",
+        "path": "validation/tests/compatibility/Test-MIRScenarioManifests.ps1"
+      },
+      "tag_path_references": {
+        "validation/tests/compatibility/Test-MIRScenarioManifests.ps1": [
+          "v4.0.0"
+        ]
+      }
+    },
+    {
+      "blob": "b6ec2f2b5b1565eb7dffa5e96e82d662b0338553",
+      "bytes": 278,
+      "sha256": "2FD16AFDC5A46CBDFD70BE83FEAEBF946C4F3363CC4AB3C0E20FF9E3FC56D669",
+      "representative": {
+        "tag": "v4.1.0",
+        "commit": "3562377b520cccb071b97b3968946eae7024c950",
+        "path": "scripts/Test-MIRScenarioManifests.ps1"
+      },
+      "tag_path_references": {
+        "scripts/Test-MIRScenarioManifests.ps1": [
+          "v4.1.0",
+          "v4.2.0",
+          "v4.2.0-stable",
+          "v4.2.1",
+          "v4.2.2",
+          "v4.3.0",
+          "v4.4.0",
+          "v4.4.1",
+          "v4.4.2",
+          "v4.5.0",
+          "v4.5.1",
+          "v4.5.2",
+          "v4.6.0",
+          "v4.7.0",
+          "v4.7.1",
+          "v4.7.2",
+          "v4.7.3"
+        ]
+      }
+    },
+    {
+      "blob": "0129e3dccb965b91c92159da91a1cc5d54a3e2cb",
+      "bytes": 12324,
+      "sha256": "D5ECA6E098652AB130CDAB72D61823B416F0107CA55411F295D128B1E1CC901F",
+      "representative": {
+        "tag": "v4.1.0",
+        "commit": "3562377b520cccb071b97b3968946eae7024c950",
+        "path": "tests/compatibility/Test-MIRScenarioManifests.ps1"
+      },
+      "tag_path_references": {
+        "tests/compatibility/Test-MIRScenarioManifests.ps1": [
+          "v4.1.0"
+        ]
+      }
+    },
+    {
+      "blob": "cdbc573920ed3526bc0f50d17e7f3c2749865200",
+      "bytes": 18579,
+      "sha256": "4F5DD1DE3086CC69F3EB56CC434442851A138A3D428CDD5510AFE8A274B5F266",
+      "representative": {
+        "tag": "v4.2.0",
+        "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+        "path": "tests/compatibility/Test-MIRScenarioManifests.ps1"
+      },
+      "tag_path_references": {
+        "tests/compatibility/Test-MIRScenarioManifests.ps1": [
+          "v4.2.0",
+          "v4.2.0-stable",
+          "v4.2.1",
+          "v4.2.2",
+          "v4.3.0",
+          "v4.4.0",
+          "v4.4.1",
+          "v4.4.2",
+          "v4.5.0",
+          "v4.5.1",
+          "v4.5.2",
+          "v4.6.0",
+          "v4.7.0",
+          "v4.7.1",
+          "v4.7.2",
+          "v4.7.3"
+        ]
+      }
+    }
+  ],
+  "groups": [
+    {
+      "disposition": "consolidate",
+      "independent_expectation": "Four legacy path wrappers forward the same caller-bound arguments to their canonical test. The six substantive bodies retain the same registry/context calls and explicit error propagation through relocations.",
+      "current_implementation": [
+        "tests/Test-MIR5HostControls.ps1",
+        "tests/test_host_controls.py"
+      ],
+      "current_host_controls": [
+        "tests/test_host_controls.py::test_wrapper_has_one_explicit_current_host_control_plan"
+      ],
+      "remaining_executable_check": "No historical wrapper or duplicate path needs execution. Keep the current explicit complete host plan and fail-fast exit propagation.",
+      "limits": "This is wrapper intent consolidation only. Imported implementation versions are not assumed equal from identical call names."
+    },
+    {
+      "disposition": "obsolete-implementation-only",
+      "independent_expectation": "Registry scenario/assertion IDs are unique and registry scenario count matches catalog declaration count. Generated construction derives rows from selected declarations; the assertion separately requires every registry scenario in batches exactly once. Saved environment signatures match their templates; each batch has one template, multi-scenario batches include only batchable scenarios, and metrics match registry contents.",
+      "current_implementation": [
+        "spec/verification.md",
+        "spec/determinism.md",
+        "tests/Test-MIR5HostControls.ps1"
+      ],
+      "current_host_controls": [
+        "tests/test_host_controls.py"
+      ],
+      "remaining_executable_check": "Do not restore the generated registry, AST runner parser, context platform, old catalogue paths or count-based launch planner. Actual workload sharing/reuse still requires consumed-input review in the current named native case.",
+      "limits": "These assert the retired registry representation, not native behavior. Its template hash covers only template fields, not every consumed source/archive/save/harness byte. Projected avoided launches are arithmetic over assertion/batch counts, not measured process savings."
+    },
+    {
+      "disposition": "retain",
+      "independent_expectation": "The context wrapper explicitly compares current scenario source commit, complete tree and tracked-worktree fingerprint with its lock, and rejects a registry target differing from the context manifest before downstream verification.",
+      "current_implementation": [
+        "spec/verification.md",
+        "tools/lib/validation/NativeProbeCommon.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/lib/validation/DirectLibraryStartupMeasurement.ps1"
+      ],
+      "current_host_controls": [
+        "tests/tooling/Test-MIRImmutableInputStaging.ps1",
+        "tests/tooling/Test-MIRNativeProbeResources.ps1",
+        "tests/test_historical_native_runner.py"
+      ],
+      "remaining_executable_check": "Retain actual current source/package/engine/mod/settings/save/harness/endpoint binding in the affected native scenario. Review uncertain shared inputs; reuse keeps the original result identity. This docs-only classification needs no additional native launch.",
+      "limits": "Named current guards/controls cover their own boundaries, not every private controller. Source fingerprints alone never prove native acceptance or equivalent gameplay workloads."
+    },
+    {
+      "disposition": "retain",
+      "independent_expectation": "Both canonical wrappers stop when their independent scenario-manifest subprocess exits unsuccessfully; context mode invokes it against the selected source rather than the tooling checkout.",
+      "current_implementation": [
+        "tests/Test-MIR5HostControls.ps1",
+        ".github/workflows/validate.yml",
+        "spec/verification.md"
+      ],
+      "current_host_controls": [
+        "tests/test_host_controls.py"
+      ],
+      "remaining_executable_check": "Keep fail-fast current controls and exact-checkout plan readback. Fix a failed product/fixture/runner/input according to evidence; never remove the check or treat structural validation as native acceptance.",
+      "limits": "The wrappers delegating manifest assertions does not dispose every assertion inside that callee."
+    },
+    {
+      "disposition": "unresolved",
+      "independent_expectation": "The directly called manifest tests retain independent input/schema/path and named scenario expectations. These obligations cannot be dropped merely because the execution-registry platform is retired.",
+      "current_implementation": [
+        "spec/verification.md",
+        "spec/inventory/continuity.json"
+      ],
+      "current_host_controls": [],
+      "remaining_executable_check": "Reconcile the eleven exact manifest-test bodies and their named native/runtime inputs through existing CONT subjects. Preserve missing originals/unreviewed transitive helpers explicitly. No wholesale replay of every old test or source save is authorized by this intake.",
+      "limits": "Only latest registry New/Assert/Update construction/assertion functions and the manifest entry boundary were inspected here. Deeper context/AST/serialization/runner/scenario implementations and ten nonlatest manifest bodies are not declared reconciled."
+    }
+  ],
+  "owner": {
+    "reconciliation": "Aero",
+    "native_and_integration": "Black Glass"
+  },
+  "wrapper_intent_reconciliation_complete": true,
+  "source_reconciliation_complete": false,
+  "test_intent_reconciliation_complete": false,
+  "validation": {
+    "repository_checks": "pass: tools/check_repository.py and git diff --check; no native execution",
+    "native_execution": false,
+    "release_qualification": false,
+    "stable_acceptance": false
+  },
+  "limits": [
+    "No player source, test implementation, native command, queue, safeguard, request record or published asset changes.",
+    "The91-tag source counts remain discovery metadata. This bounded disposition closes no global VER-07, support, performance, GUI/client or stable-release gate.",
+    "Black Glass prepares, repairs and runs routine native tests autonomously; independent expectation/result/release review remains separate."
+  ],
+  "reference_commit_map": "spec/inventory/continuity.json:historical_preservation_audit.source_inventory.tag_commits"
+}

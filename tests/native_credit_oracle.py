@@ -187,11 +187,43 @@ def legacy_cannon_credit_rows(public_rows):
     }
 
 
+GUN_NEGATIVE_IDS = {
+    "zz-mir-native-credit-research_electric_shooting_speed-electric-negative",
+    "zz-mir-native-credit-research_electric_shooting_speed-tesla-negative",
+}
+
+
+def mixed_gun_credit_rows(public_rows):
+    """Four explicit private rows beside the captured full electric/Tesla pair."""
+    main = public_rows.get("recipe-prod-research_electric_shooting_speed-1")
+    if main is None or len(main["effects"]) != 2:
+        return {}
+    scalars = {effect["ammo_category"]: effect["modifier"] for effect in main["effects"]}
+    if set(scalars) != {"electric", "tesla"}:
+        raise AssertionError("unexpected authored mixed gun vector")
+    science = main["unit"]["ingredients"][0][0]
+    rows = {}
+    for category in ("electric", "tesla"):
+        for direction, prefix, order, sign in (
+                ("positive", "mir-native-credit-", "zz", 1),
+                ("negative", "zz-mir-native-credit-", "zzz", -1)):
+            name = f"{prefix}research_electric_shooting_speed-{category}-{direction}"
+            rows[name] = {
+                "type": "technology", "name": name, "icon": NATIVE_CREDIT_ICON, "icon_size": 256,
+                "level": 1, "upgrade": True, "hidden": True, "enabled": False,
+                "visible_when_disabled": False, "max_level": "infinite",
+                "order": f"{order}[mir-native-gun-credit]-{category}-{direction}",
+                "effects": [{"type": "gun-speed", "ammo_category": category, "modifier": sign * scalars[category]}],
+                "unit": {"count_formula": "1", "time": 1, "ingredients": [[science, 1]]},
+            }
+    return rows
+
+
 def current_native_credit_rows(public_rows, captured_recipes, family_recipes=None):
     return {**native_credit_carrier_rows(public_rows, captured_recipes, family_recipes),
             **(legacy_module_credit_rows(captured_recipes)
                if "recipe-prod-research_modules-1" in public_rows else {}),
-            **legacy_cannon_credit_rows(public_rows)}
+            **legacy_cannon_credit_rows(public_rows), **mixed_gun_credit_rows(public_rows)}
 
 
 def captured_public_productivity_recipes(public_rows):
@@ -208,7 +240,7 @@ def split_public_and_native_credit_rows(rows, private_main_ids=()):
     """Partition outputs without accepting unknown carrier identities."""
     public, credit = {}, {}
     for name, row in rows.items():
-        destination = credit if name in private_main_ids or name.startswith((
+        destination = credit if name in private_main_ids or name in GUN_NEGATIVE_IDS or name.startswith((
             "mir-native-credit-", "mir-legacy-module-credit-", "mir-legacy-cannon-credit-")) else public
         destination[name] = row
     return public, credit
