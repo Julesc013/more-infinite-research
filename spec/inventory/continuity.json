@@ -16982,13 +16982,14 @@
           ],
           "applicable_evidence": [
             "spec/evidence/library-cont10-layout-negative-control-r01.json",
-            "spec/evidence/library-current504-functional-native-r02.json"
+            "spec/evidence/library-current504-functional-native-r02.json",
+            "https://github.com/Julesc013/more-infinite-research/pull/1724"
           ],
-          "remaining_executable_check": "Use the existing library-native-input fixtures/profiles for a current505 action sequence covering Research, Availability, Queue, Settings and Help; observe typing, filters/dropdowns/checkboxes, scrolling, split/narrow layout, size/reset and native handoff at representative scale and English/German. Native game PNGs and accepted504 images exist; the supported OS screenshot route previously timed out, so repair/test only the needed live capture/input composition instead of treating all rendering as unavailable. Keep identity/focus/geometry/state guards and stop on unexpected state; no Aero dispatch approval.",
+          "remaining_executable_check": "All87 original requests have additive routing, including the34 deferred/rejected/excluded/conditional/document/intake decisions reconciled below. Preserve every original field/status/qualification; routing does not implement or qualify the requests. Named RIC Marine source correction is merged through PR1724; available0.35.8 still fails upstream engine validation, so useful-work and earned-state checks need actually compatible inputs. Continue unresolved source/test-intent and named-profile/API/settings applicability; no recovered request is silently waived or expanded into a new feature programme.",
           "owner": "Black Glass",
           "independent_review": "Aero",
-          "status": "open: host layout opposition and bounded earlier render evidence do not close real-input/all-view acceptance",
-          "readiness": "current-package and guarded-action binding needed; actual input remains unverified",
+          "status": "All87 original request decisions are explicitly routed; historical source/test-intent, implementation and native qualification remain incomplete",
+          "readiness": "Deferred/rejected/excluded scope is recorded; applicable delivered behavior and active unresolved requests retain their own checks",
           "next_work_inputs": [
             "tests/fixtures/library-native-input/control.lua",
             "tests/profiles/library-native-input-imported110-f210-2123-r15.json",
@@ -17438,6 +17439,193 @@
       "test_intent_reconciliation_complete": false,
       "native_execution": false,
       "limits": "No player source/package, published migration, original request record, native result identity or release verdict changes. This is not complete settings, API, Library or VER-07 acceptance."
+    },
+    "remaining_request_disposition_review": {
+      "reviewed_on": "2026-11-06",
+      "reviewed_against": "8b4786e238a382478e02bdba35b182e6b214850d",
+      "subjects": [
+        "CONT-15",
+        "VER-07"
+      ],
+      "request_ids": [
+        "PIPE-01",
+        "FLUID-02",
+        "WEAPON-01",
+        "VEH-01",
+        "VEH-02",
+        "FUEL-01",
+        "ROCKET-01",
+        "ROCKET-02",
+        "SPACE-01",
+        "QUAL-01",
+        "QUAL-02",
+        "URAN-01",
+        "STACK-01",
+        "STACK-02",
+        "HEALTH-01",
+        "HEALTH-02",
+        "REPAIR-01",
+        "LOG-01",
+        "SLOW-01",
+        "CRAFT-01",
+        "TREE-01",
+        "MACHINE-01",
+        "MACHINE-02",
+        "MACHINE-03",
+        "MODE-01",
+        "MODE-02",
+        "PACK-01",
+        "DEV-01",
+        "ECO-AAI",
+        "ECO-BZ",
+        "ECO-SE",
+        "ECO-IR3",
+        "ECO-IR4",
+        "ECO-PLANETS"
+      ],
+      "scope": "The34 previously unrouted original requests only. Preserve the original decision/acceptance and map existing implementation or explicit nonadmission; this completes ledger routing, not historical/native/stable qualification.",
+      "original_ledger_bindings": [
+        {
+          "tag": "v4.2.0-stable",
+          "commit": "6d19c874ea7d026d297865b96aa1b2b0916e9e61",
+          "path": "spec/programmes/community-requests.json",
+          "sha256": "7A8E6A1D8552C13169CA8551070AC399E3CC3573846D115598FFAD08C842C48F",
+          "selected_original_rows_equal": true
+        },
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "spec/programmes/community-requests.json",
+          "sha256": "BFEA3860459FCA18B4197FB0E3CD9608823C9FB774F483B386B9DFD9127F21D7",
+          "selected_original_rows_equal": true
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "spec/programmes/community-requests.json",
+          "sha256": "BFEA3860459FCA18B4197FB0E3CD9608823C9FB774F483B386B9DFD9127F21D7",
+          "selected_original_rows_equal": true
+        }
+      ],
+      "original_category_counts": {
+        "conditional": 1,
+        "deferred": 20,
+        "document-only": 1,
+        "intake/ecosystem": 7,
+        "outside-core": 1,
+        "package-excluded": 1,
+        "rejected": 2,
+        "withheld": 1
+      },
+      "request_count": 87,
+      "routed_before": 53,
+      "routed_after": 87,
+      "selected_original_decisions_reconciled": true,
+      "selected_implementation_qualification_complete": false,
+      "reused_reviews": [
+        "spec/evidence/pipe-productivity-request-intent-aero-r01.json",
+        "historical_preservation_audit.bounded_intent_reviews[5].groups[experimental-vehicle-nonadmission]"
+      ],
+      "dispositions": [
+        {
+          "ids": [
+            "STACK-02"
+          ],
+          "original_category": "conditional",
+          "disposition": "STACK-02 remains conditional/unqualified; no default cap increase or above-four claim."
+        },
+        {
+          "ids": [
+            "FLUID-02",
+            "WEAPON-01",
+            "VEH-02",
+            "FUEL-01",
+            "ROCKET-01",
+            "ROCKET-02",
+            "SPACE-01",
+            "QUAL-01",
+            "QUAL-02",
+            "URAN-01",
+            "STACK-01",
+            "HEALTH-01",
+            "HEALTH-02",
+            "REPAIR-01",
+            "LOG-01",
+            "SLOW-01",
+            "CRAFT-01",
+            "MACHINE-01",
+            "MACHINE-02",
+            "MACHINE-03"
+          ],
+          "original_category": "deferred",
+          "disposition": "Retain original deferrals; VEH-02 additionally retains its existing excluded capability observations."
+        },
+        {
+          "ids": [
+            "DEV-01"
+          ],
+          "original_category": "document-only",
+          "disposition": "DEV-01 maps current contributor/build/PR guidance; no gameplay gate."
+        },
+        {
+          "ids": [
+            "TREE-01",
+            "ECO-AAI",
+            "ECO-BZ",
+            "ECO-SE",
+            "ECO-IR3",
+            "ECO-IR4",
+            "ECO-PLANETS"
+          ],
+          "original_category": "intake/ecosystem",
+          "disposition": "Retain original owner-specific intake and six ecosystem scopes, named results and unresolved subsets."
+        },
+        {
+          "ids": [
+            "MODE-02"
+          ],
+          "original_category": "outside-core",
+          "disposition": "Retain the original outside-core decision."
+        },
+        {
+          "ids": [
+            "VEH-01"
+          ],
+          "original_category": "package-excluded",
+          "disposition": "VEH-01 remains an excluded prototype with scoped original engine observations."
+        },
+        {
+          "ids": [
+            "MODE-01",
+            "PACK-01"
+          ],
+          "original_category": "rejected",
+          "disposition": "Retain rejected default/required-split decisions; no new implementation obligation."
+        },
+        {
+          "ids": [
+            "PIPE-01"
+          ],
+          "original_category": "withheld",
+          "disposition": "PIPE-01 remains commit-4.2 and withheld; permission/economics/owner/progression work remains open."
+        }
+      ],
+      "source_and_evidence_scope": "Current source pointers are implementation surfaces or expressly unresolved subsets, not evidence of every ecosystem. Existing captures/results retain original package/engine/settings identities; no current applicability or native pass is inferred.",
+      "contributor_guidance": {
+        "path": "CONTRIBUTING.md",
+        "sha256": "6E88A16D88348C3D2E9422401DDE9CB922D5128C140E47D9B095489D3F21440E",
+        "change": "Replace obsolete main/release4.0 routing, phase-engine/fingerprint requirements and broken publication anchor with actual dev/build/feature/PR/release journeys. Preserve full authored README and separate official release controls."
+      },
+      "remaining": [
+        "All87 original requests now have explicit routing; none of the34 original statuses or qualification lists is changed.",
+        "Deferred/rejected/excluded/conditional requests keep their original acceptance and admission limits; no new native campaigns or feature promises are manufactured.",
+        "Named AAI/BZ/SE/planet subsets still need current consumed-input and genuinely affected gameplay/state/client verdicts; IR3 scope remains unresolved and recorded IR4 inputs fail upstream.",
+        "Continue the historical source/test-intent gaps and actual Library/profile/API/state/performance/release work. inventory_complete remains false."
+      ],
+      "native_execution": false,
+      "player_source_changed": false,
+      "request_decisions_changed": false,
+      "inventory_complete": false
     },
     "cap_runtime_consumer_review": {
       "subject": "CONT-07",
