@@ -109,6 +109,11 @@ class PackageTests(unittest.TestCase):
                     ironclad_ordering = "(?) aai-vehicles-ironclad"
                     self.assertNotIn(ironclad_ordering, dependencies[target])
                     expected_dependencies.insert(1, ironclad_ordering)
+                    # Marine admission consumes RIC's final recipe/native
+                    # conversion context. Keep the old inventory unchanged.
+                    ric_ordering = "(?) real-industrial-chemistry"
+                    self.assertNotIn(ric_ordering, dependencies[target])
+                    expected_dependencies.insert(expected_dependencies.index("(?) space-exploration"), ric_ordering)
                 if target in ("f200", "f210"):
                     # The retained 4.7 inventory predates this MIR5 ordering
                     # correction. Current modern packages must run after SIF
