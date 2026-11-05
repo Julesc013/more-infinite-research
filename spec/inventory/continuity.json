@@ -430,6 +430,14 @@
           "id": "atan-base-space-age-native-labs",
           "evidence": "spec/evidence/atan-gameplay-chain.json",
           "scope": "Exact F200 Base/Space Age shared filter and ash actual labs, queue state and two cold reloads; no physical output/F210 claim."
+        },
+        {
+          "id": "historical-pipeline-extent-source-intent",
+          "evidence": "spec/evidence/historical-pipeline-extent-intents-aero-r01.json",
+          "source": [
+            "source/overrides/pipeline_extent.lua"
+          ],
+          "scope": "One published fixture body at166 original commit:path references retains setting/default, rounding/extent and shared-box expectations through existing current controls. Its metadata is2.1/base2.1.8; copied historical directory names do not establish old-engine support. Existing e282 native640/960/480 observations keep their original package/engine and data-stage scope; no fluid-flow, new native or final-candidate verdict follows."
         }
       ],
       "test_subjects": [
@@ -16989,6 +16997,20 @@
         "player_source_changed": false,
         "source_reconciliation_complete": false,
         "test_intent_reconciliation_complete": false
+      },
+      {
+        "subjects": [
+          "CONT-03",
+          "CONT-06"
+        ],
+        "reviewed_on": "2026-11-06",
+        "reviewed_against": "764e8d19945e0f01a04f28a287e1a279199d08db",
+        "scope": "One deduplicated assert-pipeline-extent fixture, original emission/metadata and166 source bindings; no complete override or native acceptance claim.",
+        "evidence": "spec/evidence/historical-pipeline-extent-intents-aero-r01.json",
+        "disposition": "Retain useful parsing/scaling/shared-box assertions through current controls, preserve reviewed native-default/zero corrections, and retire only obsolete fixture-text/dispatcher plumbing. Local-onlyv3.0.0/v4.2.0 remain explicit; no tag is changed. No new product defect, campaign or replay of unchanged cases is inferred.",
+        "original_request_fields_preserved": true,
+        "native_tests_run": false,
+        "stable_acceptance": false
       }
     ],
     "stable_coverage_review": {

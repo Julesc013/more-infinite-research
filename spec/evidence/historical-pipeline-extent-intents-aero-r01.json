@@ -1,0 +1,127 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalPipelineExtentIntentDispositionV1",
+  "status": "bounded-source-intent-reconciled-native-scope-retained",
+  "reviewed_on": "2026-11-06",
+  "subjects": [
+    "CONT-03",
+    "CONT-06",
+    "VER-07"
+  ],
+  "scope": "One deduplicated historical pipeline-extent fixture and its direct published emission/metadata context; not all override history or a current native verdict.",
+  "reviewed_current_source": "9d6e7c063e1c016b903f89d169b6db3b1455b3da",
+  "original": {
+    "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+    "fixture": "fixtures/assert-pipeline-extent/data-final-fixes.lua",
+    "fixture_blob": "228bd9059a6f8bcde6cf11ef09d1a3512e65d337",
+    "fixture_bytes": 1386,
+    "fixture_sha256": "798F01C75D8678A33C630ED710771AB330CB403505D20E9E8586F4F64A4B84A0",
+    "metadata": "fixtures/assert-pipeline-extent/info.json",
+    "metadata_sha256": "18AAAFC8637ADCAE4350EA53D2A435D0A8B16BC51F6FBE509C70D5C677A1F4F4",
+    "emission": "source/prototypes/mir/pipeline/extent.lua",
+    "emission_sha256": "2551765972B2AB181C91FA54414166477EBB38E9FB24C5669FE1EB1E43EC24C3",
+    "declared_factorio_version": "2.1",
+    "declared_base_floor": "2.1.8"
+  },
+  "deduplication": {
+    "exact_commit_path_resolutions": 166,
+    "distinct_path_aliases": 18,
+    "distinct_commits": 80,
+    "indexed_tag_names": 81,
+    "live_remote_tag_matches": 79,
+    "local_only_names": [
+      "v3.0.0",
+      "v4.2.0"
+    ],
+    "canonical_4_2_0_stable_verified": true,
+    "limit": "Target-line copies are source aliases, not native execution or support evidence for the engine versions named in their directory paths."
+  },
+  "dispositions": [
+    {
+      "intent": "Normal Base prototype extent assertions",
+      "disposition": "retain-through-existing-controls",
+      "independent_expectation": "For an active factor, each present ordinary pipe, pipe-to-ground and storage-tank fluid box has floor(320 * factor + 0.5); absent boxes are skipped. Factor1 returns before the old fixture assertions.",
+      "implementation": [
+        "source/overrides/pipeline_extent.lua"
+      ],
+      "controls": [
+        "tests/test_prototype_limits.py::test_pipeline_extent_scales_every_delivered_box_field_once_with_rounding_and_bounds",
+        "tests/test_generator.py::test_pipeline_extent_uses_effective_import_and_never_imports_for_defaults"
+      ],
+      "limit": "The fixture presumes ordinary320 defaults; it does not override the existing explicit/native-default preservation contract."
+    },
+    {
+      "intent": "Published enabled override semantics",
+      "disposition": "consolidate",
+      "independent_expectation": "The original emission scales explicit extents or320 fallback, rounds to nearest integer, clamps positive results to1..4294967295, visits five named singular fluid-box fields and plural fluid_boxes, and applies once to shared boxes despite table cycles.",
+      "implementation": [
+        "source/overrides/pipeline_extent.lua"
+      ],
+      "controls": [
+        "tests/test_prototype_limits.py::test_pipeline_extent_scales_every_delivered_box_field_once_with_rounding_and_bounds",
+        "tests/test_prototype_limits.py::test_pipeline_extent_deep_shared_cycles_use_bounded_call_depth_and_one_visit"
+      ],
+      "limit": "Prototype-table traversal is an enabled override; it creates no research-family discovery or Generator graph solver."
+    },
+    {
+      "intent": "Settings interpretation and default no-op",
+      "disposition": "retain-with-existing-profile-contract",
+      "independent_expectation": "The old fixture treats invalid/nonpositive input as1, values above10 as percentages and positive values at most10 as factors. Registered dropdown strings and published portable numeric percentages keep their actual settings contracts. Default/inactive current paths do not scan or import the override.",
+      "implementation": [
+        "source/overrides/pipeline_extent.lua",
+        "source/research/settings.lua",
+        "source/research/settings_profile.lua"
+      ],
+      "controls": [
+        "tests/test_prototype_limits.py::test_pipeline_extent_preserves_percentages_and_portable_numeric_meaning",
+        "tests/test_generator.py::test_pipeline_extent_uses_effective_import_and_never_imports_for_defaults",
+        "tests/test_settings_profile.py::test_published_numeric_dropdown_imports_reach_effects_and_export_without_raw_writes"
+      ],
+      "limit": "A synthetic numeric fixture argument is not independent evidence to change accepted portable-profile percentage meaning."
+    },
+    {
+      "intent": "Custom defaults and valid native zero",
+      "disposition": "preserve-reviewed-corrections-not-old-bugs",
+      "independent_expectation": "Retain the existing explicit/native utility-default rule and valid zero extent; preserve the utility constant itself and foreign fields. The historical hardcoded fixture does not specify custom-default behavior or require changing zero to1.",
+      "implementation": [
+        "source/overrides/pipeline_extent.lua"
+      ],
+      "controls": [
+        "tests/test_prototype_limits.py::test_pipeline_extent_scales_the_native_utility_default_without_changing_it",
+        "tests/test_prototype_limits.py::test_pipeline_extent_preserves_native_zero_and_the_positive_extent_floor",
+        "tests/test_override_interactions_fixture.py::test_real_pipeline_override_meets_the_independent_native_stage_oracle"
+      ],
+      "correction_commits": [
+        "45df35e1046d41b827f81dfbf601c14cbe51c833",
+        "92e5da419c036e2fc7f4d8644a436aed5df904ea"
+      ],
+      "limit": "These reviewed corrections are not derived from the candidate merely to make the old fixture pass."
+    },
+    {
+      "intent": "Old static fixture-text/dispatcher plumbing",
+      "disposition": "obsolete-implementation-only",
+      "independent_expectation": "Keep the useful settings/output assertions; do not restore the old static snippet checker, generated execution registry or native dispatcher to retain them.",
+      "historical_paths": [
+        "tools/lib/validation/runner/DefaultCampaign02.ps1",
+        "tools/lib/validation/runner/RuntimeWorkspace.ps1",
+        "tools/lib/validation/runner/StaticSciencePackSettings.ps1",
+        "validation/scenarios/runtime.json"
+      ],
+      "limit": "A fixture declaration, quoted source constant or list of scenario IDs is not an observed engine result."
+    }
+  ],
+  "applicable_prior_component": {
+    "evidence": "spec/evidence/override-interactions-e282-native-chain.json",
+    "source": "e282b572050a9f8c1c5a0a9b887d5e05218c0413",
+    "player_sha256": "4F70FFE6E0585B27E58F7385D23B4727613A330604F2877B34B1CBAABC9081B7",
+    "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "observed": "Original native data markers preserve utility640, implicit960 and explicit480 through create/production/two reloads; physical gear crafting is a separate override observation.",
+    "limit": "Not a fluid-flow/reach measurement, native zero case, modern engine8DC result or new final-candidate run. Original pre-engine failure remains adverse."
+  },
+  "remaining_executable_check": "Review final consumed source/settings/controller/engine inputs and cover genuinely affected override boundaries through the existing native queue. Fluid reach/flow, useful work, saves and multiplayer are not established by this fixture; discovering it creates no new campaign or replay of unchanged cases.",
+  "new_product_defect_demonstrated": false,
+  "tests_run_in_this_disposition": false,
+  "native_tests_run": false,
+  "historical_inventory_complete": false,
+  "stable_acceptance": false
+}
