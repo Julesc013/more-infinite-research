@@ -1222,6 +1222,40 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_paired_wrapper_admits_exact_published505_and_refuses_changed_inputs(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw $errors[0].Message}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $node=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq'Assert-MultiplayerFixtureSelection'},$true))
+          if($node.Count-ne1){throw 'selection function differs'}
+          Invoke-Expression $node[0].Extent.Text
+          function Profile {Get-Content -LiteralPath $env:MIR_TEST_505_PROFILE -Raw|ConvertFrom-Json -AsHashtable}
+          $engine='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B'
+          $mir='764CE505DF162C2D95E9218C0B7684AB4811940F8B43698FCE681DEA71AB284D'
+          $target=Assert-MultiplayerFixtureSelection (Profile) $engine 'library-paired-browser' $mir 8192
+          if($target.mir-cne'5.0.20005'){throw 'published505 was not selected'}
+          function Refuse($profile,$actualEngine=$engine,$expected=$mir) {
+            try{Assert-MultiplayerFixtureSelection $profile $actualEngine 'library-paired-browser' $expected 8192|Out-Null}catch{return}
+            throw 'changed published505 input was admitted'
+          }
+          $bad=Profile;$bad.mods[2].version='5.0.20006';Refuse $bad
+          $bad=Profile;$bad.archive_sha256['more-infinite-research_5.0.20005.zip']='0'*64;Refuse $bad
+          Refuse (Profile) ('0'*64)
+          Refuse (Profile) $engine ('0'*64)
+          $bad=Profile;$bad.mods[4].name='mir-fixture-mir5-library-paired-browser-arm-published';Refuse $bad
+          $bad=Profile;$bad.mods[0].version='2.1.23';Refuse $bad
+        '''
+        result = subprocess.run(
+            ['pwsh', '-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script],
+            cwd=ROOT, env={**os.environ, 'MIR_TEST_WRAPPER':str(WRAPPER),
+                           'MIR_TEST_505_PROFILE':str(ROOT/'tests/profiles/library-retained-current505-f200-2077.json')},
+            capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_multiplayer_wrapper_admits_only_the_exact_current_standalone_space_age_api_client_profile_before_admission(self):
         script = r'''
           $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
