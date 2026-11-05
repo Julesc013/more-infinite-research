@@ -8477,8 +8477,8 @@
       "sha256": "56B5A66AD494579200B1E0D3DA55D5ED32ADCBEA71DD082EFADE2F72C04AFB01"
     },
     "delivery_review": {
-      "path": "1911645fe01cc830f1921b7cabed9f1bcd4511e7:evidence/aero-public505-actual-delivery-review-r01/review.json",
-      "sha256": "C4A92DA3DEFB25A1C607B9A1B7937C39A0AD71F61D1C9B752B80F920378E3D59"
+      "path": "ddb249894034d3043e04162c06f29c60cb080603:evidence/aero-public505-final-delivery-review-r01/review.json",
+      "sha256": "2CD8E1E254DD7B2CA80F1A638C2EDA9CEE09B0BE316F4DC99AC7FDF955FC27D6"
     },
     "prerelease_delivery_verified": true,
     "native_qualification_complete": false,
@@ -8491,7 +8491,12 @@
       "offline_package_evidence": "spec/evidence/current-assets-575e418c-root-readback.json",
       "native_qualification_complete": false,
       "release_qualification": false
-    }
+    },
+    "delivery_component_review": {
+      "path": "1911645fe01cc830f1921b7cabed9f1bcd4511e7:evidence/aero-public505-actual-delivery-review-r01/review.json",
+      "sha256": "C4A92DA3DEFB25A1C607B9A1B7937C39A0AD71F61D1C9B752B80F920378E3D59"
+    },
+    "prerelease_publication_and_delivery_accepted": true
   },
   "reference_path_policy": "Current source lookup pointers below use existing canonical paths. Removed MIR4 implementation locators are pinned under historical_source to the original recovery baseline; removed documentation pointers retain an explicit evidence_revision or historical_documentation commit. These source/doc lookups do not relabel historical execution identities or native scopes.",
   "historical_preservation_audit": {
@@ -16850,7 +16855,7 @@
     ],
     "stable_coverage_review": {
       "reviewed_against": "5d173925bce29ad8917346897706a0fcee4553e4",
-      "public_candidate": "Published5.0.5 GitHub prerelease, source/main5d173925bce29ad8917346897706a0fcee4553e4/player41d36ed8db131404692d5c054da3c87f7b54aecb; release434857344 and canonical tag29ab8e81806559fc7a34b26fc276a825face3ff2. Independent final package56B5A66A and actual anonymous/local delivery componentC4A92DA3 are accepted. Publisher original-custody review and complete stable qualification remain separate; earlier native results retain their actual inputs and identities.",
+      "public_candidate": "Published5.0.5 GitHub prerelease, main5d173925bce29ad8917346897706a0fcee4553e4/player41d36ed8db131404692d5c054da3c87f7b54aecb; release434857344 and canonical tag29ab8e81806559fc7a34b26fc276a825face3ff2. Independent package56B5A66A and final publication/delivery2CD8E1E2 are accepted, including actual publisher originals and both primary deliveries. Earlier public componentC4A92DA3 remains preserved under its original partial-review identity. Stable qualification remains incomplete; no prior native execution is relabelled.",
       "scope": "Current routing of the existing CONT and release obligations, not a second request ledger, complete historical-source disposition or blanket candidate qualification. Exact earlier execution identities and limits remain authoritative; the CONT-10 acceptance_rows retain their nine UI areas. Existing accepted components are not reopened merely because a later source revision exists.",
       "rows": [
         {
@@ -17067,12 +17072,13 @@
             "https://github.com/Julesc013/more-infinite-research/pull/1664#issuecomment-6632717829",
             "https://github.com/Julesc013/more-infinite-research/blob/aa8eabfd33228de5e6d3c4c27744fbb50464c1f3/spec/evidence/candidate504-github-prerelease-delivery-chain-r01.json",
             "2b910b36a300b52c316f2fdf1f3763689096e272:evidence/aero-candidate505-final-package-review-r01/review.json",
-            "1911645fe01cc830f1921b7cabed9f1bcd4511e7:evidence/aero-public505-actual-delivery-review-r01/review.json"
+            "1911645fe01cc830f1921b7cabed9f1bcd4511e7:evidence/aero-public505-actual-delivery-review-r01/review.json",
+            "ddb249894034d3043e04162c06f29c60cb080603:evidence/aero-public505-final-delivery-review-r01/review.json"
           ],
-          "remaining_executable_check": "Retain accepted 5.0.4 correspondence 2C3D4BA1 and delivery review 5C49A325: all 17 ZIPs/two sums, roots/info/changelog/source-tag-FFFPP/Base floors, exact modern native package bytes, no developer payloads, ZIP CRCs and both 21-file local deliveries. All 85 MIR5 ZIP asset labels match the requested display format; prior four releases and 76 assets retain their bytes. These package/delivery facts do not close each stable edition current native subset; the native owner runs affected current archive/catalogue/useful-lab checks without repeating unchanged historical preservation. Preserve F018/0.18.47 experimental and early best-effort limits. Review changed candidate/edition/docs inputs for stable; unchanged qualified bytes may be promoted, changed public bytes require 5.0.5.",
+          "remaining_executable_check": "Retain accepted5.0.5 package correspondence56B5A66A and final publication/delivery2CD8E1E2: all17 ZIPs/two sums, exact source/tag/extended versions/Base floors,1554 ZIP members/CRCs and both21-file local deliveries. All102 MIR5 ZIP labels match the requested format; the five prior betas/95assets and tag objects remain unchanged. These facts do not close each stable edition native subset; run genuinely affected current checks and preserve original result identities instead of repeating unchanged historical preservation. KeepF018/0.18.47 experimental and early best-effort limits. Review remaining stable edition/docs inputs; unchanged qualified bytes may be promoted, while changed public bytes after5.0.5 require5.0.6.",
           "owner": "Aero; Black Glass freezes candidate",
           "independent_review": "Aero",
-          "status": "partial:5.0.5 all-edition package identity and actual anonymous/local delivery component accepted; final stable native/support consistency remains separate"
+          "status": "partial:5.0.5 all-edition package identity and final publication/anonymous/local delivery accepted; each stable edition native/support verdict remains separately scoped"
         },
         {
           "subjects": [
@@ -17110,12 +17116,13 @@
             "https://github.com/Julesc013/more-infinite-research/pull/1664#issuecomment-6632717829",
             "https://github.com/Julesc013/more-infinite-research/blob/aa8eabfd33228de5e6d3c4c27744fbb50464c1f3/spec/evidence/candidate504-github-prerelease-delivery-chain-r01.json",
             "2b910b36a300b52c316f2fdf1f3763689096e272:evidence/aero-candidate505-final-package-review-r01/review.json",
-            "1911645fe01cc830f1921b7cabed9f1bcd4511e7:evidence/aero-public505-actual-delivery-review-r01/review.json"
+            "1911645fe01cc830f1921b7cabed9f1bcd4511e7:evidence/aero-public505-actual-delivery-review-r01/review.json",
+            "ddb249894034d3043e04162c06f29c60cb080603:evidence/aero-public505-final-delivery-review-r01/review.json"
           ],
-          "remaining_executable_check": "The 5.0.4 prerelease publication/delivery sequence is complete: exact checked main/tag promotion, fresh administration and distinct immutability probes, one 19-asset draft/publication, anonymous downloads, unchanged prior objects and both clean synchronized local deliveries are independently accepted by 5C49A325. Preserve that result rather than scheduling it again. Stable GO still requires all applicable verdicts on one candidate and independent claims review; then qualify unchanged-byte promotion or 5.0.5 for changed public bytes with normal publication safeguards. Black Glass owns integration/publication autonomously; agent publication remains GitHub-only and the maintainer handles Mod Portal.",
+          "remaining_executable_check": "The5.0.5 prerelease publication/delivery sequence is independently accepted by2CD8E1E2: exact checked main/tag promotion, fresh administration and distinct immutability probes, one19-asset draft/publication, anonymous downloads, unchanged prior objects and both verified local deliveries. Preserve that result without scheduling it again. StableGO still requires all applicable verdicts on one candidate and independent claims review; then promote unchanged qualified bytes or use5.0.6 for changed public bytes with normal publication safeguards. Black Glass owns integration/publication autonomously; agent publication remains GitHub-only and the maintainer handles Mod Portal.",
           "owner": "Black Glass; Aero independently verifies delivery",
           "independent_review": "Aero",
-          "status": "partial:5.0.5 checked promotion and actual public/local delivery observed; original publisher-custody review and full stable GO remain separate"
+          "status": "partial:5.0.5 checked promotion/publication/delivery independently accepted; full stable GO remains open"
         }
       ],
       "verdict": "NOT-READY for stable: Library input/export/personal/client and Discovery Tree reset, remaining historical/profile/API/state and whole-product performance verdicts remain. The5.0.5 correction/source/package and actual delivery components are accepted within their named scope; the affected science transition retains actualf0ca native source and does not relabel earlier5.0.4 ownership, rendering or normal factory results.",
@@ -17123,7 +17130,13 @@
       "release_qualification": false,
       "reviewed_on": "2026-11-05",
       "native_execution_policy": "The maintainer authorizes Black Glass to prepare, repair and run routine native assignments without prospective Aero packet or dispatch sign-off. Keep exact input custody, protected saves, process/resource safeguards and restoration. Aero supplies independent expectations and scoped corrections, then reviews actual results and the final candidate/release; completed source or host controls are not native acceptance.",
-      "previous_routing_source": "12eae25e24ca6600cd3cc6ed4a48d93cd8e7b472"
+      "previous_routing_source": "12eae25e24ca6600cd3cc6ed4a48d93cd8e7b472",
+      "prior_publication_context": {
+        "source_release": "5.0.4",
+        "public_candidate": "Published 5.0.4 GitHub prerelease, player a2ba6eeaf06292cd90b7d7c5a687cf96cf84529f; release 434617359 and main 401d89f67cf71c8fb3ed7a025eff18f0a9d99a28. Actual delivery is independently accepted by review 5C49A325. Stable qualification remains incomplete; earlier native results retain their original identities and actual consumed-input limits.",
+        "package_delivery_routing": "Retain accepted 5.0.4 correspondence 2C3D4BA1 and delivery review 5C49A325: all 17 ZIPs/two sums, roots/info/changelog/source-tag-FFFPP/Base floors, exact modern native package bytes, no developer payloads, ZIP CRCs and both 21-file local deliveries. All 85 MIR5 ZIP asset labels match the requested display format; prior four releases and 76 assets retain their bytes. These package/delivery facts do not close each stable edition current native subset; the native owner runs affected current archive/catalogue/useful-lab checks without repeating unchanged historical preservation. Preserve F018/0.18.47 experimental and early best-effort limits. Review changed candidate/edition/docs inputs for stable; unchanged qualified bytes may be promoted, changed public bytes require 5.0.5.",
+        "publication_routing": "The 5.0.4 prerelease publication/delivery sequence is complete: exact checked main/tag promotion, fresh administration and distinct immutability probes, one 19-asset draft/publication, anonymous downloads, unchanged prior objects and both clean synchronized local deliveries are independently accepted by 5C49A325. Preserve that result rather than scheduling it again. Stable GO still requires all applicable verdicts on one candidate and independent claims review; then qualify unchanged-byte promotion or 5.0.5 for changed public bytes with normal publication safeguards. Black Glass owns integration/publication autonomously; agent publication remains GitHub-only and the maintainer handles Mod Portal."
+      }
     },
     "report_options_restoration_review": {
       "subject": "CONT-10",
