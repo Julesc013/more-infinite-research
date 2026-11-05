@@ -1,28 +1,13 @@
-## Outcome
+## What changed and why?
 
-Describe the user, contributor, release, or assurance outcome. Link the shared finding or work-package ID.
+Describe the problem and resulting behavior. Link a related issue if there is one.
 
-## Authority and package boundary
+## Checks performed
 
-- Base commit/tree:
-- Writable authority and bounded writer:
-- Affected targets:
-- Maturity: stable / preview / shadow / experimental / omitted
-- Player-package delta: none / list exact paths
-- Forward-port or backport disposition:
+List the checks you ran and their results, including anything you could not test.
 
-## Proof
+## Compatibility concerns
 
-- Verification plan:
-- Checks run:
-- Evidence reused and exact fingerprint:
-- Independent review required:
-- Rollback or compensation:
+Mention affected Factorio versions, other mods, existing saves, settings or API users where relevant.
 
-## Checklist
-
-- [ ] Published tags, versions, assets, and receipts were not rewritten.
-- [ ] Player ZIP exclusions and one-emitter boundaries are preserved.
-- [ ] Change fragments or release copy are updated when the change is player-visible.
-- [ ] Documentation projections are regenerated when front matter changed.
-- [ ] Post-merge target-branch readback and every required forward-port, backport, or promotion disposition are planned.
+For an official release, also follow the [release procedure](../docs/development.md#github-publication-after-a-reviewed-verdict).

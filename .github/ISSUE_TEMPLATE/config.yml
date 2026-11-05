@@ -5,4 +5,4 @@ contact_links:
     about: Report vulnerabilities privately; do not open a public issue.
   - name: Installation and support guide
     url: https://github.com/Julesc013/more-infinite-research/blob/main/SUPPORT.md
-    about: Check the required evidence and claim boundaries before filing.
+    about: Installation, upgrades, recovery and help reporting a problem.

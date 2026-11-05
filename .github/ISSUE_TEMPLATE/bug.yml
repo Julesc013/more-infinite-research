@@ -1,44 +1,31 @@
-name: Player bug
-description: Report reproducible incorrect behavior, loading failure, migration failure, or crash.
+name: Bug or mod compatibility problem
+description: Tell us about a crash, loading failure, unexpected behavior, or problem with another mod.
 title: "bug: "
 labels: ["bug", "triage"]
 body:
-  - type: dropdown
-    id: target
+  - type: textarea
+    id: problem
     attributes:
-      label: MIR target
-      options: ["F210 / Factorio 2.1", "F200 / Factorio 2.0", "F110 / Factorio 1.1", "F100 / Factorio 1.0", "Unknown"]
+      label: What happened, and what did you expect?
     validations:
       required: true
   - type: input
     id: versions
     attributes:
-      label: Exact MIR and Factorio versions
-      placeholder: "MIR 4.0.21000; Factorio 2.1.x"
-    validations:
-      required: true
+      label: Factorio and MIR versions
+      description: Include the versions if you know them. "Not sure" is fine.
+  - type: textarea
+    id: mods
+    attributes:
+      label: Which other mods seem involved?
+      description: Names or a mod list help; include versions if available.
   - type: textarea
     id: reproduction
     attributes:
-      label: Reproduction
-      description: Give the smallest repeatable sequence and say whether a new save reproduces it.
-    validations:
-      required: true
-  - type: textarea
-    id: expected
-    attributes:
-      label: Expected and observed behavior
-    validations:
-      required: true
+      label: Steps to reproduce, if known
+      description: Tell us what you were doing when it happened. It is okay if you cannot reproduce it.
   - type: textarea
     id: evidence
     attributes:
-      label: Sanitized evidence
-      description: Attach a minimized SupportBundleV1 or relevant log excerpt. Remove secrets and personal paths; do not upload a save or full mod archive unless requested.
-  - type: checkboxes
-    id: security
-    attributes:
-      label: Public-report check
-      options:
-        - label: This report contains no credential, private key, recovery share, or unpatched security vulnerability.
-          required: true
+      label: Optional attachments
+      description: Error text, screenshots, factorio-current.log, a settings export or a small save can help. Check attachments for personal information before posting.
