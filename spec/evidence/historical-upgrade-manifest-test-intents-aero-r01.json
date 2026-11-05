@@ -1,0 +1,491 @@
+{
+  "schema": 1,
+  "kind": "HistoricalUpgradeManifestTestIntentReviewV1",
+  "reviewed_on": "2026-11-05",
+  "reviewed_against": "4181024f12bf745b56f670b842b40c3d1a7d9237",
+  "scope": "Direct Test-MIRUpgradeManifest.ps1 test-body family at the ten immutable bodies/fourteen retained published tag-path bindings in the existing inventory. Imported helper/fixture implementations, original native outcomes and other historical/inter-release paths remain separate.",
+  "source_custody": {
+    "repository": "Julesc013/mir-native-worker",
+    "commit": "d298d4396d9b361553c815e967424a792602761d",
+    "path": "evidence/aero-historical-upgrade-manifest-extraction-r01/original-review-inputs.json.gz",
+    "sha256": "3C4C209403DEDA380DB598251B9A2DB10265E42865F4A44BCAA137EFB75936D8",
+    "decoded_sha256": "DB2419248844CF8AB098B7BB813439B458FE730F1533C4ABB45AD872F307A3E9",
+    "unique_bodies": 10,
+    "verified_bindings": 14,
+    "raw_source_bytes": 1456650
+  },
+  "sources": [
+    {
+      "blob": "5a401026da6eac8441cab869622ca62ca12e51b2",
+      "bytes": 14985,
+      "sha256": "EC8D145EADC260408B6FCE293D757AD76B658D01C9D9E07B53A061F9399E8C17",
+      "bindings": [
+        {
+          "tag": "v4.2.1",
+          "commit": "27c4777c27b3287f18df02e200235a1870bac465",
+          "path": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+          "blob": "5a401026da6eac8441cab869622ca62ca12e51b2"
+        }
+      ]
+    },
+    {
+      "blob": "34c6980d3d32b09e01126564d6c72c9ad3c6c3db",
+      "bytes": 34098,
+      "sha256": "A19CBBB0E22AC051E11FBAB57A9610ABE032FD4AFCC500C27EB3B9BEC7EC2AAB",
+      "bindings": [
+        {
+          "tag": "v4.2.2",
+          "commit": "44fb1439ecb960e36fd79dccbec7eac902d6eb5e",
+          "path": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+          "blob": "34c6980d3d32b09e01126564d6c72c9ad3c6c3db"
+        }
+      ]
+    },
+    {
+      "blob": "d2e939367291d294041d9cb39e1aa5198ff327a3",
+      "bytes": 97691,
+      "sha256": "F3002383DF0A6334592CD5206859BBAD6017935D612DD386B7417B8710A2370A",
+      "bindings": [
+        {
+          "tag": "v4.3.0",
+          "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+          "path": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+          "blob": "d2e939367291d294041d9cb39e1aa5198ff327a3"
+        }
+      ]
+    },
+    {
+      "blob": "c3255a4011e2f106e84d09bbd4e2b9feabb9de97",
+      "bytes": 128871,
+      "sha256": "FE9359F8C5A003B3412E0D0CBF7C64320413CDC93A69B5DB11B8719534DFEEFB",
+      "bindings": [
+        {
+          "tag": "v4.4.0",
+          "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+          "path": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+          "blob": "c3255a4011e2f106e84d09bbd4e2b9feabb9de97"
+        }
+      ]
+    },
+    {
+      "blob": "08d4a9abd694fe93917f794a4266cf7f44e960a9",
+      "bytes": 131234,
+      "sha256": "4E87E32900AD27F4D81C20E5A9A71CE509E2ACC4BDF6B547FECE2D5FA150041D",
+      "bindings": [
+        {
+          "tag": "v4.4.1",
+          "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+          "path": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+          "blob": "08d4a9abd694fe93917f794a4266cf7f44e960a9"
+        }
+      ]
+    },
+    {
+      "blob": "f3a1761280f22f3a03c7e9f68a81395e9969fddf",
+      "bytes": 156280,
+      "sha256": "1E72E4C40020F9BB7F8E0250BD9D98376957D36536A27052B9ABB928564B6432",
+      "bindings": [
+        {
+          "tag": "v4.4.2",
+          "commit": "fe385332f778e1c79a0ad930140fe6e4defdb17a",
+          "path": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+          "blob": "f3a1761280f22f3a03c7e9f68a81395e9969fddf"
+        }
+      ]
+    },
+    {
+      "blob": "199d0e95d417c1a42a7cb2d52eb5d3fdbb660ea4",
+      "bytes": 196328,
+      "sha256": "C33DC95F58AD32896B9791D31F08603248A32F36D358A7F83DFD70227FE95D00",
+      "bindings": [
+        {
+          "tag": "v4.5.0",
+          "commit": "3096e89a044d705828cbcda93ac05bd877535d12",
+          "path": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+          "blob": "199d0e95d417c1a42a7cb2d52eb5d3fdbb660ea4"
+        },
+        {
+          "tag": "v4.5.1",
+          "commit": "69c297f9bca974f4280158781aa97a9678d0fcd4",
+          "path": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+          "blob": "199d0e95d417c1a42a7cb2d52eb5d3fdbb660ea4"
+        }
+      ]
+    },
+    {
+      "blob": "8db5e821893e8cffabaa93820437a6420fe69663",
+      "bytes": 210930,
+      "sha256": "D4A74FD89A43D14FF67C423DE3F15FDCAFFEAB2E4CBB9A47BFE597EF28772273",
+      "bindings": [
+        {
+          "tag": "v4.5.2",
+          "commit": "8e4de4be0f24a3da514ad39179d5ce254459788d",
+          "path": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+          "blob": "8db5e821893e8cffabaa93820437a6420fe69663"
+        }
+      ]
+    },
+    {
+      "blob": "5407084bad5a6839af46f54ed6c2f4bdab851d37",
+      "bytes": 225361,
+      "sha256": "5D52B6B0AF87578768F645E194390B4FE7B4D93BBE7AFAB1881240B1D7535D26",
+      "bindings": [
+        {
+          "tag": "v4.6.0",
+          "commit": "9d6a9de1d77ca526da78428f8de52d5c61f9f55b",
+          "path": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+          "blob": "5407084bad5a6839af46f54ed6c2f4bdab851d37"
+        }
+      ]
+    },
+    {
+      "blob": "4c287439ed3751f4c30b78266a8cb1ce9493cb63",
+      "bytes": 260872,
+      "sha256": "DD5EECFCECFC5148ABFEBB916DA8EC9C09091A4FBE3D26FC1D2211BC9ABDD6F2",
+      "bindings": [
+        {
+          "tag": "v4.7.0",
+          "commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+          "path": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+          "blob": "4c287439ed3751f4c30b78266a8cb1ce9493cb63"
+        },
+        {
+          "tag": "v4.7.1",
+          "commit": "8911ab8f9ad4a7c8764444148183a4dfa137ed7d",
+          "path": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+          "blob": "4c287439ed3751f4c30b78266a8cb1ce9493cb63"
+        },
+        {
+          "tag": "v4.7.2",
+          "commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+          "path": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+          "blob": "4c287439ed3751f4c30b78266a8cb1ce9493cb63"
+        },
+        {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+          "blob": "4c287439ed3751f4c30b78266a8cb1ce9493cb63"
+        }
+      ]
+    }
+  ],
+  "review_method": {
+    "latest_body": {
+      "tag": "v4.7.3",
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "tests/tooling/Test-MIRUpgradeManifest.ps1",
+      "blob": "4c287439ed3751f4c30b78266a8cb1ce9493cb63",
+      "bytes": 260872,
+      "sha256": "DD5EECFCECFC5148ABFEBB916DA8EC9C09091A4FBE3D26FC1D2211BC9ABDD6F2",
+      "lines": 2763
+    },
+    "latest_independent_semantic_review_sha256": "E2170D4906CE095290EBA1ECCAB66A413D036FBE01E6B103EF39F74DCD8660C5",
+    "latest_semantic_groups": 22,
+    "older_bodies": 9,
+    "earlier_changed_spans": 92,
+    "earlier_changed_lines": 158,
+    "complete_earlier_delta_sha256": "D21927F9F0B3B9A6269765ABDF7F29CA1737E636A77E122F7DE277341671836C",
+    "earlier_semantic_disposition_sha256": "D28F6092DBC1E5B5B610084B14B71B7E8489399CD9BD908393120E97A59045F4",
+    "coverage_rule": "Every earlier line is either byte-identical line text aligned to the latest body or present verbatim in a reviewed removed/replaced span. Changed routing/guard/mock contexts were reviewed before reusing the latest intent grouping. This is source-intent coverage, not old/new runner behavioral equivalence or a native pass."
+  },
+  "latest_intent_groups": [
+    {
+      "original_lines": "5-95,2737-2760",
+      "subject": "Trigger-output representative fixture",
+      "independent_expectation": "Staging rejects missing author, stale marker and selector collisions; Python/Lua control checks staged representative fixture.",
+      "classification": "harness plus transitive player science intent",
+      "imported_frontier": "fixtures/assert-trigger-output-science-f210-470/{data-updates.lua,data-final-fixes.lua}; fixtures/assert-trigger-output-science-source-failure-f210-460; tests/tooling/trigger_output_fixture_controls.py; tests/runtime/Test-MIRUpgrade.ps1"
+    },
+    {
+      "original_lines": "99-158,164-245",
+      "subject": "Manifest and target/version binding",
+      "independent_expectation": "Selected target archive resolves selected version; wrong targets, unknown versions and stale release identity reject.",
+      "classification": "packaging/provenance",
+      "imported_frontier": "tests/runtime/Test-MIRUpgrade.ps1; tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1"
+    },
+    {
+      "original_lines": "246-280",
+      "subject": "Historical transition selection",
+      "independent_expectation": "Selected same-target transition and predecessor identity are bound; unrelated transitions reject.",
+      "classification": "harness/provenance; affected save route remains scoped",
+      "imported_frontier": "tests/runtime/Test-MIRUpgrade.ps1"
+    },
+    {
+      "original_lines": "284-344,1060-1106",
+      "subject": "K2 pinned profile and cap",
+      "independent_expectation": "Locked dependency bytes and profile, explicit cap override and matching scenario/stage markers; mismatches reject.",
+      "classification": "harness/provenance and settings intent, not marker API",
+      "imported_frontier": "tests/support/MIR421K2Upgrade.ps1; fixtures/run-profiles/k2-213-imersite-f210*.json; tools/lib/validation/SettingsOverrides.ps1"
+    },
+    {
+      "original_lines": "347-403",
+      "subject": "F210 reviewed science and settings delta",
+      "independent_expectation": "Oracle specializes only selected predecessor/destination and explicit default additions; changed complete-state guard or shared source mutation rejected.",
+      "classification": "generated-source checks; settings and preservation intent",
+      "imported_frontier": "tests/support/MIR421SpaceFakeUpgrade.ps1; fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua"
+    },
+    {
+      "original_lines": "405-524",
+      "subject": "F200 Bob/Angel state and exact profile",
+      "independent_expectation": "Pinned dependency closure and active versions; selected oracle includes explicitly reviewed additions while rejecting unexpected technology-set changes.",
+      "classification": "fixture source-string and synthetic-set controls; profile-specific state intent",
+      "imported_frontier": "tests/support/MIR421SpaceFakeUpgrade.ps1; fixtures/assert-upgrade-4-0-20000-to-4-1-20000/{control.lua,settings.lua}; fixtures/run-profiles/f200-bob-angel-upgrade-422.json"
+    },
+    {
+      "original_lines": "526-667",
+      "subject": "Galore Space Age and fixture identity",
+      "independent_expectation": "Pinned selected profile and active mods, distinct scenario/version fixture identities, selected full-state hooks and unpinned input rejection.",
+      "classification": "harness and source-string checks; profile-specific save intent",
+      "imported_frontier": "fixtures/run-profiles/mir430-startup-galore-space-age-f200.json; fixtures/assert-upgrade-4-0-20000-to-4-1-20000/{control.lua,settings.lua}; tests/support/MIR421SpaceFakeUpgrade.ps1"
+    },
+    {
+      "original_lines": "670-704",
+      "subject": "Independent reload snapshots",
+      "independent_expectation": "Separate first and second stage files and hashes retained; wrong live stage rejects.",
+      "classification": "verification provenance, not new player API",
+      "imported_frontier": "tests/runtime/Test-MIRUpgrade.ps1 snapshot retainer"
+    },
+    {
+      "original_lines": "711-781",
+      "subject": "Classic synthetic snapshot corruption",
+      "independent_expectation": "Synthetic comparison of declared rows and dispositions rejects selected corrupted snapshots.",
+      "classification": "host synthetic checks; actual save effects depend on imported evaluator",
+      "imported_frontier": "tests/support/MIR430ClassicUpgrade.ps1; associated classic snapshot fixture"
+    },
+    {
+      "original_lines": "783-980",
+      "subject": "Complete catalogue and current mode boundaries",
+      "independent_expectation": "Required full-state collector selected for exact scenarios and excluded Classic modes; invalid target, profile and custody rejected.",
+      "classification": "retired selector mechanics with source/save verification purpose",
+      "imported_frontier": "tests/runtime/Test-MIRUpgrade.ps1; tests/support/MIR421SpaceFakeUpgrade.ps1; fixture controls"
+    },
+    {
+      "original_lines": "981-1058",
+      "subject": "Caller binds selected inputs",
+      "independent_expectation": "Actual caller passes selected predecessor, candidate and scenario identities; omitted base mode does not silently select DLC.",
+      "classification": "harness input provenance",
+      "imported_frontier": "tests/runtime/Test-MIRUpgrade.ps1; release-input manifests"
+    },
+    {
+      "original_lines": "1109-1230",
+      "subject": "Current K2 full-state specialization",
+      "independent_expectation": "Selected 2.1.22 and 2.1.23 profiles retain distinct locked dependencies; correct current fixture and full-state guard, cap and active versions selected; old source unmodified.",
+      "classification": "source-string/metadata controls; K2 saved-state and settings intent remains profile-specific",
+      "imported_frontier": "tests/support/MIR421K2Upgrade.ps1; fixtures/run-profiles/k2-214-imersite-f210-470*.json; selected K2 fixture control.lua and owned-speed sentinel"
+    },
+    {
+      "original_lines": "1232-1375",
+      "subject": "4.3 and 4.4 predecessor custody",
+      "independent_expectation": "Each named published predecessor uses its exact reader; reject wrong source, target, destination or custody shape.",
+      "classification": "historical release provenance and old harness mechanics",
+      "imported_frontier": "tests/runtime/Test-MIRUpgrade.ps1; fixtures/release-inputs published manifests"
+    },
+    {
+      "original_lines": "1376-1536",
+      "subject": "4.5 modern and F015 full-state routes",
+      "independent_expectation": "Actual selector binds admitted predecessor, target and full-policy oracle; unselected routes reject; fixture hooks retained.",
+      "classification": "AST/source-string selector checks; separate player preservation contract",
+      "imported_frontier": "tests/runtime/Test-MIRUpgrade.ps1; fixtures/assert-upgrade-4-0-{20000,21000}-to-4-1-*; fixtures/assert-upgrade-historical-terminal-to-mir42"
+    },
+    {
+      "original_lines": "1538-1740",
+      "subject": "4.5 remaining historical and direct-4.2.2 routes",
+      "independent_expectation": "Distinct exact predecessor/fixture identities and complete-state hooks; only explicitly reviewed Full and cap defaults added; other settings changes reject.",
+      "classification": "fixture-source and synthetic allowance checks; settings preservation applicable",
+      "imported_frontier": "fixtures/assert-upgrade-historical-terminal-to-mir42/{control.lua,mir422_complete_state.lua}; target-specific fixture controls; fixtures/release-inputs/mir423-published-422-manifest.json"
+    },
+    {
+      "original_lines": "1742-1886",
+      "subject": "4.5.2 routing and custody",
+      "independent_expectation": "Exact route, fixture identity and Full oracle selected; cross-target, unbound predecessor and invalid mode rejected.",
+      "classification": "retired version routing/provenance; no global save pass",
+      "imported_frontier": "tests/runtime/Test-MIRUpgrade.ps1; target-specific fixture controls"
+    },
+    {
+      "original_lines": "1887-2070",
+      "subject": "Published predecessor manifests",
+      "independent_expectation": "Pinned 4.3/4.4 and direct predecessor metadata and bytes are validated against tampering and cross-release substitutions.",
+      "classification": "packaging/provenance",
+      "imported_frontier": "fixtures/release-inputs/mir431-published-430-manifest.json; mir442-published-440-manifest.json; mir442-published-441-manifest.json; mir423-published-422-manifest.json"
+    },
+    {
+      "original_lines": "2071-2195",
+      "subject": "4.3 Full/Classic and oracle version scope",
+      "independent_expectation": "Full collector selected only for intended lane; staged fixture identities distinct; 4.2-only reviewed science allowance excluded from 4.3.",
+      "classification": "selector/source-string controls; actual original complete-state oracle separately traced",
+      "imported_frontier": "tests/support/MIR421SpaceFakeUpgrade.ps1; fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua; target-specific fixtures"
+    },
+    {
+      "original_lines": "2199-2350",
+      "subject": "F210 and historical settings preservation",
+      "independent_expectation": "Source, successor and reload hooks retained for selected Full paths; explicit Full setting additions permitted without accepting altered existing or unrelated settings.",
+      "classification": "generated-source and synthetic settings checks; applicable persisted-setting intent",
+      "imported_frontier": "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua; fixtures/assert-upgrade-historical-terminal-to-mir42/mir422_complete_state.lua; tests/runtime/Test-MIRUpgrade.ps1"
+    },
+    {
+      "original_lines": "2351-2530",
+      "subject": "4.6 and 4.7 target/profile specialization",
+      "independent_expectation": "Selected historical and modern paths use exact predecessor; Bob/Angel named aluminium effects, visibility and technology additions scoped to reviewed oracle; unrelated allowances excluded.",
+      "classification": "oracle text inspection and custody; material/effect semantics require separate original source trace",
+      "imported_frontier": "tests/support/MIR421SpaceFakeUpgrade.ps1; selected target fixture control.lua and mir422_complete_state.lua; tests/runtime/Test-MIRUpgrade.ps1"
+    },
+    {
+      "original_lines": "2532-2672",
+      "subject": "Governed runner resource policy",
+      "independent_expectation": "Runner retains distinct resource policy and optional bounded waiting; non-memory refusal does not retry; fresh child wait state recorded.",
+      "classification": "retired test orchestration/resource protection, no player requirement",
+      "imported_frontier": "tests/runtime/Test-MIRUpgrade.ps1; tools/mir/application/release/readiness/ResourceGovernor.ps1"
+    },
+    {
+      "original_lines": "2674-2735",
+      "subject": "Matrix direct library input",
+      "independent_expectation": "Missing direct library rejected before admission; exact selected one-library directory forwarded; cleanup stays within owned root.",
+      "classification": "test infrastructure/input custody",
+      "imported_frontier": "tests/runtime/Test-MIRUpgradeMatrix.ps1; tools/mir/application/release/readiness/ResourceGovernor.ps1"
+    }
+  ],
+  "earlier_disposition_classes": {
+    "bookkeeping": {
+      "decision": "retire implementation details; retain evidence scope",
+      "intent": "Scratch directory prefixes, assertion counters, trailing reporting objects and host-only comments do not define player behavior. Preserve the distinction between synthetic host assertions, actual published inputs and actual native execution; never infer a native pass from a reporting field."
+    },
+    "manifest_wire": {
+      "decision": "retire old manifest wire revisions; retain input authority",
+      "intent": "MIR42 candidate-manifest V1/V2/V3/V4 recognition is obsolete recorder plumbing. Exact selected source, target, package version/hash and trusted publication custody remain required before native use."
+    },
+    "routing": {
+      "decision": "consolidate exact-input and selected-route obligations",
+      "intent": "Old version arrays, fixture version assignments, predecessor readers, caller arguments and invalid-destination controls require explicit selected target/profile/source/predecessor identities and rejection of inferred or unreviewed custody. They do not require recreating every old patch campaign. Synthetic future-patch tuples are not evidence that those archives or releases were published."
+    },
+    "k2_ast": {
+      "decision": "retire result-label AST shape; retain K2 scenario intent",
+      "intent": "AssignmentStatementAst versus later array/result-label construction is an obsolete runner representation. Preserve the actual named K2 profile/science/settings/research-progress requirements under its pinned inputs; do not promote native_scenario label syntax to a player API."
+    },
+    "profile_locator": {
+      "decision": "retire old filesystem lookup representation; retain exact fixture binding",
+      "intent": "Direct Get-Content of a copied fixture info file versus a later specialized projection changes harness location only. Fixture metadata/source and actual selected inputs must remain bound; a temporary directory name alone is not provenance."
+    },
+    "state_mock": {
+      "decision": "consolidate no-unreviewed/no-unearned-state controls",
+      "intent": "Minimal established/unearned synthetic objects were later expanded with complete snapshot fields. Retain the original rejection of unapproved/unearned state and source-driven expected technology sets. A historical performance-only exact-set assertion is not a universal ban on separately approved MIR5 additions/private preservation identities."
+    },
+    "error_prefix": {
+      "decision": "retire private historical error spelling; retain rejection",
+      "intent": "The old mir421/mir423 error-prefix regex belongs to retired helper routing. Invalid unbound inputs must still reject before intended changes; no public promise for those private token spellings is created."
+    },
+    "binding_negative": {
+      "decision": "retire scratch fixture label; retain independently bound snapshot rejection",
+      "intent": "The old mir43-f210-base-wrong-snapshot-binding path is a test fixture caption. Preserve refusal of incorrect source/stage/scenario snapshots and distinct actual reload identities; do not preserve an obsolete directory as authority."
+    },
+    "fixture_uniqueness": {
+      "decision": "consolidate selected-fixture uniqueness",
+      "intent": "The fixed old five-route count became the declared route-list count as five later lanes were added. Retain no identity collisions among every selected route; the numeral5 is not a player catalogue or permanent route limit."
+    }
+  },
+  "current_mapping": [
+    {
+      "obligation": "Exact target/source/package/predecessor/profile identity and actual evidence completeness",
+      "disposition": "consolidate retained purpose; retire old manifest/result wire variants and AST forwarding",
+      "implementation": [
+        "tools/Invoke-NativeFixture.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
+        "tools/release.py"
+      ],
+      "independent_controls": [
+        "tests/test_native_fixture_modes.py",
+        "tests/test_release.py",
+        "tests/test_historical_sources.py"
+      ],
+      "scope": "Current trusted-input, real process/stage and restoration records retain original identities. A source-string assertion, fixture identity or synthetic summary is not native acceptance."
+    },
+    {
+      "obligation": "Declared technology/state continuity, no unearned additions, queue/partial/effects and settings preservation",
+      "disposition": "retain player obligation under selected current contracts",
+      "implementation": [
+        "source/research/catalogue.lua",
+        "source/runtime/lifecycle.lua",
+        "source/runtime/caps.lua",
+        "spec/migrations.md",
+        "spec/settings.md"
+      ],
+      "independent_controls": [
+        "tests/test_historical_transition_fixture.py",
+        "tests/test_caps.py",
+        "tests/test_legacy_caps.py"
+      ],
+      "scope": "MIG-01/MIG-03/MIG-05 retain the principal nine same-edition routes, selected seven older contracts and four forward journeys under exact consumed-input applicability. The old performance-only technology whitelist does not prohibit separately approved MIR5 identities; neither does retiring it waive no-unearned-state or affected save safety."
+    },
+    {
+      "obligation": "K2, Bob/Angel and Galore named profile/science/effect expectations",
+      "disposition": "retain independent profile-specific expectations; separate imported oracles and current qualification",
+      "implementation": [
+        "source/compatibility",
+        "spec/compatibility.md"
+      ],
+      "independent_controls": [
+        "tests/test_k2_base_native_fixture.py",
+        "tests/test_bob_angel_materials.py",
+        "tests/test_bob_angel_native_fixture.py"
+      ],
+      "scope": "The named old routing/label tests do not qualify the imported product or all mod combinations. The separate Bob material review and current named native records retain their actual scopes; no original source or reporter configuration is invented."
+    },
+    {
+      "obligation": "Selected full-state oracle, distinct reload bindings and source-driven allowed deltas",
+      "disposition": "consolidate snapshot provenance and applicable state intent; retire obsolete Full/Classic compiler machinery",
+      "implementation": [
+        "spec/migrations.md",
+        "spec/verification.md",
+        "tools/Invoke-NativeFixture.ps1"
+      ],
+      "independent_controls": [
+        "tests/test_historical_transition_fixture.py",
+        "tests/test_historical_sources.py"
+      ],
+      "scope": "The actual imported snapshot collectors/comparators and every relevant accepted setting/state expectation require their own disposition. Source-body completion does not certify their complete implementations or raw observed worlds."
+    },
+    {
+      "obligation": "Resource admission, bounded waiting, correct cleanup and one direct library",
+      "disposition": "retain protection and refusal semantics in current guards; retire old wrapper AST shapes",
+      "implementation": [
+        "tools/lib/validation/ResourceGovernor.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/DirectLibraryStartupMeasurement.ps1"
+      ],
+      "independent_controls": [
+        "tests/Test-MIR5HostControls.ps1"
+      ],
+      "scope": "Preserve original failed/refused receipts and ownership/restoration requirements. No unchanged retry, altered resource policy or old output-field count becomes a pass."
+    }
+  ],
+  "resolved_selected_frontiers": [
+    {
+      "intent": "Declared typed white-science source",
+      "source_review": "https://github.com/Julesc013/more-infinite-research/pull/1699",
+      "native_review": "1088e738786cbec67a40b398b66a955b70ae0877:evidence/aero-science-trigger-source-native-review-r01/review.json",
+      "native_review_sha256": "8A2FB1CCA2FA269BF8135CA53D090B46B56E506ECC9D861D52B5F23EA7A0DDF8",
+      "scope": "The accepted source correction and three actual declared-source data/init controls resolve the named admission omission only. They do not close the whole old ice/platform/compiler fixture, physical science acquisition, useful progression or affected saved-state transition."
+    },
+    {
+      "intent": "Eight fixed Bob/Angel material additions",
+      "evidence": "spec/evidence/historical-bob-material-upgrade-intent-aero-r01.json",
+      "source_review": "https://github.com/Julesc013/more-infinite-research/pull/1703",
+      "scope": "Selected material identity/effect/cost/Tin science assertions are mapped; historical150 and the reviewed MIR5 effective-cap distinction remain explicit. Existing native records keep their original identities and limits."
+    }
+  ],
+  "remaining_frontiers": [
+    "Imported generic full-state/snapshot/comparator and effective/nondefault setting bodies beyond the separately traced bounded portions.",
+    "Actual K2/profile/ownership, broader trigger-output/platform and settings/gameplay expectations behind the named imported helper calls; source/fixture/native applicability remains requirement-specific.",
+    "Remaining original assertion families, inter-release additions/removals, accepted issue/PR/request history and unresolved consumer/source groups in VER-07.",
+    "Original result/save/package/mod/settings/engine custody and affected current-candidate native checks remain independent; no source review relabels an earlier result."
+  ],
+  "synthetic_version_warning": "Old test arrays explicitly construct future-patch metadata and fixture identities. A tuple such as an anticipated4.2.3/4.3.1 destination is not proof that the release/archive existed or that an original save was tested. Preserve actual verified publication identities; do not turn synthetic rows into fabricated originals or mandatory every-patch campaigns.",
+  "verdict": "Direct named source-family intent disposition complete; consolidate valid provenance/state/profile/safeguard purposes and retire only obsolete harness/compiler mechanics. No new product defect or new native campaign is established by this family review.",
+  "source_body_intent_reconciliation_complete": true,
+  "all_imported_implementations_reconciled": false,
+  "historical_inventory_complete": false,
+  "native_execution": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}
