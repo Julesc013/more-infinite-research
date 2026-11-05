@@ -697,7 +697,20 @@
       "remaining_obligations": [
         "Deliberate permission policy and weighted recycling economics",
         "10/5/2 remains an unaccepted balance proposal"
-      ]
+      ],
+      "mir5_route_disposition": {
+        "state": "original-accepted-request-withheld-admission-open",
+        "current_source": [],
+        "evidence": [
+          "spec/evidence/pipe-productivity-request-intent-aero-r01.json"
+        ],
+        "scope": "The existing PIPE-01 review authenticates the plan and preserves commit-4.2 with withheld productivity permission. No pipe family or proposed10/5/2 rate is admitted; pipeline extent is a separate delivered control.",
+        "remaining_executable_check": "Resolve the named Base/overhaul pipe, underground-pipe and heat-pipe permissions, existing owners and weighted recovery/catalyst economics before admission; then qualify affected research and saved state. Original P1 raw discussion remains unverified.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "FLUID-01",
@@ -768,7 +781,20 @@
       ],
       "feature_group": "fluid-range",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "NATIVE-01",
@@ -853,7 +879,20 @@
       ],
       "feature_group": "WEAPON-01",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "VEH-01",
@@ -891,7 +930,20 @@
         "No player service admission",
         "Multiplayer, clone/quality/surface and save lifecycle qualification",
         "Car probe does not qualify trains, spiders or every modded Car"
-      ]
+      ],
+      "mir5_route_disposition": {
+        "state": "experimental-vehicle-proposal-not-admitted",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Reuse the existing optional-runtime source review. Car-only capability/route observations do not admit a player service; locomotive/spider setter failures retain their exact class/engine limits.",
+        "remaining_executable_check": "No new native campaign is introduced for these excluded prototypes. Before any future service admission, retain the original force/ownership, equal-work, motion, disablement, clone/quality/surface, save and client requirements.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "VEH-02",
@@ -923,7 +975,20 @@
         "No rolling-stock or spider service admission follows from this capability probe",
         "Exact native or owner adapters remain open; this setter failure does not prove every alternative impossible",
         "Fuel and grid-energy transitions, other owners, force/save lifecycle and multiplayer must be measured before a simulation is admitted"
-      ]
+      ],
+      "mir5_route_disposition": {
+        "state": "experimental-vehicle-proposal-not-admitted",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Reuse the existing optional-runtime source review. Car-only capability/route observations do not admit a player service; locomotive/spider setter failures retain their exact class/engine limits.",
+        "remaining_executable_check": "No new native campaign is introduced for these excluded prototypes. Before any future service admission, retain the original force/ownership, equal-work, motion, disablement, clone/quality/surface, save and client requirements.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "FUEL-01",
@@ -947,7 +1012,20 @@
       ],
       "feature_group": "FUEL-01",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "ROCKET-01",
@@ -975,7 +1053,20 @@
       ],
       "feature_group": "ROCKET-01",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "ROCKET-02",
@@ -1003,7 +1094,20 @@
       ],
       "feature_group": "ROCKET-02",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "SPACE-01",
@@ -1027,7 +1131,20 @@
       ],
       "feature_group": "SPACE-01",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "QUAL-01",
@@ -1052,7 +1169,20 @@
       ],
       "feature_group": "quality-probability",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "QUAL-02",
@@ -1077,7 +1207,20 @@
       ],
       "feature_group": "quality-probability",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "URAN-01",
@@ -1103,7 +1246,20 @@
       ],
       "feature_group": "URAN-01",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "STACK-01",
@@ -1129,7 +1285,20 @@
       ],
       "feature_group": "STACK-01",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "STACK-02",
@@ -1157,7 +1326,20 @@
       ],
       "feature_group": "STACK-02",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "conditional-belt-stack-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "The original request allows no default cap increase; greater-than-four behavior remains a test-only experiment. No dedicated current belt-stack service or qualification is identified by this bounded review.",
+        "remaining_executable_check": "Keep useful increments, existing owners and actual prototype caps conditional. Any admission requires transport/visual/conservation and saved-state checks across belts, inserters, loaders, splitters and undergrounds; do not substitute inserter-capacity evidence.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "HEALTH-01",
@@ -1182,7 +1364,20 @@
       ],
       "feature_group": "defensive-health",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "HEALTH-02",
@@ -1206,7 +1401,20 @@
       ],
       "feature_group": "defensive-health",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "REPAIR-01",
@@ -1231,7 +1439,20 @@
       ],
       "feature_group": "REPAIR-01",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "REPAIR-02",
@@ -1310,7 +1531,20 @@
       ],
       "feature_group": "LOG-01",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "SLOW-01",
@@ -1336,7 +1570,20 @@
       ],
       "feature_group": "SLOW-01",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "CRAFT-01",
@@ -1361,7 +1608,20 @@
       ],
       "feature_group": "CRAFT-01",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "TREE-01",
@@ -1386,7 +1646,20 @@
       ],
       "feature_group": "TREE-01",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-owner-specific-intake-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "The artificial-tree request still requires its actual owning mod and supported entity behavior; no generic tree-lifetime research is admitted.",
+        "remaining_executable_check": "Identify the actual provider and original requested behavior before designing or scheduling a scoped case; preserve the unresolved intake.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "MACHINE-01",
@@ -1411,7 +1684,20 @@
       ],
       "feature_group": "MACHINE-01",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "MACHINE-02",
@@ -1436,7 +1722,20 @@
       ],
       "feature_group": "MACHINE-02",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "MACHINE-03",
@@ -1461,7 +1760,20 @@
       ],
       "feature_group": "MACHINE-03",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-deferred-request-unqualified",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the original deferral and acceptance; this review admits no research or service. Related delivered controls keep their own scope.",
+        "remaining_executable_check": "No new native campaign is introduced for the deferred proposal. Any future admission must retain its original acceptance and resolve its stated capability/design limits.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "MODE-01",
@@ -1486,7 +1798,20 @@
       ],
       "feature_group": "MODE-01",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-rejection-preserved",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Keep the original rejected default or required-split proposal; no replacement feature requirement is created.",
+        "remaining_executable_check": "No execution is required for the rejected proposal unless the maintainer explicitly changes its decision.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "MODE-02",
@@ -1509,7 +1834,20 @@
       ],
       "feature_group": "MODE-02",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-outside-core-decision-preserved",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Quality-dependent beacon energy remains outside the admitted core scope under its original decision.",
+        "remaining_executable_check": "Preserve the proposal without adding a MIR5 gameplay or native acceptance requirement.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "PACK-01",
@@ -1534,7 +1872,20 @@
       ],
       "feature_group": "PACK-01",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-rejection-preserved",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Keep the original rejected default or required-split proposal; no replacement feature requirement is created.",
+        "remaining_executable_check": "No execution is required for the rejected proposal unless the maintainer explicitly changes its decision.",
+        "owner": "Maintainer admission; Aero reconciliation",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "DEV-01",
@@ -1561,7 +1912,25 @@
       "status": "documentation-implemented",
       "qualification": [
         "CONTRIBUTING.md"
-      ]
+      ],
+      "mir5_route_disposition": {
+        "state": "current-contributor-guidance-mapped",
+        "current_source": [
+          "CONTRIBUTING.md",
+          "docs/development.md",
+          "docs/architecture.md",
+          ".github/PULL_REQUEST_TEMPLATE.md"
+        ],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Current contributor guidance explains local builds, feature ownership, affected checks and ordinary checked dev PRs without a paid AI dependency. Official publication uses its separate existing procedure.",
+        "remaining_executable_check": "Check the contributor links/commands and keep actual authorship, editable/generated records and standing authority clear; this documentation request is not a gameplay gate.",
+        "owner": "Aero documentation; maintainer contribution policy",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "K2-01",
@@ -3939,7 +4308,25 @@
       ],
       "feature_group": "ecosystem-admission",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "named-aai-subsets-mapped-whole-programme-open",
+        "current_source": [
+          "source/compatibility/modern_catalogue.lua",
+          "source/research/science.lua",
+          "source/compatibility/product_targets.lua"
+        ],
+        "evidence": [
+          "spec/evidence/aai-complete-data-independent-aero-r01.json",
+          "spec/evidence/aai-base-space-age-e3-native-chain.json"
+        ],
+        "scope": "The named AAI Industry Base/Space Age technology/settings capture comparison and E3 lab/save successors retain their original inputs. Engine-icon selection and the separate Ironclad continuation do not establish all AAI compatibility.",
+        "remaining_executable_check": "Review current consumed-input applicability and only affected named-profile research/physical/state/client boundaries. Retain inherited source counters and the original adverse outer terminal; do not repeat or relabel them as new work.",
+        "owner": "Aero profile/source applicability; Black Glass affected native checks",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "ECO-BZ",
@@ -3965,7 +4352,25 @@
       ],
       "feature_group": "ecosystem-admission",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "named-bz-data-subsets-mapped-gameplay-open",
+        "current_source": [
+          "source/compatibility/product_bindings.lua",
+          "source/compatibility/product_targets.lua",
+          "source/research/science.lua"
+        ],
+        "evidence": [
+          "spec/evidence/broad-ecosystem-f210-575e-native-chain-r01.json",
+          "tests/profiles/bz-available-six-base-f210-2123.json"
+        ],
+        "scope": "Retain the broad575e q021..q034 named six-BZ Base/Space Age data-stage outcomes and q014/q017..q020 combinations at their actual identities. Several upstream selections failed; neither passing startup nor generic product targeting proves full BZ parity.",
+        "remaining_executable_check": "Use only an upstream-valid fixed subset. Match independently captured research/settings/output expectations to affected current inputs and saved-state/useful-work checks; preserve failed Space Age/combined profiles instead of inventing missing versions or blanket support.",
+        "owner": "Aero profile/source expectations; Black Glass affected native checks",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "ECO-PY",
@@ -4033,7 +4438,26 @@
       ],
       "feature_group": "ecosystem-admission",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "authored-se-k2se-subsets-mapped-whole-programme-open",
+        "current_source": [
+          "source/compatibility/modern_catalogue/space_exploration.lua",
+          "source/compatibility/modern_catalogue/k2_space_exploration.lua",
+          "source/research/science.lua"
+        ],
+        "evidence": [
+          "spec/evidence/broad-ecosystem-f210-575e-native-chain-r01.json",
+          "spec/evidence/k2se-carrier-current005d-native-chain-r01.json",
+          "spec/evidence/k2se-prototype-contrast-native-chain-r09.json"
+        ],
+        "scope": "Explicit Space Exploration and K2SE definitions/bindings and named startup/carrier observations exist. They retain separate profiles and provider/engine/science limits; K2SO is not K2SE.",
+        "remaining_executable_check": "Review exact current consumed-input applicability, then close genuinely affected useful-work, ownership, paid/partial/queued state and reload boundaries. Do not turn startup or an Imersite-only carrier case into complete SE/K2SE support.",
+        "owner": "Aero profile/source expectations; Black Glass affected native checks",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "ECO-IR3",
@@ -4059,7 +4483,20 @@
       ],
       "feature_group": "ecosystem-admission",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-ir3-intake-current-subset-unresolved",
+        "current_source": [],
+        "evidence": [
+          "spec/inventory/continuity.json"
+        ],
+        "scope": "Retain the active-4.2 intake. No exact current IR3 profile/reference or implementation subset was identified by this bounded mapping; absence of that evidence is not a rejection or a support claim.",
+        "remaining_executable_check": "Identify the actual supported engine/mod subset, preserved original behavior and available trusted inputs before choosing a bounded implementation or native check. Do not substitute IR4 or a differently versioned engine.",
+        "owner": "Aero original scope/input reconciliation; Black Glass any admitted native case",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "ECO-IR4",
@@ -4085,7 +4522,22 @@
       ],
       "feature_group": "ecosystem-admission",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "original-ir4-intake-upstream-failed-subsets-retained",
+        "current_source": [],
+        "evidence": [
+          "spec/evidence/broad-ecosystem-f210-575e-native-chain-r01.json",
+          "tests/profiles/ir4-base-f210-2123.json",
+          "tests/profiles/ir4-space-age-f210-2123.json"
+        ],
+        "scope": "Existing q015/q016 IR4 Base/Space Age selections fail upstream prototype loading before MIR arms, including the removed fuel_category field. These are original data-stage failures, not a MIR gameplay or full IR4 verdict.",
+        "remaining_executable_check": "An actually upstream-valid pinned input is needed before affected MIR comparison/useful-work/save checks. Preserve original failures and missing-input limits; do not silently patch the dependency or retry it unchanged.",
+        "owner": "Aero scope/source expectations; Black Glass input admission/native checks",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "ECO-PLANETS",
@@ -4111,7 +4563,28 @@
       ],
       "feature_group": "ecosystem-admission",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "named-planet-adapters-and-state-results-mapped-intake-open",
+        "current_source": [
+          "source/compatibility/modern_catalogue/muria.lua",
+          "source/compatibility/modern_catalogue/sif_retained.lua",
+          "source/compatibility/modern_catalogue/secretas.lua",
+          "source/integrations/ric/research.lua"
+        ],
+        "evidence": [
+          "spec/evidence/candidate503-native-upgrades-r01.json",
+          "spec/evidence/candidate504-weapon-first-entry-native-r01.json",
+          "spec/evidence/historical-reported-upgrade-obligations-r01.json",
+          "https://github.com/Julesc013/more-infinite-research/pull/1724"
+        ],
+        "scope": "Named Muria, Space Is Fake, Secretas and RIC bindings are distinct supported-input work. Released502/503/504 state results keep their original scopes; the new RIC source correction does not turn failed upstream0.35.8 startup into gameplay acceptance.",
+        "remaining_executable_check": "Review each claimed provider/engine/settings transition from its existing evidence, preserve paid category/recipe contributions and close genuinely affected useful-work/save/reload/client boundaries. Keep arbitrary planet stacks and the full564-name reporter selection unqualified.",
+        "owner": "Aero independent expectations/applicability; Black Glass native/integration",
+        "limitations": [
+          "Original request text, decision, status and qualification are preserved; routing is not implementation or native acceptance."
+        ]
+      }
     },
     {
       "id": "OAB-01",
