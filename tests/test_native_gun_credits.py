@@ -1,5 +1,6 @@
 """Independent two-category paid-count/lifecycle controls, not native acceptance."""
 import argparse
+import json
 from pathlib import Path
 import sys
 import unittest
@@ -11,6 +12,9 @@ class NativeGunCreditTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().player_root = (ROOT / "source").as_posix()
+        self.lua.globals().current_distribution_version = json.loads(
+            (ROOT / "source/info.json").read_text(encoding="utf-8")
+        )["version"]
         self.lua.execute(r'''
           package.path=player_root.."/?.lua;"..player_root.."/?/init.lua"
           package.cpath=""
@@ -21,7 +25,7 @@ class NativeGunCreditTests(unittest.TestCase):
             tesla={positive="mir-native-credit-research_electric_shooting_speed-tesla-positive",
             negative="zz-mir-native-credit-research_electric_shooting_speed-tesla-negative"}}
           storage={}; game={forces={}}
-          script={active_mods={base="2.1.23",["space-age"]="2.0.0",["more-infinite-research"]="5.0.21004"}}
+          script={active_mods={base="2.1.23",["space-age"]="2.0.0",["more-infinite-research"]=current_distribution_version}}
           prototypes={get_history=function(kind,name) assert(kind=="technology");return {created="more-infinite-research"} end}
           function copy(value)
             if type(value)~="table" then return value end
@@ -111,7 +115,7 @@ class NativeGunCreditTests(unittest.TestCase):
           end
           function known_event(old)
             return {mod_startup_settings_changed=false,mod_changes={
-              ["more-infinite-research"]={old_version=old or "5.0.21003",new_version="5.0.21004"}}}
+              ["more-infinite-research"]={old_version=old or "5.0.21003",new_version=current_distribution_version}}}
           end
           function configure(event)
             local plans=credit.preflight(event);credit.on_configuration_changed(event,plans)
@@ -142,8 +146,9 @@ class NativeGunCreditTests(unittest.TestCase):
     def test_published_beta_masks_are_bounded_on_both_modern_engine_families(self):
         self.lua.execute('''
           local target=require("platform.target")
+          local patch=assert(current_distribution_version:match("^5%.0%.210(%d%d)$"))
           for _,family in ipairs({{"f200","2.0.77","200"},{"f210","2.1.23","210"}}) do
-            target.id=family[1];target.distribution_version="5.0."..family[3].."04"
+            target.id=family[1];target.distribution_version="5.0."..family[3]..patch
             script.active_mods.base=family[2]
             script.active_mods["more-infinite-research"]=target.distribution_version
             for patch=0,3 do
@@ -234,6 +239,20 @@ class NativeGunCreditTests(unittest.TestCase):
             rejected(function() configure(event) end);assert(storage.mir_native_gun_credits==nil)
             prototypes.get_history=function() return {created="more-infinite-research"} end
           end
+        ''')
+
+    def test_matching_active_and_event_versions_still_require_selected_target(self):
+        self.lua.execute('''
+          local f=make_force(1,2,false,true)
+          local before=public_snapshot(f)
+          local event=known_event()
+          local other=current_distribution_version=="5.0.21004" and "5.0.21005" or "5.0.21004"
+          script.active_mods["more-infinite-research"]=other
+          event.mod_changes["more-infinite-research"].new_version=other
+          rejected(function() configure(event) end)
+          assert(storage.mir_native_gun_credits==nil)
+          assert(f.technologies[names.electric.positive].level==1)
+          assert_public(f,before)
         ''')
 
     def test_all_force_preflight_and_stale_plan_do_not_partially_apply(self):
