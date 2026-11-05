@@ -2,6 +2,13 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.5] - 2026-11-05
+
+### Bugfixes
+
+- Keep Space-policy research available on Factorio 2.1 with Space Age when a supported satellite launch source supplies space science.
+- Correct the German Research Library sorting label.
+
 ## [5.0.4] - 2026-11-05
 
 ### Bugfixes
