@@ -16982,14 +16982,13 @@
           ],
           "applicable_evidence": [
             "spec/evidence/library-cont10-layout-negative-control-r01.json",
-            "spec/evidence/library-current504-functional-native-r02.json",
-            "https://github.com/Julesc013/more-infinite-research/pull/1724"
+            "spec/evidence/library-current504-functional-native-r02.json"
           ],
-          "remaining_executable_check": "All87 original requests have additive routing, including the34 deferred/rejected/excluded/conditional/document/intake decisions reconciled below. Preserve every original field/status/qualification; routing does not implement or qualify the requests. Named RIC Marine source correction is merged through PR1724; available0.35.8 still fails upstream engine validation, so useful-work and earned-state checks need actually compatible inputs. Continue unresolved source/test-intent and named-profile/API/settings applicability; no recovered request is silently waived or expanded into a new feature programme.",
+          "remaining_executable_check": "Use the existing library-native-input fixtures/profiles for a current505 action sequence covering Research, Availability, Queue, Settings and Help; observe typing, filters/dropdowns/checkboxes, scrolling, split/narrow layout, size/reset and native handoff at representative scale and English/German. Native game PNGs and accepted504 images exist; the supported OS screenshot route previously timed out, so repair/test only the needed live capture/input composition instead of treating all rendering as unavailable. Keep identity/focus/geometry/state guards and stop on unexpected state; no Aero dispatch approval.",
           "owner": "Black Glass",
           "independent_review": "Aero",
-          "status": "All87 original request decisions are explicitly routed; historical source/test-intent, implementation and native qualification remain incomplete",
-          "readiness": "Deferred/rejected/excluded scope is recorded; applicable delivered behavior and active unresolved requests retain their own checks",
+          "status": "open: host layout opposition and bounded earlier render evidence do not close real-input/all-view acceptance",
+          "readiness": "current-package and guarded-action binding needed; actual input remains unverified",
           "next_work_inputs": [
             "tests/fixtures/library-native-input/control.lua",
             "tests/profiles/library-native-input-imported110-f210-2123-r15.json",
@@ -17280,13 +17279,14 @@
             "spec/evidence/historical-k2-imported-fixture-intents-aero-r01.json",
             "spec/evidence/historical-complete-state-comparator-intents-aero-r01.json",
             "b6c603f654025013546f9ccfeb8b0a677824d64e:evidence/aero-finite-stable-coverage-r01/source-correspondence.json",
-            "spec/evidence/historical-reported-upgrade-obligations-r01.json"
+            "spec/evidence/historical-reported-upgrade-obligations-r01.json",
+            "https://github.com/Julesc013/more-infinite-research/pull/1724"
           ],
-          "remaining_executable_check": "Retain the existing bounded source-intent reviews and53 additive request routes; all87 original request decisions/statuses remain unchanged. PROG-01 is partly implemented by named authored stages, OAB-01..06 remain unqualified beyond shared routes/prepared selection, and RIC-01..08 retain their actual intake/probe/withheld/current-host-gap distinctions. Resolve the named Marine coke identity against actual published predecessor emission and affected earned-state preservation before claiming a correction; no broad RIC support or every-old-patch campaign follows. Reuse recovered621/446 originals and the accepted Secretas source/host correction, while keeping its candidate/useful-work/save/provider checks and unknown reporter inputs explicit. Continue the unreviewed historical frontier, original request decisions, other migration/API applicability and unadopted PR344 private-custody limits. The missing detailed5058-blob file is not proof of absence or completeness; do not turn each retired helper into a native gate.",
+          "remaining_executable_check": "All87 original requests have additive routing, including the34 deferred/rejected/excluded/conditional/document/intake decisions reconciled below. Preserve every original field/status/qualification; routing does not implement or qualify the requests. Named RIC Marine source correction is merged through PR1724; available0.35.8 still fails upstream engine validation, so useful-work and earned-state checks need actually compatible inputs. Continue unresolved source/test-intent and named-profile/API/settings applicability; no recovered request is silently waived or expanded into a new feature programme.",
           "owner": "Aero",
           "independent_review": "Aero",
-          "status": "open: bounded source-intent dispositions exist; complete historical preservation remains unproved",
-          "readiness": "finite original-decision and applicability reconciliation ready; global inventory remains incomplete",
+          "status": "All87 original request decisions are explicitly routed; historical source/test-intent, implementation and native qualification remain incomplete",
+          "readiness": "Deferred/rejected/excluded scope is recorded; applicable delivered behavior and active unresolved requests retain their own checks",
           "next_work_inputs": [
             "spec/programmes/community-requests.json",
             "spec/inventory/migration-origins.json",
@@ -17613,7 +17613,7 @@
       "source_and_evidence_scope": "Current source pointers are implementation surfaces or expressly unresolved subsets, not evidence of every ecosystem. Existing captures/results retain original package/engine/settings identities; no current applicability or native pass is inferred.",
       "contributor_guidance": {
         "path": "CONTRIBUTING.md",
-        "sha256": "6E88A16D88348C3D2E9422401DDE9CB922D5128C140E47D9B095489D3F21440E",
+        "sha256": "315C6511B14E00966EB74F194B6B775B93F88E978EB0DEA714080733A549699F",
         "change": "Replace obsolete main/release4.0 routing, phase-engine/fingerprint requirements and broken publication anchor with actual dev/build/feature/PR/release journeys. Preserve full authored README and separate official release controls."
       },
       "remaining": [
