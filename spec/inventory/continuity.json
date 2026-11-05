@@ -17145,17 +17145,19 @@
           "applicable_evidence": [
             "spec/evidence/api-production-current7b0-aero-applicability-r01.json",
             "spec/evidence/api1-documented-subset-qualification-r01.json",
-            "Julesc013/mir-native-worker@cf7c985564851526a39f97034b1ba20aa3827421:evidence/aero-final504-combined-review-r01 (API consumed-input review DECD1A0A)"
+            "Julesc013/mir-native-worker@cf7c985564851526a39f97034b1ba20aa3827421:evidence/aero-final504-combined-review-r01 (API consumed-input review DECD1A0A)",
+            "spec/evidence/api-current505-consumed-input-applicability-r01.json"
           ],
-          "remaining_executable_check": "Review505 changes against the accepted API1.0 subset and504 consumed-input verdictDECD1A0A. Reuse unchanged protocol/registration/consumer components under original identities and use separately accepted native state results only within their scopes. Execute genuinely affected methods and the explicit/retained Settings-tab legacy search with independent native research/query state in the actual Library case. Unknown/computed/external consumers remain unknown; do not restart the whole API matrix or relabel old native version strings.",
+          "remaining_executable_check": "505 consumed-input review2BB0F394 closes the documented protocol/version delta: exact API/Generator/control/complete bootstrap bytes,13 original consumer files and both modern package members match accepted504 except the product literal; all four actual packaged Lua52 metadata getters pass. Retain original native identities and current saved-state results under their separate scopes. Execute the explicit/retained Settings-tab legacy search with independent native research/query state in the actual Library case, and review genuinely changed future inputs before reuse. Unknown/computed/external consumers remain unknown; do not restart the whole API matrix or relabel old native version strings.",
           "owner": "Aero; Black Glass executes affected checks",
           "independent_review": "Aero",
-          "status": "partial: documented subset and bounded 5.0.4 protocol/consumed-input reuse accepted; remaining search/client/consumer scopes stay open",
-          "readiness": "documented API consumed-input review ready; actual legacy Settings search remains open",
+          "status": "partial: documented subset and bounded505 protocol/consumed-input reuse accepted; four packaged version host checks pass; remaining search/client/consumer scopes stay open",
+          "readiness": "505 documented protocol/version review complete; actual legacy Settings search remains open",
           "next_work_inputs": [
             "spec/evidence/api1-documented-subset-qualification-r01.json",
             "spec/evidence/api-production-current7b0-aero-applicability-r01.json",
-            "tests/test_api_boundary_fixture.py"
+            "tests/test_api_boundary_fixture.py",
+            "spec/evidence/api-current505-consumed-input-applicability-r01.json"
           ]
         },
         {
