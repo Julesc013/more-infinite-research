@@ -95,6 +95,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local targets={
               f200={base="2.0.77",mir="5.0.20000"},
               f210={base="2.1.23",mir="5.0.21000"},
+              ["f210-current504"]={base="2.1.23",mir="5.0.21004"},
               ["f210-space-age"]={base="2.1.23",mir="5.0.21000",space_age=true},
               ["f210-private-credits"]={base="2.1.23",mir="5.0.21000",private_credits=true},
               ["f210-space-age-private-credits"]={base="2.1.23",mir="5.0.21000",space_age=true,private_credits=true},
@@ -2607,6 +2608,119 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                         self.assertIn("positive native holder changed", result["message"])
                         self.assertEqual([holder["level"] for holder in rows[-1]["holders"]], [1, 1, 1, 1])
                         self.assertEqual(rows[-1]["cannon_speed"], 0)
+
+    def test_current504_fixed_selection_rejects_wrong_inputs(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'wrapper parse failed'}
+          foreach($name in @('Assert-Session','Assert-MultiplayerFixtureSelection')){
+            $node=@($ast.EndBlock.Statements|Where-Object {$_ -is [Management.Automation.Language.FunctionDefinitionAst] -and $_.Name -ceq $name})
+            if($node.Count-ne1){throw 'missing selection helper'};Invoke-Expression $node[0].Extent.Text
+          }
+          $profile=Get-Content -LiteralPath $env:MIR_TEST_PROFILE -Raw|ConvertFrom-Json -AsHashtable
+          $engine=$profile.engine.sha256;$mir=$profile.archive_sha256['more-infinite-research_5.0.21004.zip']
+          $target=Assert-MultiplayerFixtureSelection $profile $engine 'library-multiplayer' $mir 7168
+          if($target.mir-cne'5.0.21004' -or -not$target.standalone_f210){throw 'current504 target differs'}
+          foreach($opponent in @('engine','version','player','observer','extra-mod','disabled','budget','case','discovery')){
+            $bad=$profile|ConvertTo-Json -Depth 16|ConvertFrom-Json -AsHashtable
+            $case='library-multiplayer';$budget=7168;$discovery=$false
+            switch($opponent){
+              'engine'{$bad.engine.sha256='F'*64}
+              'version'{$bad.mods[2].version='5.0.21005'}
+              'player'{$bad.archive_sha256['more-infinite-research_5.0.21004.zip']='A'*64}
+              'observer'{$bad.archive_sha256['mir-fixture-mir5-active-mods-observer_0.1.0.zip']='B'*64}
+              'extra-mod'{$bad.mods+=@{name='unreviewed';version='1.0.0';enabled=$true}}
+              'disabled'{$bad.mods[3].enabled=$false}
+              'budget'{$budget=8192}
+              'case'{$case='library-paired-browser'}
+              'discovery'{$discovery=$true}
+            }
+            $rejected=$false
+            try{$null=Assert-MultiplayerFixtureSelection $bad $engine $case $mir $budget -StandaloneIdentityDiscovery:$discovery}catch{$rejected=$true}
+            if(-not$rejected){throw ('current504 accepted wrong '+$opponent)}
+          }
+        '''
+        profile = ROOT / "tests/profiles/library-current504-standalone-f210-2123.json"
+        result = subprocess.run(["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+                                capture_output=True, text=True,
+                                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_PROFILE=str(profile)))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_current504_version_projection_changes_only_the_dependency(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'wrapper parse failed'}
+          foreach($node in $ast.EndBlock.Statements|Where-Object {$_ -is [Management.Automation.Language.FunctionDefinitionAst]}){Invoke-Expression $node.Extent.Text}
+          $repo=$env:MIR_TEST_REPO;$head=(& git -C $repo rev-parse HEAD).Trim()
+          $stage=New-StandaloneF210LibraryFixtureSourceProjection -RepoRoot $repo -OutputRoot $env:MIR_TEST_STAGE -SourceRevision $head -MIRVersion '5.0.21004'
+          $info=Get-Content -LiteralPath (Join-Path $stage.source 'info.json') -Raw|ConvertFrom-Json -AsHashtable
+          $original=(& git -C $repo show ($head+':tests/fixtures/library-multiplayer/info-f210.json')) -join "`n"|ConvertFrom-Json -AsHashtable
+          $original.dependencies[1]='more-infinite-research = 5.0.21004'
+          if(($info|ConvertTo-Json -Depth 8 -Compress)-cne($original|ConvertTo-Json -Depth 8 -Compress)){throw 'metadata delta exceeds selected MIR dependency'}
+          foreach($name in @('control.lua','settings-updates.lua')){
+            $bytes=Get-StandaloneF210NativeFixtureRawGitMemberBytes $repo $head 'library-multiplayer' $name
+            $expected=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
+            if((Get-FileHash -LiteralPath (Join-Path $stage.source $name)).Hash-cne$expected){throw 'fixture oracle changed during projection'}
+          }
+          foreach($opponent in @('version','space-age','private-credit')){
+            $arguments=@{RepoRoot=$repo;OutputRoot=(Join-Path $env:MIR_TEST_STAGE $opponent);SourceRevision=$head;MIRVersion='5.0.21004'}
+            switch($opponent){'version'{$arguments.MIRVersion='5.0.21005'}'space-age'{$arguments.SpaceAgeLibrary=$true}'private-credit'{$arguments.PrivateCreditChecks=$true}}
+            $rejected=$false;try{$null=New-StandaloneF210LibraryFixtureSourceProjection @arguments}catch{$rejected=$true}
+            if(-not$rejected){throw ('current504 projection accepted '+$opponent)}
+          }
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-current504-projection-") as work:
+            result = subprocess.run(["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+                                    capture_output=True, text=True,
+                                    env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_REPO=str(ROOT), MIR_TEST_STAGE=work))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_current504_fixture_and_session_keep_the_lifecycle_oracle(self):
+        for opponent in ("f210-wrong-mir-version", "f210-api-consumers", "standalone-identity-discovery"):
+            with self.subTest(opponent=opponent):
+                self.assertFalse(self.run_case(opponent, target="f210-current504")["ok"])
+        result = self.run_case(target="f210-current504")
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual((result["phase"], result["join_events"]), ("completed", 6))
+        self.assertTrue(result["load_unchanged"])
+        completed = result["markers"][-1]["witnesses"]
+        self.assertEqual(completed["mir_version"], "5.0.21004")
+        self.assertEqual(completed["screenshot_calls"], 10)
+        self.assertEqual(completed["initial_settle_ticks"], 60)
+        self.assertEqual(completed["live_refresh"]["real_lab_completions"], 2)
+        self.assertFalse(completed["live_refresh"]["native_laboratory_completion_by_script"])
+        self.assertEqual(result["saves"], ["mir5-library-multiplayer-restart", "mir5-native-complete"])
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'session parse failed'}
+          foreach($name in @('Assert-Session','Get-LibraryWitnessTarget')){
+            $node=@($ast.EndBlock.Statements|Where-Object {$_ -is [Management.Automation.Language.FunctionDefinitionAst] -and $_.Name-ceq$name})
+            if($node.Count-ne1){throw 'missing session helper'};Invoke-Expression $node[0].Extent.Text
+          }
+          $engine='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38'
+          $spec=@{library_witness_target=@{engine_sha256=$engine;base='2.1.23';mir='5.0.21004'}}
+          $target=Get-LibraryWitnessTarget $spec $engine
+          if($target.mir-cne'5.0.21004'){throw 'current504 witness differs'}
+          foreach($opponent in @('version','engine','discovery','api_client_consumers','space_age_library','private_credit_checks','positive_private_state_checks')){
+            $bad=$spec|ConvertTo-Json -Depth 8|ConvertFrom-Json -AsHashtable;$requestedEngine=$engine
+            switch($opponent){
+              'version'{$bad.library_witness_target.mir='5.0.21005'}
+              'engine'{$requestedEngine='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060';$bad.library_witness_target.engine_sha256=$requestedEngine}
+              'discovery'{$bad.standalone_identity_discovery=$true}
+              default{$bad[$opponent]=$true}
+            }
+            $rejected=$false;try{$null=Get-LibraryWitnessTarget $bad $requestedEngine}catch{$rejected=$true}
+            if(-not$rejected){throw ('current504 witness accepted '+$opponent)}
+          }
+        '''
+        observed = subprocess.run(["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
+                                  env=dict(os.environ, MIR_TEST_SESSION=str(SESSION)))
+        self.assertEqual(observed.returncode, 0, observed.stdout + observed.stderr)
 
     def test_two_real_client_join_rejoin_and_restart_state_machine(self):
         result = self.run_case()

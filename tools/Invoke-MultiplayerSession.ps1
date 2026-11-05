@@ -360,6 +360,7 @@ function Get-LibraryWitnessTarget([hashtable]$Spec,[string]$EngineSha256) {
     [ordered]@{engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';base='2.0.77';mir='5.0.20000'},
     [ordered]@{engine_sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060';base='2.1.23';mir='5.0.21000'},
     [ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$false},
+    [ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21004';standalone_identity_discovery=$false},
     [ordered]@{engine_sha256='8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38';base='2.1.23';mir='5.0.21000';standalone_identity_discovery=$true}
   )
   $requestedStandaloneIdentityDiscovery=$false
@@ -367,16 +368,21 @@ function Get-LibraryWitnessTarget([hashtable]$Spec,[string]$EngineSha256) {
     Assert-Session ($Spec.standalone_identity_discovery -is [bool] -and $Spec.standalone_identity_discovery) 'Library session standalone identity witness mode is malformed'
     $requestedStandaloneIdentityDiscovery=$true
   }
-  $matches=@($targets|Where-Object {
-    $targetStandaloneIdentityDiscovery=($_.Contains('standalone_identity_discovery') -and $_.standalone_identity_discovery -eq $true)
-    [string]$_.engine_sha256 -ceq $EngineSha256 -and $targetStandaloneIdentityDiscovery -eq $requestedStandaloneIdentityDiscovery
-  })
-  Assert-Session ($matches.Count -eq 1) 'Library session engine does not admit a witness target'
   Assert-Session ($Spec.ContainsKey('library_witness_target') -and $Spec.library_witness_target -is [System.Collections.IDictionary]) 'Library session witness target is absent or malformed'
   $provided=$Spec.library_witness_target
   Assert-Session ($provided.Count -eq 3 -and $provided.Contains('engine_sha256') -and $provided.Contains('base') -and $provided.Contains('mir') -and $provided.engine_sha256 -is [string] -and $provided.base -is [string] -and $provided.mir -is [string]) 'Library session witness target is absent or malformed'
+  $matches=@($targets|Where-Object {
+    $targetStandaloneIdentityDiscovery=($_.Contains('standalone_identity_discovery') -and $_.standalone_identity_discovery -eq $true)
+    [string]$_.engine_sha256 -ceq $EngineSha256 -and [string]$_.mir -ceq [string]$provided.mir -and $targetStandaloneIdentityDiscovery -eq $requestedStandaloneIdentityDiscovery
+  })
+  Assert-Session ($matches.Count -eq 1) 'Library session engine does not admit a witness target'
   $expected=$matches[0]
   Assert-Session ($provided.engine_sha256 -ceq [string]$expected.engine_sha256 -and $provided.base -ceq [string]$expected.base -and $provided.mir -ceq [string]$expected.mir) 'Library session witness target differs from validated launch input'
+  if($expected.mir-ceq'5.0.21004'){
+    foreach($name in @('api_client_consumers','space_age_library','private_credit_checks','positive_private_state_checks')){
+      Assert-Session (-not$Spec.ContainsKey($name)) 'current504 witness admits only the four-mod Base fixture'
+    }
+  }
   if($Spec.ContainsKey('space_age_library')){
     Assert-Session (
       $Spec.space_age_library -is [bool] -and $Spec.space_age_library -and
