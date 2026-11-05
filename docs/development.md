@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-11-04
+last_reviewed: 2026-11-05
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -13,6 +13,29 @@ source_of_truth_for:
 ---
 
 # Development guide
+
+## Build a local ZIP
+
+Install Git and Python 3 and make both available in your terminal. The packager uses Python's standard library; building a ZIP does not need Factorio, a private worker or release credentials. From a new checkout:
+
+```powershell
+git clone --branch dev https://github.com/Julesc013/more-infinite-research.git
+cd more-infinite-research
+git switch -c fix/my-change
+$mirLocalVersion = (Get-Content -LiteralPath source/info.json -Raw | ConvertFrom-Json).version
+python -B tools/package.py --source source --target f210 --output "build/packages/local/more-infinite-research_$mirLocalVersion.zip"
+if ($LASTEXITCODE -ne 0) { throw "MIR package build failed." }
+```
+
+This builds the Factorio 2.1 edition from your working tree. The ZIP is under `build/packages/local`; an existing file is preserved rather than overwritten. It keeps MIR's official mod identity and replaces the installed MIR when selected in Factorio. Back up your save and matching mods/settings, then test a copy. A successful build checks packaging, not gameplay or upgrade safety.
+
+| What you want to do | Start here |
+|---|---|
+| Build or customize a local ZIP | The command above, then [local builds and forks](#local-development-builds-upstream-changes-and-advanced-forks) for other edition/version choices |
+| Change a feature | The [source responsibility map](architecture.md#where-to-change-a-feature), its task-specific [contract](../spec/README.md#task-routing), then [affected tests](#test-selection) |
+| Publish an official release | The [source version rules](#source-release-versions-and-maturity), [asset freeze](#offline-player-asset-freeze) and [GitHub publication procedure](#github-publication-after-a-reviewed-verdict) |
+
+`source/` is the editable player code; `tests/` contains reusable checks; `tools/` builds and verifies; `spec/` defines requirements. Keep temporary output under the existing `build/` locations and accepted delivery in `dist/`. **Do not delete all of `build/`: `build/qualification` contains retained results, saves and review records.** The custody guidance below explains the other output locations.
 
 ## Development line and maintenance branches
 
@@ -71,18 +94,9 @@ After verified MIR5 publication and local delivery, continue authorized bug fixe
 
 ## Local development builds, upstream changes and advanced forks
 
-For a local replacement build, keep the official mod name `more-infinite-research`. Factorio selects one enabled version of a named mod, so this is an upgrade-style replacement of the installed MIR rather than a side-by-side installation. That identity deliberately keeps the packaged `__more-infinite-research__` imports, existing settings, technologies, migration history and draft API consumers pointed at the local build.
+For a local replacement build, keep the official mod name `more-infinite-research`. Factorio selects one enabled version of a named mod, so this is an upgrade-style replacement of the installed MIR rather than a side-by-side installation. That identity deliberately keeps the packaged `__more-infinite-research__` imports, existing settings, technologies, migration history and API consumers pointed at the local build.
 
-For MIR5 development, start from dev: main remains the published release until qualified promotion. A local build needs the existing Python packager, not release credentials or Factorio archives. Clone, branch from dev, make the bounded source change, and build a selected ordinary edition under `build/packages/local`:
-
-```powershell
-git clone https://github.com/Julesc013/more-infinite-research.git
-cd more-infinite-research
-git switch dev
-git switch -c fix/my-bounded-change
-$mirLocalVersion = (Get-Content -LiteralPath source/info.json -Raw | ConvertFrom-Json).version
-python tools/package.py --source source --target f210 --output "build/packages/local/more-infinite-research_$mirLocalVersion.zip"
-```
+Start from `dev`; `main` contains the published release. The [local build command](#build-a-local-zip) above selects the current Factorio 2.1 edition without using the release tooling.
 
 `--target` selects an implemented edition and derives its numeric version from `source/info.json`; it is not native qualification. For a one-off same-name package without target adaptation, use a valid five-digit distribution version and a matching output filename:
 
@@ -98,7 +112,7 @@ Maintain the shared cumulative migration set under the [migration contract](../s
 
 Before sharing a proposed change upstream, inspect the plan, run the narrow affected controls and repository checks, and commit the bounded change. Create your own GitHub fork when ready to contribute, add its URL as a separate remote, push the feature branch there and open a PR targeting official dev. Keep personal version/branding edits out of an unrelated upstream fix. Official repository push permission is unnecessary for a local build or contribution. A local package, passing host control or successful load is not release, compatibility or native acceptance. Keep original saves and use a disposable profile for experiments.
 
-For a companion or extension, prefer the documented draft MIR API/SDK surface and declare the official dependency; do not copy MIR merely to call its data or runtime interface. API maturity remains draft until its independent-consumer and native/client gates pass, so the companion must check the documented version/capability boundary and handle optional absence.
+For a companion or extension, use the documented [MIR API/SDK](api.md) and declare the official dependency. Check its documented API version and target capability, and handle optional absence. The API guide records the qualified modern subset and its limits; whole-product stable acceptance remains separate.
 
 An advanced renamed fork is a separate product-design task, not a metadata-only build option. Before attempting it, audit its own absolute `__more-infinite-research__` imports, API/browser/settings interfaces, settings and generated technology identities, locale/shortcut/command names, `mod_changes` and active-mod references, native ownership/override/aggregate-contribution behavior, migration policy and every external consumer. Keep Base and upstream-mod recipe/prototype IDs intact; decide explicitly which fork-owned identities change and how effects interact when both products load. Factorio already gives each mod its own `storage`/legacy `global` Lua state, so do not apply a blanket storage rename. Likewise, preserve or deliberately replace only the fork's own migration history after a save-compatibility decision. A renamed fork needs its own exact package, load, API-consumer, save and coexistence evidence; it inherits none from the official package.
 
