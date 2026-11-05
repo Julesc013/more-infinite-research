@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class NativeFixtureModeControls(unittest.TestCase):
-    def test_only_paired_create_adds_fixed_map_seed_to_actual_stage_arguments(self):
+    def test_only_named_matched_workloads_add_fixed_map_seed_to_actual_stage_arguments(self):
         script = r'''
 $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
 $tokens=$null;$errors=$null
@@ -19,11 +19,11 @@ $function=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.Function
 if($function.Count-ne1){throw 'create argument boundary missing'}
 Invoke-Expression $function[0].Extent.Text
 $seed='C:\owned checkout\seed.zip'
-foreach($case in @('library-paired-browser','library-multiplayer','repair-stress-active','historical-native')){
+foreach($case in @('library-paired-browser','library-multiplayer','repair-stress-active','agriculture-scale-active','agriculture-scale','historical-native')){
  foreach($only in @($false,$true)){
   $actual=@(Get-FixtureCreateArguments $seed $case $only)
   $expected=@('--create',$seed)
-  if($case-ceq'library-paired-browser'-and$only){$expected+=@('--map-gen-seed','424242')}
+  if(($case-ceq'library-paired-browser'-and$only)-or$case-cin@('repair-stress-active','agriculture-scale-active')){$expected+=@('--map-gen-seed','424242')}
   if(($actual|ConvertTo-Json -Compress)-cne($expected|ConvertTo-Json -Compress)){throw 'creation inputs differ'}
  }
 }

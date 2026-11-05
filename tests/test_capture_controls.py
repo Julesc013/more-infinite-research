@@ -692,12 +692,15 @@ class CaptureControlTests(unittest.TestCase):
 
         self.assertEqual(active, cases["repair_active"]["active_save"])
         self.assertEqual(active, cases["repair_active"]["seed"])
-        self.assertEqual(["--create", active], cases["repair_active"]["create"])
+        self.assertEqual(["--create", active, "--map-gen-seed", "424242"], cases["repair_active"]["create"])
 
         for name in ("agriculture_active", "ordinary"):
             with self.subTest(name=name):
                 self.assertEqual(seed, cases[name]["seed"])
-                self.assertEqual(["--create", seed], cases[name]["create"])
+                expected = ["--create", seed]
+                if name == "agriculture_active":
+                    expected += ["--map-gen-seed", "424242"]
+                self.assertEqual(expected, cases[name]["create"])
 
     def test_native_fixture_active_marker_reader_rejects_wrong_or_ambiguous_markers(self):
         cases = native_fixture_active_marker_guard_cases()
