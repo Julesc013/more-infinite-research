@@ -135,6 +135,24 @@ class PreservationTests(unittest.TestCase):
                 self.lua.execute("assert(load(...))", body)
                 self.assertIn('("' + stage + '")', body)
 
+    def test_lab_uses_writable_script_disablement_with_read_only_active(self):
+        entity = self.lua.execute('''
+            local state = {disabled_by_script=false, energy=0}
+            return setmetatable({}, {
+              __index=function(_, key)
+                if key=="active" then return not state.disabled_by_script end
+                return state[key]
+              end,
+              __newindex=function(_, key, value)
+                if key~="disabled_by_script" and key~="energy" then error("read only native attribute") end
+                state[key]=value
+              end})
+        ''')
+        for running in (False, True, False):
+            self.control.set_lab_running(entity, running)
+            self.assertEqual(entity.active, running)
+            self.assertEqual(entity.energy, 1000000000 if running else 0)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)

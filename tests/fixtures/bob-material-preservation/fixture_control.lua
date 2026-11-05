@@ -89,13 +89,18 @@ local function lab(state)
   if not state.lab or not state.lab.valid then fail("owned lab absent") end
   return state.lab, state.lab.get_inventory(defines.inventory.lab_input)
 end
+function M.set_lab_running(entity, running)
+  --2.1.23 active is a read-only aggregate. Only the script-owned flag is writable.
+  entity.disabled_by_script = not running
+  entity.energy = running and 1000000000 or 0
+end
 local function fill(state, count)
   local entity, inv = lab(state)
   inv.clear()
   for _, name in ipairs{"automation-science-pack", "space-science-pack"} do
     if inv.insert{name=name, count=count} ~= count then fail("owned lab rejected science") end
   end
-  entity.active, entity.energy = true, 1000000000
+  M.set_lab_running(entity, true)
 end
 local function flags(force, stage, foreign)
   for _, key in ipairs(FAMILIES) do
@@ -135,7 +140,7 @@ local function setup_source(state)
   local surface = game.surfaces[1]
   local old_labs = surface.find_entities_filtered{position=player.get_spawn_position(surface), name="lab", force=player}
   if #old_labs ~= 1 then fail("exact disposable predecessor lab was not found") end
-  old_labs[1].active, old_labs[1].energy = false, 0
+  M.set_lab_running(old_labs[1], false)
   player.set_saved_technology_progress(LEAD, 0.27)
   local foreign = game.create_force("mir5-bob-material-preservation-foreign")
   tech(foreign, "automation-science-pack").researched = true
@@ -191,7 +196,7 @@ function M.apply(stage)
     state.finished = state.finished + 1
     if state.finished > 3 then fail("research passed the finite cap7") end
     if state.finished == 3 then
-      state.lab.active = false
+      M.set_lab_running(state.lab, false)
       state.phase, state.started = "observe-cap", game.tick
     end
   end)
@@ -214,7 +219,7 @@ function M.apply(stage)
     entity.energy = 1000000000
     if state.phase == "earn-partial" then
       if not inv.is_empty() then return end
-      entity.active = false
+      M.set_lab_running(entity, false)
       local player = game.forces.player
       if player.current_research.name ~= BRONZE or not near(player.research_progress, 0.42)
           or #player.research_queue ~= 3 or player.research_queue[2].name ~= BRONZE then
@@ -230,7 +235,7 @@ function M.apply(stage)
       if game.tick - state.started == 20 then
         game.forces.player.reset_technology_effects(); state.reset_done = true
       elseif game.tick - state.started >= 40 then
-        entity.active = false
+        M.set_lab_running(entity, false)
         finish(state)
       end
     elseif state.phase == "observe-cap" and game.tick - state.started >= 40 then
