@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.6
+
+  Bugfixes:
+
+    - Keep unsafe Bob material productivity research unavailable when its recipes can return their own ingredients, while retaining
+      existing research and earned effects.
+    - Restore conditional Marine coke research for Real Industrial Chemistry without overriding its research owner or recipes.
+    - Preserve zero fluid-box extents when applying the pipeline-extent setting.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.5
 Date: 2026-11-05
 
