@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "kind": "MIRRICMarineDataStageDiagnosticsV1",
+  "status": "accepted-bounded-observations-from-three-failed-startups",
+  "reviewed_on": "2026-11-06",
+  "source": {
+    "fixture_commit": "bfd3a8d48ac7369ff5c4ba7b58f7489ff95fb4c9",
+    "candidate_player_source": "119ba80a38abc7fe23744097eb0291d37867cfc2",
+    "candidate_archive_sha256": "D7DD8D6D47643096709152BDD04219DCC6BC9896C3BC29AB6C8ED23271C9AF91",
+    "candidate_version": "5.0.21005",
+    "candidate_scope": "Internal committed-source test package, not the published505 archive or a public replacement.",
+    "published_version": "4.7.21003",
+    "published_archive_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
+  },
+  "inputs": {
+    "engine": "2.1.23",
+    "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "ric": "0.35.8",
+    "ric_sha256": "82108D668EA334ED71006D91A58D32D1229AF191CEF719E213AFFE5E9D26AA2F",
+    "world_mode": "marine",
+    "progression_mode": "nauvis-only",
+    "local_archive_inventory_sha256": "80FB1F8845662692EB533A61454F3BA1F42CE88E46E596210BC1E7E204BE4036",
+    "native_harness_sha256": "98FE9E3FD7B4F50904C15ACC7B2417FC754A18730977692ABC4EBF7CB1F56AF2",
+    "fixture_archive_sha256": "2B2378060B258991DB17266F0D0A8A85AF5B188BD735E9850021E48EEEDA2D2C"
+  },
+  "observations": [
+    {
+      "role": "upstream",
+      "inputs_sha256": "AB31D77B520F18CA8BE1946051257AF65D9D572ECBDF7F2B7CC581D3DC9B3E43",
+      "profile_sha256": "E049FF54BD569BB1A130555098491D804C20F11A4E67944DA184AF9BEB477583",
+      "native_terminal_sha256": "F227670605C02A0BB36CDFA0F80B63B9DBEAE12B87E1437F8EBCF11A8DA53934",
+      "native_result_sha256": "1896DDAB967776DD08D01DFFCFA0D6B6164B0C152C3D8D493DE81B0879722A7B",
+      "native_log_sha256": "84C149163835B167C7A753DD890589332E618F5B152B25DBA00D7FC075886A33",
+      "mod_count": 13,
+      "process_id": 26260,
+      "process_seconds": 3.844434,
+      "exit_code": 1,
+      "timed_out": false,
+      "actual_data_stage": {
+        "recipe": "ric-carbonise-marine-biomass",
+        "allow_productivity": true,
+        "maximum_productivity_raw": "nil",
+        "mir_owner_present": false
+      },
+      "restored": true,
+      "governed_native_processes": 1,
+      "runtime_init_observed": false,
+      "seed_save_created": false
+    },
+    {
+      "role": "published473",
+      "inputs_sha256": "7B7108FFB62D329B8CA2865CA1E4B6BD68B6D868A5405BBA5B88E4A36D376362",
+      "profile_sha256": "9E5E1E432AE7AF2C9CF9049E75765D50AD46842950DC43919DFF582EB3FDDD47",
+      "native_terminal_sha256": "388AEE451D8FBD39CCBD89AC991A8CB11F0AD36E682DD8FDA73CFBBC2F880500",
+      "native_result_sha256": "11E764FB992B4FA137E5BC4762ADF22AEB7C2D7EA5BED70BACBC6DA1C0166064",
+      "native_log_sha256": "7BBD487A8ADC3DB5BC2C529F7FFC60EC6B1D754FCF0645C78C72C6012D2F7037",
+      "mod_count": 14,
+      "process_id": 33096,
+      "process_seconds": 3.130201,
+      "exit_code": 1,
+      "timed_out": false,
+      "actual_data_stage": {
+        "recipe": "ric-carbonise-marine-biomass",
+        "allow_productivity": true,
+        "maximum_productivity_raw": "nil",
+        "mir_owner_present": true
+      },
+      "restored": true,
+      "governed_native_processes": 1,
+      "runtime_init_observed": false,
+      "seed_save_created": false
+    },
+    {
+      "role": "candidate119",
+      "inputs_sha256": "C5893A5CC80B86CB5E573BFBD227DBE33E278FDEAF1335C1FBDF516B85B939EB",
+      "profile_sha256": "09A1674663A6F7F8BAA04A679D24CFCE00D2F64BFB7B3DE826CE9544EB3A824D",
+      "native_terminal_sha256": "2C216C62EA256D9A09F3A4953FFCB13B88E69B354B844098F8BE4DD19B67DF38",
+      "native_result_sha256": "AE31B8A29149974947BFC55370A1017FE02BEEE374E281720E738634C1603A42",
+      "native_log_sha256": "7364C5EC5E46950AADF5F7FAE5BAD43790DE0C04216E84D410E1A5121FB6DF46",
+      "mod_count": 14,
+      "process_id": 4648,
+      "process_seconds": 1.805969,
+      "exit_code": 1,
+      "timed_out": false,
+      "actual_data_stage": {
+        "recipe": "ric-carbonise-marine-biomass",
+        "allow_productivity": true,
+        "maximum_productivity_raw": "nil",
+        "mir_owner_present": true
+      },
+      "restored": true,
+      "governed_native_processes": 1,
+      "runtime_init_observed": false,
+      "seed_save_created": false
+    }
+  ],
+  "common_upstream_failure": "Error while loading item prototype \"ric-coke\" (item): ItemPrototype::fuel_category was removed. Please use ItemPrototype::fuel_categories.",
+  "native_launches": 3,
+  "composition_native_launches": 0,
+  "all_original_controls_and_owned_archives_restored": true,
+  "independent_review": {
+    "source_comment": "https://github.com/Julesc013/more-infinite-research/pull/1725#issuecomment-6661518036",
+    "actual_review_sha256": "3271BAEF5EC589F4D8F8C8332A6CA815BC82F80E038A7334AC4222456CAFF926",
+    "evidence_sha256": "8C05DC4D8B3EE47F8EA325DF9517639C587D0A7A98D22494675491F267740B5C",
+    "decision": "accepted-bounded-diagnostics"
+  },
+  "custody": {
+    "repository": "Julesc013/scratchpad",
+    "commit": "25e7d97e63348f29ba57b6d8ca645412be1f87e7",
+    "directory": "projects/mir/runs/ric-marine-context-r01",
+    "original_summary_sha256": "32D4157BE5FB80ADAAD34683FAD5441CB62C88E4290E5AC9EF3D1DC82EA8014B",
+    "git_summary_sha256": "6799E81991F05AF4F7D1EB4E1047EB01987D6CCCFF67346C9828842A67589649",
+    "summary_normalization": "Git metadata copy uses LF; the exact original CRLF summary remains unchanged inside the capsule and primary custody. Logical bytes agree after CRLF-to-LF only.",
+    "capsule_sha256": "59DB5ABCD30F6447B122BD282C2E9F42E622197D942DB5DD4960C32AB231A0CE",
+    "capsule_decoded_sha256": "92ADC2D127386D0596F6C031125D3668E4C4FF30B64A4CE39921A60A73096C1D",
+    "exact_original_small_records": 81,
+    "remote_readback_sha256": "6966848FFE64ACB9F5604E1BF6C4EE884D176CC87928304527377C566AF8944C"
+  },
+  "original_adverses": [
+    "All three actual engine starts remain failed on the same upstream prototype error; no failed result is relabelled passed.",
+    "The first outer composition receipt reader failed on an empty JSON key. Its original terminal is preserved, and dictionary-safe readback verifies zero native launches and restoration.",
+    "The first coordination transcription of the second/third descriptive durations was corrected against original receipts; its original comment is retained."
+  ],
+  "limits": [
+    "The named technology is absent without MIR and present with actual published4.7.3 and reviewed119 only at final data stage. This is not engine validation, useful effects, research, physical output or paid-state qualification.",
+    "Runtime initialization never executes and no seed save is created; earned/partial/queued/cap/provider-mode transitions and save/two-cold-reload acceptance remain open.",
+    "Raw maximum_productivity is nil; no unlimited or measured native cap is inferred.",
+    "The available0.35.8 archive is not a reconstruction of missing0.36.1, original save or2.1.20. No upstream field patch, dependency change or unchanged retry was used.",
+    "Runtime observation code is source/API reviewed but unexecuted. Its legacy probability field does not fully serialize modern probabilistic products; no runtime-yield claim is made.",
+    "Descriptive process intervals are not performance samples. No release or stable verdict follows."
+  ]
+}
