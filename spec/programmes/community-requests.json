@@ -703,7 +703,28 @@
       ],
       "feature_group": "fluid-range",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "implemented-startup-control-source-host-mapped-native-network-check-open",
+        "current_source": [
+          "source/research/historical_settings.lua",
+          "source/research/settings.lua",
+          "source/data-final-fixes.lua",
+          "source/overrides/pipeline_extent.lua"
+        ],
+        "evidence": [
+          "tests/test_prototype_limits.py",
+          "tests/test_generator.py",
+          "Julesc013/mir-native-worker@0fc3c0558df084cf6c445aec59418bcdba935d64:evidence/aero-existing-request-source-inputs-r01/inputs.json",
+          "https://github.com/Julesc013/more-infinite-research/pull/1714"
+        ],
+        "limitations": [
+          "This is the existing startup multiplier, not researched pipe range or PIPE-01 recipe productivity. All original fields/statuses remain unchanged. Exact4.2.0/4.2.1/4.7.3/5.0.0 request projections agree.",
+          "Pinned2.0.77/2.1.23 prototype APIs state that the smallest member-fluidbox extent limits the network. The13 authored dropdown values include25,750 and1000percent; the README now lists them. Nondefault values retain experimental scope.",
+          "Merged1714 preserves valid explicit/inherited zero; its original red/green and22unique affected host controls remain at90e701af:evidence/aero-pipeline-zero-preservation-r01/. This correction is later than published505 and has no native property/network verdict. No physical zero meaning is invented."
+        ],
+        "remaining_executable_check": "On the affected successor,observe the actual selected nondefault fields and representative connected pipe/tank/machine networks,including mixed limiting boxes and explicit/inherited zero where natively valid. Reuse proven unchanged default/no-op controls; verify target omission/capability scope. No unchanged whole-suite or every-old-version rerun."
+      }
     },
     {
       "id": "FLUID-02",
@@ -763,7 +784,31 @@
       ],
       "feature_group": "NATIVE-01",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "implemented-native-owner-policy-with-scoped-paid-state-and-useful-lab-evidence",
+        "current_source": [
+          "source/research/catalogue.lua",
+          "source/research/modern.lua",
+          "source/runtime/catalogue.lua",
+          "source/research/native_gun_credit_definitions.lua",
+          "source/runtime/native_gun_credits.lua"
+        ],
+        "evidence": [
+          "tests/test_continuation_ownership.py",
+          "tests/test_native_gun_credits.py",
+          "spec/evidence/candidate504-weapon-first-entry-native-r01.json",
+          "spec/evidence/candidate504-galore-weapon-useful-work-r01.json",
+          "spec/evidence/candidate504-mixed-gun-native-r01.json",
+          "Julesc013/mir-native-worker@0fc3c0558df084cf6c445aec59418bcdba935d64:evidence/aero-existing-request-source-inputs-r01/inputs.json"
+        ],
+        "limitations": [
+          "The original request audits existing firing-speed streams; manufacturing-intake recipe productivity remains a different effect. Original R3 resolves to abe152:src/mod/families/modern/prototypes/streams/direct-effects.lua,byte-identical to its root copy. The later source-register source/prototypes locator is absent and is not silently substituted.",
+          "Accepted original504 components cover foreign infinite ownership,retained paid/current/queued work,four-category vectors,partial electric/Tesla ownership,provider reset/return/actual destination-history merge,real useful labs and save/two-cold boundaries on their named modern inputs. They are not fresh505 runs or a universal weapon/modpack verdict.",
+          "Original signed-effect/full-provider and fixture adverses remain adverse. README explains separate firing-speed,damage and ammo-productivity effects and possible higher ammo/energy demand,without a measured throughput percentage."
+        ],
+        "remaining_executable_check": "Review actual changed successor gun-owner/settings/credit/category inputs against the accepted504 evidence before reuse. Resolve any uncovered ammo-category/saturation and useful firing/consumption expectations within supported profiles; preserve earned vectors when owners change. Do not infer all categories or reporter configurations from the selected native components."
+      }
     },
     {
       "id": "WEAPON-01",
@@ -4338,7 +4383,32 @@
       "source_ids": ["P4", "S3", "S4", "S25", "S33", "S34", "S35"],
       "feature_group": "portable-player-surfaces",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "embedded-detached-query-and-player-view-source-mapped-input-client-acceptance-open",
+        "current_source": [
+          "source/presentation/library_model.lua",
+          "source/runtime/library.lua",
+          "source/runtime/library_translations.lua",
+          "source/presentation/library_layout.lua",
+          "source/runtime/bootstrap.lua"
+        ],
+        "evidence": [
+          "tests/test_library_model.py",
+          "tests/test_library.py",
+          "tests/test_library_translations.py",
+          "spec/evidence/library-current504-functional-native-r02.json",
+          "https://github.com/Julesc013/more-infinite-research/blob/c19070e0c615864712e3ff720a93226fd0721711/spec/evidence/api-current505-consumed-input-applicability-r01.json",
+          "Julesc013/mir-native-worker@0fc3c0558df084cf6c445aec59418bcdba935d64:evidence/aero-existing-request-source-inputs-r01/inputs.json",
+          "Julesc013/mir-native-worker@97a779e730f9bdeafdae2de977a54679914c9693:evidence/aero-library505-retained-independent-review-r01/"
+        ],
+        "limitations": [
+          "The preserved P4 direction and original acceptance remain authoritative. A detached model plus the embedded MIR host,personal view state,bounded translations,filters/sorts and native technology handoff are implemented; source/host shape is not actual input acceptance.",
+          "Original504 six joins/two labs/rejoin/save/restart and ten inspected English/German images retain their scopes. Current505 retained-window sessions and four preflight images add scripted peer completion/rendering only; the same-published A/A comparison failed,with zero scored MIR5 cases. Short-height clipping remains unexplained.",
+          "No optional companion/upstream presentation hook is claimed as delivered. Its original conditional integration status and the later evidence-led full-tree/queue candidate remain unchanged. Do not turn unimplemented proposals into hidden stable prerequisites,restore private GUI mutation,or waive delivered embedded-UI obligations."
+        ],
+        "remaining_executable_check": "Complete real filter/search/dropdown/sort/personal-hide/scroll/layout/localized/native-handoff input,explicit/retained legacy Settings search,actual exports,and divergent player/save/reload/removal/configuration/client/Discovery Tree behavior on the selected candidate. Preserve force research,queue and prototype state; close performance separately under its original controls."
+      }
     },
     {
       "id": "SIF-01",
