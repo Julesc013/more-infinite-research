@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "kind": "MIRCurrent505FoundationActivityAndApplicabilityV1",
+  "status": "accepted-bounded-current505-activity-and-original504-normal-input-applicability",
+  "reviewed_on": "2026-11-06",
+  "player": {
+    "release": "v5.0.5",
+    "source": "5d173925bce29ad8917346897706a0fcee4553e4",
+    "tree": "41d36ed8db131404692d5c054da3c87f7b54aecb",
+    "archive": "more-infinite-research_5.0.20005.zip",
+    "sha256": "764CE505DF162C2D95E9218C0B7684AB4811940F8B43698FCE681DEA71AB284D"
+  },
+  "inputs": {
+    "engine": "2.0.77",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "protected_save_sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA",
+    "diagnostic_profile_sha256": "E4451B358D6F4571169D3A9573B34CA68F433A8D73A56C62A1211D09E7F21625",
+    "selected_mod_rows": 37,
+    "archive_rows": 33,
+    "observer_sha256": "13C4CAA69F160BD67B1C5A136FDE49762B4614D85112388F6BBFB69B703746C4",
+    "private_native_source": "2ee66b0672df2d16dba7dc85b56688d946c2df09",
+    "caller_sha256": "AF27E1FD5D5DFE0FE76CEB2F73A0421EA7E51E28716AAD218D4279A2D067A7F9",
+    "reader_sha256": "B9668DD2D55A3DE7F4715A11F77BAC15CC3DAAFE76BC28E7024C7BDD6704270C",
+    "packet_sha256": "F5D4AE57D3A558C69CA8F9CB60961C9EB86061D3183CF928D72D9A42A7C0CF1B"
+  },
+  "execution": {
+    "composition_processes": 0,
+    "native_processes": 1,
+    "process_id": 18128,
+    "natural_exit_code": 0,
+    "timeout": false,
+    "duration_seconds": 43.246786,
+    "duration_scope": "Descriptive direct process start-to-exit; not responsive-menu or isolated load time.",
+    "result_sha256": "B0331D85F5AE4C1D6B4383D9D7938356C8075BC0FCFA13C999A0E4C93CC8031A",
+    "terminal_sha256": "51D6D9321384CE465B933A52487F110189E02C43FB2A2D4169227BE141C09E82",
+    "current_library_states_restored": 5,
+    "protected_inputs_unchanged": true,
+    "no_Save_output": true
+  },
+  "useful_work": {
+    "expected_and_observed_projection_sha256": "490A7B07EC7765D25FD218CCE3156DD2E9F448CD52E7548B78F57BAC3753DB11",
+    "exact_equal": true,
+    "surfaces": 57,
+    "elapsed_ticks": 600,
+    "bounded_sampled_machines": 1918,
+    "machines_with_progress": 275,
+    "sampled_products_finished": 4006,
+    "positive_named_normal_item_counter_deltas": 5899,
+    "scope": "Fixed independently established NoMIR projection; not every product,quality,force or backlog."
+  },
+  "original_normal_evidence": {
+    "path": "spec/evidence/foundation504-normal-comparison-r01.json",
+    "independent_review_sha256": "6950973FCC47C4DE0F968B07A466D2E9FAD93C84B6C6D37EC07FC623D1137DBF",
+    "applicability": "Accepted changed-input inference for original18process601-update observer-absent F200 mean-update scope only. These remain504 observations; no fresh505timing.",
+    "changed_members": [
+      "changelog.txt",
+      "compatibility/science_bindings.lua",
+      "info.json",
+      "locale/de/mir-library.cfg",
+      "platform/target.lua"
+    ],
+    "source_reason": "Actual F200 target remainsf200; the new science alternative is guardedf210, with original Space Age recipe-unlock source preserved. Runtime/control/migration bytes are identical; metadata and German Library text do not introduce a changed recurring normal-simulation path. The new current505 activity projection matches exactly.",
+    "rerun_required_for_this_delta": false
+  },
+  "reviews": {
+    "native_review_sha256": "24643BB3AC7A6190CFD00E71B5A4D6E55DECB9066480F82B4FC672BD66EC1A7C",
+    "native_evidence_sha256": "08A1C97320DD279DCFBCC7AB5F466A54CAABF44D6E27EFAD7CA21A454B070A4D",
+    "receipt_review_sha256": "6E0952ECE6293B0A5F689C06CC763429493FE01792D5466939FE53C1316FAC45",
+    "receipt_evidence_sha256": "F7B410A68B65DC66B5F1F5AB962B188F8675508F289208EA998D693959B7B0F0",
+    "erratum": "Original governed_runs is a complete singleton dictionary equal to native, not a string array as first described by the reviewer. Original review/terminal hashes remain; later receipt review corrects the description. Independently corroborated one-process/activity verdict is unaffected."
+  },
+  "future_receipt_fix": {
+    "source": "3b4334d3a12ba01738d456ac348157b690492cc2",
+    "change": "Future terminal run records retain typed arrays instead of singleton collapse; full native payload preserved.",
+    "controls": "Retained actual malformed array shape rejected;zero,one,two and null-context output controls pass. No engine rerun."
+  },
+  "custody": {
+    "repository": "Julesc013/scratchpad",
+    "commit": "bad4dd311ee774ea907ab8e5e418b023231ab078",
+    "path": "evidence/foundation-current505-activity-r01",
+    "manifest_sha256": "8FDC289B0CD69108861B22AA4F9FE647270E07A04991281196D6E35F93904C4D",
+    "gzip_sha256": "F6983B867C801D0D6C0769FC6FF6C281D359207C872315F45427589075DE70D3",
+    "decoded_sha256": "715CEE94A56C90DDEE9189D9A01F66428C3281D2497450C37CDBB6A62CC1A27F",
+    "exact_original_bodies": 73,
+    "raw_copied_files": 36,
+    "raw_copied_bytes": 1471905,
+    "actual_remote_readback_sha256": "4C360FF5A0B5E8F9312B807D1722BB408087E0DC8ABAE345770D072C0E6A31A9",
+    "identical_staged_save_locators": 3,
+    "staged_inputs_referenced_without_additional_custody_copies": true
+  },
+  "limitations": [
+    "One exact frozen505/2.0.77 factory selection,not full reporter-modpack or all-edition qualification.",
+    "No new performance comparison,process-to-responsive-menu,isolated load,Library open/search,event-spike,retained-memory or active MIR scripted-work verdict.",
+    "Earlier504observations and all original adverse/evidence identities remain unchanged; accepted applicability is explicit inference.",
+    "Future dev pipeline-zero/RIC/other changes require their own consumed-input review."
+  ],
+  "native_activity_observed": true,
+  "normal504_applicability_accepted": true,
+  "performance_qualified": false,
+  "whole_product_qualified": false,
+  "stable_acceptance": false,
+  "release_qualification": false
+}

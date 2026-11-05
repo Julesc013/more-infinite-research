@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-05
+last_reviewed: 2026-11-06
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
-## Current checkpoint (2026-11-05)
+## Current checkpoint (2026-11-06)
 
 | Item | State |
 |---|---|
@@ -23,7 +23,7 @@ source_of_truth_for:
 | Affected science safety | The [actual504-to505 science components](../spec/evidence/candidate505-science-upgrade-native-r01.json) retain native author `f0ca` and exact F210 ZIP `35378109`. A published504 source lab earns both gear bonuses at0.10 and21.67% unfinished work; stock and representative satellite-source505 successors preserve it, foreign queue/detached27%/force state, complete one new lab each to0.20, save and pass two separate cold reloads per case. Ten governed instances comprise seven natural exit0 and three completion-predicate stops. Original r01 wrong-fixture and f0ca host failures remain failed. Independent actual review `6525F79D` accepts this exact2.1.23 Space Age scope, not physical science manufacture or full modpack coverage. |
 | Prior ownership and saves | The [mixed-gun index](../spec/evidence/candidate504-mixed-gun-native-r01.json), [weapon](../spec/evidence/candidate504-weapon-first-entry-native-r01.json), [Galore/useful-work](../spec/evidence/candidate504-galore-weapon-useful-work-r01.json) and [503 routes](../spec/evidence/candidate503-native-upgrades-r01.json) retain their original package/controller identities and consumed-input limits. Valid-source removal/reset/return/merge and useful-lab components pass on their recorded engines. Original signed arithmetic and full-provider8751 failures remain failed; arbitrary provider changes remain unqualified. |
 | Library and earlier editions | The [published504 Library component](../spec/evidence/library-current504-functional-native-r02.json) has accepted six joins, two labs, rejoin/save/restart and ten inspected English/German1280x720 images (`3746EE3E`/`AC8276CF`). The original outer result-path failure stays failed. This observes Research/Availability rendering, not actual input, full views/exports/imported credits or every layout.505 corrects the German sort string without relabelling those original images. The [seven earlier-edition lab/save/two cold components](../spec/evidence/current504-earlier-editions-native-r01.json) retain independent `4F1D2B77` acceptance and both original F015/F100 adverse receipts; they are not fresh505 preservation-route runs or full parity. |
-| Performance | Published504 Foundation activity matches the fixed NoMIR 57-surface/600-tick useful-work projection (`FCE764CF`). Its separate [18-process normal comparison](../spec/evidence/foundation504-normal-comparison-r01.json) passes the predeclared+1ms mean-update margin: paired difference−0.02333ms,95% interval[−0.20562,+0.15895]ms, accepted `6950973F`. These remain bounded original points. Responsive-menu repeatability has37 selected rows/32 archive hashes preflighted only; no new menu result is asserted. Full startup/load/factory/spike/throughput/backlog/Library/retained-memory verdicts remain open. |
+| Performance | The [current505 Foundation activity diagnostic](../spec/evidence/foundation-current505-activity-r01.json) exactly matches the independent NoMIR57-surface/600-tick work projection (`490A7B07`):1natural process,1,918sampled machines,4,006sampled products and5,899positive named counters, all protected inputs/controls restored. Independent `24643BB3`/`08A1C973` accepts this bounded point, with receipt-shape erratum `6E0952EC`. Its five-member504→505 delta permits explicit reuse of the original [18-process normal comparison](../spec/evidence/foundation504-normal-comparison-r01.json),+1ms mean margin, `6950973F`; those remain504timings, not18new505runs. Responsive-menu37-row/32-archive preparation remains preflight only. Full startup/load/factory/spike/throughput/backlog/Library/retained-memory verdicts remain open. |
 | Historical and profile coverage | VER-07 and the existing [finite coverage routing](../spec/inventory/continuity.json) remain incomplete. Preserve87 original requests, the selected nine 4.7.3 routes/seven older-contract groups/four forward journeys, original results and missing-input limits. The reduced glass configuration is qualified and issue1651 is closed; the full564-name reporter selection/physical manufacture is not. Issues621/446 and PR344 remain unresolved. Default-branch fork checks find no new ahead contribution beyond the already-dispositioned Russian work. |
 | Next work and custody | Complete Library real input/search/filters/scrolling/layout/settings/export files/personal/client/Discovery Tree reset, historical/profile/API/state applicability and whole-product performance on one stable candidate. Supported screenshot requests still time out while text-only accessibility works; cause unknown. Black Glass selects, repairs and executes routine tests without Aero packet approval; save/process/library/resource guards and independent source/result/release reviews remain binding. Accepted505 files are hash-verified in `dist/v5.0.5`; source authors, protected saves and adverse evidence remain discoverable through `.task-builds/LOCATIONS.txt`. |
 
