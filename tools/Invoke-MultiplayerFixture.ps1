@@ -228,6 +228,15 @@ function Assert-MultiplayerFixtureSelection {
       fixture_mods=@('elevated-rails@2.0.77','quality@2.0.77','space-age@2.0.77','mir-fixture-mir5-scripted-effects-multiplayer@0.1.0')
       optional_archives=@('more-infinite-research_5.0.20000.zip','mir-fixture-mir5-scripted-effects-multiplayer_0.1.0.zip')
     }
+    [ordered]@{
+      fixture_case='library-paired-browser';target='f200'
+      kind='mir5-library-paired-browser-f200-native-selection';factorio_line='2.0';base='2.0.77'
+      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20005';build_version=84539
+      observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
+      mir_archive_sha256='764CE505DF162C2D95E9218C0B7684AB4811940F8B43698FCE681DEA71AB284D'
+      fixture_mods=@('mir-fixture-mir5-library-paired-browser@0.1.0','mir-fixture-mir5-library-paired-browser-arm-mir5@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.20005.zip','mir-fixture-mir5-library-paired-browser_0.1.0.zip','mir-fixture-mir5-library-paired-browser-arm-mir5_0.1.0.zip')
+    }
   )
   # Two explicit disposable positive-state variants reuse the exact corrected
   # player/API/engine inputs, with separately named fixture0.4 metadata.
@@ -894,7 +903,7 @@ try {
     Assert-Session ($mirRows.Count -eq 1 -and $armRows.Count -eq 1) 'paired browser profile arm selection differs'
     $armName=[string]$armRows[0].name
     if($armName -ceq 'mir-fixture-mir5-library-paired-browser-arm-published' -and [string]$mirRows[0].version -ceq '4.7.20002'){$pairedArm='published'}
-    elseif($armName -ceq 'mir-fixture-mir5-library-paired-browser-arm-mir5' -and [string]$mirRows[0].version -ceq '5.0.20000'){$pairedArm='mir5'}
+    elseif($armName -ceq 'mir-fixture-mir5-library-paired-browser-arm-mir5' -and [string]$mirRows[0].version -cin @('5.0.20000','5.0.20005')){$pairedArm='mir5'}
     else{throw '[mir5-multiplayer-fixture] paired browser profile MIR arm/version differs'}
   }
   $hashes=@{};foreach($entry in $selection.archive_sha256.GetEnumerator()){$hashes[$entry.Key]=$entry.Value}
