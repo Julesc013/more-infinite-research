@@ -141,15 +141,13 @@ source_of_truth_for:
 
 ## Safe diagnosis
 
-- Before reporting a problem, preserve the original save and reproduce it on a copy where possible. Include:
+- Use the [bug report form](https://github.com/Julesc013/more-infinite-research/issues/new?template=bug.yml) for crashes, loading failures and mod compatibility problems. Describe what happened and what you expected. You do not need a complete diagnosis or a repeatable case to report it.
 
-- Factorio version, MIR version and enabled mod list;
-- relevant startup settings or a full exported settings profile;
-- clear expected and observed behavior;
-- repeatable steps, plus a save only when it is safe to share;
-- `factorio-current.log` and any crash message, after removing secrets and private paths.
+- Add Factorio/MIR versions and relevant mods if known; “not sure” is fine.
+- Give reproduction steps if you have them. Preserve the original save and matching mods/settings, and use a copy for further testing.
+- Optional: attach error text, a screenshot, `factorio-current.log`, a settings export or a small save. Check attachments for personal information before sharing.
 
-- On Factorio 2.0/2.1, Library **Export Settings** creates a full settings profile. Use this for support requests.
+- On Factorio 2.0/2.1, Library **Export Settings** creates a full settings profile that can help with configuration problems. If the game fails before MIR loads, send the engine log or error text instead.
 - **Export Compact** omits defaults; it can behave differently after defaults change in a later version.
 - Use `/mir-settings-export` or `/mir-settings-export --compact` for the same exports through chat/console.
 - Find the settings file at `script-output/more-infinite-research/settings/mir-settings-profile.txt` in Factorio's user-data folder.

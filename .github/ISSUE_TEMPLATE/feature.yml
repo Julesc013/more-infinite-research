@@ -1,28 +1,23 @@
-name: Feature proposal
-description: Propose a player, target, extension, tooling, or documentation outcome.
+name: Feature request
+description: Suggest an improvement and tell us how you would use it.
 title: "feat: "
 labels: ["enhancement", "triage"]
 body:
   - type: textarea
-    id: problem
+    id: behavior
     attributes:
-      label: Problem and desired outcome
-      description: Describe the player or developer problem before describing an implementation.
-    validations:
-      required: true
-  - type: dropdown
-    id: surface
-    attributes:
-      label: Surface
-      options: ["Player behavior", "Compatibility", "Target support", "Extension/API/SDK", "Inspector/diagnostics", "Release/tooling", "Documentation"]
+      label: What would you like MIR to do?
     validations:
       required: true
   - type: textarea
-    id: compatibility
+    id: use_case
     attributes:
-      label: Compatibility, migration, and target impact
+      label: How would this help you?
+      description: Describe your use case or the problem you want to solve.
+    validations:
+      required: true
   - type: textarea
-    id: evidence
+    id: context
     attributes:
-      label: Suggested acceptance evidence
-      description: Name fixtures, engines, upgrade paths, conformance tests, or external consumers that would prove the outcome.
+      label: Anything else? (optional)
+      description: Examples, related mods or screenshots are welcome.
