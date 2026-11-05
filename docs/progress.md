@@ -662,8 +662,8 @@ The [current005D R05 discovery inputs](../spec/evidence/discovery-recovery-curre
 
 | Release decision | Current rule |
 |---|---|
-| Next source version | 5.0.3 is published; next changed public package is5.0.4. Preserve all published5.0.0–5.0.3 bytes. Private qualification archives remain distinct inputs and consume no version. |
-| Maturity | 5.0.3 is the delivered GitHub prerelease; stable still requires every applicable acceptance verdict, independent review, exact-head checks and exact artifact delivery. A prerelease flag does not waive a known save-safety defect. |
+| Next source version | 5.0.4 is published; next changed public package is5.0.5. Preserve all published5.0.0–5.0.4 bytes. Private qualification archives remain distinct inputs and consume no version. |
+| Maturity | 5.0.4 is the delivered GitHub prerelease; stable still requires every applicable acceptance verdict, independent review, exact-head checks and exact artifact delivery. A prerelease flag does not waive a known save-safety defect. |
 | Library restoration | The retained/split layout is integrated. R63b retains its stale5.0.0 adverse; r15 published5.0.1 profiles/observer controls are preparation, with imported-save real-input/lifecycle acceptance still open. Later DiscoveryTree/Library r04 remains adverse: saved-world readiness but zero game input/images after capture timeouts. Current input execution needs a working capture path and the native owner’s exact consumed-input/package/runtime/actor checks; routine execution does not wait for prospective Aero packet approval. Independent expectations, save/process/library guards and final release review remain binding; no unchanged capture retry follows. |
 | Remaining audit | Complete real-input and visual Library checks, saved-state lifecycle, affected memory/performance checks and historical behavior/test dispositions. Reuse unaffected evidence; do not replay every old campaign. |
 
