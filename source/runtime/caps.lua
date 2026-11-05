@@ -43,7 +43,7 @@ local function valid_level(technology)
   return technology and positive_integer(technology.level) and technology.level or nil
 end
 
-local function filter_queue(force, limits)
+local function filter_queue(force, limits, unavailable)
   local queue = force.research_queue
   local current = force.current_research
   local current_name = current and current.name or nil
@@ -52,7 +52,9 @@ local function filter_queue(force, limits)
     and valid_level(force.technologies[current_name]) or nil
   local current_over_cap = current_limit and current_limit > 0
     and current_level and current_level > current_limit
-  if queue == nil then return false, nil, current_over_cap and current_name or nil end
+  local current_unavailable = current_name and unavailable and unavailable[current_name] == true
+  local current_disallowed = current_over_cap or current_unavailable
+  if queue == nil then return false, nil, current_disallowed and current_name or nil end
 
   local next_level, filtered, removed = {}, {}, 0
   for _, queued in ipairs(queue) do
@@ -61,7 +63,8 @@ local function filter_queue(force, limits)
     local technology = name and force.technologies and force.technologies[name]
     local level = name and (next_level[name] or valid_level(technology)) or nil
 
-    if limit and limit > 0 and level and level > limit then
+    if (unavailable and unavailable[name] == true)
+        or (limit and limit > 0 and level and level > limit) then
       removed = removed + 1
     else
       filtered[#filtered + 1] = queued
@@ -69,24 +72,70 @@ local function filter_queue(force, limits)
     end
   end
 
-  if removed == 0 then return false, nil, current_over_cap and current_name or nil end
+  if removed == 0 then return false, nil, current_disallowed and current_name or nil end
 
   -- Factorio's queue setter owns current-research cancellation when the
   -- current entry was removed.  Reapply progress only when that exact current
   -- technology remains current, so valid fractional progress is preserved and
   -- removed research does not leak progress into another queue entry.
   local progress = current and force.research_progress or nil
+  if current_unavailable then
+    -- Modern native saved_progress accepts [0,1). Refuse an unsupported
+    -- snapshot before cancellation rather than discarding invested work.
+    if not queue[1] or queue[1].name ~= current_name or type(progress) ~= "number"
+        or progress ~= progress or progress < 0 or progress >= 1 then
+      error("MIR cannot preserve unavailable current research progress: " .. current_name, 3)
+    end
+  end
   force.research_queue = filtered
   local retained = force.current_research
+  if unavailable then
+    -- The native setter may silently reject an unresearchable remainder. Do
+    -- not report that as preserved foreign/eligible queue state.
+    local actual = force.research_queue or {}
+    if #actual ~= #filtered then error("MIR native queue dropped unselected research", 3) end
+    for index, technology in ipairs(filtered) do
+      if not actual[index] or actual[index].name ~= technology.name then
+        error("MIR native queue changed unselected research order", 3)
+      end
+    end
+  end
   if current_name and retained and retained.name == current_name and progress ~= nil then
     force.research_progress = progress
   end
   local current_retained = current_name and retained and retained.name == current_name
   local removed_current = nil
   if current_name and not current_retained then removed_current = current_name end
+  if current_unavailable and removed_current then
+    -- Keep investment on its native technology, never in a MIR queue journal.
+    -- This path is admitted only by modern-engine lifecycle callers.
+    current.saved_progress = progress
+    local saved = current.saved_progress
+    if type(saved) ~= "number" or saved ~= saved or math.abs(saved - progress) > 0.000000001 then
+      error("MIR native technology did not retain suspended research progress: " .. current_name, 3)
+    end
+  end
   local unresolved_current = nil
-  if current_over_cap and current_retained then unresolved_current = current_name end
+  if current_disallowed and current_retained then unresolved_current = current_name end
   return true, removed_current, unresolved_current
+end
+
+-- Remove only the caller's unavailable authored rows. Levels, completed
+-- effects, detached work and the remaining native queue are not MIR-owned.
+-- No queued intentions are copied into persistent state or restored later.
+function M.remove_unavailable_from_queue(force, unavailable)
+  if type(unavailable) ~= "table" then error("MIR unavailable research must be a name set", 2) end
+  for name, value in pairs(unavailable) do
+    if type(name) ~= "string" or name == "" or value ~= true then
+      error("MIR unavailable research must name exact technologies", 2)
+    end
+  end
+  if not force or force.valid == false or not force.technologies or next(unavailable) == nil then
+    return {queue_changed = false, removed_current = nil, unresolved_current = nil}
+  end
+  local changed, removed, unresolved = filter_queue(force, {}, unavailable)
+  if unresolved then error("MIR native queue did not cancel unavailable current research: " .. unresolved, 2) end
+  return {queue_changed = changed, removed_current = removed, unresolved_current = unresolved}
 end
 
 local function ensure_record(owned_disabled, force_index, owned, name)

@@ -141,7 +141,7 @@ local function bob_tech_rows()
   return rows
 end
 
-local function material_rows(definitions, retain_unavailable_cap_right)
+local function material_rows(definitions, guarded_unavailability)
   local rows = {}
   for _, definition in ipairs(definitions) do
     for _, stage in ipairs({definition.early, definition.continuation}) do
@@ -150,7 +150,12 @@ local function material_rows(definitions, retain_unavailable_cap_right)
       row.progression = stage.first_level or 1
       row.productivity_ceiling = definition.productivity_ceiling
       row.productivity_recipes = named_productivity_recipes(definition.routes)
-      if retain_unavailable_cap_right then row.retain_unavailable_cap_right = true end
+      if guarded_unavailability then
+        row.retain_unavailable_cap_right = true
+        -- Unsafe returning routes must stop spending science, unlike retired
+        -- native-owner streams with an admitted pending-completion contract.
+        row.cancel_queued_when_unavailable = true
+      end
       rows[#rows + 1] = row
     end
   end

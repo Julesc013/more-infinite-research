@@ -7,6 +7,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 ### Bugfixes
 
 - Keep unsafe Bob material productivity research unavailable when its recipes can return their own ingredients, while retaining existing research and earned effects.
+- On Factorio 2.1, unsafe Bob material research leaves the active queue while keeping its partial progress and earned bonuses.
 - Restore conditional Marine coke research for Real Industrial Chemistry without overriding its research owner or recipes.
 - Preserve zero fluid-box extents when applying the pipeline-extent setting.
 
