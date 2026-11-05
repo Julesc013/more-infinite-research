@@ -48,12 +48,13 @@ local function entries(definition, field)
   local rows = definition[field]
   if rows ~= nil then
     if type(rows) ~= "table" then fail("unsupported process " .. field) end
-    local count = 0
+    local count, maximum = 0, 0
     for key in pairs(rows) do
       if type(key) ~= "number" or key < 1 or key % 1 ~= 0 then fail("unsupported process array") end
       count = count + 1
+      maximum = math.max(maximum, key)
     end
-    if count ~= #rows then fail("incomplete process array") end
+    if count ~= maximum then fail("incomplete process array") end
     return rows
   end
   if field == "results" and definition.result ~= nil then

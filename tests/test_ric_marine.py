@@ -448,11 +448,19 @@ class RicMarineTests(unittest.TestCase):
 
     def test_reached_unrepresentable_results_cannot_grant_a_proof(self):
         for results in ('{[1]={name="harmless",amount=1},[3]={name="ric-dried-marine-biomass",amount=1}}',
+                        '{[1]={name="harmless",amount=1},[2]={name="harmless",amount=1},[4]={name="harmless",amount=1},[6]={name="ric-dried-marine-biomass",amount=1}}',
+                        '{[1]={name="harmless",amount=1},[3]={name="harmless",amount=1},[4]={name="harmless",amount=1},[6]={name="ric-dried-marine-biomass",amount=1}}',
                         '{"ric-dried-marine-biomass"}', '{["named"]={name="ric-dried-marine-biomass",amount=1}}'):
             lua = self.return_stage('data.raw.recipe.unsupported={ingredients={{"ric-coke",1}},results='+results+'}')
             with self.assertRaisesRegex(LuaError, "return path"):
                 self.pipeline(lua)
             self.assertEqual(0, lua.globals().data.writes)
+        lua = self.return_stage('''data.raw.recipe.unsupported={
+          ingredients={[1]={"unrelated",1},[2]={"unrelated",1},[4]={"unrelated",1},[6]={"ric-coke",1}},
+          results={{name="ric-dried-marine-biomass",amount=1}}}''')
+        with self.assertRaisesRegex(LuaError, "return path"):
+            self.pipeline(lua)
+        self.assertEqual(0, lua.globals().data.writes)
 
 
 if __name__ == "__main__":
