@@ -1404,8 +1404,18 @@ local function setting_display(name, value)
       and name:find("%-max%-level%-", 1) then
     return {"mir-browser.setting-unlimited"}
   end
+  if type(value) == "number" and value == value and math.abs(value) ~= math.huge then
+    local compact = string.format("%.6g", value)
+    return tonumber(compact) == value and compact or "≈ " .. compact
+  end
   return tostring(value)
 end
+
+local SETTING_FIELD_CAPTIONS = {
+  enabled = "setting-enable", base_cost = "setting-cost-base",
+  linear_increment = "setting-cost-linear-increment", growth_factor = "setting-cost-growth",
+  max_level = "setting-max-level", research_time = "setting-research-time",
+}
 
 local function setting_catalogue()
   -- Startup settings and their imported-profile precedence cannot change
@@ -1461,7 +1471,8 @@ local function setting_catalogue()
     end
     group.fields[#group.fields + 1] = {
       name = name,
-      caption = (prototypes[name] and prototypes[name].localised_name) or name,
+      caption = stream and SETTING_FIELD_CAPTIONS[spec.key] and {"mir-browser." .. SETTING_FIELD_CAPTIONS[spec.key]}
+        or (prototypes[name] and prototypes[name].localised_name) or name,
       description = prototypes[name] and prototypes[name].localised_description or nil,
       effective = effective[name], direct = direct, default = default, source = source,
       order = spec.field_index or index

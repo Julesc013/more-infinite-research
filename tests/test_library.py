@@ -9,6 +9,27 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_settings_use_authored_short_field_names_and_honest_compact_numbers(self):
+        self.lua.execute('''
+          boot()
+          settings.startup["ips-cost-growth-research_gears"]={value=1.23456789}
+          local root=library.open(player,{tab="settings",settings_scope="research",settings_search="research_gears"})
+          local detail=root.mir_library_tabs.mir_library_settings_content
+            .mir_library_settings_dynamic.mir_library_settings_detail
+          local keys={"enable","cost-base","cost-linear-increment","cost-growth","max-level","research-time"}
+          for index,key in ipairs(keys) do
+            assert(detail["mir_library_setting_"..index.."_name"].caption[1]=="mir-browser.setting-"..key,
+              "the group already names the research; standard field names must stay short")
+          end
+          local growth=detail.mir_library_setting_4_value
+          assert(growth.caption=="≈ 1.23457","rounded display must be compact and visibly approximate")
+          assert(growth.tooltip[2]=="≈ 1.23457" and growth.tooltip[4][1]=="mir-browser.source-direct")
+          assert(detail.mir_library_setting_5_value.caption[1]=="mir-browser.setting-unlimited")
+          assert(settings.startup["ips-cost-growth-research_gears"].value==1.23456789,
+            "presentation must not round configuration or profile values")
+          assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
+        ''')
+
     def test_research_details_present_localized_benefits_before_requirements(self):
         self.lua.execute('''
           boot()
