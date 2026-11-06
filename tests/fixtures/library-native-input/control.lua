@@ -114,8 +114,20 @@ local function location(root)
   if type(value)~="table" or type(value.x)~="number" or type(value.y)~="number" then fail("native root location is absent") end
   return {x=value.x,y=value.y}
 end
+-- The published MIR5 tree had root filters and a direct tab body.  A page,
+-- when present, must be the expected owned page; never fall back through it.
+local function research_parts(root)
+  local tabs=valid(root) and root.mir_library_tabs or nil
+  local page=valid(tabs) and tabs.mir_library_research_page or nil
+  if page ~= nil then
+    if not valid(tabs) or tabs.type~="tabbed-pane" or not valid(page) or page.type~="scroll-pane"
+        or (page.get_mod and page.get_mod()~="more-infinite-research") then fail("native research page is malformed or foreign") end
+    return page[FILTERS],page.mir_library_research_content
+  end
+  return (valid(root) and root[FILTERS] or nil),(valid(tabs) and tabs.mir_library_research_content or nil)
+end
 local function parts(p)
-  local root=p.gui.screen[ROOT];local filters=valid(root) and root[FILTERS]
+  local root=p.gui.screen[ROOT];local filters=research_parts(root)
   local query=valid(filters) and filters[QUERY]
   if not valid(root) or root.type~="frame" or root.get_mod()~="more-infinite-research"
       or not valid(query) or query.type~="textfield" then fail("native Library root/query is absent or foreign") end
@@ -139,7 +151,7 @@ local function exclusion_probe(en,de)
     for _, family in ipairs({"all","external"}) do
       local ordinary=family=="all" and GEAR or "automation"
       if remote.call(BROWSER,"open",p.index,{search=ordinary,selected=ordinary,family=family,visibility=1,tab="research"})~=true then fail("ordinary positive query failed") end
-      local ordinary_content=p.gui.screen[ROOT].mir_library_tabs.mir_library_research_content
+      local _,ordinary_content=research_parts(p.gui.screen[ROOT])
       if not valid(ordinary_content) or not valid(ordinary_content.mir_library_results) or #ordinary_content.mir_library_results.items<1
           or ordinary_content.mir_library_results.selected_index<1
           or (ordinary_content.type=="table" and ordinary_content.column_count~=2)
@@ -150,9 +162,8 @@ local function exclusion_probe(en,de)
           or ordinary_content.mir_library_actions.mir_library_open_native.enabled~=true then fail("ordinary inspection positive control failed") end
       for _, id in ipairs(IDS) do
         if remote.call(BROWSER,"open",p.index,{search=id,selected=id,family=family,visibility=1,tab="research"})~=true then fail("private query failed") end
-        local root=p.gui.screen[ROOT];local filters=valid(root) and root[FILTERS]
-        local tabs=valid(root) and root.mir_library_tabs
-        local content=valid(tabs) and tabs.mir_library_research_content
+        local root=p.gui.screen[ROOT];local filters=research_parts(root)
+        local _,content=research_parts(root)
         local results=valid(content) and content.mir_library_results
         local detail=valid(content) and content.mir_library_detail
         local actions=valid(content) and content.mir_library_actions
@@ -235,7 +246,7 @@ local function observed_opened(p, root)
 end
 local function input_state(p)
   if not valid(p) then return false end
-  local root=p.gui.screen[ROOT];local filters=valid(root) and root[FILTERS] or nil
+  local root=p.gui.screen[ROOT];local filters=research_parts(root) or nil
   local query=valid(filters) and filters[QUERY] or nil
   local other=p.gui.screen[OTHER];local other_query=valid(other) and other[OTHER_QUERY] or nil
   local opened_kind,opened_is_library_root,opened,opened_available=observed_opened(p,root)
@@ -250,7 +261,7 @@ local function target_witness(p, root_ref, query_ref, root_name, query_name, fil
   if not valid(p) then return false end
   local root=p.gui.screen[root_name]
   local parent=nil
-  if valid(root) then if filters_name then parent=root[filters_name] else parent=root end end
+  if valid(root) then if filters_name then parent=research_parts(root) else parent=root end end
   local query=valid(parent) and parent[query_name] or nil
   local _,_,opened,opened_available=observed_opened(p,root)
   local rv,pv,qv=valid(root)==true,valid(parent)==true,valid(query)==true

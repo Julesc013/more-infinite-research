@@ -338,6 +338,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               content.children={}
               content.style.width=760
               tabs[CONTENT]=content
+              if opponent=="new-page" or opponent=="bad-page" or opponent=="foreign-page" then
+                local page=element(opponent=="bad-page" and "flow" or "scroll-pane","mir_library_research_page")
+                page.get_mod=function() return opponent=="foreign-page" and "other" or "more-infinite-research" end
+                page[FILTERS]=filters;page[CONTENT]=content;tabs.mir_library_research_page=page
+              end
               local list_width=math.floor((content.style.maximal_width-36)*.4)
               local detail_width=content.style.maximal_width-36-list_width
               local function browser_results()
@@ -2832,6 +2837,14 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         observed = subprocess.run(["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
                                   env=dict(os.environ, MIR_TEST_SESSION=str(SESSION)))
         self.assertEqual(observed.returncode, 0, observed.stdout + observed.stderr)
+
+    def test_research_page_path_and_malformed_page_refusal(self):
+        result = self.run_case("new-page")
+        self.assertTrue(result["ok"], result["message"])
+        for opponent in ("bad-page", "foreign-page"):
+            result = self.run_case(opponent)
+            self.assertFalse(result["ok"])
+            self.assertIn("research page is malformed or foreign", result["message"])
 
     def test_two_real_client_join_rejoin_and_restart_state_machine(self):
         result = self.run_case()
