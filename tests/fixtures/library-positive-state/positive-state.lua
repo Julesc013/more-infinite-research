@@ -96,7 +96,10 @@ local function assert_result(player, family, id, visibility, present)
   local root = player.gui.screen.mir_research_browser
   local filters = valid(root) and root.mir_library_filters
   local tabs = valid(root) and root.mir_library_tabs
-  local content = valid(tabs) and tabs.mir_library_research_content
+  local page = valid(tabs) and tabs.mir_library_research_page
+  if page ~= nil and (not valid(page) or page.type ~= "scroll-pane" or (page.get_mod and page.get_mod() ~= "more-infinite-research")) then fail("research page is malformed or foreign") end
+  if page ~= nil then filters = page.mir_library_filters end
+  local content = valid(page) and page.mir_library_research_content or (valid(tabs) and tabs.mir_library_research_content)
   local results = valid(content) and content.mir_library_results
   local detail = valid(content) and content.mir_library_detail
   local actions = valid(content) and content.mir_library_actions
@@ -106,10 +109,14 @@ local function assert_result(player, family, id, visibility, present)
       or not valid(filters.mir_library_family) or filters.mir_library_family.selected_index ~= family_index
       or not valid(filters.mir_library_visibility) or filters.mir_library_visibility.selected_index ~= visibility
       or not valid(results) or not valid(detail) or not valid(button) then fail("query GUI differs") end
+  local facts = valid(detail) and detail.mir_library_research_facts
+  local heading = valid(facts) and facts.mir_library_detail_heading or nil
+  local title = page == nil and detail.mir_library_detail_title or (valid(heading) and heading.mir_library_detail_title or nil)
   if present then
-    if #results.items ~= 1 or results.selected_index ~= 1 or not valid(detail.mir_library_detail_title)
+    if #results.items ~= 1 or results.selected_index ~= 1 or not valid(title)
+        or (page ~= nil and (not valid(facts) or facts.type ~= "scroll-pane" or not valid(heading) or heading.type ~= "flow" or heading.direction ~= "horizontal" or not valid(heading.mir_library_detail_icon)))
         or button.enabled ~= true then fail("foreign hidden research was suppressed") end
-  elseif #results.items ~= 0 or results.selected_index ~= 0 or valid(detail.mir_library_detail_title)
+  elseif #results.items ~= 0 or results.selected_index ~= 0 or valid(detail.mir_library_detail_title) or valid(facts)
       or not valid(detail.mir_library_detail_empty) or button.enabled ~= false then
     fail("excluded research or native action exposed: " .. id)
   end

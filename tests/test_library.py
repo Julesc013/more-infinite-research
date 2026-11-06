@@ -9,6 +9,78 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_settings_follow_the_authored_compact_field_value_grid(self):
+        # Original8a settings_rows521-569 keeps provenance in the tooltip,
+        # adds defaults only for changed values and marks imported overrides.
+        self.lua.execute('''
+          boot()
+          settings.startup["ips-cost-growth-research_gears"]={value=1.25}
+          local root=library.open(player,{tab="settings",settings_scope="research",settings_search="research_gears"})
+          local detail=root.mir_library_tabs.mir_library_settings_content.mir_library_settings_dynamic.mir_library_settings_detail
+          local page=root.mir_library_tabs.mir_library_settings_content
+          local live={}
+          for _,child in ipairs(page._children) do if child.valid then live[#live+1]=child end end
+          assert(live[1]==page.mir_library_settings_search_label and live[2]==page.mir_library_settings_query
+            and live[3]==page.mir_library_settings_toolbar,
+            "the original labelled full-width search belongs above the scope buttons")
+          assert(page.mir_library_settings_query.style.maximal_width==page.style.maximal_width-24)
+          local fields=detail.mir_library_settings_fields
+          assert(fields and fields.type=="table" and fields.column_count==2,
+            "Settings must use the original compact field/value grid")
+          assert(fields.style.horizontal_spacing==12 and fields.style.vertical_spacing==10)
+          local growth=fields.mir_library_setting_4_value
+          assert(growth.caption[1]=="mir-browser.setting-with-default" and growth.caption[2]=="1.25")
+          assert(growth.tooltip[1]=="mir-browser.setting-provenance" and growth.tooltip[2]=="1.25")
+          assert(fields.mir_library_setting_4_source==nil,
+            "ordinary fields must not repeat the full provenance as another paragraph")
+          assert(detail.mir_library_settings_title.style.font=="default-large-bold")
+          assert(detail.mir_library_settings_source_summary.caption[1]=="mir-browser.source-direct")
+          assert(settings.startup["ips-cost-growth-research_gears"].value==1.25)
+          assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
+        ''')
+
+    def test_authored_research_presentation_uses_compact_facts_and_independent_recipes(self):
+        # 8a3b190d:research_browser.lua729-805: horizontal 48px heading,
+        # no generic recipe paragraph, science/prerequisite icons, separate list.
+        self.lua.execute('''
+          boot()
+          gear.localised_description="generic productivity paragraph must remain in its tooltip"
+          player.force.recipes={gears={valid=true,localised_name="Gears"}}
+          player.force.technologies.automation={valid=true,localised_name="Automation"}
+          prototypes={item={red={valid=true,localised_name="Red science"},green={valid=true,localised_name="Green science"}}}
+          require("presentation.library_model").detail=function()
+            return {effects={{type="change-recipe-productivity",recipe="gears",change=.1}},
+              recipe_targets={"gears"},cost={count=100,time=30,ingredients={{name="red",amount=1},{name="green",amount=2}}},
+              prerequisites={"automation"}}
+          end
+          local root=library.open(player,{selected=gear.name})
+          local outer=research_content(root).mir_library_detail
+          local facts=outer.mir_library_research_facts
+          assert(facts and facts.type=="scroll-pane" and facts.vertical_scroll_policy=="auto")
+          local heading=facts.mir_library_detail_heading
+          assert(heading.direction=="horizontal" and heading.mir_library_detail_icon.style.maximal_width==48)
+          assert(heading.mir_library_detail_title.caption==gear.localised_name)
+          assert(facts.mir_library_detail_description==nil and facts.mir_library_detail_family==nil,
+            "recipe benefits must not repeat their generic description and selected research name")
+          assert(facts.mir_library_detail_context.mir_library_context_queue_guidance==nil)
+          local divider=facts.mir_library_detail_benefits_divider
+          assert(divider.type=="line" and divider.direction=="horizontal")
+          assert(divider.style.top_margin==10 and divider.style.bottom_margin==4
+            and facts.mir_library_detail_benefits.style.bottom_margin==4,
+            "sections must retain the original native dividers and spacing")
+          local science=facts.mir_library_science_icons
+          assert(science.type=="table" and science.column_count>=2)
+          assert(science.mir_library_science_1.sprite=="item/red" and science.mir_library_science_2.sprite=="item/green")
+          assert(facts.mir_library_prerequisite_icons.mir_library_prerequisite_1.sprite=="technology/automation")
+          assert(outer.mir_library_recipe_list.parent==outer and facts.mir_library_recipe_list==nil)
+          assert(outer.mir_library_recipe_list.style.maximal_height==36,
+            "one affected recipe uses one row, as in the authored interface")
+          assert(facts.style.maximal_height+36+70<=outer.style.maximal_height)
+          local sizes=require("presentation.library_layout").split_sizes(480,300)
+          assert(sizes.columns==2,"the original400px pane boundary must not stack an adequate split window")
+          assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
+        ''')
+
     def test_settings_actions_and_stacked_details_fit_the_page_or_its_vertical_scroll(self):
         self.lua.execute('''
           for _,width in ipairs{480,528,592,832} do
@@ -37,7 +109,7 @@ class LibraryTests(unittest.TestCase):
               assert(page.vertical_scroll_policy=="auto" and page.horizontal_scroll_policy=="never")
             end
             for _,label in ipairs{detail.mir_library_settings_title,
-              detail.mir_library_setting_1_name,detail.mir_library_setting_1_source} do
+              detail.mir_library_settings_fields.mir_library_setting_1_name,detail.mir_library_settings_fields.mir_library_setting_1_value} do
               assert(label.style.single_line==false and label.style.maximal_width<=detail.style.maximal_width-16,
                 "localized names and provenance must wrap within the details viewport")
             end
@@ -49,9 +121,10 @@ class LibraryTests(unittest.TestCase):
             storage.mir_library.players[1].geometry={width=width==832 and 704 or 832,height=360}
             root=library.open(player,{tab="settings"})
             page=root.mir_library_tabs.mir_library_settings_content
-            local first
-            for _,child in ipairs(page._children) do if child.valid then first=child;break end end
-            assert(first==page.mir_library_settings_toolbar)
+            local live={}
+            for _,child in ipairs(page._children) do if child.valid then live[#live+1]=child end end
+            assert(live[1]==page.mir_library_settings_search_label and live[2]==page.mir_library_settings_query
+              and live[3]==page.mir_library_settings_toolbar)
             assert(storage.mir_library.players[1].settings_scope=="options")
             assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
           end
@@ -81,11 +154,11 @@ class LibraryTests(unittest.TestCase):
           local root=library.open(player,{tab="settings",settings_scope="options",settings_search="mir-settings-profile-import"})
           local detail=root.mir_library_tabs.mir_library_settings_content
             .mir_library_settings_dynamic.mir_library_settings_detail
-          local shown=detail.mir_library_setting_1_value.caption
+          local shown=detail.mir_library_settings_fields.mir_library_setting_1_value.caption[2]
           assert(type(shown)=="string" and #shown<=120 and shown:sub(-3)=="...",
             "opaque imported profiles must not flood the ordinary Settings view")
           assert(shown:sub(1,8)==imported:sub(1,8) and valid_preview_utf8(shown))
-          local source=detail.mir_library_setting_1_source.caption
+          local source=detail.mir_library_settings_fields.mir_library_setting_1_value.tooltip
           assert(type(source[2])=="string" and #source[2]<=120)
           assert(settings.startup["mir-settings-profile-import"].value==imported)
           assert(settings.startup["ips-cost-base-research_gears"].value==4242)
@@ -136,6 +209,7 @@ class LibraryTests(unittest.TestCase):
           assert(research_content(root).type=="table")
           for _,action in ipairs{"layout_smaller","layout_larger","layout_smaller","layout_reset"} do
             local old=root
+            player.display_resolution={width=action=="layout_smaller" and 480 or 1280,height=720}
             local button=root.mir_library_title["mir_library_"..action]
             local name=button.name
             rawset(button,"name",nil)
@@ -217,7 +291,7 @@ class LibraryTests(unittest.TestCase):
             and storage.mir_library.players[1].selected==gear.name,
             "an excluded old selection must not leave a nonempty result list without details")
           assert(body.mir_library_results==list and list.valid)
-          assert(body.mir_library_detail.mir_library_detail_title.caption==gear.localised_name)
+          assert(body.mir_library_detail.mir_library_research_facts.mir_library_detail_heading.mir_library_detail_title.caption==gear.localised_name)
           assert(gear.level==3 and foreign.level==1 and player.force.research_progress==.5)
         ''')
 
@@ -250,13 +324,13 @@ class LibraryTests(unittest.TestCase):
             .mir_library_settings_dynamic.mir_library_settings_detail
           local keys={"enable","cost-base","cost-linear-increment","cost-growth","max-level","research-time"}
           for index,key in ipairs(keys) do
-            assert(detail["mir_library_setting_"..index.."_name"].caption[1]=="mir-browser.setting-"..key,
+            assert(detail.mir_library_settings_fields["mir_library_setting_"..index.."_name"].caption[1]=="mir-browser.setting-"..key,
               "the group already names the research; standard field names must stay short")
           end
-          local growth=detail.mir_library_setting_4_value
-          assert(growth.caption=="≈ 1.23457","rounded display must be compact and visibly approximate")
+          local growth=detail.mir_library_settings_fields.mir_library_setting_4_value
+          assert(growth.caption[1]=="mir-browser.setting-with-default" and growth.caption[2]=="≈ 1.23457","rounded display must be compact and visibly approximate")
           assert(growth.tooltip[2]=="≈ 1.23457" and growth.tooltip[4][1]=="mir-browser.source-direct")
-          assert(detail.mir_library_setting_5_value.caption[1]=="mir-browser.setting-unlimited")
+          assert(detail.mir_library_settings_fields.mir_library_setting_5_value.caption[1]=="mir-browser.setting-unlimited")
           assert(settings.startup["ips-cost-growth-research_gears"].value==1.23456789,
             "presentation must not round configuration or profile values")
           assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
@@ -280,25 +354,25 @@ class LibraryTests(unittest.TestCase):
           local root=library.open(player,{selected=gear.name})
           local detail=research_content(root).mir_library_detail
           local position={}
-          for index,child in ipairs(detail._children) do position[child.name]=index end
-          assert(detail.mir_library_detail_benefits and detail.mir_library_detail_requirements,
+          for index,child in ipairs(detail.mir_library_research_facts._children) do position[child.name]=index end
+          assert(detail.mir_library_research_facts.mir_library_detail_benefits and detail.mir_library_research_facts.mir_library_detail_requirements,
             "Benefit and Research requirements must be clear sections")
           assert(position.mir_library_detail_benefits < position.mir_library_effect_1
             and position.mir_library_effect_1 < position.mir_library_detail_requirements
             and position.mir_library_detail_requirements < position.mir_library_detail_cost,
             "show what research improves before its requirements")
-          assert(detail.mir_library_detail_description.caption==gear.localised_description)
-          assert(detail.mir_library_detail_icon.style.minimal_width==48
-            and detail.mir_library_detail_icon.style.minimal_height==48)
-          assert(detail.mir_library_detail_icon.resize_to_sprite==false
-            and detail.mir_library_detail_icon.style.stretch_image_to_widget_size==true,
+          assert(detail.mir_library_research_facts.mir_library_detail_description.caption==gear.localised_description)
+          assert(detail.mir_library_research_facts.mir_library_detail_heading.mir_library_detail_icon.style.minimal_width==48
+            and detail.mir_library_research_facts.mir_library_detail_heading.mir_library_detail_icon.style.minimal_height==48)
+          assert(detail.mir_library_research_facts.mir_library_detail_heading.mir_library_detail_icon.resize_to_sprite==false
+            and detail.mir_library_research_facts.mir_library_detail_heading.mir_library_detail_icon.style.stretch_image_to_widget_size==true,
             "the actual sprite must fit the box, not overlap the adjacent facts at native size")
-          local speed=detail.mir_library_effect_1.caption
+          local speed=detail.mir_library_research_facts.mir_library_effect_1.caption
           assert(speed[2][1]=="gui-bonus.laboratory-speed" and speed[4]=="+60%")
-          assert(detail.mir_library_effect_2.caption[4]=="+1")
-          assert(detail.mir_library_effect_3.caption==scripted)
-          assert(detail.mir_library_effect_4.caption[1]=="mir-browser.productivity-increment"
-            and detail.mir_library_effect_5==nil,"identical per-recipe gains repeat the same fact")
+          assert(detail.mir_library_research_facts.mir_library_effect_2.caption[4]=="+1")
+          assert(detail.mir_library_research_facts.mir_library_effect_3.caption==scripted)
+          assert(detail.mir_library_research_facts.mir_library_effect_4.caption[1]=="mir-browser.productivity-increment"
+            and detail.mir_library_research_facts.mir_library_effect_5==nil,"identical per-recipe gains repeat the same fact")
           assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
         ''')
 
@@ -309,8 +383,8 @@ class LibraryTests(unittest.TestCase):
           model.detail=function() return {effects={{type="future-foreign-effect",modifier=12345}}} end
           local root=library.open(player,{selected=gear.name})
           local detail=research_content(root).mir_library_detail
-          assert(detail.mir_library_effect_1==nil)
-          assert(detail.mir_library_other_effects.caption[1]=="mir-browser.effect-native-details")
+          assert(detail.mir_library_research_facts.mir_library_effect_1==nil)
+          assert(detail.mir_library_research_facts.mir_library_other_effects.caption[1]=="mir-browser.effect-native-details")
           assert(research_content(root).mir_library_actions.mir_library_open_native.enabled)
           assert(gear.level==3 and gear.enabled==false)
         ''')
@@ -738,11 +812,11 @@ class LibraryTests(unittest.TestCase):
           assert(queued_rows() == 0 and native_ticks[1] == nil)
           assert(open_routed({status=1,selected=gear.name}) == root)
           local detail = research_content(root)["mir_library_detail"]
-          assert(detail["mir_library_detail_level"].caption[2] == 4)
+          assert(detail.mir_library_research_facts["mir_library_detail_level"].caption[2] == 4)
           native_handlers.events[5]({research=gear})
           gear.level = 3
           native_ticks[1]({tick=2})
-          assert(research_content(root)["mir_library_detail"]["mir_library_detail_level"].caption[2] == 3)
+          assert(research_content(root)["mir_library_detail"].mir_library_research_facts["mir_library_detail_level"].caption[2] == 3)
           assert(player.force.research_queue == queue and player.force.current_research == nil
             and player.force.research_progress == 0 and gear.level == 3 and not gear.researched)
         ''')
@@ -943,10 +1017,10 @@ class LibraryTests(unittest.TestCase):
           local detail = content["mir_library_detail"]
           assert(content["mir_library_results"].items[1] == gear_name,
             "first-open display exposed an ID while native localized name was available")
-          assert(detail["mir_library_detail_title"].caption == gear_name)
-          assert(detail["mir_library_detail_family"].caption[2] == gear_name)
-          assert(detail["mir_library_science_1"].caption[2] == science_name)
-          assert(detail["mir_library_prerequisite_1"].caption == prerequisite_name)
+          assert(detail.mir_library_research_facts.mir_library_detail_heading["mir_library_detail_title"].caption == gear_name)
+          assert(detail.mir_library_research_facts["mir_library_detail_family"] == nil)
+          assert(detail.mir_library_research_facts.mir_library_science_icons["mir_library_science_1"].tooltip[2] == science_name)
+          assert(detail.mir_library_research_facts.mir_library_prerequisite_icons["mir_library_prerequisite_1"].tooltip == prerequisite_name)
           assert(#player.translation_requests == 3, "display names changed existing search-translation scheduling")
           assert(player.force.research_queue == native_queue)
           -- The current force/prototype is authoritative after a refresh;
@@ -954,7 +1028,7 @@ class LibraryTests(unittest.TestCase):
           local replacement = {"technology-name.replaced-prerequisite", "second parameter"}
           player.force.technologies["fixture-prerequisite"].localised_name = replacement
           library.open(player)
-          assert(research_content(root)["mir_library_detail"]["mir_library_prerequisite_1"].caption == replacement)
+          assert(research_content(root)["mir_library_detail"].mir_library_research_facts.mir_library_prerequisite_icons["mir_library_prerequisite_1"].tooltip == replacement)
         ''')
 
     def test_missing_or_invalid_native_detail_names_keep_identity_fallbacks(self):
@@ -973,10 +1047,10 @@ class LibraryTests(unittest.TestCase):
           local content = research_content(root)
           local detail = content["mir_library_detail"]
           assert(content["mir_library_results"].items[1] == gear.name)
-          assert(detail["mir_library_detail_family"].caption[2] == "Gears")
-          assert(detail["mir_library_science_1"].caption[2] == "missing-science")
-          assert(detail["mir_library_prerequisite_1"].caption == "fixture-prerequisite")
-          assert(detail["mir_library_prerequisite_2"].caption == "missing-prerequisite")
+          assert(detail.mir_library_research_facts["mir_library_detail_family"] == nil)
+          assert(detail.mir_library_research_facts.mir_library_science_icons["mir_library_science_1"].caption[2] == "missing-science")
+          assert(detail.mir_library_research_facts.mir_library_prerequisite_icons["mir_library_prerequisite_1"].caption == "fixture-prerequisite")
+          assert(detail.mir_library_research_facts.mir_library_prerequisite_icons["mir_library_prerequisite_2"].caption == "missing-prerequisite")
         ''')
 
     def test_requested_view_fits_scaled_display_wraps_details_and_converts_native_ticks(self):
@@ -1004,13 +1078,13 @@ class LibraryTests(unittest.TestCase):
           local detail = content["mir_library_detail"]
           assert(detail.type == "scroll-pane" and detail.horizontal_scroll_policy == "never")
           assert(detail.style.minimal_width < content.style.maximal_width
-            and detail.style.maximal_width == 334)
-          local cost = content["mir_library_detail"]["mir_library_detail_cost"]
+            and detail.style.maximal_width == 339)
+          local cost = content["mir_library_detail"].mir_library_research_facts["mir_library_detail_cost"]
           assert(cost.caption[1] == "mir-browser.research-cost" and tonumber(cost.caption[3]) == 60)
-          assert(cost.style.single_line == false and cost.style.maximal_width == detail.style.maximal_width)
-          local science = detail["mir_library_science_1"]
-          assert(science.caption[2] == long_ingredient and science.style.maximal_width == detail.style.maximal_width)
-          assert(content["mir_library_detail"]["mir_library_effect_1"].caption[2] == "10")
+          assert(cost.style.single_line == false and cost.style.maximal_width == detail.style.maximal_width-16)
+          local science = detail.mir_library_research_facts.mir_library_science_icons["mir_library_science_1"]
+          assert(science.caption[2] == long_ingredient and science.style.maximal_width == detail.style.maximal_width-16)
+          assert(content["mir_library_detail"].mir_library_research_facts["mir_library_effect_1"].caption[2] == "10")
           assert(filters["mir_library_family_label"].caption[1] == "mir-browser.filter-scope")
           library.close(player)
           storage.mir_library.players[1].location = {x=17,y=29}
@@ -1185,8 +1259,8 @@ class LibraryTests(unittest.TestCase):
           assert(content.style.minimal_width == 592 and content.style.maximal_width == 592)
           assert(content.style.minimal_height == 170 and content.style.maximal_height == 170)
           assert(content.type == "table" and content.column_count == 2)
-          assert(content["mir_library_results"].style.minimal_width == 222)
-          assert(content["mir_library_detail"].style.minimal_width == 334)
+          assert(content["mir_library_results"].style.minimal_width == 225)
+          assert(content["mir_library_detail"].style.minimal_width == 339)
         ''')
 
     def test_research_library_opens_with_a_selected_split_detail_view(self):
@@ -1199,8 +1273,8 @@ class LibraryTests(unittest.TestCase):
           assert(results.type == "list-box" and results.selected_index == 1)
           assert(detail.type == "scroll-pane" and detail.vertical_scroll_policy == "auto"
             and detail.horizontal_scroll_policy == "never")
-          assert(detail["mir_library_detail_title"].caption == gear.localised_name)
-          assert(detail["mir_library_detail_icon"].sprite == "technology/" .. gear.name)
+          assert(detail.mir_library_research_facts.mir_library_detail_heading["mir_library_detail_title"].caption == gear.localised_name)
+          assert(detail.mir_library_research_facts.mir_library_detail_heading["mir_library_detail_icon"].sprite == "technology/" .. gear.name)
           assert(results.style.maximal_width < detail.style.maximal_width)
           local title = root["mir_library_title"]
           assert(title["mir_library_layout_smaller"] and title["mir_library_layout_larger"]
@@ -1266,7 +1340,7 @@ class LibraryTests(unittest.TestCase):
           assert(recipes.tooltip[1] == "mir-browser.recipe-list-only-hint"
             and content["mir_library_detail"]["mir_library_recipe_hint"].caption[1]
               == "mir-browser.recipe-list-only-hint")
-          local check = content["mir_library_detail"]["mir_library_production_check"]
+          local check = content["mir_library_detail"].mir_library_research_facts["mir_library_production_check"]
           assert(check and check.caption[1] == "mir-browser.production-check")
           local retained_root = player.gui.screen["mir_research_browser"]
           local retained_query = research_filters(retained_root)["mir_library_query"]
@@ -1276,11 +1350,26 @@ class LibraryTests(unittest.TestCase):
           assert(player.gui.screen["mir_research_browser"] == retained_root
             and research_filters(retained_root)["mir_library_query"] == retained_query,
             "a production action must patch its panel without rebuilding the retained controls")
-          local panel = content["mir_library_detail"]["mir_library_production_results"]
+          local panel = content["mir_library_detail"].mir_library_research_facts["mir_library_production_results"]
           assert(panel["mir_library_production_scope"].caption[1] == "mir-browser.production-scope")
           assert(panel["mir_library_production_snapshot"].caption[2] == "240")
           assert(panel["mir_library_production_row_1"].caption[1] == "mir-browser.production-row")
           assert(queue == player.force.research_queue and gear.level == level)
+          player.display_resolution,player.display_scale={width=480,height=600},1.5
+          player.opened_recipe=nil
+          player.open_factoriopedia_gui=function(prototype) player.opened_recipe=prototype end
+          local compact_root=library.open(player,{selected=gear.name})
+          local facts=research_content(compact_root).mir_library_detail.mir_library_research_facts
+          local compact_recipe=facts.mir_library_recipe_list
+          assert(compact_recipe and compact_recipe.parent==facts)
+          compact_recipe.selected_index=1
+          library.on_gui_selection_state_changed({player_index=1,element=compact_recipe})
+          assert(player.opened_recipe==recipe_prototype,"compact recipe navigation must keep working")
+          player.opened_recipe=nil
+          local wrong=facts.add{type="flow",name="wrong-parent"}
+          local foreign=wrong.add{type="list-box",name="mir_library_recipe_list",selected_index=1}
+          library.on_gui_selection_state_changed({player_index=1,element=foreign})
+          assert(player.opened_recipe==nil,"a same-named control under an unowned parent must be inert")
           library.close(player)
           library.on_gui_click({player_index=1,element=check})
           assert(statistics_reads == 1 and flow_reads == 2,
@@ -1301,7 +1390,7 @@ class LibraryTests(unittest.TestCase):
           player.force.recipes = {gear=recipe}
           local function detail()
             local root = library.open(player,{selected=gear.name})
-            return research_content(root)["mir_library_detail"]
+            return research_content(root)["mir_library_detail"].mir_library_research_facts
           end
           local first = detail()
           assert(first["mir_library_productivity_current_cap"]
@@ -1382,9 +1471,9 @@ class LibraryTests(unittest.TestCase):
           local recipes = detail["mir_library_recipe_list"]
           assert(recipes and #recipes.items == 1 and recipes.items[1][3] == recipe_name,
             "the affected-recipe list must resolve through game.recipe_prototypes")
-          local check = detail["mir_library_production_check"]
+          local check = detail.mir_library_research_facts["mir_library_production_check"]
           library.on_gui_click({player_index=1, element=check})
-          local production = detail["mir_library_production_results"]["mir_library_production_row_1"]
+          local production = detail.mir_library_research_facts["mir_library_production_results"]["mir_library_production_row_1"]
           assert(production and production.caption[2] == item_name,
             "the science snapshot must resolve names through game.item_prototypes")
         ''')
@@ -1392,7 +1481,7 @@ class LibraryTests(unittest.TestCase):
     def test_narrow_display_uses_a_scrollable_stacked_library(self):
         self.lua.execute(r'''
           boot()
-          player.display_resolution, player.display_scale = {width=800,height=600}, 1.5
+          player.display_resolution, player.display_scale = {width=480,height=600}, 1.5
           local root = library.open(player, {selected=gear.name})
           local content = research_content(root)
           assert(content.type == "scroll-pane" and content.vertical_scroll_policy == "auto")
@@ -2230,7 +2319,7 @@ class LibraryTests(unittest.TestCase):
           assert(#listed == 2 and (listed[1] == "Erzförderer-Produktivität" or listed[2] == "Erzförderer-Produktivität"))
           assert(listed[1] == "Eisenrad-Produktivität" or listed[2] == "Eisenrad-Produktivität",
             "the working gear LocalisedString regressed")
-          assert(content["mir_library_detail"]["mir_library_detail_title"].caption == "Erzförderer-Produktivität")
+          assert(content["mir_library_detail"].mir_library_research_facts.mir_library_detail_heading["mir_library_detail_title"].caption == "Erzförderer-Produktivität")
         ''')
 
     def test_imported_finite_cap_keeps_zero_default_and_direct_provenance(self):
@@ -2258,13 +2347,14 @@ class LibraryTests(unittest.TestCase):
             return {[gear.name]=effective[name]}
           end)
           local root = library.open(player, {selected=gear.name})
-          local cap = research_content(root)["mir_library_detail"]["mir_library_detail_cap"]
+          local cap = research_content(root)["mir_library_detail"].mir_library_research_facts["mir_library_detail_cap"]
           assert(cap.caption[1] == "mir-browser.cap-finite" and cap.caption[2] == 10)
           library.open(player, {tab="settings", settings_scope="research", settings_search="research_gears"})
           local detail = root["mir_library_tabs"]["mir_library_settings_content"]
             ["mir_library_settings_dynamic"]["mir_library_settings_detail"]
-          local value = detail["mir_library_setting_" .. catalog.spec(name).field_index .. "_value"]
-          assert(value.caption == "10" and value.tooltip[2][1] == "mir-browser.setting-unlimited"
+          local value = detail.mir_library_settings_fields["mir_library_setting_" .. catalog.spec(name).field_index .. "_value"]
+          assert(value.caption[1]=="mir-browser.setting-with-default" and value.caption[2] == "10"
+            and value.tooltip[2][1] == "mir-browser.setting-unlimited"
             and value.tooltip[3][1] == "mir-browser.setting-unlimited"
             and value.tooltip[4][1] == "mir-browser.source-mirset1",
             "finite imported cap lost its valid zero default/direct provenance")
@@ -2864,15 +2954,16 @@ class LibraryTests(unittest.TestCase):
 
           root = player.gui.screen["mir_research_browser"]
           local detail = research_content(root)["mir_library_detail"]
-          local context = detail["mir_library_detail_context"]
+          local context = detail.mir_library_research_facts["mir_library_detail_context"]
           assert(context["mir_library_context_status"].caption[1] == "mir-browser.context-status")
           assert(context["mir_library_context_current"].caption[1] == "mir-browser.context-current")
           assert(context["mir_library_context_queue_count"].caption[1] == "mir-browser.context-queue-count"
             and context["mir_library_context_queue_count"].caption[2] == 1)
           assert(context["mir_library_context_queue_position"].caption[1] == "mir-browser.context-queue-position"
             and context["mir_library_context_queue_position"].caption[2] == 1)
-          assert(context["mir_library_context_queue_guidance"].caption[1] == "mir-browser.native-queue-guidance")
-          assert(detail["mir_library_detail_cap"].caption[1] == "mir-browser.cap-finite")
+          assert(context["mir_library_context_queue_guidance"]==nil
+            and research_content(root).mir_library_actions.mir_library_open_native.tooltip[1]=="mir-browser.native-queue-guidance")
+          assert(detail.mir_library_research_facts["mir_library_detail_cap"].caption[1] == "mir-browser.cap-finite")
 
           local queue, current, progress = player.force.research_queue, player.force.current_research, player.force.research_progress
           local saved = storage.mir_library
@@ -2984,7 +3075,7 @@ class LibraryTests(unittest.TestCase):
           player.force.research_queue, player.force.current_research = {}, nil
           local function status()
             local root = library.open(player, {selected=gear.name})
-            local context = research_content(root)["mir_library_detail"]["mir_library_detail_context"]
+            local context = research_content(root)["mir_library_detail"].mir_library_research_facts["mir_library_detail_context"]
             return context["mir_library_context_status"].caption[2][1]
           end
           assert(status() == "mir-browser.status-complete",
@@ -3016,17 +3107,17 @@ class LibraryTests(unittest.TestCase):
           library.open(player)
           local root = player.gui.screen["mir_research_browser"]
           local detail = research_content(root)["mir_library_detail"]
-          assert(cap_calls == 1 and detail["mir_library_detail_cap"] ~= nil)
+          assert(cap_calls == 1 and detail.mir_library_research_facts["mir_library_detail_cap"] ~= nil)
           local rows = research_content(root)["mir_library_results"]
           rows.selected_index = 1
           library.on_gui_selection_state_changed({player_index = 1, element = rows})
           root = player.gui.screen["mir_research_browser"]
           detail = research_content(root)["mir_library_detail"]
           assert(cap_calls == 2)
-          assert(detail["mir_library_detail_level"].caption[1] == "mir-browser.level-cap")
-          assert(detail["mir_library_detail_cap"].caption[1] == "mir-browser.cap-finite"
-            and detail["mir_library_detail_cap"].caption[2] == 2
-            and detail["mir_library_detail_cap"].caption[3] == "ips-max-level-research_gears")
+          assert(detail.mir_library_research_facts["mir_library_detail_level"].caption[1] == "mir-browser.level-cap")
+          assert(detail.mir_library_research_facts["mir_library_detail_cap"].caption[1] == "mir-browser.cap-finite"
+            and detail.mir_library_research_facts["mir_library_detail_cap"].caption[2] == 2
+            and detail.mir_library_research_facts["mir_library_detail_cap"].caption[3] == "ips-max-level-research_gears")
           local ok = pcall(function() library.set_cap_provider("not a function") end)
           assert(not ok)
         ''')
@@ -3436,16 +3527,15 @@ class LibraryTests(unittest.TestCase):
           local settings_dynamic = settings_content["mir_library_settings_dynamic"]
           assert(storage.mir_library.players[1].tab == "settings"
             and settings_dynamic["mir_library_settings_count"].caption[1] == "mir-browser.settings-count")
-          local enabled = settings_dynamic["mir_library_settings_detail"]["mir_library_setting_1_value"]
-          assert(enabled.caption[1] == "mir-browser.setting-off"
+          local enabled = settings_dynamic["mir_library_settings_detail"].mir_library_settings_fields["mir_library_setting_1_value"]
+          assert(enabled.caption[1] == "mir-browser.setting-with-default" and enabled.caption[2][1] == "mir-browser.setting-off"
             and enabled.tooltip[2][1] == "mir-browser.setting-off"
             and enabled.tooltip[3][1] == "mir-browser.setting-on"
             and enabled.tooltip[4][1] == "mir-browser.source-direct")
-          local enabled_source = settings_dynamic["mir_library_settings_detail"]["mir_library_setting_1_source"]
-          assert(enabled_source.caption[1] == "mir-browser.setting-provenance"
-            and enabled_source.caption[4][1] == "mir-browser.source-direct")
-          local cost = settings_dynamic["mir_library_settings_detail"]["mir_library_setting_2_value"]
-          assert(cost.caption == "777" and cost.tooltip[1] == "mir-browser.setting-provenance"
+          local enabled_source = settings_dynamic["mir_library_settings_detail"].mir_library_settings_fields["mir_library_setting_1_source"]
+          assert(enabled_source==nil and enabled.tooltip[4][1]=="mir-browser.source-direct")
+          local cost = settings_dynamic["mir_library_settings_detail"].mir_library_settings_fields["mir_library_setting_2_value"]
+          assert(cost.caption[1]=="mir-browser.setting-with-default" and cost.caption[2] == "777" and cost.tooltip[1] == "mir-browser.setting-provenance"
             and cost.tooltip[2] == "4242" and cost.tooltip[4][1] == "mir-browser.source-mirset1")
           local settings_query = settings_content["mir_library_settings_query"]
           settings_query.text = "gears"

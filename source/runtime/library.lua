@@ -1103,7 +1103,7 @@ add = function(parent, spec)
   if style and type(width) == "number" and width > 0 then
     if spec.type == "label" then
       style.single_line = false
-      style.maximal_width = width
+      style.maximal_width = parent.name == PREFIX .. "research_facts" and math.max(1, width - 16) or width
     elseif spec.type == "flow" or spec.type == "scroll-pane"
         or spec.type == "tabbed-pane" or spec.type == "list-box" then
       style.maximal_width = width
@@ -1156,30 +1156,51 @@ local function add_recipe_benefits(parent, detail)
   end
 end
 
+local function library_section(parent, name, caption, width)
+  -- Authored8a3b190d section(): a native divider and restrained spacing,
+  -- followed by a short bold heading rather than another paragraph.
+  local divider = add(parent, {type = "line", name = PREFIX .. name .. "_divider", direction = "horizontal"})
+  divider.style.width = math.max(1, width - 16)
+  divider.style.top_margin, divider.style.bottom_margin = 10, 4
+  local heading = add(parent, {type = "label", name = PREFIX .. name, caption = {caption}})
+  heading.style.font, heading.style.bottom_margin = "default-bold", 4
+end
+
 local function detail_lines(parent, row, detail, player)
   if not row then
     add(parent, {type = "label", name = PREFIX .. "detail_empty", caption = {"mir-browser.no-results"}})
     return
   end
 
+  local container = parent
+  local width = parent.style and parent.style.maximal_width or 560
+  local height = parent.style and parent.style.maximal_height or 220
+  local recipe_rows = affected_recipe_rows(player, detail)
+  local compact = height < 200
+  local recipe_height = #recipe_rows > 0
+    and math.min(#recipe_rows * 28 + 8, math.max(32, style_pixels(height * .28))) or 0
+  parent = add(container, {type = "scroll-pane", name = PREFIX .. "research_facts",
+    horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
+  parent.style.width = width
+  parent.style.height = recipe_height > 0 and not compact and math.max(60, height - recipe_height - 70) or height
+  local heading = add(parent, {type = "flow", name = PREFIX .. "detail_heading", direction = "horizontal"})
+  heading.style.width = math.max(1, width - 16)
   local technology = known_technology(player, row.id)
   if technology then
-    local icon = add(parent, {type = "sprite", name = PREFIX .. "detail_icon", sprite = "technology/" .. row.id,
+    local icon = add(heading, {type = "sprite", name = PREFIX .. "detail_icon", sprite = "technology/" .. row.id,
       tooltip = technology.localised_name, resize_to_sprite = false})
     if icon.style then
       icon.style.width, icon.style.height = 48, 48
       icon.style.stretch_image_to_widget_size = true
     end
   end
-  local title = add(parent, {type = "label", name = PREFIX .. "detail_title", caption = caption(row, player)})
-  if title.style then title.style.font = "default-large-bold" end
-  local family = row.family or "mir"
-  local family_name = family_caption(family, {[family] = native_technology_name(player, row.id)})
-  local family_label = add(parent, {type = "label", name = PREFIX .. "detail_family", caption = {"mir-browser.family", family_name}})
-  if family_label.style then family_label.style.font = "default-semibold" end
-  local benefits_heading = add(parent, {type = "label", name = PREFIX .. "detail_benefits", caption = {"mir-browser.benefits"}})
-  if benefits_heading.style then benefits_heading.style.font = "default-bold" end
-  if technology then
+  local title = add(heading, {type = "label", name = PREFIX .. "detail_title", caption = caption(row, player)})
+  if title.style then
+    title.style.font = "default-large-bold"
+    title.style.maximal_width = math.max(80, width - 72)
+  end
+  library_section(parent, "detail_benefits", "mir-browser.benefits", width)
+  if technology and #recipe_rows == 0 then
     local ok, description = pcall(function() return technology.localised_description end)
     if ok and description ~= nil and description ~= "" then
       add(parent, {type = "label", name = PREFIX .. "detail_description", caption = description})
@@ -1204,30 +1225,7 @@ local function detail_lines(parent, row, detail, player)
     add(parent, {type = "label", name = PREFIX .. "other_effects", caption = {"mir-browser.effect-native-details"}})
   end
   add_recipe_benefits(parent, detail)
-  local recipe_rows = affected_recipe_rows(player, detail)
-  if #recipe_rows > 0 then
-    local recipe_heading = add(parent, {type = "label", name = PREFIX .. "detail_affected_recipes",
-      caption = {"mir-browser.affected-recipes"}})
-    if recipe_heading.style then recipe_heading.style.font = "default-bold" end
-    local items = {}
-    for index, recipe in ipairs(recipe_rows) do
-      items[index] = {"", "[img=recipe/" .. recipe.id .. "] ", recipe.name}
-    end
-    local recipe_navigation = type(player.open_factoriopedia_gui) == "function"
-    local recipe_hint = recipe_navigation and "mir-browser.recipe-select-hint" or "mir-browser.recipe-list-only-hint"
-    local list = add(parent, {type = "list-box", name = PREFIX .. "recipe_list", items = items,
-      selected_index = 0, tooltip = {recipe_hint}})
-    if list.style then
-      list.style.width = parent.style and parent.style.maximal_width or 560
-      list.style.height = math.min(196, math.max(72, #items * 28))
-    end
-    if not recipe_navigation then
-      add(parent, {type = "label", name = PREFIX .. "recipe_hint", caption = {recipe_hint}})
-    end
-  end
-  local requirements_heading = add(parent, {type = "label", name = PREFIX .. "detail_requirements",
-    caption = {"mir-browser.research-requirements"}})
-  if requirements_heading.style then requirements_heading.style.font = "default-bold" end
+  library_section(parent, "detail_requirements", "mir-browser.research-requirements", width)
   local context = add(parent, {type = "flow", name = PREFIX .. "detail_context", direction = "vertical"})
   local status_key = {
     ready = "mir-browser.status-ready",
@@ -1242,8 +1240,6 @@ local function detail_lines(parent, row, detail, player)
     add(context, {type = "label", name = PREFIX .. "context_current", caption = {"mir-browser.context-current"}})
   elseif type(row.queued_count) == "number" and row.queued_count > 0 then
     add(context, {type = "label", name = PREFIX .. "context_queued", caption = {"mir-browser.context-queued"}})
-  else
-    add(context, {type = "label", name = PREFIX .. "context_not_queued", caption = {"mir-browser.context-not-queued"}})
   end
   if type(row.queued_count) == "number" and row.queued_count > 0 then
     add(context, {type = "label", name = PREFIX .. "context_queue_count", caption = {"mir-browser.context-queue-count", row.queued_count}})
@@ -1251,7 +1247,6 @@ local function detail_lines(parent, row, detail, player)
       add(context, {type = "label", name = PREFIX .. "context_queue_position", caption = {"mir-browser.context-queue-position", row.queue_index}})
     end
   end
-  add(context, {type = "label", name = PREFIX .. "context_queue_guidance", caption = {"mir-browser.native-queue-guidance"}})
   if row.cap and row.cap > 0 then
     add(parent, {type = "label", name = PREFIX .. "detail_level", caption = {"mir-browser.level-cap", row.current_level or 1, row.cap}})
     add(parent, {type = "label", name = PREFIX .. "detail_cap", caption = {"mir-browser.cap-finite", row.cap, tostring(row.cap_setting or "?")}})
@@ -1269,10 +1264,21 @@ local function detail_lines(parent, row, detail, player)
         and #detail.cost.ingredients > 0 then
       local science_heading = add(parent, {type = "label", name = PREFIX .. "detail_science", caption = {"mir-browser.science"}})
       if science_heading.style then science_heading.style.font = "default-bold" end
+      local science = add(parent, {type = "table", name = PREFIX .. "science_icons",
+        column_count = math.max(1, math.min(8, style_pixels((width - 16) / 40)))})
+      science.style.width = math.max(1, width - 16)
       for index, ingredient in ipairs(detail.cost.ingredients) do
         if type(ingredient) == "table" then
-          add(parent, {type = "label", name = PREFIX .. "science_" .. index,
-            caption = {"mir-browser.science-ingredient", native_item_name(ingredient.name) or tostring(ingredient.name or "?"), tostring(ingredient.amount or "?")}})
+          local name = native_item_name(ingredient.name)
+          local text = {"mir-browser.science-ingredient", name or tostring(ingredient.name or "?"), tostring(ingredient.amount or "?")}
+          if name then
+            local icon = add(science, {type = "sprite", name = PREFIX .. "science_" .. index,
+              sprite = "item/" .. ingredient.name, tooltip = text, resize_to_sprite = false})
+            icon.style.width, icon.style.height = 32, 32
+            icon.style.stretch_image_to_widget_size = true
+          else
+            add(science, {type = "label", name = PREFIX .. "science_" .. index, caption = text})
+          end
         end
       end
     end
@@ -1280,9 +1286,19 @@ local function detail_lines(parent, row, detail, player)
   if type(detail) == "table" and type(detail.prerequisites) == "table" and #detail.prerequisites > 0 then
     local prerequisite_heading = add(parent, {type = "label", name = PREFIX .. "detail_prerequisites", caption = {"mir-browser.prerequisites"}})
     if prerequisite_heading.style then prerequisite_heading.style.font = "default-bold" end
+    local prerequisites = add(parent, {type = "table", name = PREFIX .. "prerequisite_icons",
+      column_count = math.max(1, math.min(8, style_pixels((width - 16) / 40)))})
+    prerequisites.style.width = math.max(1, width - 16)
     for index, prerequisite in ipairs(detail.prerequisites) do
-      add(parent, {type = "label", name = PREFIX .. "prerequisite_" .. index,
-        caption = native_technology_name(player, prerequisite) or tostring(prerequisite)})
+      local name = native_technology_name(player, prerequisite)
+      if name then
+        local icon = add(prerequisites, {type = "sprite", name = PREFIX .. "prerequisite_" .. index,
+          sprite = "technology/" .. prerequisite, tooltip = name, resize_to_sprite = false})
+        icon.style.width, icon.style.height = 32, 32
+        icon.style.stretch_image_to_widget_size = true
+      else
+        add(prerequisites, {type = "label", name = PREFIX .. "prerequisite_" .. index, caption = tostring(prerequisite)})
+      end
     end
   end
   if type(detail) == "table" and type(detail.cost) == "table"
@@ -1290,6 +1306,27 @@ local function detail_lines(parent, row, detail, player)
     add(parent, {type = "button", name = PREFIX .. "production_check",
       caption = {"mir-browser.production-check"}})
     add(parent, {type = "flow", name = PREFIX .. "production_results", direction = "vertical"})
+  end
+  if #recipe_rows > 0 then
+    local recipe_parent = compact and parent or container
+    local recipe_heading = add(recipe_parent, {type = "label", name = PREFIX .. "detail_affected_recipes",
+      caption = {"mir-browser.affected-recipes"}})
+    if recipe_heading.style then recipe_heading.style.font = "default-bold" end
+    local items = {}
+    for index, recipe in ipairs(recipe_rows) do
+      items[index] = {"", "[img=recipe/" .. recipe.id .. "] ", recipe.name}
+    end
+    local recipe_navigation = type(player.open_factoriopedia_gui) == "function"
+    local recipe_hint = recipe_navigation and "mir-browser.recipe-select-hint" or "mir-browser.recipe-list-only-hint"
+    local list = add(recipe_parent, {type = "list-box", name = PREFIX .. "recipe_list", items = items,
+      selected_index = 0, tooltip = {recipe_hint}})
+    if list.style then
+      list.style.width = math.max(1, width - 16)
+      list.style.height = recipe_height
+    end
+    if not recipe_navigation then
+      add(recipe_parent, {type = "label", name = PREFIX .. "recipe_hint", caption = {recipe_hint}})
+    end
   end
 end
 
@@ -1404,7 +1441,7 @@ local function update_research_content(content, player, view, context, translati
     add(actions, {type = "button", name = PREFIX .. "inspect_settings", caption = {"mir-browser.settings"},
       tooltip = {"mir-browser.inspect-settings"}})
     add(actions, {type = "sprite-button", name = PREFIX .. "open_native", style = "tool_button",
-      sprite = "utility/side_menu_technology_icon", tooltip = {"mir-browser.open-research"}})
+      sprite = "utility/side_menu_technology_icon", tooltip = {"mir-browser.native-queue-guidance"}})
     add(actions, {type = "button", name = PREFIX .. "close", caption = {"mir-browser.close"}})
   end
   local count = panes.columns == 1 and actions[PREFIX .. "count"] or content[PREFIX .. "count"]
@@ -1594,11 +1631,22 @@ local function update_settings_content(content, view, preserve_query, translatio
   local available_height = content.style and (content.style.maximal_height or content.style.height) or 220
   local toolbar_columns = width < 380 and 1 or (width < 700 and 2 or 4)
   local toolbar = content[PREFIX .. "settings_toolbar"]
-  if valid(toolbar) and (toolbar.type ~= "table" or toolbar.column_count ~= toolbar_columns) then
+  if not valid(content[PREFIX .. "settings_search_label"])
+      or (valid(toolbar) and (toolbar.type ~= "table" or toolbar.column_count ~= toolbar_columns)) then
     -- A recreated toolbar must precede the query and panes, including when
     -- an older open GUI still contains the former horizontal flow.
     content.clear()
     toolbar = nil
+  end
+  if not valid(content[PREFIX .. "settings_search_label"]) then
+    add(content, {type = "label", name = PREFIX .. "settings_search_label", caption = {"mir-browser.search-settings"}})
+  end
+  local query = content[PREFIX .. "settings_query"]
+  if not valid(query) then
+    query = add(content, {type = "textfield", name = PREFIX .. "settings_query", text = view.settings_query,
+      tooltip = {"mir-browser.search-settings"}})
+  elseif not preserve_query then
+    query.text = view.settings_query
   end
   if not valid(toolbar) then
     toolbar = add(content, {type = "table", name = PREFIX .. "settings_toolbar", column_count = toolbar_columns})
@@ -1623,16 +1671,9 @@ local function update_settings_content(content, view, preserve_query, translatio
       if name == "settings_research" or name == "settings_options" then button.tooltip = button.caption end
     end
   end
-  local query = content[PREFIX .. "settings_query"]
-  if not valid(query) then
-    query = add(content, {type = "textfield", name = PREFIX .. "settings_query", text = view.settings_query,
-      tooltip = {"mir-browser.search-settings"}})
-  elseif not preserve_query then
-    query.text = view.settings_query
-  end
-  if query.style then query.style.width = math.min(280, width - 24) end
+  if query.style then query.style.width = math.max(1, width - 24) end
   local toolbar_rows = math.ceil((support_exports and 4 or 2) / toolbar_columns)
-  local dynamic_height = math.max(80, available_height - 64 - (toolbar_rows - 1) * 32)
+  local dynamic_height = math.max(80, available_height - 84 - (toolbar_rows - 1) * 32)
   local panes = library_layout.split_sizes(width, dynamic_height)
   -- The outer page owns overflow. A one-column table must contain both
   -- panes plus its two heading rows, even at the minimum window height.
@@ -1693,11 +1734,11 @@ local function update_settings_content(content, view, preserve_query, translatio
     detail.style.width, detail.style.height = panes.detail_width, panes.detail_height
     detail.style.maximal_width = panes.detail_width
   end
-  local function setting_label(spec)
-    local label = add(detail, spec)
+  local function setting_label(spec, parent, width)
+    local label = add(parent or detail, spec)
     if valid(label) and label.style then
       label.style.single_line = false
-      label.style.maximal_width = math.max(1, panes.detail_width - 16)
+      label.style.maximal_width = math.max(1, width or panes.detail_width - 16)
     end
     return label
   end
@@ -1706,23 +1747,41 @@ local function update_settings_content(content, view, preserve_query, translatio
     setting_label({type = "label", name = PREFIX .. "settings_empty", caption = {"mir-browser.settings-empty"}})
     return
   end
-  setting_label({type = "label", name = PREFIX .. "settings_title", caption = selected.title})
+  local title = setting_label({type = "label", name = PREFIX .. "settings_title", caption = selected.title})
+  title.style.font = "default-large-bold"
   setting_label({type = "label", name = PREFIX .. "settings_scope", caption = {"mir-browser.scope-startup"}})
   if selected.externally_supplied then
     setting_label({type = "label", name = PREFIX .. "settings_external", caption = {"mir-browser.settings-external-owner"}})
   end
-  setting_label({type = "label", name = PREFIX .. "settings_effective", caption = {"mir-browser.effective-values"}})
+  library_section(detail, "settings_effective", "mir-browser.effective-values", panes.detail_width)
+  local fields = add(detail, {type = "table", name = PREFIX .. "settings_fields", column_count = 2})
+  fields.style.width = math.max(1, panes.detail_width - 16)
+  fields.style.horizontal_spacing, fields.style.vertical_spacing = 12, 10
+  local field_width = math.max(1, style_pixels((panes.detail_width - 40) * .55))
+  local value_width = math.max(1, panes.detail_width - 40 - field_width)
+  local source = "default"
   for index, field in ipairs(selected.fields) do
     local name = PREFIX .. "setting_" .. index
-    setting_label({type = "label", name = name .. "_name", caption = field.caption, tooltip = field.description})
-    setting_label({type = "label", name = name .. "_value", caption = setting_display(field.name, field.effective),
+    local label = setting_label({type = "label", name = name .. "_name", caption = field.caption,
+      tooltip = field.description}, fields, field_width)
+    label.style.font = "default-semibold"
+    local display = setting_display(field.name, field.effective)
+    if field.default ~= nil and field.effective ~= field.default then
+      display = {"mir-browser.setting-with-default", display, setting_display(field.name, field.default)}
+    end
+    setting_label({type = "label", name = name .. "_value", caption = display,
       tooltip = {"mir-browser.setting-provenance", setting_display(field.name, field.direct),
-        setting_display(field.name, field.default), {"mir-browser.source-" .. field.source}}})
-    setting_label({type = "label", name = name .. "_source",
-      caption = {"mir-browser.setting-provenance", setting_display(field.name, field.direct),
-        setting_display(field.name, field.default), {"mir-browser.source-" .. field.source}}})
+        setting_display(field.name, field.default), {"mir-browser.source-" .. field.source}}}, fields, value_width)
+    if field.source == "mirset1" then
+      source = "mirset1"
+      setting_label({type = "label", name = name .. "_profile_marker", caption = {"mir-browser.profile-override"}}, fields, field_width)
+      setting_label({type = "label", name = name .. "_source", caption = {"mir-browser.source-mirset1"}}, fields, value_width)
+    elseif source ~= "mirset1" and field.source == "direct" then
+      source = "direct"
+    end
   end
-  setting_label({type = "label", name = PREFIX .. "settings_source", caption = {"mir-browser.configuration-source"}})
+  library_section(detail, "settings_source", "mir-browser.configuration-source", panes.detail_width)
+  setting_label({type = "label", name = PREFIX .. "settings_source_summary", caption = {"mir-browser.source-" .. source}})
 end
 
 local function queue_name(entry)
@@ -2308,9 +2367,13 @@ function M.on_gui_selection_state_changed(event)
       render(player, view, context)
     end
   elseif element.name == PREFIX .. "recipe_list" then
-    if not owns_element(player, element, {
+    local ordinary = owns_element(player, element, {
       PREFIX .. "recipe_list", PREFIX .. "detail", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
-    }) then return end
+    })
+    local compact = owns_element(player, element, {
+      PREFIX .. "recipe_list", PREFIX .. "research_facts", PREFIX .. "detail", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
+    })
+    if not ordinary and not compact then return end
     local view = view_for(player.index)
     local detail = selected_detail(player, view, context_for(player.force),
       translated_labels(translation_caches[player.index]))
@@ -2407,7 +2470,7 @@ function M.on_gui_click(event)
   end
   if element.name == PREFIX .. "production_check" then
     if not owns_element(player, element, {
-      PREFIX .. "production_check", PREFIX .. "detail", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
+      PREFIX .. "production_check", PREFIX .. "research_facts", PREFIX .. "detail", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     local id = technology_id(view.selected)
