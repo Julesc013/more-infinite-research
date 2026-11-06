@@ -359,6 +359,7 @@ class FiniteResearchSpeedFixtureTests(unittest.TestCase):
         spec = importlib.util.spec_from_file_location("finite_boundary_package", ROOT / "tools/package.py")
         package = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(package)
+        (ROOT / "build/tmp").mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(prefix="finite-boundary-host-", dir=ROOT / "build/tmp") as directory:
             for name in ("cap-controls", "provider-changed"):
                 source = FIXTURE / name
