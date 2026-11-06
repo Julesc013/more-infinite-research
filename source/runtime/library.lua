@@ -1155,6 +1155,103 @@ local function add_recipe_benefits(parent, detail)
   end
 end
 
+-- Only the selected presentation is retained, on its native GUI owner. Tags
+-- survive a client joining; a module-local last-render cache would not.
+-- Decline unsupported/oversized inputs rather than caching a partial match.
+local function copy_detail_inputs(value, budget, depth)
+  budget.nodes = budget.nodes - 1
+  if budget.nodes < 0 or depth > 12 then return nil end
+  local kind = type(value)
+  if kind == "boolean" or finite_number(value) then return value end
+  if kind == "string" then
+    budget.bytes = budget.bytes - #value
+    return budget.bytes >= 0 and value or nil
+  end
+  if kind ~= "table" or getmetatable(value) ~= nil then return nil end
+  local out, count, numeric, maximum = {}, 0, 0, 0
+  for key, child in pairs(value) do
+    count = count + 1
+    if type(key) == "string" then
+      budget.bytes = budget.bytes - #key
+      if budget.bytes < 0 then return nil end
+    elseif whole_number(key, 1) then
+      numeric, maximum = numeric + 1, math.max(maximum, key)
+    else return nil end
+    out[key] = copy_detail_inputs(child, budget, depth + 1)
+    if out[key] == nil then return nil end
+  end
+  -- Native tags stringify sparse numeric keys. Admit only records or dense
+  -- arrays so an exact readback cannot silently change the comparison shape.
+  if numeric > 0 and (numeric ~= count or maximum ~= count) then return nil end
+  return out
+end
+
+local function same_detail_inputs(left, right, budget)
+  budget.left = budget.left - 1
+  if budget.left < 0 then return false end
+  if left == right then return true end
+  if type(left) ~= "table" or type(right) ~= "table" or getmetatable(right) ~= nil then return false end
+  for key, value in pairs(left) do
+    if not same_detail_inputs(value, right[key], budget) then return false end
+  end
+  for key in pairs(right) do
+    budget.left = budget.left - 1
+    if budget.left < 0 or left[key] == nil then return false end
+  end
+  return true
+end
+
+local function detail_inputs(player, row, detail, panes, recipes)
+  local technology = row and known_technology(player, row.id)
+  if not technology then return nil end
+  detail = type(detail) == "table" and detail or {}
+  local inputs = {
+    revision = 1, id = row.id, force = player.force.index, locale = player.locale,
+    width = panes.detail_width, height = panes.detail_height,
+    title = caption(row, player), native_name = technology.localised_name,
+    status = row.status, current = row.current, queued_count = row.queued_count, queue_index = row.queue_index,
+    level = row.current_level, cap = row.cap, cap_state = row.cap_state, cap_setting = row.cap_setting,
+    effects = detail.effects, effects_complete = detail.effects_complete, cost = detail.cost,
+    prerequisites = detail.prerequisites, recipe_benefits = detail.recipe_benefits,
+    recipe_benefits_state = detail.recipe_benefits_state,
+    next_level_has_effective_benefit = detail.next_level_has_effective_benefit,
+    recipe_benefits_only_effects = detail.recipe_benefits_only_effects,
+    science_names = {}, prerequisite_names = {}, recipes = {},
+    recipe_navigation = type(player.open_factoriopedia_gui) == "function",
+  }
+  if #recipes == 0 then
+    local ok, description = pcall(function() return technology.localised_description end)
+    if ok then inputs.description = description end
+  end
+  local ingredients = type(detail.cost) == "table" and detail.cost.ingredients or nil
+  for index, ingredient in ipairs(type(ingredients) == "table" and ingredients or {}) do
+    if index > 512 then return nil end
+    inputs.science_names[index] = type(ingredient) == "table" and native_item_name(ingredient.name) or false
+  end
+  for index, id in ipairs(type(detail.prerequisites) == "table" and detail.prerequisites or {}) do
+    if index > 512 then return nil end
+    inputs.prerequisite_names[index] = native_technology_name(player, id) or false
+  end
+  for index, recipe in ipairs(recipes) do inputs.recipes[index] = {id = recipe.id, name = recipe.name} end
+  return copy_detail_inputs(inputs, {nodes = 4096, bytes = 65536}, 0)
+end
+
+local function detail_subtree_present(container, inputs)
+  local facts = container[PREFIX .. "research_facts"]
+  local heading = valid(facts) and facts[PREFIX .. "detail_heading"]
+  if not valid(facts) or facts.type ~= "scroll-pane" or not valid(heading) or heading.type ~= "flow"
+      or not valid(heading[PREFIX .. "detail_title"]) or not valid(heading[PREFIX .. "detail_icon"])
+      or not valid(facts[PREFIX .. "detail_context"]) or not valid(facts[PREFIX .. "detail_requirements"]) then return false end
+  local recipe_parent = inputs.height < 200 and facts or container
+  if #inputs.recipes > 0 and not valid(recipe_parent[PREFIX .. "recipe_list"]) then return false end
+  if type(inputs.cost) == "table" and type(inputs.cost.ingredients) == "table" and #inputs.cost.ingredients > 0 then
+    if not valid(facts[PREFIX .. "science_icons"]) or not valid(facts[PREFIX .. "production_check"])
+        or not valid(facts[PREFIX .. "production_results"]) then return false end
+  end
+  return not (type(inputs.prerequisites) == "table" and #inputs.prerequisites > 0)
+    or valid(facts[PREFIX .. "prerequisite_icons"])
+end
+
 local function library_section(parent, name, caption, width)
   -- Authored8a3b190d section(): a native divider and restrained spacing,
   -- followed by a short bold heading rather than another paragraph.
@@ -1165,7 +1262,7 @@ local function library_section(parent, name, caption, width)
   heading.style.font, heading.style.bottom_margin = "default-bold", 4
 end
 
-local function detail_lines(parent, row, detail, player)
+local function detail_lines(parent, row, detail, player, recipe_rows)
   if not row then
     add(parent, {type = "label", name = PREFIX .. "detail_empty", caption = {"mir-browser.no-results"}})
     return
@@ -1174,7 +1271,7 @@ local function detail_lines(parent, row, detail, player)
   local container = parent
   local width = parent.style and parent.style.maximal_width or 560
   local height = parent.style and parent.style.maximal_height or 220
-  local recipe_rows = affected_recipe_rows(player, detail)
+  recipe_rows = recipe_rows or affected_recipe_rows(player, detail)
   local compact = height < 200
   local recipe_height = #recipe_rows > 0
     and math.min(#recipe_rows * 28 + 8, math.max(32, style_pixels(height * .28))) or 0
@@ -1521,12 +1618,21 @@ local function update_research_content(content, player, view, context, translati
   if not valid(detail_box) then
     detail_box = add(content, {type = "scroll-pane", name = PREFIX .. "detail",
       horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
-  else detail_box.clear() end
+  end
   if detail_box.style then
     detail_box.style.width, detail_box.style.height = panes.detail_width, panes.detail_height
     detail_box.style.maximal_width = panes.detail_width
   end
-  detail_lines(detail_box, selected, detail, player)
+  local recipes = selected and affected_recipe_rows(player, detail) or {}
+  local inputs = detail_inputs(player, selected, detail, panes, recipes)
+  local tags = detail_box.tags or {}
+  if not (inputs and detail_subtree_present(detail_box, inputs)
+      and same_detail_inputs(inputs, tags.mir_detail_inputs, {left = 8192})) then
+    detail_box.clear()
+    detail_lines(detail_box, selected, detail, player, recipes)
+    tags.mir_detail_inputs = inputs
+    detail_box.tags = tags
+  end
 end
 
 local function setting_value(startup, name, fallback)
