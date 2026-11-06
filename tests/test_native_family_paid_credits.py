@@ -300,6 +300,203 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
           reload_credits(BASE_ACTIVE,base_destination)
         ''')
 
+    def _published_data_only_base(self, version="1.1.0", destination="f210"):
+        # MIR1.1/1.2 use their independent source fixture catalogues. MIR1.0
+        # uses its published conditional producer contract, not a claim that
+        # all four identities occurred in the protected21-row source roster.
+        origin = "110" if version == "1.1.0" else "120"
+        self.lua.globals().old_catalogue_path = (
+            Path(__file__).resolve().parents[1] / "tests" / "fixtures" /
+            "migration-origins" / ("f200-" + origin + "-source") / "catalogue.lua").as_posix()
+        self.lua.globals().old_data_version = version
+        self.lua.globals().data_destination = destination
+        self.lua.execute(r'''
+          local old
+          if old_data_version=="1.0.0" then
+            old={rows={}}
+            local original={low_density_structure="low-density-structure",plastic="plastic-bar",
+              processing_unit="processing-unit",rocket_fuel="rocket-fuel"}
+            for name,recipe in pairs(original) do
+              old.rows["recipe-prod-research_"..name.."-1"]={effects={
+                {type="change-recipe-productivity",recipe=recipe,change=.1}}}
+            end
+          else old=assert(loadfile(old_catalogue_path))() end
+          old_families={"low_density_structure","plastic","processing_unit","rocket_fuel"}
+          GROUPS={};data_mask={}
+          for _,name in ipairs(old_families) do
+            local family="research_"..name
+            local row=assert(old.rows["recipe-prod-"..family.."-1"])
+            assert(#row.effects==1 and row.effects[1].type=="change-recipe-productivity")
+            local effect=row.effects[1]
+            GROUPS[family]={{recipe=effect.recipe,change=effect.change}}
+            data_mask[key(family,effect.recipe)]=true
+          end
+          assert(old.rows["recipe-prod-research_steel-1"]==nil)
+          GROUPS.research_steel={{recipe="steel-plate",change=.1}}
+          data_mask[key("research_steel","steel-plate")]=true
+          GROUPS.research_plastic[2]={recipe="new-unpaid-plastic",change=.1}
+          data_mask[key("research_plastic","new-unpaid-plastic")]=true
+          local version=data_destination=="f200" and "5.0.20006" or "5.0.21006"
+          DATA_ACTIVE={base=data_destination=="f200" and "2.0.77" or "2.1.23",
+            ["more-infinite-research"]=version}
+          reload_credits(DATA_ACTIVE,data_destination)
+          force=make_collected_force(1,2,data_mask,false)
+          advance(force,"recipe-prod-research_steel-1",1,false)
+          plastic=force.technologies["recipe-prod-research_plastic-1"]
+          force.research_queue={force.technologies.foreign,plastic}
+          force.current_research=force.technologies.foreign
+          force.technologies["recipe-prod-research_low_density_structure-1"].saved_progress=.27
+          data_event={mod_startup_settings_changed=false,
+            mod_changes={["more-infinite-research"]={old_version=old_data_version,new_version=version}}}
+          if data_destination=="f210" then
+            data_event.mod_changes.base={old_version="2.0.77",new_version="2.1.23"}
+          end
+        ''')
+
+    def test_published_data_only_base_preserves_four_paid_families_and_new_zero_steel(self):
+        for version in ("1.0.0", "1.1.0", "1.2.0"):
+            for destination in ("f200", "f210"):
+                with self.subTest(version=version, destination=destination):
+                    self.setUp()
+                    self._published_data_only_base(version, destination)
+                    self.lua.execute(r'''
+                      local queue,current=force.research_queue,force.current_research
+                      native_credits.on_configuration_changed(data_event)
+                      for _,name in ipairs(old_families) do
+                        local family="research_"..name;local recipe=GROUPS[family][1].recipe
+                        close(own_contribution(force,family,recipe),.1)
+                        assert(record(force,family,recipe).offset==0)
+                      end
+                      close(own_contribution(force,"research_plastic","new-unpaid-plastic"),0)
+                      assert(record(force,"research_plastic","new-unpaid-plastic").offset==-1)
+                      close(own_contribution(force,"research_steel","steel-plate"),0)
+                      assert(force.research_queue==queue and force.current_research==current
+                        and force.research_progress==.42
+                        and force.technologies["recipe-prod-research_low_density_structure-1"].saved_progress==.27)
+                      local writes=0
+                      for _,s in pairs(force._states) do writes=writes+s.writes.level+s.writes.enabled end
+                      native_credits.on_configuration_changed()
+                      local after=0
+                      for _,s in pairs(force._states) do after=after+s.writes.level+s.writes.enabled end
+                      assert(after==writes,"reconciliation repeated paid credit writes")
+                      advance(force,"recipe-prod-research_steel-1",2,false)
+                      native_credits.on_configuration_changed(data_event)
+                      close(own_contribution(force,"research_steel","steel-plate"),.1)
+                      assert(record(force,"research_steel","steel-plate").offset==0,
+                        "complete MIR5 history was replaced by an old absent-family mask")
+                      no_foreign_write(force)
+                    ''')
+
+    def test_data_only_known_startup_change_matches_staged_module_disable_and_retuning(self):
+        for version in ("1.0.0", "1.1.0", "1.2.0"):
+            for destination in ("f200", "f210"):
+                with self.subTest(version=version, destination=destination):
+                    self.setUp()
+                    self._published_data_only_base(version, destination)
+                    self.lua.execute(r'''
+                      -- The actual effective-setting contract supplies the new
+                      -- coefficient and disabled-module intent independently.
+                      local values=require("research.settings").resolve({
+                        ["ips-enable-research_modules"]={value=false},
+                        ["ips-effect-per-level-research_plastic"]={value=17}})
+                      assert(values.streams.research_modules.enabled==false)
+                      assert(values.streams.research_plastic.effect_percent==17)
+                      local selected=values.streams.research_plastic.effect_percent/100
+                      local staged=force
+                      native_credits.on_configuration_changed(data_event)
+                      -- A later settings reload replaces prototype coefficients,
+                      -- while the engine retains completed/signed native levels.
+                      GROUPS.research_plastic[1].change=selected
+                      reload_credits(DATA_ACTIVE,data_destination)
+                      for _,d in ipairs(native_credit_definitions.collected_descriptors(GROUPS)) do
+                        if d.family=="research_plastic" and d.recipe=="plastic-bar" then
+                          for _,effect in ipairs(staged.technologies[d.main_id].prototype.effects) do
+                            if effect.recipe==d.recipe then effect.change=selected end
+                          end
+                          staged.technologies[d.positive_id].prototype.effects[1].change=selected
+                          staged.technologies[d.negative_id].prototype.effects[1].change=-selected
+                        end
+                      end
+                      local direct=make_collected_force(2,2,data_mask,false)
+                      advance(direct,"recipe-prod-research_steel-1",1,false)
+                      data_event.mod_startup_settings_changed=true
+                      native_credits.on_configuration_changed(data_event)
+                      for _,name in ipairs(old_families) do
+                        local family="research_"..name;local recipe=GROUPS[family][1].recipe
+                        local expected=family=="research_plastic" and 17/100 or 10/100
+                        close(own_contribution(staged,family,recipe),expected)
+                        close(own_contribution(direct,family,recipe),expected)
+                      end
+                      for _,target in ipairs({staged,direct}) do
+                        close(own_contribution(target,"research_plastic","new-unpaid-plastic"),0)
+                        close(own_contribution(target,"research_steel","steel-plate"),0)
+                        no_foreign_write(target)
+                      end
+                      assert(staged.research_queue[2]==plastic and staged.research_progress==.42
+                        and staged.technologies["recipe-prod-research_low_density_structure-1"].saved_progress==.27)
+                    ''')
+
+    def test_original_100_trimmed_family_has_no_invented_paid_credit(self):
+        for destination in ("f200", "f210"):
+            with self.subTest(destination=destination):
+                self.setUp()
+                self._published_data_only_base("1.0.0", destination)
+                self.lua.execute(r'''
+                  -- Model an original recipe covered before MIR1.0 ran:
+                  -- trim_conflicts suppressed its entire one-recipe family.
+                  -- Its newly emitted destination identity starts unearned.
+                  advance(force,plastic.name,1,false)
+                  force.research_queue={force.technologies.foreign}
+                  local queue,current=force.research_queue,force.current_research
+                  native_credits.on_configuration_changed(data_event)
+                  close(own_contribution(force,"research_plastic","plastic-bar"),0)
+                  close(own_contribution(force,"research_plastic","new-unpaid-plastic"),0)
+                  assert(record(force,"research_plastic","plastic-bar").offset==0)
+                  close(own_contribution(force,"research_processing_unit","processing-unit"),.1)
+                  close(own_contribution(force,"research_steel","steel-plate"),0)
+                  assert(force.research_queue==queue and force.current_research==current
+                    and force.research_progress==.42)
+                  no_foreign_write(force)
+                ''')
+
+    def test_data_only_first_mask_refuses_unproven_inputs_and_impossible_steel_investment(self):
+        opponents = ("invalid-startup", "unknown-startup", "provider", "removed-provider", "observer", "space-age",
+                     "unknown-origin", "missing-engine", "wrong-old-engine", "wrong-current-engine",
+                     "inconsistent-destination", "private-main", "incomplete-old-mask",
+                     "paid-steel", "queued-steel", "saved-steel")
+        for opponent in opponents:
+            with self.subTest(opponent=opponent):
+                self.setUp()
+                self._published_data_only_base()
+                self.lua.globals().opponent = opponent
+                self.lua.execute(r'''
+                  if opponent=="invalid-startup" then data_event.mod_startup_settings_changed="true" end
+                  if opponent=="unknown-startup" then data_event.mod_startup_settings_changed=nil end
+                  if opponent=="provider" then DATA_ACTIVE.provider="1.0.0" end
+                  if opponent=="removed-provider" then data_event.mod_changes.provider={old_version="1.0.0"} end
+                  if opponent=="observer" then DATA_ACTIVE["mir-fixture-observer"]="0.1.0" end
+                  if opponent=="space-age" then DATA_ACTIVE["space-age"]="2.1.23" end
+                  if opponent=="unknown-origin" then data_event.mod_changes["more-infinite-research"].old_version="1.1.1" end
+                  if opponent=="missing-engine" then data_event.mod_changes.base=nil end
+                  if opponent=="wrong-old-engine" then data_event.mod_changes.base.old_version="2.0.76" end
+                  if opponent=="wrong-current-engine" then DATA_ACTIVE.base="2.1.24" end
+                  if opponent=="inconsistent-destination" then data_event.mod_changes["more-infinite-research"].new_version="5.0.21007" end
+                  if opponent=="incomplete-old-mask" then GROUPS.research_processing_unit=nil end
+                  reload_credits(DATA_ACTIVE,"f210")
+                  if opponent=="private-main" then plastic.prototype.hidden=true end
+                  local steel=force.technologies["recipe-prod-research_steel-1"]
+                  if opponent=="paid-steel" then advance(force,steel.name,2,false) end
+                  if opponent=="queued-steel" then force.research_queue[#force.research_queue+1]=steel end
+                  if opponent=="saved-steel" then steel.saved_progress=.27 end
+                  local ok,message=pcall(native_credits.on_configuration_changed,data_event)
+                  assert(not ok and tostring(message):find("native family",1,true),"unproven source admitted")
+                  assert(next(storage)==nil,"refusal wrote persistent state")
+                  for _,s in pairs(force._states) do
+                    assert(s.writes.level==0 and s.writes.enabled==0,"refusal changed native levels/flags")
+                  end
+                  no_foreign_write(force)
+                ''')
+
     def test_published_f200_m4_base_direct_upgrade_keeps_only_original_paid_mask(self):
         for full_bootstrap in (False, True):
             for explicit_base in (False, True):
@@ -423,15 +620,55 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                   no_foreign_write(force)
                 ''')
 
+    def test_published_m4_engine_hop_known_mask_does_not_require_unchanged_settings_flag(self):
+        for full_bootstrap in (False, True):
+            for changed in (False, True):
+                with self.subTest(bootstrap=full_bootstrap, changed=changed):
+                    self.setUp()
+                    self._published_m4_base()
+                    if full_bootstrap:
+                        bootstrap_fixture.BootstrapTests().setUp(self.lua)
+                        self.lua.execute('''
+                          local real_credits=native_credits
+                          install_modules(false,false,false,true);install_runtime(nil,BASE_ACTIVE);game.forces={}
+                          package.preload["runtime.native_credits"]=function()return real_credits end
+                          load_control()
+                        ''')
+                    self.lua.globals().changed_startup = changed
+                    self.lua.globals().full_bootstrap = full_bootstrap
+                    self.lua.execute('''
+                      local force=make_collected_force(1,8,published_base_mask,false)
+                      local main=force.technologies["recipe-prod-research_steel-1"]
+                      -- The current recipe set differs. Its extra route has no
+                      -- historical right, while a removed old effect keeps it.
+                      set_mask(force,{[key("research_steel","new-unpaid-steel")]=true},false)
+                      main.saved_progress=.27;force.research_queue={main,force.technologies.foreign}
+                      force.current_research=main;local queue=force.research_queue
+                      local event={mod_startup_settings_changed=changed_startup,mod_changes={
+                        base={old_version="2.0.77",new_version="2.1.23"},
+                        ["more-infinite-research"]={old_version="4.7.20003",new_version="5.0.21003"}}}
+                      local callback=full_bootstrap and handlers.configuration or native_credits.on_configuration_changed
+                      callback(event)
+                      for family,recipes in pairs(GROUPS) do
+                        close(own_contribution(force,family,recipes[1].recipe),7*recipes[1].change)
+                        assert(record(force,family,recipes[1].recipe).offset==7)
+                      end
+                      close(own_contribution(force,"research_steel","new-unpaid-steel"),0)
+                      assert(record(force,"research_steel","new-unpaid-steel").offset==-7)
+                      assert(force.research_queue==queue and force.current_research==main
+                        and main.saved_progress==.27 and force.research_progress==.42)
+                      no_foreign_write(force)
+                    ''')
+
     def test_published_m4_base_hop_refuses_unproven_inputs_before_all_mir_writes(self):
-        opponents = ("startup", "unknown-startup", "added-provider", "unchanged-provider", "removed-provider",
+        opponents = ("invalid-startup", "unknown-startup", "added-provider", "unchanged-provider", "removed-provider",
                      "observer", "unknown-origin", "wrong-destination", "wrong-current-version", "missing-engine",
                      "other-source-patch", "older-destination-patch", "future-destination-patch", "future-engine",
                      "wrong-active-engine", "future-minor", "same-engine-future-patch", "inconsistent-same-engine",
                      "private-main", "incomplete-old-mask")
-        for full_bootstrap in (False, True):
+        for full_bootstrap, changed_flag in ((False, False), (False, True), (True, False), (True, True)):
             for opponent in opponents:
-                with self.subTest(bootstrap=full_bootstrap, opponent=opponent):
+                with self.subTest(bootstrap=full_bootstrap, changed=changed_flag, opponent=opponent):
                     self.setUp()
                     self._published_m4_base()
                     if full_bootstrap:
@@ -444,11 +681,12 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                         ''')
                     self.lua.globals().opponent = opponent
                     self.lua.globals().full_bootstrap = full_bootstrap
+                    self.lua.globals().changed_flag = changed_flag
                     self.lua.execute('''
                       local changes={base={old_version="2.0.77",new_version="2.1.23"},
                         ["more-infinite-research"]={old_version="4.7.20003",new_version="5.0.21003"}}
-                      local changed=false
-                      if opponent=="startup" then changed=true end
+                      local changed=changed_flag
+                      if opponent=="invalid-startup" then changed="true" end
                       if opponent=="unknown-startup" then changed=nil end
                       if opponent=="added-provider" or opponent=="unchanged-provider" then
                         BASE_ACTIVE.ExpandedProductivityResearch="1.0.0"

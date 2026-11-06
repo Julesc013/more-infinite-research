@@ -1,0 +1,198 @@
+{
+  "schema": 1,
+  "kind": "MIRPublished473ForwardCurrent506ApplicabilityV1",
+  "status": "accepted-bounded-F100-F110-preservation-reuse; current-F200-paid-transition-unqualified",
+  "reviewed_source": "6360a194e4ae616fcbbc1e5b03606e2fb4048823",
+  "qualified_dev": "5c3e3c5a93230e2c940b86b0714108415e2f4627",
+  "qualified_player_tree": "147deb56b966707a832cfb35507c57528d599d36",
+  "reviewed_to_qualified_player_delta": [
+    "source/changelog.txt"
+  ],
+  "qualification_correspondence": "The final player tree changes only the dated changelog from the reviewed source. Relevant Lua, settings and migration bytes are unchanged. Original native results retain their original package, fixture, engine, save and endpoint identities.",
+  "scope": "Exactly the published MIR4.7.3 Factorio1.0-to2.1, 1.1-to2.1 and 2.0-to2.1 routes. These differ from the seven older MIR-contract groups and the separately reviewed Factorio1.0-to1.1 route. No new run or beta prerequisite is introduced.",
+  "independent_review": {
+    "sha256": "D2F8FE9B1B7ED896D67328E81FC2C45129CA92DC165F10B8DABCDF342EDB4976",
+    "private_commit": "6998cb43d6e217236bdbf03d5888e0e0f49c891f",
+    "private_path": "evidence/aero-bob506-qualified-state-forward-review-r01/forward-applicability.json",
+    "custody": "The preserved review capsule retains the exact independent review, source comparison, original-archive analysis and receipt extraction. It is historical review custody, not a public build dependency."
+  },
+  "source_analysis": {
+    "common_original_candidate_sources": [
+      "42032477d45ced683e72736a4fe30a7a3195b995",
+      "b2e9243dacf8c10f623fe90ddac957329fbf1d9e"
+    ],
+    "common_original_source_tree": "5a6adf0aab4e945aeca13420ddd045ad45f050a0",
+    "eight_selected_equal_paths_rehashed": true,
+    "all_four_migration_names_modes_blobs_identical": true,
+    "additional_identical_paths": [
+      "source/research/native_direct_definitions.lua",
+      "source/compatibility/historical_direct.lua",
+      "source/research/historical_direct.lua",
+      "source/compatibility/modern_catalogue/base.lua",
+      "source/runtime/configuration.lua"
+    ],
+    "original_f100_archive_sha256": "C04F3543EBF99D2B76B2C9193EA0886381B7CDDF2F2C1610310E7961B24BE0E1",
+    "original_f110_archive_sha256": "66C127D8BFC1919FA88F19D2D9B3047316A1B90401CAA05A6D05979B7A099D1E",
+    "original_archives_read_in_place": "Both exact ZIP hashes verified. Both1.x target profiles disable recipe productivity;five families are non-direct productivity streams and qualification skips them. No archive/save was extracted.",
+    "original_body_verification": "Relied on the bounded Luna93-body extraction for the three native journeys;independently verified the separate c10769-body capsule while checking its disputed origin identity."
+  },
+  "selected_unchanged_paths": [
+    {
+      "path": "source/runtime/legacy_caps.lua",
+      "old_sha256": "C13466CF0416461F298217D897D060BA1AE916A571A51CA8A663371A3747EA18",
+      "new_sha256": "C13466CF0416461F298217D897D060BA1AE916A571A51CA8A663371A3747EA18",
+      "equal": true
+    },
+    {
+      "path": "source/runtime/legacy_module_credits.lua",
+      "old_sha256": "EB6E25EA62C46D8B104F6C6218FD42EF156D863B31C052EDF879E86A25067B81",
+      "new_sha256": "EB6E25EA62C46D8B104F6C6218FD42EF156D863B31C052EDF879E86A25067B81",
+      "equal": true
+    },
+    {
+      "path": "source/runtime/legacy_cannon_credits.lua",
+      "old_sha256": "60FEE07DBFC9590F5426925E05CA287FC386DCDE5C2BF8EC405B99D2BA920DCD",
+      "new_sha256": "60FEE07DBFC9590F5426925E05CA287FC386DCDE5C2BF8EC405B99D2BA920DCD",
+      "equal": true
+    },
+    {
+      "path": "source/research/legacy_module_credit_definitions.lua",
+      "old_sha256": "98182E7F7C8294678DDFC01CE45C2CC23616B622039D8FDB952E5CCACB567AC7",
+      "new_sha256": "98182E7F7C8294678DDFC01CE45C2CC23616B622039D8FDB952E5CCACB567AC7",
+      "equal": true
+    },
+    {
+      "path": "source/research/legacy_cannon_credit_definitions.lua",
+      "old_sha256": "9B16B3151F996016DA0CD155BF33281EE69AB6E3FE6D0B0B8B34E564C15E7028",
+      "new_sha256": "9B16B3151F996016DA0CD155BF33281EE69AB6E3FE6D0B0B8B34E564C15E7028",
+      "equal": true
+    },
+    {
+      "path": "source/research/historical_settings.lua",
+      "old_sha256": "F23AABE1910B6624C7B885E127AE5390063FB3E0381BA0EC71BB5829F3D0DBB7",
+      "new_sha256": "F23AABE1910B6624C7B885E127AE5390063FB3E0381BA0EC71BB5829F3D0DBB7",
+      "equal": true
+    },
+    {
+      "path": "source/api/v1/runtime.lua",
+      "old_sha256": "5FA121E602EF99CC67DAE4C1E17C5334A8FB26BBEF97F00BF0AE9AE242D9C873",
+      "new_sha256": "5FA121E602EF99CC67DAE4C1E17C5334A8FB26BBEF97F00BF0AE9AE242D9C873",
+      "equal": true
+    },
+    {
+      "path": "source/research/generator.lua",
+      "old_sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526",
+      "new_sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526",
+      "equal": true
+    }
+  ],
+  "migration_names_modes_blobs": [
+    "100644 blob 014ca09a8864fab28275dafcf02f0295c8cac229\tsource/migrations/more-infinite-research_2.0.5.json",
+    "100644 blob 0faf1db024013eab38164432037b51c37d052f00\tsource/migrations/more-infinite-research_2.1.0.json",
+    "100644 blob fc59c77d1a43c547ec261e57676a1d1df187c21a\tsource/migrations/more-infinite-research_4.7.0.json",
+    "100644 blob e798b97979f9432bc3970938e5e412311aac6e6e\tsource/migrations/more-infinite-research_5.0.11000.json"
+  ],
+  "original_receipt_capsules": [
+    {
+      "chain": "F100\u2192F210",
+      "capsule_path": "spec/evidence/published473-f100-f210-native-receipts-r05.json.gz",
+      "capsule_sha256": "D112234590E82EBCFA3E026EBDF1D98F06B4E29FCBDAD2F1382DD2B7F65E0069",
+      "compressed_bytes": 65067,
+      "decoded_bytes": 335752,
+      "decoded_sha256": "2586644F42CA44FF88A49580C3E62FEDC9CCD53510DA2771FC9FEED4193A36C2",
+      "verified_body_count": 29
+    },
+    {
+      "chain": "F110\u2192F210",
+      "capsule_path": "spec/evidence/published473-f110-f210-native-receipts-r01.json.gz",
+      "capsule_sha256": "CF4979E7397CB0B29F631DC515A99A7B1CD3290C88253F3DA202B22B9F2C3488",
+      "compressed_bytes": 49256,
+      "decoded_bytes": 225457,
+      "decoded_sha256": "6810D01B6DDB88B022823CDDCBE6B79A7E8A1325D293CA23C254DB140A4E7A92",
+      "verified_body_count": 28
+    },
+    {
+      "chain": "F200\u2192F210 C563",
+      "capsule_path": "spec/evidence/full-catalogue-f200-f210-c563-native-receipts-r01.json.gz",
+      "capsule_sha256": "0FF0B7493DEB3551F3E8C33C2738DFDD8E24B50BFF419AA93E4181BA5910FC4B",
+      "compressed_bytes": 71007,
+      "decoded_bytes": 281983,
+      "decoded_sha256": "289D72A9415DBF4689B97BDA222E7686C132593CC16A313AEFCB929DDB611D1E",
+      "verified_body_count": 36
+    }
+  ],
+  "changed_consumed_paths": {
+    "not_total_byte_reuse": "Modern construction,product-target extension,bootstrap,catalogue,native_credits and lifecycle changed;equal legacy readers alone do not qualify these routes.",
+    "active_Base_change": "Current data-final-fixes107-171 collects five manufacturing groups on F200/F210 Base as well as applicable SpaceAge paths;Base is not exempt.",
+    "retained_direct_boundary": "The direct/native declaration contracts and Base definition table remain unchanged. Examined modern constructor changes are conditional inherited-time/ingredients/provider/retired-work paths,not a rewrite of the exact Base direct saved-field contract. New Bob cancellation authority is absent from the Base+own-fixture closures.",
+    "zero_first_entry": "native_credits completed_infinite=level-1+(researched and1 or0). A newly introduced level1/unresearched main and zero carriers have completed0/offset0;preflight_family_transition570 takes the zero-earned/no-private-investment branch without a historical paid mask. This is valid because original source emission forbids those1.x recipe families,not because their values were omitted from old logs.",
+    "paid_first_entry": "An earned main with no complete history requires an independently admitted old mask. Current m4_base requires plainBase and an exact supported old/new engine/version event;fixture/observer mods make that context false. Do not infer a prior paid mask from current collected output."
+  },
+  "routes": [
+    {
+      "route": "published4.7.10003 F100 -> F210",
+      "decision": "Accept bounded preservation applicability of the existing original direct/native-field observations;no indispensable new run is identified solely for the examined current changes.",
+      "original_evidence": "spec/evidence/published473-f100-f210-native-chain-r05.json",
+      "original_candidate_source": "42032477d45ced683e72736a4fe30a7a3195b995",
+      "original_candidate_sha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+      "enhanced_source_sha256": "0381F33BAC7F229D9697C486B68B6F14D975B1D79FE5C88D7EE663EBFEE4ACA9",
+      "original_completed_save_sha256": "4CA6D387B92CECDAFCF82F20D5808E7259368B4DC619CB4BE07350943066629B",
+      "independent_expected_state": [
+        "Retain the exact23 observed rows,source-recorded native levels/effects and foreign disablement;queued42% and detached27% work remain.",
+        "Keep laser2.2,inserter2,stack/bulk4 and the original finite7-laser/1-inserter source seeding distinction. Reused source lab remains one,not a new historical earned run;original successor lab remains one.",
+        "At first current entry,the five formerly unsupported manufacturing mains are new/unearned:level1,researched=false,no inherited queue or saved work;new signed carriers contribute0. Do not invent credit or label the original capsule as having measured these current rows."
+      ],
+      "limits": "Exact original Base+historical-transition fixture/settings closure and protected enhanced source only. Original two-cold-reload/native identities remain unchanged;this is not a new6360 native result,new manufacturing-family earning or all-provider equivalence."
+    },
+    {
+      "route": "published4.7.11003 F110 -> F210",
+      "decision": "Accept the same bounded preservation applicability;no indispensable additional run is identified solely for the examined changes.",
+      "original_evidence": "spec/evidence/published473-f110-f210-native-chain-r01.json",
+      "original_candidate_source": "b2e9243dacf8c10f623fe90ddac957329fbf1d9e",
+      "original_candidate_sha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B",
+      "protected_source_save_sha256": "D524AA78440F242B179A1E9BC40BF89B87C1A66E99F64C14D3250DEAEBB69253",
+      "original_completed_save_sha256": "B60A5F0F1147CB4AEFB3C55572FFC5F360BC2B8C00455F8CDE570B5EEB021202",
+      "independent_expected_state": [
+        "Retain original17 rows,16 seeded rows,one reused source direct lab and one successor direct lab.",
+        "Preserve queued42%,detached27%,foreign disablement,inserter2 and bulk4 plus all original per-row snapshots.",
+        "The same five newly introduced manufacturing groups must enter unearned0/zero-carrier state;do not use missing old serialized fields as their proof."
+      ],
+      "limits": "Exact original Base+transition-fixture/settings/protected-source route only. Preserve original two cold reloads and adverse preparations;do not relabel as current native or MIR1.1-origin evidence."
+    },
+    {
+      "route": "published4.7.20003 F200/2.0.77 -> F210/2.1.23 C563",
+      "decision": "Preserve the original exact C563 pass;do not accept whole current-route reuse because the active first-paid-family admission has changed.",
+      "original_evidence": "spec/evidence/full-catalogue-f200-f210-c563-native-chain-r01.json",
+      "original_frozen_source": "1c90ceb7f0096fa6ccbcb9fc369fae699889c866",
+      "original_candidate_sha256": "C563CB5B96C9E64CB3373BDB60CF5C8B7D3C97E93EADB8F924443C703CDC024D",
+      "original_completed_save_sha256": "1C0BC8335E91B70E01744A7DCF8ABD2915ACD7E457C4B5F7D168E11FDD4D22FA",
+      "independent_expected_state": [
+        "Retain all54 original level-backed public rows and their per-row snapshots;the five manufacturing mains are explicitly seeded to prototype.level+1 and checked,not absent merely because emitted markers aggregate54.",
+        "Preserve original queued42%,paused27%,source/successor gear lab1/1 and foreign rights. The old20 zero-credit rows are an original witness count,not an asserted current carrier count.",
+        "For a genuinely known published Base paid mask,retain only the independently owed per-recipe effect and investment;newly collected recipes get no invented old credit. All current carrier/complete-history changes must reflect that independently known source mask."
+      ],
+      "current_guard": "C563 loads its full-catalogue fixture and active-mods observer. Current legacy_family_context plain_base is false;with seeded completed>0 and no complete prior collected-family history,the unknown-first-paid-mask refusal applies if that state reaches current preflight. This is a source applicability limitation,not a newly executed failure or a generic product defect.",
+      "remaining_executable_boundary": "Observe current6360 with a genuinely matching published4.7.20003/Base2.0.77 paid source and independently known five-family mask through the supported2.1.23 exact_hop closure;retain paid/native/direct state,queue/current/detached investment,and the existing saved-successor/two-cold-reload outcome. Root may inspect retained C563 inputs or another genuinely matching old-source continuation. No fixture whitelist,mask inferred from candidate,new harness or every-route/beta requirement is prescribed."
+    }
+  ],
+  "corrected_possible_input_reference": {
+    "private_commit": "c1072002b9685f8163d6e2934de18593d69d6537",
+    "directory": "evidence/sourceb-published473-base-native-chain-r01",
+    "actual_source": "Published4.7.21003 on Base2.1.23 with only base+MIR active.",
+    "source_save_sha256": "A59EB2F9898F43D6E214FC30B9965FF90CF2ABEF8AFA5FD0024D860DF9B81B92",
+    "basis": "Verified all69 original bodies;source/actual/result.json is source record13 and explicitly names thisF210 source. No F200 record path occurs in the capsule.",
+    "decision": "Useful for its original same-engine F210 Base route only. It is not the matching F200/2.0.77 source for exact_hop and cannot replace or relabel C563."
+  },
+  "remaining_work": "Black Glass retains execution ownership of the affected published4.7.20003/Base2.0.77 paid-state transition through the supported2.1.23 closure. Inspect matching retained inputs first. Do not broaden legacy admission to fixture mods or infer an old paid mask from candidate output. The two1.x preservation scopes need no new run solely for the examined changes.",
+  "limits": [
+    "All three actual destinations were Base-only plus their own fixtures;none loaded SpaceAge.",
+    "Original93-body receipts,source enhancements,seeding/source-lab distinctions and every adverse preparation remain unchanged.",
+    "This review does not establish all editions,changed providers/settings,physical production,multiplayer,performance,release or stable acceptance.",
+    "No arbitrary state recovery is authorized if a purported1.x input actually contains paid/queued/saved manufacturing work;that would invalidate the zero-earned applicability premise and require independent source-mask resolution.",
+    "All nine same-edition routes, seven older-contract groups, complete supported-profile/API coverage and stable release remain separate finite obligations. Inventory completeness remains false."
+  ],
+  "native_execution": false,
+  "old_results_relabelled": false,
+  "product_source_changed": false,
+  "new_beta_gate": false
+}

@@ -9,6 +9,93 @@ import test_native_credit_definitions as fixed_fixture
 
 
 class NativeFamilyCreditDefinitionTests(unittest.TestCase):
+    def test_published_m4_base_masks_match_independent_captures_and_are_detached(self):
+        root = Path(__file__).resolve().parents[1]
+        expected = {}
+        for edition in ("f200", "f210"):
+            inventory = json.loads((root / "spec/inventory" / ("modern-" + edition + "-470.json")).read_bytes())
+            profile = next(p for p in inventory["profiles"] if p["id"] == "base-" + edition)
+            additions = profile["published_output"]["data"]["additions"]
+            for family in ("low_density_structure", "plastic", "processing_unit", "rocket_fuel", "steel"):
+                row = next(r["row"] for r in additions if r["type"] == "technology"
+                           and r["name"] == "recipe-prod-research_" + family + "-1")
+                self.assertEqual(len(row["effects"]), 1)
+                effect = row["effects"][0]
+                self.assertEqual(effect["type"], "change-recipe-productivity")
+                key = "research_" + family
+                if key in expected:
+                    self.assertEqual(expected[key], effect["recipe"])
+                expected[key] = effect["recipe"]
+        self.lua.globals().old_base_recipes = self.lua.table_from(expected)
+        self.lua.execute('''
+          local contracts=require("research.native_credit_contracts")
+          for _,version in ipairs({"4.7.20003","4.7.21003"}) do
+            local mask=assert(contracts.published_m4_base_paid_recipe_sets(version))
+            local count=0
+            for family,recipes in pairs(mask) do
+              local recipe=assert(old_base_recipes[family])
+              assert(recipes[recipe]==true and next(recipes,recipe)==nil);count=count+1
+            end
+            assert(count==5)
+            mask.research_plastic["plastic-bar"]=false;mask.fake={unearned=true}
+            local again=contracts.published_m4_base_paid_recipe_sets(version)
+            assert(again.research_plastic["plastic-bar"] and again.fake==nil)
+          end
+          for _,version in ipairs({"4.7.20002","4.7.21004","5.0.21003",false,{}}) do
+            assert(contracts.published_m4_base_paid_recipe_sets(version)==nil)
+          end
+          assert(contracts.published_m4_base_paid_recipe_sets(nil)==nil)
+        ''')
+
+    def test_data_only_base_masks_are_exact_original_contracts_and_detached(self):
+        root = Path(__file__).resolve().parents[1]
+        self.lua.globals().original_fixture_root = (root / "tests/fixtures/migration-origins").as_posix()
+        self.lua.execute(r'''
+          local contracts=require("research.native_credit_contracts")
+          local expected={research_low_density_structure="low-density-structure",research_plastic="plastic-bar",
+            research_processing_unit="processing-unit",research_rocket_fuel="rocket-fuel"}
+          for _,case in ipairs({{"1.1.0","110"},{"1.2.0","120"}}) do
+            local old=assert(loadfile(original_fixture_root.."/f200-"..case[2].."-source/catalogue.lua"))()
+            local mask=contracts.published_data_only_base_paid_recipe_sets(case[1])
+            local count=0
+            for family,recipe in pairs(expected) do
+              local effects=assert(old.rows["recipe-prod-"..family.."-1"]).effects
+              assert(#effects==1 and effects[1].recipe==recipe and effects[1].change==.1)
+              assert(mask[family][recipe]==true and next(mask[family],recipe)==nil)
+              count=count+1
+            end
+            local actual=0;for family in pairs(mask) do assert(expected[family]);actual=actual+1 end
+            assert(count==4 and actual==4 and mask.research_steel==nil
+              and old.rows["recipe-prod-research_steel-1"]==nil)
+            mask.research_plastic["plastic-bar"]=false;mask.research_steel={fake=true}
+            local again=contracts.published_data_only_base_paid_recipe_sets(case[1])
+            assert(again.research_plastic["plastic-bar"] and again.research_steel==nil)
+          end
+          for _,version in ipairs({"1.0.1","1.1.1","1.2.5","1.2.9","4.7.20003","5.0.20006"}) do
+            assert(contracts.published_data_only_base_paid_recipe_sets(version)==nil)
+          end
+        ''')
+
+    def test_original_100_conditional_mask_does_not_claim_a_complete_source_roster(self):
+        # Numeric tag1.0.0 config/util/tech-gen, also verified against public
+        # ZIP C328D8F9: each of these nongroup streams targets one Base item at
+        # .10. Conflict trimming can retain its recipe or suppress the identity.
+        self.lua.execute(r'''
+          local contracts=require("research.native_credit_contracts")
+          local expected={research_low_density_structure="low-density-structure",research_plastic="plastic-bar",
+            research_processing_unit="processing-unit",research_rocket_fuel="rocket-fuel"}
+          local mask=assert(contracts.published_data_only_base_paid_recipe_sets("1.0.0"))
+          local count=0
+          for family,recipes in pairs(mask) do
+            assert(expected[family] and recipes[expected[family]]==true)
+            local n=0;for recipe in pairs(recipes) do assert(recipe==expected[family]);n=n+1 end
+            assert(n==1);count=count+1
+          end
+          assert(count==4 and mask.research_steel==nil)
+          mask.research_plastic["plastic-bar"]=false
+          assert(contracts.published_data_only_base_paid_recipe_sets("1.0.0").research_plastic["plastic-bar"])
+        ''')
+
     def test_settings_stage_never_imports_credit_construction_or_recipe_collection(self):
         root = Path(__file__).resolve().parents[1]
         editions = json.loads((root / "targets/editions.json").read_bytes())["targets"]

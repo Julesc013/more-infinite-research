@@ -60,4 +60,30 @@ function M.published_beta_base_paid_recipe_sets()
   return out
 end
 
+-- These exact MIR4 Base producers have the same five one-product families.
+-- With Base alone each retained public identity can only have paid its named
+-- recipe. Startup tuning may suppress a family, but cannot select another
+-- recipe mask for its retained investment. This grants no provider rights.
+function M.published_m4_base_paid_recipe_sets(version)
+  if version ~= "4.7.20003" and version ~= "4.7.21003" then return nil end
+  return M.published_beta_base_paid_recipe_sets()
+end
+
+-- Published data-only 1.0.0/1.1.0/1.2.0 Base research. In 1.0 conflict
+-- trimming can suppress a whole one-recipe family; these are conditional
+-- earning masks, not a claim that every family existed in an old save.
+-- Steel was not authored and cannot carry investment from these sources.
+local PUBLISHED_DATA_ONLY_BASE_RECIPES = {
+  research_low_density_structure="low-density-structure",
+  research_plastic="plastic-bar", research_processing_unit="processing-unit",
+  research_rocket_fuel="rocket-fuel",
+}
+
+function M.published_data_only_base_paid_recipe_sets(version)
+  if version ~= "1.0.0" and version ~= "1.1.0" and version ~= "1.2.0" then return nil end
+  local out = {}
+  for family, recipe in pairs(PUBLISHED_DATA_ONLY_BASE_RECIPES) do out[family] = {[recipe]=true} end
+  return out
+end
+
 return M

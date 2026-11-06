@@ -1,0 +1,408 @@
+{
+  "schema": 1,
+  "kind": "MIRDataOnlyPaidFamilyRestorationV1",
+  "status": "bounded-1.0-1.1-1.2-native-components-accepted; whole-older-groups-and-stable-not-ready",
+  "scope": "Consolidates the original four-family correction and its independently reviewed settings/conditional1.0 follow-ups with the exact accepted Base1.0/1.1/1.2 source, first-entry, useful gear, native reset, save and separate-cold components below. The1.1/1.2 executions retain source2a and0707/08F2 packages; bounded applicability to128f/source4729 is separate. The1.0 execution actually uses128f. No whole older-contract group or seven-group preservation gate is closed.",
+  "original_sources": [
+    {
+      "path": "spec/evidence/migration-origin-110-f200-source-native-chain-r05.json",
+      "sha256": "CE2D69921C3792238AD369DE7576376C4778542C5C89AAA4708A10FC789974D8"
+    },
+    {
+      "path": "spec/evidence/migration-origin-120-f200-source-native-chain-r06.json",
+      "sha256": "7B3010BE4BF66F98E3F2F2C9EA6BBD1CDEBA8C5DAF689BC65AEC10E7EA34208C"
+    }
+  ],
+  "original_source_fixture_commits": [
+    "bec37fb87a05d17cf4cf0225e0458218830fef63",
+    "e26bb227bf46f626964d1f3bfe272a6b36832c4d"
+  ],
+  "independent_source_facts": {
+    "native_1_1_rows": 31,
+    "native_1_2_rows": 34,
+    "manufacturing_state": "Each original fixture sets every non-gear row to prototype.level+1, asserts researched=false and resets effects on player/foreign/detached forces. Four named manufacturing identities therefore carry one fixture-seeded completed level. Only gears are lab-earned.",
+    "paid_recipes": {
+      "research_low_density_structure": "low-density-structure",
+      "research_plastic": "plastic-bar",
+      "research_processing_unit": "processing-unit",
+      "research_rocket_fuel": "rocket-fuel"
+    },
+    "per_level_change": 0.1,
+    "steel": "Not authored in either original roster; no old paid/queued/saved steel state is inferred.",
+    "receipt_limit": "Retain the exact original protected saves, source counts, private module/cannon rights, foreign state and adverse receipts. A derived pure-world input needs its own observations; original gear acceleration/game.speed16 are not silently ordinary tuning."
+  },
+  "implementation": {
+    "author": "bd06e00ef1ed870a7216a7788d884d16345c3b9f",
+    "integrated_dev": "895937a320f99aef492653851584fbfaadb918b1",
+    "player_tree": "5366e4c29f68ef2835281929f38704910eb3dd6d",
+    "pr": 1744,
+    "paths": [
+      "source/research/native_credit_contracts.lua",
+      "source/runtime/native_credits.lua"
+    ],
+    "behavior": "An exact known four-recipe mask may establish the first baseline in plain Base with unchanged startup settings and the exact2.0.77 same-engine or2.0.77-to2.1.23 event. New recipes receive no old credit. Unexplained investment in absent steel refuses. Complete MIR5 histories retain priority. No fixture/provider whitelist or candidate-derived old mask."
+  },
+  "independent_review": {
+    "sha256": "460B2E30347E8C85CDB6230573979A1367B468D2342E8D66EAC27B3D68F3B4ED",
+    "private_commit": "7389bf4bf8dd00147bc65392c0d6eb1f8001af4b",
+    "private_path": "evidence/aero-data-only-paid-families-r01/source-review.json",
+    "extraction_sha256": "27C9F9123519CF2FF46296F11727D533E03AAC5D1FA8406ED6E1B41500AC8E4F"
+  },
+  "host_evidence": {
+    "negative_control": "The new positive preservation control fails on unchanged delivered506 source with the unknown-first-paid-mask error in all four source/destination subcases.",
+    "focused_controls_passed": 110,
+    "exact_author_required_checks": "All four pass atbd06e00e.",
+    "independent_expectations": [
+      "tests/test_native_family_credit_definitions.py",
+      "tests/test_native_family_paid_credits.py"
+    ],
+    "preserved_originals": "7389bf4bf8dd00147bc65392c0d6eb1f8001af4b:evidence/aero-data-only-paid-families-r01/",
+    "native_execution": false
+  },
+  "internal_packages": {
+    "f200_sha256": "2131B14D14D8F7C527AEA3D5A7C264489E645A9BA279F16D4AD2F2F3AEFAD7AC",
+    "f210_sha256": "D4113DBA8726FA2515834A58734219402344168BB9FA47944403306AAAD20C7C",
+    "correspondence_sha256": "D935159DD3B552A2E79E6C5B9685FF37BCC1147FACC137EF46B7E4BFC4985999",
+    "limit": "Only the two reviewed Lua files differ from delivered506; all475 members/CRCs/Git projections match their records. These are internal inputs, not replacement public506 assets."
+  },
+  "remaining_native_work": {
+    "owner": "Black Glass",
+    "default_routes": "The exact1.0 and1.2 default F200/F210 source/first-entry/useful-gear/reset/save/two-cold components below are accepted, alongside the existing1.1 components. Their old pending entries are closed only at that scope. Whole older-contract groups, other affected routes and global stable acceptance remain NOT READY.",
+    "disabled_module_route": "The exact MIR1.1-to-F210 direct first-entry modules=false path now passes the recorded pre-lab and useful-work/save/two-cold components below. Other source versions or settings changes need their own affected evidence. The actual startup-change event flag was not exported or invented; effective startup values and disabled public/module prototype state were observed.",
+    "guard_limits": "Unknown providers/settings/versions/engines and active observer/fixture mods are not silently admitted. A source/input discrepancy is not permission to weaken a guard or change the oracle.",
+    "conditional_1_0_route": "Actual unchanged-source observations now establish all four manufacturing families paid within the protectedF8B38209-derived21-row input. Both exact128f destinations preserve that state through the recorded first-entry/work/reset/save/cold components. This does not qualify every conditional trim mask or arbitrary scripted offsets; the manual-mining sentinel qualification below remains explicit."
+  },
+  "old_review_naming": "The1.2/boolean records labelled505 refer to old7a2f9322/player505837/source5.0.0, not published MIR5.0.5. Their original fields, receipts and verdicts remain unchanged.",
+  "native_acceptance": false,
+  "stable_acceptance": false,
+  "published_bytes_replaced": false,
+  "followup_source_units": [
+    {
+      "pr": 1746,
+      "author": "2a8e85e6ed636da494275f564d1fe87e57e9898f",
+      "player_tree": "79775e0e6deab30a7647d2768e4e8c800c4e2342",
+      "behavior": "The independently fixed1.1.0/1.2.0 masks admit either explicit boolean startup-change flag. Unknown flag types, other source versions/providers/engines and complete-history priority remain guarded. Actual effective modules=false/plastic17% host controls compare direct first entry with staged retuning.",
+      "focused_controls_passed": 111,
+      "independent_review_sha256": "79A6C9BA5D5BB56CA9364193FC13CCE45BD293D02B44ED4AFC287466BAACBC7F",
+      "review_custody": "3a0619464509008e45004a213eb5f7d753356396:evidence/aero-data-only-settings-transition-r01/",
+      "internal_f200_sha256": "070703B034875BF6588E529556C32AB93D36B0860AC451DCE0BAD5EB82AE65CB",
+      "internal_f210_sha256": "08F2D22C6988A1B0F31679A4AF3CDB4D8F30E63FD6F9EE38548BBAFE53D34932",
+      "required_author_checks": "All four pass at the exact author; merged through PR1746. The three1.1 native components retain the actual2a author/package identities below.",
+      "integrated_dev": "6929ec3edf54fe6742af18a077dbee7895dffbee"
+    },
+    {
+      "pr": 1748,
+      "author": "0b985ba6e7a868ea22f9beeec3ba5e1eaf83013c",
+      "player_tree": "e28d7409ac3cd1f31ddbe077ee4a9aa3dd569973",
+      "behavior": "Exactly1.0.0 joins the finite plain-Base declaration. Its original conflict trimming can suppress a whole one-recipe family. This is a conditional earning mask for retained investment, not proof that all four occurred in the21-row source. A newly unearned family receives zero prior credit.",
+      "published_archive_sha256": "C328D8F958BEC2A44297E94E83B1A956D76BEA5E333601A42FDDE60F4155472F",
+      "producer_correspondence_sha256": "645896B381C4E07E72FA547E107AA50CF94A74E8A7271C78ED17CAFBC5EB4ED8",
+      "source_fixture_note": "The retained r01 failed source log names plastic; corrected source control seeds each emitted non-gear row. The aggregate21 rows do not serialize a complete four-family ledger.",
+      "focused_controls_passed": 113,
+      "negative_control": "One definition refusal and six paid-mask errors on the prior source; the new source passes the suppressed/unearned, paid, changed-settings and foreign-state controls.",
+      "independent_review_sha256": "F5DEF56308A50E06991886E6D8A2A644B277645FE1FD0084E069CA28407B01CE",
+      "review_custody": "ca5dcfc695476fafb853e1d07b5a6d4dc69baf1d:evidence/aero-source-navigation-paid100-r01/",
+      "required_author_checks": "All four pass at original0b and refreshedb192; normal-merge correspondence preserves the exact reviewed incremental patch. PR1748 mergedcadf and all four integrated-head checks pass.",
+      "native_execution": false,
+      "refreshed_author": "b192e85084821eacb6b34fd0cbad7d2562ac4fd1",
+      "integrated_dev": "cadf7eba4e2de8747a8d1362c0268c68fd4b455f"
+    }
+  ],
+  "native_1_1_components": {
+    "status": "accepted-bounded-components-not-whole-group",
+    "actual_source": "2a8e85e6ed636da494275f564d1fe87e57e9898f",
+    "actual_player_tree": "79775e0e6deab30a7647d2768e4e8c800c4e2342",
+    "published_source": {
+      "version": "1.1.0",
+      "archive_sha256": "6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
+      "protected_original_save_sha256": "88FC8E9891040275E001930C3E6AA0A4A7A28C31D81DF30E3F08AEDD98E5019A",
+      "helper_free_derived_save_sha256": "45204B6FDB92CF4933DCE9C1D10A2B01E669312A87228874A029D70B460BF4B4",
+      "preparation_review_sha256": "1B0B4708B4ABED777BB691999AD0314BC577401C567788296792A68DFCBA52C5",
+      "limit": "The derived published1.1 source and two cold observations contain Base/MIR only. Original fixture-seeded non-gear contributions and prior accelerated gear work are preserved, not called additional lab-earned manufacturing research. Restoring published gear costs retains foreign0.42/detached0.27 research-unit equivalents, rather than retaining their accelerated-cost progress fractions."
+    },
+    "engines": [
+      {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      }
+    ],
+    "arms": [
+      {
+        "target": "f200",
+        "modules_enabled": true,
+        "archive_sha256": "070703B034875BF6588E529556C32AB93D36B0860AC451DCE0BAD5EB82AE65CB",
+        "prelab_save_sha256": "CF8DFC1D1C37679B416F533BF14F3359330C44E463948A9A898E0D0749A1CBE9",
+        "work_save_sha256": "56598A69E7AFD30023EE368D17BAD3325CB58A6FF08B26B2DA2BD0AABBB0D500"
+      },
+      {
+        "target": "f210",
+        "modules_enabled": true,
+        "archive_sha256": "08F2D22C6988A1B0F31679A4AF3CDB4D8F30E63FD6F9EE38548BBAFE53D34932",
+        "prelab_save_sha256": "4B09A3D43EA45EADC2463F01A875CCFA947AB97292D46286C3DC8320EAEE7D85",
+        "work_save_sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD"
+      },
+      {
+        "target": "f210",
+        "modules_enabled": false,
+        "archive_sha256": "08F2D22C6988A1B0F31679A4AF3CDB4D8F30E63FD6F9EE38548BBAFE53D34932",
+        "prelab_save_sha256": "C93FB73564A2284CBAB79BFEA8265F129F4E6D4B02A5E3BF3E63FB03BC4D3A46",
+        "work_save_sha256": "6149769AEA7BFB221FA7664E10EC8DBA62EB7B839FAEDF16132673B4251836AA"
+      }
+    ],
+    "prelab": {
+      "private_commit": "31445c7c4e8c1afab6007e0bac61921041c9ec1a",
+      "private_path": "projects/mir/runs/data-only-110-prelab-r01/",
+      "capsule_sha256": "C8B418237B00D941053E305C960296761F091CDBCF3D056746E6DF284385719F",
+      "exact_safe_originals": 50,
+      "accepted_successor_instances": 9,
+      "saved_successors": 3,
+      "separate_cold_reloads": 6,
+      "state_review_sha256": "37EEC8052AB3FC590CFBC6E224F89E0FD6316B0A7319E2777A1FFBE223011638",
+      "parent_review_sha256": "D04B7ED8909765F4B8643D562D298A8947C9AE5FD8092859147B004728462E8F",
+      "observation": "All31 old row levels and71 old recipe totals survive across three forces; new collected/steel rights remain zero. Foreign queue/detached research-unit investment, battery bonus,42selected startup booleans and module credits survive. First-entry modules=false keeps public/prototype disabled and private module holders at level2, retaining the old0.11 tier1 totals."
+    },
+    "useful_work": {
+      "private_commit": "d512c2aafb04e2955910ec60d8694cc134f57143",
+      "private_path": "projects/mir/runs/data-only-110-useful-work-r01/",
+      "capsule_sha256": "D2FA34372C6D1791C8E92AC9C9E45D3B010ED1BF0856EDAB57927BCD0D639080",
+      "decoded_sha256": "DC3FFF2B9EABD4F11DA89914D6686B42A97028D6FECF6EF88804A2350BFD51C8",
+      "exact_safe_originals": 235,
+      "actual_source_bindings": 32,
+      "accepted_instances": 9,
+      "new_research_completions": 3,
+      "saved_successors": 3,
+      "separate_cold_reloads": 6,
+      "parent_correspondence_sha256": "1B92DBE1323947CCB379AD59D231A80BABA9722D3BF801FEFA842022DC1A895E",
+      "state_review_sha256": "70B59CF78EE99BDF0D107174D6BB8C9CFCDBB94C7FB3C53FDB8CAFC83D7DB0AB",
+      "observation": "Each arm completes one native gear level2-to3 research at unchanged16000-unit/60second cost using1000ordinary fixture labs at game.speed16. Exactly16000of each of the four science packs is consumed before fixture cleanup; gear bonus becomes0.20. Native reset, full old-state/foreign/queue/module checks, a saved successor and two separate cold readbacks pass.",
+      "independent_tolerance": "All independently recomputed old31-row/71-recipe expectations pass1e-8; largest observed absolute error2.98023223e-9. Existing controller1e-7 predicates are unchanged; the independent review does not claim they were1e-8.",
+      "stops_and_scheduling": "All nine accepted instances are exit-1 completion-predicate governor stops, not natural engine exit0. Their219.018090direct-native seconds are scheduling observations only.",
+      "adverse": "The separate F210default-r01 process completed gear research but failed its fixture finish on read-only LuaEntity.active before reset/post-state/save. Its original failure remains failed. The correction only clears owned lab inventories/energy and stops the owned power interface; cost/effect/reset assertions remain unchanged."
+    },
+    "applicability": {
+      "reviewed_dev": "cadf7eba4e2de8747a8d1362c0268c68fd4b455f",
+      "reviewed_player_tree": "4729b97b28056ef7fd02f500023192c4673dc9f1",
+      "prelab_review_sha256": "BAC13BDEB3E941B24D6D956924D42601F7E770EBBDEF363F3137E292F2D76798",
+      "useful_work_review_sha256": "E9B41859B4626DB852EA171D1241395EE4BE7279AEA377B05C20CE4A83550F7A",
+      "decision": "The2a-to-cadf delta is package-excluded sourceREADME and the exact1.0-only declaration/comment. Consumed1.1 construction/settings/caps/credit/completion/reset/save paths are unchanged. Reuse is accepted only for these three1.1 arms under their original2a package/controller identities; no newcadf native execution is claimed."
+    },
+    "custody_limit": "Independent review verifies safe originals and committed controller/source correspondence. Raw credential-bearing logs/argv/resource ledgers and saved successor binaries remain the native owner's hash-verified primary/secondary local custody; no direct Aero binary/rawlog inspection is claimed.",
+    "not_claimed": [
+      "physical science manufacture",
+      "performance",
+      "UI/client/API parity",
+      "MIR1.0 or1.2 qualification",
+      "whole older-contract group",
+      "stable acceptance",
+      "replacement of published5.0.6 bytes"
+    ]
+  },
+  "native_1_0_components": {
+    "status": "accepted-bounded-components-not-whole-group",
+    "actual_source": "128f6945b8ffcc46b863ecb86e6038277faa77d1",
+    "actual_player_tree": "4729b97b28056ef7fd02f500023192c4673dc9f1",
+    "published_source": {
+      "version": "1.0.0",
+      "archive_sha256": "C328D8F958BEC2A44297E94E83B1A956D76BEA5E333601A42FDDE60F4155472F",
+      "protected_original_save_sha256": "F8B38209DA632C8B2EFA049C8F69CDB3E3EC01F6BEE0C5D03BAFF03C27989C54",
+      "helper_free_derived_save_sha256": "3E17EACF4A8078FD3B8E1BCDBAF609F0B5E43BE27E49AF9E91589187C65AB196",
+      "frozen_source_ledger_sha256": "73B449289438BBAD47A9F4BDFD2F4D6E7A1C1FB41435F31008EC397DFCFD9AAE",
+      "source_raw_state_sha256": "EF9248BBC56A391B76F2606E2B012C361AE0F039CEB9BBCA4ADCB6E54540CE92",
+      "observation": "Three unchanged published-source observations, including two separate cold reloads, establish21 paid rows/39 recipe totals and31 raw startup booleans on player/foreign/detached. All four manufacturing families actually carry paid state; this follows from the frozen source ledger, not from the aggregate21 count. Original fixture-seeded rights remain distinct from the original gear lab. No module/battery investment is imported from1.1."
+    },
+    "engines": [
+      {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      }
+    ],
+    "arms": [
+      {
+        "target": "f200",
+        "archive_sha256": "F8A55069E2C44A8FE356670F66637FF71377F9FF015ABC6C46A36248EC5FC9CD",
+        "prelab_save_sha256": "2CF624B5C9269F30086269F6A400E42DC79C5C194D86B8CEE09F1EB7A23F3DFD",
+        "work_save_sha256": "CA9077D72095218D216022A8A5661BC658A6562FA50E23AB3F9729BA12D32607"
+      },
+      {
+        "target": "f210",
+        "archive_sha256": "3E6AB58201717FA8A89CFB8466EC83CC856CCC12B263F4E36EE184D64509D8BC",
+        "prelab_save_sha256": "D96A68C726A8C05F00F677F880156B970D5144FF9CF037316642A386F83830BE",
+        "work_save_sha256": "EF1735C195512D80A716D87A7DA925589013AD3C736249AEF46A037A89FB5E59"
+      }
+    ],
+    "native_batch": {
+      "private_commit": "1635a00dfc87f82628b51c9456f62740d5b58298",
+      "private_path": "projects/mir/runs/data-only-100-native-r01/",
+      "capsule_sha256": "CD0E0BD38EBECB74EFDDB8F14CF0548DAA129D84B6BB04DEACA67D9464068D08",
+      "decoded_sha256": "82258DF5A26AC1DF0BA236ADB84BCA5A35972259DB9AF542DEF2892C5FA777D5",
+      "exact_safe_originals": 168,
+      "actual_source_bindings": 39,
+      "accepted_source_instances": 3,
+      "accepted_successor_instances": 12,
+      "new_research_completions": 2,
+      "saved_successors": 4,
+      "separate_successor_cold_reloads": 8,
+      "source_cold_reloads": 2,
+      "parent_correspondence": {
+        "file": "paid100-1635-parent-custody-correspondence-r01.json",
+        "sha256": "8BA6A2CA6C6F00561374A0EAA45673659734983E7BA4CA1D17FE0E54361DCDF9",
+        "private_commit": "22bf4d38df2c2cad8f449318c290140a431c1dd8",
+        "private_path": "projects/mir/runs/aero-mir100-actual-native-review-r01/correspondence.json"
+      },
+      "package_correspondence": "Aero independently rebuilt exact128f F200/F210 packages before the read-only correspondence review. Both ZIP hashes/sizes and all475 member CRCs/lengths/hashes match the executed Root package records; neither the rebuild nor the member check is native execution.",
+      "state_review": {
+        "commit": "84aa6ff2872f94370ed4e419e421d7ffc3b47e4a",
+        "path": "projects/mir/runs/data-only-100-native-r01/independent-review-and-offset-qualification.json",
+        "git_blob": "b70812396dd58e267a8960f01cb9e8d522720b39",
+        "sha256": "69BA8EFE3300D4CF55550BDC521EF916B8D2C5A914ECDD7C0A26C86623B10FE6"
+      },
+      "observation": "Both arms preserve all21 levels and39 recipe totals, zero newly collected/steel rights, all three initial gear level2/.1 rights, foreign gears-to-advanced-circuit queue, foreign.42/detached.27 research units at16000 cost, and31 raw booleans including breeding=false. Each arm then completes one native full16000-unit gear level2-to3 research/.2, uses native player effects reset and saves with two separate cold readbacks. Two first-entry and two work saves are distinct.",
+      "work_boundary": "Each completion consumes16000of each of four science packs in1000ordinary fixture labs/game.speed16, from fixture-injected science/electricity. This demonstrates lab consumption and research, not physical science manufacture or performance.",
+      "independent_tolerance": "Independent Root state review retains1e-8; maximum effect error1.49011612e-9 and earned error2.98023223e-9.",
+      "stops": "All15 accepted instances are completion-predicate governor stops with exit-1, not natural exit0."
+    },
+    "manual_mining_sentinel": "The original.125 sentinel survives unchanged-source helper removal. Zero is observed on all three forces at first candidate entry; the cause was not isolated. The original custody phrase native configuration reset is retained in its original bytes but is not adopted as demonstrated causality. No arbitrary scripted-offset preservation verdict is made. Later explicit player native reset is a separate observation.",
+    "custody_limit": "29,022,747 raw bytes are Root hash-verified primaryD/secondaryC custody manifests. Aero checked safe bodies, historical committed launch bytes and the two own packages; it did not directly inspect native binary saves or secret-bearing raw logs/argv.",
+    "not_claimed": [
+      "all conditional trim masks",
+      "arbitrary scripted offsets/providers/settings",
+      "physical manufacture",
+      "performance",
+      "whole older-contract group",
+      "stable acceptance",
+      "replacement of public5.0.6 bytes"
+    ]
+  },
+  "native_1_2_components": {
+    "status": "accepted-bounded-components-not-whole-group",
+    "actual_source": "2a8e85e6ed636da494275f564d1fe87e57e9898f",
+    "actual_player_tree": "79775e0e6deab30a7647d2768e4e8c800c4e2342",
+    "published_source": {
+      "version": "1.2.0",
+      "archive_sha256": "880C137F7AB35FE7AF1DA5538BFA91F620C80785134DB488800352DD6154AB22",
+      "protected_original_save_sha256": "FDC9BA445B17716CAE7C021959B9B3BF4E1C7EE9F6485AA76DBCC59D70101CAC",
+      "helper_free_derived_save_sha256": "DBF8E2689209D56E60196AA569CC8A139CC3716106AEDD94033B8A460A3C8F41",
+      "source_fixture": "e26bb227bf46f626964d1f3bfe272a6b36832c4d:tests/fixtures/migration-origins/f200-120-source/",
+      "independent_successor_contract": {
+        "ref": "60c7c6538af512b899e868010e72eb9cab9722c5",
+        "path": "tests/fixtures/migration-origins/f200-120-successor/catalogue.lua",
+        "sha256": "9F3801D4AAF5DF4669458E3D18F15AC86CFEAE92A9545302D68B25F98B95E8B5"
+      },
+      "observation": "Three helper-free source observations, including two separate colds, preserve34 rows/71 recipe totals, seven finite weapon-owner histories and201 actual raw settings (177 selected original MIR settings plus24 continuation settings). Non-gear and finite-owner histories are fixture-seeded; the original gear lab is counted once."
+    },
+    "engines": [
+      {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      }
+    ],
+    "arms": [
+      {
+        "target": "f200",
+        "modules_enabled": true,
+        "archive_sha256": "070703B034875BF6588E529556C32AB93D36B0860AC451DCE0BAD5EB82AE65CB",
+        "prelab_save_sha256": "40D7D50EC7AC07756A2B758B1C1DB171605DEA3D8E7FCAE6486D6D6B0D82959D",
+        "work_save_sha256": "D1480C973EA5769782C5BC6A4625DF42E06FB53AC665234651D42797359506B4"
+      },
+      {
+        "target": "f210",
+        "modules_enabled": true,
+        "archive_sha256": "08F2D22C6988A1B0F31679A4AF3CDB4D8F30E63FD6F9EE38548BBAFE53D34932",
+        "prelab_save_sha256": "9059F57DD9D40CCCA880A6C7F1415C8B30A56D4308A06AC2E4D27CEC1F645C59",
+        "work_save_sha256": "7B00E3F2F8CC889A7E278359E19449473FCF270F0BB209757EC15DD34C442172"
+      }
+    ],
+    "native_batch": {
+      "private_commit": "d6bb94aa9e0e7c970b1db279ec4d7110136a37cb",
+      "private_path": "projects/mir/runs/data-only-120-native-r01/",
+      "capsule_sha256": "76492A7C5F8580CB3E612A66550EB3BEF4B41D154CFD057C8CE621CCB2E840B4",
+      "decoded_sha256": "85CDAE65683D7FD6AA0E5A071B5388599A90887F295363B228B764C8603B5C7E",
+      "exact_safe_originals": 166,
+      "actual_source_bindings": 41,
+      "accepted_source_instances": 3,
+      "accepted_successor_instances": 12,
+      "new_research_completions": 2,
+      "saved_successors": 4,
+      "separate_successor_cold_reloads": 8,
+      "source_cold_reloads": 2,
+      "parent_correspondence": {
+        "file": "paid120-d6bb-parent-custody-correspondence-r01.json",
+        "sha256": "75B4D52228A450F7B0555848ED745200F502EECB5EFFD8887064B7DA40F4E9FD",
+        "private_commit": "32f685abd94c5ba1a9cb813dbef5d658d79684ce",
+        "private_path": "projects/mir/runs/aero-mir120-actual-native-review-r01/correspondence.json"
+      },
+      "state_review": {
+        "file": "paid120-d6bb-independent-state-review-r01.json",
+        "sha256": "18B5A852FC6C32CCACB8DF08AA3A44D094B78EAF8002CBC99AEA91EB1DFFA3EA",
+        "private_commit": "32f685abd94c5ba1a9cb813dbef5d658d79684ce",
+        "private_path": "projects/mir/runs/aero-mir120-actual-native-review-r01/state-review.json"
+      },
+      "corrected_contract_sha256": "B877440FC2D4842F8D81BCA87D2E390D0A99635C9F8AFAEE7F87D7FDF6C758CD",
+      "observation": "All34 old rows,71 old recipe totals,201 raw settings, finite histories and zero new steel rights survive, apart from the intended extra player gear completion. Foreign gears-to-plastic queue retains.42 research units and detached idle work retains.27; at8000 cost these are fractions.0000525/.00003375, not42%/27%. Battery.1 persists. All three private module holders remain level1 with zero extra completed rights (tier totals.10/.05/.02); no1.1 holder2/.11 expectation is imported.",
+      "finite_conservation": "From originale26 and frozen60c7: saved effect minus old finite contribution plus current finite contribution for actually researched owners. Player finite1-6 gives current rocket3.5/cannon2.4; foreign1/detached0 remain unchanged; finite7 stays unresearched. Old infinite cannon/rocket credit.1 survives. Frozen policy permits hidden credit or corresponding paid public cannon state; actual observations are public cannon1 and hidden holder2 across all three forces.",
+      "work_boundary": "One full16000-unit native gear2-to3 completion/.2 per engine,60seconds per unit,1000ordinary fixture labs/game.speed16. Fixture injects32000of each four science packs;16000consumed natively and16000measured before cleanup. Native reset, save and two separate colds preserve the full checked state. No physical science manufacture/performance claim.",
+      "independent_tolerance": "Independent1e-8 checks; maximum absolute error2.98023223e-9. No widened assertion acceptance.",
+      "adverse": "Old absolute-gun comparison failed/unsaved and remains failed. Correction derives from frozen60c7 conservation, not candidate output; no product change or tolerance waiver.",
+      "stops": "All15accepted instances are exit-1 completion-predicate governor stops, not natural engine exit0."
+    },
+    "applicability": {
+      "reviewed_dev": "128f6945b8ffcc46b863ecb86e6038277faa77d1",
+      "reviewed_player_tree": "4729b97b28056ef7fd02f500023192c4673dc9f1",
+      "review": {
+        "file": "paid120-d6bb-current-applicability-r01.json",
+        "sha256": "AB428DF5F83BED8C069E5410246C0553AC228D4CB1700A14498D9AE462FEB962",
+        "private_commit": "32f685abd94c5ba1a9cb813dbef5d658d79684ce",
+        "private_path": "projects/mir/runs/aero-mir120-actual-native-review-r01/applicability-review.json"
+      },
+      "decision": "Exact2a-to128f player changes are excludedREADME and exact1.0-only enumeration/comments. The1.2 earning mask and all consumed construction/settings/credit/caps/lifecycle/completion/reset/save code remain unchanged. Bounded reuse covers these two default arms under original2a/0707/08F2 execution identities; no128f native execution is relabelled."
+    },
+    "custody_limit": "The166 safe bodies and41 committed launch bindings are checked. Native binary saves and secret-bearing raw logs/argv remain Root primary/secondary custody; no direct Aero binary/rawlog inspection is claimed.",
+    "not_claimed": [
+      "1.2 modules-disabled route",
+      "arbitrary providers/settings",
+      "physical manufacture",
+      "performance",
+      "whole older-contract group",
+      "stable acceptance",
+      "replacement of public5.0.6 bytes"
+    ]
+  },
+  "current_component_applicability": {
+    "reviewed_dev": "128f6945b8ffcc46b863ecb86e6038277faa77d1",
+    "player_tree": "4729b97b28056ef7fd02f500023192c4673dc9f1",
+    "one_point_one": "The existing2a-to-cadf independent reviews remain authoritative for their three exact1.1 arms. cadf and128f have identical source tree4729; their actual execution remains2a/0707/08F2.",
+    "whole_older_groups": "NOT READY",
+    "global_stable": "NOT READY",
+    "boundary": "Only the closed components above replace stale pending entries. Existing historical receipts, source follow-ups and all adverse outcomes remain unchanged. No full older group, candidate/release acceptance, arbitrary consumer, UI/client/API parity or stable verdict follows.",
+    "subsequent_source": {
+      "reviewed_head": "19332d2ea337543a9209d1f7083cedc6c3a202a7",
+      "player_tree": "ac4c8664ce76303ee96b65ec1dcab586e943c8c2",
+      "private_review": "c701dcc66e3acedef6eea9e64d40f692b3f181f2:projects/mir/runs/aero-mir473-engine-hop-source-r01/source-review.json",
+      "review_sha256": "4369C2EF2D742208BA843508500E430DCF1124D9EFC5C6DA2256404FF402EE34",
+      "decision": "The new MIR4 lookup is nil for1.0/1.1/1.2 and their data-only masks, precedence and consumed decisions are unchanged. Bounded component reuse retains the actual2a/128f execution identities. This does not accept the separate MIR4 native correction or whole older groups."
+    }
+  },
+  "consolidation_basis": {
+    "prior_remote_commit": "128f6945b8ffcc46b863ecb86e6038277faa77d1",
+    "prior_path": "spec/evidence/data-only-paid-family-restoration-r01.json",
+    "prior_sha256": "885B9407203AF80DEE7D9B7E97E5083103D37965EE28847DA5D4DC2BD38951B7",
+    "health": {
+      "file": "paid100-1635-parent-health-r01.json",
+      "sha256": "D4DCB84AEF532896541D791590F3DDC6D9A0E8533018FEAE6E7B093EA17DF938"
+    },
+    "publication": "Consolidates accepted observed components in the existing evidence record. Original execution identities, source-review descriptions and adverse outcomes remain unchanged; this record changes no player package."
+  },
+  "native_acceptance_scope": "The top-level false retains the whole older-origin programme verdict; only the explicitly named native components are accepted."
+}

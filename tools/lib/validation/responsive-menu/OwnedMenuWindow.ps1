@@ -28,6 +28,12 @@ public static class MIROwnedMenuNative {
   [DllImport("user32.dll")] public static extern bool ClientToScreen(IntPtr h, ref Point p);
   [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
   [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
+  [StructLayout(LayoutKind.Sequential)] public struct LastInputInfo { public uint size; public uint tick; }
+  [StructLayout(LayoutKind.Sequential)] public struct GuiThreadInfo { public uint size; public uint flags; public IntPtr active; public IntPtr focus; public IntPtr capture; public IntPtr menuOwner; public IntPtr moveSize; public IntPtr caret; public Rect caretRect; }
+  [DllImport("user32.dll", SetLastError=true)] public static extern bool SystemParametersInfo(uint action, uint param, out uint value, uint flags);
+  [DllImport("user32.dll", SetLastError=true)] public static extern bool GetLastInputInfo(ref LastInputInfo info);
+  [DllImport("user32.dll", SetLastError=true)] public static extern bool GetGUIThreadInfo(uint thread, ref GuiThreadInfo info);
+  [DllImport("kernel32.dll")] public static extern uint GetTickCount();
   [DllImport("kernel32.dll")] public static extern uint GetCurrentThreadId();
   [DllImport("user32.dll")] public static extern IntPtr GetThreadDesktop(uint threadId);
   [DllImport("user32.dll", SetLastError=true)] public static extern bool AttachThreadInput(uint attachingThread, uint attachedThread, bool attach);
@@ -264,6 +270,37 @@ function Invoke-MIROwnedMenuOwnedPeerForeground {
   return $Diagnostics.owned_peer_foreground_last
 }
 
+# Diagnostic only: these facts do not predict or authorize foreground activation.
+function Get-MIROwnedMenuForegroundContext {
+  param([Parameter(Mandatory)][IntPtr]$ForegroundHandle)
+  $result=[ordered]@{foreground_lock_timeout=$null;last_input=$null;gui_thread=$null;foreground_process=$null;caller_process=$null}
+  try {
+    [uint32]$value=0
+    $ok=[MIROwnedMenuNative]::SystemParametersInfo(0x2000,0,[ref]$value,0)
+    $result.foreground_lock_timeout=[ordered]@{available=$ok;milliseconds=$(if($ok){$value}else{$null})}
+  } catch { $result.foreground_lock_timeout=[ordered]@{available=$false;milliseconds=$null} }
+  try {
+    $info=New-Object MIROwnedMenuNative+LastInputInfo
+    $info.size=[Runtime.InteropServices.Marshal]::SizeOf($info)
+    $ok=[MIROwnedMenuNative]::GetLastInputInfo([ref]$info)
+    [uint32]$now=[MIROwnedMenuNative]::GetTickCount()
+    $age=if($ok){([int64]$now-[int64]$info.tick+4294967296)%4294967296}else{$null}
+    $result.last_input=[ordered]@{available=$ok;tick=$(if($ok){$info.tick}else{$null});current_tick=$now;modulo_age_milliseconds=$age;chronology='unverified; tick values may wrap or be non-monotonic'}
+  } catch { $result.last_input=[ordered]@{available=$false;tick=$null;current_tick=$null;modulo_age_milliseconds=$null;chronology='unknown'} }
+  try {
+    $info=New-Object MIROwnedMenuNative+GuiThreadInfo
+    $info.size=[Runtime.InteropServices.Marshal]::SizeOf($info)
+    $ok=[MIROwnedMenuNative]::GetGUIThreadInfo(0,[ref]$info)
+    $result.gui_thread=[ordered]@{available=$ok;flags=$(if($ok){$info.flags}else{$null});menu_active=$(if($ok){[bool]($info.flags-band 28)}else{$null});move_size_active=$(if($ok){[bool]($info.flags-band 2)}else{$null})}
+  } catch { $result.gui_thread=[ordered]@{available=$false;flags=$null;menu_active=$null;move_size_active=$null} }
+  $caller=[Diagnostics.Process]::GetCurrentProcess()
+  try { $result.caller_process=[ordered]@{process_id=$caller.Id;session_id=$caller.SessionId} } catch { $result.caller_process=[ordered]@{process_id=$caller.Id;session_id=$null} } finally { $caller.Dispose() }
+  $pidValue=if($ForegroundHandle-eq[IntPtr]::Zero){0}else{Get-MIROwnedMenuWindowProcessId $ForegroundHandle}
+  $result.foreground_process=[ordered]@{process_id=$pidValue;session_id=$null}
+  if($pidValue-ne0){try {$p=[Diagnostics.Process]::GetProcessById($pidValue);try {$result.foreground_process.session_id=$p.SessionId} finally {$p.Dispose()}} catch {}}
+  return $result
+}
+
 function Request-MIROwnedMenuForeground {
   param(
     [Parameter(Mandatory)][Diagnostics.Process]$Process,
@@ -287,6 +324,10 @@ function Request-MIROwnedMenuForeground {
     after=$null;set_foreground=$false;status='requested'
   }
   $Diagnostics.foreground_request_last=$request
+  if ($Diagnostics.Contains('foreground_context_enabled') -and $Diagnostics.foreground_context_enabled) {
+    try { $request['context']=Get-MIROwnedMenuForegroundContext -ForegroundHandle $before }
+    catch { $request['context']=[ordered]@{available=$false;reason='diagnostic-unavailable'} }
+  }
   $requested=Set-MIROwnedMenuForegroundHandle $Handle
   $after=Get-MIROwnedMenuForegroundHandle
   $request.set_foreground=[bool]$requested
