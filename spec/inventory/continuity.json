@@ -17160,20 +17160,22 @@
             "Julesc013/mir-native-worker@017a40be8ed5f97d92e876cb6f4d259a92cdb47e:evidence/aero-historical473-current504-applicability-r01/source-applicability.json (9C3C8D07)",
             "9b8e34592ac5eafb5b9719705ddce31ca3fc62e1:evidence/aero-candidate505-source-native-review-r01/native-review.json",
             "spec/evidence/historical473-current505-applicability-r01.json",
-            "spec/evidence/historical473-forward-current506-applicability-r01.json"
+            "spec/evidence/historical473-forward-current506-applicability-r01.json",
+            "spec/evidence/data-only-paid-family-restoration-r01.json"
           ],
-          "remaining_executable_check": "Retain published505 reviewFC930CC9 for the seven earlier stable same-edition473 routes and separate F100-to-F110 journey. The current506 forward review accepts bounded F100-to-F210 and F110-to-F210 preservation reuse with their original native identities. The F200-to-F210 C563 pass remains historical; its changed first-paid-family admission still needs a matching published4.7.20003/Base2.0.77 source and independently known paid mask through the supported2.1.23 closure, saved successor and two cold reloads. Do not whitelist fixture mods, substitute the same-engine F210 c107 source or infer the mask from candidate output. Finish modern same-edition and seven older MIR-contract applicability decisions as distinct sets. Preserve accepted science components, adverse receipts, missing inputs and ambiguous locks; execute genuinely affected checks only. Complete current-candidate/profile/client/performance acceptance remains open.",
+          "remaining_executable_check": "Retain published505 reviewFC930CC9 for the seven earlier stable same-edition473 routes and separate F100-to-F110 journey. The current506 forward review accepts bounded F100-to-F210 and F110-to-F210 preservation reuse with their original native identities. The F200-to-F210 C563 pass remains historical; its changed first-paid-family admission still needs a matching published4.7.20003/Base2.0.77 source and independently known paid mask through the supported2.1.23 closure, saved successor and two cold reloads. Do not whitelist fixture mods, substitute the same-engine F210 c107 source or infer the mask from candidate output. Finish modern same-edition and seven older MIR-contract applicability decisions as distinct sets. Preserve accepted science components, adverse receipts, missing inputs and ambiguous locks; execute genuinely affected checks only. Complete current-candidate/profile/client/performance acceptance remains open. The known MIR1.1/1.2 four-family correction is merged at895937a3 with110 focused controls and exact-author checks passing. Actual affected paid-state qualification remains pending, including the separate original MIR1.1 first-entry modules=false boundary; observe its real startup event and effective settings without forcing flags; source1746 independently supports either boolean flag for the fixed data-only mask. Old7a2/player505837 applicability is not a published5.0.5 pass. PR1748 extends the same finite declaration to exactly1.0.0 conditionally on retained source investment; the suppressed/unearned case receives no old credit. Its113 focused/all four author checks and independent source review do not establish actual1.0/1.1/1.2 native successor/save results. Preserve the original21/31/34-row identities and fixture-seeded-versus-lab distinction.",
           "owner": "Aero; Black Glass executes affected checks",
           "independent_review": "Aero",
           "status": "partial: earlier-seven473/F100-F110505 and two1.x-to-F210506 bounded preservation applicability accepted; current F200 paid cross-engine boundary, modern same-edition and older-contract decisions remain open",
-          "readiness": "two1.x forward preservation decisions complete; matching F200 paid-transition inputs and modern/older-contract decisions remain next",
+          "readiness": "known four-family source correction reviewed and integrated; matching affected native inputs plus remaining older-contract/modern decisions are next; data-only1.0/1.1/1.2 source corrections reviewed and author checks pass, affected native cases remain open",
           "next_work_inputs": [
             "spec/inventory/migration-origins.json",
             "spec/evidence/candidate503-native-upgrades-r01.json",
             "spec/evidence/candidate504-mixed-gun-native-r01.json",
             "spec/evidence/candidate505-science-upgrade-native-r01.json",
             "spec/evidence/historical473-current505-applicability-r01.json",
-            "spec/evidence/historical473-forward-current506-applicability-r01.json"
+            "spec/evidence/historical473-forward-current506-applicability-r01.json",
+            "spec/evidence/data-only-paid-family-restoration-r01.json"
           ]
         },
         {

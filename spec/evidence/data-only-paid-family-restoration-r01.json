@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "kind": "MIRDataOnlyPaidFamilyRestorationV1",
+  "status": "source-corrected-and-host-checked; affected-native-qualification-pending",
+  "scope": "Records the original1.1.0/1.2.0 four-family Base correction and the independently reviewed first-settings and conditional1.0.0 follow-ups. This does not complete any whole older-contract group or the seven-group preservation gate.",
+  "original_sources": [
+    {
+      "path": "spec/evidence/migration-origin-110-f200-source-native-chain-r05.json",
+      "sha256": "CE2D69921C3792238AD369DE7576376C4778542C5C89AAA4708A10FC789974D8"
+    },
+    {
+      "path": "spec/evidence/migration-origin-120-f200-source-native-chain-r06.json",
+      "sha256": "7B3010BE4BF66F98E3F2F2C9EA6BBD1CDEBA8C5DAF689BC65AEC10E7EA34208C"
+    }
+  ],
+  "original_source_fixture_commits": [
+    "bec37fb87a05d17cf4cf0225e0458218830fef63",
+    "e26bb227bf46f626964d1f3bfe272a6b36832c4d"
+  ],
+  "independent_source_facts": {
+    "native_1_1_rows": 31,
+    "native_1_2_rows": 34,
+    "manufacturing_state": "Each original fixture sets every non-gear row to prototype.level+1, asserts researched=false and resets effects on player/foreign/detached forces. Four named manufacturing identities therefore carry one fixture-seeded completed level. Only gears are lab-earned.",
+    "paid_recipes": {
+      "research_low_density_structure": "low-density-structure",
+      "research_plastic": "plastic-bar",
+      "research_processing_unit": "processing-unit",
+      "research_rocket_fuel": "rocket-fuel"
+    },
+    "per_level_change": 0.1,
+    "steel": "Not authored in either original roster; no old paid/queued/saved steel state is inferred.",
+    "receipt_limit": "Retain the exact original protected saves, source counts, private module/cannon rights, foreign state and adverse receipts. A derived pure-world input needs its own observations; original gear acceleration/game.speed16 are not silently ordinary tuning."
+  },
+  "implementation": {
+    "author": "bd06e00ef1ed870a7216a7788d884d16345c3b9f",
+    "integrated_dev": "895937a320f99aef492653851584fbfaadb918b1",
+    "player_tree": "5366e4c29f68ef2835281929f38704910eb3dd6d",
+    "pr": 1744,
+    "paths": [
+      "source/research/native_credit_contracts.lua",
+      "source/runtime/native_credits.lua"
+    ],
+    "behavior": "An exact known four-recipe mask may establish the first baseline in plain Base with unchanged startup settings and the exact2.0.77 same-engine or2.0.77-to2.1.23 event. New recipes receive no old credit. Unexplained investment in absent steel refuses. Complete MIR5 histories retain priority. No fixture/provider whitelist or candidate-derived old mask."
+  },
+  "independent_review": {
+    "sha256": "460B2E30347E8C85CDB6230573979A1367B468D2342E8D66EAC27B3D68F3B4ED",
+    "private_commit": "7389bf4bf8dd00147bc65392c0d6eb1f8001af4b",
+    "private_path": "evidence/aero-data-only-paid-families-r01/source-review.json",
+    "extraction_sha256": "27C9F9123519CF2FF46296F11727D533E03AAC5D1FA8406ED6E1B41500AC8E4F"
+  },
+  "host_evidence": {
+    "negative_control": "The new positive preservation control fails on unchanged delivered506 source with the unknown-first-paid-mask error in all four source/destination subcases.",
+    "focused_controls_passed": 110,
+    "exact_author_required_checks": "All four pass atbd06e00e.",
+    "independent_expectations": [
+      "tests/test_native_family_credit_definitions.py",
+      "tests/test_native_family_paid_credits.py"
+    ],
+    "preserved_originals": "7389bf4bf8dd00147bc65392c0d6eb1f8001af4b:evidence/aero-data-only-paid-families-r01/",
+    "native_execution": false
+  },
+  "internal_packages": {
+    "f200_sha256": "2131B14D14D8F7C527AEA3D5A7C264489E645A9BA279F16D4AD2F2F3AEFAD7AC",
+    "f210_sha256": "D4113DBA8726FA2515834A58734219402344168BB9FA47944403306AAAD20C7C",
+    "correspondence_sha256": "D935159DD3B552A2E79E6C5B9685FF37BCC1147FACC137EF46B7E4BFC4985999",
+    "limit": "Only the two reviewed Lua files differ from delivered506; all475 members/CRCs/Git projections match their records. These are internal inputs, not replacement public506 assets."
+  },
+  "remaining_native_work": {
+    "owner": "Black Glass",
+    "default_routes": "Qualify matching independently observed published1.1.0/1.2.0 Base paid inputs through the admitted destinations, preserving all originally required native/partial/current/queued/detached/foreign/module/cannon state and save/two-cold outcomes.",
+    "disabled_module_route": "The originally accepted MIR1.1-to-F210 first-entry modules=false case remains required. Source1746 now supports either known boolean startup-change flag for the independently fixed old mask; actual effective settings, old contributions, unfinished/queued/foreign state and save/two-cold observations remain unverified. Do not invent the observed event flag or replace this case with the default path.",
+    "guard_limits": "Unknown providers/settings/versions/engines and active observer/fixture mods are not silently admitted. A source/input discrepancy is not permission to weaken a guard or change the oracle.",
+    "conditional_1_0_route": "Inspect the protected F8B38209 MIR1.0 predecessor and qualify the affected current F200/F210 successors within their original21-row/gear-lab/queue/detached/foreign/sentinel scope. Establish actual source manufacturing state; do not infer a full four-family ledger from the count or count fixture-seeded rows as lab-earned. Retain original old-package passes and adverse results."
+  },
+  "old_review_naming": "The1.2/boolean records labelled505 refer to old7a2f9322/player505837/source5.0.0, not published MIR5.0.5. Their original fields, receipts and verdicts remain unchanged.",
+  "native_acceptance": false,
+  "stable_acceptance": false,
+  "published_bytes_replaced": false,
+  "followup_source_units": [
+    {
+      "pr": 1746,
+      "author": "2a8e85e6ed636da494275f564d1fe87e57e9898f",
+      "player_tree": "79775e0e6deab30a7647d2768e4e8c800c4e2342",
+      "behavior": "The independently fixed1.1.0/1.2.0 masks admit either explicit boolean startup-change flag. Unknown flag types, other source versions/providers/engines and complete-history priority remain guarded. Actual effective modules=false/plastic17% host controls compare direct first entry with staged retuning.",
+      "focused_controls_passed": 111,
+      "independent_review_sha256": "79A6C9BA5D5BB56CA9364193FC13CCE45BD293D02B44ED4AFC287466BAACBC7F",
+      "review_custody": "3a0619464509008e45004a213eb5f7d753356396:evidence/aero-data-only-settings-transition-r01/",
+      "internal_f200_sha256": "070703B034875BF6588E529556C32AB93D36B0860AC451DCE0BAD5EB82AE65CB",
+      "internal_f210_sha256": "08F2D22C6988A1B0F31679A4AF3CDB4D8F30E63FD6F9EE38548BBAFE53D34932",
+      "required_author_checks": "All four pass; source not yet merged at this documentation revision."
+    },
+    {
+      "pr": 1748,
+      "author": "0b985ba6e7a868ea22f9beeec3ba5e1eaf83013c",
+      "player_tree": "e28d7409ac3cd1f31ddbe077ee4a9aa3dd569973",
+      "behavior": "Exactly1.0.0 joins the finite plain-Base declaration. Its original conflict trimming can suppress a whole one-recipe family. This is a conditional earning mask for retained investment, not proof that all four occurred in the21-row source. A newly unearned family receives zero prior credit.",
+      "published_archive_sha256": "C328D8F958BEC2A44297E94E83B1A956D76BEA5E333601A42FDDE60F4155472F",
+      "producer_correspondence_sha256": "645896B381C4E07E72FA547E107AA50CF94A74E8A7271C78ED17CAFBC5EB4ED8",
+      "source_fixture_note": "The retained r01 failed source log names plastic; corrected source control seeds each emitted non-gear row. The aggregate21 rows do not serialize a complete four-family ledger.",
+      "focused_controls_passed": 113,
+      "negative_control": "One definition refusal and six paid-mask errors on the prior source; the new source passes the suppressed/unearned, paid, changed-settings and foreign-state controls.",
+      "independent_review_sha256": "F5DEF56308A50E06991886E6D8A2A644B277645FE1FD0084E069CA28407B01CE",
+      "review_custody": "ca5dcfc695476fafb853e1d07b5a6d4dc69baf1d:evidence/aero-source-navigation-paid100-r01/",
+      "required_author_checks": "All four pass in run42146325363 plus branch-policy42146325386; source not yet merged at this documentation revision.",
+      "native_execution": false
+    }
+  ]
+}
