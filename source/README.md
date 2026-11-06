@@ -1,11 +1,32 @@
-# Player source boundary
+# Player source
 
-This directory contains the canonical MIR player-source implementation. It now includes authored modern and historical research, native continuations, effective settings, bounded compatibility bindings and product collection, opt-in prototype overrides, scripted effects, migrations, the Research Library and the data/runtime API. The support guide and recorded release verdict identify qualified packages and their exact supported scope; a source checkout is not a release verdict. Do not package this README as a mod or use an unqualified development package to upgrade a production save.
+`source/` is the single editable player implementation. To build a local ZIP, start with the [development guide](../docs/development.md#build-a-local-zip). Tests, build tools and contributor documentation stay outside the player package; this README is excluded too.
 
-Maintain these components using [the Generator contract](../spec/generator.md), [determinism](../spec/determinism.md) and the [API contract](../spec/api.md). Native imports and asset paths are package-relative and never contain the checkout prefix. Player code must not import the former compiler or developer SDK. The Generator validates the submitted finite family locally without recursion, then publishes once; compatibility collection and opt-in broad overrides remain separate.
+The startup path is: effective configuration and selected integrations → authored technology construction → Generator validation and publication. Factorio owns ordinary research and its native effects. Runtime callbacks handle caps, earned contributions, scripted effects and the Research Library.
 
-Use disposable test worlds until the complete relevant catalogue and migration path are qualified. Earlier exact-source native receipts retain their original identities; they do not automatically qualify current bytes. This `source/README.md` remains package-excluded. Native qualification is recorded separately for its actual source and inputs.
+## Find a feature
 
-Build only this explicitly selected subtree with `python tools/package.py --source source --target <target> --output <canonical-name.zip>`. The tracked edition record selects normal targets and their actual engine capabilities; it is not another editable player source. Player packages contain only admitted native files and presentation assets. Read [current progress](../docs/progress.md) for accepted observations and remaining work, and [verification](../spec/verification.md) for the independent release verdicts. Offline packaging, host test counts and source size do not establish save safety or a native speedup.
+| What you want to change | Start here |
+|---|---|
+| Setting definitions, imports or effective values | [settings.lua](settings.lua), [research/settings.lua](research/settings.lua), [research/settings_profile.lua](research/settings_profile.lua) |
+| Research definitions and startup composition | [research/catalogue.lua](research/catalogue.lua), the related `research/` modules, [data-final-fixes.lua](data-final-fixes.lua) |
+| Validation and publication of already-built technologies | [research/generator.lua](research/generator.lua) |
+| Overhaul bindings and recipe targets | `compatibility/`, related definitions in `research/`; the RIC integration is grouped under `integrations/ric/` |
+| Explicit changes to existing prototypes | `overrides/` |
+| Runtime event registration | [control.lua](control.lua), [runtime/bootstrap.lua](runtime/bootstrap.lua) |
+| Caps and preservation of earned contributions | [runtime/lifecycle.lua](runtime/lifecycle.lua), [runtime/native_credits.lua](runtime/native_credits.lua), [runtime/native_gun_credits.lua](runtime/native_gun_credits.lua) |
+| Repair, agriculture or spoilage | [runtime/passive_repair.lua](runtime/passive_repair.lua), [runtime/scripted_effects.lua](runtime/scripted_effects.lua) |
+| Library rendering, input or personal state | [runtime/library.lua](runtime/library.lua), the `runtime/library_*` and `presentation/library_*` modules |
+| Engine differences | [platform/target.lua](platform/target.lua), `adapters/` |
+| Public integration API | [api/v1/data.lua](api/v1/data.lua), [api/v1/runtime.lua](api/v1/runtime.lua), and the [API guide](../docs/api.md) |
+| Save migrations, translations or release history | `migrations/`, `locale/`, and the authored [root changelog](../CHANGELOG.md), which generates `changelog.txt` |
 
-The separate [early-edition record](../targets/early-editions.json) opts into best-effort F006–F012 data-only builds; those finite fixed defaults have no startup settings, control/runtime API, Library or migrations. F001–F005 remain unresolved, while F018/0.18.47 remains a GitHub-only experimental best-effort edition with shared packaging and an unverified native load smoke under the [target contract](../spec/targets.md#additional-historical-editions). The authored [root changelog](../CHANGELOG.md) generates `changelog.txt`; every edition receives that complete shared history with authored source versions retained.
+The [architecture guide](../docs/architecture.md#where-to-change-a-feature) explains the current module boundaries, saved-state owners and planned Library move. Its destination paths are a move plan; the table above points to files that exist now.
+
+## Make a change
+
+Keep package-relative imports, published technology/setting/API identities, saved-state keys and migration filenames intact. Use the relevant [task contract](../spec/README.md#task-routing) and [affected checks](../docs/development.md#test-selection). The Generator validates a finite submitted family and publishes it once; compatibility collection and optional broad overrides remain separate.
+
+Use disposable test worlds or copies of saves with their matching mods and settings for development packages. The [support guide](../docs/support.md) describes supported configurations; [current progress](../docs/progress.md) distinguishes accepted results from remaining work. A ZIP build or host pass alone does not establish gameplay, upgrade safety or performance.
+
+The nine stable editions share this source. The [target contract](../spec/targets.md#additional-historical-editions) separately describes experimental Factorio 0.18.47 and best-effort early builds: F006–F012 have fixed finite defaults and no settings, runtime API, Library or migrations; F001–F005 remain unresolved. Edition metadata selects capabilities rather than another editable source tree.
