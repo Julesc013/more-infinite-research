@@ -1156,7 +1156,7 @@ local function add_recipe_benefits(parent, detail)
   end
 end
 
-local function research_section(parent, name, caption, width)
+local function library_section(parent, name, caption, width)
   -- Authored8a3b190d section(): a native divider and restrained spacing,
   -- followed by a short bold heading rather than another paragraph.
   local divider = add(parent, {type = "line", name = PREFIX .. name .. "_divider", direction = "horizontal"})
@@ -1199,7 +1199,7 @@ local function detail_lines(parent, row, detail, player)
     title.style.font = "default-large-bold"
     title.style.maximal_width = math.max(80, width - 72)
   end
-  research_section(parent, "detail_benefits", "mir-browser.benefits", width)
+  library_section(parent, "detail_benefits", "mir-browser.benefits", width)
   if technology and #recipe_rows == 0 then
     local ok, description = pcall(function() return technology.localised_description end)
     if ok and description ~= nil and description ~= "" then
@@ -1225,7 +1225,7 @@ local function detail_lines(parent, row, detail, player)
     add(parent, {type = "label", name = PREFIX .. "other_effects", caption = {"mir-browser.effect-native-details"}})
   end
   add_recipe_benefits(parent, detail)
-  research_section(parent, "detail_requirements", "mir-browser.research-requirements", width)
+  library_section(parent, "detail_requirements", "mir-browser.research-requirements", width)
   local context = add(parent, {type = "flow", name = PREFIX .. "detail_context", direction = "vertical"})
   local status_key = {
     ready = "mir-browser.status-ready",
@@ -1631,11 +1631,22 @@ local function update_settings_content(content, view, preserve_query, translatio
   local available_height = content.style and (content.style.maximal_height or content.style.height) or 220
   local toolbar_columns = width < 380 and 1 or (width < 700 and 2 or 4)
   local toolbar = content[PREFIX .. "settings_toolbar"]
-  if valid(toolbar) and (toolbar.type ~= "table" or toolbar.column_count ~= toolbar_columns) then
+  if not valid(content[PREFIX .. "settings_search_label"])
+      or (valid(toolbar) and (toolbar.type ~= "table" or toolbar.column_count ~= toolbar_columns)) then
     -- A recreated toolbar must precede the query and panes, including when
     -- an older open GUI still contains the former horizontal flow.
     content.clear()
     toolbar = nil
+  end
+  if not valid(content[PREFIX .. "settings_search_label"]) then
+    add(content, {type = "label", name = PREFIX .. "settings_search_label", caption = {"mir-browser.search-settings"}})
+  end
+  local query = content[PREFIX .. "settings_query"]
+  if not valid(query) then
+    query = add(content, {type = "textfield", name = PREFIX .. "settings_query", text = view.settings_query,
+      tooltip = {"mir-browser.search-settings"}})
+  elseif not preserve_query then
+    query.text = view.settings_query
   end
   if not valid(toolbar) then
     toolbar = add(content, {type = "table", name = PREFIX .. "settings_toolbar", column_count = toolbar_columns})
@@ -1660,16 +1671,9 @@ local function update_settings_content(content, view, preserve_query, translatio
       if name == "settings_research" or name == "settings_options" then button.tooltip = button.caption end
     end
   end
-  local query = content[PREFIX .. "settings_query"]
-  if not valid(query) then
-    query = add(content, {type = "textfield", name = PREFIX .. "settings_query", text = view.settings_query,
-      tooltip = {"mir-browser.search-settings"}})
-  elseif not preserve_query then
-    query.text = view.settings_query
-  end
-  if query.style then query.style.width = math.min(280, width - 24) end
+  if query.style then query.style.width = math.max(1, width - 24) end
   local toolbar_rows = math.ceil((support_exports and 4 or 2) / toolbar_columns)
-  local dynamic_height = math.max(80, available_height - 64 - (toolbar_rows - 1) * 32)
+  local dynamic_height = math.max(80, available_height - 84 - (toolbar_rows - 1) * 32)
   local panes = library_layout.split_sizes(width, dynamic_height)
   -- The outer page owns overflow. A one-column table must contain both
   -- panes plus its two heading rows, even at the minimum window height.
@@ -1730,11 +1734,11 @@ local function update_settings_content(content, view, preserve_query, translatio
     detail.style.width, detail.style.height = panes.detail_width, panes.detail_height
     detail.style.maximal_width = panes.detail_width
   end
-  local function setting_label(spec)
-    local label = add(detail, spec)
+  local function setting_label(spec, parent, width)
+    local label = add(parent or detail, spec)
     if valid(label) and label.style then
       label.style.single_line = false
-      label.style.maximal_width = math.max(1, panes.detail_width - 16)
+      label.style.maximal_width = math.max(1, width or panes.detail_width - 16)
     end
     return label
   end
@@ -1743,23 +1747,41 @@ local function update_settings_content(content, view, preserve_query, translatio
     setting_label({type = "label", name = PREFIX .. "settings_empty", caption = {"mir-browser.settings-empty"}})
     return
   end
-  setting_label({type = "label", name = PREFIX .. "settings_title", caption = selected.title})
+  local title = setting_label({type = "label", name = PREFIX .. "settings_title", caption = selected.title})
+  title.style.font = "default-large-bold"
   setting_label({type = "label", name = PREFIX .. "settings_scope", caption = {"mir-browser.scope-startup"}})
   if selected.externally_supplied then
     setting_label({type = "label", name = PREFIX .. "settings_external", caption = {"mir-browser.settings-external-owner"}})
   end
-  setting_label({type = "label", name = PREFIX .. "settings_effective", caption = {"mir-browser.effective-values"}})
+  library_section(detail, "settings_effective", "mir-browser.effective-values", panes.detail_width)
+  local fields = add(detail, {type = "table", name = PREFIX .. "settings_fields", column_count = 2})
+  fields.style.width = math.max(1, panes.detail_width - 16)
+  fields.style.horizontal_spacing, fields.style.vertical_spacing = 12, 10
+  local field_width = math.max(1, style_pixels((panes.detail_width - 40) * .55))
+  local value_width = math.max(1, panes.detail_width - 40 - field_width)
+  local source = "default"
   for index, field in ipairs(selected.fields) do
     local name = PREFIX .. "setting_" .. index
-    setting_label({type = "label", name = name .. "_name", caption = field.caption, tooltip = field.description})
-    setting_label({type = "label", name = name .. "_value", caption = setting_display(field.name, field.effective),
+    local label = setting_label({type = "label", name = name .. "_name", caption = field.caption,
+      tooltip = field.description}, fields, field_width)
+    label.style.font = "default-semibold"
+    local display = setting_display(field.name, field.effective)
+    if field.default ~= nil and field.effective ~= field.default then
+      display = {"mir-browser.setting-with-default", display, setting_display(field.name, field.default)}
+    end
+    setting_label({type = "label", name = name .. "_value", caption = display,
       tooltip = {"mir-browser.setting-provenance", setting_display(field.name, field.direct),
-        setting_display(field.name, field.default), {"mir-browser.source-" .. field.source}}})
-    setting_label({type = "label", name = name .. "_source",
-      caption = {"mir-browser.setting-provenance", setting_display(field.name, field.direct),
-        setting_display(field.name, field.default), {"mir-browser.source-" .. field.source}}})
+        setting_display(field.name, field.default), {"mir-browser.source-" .. field.source}}}, fields, value_width)
+    if field.source == "mirset1" then
+      source = "mirset1"
+      setting_label({type = "label", name = name .. "_profile_marker", caption = {"mir-browser.profile-override"}}, fields, field_width)
+      setting_label({type = "label", name = name .. "_source", caption = {"mir-browser.source-mirset1"}}, fields, value_width)
+    elseif source ~= "mirset1" and field.source == "direct" then
+      source = "direct"
+    end
   end
-  setting_label({type = "label", name = PREFIX .. "settings_source", caption = {"mir-browser.configuration-source"}})
+  library_section(detail, "settings_source", "mir-browser.configuration-source", panes.detail_width)
+  setting_label({type = "label", name = PREFIX .. "settings_source_summary", caption = {"mir-browser.source-" .. source}})
 end
 
 local function queue_name(entry)

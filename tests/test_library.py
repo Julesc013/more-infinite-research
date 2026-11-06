@@ -9,6 +9,36 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_settings_follow_the_authored_compact_field_value_grid(self):
+        # Original8a settings_rows521-569 keeps provenance in the tooltip,
+        # adds defaults only for changed values and marks imported overrides.
+        self.lua.execute('''
+          boot()
+          settings.startup["ips-cost-growth-research_gears"]={value=1.25}
+          local root=library.open(player,{tab="settings",settings_scope="research",settings_search="research_gears"})
+          local detail=root.mir_library_tabs.mir_library_settings_content.mir_library_settings_dynamic.mir_library_settings_detail
+          local page=root.mir_library_tabs.mir_library_settings_content
+          local live={}
+          for _,child in ipairs(page._children) do if child.valid then live[#live+1]=child end end
+          assert(live[1]==page.mir_library_settings_search_label and live[2]==page.mir_library_settings_query
+            and live[3]==page.mir_library_settings_toolbar,
+            "the original labelled full-width search belongs above the scope buttons")
+          assert(page.mir_library_settings_query.style.maximal_width==page.style.maximal_width-24)
+          local fields=detail.mir_library_settings_fields
+          assert(fields and fields.type=="table" and fields.column_count==2,
+            "Settings must use the original compact field/value grid")
+          assert(fields.style.horizontal_spacing==12 and fields.style.vertical_spacing==10)
+          local growth=fields.mir_library_setting_4_value
+          assert(growth.caption[1]=="mir-browser.setting-with-default" and growth.caption[2]=="1.25")
+          assert(growth.tooltip[1]=="mir-browser.setting-provenance" and growth.tooltip[2]=="1.25")
+          assert(fields.mir_library_setting_4_source==nil,
+            "ordinary fields must not repeat the full provenance as another paragraph")
+          assert(detail.mir_library_settings_title.style.font=="default-large-bold")
+          assert(detail.mir_library_settings_source_summary.caption[1]=="mir-browser.source-direct")
+          assert(settings.startup["ips-cost-growth-research_gears"].value==1.25)
+          assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
+        ''')
+
     def test_authored_research_presentation_uses_compact_facts_and_independent_recipes(self):
         # 8a3b190d:research_browser.lua729-805: horizontal 48px heading,
         # no generic recipe paragraph, science/prerequisite icons, separate list.
@@ -79,7 +109,7 @@ class LibraryTests(unittest.TestCase):
               assert(page.vertical_scroll_policy=="auto" and page.horizontal_scroll_policy=="never")
             end
             for _,label in ipairs{detail.mir_library_settings_title,
-              detail.mir_library_setting_1_name,detail.mir_library_setting_1_source} do
+              detail.mir_library_settings_fields.mir_library_setting_1_name,detail.mir_library_settings_fields.mir_library_setting_1_value} do
               assert(label.style.single_line==false and label.style.maximal_width<=detail.style.maximal_width-16,
                 "localized names and provenance must wrap within the details viewport")
             end
@@ -91,9 +121,10 @@ class LibraryTests(unittest.TestCase):
             storage.mir_library.players[1].geometry={width=width==832 and 704 or 832,height=360}
             root=library.open(player,{tab="settings"})
             page=root.mir_library_tabs.mir_library_settings_content
-            local first
-            for _,child in ipairs(page._children) do if child.valid then first=child;break end end
-            assert(first==page.mir_library_settings_toolbar)
+            local live={}
+            for _,child in ipairs(page._children) do if child.valid then live[#live+1]=child end end
+            assert(live[1]==page.mir_library_settings_search_label and live[2]==page.mir_library_settings_query
+              and live[3]==page.mir_library_settings_toolbar)
             assert(storage.mir_library.players[1].settings_scope=="options")
             assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
           end
@@ -123,11 +154,11 @@ class LibraryTests(unittest.TestCase):
           local root=library.open(player,{tab="settings",settings_scope="options",settings_search="mir-settings-profile-import"})
           local detail=root.mir_library_tabs.mir_library_settings_content
             .mir_library_settings_dynamic.mir_library_settings_detail
-          local shown=detail.mir_library_setting_1_value.caption
+          local shown=detail.mir_library_settings_fields.mir_library_setting_1_value.caption[2]
           assert(type(shown)=="string" and #shown<=120 and shown:sub(-3)=="...",
             "opaque imported profiles must not flood the ordinary Settings view")
           assert(shown:sub(1,8)==imported:sub(1,8) and valid_preview_utf8(shown))
-          local source=detail.mir_library_setting_1_source.caption
+          local source=detail.mir_library_settings_fields.mir_library_setting_1_value.tooltip
           assert(type(source[2])=="string" and #source[2]<=120)
           assert(settings.startup["mir-settings-profile-import"].value==imported)
           assert(settings.startup["ips-cost-base-research_gears"].value==4242)
@@ -293,13 +324,13 @@ class LibraryTests(unittest.TestCase):
             .mir_library_settings_dynamic.mir_library_settings_detail
           local keys={"enable","cost-base","cost-linear-increment","cost-growth","max-level","research-time"}
           for index,key in ipairs(keys) do
-            assert(detail["mir_library_setting_"..index.."_name"].caption[1]=="mir-browser.setting-"..key,
+            assert(detail.mir_library_settings_fields["mir_library_setting_"..index.."_name"].caption[1]=="mir-browser.setting-"..key,
               "the group already names the research; standard field names must stay short")
           end
-          local growth=detail.mir_library_setting_4_value
-          assert(growth.caption=="≈ 1.23457","rounded display must be compact and visibly approximate")
+          local growth=detail.mir_library_settings_fields.mir_library_setting_4_value
+          assert(growth.caption[1]=="mir-browser.setting-with-default" and growth.caption[2]=="≈ 1.23457","rounded display must be compact and visibly approximate")
           assert(growth.tooltip[2]=="≈ 1.23457" and growth.tooltip[4][1]=="mir-browser.source-direct")
-          assert(detail.mir_library_setting_5_value.caption[1]=="mir-browser.setting-unlimited")
+          assert(detail.mir_library_settings_fields.mir_library_setting_5_value.caption[1]=="mir-browser.setting-unlimited")
           assert(settings.startup["ips-cost-growth-research_gears"].value==1.23456789,
             "presentation must not round configuration or profile values")
           assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
@@ -2321,8 +2352,9 @@ class LibraryTests(unittest.TestCase):
           library.open(player, {tab="settings", settings_scope="research", settings_search="research_gears"})
           local detail = root["mir_library_tabs"]["mir_library_settings_content"]
             ["mir_library_settings_dynamic"]["mir_library_settings_detail"]
-          local value = detail["mir_library_setting_" .. catalog.spec(name).field_index .. "_value"]
-          assert(value.caption == "10" and value.tooltip[2][1] == "mir-browser.setting-unlimited"
+          local value = detail.mir_library_settings_fields["mir_library_setting_" .. catalog.spec(name).field_index .. "_value"]
+          assert(value.caption[1]=="mir-browser.setting-with-default" and value.caption[2] == "10"
+            and value.tooltip[2][1] == "mir-browser.setting-unlimited"
             and value.tooltip[3][1] == "mir-browser.setting-unlimited"
             and value.tooltip[4][1] == "mir-browser.source-mirset1",
             "finite imported cap lost its valid zero default/direct provenance")
@@ -3495,16 +3527,15 @@ class LibraryTests(unittest.TestCase):
           local settings_dynamic = settings_content["mir_library_settings_dynamic"]
           assert(storage.mir_library.players[1].tab == "settings"
             and settings_dynamic["mir_library_settings_count"].caption[1] == "mir-browser.settings-count")
-          local enabled = settings_dynamic["mir_library_settings_detail"]["mir_library_setting_1_value"]
-          assert(enabled.caption[1] == "mir-browser.setting-off"
+          local enabled = settings_dynamic["mir_library_settings_detail"].mir_library_settings_fields["mir_library_setting_1_value"]
+          assert(enabled.caption[1] == "mir-browser.setting-with-default" and enabled.caption[2][1] == "mir-browser.setting-off"
             and enabled.tooltip[2][1] == "mir-browser.setting-off"
             and enabled.tooltip[3][1] == "mir-browser.setting-on"
             and enabled.tooltip[4][1] == "mir-browser.source-direct")
-          local enabled_source = settings_dynamic["mir_library_settings_detail"]["mir_library_setting_1_source"]
-          assert(enabled_source.caption[1] == "mir-browser.setting-provenance"
-            and enabled_source.caption[4][1] == "mir-browser.source-direct")
-          local cost = settings_dynamic["mir_library_settings_detail"]["mir_library_setting_2_value"]
-          assert(cost.caption == "777" and cost.tooltip[1] == "mir-browser.setting-provenance"
+          local enabled_source = settings_dynamic["mir_library_settings_detail"].mir_library_settings_fields["mir_library_setting_1_source"]
+          assert(enabled_source==nil and enabled.tooltip[4][1]=="mir-browser.source-direct")
+          local cost = settings_dynamic["mir_library_settings_detail"].mir_library_settings_fields["mir_library_setting_2_value"]
+          assert(cost.caption[1]=="mir-browser.setting-with-default" and cost.caption[2] == "777" and cost.tooltip[1] == "mir-browser.setting-provenance"
             and cost.tooltip[2] == "4242" and cost.tooltip[4][1] == "mir-browser.source-mirset1")
           local settings_query = settings_content["mir_library_settings_query"]
           settings_query.text = "gears"
