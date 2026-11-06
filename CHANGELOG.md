@@ -2,6 +2,18 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.7] - 2026-11-06
+
+### Bugfixes
+
+- Preserve earned low-density structure, plastic, processing-unit and rocket-fuel research when upgrading Base saves from MIR 1.0–1.2.
+- Preserve earned module bonuses when module research is disabled on the first updated load from MIR 1.1.
+- Fix the research-preservation check when moving Base saves from MIR 4.7.3 on Factorio 2.0.77 to Factorio 2.1.23.
+
+### Documentation
+
+- Simplify player reports, contributor build instructions and source navigation, and update the API guide.
+
 ## [5.0.6] - 2026-11-06
 
 ### Bugfixes

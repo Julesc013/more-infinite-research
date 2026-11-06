@@ -1,4 +1,19 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.7
+Date: 2026-11-06
+
+  Bugfixes:
+
+    - Preserve earned low-density structure, plastic, processing-unit and rocket-fuel research when upgrading Base saves from MIR
+      1.0–1.2.
+    - Preserve earned module bonuses when module research is disabled on the first updated load from MIR 1.1.
+    - Fix the research-preservation check when moving Base saves from MIR 4.7.3 on Factorio 2.0.77 to Factorio 2.1.23.
+
+  Documentation:
+
+    - Simplify player reports, contributor build instructions and source navigation, and update the API guide.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.6
 Date: 2026-11-06
 
