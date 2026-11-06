@@ -491,7 +491,8 @@
     "Original observer0.1 source attempt wrote read-only LuaEntity.active after actual completion; failed before producing a qualified source. Original40files/1,117,296B retained in primary/C custody. Corrected observer uses disabled_by_script, empty lab inputs and zero energy.",
     "Boundary preparation first projected an extra active-observer info-f200.json member; composition refused before native activation. Corrected selected-member projection retained separately.",
     "Initial File-settings helper incorrectly refused retained non-File metadata. Independent actual-profile regression detected it;3d2 restores prior selection and four focused controls pass. Originalac1 remains preserved.",
-    "Fresh integration-checkout host fixture failed because build/tmp did not exist. Its test setup now creates that scratch parent; all14 fixture and4 runner controls pass. Original failed host log remains primary custody; no native input or oracle changed."
+    "Fresh integration-checkout host fixture failed because build/tmp did not exist. Its test setup now creates that scratch parent; all14 fixture and4 runner controls pass. Original failed host log remains primary custody; no native input or oracle changed.",
+    "Hosted6da host-controls failed four raw fixture/provenance byte checks after Windows LF-to-CRLF checkout conversion. Scoped .gitattributes preserves the original committed finite-fixture bytes; all14 controls pass without changing native/archive/provenance pins. The original red run42302599890 and logB384A763 remain retained."
   ],
   "limits": [
     "Exact controlled Base2.1.23 profile, not all overhauls/providers or reporter modpack.",

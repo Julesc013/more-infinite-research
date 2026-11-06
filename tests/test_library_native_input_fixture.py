@@ -1486,7 +1486,7 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
         self.lua.globals().support_path = (FIXTURE / "support-exports.lua").as_posix()
         self.lua.globals().fingerprint = lambda value: json.dumps(plain(value), sort_keys=True)
         self.lua.execute(r'''
-          function run_export_observer(target,opponent,qualified)
+          function run_export_observer(target,opponent,qualified,layout)
             local key="mir5_library_native_input"
             local base=target=="f200"and"2.0.77"or"2.1.23"
             local mir=target=="f200"and(qualified and"5.0.20007"or"5.0.20000")or(qualified and"5.0.21007"or"5.0.21000")
@@ -1527,7 +1527,18 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
                 local toolbar=node(settings,{type="flow",name="mir_library_settings_toolbar"},"more-infinite-research")
                 for _,name in ipairs({"settings","compact"})do node(toolbar,{type="button",name="mir_library_export_"..name},"more-infinite-research")end
                 local help=node(tabs,{type="flow",name="mir_library_help_content"},"more-infinite-research")
-                node(help,{type="button",name="mir_library_export_diagnostics"},"more-infinite-research")
+                if layout then
+                  local panes=node(help,{type="flow",name="mir_library_help_panes"},layout=="foreign-panes"and"fixture"or"more-infinite-research")
+                  if layout~="missing-panel"then
+                    local panel=node(panes,{type="flow",name="mir_library_report_panel"},layout=="foreign-panel"and"fixture"or"more-infinite-research")
+                    if layout=="wrong-parent"then panel.parent=help end
+                    if layout~="flat-decoy"then node(panel,{type="button",name="mir_library_export_diagnostics"},"more-infinite-research")end
+                  end
+                  -- A matching flat control must not bypass malformed/new panes.
+                  if layout~="authored"then node(help,{type="button",name="mir_library_export_diagnostics"},"more-infinite-research")end
+                else
+                  node(help,{type="button",name="mir_library_export_diagnostics"},"more-infinite-research")
+                end
               end
               root.mir_library_tabs.selected_tab_index=options.tab=="help"and 4 or 3
               return true
@@ -1615,6 +1626,7 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
               else
                 local help=action:find("diagnostics",1,true)~=nil
                 content=root.mir_library_tabs[help and"mir_library_help_content"or"mir_library_settings_content"]
+                if help and layout then content=content.mir_library_help_panes.mir_library_report_panel end
                 kind=help and"diagnostics"or(action:find("compact",1,true)and"compact"or"full")
                 button=(help and content or content.mir_library_settings_toolbar)["mir_library_export_"..(kind=="full"and"settings"or kind)]
                 local old=content.mir_library_export_profile
@@ -1664,6 +1676,29 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
                 with self.subTest(target=target, opponent=opponent):
                     with self.assertRaises(Exception):
                         self.lua.globals().run_export_observer(target, opponent, True)
+
+    def test_authored_debug_panes_preserve_export_protocol_and_earlier_flat_packages(self):
+        for target in ("f200", "f210"):
+            for qualified in (False, True):
+                with self.subTest(target=target, qualified=qualified):
+                    run = self.lua.globals().run_export_observer
+                    self.assertEqual(run(target, "", qualified, "authored"), (13, 5, 2, 0))
+                    self.assertEqual(run(target, "", qualified), (13, 5, 2, 0))
+            for opponent in ("missing-click", "duplicate-click", "wrong-player", "invalid-profile", "false-zero",
+                             "wrong-user", "editable", "stale-preview", "native-mutation", "setting-mutation",
+                             "missing-rejoin", "missing-restart"):
+                with self.subTest(target=target, opponent=opponent):
+                    with self.assertRaises(Exception):
+                        self.lua.globals().run_export_observer(target, opponent, True, "authored")
+
+    def test_authored_debug_export_rejects_foreign_or_malformed_parent_paths_and_flat_decoys(self):
+        for target in ("f200", "f210"):
+            for layout in ("foreign-panes", "foreign-panel", "missing-panel", "wrong-parent"):
+                with self.subTest(target=target, layout=layout):
+                    with self.assertRaisesRegex(Exception, "native diagnostics container differs"):
+                        self.lua.globals().run_export_observer(target, "", True, layout)
+            with self.assertRaisesRegex(Exception, "actual export button absent"):
+                self.lua.globals().run_export_observer(target, "", True, "flat-decoy")
 
     def test_export_report_tick_is_monotonic_and_read_only(self):
         for target in ("f200", "f210"):
