@@ -242,7 +242,7 @@ function Invoke-MIRDirectLibraryResponsiveMenuSample {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$FactorioBin,[Parameter(Mandatory)][string]$LibraryDirectory,[Parameter(Mandatory)][string]$EngineDataDirectory,
     [Parameter(Mandatory)][object[]]$BaseRows,[Parameter(Mandatory)][string]$RunRoot,[Parameter(Mandatory)][string]$WriteDataRoot,[Parameter(Mandatory)][string]$Label,
-    [Parameter(Mandatory)]$Resources,[AllowNull()]$MirArchive,[ValidateRange(1,300)][int]$TimeoutSeconds=300,[Parameter(Mandatory)]$OrdinaryPlayerConfig,[Parameter(Mandatory)]$OrdinaryMenuPreparation,[string]$ActiveModsObserver=''
+    [Parameter(Mandatory)]$Resources,[AllowNull()]$MirArchive,[ValidateRange(1,300)][int]$TimeoutSeconds=300,[Parameter(Mandatory)]$OrdinaryPlayerConfig,[Parameter(Mandatory)]$OrdinaryMenuPreparation,[string]$ActiveModsObserver='',[switch]$ForegroundContextDiagnostic
   )
   [IO.Directory]::CreateDirectory($RunRoot)|Out-Null
   Assert-MIRDirectLibraryStartupMeasurement (Test-Path -LiteralPath $WriteDataRoot -PathType Container) 'ordinary-menu-shared-write-data-missing'
@@ -271,9 +271,12 @@ function Invoke-MIRDirectLibraryResponsiveMenuSample {
       library_directory=[string]$activation.library
     }
     $spec=[ordered]@{kind='MIRDirectLibraryOwnedMenuLaunchV1';factorio_path=(Resolve-Path -LiteralPath $FactorioBin).Path;factorio_sha256=$executionControls.engine_sha256;arguments=$arguments;engine_current_log=$engineLog;timeout_seconds=$TimeoutSeconds}
+    if($ForegroundContextDiagnostic){$spec['foreground_context_diagnostic']=$true}
     [IO.File]::WriteAllText($specPath,($spec|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
     $specSha=Get-MIRImmutableInputSha256 -Path $specPath
     $native=Invoke-MIRNativeProbeProcess -Context $Resources -FilePath $actor.host -Arguments @('-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',$actor.path,'-LaunchSpecPath',$specPath,'-LaunchSpecSha256',$specSha,'-OutputRoot',$actorRoot) -TimeoutSeconds ($TimeoutSeconds+20)
+    # A diagnostic run can never enter the scored sample path; its actor receipt remains in custody.
+    if($ForegroundContextDiagnostic){throw '[mir-direct-startup-foreground-context-diagnostic-not-scored]'}
     Assert-MIRDirectLibraryStartupMeasurement ($native.result.passed -and -not $native.result.timed_out -and $native.result.exit_code -eq 0) 'ordinary-menu-actor-process'
     $actorRecordPath=Join-Path $actorRoot 'actor-result.json'
     Assert-MIRDirectLibraryStartupMeasurement (Test-Path -LiteralPath $actorRecordPath -PathType Leaf) 'ordinary-menu-actor-result'
