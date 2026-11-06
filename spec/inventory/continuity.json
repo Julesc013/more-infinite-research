@@ -19476,7 +19476,28 @@
             "proposed_suite_reference": "S07",
             "existing_route_group": "effects",
             "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
-            "remaining_specific_endpoint": "Reconcile actual original named mod/port/version and accepted attributes/defaults; generic source/native effect is not this exact integration proof."
+            "remaining_specific_endpoint": "Reconcile actual original named mod/port/version and accepted attributes/defaults; generic source/native effect is not this exact integration proof.",
+            "original_scope_reconciliation_20261107": {
+              "status": "test-proposal-scope-corrected-from-original-request-and-published-contract-not-new-native-pass",
+              "original_request_url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6ab70615699cfb2909dba025",
+              "original_request_readback_sha256": "DA630F1D4EA5BA186B7DDF7F5A865B6E237D71BB6C2FB4C1875CF0F2D6F5D893",
+              "authoritative_behavior": "Manufacturing productivity for recipes producing the accepted furnace item; the original request does not specify faster smelting or extra output from placed furnaces.",
+              "independent_published_source": {
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "path": "source/prototypes/streams/productivity.lua",
+                "git_blob": "50cabb703b3a50521c9529e0b9287e32d45ba4af",
+                "sha256": "EA66B64C03943A99B877847FD6E3903A099C83AB0333A441A29957C1C2142853",
+                "identical_also_at": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+              },
+              "proposal_limit": "The supplied physical-power/storage/entity-speed test steps are retained as audit proposals, not adopted as an additional delivered mechanic. The original posts ask to add targets to existing productivity research. No original request ID, text or decision is removed.",
+              "current_implementation": [
+                "source/compatibility/product_bindings.lua",
+                "source/research/product_target_extension.lua"
+              ],
+              "remaining_native_check": "Resolve the actual SE industrial-oven item/recipe IDs before selecting its independent manufacturing expectation. The historical literal industrial-furnace is not proof that a particular SE version uses that ID. Then check recipe productivity and physical crafting with paid-state/save preservation; this review does not qualify the named oven.",
+              "native_execution": false,
+              "release_qualification": false
+            }
           },
           {
             "source_item_id": "T16-I03",
@@ -19493,7 +19514,36 @@
             "proposed_suite_reference": "S07",
             "existing_route_group": "effects",
             "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
-            "remaining_specific_endpoint": "Reconcile actual original named mod/port/version and accepted attributes/defaults; generic source/native effect is not this exact integration proof."
+            "remaining_specific_endpoint": "Reconcile actual original named mod/port/version and accepted attributes/defaults; generic source/native effect is not this exact integration proof.",
+            "original_scope_reconciliation_20261107": {
+              "status": "test-proposal-scope-corrected-from-original-request-and-published-contract-not-new-native-pass",
+              "original_request_url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6ab70615699cfb2909dba025",
+              "original_request_readback_sha256": "DA630F1D4EA5BA186B7DDF7F5A865B6E237D71BB6C2FB4C1875CF0F2D6F5D893",
+              "authoritative_behavior": "Manufacturing productivity for recipes producing each accepted SE solar-panel tier.",
+              "independent_published_source": {
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "path": "source/prototypes/streams/productivity.lua",
+                "git_blob": "50cabb703b3a50521c9529e0b9287e32d45ba4af",
+                "sha256": "EA66B64C03943A99B877847FD6E3903A099C83AB0333A441A29957C1C2142853",
+                "identical_also_at": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+              },
+              "proposal_limit": "The supplied physical-power/storage/entity-speed test steps are retained as audit proposals, not adopted as an additional delivered mechanic. The original posts ask to add targets to existing productivity research. No original request ID, text or decision is removed.",
+              "current_implementation": [
+                "source/compatibility/product_bindings.lua",
+                "source/research/product_target_extension.lua"
+              ],
+              "remaining_native_check": "Pin actual mod versions and item/recipe identities; measure the intended recipe-productivity increment and useful physical crafting, preserve paid research/bonuses through save/reloads. Generic product fixtures do not qualify the named installation.",
+              "native_execution": false,
+              "release_qualification": false,
+              "independent_default_recipe_productivity_changes": {
+                "se-space-solar-panel": 0.05,
+                "se-space-solar-panel-2": 0.02,
+                "se-space-solar-panel-3": 0.01
+              },
+              "configuration_contract": "These published default increments use the retained 10-percent family default. Nondefault ips-effect-per-level-research_electric_energy scales the authored tiers proportionally; 22-percent is independently controlled. Requested Advanced Solar HR10/5/2/1-percent rates are not silently adopted.",
+              "focused_host_control": "tests/test_generator.py:GeneratorTests.test_electric_energy_preserves_published_manufacturing_tiers_and_not_entity_output",
+              "focused_host_scope": "Four F210 Base/Space Age host constructions at10/22percent; all15 published item targets plus a differently named Matrix recipe have exactly one intended recipe effect. Synthetic solar/accumulator production/storage fields remain unchanged. Three negative vectors reject full-rate Matrix, omitted SE tier3 and duplicate Matrix. No engine, actual mod archive, physical crafting or save result."
+            }
           },
           {
             "source_item_id": "T16-I04",
@@ -19510,7 +19560,35 @@
             "proposed_suite_reference": "S07",
             "existing_route_group": "effects",
             "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
-            "remaining_specific_endpoint": "Reconcile actual original named mod/port/version and accepted attributes/defaults; generic source/native effect is not this exact integration proof."
+            "remaining_specific_endpoint": "Reconcile actual original named mod/port/version and accepted attributes/defaults; generic source/native effect is not this exact integration proof.",
+            "original_scope_reconciliation_20261107": {
+              "status": "test-proposal-scope-corrected-from-original-request-and-published-contract-not-new-native-pass",
+              "original_request_url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6ab70615699cfb2909dba025",
+              "original_request_readback_sha256": "DA630F1D4EA5BA186B7DDF7F5A865B6E237D71BB6C2FB4C1875CF0F2D6F5D893",
+              "authoritative_behavior": "Manufacturing productivity for recipes producing the accepted SE accumulator items.",
+              "independent_published_source": {
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "path": "source/prototypes/streams/productivity.lua",
+                "git_blob": "50cabb703b3a50521c9529e0b9287e32d45ba4af",
+                "sha256": "EA66B64C03943A99B877847FD6E3903A099C83AB0333A441A29957C1C2142853",
+                "identical_also_at": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+              },
+              "proposal_limit": "The supplied physical-power/storage/entity-speed test steps are retained as audit proposals, not adopted as an additional delivered mechanic. The original posts ask to add targets to existing productivity research. No original request ID, text or decision is removed.",
+              "current_implementation": [
+                "source/compatibility/product_bindings.lua",
+                "source/research/product_target_extension.lua"
+              ],
+              "remaining_native_check": "Pin actual mod versions and item/recipe identities; measure the intended recipe-productivity increment and useful physical crafting, preserve paid research/bonuses through save/reloads. Generic product fixtures do not qualify the named installation.",
+              "native_execution": false,
+              "release_qualification": false,
+              "independent_default_recipe_productivity_changes": {
+                "se-space-accumulator": 0.05,
+                "se-space-accumulator-2": 0.02
+              },
+              "configuration_contract": "These published default increments use the retained 10-percent family default. Nondefault ips-effect-per-level-research_electric_energy scales the authored tiers proportionally; 22-percent is independently controlled. Requested Advanced Solar HR10/5/2/1-percent rates are not silently adopted.",
+              "focused_host_control": "tests/test_generator.py:GeneratorTests.test_electric_energy_preserves_published_manufacturing_tiers_and_not_entity_output",
+              "focused_host_scope": "Four F210 Base/Space Age host constructions at10/22percent; all15 published item targets plus a differently named Matrix recipe have exactly one intended recipe effect. Synthetic solar/accumulator production/storage fields remain unchanged. Three negative vectors reject full-rate Matrix, omitted SE tier3 and duplicate Matrix. No engine, actual mod archive, physical crafting or save result."
+            }
           },
           {
             "source_item_id": "T16-I05",
@@ -19543,7 +19621,34 @@
             "proposed_suite_reference": "S07",
             "existing_route_group": "effects",
             "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
-            "remaining_specific_endpoint": "Reconcile actual original named mod/port/version and accepted attributes/defaults; generic source/native effect is not this exact integration proof."
+            "remaining_specific_endpoint": "Reconcile actual original named mod/port/version and accepted attributes/defaults; generic source/native effect is not this exact integration proof.",
+            "original_scope_reconciliation_20261107": {
+              "status": "test-proposal-scope-corrected-from-original-request-and-published-contract-not-new-native-pass",
+              "original_request_url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6abdc8b7355a774e6368e91c",
+              "original_request_readback_sha256": "82A06BD16793664736F3433BBF1CDE437E162E4204A06CBECC123BA7359997FF",
+              "authoritative_behavior": "Manufacturing productivity for recipes producing Solar Matrix items.",
+              "independent_published_source": {
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "path": "source/prototypes/streams/productivity.lua",
+                "git_blob": "50cabb703b3a50521c9529e0b9287e32d45ba4af",
+                "sha256": "EA66B64C03943A99B877847FD6E3903A099C83AB0333A441A29957C1C2142853",
+                "identical_also_at": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+              },
+              "proposal_limit": "The supplied physical-power/storage/entity-speed test steps are retained as audit proposals, not adopted as an additional delivered mechanic. The original posts ask to add targets to existing productivity research. No original request ID, text or decision is removed.",
+              "current_implementation": [
+                "source/compatibility/product_bindings.lua",
+                "source/research/product_target_extension.lua"
+              ],
+              "remaining_native_check": "Pin actual mod versions and item/recipe identities; measure the intended recipe-productivity increment and useful physical crafting, preserve paid research/bonuses through save/reloads. Generic product fixtures do not qualify the named installation.",
+              "native_execution": false,
+              "release_qualification": false,
+              "independent_default_recipe_productivity_changes": {
+                "solar-matrix": 0.05
+              },
+              "configuration_contract": "These published default increments use the retained 10-percent family default. Nondefault ips-effect-per-level-research_electric_energy scales the authored tiers proportionally; 22-percent is independently controlled. Requested Advanced Solar HR10/5/2/1-percent rates are not silently adopted.",
+              "focused_host_control": "tests/test_generator.py:GeneratorTests.test_electric_energy_preserves_published_manufacturing_tiers_and_not_entity_output",
+              "focused_host_scope": "Four F210 Base/Space Age host constructions at10/22percent; all15 published item targets plus a differently named Matrix recipe have exactly one intended recipe effect. Synthetic solar/accumulator production/storage fields remain unchanged. Three negative vectors reject full-rate Matrix, omitted SE tier3 and duplicate Matrix. No engine, actual mod archive, physical crafting or save result."
+            }
           },
           {
             "source_item_id": "T17-I02",
@@ -19560,7 +19665,34 @@
             "proposed_suite_reference": "S07",
             "existing_route_group": "effects",
             "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
-            "remaining_specific_endpoint": "Reconcile actual original named mod/port/version and accepted attributes/defaults; generic source/native effect is not this exact integration proof."
+            "remaining_specific_endpoint": "Reconcile actual original named mod/port/version and accepted attributes/defaults; generic source/native effect is not this exact integration proof.",
+            "original_scope_reconciliation_20261107": {
+              "status": "test-proposal-scope-corrected-from-original-request-and-published-contract-not-new-native-pass",
+              "original_request_url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6abdc8b7355a774e6368e91c",
+              "original_request_readback_sha256": "82A06BD16793664736F3433BBF1CDE437E162E4204A06CBECC123BA7359997FF",
+              "authoritative_behavior": "Manufacturing productivity for recipes producing Accumulator V2 items.",
+              "independent_published_source": {
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "path": "source/prototypes/streams/productivity.lua",
+                "git_blob": "50cabb703b3a50521c9529e0b9287e32d45ba4af",
+                "sha256": "EA66B64C03943A99B877847FD6E3903A099C83AB0333A441A29957C1C2142853",
+                "identical_also_at": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+              },
+              "proposal_limit": "The supplied physical-power/storage/entity-speed test steps are retained as audit proposals, not adopted as an additional delivered mechanic. The original posts ask to add targets to existing productivity research. No original request ID, text or decision is removed.",
+              "current_implementation": [
+                "source/compatibility/product_bindings.lua",
+                "source/research/product_target_extension.lua"
+              ],
+              "remaining_native_check": "Pin actual mod versions and item/recipe identities; measure the intended recipe-productivity increment and useful physical crafting, preserve paid research/bonuses through save/reloads. Generic product fixtures do not qualify the named installation.",
+              "native_execution": false,
+              "release_qualification": false,
+              "independent_default_recipe_productivity_changes": {
+                "accumulator-v2": 0.05
+              },
+              "configuration_contract": "These published default increments use the retained 10-percent family default. Nondefault ips-effect-per-level-research_electric_energy scales the authored tiers proportionally; 22-percent is independently controlled. Requested Advanced Solar HR10/5/2/1-percent rates are not silently adopted.",
+              "focused_host_control": "tests/test_generator.py:GeneratorTests.test_electric_energy_preserves_published_manufacturing_tiers_and_not_entity_output",
+              "focused_host_scope": "Four F210 Base/Space Age host constructions at10/22percent; all15 published item targets plus a differently named Matrix recipe have exactly one intended recipe effect. Synthetic solar/accumulator production/storage fields remain unchanged. Three negative vectors reject full-rate Matrix, omitted SE tier3 and duplicate Matrix. No engine, actual mod archive, physical crafting or save result."
+            }
           },
           {
             "source_item_id": "T18-I01",
