@@ -2299,16 +2299,21 @@ function M.on_gui_click(event)
   if element.name == PREFIX .. "layout_smaller" or element.name == PREFIX .. "layout_larger"
       or element.name == PREFIX .. "layout_reset" then
     if not owns_element(player, element, {element.name, PREFIX .. "title", ROOT}) then return end
+    local reset_layout = element.name == PREFIX .. "layout_reset"
     local view = view_for(player.index)
-    if element.name == PREFIX .. "layout_reset" then
+    if reset_layout then
       view.geometry, view.location = nil, nil
     else
       local delta = element.name == PREFIX .. "layout_larger" and 64 or -64
       view.geometry = library_layout.resize(player.display_resolution, player.display_scale, view.geometry, delta)
     end
     local frame = render(player, view)
-    if element.name == PREFIX .. "layout_reset" and valid(frame)
-        and type(frame.force_auto_center) == "function" then frame.force_auto_center() end
+    -- Crossing the split/stacked boundary can replace the frame and destroy
+    -- the clicked native element. Use the captured action, not that object.
+    if reset_layout then
+      view.location = nil
+      if valid(frame) and type(frame.force_auto_center) == "function" then frame.force_auto_center() end
+    end
     return
   end
   if support_exports and (element.name == PREFIX .. "export_settings" or element.name == PREFIX .. "export_compact") then

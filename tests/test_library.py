@@ -9,6 +9,45 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_explicit_resize_does_not_read_the_clicked_element_after_layout_rebuild(self):
+        self.lua.execute('''
+          boot()
+          local root=library.open(player,{selected=gear.name,search="gear"})
+          local view=storage.mir_library.players[1]
+          view.geometry={width=592,height=480}
+          root=library.open(player)
+          root.location={x=31,y=17}
+          library.on_gui_location_changed({player_index=1,element=root})
+          assert(research_content(root).type=="table")
+          for _,action in ipairs{"layout_smaller","layout_larger","layout_smaller","layout_reset"} do
+            local old=root
+            local button=root.mir_library_title["mir_library_"..action]
+            local name=button.name
+            rawset(button,"name",nil)
+            local meta=getmetatable(button)
+            local original_index=meta.__index
+            meta.__index=function(target,key)
+              if key=="name" then
+                local ancestor=target
+                while ancestor do
+                  assert(ancestor.valid,"LuaGuiElement API call when LuaGuiElement invalid")
+                  ancestor=ancestor._parent
+                end
+                return name
+              end
+              return original_index(target,key)
+            end
+            library.on_gui_click({player_index=1,element=button})
+            root=player.gui.screen.mir_research_browser
+            assert(root and root.valid and root~=old and not old.valid,
+              "crossing the split/stacked boundary must replace the obsolete layout safely")
+            assert(research_filters(root).mir_library_query.text=="gear" and view.selected==gear.name)
+          end
+          assert(view.geometry==nil and view.location==nil)
+          assert(root.force_auto_center_calls>=1)
+          assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
+        ''')
+
     def test_research_refresh_retains_list_controls_without_repositioning_unchanged_items(self):
         self.lua.execute('''
           boot()
