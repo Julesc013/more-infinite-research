@@ -38,6 +38,8 @@ param(
   [switch]$MIRAbsent,
   [string]$InputSavePath='',
   [string]$ExpectedInputSaveSha256='',
+  [string]$SettingsPath='',
+  [string]$SettingsSha256='',
   [ValidateRange(30,600)][int]$TimeoutSeconds=180,
   [ValidateRange(128,8192)][int]$ExpectedPeakMemoryMiB=512,
   [ValidateRange(0,60)][int]$AdmissionWaitSeconds=30,
@@ -51,6 +53,23 @@ function Assert-Fixture([bool]$Condition,[string]$Message) {
 }
 function Get-FixtureSha([string]$Path) {
   (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
+}
+function Get-FixtureSettingsArguments([Collections.IDictionary]$ProfileDefinition,[string]$Path,[string]$Sha256,[bool]$RestrictedMode,[string]$InputSave,[string]$Case) {
+  $mode=if($ProfileDefinition.Contains('settings_mode')){[string]$ProfileDefinition.settings_mode}else{'Defaults'}
+  if(-not $Path -and -not $Sha256){
+    # Retained Protected* labels describe source-save custody and keep the
+    # existing Defaults activation arguments. File alone opts into this seam.
+    Assert-Fixture ($mode -cne 'File') 'file settings require explicit path and hash'
+    return @{SettingsMode='Defaults'}
+  }
+  Assert-Fixture (-not $RestrictedMode -and $InputSave -and $Case -ceq 'native-research-speed-finite' -and [string]$ProfileDefinition.target -ceq 'f210') 'file settings require the bounded modern finite-speed input-save case'
+  Assert-Fixture ($Path -and $Sha256 -cmatch '^[A-Fa-f0-9]{64}$' -and $mode -ceq 'File' -and $ProfileDefinition.Contains('settings_sha256') -and [string]$ProfileDefinition.settings_sha256 -ceq $Sha256.ToUpperInvariant()) 'file settings profile/path/hash declaration differs'
+  $resolved=(Resolve-Path -LiteralPath $Path).Path
+  Assert-Fixture ((Test-Path -LiteralPath $resolved -PathType Leaf) -and (Get-FixtureSha $resolved) -ceq $Sha256.ToUpperInvariant()) 'file settings hash differs'
+  Assert-Fixture ((Get-Item -LiteralPath $resolved).Length -le 4MB) 'file settings exceed the control-file budget'
+  $bytes=[IO.File]::ReadAllBytes($resolved)
+  Assert-Fixture ($bytes.Length -ge 9 -and [Convert]::ToHexString($bytes[0..8]) -ceq '020001001700000000') 'file settings require the exact 2.1.23 header'
+  return @{SettingsMode='File';SettingsPath=$resolved;SettingsSha256=$Sha256.ToUpperInvariant()}
 }
 function Get-FixtureCreateArguments([string]$Seed,[string]$Case,[bool]$OnlyCreate) {
   $arguments=@('--create',$Seed)
@@ -757,6 +776,7 @@ Import-Module $identityModule -Force
 . (Join-Path $repo 'tools/lib/validation/DirectLibraryStartupMeasurement.ps1')
 $profile=(Resolve-Path -LiteralPath $ProfilePath).Path
 $profileDefinition=Get-Content -LiteralPath $profile -Raw | ConvertFrom-Json -AsHashtable
+$selectedSettings=Get-FixtureSettingsArguments -ProfileDefinition $profileDefinition -Path $SettingsPath -Sha256 $SettingsSha256 -RestrictedMode ($historicalProcess -or $historicalTransition -or $CreateOnly -or $activeSeed -or $MIRAbsent -or $publishedF100Forward) -InputSave $inputSave -Case $CaseName
 $rows=@($profileDefinition.mods)
 $publishedF100Fixture=$null
 if($publishedF100Forward){
@@ -842,6 +862,7 @@ $record=[ordered]@{
   input_save=if($inputSave){@{path=$inputSave;sha256=$ExpectedInputSaveSha256.ToUpperInvariant()}}else{$null}
   release_qualification=$false
 }
+if($selectedSettings.SettingsMode -ceq 'File'){$record.settings=@{mode='File';path=$selectedSettings.SettingsPath;sha256=$selectedSettings.SettingsSha256}}
 if($laserTransition){$record.f100_f110_laser_transition=@{stage=$F100F110LaserStage;factorio_version=$historicalProcessVersion}}
 if($publishedF100Forward){$record.published_f100_forward=@{stage=$PublishedF100ForwardStage;target=$publishedF100Fixture.target;role=$publishedF100Fixture.role;predecessor_origin='published-f100-4.7.10003';protected_input_sha256=$ExpectedInputSaveSha256.ToUpperInvariant()}}
 if($publishedF100Forward -and $PublishedF100ForwardStage -ceq 'bridge'){$record.published_f100_forward.engine_bridge_refusal_readback=$publishedF100Fixture.refusal_readback}
@@ -864,6 +885,7 @@ try{
     New-MIRDirectLibraryStartupConfig -Path $config -EngineDataDirectory $engineData -WriteDataDirectory $writeData
   }
   $activationArguments=@{LibraryDirectory=$library;EngineDataDirectory=$engineData;ProfilePath=$profile;ArchiveHashes=$archiveHashes;SettingsMode='Defaults'}
+  if($selectedSettings.SettingsMode -ceq 'File'){$activationArguments.SettingsMode='File';$activationArguments.SettingsPath=$selectedSettings.SettingsPath;$activationArguments.SettingsSha256=$selectedSettings.SettingsSha256}
   # F013--F016 inspect every owned archive name before applying mod-list.json.
   # Preserve single-version external libraries. Coexisting owned versions
   # use the existing checkout-local selector and identity/hash restoration.

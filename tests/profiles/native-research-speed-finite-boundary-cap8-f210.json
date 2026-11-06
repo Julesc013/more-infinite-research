@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "kind": "mir-native-research-speed-finite-prepared",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "settings_mode": "File",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-finite-base-extension-level",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.21007",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-native-research-speed-finite",
+      "version": "0.2.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "mir-fixture-finite-base-extension-level_0.1.0.zip": "79FF0EF2DF88E8A3D50FE3E239A74F60EBDDE1B7E9C511C11B5D5B941CA148DA",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "more-infinite-research_5.0.21007.zip": "81C896F0F33CE7CFF1E8ED78AA7F8F4014A97123DFD6DACFC492247625775776",
+    "mir-fixture-native-research-speed-finite_0.2.0.zip": "BB233B2AB7B5D297B6EB0600A6099871AF0C59F20F8E62DF3C96FEDE846BA8DA"
+  },
+  "scope": "Preparation only: cap0 to8 AFTER the NEW accepted current-marker save; preserve earned8/+0.6, foreign7 flags and detached42% work, cancel MIR8 queue intent leaving automation, retain paused27%; save/two reloads required, then use current Defaults profile to restore MIR-owned enablement/visibility without requeueing.",
+  "boundary_stage": "cap8",
+  "settings_sha256": "3018731C6C24960C3664330755C5D435010788BE6186265B6EEDEF2275BFE0E9",
+  "settings_input": "tests/fixtures/native-research-speed-finite/control-settings/cap8-settings.dat"
+}
