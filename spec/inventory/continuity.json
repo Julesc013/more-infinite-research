@@ -17938,6 +17938,277 @@
       "disposition": "port",
       "whole_source_reconciliation_complete": false,
       "native_execution": false
+    },
+    "discussion_audit_intake_20261107": {
+      "status": "supplied-summary-reconciled-full-row-audit-awaiting-input",
+      "received_on": "2026-11-07",
+      "reviewed_repository_commit": "8508f1c97b99bbeb8967f52fe3e99b6da573b5d5",
+      "provenance": "Maintainer supplied GPT-6 Astra Pro discussion-audit summary dated2026-11-07 01:54:25AEDT. This intake routes its stated obligations; it is not an independent reread of45 Portal threads or the unavailable122-row files.",
+      "reported_counts": {
+        "threads": 45,
+        "replies": 222,
+        "posts": 267,
+        "actionable_records": 122,
+        "regression": 72,
+        "accepted_feature": 17,
+        "evidence_gap": 9,
+        "optional_or_design": 24,
+        "execution_relevant": 98,
+        "proposed_p0": 37
+      },
+      "count_and_completeness_verification": "Author-reported only. Arithmetic45+222=267 and72+17+9+24=122 reconciles; unique record IDs, duplicates, per-thread coverage, proposed priorities and8-thread/12-request crosswalk cannot be checked without the actual files. Proposed P0 rows are not confirmed current defects.",
+      "full_audit_inputs": [
+        {
+          "filename": "MIR5_Discussion_Audit_2026-11-07.md",
+          "library_file_id": "libfile_62967afbe08c8191b02daa0617c43213"
+        },
+        {
+          "filename": "MIR5_Regression_Register_2026-11-07.xlsx",
+          "library_file_id": "libfile_ebc3b8722c2481919744c48aedc4c629"
+        },
+        {
+          "filename": "MIR5_Audit_Bundle_2026-11-07.zip",
+          "library_file_id": "libfile_080369412120819197403c52e4509ec2"
+        },
+        {
+          "filename": "MIR5_Audit_Data_2026-11-07.json",
+          "library_file_id": "libfile_f671c18d97948191b4a1ea6b8d395746"
+        }
+      ],
+      "input_recovery": "Filename search in both local Downloads locations and Codex attachments found no audit files. Maintainer asked for their local path; summary reconciliation continues independently. Recover original IDs/text/decisions before row-level import. No inaccessible file has an invented hash or local locator.",
+      "custody_and_scope": "Preserve all87 existing request IDs/decisions and32 seed case IDs. This additive CONT-15/VER-07 intake is not another request ledger or execution tracker. Keep optional/unresolved/rejected proposals separate from delivered obligations. The new workbook's initial NOT RUN values do not reset existing native results; any reuse needs VER-06 consumed-input review. Keep relative ages and missing inputs unknown.",
+      "reported_inventory_inputs": [
+        {
+          "source": "https://pastebin.com/wqE5DseT",
+          "reported_enabled_names": 564,
+          "limits": "Names already supplied earlier; exact reporter versions/settings/save remain missing. Existing reduced Muria/Tree/Science evidence is not the full installation."
+        },
+        {
+          "source": "https://justpaste.it/egfb3",
+          "reported_entries": 63,
+          "reported_enabled": 52,
+          "reported_disabled": 11,
+          "limits": "Recovered inventory body is in the unavailable bundle; exact versions/settings/save remain unknown. Do not fabricate its profile."
+        }
+      ],
+      "exact_url_overlap_with_existing_request_ledger": [
+        {
+          "thread": "https://mods.factorio.com/mod/more-infinite-research/discussion/6ab6af245dc9150e0f1459aa",
+          "existing_source_id": "P5",
+          "existing_request_ids": [
+            "SIF-01"
+          ]
+        },
+        {
+          "thread": "https://mods.factorio.com/mod/more-infinite-research/discussion/6ad37dc9edf876883c832c02",
+          "existing_source_id": "P-SCI-WEB-2026-10-25",
+          "existing_request_ids": [
+            "SCI-UNLOCK-01"
+          ]
+        }
+      ],
+      "url_overlap_limit": "These two exact-URL matches were read from the current original ledger. The supplied summary's8-thread/12-request crosswalk remains unverified. Other thematic routes below are not claims of exact reporter or source equivalence; absence of a URL match does not establish an absent implementation.",
+      "obligation_routes": [
+        {
+          "subject": "Saved levels and removed duplicates",
+          "continuity_ids": [
+            "CONT-02",
+            "CONT-07",
+            "CONT-11"
+          ],
+          "acceptance_case_ids": [
+            "MIG-SAVE",
+            "CAP-STATE",
+            "MIG-ORIGINS"
+          ],
+          "related_request_ids": [],
+          "independent_expectation_from_supplied_summary": "Preserve earned value as well as technology identities: effects, partial/current/queued work, foreign contributions and cold-reloaded state. A duplicate disappearing is not proof of retained earned bonuses.",
+          "existing_evidence_to_review_for_applicability": [
+            "spec/evidence/candidate503-native-upgrades-r01.json",
+            "spec/evidence/candidate504-mixed-gun-native-r01.json",
+            "spec/evidence/published473-modern-native-r01.json"
+          ],
+          "remaining_check_or_limit": "Retain accepted components at original inputs and all adverse attempts. Current finite native research-speed8/provider and affected public-beta successor checks require their actual saved-state result; do not restart every old patch.",
+          "thread_urls_as_supplied": [
+            "https://mods.factorio.com/mod/more-infinite-research/discussion/6ac991816db6705d84dfd68e",
+            "https://mods.factorio.com/mod/more-infinite-research/discussion/690240a9a8da210ba60a6655"
+          ]
+        },
+        {
+          "subject": "Planet discovery and platform access",
+          "continuity_ids": [
+            "CONT-11",
+            "CONT-12"
+          ],
+          "acceptance_case_ids": [
+            "MIG-SAVE",
+            "GEN-NATIVE"
+          ],
+          "related_request_ids": [],
+          "independent_expectation_from_supplied_summary": "The supplied3.2.0 report/3.2.1 confirmation requires normal planet access and actual platform travel after upgrade, beyond surfaces or researched flags.",
+          "existing_evidence_to_review_for_applicability": [
+            "spec/evidence/discovery-recovery-a575-native-chain-r05.json",
+            "spec/evidence/planet-discovery-api-native-chain-r02.json"
+          ],
+          "remaining_check_or_limit": "The named a575 no-helper case proves Vulcanus unlock, gear work and save/two cold reloads. The API record is MIR-absent runtime-shape evidence only. Neither named record documents actual platform travel; check for an existing accepted travel witness before preparing only that missing affected endpoint. Discovery Tree is a separate case.",
+          "thread_urls_as_supplied": [
+            "https://mods.factorio.com/mod/more-infinite-research/discussion/6a64fba3954cdc5ccdc7127d"
+          ]
+        },
+        {
+          "subject": "Science and laboratory progression",
+          "continuity_ids": [
+            "CONT-05",
+            "CONT-12",
+            "CONT-15"
+          ],
+          "acceptance_case_ids": [
+            "COMP-SCIENCE",
+            "GEN-NATIVE"
+          ],
+          "related_request_ids": [
+            "SCI-UNLOCK-01",
+            "SCI-RESEARCH-01",
+            "SIF-01",
+            "K2-01"
+          ],
+          "independent_expectation_from_supplied_summary": "Distinguish startup admission, disabled prerequisite blockers, obtainable science, an accepting lab and intended pack retirement. Legitimate late K2 retirement is not an accidental red-only result.",
+          "existing_evidence_to_review_for_applicability": [
+            "spec/evidence/science-default-catalogue-chain.json",
+            "spec/evidence/sif-science-retirement-f200-selected-native-chain.json",
+            "spec/evidence/candidate505-science-upgrade-native-r01.json"
+          ],
+          "remaining_check_or_limit": "Review exact profile/data/lab/useful-work applicability. Original SCI-UNLOCK-01 and SCI-RESEARCH-01 reporter closures remain unknown; representative success does not close them.",
+          "thread_urls_as_supplied": [
+            "https://mods.factorio.com/mod/more-infinite-research/discussion/6ab6af245dc9150e0f1459aa"
+          ]
+        },
+        {
+          "subject": "MIR5 continuation, glass and optional-mod reports",
+          "continuity_ids": [
+            "CONT-02",
+            "CONT-07",
+            "CONT-12"
+          ],
+          "acceptance_case_ids": [
+            "GEN-PREFLIGHT",
+            "GEN-NATIVE",
+            "MIG-SAVE"
+          ],
+          "related_request_ids": [
+            "NATIVE-01",
+            "K2-05"
+          ],
+          "independent_expectation_from_supplied_summary": "Preserve qualifying foreign owners, reject internal duplicates and retain affected earned state. Modification history alone does not identify a creator or prove Science Spread caused a collision.",
+          "existing_evidence_to_review_for_applicability": [
+            "spec/evidence/muria-discovery-science-native-chain-r01.json",
+            "spec/evidence/muria-provider-refusal-native-chain-r01.json",
+            "spec/evidence/candidate503-native-upgrades-r01.json"
+          ],
+          "remaining_check_or_limit": "Reduced Muria1.9.5/Tree1.0.12/ScienceSpread0.9.2 and named K2SO/Crushing Industry checks retain their actual scopes. Glass stack without an exact MIR archive cannot be attributed to current5.0.7; full564-mod setup and arbitrary provider switches remain unverified.",
+          "thread_urls_as_supplied": [
+            "https://mods.factorio.com/mod/more-infinite-research/discussion/6ad37dc9edf876883c832c02"
+          ]
+        },
+        {
+          "subject": "Multiplayer joining and event reconstruction",
+          "continuity_ids": [
+            "CONT-10",
+            "CONT-11"
+          ],
+          "acceptance_case_ids": [
+            "RUN-LIFECYCLE",
+            "DET-RUNTIME"
+          ],
+          "related_request_ids": [
+            "MP-JOIN-01"
+          ],
+          "independent_expectation_from_supplied_summary": "Use a separate real client joining a host, saved/restarted host and client reconnect with relevant runtime/migrated states. Server ready alone cannot close the historical on_tick mismatch.",
+          "existing_evidence_to_review_for_applicability": [
+            "spec/evidence/library-current507-input-lifecycle-native-r01.json"
+          ],
+          "remaining_check_or_limit": "Published5.0.7 Base2.0.77/2.1.23 has actual joins and saved-host restart within its imported1.1 scope; final saves were not separately cold-loaded. Review changed Library hierarchy/input for the successor, not a universal multiplayer claim. Preserve distinct inaccessible-screenshot MP-JOIN-01.",
+          "thread_urls_as_supplied": [
+            "https://mods.factorio.com/mod/more-infinite-research/discussion/6acabc9e1ccfd8621529e70e"
+          ]
+        },
+        {
+          "subject": "Startup and Library performance",
+          "continuity_ids": [
+            "CONT-10",
+            "CONT-12"
+          ],
+          "acceptance_case_ids": [
+            "PERF-NATIVE",
+            "PERF-SHAPE",
+            "UI-FIRSTUSE"
+          ],
+          "related_request_ids": [],
+          "independent_expectation_from_supplied_summary": "Compare retained functionality and useful work on fixed valid profiles, distinguishing total from MIR-added startup and startup from runtime/Library/memory. Keep scored timing, warmup and timeout observations separate.",
+          "existing_evidence_to_review_for_applicability": [
+            "spec/evidence/candidate502-base-f200-startup-chain-r01.json",
+            "spec/evidence/whole-product-heavy-space-age-f210-menu-adverse-chain-r04.json"
+          ],
+          "remaining_check_or_limit": "Earlier means retain their candidate identities; heavy prefixes and warmups are not a completed comparison. Existing fixed campaign/admission policy governs reruns; the proposed audit suite does not mandate a new reboot campaign. Whole-product performance remains open.",
+          "thread_urls_as_supplied": [
+            "https://mods.factorio.com/mod/more-infinite-research/discussion/6acabc9e1ccfd8621529e70e"
+          ]
+        },
+        {
+          "subject": "Caps, settings and actual rewards",
+          "continuity_ids": [
+            "CONT-03",
+            "CONT-06",
+            "CONT-07"
+          ],
+          "acceptance_case_ids": [
+            "SET-PARITY",
+            "CAP-STATE",
+            "GEN-NATIVE",
+            "SET-LIFETIME"
+          ],
+          "related_request_ids": [],
+          "independent_expectation_from_supplied_summary": "Check below/at/above cap including10/11 where applicable, queued next level, lowering below earned levels, raising and save/reload; inspect actual effects and preserve foreign disablement.",
+          "existing_evidence_to_review_for_applicability": [
+            "spec/evidence/candidate503-native-upgrades-r01.json",
+            "spec/evidence/f200-positive-cap-qualified-chain.json",
+            "spec/evidence/worker-uncap-chain.json"
+          ],
+          "remaining_check_or_limit": "Reuse applicable controlled cap/effect/cap0 components. Positive numeric native description and current Settings provenance/import/full-compact actual export files remain affected presentation checks; do not infer gameplay from a displayed option.",
+          "thread_urls_as_supplied": [
+            "https://mods.factorio.com/mod/more-infinite-research/discussion/6a80d38cb9fb3a3d9576696a",
+            "https://mods.factorio.com/mod/more-infinite-research/discussion/6acabc9e1ccfd8621529e70e"
+          ]
+        },
+        {
+          "subject": "Library design, discovery, localization and support",
+          "continuity_ids": [
+            "CONT-10",
+            "CONT-16"
+          ],
+          "acceptance_case_ids": [
+            "DET-PRESENTATION",
+            "UI-FIRSTUSE",
+            "SET-PARITY"
+          ],
+          "related_request_ids": [
+            "UI-01",
+            "UI-02",
+            "UI-03",
+            "UI-04",
+            "PLAT-UI-01"
+          ],
+          "independent_expectation_from_supplied_summary": "Restore accepted MIR4.2 stable navigation, retained continuous list/details, personal queries/selection and useful localized benefits. Respect Discovery Tree's actual visibility rather than revealing all MIR research.",
+          "existing_evidence_to_review_for_applicability": [
+            "spec/evidence/library-cont10-layout-negative-control-r01.json",
+            "spec/evidence/library-current507-input-lifecycle-native-r01.json",
+            "spec/evidence/muria-discovery-science-native-chain-r01.json"
+          ],
+          "remaining_check_or_limit": "Issue1768/PRs1769-1772 carry the concrete restoration and narrow clipping correction. Real affected English/German/size/filter/scroll/Settings/Discovery Tree transition/reset observations remain separately scoped; old lifecycle passes do not establish new pixels."
+        }
+      ],
+      "release_direction": "The maintainer targets the next cumulative5.0.x release within12hours. Current public5.0.7 means changed bytes use5.0.8 unless live history advances. Include completed reviewed work after applicable startup/save/package/CI checks; Black Glass owns native execution/integration/tag/GitHub publication and Aero independent review/delivery. The12-hour target is not a stable verdict or waiver. The summary's proposed Mod Portal options are discussion only: agent publication remains GitHub-only; maintainer handles Portal.",
+      "next_action": "Obtain full JSON/bundle; verify original audit IDs/counts/source URLs and deduplicate each record against this existing inventory/ledger/cases and exact results. Reuse named evidence only after applicability review, identify genuinely missing executable endpoints, and leave optional/design decisions with their original status. Do not invent122 row dispositions from this summary or set inventory_complete=true."
     }
   }
 }
