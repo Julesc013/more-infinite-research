@@ -242,7 +242,7 @@ function Invoke-MIRDirectLibraryResponsiveMenuSample {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$FactorioBin,[Parameter(Mandatory)][string]$LibraryDirectory,[Parameter(Mandatory)][string]$EngineDataDirectory,
     [Parameter(Mandatory)][object[]]$BaseRows,[Parameter(Mandatory)][string]$RunRoot,[Parameter(Mandatory)][string]$WriteDataRoot,[Parameter(Mandatory)][string]$Label,
-    [Parameter(Mandatory)]$Resources,[AllowNull()]$MirArchive,[ValidateRange(1,300)][int]$TimeoutSeconds=300,[Parameter(Mandatory)]$OrdinaryPlayerConfig,[Parameter(Mandatory)]$OrdinaryMenuPreparation,[string]$ActiveModsObserver=''
+    [Parameter(Mandatory)]$Resources,[AllowNull()]$MirArchive,[ValidateRange(1,300)][int]$TimeoutSeconds=300,[Parameter(Mandatory)]$OrdinaryPlayerConfig,[Parameter(Mandatory)]$OrdinaryMenuPreparation,[string]$ActiveModsObserver='',[switch]$ForegroundContextDiagnostic
   )
   [IO.Directory]::CreateDirectory($RunRoot)|Out-Null
   Assert-MIRDirectLibraryStartupMeasurement (Test-Path -LiteralPath $WriteDataRoot -PathType Container) 'ordinary-menu-shared-write-data-missing'
@@ -271,6 +271,7 @@ function Invoke-MIRDirectLibraryResponsiveMenuSample {
       library_directory=[string]$activation.library
     }
     $spec=[ordered]@{kind='MIRDirectLibraryOwnedMenuLaunchV1';factorio_path=(Resolve-Path -LiteralPath $FactorioBin).Path;factorio_sha256=$executionControls.engine_sha256;arguments=$arguments;engine_current_log=$engineLog;timeout_seconds=$TimeoutSeconds}
+    if($ForegroundContextDiagnostic){$spec['foreground_context_diagnostic']=$true}
     [IO.File]::WriteAllText($specPath,($spec|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
     $specSha=Get-MIRImmutableInputSha256 -Path $specPath
     $native=Invoke-MIRNativeProbeProcess -Context $Resources -FilePath $actor.host -Arguments @('-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',$actor.path,'-LaunchSpecPath',$specPath,'-LaunchSpecSha256',$specSha,'-OutputRoot',$actorRoot) -TimeoutSeconds ($TimeoutSeconds+20)
@@ -300,6 +301,8 @@ function Invoke-MIRDirectLibraryResponsiveMenuSample {
     $loaded=@(Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -LatestInvocation -ActiveModsObserver $ActiveModsObserver -ActiveModsObserverScript data-final-fixes.lua)
     Assert-MIRDirectLibraryStartupMeasurement ((Get-MIRImmutableInputSha256 -Path $FactorioBin)-ceq$executionControls.engine_sha256-and(Get-MIRImmutableInputSha256 -Path $config)-ceq$executionControls.config.sha256-and(Get-MIRImmutableInputSha256 -Path $profile)-ceq$executionControls.selection.sha256) 'ordinary-menu-execution-controls-drift'
     $playerDataAfter=Get-MIRImmutableInputSha256 -Path $playerData
+    # Validate the complete ordinary sample first, but emit no scored diagnostic sample.
+    if($ForegroundContextDiagnostic){throw '[mir-direct-startup-foreground-context-diagnostic-not-scored]'}
     [pscustomobject][ordered]@{
       label=$Label;run_relative_path=[IO.Path]::GetRelativePath($Resources.root,$RunRoot).Replace('\','/');elapsed_seconds=[double]$menu.elapsed_seconds;endpoint_class='ordinary-responsive-menu'
       ready_endpoint='A Factorio process reached a captured owned main menu and completed a harmless owned Settings action whose distinct Settings screen was captured and OCR-confirmed. The elapsed interval is the actor QPC launch bracket to that confirmed response; actor preheat and shutdown/cleanup are excluded.'
