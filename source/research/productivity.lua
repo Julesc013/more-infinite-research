@@ -10,6 +10,14 @@ function M.cost(base, increment, growth)
   return cost.cost(base, increment, growth)
 end
 
+-- The caller supplies an exclusively owned prototype and resolved positive cap.
+-- Runtime still owns the limit; retaining infinity preserves earned research.
+function M.apply_cap_presentation(output, maximum, setting_caption)
+  output.show_levels_info = false
+  output.localised_description = {"", output.localised_description or "", "\n",
+    {setting_caption, output.localised_name}, ": ", tostring(maximum)}
+end
+
 local function copy_binding(binding)
   if binding == nil then return BASE_ICON, {DEFAULT_RECIPES[1]} end
   assert(type(binding) == "table" and getmetatable(binding) == nil,
@@ -59,6 +67,9 @@ function M.gears(values, binding)
     }
   }
   if values.enabled == false then output.enabled = false end
+  if (values.max_level or 0) > 0 then
+    M.apply_cap_presentation(output, values.max_level, "mod-setting-name.ips-max-level-stream")
+  end
   return output
 end
 

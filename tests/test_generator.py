@@ -1941,6 +1941,73 @@ class GeneratorTests(unittest.TestCase):
           assert(capped.effects[1].change == .1 and capped.unit.count_formula == a.unit.count_formula)
         ''')
 
+    def test_native_cap_description_follows_effective_limit_without_changing_research(self):
+        # Original c86ec2cc/faec7a56 fixtures require an infinite underlying
+        # prototype, explicit finite-cap presentation and its configured value.
+        self.lua.globals().native_cap_fingerprint = lambda value: json.dumps(plain_lua(value), sort_keys=True)
+        build_case = self.lua.eval('''function(family, direct, imported, disabled)
+          local selection, definition = modern_catalogue.select({}), nil
+          local native = family == "research-speed"
+          for _, row in ipairs(native and selection.continuations or selection.definitions) do
+            if row.family == family then definition = row; break end
+          end
+          local cap_key = native and "mir-max-level-research-speed" or "ips-max-level-" .. family
+          local enable_key = native and "mir-enable-research-speed" or "ips-enable-" .. family
+          local startup, baseline_startup = defaults(), defaults()
+          startup[cap_key].value = direct
+          startup[enable_key].value, baseline_startup[enable_key].value = not disabled, not disabled
+          local codec
+          if imported ~= nil then
+            startup["mir-settings-profile-import"].value = "MIRSET1:cap-presentation"
+            codec = {decode_string=function(value)return value end, encode_string=function(value)return value end,
+              json_to_table=function(value)
+                assert(value=="cap-presentation")
+                return {schema=1,kind="mir-settings-profile",settings={[cap_key]=imported}}
+              end}
+          end
+          local values, baseline_values = config.resolve(startup, codec), config.resolve(baseline_startup)
+          local function build(resolved)
+            if family=="research_gears" then return productivity.gears(resolved) end
+            assert(definition,"missing named cap definition")
+            return native and modern.continuation(definition,resolved) or modern.technology(definition,resolved)
+          end
+          local before = native_cap_fingerprint({definition=definition,values=values})
+          local output, baseline = build(values), build(baseline_values)
+          assert(before==native_cap_fingerprint({definition=definition,values=values}),"cap presentation mutated inputs")
+          assert(startup[cap_key].value==direct,"cap presentation changed direct setting")
+          return {output=output,baseline=baseline,effective=values.streams[family].max_level}
+        end''')
+
+        def leaves(value):
+            if isinstance(value, list):
+                return [leaf for child in value for leaf in leaves(child)]
+            return [str(value)]
+
+        def contains(value, expected):
+            return value == expected or isinstance(value, list) and any(contains(child, expected) for child in value)
+
+        families = ("research_gears", "research_copper", "research_processing_unit", "research_plastic",
+                    "research_low_density_structure", "research_rocket_fuel", "research_steel", "research-speed")
+        for family in families:
+            for direct, imported in ((5, None), (7, None), (0, 10), (0, None)):
+                for disabled in (False, True):
+                    with self.subTest(family=family, direct=direct, imported=imported, disabled=disabled):
+                        result = plain_lua(build_case(family, direct, imported, disabled))
+                        output, baseline = result["output"], result["baseline"]
+                        limit = imported if imported is not None else direct
+                        self.assertEqual(result["effective"], limit)
+                        self.assertEqual(output["max_level"], "infinite")
+                        if limit == 0:
+                            self.assertEqual(output, baseline)
+                            continue
+                        self.assertIs(output.get("show_levels_info"), False)
+                        self.assertIn(str(limit), leaves(output["localised_description"]))
+                        self.assertTrue(contains(output["localised_description"], baseline["localised_description"]))
+                        for field in ("show_levels_info", "localised_description"):
+                            output.pop(field, None)
+                            baseline.pop(field, None)
+                        self.assertEqual(output, baseline, "finite-cap disclosure changed native research")
+
     def test_scripted_effect_rows_match_the_captured_space_age_contract(self):
         self.lua.execute('''
           mods = {['space-age'] = '2.1.23'}
