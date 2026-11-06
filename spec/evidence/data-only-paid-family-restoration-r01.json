@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIRDataOnlyPaidFamilyRestorationV1",
-  "status": "source-corrected-and-host-checked; affected-native-qualification-pending",
+  "status": "source-corrected-and-host-checked; bounded-1.1-native-components-accepted; 1.0-and-1.2-pending",
   "scope": "Records the original1.1.0/1.2.0 four-family Base correction and the independently reviewed first-settings and conditional1.0.0 follow-ups. This does not complete any whole older-contract group or the seven-group preservation gate.",
   "original_sources": [
     {
@@ -67,8 +67,8 @@
   },
   "remaining_native_work": {
     "owner": "Black Glass",
-    "default_routes": "Qualify matching independently observed published1.1.0/1.2.0 Base paid inputs through the admitted destinations, preserving all originally required native/partial/current/queued/detached/foreign/module/cannon state and save/two-cold outcomes.",
-    "disabled_module_route": "The originally accepted MIR1.1-to-F210 first-entry modules=false case remains required. Source1746 now supports either known boolean startup-change flag for the independently fixed old mask; actual effective settings, old contributions, unfinished/queued/foreign state and save/two-cold observations remain unverified. Do not invent the observed event flag or replace this case with the default path.",
+    "default_routes": "Qualify the independently observed published1.2.0 Base input through affected destinations, preserving its full34-row/finite-weapon/partial/current/queued/detached/foreign/module/cannon state and save/two-cold outcomes. The three exact1.1 paths below now have accepted pre-lab and useful-work components; no whole older-contract group is closed.",
+    "disabled_module_route": "The exact MIR1.1-to-F210 direct first-entry modules=false path now passes the recorded pre-lab and useful-work/save/two-cold components below. Other source versions or settings changes need their own affected evidence. The actual startup-change event flag was not exported or invented; effective startup values and disabled public/module prototype state were observed.",
     "guard_limits": "Unknown providers/settings/versions/engines and active observer/fixture mods are not silently admitted. A source/input discrepancy is not permission to weaken a guard or change the oracle.",
     "conditional_1_0_route": "Inspect the protected F8B38209 MIR1.0 predecessor and qualify the affected current F200/F210 successors within their original21-row/gear-lab/queue/detached/foreign/sentinel scope. Establish actual source manufacturing state; do not infer a full four-family ledger from the count or count fixture-seeded rows as lab-earned. Retain original old-package passes and adverse results."
   },
@@ -87,7 +87,8 @@
       "review_custody": "3a0619464509008e45004a213eb5f7d753356396:evidence/aero-data-only-settings-transition-r01/",
       "internal_f200_sha256": "070703B034875BF6588E529556C32AB93D36B0860AC451DCE0BAD5EB82AE65CB",
       "internal_f210_sha256": "08F2D22C6988A1B0F31679A4AF3CDB4D8F30E63FD6F9EE38548BBAFE53D34932",
-      "required_author_checks": "All four pass; source not yet merged at this documentation revision."
+      "required_author_checks": "All four pass at the exact author; merged through PR1746. The three1.1 native components retain the actual2a author/package identities below.",
+      "integrated_dev": "6929ec3edf54fe6742af18a077dbee7895dffbee"
     },
     {
       "pr": 1748,
@@ -101,8 +102,103 @@
       "negative_control": "One definition refusal and six paid-mask errors on the prior source; the new source passes the suppressed/unearned, paid, changed-settings and foreign-state controls.",
       "independent_review_sha256": "F5DEF56308A50E06991886E6D8A2A644B277645FE1FD0084E069CA28407B01CE",
       "review_custody": "ca5dcfc695476fafb853e1d07b5a6d4dc69baf1d:evidence/aero-source-navigation-paid100-r01/",
-      "required_author_checks": "All four pass in run42146325363 plus branch-policy42146325386; source not yet merged at this documentation revision.",
-      "native_execution": false
+      "required_author_checks": "All four pass at original0b and refreshedb192; normal-merge correspondence preserves the exact reviewed incremental patch. PR1748 mergedcadf and all four integrated-head checks pass.",
+      "native_execution": false,
+      "refreshed_author": "b192e85084821eacb6b34fd0cbad7d2562ac4fd1",
+      "integrated_dev": "cadf7eba4e2de8747a8d1362c0268c68fd4b455f"
     }
-  ]
+  ],
+  "native_1_1_components": {
+    "status": "accepted-bounded-components-not-whole-group",
+    "actual_source": "2a8e85e6ed636da494275f564d1fe87e57e9898f",
+    "actual_player_tree": "79775e0e6deab30a7647d2768e4e8c800c4e2342",
+    "published_source": {
+      "version": "1.1.0",
+      "archive_sha256": "6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44",
+      "protected_original_save_sha256": "88FC8E9891040275E001930C3E6AA0A4A7A28C31D81DF30E3F08AEDD98E5019A",
+      "helper_free_derived_save_sha256": "45204B6FDB92CF4933DCE9C1D10A2B01E669312A87228874A029D70B460BF4B4",
+      "preparation_review_sha256": "1B0B4708B4ABED777BB691999AD0314BC577401C567788296792A68DFCBA52C5",
+      "limit": "The derived published1.1 source and two cold observations contain Base/MIR only. Original fixture-seeded non-gear contributions and prior accelerated gear work are preserved, not called additional lab-earned manufacturing research. Restoring published gear costs retains foreign0.42/detached0.27 research-unit equivalents, rather than retaining their accelerated-cost progress fractions."
+    },
+    "engines": [
+      {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      }
+    ],
+    "arms": [
+      {
+        "target": "f200",
+        "modules_enabled": true,
+        "archive_sha256": "070703B034875BF6588E529556C32AB93D36B0860AC451DCE0BAD5EB82AE65CB",
+        "prelab_save_sha256": "CF8DFC1D1C37679B416F533BF14F3359330C44E463948A9A898E0D0749A1CBE9",
+        "work_save_sha256": "56598A69E7AFD30023EE368D17BAD3325CB58A6FF08B26B2DA2BD0AABBB0D500"
+      },
+      {
+        "target": "f210",
+        "modules_enabled": true,
+        "archive_sha256": "08F2D22C6988A1B0F31679A4AF3CDB4D8F30E63FD6F9EE38548BBAFE53D34932",
+        "prelab_save_sha256": "4B09A3D43EA45EADC2463F01A875CCFA947AB97292D46286C3DC8320EAEE7D85",
+        "work_save_sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD"
+      },
+      {
+        "target": "f210",
+        "modules_enabled": false,
+        "archive_sha256": "08F2D22C6988A1B0F31679A4AF3CDB4D8F30E63FD6F9EE38548BBAFE53D34932",
+        "prelab_save_sha256": "C93FB73564A2284CBAB79BFEA8265F129F4E6D4B02A5E3BF3E63FB03BC4D3A46",
+        "work_save_sha256": "6149769AEA7BFB221FA7664E10EC8DBA62EB7B839FAEDF16132673B4251836AA"
+      }
+    ],
+    "prelab": {
+      "private_commit": "31445c7c4e8c1afab6007e0bac61921041c9ec1a",
+      "private_path": "projects/mir/runs/data-only-110-prelab-r01/",
+      "capsule_sha256": "C8B418237B00D941053E305C960296761F091CDBCF3D056746E6DF284385719F",
+      "exact_safe_originals": 50,
+      "accepted_successor_instances": 9,
+      "saved_successors": 3,
+      "separate_cold_reloads": 6,
+      "state_review_sha256": "37EEC8052AB3FC590CFBC6E224F89E0FD6316B0A7319E2777A1FFBE223011638",
+      "parent_review_sha256": "D04B7ED8909765F4B8643D562D298A8947C9AE5FD8092859147B004728462E8F",
+      "observation": "All31 old row levels and71 old recipe totals survive across three forces; new collected/steel rights remain zero. Foreign queue/detached research-unit investment, battery bonus,42selected startup booleans and module credits survive. First-entry modules=false keeps public/prototype disabled and private module holders at level2, retaining the old0.11 tier1 totals."
+    },
+    "useful_work": {
+      "private_commit": "d512c2aafb04e2955910ec60d8694cc134f57143",
+      "private_path": "projects/mir/runs/data-only-110-useful-work-r01/",
+      "capsule_sha256": "D2FA34372C6D1791C8E92AC9C9E45D3B010ED1BF0856EDAB57927BCD0D639080",
+      "decoded_sha256": "DC3FFF2B9EABD4F11DA89914D6686B42A97028D6FECF6EF88804A2350BFD51C8",
+      "exact_safe_originals": 235,
+      "actual_source_bindings": 32,
+      "accepted_instances": 9,
+      "new_research_completions": 3,
+      "saved_successors": 3,
+      "separate_cold_reloads": 6,
+      "parent_correspondence_sha256": "1B92DBE1323947CCB379AD59D231A80BABA9722D3BF801FEFA842022DC1A895E",
+      "state_review_sha256": "70B59CF78EE99BDF0D107174D6BB8C9CFCDBB94C7FB3C53FDB8CAFC83D7DB0AB",
+      "observation": "Each arm completes one native gear level2-to3 research at unchanged16000-unit/60second cost using1000ordinary fixture labs at game.speed16. Exactly16000of each of the four science packs is consumed before fixture cleanup; gear bonus becomes0.20. Native reset, full old-state/foreign/queue/module checks, a saved successor and two separate cold readbacks pass.",
+      "independent_tolerance": "All independently recomputed old31-row/71-recipe expectations pass1e-8; largest observed absolute error2.98023223e-9. Existing controller1e-7 predicates are unchanged; the independent review does not claim they were1e-8.",
+      "stops_and_scheduling": "All nine accepted instances are exit-1 completion-predicate governor stops, not natural engine exit0. Their219.018090direct-native seconds are scheduling observations only.",
+      "adverse": "The separate F210default-r01 process completed gear research but failed its fixture finish on read-only LuaEntity.active before reset/post-state/save. Its original failure remains failed. The correction only clears owned lab inventories/energy and stops the owned power interface; cost/effect/reset assertions remain unchanged."
+    },
+    "applicability": {
+      "reviewed_dev": "cadf7eba4e2de8747a8d1362c0268c68fd4b455f",
+      "reviewed_player_tree": "4729b97b28056ef7fd02f500023192c4673dc9f1",
+      "prelab_review_sha256": "BAC13BDEB3E941B24D6D956924D42601F7E770EBBDEF363F3137E292F2D76798",
+      "useful_work_review_sha256": "E9B41859B4626DB852EA171D1241395EE4BE7279AEA377B05C20CE4A83550F7A",
+      "decision": "The2a-to-cadf delta is package-excluded sourceREADME and the exact1.0-only declaration/comment. Consumed1.1 construction/settings/caps/credit/completion/reset/save paths are unchanged. Reuse is accepted only for these three1.1 arms under their original2a package/controller identities; no newcadf native execution is claimed."
+    },
+    "custody_limit": "Independent review verifies safe originals and committed controller/source correspondence. Raw credential-bearing logs/argv/resource ledgers and saved successor binaries remain the native owner's hash-verified primary/secondary local custody; no direct Aero binary/rawlog inspection is claimed.",
+    "not_claimed": [
+      "physical science manufacture",
+      "performance",
+      "UI/client/API parity",
+      "MIR1.0 or1.2 qualification",
+      "whole older-contract group",
+      "stable acceptance",
+      "replacement of published5.0.6 bytes"
+    ]
+  }
 }
