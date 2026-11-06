@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryAuthoredLayoutNativeObservationsV1",
+  "requirement": {
+    "issue": 1768,
+    "continuity": "CONT-10"
+  },
+  "status": "bounded-normal-display-and-retained-details-pass-full-library-acceptance-open",
+  "reference": {
+    "tag": "v4.7.3",
+    "package_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+    "actual_capture": "93e9dc5f0ec80e1d4d9ec9bc34ff67e3a170b504:projects/mir/runs/library-mir4-reference-r01/",
+    "limits": "Original renderer observed on2.1.23 from a protected-copy setup; not a historical save qualification. Its owner deadline is retained as adverse."
+  },
+  "source_head": "175200891c39602eb7c34d259caeec9328793e0a",
+  "player_tree": "c2c4b489f1195eedca0769db1cc183ebbd0e6d17",
+  "actual_runs": [
+    {
+      "name": "authored-normal-en-r05",
+      "source_head": "6e4a31be97fc5421625f1d2df7510a609061e587",
+      "package_sha256": "945910B6E75574E5E8354B5620A917D93086F03B09AD422D75AE87C6ADEE0453",
+      "scope": "Actual Research/Queue/Settings/Debug/Research navigation and normal close/quit/Exit; not the later retained-details implementation.",
+      "owner_result": {
+        "bytes": 3774,
+        "sha256": "5607EBF0DB6487D4E18CD95CEC4F07CC1E0A37DF694FC8C482B82E6394F03D0C"
+      },
+      "exit_code": 0,
+      "timed_out": false
+    },
+    {
+      "name": "authored-normal-en-r06",
+      "source_head": "175200891c39602eb7c34d259caeec9328793e0a",
+      "package_sha256": "CACBF5A0DAD162E79A17C7A136C076F260DFA254676A1FD2A0C4A6DA6F9F77C0",
+      "scope": [
+        "Initial normal-display research shows authored icon/title, compact benefit/requirements and four science icons, with separate recipe pane.",
+        "Actual bounded drag scrolls the right facts pane independently of the left list.",
+        "Actual native level dropdown All to Infinite retains Advanced circuit selection and the same scrolled Benefit/requirements position.",
+        "Check science production updates an actual player/nauvis snapshot, sampled at tick197986 with current zero factory output; its additional content is reachable by scrolling.",
+        "Library close, pause-menu exit, confirmation to quit the disposable test copy and main-menu Exit complete normally; owner exit0, no timeout, no remaining Factorio and direct-library controls restored."
+      ],
+      "owner_result": {
+        "bytes": 3774,
+        "sha256": "10B787C73368393742A515C5C58244C275B87E3D2B52028457135F8895F89954"
+      },
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_seconds": 713.03362,
+      "peak_sampled_private_bytes": 2651484160
+    }
+  ],
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "client": {
+    "width": 2560,
+    "height": 1440,
+    "language": "en"
+  },
+  "custody": {
+    "private_commit": "cc3b884002b32467a54a420da083137ee7227e6f",
+    "path": "projects/mir/runs/library-authored-retained-details-r01/",
+    "current_originals": 527,
+    "current_bytes": 69455043,
+    "primary": "build/qualification/library-tab-layout-native-r01/retained-authored-normal-en-r06/",
+    "verified_secondary": true,
+    "zero_factorio": true,
+    "controls_restored": true,
+    "protected_inputs_unchanged": true
+  },
+  "independent_source_review": "https://github.com/Julesc013/more-infinite-research/pull/1769#issuecomment-6695178452",
+  "actual_pixels": [
+    {
+      "path": "research-initial.png",
+      "bytes": 3324837,
+      "sha256": "0342FBBEDDF58816CA758290726CB899CA82A516068A8A39CA6F8EC056808BAF"
+    },
+    {
+      "path": "details-scrolled.png",
+      "bytes": 4221312,
+      "sha256": "2F5C716E7CCA4BF89C37541EE87B590D2D82613CD0837B80C4F493952EDD8776"
+    },
+    {
+      "path": "infinite-retained.png",
+      "bytes": 3937660,
+      "sha256": "86BDC6749B226BD3ED40D92FD5D0B0289211584C181A5B2CC6F26FEC7E0F355C"
+    },
+    {
+      "path": "production-results.png",
+      "bytes": 4212695,
+      "sha256": "18E353EE63C1D991CDCE6508A8B02BA6651B88FD4BC16C2B77FCF396D8D2FFC0"
+    },
+    {
+      "path": "main-menu.png",
+      "bytes": 7292878,
+      "sha256": "6A7CE2BEEC50397F0D6F123818E100D78A3B7E0C82F770ED9431B074D02107FA"
+    }
+  ],
+  "adverse_history": [
+    "Initial fixed-tab source revealed list-context loss and an actual split/stacked resize crash; both corrected and retained.",
+    "Later icon overlap and narrow Settings clipping corrected; those observations retain their original player inputs.",
+    "English r01 and German r02 manual sessions exceeded owner deadlines; never promoted to normal-exit passes.",
+    "r03 controller prelaunch failure and r04 commit admission refusal remain adverse; actual measured single-client memory justified4GiB budget while keeping reserves/guard checks."
+  ],
+  "limits": [
+    "One English client on internal source7-labelled ZIP; not public7 and not final8 freeze.",
+    "Earlier r05 actual four-tab/return and natural exit passed on player83fbaeba; r06 specifically tests the combined c2c4 retained-details change.",
+    "German r02 observed layout/report/settings actions but owner hit its deadline during quit; retained as adverse, not a natural exit pass.",
+    "No multiplayer, saved-view upgrade, full narrow layout, gameplay, physical production or performance acceptance inferred."
+  ],
+  "release_qualification": false,
+  "stable_acceptance": false
+}
