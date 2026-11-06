@@ -9,6 +9,94 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryModelTests(unittest.TestCase):
+    def test_benefit_captions_use_native_labels_and_correct_percent_or_count_units(self):
+        self.lua.execute('''
+          local effects=require("presentation.library_effects")
+          for _,kind in ipairs{"laboratory-speed","laboratory-productivity","worker-robot-battery",
+            "worker-robot-speed","character-crafting-speed","character-mining-speed",
+            "character-running-speed","mining-drill-productivity-bonus","train-braking-force-bonus",
+            "artillery-range"} do
+            local effect={type=kind,modifier=.15}
+            local caption=effects.caption(effect)
+            assert(caption[1]=="" and caption[2][1]=="gui-bonus."..kind and caption[4]=="+15%")
+            assert(effect.type==kind and effect.modifier==.15 and effect.caption==nil)
+          end
+          for _,kind in ipairs{"worker-robot-storage","character-inventory-slots-bonus",
+            "character-logistic-trash-slots","character-reach-distance","character-build-distance",
+            "character-resource-reach-distance","character-item-drop-distance",
+            "character-item-pickup-distance","character-loot-pickup-distance",
+            "character-health-bonus","bulk-inserter-capacity-bonus","inserter-stack-size-bonus",
+            "maximum-following-robots-count"} do
+            local caption=effects.caption({type=kind,modifier=2})
+            assert(caption[2][1]=="gui-bonus."..kind and caption[4]=="+2")
+          end
+          assert(effects.caption({type="laboratory-speed",modifier=-.15})[4]=="-15%")
+          assert(effects.caption({type="worker-robot-storage",modifier=0})[4]=="+0")
+        ''')
+
+    def test_benefit_captions_retain_ammo_turret_and_scripted_effect_meaning(self):
+        self.lua.execute('''
+          local effects=require("presentation.library_effects")
+          local gun=effects.caption({type="gun-speed",ammo_category="cannon-shell",modifier=1.5})
+          assert(gun[2][1]=="?" and gun[2][2][1]=="ammo-category-name.cannon-shell")
+          assert(gun[4][1]=="gui-bonus.shooting-speed-bonus" and gun[6]=="+150%")
+          local damage=effects.caption({type="ammo-damage",ammo_category="mortar-bomb",modifier=.25})
+          assert(damage[2][3]=="mortar-bomb" and damage[4][1]=="gui-bonus.damage-bonus"
+            and damage[6]=="+25%")
+          local turret=effects.caption({type="turret-attack",turret_id="gun-turret",modifier=.3})
+          assert(turret[2][2][1]=="entity-name.gun-turret" and turret[6]=="+30%")
+          local description={"modifier-description.more-infinite-research.agricultural_growth_speed","10"}
+          local scripted={type="nothing",effect_description=description}
+          assert(effects.caption(scripted)==description and scripted.type=="nothing")
+          local recipe=effects.caption({type="change-recipe-productivity",recipe="gears",change=.1})
+          assert(recipe[1]=="mir-browser.productivity-increment" and recipe[2]=="10")
+        ''')
+
+    def test_unknown_or_invalid_effects_do_not_invent_a_benefit(self):
+        self.lua.execute('''
+          local effects=require("presentation.library_effects")
+          for _,effect in ipairs{{type="future-foreign-effect",modifier=.1},
+            {type="laboratory-speed",modifier=0/0},{type="laboratory-speed",modifier=math.huge},
+            {type="laboratory-speed",modifier=1e308},{type="worker-robot-storage",modifier="2"},
+            {type="gun-speed",modifier=.1},{type="turret-attack",modifier=.1},
+            {type="change-recipe-productivity",change=math.huge}} do
+            assert(effects.caption(effect)==nil)
+          end
+        ''')
+
+    def test_scripted_detail_retains_its_authored_description_without_numeric_variant_reads(self):
+        self.lua.execute('''
+          local id="recipe-prod-research_gears-1"
+          local description={"modifier-description.more-infinite-research.spoilage_preservation","10"}
+          local effect=setmetatable({type="nothing",effect_description=description},
+            {__index=function(_,key) error("invalid scripted-effect field: "..tostring(key)) end})
+          local native=technology(id,{effects={effect}})
+          local force={technologies={[id]=native},research_queue={}}
+          local detail=assert(model.detail(force,{{id=id,family="mir"}},{selected=id}))
+          assert(detail.effects_complete and #detail.effects==1)
+          assert(detail.effects[1].type=="nothing" and detail.effects[1].effect_description~=description)
+          assert(detail.effects[1].effect_description[1]==description[1]
+            and detail.effects[1].effect_description[2]=="10")
+          detail.effects[1].effect_description[2]="mutated"
+          assert(description[2]=="10","detail aliases a native effect's localized table")
+          assert(detail.effects[1].modifier==nil and detail.effects[1].ammo_category==nil)
+          assert(native.prototype.effects[1]==effect and native.level==1)
+        ''')
+
+    def test_scripted_descriptions_refuse_unbounded_or_cyclic_text_without_aliasing(self):
+        self.lua.execute('''
+          local id="recipe-prod-research_gears-1"
+          local cycle={""}; cycle[2]=cycle
+          local large={"",string.rep("x",65537)}
+          for _,description in ipairs{cycle,large} do
+            local native=technology(id,{effects={{type="nothing",effect_description=description}}})
+            local detail=assert(model.detail({technologies={[id]=native},research_queue={}},
+              {{id=id,family="mir"}},{selected=id}))
+            assert(not detail.effects_complete and detail.effects[1].effect_description==nil)
+            assert(native.prototype.effects[1].effect_description==description)
+          end
+        ''')
+
     def test_data_stage_identity_lookup_does_not_select_a_runtime_catalogue(self):
         self.lua.execute('''
           script, mods = nil, {}
