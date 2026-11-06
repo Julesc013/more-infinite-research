@@ -112,6 +112,18 @@ local function query(player, family, id, visibility, hidden)
   }) ~= true then fail("public browser query failed") end
 end
 
+local function browser_list_parts(content)
+  local pane = valid(content) and content.mir_library_list_pane or nil
+  if pane == nil then
+    return valid(content) and content.mir_library_results or nil, valid(content) and content.mir_library_actions or nil
+  end
+  if not valid(pane) or pane.type ~= "flow" or pane.direction ~= "vertical"
+      or (pane.get_mod and pane.get_mod() ~= "more-infinite-research") then
+    fail("native research list pane is malformed or foreign")
+  end
+  return pane.mir_library_results, pane.mir_library_actions
+end
+
 local function assert_result(player, family, id, visibility, present)
   local root = player.gui.screen.mir_research_browser
   local filters = valid(root) and root.mir_library_filters
@@ -120,9 +132,8 @@ local function assert_result(player, family, id, visibility, present)
   if page ~= nil and (not valid(page) or page.type ~= "scroll-pane" or (page.get_mod and page.get_mod() ~= "more-infinite-research")) then fail("research page is malformed or foreign") end
   if page ~= nil then filters = page.mir_library_filters end
   local content = valid(page) and page.mir_library_research_content or (valid(tabs) and tabs.mir_library_research_content)
-  local results = valid(content) and content.mir_library_results
+  local results, actions = browser_list_parts(content)
   local detail = valid(content) and content.mir_library_detail
-  local actions = valid(content) and content.mir_library_actions
   local button = valid(actions) and actions.mir_library_open_native
   local family_index = family == "all" and 2 or 3
   local family_control = filter_control(root, filters, "mir_library_family")

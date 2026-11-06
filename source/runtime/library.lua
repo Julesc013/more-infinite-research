@@ -937,9 +937,8 @@ local function dispatch_translations(player, record)
 end
 
 local function update_discovery_indicator(content, record)
-  local actions = valid(content) and content[PREFIX .. "actions"] or nil
-  local indicator = valid(content) and content[PREFIX .. "count"]
-    or (valid(actions) and actions[PREFIX .. "count"])
+  local list_pane = valid(content) and content[PREFIX .. "list_pane"]
+  local indicator = valid(list_pane) and list_pane[PREFIX .. "count"] or nil
   if valid(indicator) then
     indicator.tooltip = type(record) == "table"
       and translation_queue.discovery_limited(record.cache, record.scope) == true
@@ -1251,9 +1250,9 @@ local function detail_lines(parent, row, detail, player)
     add(parent, {type = "label", name = PREFIX .. "detail_level", caption = {"mir-browser.level-cap", row.current_level or 1, row.cap}})
     add(parent, {type = "label", name = PREFIX .. "detail_cap", caption = {"mir-browser.cap-finite", row.cap, tostring(row.cap_setting or "?")}})
   else
-    add(parent, {type = "label", name = PREFIX .. "detail_level", caption = {"mir-browser.level", row.current_level or 1}})
+    local level = add(parent, {type = "label", name = PREFIX .. "detail_level", caption = {"mir-browser.level", row.current_level or 1}})
     if row.cap_state == "unlimited" then
-      add(parent, {type = "label", name = PREFIX .. "detail_cap", caption = {"mir-browser.cap-unlimited"}})
+      level.tooltip = {"mir-browser.cap-unlimited"}
     elseif row.cap_state == "unavailable" then
       add(parent, {type = "label", name = PREFIX .. "detail_cap", caption = {"mir-browser.cap-unavailable"}})
     end
@@ -1429,7 +1428,8 @@ local function update_research_content(content, player, view, context, translati
   if not valid(content) then return end
   -- Availability is a different projection in the same body. Clear it only
   -- at that boundary; ordinary Research refreshes retain their widgets.
-  if valid(content[PREFIX .. "availability_empty"]) or valid(content[PREFIX .. "availability_1"]) then
+  if valid(content[PREFIX .. "availability_empty"]) or valid(content[PREFIX .. "availability_1"])
+      or valid(content[PREFIX .. "actions"]) or valid(content[PREFIX .. "results"]) then
     content.clear()
   end
 
@@ -1449,30 +1449,47 @@ local function update_research_content(content, player, view, context, translati
   end
   local width = content.style and content.style.maximal_width or 592
   local height = content.style and content.style.maximal_height or 220
-  local panes = library_layout.split_sizes(width, height)
+  -- The list header now belongs to its own pane. The selected detail can
+  -- use the full body instead of reserving a toolbar row above both panes.
+  local panes = library_layout.split_sizes(width, height + 36)
   local selected = selected_index > 0 and rows[selected_index] or nil
   if selected then
     view.selected = selected.id
     selected.hidden = view.hidden[selected.id] == true
   end
 
-  local actions = content[PREFIX .. "actions"]
+  local list_pane = content[PREFIX .. "list_pane"]
+  if not valid(list_pane) then
+    list_pane = add(content, {type = "flow", name = PREFIX .. "list_pane", direction = "vertical"})
+    add(list_pane, {type = "label", name = PREFIX .. "count"})
+  end
+  list_pane.style.width = panes.list_width
+  local action_columns = panes.list_width < 300 and 2 or 5
+  local action_rows = math.ceil((view.visibility == 2 and 5 or 4) / action_columns)
+  local header_height = 28 + action_rows * 32
+  list_pane.style.height = math.max(header_height + 76, panes.list_height)
+  local actions = list_pane[PREFIX .. "actions"]
+  if valid(actions) and (actions.type ~= "table" or actions.column_count ~= action_columns) then
+    local previous_results = list_pane[PREFIX .. "results"]
+    if valid(previous_results) then previous_results.destroy() end
+    actions.destroy()
+    actions = nil
+  end
   if not valid(actions) then
-    if panes.columns == 1 then
-      actions = add(content, {type = "flow", name = PREFIX .. "actions", direction = "horizontal"})
-      add(actions, {type = "label", name = PREFIX .. "count"})
-    else
-      add(content, {type = "label", name = PREFIX .. "count"})
-      actions = add(content, {type = "flow", name = PREFIX .. "actions", direction = "horizontal"})
-    end
+    actions = add(list_pane, {type = "table", name = PREFIX .. "actions", column_count = action_columns})
     add(actions, {type = "sprite-button", name = PREFIX .. "hide", style = "tool_button"})
     add(actions, {type = "button", name = PREFIX .. "inspect_settings", caption = {"mir-browser.settings"},
       tooltip = {"mir-browser.inspect-settings"}})
     add(actions, {type = "sprite-button", name = PREFIX .. "open_native", style = "tool_button",
       sprite = "utility/side_menu_technology_icon", tooltip = {"mir-browser.native-queue-guidance"}})
-    add(actions, {type = "button", name = PREFIX .. "close", caption = {"mir-browser.close"}})
+    add(actions, {type = "sprite-button", name = PREFIX .. "close", style = "tool_button",
+      sprite = "utility/close", tooltip = {"mir-browser.close"}})
   end
-  local count = panes.columns == 1 and actions[PREFIX .. "count"] or content[PREFIX .. "count"]
+  actions.style.width = panes.list_width
+  actions.style.horizontal_spacing, actions.style.vertical_spacing = 4, 4
+  actions[PREFIX .. "inspect_settings"].style.minimal_width = 0
+  actions[PREFIX .. "inspect_settings"].style.maximal_width = math.max(1, panes.list_width - (action_columns == 2 and 40 or 132))
+  local count = list_pane[PREFIX .. "count"]
   count.caption = {"mir-browser.count", #rows}
   local hide = actions[PREFIX .. "hide"]
   hide.sprite, hide.enabled = selected and selected.hidden and "utility/expand" or "utility/collapse", selected ~= nil
@@ -1487,13 +1504,13 @@ local function update_research_content(content, player, view, context, translati
     show_hidden.destroy()
   end
 
-  local results = content[PREFIX .. "results"]
+  local results = list_pane[PREFIX .. "results"]
   local created = not valid(results)
   if created then
-    results = add(content, {type = "list-box", name = PREFIX .. "results", items = item_labels, selected_index = selected_index})
+    results = add(list_pane, {type = "list-box", name = PREFIX .. "results", items = item_labels, selected_index = selected_index})
   end
   local items_changed, selection_changed = update_list_items(results, item_labels, selected_index)
-  if results.style then results.style.width, results.style.height = panes.list_width, panes.list_height end
+  if results.style then results.style.width, results.style.height = panes.list_width, math.max(76, panes.list_height - header_height) end
   if created and view.scroll and view.scroll <= #item_labels and type(results.scroll_to_item) == "function" then
     results.scroll_to_item(view.scroll, "top-third")
   elseif (items_changed or selection_changed) and selected_index > 0 and type(results.scroll_to_item) == "function" then
@@ -1952,10 +1969,8 @@ local function update_help_content(content, player, view)
         tooltip = {"mir-browser.report-preview"}})
       preview.read_only, preview.word_wrap = true, true
       add(panel, {type = "button", name = PREFIX .. "report_select", caption = {"mir-browser.report-select"}})
-      add(panel, {type = "button", name = PREFIX .. "export_diagnostics", caption = {"mir-browser.export-diagnostics"},
-        tooltip = {"mir-browser.export-diagnostics-tooltip"}})
+      add(panel, {type = "button", name = PREFIX .. "export_diagnostics", caption = {"mir-browser.export-diagnostics"}})
       add(panel, {type = "label", name = PREFIX .. "report_local", caption = {"mir-browser.report-local"}})
-      add(panel, {type = "label", name = PREFIX .. "export_privacy", caption = {"mir-browser.export-sharing-guidance"}})
     end
     library_section(tools, "help_configuration", "mir-browser.configuration", sizes.list_width)
     add(tools, {type = "label", name = PREFIX .. "help_profile", caption = {"mir-browser.profile-purpose"}})
@@ -1974,6 +1989,15 @@ local function update_help_content(content, player, view)
   elseif diagnostics and (settings_box.state ~= view.report_settings or omissions_box.state ~= view.report_omissions) then
     settings_box.state, omissions_box.state = view.report_settings, view.report_omissions
     update_report_preview(content, player, view)
+  end
+  -- Adopt an already-open pane from the preceding layout without replacing
+  -- its selected report text or exporting/re-encoding a fresh snapshot.
+  local old_privacy = panel[PREFIX .. "export_privacy"]
+  if valid(old_privacy) then old_privacy.destroy() end
+  local local_only, export = panel[PREFIX .. "report_local"], panel[PREFIX .. "export_diagnostics"]
+  if valid(local_only) then local_only.tooltip = {"mir-browser.export-sharing-guidance"} end
+  if valid(export) then
+    export.tooltip = {"", {"mir-browser.export-diagnostics-tooltip"}, "\n\n", {"mir-browser.export-sharing-guidance"}}
   end
   -- Layout updates do not re-encode or replace the report snapshot/selection.
   tools.style.width, tools.style.height = sizes.list_width, sizes.columns == 1 and sizes.list_height or sizes.detail_height
@@ -2446,7 +2470,7 @@ function M.on_gui_selection_state_changed(event)
     render(player, view)
   elseif element.name == PREFIX .. "results" then
     if not owns_element(player, element, {
-      PREFIX .. "results", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
+      PREFIX .. "results", PREFIX .. "list_pane", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     local context = context_for(player.force)
@@ -2584,7 +2608,7 @@ function M.on_gui_click(event)
   end
   if element.name == PREFIX .. "close" then
     local in_research_actions = owns_element(player, element, {
-      PREFIX .. "close", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
+      PREFIX .. "close", PREFIX .. "actions", PREFIX .. "list_pane", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     })
     local in_title = owns_element(player, element, {PREFIX .. "close", PREFIX .. "title", ROOT})
     if not in_research_actions and not in_title then return end
@@ -2593,7 +2617,7 @@ function M.on_gui_click(event)
   end
   if element.name == PREFIX .. "hide" then
     if not owns_element(player, element, {
-      PREFIX .. "hide", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
+      PREFIX .. "hide", PREFIX .. "actions", PREFIX .. "list_pane", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     local id = technology_id(view.selected)
@@ -2613,7 +2637,7 @@ function M.on_gui_click(event)
   end
   if element.name == PREFIX .. "show_hidden" then
     if not owns_element(player, element, {
-      PREFIX .. "show_hidden", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
+      PREFIX .. "show_hidden", PREFIX .. "actions", PREFIX .. "list_pane", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     view.hidden, view.visibility, view.selected = {}, 1, nil
@@ -2623,7 +2647,7 @@ function M.on_gui_click(event)
   end
   if element.name == PREFIX .. "inspect_settings" then
     if not owns_element(player, element, {
-      PREFIX .. "inspect_settings", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
+      PREFIX .. "inspect_settings", PREFIX .. "actions", PREFIX .. "list_pane", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     local selected = technology_id(view.selected)
@@ -2660,7 +2684,7 @@ function M.on_gui_click(event)
   end
   if element.name ~= PREFIX .. "open_native" then return end
   if not owns_element(player, element, {
-    PREFIX .. "open_native", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
+    PREFIX .. "open_native", PREFIX .. "actions", PREFIX .. "list_pane", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
   }) then return end
   local view = view_for(player.index)
   local selected = technology_id(view.selected)

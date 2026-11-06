@@ -658,7 +658,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               content.column_count=2
               content.style.maximal_width=760
               root.mir_library_tabs.mir_library_research_content=content
-              if opponent=="new-page" or opponent=="bad-page" or opponent=="foreign-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field" then
+              if opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" or opponent=="bad-page" or opponent=="foreign-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field" then
                 local page=element(opponent=="bad-page" and "flow" or "scroll-pane","mir_library_research_page")
                 page.get_mod=function() return opponent=="foreign-page" and "other" or "more-infinite-research" end
                 filters.type,filters.direction="flow","vertical"
@@ -690,7 +690,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               content.mir_library_detail.style.minimal_width=442
               content.mir_library_detail.style.maximal_width=442
               local detail=content.mir_library_detail
-              if present and (opponent=="new-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field") then
+              if present and (opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field") then
                 local facts=element("scroll-pane","mir_library_research_facts")
                 local heading=element("flow","mir_library_detail_heading");heading.direction="horizontal"
                 detail.mir_library_research_facts=facts;facts.mir_library_detail_heading=heading
@@ -702,6 +702,14 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               content.mir_library_actions=element("flow","mir_library_actions")
               content.mir_library_actions.mir_library_open_native=element("button","mir_library_open_native")
               content.mir_library_actions.mir_library_open_native.enabled=present
+              if opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" then
+                local pane=element(opponent=="bad-list-pane" and "frame" or "flow","mir_library_list_pane")
+                pane.direction="vertical"
+                pane.get_mod=function() return opponent=="foreign-list-pane" and "other" or "more-infinite-research" end
+                pane.mir_library_results,pane.mir_library_actions=content.mir_library_results,content.mir_library_actions
+                content.mir_library_list_pane=pane
+                content.mir_library_results,content.mir_library_actions=nil,nil
+              end
               p.opened=root
               return root
             end
@@ -953,6 +961,14 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertFalse(final["fixture_seeds_credit"])
                 self.assertTrue(final["load_observed"])
                 self.assertEqual(final["en_geometry"]["location"], {"x": 170, "y": 100})
+
+    def test_list_pane_path_rejects_malformed_or_foreign_container(self):
+        result = self.run_case(opponent="list-pane")
+        self.assertTrue(result["ok"], result["message"])
+        for opponent in ("bad-list-pane", "foreign-list-pane"):
+            result = self.run_case(opponent=opponent)
+            self.assertFalse(result["ok"])
+            self.assertIn("native research list pane is malformed or foreign", result["message"])
 
     def test_research_page_path_and_malformed_page_refusal(self):
         result = self.run_case(opponent="new-page")

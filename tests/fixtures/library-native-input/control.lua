@@ -176,27 +176,39 @@ local function selected_title(root, detail)
       or not valid(heading.mir_library_detail_icon) then return nil end
   return heading.mir_library_detail_title
 end
+local function browser_list_parts(content)
+  local pane = valid(content) and content.mir_library_list_pane or nil
+  if pane == nil then
+    return valid(content) and content.mir_library_results or nil, valid(content) and content.mir_library_actions or nil
+  end
+  if not valid(pane) or pane.type ~= "flow" or pane.direction ~= "vertical"
+      or (pane.get_mod and pane.get_mod() ~= "more-infinite-research") then
+    fail("native research list pane is malformed or foreign")
+  end
+  return pane.mir_library_results, pane.mir_library_actions
+end
+
 local function exclusion_probe(en,de)
   for _, p in ipairs({en,de}) do
     for _, family in ipairs({"all","external"}) do
       local ordinary=family=="all" and GEAR or "automation"
       if remote.call(BROWSER,"open",p.index,{search=ordinary,selected=ordinary,family=family,visibility=1,tab="research"})~=true then fail("ordinary positive query failed") end
       local _,ordinary_content=research_parts(p.gui.screen[ROOT])
-      if not valid(ordinary_content) or not valid(ordinary_content.mir_library_results) or #ordinary_content.mir_library_results.items<1
-          or ordinary_content.mir_library_results.selected_index<1
+      local ordinary_results,ordinary_actions=browser_list_parts(ordinary_content)
+      if not valid(ordinary_content) or not valid(ordinary_results) or #ordinary_results.items<1
+          or ordinary_results.selected_index<1
           or (ordinary_content.type=="table" and ordinary_content.column_count~=2)
           or (ordinary_content.type=="scroll-pane" and ordinary_content.vertical_scroll_policy~="auto")
           or (ordinary_content.type~="table" and ordinary_content.type~="scroll-pane")
           or ordinary_content.mir_library_detail.type~="scroll-pane"
           or not valid(selected_title(p.gui.screen[ROOT], ordinary_content.mir_library_detail))
-          or ordinary_content.mir_library_actions.mir_library_open_native.enabled~=true then fail("ordinary inspection positive control failed") end
+          or ordinary_actions.mir_library_open_native.enabled~=true then fail("ordinary inspection positive control failed") end
       for _, id in ipairs(IDS) do
         if remote.call(BROWSER,"open",p.index,{search=id,selected=id,family=family,visibility=1,tab="research"})~=true then fail("private query failed") end
         local root=p.gui.screen[ROOT];local filters=research_parts(root)
         local _,content=research_parts(root)
-        local results=valid(content) and content.mir_library_results
+        local results,actions=browser_list_parts(content)
         local detail=valid(content) and content.mir_library_detail
-        local actions=valid(content) and content.mir_library_actions
         local button=valid(actions) and actions.mir_library_open_native
         if not valid(filters) or not valid(content) or filters[QUERY].text~=id or filter_control(root, filters, "mir_library_family").selected_index~=(family=="all" and 2 or 3)
             or (content.type=="table" and content.column_count~=2)

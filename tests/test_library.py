@@ -9,6 +9,66 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_normal_research_details_use_full_height_without_a_toolbar_or_unlimited_cap_paragraph(self):
+        self.lua.execute('''
+          boot()
+          player.display_resolution,player.display_scale={width=2560,height=1440},1.25
+          local model=require("presentation.library_model")
+          local original=model.rows
+          model.rows=function(...)
+            local rows=original(...);rows[1].cap=nil;rows[1].cap_state="unlimited";return rows
+          end
+          prototypes={item={["automation-science-pack"]={valid=true,name="automation-science-pack",localised_name="Automation science pack"}}}
+          model.detail=function()return {cost={count=16000,energy=3600,
+            ingredients={{name="automation-science-pack",amount=1}}},effects={},prerequisites={}} end
+          local queue,current,progress=player.force.research_queue,player.force.current_research,player.force.research_progress
+          local root=library.open(player,{selected=gear.name})
+          local body=research_content(root)
+          local left=body.mir_library_list_pane
+          assert(left.type=="flow" and left.direction=="vertical")
+          assert(body._children[1]==left and body._children[2]==body.mir_library_detail,
+            "no toolbar row may displace the selected detail below the list header")
+          local actions=left.mir_library_actions
+          assert(actions.type=="table" and actions.column_count==5)
+          assert(actions.mir_library_hide and actions.mir_library_inspect_settings
+            and actions.mir_library_open_native and actions.mir_library_close)
+          assert(actions.mir_library_close.type=="sprite-button" and actions.mir_library_close.tooltip[1]=="mir-browser.close")
+          assert(body.mir_library_detail.style.maximal_height==body.style.maximal_height)
+          local facts=body.mir_library_detail.mir_library_research_facts
+          assert(facts.mir_library_detail_cap==nil and facts.mir_library_detail_level.tooltip[1]=="mir-browser.cap-unlimited")
+          assert(facts.mir_library_science_icons and facts.mir_library_production_check)
+          assert(player.force.research_queue==queue and player.force.current_research==current
+            and player.force.research_progress==progress)
+          player.display_resolution={width=1280,height=720}
+          library.close(player)
+          root=library.open(player,{selected=gear.name})
+          left=research_content(root).mir_library_list_pane
+          actions=left.mir_library_actions
+          assert(actions.column_count==2 and actions.mir_library_inspect_settings.style.maximal_width>100,
+            "narrow list headers wrap actions rather than clipping the Settings label")
+          assert(left.mir_library_results.style.maximal_height+92<=left.style.maximal_height)
+        ''')
+
+    def test_debug_sharing_guidance_stays_on_the_export_without_a_clipped_duplicate_footer(self):
+        self.lua.execute('''
+          helpers={write_file=function() error("opening Debug exported a file") end}
+          boot()
+          local page=library.open(player,{tab="help"}).mir_library_tabs.mir_library_help_content
+          local panel=debug_report(page)
+          assert(panel.mir_library_export_privacy==nil)
+          assert(panel.mir_library_report_local.caption[1]=="mir-browser.report-local")
+          assert(panel.mir_library_report_local.tooltip[1]=="mir-browser.export-sharing-guidance")
+          assert(panel.mir_library_export_diagnostics.tooltip[4][1]=="mir-browser.export-sharing-guidance")
+          local preview=panel.mir_library_report_preview
+          panel.add{type="label",name="mir_library_export_privacy",caption={"mir-browser.export-sharing-guidance"}}
+          panel.mir_library_report_local.tooltip=nil
+          panel.mir_library_export_diagnostics.tooltip={"mir-browser.export-diagnostics-tooltip"}
+          library.open(player,{tab="help"})
+          assert(panel.mir_library_export_privacy==nil and panel.mir_library_report_preview==preview)
+          assert(panel.mir_library_report_local.tooltip[1]=="mir-browser.export-sharing-guidance")
+          assert(panel.mir_library_export_diagnostics.tooltip[4][1]=="mir-browser.export-sharing-guidance")
+        ''')
+
     def test_queue_restores_the_original_numbered_full_height_native_projection(self):
         self.lua.execute('''
           boot()
@@ -69,8 +129,8 @@ class LibraryTests(unittest.TestCase):
               and box._children[2]==box["mir_library_"..name])
             assert(box["mir_library_"..name.."_label"].visible==true)
           end
-          assert(research_content(root).mir_library_results.items[1][2]=="[img=technology/"..gear.name.."] ")
-          assert(research_content(root).mir_library_results.items[1][3]==gear.localised_name)
+          assert(research_content(root).mir_library_list_pane.mir_library_results.items[1][2]=="[img=technology/"..gear.name.."] ")
+          assert(research_content(root).mir_library_list_pane.mir_library_results.items[1][3]==gear.localised_name)
           query.text="gears"
           library.on_gui_text_changed({player_index=1,element=query})
           assert(research_filters(root)==filters and filters.mir_library_query==query and query.text=="gears")
@@ -260,12 +320,12 @@ class LibraryTests(unittest.TestCase):
             library.on_gui_selection_state_changed({player_index=1,element=visibility})
             assert(not old.valid and body[name]==nil,
               "Availability labels must not survive into the ordinary Research grid")
-            assert(body.mir_library_results.valid and body.mir_library_detail.valid)
+            assert(body.mir_library_list_pane.mir_library_results.valid and body.mir_library_detail.valid)
             -- Repair a retained body produced by the intermediate mixed-layout draft.
             local orphan=body.add{type="label",name="mir_library_availability_1",caption="old projection"}
             library.open(player)
             assert(not orphan.valid and body.mir_library_availability_1==nil)
-            assert(body.mir_library_results.valid and body.mir_library_detail.valid)
+            assert(body.mir_library_list_pane.mir_library_results.valid and body.mir_library_detail.valid)
           end
           end
         ''')
@@ -316,7 +376,7 @@ class LibraryTests(unittest.TestCase):
           boot()
           local root=library.open(player,{selected=gear.name})
           local body=research_content(root)
-          local list,actions=body.mir_library_results,body.mir_library_actions
+          local list,actions=body.mir_library_list_pane.mir_library_results,body.mir_library_list_pane.mir_library_actions
           local detail=body.mir_library_detail
           local scroll_calls=0
           list.scroll_to_item=function() scroll_calls=scroll_calls+1 end
@@ -332,12 +392,12 @@ class LibraryTests(unittest.TestCase):
             if key=="items" then writes=writes+1;items=value else previous_write(target,key,value) end
           end
           library.open(player)
-          assert(body.mir_library_results==list and list.valid and body.mir_library_actions==actions,
+          assert(body.mir_library_list_pane.mir_library_results==list and list.valid and body.mir_library_list_pane.mir_library_actions==actions,
             "ordinary refresh must retain the native list and its interaction context")
           assert(body.mir_library_detail==detail and detail.valid)
           library.open(player,{tab="queue"})
           library.open(player,{tab="research"})
-          assert(research_content(root).mir_library_results==list and list.valid)
+          assert(research_content(root).mir_library_list_pane.mir_library_results==list and list.valid)
           assert(scroll_calls==0,"unchanged lists must not be programmatically scrolled again")
           assert(writes==0,"unchanged native items must not be reassigned")
           local model=require("presentation.library_model")
@@ -346,7 +406,7 @@ class LibraryTests(unittest.TestCase):
             local rows=original(...);rows[1].name="Updated display name";return rows
           end
           library.open(player)
-          assert(body.mir_library_results==list and writes==1 and list.items[1][3]=="Updated display name",
+          assert(body.mir_library_list_pane.mir_library_results==list and writes==1 and list.items[1][3]=="Updated display name",
             "changed display names must update the retained native list")
           assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
         ''')
@@ -355,7 +415,7 @@ class LibraryTests(unittest.TestCase):
         self.lua.execute('''
           boot()
           local root=library.open(player,{family="all",selected=foreign.name})
-          local list=research_content(root).mir_library_results
+          local list=research_content(root).mir_library_list_pane.mir_library_results
           local query=research_filters(root).mir_library_query
           query.text="gear"
           library.on_gui_text_changed({player_index=1,element=query})
@@ -363,7 +423,7 @@ class LibraryTests(unittest.TestCase):
           assert(#list.items==1 and list.selected_index==1
             and storage.mir_library.players[1].selected==gear.name,
             "an excluded old selection must not leave a nonempty result list without details")
-          assert(body.mir_library_results==list and list.valid)
+          assert(body.mir_library_list_pane.mir_library_results==list and list.valid)
           assert(body.mir_library_detail.mir_library_research_facts.mir_library_detail_heading.mir_library_detail_title.caption==gear.localised_name)
           assert(gear.level==3 and foreign.level==1 and player.force.research_progress==.5)
         ''')
@@ -458,7 +518,7 @@ class LibraryTests(unittest.TestCase):
           local detail=research_content(root).mir_library_detail
           assert(detail.mir_library_research_facts.mir_library_effect_1==nil)
           assert(detail.mir_library_research_facts.mir_library_other_effects.caption[1]=="mir-browser.effect-native-details")
-          assert(research_content(root).mir_library_actions.mir_library_open_native.enabled)
+          assert(research_content(root).mir_library_list_pane.mir_library_actions.mir_library_open_native.enabled)
           assert(gear.level==3 and gear.enabled==false)
         ''')
 
@@ -817,7 +877,7 @@ class LibraryTests(unittest.TestCase):
           end
 
           function queued_rows()
-            return #research_content(player.gui.screen["mir_research_browser"])["mir_library_results"].items
+            return #research_content(player.gui.screen["mir_research_browser"])["mir_library_list_pane"]["mir_library_results"].items
           end
         ''')
 
@@ -1100,7 +1160,7 @@ class LibraryTests(unittest.TestCase):
           local root = library.open(player,{selected=gear.name,family="all"})
           local content = research_content(root)
           local detail = content["mir_library_detail"]
-          assert(content["mir_library_results"].items[1][3] == gear_name,
+          assert(content["mir_library_list_pane"]["mir_library_results"].items[1][3] == gear_name,
             "first-open display exposed an ID while native localized name was available")
           assert(detail.mir_library_research_facts.mir_library_detail_heading["mir_library_detail_title"].caption == gear_name)
           assert(detail.mir_library_research_facts["mir_library_detail_family"] == nil)
@@ -1131,7 +1191,7 @@ class LibraryTests(unittest.TestCase):
           local root = library.open(player,{selected=gear.name,family="all"})
           local content = research_content(root)
           local detail = content["mir_library_detail"]
-          assert(content["mir_library_results"].items[1][3] == gear.name)
+          assert(content["mir_library_list_pane"]["mir_library_results"].items[1][3] == gear.name)
           assert(detail.mir_library_research_facts["mir_library_detail_family"] == nil)
           assert(detail.mir_library_research_facts.mir_library_science_icons["mir_library_science_1"].caption[2] == "missing-science")
           assert(detail.mir_library_research_facts.mir_library_prerequisite_icons["mir_library_prerequisite_1"].caption == "fixture-prerequisite")
@@ -1344,7 +1404,7 @@ class LibraryTests(unittest.TestCase):
           assert(content.style.minimal_width == 592 and content.style.maximal_width == 592)
           assert(content.style.minimal_height == 180 and content.style.maximal_height == 180)
           assert(content.type == "table" and content.column_count == 2)
-          assert(content["mir_library_results"].style.minimal_width == 225)
+          assert(content["mir_library_list_pane"]["mir_library_results"].style.minimal_width == 225)
           assert(content["mir_library_detail"].style.minimal_width == 339)
         ''')
 
@@ -1353,7 +1413,7 @@ class LibraryTests(unittest.TestCase):
           boot()
           local root = library.open(player)
           local content = research_content(root)
-          local results, detail = content["mir_library_results"], content["mir_library_detail"]
+          local results, detail = content["mir_library_list_pane"]["mir_library_results"], content["mir_library_detail"]
           assert(content.type == "table" and content.column_count == 2)
           assert(results.type == "list-box" and results.selected_index == 1)
           assert(detail.type == "scroll-pane" and detail.vertical_scroll_policy == "auto"
@@ -1375,7 +1435,7 @@ class LibraryTests(unittest.TestCase):
           assert(panes["mir_library_settings_list"].style.minimal_height
             == panes["mir_library_settings_detail"].style.minimal_height)
           root = library.open(player, {tab="research", selected=gear.name})
-          local actions = research_content(root)["mir_library_actions"]
+          local actions = research_content(root)["mir_library_list_pane"]["mir_library_actions"]
           assert(actions["mir_library_inspect_settings"].enabled)
           library.on_gui_click({player_index=1, element=actions["mir_library_inspect_settings"]})
           assert(storage.mir_library.players[1].tab == "settings"
@@ -1570,13 +1630,13 @@ class LibraryTests(unittest.TestCase):
           local root = library.open(player, {selected=gear.name})
           local content = research_content(root)
           assert(content.type == "scroll-pane" and content.vertical_scroll_policy == "auto")
-          assert(content["mir_library_actions"] and content["mir_library_results"]
+          assert(content["mir_library_list_pane"]["mir_library_actions"] and content["mir_library_list_pane"]["mir_library_results"]
             and content["mir_library_detail"])
-          assert(content["mir_library_results"].style.minimal_height >= 76
+          assert(content["mir_library_list_pane"]["mir_library_results"].style.minimal_height >= 76
             and content["mir_library_detail"].style.minimal_height >= 80)
-          assert(content["mir_library_results"].style.maximal_width
+          assert(content["mir_library_list_pane"]["mir_library_results"].style.maximal_width
             == content["mir_library_detail"].style.maximal_width
-            and content["mir_library_results"].style.maximal_width <= content.style.maximal_width)
+            and content["mir_library_list_pane"]["mir_library_results"].style.maximal_width <= content.style.maximal_width)
         ''')
 
     def test_title_close_button_closes_the_library_from_every_tab(self):
@@ -1789,27 +1849,27 @@ class LibraryTests(unittest.TestCase):
           local queue, level = player.force.research_queue, gear.level
           local root = library.open(player, {selected=gear.name})
           local content = research_content(root)
-          assert(content["mir_library_actions"]["mir_library_hide"].sprite == "utility/collapse")
-          library.on_gui_click({player_index=1, element=content["mir_library_actions"]["mir_library_hide"]})
+          assert(content["mir_library_list_pane"]["mir_library_actions"]["mir_library_hide"].sprite == "utility/collapse")
+          library.on_gui_click({player_index=1, element=content["mir_library_list_pane"]["mir_library_actions"]["mir_library_hide"]})
           assert(storage.mir_library.players[1].hidden[gear.name] == true)
-          assert(#content["mir_library_results"].items == 0)
+          assert(#content["mir_library_list_pane"]["mir_library_results"].items == 0)
           assert(player.force.research_queue == queue and gear.level == level)
 
           local filters = research_filters(root)
           filters["mir_library_filter_grid"]["mir_library_visibility_field"]["mir_library_visibility"].selected_index = 2
           library.on_gui_selection_state_changed({player_index=1, element=filters["mir_library_filter_grid"]["mir_library_visibility_field"]["mir_library_visibility"]})
-          assert(content["mir_library_results"].selected_index == 1)
-          assert(content["mir_library_actions"]["mir_library_hide"].sprite == "utility/expand"
-            and content["mir_library_actions"]["mir_library_hide"].tooltip[1] == "mir-browser.show-tooltip")
-          library.on_gui_click({player_index=1, element=content["mir_library_actions"]["mir_library_hide"]})
+          assert(content["mir_library_list_pane"]["mir_library_results"].selected_index == 1)
+          assert(content["mir_library_list_pane"]["mir_library_actions"]["mir_library_hide"].sprite == "utility/expand"
+            and content["mir_library_list_pane"]["mir_library_actions"]["mir_library_hide"].tooltip[1] == "mir-browser.show-tooltip")
+          library.on_gui_click({player_index=1, element=content["mir_library_list_pane"]["mir_library_actions"]["mir_library_hide"]})
           assert(storage.mir_library.players[1].hidden[gear.name] == nil
             and storage.mir_library.players[1].visibility == 1)
-          assert(#content["mir_library_results"].items == 1 and content["mir_library_results"].selected_index == 1)
+          assert(#content["mir_library_list_pane"]["mir_library_results"].items == 1 and content["mir_library_list_pane"]["mir_library_results"].selected_index == 1)
 
-          library.on_gui_click({player_index=1, element=content["mir_library_actions"]["mir_library_hide"]})
+          library.on_gui_click({player_index=1, element=content["mir_library_list_pane"]["mir_library_actions"]["mir_library_hide"]})
           filters["mir_library_filter_grid"]["mir_library_visibility_field"]["mir_library_visibility"].selected_index = 2
           library.on_gui_selection_state_changed({player_index=1, element=filters["mir_library_filter_grid"]["mir_library_visibility_field"]["mir_library_visibility"]})
-          library.on_gui_click({player_index=1, element=content["mir_library_actions"]["mir_library_show_hidden"]})
+          library.on_gui_click({player_index=1, element=content["mir_library_list_pane"]["mir_library_actions"]["mir_library_show_hidden"]})
           assert(next(storage.mir_library.players[1].hidden) == nil
             and storage.mir_library.players[1].visibility == 1)
           assert(player.force.research_queue == queue and gear.level == level)
@@ -1853,13 +1913,13 @@ class LibraryTests(unittest.TestCase):
             assert(a.hidden[gear.name] and not a.hidden[foreign.name] and next(b.hidden)==nil,
               "invalid replacement or another player's action changed personal hidden choices")
             local ca,cb=research_content(root_a),research_content(root_b)
-            assert(#ca.mir_library_results.items==1
-              and ca.mir_library_results.items[1][3]==foreign.localised_name
-              and a.selected==foreign.name and ca.mir_library_actions.mir_library_hide.sprite=="utility/collapse",
+            assert(#ca.mir_library_list_pane.mir_library_results.items==1
+              and ca.mir_library_list_pane.mir_library_results.items[1][3]==foreign.localised_name
+              and a.selected==foreign.name and ca.mir_library_list_pane.mir_library_actions.mir_library_hide.sprite=="utility/collapse",
               "malformed hidden replacement changed the prior visible selection or action")
-            assert(#cb.mir_library_results.items==1
-              and cb.mir_library_results.items[1][3]==gear.localised_name
-              and b.selected==gear.name and cb.mir_library_actions.mir_library_hide.sprite=="utility/collapse")
+            assert(#cb.mir_library_list_pane.mir_library_results.items==1
+              and cb.mir_library_list_pane.mir_library_results.items[1][3]==gear.localised_name
+              and b.selected==gear.name and cb.mir_library_list_pane.mir_library_actions.mir_library_hide.sprite=="utility/collapse")
             assert(snapshot()==native_before,"Library personal views changed active native research")
           end
           assert_views()
@@ -1872,7 +1932,7 @@ class LibraryTests(unittest.TestCase):
 
           library.open(player,{hidden={}})
           assert(next(storage.mir_library.players[1].hidden)==nil
-            and #research_content(root_a).mir_library_results.items==2,
+            and #research_content(root_a).mir_library_list_pane.mir_library_results.items==2,
             "a valid empty replacement must actually clear the personal hidden list")
           root_a=library.open(player,{hidden={gear.name},selected=foreign.name})
           assert_views()
@@ -1899,7 +1959,7 @@ class LibraryTests(unittest.TestCase):
           local query=research_filters(root).mir_library_query
           local function indicator(frame)
             local content=research_content(frame)
-            return content.mir_library_count or content.mir_library_actions.mir_library_count
+            return content.mir_library_list_pane.mir_library_count
           end
           assert(indicator(root).tooltip and indicator(root).tooltip[1]=="mir-browser.discovery-limited",
             "limited localized discovery must warn on the existing result count")
@@ -1927,7 +1987,7 @@ class LibraryTests(unittest.TestCase):
             "cold-load lost settled discovery limits or issued duplicate requests")
           player.display_resolution={width=480,height=400}
           root=library.open(player)
-          assert(research_content(root).mir_library_actions.mir_library_count.tooltip[1]=="mir-browser.discovery-limited",
+          assert(research_content(root).mir_library_list_pane.mir_library_count.tooltip[1]=="mir-browser.discovery-limited",
             "narrow layout lost the count warning")
           assert(indicator(peer_root).tooltip==nil)
           library.close(player);gear.prototype.effects={}
@@ -1952,7 +2012,7 @@ class LibraryTests(unittest.TestCase):
                 translated=opponent~="failed-callback",result="Gear\31Casting"}
             end
             local content=research_content(root)
-            local count=content.mir_library_count or content.mir_library_actions.mir_library_count
+            local count=content.mir_library_list_pane.mir_library_count
             assert(count.tooltip and count.tooltip[1]=="mir-browser.discovery-limited",
               "actual host lost discovery failure metadata: "..opponent)
             local ledger=storage.mir_library.translations
@@ -1995,7 +2055,7 @@ class LibraryTests(unittest.TestCase):
           library.on_string_translated{player_index=1,id=first,translated=true,result="invalid old composition"}
           assert(#ledger.active[1].pending==1)
           local content=research_content(root)
-          local count=content.mir_library_count or content.mir_library_actions.mir_library_count
+          local count=content.mir_library_list_pane.mir_library_count
           assert(count.tooltip==nil,"an old-scope discovery callback contaminated the renewed view")
           library.on_string_translated{player_index=1,id=player.translation_requests[2].id,
             translated=true,result="Complete current caption"}
@@ -2169,27 +2229,27 @@ class LibraryTests(unittest.TestCase):
           library.on_gui_text_changed({player_index = 1, element = query})
           root = player.gui.screen["mir_research_browser"]
           assert(root == original_root and research_filters(root)["mir_library_query"] == original_query)
-          local rows = research_content(root)["mir_library_results"]
+          local rows = research_content(root)["mir_library_list_pane"]["mir_library_results"]
           assert(#rows.items == 1 and rows.items[1][3] == "Iron gear wheel productivity")
           rows.selected_index = 1
           library.on_gui_selection_state_changed({player_index = 1, element = rows})
           root = player.gui.screen["mir_research_browser"]
           local state = storage.mir_library.players[1]
           assert(state.query == "gear wheel" and state.selected == gear.name and state.scroll == 1)
-          assert(research_content(root)["mir_library_actions"]["mir_library_open_native"].sprite
+          assert(research_content(root)["mir_library_list_pane"]["mir_library_actions"]["mir_library_open_native"].sprite
             == "utility/side_menu_technology_icon")
           assert(state.location.x == 91 and state.location.y == 44)
           local before = storage.mir_library
           library.on_load()
           assert(storage.mir_library == before)
-          library.on_gui_click({player_index = 1, element = research_content(root)["mir_library_actions"]["mir_library_open_native"]})
+          library.on_gui_click({player_index = 1, element = research_content(root)["mir_library_list_pane"]["mir_library_actions"]["mir_library_open_native"]})
           assert(player.opened_technology == gear and player.gui.screen["mir_research_browser"] == nil)
           assert(not player.shortcut_toggled)
           library.open(player)
           root = player.gui.screen["mir_research_browser"]
           assert(root.location.x == 91 and root.location.y == 44)
-          assert(research_content(root)["mir_library_results"].scrolled_to.index == 1)
-          library.on_gui_click({player_index = 1, element = research_content(root)["mir_library_actions"]["mir_library_close"]})
+          assert(research_content(root)["mir_library_list_pane"]["mir_library_results"].scrolled_to.index == 1)
+          library.on_gui_click({player_index = 1, element = research_content(root)["mir_library_list_pane"]["mir_library_actions"]["mir_library_close"]})
           assert(player.gui.screen["mir_research_browser"] == nil and not player.shortcut_toggled)
         ''')
 
@@ -2204,7 +2264,7 @@ class LibraryTests(unittest.TestCase):
           family.selected_index = 2
           library.on_gui_selection_state_changed({player_index = 1, element = family})
           root = player.gui.screen["mir_research_browser"]
-          assert(#research_content(root)["mir_library_results"].items == 1)
+          assert(#research_content(root)["mir_library_list_pane"]["mir_library_results"].items == 1)
           library.on_player_removed({player_index = 1})
           assert(storage.mir_library.players[1] == nil)
         ''')
@@ -2277,7 +2337,7 @@ class LibraryTests(unittest.TestCase):
             assert(not library.subscription_needs() and native_ticks[library.translation_maintenance_ticks]==nil,
               "the final peer callback must remove translation maintenance")
             assert(ledger.active[2]==nil and peer_cache.labels[gear.name]=="Zahnrad des zweiten Spielers")
-            assert(research_content(second).mir_library_results.items[1][3]=="Zahnrad des zweiten Spielers"
+            assert(research_content(second).mir_library_list_pane.mir_library_results.items[1][3]=="Zahnrad des zweiten Spielers"
               and second==peer.gui.screen.mir_research_browser and query==research_filters(second).mir_library_query)
             assert(player.force.research_queue==queue and player.force.current_research==current
               and player.force.research_progress==progress and gear.level==3 and gear.enabled==false)
@@ -2400,7 +2460,7 @@ class LibraryTests(unittest.TestCase):
             library.on_string_translated({player_index=1, id=request.id, translated=true, result=request.result})
           end
           local content = research_content(root)
-          local listed = content["mir_library_results"].items
+          local listed = content["mir_library_list_pane"]["mir_library_results"].items
           assert(#listed == 2 and (listed[1][3] == "Erzförderer-Produktivität" or listed[2][3] == "Erzförderer-Produktivität"))
           assert(listed[1][3] == "Eisenrad-Produktivität" or listed[2][3] == "Eisenrad-Produktivität",
             "the working gear LocalisedString regressed")
@@ -2482,15 +2542,15 @@ class LibraryTests(unittest.TestCase):
           for _, term in ipairs({"recipe-tail", "item-tail", "fluid-tail"}) do
             assert(string.find(payload, term, 1, true) > 1024)
           end
-          assert(#research_content(root)["mir_library_results"].items == 0)
+          assert(#research_content(root)["mir_library_list_pane"]["mir_library_results"].items == 0)
           library.on_string_translated({player_index=1, id=request.id+999, translated=true, result=payload})
-          assert(#research_content(root)["mir_library_results"].items == 0,
+          assert(#research_content(root)["mir_library_list_pane"]["mir_library_results"].items == 0,
             "an unrelated callback published localized search data")
           library.on_string_translated({player_index=1, id=request.id, translated=true, result=payload})
           for _, term in ipairs({"recipe-tail", "item-tail", "fluid-tail"}) do
             query.text = term
             library.on_gui_text_changed({player_index=1, element=query})
-            local listed = research_content(root)["mir_library_results"].items
+            local listed = research_content(root)["mir_library_list_pane"]["mir_library_results"].items
             assert(#listed == 1 and listed[1][3] == "Produktivitätsforschung",
               "a late recipe/item/fluid term was lost through callback or refresh: " .. term)
             assert(player.gui.screen["mir_research_browser"] == root and root.valid
@@ -2530,7 +2590,7 @@ class LibraryTests(unittest.TestCase):
           library.on_string_translated({player_index = 1, id = all_foreign,
             translated = true, result = "Foreign translated"})
           root = player.gui.screen["mir_research_browser"]
-          assert(research_content(root)["mir_library_results"].items[1][3] == "Gear translated")
+          assert(research_content(root)["mir_library_list_pane"]["mir_library_results"].items[1][3] == "Gear translated")
         ''')
 
     def test_private_credit_holders_stay_out_of_library_selection_translation_and_native_open(self):
@@ -2567,7 +2627,7 @@ class LibraryTests(unittest.TestCase):
 
           local function assert_private_rows(root, label)
             local listed = {}
-            for _, item in ipairs(research_content(root)["mir_library_results"].items) do listed[item[3]] = true end
+            for _, item in ipairs(research_content(root)["mir_library_list_pane"]["mir_library_results"].items) do listed[item[3]] = true end
             assert(listed[gear.localised_name] and listed[foreign.localised_name], label .. " dropped ordinary rows")
             for index, id in ipairs(credits) do
               assert(not listed[id] and not listed["Private credit " .. index], label .. " exposed private credit: " .. id)
@@ -2616,7 +2676,7 @@ class LibraryTests(unittest.TestCase):
           library.close(player)
           storage.mir_library.players[1].selected = credits[1]
           root = library.open(player, {tab = "research"})
-          local actions = research_content(root)["mir_library_actions"]
+          local actions = research_content(root)["mir_library_list_pane"]["mir_library_actions"]
           assert(storage.mir_library.players[1].selected == credits[1]
             and actions["mir_library_open_native"].enabled == false,
             "stale private selection was repaired or exposed as an openable row")
@@ -2657,7 +2717,7 @@ class LibraryTests(unittest.TestCase):
           -- the ID without applying the label to the stale cached scope.
           library.on_string_translated({player_index = 1, id = id,
             translated = true, result = "incorrect locale label"})
-          assert(research_content(root)["mir_library_results"].items[1][3] == "Iron gear wheel productivity")
+          assert(research_content(root)["mir_library_list_pane"]["mir_library_results"].items[1][3] == "Iron gear wheel productivity")
           assert(library.subscription_needs() == false)
           library.on_player_locale_changed({player_index = 1})
           assert(#player.translation_requests == 2)
@@ -2666,7 +2726,7 @@ class LibraryTests(unittest.TestCase):
           player.force.index = 2
           library.on_string_translated({player_index = 1, id = locale_current,
             translated = true, result = "incorrect force label"})
-          assert(research_content(root)["mir_library_results"].items[1][3] == "Iron gear wheel productivity")
+          assert(research_content(root)["mir_library_list_pane"]["mir_library_results"].items[1][3] == "Iron gear wheel productivity")
           library.on_player_changed_force({player_index = 1})
           assert(#player.translation_requests == 3)
 
@@ -2745,7 +2805,7 @@ class LibraryTests(unittest.TestCase):
           library.on_string_translated({player_index = 1, id = player.translation_requests[6].id,
             translated = true, result = "Fremde Forschung"})
           local root = player.gui.screen["mir_research_browser"]
-          assert(research_content(root)["mir_library_results"].items[1][3] == "Zahnrad")
+          assert(research_content(root)["mir_library_list_pane"]["mir_library_results"].items[1][3] == "Zahnrad")
           assert(not library.subscription_needs())
           assert(player.force.research_queue == queue and player.force.current_research == current
             and player.force.research_progress == progress)
@@ -2817,7 +2877,7 @@ class LibraryTests(unittest.TestCase):
           assert(ledger.working[1].cache==saved_cache and ledger.next_epoch==epoch)
           game=available_game
           assert(library.open(player)==root and #player.translation_requests==2 and ledger.next_epoch==epoch)
-          assert(research_content(root)["mir_library_results"].items[1][3]=="Zahnrad")
+          assert(research_content(root)["mir_library_list_pane"]["mir_library_results"].items[1][3]=="Zahnrad")
           library.close(player)
           assert(ledger.working==nil and ledger.active[1]==nil and not library.subscription_needs())
         ''')
@@ -2879,7 +2939,7 @@ class LibraryTests(unittest.TestCase):
           library.on_configuration_changed()
           assert(ledger.working[1].cache~=old_cache and ledger.next_epoch>epoch)
           assert(#player.translation_requests==4)
-          assert(research_content(player.gui.screen["mir_research_browser"])["mir_library_results"].items[1][3]
+          assert(research_content(player.gui.screen["mir_research_browser"])["mir_library_list_pane"]["mir_library_results"].items[1][3]
             =="Iron gear wheel productivity","configuration retained old translated labels")
         ''')
 
@@ -2915,7 +2975,7 @@ class LibraryTests(unittest.TestCase):
           library.on_string_translated({player_index = 1, id = old_foreign,
             translated = true, result = "OLD FOREIGN"})
           local root = player.gui.screen["mir_research_browser"]
-          assert(research_content(root)["mir_library_results"].items[1][3] == "Iron gear wheel productivity")
+          assert(research_content(root)["mir_library_list_pane"]["mir_library_results"].items[1][3] == "Iron gear wheel productivity")
 
           player.force.index = 2
           library.on_player_changed_force({player_index = 1})
@@ -2927,13 +2987,13 @@ class LibraryTests(unittest.TestCase):
           library.on_string_translated({player_index = 1, id = locale_foreign,
             translated = true, result = "STALE LOCALE FOREIGN"})
           root = player.gui.screen["mir_research_browser"]
-          assert(research_content(root)["mir_library_results"].items[1][3] == "Iron gear wheel productivity")
+          assert(research_content(root)["mir_library_list_pane"]["mir_library_results"].items[1][3] == "Iron gear wheel productivity")
           library.on_string_translated({player_index = 1, id = force_gear,
             translated = true, result = "Zahnrad"})
           library.on_string_translated({player_index = 1, id = force_foreign,
             translated = true, result = "Fremde Forschung"})
           root = player.gui.screen["mir_research_browser"]
-          assert(research_content(root)["mir_library_results"].items[1][3] == "Zahnrad")
+          assert(research_content(root)["mir_library_list_pane"]["mir_library_results"].items[1][3] == "Zahnrad")
 
           local saved = storage.mir_library
           local reload_gear, reload_foreign = force_gear, force_foreign
@@ -2951,7 +3011,7 @@ class LibraryTests(unittest.TestCase):
           assert(library.subscription_needs() == false)
 
           assert(#player.translation_requests == 8
-            and research_content(player.gui.screen["mir_research_browser"])["mir_library_results"].items[1][3] == "late",
+            and research_content(player.gui.screen["mir_research_browser"])["mir_library_list_pane"]["mir_library_results"].items[1][3] == "late",
             "same-scope callbacks were not restored consistently across load")
           -- A later explicit close/open starts the separate request lifetime
           -- used by the removed/reused-player regression below.
@@ -3011,12 +3071,12 @@ class LibraryTests(unittest.TestCase):
           library.on_string_translated({player_index = 1, id = old_gear,
             translated = true, result = "old player gear"})
           assert(#player.translation_requests == 0
-            and research_content(root)["mir_library_results"].items[1][3] == "Iron gear wheel productivity")
+            and research_content(root)["mir_library_list_pane"]["mir_library_results"].items[1][3] == "Iron gear wheel productivity")
           library.on_string_translated({player_index = 1, id = old_foreign,
             translated = true, result = "old player foreign"})
           assert(#player.translation_requests == 1 and player.translation_requests[1].id == 101,
             "last retired callback did not resume the already open replacement player")
-          assert(research_content(root)["mir_library_results"].items[1][3] == "Iron gear wheel productivity",
+          assert(research_content(root)["mir_library_list_pane"]["mir_library_results"].items[1][3] == "Iron gear wheel productivity",
             "retired callback published into the replacement player's view")
         ''')
 
@@ -3032,7 +3092,7 @@ class LibraryTests(unittest.TestCase):
           root = player.gui.screen["mir_research_browser"]
           local state = storage.mir_library.players[1]
           assert(state.status == 4 and research_filters(root)["mir_library_filter_grid"]["mir_library_status_field"]["mir_library_status"].selected_index == 4)
-          local rows = research_content(root)["mir_library_results"]
+          local rows = research_content(root)["mir_library_list_pane"]["mir_library_results"]
           assert(#rows.items == 1 and rows.items[1][3] == "Iron gear wheel productivity")
           rows.selected_index = 1
           library.on_gui_selection_state_changed({player_index = 1, element = rows})
@@ -3047,7 +3107,7 @@ class LibraryTests(unittest.TestCase):
           assert(context["mir_library_context_queue_position"].caption[1] == "mir-browser.context-queue-position"
             and context["mir_library_context_queue_position"].caption[2] == 1)
           assert(context["mir_library_context_queue_guidance"]==nil
-            and research_content(root).mir_library_actions.mir_library_open_native.tooltip[1]=="mir-browser.native-queue-guidance")
+            and research_content(root).mir_library_list_pane.mir_library_actions.mir_library_open_native.tooltip[1]=="mir-browser.native-queue-guidance")
           assert(detail.mir_library_research_facts["mir_library_detail_cap"].caption[1] == "mir-browser.cap-finite")
 
           local queue, current, progress = player.force.research_queue, player.force.current_research, player.force.research_progress
@@ -3193,7 +3253,7 @@ class LibraryTests(unittest.TestCase):
           local root = player.gui.screen["mir_research_browser"]
           local detail = research_content(root)["mir_library_detail"]
           assert(cap_calls == 1 and detail.mir_library_research_facts["mir_library_detail_cap"] ~= nil)
-          local rows = research_content(root)["mir_library_results"]
+          local rows = research_content(root)["mir_library_list_pane"]["mir_library_results"]
           rows.selected_index = 1
           library.on_gui_selection_state_changed({player_index = 1, element = rows})
           root = player.gui.screen["mir_research_browser"]
@@ -3237,7 +3297,7 @@ class LibraryTests(unittest.TestCase):
           query.text = "research_gears"
           library.on_gui_text_changed({player_index = 1, element = query})
           root = player.gui.screen["mir_research_browser"]
-          local results = research_content(root)["mir_library_results"]
+          local results = research_content(root)["mir_library_list_pane"]["mir_library_results"]
           assert(#results.items == 1 and results.items[1][3] == gear.localised_name)
           results.selected_index = 1
           library.on_gui_selection_state_changed({player_index = 1, element = results})
@@ -3320,16 +3380,16 @@ class LibraryTests(unittest.TestCase):
           local filters, content = research_filters(root), research_content(root)
           local query, mode = filters["mir_library_query"], filters["mir_library_filter_grid"]["mir_library_mode_field"]["mir_library_mode"]
           assert(view.mode == 2 and view.page == 7 and mode.selected_index == 2)
-          assert(#content["mir_library_results"].items == 1
-            and content["mir_library_results"].items[1][3] == foreign.localised_name)
+          assert(#content["mir_library_list_pane"]["mir_library_results"].items == 1
+            and content["mir_library_list_pane"]["mir_library_results"].items[1][3] == foreign.localised_name)
 
           mode.selected_index = 3
           library.on_gui_selection_state_changed({player_index = 1, element = mode})
           view = storage.mir_library.players[1]
           assert(view.mode == 3 and view.page == 1 and view.scroll == 1)
           assert(filters["mir_library_query"] == query and filters["mir_library_filter_grid"]["mir_library_mode_field"]["mir_library_mode"] == mode)
-          assert(#content["mir_library_results"].items == 1
-            and content["mir_library_results"].items[1][3] == gear.localised_name)
+          assert(#content["mir_library_list_pane"]["mir_library_results"].items == 1
+            and content["mir_library_list_pane"]["mir_library_results"].items[1][3] == gear.localised_name)
 
           library.open(player, {page = 7})
           for _, invalid in ipairs({0, 4, 1.5, "2", 0/0}) do
@@ -3355,7 +3415,7 @@ class LibraryTests(unittest.TestCase):
           -- Published modes classify an effective capped infinity as finite.
           library.set_cap_provider(function() return {[gear.name] = 2} end)
           library.open(player, {mode = 2})
-          assert(#research_content(root)["mir_library_results"].items == 2)
+          assert(#research_content(root)["mir_library_list_pane"]["mir_library_results"].items == 2)
           assert(player.force.research_queue == native_queue and player.force.current_research == native_current
             and player.force.research_progress == .5 and gear.level == 3 and gear.enabled == false)
         ''')
@@ -3376,7 +3436,7 @@ class LibraryTests(unittest.TestCase):
             and view.stable_sort == "progression" and view.page == 7
             and next(view.hidden) == nil and view.selected == gear.name)
           assert(research_filters(root)["mir_library_filter_grid"]["mir_library_sort_field"]["mir_library_sort"].selected_index == 4)
-          local rows = research_content(root)["mir_library_results"]
+          local rows = research_content(root)["mir_library_list_pane"]["mir_library_results"]
           assert(#rows.items == 2 and rows.items[1][3] == gear.localised_name and rows.items[2][3] == foreign.localised_name)
 
           -- The historical page value survives reopening, but it was never a
@@ -3385,7 +3445,7 @@ class LibraryTests(unittest.TestCase):
           library.open(player)
           view = storage.mir_library.players[1]
           root = player.gui.screen["mir_research_browser"]
-          rows = research_content(root)["mir_library_results"]
+          rows = research_content(root)["mir_library_list_pane"]["mir_library_results"]
           assert(view.page == 7 and #rows.items == 2
             and rows.items[1][3] == gear.localised_name and rows.items[2][3] == foreign.localised_name)
 
@@ -3394,7 +3454,7 @@ class LibraryTests(unittest.TestCase):
           library.open(player, {hidden = {foreign.name}, page = 7})
           view = storage.mir_library.players[1]
           root = player.gui.screen["mir_research_browser"]
-          rows = research_content(root)["mir_library_results"]
+          rows = research_content(root)["mir_library_list_pane"]["mir_library_results"]
           assert(view.hidden[foreign.name] and view.page == 7
             and #rows.items == 1 and rows.items[1][3] == gear.localised_name)
 
@@ -3462,8 +3522,8 @@ class LibraryTests(unittest.TestCase):
           assert(family.items[5] == gear.localised_name,
             "authored family caption dropped the complete native localization parameters")
           assert(#player.translation_requests == 1)
-          assert(#content["mir_library_results"].items == 1
-            and content["mir_library_results"].items[1][3] == gear.localised_name)
+          assert(#content["mir_library_list_pane"]["mir_library_results"].items == 1
+            and content["mir_library_list_pane"]["mir_library_results"].items[1][3] == gear.localised_name)
 
           library.close(player); library.on_load(); library.open(player)
           root = player.gui.screen["mir_research_browser"]
@@ -3471,8 +3531,8 @@ class LibraryTests(unittest.TestCase):
           family, visibility = filters["mir_library_filter_grid"]["mir_library_family_field"]["mir_library_family"], filters["mir_library_filter_grid"]["mir_library_visibility_field"]["mir_library_visibility"]
           assert(storage.mir_library.players[1].family == "research_gears"
             and filters["mir_library_filter_grid"]["mir_library_family_field"]["mir_library_family"].selected_index == 5
-            and #content["mir_library_results"].items == 1
-            and content["mir_library_results"].items[1][3] == gear.localised_name)
+            and #content["mir_library_list_pane"]["mir_library_results"].items == 1
+            and content["mir_library_list_pane"]["mir_library_results"].items[1][3] == gear.localised_name)
 
           -- External is the published native scope. It is the only selector
           -- here that includes the actual foreign technology.
@@ -3481,8 +3541,8 @@ class LibraryTests(unittest.TestCase):
           library.on_gui_selection_state_changed({player_index = 1, element = family})
           view = storage.mir_library.players[1]
           assert(view.family == "external" and view.page == 1
-            and #content["mir_library_results"].items == 1
-            and content["mir_library_results"].items[1][3] == foreign.localised_name)
+            and #content["mir_library_list_pane"]["mir_library_results"].items == 1
+            and content["mir_library_list_pane"]["mir_library_results"].items[1][3] == foreign.localised_name)
 
           -- Remote-style input stays strict and cannot replace a persisted
           -- hidden-only selection or its explicitly retained page.
@@ -3519,7 +3579,7 @@ class LibraryTests(unittest.TestCase):
           library.on_gui_selection_state_changed({player_index = 1, element = visibility})
           view = storage.mir_library.players[1]
           assert(view.visibility == 1 and view.page == 1 and view.scroll == 1)
-          assert(#content["mir_library_results"].items == 0)
+          assert(#content["mir_library_list_pane"]["mir_library_results"].items == 0)
           assert(player.force.research_queue == native_queue and player.force.current_research == native_current
             and player.force.research_progress == .5 and gear.level == 3 and gear.enabled == false)
         ''')
