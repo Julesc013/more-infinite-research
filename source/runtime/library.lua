@@ -1466,7 +1466,19 @@ local function setting_display(name, value)
     local compact = string.format("%.6g", value)
     return tonumber(compact) == value and compact or "≈ " .. compact
   end
-  return tostring(value)
+  local shown = tostring(value)
+  if #shown > 120 then
+    -- Keep the authored compact preview without splitting a UTF-8 character.
+    -- Configuration and profile export continue to use the original value.
+    local last = 117
+    while last > 0 do
+      local next_byte = string.byte(shown, last + 1)
+      if next_byte < 128 or next_byte > 191 then break end
+      last = last - 1
+    end
+    return string.sub(shown, 1, last) .. "..."
+  end
+  return shown
 end
 
 local SETTING_FIELD_CAPTIONS = {

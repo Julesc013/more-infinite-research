@@ -9,6 +9,43 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_long_imported_profile_is_bounded_in_settings_without_changing_exact_values(self):
+        profile = {"schema": 1, "kind": "mir-settings-profile", "metadata": {"note": "ä" * 512},
+                   "settings": {"ips-cost-base-research_gears": 777}}
+        imported = json.dumps(profile, ensure_ascii=False, separators=(",", ":"))
+        # Put the historical 117-byte preview boundary inside a UTF-8 pair.
+        if imported.encode("utf-8")[116] != 0xC3:
+            profile["metadata"]["note"] = "x" + profile["metadata"]["note"]
+            imported = json.dumps(profile, ensure_ascii=False, separators=(",", ":"))
+        self.lua.globals().imported_profile_json = imported
+        self.lua.globals().parse_profile_json = lambda text: self.lua.table_from(json.loads(text), recursive=True)
+        self.lua.globals().valid_preview_utf8 = lambda text: isinstance(text, str) and text.endswith("...")
+        self.lua.execute('''
+          boot()
+          local imported=imported_profile_json
+          helpers={encode_string=function(value) return value end,
+            decode_string=function() error("raw JSON imports must not use the encoded string decoder") end,
+            json_to_table=parse_profile_json}
+          assert(require("research.settings_profile").decode(imported,helpers)
+            .settings["ips-cost-base-research_gears"]==777,"profile fixture must be accepted before display")
+          settings.startup["mir-settings-profile-import"]={value=imported}
+          settings.startup["ips-cost-base-research_gears"]={value=4242}
+          local root=library.open(player,{tab="settings",settings_scope="options",settings_search="mir-settings-profile-import"})
+          local detail=root.mir_library_tabs.mir_library_settings_content
+            .mir_library_settings_dynamic.mir_library_settings_detail
+          local shown=detail.mir_library_setting_1_value.caption
+          assert(type(shown)=="string" and #shown<=120 and shown:sub(-3)=="...",
+            "opaque imported profiles must not flood the ordinary Settings view")
+          assert(shown:sub(1,8)==imported:sub(1,8) and valid_preview_utf8(shown))
+          local source=detail.mir_library_setting_1_source.caption
+          assert(type(source[2])=="string" and #source[2]<=120)
+          assert(settings.startup["mir-settings-profile-import"].value==imported)
+          assert(settings.startup["ips-cost-base-research_gears"].value==4242)
+          assert(require("research.settings").effective_values(settings.startup,helpers)
+            ["ips-cost-base-research_gears"]==777,"display shortening changed imported effective settings")
+          assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
+        ''')
+
     def test_returning_from_availability_removes_its_projection_before_research(self):
         self.lua.execute('''
           for _,width in ipairs{592,528} do
