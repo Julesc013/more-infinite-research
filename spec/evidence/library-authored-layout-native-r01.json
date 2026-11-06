@@ -58,7 +58,7 @@
     "language": "en"
   },
   "custody": {
-    "private_commit": "cc3b884002b32467a54a420da083137ee7227e6f",
+    "private_commit": "3673efa2a55d20f11adaed5594a134d67d953761",
     "path": "projects/mir/runs/library-authored-retained-details-r01/",
     "current_originals": 527,
     "current_bytes": 69455043,
