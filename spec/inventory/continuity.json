@@ -17943,7 +17943,7 @@
       "status": "actual-bundle-consistency-verified-122-records-routed-not-native-qualified",
       "received_on": "2026-11-07",
       "reviewed_repository_commit": "8508f1c97b99bbeb8967f52fe3e99b6da573b5d5",
-      "provenance": "Maintainer supplied GPT-6 Astra Pro discussion-audit summary dated2026-11-07 01:54:25AEDT. This intake routes its stated obligations; it is not an independent reread of45 Portal threads or the unavailable122-row files.",
+      "provenance": "Maintainer supplied GPT-6 Astra Pro discussion-audit summary dated2026-11-07 01:54:25AEDT and subsequently the actual bundle. Initial summary-only intake remains atd5074d0b; the full supplied122-row JSON/workbook consistency and routing review is recorded below. This is not an independent Portal reread of45threads.",
       "reported_counts": {
         "threads": 45,
         "replies": 222,
@@ -17988,7 +17988,7 @@
           "reported_entries": 63,
           "reported_enabled": 52,
           "reported_disabled": 11,
-          "limits": "Recovered inventory body is in the unavailable bundle; exact versions/settings/save remain unknown. Do not fabricate its profile."
+          "limits": "Actual supplied bundle inventory body inspected:63entries,52enabled/11disabled, no duplicate names. Exact versions/startup settings/original save remain unknown; do not fabricate its reporter profile."
         }
       ],
       "exact_url_overlap_with_existing_request_ledger": [
