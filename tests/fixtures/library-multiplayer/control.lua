@@ -247,6 +247,26 @@ local function open_availability(player)
   end
 end
 
+local function filter_control(root, filters, name)
+  local tabs = valid(root) and root.mir_library_tabs
+  local page = valid(tabs) and tabs.mir_library_research_page or nil
+  if page == nil then return valid(filters) and filters[name] or nil end
+  if not valid(filters) then return nil end
+  local grid = valid(filters) and filters.mir_library_filter_grid
+  if not valid(filters) or filters.type ~= "flow" or filters.direction ~= "vertical"
+      or not valid(grid) or grid.type ~= "table" or grid.column_count ~= 2 then
+    fail("authored research filter grid is malformed")
+  end
+  if name == "mir_library_query" then return filters[name] end
+  local field = grid[name .. "_field"]
+  local control = valid(field) and field[name]
+  if not valid(field) or field.type ~= "flow" or field.direction ~= "vertical"
+      or not valid(field[name .. "_label"]) or not valid(control) or control.type ~= "drop-down" then
+    fail("authored research filter field is malformed")
+  end
+  return control
+end
+
 local function research_parts(root)
   local tabs = valid(root) and root[TABS] or nil
   local page = valid(tabs) and tabs["mir_library_research_page"] or nil
@@ -255,6 +275,7 @@ local function research_parts(root)
         or (page.get_mod and page.get_mod() ~= "more-infinite-research") then
       fail("native research page is malformed or foreign")
     end
+    filter_control(root, page[FILTERS], QUERY)
     return page[FILTERS], page[RESEARCH_CONTENT], tabs
   end
   return valid(root) and root[FILTERS] or nil, valid(tabs) and tabs[RESEARCH_CONTENT] or nil, tabs
@@ -262,7 +283,7 @@ end
 
 local function selected_facts(root, detail)
   local tabs = valid(root) and root[TABS]
-  local page = valid(tabs) and tabs.mir_library_research_page
+  local page = valid(tabs) and tabs.mir_library_research_page or nil
   if page == nil then return detail, valid(detail) and detail[DETAIL_TITLE] end
   local facts = valid(detail) and detail.mir_library_research_facts
   local heading = valid(facts) and facts.mir_library_detail_heading or nil
@@ -277,7 +298,7 @@ local function frame_parts(player)
   local root = screen and screen[ROOT]
   if not valid(root) or root.type ~= "frame" or root.visible ~= true then fail("native browser root is absent or hidden") end
   local filters, content, tabs = research_parts(root)
-  local query, sort = valid(filters) and filters[QUERY] or nil, valid(filters) and filters[SORT] or nil
+  local query, sort = valid(filters) and filters[QUERY] or nil, filter_control(root, filters, SORT)
   local results = valid(content) and content[RESULTS] or nil
   local detail = valid(content) and content[DETAIL] or nil
   if not valid(query) or query.type ~= "textfield" or not valid(sort) or sort.type ~= "drop-down"
@@ -322,7 +343,7 @@ local function assert_private_credit_empty_view(player, family, id)
   local root = screen and screen[ROOT]
   local filters, content, tabs = research_parts(root)
   local query = valid(filters) and filters[QUERY] or nil
-  local family_picker = valid(filters) and filters[FAMILY] or nil
+  local family_picker = filter_control(root, filters, FAMILY)
   local results = valid(content) and content[RESULTS] or nil
   local detail = valid(content) and content[DETAIL] or nil
   local actions = valid(content) and content[ACTIONS] or nil
@@ -343,7 +364,7 @@ local function assert_private_credit_personal_families(english, german)
     local screen = player.gui and player.gui.screen
     local root = screen and screen[ROOT]
     local filters, content, tabs = research_parts(root)
-    local family_picker = valid(filters) and filters[FAMILY] or nil
+    local family_picker = filter_control(root, filters, FAMILY)
     if not valid(family_picker) or family_picker.type ~= "drop-down" or family_picker.selected_index ~= 1 then
       fail("private credit browse did not restore the personal mir family filter")
     end
@@ -355,7 +376,7 @@ local function assert_public_browser_result(player, family, query)
   local root = screen and screen[ROOT]
   local filters, content, tabs = research_parts(root)
   local query_field = valid(filters) and filters[QUERY] or nil
-  local family_picker = valid(filters) and filters[FAMILY] or nil
+  local family_picker = filter_control(root, filters, FAMILY)
   local results = valid(content) and content[RESULTS] or nil
   local detail = valid(content) and content[DETAIL] or nil
   local actions = valid(content) and content[ACTIONS] or nil

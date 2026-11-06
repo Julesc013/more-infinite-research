@@ -116,12 +116,33 @@ local function location(root)
 end
 -- The published MIR5 tree had root filters and a direct tab body.  A page,
 -- when present, must be the expected owned page; never fall back through it.
+local function filter_control(root, filters, name)
+  local tabs = valid(root) and root.mir_library_tabs
+  local page = valid(tabs) and tabs.mir_library_research_page or nil
+  if page == nil then return valid(filters) and filters[name] or nil end
+  if not valid(filters) then return nil end
+  local grid = valid(filters) and filters.mir_library_filter_grid
+  if not valid(filters) or filters.type ~= "flow" or filters.direction ~= "vertical"
+      or not valid(grid) or grid.type ~= "table" or grid.column_count ~= 2 then
+    fail("authored research filter grid is malformed")
+  end
+  if name == "mir_library_query" then return filters[name] end
+  local field = grid[name .. "_field"]
+  local control = valid(field) and field[name]
+  if not valid(field) or field.type ~= "flow" or field.direction ~= "vertical"
+      or not valid(field[name .. "_label"]) or not valid(control) or control.type ~= "drop-down" then
+    fail("authored research filter field is malformed")
+  end
+  return control
+end
+
 local function research_parts(root)
   local tabs=valid(root) and root.mir_library_tabs or nil
   local page=valid(tabs) and tabs.mir_library_research_page or nil
   if page ~= nil then
     if not valid(tabs) or tabs.type~="tabbed-pane" or not valid(page) or page.type~="scroll-pane"
         or (page.get_mod and page.get_mod()~="more-infinite-research") then fail("native research page is malformed or foreign") end
+    filter_control(root, page[FILTERS], QUERY)
     return page[FILTERS],page.mir_library_research_content
   end
   return (valid(root) and root[FILTERS] or nil),(valid(tabs) and tabs.mir_library_research_content or nil)
@@ -177,7 +198,7 @@ local function exclusion_probe(en,de)
         local detail=valid(content) and content.mir_library_detail
         local actions=valid(content) and content.mir_library_actions
         local button=valid(actions) and actions.mir_library_open_native
-        if not valid(filters) or not valid(content) or filters[QUERY].text~=id or filters.mir_library_family.selected_index~=(family=="all" and 2 or 3)
+        if not valid(filters) or not valid(content) or filters[QUERY].text~=id or filter_control(root, filters, "mir_library_family").selected_index~=(family=="all" and 2 or 3)
             or (content.type=="table" and content.column_count~=2)
             or (content.type=="scroll-pane" and content.vertical_scroll_policy~="auto")
             or (content.type~="table" and content.type~="scroll-pane")

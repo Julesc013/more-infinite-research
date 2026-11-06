@@ -30,9 +30,8 @@ function M.frame_size(resolution, scale, geometry)
 end
 
 function M.filter_layout(width)
-  local pairs_per_row = width >= 800 and 2 or 1
-  local control_width = math.min(280, math.max(100, width / pairs_per_row - 175))
-  return pairs_per_row, integer(control_width)
+  -- The authored controls use two columns below a full-width search.
+  return 2, math.max(1, integer((width - 80) / 2))
 end
 
 -- Every selected tab occupies the same viewport below the fixed navigation.
@@ -41,7 +40,7 @@ function M.tab_content_height(frame_height)
 end
 
 function M.content_height(frame_height, pairs_per_row)
-  return math.max(120, frame_height - (pairs_per_row == 2 and 210 or 290))
+  return math.max(120, frame_height - (frame_height < 600 and 280 or 360))
 end
 
 function M.split_sizes(width, height)
