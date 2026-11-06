@@ -2460,6 +2460,8 @@ class GeneratorTests(unittest.TestCase):
           refused({a}, environment, "duplicate")
           b.name = "second-1"; a.prerequisites = {b.name}; b.prerequisites = {a.name}
           refused({a,b}, world(), "cycle")
+          a, b = build(), build(); b.name = "second-1"; b.prerequisites = {"missing"}
+          refused({a,b}, world(), "missing prerequisite")
           a = build(); a.unit.ingredients[1][1] = "missing"; refused({a}, world(), "ingredient")
           a = build(); a.effects[1].change = 0/0; refused({a}, world(), "productivity")
           refused({[1]=build(),[3]=build()}, world(), "missing entry")
