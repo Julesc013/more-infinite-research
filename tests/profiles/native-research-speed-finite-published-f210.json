@@ -38,8 +38,8 @@
   "archive_sha256": {
     "mir-fixture-finite-base-extension-level_0.1.0.zip": "79FF0EF2DF88E8A3D50FE3E239A74F60EBDDE1B7E9C511C11B5D5B941CA148DA",
     "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
-    "mir-fixture-native-research-speed-finite_0.1.0.zip": "7E65A61D9FA81EC592960FC272DDB0D771E72CDFAA6E4431B625C480E798FBE4",
+    "mir-fixture-native-research-speed-finite_0.1.0.zip": "30B949662A2AF950D65DA2F27A1F9094CC700FA0CF8B90A78DD72400F13877DB",
     "more-infinite-research_4.7.21003.zip": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
   },
-  "scope": "Preparation only. Exact published4.7.3 F210 archive and original finite7 producer; one actual laboratory completion is required by the observer, followed by a frozen lab, queued9 at42%,paused8 at27%,save and two cold reloads. Engine pin is a declared input requiring actual executable readback. No native execution or saved-input hash exists in this preparation."
+  "scope": "Preparation only. Exact published4.7.3 F210 archive and original finite7 producer; one actual laboratory completion is required by the observer, followed by a script-disabled lab, queued9 at42%,paused8 at27%,save and two cold reloads. Engine pin requires actual executable readback. The earlier source attempt failed on a read-only active write after completion; corrected observer native execution and a valid saved-input hash remain pending."
 }

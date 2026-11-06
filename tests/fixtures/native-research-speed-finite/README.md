@@ -1,6 +1,6 @@
 ---
 title: "Finite foreign research-speed7 to MIR8 native preparation"
-status: prepared-not-executed
+status: prepared-native-retry-pending
 applies_to: "Factorio 2.1.23 Base"
 audience: developer
 doc_type: test-fixture
@@ -10,7 +10,7 @@ last_reviewed: 2026-11-07
 
 # Finite foreign7 to MIR8
 
-This is one prepared F210 source/upgrade/reload scenario, plus a separate fresh-current arm; no native run, source save, transported ledger observation, cap rendering or Library result is asserted.
+This is one prepared F210 source/upgrade/reload scenario, plus a separate fresh-current arm; the first published-source attempt failed after laboratory completion, and no valid source save, transported ledger observation, cap rendering or Library result is asserted.
 
 The independent source is published `v4.7.3` commit `8643cc91bc915e008556a5315dbb0a743247e7ab`, archive `more-infinite-research_4.7.21003.zip` SHA256 `B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852` (1463293 bytes).
 The provider retains its original identity/version and exact Lua blob `9888359ab72cdc95fd10192b0e691254d31c2865` from `fixtures/finite-base-extension-level/data-final-fixes.lua`; it copies actual Base6 and declares finite7 with count777, time77, red science and prerequisite6.
@@ -20,11 +20,15 @@ The original independent source/science and published-producer reviews remain in
 
 The observer validates those exact technology fields before adding its own accelerated lab; it never changes foreign7 or MIR8.
 Only the fixed eight prerequisites are seeded; MIR8 itself earns one actual laboratory completion and a measured native bonus increase of .6.
-The lab then freezes, MIR8 remains at next level9 with current research42% and a second `automation` queue entry, a separate paused force keeps27% work, and foreign7 is independently disabled.
+The lab then freezes through writable `disabled_by_script=true`, with actual `active=false`, zero energy and empty input readback; MIR8 remains at next level9 with current research42% and a second `automation` queue entry, a separate paused force keeps27% work, and foreign7 is independently disabled.
 The successor and reload checks preserve levels, flags, bonus, queue order, current work, paused work and native creator histories.
 This is a disposable native-effect/save scenario, not full factory acquisition or normal-speed/performance qualification.
 
 Use the same provider0.1.0, observer0.1.0 and generic active-mod observer0.1.0 ZIP bytes in every arm.
+The failed first source attempt is retained under `build/tmp/finite8-published-source-r01`: it reached the real MIR8 completion at tick335, then the observer's attempted `LuaEntity.active=false` write failed because that property is read-only on2.1.23; no valid completed predecessor save was produced.
+The earlier observer archive `7E65A61D9FA81EC592960FC272DDB0D771E72CDFAA6E4431B625C480E798FBE4` and preparation/adverse records remain historical inputs, never a source-save qualification.
+The corrected observer keeps version0.1.0 and pins archive `30B949662A2AF950D65DA2F27A1F9094CC700FA0CF8B90A78DD72400F13877DB` in both profiles; every future source, successor and fresh-current arm must use these same corrected bytes.
+The installed official `D:/Games/Factorio/2.1/doc-html/runtime-api.json` identifies2.1.23/API6 and declares `active` read-only and `disabled_by_script` boolean read/write for updatable entities; its SHA256 is `7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373`.
 Do not change a fixture version, add an observer, or change settings on first MIR4→MIR5 entry: the one-time legacy guard requires all nonMIR mod selections/versions and startup settings to remain unchanged.
 The two profiles differ only in MIR version/archive and their explanatory scope.
 The candidate pin is exact `13f6cc857c26d198df1c275106dcb7d0334ef748` source, ZIP SHA256 `81C896F0F33CE7CFF1E8ED78AA7F8F4014A97123DFD6DACFC492247625775776`; the source version remains5.0.7 and no public release is changed.
@@ -60,5 +64,5 @@ For successor/fresh, select `tests/profiles/native-research-speed-finite-current
 Changing-provider and changing-settings first-entry native refusals, positive-cap ownership, Library native rendering/input and exports remain separate pending controls; the existing20 ownership host controls cover the relevant strict/rejection paths without native qualification.
 The F200 management-only legacy tuple remains insufficient creator proof and is not an accepted native route.
 
-The focused host command is `python -B tests/test_native_research_speed_finite_fixture.py --lua-runtime-dir <pinned-lua52-directory>`; it checks the old provider's original bytes, prototype negatives, source/successor/reloads, fresh-current and loss-of-state opposition with native-shaped doubles.
-The module is deliberately standalone in this bounded ownership assignment; adding it to the ordered host driver is an integration change, not a claim that the full driver ran.
+The focused host command is `python -B tests/test_native_research_speed_finite_fixture.py --lua-runtime-dir <pinned-lua52-directory>`; it checks the old provider's original bytes, prototype negatives, source/successor/reloads, fresh-current and loss-of-state opposition with native-shaped doubles, including rejection of writes to read-only `active` and detection of lost lab disablement, energy or empty-input state.
+The module is registered in the ordered host driver; focused execution does not claim that the full driver ran.

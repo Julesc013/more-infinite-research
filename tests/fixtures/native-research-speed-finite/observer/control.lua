@@ -24,7 +24,8 @@ end
 local function player() return game.forces.player end
 local function target(force) return assert(force.technologies[TARGET]) end
 local function freeze(state)
-  state.lab.active=false
+  -- Factorio2.1 exposes active as read-only; this writable lab flag stops work.
+  state.lab.disabled_by_script=true
   state.lab.energy=0
   state.lab.get_inventory(defines.inventory.lab_input).clear()
 end
@@ -40,7 +41,7 @@ local function check_saved(state)
   O.preserved(O.snapshot(game.forces[state.paused_index]),state.paused)
   assert(O.close(player().laboratory_speed_modifier,state.before_bonus+.6),"earned native MIR8 bonus differs")
   assert(target(player()).level==9 and not target(player()).researched,"earned MIR8 native level differs")
-  assert(not state.lab.active and state.lab.energy==0
+  assert(state.lab.disabled_by_script and not state.lab.active and state.lab.energy==0
     and state.lab.get_inventory(defines.inventory.lab_input).is_empty(),"saved lab was not frozen")
 end
 local function marker(stage,state)

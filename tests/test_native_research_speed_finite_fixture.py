@@ -44,7 +44,9 @@ class FiniteResearchSpeedFixtureTests(unittest.TestCase):
           end
           function fixture_flow(version,opponent)
             local callbacks={};local logs,saves,game_reads={},0,0
-            local inventory={insert=function()return 200 end,clear=function()end,is_empty=function()return true end}
+            local inventory_count=0
+            local inventory={insert=function(row)inventory_count=inventory_count+row.count;return row.count end,
+              clear=function()inventory_count=0 end,is_empty=function()return inventory_count==0 end}
             local force_index=0
             local function force(name)
               force_index=force_index+1
@@ -71,7 +73,17 @@ class FiniteResearchSpeedFixtureTests(unittest.TestCase):
                 end})
             end
             local p=proxy(force("player"));local forces={player=p,[p.index]=p}
-            local entity={active=true,energy=0,get_inventory=function()return inventory end}
+            -- Pinned2.1.23 exposes active as read-only. Script disablement is
+            -- writable and reflected by active; reject the original native fault.
+            local entity_values={disabled_by_script=false,energy=0,get_inventory=function()return inventory end}
+            local entity=setmetatable({},{__index=function(_,key)
+                if key=="active"then return not entity_values.disabled_by_script end
+                return entity_values[key]
+              end,__newindex=function(_,key,value)
+                assert(key~="active","LuaEntity.active is read-only")
+                entity_values[key]=value
+              end})
+            assert(not pcall(function()entity.active=false end),"host double permits read-only active write")
             local game_value={tick=0,forces=forces,surfaces={{create_entity=function()return entity end}},
               create_force=function(name)local f=proxy(force(name));forces[f.index]=f;return f end,
               server_save=function(name)assert(name=="mir5-native-complete");saves=saves+1 end}
@@ -93,6 +105,8 @@ class FiniteResearchSpeedFixtureTests(unittest.TestCase):
             p.laboratory_speed_modifier=1.8
             p.current_research=nil;p.research_queue={}
             callbacks[2]({research=p.technologies["research-speed-8"]})
+            assert(entity.disabled_by_script and not entity.active and entity.energy==0
+              and inventory.is_empty(),"completed lab can still work")
             callbacks[1]()
             assert(saves==1 and #logs==1 and logs[1].stage=="initial")
             local state=env.storage.mir_native_research_speed_finite
@@ -106,7 +120,10 @@ class FiniteResearchSpeedFixtureTests(unittest.TestCase):
               elseif opponent=="foreign-enabled"then p.technologies["research-speed-7"].enabled=true
               elseif opponent=="lost-queue"then p.research_queue={p.technologies["research-speed-8"]}
               elseif opponent=="lost-progress"then p.research_progress=0
-              elseif opponent=="lost-paused"then forces[state.paused_index].technologies["research-speed-8"].saved_progress=0 end
+              elseif opponent=="lost-paused"then forces[state.paused_index].technologies["research-speed-8"].saved_progress=0
+              elseif opponent=="lab-enabled"then entity.disabled_by_script=false
+              elseif opponent=="lab-energy"then entity.energy=1
+              elseif opponent=="lab-input"then inventory.insert{name="automation-science-pack",count=1} end
               local ok,message=pcall(callbacks.changed,{mod_changes={
                 ["more-infinite-research"]={old_version="4.7.21003",new_version="5.0.21007"}}})
               if opponent then assert(not ok,"broken transition admitted: "..opponent);assert(saves==1);return end
@@ -199,7 +216,8 @@ class FiniteResearchSpeedFixtureTests(unittest.TestCase):
         self.lua.execute('fixture_flow("5.0.21007")')
 
     def test_transition_negatives_fail_before_successor_save(self):
-        for opponent in ("lost-level", "lost-bonus", "foreign-enabled", "lost-queue", "lost-progress", "lost-paused"):
+        for opponent in ("lost-level", "lost-bonus", "foreign-enabled", "lost-queue", "lost-progress", "lost-paused",
+                         "lab-enabled", "lab-energy", "lab-input"):
             with self.subTest(opponent=opponent):
                 self.lua.globals().opponent = opponent
                 self.lua.execute('fixture_flow("4.7.21003",opponent)')
