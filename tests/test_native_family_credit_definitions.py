@@ -9,6 +9,44 @@ import test_native_credit_definitions as fixed_fixture
 
 
 class NativeFamilyCreditDefinitionTests(unittest.TestCase):
+    def test_published_m4_base_masks_match_independent_captures_and_are_detached(self):
+        root = Path(__file__).resolve().parents[1]
+        expected = {}
+        for edition in ("f200", "f210"):
+            inventory = json.loads((root / "spec/inventory" / ("modern-" + edition + "-470.json")).read_bytes())
+            profile = next(p for p in inventory["profiles"] if p["id"] == "base-" + edition)
+            additions = profile["published_output"]["data"]["additions"]
+            for family in ("low_density_structure", "plastic", "processing_unit", "rocket_fuel", "steel"):
+                row = next(r["row"] for r in additions if r["type"] == "technology"
+                           and r["name"] == "recipe-prod-research_" + family + "-1")
+                self.assertEqual(len(row["effects"]), 1)
+                effect = row["effects"][0]
+                self.assertEqual(effect["type"], "change-recipe-productivity")
+                key = "research_" + family
+                if key in expected:
+                    self.assertEqual(expected[key], effect["recipe"])
+                expected[key] = effect["recipe"]
+        self.lua.globals().old_base_recipes = self.lua.table_from(expected)
+        self.lua.execute('''
+          local contracts=require("research.native_credit_contracts")
+          for _,version in ipairs({"4.7.20003","4.7.21003"}) do
+            local mask=assert(contracts.published_m4_base_paid_recipe_sets(version))
+            local count=0
+            for family,recipes in pairs(mask) do
+              local recipe=assert(old_base_recipes[family])
+              assert(recipes[recipe]==true and next(recipes,recipe)==nil);count=count+1
+            end
+            assert(count==5)
+            mask.research_plastic["plastic-bar"]=false;mask.fake={unearned=true}
+            local again=contracts.published_m4_base_paid_recipe_sets(version)
+            assert(again.research_plastic["plastic-bar"] and again.fake==nil)
+          end
+          for _,version in ipairs({"4.7.20002","4.7.21004","5.0.21003",false,{}}) do
+            assert(contracts.published_m4_base_paid_recipe_sets(version)==nil)
+          end
+          assert(contracts.published_m4_base_paid_recipe_sets(nil)==nil)
+        ''')
+
     def test_data_only_base_masks_are_exact_original_contracts_and_detached(self):
         root = Path(__file__).resolve().parents[1]
         self.lua.globals().original_fixture_root = (root / "tests/fixtures/migration-origins").as_posix()

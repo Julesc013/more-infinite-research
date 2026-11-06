@@ -620,15 +620,55 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                   no_foreign_write(force)
                 ''')
 
+    def test_published_m4_engine_hop_known_mask_does_not_require_unchanged_settings_flag(self):
+        for full_bootstrap in (False, True):
+            for changed in (False, True):
+                with self.subTest(bootstrap=full_bootstrap, changed=changed):
+                    self.setUp()
+                    self._published_m4_base()
+                    if full_bootstrap:
+                        bootstrap_fixture.BootstrapTests().setUp(self.lua)
+                        self.lua.execute('''
+                          local real_credits=native_credits
+                          install_modules(false,false,false,true);install_runtime(nil,BASE_ACTIVE);game.forces={}
+                          package.preload["runtime.native_credits"]=function()return real_credits end
+                          load_control()
+                        ''')
+                    self.lua.globals().changed_startup = changed
+                    self.lua.globals().full_bootstrap = full_bootstrap
+                    self.lua.execute('''
+                      local force=make_collected_force(1,8,published_base_mask,false)
+                      local main=force.technologies["recipe-prod-research_steel-1"]
+                      -- The current recipe set differs. Its extra route has no
+                      -- historical right, while a removed old effect keeps it.
+                      set_mask(force,{[key("research_steel","new-unpaid-steel")]=true},false)
+                      main.saved_progress=.27;force.research_queue={main,force.technologies.foreign}
+                      force.current_research=main;local queue=force.research_queue
+                      local event={mod_startup_settings_changed=changed_startup,mod_changes={
+                        base={old_version="2.0.77",new_version="2.1.23"},
+                        ["more-infinite-research"]={old_version="4.7.20003",new_version="5.0.21003"}}}
+                      local callback=full_bootstrap and handlers.configuration or native_credits.on_configuration_changed
+                      callback(event)
+                      for family,recipes in pairs(GROUPS) do
+                        close(own_contribution(force,family,recipes[1].recipe),7*recipes[1].change)
+                        assert(record(force,family,recipes[1].recipe).offset==7)
+                      end
+                      close(own_contribution(force,"research_steel","new-unpaid-steel"),0)
+                      assert(record(force,"research_steel","new-unpaid-steel").offset==-7)
+                      assert(force.research_queue==queue and force.current_research==main
+                        and main.saved_progress==.27 and force.research_progress==.42)
+                      no_foreign_write(force)
+                    ''')
+
     def test_published_m4_base_hop_refuses_unproven_inputs_before_all_mir_writes(self):
-        opponents = ("startup", "unknown-startup", "added-provider", "unchanged-provider", "removed-provider",
+        opponents = ("invalid-startup", "unknown-startup", "added-provider", "unchanged-provider", "removed-provider",
                      "observer", "unknown-origin", "wrong-destination", "wrong-current-version", "missing-engine",
                      "other-source-patch", "older-destination-patch", "future-destination-patch", "future-engine",
                      "wrong-active-engine", "future-minor", "same-engine-future-patch", "inconsistent-same-engine",
                      "private-main", "incomplete-old-mask")
-        for full_bootstrap in (False, True):
+        for full_bootstrap, changed_flag in ((False, False), (False, True), (True, False), (True, True)):
             for opponent in opponents:
-                with self.subTest(bootstrap=full_bootstrap, opponent=opponent):
+                with self.subTest(bootstrap=full_bootstrap, changed=changed_flag, opponent=opponent):
                     self.setUp()
                     self._published_m4_base()
                     if full_bootstrap:
@@ -641,11 +681,12 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                         ''')
                     self.lua.globals().opponent = opponent
                     self.lua.globals().full_bootstrap = full_bootstrap
+                    self.lua.globals().changed_flag = changed_flag
                     self.lua.execute('''
                       local changes={base={old_version="2.0.77",new_version="2.1.23"},
                         ["more-infinite-research"]={old_version="4.7.20003",new_version="5.0.21003"}}
-                      local changed=false
-                      if opponent=="startup" then changed=true end
+                      local changed=changed_flag
+                      if opponent=="invalid-startup" then changed="true" end
                       if opponent=="unknown-startup" then changed=nil end
                       if opponent=="added-provider" or opponent=="unchanged-provider" then
                         BASE_ACTIVE.ExpandedProductivityResearch="1.0.0"
