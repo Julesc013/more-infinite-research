@@ -5,7 +5,7 @@ applies_to: "Exact MIR1.1 completed F200/F210 Base successor copies"
 audience: developer
 doc_type: test-fixture
 owner: mir-maintainers
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-07
 supersedes: []
 superseded_by: []
 ---
@@ -13,6 +13,12 @@ superseded_by: []
 # Imported Library native input and lifecycle observation
 
 ## Current helper-free inputs
+
+### Qualified support exports
+
+Support-export observer0.4.1 attaches the existing thirteen-click/five-join/two-save protocol to the qualified1.1 work saves identified below and the published5.0.7 packages. Compose `control.lua`, the selected `info-exports-current-f200.json` or `info-exports-current-f210.json` as `info.json`, `support-exports.lua` and the unchanged local `catalogue.lua` from one committed revision. The exact closure is Base2.0.77/MIR5.0.20007 or Base2.1.23/MIR5.0.21007, active-mod observer0.1.0 and export observer0.4.1; the old migration controller is excluded.
+
+The one-shot first-tick baseline retains the same independent31-row/71-recipe/three-force paid/private/foreign-work expectations. An early report refuses readiness. The existing full/compact profile checks, false/zero values, EN/DE identity, actual click witnesses, foreign-root rejection, visible write-failure behavior, server commands, rejoin and saved-host restart assertions remain binding. Actual output files still require separate client/server path, byte/newline and preservation readback; a preview or host control cannot supply that verdict. The old0.4.0 metadata, profiles and failed runs retain their original inputs. The accepted0.3.5 [input/lifecycle component](../../../spec/evidence/library-current507-input-lifecycle-native-r01.json) does not establish this support-export native result.
 
 Input observer0.3.5 attaches to the already-qualified direct MIR1.1 successor work saves: F200 `56598A69E7AFD30023EE368D17BAD3325CB58A6FF08B26B2DA2BD0AABBB0D500` (905921bytes) or F210 `8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD` (893285bytes). Their actual predecessor packages were internal source2a8e85e6, versions5.0.20006/5.0.21006; these are separate inputs from the original7a2/r20 saves. See the [accepted direct1.1 components](../../../spec/evidence/data-only-paid-family-restoration-r01.json) and exact useful-work originals at `Julesc013/scratchpad@d512c2aafb04e2955910ec60d8694cc134f57143:projects/mir/runs/data-only-110-useful-work-r01/`. Preserve the original inputs and every failed old-input attempt; this adapter does not claim a new native pass.
 
