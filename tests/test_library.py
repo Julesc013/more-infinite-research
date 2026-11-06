@@ -205,6 +205,9 @@ class LibraryTests(unittest.TestCase):
           assert(detail.mir_library_detail_description.caption==gear.localised_description)
           assert(detail.mir_library_detail_icon.style.minimal_width==48
             and detail.mir_library_detail_icon.style.minimal_height==48)
+          assert(detail.mir_library_detail_icon.resize_to_sprite==false
+            and detail.mir_library_detail_icon.style.stretch_image_to_widget_size==true,
+            "the actual sprite must fit the box, not overlap the adjacent facts at native size")
           local speed=detail.mir_library_effect_1.caption
           assert(speed[2][1]=="gui-bonus.laboratory-speed" and speed[4]=="+60%")
           assert(detail.mir_library_effect_2.caption[4]=="+1")
