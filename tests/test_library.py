@@ -9,6 +9,132 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_unchanged_details_retain_widgets_snapshot_translation_tab_and_cold_load(self):
+        self.lua.execute('''
+          boot()
+          gear.prototype.effects={{type="change-recipe-productivity",recipe="gears",change=.1}}
+          gear.research_unit_ingredients={{name="red",amount=1}}
+          player.force.recipes={gears={valid=true,localised_name="Gears"}}
+          player.force.valid,gear.force=true,player.force
+          player.surface={valid=true,index=1,name="nauvis"}
+          defines={flow_precision_index={one_minute=1}}
+          local reads=0
+          player.force.get_item_production_statistics=function()
+            reads=reads+1
+            return {valid=true,get_flow_count=function() return 8 end}
+          end
+          local root=library.open(player,{selected=gear.name})
+          local outer=research_content(root).mir_library_detail
+          local facts,recipes=outer.mir_library_research_facts,outer.mir_library_recipe_list
+          recipes.selected_index=1
+          library.on_gui_click({player_index=1,element=facts.mir_library_production_check})
+          local snapshot=facts.mir_library_production_results.mir_library_production_snapshot
+          assert(snapshot and reads==1)
+          local function retained()
+            assert(research_content(root).mir_library_detail==outer)
+            assert(outer.mir_library_research_facts==facts and facts.valid,
+              "an unchanged refresh destroyed the facts scroll widget")
+            assert(outer.mir_library_recipe_list==recipes and recipes.valid and recipes.selected_index==1,
+              "an unchanged refresh destroyed recipe interaction state")
+            assert(facts.mir_library_production_results.mir_library_production_snapshot==snapshot and reads==1,
+              "an unchanged refresh discarded or resampled the explicit production snapshot")
+          end
+          library.open(player);retained()
+          library.on_native_state_changed({force=player.force});library.on_native_refresh_tick();retained()
+          local request=player.translation_requests[1]
+          library.on_string_translated({player_index=1,id=request.id,translated=true,result=gear.localised_name})
+          retained()
+          local tabs=root.mir_library_tabs
+          tabs.selected_tab_index=2;library.on_gui_selected_tab_changed({player_index=1,element=tabs})
+          tabs.selected_tab_index=1;library.on_gui_selected_tab_changed({player_index=1,element=tabs});retained()
+          -- A fresh module sees the same saved GUI and plain persisted inputs,
+          -- without retaining any module-local presentation cache.
+          storage=copy_gui_tags(storage)
+          package.loaded["runtime.library"]=nil
+          library=require("runtime.library")
+          local live_game=game;game=nil;library.on_load();game=live_game
+          library.open(player);retained()
+          assert(gear.level==3 and not gear.enabled and player.force.research_progress==.5)
+        ''')
+
+    def test_retained_details_refresh_changed_native_facts_names_scope_and_geometry(self):
+        self.lua.execute('''
+          boot()
+          library_declarations={{id=gear.name,name=gear.name,family="mir",cap=2,cap_setting="cap"}}
+          player.force.recipes={gears={valid=true,localised_name="Gears"}}
+          player.force.technologies.automation={valid=true,localised_name="Automation"}
+          prototypes={item={red={valid=true,localised_name="Red science"}}}
+          local detail={effects={{type="change-recipe-productivity",recipe="gears",change=.1}},
+            recipe_targets={"gears"},cost={count=100,time=30,ingredients={{name="red",amount=1}}},
+            prerequisites={"automation"},recipe_benefits_state="available",
+            recipe_benefits={{current_productivity_bonus=.1,maximum_productivity=3}},
+            next_level_has_effective_benefit=true,recipe_benefits_only_effects=true}
+          require("presentation.library_model").detail=function() return detail end
+          local root=library.open(player,{selected=gear.name})
+          local function facts() return research_content(root).mir_library_detail.mir_library_research_facts end
+          local function changed(mutate,check)
+            local previous=facts()
+            previous.mir_library_production_results.add{type="label",name="old_snapshot",caption="old"}
+            mutate();library.open(player)
+            assert(facts()~=previous and not previous.valid,"changed selected facts were retained")
+            assert(facts().mir_library_production_results.old_snapshot==nil,"changed facts retained an old snapshot")
+            if check then check(facts()) end
+            local current=facts();library.open(player)
+            assert(facts()==current,"freshly rendered unchanged facts must now be retained")
+          end
+          changed(function() gear.level=4 end,function(f) assert(f.mir_library_detail_level.caption[2]==4) end)
+          changed(function() library_declarations[1].cap=7 end,function(f) assert(f.mir_library_detail_cap.caption[2]==7) end)
+          changed(function() detail.cost.count=250 end,function(f) assert(f.mir_library_detail_cost.caption[2]=="250") end)
+          changed(function() detail.effects[1].change=.2 end,function(f) assert(f.mir_library_effect_1.caption[2]=="20") end)
+          changed(function() detail.recipe_benefits[1].current_productivity_bonus=.4 end,
+            function(f) assert(f.mir_library_productivity_current_cap.caption[2]=="40") end)
+          changed(function() gear.localised_name="New native name" end,
+            function(f) assert(f.mir_library_detail_heading.mir_library_detail_title.caption=="New native name") end)
+          changed(function() prototypes.item.red.localised_name="New science" end,
+            function(f) assert(f.mir_library_science_icons.mir_library_science_1.tooltip[2]=="New science") end)
+          changed(function() player.force.technologies.automation.localised_name="New prerequisite" end,
+            function(f) assert(f.mir_library_prerequisite_icons.mir_library_prerequisite_1.tooltip=="New prerequisite") end)
+          changed(function() player.force.recipes.gears.localised_name="New recipe" end,
+            function() assert(research_content(root).mir_library_detail.mir_library_recipe_list.items[1][3]=="New recipe") end)
+          changed(function() player.open_factoriopedia_gui=function() end end,
+            function() assert(research_content(root).mir_library_detail.mir_library_recipe_list.tooltip[1]=="mir-browser.recipe-select-hint") end)
+          changed(function() player.force.current_research=nil;player.force.research_queue={} end,
+            function(f) assert(f.mir_library_detail_context.mir_library_context_current==nil) end)
+          changed(function() player.locale="de" end)
+          changed(function() player.force.index=2 end)
+          changed(function() storage.mir_library.players[1].geometry={width=704,height=604} end)
+          changed(function() player.force.recipes.gears.valid=false;gear.localised_description="Visible description" end,
+            function(f) assert(f.mir_library_detail_description.caption=="Visible description") end)
+          changed(function() gear.localised_description="Changed description" end,
+            function(f) assert(f.mir_library_detail_description.caption=="Changed description") end)
+        ''')
+
+    def test_detail_retention_declines_unsupported_or_overbudget_inputs_and_repairs_missing_children(self):
+        self.lua.execute('''
+          boot()
+          local detail={effects={},cost={count=100,time=30,ingredients={}}}
+          require("presentation.library_model").detail=function() return detail end
+          local root=library.open(player,{selected=gear.name})
+          local outer=research_content(root).mir_library_detail
+          local function facts() return outer.mir_library_research_facts end
+          local function rebuilt()
+            local previous=facts();library.open(player)
+            assert(facts()~=previous and not previous.valid,"unsafe/incomplete presentation stamp was reused")
+          end
+          outer.tags={};rebuilt()
+          local stable=facts();library.open(player);assert(facts()==stable)
+          facts().mir_library_detail_heading.destroy();rebuilt()
+          gear.localised_description=string.rep("x",65537);rebuilt();rebuilt()
+          gear.localised_description=nil
+          detail.cost.extra=function() end;rebuilt();rebuilt()
+          detail.cost.extra={[2]="sparse"};rebuilt();rebuilt()
+          detail.cost.extra=detail.cost;rebuilt();rebuilt()
+          detail.cost.extra={};for index=1,4096 do detail.cost.extra[index]=index end;rebuilt();rebuilt()
+          detail.cost.extra=0/0;rebuilt();rebuilt()
+          detail.cost.extra=nil;rebuilt()
+          stable=facts();library.open(player);assert(facts()==stable)
+        ''')
+
     def test_authored_research_presentation_uses_compact_facts_and_independent_recipes(self):
         # 8a3b190d:research_browser.lua729-805: horizontal 48px heading,
         # no generic recipe paragraph, science/prerequisite icons, separate list.
@@ -547,6 +673,13 @@ class LibraryTests(unittest.TestCase):
             })
           end
 
+          function copy_gui_tags(value)
+            if type(value)~="table" then return value end
+            local result={}
+            for key,child in pairs(value) do result[key]=copy_gui_tags(child) end
+            return result
+          end
+
           function gui_container(parent)
             local value = {valid = true, parent = parent, _parent = parent, _children = {}, style = gui_style()}
             value.auto_center = true
@@ -567,13 +700,17 @@ class LibraryTests(unittest.TestCase):
                 if key == "style" then element.style_name = field else element[key] = field end
               end
               local read_only_column_count = element.column_count
+              local native_tags = copy_gui_tags(element.tags or {})
               rawset(element, "column_count", nil)
+              rawset(element, "tags", nil)
               setmetatable(element, {
                 __index = function(_, key)
                   if key == "column_count" then return read_only_column_count end
+                  if key == "tags" then return copy_gui_tags(native_tags) end
                 end,
                 __newindex = function(target, key, field)
                   if key == "column_count" then error("LuaGuiElement.column_count is read only") end
+                  if key == "tags" then native_tags=copy_gui_tags(field);return end
                   rawset(target, key, field)
                 end
               })
