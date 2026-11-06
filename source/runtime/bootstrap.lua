@@ -14,6 +14,12 @@ local diagnostics = helpers and type(helpers.write_file) == "function" and requi
 local passive_repair = require("runtime.passive_repair")
 local effective = require("runtime.configuration")
 local target = require("platform.target")
+local finite_research_speed = (target.id == "f200" or target.id == "f210")
+  and require("runtime.finite_research_speed")
+local function finite_research_speed_provider()
+  return type(catalogue.finite_research_speed_provider) == "function"
+    and catalogue.finite_research_speed_provider() or nil
+end
 local DISCOVERY_TREE = script and script.active_mods and script.active_mods.discovery_tree ~= nil
 local native_credits, legacy_module_credits, legacy_cannon_credits
 if target.recipe_productivity == true then
@@ -307,6 +313,7 @@ local function add_command()
 end
 
 local function on_init()
+  if finite_research_speed then finite_research_speed.on_init(finite_research_speed_provider()) end
   initialize_imersite()
   lifecycle.on_init()
   if native_credits then native_credits.on_init() end
@@ -357,6 +364,8 @@ local function on_configuration_changed(event)
   -- This preflight must run before any lifecycle reconciler can write a level,
   -- ownership record, queue state, or disablement flag.
   local family_credit_plan
+  local finite_speed_plan = finite_research_speed
+    and finite_research_speed.preflight(event, finite_research_speed_provider())
   if native_credits then
     native_credits.preflight_legacy_preference_transition(event, relevant_competing_provider_transition(event))
     if native_credits.preflight_family_transition then
@@ -366,6 +375,7 @@ local function on_configuration_changed(event)
   local module_credit_plan = legacy_module_credits and legacy_module_credits.preflight(event)
   local cannon_credit_plan = legacy_cannon_credits and legacy_cannon_credits.preflight(event)
   local gun_credit_plan = native_gun_credits and native_gun_credits.preflight(event)
+  if finite_research_speed then finite_research_speed.apply(finite_speed_plan) end
   reconcile_imersite()
   lifecycle.on_configuration_changed(event)
   if native_credits then native_credits.on_configuration_changed(event, family_credit_plan) end
@@ -400,6 +410,7 @@ local function on_configuration_changed(event)
 end
 
 local function on_load()
+  if finite_research_speed then finite_research_speed.on_load(finite_research_speed_provider()) end
   lifecycle.on_load()
   if native_credits then native_credits.on_load() end
   if native_gun_credits then native_gun_credits.on_load() end

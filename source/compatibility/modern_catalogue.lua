@@ -1128,6 +1128,7 @@ end
 function M.continuation_names(active_mods)
   local names = {}
   for index, row in ipairs(CONTINUATIONS) do names[index] = row.id end
+  names[#names + 1] = "research-speed-8"
   if target.id == "f210" and type(active_mods) == "table" and active_mods.Muria ~= nil then
     names[#names + 1] = "weapon-shooting-speed-9"
   end
@@ -1176,6 +1177,7 @@ function M.omit_existing_continuations(rows, technology_prototypes)
   if technology_prototypes == nil then return rows end
   local shared = {}
   for _, row in ipairs(CONTINUATIONS) do shared[row.id] = true end
+  shared["research-speed-8"] = true
   shared["worker-robots-storage-9"] = true
   local retained = {}
   for _, row in ipairs(rows) do
@@ -1278,6 +1280,12 @@ function M.continuations(active_mods, raw, external_continuations)
     if row.id == "weapon-shooting-speed-7" and target.id == "f210"
         and type(active_mods) == "table" and active_mods.Muria ~= nil then
       require("compatibility.modern_catalogue.muria").weapon_continuation(row, raw)
+    end
+    if row.id == "research-speed-7" and (target.id == "f200" or target.id == "f210")
+        and type(raw) == "table" and type(raw.technology) == "table"
+        and raw.technology["research-speed-7"] ~= nil then
+      require("compatibility.modern_catalogue.finite_research_speed").adapt(row, raw,
+        M.science_ingredients(row.science, row.science_amounts))
     end
     if row.id == "worker-robots-storage-4" and M.has_secretas(active_mods) then
       -- Only this named finite route receives a later identity. A meaningful

@@ -185,7 +185,7 @@ local function py_material_rows()
   return rows
 end
 
-local function static_rows(existing_technology_prototypes, withheld_native_owners)
+local function static_rows(existing_technology_prototypes, withheld_native_owners, finite_research_speed)
   runtime_private_credit_ids = copy(INTERNAL_CREDIT_IDS)
   local rows = {generated_row(GEAR_ID, "research_gears", "p[research_gears]",
     "technology-name.more-infinite-research.research_gears", "iron-gear-wheel")}
@@ -202,6 +202,13 @@ local function static_rows(existing_technology_prototypes, withheld_native_owner
   local selected
   if ordinary_profile or k2_base_profile or k2so_profile then
     selected = modern_catalogue.select(active_mods, nil, withheld_native_owners)
+    if finite_research_speed then
+      for _, continuation in ipairs(selected.continuations) do
+        if continuation.id == "research-speed-7" then
+          require("compatibility.modern_catalogue.finite_research_speed").use_identity(continuation)
+        end
+      end
+    end
     if existing_technology_prototypes ~= nil then
       selected.continuations = modern_catalogue.omit_existing_continuations(
         selected.continuations, existing_technology_prototypes)
@@ -303,23 +310,27 @@ end
 local runtime_rows
 local runtime_rows_source
 local runtime_rows_withheld
+local runtime_rows_finite_research_speed
 
-local function prepare_rows(existing_technology_prototypes, withheld_native_owners)
+local function prepare_rows(existing_technology_prototypes, withheld_native_owners, finite_research_speed)
+  finite_research_speed = finite_research_speed == true
   if runtime_rows == nil or runtime_rows_source ~= existing_technology_prototypes
-      or runtime_rows_withheld ~= withheld_native_owners then
+      or runtime_rows_withheld ~= withheld_native_owners
+      or runtime_rows_finite_research_speed ~= finite_research_speed then
     runtime_rows_source = existing_technology_prototypes
     runtime_rows_withheld = withheld_native_owners
-    runtime_rows = static_rows(existing_technology_prototypes, withheld_native_owners)
+    runtime_rows_finite_research_speed = finite_research_speed
+    runtime_rows = static_rows(existing_technology_prototypes, withheld_native_owners, finite_research_speed)
   end
   return runtime_rows
 end
 
-function M.prepare(existing_technology_prototypes, withheld_native_owners)
-  prepare_rows(existing_technology_prototypes, withheld_native_owners)
+function M.prepare(existing_technology_prototypes, withheld_native_owners, finite_research_speed)
+  prepare_rows(existing_technology_prototypes, withheld_native_owners, finite_research_speed)
 end
 
-function M.declared(existing_technology_prototypes, withheld_native_owners)
-  local rows = prepare_rows(existing_technology_prototypes, withheld_native_owners)
+function M.declared(existing_technology_prototypes, withheld_native_owners, finite_research_speed)
+  local rows = prepare_rows(existing_technology_prototypes, withheld_native_owners, finite_research_speed)
   local out = {}
   for index = 1, #rows do out[index] = copy(rows[index]) end
   return out
