@@ -11,8 +11,10 @@ local ALLOW_REMOVED_INDEX_REUSE = (INPUT_OBSERVER=="0.3.3" and (
   (script.active_mods.base=="2.0.77" and script.active_mods["more-infinite-research"]=="5.0.20001")
   or (script.active_mods.base=="2.1.23" and script.active_mods["more-infinite-research"]=="5.0.21001")))
   or (INPUT_OBSERVER=="0.3.4" and (
-    (script.active_mods.base=="2.0.77" and script.active_mods["more-infinite-research"]=="5.0.20001")
-    or (script.active_mods.base=="2.1.23" and script.active_mods["more-infinite-research"]=="5.0.21001")))
+    (script.active_mods.base=="2.0.77" and (script.active_mods["more-infinite-research"]=="5.0.20001"
+      or script.active_mods["more-infinite-research"]=="5.0.20007"))
+    or (script.active_mods.base=="2.1.23" and (script.active_mods["more-infinite-research"]=="5.0.21001"
+      or script.active_mods["more-infinite-research"]=="5.0.21007"))))
 local GEAR, MINING = "recipe-prod-research_gears-1", "recipe-prod-research_mining_drill-1"
 local IDS = {"mir-legacy-module-credit-speed-module", "mir-legacy-module-credit-productivity-module",
   "mir-legacy-module-credit-efficiency-module", "mir-legacy-cannon-credit-rocket-shooting-speed"}
@@ -432,6 +434,12 @@ script.on_init(function()
       and {mir="5.0.20001",fixture="0.3.0",observer="0.3.3"})
     or (script.active_mods.base=="2.1.23" and observer_version=="0.3.3"
       and {mir="5.0.21001",fixture="0.4.0",observer="0.3.3"})
+    or (script.active_mods.base=="2.0.77" and observer_version=="0.3.4"
+      and script.active_mods["more-infinite-research"]=="5.0.20007"
+      and {mir="5.0.20007",fixture="0.3.0",observer="0.3.4"})
+    or (script.active_mods.base=="2.1.23" and observer_version=="0.3.4"
+      and script.active_mods["more-infinite-research"]=="5.0.21007"
+      and {mir="5.0.21007",fixture="0.4.0",observer="0.3.4"})
     or (script.active_mods.base=="2.0.77" and observer_version=="0.3.4"
       and {mir="5.0.20001",fixture="0.3.0",observer="0.3.4"})
     or (script.active_mods.base=="2.1.23" and observer_version=="0.3.4"

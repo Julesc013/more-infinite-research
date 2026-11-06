@@ -859,7 +859,7 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
                 and storage_by_mod[active_wrapper_name][catalogue.storage_key].successors~=nil}
           end
         ''')
-    def test_501_exact_source_default_identities_at_all_three_stages(self):
+    def test_exact_source_default_identities_at_all_three_stages(self):
         fixture = "mir-fixture-mir5-migration-origin-f200-110-source"
         observer = "mir-fixture-mir5-active-mods-observer"
         raw = {"bool-setting": {
@@ -870,7 +870,9 @@ class MigrationOriginF200110SuccessorControls(unittest.TestCase):
         self._install_lifecycle_model()
         run = self.lua.eval("migration_origin_110_successor_lifecycle")
         for target, base, version, cohort in (("f200_source_defaults", "2.0.77", "5.0.20001", "0.3.0"),
-                                               ("f210_source_defaults", "2.1.23", "5.0.21001", "0.4.0")):
+                                               ("f210_source_defaults", "2.1.23", "5.0.21001", "0.4.0"),
+                                               ("f200_source_defaults", "2.0.77", "5.0.20007", "0.3.0"),
+                                               ("f210_source_defaults", "2.1.23", "5.0.21007", "0.4.0")):
             mods = {"base": base, "more-infinite-research": version, fixture: cohort, observer: "0.1.0"}
             opponents = [dict(mods, base="2.9.99"), dict(mods, **{"more-infinite-research": version[:-1] + "2"}),
                          dict(mods, **{fixture: "0.5.0"}), dict(mods, **{observer: "0.2.0"})]

@@ -1003,6 +1003,60 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 foreign = result["foreign_witness"]["en_foreign_target"]
                 self.assertTrue(foreign["parent_valid"] and foreign["parent_visible"] and foreign["parent_enabled"])
 
+    def test_current_034_keeps_imported_lifecycle_and_reused_slot_on_exact_507(self):
+        for target, version in (("f200", "5.0.20007"), ("f210", "5.0.21007")):
+            for opponent in (None, "removed-index-reused"):
+                with self.subTest(target=target, opponent=opponent):
+                    result = self.run_case(target, opponent, version, "0.3.4")
+                    self.assertTrue(result["ok"], result["message"])
+                    self.assertFalse(result["native_input_evidence"])
+                    self.assertTrue(result["readonly_report"])
+                    self.assertTrue(result["readonly_load"])
+                    self.assertEqual(result["resets"], 2)
+                    final = result["final"]
+                    self.assertEqual((final["phase"], final["actual_joins"], final["private_queries"]),
+                                     ("delivered", 5, 48))
+                    self.assertTrue(final["imported_earnings"])
+                    self.assertFalse(final["fixture_seeds_credit"])
+                    if opponent:
+                        self.assertEqual(final["removed_index"], final["de_index"])
+            for opponent in ("missing-click-event", "removal-no-event", "replacement-index-reuses-en",
+                             "changed-restart-index", "native-effect-change", "extra-mod"):
+                with self.subTest(target=target, opponent=opponent):
+                    result = self.run_case(target, opponent, version, "0.3.4")
+                    self.assertFalse(result["ok"])
+
+    def test_current_507_does_not_admit_another_candidate_or_an_old_observer(self):
+        for target, version, observer in (
+            ("f200", "5.0.20008", "0.3.4"), ("f210", "5.0.21008", "0.3.4"),
+            ("f200", "5.0.21007", "0.3.4"), ("f210", "5.0.20007", "0.3.4"),
+            ("f200", "5.0.20007", "0.3.3"), ("f210", "5.0.21007", "0.3.3"),
+        ):
+            with self.subTest(target=target, version=version, observer=observer):
+                result = self.run_case(target, package_version=version, input_observer_version=observer)
+                self.assertFalse(result["ok"])
+                self.assertIn("imported native target differs", result["message"])
+
+    def test_current_fixture_metadata_pins_only_the_selected_507_engine_and_identity(self):
+        historical_name = "mir-fixture-mir5-migration-origin-f200-110-source"
+        for target, base, version, historical_version in (
+            ("f200", "2.0.77", "5.0.20007", "0.3.0"),
+            ("f210", "2.1.23", "5.0.21007", "0.4.0"),
+        ):
+            with self.subTest(target=target):
+                observer = json.loads((FIXTURE / f"info-input-current-{target}.json").read_text())
+                self.assertEqual((observer["name"], observer["version"], observer["factorio_version"]),
+                                 ("mir-fixture-mir5-library-native-input", "0.3.4", base.rsplit(".", 1)[0]))
+                self.assertEqual(observer["dependencies"], [f"base = {base}",
+                                 f"~ more-infinite-research = {version}",
+                                 f"~ {historical_name} = {historical_version}"])
+                historical = json.loads((ROOT / "tests/fixtures/migration-origins/f200-110-successor" /
+                                         f"info-{target}-source-defaults-current.json").read_text())
+                self.assertEqual((historical["name"], historical["version"], historical["factorio_version"]),
+                                 (historical_name, historical_version, base.rsplit(".", 1)[0]))
+                self.assertEqual(historical["dependencies"], [f"base = {base}",
+                                 f"more-infinite-research = {version}"])
+
     def test_readonly_reports_expose_actual_library_and_foreign_input_state(self):
         for target in ("f200", "f210"):
             with self.subTest(target=target):
