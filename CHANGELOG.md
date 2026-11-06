@@ -6,8 +6,8 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Bugfixes
 
-- Preserve earned low-density structure, plastic, processing-unit and rocket-fuel research when upgrading Base saves from MIR 1.0–1.2.
-- Preserve earned module bonuses when module research is disabled on the first updated load from MIR 1.1.
+- Preserve earned low-density structure, plastic, processing-unit and rocket-fuel research when upgrading Base saves from MIR 1.0.0, 1.1.0 and 1.2.0.
+- Preserve earned module bonuses when module research is disabled on the first updated load from MIR 1.1.0.
 - Fix the research-preservation check when moving Base saves from MIR 4.7.3 on Factorio 2.0.77 to Factorio 2.1.23.
 
 ### Documentation
