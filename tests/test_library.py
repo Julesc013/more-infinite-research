@@ -39,6 +39,7 @@ class LibraryTests(unittest.TestCase):
             end
             library.on_gui_click({player_index=1,element=button})
             root=player.gui.screen.mir_research_browser
+            view=storage.mir_library.players[1]
             assert(root and root.valid and root~=old and not old.valid,
               "crossing the split/stacked boundary must replace the obsolete layout safely")
             assert(research_filters(root).mir_library_query.text=="gear" and view.selected==gear.name)
