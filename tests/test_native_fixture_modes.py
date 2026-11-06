@@ -9,6 +9,43 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class NativeFixtureModeControls(unittest.TestCase):
+    def test_retained_protected_profile_metadata_keeps_default_activation_arguments(self):
+        script = r'''
+$ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+$tokens=$null;$errors=$null
+$ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
+if($errors.Count){throw 'runner parse failed'}
+foreach($name in @('Assert-Fixture','Get-FixtureSettingsArguments')){
+ $nodes=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq$name},$true))
+ if($nodes.Count-ne1){throw 'settings admission function absent'}
+ Invoke-Expression $nodes[0].Extent.Text
+}
+$retained=@{
+ 'migration-origins-1.0.0-successor-f200-2077.json'='ProtectedSourceSave'
+ 'migration-origins-1.0.0-successor-f210-2123.json'='ProtectedOriginalF200SourceSave'
+ 'migration-origins-1.1.0-successor-f210-2123.json'='ProtectedOriginalF200SourceSavePendingNative'
+ 'discovery-recovery-successor-control-a575-f210-2123.json'='ProtectedOriginalSourceSavePendingNative'
+}
+foreach($file in $retained.Keys){
+ $profile=Get-Content -LiteralPath (Join-Path $env:MIR_TEST_PROFILES $file) -Raw|ConvertFrom-Json -AsHashtable
+ if($profile.settings_mode-cne$retained[$file]){throw 'retained profile shape changed'}
+ foreach($restricted in @($false,$true)){
+  foreach($inputSave in @('','protected.zip')){
+   $actual=Get-FixtureSettingsArguments $profile '' '' $restricted $inputSave 'retained-case'
+   if($actual.Count-ne1-or$actual.SettingsMode-cne'Defaults'){throw ('retained activation differs: '+$file)}
+  }
+ }
+}
+$legacyWithoutMetadata=Get-FixtureSettingsArguments @{target='f200'} '' '' $true '' 'retained-case'
+if($legacyWithoutMetadata.Count-ne1-or$legacyWithoutMetadata.SettingsMode-cne'Defaults'){throw 'absent metadata activation changed'}
+'PASS actual retained protected-source profile activation arguments'
+'''
+        result = subprocess.run(['pwsh', '-NoProfile', '-NonInteractive', '-Command', script],
+                                env=dict(os.environ, MIR_TEST_RUNNER=str(ROOT / 'tools/Invoke-NativeFixture.ps1'),
+                                         MIR_TEST_PROFILES=str(ROOT / 'tests/profiles')),
+                                capture_output=True, text=True)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
     def test_explicit_file_settings_require_exact_declared_bounded_inputs(self):
         script = r'''
 $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
@@ -25,12 +62,14 @@ $file=Join-Path $env:MIR_TEST_OUTPUT 'settings.dat'
 $hash=Get-FixtureSha $file
 $defaults=Get-FixtureSettingsArguments @{settings_mode='Defaults'} '' '' $false '' 'old-case'
 if($defaults.Count-ne1-or$defaults.SettingsMode-cne'Defaults'){throw 'default path changed'}
-foreach($mode in @('valid','missing-path','missing-hash','defaults-profile','declaration','content-hash','header','oversize','restricted','no-save','wrong-case','wrong-target')){
+foreach($mode in @('valid','no-explicit-inputs','missing-path','missing-hash','defaults-profile','protected-profile','declaration','content-hash','header','oversize','restricted','no-save','wrong-case','wrong-target')){
  $profile=@{settings_mode='File';settings_sha256=$hash;target='f210'}
  $settingsArguments=@{ProfileDefinition=$profile;Path=$file;Sha256=$hash;RestrictedMode=$false;InputSave='protected.zip';Case='native-research-speed-finite'}
+ if($mode-ceq'no-explicit-inputs'){$settingsArguments.Path='';$settingsArguments.Sha256=''}
  if($mode-ceq'missing-path'){$settingsArguments.Path=''}
  if($mode-ceq'missing-hash'){$settingsArguments.Sha256=''}
  if($mode-ceq'defaults-profile'){$profile.settings_mode='Defaults'}
+ if($mode-ceq'protected-profile'){$profile.settings_mode='ProtectedSourceSave'}
  if($mode-ceq'declaration'){$profile.settings_sha256='A'*64}
  if($mode-ceq'content-hash'){$settingsArguments.Sha256='A'*64;$profile.settings_sha256='A'*64}
  if($mode-ceq'header'){

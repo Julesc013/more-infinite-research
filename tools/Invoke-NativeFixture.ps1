@@ -57,7 +57,9 @@ function Get-FixtureSha([string]$Path) {
 function Get-FixtureSettingsArguments([Collections.IDictionary]$ProfileDefinition,[string]$Path,[string]$Sha256,[bool]$RestrictedMode,[string]$InputSave,[string]$Case) {
   $mode=if($ProfileDefinition.Contains('settings_mode')){[string]$ProfileDefinition.settings_mode}else{'Defaults'}
   if(-not $Path -and -not $Sha256){
-    Assert-Fixture ($mode -ceq 'Defaults') 'file settings require explicit path and hash'
+    # Retained Protected* labels describe source-save custody and keep the
+    # existing Defaults activation arguments. File alone opts into this seam.
+    Assert-Fixture ($mode -cne 'File') 'file settings require explicit path and hash'
     return @{SettingsMode='Defaults'}
   }
   Assert-Fixture (-not $RestrictedMode -and $InputSave -and $Case -ceq 'native-research-speed-finite' -and [string]$ProfileDefinition.target -ceq 'f210') 'file settings require the bounded modern finite-speed input-save case'
