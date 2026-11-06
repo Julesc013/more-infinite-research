@@ -301,8 +301,9 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
         ''')
 
     def _published_data_only_base(self, version="1.1.0", destination="f210"):
-        # Independent original source catalogues; both fixtures seed every
-        # non-gear row, including these four, then reset native effects.
+        # MIR1.1/1.2 use their independent source fixture catalogues. MIR1.0
+        # uses its published conditional producer contract, not a claim that
+        # all four identities occurred in the protected21-row source roster.
         origin = "110" if version == "1.1.0" else "120"
         self.lua.globals().old_catalogue_path = (
             Path(__file__).resolve().parents[1] / "tests" / "fixtures" /
@@ -310,7 +311,16 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
         self.lua.globals().old_data_version = version
         self.lua.globals().data_destination = destination
         self.lua.execute(r'''
-          local old=assert(loadfile(old_catalogue_path))()
+          local old
+          if old_data_version=="1.0.0" then
+            old={rows={}}
+            local original={low_density_structure="low-density-structure",plastic="plastic-bar",
+              processing_unit="processing-unit",rocket_fuel="rocket-fuel"}
+            for name,recipe in pairs(original) do
+              old.rows["recipe-prod-research_"..name.."-1"]={effects={
+                {type="change-recipe-productivity",recipe=recipe,change=.1}}}
+            end
+          else old=assert(loadfile(old_catalogue_path))() end
           old_families={"low_density_structure","plastic","processing_unit","rocket_fuel"}
           GROUPS={};data_mask={}
           for _,name in ipairs(old_families) do
@@ -344,7 +354,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
         ''')
 
     def test_published_data_only_base_preserves_four_paid_families_and_new_zero_steel(self):
-        for version in ("1.1.0", "1.2.0"):
+        for version in ("1.0.0", "1.1.0", "1.2.0"):
             for destination in ("f200", "f210"):
                 with self.subTest(version=version, destination=destination):
                     self.setUp()
@@ -378,7 +388,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                     ''')
 
     def test_data_only_known_startup_change_matches_staged_module_disable_and_retuning(self):
-        for version in ("1.1.0", "1.2.0"):
+        for version in ("1.0.0", "1.1.0", "1.2.0"):
             for destination in ("f200", "f210"):
                 with self.subTest(version=version, destination=destination):
                     self.setUp()
@@ -425,6 +435,29 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                       assert(staged.research_queue[2]==plastic and staged.research_progress==.42
                         and staged.technologies["recipe-prod-research_low_density_structure-1"].saved_progress==.27)
                     ''')
+
+    def test_original_100_trimmed_family_has_no_invented_paid_credit(self):
+        for destination in ("f200", "f210"):
+            with self.subTest(destination=destination):
+                self.setUp()
+                self._published_data_only_base("1.0.0", destination)
+                self.lua.execute(r'''
+                  -- Model an original recipe covered before MIR1.0 ran:
+                  -- trim_conflicts suppressed its entire one-recipe family.
+                  -- Its newly emitted destination identity starts unearned.
+                  advance(force,plastic.name,1,false)
+                  force.research_queue={force.technologies.foreign}
+                  local queue,current=force.research_queue,force.current_research
+                  native_credits.on_configuration_changed(data_event)
+                  close(own_contribution(force,"research_plastic","plastic-bar"),0)
+                  close(own_contribution(force,"research_plastic","new-unpaid-plastic"),0)
+                  assert(record(force,"research_plastic","plastic-bar").offset==0)
+                  close(own_contribution(force,"research_processing_unit","processing-unit"),.1)
+                  close(own_contribution(force,"research_steel","steel-plate"),0)
+                  assert(force.research_queue==queue and force.current_research==current
+                    and force.research_progress==.42)
+                  no_foreign_write(force)
+                ''')
 
     def test_data_only_first_mask_refuses_unproven_inputs_and_impossible_steel_investment(self):
         opponents = ("invalid-startup", "unknown-startup", "provider", "removed-provider", "observer", "space-age",
