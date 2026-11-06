@@ -140,6 +140,7 @@ Factorio owns raw settings, technology prototypes, force research, progress, que
 |---|---|---|---|
 | `storage.mir_library` | `runtime/library.lua` | 1, including a versioned translation ledger | Library open and relevant player/GUI callbacks; configuration imports the applicable legacy `storage.mir.research_browser` view |
 | `storage.mir_caps` | `runtime/lifecycle.lua` | 1 | Cap reconciliation when bookkeeping is needed; configuration imports admitted legacy `storage.mir.maximum_level_control` rights |
+| `storage.mir_finite_research_speed` | `runtime/finite_research_speed.lua` | 1 | Init or admitted configuration for the finite level-7 to MIR level-8 variant; records the provider and identities, without copying research levels, bonuses or work |
 | `storage.mir_native_credits` | `runtime/native_credits.lua` | 1 | Init/configuration and affected research/force callbacks; retains per-force earned recipe history |
 | `storage.mir_native_gun_credits` | `runtime/native_gun_credits.lua` | 1 | Init/configuration and affected research/force callbacks; retains the authored electric/Tesla contribution masks and holder counts |
 | `storage.mir_competing_productivity` | `runtime/competing_productivity.lua` | 1 | Applicable suppression reconciliation; removed when its owned-disablement records become empty |

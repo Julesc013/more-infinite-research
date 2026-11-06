@@ -164,3 +164,6 @@ fixtures/assert-f210-current-bob-angel-gunmetal-invar-observer/* -text -eol whit
 fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2123.json -text -eol
 fixtures/assert-f210-current-bob-angel-gunmetal-invar-qualification/data-final-fixes.lua -text -eol
 fixtures/assert-f210-current-bob-angel-tin-route-observer/data-final-fixes.lua -text -eol
+
+# Native finite-continuation profiles bind exact committed fixture bytes.
+tests/fixtures/native-research-speed-finite/** -text -eol whitespace=cr-at-eol

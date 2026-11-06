@@ -10,6 +10,7 @@ local foreign_technology_prototypes
 local native_adoptions
 local withheld_native_owners
 local native_credit_groups
+local finite_research_speed_provider
 local retirement_facts = {}
 if target.id == "f200" or target.id == "f210" then
   local live_technologies
@@ -20,6 +21,7 @@ if target.id == "f200" or target.id == "f210" then
   end
   if live_technologies ~= nil then
     foreign_technology_prototypes = {}
+    local creators = {}
     for _, name in ipairs(modern.continuation_names(script and script.active_mods)) do
       local existing = live_technologies[name]
       if existing ~= nil then
@@ -31,6 +33,7 @@ if target.id == "f200" or target.id == "f210" then
         if type(history) ~= "table" or type(history.created) ~= "string" or history.created == "" then
           error("MIR runtime catalogue requires prototype creation history for " .. name, 2)
         end
+        creators[name] = history.created
         if history.created ~= "more-infinite-research" then
           -- The exact Muria adapter's ninth level is not one of the six
           -- yieldable shared tails. Unexpected final custody must refuse,
@@ -41,6 +44,20 @@ if target.id == "f200" or target.id == "f210" then
           foreign_technology_prototypes[name] = existing
         end
       end
+    end
+    local seven = live_technologies["research-speed-7"]
+    local eight = live_technologies["research-speed-8"]
+    if foreign_technology_prototypes["research-speed-7"] ~= nil and seven.max_level == 7
+        and (eight == nil or eight.max_level ~= 4294967295) then
+      error("MIR finite research-speed route requires its infinite eighth continuation", 2)
+    end
+    if creators["research-speed-8"] == "more-infinite-research" then
+      local provider = creators["research-speed-7"]
+      if seven == nil or seven.max_level ~= 7 or eight.max_level ~= 4294967295
+          or provider == nil or provider == "more-infinite-research" then
+        error("MIR finite research-speed continuation requires foreign finite7 and MIR infinite8 custody", 2)
+      end
+      finite_research_speed_provider = provider
     end
     if modern.has_secretas(script and script.active_mods)
         and live_technologies["worker-robots-storage-9"] == nil then
@@ -80,11 +97,11 @@ end
 -- shipped module; the real player module always supplies this preparation
 -- hook.
 if type(catalogue.prepare) == "function" then
-  catalogue.prepare(foreign_technology_prototypes, withheld_native_owners)
+  catalogue.prepare(foreign_technology_prototypes, withheld_native_owners, finite_research_speed_provider ~= nil)
 end
 
 function M.declared()
-  local rows = catalogue.declared(foreign_technology_prototypes, withheld_native_owners)
+  local rows = catalogue.declared(foreign_technology_prototypes, withheld_native_owners, finite_research_speed_provider ~= nil)
   if native_adoptions == nil or next(native_adoptions) == nil then return rows end
   for _, row in ipairs(rows) do
     local adoption = native_adoptions and native_adoptions[row.id]
@@ -124,7 +141,12 @@ function M.internal_credit_ids()
 end
 
 function M.externally_supplied_continuation(name)
+  if name == "research-speed-7" and finite_research_speed_provider ~= nil then return false end
   return foreign_technology_prototypes ~= nil and foreign_technology_prototypes[name] ~= nil
+end
+
+function M.finite_research_speed_provider()
+  return finite_research_speed_provider
 end
 
 return M
