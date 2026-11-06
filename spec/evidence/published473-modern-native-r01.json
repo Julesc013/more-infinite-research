@@ -1,0 +1,268 @@
+{
+  "schema": 1,
+  "kind": "MIRPublished473ModernNativeComponentV1",
+  "status": "ACCEPT-bounded-Base-preservation-and-useful-research-components",
+  "scope": "Exact published4.7.20003 Base source to the recorded F200 same-engine and F210 cross-engine successors. The actual executions and independent current-source applicability remain distinct. No whole nine-route/older-group or stable verdict.",
+  "source": {
+    "published_archive_sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+    "protected_original_save_sha256": "9D391DB311DA3C82E43648FAE5E6FE9C08D00F0592880B3160F35EE822FECA09",
+    "helper_free_save_sha256": "1F7DD178D9CAA6CDD47F82C3B55F19D846D70E36A995F70E858E36A0918A98AF",
+    "accepted_source_observations": 3,
+    "source_cold_reloads": 2,
+    "source_cold_projections_exact_except_tick": true,
+    "forces": [
+      "player",
+      "mir5-full-catalogue-upgrade-paused"
+    ],
+    "source_carriers": "All20MIR5 signed holders are absent, correctly represented as successor-only. The separate source-r01 wrong-stage assertion failed/unsaved and stays failed.",
+    "source_lab": "Original one lab completion is historical, counted once. Other plan rows are fixture-seeded prototype.level+1; player gear has two completed levels, paused gear one. Fixture acceleration removal restores native8000*2^(L-1)/60second costs, retaining.42/.27research units rather than historical progress fractions."
+  },
+  "frozen_expectation": {
+    "source_state_sha256": "72B02BA2A2BDD0D974A6E3C2E9124FAE24CCD21233295D128F44EECFA608B428",
+    "contract_sha256": "B79B6DDD2072D976E05BF62EDAA9A0D05AA2962659D137E2BAE0186D7A3A02C0",
+    "projection_sha256": "ADFD236BEDF8D1F443C5672E44D3616030F2971C8BB814C3BE134B034BFF19BA",
+    "source_contract": "Independent old54-row/85-recipe/15-field/7-category declaration plus unchanged published source/two cold observations;875 old raw settings captured before candidate execution.20signed holders are destination-only."
+  },
+  "actual_arms": [
+    {
+      "target": "f200",
+      "engine": "2.0.77",
+      "source": "128f6945b8ffcc46b863ecb86e6038277faa77d1",
+      "player_tree": "4729b97b28056ef7fd02f500023192c4673dc9f1",
+      "package_sha256": "F8A55069E2C44A8FE356670F66637FF71377F9FF015ABC6C46A36248EC5FC9CD"
+    },
+    {
+      "target": "f210",
+      "engine": "2.1.23",
+      "source": "19332d2ea337543a9209d1f7083cedc6c3a202a7",
+      "player_tree": "ac4c8664ce76303ee96b65ec1dcab586e943c8c2",
+      "package_sha256": "B8A5122D430CF396C0FE00A2CFC4EC71C08577E791D9C40AAFD7A32BC53318EE"
+    }
+  ],
+  "observations": {
+    "old_rows": 54,
+    "old_recipe_totals": 85,
+    "native_force_fields": 15,
+    "weapon_categories": 7,
+    "signed_holders_zero": 20,
+    "old_raw_settings": 875,
+    "additional_f210_settings": 14,
+    "forces": [
+      "player",
+      "mir5-full-catalogue-upgrade-paused"
+    ],
+    "preservation": "All named old state and settings survive first entry and the final work/reset/save/colds; player gear gains the one intended new level. Paused force stays idle with.27research units at16000cost. Source fixture-seeded rights and the original source lab retain their original meaning; no new three-force older1.x claim."
+  },
+  "saved_and_cold_chains": [
+    {
+      "target": "f200",
+      "stage": "first-entry",
+      "first": "upgrade473-f200-first-r01",
+      "saved_sha256": "EC92114311E735CA9B7EE88D6BCC0F6BF4791F1275B22C7C1766B75526523A4A",
+      "two_independent_colds": [
+        "upgrade473-f200-cold1-r01",
+        "upgrade473-f200-cold2-r01"
+      ],
+      "exact_saved_state_projection_equal_except_tick": true
+    },
+    {
+      "target": "f200",
+      "stage": "work-reset",
+      "first": "work473-f200-work-r03",
+      "saved_sha256": "A9DDD9AE62B659EC585579823E362DCEE777C69D10723345DC8040797C54FAC0",
+      "two_independent_colds": [
+        "work473-f200-cold1-r01",
+        "work473-f200-cold2-r01"
+      ],
+      "exact_saved_state_projection_equal_except_tick": true
+    },
+    {
+      "target": "f210",
+      "stage": "first-entry",
+      "first": "upgrade473-f210-first-r02",
+      "saved_sha256": "6D71B16F5787DB90BEC4C8332603AEDB2A7BF2BDDCDDD545995ACE112DE43139",
+      "two_independent_colds": [
+        "upgrade473-f210-cold1-r01",
+        "upgrade473-f210-cold2-r01"
+      ],
+      "exact_saved_state_projection_equal_except_tick": true
+    },
+    {
+      "target": "f210",
+      "stage": "work-reset",
+      "first": "work473-f210-work-r02",
+      "saved_sha256": "AB88EF5666E571047FE67841541EEC98359F8D73D376D7938C463A00AC51FD01",
+      "two_independent_colds": [
+        "work473-f210-cold1-r01",
+        "work473-f210-cold2-r01"
+      ],
+      "exact_saved_state_projection_equal_except_tick": true
+    }
+  ],
+  "useful_work": [
+    {
+      "target": "f200",
+      "case": "work473-f200-work-r03",
+      "native_gear_level": [
+        3,
+        4
+      ],
+      "research_units": 32000,
+      "old_current_units": 0.42,
+      "time_seconds_per_unit": 60,
+      "lab_count": 1000,
+      "speed": 16,
+      "lab_productivity": 0.1,
+      "lab_speed": 0.6,
+      "injected_each": 32000,
+      "consumed_each": {
+        "automation-science-pack": 29000,
+        "logistic-science-pack": 29000,
+        "chemical-science-pack": 29000,
+        "production-science-pack": 29000
+      },
+      "nominal_fresh_each": 29090.52727272727,
+      "predeclared_absolute_inventory_bound": 1000,
+      "remaining_before_cleanup": {
+        "automation-science-pack": 3000,
+        "logistic-science-pack": 3000,
+        "chemical-science-pack": 3000,
+        "production-science-pack": 3000
+      },
+      "observed_post_reset_gear_bonus": 0.30000001192092896,
+      "independent_expected_bonus": 0.3000000029802322,
+      "absolute_error": 8.940696738513054e-09,
+      "work_result_sha256": "DA2251C44D1682E2C10CA95ABACD225E0A8471BD0354FB853134D3F52B37DD21",
+      "accepted_poll_records": 52
+    },
+    {
+      "target": "f210",
+      "case": "work473-f210-work-r02",
+      "native_gear_level": [
+        3,
+        4
+      ],
+      "research_units": 32000,
+      "old_current_units": 0.42,
+      "time_seconds_per_unit": 60,
+      "lab_count": 1000,
+      "speed": 16,
+      "lab_productivity": 0.1,
+      "lab_speed": 0.6,
+      "injected_each": 32000,
+      "consumed_each": {
+        "automation-science-pack": 30000,
+        "logistic-science-pack": 30000,
+        "chemical-science-pack": 30000,
+        "production-science-pack": 30000
+      },
+      "nominal_fresh_each": 29090.52727272727,
+      "predeclared_absolute_inventory_bound": 1000,
+      "remaining_before_cleanup": {
+        "automation-science-pack": 2000,
+        "logistic-science-pack": 2000,
+        "chemical-science-pack": 2000,
+        "production-science-pack": 2000
+      },
+      "observed_post_reset_gear_bonus": 0.3,
+      "independent_expected_bonus": 0.3000000029802322,
+      "absolute_error": 2.980232227667301e-09,
+      "work_result_sha256": "BCD5EE5A0B61D929FB1AE07DFA9C8B6AEA3D20A297C36C3258AD17829F266330",
+      "accepted_poll_records": 52
+    }
+  ],
+  "gear_oracle": {
+    "source_two_completed_bonus": 0.20000000298023224,
+    "old_effect_setting_percent": 10,
+    "authored_new_level": 0.1,
+    "independent_expected_total": 0.3000000029802322,
+    "frozen_expectation_sha256": "B3C094DAC532DE5C63F94E239CE8BBE4BA04D36F88E9EEE59872B75ECCC66B62",
+    "basis": "Frozen60c7 shared/control.lua132-146 independently requires saved recipe total plus.1 for one successor gear completion. Original875raw setting10percent independently supplies.1. The expectation is not the candidate observed value and assumes no engine bit width.",
+    "negative_controls": "Lost new credit, an extra completed level and adjacent lower/upper binary32 values all fail unchanged1e-8. F200.30000001192092896 differs from source+.1 by8.94069674e-9; F210.3 differs by2.98023223e-9.",
+    "prior_precision_oracle": "Original binary32-only expectation remains preserved, valid for its F200 observation but not generalized toF210. Both precision failures remain failed/unsaved; source-plus-delta changes the justified expectation without widening1e-8."
+  },
+  "queue_and_reset_boundary": "Work setup removes only the pending braking probe from the player queue and checks that current gear plus.42units remain. It runs one native completion, clears owned lab inputs/energy and power production, calls force.reset_technology_effects(), validates earned bonus, then requeues unchanged braking-force-1 at zero progress. Final full published-state.json is captured after finish/reset/restoration, saved, and exactly matches both independent cold state projections except tick. Paused force remains idle with.27units at16000cost; this is two-force evidence, not a three-force older1.x vector.",
+  "accepted_counts": {
+    "source_instances": 3,
+    "source_cold_reloads": 2,
+    "candidate_instances": 12,
+    "saved_candidate_archives": 4,
+    "candidate_cold_reloads": 8,
+    "new_gear_completions": 2,
+    "candidate_adverses_retained": 5,
+    "source_preparation_adverses_retained": 1
+  },
+  "adverses": [
+    {
+      "case": "diagnostic473-f210-context-r01",
+      "terminal_sha256": "18A99EC47D27663E751FF689CE60E56AD7916B9CC18B2E2032DB0E57D7FA4EAB",
+      "exception": "[mir441-process-exit] 1",
+      "disposition": "failed/unsaved; retained independently of later accepted successor"
+    },
+    {
+      "case": "upgrade473-f210-first-r01",
+      "terminal_sha256": "0BD703BE465EF59478A16E95E12692DE213F94A4D49C3844930FC85ABB5BDA77",
+      "exception": "[mir441-process-exit] 1",
+      "disposition": "failed/unsaved; retained independently of later accepted successor"
+    },
+    {
+      "case": "work473-f200-work-r01",
+      "terminal_sha256": "F9F0A8F368A43B35929A49302B661F4AB8901B53C9387EFB9FC9F81706540EAA",
+      "exception": "[mir-pure-published-source] RCON response deadline without expected marker; command_sent=True replies=3 chars=122",
+      "disposition": "failed/unsaved; retained independently of later accepted successor"
+    },
+    {
+      "case": "work473-f200-work-r02",
+      "terminal_sha256": "202D633D4B62E4F1697BFBEECE6AA3CCEB612250BA589A93130329A41B7C73FC",
+      "exception": "[mir-pure-published-source] RCON response deadline without expected marker; command_sent=True replies=3 chars=139",
+      "disposition": "failed/unsaved; retained independently of later accepted successor"
+    },
+    {
+      "case": "work473-f210-work-r01",
+      "terminal_sha256": "C9B62810E85905E74DDEFD825B61BF628A6B176F5887CCEBDB1D6E92BFC236B1",
+      "exception": "[mir-pure-published-source] RCON response deadline without expected marker; command_sent=True replies=3 chars=139",
+      "disposition": "failed/unsaved; retained independently of later accepted successor"
+    }
+  ],
+  "stop_semantics": "All12candidate and3source accepted instances are completion-predicate governor stops with exit-1, not natural engine exit0; timing/resource samples are not performance acceptance.",
+  "source_applicability": {
+    "reviewed_current": "d878e98563ad061dda2d844ad513107845335747",
+    "player_tree": "ac4c8664ce76303ee96b65ec1dcab586e943c8c2",
+    "review_sha256": "AECA6D2C9617A22B72F1410EACA093DE63C50DB0872881938CEF5C64C8945AF5",
+    "basis": "The actual F200 same-engine/false-flag branch retains the same detached fixed mask and existing ledger operations through128f-to19332. F210 actually ran19332; d878 has that identical source tree. This is bounded reuse with original execution identities, not new current-version execution.",
+    "version_boundary": "Final5.0.7 metadata/package/source freeze needs its own exact correspondence and affected review; this component alone does not qualify an unbuilt version."
+  },
+  "custody": {
+    "candidate_commit": "f6fbab40f9df8ace4ba0d6d761f36455c56ad0d7",
+    "candidate_path": "projects/mir/runs/published473-modern-native-r01/",
+    "candidate_capsule_sha256": "1929E4686693014396EAC9D9D147E823A91BC26B0BACEE0F2340622DB51B94EF",
+    "candidate_decoded_sha256": "50E99775BE34D257C13241EB879DF3E9C7AA9C34ECC74180B8B87B71F47C4DB6",
+    "source_commit": "67b271d2c0a1da53f9c0fe9bbf82689fb2e37916",
+    "source_path": "projects/mir/runs/pure-published-473-source-r01/",
+    "safe_originals": 323,
+    "candidate_launch_bindings": 74,
+    "source_launch_bindings": 39,
+    "distinct_launch_bindings": 88,
+    "raw_candidate_primary_secondary_bytes": 40460708,
+    "raw_source_primary_secondary_bytes": 8011864,
+    "direct_inspection_limit": "Aero checks safe JSON/Git/controller/package bytes; native saves and secret-bearing raw logs/argv stay native primaryD/secondaryC custody. No direct Aero binary-save/raw-log inspection."
+  },
+  "independent_reviews": {
+    "custody_ref": "f3b8b312c53ef35665f28f79243f19e5b5d56d96:projects/mir/runs/aero-published473-modern-native-review-r01/",
+    "state_sha256": "613CDC31A75D3D1B734ABAFCC053A097A9149AF8722141A12F0FDA19F68C1D94",
+    "applicability_sha256": "AECA6D2C9617A22B72F1410EACA093DE63C50DB0872881938CEF5C64C8945AF5",
+    "parent_correspondence_sha256": "88FDE25361825D431B678EC71717D3C01A2BB5D9D9F5E3639A6DABB239419C97",
+    "package_correspondence_sha256": "4E977021FB669572EA8018F8B357F6974A7AF58F6CA76F7D7C74AD0235B95D1E"
+  },
+  "limits": [
+    "Injected science/electricity,1000fixture labs and game.speed16 demonstrate consumption/research, not physical science manufacture or performance.",
+    "Only the exact plain-Base source/routes are qualified; provider/DLC/other-engine/settings/force/client/API scopes remain separate.",
+    "Original five candidate/diagnostic/oracle and one source preparation failures remain failed/unsaved; source-based oracle correction keeps1e-8 and assumes no engine bit width.",
+    "Whole modern/older migration groups, Library/client, full supported-profile and stable performance verdicts remain open.",
+    "No published bytes are replaced and no new5.0.7 native execution is claimed."
+  ],
+  "native_acceptance": true,
+  "stable_acceptance": false,
+  "published_bytes_replaced": false,
+  "native_acceptance_scope": "Only the explicitly recorded plain-Base source and two successor components; no whole route group, future release or stable acceptance."
+}
