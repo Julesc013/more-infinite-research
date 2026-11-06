@@ -377,8 +377,57 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                       no_foreign_write(force)
                     ''')
 
+    def test_data_only_known_startup_change_matches_staged_module_disable_and_retuning(self):
+        for version in ("1.1.0", "1.2.0"):
+            for destination in ("f200", "f210"):
+                with self.subTest(version=version, destination=destination):
+                    self.setUp()
+                    self._published_data_only_base(version, destination)
+                    self.lua.execute(r'''
+                      -- The actual effective-setting contract supplies the new
+                      -- coefficient and disabled-module intent independently.
+                      local values=require("research.settings").resolve({
+                        ["ips-enable-research_modules"]={value=false},
+                        ["ips-effect-per-level-research_plastic"]={value=17}})
+                      assert(values.streams.research_modules.enabled==false)
+                      assert(values.streams.research_plastic.effect_percent==17)
+                      local selected=values.streams.research_plastic.effect_percent/100
+                      local staged=force
+                      native_credits.on_configuration_changed(data_event)
+                      -- A later settings reload replaces prototype coefficients,
+                      -- while the engine retains completed/signed native levels.
+                      GROUPS.research_plastic[1].change=selected
+                      reload_credits(DATA_ACTIVE,data_destination)
+                      for _,d in ipairs(native_credit_definitions.collected_descriptors(GROUPS)) do
+                        if d.family=="research_plastic" and d.recipe=="plastic-bar" then
+                          for _,effect in ipairs(staged.technologies[d.main_id].prototype.effects) do
+                            if effect.recipe==d.recipe then effect.change=selected end
+                          end
+                          staged.technologies[d.positive_id].prototype.effects[1].change=selected
+                          staged.technologies[d.negative_id].prototype.effects[1].change=-selected
+                        end
+                      end
+                      local direct=make_collected_force(2,2,data_mask,false)
+                      advance(direct,"recipe-prod-research_steel-1",1,false)
+                      data_event.mod_startup_settings_changed=true
+                      native_credits.on_configuration_changed(data_event)
+                      for _,name in ipairs(old_families) do
+                        local family="research_"..name;local recipe=GROUPS[family][1].recipe
+                        local expected=family=="research_plastic" and 17/100 or 10/100
+                        close(own_contribution(staged,family,recipe),expected)
+                        close(own_contribution(direct,family,recipe),expected)
+                      end
+                      for _,target in ipairs({staged,direct}) do
+                        close(own_contribution(target,"research_plastic","new-unpaid-plastic"),0)
+                        close(own_contribution(target,"research_steel","steel-plate"),0)
+                        no_foreign_write(target)
+                      end
+                      assert(staged.research_queue[2]==plastic and staged.research_progress==.42
+                        and staged.technologies["recipe-prod-research_low_density_structure-1"].saved_progress==.27)
+                    ''')
+
     def test_data_only_first_mask_refuses_unproven_inputs_and_impossible_steel_investment(self):
-        opponents = ("startup", "unknown-startup", "provider", "removed-provider", "observer", "space-age",
+        opponents = ("invalid-startup", "unknown-startup", "provider", "removed-provider", "observer", "space-age",
                      "unknown-origin", "missing-engine", "wrong-old-engine", "wrong-current-engine",
                      "inconsistent-destination", "private-main", "incomplete-old-mask",
                      "paid-steel", "queued-steel", "saved-steel")
@@ -388,7 +437,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                 self._published_data_only_base()
                 self.lua.globals().opponent = opponent
                 self.lua.execute(r'''
-                  if opponent=="startup" then data_event.mod_startup_settings_changed=true end
+                  if opponent=="invalid-startup" then data_event.mod_startup_settings_changed="true" end
                   if opponent=="unknown-startup" then data_event.mod_startup_settings_changed=nil end
                   if opponent=="provider" then DATA_ACTIVE.provider="1.0.0" end
                   if opponent=="removed-provider" then data_event.mod_changes.provider={old_version="1.0.0"} end
