@@ -3854,12 +3854,18 @@
             "path": "spec/evidence/migration-origin-110-enabled-preflight-correction-r01.json",
             "sha256": "718BB44C428204245DC5547A356A702D417E0FC80045A4C4C38281A9A7448590"
           },
-          "diagnostic_raw_nil": "Separate unchanged-assertion native probe6EA6 observes expected=true actual=nil type=nil before source map load; original0609 did not serialize the raw value. Both original result/log pairs are retained in the new seven-record capsule."
+          "diagnostic_raw_nil": "Separate unchanged-assertion native probe6EA6 observes expected=true actual=nil type=nil before source map load; original0609 did not serialize the raw value. Both original result/log pairs are retained in the new seven-record capsule.",
+          "current506_applicability": {
+            "status": "implemented-and-host-checked; affected-native-qualification-pending",
+            "evidence": "spec/evidence/data-only-paid-family-restoration-r01.json",
+            "source": "bd06e00ef1ed870a7216a7788d884d16345c3b9f",
+            "original_results": "Keep original closed-at-recorded-inputs verdicts; no current native pass or disabled-module waiver."
+          }
         },
         {
           "boundary": "MIR1.2 combined rocket/cannon credit",
           "status": "closed",
-          "problem": "The original575e F200/F210 Base routes pass from protected FDC9. Exact package/member and no-player consumed-path review supports current505 applicability for this named route only.",
+          "problem": "The original575e F200/F210 Base routes pass from protected FDC9. Exact package/member and no-player consumed-path review supports original7a2/player505837 applicability (source5.0.0, not published5.0.5) for this named route only.",
           "next_action": "Reuse the scoped original headless checks under their unchanged575e execution identities. Keep1.2.5/.9, Space Age and GUI saved-state cases unverified; do not rerun the unchanged chain solely for current documentation commits.",
           "evidence": [
             {
@@ -3870,12 +3876,18 @@
           "applicability": {
             "path": "spec/evidence/migration-origin-120-7a2-applicability-r01.json",
             "sha256": "0CCDF0447AA7D47E60CA355113EF1B7FA421EE4CBFDA41A3FDE35911D4B2A45D"
+          },
+          "current506_applicability": {
+            "status": "implemented-and-host-checked; affected-native-qualification-pending",
+            "evidence": "spec/evidence/data-only-paid-family-restoration-r01.json",
+            "source": "bd06e00ef1ed870a7216a7788d884d16345c3b9f",
+            "original_results": "Keep original closed-at-recorded-inputs verdicts; no current native pass or disabled-module waiver."
           }
         },
         {
           "boundary": "Policy-v1 literal-boolean cap ownership",
           "status": "closed",
-          "problem": "The exact4.0.20000 Base source and direct a575 F200/F210 results retain their original execution identities. Scoped VER-06 review establishes current505 applicability for that representative, not a new native execution or every V1 origin.",
+          "problem": "The exact4.0.20000 Base source and direct a575 F200/F210 results retain their original execution identities. Scoped VER-06 review establishes original7a2/player505837 applicability (source5.0.0, not published5.0.5) for that representative, not a new native execution or every V1 origin.",
           "next_action": "Reuse only the named CEEB/4.0.20000 Base gear-cap observations at their original D3 F200 and SteamFE4 F210 engine/fixture/profile inputs. Preserve adverse and absent/false/foreign ownership limits; other origins, standalone8DC, Library, new credits, reset behavior and full-product qualification are separate.",
           "evidence": [
             {

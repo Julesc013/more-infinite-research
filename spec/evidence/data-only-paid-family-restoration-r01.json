@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "kind": "MIRDataOnlyPaidFamilyRestorationV1",
+  "status": "source-corrected-and-host-checked; affected-native-qualification-pending",
+  "scope": "The known four manufacturing families in published MIR1.1.0/1.2.0 Base sources. This is not completion of either whole older-contract group or the seven-group preservation gate.",
+  "original_sources": [
+    {
+      "path": "spec/evidence/migration-origin-110-f200-source-native-chain-r05.json",
+      "sha256": "CE2D69921C3792238AD369DE7576376C4778542C5C89AAA4708A10FC789974D8"
+    },
+    {
+      "path": "spec/evidence/migration-origin-120-f200-source-native-chain-r06.json",
+      "sha256": "7B3010BE4BF66F98E3F2F2C9EA6BBD1CDEBA8C5DAF689BC65AEC10E7EA34208C"
+    }
+  ],
+  "original_source_fixture_commits": [
+    "bec37fb87a05d17cf4cf0225e0458218830fef63",
+    "e26bb227bf46f626964d1f3bfe272a6b36832c4d"
+  ],
+  "independent_source_facts": {
+    "native_1_1_rows": 31,
+    "native_1_2_rows": 34,
+    "manufacturing_state": "Each original fixture sets every non-gear row to prototype.level+1, asserts researched=false and resets effects on player/foreign/detached forces. Four named manufacturing identities therefore carry one fixture-seeded completed level. Only gears are lab-earned.",
+    "paid_recipes": {
+      "research_low_density_structure": "low-density-structure",
+      "research_plastic": "plastic-bar",
+      "research_processing_unit": "processing-unit",
+      "research_rocket_fuel": "rocket-fuel"
+    },
+    "per_level_change": 0.1,
+    "steel": "Not authored in either original roster; no old paid/queued/saved steel state is inferred.",
+    "receipt_limit": "Retain the exact original protected saves, source counts, private module/cannon rights, foreign state and adverse receipts. A derived pure-world input needs its own observations; original gear acceleration/game.speed16 are not silently ordinary tuning."
+  },
+  "implementation": {
+    "author": "bd06e00ef1ed870a7216a7788d884d16345c3b9f",
+    "integrated_dev": "895937a320f99aef492653851584fbfaadb918b1",
+    "player_tree": "5366e4c29f68ef2835281929f38704910eb3dd6d",
+    "pr": 1744,
+    "paths": [
+      "source/research/native_credit_contracts.lua",
+      "source/runtime/native_credits.lua"
+    ],
+    "behavior": "An exact known four-recipe mask may establish the first baseline in plain Base with unchanged startup settings and the exact2.0.77 same-engine or2.0.77-to2.1.23 event. New recipes receive no old credit. Unexplained investment in absent steel refuses. Complete MIR5 histories retain priority. No fixture/provider whitelist or candidate-derived old mask."
+  },
+  "independent_review": {
+    "sha256": "460B2E30347E8C85CDB6230573979A1367B468D2342E8D66EAC27B3D68F3B4ED",
+    "private_commit": "7389bf4bf8dd00147bc65392c0d6eb1f8001af4b",
+    "private_path": "evidence/aero-data-only-paid-families-r01/source-review.json",
+    "extraction_sha256": "27C9F9123519CF2FF46296F11727D533E03AAC5D1FA8406ED6E1B41500AC8E4F"
+  },
+  "host_evidence": {
+    "negative_control": "The new positive preservation control fails on unchanged delivered506 source with the unknown-first-paid-mask error in all four source/destination subcases.",
+    "focused_controls_passed": 110,
+    "exact_author_required_checks": "All four pass atbd06e00e.",
+    "independent_expectations": [
+      "tests/test_native_family_credit_definitions.py",
+      "tests/test_native_family_paid_credits.py"
+    ],
+    "preserved_originals": "7389bf4bf8dd00147bc65392c0d6eb1f8001af4b:evidence/aero-data-only-paid-families-r01/",
+    "native_execution": false
+  },
+  "internal_packages": {
+    "f200_sha256": "2131B14D14D8F7C527AEA3D5A7C264489E645A9BA279F16D4AD2F2F3AEFAD7AC",
+    "f210_sha256": "D4113DBA8726FA2515834A58734219402344168BB9FA47944403306AAAD20C7C",
+    "correspondence_sha256": "D935159DD3B552A2E79E6C5B9685FF37BCC1147FACC137EF46B7E4BFC4985999",
+    "limit": "Only the two reviewed Lua files differ from delivered506; all475 members/CRCs/Git projections match their records. These are internal inputs, not replacement public506 assets."
+  },
+  "remaining_native_work": {
+    "owner": "Black Glass",
+    "default_routes": "Qualify matching independently observed published1.1.0/1.2.0 Base paid inputs through the admitted destinations, preserving all originally required native/partial/current/queued/detached/foreign/module/cannon state and save/two-cold outcomes.",
+    "disabled_module_route": "The separate originally accepted MIR1.1-to-F210 first-entry modules=false case remains required. Its actual startup-setting-change event is not established by these new default-path host controls; do not force the flag false or declare the route reusable. Resolve that boundary from actual inputs/independent setting semantics.",
+    "guard_limits": "Unknown providers/settings/versions/engines and active observer/fixture mods are not silently admitted. A source/input discrepancy is not permission to weaken a guard or change the oracle."
+  },
+  "old_review_naming": "The1.2/boolean records labelled505 refer to old7a2f9322/player505837/source5.0.0, not published MIR5.0.5. Their original fields, receipts and verdicts remain unchanged.",
+  "native_acceptance": false,
+  "stable_acceptance": false,
+  "published_bytes_replaced": false
+}
