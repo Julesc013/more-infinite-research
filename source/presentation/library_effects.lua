@@ -27,6 +27,9 @@ local COUNT = {
   ["character-resource-reach-distance"] = true,
   ["inserter-stack-size-bonus"] = true,
   ["maximum-following-robots-count"] = true,
+  ["max-cargo-bay-unloading-distance"] = true,
+  ["cargo-landing-pad-count"] = true,
+  ["stack-inserter-capacity-bonus"] = true,
   ["worker-robot-storage"] = true,
 }
 
@@ -44,6 +47,7 @@ function M.caption(effect)
   if kind == "change-recipe-productivity" then
     local value = number(effect.change, true)
     if value then
+      if effect.change < 0 then return {"", {"gui-bonus.productivity-bonus"}, ": ", value} end
       -- Preserve the authored productivity caption and its existing units.
       return {"mir-browser.productivity-increment", string.format("%.6g", effect.change * 100)}
     end
@@ -60,6 +64,12 @@ function M.caption(effect)
   elseif kind == "turret-attack" then
     if type(effect.turret_id) ~= "string" or effect.turret_id == "" then return nil end
     return {"", {"?", {"entity-name." .. effect.turret_id}, effect.turret_id}, " — ", {"gui-bonus.damage-bonus"}, ": ", value}
+  elseif kind == "max-cargo-bay-unloading-distance" then
+    return {"", {"technology-name.more-infinite-research.research_cargo_bay_unloading_distance"}, ": ", value}
+  elseif kind == "cargo-landing-pad-count" then
+    return {"", {"technology-name.more-infinite-research.research_cargo_landing_pad_count"}, ": ", value}
+  elseif kind == "stack-inserter-capacity-bonus" then
+    return {"", {"?", {"gui-bonus.stack-inserter-capacity-bonus"}, {"gui-bonus.bulk-inserter-capacity-bonus"}}, ": ", value}
   end
   return {"", {"gui-bonus." .. kind}, ": ", value}
 end

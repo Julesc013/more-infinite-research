@@ -50,6 +50,22 @@ class LibraryModelTests(unittest.TestCase):
           assert(effects.caption(scripted)==description and scripted.type=="nothing")
           local recipe=effects.caption({type="change-recipe-productivity",recipe="gears",change=.1})
           assert(recipe[1]=="mir-browser.productivity-increment" and recipe[2]=="10")
+          local negative=effects.caption({type="change-recipe-productivity",recipe="gears",change=-.1})
+          assert(negative[2][1]=="gui-bonus.productivity-bonus" and negative[4]=="-10%")
+        ''')
+
+    def test_authored_space_age_and_historical_capacity_benefits_use_count_units(self):
+        self.lua.execute('''
+          local effects=require("presentation.library_effects")
+          local distance=effects.caption({type="max-cargo-bay-unloading-distance",modifier=10})
+          assert(distance[2][1]=="technology-name.more-infinite-research.research_cargo_bay_unloading_distance"
+            and distance[4]=="+10")
+          local pads=effects.caption({type="cargo-landing-pad-count",modifier=1})
+          assert(pads[2][1]=="technology-name.more-infinite-research.research_cargo_landing_pad_count"
+            and pads[4]=="+1")
+          local stack=effects.caption({type="stack-inserter-capacity-bonus",modifier=2})
+          assert(stack[2][1]=="?" and stack[2][2][1]=="gui-bonus.stack-inserter-capacity-bonus"
+            and stack[2][3][1]=="gui-bonus.bulk-inserter-capacity-bonus" and stack[4]=="+2")
         ''')
 
     def test_unknown_or_invalid_effects_do_not_invent_a_benefit(self):
