@@ -7,12 +7,16 @@ local BROWSER = "more-infinite-research-browser"
 local ROOT, FILTERS, QUERY = "mir_research_browser", "mir_library_filters", "mir_library_query"
 local OTHER, OTHER_QUERY = "mir5_input_other", "mir5_input_other_query"
 local INPUT_OBSERVER = script.active_mods["mir-fixture-mir5-library-native-input"]
+local DEFER_IMPORTED_BASELINE = INPUT_OBSERVER=="0.3.4" and
+  (script.active_mods["more-infinite-research"]=="5.0.20007" or script.active_mods["more-infinite-research"]=="5.0.21007")
 local ALLOW_REMOVED_INDEX_REUSE = (INPUT_OBSERVER=="0.3.3" and (
   (script.active_mods.base=="2.0.77" and script.active_mods["more-infinite-research"]=="5.0.20001")
   or (script.active_mods.base=="2.1.23" and script.active_mods["more-infinite-research"]=="5.0.21001")))
   or (INPUT_OBSERVER=="0.3.4" and (
-    (script.active_mods.base=="2.0.77" and script.active_mods["more-infinite-research"]=="5.0.20001")
-    or (script.active_mods.base=="2.1.23" and script.active_mods["more-infinite-research"]=="5.0.21001")))
+    (script.active_mods.base=="2.0.77" and (script.active_mods["more-infinite-research"]=="5.0.20001"
+      or script.active_mods["more-infinite-research"]=="5.0.20007"))
+    or (script.active_mods.base=="2.1.23" and (script.active_mods["more-infinite-research"]=="5.0.21001"
+      or script.active_mods["more-infinite-research"]=="5.0.21007"))))
 local GEAR, MINING = "recipe-prod-research_gears-1", "recipe-prod-research_mining_drill-1"
 local IDS = {"mir-legacy-module-credit-speed-module", "mir-legacy-module-credit-productivity-module",
   "mir-legacy-module-credit-efficiency-module", "mir-legacy-cannon-credit-rocket-shooting-speed"}
@@ -85,6 +89,7 @@ local function world()
 end
 local function assert_world()
   local s=state();local actual=world()
+  if s.native==nil then fail("imported baseline is not ready") end
   for index, expected in ipairs(s.native) do
     local value=actual[index]
     if value.name~=expected.name or value.index~=expected.index or value.current~=expected.current
@@ -169,7 +174,12 @@ local function check_imported_literals()
     for index,id in ipairs(IDS) do
       local value=force.technologies[id]
       if not valid(value) or value.level~=(index<4 and 2 or 1) or value.researched~=false
-          or value.enabled~=false or value.visible_when_disabled~=false or value.prototype.hidden~=true then fail("imported credit baseline differs") end
+          or value.enabled~=false or value.visible_when_disabled~=false or value.prototype.hidden~=true then
+        local observed=valid(value) and ("level="..tostring(value.level)..",researched="..tostring(value.researched)
+          ..",enabled="..tostring(value.enabled)..",visible_when_disabled="..tostring(value.visible_when_disabled)
+          ..",hidden="..tostring(value.prototype.hidden)) or "absent"
+        fail("imported credit baseline differs: "..name.."/"..id.." ["..observed.."]")
+      end
     end
     for _, id in ipairs({"speed-module","productivity-module","efficiency-module"}) do
       if not close(force.recipes[id].productivity_bonus,.11) then fail("actual imported module effect differs") end
@@ -247,6 +257,7 @@ local function observe_removal(s)
 end
 local function report()
   local s=storage[KEY];if type(s)~="table" then return nil end
+  if s.native==nil then fail("imported baseline is not ready") end
   local en=s.en_index~=nil and game.get_player(s.en_index) or nil
   local de=s.de_index~=nil and game.get_player(s.de_index) or nil
   return {schema=1,case="library-native-input-imported110",phase=s.phase,tick=game.tick,
@@ -433,6 +444,12 @@ script.on_init(function()
     or (script.active_mods.base=="2.1.23" and observer_version=="0.3.3"
       and {mir="5.0.21001",fixture="0.4.0",observer="0.3.3"})
     or (script.active_mods.base=="2.0.77" and observer_version=="0.3.4"
+      and script.active_mods["more-infinite-research"]=="5.0.20007"
+      and {mir="5.0.20007",fixture="0.3.0",observer="0.3.4"})
+    or (script.active_mods.base=="2.1.23" and observer_version=="0.3.4"
+      and script.active_mods["more-infinite-research"]=="5.0.21007"
+      and {mir="5.0.21007",fixture="0.4.0",observer="0.3.4"})
+    or (script.active_mods.base=="2.0.77" and observer_version=="0.3.4"
       and {mir="5.0.20001",fixture="0.3.0",observer="0.3.4"})
     or (script.active_mods.base=="2.1.23" and observer_version=="0.3.4"
       and {mir="5.0.21001",fixture="0.4.0",observer="0.3.4"})
@@ -444,9 +461,20 @@ script.on_init(function()
   for name,version in pairs(allowed) do if script.active_mods[name]~=version then fail("missing imported observer closure member") end end
   for _ in pairs(game.players) do fail("protected headless source must contain no pre-existing players") end
   if storage[KEY]~=nil then fail("observer state already exists") end
-  storage[KEY]={schema=1,phase="waiting-clients",native=world(),joins=0,restart_joins={},text_events=0,closed_events=0,
+  storage[KEY]={schema=1,phase=DEFER_IMPORTED_BASELINE and "waiting-native-baseline" or "waiting-clients",
+    native=not DEFER_IMPORTED_BASELINE and world() or nil,joins=0,restart_joins={},text_events=0,closed_events=0,
     drag_events=0,reset_events=0,requested_resets=0,removed_events=0,private_queries=0,query_clicks=0,other_clicks=0,imported_probe_verified=false,close_observations={}}
-  check_imported_literals()
+  if DEFER_IMPORTED_BASELINE then
+    -- Every mod's on_init runs before configuration reconciliation. The first
+    -- native tick is after that complete stage, regardless of mod event order.
+    script.on_event(defines.events.on_tick,function()
+      check_imported_literals()
+      local s=state();s.native=world();s.phase="waiting-clients"
+      script.on_event(defines.events.on_tick,nil)
+    end)
+  else
+    check_imported_literals()
+  end
 end)
 script.on_load(function()local s=storage[KEY];loaded_restart=type(s)=="table" and s.phase=="awaiting-restart";refs={} end)
 script.on_event(defines.events.on_player_joined_game,function(event)
