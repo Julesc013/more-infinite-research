@@ -6,6 +6,7 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 import struct
@@ -16,6 +17,26 @@ FIXTURE = ROOT / "tests/fixtures/native-research-speed-finite"
 
 
 class FiniteResearchSpeedFixtureTests(unittest.TestCase):
+    def _committed_active_observer(self, package, destination, working_source):
+        relative = "tests/fixtures/active-mods-observer"
+        selected = {"info.json", "data-final-fixes.lua"}
+        admitted = {path.relative_to(working_source).as_posix() for path in working_source.rglob("*")
+                    if path.is_file() and package.admitted(path.relative_to(working_source).as_posix())}
+        self.assertEqual(admitted, selected, "shared observer selected members differ")
+        committed = {}
+        for name in sorted(selected):
+            original = subprocess.check_output(["git", "-C", str(ROOT), "show", f"HEAD:{relative}/{name}"])
+            working = (working_source / name).read_bytes()
+            self.assertEqual(working.replace(b"\r\n", b"\n"), original.replace(b"\r\n", b"\n"),
+                             f"shared observer {name} differs beyond checkout newlines")
+            committed[name] = original
+        # Match the native selected-member projection; never rewrite the shared
+        # working fixture or hide real local edits behind a committed copy.
+        destination.mkdir()
+        for name, body in committed.items():
+            (destination / name).write_bytes(body)
+        return destination
+
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().oracle_path = (FIXTURE / "observer/oracle.lua").as_posix()
@@ -196,11 +217,79 @@ class FiniteResearchSpeedFixtureTests(unittest.TestCase):
         scratch = ROOT / "build/tmp"
         scratch.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(prefix="finite-fixture-host-", dir=scratch) as directory:
+            self.assertTrue(Path(directory).resolve().is_relative_to(scratch.resolve()))
             for source in (FIXTURE / "provider", FIXTURE / "observer", ROOT / "tests/fixtures/active-mods-observer"):
+                if source == ROOT / "tests/fixtures/active-mods-observer":
+                    source = self._committed_active_observer(package, Path(directory) / "active-observer", source)
                 info = json.loads((source / "info.json").read_text())
                 name = info["name"] + "_" + info["version"] + ".zip"
                 record = package.build(source, Path(directory) / name)
                 self.assertEqual(record["sha256"].upper(), pins(profiles[0])[name])
+
+    def test_shared_observer_projection_preserves_native_archive_across_checkout_newlines(self):
+        spec = importlib.util.spec_from_file_location("finite_fixture_package_eol", ROOT / "tools/package.py")
+        package = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(package)
+        relative = "tests/fixtures/active-mods-observer"
+        original = {name: subprocess.check_output(["git", "-C", str(ROOT), "show", f"HEAD:{relative}/{name}"])
+                    for name in ("info.json", "data-final-fixes.lua")}
+        profile = json.loads((ROOT / "tests/profiles/native-research-speed-finite-published-f210.json").read_bytes())
+        archive = "mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+        expected = profile["archive_sha256"][archive]
+        scratch = ROOT / "build/tmp"
+        scratch.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="finite-observer-eol-", dir=scratch) as directory:
+            folder = Path(directory)
+            self.assertTrue(folder.resolve().is_relative_to(scratch.resolve()))
+            for mode in ("lf", "crlf"):
+                with self.subTest(mode=mode):
+                    working = folder / mode
+                    working.mkdir()
+                    for name, body in original.items():
+                        body = body.replace(b"\r\n", b"\n")
+                        (working / name).write_bytes(body if mode == "lf" else body.replace(b"\n", b"\r\n"))
+                    raw = folder / (mode + "-working")
+                    raw.mkdir()
+                    unprojected = package.build(working, raw / archive)
+                    if mode == "crlf":
+                        self.assertEqual(unprojected["sha256"].upper(),
+                                         "51DE05F9003B5BDA0E0526A17C176E50CC606C6F6C3B7547074409DA722967D1")
+                        self.assertNotEqual(unprojected["sha256"].upper(), expected)
+                    projected = self._committed_active_observer(package, folder / (mode + "-committed"), working)
+                    output = folder / (mode + "-output")
+                    output.mkdir()
+                    self.assertEqual(package.build(projected, output / archive)["sha256"].upper(), expected)
+
+    def test_shared_observer_projection_rejects_real_edits_and_changed_members_before_output(self):
+        spec = importlib.util.spec_from_file_location("finite_fixture_package_edits", ROOT / "tools/package.py")
+        package = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(package)
+        relative = "tests/fixtures/active-mods-observer"
+        original = {name: subprocess.check_output(["git", "-C", str(ROOT), "show", f"HEAD:{relative}/{name}"])
+                    for name in ("info.json", "data-final-fixes.lua")}
+        scratch = ROOT / "build/tmp"
+        scratch.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="finite-observer-edits-", dir=scratch) as directory:
+            folder = Path(directory)
+            self.assertTrue(folder.resolve().is_relative_to(scratch.resolve()))
+            for mode in ("lua-edit", "metadata-edit", "extra-lua", "missing-lua"):
+                with self.subTest(mode=mode):
+                    working = folder / mode
+                    working.mkdir()
+                    for name, body in original.items():
+                        if mode == "missing-lua" and name == "data-final-fixes.lua":
+                            continue
+                        if mode == "lua-edit" and name == "data-final-fixes.lua":
+                            body += b"\n-- changed local fixture\n"
+                        if mode == "metadata-edit" and name == "info.json":
+                            body = body.replace(b"0.1.0", b"0.1.1")
+                        (working / name).write_bytes(body)
+                    if mode == "extra-lua":
+                        (working / "unexpected.lua").write_bytes(b"return {}\n")
+                    destination = folder / (mode + "-committed")
+                    with self.assertRaisesRegex(AssertionError, "differs beyond checkout newlines|selected members differ"):
+                        self._committed_active_observer(package, destination, working)
+                    self.assertFalse(destination.exists())
 
     def test_independent_prototype_oracle_and_provider_preservation(self):
         self.lua.execute('local raw=independent_prototypes();O.prototypes(raw);assert(raw["research-speed-6"].unit.count==500)')
