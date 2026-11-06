@@ -9,6 +9,83 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_research_refresh_retains_list_controls_without_repositioning_unchanged_items(self):
+        self.lua.execute('''
+          boot()
+          local root=library.open(player,{selected=gear.name})
+          local body=research_content(root)
+          local list,actions=body.mir_library_results,body.mir_library_actions
+          local detail=body.mir_library_detail
+          local scroll_calls=0
+          list.scroll_to_item=function() scroll_calls=scroll_calls+1 end
+          local items,writes=list.items,0
+          rawset(list,"items",nil)
+          local meta=getmetatable(list)
+          local previous_index,previous_write=meta.__index,meta.__newindex
+          meta.__index=function(target,key)
+            if key=="items" then return items end
+            return previous_index(target,key)
+          end
+          meta.__newindex=function(target,key,value)
+            if key=="items" then writes=writes+1;items=value else previous_write(target,key,value) end
+          end
+          library.open(player)
+          assert(body.mir_library_results==list and list.valid and body.mir_library_actions==actions,
+            "ordinary refresh must retain the native list and its interaction context")
+          assert(body.mir_library_detail==detail and detail.valid)
+          library.open(player,{tab="queue"})
+          library.open(player,{tab="research"})
+          assert(research_content(root).mir_library_results==list and list.valid)
+          assert(scroll_calls==0,"unchanged lists must not be programmatically scrolled again")
+          assert(writes==0,"unchanged native items must not be reassigned")
+          local model=require("presentation.library_model")
+          local original=model.rows
+          model.rows=function(...)
+            local rows=original(...);rows[1].name="Updated display name";return rows
+          end
+          library.open(player)
+          assert(body.mir_library_results==list and writes==1 and list.items[1]=="Updated display name",
+            "changed display names must update the retained native list")
+          assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
+        ''')
+
+    def test_filter_excluding_selection_selects_the_first_matching_subject(self):
+        self.lua.execute('''
+          boot()
+          local root=library.open(player,{family="all",selected=foreign.name})
+          local list=research_content(root).mir_library_results
+          local query=research_filters(root).mir_library_query
+          query.text="gear"
+          library.on_gui_text_changed({player_index=1,element=query})
+          local body=research_content(root)
+          assert(#list.items==1 and list.selected_index==1
+            and storage.mir_library.players[1].selected==gear.name,
+            "an excluded old selection must not leave a nonempty result list without details")
+          assert(body.mir_library_results==list and list.valid)
+          assert(body.mir_library_detail.mir_library_detail_title.caption==gear.localised_name)
+          assert(gear.level==3 and foreign.level==1 and player.force.research_progress==.5)
+        ''')
+
+    def test_settings_refresh_retains_its_list_and_search_context(self):
+        self.lua.execute('''
+          boot()
+          local root=library.open(player,{tab="settings",settings_search="research_gears"})
+          local content=root.mir_library_tabs.mir_library_settings_content
+          local dynamic=content.mir_library_settings_dynamic
+          local list,detail=dynamic.mir_library_settings_list,dynamic.mir_library_settings_detail
+          local query=content.mir_library_settings_query
+          local scroll_calls=0
+          list.scroll_to_item=function() scroll_calls=scroll_calls+1 end
+          library.open(player,{tab="settings"})
+          library.on_gui_selection_state_changed({player_index=1,element=list})
+          assert(dynamic.mir_library_settings_list==list and list.valid,
+            "Settings selection must retain the native list")
+          assert(dynamic.mir_library_settings_detail==detail and detail.valid)
+          assert(content.mir_library_settings_query==query and query.text=="research_gears")
+          assert(scroll_calls==0,"unchanged Settings lists must not be scrolled on refresh")
+          assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
+        ''')
+
     def test_settings_use_authored_short_field_names_and_honest_compact_numbers(self):
         self.lua.execute('''
           boot()

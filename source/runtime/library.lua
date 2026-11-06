@@ -1331,15 +1331,47 @@ local function frame_layout_ready(frame, player, view)
     and valid(settings) and valid(settings.type == "scroll-pane" and settings or nil)
 end
 
+-- Native list widgets own their actual scroll/interaction state. Compare the
+-- bounded LocalisedString rows before assigning items; a no-op refresh should
+-- neither replace a widget nor repopulate it. No durable mirror is needed.
+local function same_list_caption(left, right, budget)
+  if budget.left == 0 then return false end
+  budget.left = budget.left - 1
+  if left == right then return true end
+  if type(left) ~= "table" or type(right) ~= "table" or #left ~= #right then return false end
+  for index = 1, #left do
+    if not same_list_caption(left[index], right[index], budget) then return false end
+  end
+  return true
+end
+
+local function update_list_items(list, items, selected_index)
+  local previous = list.items
+  local changed = type(previous) ~= "table" or #previous ~= #items
+  if not changed then
+    local budget = {left = 256}
+    for index = 1, #items do
+      budget.left = 256
+      if not same_list_caption(previous[index], items[index], budget) then changed = true; break end
+    end
+  end
+  if changed then list.items = items end
+  local selection_changed = list.selected_index ~= selected_index
+  if selection_changed then list.selected_index = selected_index end
+  return changed, selection_changed
+end
+
 local function update_research_content(content, player, view, context, translations)
   if not valid(content) then return end
-  content.clear()
 
   local rows = rows_for(player, view, context, translations)
   local item_labels = {}
   for index, row in ipairs(rows) do item_labels[index] = caption(row, player) end
   local selected_index = row_index(rows, view.selected) or 0
-  if selected_index == 0 and #rows > 0 and view.selected == nil then
+  -- Filter changes choose a useful visible subject. Keep explicitly hidden
+  -- personal focus and stale private-credit selections inert, as before.
+  local reserved_selection = private_credit_id(view.selected) or view.hidden[view.selected] == true
+  if selected_index == 0 and #rows > 0 and not reserved_selection then
     selected_index, view.selected = 1, rows[1].id
   end
   local width = content.style and content.style.maximal_width or 592
@@ -1351,37 +1383,55 @@ local function update_research_content(content, player, view, context, translati
     selected.hidden = view.hidden[selected.id] == true
   end
 
-  local actions
-  if panes.columns == 1 then
-    actions = add(content, {type = "flow", name = PREFIX .. "actions", direction = "horizontal"})
-    add(actions, {type = "label", name = PREFIX .. "count", caption = {"mir-browser.count", #rows}})
-  else
-    add(content, {type = "label", name = PREFIX .. "count", caption = {"mir-browser.count", #rows}})
-    actions = add(content, {type = "flow", name = PREFIX .. "actions", direction = "horizontal"})
+  local actions = content[PREFIX .. "actions"]
+  if not valid(actions) then
+    if panes.columns == 1 then
+      actions = add(content, {type = "flow", name = PREFIX .. "actions", direction = "horizontal"})
+      add(actions, {type = "label", name = PREFIX .. "count"})
+    else
+      add(content, {type = "label", name = PREFIX .. "count"})
+      actions = add(content, {type = "flow", name = PREFIX .. "actions", direction = "horizontal"})
+    end
+    add(actions, {type = "sprite-button", name = PREFIX .. "hide", style = "tool_button"})
+    add(actions, {type = "button", name = PREFIX .. "inspect_settings", caption = {"mir-browser.settings"},
+      tooltip = {"mir-browser.inspect-settings"}})
+    add(actions, {type = "sprite-button", name = PREFIX .. "open_native", style = "tool_button",
+      sprite = "utility/side_menu_technology_icon", tooltip = {"mir-browser.open-research"}})
+    add(actions, {type = "button", name = PREFIX .. "close", caption = {"mir-browser.close"}})
   end
-  add(actions, {type = "sprite-button", name = PREFIX .. "hide", style = "tool_button",
-    sprite = selected and selected.hidden and "utility/expand" or "utility/collapse",
-    enabled = selected ~= nil,
-    tooltip = {"mir-browser." .. (selected and selected.hidden and "show-tooltip" or "hide-tooltip")}})
-  add(actions, {type = "button", name = PREFIX .. "inspect_settings", caption = {"mir-browser.settings"},
-    enabled = selected ~= nil and type(selected.cap_setting) == "string", tooltip = {"mir-browser.inspect-settings"}})
-  add(actions, {type = "sprite-button", name = PREFIX .. "open_native", style = "tool_button",
-    sprite = "utility/side_menu_technology_icon",
-    enabled = selected ~= nil, tooltip = {"mir-browser.open-research"}})
-  add(actions, {type = "button", name = PREFIX .. "close", caption = {"mir-browser.close"}})
-  if view.visibility == 2 then
+  local count = panes.columns == 1 and actions[PREFIX .. "count"] or content[PREFIX .. "count"]
+  count.caption = {"mir-browser.count", #rows}
+  local hide = actions[PREFIX .. "hide"]
+  hide.sprite, hide.enabled = selected and selected.hidden and "utility/expand" or "utility/collapse", selected ~= nil
+  hide.tooltip = {"mir-browser." .. (selected and selected.hidden and "show-tooltip" or "hide-tooltip")}
+  actions[PREFIX .. "inspect_settings"].enabled = selected ~= nil and type(selected.cap_setting) == "string"
+  actions[PREFIX .. "open_native"].enabled = selected ~= nil
+  local show_hidden = actions[PREFIX .. "show_hidden"]
+  if view.visibility == 2 and not valid(show_hidden) then
     add(actions, {type = "sprite-button", name = PREFIX .. "show_hidden", style = "tool_button",
       sprite = "utility/reset", tooltip = {"mir-browser.show-hidden"}})
+  elseif view.visibility ~= 2 and valid(show_hidden) then
+    show_hidden.destroy()
   end
 
-  local results = add(content, {type = "list-box", name = PREFIX .. "results", items = item_labels, selected_index = selected_index})
+  local results = content[PREFIX .. "results"]
+  local created = not valid(results)
+  if created then
+    results = add(content, {type = "list-box", name = PREFIX .. "results", items = item_labels, selected_index = selected_index})
+  end
+  local items_changed, selection_changed = update_list_items(results, item_labels, selected_index)
   if results.style then results.style.width, results.style.height = panes.list_width, panes.list_height end
-  if view.scroll and view.scroll <= #item_labels and type(results.scroll_to_item) == "function" then
+  if created and view.scroll and view.scroll <= #item_labels and type(results.scroll_to_item) == "function" then
     results.scroll_to_item(view.scroll, "top-third")
+  elseif (items_changed or selection_changed) and selected_index > 0 and type(results.scroll_to_item) == "function" then
+    results.scroll_to_item(selected_index, "in-view")
   end
   local detail = selected and selected_detail(player, view, context, translations) or nil
-  local detail_box = add(content, {type = "scroll-pane", name = PREFIX .. "detail",
-    horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
+  local detail_box = content[PREFIX .. "detail"]
+  if not valid(detail_box) then
+    detail_box = add(content, {type = "scroll-pane", name = PREFIX .. "detail",
+      horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
+  else detail_box.clear() end
   if detail_box.style then
     detail_box.style.width, detail_box.style.height = panes.detail_width, panes.detail_height
     detail_box.style.maximal_width = panes.detail_width
@@ -1556,10 +1606,9 @@ local function update_settings_content(content, view, preserve_query, translatio
     dynamic.style.maximal_width = width
     dynamic.style.height, dynamic.style.maximal_height = dynamic_height, dynamic_height
   end
-  dynamic.clear()
-
   local groups = setting_catalogue()
   if groups == nil then
+    dynamic.clear()
     add(dynamic, {type = "label", name = PREFIX .. "settings_unavailable", caption = {"mir-browser.detail-unavailable", "settings"}})
     return
   end
@@ -1574,16 +1623,24 @@ local function update_settings_content(content, view, preserve_query, translatio
   if selected_index == 0 and #visible > 0 then
     selected_index, view.setting_selected = 1, visible[1].key
   end
-  add(dynamic, {type = "label", name = PREFIX .. "settings_count", caption = {"mir-browser.settings-count", #visible}})
-  add(dynamic, {type = "label", name = PREFIX .. "settings_scope_label",
-    caption = {"mir-browser.settings-scope-" .. view.settings_scope}})
-  local list = add(dynamic, {type = "list-box", name = PREFIX .. "settings_list", items = items, selected_index = selected_index})
+  local list, detail = dynamic[PREFIX .. "settings_list"], dynamic[PREFIX .. "settings_detail"]
+  local created = not valid(list) or not valid(detail) or not valid(dynamic[PREFIX .. "settings_count"])
+    or not valid(dynamic[PREFIX .. "settings_scope_label"])
+  if created then
+    dynamic.clear()
+    add(dynamic, {type = "label", name = PREFIX .. "settings_count"})
+    add(dynamic, {type = "label", name = PREFIX .. "settings_scope_label"})
+    list = add(dynamic, {type = "list-box", name = PREFIX .. "settings_list", items = items, selected_index = selected_index})
+    detail = add(dynamic, {type = "scroll-pane", name = PREFIX .. "settings_detail",
+      horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
+  else detail.clear() end
+  dynamic[PREFIX .. "settings_count"].caption = {"mir-browser.settings-count", #visible}
+  dynamic[PREFIX .. "settings_scope_label"].caption = {"mir-browser.settings-scope-" .. view.settings_scope}
+  local items_changed, selection_changed = update_list_items(list, items, selected_index)
   if list.style then list.style.width, list.style.height = panes.list_width, panes.list_height end
-  if selected_index > 0 and type(list.scroll_to_item) == "function" then
-    list.scroll_to_item(selected_index, "top-third")
+  if (created or items_changed or selection_changed) and selected_index > 0 and type(list.scroll_to_item) == "function" then
+    list.scroll_to_item(selected_index, created and "top-third" or "in-view")
   end
-  local detail = add(dynamic, {type = "scroll-pane", name = PREFIX .. "settings_detail",
-    horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
   if detail.style then
     detail.style.width, detail.style.height = panes.detail_width, panes.detail_height
     detail.style.maximal_width = panes.detail_width
