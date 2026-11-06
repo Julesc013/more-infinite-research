@@ -197,7 +197,9 @@
     "all_six_bodies_unchanged": true,
     "aero_independent_tag_asset_metadata_unchanged": true,
     "aero_prior505_body_unchanged": true,
-    "aero_other_prior_body_equivalence_claimed": false
+    "aero_actual_download_review_other_prior_body_equivalence_claimed": false,
+    "aero_final_publisher_review_all_six_body_equivalence_accepted": true,
+    "final_publisher_comparison_basis": "03CF7364 compares Root before-baseline to Aero anonymous after-readbacks; earlier DDCAE review had deliberately not claimed the other five bodies."
   },
   "publisher_custody": {
     "repository": "Julesc013/scratchpad",
