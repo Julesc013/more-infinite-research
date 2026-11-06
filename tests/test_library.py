@@ -9,6 +9,91 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_settings_actions_and_stacked_details_fit_the_page_or_its_vertical_scroll(self):
+        self.lua.execute('''
+          for _,width in ipairs{480,528,592,832} do
+            helpers={write_file=function() error("layout refresh must not write an export") end}
+            boot()
+            library.open(player,{tab="settings",settings_scope="research"})
+            storage.mir_library.players[1].geometry={width=width,height=360}
+            local root=library.open(player,{tab="settings"})
+            local page=root.mir_library_tabs.mir_library_settings_content
+            local toolbar=page.mir_library_settings_toolbar
+            local columns=page.style.maximal_width<700 and 2 or 4
+            assert(toolbar.type=="table" and toolbar.column_count==columns,
+              "Settings actions must wrap before a narrow page clips the fourth export button")
+            local names={"settings_research","settings_options","export_settings","export_compact"}
+            for _,name in ipairs(names) do
+              local button=toolbar["mir_library_"..name]
+              assert(button and button.parent==toolbar and button.style.maximal_width>0)
+              assert(columns*button.style.maximal_width+(columns-1)*8<=page.style.maximal_width-24,
+                "every action must remain inside the page including scrollbar space")
+            end
+            local dynamic=page.mir_library_settings_dynamic
+            local list,detail=dynamic.mir_library_settings_list,dynamic.mir_library_settings_detail
+            if dynamic.column_count==1 then
+              assert(dynamic.style.minimal_height>=list.style.minimal_height+detail.style.minimal_height+48,
+                "the containing table must contain both stacked panes and their headers")
+              assert(page.vertical_scroll_policy=="auto" and page.horizontal_scroll_policy=="never")
+            end
+            for _,label in ipairs{detail.mir_library_settings_title,
+              detail.mir_library_setting_1_name,detail.mir_library_setting_1_source} do
+              assert(label.style.single_line==false and label.style.maximal_width<=detail.style.maximal_width-16,
+                "localized names and provenance must wrap within the details viewport")
+            end
+            local selected=storage.mir_library.players[1].setting_selected
+            library.on_gui_click({player_index=1,element=toolbar.mir_library_settings_options})
+            assert(storage.mir_library.players[1].settings_scope=="options")
+            -- Crossing just the toolbar breakpoint must keep it first,
+            -- rather than appending the recreated actions below the panes.
+            storage.mir_library.players[1].geometry={width=width==832 and 704 or 832,height=360}
+            root=library.open(player,{tab="settings"})
+            page=root.mir_library_tabs.mir_library_settings_content
+            local first
+            for _,child in ipairs(page._children) do if child.valid then first=child;break end end
+            assert(first==page.mir_library_settings_toolbar)
+            assert(storage.mir_library.players[1].settings_scope=="options")
+            assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
+          end
+        ''')
+
+    def test_long_imported_profile_is_bounded_in_settings_without_changing_exact_values(self):
+        profile = {"schema": 1, "kind": "mir-settings-profile", "metadata": {"note": "ä" * 512},
+                   "settings": {"ips-cost-base-research_gears": 777}}
+        imported = json.dumps(profile, ensure_ascii=False, separators=(",", ":"))
+        # Put the historical 117-byte preview boundary inside a UTF-8 pair.
+        if imported.encode("utf-8")[116] != 0xC3:
+            profile["metadata"]["note"] = "x" + profile["metadata"]["note"]
+            imported = json.dumps(profile, ensure_ascii=False, separators=(",", ":"))
+        self.lua.globals().imported_profile_json = imported
+        self.lua.globals().parse_profile_json = lambda text: self.lua.table_from(json.loads(text), recursive=True)
+        self.lua.globals().valid_preview_utf8 = lambda text: isinstance(text, str) and text.endswith("...")
+        self.lua.execute('''
+          boot()
+          local imported=imported_profile_json
+          helpers={encode_string=function(value) return value end,
+            decode_string=function() error("raw JSON imports must not use the encoded string decoder") end,
+            json_to_table=parse_profile_json}
+          assert(require("research.settings_profile").decode(imported,helpers)
+            .settings["ips-cost-base-research_gears"]==777,"profile fixture must be accepted before display")
+          settings.startup["mir-settings-profile-import"]={value=imported}
+          settings.startup["ips-cost-base-research_gears"]={value=4242}
+          local root=library.open(player,{tab="settings",settings_scope="options",settings_search="mir-settings-profile-import"})
+          local detail=root.mir_library_tabs.mir_library_settings_content
+            .mir_library_settings_dynamic.mir_library_settings_detail
+          local shown=detail.mir_library_setting_1_value.caption
+          assert(type(shown)=="string" and #shown<=120 and shown:sub(-3)=="...",
+            "opaque imported profiles must not flood the ordinary Settings view")
+          assert(shown:sub(1,8)==imported:sub(1,8) and valid_preview_utf8(shown))
+          local source=detail.mir_library_setting_1_source.caption
+          assert(type(source[2])=="string" and #source[2]<=120)
+          assert(settings.startup["mir-settings-profile-import"].value==imported)
+          assert(settings.startup["ips-cost-base-research_gears"].value==4242)
+          assert(require("research.settings").effective_values(settings.startup,helpers)
+            ["ips-cost-base-research_gears"]==777,"display shortening changed imported effective settings")
+          assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
+        ''')
+
     def test_returning_from_availability_removes_its_projection_before_research(self):
         self.lua.execute('''
           for _,width in ipairs{592,528} do

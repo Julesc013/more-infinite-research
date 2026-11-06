@@ -1466,7 +1466,19 @@ local function setting_display(name, value)
     local compact = string.format("%.6g", value)
     return tonumber(compact) == value and compact or "≈ " .. compact
   end
-  return tostring(value)
+  local shown = tostring(value)
+  if #shown > 120 then
+    -- Keep the authored compact preview without splitting a UTF-8 character.
+    -- Configuration and profile export continue to use the original value.
+    local last = 117
+    while last > 0 do
+      local next_byte = string.byte(shown, last + 1)
+      if next_byte < 128 or next_byte > 191 then break end
+      last = last - 1
+    end
+    return string.sub(shown, 1, last) .. "..."
+  end
+  return shown
 end
 
 local SETTING_FIELD_CAPTIONS = {
@@ -1578,9 +1590,18 @@ end
 
 local function update_settings_content(content, view, preserve_query, translations)
   if not valid(content) then return end
+  local width = content.style and (content.style.maximal_width or content.style.width) or 592
+  local available_height = content.style and (content.style.maximal_height or content.style.height) or 220
+  local toolbar_columns = width < 380 and 1 or (width < 700 and 2 or 4)
   local toolbar = content[PREFIX .. "settings_toolbar"]
+  if valid(toolbar) and (toolbar.type ~= "table" or toolbar.column_count ~= toolbar_columns) then
+    -- A recreated toolbar must precede the query and panes, including when
+    -- an older open GUI still contains the former horizontal flow.
+    content.clear()
+    toolbar = nil
+  end
   if not valid(toolbar) then
-    toolbar = add(content, {type = "flow", name = PREFIX .. "settings_toolbar", direction = "horizontal"})
+    toolbar = add(content, {type = "table", name = PREFIX .. "settings_toolbar", column_count = toolbar_columns})
     add(toolbar, {type = "button", name = PREFIX .. "settings_research", caption = {"mir-browser.settings-scope-research"}})
     add(toolbar, {type = "button", name = PREFIX .. "settings_options", caption = {"mir-browser.settings-scope-options"}})
     if support_exports then
@@ -1590,6 +1611,18 @@ local function update_settings_content(content, view, preserve_query, translatio
         tooltip = {"mir-browser.export-compact-tooltip"}})
     end
   end
+  if toolbar.style then
+    toolbar.style.horizontal_spacing, toolbar.style.vertical_spacing = 8, 4
+    toolbar.style.width, toolbar.style.maximal_width = width - 24, width - 24
+  end
+  for _, name in ipairs({"settings_research", "settings_options", "export_settings", "export_compact"}) do
+    local button = toolbar[PREFIX .. name]
+    if valid(button) and button.style then
+      button.style.width = style_pixels((width - 24 - (toolbar_columns - 1) * 8) / toolbar_columns)
+      button.style.height = 28
+      if name == "settings_research" or name == "settings_options" then button.tooltip = button.caption end
+    end
+  end
   local query = content[PREFIX .. "settings_query"]
   if not valid(query) then
     query = add(content, {type = "textfield", name = PREFIX .. "settings_query", text = view.settings_query,
@@ -1597,10 +1630,15 @@ local function update_settings_content(content, view, preserve_query, translatio
   elseif not preserve_query then
     query.text = view.settings_query
   end
-  local width = content.style and (content.style.maximal_width or content.style.width) or 592
-  local available_height = content.style and (content.style.maximal_height or content.style.height) or 220
-  local dynamic_height = math.max(80, available_height - 64)
+  if query.style then query.style.width = math.min(280, width - 24) end
+  local toolbar_rows = math.ceil((support_exports and 4 or 2) / toolbar_columns)
+  local dynamic_height = math.max(80, available_height - 64 - (toolbar_rows - 1) * 32)
   local panes = library_layout.split_sizes(width, dynamic_height)
+  -- The outer page owns overflow. A one-column table must contain both
+  -- panes plus its two heading rows, even at the minimum window height.
+  if panes.columns == 1 then
+    dynamic_height = math.max(dynamic_height, panes.list_height + panes.detail_height + 48)
+  end
   local dynamic = content[PREFIX .. "settings_dynamic"]
   if valid(dynamic) and dynamic.column_count ~= panes.columns then
     dynamic.destroy()
@@ -1644,6 +1682,8 @@ local function update_settings_content(content, view, preserve_query, translatio
   else detail.clear() end
   dynamic[PREFIX .. "settings_count"].caption = {"mir-browser.settings-count", #visible}
   dynamic[PREFIX .. "settings_scope_label"].caption = {"mir-browser.settings-scope-" .. view.settings_scope}
+  dynamic[PREFIX .. "settings_count"].style.width = panes.list_width
+  dynamic[PREFIX .. "settings_scope_label"].style.width = panes.detail_width
   local items_changed, selection_changed = update_list_items(list, items, selected_index)
   if list.style then list.style.width, list.style.height = panes.list_width, panes.list_height end
   if (created or items_changed or selection_changed) and selected_index > 0 and type(list.scroll_to_item) == "function" then
@@ -1653,29 +1693,36 @@ local function update_settings_content(content, view, preserve_query, translatio
     detail.style.width, detail.style.height = panes.detail_width, panes.detail_height
     detail.style.maximal_width = panes.detail_width
   end
+  local function setting_label(spec)
+    local label = add(detail, spec)
+    if valid(label) and label.style then
+      label.style.single_line = false
+      label.style.maximal_width = math.max(1, panes.detail_width - 16)
+    end
+    return label
+  end
   local selected = visible[selected_index]
   if selected == nil then
-    add(detail, {type = "label", name = PREFIX .. "settings_empty", caption = {"mir-browser.settings-empty"}})
+    setting_label({type = "label", name = PREFIX .. "settings_empty", caption = {"mir-browser.settings-empty"}})
     return
   end
-  add(detail, {type = "label", name = PREFIX .. "settings_title", caption = selected.title})
-  add(detail, {type = "label", name = PREFIX .. "settings_scope", caption = {"mir-browser.scope-startup"}})
+  setting_label({type = "label", name = PREFIX .. "settings_title", caption = selected.title})
+  setting_label({type = "label", name = PREFIX .. "settings_scope", caption = {"mir-browser.scope-startup"}})
   if selected.externally_supplied then
-    local warning = add(detail, {type = "label", name = PREFIX .. "settings_external", caption = {"mir-browser.settings-external-owner"}})
-    if valid(warning) then warning.style.single_line = false end
+    setting_label({type = "label", name = PREFIX .. "settings_external", caption = {"mir-browser.settings-external-owner"}})
   end
-  add(detail, {type = "label", name = PREFIX .. "settings_effective", caption = {"mir-browser.effective-values"}})
+  setting_label({type = "label", name = PREFIX .. "settings_effective", caption = {"mir-browser.effective-values"}})
   for index, field in ipairs(selected.fields) do
     local name = PREFIX .. "setting_" .. index
-    add(detail, {type = "label", name = name .. "_name", caption = field.caption, tooltip = field.description})
-    add(detail, {type = "label", name = name .. "_value", caption = setting_display(field.name, field.effective),
+    setting_label({type = "label", name = name .. "_name", caption = field.caption, tooltip = field.description})
+    setting_label({type = "label", name = name .. "_value", caption = setting_display(field.name, field.effective),
       tooltip = {"mir-browser.setting-provenance", setting_display(field.name, field.direct),
         setting_display(field.name, field.default), {"mir-browser.source-" .. field.source}}})
-    add(detail, {type = "label", name = name .. "_source",
+    setting_label({type = "label", name = name .. "_source",
       caption = {"mir-browser.setting-provenance", setting_display(field.name, field.direct),
         setting_display(field.name, field.default), {"mir-browser.source-" .. field.source}}})
   end
-  add(detail, {type = "label", name = PREFIX .. "settings_source", caption = {"mir-browser.configuration-source"}})
+  setting_label({type = "label", name = PREFIX .. "settings_source", caption = {"mir-browser.configuration-source"}})
 end
 
 local function queue_name(entry)
