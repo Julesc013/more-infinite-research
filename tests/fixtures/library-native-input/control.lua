@@ -209,8 +209,7 @@ local function check_imported_literals()
         local value=current.recipes[recipe]
         if not valid(value) or not close(value.productivity_bonus,expected) then fail("helper-free historical recipe differs: "..name.."/"..recipe) end
       end
-      if not close(current.manual_mining_speed_modifier,0) or not close(current.worker_robots_battery_modifier,.1)
-          or not close(current.get_gun_speed_modifier("cannon-shell"),0) then fail("helper-free native aggregate differs") end
+      if not close(current.manual_mining_speed_modifier,0) or not close(current.worker_robots_battery_modifier,.1) then fail("helper-free native aggregate differs") end
       local queue=current.research_queue or {}
       if index==2 then
         if not current.current_research or current.current_research.name~=GEAR or #queue~=2

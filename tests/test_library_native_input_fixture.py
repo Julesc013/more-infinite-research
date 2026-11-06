@@ -796,6 +796,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               if opponent=="helperfree-wrong-foreign-queue" then forces["mir5-migration-origin-f200-110-foreign"].research_queue={} end
               if opponent=="helperfree-lost-detached-work" then forces["mir5-migration-origin-f200-110-detached"].technologies[gear].saved_progress=0 end
               if opponent=="helperfree-wrong-battery" then forces.player.worker_robots_battery_modifier=0 end
+              if opponent=="helperfree-unrelated-cannon-bonus" then forces.player.get_gun_speed_modifier=function()return .25 end end
               if opponent=="startup-credit-enabled-until-configuration" or opponent=="startup-credit-still-enabled" then
                 forces.player.technologies[ids[1]].enabled=true
               elseif opponent=="startup-credit-level-lost" then
@@ -1133,7 +1134,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
 
     def test_helperfree_input_retains_the_full_existing_lifecycle_without_a_migration_controller(self):
         for target, version in (("f200", "5.0.20007"), ("f210", "5.0.21007")):
-            for opponent in (None, "replacement-index-reused", "startup-credit-enabled-until-configuration"):
+            for opponent in (None, "replacement-index-reused", "startup-credit-enabled-until-configuration", "helperfree-unrelated-cannon-bonus"):
                 with self.subTest(target=target, opponent=opponent):
                     result = self.run_case(target, opponent, version, "0.3.5")
                     self.assertTrue(result["ok"], result["message"])
