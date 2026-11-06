@@ -1,0 +1,218 @@
+{
+  "schema": 1,
+  "kind": "MIR507GitHubPrereleaseDeliveryChainV1",
+  "status": "DELIVERED-qualified-GitHub-prerelease-not-stable",
+  "observed_on": "2026-11-06",
+  "release": {
+    "id": 436222708,
+    "url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.7",
+    "title": "MIR 5.0.7",
+    "tag": "v5.0.7",
+    "published_at": "2026-11-06T07:41:47Z",
+    "prerelease": true,
+    "immutable": false,
+    "make_latest": false,
+    "public_asset_count": 19
+  },
+  "source": {
+    "frozen_author": "07e1a4bb0104b4473e8e3ab1ff747d2902dd2c57",
+    "version_author": "517e629e224541693bc64013cc21f9a07d540691",
+    "promotion_author": "07e1a4bb0104b4473e8e3ab1ff747d2902dd2c57",
+    "integrated_dev": "0330a3699e167a7f5825ebaffceeb9a5146f451b",
+    "main": "e296d40924f4d0f1d133eb5710f392b92ac42158",
+    "whole_tree": "091f439f3890f9a7cb593f8776f3f76c575f317f",
+    "player_tree": "b3401ef94a9a84f80a9a953a85f90934e57d3750",
+    "canonical_annotated_tag": "375630b822007fb8bdd0166f37c19eab847896d1",
+    "inventory": "4D8609E0D6C9F3CFF362EDD6AE35CF9E0FAC4488B18F25C331DC59511878B385",
+    "inventory_file_sha256": "4B4B9D6B353C3AA2B0F61C8C0935EF4BD4F073C4B5BD6CE0FC0F4B7691673A6F",
+    "frozen_to_main_changed_files": [],
+    "complete_tree_equality": true
+  },
+  "reviews": {
+    "content_package_and_bounded_native_applicability": "C3FC8BC45ED3651F583B5BA7074D0F52F7F7E294D0FD4296526D5E5367FB6EBC",
+    "content_custody": "4c63bc125e9db91ab3a360f208eb75b68ab567ad:projects/mir/runs/aero-candidate507-r02-package-review-r01/",
+    "original_version_review": "3506A0C5846917E200FD5D7AEFF8C2E7C27EAD79B544501CC2BC937C1EDDFD87",
+    "original_wording_finding_F1": "Closed in C3FC8BC4 by exact1.0.0/1.1.0/1.2.0 and1.1.0module copy; original request-changes report preserved.",
+    "actual_delivery": "4CAE7DB15D6686D168076947E8A2A1B5B95E373A76E7A2B3DF3E9A5BA82D5A9C",
+    "actual_delivery_announcement": "https://github.com/Julesc013/scratchpad/issues/137#issuecomment-6679922594"
+  },
+  "required_checks": {
+    "author_roles": [
+      "version",
+      "component",
+      "promotion"
+    ],
+    "all_four_exact_author_checks_pass": true,
+    "all_four_exact_integrated_main_and_dev_checks_pass": true,
+    "author_receipt_sha256": "13D5CFF19E3CF8F933CC8F7B394B64D5EB3DD2BF2188342D6A96B8DA9FD21C35",
+    "integrated_receipt_sha256": "687C3EDE161B9BB5935C287C9D0195BB1F7AD52CE07D44C54E7F458CEE5245FA"
+  },
+  "immediate_publication_probes": {
+    "administration": "ready",
+    "authenticated_login": "Julesc013",
+    "administration_sha256": "671DE12F6DB07C7CE1B12EC202023482E5354C79BEB58E6BBD26FE5B95464D12",
+    "generated_at": "2026-11-06T18:41:39.8262029+11:00",
+    "distinct_immutability": {
+      "enabled": false,
+      "enforced_by_owner": false
+    },
+    "immutability_sha256": "E3EC8530EC17E43D07B727267E960BA41214137DA4A3FBE14CAB1FF71BA40EF4"
+  },
+  "delivery": {
+    "root_anonymous_files": 19,
+    "root_local_files": 21,
+    "aero_anonymous_files": 19,
+    "aero_local_files": 21,
+    "zip_members_crc_checked": 1562,
+    "notes_sha256": "91AD84B4B0CCA48A08E57FE2F143F37FB3CFDC2C2949AC8E8113F4203BCC4238",
+    "upload_text_sha256": "2376C981B2119A6D14D528E39BF51E375302E84FA54CA3D6B0FEC5A021BF746B",
+    "primary_directory": "dist/v5.0.7",
+    "assets": [
+      {
+        "name": "more-infinite-research_5.0.01307.zip",
+        "bytes": 506025,
+        "sha256": "c78aace2c61c55895d1a686ec28186582e7de2569c22e055f01643cb471ae803",
+        "label": "MIR 5.0.7 for Factorio 0.13.20 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.01407.zip",
+        "bytes": 506028,
+        "sha256": "17226d0e0555235a9520729fda90972cc95a1791698620b594e58ada6949a033",
+        "label": "MIR 5.0.7 for Factorio 0.14.23 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.01507.zip",
+        "bytes": 506026,
+        "sha256": "cc235092d5a0a94e4b937c3c3390b559fb78a4a996a329f4bb71d3b6669ec759",
+        "label": "MIR 5.0.7 for Factorio 0.15.40 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.01607.zip",
+        "bytes": 506027,
+        "sha256": "601a1bdf40be5a31f16ef488f7e7375385d8b891e9860847588a92e03db09db9",
+        "label": "MIR 5.0.7 for Factorio 0.16.51 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.01707.zip",
+        "bytes": 506026,
+        "sha256": "8f477583af060f549eedd85cfb3619e666b343c1d5ce902009fedb9e76fe52d1",
+        "label": "MIR 5.0.7 for Factorio 0.17.79 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.01807.zip",
+        "bytes": 506027,
+        "sha256": "229839aca298f117b3755ddc937557986c4e30139191de93461b8f69b80c0750",
+        "label": "MIR 5.0.7 for Factorio 0.18.47 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.10007.zip",
+        "bytes": 506020,
+        "sha256": "fbb3fb27572ecd0cfec98ee0d1c51bb537d3a5546911de8ff36c171f17cb1be8",
+        "label": "MIR 5.0.7 for Factorio 1.0.0 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.11007.zip",
+        "bytes": 506331,
+        "sha256": "61145eaa0917b11465d479265e29522a96adde2c5f6153709ebbe935607f77cd",
+        "label": "MIR 5.0.7 for Factorio 1.1.110 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.20007.zip",
+        "bytes": 814982,
+        "sha256": "7fad132323d9bd8c2841278f51dfb910e9d40d65fc9b0310b07430d7acb45a7a",
+        "label": "MIR 5.0.7 for Factorio 2.0.77 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.21007.zip",
+        "bytes": 815411,
+        "sha256": "b59c8eba9fce8f152c6632bf843de527c3c03bae8a60b7c9dfa72d36541b4f52",
+        "label": "MIR 5.0.7 for Factorio 2.1.23 (zip)"
+      },
+      {
+        "name": "SHA256SUMS.txt",
+        "bytes": 1030,
+        "sha256": "d1ddc8a2984cd0ffe63324152f64b8fceb2250ebf5a99273cd65d720bfb680a1",
+        "label": "SHA256SUMS.txt"
+      },
+      {
+        "name": "more-infinite-research_5.0.00607.zip",
+        "bytes": 137937,
+        "sha256": "7f77c688fbf9aba5facaa42b874f9f2b11d58022c698bfdb6f20dfa53bfeca46",
+        "label": "MIR 5.0.7 for Factorio 0.6.4 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.00707.zip",
+        "bytes": 137937,
+        "sha256": "cabc31be514bb5becaa51b8bae1a86ef137183f5ebc5ac93e28f5d394f4c3f12",
+        "label": "MIR 5.0.7 for Factorio 0.7.5 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.00807.zip",
+        "bytes": 137936,
+        "sha256": "869e9c4a02951fb7b898fd327d6bf288da8f3730b9bc958b82485cdd54aa270a",
+        "label": "MIR 5.0.7 for Factorio 0.8.8 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.00907.zip",
+        "bytes": 137937,
+        "sha256": "05c8322891ed68cb51a7d6f81a57e136b09a3636f0fca705aace58a9e8d1913e",
+        "label": "MIR 5.0.7 for Factorio 0.9.8 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.01007.zip",
+        "bytes": 137937,
+        "sha256": "e3851f3fea03b568d8d063569fb06189809c640103eeb2c7217af638461ef292",
+        "label": "MIR 5.0.7 for Factorio 0.10.12 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.01107.zip",
+        "bytes": 137939,
+        "sha256": "42a9140a9595f0435e7abe64d6169c6cd84fe81f2f62e97e8ec316068cc3c8a4",
+        "label": "MIR 5.0.7 for Factorio 0.11.22 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.01207.zip",
+        "bytes": 137940,
+        "sha256": "e840193a7557e178be7a935a1014347497d4e272505998796e66be9c431cbc90",
+        "label": "MIR 5.0.7 for Factorio 0.12.35 (zip)"
+      },
+      {
+        "name": "SHA256SUMS-early.txt",
+        "bytes": 721,
+        "sha256": "0d151c6d4f9a9cbfa97ea78cbf5c177f83700055e2af91fa5bbf67fc8a1ddafd",
+        "label": "SHA256SUMS-early.txt"
+      }
+    ]
+  },
+  "prior_published_preservation": {
+    "root_status": "PASS-prior-seven-beta-bodies-tags-and133-assets-unchanged",
+    "tags": 7,
+    "assets": 133,
+    "scope": "Root and independent Aero compare all seven prior beta bodies/tag objects and133asset metadata/digests with their retained baselines; no claim to newly download every prior binary."
+  },
+  "publisher_custody": {
+    "repository": "Julesc013/scratchpad",
+    "commit": "5c5d041dc6e8f0e67628aba3da01f09bfd4234e6",
+    "path": "projects/mir/runs/candidate507-delivery-r01",
+    "exact_original_text_controller_patch_bodies": 74,
+    "gzip_sha256": "13DC46A942C891B5378238204706105B34BF9C5C525B0132F866EC4310C5A4B4",
+    "decoded_sha256": "2CCDABB0DDE443F21426A5AF4C62933CB724294254411E388964B72EE9E0BB62",
+    "manifest_sha256": "B5EFFD5927B5B2ECBE2A73706C35C4CC74EC9EC8B03AE3ACB4ADF9CAC5806CA4",
+    "remote_blobs_byte_verified": true
+  },
+  "affected_native_components": [
+    "spec/evidence/data-only-paid-family-restoration-r01.json",
+    "spec/evidence/published473-modern-native-r01.json"
+  ],
+  "limits": [
+    "Closes exact5.0.7 GitHub beta delivery and named old-Base preservation components; stable acceptance remains incomplete.",
+    "Actual native executions retain their original2a/128f/19332 source, package, controller, engine and result identities.3506/C3FC proves bounded coherent-version/package applicability; no new native5.0.7 execution is claimed.",
+    "Original adverse attempts remain failed, including the4.7source/diagnostic/oracle failures. The1.0manual-mining fixture offset cause is unisolated; arbitrary scripted offsets are unqualified.",
+    "Library real input/export/personal/client and Discovery Tree reset, remaining finite historical/profile/API/state and whole-product performance decisions stay open. No whole historical group, arbitrary-provider or full-modpack verdict.",
+    "F0180.18.47 is experimental/best effort with unverified native smoke. Early0.6-0.12 packages are best effort without native qualification; early0.6-0.8 need extraction.",
+    "Agent publication is GitHub-only. The maintainer handles Mod Portal. Changed future public player bytes require5.0.8; unchanged5.0.7 bytes may be promoted only after all applicable stable requirements pass."
+  ],
+  "stable_acceptance": false,
+  "mod_portal_agent_upload": false,
+  "published_bytes_replaced": false
+}
