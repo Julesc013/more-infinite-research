@@ -291,7 +291,7 @@ function Get-MIROwnedMenuForegroundContext {
     $info=New-Object MIROwnedMenuNative+GuiThreadInfo
     $info.size=[Runtime.InteropServices.Marshal]::SizeOf($info)
     $ok=[MIROwnedMenuNative]::GetGUIThreadInfo(0,[ref]$info)
-    $result.gui_thread=[ordered]@{available=$ok;flags=$(if($ok){$info.flags}else{$null});menu_active=$(if($ok){[bool]($info.flags-band 4)}else{$null});move_size_active=$(if($ok){[bool]($info.flags-band 2)}else{$null})}
+    $result.gui_thread=[ordered]@{available=$ok;flags=$(if($ok){$info.flags}else{$null});menu_active=$(if($ok){[bool]($info.flags-band 28)}else{$null});move_size_active=$(if($ok){[bool]($info.flags-band 2)}else{$null})}
   } catch { $result.gui_thread=[ordered]@{available=$false;flags=$null;menu_active=$null;move_size_active=$null} }
   $caller=[Diagnostics.Process]::GetCurrentProcess()
   try { $result.caller_process=[ordered]@{process_id=$caller.Id;session_id=$caller.SessionId} } catch { $result.caller_process=[ordered]@{process_id=$caller.Id;session_id=$null} } finally { $caller.Dispose() }

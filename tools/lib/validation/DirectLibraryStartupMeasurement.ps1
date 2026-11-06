@@ -275,8 +275,6 @@ function Invoke-MIRDirectLibraryResponsiveMenuSample {
     [IO.File]::WriteAllText($specPath,($spec|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
     $specSha=Get-MIRImmutableInputSha256 -Path $specPath
     $native=Invoke-MIRNativeProbeProcess -Context $Resources -FilePath $actor.host -Arguments @('-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',$actor.path,'-LaunchSpecPath',$specPath,'-LaunchSpecSha256',$specSha,'-OutputRoot',$actorRoot) -TimeoutSeconds ($TimeoutSeconds+20)
-    # A diagnostic run can never enter the scored sample path; its actor receipt remains in custody.
-    if($ForegroundContextDiagnostic){throw '[mir-direct-startup-foreground-context-diagnostic-not-scored]'}
     Assert-MIRDirectLibraryStartupMeasurement ($native.result.passed -and -not $native.result.timed_out -and $native.result.exit_code -eq 0) 'ordinary-menu-actor-process'
     $actorRecordPath=Join-Path $actorRoot 'actor-result.json'
     Assert-MIRDirectLibraryStartupMeasurement (Test-Path -LiteralPath $actorRecordPath -PathType Leaf) 'ordinary-menu-actor-result'
@@ -303,6 +301,8 @@ function Invoke-MIRDirectLibraryResponsiveMenuSample {
     $loaded=@(Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -LatestInvocation -ActiveModsObserver $ActiveModsObserver -ActiveModsObserverScript data-final-fixes.lua)
     Assert-MIRDirectLibraryStartupMeasurement ((Get-MIRImmutableInputSha256 -Path $FactorioBin)-ceq$executionControls.engine_sha256-and(Get-MIRImmutableInputSha256 -Path $config)-ceq$executionControls.config.sha256-and(Get-MIRImmutableInputSha256 -Path $profile)-ceq$executionControls.selection.sha256) 'ordinary-menu-execution-controls-drift'
     $playerDataAfter=Get-MIRImmutableInputSha256 -Path $playerData
+    # Validate the complete ordinary sample first, but emit no scored diagnostic sample.
+    if($ForegroundContextDiagnostic){throw '[mir-direct-startup-foreground-context-diagnostic-not-scored]'}
     [pscustomobject][ordered]@{
       label=$Label;run_relative_path=[IO.Path]::GetRelativePath($Resources.root,$RunRoot).Replace('\','/');elapsed_seconds=[double]$menu.elapsed_seconds;endpoint_class='ordinary-responsive-menu'
       ready_endpoint='A Factorio process reached a captured owned main menu and completed a harmless owned Settings action whose distinct Settings screen was captured and OCR-confirmed. The elapsed interval is the actor QPC launch bracket to that confirmed response; actor preheat and shutdown/cleanup are excluded.'

@@ -166,7 +166,7 @@ $native=@($ast.FindAll({param($n) $n -is [System.Management.Automation.Language.
 $native=$native.Replace('[DllImport("user32.dll", SetLastError=true)] public static extern bool SystemParametersInfo(uint action, uint param, out uint value, uint flags);','public static int Calls=0; public static bool Available=true; public static bool SystemParametersInfo(uint action, uint param, out uint value, uint flags) { if(action!=0x2000 || param!=0 || flags!=0) throw new Exception("non-GET"); Calls++; value=200000; return Available; }')
 $native=$native.Replace('[DllImport("user32.dll", SetLastError=true)] public static extern bool GetLastInputInfo(ref LastInputInfo info);','public static bool GetLastInputInfo(ref LastInputInfo info) { Calls++; info.tick=4294967290; return Available; }')
 $native=$native.Replace('[DllImport("kernel32.dll")] public static extern uint GetTickCount();','public static uint GetTickCount() { Calls++; return 4; }')
-$native=$native.Replace('[DllImport("user32.dll", SetLastError=true)] public static extern bool GetGUIThreadInfo(uint thread, ref GuiThreadInfo info);','public static bool GetGUIThreadInfo(uint thread, ref GuiThreadInfo info) { if(thread!=0) throw new Exception("thread"); Calls++; info.flags=6; return Available; }')
+$native=$native.Replace('[DllImport("user32.dll", SetLastError=true)] public static extern bool GetGUIThreadInfo(uint thread, ref GuiThreadInfo info);','public static uint Flags=6; public static bool GetGUIThreadInfo(uint thread, ref GuiThreadInfo info) { if(thread!=0) throw new Exception("thread"); Calls++; info.flags=Flags; return Available; }')
 Add-Type -TypeDefinition $native
 $script:sets=0
 function Get-MIROwnedMenuMainWindowHandle { param($Process) return [IntPtr]42 }
@@ -187,7 +187,13 @@ try {
     catch { if($_.Exception.Message -notmatch 'mir-menu-foreground-request-refused'){throw} }
     $rows+=,[ordered]@{mode=$mode;calls=[MIROwnedMenuNative]::Calls;diagnostics=$d}
   }
-  [ordered]@{rows=$rows;sets=$script:sets}|ConvertTo-Json -Depth 20 -Compress
+  $flags=@()
+  foreach($value in @(0,4,8,16)){
+    [MIROwnedMenuNative]::Available=$true; [MIROwnedMenuNative]::Flags=$value
+    $context=Get-MIROwnedMenuForegroundContext -ForegroundHandle ([IntPtr]43)
+    $flags+=,[ordered]@{raw=$context.gui_thread.flags;menu=$context.gui_thread.menu_active}
+  }
+  [ordered]@{rows=$rows;sets=$script:sets;flags=$flags}|ConvertTo-Json -Depth 20 -Compress
 } finally {$p.Dispose()}
 '''
         completed = subprocess.run(['pwsh', '-NoProfile', '-Command', command], cwd=ROOT,
@@ -195,6 +201,10 @@ try {
         result = json.loads(completed.stdout)
         default, available, unavailable = result['rows']
         self.assertEqual(result['sets'], 3)
+        self.assertEqual(result['flags'], [
+            {'raw': 0, 'menu': False}, {'raw': 4, 'menu': True},
+            {'raw': 8, 'menu': True}, {'raw': 16, 'menu': True},
+        ])
         self.assertEqual(default['calls'], 0)
         self.assertNotIn('context', default['diagnostics']['foreground_request_last'])
         for row in result['rows']:
@@ -212,6 +222,61 @@ try {
         self.assertFalse(context['foreground_lock_timeout']['available'])
         self.assertIsNone(context['last_input']['modulo_age_milliseconds'])
         self.assertIsNone(context['gui_thread']['flags'])
+
+    def test_diagnostic_preserves_process_receipt_and_selection_failures_before_stopping(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            command = r'''
+. ./tools/lib/validation/DirectLibraryStartupMeasurement.ps1
+$root=__ROOT__; $script:scenario=''; $script:restored=0; $script:selectionChecks=0
+$engine=Join-Path $root 'factorio.exe'; [IO.File]::WriteAllText($engine,'fixture')
+$write=Join-Path $root 'write'; [IO.Directory]::CreateDirectory($write)|Out-Null
+[IO.File]::WriteAllText((Join-Path $write 'player-data.json'),'{}')
+function Get-MIRImmutableInputSha256 { param($Path) return ('A'*64) }
+function Write-MIRDirectLibraryStartupProfile { param($Path,$BaseRows,$MirArchive) [IO.File]::WriteAllText($Path,'{}') }
+function New-MIRDirectLibraryOrdinaryPlayerConfig { param($PlayerConfigInput,$Path,$EngineDataDirectory,$WriteDataDirectory) [IO.File]::WriteAllText($Path,'fixture'); return @{} }
+function Get-MIRDirectLibraryStartupArchiveHashes { return @{} }
+function Get-MIRDirectLibraryResponsiveMenuActor { return [pscustomobject]@{host='fixture';path='actor';sha256=('A'*64);observation_sha256=('A'*64);window_sha256=('A'*64)} }
+function Start-MIRLibraryActivation { return [pscustomobject]@{library='fixture';closed=$false;selected=@()} }
+function Add-MIRNativeProbeLibraryActivation { param($Context,$Activation) }
+function Complete-MIRLibraryActivation { param($Activation) $script:restored++; $Activation.closed=$true }
+function Assert-MIRLibraryLaunch { param($Activation,$FactorioBin,$Arguments) }
+function Get-MIRDirectLibraryStartupTextSha256 { return ('A'*64) }
+function Read-MIRDirectLibraryResponsiveMenuRecord { return [pscustomobject]@{elapsed_seconds=1} }
+function Assert-MIRLibraryLoadedSelection { $script:selectionChecks++; if($script:scenario-eq'selection'){throw '[fixture-bad-selection]'}; return @() }
+function Invoke-MIRNativeProbeProcess {
+  param($Context,$FilePath,$Arguments,$TimeoutSeconds)
+  $actorRoot=$Arguments[-1]; [IO.Directory]::CreateDirectory($actorRoot)|Out-Null
+  [IO.File]::WriteAllText((Join-Path $write 'factorio-current.log'),"1.0 Factorio initialised`n")
+  if($script:scenario-ne'missing') {
+    $receipt=[ordered]@{kind='MIRDirectLibraryOwnedMenuObservationV1';status='observed-response-awaiting-parent-selection-validation';launch_spec_sha256=('A'*64);factorio_sha256=('A'*64);claims_library_selection_validation=$false;claims_final_acceptance=$false;observation=@{claims_factorio_acceptance=$false};process_id=123;process_start_utc='2026-01-01T00:00:00Z';launch_before_qpc=1;launch_after_qpc=2;clock_frequency=1}
+    if($script:scenario-eq'mismatch'){$receipt.launch_spec_sha256=('B'*64)}
+    [IO.File]::WriteAllText((Join-Path $actorRoot 'actor-result.json'),($receipt|ConvertTo-Json -Depth 8))
+  }
+  return [pscustomobject]@{result=[pscustomobject]@{passed=($script:scenario-ne'process');timed_out=$false;exit_code=0};ledger='fixture'}
+}
+$rows=@()
+foreach($scenario in @('process','missing','mismatch','selection','valid')) {
+  $script:scenario=$scenario
+  $run=Join-Path $root $scenario
+  try {
+    Invoke-MIRDirectLibraryResponsiveMenuSample -RepoRoot $root -FactorioBin $engine -LibraryDirectory $root -EngineDataDirectory $root -BaseRows @('fixture') -RunRoot $run -WriteDataRoot $write -Label $scenario -Resources ([pscustomobject]@{root=$root}) -OrdinaryPlayerConfig @{} -OrdinaryMenuPreparation @{source=@{sha256="fixture"}} -ForegroundContextDiagnostic
+    throw 'sample unexpectedly emitted'
+  } catch { $rows+=,[ordered]@{scenario=$scenario;failure=$_.Exception.Message} }
+}
+[ordered]@{rows=$rows;restored=$script:restored;selection_checks=$script:selectionChecks}|ConvertTo-Json -Depth 8 -Compress
+'''.replace('__ROOT__', powershell_literal(temporary))
+            completed = subprocess.run(['pwsh', '-NoProfile', '-Command', command], cwd=ROOT,
+                                       text=True, capture_output=True, check=True)
+        result = json.loads(completed.stdout)
+        self.assertEqual([r['failure'] for r in result['rows']], [
+            '[mir-direct-startup-ordinary-menu-actor-process]',
+            '[mir-direct-startup-ordinary-menu-actor-result]',
+            '[mir-direct-startup-ordinary-menu-actor-inputs]',
+            '[fixture-bad-selection]',
+            '[mir-direct-startup-foreground-context-diagnostic-not-scored]',
+        ])
+        self.assertEqual(result['selection_checks'], 2)
+        self.assertEqual(result['restored'], 5)
 
     def test_attempt_diagnostics_preserve_retry_phases_and_the_response_endpoint(self):
         states = ['unrecognized', 'main-menu', 'main-menu', 'settings-menu']
