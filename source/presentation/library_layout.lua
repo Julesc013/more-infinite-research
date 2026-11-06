@@ -45,9 +45,10 @@ function M.content_height(frame_height, pairs_per_row)
 end
 
 function M.split_sizes(width, height)
-  local available_width = math.max(1, width - 24)
+  local available_width = math.max(1, width - 16)
   local body_height = math.max(80, height - 36)
-  local stacked = available_width < 500
+  -- Authored MIR4 split boundary; keep adequate narrow windows side by side.
+  local stacked = available_width < 400
   if stacked then
     local list_height = math.max(76, integer(body_height * 0.30))
     return {

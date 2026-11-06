@@ -676,7 +676,16 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               content.mir_library_detail.vertical_scroll_policy="auto"
               content.mir_library_detail.style.minimal_width=442
               content.mir_library_detail.style.maximal_width=442
-              content.mir_library_detail[present and "mir_library_detail_title" or "mir_library_detail_empty"]=element("label","label")
+              local detail=content.mir_library_detail
+              if present and opponent=="new-page" then
+                local facts=element("scroll-pane","mir_library_research_facts")
+                local heading=element("flow","mir_library_detail_heading");heading.direction="horizontal"
+                detail.mir_library_research_facts=facts;facts.mir_library_detail_heading=heading
+                heading.mir_library_detail_icon=element("sprite","mir_library_detail_icon")
+                heading.mir_library_detail_title=element("label","mir_library_detail_title")
+              else
+                detail[present and "mir_library_detail_title" or "mir_library_detail_empty"]=element("label","label")
+              end
               content.mir_library_actions=element("flow","mir_library_actions")
               content.mir_library_actions.mir_library_open_native=element("button","mir_library_open_native")
               content.mir_library_actions.mir_library_open_native.enabled=present

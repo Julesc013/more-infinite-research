@@ -455,12 +455,23 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               content[RESULTS]=results
               local detail=browser_detail()
               if opponent=="detail-width-narrow" then detail.style.width=180 end
-              detail[DETAIL_TITLE]=element("label",DETAIL_TITLE)
-              detail[DETAIL_TITLE].caption=options.selected
+              local facts=detail
+              if opponent=="new-page" then
+                facts=element("scroll-pane","mir_library_research_facts")
+                detail.mir_library_research_facts=facts
+                local heading=element("flow","mir_library_detail_heading");heading.direction="horizontal"
+                facts.mir_library_detail_heading=heading
+                heading.mir_library_detail_icon=element("sprite","mir_library_detail_icon")
+                heading[DETAIL_TITLE]=element("label",DETAIL_TITLE)
+                heading[DETAIL_TITLE].caption=options.selected
+              else
+                detail[DETAIL_TITLE]=element("label",DETAIL_TITLE)
+                detail[DETAIL_TITLE].caption=options.selected
+              end
               local context=element("flow","mir_library_detail_context")
-              detail["mir_library_detail_context"]=context
+              facts["mir_library_detail_context"]=context
               context["mir_library_context_status"]=element("label","mir_library_context_status")
-              detail["mir_library_detail_level"]=element("label","mir_library_detail_level")
+              facts["mir_library_detail_level"]=element("label","mir_library_detail_level")
               content[DETAIL]=detail
               if ordinary_private_query then
                 local actions=element("flow",ACTIONS)
@@ -481,7 +492,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               local content=tabs and tabs[CONTENT]
               local detail=content and content[DETAIL]
               if not (root and query and detail) or query.text~=gear then return end
-              local context=detail["mir_library_detail_context"]
+              local facts=detail.mir_library_research_facts or detail
+              local context=facts["mir_library_detail_context"]
               if not context then return end
               local queued=#force.research_queue
               local current=force.current_research~=nil
@@ -506,7 +518,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 context["mir_library_context_queue_count"].caption={"mir-browser.context-queue-count",count}
                 context["mir_library_context_queue_position"].caption={"mir-browser.context-queue-position",position}
               end
-              detail["mir_library_detail_level"].caption={level_key,level}
+              facts["mir_library_detail_level"].caption={level_key,level}
             end
             local remote={interfaces={["more-infinite-research-browser"]={open=true}}}
             remote.call=function(interface, method, index, options)
