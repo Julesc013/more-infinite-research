@@ -551,7 +551,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
           function run_input_observer(target,opponent,package_version,input_observer_version)
             local historical=assert(loadfile(historical_path))()
             local events={on_player_joined_game=1,on_gui_text_changed=2,on_gui_click=3,on_gui_location_changed=4,
-              on_gui_closed=5,on_technology_effects_reset=6,on_player_removed=7}
+              on_gui_closed=5,on_technology_effects_reset=6,on_player_removed=7,on_tick=8}
             local ids={"mir-legacy-module-credit-speed-module","mir-legacy-module-credit-productivity-module",
               "mir-legacy-module-credit-efficiency-module","mir-legacy-cannon-credit-rocket-shooting-speed"}
             local gear,mining="recipe-prod-research_gears-1","recipe-prod-research_mining_drill-1"
@@ -769,7 +769,34 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               if opponent=="wrong-initial-credit" then forces.player.technologies[ids[1]].level=1 end
               if opponent=="preexisting-player" then game.players[9]={} end
               if opponent=="extra-mod" then active.extra="1.0.0" end
+              if opponent=="startup-credit-enabled-until-configuration" or opponent=="startup-credit-still-enabled" then
+                forces.player.technologies[ids[1]].enabled=true
+              elseif opponent=="startup-credit-level-lost" then
+                forces.player.technologies[ids[1]].level=1
+              elseif opponent=="startup-credit-effect-lost" then
+                forces.player.recipes["speed-module"].productivity_bonus=.1
+              end
               callbacks.init()
+              if callbacks.events[8] then
+                if opponent=="startup-baseline-early-report" then api().report() end
+                if opponent=="startup-credit-enabled-until-configuration" then
+                  -- Independent lifecycle model: the product reconciles before
+                  -- the first game tick. The observer may not perform this write.
+                  forces.player.technologies[ids[1]].enabled=false
+                end
+                local function native_fingerprint()
+                  local rows={}
+                  for name,force in pairs(forces) do
+                    rows[name]={force.technologies,force.recipes,force.research_queue,force.research_progress,
+                      force.manual_mining_speed_modifier,force.worker_robots_battery_modifier}
+                  end
+                  return fingerprint(rows)
+                end
+                local before_tick=native_fingerprint()
+                callbacks.events[8]({tick=game.tick})
+                assert(native_fingerprint()==before_tick,"observer changed native startup state")
+                assert(callbacks.events[8]==nil,"baseline observer stayed subscribed")
+              end
               local before=fingerprint(store);initial_report=api().report();api().report();readonly_report=before==fingerprint(store)
               en=join(0,"en");de=join(2,"de")
               if opponent=="duplicate-initial-join" then join(0,"en") end
@@ -837,7 +864,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               initial_report=initial_report,missing_query_report=missing_query_report,missing_query_readonly=missing_query_readonly,
               opened_getter_report=opened_getter_report,opened_getter_readonly=opened_getter_readonly,
               readonly_load=readonly_load,resets=resets,calls=calls,cold_calls_before=cold_calls_before,cold_calls_after=cold_calls_after,
-              final=store[key] and api().report(),native_input_evidence=false,final_calls=calls}
+              final=store[key] and store[key].native~=nil and api().report() or nil,native_input_evidence=false,final_calls=calls}
           end
         ''')
 
@@ -1036,6 +1063,21 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 result = self.run_case(target, package_version=version, input_observer_version=observer)
                 self.assertFalse(result["ok"])
                 self.assertIn("imported native target differs", result["message"])
+
+    def test_current_baseline_waits_for_configuration_without_waiving_preservation(self):
+        for target, version in (("f200", "5.0.20007"), ("f210", "5.0.21007")):
+            with self.subTest(target=target):
+                result = self.run_case(target, "startup-credit-enabled-until-configuration", version, "0.3.4")
+                self.assertTrue(result["ok"], result["message"])
+                for opponent, message in (
+                    ("startup-credit-still-enabled", "imported credit baseline differs"),
+                    ("startup-credit-level-lost", "imported credit baseline differs"),
+                    ("startup-credit-effect-lost", "actual imported module effect differs"),
+                    ("startup-baseline-early-report", "imported baseline is not ready"),
+                ):
+                    bad = self.run_case(target, opponent, version, "0.3.4")
+                    self.assertFalse(bad["ok"], opponent)
+                    self.assertIn(message, bad["message"])
 
     def test_current_fixture_metadata_pins_only_the_selected_507_engine_and_identity(self):
         historical_name = "mir-fixture-mir5-migration-origin-f200-110-source"
