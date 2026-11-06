@@ -9,6 +9,35 @@ import test_native_credit_definitions as fixed_fixture
 
 
 class NativeFamilyCreditDefinitionTests(unittest.TestCase):
+    def test_data_only_base_masks_are_exact_original_contracts_and_detached(self):
+        root = Path(__file__).resolve().parents[1]
+        self.lua.globals().original_fixture_root = (root / "tests/fixtures/migration-origins").as_posix()
+        self.lua.execute(r'''
+          local contracts=require("research.native_credit_contracts")
+          local expected={research_low_density_structure="low-density-structure",research_plastic="plastic-bar",
+            research_processing_unit="processing-unit",research_rocket_fuel="rocket-fuel"}
+          for _,case in ipairs({{"1.1.0","110"},{"1.2.0","120"}}) do
+            local old=assert(loadfile(original_fixture_root.."/f200-"..case[2].."-source/catalogue.lua"))()
+            local mask=contracts.published_data_only_base_paid_recipe_sets(case[1])
+            local count=0
+            for family,recipe in pairs(expected) do
+              local effects=assert(old.rows["recipe-prod-"..family.."-1"]).effects
+              assert(#effects==1 and effects[1].recipe==recipe and effects[1].change==.1)
+              assert(mask[family][recipe]==true and next(mask[family],recipe)==nil)
+              count=count+1
+            end
+            local actual=0;for family in pairs(mask) do assert(expected[family]);actual=actual+1 end
+            assert(count==4 and actual==4 and mask.research_steel==nil
+              and old.rows["recipe-prod-research_steel-1"]==nil)
+            mask.research_plastic["plastic-bar"]=false;mask.research_steel={fake=true}
+            local again=contracts.published_data_only_base_paid_recipe_sets(case[1])
+            assert(again.research_plastic["plastic-bar"] and again.research_steel==nil)
+          end
+          for _,version in ipairs({"1.0.0","1.1.1","1.2.5","1.2.9","4.7.20003","5.0.20006"}) do
+            assert(contracts.published_data_only_base_paid_recipe_sets(version)==nil)
+          end
+        ''')
+
     def test_settings_stage_never_imports_credit_construction_or_recipe_collection(self):
         root = Path(__file__).resolve().parents[1]
         editions = json.loads((root / "targets/editions.json").read_bytes())["targets"]
