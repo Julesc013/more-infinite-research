@@ -11,6 +11,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Preserve a supplied finite research-speed level 7 and continue MIR research from level 8, while protecting earned bonuses and partial work.
 - Refuse unsafe first upgrades when finite research ownership cannot be established; retain normal cap changes after a verified upgrade.
 - Show configured numeric research caps in native technology descriptions.
+- Restore missing setting names, help and dropdown labels without changing setting values.
 
 ## [5.0.7] - 2026-11-06
 

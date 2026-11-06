@@ -13,6 +13,7 @@ Date: 2026-11-07
     - Refuse unsafe first upgrades when finite research ownership cannot be established; retain normal cap changes after a verified
       upgrade.
     - Show configured numeric research caps in native technology descriptions.
+    - Restore missing setting names, help and dropdown labels without changing setting values.
 
 ---------------------------------------------------------------------------------------------------
 Version: 5.0.7

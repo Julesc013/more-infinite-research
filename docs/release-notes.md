@@ -18,6 +18,7 @@ This beta restores the authored Research Library layout and fixes research-speed
 - Preserve selection, scrolling and science-production snapshots during updates, and fix the narrow-layout resizing crash.
 - Preserve external research-speed level 7 and continue MIR research from level 8, with earned bonuses and unfinished work protected.
 - Show configured numeric caps in native research descriptions.
+- Restore missing setting names, help and readable dropdown choices, retaining the authored translations.
 
 Use the ZIP matching your Factorio version. Modern packages require Factorio 2.0.77 or 2.1.23 respectively. Back up your save and keep the previous package before updating.
 

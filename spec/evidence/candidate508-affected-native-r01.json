@@ -412,5 +412,10 @@
     "Private fixture results qualify only these components. No whole-product performance, complete modpack or stable release verdict. Later player changes require explicit consumed-input applicability review."
   ],
   "stable_qualification": false,
-  "release_publication": false
+  "release_publication": false,
+  "later_locale_only_correction": {
+    "source": "9ca9529c38a4797eac1ee93db364a32c7bed0704",
+    "scope": "Only appended/recovered locale keys and the independent settings-key closure control; existing player Lua, technology/settings identities and values remain unchanged. Final release notes/changelog disclose this correction.",
+    "applicability": "The c7/EEF native observations retain their original identity. Rebuilt release packages require exact member comparison: all runtime/data/configuration Lua and existing viewed Library captions remain byte-identical; new locale text is checked independently against authored history and generated settings references. This does not claim native rendering of every restored label or a new gameplay execution."
+  }
 }
