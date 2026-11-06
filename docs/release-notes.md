@@ -1,7 +1,7 @@
 ---
-title: "MIR 5.0.6 beta release notes"
+title: "MIR 5.0.7 beta release notes"
 status: current
-applies_to: "MIR 5.0.6 GitHub prerelease"
+applies_to: "MIR 5.0.7 GitHub prerelease"
 audience: player
 doc_type: reference
 owner: mir-maintainers
@@ -9,18 +9,19 @@ last_reviewed: 2026-11-06
 supersedes: []
 superseded_by: []
 source_of_truth_for:
-  - mir-506-release-notes
+  - mir-507-release-notes
 ---
 
-This beta prevents unsafe Bob material research from consuming more science while preserving earned bonuses and unfinished work.
+This beta preserves more earned research when updating older Base saves and fixes an upgrade check when moving from Factorio 2.0 to 2.1.
 
-- Keep Bob material research unavailable when a recipe can return its own ingredients. On Factorio 2.1, remove that research from the active queue while retaining its partial progress and earned bonuses; eligible research continues normally.
-- Restore conditional Marine coke research for Real Industrial Chemistry without changing its research owner or recipes.
-- Preserve zero fluid-box extents when applying the pipeline-extent setting.
+- Preserve earned low-density structure, plastic, processing-unit and rocket-fuel bonuses from MIR 1.0.0, 1.1.0 and 1.2.0 Base saves.
+- Preserve earned module bonuses when module research is disabled on the first updated load from MIR 1.1.0.
+- Allow the reviewed MIR 4.7.3 Base upgrade from Factorio 2.0.77 to 2.1.23 without rejecting its known research ownership.
+- Simplify player reports, local build instructions and source navigation, and update the API guide.
 
 Use the ZIP matching your Factorio version. The modern packages require Factorio 2.0.77 or 2.1.23 respectively. Back up your save before updating and keep the previous package available.
 
-Focused Factorio 2.1.23 full-Bob/Space Age checks start with bonuses earned in published 5.0.5, preserve paid and partial research through unavailability, and exercise a controlled recipe return. Eligible research and three new Tin levels complete normally; the configured cap, foreign force state, save and two cold reloads pass. These checks do not qualify physical Tin production, arbitrary provider changes or an entire modpack.
+Focused Base checks start from published MIR 1.0.0, 1.1.0, 1.2.0 and 4.7.3 saves. The affected earned bonuses, partial research and foreign force state survive the tested upgrades; new gear research, effects reset, save and cold reloads are checked on Factorio 2.0.77 and 2.1.23. The MIR 1.1.0 case also checks module research disabled on the first update. These are bounded save-preservation checks, not full historical or modpack qualification. Arbitrary scripted bonus offsets remain unqualified.
 
 Real Industrial Chemistry runtime/save compatibility remains unverified: the available 0.35.8 archive fails upstream on Factorio 2.1.23 even without MIR, and 0.36.1 has not been natively checked.
 
