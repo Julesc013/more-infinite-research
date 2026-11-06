@@ -1128,10 +1128,11 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                                  f"more-infinite-research = {version}"])
 
     def test_helperfree_catalogue_is_the_unchanged_historical_test_data(self):
-        original = (ROOT / "tests/fixtures/migration-origins/f200-110-successor/catalogue.lua").read_bytes()
+        # Git may check text out with CRLF; native archives still use raw Git bytes.
+        original = (ROOT / "tests/fixtures/migration-origins/f200-110-successor/catalogue.lua").read_bytes().replace(b"\r\n", b"\n")
         self.assertEqual(hashlib.sha256(original).hexdigest().upper(),
                          "39BC46FC931CD178756FC47E499744C92A58D4C725B62403B06254F57A7FFA26")
-        self.assertEqual((FIXTURE / "catalogue.lua").read_bytes(), original)
+        self.assertEqual((FIXTURE / "catalogue.lua").read_bytes().replace(b"\r\n", b"\n"), original)
 
     def test_helperfree_input_retains_the_full_existing_lifecycle_without_a_migration_controller(self):
         for target, version in (("f200", "5.0.20007"), ("f210", "5.0.21007")):
