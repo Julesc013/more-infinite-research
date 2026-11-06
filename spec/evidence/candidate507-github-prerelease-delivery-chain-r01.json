@@ -26,7 +26,14 @@
     "inventory": "4D8609E0D6C9F3CFF362EDD6AE35CF9E0FAC4488B18F25C331DC59511878B385",
     "inventory_file_sha256": "4B4B9D6B353C3AA2B0F61C8C0935EF4BD4F073C4B5BD6CE0FC0F4B7691673A6F",
     "frozen_to_main_changed_files": [],
-    "complete_tree_equality": true
+    "complete_tree_equality": true,
+    "version_author_whole_tree": "c4d77638f5d5ec58a6a8f53c3bcd5c6d0741e7f8",
+    "complete_tree_equality_refs": {
+      "frozen_author": "07e1a4bb0104b4473e8e3ab1ff747d2902dd2c57",
+      "integrated_dev": "0330a3699e167a7f5825ebaffceeb9a5146f451b",
+      "main": "e296d40924f4d0f1d133eb5710f392b92ac42158"
+    },
+    "equality_scope": "Frozen07e/integrateddev0330/main e296 share whole091f. Version author517 shares playerb340 but its wholec4d predates the accepted routing/component records."
   },
   "reviews": {
     "content_package_and_bounded_native_applicability": "C3FC8BC45ED3651F583B5BA7074D0F52F7F7E294D0FD4296526D5E5367FB6EBC",
@@ -34,7 +41,10 @@
     "original_version_review": "3506A0C5846917E200FD5D7AEFF8C2E7C27EAD79B544501CC2BC937C1EDDFD87",
     "original_wording_finding_F1": "Closed in C3FC8BC4 by exact1.0.0/1.1.0/1.2.0 and1.1.0module copy; original request-changes report preserved.",
     "actual_delivery": "4CAE7DB15D6686D168076947E8A2A1B5B95E373A76E7A2B3DF3E9A5BA82D5A9C",
-    "actual_delivery_announcement": "https://github.com/Julesc013/scratchpad/issues/137#issuecomment-6679922594"
+    "actual_delivery_announcement": "https://github.com/Julesc013/scratchpad/issues/137#issuecomment-6679922594",
+    "actual_delivery_custody": "3819af8fafb2e7163bc79be6028e4a3721e156a5:projects/mir/runs/aero-public507-actual-delivery-r01/review.json",
+    "actual_publisher": "52A7BFDDF81C8A905BB23363265C4D71CD9E8B5C94A73A3B9C5A093D998E9566",
+    "actual_publisher_custody": "4aa5243c8f78386dce13251ed5672868884d612d:projects/mir/runs/aero-public507-final-publisher-review-r01/review.json"
   },
   "required_checks": {
     "author_roles": [
