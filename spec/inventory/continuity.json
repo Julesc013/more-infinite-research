@@ -17283,17 +17283,19 @@
           "applicable_evidence": [
             "spec/evidence/library-native-input-observer-r15-prepared.json",
             "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json",
-            "spec/evidence/library-imported-r20-f200-completion-chain-r01.json"
+            "spec/evidence/library-imported-r20-f200-completion-chain-r01.json",
+            "spec/evidence/library-current507-input-lifecycle-native-r01.json"
           ],
-          "remaining_executable_check": "Retain the accepted r20 Factorio 2.0.77 input/lifecycle component on published 5.0.1, with its actual fce598a9/9bf61979 observer/caller and original private earned state. The existing FE820FED chain and Aero review 817A8B49/DC60EB4B already verify physical input, invalidated removed objects, restart and five inspected images; do not repeat their independent review or infer a current-package pass. Compare the selected 5.0.7 Library/import/cap/credit/observer inputs and run only affected checks. Its final save was not separately cold-loaded; all views, controls, exports, layouts and current-package lifecycle remain open. F210 R37 has zero actors after a foreground refusal; R63b is unexecuted stale preparation. Adopt existing callers and protected 7a2 source, bind exact runtime/actions and retain per-action safeguards. No new observer or prospective Aero approval is required.",
+          "remaining_executable_check": "Published 5.0.7 passes the imported 1.1 input/client/personal lifecycle case on Base 2.0.77 and 2.1.23 with observer 876fc65, private caller c8a4807 and qualified saves 56598A/8B32. Independent review 0EF0708A accepts the actual input, protected state, removal/replacement and saved-host restart observations. Neither final save was separately cold-loaded. Other views, controls, scrolling/layout/size, settings/import/export files and Discovery Tree remain open. Preserve the paid-mask refusal from the old mixed internal 7a2/029AA input; use the qualified saves for new work. Review affected inputs for the next player tree without requiring prospective Aero dispatch approval.",
           "owner": "Black Glass",
           "independent_review": "Aero",
-          "status": "partial: accepted published 5.0.1 F200 physical input/lifecycle component; current-package applicability and remaining F210/views/export/client checks stay open",
-          "readiness": "Existing reviewed r20 result, observer and stronger 9bf61979 caller are available. Reconcile retained corrections before binding the selected package.",
+          "status": "partial: published 5.0.7 F200/F210 imported input/client/personal lifecycle accepted; broader GUI/exports/Discovery Tree and next-package applicability remain open",
+          "readiness": "Both current runs and independent review complete. The existing support-export caller needs exact package, qualified-save, runtime and action bindings; its older failed/unbound preparation remains unready.",
           "next_work_inputs": [
-            "spec/evidence/library-native-input-observer-r15-prepared.json",
-            "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json",
-            "spec/evidence/library-imported-r20-f200-completion-chain-r01.json"
+            "spec/evidence/library-current507-input-lifecycle-native-r01.json",
+            "tests/fixtures/library-native-input/support-exports.lua",
+            "tests/profiles/library-support-exports-imported110-f200-2077-r04.json",
+            "tests/profiles/library-support-exports-imported110-f210-2123-r04.json"
           ]
         },
         {
@@ -17331,13 +17333,14 @@
           "applicable_evidence": [
             "spec/inventory/library-baseline.json",
             "spec/evidence/beta501-f200-successor-native-chain-r01.json",
-            "spec/evidence/library-current504-functional-native-r02.json"
+            "spec/evidence/library-current504-functional-native-r02.json",
+            "spec/evidence/library-current507-input-lifecycle-native-r01.json"
           ],
-          "remaining_executable_check": "Reuse the accepted504 Library joins/labs/rendered component and501 headless personal scalars only within their original scope; close affected rendered personal state on the selected frozen package, independent client locale/translation, root/player removal, reopen/save and read-only load through the existing Library case. Separately bind Discovery Tree1.0.12 visibility/reset behavior from the actual reduced integration inputs; observe hidden-to-discovered and disabled/reset modes without exposing private credits. The historical discovery-recovery fixture is a Vulcanus migration case and is not a Discovery Tree test.",
+          "remaining_executable_check": "The published 5.0.7 imported 1.1 case observes rendered English/German queries and dragged position across actual removal/replacement and saved-host restart on 2.0.77/2.1.23; independent review 0EF0708A accepts that component. Selection/scroll/size/configuration transitions and public-beta-to-successor personal continuity retain their separate obligations. Bind Discovery Tree 1.0.12 from actual reduced inputs and observe hidden-to-discovered and disabled/reset modes without exposing private credits. The historical discovery-recovery fixture is a Vulcanus migration case, not a Discovery Tree test.",
           "owner": "Black Glass",
           "independent_review": "Aero",
-          "status": "partial: earlier published-beta persisted scalars observed; rendered personal/client lifecycle and final applicability remain open",
-          "readiness": "partial504 rendering/client evidence and reported505 preflight; Tree reset needs its own exact binding",
+          "status": "partial: current published imported query/position/removal/client restart accepted; other personal transitions, beta-successor and Discovery Tree remain open",
+          "readiness": "Current published input/client component complete; remaining controls/export and Tree reset need their existing exact bindings",
           "next_work_inputs": [
             "spec/evidence/library-current504-functional-native-r02.json",
             "spec/evidence/beta501-f200-successor-native-chain-r01.json",
@@ -17628,7 +17631,7 @@
           ]
         }
       ],
-      "verdict": "NOT READY for stable: Library input/export/personal/client and Discovery Tree reset, remaining historical/profile/API/state and whole-product performance decisions stay open. Public 5.0.7 delivery and named preservation components pass within their recorded scopes. The beta and this routing update do not close stable.",
+      "verdict": "NOT READY for stable: broader Library views/controls/settings/import/export and Discovery Tree reset, remaining historical/profile/API/state and whole-product performance decisions stay open. Public 5.0.7 delivery and the F200/F210 imported input/client/personal lifecycle components pass within their recorded scopes.",
       "native_execution": false,
       "release_qualification": false,
       "reviewed_on": "2026-11-06",
@@ -17640,7 +17643,7 @@
         "package_delivery_routing": "Retain accepted 5.0.4 correspondence 2C3D4BA1 and delivery review 5C49A325: all 17 ZIPs/two sums, roots/info/changelog/source-tag-FFFPP/Base floors, exact modern native package bytes, no developer payloads, ZIP CRCs and both 21-file local deliveries. All 85 MIR5 ZIP asset labels match the requested display format; prior four releases and 76 assets retain their bytes. These package/delivery facts do not close each stable edition current native subset; the native owner runs affected current archive/catalogue/useful-lab checks without repeating unchanged historical preservation. Preserve F018/0.18.47 experimental and early best-effort limits. Review changed candidate/edition/docs inputs for stable; unchanged qualified bytes may be promoted, changed public bytes require 5.0.5.",
         "publication_routing": "The 5.0.4 prerelease publication/delivery sequence is complete: exact checked main/tag promotion, fresh administration and distinct immutability probes, one 19-asset draft/publication, anonymous downloads, unchanged prior objects and both clean synchronized local deliveries are independently accepted by 5C49A325. Preserve that result rather than scheduling it again. Stable GO still requires all applicable verdicts on one candidate and independent claims review; then qualify unchanged-byte promotion or 5.0.5 for changed public bytes with normal publication safeguards. Black Glass owns integration/publication autonomously; agent publication remains GitHub-only and the maintainer handles Mod Portal."
       },
-      "work_order": "Black Glass adopts the existing r20 observer, stronger 9bf61979 caller and accepted 5.0.1 F200 result before making a demonstrated correction or binding published 5.0.7. It runs ready native work autonomously with capture/focus safeguards. Aero reviews changed consumed-input applicability, results, remaining historical intent and support copy. Missing reporter/private evidence stays unverified. Preserve the stopped reference calibration, original tolerances and completed results; do not retry unchanged failures or restart old campaigns.",
+      "work_order": "Black Glass binds the existing support-export case to the selected published package and qualified 56598A/8B32 saves, preserving the old internal 7a2 paid-mask refusal. It prepares, repairs and runs routine work with the existing resource/focus/process/restoration safeguards. Aero reviews results, changed-input applicability and historical intent. Published 5.0.7 acceptance does not qualify changed source; preserve completed components, adverse results, tolerances and missing reporter limits.",
       "bounded_source_correspondence": {
         "path": "b6c603f654025013546f9ccfeb8b0a677824d64e:evidence/aero-finite-stable-coverage-r01/source-correspondence.json",
         "sha256": "8BF8D1CC9F08CB4B311B3C66D31E65D31FF969AF6D43088AACEAA6FB5AB3BD0B",
