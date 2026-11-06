@@ -1156,6 +1156,16 @@ local function add_recipe_benefits(parent, detail)
   end
 end
 
+local function research_section(parent, name, caption, width)
+  -- Authored8a3b190d section(): a native divider and restrained spacing,
+  -- followed by a short bold heading rather than another paragraph.
+  local divider = add(parent, {type = "line", name = PREFIX .. name .. "_divider", direction = "horizontal"})
+  divider.style.width = math.max(1, width - 16)
+  divider.style.top_margin, divider.style.bottom_margin = 10, 4
+  local heading = add(parent, {type = "label", name = PREFIX .. name, caption = {caption}})
+  heading.style.font, heading.style.bottom_margin = "default-bold", 4
+end
+
 local function detail_lines(parent, row, detail, player)
   if not row then
     add(parent, {type = "label", name = PREFIX .. "detail_empty", caption = {"mir-browser.no-results"}})
@@ -1189,8 +1199,7 @@ local function detail_lines(parent, row, detail, player)
     title.style.font = "default-large-bold"
     title.style.maximal_width = math.max(80, width - 72)
   end
-  local benefits_heading = add(parent, {type = "label", name = PREFIX .. "detail_benefits", caption = {"mir-browser.benefits"}})
-  if benefits_heading.style then benefits_heading.style.font = "default-bold" end
+  research_section(parent, "detail_benefits", "mir-browser.benefits", width)
   if technology and #recipe_rows == 0 then
     local ok, description = pcall(function() return technology.localised_description end)
     if ok and description ~= nil and description ~= "" then
@@ -1216,9 +1225,7 @@ local function detail_lines(parent, row, detail, player)
     add(parent, {type = "label", name = PREFIX .. "other_effects", caption = {"mir-browser.effect-native-details"}})
   end
   add_recipe_benefits(parent, detail)
-  local requirements_heading = add(parent, {type = "label", name = PREFIX .. "detail_requirements",
-    caption = {"mir-browser.research-requirements"}})
-  if requirements_heading.style then requirements_heading.style.font = "default-bold" end
+  research_section(parent, "detail_requirements", "mir-browser.research-requirements", width)
   local context = add(parent, {type = "flow", name = PREFIX .. "detail_context", direction = "vertical"})
   local status_key = {
     ready = "mir-browser.status-ready",

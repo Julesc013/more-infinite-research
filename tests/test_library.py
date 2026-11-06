@@ -33,6 +33,11 @@ class LibraryTests(unittest.TestCase):
           assert(facts.mir_library_detail_description==nil and facts.mir_library_detail_family==nil,
             "recipe benefits must not repeat their generic description and selected research name")
           assert(facts.mir_library_detail_context.mir_library_context_queue_guidance==nil)
+          local divider=facts.mir_library_detail_benefits_divider
+          assert(divider.type=="line" and divider.direction=="horizontal")
+          assert(divider.style.top_margin==10 and divider.style.bottom_margin==4
+            and facts.mir_library_detail_benefits.style.bottom_margin==4,
+            "sections must retain the original native dividers and spacing")
           local science=facts.mir_library_science_icons
           assert(science.type=="table" and science.column_count>=2)
           assert(science.mir_library_science_1.sprite=="item/red" and science.mir_library_science_2.sprite=="item/green")
