@@ -19494,9 +19494,33 @@
                 "source/compatibility/product_bindings.lua",
                 "source/research/product_target_extension.lua"
               ],
-              "remaining_native_check": "Resolve the actual SE industrial-oven item/recipe IDs before selecting its independent manufacturing expectation. The historical literal industrial-furnace is not proof that a particular SE version uses that ID. Then check recipe productivity and physical crafting with paid-state/save preservation; this review does not qualify the named oven.",
+              "remaining_native_check": "Use the pinned named input identities above in a compatible complete profile; verify the final recipe-productivity increment, useful physical crafting, earned bonuses and save/reloads. Source identity readback and generic host fixtures do not close those native requirements.",
               "native_execution": false,
-              "release_qualification": false
+              "release_qualification": false,
+              "actual_named_input_readback_20261107": {
+                "engine_family": "2.1",
+                "method": "Read selected Lua members directly from existing ZIPs in memory; no extraction, library copy or native activation. Exact reporter versions/settings/save remain unknown.",
+                "native_execution": false,
+                "final_profile_admission": false,
+                "archives": [
+                  {
+                    "filename": "aai-industry_0.7.5.zip",
+                    "bytes": 9488979,
+                    "sha256": "DFB734B8B9B8BF847C90759E8A63D2DB4C24B5DF871D49E2A230E1AE58E7E829",
+                    "version": "0.7.5"
+                  },
+                  {
+                    "filename": "space-exploration_0.7.63.zip",
+                    "bytes": 3832380,
+                    "sha256": "BF993DB8DCD75D368943A4499F9C3E7E518940D24025C236B7B43AB5BF91CBED",
+                    "version": "0.7.63"
+                  }
+                ],
+                "item_and_recipe": "industrial-furnace",
+                "creator": "aai-industry0.7.5 creates item, recipe, technology and assembling-machine; SE0.7.63 patches this same furnace recipe/technology.",
+                "declaration_member": "aai-industry_0.7.5/prototypes/phase-1/combined/industrial-furnace.lua",
+                "declaration_member_sha256": "62E8E3B35CF6FA4E6D99BED940D2F8362D788626AC6C1B138E3E727C777561C7"
+              }
             }
           },
           {
@@ -19532,7 +19556,7 @@
                 "source/compatibility/product_bindings.lua",
                 "source/research/product_target_extension.lua"
               ],
-              "remaining_native_check": "Pin actual mod versions and item/recipe identities; measure the intended recipe-productivity increment and useful physical crafting, preserve paid research/bonuses through save/reloads. Generic product fixtures do not qualify the named installation.",
+              "remaining_native_check": "Use the pinned named input identities above in a compatible complete profile; verify the final recipe-productivity increment, useful physical crafting, earned bonuses and save/reloads. Source identity readback and generic host fixtures do not close those native requirements.",
               "native_execution": false,
               "release_qualification": false,
               "independent_default_recipe_productivity_changes": {
@@ -19542,7 +19566,29 @@
               },
               "configuration_contract": "These published default increments use the retained 10-percent family default. Nondefault ips-effect-per-level-research_electric_energy scales the authored tiers proportionally; 22-percent is independently controlled. Requested Advanced Solar HR10/5/2/1-percent rates are not silently adopted.",
               "focused_host_control": "tests/test_generator.py:GeneratorTests.test_electric_energy_preserves_published_manufacturing_tiers_and_not_entity_output",
-              "focused_host_scope": "Four F210 Base/Space Age host constructions at10/22percent; all15 published item targets plus a differently named Matrix recipe have exactly one intended recipe effect. Synthetic solar/accumulator production/storage fields remain unchanged. Three negative vectors reject full-rate Matrix, omitted SE tier3 and duplicate Matrix. No engine, actual mod archive, physical crafting or save result."
+              "focused_host_scope": "Four F210 Base/Space Age host constructions at10/22percent; all15 published item targets plus a differently named Matrix recipe have exactly one intended recipe effect. Synthetic solar/accumulator production/storage fields remain unchanged. Three negative vectors reject full-rate Matrix, omitted SE tier3 and duplicate Matrix. No engine, actual mod archive, physical crafting or save result.",
+              "actual_named_input_readback_20261107": {
+                "engine_family": "2.1",
+                "method": "Read selected Lua members directly from existing ZIPs in memory; no extraction, library copy or native activation. Exact reporter versions/settings/save remain unknown.",
+                "native_execution": false,
+                "final_profile_admission": false,
+                "archives": [
+                  {
+                    "filename": "space-exploration_0.7.63.zip",
+                    "bytes": 3832380,
+                    "sha256": "BF993DB8DCD75D368943A4499F9C3E7E518940D24025C236B7B43AB5BF91CBED",
+                    "version": "0.7.63"
+                  }
+                ],
+                "items_and_same_named_recipes": [
+                  "se-space-solar-panel",
+                  "se-space-solar-panel-2",
+                  "se-space-solar-panel-3"
+                ],
+                "declaration_member": "space-exploration_0.7.63/prototypes/phase-1/recipe/manufacturing.lua",
+                "declaration_member_sha256": "7D0AA54FDD993BD1F48A62D11E4DB98748D8C0CC7DAF5CBE6A1000CA714EFF53",
+                "profile_limit": "The actual selected SE archive excludes space-age. Generic Base/Space Age host vectors are not admission of SE+Space Age."
+              }
             }
           },
           {
@@ -19578,7 +19624,7 @@
                 "source/compatibility/product_bindings.lua",
                 "source/research/product_target_extension.lua"
               ],
-              "remaining_native_check": "Pin actual mod versions and item/recipe identities; measure the intended recipe-productivity increment and useful physical crafting, preserve paid research/bonuses through save/reloads. Generic product fixtures do not qualify the named installation.",
+              "remaining_native_check": "Use the pinned named input identities above in a compatible complete profile; verify the final recipe-productivity increment, useful physical crafting, earned bonuses and save/reloads. Source identity readback and generic host fixtures do not close those native requirements.",
               "native_execution": false,
               "release_qualification": false,
               "independent_default_recipe_productivity_changes": {
@@ -19587,7 +19633,28 @@
               },
               "configuration_contract": "These published default increments use the retained 10-percent family default. Nondefault ips-effect-per-level-research_electric_energy scales the authored tiers proportionally; 22-percent is independently controlled. Requested Advanced Solar HR10/5/2/1-percent rates are not silently adopted.",
               "focused_host_control": "tests/test_generator.py:GeneratorTests.test_electric_energy_preserves_published_manufacturing_tiers_and_not_entity_output",
-              "focused_host_scope": "Four F210 Base/Space Age host constructions at10/22percent; all15 published item targets plus a differently named Matrix recipe have exactly one intended recipe effect. Synthetic solar/accumulator production/storage fields remain unchanged. Three negative vectors reject full-rate Matrix, omitted SE tier3 and duplicate Matrix. No engine, actual mod archive, physical crafting or save result."
+              "focused_host_scope": "Four F210 Base/Space Age host constructions at10/22percent; all15 published item targets plus a differently named Matrix recipe have exactly one intended recipe effect. Synthetic solar/accumulator production/storage fields remain unchanged. Three negative vectors reject full-rate Matrix, omitted SE tier3 and duplicate Matrix. No engine, actual mod archive, physical crafting or save result.",
+              "actual_named_input_readback_20261107": {
+                "engine_family": "2.1",
+                "method": "Read selected Lua members directly from existing ZIPs in memory; no extraction, library copy or native activation. Exact reporter versions/settings/save remain unknown.",
+                "native_execution": false,
+                "final_profile_admission": false,
+                "archives": [
+                  {
+                    "filename": "space-exploration_0.7.63.zip",
+                    "bytes": 3832380,
+                    "sha256": "BF993DB8DCD75D368943A4499F9C3E7E518940D24025C236B7B43AB5BF91CBED",
+                    "version": "0.7.63"
+                  }
+                ],
+                "items_and_same_named_recipes": [
+                  "se-space-accumulator",
+                  "se-space-accumulator-2"
+                ],
+                "declaration_member": "space-exploration_0.7.63/prototypes/phase-1/recipe/manufacturing.lua",
+                "declaration_member_sha256": "7D0AA54FDD993BD1F48A62D11E4DB98748D8C0CC7DAF5CBE6A1000CA714EFF53",
+                "profile_limit": "The actual selected SE archive excludes space-age. Generic Base/Space Age host vectors are not admission of SE+Space Age."
+              }
             }
           },
           {
@@ -19639,7 +19706,7 @@
                 "source/compatibility/product_bindings.lua",
                 "source/research/product_target_extension.lua"
               ],
-              "remaining_native_check": "Pin actual mod versions and item/recipe identities; measure the intended recipe-productivity increment and useful physical crafting, preserve paid research/bonuses through save/reloads. Generic product fixtures do not qualify the named installation.",
+              "remaining_native_check": "Use the pinned named input identities above in a compatible complete profile; verify the final recipe-productivity increment, useful physical crafting, earned bonuses and save/reloads. Source identity readback and generic host fixtures do not close those native requirements.",
               "native_execution": false,
               "release_qualification": false,
               "independent_default_recipe_productivity_changes": {
@@ -19647,7 +19714,25 @@
               },
               "configuration_contract": "These published default increments use the retained 10-percent family default. Nondefault ips-effect-per-level-research_electric_energy scales the authored tiers proportionally; 22-percent is independently controlled. Requested Advanced Solar HR10/5/2/1-percent rates are not silently adopted.",
               "focused_host_control": "tests/test_generator.py:GeneratorTests.test_electric_energy_preserves_published_manufacturing_tiers_and_not_entity_output",
-              "focused_host_scope": "Four F210 Base/Space Age host constructions at10/22percent; all15 published item targets plus a differently named Matrix recipe have exactly one intended recipe effect. Synthetic solar/accumulator production/storage fields remain unchanged. Three negative vectors reject full-rate Matrix, omitted SE tier3 and duplicate Matrix. No engine, actual mod archive, physical crafting or save result."
+              "focused_host_scope": "Four F210 Base/Space Age host constructions at10/22percent; all15 published item targets plus a differently named Matrix recipe have exactly one intended recipe effect. Synthetic solar/accumulator production/storage fields remain unchanged. Three negative vectors reject full-rate Matrix, omitted SE tier3 and duplicate Matrix. No engine, actual mod archive, physical crafting or save result.",
+              "actual_named_input_readback_20261107": {
+                "engine_family": "2.1",
+                "method": "Read selected Lua members directly from existing ZIPs in memory; no extraction, library copy or native activation. Exact reporter versions/settings/save remain unknown.",
+                "native_execution": false,
+                "final_profile_admission": false,
+                "archives": [
+                  {
+                    "filename": "SolarMatrix_1.0.9.zip",
+                    "bytes": 6222079,
+                    "sha256": "D56C64B762B39B28C8D6F1B32F90A1134CD50961BE420C3C067CC099368DFA8B",
+                    "version": "1.0.9"
+                  }
+                ],
+                "item_and_recipe": "solar-matrix",
+                "declaration_member": "SolarMatrix_1.0.9/prototypes/recipe.lua",
+                "declaration_member_sha256": "835127DB723E4AC18AC04B35A42A00868836A35C47CF8B2D7AFFA541A2B6396B",
+                "mod_owned_electrical_settings": "The source mod owns placed-entity electrical production/storage and optional ingredient scaling; MIR manufacturing productivity does not claim those properties."
+              }
             }
           },
           {
@@ -19683,7 +19768,7 @@
                 "source/compatibility/product_bindings.lua",
                 "source/research/product_target_extension.lua"
               ],
-              "remaining_native_check": "Pin actual mod versions and item/recipe identities; measure the intended recipe-productivity increment and useful physical crafting, preserve paid research/bonuses through save/reloads. Generic product fixtures do not qualify the named installation.",
+              "remaining_native_check": "Use the pinned named input identities above in a compatible complete profile; verify the final recipe-productivity increment, useful physical crafting, earned bonuses and save/reloads. Source identity readback and generic host fixtures do not close those native requirements.",
               "native_execution": false,
               "release_qualification": false,
               "independent_default_recipe_productivity_changes": {
@@ -19691,7 +19776,25 @@
               },
               "configuration_contract": "These published default increments use the retained 10-percent family default. Nondefault ips-effect-per-level-research_electric_energy scales the authored tiers proportionally; 22-percent is independently controlled. Requested Advanced Solar HR10/5/2/1-percent rates are not silently adopted.",
               "focused_host_control": "tests/test_generator.py:GeneratorTests.test_electric_energy_preserves_published_manufacturing_tiers_and_not_entity_output",
-              "focused_host_scope": "Four F210 Base/Space Age host constructions at10/22percent; all15 published item targets plus a differently named Matrix recipe have exactly one intended recipe effect. Synthetic solar/accumulator production/storage fields remain unchanged. Three negative vectors reject full-rate Matrix, omitted SE tier3 and duplicate Matrix. No engine, actual mod archive, physical crafting or save result."
+              "focused_host_scope": "Four F210 Base/Space Age host constructions at10/22percent; all15 published item targets plus a differently named Matrix recipe have exactly one intended recipe effect. Synthetic solar/accumulator production/storage fields remain unchanged. Three negative vectors reject full-rate Matrix, omitted SE tier3 and duplicate Matrix. No engine, actual mod archive, physical crafting or save result.",
+              "actual_named_input_readback_20261107": {
+                "engine_family": "2.1",
+                "method": "Read selected Lua members directly from existing ZIPs in memory; no extraction, library copy or native activation. Exact reporter versions/settings/save remain unknown.",
+                "native_execution": false,
+                "final_profile_admission": false,
+                "archives": [
+                  {
+                    "filename": "Accumulator-V2_1.0.8.zip",
+                    "bytes": 1361974,
+                    "sha256": "484505A04282450B767EA1A165A443FFD25B73F69ADFA09AAB4D1C9249EA0537",
+                    "version": "1.0.8"
+                  }
+                ],
+                "item_and_recipe": "accumulator-v2",
+                "declaration_member": "Accumulator-V2_1.0.8/prototypes/recipe.lua",
+                "declaration_member_sha256": "941992489ADAA7E9F3BCF1C27676B7ABC156EE2D66262A53122D59F5311AD434",
+                "mod_owned_electrical_settings": "The source mod owns placed-entity electrical production/storage and optional ingredient scaling; MIR manufacturing productivity does not claim those properties."
+              }
             }
           },
           {
@@ -20317,7 +20420,7 @@
             "source_item_id": "T25-I03",
             "source_test_id": "R-T25-03",
             "source_thread_id": "T25",
-            "summary": "Base cost 2× prerequisite total, increasing 0.5× that total each level.",
+            "summary": "Base cost 2Ã— prerequisite total, increasing 0.5Ã— that total each level.",
             "source_gate": "optional_request",
             "source_priority": "P2",
             "source_historical_status": "investigation_promised",
@@ -20929,7 +21032,7 @@
             "source_item_id": "T40-I04",
             "source_test_id": "R-T40-04",
             "source_thread_id": "T40",
-            "summary": "MIR described as covering the other mod’s features.",
+            "summary": "MIR described as covering the other modâ€™s features.",
             "source_gate": "evidence_needed",
             "source_priority": "P1",
             "source_historical_status": "historical_parity_claim",
