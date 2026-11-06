@@ -21,6 +21,8 @@ class LibraryNativeInputControls(unittest.TestCase):
                     {**base, "action": "click", "x": 600, "y": 150},
                     {**base, "action": "drag", "x": 950, "y": 130, "target_x": 920, "target_y": 100},
                     {**base, "client_width": 2560, "client_height": 1440}]
+        normal = {**base, "client_width": 2560, "client_height": 1440, "action": "click", "x": 2000, "y": 1000}
+        accepted.extend([normal, {**normal, "action": "drag", "target_x": 2030, "target_y": 1020}])
         rejected = []
         for key, value in (("schema", True), ("schema", "1"), ("kind", [base["kind"]]), ("role", "server"),
                            ("process_id", "12345"), ("process_id", 0), ("process_start_utc", "not-a-date"),
@@ -31,6 +33,9 @@ class LibraryNativeInputControls(unittest.TestCase):
         rejected.extend([{**base, "client_width": 2560}, {**base, "client_height": 1440},
                          {**base, "client_width": "2560", "client_height": 1440},
                          {**base, "client_width": 2560, "client_height": "1440"}])
+        rejected.extend([{**normal, "x": 2558}, {**normal, "y": 1438},
+                         {**normal, "action": "drag", "target_x": 2558, "target_y": 1000},
+                         {**normal, "action": "drag", "target_x": 2000, "target_y": 1438}])
         for text in ("", "a" * 33, "gears\n", "{ENTER}", "~", "☃"):
             rejected.append({**base, "action": "text", "text": text})
         for point in ((0, 150), (600, 720), ("600", 150)):

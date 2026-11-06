@@ -101,11 +101,11 @@ function Assert-LibraryInputPlan([System.Collections.IDictionary]$Spec){
   }
   if($Spec.action-cin@('click','drag')){
     foreach($name in @('x','y')){Assert-LibraryInput (Test-LibraryInputInteger $Spec[$name]) 'point type differs'}
-    Assert-LibraryInput ($Spec.x-ge2 -and $Spec.x-lt1278 -and $Spec.y-ge2 -and $Spec.y-lt718) 'point outside client'
+    Assert-LibraryInput ($Spec.x-ge2 -and $Spec.x-lt($Spec.client_width-2) -and $Spec.y-ge2 -and $Spec.y-lt($Spec.client_height-2)) 'point outside client'
   }
   if($Spec.action-ceq'drag'){
     foreach($name in @('target_x','target_y')){Assert-LibraryInput (Test-LibraryInputInteger $Spec[$name]) 'drag point type differs'}
-    Assert-LibraryInput ($Spec.target_x-ge2 -and $Spec.target_x-lt1278 -and $Spec.target_y-ge2 -and $Spec.target_y-lt718) 'drag outside client'
+    Assert-LibraryInput ($Spec.target_x-ge2 -and $Spec.target_x-lt($Spec.client_width-2) -and $Spec.target_y-ge2 -and $Spec.target_y-lt($Spec.client_height-2)) 'drag outside client'
     $dx=$Spec.target_x-$Spec.x;$dy=$Spec.target_y-$Spec.y
     Assert-LibraryInput ([Math]::Abs($dx)-le80 -and [Math]::Abs($dy)-le80 -and ($dx-ne0 -or $dy-ne0)) 'drag distance differs'
   }
