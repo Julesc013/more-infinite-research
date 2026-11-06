@@ -18545,12 +18545,13 @@
             ],
             "evidence": [
               "spec/evidence/library-current507-input-lifecycle-native-r01.json",
-              "spec/evidence/muria-discovery-science-native-chain-r01.json"
+              "spec/evidence/muria-discovery-science-native-chain-r01.json",
+              "spec/evidence/library-authored-layout-native-r01.json"
             ],
-            "remaining": "Maintainer rejected current cramped/prose-heavy UI. PR1774/471541701 restores concrete authored8a layout; original/current normal-display visual comparison and full views/input/settings/export/personal/DiscoveryTree reveal/reset remain open. Earlier functional pixels are not design acceptance. Chinese/unknown-key/contribution/support work keeps its own scope.",
+            "remaining": "Accepted authored restoration merged in PR1769 at8e8359c8. The actual4.7.3 renderer comparison and normal-English r05 four-tab navigation plus r06 retained selection/right-pane scrolling and science-production snapshot are observed on their separately recorded internal test packages. Keep r05/r06 distinct. Full narrow/layout/locales, saved views/clients, settings/export files, personal state and Discovery Tree reveal/reset remain open; original uploaded screenshots are unrecovered. Chinese/unknown-key/contribution/support work retains its own scope.",
             "native_owner": "Black Glass",
             "reconciliation_and_review": "Aero",
-            "evidence_status": "Original named scopes only; final-candidate consumed-input applicability required. No new pass from this audit."
+            "evidence_status": "The retained r05/r06 results close only their named rendering/input observations. This audit update performs no new native run and does not qualify final5.0.8 packages, multiplayer, performance or stable acceptance."
           },
           "inputs": {
             "continuity": [
