@@ -1340,6 +1340,30 @@ local function research_filters(frame)
   return valid(page) and page[PREFIX .. "filters"] or nil
 end
 
+local function research_filter_control(filters, name)
+  if not valid(filters) then return nil end
+  if name == "query" then return filters[PREFIX .. "query"] end
+  local grid = filters[PREFIX .. "filter_grid"]
+  local field = valid(grid) and grid[PREFIX .. name .. "_field"]
+  return valid(field) and field[PREFIX .. name] or nil
+end
+
+local function research_filters_ready(filters)
+  local grid = valid(filters) and filters[PREFIX .. "filter_grid"]
+  local query = research_filter_control(filters, "query")
+  if not valid(filters) or filters.type ~= "flow" or filters.direction ~= "vertical"
+      or not valid(grid) or grid.type ~= "table" or grid.column_count ~= 2
+      or not valid(query) or query.type ~= "textfield" then return false end
+  for _, name in ipairs({"family", "status", "mode", "sort", "visibility"}) do
+    local field = grid[PREFIX .. name .. "_field"]
+    local control = research_filter_control(filters, name)
+    if not valid(field) or field.type ~= "flow" or field.direction ~= "vertical"
+        or not valid(field[PREFIX .. name .. "_label"])
+        or not valid(control) or control.type ~= "drop-down" then return false end
+  end
+  return true
+end
+
 local function tab_content(frame, tab)
   if tab == "research" then
     local page = research_page(frame)
@@ -1366,7 +1390,7 @@ local function frame_layout_ready(frame, player, view)
   return valid(title) and valid(title[PREFIX .. "layout_smaller"])
     and valid(title[PREFIX .. "layout_larger"]) and valid(title[PREFIX .. "layout_reset"])
     and valid(title[PREFIX .. "close"])
-    and valid(filters) and filters.type == "table"
+    and research_filters_ready(filters)
     and valid(research) and research.type == research_content_type(player, view)
     and valid(settings) and valid(settings.type == "scroll-pane" and settings or nil)
 end
@@ -1411,7 +1435,11 @@ local function update_research_content(content, player, view, context, translati
 
   local rows = rows_for(player, view, context, translations)
   local item_labels = {}
-  for index, row in ipairs(rows) do item_labels[index] = caption(row, player) end
+  for index, row in ipairs(rows) do
+    local text = caption(row, player)
+    item_labels[index] = known_technology(player, row.id)
+      and {"", "[img=technology/" .. row.id .. "] ", text} or text
+  end
   local selected_index = row_index(rows, view.selected) or 0
   -- Filter changes choose a useful visible subject. Keep explicitly hidden
   -- personal focus and stale private-credit selections inert, as before.
@@ -1806,21 +1834,35 @@ end
 
 local function update_queue_content(content, player, view)
   if not valid(content) then return end
-  content.clear()
-  add(content, {type = "label", name = PREFIX .. "queue_guidance", caption = {"mir-browser.native-queue-guidance"}})
-  add(content, {type = "button", name = PREFIX .. "queue_open_native", caption = {"mir-browser.open-research"}})
+  local list = content[PREFIX .. "queue_list"]
+  if not valid(list) or not valid(content[PREFIX .. "queue_heading"]) then
+    content.clear()
+    add(content, {type = "label", name = PREFIX .. "queue_guidance", caption = {"mir-browser.native-queue-guidance"}})
+    add(content, {type = "button", name = PREFIX .. "queue_open_native", caption = {"mir-browser.open-research"}})
+    add(content, {type = "label", name = PREFIX .. "queue_heading", caption = {"mir-browser.queue"}})
+    list = add(content, {type = "list-box", name = PREFIX .. "queue_list", items = {}})
+    add(content, {type = "label", name = PREFIX .. "queue_empty", caption = {"mir-browser.queue-empty"}})
+  end
+  local width, height = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
+  local available_width = math.max(1, width - 64)
+  list.style.width = available_width
+  list.style.height = math.max(48, library_layout.tab_content_height(height) - 130)
+  local guidance = content[PREFIX .. "queue_guidance"]
+  guidance.style.single_line, guidance.style.maximal_width = false, available_width
   local ids, items = queue_entries(player.force), {}
   local context = DISCOVERY_TREE and context_for(player.force) or nil
   for index, id in ipairs(ids) do
     local technology = known_technology(player, id)
+    local name
     if DISCOVERY_TREE and not library_model.technology_visible(technology, id, context) then
-      items[index] = {"mir-browser.undiscovered-research"}
-    else items[index] = technology and technology.localised_name or id end
+      name = {"mir-browser.undiscovered-research"}
+    else name = technology and technology.localised_name or id end
+    items[index] = {"", tostring(index) .. ". ", name}
   end
   local selected_index = 0
   for index, id in ipairs(ids) do if id == view.selected then selected_index = index; break end end
-  add(content, {type = "list-box", name = PREFIX .. "queue_list", items = items, selected_index = selected_index})
-  if #items == 0 then add(content, {type = "label", name = PREFIX .. "queue_empty", caption = {"mir-browser.queue-empty"}}) end
+  update_list_items(list, items, selected_index)
+  content[PREFIX .. "queue_empty"].visible = #items == 0
 end
 
 local function update_availability_content(content, player, view)
@@ -1857,8 +1899,19 @@ local function report_options(player, view)
   return {report_settings = view.report_settings, report_omissions = view.report_omissions, availability_rows = rows}
 end
 
+local function help_tools(content)
+  local panes = valid(content) and content[PREFIX .. "help_panes"]
+  return valid(panes) and panes[PREFIX .. "help_tools"] or nil
+end
+
+local function report_panel(content)
+  local panes = valid(content) and content[PREFIX .. "help_panes"]
+  return valid(panes) and panes[PREFIX .. "report_panel"] or nil
+end
+
 local function update_report_preview(content, player, view)
-  local preview = content and content[PREFIX .. "report_preview"]
+  local panel = report_panel(content)
+  local preview = valid(panel) and panel[PREFIX .. "report_preview"]
   if not valid(preview) then return end
   local result, err = diagnostics.preview(player.index, view.selected, report_options(player, view))
   preview.text = result or ("Diagnostic preview unavailable: " .. tostring(err))
@@ -1866,46 +1919,77 @@ end
 
 local function update_help_content(content, player, view)
   if not valid(content) then return end
-  -- Keep the preview as a snapshot. Research/translation refreshes must not
-  -- repeatedly encode hundreds of settings or replace a player's selection.
-  local settings_box, omissions_box = content[PREFIX .. "report_settings"], content[PREFIX .. "report_omissions"]
-  local preview = content[PREFIX .. "report_preview"]
-  local complete_help = valid(content[PREFIX .. "help_summary"]) and (not diagnostics or (
-    valid(settings_box) and settings_box.type == "checkbox" and valid(omissions_box) and omissions_box.type == "checkbox"
-    and valid(preview) and preview.type == "text-box" and valid(content[PREFIX .. "report_select"])
-    and valid(content[PREFIX .. "report_refresh"])))
-  if complete_help then
-    if diagnostics and (settings_box.state ~= view.report_settings or omissions_box.state ~= view.report_omissions) then
-      settings_box.state, omissions_box.state = view.report_settings, view.report_omissions
-      update_report_preview(content, player, view)
+  local width, height = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
+  local sizes = library_layout.split_sizes(math.max(1, width - 48), library_layout.tab_content_height(height))
+  local tools, panel = help_tools(content), report_panel(content)
+  local settings_box = valid(tools) and tools[PREFIX .. "report_settings"]
+  local omissions_box = valid(tools) and tools[PREFIX .. "report_omissions"]
+  local preview = valid(panel) and panel[PREFIX .. "report_preview"]
+  local complete = valid(tools) and valid(panel) and valid(tools[PREFIX .. "help_versions"])
+    and (not diagnostics or (valid(settings_box) and settings_box.type == "checkbox"
+      and valid(omissions_box) and omissions_box.type == "checkbox" and valid(preview)
+      and preview.type == "text-box" and valid(panel[PREFIX .. "report_select"])
+      and valid(tools[PREFIX .. "report_refresh"])))
+  if not complete then
+    content.clear()
+    local panes = add(content, {type = "flow", name = PREFIX .. "help_panes", direction = sizes.columns == 1 and "vertical" or "horizontal"})
+    tools = add(panes, {type = "scroll-pane", name = PREFIX .. "help_tools", direction = "vertical"})
+    tools.horizontal_scroll_policy = "never"
+    panel = add(panes, {type = "flow", name = PREFIX .. "report_panel", direction = "vertical"})
+    library_section(tools, "help_installation", "mir-browser.debug-installation", sizes.list_width)
+    local active_mods = script and script.active_mods or {}
+    add(tools, {type = "label", name = PREFIX .. "help_versions", caption = {"mir-browser.debug-versions",
+      active_mods.base or "?", active_mods["more-infinite-research"] or "?"}})
+    if diagnostics then
+      add(tools, {type = "button", name = PREFIX .. "report_refresh", caption = {"mir-browser.debug-refresh"}})
+      library_section(tools, "help_report_options", "mir-browser.report-options", sizes.list_width)
+      for _, option in ipairs({"report_settings", "report_omissions"}) do
+        add(tools, {type = "checkbox", name = PREFIX .. option, state = view[option],
+          caption = {"mir-browser." .. option:gsub("_", "-")}})
+      end
+      library_section(panel, "help_preview", "mir-browser.report-preview", sizes.detail_width)
+      preview = add(panel, {type = "text-box", name = PREFIX .. "report_preview", text = "",
+        tooltip = {"mir-browser.report-preview"}})
+      preview.read_only, preview.word_wrap = true, true
+      add(panel, {type = "button", name = PREFIX .. "report_select", caption = {"mir-browser.report-select"}})
+      add(panel, {type = "button", name = PREFIX .. "export_diagnostics", caption = {"mir-browser.export-diagnostics"},
+        tooltip = {"mir-browser.export-diagnostics-tooltip"}})
+      add(panel, {type = "label", name = PREFIX .. "report_local", caption = {"mir-browser.report-local"}})
+      add(panel, {type = "label", name = PREFIX .. "export_privacy", caption = {"mir-browser.export-sharing-guidance"}})
     end
-    return
-  end
-  content.clear()
-  add(content, {type = "label", name = PREFIX .. "help_summary", caption = {"mir-browser.help-summary"}})
-  add(content, {type = "label", name = PREFIX .. "help_queue", caption = {"mir-browser.native-queue-guidance"}})
-  if diagnostics then
-    add(content, {type = "label", name = PREFIX .. "report_options", caption = {"mir-browser.report-options"}})
-    for _, option in ipairs({"report_settings", "report_omissions"}) do
-      add(content, {type = "checkbox", name = PREFIX .. option, state = view[option],
-        caption = {"mir-browser." .. option:gsub("_", "-")}})
+    library_section(tools, "help_configuration", "mir-browser.configuration", sizes.list_width)
+    add(tools, {type = "label", name = PREFIX .. "help_profile", caption = {"mir-browser.profile-purpose"}})
+    if support_exports then
+      add(tools, {type = "button", name = PREFIX .. "export_settings", caption = {"mir-browser.export-settings"},
+        tooltip = {"mir-browser.export-settings-tooltip"}})
     end
-    local preview = add(content, {type = "text-box", name = PREFIX .. "report_preview", text = "",
-      tooltip = {"mir-browser.report-preview"}})
-    preview.read_only, preview.word_wrap = true, true
-    if preview.style then
-      preview.style.maximal_width, preview.style.height = 650, 160
-      preview.style.horizontally_stretchable = true
-    end
-    add(content, {type = "button", name = PREFIX .. "report_select", caption = {"mir-browser.report-select"}})
-    add(content, {type = "button", name = PREFIX .. "report_refresh", caption = {"mir-browser.debug-refresh"}})
-    local local_only = add(content, {type = "label", name = PREFIX .. "report_local", caption = {"mir-browser.report-local"}})
-    if local_only.style then local_only.style.single_line = false; local_only.style.maximal_width = 650 end
+    library_section(tools, "help_layout", "mir-browser.layout", sizes.list_width)
+    add(tools, {type = "button", name = PREFIX .. "layout_reset", caption = {"mir-browser.reset-layout"},
+      tooltip = {"mir-browser.layout-reset"}})
+    library_section(tools, "help_startup_crash", "mir-browser.startup-crash", sizes.list_width)
+    -- The old standalone preview collector no longer ships. Show the current
+    -- report/log boundary rather than restoring obsolete instructions.
+    add(tools, {type = "label", name = PREFIX .. "help_startup_report", caption = {"mir-browser.export-diagnostics-tooltip"}})
+    if diagnostics then update_report_preview(content, player, view) end
+  elseif diagnostics and (settings_box.state ~= view.report_settings or omissions_box.state ~= view.report_omissions) then
+    settings_box.state, omissions_box.state = view.report_settings, view.report_omissions
     update_report_preview(content, player, view)
-    add(content, {type = "button", name = PREFIX .. "export_diagnostics", caption = {"mir-browser.export-diagnostics"},
-      tooltip = {"mir-browser.export-diagnostics-tooltip"}})
-    local guidance = add(content, {type = "label", name = PREFIX .. "export_privacy", caption = {"mir-browser.export-sharing-guidance"}})
-    if guidance.style then guidance.style.single_line = false; guidance.style.maximal_width = 650 end
+  end
+  -- Layout updates do not re-encode or replace the report snapshot/selection.
+  tools.style.width, tools.style.height = sizes.list_width, sizes.columns == 1 and sizes.list_height or sizes.detail_height
+  panel.style.width = sizes.detail_width
+  for _, entry in ipairs({{tools, sizes.list_width}, {panel, sizes.detail_width}}) do
+    for _, child in ipairs(entry[1].children) do
+      local available = math.max(1, entry[2] - 20)
+      child.style.maximal_width = available
+      if child.type == "label" then child.style.single_line = false
+      elseif child.type == "line" or child.type == "button" then child.style.width = available end
+    end
+  end
+  preview = panel[PREFIX .. "report_preview"]
+  if valid(preview) then
+    preview.style.width = math.max(1, sizes.detail_width - 20)
+    preview.style.height = math.max(40, sizes.detail_height - 144)
   end
 end
 
@@ -1920,7 +2004,7 @@ local function show_export_profile(content, encoded)
       tooltip = {"mir-browser.export-sharing-guidance"}})
     preview.read_only, preview.word_wrap = true, true
     if preview.style then
-      preview.style.maximal_width = 650
+      preview.style.width = math.max(1, math.min(650, (content.style.maximal_width or 650) - 20))
       preview.style.horizontally_stretchable = true
       preview.style.height = 100
     end
@@ -1939,37 +2023,35 @@ local function icon_button(parent, name, sprite, tooltip)
 end
 
 local function create_filters(frame, player, view, width)
-  local pairs_per_row, control_width = library_layout.filter_layout(width)
-  local filters = add(frame, {type = "table", name = PREFIX .. "filters", column_count = 2 * pairs_per_row})
-  add(filters, {type = "label", name = PREFIX .. "search_label", caption = {"mir-browser.search-label"}})
-  add(filters, {type = "textfield", name = PREFIX .. "query", text = view.query,
+  local _, control_width = library_layout.filter_layout(width)
+  local _, height = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
+  local filters = add(frame, {type = "flow", name = PREFIX .. "filters", direction = "vertical"})
+  filters.style.width = math.max(1, width - 64)
+  local search = add(filters, {type = "label", name = PREFIX .. "search_label", caption = {"mir-browser.search-label"}})
+  search.style.font = "default-semibold"
+  local query = add(filters, {type = "textfield", name = PREFIX .. "query", text = view.query,
     tooltip = {"mir-browser.search-label"}})
-  add(filters, {type = "label", name = PREFIX .. "family_label", caption = {"mir-browser.filter-scope"}})
-  local families = family_values()
-  add(filters, {type = "drop-down", name = PREFIX .. "family", items = family_items(families, player),
-    selected_index = family_index(families, view.family) or 1, tooltip = {"mir-browser.filter-scope"}})
-  add(filters, {type = "label", name = PREFIX .. "visibility_label", caption = {"mir-browser.visibility"}})
-  add(filters, {type = "drop-down", name = PREFIX .. "visibility", items = {
-    {"mir-browser.visibility-normal"}, {"mir-browser.visibility-hidden"}, {"mir-browser.not-added"}
-  }, selected_index = view.visibility, tooltip = {"mir-browser.visibility"}})
-  add(filters, {type = "label", name = PREFIX .. "mode_label", caption = {"mir-browser.filter-level"}})
-  add(filters, {type = "drop-down", name = PREFIX .. "mode", items = {
-    {"mir-browser.all"}, {"mir-browser.finite"}, {"mir-browser.infinite"}
-  }, selected_index = view.mode, tooltip = {"mir-browser.filter-level"}})
-  add(filters, {type = "label", name = PREFIX .. "status_label", caption = {"mir-browser.filter-status"}})
-  add(filters, {type = "drop-down", name = PREFIX .. "status", items = {
-    {"mir-browser.status-all"}, {"mir-browser.status-ready"},
-    {"mir-browser.status-locked"}, {"mir-browser.status-queued"}
-  }, selected_index = view.status, tooltip = {"mir-browser.filter-status"}})
-  add(filters, {type = "label", name = PREFIX .. "sort_label", caption = {"mir-browser.filter-order"}})
-  add(filters, {type = "drop-down", name = PREFIX .. "sort", items = {
-    {"mir-browser.order-progression"}, {"mir-browser.order-native"},
-    {"mir-browser.order-name-asc"}, {"mir-browser.order-name-desc"}
-  }, selected_index = SORT_INDEX[view.sort] or 1, tooltip = {"mir-browser.filter-order"}})
-  for _, field in ipairs({"query", "family", "visibility", "mode", "status", "sort"}) do
-    local control = filters[PREFIX .. field]
-    if control.style then control.style.width = control_width end
+  query.style.width = math.max(1, width - 64)
+  local grid = add(filters, {type = "table", name = PREFIX .. "filter_grid", column_count = 2})
+  grid.style.width, grid.style.horizontal_spacing = math.max(1, width - 64), 12
+  local function choice(name, caption, items, selected)
+    local field = add(grid, {type = "flow", name = PREFIX .. name .. "_field", direction = "vertical"})
+    field.style.width = control_width
+    local label = add(field, {type = "label", name = PREFIX .. name .. "_label", caption = {caption}})
+    label.visible = height >= 600
+    local control = add(field, {type = "drop-down", name = PREFIX .. name, items = items,
+      selected_index = selected, tooltip = {caption}})
+    control.style.width = control_width
   end
+  local families = family_values()
+  choice("family", "mir-browser.filter-scope", family_items(families, player), family_index(families, view.family) or 1)
+  choice("status", "mir-browser.filter-status", {{"mir-browser.status-all"}, {"mir-browser.status-ready"},
+    {"mir-browser.status-locked"}, {"mir-browser.status-queued"}}, view.status)
+  choice("mode", "mir-browser.filter-level", {{"mir-browser.all"}, {"mir-browser.finite"}, {"mir-browser.infinite"}}, view.mode)
+  choice("sort", "mir-browser.filter-order", {{"mir-browser.order-progression"}, {"mir-browser.order-native"},
+    {"mir-browser.order-name-asc"}, {"mir-browser.order-name-desc"}}, SORT_INDEX[view.sort] or 1)
+  choice("visibility", "mir-browser.visibility", {{"mir-browser.visibility-normal"}, {"mir-browser.visibility-hidden"},
+    {"mir-browser.not-added"}}, view.visibility)
   return filters
 end
 
@@ -2015,7 +2097,7 @@ local function sync_frame_layout(player, view, frame)
     frame.location = clamped_location
   end
   local filters = research_filters(frame)
-  if valid(filters) and filters.column_count ~= 2 * pairs_per_row then
+  if valid(filters) and not research_filters_ready(filters) then
     local tabs = frame[PREFIX .. "tabs"]
     if valid(tabs) then tabs.destroy() end
     filters = nil
@@ -2025,9 +2107,19 @@ local function sync_frame_layout(player, view, frame)
     filters = research_filters(frame)
   end
   if valid(filters) then
-    for _, field in ipairs({"query", "family", "visibility", "mode", "status", "sort"}) do
-      local control = filters[PREFIX .. field]
-      if valid(control) and control.style then control.style.width = control_width end
+    filters.style.width = math.max(1, width - 64)
+    local query = research_filter_control(filters, "query")
+    if valid(query) then query.style.width = math.max(1, width - 64) end
+    local grid = filters[PREFIX .. "filter_grid"]
+    if valid(grid) then grid.style.width = math.max(1, width - 64) end
+    for _, name in ipairs({"family", "status", "mode", "sort", "visibility"}) do
+      local control = research_filter_control(filters, name)
+      local field = valid(grid) and grid[PREFIX .. name .. "_field"]
+      if valid(field) then
+        field.style.width = control_width
+        field[PREFIX .. name .. "_label"].visible = height >= 600
+      end
+      if valid(control) then control.style.width = control_width end
     end
   end
   local tabs = frame[PREFIX .. "tabs"]
@@ -2099,7 +2191,7 @@ local function render(player, view, context, preserve_query)
   local filters = research_filters(frame)
   local query = valid(filters) and filters[PREFIX .. "query"] or nil
   if valid(query) and not preserve_query then query.text = view.query end
-  local family = valid(filters) and filters[PREFIX .. "family"] or nil
+  local family = research_filter_control(filters, "family")
   local families = family_values()
   local selected_family = family_index(families, view.family)
   if selected_family == nil then
@@ -2109,13 +2201,13 @@ local function render(player, view, context, preserve_query)
     family.items = family_items(families, player)
     family.selected_index = selected_family
   end
-  local visibility = valid(filters) and filters[PREFIX .. "visibility"] or nil
+  local visibility = research_filter_control(filters, "visibility")
   if valid(visibility) then visibility.selected_index = view.visibility end
-  local mode = valid(filters) and filters[PREFIX .. "mode"] or nil
+  local mode = research_filter_control(filters, "mode")
   if valid(mode) then mode.selected_index = view.mode end
-  local status = valid(filters) and filters[PREFIX .. "status"] or nil
+  local status = research_filter_control(filters, "status")
   if valid(status) then status.selected_index = view.status end
-  local sort = valid(filters) and filters[PREFIX .. "sort"] or nil
+  local sort = research_filter_control(filters, "sort")
   if valid(sort) then sort.selected_index = SORT_INDEX[view.sort] or 1 end
   local tabs = frame[PREFIX .. "tabs"]
   if valid(tabs) then tabs.selected_tab_index = TAB_INDEX[view.tab] or 1 end
@@ -2291,10 +2383,10 @@ function M.on_gui_checked_state_changed(event)
   if not diagnostics or not field then return end
   local player = player_for(event and event.player_index)
   if not player or type(element.state) ~= "boolean" then return end
-  if not owns_element(player, element, {element.name, PREFIX .. "help_content", PREFIX .. "tabs", ROOT}) then return end
+  if not owns_element(player, element, {element.name, PREFIX .. "help_tools", PREFIX .. "help_panes", PREFIX .. "help_content", PREFIX .. "tabs", ROOT}) then return end
   local view = view_for(player.index)
   view[field] = element.state
-  update_report_preview(element.parent, player, view)
+  update_report_preview(element.parent.parent.parent, player, view)
 end
 
 function M.on_gui_selection_state_changed(event)
@@ -2304,7 +2396,7 @@ function M.on_gui_selection_state_changed(event)
   if not player then return end
   if element.name == PREFIX .. "family" then
     if not owns_element(player, element, {
-      PREFIX .. "family", PREFIX .. "filters", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
+      PREFIX .. "family", PREFIX .. "family_field", PREFIX .. "filter_grid", PREFIX .. "filters", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     local family = family_from_index(element.selected_index)
@@ -2315,7 +2407,7 @@ function M.on_gui_selection_state_changed(event)
     render(player, view)
   elseif element.name == PREFIX .. "visibility" then
     if not owns_element(player, element, {
-      PREFIX .. "visibility", PREFIX .. "filters", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
+      PREFIX .. "visibility", PREFIX .. "visibility_field", PREFIX .. "filter_grid", PREFIX .. "filters", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local visibility = visibility_option(element.selected_index)
     if visibility == nil then return end
@@ -2324,7 +2416,7 @@ function M.on_gui_selection_state_changed(event)
     render(player, view)
   elseif element.name == PREFIX .. "mode" then
     if not owns_element(player, element, {
-      PREFIX .. "mode", PREFIX .. "filters", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
+      PREFIX .. "mode", PREFIX .. "mode_field", PREFIX .. "filter_grid", PREFIX .. "filters", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local mode = whole_option(element.selected_index, 1, 3)
     if mode == nil then return end
@@ -2333,7 +2425,7 @@ function M.on_gui_selection_state_changed(event)
     render(player, view)
   elseif element.name == PREFIX .. "status" then
     if not owns_element(player, element, {
-      PREFIX .. "status", PREFIX .. "filters", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
+      PREFIX .. "status", PREFIX .. "status_field", PREFIX .. "filter_grid", PREFIX .. "filters", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     local status = element.selected_index
@@ -2343,7 +2435,7 @@ function M.on_gui_selection_state_changed(event)
     render(player, view)
   elseif element.name == PREFIX .. "sort" then
     if not owns_element(player, element, {
-      PREFIX .. "sort", PREFIX .. "filters", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
+      PREFIX .. "sort", PREFIX .. "sort_field", PREFIX .. "filter_grid", PREFIX .. "filters", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     local sort = sort_from_index(element.selected_index)
@@ -2416,7 +2508,10 @@ function M.on_gui_click(event)
   if not player then return end
   if element.name == PREFIX .. "layout_smaller" or element.name == PREFIX .. "layout_larger"
       or element.name == PREFIX .. "layout_reset" then
-    if not owns_element(player, element, {element.name, PREFIX .. "title", ROOT}) then return end
+    if not owns_element(player, element, {element.name, PREFIX .. "title", ROOT})
+      and not (element.name == PREFIX .. "layout_reset" and owns_element(player, element, {
+        element.name, PREFIX .. "help_tools", PREFIX .. "help_panes", PREFIX .. "help_content", PREFIX .. "tabs", ROOT
+      })) then return end
     local reset_layout = element.name == PREFIX .. "layout_reset"
     local view = view_for(player.index)
     if reset_layout then
@@ -2435,17 +2530,22 @@ function M.on_gui_click(event)
     return
   end
   if support_exports and (element.name == PREFIX .. "export_settings" or element.name == PREFIX .. "export_compact") then
-    if not owns_element(player, element, {
+    local in_settings = owns_element(player, element, {
       element.name, PREFIX .. "settings_toolbar", PREFIX .. "settings_content", PREFIX .. "tabs", ROOT
-    }) then return end
+    })
+    local in_debug = element.name == PREFIX .. "export_settings" and owns_element(player, element, {
+      element.name, PREFIX .. "help_tools", PREFIX .. "help_panes", PREFIX .. "help_content", PREFIX .. "tabs", ROOT
+    })
+    if not in_settings and not in_debug then return end
     local encoded = support_exports.export({player_index = player.index,
       parameter = element.name == PREFIX .. "export_compact" and "--compact" or nil})
-    show_export_profile(element.parent.parent, encoded)
+    local destination = in_settings and element.parent.parent or report_panel(element.parent.parent.parent)
+    show_export_profile(destination, encoded)
     return
   end
   if diagnostics and element.name == PREFIX .. "export_diagnostics" then
     if not owns_element(player, element, {
-      element.name, PREFIX .. "help_content", PREFIX .. "tabs", ROOT
+      element.name, PREFIX .. "report_panel", PREFIX .. "help_panes", PREFIX .. "help_content", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     local encoded, _, report = diagnostics.export(player.index, view.selected, report_options(player, view))
@@ -2456,9 +2556,12 @@ function M.on_gui_click(event)
     return
   end
   if diagnostics and (element.name == PREFIX .. "report_select" or element.name == PREFIX .. "report_refresh") then
-    if not owns_element(player, element, {element.name, PREFIX .. "help_content", PREFIX .. "tabs", ROOT}) then return end
+    local pane = element.name == PREFIX .. "report_refresh" and "help_tools" or "report_panel"
+    if not owns_element(player, element, {
+      element.name, PREFIX .. pane, PREFIX .. "help_panes", PREFIX .. "help_content", PREFIX .. "tabs", ROOT
+    }) then return end
     if element.name == PREFIX .. "report_refresh" then
-      update_report_preview(element.parent, player, view_for(player.index))
+      update_report_preview(element.parent.parent.parent, player, view_for(player.index))
       return
     end
     local preview = element.parent[PREFIX .. "report_preview"]

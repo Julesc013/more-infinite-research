@@ -338,9 +338,20 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               content.children={}
               content.style.width=760
               tabs[CONTENT]=content
-              if opponent=="new-page" or opponent=="bad-page" or opponent=="foreign-page" then
+              if opponent=="new-page" or opponent=="bad-page" or opponent=="foreign-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field" then
                 local page=element(opponent=="bad-page" and "flow" or "scroll-pane","mir_library_research_page")
                 page.get_mod=function() return opponent=="foreign-page" and "other" or "more-infinite-research" end
+                filters.type,filters.direction="flow","vertical"
+                local grid=element(opponent=="bad-filter-grid" and "flow" or "table","mir_library_filter_grid")
+                grid.column_count=2;filters.mir_library_filter_grid=grid
+                for _,name in ipairs({"family","status","mode","sort","visibility"}) do
+                  local id="mir_library_"..name
+                  local field=element(opponent=="bad-filter-field" and "table" or "flow",id.."_field")
+                  field.direction="vertical";grid[id.."_field"]=field
+                  field[id.."_label"]=element("label",id.."_label")
+                  field[id]=filters[id] or element("drop-down",id)
+                  filters[id]=nil
+                end
                 page[FILTERS]=filters;page[CONTENT]=content;tabs.mir_library_research_page=page
               end
               local list_width=math.floor((content.style.maximal_width-36)*.4)
@@ -2853,10 +2864,10 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
     def test_research_page_path_and_malformed_page_refusal(self):
         result = self.run_case("new-page")
         self.assertTrue(result["ok"], result["message"])
-        for opponent in ("bad-page", "foreign-page"):
+        for opponent in ("bad-page", "foreign-page", "bad-filter-grid", "bad-filter-field"):
             result = self.run_case(opponent)
             self.assertFalse(result["ok"])
-            self.assertIn("research page is malformed or foreign", result["message"])
+            self.assertRegex(result["message"], "research page is malformed or foreign" if opponent in ("bad-page", "foreign-page") else "authored research filter .* is malformed")
 
     def test_two_real_client_join_rejoin_and_restart_state_machine(self):
         result = self.run_case()
