@@ -1,0 +1,147 @@
+-- Exact published MIR 1.1.0 F200 source facts consumed by the two direct
+-- MIR5 successor wrappers. This is finite fixture data, not a catalogue scan.
+local function recipe(recipe, change)
+  return {type = "change-recipe-productivity", recipe = recipe, change = change}
+end
+
+return {
+  storage_key = "mir5_migration_origin_f200_110_source",
+  -- Factorio storage is owned by the fixture mod identity.  The successor
+  -- projection must therefore replace the source fixture by name, rather
+  -- than add a differently named observer that cannot see its protected
+  -- source state.
+  fixture = "mir-fixture-mir5-migration-origin-f200-110-source",
+  direct = "recipe-prod-research_gears-1",
+  gear_recipe = "iron-gear-wheel",
+  robot_battery = "recipe-prod-research_robot_battery-1",
+  -- The current public row deliberately has its normal nine effects only.
+  -- The three published 1.1.0 .01 tier-one effects are retained by hidden
+  -- earned-state holders after configuration, rather than duplicated on the
+  -- current public technology.
+  module_credit = {
+    public = {
+      recipe("efficiency-module", .10), recipe("productivity-module", .10), recipe("speed-module", .10),
+      recipe("efficiency-module-2", .05), recipe("productivity-module-2", .05), recipe("speed-module-2", .05),
+      recipe("efficiency-module-3", .02), recipe("productivity-module-3", .02), recipe("speed-module-3", .02),
+    },
+    holders = {
+      {id = "mir-legacy-module-credit-speed-module", recipe = "speed-module", change = .01},
+      {id = "mir-legacy-module-credit-productivity-module", recipe = "productivity-module", change = .01},
+      {id = "mir-legacy-module-credit-efficiency-module", recipe = "efficiency-module", change = .01},
+    },
+  },
+  source_fixture_version = "0.1.0",
+  targets = {
+    f200 = {base = "2.0.77", mir = "5.0.20000", fixture = "0.2.0", modules_enabled = true},
+    f200_source_defaults = {base = "2.0.77", mir = "5.0.20000", fixture = "0.3.0", modules_enabled = true},
+    f210 = {base = "2.1.23", mir = "5.0.21000", fixture = "0.3.0", modules_enabled = true},
+    -- Source-default arms stage only the two independently verified 1.1
+    -- differences from fresh Defaults.  The final F210 sibling additionally
+    -- disables only the destination module family, never the source facts.
+    f210_source_defaults = {base = "2.1.23", mir = "5.0.21000", fixture = "0.4.0", modules_enabled = true},
+    f210_source_defaults_modules_disabled = {
+      base = "2.1.23", mir = "5.0.21000", fixture = "0.5.0", modules_enabled = false,
+    },
+  },
+  save = "mir5-native-complete",
+  deadline_ticks = 18000,
+  lab_packs = 32,
+  expected_gear_delta = .10,
+  source_change_tokens = {
+    [0.10] = "0.10000000149011612",
+    [0.05] = "0.05000000074505806",
+    [0.02] = "0.019999999552965164",
+    [0.01] = "0.0099999997764825821",
+    [0.20] = "0.20000000298023224",
+  },
+  -- The original F200 source save records this force modifier as its native
+  -- `0.1` spelling.  It is intentionally separate from recipe-effect tokens,
+  -- whose Factorio float32 serialisation is part of the protected snapshot.
+  source_modifier_tokens = {
+    [0.10] = "0.1",
+  },
+  settings = {
+    ["ips-require-space-gate"] = true,
+    ["ips-enable-research_breeding"] = true,
+    ["ips-enable-research_plastic"] = true,
+    ["ips-enable-research_sulfur"] = true,
+    ["ips-enable-research_batteries"] = true,
+    ["ips-enable-research_explosives"] = true,
+    ["ips-enable-research_gears"] = true,
+    ["ips-enable-research_iron_sticks"] = true,
+    ["ips-enable-research_copper_cable"] = true,
+    ["ips-enable-research_electronic_circuit"] = true,
+    ["ips-enable-research_advanced_circuit"] = true,
+    ["ips-enable-research_processing_unit"] = true,
+    ["ips-enable-research_low_density_structure"] = true,
+    ["ips-enable-research_rocket_fuel"] = true,
+    ["ips-enable-research_copper"] = true,
+    ["ips-enable-research_iron"] = true,
+    ["ips-enable-research_engine"] = true,
+    ["ips-enable-research_electric_engine"] = true,
+    ["ips-enable-research_flying_robot_frame"] = true,
+    ["ips-enable-research_tungsten"] = true,
+    ["ips-enable-research_holmium"] = true,
+    ["ips-enable-research_supercapacitor"] = true,
+    ["ips-enable-research_superconductor"] = true,
+    ["ips-enable-research_bioflux"] = true,
+    ["ips-enable-research_carbon_fiber"] = true,
+    ["ips-enable-research_lithium"] = true,
+    ["ips-enable-research_quantum_processor"] = true,
+    ["ips-enable-research_modules"] = true,
+    ["ips-enable-research_belts"] = true,
+    ["ips-enable-research_inserters"] = true,
+    ["ips-enable-research_bullets"] = true,
+    ["ips-enable-research_rockets"] = true,
+    ["ips-enable-research_inventory_capacity"] = false,
+    ["ips-enable-research_robot_battery"] = true,
+    ["ips-enable-research_science_pack_productivity"] = true,
+    ["ips-enable-research_walls"] = true,
+    ["ips-enable-research_grenades"] = true,
+    ["ips-enable-research_rails"] = true,
+    ["ips-enable-research_electric_energy"] = true,
+    ["ips-enable-research_concrete"] = true,
+    ["ips-enable-research_furnace"] = true,
+    ["ips-enable-research_mining_drill"] = true,
+  },
+  rows = {
+    ["recipe-prod-research_plastic-1"] = {recipe("plastic-bar", .10)},
+    ["recipe-prod-research_sulfur-1"] = {recipe("sulfur", .10)},
+    ["recipe-prod-research_batteries-1"] = {recipe("battery", .10)},
+    ["recipe-prod-research_explosives-1"] = {recipe("explosives", .10)},
+    ["recipe-prod-research_gears-1"] = {recipe("iron-gear-wheel", .10)},
+    ["recipe-prod-research_iron_sticks-1"] = {recipe("iron-stick", .10)},
+    ["recipe-prod-research_copper_cable-1"] = {recipe("copper-cable", .10)},
+    ["recipe-prod-research_electronic_circuit-1"] = {recipe("electronic-circuit", .10)},
+    ["recipe-prod-research_advanced_circuit-1"] = {recipe("advanced-circuit", .10)},
+    ["recipe-prod-research_processing_unit-1"] = {recipe("processing-unit", .10)},
+    ["recipe-prod-research_low_density_structure-1"] = {recipe("low-density-structure", .10)},
+    ["recipe-prod-research_rocket_fuel-1"] = {recipe("rocket-fuel", .10)},
+    ["recipe-prod-research_copper-1"] = {recipe("copper-plate", .10)},
+    ["recipe-prod-research_iron-1"] = {recipe("iron-plate", .10)},
+    ["recipe-prod-research_engine-1"] = {recipe("engine-unit", .10)},
+    ["recipe-prod-research_electric_engine-1"] = {recipe("electric-engine-unit", .10)},
+    ["recipe-prod-research_flying_robot_frame-1"] = {recipe("flying-robot-frame", .10)},
+    ["recipe-prod-research_modules-1"] = {
+      recipe("productivity-module", .10), recipe("speed-module", .10), recipe("efficiency-module", .10),
+      recipe("productivity-module-2", .05), recipe("speed-module-2", .05), recipe("efficiency-module-2", .05),
+      recipe("productivity-module-3", .02), recipe("speed-module-3", .02), recipe("efficiency-module-3", .02),
+      -- Published 1.1.0 also retained this second tier-one pattern group.
+      -- These are separate same-recipe effects, not replacements for the .10 rows.
+      recipe("speed-module", .01), recipe("productivity-module", .01), recipe("efficiency-module", .01),
+    },
+    ["recipe-prod-research_belts-1"] = {recipe("transport-belt", .10), recipe("underground-belt", .10), recipe("splitter", .10), recipe("fast-transport-belt", .05), recipe("fast-underground-belt", .05), recipe("fast-splitter", .05), recipe("express-transport-belt", .02), recipe("express-underground-belt", .02), recipe("express-splitter", .02)},
+    ["recipe-prod-research_inserters-1"] = {recipe("inserter", .10), recipe("burner-inserter", .10), recipe("fast-inserter", .05), recipe("long-handed-inserter", .05), recipe("bulk-inserter", .02)},
+    ["recipe-prod-research_bullets-1"] = {recipe("firearm-magazine", .10), recipe("shotgun-shell", .10), recipe("piercing-rounds-magazine", .05), recipe("piercing-shotgun-shell", .05), recipe("uranium-rounds-magazine", .02)},
+    ["recipe-prod-research_rockets-1"] = {recipe("rocket", .10), recipe("explosive-rocket", .05), recipe("atomic-bomb", .02)},
+    ["recipe-prod-research_robot_battery-1"] = {{type = "worker-robot-battery", modifier = .10}},
+    ["recipe-prod-research_science_pack_productivity-1"] = {recipe("automation-science-pack", .10), recipe("logistic-science-pack", .10), recipe("chemical-science-pack", .10), recipe("military-science-pack", .10), recipe("production-science-pack", .10), recipe("utility-science-pack", .10)},
+    ["recipe-prod-research_walls-1"] = {recipe("stone-wall", .10), recipe("gate", .05)},
+    ["recipe-prod-research_grenades-1"] = {recipe("grenade", .10), recipe("cluster-grenade", .05)},
+    ["recipe-prod-research_rails-1"] = {recipe("rail", .10)},
+    ["recipe-prod-research_electric_energy-1"] = {recipe("solar-panel", .10), recipe("accumulator", .10)},
+    ["recipe-prod-research_concrete-1"] = {recipe("stone-brick", .10), recipe("concrete", .05), recipe("hazard-concrete", .05), recipe("refined-concrete", .02), recipe("refined-hazard-concrete", .02)},
+    ["recipe-prod-research_furnace-1"] = {recipe("stone-furnace", .20), recipe("steel-furnace", .10), recipe("electric-furnace", .05)},
+    ["recipe-prod-research_mining_drill-1"] = {recipe("burner-mining-drill", .20), recipe("electric-mining-drill", .10)},
+  },
+}

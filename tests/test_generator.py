@@ -1007,7 +1007,7 @@ class GeneratorTests(unittest.TestCase):
           data = full_world(mods)
           data.raw.recipe['engine-unit'] = nil
           local foreign = {enabled=true, effects={{type='change-recipe-productivity',
-            recipe='foreign-missing-recipe', change=.7}}}
+            recipe='foreign-missing-recipe', change=.7}, {type='unlock-recipe',recipe='copper-cable'}}}
           data.raw.technology['unrelated-foreign-research'] = foreign
           local ok, message = pcall(dofile, data_final_path)
           assert(ok, tostring(message))
@@ -1023,6 +1023,8 @@ class GeneratorTests(unittest.TestCase):
           assert(found and data.raw.technology['unrelated-foreign-research'] == foreign)
           assert(foreign.enabled and foreign.effects[1].recipe == 'foreign-missing-recipe'
             and foreign.effects[1].change == .7, 'foreign technology was changed')
+          assert(#foreign.effects == 2 and foreign.effects[2].type == 'unlock-recipe'
+            and foreign.effects[2].recipe == 'copper-cable', 'valid foreign unlock was lost')
         ''')
 
     def test_missing_module_recipe_omits_only_its_hidden_historical_holder(self):

@@ -17164,6 +17164,81 @@
         "native_execution": false,
         "source_reconciliation_complete": false,
         "test_intent_reconciliation_complete": false
+      },
+      {
+        "subjects": [
+          "CONT-01",
+          "CONT-12",
+          "CONT-15",
+          "VER-07"
+        ],
+        "reviewed_on": "2026-11-06",
+        "reviewed_current_commit": "c6f7835f2a3045b97a0488d8f314e2cd1a9efd8a",
+        "scope": "Four complete final-recipe integrity fixture/metadata bodies at74 indexed commit/path bindings; two complete synthetic setup bodies and only the stated old sanitizer context. Not an actual upstream archive or whole historical verdict.",
+        "independent_inputs": {
+          "extraction_sha256": "280DC08A3C5D0C82C8AA41B76B3E06B3A2136D80094CA6599E95DED17B84D87D",
+          "review_sha256": "F65556FCD840D45F1E8B01D7DA55805CB16FC3434099CA152EA84A8C73D1C684",
+          "source_blob": "3dc37701a4368a73cbae2300ff83204f6c932f25",
+          "original_setup": [
+            "8643cc91bc915e008556a5315dbb0a743247e7ab:fixtures/space-exploration-recipe-removal/data.lua",
+            "8643cc91bc915e008556a5315dbb0a743247e7ab:fixtures/space-exploration-recipe-removal/data-final-fixes.lua"
+          ],
+          "exact_originals": "Julesc013/scratchpad@cfde8c7851cab0408d019f1d10e8e66249df8a32:projects/mir/runs/aero-historical-final-recipe-integrity-r01/",
+          "control_sha256": "C645F2AA6F97FA58E9C3A935258606ED717B6075CF0DE14152EEC01319DEBA86"
+        },
+        "dispositions": [
+          {
+            "id": "MIR-live-recipe-effects",
+            "disposition": "retain-and-map",
+            "independent_expectation": "After the named removal, MIR copper-cable research remains present and keeps its valid copper-cable reward; emitted recipe effects have live targets.",
+            "implementation": [
+              "source/data-final-fixes.lua:305-333",
+              "source/research/generator.lua:96-107"
+            ],
+            "controls": [
+              "tests/test_generator.py::test_complete_data_final_accepts_named_science_replacement_without_dangling_effects",
+              "tests/test_generator.py::test_missing_last_recipe_keeps_disabled_owned_identity",
+              "tests/test_generator.py::test_data_final_keeps_malformed_missing_effects_for_generator_preflight"
+            ],
+            "limit": "These owned-output controls do not establish the exact old K2/SE archive combination or native startup."
+          },
+          {
+            "id": "valid-foreign-unlock",
+            "disposition": "retain-foreign-fields",
+            "independent_expectation": "The separate foreign technology retains its valid copper-cable unlock; MIR does not delete unrelated valid rewards.",
+            "implementation": [
+              "source/data-final-fixes.lua:317-333"
+            ],
+            "controls": [
+              "tests/test_generator.py::test_missing_last_recipe_keeps_disabled_owned_identity (valid copper-cable unlock added)"
+            ],
+            "limit": "The retained exact valid-unlock clause now has host opposition; exact upstream archive ordering/native progression remain unverified."
+          },
+          {
+            "id": "whole-world-sanitizer",
+            "disposition": "supersede-mechanism-keep-specific-compatibility-question",
+            "independent_expectation": "Old lines15-29 assert all foreign and generated recipe effects, whereas the synthetic setup deliberately leaves a foreign dangling unlock after deleting its own recipe.",
+            "implementation": "Old sanitize_all_technology_effects scans/sorts all technologies and mutates foreign effect vectors. MIR5 GEN-04/06 and COMP-01 instead bound owned publication and explicit integration writes.",
+            "limit": "Do not restore a global sanitizer or infer that current supported K2/SE inputs are coherent. Whether an actual upstream owner needs a named adapter remains unverified; route that case under existing CONT-12 when exact inputs establish it. This does not waive a demonstrated current-profile failure."
+          },
+          {
+            "id": "metadata-and-stage",
+            "disposition": "consolidate-target-context",
+            "independent_expectation": "Three metadata variants retain their actual Base floors/Factorio lines and source dependencies. The separate setup requires recipe deletion before MIR publication.",
+            "implementation": "Existing compatibility/target declarations and current exact-input native queue own actual support; historical metadata is not current qualification.",
+            "limit": "The synthetic Space Exploration-named fixture is not proof of the contents or behavior of a real installed Space Exploration archive."
+          }
+        ],
+        "remaining_executable_check": "Keep actual supported-profile stage/order, live output, unlock/progression and saved-state evidence under existing owners. Old all-world fixture success is not a current native verdict; actual invalid upstream references need classification and a scoped correction when demonstrated. No new every-version/native campaign.",
+        "native_execution": false,
+        "player_source_changed": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false,
+        "host_control": {
+          "report_sha256": "C645F2AA6F97FA58E9C3A935258606ED717B6075CF0DE14152EEC01319DEBA86",
+          "cases": 4,
+          "method": "Both controls pass unchanged source; old accepts dropped-valid-unlock opponent/new rejects it. Only the selected control is rerun, not the whole host/native programme."
+        }
       }
     ],
     "stable_coverage_review": {
