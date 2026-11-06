@@ -17938,6 +17938,3065 @@
       "disposition": "port",
       "whole_source_reconciliation_complete": false,
       "native_execution": false
+    },
+    "discussion_audit_intake_20261107": {
+      "status": "actual-bundle-consistency-verified-122-records-routed-not-native-qualified",
+      "received_on": "2026-11-07",
+      "reviewed_repository_commit": "8508f1c97b99bbeb8967f52fe3e99b6da573b5d5",
+      "provenance": "Maintainer supplied GPT-6 Astra Pro discussion-audit summary dated2026-11-07 01:54:25AEDT and subsequently the actual bundle. Initial summary-only intake remains atd5074d0b; the full supplied122-row JSON/workbook consistency and routing review is recorded below. This is not an independent Portal reread of45threads.",
+      "reported_counts": {
+        "threads": 45,
+        "replies": 222,
+        "posts": 267,
+        "actionable_records": 122,
+        "regression": 72,
+        "accepted_feature": 17,
+        "evidence_gap": 9,
+        "optional_or_design": 24,
+        "execution_relevant": 98,
+        "proposed_p0": 37
+      },
+      "count_and_completeness_verification": "Actual supplied JSON/XLSX IDs reconcile45threads/267history/122items/tests; all unique.98 nonoptional rows occur once in12 proposed suites;24optional excluded. Source index completeness/deleted posts were not independently refetched by this reconciliation.",
+      "full_audit_inputs": [
+        {
+          "filename": "MIR5_Discussion_Audit_2026-11-07.md",
+          "library_file_id": "libfile_62967afbe08c8191b02daa0617c43213"
+        },
+        {
+          "filename": "MIR5_Regression_Register_2026-11-07.xlsx",
+          "library_file_id": "libfile_ebc3b8722c2481919744c48aedc4c629"
+        },
+        {
+          "filename": "MIR5_Audit_Bundle_2026-11-07.zip",
+          "library_file_id": "libfile_080369412120819197403c52e4509ec2"
+        },
+        {
+          "filename": "MIR5_Audit_Data_2026-11-07.json",
+          "library_file_id": "libfile_f671c18d97948191b4a1ea6b8d395746"
+        }
+      ],
+      "input_recovery": "Maintainer supplied the actual ZIP in C:\\Downloads. Primary retained copy and private5ed804ccc17f58812e4d7578c89d576d97e08e62:projects/mir/runs/aero-supplied-discussion-audit-20261107 retain exact ZIP and JSON. All7 listed member hashes, CRC/path/size bounds and remote bytes pass; no embedded instruction was executed.",
+      "custody_and_scope": "Preserve all87 existing request IDs/decisions and32 seed case IDs. This additive CONT-15/VER-07 intake is not another request ledger or execution tracker. Keep optional/unresolved/rejected proposals separate from delivered obligations. The new workbook's initial NOT RUN values do not reset existing native results; any reuse needs VER-06 consumed-input review. Keep relative ages and missing inputs unknown.",
+      "reported_inventory_inputs": [
+        {
+          "source": "https://pastebin.com/wqE5DseT",
+          "reported_enabled_names": 564,
+          "limits": "Names already supplied earlier; exact reporter versions/settings/save remain missing. Existing reduced Muria/Tree/Science evidence is not the full installation."
+        },
+        {
+          "source": "https://justpaste.it/egfb3",
+          "reported_entries": 63,
+          "reported_enabled": 52,
+          "reported_disabled": 11,
+          "limits": "Actual supplied bundle inventory body inspected:63entries,52enabled/11disabled, no duplicate names. Exact versions/startup settings/original save remain unknown; do not fabricate its reporter profile."
+        }
+      ],
+      "exact_url_overlap_with_existing_request_ledger": [
+        {
+          "source_thread_id": "T02",
+          "thread": "https://mods.factorio.com/mod/more-infinite-research/discussion/6ad37dc9edf876883c832c02",
+          "existing_source_ids": [
+            "P-SCI-WEB-2026-10-25"
+          ],
+          "existing_request_ids": [
+            "SCI-UNLOCK-01"
+          ]
+        },
+        {
+          "source_thread_id": "T03",
+          "thread": "https://mods.factorio.com/mod/more-infinite-research/discussion/6ad043552eba030bbe7b9999",
+          "existing_source_ids": [
+            "P-MP-JOIN-2026-10-25"
+          ],
+          "existing_request_ids": [
+            "MP-JOIN-01"
+          ]
+        },
+        {
+          "source_thread_id": "T04",
+          "thread": "https://mods.factorio.com/mod/more-infinite-research/discussion/6ad0f799032bb672e99b49cc",
+          "existing_source_ids": [
+            "P-TRUE-NUKES-2026-10-25"
+          ],
+          "existing_request_ids": [
+            "COMP-TRUE-NUKES-01"
+          ]
+        },
+        {
+          "source_thread_id": "T06",
+          "thread": "https://mods.factorio.com/mod/more-infinite-research/discussion/6ad33b18698cbdddab2f4493",
+          "existing_source_ids": [
+            "P-ANGEL-SILVER-2026-10-25"
+          ],
+          "existing_request_ids": [
+            "SCI-UNLOCK-01"
+          ]
+        },
+        {
+          "source_thread_id": "T07",
+          "thread": "https://mods.factorio.com/mod/more-infinite-research/discussion/6ad79fcdf560f49854f1b624",
+          "existing_source_ids": [
+            "P-SCI-CRYO-2026-10-25"
+          ],
+          "existing_request_ids": [
+            "SCI-UNLOCK-01"
+          ]
+        },
+        {
+          "source_thread_id": "T08",
+          "thread": "https://mods.factorio.com/mod/more-infinite-research/discussion/6adaf0f625d5abdc6c80cdf0",
+          "existing_source_ids": [
+            "P-SCI-OWNER-2026-10-23"
+          ],
+          "existing_request_ids": [
+            "SCI-RESEARCH-01"
+          ]
+        },
+        {
+          "source_thread_id": "T14",
+          "thread": "https://mods.factorio.com/mod/more-infinite-research/discussion/6ab6af245dc9150e0f1459aa",
+          "existing_source_ids": [
+            "P5"
+          ],
+          "existing_request_ids": [
+            "SIF-01"
+          ]
+        },
+        {
+          "source_thread_id": "T22",
+          "thread": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a4e8c6884594f98390cc27e",
+          "existing_source_ids": [
+            "P2"
+          ],
+          "existing_request_ids": [
+            "K2-01",
+            "K2-02",
+            "K2-03",
+            "K2-04",
+            "K2-05",
+            "K2-06",
+            "K2-07"
+          ]
+        }
+      ],
+      "url_overlap_limit": "Eight exact thread URLs link12distinct original requestIDs. These are provenance links, not automatic semantic matches for every item in a thread. The remaining37 empty matches do not imply absent implementation. A worker flagged the repeated method label; lead review finds it describes the matching method, while empty request lists correctly report no positive match. No false-positive request mapping was verified.",
+      "obligation_routes": [
+        {
+          "subject": "Saved levels and removed duplicates",
+          "continuity_ids": [
+            "CONT-02",
+            "CONT-07",
+            "CONT-11"
+          ],
+          "acceptance_case_ids": [
+            "MIG-SAVE",
+            "CAP-STATE",
+            "MIG-ORIGINS"
+          ],
+          "related_request_ids": [],
+          "independent_expectation_from_supplied_summary": "Preserve earned value as well as technology identities: effects, partial/current/queued work, foreign contributions and cold-reloaded state. A duplicate disappearing is not proof of retained earned bonuses.",
+          "existing_evidence_to_review_for_applicability": [
+            "spec/evidence/candidate503-native-upgrades-r01.json",
+            "spec/evidence/candidate504-mixed-gun-native-r01.json",
+            "spec/evidence/published473-modern-native-r01.json"
+          ],
+          "remaining_check_or_limit": "Retain accepted components at original inputs and all adverse attempts. Current finite native research-speed8/provider and affected public-beta successor checks require their actual saved-state result; do not restart every old patch.",
+          "thread_urls_as_supplied": [
+            "https://mods.factorio.com/mod/more-infinite-research/discussion/6ac991816db6705d84dfd68e",
+            "https://mods.factorio.com/mod/more-infinite-research/discussion/690240a9a8da210ba60a6655"
+          ]
+        },
+        {
+          "subject": "Planet discovery and platform access",
+          "continuity_ids": [
+            "CONT-11",
+            "CONT-12"
+          ],
+          "acceptance_case_ids": [
+            "MIG-SAVE",
+            "GEN-NATIVE"
+          ],
+          "related_request_ids": [],
+          "independent_expectation_from_supplied_summary": "The supplied3.2.0 report/3.2.1 confirmation requires normal planet access and actual platform travel after upgrade, beyond surfaces or researched flags.",
+          "existing_evidence_to_review_for_applicability": [
+            "spec/evidence/discovery-recovery-a575-native-chain-r05.json",
+            "spec/evidence/planet-discovery-api-native-chain-r02.json"
+          ],
+          "remaining_check_or_limit": "The named a575 no-helper case proves Vulcanus unlock, gear work and save/two cold reloads. The API record is MIR-absent runtime-shape evidence only. Neither named record documents actual platform travel; check for an existing accepted travel witness before preparing only that missing affected endpoint. Discovery Tree is a separate case.",
+          "thread_urls_as_supplied": [
+            "https://mods.factorio.com/mod/more-infinite-research/discussion/6a64fba3954cdc5ccdc7127d"
+          ]
+        },
+        {
+          "subject": "Science and laboratory progression",
+          "continuity_ids": [
+            "CONT-05",
+            "CONT-12",
+            "CONT-15"
+          ],
+          "acceptance_case_ids": [
+            "COMP-SCIENCE",
+            "GEN-NATIVE"
+          ],
+          "related_request_ids": [
+            "SCI-UNLOCK-01",
+            "SCI-RESEARCH-01",
+            "SIF-01",
+            "K2-01"
+          ],
+          "independent_expectation_from_supplied_summary": "Distinguish startup admission, disabled prerequisite blockers, obtainable science, an accepting lab and intended pack retirement. Legitimate late K2 retirement is not an accidental red-only result.",
+          "existing_evidence_to_review_for_applicability": [
+            "spec/evidence/science-default-catalogue-chain.json",
+            "spec/evidence/sif-science-retirement-f200-selected-native-chain.json",
+            "spec/evidence/candidate505-science-upgrade-native-r01.json"
+          ],
+          "remaining_check_or_limit": "Review exact profile/data/lab/useful-work applicability. Original SCI-UNLOCK-01 and SCI-RESEARCH-01 reporter closures remain unknown; representative success does not close them.",
+          "thread_urls_as_supplied": [
+            "https://mods.factorio.com/mod/more-infinite-research/discussion/6ab6af245dc9150e0f1459aa"
+          ]
+        },
+        {
+          "subject": "MIR5 continuation, glass and optional-mod reports",
+          "continuity_ids": [
+            "CONT-02",
+            "CONT-07",
+            "CONT-12"
+          ],
+          "acceptance_case_ids": [
+            "GEN-PREFLIGHT",
+            "GEN-NATIVE",
+            "MIG-SAVE"
+          ],
+          "related_request_ids": [
+            "NATIVE-01",
+            "K2-05"
+          ],
+          "independent_expectation_from_supplied_summary": "Preserve qualifying foreign owners, reject internal duplicates and retain affected earned state. Modification history alone does not identify a creator or prove Science Spread caused a collision.",
+          "existing_evidence_to_review_for_applicability": [
+            "spec/evidence/muria-discovery-science-native-chain-r01.json",
+            "spec/evidence/muria-provider-refusal-native-chain-r01.json",
+            "spec/evidence/candidate503-native-upgrades-r01.json"
+          ],
+          "remaining_check_or_limit": "Reduced Muria1.9.5/Tree1.0.12/ScienceSpread0.9.2 and named K2SO/Crushing Industry checks retain their actual scopes. Glass stack without an exact MIR archive cannot be attributed to current5.0.7; full564-mod setup and arbitrary provider switches remain unverified.",
+          "thread_urls_as_supplied": [
+            "https://mods.factorio.com/mod/more-infinite-research/discussion/6ad37dc9edf876883c832c02"
+          ]
+        },
+        {
+          "subject": "Multiplayer joining and event reconstruction",
+          "continuity_ids": [
+            "CONT-10",
+            "CONT-11"
+          ],
+          "acceptance_case_ids": [
+            "RUN-LIFECYCLE",
+            "DET-RUNTIME"
+          ],
+          "related_request_ids": [
+            "MP-JOIN-01"
+          ],
+          "independent_expectation_from_supplied_summary": "Use a separate real client joining a host, saved/restarted host and client reconnect with relevant runtime/migrated states. Server ready alone cannot close the historical on_tick mismatch.",
+          "existing_evidence_to_review_for_applicability": [
+            "spec/evidence/library-current507-input-lifecycle-native-r01.json"
+          ],
+          "remaining_check_or_limit": "Published5.0.7 Base2.0.77/2.1.23 has actual joins and saved-host restart within its imported1.1 scope; final saves were not separately cold-loaded. Review changed Library hierarchy/input for the successor, not a universal multiplayer claim. Preserve distinct inaccessible-screenshot MP-JOIN-01.",
+          "thread_urls_as_supplied": [
+            "https://mods.factorio.com/mod/more-infinite-research/discussion/6acabc9e1ccfd8621529e70e"
+          ]
+        },
+        {
+          "subject": "Startup and Library performance",
+          "continuity_ids": [
+            "CONT-10",
+            "CONT-12"
+          ],
+          "acceptance_case_ids": [
+            "PERF-NATIVE",
+            "PERF-SHAPE",
+            "UI-FIRSTUSE"
+          ],
+          "related_request_ids": [],
+          "independent_expectation_from_supplied_summary": "Compare retained functionality and useful work on fixed valid profiles, distinguishing total from MIR-added startup and startup from runtime/Library/memory. Keep scored timing, warmup and timeout observations separate.",
+          "existing_evidence_to_review_for_applicability": [
+            "spec/evidence/candidate502-base-f200-startup-chain-r01.json",
+            "spec/evidence/whole-product-heavy-space-age-f210-menu-adverse-chain-r04.json"
+          ],
+          "remaining_check_or_limit": "Earlier means retain their candidate identities; heavy prefixes and warmups are not a completed comparison. Existing fixed campaign/admission policy governs reruns; the proposed audit suite does not mandate a new reboot campaign. Whole-product performance remains open.",
+          "thread_urls_as_supplied": [
+            "https://mods.factorio.com/mod/more-infinite-research/discussion/6acabc9e1ccfd8621529e70e"
+          ]
+        },
+        {
+          "subject": "Caps, settings and actual rewards",
+          "continuity_ids": [
+            "CONT-03",
+            "CONT-06",
+            "CONT-07"
+          ],
+          "acceptance_case_ids": [
+            "SET-PARITY",
+            "CAP-STATE",
+            "GEN-NATIVE",
+            "SET-LIFETIME"
+          ],
+          "related_request_ids": [],
+          "independent_expectation_from_supplied_summary": "Check below/at/above cap including10/11 where applicable, queued next level, lowering below earned levels, raising and save/reload; inspect actual effects and preserve foreign disablement.",
+          "existing_evidence_to_review_for_applicability": [
+            "spec/evidence/candidate503-native-upgrades-r01.json",
+            "spec/evidence/f200-positive-cap-qualified-chain.json",
+            "spec/evidence/worker-uncap-chain.json"
+          ],
+          "remaining_check_or_limit": "Reuse applicable controlled cap/effect/cap0 components. Positive numeric native description and current Settings provenance/import/full-compact actual export files remain affected presentation checks; do not infer gameplay from a displayed option.",
+          "thread_urls_as_supplied": [
+            "https://mods.factorio.com/mod/more-infinite-research/discussion/6a80d38cb9fb3a3d9576696a",
+            "https://mods.factorio.com/mod/more-infinite-research/discussion/6acabc9e1ccfd8621529e70e"
+          ]
+        },
+        {
+          "subject": "Library design, discovery, localization and support",
+          "continuity_ids": [
+            "CONT-10",
+            "CONT-16"
+          ],
+          "acceptance_case_ids": [
+            "DET-PRESENTATION",
+            "UI-FIRSTUSE",
+            "SET-PARITY"
+          ],
+          "related_request_ids": [
+            "UI-01",
+            "UI-02",
+            "UI-03",
+            "UI-04",
+            "PLAT-UI-01"
+          ],
+          "independent_expectation_from_supplied_summary": "Restore accepted MIR4.2 stable navigation, retained continuous list/details, personal queries/selection and useful localized benefits. Respect Discovery Tree's actual visibility rather than revealing all MIR research.",
+          "existing_evidence_to_review_for_applicability": [
+            "spec/evidence/library-cont10-layout-negative-control-r01.json",
+            "spec/evidence/library-current507-input-lifecycle-native-r01.json",
+            "spec/evidence/muria-discovery-science-native-chain-r01.json"
+          ],
+          "remaining_check_or_limit": "Issue1768/PRs1769-1772 carry the concrete restoration and narrow clipping correction. Real affected English/German/size/filter/scroll/Settings/Discovery Tree transition/reset observations remain separately scoped; old lifecycle passes do not establish new pixels."
+        }
+      ],
+      "release_direction": "The maintainer targets the next cumulative5.0.x release within12hours. Current public5.0.7 means changed bytes use5.0.8 unless live history advances. Include completed reviewed work after applicable startup/save/package/CI checks; Black Glass owns native execution/integration/tag/GitHub publication and Aero independent review/delivery. The12-hour target is not a stable verdict or waiver. The summary's proposed Mod Portal options are discussion only: agent publication remains GitHub-only; maintainer handles Portal.",
+      "next_action": "Obtain full JSON/bundle; verify original audit IDs/counts/source URLs and deduplicate each record against this existing inventory/ledger/cases and exact results. Reuse named evidence only after applicability review, identify genuinely missing executable endpoints, and leave optional/design decisions with their original status. Do not invent122 row dispositions from this summary or set inventory_complete=true.",
+      "initial_summary_intake_commit": "d5074d0bc154cf338be29afd83e294ee38888efb",
+      "full_bundle_reconciliation_r01": {
+        "source_archive_sha256": "C650799342602184D24BB65F980B1B8D53A705113A7BFB27290F435D72570E11",
+        "source_json_sha256": "1E46253B58292BEC7DEC041EB674CD8E6ECE78DF8B84B86F7B98740EDFE42BD2",
+        "original_audit_preserved_unchanged": true,
+        "original_requests_and_cases_unchanged": true,
+        "consistency_review": "Luna/high explicitly selected; source/workbook/fixture extraction only, report03FD9BA8/F1B88448. Lead checked actual row expectations and exact-URL contents; worker method-label concern resolved as above.",
+        "source_fixture_counts": {
+          "T02": {
+            "enabled_unique_names": 564
+          },
+          "T30": {
+            "entries": 63,
+            "enabled": 52,
+            "disabled": 11
+          },
+          "limits": "Neither fixture contains exact mod versions, startup settings or original save."
+        },
+        "routing_rule": "All122 external audit IDs/testIDs stay distinct; repeated behavior shares existing route groups/requirements. These groups are references, not a new runner/suite authority. Original proposed NOT RUN tracker and current native evidence retain separate identities.",
+        "scope_rule": "Audit optional labels do not waive accepted K2/BA requests; original decisions below govern. STACK-02 remains conditional-native-audit-4.2, not a newly accepted release feature. Priorities37P0/53P1/32P2 are recommendations, not current defect counts.",
+        "route_groups": {
+          "packages": {
+            "continuity": [
+              "CONT-13",
+              "CONT-16",
+              "CONT-17"
+            ],
+            "cases": [
+              "PKG-PARITY",
+              "DET-BUILD"
+            ],
+            "implementation": [
+              "tools/package.py",
+              "targets/editions.json"
+            ],
+            "evidence": [
+              "spec/evidence/candidate507-github-prerelease-delivery-chain-r01.json"
+            ],
+            "remaining": "Final successor edition/asset/source/tag/floor readback; keep nine stable subsets, experimental F018 and early limits. Wrong edition delivery and gameplay verdicts remain different.",
+            "native_owner": "Black Glass",
+            "reconciliation_and_review": "Aero",
+            "evidence_status": "Original named scopes only; final-candidate consumed-input applicability required. No new pass from this audit."
+          },
+          "science": {
+            "continuity": [
+              "CONT-05",
+              "CONT-12",
+              "CONT-15"
+            ],
+            "cases": [
+              "COMP-SCIENCE",
+              "GEN-NATIVE"
+            ],
+            "implementation": [
+              "source/research/science.lua",
+              "source/compatibility/science_bindings.lua",
+              "source/overrides/prerequisite_repairs.lua"
+            ],
+            "evidence": [
+              "spec/evidence/science-default-catalogue-chain.json",
+              "spec/evidence/candidate505-science-upgrade-native-r01.json",
+              "spec/evidence/sif-science-retirement-f200-selected-native-chain.json"
+            ],
+            "remaining": "Review named profile/output/lab/useful-work applicability. Keep F200/F210, K2/K2SO, pack retirement, disabled edges and alternate/recycling routes distinct. Unknown original provider/versions/settings remain missing; no recursive discovery solver is restored.",
+            "native_owner": "Black Glass",
+            "reconciliation_and_review": "Aero",
+            "evidence_status": "Original named scopes only; final-candidate consumed-input applicability required. No new pass from this audit."
+          },
+          "ownership": {
+            "continuity": [
+              "CONT-02",
+              "CONT-04",
+              "CONT-07",
+              "CONT-12"
+            ],
+            "cases": [
+              "GEN-PREFLIGHT",
+              "GEN-FAMILY",
+              "MIG-SAVE"
+            ],
+            "implementation": [
+              "source/research/modern.lua",
+              "source/research/native_owners.lua",
+              "source/runtime/catalogue.lua",
+              "source/runtime/native_gun_credits.lua"
+            ],
+            "evidence": [
+              "spec/evidence/muria-discovery-science-native-chain-r01.json",
+              "spec/evidence/candidate503-native-upgrades-r01.json",
+              "spec/evidence/candidate504-galore-weapon-useful-work-r01.json",
+              "spec/evidence/candidate504-mixed-gun-native-r01.json"
+            ],
+            "remaining": "Retain strict internal duplicate checks and qualifying foreign owners; preserve category/recipe earned vectors. Review actual final consumed inputs. Finite research-speed8 PR1767 still needs actual predecessor/provider/saved-tuple/paid/partial/queue/save/cold/refusal checks; other foreign finite tails need their own original contract/profile, not blanket skip/rename.",
+            "native_owner": "Black Glass",
+            "reconciliation_and_review": "Aero",
+            "evidence_status": "Original named scopes only; final-candidate consumed-input applicability required. No new pass from this audit."
+          },
+          "saved_state": {
+            "continuity": [
+              "CONT-07",
+              "CONT-11",
+              "CONT-13"
+            ],
+            "cases": [
+              "MIG-SAVE",
+              "MIG-ORIGINS",
+              "MIG-HISTORY"
+            ],
+            "implementation": [
+              "source/migrations",
+              "source/runtime/legacy_caps.lua",
+              "source/runtime/native_credits.lua"
+            ],
+            "evidence": [
+              "spec/evidence/published473-modern-native-r01.json",
+              "spec/evidence/data-only-paid-family-restoration-r01.json",
+              "spec/evidence/candidate503-native-upgrades-r01.json",
+              "spec/evidence/discovery-recovery-a575-native-chain-r05.json"
+            ],
+            "remaining": "Keep accepted nine4.7.3 routes/seven groups/four forward journeys and original failures under their actual identities. Review affected beta-to-successor state only. Named discovery recovery proves Vulcanus unlock/save/two cold, not actual platform travel; locate or add that exact missing endpoint without repeating closed journeys.",
+            "native_owner": "Black Glass",
+            "reconciliation_and_review": "Aero",
+            "evidence_status": "Original named scopes only; final-candidate consumed-input applicability required. No new pass from this audit."
+          },
+          "settings_caps": {
+            "continuity": [
+              "CONT-03",
+              "CONT-07",
+              "CONT-10"
+            ],
+            "cases": [
+              "SET-PARITY",
+              "CAP-STATE",
+              "SET-LIFETIME"
+            ],
+            "implementation": [
+              "source/research/settings.lua",
+              "source/runtime/caps.lua",
+              "source/runtime/library.lua"
+            ],
+            "evidence": [
+              "spec/evidence/candidate503-native-upgrades-r01.json",
+              "spec/evidence/f200-positive-cap-qualified-chain.json",
+              "spec/evidence/worker-uncap-chain.json"
+            ],
+            "remaining": "Use applicable cap/effect/relaxation/foreign-right components and exact configured/native-owner boundaries. Check meaningful cap10/11 or13 boundaries and queue/lower/raise/reload where not already applicable. Numeric cap rendering, Settings provenance and real full/compact import/export files remain separately observed; never infer effects from visible controls.",
+            "native_owner": "Black Glass",
+            "reconciliation_and_review": "Aero",
+            "evidence_status": "Original named scopes only; final-candidate consumed-input applicability required. No new pass from this audit."
+          },
+          "catalogue": {
+            "continuity": [
+              "CONT-01",
+              "CONT-04",
+              "CONT-06",
+              "CONT-12"
+            ],
+            "cases": [
+              "COMP-COLLECT",
+              "GEN-FAMILY",
+              "GEN-NATIVE"
+            ],
+            "implementation": [
+              "source/research/catalogue.lua",
+              "source/compatibility/product_targets.lua",
+              "source/compatibility/modern_catalogue.lua"
+            ],
+            "evidence": [
+              "spec/evidence/candidate504-galore-weapon-useful-work-r01.json",
+              "spec/evidence/atan-gameplay-chain.json"
+            ],
+            "remaining": "Map accepted exact products/recipes and independent delivered expectations before actual useful output. Preserve complete profile coverage while deduplicating overlaps; selected fixtures do not qualify all named tiers/overhauls/variants.",
+            "native_owner": "Black Glass",
+            "reconciliation_and_review": "Aero",
+            "evidence_status": "Original named scopes only; final-candidate consumed-input applicability required. No new pass from this audit."
+          },
+          "effects": {
+            "continuity": [
+              "CONT-06",
+              "CONT-08",
+              "CONT-09",
+              "CONT-12"
+            ],
+            "cases": [
+              "GEN-NATIVE",
+              "RUN-SCOPE"
+            ],
+            "implementation": [
+              "source/research/catalogue.lua",
+              "source/runtime/bootstrap.lua",
+              "source/runtime/passive_repair.lua"
+            ],
+            "evidence": [
+              "spec/evidence/atan-gameplay-chain.json",
+              "spec/evidence/candidate504-mixed-gun-native-r01.json"
+            ],
+            "remaining": "Verify intended actual machine/electrical/combat/runtime effects, defaults, paid values and foreign composition for each named input. Solar Matrix/AccumulatorV2/SE ovens/solar tiers/accumulators/Better Bot Battery are distinct exact archive obligations where historically accepted; generic source effects or names do not prove those profiles.",
+            "native_owner": "Black Glass",
+            "reconciliation_and_review": "Aero",
+            "evidence_status": "Original named scopes only; final-candidate consumed-input applicability required. No new pass from this audit."
+          },
+          "multiplayer": {
+            "continuity": [
+              "CONT-10",
+              "CONT-11"
+            ],
+            "cases": [
+              "RUN-LIFECYCLE",
+              "DET-RUNTIME"
+            ],
+            "implementation": [
+              "source/runtime/bootstrap.lua",
+              "source/runtime/library.lua"
+            ],
+            "evidence": [
+              "spec/evidence/library-current507-input-lifecycle-native-r01.json"
+            ],
+            "remaining": "Published5.0.7 Base2.0.77/2.1.23 imported1.1 has actual joins and saved-host restart. Review successor observer/UI ancestry and affected clients; final saves were not separately cold-loaded. Server readiness and multi-force mocks are not join/rejoin proof.",
+            "native_owner": "Black Glass",
+            "reconciliation_and_review": "Aero",
+            "evidence_status": "Original named scopes only; final-candidate consumed-input applicability required. No new pass from this audit."
+          },
+          "performance": {
+            "continuity": [
+              "CONT-04",
+              "CONT-10",
+              "CONT-12"
+            ],
+            "cases": [
+              "PERF-NATIVE",
+              "PERF-SHAPE",
+              "UI-FIRSTUSE"
+            ],
+            "implementation": [
+              "source/data-final-fixes.lua",
+              "source/compatibility/product_targets.lua",
+              "source/runtime/library.lua"
+            ],
+            "evidence": [
+              "spec/evidence/candidate502-base-f200-startup-chain-r01.json",
+              "spec/evidence/whole-product-heavy-space-age-f210-menu-adverse-chain-r04.json"
+            ],
+            "remaining": "Continue existing fixed valid Base/SpaceAge/heavy2.0/2.1 queue with equivalent research/useful work, total/MIR-added startup, runtime/load/spikes/backlogs/Library/memory distinguished. Preserve failures, warmups and incomplete campaigns; no automatic reboot or unchanged retry campaign from proposed audit steps.",
+            "native_owner": "Black Glass",
+            "reconciliation_and_review": "Aero",
+            "evidence_status": "Original named scopes only; final-candidate consumed-input applicability required. No new pass from this audit."
+          },
+          "presentation": {
+            "continuity": [
+              "CONT-10",
+              "CONT-16"
+            ],
+            "cases": [
+              "DET-PRESENTATION",
+              "UI-FIRSTUSE",
+              "SET-PARITY"
+            ],
+            "implementation": [
+              "source/runtime/library.lua",
+              "source/presentation/library_layout.lua",
+              "source/locale"
+            ],
+            "evidence": [
+              "spec/evidence/library-current507-input-lifecycle-native-r01.json",
+              "spec/evidence/muria-discovery-science-native-chain-r01.json"
+            ],
+            "remaining": "Maintainer rejected current cramped/prose-heavy UI. PR1774/471541701 restores concrete authored8a layout; original/current normal-display visual comparison and full views/input/settings/export/personal/DiscoveryTree reveal/reset remain open. Earlier functional pixels are not design acceptance. Chinese/unknown-key/contribution/support work keeps its own scope.",
+            "native_owner": "Black Glass",
+            "reconciliation_and_review": "Aero",
+            "evidence_status": "Original named scopes only; final-candidate consumed-input applicability required. No new pass from this audit."
+          },
+          "inputs": {
+            "continuity": [
+              "CONT-15",
+              "CONT-17"
+            ],
+            "cases": [
+              "REQUEST-CUSTODY",
+              "TEST-REUSE"
+            ],
+            "implementation": [
+              "spec/programmes/community-requests.json",
+              "spec/inventory/continuity.json"
+            ],
+            "evidence": [],
+            "remaining": "Recover original error/archive/settings/save when indispensable; compare upstream without MIR before attributing. Preserve withdrawn diagnoses and upstream-only failures. Driku564 names and freezeball63 entries are factual inventories, not exact reporter installations.",
+            "native_owner": "Black Glass",
+            "reconciliation_and_review": "Aero",
+            "evidence_status": "Original named scopes only; final-candidate consumed-input applicability required. No new pass from this audit."
+          },
+          "scope": {
+            "continuity": [
+              "CONT-15",
+              "CONT-16"
+            ],
+            "cases": [
+              "REQUEST-CUSTODY"
+            ],
+            "implementation": [
+              "spec/programmes/community-requests.json",
+              "docs/support.md",
+              "docs/development.md"
+            ],
+            "evidence": [],
+            "remaining": "Original accepted/conditional/withheld/rejected decisions and delivered behavior govern. Audit recommendation or old aspiration alone does not accept a feature, prescribe rates, restore the compiler, or permit a new beta mod ID/Portal upload. Retain exact test intent for later scoped decisions.",
+            "native_owner": "Black Glass",
+            "reconciliation_and_review": "Aero",
+            "evidence_status": "Original named scopes only; final-candidate consumed-input applicability required. No new pass from this audit."
+          }
+        },
+        "records": [
+          {
+            "source_item_id": "T01-I01",
+            "source_test_id": "R-T01-01",
+            "source_thread_id": "T01",
+            "summary": "Reliable updates, preserved customization and intelligible documentation.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "BROAD_COMPLAINT; one unscoped beta success",
+            "independent_expectations_from_supplied_audit": [
+              "No lost research or effective settings.",
+              "Documentation identifies supported scope, installation and useful diagnostics.",
+              "Do not count an unversioned success as coverage of all profiles."
+            ],
+            "proposed_suite_reference": "S10",
+            "existing_route_group": "saved_state",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T01-I02",
+            "source_test_id": "R-T01-02",
+            "source_thread_id": "T01",
+            "summary": "Replace automatic discovery with explicit technology/compatibility definitions.",
+            "source_gate": "accepted_feature",
+            "source_priority": "P1",
+            "source_historical_status": "AUTHOR_DECISION",
+            "independent_expectations_from_supplied_audit": [
+              "Definitions and ownership are reviewable.",
+              "Valid supported content loads; unsupported cases have a deliberate, documented outcome.",
+              "A rewrite alone does not satisfy behavioral regression tests."
+            ],
+            "proposed_suite_reference": "S01",
+            "existing_route_group": "packages",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T02-I01",
+            "source_test_id": "R-T02-01",
+            "source_thread_id": "T02",
+            "summary": "Space science dependency rejection.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "AUTHOR_FIX_CLAIM",
+            "independent_expectations_from_supplied_audit": [
+              "Reach main menu and playable save.",
+              "Valid space-science research remains obtainable."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "source_thread_url_request_links_only": [
+              "SCI-UNLOCK-01"
+            ]
+          },
+          {
+            "source_item_id": "T02-I02",
+            "source_test_id": "R-T02-02",
+            "source_thread_id": "T02",
+            "summary": "Ambiguous automation-science unlock.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "PERSISTED_AFTER_FIX_CLAIM",
+            "independent_expectations_from_supplied_audit": [
+              "Valid alternate unlocks do not abort all MIR generation.",
+              "No arbitrary producer selection changes progression."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "source_thread_url_request_links_only": [
+              "SCI-UNLOCK-01"
+            ]
+          },
+          {
+            "source_item_id": "T02-I03",
+            "source_test_id": "R-T02-03",
+            "source_thread_id": "T02",
+            "summary": "Ironclad native mortar bonus rejected.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "AUTHOR_FIX_CLAIM",
+            "independent_expectations_from_supplied_audit": [
+              "Accepted native changes preserved.",
+              "MIR increments apply once; no preflight crash."
+            ],
+            "proposed_suite_reference": "S03",
+            "existing_route_group": "ownership",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "semantic_request_links": [
+              {
+                "id": "NATIVE-01",
+                "original_decision": "existing-audit-4.2",
+                "original_status": "requested-not-qualified",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              }
+            ],
+            "source_thread_url_request_links_only": [
+              "SCI-UNLOCK-01"
+            ]
+          },
+          {
+            "source_item_id": "T02-I04",
+            "source_test_id": "R-T02-04",
+            "source_thread_id": "T02",
+            "summary": "K2SO science tuple rejects patch transition.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "AUTHOR_FIX_CLAIM",
+            "independent_expectations_from_supplied_audit": [
+              "Compatible patch revisions remain usable.",
+              "Actual changed science semantics are validated, not bypassed."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "source_thread_url_request_links_only": [
+              "SCI-UNLOCK-01"
+            ]
+          },
+          {
+            "source_item_id": "T02-I05",
+            "source_test_id": "R-T02-05",
+            "source_thread_id": "T02",
+            "summary": "Foreign braking-force-8 collision.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "AUTHOR_FIX_CLAIM",
+            "independent_expectations_from_supplied_audit": [
+              "One coherent continuation; no duplicate prototype.",
+              "Foreign effects and earned braking bonuses preserved."
+            ],
+            "proposed_suite_reference": "S03",
+            "existing_route_group": "ownership",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "semantic_request_links": [
+              {
+                "id": "NATIVE-01",
+                "original_decision": "existing-audit-4.2",
+                "original_status": "requested-not-qualified",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              }
+            ],
+            "source_thread_url_request_links_only": [
+              "SCI-UNLOCK-01"
+            ]
+          },
+          {
+            "source_item_id": "T02-I06",
+            "source_test_id": "R-T02-06",
+            "source_thread_id": "T02",
+            "summary": "Foreign weapon-shooting-speed-7 collision.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "AUTHOR_FIX_CLAIM",
+            "independent_expectations_from_supplied_audit": [
+              "No duplicate ownership or lost paid effects.",
+              "Next research changes the actual native modifier once."
+            ],
+            "proposed_suite_reference": "S03",
+            "existing_route_group": "ownership",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "semantic_request_links": [
+              {
+                "id": "NATIVE-01",
+                "original_decision": "existing-audit-4.2",
+                "original_status": "requested-not-qualified",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              }
+            ],
+            "source_thread_url_request_links_only": [
+              "SCI-UNLOCK-01"
+            ]
+          },
+          {
+            "source_item_id": "T02-I07",
+            "source_test_id": "R-T02-07",
+            "source_thread_id": "T02",
+            "summary": "Research Library visibility must respect Discovery Tree.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "AUTHOR_CHANGE_CLAIMS",
+            "independent_expectations_from_supplied_audit": [
+              "Intended hidden/revealed state is respected without changing actual force research."
+            ],
+            "proposed_suite_reference": "S10",
+            "existing_route_group": "presentation",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "source_thread_url_request_links_only": [
+              "SCI-UNLOCK-01"
+            ]
+          },
+          {
+            "source_item_id": "T02-I08",
+            "source_test_id": "R-T02-08",
+            "source_thread_id": "T02",
+            "summary": "K2SO kr-glass catalogue rejects changed recipe.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "REPORTER_PASS_ABSENT; later release evidence evaluated separately",
+            "independent_expectations_from_supplied_audit": [
+              "Replacement glass route validates and loads.",
+              "Productivity, saved paid/partial progress and queue remain correct.",
+              "Reduced-fixture success is recorded separately from full-profile success."
+            ],
+            "proposed_suite_reference": "S03",
+            "existing_route_group": "ownership",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "semantic_request_links": [
+              {
+                "id": "K2-05",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              }
+            ],
+            "source_thread_url_request_links_only": [
+              "SCI-UNLOCK-01"
+            ]
+          },
+          {
+            "source_item_id": "T02-I09",
+            "source_test_id": "R-T02-09",
+            "source_thread_id": "T02",
+            "summary": "Space Is Fake saved bonuses and supported satellite science need preservation.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "AUTHOR_CHANGE_CLAIMS",
+            "independent_expectations_from_supplied_audit": [
+              "Bonuses and progress are retained without double application.",
+              "A supported satellite science source remains usable."
+            ],
+            "proposed_suite_reference": "S04",
+            "existing_route_group": "saved_state",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "source_thread_url_request_links_only": [
+              "SCI-UNLOCK-01"
+            ]
+          },
+          {
+            "source_item_id": "T02-I10",
+            "source_test_id": "R-T02-10",
+            "source_thread_id": "T02",
+            "summary": "Settings imports and diagnostics were announced corrected.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "AUTHOR_CHANGE_CLAIMS",
+            "independent_expectations_from_supplied_audit": [
+              "Supported values round-trip exactly.",
+              "Invalid input produces actionable diagnostics without a partially changed profile."
+            ],
+            "proposed_suite_reference": "S05",
+            "existing_route_group": "settings_caps",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "source_thread_url_request_links_only": [
+              "SCI-UNLOCK-01"
+            ]
+          },
+          {
+            "source_item_id": "T03-I01",
+            "source_test_id": "R-T03-01",
+            "source_thread_id": "T03",
+            "summary": "Multiplayer joining fails after update.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "AUTHOR_FIX_CLAIM; screenshot unavailable",
+            "independent_expectations_from_supplied_audit": [
+              "Join reaches active play and stays synchronized.",
+              "No script-event registration mismatch.",
+              "Server ready alone is insufficient evidence."
+            ],
+            "proposed_suite_reference": "S08",
+            "existing_route_group": "multiplayer",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "semantic_request_links": [
+              {
+                "id": "MP-JOIN-01",
+                "original_decision": "retain-open-for-mir5-regression-and-community-continuity",
+                "original_status": "requested-not-qualified",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              }
+            ],
+            "source_thread_url_request_links_only": [
+              "MP-JOIN-01"
+            ]
+          },
+          {
+            "source_item_id": "T04-I01",
+            "source_test_id": "R-T04-01",
+            "source_thread_id": "T04",
+            "summary": "Enabling True Nukes causes a test-related crash; phase and exact error unknown.",
+            "source_gate": "evidence_needed",
+            "source_priority": "P0",
+            "source_historical_status": "UNRESOLVED_REPORT; installation/enabling reported, runtime progression not observed",
+            "independent_expectations_from_supplied_audit": [
+              "No MIR-induced startup/runtime error.",
+              "Original test triggers and unlock progression remain functional.",
+              "Unreproduced report remains an evidence gap."
+            ],
+            "proposed_suite_reference": "S11",
+            "existing_route_group": "inputs",
+            "disposition": "original-input-or-scope-investigation",
+            "semantic_request_links": [
+              {
+                "id": "COMP-TRUE-NUKES-01",
+                "original_decision": "retain-open-for-mir5-regression-and-community-continuity",
+                "original_status": "requested-not-qualified",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              }
+            ],
+            "source_thread_url_request_links_only": [
+              "COMP-TRUE-NUKES-01"
+            ]
+          },
+          {
+            "source_item_id": "T05-I01",
+            "source_test_id": "R-T05-01",
+            "source_thread_id": "T05",
+            "summary": "Promethium unlock ambiguity blocks F210 loading.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "AUTHOR_FIX_CLAIM_AFTER_COUNTEREXAMPLE",
+            "independent_expectations_from_supplied_audit": [
+              "Valid supported promethium graph loads.",
+              "No silent elimination of established research."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T05-I02",
+            "source_test_id": "R-T05-02",
+            "source_thread_id": "T05",
+            "summary": "Unknown collision-layer message follows initial failure.",
+            "source_gate": "evidence_needed",
+            "source_priority": "P1",
+            "source_historical_status": "SECONDARY_DIAGNOSTIC; causality unproven",
+            "independent_expectations_from_supplied_audit": [
+              "Root cause remains distinguishable from recovery cascades.",
+              "Do not modify unrelated utility prototypes solely from this trailing error."
+            ],
+            "proposed_suite_reference": "S11",
+            "existing_route_group": "inputs",
+            "disposition": "original-input-or-scope-investigation"
+          },
+          {
+            "source_item_id": "T05-I03",
+            "source_test_id": "R-T05-03",
+            "source_thread_id": "T05",
+            "summary": "Electromagnetic unlock ambiguity blocks F200 loading.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "AUTHOR_FIX_CLAIM_AFTER_COUNTEREXAMPLE",
+            "independent_expectations_from_supplied_audit": [
+              "Valid supported electromagnetic graph loads on its own F200 package.",
+              "F210 build numbers are not attributed to this F200 report."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T06-I01",
+            "source_test_id": "R-T06-01",
+            "source_thread_id": "T06",
+            "summary": "modules depends on disabled angels-silver-smelting-1.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "WORKAROUND_USER_SUCCESS; packaged fix author claim",
+            "independent_expectations_from_supplied_audit": [
+              "Only the explicitly supported broken edge is repaired when its guard applies.",
+              "Enabled legitimate prerequisites and unrelated mods remain intact.",
+              "Science remains reachable."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "source_thread_url_request_links_only": [
+              "SCI-UNLOCK-01"
+            ]
+          },
+          {
+            "source_item_id": "T07-I01",
+            "source_test_id": "R-T07-01",
+            "source_thread_id": "T07",
+            "summary": "Cryogenic science dependencies reject Factorio 2.1.23.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "NO_REPORTER_CONFIRMATION",
+            "independent_expectations_from_supplied_audit": [
+              "No science binding error.",
+              "Correct pack requirements and earned effects persist."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "source_thread_url_request_links_only": [
+              "SCI-UNLOCK-01"
+            ]
+          },
+          {
+            "source_item_id": "T08-I01",
+            "source_test_id": "R-T08-01",
+            "source_thread_id": "T08",
+            "summary": "Foreign Space-Lab-Research-61 binding rejected.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "F210_UNCONFIRMED",
+            "independent_expectations_from_supplied_audit": [
+              "Foreign research is retained with its intended effects.",
+              "Unneeded MIR binding assumptions do not prevent supported startup."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "semantic_request_links": [
+              {
+                "id": "SCI-RESEARCH-01",
+                "original_decision": "retain-open-for-mir5-regression-and-save-continuity",
+                "original_status": "requested-not-qualified",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              }
+            ],
+            "source_thread_url_request_links_only": [
+              "SCI-RESEARCH-01"
+            ]
+          },
+          {
+            "source_item_id": "T08-I02",
+            "source_test_id": "R-T08-02",
+            "source_thread_id": "T08",
+            "summary": "K2SO planetary-data source ambiguity persists.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "PERSISTED_AFTER_PATCH_SUGGESTION",
+            "independent_expectations_from_supplied_audit": [
+              "Supported sources resolve deterministically.",
+              "No inappropriate science deletion or unreachable research."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "source_thread_url_request_links_only": [
+              "SCI-RESEARCH-01"
+            ]
+          },
+          {
+            "source_item_id": "T08-I03",
+            "source_test_id": "R-T08-03",
+            "source_thread_id": "T08",
+            "summary": "Cryogenic failure follows an earlier patch suggestion; later F200 success is unscoped.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "CRYOGENIC_UNCONFIRMED; separate F200 success does not identify the fixed symptom",
+            "independent_expectations_from_supplied_audit": [
+              "A pass on F200 cannot close F210.",
+              "Both supported configurations load and retain technology effects."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "source_thread_url_request_links_only": [
+              "SCI-RESEARCH-01"
+            ]
+          },
+          {
+            "source_item_id": "T09-I01",
+            "source_test_id": "R-T09-01",
+            "source_thread_id": "T09",
+            "summary": "Startup stalls scale badly with large recipe graphs.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "MIXED_PROFILE_OUTCOMES",
+            "independent_expectations_from_supplied_audit": [
+              "Each supported profile reaches menu within the chosen release budget.",
+              "No missing research used to obtain a speedup.",
+              "Report incremental MIR cost and per-profile dispersion; no extrapolation from one user percentage."
+            ],
+            "proposed_suite_reference": "S09",
+            "existing_route_group": "performance",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T09-I02",
+            "source_test_id": "R-T09-02",
+            "source_thread_id": "T09",
+            "summary": "Classic path removes productivity; no_lab_compatible_science.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "LATER_USER_SUCCESS; exact fixing build absent",
+            "independent_expectations_from_supplied_audit": [
+              "Real compatible labs admit usable science sets.",
+              "Existing paid research remains represented or explicitly migrated.",
+              "No blanket suppression masquerading as successful load."
+            ],
+            "proposed_suite_reference": "S06",
+            "existing_route_group": "catalogue",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T09-I03",
+            "source_test_id": "R-T09-03",
+            "source_thread_id": "T09",
+            "summary": "Client on_tick registration differs from saved server.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "USER_CONFIRMED_HISTORIC_FIX",
+            "independent_expectations_from_supplied_audit": [
+              "Client reaches play without event mismatch or desync.",
+              "Handler set is deterministic across lifecycle paths."
+            ],
+            "proposed_suite_reference": "S08",
+            "existing_route_group": "multiplayer",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T09-I04",
+            "source_test_id": "R-T09-04",
+            "source_thread_id": "T09",
+            "summary": "DMR scoop science dependency rejected.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "LATER_USER_SUCCESS; exact fixing build absent",
+            "independent_expectations_from_supplied_audit": [
+              "Supported research loads and can be completed in a real compatible lab.",
+              "No stale dependency rejection."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T09-I05",
+            "source_test_id": "R-T09-05",
+            "source_thread_id": "T09",
+            "summary": "Working Robot Speed cap10 permits level11.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "UNRESOLVED_REPORT",
+            "independent_expectations_from_supplied_audit": [
+              "New completion above cap blocked as specified.",
+              "Existing earned effects follow documented preservation policy.",
+              "Queue/reload cannot bypass the cap."
+            ],
+            "proposed_suite_reference": "S05",
+            "existing_route_group": "settings_caps",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T09-I06",
+            "source_test_id": "R-T09-06",
+            "source_thread_id": "T09",
+            "summary": "Make the research browser optional or separate.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "MIXED_REQUEST_AND_AUTHOR_DIAGNOSIS",
+            "independent_expectations_from_supplied_audit": [
+              "Public documentation matches the chosen design.",
+              "An unaccepted request does not become a stable-release blocker."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "proposal-no-new-acceptance-inferred",
+            "scope_note": "A portable Library request does not authorize a separately published browser mod."
+          },
+          {
+            "source_item_id": "T09-I07",
+            "source_test_id": "R-T09-07",
+            "source_thread_id": "T09",
+            "summary": "Factoriopedia recipe copies unnecessarily cached.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "MIXED_REQUEST_AND_AUTHOR_DIAGNOSIS",
+            "independent_expectations_from_supplied_audit": [
+              "No accumulating duplicate cache entries.",
+              "Measured cost is attributed to the correct subsystem."
+            ],
+            "proposed_suite_reference": "S09",
+            "existing_route_group": "performance",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T09-I08",
+            "source_test_id": "R-T09-08",
+            "source_thread_id": "T09",
+            "summary": "Bob plates coverage questioned after research restoration.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "MIXED_REQUEST_AND_AUTHOR_DIAGNOSIS",
+            "independent_expectations_from_supplied_audit": [
+              "Accepted plate coverage is demonstrable.",
+              "Unaccepted expansions remain separately recorded."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "original-request-decision-controls",
+            "semantic_request_links": [
+              {
+                "id": "BA-01",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-02",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-03",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-04",
+                "original_decision": "commit-4.2",
+                "original_status": "withheld-with-exact-environment-evidence",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-05",
+                "original_decision": "commit-4.2",
+                "original_status": "withheld-with-exact-environment-evidence",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-06",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-07",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-08",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-09",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-10",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-11",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-12",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-13",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-14",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-15",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-16",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              }
+            ]
+          },
+          {
+            "source_item_id": "T10-I01",
+            "source_test_id": "R-T10-01",
+            "source_thread_id": "T10",
+            "summary": "K2/SE recipe coverage regressed during optimization.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "SUPPORT_NOT_STABLE_BY_AUTHOR_ACCOUNT",
+            "independent_expectations_from_supplied_audit": [
+              "Promised productivity reaches the intended recipes.",
+              "Missing or excluded support is declared rather than silently described as complete.",
+              "Performance improvements retain accepted coverage."
+            ],
+            "proposed_suite_reference": "S06",
+            "existing_route_group": "catalogue",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T11-I01",
+            "source_test_id": "R-T11-01",
+            "source_thread_id": "T11",
+            "summary": "Finite foreign extension prevents infinite robot cargo.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "PATCH_UNVERIFIED_DUE_STARTUP_STALL",
+            "independent_expectations_from_supplied_audit": [
+              "Infinite continuation starts after the actual foreign terminal level.",
+              "No overwrite, missing continuation or double effect."
+            ],
+            "proposed_suite_reference": "S06",
+            "existing_route_group": "ownership",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T11-I02",
+            "source_test_id": "R-T11-02",
+            "source_thread_id": "T11",
+            "summary": "SE miner productivity research gives no effective gain.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "UNRESOLVED_REPORT",
+            "independent_expectations_from_supplied_audit": [
+              "Actual results match the published per-entity contract.",
+              "Research UI and effective production agree; claimed5% for big/core is verified against current mechanics."
+            ],
+            "proposed_suite_reference": "S06",
+            "existing_route_group": "effects",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T11-I03",
+            "source_test_id": "R-T11-03",
+            "source_thread_id": "T11",
+            "summary": "Should oil pumps receive mining productivity?",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "OPEN_DESIGN_QUESTION",
+            "independent_expectations_from_supplied_audit": [
+              "Accepted scope is explicit; no accidental promise that every extraction entity is covered."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "proposal-no-new-acceptance-inferred"
+          },
+          {
+            "source_item_id": "T11-I04",
+            "source_test_id": "R-T11-04",
+            "source_thread_id": "T11",
+            "summary": "Startup remains stalled for over ten minutes after the4.2.2 suggestion.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "AUTHOR_ACKNOWLEDGED; patch could not be evaluated",
+            "independent_expectations_from_supplied_audit": [
+              "Profile reaches menu within the declared startup budget.",
+              "Robot-cargo preservation and continuation also pass; a speedup cannot discard them."
+            ],
+            "proposed_suite_reference": "S09",
+            "existing_route_group": "performance",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T12-I01",
+            "source_test_id": "R-T12-01",
+            "source_thread_id": "T12",
+            "summary": "Shortcut calls require after control.lua parsing.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "NO_REPLY_OR_FIX_CONFIRMATION",
+            "independent_expectations_from_supplied_audit": [
+              "No runtime require or missing module error.",
+              "Settings/Library UI opens and functions through each lifecycle."
+            ],
+            "proposed_suite_reference": "S08",
+            "existing_route_group": "multiplayer",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T13-I01",
+            "source_test_id": "R-T13-01",
+            "source_thread_id": "T13",
+            "summary": "Update removes all MIR tree entries and risks progress.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "USER_CONFIRMED_HISTORIC_FIX",
+            "independent_expectations_from_supplied_audit": [
+              "No unintended removed-technology notice.",
+              "Paid levels, partial progress, queue and effective bonuses remain correct.",
+              "Retained settings alone do not count as retained research."
+            ],
+            "proposed_suite_reference": "S04",
+            "existing_route_group": "saved_state",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T14-I01",
+            "source_test_id": "R-T14-01",
+            "source_thread_id": "T14",
+            "summary": "SIF leaves unreachable space-pack requirements on speed7.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "USER_CONFIRMED_HISTORIC_FIX",
+            "independent_expectations_from_supplied_audit": [
+              "Unavailable science is never required.",
+              "Supported alternate production routes remain usable.",
+              "Earned bonuses survive policy changes."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "semantic_request_links": [
+              {
+                "id": "SIF-01",
+                "original_decision": "commit-4.2.1",
+                "original_status": "requested-not-qualified",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              }
+            ],
+            "source_thread_url_request_links_only": [
+              "SIF-01"
+            ]
+          },
+          {
+            "source_item_id": "T15-I01",
+            "source_test_id": "R-T15-01",
+            "source_thread_id": "T15",
+            "summary": "Space Age icon referenced without an enabled dependency.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "FALLBACK_PLANNED; no confirmed fix",
+            "independent_expectations_from_supplied_audit": [
+              "Fallback uses accessible graphics without startup failure.",
+              "Preference cannot force an invalid file reference.",
+              "No advice to text-edit binary mod-settings.dat."
+            ],
+            "proposed_suite_reference": "S01",
+            "existing_route_group": "packages",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T16-I01",
+            "source_test_id": "R-T16-01",
+            "source_thread_id": "T16",
+            "summary": "Active breed productivity had no corresponding settings.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "reported_open",
+            "independent_expectations_from_supplied_audit": [
+              "Every promised control is visible and affects the intended family.",
+              "Unavailable or unsupported controls are explicitly documented.",
+              "No unrelated family's settings or earned bonuses change."
+            ],
+            "proposed_suite_reference": "S05",
+            "existing_route_group": "settings_caps",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T16-I02",
+            "source_test_id": "R-T16-02",
+            "source_thread_id": "T16",
+            "summary": "Extend furnace research to Space Exploration's industrial oven.",
+            "source_gate": "accepted_feature",
+            "source_priority": "P2",
+            "source_historical_status": "planned",
+            "independent_expectations_from_supplied_audit": [
+              "Approved furnace bonuses reach the intended industrial oven once.",
+              "No bonus is applied to unrelated machines or excluded recipes."
+            ],
+            "proposed_suite_reference": "S07",
+            "existing_route_group": "effects",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "remaining_specific_endpoint": "Reconcile actual original named mod/port/version and accepted attributes/defaults; generic source/native effect is not this exact integration proof."
+          },
+          {
+            "source_item_id": "T16-I03",
+            "source_test_id": "R-T16-03",
+            "source_thread_id": "T16",
+            "summary": "Cover all three SE flat solar-panel tiers.",
+            "source_gate": "accepted_feature",
+            "source_priority": "P2",
+            "source_historical_status": "planned",
+            "independent_expectations_from_supplied_audit": [
+              "Every approved tier receives the documented multiplier exactly once.",
+              "Surface solar modifiers remain intact."
+            ],
+            "proposed_suite_reference": "S07",
+            "existing_route_group": "effects",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "remaining_specific_endpoint": "Reconcile actual original named mod/port/version and accepted attributes/defaults; generic source/native effect is not this exact integration proof."
+          },
+          {
+            "source_item_id": "T16-I04",
+            "source_test_id": "R-T16-04",
+            "source_thread_id": "T16",
+            "summary": "Include SE accumulators in electricity research.",
+            "source_gate": "accepted_feature",
+            "source_priority": "P2",
+            "source_historical_status": "planned",
+            "independent_expectations_from_supplied_audit": [
+              "Only documented accumulator attributes change.",
+              "Stored energy is not unintentionally lost or created during migration."
+            ],
+            "proposed_suite_reference": "S07",
+            "existing_route_group": "effects",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "remaining_specific_endpoint": "Reconcile actual original named mod/port/version and accepted attributes/defaults; generic source/native effect is not this exact integration proof."
+          },
+          {
+            "source_item_id": "T16-I05",
+            "source_test_id": "R-T16-05",
+            "source_thread_id": "T16",
+            "summary": "Research levels disappeared on loading an existing save.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "acknowledged_unresolved",
+            "independent_expectations_from_supplied_audit": [
+              "Earned progress and applicable bonuses are preserved under the documented migration mapping.",
+              "No level loss, duplicate effects, or manual re-research is required."
+            ],
+            "proposed_suite_reference": "S04",
+            "existing_route_group": "saved_state",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T17-I01",
+            "source_test_id": "R-T17-01",
+            "source_thread_id": "T17",
+            "summary": "Solar Matrix electricity bonus coverage.",
+            "source_gate": "accepted_feature",
+            "source_priority": "P1",
+            "source_historical_status": "fix_claim_unconfirmed",
+            "independent_expectations_from_supplied_audit": [
+              "The documented energy bonus applies consistently and exactly once.",
+              "Other solar output modifiers still compose correctly."
+            ],
+            "proposed_suite_reference": "S07",
+            "existing_route_group": "effects",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "remaining_specific_endpoint": "Reconcile actual original named mod/port/version and accepted attributes/defaults; generic source/native effect is not this exact integration proof."
+          },
+          {
+            "source_item_id": "T17-I02",
+            "source_test_id": "R-T17-02",
+            "source_thread_id": "T17",
+            "summary": "Accumulator V2 electricity bonus coverage.",
+            "source_gate": "accepted_feature",
+            "source_priority": "P1",
+            "source_historical_status": "fix_claim_unconfirmed",
+            "independent_expectations_from_supplied_audit": [
+              "All promised attributes follow the documented formula without double application.",
+              "Disabled behavior matches the approved baseline."
+            ],
+            "proposed_suite_reference": "S07",
+            "existing_route_group": "effects",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "remaining_specific_endpoint": "Reconcile actual original named mod/port/version and accepted attributes/defaults; generic source/native effect is not this exact integration proof."
+          },
+          {
+            "source_item_id": "T18-I01",
+            "source_test_id": "R-T18-01",
+            "source_thread_id": "T18",
+            "summary": "Lignumis collapsed the science-pack requirement set.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "planned_unverified",
+            "independent_expectations_from_supplied_audit": [
+              "The pack set neither collapses to Lignumis-only nor reintroduces intentionally retired packs.",
+              "Every required pack and prerequisite is obtainable on the selected profile."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T19-I01",
+            "source_test_id": "R-T19-01",
+            "source_thread_id": "T19",
+            "summary": "Productivity for sixteen metal/alloy plates.",
+            "source_gate": "accepted_feature",
+            "source_priority": "P2",
+            "source_historical_status": "accepted_unverified",
+            "independent_expectations_from_supplied_audit": [
+              "Every approved plate route receives the intended bonus once.",
+              "Recycling or catalyst loops do not yield unintended net duplication."
+            ],
+            "proposed_suite_reference": "S06",
+            "existing_route_group": "catalogue",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "semantic_request_links": [
+              {
+                "id": "BA-01",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-02",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-03",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-04",
+                "original_decision": "commit-4.2",
+                "original_status": "withheld-with-exact-environment-evidence",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-05",
+                "original_decision": "commit-4.2",
+                "original_status": "withheld-with-exact-environment-evidence",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-06",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-07",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-08",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-09",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-10",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-11",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-12",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-13",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-14",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-15",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "BA-16",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              }
+            ]
+          },
+          {
+            "source_item_id": "T19-I02",
+            "source_test_id": "R-T19-02",
+            "source_thread_id": "T19",
+            "summary": "Tree production support.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "request_only",
+            "independent_expectations_from_supplied_audit": [
+              "If accepted, effects target the documented products and do not create an unintended self-amplifying loop."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "proposal-no-new-acceptance-inferred",
+            "scope_note": "Tree production differs from TREE-01 pollution lifetime; metal-wire variants differ from accepted BA plate identities. Do not merge these by keyword."
+          },
+          {
+            "source_item_id": "T19-I03",
+            "source_test_id": "R-T19-03",
+            "source_thread_id": "T19",
+            "summary": "Bob's ammunition productivity.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "request_only",
+            "independent_expectations_from_supplied_audit": [
+              "Accepted ammunition recipes receive the promised bonus exactly once; excluded recipes are documented."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "proposal-no-new-acceptance-inferred"
+          },
+          {
+            "source_item_id": "T19-I04",
+            "source_test_id": "R-T19-04",
+            "source_thread_id": "T19",
+            "summary": "Plant-life sample productivity.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "request_only",
+            "independent_expectations_from_supplied_audit": [
+              "If accepted, the expected net sample output increases without duplicating catalysts or resetting progress."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "proposal-no-new-acceptance-inferred"
+          },
+          {
+            "source_item_id": "T19-I05",
+            "source_test_id": "R-T19-05",
+            "source_thread_id": "T19",
+            "summary": "Silver, gold and platinum wire productivity.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "request_only",
+            "independent_expectations_from_supplied_audit": [
+              "Accepted wire routes receive one matching effect; copper-wire behavior remains correct."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "proposal-no-new-acceptance-inferred",
+            "scope_note": "Tree production differs from TREE-01 pollution lifetime; metal-wire variants differ from accepted BA plate identities. Do not merge these by keyword."
+          },
+          {
+            "source_item_id": "T19-I06",
+            "source_test_id": "R-T19-06",
+            "source_thread_id": "T19",
+            "summary": "Nitric/hydrochloric/hydrofluoric acid, acid gas, nitroglycerin and liquid glycerol productivity.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "request_only",
+            "independent_expectations_from_supplied_audit": [
+              "If accepted, each target's documented bonus is observable; co-product and catalyst handling follow policy."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "proposal-no-new-acceptance-inferred"
+          },
+          {
+            "source_item_id": "T20-I01",
+            "source_test_id": "R-T20-01",
+            "source_thread_id": "T20",
+            "summary": "Missing __recycler__/sound/recycler/recycler-loop.ogg was attributed upstream.",
+            "source_gate": "evidence_needed",
+            "source_priority": "P1",
+            "source_historical_status": "upstream_attributed",
+            "independent_expectations_from_supplied_audit": [
+              "An upstream-only failure is not recorded as an MIR regression.",
+              "Supported fixed combinations load successfully; unsupported package combinations are identified precisely."
+            ],
+            "proposed_suite_reference": "S11",
+            "existing_route_group": "inputs",
+            "disposition": "original-input-or-scope-investigation"
+          },
+          {
+            "source_item_id": "T20-I02",
+            "source_test_id": "R-T20-02",
+            "source_thread_id": "T20",
+            "summary": "Add quality-recycler to release compatibility checks.",
+            "source_gate": "accepted_feature",
+            "source_priority": "P1",
+            "source_historical_status": "test_promised_no_results",
+            "independent_expectations_from_supplied_audit": [
+              "The supported pair loads, operates and reloads without missing assets or prototype conflicts."
+            ],
+            "proposed_suite_reference": "S11",
+            "existing_route_group": "inputs",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "remaining_specific_endpoint": "Reconcile actual original named mod/port/version and accepted attributes/defaults; generic source/native effect is not this exact integration proof."
+          },
+          {
+            "source_item_id": "T21-I01",
+            "source_test_id": "R-T21-01",
+            "source_thread_id": "T21",
+            "summary": "Overhaul profiles inconsistently hid productivity research.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "planned_unverified",
+            "independent_expectations_from_supplied_audit": [
+              "Supported reachable families remain available; intentional omissions have an explicit documented reason.",
+              "No family vanishes merely because unrelated overhaul recipes or alternate routes exist."
+            ],
+            "proposed_suite_reference": "S06",
+            "existing_route_group": "catalogue",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T21-I02",
+            "source_test_id": "R-T21-02",
+            "source_thread_id": "T21",
+            "summary": "Broad item productivity across K2, SE, BZ, AAI, Bob's and Angel's.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "request_only",
+            "independent_expectations_from_supplied_audit": [
+              "The shipped compatibility claim matches tested, enumerated coverage.",
+              "A broad request is not silently treated as a promise of every possible item/mod combination."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "original-request-decision-controls",
+            "semantic_request_links": [
+              {
+                "id": "ECO-AAI",
+                "original_decision": "active-4.2-intake",
+                "original_status": "requested-not-qualified",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "ECO-BZ",
+                "original_decision": "active-4.2-intake",
+                "original_status": "requested-not-qualified",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "ECO-SE",
+                "original_decision": "active-4.2-intake",
+                "original_status": "requested-not-qualified",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              }
+            ]
+          },
+          {
+            "source_item_id": "T22-I01",
+            "source_test_id": "R-T22-01",
+            "source_thread_id": "T22",
+            "summary": "K2 and K2SO compatibility are separate profiles.",
+            "source_gate": "accepted_feature",
+            "source_priority": "P1",
+            "source_historical_status": "planned_unverified",
+            "independent_expectations_from_supplied_audit": [
+              "Each advertised profile has its own passing evidence and correct catalogue.",
+              "Compatibility is not inferred from the other profile's success."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "source_thread_url_request_links_only": [
+              "K2-01",
+              "K2-02",
+              "K2-03",
+              "K2-04",
+              "K2-05",
+              "K2-06",
+              "K2-07"
+            ]
+          },
+          {
+            "source_item_id": "T22-I02",
+            "source_test_id": "R-T22-02",
+            "source_thread_id": "T22",
+            "summary": "Retire red, green, military and blue packs after K2's space-science boundary.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "planned_unverified",
+            "independent_expectations_from_supplied_audit": [
+              "Late tiers follow the accepted K2/K2SO science policy and remain researchable without retired packs.",
+              "Early tiers keep their intended requirements; no red-only collapse occurs."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "semantic_request_links": [
+              {
+                "id": "K2-01",
+                "original_decision": "commit-4.2",
+                "original_status": "existing-source-fix-with-open-current-environment-and-affected-save-proof",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              }
+            ],
+            "source_thread_url_request_links_only": [
+              "K2-01",
+              "K2-02",
+              "K2-03",
+              "K2-04",
+              "K2-05",
+              "K2-06",
+              "K2-07"
+            ]
+          },
+          {
+            "source_item_id": "T22-I03",
+            "source_test_id": "R-T22-03",
+            "source_thread_id": "T22",
+            "summary": "Rare-metals productivity.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "request_only",
+            "independent_expectations_from_supplied_audit": [
+              "The expected recipe output changes once and survives reload."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "original-request-decision-controls",
+            "semantic_request_links": [
+              {
+                "id": "K2-02",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              }
+            ],
+            "source_thread_url_request_links_only": [
+              "K2-01",
+              "K2-02",
+              "K2-03",
+              "K2-04",
+              "K2-05",
+              "K2-06",
+              "K2-07"
+            ]
+          },
+          {
+            "source_item_id": "T22-I04",
+            "source_test_id": "R-T22-04",
+            "source_thread_id": "T22",
+            "summary": "Immersite productivity while respecting K2SO's existing infinite research.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "request_only",
+            "independent_expectations_from_supplied_audit": [
+              "No duplicate prototype or unintended double bonus is generated.",
+              "Each profile follows the explicit ownership/extension policy."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "original-request-decision-controls",
+            "semantic_request_links": [
+              {
+                "id": "K2-03",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              }
+            ],
+            "source_thread_url_request_links_only": [
+              "K2-01",
+              "K2-02",
+              "K2-03",
+              "K2-04",
+              "K2-05",
+              "K2-06",
+              "K2-07"
+            ]
+          },
+          {
+            "source_item_id": "T22-I05",
+            "source_test_id": "R-T22-05",
+            "source_thread_id": "T22",
+            "summary": "Silicon and glass productivity.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "request_only",
+            "independent_expectations_from_supplied_audit": [
+              "Accepted products receive the specified bonus once without inaccessible research."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "original-request-decision-controls",
+            "semantic_request_links": [
+              {
+                "id": "K2-04",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "K2-05",
+                "original_decision": "commit-4.2",
+                "original_status": "implemented-finite-routes-with-open-qualification",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              }
+            ],
+            "source_thread_url_request_links_only": [
+              "K2-01",
+              "K2-02",
+              "K2-03",
+              "K2-04",
+              "K2-05",
+              "K2-06",
+              "K2-07"
+            ]
+          },
+          {
+            "source_item_id": "T22-I06",
+            "source_test_id": "R-T22-06",
+            "source_thread_id": "T22",
+            "summary": "Black/white tile productivity, shared with concrete or separate.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "request_only",
+            "independent_expectations_from_supplied_audit": [
+              "Both products follow the chosen documented design and receive no duplicate effect."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "original-request-decision-controls",
+            "semantic_request_links": [
+              {
+                "id": "K2-06",
+                "original_decision": "commit-4.2",
+                "original_status": "withheld-with-exact-environment-evidence",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              },
+              {
+                "id": "K2-07",
+                "original_decision": "commit-4.2",
+                "original_status": "withheld-with-exact-environment-evidence",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              }
+            ],
+            "source_thread_url_request_links_only": [
+              "K2-01",
+              "K2-02",
+              "K2-03",
+              "K2-04",
+              "K2-05",
+              "K2-06",
+              "K2-07"
+            ]
+          },
+          {
+            "source_item_id": "T23-I01",
+            "source_test_id": "R-T23-01",
+            "source_thread_id": "T23",
+            "summary": "Dangling recipe reference: kr-copper-cable-from-copper=ore.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "fix_claim_unconfirmed",
+            "independent_expectations_from_supplied_audit": [
+              "No reference remains to a removed recipe.",
+              "Supported replacement routes receive the intended effect and game startup succeeds."
+            ],
+            "proposed_suite_reference": "S03",
+            "existing_route_group": "ownership",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T23-I02",
+            "source_test_id": "R-T23-02",
+            "source_thread_id": "T23",
+            "summary": "K2SO science requirements collapsed to red only.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "repeat_report_unresolved",
+            "independent_expectations_from_supplied_audit": [
+              "Each tier uses its intended pack set rather than a single-pack fallback.",
+              "Fix acceptance requires a native profile result, not the prior promise."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T24-I01",
+            "source_test_id": "R-T24-01",
+            "source_thread_id": "T24",
+            "summary": "Finite caps remained unenforced.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "followup_failure",
+            "independent_expectations_from_supplied_audit": [
+              "Research cannot progress beyond an enforced finite cap through any supported path.",
+              "Settings, displayed limit and effective limit agree.",
+              "Lowering a cap follows the documented earned-bonus preservation policy without silently losing progress."
+            ],
+            "proposed_suite_reference": "S05",
+            "existing_route_group": "settings_caps",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T24-I02",
+            "source_test_id": "R-T24-02",
+            "source_thread_id": "T24",
+            "summary": "Completed capped research vanished or became undiscovered.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "acknowledged_unresolved",
+            "independent_expectations_from_supplied_audit": [
+              "Enabled completed research stays identifiable as completed and does not turn into an unexplained undiscovered entry.",
+              "Bonuses remain correct and are not applied twice.",
+              "Disabled-family visibility matches documented behavior."
+            ],
+            "proposed_suite_reference": "S05",
+            "existing_route_group": "settings_caps",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T24-I03",
+            "source_test_id": "R-T24-03",
+            "source_thread_id": "T24",
+            "summary": "Braking and module research lost level display.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "reported_open",
+            "independent_expectations_from_supplied_audit": [
+              "The next researchable level and completed state are unambiguous.",
+              "Displayed information agrees with native progression and enforcement."
+            ],
+            "proposed_suite_reference": "S05",
+            "existing_route_group": "settings_caps",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T24-I04",
+            "source_test_id": "R-T24-04",
+            "source_thread_id": "T24",
+            "summary": "Wrong edition/version ordering blocked delivery of a fix.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "user_confirmed_delivery_fix_only",
+            "independent_expectations_from_supplied_audit": [
+              "Each package installs in its declared edition and is recognized as the intended update.",
+              "Delivery success does not count as a pass for gameplay cap behavior."
+            ],
+            "proposed_suite_reference": "S01",
+            "existing_route_group": "packages",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T25-I01",
+            "source_test_id": "R-T25-01",
+            "source_thread_id": "T25",
+            "summary": "Configurable linear cost growth was claimed implemented.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "fix_claim_unconfirmed",
+            "independent_expectations_from_supplied_audit": [
+              "In-game displayed and consumed costs match the approved formula.",
+              "All supported settings produce valid engine counts and no discontinuity from level indexing."
+            ],
+            "proposed_suite_reference": "S05",
+            "existing_route_group": "settings_caps",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T25-I02",
+            "source_test_id": "R-T25-02",
+            "source_thread_id": "T25",
+            "summary": "Bulk-setting all research costs.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "investigation_promised",
+            "independent_expectations_from_supplied_audit": [
+              "If implemented, precedence is deterministic, visible and consistent; unrelated settings remain unchanged."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "proposal-no-new-acceptance-inferred"
+          },
+          {
+            "source_item_id": "T25-I03",
+            "source_test_id": "R-T25-03",
+            "source_thread_id": "T25",
+            "summary": "Base cost 2× prerequisite total, increasing 0.5× that total each level.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "investigation_promised",
+            "independent_expectations_from_supplied_audit": [
+              "If accepted, base and slope follow the defined 2S and 0.5S policy with explicit level indexing.",
+              "Shared ancestors are handled consistently rather than accidentally double-counted."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "proposal-no-new-acceptance-inferred",
+            "scope_note": "Requested2S/0.5S ancestor-cost policy is not accepted merely by this audit; no recursive prerequisite-cost solver is reintroduced."
+          },
+          {
+            "source_item_id": "T25-I04",
+            "source_test_id": "R-T25-04",
+            "source_thread_id": "T25",
+            "summary": "Recycler Progression bypassed late science unlocks.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "investigation_promised",
+            "independent_expectations_from_supplied_audit": [
+              "Late research cannot unlock merely through logistics science and recycler tier one when later sciences remain required.",
+              "Legitimate modded recycling-based designs work only through their explicitly supported policy."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T26-I01",
+            "source_test_id": "R-T26-01",
+            "source_thread_id": "T26",
+            "summary": "Alternate Cubium recipes over-gated MIR behind cube-mastery-4.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "user_confirmed_partial_fix",
+            "independent_expectations_from_supplied_audit": [
+              "An optional alternate production route does not force an unrelated late prerequisite.",
+              "Required packs remain producible through approved routes."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T26-I02",
+            "source_test_id": "R-T26-02",
+            "source_thread_id": "T26",
+            "summary": "User attributed false science prerequisites to recycling/self-return routes.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "local_workaround_unreleased",
+            "independent_expectations_from_supplied_audit": [
+              "Self-return cycles cannot substitute for independent science production.",
+              "Any legitimate recycling-based route follows an explicit supported rule rather than a blanket accidental exclusion."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T26-I03",
+            "source_test_id": "R-T26-03",
+            "source_thread_id": "T26",
+            "summary": "User-configurable prerequisite exclusion list.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "considered_not_accepted",
+            "independent_expectations_from_supplied_audit": [
+              "Overrides are deterministic and documented; invalid entries cannot silently remove needed progression or research.",
+              "The goal may be met by explicit compatibility policy instead of dynamic inference."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "proposal-no-new-acceptance-inferred"
+          },
+          {
+            "source_item_id": "T26-I04",
+            "source_test_id": "R-T26-04",
+            "source_thread_id": "T26",
+            "summary": "Cubium independently failed on an obsolete ambient-sound field.",
+            "source_gate": "evidence_needed",
+            "source_priority": "P1",
+            "source_historical_status": "upstream_report_separate",
+            "independent_expectations_from_supplied_audit": [
+              "An independent Cubium loader error is not mislabeled as an MIR regression.",
+              "The intended MIR compatibility test has a valid upstream baseline."
+            ],
+            "proposed_suite_reference": "S11",
+            "existing_route_group": "inputs",
+            "disposition": "original-input-or-scope-investigation"
+          },
+          {
+            "source_item_id": "T27-I01",
+            "source_test_id": "R-T27-01",
+            "source_thread_id": "T27",
+            "summary": "Duplicate gun-speed/tesla effect identity aborted startup.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "fix_claim_unconfirmed",
+            "independent_expectations_from_supplied_audit": [
+              "Valid overlapping contributors do not cause a fatal duplicate-identity rejection.",
+              "Effects neither disappear nor apply twice.",
+              "A synthetic pass remains distinct from an unrecovered original-profile test."
+            ],
+            "proposed_suite_reference": "S03",
+            "existing_route_group": "ownership",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T28-I01",
+            "source_test_id": "R-T28-01",
+            "source_thread_id": "T28",
+            "summary": "Ice productivity unlocked before its only affected recipe.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "acknowledged_unresolved",
+            "independent_expectations_from_supplied_audit": [
+              "The research's unlock and description match the approved usable recipe set.",
+              "Aquilo-only effects are not presented as immediately useful on Nauvis unless explicitly intended."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T28-I02",
+            "source_test_id": "R-T28-02",
+            "source_thread_id": "T28",
+            "summary": "Proposed post-Aquilo split for ice and space platforms needs scope clarification.",
+            "source_gate": "evidence_needed",
+            "source_priority": "P2",
+            "source_historical_status": "ambiguous_design_proposal",
+            "independent_expectations_from_supplied_audit": [
+              "The shipped design is internally consistent and migration preserves earned bonuses.",
+              "An ambiguous historical reply is not silently converted into a broader progression change."
+            ],
+            "proposed_suite_reference": "S12",
+            "existing_route_group": "scope",
+            "disposition": "original-input-or-scope-investigation"
+          },
+          {
+            "source_item_id": "T29-I01",
+            "source_test_id": "R-T29-01",
+            "source_thread_id": "T29",
+            "summary": "Earlier modded-module omission was reported fixed.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "user_reported_fix_without_version",
+            "independent_expectations_from_supplied_audit": [
+              "Previously supported modded modules retain their effect.",
+              "A substitute fixture is not labeled as the user's unrecovered original case."
+            ],
+            "proposed_suite_reference": "S06",
+            "existing_route_group": "catalogue",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T29-I02",
+            "source_test_id": "R-T29-02",
+            "source_thread_id": "T29",
+            "summary": "AdvancedBeltsSA tiers missed productivity effects.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "planned_unverified",
+            "independent_expectations_from_supplied_audit": [
+              "All advertised eligible recipes receive the correct bonus once.",
+              "No tier is omitted because only vanilla identifiers were considered."
+            ],
+            "proposed_suite_reference": "S06",
+            "existing_route_group": "catalogue",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T29-I03",
+            "source_test_id": "R-T29-03",
+            "source_thread_id": "T29",
+            "summary": "Generic coverage for modded belts, modules and inserters.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "request_only",
+            "independent_expectations_from_supplied_audit": [
+              "The chosen extension design covers accepted additions predictably.",
+              "This request does not by itself require restoring MIR 4's automatic compiler."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "proposal-no-new-acceptance-inferred"
+          },
+          {
+            "source_item_id": "T30-I01",
+            "source_test_id": "R-T30-01",
+            "source_thread_id": "T30",
+            "summary": "Upgrade hid discovered planets and connections despite intact surfaces.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "user_confirmed_historical_fix",
+            "independent_expectations_from_supplied_audit": [
+              "Discovered locations/connections remain discovered and usable; undiscovered ones remain appropriately gated.",
+              "Surfaces, players and researched unlocks preserve their identities and state.",
+              "A confirmed 3.2.1 fix is revalidated rather than assumed to carry over to MIR 5."
+            ],
+            "proposed_suite_reference": "S04",
+            "existing_route_group": "saved_state",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T30-I02",
+            "source_test_id": "R-T30-02",
+            "source_thread_id": "T30",
+            "summary": "Lost discovery state stopped platform routes.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "user_confirmed_historical_fix",
+            "independent_expectations_from_supplied_audit": [
+              "Previously valid routes remain executable without editor/alert workarounds.",
+              "Platform state and cargo remain intact and scheduled logistics resume."
+            ],
+            "proposed_suite_reference": "S04",
+            "existing_route_group": "saved_state",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "remaining_specific_endpoint": "Actual normal platform travel with retained platform/cargo/schedule; named unlock/API records do not establish this."
+          },
+          {
+            "source_item_id": "T31-I01",
+            "source_test_id": "R-T31-01",
+            "source_thread_id": "T31",
+            "summary": "Landfill family covers ice and space platforms.",
+            "source_gate": "accepted_feature",
+            "source_priority": "P1",
+            "source_historical_status": "author_claim_unverified",
+            "independent_expectations_from_supplied_audit": [
+              "Each supported recipe receives its documented bonus once.",
+              "No unintended vanilla or external productivity family is duplicated."
+            ],
+            "proposed_suite_reference": "S06",
+            "existing_route_group": "catalogue",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T31-I02",
+            "source_test_id": "R-T31-02",
+            "source_thread_id": "T31",
+            "summary": "Capture-bot rocket productivity exists.",
+            "source_gate": "accepted_feature",
+            "source_priority": "P1",
+            "source_historical_status": "author_claim_unverified",
+            "independent_expectations_from_supplied_audit": [
+              "Family is reachable and the chosen recipes gain the documented effect exactly once."
+            ],
+            "proposed_suite_reference": "S06",
+            "existing_route_group": "catalogue",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T31-I03",
+            "source_test_id": "R-T31-03",
+            "source_thread_id": "T31",
+            "summary": "Breeding includes pentapod eggs.",
+            "source_gate": "accepted_feature",
+            "source_priority": "P1",
+            "source_historical_status": "author_assertion_unverified",
+            "independent_expectations_from_supplied_audit": [
+              "Valid egg recipes receive the intended enabled effect.",
+              "Disabling the family leaves unrelated research and recipes valid."
+            ],
+            "proposed_suite_reference": "S06",
+            "existing_route_group": "catalogue",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T31-I04",
+            "source_test_id": "R-T31-04",
+            "source_thread_id": "T31",
+            "summary": "Nutrient productivity exists.",
+            "source_gate": "accepted_feature",
+            "source_priority": "P1",
+            "source_historical_status": "author_claim_unverified",
+            "independent_expectations_from_supplied_audit": [
+              "Intended variants gain the configured bonus; no double application or missing family."
+            ],
+            "proposed_suite_reference": "S06",
+            "existing_route_group": "catalogue",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T31-I05",
+            "source_test_id": "R-T31-05",
+            "source_thread_id": "T31",
+            "summary": "Inserter capacity default-on; blueprint risk acknowledged.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "historical_default_change_claim",
+            "independent_expectations_from_supplied_audit": [
+              "Defaults match the current approved contract and existing user overrides survive.",
+              "Capacity changes are measurable and disabling remains possible; timing changes are documented rather than hidden."
+            ],
+            "proposed_suite_reference": "S07",
+            "existing_route_group": "effects",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T31-I06",
+            "source_test_id": "R-T31-06",
+            "source_thread_id": "T31",
+            "summary": "Belt stacking deferred/default-off; rendering/stack interaction concerns.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "tentative_deferral",
+            "independent_expectations_from_supplied_audit": [
+              "Supported limits and visible representation agree with documentation.",
+              "No blocked transfers, item loss or misleading enabled setting."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "original-request-decision-controls",
+            "semantic_request_links": [
+              {
+                "id": "STACK-02",
+                "original_decision": "conditional-native-audit-4.2",
+                "original_status": "requested-not-qualified",
+                "relationship": "thematic behavior/scope; not an exact item provenance assertion"
+              }
+            ]
+          },
+          {
+            "source_item_id": "T31-I07",
+            "source_test_id": "R-T31-07",
+            "source_thread_id": "T31",
+            "summary": "Belt-speed research deferred/default-off.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "tentative_deferral",
+            "independent_expectations_from_supplied_audit": [
+              "Published support matches behavior and entity identity changes preserve state."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "proposal-no-new-acceptance-inferred"
+          },
+          {
+            "source_item_id": "T31-I08",
+            "source_test_id": "R-T31-08",
+            "source_thread_id": "T31",
+            "summary": "Follower count described as already vanilla-infinite.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "author_explanation_unverified",
+            "independent_expectations_from_supplied_audit": [
+              "The promised infinite continuation is reachable without duplicate ownership or lost bonuses."
+            ],
+            "proposed_suite_reference": "S07",
+            "existing_route_group": "effects",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T31-I09",
+            "source_test_id": "R-T31-09",
+            "source_thread_id": "T31",
+            "summary": "Spoilage-prevention default enablement was only contemplated.",
+            "source_gate": "evidence_needed",
+            "source_priority": "P2",
+            "source_historical_status": "tentative_plan_no_completion",
+            "independent_expectations_from_supplied_audit": [
+              "Actual behavior follows the documented policy; this tentative reply alone creates no mandatory new feature."
+            ],
+            "proposed_suite_reference": "S12",
+            "existing_route_group": "scope",
+            "disposition": "original-input-or-scope-investigation"
+          },
+          {
+            "source_item_id": "T32-I01",
+            "source_test_id": "R-T32-01",
+            "source_thread_id": "T32",
+            "summary": "Base-game steel productivity omitted.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "edition_fix_claim_not_verified",
+            "independent_expectations_from_supplied_audit": [
+              "Base-only players receive promised steel productivity without requiring DLC.",
+              "Space Age retains one intended owner/effect; upgrades preserve earned bonuses."
+            ],
+            "proposed_suite_reference": "S06",
+            "existing_route_group": "catalogue",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T33-I01",
+            "source_test_id": "R-T33-01",
+            "source_thread_id": "T33",
+            "summary": "Chinese localization incomplete.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "completion_not_established",
+            "independent_expectations_from_supplied_audit": [
+              "Required keys resolve; fallbacks are deliberate and no unknown-key labels appear."
+            ],
+            "proposed_suite_reference": "S10",
+            "existing_route_group": "presentation",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T33-I02",
+            "source_test_id": "R-T33-02",
+            "source_thread_id": "T33",
+            "summary": "Translation contribution path must work without push permission.",
+            "source_gate": "accepted_feature",
+            "source_priority": "P2",
+            "source_historical_status": "guidance_given_no_completion",
+            "independent_expectations_from_supplied_audit": [
+              "A contributor can prepare a valid contribution without owner-level push access."
+            ],
+            "proposed_suite_reference": "S10",
+            "existing_route_group": "presentation",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T34-I01",
+            "source_test_id": "R-T34-01",
+            "source_thread_id": "T34",
+            "summary": "Deleted breeding recipe causes assignID failure.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "historical_fix_reporter_confirmed",
+            "independent_expectations_from_supplied_audit": [
+              "No effect references a missing recipe.",
+              "Valid breeding coverage remains, and disabling one family does not remove unrelated research."
+            ],
+            "proposed_suite_reference": "S03",
+            "existing_route_group": "ownership",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T34-I02",
+            "source_test_id": "R-T34-02",
+            "source_thread_id": "T34",
+            "summary": "Universal automatic mod compatibility was aspirational.",
+            "source_gate": "evidence_needed",
+            "source_priority": "P2",
+            "source_historical_status": "historical_design_goal",
+            "independent_expectations_from_supplied_audit": [
+              "Promises reflect current support; an old aspiration is not treated as proof of universal compatibility."
+            ],
+            "proposed_suite_reference": "S12",
+            "existing_route_group": "scope",
+            "disposition": "original-input-or-scope-investigation"
+          },
+          {
+            "source_item_id": "T35-I01",
+            "source_test_id": "R-T35-01",
+            "source_thread_id": "T35",
+            "summary": "Cross-mod prerequisite cycle blocks startup.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "fix_claim_followed_by_loading_failure",
+            "independent_expectations_from_supplied_audit": [
+              "MIR does not introduce a cycle or reject a valid playable foreign graph merely because an alternative path cycles.",
+              "Supported research is reachable and existing external prerequisites are preserved."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T35-I02",
+            "source_test_id": "R-T35-02",
+            "source_thread_id": "T35",
+            "summary": "Attempted cycle fix replaced crash with 9% stall.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "unresolved_later_failure",
+            "independent_expectations_from_supplied_audit": [
+              "Every supported case reaches the menu within the approved timeout and performance budget.",
+              "No unbounded traversal or silent long stall."
+            ],
+            "proposed_suite_reference": "S09",
+            "existing_route_group": "performance",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T36-I01",
+            "source_test_id": "R-T36-01",
+            "source_thread_id": "T36",
+            "summary": "Disabled science-unlock technology aborts generation.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "historical_fix_reporter_confirmed_version_unknown",
+            "independent_expectations_from_supplied_audit": [
+              "A disabled unlock prototype alone does not invalidate a usable pack.",
+              "Unavailable packs are handled by the documented policy without dangling prerequisites."
+            ],
+            "proposed_suite_reference": "S02",
+            "existing_route_group": "science",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T37-I01",
+            "source_test_id": "R-T37-01",
+            "source_thread_id": "T37",
+            "summary": "Vanilla infinite-family configuration disappeared.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "acknowledged_fix_promised_not_confirmed",
+            "independent_expectations_from_supplied_audit": [
+              "Advertised controls remain visible and affect the intended owner exactly once.",
+              "Default and saved settings survive refactors without removing earned bonuses."
+            ],
+            "proposed_suite_reference": "S05",
+            "existing_route_group": "settings_caps",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T38-I01",
+            "source_test_id": "R-T38-01",
+            "source_thread_id": "T38",
+            "summary": "Duplicate vgal-coal-crushing effect crashes compiler.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "author_fix_claim_unverified",
+            "independent_expectations_from_supplied_audit": [
+              "Valid overlap is reconciled by a documented ownership rule without a startup crash.",
+              "Exactly the intended productivity effect survives; no duplicate or lost recipe."
+            ],
+            "proposed_suite_reference": "S03",
+            "existing_route_group": "ownership",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T39-I01",
+            "source_test_id": "R-T39-01",
+            "source_thread_id": "T39",
+            "summary": "ATAN productivity support; exact recipe scope unclear.",
+            "source_gate": "accepted_feature",
+            "source_priority": "P1",
+            "source_historical_status": "ui_presence_confirmed_effects_unverified",
+            "independent_expectations_from_supplied_audit": [
+              "Supported recipes gain only the intended bonus; a visible option alone is insufficient.",
+              "No missing recipe references, unintended recycling/filter loops or unavailable-science prerequisites."
+            ],
+            "proposed_suite_reference": "S06",
+            "existing_route_group": "catalogue",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T39-I02",
+            "source_test_id": "R-T39-02",
+            "source_thread_id": "T39",
+            "summary": "Better Bot Battery and its 2.0 port supported.",
+            "source_gate": "accepted_feature",
+            "source_priority": "P1",
+            "source_historical_status": "ui_presence_confirmed_effects_unverified",
+            "independent_expectations_from_supplied_audit": [
+              "The supported battery family has one owner and correct effects.",
+              "Matching names across ports do not create duplicate prototypes or reset research."
+            ],
+            "proposed_suite_reference": "S07",
+            "existing_route_group": "effects",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
+            "remaining_specific_endpoint": "Reconcile actual original named mod/port/version and accepted attributes/defaults; generic source/native effect is not this exact integration proof."
+          },
+          {
+            "source_item_id": "T40-I01",
+            "source_test_id": "R-T40-01",
+            "source_thread_id": "T40",
+            "summary": "Circuit productivity deduplication repeatedly failed.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "later_reporter_confirms_visibility_fix",
+            "independent_expectations_from_supplied_audit": [
+              "Each recipe has intended ownership and bonus, with no duplicate or missing family.",
+              "The chosen owner is explicit and full-profile behavior matches unit expectations."
+            ],
+            "proposed_suite_reference": "S03",
+            "existing_route_group": "ownership",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T40-I02",
+            "source_test_id": "R-T40-02",
+            "source_thread_id": "T40",
+            "summary": "Research removal requires progress-preservation proof.",
+            "source_gate": "regression",
+            "source_priority": "P0",
+            "source_historical_status": "derived_guard_from_removal_report_not_reported_loss",
+            "independent_expectations_from_supplied_audit": [
+              "No earned effects or progress silently disappear or multiply.",
+              "Any intended conversion is deterministic and documented; a removal popup is not migration proof."
+            ],
+            "proposed_suite_reference": "S04",
+            "existing_route_group": "saved_state",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T40-I03",
+            "source_test_id": "R-T40-03",
+            "source_thread_id": "T40",
+            "summary": "Global duplicate toggle was contemplated.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "tentative_plan_no_confirmation",
+            "independent_expectations_from_supplied_audit": [
+              "The toggle has documented deterministic ownership/effect behavior without data loss."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "proposal-no-new-acceptance-inferred"
+          },
+          {
+            "source_item_id": "T40-I04",
+            "source_test_id": "R-T40-04",
+            "source_thread_id": "T40",
+            "summary": "MIR described as covering the other mod’s features.",
+            "source_gate": "evidence_needed",
+            "source_priority": "P1",
+            "source_historical_status": "historical_parity_claim",
+            "independent_expectations_from_supplied_audit": [
+              "Any current replacement claim is supported by a complete coverage comparison and a defined migration path."
+            ],
+            "proposed_suite_reference": "S06",
+            "existing_route_group": "catalogue",
+            "disposition": "original-input-or-scope-investigation"
+          },
+          {
+            "source_item_id": "T41-I01",
+            "source_test_id": "R-T41-01",
+            "source_thread_id": "T41",
+            "summary": "Vanilla productivity families were duplicated.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "vanilla_fix_reporter_confirmed",
+            "independent_expectations_from_supplied_audit": [
+              "No redundant infinite family or double productivity, and no lost supported effect."
+            ],
+            "proposed_suite_reference": "S03",
+            "existing_route_group": "ownership",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T41-I02",
+            "source_test_id": "R-T41-02",
+            "source_thread_id": "T41",
+            "summary": "Panglia variant recipes bypassed duplicate handling.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "later_fix_reporter_confirmed_version_unknown",
+            "independent_expectations_from_supplied_audit": [
+              "Every supported variant receives intended productivity once.",
+              "Deduplication preserves nonoverlapping variants, settings and earned effects."
+            ],
+            "proposed_suite_reference": "S03",
+            "existing_route_group": "ownership",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T41-I03",
+            "source_test_id": "R-T41-03",
+            "source_thread_id": "T41",
+            "summary": "Planet fix requires edition-specific backport evidence.",
+            "source_gate": "evidence_needed",
+            "source_priority": "P1",
+            "source_historical_status": "2_1_confirmation_2_0_backport_unconfirmed",
+            "independent_expectations_from_supplied_audit": [
+              "Passing one game branch is not used as evidence for another; unavailable profiles are explicitly recorded."
+            ],
+            "proposed_suite_reference": "S01",
+            "existing_route_group": "packages",
+            "disposition": "original-input-or-scope-investigation"
+          },
+          {
+            "source_item_id": "T42-I01",
+            "source_test_id": "R-T42-01",
+            "source_thread_id": "T42",
+            "summary": "Tesla turret shooting-speed coverage missing.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "author_fix_claim_unverified",
+            "independent_expectations_from_supplied_audit": [
+              "Each intended electric weapon receives its documented effect once.",
+              "Discharge-defense behavior remains correct and unrelated weapons are unchanged."
+            ],
+            "proposed_suite_reference": "S07",
+            "existing_route_group": "effects",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T43-I01",
+            "source_test_id": "R-T43-01",
+            "source_thread_id": "T43",
+            "summary": "Turbo-belt crafting excluded; suggested 1%/level.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "coverage_report_not_retested",
+            "independent_expectations_from_supplied_audit": [
+              "Coverage and configured percentages match the approved specification; the suggested 1% is not assumed accepted."
+            ],
+            "proposed_suite_reference": "S06",
+            "existing_route_group": "catalogue",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T43-I02",
+            "source_test_id": "R-T43-02",
+            "source_thread_id": "T43",
+            "summary": "OCs Ammo and Armor foundry recipes requested.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "broad_update_claim_test_blocked",
+            "independent_expectations_from_supplied_audit": [
+              "Advertised variants receive correct productivity without duplicating existing owners."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "proposal-no-new-acceptance-inferred"
+          },
+          {
+            "source_item_id": "T43-I03",
+            "source_test_id": "R-T43-03",
+            "source_thread_id": "T43",
+            "summary": "OCs Stone Casting recipes requested.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "broad_update_claim_test_blocked",
+            "independent_expectations_from_supplied_audit": [
+              "Promised stone-product recipes receive one correct bonus."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "proposal-no-new-acceptance-inferred"
+          },
+          {
+            "source_item_id": "T43-I04",
+            "source_test_id": "R-T43-04",
+            "source_thread_id": "T43",
+            "summary": "Fluid Quality Imprinting variants requested.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "broad_update_claim_test_blocked",
+            "independent_expectations_from_supplied_audit": [
+              "Promised recipes retain both intended quality and productivity semantics without double bonuses."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "proposal-no-new-acceptance-inferred"
+          },
+          {
+            "source_item_id": "T43-I05",
+            "source_test_id": "R-T43-05",
+            "source_thread_id": "T43",
+            "summary": "Advanced Solar HR tiers requested; suggested 10/5/2/1%.",
+            "source_gate": "optional_request",
+            "source_priority": "P2",
+            "source_historical_status": "broad_update_claim_test_blocked",
+            "independent_expectations_from_supplied_audit": [
+              "Actual tier bonuses match the approved contract; requested rates are not silently treated as a commitment."
+            ],
+            "proposed_suite_reference": null,
+            "existing_route_group": "scope",
+            "disposition": "proposal-no-new-acceptance-inferred",
+            "scope_note": "Requested10/5/2/1percent tier rates are not an accepted Solar Matrix or general solar-rate contract."
+          },
+          {
+            "source_item_id": "T44-I01",
+            "source_test_id": "R-T44-01",
+            "source_thread_id": "T44",
+            "summary": "Research-cost growth must be configurable.",
+            "source_gate": "accepted_feature",
+            "source_priority": "P1",
+            "source_historical_status": "author_claim_unverified",
+            "independent_expectations_from_supplied_audit": [
+              "Costs match the configured formula and are not silently restored to doubling.",
+              "UI, prototype values and saved settings agree."
+            ],
+            "proposed_suite_reference": "S05",
+            "existing_route_group": "settings_caps",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T45-I01",
+            "source_test_id": "R-T45-01",
+            "source_thread_id": "T45",
+            "summary": "Setting-name locale keys unresolved.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "author_repair_acknowledgment_unverified",
+            "independent_expectations_from_supplied_audit": [
+              "No unresolved key labels; migration maps settings without requiring renamed keys to display raw IDs."
+            ],
+            "proposed_suite_reference": "S10",
+            "existing_route_group": "presentation",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          },
+          {
+            "source_item_id": "T45-I02",
+            "source_test_id": "R-T45-02",
+            "source_thread_id": "T45",
+            "summary": "DLC dependency hypothesis was withdrawn.",
+            "source_gate": "regression",
+            "source_priority": "P1",
+            "source_historical_status": "hypothesis_retracted",
+            "independent_expectations_from_supplied_audit": [
+              "Base-only use and localization work according to the advertised dependency contract."
+            ],
+            "proposed_suite_reference": "S01",
+            "existing_route_group": "packages",
+            "disposition": "existing-behavior-obligation-routed-not-newly-qualified"
+          }
+        ],
+        "native_tests_executed": 0,
+        "full_historical_preservation_complete": false,
+        "next": "Use the existing shared native/release queue: original/current normal-display Library comparison and coherent corrected UI; actual finite8 old-provider state/save/cold qualification; then exact-candidate applicable checks, package/docs and delivery review for the12hour next-prerelease target. Broader stable work remains open; no automatic122-case rerun, added reboot programme, beta mod identity or Portal upload."
+      }
     }
   }
 }
