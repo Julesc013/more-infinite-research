@@ -1363,6 +1363,11 @@ end
 
 local function update_research_content(content, player, view, context, translations)
   if not valid(content) then return end
+  -- Availability is a different projection in the same body. Clear it only
+  -- at that boundary; ordinary Research refreshes retain their widgets.
+  if valid(content[PREFIX .. "availability_empty"]) or valid(content[PREFIX .. "availability_1"]) then
+    content.clear()
+  end
 
   local rows = rows_for(player, view, context, translations)
   local item_labels = {}
