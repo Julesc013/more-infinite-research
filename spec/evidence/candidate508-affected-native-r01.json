@@ -1,0 +1,416 @@
+{
+  "schema": 1,
+  "kind": "MIR508AffectedNativeObservationsV1",
+  "status": "bounded-published-finite-upgrade-and-normal-display-library-observed",
+  "observed_source": "c7d24378f6492f622c18bc80fce9e70605585443",
+  "observed_player_tree": "45cf795c47332986ae53cf06701f8fbe90cc89f9",
+  "observed_package": {
+    "version": "5.0.21008",
+    "bytes": 843034,
+    "sha256": "EEF0CE398799946DBB8A240928997C759DC97F3837E93939CB620CDD8E35541E"
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "finite": {
+    "observer_version": "0.3.0",
+    "observer_sha256": "59CC5E792EB216F674C8E32D93E3ADEED1C7CC88F54BA8861ADF89AEB9DC0D82",
+    "native_plan_sha256": "D5D057933F96C849B2F2E432EF75BDFEE2CC3FFE05DEDF590F480854905E7E4C",
+    "native_caller_sha256": "6505A6E795B8ABE54865935ADE6E60EDD6B3EE8EB159CB6DCCDC8BF0D4C2D695",
+    "capture_caller_sha256": "61D5B56DC6EB7111EF1A6CE9DE6486684CB6FB3593CDDA3E69BED3758EACD756",
+    "actual_runs": [
+      {
+        "stage": "source",
+        "result_sha256": "DFB40976DACA99598E88910329F155BE78233F83D06842B6FF8FDBB66B1BAE1F",
+        "caller_sha256": "BA636A322D5DD79EAB621CCADA2BC5A84BA8C1EA0FB3C883DC485B441C8C13B9",
+        "package_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+        "profile_sha256": "F16B64A75CD60D3E158C213A47CA8595CA47B260841F80DF5AF8EE1AEA9C6E1A",
+        "produced_save_sha256": "9F8B4030C9222E06EE6C390C8655F0778D571F6511D2ECEC6CA8521FABD7BEDC",
+        "input_save_sha256": null,
+        "initial": {
+          "source_mir": "4.7.21003",
+          "destination_mir": "4.7.21003",
+          "actual_lab_completions": 1,
+          "cap": 0,
+          "eight_enabled": true,
+          "eight_visible": false,
+          "eight_saved": 0,
+          "next_level": 9,
+          "native_bonus": 1.7999999999999998,
+          "native_bonus_before": 1.2,
+          "current": "research-speed-8",
+          "seven_creator": "mir-fixture-finite-base-extension-level",
+          "eight_creator": "more-infinite-research",
+          "current_progress": 0.42000000000000004,
+          "queue": [
+            "research-speed-8",
+            "automation"
+          ],
+          "paused_progress": 0.27,
+          "foreign7_enabled": false,
+          "on_load_read_only": false
+        },
+        "cold_reloads": [
+          {
+            "save_sha256": "9F8B4030C9222E06EE6C390C8655F0778D571F6511D2ECEC6CA8521FABD7BEDC",
+            "save_byte_identical": true,
+            "status": "passed",
+            "witnesses": {
+              "source_mir": "4.7.21003",
+              "destination_mir": "4.7.21003",
+              "actual_lab_completions": 1,
+              "cap": 0,
+              "eight_enabled": true,
+              "eight_visible": false,
+              "eight_saved": 0,
+              "next_level": 9,
+              "native_bonus": 1.7999999999999998,
+              "native_bonus_before": 1.2,
+              "current": "research-speed-8",
+              "seven_creator": "mir-fixture-finite-base-extension-level",
+              "eight_creator": "more-infinite-research",
+              "current_progress": 0.42000000000000004,
+              "queue": [
+                "research-speed-8",
+                "automation"
+              ],
+              "paused_progress": 0.27,
+              "foreign7_enabled": false,
+              "on_load_read_only": true
+            }
+          },
+          {
+            "save_sha256": "9F8B4030C9222E06EE6C390C8655F0778D571F6511D2ECEC6CA8521FABD7BEDC",
+            "save_byte_identical": true,
+            "status": "passed",
+            "witnesses": {
+              "source_mir": "4.7.21003",
+              "destination_mir": "4.7.21003",
+              "actual_lab_completions": 1,
+              "cap": 0,
+              "eight_enabled": true,
+              "eight_visible": false,
+              "eight_saved": 0,
+              "next_level": 9,
+              "native_bonus": 1.7999999999999998,
+              "native_bonus_before": 1.2,
+              "current": "research-speed-8",
+              "seven_creator": "mir-fixture-finite-base-extension-level",
+              "eight_creator": "more-infinite-research",
+              "current_progress": 0.42000000000000004,
+              "queue": [
+                "research-speed-8",
+                "automation"
+              ],
+              "paused_progress": 0.27,
+              "foreign7_enabled": false,
+              "on_load_read_only": true
+            }
+          }
+        ],
+        "capture_sha256": "438B02AFB3EAF4F86B254A13D0FDD9627C4783091D5EED5C2A855A5C98AF264C",
+        "capture_terminal_sha256": "B2B872AF4776AC49158DBF0DF5E3E8FBE32122D9E19A14472C92B8997B027EEB",
+        "actual_producer": {
+          "active_mods": {
+            "base": "2.1.23",
+            "mir-fixture-finite-base-extension-level": "0.1.0",
+            "mir-fixture-mir5-active-mods-observer": "0.1.0",
+            "more-infinite-research": "4.7.21003",
+            "mir-fixture-native-research-speed-finite": "0.3.0"
+          },
+          "row_present": true,
+          "policy_version": 3,
+          "managed_eight": {
+            "technology": "research-speed-8",
+            "source": "base-continuation",
+            "operation": "emit_base_extension",
+            "setting": "mir-max-level-research-speed",
+            "selected": "infinite",
+            "native_finite_stage": false,
+            "binding_fingerprint": "mir32-a71c8ffd",
+            "policy_transport": "transported-v3",
+            "ownership_kind": "transported-v3",
+            "legacy": false
+          },
+          "seven_history": {
+            "created": "mir-fixture-finite-base-extension-level",
+            "changed": {}
+          },
+          "eight_history": {
+            "created": "more-infinite-research",
+            "changed": {}
+          },
+          "current_marker_present": false,
+          "current_marker": false
+        }
+      },
+      {
+        "stage": "current",
+        "result_sha256": "FEF90BAC3ECD9E2020E09191D1E3054ADAAD047A4FF2C08688ACA25E1223FC19",
+        "caller_sha256": "176A13FA4A0EDA0ADD33F736D17482DD5C63E25FBDE8F48C3BDD17CD63CF7C7C",
+        "package_sha256": "EEF0CE398799946DBB8A240928997C759DC97F3837E93939CB620CDD8E35541E",
+        "profile_sha256": "1B48FCA61271C5DDB3A86A0BE9E7F6C69A7C2A653AC168AF59EDF68D2FD25D71",
+        "produced_save_sha256": "5FBE9409AF9B359A380A53EE623C11AC4A43A8C8248E9CDD959A3C9FB24A5D83",
+        "input_save_sha256": "9F8B4030C9222E06EE6C390C8655F0778D571F6511D2ECEC6CA8521FABD7BEDC",
+        "initial": {
+          "source_mir": "4.7.21003",
+          "destination_mir": "5.0.21008",
+          "actual_lab_completions": 1,
+          "cap": 0,
+          "eight_enabled": true,
+          "eight_visible": false,
+          "eight_saved": 0,
+          "next_level": 9,
+          "native_bonus": 1.7999999999999998,
+          "native_bonus_before": 1.2,
+          "current": "research-speed-8",
+          "seven_creator": "mir-fixture-finite-base-extension-level",
+          "eight_creator": "more-infinite-research",
+          "current_progress": 0.42000000000000004,
+          "queue": [
+            "research-speed-8",
+            "automation"
+          ],
+          "paused_progress": 0.27,
+          "foreign7_enabled": false,
+          "on_load_read_only": false
+        },
+        "cold_reloads": [
+          {
+            "save_sha256": "5FBE9409AF9B359A380A53EE623C11AC4A43A8C8248E9CDD959A3C9FB24A5D83",
+            "save_byte_identical": true,
+            "status": "passed",
+            "witnesses": {
+              "source_mir": "4.7.21003",
+              "destination_mir": "5.0.21008",
+              "actual_lab_completions": 1,
+              "cap": 0,
+              "eight_enabled": true,
+              "eight_visible": false,
+              "eight_saved": 0,
+              "next_level": 9,
+              "native_bonus": 1.7999999999999998,
+              "native_bonus_before": 1.2,
+              "current": "research-speed-8",
+              "seven_creator": "mir-fixture-finite-base-extension-level",
+              "eight_creator": "more-infinite-research",
+              "current_progress": 0.42000000000000004,
+              "queue": [
+                "research-speed-8",
+                "automation"
+              ],
+              "paused_progress": 0.27,
+              "foreign7_enabled": false,
+              "on_load_read_only": true
+            }
+          },
+          {
+            "save_sha256": "5FBE9409AF9B359A380A53EE623C11AC4A43A8C8248E9CDD959A3C9FB24A5D83",
+            "save_byte_identical": true,
+            "status": "passed",
+            "witnesses": {
+              "source_mir": "4.7.21003",
+              "destination_mir": "5.0.21008",
+              "actual_lab_completions": 1,
+              "cap": 0,
+              "eight_enabled": true,
+              "eight_visible": false,
+              "eight_saved": 0,
+              "next_level": 9,
+              "native_bonus": 1.7999999999999998,
+              "native_bonus_before": 1.2,
+              "current": "research-speed-8",
+              "seven_creator": "mir-fixture-finite-base-extension-level",
+              "eight_creator": "more-infinite-research",
+              "current_progress": 0.42000000000000004,
+              "queue": [
+                "research-speed-8",
+                "automation"
+              ],
+              "paused_progress": 0.27,
+              "foreign7_enabled": false,
+              "on_load_read_only": true
+            }
+          }
+        ],
+        "capture_sha256": "8BBA581A5022FFB73D548056BAA2BF85AB226076E517B0E1600DF5386AC2160B",
+        "capture_terminal_sha256": "8B9DE5FAB5F6208182B02B8B17F3B80A8DE75AE574BC5042F469DBA781BA7318",
+        "actual_producer": {
+          "active_mods": {
+            "base": "2.1.23",
+            "mir-fixture-finite-base-extension-level": "0.1.0",
+            "mir-fixture-mir5-active-mods-observer": "0.1.0",
+            "more-infinite-research": "5.0.21008",
+            "mir-fixture-native-research-speed-finite": "0.3.0"
+          },
+          "row_present": true,
+          "policy_version": 3,
+          "managed_eight": {
+            "technology": "research-speed-8",
+            "source": "base-continuation",
+            "operation": "emit_base_extension",
+            "setting": "mir-max-level-research-speed",
+            "selected": "infinite",
+            "native_finite_stage": false,
+            "binding_fingerprint": "mir32-a71c8ffd",
+            "policy_transport": "transported-v3",
+            "ownership_kind": "transported-v3",
+            "legacy": false
+          },
+          "seven_history": {
+            "created": "mir-fixture-finite-base-extension-level",
+            "changed": {}
+          },
+          "eight_history": {
+            "created": "more-infinite-research",
+            "changed": {}
+          },
+          "current_marker_present": true,
+          "current_marker": {
+            "schema": 1,
+            "technology": "research-speed-8",
+            "predecessor": "research-speed-7",
+            "provider": "mir-fixture-finite-base-extension-level"
+          }
+        }
+      }
+    ],
+    "prior_components": "spec/evidence/native-research-speed-finite-ownership-r01.json",
+    "applicability": "Observer0.3 changes only mod version and expected MIR successor version from0.2. The actual published source and current package were executed separately. Earlier fresh/refusal/cap/uncap controls retain their original13f inputs; the eight finite player source files remain byte-identical. This does not create final8 executions for those earlier controls.",
+    "custody": "https://github.com/Julesc013/scratchpad/tree/6876e97b72b3b00a64ab03837d1198d75f516b2d/projects/mir/runs/candidate508-finite-final-r01",
+    "raw_files": 237,
+    "raw_bytes": 12572982
+  },
+  "library": {
+    "plan_sha256": "27F6D4AB55E3934ADEC0A850D12805EAA6ED7104ADF50576103052C3B0D53DF6",
+    "visible_sequence": [
+      "dismiss intro",
+      "open Research Library",
+      "Queue",
+      "Settings",
+      "Debug",
+      "Research return",
+      "close Library",
+      "Escape to pause menu",
+      "Exit and confirm quit without saving",
+      "main menu Exit"
+    ],
+    "frame_bounds": {
+      "bottom": 1199,
+      "top": 120,
+      "left": 640,
+      "right": 1919
+    },
+    "tab_bounds": {
+      "Settings": {
+        "left": 880,
+        "right": 983
+      },
+      "Debug": {
+        "left": 984,
+        "right": 1089
+      },
+      "Queue": {
+        "left": 775,
+        "right": 879
+      },
+      "top": 187,
+      "bottom": 230,
+      "Research": {
+        "left": 671,
+        "right": 774
+      }
+    },
+    "owner": {
+      "status": "native-process-completed-ui-verdict-separate",
+      "mode": "native",
+      "native_exit_code": 0,
+      "timed_out": false,
+      "duration_seconds": 389.628647,
+      "peak_sampled_private_bytes": 2645606400,
+      "factorio_zero": true,
+      "original_library_restored": true,
+      "release_qualification": false
+    },
+    "images": [
+      {
+        "file": "01-library-research.png",
+        "observed_tab": "Research",
+        "source_capture": "D:/Projects/Factorio/.task-builds/release-508-r01/build/tmp/candidate508-library-functional-r02/captures/library-open/capture.png",
+        "bytes": 2971013,
+        "sha256": "6BD4E2AADEDB6695E0D9944E2AEA4905498F79B6F8BA681FFE66A235B4A30BFC"
+      },
+      {
+        "file": "02-library-queue.png",
+        "observed_tab": "Queue",
+        "source_capture": "D:/Projects/Factorio/.task-builds/release-508-r01/build/tmp/candidate508-library-functional-r02/captures/queue/capture.png",
+        "bytes": 3387166,
+        "sha256": "9B8BE28A1E17BD87856A2BCC369021D225127C41C34707174A4B97AAB0C92234"
+      },
+      {
+        "file": "03-library-settings.png",
+        "observed_tab": "Settings",
+        "source_capture": "D:/Projects/Factorio/.task-builds/release-508-r01/build/tmp/candidate508-library-functional-r02/captures/settings/capture.png",
+        "bytes": 3024705,
+        "sha256": "8DF13C8D503BF8CD8DD4330753B3316AC7197DA0C5F7347D054CD51F1B0BBA90"
+      },
+      {
+        "file": "04-library-debug.png",
+        "observed_tab": "Debug",
+        "source_capture": "D:/Projects/Factorio/.task-builds/release-508-r01/build/tmp/candidate508-library-functional-r02/captures/debug/capture.png",
+        "bytes": 2946957,
+        "sha256": "FED2ADBB925D4715C68C8FA0EFA717BE368AD2D0809A7F6FD7D40047B192DB57"
+      },
+      {
+        "file": "05-library-research-return.png",
+        "observed_tab": "Research return",
+        "source_capture": "D:/Projects/Factorio/.task-builds/release-508-r01/build/tmp/candidate508-library-functional-r02/captures/research-return/capture.png",
+        "bytes": 2980368,
+        "sha256": "3FA4C4612250EC9FFC73612D59303125ACC5DF819DD8E5271A1811F74CD3EFE9"
+      }
+    ],
+    "observations": [
+      "Research, Queue, Settings and Debug highlight their intended tab; title, frame and tab positions stay fixed; returning to Research retains the selected Advanced circuit row.",
+      "A separate r01 session on the same package observed focused gear search, finite exclusion to zero results and infinite inclusion with query retained, plus a real diagnostics/settings export. Its owner timed out after these actions; it is not a normal-exit pass."
+    ],
+    "custody": "https://github.com/Julesc013/scratchpad/tree/128b0402c0fd914adfaf2f336e0ed3c8169afa2a/projects/mir/runs/candidate508-library-short-r02",
+    "raw_files": 109,
+    "raw_bytes": 51799301,
+    "limits": [
+      "One exact Factorio 2.1.23 client and this protected source7-era fixture only.",
+      "Short visible tab navigation and natural exit only; no search, export, resize, detail, filter, performance, multiplayer, or stable acceptance claim.",
+      "Owner native duration is reported as measured, including that it exceeded the requested five-minute target."
+    ],
+    "actual_full_export": {
+      "bytes": 6493,
+      "sha256": "D7CD347AA6666910157775B8048F4AD9248FDCDABE6C7BEDD571B409E354CA6F",
+      "decoded_bytes": 43193,
+      "decoded_sha256": "63F4FBF3E23FD463D50E38B4B5D99AF3FA3F4E4898F52A06E2767CFBC8739E9D",
+      "settings_count": 888,
+      "kind": "mir-settings-profile",
+      "schema": 1,
+      "codec": "canonical-json-deflate-base64",
+      "false_settings": 10,
+      "zero_settings": 245
+    },
+    "adverse_originals": {
+      "files": 160,
+      "bytes": 70359436,
+      "inventory_sha256": "827BBCE47BA7DF95F0817382324F138F271D35A990686F2E28553F3E08C6BDEE"
+    },
+    "actions_custody": "https://github.com/Julesc013/scratchpad/tree/cce5d133d18141c40768a6d648793638e32c2236/projects/mir/runs/candidate508-library-actions-r01"
+  },
+  "preserved_adverse": [
+    "Initial finite storage capture r01 used TCP to choose its game UDP port and failed with native bind10013 before hosting. Original failed output/controller remain; new r02 uses actual UDP selection and independently passes source/current read-only capture.",
+    "Library r01 initially refused before input because its actor locator named a different checkout. A new action plan changes only the locator to byte-identical code within the owned checkout; original launch plan/actor refusal remain.",
+    "Library r01 later exceeded the unchanged1200-second owner deadline. Captures and actual exports retain their positive bounded observations, while timeout remains adverse. Separate r02 exits naturally0 in389.628647seconds; the intended five-minute scheduling target was exceeded."
+  ],
+  "limits": [
+    "One exact Base2.1.23 finite-provider profile, not all providers or Factorio2.0 old finite history.",
+    "Normal English display and this protected public7-era fixture; narrow/layout/locales, saved views/clients, import/export completeness, personal state and Discovery Tree still require their named acceptance.",
+    "Private fixture results qualify only these components. No whole-product performance, complete modpack or stable release verdict. Later player changes require explicit consumed-input applicability review."
+  ],
+  "stable_qualification": false,
+  "release_publication": false
+}
