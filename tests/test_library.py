@@ -9,6 +9,36 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_returning_from_availability_removes_its_projection_before_research(self):
+        self.lua.execute('''
+          for _,width in ipairs{592,528} do
+          for _,empty in ipairs{false,true} do
+            boot()
+            require("presentation.availability").rows=function()
+              return empty and {} or {{family="research_gears",reason="requires-space-age"}}
+            end
+            library.open(player)
+            storage.mir_library.players[1].geometry={width=width,height=480}
+            local root=library.open(player,{tab="research",visibility=3})
+            local body=research_content(root)
+            local name=empty and "mir_library_availability_empty" or "mir_library_availability_1"
+            local old=body[name]
+            assert(old and old.valid)
+            local visibility=research_filters(root).mir_library_visibility
+            visibility.selected_index=1
+            library.on_gui_selection_state_changed({player_index=1,element=visibility})
+            assert(not old.valid and body[name]==nil,
+              "Availability labels must not survive into the ordinary Research grid")
+            assert(body.mir_library_results.valid and body.mir_library_detail.valid)
+            -- Repair a retained body produced by the intermediate mixed-layout draft.
+            local orphan=body.add{type="label",name="mir_library_availability_1",caption="old projection"}
+            library.open(player)
+            assert(not orphan.valid and body.mir_library_availability_1==nil)
+            assert(body.mir_library_results.valid and body.mir_library_detail.valid)
+          end
+          end
+        ''')
+
     def test_explicit_resize_does_not_read_the_clicked_element_after_layout_rebuild(self):
         self.lua.execute('''
           boot()
