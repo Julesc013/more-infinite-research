@@ -315,7 +315,7 @@ local function report()
     imported_earnings=true,fixture_seeds_credit=false,load_observed=loaded_restart,
     en_geometry=s.en_index and geometry(game.get_player(s.en_index)) or nil,
     de_geometry=s.de_index and geometry(game.get_player(s.de_index)) or nil,
-    original_preservation_fixture_required=true,performance_acceptance=false,release_qualification=false}
+    original_preservation_fixture_required=not HELPER_FREE_INPUT,performance_acceptance=false,release_qualification=false}
 end
 local function phase(expected)
   local s=state();if s.phase~=expected then fail("step out of order: "..s.phase.." expected "..expected) end

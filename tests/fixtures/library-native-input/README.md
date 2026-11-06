@@ -5,7 +5,7 @@ applies_to: "Exact MIR1.1 completed F200/F210 Base successor copies"
 audience: developer
 doc_type: test-fixture
 owner: mir-maintainers
-last_reviewed: 2026-10-31
+last_reviewed: 2026-11-06
 supersedes: []
 superseded_by: []
 ---
@@ -97,7 +97,7 @@ After independent review and exact native-process/window binding, the governed p
 
 This is prepared public code, not a dispatched native assignment. The native execution owner must still bind/review the private caller, exact five-mod profiles, protected source/corrected historical fixture members, actual archive hashes, desktop points, ordered actor/readback commands, closed-save custody, clients-first teardown and restoration before executing. The generic first-upgrade production or fresh0.3/0.4 multiplayer witness readers are not claimed compatible with this separate five-join imported/input protocol. Stop at the first missing input, identity/geometry/phase/event/view/native-state mismatch; retain the original receipt and unmodified input, and diagnose fixture versus product before correcting anything. No silent assertion relaxation, programmatic Esc/E substitute, favorable retries or pre-existing player removal is allowed.
 
-The `info-input-current-f200.json` and `info-input-current-f210.json` variants bind this same0.3.4 observer to published MIR5.0.7 on Factorio2.0.77 and2.1.23. Pair them with the corresponding `info-*-source-defaults-current.json` historical-fixture metadata. Only these exact candidate/engine tuples are newly admitted; the31-row catalogue, imported rights, event/private-query/slot/phase assertions and original metadata/profile histories stay unchanged. Derive fresh hash-bound run inputs and use the existing caller; this binding and its host controls are not native acceptance.
+At [frozen source7df0ab82](https://github.com/Julesc013/more-infinite-research/tree/7df0ab82a327d712234ee948c3ff10cf563713cf/tests/fixtures/library-native-input), the `info-input-current-f200.json` and `info-input-current-f210.json` variants bound observer0.3.4 to MIR5.0.7 with the corresponding `info-*-source-defaults-current.json` historical-controller metadata. Preserve that source and its failed native input attempts under their original identities. Current0.3.5 files use the helper-free inputs described above; do not combine them with the old controller. Neither preparation is a native acceptance result.
 
 Host controls use native-shaped doubles and deliberately injected missing events, replaced query objects, wrong native effects/queues, lost focus, incomplete waits, failed removal and cold-view loss. They prove observer rejection and readonly callback behavior, not actual desktop input. Actual imported cannon earnings from MIR1.2, a predecessor-selected private research row, native private-queue insertion, comparative performance and universal leak/memory claims remain outside this fixture.
 

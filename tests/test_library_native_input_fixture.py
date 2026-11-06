@@ -1073,6 +1073,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                                      ("delivered", 5, 48))
                     self.assertTrue(final["imported_earnings"])
                     self.assertFalse(final["fixture_seeds_credit"])
+                    self.assertTrue(final["original_preservation_fixture_required"])
                     if opponent:
                         self.assertEqual(final["removed_index"], final["de_index"])
             for opponent in ("missing-click-event", "removal-no-event", "replacement-index-reuses-en",
@@ -1144,6 +1145,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                                       result["final"]["private_queries"]), ("delivered", 5, 48))
                     self.assertEqual(result["resets"], 2)
                     self.assertFalse(result["final"]["fixture_seeds_credit"])
+                    self.assertFalse(result["final"]["original_preservation_fixture_required"])
 
     def test_helperfree_input_rejects_wrong_inputs_and_lost_paid_or_foreign_state(self):
         for target, version in (("f200", "5.0.20007"), ("f210", "5.0.21007")):
