@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 import unittest
 
+from historical_sources import read_published_source
 from native_credit_oracle import (
     NATIVE_FAMILY_RECIPES,
     captured_public_productivity_recipes,
@@ -698,6 +699,95 @@ class GeneratorTests(unittest.TestCase):
             end
           end
           assert(#space_declared == 76 and owners == 5)
+        ''')
+
+    def test_electric_energy_preserves_published_manufacturing_tiers_and_not_entity_output(self):
+        # T16/T17 ask to extend the existing manufacturing research. The
+        # supplied discussion audit's physical-power/storage proposals are
+        # not its oracle. Published4.7.2/4.7.3 share this exact authored blob.
+        original = read_published_source(ROOT,
+            "source/prototypes/streams/productivity.lua",
+            "EA66B64C03943A99B877847FD6E3903A099C83AB0333A441A29957C1C2142853").decode()
+        literal = self.lua.eval("function(text) return text:match('research_electric_energy%s*=%s*(%b{})') end")(original)
+        self.assertIsNotNone(literal)
+        # Execute only the finite literal, never the historical stream loader.
+        self.lua.execute("historical_energy = " + literal)
+        self.lua.execute(r'''
+          local extension = require("research.product_target_extension")
+          for _, space_age in ipairs({false,true}) do
+            for _, percent in ipairs({.10,.22}) do
+              local active={base="2.1.23"}
+              if space_age then active["space-age"]="2.1.23" end
+              local selection=modern_catalogue.select(active)
+              local supplied=defaults()
+              supplied["ips-effect-per-level-research_electric_energy"]={value=percent*100}
+              local values=config.resolve(supplied)
+              assert(values.streams.research_electric_energy.effect_percent==percent*100,
+                "the retained effect setting did not reach the family")
+              local energy
+              for _, row in ipairs(modern.technologies(selection,values)) do
+                if row.name=="recipe-prod-research_electric_energy-1" then energy=row end
+              end
+              assert(energy,"authored manufacturing family disappeared")
+              local expected,recipes,items={}, {}, {}
+              local panels,accumulators={},{}
+              for _,group in ipairs(historical_energy.groups) do
+                for _,name in ipairs(group.items) do
+                  expected[name]=group.change*(percent/.10)
+                  recipes[name]={enabled=true,ingredients={{"iron-plate",1}},
+                    results={{type="item",name=name,amount=1}}}
+                  items[name]={}
+                  if name:find("accumulator",1,true) then
+                    accumulators[name]={energy_source={buffer_capacity="5MJ",input_flow_limit="300kW",output_flow_limit="300kW"}}
+                  else panels[name]={production="60kW"} end
+                end
+              end
+              -- A differently named manufacturing recipe is still covered;
+              -- item/product identity, rather than recipe-name coincidence,
+              -- is the original extension contract.
+              recipes["alternate-matrix-crafting"]={enabled=true,ingredients={{"iron-plate",2}},
+                results={{type="item",name="solar-matrix",amount=1}}}
+              expected["alternate-matrix-crafting"]=.05*(percent/.10)
+              local raw={recipe=recipes,item=items,["solar-panel"]=panels,accumulator=accumulators}
+              extension.extend({energy},values,{raw=raw,mods=active})
+              local function check(effects)
+                local seen,count={},0
+                for _,effect in ipairs(effects) do
+                  assert(effect.type=="change-recipe-productivity","manufacturing research changed a different effect")
+                  assert(expected[effect.recipe] and not seen[effect.recipe],"unexpected or duplicate recipe effect")
+                  assert(math.abs(effect.change-expected[effect.recipe])<1e-12,
+                    "published tier amount changed: "..effect.recipe.." actual="..tostring(effect.change)
+                      .." expected="..tostring(expected[effect.recipe]))
+                  seen[effect.recipe],count=true,count+1
+                end
+                assert(count==16,"an authored product tier was dropped")
+                for name in pairs(expected) do assert(seen[name],"missing manufacturing recipe: "..name) end
+              end
+              check(energy.effects)
+              for _,prototype in pairs(panels) do assert(prototype.production=="60kW") end
+              for _,prototype in pairs(accumulators) do
+                assert(prototype.energy_source.buffer_capacity=="5MJ"
+                  and prototype.energy_source.input_flow_limit=="300kW"
+                  and prototype.energy_source.output_flow_limit=="300kW")
+              end
+              -- Negative controls reject the proposed full-rate replacement,
+              -- omission of the third SE tier and a duplicate Matrix effect.
+              local first,last
+              for i,e in ipairs(energy.effects) do
+                if e.recipe=="solar-matrix" then first=i end
+                if e.recipe=="se-space-solar-panel-3" then last=i end
+              end
+              assert(first and last)
+              local saved=energy.effects[first].change
+              energy.effects[first].change=percent
+              assert(not pcall(check,energy.effects));energy.effects[first].change=saved
+              local removed=table.remove(energy.effects,last)
+              assert(not pcall(check,energy.effects));table.insert(energy.effects,last,removed)
+              energy.effects[#energy.effects+1]=energy.effects[first]
+              assert(not pcall(check,energy.effects));energy.effects[#energy.effects]=nil
+              check(energy.effects)
+            end
+          end
         ''')
 
     def test_mining_effects_preserve_published_denial_policy_without_granting_recipe_permissions(self):
