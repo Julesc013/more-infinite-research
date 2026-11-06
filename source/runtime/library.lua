@@ -13,6 +13,7 @@ local effective_configuration = require("runtime.configuration")
 local profile_codec = require("research.settings_profile")
 local library_model = require("presentation.library_model")
 local library_layout = require("presentation.library_layout")
+local library_effects = require("presentation.library_effects")
 local library_localization = require("presentation.library_localization")
 local availability = require("presentation.availability")
 local target = require("platform.target")
@@ -1163,8 +1164,9 @@ local function detail_lines(parent, row, detail, player)
 
   local technology = known_technology(player, row.id)
   if technology then
-    add(parent, {type = "sprite", name = PREFIX .. "detail_icon", sprite = "technology/" .. row.id,
+    local icon = add(parent, {type = "sprite", name = PREFIX .. "detail_icon", sprite = "technology/" .. row.id,
       tooltip = technology.localised_name})
+    if icon.style then icon.style.width, icon.style.height = 48, 48 end
   end
   local title = add(parent, {type = "label", name = PREFIX .. "detail_title", caption = caption(row, player)})
   if title.style then title.style.font = "default-large-bold" end
@@ -1172,6 +1174,57 @@ local function detail_lines(parent, row, detail, player)
   local family_name = family_caption(family, {[family] = native_technology_name(player, row.id)})
   local family_label = add(parent, {type = "label", name = PREFIX .. "detail_family", caption = {"mir-browser.family", family_name}})
   if family_label.style then family_label.style.font = "default-semibold" end
+  local benefits_heading = add(parent, {type = "label", name = PREFIX .. "detail_benefits", caption = {"mir-browser.benefits"}})
+  if benefits_heading.style then benefits_heading.style.font = "default-bold" end
+  if technology then
+    local ok, description = pcall(function() return technology.localised_description end)
+    if ok and description ~= nil and description ~= "" then
+      add(parent, {type = "label", name = PREFIX .. "detail_description", caption = description})
+    end
+  end
+  local other_effects = type(detail) == "table" and detail.effects_complete == false
+  local productivity_changes = {}
+  local effects = type(detail) == "table" and type(detail.effects) == "table" and detail.effects or {}
+  for index, effect in ipairs(effects) do
+    local text_value = library_effects.caption(effect)
+    if text_value then
+      local change = type(effect) == "table" and effect.type == "change-recipe-productivity" and effect.change or nil
+      if change == nil or not productivity_changes[change] then
+        add(parent, {type = "label", name = PREFIX .. "effect_" .. index, caption = text_value})
+      end
+      if change ~= nil then productivity_changes[change] = true end
+    elseif type(effect) ~= "table" or effect.type ~= "unlock-recipe" then
+      other_effects = true
+    end
+  end
+  if other_effects then
+    add(parent, {type = "label", name = PREFIX .. "other_effects", caption = {"mir-browser.effect-native-details"}})
+  end
+  add_recipe_benefits(parent, detail)
+  local recipe_rows = affected_recipe_rows(player, detail)
+  if #recipe_rows > 0 then
+    local recipe_heading = add(parent, {type = "label", name = PREFIX .. "detail_affected_recipes",
+      caption = {"mir-browser.affected-recipes"}})
+    if recipe_heading.style then recipe_heading.style.font = "default-bold" end
+    local items = {}
+    for index, recipe in ipairs(recipe_rows) do
+      items[index] = {"", "[img=recipe/" .. recipe.id .. "] ", recipe.name}
+    end
+    local recipe_navigation = type(player.open_factoriopedia_gui) == "function"
+    local recipe_hint = recipe_navigation and "mir-browser.recipe-select-hint" or "mir-browser.recipe-list-only-hint"
+    local list = add(parent, {type = "list-box", name = PREFIX .. "recipe_list", items = items,
+      selected_index = 0, tooltip = {recipe_hint}})
+    if list.style then
+      list.style.width = parent.style and parent.style.maximal_width or 560
+      list.style.height = math.min(196, math.max(72, #items * 28))
+    end
+    if not recipe_navigation then
+      add(parent, {type = "label", name = PREFIX .. "recipe_hint", caption = {recipe_hint}})
+    end
+  end
+  local requirements_heading = add(parent, {type = "label", name = PREFIX .. "detail_requirements",
+    caption = {"mir-browser.research-requirements"}})
+  if requirements_heading.style then requirements_heading.style.font = "default-bold" end
   local context = add(parent, {type = "flow", name = PREFIX .. "detail_context", direction = "vertical"})
   local status_key = {
     ready = "mir-browser.status-ready",
@@ -1227,47 +1280,6 @@ local function detail_lines(parent, row, detail, player)
     for index, prerequisite in ipairs(detail.prerequisites) do
       add(parent, {type = "label", name = PREFIX .. "prerequisite_" .. index,
         caption = native_technology_name(player, prerequisite) or tostring(prerequisite)})
-    end
-  end
-  if type(detail) == "table" and type(detail.effects) == "table" and #detail.effects > 0 then
-    local benefits_heading = add(parent, {type = "label", name = PREFIX .. "detail_benefits", caption = {"mir-browser.benefits"}})
-    if benefits_heading.style then benefits_heading.style.font = "default-bold" end
-    for index, effect in ipairs(detail.effects) do
-      local effect_type = type(effect) == "table" and effect.type or effect
-      local change = type(effect) == "table" and (effect.change or effect.modifier) or nil
-      local text_value = tostring(effect_type or "")
-      if effect_type == "change-recipe-productivity" and type(change) == "number" then
-        text_value = {"mir-browser.productivity-increment", string.format("%.6g", change * 100)}
-      elseif change ~= nil then
-        text_value = text_value .. " " .. tostring(change)
-        if type(effect) == "table" and effect.ammo_category then text_value = text_value .. " " .. effect.ammo_category end
-        if type(effect) == "table" and effect.turret_id then text_value = text_value .. " " .. effect.turret_id end
-      elseif type(effect) == "table" and effect.recipe then
-        text_value = text_value .. " " .. effect.recipe
-      end
-      add(parent, {type = "label", name = PREFIX .. "effect_" .. index, caption = text_value})
-    end
-  end
-  add_recipe_benefits(parent, detail)
-  local recipe_rows = affected_recipe_rows(player, detail)
-  if #recipe_rows > 0 then
-    local recipe_heading = add(parent, {type = "label", name = PREFIX .. "detail_affected_recipes",
-      caption = {"mir-browser.affected-recipes"}})
-    if recipe_heading.style then recipe_heading.style.font = "default-bold" end
-    local items = {}
-    for index, recipe in ipairs(recipe_rows) do
-      items[index] = {"", "[img=recipe/" .. recipe.id .. "] ", recipe.name}
-    end
-    local recipe_navigation = type(player.open_factoriopedia_gui) == "function"
-    local recipe_hint = recipe_navigation and "mir-browser.recipe-select-hint" or "mir-browser.recipe-list-only-hint"
-    local list = add(parent, {type = "list-box", name = PREFIX .. "recipe_list", items = items,
-      selected_index = 0, tooltip = {recipe_hint}})
-    if list.style then
-      list.style.width = parent.style and parent.style.maximal_width or 560
-      list.style.height = math.min(196, math.max(72, #items * 28))
-    end
-    if not recipe_navigation then
-      add(parent, {type = "label", name = PREFIX .. "recipe_hint", caption = {recipe_hint}})
     end
   end
   if type(detail) == "table" and type(detail.cost) == "table"

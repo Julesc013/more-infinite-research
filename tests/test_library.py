@@ -9,6 +9,56 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_research_details_present_localized_benefits_before_requirements(self):
+        self.lua.execute('''
+          boot()
+          gear.localised_description={"technology-description.research-speed"}
+          local scripted={"modifier-description.more-infinite-research.agricultural_growth_speed","10"}
+          local model=require("presentation.library_model")
+          model.detail=function()
+            return {effects_complete=true,effects={
+              {type="laboratory-speed",modifier=.6},
+              {type="worker-robot-storage",modifier=1},
+              {type="nothing",effect_description=scripted},
+              {type="change-recipe-productivity",recipe="gears",change=.1},
+              {type="change-recipe-productivity",recipe="iron",change=.1}},
+              cost={count=100,time=30,ingredients={{name="automation-science-pack",amount=1}}}}
+          end
+          local root=library.open(player,{selected=gear.name})
+          local detail=research_content(root).mir_library_detail
+          local position={}
+          for index,child in ipairs(detail._children) do position[child.name]=index end
+          assert(detail.mir_library_detail_benefits and detail.mir_library_detail_requirements,
+            "Benefit and Research requirements must be clear sections")
+          assert(position.mir_library_detail_benefits < position.mir_library_effect_1
+            and position.mir_library_effect_1 < position.mir_library_detail_requirements
+            and position.mir_library_detail_requirements < position.mir_library_detail_cost,
+            "show what research improves before its requirements")
+          assert(detail.mir_library_detail_description.caption==gear.localised_description)
+          assert(detail.mir_library_detail_icon.style.minimal_width==48
+            and detail.mir_library_detail_icon.style.minimal_height==48)
+          local speed=detail.mir_library_effect_1.caption
+          assert(speed[2][1]=="gui-bonus.laboratory-speed" and speed[4]=="+60%")
+          assert(detail.mir_library_effect_2.caption[4]=="+1")
+          assert(detail.mir_library_effect_3.caption==scripted)
+          assert(detail.mir_library_effect_4.caption[1]=="mir-browser.productivity-increment"
+            and detail.mir_library_effect_5==nil,"identical per-recipe gains repeat the same fact")
+          assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
+        ''')
+
+    def test_unsupported_effects_link_to_native_facts_without_raw_type_or_invented_numbers(self):
+        self.lua.execute('''
+          boot()
+          local model=require("presentation.library_model")
+          model.detail=function() return {effects={{type="future-foreign-effect",modifier=12345}}} end
+          local root=library.open(player,{selected=gear.name})
+          local detail=research_content(root).mir_library_detail
+          assert(detail.mir_library_effect_1==nil)
+          assert(detail.mir_library_other_effects.caption[1]=="mir-browser.effect-native-details")
+          assert(research_content(root).mir_library_actions.mir_library_open_native.enabled)
+          assert(gear.level==3 and gear.enabled==false)
+        ''')
+
     def test_discovery_queue_uses_anonymous_labels_without_changing_native_entries(self):
         self.lua.execute('''
           boot()
