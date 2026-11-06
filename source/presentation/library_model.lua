@@ -529,6 +529,24 @@ function M.rows(force, catalogue, view, translations, context)
   return selected
 end
 
+local function copy_effect_description(value, budget, depth)
+  if budget.nodes == 0 or depth > 8 then return nil end
+  budget.nodes = budget.nodes - 1
+  if type(value) == "string" then
+    if #value > budget.bytes then return nil end
+    budget.bytes = budget.bytes - #value
+    return value
+  end
+  if finite_number(value) then return value end
+  if type(value) ~= "table" or #value > 21 then return nil end
+  local out = {}
+  for index = 1, #value do
+    out[index] = copy_effect_description(value[index], budget, depth + 1)
+    if out[index] == nil then return nil end
+  end
+  return out
+end
+
 local function copy_effects(technology)
   local effects = native_read(native_read(technology, "prototype"), "effects")
   local result, complete = {}, true
@@ -545,6 +563,10 @@ local function copy_effects(technology)
         copied.change = native_read(effect, "change")
       elseif kind == "unlock-recipe" then
         copied.recipe = bounded_string(native_read(effect, "recipe"), MAX_SEARCH)
+      elseif kind == "nothing" then
+        copied.effect_description = copy_effect_description(native_read(effect, "effect_description"),
+          {nodes = 128, bytes = 65536}, 0)
+        if copied.effect_description == nil then complete = false end
       else
         -- Most native modifier variants expose their signed numeric payload
         -- through `modifier`; retain only that scalar and the few bounded

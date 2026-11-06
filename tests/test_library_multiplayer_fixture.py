@@ -317,6 +317,15 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local function element(kind,name)
               return {valid=true,type=kind,name=name,style=native_style()}
             end
+            local function wrap_browser_list(content)
+              if (opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane") and content[RESULTS] then
+                local pane=element(opponent=="bad-list-pane" and "frame" or "flow","mir_library_list_pane")
+                pane.direction="vertical"
+                pane.get_mod=function() return opponent=="foreign-list-pane" and "other" or "more-infinite-research" end
+                pane[RESULTS],pane[ACTIONS]=content[RESULTS],content[ACTIONS]
+                content.mir_library_list_pane=pane;content[RESULTS],content[ACTIONS]=nil,nil
+              end
+            end
             local function build_gui(client, options)
               local target=client
               if opponent=="view-crosspollution" and client.index==2 then target=en end
@@ -338,6 +347,22 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               content.children={}
               content.style.width=760
               tabs[CONTENT]=content
+              if opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" or opponent=="bad-page" or opponent=="foreign-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field" then
+                local page=element(opponent=="bad-page" and "flow" or "scroll-pane","mir_library_research_page")
+                page.get_mod=function() return opponent=="foreign-page" and "other" or "more-infinite-research" end
+                filters.type,filters.direction="flow","vertical"
+                local grid=element(opponent=="bad-filter-grid" and "flow" or "table","mir_library_filter_grid")
+                grid.column_count=2;filters.mir_library_filter_grid=grid
+                for _,name in ipairs({"family","status","mode","sort","visibility"}) do
+                  local id="mir_library_"..name
+                  local field=element(opponent=="bad-filter-field" and "table" or "flow",id.."_field")
+                  field.direction="vertical";grid[id.."_field"]=field
+                  field[id.."_label"]=element("label",id.."_label")
+                  field[id]=filters[id] or element("drop-down",id)
+                  filters[id]=nil
+                end
+                page[FILTERS]=filters;page[CONTENT]=content;tabs.mir_library_research_page=page
+              end
               local list_width=math.floor((content.style.maximal_width-36)*.4)
               local detail_width=content.style.maximal_width-36-list_width
               local function browser_results()
@@ -372,7 +397,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 if opponent=="extra-availability-label" then
                   content.children[#content.children+1]=element("label","mir_library_availability_unexpected")
                 end
-                target.gui.screen[ROOT_NAME]=root
+                wrap_browser_list(content);target.gui.screen[ROOT_NAME]=root
                 return
               end
               assert(options.visibility==1 or selected.positive_state,"ordinary Library opens must reset Availability visibility")
@@ -394,7 +419,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                   local actions=element("flow",ACTIONS)
                   actions[OPEN_NATIVE]=element("sprite-button",OPEN_NATIVE);actions[OPEN_NATIVE].enabled=present
                   content[ACTIONS]=actions
-                  target.gui.screen[ROOT_NAME]=root
+                  wrap_browser_list(content);target.gui.screen[ROOT_NAME]=root
                   return
                 end
               end
@@ -416,7 +441,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 actions[OPEN_NATIVE]=element("sprite-button",OPEN_NATIVE)
                 actions[OPEN_NATIVE].enabled=opponent=="private-credit-action-enabled"
                 content[ACTIONS]=actions
-                target.gui.screen[ROOT_NAME]=root
+                wrap_browser_list(content);target.gui.screen[ROOT_NAME]=root
                 if opponent=="private-credit-mutate" and private_query_calls==1 then
                   force.technologies[private_credit_ids[1]].level=force.technologies[private_credit_ids[1]].level+1
                 end
@@ -440,7 +465,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 actions[OPEN_NATIVE]=element("sprite-button",OPEN_NATIVE)
                 actions[OPEN_NATIVE].enabled=false
                 content[ACTIONS]=actions
-                target.gui.screen[ROOT_NAME]=root
+                wrap_browser_list(content);target.gui.screen[ROOT_NAME]=root
                 return
               end
               if opponent=="private-credit-restore" and private_query_calls>0 and options.family=="mir" then filters[QUERY].text="restoration-failed" end
@@ -450,12 +475,23 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               content[RESULTS]=results
               local detail=browser_detail()
               if opponent=="detail-width-narrow" then detail.style.width=180 end
-              detail[DETAIL_TITLE]=element("label",DETAIL_TITLE)
-              detail[DETAIL_TITLE].caption=options.selected
+              local facts=detail
+              if opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" then
+                facts=element("scroll-pane","mir_library_research_facts")
+                detail.mir_library_research_facts=facts
+                local heading=element("flow","mir_library_detail_heading");heading.direction="horizontal"
+                facts.mir_library_detail_heading=heading
+                heading.mir_library_detail_icon=element("sprite","mir_library_detail_icon")
+                heading[DETAIL_TITLE]=element("label",DETAIL_TITLE)
+                heading[DETAIL_TITLE].caption=options.selected
+              else
+                detail[DETAIL_TITLE]=element("label",DETAIL_TITLE)
+                detail[DETAIL_TITLE].caption=options.selected
+              end
               local context=element("flow","mir_library_detail_context")
-              detail["mir_library_detail_context"]=context
+              facts["mir_library_detail_context"]=context
               context["mir_library_context_status"]=element("label","mir_library_context_status")
-              detail["mir_library_detail_level"]=element("label","mir_library_detail_level")
+              facts["mir_library_detail_level"]=element("label","mir_library_detail_level")
               content[DETAIL]=detail
               if ordinary_private_query then
                 local actions=element("flow",ACTIONS)
@@ -463,7 +499,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 actions[OPEN_NATIVE].enabled=true
                 content[ACTIONS]=actions
               end
-              target.gui.screen[ROOT_NAME]=root
+              wrap_browser_list(content);target.gui.screen[ROOT_NAME]=root
               if ordinary_private_query and opponent=="private-credit-automation-mutate" and options.family=="external" then
                 force.technologies["automation"].level=force.technologies["automation"].level+1
               end
@@ -476,7 +512,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               local content=tabs and tabs[CONTENT]
               local detail=content and content[DETAIL]
               if not (root and query and detail) or query.text~=gear then return end
-              local context=detail["mir_library_detail_context"]
+              local facts=detail.mir_library_research_facts or detail
+              local context=facts["mir_library_detail_context"]
               if not context then return end
               local queued=#force.research_queue
               local current=force.current_research~=nil
@@ -501,7 +538,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 context["mir_library_context_queue_count"].caption={"mir-browser.context-queue-count",count}
                 context["mir_library_context_queue_position"].caption={"mir-browser.context-queue-position",position}
               end
-              detail["mir_library_detail_level"].caption={level_key,level}
+              facts["mir_library_detail_level"].caption={level_key,level}
             end
             local remote={interfaces={["more-infinite-research-browser"]={open=true}}}
             remote.call=function(interface, method, index, options)
@@ -2832,6 +2869,22 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         observed = subprocess.run(["pwsh", "-NoLogo", "-NoProfile", "-Command", script], capture_output=True, text=True,
                                   env=dict(os.environ, MIR_TEST_SESSION=str(SESSION)))
         self.assertEqual(observed.returncode, 0, observed.stdout + observed.stderr)
+
+    def test_list_pane_path_rejects_malformed_or_foreign_container(self):
+        result = self.run_case("list-pane")
+        self.assertTrue(result["ok"], result["message"])
+        for opponent in ("bad-list-pane", "foreign-list-pane"):
+            result = self.run_case(opponent)
+            self.assertFalse(result["ok"])
+            self.assertIn("native research list pane is malformed or foreign", result["message"])
+
+    def test_research_page_path_and_malformed_page_refusal(self):
+        result = self.run_case("new-page")
+        self.assertTrue(result["ok"], result["message"])
+        for opponent in ("bad-page", "foreign-page", "bad-filter-grid", "bad-filter-field"):
+            result = self.run_case(opponent)
+            self.assertFalse(result["ok"])
+            self.assertRegex(result["message"], "research page is malformed or foreign" if opponent in ("bad-page", "foreign-page") else "authored research filter .* is malformed")
 
     def test_two_real_client_join_rejoin_and_restart_state_machine(self):
         result = self.run_case()

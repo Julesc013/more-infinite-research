@@ -85,6 +85,26 @@ function M.seed(force)
   return M.assert_credits(force)
 end
 
+local function filter_control(root, filters, name)
+  local tabs = valid(root) and root.mir_library_tabs
+  local page = valid(tabs) and tabs.mir_library_research_page or nil
+  if page == nil then return valid(filters) and filters[name] or nil end
+  if not valid(filters) then return nil end
+  local grid = valid(filters) and filters.mir_library_filter_grid
+  if not valid(filters) or filters.type ~= "flow" or filters.direction ~= "vertical"
+      or not valid(grid) or grid.type ~= "table" or grid.column_count ~= 2 then
+    fail("authored research filter grid is malformed")
+  end
+  if name == "mir_library_query" then return filters[name] end
+  local field = grid[name .. "_field"]
+  local control = valid(field) and field[name]
+  if not valid(field) or field.type ~= "flow" or field.direction ~= "vertical"
+      or not valid(field[name .. "_label"]) or not valid(control) or control.type ~= "drop-down" then
+    fail("authored research filter field is malformed")
+  end
+  return control
+end
+
 local function query(player, family, id, visibility, hidden)
   if remote.call(BROWSER, "open", player.index, {
     search=id, selected=id, family=family, visibility=visibility, hidden=hidden,
@@ -92,24 +112,44 @@ local function query(player, family, id, visibility, hidden)
   }) ~= true then fail("public browser query failed") end
 end
 
+local function browser_list_parts(content)
+  local pane = valid(content) and content.mir_library_list_pane or nil
+  if pane == nil then
+    return valid(content) and content.mir_library_results or nil, valid(content) and content.mir_library_actions or nil
+  end
+  if not valid(pane) or pane.type ~= "flow" or pane.direction ~= "vertical"
+      or (pane.get_mod and pane.get_mod() ~= "more-infinite-research") then
+    fail("native research list pane is malformed or foreign")
+  end
+  return pane.mir_library_results, pane.mir_library_actions
+end
+
 local function assert_result(player, family, id, visibility, present)
   local root = player.gui.screen.mir_research_browser
   local filters = valid(root) and root.mir_library_filters
   local tabs = valid(root) and root.mir_library_tabs
-  local content = valid(tabs) and tabs.mir_library_research_content
-  local results = valid(content) and content.mir_library_results
+  local page = valid(tabs) and tabs.mir_library_research_page or nil
+  if page ~= nil and (not valid(page) or page.type ~= "scroll-pane" or (page.get_mod and page.get_mod() ~= "more-infinite-research")) then fail("research page is malformed or foreign") end
+  if page ~= nil then filters = page.mir_library_filters end
+  local content = valid(page) and page.mir_library_research_content or (valid(tabs) and tabs.mir_library_research_content)
+  local results, actions = browser_list_parts(content)
   local detail = valid(content) and content.mir_library_detail
-  local actions = valid(content) and content.mir_library_actions
   local button = valid(actions) and actions.mir_library_open_native
   local family_index = family == "all" and 2 or 3
+  local family_control = filter_control(root, filters, "mir_library_family")
+  local visibility_control = filter_control(root, filters, "mir_library_visibility")
   if not valid(filters) or not valid(filters.mir_library_query) or filters.mir_library_query.text ~= id
-      or not valid(filters.mir_library_family) or filters.mir_library_family.selected_index ~= family_index
-      or not valid(filters.mir_library_visibility) or filters.mir_library_visibility.selected_index ~= visibility
+      or not valid(family_control) or family_control.selected_index ~= family_index
+      or not valid(visibility_control) or visibility_control.selected_index ~= visibility
       or not valid(results) or not valid(detail) or not valid(button) then fail("query GUI differs") end
+  local facts = valid(detail) and detail.mir_library_research_facts
+  local heading = valid(facts) and facts.mir_library_detail_heading or nil
+  local title = page == nil and detail.mir_library_detail_title or (valid(heading) and heading.mir_library_detail_title or nil)
   if present then
-    if #results.items ~= 1 or results.selected_index ~= 1 or not valid(detail.mir_library_detail_title)
+    if #results.items ~= 1 or results.selected_index ~= 1 or not valid(title)
+        or (page ~= nil and (not valid(facts) or facts.type ~= "scroll-pane" or not valid(heading) or heading.type ~= "flow" or heading.direction ~= "horizontal" or not valid(heading.mir_library_detail_icon)))
         or button.enabled ~= true then fail("foreign hidden research was suppressed") end
-  elseif #results.items ~= 0 or results.selected_index ~= 0 or valid(detail.mir_library_detail_title)
+  elseif #results.items ~= 0 or results.selected_index ~= 0 or valid(detail.mir_library_detail_title) or valid(facts)
       or not valid(detail.mir_library_detail_empty) or button.enabled ~= false then
     fail("excluded research or native action exposed: " .. id)
   end

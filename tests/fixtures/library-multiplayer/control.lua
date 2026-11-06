@@ -247,20 +247,76 @@ local function open_availability(player)
   end
 end
 
+local function filter_control(root, filters, name)
+  local tabs = valid(root) and root.mir_library_tabs
+  local page = valid(tabs) and tabs.mir_library_research_page or nil
+  if page == nil then return valid(filters) and filters[name] or nil end
+  if not valid(filters) then return nil end
+  local grid = valid(filters) and filters.mir_library_filter_grid
+  if not valid(filters) or filters.type ~= "flow" or filters.direction ~= "vertical"
+      or not valid(grid) or grid.type ~= "table" or grid.column_count ~= 2 then
+    fail("authored research filter grid is malformed")
+  end
+  if name == "mir_library_query" then return filters[name] end
+  local field = grid[name .. "_field"]
+  local control = valid(field) and field[name]
+  if not valid(field) or field.type ~= "flow" or field.direction ~= "vertical"
+      or not valid(field[name .. "_label"]) or not valid(control) or control.type ~= "drop-down" then
+    fail("authored research filter field is malformed")
+  end
+  return control
+end
+
+local function research_parts(root)
+  local tabs = valid(root) and root[TABS] or nil
+  local page = valid(tabs) and tabs["mir_library_research_page"] or nil
+  if page ~= nil then
+    if not valid(tabs) or tabs.type ~= "tabbed-pane" or not valid(page) or page.type ~= "scroll-pane"
+        or (page.get_mod and page.get_mod() ~= "more-infinite-research") then
+      fail("native research page is malformed or foreign")
+    end
+    filter_control(root, page[FILTERS], QUERY)
+    return page[FILTERS], page[RESEARCH_CONTENT], tabs
+  end
+  return valid(root) and root[FILTERS] or nil, valid(tabs) and tabs[RESEARCH_CONTENT] or nil, tabs
+end
+
+local function selected_facts(root, detail)
+  local tabs = valid(root) and root[TABS]
+  local page = valid(tabs) and tabs.mir_library_research_page or nil
+  if page == nil then return detail, valid(detail) and detail[DETAIL_TITLE] end
+  local facts = valid(detail) and detail.mir_library_research_facts
+  local heading = valid(facts) and facts.mir_library_detail_heading or nil
+  local title = valid(heading) and heading[DETAIL_TITLE] or nil
+  if not valid(facts) or facts.type ~= "scroll-pane" or not valid(heading) or heading.type ~= "flow" or heading.direction ~= "horizontal"
+      or not valid(title) or not valid(heading.mir_library_detail_icon) then return nil, nil end
+  return facts, title
+end
+
+local function browser_list_parts(content)
+  local pane = valid(content) and content.mir_library_list_pane or nil
+  if pane == nil then
+    return valid(content) and content.mir_library_results or nil, valid(content) and content.mir_library_actions or nil
+  end
+  if not valid(pane) or pane.type ~= "flow" or pane.direction ~= "vertical"
+      or (pane.get_mod and pane.get_mod() ~= "more-infinite-research") then
+    fail("native research list pane is malformed or foreign")
+  end
+  return pane.mir_library_results, pane.mir_library_actions
+end
+
 local function frame_parts(player)
   local screen = player.gui and player.gui.screen
   local root = screen and screen[ROOT]
   if not valid(root) or root.type ~= "frame" or root.visible ~= true then fail("native browser root is absent or hidden") end
-  local filters = root[FILTERS]
-  local query, sort = valid(filters) and filters[QUERY] or nil, valid(filters) and filters[SORT] or nil
-  local tabs = root[TABS]
-  local content = valid(tabs) and tabs[RESEARCH_CONTENT] or nil
-  local results = valid(content) and content[RESULTS] or nil
+  local filters, content, tabs = research_parts(root)
+  local query, sort = valid(filters) and filters[QUERY] or nil, filter_control(root, filters, SORT)
+  local results, actions = browser_list_parts(content)
   local detail = valid(content) and content[DETAIL] or nil
   if not valid(query) or query.type ~= "textfield" or not valid(sort) or sort.type ~= "drop-down"
       or not valid(tabs) or tabs.type ~= "tabbed-pane" or not valid(results) or results.type ~= "list-box"
       or not valid(content) or content.type ~= "table" or content.column_count ~= 2
-      or not valid(detail) or detail.type ~= "scroll-pane" or not valid(detail[DETAIL_TITLE]) then
+      or not valid(detail) or detail.type ~= "scroll-pane" or not valid(select(2, selected_facts(root, detail))) then
     fail("native public browser GUI tree is incomplete")
   end
   local content_width = content.style and content.style.maximal_width
@@ -297,21 +353,18 @@ end
 local function assert_private_credit_empty_view(player, family, id)
   local screen = player.gui and player.gui.screen
   local root = screen and screen[ROOT]
-  local filters = valid(root) and root[FILTERS] or nil
+  local filters, content, tabs = research_parts(root)
   local query = valid(filters) and filters[QUERY] or nil
-  local family_picker = valid(filters) and filters[FAMILY] or nil
-  local tabs = valid(root) and root[TABS] or nil
-  local content = valid(tabs) and tabs[RESEARCH_CONTENT] or nil
-  local results = valid(content) and content[RESULTS] or nil
+  local family_picker = filter_control(root, filters, FAMILY)
+  local results, actions = browser_list_parts(content)
   local detail = valid(content) and content[DETAIL] or nil
-  local actions = valid(content) and content[ACTIONS] or nil
   local native_open = valid(actions) and actions[OPEN_NATIVE] or nil
   local family_index = family == "all" and 2 or (family == "external" and 3 or nil)
   if family_index == nil or not valid(root) or root.type ~= "frame" or root.visible ~= true
       or not valid(query) or query.type ~= "textfield" or query.text ~= id
       or not valid(family_picker) or family_picker.type ~= "drop-down" or family_picker.selected_index ~= family_index
       or not valid(results) or results.type ~= "list-box" or #results.items ~= 0 or results.selected_index ~= 0
-      or not valid(detail) or valid(detail[DETAIL_TITLE]) or not valid(detail[DETAIL_EMPTY])
+      or not valid(detail) or valid(detail[DETAIL_TITLE]) or valid(detail.mir_library_research_facts) or not valid(detail[DETAIL_EMPTY])
       or not valid(native_open) or native_open.type ~= "sprite-button" or native_open.enabled ~= false then
     fail("private credit query exposed a public result or native action: " .. family .. "/" .. id)
   end
@@ -321,8 +374,8 @@ local function assert_private_credit_personal_families(english, german)
   for _, player in ipairs({english, german}) do
     local screen = player.gui and player.gui.screen
     local root = screen and screen[ROOT]
-    local filters = valid(root) and root[FILTERS] or nil
-    local family_picker = valid(filters) and filters[FAMILY] or nil
+    local filters, content, tabs = research_parts(root)
+    local family_picker = filter_control(root, filters, FAMILY)
     if not valid(family_picker) or family_picker.type ~= "drop-down" or family_picker.selected_index ~= 1 then
       fail("private credit browse did not restore the personal mir family filter")
     end
@@ -332,21 +385,18 @@ end
 local function assert_public_browser_result(player, family, query)
   local screen = player.gui and player.gui.screen
   local root = screen and screen[ROOT]
-  local filters = valid(root) and root[FILTERS] or nil
+  local filters, content, tabs = research_parts(root)
   local query_field = valid(filters) and filters[QUERY] or nil
-  local family_picker = valid(filters) and filters[FAMILY] or nil
-  local tabs = valid(root) and root[TABS] or nil
-  local content = valid(tabs) and tabs[RESEARCH_CONTENT] or nil
-  local results = valid(content) and content[RESULTS] or nil
+  local family_picker = filter_control(root, filters, FAMILY)
+  local results, actions = browser_list_parts(content)
   local detail = valid(content) and content[DETAIL] or nil
-  local actions = valid(content) and content[ACTIONS] or nil
   local native_open = valid(actions) and actions[OPEN_NATIVE] or nil
   local family_index = family == "all" and 2 or (family == "external" and 3 or nil)
   if family_index == nil or not valid(root) or root.type ~= "frame" or root.visible ~= true
       or not valid(query_field) or query_field.type ~= "textfield" or query_field.text ~= query
       or not valid(family_picker) or family_picker.type ~= "drop-down" or family_picker.selected_index ~= family_index
       or not valid(results) or results.type ~= "list-box" or #results.items < 1 or results.selected_index < 1
-      or not valid(detail) or not valid(detail[DETAIL_TITLE])
+      or not valid(detail) or not valid(select(2, selected_facts(root, detail)))
       or not valid(native_open) or native_open.type ~= "sprite-button" or native_open.enabled ~= true then
     fail("public Library " .. family .. " query did not expose a selected ordinary result: " .. query)
   end
@@ -449,9 +499,10 @@ local function live_detail(player, retained, expected)
   if root ~= retained.root or query ~= retained.query then
     fail("native Library refresh replaced the owned root or query")
   end
-  local context = detail["mir_library_detail_context"]
+  local facts = selected_facts(root, detail)
+  local context = valid(facts) and facts["mir_library_detail_context"]
   if not valid(context) then fail("native Library refresh removed the detail context") end
-  local level = detail["mir_library_detail_level"]
+  local level = valid(facts) and facts["mir_library_detail_level"]
   if not valid(level) or not localized_number(level.caption, "mir-browser.level", expected.level) then
     fail("native Library refresh level differs (" .. localized_caption_shape(valid(level) and level.caption, "mir-browser.level") .. ")")
   end
@@ -629,16 +680,15 @@ end
 local function assert_availability(player)
   local screen = player.gui and player.gui.screen
   local root = screen and screen[ROOT]
-  local filters = valid(root) and root[FILTERS] or nil
+  local filters, content, tabs = research_parts(root)
   local query = valid(filters) and filters[QUERY] or nil
-  local tabs = valid(root) and root[TABS] or nil
-  local content = valid(tabs) and tabs[RESEARCH_CONTENT] or nil
   local children = valid(content) and content.children or nil
   if not valid(root) or root.type ~= "frame" or root.visible ~= true or not valid(query) or query.text ~= ""
       or not valid(content) or children == nil then
     fail("native Availability browser GUI tree is incomplete")
   end
-  if valid(content[RESULTS]) or valid(content[DETAIL]) or valid(content["mir_library_actions"]) then
+  local results, actions = browser_list_parts(content)
+  if valid(results) or valid(content[DETAIL]) or valid(actions) then
     fail("Availability exposed research results or actions")
   end
   if space_age_library() then
