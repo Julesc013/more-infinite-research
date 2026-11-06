@@ -1,4 +1,20 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.8
+Date: 2026-11-07
+
+  Bugfixes:
+
+    - Restore fixed Library tabs, compact research details, labelled filters, Settings fields and sectioned help from the authored
+      interface.
+    - Keep Library selection, list/detail scrolling and science-production snapshots during updates; fix resizing across narrow
+      layouts.
+    - Preserve a supplied finite research-speed level 7 and continue MIR research from level 8, while protecting earned bonuses and
+      partial work.
+    - Refuse unsafe first upgrades when finite research ownership cannot be established; retain normal cap changes after a verified
+      upgrade.
+    - Show configured numeric research caps in native technology descriptions.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.7
 Date: 2026-11-06
 

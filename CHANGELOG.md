@@ -2,6 +2,16 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.8] - 2026-11-07
+
+### Bugfixes
+
+- Restore fixed Library tabs, compact research details, labelled filters, Settings fields and sectioned help from the authored interface.
+- Keep Library selection, list/detail scrolling and science-production snapshots during updates; fix resizing across narrow layouts.
+- Preserve a supplied finite research-speed level 7 and continue MIR research from level 8, while protecting earned bonuses and partial work.
+- Refuse unsafe first upgrades when finite research ownership cannot be established; retain normal cap changes after a verified upgrade.
+- Show configured numeric research caps in native technology descriptions.
+
 ## [5.0.7] - 2026-11-06
 
 ### Bugfixes
