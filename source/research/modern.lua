@@ -111,6 +111,9 @@ function M.technology(definition, values)
     }
   }
   if stream.enabled == false or definition.available == false then output.enabled = false end
+  if (stream.max_level or 0) > 0 then
+    productivity.apply_cap_presentation(output, stream.max_level, "mod-setting-name.ips-max-level-stream")
+  end
   return output
 end
 
@@ -230,6 +233,9 @@ function M.continuation(definition, values)
   }
   if definition.icon_size ~= nil then output.icon_size = definition.icon_size end
   if stream.enabled == false then output.enabled = false end
+  if (stream.max_level or 0) > 0 then
+    productivity.apply_cap_presentation(output, stream.max_level, "mod-setting-name.mir-max-level")
+  end
   return output
 end
 
