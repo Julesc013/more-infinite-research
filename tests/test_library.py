@@ -9,6 +9,194 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_explicit_resize_does_not_read_the_clicked_element_after_layout_rebuild(self):
+        self.lua.execute('''
+          boot()
+          local root=library.open(player,{selected=gear.name,search="gear"})
+          local view=storage.mir_library.players[1]
+          view.geometry={width=592,height=480}
+          root=library.open(player)
+          root.location={x=31,y=17}
+          library.on_gui_location_changed({player_index=1,element=root})
+          assert(research_content(root).type=="table")
+          for _,action in ipairs{"layout_smaller","layout_larger","layout_smaller","layout_reset"} do
+            local old=root
+            local button=root.mir_library_title["mir_library_"..action]
+            local name=button.name
+            rawset(button,"name",nil)
+            local meta=getmetatable(button)
+            local original_index=meta.__index
+            meta.__index=function(target,key)
+              if key=="name" then
+                local ancestor=target
+                while ancestor do
+                  assert(ancestor.valid,"LuaGuiElement API call when LuaGuiElement invalid")
+                  ancestor=ancestor._parent
+                end
+                return name
+              end
+              return original_index(target,key)
+            end
+            library.on_gui_click({player_index=1,element=button})
+            root=player.gui.screen.mir_research_browser
+            view=storage.mir_library.players[1]
+            assert(root and root.valid and root~=old and not old.valid,
+              "crossing the split/stacked boundary must replace the obsolete layout safely")
+            assert(research_filters(root).mir_library_query.text=="gear" and view.selected==gear.name)
+          end
+          assert(view.geometry==nil and view.location==nil)
+          assert(root.force_auto_center_calls>=1)
+          assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
+        ''')
+
+    def test_research_refresh_retains_list_controls_without_repositioning_unchanged_items(self):
+        self.lua.execute('''
+          boot()
+          local root=library.open(player,{selected=gear.name})
+          local body=research_content(root)
+          local list,actions=body.mir_library_results,body.mir_library_actions
+          local detail=body.mir_library_detail
+          local scroll_calls=0
+          list.scroll_to_item=function() scroll_calls=scroll_calls+1 end
+          local items,writes=list.items,0
+          rawset(list,"items",nil)
+          local meta=getmetatable(list)
+          local previous_index,previous_write=meta.__index,meta.__newindex
+          meta.__index=function(target,key)
+            if key=="items" then return items end
+            return previous_index(target,key)
+          end
+          meta.__newindex=function(target,key,value)
+            if key=="items" then writes=writes+1;items=value else previous_write(target,key,value) end
+          end
+          library.open(player)
+          assert(body.mir_library_results==list and list.valid and body.mir_library_actions==actions,
+            "ordinary refresh must retain the native list and its interaction context")
+          assert(body.mir_library_detail==detail and detail.valid)
+          library.open(player,{tab="queue"})
+          library.open(player,{tab="research"})
+          assert(research_content(root).mir_library_results==list and list.valid)
+          assert(scroll_calls==0,"unchanged lists must not be programmatically scrolled again")
+          assert(writes==0,"unchanged native items must not be reassigned")
+          local model=require("presentation.library_model")
+          local original=model.rows
+          model.rows=function(...)
+            local rows=original(...);rows[1].name="Updated display name";return rows
+          end
+          library.open(player)
+          assert(body.mir_library_results==list and writes==1 and list.items[1]=="Updated display name",
+            "changed display names must update the retained native list")
+          assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
+        ''')
+
+    def test_filter_excluding_selection_selects_the_first_matching_subject(self):
+        self.lua.execute('''
+          boot()
+          local root=library.open(player,{family="all",selected=foreign.name})
+          local list=research_content(root).mir_library_results
+          local query=research_filters(root).mir_library_query
+          query.text="gear"
+          library.on_gui_text_changed({player_index=1,element=query})
+          local body=research_content(root)
+          assert(#list.items==1 and list.selected_index==1
+            and storage.mir_library.players[1].selected==gear.name,
+            "an excluded old selection must not leave a nonempty result list without details")
+          assert(body.mir_library_results==list and list.valid)
+          assert(body.mir_library_detail.mir_library_detail_title.caption==gear.localised_name)
+          assert(gear.level==3 and foreign.level==1 and player.force.research_progress==.5)
+        ''')
+
+    def test_settings_refresh_retains_its_list_and_search_context(self):
+        self.lua.execute('''
+          boot()
+          local root=library.open(player,{tab="settings",settings_search="research_gears"})
+          local content=root.mir_library_tabs.mir_library_settings_content
+          local dynamic=content.mir_library_settings_dynamic
+          local list,detail=dynamic.mir_library_settings_list,dynamic.mir_library_settings_detail
+          local query=content.mir_library_settings_query
+          local scroll_calls=0
+          list.scroll_to_item=function() scroll_calls=scroll_calls+1 end
+          library.open(player,{tab="settings"})
+          library.on_gui_selection_state_changed({player_index=1,element=list})
+          assert(dynamic.mir_library_settings_list==list and list.valid,
+            "Settings selection must retain the native list")
+          assert(dynamic.mir_library_settings_detail==detail and detail.valid)
+          assert(content.mir_library_settings_query==query and query.text=="research_gears")
+          assert(scroll_calls==0,"unchanged Settings lists must not be scrolled on refresh")
+          assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
+        ''')
+
+    def test_settings_use_authored_short_field_names_and_honest_compact_numbers(self):
+        self.lua.execute('''
+          boot()
+          settings.startup["ips-cost-growth-research_gears"]={value=1.23456789}
+          local root=library.open(player,{tab="settings",settings_scope="research",settings_search="research_gears"})
+          local detail=root.mir_library_tabs.mir_library_settings_content
+            .mir_library_settings_dynamic.mir_library_settings_detail
+          local keys={"enable","cost-base","cost-linear-increment","cost-growth","max-level","research-time"}
+          for index,key in ipairs(keys) do
+            assert(detail["mir_library_setting_"..index.."_name"].caption[1]=="mir-browser.setting-"..key,
+              "the group already names the research; standard field names must stay short")
+          end
+          local growth=detail.mir_library_setting_4_value
+          assert(growth.caption=="≈ 1.23457","rounded display must be compact and visibly approximate")
+          assert(growth.tooltip[2]=="≈ 1.23457" and growth.tooltip[4][1]=="mir-browser.source-direct")
+          assert(detail.mir_library_setting_5_value.caption[1]=="mir-browser.setting-unlimited")
+          assert(settings.startup["ips-cost-growth-research_gears"].value==1.23456789,
+            "presentation must not round configuration or profile values")
+          assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
+        ''')
+
+    def test_research_details_present_localized_benefits_before_requirements(self):
+        self.lua.execute('''
+          boot()
+          gear.localised_description={"technology-description.research-speed"}
+          local scripted={"modifier-description.more-infinite-research.agricultural_growth_speed","10"}
+          local model=require("presentation.library_model")
+          model.detail=function()
+            return {effects_complete=true,effects={
+              {type="laboratory-speed",modifier=.6},
+              {type="worker-robot-storage",modifier=1},
+              {type="nothing",effect_description=scripted},
+              {type="change-recipe-productivity",recipe="gears",change=.1},
+              {type="change-recipe-productivity",recipe="iron",change=.1}},
+              cost={count=100,time=30,ingredients={{name="automation-science-pack",amount=1}}}}
+          end
+          local root=library.open(player,{selected=gear.name})
+          local detail=research_content(root).mir_library_detail
+          local position={}
+          for index,child in ipairs(detail._children) do position[child.name]=index end
+          assert(detail.mir_library_detail_benefits and detail.mir_library_detail_requirements,
+            "Benefit and Research requirements must be clear sections")
+          assert(position.mir_library_detail_benefits < position.mir_library_effect_1
+            and position.mir_library_effect_1 < position.mir_library_detail_requirements
+            and position.mir_library_detail_requirements < position.mir_library_detail_cost,
+            "show what research improves before its requirements")
+          assert(detail.mir_library_detail_description.caption==gear.localised_description)
+          assert(detail.mir_library_detail_icon.style.minimal_width==48
+            and detail.mir_library_detail_icon.style.minimal_height==48)
+          local speed=detail.mir_library_effect_1.caption
+          assert(speed[2][1]=="gui-bonus.laboratory-speed" and speed[4]=="+60%")
+          assert(detail.mir_library_effect_2.caption[4]=="+1")
+          assert(detail.mir_library_effect_3.caption==scripted)
+          assert(detail.mir_library_effect_4.caption[1]=="mir-browser.productivity-increment"
+            and detail.mir_library_effect_5==nil,"identical per-recipe gains repeat the same fact")
+          assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
+        ''')
+
+    def test_unsupported_effects_link_to_native_facts_without_raw_type_or_invented_numbers(self):
+        self.lua.execute('''
+          boot()
+          local model=require("presentation.library_model")
+          model.detail=function() return {effects={{type="future-foreign-effect",modifier=12345}}} end
+          local root=library.open(player,{selected=gear.name})
+          local detail=research_content(root).mir_library_detail
+          assert(detail.mir_library_effect_1==nil)
+          assert(detail.mir_library_other_effects.caption[1]=="mir-browser.effect-native-details")
+          assert(research_content(root).mir_library_actions.mir_library_open_native.enabled)
+          assert(gear.level==3 and gear.enabled==false)
+        ''')
+
     def test_discovery_queue_uses_anonymous_labels_without_changing_native_entries(self):
         self.lua.execute('''
           boot()
