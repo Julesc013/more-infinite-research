@@ -62,6 +62,19 @@ function M.register(context)
     local tabs=root[PREFIX.."tabs"]
     local node=valid(tabs) and tabs[PREFIX..((kind=="diagnostics" or kind=="diagnostics-failure") and "help_content" or "settings_content")]
     if not valid(node) then fail("native export content absent") end
+    if kind=="diagnostics" or kind=="diagnostics-failure" then
+      local panes=node[PREFIX.."help_panes"]
+      if panes~=nil then
+        -- Authored Debug layout; retain the exact flat path for earlier
+        -- frozen packages, without falling back past malformed new panes.
+        local panel=valid(panes) and panes[PREFIX.."report_panel"]
+        if not valid(panes) or panes.parent~=node or panes.get_mod()~="more-infinite-research"
+            or not valid(panel) or panel.parent~=panes or panel.get_mod()~="more-infinite-research" then
+          fail("native diagnostics container differs")
+        end
+        node=panel
+      end
+    end
     return node
   end
   local function preview(p,kind)
