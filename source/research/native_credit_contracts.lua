@@ -60,6 +60,15 @@ function M.published_beta_base_paid_recipe_sets()
   return out
 end
 
+-- These exact MIR4 Base producers have the same five one-product families.
+-- With Base alone each retained public identity can only have paid its named
+-- recipe. Startup tuning may suppress a family, but cannot select another
+-- recipe mask for its retained investment. This grants no provider rights.
+function M.published_m4_base_paid_recipe_sets(version)
+  if version ~= "4.7.20003" and version ~= "4.7.21003" then return nil end
+  return M.published_beta_base_paid_recipe_sets()
+end
+
 -- Published data-only 1.0.0/1.1.0/1.2.0 Base research. In 1.0 conflict
 -- trimming can suppress a whole one-recipe family; these are conditional
 -- earning masks, not a claim that every family existed in an old save.
