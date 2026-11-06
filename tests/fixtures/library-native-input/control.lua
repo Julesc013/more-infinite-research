@@ -171,7 +171,12 @@ local function check_imported_literals()
     for index,id in ipairs(IDS) do
       local value=force.technologies[id]
       if not valid(value) or value.level~=(index<4 and 2 or 1) or value.researched~=false
-          or value.enabled~=false or value.visible_when_disabled~=false or value.prototype.hidden~=true then fail("imported credit baseline differs") end
+          or value.enabled~=false or value.visible_when_disabled~=false or value.prototype.hidden~=true then
+        local observed=valid(value) and ("level="..tostring(value.level)..",researched="..tostring(value.researched)
+          ..",enabled="..tostring(value.enabled)..",visible_when_disabled="..tostring(value.visible_when_disabled)
+          ..",hidden="..tostring(value.prototype.hidden)) or "absent"
+        fail("imported credit baseline differs: "..name.."/"..id.." ["..observed.."]")
+      end
     end
     for _, id in ipairs({"speed-module","productivity-module","efficiency-module"}) do
       if not close(force.recipes[id].productivity_bonus,.11) then fail("actual imported module effect differs") end
