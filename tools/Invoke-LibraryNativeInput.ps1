@@ -93,7 +93,9 @@ function Assert-LibraryInputPlan([System.Collections.IDictionary]$Spec){
   $parsed=[datetimeoffset]::MinValue
   Assert-LibraryInput ($Spec.process_start_utc-is[string] -and $Spec.process_start_utc.EndsWith('Z') -and [datetimeoffset]::TryParse($Spec.process_start_utc,[ref]$parsed)) 'start time differs'
   Assert-LibraryInput ($Spec.engine_sha256-is[string] -and $Spec.engine_sha256-cmatch'^[A-F0-9]{64}$') 'engine hash differs'
-  Assert-LibraryInput ((Test-LibraryInputInteger $Spec.client_width) -and (Test-LibraryInputInteger $Spec.client_height) -and $Spec.client_width-eq1280 -and $Spec.client_height-eq720) 'client geometry differs'
+  Assert-LibraryInput ((Test-LibraryInputInteger $Spec.client_width) -and (Test-LibraryInputInteger $Spec.client_height) -and
+    (($Spec.client_width-eq1280 -and $Spec.client_height-eq720) -or
+     ($Spec.client_width-eq2560 -and $Spec.client_height-eq1440))) 'client geometry differs'
   if($Spec.action-ceq'text'){
     Assert-LibraryInput ($Spec.text-is[string] -and $Spec.text.Length-ge1 -and $Spec.text.Length-le32 -and $Spec.text-cmatch'\A[A-Za-z0-9 -]+\z') 'text differs'
   }
