@@ -13,6 +13,8 @@ Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot 'OwnedMenuWindow.ps1')
 if((Get-MIRMenuFileSha256 $LaunchSpecPath)-cne$LaunchSpecSha256.ToUpperInvariant()){throw '[mir-menu-launch-spec-hash]'}
 $spec=Get-Content -LiteralPath $LaunchSpecPath -Raw|ConvertFrom-Json
+$contextOption=$spec.PSObject.Properties['foreground_context_diagnostic']
+if($null-ne$contextOption -and $contextOption.Value -isnot [bool]){throw '[mir-menu-launch-context-diagnostic]'}
 if($spec.kind-cne'MIRDirectLibraryOwnedMenuLaunchV1'-or$spec.timeout_seconds-lt1-or$spec.timeout_seconds-gt300){throw '[mir-menu-launch-spec-contract]'}
 $engine=(Resolve-Path -LiteralPath ([string]$spec.factorio_path)).Path
 if([IO.Path]::GetFileName($engine)-cne'factorio.exe'-or(Get-MIRMenuFileSha256 $engine)-cne[string]$spec.factorio_sha256){throw '[mir-menu-launch-engine-identity]'}
@@ -43,6 +45,7 @@ if(-not$process.Start()){throw '[mir-menu-launch-process]'}
 $afterQpc=[Diagnostics.Stopwatch]::GetTimestamp()
 $startUtc=$process.StartTime.ToUniversalTime()
 $result=$null;$failure='';$cleanup='not-started';$observerDiagnostics=New-MIROwnedMenuObserverDiagnostics
+if($null-ne$contextOption -and $contextOption.Value){$observerDiagnostics['foreground_context_enabled']=$true}
 try{
   $result=Wait-MIROwnedMenuResponse $process $startUtc $ocr $OutputRoot $beforeQpc -TimeoutSeconds ([int]$spec.timeout_seconds) -RequiredInitialisedLog ([string]$spec.engine_current_log) -Diagnostics $observerDiagnostics
 }catch{$failure=$_.Exception.Message;throw}
