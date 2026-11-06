@@ -389,13 +389,18 @@ local function legacy_family_context(event)
   local f210_destination = type(active[MIR_MOD]) == "string" and active[MIR_MOD]:match("^5%.0%.210%d%d$") ~= nil
   local m4_base, data_only_base = false, nil
   local data_only_mask = CREDIT_CONTRACTS.published_data_only_base_paid_recipe_sets(old)
+  -- These two data-only producers have fixed recipe masks. Known startup
+  -- changes (including modules=false) do not make that old mask unknowable.
+  -- Other origins retain their unchanged-input requirement.
+  local data_only_startup_known = data_only_mask ~= nil
+    and type(event.mod_startup_settings_changed) == "boolean"
   if plain_base and (old == "4.7.20003" or old == "4.7.21003" or data_only_mask ~= nil) then
     -- These published Base origins have independently known source masks,
     -- not today's collected output. Admit only their exact engine routes.
     local f200_origin = old == "4.7.20003" or data_only_mask ~= nil
     local base_change = changes.base
     local same_f200 = f200_origin and f200_destination and active.base == "2.0.77"
-      and same_inputs and (base_change == nil or type(base_change) == "table"
+      and (same_inputs or data_only_startup_known) and (base_change == nil or type(base_change) == "table"
         and base_change.old_version == "2.0.77" and base_change.new_version == "2.0.77")
     local exact_hop = f200_origin and type(base_change) == "table"
       and base_change.old_version == "2.0.77" and base_change.new_version == "2.1.23"
@@ -403,7 +408,7 @@ local function legacy_family_context(event)
       or type(base_change) == "table" and base_change.old_version == "2.1.23" and base_change.new_version == "2.1.23")
     local admitted = valid and (same_f200 or f210_destination and active.base == "2.1.23"
       and (same_engine or exact_hop))
-      and event.mod_startup_settings_changed == false
+      and (event.mod_startup_settings_changed == false or data_only_startup_known)
     for name in pairs(changes) do
       if name ~= MIR_MOD and name ~= "base" then admitted = false end
     end
