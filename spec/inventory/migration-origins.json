@@ -3811,8 +3811,8 @@
         {
           "boundary": "MIR1.0 data-only identities",
           "status": "closed",
-          "problem": "Current005D/65FC direct successors both pass from protected originalF8 with all21 retained rows/effects, one new lab per target and two unchanged-byte cold reloads. The current stricter fixture preflights source state before its owned sentinel restoration.",
-          "next_action": "Reuse the named current Base pair and unchanged protected original source. Retain earlier native/adverse identities and fixture-owned-sentinel limits; no arbitrary settings, Space Age, GUI, other origins or whole-product pass is implied.",
+          "problem": "Current005D/65FC direct successors both pass from protected originalF8 with all21 retained rows/effects, one new lab per target and two unchanged-byte cold reloads. The current stricter fixture preflights source state before its owned sentinel restoration. Current follow-up: PR1748/0b985ba6 independently fixes the exact1.0.0 conditional first-paid mask and passes113 focused/all four required author checks; this does not relabel the original21-row native result as a current package pass.",
+          "next_action": "Use the reviewed source1748 conditional producer rule, inspect actual protected source investment and complete only the affected current successor/save/two-cold check. Preserve the original scoped pass, source count, lab/fixture distinction, sentinel limits and all adverse receipts.",
           "evidence": [
             {
               "path": "spec/evidence/migration-origin-100-direct-successor-native-chain.json",
@@ -3821,14 +3821,18 @@
             {
               "path": "spec/evidence/migration-origin-100-7a2-direct-native-chain-r01.json",
               "sha256": "C2A15915ED7ADEEBC82C20EFB006C23B5A13E4B8670E2D9C28A67E1F3E61D568"
+            },
+            {
+              "path": "spec/evidence/data-only-paid-family-restoration-r01.json",
+              "sha256": "8578EF08D8CF47AE1157AC0A47D377F97014F9ABE315BD0044A7508869FCED21"
             }
           ]
         },
         {
           "boundary": "MIR1.1 module credits and disabled public row",
           "status": "closed",
-          "problem": "Current005D/65FC default direct successors and explicit disabled-module005D pass from original88FC after the reviewed fixture-only omitted-enabled-default correction. All31 rows/credits/three-force state and native battery effects survive lab, reset, save and two cold reloads per case.",
-          "next_action": "Reuse the three named current Base routes and protected original. Keep0609 and logging-only actual=nil diagnostic as adverse startups, not saved-state failures or passes. Arbitrary user settings, F200 disabled-module, Space Age, earned Library GUI and other closures remain unverified.",
+          "problem": "Current005D/65FC default direct successors and explicit disabled-module005D pass from original88FC after the reviewed fixture-only omitted-enabled-default correction. All31 rows/credits/three-force state and native battery effects survive lab, reset, save and two cold reloads per case. Current follow-up: PR1746/2a8e85e6 independently admits either known boolean startup-change flag for the fixed1.1.0/1.2.0 mask, with111 focused/all four required author checks. Actual affected native qualification remains pending.",
+          "next_action": "Use the reviewed1746 source and its separately fixed internal pair for affected source-default checks. For MIR1.1 retain the original first-entry modules=false check with actual effective values; both boolean flags are supported by source, but actual native observations are still required. Preserve paid/private module/cannon, queue/partial/foreign state and original source/default/disabled-case results.",
           "evidence": [
             {
               "path": "spec/evidence/migration-origin-110-direct-c74-native-chain-r01.json",
@@ -3841,6 +3845,10 @@
             {
               "path": "spec/evidence/migration-origin-110-7a2-direct-native-chain-r01.json",
               "sha256": "796A466F6267E0585A2FD7D1287ECBEF276317A84647F92B065D3EA93A170EDB"
+            },
+            {
+              "path": "spec/evidence/data-only-paid-family-restoration-r01.json",
+              "sha256": "8578EF08D8CF47AE1157AC0A47D377F97014F9ABE315BD0044A7508869FCED21"
             }
           ],
           "current_adverse": {
@@ -3865,12 +3873,16 @@
         {
           "boundary": "MIR1.2 combined rocket/cannon credit",
           "status": "closed",
-          "problem": "The original575e F200/F210 Base routes pass from protected FDC9. Exact package/member and no-player consumed-path review supports original7a2/player505837 applicability (source5.0.0, not published5.0.5) for this named route only.",
-          "next_action": "Reuse the scoped original headless checks under their unchanged575e execution identities. Keep1.2.5/.9, Space Age and GUI saved-state cases unverified; do not rerun the unchanged chain solely for current documentation commits.",
+          "problem": "The original575e F200/F210 Base routes pass from protected FDC9. Exact package/member and no-player consumed-path review supports original7a2/player505837 applicability (source5.0.0, not published5.0.5) for this named route only. Current follow-up: PR1746/2a8e85e6 independently admits either known boolean startup-change flag for the fixed1.1.0/1.2.0 mask, with111 focused/all four required author checks. Actual affected native qualification remains pending.",
+          "next_action": "Use the reviewed1746 source and its separately fixed internal pair for affected source-default checks. For MIR1.1 retain the original first-entry modules=false check with actual effective values; both boolean flags are supported by source, but actual native observations are still required. Preserve paid/private module/cannon, queue/partial/foreign state and original source/default/disabled-case results.",
           "evidence": [
             {
               "path": "spec/evidence/migration-origin-120-575e-direct-native-chain-r01.json",
               "sha256": "8B42D0FEC713CB6DD6CEC57C9C3BCA70ACA05E09ECE1228B36AE4F041733E240"
+            },
+            {
+              "path": "spec/evidence/data-only-paid-family-restoration-r01.json",
+              "sha256": "8578EF08D8CF47AE1157AC0A47D377F97014F9ABE315BD0044A7508869FCED21"
             }
           ],
           "applicability": {
