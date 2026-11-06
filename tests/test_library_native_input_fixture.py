@@ -545,13 +545,15 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().observer_path = (FIXTURE / "control.lua").as_posix()
+        self.lua.globals().support_path = (FIXTURE / "support-exports.lua").as_posix()
         self.lua.globals().historical_path = (ROOT / "tests/fixtures/migration-origins/f200-110-successor/catalogue.lua").as_posix()
         self.lua.globals().fingerprint = lambda value: json.dumps(plain(value), sort_keys=True)
         self.lua.execute(r'''
           function run_input_observer(target,opponent,package_version,input_observer_version)
+            local helper_free=input_observer_version=="0.3.5" or input_observer_version=="0.4.1"
             local historical=assert(loadfile(historical_path))()
             local events={on_player_joined_game=1,on_gui_text_changed=2,on_gui_click=3,on_gui_location_changed=4,
-              on_gui_closed=5,on_technology_effects_reset=6,on_player_removed=7,on_tick=8}
+              on_gui_closed=5,on_technology_effects_reset=6,on_player_removed=7,on_tick=8,on_console_command=9}
             local ids={"mir-legacy-module-credit-speed-module","mir-legacy-module-credit-productivity-module",
               "mir-legacy-module-credit-efficiency-module","mir-legacy-cannon-credit-rocket-shooting-speed"}
             local gear,mining="recipe-prod-research_gears-1","recipe-prod-research_mining_drill-1"
@@ -585,7 +587,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 force.current_research=force.technologies[gear];force.research_progress=.42
                 force.research_queue={force.technologies[gear],force.technologies["recipe-prod-research_plastic-1"]}
               elseif force_index==3 then force.technologies[gear].saved_progress=.27 end
-              if input_observer_version=="0.3.5" then
+              if helper_free then
                 for _,value in pairs(force.recipes) do value.productivity_bonus=0 end
                 for id,effects in pairs(historical.rows) do
                   local completed=id==gear and (force_index==1 and 2 or 0) or 1
@@ -735,11 +737,12 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               [historical.fixture]=target=="f200" and "0.3.0" or "0.4.0",
               ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
               ["mir-fixture-mir5-library-native-input"]=input_observer_version or "0.3.0"}
-            if input_observer_version=="0.3.5" then active[historical.fixture]=nil end
-            local env={game=game,storage=store,defines={events=events,gui_type={custom=99},controllers={character=7,cutscene=11}},log=function(message)logs[#logs+1]=message end,
+            if helper_free then active[historical.fixture]=nil end
+            local env;env={game=game,storage=store,settings={startup={}},defines={events=events,gui_type={custom=99},controllers={character=7,cutscene=11}},log=function(message)logs[#logs+1]=message end,
               helpers={table_to_json=function()return "{}"end},
               require=function(name)
-                assert(name==(input_observer_version=="0.3.5" and "catalogue"
+                if name=="support-exports" then return assert(loadfile(support_path,"t",env))() end
+                assert(name==(helper_free and "catalogue"
                   or "__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue"));return historical
               end,
               remote={add_interface=function(name,value)interfaces[name]=value end,
@@ -826,6 +829,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 assert(callbacks.events[8]==nil,"baseline observer stayed subscribed")
               end
               local before=fingerprint(store);initial_report=api().report();api().report();readonly_report=before==fingerprint(store)
+              if input_observer_version=="0.4.1" then return end
               en=join(0,"en");de=join(2,"de")
               if opponent=="duplicate-initial-join" then join(0,"en") end
               if opponent=="out-of-order" then step("prefix");return end
@@ -1148,6 +1152,42 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                     self.assertFalse(result["final"]["fixture_seeds_credit"])
                     self.assertFalse(result["final"]["original_preservation_fixture_required"])
 
+    def test_current_support_attachment_preserves_the_independent_paid_world(self):
+        for target, version in (("f200", "5.0.20007"), ("f210", "5.0.21007")):
+            metadata = json.loads((FIXTURE / f"info-exports-current-{target}.json").read_text())
+            self.assertEqual((metadata["version"], metadata["dependencies"]),
+                             ("0.4.1", [f"base = {'2.0.77' if target == 'f200' else '2.1.23'}", f"~ more-infinite-research = {version}"]))
+            for opponent in (None, "startup-credit-enabled-until-configuration", "helperfree-unrelated-cannon-bonus"):
+                with self.subTest(target=target, opponent=opponent):
+                    result = self.run_case(target, opponent, version, "0.4.1")
+                    self.assertTrue(result["ok"], result["message"])
+                    self.assertEqual((result["initial_report"]["case"], result["initial_report"]["phase"],
+                                      result["initial_report"]["actual_joins"]), ("library-support-exports", "ready", 0))
+                    self.assertFalse(result["initial_report"]["original_preservation_fixture_required"])
+                    self.assertTrue(result["readonly_report"])
+            for opponent, message in (
+                    ("helperfree-historical-controller", "unexpected export observer closure"),
+                    ("helperfree-missing-active-observer", "missing export observer closure"),
+                    ("helperfree-wrong-engine", "exact engine target differs"),
+                    ("helperfree-lost-row", "helper-free historical row differs"),
+                    ("helperfree-lost-recipe", "helper-free historical recipe differs"),
+                    ("helperfree-lost-foreign-work", "helper-free foreign work differs"),
+                    ("helperfree-wrong-foreign-queue", "helper-free foreign work differs"),
+                    ("helperfree-lost-detached-work", "helper-free detached work differs"),
+                    ("helperfree-wrong-battery", "helper-free native aggregate differs"),
+                    ("preexisting-player", "protected headless source must have no existing players"),
+                    ("extra-mod", "unexpected export observer closure"),
+                    ("startup-baseline-early-report", "imported baseline is not ready"),
+                    ("startup-credit-still-enabled", "imported credit baseline differs"),
+                    ("startup-credit-level-lost", "imported credit baseline differs"),
+                    ("startup-credit-effect-lost", "actual imported module effect differs")):
+                with self.subTest(target=target, opponent=opponent):
+                    result = self.run_case(target, opponent, version, "0.4.1")
+                    self.assertFalse(result["ok"], result["message"])
+                    self.assertIn(message, result["message"])
+            result = self.run_case(target, package_version="5.0.20000" if target=="f200" else "5.0.21000", input_observer_version="0.4.1")
+            self.assertFalse(result["ok"], result["message"])
+
     def test_helperfree_input_rejects_wrong_inputs_and_lost_paid_or_foreign_state(self):
         for target, version in (("f200", "5.0.20007"), ("f210", "5.0.21007")):
             for opponent in ("helperfree-historical-controller", "helperfree-missing-active-observer", "helperfree-wrong-engine",
@@ -1392,17 +1432,17 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
         self.lua.globals().support_path = (FIXTURE / "support-exports.lua").as_posix()
         self.lua.globals().fingerprint = lambda value: json.dumps(plain(value), sort_keys=True)
         self.lua.execute(r'''
-          function run_export_observer(target,opponent)
+          function run_export_observer(target,opponent,qualified)
             local key="mir5_library_native_input"
             local base=target=="f200"and"2.0.77"or"2.1.23"
-            local mir=target=="f200"and"5.0.20000"or"5.0.21000"
+            local mir=target=="f200"and(qualified and"5.0.20007"or"5.0.20000")or(qualified and"5.0.21007"or"5.0.21000")
             local original="mir-fixture-mir5-migration-origin-f200-110-source"
             local fixture=target=="f200"and"0.3.0"or"0.4.0"
             local callbacks,interfaces,store,players,decoded={},{},{},{},{}
             local native,logs,saves,write_calls=1,0,0,0
             local env={storage=store,settings={startup={disabled={value=false},zero={value=0},normal={value=15}}}}
             env._G=env;setmetatable(env,{__index=_G})
-            local game={players={},connected_players={},forces={player={}}}
+            local game={players={},connected_players={},forces={player={}},tick=0}
             env.game=game
             function game.get_player(index)assert(index~=nil);return players[index]end
             function game.server_save(name)assert(name=="mir5-library-support-exports-restart"or name=="mir5-native-complete");saves=saves+1 end
@@ -1446,12 +1486,13 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
               return{valid=opponent~="invalid-profile",recognized=2,invalid=0,unknown=0}
             end}
             env.log=function()logs=logs+1 end
-            env.defines={events={on_player_joined_game=1,on_gui_click=2,on_console_command=3}}
+            env.defines={events={on_player_joined_game=1,on_gui_click=2,on_console_command=3,on_tick=4}}
             env.script={active_mods={base=base,["more-infinite-research"]=mir,[original]=fixture,
-              ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]="0.4.0"},
+              ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]=qualified and"0.4.1"or"0.4.0"},
               on_init=function(f)callbacks.init=f end,on_load=function(f)callbacks.load=f end,
               on_event=function(id,f)callbacks[id]=f end}
-            local context={key=key,interface="mir5-library-native-input",historical_fixture=original,
+            if qualified then env.script.active_mods[original]=nil end
+            local context={key=key,interface="mir5-library-native-input",historical_fixture=original,qualified_input=qualified==true,
               world=function()return{serial=native}end,
               assert_world=function()assert(store[key].native.serial==native,"protected native state changed")end,
               imported=function()assert(native==1,"actual imported credit changed")end}
@@ -1459,7 +1500,12 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
               assert(loadfile(support_path,"t",env))().register(context)
               return interfaces[context.interface]
             end
-            local api=register();callbacks.init();assert(api.report().phase=="ready")
+            local api=register();callbacks.init()
+            if qualified then
+              assert(store[key].native==nil and not pcall(api.report),"early support baseline was admitted")
+              callbacks[4]({tick=1});assert(callbacks[4]==nil,"support baseline kept its tick handler")
+            end
+            assert(api.report().phase=="ready" and api.report().original_preservation_fixture_required~=(qualified==true))
             local en,de=player(0,"en"),player(2,"de")
             game.players,game.connected_players={[0]=en,[2]=de},{en,de}
             local function joined(index)
@@ -1533,13 +1579,17 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
               if opponent=="duplicate-click"then callbacks[2]({element=button,player_index=p.index})end
               api.check(action)
             end
-            local before=fingerprint(store);local result=api.report();assert(fingerprint(store)==before)
+            local before=fingerprint(store);local result=api.report();local first_tick=result.tick
+            game.tick=game.tick+1
+            local second=api.report();assert(fingerprint(store)==before)
+            assert(type(first_tick)=="number" and type(second.tick)=="number" and second.tick==first_tick+1)
             assert(result.phase=="completed"and result.actual_clicks==13 and result.actual_joins==5 and saves==2 and logs==13 and write_calls==0)
             assert(result.server_commands==2 and result.server_command_counts["mir-settings-export"]==1
               and result.server_command_counts["mir-diagnostics-export"]==1)
             assert(result.joins_by_phase.initial.en==1 and result.joins_by_phase.initial.de==1
               and result.joins_by_phase.rejoin.en==0 and result.joins_by_phase.rejoin.de==1
               and result.joins_by_phase.restart.en==1 and result.joins_by_phase.restart.de==1)
+            if opponent=="report-clock" then return first_tick,second.tick end
             return result.actual_clicks,result.actual_joins,saves,write_calls
           end
         ''')
@@ -1548,6 +1598,24 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
         for target in ("f200", "f210"):
             with self.subTest(target=target):
                 self.assertEqual(self.lua.globals().run_export_observer(target, ""), (13, 5, 2, 0))
+
+    def test_current_support_keeps_the_full_protocol_and_negative_controls(self):
+        for target in ("f200", "f210"):
+            self.assertEqual(self.lua.globals().run_export_observer(target, "", True), (13, 5, 2, 0))
+            for opponent in ("missing-click", "duplicate-click", "wrong-player", "invalid-profile", "false-zero",
+                             "wrong-user", "editable", "stale-preview", "native-mutation", "setting-mutation",
+                             "missing-rejoin", "missing-restart", "duplicate-settings-command", "early-server-commands",
+                             "post-load-server-command", "wrong-role-rejoin", "duplicate-initial-join", "duplicate-rejoin",
+                             "duplicate-restart-role", "early-rejoin", "zero-server-index"):
+                with self.subTest(target=target, opponent=opponent):
+                    with self.assertRaises(Exception):
+                        self.lua.globals().run_export_observer(target, opponent, True)
+
+    def test_export_report_tick_is_monotonic_and_read_only(self):
+        for target in ("f200", "f210"):
+            for qualified in (False, True):
+                with self.subTest(target=target, qualified=qualified):
+                    self.assertEqual(self.lua.globals().run_export_observer(target, "report-clock", qualified), (0, 1))
 
     def test_initial_and_restart_roles_can_arrive_in_either_order(self):
         for target in ("f200", "f210"):

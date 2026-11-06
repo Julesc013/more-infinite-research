@@ -2,7 +2,7 @@
 -- Helper-free inputs carry the same immutable test catalogue locally; they do
 -- not activate the obsolete migration controller. Older protocols keep theirs.
 local INPUT_OBSERVER = script.active_mods["mir-fixture-mir5-library-native-input"]
-local HELPER_FREE_INPUT = INPUT_OBSERVER=="0.3.5"
+local HELPER_FREE_INPUT = INPUT_OBSERVER=="0.3.5" or INPUT_OBSERVER=="0.4.1"
 local historical = HELPER_FREE_INPUT and require("catalogue")
   or require("__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
 local KEY, INTERFACE = "mir5_library_native_input", "mir5-library-native-input"
@@ -458,9 +458,9 @@ local function advance(step)
 end
 -- The separate0.4 observer reuses only these independent protected-save assertions.
 -- Original0.1/0.2 sources and packets remain pinned by their historical records.
-if script.active_mods["mir-fixture-mir5-library-native-input"] == "0.4.0" then
+if INPUT_OBSERVER=="0.4.0" or INPUT_OBSERVER=="0.4.1" then
   require("support-exports").register({key=KEY,interface=INTERFACE,world=world,assert_world=assert_world,
-    imported=check_imported_literals,historical_fixture=historical.fixture})
+    imported=check_imported_literals,historical_fixture=historical.fixture,qualified_input=HELPER_FREE_INPUT})
   return
 end
 remote.add_interface(INTERFACE,{report=report,advance=advance})
