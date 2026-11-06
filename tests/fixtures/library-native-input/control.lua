@@ -114,8 +114,41 @@ local function location(root)
   if type(value)~="table" or type(value.x)~="number" or type(value.y)~="number" then fail("native root location is absent") end
   return {x=value.x,y=value.y}
 end
+-- The published MIR5 tree had root filters and a direct tab body.  A page,
+-- when present, must be the expected owned page; never fall back through it.
+local function filter_control(root, filters, name)
+  local tabs = valid(root) and root.mir_library_tabs
+  local page = valid(tabs) and tabs.mir_library_research_page or nil
+  if page == nil then return valid(filters) and filters[name] or nil end
+  if not valid(filters) then return nil end
+  local grid = valid(filters) and filters.mir_library_filter_grid
+  if not valid(filters) or filters.type ~= "flow" or filters.direction ~= "vertical"
+      or not valid(grid) or grid.type ~= "table" or grid.column_count ~= 2 then
+    fail("authored research filter grid is malformed")
+  end
+  if name == "mir_library_query" then return filters[name] end
+  local field = grid[name .. "_field"]
+  local control = valid(field) and field[name]
+  if not valid(field) or field.type ~= "flow" or field.direction ~= "vertical"
+      or not valid(field[name .. "_label"]) or not valid(control) or control.type ~= "drop-down" then
+    fail("authored research filter field is malformed")
+  end
+  return control
+end
+
+local function research_parts(root)
+  local tabs=valid(root) and root.mir_library_tabs or nil
+  local page=valid(tabs) and tabs.mir_library_research_page or nil
+  if page ~= nil then
+    if not valid(tabs) or tabs.type~="tabbed-pane" or not valid(page) or page.type~="scroll-pane"
+        or (page.get_mod and page.get_mod()~="more-infinite-research") then fail("native research page is malformed or foreign") end
+    filter_control(root, page[FILTERS], QUERY)
+    return page[FILTERS],page.mir_library_research_content
+  end
+  return (valid(root) and root[FILTERS] or nil),(valid(tabs) and tabs.mir_library_research_content or nil)
+end
 local function parts(p)
-  local root=p.gui.screen[ROOT];local filters=valid(root) and root[FILTERS]
+  local root=p.gui.screen[ROOT];local filters=research_parts(root)
   local query=valid(filters) and filters[QUERY]
   if not valid(root) or root.type~="frame" or root.get_mod()~="more-infinite-research"
       or not valid(query) or query.type~="textfield" then fail("native Library root/query is absent or foreign") end
@@ -134,35 +167,55 @@ local function assert_retained(en,de,query)
   if er~=refs.en_root or eq~=refs.en_query or dr~=refs.de_root or dq~=refs.de_query then fail("native refresh replaced a live root/query") end
   assert_world()
 end
+local function selected_title(root, detail)
+  local tabs=valid(root) and root.mir_library_tabs
+  if not (valid(tabs) and tabs.mir_library_research_page ~= nil) then return valid(detail) and detail.mir_library_detail_title end
+  local facts=valid(detail) and detail.mir_library_research_facts
+  local heading=valid(facts) and facts.mir_library_detail_heading or nil
+  if not valid(facts) or facts.type~="scroll-pane" or not valid(heading) or heading.type~="flow" or heading.direction~="horizontal"
+      or not valid(heading.mir_library_detail_icon) then return nil end
+  return heading.mir_library_detail_title
+end
+local function browser_list_parts(content)
+  local pane = valid(content) and content.mir_library_list_pane or nil
+  if pane == nil then
+    return valid(content) and content.mir_library_results or nil, valid(content) and content.mir_library_actions or nil
+  end
+  if not valid(pane) or pane.type ~= "flow" or pane.direction ~= "vertical"
+      or (pane.get_mod and pane.get_mod() ~= "more-infinite-research") then
+    fail("native research list pane is malformed or foreign")
+  end
+  return pane.mir_library_results, pane.mir_library_actions
+end
+
 local function exclusion_probe(en,de)
   for _, p in ipairs({en,de}) do
     for _, family in ipairs({"all","external"}) do
       local ordinary=family=="all" and GEAR or "automation"
       if remote.call(BROWSER,"open",p.index,{search=ordinary,selected=ordinary,family=family,visibility=1,tab="research"})~=true then fail("ordinary positive query failed") end
-      local ordinary_content=p.gui.screen[ROOT].mir_library_tabs.mir_library_research_content
-      if not valid(ordinary_content) or not valid(ordinary_content.mir_library_results) or #ordinary_content.mir_library_results.items<1
-          or ordinary_content.mir_library_results.selected_index<1
+      local _,ordinary_content=research_parts(p.gui.screen[ROOT])
+      local ordinary_results,ordinary_actions=browser_list_parts(ordinary_content)
+      if not valid(ordinary_content) or not valid(ordinary_results) or #ordinary_results.items<1
+          or ordinary_results.selected_index<1
           or (ordinary_content.type=="table" and ordinary_content.column_count~=2)
           or (ordinary_content.type=="scroll-pane" and ordinary_content.vertical_scroll_policy~="auto")
           or (ordinary_content.type~="table" and ordinary_content.type~="scroll-pane")
           or ordinary_content.mir_library_detail.type~="scroll-pane"
-          or not valid(ordinary_content.mir_library_detail.mir_library_detail_title)
-          or ordinary_content.mir_library_actions.mir_library_open_native.enabled~=true then fail("ordinary inspection positive control failed") end
+          or not valid(selected_title(p.gui.screen[ROOT], ordinary_content.mir_library_detail))
+          or ordinary_actions.mir_library_open_native.enabled~=true then fail("ordinary inspection positive control failed") end
       for _, id in ipairs(IDS) do
         if remote.call(BROWSER,"open",p.index,{search=id,selected=id,family=family,visibility=1,tab="research"})~=true then fail("private query failed") end
-        local root=p.gui.screen[ROOT];local filters=valid(root) and root[FILTERS]
-        local tabs=valid(root) and root.mir_library_tabs
-        local content=valid(tabs) and tabs.mir_library_research_content
-        local results=valid(content) and content.mir_library_results
+        local root=p.gui.screen[ROOT];local filters=research_parts(root)
+        local _,content=research_parts(root)
+        local results,actions=browser_list_parts(content)
         local detail=valid(content) and content.mir_library_detail
-        local actions=valid(content) and content.mir_library_actions
         local button=valid(actions) and actions.mir_library_open_native
-        if not valid(filters) or not valid(content) or filters[QUERY].text~=id or filters.mir_library_family.selected_index~=(family=="all" and 2 or 3)
+        if not valid(filters) or not valid(content) or filters[QUERY].text~=id or filter_control(root, filters, "mir_library_family").selected_index~=(family=="all" and 2 or 3)
             or (content.type=="table" and content.column_count~=2)
             or (content.type=="scroll-pane" and content.vertical_scroll_policy~="auto")
             or (content.type~="table" and content.type~="scroll-pane")
             or not valid(results) or #results.items~=0 or results.selected_index~=0
-            or not valid(detail) or detail.type~="scroll-pane" or valid(detail.mir_library_detail_title) or not valid(detail.mir_library_detail_empty)
+            or not valid(detail) or detail.type~="scroll-pane" or valid(detail.mir_library_detail_title) or valid(detail.mir_library_research_facts) or not valid(detail.mir_library_detail_empty)
             or not valid(button) or button.enabled~=false then fail("imported private research/action exposed") end
       end
     end
@@ -235,7 +288,7 @@ local function observed_opened(p, root)
 end
 local function input_state(p)
   if not valid(p) then return false end
-  local root=p.gui.screen[ROOT];local filters=valid(root) and root[FILTERS] or nil
+  local root=p.gui.screen[ROOT];local filters=research_parts(root) or nil
   local query=valid(filters) and filters[QUERY] or nil
   local other=p.gui.screen[OTHER];local other_query=valid(other) and other[OTHER_QUERY] or nil
   local opened_kind,opened_is_library_root,opened,opened_available=observed_opened(p,root)
@@ -250,7 +303,7 @@ local function target_witness(p, root_ref, query_ref, root_name, query_name, fil
   if not valid(p) then return false end
   local root=p.gui.screen[root_name]
   local parent=nil
-  if valid(root) then if filters_name then parent=root[filters_name] else parent=root end end
+  if valid(root) then if filters_name then parent=research_parts(root) else parent=root end end
   local query=valid(parent) and parent[query_name] or nil
   local _,_,opened,opened_available=observed_opened(p,root)
   local rv,pv,qv=valid(root)==true,valid(parent)==true,valid(query)==true
