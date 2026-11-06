@@ -33,9 +33,29 @@ class NativeFamilyCreditDefinitionTests(unittest.TestCase):
             local again=contracts.published_data_only_base_paid_recipe_sets(case[1])
             assert(again.research_plastic["plastic-bar"] and again.research_steel==nil)
           end
-          for _,version in ipairs({"1.0.0","1.1.1","1.2.5","1.2.9","4.7.20003","5.0.20006"}) do
+          for _,version in ipairs({"1.0.1","1.1.1","1.2.5","1.2.9","4.7.20003","5.0.20006"}) do
             assert(contracts.published_data_only_base_paid_recipe_sets(version)==nil)
           end
+        ''')
+
+    def test_original_100_conditional_mask_does_not_claim_a_complete_source_roster(self):
+        # Numeric tag1.0.0 config/util/tech-gen, also verified against public
+        # ZIP C328D8F9: each of these nongroup streams targets one Base item at
+        # .10. Conflict trimming can retain its recipe or suppress the identity.
+        self.lua.execute(r'''
+          local contracts=require("research.native_credit_contracts")
+          local expected={research_low_density_structure="low-density-structure",research_plastic="plastic-bar",
+            research_processing_unit="processing-unit",research_rocket_fuel="rocket-fuel"}
+          local mask=assert(contracts.published_data_only_base_paid_recipe_sets("1.0.0"))
+          local count=0
+          for family,recipes in pairs(mask) do
+            assert(expected[family] and recipes[expected[family]]==true)
+            local n=0;for recipe in pairs(recipes) do assert(recipe==expected[family]);n=n+1 end
+            assert(n==1);count=count+1
+          end
+          assert(count==4 and mask.research_steel==nil)
+          mask.research_plastic["plastic-bar"]=false
+          assert(contracts.published_data_only_base_paid_recipe_sets("1.0.0").research_plastic["plastic-bar"])
         ''')
 
     def test_settings_stage_never_imports_credit_construction_or_recipe_collection(self):

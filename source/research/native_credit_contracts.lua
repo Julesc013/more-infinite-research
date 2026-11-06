@@ -60,8 +60,10 @@ function M.published_beta_base_paid_recipe_sets()
   return out
 end
 
--- Published data-only 1.1.0/1.2.0 Base research. Steel was not authored;
--- its later identity cannot carry investment from either original source.
+-- Published data-only 1.0.0/1.1.0/1.2.0 Base research. In 1.0 conflict
+-- trimming can suppress a whole one-recipe family; these are conditional
+-- earning masks, not a claim that every family existed in an old save.
+-- Steel was not authored and cannot carry investment from these sources.
 local PUBLISHED_DATA_ONLY_BASE_RECIPES = {
   research_low_density_structure="low-density-structure",
   research_plastic="plastic-bar", research_processing_unit="processing-unit",
@@ -69,7 +71,7 @@ local PUBLISHED_DATA_ONLY_BASE_RECIPES = {
 }
 
 function M.published_data_only_base_paid_recipe_sets(version)
-  if version ~= "1.1.0" and version ~= "1.2.0" then return nil end
+  if version ~= "1.0.0" and version ~= "1.1.0" and version ~= "1.2.0" then return nil end
   local out = {}
   for family, recipe in pairs(PUBLISHED_DATA_ONLY_BASE_RECIPES) do out[family] = {[recipe]=true} end
   return out
