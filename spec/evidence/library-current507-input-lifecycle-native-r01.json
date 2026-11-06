@@ -1,0 +1,178 @@
+{
+  "schema": 1,
+  "kind": "MIRPublished507ImportedLibraryInputLifecycleNativeComponentsV1",
+  "status": "independently-accepted-exact-functional-components",
+  "source": {
+    "source_release": "5.0.7",
+    "player_source": "07e1a4bb0104b4473e8e3ab1ff747d2902dd2c57",
+    "player_tree": "b3401ef94a9a84f80a9a953a85f90934e57d3750",
+    "observer": "876fc65af99749aaefa38e17d2f82eb0cec91880",
+    "observer_version": "0.3.5",
+    "private_caller": "c8a48072ab9efaa35e341c8beeff8055ea53a31d"
+  },
+  "scope": "Two actual Base imported 1.1 input/client/personal lifecycle runs; broader Library, performance and stable acceptance remain open.",
+  "arms": [
+    {
+      "target": "f200",
+      "engine": {
+        "version": "2.0.77",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "player_zip_sha256": "7FAD132323D9BD8C2841278F51DFB910E9D40D65FC9B0310B07430D7ACB45A7A",
+      "protected_save_sha256": "56598A69E7AFD30023EE368D17BAD3325CB58A6FF08B26B2DA2BD0AABBB0D500",
+      "terminal_sha256": "30E0E9831BEC0D2DD081874666EF51FC41463CB3E6F7D196F22ED8A9ABDCBC95",
+      "execution_freeze_sha256": "D264691AAE73912665872DB3C68FE451FF26E0BD514D17957B051B818CBE2E95",
+      "observed": {
+        "one_shot_advances": 15,
+        "physical_actor_runs": 9,
+        "native_input_witnesses": 9,
+        "framed_native_reports": 56,
+        "successful_captures": 5,
+        "joins": 5,
+        "native_effect_resets": 2,
+        "player_removal": 1,
+        "private_queries": 48,
+        "removed_index": 2,
+        "replacement_index": 2,
+        "host_restart_with_both_clients": true
+      },
+      "restart_save": {
+        "bytes": 2745893,
+        "sha256": "383235C9C76A92D55800D2D8DC83682CF0635024C0B4B94B2586F179200012FB"
+      },
+      "final_save": {
+        "bytes": 2749121,
+        "sha256": "DE3E21FA1F2FDBBB327EF576D27EF2818FB180D820FD6002A16B2EC4006E6BD6"
+      },
+      "final_save_separately_cold_loaded": false,
+      "controls_restored": true,
+      "cleanup_errors": [],
+      "factorio_zero": true
+    },
+    {
+      "target": "f210",
+      "engine": {
+        "version": "2.1.23",
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "player_zip_sha256": "B59C8EBA9FCE8F152C6632BF843DE527C3C03BAE8A60B7C9DFA72D36541B4F52",
+      "protected_save_sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD",
+      "terminal_sha256": "15A294B6AC89810E606A9792BBC0BE04B91AB617A536771907C74FF4C1FDC16D",
+      "execution_freeze_sha256": "908FA335387068300E1D8A692D6193FF41C911EAAD882C675EEBDC808C73A8BA",
+      "observed": {
+        "one_shot_advances": 15,
+        "physical_actor_runs": 9,
+        "native_input_witnesses": 9,
+        "framed_native_reports": 53,
+        "successful_captures": 5,
+        "joins": 5,
+        "native_effect_resets": 2,
+        "player_removal": 1,
+        "private_queries": 48,
+        "removed_index": 2,
+        "replacement_index": 2,
+        "host_restart_with_both_clients": true
+      },
+      "restart_save": {
+        "bytes": 2774378,
+        "sha256": "FA7C6B1BF3CBE0EF2CAE8F0D48EF83853A7F3EE75B5D8EA9A55F02118C6C2054"
+      },
+      "final_save": {
+        "bytes": 2772384,
+        "sha256": "58BFEC4DF22CE47F8792C1E82386A9D93A42D7CAD72F6D51BC450E6E5F6046E3"
+      },
+      "final_save_separately_cold_loaded": false,
+      "controls_restored": true,
+      "cleanup_errors": [],
+      "factorio_zero": true
+    }
+  ],
+  "protected_state": "The frozen 0.3.5 observer checks independently recovered literals for 31 paid rows and 71 recipe totals across three forces, hidden credits and foreign partial/queued work before input and after saved-host restart. Immutable world comparisons remain across the fixed lifecycle. The observer does not seed credits or require a product whitelist.",
+  "input_and_view_findings": [
+    "Hardware typing produces \"ge\" then \"gears\" in the English Library; native resets preserve that live root/query and the independent German mining view.",
+    "A real 30-pixel horizontal drag persists through both close/reopen paths and saved-host restart. Esc and inventory closes have accepted actual gui-closed witnesses.",
+    "Native refresh preserves foreign GUI focus; typing \"focus\" then \"focus kept\" is observed while the Library stays closed.",
+    "Removed player/root/query objects become invalid. Factorio reuses numeric player index 2 for the German replacement; the original objects remain retired.",
+    "Both locale views and the English window position remain after replacement, native save and a new host/two-client restart."
+  ],
+  "visual_review": {
+    "images_individually_inspected": 10,
+    "resolution": [
+      1280,
+      720
+    ],
+    "display_scale": 0.75,
+    "findings": [
+      "All ten actual 1280x720 PNGs were inspected separately. English/German text is readable, the list/detail panes fit the selected geometry and no error dialog appears.",
+      "Each initial English view has 54 matching rows and selected iron gear detail at level 3; each German view has one mining result at level 2.",
+      "The foreign-focus screenshot shows the separate fixture frame with Library closed. Native reports establish subsequent typing and focus retention.",
+      "Each final English view has the \"gears\" query and one result at window x=290. German retains its distinct mining query at x=320. The initial Library x=320 and drag reports establish the 30-pixel displacement."
+    ],
+    "original_images": [
+      {
+        "path": "qualified-inputs-f210-r02/inputs/native-captures/client-de/inspection.png",
+        "sha256": "355DBD71BFF6FE192FAAEE194ECA487CCD2C7DE822B9D2C50B527E77F20ED174"
+      },
+      {
+        "path": "qualified-inputs-f210-r02/inputs/native-captures/client-de-restart/final.png",
+        "sha256": "88E6C6B3B10B9828A45C611B647F1A164AFEF9A94AC8361FBE35FC708FE5509A"
+      },
+      {
+        "path": "qualified-inputs-f210-r02/inputs/native-captures/client-en/foreign-inspection.png",
+        "sha256": "C6F484266BE536343EB8CA98BA7B18F3DA5F4D39133D01DB8B9A51E222A85689"
+      },
+      {
+        "path": "qualified-inputs-f210-r02/inputs/native-captures/client-en/inspection.png",
+        "sha256": "0F030C4B7B319A6224A34E91AD2A9053298EA4DB039E32259EDBA7B06A8DF146"
+      },
+      {
+        "path": "qualified-inputs-f210-r02/inputs/native-captures/client-en-restart/final.png",
+        "sha256": "CE1BE2FF3405F0D813AC075E7923AB000EB6040330A747964B97BE265CB35324"
+      },
+      {
+        "path": "qualified-inputs-r05/inputs/native-captures/client-de/inspection.png",
+        "sha256": "972F8ADD0A681875AB00CABBB1F1EF8D082E09DA7716A3F9D4E719D1E99E9FD5"
+      },
+      {
+        "path": "qualified-inputs-r05/inputs/native-captures/client-de-restart/final.png",
+        "sha256": "BAC4560C4F79572A17992E81F1AB1415FB332B0A4AA2899E87885DDC9540602D"
+      },
+      {
+        "path": "qualified-inputs-r05/inputs/native-captures/client-en/foreign-inspection.png",
+        "sha256": "A2076682736CC5C4913BFA29CE06D2E1ADEC68209D99AEA7DC467BC20A987B4B"
+      },
+      {
+        "path": "qualified-inputs-r05/inputs/native-captures/client-en/inspection.png",
+        "sha256": "FA52AE7F9E419376E8F9C785EE6C15CA2DBDA04F8190CC96D4A7647BA98F1B50"
+      },
+      {
+        "path": "qualified-inputs-r05/inputs/native-captures/client-en-restart/final.png",
+        "sha256": "CC7BCC102FAD50FDD3A0574C6DADB128AF6F362DBAF423B0AF58DFCC7AE79002"
+      }
+    ]
+  },
+  "resource_handling": "Medium sprite inputs are functional only. Capture actors retain the 7168 MiB session budget and existing machine reserves. One F200 pre-start memory refusal was admitted after the existing 10-second wait under the same threshold; the original refusal is retained. Hardware actions and fixture advances were not retried.",
+  "custody": {
+    "original_commit": "04aed46021d283fad3050f9cbf1502bcc4d572bc",
+    "original_path": "projects/mir/runs/library-current507-native-r01",
+    "original_records": 781,
+    "capsule_sha256": "A3E7E69E8D40C2560B251DA1D9B74F424D154ABE625655F11477C1ECBE8093DA",
+    "decoded_sha256": "D955B89F6191AB0E4B821C1F4FB0013EC7B9181E08EF7DCF3B5FF83229482C86",
+    "raw_local_files": 1519,
+    "raw_local_bytes": 120697212,
+    "raw_files_hash_verified_to_secondary": true,
+    "independent_review_commit": "d898ef24ac6aaeb707693a39038a53914a8769b6",
+    "independent_review_path": "projects/mir/runs/aero-library-current507-actual-review-r01/review.json",
+    "independent_review_sha256": "0EF0708A93AEA3461C2D4EBED894013401A0FF0D56B6186D864ECC9C86B16255"
+  },
+  "adverse_scope": "All four qualified-input failures and earlier mixed internal 7a2, observer, readiness and capture failures retain their original records. Later completed runs do not relabel those failures.",
+  "limits": [
+    "The restart saves were actually loaded; the two final saves have native save-completion/CRC observations but were not separately cold-loaded.",
+    "Fixture API opens are setup and private exclusion probes; the nine fixed hardware actions do not establish dropdown/checkbox/all-view/scroll/resize/settings/import/export-file coverage.",
+    "Discovery Tree, broader Library/performance and stable remain unqualified. The next source change, player tree d736, is outside these published 5.0.7 / player tree b340 observations.",
+    "Safe originals include framed non-auth responses and receipts. Protected full logs/saves remain in native-owner primary/secondary custody; independent review does not claim fresh downloads of those protected raw files."
+  ],
+  "performance_acceptance": false,
+  "broader_library_acceptance": false,
+  "stable_acceptance": false
+}
