@@ -17,7 +17,7 @@ class LibraryNativeInputControls(unittest.TestCase):
         base = {"schema": 1, "kind": "MIRLibraryNativeInputV1", "role": "client-en", "process_id": 12345,
                 "process_start_utc": "2026-10-29T09:00:00.1234567Z", "engine_sha256": "A" * 64,
                 "client_width": 1280, "client_height": 720, "action": "escape"}
-        accepted = [base, {**base, "action": "inventory"}, {**base, "action": "text", "text": "gears"},
+        accepted = [base, {**base, "action": "inventory"}, {**base, "action": "tab"}, {**base, "action": "text", "text": "gears"},
                     {**base, "action": "click", "x": 600, "y": 150},
                     {**base, "action": "drag", "x": 950, "y": 130, "target_x": 920, "target_y": 100}]
         rejected = []
@@ -230,9 +230,9 @@ public static class MIRLibraryInputNative {
           $try=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.TryStatementAst]},$true))
           if($try.Count-ne1){throw 'actor finally differs'}
           $actualFinally=(@($try[0].Finally.Statements|ForEach-Object {$_.Extent.Text})-join"`n")
-          foreach($case in @('escape','inventory','lost-window','zero-map','down-failed','up-failed')){
+          foreach($case in @('escape','inventory','tab','lost-window','zero-map','down-failed','up-failed')){
             [MIRLibraryInputNative]::Events.Clear();$script:checks=0
-            $action=if($case-ceq'inventory'){'inventory'}else{'escape'}
+            $action=if($case-ceq'inventory'){'inventory'}elseif($case-ceq'tab'){'tab'}else{'escape'}
             $script:sent=0;$script:heldHardwareScan=[uint16]0;$script:mouseHeld=$false
             $script:hardwareKeyEvents=[Collections.Generic.List[object]]::new()
             $script:physicalPointerPositions=[Collections.Generic.List[object]]::new()
@@ -243,7 +243,7 @@ public static class MIRLibraryInputNative {
               Invoke-LibraryInputHardwareKey -Action $action -ResolveScan {
                 param([uint16]$VirtualKey)
                 [MIRLibraryInputNative]::Events.Add("map:$VirtualKey")
-                if($case-ceq'zero-map'){return 0};if($VirtualKey-eq0x1b){return 1};if($VirtualKey-eq0x45){return 0x12};throw 'unexpected virtual key'
+                if($case-ceq'zero-map'){return 0};if($VirtualKey-eq0x1b){return 1};if($VirtualKey-eq0x45){return 0x12};if($VirtualKey-eq0x09){return 0x0f};throw 'unexpected virtual key'
               } -KeyEvent {
                 param([uint16]$Scan,[bool]$Down)
                 [MIRLibraryInputNative]::Events.Add("key:${Scan}:$Down")
@@ -261,13 +261,14 @@ public static class MIRLibraryInputNative {
             $expected=switch($case){
               'escape'{'window|map:27|key:1:True|pause:100|window|key:1:False'}
               'inventory'{'window|map:69|key:18:True|pause:100|window|key:18:False'}
+              'tab'{'window|map:9|key:15:True|pause:100|window|key:15:False'}
               'lost-window'{'window|map:27|key:1:True|pause:100|window|cleanup:1:False'}
               'zero-map'{'window|map:27'}
               'down-failed'{'window|map:27|key:1:True'}
               'up-failed'{'window|map:27|key:1:True|pause:100|window|key:1:False|cleanup:1:False'}
             }
             if($events-cne$expected){throw "hardware event order differs ${case}: $events"}
-            if($failed-ne($case-cnotin@('escape','inventory'))){throw 'hardware failure classification differs'}
+            if($failed-ne($case-cnotin@('escape','inventory','tab'))){throw 'hardware failure classification differs'}
             $r=Get-Content -LiteralPath $script:receipt -Raw|ConvertFrom-Json
             $expectedSent=if($case-cin@('zero-map','down-failed')){0}else{2}
             if($r.input_events_sent-ne$expectedSent-or$r.hardware_key_still_held){throw 'hardware cleanup receipt differs'}

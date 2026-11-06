@@ -13,7 +13,7 @@ function Assert-LibraryInput([bool]$Condition,[string]$Message){if(-not$Conditio
 function Test-LibraryInputInteger($Value){return $Value-is[int] -or $Value-is[long]}
 function Invoke-LibraryInputHardwareKey{
   param(
-    [Parameter(Mandatory)][ValidateSet('escape','inventory')][string]$Action,
+    [Parameter(Mandatory)][ValidateSet('escape','inventory','tab')][string]$Action,
     [Parameter(Mandatory)][scriptblock]$ResolveScan,
     [Parameter(Mandatory)][scriptblock]$KeyEvent,
     [Parameter(Mandatory)][scriptblock]$Pause,
@@ -23,7 +23,7 @@ function Invoke-LibraryInputHardwareKey{
     [Parameter(Mandatory)][AllowEmptyCollection()][System.Collections.Generic.List[object]]$Events
   )
   & $AssertWindow
-  $virtualKey=if($Action-ceq'escape'){0x1b}else{0x45}
+  $virtualKey=switch($Action){'escape'{0x1b};'inventory'{0x45};'tab'{0x09}}
   $scan=& $ResolveScan ([uint16]$virtualKey)
   Assert-LibraryInput ((Test-LibraryInputInteger $scan)-and$scan-gt0-and$scan-le0xff) 'hardware key scan mapping differs'
   $n=& $KeyEvent ([uint16]$scan) $true;$Sent.Value+=$n
@@ -83,7 +83,7 @@ function Invoke-LibraryInputDragSchedule{
 }
 function Assert-LibraryInputPlan([System.Collections.IDictionary]$Spec){
   $common=@('schema','kind','role','process_id','process_start_utc','engine_sha256','action','client_width','client_height')
-  Assert-LibraryInput ($Spec.Contains('action') -and $Spec.action-is[string] -and $Spec.action-cin@('escape','inventory','text','click','drag')) 'action differs'
+  Assert-LibraryInput ($Spec.Contains('action') -and $Spec.action-is[string] -and $Spec.action-cin@('escape','inventory','tab','text','click','drag')) 'action differs'
   $extra=switch($Spec.action){'text'{@('text')};'click'{@('x','y')};'drag'{@('x','y','target_x','target_y')};default{@()}}
   $expected=@($common)+@($extra)
   Assert-LibraryInput ($Spec.Count-eq$expected.Count -and ((@($Spec.Keys|Sort-Object)-join'|')-ceq(@($expected|Sort-Object)-join'|'))) 'fields differ'
@@ -193,7 +193,7 @@ try{
     Assert-LibraryInput ((Get-MIROwnedMenuPointRoot -X $absoluteX -Y $absoluteY)-eq[IntPtr]$window.handle) 'pointer target is not owned'
   }
   switch($spec.action){
-    {$_-cin@('escape','inventory')}{
+    {$_-cin@('escape','inventory','tab')}{
       Invoke-LibraryInputHardwareKey -Action $spec.action -ResolveScan {param([uint16]$VirtualKey)[int][MIRLibraryInputNative]::ResolveHardwareScan($VirtualKey,4)} -KeyEvent {param([uint16]$Scan,[bool]$Down)[MIRLibraryInputNative]::HardwareKey($Scan,$Down)} -Pause {param([int]$Milliseconds)Start-Sleep -Milliseconds $Milliseconds} -AssertWindow {Assert-CurrentInputWindow} -Sent ([ref]$sent) -HeldScan ([ref]$heldHardwareScan) -Events $hardwareKeyEvents
     }
     'text'{foreach($character in $spec.text.ToCharArray()){
@@ -225,7 +225,7 @@ try{
   }
   $result.failure=$failure;$result.input_events_sent=$sent;$result.window=$window;$result.window_diagnostics=$diagnostics;$result.physical_pointer_positions=$physicalPointerPositions.ToArray()
   $result.hardware_key_events=$hardwareKeyEvents.ToArray();$result.hardware_key_still_held=($heldHardwareScan-ne0)
-  $result.input_method='Windows SendInput;Esc/E scan-code down,100ms hold,up;text Unicode;physical-cursor readback;owned foreground PID/start/engine/geometry/hit-test checked;no Factorio events raised'
+  $result.input_method='Windows SendInput;Esc/E/Tab scan-code down,100ms hold,up;text Unicode;physical-cursor readback;owned foreground PID/start/engine/geometry/hit-test checked;no Factorio events raised'
   $result|ConvertTo-Json -Depth 12|Set-Content -LiteralPath $receipt -Encoding utf8
   if($null-ne$client){$client.Dispose()}
 }
