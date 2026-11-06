@@ -17013,6 +17013,157 @@
         "original_request_fields_preserved": true,
         "native_tests_run": false,
         "stable_acceptance": false
+      },
+      {
+        "subjects": [
+          "CONT-01",
+          "CONT-02",
+          "CONT-12"
+        ],
+        "reviewed_on": "2026-11-06",
+        "reviewed_against": "f10284234479f8ffa4be852b04875ee0a936b906",
+        "scope": "Six complete external-cycle/Classic-cycle test bodies at 256 indexed commit/path bindings, with focused published call-context inspection. This is test-intent reconciliation, not native compatibility or whole-history acceptance.",
+        "method": "Read exact original assertions before current implementation. Verify immutable Git objects and consolidate aliases. Distinguish the old internal compatibility probe from its separate production graph assertion; retain product behavior under GEN-04/06 and the named compatibility contract, and retire replaced compiler/harness interfaces explicitly.",
+        "sources": [
+          {
+            "blob": "a26a4301de813f1813d390b7e97d269441cf0ca2",
+            "sha256": "DFA581A053E2BE47A6D6D2636DBEEC5888BBF475D69C2F1D21AA5B42132278E1",
+            "bytes": 3666,
+            "representative_reference": {
+              "tag": "v4.1.0",
+              "commit": "3562377b520cccb071b97b3968946eae7024c950",
+              "path": "fixtures/external-technology-cycle/data-final-fixes.lua"
+            },
+            "indexed_bindings": 94
+          },
+          {
+            "blob": "f0839ee54d1ce03de08c515eb33c319ab9dbc8be",
+            "sha256": "2B419EC4DBB20DE9BEE76081863F2E1B8D39B984BFC731DC966E4B8BE71A21BA",
+            "bytes": 4523,
+            "representative_reference": {
+              "tag": "v4.7.3",
+              "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+              "path": "fixtures/external-technology-cycle/data-final-fixes.lua"
+            },
+            "indexed_bindings": 16
+          },
+          {
+            "blob": "af49424b6427c25208443713f03a6365a4100aee",
+            "sha256": "95176ABB9632A4F23695BD2EB58A473FBC74C64E7D4E2AC560D0DADF496417DA",
+            "bytes": 75,
+            "representative_reference": {
+              "tag": "v4.7.3",
+              "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+              "path": "fixtures/external-technology-cycle/data.lua"
+            },
+            "indexed_bindings": 110
+          },
+          {
+            "blob": "2ffb90d11a865fd0141a5fbb8cfe48c869d1eec4",
+            "sha256": "82BEEEF964B91897925D58A198CB1D676E55A5CFC89EA66868006634DCF92B46",
+            "bytes": 1736,
+            "representative_reference": {
+              "tag": "v4.7.3",
+              "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+              "path": "tests/compiler/Test-MIRClassicCompatibilityCycleBounds.ps1"
+            },
+            "indexed_bindings": 12
+          },
+          {
+            "blob": "1ba550f5444703729f11ebabfe580ad5633025ca",
+            "sha256": "46A33C14D93E45F2F43695236DE4C35CF6371442567C482256F3E9E0BE755915",
+            "bytes": 6918,
+            "representative_reference": {
+              "tag": "v4.7.3",
+              "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+              "path": "tests/compiler/classic_compatibility_cycle_bounds.lua"
+            },
+            "indexed_bindings": 12
+          },
+          {
+            "blob": "290a3aaa85716f995de15510e7fd7d9445ff38a0",
+            "sha256": "E0B22532B10C76DE471676165DCB635C7D092A4A23F04A1D5C6EB0CDB27689A0",
+            "bytes": 1905,
+            "representative_reference": {
+              "tag": "v4.7.3",
+              "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+              "path": "tests/compiler/run_classic_compatibility_cycle_bounds.py"
+            },
+            "indexed_bindings": 12
+          }
+        ],
+        "call_context": [
+          {
+            "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+            "path": "source/prototypes/mir/emit/technology_graph_safety.lua",
+            "blob": "9058a182491144ffe9b9b8a2511bcabef7313646",
+            "sha256": "8467B375F695F1C20DE36EE75506F61F6127CA6545FA12FF0FF11D76E730A772",
+            "lines": "32-81"
+          },
+          {
+            "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+            "path": "source/prototypes/mir/pipeline/commands.lua",
+            "blob": "5819a2e3c2bd31d840d169adf9fb405311cd0d0d",
+            "sha256": "1FF005F1628D631B03389BA0D0D5A945CE72ECD20F28A7154CFA96FB58E015C8",
+            "lines": "128-134"
+          }
+        ],
+        "source_binding_limits": "All 256 indexed commit:path bindings resolve; 50 local index names represent 49 commits. The local v4.2.0 alias remains distinct from v4.2.0-stable. These counts do not establish current remote publication or native passes.",
+        "groups": [
+          {
+            "intent": "Named Astroponics/Muluna repair, activation and unrelated-state preservation",
+            "disposition": "Retain the independently declared edge removal only after a proven return path, with both named mods active. Preserve other prerequisites and fields, no-op identity, idempotence and useful repair logging. The old injected/stale operation interface is superseded by synchronous named mutation with no operation/evidence argument.",
+            "implementation": [
+              "source/overrides/prerequisite_repairs.lua",
+              "source/data-final-fixes.lua"
+            ],
+            "controls": [
+              "tests/test_prerequisite_repairs.py::test_astroponics_repairs_the_published_three_edge_path_on_both_targets",
+              "tests/test_prerequisite_repairs.py::test_astroponics_refuses_missing_or_different_paths_without_touching_foreign_arrays",
+              "tests/test_prerequisite_repairs.py::test_astroponics_matches_published_reachability_on_finite_independent_graphs",
+              "tests/test_prerequisite_repairs.py::test_data_final_imports_the_repair_only_for_an_active_supported_named_input"
+            ]
+          },
+          {
+            "intent": "Required direct reference and local-cycle failures before publication",
+            "disposition": "Retain GEN-04/06. Source already rejects missing direct prerequisites and local family cycles before its first write. Add the missing direct-prerequisite opponent to the existing all-family publication-safety control; valid forward references remain accepted.",
+            "implementation": [
+              "source/research/generator.lua"
+            ],
+            "controls": [
+              "tests/test_generator.py::test_all_family_failures_precede_first_write",
+              "tests/test_generator.py::test_valid_family_forward_reference_and_one_write"
+            ],
+            "opposition": "The prior control accepts an opponent omitting only missing-prerequisite rejection; the recovered control rejects it and retains zero-write assertions. Both controls pass the unchanged implementation. Four observations use pinned Lua 5.2; the complete 54-test Generator group also passes.",
+            "evidence": "5e286d5f2d8ecf097c51b2113a79d8bd07e0af02:projects/mir/runs/aero-cycle-and-retained-library-review-r01/control-results.json (F76AD6C2E4E77E563754831E37F80BB15A0E4EA7372ACE3B16D2AD1A16481B94)"
+          },
+          {
+            "intent": "General foreign graph, enabled-only and mixed generated/foreign cycle probe",
+            "disposition": "Superseded internal probe/global-planner contract under ARCH and explicit GEN-06 local preflight. The original inspect_reachable fixture probe is distinct from the old production assert_registered_technologies path. No generic foreign graph or disabled-everywhere scan is restored.",
+            "limits": "The current local cycle control does not test the old mixed foreign graph. Arbitrary foreign safety remains unclaimed. A concrete admitted authored back-edge needs a scoped correction. COMP-01 still requires missing/disabled direct prerequisites to grant no named external gun-owner coverage; this disposition does not waive that rule."
+          },
+          {
+            "intent": "Deep traversal and Classic work/refusal boundaries",
+            "disposition": "Preserve nonrecursive, reached-input work and no fabricated repair; retire the old generic 4096-node probe, Classic 64/128 budgets, 65-wide/129-chain refusal reasons and separate plan/apply protocol. The current named repair explicitly allows one iterative finite reached-subgraph proof.",
+            "controls": [
+              "tests/test_prerequisite_repairs.py::test_astroponics_reachability_is_deterministic_and_visits_only_the_reached_graph_once",
+              "tests/test_generator.py::test_unrelated_world_growth_is_not_traversed"
+            ],
+            "limits": "No execution of the old 4096-node or Classic budget fixtures, or new native stress pass, is claimed."
+          },
+          {
+            "intent": "Registry modes, wrapper and comment-only entry point",
+            "disposition": "Retire internal Full/Classic options, nil return shape, old compiler registry/runtime-directory/check-count wrappers and comment-only data.lua. Keep original Git references and current activation/logging expectations; do not restore the retired framework or create a native campaign merely for these wrappers."
+          }
+        ],
+        "independent_review": {
+          "path": "5e286d5f2d8ecf097c51b2113a79d8bd07e0af02:projects/mir/runs/aero-cycle-and-retained-library-review-r01/historical-review.json",
+          "sha256": "E12F8A3F212AA3A99387EB01C105C5BBF94C944D980AB47EB2B656FB8BE98F05"
+        },
+        "remaining_executable_check": "Keep actual Astroponics/Planet Muluna and other supported-profile loading/progression under the existing CONT-12 native queue and exact inputs. Source/host assertions do not qualify their upstream archives or current gameplay. Other historical helpers, inter-release changes and consumers remain outside this slice; do not restart the old graph/compiler campaigns.",
+        "native_execution": false,
+        "source_reconciliation_complete": false,
+        "test_intent_reconciliation_complete": false
       }
     ],
     "stable_coverage_review": {
@@ -17246,13 +17397,14 @@
             "https://github.com/Julesc013/more-infinite-research/blob/aa8eabfd33228de5e6d3c4c27744fbb50464c1f3/spec/evidence/foundation504-normal-comparison-r01.json",
             "Julesc013/mir-native-worker@c45ba6f168b28a8c6234daf62f4f034daab4a00f:evidence/aero-foundation504-normal-result-review-r01/review.json (6950973F)",
             "https://github.com/Julesc013/mir-native-worker/pull/137#issuecomment-6654277233",
-            "https://github.com/Julesc013/mir-native-worker/pull/137#issuecomment-6654821985"
+            "https://github.com/Julesc013/mir-native-worker/pull/137#issuecomment-6654821985",
+            "5e286d5f2d8ecf097c51b2113a79d8bd07e0af02:projects/mir/runs/aero-cycle-and-retained-library-review-r01/retained-review.json (A8C5909AA41D1F6CAD6AC47A7EE0F0559322960BBCF435A0C4915D0233BC3C8B)"
           ],
-          "remaining_executable_check": "Independently review originals from07431FDE r02: Root reports four data-valid sessions (two warmups/two identical4.7.20002 controls), full restoration and zero remaining Factorio processes. The fixed38-endpoint A/A gate9DB77444 stops on German Library reopen:36.3499 versus20.1254ms, absolute16.2245ms above5ms allowance; both are reference observations despite generic published/candidate field labels. No scored MIR5 pair or performance verdict follows. Verify source/workload/stage/state equivalence and the original samples before deciding a changed diagnostic or method; preserve tolerances and25EAA failure. Advance ready settings/export or active-runtime work meanwhile. Whole-product responsive-menu/load/spikes/useful-work/backlog/Library/memory endpoints remain open on pinned Base/SpaceAge/heavy2.0/2.1 profiles; earlier Foundation6950973F and menu components retain original scopes.",
+          "remaining_executable_check": "The 07431FDE retained-Library originals are independently reviewed by A8C5909A: all 1,503 safe bodies (1,496 lossless/7 explicit redacted projections), 152 acceptance observations and 104 diagnostic values verify. Two warmups precede two identical 4.7.20002 reference controls with the same seed. Of 38 A/A controls, 37 pass; the German peer reopen is 36.3499 versus 20.1254 ms, absolute 16.2245 ms above the fixed 5 ms floor. The stop remains adverse with no scored MIR5 pair, extension, retry or performance pass. Profiler timings cover two player-open calls on each peer; save_ready is process-log elapsed to ready, not isolated map-load time or responsive-menu time. A further retained comparison needs an evidence-based changed diagnostic/method with frozen inputs and unchanged original criteria; the cause remains unestablished. Advance ready independent startup/load/active-runtime/input work meanwhile. Complete whole-product spikes/useful-work/backlog/Library/memory endpoints on the selected pinned profiles; preserve earlier Foundation and menu scopes.",
           "owner": "Black Glass",
           "independent_review": "Aero",
-          "status": "partial: bounded Foundation mean-update component accepted; recorded505 Library comparison stops at identical-reference A/A repeatability before scoring; full performance remains unqualified",
-          "readiness": "Root reports07431FDE terminal: identical-reference A/A fails one repeatability endpoint; no scored MIR5 pair",
+          "status": "partial: bounded Foundation component retained and stopped Library A/A originals independently reviewed; no scored Library/current-package or whole-product performance acceptance",
+          "readiness": "The adverse A/A result and its exact stop are reviewed. Resolve a changed evidence-based measurement step before another retained comparison; other ready native cases remain independent.",
           "next_work_inputs": [
             "https://github.com/Julesc013/mir-native-worker/pull/137#issuecomment-6654277233",
             "spec/evidence/foundation504-normal-comparison-r01.json",
