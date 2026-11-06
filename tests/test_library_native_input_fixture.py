@@ -585,6 +585,20 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 force.current_research=force.technologies[gear];force.research_progress=.42
                 force.research_queue={force.technologies[gear],force.technologies["recipe-prod-research_plastic-1"]}
               elseif force_index==3 then force.technologies[gear].saved_progress=.27 end
+              if input_observer_version=="0.3.5" then
+                for _,value in pairs(force.recipes) do value.productivity_bonus=0 end
+                for id,effects in pairs(historical.rows) do
+                  local completed=id==gear and (force_index==1 and 2 or 0) or 1
+                  for _,effect in ipairs(effects) do
+                    if effect.type=="change-recipe-productivity" then
+                      local value=force.recipes[effect.recipe]
+                      value.productivity_bonus=value.productivity_bonus+effect.change*completed
+                    end
+                  end
+                end
+                if force_index==2 then force.research_progress=.42/8000
+                elseif force_index==3 then force.technologies[gear].saved_progress=.27/8000 end
+              end
               forces[name]=force
             end
             local game={forces=forces,players={},connected_players={},tick=0,saves={}}
@@ -721,9 +735,13 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               [historical.fixture]=target=="f200" and "0.3.0" or "0.4.0",
               ["mir-fixture-mir5-active-mods-observer"]="0.1.0",
               ["mir-fixture-mir5-library-native-input"]=input_observer_version or "0.3.0"}
+            if input_observer_version=="0.3.5" then active[historical.fixture]=nil end
             local env={game=game,storage=store,defines={events=events,gui_type={custom=99},controllers={character=7,cutscene=11}},log=function(message)logs[#logs+1]=message end,
               helpers={table_to_json=function()return "{}"end},
-              require=function(name)assert(name=="__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue");return historical end,
+              require=function(name)
+                assert(name==(input_observer_version=="0.3.5" and "catalogue"
+                  or "__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue"));return historical
+              end,
               remote={add_interface=function(name,value)interfaces[name]=value end,
                 call=function(name,method,index,options)
                   assert(name=="more-infinite-research-browser" and method=="open");calls=calls+1;build(game.players[index],options);return true
@@ -769,6 +787,16 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               if opponent=="wrong-initial-credit" then forces.player.technologies[ids[1]].level=1 end
               if opponent=="preexisting-player" then game.players[9]={} end
               if opponent=="extra-mod" then active.extra="1.0.0" end
+              if opponent=="helperfree-historical-controller" then active[historical.fixture]="0.3.0" end
+              if opponent=="helperfree-missing-active-observer" then active["mir-fixture-mir5-active-mods-observer"]=nil end
+              if opponent=="helperfree-wrong-engine" then active.base="2.0.78" end
+              if opponent=="helperfree-lost-row" then forces.player.technologies["recipe-prod-research_plastic-1"].level=1 end
+              if opponent=="helperfree-lost-recipe" then forces.player.recipes["plastic-bar"].productivity_bonus=0 end
+              if opponent=="helperfree-lost-foreign-work" then forces["mir5-migration-origin-f200-110-foreign"].research_progress=0 end
+              if opponent=="helperfree-wrong-foreign-queue" then forces["mir5-migration-origin-f200-110-foreign"].research_queue={} end
+              if opponent=="helperfree-lost-detached-work" then forces["mir5-migration-origin-f200-110-detached"].technologies[gear].saved_progress=0 end
+              if opponent=="helperfree-wrong-battery" then forces.player.worker_robots_battery_modifier=0 end
+              if opponent=="helperfree-unrelated-cannon-bonus" then forces.player.get_gun_speed_modifier=function()return .25 end end
               if opponent=="startup-credit-enabled-until-configuration" or opponent=="startup-credit-still-enabled" then
                 forces.player.technologies[ids[1]].enabled=true
               elseif opponent=="startup-credit-level-lost" then
@@ -1045,6 +1073,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                                      ("delivered", 5, 48))
                     self.assertTrue(final["imported_earnings"])
                     self.assertFalse(final["fixture_seeds_credit"])
+                    self.assertTrue(final["original_preservation_fixture_required"])
                     if opponent:
                         self.assertEqual(final["removed_index"], final["de_index"])
             for opponent in ("missing-click-event", "removal-no-event", "replacement-index-reuses-en",
@@ -1088,16 +1117,55 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             with self.subTest(target=target):
                 observer = json.loads((FIXTURE / f"info-input-current-{target}.json").read_text())
                 self.assertEqual((observer["name"], observer["version"], observer["factorio_version"]),
-                                 ("mir-fixture-mir5-library-native-input", "0.3.4", base.rsplit(".", 1)[0]))
+                                 ("mir-fixture-mir5-library-native-input", "0.3.5", base.rsplit(".", 1)[0]))
                 self.assertEqual(observer["dependencies"], [f"base = {base}",
-                                 f"~ more-infinite-research = {version}",
-                                 f"~ {historical_name} = {historical_version}"])
+                                 f"~ more-infinite-research = {version}"])
                 historical = json.loads((ROOT / "tests/fixtures/migration-origins/f200-110-successor" /
                                          f"info-{target}-source-defaults-current.json").read_text())
                 self.assertEqual((historical["name"], historical["version"], historical["factorio_version"]),
                                  (historical_name, historical_version, base.rsplit(".", 1)[0]))
                 self.assertEqual(historical["dependencies"], [f"base = {base}",
                                  f"more-infinite-research = {version}"])
+
+    def test_helperfree_catalogue_is_the_unchanged_historical_test_data(self):
+        # Git may check text out with CRLF; native archives still use raw Git bytes.
+        original = (ROOT / "tests/fixtures/migration-origins/f200-110-successor/catalogue.lua").read_bytes().replace(b"\r\n", b"\n")
+        self.assertEqual(hashlib.sha256(original).hexdigest().upper(),
+                         "39BC46FC931CD178756FC47E499744C92A58D4C725B62403B06254F57A7FFA26")
+        self.assertEqual((FIXTURE / "catalogue.lua").read_bytes().replace(b"\r\n", b"\n"), original)
+
+    def test_helperfree_input_retains_the_full_existing_lifecycle_without_a_migration_controller(self):
+        for target, version in (("f200", "5.0.20007"), ("f210", "5.0.21007")):
+            for opponent in (None, "replacement-index-reused", "startup-credit-enabled-until-configuration", "helperfree-unrelated-cannon-bonus"):
+                with self.subTest(target=target, opponent=opponent):
+                    result = self.run_case(target, opponent, version, "0.3.5")
+                    self.assertTrue(result["ok"], result["message"])
+                    self.assertTrue(result["readonly_report"])
+                    self.assertTrue(result["readonly_load"])
+                    self.assertEqual((result["final"]["phase"], result["final"]["actual_joins"],
+                                      result["final"]["private_queries"]), ("delivered", 5, 48))
+                    self.assertEqual(result["resets"], 2)
+                    self.assertFalse(result["final"]["fixture_seeds_credit"])
+                    self.assertFalse(result["final"]["original_preservation_fixture_required"])
+
+    def test_helperfree_input_rejects_wrong_inputs_and_lost_paid_or_foreign_state(self):
+        for target, version in (("f200", "5.0.20007"), ("f210", "5.0.21007")):
+            for opponent in ("helperfree-historical-controller", "helperfree-missing-active-observer", "helperfree-wrong-engine",
+                             "helperfree-lost-row", "helperfree-lost-recipe", "helperfree-lost-foreign-work",
+                             "helperfree-wrong-foreign-queue", "helperfree-lost-detached-work", "helperfree-wrong-battery",
+                             "wrong-initial-credit", "preexisting-player", "extra-mod", "startup-baseline-early-report",
+                             "startup-credit-still-enabled", "startup-credit-level-lost", "startup-credit-effect-lost",
+                             "missing-click-event", "removal-no-event", "replacement-index-reuses-en",
+                             "changed-restart-index", "native-effect-change"):
+                with self.subTest(target=target, opponent=opponent):
+                    result = self.run_case(target, opponent, version, "0.3.5")
+                    self.assertFalse(result["ok"], opponent)
+            for wrong in ("5.0.20008", "5.0.21008", "5.0.20001", "5.0.21001",
+                          "5.0.21007" if target=="f200" else "5.0.20007"):
+                with self.subTest(target=target, version=wrong):
+                    result = self.run_case(target, package_version=wrong, input_observer_version="0.3.5")
+                    self.assertFalse(result["ok"])
+                    self.assertIn("imported native target differs", result["message"])
 
     def test_readonly_reports_expose_actual_library_and_foreign_input_state(self):
         for target in ("f200", "f210"):

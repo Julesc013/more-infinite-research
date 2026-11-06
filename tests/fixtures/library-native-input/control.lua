@@ -1,18 +1,20 @@
 -- Test-only observer of the protected, completed MIR1.1 successor copies.
--- The imported fixture still owns its full independent preservation contract.
--- This imports its finite historical expectations, never MIR implementation.
-local historical = require("__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
+-- Helper-free inputs carry the same immutable test catalogue locally; they do
+-- not activate the obsolete migration controller. Older protocols keep theirs.
+local INPUT_OBSERVER = script.active_mods["mir-fixture-mir5-library-native-input"]
+local HELPER_FREE_INPUT = INPUT_OBSERVER=="0.3.5"
+local historical = HELPER_FREE_INPUT and require("catalogue")
+  or require("__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
 local KEY, INTERFACE = "mir5_library_native_input", "mir5-library-native-input"
 local BROWSER = "more-infinite-research-browser"
 local ROOT, FILTERS, QUERY = "mir_research_browser", "mir_library_filters", "mir_library_query"
 local OTHER, OTHER_QUERY = "mir5_input_other", "mir5_input_other_query"
-local INPUT_OBSERVER = script.active_mods["mir-fixture-mir5-library-native-input"]
-local DEFER_IMPORTED_BASELINE = INPUT_OBSERVER=="0.3.4" and
+local DEFER_IMPORTED_BASELINE = (INPUT_OBSERVER=="0.3.4" or HELPER_FREE_INPUT) and
   (script.active_mods["more-infinite-research"]=="5.0.20007" or script.active_mods["more-infinite-research"]=="5.0.21007")
 local ALLOW_REMOVED_INDEX_REUSE = (INPUT_OBSERVER=="0.3.3" and (
   (script.active_mods.base=="2.0.77" and script.active_mods["more-infinite-research"]=="5.0.20001")
   or (script.active_mods.base=="2.1.23" and script.active_mods["more-infinite-research"]=="5.0.21001")))
-  or (INPUT_OBSERVER=="0.3.4" and (
+  or ((INPUT_OBSERVER=="0.3.4" or HELPER_FREE_INPUT) and (
     (script.active_mods.base=="2.0.77" and (script.active_mods["more-infinite-research"]=="5.0.20001"
       or script.active_mods["more-infinite-research"]=="5.0.20007"))
     or (script.active_mods.base=="2.1.23" and (script.active_mods["more-infinite-research"]=="5.0.21001"
@@ -187,6 +189,37 @@ local function check_imported_literals()
   end
   local force=game.forces.player
   if force.technologies[GEAR].level~=3 or not close(force.recipes["iron-gear-wheel"].productivity_bonus,.2) then fail("completed imported gear baseline differs") end
+  if HELPER_FREE_INPUT then
+    -- Original1.1 catalogue and accepted direct-successor work/cold records:
+    -- all non-gear rows have one paid level; only player gears have two.
+    for index,name in ipairs(FORCES) do
+      local current=game.forces[name];local expected_recipes={}
+      for id,effects in pairs(historical.rows) do
+        local value=current.technologies[id]
+        local completed=id==GEAR and (index==1 and 2 or 0) or 1
+        if not valid(value) or value.level~=completed+1 or value.researched~=false
+            or value.enabled~=true or value.visible_when_disabled~=false then fail("helper-free historical row differs: "..name.."/"..id) end
+        for _,effect in ipairs(effects) do
+          if effect.type=="change-recipe-productivity" then
+            expected_recipes[effect.recipe]=(expected_recipes[effect.recipe] or 0)+effect.change*completed
+          end
+        end
+      end
+      for recipe,expected in pairs(expected_recipes) do
+        local value=current.recipes[recipe]
+        if not valid(value) or not close(value.productivity_bonus,expected) then fail("helper-free historical recipe differs: "..name.."/"..recipe) end
+      end
+      if not close(current.manual_mining_speed_modifier,0) or not close(current.worker_robots_battery_modifier,.1) then fail("helper-free native aggregate differs") end
+      local queue=current.research_queue or {}
+      if index==2 then
+        if not current.current_research or current.current_research.name~=GEAR or #queue~=2
+            or queue[1].name~=GEAR or queue[2].name~="recipe-prod-research_plastic-1"
+            or not close(current.research_progress,.42/8000) then fail("helper-free foreign work differs") end
+      elseif current.current_research~=nil or #queue~=0 or not close(current.research_progress,0) then fail("helper-free idle work differs") end
+      local saved=current.technologies[GEAR].saved_progress or 0
+      if not close(saved,index==3 and .27/8000 or 0) then fail("helper-free detached work differs") end
+    end
+  end
 end
 local function geometry(p)
   if not valid(p) then return nil end
@@ -282,7 +315,7 @@ local function report()
     imported_earnings=true,fixture_seeds_credit=false,load_observed=loaded_restart,
     en_geometry=s.en_index and geometry(game.get_player(s.en_index)) or nil,
     de_geometry=s.de_index and geometry(game.get_player(s.de_index)) or nil,
-    original_preservation_fixture_required=true,performance_acceptance=false,release_qualification=false}
+    original_preservation_fixture_required=not HELPER_FREE_INPUT,performance_acceptance=false,release_qualification=false}
 end
 local function phase(expected)
   local s=state();if s.phase~=expected then fail("step out of order: "..s.phase.." expected "..expected) end
@@ -453,10 +486,15 @@ script.on_init(function()
       and {mir="5.0.20001",fixture="0.3.0",observer="0.3.4"})
     or (script.active_mods.base=="2.1.23" and observer_version=="0.3.4"
       and {mir="5.0.21001",fixture="0.4.0",observer="0.3.4"})
+    or (script.active_mods.base=="2.0.77" and observer_version=="0.3.5"
+      and {mir="5.0.20007",observer="0.3.5"})
+    or (script.active_mods.base=="2.1.23" and observer_version=="0.3.5"
+      and {mir="5.0.21007",observer="0.3.5"})
   if not expected or script.active_mods["more-infinite-research"]~=expected.mir
-      or script.active_mods[historical.fixture]~=expected.fixture then fail("imported native target differs") end
-  local allowed={base=script.active_mods.base,["more-infinite-research"]=expected.mir,[historical.fixture]=expected.fixture,
+      or (not HELPER_FREE_INPUT and script.active_mods[historical.fixture]~=expected.fixture) then fail("imported native target differs") end
+  local allowed={base=script.active_mods.base,["more-infinite-research"]=expected.mir,
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]=expected.observer}
+  if not HELPER_FREE_INPUT then allowed[historical.fixture]=expected.fixture end
   for name,version in pairs(script.active_mods) do if allowed[name]~=version then fail("unexpected imported observer closure") end end
   for name,version in pairs(allowed) do if script.active_mods[name]~=version then fail("missing imported observer closure member") end end
   for _ in pairs(game.players) do fail("protected headless source must contain no pre-existing players") end
