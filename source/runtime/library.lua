@@ -1165,8 +1165,11 @@ local function detail_lines(parent, row, detail, player)
   local technology = known_technology(player, row.id)
   if technology then
     local icon = add(parent, {type = "sprite", name = PREFIX .. "detail_icon", sprite = "technology/" .. row.id,
-      tooltip = technology.localised_name})
-    if icon.style then icon.style.width, icon.style.height = 48, 48 end
+      tooltip = technology.localised_name, resize_to_sprite = false})
+    if icon.style then
+      icon.style.width, icon.style.height = 48, 48
+      icon.style.stretch_image_to_widget_size = true
+    end
   end
   local title = add(parent, {type = "label", name = PREFIX .. "detail_title", caption = caption(row, player)})
   if title.style then title.style.font = "default-large-bold" end
