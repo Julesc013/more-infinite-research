@@ -1278,7 +1278,21 @@ local function detail_lines(parent, row, detail, player)
   end
 end
 
+local function research_page(frame)
+  local tabs = frame and frame[PREFIX .. "tabs"]
+  return valid(tabs) and tabs[PREFIX .. "research_page"] or nil
+end
+
+local function research_filters(frame)
+  local page = research_page(frame)
+  return valid(page) and page[PREFIX .. "filters"] or nil
+end
+
 local function tab_content(frame, tab)
+  if tab == "research" then
+    local page = research_page(frame)
+    return valid(page) and page[PREFIX .. "research_content"] or nil
+  end
   local tabs = frame and frame[PREFIX .. "tabs"]
   return valid(tabs) and tabs[PREFIX .. tab .. "_content"] or nil
 end
@@ -1294,8 +1308,8 @@ end
 local function frame_layout_ready(frame, player, view)
   local title = frame and frame[PREFIX .. "title"]
   local tabs = frame and frame[PREFIX .. "tabs"]
-  local filters = frame and frame[PREFIX .. "filters"] or nil
-  local research = valid(tabs) and tabs[PREFIX .. "research_content"] or nil
+  local filters = research_filters(frame)
+  local research = tab_content(frame, "research")
   local settings = valid(tabs) and tabs[PREFIX .. "settings_content"] or nil
   return valid(title) and valid(title[PREFIX .. "layout_smaller"])
     and valid(title[PREFIX .. "layout_larger"]) and valid(title[PREFIX .. "layout_reset"])
@@ -1766,17 +1780,25 @@ local function create_filters(frame, player, view, width)
 end
 
 local function create_tabs(frame, player, view)
+  local width = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
   local tabs = add(frame, {type = "tabbed-pane", name = PREFIX .. "tabs"})
   for _, tab_name in ipairs(TABS) do
     local tab = add(tabs, {type = "tab", name = PREFIX .. "tab_" .. tab_name,
       caption = {"mir-browser." .. (tab_name == "queue" and "queue-tab" or tab_name)}})
-    local content_type = tab_name == "research" and research_content_type(player, view) or "scroll-pane"
-    local content_spec = {type = content_type,
-      horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"}
-    if content_type == "table" then content_spec.column_count = 2 end
-    content_spec.name = PREFIX .. tab_name .. "_content"
-    local content = add(tabs, content_spec)
-    tabs.add_tab(tab, content)
+    -- Keep the MIR4 title -> tabs -> page structure. Research-only controls
+    -- belong to that page, so changing tabs cannot move the navigation strip.
+    local page = add(tabs, {type = "scroll-pane",
+      name = PREFIX .. (tab_name == "research" and "research_page" or tab_name .. "_content"),
+      horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
+    if tab_name == "research" then
+      create_filters(page, player, view, width)
+      local kind = research_content_type(player, view)
+      local spec = {type = kind, name = PREFIX .. "research_content",
+        horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"}
+      if kind == "table" then spec.column_count = 2 end
+      add(page, spec)
+    end
+    tabs.add_tab(tab, page)
   end
   tabs.selected_tab_index = TAB_INDEX[view.tab] or 1
   return tabs
@@ -1787,6 +1809,7 @@ local function sync_frame_layout(player, view, frame)
   local pairs_per_row, control_width = library_layout.filter_layout(width)
   local content_width = style_pixels(width - 48)
   local content_height = style_pixels(library_layout.content_height(height, pairs_per_row))
+  local page_height = style_pixels(library_layout.tab_content_height(height))
   if frame.style then
     frame.style.width, frame.style.height = width, height
     frame.style.maximal_width = width
@@ -1797,16 +1820,15 @@ local function sync_frame_layout(player, view, frame)
     view.location = clamped_location
     frame.location = clamped_location
   end
-  local filters = frame[PREFIX .. "filters"]
+  local filters = research_filters(frame)
   if valid(filters) and filters.column_count ~= 2 * pairs_per_row then
-    filters.destroy()
     local tabs = frame[PREFIX .. "tabs"]
     if valid(tabs) then tabs.destroy() end
     filters = nil
   end
   if not valid(filters) then
-    filters = create_filters(frame, player, view, width)
     create_tabs(frame, player, view)
+    filters = research_filters(frame)
   end
   if valid(filters) then
     for _, field in ipairs({"query", "family", "visibility", "mode", "status", "sort"}) do
@@ -1816,13 +1838,18 @@ local function sync_frame_layout(player, view, frame)
   end
   local tabs = frame[PREFIX .. "tabs"]
   if valid(tabs) then
-    if tabs.style then tabs.style.maximal_width = style_pixels(width - 32) end
+    if tabs.style then tabs.style.width = style_pixels(width - 32) end
     for _, tab_name in ipairs(TABS) do
-      local content = tabs[PREFIX .. tab_name .. "_content"]
-      if valid(content) and content.style then
-        content.style.width, content.style.maximal_width = content_width, content_width
-        content.style.height, content.style.maximal_height = content_height, content_height
+      local page = tab_name == "research" and research_page(frame) or tab_content(frame, tab_name)
+      if valid(page) and page.style then
+        page.style.width, page.style.maximal_width = content_width, content_width
+        page.style.height, page.style.maximal_height = page_height, page_height
       end
+    end
+    local body = tab_content(frame, "research")
+    if valid(body) and body.style then
+      body.style.width, body.style.maximal_width = content_width, content_width
+      body.style.height, body.style.maximal_height = content_height, content_height
     end
   end
   return width, height, content_width, content_height
@@ -1850,8 +1877,6 @@ local function create_frame(player, view)
   icon_button(title, "layout_reset", "utility/reset", {"mir-browser.layout-reset"})
   icon_button(title, "close", "utility/close", {"mir-browser.close"})
 
-  local width = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
-  create_filters(frame, player, view, width)
   create_tabs(frame, player, view)
   sync_frame_layout(player, view, frame)
   return frame
@@ -1877,8 +1902,7 @@ local function render(player, view, context, preserve_query)
   if not valid(frame) then return nil end
   sync_frame_layout(player, view, frame)
 
-  local filters = frame[PREFIX .. "filters"]
-  if valid(filters) then filters.visible = view.tab == "research" end
+  local filters = research_filters(frame)
   local query = valid(filters) and filters[PREFIX .. "query"] or nil
   if valid(query) and not preserve_query then query.text = view.query end
   local family = valid(filters) and filters[PREFIX .. "family"] or nil
@@ -2039,7 +2063,7 @@ function M.on_gui_text_changed(event)
   local player = player_for(event and event.player_index)
   if not player then return end
   if element.name == PREFIX .. "query" then
-    if not owns_element(player, element, {PREFIX .. "query", PREFIX .. "filters", ROOT}) then return end
+    if not owns_element(player, element, {PREFIX .. "query", PREFIX .. "filters", PREFIX .. "research_page", PREFIX .. "tabs", ROOT}) then return end
     local view = view_for(player.index)
     view.query, view.page, view.scroll = text(element.text), 1, 1
     render(player, view, nil, true)
@@ -2086,7 +2110,7 @@ function M.on_gui_selection_state_changed(event)
   if not player then return end
   if element.name == PREFIX .. "family" then
     if not owns_element(player, element, {
-      PREFIX .. "family", PREFIX .. "filters", ROOT
+      PREFIX .. "family", PREFIX .. "filters", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     local family = family_from_index(element.selected_index)
@@ -2097,7 +2121,7 @@ function M.on_gui_selection_state_changed(event)
     render(player, view)
   elseif element.name == PREFIX .. "visibility" then
     if not owns_element(player, element, {
-      PREFIX .. "visibility", PREFIX .. "filters", ROOT
+      PREFIX .. "visibility", PREFIX .. "filters", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local visibility = visibility_option(element.selected_index)
     if visibility == nil then return end
@@ -2106,7 +2130,7 @@ function M.on_gui_selection_state_changed(event)
     render(player, view)
   elseif element.name == PREFIX .. "mode" then
     if not owns_element(player, element, {
-      PREFIX .. "mode", PREFIX .. "filters", ROOT
+      PREFIX .. "mode", PREFIX .. "filters", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local mode = whole_option(element.selected_index, 1, 3)
     if mode == nil then return end
@@ -2115,7 +2139,7 @@ function M.on_gui_selection_state_changed(event)
     render(player, view)
   elseif element.name == PREFIX .. "status" then
     if not owns_element(player, element, {
-      PREFIX .. "status", PREFIX .. "filters", ROOT
+      PREFIX .. "status", PREFIX .. "filters", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     local status = element.selected_index
@@ -2125,7 +2149,7 @@ function M.on_gui_selection_state_changed(event)
     render(player, view)
   elseif element.name == PREFIX .. "sort" then
     if not owns_element(player, element, {
-      PREFIX .. "sort", PREFIX .. "filters", ROOT
+      PREFIX .. "sort", PREFIX .. "filters", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     local sort = sort_from_index(element.selected_index)
@@ -2136,7 +2160,7 @@ function M.on_gui_selection_state_changed(event)
     render(player, view)
   elseif element.name == PREFIX .. "results" then
     if not owns_element(player, element, {
-      PREFIX .. "results", PREFIX .. "research_content", PREFIX .. "tabs", ROOT
+      PREFIX .. "results", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     local context = context_for(player.force)
@@ -2150,7 +2174,7 @@ function M.on_gui_selection_state_changed(event)
     end
   elseif element.name == PREFIX .. "recipe_list" then
     if not owns_element(player, element, {
-      PREFIX .. "recipe_list", PREFIX .. "detail", PREFIX .. "research_content", PREFIX .. "tabs", ROOT
+      PREFIX .. "recipe_list", PREFIX .. "detail", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     local detail = selected_detail(player, view, context_for(player.force),
@@ -2243,7 +2267,7 @@ function M.on_gui_click(event)
   end
   if element.name == PREFIX .. "production_check" then
     if not owns_element(player, element, {
-      PREFIX .. "production_check", PREFIX .. "detail", PREFIX .. "research_content", PREFIX .. "tabs", ROOT
+      PREFIX .. "production_check", PREFIX .. "detail", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     local id = technology_id(view.selected)
@@ -2254,7 +2278,7 @@ function M.on_gui_click(event)
   end
   if element.name == PREFIX .. "close" then
     local in_research_actions = owns_element(player, element, {
-      PREFIX .. "close", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "tabs", ROOT
+      PREFIX .. "close", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     })
     local in_title = owns_element(player, element, {PREFIX .. "close", PREFIX .. "title", ROOT})
     if not in_research_actions and not in_title then return end
@@ -2263,7 +2287,7 @@ function M.on_gui_click(event)
   end
   if element.name == PREFIX .. "hide" then
     if not owns_element(player, element, {
-      PREFIX .. "hide", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "tabs", ROOT
+      PREFIX .. "hide", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     local id = technology_id(view.selected)
@@ -2283,7 +2307,7 @@ function M.on_gui_click(event)
   end
   if element.name == PREFIX .. "show_hidden" then
     if not owns_element(player, element, {
-      PREFIX .. "show_hidden", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "tabs", ROOT
+      PREFIX .. "show_hidden", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     view.hidden, view.visibility, view.selected = {}, 1, nil
@@ -2293,7 +2317,7 @@ function M.on_gui_click(event)
   end
   if element.name == PREFIX .. "inspect_settings" then
     if not owns_element(player, element, {
-      PREFIX .. "inspect_settings", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "tabs", ROOT
+      PREFIX .. "inspect_settings", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     local selected = technology_id(view.selected)
@@ -2330,7 +2354,7 @@ function M.on_gui_click(event)
   end
   if element.name ~= PREFIX .. "open_native" then return end
   if not owns_element(player, element, {
-    PREFIX .. "open_native", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "tabs", ROOT
+    PREFIX .. "open_native", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "research_page", PREFIX .. "tabs", ROOT
   }) then return end
   local view = view_for(player.index)
   local selected = technology_id(view.selected)

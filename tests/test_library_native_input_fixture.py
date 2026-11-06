@@ -657,6 +657,12 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               content.column_count=2
               content.style.maximal_width=760
               root.mir_library_tabs.mir_library_research_content=content
+              if opponent=="new-page" or opponent=="bad-page" or opponent=="foreign-page" then
+                local page=element(opponent=="bad-page" and "flow" or "scroll-pane","mir_library_research_page")
+                page.get_mod=function() return opponent=="foreign-page" and "other" or "more-infinite-research" end
+                page.mir_library_filters=filters;page.mir_library_research_content=content
+                root.mir_library_tabs.mir_library_research_page=page
+              end
               local private=false;for _,id in ipairs(ids) do if search==id then private=true end end
               local present=not private
               if opponent=="private-listed" and private then present=true end
@@ -925,6 +931,13 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertFalse(final["fixture_seeds_credit"])
                 self.assertTrue(final["load_observed"])
                 self.assertEqual(final["en_geometry"]["location"], {"x": 170, "y": 100})
+
+    def test_research_page_path_and_malformed_page_refusal(self):
+        result = self.run_case(opponent="new-page")
+        self.assertTrue(result["ok"], result["message"])
+        for opponent in ("bad-page", "foreign-page"):
+            with self.assertRaisesRegex(Exception, "research page is malformed or foreign"):
+                self.run_case(opponent=opponent)
 
     def test_501_f210_observer_accepts_only_its_exact_candidate_identity(self):
         accepted = self.run_case("f210", package_version="5.0.21001", input_observer_version="0.3.2")

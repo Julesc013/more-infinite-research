@@ -35,6 +35,11 @@ function M.filter_layout(width)
   return pairs_per_row, integer(control_width)
 end
 
+-- Every selected tab occupies the same viewport below the fixed navigation.
+function M.tab_content_height(frame_height)
+  return math.max(120, frame_height - 100)
+end
+
 function M.content_height(frame_height, pairs_per_row)
   return math.max(120, frame_height - (pairs_per_row == 2 and 210 or 290))
 end
