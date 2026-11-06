@@ -1,0 +1,44 @@
+{
+  "kind": "MIRFinite8PreparedCapSettingsV1",
+  "source_capture_sha256": "3CEC4CBED1709CF2543BB1C0B5E8AF009A7C0BDCA324F6469AECEEDB609FE539",
+  "source_capture_context": {
+    "base": "2.1.23",
+    "mir": "4.7.21003",
+    "startup_count": 889
+  },
+  "published_startup_sha256": "0E0011C794B80EADC68B866A60C2846089B5A3FAA490BADF8C8139A2B4D3F89C",
+  "mechanical_codec_source": {
+    "path": "D:\\Projects\\Factorio\\mir-native-worker\\projects\\mir\\tasks\\data-only-paid-upgrade\\Write-PureUpgradeSettings.py",
+    "sha256": "7076BE652760B8F8CB6C82C0A2F273AB2CEA33B4253D7F953DB74155FD853017",
+    "functions": "text,tree only; original CLI is not invoked and does not support F210"
+  },
+  "header": [
+    2,
+    1,
+    23,
+    0,
+    false
+  ],
+  "only_change": {
+    "mir-max-level-research-speed": {
+      "before": 0,
+      "after": 8
+    }
+  },
+  "settings_sha256": "3018731C6C24960C3664330755C5D435010788BE6186265B6EEDEF2275BFE0E9",
+  "bytes": 58757,
+  "native_readback": "pending; engine must report effective cap8 and unchanged other effective settings",
+  "actual_managed_eight": {
+    "technology": "research-speed-8",
+    "source": "base-continuation",
+    "operation": "emit_base_extension",
+    "setting": "mir-max-level-research-speed",
+    "selected": "infinite",
+    "native_finite_stage": false,
+    "binding_fingerprint": "mir32-6863f9cf",
+    "policy_transport": "transported-v3",
+    "ownership_kind": "transported-v3",
+    "legacy": false
+  },
+  "actual_policy_version": 3
+}

@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-native-research-speed-finite",
+  "version": "0.2.0",
+  "title": "MIR finite research-speed boundary observer",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "mir-fixture-finite-base-extension-level >= 0.1.0",
+    "more-infinite-research >= 4.7.21003"
+  ]
+}
