@@ -262,11 +262,20 @@ local function assert_shape(player, arm, view)
   local shape, query, results, detail, family
   shape = arm.shape
   if shape.filters then
-    local filters = child(root, shape.filters)
+    local tabs = child(root, shape.tabs)
+    local page = child(tabs, "mir_library_research_page")
+    local filters, content
+    if page ~= nil then
+      if not valid(tabs) or tabs.type ~= "tabbed-pane" or not valid(page) or page.type ~= "scroll-pane"
+          or (page.get_mod and page.get_mod() ~= "more-infinite-research") then
+        fail("MIR5 research page is malformed or foreign")
+      end
+      filters, content = child(page, shape.filters), child(page, shape.content)
+    else
+      filters, content = child(root, shape.filters), child(tabs, shape.content)
+    end
     query = child(filters, shape.query)
     family = child(filters, shape.family)
-    local tabs = child(root, shape.tabs)
-    local content = child(tabs, shape.content)
     results, detail = child(content, shape.results), child(content, shape.detail)
     if not valid(content) or not valid(results) then
       fail("MIR5 public browser research panes are absent")

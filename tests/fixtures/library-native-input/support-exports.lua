@@ -6,6 +6,7 @@ function M.register(context)
   local ROOT, PREFIX = "mir_research_browser", "mir_library_"
   local BROWSER, PROFILES = "more-infinite-research-browser", "more-infinite-research-settings"
   local NAME, OTHER = "mir-fixture-mir5-library-native-input", "mir_export_foreign"
+  local qualified_input = context.qualified_input==true
   local refs, loaded = {}, false
   local actions = {
     {"en-full","en","full"},{"en-compact","en","compact"},{"en-diagnostics","en","diagnostics"},
@@ -61,13 +62,28 @@ function M.register(context)
     local tabs=root[PREFIX.."tabs"]
     local node=valid(tabs) and tabs[PREFIX..((kind=="diagnostics" or kind=="diagnostics-failure") and "help_content" or "settings_content")]
     if not valid(node) then fail("native export content absent") end
+    if kind=="diagnostics" or kind=="diagnostics-failure" then
+      local panes=node[PREFIX.."help_panes"]
+      if panes~=nil then
+        -- Authored Debug layout; retain the exact flat path for earlier
+        -- frozen packages, without falling back past malformed new panes.
+        local panel=valid(panes) and panes[PREFIX.."report_panel"]
+        if not valid(panes) or panes.parent~=node or panes.get_mod()~="more-infinite-research"
+            or not valid(panel) or panel.parent~=panes or panel.get_mod()~="more-infinite-research" then
+          fail("native diagnostics container differs")
+        end
+        node=panel
+      end
+    end
     return node
   end
   local function preview(p,kind)
     return content(owner(p),kind)[PREFIX.."export_profile"]
   end
   local function report()
-    local s=state();unchanged()
+    local s=state()
+    if s.phase=="waiting-native-baseline" then fail("imported baseline is not ready") end
+    unchanged()
     local geometry={}
     for _,role in ipairs({"en","de"}) do
       local index=s[role.."_index"]
@@ -78,11 +94,12 @@ function M.register(context)
           location=valid(root) and root.location or false}
       end
     end
-    return {case=s.case,phase=s.phase,cursor=s.cursor,expected=actions[s.cursor] and actions[s.cursor][1] or false,
+    return {case=s.case,phase=s.phase,cursor=s.cursor,tick=game.tick,expected=actions[s.cursor] and actions[s.cursor][1] or false,
       actual_clicks=s.clicks,actual_joins=s.joins,joins_by_phase=s.joins_by_phase,
       server_commands=s.server_commands,server_command_counts=s.server_command_counts,completed=s.completed,
       native_and_settings_unchanged=true,geometry=geometry,load_observed=loaded,
-      files_require_external_readback=true,engine_log_exported=false,performance_acceptance=false,release_qualification=false}
+      files_require_external_readback=true,original_preservation_fixture_required=not qualified_input,
+      engine_log_exported=false,performance_acceptance=false,release_qualification=false}
   end
   local function prepare(action)
     local s=state();local expected=actions[s.cursor]
@@ -178,20 +195,29 @@ function M.register(context)
   remote.add_interface(context.interface,{report=report,prepare=prepare,check=check,checkpoint=checkpoint})
   script.on_init(function()
     local mods=script.active_mods
-    local tuple=mods.base=="2.0.77" and {mir="5.0.20000",fixture="0.3.0"}
-      or (mods.base=="2.1.23" and {mir="5.0.21000",fixture="0.4.0"})
+    local tuple=mods.base=="2.0.77" and {mir=qualified_input and "5.0.20007" or "5.0.20000",fixture="0.3.0"}
+      or (mods.base=="2.1.23" and {mir=qualified_input and "5.0.21007" or "5.0.21000",fixture="0.4.0"})
     if not tuple then fail("exact engine target differs") end
-    local allowed={base=mods.base,["more-infinite-research"]=tuple.mir,[context.historical_fixture]=tuple.fixture,
-      ["mir-fixture-mir5-active-mods-observer"]="0.1.0",[NAME]="0.4.0"}
+    local allowed={base=mods.base,["more-infinite-research"]=tuple.mir,
+      ["mir-fixture-mir5-active-mods-observer"]="0.1.0",[NAME]=qualified_input and "0.4.1" or "0.4.0"}
+    if not qualified_input then allowed[context.historical_fixture]=tuple.fixture end
     for name,version in pairs(mods) do if allowed[name]~=version then fail("unexpected export observer closure") end end
     for name,version in pairs(allowed) do if mods[name]~=version then fail("missing export observer closure") end end
     for _ in pairs(game.players) do fail("protected headless source must have no existing players") end
     if storage[context.key]~=nil then fail("observer state already exists") end
-    storage[context.key]={schema=1,case="library-support-exports",phase="ready",cursor=1,native=context.world(),
+    storage[context.key]={schema=1,case="library-support-exports",phase=qualified_input and "waiting-native-baseline" or "ready",
+      cursor=1,native=not qualified_input and context.world() or nil,
       settings=startup(),clicks=0,joins=0,server_commands=0,completed={},
       joins_by_phase={initial={en=0,de=0},rejoin={en=0,de=0},restart={en=0,de=0}},
       server_command_counts={["mir-settings-export"]=0,["mir-diagnostics-export"]=0}}
-    unchanged()
+    if qualified_input then
+      script.on_event(defines.events.on_tick,function()
+        context.imported()
+        local s=state();s.native=context.world();s.phase="ready"
+        unchanged()
+        script.on_event(defines.events.on_tick,nil)
+      end)
+    else unchanged() end
   end)
   script.on_load(function()
     local s=storage[context.key];loaded=type(s)=="table" and (s.phase=="await-restart" or s.phase=="completed");refs={}

@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 import unittest
 
+from historical_sources import read_published_source
 from native_credit_oracle import (
     NATIVE_FAMILY_RECIPES,
     captured_public_productivity_recipes,
@@ -700,6 +701,95 @@ class GeneratorTests(unittest.TestCase):
           assert(#space_declared == 76 and owners == 5)
         ''')
 
+    def test_electric_energy_preserves_published_manufacturing_tiers_and_not_entity_output(self):
+        # T16/T17 ask to extend the existing manufacturing research. The
+        # supplied discussion audit's physical-power/storage proposals are
+        # not its oracle. Published4.7.2/4.7.3 share this exact authored blob.
+        original = read_published_source(ROOT,
+            "source/prototypes/streams/productivity.lua",
+            "EA66B64C03943A99B877847FD6E3903A099C83AB0333A441A29957C1C2142853").decode()
+        literal = self.lua.eval("function(text) return text:match('research_electric_energy%s*=%s*(%b{})') end")(original)
+        self.assertIsNotNone(literal)
+        # Execute only the finite literal, never the historical stream loader.
+        self.lua.execute("historical_energy = " + literal)
+        self.lua.execute(r'''
+          local extension = require("research.product_target_extension")
+          for _, space_age in ipairs({false,true}) do
+            for _, percent in ipairs({.10,.22}) do
+              local active={base="2.1.23"}
+              if space_age then active["space-age"]="2.1.23" end
+              local selection=modern_catalogue.select(active)
+              local supplied=defaults()
+              supplied["ips-effect-per-level-research_electric_energy"]={value=percent*100}
+              local values=config.resolve(supplied)
+              assert(values.streams.research_electric_energy.effect_percent==percent*100,
+                "the retained effect setting did not reach the family")
+              local energy
+              for _, row in ipairs(modern.technologies(selection,values)) do
+                if row.name=="recipe-prod-research_electric_energy-1" then energy=row end
+              end
+              assert(energy,"authored manufacturing family disappeared")
+              local expected,recipes,items={}, {}, {}
+              local panels,accumulators={},{}
+              for _,group in ipairs(historical_energy.groups) do
+                for _,name in ipairs(group.items) do
+                  expected[name]=group.change*(percent/.10)
+                  recipes[name]={enabled=true,ingredients={{"iron-plate",1}},
+                    results={{type="item",name=name,amount=1}}}
+                  items[name]={}
+                  if name:find("accumulator",1,true) then
+                    accumulators[name]={energy_source={buffer_capacity="5MJ",input_flow_limit="300kW",output_flow_limit="300kW"}}
+                  else panels[name]={production="60kW"} end
+                end
+              end
+              -- A differently named manufacturing recipe is still covered;
+              -- item/product identity, rather than recipe-name coincidence,
+              -- is the original extension contract.
+              recipes["alternate-matrix-crafting"]={enabled=true,ingredients={{"iron-plate",2}},
+                results={{type="item",name="solar-matrix",amount=1}}}
+              expected["alternate-matrix-crafting"]=.05*(percent/.10)
+              local raw={recipe=recipes,item=items,["solar-panel"]=panels,accumulator=accumulators}
+              extension.extend({energy},values,{raw=raw,mods=active})
+              local function check(effects)
+                local seen,count={},0
+                for _,effect in ipairs(effects) do
+                  assert(effect.type=="change-recipe-productivity","manufacturing research changed a different effect")
+                  assert(expected[effect.recipe] and not seen[effect.recipe],"unexpected or duplicate recipe effect")
+                  assert(math.abs(effect.change-expected[effect.recipe])<1e-12,
+                    "published tier amount changed: "..effect.recipe.." actual="..tostring(effect.change)
+                      .." expected="..tostring(expected[effect.recipe]))
+                  seen[effect.recipe],count=true,count+1
+                end
+                assert(count==16,"an authored product tier was dropped")
+                for name in pairs(expected) do assert(seen[name],"missing manufacturing recipe: "..name) end
+              end
+              check(energy.effects)
+              for _,prototype in pairs(panels) do assert(prototype.production=="60kW") end
+              for _,prototype in pairs(accumulators) do
+                assert(prototype.energy_source.buffer_capacity=="5MJ"
+                  and prototype.energy_source.input_flow_limit=="300kW"
+                  and prototype.energy_source.output_flow_limit=="300kW")
+              end
+              -- Negative controls reject the proposed full-rate replacement,
+              -- omission of the third SE tier and a duplicate Matrix effect.
+              local first,last
+              for i,e in ipairs(energy.effects) do
+                if e.recipe=="solar-matrix" then first=i end
+                if e.recipe=="se-space-solar-panel-3" then last=i end
+              end
+              assert(first and last)
+              local saved=energy.effects[first].change
+              energy.effects[first].change=percent
+              assert(not pcall(check,energy.effects));energy.effects[first].change=saved
+              local removed=table.remove(energy.effects,last)
+              assert(not pcall(check,energy.effects));table.insert(energy.effects,last,removed)
+              energy.effects[#energy.effects+1]=energy.effects[first]
+              assert(not pcall(check,energy.effects));energy.effects[#energy.effects]=nil
+              check(energy.effects)
+            end
+          end
+        ''')
+
     def test_mining_effects_preserve_published_denial_policy_without_granting_recipe_permissions(self):
         # Original permission runner at v4.7.3 (a502c05016d2d56b9961c46b4441f1cf455aec78)
         # independently pins these weights to the v4.2.2/v4.3.0 declarations.
@@ -1007,7 +1097,7 @@ class GeneratorTests(unittest.TestCase):
           data = full_world(mods)
           data.raw.recipe['engine-unit'] = nil
           local foreign = {enabled=true, effects={{type='change-recipe-productivity',
-            recipe='foreign-missing-recipe', change=.7}}}
+            recipe='foreign-missing-recipe', change=.7}, {type='unlock-recipe',recipe='copper-cable'}}}
           data.raw.technology['unrelated-foreign-research'] = foreign
           local ok, message = pcall(dofile, data_final_path)
           assert(ok, tostring(message))
@@ -1023,6 +1113,8 @@ class GeneratorTests(unittest.TestCase):
           assert(found and data.raw.technology['unrelated-foreign-research'] == foreign)
           assert(foreign.enabled and foreign.effects[1].recipe == 'foreign-missing-recipe'
             and foreign.effects[1].change == .7, 'foreign technology was changed')
+          assert(#foreign.effects == 2 and foreign.effects[2].type == 'unlock-recipe'
+            and foreign.effects[2].recipe == 'copper-cable', 'valid foreign unlock was lost')
         ''')
 
     def test_missing_module_recipe_omits_only_its_hidden_historical_holder(self):
@@ -1939,6 +2031,73 @@ class GeneratorTests(unittest.TestCase):
           assert(capped.effects[1].change == .1 and capped.unit.count_formula == a.unit.count_formula)
         ''')
 
+    def test_native_cap_description_follows_effective_limit_without_changing_research(self):
+        # Original c86ec2cc/faec7a56 fixtures require an infinite underlying
+        # prototype, explicit finite-cap presentation and its configured value.
+        self.lua.globals().native_cap_fingerprint = lambda value: json.dumps(plain_lua(value), sort_keys=True)
+        build_case = self.lua.eval('''function(family, direct, imported, disabled)
+          local selection, definition = modern_catalogue.select({}), nil
+          local native = family == "research-speed"
+          for _, row in ipairs(native and selection.continuations or selection.definitions) do
+            if row.family == family then definition = row; break end
+          end
+          local cap_key = native and "mir-max-level-research-speed" or "ips-max-level-" .. family
+          local enable_key = native and "mir-enable-research-speed" or "ips-enable-" .. family
+          local startup, baseline_startup = defaults(), defaults()
+          startup[cap_key].value = direct
+          startup[enable_key].value, baseline_startup[enable_key].value = not disabled, not disabled
+          local codec
+          if imported ~= nil then
+            startup["mir-settings-profile-import"].value = "MIRSET1:cap-presentation"
+            codec = {decode_string=function(value)return value end, encode_string=function(value)return value end,
+              json_to_table=function(value)
+                assert(value=="cap-presentation")
+                return {schema=1,kind="mir-settings-profile",settings={[cap_key]=imported}}
+              end}
+          end
+          local values, baseline_values = config.resolve(startup, codec), config.resolve(baseline_startup)
+          local function build(resolved)
+            if family=="research_gears" then return productivity.gears(resolved) end
+            assert(definition,"missing named cap definition")
+            return native and modern.continuation(definition,resolved) or modern.technology(definition,resolved)
+          end
+          local before = native_cap_fingerprint({definition=definition,values=values})
+          local output, baseline = build(values), build(baseline_values)
+          assert(before==native_cap_fingerprint({definition=definition,values=values}),"cap presentation mutated inputs")
+          assert(startup[cap_key].value==direct,"cap presentation changed direct setting")
+          return {output=output,baseline=baseline,effective=values.streams[family].max_level}
+        end''')
+
+        def leaves(value):
+            if isinstance(value, list):
+                return [leaf for child in value for leaf in leaves(child)]
+            return [str(value)]
+
+        def contains(value, expected):
+            return value == expected or isinstance(value, list) and any(contains(child, expected) for child in value)
+
+        families = ("research_gears", "research_copper", "research_processing_unit", "research_plastic",
+                    "research_low_density_structure", "research_rocket_fuel", "research_steel", "research-speed")
+        for family in families:
+            for direct, imported in ((5, None), (7, None), (0, 10), (0, None)):
+                for disabled in (False, True):
+                    with self.subTest(family=family, direct=direct, imported=imported, disabled=disabled):
+                        result = plain_lua(build_case(family, direct, imported, disabled))
+                        output, baseline = result["output"], result["baseline"]
+                        limit = imported if imported is not None else direct
+                        self.assertEqual(result["effective"], limit)
+                        self.assertEqual(output["max_level"], "infinite")
+                        if limit == 0:
+                            self.assertEqual(output, baseline)
+                            continue
+                        self.assertIs(output.get("show_levels_info"), False)
+                        self.assertIn(str(limit), leaves(output["localised_description"]))
+                        self.assertTrue(contains(output["localised_description"], baseline["localised_description"]))
+                        for field in ("show_levels_info", "localised_description"):
+                            output.pop(field, None)
+                            baseline.pop(field, None)
+                        self.assertEqual(output, baseline, "finite-cap disclosure changed native research")
+
     def test_scripted_effect_rows_match_the_captured_space_age_contract(self):
         self.lua.execute('''
           mods = {['space-age'] = '2.1.23'}
@@ -2460,6 +2619,8 @@ class GeneratorTests(unittest.TestCase):
           refused({a}, environment, "duplicate")
           b.name = "second-1"; a.prerequisites = {b.name}; b.prerequisites = {a.name}
           refused({a,b}, world(), "cycle")
+          a, b = build(), build(); b.name = "second-1"; b.prerequisites = {"missing"}
+          refused({a,b}, world(), "missing prerequisite")
           a = build(); a.unit.ingredients[1][1] = "missing"; refused({a}, world(), "ingredient")
           a = build(); a.effects[1].change = 0/0; refused({a}, world(), "productivity")
           refused({[1]=build(),[3]=build()}, world(), "missing entry")

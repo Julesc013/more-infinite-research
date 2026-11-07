@@ -1,0 +1,517 @@
+{
+  "schema": 1,
+  "kind": "MIRFiniteResearchSpeedOwnershipNativeV1",
+  "status": "bounded-f210-published-entry-fresh-refusal-cap-uncap-components-pass",
+  "product_source": "13f6cc857c26d198df1c275106dcb7d0334ef748",
+  "native_harness_source": "3d2e83dc961862e9bfecc653236bde90d32ee5c9",
+  "internal_candidate_sha256": "81C896F0F33CE7CFF1E8ED78AA7F8F4014A97123DFD6DACFC492247625775776",
+  "published_candidate": false,
+  "published_source": {
+    "tag": "v4.7.3",
+    "package_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+    "package_version": "4.7.21003"
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "observer": {
+    "version": "0.2.0",
+    "sha256": "BB233B2AB7B5D297B6EB0600A6099871AF0C59F20F8E62DF3C96FEDE846BA8DA",
+    "unchanged_across_boundary_stages": true
+  },
+  "independent_expectations": [
+    "Published finite foreign research-speed7 retains its exact count777/time77/red-science/prerequisite6/effect.6 and creation owner; MIR emits historical8 with authored formula1025.15625*1.5^(L-8),120s,.6 effect,six ordered sciences and prerequisites.",
+    "One actual laboratory completion earns level8 and +.6 native lab speed; next9,current42%,ordered8/automation queue,paused27% and disabledforeign7 survive the actual published-source upgrade and cold reloads.",
+    "First old entry requires actual known transported-v3 MIR-emission proof and unchanged non-MIR selection/versions/startup. Changed provider or cap first entry refuses from MIR before unsafe ownership writes.",
+    "After the actual valid current marker, cap8 disables next9 with readable visibility, retains earned1.8 bonus and42%detached native investment, removes MIR8 queued intent and leaves automation current at0%; paused27% and foreign7 remain.",
+    "Uncapping restores MIR enablement/previous visibility while preserving42%detached work and automation; cancelled MIR8 queue intent is not reconstructed."
+  ],
+  "actual_runs": [
+    {
+      "stage": "source",
+      "result_sha256": "D8FFF2779DF65D6A41FAC2888034CB601BAA3F6E0EB86DBA4F99AE696E0D569E",
+      "terminal_sha256": "8ABD89E832C3B573ACB0D4D5D35AA7E37707B201E5C187D0F37DF10A6B2DC158",
+      "input_save_sha256": null,
+      "produced_save_sha256": "DAB07BCB9E7E25E27DBC6C9CD2144A71133DF3C52926CFEE1B3B3B9435F60418",
+      "release_qualification": false,
+      "profile_sha256": "C1FD0B77C248956F76FC2D4D6522440B8CEA13960E20A1305E0EC14E5C568E2B",
+      "mir_sha256": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+      "initial": {
+        "source_mir": "4.7.21003",
+        "destination_mir": "4.7.21003",
+        "actual_lab_completions": 1,
+        "cap": 0,
+        "eight_enabled": true,
+        "eight_visible": false,
+        "eight_saved": 0,
+        "next_level": 9,
+        "native_bonus": 1.7999999999999998,
+        "native_bonus_before": 1.2,
+        "current": "research-speed-8",
+        "seven_creator": "mir-fixture-finite-base-extension-level",
+        "eight_creator": "more-infinite-research",
+        "current_progress": 0.42000000000000004,
+        "queue": [
+          "research-speed-8",
+          "automation"
+        ],
+        "paused_progress": 0.27,
+        "foreign7_enabled": false,
+        "on_load_read_only": false
+      },
+      "cold_reloads": [
+        {
+          "source_mir": "4.7.21003",
+          "destination_mir": "4.7.21003",
+          "actual_lab_completions": 1,
+          "cap": 0,
+          "eight_enabled": true,
+          "eight_visible": false,
+          "eight_saved": 0,
+          "next_level": 9,
+          "native_bonus": 1.7999999999999998,
+          "native_bonus_before": 1.2,
+          "current": "research-speed-8",
+          "seven_creator": "mir-fixture-finite-base-extension-level",
+          "eight_creator": "more-infinite-research",
+          "current_progress": 0.42000000000000004,
+          "queue": [
+            "research-speed-8",
+            "automation"
+          ],
+          "paused_progress": 0.27,
+          "foreign7_enabled": false,
+          "on_load_read_only": true
+        },
+        {
+          "source_mir": "4.7.21003",
+          "destination_mir": "4.7.21003",
+          "actual_lab_completions": 1,
+          "cap": 0,
+          "eight_enabled": true,
+          "eight_visible": false,
+          "eight_saved": 0,
+          "next_level": 9,
+          "native_bonus": 1.7999999999999998,
+          "native_bonus_before": 1.2,
+          "current": "research-speed-8",
+          "seven_creator": "mir-fixture-finite-base-extension-level",
+          "eight_creator": "more-infinite-research",
+          "current_progress": 0.42000000000000004,
+          "queue": [
+            "research-speed-8",
+            "automation"
+          ],
+          "paused_progress": 0.27,
+          "foreign7_enabled": false,
+          "on_load_read_only": true
+        }
+      ],
+      "controls_restored": true
+    },
+    {
+      "stage": "current",
+      "result_sha256": "A37843C1694243FD449C3EC927D151D8E0AC64587629730B904BD132D5F65C32",
+      "terminal_sha256": "E825AE9D41FC8F6066E7FCB2802EEF81C6CC9E77A1FDED37CAD5F6141A08D376",
+      "input_save_sha256": "DAB07BCB9E7E25E27DBC6C9CD2144A71133DF3C52926CFEE1B3B3B9435F60418",
+      "produced_save_sha256": "ED15B2E663A2032E786A80F6462B932E4D3EAD5189433FEDBDD14FCD0C2C103A",
+      "release_qualification": false,
+      "profile_sha256": "BDE043CB3ACD442209F938C9DFE37D9247ECE35959E252F1A7392D6B8BB55ECB",
+      "mir_sha256": "81C896F0F33CE7CFF1E8ED78AA7F8F4014A97123DFD6DACFC492247625775776",
+      "initial": {
+        "source_mir": "4.7.21003",
+        "destination_mir": "5.0.21007",
+        "actual_lab_completions": 1,
+        "cap": 0,
+        "eight_enabled": true,
+        "eight_visible": false,
+        "eight_saved": 0,
+        "next_level": 9,
+        "native_bonus": 1.7999999999999998,
+        "native_bonus_before": 1.2,
+        "current": "research-speed-8",
+        "seven_creator": "mir-fixture-finite-base-extension-level",
+        "eight_creator": "more-infinite-research",
+        "current_progress": 0.42000000000000004,
+        "queue": [
+          "research-speed-8",
+          "automation"
+        ],
+        "paused_progress": 0.27,
+        "foreign7_enabled": false,
+        "on_load_read_only": false
+      },
+      "cold_reloads": [
+        {
+          "source_mir": "4.7.21003",
+          "destination_mir": "5.0.21007",
+          "actual_lab_completions": 1,
+          "cap": 0,
+          "eight_enabled": true,
+          "eight_visible": false,
+          "eight_saved": 0,
+          "next_level": 9,
+          "native_bonus": 1.7999999999999998,
+          "native_bonus_before": 1.2,
+          "current": "research-speed-8",
+          "seven_creator": "mir-fixture-finite-base-extension-level",
+          "eight_creator": "more-infinite-research",
+          "current_progress": 0.42000000000000004,
+          "queue": [
+            "research-speed-8",
+            "automation"
+          ],
+          "paused_progress": 0.27,
+          "foreign7_enabled": false,
+          "on_load_read_only": true
+        },
+        {
+          "source_mir": "4.7.21003",
+          "destination_mir": "5.0.21007",
+          "actual_lab_completions": 1,
+          "cap": 0,
+          "eight_enabled": true,
+          "eight_visible": false,
+          "eight_saved": 0,
+          "next_level": 9,
+          "native_bonus": 1.7999999999999998,
+          "native_bonus_before": 1.2,
+          "current": "research-speed-8",
+          "seven_creator": "mir-fixture-finite-base-extension-level",
+          "eight_creator": "more-infinite-research",
+          "current_progress": 0.42000000000000004,
+          "queue": [
+            "research-speed-8",
+            "automation"
+          ],
+          "paused_progress": 0.27,
+          "foreign7_enabled": false,
+          "on_load_read_only": true
+        }
+      ],
+      "controls_restored": true
+    },
+    {
+      "stage": "provider-refusal",
+      "result_sha256": "1B9C605311CE548297B12AC8DD3C39888ECAC2AA38AF6B6B05505952AE78D198",
+      "terminal_sha256": "68467C39E6B3A49D9C15720EAFFCA8014151269EBDA97A740387D0B1FA539C1B",
+      "input_save_sha256": "DAB07BCB9E7E25E27DBC6C9CD2144A71133DF3C52926CFEE1B3B3B9435F60418",
+      "produced_save_sha256": null,
+      "release_qualification": false,
+      "status": "passed-exact-natural-refusal",
+      "error": "MIR cannot safely change finite research-speed ownership on this existing save; restore the previous mod selection and original save",
+      "exit_code": 1,
+      "natural_exit": true,
+      "successor_save": false,
+      "protected_copy_sha256": "DAB07BCB9E7E25E27DBC6C9CD2144A71133DF3C52926CFEE1B3B3B9435F60418"
+    },
+    {
+      "stage": "settings-refusal",
+      "result_sha256": "3AEC54F6A0BB77C7271560D3A8C3EB22195653CE61177620ABC262695C7D6BF8",
+      "terminal_sha256": "B00E137047C6E87CA2064EF84DBA1FFD093129DE0F16B152D3C2394270532F33",
+      "input_save_sha256": "DAB07BCB9E7E25E27DBC6C9CD2144A71133DF3C52926CFEE1B3B3B9435F60418",
+      "produced_save_sha256": null,
+      "release_qualification": false,
+      "status": "passed-exact-natural-refusal",
+      "error": "MIR cannot safely change finite research-speed ownership on this existing save; restore the previous mod selection and original save",
+      "exit_code": 1,
+      "natural_exit": true,
+      "successor_save": false,
+      "protected_copy_sha256": "DAB07BCB9E7E25E27DBC6C9CD2144A71133DF3C52926CFEE1B3B3B9435F60418"
+    },
+    {
+      "stage": "cap8",
+      "result_sha256": "BC5D42B07B8473D3A5B4F1EC580BC05675B3C911DAB3136FE4DF41EADEBD685A",
+      "terminal_sha256": "E94F48253EDA166DEF74F2B084D8EC48DE2967D67F989BD0C2EA3BB7C3E254B5",
+      "input_save_sha256": "ED15B2E663A2032E786A80F6462B932E4D3EAD5189433FEDBDD14FCD0C2C103A",
+      "produced_save_sha256": "E7D5EB9CFDF0567CE704D127A58EC496BF301F243D8CC3288FB4A2436CF4C935",
+      "release_qualification": false,
+      "profile_sha256": "C42427012E823067FBE8DFD7FB779900A13EBCD49AD5B0C01C01C26F59612BFD",
+      "mir_sha256": "81C896F0F33CE7CFF1E8ED78AA7F8F4014A97123DFD6DACFC492247625775776",
+      "initial": {
+        "source_mir": "4.7.21003",
+        "destination_mir": "5.0.21007",
+        "actual_lab_completions": 1,
+        "cap": 8,
+        "eight_enabled": false,
+        "eight_visible": true,
+        "eight_saved": 0.42000000000000004,
+        "next_level": 9,
+        "native_bonus": 1.7999999999999998,
+        "native_bonus_before": 1.2,
+        "current": "automation",
+        "seven_creator": "mir-fixture-finite-base-extension-level",
+        "eight_creator": "more-infinite-research",
+        "current_progress": 0,
+        "queue": [
+          "automation"
+        ],
+        "paused_progress": 0.27,
+        "foreign7_enabled": false,
+        "on_load_read_only": false
+      },
+      "cold_reloads": [
+        {
+          "source_mir": "4.7.21003",
+          "destination_mir": "5.0.21007",
+          "actual_lab_completions": 1,
+          "cap": 8,
+          "eight_enabled": false,
+          "eight_visible": true,
+          "eight_saved": 0.42000000000000004,
+          "next_level": 9,
+          "native_bonus": 1.7999999999999998,
+          "native_bonus_before": 1.2,
+          "current": "automation",
+          "seven_creator": "mir-fixture-finite-base-extension-level",
+          "eight_creator": "more-infinite-research",
+          "current_progress": 0,
+          "queue": [
+            "automation"
+          ],
+          "paused_progress": 0.27,
+          "foreign7_enabled": false,
+          "on_load_read_only": true
+        },
+        {
+          "source_mir": "4.7.21003",
+          "destination_mir": "5.0.21007",
+          "actual_lab_completions": 1,
+          "cap": 8,
+          "eight_enabled": false,
+          "eight_visible": true,
+          "eight_saved": 0.42000000000000004,
+          "next_level": 9,
+          "native_bonus": 1.7999999999999998,
+          "native_bonus_before": 1.2,
+          "current": "automation",
+          "seven_creator": "mir-fixture-finite-base-extension-level",
+          "eight_creator": "more-infinite-research",
+          "current_progress": 0,
+          "queue": [
+            "automation"
+          ],
+          "paused_progress": 0.27,
+          "foreign7_enabled": false,
+          "on_load_read_only": true
+        }
+      ],
+      "controls_restored": true
+    },
+    {
+      "stage": "uncap",
+      "result_sha256": "95EF1FA9B04C65E29769C6F7B3B3362D9236E2033E35B71EFF349FAA377B041D",
+      "terminal_sha256": "67C1D38FF80BE585056CCCEAF9B009A895ACF4E160E847CC13CAF85158DCE849",
+      "input_save_sha256": "E7D5EB9CFDF0567CE704D127A58EC496BF301F243D8CC3288FB4A2436CF4C935",
+      "produced_save_sha256": "415ADBF0E8C72E46781E9ECA72BD4A97C764C8131F0ABDFCD571721405D55C16",
+      "release_qualification": false,
+      "profile_sha256": "BDE043CB3ACD442209F938C9DFE37D9247ECE35959E252F1A7392D6B8BB55ECB",
+      "mir_sha256": "81C896F0F33CE7CFF1E8ED78AA7F8F4014A97123DFD6DACFC492247625775776",
+      "initial": {
+        "source_mir": "4.7.21003",
+        "destination_mir": "5.0.21007",
+        "actual_lab_completions": 1,
+        "cap": 0,
+        "eight_enabled": true,
+        "eight_visible": false,
+        "eight_saved": 0.42000000000000004,
+        "next_level": 9,
+        "native_bonus": 1.7999999999999998,
+        "native_bonus_before": 1.2,
+        "current": "automation",
+        "seven_creator": "mir-fixture-finite-base-extension-level",
+        "eight_creator": "more-infinite-research",
+        "current_progress": 0,
+        "queue": [
+          "automation"
+        ],
+        "paused_progress": 0.27,
+        "foreign7_enabled": false,
+        "on_load_read_only": false
+      },
+      "cold_reloads": [
+        {
+          "source_mir": "4.7.21003",
+          "destination_mir": "5.0.21007",
+          "actual_lab_completions": 1,
+          "cap": 0,
+          "eight_enabled": true,
+          "eight_visible": false,
+          "eight_saved": 0.42000000000000004,
+          "next_level": 9,
+          "native_bonus": 1.7999999999999998,
+          "native_bonus_before": 1.2,
+          "current": "automation",
+          "seven_creator": "mir-fixture-finite-base-extension-level",
+          "eight_creator": "more-infinite-research",
+          "current_progress": 0,
+          "queue": [
+            "automation"
+          ],
+          "paused_progress": 0.27,
+          "foreign7_enabled": false,
+          "on_load_read_only": true
+        },
+        {
+          "source_mir": "4.7.21003",
+          "destination_mir": "5.0.21007",
+          "actual_lab_completions": 1,
+          "cap": 0,
+          "eight_enabled": true,
+          "eight_visible": false,
+          "eight_saved": 0.42000000000000004,
+          "next_level": 9,
+          "native_bonus": 1.7999999999999998,
+          "native_bonus_before": 1.2,
+          "current": "automation",
+          "seven_creator": "mir-fixture-finite-base-extension-level",
+          "eight_creator": "more-infinite-research",
+          "current_progress": 0,
+          "queue": [
+            "automation"
+          ],
+          "paused_progress": 0.27,
+          "foreign7_enabled": false,
+          "on_load_read_only": true
+        }
+      ],
+      "controls_restored": true
+    }
+  ],
+  "actual_mod_context_captures": [
+    {
+      "arm": "source",
+      "capture_sha256": "6BDBFD8C5C41B8CC92A3E8D1C266F3B99565DD264E48A1A83C28F2925B757448",
+      "tick": 409,
+      "active_mods": {
+        "base": "2.1.23",
+        "mir-fixture-finite-base-extension-level": "0.1.0",
+        "mir-fixture-mir5-active-mods-observer": "0.1.0",
+        "more-infinite-research": "4.7.21003",
+        "mir-fixture-native-research-speed-finite": "0.2.0"
+      },
+      "startup_values": 889,
+      "row_present": true,
+      "policy_version": 3,
+      "managed_eight": {
+        "technology": "research-speed-8",
+        "source": "base-continuation",
+        "operation": "emit_base_extension",
+        "setting": "mir-max-level-research-speed",
+        "selected": "infinite",
+        "native_finite_stage": false,
+        "binding_fingerprint": "mir32-077f8330",
+        "policy_transport": "transported-v3",
+        "ownership_kind": "transported-v3",
+        "legacy": false
+      },
+      "current_marker_present": false,
+      "current_marker": false,
+      "seven_history": {
+        "created": "mir-fixture-finite-base-extension-level",
+        "changed": {}
+      },
+      "eight_history": {
+        "created": "more-infinite-research",
+        "changed": {}
+      }
+    },
+    {
+      "arm": "current",
+      "capture_sha256": "713E3593F18294BD49A153C1FCA8DC1BB53D79F942D9DD5F989168D344CB06C8",
+      "tick": 435,
+      "active_mods": {
+        "base": "2.1.23",
+        "mir-fixture-finite-base-extension-level": "0.1.0",
+        "mir-fixture-mir5-active-mods-observer": "0.1.0",
+        "more-infinite-research": "5.0.21007",
+        "mir-fixture-native-research-speed-finite": "0.2.0"
+      },
+      "startup_values": 889,
+      "row_present": true,
+      "policy_version": 3,
+      "managed_eight": {
+        "technology": "research-speed-8",
+        "source": "base-continuation",
+        "operation": "emit_base_extension",
+        "setting": "mir-max-level-research-speed",
+        "selected": "infinite",
+        "native_finite_stage": false,
+        "binding_fingerprint": "mir32-077f8330",
+        "policy_transport": "transported-v3",
+        "ownership_kind": "transported-v3",
+        "legacy": false
+      },
+      "current_marker_present": true,
+      "current_marker": {
+        "schema": 1,
+        "technology": "research-speed-8",
+        "predecessor": "research-speed-7",
+        "provider": "mir-fixture-finite-base-extension-level"
+      },
+      "seven_history": {
+        "created": "mir-fixture-finite-base-extension-level",
+        "changed": {}
+      },
+      "eight_history": {
+        "created": "more-infinite-research",
+        "changed": {}
+      }
+    }
+  ],
+  "separate_fresh_component": {
+    "native_harness_source": "446ec20bd424d6492ba49ac55be3c49a337a816a",
+    "observer_version": "0.1.0",
+    "observer_sha256": "30B949662A2AF950D65DA2F27A1F9094CC700FA0CF8B90A78DD72400F13877DB",
+    "result_sha256": "05C47C6C14F059428A8B20FDD9E5AFF7FC1CE893C471D78CA3AF272565039E53",
+    "initial": {
+      "source_mir": "5.0.21007",
+      "destination_mir": "5.0.21007",
+      "actual_lab_completions": 1,
+      "next_level": 9,
+      "native_bonus": 1.7999999999999998,
+      "native_bonus_before": 1.2,
+      "current": "research-speed-8",
+      "seven_creator": "mir-fixture-finite-base-extension-level",
+      "eight_creator": "more-infinite-research",
+      "current_progress": 0.42000000000000004,
+      "queue": [
+        "research-speed-8",
+        "automation"
+      ],
+      "paused_progress": 0.27,
+      "foreign7_enabled": false,
+      "on_load_read_only": false
+    },
+    "cold_reloads": 2,
+    "private_custody": "3673efa2a55d20f11adaed5594a134d67d953761:projects/mir/runs/finite8-passed-components-r02/"
+  },
+  "adverse_history": [
+    "Original observer0.1 source attempt wrote read-only LuaEntity.active after actual completion; failed before producing a qualified source. Original40files/1,117,296B retained in primary/C custody. Corrected observer uses disabled_by_script, empty lab inputs and zero energy.",
+    "Boundary preparation first projected an extra active-observer info-f200.json member; composition refused before native activation. Corrected selected-member projection retained separately.",
+    "Initial File-settings helper incorrectly refused retained non-File metadata. Independent actual-profile regression detected it;3d2 restores prior selection and four focused controls pass. Originalac1 remains preserved.",
+    "Fresh integration-checkout host fixture failed because build/tmp did not exist. Its test setup now creates that scratch parent; all14 fixture and4 runner controls pass. Original failed host log remains primary custody; no native input or oracle changed.",
+    "Hosted6da host-controls failed four raw fixture/provenance byte checks after Windows LF-to-CRLF checkout conversion. Scoped .gitattributes preserves the original committed finite-fixture bytes; all14 controls pass without changing native/archive/provenance pins. The original red run42302599890 and logB384A763 remain retained."
+  ],
+  "limits": [
+    "Exact controlled Base2.1.23 profile, not all overhauls/providers or reporter modpack.",
+    "Actual old4.7 source and internal13f package; not an invented published5.0.7 transition or final5.0.8 package freeze.",
+    "F200 weak/settings-derived history lacks creation proof and remains refused/unverified; no F200 finite saved-state pass is claimed.",
+    "Prerequisites are fixed fixture setup; laboratory completion is real, but full science production/factory progression and physical output are separate.",
+    "No whole Library, multiplayer, broad historical or performance acceptance is inferred."
+  ],
+  "release_qualification": false,
+  "stable_acceptance": false,
+  "custody": {
+    "private_commit": "baafbc8fe4df31308a19bfc8fb36f3fdc85cb436",
+    "path": "projects/mir/runs/finite8-boundary-native-r01/",
+    "primary": "build/qualification/finite8-boundary-originals-r01/",
+    "verified_secondary": true,
+    "raw_files": 257,
+    "raw_bytes": 13774444,
+    "manifest_sha256": "4E981486CAFF996D8EF6AC1863904BB480CFA402CCEC9FD2922D3C0212250F33",
+    "remaining_factorio": 0,
+    "controls_restored": true
+  }
+}

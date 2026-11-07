@@ -365,10 +365,11 @@ local FAMILY_CONDITIONS = {
 
 -- SIF's data-updates stage retires space science before MIR's final-stage
 -- continuations are emitted.  Keep the retained 4.2.1 correction to the two
--- observed stable identities; no other family is inferred from the active
--- mod name or from hidden prototype state.
+-- observed stable identities and the named finite7 -> research-speed8 variant;
+-- no other family is inferred from the active mod name or hidden state.
 local SIF_CONTINUATION_EXCLUSIONS = {
   ["research-speed-7"] = {"space-science-pack"},
+  ["research-speed-8"] = {"space-science-pack"},
   ["weapon-shooting-speed-7"] = {"space-science-pack"}
 }
 

@@ -303,7 +303,9 @@ local function exact_target()
   for name, expected in pairs(catalogue.targets) do
     if script.active_mods.base == expected.base and (script.active_mods["more-infinite-research"] == expected.mir
         or (name == "f200_source_defaults" and script.active_mods["more-infinite-research"] == "5.0.20001")
-        or (name == "f210_source_defaults" and script.active_mods["more-infinite-research"] == "5.0.21001"))
+        or (name == "f200_source_defaults" and script.active_mods["more-infinite-research"] == "5.0.20007")
+        or (name == "f210_source_defaults" and script.active_mods["more-infinite-research"] == "5.0.21001")
+        or (name == "f210_source_defaults" and script.active_mods["more-infinite-research"] == "5.0.21007"))
         and script.active_mods[FIXTURE] == expected.fixture
         and script.active_mods["mir-fixture-mir5-active-mods-observer"] == "0.1.0" then
       return name, expected

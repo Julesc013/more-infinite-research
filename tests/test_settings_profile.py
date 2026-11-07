@@ -2,8 +2,11 @@
 import argparse
 import json
 from pathlib import Path
+import re
 import sys
 import unittest
+
+from test_locale_catalogue import parse_cfg
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -36,6 +39,63 @@ class SettingsProfileTests(unittest.TestCase):
           end
           settings = {startup = defaults()}
         ''')
+
+    def test_all_generated_setting_labels_notes_and_choices_have_mir_locale_keys(self):
+        required = {}
+        prefixes = (
+            "mod-setting-name.mir-", "mod-setting-name.ips-",
+            "mod-setting-description.mir-", "mod-setting-description.ips-",
+            "string-mod-setting.mir-", "string-mod-setting.ips-",
+            "technology-name.more-infinite-research.",
+            "technology-description.more-infinite-research.",
+        )
+
+        def collect(expression, setting):
+            if not hasattr(expression, "items"):
+                return
+            key = expression[1]
+            self.assertIsInstance(key, str)
+            self.assertNotEqual(key, "?", "Review alternative-localization semantics if used here")
+            if key.startswith(prefixes):
+                required.setdefault(key, []).append((setting, len(expression) - 1))
+            for index, child in expression.items():
+                if isinstance(index, int) and index > 1:
+                    collect(child, setting)
+
+        for _, prototype in self.lua.eval("config.prototypes()").items():
+            for field in ("localised_name", "localised_description"):
+                collect(prototype[field], prototype["name"])
+            choices = prototype["allowed_values"]
+            if choices is not None:
+                for _, choice in choices.items():
+                    key = "string-mod-setting." + prototype["name"] + "-" + str(choice)
+                    required.setdefault(key, []).append((prototype["name"], 0))
+
+        def language_values(language):
+            values = {}
+            for path in sorted((ROOT / "source" / "locale" / language).glob("*.cfg")):
+                for section, entries in parse_cfg(path).items():
+                    for key, text in entries.items():
+                        full_key = section + "." + key
+                        self.assertNotIn(full_key, values, str(path))
+                        values[full_key] = text
+            return values
+
+        english = language_values("en")
+        self.assertTrue(required)
+        # Native Base technology labels are owned by the engine, outside this
+        # MIR-only lookup. Missing translated MIR keys use the English fallback.
+        for directory in sorted((ROOT / "source" / "locale").iterdir()):
+            if not directory.is_dir():
+                continue
+            translated = language_values(directory.name)
+            for key, uses in required.items():
+                with self.subTest(language=directory.name, key=key):
+                    text = translated.get(key, english.get(key, ""))
+                    self.assertTrue(text.strip(), f"Missing MIR locale key {key}; used by {uses}")
+                    arguments = {int(number) for number in re.findall(r"__(\d+)__", text)}
+                    if arguments:
+                        self.assertLessEqual(max(arguments), min(count for _, count in uses), key)
 
     def test_registered_settings_are_the_single_active_profile_authority(self):
         self.lua.execute(r'''
