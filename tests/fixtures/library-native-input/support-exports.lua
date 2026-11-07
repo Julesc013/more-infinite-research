@@ -7,6 +7,7 @@ function M.register(context)
   local BROWSER, PROFILES = "more-infinite-research-browser", "more-infinite-research-settings"
   local NAME, OTHER = "mir-fixture-mir5-library-native-input", "mir_export_foreign"
   local qualified_input = context.qualified_input==true
+  local current_508 = context.current_508==true
   local refs, loaded = {}, false
   local actions = {
     {"en-full","en","full"},{"en-compact","en","compact"},{"en-diagnostics","en","diagnostics"},
@@ -62,8 +63,10 @@ function M.register(context)
     local tabs=root[PREFIX.."tabs"]
     local node=valid(tabs) and tabs[PREFIX..((kind=="diagnostics" or kind=="diagnostics-failure") and "help_content" or "settings_content")]
     if not valid(node) then fail("native export content absent") end
+    if current_508 and (not valid(tabs) or tabs.parent~=root or tabs.get_mod()~="more-infinite-research" or node.parent~=tabs or node.get_mod()~="more-infinite-research") then fail("native export content differs") end
     if kind=="diagnostics" or kind=="diagnostics-failure" then
       local panes=node[PREFIX.."help_panes"]
+      if current_508 and panes==nil then fail("native diagnostics container differs") end
       if panes~=nil then
         -- Authored Debug layout; retain the exact flat path for earlier
         -- frozen packages, without falling back past malformed new panes.
@@ -71,6 +74,10 @@ function M.register(context)
         if not valid(panes) or panes.parent~=node or panes.get_mod()~="more-infinite-research"
             or not valid(panel) or panel.parent~=panes or panel.get_mod()~="more-infinite-research" then
           fail("native diagnostics container differs")
+        end
+        if current_508 then
+          local report=panel[PREFIX.."report_preview"]
+          if not valid(report) or report.parent~=panel or report.get_mod()~="more-infinite-research" then fail("native diagnostics preview differs") end
         end
         node=panel
       end
@@ -133,7 +140,7 @@ function M.register(context)
       if (kind=="settings-failure" or kind=="diagnostics-failure") and not valid(refs.previous) then fail("failure control requires an existing successful preview") end
       local button_name=(kind=="compact" and "export_compact") or ((kind=="diagnostics" or kind=="diagnostics-failure") and "export_diagnostics") or "export_settings"
       refs.button=(button_name=="export_diagnostics" and node or node[PREFIX.."settings_toolbar"])[PREFIX..button_name]
-      if not valid(refs.button) or refs.button.get_mod()~="more-infinite-research" then fail("actual export button absent") end
+      if not valid(refs.button) or refs.button.get_mod()~="more-infinite-research" or (current_508 and button_name=="export_diagnostics" and refs.button.parent~=node) then fail("actual export button absent") end
     end
     refs.player=p.index;s.pending=action;s.click_start=s.clicks;s.phase="await-click"
     unchanged();return report()
@@ -195,11 +202,11 @@ function M.register(context)
   remote.add_interface(context.interface,{report=report,prepare=prepare,check=check,checkpoint=checkpoint})
   script.on_init(function()
     local mods=script.active_mods
-    local tuple=mods.base=="2.0.77" and {mir=qualified_input and "5.0.20007" or "5.0.20000",fixture="0.3.0"}
-      or (mods.base=="2.1.23" and {mir=qualified_input and "5.0.21007" or "5.0.21000",fixture="0.4.0"})
+    local tuple=mods.base=="2.0.77" and {mir=qualified_input and (current_508 and "5.0.20008" or "5.0.20007") or "5.0.20000",fixture="0.3.0"}
+      or (mods.base=="2.1.23" and {mir=qualified_input and (current_508 and "5.0.21008" or "5.0.21007") or "5.0.21000",fixture="0.4.0"})
     if not tuple then fail("exact engine target differs") end
     local allowed={base=mods.base,["more-infinite-research"]=tuple.mir,
-      ["mir-fixture-mir5-active-mods-observer"]="0.1.0",[NAME]=qualified_input and "0.4.1" or "0.4.0"}
+      ["mir-fixture-mir5-active-mods-observer"]="0.1.0",[NAME]=qualified_input and (current_508 and "0.4.2" or "0.4.1") or "0.4.0"}
     if not qualified_input then allowed[context.historical_fixture]=tuple.fixture end
     for name,version in pairs(mods) do if allowed[name]~=version then fail("unexpected export observer closure") end end
     for name,version in pairs(allowed) do if mods[name]~=version then fail("missing export observer closure") end end
