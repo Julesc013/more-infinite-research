@@ -1,0 +1,339 @@
+{
+  "schema": 1,
+  "kind": "MIRPrivateCreditResearchCostNativeReproductionV1",
+  "issue": "https://github.com/Julesc013/more-infinite-research/issues/1797",
+  "verdict": "REPRODUCED published5.0.8 failure class on both modern engines; correction not yet qualified",
+  "rows": [
+    {
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "exists": true,
+        "bytes": 49398736,
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "published_package": {
+        "path": "dist/v5.0.8/more-infinite-research_5.0.21008.zip",
+        "exists": true,
+        "bytes": 986661,
+        "sha256": "C0FF59C8DA771DC43D1C804B10A533AB0EDF4ED4B36CB7C28A56F61E5DF7E9CB"
+      },
+      "default_price_1_endpoint": "Performed 1 updates; no fatal diagnostic",
+      "saved_price_4_endpoint": "Exact supplied on_init holder-shape crash; not a successful benchmark",
+      "observed_private_holders": {
+        "force": "player",
+        "technology_price_multiplier": 4,
+        "mir_version": "5.0.21008",
+        "holders": [
+          {
+            "name": "mir-native-credit-research_electric_shooting_speed-electric-positive",
+            "level": 1,
+            "researched": false,
+            "effective_count": 4,
+            "effective_formula": "1",
+            "prototype_count": 4,
+            "prototype_formula": "1",
+            "ignore_tech_cost_multiplier": false,
+            "energy": 60,
+            "hidden": true,
+            "enabled": false,
+            "visible_when_disabled": false,
+            "ingredients": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              }
+            ],
+            "effects": [
+              {
+                "type": "gun-speed",
+                "ammo_category": "electric",
+                "modifier": 0.1
+              }
+            ]
+          },
+          {
+            "name": "zz-mir-native-credit-research_electric_shooting_speed-electric-negative",
+            "level": 1,
+            "researched": false,
+            "effective_count": 4,
+            "effective_formula": "1",
+            "prototype_count": 4,
+            "prototype_formula": "1",
+            "ignore_tech_cost_multiplier": false,
+            "energy": 60,
+            "hidden": true,
+            "enabled": false,
+            "visible_when_disabled": false,
+            "ingredients": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              }
+            ],
+            "effects": [
+              {
+                "type": "gun-speed",
+                "ammo_category": "electric",
+                "modifier": -0.1
+              }
+            ]
+          },
+          {
+            "name": "mir-native-credit-research_electric_shooting_speed-tesla-positive",
+            "level": 1,
+            "researched": false,
+            "effective_count": 4,
+            "effective_formula": "1",
+            "prototype_count": 4,
+            "prototype_formula": "1",
+            "ignore_tech_cost_multiplier": false,
+            "energy": 60,
+            "hidden": true,
+            "enabled": false,
+            "visible_when_disabled": false,
+            "ingredients": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              }
+            ],
+            "effects": [
+              {
+                "type": "gun-speed",
+                "ammo_category": "tesla",
+                "modifier": 0.1
+              }
+            ]
+          },
+          {
+            "name": "zz-mir-native-credit-research_electric_shooting_speed-tesla-negative",
+            "level": 1,
+            "researched": false,
+            "effective_count": 4,
+            "effective_formula": "1",
+            "prototype_count": 4,
+            "prototype_formula": "1",
+            "ignore_tech_cost_multiplier": false,
+            "energy": 60,
+            "hidden": true,
+            "enabled": false,
+            "visible_when_disabled": false,
+            "ingredients": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              }
+            ],
+            "effects": [
+              {
+                "type": "gun-speed",
+                "ammo_category": "tesla",
+                "modifier": -0.1
+              }
+            ]
+          }
+        ]
+      },
+      "observed_shape_unchanged_except_price": "Energy60, hidden, disabled, invisible-when-disabled, one automation science amount1, authored electric/Tesla +/-0.1 effects.",
+      "source_saves": [
+        {
+          "path": "nomir-price-1.zip",
+          "bytes": 820789,
+          "sha256": "00DA4F3C61358A7A2B772A589715878E19846F2679FDDB8B2478CCDC27853CDD"
+        },
+        {
+          "path": "nomir-price-4.zip",
+          "bytes": 820788,
+          "sha256": "2DB96B4D9737C02C62416390F7331D858BA495AB321B73636CFB9583F0F85DFC"
+        }
+      ],
+      "original_source_saves_unchanged": true,
+      "original_library_controls_and_archives_restored": true,
+      "factorio_zero": true,
+      "failed_stdout_sha256": "2A8E16070ABCA55B977269213D1A83B921FABCA1A836651E9454F03E62C416F2",
+      "native_failure_exit_code": 1
+    },
+    {
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "exists": true,
+        "bytes": 43530192,
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "published_package": {
+        "path": "dist/v5.0.8/more-infinite-research_5.0.20008.zip",
+        "exists": true,
+        "bytes": 986233,
+        "sha256": "F7660CA6F2E0A988DB9E5F74B1D169D62B24A8C578209D55A59841D1E1FC9148"
+      },
+      "default_price_1_endpoint": "Performed 1 updates; no fatal diagnostic",
+      "saved_price_4_endpoint": "Exact supplied on_init holder-shape crash; not a successful benchmark",
+      "observed_private_holders": {
+        "force": "player",
+        "technology_price_multiplier": 4,
+        "mir_version": "5.0.20008",
+        "holders": [
+          {
+            "name": "mir-native-credit-research_electric_shooting_speed-electric-positive",
+            "level": 1,
+            "researched": false,
+            "effective_count": 4,
+            "effective_formula": "1",
+            "prototype_count": 4,
+            "prototype_formula": "1",
+            "ignore_tech_cost_multiplier": false,
+            "energy": 60,
+            "hidden": true,
+            "enabled": false,
+            "visible_when_disabled": false,
+            "ingredients": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              }
+            ],
+            "effects": [
+              {
+                "type": "gun-speed",
+                "ammo_category": "electric",
+                "modifier": 0.1
+              }
+            ]
+          },
+          {
+            "name": "zz-mir-native-credit-research_electric_shooting_speed-electric-negative",
+            "level": 1,
+            "researched": false,
+            "effective_count": 4,
+            "effective_formula": "1",
+            "prototype_count": 4,
+            "prototype_formula": "1",
+            "ignore_tech_cost_multiplier": false,
+            "energy": 60,
+            "hidden": true,
+            "enabled": false,
+            "visible_when_disabled": false,
+            "ingredients": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              }
+            ],
+            "effects": [
+              {
+                "type": "gun-speed",
+                "ammo_category": "electric",
+                "modifier": -0.1
+              }
+            ]
+          },
+          {
+            "name": "mir-native-credit-research_electric_shooting_speed-tesla-positive",
+            "level": 1,
+            "researched": false,
+            "effective_count": 4,
+            "effective_formula": "1",
+            "prototype_count": 4,
+            "prototype_formula": "1",
+            "ignore_tech_cost_multiplier": false,
+            "energy": 60,
+            "hidden": true,
+            "enabled": false,
+            "visible_when_disabled": false,
+            "ingredients": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              }
+            ],
+            "effects": [
+              {
+                "type": "gun-speed",
+                "ammo_category": "tesla",
+                "modifier": 0.1
+              }
+            ]
+          },
+          {
+            "name": "zz-mir-native-credit-research_electric_shooting_speed-tesla-negative",
+            "level": 1,
+            "researched": false,
+            "effective_count": 4,
+            "effective_formula": "1",
+            "prototype_count": 4,
+            "prototype_formula": "1",
+            "ignore_tech_cost_multiplier": false,
+            "energy": 60,
+            "hidden": true,
+            "enabled": false,
+            "visible_when_disabled": false,
+            "ingredients": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              }
+            ],
+            "effects": [
+              {
+                "type": "gun-speed",
+                "ammo_category": "tesla",
+                "modifier": -0.1
+              }
+            ]
+          }
+        ]
+      },
+      "observed_shape_unchanged_except_price": "Energy60, hidden, disabled, invisible-when-disabled, one automation science amount1, authored electric/Tesla +/-0.1 effects.",
+      "source_saves": [
+        {
+          "path": "nomir-price-1.zip",
+          "bytes": 819902,
+          "sha256": "229713FAB5BCDE74B7A29220C4CF6A79344411825270E52ED34F553C4045C2AA"
+        },
+        {
+          "path": "nomir-price-4.zip",
+          "bytes": 819898,
+          "sha256": "81EA706F8448A30D8C382E856B2FD68E9FB7DDD5172FE7EE3F4E42D638CA91ED"
+        }
+      ],
+      "original_source_saves_unchanged": true,
+      "original_library_controls_and_archives_restored": true,
+      "factorio_zero": true,
+      "failed_stdout_sha256": "C47E9AC9DF8BD9CD82B92089B8B0EAED99030020335268B2900A4396613F2C1C",
+      "native_failure_exit_code": 1
+    }
+  ],
+  "independent_no_mir_observation": "No-MIR read-only load independently confirms actual saved difficulty multiplier4 before adding MIR.",
+  "mechanism": "Private formula1 holders inherit map technology-price multiplier. Both effective and prototype counts become4; all other captured shape fields retain their authored values.",
+  "native_endpoint_caveat": "Both observed multiplier4 failures exit1. The Lua on_init stack is in stdout and absent from factorio-current.log; default-price loads exit0 and complete the benchmark. Require the actual endpoint and inspect all streams.",
+  "private_originals": {
+    "repository": "Julesc013/scratchpad",
+    "commit": "0adf4ec91f18e57bca478211854d1cf690b9ec4e",
+    "path": "projects/mir/runs/gun-credit-research-cost-r01/",
+    "verdict_sha256": "2B0676D9814B126BED695454A9C7318EE6C9BAACE1756D31B0738E9DA739DFC4",
+    "body_count": 184,
+    "gzip_sha256": "8370A166FE9EE971B84E5A8CDC8907B8E5EBDBDA6499FD78DABD7C6E9C345A74",
+    "decoded_sha256": "3AD3A4A912AB813E50868B27D65A661216B06D7FC9CE2E7DD1DFEDFBD4D919A2",
+    "interpretation_erratum": {
+      "commit": "babd02509aa4101b027406bd40328fd5473aeec7",
+      "path": "projects/mir/runs/gun-credit-research-cost-r01/exit-code-erratum.json",
+      "sha256": "1903062AE88FC272785DE750AF10107D6CD9CD5B213EF25EFCC65E0877A449C6",
+      "original_capsule_unchanged": true
+    }
+  },
+  "custody": "All five attempts, protected source ZIPs, exact controllers, selections, map settings and logs copied and hash-verified to discoverable primary qualification and C-drive preservation roots.184 exact original bodies retained remotely.",
+  "adverse_attempts": [
+    "Prelaunch output-root refusal preserved; existing governor unchanged and output moved to admitted scratch.",
+    "First source create failed because a partial map-settings file omitted mandatory pollution. Retained failure; subsequent file uses exact installed complete example with only price changed.",
+    "The first F210 parent required its failure diagnostic in the engine log, but the actual error is in stdout. The native ledger correctly records exit1. An initial human readback wrongly inferred exit0; independent review corrected that interpretation without rerunning or changing any raw result.",
+    "Read-only observer initially lacked a prototype-stage load line; selection guard refused acceptance after the default observation. Added existing full-mod-table data-stage observer, preserved first input/result.",
+    "Packaging refused an overwrite; preserved old local observer ZIP and built the revised observer in a separate directory. F200 preparation caught an overlapping mechanical replacement before native dispatch."
+  ],
+  "limits": [
+    "Reporter exact save, mod versions and settings remain unavailable/unverified. This establishes a reproducible mechanism, not reporter attribution.",
+    "No corrected package, paid-state transition, cold successor reload, GUI, multiplayer, performance or stable acceptance claimed.",
+    "Read-only observer is explicitly local/uncommitted experiment, hash-bound per run; original controlled F210 failure also reproduced without it.",
+    "Do not trust native exit0 alone. Require the actual endpoint and inspect stdout, stderr and engine log."
+  ],
+  "next": "Review Aero correction, then exact package first-add/default/nondefault/fractional and affected paid-state/save/two-reload checks."
+}
