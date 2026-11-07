@@ -581,7 +581,7 @@ class LibraryTests(unittest.TestCase):
           local root=library.open(player,{tab="settings",settings_scope="research",settings_search="research_gears"})
           local detail=root.mir_library_tabs.mir_library_settings_content
             .mir_library_settings_dynamic.mir_library_settings_detail
-          local keys={"enable","cost-base","cost-linear-increment","cost-growth","max-level","research-time"}
+          local keys={"enable","cost-base","cost-linear-increment","cost-growth","max-level","research-time","effect-per-level-percent"}
           for index,key in ipairs(keys) do
             assert(detail.mir_library_settings_fields["mir_library_setting_"..index.."_name"].caption[1]=="mir-browser.setting-"..key,
               "the group already names the research; standard field names must stay short")
@@ -592,6 +592,43 @@ class LibraryTests(unittest.TestCase):
           assert(detail.mir_library_settings_fields.mir_library_setting_5_value.caption[1]=="mir-browser.setting-unlimited")
           assert(settings.startup["ips-cost-growth-research_gears"].value==1.23456789,
             "presentation must not round configuration or profile values")
+          assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
+        ''')
+
+    def test_effect_field_labels_keep_the_original_percentage_and_native_units(self):
+        # Published4.7.3 direct-effects.lua plus descriptor.lua give exactly
+        # these four native-unit stream contracts; productivity uses percent.
+        # Its renderer keeps native-continuation labels generic.
+        self.lua.execute('''
+          boot()
+          local catalog=require("research.settings")
+          local native_units={research_inventory_capacity=true,research_character_reach=true,
+            research_cargo_bay_unloading_distance=true,research_cargo_landing_pad_count=true}
+          local checked,continuations,native=0,0,0
+          library.open(player,{tab="settings",settings_scope="research",settings_search=""})
+          for _,name in ipairs(catalog.registered_names()) do
+            local spec=catalog.spec(name)
+            if spec.key=="effect_percent" and spec.stream then
+              local stream=spec.stream
+              local percent=not stream.native_continuation and not native_units[stream.key]
+              if not stream.native_continuation then
+                assert((spec.type=="int-setting")== (native_units[stream.key]==true),
+                  "the compact caption needs review when an authored unit changes: "..stream.key)
+              end
+              storage.mir_library.players[1].setting_selected=stream.key
+              local root=library.open(player,{tab="settings"})
+              local content=root.mir_library_tabs.mir_library_settings_content
+              assert(storage.mir_library.players[1].setting_selected==stream.key)
+              local field=content.mir_library_settings_dynamic.mir_library_settings_detail
+                .mir_library_settings_fields.mir_library_setting_7_name
+              assert(field.caption[1]=="mir-browser.setting-effect-per-level"..(percent and "-percent" or ""),
+                "the seventh field repeats its title or misstates its units: "..stream.key)
+              checked=checked+1
+              if stream.native_continuation then continuations=continuations+1 end
+              if native_units[stream.key] then native=native+1 end
+            end
+          end
+          assert(checked>70 and continuations>0 and native==4)
           assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
         ''')
 
