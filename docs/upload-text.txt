@@ -1,9 +1,11 @@
-GitHub prerelease: MIR 5.0.8
+MIR 5.0.8 — GitHub prerelease (no Mod Portal upload).
 
-The maintainer handles Mod Portal publication of qualified stable packages, using the identical tested GitHub ZIPs. This prerelease is GitHub-only.
+This update restores the MIR 4-style Research Library and fixes finite research-speed compatibility.
 
-Changes: restore the authored Research Library layout, fixed navigation and retained selection/scrolling; fix narrow-layout resizing; preserve a supplied finite research-speed level 7 and continue MIR from level 8; protect earned and partial work with safe first-upgrade checks; show numeric research caps in native descriptions.
+- Fixed tabs, labelled filters and clearer Research, Settings and help pages.
+- Preserved selection and scrolling; fixed narrow-window resizing.
+- Continue research speed from level 8 when another mod supplies finite level 7, preserving earned bonuses and unfinished work.
+- Show numeric research caps in native descriptions.
+- Restored missing setting names, help and dropdown translations.
 
-Modern engine minima: Factorio 2.0.77 and 2.1.23. Back up saves and retain the previous packages. The finite level-7 old-save route is qualified only on the tested Factorio 2.1 setup: keep the same non-MIR mods, versions and startup settings for first entry. Restore the original save/selection if MIR refuses ambiguous ownership. No blanket provider/overhaul claim is made.
-
-Full Library saved-view/client/layout coverage, historical reconciliation and whole-product performance remain open. Complete reporter-modpack and Real Industrial Chemistry runtime/save compatibility remain unverified. Factorio 0.18.47 and early builds remain experimental/best effort. Early 0.6–0.12 ZIPs require extraction and contain a fixed finite subset without runtime, settings, Library UI or migrations; native qualification is absent.
+[Installation, compatibility and upgrade guidance](https://github.com/Julesc013/more-infinite-research/blob/v5.0.8/docs/support.md).
