@@ -134,6 +134,7 @@ local function filter_control(root, filters, name)
   if CURRENT_508 and (grid.parent~=filters or grid.get_mod()~="more-infinite-research") then fail("authored research filter grid is foreign") end
   if name == "mir_library_query" then
     local query=filters[name]
+    if CURRENT_508 and (not valid(query) or query.type~="textfield" or query.parent~=filters or query.get_mod()~="more-infinite-research") then fail("authored research query is malformed or foreign") end
     return query
   end
   local field = grid[name .. "_field"]

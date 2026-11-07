@@ -678,11 +678,14 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                   local owner=function()return "more-infinite-research" end
                   root.mir_library_tabs.parent=root;root.mir_library_tabs.get_mod=owner
                   page.parent=root.mir_library_tabs;filters.parent=page;filters.get_mod=owner
-                  filters.mir_library_query.parent=filters;filters.mir_library_query.get_mod=owner
+                  filters.mir_library_query.parent=opponent=="wrong-query-parent" and page or filters
+                  filters.mir_library_query.get_mod=opponent=="foreign-query" and function()return "fixture" end or owner
+                  if opponent=="bad-query-type" then filters.mir_library_query.type="button" end
                   grid.parent=filters;grid.get_mod=owner
                   for _,name in ipairs({"family","status","mode","sort","visibility"}) do
                     local id="mir_library_"..name;local field=grid[id.."_field"]
-                    field.parent=grid;field.get_mod=owner;field[id].parent=field;field[id].get_mod=owner
+                    field.parent=grid;field.get_mod=owner;field[id].parent=opponent=="wrong-field-parent" and grid or field
+                    field[id].get_mod=opponent=="foreign-field" and function()return "fixture" end or owner
                   end
                 end
                 root.mir_library_tabs.mir_library_research_page=page
@@ -701,7 +704,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               content.mir_library_detail.style.minimal_width=442
               content.mir_library_detail.style.maximal_width=442
               local detail=content.mir_library_detail
-              if present and (opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field") then
+              if present and (input_observer_version=="0.3.6" or opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field") then
                 local facts=element("scroll-pane","mir_library_research_facts")
                 local heading=element("flow","mir_library_detail_heading");heading.direction="horizontal"
                 detail.mir_library_research_facts=facts;facts.mir_library_detail_heading=heading
@@ -899,7 +902,9 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               end
               local before_witness=fingerprint(store);witness_before=api().report();readonly_witness=before_witness==fingerprint(store)
               click(en,query(en));witness_after=api().report()
-              local saved=query(en);en.gui.screen[root_name].mir_library_filters.mir_library_query=element("textfield","replacement")
+              local saved=query(en);local replacement=element("textfield","replacement")
+              if input_observer_version=="0.3.6" then replacement.parent=en.gui.screen[root_name].mir_library_filters;replacement.get_mod=function()return "more-infinite-research" end end
+              en.gui.screen[root_name].mir_library_filters.mir_library_query=replacement
               witness_wrong=api().report();en.gui.screen[root_name].mir_library_filters.mir_library_query=saved
               local filter=en.gui.screen[root_name].mir_library_filters
               filter.visible=false;witness_parent_hidden=api().report();filter.visible=true
@@ -1138,12 +1143,24 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertEqual((result["final"]["phase"], result["final"]["actual_joins"]), ("delivered", 5))
                 for opponent in ("native-effect-change", "replacement-index-reuses-en"):
                     self.assertFalse(self.run_case(target, opponent, version, "0.3.6")["ok"], opponent)
-                for opponent in ("old-layout", "bad-filter-grid", "bad-filter-field"):
-                    try:
-                        bad = self.run_case(target, opponent, version, "0.3.6")
-                    except Exception:
-                        continue
-                    self.assertFalse(bad["ok"], opponent)
+                for opponent, message in (
+                    ("old-layout", "authored research page is absent"),
+                    ("bad-filter-grid", "authored research filter grid is malformed"),
+                    ("bad-filter-field", "authored research filter field is malformed"),
+                    ("foreign-query", "authored research query is malformed or foreign"),
+                    ("wrong-query-parent", "authored research query is malformed or foreign"),
+                    ("bad-query-type", "authored research query is malformed or foreign"),
+                    ("foreign-field", "authored research filter field is foreign"),
+                    ("wrong-field-parent", "authored research filter field is foreign"),
+                ):
+                    with self.subTest(opponent=opponent):
+                        try:
+                            bad = self.run_case(target, opponent, version, "0.3.6")
+                        except Exception as exc:
+                            self.assertIn(message, str(exc))
+                        else:
+                            self.assertFalse(bad["ok"], opponent)
+                            self.assertIn(message, bad["message"])
                 self.assertFalse(self.run_case(target, package_version=version.replace("008", "007"), input_observer_version="0.3.6")["ok"])
 
     def test_current_034_keeps_imported_lifecycle_and_reused_slot_on_exact_507(self):
@@ -1737,8 +1754,13 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
             self.assertEqual((metadata["version"], metadata["dependencies"][-1]), ("0.4.2", f"~ more-infinite-research = {version}"))
             run = self.lua.globals().run_export_observer
             self.assertEqual(run(target, "", "508", "authored"), (13, 5, 2, 0))
-            for layout in (None, "flat-decoy", "foreign-panes", "foreign-panel", "missing-panel", "wrong-parent"):
-                with self.subTest(target=target, layout=layout), self.assertRaises(Exception):
+            for layout, message in ((None, "native diagnostics container differs"),
+                                    ("flat-decoy", "actual export button absent"),
+                                    ("foreign-panes", "native diagnostics container differs"),
+                                    ("foreign-panel", "native diagnostics container differs"),
+                                    ("missing-panel", "native diagnostics container differs"),
+                                    ("wrong-parent", "native diagnostics container differs")):
+                with self.subTest(target=target, layout=layout), self.assertRaisesRegex(Exception, message):
                     run(target, "", "508", layout)
 
     def test_export_report_tick_is_monotonic_and_read_only(self):
