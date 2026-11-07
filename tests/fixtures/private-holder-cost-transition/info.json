@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-mixed-gun504-first-entry",
+  "version": "0.6.0",
+  "title": "Private-holder cost and paid-state continuity",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "description": "Protected published8 source and corrected successor; retains actual prior lab/paid/queue/foreign state without research or bonus setters.",
+  "dependencies": [
+    "base = 2.1.23",
+    "space-age = 2.1.23",
+    "more-infinite-research >= 5.0.21008"
+  ]
+}

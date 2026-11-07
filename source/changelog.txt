@@ -1,4 +1,15 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.9
+Date: 2026-11-07
+
+  Bugfixes:
+
+    - Fix loading existing saves with non-default research costs by keeping private bonus tracking independent of the map
+      multiplier.
+    - Keep the Library Settings page inside the window at normal and narrow sizes.
+    - Restore compact effect labels and their original translations in the Library.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.8
 Date: 2026-11-07
 

@@ -1,0 +1,5 @@
+local c=require("contract")
+assert(not data.raw.technology[c.owner],"requires absent upstream laser8")
+data:extend({c.owner_definition()})
+local lab=table.deepcopy(assert(data.raw.lab.lab))
+lab.name=c.lab;lab.researching_speed=c.speed;data:extend({lab})
