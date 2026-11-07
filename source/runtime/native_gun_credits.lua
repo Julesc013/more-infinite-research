@@ -129,7 +129,25 @@ local function observe(force)
           or ingredients[1].name ~= science.name or ingredients[1].amount ~= 1
           or type(effects) ~= "table" or #effects ~= 1
           or effects[1].type ~= "gun-speed" or effects[1].ammo_category ~= category then
-        refuse("invalid holder shape " .. name)
+        local ingredient = type(ingredients) == "table" and ingredients[1]
+        local effect = type(effects) == "table" and effects[1]
+        local difficulty = game and game.difficulty_settings
+        refuse("invalid holder shape " .. name .. " (force=" .. tostring(force.index)
+          .. "; research_unit_count=" .. tostring(holder.research_unit_count) .. ", expected=1"
+          .. "; cost_multiplier=" .. tostring(difficulty and difficulty.technology_price_multiplier)
+          .. "; ignore_cost_multiplier=" .. tostring(shape.ignore_tech_cost_multiplier)
+          .. "; research_unit_energy=" .. tostring(holder.research_unit_energy) .. ", expected=60"
+          .. "; prototype_flags=" .. tostring(shape.hidden) .. "/" .. tostring(shape.enabled)
+          .. "/" .. tostring(shape.visible_when_disabled) .. ", expected=true/false/false"
+          .. "; runtime_flags=" .. type(holder.enabled) .. "/" .. type(holder.visible_when_disabled)
+          .. "; ingredients=" .. tostring(type(ingredients) == "table" and #ingredients)
+          .. "/" .. tostring(type(ingredient) == "table" and ingredient.name)
+          .. "/" .. tostring(type(ingredient) == "table" and ingredient.amount)
+          .. ", expected=1/" .. science.name .. "/1"
+          .. "; effects=" .. tostring(type(effects) == "table" and #effects)
+          .. "/" .. tostring(type(effect) == "table" and effect.type)
+          .. "/" .. tostring(type(effect) == "table" and effect.ammo_category)
+          .. ", expected=1/gun-speed/" .. category .. ")")
       end
       local modifier = effects[1].modifier
       if direction == "positive" then

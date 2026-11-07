@@ -40,6 +40,7 @@ local function row(descriptor)
     hidden = true,
     enabled = false,
     visible_when_disabled = false,
+    ignore_tech_cost_multiplier = true,
     max_level = "infinite",
     order = ORDER_PREFIX .. descriptor.id,
     effects = {{type = "change-recipe-productivity", recipe = descriptor.recipe, change = CHANGE}},

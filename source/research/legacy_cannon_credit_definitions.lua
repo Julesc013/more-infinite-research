@@ -90,6 +90,7 @@ local function holder(change, science)
     hidden = true,
     enabled = false,
     visible_when_disabled = false,
+    ignore_tech_cost_multiplier = true,
     max_level = "infinite",
     order = "zz[mir-legacy-cannon-credit]-rocket-shooting-speed",
     effects = {{type = "gun-speed", ammo_category = "cannon-shell", modifier = change}},
