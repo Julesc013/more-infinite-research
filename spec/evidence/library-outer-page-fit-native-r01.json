@@ -1,0 +1,211 @@
+{
+  "schema": 1,
+  "kind": "MIRLibraryOuterPageNativeFitV1",
+  "verdict": "ACCEPT bounded normal/narrow English/German outer-page containment; broader Library and stable remain open",
+  "source_head": "3cc0c7292785edb58cc6668967fec6a2ae72f700",
+  "player_tree": "bf20820aa597416a5fba188c079d21bf887ee849",
+  "private_candidate": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/packages/library-outer-fit-r02/more-infinite-research_5.0.21008.zip",
+    "bytes": 986745,
+    "sha256": "1B30495D4A7A8A350514844A3212B5C4A0EF34CECBF3ACB1C9A935C30D73906A"
+  },
+  "published_baseline": {
+    "path": "dist/v5.0.8/more-infinite-research_5.0.21008.zip",
+    "bytes": 986661,
+    "sha256": "C0FF59C8DA771DC43D1C804B10A533AB0EDF4ED4B36CB7C28A56F61E5DF7E9CB"
+  },
+  "changed_zip_members": [
+    "more-infinite-research_5.0.21008/presentation/library_layout.lua"
+  ],
+  "engine": {
+    "path": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+    "bytes": 49398736,
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "protected_source": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/migration-origins/pure-published-source-r01/work110-f210-default-r02-controller/retained-native/write-data/saves/mir-pure-predecessor.zip",
+    "bytes": 893285,
+    "sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD"
+  },
+  "plan_hashes": {
+    "en": "99E8AB404B4190416456384F9352F18D4FDC754B785D97713E949E249DF67F24",
+    "de": "C3A2E7CBE1966567BB5432975F8A2BDDE83DEEE8C8990DBB785E20A904E4021E"
+  },
+  "observations": {
+    "normal_frame": [
+      640,
+      120,
+      1919,
+      1199
+    ],
+    "narrow_frame": [
+      640,
+      120,
+      1439,
+      719
+    ],
+    "settings_border": "Inside retained frame in all four normal/narrow language captures",
+    "tab_strip_y": [
+      187,
+      230
+    ],
+    "english": [
+      "Normal Research and Settings; six strictly pixel-checked native smaller-button inputs; narrow Settings."
+    ],
+    "german": [
+      "Normal Research, Queue and Settings; six strictly pixel-checked native smaller-button inputs; narrow Settings, Debug and Research return.",
+      "Research selection persists through page and explicit size changes. Natural close, pause-menu quit without saving and Exit to desktop."
+    ],
+    "size_replay": "Existing exact-owned capture/input actors retained. Before every size action, fresh title/tab/smaller-arrow pixels match the visually inspected current normal Settings reference; all six actions complete per language. Before resumed DE tab actions, freshly captured title and entire tab strip match the inspected previous state. Original full-size PNGs are retained; JPEGs are scaled inspection copies only."
+  },
+  "process": {
+    "english": {
+      "status": "adverse",
+      "error": "[mir441-process-timeout]",
+      "scope": "Operator let the model-directed session idle; unchanged1200s guard stopped it. Earlier actual normal/narrow observations remain separately scoped, not a natural-exit pass."
+    },
+    "german": {
+      "status": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "passed": true,
+      "completion_predicate_observed": false,
+      "duration_seconds": 1106.616457,
+      "peak_working_set_bytes": 1571942400,
+      "peak_sampled_private_bytes": 2701836288,
+      "admission": {
+        "observed_at": "2026-11-07T02:13:46.4758469+00:00",
+        "memory": {
+          "total_bytes": 34045980672,
+          "free_bytes": 13532659712,
+          "committed_bytes": 27855085568,
+          "commit_limit_bytes": 41293737984
+        },
+        "work_volume": {
+          "name": "D:\\",
+          "free_bytes": 106249289728,
+          "total_bytes": 1500099112960
+        },
+        "system_volume": {
+          "name": "C:\\",
+          "free_bytes": 193756794880,
+          "total_bytes": 599395090432
+        }
+      }
+    },
+    "controls_restored_both": true,
+    "factorio_zero_both": true,
+    "protected_source_unchanged": true
+  },
+  "negative_control": {
+    "source": "ce3920810fbb9cfe197ba21141272c855bceb43b",
+    "private_commit": "959fc065fffd94f6013f1b190af8d02f8d49f9ea",
+    "path": "projects/mir/runs/library-outer-fit-native-r01/",
+    "finding_sha256": "C16F94002299EE2664982C7B542DDDF80ED86BBED73599202257F154AAD004B8",
+    "verdict": "Activated-padding-only change retained approximately6px lower-border overflow in normal and narrow; naturalexit0."
+  },
+  "originals": {
+    "images": [
+      {
+        "language": "en",
+        "name": "en-normal-research.png",
+        "bytes": 3953102,
+        "sha256": "A058542946227D0B4681F8F08B64470FFB7C50712B52D40A9641B66BC02F72BE"
+      },
+      {
+        "language": "en",
+        "name": "en-normal-settings.png",
+        "bytes": 4022642,
+        "sha256": "37AC4C42F8448A2EFCC0334A3593521FC62212377C611817AED0546295CAA28A"
+      },
+      {
+        "language": "en",
+        "name": "en-narrow-settings.png",
+        "bytes": 5820088,
+        "sha256": "B55FA0AC45E1C87BB6A41C32A342E6887B5DF158E8CEF1B759032C57D5C8CA84"
+      },
+      {
+        "language": "de",
+        "name": "de-normal-research.png",
+        "bytes": 3489442,
+        "sha256": "B3E3D8F34CF9F3C36F3C0EBC325088A3A2CACEF2900368CAE43CB9789C20D194"
+      },
+      {
+        "language": "de",
+        "name": "de-normal-queue.png",
+        "bytes": 3833919,
+        "sha256": "C103AEF82CFF3233E82E5DF89FB86539A82E050E5E5247D5624EE0D45AA4C1B0"
+      },
+      {
+        "language": "de",
+        "name": "de-normal-settings.png",
+        "bytes": 4018582,
+        "sha256": "05A0B6D713181AA9AA494CD2D88D7BCC9EC37BD07078593600C5B2BF4839CA97"
+      },
+      {
+        "language": "de",
+        "name": "de-narrow-settings.png",
+        "bytes": 5546796,
+        "sha256": "B7CC6946455F8282421E96774698F63635FD45D144885036D7286AE68A033EA1"
+      },
+      {
+        "language": "de",
+        "name": "de-narrow-debug.png",
+        "bytes": 4544897,
+        "sha256": "B241A5EB2499CC0DFAEBFD0025DEB59E627A6DEF861F6DCCF99FDA0936FFEBB6"
+      },
+      {
+        "language": "de",
+        "name": "de-narrow-research-return.png",
+        "bytes": 5672338,
+        "sha256": "114EB1F0583859CD00D047BFFBCC91DC3AD353A66E81125D8F2F842E635E83FF"
+      }
+    ],
+    "custody": [
+      {
+        "language": "en",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-outer-fit-native-r02\\native-originals-en",
+        "files": 117,
+        "bytes": 66838420
+      },
+      {
+        "language": "en",
+        "path": "C:\\MIRWorker\\preserved\\library-outer-fit-native-r02\\en",
+        "files": 117,
+        "bytes": 66838420
+      },
+      {
+        "language": "de",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-outer-fit-native-r02\\native-originals-de",
+        "files": 199,
+        "bytes": 112521124
+      },
+      {
+        "language": "de",
+        "path": "C:\\MIRWorker\\preserved\\library-outer-fit-native-r02\\de",
+        "files": 199,
+        "bytes": 112521124
+      }
+    ],
+    "body_count": 198
+  },
+  "limitations": [
+    "One protected published7-era Base seed and Factorio2.1.23 only; private same-version build, not newly released bytes.",
+    "Remaining searches, filters, typing/caret, continuous scroll positions, exports/imports, personal state, client/multiplayer, discovery and saved-view coverage stay open under issue1768.",
+    "The six physical size clicks changed both width and height; no display-scale/resolution-change or genuinely tiny stacked-layout acceptance is claimed.",
+    "English timeout and stale-capture refusals are retained adverse operator/runner observations. No performance or stable acceptance."
+  ],
+  "status": "bounded-rendered-components-pass; English owner timeout remains adverse",
+  "private_original_custody": {
+    "repository": "Julesc013/scratchpad",
+    "commit": "f33323610c167d5bbd2890b90bb9028eac3e54bf",
+    "path": "projects/mir/runs/library-outer-fit-native-r02/",
+    "verdict_sha256": "AC28E19EA10FC1E12C7CEF02AEA4133C33E28B45ADB2A1F976081B2FB407DC85",
+    "gzip_sha256": "3400CF43BD3A1797796BC39C0C9662F0D800916C1B4740334D6434424346A40D",
+    "decoded_sha256": "F1FBCD11F91B9EFBAE56FF161C77AC745BBEAF022ADD4399ED145DCECB977A81",
+    "original_bodies": 198,
+    "unedited_pngs": 9
+  },
+  "acceptance_scope": "The shared viewport budget restores the authored title/tab/frame allowance and closes the observed approximately6px Settings border overrun on these exact normal/narrow language cases. This does not close issue1768 or broad Library/stable acceptance.",
+  "source_review": "PR1790 authored continuation ce392→3cc; ineffective padding-only change removed, historical negative retained. All four required exact3cc checks pass."
+}
