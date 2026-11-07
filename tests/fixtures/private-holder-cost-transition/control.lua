@@ -33,7 +33,7 @@ local function snapshot(force)
   return out
 end
 
-local function audit(expected_cost, exemption)
+local function audit(expected_cost, exemption, prepared_expected)
   c.same(c.mods(), script.active_mods, "exact selected closure")
   c.same(c.old_fixture(), storage[c.old_key], "earlier first-entry fixture preserved")
   local old = assert(storage[c.key], "retained real-lab witness absent")
@@ -72,8 +72,12 @@ local function audit(expected_cost, exemption)
     assert(public.research_unit_count_formula == "60*1.5^(L-1)", "authored public work changed")
     costs[i].public = {count=public.research_unit_count,formula=public.research_unit_count_formula}
   end
-  c.same(c.post(old.post[1].progress,old.work.next_count), actual, "independent retained paid-state expectation")
-  c.same(old.post, actual, "original completed/partial/queue/foreign state preserved")
+  if prepared_expected then
+    c.same(prepared_expected,actual,"exact published8 prepared source state")
+  else
+    c.same(c.post(old.post[1].progress,old.work.next_count), actual, "independent retained paid-state expectation")
+    c.same(old.post, actual, "original completed/partial/queue/foreign state preserved")
+  end
   return {states=actual,costs=costs,multiplier=game.difficulty_settings.technology_price_multiplier,
     prior_real_lab_completions=old.completions,new_real_lab_completions=0}
 end
@@ -103,7 +107,7 @@ script.on_configuration_changed(function(event)
     assert(change.old_version == "0.6.0", "successor must consume published8 source")
     local state = assert(storage[KEY])
     assert(state.phase == "source-ready" and state.multiplier == 4, "protected source not ready")
-    local observation = audit(1,true)
+    local observation = audit(1,true,state.expected)
     assert(observation.multiplier == 4, "saved map difficulty lost")
     c.same(state.expected, observation.states, "source-to-successor paid rights")
     report("successor-entry",observation)
@@ -117,7 +121,7 @@ script.on_event(defines.events.on_tick,function()
   if cold then
     local source = c.version == "0.6.0"
     assert(state.phase == (source and "source-ready" or "successor-ready"), "cold incomplete phase")
-    local observation = audit(source and 4 or 1,not source)
+    local observation = audit(source and 4 or 1,not source,state.expected)
     assert(observation.multiplier == 4, "cold map difficulty lost")
     c.same(state.expected,observation.states,"cold paid state")
     report("cold",observation)
@@ -129,13 +133,33 @@ script.on_event(defines.events.on_tick,function()
   if state.phase == "source-pending" and game.tick > state.entry_tick then
     local before = audit(1,false)
     game.difficulty_settings.technology_price_multiplier = 4
-    local observation = audit(4,false)
-    c.same(before.states,observation.states,"changing difficulty cannot change earned state")
+    -- This is source preparation on the unmodified published package. Engine
+    -- price changes may re-express unfinished work as a different fraction.
+    -- Record that source baseline BEFORE any candidate runs; never permit a
+    -- successor to adjust it. Every non-progress field must remain identical.
+    local prepared = {}
+    for i,name in ipairs(c.forces) do
+      prepared[i] = snapshot(assert(game.forces[name]))
+      local normalized = c.copy(prepared[i])
+      local prior = before.states[i]
+      local function fraction(previous,current)
+        assert(type(current)=="number" and current==current and current>=0 and current<=1,"invalid source fraction")
+        assert(previous==0 and current==0 or previous>0 and current>0 and current<=previous+1e-8,
+          "increasing source price cannot reset or increase unfinished work")
+      end
+      fraction(prior.progress,normalized.progress);normalized.progress=prior.progress
+      for _,key in ipairs({"main","owner","detached"}) do
+        fraction(prior[key].saved,normalized[key].saved);normalized[key].saved=prior[key].saved
+      end
+      c.same(prior,normalized,"source price preparation preserves earned levels, bonuses, availability and queue")
+    end
+    local observation = audit(4,false,prepared)
+    report("source-price-change",{before=before,after=observation})
     state.phase,state.expected,state.multiplier = "source-ready",c.copy(observation.states),4
     report("source-ready",observation)
     game.server_save("private-holder-cost-published508-ready")
   elseif state.phase == "successor-pending" and game.tick > state.entry_tick then
-    local observation = audit(1,true)
+    local observation = audit(1,true,state.expected)
     assert(observation.multiplier == 4, "successor changed map difficulty")
     c.same(state.expected,observation.states,"next-tick paid state")
     state.phase = "successor-ready"
