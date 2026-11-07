@@ -550,7 +550,8 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         self.lua.globals().fingerprint = lambda value: json.dumps(plain(value), sort_keys=True)
         self.lua.execute(r'''
           function run_input_observer(target,opponent,package_version,input_observer_version)
-            local helper_free=input_observer_version=="0.3.5" or input_observer_version=="0.4.1" or input_observer_version=="0.3.6" or input_observer_version=="0.4.2"
+            local authored_page=input_observer_version=="0.3.6" or input_observer_version=="0.3.7"
+            local helper_free=input_observer_version=="0.3.5" or input_observer_version=="0.4.1" or authored_page or input_observer_version=="0.4.2"
             local historical=assert(loadfile(historical_path))()
             local events={on_player_joined_game=1,on_gui_text_changed=2,on_gui_click=3,on_gui_location_changed=4,
               on_gui_closed=5,on_technology_effects_reset=6,on_player_removed=7,on_tick=8,on_console_command=9}
@@ -658,7 +659,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               content.column_count=2
               content.style.maximal_width=760
               root.mir_library_tabs.mir_library_research_content=content
-              if (input_observer_version=="0.3.6" and opponent~="old-layout") or opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" or opponent=="bad-page" or opponent=="foreign-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field" then
+              if (authored_page and opponent~="old-layout") or opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" or opponent=="bad-page" or opponent=="foreign-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field" then
                 local page=element(opponent=="bad-page" and "flow" or "scroll-pane","mir_library_research_page")
                 page.get_mod=function() return opponent=="foreign-page" and "other" or "more-infinite-research" end
                 filters.type,filters.direction="flow","vertical"
@@ -674,7 +675,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                   filters[id]=nil
                 end
                 page.mir_library_filters=filters;page.mir_library_research_content=content
-                if input_observer_version=="0.3.6" then
+                if authored_page then
                   local owner=function()return "more-infinite-research" end
                   root.mir_library_tabs.parent=root;root.mir_library_tabs.get_mod=owner
                   page.parent=root.mir_library_tabs;filters.parent=page;filters.get_mod=owner
@@ -704,7 +705,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               content.mir_library_detail.style.minimal_width=442
               content.mir_library_detail.style.maximal_width=442
               local detail=content.mir_library_detail
-              if present and (input_observer_version=="0.3.6" or opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field") then
+              if present and (authored_page or opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field") then
                 local facts=element("scroll-pane","mir_library_research_facts")
                 local heading=element("flow","mir_library_detail_heading");heading.direction="horizontal"
                 detail.mir_library_research_facts=facts;facts.mir_library_detail_heading=heading
@@ -903,7 +904,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               local before_witness=fingerprint(store);witness_before=api().report();readonly_witness=before_witness==fingerprint(store)
               click(en,query(en));witness_after=api().report()
               local saved=query(en);local replacement=element("textfield","replacement")
-              if input_observer_version=="0.3.6" then replacement.parent=en.gui.screen[root_name].mir_library_filters;replacement.get_mod=function()return "more-infinite-research" end end
+              if authored_page then replacement.parent=en.gui.screen[root_name].mir_library_filters;replacement.get_mod=function()return "more-infinite-research" end end
               en.gui.screen[root_name].mir_library_filters.mir_library_query=replacement
               witness_wrong=api().report();en.gui.screen[root_name].mir_library_filters.mir_library_query=saved
               local filter=en.gui.screen[root_name].mir_library_filters
@@ -1162,6 +1163,48 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                             self.assertFalse(bad["ok"], opponent)
                             self.assertIn(message, bad["message"])
                 self.assertFalse(self.run_case(target, package_version=version.replace("008", "007"), input_observer_version="0.3.6")["ok"])
+
+    def test_509_binding_retains_exact_paid_lifecycle_and_rejects_mismatched_identity(self):
+        for target, version in (("f200", "5.0.20009"), ("f210", "5.0.21009")):
+            with self.subTest(target=target):
+                metadata = json.loads((FIXTURE / f"info-input-509-{target}.json").read_text())
+                previous = json.loads((FIXTURE / f"info-input-508-{target}.json").read_text())
+                expected = dict(previous, version="0.3.7", dependencies=[previous["dependencies"][0],
+                                f"~ more-infinite-research = {version}"])
+                self.assertEqual(metadata, expected)
+                for opponent in ("new-page", "removed-index-reused"):
+                    result = self.run_case(target, opponent, version, "0.3.7")
+                    self.assertTrue(result["ok"], result["message"])
+                    final = result["final"]
+                    self.assertEqual((final["phase"], final["actual_joins"], final["private_queries"]),
+                                     ("delivered", 5, 48))
+                    self.assertEqual((final["actual_library_closed_events"], final["actual_removed_events"]), (2, 1))
+                    self.assertTrue(final["imported_earnings"])
+                    self.assertFalse(final["fixture_seeds_credit"])
+                    self.assertTrue(result["readonly_load"])
+                for opponent, message in (
+                    ("old-layout", "authored research page is absent"),
+                    ("bad-filter-grid", "authored research filter grid is malformed"),
+                    ("bad-filter-field", "authored research filter field is malformed"),
+                    ("foreign-query", "authored research query is malformed or foreign"),
+                    ("wrong-query-parent", "authored research query is malformed or foreign"),
+                    ("bad-query-type", "authored research query is malformed or foreign"),
+                    ("foreign-field", "authored research filter field is foreign"),
+                    ("wrong-field-parent", "authored research filter field is foreign"),
+                ):
+                    with self.subTest(opponent=opponent):
+                        try:
+                            result = self.run_case(target, opponent, version, "0.3.7")
+                        except Exception as exc:
+                            self.assertIn(message, str(exc))
+                        else:
+                            self.assertFalse(result["ok"], opponent)
+                            self.assertIn(message, result["message"])
+                for opponent in ("native-effect-change", "replacement-index-reuses-en"):
+                    self.assertFalse(self.run_case(target, opponent, version, "0.3.7")["ok"], opponent)
+                old_version = version[:-1] + "8"
+                self.assertFalse(self.run_case(target, "new-page", old_version, "0.3.7")["ok"])
+                self.assertFalse(self.run_case(target, "new-page", version, "0.3.6")["ok"])
 
     def test_current_034_keeps_imported_lifecycle_and_reused_slot_on_exact_507(self):
         for target, version in (("f200", "5.0.20007"), ("f210", "5.0.21007")):
