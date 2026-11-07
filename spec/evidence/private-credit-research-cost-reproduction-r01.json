@@ -150,7 +150,8 @@
       "original_source_saves_unchanged": true,
       "original_library_controls_and_archives_restored": true,
       "factorio_zero": true,
-      "failed_stdout_sha256": "2A8E16070ABCA55B977269213D1A83B921FABCA1A836651E9454F03E62C416F2"
+      "failed_stdout_sha256": "2A8E16070ABCA55B977269213D1A83B921FABCA1A836651E9454F03E62C416F2",
+      "native_failure_exit_code": 1
     },
     {
       "engine": {
@@ -298,12 +299,13 @@
       "original_source_saves_unchanged": true,
       "original_library_controls_and_archives_restored": true,
       "factorio_zero": true,
-      "failed_stdout_sha256": "C47E9AC9DF8BD9CD82B92089B8B0EAED99030020335268B2900A4396613F2C1C"
+      "failed_stdout_sha256": "C47E9AC9DF8BD9CD82B92089B8B0EAED99030020335268B2900A4396613F2C1C",
+      "native_failure_exit_code": 1
     }
   ],
   "independent_no_mir_observation": "No-MIR read-only load independently confirms actual saved difficulty multiplier4 before adding MIR.",
   "mechanism": "Private formula1 holders inherit map technology-price multiplier. Both effective and prototype counts become4; all other captured shape fields retain their authored values.",
-  "native_endpoint_caveat": "Factorio returns exit0 even when it prints this Lua on_init error to stdout and omits it from factorio-current.log. Price4 is a failed product load. Require successful endpoint and inspect all streams.",
+  "native_endpoint_caveat": "Both observed multiplier4 failures exit1. The Lua on_init stack is in stdout and absent from factorio-current.log; default-price loads exit0 and complete the benchmark. Require the actual endpoint and inspect all streams.",
   "private_originals": {
     "repository": "Julesc013/scratchpad",
     "commit": "0adf4ec91f18e57bca478211854d1cf690b9ec4e",
@@ -311,13 +313,19 @@
     "verdict_sha256": "2B0676D9814B126BED695454A9C7318EE6C9BAACE1756D31B0738E9DA739DFC4",
     "body_count": 184,
     "gzip_sha256": "8370A166FE9EE971B84E5A8CDC8907B8E5EBDBDA6499FD78DABD7C6E9C345A74",
-    "decoded_sha256": "3AD3A4A912AB813E50868B27D65A661216B06D7FC9CE2E7DD1DFEDFBD4D919A2"
+    "decoded_sha256": "3AD3A4A912AB813E50868B27D65A661216B06D7FC9CE2E7DD1DFEDFBD4D919A2",
+    "interpretation_erratum": {
+      "commit": "babd02509aa4101b027406bd40328fd5473aeec7",
+      "path": "projects/mir/runs/gun-credit-research-cost-r01/exit-code-erratum.json",
+      "sha256": "1903062AE88FC272785DE750AF10107D6CD9CD5B213EF25EFCC65E0877A449C6",
+      "original_capsule_unchanged": true
+    }
   },
   "custody": "All five attempts, protected source ZIPs, exact controllers, selections, map settings and logs copied and hash-verified to discoverable primary qualification and C-drive preservation roots.184 exact original bodies retained remotely.",
   "adverse_attempts": [
     "Prelaunch output-root refusal preserved; existing governor unchanged and output moved to admitted scratch.",
     "First source create failed because a partial map-settings file omitted mandatory pollution. Retained failure; subsequent file uses exact installed complete example with only price changed.",
-    "First F210 parent expected nonzero exit or engine-log error. Factorio instead exits0 with the actual Lua error in stdout. Reanalyzed original bodies without retry; error remains a failed product endpoint.",
+    "The first F210 parent required its failure diagnostic in the engine log, but the actual error is in stdout. The native ledger correctly records exit1. An initial human readback wrongly inferred exit0; independent review corrected that interpretation without rerunning or changing any raw result.",
     "Read-only observer initially lacked a prototype-stage load line; selection guard refused acceptance after the default observation. Added existing full-mod-table data-stage observer, preserved first input/result.",
     "Packaging refused an overwrite; preserved old local observer ZIP and built the revised observer in a separate directory. F200 preparation caught an overlapping mechanical replacement before native dispatch."
   ],
