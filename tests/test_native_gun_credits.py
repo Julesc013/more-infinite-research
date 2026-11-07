@@ -127,6 +127,55 @@ class NativeGunCreditTests(unittest.TestCase):
           reload()
         ''')
 
+    def test_private_bookkeeping_ignores_map_cost_without_changing_public_work(self):
+        # Exact2.0.77/2.1.23 LuaTechnology API: research_unit_count includes
+        # difficulty unless the private prototype explicitly opts out. Use
+        # integer2 for the old failure; no engine rounding is guessed.
+        self.lua.execute('''
+          local definitions=require("research.native_gun_credit_definitions")
+          local public={type="technology",name=main_id,effects={
+            {type="gun-speed",ammo_category="electric",modifier=.17},
+            {type="gun-speed",ammo_category="tesla",modifier=.17}},
+            unit={count_formula="100*2^L",time=60,ingredients={{"automation-science-pack",2}}}}
+          local original=copy(public)
+          local holders=definitions.technologies(public,public)
+          for _,multiplier in ipairs{2,1,4,.5} do
+            storage={};game.forces={};game.difficulty_settings={technology_price_multiplier=multiplier}
+            local f=make_force(1,0,true,true)
+            local before=public_snapshot(f)
+            for _,definition in ipairs(holders) do
+              local holder=f.technologies[definition.name]
+              holder.prototype.ignore_tech_cost_multiplier=definition.ignore_tech_cost_multiplier==true
+              holder.research_unit_count=definition.ignore_tech_cost_multiplier and 1 or multiplier
+            end
+            credit.on_init()
+            for _,definition in ipairs(holders) do
+              assert(definition.ignore_tech_cost_multiplier==true,
+                "private bookkeeping inherited map difficulty")
+              assert(f.technologies[definition.name].research_unit_count==1)
+            end
+            assert(same(public,original) and public.ignore_tech_cost_multiplier==nil)
+            assert_public(f,before);expect(f,0,0)
+          end
+        ''')
+
+    def test_wrong_holder_count_reports_its_force_and_cost_invariant_before_writes(self):
+        self.lua.execute('''
+          local f=make_force(7,0,true,true)
+          game.difficulty_settings={technology_price_multiplier=2}
+          local holder=f.technologies[names.electric.positive]
+          holder.research_unit_count=2
+          holder.prototype.ignore_tech_cost_multiplier=false
+          local before=public_snapshot(f)
+          local ok,message=pcall(credit.on_init)
+          assert(not ok and tostring(message):find("force=7",1,true)
+            and tostring(message):find("research_unit_count=2, expected=1",1,true)
+            and tostring(message):find("cost_multiplier=2",1,true)
+            and tostring(message):find("ignore_cost_multiplier=false",1,true),tostring(message))
+          assert_public(f,before)
+          assert(storage.mir_native_gun_credits==nil and holder.level==1)
+        ''')
+
     def test_published_partial_paid_mask_and_all_public_work_are_preserved(self):
         self.lua.execute('''
           local f=make_force(1,4,false,true);local main=f.technologies[main_id]

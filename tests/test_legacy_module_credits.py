@@ -224,6 +224,7 @@ class LegacyModuleCreditTests(unittest.TestCase):
             [row["name"] for row in result["two"]],
         )
         for row, descriptor in zip(result["two"], result["descriptors"]):
+            self.assertIs(row["ignore_tech_cost_multiplier"], True)
             self.assertEqual((True, False, False, "infinite", 1, 1),
                              (row["hidden"], row["enabled"], row["visible_when_disabled"], row["max_level"],
                               row["unit"]["count"], row["unit"]["time"]))
