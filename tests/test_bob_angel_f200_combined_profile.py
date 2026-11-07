@@ -485,7 +485,11 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
                          | {"mir-legacy-cannon-credit-rocket-shooting-speed"})
         self.assert_private_rows(emitted, public, raw)
         cannon = "mir-legacy-cannon-credit-rocket-shooting-speed"
-        self.assertEqual(emitted[cannon], reference["old_Base_B_cannon_row"])
+        # Keep the original captured row/hash intact. Private bookkeeping now
+        # opts out of map difficulty; every other captured field still agrees.
+        self.assertNotIn("ignore_tech_cost_multiplier", reference["old_Base_B_cannon_row"])
+        self.assertEqual(emitted[cannon], {**reference["old_Base_B_cannon_row"],
+                                          "ignore_tech_cost_multiplier": True})
 
         # The conditional cannon holder still needs its selected public
         # rocket stream; the other recipe/gun holders do not authorize it.

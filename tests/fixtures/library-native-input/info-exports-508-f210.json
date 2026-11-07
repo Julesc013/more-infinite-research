@@ -1,0 +1,11 @@
+{
+  "name": "mir-fixture-mir5-library-native-input",
+  "version": "0.4.2",
+  "title": "MIR qualified imported Library export observer",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "~ more-infinite-research = 5.0.21008"
+  ]
+}

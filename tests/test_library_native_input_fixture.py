@@ -550,7 +550,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         self.lua.globals().fingerprint = lambda value: json.dumps(plain(value), sort_keys=True)
         self.lua.execute(r'''
           function run_input_observer(target,opponent,package_version,input_observer_version)
-            local helper_free=input_observer_version=="0.3.5" or input_observer_version=="0.4.1"
+            local helper_free=input_observer_version=="0.3.5" or input_observer_version=="0.4.1" or input_observer_version=="0.3.6" or input_observer_version=="0.4.2"
             local historical=assert(loadfile(historical_path))()
             local events={on_player_joined_game=1,on_gui_text_changed=2,on_gui_click=3,on_gui_location_changed=4,
               on_gui_closed=5,on_technology_effects_reset=6,on_player_removed=7,on_tick=8,on_console_command=9}
@@ -607,7 +607,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             local function invalidate(node)
               if type(node)~="table" or node.type==nil then return end
               node.valid=false
-              for _,child in pairs(node) do if type(child)=="table" and child.type then invalidate(child) end end
+              for key,child in pairs(node) do if key~="parent" and type(child)=="table" and child.type then invalidate(child) end end
             end
             local function element(kind,name)
               local dimensions={}
@@ -658,7 +658,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               content.column_count=2
               content.style.maximal_width=760
               root.mir_library_tabs.mir_library_research_content=content
-              if opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" or opponent=="bad-page" or opponent=="foreign-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field" then
+              if (input_observer_version=="0.3.6" and opponent~="old-layout") or opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" or opponent=="bad-page" or opponent=="foreign-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field" then
                 local page=element(opponent=="bad-page" and "flow" or "scroll-pane","mir_library_research_page")
                 page.get_mod=function() return opponent=="foreign-page" and "other" or "more-infinite-research" end
                 filters.type,filters.direction="flow","vertical"
@@ -674,6 +674,20 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                   filters[id]=nil
                 end
                 page.mir_library_filters=filters;page.mir_library_research_content=content
+                if input_observer_version=="0.3.6" then
+                  local owner=function()return "more-infinite-research" end
+                  root.mir_library_tabs.parent=root;root.mir_library_tabs.get_mod=owner
+                  page.parent=root.mir_library_tabs;filters.parent=page;filters.get_mod=owner
+                  filters.mir_library_query.parent=opponent=="wrong-query-parent" and page or filters
+                  filters.mir_library_query.get_mod=opponent=="foreign-query" and function()return "fixture" end or owner
+                  if opponent=="bad-query-type" then filters.mir_library_query.type="button" end
+                  grid.parent=filters;grid.get_mod=owner
+                  for _,name in ipairs({"family","status","mode","sort","visibility"}) do
+                    local id="mir_library_"..name;local field=grid[id.."_field"]
+                    field.parent=grid;field.get_mod=owner;field[id].parent=opponent=="wrong-field-parent" and grid or field
+                    field[id].get_mod=opponent=="foreign-field" and function()return "fixture" end or owner
+                  end
+                end
                 root.mir_library_tabs.mir_library_research_page=page
               end
               local private=false;for _,id in ipairs(ids) do if search==id then private=true end end
@@ -690,7 +704,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               content.mir_library_detail.style.minimal_width=442
               content.mir_library_detail.style.maximal_width=442
               local detail=content.mir_library_detail
-              if present and (opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field") then
+              if present and (input_observer_version=="0.3.6" or opponent=="list-pane" or opponent=="bad-list-pane" or opponent=="foreign-list-pane" or opponent=="new-page" or opponent=="bad-filter-grid" or opponent=="bad-filter-field") then
                 local facts=element("scroll-pane","mir_library_research_facts")
                 local heading=element("flow","mir_library_detail_heading");heading.direction="horizontal"
                 detail.mir_library_research_facts=facts;facts.mir_library_detail_heading=heading
@@ -865,7 +879,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 assert(callbacks.events[8]==nil,"baseline observer stayed subscribed")
               end
               local before=fingerprint(store);initial_report=api().report();api().report();readonly_report=before==fingerprint(store)
-              if input_observer_version=="0.4.1" then return end
+              if input_observer_version=="0.4.1" or input_observer_version=="0.4.2" then return end
               en=join(0,"en");de=join(2,"de")
               if opponent=="duplicate-initial-join" then join(0,"en") end
               if opponent=="out-of-order" then step("prefix");return end
@@ -888,7 +902,9 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               end
               local before_witness=fingerprint(store);witness_before=api().report();readonly_witness=before_witness==fingerprint(store)
               click(en,query(en));witness_after=api().report()
-              local saved=query(en);en.gui.screen[root_name].mir_library_filters.mir_library_query=element("textfield","replacement")
+              local saved=query(en);local replacement=element("textfield","replacement")
+              if input_observer_version=="0.3.6" then replacement.parent=en.gui.screen[root_name].mir_library_filters;replacement.get_mod=function()return "more-infinite-research" end end
+              en.gui.screen[root_name].mir_library_filters.mir_library_query=replacement
               witness_wrong=api().report();en.gui.screen[root_name].mir_library_filters.mir_library_query=saved
               local filter=en.gui.screen[root_name].mir_library_filters
               filter.visible=false;witness_parent_hidden=api().report();filter.visible=true
@@ -1115,6 +1131,37 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                     self.assertFalse(result[case]["en_library_target"][field])
                 foreign = result["foreign_witness"]["en_foreign_target"]
                 self.assertTrue(foreign["parent_valid"] and foreign["parent_visible"] and foreign["parent_enabled"])
+
+    def test_508_input_binding_preserves_lifecycle_and_rejects_old_layout(self):
+        for target, version in (("f200", "5.0.20008"), ("f210", "5.0.21008")):
+            with self.subTest(target=target):
+                metadata = json.loads((FIXTURE / f"info-input-508-{target}.json").read_text())
+                self.assertEqual(metadata["version"], "0.3.6")
+                self.assertEqual(metadata["dependencies"][-1], f"~ more-infinite-research = {version}")
+                result = self.run_case(target, "new-page", version, "0.3.6")
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual((result["final"]["phase"], result["final"]["actual_joins"]), ("delivered", 5))
+                for opponent in ("native-effect-change", "replacement-index-reuses-en"):
+                    self.assertFalse(self.run_case(target, opponent, version, "0.3.6")["ok"], opponent)
+                for opponent, message in (
+                    ("old-layout", "authored research page is absent"),
+                    ("bad-filter-grid", "authored research filter grid is malformed"),
+                    ("bad-filter-field", "authored research filter field is malformed"),
+                    ("foreign-query", "authored research query is malformed or foreign"),
+                    ("wrong-query-parent", "authored research query is malformed or foreign"),
+                    ("bad-query-type", "authored research query is malformed or foreign"),
+                    ("foreign-field", "authored research filter field is foreign"),
+                    ("wrong-field-parent", "authored research filter field is foreign"),
+                ):
+                    with self.subTest(opponent=opponent):
+                        try:
+                            bad = self.run_case(target, opponent, version, "0.3.6")
+                        except Exception as exc:
+                            self.assertIn(message, str(exc))
+                        else:
+                            self.assertFalse(bad["ok"], opponent)
+                            self.assertIn(message, bad["message"])
+                self.assertFalse(self.run_case(target, package_version=version.replace("008", "007"), input_observer_version="0.3.6")["ok"])
 
     def test_current_034_keeps_imported_lifecycle_and_reused_slot_on_exact_507(self):
         for target, version in (("f200", "5.0.20007"), ("f210", "5.0.21007")):
@@ -1489,7 +1536,7 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
           function run_export_observer(target,opponent,qualified,layout)
             local key="mir5_library_native_input"
             local base=target=="f200"and"2.0.77"or"2.1.23"
-            local mir=target=="f200"and(qualified and"5.0.20007"or"5.0.20000")or(qualified and"5.0.21007"or"5.0.21000")
+            local mir=target=="f200"and(qualified and(qualified=="508" and "5.0.20008" or "5.0.20007")or"5.0.20000")or(qualified and(qualified=="508" and "5.0.21008" or "5.0.21007")or"5.0.21000")
             local original="mir-fixture-mir5-migration-origin-f200-110-source"
             local fixture=target=="f200"and"0.3.0"or"0.4.0"
             local callbacks,interfaces,store,players,decoded={},{},{},{},{}
@@ -1532,6 +1579,7 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
                   if layout~="missing-panel"then
                     local panel=node(panes,{type="flow",name="mir_library_report_panel"},layout=="foreign-panel"and"fixture"or"more-infinite-research")
                     if layout=="wrong-parent"then panel.parent=help end
+                    node(panel,{type="text-box",name="mir_library_report_preview"},"more-infinite-research")
                     if layout~="flat-decoy"then node(panel,{type="button",name="mir_library_export_diagnostics"},"more-infinite-research")end
                   end
                   -- A matching flat control must not bypass malformed/new panes.
@@ -1553,11 +1601,11 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
             env.log=function()logs=logs+1 end
             env.defines={events={on_player_joined_game=1,on_gui_click=2,on_console_command=3,on_tick=4}}
             env.script={active_mods={base=base,["more-infinite-research"]=mir,[original]=fixture,
-              ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]=qualified and"0.4.1"or"0.4.0"},
+              ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]=qualified and(qualified=="508" and "0.4.2" or "0.4.1")or"0.4.0"},
               on_init=function(f)callbacks.init=f end,on_load=function(f)callbacks.load=f end,
               on_event=function(id,f)callbacks[id]=f end}
             if qualified then env.script.active_mods[original]=nil end
-            local context={key=key,interface="mir5-library-native-input",historical_fixture=original,qualified_input=qualified==true,
+            local context={key=key,interface="mir5-library-native-input",historical_fixture=original,qualified_input=qualified==true or qualified=="508",current_508=qualified=="508",
               world=function()return{serial=native}end,
               assert_world=function()assert(store[key].native.serial==native,"protected native state changed")end,
               imported=function()assert(native==1,"actual imported credit changed")end}
@@ -1570,7 +1618,7 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
               assert(store[key].native==nil and not pcall(api.report),"early support baseline was admitted")
               callbacks[4]({tick=1});assert(callbacks[4]==nil,"support baseline kept its tick handler")
             end
-            assert(api.report().phase=="ready" and api.report().original_preservation_fixture_required~=(qualified==true))
+            assert(api.report().phase=="ready" and api.report().original_preservation_fixture_required~=(qualified==true or qualified=="508"))
             local en,de=player(0,"en"),player(2,"de")
             game.players,game.connected_players={[0]=en,[2]=de},{en,de}
             local function joined(index)
@@ -1699,6 +1747,21 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
                         self.lua.globals().run_export_observer(target, "", True, layout)
             with self.assertRaisesRegex(Exception, "actual export button absent"):
                 self.lua.globals().run_export_observer(target, "", True, "flat-decoy")
+
+    def test_508_export_requires_nested_panel_and_exact_identity(self):
+        for target, version in (("f200", "5.0.20008"), ("f210", "5.0.21008")):
+            metadata = json.loads((FIXTURE / f"info-exports-508-{target}.json").read_text())
+            self.assertEqual((metadata["version"], metadata["dependencies"][-1]), ("0.4.2", f"~ more-infinite-research = {version}"))
+            run = self.lua.globals().run_export_observer
+            self.assertEqual(run(target, "", "508", "authored"), (13, 5, 2, 0))
+            for layout, message in ((None, "native diagnostics container differs"),
+                                    ("flat-decoy", "actual export button absent"),
+                                    ("foreign-panes", "native diagnostics container differs"),
+                                    ("foreign-panel", "native diagnostics container differs"),
+                                    ("missing-panel", "native diagnostics container differs"),
+                                    ("wrong-parent", "native diagnostics container differs")):
+                with self.subTest(target=target, layout=layout), self.assertRaisesRegex(Exception, message):
+                    run(target, "", "508", layout)
 
     def test_export_report_tick_is_monotonic_and_read_only(self):
         for target in ("f200", "f210"):
