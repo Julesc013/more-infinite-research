@@ -124,6 +124,8 @@ script.on_event(defines.events.on_tick,function()
     cold = false
     return
   end
+  if (state.phase == "source-pending" or state.phase == "successor-pending")
+      and game.tick <= state.entry_tick then return end
   if state.phase == "source-pending" and game.tick > state.entry_tick then
     local before = audit(1,false)
     game.difficulty_settings.technology_price_multiplier = 4
