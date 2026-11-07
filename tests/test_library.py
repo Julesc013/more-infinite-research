@@ -9,6 +9,39 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_outer_pages_reserve_the_authored_title_and_tab_height_budget(self):
+        self.lua.execute(r'''
+          boot()
+          player.display_resolution,player.display_scale={width=2560,height=1440},1.25
+          local root=library.open(player,{selected=gear.name,query="gear"})
+          local tabs=root.mir_library_tabs
+          local function check_pages()
+            -- Published 4.7.3's renderer reserves 112 logical pixels for the
+            -- title, tabs and frame. Its accepted page budget is independent
+            -- of the candidate and of the observed six-pixel overrun.
+            local maximum=math.max(120,root.style.maximal_height-112)
+            for _,name in ipairs({"research_page","queue_content","settings_content","help_content"}) do
+              local page=tabs["mir_library_"..name]
+              assert(page.style.maximal_height<=maximum,
+                "outer page must reserve the authored title, tabs and frame height")
+              assert(page.vertical_scroll_policy=="auto" and page.horizontal_scroll_policy=="never")
+            end
+          end
+          check_pages()
+          for _=1,6 do
+            library.on_gui_click({player_index=1,element=root.mir_library_title.mir_library_layout_smaller})
+            assert(player.gui.screen.mir_research_browser==root and root.mir_library_tabs==tabs)
+            check_pages()
+          end
+          assert(root.style.maximal_width==640 and root.style.maximal_height==480)
+          for _,tab in ipairs({"settings","queue","help","research"}) do
+            assert(library.open(player,{tab=tab})==root)
+            check_pages()
+          end
+          assert(storage.mir_library.players[1].query=="gear"
+            and storage.mir_library.players[1].selected==gear.name)
+        ''')
+
     def test_normal_research_details_use_full_height_without_a_toolbar_or_unlimited_cap_paragraph(self):
         self.lua.execute('''
           boot()
