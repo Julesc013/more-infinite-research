@@ -2,6 +2,14 @@
 
 This is the authoritative product changelog. Each MIR 1–3 master release appears once; reduced backport release logs are omitted. MIR 4 and later use source release versions here, while built packages encode their Factorio edition in the distribution version. Edition-specific changes name their Factorio version; a historical entry does not promise that feature on every engine. GitHub marks prereleases separately; a beta does not establish stable qualification.
 
+## [5.0.9] - 2026-11-07
+
+### Bugfixes
+
+- Fix loading existing saves with non-default research costs by keeping private bonus tracking independent of the map multiplier.
+- Keep the Library Settings page inside the window at normal and narrow sizes.
+- Restore compact effect labels and their original translations in the Library.
+
 ## [5.0.8] - 2026-11-07
 
 ### Bugfixes
