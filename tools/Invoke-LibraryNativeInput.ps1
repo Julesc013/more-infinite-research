@@ -13,7 +13,7 @@ function Assert-LibraryInput([bool]$Condition,[string]$Message){if(-not$Conditio
 function Test-LibraryInputInteger($Value){return $Value-is[int] -or $Value-is[long]}
 function Invoke-LibraryInputHardwareKey{
   param(
-    [Parameter(Mandatory)][ValidateSet('escape','inventory')][string]$Action,
+    [Parameter(Mandatory)][ValidateSet('escape','inventory','tab')][string]$Action,
     [Parameter(Mandatory)][scriptblock]$ResolveScan,
     [Parameter(Mandatory)][scriptblock]$KeyEvent,
     [Parameter(Mandatory)][scriptblock]$Pause,
@@ -23,7 +23,7 @@ function Invoke-LibraryInputHardwareKey{
     [Parameter(Mandatory)][AllowEmptyCollection()][System.Collections.Generic.List[object]]$Events
   )
   & $AssertWindow
-  $virtualKey=if($Action-ceq'escape'){0x1b}else{0x45}
+  $virtualKey=switch($Action){'escape'{0x1b};'inventory'{0x45};'tab'{0x09}}
   $scan=& $ResolveScan ([uint16]$virtualKey)
   Assert-LibraryInput ((Test-LibraryInputInteger $scan)-and$scan-gt0-and$scan-le0xff) 'hardware key scan mapping differs'
   $n=& $KeyEvent ([uint16]$scan) $true;$Sent.Value+=$n
@@ -83,7 +83,7 @@ function Invoke-LibraryInputDragSchedule{
 }
 function Assert-LibraryInputPlan([System.Collections.IDictionary]$Spec){
   $common=@('schema','kind','role','process_id','process_start_utc','engine_sha256','action','client_width','client_height')
-  Assert-LibraryInput ($Spec.Contains('action') -and $Spec.action-is[string] -and $Spec.action-cin@('escape','inventory','text','click','drag')) 'action differs'
+  Assert-LibraryInput ($Spec.Contains('action') -and $Spec.action-is[string] -and $Spec.action-cin@('escape','inventory','tab','text','click','drag')) 'action differs'
   $extra=switch($Spec.action){'text'{@('text')};'click'{@('x','y')};'drag'{@('x','y','target_x','target_y')};default{@()}}
   $expected=@($common)+@($extra)
   Assert-LibraryInput ($Spec.Count-eq$expected.Count -and ((@($Spec.Keys|Sort-Object)-join'|')-ceq(@($expected|Sort-Object)-join'|'))) 'fields differ'
@@ -93,17 +93,19 @@ function Assert-LibraryInputPlan([System.Collections.IDictionary]$Spec){
   $parsed=[datetimeoffset]::MinValue
   Assert-LibraryInput ($Spec.process_start_utc-is[string] -and $Spec.process_start_utc.EndsWith('Z') -and [datetimeoffset]::TryParse($Spec.process_start_utc,[ref]$parsed)) 'start time differs'
   Assert-LibraryInput ($Spec.engine_sha256-is[string] -and $Spec.engine_sha256-cmatch'^[A-F0-9]{64}$') 'engine hash differs'
-  Assert-LibraryInput ((Test-LibraryInputInteger $Spec.client_width) -and (Test-LibraryInputInteger $Spec.client_height) -and $Spec.client_width-eq1280 -and $Spec.client_height-eq720) 'client geometry differs'
+  Assert-LibraryInput ((Test-LibraryInputInteger $Spec.client_width) -and (Test-LibraryInputInteger $Spec.client_height) -and
+    (($Spec.client_width-eq1280 -and $Spec.client_height-eq720) -or
+     ($Spec.client_width-eq2560 -and $Spec.client_height-eq1440))) 'client geometry differs'
   if($Spec.action-ceq'text'){
     Assert-LibraryInput ($Spec.text-is[string] -and $Spec.text.Length-ge1 -and $Spec.text.Length-le32 -and $Spec.text-cmatch'\A[A-Za-z0-9 -]+\z') 'text differs'
   }
   if($Spec.action-cin@('click','drag')){
     foreach($name in @('x','y')){Assert-LibraryInput (Test-LibraryInputInteger $Spec[$name]) 'point type differs'}
-    Assert-LibraryInput ($Spec.x-ge2 -and $Spec.x-lt1278 -and $Spec.y-ge2 -and $Spec.y-lt718) 'point outside client'
+    Assert-LibraryInput ($Spec.x-ge2 -and $Spec.x-lt($Spec.client_width-2) -and $Spec.y-ge2 -and $Spec.y-lt($Spec.client_height-2)) 'point outside client'
   }
   if($Spec.action-ceq'drag'){
     foreach($name in @('target_x','target_y')){Assert-LibraryInput (Test-LibraryInputInteger $Spec[$name]) 'drag point type differs'}
-    Assert-LibraryInput ($Spec.target_x-ge2 -and $Spec.target_x-lt1278 -and $Spec.target_y-ge2 -and $Spec.target_y-lt718) 'drag outside client'
+    Assert-LibraryInput ($Spec.target_x-ge2 -and $Spec.target_x-lt($Spec.client_width-2) -and $Spec.target_y-ge2 -and $Spec.target_y-lt($Spec.client_height-2)) 'drag outside client'
     $dx=$Spec.target_x-$Spec.x;$dy=$Spec.target_y-$Spec.y
     Assert-LibraryInput ([Math]::Abs($dx)-le80 -and [Math]::Abs($dy)-le80 -and ($dx-ne0 -or $dy-ne0)) 'drag distance differs'
   }
@@ -193,7 +195,7 @@ try{
     Assert-LibraryInput ((Get-MIROwnedMenuPointRoot -X $absoluteX -Y $absoluteY)-eq[IntPtr]$window.handle) 'pointer target is not owned'
   }
   switch($spec.action){
-    {$_-cin@('escape','inventory')}{
+    {$_-cin@('escape','inventory','tab')}{
       Invoke-LibraryInputHardwareKey -Action $spec.action -ResolveScan {param([uint16]$VirtualKey)[int][MIRLibraryInputNative]::ResolveHardwareScan($VirtualKey,4)} -KeyEvent {param([uint16]$Scan,[bool]$Down)[MIRLibraryInputNative]::HardwareKey($Scan,$Down)} -Pause {param([int]$Milliseconds)Start-Sleep -Milliseconds $Milliseconds} -AssertWindow {Assert-CurrentInputWindow} -Sent ([ref]$sent) -HeldScan ([ref]$heldHardwareScan) -Events $hardwareKeyEvents
     }
     'text'{foreach($character in $spec.text.ToCharArray()){
@@ -225,7 +227,7 @@ try{
   }
   $result.failure=$failure;$result.input_events_sent=$sent;$result.window=$window;$result.window_diagnostics=$diagnostics;$result.physical_pointer_positions=$physicalPointerPositions.ToArray()
   $result.hardware_key_events=$hardwareKeyEvents.ToArray();$result.hardware_key_still_held=($heldHardwareScan-ne0)
-  $result.input_method='Windows SendInput;Esc/E scan-code down,100ms hold,up;text Unicode;physical-cursor readback;owned foreground PID/start/engine/geometry/hit-test checked;no Factorio events raised'
+  $result.input_method='Windows SendInput;Esc/E/Tab scan-code down,100ms hold,up;text Unicode;physical-cursor readback;owned foreground PID/start/engine/geometry/hit-test checked;no Factorio events raised'
   $result|ConvertTo-Json -Depth 12|Set-Content -LiteralPath $receipt -Encoding utf8
   if($null-ne$client){$client.Dispose()}
 }

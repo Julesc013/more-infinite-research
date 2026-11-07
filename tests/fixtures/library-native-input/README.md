@@ -5,12 +5,26 @@ applies_to: "Exact MIR1.1 completed F200/F210 Base successor copies"
 audience: developer
 doc_type: test-fixture
 owner: mir-maintainers
-last_reviewed: 2026-10-31
+last_reviewed: 2026-11-07
 supersedes: []
 superseded_by: []
 ---
 
 # Imported Library native input and lifecycle observation
+
+## Current helper-free inputs
+
+### Qualified support exports
+
+Support-export observer0.4.1 attaches the existing thirteen-click/five-join/two-save protocol to the qualified1.1 work saves identified below and the published5.0.7 packages. Compose `control.lua`, the selected `info-exports-current-f200.json` or `info-exports-current-f210.json` as `info.json`, `support-exports.lua` and the unchanged local `catalogue.lua` from one committed revision. The exact closure is Base2.0.77/MIR5.0.20007 or Base2.1.23/MIR5.0.21007, active-mod observer0.1.0 and export observer0.4.1; the old migration controller is excluded.
+
+The one-shot first-tick baseline retains the same independent31-row/71-recipe/three-force paid/private/foreign-work expectations. An early report refuses readiness. The existing full/compact profile checks, false/zero values, EN/DE identity, actual click witnesses, foreign-root rejection, visible write-failure behavior, server commands, rejoin and saved-host restart assertions remain binding. Actual output files still require separate client/server path, byte/newline and preservation readback; a preview or host control cannot supply that verdict. The old0.4.0 metadata, profiles and failed runs retain their original inputs. The accepted0.3.5 [input/lifecycle component](../../../spec/evidence/library-current507-input-lifecycle-native-r01.json) does not establish this support-export native result.
+
+Input observer0.3.5 attaches to the already-qualified direct MIR1.1 successor work saves: F200 `56598A69E7AFD30023EE368D17BAD3325CB58A6FF08B26B2DA2BD0AABBB0D500` (905921bytes) or F210 `8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD` (893285bytes). Their actual predecessor packages were internal source2a8e85e6, versions5.0.20006/5.0.21006; these are separate inputs from the original7a2/r20 saves. See the [accepted direct1.1 components](../../../spec/evidence/data-only-paid-family-restoration-r01.json) and exact useful-work originals at `Julesc013/scratchpad@d512c2aafb04e2955910ec60d8694cc134f57143:projects/mir/runs/data-only-110-useful-work-r01/`. Preserve the original inputs and every failed old-input attempt; this adapter does not claim a new native pass.
+
+Project exactly `control.lua`, the immutable `catalogue.lua` and `info-input-current-f200.json` or `info-input-current-f210.json` as `info.json`, using raw bytes from one committed revision. The catalogue is byte-identical to the independent historical successor test data at7df0ab82, not MIR implementation. The current closure is Base2.0.77/MIR5.0.20007 or Base2.1.23/MIR5.0.21007, active-mod observer0.1.0 and input observer0.3.5: three archives in addition to built-in Base. Do not install or reactivate the old migration controller, API companion, Space Age or another mod. The original501 profiles/metadata and0.3.4 inputs retain their own immutable revisions.
+
+The observer refuses pre-existing players or its own prior state and waits until the first tick after configuration before admitting clients. It verifies the original31-row/71-recipe, three-force earned-state contract: player gear3/.20, unearned foreign/detached gear, the other paid rows, three private module holders2/.11, unearned cannon holder1, battery.10, foreign queue and `.42/8000` current progress, and `.27/8000` detached saved progress. The fractions preserve research units at the original full cost; they are not42%/27%. Native flags, queue/current/partial work, recipe totals and aggregates remain protected throughout the existing48-query/five-join/two-reset lifecycle. No research or credit is seeded. Raw save/player/mod-state applicability and exact package/controller binding remain the native owner's responsibility; a missing force, mismatched state or configuration refusal stops before input.
 
 ## Corrected client identity observers
 
@@ -70,7 +84,7 @@ The fixture exposes only its own test interface `mir5-library-native-input`: `re
 | foreign-refresh | Wait at least60ticks after the second actual native effect-reset event | foreign-refresh |
 | foreign-suffix | Type ` kept` without clicking/refocusing; foreign GUI must retain focus | foreign-suffix |
 | disconnect-de | Stop only the owned German test client; verify it is offline | remove-de |
-| replacement | One real German replacement joins with a new native player index | replacement |
+| replacement | One real German replacement joins under the declared slot policy; a reused numeric index still requires the real removal event and invalidated old objects | replacement |
 | pre-save | Wait60ticks and retain both restored personal views | save |
 | awaiting-restart | Closed/hash-verified new restart save; real host restart and both actual reconnects | restart |
 | completed | Preserve restored queries and drag location, capture both clients, wait60ticks | complete-save |
@@ -88,6 +102,8 @@ pwsh -NoProfile -File tools/Invoke-LibraryNativeInput.ps1 `
 After independent review and exact native-process/window binding, the governed parent invokes the same command without `-ValidateOnly`. Its actual engine interaction is separate from schema validation. The fixed observer operations are Lua calls through the existing private RCON owner, for example `remote.call("mir5-library-native-input", "advance", "inspect")`, followed by a bounded serialized `report`. Do not expose/log the private RCON password or accept arbitrary user commands as actor actions. Use PowerShell7.5+ so JSON timestamps can remain exact strings with `-DateKind String`.
 
 This is prepared public code, not a dispatched native assignment. The native execution owner must still bind/review the private caller, exact five-mod profiles, protected source/corrected historical fixture members, actual archive hashes, desktop points, ordered actor/readback commands, closed-save custody, clients-first teardown and restoration before executing. The generic first-upgrade production or fresh0.3/0.4 multiplayer witness readers are not claimed compatible with this separate five-join imported/input protocol. Stop at the first missing input, identity/geometry/phase/event/view/native-state mismatch; retain the original receipt and unmodified input, and diagnose fixture versus product before correcting anything. No silent assertion relaxation, programmatic Esc/E substitute, favorable retries or pre-existing player removal is allowed.
+
+At [frozen source7df0ab82](https://github.com/Julesc013/more-infinite-research/tree/7df0ab82a327d712234ee948c3ff10cf563713cf/tests/fixtures/library-native-input), the `info-input-current-f200.json` and `info-input-current-f210.json` variants bound observer0.3.4 to MIR5.0.7 with the corresponding `info-*-source-defaults-current.json` historical-controller metadata. Preserve that source and its failed native input attempts under their original identities. Current0.3.5 files use the helper-free inputs described above; do not combine them with the old controller. Neither preparation is a native acceptance result.
 
 Host controls use native-shaped doubles and deliberately injected missing events, replaced query objects, wrong native effects/queues, lost focus, incomplete waits, failed removal and cold-view loss. They prove observer rejection and readonly callback behavior, not actual desktop input. Actual imported cannon earnings from MIR1.2, a predecessor-selected private research row, native private-queue insertion, comparative performance and universal leak/memory claims remain outside this fixture.
 

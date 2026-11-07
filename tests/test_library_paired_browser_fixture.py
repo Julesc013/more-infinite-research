@@ -188,6 +188,12 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 tabs["mir_library_research_content"] = content
                 root["mir_library_filters"] = filters
                 root["mir_library_tabs"] = tabs
+                if opponent == "new-page" or opponent == "bad-page" or opponent == "foreign-page" then
+                  local page = element(opponent == "bad-page" and "flow" or "scroll-pane", "mir_library_research_page")
+                  page.get_mod = function() return opponent == "foreign-page" and "other" or "more-infinite-research" end
+                  page["mir_library_filters"], page["mir_library_research_content"] = filters, content
+                  tabs["mir_library_research_page"] = page
+                end
               end
               if opponent == "bad-shape" then
                 if arm == "published" then
@@ -467,6 +473,14 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
 
     def runtime_result(self, arm, opponent=None):
         return plain(self.lua.globals().paired_browser_runtime(self.lua.globals().control_path, arm, opponent))
+
+    def test_research_page_path_and_malformed_page_refusal(self):
+        result = self.runtime_result("mir5", "new-page")
+        self.assertTrue(result["ok"], result["message"])
+        for opponent in ("bad-page", "foreign-page"):
+            result = self.runtime_result("mir5", opponent)
+            self.assertFalse(result["ok"])
+            self.assertIn("research page is malformed or foreign", result["message"])
 
     def test_load_guard_rejects_nested_saved_state_writes_on_both_loads(self):
         original = CONTROL.read_text(encoding="utf-8")

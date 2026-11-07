@@ -1,18 +1,24 @@
 -- Test-only observer of the protected, completed MIR1.1 successor copies.
--- The imported fixture still owns its full independent preservation contract.
--- This imports its finite historical expectations, never MIR implementation.
-local historical = require("__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
+-- Helper-free inputs carry the same immutable test catalogue locally; they do
+-- not activate the obsolete migration controller. Older protocols keep theirs.
+local INPUT_OBSERVER = script.active_mods["mir-fixture-mir5-library-native-input"]
+local HELPER_FREE_INPUT = INPUT_OBSERVER=="0.3.5" or INPUT_OBSERVER=="0.4.1"
+local historical = HELPER_FREE_INPUT and require("catalogue")
+  or require("__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
 local KEY, INTERFACE = "mir5_library_native_input", "mir5-library-native-input"
 local BROWSER = "more-infinite-research-browser"
 local ROOT, FILTERS, QUERY = "mir_research_browser", "mir_library_filters", "mir_library_query"
 local OTHER, OTHER_QUERY = "mir5_input_other", "mir5_input_other_query"
-local INPUT_OBSERVER = script.active_mods["mir-fixture-mir5-library-native-input"]
+local DEFER_IMPORTED_BASELINE = (INPUT_OBSERVER=="0.3.4" or HELPER_FREE_INPUT) and
+  (script.active_mods["more-infinite-research"]=="5.0.20007" or script.active_mods["more-infinite-research"]=="5.0.21007")
 local ALLOW_REMOVED_INDEX_REUSE = (INPUT_OBSERVER=="0.3.3" and (
   (script.active_mods.base=="2.0.77" and script.active_mods["more-infinite-research"]=="5.0.20001")
   or (script.active_mods.base=="2.1.23" and script.active_mods["more-infinite-research"]=="5.0.21001")))
-  or (INPUT_OBSERVER=="0.3.4" and (
-    (script.active_mods.base=="2.0.77" and script.active_mods["more-infinite-research"]=="5.0.20001")
-    or (script.active_mods.base=="2.1.23" and script.active_mods["more-infinite-research"]=="5.0.21001")))
+  or ((INPUT_OBSERVER=="0.3.4" or HELPER_FREE_INPUT) and (
+    (script.active_mods.base=="2.0.77" and (script.active_mods["more-infinite-research"]=="5.0.20001"
+      or script.active_mods["more-infinite-research"]=="5.0.20007"))
+    or (script.active_mods.base=="2.1.23" and (script.active_mods["more-infinite-research"]=="5.0.21001"
+      or script.active_mods["more-infinite-research"]=="5.0.21007"))))
 local GEAR, MINING = "recipe-prod-research_gears-1", "recipe-prod-research_mining_drill-1"
 local IDS = {"mir-legacy-module-credit-speed-module", "mir-legacy-module-credit-productivity-module",
   "mir-legacy-module-credit-efficiency-module", "mir-legacy-cannon-credit-rocket-shooting-speed"}
@@ -85,6 +91,7 @@ local function world()
 end
 local function assert_world()
   local s=state();local actual=world()
+  if s.native==nil then fail("imported baseline is not ready") end
   for index, expected in ipairs(s.native) do
     local value=actual[index]
     if value.name~=expected.name or value.index~=expected.index or value.current~=expected.current
@@ -107,8 +114,41 @@ local function location(root)
   if type(value)~="table" or type(value.x)~="number" or type(value.y)~="number" then fail("native root location is absent") end
   return {x=value.x,y=value.y}
 end
+-- The published MIR5 tree had root filters and a direct tab body.  A page,
+-- when present, must be the expected owned page; never fall back through it.
+local function filter_control(root, filters, name)
+  local tabs = valid(root) and root.mir_library_tabs
+  local page = valid(tabs) and tabs.mir_library_research_page or nil
+  if page == nil then return valid(filters) and filters[name] or nil end
+  if not valid(filters) then return nil end
+  local grid = valid(filters) and filters.mir_library_filter_grid
+  if not valid(filters) or filters.type ~= "flow" or filters.direction ~= "vertical"
+      or not valid(grid) or grid.type ~= "table" or grid.column_count ~= 2 then
+    fail("authored research filter grid is malformed")
+  end
+  if name == "mir_library_query" then return filters[name] end
+  local field = grid[name .. "_field"]
+  local control = valid(field) and field[name]
+  if not valid(field) or field.type ~= "flow" or field.direction ~= "vertical"
+      or not valid(field[name .. "_label"]) or not valid(control) or control.type ~= "drop-down" then
+    fail("authored research filter field is malformed")
+  end
+  return control
+end
+
+local function research_parts(root)
+  local tabs=valid(root) and root.mir_library_tabs or nil
+  local page=valid(tabs) and tabs.mir_library_research_page or nil
+  if page ~= nil then
+    if not valid(tabs) or tabs.type~="tabbed-pane" or not valid(page) or page.type~="scroll-pane"
+        or (page.get_mod and page.get_mod()~="more-infinite-research") then fail("native research page is malformed or foreign") end
+    filter_control(root, page[FILTERS], QUERY)
+    return page[FILTERS],page.mir_library_research_content
+  end
+  return (valid(root) and root[FILTERS] or nil),(valid(tabs) and tabs.mir_library_research_content or nil)
+end
 local function parts(p)
-  local root=p.gui.screen[ROOT];local filters=valid(root) and root[FILTERS]
+  local root=p.gui.screen[ROOT];local filters=research_parts(root)
   local query=valid(filters) and filters[QUERY]
   if not valid(root) or root.type~="frame" or root.get_mod()~="more-infinite-research"
       or not valid(query) or query.type~="textfield" then fail("native Library root/query is absent or foreign") end
@@ -127,35 +167,55 @@ local function assert_retained(en,de,query)
   if er~=refs.en_root or eq~=refs.en_query or dr~=refs.de_root or dq~=refs.de_query then fail("native refresh replaced a live root/query") end
   assert_world()
 end
+local function selected_title(root, detail)
+  local tabs=valid(root) and root.mir_library_tabs
+  if not (valid(tabs) and tabs.mir_library_research_page ~= nil) then return valid(detail) and detail.mir_library_detail_title end
+  local facts=valid(detail) and detail.mir_library_research_facts
+  local heading=valid(facts) and facts.mir_library_detail_heading or nil
+  if not valid(facts) or facts.type~="scroll-pane" or not valid(heading) or heading.type~="flow" or heading.direction~="horizontal"
+      or not valid(heading.mir_library_detail_icon) then return nil end
+  return heading.mir_library_detail_title
+end
+local function browser_list_parts(content)
+  local pane = valid(content) and content.mir_library_list_pane or nil
+  if pane == nil then
+    return valid(content) and content.mir_library_results or nil, valid(content) and content.mir_library_actions or nil
+  end
+  if not valid(pane) or pane.type ~= "flow" or pane.direction ~= "vertical"
+      or (pane.get_mod and pane.get_mod() ~= "more-infinite-research") then
+    fail("native research list pane is malformed or foreign")
+  end
+  return pane.mir_library_results, pane.mir_library_actions
+end
+
 local function exclusion_probe(en,de)
   for _, p in ipairs({en,de}) do
     for _, family in ipairs({"all","external"}) do
       local ordinary=family=="all" and GEAR or "automation"
       if remote.call(BROWSER,"open",p.index,{search=ordinary,selected=ordinary,family=family,visibility=1,tab="research"})~=true then fail("ordinary positive query failed") end
-      local ordinary_content=p.gui.screen[ROOT].mir_library_tabs.mir_library_research_content
-      if not valid(ordinary_content) or not valid(ordinary_content.mir_library_results) or #ordinary_content.mir_library_results.items<1
-          or ordinary_content.mir_library_results.selected_index<1
+      local _,ordinary_content=research_parts(p.gui.screen[ROOT])
+      local ordinary_results,ordinary_actions=browser_list_parts(ordinary_content)
+      if not valid(ordinary_content) or not valid(ordinary_results) or #ordinary_results.items<1
+          or ordinary_results.selected_index<1
           or (ordinary_content.type=="table" and ordinary_content.column_count~=2)
           or (ordinary_content.type=="scroll-pane" and ordinary_content.vertical_scroll_policy~="auto")
           or (ordinary_content.type~="table" and ordinary_content.type~="scroll-pane")
           or ordinary_content.mir_library_detail.type~="scroll-pane"
-          or not valid(ordinary_content.mir_library_detail.mir_library_detail_title)
-          or ordinary_content.mir_library_actions.mir_library_open_native.enabled~=true then fail("ordinary inspection positive control failed") end
+          or not valid(selected_title(p.gui.screen[ROOT], ordinary_content.mir_library_detail))
+          or ordinary_actions.mir_library_open_native.enabled~=true then fail("ordinary inspection positive control failed") end
       for _, id in ipairs(IDS) do
         if remote.call(BROWSER,"open",p.index,{search=id,selected=id,family=family,visibility=1,tab="research"})~=true then fail("private query failed") end
-        local root=p.gui.screen[ROOT];local filters=valid(root) and root[FILTERS]
-        local tabs=valid(root) and root.mir_library_tabs
-        local content=valid(tabs) and tabs.mir_library_research_content
-        local results=valid(content) and content.mir_library_results
+        local root=p.gui.screen[ROOT];local filters=research_parts(root)
+        local _,content=research_parts(root)
+        local results,actions=browser_list_parts(content)
         local detail=valid(content) and content.mir_library_detail
-        local actions=valid(content) and content.mir_library_actions
         local button=valid(actions) and actions.mir_library_open_native
-        if not valid(filters) or not valid(content) or filters[QUERY].text~=id or filters.mir_library_family.selected_index~=(family=="all" and 2 or 3)
+        if not valid(filters) or not valid(content) or filters[QUERY].text~=id or filter_control(root, filters, "mir_library_family").selected_index~=(family=="all" and 2 or 3)
             or (content.type=="table" and content.column_count~=2)
             or (content.type=="scroll-pane" and content.vertical_scroll_policy~="auto")
             or (content.type~="table" and content.type~="scroll-pane")
             or not valid(results) or #results.items~=0 or results.selected_index~=0
-            or not valid(detail) or detail.type~="scroll-pane" or valid(detail.mir_library_detail_title) or not valid(detail.mir_library_detail_empty)
+            or not valid(detail) or detail.type~="scroll-pane" or valid(detail.mir_library_detail_title) or valid(detail.mir_library_research_facts) or not valid(detail.mir_library_detail_empty)
             or not valid(button) or button.enabled~=false then fail("imported private research/action exposed") end
       end
     end
@@ -169,7 +229,12 @@ local function check_imported_literals()
     for index,id in ipairs(IDS) do
       local value=force.technologies[id]
       if not valid(value) or value.level~=(index<4 and 2 or 1) or value.researched~=false
-          or value.enabled~=false or value.visible_when_disabled~=false or value.prototype.hidden~=true then fail("imported credit baseline differs") end
+          or value.enabled~=false or value.visible_when_disabled~=false or value.prototype.hidden~=true then
+        local observed=valid(value) and ("level="..tostring(value.level)..",researched="..tostring(value.researched)
+          ..",enabled="..tostring(value.enabled)..",visible_when_disabled="..tostring(value.visible_when_disabled)
+          ..",hidden="..tostring(value.prototype.hidden)) or "absent"
+        fail("imported credit baseline differs: "..name.."/"..id.." ["..observed.."]")
+      end
     end
     for _, id in ipairs({"speed-module","productivity-module","efficiency-module"}) do
       if not close(force.recipes[id].productivity_bonus,.11) then fail("actual imported module effect differs") end
@@ -177,6 +242,37 @@ local function check_imported_literals()
   end
   local force=game.forces.player
   if force.technologies[GEAR].level~=3 or not close(force.recipes["iron-gear-wheel"].productivity_bonus,.2) then fail("completed imported gear baseline differs") end
+  if HELPER_FREE_INPUT then
+    -- Original1.1 catalogue and accepted direct-successor work/cold records:
+    -- all non-gear rows have one paid level; only player gears have two.
+    for index,name in ipairs(FORCES) do
+      local current=game.forces[name];local expected_recipes={}
+      for id,effects in pairs(historical.rows) do
+        local value=current.technologies[id]
+        local completed=id==GEAR and (index==1 and 2 or 0) or 1
+        if not valid(value) or value.level~=completed+1 or value.researched~=false
+            or value.enabled~=true or value.visible_when_disabled~=false then fail("helper-free historical row differs: "..name.."/"..id) end
+        for _,effect in ipairs(effects) do
+          if effect.type=="change-recipe-productivity" then
+            expected_recipes[effect.recipe]=(expected_recipes[effect.recipe] or 0)+effect.change*completed
+          end
+        end
+      end
+      for recipe,expected in pairs(expected_recipes) do
+        local value=current.recipes[recipe]
+        if not valid(value) or not close(value.productivity_bonus,expected) then fail("helper-free historical recipe differs: "..name.."/"..recipe) end
+      end
+      if not close(current.manual_mining_speed_modifier,0) or not close(current.worker_robots_battery_modifier,.1) then fail("helper-free native aggregate differs") end
+      local queue=current.research_queue or {}
+      if index==2 then
+        if not current.current_research or current.current_research.name~=GEAR or #queue~=2
+            or queue[1].name~=GEAR or queue[2].name~="recipe-prod-research_plastic-1"
+            or not close(current.research_progress,.42/8000) then fail("helper-free foreign work differs") end
+      elseif current.current_research~=nil or #queue~=0 or not close(current.research_progress,0) then fail("helper-free idle work differs") end
+      local saved=current.technologies[GEAR].saved_progress or 0
+      if not close(saved,index==3 and .27/8000 or 0) then fail("helper-free detached work differs") end
+    end
+  end
 end
 local function geometry(p)
   if not valid(p) then return nil end
@@ -192,7 +288,7 @@ local function observed_opened(p, root)
 end
 local function input_state(p)
   if not valid(p) then return false end
-  local root=p.gui.screen[ROOT];local filters=valid(root) and root[FILTERS] or nil
+  local root=p.gui.screen[ROOT];local filters=research_parts(root) or nil
   local query=valid(filters) and filters[QUERY] or nil
   local other=p.gui.screen[OTHER];local other_query=valid(other) and other[OTHER_QUERY] or nil
   local opened_kind,opened_is_library_root,opened,opened_available=observed_opened(p,root)
@@ -207,7 +303,7 @@ local function target_witness(p, root_ref, query_ref, root_name, query_name, fil
   if not valid(p) then return false end
   local root=p.gui.screen[root_name]
   local parent=nil
-  if valid(root) then if filters_name then parent=root[filters_name] else parent=root end end
+  if valid(root) then if filters_name then parent=research_parts(root) else parent=root end end
   local query=valid(parent) and parent[query_name] or nil
   local _,_,opened,opened_available=observed_opened(p,root)
   local rv,pv,qv=valid(root)==true,valid(parent)==true,valid(query)==true
@@ -247,6 +343,7 @@ local function observe_removal(s)
 end
 local function report()
   local s=storage[KEY];if type(s)~="table" then return nil end
+  if s.native==nil then fail("imported baseline is not ready") end
   local en=s.en_index~=nil and game.get_player(s.en_index) or nil
   local de=s.de_index~=nil and game.get_player(s.de_index) or nil
   return {schema=1,case="library-native-input-imported110",phase=s.phase,tick=game.tick,
@@ -271,7 +368,7 @@ local function report()
     imported_earnings=true,fixture_seeds_credit=false,load_observed=loaded_restart,
     en_geometry=s.en_index and geometry(game.get_player(s.en_index)) or nil,
     de_geometry=s.de_index and geometry(game.get_player(s.de_index)) or nil,
-    original_preservation_fixture_required=true,performance_acceptance=false,release_qualification=false}
+    original_preservation_fixture_required=not HELPER_FREE_INPUT,performance_acceptance=false,release_qualification=false}
 end
 local function phase(expected)
   local s=state();if s.phase~=expected then fail("step out of order: "..s.phase.." expected "..expected) end
@@ -414,9 +511,9 @@ local function advance(step)
 end
 -- The separate0.4 observer reuses only these independent protected-save assertions.
 -- Original0.1/0.2 sources and packets remain pinned by their historical records.
-if script.active_mods["mir-fixture-mir5-library-native-input"] == "0.4.0" then
+if INPUT_OBSERVER=="0.4.0" or INPUT_OBSERVER=="0.4.1" then
   require("support-exports").register({key=KEY,interface=INTERFACE,world=world,assert_world=assert_world,
-    imported=check_imported_literals,historical_fixture=historical.fixture})
+    imported=check_imported_literals,historical_fixture=historical.fixture,qualified_input=HELPER_FREE_INPUT})
   return
 end
 remote.add_interface(INTERFACE,{report=report,advance=advance})
@@ -433,20 +530,42 @@ script.on_init(function()
     or (script.active_mods.base=="2.1.23" and observer_version=="0.3.3"
       and {mir="5.0.21001",fixture="0.4.0",observer="0.3.3"})
     or (script.active_mods.base=="2.0.77" and observer_version=="0.3.4"
+      and script.active_mods["more-infinite-research"]=="5.0.20007"
+      and {mir="5.0.20007",fixture="0.3.0",observer="0.3.4"})
+    or (script.active_mods.base=="2.1.23" and observer_version=="0.3.4"
+      and script.active_mods["more-infinite-research"]=="5.0.21007"
+      and {mir="5.0.21007",fixture="0.4.0",observer="0.3.4"})
+    or (script.active_mods.base=="2.0.77" and observer_version=="0.3.4"
       and {mir="5.0.20001",fixture="0.3.0",observer="0.3.4"})
     or (script.active_mods.base=="2.1.23" and observer_version=="0.3.4"
       and {mir="5.0.21001",fixture="0.4.0",observer="0.3.4"})
+    or (script.active_mods.base=="2.0.77" and observer_version=="0.3.5"
+      and {mir="5.0.20007",observer="0.3.5"})
+    or (script.active_mods.base=="2.1.23" and observer_version=="0.3.5"
+      and {mir="5.0.21007",observer="0.3.5"})
   if not expected or script.active_mods["more-infinite-research"]~=expected.mir
-      or script.active_mods[historical.fixture]~=expected.fixture then fail("imported native target differs") end
-  local allowed={base=script.active_mods.base,["more-infinite-research"]=expected.mir,[historical.fixture]=expected.fixture,
+      or (not HELPER_FREE_INPUT and script.active_mods[historical.fixture]~=expected.fixture) then fail("imported native target differs") end
+  local allowed={base=script.active_mods.base,["more-infinite-research"]=expected.mir,
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]=expected.observer}
+  if not HELPER_FREE_INPUT then allowed[historical.fixture]=expected.fixture end
   for name,version in pairs(script.active_mods) do if allowed[name]~=version then fail("unexpected imported observer closure") end end
   for name,version in pairs(allowed) do if script.active_mods[name]~=version then fail("missing imported observer closure member") end end
   for _ in pairs(game.players) do fail("protected headless source must contain no pre-existing players") end
   if storage[KEY]~=nil then fail("observer state already exists") end
-  storage[KEY]={schema=1,phase="waiting-clients",native=world(),joins=0,restart_joins={},text_events=0,closed_events=0,
+  storage[KEY]={schema=1,phase=DEFER_IMPORTED_BASELINE and "waiting-native-baseline" or "waiting-clients",
+    native=not DEFER_IMPORTED_BASELINE and world() or nil,joins=0,restart_joins={},text_events=0,closed_events=0,
     drag_events=0,reset_events=0,requested_resets=0,removed_events=0,private_queries=0,query_clicks=0,other_clicks=0,imported_probe_verified=false,close_observations={}}
-  check_imported_literals()
+  if DEFER_IMPORTED_BASELINE then
+    -- Every mod's on_init runs before configuration reconciliation. The first
+    -- native tick is after that complete stage, regardless of mod event order.
+    script.on_event(defines.events.on_tick,function()
+      check_imported_literals()
+      local s=state();s.native=world();s.phase="waiting-clients"
+      script.on_event(defines.events.on_tick,nil)
+    end)
+  else
+    check_imported_literals()
+  end
 end)
 script.on_load(function()local s=storage[KEY];loaded_restart=type(s)=="table" and s.phase=="awaiting-restart";refs={} end)
 script.on_event(defines.events.on_player_joined_game,function(event)

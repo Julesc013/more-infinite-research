@@ -111,6 +111,9 @@ function M.technology(definition, values)
     }
   }
   if stream.enabled == false or definition.available == false then output.enabled = false end
+  if (stream.max_level or 0) > 0 then
+    productivity.apply_cap_presentation(output, stream.max_level, "mod-setting-name.ips-max-level-stream")
+  end
   return output
 end
 
@@ -192,6 +195,15 @@ local function continuation_formula(definition, stream)
 end
 
 local function continuation_effects(definition, stream)
+  if definition.inherited_research_speed_effects then
+    local effects = copy(definition.inherited_research_speed_effects)
+    for _, effect in ipairs(effects) do
+      if effect.type == "laboratory-speed" then
+        effect.modifier = effect.modifier * (stream.effect_percent / 60)
+      end
+    end
+    return effects
+  end
   local out = {}
   for index = 1, #definition.effects do
     local authored = definition.effects[index]
@@ -230,6 +242,9 @@ function M.continuation(definition, values)
   }
   if definition.icon_size ~= nil then output.icon_size = definition.icon_size end
   if stream.enabled == false then output.enabled = false end
+  if (stream.max_level or 0) > 0 then
+    productivity.apply_cap_presentation(output, stream.max_level, "mod-setting-name.mir-max-level")
+  end
   return output
 end
 
