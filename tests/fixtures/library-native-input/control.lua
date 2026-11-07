@@ -2,7 +2,8 @@
 -- Helper-free inputs carry the same immutable test catalogue locally; they do
 -- not activate the obsolete migration controller. Older protocols keep theirs.
 local INPUT_OBSERVER = script.active_mods["mir-fixture-mir5-library-native-input"]
-local HELPER_FREE_INPUT = INPUT_OBSERVER=="0.3.5" or INPUT_OBSERVER=="0.4.1" or INPUT_OBSERVER=="0.3.6" or INPUT_OBSERVER=="0.4.2"
+local CURRENT_509 = INPUT_OBSERVER=="0.3.7"
+local HELPER_FREE_INPUT = INPUT_OBSERVER=="0.3.5" or INPUT_OBSERVER=="0.4.1" or INPUT_OBSERVER=="0.3.6" or INPUT_OBSERVER=="0.4.2" or CURRENT_509
 local historical = HELPER_FREE_INPUT and require("catalogue")
   or require("__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
 local KEY, INTERFACE = "mir5_library_native_input", "mir5-library-native-input"
@@ -10,16 +11,18 @@ local BROWSER = "more-infinite-research-browser"
 local ROOT, FILTERS, QUERY = "mir_research_browser", "mir_library_filters", "mir_library_query"
 local OTHER, OTHER_QUERY = "mir5_input_other", "mir5_input_other_query"
 local CURRENT_508 = INPUT_OBSERVER=="0.3.6" or INPUT_OBSERVER=="0.4.2"
+-- The authored Research page hierarchy introduced in8 is retained in9.
+local CURRENT_LAYOUT = CURRENT_508 or CURRENT_509
 local DEFER_IMPORTED_BASELINE = (INPUT_OBSERVER=="0.3.4" or HELPER_FREE_INPUT) and
-  (script.active_mods["more-infinite-research"]=="5.0.20007" or script.active_mods["more-infinite-research"]=="5.0.21007" or (CURRENT_508 and (script.active_mods["more-infinite-research"]=="5.0.20008" or script.active_mods["more-infinite-research"]=="5.0.21008")))
+  (script.active_mods["more-infinite-research"]=="5.0.20007" or script.active_mods["more-infinite-research"]=="5.0.21007" or (CURRENT_508 and (script.active_mods["more-infinite-research"]=="5.0.20008" or script.active_mods["more-infinite-research"]=="5.0.21008")) or (CURRENT_509 and (script.active_mods["more-infinite-research"]=="5.0.20009" or script.active_mods["more-infinite-research"]=="5.0.21009")))
 local ALLOW_REMOVED_INDEX_REUSE = (INPUT_OBSERVER=="0.3.3" and (
   (script.active_mods.base=="2.0.77" and script.active_mods["more-infinite-research"]=="5.0.20001")
   or (script.active_mods.base=="2.1.23" and script.active_mods["more-infinite-research"]=="5.0.21001")))
   or ((INPUT_OBSERVER=="0.3.4" or HELPER_FREE_INPUT) and (
     (script.active_mods.base=="2.0.77" and (script.active_mods["more-infinite-research"]=="5.0.20001"
-      or script.active_mods["more-infinite-research"]=="5.0.20007" or (CURRENT_508 and script.active_mods["more-infinite-research"]=="5.0.20008")))
+      or script.active_mods["more-infinite-research"]=="5.0.20007" or (CURRENT_508 and script.active_mods["more-infinite-research"]=="5.0.20008") or (CURRENT_509 and script.active_mods["more-infinite-research"]=="5.0.20009")))
     or (script.active_mods.base=="2.1.23" and (script.active_mods["more-infinite-research"]=="5.0.21001"
-      or script.active_mods["more-infinite-research"]=="5.0.21007" or (CURRENT_508 and script.active_mods["more-infinite-research"]=="5.0.21008")))))
+      or script.active_mods["more-infinite-research"]=="5.0.21007" or (CURRENT_508 and script.active_mods["more-infinite-research"]=="5.0.21008") or (CURRENT_509 and script.active_mods["more-infinite-research"]=="5.0.21009")))))
 local GEAR, MINING = "recipe-prod-research_gears-1", "recipe-prod-research_mining_drill-1"
 local IDS = {"mir-legacy-module-credit-speed-module", "mir-legacy-module-credit-productivity-module",
   "mir-legacy-module-credit-efficiency-module", "mir-legacy-cannon-credit-rocket-shooting-speed"}
@@ -121,20 +124,20 @@ local function filter_control(root, filters, name)
   local tabs = valid(root) and root.mir_library_tabs
   local page = valid(tabs) and tabs.mir_library_research_page or nil
   if page == nil then
-    if CURRENT_508 and valid(root) then fail("authored research page is absent") end
+    if CURRENT_LAYOUT and valid(root) then fail("authored research page is absent") end
     return valid(filters) and filters[name] or nil
   end
   if not valid(filters) then return nil end
-  if CURRENT_508 and (filters.parent~=page or filters.get_mod()~="more-infinite-research") then fail("authored research filters are foreign") end
+  if CURRENT_LAYOUT and (filters.parent~=page or filters.get_mod()~="more-infinite-research") then fail("authored research filters are foreign") end
   local grid = valid(filters) and filters.mir_library_filter_grid
   if not valid(filters) or filters.type ~= "flow" or filters.direction ~= "vertical"
       or not valid(grid) or grid.type ~= "table" or grid.column_count ~= 2 then
     fail("authored research filter grid is malformed")
   end
-  if CURRENT_508 and (grid.parent~=filters or grid.get_mod()~="more-infinite-research") then fail("authored research filter grid is foreign") end
+  if CURRENT_LAYOUT and (grid.parent~=filters or grid.get_mod()~="more-infinite-research") then fail("authored research filter grid is foreign") end
   if name == "mir_library_query" then
     local query=filters[name]
-    if CURRENT_508 and (not valid(query) or query.type~="textfield" or query.parent~=filters or query.get_mod()~="more-infinite-research") then fail("authored research query is malformed or foreign") end
+    if CURRENT_LAYOUT and (not valid(query) or query.type~="textfield" or query.parent~=filters or query.get_mod()~="more-infinite-research") then fail("authored research query is malformed or foreign") end
     return query
   end
   local field = grid[name .. "_field"]
@@ -143,7 +146,7 @@ local function filter_control(root, filters, name)
       or not valid(field[name .. "_label"]) or not valid(control) or control.type ~= "drop-down" then
     fail("authored research filter field is malformed")
   end
-  if CURRENT_508 and (field.parent~=grid or control.parent~=field or field.get_mod()~="more-infinite-research" or control.get_mod()~="more-infinite-research") then fail("authored research filter field is foreign") end
+  if CURRENT_LAYOUT and (field.parent~=grid or control.parent~=field or field.get_mod()~="more-infinite-research" or control.get_mod()~="more-infinite-research") then fail("authored research filter field is foreign") end
   return control
 end
 
@@ -153,11 +156,11 @@ local function research_parts(root)
   if page ~= nil then
     if not valid(tabs) or tabs.type~="tabbed-pane" or not valid(page) or page.type~="scroll-pane"
         or (page.get_mod and page.get_mod()~="more-infinite-research") then fail("native research page is malformed or foreign") end
-    if CURRENT_508 and (tabs.parent~=root or page.parent~=tabs or tabs.get_mod()~="more-infinite-research") then fail("native research page is malformed or foreign") end
+    if CURRENT_LAYOUT and (tabs.parent~=root or page.parent~=tabs or tabs.get_mod()~="more-infinite-research") then fail("native research page is malformed or foreign") end
     filter_control(root, page[FILTERS], QUERY)
     return page[FILTERS],page.mir_library_research_content
   end
-  if CURRENT_508 and valid(root) then fail("authored research page is absent") end
+  if CURRENT_LAYOUT and valid(root) then fail("authored research page is absent") end
   return (valid(root) and root[FILTERS] or nil),(valid(tabs) and tabs.mir_library_research_content or nil)
 end
 local function parts(p)
@@ -526,7 +529,7 @@ end
 -- Original0.1/0.2 sources and packets remain pinned by their historical records.
 if INPUT_OBSERVER=="0.4.0" or INPUT_OBSERVER=="0.4.1" or INPUT_OBSERVER=="0.4.2" then
   require("support-exports").register({key=KEY,interface=INTERFACE,world=world,assert_world=assert_world,
-    imported=check_imported_literals,historical_fixture=historical.fixture,qualified_input=HELPER_FREE_INPUT,current_508=CURRENT_508})
+    imported=check_imported_literals,historical_fixture=historical.fixture,qualified_input=HELPER_FREE_INPUT,current_508=CURRENT_LAYOUT})
   return
 end
 remote.add_interface(INTERFACE,{report=report,advance=advance})
@@ -558,6 +561,8 @@ script.on_init(function()
       and {mir="5.0.21007",observer="0.3.5"})
     or (script.active_mods.base=="2.0.77" and observer_version=="0.3.6" and {mir="5.0.20008",observer="0.3.6"})
     or (script.active_mods.base=="2.1.23" and observer_version=="0.3.6" and {mir="5.0.21008",observer="0.3.6"})
+    or (script.active_mods.base=="2.0.77" and observer_version=="0.3.7" and {mir="5.0.20009",observer="0.3.7"})
+    or (script.active_mods.base=="2.1.23" and observer_version=="0.3.7" and {mir="5.0.21009",observer="0.3.7"})
   if not expected or script.active_mods["more-infinite-research"]~=expected.mir
       or (not HELPER_FREE_INPUT and script.active_mods[historical.fixture]~=expected.fixture) then fail("imported native target differs") end
   local allowed={base=script.active_mods.base,["more-infinite-research"]=expected.mir,
