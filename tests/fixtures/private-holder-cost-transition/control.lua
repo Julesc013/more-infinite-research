@@ -133,26 +133,11 @@ script.on_event(defines.events.on_tick,function()
   if state.phase == "source-pending" and game.tick > state.entry_tick then
     local before = audit(1,false)
     game.difficulty_settings.technology_price_multiplier = 4
-    -- This is source preparation on the unmodified published package. Engine
-    -- price changes may re-express unfinished work as a different fraction.
-    -- Record that source baseline BEFORE any candidate runs; never permit a
-    -- successor to adjust it. Every non-progress field must remain identical.
-    local prepared = {}
-    for i,name in ipairs(c.forces) do
-      prepared[i] = snapshot(assert(game.forces[name]))
-      local normalized = c.copy(prepared[i])
-      local prior = before.states[i]
-      local function fraction(previous,current)
-        assert(type(current)=="number" and current==current and current>=0 and current<=1,"invalid source fraction")
-        assert(previous==0 and current==0 or previous>0 and current>0 and current<=previous+1e-8,
-          "increasing source price cannot reset or increase unfinished work")
-      end
-      fraction(prior.progress,normalized.progress);normalized.progress=prior.progress
-      for _,key in ipairs({"main","owner","detached"}) do
-        fraction(prior[key].saved,normalized[key].saved);normalized[key].saved=prior[key].saved
-      end
-      c.same(prior,normalized,"source price preparation preserves earned levels, bonuses, availability and queue")
-    end
+    -- Independent unmodified5.0.8 source observation: price1->4 divides the
+    -- current fraction by4; detached saved fractions and all other state stay
+    -- identical. This is preparation, before the candidate is introduced.
+    local prepared = c.copy(before.states)
+    for _,expected in ipairs(prepared) do expected.progress = expected.progress / 4 end
     local observation = audit(4,false,prepared)
     report("source-price-change",{before=before,after=observation})
     state.phase,state.expected,state.multiplier = "source-ready",c.copy(observation.states),4
