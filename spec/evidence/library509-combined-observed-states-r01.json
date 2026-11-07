@@ -1,0 +1,295 @@
+{
+  "schema": 1,
+  "kind": "MIR509CombinedLibraryObservedStatesV1",
+  "verdict": "ACCEPT bounded observed layout/caption/input states; full Library remains open",
+  "candidate": {
+    "source": "1bd92e4d4d3e13b74799a26362072811925203f7",
+    "observed_controller_head": "528e4719d26264a18113fc50cf977f49e7de8c05",
+    "player_tree": "99143111b0c4e834e080902ec66a9c88a4069c1e",
+    "package": "more-infinite-research_5.0.21009.zip",
+    "bytes": 988888,
+    "sha256": "F1F8174F52184AD2964319F0E6332476D48DFF30ABC64AB80557350C9E1AEE33",
+    "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "engine_visible_version": "2.1.23"
+  },
+  "source_correspondence": {
+    "layout_commits": [
+      "3cc0c7292785edb58cc6668967fec6a2ae72f700",
+      "1bd92e4d4d3e13b74799a26362072811925203f7"
+    ],
+    "path": "source/presentation/library_layout.lua",
+    "both_git_blob": "93e16ecc1c5ef7c015dcb79bb4c3a979e2133ed2",
+    "caption_source_commit": "990591216b3e9d9c6daf12f24d5a68bec718d922",
+    "caption_correspondence": "Aero independent full package review 3574 reported equality; not independently re-established here."
+  },
+  "native_cases": [
+    {
+      "source_head": "528e4719d26264a18113fc50cf977f49e7de8c05",
+      "player_tree": "99143111b0c4e834e080902ec66a9c88a4069c1e",
+      "plan_sha256": "1C07396A4562503DDA3D9DCD792D6B694F4DBE551D16BA87E235F8BA80C8DBC7",
+      "status": "adverse",
+      "factorio_zero": true,
+      "original_library_restored": true,
+      "case": "en-r03",
+      "owner_sha256": "FF393EBC62A39EC71A6EE4689E7C9B314A08387A4142C6ABFA6BA9A3D8B18F0C",
+      "native_result": null,
+      "error": "[mir441-process-timeout]"
+    },
+    {
+      "source_head": "528e4719d26264a18113fc50cf977f49e7de8c05",
+      "player_tree": "99143111b0c4e834e080902ec66a9c88a4069c1e",
+      "plan_sha256": "7CB432452EF470CD9B061065784EB740A00D304222D24DCC59C7D1CD7EC9062B",
+      "status": "native-process-completed-ui-verdict-separate",
+      "factorio_zero": true,
+      "original_library_restored": true,
+      "case": "en-r04",
+      "owner_sha256": "EB8AD5B3B2F82666A92284D5624DAAF2B51C4F82692E2F629A57C52BAF162BAF",
+      "native_result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 735.974014,
+        "peak_working_set_bytes": 1295409152,
+        "peak_sampled_private_bytes": 2436702208,
+        "admission": {
+          "observed_at": "2026-11-07T06:58:08.0050167+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 14510505984,
+            "committed_bytes": 26918027264,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 104829599744,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 192650416128,
+            "total_bytes": 599395090432
+          }
+        }
+      }
+    },
+    {
+      "source_head": "528e4719d26264a18113fc50cf977f49e7de8c05",
+      "player_tree": "99143111b0c4e834e080902ec66a9c88a4069c1e",
+      "plan_sha256": "A1D6AC1B8445903C8DC76C94C38BAEB80C485EE2F3EE492109E95C68D54F49AB",
+      "status": "native-process-completed-ui-verdict-separate",
+      "factorio_zero": true,
+      "original_library_restored": true,
+      "case": "de-r04",
+      "owner_sha256": "65E8F5207816D6DF95C9CFF9889F2D0C128C36A54229A910C2E169C22D78EADB",
+      "native_result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 1139.890129,
+        "peak_working_set_bytes": 1542692864,
+        "peak_sampled_private_bytes": 2629705728,
+        "admission": {
+          "observed_at": "2026-11-07T07:15:35.1050478+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 15124410368,
+            "committed_bytes": 27035791360,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 104742739968,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 192291639296,
+            "total_bytes": 599395090432
+          }
+        }
+      }
+    }
+  ],
+  "observed": [
+    "Normal Research, Settings, Queue, Debug and return captures show a fixed title and tabs with content inside the frame.",
+    "Narrow Settings retains title and tabs, reflows four settings buttons into two rows and contains list and detail scroll regions. A long list item is visibly ellipsized.",
+    "Normal and narrow percentage show Bonus per level (%) 10; normal and narrow count show Inserter capacity bonus and Effect per level 4. Narrow count retains detail scroll position after selection; its detail heading is above the scrolled viewport.",
+    "Battery query shows focus and two matching rows; Worker robot battery selection is highlighted with matching detail. Returning to Settings shows Inserter capacity bonus selected with effect 4.",
+    "German normal Research and Settings and narrow Settings display fixed title and tab positions, contained content, and two-row button reflow. Narrow list truncates long labels with ellipses and the detail scroll area wraps long labels.",
+    "German percentage normal and narrow show Bonus pro Level (%) 10. Narrow count shows selected Kapazitätsbonus für Greifarme and Wirkung pro Level 4 at retained detail scroll position; heading is above the viewport. German closed capture shows the library closed."
+  ],
+  "adverse_and_limits": [
+    "EN r03 owner-result status adverse with [mir441-process-timeout]; this is not a full-session pass. It reports factorio_zero and original_library_restored.",
+    "EN r04 owner reports native-process-completed-ui-verdict-separate, exit code 0, timed_out false, completion_predicate_observed false, original_library_restored and factorio_zero. This is a shorter follow-up, not replacement of the adverse r03 result.",
+    "EN r04 six size clicks used existing pixel-state guards; correspondence receipt says locator bindings and post-capture hash display changed, with guards unchanged.",
+    "Supported desktop capture APIs previously timed out; capture-failures-r02.json retains these failures. The qualified native capture harness produced the inspected images.",
+    "Preinput refusals for wrong scratch root, old actor path to another worktree, stale capture and drag exceeding 80 were retained and corrected; do not erase or describe as product passes.",
+    "Only the specific displayed states are assessed; no claim of full input/export/personal-view restoration, multiplayer, performance, stable acceptance or reporter acceptance.",
+    "DE r04 owner reports native-process-completed-ui-verdict-separate, exit 0, timed_out false, completion_predicate_observed false, factorio_zero and original_library_restored. Protected mod-list and mod-settings before/after hashes match in that receipt.",
+    "Six German smaller-button actor receipts report input sent, native readback required, and no native-game observation; the guarded controller reports six completed inputs. The actual normal and narrow captures provide the bounded visual readback."
+  ],
+  "separate_content_issue": {
+    "tracking": "#1768",
+    "evidence": "en-r03/captures/worker-battery-selected/capture.png",
+    "finding": "The description says science packs are selected from active labs, inconsistent with MIR5 explicit bindings; separate from visual geometry verdict."
+  },
+  "input_actor": {
+    "path": "tools/Invoke-LibraryNativeInput.ps1",
+    "sha256": "8F55CAD7A03163E51F70B245A3320CFE5AFE4450A2FEE7D0569E08AB88F76096",
+    "safeguards": "Fresh capture lease, exact owned process/executable/start/foreground/client geometry, hit test and bounded pointer readback remain enforced; no synthetic Factorio events."
+  },
+  "independent_review": {
+    "sha256": "D09DC15010062D5B0384E1E52C9E91E96C42FF5D21B4B420724BF7113732FC0D",
+    "custody": "e59ec6e66e12711d0264fd49bc77e85371e515a7:projects/mir/runs/candidate509-delivery-r01/independent-gui-final-review.json",
+    "directly_inspected_pngs": 21
+  },
+  "custody": {
+    "originals": "e59ec6e66e12711d0264fd49bc77e85371e515a7:projects/mir/runs/candidate509-delivery-r01/",
+    "original_body_count": 576,
+    "gzip_sha256": "2F8BC4EED088A4B615D03E8D7BC7E8BDA1D4B770924E2CF026B30E8F45A70A89",
+    "decoded_sha256": "F93710AEA1E602933EE458CDF7B15459596A41DF5D3C29A85422D8617D281383",
+    "images": [
+      {
+        "path": "build/tmp/library509-combined-en-r03/captures/research-normal/capture.png",
+        "bytes": 4056078,
+        "sha256": "2EF50473294A63F8BD6810E646CD82B40ACA10DDED55AC4D089004DFDAF4F201",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-en-r03/captures/research-normal/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-en-r03/captures/settings-normal/capture.png",
+        "bytes": 3440699,
+        "sha256": "8728627194E76A12DC96178FE607FF9108F17565479D020BFD5786F2E134E13E",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-en-r03/captures/settings-normal/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-en-r03/captures/percentage-normal/capture.png",
+        "bytes": 3543312,
+        "sha256": "4D0F94D208732E013FE056E9CB9F4053F545394F369348F155506FB7FAE93313",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-en-r03/captures/percentage-normal/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-en-r03/captures/count-normal/capture.png",
+        "bytes": 4047979,
+        "sha256": "D79A8E378C65166B6C1F6ACF2A729B9D19211C8E0625E29ABFB7FB9C0BAF2069",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-en-r03/captures/count-normal/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-en-r03/captures/queue-normal/capture.png",
+        "bytes": 3866907,
+        "sha256": "C9F90E8FA2034027800629AEBFFD23368C9B2BD61A05B49F6E11FA02C83A7C57",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-en-r03/captures/queue-normal/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-en-r03/captures/debug-normal-settled/capture.png",
+        "bytes": 3696105,
+        "sha256": "1795C3BE1A97D998119DB9B81525BFFBAAFBF57626285B38F94504F1941BB836",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-en-r03/captures/debug-normal-settled/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-en-r03/captures/research-return/capture.png",
+        "bytes": 4240419,
+        "sha256": "F1EF262614E777701877811A57B8945B1BF2D5638A40E06325471B7493A4FA9E",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-en-r03/captures/research-return/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-en-r03/captures/battery-query/capture.png",
+        "bytes": 4119534,
+        "sha256": "854797A18B0751E8A7377EAC6B7B7E8BF171C20F90DB0DF4FBE94F3DF7334DC7",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-en-r03/captures/battery-query/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-en-r03/captures/worker-battery-selected/capture.png",
+        "bytes": 2913071,
+        "sha256": "91AAB28F547DE8FB706ADB15955B7A4FC8E01C3C997DEEC5582A8F7F823AB6A1",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-en-r03/captures/worker-battery-selected/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-en-r03/captures/settings-context/capture.png",
+        "bytes": 4037589,
+        "sha256": "373E4240B66CF83DB5FC950D061260886DD57C00087AB83C6DB6566A47EA4348",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-en-r03/captures/settings-context/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-en-r04/captures/short-percentage/capture.png",
+        "bytes": 2952820,
+        "sha256": "41299D7C71CE31A15A5594CE78F470F1304AC34A30A770AA239B167F11DF653F",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-en-r04/captures/short-percentage/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-en-r04/captures/narrow-settings/capture.png",
+        "bytes": 5796530,
+        "sha256": "52DB672E678F74BACA640169799F9DEDA637987B016D2E99B7B2C87F643A648B",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-en-r04/captures/narrow-settings/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-en-r04/captures/narrow-percentage/capture.png",
+        "bytes": 4774595,
+        "sha256": "C7EDBED522C8F06808904BE4760CD4E062CBAA87687FA5E20E8D7F6677EF32BB",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-en-r04/captures/narrow-percentage/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-en-r04/captures/narrow-count-selected/capture.png",
+        "bytes": 5764234,
+        "sha256": "F246E6CC2AEC7CBBC0B1A58F8E9E558100A40F551588BFB7D920722A4D008C55",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-en-r04/captures/narrow-count-selected/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-de-r04/captures/de-research/capture.png",
+        "bytes": 4127097,
+        "sha256": "CD128E5780EDA4753BBF5E962B993FFF9682474D1F204BE73B2A8254A066642E",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-de-r04/captures/de-research/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-de-r04/captures/normal-settings/capture.png",
+        "bytes": 3676054,
+        "sha256": "AADCEB7BE1763F8D088C9A857680B8DCD34D6D5FCF53D2FCFFFA744381C9E7A8",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-de-r04/captures/normal-settings/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-de-r04/captures/de-percentage-normal/capture.png",
+        "bytes": 3903089,
+        "sha256": "F9948069097636DE05489C488FD56D650C59B13CFE2C562BEC8B95DDFAD2986B",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-de-r04/captures/de-percentage-normal/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-de-r04/captures/narrow-settings/capture.png",
+        "bytes": 5530354,
+        "sha256": "78A23D45380BB0F7806667CB539F582E1AB287A65F0D405A75877B8F085B983E",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-de-r04/captures/narrow-settings/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-de-r04/captures/de-percentage-narrow/capture.png",
+        "bytes": 5583225,
+        "sha256": "C324FFC6A0B34AF5F690DEC461E159D8F35BB30869A132447FD57FC32655CB6B",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-de-r04/captures/de-percentage-narrow/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-de-r04/captures/de-count-narrow/capture.png",
+        "bytes": 5613485,
+        "sha256": "8E7666825EC020CC32C676CEC7286B6110CA2F840803EDC0E046743ACD7CB396",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-de-r04/captures/de-count-narrow/capture.png"
+      },
+      {
+        "path": "build/tmp/library509-combined-de-r04/captures/de-library-closed/capture.png",
+        "bytes": 6058820,
+        "sha256": "69D11D0FDFA695D411FB929838C7AAAC8E7F54D0A6442EA72E7091E97BD92A7C",
+        "original": "D:/Projects/Factorio/more-infinite-research/build/tmp/library509-combined-de-r04/captures/de-library-closed/capture.png"
+      }
+    ],
+    "full_local_manifest_sha256": "4B0B5C8ED0D4D290C1E5A9EFCEA896625888651EBEB0D3E8EAA6BC6363913007",
+    "full_local_manifest_files": 597,
+    "full_local_manifest_bytes": 294073720,
+    "image_policy": "All21 reviewed original PNGs and full native cohorts are in two verified local custodies. Private Git retains original controller/owner/input/capture metadata and image hashes, not image bodies."
+  },
+  "exclusions": [
+    "Full Library restoration and every control",
+    "Saved-client/personal/import-export/Discovery Tree lifecycle",
+    "Performance",
+    "Stable qualification",
+    "Exact reporter save"
+  ]
+}
