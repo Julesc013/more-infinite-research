@@ -1,0 +1,145 @@
+{
+  "schema": 1,
+  "kind": "MIR509AffectedNativeQualificationV1",
+  "verdict": "ACCEPT final5.0.9 affected native cost and paid-gun scope; whole stable remains NOT READY",
+  "source": {
+    "commit": "1bd92e4d4d3e13b74799a26362072811925203f7",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21009",
+    "source_tree": "99143111b0c4e834e080902ec66a9c88a4069c1e",
+    "tree": "3d54a821e93a87a7dd97f6ffef8f0443731513fd"
+  },
+  "modern_packages": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\candidate509-r01\\more-infinite-research_5.0.20009.zip",
+      "bytes": 988460,
+      "sha256": "0C845293BA25DA32A614F8F0C8B55976FA7B7F5EEDC38648D3C5863869FB6F8F"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\candidate509-r01\\more-infinite-research_5.0.21009.zip",
+      "bytes": 988888,
+      "sha256": "F1F8174F52184AD2964319F0E6332476D48DFF30ABC64AB80557350C9E1AEE33"
+    }
+  ],
+  "fresh_and_first_add": [
+    {
+      "case": "candidate509-first-add-f210-r01",
+      "actual_MIR_version": "5.0.21009",
+      "map_multiplier": 4,
+      "eight_private_costs": 1,
+      "private_exemptions": true,
+      "public_cost": 240,
+      "public_exemption": false,
+      "native_exit_code": 0
+    },
+    {
+      "case": "candidate509-fresh-f210-r01",
+      "actual_MIR_version": "5.0.21009",
+      "map_multiplier": 4,
+      "eight_private_costs": 1,
+      "private_exemptions": true,
+      "public_cost": 240,
+      "public_exemption": false,
+      "native_exit_code": 0
+    },
+    {
+      "case": "candidate509-first-add-f200-r01",
+      "actual_MIR_version": "5.0.20009",
+      "map_multiplier": 4,
+      "eight_private_costs": 1,
+      "private_exemptions": true,
+      "public_cost": 240,
+      "public_exemption": false,
+      "native_exit_code": 0
+    },
+    {
+      "case": "candidate509-fresh-f200-r01",
+      "actual_MIR_version": "5.0.20009",
+      "map_multiplier": 4,
+      "eight_private_costs": 1,
+      "private_exemptions": true,
+      "public_cost": 240,
+      "public_exemption": false,
+      "native_exit_code": 0
+    }
+  ],
+  "paid_upgrade": {
+    "engine": "2.1.23",
+    "published_source_version": "5.0.21008",
+    "successor_version": "5.0.21009",
+    "fixture_version": "0.8.0",
+    "source_save": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\private-holder-cost-paid-r06\\published508-source\\write-data\\saves\\private-holder-cost-published508-ready.zip",
+      "exists": true,
+      "bytes": 713703,
+      "sha256": "714DAB09F9505B15D3C02EF8DEC168E95B91BF2C1C1FC488964172BC93141152"
+    },
+    "successor_save": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\candidate509-paid-r01\\final509-successor\\write-data\\saves\\private-holder-cost-successor-ready.zip",
+      "exists": true,
+      "bytes": 713695,
+      "sha256": "059AC4954F5E83B70A7567609923677059BE8FCCEB4AB0E8699FDF957A79DE96"
+    },
+    "forces": 3,
+    "nonzero_private_tesla_levels": [
+      2,
+      3
+    ],
+    "states": "Every prepared source field remains equal on successor entry, next tick, saved successor and both cold reloads: earned/foreign bonuses, availability, current/queue and detached work.",
+    "prior_real_lab_completions": 1,
+    "new_real_lab_completions": 0,
+    "endpoints": [
+      {
+        "label": "final509-successor",
+        "mode": "owned-server-save-completion",
+        "exit_code": -1,
+        "completion_predicate_observed": true
+      },
+      {
+        "label": "final509-cold-1",
+        "mode": "natural-cold-benchmark",
+        "exit_code": 0,
+        "completion_predicate_observed": false
+      },
+      {
+        "label": "final509-cold-2",
+        "mode": "natural-cold-benchmark",
+        "exit_code": 0,
+        "completion_predicate_observed": false
+      }
+    ]
+  },
+  "member_applicability": {
+    "qualified_private_source": "12f82f0e49207f5ee9f8d1491d00601b115a2395",
+    "source_player_tree": "99143111b0c4e834e080902ec66a9c88a4069c1e",
+    "four_cost_definition_runtime_modules_byte_identical": true,
+    "normalized_member_sets_equal": true,
+    "changed_members_each_modern_package": 54,
+    "changes": "Version metadata/changelog and separately reviewed compact Library captions/50 locale additions only. Earlier default/fractional cases retain their12f identities, not relabelled as final9 executions.",
+    "record_sha256": "CF30FB69B06215FB0B662928528CCB16C117BB09D2E7F06026C52C29D227DF13"
+  },
+  "private_originals": {
+    "repository": "Julesc013/scratchpad",
+    "commit": "dad59755c7f734146027968a95e4c10aa9e16d09",
+    "path": "projects/mir/runs/candidate509-final-freeze-r01/",
+    "body_count": 131,
+    "gzip_sha256": "68C0F8BB06CAF71FFF2B83F21CA0A80E61D0707381F8DB2A9D747CC2AC467049",
+    "decoded_sha256": "9F354DF14B51A7134DE1AA8C51FFC351F6FA6D9D5B414A93B34F5368D525E4D2",
+    "verdict_sha256": "9F4D548FE50720CFFE1D0D4361F7471E0A361253155B11C222AEC5AE03BE9168"
+  },
+  "independent_review": {
+    "model": "gpt-6.1-sol",
+    "effort": "high",
+    "decision": "ACCEPT affected final9 native scope",
+    "sha256": "0F3EB94FADFF736D2713DB30C8B6E988C27B59017D92686E805FB05A3B12BEAB"
+  },
+  "custody": "Original8 source and final9 successor hashes unchanged; every owned direct-library control/archive restored; no remaining Factorio; all raw outputs verified in primary and C preservation copies and actual remote131-body capsule.",
+  "limits": [
+    "Reporter original save/config remains unverified.",
+    "Paid gun rights on2.1.23 only; no earned legacy module/cannon or other historical/profile transition verdict invented.",
+    "No full Library, multiplayer, performance or stable acceptance.",
+    "Owned server-save stops are distinct from natural cold exits. Earlier private12f and adverse preparation results retain original identities."
+  ]
+}
