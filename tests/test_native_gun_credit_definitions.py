@@ -60,6 +60,7 @@ class NativeGunCreditDefinitionTests(unittest.TestCase):
             return {type="technology",name=name,
               icon="__base__/graphics/technology/automation-1.png",icon_size=256,
               hidden=true,enabled=false,visible_when_disabled=false,upgrade=true,
+              ignore_tech_cost_multiplier=true,
               level=1,max_level="infinite",order=order,
               effects={{type="gun-speed",ammo_category=category,modifier=modifier}},
               unit={count_formula="1",time=1,ingredients={{"authored-science",1}}}}

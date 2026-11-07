@@ -262,6 +262,7 @@ class LegacyCannonCreditTests(unittest.TestCase):
         self.assertEqual("mir-legacy-cannon-credit-rocket-shooting-speed", result["descriptor"]["id"])
         self.assertEqual(1, len(result["first"]))
         holder = result["second"][0]
+        self.assertIs(holder["ignore_tech_cost_multiplier"], True)
         self.assertEqual((True, False, False, "infinite", 1, 1),
                          (holder["hidden"], holder["enabled"], holder["visible_when_disabled"],
                           holder["max_level"], holder["unit"]["count"], holder["unit"]["time"]))

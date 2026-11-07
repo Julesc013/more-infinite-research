@@ -1,0 +1,192 @@
+{
+  "schema": 1,
+  "kind": "MIRPrivateCreditCostNativeQualificationV1",
+  "verdict": "ACCEPT bounded private correction at12f82; final5.0.9 package qualification remains separate.",
+  "product_source": "12f82f0e49207f5ee9f8d1491d00601b115a2395",
+  "fixture_source": "462d440c91c748fee2bd11a70f882cefa53e2aa0",
+  "engines": {
+    "f210": {
+      "version": "2.1.23",
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+    },
+    "f200": {
+      "version": "2.0.77",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    }
+  },
+  "first_add": [
+    {
+      "target": "f210",
+      "observed_cost_cases": [
+        {
+          "saved_multiplier": 1,
+          "private_holders": 8,
+          "all_effective_and_prototype_counts": 1,
+          "all_private_exemptions": true,
+          "public_count": 60,
+          "public_exemption": false
+        },
+        {
+          "saved_multiplier": 2,
+          "private_holders": 8,
+          "all_effective_and_prototype_counts": 1,
+          "all_private_exemptions": true,
+          "public_count": 120,
+          "public_exemption": false
+        },
+        {
+          "saved_multiplier": 4,
+          "private_holders": 8,
+          "all_effective_and_prototype_counts": 1,
+          "all_private_exemptions": true,
+          "public_count": 240,
+          "public_exemption": false
+        },
+        {
+          "saved_multiplier": 0.5,
+          "private_holders": 8,
+          "all_effective_and_prototype_counts": 1,
+          "all_private_exemptions": true,
+          "public_count": 30,
+          "public_exemption": false
+        }
+      ]
+    },
+    {
+      "target": "f200",
+      "observed_cost_cases": [
+        {
+          "saved_multiplier": 1,
+          "private_holders": 8,
+          "all_effective_and_prototype_counts": 1,
+          "all_private_exemptions": true,
+          "public_count": 60,
+          "public_exemption": false
+        },
+        {
+          "saved_multiplier": 2,
+          "private_holders": 8,
+          "all_effective_and_prototype_counts": 1,
+          "all_private_exemptions": true,
+          "public_count": 120,
+          "public_exemption": false
+        },
+        {
+          "saved_multiplier": 4,
+          "private_holders": 8,
+          "all_effective_and_prototype_counts": 1,
+          "all_private_exemptions": true,
+          "public_count": 240,
+          "public_exemption": false
+        },
+        {
+          "saved_multiplier": 0.5,
+          "private_holders": 8,
+          "all_effective_and_prototype_counts": 1,
+          "all_private_exemptions": true,
+          "public_count": 30,
+          "public_exemption": false
+        }
+      ]
+    }
+  ],
+  "fresh_creation": {
+    "both_engines": true,
+    "saved_multiplier": 4,
+    "private_holders": 8,
+    "all_private_counts": 1,
+    "public_count": 240,
+    "public_exempted": false
+  },
+  "paid_gun_state": {
+    "engine": "2.1.23",
+    "published_source_version": "5.0.21008",
+    "source_sha256": "714DAB09F9505B15D3C02EF8DEC168E95B91BF2C1C1FC488964172BC93141152",
+    "successor_sha256": "A7D67F7EB27E832F7B33DAB1CD9EB73BD4026A1A100D8B3E2E4312B287113B69",
+    "original_paid_save_sha256": "8751A847A92F4FB0E52843D79C59EB97437153DA7B6A88FA9F2ADD934F371EF0",
+    "forces": 3,
+    "nonzero_private_tesla_levels": [
+      2,
+      3
+    ],
+    "prior_real_lab_completions": 1,
+    "new_real_lab_completions": 0,
+    "retained": [
+      "earned electric/Tesla effects",
+      "foreign bonuses and disablement",
+      "current research and queue",
+      "detached partial work",
+      "source and successor save hashes"
+    ],
+    "source_preparation": "On unchanged published8, explicit disposable map price1->4 changes current fractions .19->.0475 and .38->.095; detached .27 and all other fields stay. This independent source baseline is frozen before candidate introduction.",
+    "native_legs": [
+      {
+        "label": "published508-source",
+        "mode": "owned-server-save-completion",
+        "exit_code": -1,
+        "completion_predicate_observed": true
+      },
+      {
+        "label": "published508-cold",
+        "mode": "natural-cold-benchmark",
+        "exit_code": 0,
+        "completion_predicate_observed": false
+      },
+      {
+        "label": "corrected-successor",
+        "mode": "owned-server-save-completion",
+        "exit_code": -1,
+        "completion_predicate_observed": true
+      },
+      {
+        "label": "corrected-cold-1",
+        "mode": "natural-cold-benchmark",
+        "exit_code": 0,
+        "completion_predicate_observed": false
+      },
+      {
+        "label": "corrected-cold-2",
+        "mode": "natural-cold-benchmark",
+        "exit_code": 0,
+        "completion_predicate_observed": false
+      }
+    ],
+    "source_to_successor_and_both_colds": "Every exact prepared source state field matches; internal unit costs become1/ignoretrue. Owned server-save stops are separate from natural cold exits."
+  },
+  "custody": {
+    "original_saves_unchanged": true,
+    "direct_library_controls_and_owned_archives_restored": true,
+    "factorio_zero": true,
+    "verified_primary_and_C_copies": true
+  },
+  "private_originals": {
+    "repository": "Julesc013/scratchpad",
+    "commit": "f5d0de0253813bbef614b0eccb3a347d1f524ff3",
+    "path": "projects/mir/runs/private-credit-cost-qualification-r01/",
+    "verdict_sha256": "31236CC75A95F90107C7F0E6FB6C3E668082071590F2E4E1F84C5CDFBC969DDF",
+    "body_count": 443,
+    "gzip_sha256": "9332617866798AF0C901E9A452AAA97A735D4CB5792B9C57390CD23715D43CB7",
+    "decoded_sha256": "8A2D2F68FCDFFE0F18E2FC7D1EBAED7094BD422C613B798E2C63D5FA10BFDF97"
+  },
+  "independent_review": {
+    "model": "gpt-6.1-sol",
+    "effort": "high",
+    "verdict": "ACCEPT bounded fixture/controller/native result",
+    "sha256": "7236B08A673366BB1E1B324A2244916D0C429F24797F06C2A2E89B6596BE98CC"
+  },
+  "adverse_attempts": [
+    "Paid r01 prelaunch bool/path variable collision.",
+    "r02 source-entry passed; server inherited auto_pause; stopped only exact owned PID/start/hash/config/save after correcting a DateTime JSON string parsing false refusal.",
+    "r03 same-tick pending fixture rejection; corrected explicit first-tick wait.",
+    "r04 source map-price change re-expresses current fractions; original same-percentage assumption rejected.",
+    "r05 all source-ready rights/cost checks passed, but server_save refused missing disposable saves directory. r06 prepares that directory and completes all legs."
+  ],
+  "limits": [
+    "No final5.0.9 package qualification or publication yet; exact source/member applicability must be reviewed.",
+    "No Driku exact save/modpack attribution or pass.",
+    "F210 actual nonzero paid electric/Tesla preservation only; earned legacy module/cannon, other historical/profile transitions and full stable remain separate.",
+    "No new native lab completion is claimed. The accepted original lab count1 is retained input evidence.",
+    "Owned server save-completion stops are not natural exits; three cold benchmark legs naturally exit0.",
+    "No GUI, multiplayer, performance or whole-product stable acceptance."
+  ]
+}

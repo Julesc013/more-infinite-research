@@ -1,0 +1,236 @@
+{
+  "schema": 1,
+  "kind": "MIR508GitHubPrereleaseDeliveryChainV1",
+  "status": "DELIVERED-qualified-GitHub-prerelease-not-stable",
+  "observed_on": "2026-11-07",
+  "release": {
+    "id": 437224420,
+    "url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.8",
+    "title": "MIR 5.0.8",
+    "tag": "v5.0.8",
+    "published_at": "2026-11-07T01:01:17Z",
+    "prerelease": true,
+    "immutable": false,
+    "make_latest": false,
+    "public_asset_count": 19
+  },
+  "source": {
+    "frozen_author": "50dc8bb828377431a231de7ebacabef4e98d2c1a",
+    "promotion_author": "45b85af95a263c658d6ef35544ecd9796cdf81e6",
+    "integrated_dev": "5d2df33b64dc3a03dd47668e760053e1597e2353",
+    "main": "492bbda6249e9b42b1e28ea1db113ac347bcd66b",
+    "whole_tree": "330c73cecff021c6a132dd53005d9bfae71667d4",
+    "player_tree": "27bf06293a4b2723e0b853551c63ecc5b21bf7d6",
+    "canonical_annotated_tag": "e37d7ff814fcae08041c36badfdba0559695fa85",
+    "inventory": "a104de3ce24fc0e8c771a8072af6b194fbd76a3826cb5937c4ee4a55d29d6a4e",
+    "inventory_file_sha256": "2013B2A5D342465EE044CA513CA5099337D7A7893ABCC1269827AD38FD8F8FB5",
+    "frozen_whole_tree": "e34ac7211c477ede87fa2dcceee1cc3eeba93cf0",
+    "frozen_to_main_changed_files": [
+      "docs/support.md"
+    ],
+    "frozen_to_main_patch_sha256": "07BC096C2E54283E7E425794C678A35F9EEBD0053C8809E9418C775C7AAA6F0E",
+    "main_and_released_dev_complete_tree_equality": true,
+    "frozen_and_main_player_tree_equality": true,
+    "equality_scope": "Released main/dev share330c73ce. Frozen50dc/e34 differs only by the independently reviewed support paragraph; all17 accepted ZIPs and player27bf remain exact."
+  },
+  "reviews": {
+    "content_package_and_bounded_native_applicability": "EE9ABA74F0C2CF7831B5D6B9C2B907287B1B7850605B6ECCF5EA66A2508E11BF",
+    "content_custody": "b9db85b04a2c70b8a71ab522f5cf00abc6c37eb5:projects/mir/runs/aero-candidate508-final-native-locale-packages-r02/",
+    "actual_finite": "0CDADE89C69EEB9BB7B9A82A68066D3DAA52A821F8FC03AAB2E14364BED31885",
+    "actual_short_ui": "D5CC24D03AA901347B842C55FE8F073DCB919D6F5138210C1D03825EFC0B7051",
+    "actual_input_export": "997A0440818248DD954E52A151AFD91BD5C441CBFDCC0648511252CC3B01B596",
+    "support_correspondence": "446FF4D8DFF93236E70CD57B72EA8A076444C1131E5E692F386504F9245BD714",
+    "support_custody": "e433b389547b39bdda4a9906d0bf16968a64dd52:projects/mir/runs/aero-candidate508-final-wording-correspondence-r01/",
+    "independent_original_bodies_verified": 31,
+    "actual_delivery": "324EE5C73B71DF508CAB3A6F7B34156DAA5DFDEEA03047ADF7EF77CCD295E785",
+    "actual_delivery_announcement": "https://github.com/Julesc013/scratchpad/issues/137#issuecomment-6700067774",
+    "actual_delivery_custody": {
+      "commit": "47462900d564a351fee74b3fa58fc97bd642197a",
+      "path": "projects/mir/runs/aero-candidate508-public-delivery-r01/",
+      "gzip_sha256": "639D61A8C445522461280EBAEDC73D047C85D2E0D587EEBD21F8BC2F2A6C8FEC",
+      "decoded_sha256": "4E6BE25D020A21FE90F88F912848091B6A279920B2311DDD0B6EE109325B63E9",
+      "original_bodies_verified": 5
+    },
+    "independent_publisher_review": {
+      "sha256": "1B91D9C53F855DB201449D131073C0AB9641792E660D378443174540144CA788",
+      "announcement": "https://github.com/Julesc013/scratchpad/issues/137#issuecomment-6700240130",
+      "scope": "Independent read of all119 publisher-original bodies,44 identity rows,31 Aero originals, exact controller/probe/CI/tag/19-public/21-local/8-prior-152-asset chain. Original review custody readback follows separately."
+    }
+  },
+  "required_checks": {
+    "all_four_exact_author_and_promotion_checks_pass": true,
+    "all_four_exact_integrated_main_and_dev_checks_pass": true,
+    "author_receipt_sha256": "C3B71C3D24352ABDFF1671FB7FF1516E873188A69D2E45B9F33E2197CF205693",
+    "final_text_receipt_sha256": "9AF0A15A8AC52F9F2A247A78C3F9A103CF8A4A5D8532E8B13A065689CEE40759",
+    "integrated_receipt_sha256": "03EF0ABEBEBFC11DE62E18F84D992CEAD012A7FC9038F78A63986F89A5399D76"
+  },
+  "immediate_publication_probes": {
+    "administration": "ready",
+    "authenticated_login": "Julesc013",
+    "administration_sha256": "DCE62898B72198681CBD020CA1BDA49B27772723124C3860FFCCC7650F6F174F",
+    "generated_at": "2026-11-07T12:01:10.7654529+11:00",
+    "distinct_immutability": {
+      "enabled": false,
+      "enforced_by_owner": false
+    },
+    "immutability_sha256": "E3EC8530EC17E43D07B727267E960BA41214137DA4A3FBE14CAB1FF71BA40EF4"
+  },
+  "delivery": {
+    "root_anonymous_files": 19,
+    "root_local_files": 21,
+    "aero_anonymous_files": 19,
+    "aero_local_files": 21,
+    "zip_members_crc_checked": 1568,
+    "notes_sha256": "1D959830A17BF8936C4EFDDD0FDE23BD042A6ABC9542B702BA0DE3FDA097D953",
+    "upload_text_sha256": "44A4FC082673ABC6D30B57140FFD21841C9AB1B29BBB0A4F6BEAFEC8BF0CE8A4",
+    "primary_directory": "dist/v5.0.8",
+    "assets": [
+      {
+        "name": "more-infinite-research_5.0.01308.zip",
+        "bytes": 664866,
+        "sha256": "6077adcbe38dd904ea230308bf063171f6b46252331a8c9e0446d5df5bc7b571",
+        "label": "MIR 5.0.8 for Factorio 0.13.20 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.01408.zip",
+        "bytes": 664870,
+        "sha256": "85e17c2e24f866f0d4f4e82d2b2b7d6599d106a4cbdb15d5aa9be81aed7fdd9e",
+        "label": "MIR 5.0.8 for Factorio 0.14.23 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.01508.zip",
+        "bytes": 664868,
+        "sha256": "7eeccdaefa6d3ac35fc84d9316c9dd9825c8bc846da50bbcfca09de5def6979c",
+        "label": "MIR 5.0.8 for Factorio 0.15.40 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.01608.zip",
+        "bytes": 664869,
+        "sha256": "a88f01328c5a0e28af6ccf492df446bf007ee9460476b0162acd5ca494df7996",
+        "label": "MIR 5.0.8 for Factorio 0.16.51 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.01708.zip",
+        "bytes": 664870,
+        "sha256": "1919a9030f6bc9181cc3d60a5337087b93e107f7a1f02e98bc05d996cef5ed9c",
+        "label": "MIR 5.0.8 for Factorio 0.17.79 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.01808.zip",
+        "bytes": 664869,
+        "sha256": "238158c04a5ca3e3eb9d3b546b40be483e7950bb4ecc51d6342308596c248f2e",
+        "label": "MIR 5.0.8 for Factorio 0.18.47 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.10008.zip",
+        "bytes": 664862,
+        "sha256": "5b40011b0b7219ce61564fe5f6617d1b48afb26ac044c1c1fdbf69c87cf4ab5c",
+        "label": "MIR 5.0.8 for Factorio 1.0.0 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.11008.zip",
+        "bytes": 665172,
+        "sha256": "14f273ba0a5f3e03de5cccce7751c8d95cc575ef059d5a66f3db743f35175a1d",
+        "label": "MIR 5.0.8 for Factorio 1.1.110 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.20008.zip",
+        "bytes": 986233,
+        "sha256": "f7660ca6f2e0a988db9e5f74b1d169d62b24a8c578209d55a59841d1e1fc9148",
+        "label": "MIR 5.0.8 for Factorio 2.0.77 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.21008.zip",
+        "bytes": 986661,
+        "sha256": "c0ff59c8da771dc43d1c804b10a533ab0edf4ed4b36cb7c28a56f61e5df7e9cb",
+        "label": "MIR 5.0.8 for Factorio 2.1.23 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.00608.zip",
+        "bytes": 138192,
+        "sha256": "220ca9889530b5fcd16290fc17270c790cdac4f93c5d895bb16c507cc16a49dd",
+        "label": "MIR 5.0.8 for Factorio 0.6.4 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.00708.zip",
+        "bytes": 138192,
+        "sha256": "dcc0f3694a60fd3a9670a399758e61a4a6ace462b3b356d0a15e7293b4f2329f",
+        "label": "MIR 5.0.8 for Factorio 0.7.5 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.00808.zip",
+        "bytes": 138190,
+        "sha256": "140dc271d0aa7b0f0a7a443b5eaf0d85e651a973aaccad7b5d4397bbcdd904c6",
+        "label": "MIR 5.0.8 for Factorio 0.8.8 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.00908.zip",
+        "bytes": 138192,
+        "sha256": "f0f31f7920e76e6ae6c8133a8c95d539500f53ddb94efea70f1ce216b8c78729",
+        "label": "MIR 5.0.8 for Factorio 0.9.8 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.01008.zip",
+        "bytes": 138192,
+        "sha256": "d82563e0301a4ebb23eab501eb3cba1f4bea93b73a261143c1ca85a0547c79a3",
+        "label": "MIR 5.0.8 for Factorio 0.10.12 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.01108.zip",
+        "bytes": 138194,
+        "sha256": "187951f922bad9560d7ff6c2e48d366a829b59be5b09bd5a918b20fe0db6cb6f",
+        "label": "MIR 5.0.8 for Factorio 0.11.22 (zip)"
+      },
+      {
+        "name": "more-infinite-research_5.0.01208.zip",
+        "bytes": 138195,
+        "sha256": "cb47f5373e5e9f451225e4d4e1814da7be15e8ac453acd9849d45f7762d92a88",
+        "label": "MIR 5.0.8 for Factorio 0.12.35 (zip)"
+      },
+      {
+        "name": "SHA256SUMS.txt",
+        "bytes": 1030,
+        "sha256": "6db6d16e9b5672cd624371e4309e8d7d01d9fc3f56f2aa3a90936c3d38f7db94",
+        "label": "SHA256SUMS.txt"
+      },
+      {
+        "name": "SHA256SUMS-early.txt",
+        "bytes": 721,
+        "sha256": "15f93abc248a458e307fba561e80776f770a280b980ee00f5449360ffc5e9557",
+        "label": "SHA256SUMS-early.txt"
+      }
+    ]
+  },
+  "previous_releases": {
+    "count": 8,
+    "assets": 152,
+    "status": "PASS-prior-eight-beta-bodies-tags-and152-assets-unchanged",
+    "after_receipt_sha256": "8CAE4D1B7A43CF3E2350343557F268693104E08771C15CBCAFB872D7C2617547"
+  },
+  "publisher_originals": {
+    "commit": "496512aff656e4a1a80de0182457ea4a33e138c4",
+    "original_commit": "469b98d304447c4c9486f46f265db11e7ee8911f",
+    "path": "projects/mir/runs/candidate508-delivery-r01",
+    "original_body_count": 119,
+    "gzip_sha256": "AC4EEA97807E06A2B413AA0DF95D463AEF3E597924C555C5EDB0C3779DD41E1E",
+    "decoded_sha256": "85AD64BB5EB9E215360761F7CBA04966457728A7F36FD2335C3AA872375041C6",
+    "all_remote_raw_bodies_verified": true
+  },
+  "preserved_adverse": [
+    "The private preparation first decoded one UTF-8 notes dash using cp1252. Its exact notes hash guard refused before tag/release creation; original payload/controller/probes remain. Explicit UTF-8 correction preserved the approved body and all19 assets.",
+    "Native Library r01 owner timeout and first wrong-checkout actor refusal remain separate adverse records; r02 alone is the normal-exit pass.",
+    "The first finite context capture UDP-bind failure remains; corrected r02 source/current read-only captures pass."
+  ],
+  "maturity": {
+    "beta_delivery_complete": true,
+    "stable_acceptance": false,
+    "mod_portal_upload": false,
+    "next_changed_public_source_version": "5.0.9"
+  },
+  "remaining": [
+    "Library Settings outer-page content-fit finding, remaining narrow/localized and saved-view/client/personal/export/discovery/lifecycle acceptance.",
+    "Historical preservation and supported-profile/API/state reconciliation under the existing nine4.7.3 routes, seven older groups and four forward journeys.",
+    "Whole-product startup/load/large-factory/spike/useful-work/backlog/Library/retained-memory acceptance; diagnostic and historical observations retain their identities.",
+    "Complete564-name reporter reconstruction and Real Industrial Chemistry runtime/save remain unverified."
+  ]
+}

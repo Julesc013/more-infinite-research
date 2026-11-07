@@ -101,6 +101,7 @@ local function holder(name, category, modifier, science, direction)
     hidden = true,
     enabled = false,
     visible_when_disabled = false,
+    ignore_tech_cost_multiplier = true,
     upgrade = true,
     level = 1,
     max_level = "infinite",
