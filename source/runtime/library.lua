@@ -1727,9 +1727,16 @@ local function setting_catalogue()
       local accepted = settings_catalog.validate_value(name, imported[name])
       if accepted then source = "mirset1" end
     end
+    local field_caption = stream and SETTING_FIELD_CAPTIONS[spec.key]
+    if stream and spec.key == "effect_percent" then
+      -- Preserve the authored percentage/count distinction. Continuations
+      -- use the original generic label; their setting description has units.
+      field_caption = "setting-effect-per-level"
+        .. (not stream.native_continuation and spec.type == "double-setting" and "-percent" or "")
+    end
     group.fields[#group.fields + 1] = {
       name = name,
-      caption = stream and SETTING_FIELD_CAPTIONS[spec.key] and {"mir-browser." .. SETTING_FIELD_CAPTIONS[spec.key]}
+      caption = field_caption and {"mir-browser." .. field_caption}
         or (prototypes[name] and prototypes[name].localised_name) or name,
       description = prototypes[name] and prototypes[name].localised_description or nil,
       effective = effective[name], direct = direct, default = default, source = source,

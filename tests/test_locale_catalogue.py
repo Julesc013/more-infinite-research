@@ -339,6 +339,21 @@ STANDALONE_SETTING_KEYS = (
 
 
 class LocaleCatalogueTests(unittest.TestCase):
+    def test_library_effect_labels_restore_the_authored_fifty_language_projection(self) -> None:
+        # Published v4.7.3 mir-browser values, recovered unchanged. Keep the
+        # original unit distinction without inventing new translations.
+        keys = ("setting-effect-per-level", "setting-effect-per-level-percent")
+        projection = {}
+        for path in sorted(LOCALE_ROOT.glob("*/mir-library.cfg")):
+            browser = parse_cfg(path)["mir-browser"]
+            projection[path.parent.name] = {key: browser[key] for key in keys}
+        self.assertEqual(len(projection), 50)
+        encoded = json.dumps(projection, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        self.assertEqual(hashlib.sha256(encoded).hexdigest(),
+                         "46438ef947849f25a88e809902e1bc101b07a7c86d16a5f639b400633d086e4c")
+        self.assertEqual(projection["en"], {keys[0]: "Effect per level", keys[1]: "Bonus per level (%)"})
+        self.assertEqual(projection["de"], {keys[0]: "Wirkung pro Level", keys[1]: "Bonus pro Level (%)"})
+
     def test_current_settings_have_english_names_descriptions_and_arguments(self) -> None:
         english = parse_cfg(LOCALE_ROOT / "en" / "more-infinite-research.cfg")
         for section in ("mod-setting-name", "mod-setting-description"):
