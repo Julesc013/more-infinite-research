@@ -18709,7 +18709,19 @@
             ],
             "source_thread_url_request_links_only": [
               "SCI-UNLOCK-01"
-            ]
+            ],
+            "component_reconciliation": {
+              "available_component": "Source correction and independent captured-upstream host pipeline; not a new native verdict.",
+              "implementation": [
+                "source/compatibility/ironclad.lua"
+              ],
+              "evidence": [
+                "tests/test_ironclad_f210_pipeline.py::test_rebalanced_native_mortar_bonus_keeps_mir_anchor",
+                "tests/fixtures/ironclad-f210-upstream-context.json.gz"
+              ],
+              "remaining_executable_check": "Review consumed-input applicability of any retained actual Ironclad component. If uncovered, use the existing small Base/Space Age Ironclad profiles with exact archives to observe accepted native mortar tuning, one MIR increment and unchanged foreign categories. Host output alone does not prove the earned native effect.",
+              "final_candidate_native_verdict": "not-established-by-this-reconciliation"
+            }
           },
           {
             "source_item_id": "T02-I04",
@@ -18728,7 +18740,20 @@
             "disposition": "existing-behavior-obligation-routed-not-newly-qualified",
             "source_thread_url_request_links_only": [
               "SCI-UNLOCK-01"
-            ]
+            ],
+            "component_reconciliation": {
+              "available_component": "K2SO binding and patch-line admission controls are implemented; the synthetic science-upgrade native result is a separate boundary.",
+              "implementation": [
+                "source/compatibility/science_bindings.lua",
+                "source/research/science.lua"
+              ],
+              "evidence": [
+                "tests/test_science.py",
+                "spec/evidence/candidate505-science-upgrade-native-r01.json"
+              ],
+              "remaining_executable_check": "Bind the actual selected K2SO patch revisions and startup settings to captured phase/science expectations, then review or execute the affected final science/lab/paid-state transition. Do not reuse the unrelated synthetic disabled-science result as proof of every K2SO patch tuple or collapse K2 and K2SO.",
+              "final_candidate_native_verdict": "not-established-by-this-reconciliation"
+            }
           },
           {
             "source_item_id": "T02-I05",
@@ -18755,7 +18780,21 @@
             ],
             "source_thread_url_request_links_only": [
               "SCI-UNLOCK-01"
-            ]
+            ],
+            "component_reconciliation": {
+              "available_component": "Foreign-created continuation publication, creation-history ownership and cap admission have focused host controls.",
+              "implementation": [
+                "source/research/native_owners.lua",
+                "source/runtime/catalogue.lua"
+              ],
+              "evidence": [
+                "tests/test_continuation_ownership.py::test_each_existing_foreign_infinite_owner_is_preserved",
+                "tests/test_continuation_ownership.py::test_foreign_creator_remains_external_after_later_modifications",
+                "tests/test_continuation_ownership.py::test_all_six_foreign_creators_stay_out_of_real_cap_admission"
+              ],
+              "remaining_executable_check": "Locate and review a retained actual foreign-created braking continuation component before rerunning it. If its consumed inputs do not cover the candidate, verify preserved paid braking effects, subsequent one-owner research and cap/settings behavior in a reduced native profile. Later modifiers alone do not establish foreign creation.",
+              "final_candidate_native_verdict": "not-established-by-this-reconciliation"
+            }
           },
           {
             "source_item_id": "T02-I06",
@@ -18782,7 +18821,21 @@
             ],
             "source_thread_url_request_links_only": [
               "SCI-UNLOCK-01"
-            ]
+            ],
+            "component_reconciliation": {
+              "available_component": "The reported collision is reproduced and corrected in the named reduced Muria/default/configured native components; the full reporter installation remains unverified.",
+              "implementation": [
+                "source/research/native_owners.lua",
+                "source/runtime/catalogue.lua"
+              ],
+              "evidence": [
+                "spec/evidence/muria-discovery-science-native-chain-r01.json",
+                "spec/evidence/muria-provider-refusal-native-chain-r01.json",
+                "tests/test_continuation_ownership.py::test_muria_exact_finite_chain_selects_nine_and_preserves_default_effects"
+              ],
+              "remaining_executable_check": "Preserve original551/F563/2.1.23 reduced Muria1.9.5/DiscoveryTree1.0.12/ScienceSpread0.9.2 identities: real lab-earned8/9, partial10 and two colds per default/configured case. Review current consumed publication/ownership/cap/runtime inputs before reuse; guarded provider changes are not seamless provider replacement. No reconstruction of unknown564-mod versions is invented.",
+              "final_candidate_native_verdict": "not-established-by-this-reconciliation"
+            }
           },
           {
             "source_item_id": "T02-I07",
@@ -18828,7 +18881,19 @@
             ],
             "source_thread_url_request_links_only": [
               "SCI-UNLOCK-01"
-            ]
+            ],
+            "component_reconciliation": {
+              "available_component": "Accepted reduced published502-to503 K2SO+Crushing paid-state, actual glass research/save/two-cold components exist; this is stronger than startup alone.",
+              "implementation": [
+                "source/compatibility/material_catalogue.lua"
+              ],
+              "evidence": [
+                "spec/evidence/candidate503-native-upgrades-r01.json",
+                "tests/test_material_catalogue.py::test_crushing_industry_keeps_paid_glass_and_adds_the_replacement_route"
+              ],
+              "remaining_executable_check": "Reuse only after current consumed-input review of the named63997d43/FACF94F7 component: two paid levels, glass42percent, silicon27percent, actual final glass level and cold persistence. Original foreign direct-crafting offsets .125/.25 were already zero before MIR configuration; preserve that unresolved upstream/configuration-order boundary, not a claim that all original flags/offsets survived. Full reporter profile and physical manufacturing remain separate.",
+              "final_candidate_native_verdict": "not-established-by-this-reconciliation"
+            }
           },
           {
             "source_item_id": "T02-I09",
