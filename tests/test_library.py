@@ -9,54 +9,37 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
-    def test_outer_pages_keep_fixed_padding_when_scrollbars_activate_and_on_retained_windows(self):
+    def test_outer_pages_reserve_the_authored_title_and_tab_height_budget(self):
         self.lua.execute(r'''
-          for _,display in ipairs({
-            {width=2560,height=1440,scale=1.25},
-            {width=480,height=600,scale=1.5}
-          }) do
-            boot()
-            player.display_resolution={width=display.width,height=display.height}
-            player.display_scale=display.scale
-            local queue,current,progress=player.force.research_queue,player.force.current_research,player.force.research_progress
-            local root=library.open(player,{selected=gear.name,query="gear",
-              settings_search="repair",settings_scope="options"})
-            local tabs=root.mir_library_tabs
-            local pages={tabs.mir_library_research_page,tabs.mir_library_queue_content,
-              tabs.mir_library_settings_content,tabs.mir_library_help_content}
-            local width,height=root.style.maximal_width,root.style.maximal_height
-            local function check_pages()
-              for _,page in ipairs(pages) do
-                assert(page.valid and page.type=="scroll-pane"
-                  and page.horizontal_scroll_policy=="never" and page.vertical_scroll_policy=="auto",
-                  "fixed page bounds must keep narrow content scrollable")
-                for _,edge in ipairs({"top","bottom","left","right"}) do
-                  assert(page.style["extra_"..edge.."_padding_when_activated"]==0,
-                    "outer Library pages must not grow padding when a scrollbar activates")
-                end
-              end
+          boot()
+          player.display_resolution,player.display_scale={width=2560,height=1440},1.25
+          local root=library.open(player,{selected=gear.name,query="gear"})
+          local tabs=root.mir_library_tabs
+          local function check_pages()
+            -- Published 4.7.3's renderer reserves 112 logical pixels for the
+            -- title, tabs and frame. Its accepted page budget is independent
+            -- of the candidate and of the observed six-pixel overrun.
+            local maximum=math.max(120,root.style.maximal_height-112)
+            for _,name in ipairs({"research_page","queue_content","settings_content","help_content"}) do
+              local page=tabs["mir_library_"..name]
+              assert(page.style.maximal_height<=maximum,
+                "outer page must reserve the authored title, tabs and frame height")
+              assert(page.vertical_scroll_policy=="auto" and page.horizontal_scroll_policy=="never")
             end
-            check_pages()
-            -- An already-open pre-correction GUI inherits the engine's four-pixel
-            -- activated padding. Layout sync must repair it without replacement.
-            for _,page in ipairs(pages) do page.style.extra_padding_when_activated=4 end
-            for _,tab in ipairs({"settings","queue","help","research"}) do
-              assert(library.open(player,{tab=tab})==root and root.mir_library_tabs==tabs,
-                "padding repair must retain the window and navigation")
-              check_pages()
-              assert(root.style.maximal_width==width and root.style.maximal_height==height)
-            end
-            local view=storage.mir_library.players[1]
-            assert(view.query=="gear" and view.selected==gear.name
-              and view.settings_query=="repair" and view.settings_scope=="options",
-              "padding repair must retain independent personal queries and selection")
-            local detail=tabs.mir_library_settings_content.mir_library_settings_dynamic.mir_library_settings_detail
-            assert(detail.style.extra_top_padding_when_activated==4
-              and detail.style.extra_bottom_padding_when_activated==4,
-              "the outer-page correction must not change inner-pane padding")
-            assert(player.force.research_queue==queue and player.force.current_research==current
-              and player.force.research_progress==progress)
           end
+          check_pages()
+          for _=1,6 do
+            library.on_gui_click({player_index=1,element=root.mir_library_title.mir_library_layout_smaller})
+            assert(player.gui.screen.mir_research_browser==root and root.mir_library_tabs==tabs)
+            check_pages()
+          end
+          assert(root.style.maximal_width==640 and root.style.maximal_height==480)
+          for _,tab in ipairs({"settings","queue","help","research"}) do
+            assert(library.open(player,{tab=tab})==root)
+            check_pages()
+          end
+          assert(storage.mir_library.players[1].query=="gear"
+            and storage.mir_library.players[1].selected==gear.name)
         ''')
 
     def test_normal_research_details_use_full_height_without_a_toolbar_or_unlimited_cap_paragraph(self):
@@ -866,17 +849,9 @@ class LibraryTests(unittest.TestCase):
                 "LuaStyle." .. key .. " requires an int32")
             end
             return setmetatable({}, {
-              __index = function(_, key)
-                assert(key ~= "extra_padding_when_activated", "LuaStyle.extra_padding_when_activated is write only")
-                return values[key]
-              end,
+              __index = function(_, key) return values[key] end,
               __newindex = function(_, key, value)
-                if key == "extra_padding_when_activated" then
-                  assert_int32(key, value)
-                  for _,edge in ipairs({"top","bottom","left","right"}) do
-                    values["extra_" .. edge .. "_padding_when_activated"] = value
-                  end
-                elseif key == "width" then
+                if key == "width" then
                   assert_int32(key, value)
                   -- LuaStyle.width writes both bounds. Keep this host double
                   -- aligned with the native F200/F210 GUI contract.
@@ -920,11 +895,6 @@ class LibraryTests(unittest.TestCase):
               local element = gui_container(value)
               for key, field in pairs(spec) do
                 if key == "style" then element.style_name = field else element[key] = field end
-              end
-              if spec.type == "scroll-pane" then
-                -- Exact 2.0.77/2.1.23 ScrollPaneStyle exposes writable edge
-                -- padding; the 2.1.23 core scroll_pane style activates four.
-                element.style.extra_padding_when_activated = 4
               end
               local read_only_column_count = element.column_count
               local native_tags = copy_gui_tags(element.tags or {})

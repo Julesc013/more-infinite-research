@@ -2260,9 +2260,6 @@ local function sync_frame_layout(player, view, frame)
       if valid(page) and page.style then
         page.style.width, page.style.maximal_width = content_width, content_width
         page.style.height, page.style.maximal_height = page_height, page_height
-        -- Scrollbar activation must not change a fixed page's padding.
-        -- Apply on sync so an already-open page receives the correction too.
-        page.style.extra_padding_when_activated = 0
       end
     end
     local body = tab_content(frame, "research")

@@ -36,7 +36,9 @@ end
 
 -- Every selected tab occupies the same viewport below the fixed navigation.
 function M.tab_content_height(frame_height)
-  return math.max(120, frame_height - 100)
+  -- Preserve the published MIR4 page budget for title, tabs and frame chrome.
+  -- The viewport excludes that chrome even when a page needs scrolling.
+  return math.max(120, frame_height - 112)
 end
 
 function M.content_height(frame_height, pairs_per_row)
