@@ -5,7 +5,7 @@ applies_to: "MIR players and upgrades"
 audience: player
 doc_type: guide
 owner: mir-maintainers
-last_reviewed: 2026-11-05
+last_reviewed: 2026-11-07
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -168,7 +168,7 @@ source_of_truth_for:
 
 - When another mod already provides an infinite native research chain, MIR preserves that research. The Library explains when MIR's settings do not control it. On Factorio 2.1, Muria keeps its finite weapon-speed levels 7 and 8; MIR adds infinite research from level 9.
 
-- Development builds are testing the restored research-speed level-8 continuation after another mod's finite level 7. This is not in 5.0.7. Existing saves need sufficient evidence of their earlier research owner; adding, removing or switching the provider can be refused. The first eligible older-save upgrade keeps other mods and startup settings unchanged, then saves before further changes. Some older formats lack the required history and remain unverified; retain the original save and matching mods.
+- MIR 5.0.8 restores research-speed level 8 after another mod's finite level 7 in the tested Factorio 2.1.23 setup. For the first eligible older-save upgrade, keep the same non-MIR mods, their versions and startup settings; inspect the result, save and reload before making later changes. MIR stops with recovery guidance if it cannot identify the earlier research owner safely; restore the original save and matching selection if that happens. Older histories without the required ownership record, including unqualified Factorio 2.0 cases, remain refused or unverified.
 
 - Adding or removing Muria on a save that already uses MIR is refused because those changes replace different earned weapon-research identities. Keep the original save and restore its previous mod selection. Starting together, or installing MIR for the first time alongside Muria, is a different route; use the release notes for its tested scope.
 
