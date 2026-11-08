@@ -9175,6 +9175,22 @@
               "spec/evidence/f200-positive-cap-qualified-chain.json",
               "spec/evidence/f200-published-science-control-chain.json"
             ],
+            "provenance_actions": [
+              {
+                "action": "preserve-exact-c93-package-provenance",
+                "record": "spec/evidence/cap-preservation-provenance-aero-r01.json",
+                "meaning": "The one recovered C93 F200 successor archive exactly matches its original 377942-byte, 177-member receipt, while the selected C93-to-published510 member boundaries remain explicit."
+              },
+              {
+                "action": "retain-affected-boundary-selection",
+                "meaning": "Changed member bytes are not a runtime-equivalence verdict; retain the original consumed-input review and execute only a demonstrated affected setting, configuration, or removal/readdition boundary."
+              },
+              {
+                "action": "preserve-storage4-prepublication-absence-inference",
+                "record": "spec/evidence/cap-preservation-provenance-aero-r01.json",
+                "meaning": "The exact successful C93 Base gear-case fixture logically establishes storage4 absence before C93 Generator publication; it carries only to the same current four-mod Base preselection closure and is not a retained raw dump or current native verdict."
+              }
+            ],
             "remaining_executable_check": "Review consumed inputs of the original gear/worker native chains against the frozen successor; execute only affected setting/configuration/removal-readdition boundaries.",
             "owner": {
               "reconciliation": "Aero",
@@ -9232,6 +9248,17 @@
             ],
             "original_evidence": [
               "spec/inventory/migration-origins.json"
+            ],
+            "provenance_actions": [
+              {
+                "action": "retire-private-v2-reconstruction-from-indispensable-public-case-list",
+                "record": "spec/evidence/cap-preservation-provenance-aero-r01.json",
+                "meaning": "The historical V2 predecessor was a pinned private reconstructed input, not a public supported producer; retain its historical identity without requesting an authentic public V2 native route."
+              },
+              {
+                "action": "retain-public-owner-and-visibility-boundaries",
+                "meaning": "Keep the separate public policy-v1 and policy-v3 routes, visibility-only fallback, ownership/progress controls, original native scopes, and the old F200 V2 exclusion."
+              }
             ],
             "remaining_executable_check": "Match each relevant schema/owner state to an existing selected migration route by consumed state, or name its missing protected input. Use one affected route for a genuinely uncovered contract, not every patch.",
             "owner": {

@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "kind": "MIR5CapPreservationProvenanceAeroR01",
+  "status": "read-only provenance reconciliation; not native qualification",
+  "scope": "One recovered F200 gear-cap successor archive and one historical private-V2 producer classification. This record preserves original native execution identities and does not create a source, package, CI, or release dependency.",
+  "c93_recovery": {
+    "historical_receipt": {
+      "chain": "spec/evidence/f200-positive-cap-qualified-chain.json",
+      "receipt": "spec/evidence/f200-legacy-gear-qualified-upgrade-native.json.gz",
+      "receipt_uncompressed_sha256": "31752612BBA2202D542CF3EA54B5AD8665BC3A247F49507F13ACD4B12797244B",
+      "co_recorded_source_commit": "bb602332f6526920b0c455718c9210ae08722f15",
+      "target": "f200",
+      "distribution_version": "5.0.20000"
+    },
+    "reconstruction": {
+      "source_commit": "bb602332f6526920b0c455718c9210ae08722f15",
+      "source_tree": "b9f5b4b4586351c507a22bf8cdea46ad9ca537b7",
+      "source_root": "source/mir5",
+      "packager": {
+        "path": "tools/mir5/package.py",
+        "git_blob": "e8a4ea91f38cf0fbdbc7ce64ffb85c47005d5558"
+      },
+      "edition_record": {
+        "path": "targets/mir5/editions.json",
+        "git_blob": "144f533e18890238fbae600e87160557896c2545",
+        "sha256": "B814348EE95C09DCAB89957DD3ACE3EDD461AF1104ECBB0589453BA018A8EB04"
+      },
+      "archive": {
+        "filename": "more-infinite-research_5.0.20000.zip",
+        "sha256": "C93B3CF3DD904AFBAD3555EFBC6F858D86C9B54100B866D0B2FB03E68D2F6ED8",
+        "bytes": 377942,
+        "members": 177,
+        "receipt_sha256_and_bytes_match": true
+      },
+      "candidate_record": {
+        "sha256": "C037088CC0DA03357CFAF4039DD27E07A277F849799C53987C1D9F49F741548B",
+        "member_map_matches_archive": true
+      },
+      "recovery_summary_sha256": "69A871879D2D34029C16D3DB6FC73BF7B5A20165468032DB3917BA9821F1F445",
+      "attempts": 1
+    },
+    "published_510_member_boundaries": {
+      "commit": "958e34dd2701418c71f74ae094c26ff7cd467e6b",
+      "source_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+      "player_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+      "source_and_player_members_equal": true,
+      "members": [
+        {"path": "runtime/legacy_caps.lua", "c93_sha256": "0E8B1217099CB0ED0039EE5A43A44818D96A7FA2CBD7332FC5C6EA6BEC539EF7", "c93_bytes": 15115, "published510_git_blob": "b77321635721e5b81152cf407cf0abef273997fa", "published510_sha256": "C13466CF0416461F298217D897D060BA1AE916A571A51CA8A663371A3747EA18", "published510_bytes": 23297, "relation": "changed"},
+        {"path": "runtime/caps.lua", "c93_sha256": "1E9E70ED09E9B1B1952DA8D8B949D5F5899D51361B831E4CFB069C7B49544D99", "c93_bytes": 7398, "published510_git_blob": "9d1b3efae685f37d1771ff35b9b4c22a997b79d6", "published510_sha256": "A50E7D56082E8454FA40FA0DB0CD7DA33B5441FAA7A39AABAD9438A77E5A3C52", "published510_bytes": 12624, "relation": "changed"},
+        {"path": "runtime/lifecycle.lua", "c93_sha256": "2B914222560A61CBC54A61D2567858874F83C943CB9BB06F04C4EAA1D8406C31", "c93_bytes": 22053, "published510_git_blob": "c38ab03888ef0f53f8d800a401da1ae03a3d2e25", "published510_sha256": "E9ABE68A1032B314FB425D36ED58A7CA917A634FCC920A812942A5C59267BBC6", "published510_bytes": 36705, "relation": "changed"},
+        {"path": "runtime/bootstrap.lua", "c93_sha256": "A398020672C3395066D63DBB20AAA3C5A4C51EDAF976FDA1D490494FDB6F3861", "c93_bytes": 23114, "published510_git_blob": "70d41578bb940cf9b3d71fa5791e256e9e9b6f94", "published510_sha256": "5FA06DB840E7525F09CF64FC2FC29EF70842B21CD48F8847FF4AB32932AE3AD5", "published510_bytes": 35461, "relation": "changed"},
+        {"path": "runtime/configuration.lua", "c93_sha256": "21C832FF2C234C178D86DA51E24ABA34A51724A009E9E8299EBBF62F91EDAD5E", "c93_bytes": 347, "published510_git_blob": "8464ea23f0b9c7695295efd1996eb66dd4230d9a", "published510_sha256": "21C832FF2C234C178D86DA51E24ABA34A51724A009E9E8299EBBF62F91EDAD5E", "published510_bytes": 347, "relation": "identical"},
+        {"path": "research/catalogue.lua", "c93_sha256": "D1C521265DD3F36D4C7164ECC4BBA251D9CC1B5C64E0F7AFDB2E8CA130CEE3A1", "c93_bytes": 9347, "published510_git_blob": "7c3e8036ac11218823c0f1737b330be302e82b82", "published510_sha256": "ACF1BCB5BF8FAE4E5AA53E9931FE897BEE073951387231B0AA4856D86E1C7F2A", "published510_bytes": 17519, "relation": "changed"},
+        {"path": "research/modern.lua", "c93_sha256": "4B1F866DBD48BF93A4845215D862EE582951688C4983DC5EAD18C6D09F7C6CB4", "c93_bytes": 19148, "published510_git_blob": "c942084c03b6922e284b3730217be59e01b3b0c5", "published510_sha256": "E1C40E66DB0752C0821A752A97489AD9F7B30A3DB2244771138C92EF495ABAF1", "published510_bytes": 32775, "relation": "changed"},
+        {"path": "compatibility/modern_catalogue.lua", "c93_sha256": "F2BC157E5EEB650257BF478D569B9C5A197F8EB038BD1B78B4C8AE8654642E67", "c93_bytes": 28767, "published510_git_blob": "d483c1b54b114c07190eb6cd44860e8c02195657", "published510_sha256": "B0BB13FF52506D36030C59D157132A68D9EF046F87343E18B953B3E2DA5487E9", "published510_bytes": 72594, "relation": "changed"},
+        {"path": "runtime/catalogue.lua", "c93_member_absent": true, "published510_git_blob": "36ff5c360450f185afcbfc72b60cb95eb0908670", "published510_sha256": "E913D1940B684C7DA6F4F5BBAB3DAE0780BF8A1215F0DACA254793B15BE50467", "published510_bytes": 9253, "relation": "absent-from-c93"}
+      ]
+    },
+    "worker_robots_storage_4_prepublication_absence_inference": {
+      "classification": "logical inference from the exact recovered C93 source and original successful native receipt; not a retained raw dump",
+      "historical_identity": {
+        "source_commit": "bb602332f6526920b0c455718c9210ae08722f15",
+        "archive_sha256": "C93B3CF3DD904AFBAD3555EFBC6F858D86C9B54100B866D0B2FB03E68D2F6ED8",
+        "receipt": "spec/evidence/f200-legacy-gear-qualified-upgrade-native.json.gz",
+        "receipt_uncompressed_sha256": "31752612BBA2202D542CF3EA54B5AD8665BC3A247F49507F13ACD4B12797244B",
+        "case": "f200-positive-legacy-cap",
+        "profile": {
+          "path": "tests/mir5/profiles/f200-legacy-cap-mir5-2077.json",
+          "sha256": "E275646939E63A5E443F8B86702822212E9984B83FD7DAC0E60FE1D0437FE3E9"
+        },
+        "gear_case_fixture": {
+          "name": "mir-fixture-mir5-f200-legacy-cap",
+          "version": "0.2.0",
+          "sha256": "D525B92EFA7A199D15548E84A512A9DA71953D47C141F56549544927BD61F231"
+        },
+        "active_mods_observer": {
+          "name": "mir-fixture-mir5-active-mods-observer",
+          "version": "0.1.0",
+          "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+        },
+        "base": {"version": "2.0.77", "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"},
+        "native_status": "passed-private-native-fixture"
+      },
+      "c93_construction": {
+        "definition": "compatibility/modern_catalogue.lua lines 317-343 declares worker-robots-storage-4 in BASE.definitions",
+        "f200_base_selection": "select lines 487-525 copies BASE.definitions; Base has no Space Age or optional profile omission",
+        "disabled_stream_boundary": "research/modern.lua lines 94-108 creates the technology for every selected definition and only assigns enabled=false when the stream is disabled",
+        "strict_duplicate_preflight": "research/generator.lua lines 47-56 rejects raw.technology[prototype.name] before data_stage:extend(prototypes) at line 125"
+      },
+      "inferred_original_fact": "Because the receipt records the exact C93 archive and successful Base production/reload process, data.raw.technology['worker-robots-storage-4'] was absent immediately before C93 Generator publication in that exact native closure.",
+      "current_same_closure_carriage": {
+        "profile_bytes_equal_original": "tests/profiles/f200-legacy-cap-mir5-2077.json remains SHA256 E275646939E63A5E443F8B86702822212E9984B83FD7DAC0E60FE1D0437FE3E9",
+        "preselection_writes": "current data.lua emits only the Library shortcut and more-infinite-research-native-adoptions type mod-data; it emits no technology",
+        "inactive_optional_writers": "current data-final-fixes.lua recipe-schema branch requires Base2.1 plus named ATAN input, and prerequisite repair requires Angel or Astroponics input; neither is present in the exact four-mod Base closure",
+        "unchanged_or_nonwriting_inputs": "Base engine D3 and observer archive 723D are the original inputs; the observer body is byte-identical and logging-only. The gear-case fixture metadata is byte-identical; its later broadened assertion body, like its original body, only inspects/adjusts the gear technology and never writes worker-robots-storage-4.",
+        "current_reader_limit": "The current selector has an explicit existing-worker route only when raw.technology['worker-robots-storage-4'] is already present. The carried absent input does not select that route."
+      },
+      "does_not_prove": [
+        "A retained data.raw dump or absence after C93/current publication.",
+        "Absence under a foreign-provider, extra-mod, or other profile closure.",
+        "Current whole-package startup, native acceptance, or release qualification."
+      ]
+    }
+  },
+  "private_v2_producer_reconciliation": {
+    "historical_source": {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "historical_source_authority": {
+        "path": "tools/mir/application/package/HistoricalSourceAuthority.ps1",
+        "git_blob": "d47a36340ade85ffffbf31f92df7dd5f7085eb55",
+        "lines": "8-59",
+        "pinned_source_commit": "f7f9bab7bb1d1a63c98b5e21178fbaed418a3f6e",
+        "reconstructed_members": 337,
+        "sole_metadata_substitution": "info.json version 4.0.21000 to 4.2.21000",
+        "classification": "pinned-private-V2-source-input-only",
+        "publication_authorized": false
+      },
+      "historical_consumer": {
+        "path": "tests/runtime/Test-MIR42V2V3CapMigration.ps1",
+        "git_blob": "bf77bd0275507e58d34be26c9f0f69ec9cd367ea",
+        "lines": "167-177",
+        "role": "consumes the reconstructed predecessor before testing the V3 current candidate"
+      }
+    },
+    "public_archive_boundary": {
+      "migration_inventory": "spec/inventory/migration-origins.json",
+      "public_modern_archives_byte_info_controller_verified": 36,
+      "public_controller_cohorts": {"policy_v1_boolean": 4, "policy_v3_structured": 32},
+      "public_policy_v2_controller_observed": false,
+      "structured_archive_metadata": "spec/evidence/historical-structured-cap-archive-metadata.json",
+      "boolean_archive_metadata": "spec/evidence/historical-boolean-cap-archive-metadata.json"
+    },
+    "current_reader_boundary": {
+      "path": "source/runtime/legacy_caps.lua",
+      "git_blob": "b77321635721e5b81152cf407cf0abef273997fa",
+      "structured_reader": "import_for_force lines 312-388 admits only policy_version 3",
+      "ownership_boundary": "disable_matches line 277 refuses an enablement restoration right when migrated_from_policy_version is present; the fallback imports the separately proved visibility value only",
+      "boolean_reader": "import_boolean_for_force lines 391-477 remains the separate policy_version 1 reader"
+    },
+    "disposition": "Retire the literal private V2 reconstruction from the current indispensable-public-case list. Preserve the historical private-case identity, applicable ownership/visibility/progress controls, exact policy-v1 and policy-v3 evidence scopes, and the old F200 V2 exclusion; do not infer a public V2 native case or reopen a general cap campaign."
+  },
+  "limits": [
+    "The exact C93 reconstruction proves package and selected member provenance, not full runtime equivalence between C93 and published 5.0.10.",
+    "The recovered archive does not supply raw worker-robots-storage-4 data-stage proof or a replacement native result.",
+    "Original native receipts, source saves, engine/profile identities, failures, unqualified flags, and remaining current native gates retain their recorded identities and scope.",
+    "This record does not make the historical packager active, add a CI dependency, admit an archive, or establish inventory, native, stable, or release completion."
+  ],
+  "release_qualification": false
+}
