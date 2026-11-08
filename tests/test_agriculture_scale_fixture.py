@@ -53,6 +53,7 @@ F210_RUNTIME_API_CANDIDATES = (
     "C:/Program Files/Steam/steamapps/common/Factorio/doc-html/runtime-api.json",
 )
 ENGINE_SHA = "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+PUBLISHED_510_SOURCE = "958e34dd2701418c71f74ae094c26ff7cd467e6b"
 
 
 def plain(value):
@@ -1084,6 +1085,13 @@ foreach($row in $selected){
 }
 Assert-MIRLibraryDependencies -Selected $selected
 '''
+        published_mir_info_bytes = subprocess.check_output(
+            ["git", "show", f"{PUBLISHED_510_SOURCE}:source/info.json"], cwd=ROOT
+        )
+        published_mir_info = json.loads(published_mir_info_bytes.decode("utf-8"))
+        self.assertEqual(("more-infinite-research", "5.0.21010"),
+                         (published_mir_info["name"], published_mir_info["version"]))
+        current_mir_info = json.loads((ROOT / "source/info.json").read_text(encoding="utf-8"))
         for tier in (1, 32, 128):
             profile = json.loads((ROOT / f"tests/profiles/agriculture-active-matched-current-defaults-{tier}-f210-2123.json").read_text())
             fixture_paths = {
@@ -1093,18 +1101,28 @@ Assert-MIRLibraryDependencies -Selected $selected
                 "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults": FIXTURE / "arm-candidate-defaults/info-active-current-f210.json",
                 f"mir-fixture-mir5-agriculture-scale-matched-tier-{tier}": FIXTURE / f"matched-tier-{tier}/info.json",
                 "mir-fixture-mir5-agriculture-scale-active": FIXTURE / "active/info.json",
-                "more-infinite-research": ROOT / "source/info.json",
             }
             rows = []
             for row in profile["mods"]:
                 self.assertTrue(row["enabled"])
                 name = row["name"]
                 info = ({"name": name, "version": "2.1.23", "dependencies": official[name]}
-                        if name in official else json.loads(fixture_paths[name].read_text()))
+                        if name in official else published_mir_info if name == "more-infinite-research"
+                        else json.loads(fixture_paths[name].read_text(encoding="utf-8")))
                 rows.append({"name": name, "version": row["version"], "info": info})
             self.assertEqual(12, len(rows))
+            if current_mir_info["version"] != published_mir_info["version"]:
+                with self.subTest(tier=tier, base="current-source-version-mismatch"):
+                    selected = json.loads(json.dumps(rows))
+                    mir = next(row for row in selected if row["name"] == "more-infinite-research")
+                    mir["info"] = current_mir_info
+                    result = subprocess.run(["pwsh", "-NoProfile", "-NonInteractive", "-Command", script],
+                        env=dict(os.environ, MIR_DEPENDENCY_CHECKER=str(ROOT / "tools/lib/compatibility/LibraryActivation.ps1"),
+                                 MIR_SELECTED=json.dumps(selected)), capture_output=True, text=True)
+                    self.assertNotEqual(0, result.returncode, result.stdout + result.stderr)
+                    self.assertIn("selected metadata identity differs", result.stderr)
             for arm_file, allowed in ((None, True), ("info.json", False), ("info-505.json", False)):
-                with self.subTest(tier=tier, arm_file=arm_file):
+                with self.subTest(tier=tier, base="published-5.0.21010", arm_file=arm_file):
                     selected = json.loads(json.dumps(rows))
                     if arm_file:
                         arm = next(row for row in selected if row["name"] == "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults")

@@ -158,6 +158,8 @@ jobs:
         run: |
           git fetch --no-tags --depth=1 origin bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1
           if ($LASTEXITCODE -ne 0) { throw 'Exact published historical oracle fetch failed.' }
+          git fetch --no-tags --depth=1 origin 958e34dd2701418c71f74ae094c26ff7cd467e6b
+          if ($LASTEXITCODE -ne 0) { throw 'Exact published 5.0.10 source metadata fetch failed.' }
           git fetch --no-tags --depth=1 origin 8643cc91bc915e008556a5315dbb0a743247e7ab
           if ($LASTEXITCODE -ne 0) { throw 'Exact published 4.7.3 repair-source fetch failed.' }
           git fetch --no-tags --depth=1 origin 5c51ed46d1762b4fca7480f05a057482bbbedb0a
