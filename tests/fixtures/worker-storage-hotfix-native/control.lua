@@ -144,6 +144,7 @@ script.on_configuration_changed(function()
   if not state or state.phase ~= "provider-ready" or script.active_mods[MIR] == nil then return end
   verify_provider(force, state)
   marker("before-first-add", force, state)
+  loaded = false
   local main = assert_prototypes(force)
   for _, prerequisite in pairs(main.prerequisites) do prerequisite.researched = true end
   if main.enabled ~= true or force.worker_robots_storage_bonus ~= 7 then fail("MIR first-add changed provider state before research") end
