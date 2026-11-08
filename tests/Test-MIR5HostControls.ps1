@@ -141,6 +141,7 @@ $controls = @(
   [ordered]@{path='tests/test_module_permissions_activation.py';lua=$true},
   [ordered]@{path='tests/test_bootstrap.py';lua=$true},
   [ordered]@{path='tests/test_library.py';lua=$true},
+  [ordered]@{path='tests/test_library_legacy_settings_search_probe.py';lua=$true},
   [ordered]@{path='tests/test_library_multiplayer_fixture.py';lua=$true},
   [ordered]@{path='tests/test_library_native_input_fixture.py';lua=$true},
   [ordered]@{path='tests/test_library_paired_browser_fixture.py';lua=$true},
