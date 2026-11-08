@@ -373,7 +373,7 @@ function Assert-ActiveFixtureSelection([string]$Kind,[object[]]$ProfileRows,[obj
   Assert-Fixture ($selected.Count -eq 1 -and [string]$selected[0].version -ceq '0.1.0') 'active seed selector differs'
   $baseFixture=if($Kind -ceq 'repair-stress'){'mir-fixture-mir5-repair-stress'}else{'mir-fixture-mir5-agriculture-scale'}
   $expectedBaseVersion=if($Kind -ceq 'repair-stress'){
-    if([string]$MirRows[0].version -ceq '4.7.21002'){'0.1.0'}elseif([string]$MirRows[0].version -cin @('5.0.21000','5.0.21001','5.0.21005')){'0.2.0'}else{''}
+    if([string]$MirRows[0].version -ceq '4.7.21002'){'0.1.0'}elseif([string]$MirRows[0].version -cin @('5.0.21000','5.0.21001','5.0.21005')){'0.2.0'}elseif([string]$MirRows[0].version -ceq '5.0.21010'){'0.2.1'}else{''}
   }else{'0.1.0'}
   Assert-Fixture (-not [string]::IsNullOrWhiteSpace($expectedBaseVersion)) 'active repair MIR role is unsupported'
   Assert-Fixture (@($ProfileRows | Where-Object {[string]$_.name -ceq $baseFixture -and [bool]$_.enabled -and [string]$_.version -ceq $expectedBaseVersion}).Count -eq 1) 'active seed base fixture differs'
