@@ -1,0 +1,1 @@
+{"name":"mir-worker-storage-all-science-selector","version":"0.1.0","title":"Private final science-policy selector","author":"MIR maintainers","factorio_version":"2.1","dependencies":["base >= 2.1.23","more-infinite-research"]}
