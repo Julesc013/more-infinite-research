@@ -12,7 +12,7 @@ local function technology(force, name)
 end
 local function names(rows)
   local out = {}
-  for _, row in pairs(rows or {}) do out[row.name] = row.amount or true end
+  for _, row in pairs(rows or {}) do out[row.name] = true end
   return out
 end
 local function assert_prototypes(force)
