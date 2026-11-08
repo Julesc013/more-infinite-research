@@ -205,11 +205,27 @@ class PropertyTests(unittest.TestCase):
           local ok = pcall(generator.install, {first, second}, stage)
           return ok, stage.writes
         '''
-        duplicate_guard = 'if names[name] or (raw.technology and raw.technology[name]) then reject("duplicate technology " .. name) end'
-        mutant = self._mutate(duplicate_guard, 'if false then reject("duplicate technology " .. name) end')
+        duplicate_guard = 'if names[name] then reject("duplicate technology " .. name .. " within MIR emission") end'
+        mutant = self._mutate(duplicate_guard, 'if false then reject("duplicate technology " .. name .. " within MIR emission") end')
         self.assertTrue(self._rejected_before_write(GENERATOR_SOURCE, scenario))
         self.assertFalse(self._rejected_before_write(mutant, scenario),
             "identity oracle did not kill the duplicate-guard mutant")
+
+    def test_existing_owner_guard_mutation_is_killed_by_identity_oracle(self):
+        scenario = '''
+          local foreign = property_definition("existing-property-id", {})
+          local submitted = property_definition("existing-property-id", {})
+          local stage = property_world()
+          stage.raw.technology[foreign.name] = foreign
+          local ok = pcall(generator.install, {submitted}, stage)
+          return ok, stage.writes
+        '''
+        existing_guard = 'if existing then\n      local maximum = type(existing) == "table" and existing.max_level'
+        mutant = self._mutate(existing_guard,
+            'if false then\n      local maximum = type(existing) == "table" and existing.max_level')
+        self.assertTrue(self._rejected_before_write(GENERATOR_SOURCE, scenario))
+        self.assertFalse(self._rejected_before_write(mutant, scenario),
+            "identity oracle did not kill the existing-owner guard mutant")
 
     def test_cycle_guard_mutation_is_killed_by_graph_oracle(self):
         scenario = '''

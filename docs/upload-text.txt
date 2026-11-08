@@ -1,9 +1,11 @@
-MIR 5.0.9
+MIR 5.0.10
+Channel: GitHub prerelease. Mod Portal publication remains with the maintainer.
 
-Fixes a save-loading crash when research costs use a non-default multiplier.
+Fixes worker robot cargo research conflicts and Space Is Fake science requirements.
 
-- Preserve earned bonuses and unfinished research while keeping normal science costs.
-- Fix the Library Settings page overflowing its window.
-- Restore compact effect labels and their original translations.
+- Preserve finite cargo research and continue after its actual endpoint; retain external infinite research.
+- Retire white science consistently from final MIR research under Space Is Fake.
+- Preserve the previous multiplier fix and improve saved bonus-history diagnostics.
+- Back up saves and matching mods. Provider changes on earned MIR worlds can be refused when ownership cannot be established.
 
-[Installation and support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.9/docs/support.md).
+https://github.com/Julesc013/more-infinite-research/blob/v5.0.10/docs/support.md

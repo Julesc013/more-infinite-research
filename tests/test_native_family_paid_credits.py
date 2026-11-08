@@ -188,6 +188,53 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
           end end
         ''')
 
+    def test_unknown_paid_mask_error_contains_the_failed_identity_and_transition(self):
+        # A normal copied error must identify the refused earning history;
+        # opening the Library or exporting a report is impossible after this.
+        self.lua.execute(r'''
+          GROUPS={research_steel={{recipe="steel-plate",change=.17}}}
+          reload_credits({base="2.1.24",["more-infinite-research"]="5.0.21009",
+            ["space-age"]="2.1.24"})
+          local force=make_collected_force(2,8,{},true)
+          local main=force.technologies["recipe-prod-research_steel-1"]
+          main.saved_progress=.27
+          force.research_queue={main,force.technologies.foreign};force.current_research=main
+          local queue=force.research_queue
+          local ok,message=pcall(native_credits.on_configuration_changed,{
+            mod_startup_settings_changed=true,mod_changes={
+              ["more-infinite-research"]={old_version="4.7.21003",new_version="5.0.21009"},
+              base={old_version="2.1.23",new_version="2.1.24"}}})
+          assert(not ok,"unknown earning history was accepted")
+          message=tostring(message)
+          for _,text in ipairs({"MIR-CREDIT-HISTORY", "family=research_steel", "recipe=steel-plate",
+            "technology=recipe-prod-research_steel-1", "force=2", "completed=7", "included=false",
+            "private=true", "queued=1", "saved_progress=0.27", "offset=0",
+            "source=4.7.21003", "destination=5.0.21009", "base=2.1.24",
+            "startup_changed=true", "ledger=absent", "family_history=absent"}) do
+            assert(message:find(text,1,true),"copied error omits "..text..": "..message)
+          end
+          assert(storage.mir_native_credits==nil,"diagnostics allocated credit state")
+          assert(force.research_queue==queue and force.current_research==main
+            and main.saved_progress==.27 and force.research_progress==.42)
+          for _,state in pairs(force._states) do assert(state.writes.level==0 and state.writes.enabled==0) end
+          no_foreign_write(force)
+        ''')
+
+    def test_unknown_paid_mask_error_distinguishes_unchanged_mir_from_absent_event(self):
+        self.lua.execute(r'''
+          GROUPS={research_steel={{recipe="steel-plate",change=.17}}}
+          reload_credits({base="2.1.24",["more-infinite-research"]="5.0.21009"})
+          make_collected_force(1,3,{},true)
+          local ok,message=pcall(native_credits.on_configuration_changed,{
+            mod_startup_settings_changed=false,mod_changes={foreign={old_version="1.0",new_version="1.1"}}})
+          assert(not ok and tostring(message):find("source=5.0.21009",1,true)
+            and tostring(message):find("startup_changed=false",1,true),tostring(message))
+          ok,message=pcall(native_credits.on_configuration_changed)
+          assert(not ok and tostring(message):find("source=unknown",1,true)
+            and tostring(message):find("startup_changed=unknown",1,true),tostring(message))
+          assert(storage.mir_native_credits==nil)
+        ''')
+
     def _plain_beta_base(self, edition="f210", extra=False):
         # These five one-recipe public masks are independently retained in all
         # six published 5.0.0-5.0.2 Base ZIP observations (18 controlled cases).

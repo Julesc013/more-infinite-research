@@ -1,4 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.10
+Date: 2026-11-08
+
+  Bugfixes:
+
+    - Preserve finite worker robot cargo research from other mods and continue after its actual final level; retain an existing
+      infinite continuation.
+    - Keep Space Is Fake research obtainable when white science is retired, including shifted continuations and expanded science
+      policies.
+    - Include the affected research and saved-state context in unknown bonus-history errors.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.9
 Date: 2026-11-07
 

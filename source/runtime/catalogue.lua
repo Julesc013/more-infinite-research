@@ -11,8 +11,16 @@ local native_adoptions
 local withheld_native_owners
 local native_credit_groups
 local finite_research_speed_provider
-local retirement_facts = {}
+local worker_storage
+local admission_facts = {}
 if target.id == "f200" or target.id == "f210" then
+  local native_data = prototypes and prototypes.mod_data
+  local adopted = native_data and native_data["more-infinite-research-native-adoptions"]
+  if adopted ~= nil then
+    native_adoptions, withheld_native_owners, native_credit_groups = require("research.native_adoption").read(adopted.data,
+      modern.native_owners(script and script.active_mods), admission_facts)
+    worker_storage = admission_facts.worker_storage
+  end
   local live_technologies
   if prototypes ~= nil and prototypes.technology ~= nil then
     live_technologies = prototypes.technology
@@ -22,7 +30,16 @@ if target.id == "f200" or target.id == "f210" then
   if live_technologies ~= nil then
     foreign_technology_prototypes = {}
     local creators = {}
-    for _, name in ipairs(modern.continuation_names(script and script.active_mods)) do
+    local names = modern.continuation_names(script and script.active_mods)
+    if worker_storage ~= nil then
+      local named = {}
+      for _, name in ipairs(names) do named[name] = true end
+      for _, stage in ipairs(worker_storage.finite) do
+        if not named[stage.name] then names[#names + 1], named[stage.name] = stage.name, true end
+      end
+      if not named[worker_storage.technology] then names[#names + 1] = worker_storage.technology end
+    end
+    for _, name in ipairs(names) do
       local existing = live_technologies[name]
       if existing ~= nil then
         local get_history = prototypes and prototypes.get_history
@@ -44,6 +61,23 @@ if target.id == "f200" or target.id == "f210" then
           foreign_technology_prototypes[name] = existing
         end
       end
+    end
+    if worker_storage ~= nil then
+      for _, stage in ipairs(worker_storage.finite) do
+        local technology, provider = live_technologies[stage.name], creators[stage.name]
+        if technology == nil or technology.max_level ~= stage.max_level or provider == nil
+            or provider == "more-infinite-research" then
+          error("MIR worker robot storage: finite creation custody changed for " .. stage.name, 2)
+        end
+        stage.provider = provider
+      end
+      local technology, provider = live_technologies[worker_storage.technology], creators[worker_storage.technology]
+      if technology == nil or technology.max_level ~= 4294967295 or provider == nil
+          or technology.level ~= nil and technology.level ~= worker_storage.level
+          or (provider == "more-infinite-research") ~= worker_storage.owned then
+        error("MIR worker robot storage: infinite creation custody changed for " .. worker_storage.technology, 2)
+      end
+      if not worker_storage.owned then worker_storage.provider = provider end
     end
     local seven = live_technologies["research-speed-7"]
     local eight = live_technologies["research-speed-8"]
@@ -72,11 +106,8 @@ if target.id == "f200" or target.id == "f210" then
       end
     end
   end
-  local native_data = prototypes and prototypes.mod_data
-  local adopted = native_data and native_data["more-infinite-research-native-adoptions"]
-  if adopted ~= nil then
-    native_adoptions, withheld_native_owners, native_credit_groups = require("research.native_adoption").read(adopted.data,
-      modern.native_owners(script and script.active_mods), retirement_facts)
+  if worker_storage ~= nil and live_technologies == nil then
+    error("MIR worker robot storage: missing admitted technology prototypes", 2)
   end
 end
 
@@ -87,7 +118,7 @@ function M.native_credit_groups()
 end
 
 function M.galore_sulfur_retired()
-  return retirement_facts.galore_sulfur_retired == true
+  return admission_facts.galore_sulfur_retired == true
 end
 
 -- Select and retain the bounded authored rows during control parsing, before
@@ -97,11 +128,11 @@ end
 -- shipped module; the real player module always supplies this preparation
 -- hook.
 if type(catalogue.prepare) == "function" then
-  catalogue.prepare(foreign_technology_prototypes, withheld_native_owners, finite_research_speed_provider ~= nil)
+  catalogue.prepare(foreign_technology_prototypes, withheld_native_owners, finite_research_speed_provider ~= nil, worker_storage)
 end
 
 function M.declared()
-  local rows = catalogue.declared(foreign_technology_prototypes, withheld_native_owners, finite_research_speed_provider ~= nil)
+  local rows = catalogue.declared(foreign_technology_prototypes, withheld_native_owners, finite_research_speed_provider ~= nil, worker_storage)
   if native_adoptions == nil or next(native_adoptions) == nil then return rows end
   for _, row in ipairs(rows) do
     local adoption = native_adoptions and native_adoptions[row.id]
@@ -142,11 +173,23 @@ end
 
 function M.externally_supplied_continuation(name)
   if name == "research-speed-7" and finite_research_speed_provider ~= nil then return false end
+  if name == "worker-robots-storage-4" and worker_storage ~= nil then return not worker_storage.owned end
   return foreign_technology_prototypes ~= nil and foreign_technology_prototypes[name] ~= nil
 end
 
 function M.finite_research_speed_provider()
   return finite_research_speed_provider
+end
+
+function M.worker_storage_route()
+  if worker_storage == nil then return nil end
+  local route = {technology=worker_storage.technology, level=worker_storage.level,
+    predecessor=worker_storage.predecessor, owned=worker_storage.owned, provider=worker_storage.provider,
+    legacy_compatible=worker_storage.legacy_compatible, finite={}}
+  for index, stage in ipairs(worker_storage.finite) do
+    route.finite[index] = {name=stage.name, max_level=stage.max_level, provider=stage.provider}
+  end
+  return route
 end
 
 return M

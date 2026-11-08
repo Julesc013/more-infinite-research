@@ -1,0 +1,265 @@
+{
+  "schema": 1,
+  "kind": "MIR509GitHubPrereleaseDeliveryChainV1",
+  "status": "DELIVERED-qualified-GitHub-prerelease-not-stable",
+  "observed_on": "2026-11-07",
+  "release": {
+    "id": 437425238,
+    "name": "MIR 5.0.9",
+    "tag_name": "v5.0.9",
+    "html_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.9",
+    "published_at": "2026-11-07T08:04:31Z",
+    "draft": false,
+    "prerelease": true,
+    "immutable": false
+  },
+  "source": {
+    "kind": "MIR509FrozenCandidateVerdictBindingV1",
+    "status": "PASS-qualified-GitHub-hotfix-beta-not-stable",
+    "frozen_author": "1bd92e4d4d3e13b74799a26362072811925203f7",
+    "qualified_author": "1bd92e4d4d3e13b74799a26362072811925203f7",
+    "promotion_author": "eefbcb39b25e36b68360eb22481abc5281a97277",
+    "main": "b86c0262104529e4301386db4e9ce67284a03ce8",
+    "dev": "528e4719d26264a18113fc50cf977f49e7de8c05",
+    "whole_tree": "fa0c1fd6db86273c1d30e4f269102424114048c8",
+    "player_tree": "99143111b0c4e834e080902ec66a9c88a4069c1e",
+    "inventory": "3858ff7e8667a42199e2f8137143137bd9ebe9f7e984829d5fb845a5dce685bf",
+    "inventory_file_sha256": "E0FD91E76251E394BB042BB6D01EA0B436DFBF7998CD7CECCAC4F7E2229E8271",
+    "independent_review": "3574F2237AB8E8AEF4DFCD24078B153AE880D8B7BA952E4883FB9DC26538452A",
+    "independent_review_custody": "dacec6a7f6c923087f06beb1d80f1379db664647:projects/mir/runs/aero-private-credit509-and-library-captions-r01/",
+    "independent_report_hashes": {
+      "complete-package-review.json": "3574F2237AB8E8AEF4DFCD24078B153AE880D8B7BA952E4883FB9DC26538452A",
+      "native-applicability.json": "386C43B3ABDCA51A133A5BC19926209D07C269A67A4AD689F529B12F635ACFC1"
+    },
+    "independent_remote_readback_sha256": "D8910C7503048D35649A6DDB07A382B098459D36EEABAF26413EDB6E2D548EE8",
+    "independent_native_review_sha256": "0F3EB94FADFF736D2713DB30C8B6E988C27B59017D92686E805FB05A3B12BEAB",
+    "independent_GUI_review_sha256": "D09DC15010062D5B0384E1E52C9E91E96C42FF5D21B4B420724BF7113732FC0D",
+    "independent_integrity_review_sha256": "35F868E88173CD24096F7E55A982CB9CD4FBAFE134776F04F27C1548D879C23B",
+    "publication_mechanics_review_sha256": "8BDAFA33D27605889519C914C81716F74326FFF568DE4AD2AE4A279A371A353F",
+    "reviewed_nonplayer_files": [
+      "docs/progress.md",
+      "spec/evidence/candidate509-affected-native-r01.json"
+    ],
+    "reviewed_nonplayer_patch_sha256": "7BC6C6C2C866BD78F1D0A267CBBADC25D60061711C395E18E47449CA4A0F6670",
+    "notes_sha256": "4CBB057BFAD76FD539B9A8488D2507E59CD43C49262EFF029114C065170439A7",
+    "public_asset_count": 19,
+    "prerelease": true,
+    "stable_qualification": false,
+    "mod_portal_upload": false,
+    "integrated_checks_sha256": "15E482D17C95FA0E82AE9C9B6961FC144E14908C673FAA8EB10E8225B1FF0034",
+    "GUI_scope": "Actual normal/narrow F210 English/German captions and containment, inner scroll and selection; earlier all-tab/search observations retain their adverse long-session identity. Both short followups exit0. Full Library/stable remains open; old misleading science-selection description retained as #1768 follow-up."
+  },
+  "canonical_annotated_tag": "55bf220eeb51790fc68c1ea9349af1dba72cc613",
+  "source_native_record": "spec/evidence/candidate509-affected-native-r01.json",
+  "combined_gui_record": "spec/evidence/library509-combined-observed-states-r01.json",
+  "required_checks": {
+    "all_four_exact_author_promotion_and_integrated_checks_pass": true,
+    "author_promotion_receipt_sha256": "0163F7C016300D65D5F4EE364B6A1E57D8B98FC88DC70D393EBC0955D035CA7F",
+    "integrated_receipt_sha256": "15E482D17C95FA0E82AE9C9B6961FC144E14908C673FAA8EB10E8225B1FF0034"
+  },
+  "immediate_publication_probes": {
+    "administration": "ready",
+    "administration_sha256": "E6117438D571E4865D6B3A66EAE6ACA24C9F4713E20179E679009C45C739983E",
+    "generated_at": "2026-11-07T19:04:23.8127141+11:00",
+    "distinct_immutability": {
+      "enabled": false,
+      "enforced_by_owner": false
+    },
+    "immutability_sha256": "D01569A17BCC41EBA8FCC713D06F01B4EA0582820A72486290871F3C3D2EEA13"
+  },
+  "delivery": {
+    "root_anonymous_files": 19,
+    "root_local_files": 21,
+    "zip_members_crc_checked": 1568,
+    "primary_directory": "dist/v5.0.9",
+    "notes_bytes": 395,
+    "notes_sha256": "4CBB057BFAD76FD539B9A8488D2507E59CD43C49262EFF029114C065170439A7",
+    "upload_text_sha256": "4EDB6FB1A9110969BC5A56B412B0C1B1F49177B50FE69FDD3EAD2D58580A45F7",
+    "anonymous_receipt_sha256": "A74C26CA24FBE31BAC73475D3A72675B84BBC276C1AFBEAD018316ABF6BF90FB",
+    "local_receipt_sha256": "FB40A2409F4EFA2FBE7B673B0DE676487C848A9A713396A6E52CBC6E7E114AB2",
+    "assets": [
+      {
+        "name": "more-infinite-research_5.0.01309.zip",
+        "asset_id": 720034915,
+        "bytes": 666524,
+        "sha256": "ACDC01F41D2628750E3585813601C878F7B722676E816819A66A350B7C722B26",
+        "label": "MIR 5.0.9 for Factorio 0.13.20 (zip)",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/more-infinite-research_5.0.01309.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.01409.zip",
+        "asset_id": 720034970,
+        "bytes": 666527,
+        "sha256": "777359611FA074920FD64BF82A8116E3F9138939BA08768CFBB0B28234477D05",
+        "label": "MIR 5.0.9 for Factorio 0.14.23 (zip)",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/more-infinite-research_5.0.01409.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.01509.zip",
+        "asset_id": 720035024,
+        "bytes": 666525,
+        "sha256": "AE4574BD4B2CAAE5ADF401A116587A1B7CF97577968619E9919B8EB4F57494D6",
+        "label": "MIR 5.0.9 for Factorio 0.15.40 (zip)",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/more-infinite-research_5.0.01509.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.01609.zip",
+        "asset_id": 720035084,
+        "bytes": 666526,
+        "sha256": "1AA4D06E5B94AEEF1FCC6F0780FCDFD4DC14AA6670D7A64382624F3C2D953F09",
+        "label": "MIR 5.0.9 for Factorio 0.16.51 (zip)",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/more-infinite-research_5.0.01609.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.01709.zip",
+        "asset_id": 720035162,
+        "bytes": 666526,
+        "sha256": "1666589A34AD59E52B49A956FF6AADFF78DB8CBAA7D29ECB9DB62C7A0B370FF0",
+        "label": "MIR 5.0.9 for Factorio 0.17.79 (zip)",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/more-infinite-research_5.0.01709.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.01809.zip",
+        "asset_id": 720035234,
+        "bytes": 666527,
+        "sha256": "4572F6E8E59E8CFCAB4408F852FE4C1B9F481D0AB3513CC420FD65830EF00046",
+        "label": "MIR 5.0.9 for Factorio 0.18.47 (zip)",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/more-infinite-research_5.0.01809.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.10009.zip",
+        "asset_id": 720035324,
+        "bytes": 666519,
+        "sha256": "62D9580CD07A4ADC9149397FB97975EFD9A3AA186B2ACF6AB52B3270290FD853",
+        "label": "MIR 5.0.9 for Factorio 1.0.0 (zip)",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/more-infinite-research_5.0.10009.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.11009.zip",
+        "asset_id": 720035368,
+        "bytes": 666830,
+        "sha256": "CBE802F84BEA385AC846871A781C0C3A5853CE65E4911006E968FFE41F2013FB",
+        "label": "MIR 5.0.9 for Factorio 1.1.110 (zip)",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/more-infinite-research_5.0.11009.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.20009.zip",
+        "asset_id": 720035462,
+        "bytes": 988460,
+        "sha256": "0C845293BA25DA32A614F8F0C8B55976FA7B7F5EEDC38648D3C5863869FB6F8F",
+        "label": "MIR 5.0.9 for Factorio 2.0.77 (zip)",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/more-infinite-research_5.0.20009.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.21009.zip",
+        "asset_id": 720035514,
+        "bytes": 988888,
+        "sha256": "F1F8174F52184AD2964319F0E6332476D48DFF30ABC64AB80557350C9E1AEE33",
+        "label": "MIR 5.0.9 for Factorio 2.1.23 (zip)",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/more-infinite-research_5.0.21009.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.00609.zip",
+        "asset_id": 720035622,
+        "bytes": 138289,
+        "sha256": "66D7370B819AD8ACA4189B1E2668C8D290981C21D31C9080A98C4C0D7C02CB53",
+        "label": "MIR 5.0.9 for Factorio 0.6.4 (zip)",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/more-infinite-research_5.0.00609.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.00709.zip",
+        "asset_id": 720035706,
+        "bytes": 138289,
+        "sha256": "88715B8F00BBFE3C9FC2359ACB8447BD3FC010CADC4DA9F60C04D680F13E30DB",
+        "label": "MIR 5.0.9 for Factorio 0.7.5 (zip)",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/more-infinite-research_5.0.00709.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.00809.zip",
+        "asset_id": 720035786,
+        "bytes": 138288,
+        "sha256": "9B9DE42627A8A7E59BBA8BAD0D241A280929A168B460E820FB466E36F0C1EDEA",
+        "label": "MIR 5.0.9 for Factorio 0.8.8 (zip)",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/more-infinite-research_5.0.00809.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.00909.zip",
+        "asset_id": 720035850,
+        "bytes": 138288,
+        "sha256": "CC60319BC0A9BFF6CBE2E682A54355FFA05A3CFBA2431D8464BE00696C2FEE0E",
+        "label": "MIR 5.0.9 for Factorio 0.9.8 (zip)",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/more-infinite-research_5.0.00909.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.01009.zip",
+        "asset_id": 720035909,
+        "bytes": 138289,
+        "sha256": "41A3D3A231463EE860EC5912B9D3D4C42E6E700B23E40DB310AD359DBBDE31C9",
+        "label": "MIR 5.0.9 for Factorio 0.10.12 (zip)",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/more-infinite-research_5.0.01009.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.01109.zip",
+        "asset_id": 720035975,
+        "bytes": 138291,
+        "sha256": "79EB1DADF597D75AA2301DB3A741C06E867EE21DE4DA1E92644B884509D81F8F",
+        "label": "MIR 5.0.9 for Factorio 0.11.22 (zip)",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/more-infinite-research_5.0.01109.zip"
+      },
+      {
+        "name": "more-infinite-research_5.0.01209.zip",
+        "asset_id": 720036054,
+        "bytes": 138292,
+        "sha256": "F79A5B1CE90D2B161D8172B9C20C99C4EA4C78FB118B895AB0E6467E2F8A3DA8",
+        "label": "MIR 5.0.9 for Factorio 0.12.35 (zip)",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/more-infinite-research_5.0.01209.zip"
+      },
+      {
+        "name": "SHA256SUMS.txt",
+        "asset_id": 720036142,
+        "bytes": 1030,
+        "sha256": "A79E99371D01C48DA076B3A47A57A6C19D7F383FEDBEA50233B6910D4F40013E",
+        "label": "SHA256SUMS.txt",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/SHA256SUMS.txt"
+      },
+      {
+        "name": "SHA256SUMS-early.txt",
+        "asset_id": 720036226,
+        "bytes": 721,
+        "sha256": "3A9C0EC9C613ABE5B0FCC1C9E09AE3C53D539ED9CA4C56A7FFE679C88C47436F",
+        "label": "SHA256SUMS-early.txt",
+        "url": "https://github.com/Julesc013/more-infinite-research/releases/download/v5.0.9/SHA256SUMS-early.txt"
+      }
+    ]
+  },
+  "previous_releases": {
+    "count": 9,
+    "assets": 171,
+    "status": "PASS-prior-nine-beta-bodies-tags-and171-assets-unchanged",
+    "after_receipt_sha256": "78CBDD398C3684633B88A9BB742ECDA8A8473572E203313971FE9B0D8BADFEAE"
+  },
+  "publisher_originals": {
+    "commit": "e59ec6e66e12711d0264fd49bc77e85371e515a7",
+    "path": "projects/mir/runs/candidate509-delivery-r01/",
+    "original_body_count": 576,
+    "gzip_sha256": "2F8BC4EED088A4B615D03E8D7BC7E8BDA1D4B770924E2CF026B30E8F45A70A89",
+    "decoded_sha256": "F93710AEA1E602933EE458CDF7B15459596A41DF5D3C29A85422D8617D281383",
+    "all_remote_raw_bodies_verified": true
+  },
+  "preserved_adverse": [
+    "PR1801 merge-commit method refused by repository policy before mutation; normal checked squash succeeded. Original refusal retained.",
+    "The earlier published508 native failure exit-code reporting error remains corrected by its explicit erratum; original receipts are unchanged.",
+    "Combined GUI ENr03 operator timeout and capture/input preparation refusals remain adverse; short ENr04/DEr04 natural exits do not erase them."
+  ],
+  "maturity": {
+    "beta_delivery_complete": true,
+    "stable_acceptance": false,
+    "mod_portal_upload": false,
+    "next_changed_public_source_version": "5.0.10"
+  },
+  "remaining": [
+    "Exact Driku original save/modpack is not supplied or claimed tested.",
+    "Full Library/client/personal/import-export/Discovery Tree and accepted-design restoration remain under1768.",
+    "Historical/profile/API/state reconciliation and whole-product performance remain open; preserve named9 routes,7 older groups and4 forward journeys."
+  ]
+}

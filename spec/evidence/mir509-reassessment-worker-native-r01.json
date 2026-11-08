@@ -1,0 +1,1013 @@
+{
+  "schema": 1,
+  "kind": "MIR509ReassessmentWorkerNativeV1",
+  "date_utc": "2026-11-08",
+  "verdict": "ACCEPT controlled F210 worker startup, original473 upgrade, lab/save and two cold reloads; whole stable NOT READY",
+  "native_execution": true,
+  "source": {
+    "commit": "cf7fa0c54dab33735e38abe5ed450a6f79c1de5e",
+    "tree": "8e0fb70f146b1d428475f3bb06c50d81ce4b7ba1",
+    "base": "2786326a5bd2d45ea6a7865f755ec37493656163",
+    "pull_request": "https://github.com/Julesc013/more-infinite-research/pull/1808"
+  },
+  "candidate": {
+    "archive": "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r08/packages/more-infinite-research_5.0.21009.zip",
+    "sha256": "d8125859ae31e1680f8383dc6ba489427180eccc432ce45760490ac3264eb7ef",
+    "bytes": 995348
+  },
+  "candidate_metadata_version": "5.0.21009; private candidate, published asset unchanged",
+  "engine": {
+    "version": "2.1.24",
+    "build": 87808,
+    "platform": "Linux headless",
+    "archive_sha256": "c49b66cff90aceff87b30f2973af0df7f51712cb2ee3153e0169d9bed46a964f",
+    "binary_sha256": "062277b9d91f5df9e655a77e6a94ec0208e668ecfc1c4424ee1b12c9aaab2dcf"
+  },
+  "fixtures": [
+    {
+      "name": "mir-worker-storage-finite-fixture_0.1.0.zip",
+      "bytes": 1064,
+      "sha256": "6ab77caf709f88029ee26e30cd932fd03558ee2059068176989b9423dcc678b1"
+    },
+    {
+      "name": "mir-worker-storage-native-observer_0.1.2.zip",
+      "bytes": 3089,
+      "sha256": "e1ba1bbbb7339e29f5a8e6d0e08561cdadbf5c69cb34b061a49563bc7027d453"
+    }
+  ],
+  "setup": {
+    "selection": "Base plus synthetic finite-four provider and observer; Space Age disabled",
+    "seeded": "science prerequisites and worker1..4;42percent current and27percent unrelated partial-work continuity sentinels",
+    "earned": "one actual MIR lab completion in original473, one further actual completion in candidate, one on separate fresh candidate; reject by_script research completions",
+    "acceleration": "lab energy/science supplied; lab-speed modifier1000 and simulation speed16; controller reapplies fixture lab-speed after configuration without changing worker effects or research costs/time",
+    "protected_input": "server consumes independent copy; originals SHA256 checked before/after",
+    "performance_claim": false
+  },
+  "original_technology": {
+    "name": "worker-robots-storage-5",
+    "localised_name": [
+      "technology-name.worker-robots-storage"
+    ],
+    "localised_description": [
+      "technology-description.worker-robots-storage"
+    ],
+    "icon": "__base__/graphics/technology/worker-robots-storage.png",
+    "icon_size": 256,
+    "effects": [
+      {
+        "type": "worker-robot-storage",
+        "modifier": 2
+      }
+    ],
+    "prerequisites": [
+      "worker-robots-storage-3",
+      "worker-robots-storage-4",
+      "automation-science-pack",
+      "logistic-science-pack",
+      "utility-science-pack"
+    ],
+    "unit": {
+      "ingredients": [
+        [
+          "automation-science-pack",
+          2
+        ],
+        [
+          "logistic-science-pack",
+          3
+        ],
+        [
+          "utility-science-pack",
+          4
+        ]
+      ],
+      "count_formula": "1012.5*1.5^(L-5)",
+      "time": 60
+    },
+    "max_level": "infinite",
+    "level": 5,
+    "hidden": false,
+    "upgrade": true,
+    "type": "technology"
+  },
+  "candidate_gameplay_fields_equal": {
+    "name": true,
+    "prerequisites": true,
+    "unit": true,
+    "effects": true,
+    "max_level": true,
+    "level": true
+  },
+  "prototype_captures": [
+    {
+      "path": "build/tmp/reassessment-native-r07/published473/worker5-data.json",
+      "bytes": 1178,
+      "sha256": "4e23fcd9805efde5161006480cffa66afed5fe2693b9aae4566262e65cab175a"
+    },
+    {
+      "path": "build/tmp/reassessment-native-r10/candidate-fresh/dump-data.receipt.json",
+      "bytes": 2108,
+      "sha256": "8ff573907a770b2348e74e76b6d3b2c9f6b3eab8d12c836d03ac88b213a5aed1"
+    }
+  ],
+  "accepted": [
+    {
+      "case": "published473-source-lab-save",
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r07/published473/source.receipt.json",
+        "bytes": 1709,
+        "sha256": "6e90a34d1e67d4ca72ebcccb378b75c9f605b1e50a84c3d1be3b3cee45ebc64d"
+      },
+      "result": {
+        "phase": "source",
+        "native_execution": true,
+        "passed": true,
+        "failure": null,
+        "console_started": true,
+        "exit_code": 0,
+        "seconds": 5.478745587999583,
+        "command": [
+          "/workspace/scratch/1437ecffaf60/mir-headless-2124/factorio/bin/x64/factorio",
+          "--config",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r07/published473/config.ini",
+          "--mod-directory",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r07/published473/mods",
+          "--start-server",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r07/published473/source-consumed-input.zip",
+          "--server-settings",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r07/published473/server-settings.json",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "34197"
+        ],
+        "protected_input": "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r07/published473/seed.zip",
+        "consumed_input": "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r07/published473/source-consumed-input.zip",
+        "input_sha256": "26f514b6c4d006dfa21f8d63de1dcd1492065b7ee267b9c9b4298599181c04d2",
+        "input_unchanged": true,
+        "output_path": "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r07/published473/work/saves/worker-source.zip",
+        "output_sha256": "8f8f7279930e0d4978b504af064caf5e1b722354a220ce76ff0a127be655b79c",
+        "log_sha256": "9e25d2ad10c76dc712cfaa42902cfa4a081bbfd689e0eb384f117c7799def090"
+      }
+    },
+    {
+      "case": "published473-source-cold-reload",
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r07/published473/reload.receipt.json",
+        "bytes": 873,
+        "sha256": "16e04eb9ec2cc65aba69f7be01f15919d48dddc7367bd3d9126b7e8e4833e390"
+      },
+      "result": {
+        "phase": "source-cold-reload",
+        "native_execution": true,
+        "exit_code": 0,
+        "passed": true,
+        "seconds": 1.3702316069993685,
+        "command": [
+          "/workspace/scratch/1437ecffaf60/mir-headless-2124/factorio/bin/x64/factorio",
+          "--config",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r07/published473/config.ini",
+          "--mod-directory",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r07/published473/mods",
+          "--test-save",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r07/published473/work/saves/worker-source.zip",
+          "--test-arg",
+          "reload",
+          "--test-ticks",
+          "10"
+        ],
+        "input_sha256": "8f8f7279930e0d4978b504af064caf5e1b722354a220ce76ff0a127be655b79c",
+        "input_unchanged": true
+      }
+    },
+    {
+      "case": "committed-candidate-upgrade-lab-save",
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r09/candidate/successor.receipt.json",
+        "bytes": 1770,
+        "sha256": "5fe9eb1dc6652aec7603033c88d0e72f8c938633ef769cb21866006402469148"
+      },
+      "result": {
+        "phase": "successor",
+        "native_execution": true,
+        "passed": true,
+        "failure": null,
+        "test_lab_speed_reapplied_before_mode": 1000,
+        "console_started": true,
+        "exit_code": 0,
+        "seconds": 4.27863701699971,
+        "command": [
+          "/workspace/scratch/1437ecffaf60/mir-headless-2124/factorio/bin/x64/factorio",
+          "--config",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r09/candidate/config.ini",
+          "--mod-directory",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r09/candidate/mods",
+          "--start-server",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r09/candidate/successor-consumed-input.zip",
+          "--server-settings",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r09/candidate/server-settings.json",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "34197"
+        ],
+        "protected_input": "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r07/published473/work/saves/worker-source.zip",
+        "consumed_input": "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r09/candidate/successor-consumed-input.zip",
+        "input_sha256": "8f8f7279930e0d4978b504af064caf5e1b722354a220ce76ff0a127be655b79c",
+        "input_unchanged": true,
+        "output_path": "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r09/candidate/work/saves/worker-successor.zip",
+        "output_sha256": "b79a76e840e5ba538551735be3c9fe7783276faa9672fe0f3c1757106ea52b59",
+        "log_sha256": "743380686fda07b52cb7effe047e6a3cef1a651af754d23a14a1080bf60293a9"
+      }
+    },
+    {
+      "case": "successor-cold-reload-1",
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r09/candidate/reload-1.receipt.json",
+        "bytes": 2134,
+        "sha256": "c6e5f53f3d8f982473d4044b218defbd41dc48e2980f0f1f088e90bc1ff2ef0a"
+      },
+      "result": {
+        "phase": "successor-cold-reload-1",
+        "native_execution": true,
+        "exit_code": 0,
+        "passed": true,
+        "seconds": 0.5654730319984083,
+        "command": [
+          "/workspace/scratch/1437ecffaf60/mir-headless-2124/factorio/bin/x64/factorio",
+          "--config",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r09/candidate/config.ini",
+          "--mod-directory",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r09/candidate/mods",
+          "--test-save",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r09/candidate/work/saves/worker-successor.zip",
+          "--test-arg",
+          "reload",
+          "--test-ticks",
+          "10"
+        ],
+        "input_sha256": "b79a76e840e5ba538551735be3c9fe7783276faa9672fe0f3c1757106ea52b59",
+        "input_unchanged": true,
+        "observed": {
+          "stage": "reload",
+          "engine": "2.1.24",
+          "mods": {
+            "base": "2.1.24",
+            "mir-worker-storage-finite-fixture": "0.1.0",
+            "more-infinite-research": "5.0.21009",
+            "mir-worker-storage-native-observer": "0.1.2"
+          },
+          "tick": 6883,
+          "next_level": 7,
+          "researched": false,
+          "completed": 2,
+          "enabled": true,
+          "worker_bonus": 9,
+          "finite_researched": true,
+          "finite_maximum": 4,
+          "finite_effect": 2,
+          "research_progress": 0.42000000000000004,
+          "saved_progress": 0,
+          "current": "worker-robots-storage-5",
+          "queue": [
+            "worker-robots-storage-5",
+            "mir-worker-test-unrelated"
+          ],
+          "foreign_progress": 0.27,
+          "native_lab_completions": 2,
+          "prototype": {
+            "count_formula": "1012.5*1.5^(L-5)",
+            "research_time": 3600,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 2
+              }
+            ],
+            "ingredients": [
+              {
+                "name": "automation-science-pack",
+                "amount": 2
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 3
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 4
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "case": "successor-cold-reload-2",
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r09/candidate/reload-2.receipt.json",
+        "bytes": 2134,
+        "sha256": "e935965761a51f0d9b2e90cbab282ec53aebf013a409703456315d6c57098a58"
+      },
+      "result": {
+        "phase": "successor-cold-reload-2",
+        "native_execution": true,
+        "exit_code": 0,
+        "passed": true,
+        "seconds": 0.5652408209989517,
+        "command": [
+          "/workspace/scratch/1437ecffaf60/mir-headless-2124/factorio/bin/x64/factorio",
+          "--config",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r09/candidate/config.ini",
+          "--mod-directory",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r09/candidate/mods",
+          "--test-save",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r09/candidate/work/saves/worker-successor.zip",
+          "--test-arg",
+          "reload",
+          "--test-ticks",
+          "10"
+        ],
+        "input_sha256": "b79a76e840e5ba538551735be3c9fe7783276faa9672fe0f3c1757106ea52b59",
+        "input_unchanged": true,
+        "observed": {
+          "stage": "reload",
+          "engine": "2.1.24",
+          "mods": {
+            "base": "2.1.24",
+            "mir-worker-storage-finite-fixture": "0.1.0",
+            "more-infinite-research": "5.0.21009",
+            "mir-worker-storage-native-observer": "0.1.2"
+          },
+          "tick": 6883,
+          "next_level": 7,
+          "researched": false,
+          "completed": 2,
+          "enabled": true,
+          "worker_bonus": 9,
+          "finite_researched": true,
+          "finite_maximum": 4,
+          "finite_effect": 2,
+          "research_progress": 0.42000000000000004,
+          "saved_progress": 0,
+          "current": "worker-robots-storage-5",
+          "queue": [
+            "worker-robots-storage-5",
+            "mir-worker-test-unrelated"
+          ],
+          "foreign_progress": 0.27,
+          "native_lab_completions": 2,
+          "prototype": {
+            "count_formula": "1012.5*1.5^(L-5)",
+            "research_time": 3600,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 2
+              }
+            ],
+            "ingredients": [
+              {
+                "name": "automation-science-pack",
+                "amount": 2
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 3
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 4
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "case": "committed-candidate-fresh-lab-save",
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r10/candidate-fresh/fresh.receipt.json",
+        "bytes": 1774,
+        "sha256": "6ac8e8c592f7eff65b2a449331e89fef1c8fcbc5664f91b393e21b234b682c0e"
+      },
+      "result": {
+        "phase": "fresh",
+        "native_execution": true,
+        "passed": true,
+        "failure": null,
+        "test_lab_speed_reapplied_before_mode": 1000,
+        "console_started": true,
+        "exit_code": 0,
+        "seconds": 4.777255094000793,
+        "command": [
+          "/workspace/scratch/1437ecffaf60/mir-headless-2124/factorio/bin/x64/factorio",
+          "--config",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r10/candidate-fresh/config.ini",
+          "--mod-directory",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r10/candidate-fresh/mods",
+          "--start-server",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r10/candidate-fresh/fresh-consumed-input.zip",
+          "--server-settings",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r10/candidate-fresh/server-settings.json",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "34197"
+        ],
+        "protected_input": "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r10/candidate-fresh/seed.zip",
+        "consumed_input": "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r10/candidate-fresh/fresh-consumed-input.zip",
+        "input_sha256": "90f8055cc134afaf4a816c90404650988af9ec96f2871647e35d7dee78db9fab",
+        "input_unchanged": true,
+        "output_path": "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r10/candidate-fresh/work/saves/worker-fresh.zip",
+        "output_sha256": "1139a8a8f13c8ab8913de6b926eb2b52c766fd638fdc71bd8e18331c56d41702",
+        "log_sha256": "d97d8cb64cddfb0eb77f5cdc04fe526bbc0a10e3ac399d783700e70442056b17"
+      }
+    }
+  ],
+  "observations": {
+    "source": {
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r07/published473/work/script-output/worker-storage/source-earned.json",
+        "bytes": 932,
+        "sha256": "cb54b9cb8a88cf6c5f02a132f95b84a07f74b6827ca05bd2912942fcd3792a38"
+      },
+      "observed": {
+        "stage": "source-earned",
+        "engine": "2.1.24",
+        "mods": {
+          "base": "2.1.24",
+          "mir-worker-storage-finite-fixture": "0.1.0",
+          "more-infinite-research": "4.7.21003",
+          "mir-worker-storage-native-observer": "0.1.2"
+        },
+        "tick": 3649,
+        "next_level": 6,
+        "researched": false,
+        "completed": 1,
+        "enabled": true,
+        "worker_bonus": 7,
+        "finite_researched": true,
+        "finite_maximum": 4,
+        "finite_effect": 2,
+        "research_progress": 0.42000000000000004,
+        "saved_progress": 0,
+        "current": "worker-robots-storage-5",
+        "queue": [
+          "worker-robots-storage-5",
+          "mir-worker-test-unrelated"
+        ],
+        "foreign_progress": 0.27,
+        "native_lab_completions": 1,
+        "prototype": {
+          "count_formula": "1012.5*1.5^(L-5)",
+          "research_time": 3600,
+          "effects": [
+            {
+              "hidden": false,
+              "type": "worker-robot-storage",
+              "modifier": 2
+            }
+          ],
+          "ingredients": [
+            {
+              "name": "automation-science-pack",
+              "amount": 2
+            },
+            {
+              "name": "logistic-science-pack",
+              "amount": 3
+            },
+            {
+              "name": "utility-science-pack",
+              "amount": 4
+            }
+          ]
+        }
+      }
+    },
+    "candidate_entry": {
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r09/candidate/work/script-output/worker-storage/configuration.json",
+        "bytes": 932,
+        "sha256": "9e2736e091b083f9f378f8e2df797c659eb50f83ca4eb70715825547aa88de27"
+      },
+      "observed": {
+        "stage": "configuration",
+        "engine": "2.1.24",
+        "mods": {
+          "base": "2.1.24",
+          "mir-worker-storage-finite-fixture": "0.1.0",
+          "more-infinite-research": "5.0.21009",
+          "mir-worker-storage-native-observer": "0.1.2"
+        },
+        "tick": 3650,
+        "next_level": 6,
+        "researched": false,
+        "completed": 1,
+        "enabled": true,
+        "worker_bonus": 7,
+        "finite_researched": true,
+        "finite_maximum": 4,
+        "finite_effect": 2,
+        "research_progress": 0.42000000000000004,
+        "saved_progress": 0,
+        "current": "worker-robots-storage-5",
+        "queue": [
+          "worker-robots-storage-5",
+          "mir-worker-test-unrelated"
+        ],
+        "foreign_progress": 0.27,
+        "native_lab_completions": 1,
+        "prototype": {
+          "count_formula": "1012.5*1.5^(L-5)",
+          "research_time": 3600,
+          "effects": [
+            {
+              "hidden": false,
+              "type": "worker-robot-storage",
+              "modifier": 2
+            }
+          ],
+          "ingredients": [
+            {
+              "name": "automation-science-pack",
+              "amount": 2
+            },
+            {
+              "name": "logistic-science-pack",
+              "amount": 3
+            },
+            {
+              "name": "utility-science-pack",
+              "amount": 4
+            }
+          ]
+        }
+      }
+    },
+    "candidate_before_lab": {
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r09/candidate/work/script-output/worker-storage/before-successor-lab.json",
+        "bytes": 939,
+        "sha256": "e6e5f46d27fb6c28debc9fd915d7ad4255a1ef9b3508fdb0ae0b3903099c07a0"
+      },
+      "observed": {
+        "stage": "before-successor-lab",
+        "engine": "2.1.24",
+        "mods": {
+          "base": "2.1.24",
+          "mir-worker-storage-finite-fixture": "0.1.0",
+          "more-infinite-research": "5.0.21009",
+          "mir-worker-storage-native-observer": "0.1.2"
+        },
+        "tick": 3715,
+        "next_level": 6,
+        "researched": false,
+        "completed": 1,
+        "enabled": true,
+        "worker_bonus": 7,
+        "finite_researched": true,
+        "finite_maximum": 4,
+        "finite_effect": 2,
+        "research_progress": 0.42000000000000004,
+        "saved_progress": 0,
+        "current": "worker-robots-storage-5",
+        "queue": [
+          "worker-robots-storage-5",
+          "mir-worker-test-unrelated"
+        ],
+        "foreign_progress": 0.27,
+        "native_lab_completions": 1,
+        "prototype": {
+          "count_formula": "1012.5*1.5^(L-5)",
+          "research_time": 3600,
+          "effects": [
+            {
+              "hidden": false,
+              "type": "worker-robot-storage",
+              "modifier": 2
+            }
+          ],
+          "ingredients": [
+            {
+              "name": "automation-science-pack",
+              "amount": 2
+            },
+            {
+              "name": "logistic-science-pack",
+              "amount": 3
+            },
+            {
+              "name": "utility-science-pack",
+              "amount": 4
+            }
+          ]
+        }
+      }
+    },
+    "candidate_earned": {
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r09/candidate/work/script-output/worker-storage/successor-earned.json",
+        "bytes": 935,
+        "sha256": "9136505b9b68a09aa071e51dec499ad968a70f5de3ef409dfb0ce78c9faa19bd"
+      },
+      "observed": {
+        "stage": "successor-earned",
+        "engine": "2.1.24",
+        "mods": {
+          "base": "2.1.24",
+          "mir-worker-storage-finite-fixture": "0.1.0",
+          "more-infinite-research": "5.0.21009",
+          "mir-worker-storage-native-observer": "0.1.2"
+        },
+        "tick": 6882,
+        "next_level": 7,
+        "researched": false,
+        "completed": 2,
+        "enabled": true,
+        "worker_bonus": 9,
+        "finite_researched": true,
+        "finite_maximum": 4,
+        "finite_effect": 2,
+        "research_progress": 0.42000000000000004,
+        "saved_progress": 0,
+        "current": "worker-robots-storage-5",
+        "queue": [
+          "worker-robots-storage-5",
+          "mir-worker-test-unrelated"
+        ],
+        "foreign_progress": 0.27,
+        "native_lab_completions": 2,
+        "prototype": {
+          "count_formula": "1012.5*1.5^(L-5)",
+          "research_time": 3600,
+          "effects": [
+            {
+              "hidden": false,
+              "type": "worker-robot-storage",
+              "modifier": 2
+            }
+          ],
+          "ingredients": [
+            {
+              "name": "automation-science-pack",
+              "amount": 2
+            },
+            {
+              "name": "logistic-science-pack",
+              "amount": 3
+            },
+            {
+              "name": "utility-science-pack",
+              "amount": 4
+            }
+          ]
+        }
+      }
+    },
+    "candidate_fresh": {
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r10/candidate-fresh/work/script-output/worker-storage/fresh-earned.json",
+        "bytes": 931,
+        "sha256": "65236276db22523129c8b78b7c77d3906d5c3a60b8116be39a9ea722ff6e65e2"
+      },
+      "observed": {
+        "stage": "fresh-earned",
+        "engine": "2.1.24",
+        "mods": {
+          "base": "2.1.24",
+          "mir-worker-storage-finite-fixture": "0.1.0",
+          "more-infinite-research": "5.0.21009",
+          "mir-worker-storage-native-observer": "0.1.2"
+        },
+        "tick": 3646,
+        "next_level": 6,
+        "researched": false,
+        "completed": 1,
+        "enabled": true,
+        "worker_bonus": 7,
+        "finite_researched": true,
+        "finite_maximum": 4,
+        "finite_effect": 2,
+        "research_progress": 0.42000000000000004,
+        "saved_progress": 0,
+        "current": "worker-robots-storage-5",
+        "queue": [
+          "worker-robots-storage-5",
+          "mir-worker-test-unrelated"
+        ],
+        "foreign_progress": 0.27,
+        "native_lab_completions": 1,
+        "prototype": {
+          "count_formula": "1012.5*1.5^(L-5)",
+          "research_time": 3600,
+          "effects": [
+            {
+              "hidden": false,
+              "type": "worker-robot-storage",
+              "modifier": 2
+            }
+          ],
+          "ingredients": [
+            {
+              "name": "automation-science-pack",
+              "amount": 2
+            },
+            {
+              "name": "logistic-science-pack",
+              "amount": 3
+            },
+            {
+              "name": "utility-science-pack",
+              "amount": 4
+            }
+          ]
+        }
+      }
+    }
+  },
+  "adverse_and_superseded": [
+    {
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r01/published509/create.receipt.json",
+        "bytes": 1034,
+        "sha256": "d0eae6f9b7cfeef872e46840534f0bb5fbf55777898c83474222cf6a90f939d6"
+      },
+      "interpretation": "Accepted reproduction: original published509 duplicate worker4 startup failure.",
+      "original_result": {
+        "case": "published509",
+        "command": [
+          "/workspace/scratch/1437ecffaf60/mir-headless-2124/factorio/bin/x64/factorio",
+          "--config",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r01/published509/config.ini",
+          "--mod-directory",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r01/published509/mods",
+          "--create",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r01/published509/seed.zip",
+          "--map-gen-settings",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r01/published509/map-gen-settings.json"
+        ],
+        "pid": 6,
+        "exit_code": 1,
+        "timed_out": false,
+        "seconds": 0.265,
+        "log_sha256": "da72b9ed3438816c9cd7923c8dfc6cb47074c61b5954e9a7e607f32bfb8ada73",
+        "save_sha256": null,
+        "source_snapshot": "d92ef1021612a09fda895f7a8d3484231a269bd4e112e7ecd83d6fbeacf62de9",
+        "native_execution": true
+      }
+    },
+    {
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r01/candidate/create.receipt.json",
+        "bytes": 1083,
+        "sha256": "0f8e9147e8b8e437e01e40aca2cbc646ca2432f76ad68d10d4bcbb99293a443c"
+      },
+      "interpretation": "Superseded private patch: startup passed but later original-output comparison exposed science and prerequisite mismatch. Not final candidate acceptance.",
+      "original_result": {
+        "case": "candidate",
+        "command": [
+          "/workspace/scratch/1437ecffaf60/mir-headless-2124/factorio/bin/x64/factorio",
+          "--config",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r01/candidate/config.ini",
+          "--mod-directory",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r01/candidate/mods",
+          "--create",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r01/candidate/seed.zip",
+          "--map-gen-settings",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r01/candidate/map-gen-settings.json"
+        ],
+        "pid": 102,
+        "exit_code": 0,
+        "timed_out": false,
+        "seconds": 0.616,
+        "log_sha256": "02dc5d7a2b67b2d222ce1305abf80dcc7ac33d38a0c471f2106c214b67402f41",
+        "save_sha256": "9b89a9170f63a924c9e53dd262a9e90bf591ce7d20e5490a002263f73a58a37d",
+        "source_snapshot": "d92ef1021612a09fda895f7a8d3484231a269bd4e112e7ecd83d6fbeacf62de9",
+        "native_execution": true
+      }
+    },
+    {
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r02/published473/create.receipt.json",
+        "bytes": 927,
+        "sha256": "95f9d7ebd30a01b1debea216cab154be6b7a3d1681fab0f2654f70bb146f0fe3"
+      },
+      "interpretation": "Fixture0.1.0 used removed research_queue_enabled API; observer error, no MIR acceptance.",
+      "original_result": {
+        "case": "published473",
+        "phase": "create",
+        "exit_code": 1,
+        "seconds": 1.4175446590006686,
+        "command": [
+          "/workspace/scratch/1437ecffaf60/mir-headless-2124/factorio/bin/x64/factorio",
+          "--config",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r02/published473/config.ini",
+          "--mod-directory",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r02/published473/mods",
+          "--create",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r02/published473/seed.zip",
+          "--map-gen-settings",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r02/published473/map-gen-settings.json"
+        ],
+        "observer_sha256": "bebda624df9ed1e4a5c9b9c6db125d7850ffef990c04291dcd9a52c71827446e",
+        "native_execution": true
+      }
+    },
+    {
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r03/published473/source.receipt.json",
+        "bytes": 811,
+        "sha256": "5ff932107a637f445e2dc20783a965c55396a6e185a7496ac311f8a16de9eeaf"
+      },
+      "interpretation": "Actual lab completed in test-save mode; no save produced. Exit0 is not accepted save evidence.",
+      "original_result": {
+        "phase": "source-native-lab",
+        "exit_code": 0,
+        "seconds": 2.2695319159993232,
+        "command": [
+          "/workspace/scratch/1437ecffaf60/mir-headless-2124/factorio/bin/x64/factorio",
+          "--config",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r03/published473/config.ini",
+          "--mod-directory",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r03/published473/mods",
+          "--test-save",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r03/published473/seed.zip",
+          "--test-arg",
+          "source",
+          "--test-ticks",
+          "200000"
+        ],
+        "input_sha256": "aadb82bbd8f03e099bc0261b90ae8ccecef19fbed4009c08ceeb4bcd8f891000",
+        "native_execution": true
+      }
+    },
+    {
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r04/published473/source.receipt.json",
+        "bytes": 1219,
+        "sha256": "6ed88f398a02ff3d07ca67d9a83137a02b9968132225c61acd42d064391f8619"
+      },
+      "interpretation": "Fixture server-settings JSON lacked required description; no gameplay run.",
+      "original_result": {
+        "phase": "source",
+        "native_execution": true,
+        "passed": false,
+        "failure": "engine_exited_before_completed_save",
+        "console_started": false,
+        "exit_code": 1,
+        "seconds": 1.3046564899996156,
+        "command": [
+          "/workspace/scratch/1437ecffaf60/mir-headless-2124/factorio/bin/x64/factorio",
+          "--config",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r04/published473/config.ini",
+          "--mod-directory",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r04/published473/mods",
+          "--start-server",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r04/published473/seed.zip",
+          "--server-settings",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r04/published473/server-settings.json",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "34197"
+        ],
+        "input_sha256": "26f514b6c4d006dfa21f8d63de1dcd1492065b7ee267b9c9b4298599181c04d2",
+        "input_unchanged": true,
+        "output_path": null,
+        "output_sha256": null,
+        "log_sha256": "8d165d6b10efe0d6d13622403abb17d6daff5c13a02bcafbba24587e8b9a851a"
+      }
+    },
+    {
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r05/published473/source.receipt.json",
+        "bytes": 1215,
+        "sha256": "05474ce2041eda17113fe324f93543cbe14ceebe8a9ac6e5692fbd9c9f955fd8"
+      },
+      "interpretation": "Controller did not repeat observed Lua-command confirmation; timeout. SIGINT rewrote the disposable synthetic seed. Original seed bytes reproduced independently at r07.",
+      "original_result": {
+        "phase": "source",
+        "native_execution": true,
+        "passed": false,
+        "failure": "timed_out_without_completed_save",
+        "console_started": true,
+        "exit_code": 0,
+        "seconds": 45.29321365399937,
+        "command": [
+          "/workspace/scratch/1437ecffaf60/mir-headless-2124/factorio/bin/x64/factorio",
+          "--config",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r05/published473/config.ini",
+          "--mod-directory",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r05/published473/mods",
+          "--start-server",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r04/published473/seed.zip",
+          "--server-settings",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r05/published473/server-settings.json",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "34197"
+        ],
+        "input_sha256": "26f514b6c4d006dfa21f8d63de1dcd1492065b7ee267b9c9b4298599181c04d2",
+        "input_unchanged": false,
+        "output_path": null,
+        "output_sha256": null,
+        "log_sha256": "c7f503ade892dbc165a67f3fff8c465d57b90b400465a08246949c0227c685f8"
+      }
+    },
+    {
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r06/published473/source.receipt.json",
+        "bytes": 1219,
+        "sha256": "42f8ce6b43656e421c680c0a3cf9f7614b5920a7dc99379da835483c90c90b5a"
+      },
+      "interpretation": "Actual lab completed but fixture saves directory was missing; save failed. No complete-chain acceptance.",
+      "original_result": {
+        "phase": "source",
+        "native_execution": true,
+        "passed": false,
+        "failure": "engine_exited_before_completed_save",
+        "console_started": true,
+        "exit_code": 255,
+        "seconds": 5.617148934000397,
+        "command": [
+          "/workspace/scratch/1437ecffaf60/mir-headless-2124/factorio/bin/x64/factorio",
+          "--config",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r06/published473/config.ini",
+          "--mod-directory",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r06/published473/mods",
+          "--start-server",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r04/published473/seed.zip",
+          "--server-settings",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r06/published473/server-settings.json",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "34197"
+        ],
+        "input_sha256": "b1136e45fedde099678996b1e3a2b9070b6901e907cf1f72da7430099b51d3e4",
+        "input_unchanged": true,
+        "output_path": null,
+        "output_sha256": null,
+        "log_sha256": "3b17ac1c4230342091d5a86ac179bee7b79c79d3a9b4c242ac3250592a1ec77c"
+      }
+    },
+    {
+      "receipt": {
+        "path": "build/tmp/reassessment-native-r08/candidate/successor.receipt.json",
+        "bytes": 1553,
+        "sha256": "12a26c76fd30a279c744ae3870f1263fea4658a31baeb39a40ab9a30edbba26a"
+      },
+      "interpretation": "Entry preservation passed; controller lab-speed accelerator reset to0 at configuration and was not reapplied; earning timed out. Same player/observer inputs pass in r09 after explicit fixture accelerator reapplication.",
+      "original_result": {
+        "phase": "successor",
+        "native_execution": true,
+        "passed": false,
+        "failure": "timed_out_without_completed_save",
+        "console_started": true,
+        "exit_code": 0,
+        "seconds": 45.25511189600002,
+        "command": [
+          "/workspace/scratch/1437ecffaf60/mir-headless-2124/factorio/bin/x64/factorio",
+          "--config",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r08/candidate/config.ini",
+          "--mod-directory",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r08/candidate/mods",
+          "--start-server",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r08/candidate/successor-consumed-input.zip",
+          "--server-settings",
+          "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r08/candidate/server-settings.json",
+          "--bind",
+          "127.0.0.1",
+          "--port",
+          "34197"
+        ],
+        "protected_input": "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r07/published473/work/saves/worker-source.zip",
+        "consumed_input": "/workspace/scratch/1437ecffaf60/.task-builds/mir-509-reassessment/build/tmp/reassessment-native-r08/candidate/successor-consumed-input.zip",
+        "input_sha256": "8f8f7279930e0d4978b504af064caf5e1b722354a220ce76ff0a127be655b79c",
+        "input_unchanged": true,
+        "output_path": null,
+        "output_sha256": null,
+        "log_sha256": "23e9259464d1853b3bfea05f415e693f8abaa9d798906b7ecdcd2735d20c98f9"
+      }
+    }
+  ],
+  "source_member_manifest": {
+    "path": "build/tmp/reassessment-native-r08/package.receipt.json",
+    "bytes": 85949,
+    "sha256": "c34df5c338df9469c6ec91fdcfb2707bd6139b68350908854a0520c8b5069797"
+  },
+  "limits": [
+    "Synthetic provider is not the unnamed reporter planet.",
+    "No native SIF or F200 qualification.",
+    "No arbitrary modpack, multiplayer/client or performance qualification.",
+    "No native finite-cap/relaxation or changed-provider transition in this controlled sequence.",
+    "First legacy admission qualified only for the exact supported473 route and unchanged upstream/settings.",
+    "Unknown first paid-mask case1806 remains unqualified.",
+    "No release publication or stable acceptance."
+  ]
+}
