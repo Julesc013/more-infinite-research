@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "kind": "MIR510IndependentHotfixReview",
+  "reviewed_at": "2026-11-09T00:10:00+11:00",
+  "reviewer_role": "independent-read-only-release-reviewer",
+  "scope": "WorkerRobotCargoSizeResearch collision and Space Is Fake final-science hotfix evidence; exact candidate reconciliation for a GitHub prerelease",
+  "verdict": {
+    "disposition": "accept-qualified-github-hotfix-beta-when-publication-conditions-pass",
+    "release_maturity": "GitHub prerelease only",
+    "stable_verdict": "not-ready",
+    "reason": "The bounded incident behavior and affected save boundary are independently evidenced on the frozen candidate. This review does not close the broader stable acceptance programme."
+  },
+  "reviewed_candidate": {
+    "accepted_source_commit": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+    "accepted_source_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+    "reconciliation_commit": "be6b06dba9a4338756737b569c6b55e2123e7161",
+    "reconciliation_parents": [
+      "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+      "b86c0262104529e4301386db4e9ce67284a03ce8"
+    ],
+    "reconciliation_tree": "416e7b290caa3ce2c164e5496d482a2041e43e90",
+    "tree_review": "git diff --quiet accepted_source_commit reconciliation_commit returned identical; both source subtrees resolve to accepted_source_tree. No product-source change was introduced by preserving published main history.",
+    "package": {
+      "version": "5.0.21010",
+      "sha256": "C625D648978F6FE677B5EDC5C68090A2AA9A939D48A54A736610D55E47337806"
+    }
+  },
+  "incident_evidence": {
+    "published_negative": {
+      "record": "build/tmp/mir509-worker-negative-r01/process-1.stdout.txt",
+      "observation": "Published 5.0.21009 reproduces the duplicate worker-robots-storage-4 preflight failure with the selected worker provider."
+    },
+    "data_stage": [
+      "build/qualification/mir510-worker-default-result.json",
+      "build/qualification/mir510-sif-worker-result.json",
+      "build/qualification/mir510-sif-worker-upstream-result.json",
+      "build/qualification/mir510-infinite-combined-result.json"
+    ],
+    "data_stage_findings": [
+      "With the provider's finite 4..7 route, the candidate preserves the foreign rows and emits MIR worker-robots-storage-8 after worker-robots-storage-7.",
+      "The combined Space Is Fake capture retains the foreign chain but removes white science from the affected final output.",
+      "The positive provider-infinite setting capture completes in Factorio 2.1.23: worker-robots-storage-8 is the external infinite technology, its prerequisite is worker-robots-storage-7, its formula is 2^(L - 4)*1000, and MIR worker-robots-storage-9 is absent. The record is explicitly data-stage-only, not gameplay qualification."
+    ],
+    "actual_lab_and_save": {
+      "fresh_combined": "build/qualification/mir510-lab-combined-r02-result.json",
+      "provider_earned_predecessor": "build/qualification/mir510-provider-earned-r03-result.json",
+      "first_add": "build/qualification/mir510-first-add-r01-result.json",
+      "controller": {
+        "commit": "5b24c839f30081e20c621097f0576499ac5e89c2",
+        "archive_sha256": "CF2B82498660BC49EAD7188962EF685726BF253EBEF1F031E29BA1202B4CC5A2",
+        "scope": "separate private native-observer fixture; not player-source content"
+      },
+      "findings": [
+        "A real provider level-7 lab completion witnesses bonus 7, the finite foreign 4..7 chain, and active research progress 0.27; its protected provider-only save survives two cold reloads byte-identically.",
+        "The first-add record consumes that exact protected input save. Its before-first-add marker is emitted before the controller deliberately changes the queue and shows MIR8/provider7, worker bonus 7, white-science retirement, foreign finite 4..7, and current research progress 0.27.",
+        "The actual MIR8 lab completion then witnesses worker bonus 8 and level 9. The saved result and both independent cold reloads pass with the same post-save hash; the unrelated 0.27 sentinel is retained while the controlled main sentinel is 0.42.",
+        "The combined fresh lab record separately witnesses MIR8 completion from bonus 7 to 8 and two byte-identical cold reloads."
+      ]
+    }
+  },
+  "reviewed_safety_boundary": "Existing history that has already earned MIR worker storage refuses an unsafe provider add/change before lifecycle writes. The positive native preservation route is provider-earned level 7 followed by first addition of corrected MIR; it is not a claim that every provider change after MIR progression is save-safe.",
+  "provenance_and_limits": [
+    "WorkerRobotCargoSizeResearch is a private reconstruction from selected verified upstream source blobs, not an official downloaded provider archive and not the reporter's full modpack.",
+    "The lab runs are controlled fixtures. They are native Factorio 2.1.23 evidence for the stated worker/SIF routes, not general client, multiplayer, performance, Library, cap-relaxation, provider-removal, or arbitrary provider-change qualification.",
+    "The cited data-stage captures establish prototype output only where so labelled; they do not replace actual gameplay or save evidence.",
+    "Stable acceptance remains open for its applicable unresolved programme, including the broader client/performance/Library and unsupported-transition boundaries."
+  ],
+  "mandatory_conditions_before_publication": [
+    "Run and retain required fresh CI/check results for the pushed reconciliation head be6b06dba9a4338756737b569c6b55e2123e7161; do not substitute an earlier-head result merely because the tree is identical.",
+    "Keep the selected release inventory and package bytes fixed; reverify the frozen asset hashes, inventory, exact source/package/controller provenance, and upgrade-safety records.",
+    "Immediately before publication, pass Test-MIRGitHubAdministration.ps1 and the distinct release-immutability probe in the real Black Glass Windows user context.",
+    "Promote only after exact main/release tree readback, stage the complete frozen inventory and checksums, verify staged asset names/hashes, publish as prerelease rather than latest stable, then anonymously download and hash-verify every public asset and copy matching custody material to dist.",
+    "Keep release notes precise about the worker/SIF fixes and prerelease scope; do not represent this bounded review as stable qualification or claim an official provider archive/reporter-pack reproduction."
+  ]
+}
