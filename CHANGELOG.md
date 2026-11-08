@@ -8,6 +8,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 - Remove outdated active-lab science advice from translated direct-effect research descriptions.
 - Detect disabled Angel water-treatment prerequisites before publishing dependent research.
+- Retain selected Library research while translated search results reload after changing tabs.
 
 ## [5.0.10] - 2026-11-08
 

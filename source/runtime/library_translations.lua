@@ -439,6 +439,13 @@ function M.labels(cache, scope)
   return cache.labels
 end
 
+-- Rendering can distinguish a final filtered list from a partial reply batch
+-- without copying the label map or changing the issued-request ledger.
+function M.is_complete(cache, scope)
+  if not scope_is_current(cache, scope) then return nil end
+  return cache.resolved >= cache.catalogue_count
+end
+
 -- nil denotes an older working cache with no discovery coverage metadata.
 -- Its owner may renew derived work during a valid open, never during on_load.
 function M.discovery_limited(cache, scope)
