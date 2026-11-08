@@ -1,0 +1,10 @@
+{
+  "kind": "MIR510RuntimeAnalysisBindingIntentV1",
+  "scope": "Finite input/provenance binding to the existing runtime analyzer; preserve every original metric, counterbalance, summary, median, tolerance and denominator rule. New scored metric values will remain unread until binding and independent review are complete.",
+  "plan_revision": "8ab529a090128979014ebfe968b794b7511679f0",
+  "plan_sha256": "9CDED5FE074894D734210CB432384BF4B509D69AD9CB527424701358EF7054F9",
+  "capsule_sha256": "9B204C353DB4FDD6DCE51C0307A25058C1978E46B7E3249548AF21E5246D76F0",
+  "no_new_threshold_or_schedule": true,
+  "performance_acceptance": false,
+  "release_qualification": false
+}
