@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "kind": "MIR510LibraryOfflineCompositionChainV1",
+  "status": "passed-actual-f210-host-control-with-synthetic-handoff-only",
+  "preparation_sha256": "A6E3B639F82937BE4C2042D47D738BE928C29481EC1FEC82F2C9E00F434AECF9",
+  "runtime_sha256": "6AE5CFBC79DF178FFBF48740DE1155F589BF3E57B370363D011472F6315130FA",
+  "private_caller_commit": "bf8f20c050d15abe1951d83ffcce2ad681104218",
+  "caller_sha256": "3D03C5D577FBD2C28556517C14850CECFFEE2BA97F3B61C1DA92B2E0C4E776B8",
+  "primary_root": "build/qualification/library510-input-binding-r01/host-composition-synthetic-r02",
+  "result_sha256": "84691F95B3F931B6C38810B2845643A93556A41A7702F7E611ABB65563B378EA",
+  "command_sha256": "C5D03859298230013F6A37644955316856D06C68CFB136C167EEB8265E381BC0",
+  "stdout_sha256": "8E70EA1DA200652C77C2EE77ADB443AE3DC54BFE7F34D734D825CD8AFD6413C2",
+  "restoration_sha256": "CA4FDE7CE8D121965FFD0F4563B96490AB48C101164699663B536217C1763FA6",
+  "observed": [
+    "Runtime mutation, actor-binding mutation and alternate-handoff opponents refuse before staging or input.",
+    "Forced restoration failure retains an adverse terminal and verifies the cleanup ordering.",
+    "Before/after preparation, runtime, caller, driver, test helper and protected-save hashes match.",
+    "The full 733-file direct-library directory metadata inventory matches. Content hashes of two present selected archives and the two mod controls match; the input observer archive remains absent.",
+    "Six synthetic output files are retained and hash-verified before removing only those owned files; governed output returns empty."
+  ],
+  "protected_save_sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD",
+  "root_independent_readback": true,
+  "original_missing_continue_receipt_failure_preserved": true,
+  "local_wrapper_sha256": "BFDD82AC6BC5A05BA5B6F94CAD61C667F1EDB33A780DE0965E5D8EFBD0D51012",
+  "wrapper_custody_limit": "Task-local wrapper hash is post-execution custody, not a separately precommitted native controller. The actual unchanged caller was already committed and pinned.",
+  "native_execution": false,
+  "real_ui_inspection": false,
+  "real_continue_approval": false,
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "remaining": "Fresh real actor/window binding and native input/lifecycle/export acceptance remain pending. Synthetic process/window identities, captures and continue receipt confer no native authority."
+}

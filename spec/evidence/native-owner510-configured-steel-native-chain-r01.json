@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "kind": "MIR510ConfiguredSteelNativeChainV1",
+  "status": "accepted-scoped-fresh-native-completion-save-two-cold-checks",
+  "player": {
+    "source_commit": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+    "source_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+    "distribution": "5.0.21010",
+    "sha256": "C625D648978F6FE677B5EDC5C68090A2AA9A939D48A54A736610D55E47337806",
+    "bytes": 996956
+  },
+  "runner": {
+    "public_commit": "21be82a8c0637db49722c3c20bbf9c05080ba095",
+    "private_commit": "64a642ad30dcca6570b0678f77de6bb458685b7d",
+    "caller_sha256": "1D1E8848E6C9682492A1C7A361654F7D4A141D4A820A16E9CE7EC70BE1D2655D",
+    "actor_sha256": "8B1FB0951BFB0E416836976C2664A72431D70785AC5793039BE63145EAC4F964"
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "inputs": {
+    "manifest_sha256": "E40ACB89BEADD0414F490B3313BE455106A58416F5EEA7F3DF779A8EB6F049BA",
+    "profile_sha256": "1B79601A6C5EB56F8B0748B5D0D29FEFA0942E8E6785DE348025AF3B118823AC",
+    "composition_sha256": "F5EB8368BED023E1F275483F99F80629078F5A82CF034C6F020417D2097EA00C",
+    "mods": [
+      "base@2.1.23",
+      "elevated-rails@2.1.23",
+      "quality@2.1.23",
+      "recycler@2.1.23",
+      "space-age@2.1.23",
+      "more-infinite-research@5.0.21010",
+      "mir-fixture-native-owner-settings@0.1.0"
+    ],
+    "native_budget_mib": 4096,
+    "max_output_mib": 128,
+    "timeout_seconds": 180
+  },
+  "owned_observer": {
+    "original_sha256": "EA0EFBC735BEC4809569053F17C99A4F4884F4E8A47D6D616E9441A62B2C6300",
+    "current_sha256": "3E8BCFBB5570E9DDD929AB623163F3264D9AC4E8AA0C1EAD299ED1F74F9BD87E",
+    "bytes": 2124,
+    "difference": "Only the exact required MIR version in info.json changes from 5.0.21003 to 5.0.21010. All three Lua member bodies match the original byte for byte. This fresh scenario has no predecessor consuming this test variant."
+  },
+  "actual": {
+    "native_processes": 3,
+    "new_lab_completions": 1,
+    "completion_by_script": false,
+    "map_technology_price_multiplier": 1,
+    "configured_tuple": {
+      "base": 2,
+      "linear_increment": 3,
+      "growth": 1.25,
+      "time_seconds": 1,
+      "effect_percent": 17
+    },
+    "initial_owner_effective_units": 2,
+    "private_effective_units": 2,
+    "post_completion_owner_effective_units": 6,
+    "remaining_science": {
+      "automation-science-pack": 4,
+      "logistic-science-pack": 4,
+      "chemical-science-pack": 4,
+      "production-science-pack": 4
+    },
+    "recipe_rewards": {
+      "steel-plate": 0.17,
+      "casting-steel": 0.17
+    },
+    "foreign_bullet_damage_reward": 0.07,
+    "hidden_unearned_private_holder_preserved": true,
+    "foreign_state_preserved": true,
+    "production_exit": -1,
+    "production_save_predicate_observed": true,
+    "cold_exits": [
+      0,
+      0
+    ],
+    "cold_ticks_each": 1,
+    "timeouts": 0,
+    "protected_successor_sha256": "968A6C588C22E05628AB3D223B7EBE0425CF5E2AFC2D44AF569257DF8B0B45A4",
+    "successor_bytes": 561581,
+    "cold_save_bytes_unchanged": true,
+    "embedded_actor_verified": true,
+    "controls_and_19_prior_mir_archives_restored": true,
+    "temporary_owned_observer_removed": true,
+    "remaining_factorio_processes": 0
+  },
+  "result_sha256": "E861A72FD37E2AB1864AB80175BEB88FF7A900ACE6925B61CF2574DB9D298AA1",
+  "independent_review": {
+    "admission_sha256": "F5682AD9BD442E9A72A9C43D54DEF583E39F2E1E824EC143A5DEC04612E5AE16",
+    "actual_result": "spec/evidence/native-owner510-independent-result-review-r01.json",
+    "actual_result_sha256": "F15DFE67FE3621A8554C81CCA8EB17301BD7F55C7B5844E8BBBF0D5105CBD250",
+    "verdict": "Accepted the named fresh completion/save/two-cold scope; all custody and actual native records independently read back."
+  },
+  "custody": {
+    "primary_root": "build/qualification/native-owner510-native-custody-r01",
+    "manifest_sha256": "D1977D70C401A0970D336DA6E2BFD5D6F1E422836AB9857152E38467699007C2",
+    "files": 61,
+    "bytes": 4567285
+  },
+  "adverse": {
+    "status": "preserved-zero-native-dependency-refusal",
+    "original_inputs": "build/qualification/native-owner510-inputs-r01",
+    "cause": "Original owned observer requires exactly MIR 5.0.21003. Actual composition rejects it before native launch. Separate r02 corrects that owned dependency and retains the failed result."
+  },
+  "limits": [
+    "This is a fresh controlled Space Age configured-steel case, not an old-save cost conversion, arbitrary provider/configuration or full settings campaign.",
+    "No physical manufacturing, GUI/client, performance or stable verdict follows. The original C503 receipt and earlier oracle failures keep their original identities.",
+    "Native private-holder behavior is observed; no direct cross-mod private-storage inspection is claimed."
+  ],
+  "release_qualification": false
+}
