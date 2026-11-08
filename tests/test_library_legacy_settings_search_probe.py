@@ -54,23 +54,28 @@ class LibraryLegacySettingsSearchProbeTests(unittest.TestCase):
               local requested=options.tab
               if opponent=="old-route-only-changes-research" then requested="research" end
               if requested=="research" or requested=="settings" then retained_tab=requested end
-              if options.settings_scope=="research" then retained_scope="research" end
+              if options.settings_scope=="research" or options.settings_scope=="options" then retained_scope=options.settings_scope end
               if type(options.search)=="string" then
                 local text=opponent=="unbounded-no-match" and options.search or options.search:sub(1,160)
                 if retained_tab=="settings" then retained_settings=text else retained_research=text end
               end
+              if opponent=="wrong-scope" and options.settings_scope=="options" then retained_scope="research" end
               if opponent=="transient-research-leak" and retained_tab=="settings" then
                 retained_research=retained_settings=="repair" and "leaked" or "science"
               end
               research_query.text=retained_research;settings_query.text=retained_settings
               tabs.selected_tab_index=retained_tab=="settings" and 3 or 1
               local items
-              if opponent=="unfiltered-rows" and retained_settings=="repair" then
-                items={"Research growth","Repair speed","Recipe options"}
+              if retained_scope=="research" then
+                items=retained_settings=="" and {"Research growth","Research costs"} or {}
+              elseif opponent=="unfiltered-rows" and retained_settings=="repair" then
+                items={"Passive repair","Recipe options","Default options"}
               elseif retained_settings=="" then
-                items={"Research growth","Repair speed","Recipe options"}
+                items={"Passive repair","Recipe options","Default options"}
               elseif retained_settings=="repair" then
-                items={"Repair speed"}
+                items={"Passive repair"}
+              elseif retained_settings=="default" then
+                items={"Default options"}
               else items={} end
               if opponent=="wrong-query" and retained_settings=="repair" then settings_query.text="wrong" end
               list.items=items;count.caption={"mir-browser.settings-count",#items}
@@ -82,11 +87,11 @@ class LibraryLegacySettingsSearchProbeTests(unittest.TestCase):
             local probe=assert(loadfile(probe_path))().new({player=player,research_query="science",tick=function()return tick end,
               assert_world=function()if world~=1 then error("protected world changed")end end})
             if invalid=="early" then probe.prepare("research");return pcall(function()probe.check("research")end) end
-            if invalid=="order" then return pcall(function()probe.prepare("settings-baseline")end) end
-            if invalid=="wrong-check" then probe.prepare("research");tick=30;return pcall(function()probe.check("settings-baseline")end) end
-            for _,stage in ipairs({"research","settings-baseline","settings-repair","settings-retained-default","settings-no-match","restore-settings-empty","restore-research"}) do
+            if invalid=="order" then return pcall(function()probe.prepare("settings-options-baseline")end) end
+            if invalid=="wrong-check" then probe.prepare("research");tick=30;return pcall(function()probe.check("settings-options-baseline")end) end
+            for _,stage in ipairs({"research","settings-options-baseline","settings-options-repair","settings-options-retained-default","settings-options-no-match","restore-settings-options-empty","restore-research"}) do
               probe.prepare(stage)
-              if opponent=="world-mutation" and stage=="settings-repair" then world=2 end
+              if opponent=="world-mutation" and stage=="settings-options-repair" then world=2 end
               tick=tick+30
               probe.check(stage)
             end
@@ -101,25 +106,25 @@ class LibraryLegacySettingsSearchProbeTests(unittest.TestCase):
         self.assertIsNone(result.get("next_stage"))
         self.assertEqual(result["research_text"], "science")
         observations = result["observations"]
-        self.assertEqual(observations["settings-baseline"]["list_count"], 3)
-        self.assertEqual(observations["settings-repair"]["list_items"], ["Repair speed"])
-        self.assertEqual(observations["settings-retained-default"]["list_count"], 0)
-        self.assertEqual(observations["settings-no-match"]["settings_text"], "x" * 160)
-        self.assertEqual(observations["settings-no-match"]["list_count"], 0)
-        self.assertEqual(observations["restore-settings-empty"]["settings_text"], "")
+        self.assertEqual(observations["settings-options-baseline"]["list_count"], 3)
+        self.assertEqual(observations["settings-options-repair"]["list_items"], ["Passive repair"])
+        self.assertEqual(observations["settings-options-retained-default"]["list_count"], 1)
+        self.assertEqual(observations["settings-options-no-match"]["settings_text"], "x" * 160)
+        self.assertEqual(observations["settings-options-no-match"]["list_count"], 0)
+        self.assertEqual(observations["restore-settings-options-empty"]["settings_text"], "")
         self.assertEqual(observations["restore-research"]["research_text"], "science")
         self.assertEqual(observations["restore-research"]["settings_text"], "")
         self.assertEqual(observations["restore-research"]["selected_tab"], 1)
         self.assertEqual([call.get("tab") for call in calls], ["research", "settings", "settings", None, None, "settings", "research"])
-        self.assertEqual(calls[1], {"tab": "settings", "settings_scope": "research", "search": ""})
-        self.assertEqual(calls[2], {"tab": "settings", "settings_scope": "research", "search": "repair"})
+        self.assertEqual(calls[1], {"tab": "settings", "settings_scope": "options", "search": ""})
+        self.assertEqual(calls[2], {"tab": "settings", "settings_scope": "options", "search": "repair"})
         self.assertEqual(calls[3], {"search": "default"})
         self.assertEqual(calls[4], {"search": "x" * 161})
-        self.assertEqual(calls[5], {"tab": "settings", "settings_scope": "research", "search": ""})
+        self.assertEqual(calls[5], {"tab": "settings", "settings_scope": "options", "search": ""})
         self.assertEqual(calls[6], {"tab": "research"})
 
     def test_rejects_wrong_remote_projection_or_protected_world_mutation(self):
-        for opponent in ("old-route-only-changes-research", "wrong-query", "unfiltered-rows", "foreign-ownership",
+        for opponent in ("old-route-only-changes-research", "wrong-query", "wrong-scope", "unfiltered-rows", "foreign-ownership",
                          "malformed-query", "unbounded-no-match", "transient-research-leak", "world-mutation"):
             with self.subTest(opponent=opponent):
                 with self.assertRaises(Exception):
@@ -141,6 +146,33 @@ class LibraryLegacySettingsSearchProbeTests(unittest.TestCase):
         fixture = PROBE.parent
         self.assertFalse((fixture / "control.lua").exists())
         self.assertFalse((fixture / "info.json").exists())
+
+    def test_real_library_source_assigns_passive_repair_to_other_options_scope(self):
+        source = (ROOT / "source/runtime/library.lua").read_text(encoding="utf-8")
+        self.assertIn('local scope = stream and "research" or "options"', source)
+        self.assertIn('if group.scope == view.settings_scope and setting_search_matches(group, view.settings_query, translations)', source)
+        self.assertIn('if options.settings_scope == "research" or options.settings_scope == "options" then', source)
+        settings = (ROOT / "source/research/settings.lua").read_text(encoding="utf-8")
+        self.assertIn('["mir-enable-passive-repair"]', settings)
+
+    def test_real_library_search_finds_repair_only_in_other_options(self):
+        import test_library
+
+        test_library.LuaRuntime = LuaRuntime
+        case = test_library.LibraryTests()
+        case.setUp()
+        case.lua.execute(r'''
+          boot()
+          local function count(scope)
+            local root=library.open(player,{tab="settings",settings_scope=scope,search="repair"})
+            local dynamic=root.mir_library_tabs.mir_library_settings_content.mir_library_settings_dynamic
+            return #dynamic.mir_library_settings_list.items,storage.mir_library.players[1].settings_scope
+          end
+          local options,options_scope=count("options")
+          local research,research_scope=count("research")
+          assert(options_scope=="options" and options>0,"passive repair must be found in Other options")
+          assert(research_scope=="research" and research==0,"passive repair must not enter Research settings")
+        ''')
 
 
 if __name__ == "__main__":

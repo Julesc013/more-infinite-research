@@ -10,11 +10,11 @@ local OWNER = "more-infinite-research"
 local ROOT_TAG = "more-infinite-research.library-root.v1"
 local STAGES = {
   "research",
-  "settings-baseline",
-  "settings-repair",
-  "settings-retained-default",
-  "settings-no-match",
-  "restore-settings-empty",
+  "settings-options-baseline",
+  "settings-options-repair",
+  "settings-options-retained-default",
+  "settings-options-no-match",
+  "restore-settings-options-empty",
   "restore-research",
 }
 local NO_MATCH = string.rep("x", 161)
@@ -143,11 +143,11 @@ function M.new(context)
 
   local function prepare_options(stage)
     if stage == "research" then return {tab = "research", search = research_query} end
-    if stage == "settings-baseline" then return {tab = "settings", settings_scope = "research", search = ""} end
-    if stage == "settings-repair" then return {tab = "settings", settings_scope = "research", search = "repair"} end
-    if stage == "settings-retained-default" then return {search = "default"} end
-    if stage == "settings-no-match" then return {search = NO_MATCH} end
-    if stage == "restore-settings-empty" then return {tab = "settings", settings_scope = "research", search = ""} end
+    if stage == "settings-options-baseline" then return {tab = "settings", settings_scope = "options", search = ""} end
+    if stage == "settings-options-repair" then return {tab = "settings", settings_scope = "options", search = "repair"} end
+    if stage == "settings-options-retained-default" then return {search = "default"} end
+    if stage == "settings-options-no-match" then return {search = NO_MATCH} end
+    if stage == "restore-settings-options-empty" then return {tab = "settings", settings_scope = "options", search = ""} end
     if stage == "restore-research" then return {tab = "research"} end
     fail("unknown fixed stage")
   end
@@ -171,21 +171,21 @@ function M.new(context)
       observation = observe(stage, 1, nil)
       if observation.research_text ~= research_query then fail("initial Research query differs") end
       state.research_text = observation.research_text
-    elseif stage == "settings-baseline" then
+    elseif stage == "settings-options-baseline" then
       observation = observe(stage, 3, "")
-      if observation.list_count < 1 then fail("Settings baseline is empty") end
-    elseif stage == "settings-repair" then
+      if observation.list_count < 1 then fail("Other options baseline is empty") end
+    elseif stage == "settings-options-repair" then
       observation = observe(stage, 3, "repair")
-      local baseline = state.observations["settings-baseline"]
+      local baseline = state.observations["settings-options-baseline"]
       if observation.list_count < 1 or baseline == nil or observation.list_count >= baseline.list_count then
-        fail("Settings repair filter differs")
+        fail("Other options repair filter differs")
       end
-    elseif stage == "settings-retained-default" then
+    elseif stage == "settings-options-retained-default" then
       observation = observe(stage, 3, "default")
-    elseif stage == "settings-no-match" then
+    elseif stage == "settings-options-no-match" then
       observation = observe(stage, 3, string.sub(NO_MATCH, 1, 160))
       if observation.list_count ~= 0 then fail("Settings no-match filter differs") end
-    elseif stage == "restore-settings-empty" then
+    elseif stage == "restore-settings-options-empty" then
       observation = observe(stage, 3, "")
     elseif stage == "restore-research" then
       observation = observe(stage, 1, "")
