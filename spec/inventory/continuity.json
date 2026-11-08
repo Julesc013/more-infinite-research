@@ -17428,12 +17428,39 @@
             {
               "requirement": "CONT-10.truthful-research-description; issue1768",
               "existing_result": "spec/evidence/library509-combined-observed-states-r01.json separate_content_issue: actual509 worker-battery detail shows false active-lab selection claim",
-              "missing_check": "After the bounded locale correction, open the same worker-battery detail on the chosen next-source package in English/German; observe accurate benefit-only description and retained fixed tabs, selection and inner scroll.",
+              "missing_check": "The fixed7441 English/German records below already observe the corrected benefit-only description under their original input identities. On the chosen candidate containing the separately reviewed localized-selection correction, verify that the explicitly selected worker battery and accurate description survive the affected tab route; retain the fixed-tab and inner-scroll expectations without treating these two records as an inner-scroll pass. Preserve the original German selection adverse and all separate Library/client/export/lifecycle/performance gates.",
               "source_owner": "Aero",
               "native_owner": "Black Glass",
-              "status": "source-correction-reviewed-and-delivered-in-PR1817; native-not-run",
+              "status": "description-observed-in-EN-and-DE-on-fixed7441; corrected-selection-native-regression-pending",
               "source_commit": "a938ef8902cb0a744021f59f77ebee8999cc5b97",
-              "source_review": "Independent non-author root verified all50committed locale changes against original published prefixes and unchanged B6 hashes/other corrections."
+              "source_review": "Independent non-author root verified all50committed locale changes against original published prefixes and unchanged B6 hashes/other corrections.",
+              "accepted_description_observations": {
+                "distribution": "5.0.21011",
+                "published_package": false,
+                "player_source_head": "706dd02cc86993cd4d20b769aca85f2a661ea786",
+                "player_tree": "4bcdf2b89d63d38fe6cb0b66840a83096a56dd0c",
+                "player_zip_sha256": "74418DC171C8FA3F21486EF21B1FA8D348E99798E4F4D6DF5657024D2B87B892",
+                "engine": "Factorio2.1.23 build87750",
+                "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+                "english": {
+                  "evidence": "spec/evidence/library511-one-en-independent-result-review-r01.json",
+                  "observation_pointer": "/observed_states/3",
+                  "observed": "Selected Worker robot battery shows benefit-only direct-effect description and Battery size:+10%, without obsolete active-lab science advice.",
+                  "retention_scope": "The same record observes retained battery query/two matches/worker selection and description on return; its separate wrong-scope Settings nonempty predicate is unmet."
+                },
+                "german": {
+                  "evidence": "spec/evidence/library511-one-de-independent-result-review-r01.json",
+                  "observation_pointer": "/accepted_named_observations/2",
+                  "observed": "Explicitly selected Arbeitsroboter-Akkukapazitaet shows correct direct-effect description and battery capacity:+10%, without obsolete active-lab science advice.",
+                  "retention_scope": "Return Research retains akku/two matching rows but replaces the selected worker with electricity productivity; /adverse_selection remains an actual product failure."
+                },
+                "limits": "These are accepted named observations on fixed7441, not native results for the later selection correction/playerdc3f/F25D package, a full sequence, inner-scroll acceptance, saved/client lifecycle, exports, performance or stable qualification."
+              },
+              "previous_case_checkpoint": {
+                "source": "ee823e17bfe4c3422cc55aa68e857f9e55fdb491:spec/inventory/continuity.json",
+                "status": "source-correction-reviewed-and-delivered-in-PR1817; native-not-run",
+                "missing_check": "After the bounded locale correction, open the same worker-battery detail on the chosen next-source package in English/German; observe accurate benefit-only description and retained fixed tabs, selection and inner scroll."
+              }
             }
           ]
         },
