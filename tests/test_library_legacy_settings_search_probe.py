@@ -33,7 +33,7 @@ class LibraryLegacySettingsSearchProbeTests(unittest.TestCase):
             end
             local screen=node(nil,"screen","screen","fixture")
             local player={valid=true,index=47,gui={screen=screen}}
-            local frame,tabs,research,settings,settings_query,research_query,list,count
+            local frame,tabs,research,settings,settings_query,research_query,list,count,scope_label
             local retained_tab,retained_scope,retained_research,retained_settings="research","research","science",""
             local function render(options)
               if not frame then
@@ -50,6 +50,7 @@ class LibraryLegacySettingsSearchProbeTests(unittest.TestCase):
                 local dynamic=node(settings,"table","mir_library_settings_dynamic",root_mod)
                 list=node(dynamic,"list-box","mir_library_settings_list",root_mod)
                 count=node(dynamic,"label","mir_library_settings_count",root_mod)
+                scope_label=node(dynamic,"label","mir_library_settings_scope_label",root_mod)
               end
               local requested=options.tab
               if opponent=="old-route-only-changes-research" then requested="research" end
@@ -79,6 +80,7 @@ class LibraryLegacySettingsSearchProbeTests(unittest.TestCase):
               else items={} end
               if opponent=="wrong-query" and retained_settings=="repair" then settings_query.text="wrong" end
               list.items=items;count.caption={"mir-browser.settings-count",#items}
+              scope_label.caption={"mir-browser.settings-scope-" .. (opponent=="stale-scope-label" and "research" or retained_scope)}
             end
             remote={call=function(interface,method,index,options)
               if interface~="more-infinite-research-browser" or method~="open" or index~=player.index then error("wrong remote facade") end
@@ -115,6 +117,9 @@ class LibraryLegacySettingsSearchProbeTests(unittest.TestCase):
         self.assertEqual(observations["restore-research"]["research_text"], "science")
         self.assertEqual(observations["restore-research"]["settings_text"], "")
         self.assertEqual(observations["restore-research"]["selected_tab"], 1)
+        for stage in ("settings-options-baseline", "settings-options-repair", "settings-options-retained-default",
+                      "settings-options-no-match", "restore-settings-options-empty", "restore-research"):
+            self.assertEqual(observations[stage]["scope_caption"], ["mir-browser.settings-scope-options"])
         self.assertEqual([call.get("tab") for call in calls], ["research", "settings", "settings", None, None, "settings", "research"])
         self.assertEqual(calls[1], {"tab": "settings", "settings_scope": "options", "search": ""})
         self.assertEqual(calls[2], {"tab": "settings", "settings_scope": "options", "search": "repair"})
@@ -124,7 +129,7 @@ class LibraryLegacySettingsSearchProbeTests(unittest.TestCase):
         self.assertEqual(calls[6], {"tab": "research"})
 
     def test_rejects_wrong_remote_projection_or_protected_world_mutation(self):
-        for opponent in ("old-route-only-changes-research", "wrong-query", "wrong-scope", "unfiltered-rows", "foreign-ownership",
+        for opponent in ("old-route-only-changes-research", "wrong-query", "wrong-scope", "stale-scope-label", "unfiltered-rows", "foreign-ownership",
                          "malformed-query", "unbounded-no-match", "transient-research-leak", "world-mutation"):
             with self.subTest(opponent=opponent):
                 with self.assertRaises(Exception):
@@ -146,14 +151,6 @@ class LibraryLegacySettingsSearchProbeTests(unittest.TestCase):
         fixture = PROBE.parent
         self.assertFalse((fixture / "control.lua").exists())
         self.assertFalse((fixture / "info.json").exists())
-
-    def test_real_library_source_assigns_passive_repair_to_other_options_scope(self):
-        source = (ROOT / "source/runtime/library.lua").read_text(encoding="utf-8")
-        self.assertIn('local scope = stream and "research" or "options"', source)
-        self.assertIn('if group.scope == view.settings_scope and setting_search_matches(group, view.settings_query, translations)', source)
-        self.assertIn('if options.settings_scope == "research" or options.settings_scope == "options" then', source)
-        settings = (ROOT / "source/research/settings.lua").read_text(encoding="utf-8")
-        self.assertIn('["mir-enable-passive-repair"]', settings)
 
     def test_real_library_search_finds_repair_only_in_other_options(self):
         import test_library

@@ -62,6 +62,14 @@ local function count_from(label, list_count)
   return caption[2], caption
 end
 
+local function scope_from(label)
+  local caption = label.caption
+  if type(caption) ~= "table" or caption[1] ~= "mir-browser.settings-scope-options" then
+    fail("Other options scope label differs")
+  end
+  return caption
+end
+
 function M.new(context)
   if type(context) ~= "table" or not valid(context.player) or type(context.assert_world) ~= "function"
       or type(context.tick) ~= "function" then
@@ -111,8 +119,9 @@ function M.new(context)
       local dynamic = owned(settings[PREFIX .. "settings_dynamic"], settings, "table", PREFIX .. "settings_dynamic")
       local list = owned(dynamic[PREFIX .. "settings_list"], dynamic, "list-box", PREFIX .. "settings_list")
       local count = owned(dynamic[PREFIX .. "settings_count"], dynamic, "label", PREFIX .. "settings_count")
+      local scope_label = owned(dynamic[PREFIX .. "settings_scope_label"], dynamic, "label", PREFIX .. "settings_scope_label")
       if type(query.text) ~= "string" then fail("Settings query text differs") end
-      result.settings_query, result.list, result.count = query, list, count
+      result.settings_query, result.list, result.count, result.scope_label = query, list, count, scope_label
     end
     return result
   end
@@ -130,8 +139,10 @@ function M.new(context)
       if gui.settings_query.text ~= expected_query then fail("settings query differs: " .. stage) end
       local items = items_from(gui.list)
       local count, caption = count_from(gui.count, #items)
+      local scope_caption = scope_from(gui.scope_label)
       observation.settings_text = gui.settings_query.text
       observation.list_items, observation.list_count, observation.count_caption = items, count, caption
+      observation.scope_caption = scope_caption
     end
     return observation
   end
