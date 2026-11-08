@@ -4,6 +4,7 @@ These controls load only fixture-owned Lua against small doubles. They never
 launch Factorio or interpret profiler text as a timing result.
 """
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -1067,6 +1068,11 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
                     self.assertFalse(plain(run(selector, opponent, "candidate-defaults", tier, True, True))["ok"])
 
     def test_510_complete_selected_metadata_dependency_composition(self):
+        # This fixed10 control consumes original metadata, independently frozen
+        # from8e5ce79b:source/info.json; later source versions are separate inputs.
+        mir_info = ROOT / "tests/fixtures/runtime510-selected-mir-info.json"
+        self.assertEqual("4FAED4857D3F5686344546F10918DAD550686D36DB50BACB4B3F3571882CD7CD",
+                         hashlib.sha256(mir_info.read_bytes()).hexdigest().upper())
         # Official 2.1.23 dependency declarations independently read from the
         # selected engine's data/*/info.json. No Factorio process or archive is created.
         official = {
@@ -1093,7 +1099,7 @@ Assert-MIRLibraryDependencies -Selected $selected
                 "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults": FIXTURE / "arm-candidate-defaults/info-active-current-f210.json",
                 f"mir-fixture-mir5-agriculture-scale-matched-tier-{tier}": FIXTURE / f"matched-tier-{tier}/info.json",
                 "mir-fixture-mir5-agriculture-scale-active": FIXTURE / "active/info.json",
-                "more-infinite-research": ROOT / "source/info.json",
+                "more-infinite-research": mir_info,
             }
             rows = []
             for row in profile["mods"]:
@@ -1103,10 +1109,14 @@ Assert-MIRLibraryDependencies -Selected $selected
                         if name in official else json.loads(fixture_paths[name].read_text()))
                 rows.append({"name": name, "version": row["version"], "info": info})
             self.assertEqual(12, len(rows))
-            for arm_file, allowed in ((None, True), ("info.json", False), ("info-505.json", False)):
+            for arm_file, allowed in ((None, True), ("info.json", False), ("info-505.json", False),
+                                      ("wrong-mir-info", False)):
                 with self.subTest(tier=tier, arm_file=arm_file):
                     selected = json.loads(json.dumps(rows))
-                    if arm_file:
+                    if arm_file == "wrong-mir-info":
+                        mir = next(row for row in selected if row["name"] == "more-infinite-research")
+                        mir["info"]["version"] = "5.0.21011"
+                    elif arm_file:
                         arm = next(row for row in selected if row["name"] == "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults")
                         arm["info"] = json.loads((FIXTURE / "arm-candidate-defaults" / arm_file).read_text())
                         arm["version"] = arm["info"]["version"]
@@ -1115,7 +1125,9 @@ Assert-MIRLibraryDependencies -Selected $selected
                                  MIR_SELECTED=json.dumps(selected)), capture_output=True, text=True)
                     self.assertEqual(allowed, result.returncode == 0, result.stdout + result.stderr)
                     if not allowed:
-                        self.assertIn("mir-library-dependency-version", result.stderr)
+                        expected = ("selected metadata identity differs" if arm_file == "wrong-mir-info"
+                                    else "mir-library-dependency-version")
+                        self.assertIn(expected, result.stderr)
 
     def test_exact_f210_api_declares_the_fixture_runtime_surface(self):
         api_path = f210_runtime_api_path()

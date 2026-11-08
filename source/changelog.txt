@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 5.0.11
+Date: 2026-11-09
+
+  Bugfixes:
+
+    - Remove outdated active-lab science advice from translated direct-effect research descriptions.
+    - Detect disabled Angel water-treatment prerequisites before publishing dependent research.
+
+---------------------------------------------------------------------------------------------------
 Version: 5.0.10
 Date: 2026-11-08
 
