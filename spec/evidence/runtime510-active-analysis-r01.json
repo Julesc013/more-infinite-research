@@ -1,0 +1,1396 @@
+{
+  "active_prerequisites": {
+    "candidate": {
+      "origins": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime510-candidate-origins-r01.json",
+        "sha256": "1F14705A18EF6D3F218B6235C68DFB3BA2FCF3BA32864F13B2EEE8454DBEA2DE"
+      },
+      "pilot": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-formal-pilots-r01\\pinned-source\\build\\tmp\\active-marker-pilot\\runtime510-candidate-marker-pilot.json",
+        "sha256": "27B521E148D82C5A3B3EF0050A286310179B5AA2F25473D453A72D04C0305DFC"
+      },
+      "source_references": {
+        "agriculture-candidate-defaults-1": {
+          "commit": "280230f95223f0dbd7c851d5a1840ee0e5e0d5f3",
+          "tree": "1f2ca1f4af0983df7dc990e4a9aaf31e4eb9a955"
+        },
+        "agriculture-candidate-defaults-128": {
+          "commit": "280230f95223f0dbd7c851d5a1840ee0e5e0d5f3",
+          "tree": "1f2ca1f4af0983df7dc990e4a9aaf31e4eb9a955"
+        },
+        "agriculture-candidate-defaults-32": {
+          "commit": "280230f95223f0dbd7c851d5a1840ee0e5e0d5f3",
+          "tree": "1f2ca1f4af0983df7dc990e4a9aaf31e4eb9a955"
+        },
+        "repair-candidate": {
+          "commit": "063c99cb209a16ac26c30560e9bbef0a41c957e8",
+          "tree": "9130eb22aa1c1c8f8384cecf9dce9ec15ae15b4b"
+        }
+      }
+    },
+    "published": {
+      "capture": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mixed504-release-index-r01\\build\\tmp\\runtime505-active-captures-r02\\pinned-source\\build\\tmp\\active-seeds\\runtime-benchmark-active-seeds.json",
+        "sha256": "A449FF36E95491F7D3F4ED24217BCCED193F1E5E73D5A123DB581DB86363FFD6"
+      },
+      "pilot": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mixed504-release-index-r01\\build\\tmp\\runtime505-active-pilots-r02\\pinned-source\\build\\tmp\\active-marker-pilot\\runtime-benchmark-active-marker-pilot.json",
+        "sha256": "4AD021E596B64752FBBA16BC3A66BC271BEF3D16DD95D1833976F57B0F4A3DE6"
+      },
+      "plan": {
+        "revision": "848cc35300777ad952b0486135f2460c584e0d4e",
+        "sha256": "5F73A850827290FE760E7C04B3F60C991E3205B08043D046852DB968A267212C",
+        "source_reference": "23ab190b0037dfb0c9765df94f951300b5a05a16"
+      }
+    }
+  },
+  "agriculture_128_minus_1": {
+    "candidate_defaults": {
+      "engine_reported_average_milliseconds_per_tick": {
+        "percent_of_published_increment": 96.7741935483871,
+        "percentage_status": "reported-positive-finite-published-denominator",
+        "raw_128_minus_1": 0.015,
+        "tier_1": {
+          "maximum": 0.066,
+          "median": 0.065,
+          "minimum": 0.063,
+          "n": 6
+        },
+        "tier_128": {
+          "maximum": 0.084,
+          "median": 0.08,
+          "minimum": 0.078,
+          "n": 6
+        }
+      },
+      "maximum_sampled_private_bytes": {
+        "percent_of_published_increment": 10.519815875154373,
+        "percentage_status": "reported-positive-finite-published-denominator",
+        "raw_128_minus_1": 9594880.0,
+        "tier_1": {
+          "maximum": 524533760.0,
+          "median": 486356992.0,
+          "minimum": 458240000.0,
+          "n": 6
+        },
+        "tier_128": {
+          "maximum": 524877824.0,
+          "median": 495951872.0,
+          "minimum": 420966400.0,
+          "n": 6
+        }
+      },
+      "maximum_sampled_working_set_bytes": {
+        "percent_of_published_increment": 10.850249546787225,
+        "percentage_status": "reported-positive-finite-published-denominator",
+        "raw_128_minus_1": 9928704.0,
+        "tier_1": {
+          "maximum": 529850368.0,
+          "median": 490997760.0,
+          "minimum": 462745600.0,
+          "n": 6
+        },
+        "tier_128": {
+          "maximum": 530178048.0,
+          "median": 500926464.0,
+          "minimum": 426225664.0,
+          "n": 6
+        }
+      },
+      "operating_system_peak_working_set_bytes": {
+        "percent_of_published_increment": -565.6626506024096,
+        "percentage_status": "reported-positive-finite-published-denominator",
+        "raw_128_minus_1": -13461504.0,
+        "tier_1": {
+          "maximum": 530341888.0,
+          "median": 518336512.0,
+          "minimum": 501338112.0,
+          "n": 6
+        },
+        "tier_128": {
+          "maximum": 531222528.0,
+          "median": 504875008.0,
+          "minimum": 502824960.0,
+          "n": 6
+        }
+      }
+    },
+    "published": {
+      "engine_reported_average_milliseconds_per_tick": {
+        "raw_128_minus_1": 0.0155,
+        "tier_1": {
+          "maximum": 0.066,
+          "median": 0.0655,
+          "minimum": 0.064,
+          "n": 6
+        },
+        "tier_128": {
+          "maximum": 0.081,
+          "median": 0.081,
+          "minimum": 0.079,
+          "n": 6
+        }
+      },
+      "maximum_sampled_private_bytes": {
+        "raw_128_minus_1": 91207680.0,
+        "tier_1": {
+          "maximum": 546529280.0,
+          "median": 498475008.0,
+          "minimum": 435740672.0,
+          "n": 6
+        },
+        "tier_128": {
+          "maximum": 608788480.0,
+          "median": 589682688.0,
+          "minimum": 461082624.0,
+          "n": 6
+        }
+      },
+      "maximum_sampled_working_set_bytes": {
+        "raw_128_minus_1": 91506688.0,
+        "tier_1": {
+          "maximum": 550457344.0,
+          "median": 499544064.0,
+          "minimum": 435748864.0,
+          "n": 6
+        },
+        "tier_128": {
+          "maximum": 612605952.0,
+          "median": 591050752.0,
+          "minimum": 464257024.0,
+          "n": 6
+        }
+      },
+      "operating_system_peak_working_set_bytes": {
+        "raw_128_minus_1": 2379776.0,
+        "tier_1": {
+          "maximum": 638099456.0,
+          "median": 615278592.0,
+          "minimum": 596901888.0,
+          "n": 6
+        },
+        "tier_128": {
+          "maximum": 640032768.0,
+          "median": 617658368.0,
+          "minimum": 608247808.0,
+          "n": 6
+        }
+      }
+    }
+  },
+  "analysis_verdict": {
+    "memory_rule": "each candidate median <= published median + max(10 percent of published median, 64 MiB)",
+    "status": "within-predeclared-limits",
+    "time_rule": "candidate median <= published median + max(10 percent of published median, 0.25 ms/tick)"
+  },
+  "claims": {
+    "bootstrap": false,
+    "equivalence_claim": false,
+    "native_execution": true,
+    "performance_comparison": true,
+    "performance_measurement": true,
+    "release_qualification": false,
+    "universal_performance_claim": false
+  },
+  "comparisons": {
+    "agriculture_active": {
+      "tiers": {
+        "1": {
+          "metrics": {
+            "engine_reported_average_milliseconds_per_tick": {
+              "allowance": 0.25,
+              "candidate": {
+                "maximum": 0.066,
+                "median": 0.065,
+                "minimum": 0.063,
+                "n": 6
+              },
+              "candidate_minus_published_median": -0.0005000000000000004,
+              "limit": 0.3155,
+              "published": {
+                "maximum": 0.066,
+                "median": 0.0655,
+                "minimum": 0.064,
+                "n": 6
+              },
+              "status": "within-predeclared-limit"
+            },
+            "maximum_sampled_private_bytes": {
+              "allowance": 67108864.0,
+              "candidate": {
+                "maximum": 524533760.0,
+                "median": 486356992.0,
+                "minimum": 458240000.0,
+                "n": 6
+              },
+              "candidate_minus_published_median": -12118016.0,
+              "limit": 565583872.0,
+              "published": {
+                "maximum": 546529280.0,
+                "median": 498475008.0,
+                "minimum": 435740672.0,
+                "n": 6
+              },
+              "status": "within-predeclared-limit"
+            },
+            "maximum_sampled_working_set_bytes": {
+              "allowance": 67108864.0,
+              "candidate": {
+                "maximum": 529850368.0,
+                "median": 490997760.0,
+                "minimum": 462745600.0,
+                "n": 6
+              },
+              "candidate_minus_published_median": -8546304.0,
+              "limit": 566652928.0,
+              "published": {
+                "maximum": 550457344.0,
+                "median": 499544064.0,
+                "minimum": 435748864.0,
+                "n": 6
+              },
+              "status": "within-predeclared-limit"
+            },
+            "operating_system_peak_working_set_bytes": {
+              "allowance": 67108864.0,
+              "candidate": {
+                "maximum": 530341888.0,
+                "median": 518336512.0,
+                "minimum": 501338112.0,
+                "n": 6
+              },
+              "candidate_minus_published_median": -96942080.0,
+              "limit": 682387456.0,
+              "published": {
+                "maximum": 638099456.0,
+                "median": 615278592.0,
+                "minimum": 596901888.0,
+                "n": 6
+              },
+              "status": "within-predeclared-limit"
+            }
+          }
+        },
+        "128": {
+          "metrics": {
+            "engine_reported_average_milliseconds_per_tick": {
+              "allowance": 0.25,
+              "candidate": {
+                "maximum": 0.084,
+                "median": 0.08,
+                "minimum": 0.078,
+                "n": 6
+              },
+              "candidate_minus_published_median": -0.0010000000000000009,
+              "limit": 0.331,
+              "published": {
+                "maximum": 0.081,
+                "median": 0.081,
+                "minimum": 0.079,
+                "n": 6
+              },
+              "status": "within-predeclared-limit"
+            },
+            "maximum_sampled_private_bytes": {
+              "allowance": 67108864.0,
+              "candidate": {
+                "maximum": 524877824.0,
+                "median": 495951872.0,
+                "minimum": 420966400.0,
+                "n": 6
+              },
+              "candidate_minus_published_median": -93730816.0,
+              "limit": 656791552.0,
+              "published": {
+                "maximum": 608788480.0,
+                "median": 589682688.0,
+                "minimum": 461082624.0,
+                "n": 6
+              },
+              "status": "within-predeclared-limit"
+            },
+            "maximum_sampled_working_set_bytes": {
+              "allowance": 67108864.0,
+              "candidate": {
+                "maximum": 530178048.0,
+                "median": 500926464.0,
+                "minimum": 426225664.0,
+                "n": 6
+              },
+              "candidate_minus_published_median": -90124288.0,
+              "limit": 658159616.0,
+              "published": {
+                "maximum": 612605952.0,
+                "median": 591050752.0,
+                "minimum": 464257024.0,
+                "n": 6
+              },
+              "status": "within-predeclared-limit"
+            },
+            "operating_system_peak_working_set_bytes": {
+              "allowance": 67108864.0,
+              "candidate": {
+                "maximum": 531222528.0,
+                "median": 504875008.0,
+                "minimum": 502824960.0,
+                "n": 6
+              },
+              "candidate_minus_published_median": -112783360.0,
+              "limit": 684767232.0,
+              "published": {
+                "maximum": 640032768.0,
+                "median": 617658368.0,
+                "minimum": 608247808.0,
+                "n": 6
+              },
+              "status": "within-predeclared-limit"
+            }
+          }
+        },
+        "32": {
+          "metrics": {
+            "engine_reported_average_milliseconds_per_tick": {
+              "allowance": 0.25,
+              "candidate": {
+                "maximum": 0.069,
+                "median": 0.068,
+                "minimum": 0.067,
+                "n": 6
+              },
+              "candidate_minus_published_median": -0.002999999999999989,
+              "limit": 0.321,
+              "published": {
+                "maximum": 0.072,
+                "median": 0.071,
+                "minimum": 0.069,
+                "n": 6
+              },
+              "status": "within-predeclared-limit"
+            },
+            "maximum_sampled_private_bytes": {
+              "allowance": 67108864.0,
+              "candidate": {
+                "maximum": 523534336.0,
+                "median": 438855680.0,
+                "minimum": 418906112.0,
+                "n": 6
+              },
+              "candidate_minus_published_median": -149604352.0,
+              "limit": 655568896.0,
+              "published": {
+                "maximum": 657346560.0,
+                "median": 588460032.0,
+                "minimum": 527736832.0,
+                "n": 6
+              },
+              "status": "within-predeclared-limit"
+            },
+            "maximum_sampled_working_set_bytes": {
+              "allowance": 67108864.0,
+              "candidate": {
+                "maximum": 528990208.0,
+                "median": 442107904.0,
+                "minimum": 421363712.0,
+                "n": 6
+              },
+              "candidate_minus_published_median": -149942272.0,
+              "limit": 659159040.0,
+              "published": {
+                "maximum": 658313216.0,
+                "median": 592050176.0,
+                "minimum": 529543168.0,
+                "n": 6
+              },
+              "status": "within-predeclared-limit"
+            },
+            "operating_system_peak_working_set_bytes": {
+              "allowance": 67108864.0,
+              "candidate": {
+                "maximum": 531099648.0,
+                "median": 518453248.0,
+                "minimum": 500506624.0,
+                "n": 6
+              },
+              "candidate_minus_published_median": -118734848.0,
+              "limit": 704296960.0,
+              "published": {
+                "maximum": 661438464.0,
+                "median": 637188096.0,
+                "minimum": 601178112.0,
+                "n": 6
+              },
+              "status": "within-predeclared-limit"
+            }
+          }
+        }
+      }
+    },
+    "repair_active": {
+      "metrics": {
+        "engine_reported_average_milliseconds_per_tick": {
+          "allowance": 0.25,
+          "candidate": {
+            "maximum": 0.133,
+            "median": 0.1305,
+            "minimum": 0.129,
+            "n": 8
+          },
+          "candidate_minus_published_median": -0.0015000000000000013,
+          "limit": 0.382,
+          "published": {
+            "maximum": 0.141,
+            "median": 0.132,
+            "minimum": 0.129,
+            "n": 8
+          },
+          "status": "within-predeclared-limit"
+        },
+        "maximum_sampled_private_bytes": {
+          "allowance": 67108864.0,
+          "candidate": {
+            "maximum": 523878400.0,
+            "median": 478699520.0,
+            "minimum": 419323904.0,
+            "n": 8
+          },
+          "candidate_minus_published_median": -10893312.0,
+          "limit": 556701696.0,
+          "published": {
+            "maximum": 592502784.0,
+            "median": 489592832.0,
+            "minimum": 426622976.0,
+            "n": 8
+          },
+          "status": "within-predeclared-limit"
+        },
+        "maximum_sampled_working_set_bytes": {
+          "allowance": 67108864.0,
+          "candidate": {
+            "maximum": 529170432.0,
+            "median": 482430976.0,
+            "minimum": 421748736.0,
+            "n": 8
+          },
+          "candidate_minus_published_median": -9627648.0,
+          "limit": 559167488.0,
+          "published": {
+            "maximum": 596918272.0,
+            "median": 492058624.0,
+            "minimum": 428826624.0,
+            "n": 8
+          },
+          "status": "within-predeclared-limit"
+        },
+        "operating_system_peak_working_set_bytes": {
+          "allowance": 67108864.0,
+          "candidate": {
+            "maximum": 530399232.0,
+            "median": 528699392.0,
+            "minimum": 500781056.0,
+            "n": 8
+          },
+          "candidate_minus_published_median": -88936448.0,
+          "limit": 684744704.0,
+          "published": {
+            "maximum": 645976064.0,
+            "median": 617635840.0,
+            "minimum": 600600576.0,
+            "n": 8
+          },
+          "status": "within-predeclared-limit"
+        }
+      }
+    }
+  },
+  "identity": {
+    "candidate_archive_sha256": "C625D648978F6FE677B5EDC5C68090A2AA9A939D48A54A736610D55E47337806",
+    "candidate_inventory_sha256": "67D1C28B222C825F6B551B88EBC70579C166BADD4A985570D7E9FAB9D509953A",
+    "candidate_source": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+    "candidate_source_tree": "416e7b290caa3ce2c164e5496d482a2041e43e90",
+    "engine": {
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "version": "2.1.23"
+    },
+    "published_archive_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F"
+  },
+  "kind": "MIR510MixedActiveRuntimeAnalysisV1",
+  "limitations": [
+    "Warmups, active-save capture, and marker pilots are admitted as custody and workload prerequisites, not scored benchmark observations.",
+    "The 128-minus-1 section is descriptive; percentage values are omitted unless the matching published increment is finite and strictly positive.",
+    "The operating-system root peak and sampled working/private maxima are evaluated separately; sampled values are not instantaneous proven peaks."
+  ],
+  "paired_block_differences": {
+    "agriculture_active": {
+      "tiers": {
+        "1": [
+          {
+            "block": 1,
+            "candidate_minus_published": {
+              "engine_reported_average_milliseconds_per_tick": 0.0020000000000000018,
+              "maximum_sampled_private_bytes": -18833408.0,
+              "maximum_sampled_working_set_bytes": -16134144.0,
+              "operating_system_peak_working_set_bytes": -105336832.0
+            }
+          },
+          {
+            "block": 2,
+            "candidate_minus_published": {
+              "engine_reported_average_milliseconds_per_tick": 0.0010000000000000009,
+              "maximum_sampled_private_bytes": -21995520.0,
+              "maximum_sampled_working_set_bytes": -20606976.0,
+              "operating_system_peak_working_set_bytes": -66560000.0
+            }
+          },
+          {
+            "block": 3,
+            "candidate_minus_published": {
+              "engine_reported_average_milliseconds_per_tick": -0.0010000000000000009,
+              "maximum_sampled_private_bytes": 12644352.0,
+              "maximum_sampled_working_set_bytes": 14016512.0,
+              "operating_system_peak_working_set_bytes": -92073984.0
+            }
+          },
+          {
+            "block": 4,
+            "candidate_minus_published": {
+              "engine_reported_average_milliseconds_per_tick": -0.0020000000000000018,
+              "maximum_sampled_private_bytes": -11128832.0,
+              "maximum_sampled_working_set_bytes": -10997760.0,
+              "operating_system_peak_working_set_bytes": -136450048.0
+            }
+          },
+          {
+            "block": 5,
+            "candidate_minus_published": {
+              "engine_reported_average_milliseconds_per_tick": -0.0020000000000000018,
+              "maximum_sampled_private_bytes": 35942400.0,
+              "maximum_sampled_working_set_bytes": 42217472.0,
+              "operating_system_peak_working_set_bytes": -115486720.0
+            }
+          },
+          {
+            "block": 6,
+            "candidate_minus_published": {
+              "engine_reported_average_milliseconds_per_tick": -0.0010000000000000009,
+              "maximum_sampled_private_bytes": 1490944.0,
+              "maximum_sampled_working_set_bytes": 5472256.0,
+              "operating_system_peak_working_set_bytes": -81567744.0
+            }
+          }
+        ],
+        "128": [
+          {
+            "block": 1,
+            "candidate_minus_published": {
+              "engine_reported_average_milliseconds_per_tick": 0.0,
+              "maximum_sampled_private_bytes": -154812416.0,
+              "maximum_sampled_working_set_bytes": -148094976.0,
+              "operating_system_peak_working_set_bytes": -88338432.0
+            }
+          },
+          {
+            "block": 2,
+            "candidate_minus_published": {
+              "engine_reported_average_milliseconds_per_tick": 0.0020000000000000018,
+              "maximum_sampled_private_bytes": -112660480.0,
+              "maximum_sampled_working_set_bytes": -110305280.0,
+              "operating_system_peak_working_set_bytes": -114905088.0
+            }
+          },
+          {
+            "block": 3,
+            "candidate_minus_published": {
+              "engine_reported_average_milliseconds_per_tick": -0.0010000000000000009,
+              "maximum_sampled_private_bytes": -39645184.0,
+              "maximum_sampled_working_set_bytes": -42364928.0,
+              "operating_system_peak_working_set_bytes": -108212224.0
+            }
+          },
+          {
+            "block": 4,
+            "candidate_minus_published": {
+              "engine_reported_average_milliseconds_per_tick": 0.0030000000000000027,
+              "maximum_sampled_private_bytes": -112136192.0,
+              "maximum_sampled_working_set_bytes": -108568576.0,
+              "operating_system_peak_working_set_bytes": -115326976.0
+            }
+          },
+          {
+            "block": 5,
+            "candidate_minus_published": {
+              "engine_reported_average_milliseconds_per_tick": -0.0010000000000000009,
+              "maximum_sampled_private_bytes": 38785024.0,
+              "maximum_sampled_working_set_bytes": 41644032.0,
+              "operating_system_peak_working_set_bytes": -133505024.0
+            }
+          },
+          {
+            "block": 6,
+            "candidate_minus_published": {
+              "engine_reported_average_milliseconds_per_tick": -0.0010000000000000009,
+              "maximum_sampled_private_bytes": -78708736.0,
+              "maximum_sampled_working_set_bytes": -77602816.0,
+              "operating_system_peak_working_set_bytes": -77025280.0
+            }
+          }
+        ],
+        "32": [
+          {
+            "block": 1,
+            "candidate_minus_published": {
+              "engine_reported_average_milliseconds_per_tick": -0.0020000000000000018,
+              "maximum_sampled_private_bytes": -81235968.0,
+              "maximum_sampled_working_set_bytes": -78131200.0,
+              "operating_system_peak_working_set_bytes": -71954432.0
+            }
+          },
+          {
+            "block": 2,
+            "candidate_minus_published": {
+              "engine_reported_average_milliseconds_per_tick": -0.001999999999999988,
+              "maximum_sampled_private_bytes": -232779776.0,
+              "maximum_sampled_working_set_bytes": -229900288.0,
+              "operating_system_peak_working_set_bytes": -124866560.0
+            }
+          },
+          {
+            "block": 3,
+            "candidate_minus_published": {
+              "engine_reported_average_milliseconds_per_tick": -0.002999999999999989,
+              "maximum_sampled_private_bytes": -181403648.0,
+              "maximum_sampled_working_set_bytes": -186892288.0,
+              "operating_system_peak_working_set_bytes": -111431680.0
+            }
+          },
+          {
+            "block": 4,
+            "candidate_minus_published": {
+              "engine_reported_average_milliseconds_per_tick": -0.00399999999999999,
+              "maximum_sampled_private_bytes": -194326528.0,
+              "maximum_sampled_working_set_bytes": -193691648.0,
+              "operating_system_peak_working_set_bytes": -156295168.0
+            }
+          },
+          {
+            "block": 5,
+            "candidate_minus_published": {
+              "engine_reported_average_milliseconds_per_tick": -0.0010000000000000009,
+              "maximum_sampled_private_bytes": -148963328.0,
+              "maximum_sampled_working_set_bytes": -149798912.0,
+              "operating_system_peak_working_set_bytes": -144818176.0
+            }
+          },
+          {
+            "block": 6,
+            "candidate_minus_published": {
+              "engine_reported_average_milliseconds_per_tick": -0.0049999999999999906,
+              "maximum_sampled_private_bytes": -4202496.0,
+              "maximum_sampled_working_set_bytes": -552960.0,
+              "operating_system_peak_working_set_bytes": -91963392.0
+            }
+          }
+        ]
+      }
+    },
+    "repair_active": [
+      {
+        "block": 1,
+        "candidate_minus_published": {
+          "engine_reported_average_milliseconds_per_tick": -0.0020000000000000018,
+          "maximum_sampled_private_bytes": -168083456.0,
+          "maximum_sampled_working_set_bytes": -175169536.0,
+          "operating_system_peak_working_set_bytes": -98959360.0
+        }
+      },
+      {
+        "block": 2,
+        "candidate_minus_published": {
+          "engine_reported_average_milliseconds_per_tick": -0.007000000000000006,
+          "maximum_sampled_private_bytes": -30814208.0,
+          "maximum_sampled_working_set_bytes": -31334400.0,
+          "operating_system_peak_working_set_bytes": -87547904.0
+        }
+      },
+      {
+        "block": 3,
+        "candidate_minus_published": {
+          "engine_reported_average_milliseconds_per_tick": -0.0030000000000000027,
+          "maximum_sampled_private_bytes": -51646464.0,
+          "maximum_sampled_working_set_bytes": -49029120.0,
+          "operating_system_peak_working_set_bytes": -78168064.0
+        }
+      },
+      {
+        "block": 4,
+        "candidate_minus_published": {
+          "engine_reported_average_milliseconds_per_tick": -0.00799999999999998,
+          "maximum_sampled_private_bytes": 97255424.0,
+          "maximum_sampled_working_set_bytes": 97804288.0,
+          "operating_system_peak_working_set_bytes": -109772800.0
+        }
+      },
+      {
+        "block": 5,
+        "candidate_minus_published": {
+          "engine_reported_average_milliseconds_per_tick": -0.0030000000000000027,
+          "maximum_sampled_private_bytes": 29859840.0,
+          "maximum_sampled_working_set_bytes": 29773824.0,
+          "operating_system_peak_working_set_bytes": -138149888.0
+        }
+      },
+      {
+        "block": 6,
+        "candidate_minus_published": {
+          "engine_reported_average_milliseconds_per_tick": -0.0010000000000000009,
+          "maximum_sampled_private_bytes": -153731072.0,
+          "maximum_sampled_working_set_bytes": -148979712.0,
+          "operating_system_peak_working_set_bytes": -110837760.0
+        }
+      },
+      {
+        "block": 7,
+        "candidate_minus_published": {
+          "engine_reported_average_milliseconds_per_tick": 0.0020000000000000018,
+          "maximum_sampled_private_bytes": 52768768.0,
+          "maximum_sampled_working_set_bytes": 56602624.0,
+          "operating_system_peak_working_set_bytes": -98377728.0
+        }
+      },
+      {
+        "block": 8,
+        "candidate_minus_published": {
+          "engine_reported_average_milliseconds_per_tick": -0.0010000000000000009,
+          "maximum_sampled_private_bytes": -2453504.0,
+          "maximum_sampled_working_set_bytes": -1544192.0,
+          "operating_system_peak_working_set_bytes": -90177536.0
+        }
+      }
+    ]
+  },
+  "raw_plan": {
+    "path": "spec/evidence/runtime510-active-plan-r01.json",
+    "revision": "8ab529a090128979014ebfe968b794b7511679f0",
+    "sha256": "9CDED5FE074894D734210CB432384BF4B509D69AD9CB527424701358EF7054F9",
+    "source_reference": "32feeb99db3cb998f30aa73d11e8f3ebdbd487e6",
+    "source_tree": "1f2ca1f4af0983df7dc990e4a9aaf31e4eb9a955"
+  },
+  "raw_result": {
+    "sha256": "711A80F535CB10E126DD924B44AB7210F1D31C79CE8828865404B94B22E9AF46"
+  },
+  "schedule": [
+    {
+      "arm": "published",
+      "block": null,
+      "id": "repair-warmup-published-1",
+      "ordinal": 1,
+      "phase": "warmup",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "published",
+      "block": null,
+      "id": "repair-warmup-published-2",
+      "ordinal": 2,
+      "phase": "warmup",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "candidate",
+      "block": null,
+      "id": "repair-warmup-candidate-1",
+      "ordinal": 3,
+      "phase": "warmup",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "candidate",
+      "block": null,
+      "id": "repair-warmup-candidate-2",
+      "ordinal": 4,
+      "phase": "warmup",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "published",
+      "block": 1,
+      "id": "repair-b1-1-published",
+      "ordinal": 5,
+      "phase": "scored",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "candidate",
+      "block": 1,
+      "id": "repair-b1-2-candidate",
+      "ordinal": 6,
+      "phase": "scored",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "candidate",
+      "block": 2,
+      "id": "repair-b2-1-candidate",
+      "ordinal": 7,
+      "phase": "scored",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "published",
+      "block": 2,
+      "id": "repair-b2-2-published",
+      "ordinal": 8,
+      "phase": "scored",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "published",
+      "block": 3,
+      "id": "repair-b3-1-published",
+      "ordinal": 9,
+      "phase": "scored",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "candidate",
+      "block": 3,
+      "id": "repair-b3-2-candidate",
+      "ordinal": 10,
+      "phase": "scored",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "candidate",
+      "block": 4,
+      "id": "repair-b4-1-candidate",
+      "ordinal": 11,
+      "phase": "scored",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "published",
+      "block": 4,
+      "id": "repair-b4-2-published",
+      "ordinal": 12,
+      "phase": "scored",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "published",
+      "block": 5,
+      "id": "repair-b5-1-published",
+      "ordinal": 13,
+      "phase": "scored",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "candidate",
+      "block": 5,
+      "id": "repair-b5-2-candidate",
+      "ordinal": 14,
+      "phase": "scored",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "candidate",
+      "block": 6,
+      "id": "repair-b6-1-candidate",
+      "ordinal": 15,
+      "phase": "scored",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "published",
+      "block": 6,
+      "id": "repair-b6-2-published",
+      "ordinal": 16,
+      "phase": "scored",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "published",
+      "block": 7,
+      "id": "repair-b7-1-published",
+      "ordinal": 17,
+      "phase": "scored",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "candidate",
+      "block": 7,
+      "id": "repair-b7-2-candidate",
+      "ordinal": 18,
+      "phase": "scored",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "candidate",
+      "block": 8,
+      "id": "repair-b8-1-candidate",
+      "ordinal": 19,
+      "phase": "scored",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "published",
+      "block": 8,
+      "id": "repair-b8-2-published",
+      "ordinal": 20,
+      "phase": "scored",
+      "scenario": "repair-active",
+      "tier": 0
+    },
+    {
+      "arm": "published",
+      "block": null,
+      "id": "agriculture-1-warmup-published-1",
+      "ordinal": 21,
+      "phase": "warmup",
+      "scenario": "agriculture-active",
+      "tier": 1
+    },
+    {
+      "arm": "published",
+      "block": null,
+      "id": "agriculture-1-warmup-published-2",
+      "ordinal": 22,
+      "phase": "warmup",
+      "scenario": "agriculture-active",
+      "tier": 1
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": null,
+      "id": "agriculture-1-warmup-candidate-defaults-1",
+      "ordinal": 23,
+      "phase": "warmup",
+      "scenario": "agriculture-active",
+      "tier": 1
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": null,
+      "id": "agriculture-1-warmup-candidate-defaults-2",
+      "ordinal": 24,
+      "phase": "warmup",
+      "scenario": "agriculture-active",
+      "tier": 1
+    },
+    {
+      "arm": "published",
+      "block": 1,
+      "id": "agriculture-1-b1-1-published",
+      "ordinal": 25,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 1
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": 1,
+      "id": "agriculture-1-b1-2-candidate-defaults",
+      "ordinal": 26,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 1
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": 2,
+      "id": "agriculture-1-b2-1-candidate-defaults",
+      "ordinal": 27,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 1
+    },
+    {
+      "arm": "published",
+      "block": 2,
+      "id": "agriculture-1-b2-2-published",
+      "ordinal": 28,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 1
+    },
+    {
+      "arm": "published",
+      "block": 3,
+      "id": "agriculture-1-b3-1-published",
+      "ordinal": 29,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 1
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": 3,
+      "id": "agriculture-1-b3-2-candidate-defaults",
+      "ordinal": 30,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 1
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": 4,
+      "id": "agriculture-1-b4-1-candidate-defaults",
+      "ordinal": 31,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 1
+    },
+    {
+      "arm": "published",
+      "block": 4,
+      "id": "agriculture-1-b4-2-published",
+      "ordinal": 32,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 1
+    },
+    {
+      "arm": "published",
+      "block": 5,
+      "id": "agriculture-1-b5-1-published",
+      "ordinal": 33,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 1
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": 5,
+      "id": "agriculture-1-b5-2-candidate-defaults",
+      "ordinal": 34,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 1
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": 6,
+      "id": "agriculture-1-b6-1-candidate-defaults",
+      "ordinal": 35,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 1
+    },
+    {
+      "arm": "published",
+      "block": 6,
+      "id": "agriculture-1-b6-2-published",
+      "ordinal": 36,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 1
+    },
+    {
+      "arm": "published",
+      "block": null,
+      "id": "agriculture-32-warmup-published-1",
+      "ordinal": 37,
+      "phase": "warmup",
+      "scenario": "agriculture-active",
+      "tier": 32
+    },
+    {
+      "arm": "published",
+      "block": null,
+      "id": "agriculture-32-warmup-published-2",
+      "ordinal": 38,
+      "phase": "warmup",
+      "scenario": "agriculture-active",
+      "tier": 32
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": null,
+      "id": "agriculture-32-warmup-candidate-defaults-1",
+      "ordinal": 39,
+      "phase": "warmup",
+      "scenario": "agriculture-active",
+      "tier": 32
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": null,
+      "id": "agriculture-32-warmup-candidate-defaults-2",
+      "ordinal": 40,
+      "phase": "warmup",
+      "scenario": "agriculture-active",
+      "tier": 32
+    },
+    {
+      "arm": "published",
+      "block": 1,
+      "id": "agriculture-32-b1-1-published",
+      "ordinal": 41,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 32
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": 1,
+      "id": "agriculture-32-b1-2-candidate-defaults",
+      "ordinal": 42,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 32
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": 2,
+      "id": "agriculture-32-b2-1-candidate-defaults",
+      "ordinal": 43,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 32
+    },
+    {
+      "arm": "published",
+      "block": 2,
+      "id": "agriculture-32-b2-2-published",
+      "ordinal": 44,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 32
+    },
+    {
+      "arm": "published",
+      "block": 3,
+      "id": "agriculture-32-b3-1-published",
+      "ordinal": 45,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 32
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": 3,
+      "id": "agriculture-32-b3-2-candidate-defaults",
+      "ordinal": 46,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 32
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": 4,
+      "id": "agriculture-32-b4-1-candidate-defaults",
+      "ordinal": 47,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 32
+    },
+    {
+      "arm": "published",
+      "block": 4,
+      "id": "agriculture-32-b4-2-published",
+      "ordinal": 48,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 32
+    },
+    {
+      "arm": "published",
+      "block": 5,
+      "id": "agriculture-32-b5-1-published",
+      "ordinal": 49,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 32
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": 5,
+      "id": "agriculture-32-b5-2-candidate-defaults",
+      "ordinal": 50,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 32
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": 6,
+      "id": "agriculture-32-b6-1-candidate-defaults",
+      "ordinal": 51,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 32
+    },
+    {
+      "arm": "published",
+      "block": 6,
+      "id": "agriculture-32-b6-2-published",
+      "ordinal": 52,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 32
+    },
+    {
+      "arm": "published",
+      "block": null,
+      "id": "agriculture-128-warmup-published-1",
+      "ordinal": 53,
+      "phase": "warmup",
+      "scenario": "agriculture-active",
+      "tier": 128
+    },
+    {
+      "arm": "published",
+      "block": null,
+      "id": "agriculture-128-warmup-published-2",
+      "ordinal": 54,
+      "phase": "warmup",
+      "scenario": "agriculture-active",
+      "tier": 128
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": null,
+      "id": "agriculture-128-warmup-candidate-defaults-1",
+      "ordinal": 55,
+      "phase": "warmup",
+      "scenario": "agriculture-active",
+      "tier": 128
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": null,
+      "id": "agriculture-128-warmup-candidate-defaults-2",
+      "ordinal": 56,
+      "phase": "warmup",
+      "scenario": "agriculture-active",
+      "tier": 128
+    },
+    {
+      "arm": "published",
+      "block": 1,
+      "id": "agriculture-128-b1-1-published",
+      "ordinal": 57,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 128
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": 1,
+      "id": "agriculture-128-b1-2-candidate-defaults",
+      "ordinal": 58,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 128
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": 2,
+      "id": "agriculture-128-b2-1-candidate-defaults",
+      "ordinal": 59,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 128
+    },
+    {
+      "arm": "published",
+      "block": 2,
+      "id": "agriculture-128-b2-2-published",
+      "ordinal": 60,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 128
+    },
+    {
+      "arm": "published",
+      "block": 3,
+      "id": "agriculture-128-b3-1-published",
+      "ordinal": 61,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 128
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": 3,
+      "id": "agriculture-128-b3-2-candidate-defaults",
+      "ordinal": 62,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 128
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": 4,
+      "id": "agriculture-128-b4-1-candidate-defaults",
+      "ordinal": 63,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 128
+    },
+    {
+      "arm": "published",
+      "block": 4,
+      "id": "agriculture-128-b4-2-published",
+      "ordinal": 64,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 128
+    },
+    {
+      "arm": "published",
+      "block": 5,
+      "id": "agriculture-128-b5-1-published",
+      "ordinal": 65,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 128
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": 5,
+      "id": "agriculture-128-b5-2-candidate-defaults",
+      "ordinal": 66,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 128
+    },
+    {
+      "arm": "candidate-defaults",
+      "block": 6,
+      "id": "agriculture-128-b6-1-candidate-defaults",
+      "ordinal": 67,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 128
+    },
+    {
+      "arm": "published",
+      "block": 6,
+      "id": "agriculture-128-b6-2-published",
+      "ordinal": 68,
+      "phase": "scored",
+      "scenario": "agriculture-active",
+      "tier": 128
+    }
+  ],
+  "schema": 1,
+  "status": "complete-predeclared-current510-mixed-analysis"
+}
