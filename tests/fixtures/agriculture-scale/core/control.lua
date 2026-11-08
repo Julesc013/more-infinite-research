@@ -67,7 +67,8 @@ local function authored_arm(name)
     return ARMS["candidate-defaults-mir5-505"]
   end
   if name == "candidate-defaults-mir5" and script.active_mods["more-infinite-research"] == "5.0.21010"
-    and script.active_mods["mir-fixture-mir5-agriculture-scale"] == "0.1.1" and script.active_mods[ACTIVE] == "0.1.0" then
+    and script.active_mods["mir-fixture-mir5-agriculture-scale"] == "0.1.1" and script.active_mods[DEFAULTS] == "0.1.1"
+    and script.active_mods[ACTIVE] == "0.1.0" then
     return ARMS["candidate-defaults-mir5-510"]
   end
   return ARMS[name]
@@ -80,10 +81,15 @@ local function selected_arm(value)
     fail("active agriculture selector version differs")
   end
   local candidate = script.active_mods[CANDIDATE] == "0.1.0"
-  local defaults = script.active_mods[DEFAULTS] == "0.1.0"
+  local defaults = script.active_mods[DEFAULTS] == "0.1.0" or script.active_mods[DEFAULTS] == "0.1.1"
   local published = script.active_mods[PUBLISHED] == "0.1.0"
+  if script.active_mods[DEFAULTS] == "0.1.1"
+    and (script.active_mods["mir-fixture-mir5-agriculture-scale"] ~= "0.1.1"
+      or script.active_mods["more-infinite-research"] ~= "5.0.21010" or not paired or active ~= "0.1.0") then
+    fail("current Defaults selector requires exact active agriculture identity")
+  end
   if script.active_mods["mir-fixture-mir5-agriculture-scale"] == "0.1.1"
-    and (script.active_mods["more-infinite-research"] ~= "5.0.21010" or not paired or not defaults or active ~= "0.1.0") then
+    and (script.active_mods["more-infinite-research"] ~= "5.0.21010" or not paired or script.active_mods[DEFAULTS] ~= "0.1.1" or active ~= "0.1.0") then
     fail("current agriculture fixture requires exact active Defaults identity")
   end
   if paired then
