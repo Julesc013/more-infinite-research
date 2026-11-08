@@ -550,7 +550,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
         self.lua.globals().fingerprint = lambda value: json.dumps(plain(value), sort_keys=True)
         self.lua.execute(r'''
           function run_input_observer(target,opponent,package_version,input_observer_version)
-            local authored_page=input_observer_version=="0.3.6" or input_observer_version=="0.3.7"
+            local authored_page=input_observer_version=="0.3.6" or input_observer_version=="0.3.7" or input_observer_version=="0.3.8" or input_observer_version=="0.4.3"
             local helper_free=input_observer_version=="0.3.5" or input_observer_version=="0.4.1" or authored_page or input_observer_version=="0.4.2"
             local historical=assert(loadfile(historical_path))()
             local events={on_player_joined_game=1,on_gui_text_changed=2,on_gui_click=3,on_gui_location_changed=4,
@@ -880,7 +880,7 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 assert(callbacks.events[8]==nil,"baseline observer stayed subscribed")
               end
               local before=fingerprint(store);initial_report=api().report();api().report();readonly_report=before==fingerprint(store)
-              if input_observer_version=="0.4.1" or input_observer_version=="0.4.2" then return end
+              if input_observer_version=="0.4.1" or input_observer_version=="0.4.2" or input_observer_version=="0.4.3" then return end
               en=join(0,"en");de=join(2,"de")
               if opponent=="duplicate-initial-join" then join(0,"en") end
               if opponent=="out-of-order" then step("prefix");return end
@@ -1206,6 +1206,54 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 self.assertFalse(self.run_case(target, "new-page", old_version, "0.3.7")["ok"])
                 self.assertFalse(self.run_case(target, "new-page", version, "0.3.6")["ok"])
 
+    def test_510_binding_retains_exact_paid_lifecycle_and_rejects_mismatched_identity(self):
+        for target, version in (("f200", "5.0.20010"), ("f210", "5.0.21010")):
+            with self.subTest(target=target):
+                metadata = json.loads((FIXTURE / f"info-input-510-{target}.json").read_text())
+                previous = json.loads((FIXTURE / f"info-input-509-{target}.json").read_text())
+                expected = dict(previous, version="0.3.8", dependencies=[previous["dependencies"][0],
+                                f"~ more-infinite-research = {version}"])
+                self.assertEqual(metadata, expected)
+                for opponent in ("new-page", "removed-index-reused"):
+                    result = self.run_case(target, opponent, version, "0.3.8")
+                    self.assertTrue(result["ok"], result["message"])
+                    final = result["final"]
+                    self.assertEqual((final["phase"], final["actual_joins"], final["private_queries"]),
+                                     ("delivered", 5, 48))
+                    self.assertEqual((final["actual_library_closed_events"], final["actual_removed_events"]), (2, 1))
+                    self.assertTrue(final["imported_earnings"])
+                    self.assertFalse(final["fixture_seeds_credit"])
+                    self.assertTrue(result["readonly_load"])
+                for opponent, message in (
+                    ("old-layout", "authored research page is absent"),
+                    ("bad-filter-grid", "authored research filter grid is malformed"),
+                    ("bad-filter-field", "authored research filter field is malformed"),
+                    ("foreign-query", "authored research query is malformed or foreign"),
+                    ("wrong-query-parent", "authored research query is malformed or foreign"),
+                    ("bad-query-type", "authored research query is malformed or foreign"),
+                    ("foreign-field", "authored research filter field is foreign"),
+                    ("wrong-field-parent", "authored research filter field is foreign"),
+                ):
+                    with self.subTest(opponent=opponent):
+                        try:
+                            result = self.run_case(target, opponent, version, "0.3.8")
+                        except Exception as exc:
+                            self.assertIn(message, str(exc))
+                        else:
+                            self.assertFalse(result["ok"], opponent)
+                            self.assertIn(message, result["message"])
+                for opponent in ("native-effect-change", "replacement-index-reuses-en", "helperfree-lost-foreign-work",
+                                 "helperfree-wrong-foreign-queue", "helperfree-lost-detached-work",
+                                 "helperfree-lost-row", "helperfree-lost-recipe", "helperfree-wrong-battery",
+                                 "startup-credit-effect-lost", "missing-click-event", "changed-restart-index",
+                                 "helperfree-wrong-engine", "helperfree-historical-controller", "extra-mod"):
+                    self.assertFalse(self.run_case(target, opponent, version, "0.3.8")["ok"], opponent)
+                old_version = version[:-2] + "09"
+                self.assertFalse(self.run_case(target, "new-page", old_version, "0.3.8")["ok"])
+                self.assertFalse(self.run_case(target, "new-page", version, "0.3.7")["ok"])
+                other = "5.0.21010" if target == "f200" else "5.0.20010"
+                self.assertFalse(self.run_case(target, "new-page", other, "0.3.8")["ok"])
+
     def test_current_034_keeps_imported_lifecycle_and_reused_slot_on_exact_507(self):
         for target, version in (("f200", "5.0.20007"), ("f210", "5.0.21007")):
             for opponent in (None, "removed-index-reused"):
@@ -1331,6 +1379,29 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                     self.assertIn(message, result["message"])
             result = self.run_case(target, package_version="5.0.20000" if target=="f200" else "5.0.21000", input_observer_version="0.4.1")
             self.assertFalse(result["ok"], result["message"])
+
+    def test_510_support_attachment_preserves_imported_world_and_exact_closure(self):
+        for target, version, other in (("f200", "5.0.20010", "5.0.21010"),
+                                       ("f210", "5.0.21010", "5.0.20010")):
+            for opponent in (None, "startup-credit-enabled-until-configuration", "helperfree-unrelated-cannon-bonus"):
+                with self.subTest(target=target, opponent=opponent):
+                    result = self.run_case(target, opponent, version, "0.4.3")
+                    self.assertTrue(result["ok"], result["message"])
+                    self.assertEqual((result["initial_report"]["case"], result["initial_report"]["phase"],
+                                      result["initial_report"]["actual_joins"]), ("library-support-exports", "ready", 0))
+                    self.assertFalse(result["initial_report"]["original_preservation_fixture_required"])
+                    self.assertTrue(result["readonly_report"])
+            for opponent in ("helperfree-historical-controller", "helperfree-missing-active-observer", "helperfree-wrong-engine",
+                             "helperfree-lost-row", "helperfree-lost-recipe", "helperfree-lost-foreign-work",
+                             "helperfree-wrong-foreign-queue", "helperfree-lost-detached-work", "helperfree-wrong-battery",
+                             "preexisting-player", "extra-mod", "startup-baseline-early-report", "startup-credit-still-enabled",
+                             "startup-credit-level-lost", "startup-credit-effect-lost"):
+                with self.subTest(target=target, opponent=opponent):
+                    self.assertFalse(self.run_case(target, opponent, version, "0.4.3")["ok"])
+            for wrong in (version[:-2] + "08", version[:-2] + "09", other):
+                with self.subTest(target=target, version=wrong):
+                    self.assertFalse(self.run_case(target, package_version=wrong, input_observer_version="0.4.3")["ok"])
+            self.assertFalse(self.run_case(target, package_version=version, input_observer_version="0.4.2")["ok"])
 
     def test_helperfree_input_rejects_wrong_inputs_and_lost_paid_or_foreign_state(self):
         for target, version in (("f200", "5.0.20007"), ("f210", "5.0.21007")):
@@ -1576,10 +1647,10 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
         self.lua.globals().support_path = (FIXTURE / "support-exports.lua").as_posix()
         self.lua.globals().fingerprint = lambda value: json.dumps(plain(value), sort_keys=True)
         self.lua.execute(r'''
-          function run_export_observer(target,opponent,qualified,layout)
+          function run_export_observer(target,opponent,qualified,layout,override_base,override_mir,override_observer)
             local key="mir5_library_native_input"
-            local base=target=="f200"and"2.0.77"or"2.1.23"
-            local mir=target=="f200"and(qualified and(qualified=="508" and "5.0.20008" or "5.0.20007")or"5.0.20000")or(qualified and(qualified=="508" and "5.0.21008" or "5.0.21007")or"5.0.21000")
+            local base=override_base or (target=="f200"and"2.0.77"or"2.1.23")
+            local mir=override_mir or (target=="f200"and(qualified and(qualified=="510" and "5.0.20010" or (qualified=="508" and "5.0.20008" or "5.0.20007"))or"5.0.20000")or(qualified and(qualified=="510" and "5.0.21010" or (qualified=="508" and "5.0.21008" or "5.0.21007"))or"5.0.21000"))
             local original="mir-fixture-mir5-migration-origin-f200-110-source"
             local fixture=target=="f200"and"0.3.0"or"0.4.0"
             local callbacks,interfaces,store,players,decoded={},{},{},{},{}
@@ -1644,11 +1715,11 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
             env.log=function()logs=logs+1 end
             env.defines={events={on_player_joined_game=1,on_gui_click=2,on_console_command=3,on_tick=4}}
             env.script={active_mods={base=base,["more-infinite-research"]=mir,[original]=fixture,
-              ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]=qualified and(qualified=="508" and "0.4.2" or "0.4.1")or"0.4.0"},
+              ["mir-fixture-mir5-active-mods-observer"]="0.1.0",["mir-fixture-mir5-library-native-input"]=override_observer or (qualified and(qualified=="510" and "0.4.3" or (qualified=="508" and "0.4.2" or "0.4.1"))or"0.4.0")},
               on_init=function(f)callbacks.init=f end,on_load=function(f)callbacks.load=f end,
               on_event=function(id,f)callbacks[id]=f end}
             if qualified then env.script.active_mods[original]=nil end
-            local context={key=key,interface="mir5-library-native-input",historical_fixture=original,qualified_input=qualified==true or qualified=="508",current_508=qualified=="508",
+            local context={key=key,interface="mir5-library-native-input",historical_fixture=original,qualified_input=qualified==true or qualified=="508" or qualified=="510",current_508=qualified=="508" or qualified=="510",current_510=qualified=="510",
               world=function()return{serial=native}end,
               assert_world=function()assert(store[key].native.serial==native,"protected native state changed")end,
               imported=function()assert(native==1,"actual imported credit changed")end}
@@ -1661,7 +1732,7 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
               assert(store[key].native==nil and not pcall(api.report),"early support baseline was admitted")
               callbacks[4]({tick=1});assert(callbacks[4]==nil,"support baseline kept its tick handler")
             end
-            assert(api.report().phase=="ready" and api.report().original_preservation_fixture_required~=(qualified==true or qualified=="508"))
+            assert(api.report().phase=="ready" and api.report().original_preservation_fixture_required~=(qualified==true or qualified=="508" or qualified=="510"))
             local en,de=player(0,"en"),player(2,"de")
             game.players,game.connected_players={[0]=en,[2]=de},{en,de}
             local function joined(index)
@@ -1805,6 +1876,35 @@ class LibrarySupportExportObserverControls(unittest.TestCase):
                                     ("wrong-parent", "native diagnostics container differs")):
                 with self.subTest(target=target, layout=layout), self.assertRaisesRegex(Exception, message):
                     run(target, "", "508", layout)
+
+    def test_510_export_retains_protocol_and_rejects_opposing_tuples(self):
+        for target, base, version, other in (("f200", "2.0.77", "5.0.20010", "5.0.21010"),
+                                              ("f210", "2.1.23", "5.0.21010", "5.0.20010")):
+            with self.subTest(target=target):
+                metadata = json.loads((FIXTURE / f"info-exports-510-{target}.json").read_text())
+                previous = json.loads((FIXTURE / f"info-exports-508-{target}.json").read_text())
+                self.assertEqual(metadata, dict(previous, version="0.4.3", dependencies=[f"base = {base}",
+                                                f"~ more-infinite-research = {version}"]))
+                run = self.lua.globals().run_export_observer
+                self.assertEqual(run(target, "", "510", "authored"), (13, 5, 2, 0))
+                for opponent in ("missing-click", "duplicate-click", "wrong-player", "invalid-profile", "false-zero",
+                                 "wrong-user", "editable", "stale-preview", "native-mutation", "setting-mutation",
+                                 "missing-rejoin", "missing-restart", "duplicate-settings-command", "early-server-commands",
+                                 "post-load-server-command", "wrong-role-rejoin", "duplicate-initial-join", "duplicate-rejoin",
+                                 "duplicate-restart-role", "early-rejoin", "zero-server-index"):
+                    with self.subTest(opponent=opponent), self.assertRaises(Exception):
+                        run(target, opponent, "510", "authored")
+                for layout in (None, "flat-decoy", "foreign-panes", "foreign-panel", "missing-panel", "wrong-parent"):
+                    with self.subTest(layout=layout), self.assertRaises(Exception):
+                        run(target, "", "510", layout)
+                for wrong_base, wrong_mir, wrong_observer in ((base, version[:-2] + "08", "0.4.3"),
+                                                               (base, other, "0.4.3"),
+                                                               ("2.0.78", version, "0.4.3"),
+                                                               (base, version, "0.4.2")):
+                    with self.subTest(base=wrong_base, mir=wrong_mir, observer=wrong_observer), self.assertRaises(Exception):
+                        run(target, "", "510", "authored", wrong_base, wrong_mir, wrong_observer)
+                with self.assertRaises(Exception):
+                    run(target, "", "508", "authored", base, version, "0.4.2")
 
     def test_export_report_tick_is_monotonic_and_read_only(self):
         for target in ("f200", "f210"):
