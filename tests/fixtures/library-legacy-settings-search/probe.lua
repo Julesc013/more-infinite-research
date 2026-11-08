@@ -137,7 +137,7 @@ function M.new(context)
   end
 
   local function call(options)
-    if type(remote) ~= "table" or type(remote.call) ~= "function" then fail("browser remote is absent") end
+    if not remote or type(remote.call) ~= "function" then fail("browser remote is absent") end
     if remote.call(BROWSER, "open", player.index, options) ~= true then fail("browser remote did not open") end
   end
 
