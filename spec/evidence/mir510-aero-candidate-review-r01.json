@@ -1,0 +1,104 @@
+{
+  "kind": "MIR510AeroIndependentCandidateHostReviewV1",
+  "status": "focused-independent-host-controls-pass-native-and-release-verdict-not-issued",
+  "issue": "https://github.com/Julesc013/more-infinite-research/issues/1807",
+  "draft_pr": "https://github.com/Julesc013/more-infinite-research/pull/1810",
+  "candidate_commit": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+  "candidate_player_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+  "candidate_custody": "C:/Projects/Factorio/.task-builds/mir510-aero-candidate-review-r01; clean detached read-only checkout",
+  "controller": {
+    "path": "tests/test_sif_final_output.py",
+    "sha256": "5E802C1E5ACC8CDD1D534855910D34596A57CCD666A5A7781C677BA9CA9D5B78",
+    "original_baseline_record_commit": "9cb6f076c17f4d67e26bf267a2f2769013e4d784",
+    "scope": "Only controller/test/evidence changes on Aero; production source consumed from exact separate candidate."
+  },
+  "runtime": {
+    "lupa": "2.6",
+    "lua": "5.2",
+    "python": "3.14",
+    "lua52_module_sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899"
+  },
+  "independent_expectations": {
+    "source": "Current shared packet and issue1807, not candidate snapshots",
+    "worker_additive_science": {
+      "revision": "v4.7.3",
+      "path": "source/prototypes/mir/settings/defaults.lua",
+      "git_blob": "95b96cf50093cd4eb522cec4f419b8f879ed69c5",
+      "observation": "worker-robots-storage science_packs=inherit, add_science_packs={electromagnetic-science-pack}; pre-fix2786326a5 Space Age continuation binding also declares electromagnetic."
+    },
+    "upstream_source_inputs": "Same exact worker data blob and F210 SIF archive identities as mir510-aero-sif-final-output-r01.json. Direct archives remain in their original libraries; no extraction/copy/hardlink."
+  },
+  "outcomes": {
+    "unchanged_original_player_source": {
+      "commit": "2786326a5bd2d45ea6a7865f755ec37493656163",
+      "player_tree": "99143111b0c4e834e080902ec66a9c88a4069c1e",
+      "controller_methods": 9,
+      "failed_subcases": 51,
+      "result": "expected-failure"
+    },
+    "fixed_candidate": {
+      "controller_methods": 9,
+      "failed_subcases": 0,
+      "result": "pass",
+      "includes": "six native tails across two targets/four policies; rocket productivity across two targets/eight policies; required white; shifted9; usable restored source; noSIF; explicit private holder; strict duplicate; eight actual worker/SIF source combinations"
+    },
+    "candidate_existing_worker_continuation_controls": {
+      "tests": 14,
+      "result": "pass"
+    },
+    "candidate_existing_worker_history_controls": {
+      "tests": 7,
+      "result": "pass"
+    },
+    "candidate_sif_policy_controls": {
+      "tests": 5,
+      "result": "pass"
+    }
+  },
+  "adverse_disposition": {
+    "first_candidate_run": "Four host failures retained in candidate-8e5c-r01. Maximum4 lacked a finite predecessor cost; other finite cases incorrectly prohibited the independently authored electromagnetic addition. These were harness/oracle defects, not established candidate defects.",
+    "correction": "Provide finite predecessor unit.count450 as a positive host cost input; preserve the five actual adapted provider ingredients plus the published electromagnetic addition. Same controller retains51 old baseline failures and passes fixed candidate.",
+    "original_baseline_record": "Original9cb6f076c controller/result/evidence preserved, not relabeled as the newer controller."
+  },
+  "logs": [
+    {
+      "path": "build/qualification/mir510-aero-sif-final-output-baseline-r07.log",
+      "sha256": "685D186196F51BECB33772602A07FE28E7DA873460F9BA584EF679FDEA8A12F5"
+    },
+    {
+      "path": "build/qualification/mir510-aero-sif-candidate-8e5c-r01.log",
+      "sha256": "A1B59F9860CD22EA610D9706493F86424465CF6CC303CE1C4FB79870ED35B88E"
+    },
+    {
+      "path": "build/qualification/mir510-aero-sif-candidate-8e5c-r02.log",
+      "sha256": "59BE2EF60C719D6C9A33C8CEDA485708640D61E8FBFD25C66B809943BF5B1F4E"
+    },
+    {
+      "path": "build/qualification/mir510-aero-candidate-worker-continuation-r01.log",
+      "sha256": "FC7A770F043129508A05C3617E6618E5D022F4D66DC5A8896BFE3CCBB326CFD4"
+    },
+    {
+      "path": "build/qualification/mir510-aero-candidate-worker-history-r01.log",
+      "sha256": "14736DA4D617E19F974018F9CAF3E5292336A62A82482B090F06D874CA3C65CE"
+    },
+    {
+      "path": "build/qualification/mir510-aero-candidate-sif-policy-r01.log",
+      "sha256": "F6652AB0E25C70125DDD0949CEC48A0F4AB78697D06D5A03F3569F287B33210C"
+    }
+  ],
+  "command": "python -B tests/test_sif_final_output.py --lua-runtime-dir <pinned-lupa-directory> --player-source-root <exact8e5ce79be-checkout>/source --worker-data-source <shared-packet>/reference/worker/source-reference/worker-data.lua --sif-archive <direct-F210-library>/space-is-fake_1.0.78.zip",
+  "limits": [
+    "No production files or shared branches changed by Aero. Black Glass retains integration/native/publication.",
+    "Only the normal construction/science/Generator paths and bounded original upstream functions are exercised; not the complete foreign data-final-fixes composition.",
+    "External-source execution uses actual F210 worker metadata and SIF1.0.78. F200 remains the separately disclosed small target-faithful science model.",
+    "Shifted9 and restored-white scenarios are opposing host controls, not captured provider/native profiles.",
+    "No native/gameplay/save/two-cold-reload or full-release acceptance from these results. No publication claimed.",
+    "New tests remain optional/unregistered pending integrator acceptance; preserve original failing baseline record and logs."
+  ],
+  "claims": {
+    "native_execution": false,
+    "saved_state_qualification": false,
+    "full_release_qualification": false,
+    "published": false
+  }
+}

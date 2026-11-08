@@ -277,6 +277,10 @@ class SifFinalOutputTests(unittest.TestCase):
                       mods.WorkerRobotCargoSizeResearch = "1.0.0"
                       raw.technology["worker-robots-storage-1"] = {type="technology",
                         name="worker-robots-storage-1",icons={{icon="host-only.png",icon_size=64}}}
+                      -- A valid finite predecessor is needed to inherit the
+                      -- growth from max4, where no provider level5 exists.
+                      raw.technology["worker-robots-storage-3"].unit = {
+                        count=450,time=60,ingredients={{"utility-science-pack",1}}}
                       data = {raw=raw}
                       function data:extend(rows)
                         for _, row in ipairs(rows) do
@@ -322,7 +326,13 @@ class SifFinalOutputTests(unittest.TestCase):
                         local output = publish({row},raw,mods,"configured")
                         useful(output[expected],false)
                         assert(has(row.prerequisites,"worker-robots-storage-" .. worker_maximum))
-                        assert(#row.unit.ingredients == 5, "MIR lost the final adapted upstream science vector")
+                        -- Published v4.7.3 source/prototypes/mir/settings/defaults.lua
+                        -- independently declares inherit + electromagnetic, also
+                        -- retained by the pre-fix Space Age continuation binding.
+                        local terminal = raw.technology["worker-robots-storage-" .. worker_maximum]
+                        preserved_ingredients(terminal.unit.ingredients,row.unit.ingredients)
+                        assert(#row.unit.ingredients == 6 and has(row.unit.ingredients,"electromagnetic-science-pack"),
+                          "MIR lost adapted upstream science or its published electromagnetic addition")
                       end
                       assert(same_table(foreign,raw), "MIR mutated the adapted provider")
                     ''')
@@ -331,6 +341,8 @@ class SifFinalOutputTests(unittest.TestCase):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--lua-runtime-dir", type=Path, required=True)
+    parser.add_argument("--player-source-root", type=Path,
+                        help="Read-only source from an exact independent candidate checkout")
     parser.add_argument("--worker-data-source", type=Path)
     parser.add_argument("--sif-archive", type=Path)
     args = parser.parse_args()
@@ -358,6 +370,8 @@ if __name__ == "__main__":
     from lupa.lua52 import LuaRuntime
     import test_science
     test_science.LuaRuntime = LuaRuntime
+    if args.player_source_root:
+        test_science.PLAYER = args.player_source_root.resolve(strict=True)
     result = unittest.TextTestRunner(verbosity=2).run(
         unittest.defaultTestLoader.loadTestsFromTestCase(SifFinalOutputTests))
     sys.exit(0 if result.wasSuccessful() else 1)
