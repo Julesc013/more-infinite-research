@@ -227,7 +227,8 @@
       "profiles": [
         {
           "path": "tests/profiles/runtime510-repair-candidate-f210-2123.json",
-          "sha256": "F7A2876E6470E1014880A6A5612C839318B9B9171DDBC50AB462EE3C783E9E63"
+          "sha256": "3A0CE3EAB79BF3DEF715A8BAB75C70D55FA35C6A423C1082FB21E0BEC4FFF1CA",
+          "original_capture_profile_sha256": "F7A2876E6470E1014880A6A5612C839318B9B9171DDBC50AB462EE3C783E9E63"
         }
       ],
       "required_markers": [
@@ -359,15 +360,18 @@
       "profiles": [
         {
           "path": "tests/profiles/runtime510-agriculture-candidate-defaults-1-f210-2123.json",
-          "sha256": "2A2FD5A0B30517895C2CD50A3F8AE82E98AA5FC4BCB4C203A720DA132820421D"
+          "sha256": "18EE9B33E59F52565854ACE9B2829A3B28A96BFEEDABE357FB60E1D1764A1FEA",
+          "original_capture_profile_sha256": "2A2FD5A0B30517895C2CD50A3F8AE82E98AA5FC4BCB4C203A720DA132820421D"
         },
         {
           "path": "tests/profiles/runtime510-agriculture-candidate-defaults-32-f210-2123.json",
-          "sha256": "9FF5328B78EE736A0F202B4B5B6F4F2EBADC8D92C88792941998194ADFD4AB6C"
+          "sha256": "F8151809A8CF33A595AA93C9129EEFF229734CE5598E929B47D169BE1037A903",
+          "original_capture_profile_sha256": "9FF5328B78EE736A0F202B4B5B6F4F2EBADC8D92C88792941998194ADFD4AB6C"
         },
         {
           "path": "tests/profiles/runtime510-agriculture-candidate-defaults-128-f210-2123.json",
-          "sha256": "D764A76983D9BFEEE7FECCA828982D4EB4FEBC13FF353B6F69C68EFE8A71972D"
+          "sha256": "4E6F01B35143D6E7979F81A03C1A2268E6FE2FDF0C4FDBAC18EB5E3BC2144881",
+          "original_capture_profile_sha256": "D764A76983D9BFEEE7FECCA828982D4EB4FEBC13FF353B6F69C68EFE8A71972D"
         }
       ],
       "required_markers": [
@@ -499,7 +503,8 @@
       "Repair original failed observer receipt and post-terminal readback remain adverse evidence; a fresh explicit-observer verified capture supplies formal repair origin.",
       "Three successful agriculture pending sources retain their actual280230f95223f0dbd7c851d5a1840ee0e5e0d5f3 identity, without relabeling as the current merged harness.",
       "Existing custom pilots are unscored physical observations only. Run four separately retained formal pilots through the reviewed committed controller and this committed plan before scored timing.",
-      "Bind exact candidate-origin receipt SHA/bytes and new formal pilot receipt SHA/bytes in independently reviewed scored admission."
+      "Bind exact candidate-origin receipt SHA/bytes and new formal pilot receipt SHA/bytes in independently reviewed scored admission.",
+      "Canonical tracked profile LF normalization is not a new native input. Preserve the original capture-profile SHA and verify complete parsed profile equality to the declared canonical JSON, including every exact archive pin; never relabel the original bytes."
     ]
   }
 }
