@@ -144,22 +144,24 @@ class BobAngelCatalogueTests(unittest.TestCase):
         cls.mods = {row["name"]: row["version"] for row in json.loads(
             (ROOT / "tests/profiles/bob-angel-f200-2077.json").read_text())["mods"] if row["enabled"]}
 
-    def stage(self):
+    def stage(self, raw=None, startup=None, expect_failure=False):
         lua = LuaRuntime(unpack_returned_tuples=True)
         lua.globals().player_root = (ROOT / "source").as_posix()
         lua.globals().mods = _lua_value(lua, self.mods)
-        raw = deepcopy(self.inputs["raw"])
+        raw = deepcopy(self.inputs["raw"] if raw is None else raw)
         for name, recipe in raw["recipe"].items():
             recipe.setdefault("type", "recipe")
             recipe.setdefault("name", name)
         lua.globals().captured_raw = _lua_value(lua, raw)
+        lua.globals().captured_startup = _lua_value(lua, {} if startup is None else startup)
+        lua.globals().expect_failure = expect_failure
         lua.execute(r'''
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"; package.cpath = ""
           local target = require("platform.target")
           target.id, target.factorio_version, target.minimum_base = "f200", "2.0", "2.0.77"
           target.distribution_version, target.cargo_research = "5.0.20000", false
           target.recipe_probability, target.receiver_limits, target.productivity_ignores_stats = "probability", false, true
-          settings = {startup={}}; helpers={}; log=function()end
+          settings = {startup=captured_startup}; helpers={}; log=function()end
           emitted={}; publications=0; data={raw=captured_raw}
           data.raw["ammo-category"] = data.raw["ammo-category"] or { ["cannon-shell"] = {} }
           data.raw["ammo-category"]["cannon-shell"] = data.raw["ammo-category"]["cannon-shell"] or {}
@@ -172,10 +174,25 @@ class BobAngelCatalogueTests(unittest.TestCase):
               emitted[row.type]=emitted[row.type] or {};emitted[row.type][row.name]=row
             end
           end
-          assert(loadfile(player_root.."/data.lua"))()
-          assert(loadfile(player_root.."/data-final-fixes.lua"))()
+          local ok, failure = pcall(function()
+            assert(loadfile(player_root.."/data.lua"))()
+            data_publications = publications
+            assert(loadfile(player_root.."/data-final-fixes.lua"))()
+          end)
+          stage_ok, stage_failure = ok, failure
+          if not ok and not expect_failure then error(failure, 0) end
         ''')
         return lua
+
+    def assert_foreign_input_unchanged(self, lua, raw):
+        actual = _plain(lua.globals().data.raw)
+        for kind, rows in raw.items():
+            for name, row in rows.items():
+                row = deepcopy(row)
+                if kind == "recipe":
+                    row.setdefault("type", "recipe")
+                    row.setdefault("name", name)
+                self.assertTrue(catalogue._same(row, actual[kind][name]), f"foreign {kind}/{name} changed")
 
     def test_complete_native_definitions_and_foreign_inputs(self):
         lua = self.stage()
@@ -193,17 +210,42 @@ class BobAngelCatalogueTests(unittest.TestCase):
             self.assertTrue(catalogue._same(row, found), f"{name}: {catalogue._changed_paths(row, found)}")
         # Neither the ordinary adapter nor material emission may mutate the
         # source recipe/technology/item/lab tables used for this construction.
-        actual = _plain(lua.globals().data.raw)
-        for kind, rows in self.inputs["raw"].items():
-            for name, row in rows.items():
-                row = deepcopy(row)
-                if kind == "recipe":
-                    row.setdefault("type", "recipe")
-                    row.setdefault("name", name)
-                self.assertTrue(catalogue._same(row, actual[kind][name]), f"foreign {kind}/{name} changed")
+        self.assert_foreign_input_unchanged(lua, self.inputs["raw"])
         self.assertEqual(lua.globals().publications, 2)  # shortcut, one complete technology publication
         declared = _plain(lua.execute('return require("research.catalogue").declared()'))
         self.assertEqual({row["id"] for row in declared}, set(expected["technology"]))
+
+    def test_disabled_named_water_gate_refuses_enabled_routes_before_publication(self):
+        raw = deepcopy(self.inputs["raw"])
+        raw["technology"]["angels-water-treatment"]["enabled"] = False
+        lua = self.stage(raw=raw, expect_failure=True)
+        self.assertFalse(lua.globals().stage_ok)
+        self.assertIn("disabled required prerequisite angels-water-treatment", lua.globals().stage_failure)
+        # The initial data stage has already emitted MIR's shortcut. The
+        # admission check must add no later publication or Bob/Angel research.
+        self.assertEqual(lua.globals().publications, lua.globals().data_publications)
+        self.assertNotIn("recipe-prod-research_bullets-1",
+                         _plain(lua.globals().emitted).get("technology", {}))
+        self.assert_foreign_input_unchanged(lua, raw)
+
+        # The published independent rows name exactly which forward streams
+        # use the gate. With all of those streams intentionally disabled, the
+        # same foreign fact cannot suppress unrelated publication.
+        startup = {}
+        gated_rows = {
+            name for name, row in self.expected_data["technology"].items()
+            if "angels-water-treatment" in row.get("prerequisites", [])
+        }
+        self.assertIn("recipe-prod-research_bullets-1", gated_rows)
+        for name in gated_rows:
+            self.assertTrue(name.startswith("recipe-prod-") and name.endswith("-1"), name)
+            startup["ips-enable-" + name[len("recipe-prod-"):-2]] = {"value": False}
+        lua = self.stage(raw=raw, startup=startup)
+        emitted = _plain(lua.globals().emitted)
+        self.assertEqual(lua.globals().publications, 2)
+        for name in gated_rows:
+            self.assertFalse(emitted["technology"][name]["enabled"], name)
+        self.assert_foreign_input_unchanged(lua, raw)
 
     def test_all_875_settings_match_published_fields_with_reviewed_growth_bound(self):
         lua = self.stage()

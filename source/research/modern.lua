@@ -257,6 +257,20 @@ end
 
 function M.technologies(selection, values)
   if type(selection) ~= "table" then error("MIR modern selection is required", 2) end
+  -- The no-BobTech adapter records this one named disabled gate privately.
+  -- Do not turn this into general foreign-prerequisite planning.
+  if selection.bob_angel_disabled_water_gate == true then
+    for _, definition in ipairs(selection.definitions) do
+      local stream = require_stream(values, definition.family)
+      local requires_gate = false
+      for _, prerequisite in ipairs(definition.prerequisites or {}) do
+        if prerequisite == "angels-water-treatment" then requires_gate = true; break end
+      end
+      if requires_gate and definition.available ~= false and stream.enabled == true then
+        error("MIR Bob/Angel disabled required prerequisite angels-water-treatment", 2)
+      end
+    end
+  end
   local out = {}
   for index = 1, #selection.definitions do out[#out + 1] = M.technology(selection.definitions[index], values) end
   for index = 1, #selection.continuations do out[#out + 1] = M.continuation(selection.continuations[index], values) end
