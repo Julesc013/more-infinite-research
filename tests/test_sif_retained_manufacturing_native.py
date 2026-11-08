@@ -123,6 +123,10 @@ class RetainedNativeFixtureTests(unittest.TestCase):
             script.active_mods["more-infinite-research"]="5.0.20002"
             script.active_mods["mir-fixture-mir5-sif-retained-manufacturing"]="0.2.0"
           end
+          function switch_current_entry_successor()
+            script.active_mods["more-infinite-research"]="5.0.20010"
+            script.active_mods["mir-fixture-mir5-sif-retained-manufacturing"]="0.5.0"
+          end
         ''')
         self.lua.execute('''
           script.event_order="level -> mir-fixture-mir5-sif-retained-manufacturing -> space-is-fake -> more-infinite-research"
@@ -172,7 +176,8 @@ class RetainedNativeFixtureTests(unittest.TestCase):
           end
           local create,save,query=game.create_force,game.server_save,remote.call
           local function after_config()
-            if script.active_mods['mir-fixture-mir5-sif-retained-manufacturing']=='0.4.0' then
+            local role=script.active_mods['mir-fixture-mir5-sif-retained-manufacturing']
+            if role=='0.4.0' or role=='0.5.0' then
               assert(callback_phase=="after-configuration" and mir_config_seen,"fresh/API/save before all configuration callbacks")
             end
           end
@@ -224,6 +229,13 @@ class RetainedNativeFixtureTests(unittest.TestCase):
         self.lua.execute("guard_natives();guard_source_witnesses()")
         self.lua.globals().engine_flags(player, foreign)
 
+    def current_entry_setup(self, player, foreign):
+        self.source()
+        self.lua.execute("switch_current_entry_successor()")
+        self.load_control()
+        self.lua.execute("guard_natives();guard_source_witnesses()")
+        self.lua.globals().engine_flags(player, foreign)
+
     def test_entry_boundary_all_boolean_combinations_and_read_only_colds(self):
         info = json.loads((FIXTURE / "successor-entry-boundary/info.json").read_bytes())
         self.assertEqual((NAME, "0.4.0"), (info["name"], info["version"]))
@@ -250,6 +262,58 @@ class RetainedNativeFixtureTests(unittest.TestCase):
                     self.cold(); self.cold()
                     self.assertEqual(1, self.lua.globals().event_order_calls)
                     self.assertEqual(2, self.lua.globals().reset_calls)
+
+    def test_current_entry_boundary_preserves_source_through_two_read_only_colds(self):
+        info = json.loads((FIXTURE / "successor-current-entry-boundary/info.json").read_bytes())
+        profile = json.loads((ROOT / "tests/profiles/sif-retained-manufacturing-current-f200-2077.json").read_bytes())
+        self.assertEqual((NAME, "0.5.0", "2.0"), (info["name"], info["version"], info["factorio_version"]))
+        self.assertIn("more-infinite-research >= 5.0.20010", info["dependencies"])
+        self.assertEqual("36F2E9D8C01507C2CBDC01AFF6C87399B40A9E0646F40DEC1F82628F5F50CBAB",
+                         profile["archive_sha256"]["more-infinite-research_5.0.20010.zip"])
+        for player in (False, True):
+            for foreign in (False, True):
+                with self.subTest(player=player, foreign=foreign):
+                    self.setUp(); self.current_entry_setup(player, foreign)
+                    self.lua.execute("run_configuration()")
+                    self.assertEqual(1, self.lua.globals().create_calls)
+                    self.assertEqual(0, self.lua.globals().api_calls)
+                    self.assertEqual(1, self.lua.eval("#saves"))
+                    self.lua.execute("callbacks.tick()")
+                    self.assertEqual("successor-current-entry-boundary-proposal", self.lua.eval("markers[2].witnesses.role"))
+                    self.assertEqual("0.5.0", self.lua.eval("markers[2].witnesses.fixture_version"))
+                    self.assertEqual("5.0.20010", self.lua.eval("markers[2].witnesses.successor_mir"))
+                    self.assertEqual(player, self.lua.eval("markers[2].witnesses.entry_boundary.player_processing_enabled"))
+                    self.assertEqual(foreign, self.lua.eval("markers[2].witnesses.entry_boundary.foreign_mining_enabled"))
+                    self.assertFalse(self.lua.eval("markers[2].witnesses.entry_boundary.flag_deltas.player_processing.source"))
+                    self.assertFalse(self.lua.eval("markers[2].witnesses.entry_boundary.flag_deltas.foreign_mining.source"))
+                    self.assertEqual(2, self.lua.globals().create_calls)
+                    self.lua.execute("guard_all_storage()")
+                    self.cold(); self.cold()
+                    self.assertEqual(4, self.lua.eval("#markers"))
+                    self.assertEqual(15, self.lua.globals().api_calls)
+                    self.assertEqual(2, self.lua.globals().reset_calls)
+
+    def test_old_entry_role_refuses_current_successor_version_before_mutation(self):
+        self.source()
+        self.lua.execute("switch_current_entry_successor();script.active_mods['mir-fixture-mir5-sif-retained-manufacturing']='0.4.0'")
+        self.load_control()
+        before = self.storage()
+        with self.assertRaisesRegex(LuaError, "exact closure differs: more-infinite-research"):
+            self.lua.execute("callbacks.config()")
+        self.assertEqual(before, self.storage())
+        self.assertEqual(1, self.lua.eval("#saves"))
+        self.assertEqual(1, self.lua.globals().create_calls)
+
+    def test_future_entry_role_refuses_before_mutation(self):
+        self.source()
+        self.lua.execute("script.active_mods['more-infinite-research']='5.0.20010';script.active_mods['mir-fixture-mir5-sif-retained-manufacturing']='0.6.0'")
+        self.load_control()
+        before = self.storage()
+        with self.assertRaisesRegex(LuaError, "fixture version differs"):
+            self.lua.execute("callbacks.config()")
+        self.assertEqual(before, self.storage())
+        self.assertEqual(1, self.lua.eval("#saves"))
+        self.assertEqual(1, self.lua.globals().create_calls)
 
     def test_source_complete_entry_rejects_preexisting_baseline_without_recapture(self):
         self.entry_setup(True, False)
@@ -349,14 +413,21 @@ class RetainedNativeFixtureTests(unittest.TestCase):
             self.assertEqual(key, contract.rows[i].key)
             self.assertEqual(recipes, list(contract.rows[i].recipes.values()))
         self.assertEqual([3, 2, 1, 3, 2], [len(row[1]) for row in ROWS])
-        for role, version, mir, digest in (
-            ("published", "0.1.0", "4.7.20003", "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647"),
-            ("successor", "0.2.0", "5.0.20002", "920C68BD074718AB2A608D8B2FC3657AA1B9C8766A586618C4C0952BA50C3E40"),
+        self.assertEqual("5.0.20002", contract.successor)
+        self.assertEqual("5.0.20010", contract.current_successor)
+        for role, profile_role, version, mir, digest, dependency in (
+            ("published", "published", "0.1.0", "4.7.20003", "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+             "more-infinite-research = 4.7.20003"),
+            ("successor", "successor", "0.2.0", "5.0.20002", "920C68BD074718AB2A608D8B2FC3657AA1B9C8766A586618C4C0952BA50C3E40",
+             "more-infinite-research = 5.0.20002"),
+            ("successor-current-entry-boundary", "current", "0.5.0", "5.0.20010",
+             "36F2E9D8C01507C2CBDC01AFF6C87399B40A9E0646F40DEC1F82628F5F50CBAB",
+             "more-infinite-research >= 5.0.20010"),
         ):
             info = json.loads((FIXTURE / role / "info.json").read_bytes())
-            profile = json.loads((ROOT / f"tests/profiles/sif-retained-manufacturing-{role}-f200-2077.json").read_bytes())
+            profile = json.loads((ROOT / f"tests/profiles/sif-retained-manufacturing-{profile_role}-f200-2077.json").read_bytes())
             self.assertEqual((NAME, version, "2.0"), (info["name"], info["version"], info["factorio_version"]))
-            self.assertIn("more-infinite-research = " + mir, info["dependencies"])
+            self.assertIn(dependency, info["dependencies"])
             self.assertEqual(digest, profile["archive_sha256"][f"more-infinite-research_{mir}.zip"])
             selected = {r["name"]: r["version"] for r in profile["mods"] if r["enabled"]}
             self.assertEqual(9, len(selected))

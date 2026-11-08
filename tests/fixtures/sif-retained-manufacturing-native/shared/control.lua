@@ -21,10 +21,17 @@ end
 local function stage()
   local version = script.active_mods[C.fixture]
   local source = version=="0.1.0"
-  if not source and version~="0.2.0" and version~="0.4.0" then fail("fixture version differs") end
+  local successor
+  if version=="0.2.0" or version=="0.4.0" then
+    successor=C.successor
+  elseif version=="0.5.0" then
+    successor=C.current_successor
+  elseif not source then
+    fail("fixture version differs")
+  end
   local expected = {base="2.0.77",["elevated-rails"]="2.0.77",quality="2.0.77",
     ["space-age"]="2.0.77",["space-is-fake"]="1.0.60",["cr-commons"]="1.0.27",
-    [C.fixture]=version,["more-infinite-research"]=source and C.source or C.successor,
+    [C.fixture]=version,["more-infinite-research"]=source and C.source or successor,
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
   for name, value in pairs(expected) do
     if script.active_mods[name]~=value then fail("exact closure differs: " .. name) end
@@ -33,7 +40,8 @@ local function stage()
   return source
 end
 local function entry_boundary_mode()
-  return script.active_mods[C.fixture]=="0.4.0"
+  local version=script.active_mods[C.fixture]
+  return version=="0.4.0" or version=="0.5.0"
 end
 local function require_early_order(order)
   if type(order)~="string" then fail("entry boundary event order absent") end
@@ -170,14 +178,21 @@ local function verify(state, successor)
   end
 end
 local function entry_marker(phase,state)
+  local version=script.active_mods[C.fixture]
+  local witnesses={source_mir=C.source,successor_mir=C.successor,role="successor-entry-boundary-proposal",
+    source_kind=state.kind,source_actual_labs=0,successor_actual_labs=0,
+    source_snapshot=state.player,foreign_snapshot=state.foreign,entry_boundary=state.entry_boundary,
+    accepted_current={player=snapshot(game.forces.player),foreign=snapshot(game.forces[state.foreign_index])},
+    fresh_index=state.fresh_index,five_hidden_rows=true,exact_effect_counts={3,2,1,3,2},processing_unit_scrap=false,
+    actual_gui_input=false,hidden_library_enqueue_not_exercised=true,on_load_read_only=phase=="reload",
+    interpretation_review_required=true}
+  if version=="0.5.0" then
+    witnesses.successor_mir=C.current_successor
+    witnesses.role="successor-current-entry-boundary-proposal"
+    witnesses.fixture_version=version
+  end
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({case=C.case,stage=phase,status="passed",
-    witnesses={source_mir=C.source,successor_mir=C.successor,role="successor-entry-boundary-proposal",
-      source_kind=state.kind,source_actual_labs=0,successor_actual_labs=0,
-      source_snapshot=state.player,foreign_snapshot=state.foreign,entry_boundary=state.entry_boundary,
-      accepted_current={player=snapshot(game.forces.player),foreign=snapshot(game.forces[state.foreign_index])},
-      fresh_index=state.fresh_index,five_hidden_rows=true,exact_effect_counts={3,2,1,3,2},processing_unit_scrap=false,
-      actual_gui_input=false,hidden_library_enqueue_not_exercised=true,on_load_read_only=phase=="reload",
-      interpretation_review_required=true}}))
+    witnesses=witnesses}))
 end
 local function marker(phase,state,source)
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({case=C.case,stage=phase,status="passed",
