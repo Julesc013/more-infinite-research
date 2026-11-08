@@ -1,6 +1,6 @@
 -- Prepared test-only Library Settings search probe.  A later, separately
 -- committed imported/client composition owns invocation and client capture.
--- This helper registers no events or remote interface and changes no game state.
+-- This helper registers no events or remote interface and performs no gameplay mutation.
 local M = {}
 
 local ROOT = "mir_research_browser"
@@ -14,10 +14,11 @@ local STAGES = {
   "settings-repair",
   "settings-retained-default",
   "settings-no-match",
-  "restore-research",
   "restore-settings-empty",
+  "restore-research",
 }
 local NO_MATCH = string.rep("x", 161)
+local MAX_SETTING_DESCRIPTORS = 2048
 
 local function fail(message)
   error("[mir-library-legacy-settings-search] " .. message, 2)
@@ -43,18 +44,19 @@ local function owned(element, parent, element_type, name)
 end
 
 local function items_from(list)
-  if type(list.items) ~= "table" then fail("settings list items differ") end
-  local count = #list.items
-  if count > 128 then fail("settings list bound exceeded") end
+  local source = list.items
+  if type(source) ~= "table" then fail("settings list items differ") end
+  local count = #source
+  if count > MAX_SETTING_DESCRIPTORS then fail("settings list bound exceeded") end
   local items = {}
-  for index = 1, count do items[index] = list.items[index] end
+  for index = 1, count do items[index] = source[index] end
   return items
 end
 
 local function count_from(label, list_count)
   local caption = label.caption
   if type(caption) ~= "table" or caption[1] ~= "mir-browser.settings-count"
-      or not whole(caption[2], 0, 128) or caption[2] ~= list_count then
+      or not whole(caption[2], 0, MAX_SETTING_DESCRIPTORS) or caption[2] ~= list_count then
     fail("settings count differs")
   end
   return caption[2], caption
@@ -72,7 +74,7 @@ function M.new(context)
       or not whole(settle_ticks, 1, 3600) then
     fail("prepared query or settle bound differs")
   end
-  if type(player.index) ~= "number" or type(player.gui) ~= "table" or type(player.gui.screen) ~= "table" then
+  if type(player.index) ~= "number" or player.gui == nil or player.gui.screen == nil then
     fail("prepared player differs")
   end
 
@@ -145,8 +147,8 @@ function M.new(context)
     if stage == "settings-repair" then return {tab = "settings", settings_scope = "research", search = "repair"} end
     if stage == "settings-retained-default" then return {search = "default"} end
     if stage == "settings-no-match" then return {search = NO_MATCH} end
-    if stage == "restore-research" then return {tab = "research"} end
     if stage == "restore-settings-empty" then return {tab = "settings", settings_scope = "research", search = ""} end
+    if stage == "restore-research" then return {tab = "research"} end
     fail("unknown fixed stage")
   end
 
@@ -183,14 +185,18 @@ function M.new(context)
     elseif stage == "settings-no-match" then
       observation = observe(stage, 3, string.sub(NO_MATCH, 1, 160))
       if observation.list_count ~= 0 then fail("Settings no-match filter differs") end
-    elseif stage == "restore-research" then
-      observation = observe(stage, 1, nil)
-      if observation.research_text ~= state.research_text then fail("Research query was not preserved") end
     elseif stage == "restore-settings-empty" then
       observation = observe(stage, 3, "")
-      if observation.research_text ~= state.research_text then fail("Research query leaked during Settings restore") end
+    elseif stage == "restore-research" then
+      observation = observe(stage, 1, "")
+      if observation.research_text ~= state.research_text or observation.settings_text ~= "" then
+        fail("Research or hidden Settings query was not preserved")
+      end
     else
       fail("unknown fixed stage")
+    end
+    if stage ~= "research" and stage ~= "restore-research" and observation.research_text ~= state.research_text then
+      fail("Research query leaked during Settings check")
     end
     state.observations[stage] = observation
     state.pending = nil

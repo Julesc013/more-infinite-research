@@ -59,7 +59,9 @@ class LibraryLegacySettingsSearchProbeTests(unittest.TestCase):
                 local text=opponent=="unbounded-no-match" and options.search or options.search:sub(1,160)
                 if retained_tab=="settings" then retained_settings=text else retained_research=text end
               end
-              if opponent=="research-leak" and retained_tab=="settings" then retained_research="leaked" end
+              if opponent=="transient-research-leak" and retained_tab=="settings" then
+                retained_research=retained_settings=="repair" and "leaked" or "science"
+              end
               research_query.text=retained_research;settings_query.text=retained_settings
               tabs.selected_tab_index=retained_tab=="settings" and 3 or 1
               local items
@@ -82,7 +84,7 @@ class LibraryLegacySettingsSearchProbeTests(unittest.TestCase):
             if invalid=="early" then probe.prepare("research");return pcall(function()probe.check("research")end) end
             if invalid=="order" then return pcall(function()probe.prepare("settings-baseline")end) end
             if invalid=="wrong-check" then probe.prepare("research");tick=30;return pcall(function()probe.check("settings-baseline")end) end
-            for _,stage in ipairs({"research","settings-baseline","settings-repair","settings-retained-default","settings-no-match","restore-research","restore-settings-empty"}) do
+            for _,stage in ipairs({"research","settings-baseline","settings-repair","settings-retained-default","settings-no-match","restore-settings-empty","restore-research"}) do
               probe.prepare(stage)
               if opponent=="world-mutation" and stage=="settings-repair" then world=2 end
               tick=tick+30
@@ -104,18 +106,21 @@ class LibraryLegacySettingsSearchProbeTests(unittest.TestCase):
         self.assertEqual(observations["settings-retained-default"]["list_count"], 0)
         self.assertEqual(observations["settings-no-match"]["settings_text"], "x" * 160)
         self.assertEqual(observations["settings-no-match"]["list_count"], 0)
-        self.assertEqual(observations["restore-research"]["research_text"], "science")
         self.assertEqual(observations["restore-settings-empty"]["settings_text"], "")
-        self.assertEqual([call.get("tab") for call in calls], ["research", "settings", "settings", None, None, "research", "settings"])
+        self.assertEqual(observations["restore-research"]["research_text"], "science")
+        self.assertEqual(observations["restore-research"]["settings_text"], "")
+        self.assertEqual(observations["restore-research"]["selected_tab"], 1)
+        self.assertEqual([call.get("tab") for call in calls], ["research", "settings", "settings", None, None, "settings", "research"])
         self.assertEqual(calls[1], {"tab": "settings", "settings_scope": "research", "search": ""})
         self.assertEqual(calls[2], {"tab": "settings", "settings_scope": "research", "search": "repair"})
         self.assertEqual(calls[3], {"search": "default"})
         self.assertEqual(calls[4], {"search": "x" * 161})
-        self.assertEqual(calls[6], {"tab": "settings", "settings_scope": "research", "search": ""})
+        self.assertEqual(calls[5], {"tab": "settings", "settings_scope": "research", "search": ""})
+        self.assertEqual(calls[6], {"tab": "research"})
 
     def test_rejects_wrong_remote_projection_or_protected_world_mutation(self):
         for opponent in ("old-route-only-changes-research", "wrong-query", "unfiltered-rows", "foreign-ownership",
-                         "malformed-query", "unbounded-no-match", "research-leak", "world-mutation"):
+                         "malformed-query", "unbounded-no-match", "transient-research-leak", "world-mutation"):
             with self.subTest(opponent=opponent):
                 with self.assertRaises(Exception):
                     self.lua.globals().run_legacy_settings_probe(opponent, "")
