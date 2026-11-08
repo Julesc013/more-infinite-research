@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-08
+last_reviewed: 2026-11-09
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,7 +14,26 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
-## Current repair checkpoint (2026-11-08)
+## Current stable checkpoint (2026-11-09)
+
+[MIR 5.0.10 GitHub prerelease](https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.10) is delivered: [exact delivery receipt](../spec/evidence/candidate510-github-prerelease-delivery-r01.json), release438263107, main/tag958e34dd, frozen8e5ce79b, checked promotionbe6b06db, playerf4e45e56, all19 anonymous public downloads and21 local delivery files verified. Published10 bytes stay fixed. [Affected evidence](../spec/evidence/candidate510-affected-native-r01.json) and [independent review](../spec/evidence/candidate510-independent-review-r01.json) close their named worker/SIF/lab/first-add/reload scopes only; stable remains NOT READY.
+
+This is the current worklist. Preserve original IDs and detailed decisions in the existing inventories. Black Glass owns integration, the sole heavy native lane and publication; Aero supplies bounded historical/coverage work and independent review when connected without becoming a dependency. New source work uses disjoint branches. The next changed public package is5.0.11 after checking live history; commits, preparation and test batches consume no public version. Unchanged10 packages may qualify for stable only after every applicable gate passes.
+
+| Requirement / owner | Applicable result | Exact remaining check or present obstacle |
+|---|---|---|
+| Save/startup intake, Black Glass | #1806 retains unknown-first-paid-mask;10 improves context without guessing paid rights. Known origin results retain their named scopes. | Original predecessor/version/save/settings are absent: that exact report remains unverified. Preserve any recovered input and qualify the actual route; do not invent a historical mask. Advance unrelated ready work. |
+| Library imported input/lifecycle, Black Glass | `build/qualification/library509-input-binding-r02`: qualified1.1 source8B32A667, observer0.3.7, memory-admission refusal with zero engines. | Bind exact10/observer0.3.8 and the existing guarded caller, validate real composition offline, then EN/DE input, foreign GUI, disconnect/rejoin/remove/restart and protected save/reloads. Existing7168MiB proposal currently lacks admission headroom; no unchanged retry or lower reserve. |
+| Library full/compact/diagnostic exports, Black Glass | R11 static packet and current508 gap preserve oracles; neither is a current native pass. | Strict observer0.4.3/current10 binding, actual EN/DE file output/content and retained lifecycle/foreign/failure checks. R11 needs two clients/7168MiB; no ready single-client packet is claimed. PR1813 supplies the scoped fixture binding and56 focused controls, not native acceptance. |
+| Active scripted work, Black Glass | [Active planR06](../spec/evidence/runtime-benchmark-active-plan-r06.json) retains1000/256/744 repair boundaries, real agriculture workloads,25000-tick pilots and original timing/memory rules. | Bind repair selector to exact10 and actual2.1.23/8DC; keep original4096MiB proposal. Prepare a protected pending-work save, then the unscored physical-work pilot before any scored comparison. EarlierB2 results keep their original identity. |
+| Whole-product startup/load/factory/spike/Library/memory, Black Glass | Completed BaseF210 dataset and all SpaceAge/heavy/F200 adverse receipts remain intact. | Check consumed-input applicability to10; execute finite missing Base/SpaceAge/heavy2.0/2.1 cases under original admission and analysis rules. Existing8192MiB desktop cases also lack current headroom. No prefix pooling or repeated historical table/reboot campaign. |
+| API/state/compatibility, Black Glass and independent review | Documented API1.0 subset and named native compatibility/save chains remain evidence. | Map consumed paths to10, reuse equivalent results, and name only missing engine/mod/settings/save boundary checks. Startup/host counts do not replace useful gameplay or saved state. |
+| Historical preservation/coverage, Aero with Black Glass fallback | [CONT inventory](../spec/inventory/continuity.json), original request ledger and nine4.7.3/seven older/four forward groups retain original decisions and results. | Finish VER-07 obligation-to-implementation-to-applicable-evidence reconciliation with exact missing checks/support limits. inventory_complete remains false; preserve disconnected alternatives and deliver reachable bounded findings. |
+| Stable verdict and delivery, Black Glass plus non-author reviewer | Beta integrity is closed for10; [verification](../spec/verification.md) still governs stable. | All applicable current verdicts, accurate support/docs, independent review, checked promotion and exact GitHub delivery on one accepted candidate. Beta maturity supplies no stable waiver. |
+
+The9November observation was16748180KiB free physical RAM, insufficient for the unchanged dual-client admission proposal. This is an environment observation, not a product failure or accepted support limit. Keep one active and one pending native assignment; preserve failed receipts and move the admitted headless case forward while current client composition is repaired. The older checkpoints below retain their original dates and scopes.
+
+## Previous repair checkpoint (2026-11-08)
 
 [PR #1808](https://github.com/Julesc013/more-infinite-research/pull/1808) repairs the catalogue-wide SIF retirement rule and foreign finite worker-storage continuation, and adds bounded context to the still-unresolved unknown-paid-mask refusal. The [reassessment](reassessment-2026-11-08.md) explains exact changes, original-package comparisons, corrected test expectations and limits. The [native receipt](../spec/evidence/mir509-reassessment-worker-native-r01.json) accepts original473 actual lab/save, committed candidate upgrade/next lab/save, two unchanged-byte cold reloads and fresh candidate work in the controlled2.1.24 Base/provider selection. The first hosted run caught a stale mutation target; its test-only correction adds separate internal/existing-owner opponents without changing the native-tested player bytes. Actual SIF/F200/reporter-profile/native-cap and full Library/stable gates remain open. Black Glass retains release integration and publication under #1807; published509 assets remain unchanged.
 
