@@ -206,6 +206,84 @@ class SIFCataloguePolicyTests(unittest.TestCase):
                     if variant == "external-weapon":
                         self.assertNotIn("weapon-shooting-speed-7", rows)
 
+    def test_worker_robot_cargo_size_provider_ends_after_its_actual_tail_and_uses_final_sif_science(self):
+        """WorkerRobotCargoSizeResearch 1.0.0 shape: finite 4..max, optional infinite max+1."""
+        upstream_science = [
+            ["automation-science-pack", 1], ["logistic-science-pack", 1],
+            ["chemical-science-pack", 1], ["production-science-pack", 1],
+            ["utility-science-pack", 1], [WHITE, 1],
+        ]
+
+        def install_provider(raw, maximum, infinite):
+            # The upstream chain begins after Base's finite level three.  The
+            # controlled world supplies its own normalised level-three row, so
+            # retain the actual finite predecessor shape the adapter consumes.
+            raw["technology"]["worker-robots-storage-3"] = {
+                "type": "technology", "name": "worker-robots-storage-3",
+                "effects": [{"type": "worker-robot-storage", "modifier": 1}],
+                "prerequisites": ["worker-robots-storage-2"],
+                "unit": {"count": 450, "ingredients": [["automation-science-pack", 1]], "time": 60},
+                "upgrade": True,
+            }
+            provider = {}
+            for level in range(4, maximum + 1):
+                provider[f"worker-robots-storage-{level}"] = {
+                    "type": "technology", "name": f"worker-robots-storage-{level}",
+                    "effects": [{"type": "worker-robot-storage", "modifier": 1}],
+                    "prerequisites": (["worker-robots-storage-3", WHITE] if level == 4
+                                      else [f"worker-robots-storage-{level - 1}"]),
+                    "unit": {"count": 2 ** (level - 4) * 1000, "ingredients": deepcopy(upstream_science),
+                             "time": 60},
+                    "upgrade": True,
+                }
+            if infinite:
+                level = maximum + 1
+                provider[f"worker-robots-storage-{level}"] = {
+                    "type": "technology", "name": f"worker-robots-storage-{level}",
+                    "effects": [{"type": "worker-robot-storage", "modifier": 1}],
+                    "prerequisites": [f"worker-robots-storage-{level - 1}"],
+                    "unit": {"count_formula": "2^(L - 4)*1000", "ingredients": deepcopy(upstream_science),
+                             "time": 60},
+                    "max_level": "infinite", "upgrade": True,
+                }
+            raw["technology"].update(provider)
+            return provider
+
+        for maximum, infinite in ((4, False), (7, False), (10, False),
+                                  (4, True), (7, True), (10, True)):
+            for policy in ("configured", "all"):
+                with self.subTest(maximum=maximum, infinite=infinite, policy=policy):
+                    retired_raw, mods = self.inputs("f210")
+                    available_raw, _ = self.inputs("f210", source="native")
+                    mods["WorkerRobotCargoSizeResearch"] = "1.0.0"
+                    retired_provider = install_provider(retired_raw, maximum, infinite)
+                    available_provider = install_provider(available_raw, maximum, infinite)
+                    retired_lua = self.stage(retired_raw, mods, "f210", policy)
+                    available_lua = self.stage(available_raw, mods, "f210", policy)
+                    retired, available = self.emitted(retired_lua), self.emitted(available_lua)
+                    continuation = f"worker-robots-storage-{maximum + 1}"
+                    for name, expected in retired_provider.items():
+                        self.assertEqual(expected, fixture.plain_lua(retired_lua.globals().data.raw.technology[name]), name)
+                    for name, expected in available_provider.items():
+                        self.assertEqual(expected, fixture.plain_lua(available_lua.globals().data.raw.technology[name]), name)
+                    if infinite:
+                        self.assertNotIn(continuation, retired)
+                        self.assertNotIn(continuation, available)
+                        continue
+                    self.assertIn(continuation, retired)
+                    self.assertIn(continuation, available)
+                    expected = deepcopy(available[continuation])
+                    expected["unit"]["ingredients"] = [
+                        ingredient for ingredient in expected["unit"]["ingredients"] if ingredient[0] != WHITE
+                    ]
+                    expected["prerequisites"] = [
+                        prerequisite for prerequisite in expected.get("prerequisites", []) if prerequisite != WHITE
+                    ]
+                    self.assertEqual(expected, retired[continuation])
+                    self.assertNotIn(WHITE, [ingredient[0] for ingredient in retired[continuation]["unit"]["ingredients"]])
+                    self.assertNotIn(WHITE, retired[continuation].get("prerequisites", []))
+                    self.assertIn(f"worker-robots-storage-{maximum}", retired[continuation]["prerequisites"])
+
     def test_usable_white_and_absent_sif_do_not_retire_science(self):
         for source, sif in (("native", True), ("replacement", True), ("native", False)):
             for target in ("f200", "f210"):
