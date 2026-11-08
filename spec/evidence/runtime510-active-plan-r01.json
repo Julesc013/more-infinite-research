@@ -1,0 +1,510 @@
+{
+  "schema": 1,
+  "kind": "MIR5PredeclaredActiveRuntimeBenchmarkPlanV1",
+  "status": "predeclared-active-save-capture-required-not-a-result",
+  "host": "BLACKGLASS-WIN1",
+  "plan_source": {
+    "commit": "32feeb99db3cb998f30aa73d11e8f3ebdbd487e6",
+    "tree": "1f2ca1f4af0983df7dc990e4a9aaf31e4eb9a955"
+  },
+  "retains_historical_plan": {
+    "path": "spec/evidence/runtime505-active-plan-r02.json",
+    "sha256": "5F73A850827290FE760E7C04B3F60C991E3205B08043D046852DB968A267212C",
+    "disposition": "Preserve all original505R01/R02 observations, including failed published128 terrain preparation. Reuse only independently validated unchanged505R02 published pending inputs and physical pilots under their original identities. Candidate10 uses its own exact origins and new committed-controller pilots. No result is renamed; no favorable-prefix selection or threshold change."
+  },
+  "candidate": {
+    "source_commit": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+    "source_tree": "416e7b290caa3ce2c164e5496d482a2041e43e90",
+    "player_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+    "asset_root": "D:/Projects/Factorio/.task-builds/mir510-freeze-r02",
+    "asset_inventory_file_sha256": "67D1C28B222C825F6B551B88EBC70579C166BADD4A985570D7E9FAB9D509953A",
+    "asset_inventory_content_sha256": "0D397ECEA4D9E2DF22DDE027E445B281E7813D0A0D2711A02E647BA1E6D83ED0",
+    "f210_archive": {
+      "name": "more-infinite-research_5.0.21010.zip",
+      "bytes": 996956,
+      "sha256": "C625D648978F6FE677B5EDC5C68090A2AA9A939D48A54A736610D55E47337806"
+    }
+  },
+  "published": {
+    "f210_archive": {
+      "name": "more-infinite-research_4.7.21002.zip",
+      "sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F"
+    }
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "public_harness": {
+    "source_reference": "32feeb99db3cb998f30aa73d11e8f3ebdbd487e6",
+    "git_blob_sha256": [
+      {
+        "path": "tools/Invoke-NativeFixture.ps1",
+        "sha256": "5FF07FF2131DB29C42B25185CF8984824C010272FE6B1BB4CACE26189938B199"
+      },
+      {
+        "path": "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1",
+        "sha256": "D610BE142BF948C2CE5C5BAE4FE29822D84C75114EC5A7BF0A9D6F719CB7CDE1"
+      },
+      {
+        "path": "tools/lib/validation/NativeProbeCommon.ps1",
+        "sha256": "CC8462A39DE12D0746C8F985D1F86F761CF3EF261B4FA551CFFD092F76D64D71"
+      },
+      {
+        "path": "tools/lib/validation/NativeProbeResources.ps1",
+        "sha256": "9A43E8109B08A6C56D3B716F24AB88816677A41403EF57A8FCF3D5409B8EAE9A"
+      },
+      {
+        "path": "tools/lib/validation/ResourceGovernor.ps1",
+        "sha256": "BF33D66549A22D8DEE34FCA705C9E717771249A692837EDDBC4EBA7B73F9D243"
+      },
+      {
+        "path": "tools/lib/validation/OwnedProcessMemorySampler.ps1",
+        "sha256": "BED20276B381B3F8573CD0D7789678843080819FDBF2FDCD32496E9FE32FFE1E"
+      },
+      {
+        "path": "tools/lib/validation/ImmutableInputStaging.ps1",
+        "sha256": "B5FBFAC8537B08F9790BD3EE8ACEAAB38EE5CBB8EF005E67E8375DE568BBC12C"
+      },
+      {
+        "path": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
+        "sha256": "EC5E310D8C6A230D3EE107467A73B46F7A85898780C010BBFB4376F3A8EB0107"
+      },
+      {
+        "path": "tools/lib/validation/ResponsiveMenuRecord.ps1",
+        "sha256": "7F74EF416DC4C06B85B3479C02DEF13837F9D69420BBE2F88ADAFB8E5E18DFFB"
+      },
+      {
+        "path": "tools/lib/compatibility/LibraryActivation.ps1",
+        "sha256": "74CC59A11E792F3CE3BC7DF135867806CFD928E2D2BAE37240554D53624CA3A4"
+      },
+      {
+        "path": "tools/lib/workspace/RepoPaths.ps1",
+        "sha256": "E9080D02C67E79A488F7093010BDF125301152D527D3662D526D21A466CC97A0"
+      },
+      {
+        "path": "tools/lib/compatibility/ModPortal.ps1",
+        "sha256": "A16344F66A9124C0792614AAD83702603D4C0AD4FE977392C73710B745E74B08"
+      }
+    ]
+  },
+  "benchmark_command": {
+    "arguments": [
+      "--benchmark",
+      "<fresh-owned-active-seed.zip>",
+      "--benchmark-ticks",
+      "25000",
+      "--benchmark-runs",
+      "1",
+      "--benchmark-sanitize"
+    ],
+    "preparation_outside_timed_benchmark": true,
+    "fresh_owned_seed_per_launch": true,
+    "input_seed_hash_before_and_after_each_group": true,
+    "raw_stdout_retained": true,
+    "engine_reported_time_per_tick_required": true
+  },
+  "process_memory_observation": {
+    "context": "benchmark",
+    "expected_slot": {
+      "phase": "benchmark",
+      "role": "factorio"
+    },
+    "target_interval_milliseconds": 250,
+    "maximum_duration_seconds": 900,
+    "maximum_observations": 12000,
+    "maximum_serialized_bytes": 8388608,
+    "interpretation": "The operating-system peak working set is distinct from the maximum sampled working/private bytes. Real gaps and incomplete observations are retained; sampled private bytes are not an instantaneous proven peak."
+  },
+  "resources": {
+    "expected_peak_memory_mib_per_factorio": 4096,
+    "maximum_new_output_mib_per_launch": 120,
+    "exclusive_native_lock": true,
+    "direct_existing_archive_library_only": true,
+    "no_dependency_copy_hardlink_or_extraction": true
+  },
+  "comparison_rules": {
+    "counterbalancing": "Within every scored pair, odd blocks run published then candidate and even blocks candidate then published. Warm-ups are unscored and retained separately.",
+    "candidate_time_per_tick_limit": {
+      "rule": "candidate median <= published median + max(10 percent of published median, 0.25 ms/tick)",
+      "relative_fraction": 0.1,
+      "absolute_milliseconds_per_tick": 0.25
+    },
+    "candidate_memory_limits": {
+      "metrics": [
+        "operating_system_peak_working_set_bytes",
+        "maximum_sampled_working_set_bytes",
+        "maximum_sampled_private_bytes"
+      ],
+      "rule": "candidate median <= published median + max(10 percent of published median, 64 MiB), evaluated separately for each metric",
+      "relative_fraction": 0.1,
+      "absolute_bytes": 67108864
+    },
+    "agriculture_within_arm_increment_128_minus_1": {
+      "metrics": [
+        "engine_reported_average_ms_per_tick",
+        "operating_system_peak_working_set_bytes",
+        "maximum_sampled_working_set_bytes",
+        "maximum_sampled_private_bytes"
+      ],
+      "rule": "Report candidate and published 128-minus-1 raw differences separately. A percentage comparison is permitted only when the matching published incremental denominator is finite and strictly positive; otherwise report raw differences only, with no percentage or inferred non-regression conclusion from noise."
+    }
+  },
+  "schedule": {
+    "repair_active": {
+      "warmups_per_arm": 2,
+      "scored_pairs": 8,
+      "arms": [
+        "published",
+        "candidate"
+      ],
+      "physical_work": "First post-load tick damages exactly 1000 walls; 256 eligible player/reciprocal-friendly walls await native passive repair, while 744 overflow walls, foreign walls and a non-wall remain unchanged."
+    },
+    "agriculture_active": {
+      "tiers": [
+        1,
+        32,
+        128
+      ],
+      "warmups_per_arm_per_tier": 2,
+      "scored_pairs_per_tier": 6,
+      "arms": [
+        "published",
+        "candidate-defaults"
+      ],
+      "physical_work": "Two real lab completions and N towers per player/zero-research foreign force are prepared before saving. The first post-load tick performs one native seed insertion per tower and requires exactly 2N on_tower_planted_seed events."
+    },
+    "total_launches": 68
+  },
+  "active_fixture_contract": {
+    "repair": {
+      "control_path": "tests/fixtures/repair-stress/control.lua",
+      "control_sha256": "7431CB52B2EEADD9F1B6F1398809794A779785E6B4881F263234F81B76FB5D6C",
+      "fixture_source_members": [
+        {
+          "source": "tests/fixtures/repair-stress/control.lua",
+          "fixture": "repair-stress",
+          "member": "control.lua",
+          "sha256": "7431CB52B2EEADD9F1B6F1398809794A779785E6B4881F263234F81B76FB5D6C"
+        },
+        {
+          "source": "tests/fixtures/repair-stress/settings-updates.lua",
+          "fixture": "repair-stress",
+          "member": "settings-updates.lua",
+          "sha256": "169544957E9FD810B04FFFBF87313B9C992760CA45B2A2F91BA87111948B9C51"
+        },
+        {
+          "source": "tests/fixtures/repair-stress/published/info-f210.json",
+          "fixture": "repair-published",
+          "member": "info.json",
+          "sha256": "487AA0537E3B1878F612638F5CA1C2389B97C6A902D14A915DF03D5D85CF20BA"
+        },
+        {
+          "source": "tests/fixtures/repair-stress/info-active-current-f210.json",
+          "fixture": "repair-candidate",
+          "member": "info.json",
+          "sha256": "0EC890D3925FB8C566345C5A01000EF71B69C4EEEFF70217D02AC0CA48DE3298"
+        },
+        {
+          "source": "tests/fixtures/repair-stress/active/info-f210.json",
+          "fixture": "repair-active",
+          "member": "info.json",
+          "sha256": "237F1EA1FF11F762D957F3F2CCF522740C5D5745EC1D34775D36B84C85B9D4AF"
+        },
+        {
+          "source": "tests/fixtures/active-mods-observer/info.json",
+          "fixture": "active-mods-observer",
+          "member": "info.json",
+          "sha256": "C37A55C4776F1B4DABA7E4D5C98CF22FD0E978A461D3E6FD8A95E238B97908BD"
+        },
+        {
+          "source": "tests/fixtures/active-mods-observer/data-final-fixes.lua",
+          "fixture": "active-mods-observer",
+          "member": "data-final-fixes.lua",
+          "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C"
+        }
+      ],
+      "profiles": [
+        {
+          "path": "tests/profiles/runtime510-repair-candidate-f210-2123.json",
+          "sha256": "3A0CE3EAB79BF3DEF715A8BAB75C70D55FA35C6A423C1082FB21E0BEC4FFF1CA",
+          "original_capture_profile_sha256": "F7A2876E6470E1014880A6A5612C839318B9B9171DDBC50AB462EE3C783E9E63"
+        }
+      ],
+      "required_markers": [
+        "prepared",
+        "start",
+        "complete"
+      ],
+      "scope": "Candidate10 raw-Git closure only. Published rows consume their separately validated original505R02 profiles and fixture archives; these current member declarations do not rewrite or repack them."
+    },
+    "agriculture": {
+      "control_path": "tests/fixtures/agriculture-scale/core/control.lua",
+      "control_sha256": "F6D4B0FC590E55EB0B4B81A6DFD51C1D860E55968DEA70AA2640DBC5633056CF",
+      "fixture_source_members": [
+        {
+          "source": "tests/fixtures/agriculture-scale/core/info-active-current-f210.json",
+          "fixture": "agriculture-core",
+          "member": "info.json",
+          "sha256": "52AFC199B88C2F4AE40542E82199E32197932AED2A46C2E7A0E1D3B6A50B6226"
+        },
+        {
+          "source": "tests/fixtures/agriculture-scale/core/settings.lua",
+          "fixture": "agriculture-core",
+          "member": "settings.lua",
+          "sha256": "DF55175F87AE5035AB0CF0B21944A28ADA7EA755C7CDDBCF9CDE2987D0C400E4"
+        },
+        {
+          "source": "tests/fixtures/agriculture-scale/core/data-final-fixes.lua",
+          "fixture": "agriculture-core",
+          "member": "data-final-fixes.lua",
+          "sha256": "6E27397A7F8302C97B745B08A42B74FD4CD9686FEED3610C4E7B1420A9156049"
+        },
+        {
+          "source": "tests/fixtures/agriculture-scale/core/control.lua",
+          "fixture": "agriculture-core",
+          "member": "control.lua",
+          "sha256": "F6D4B0FC590E55EB0B4B81A6DFD51C1D860E55968DEA70AA2640DBC5633056CF"
+        },
+        {
+          "source": "tests/fixtures/active-mods-observer/info.json",
+          "fixture": "active-mods-observer",
+          "member": "info.json",
+          "sha256": "C37A55C4776F1B4DABA7E4D5C98CF22FD0E978A461D3E6FD8A95E238B97908BD"
+        },
+        {
+          "source": "tests/fixtures/active-mods-observer/data-final-fixes.lua",
+          "fixture": "active-mods-observer",
+          "member": "data-final-fixes.lua",
+          "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C"
+        },
+        {
+          "source": "tests/fixtures/agriculture-scale/paired/info.json",
+          "fixture": "agriculture-paired",
+          "member": "info.json",
+          "sha256": "F0E57FE8EBFDB4B9D6091E8471B1F2B84A28EDBD8122EB374ED13F14BFFB2D8A"
+        },
+        {
+          "source": "tests/fixtures/agriculture-scale/paired/settings-updates.lua",
+          "fixture": "agriculture-paired",
+          "member": "settings-updates.lua",
+          "sha256": "AE3C7991CAE29C55677154B9B3A6EAFA0E7E8E5BD2FF18E7C1B80D6AF264DF05"
+        },
+        {
+          "source": "tests/fixtures/agriculture-scale/arm-published/info.json",
+          "fixture": "agriculture-arm-published",
+          "member": "info.json",
+          "sha256": "2C55941A4EDB1EF13882BF88FA9C6B4C075664F1D58848CBEAF80A043D6959A2"
+        },
+        {
+          "source": "tests/fixtures/agriculture-scale/arm-published/settings-updates.lua",
+          "fixture": "agriculture-arm-published",
+          "member": "settings-updates.lua",
+          "sha256": "3A0B671A4CAFBD7EF04BA51C3C4DBF8C4B513B89C07FD91F2309AF6450792D55"
+        },
+        {
+          "source": "tests/fixtures/agriculture-scale/arm-candidate-defaults/info-active-current-f210.json",
+          "fixture": "agriculture-arm-candidate-defaults",
+          "member": "info.json",
+          "sha256": "5096BF2C518CCF221E4643D6E16797FC5D2ECD2FE67CCB0757CB3169E2783D34"
+        },
+        {
+          "source": "tests/fixtures/agriculture-scale/arm-candidate-defaults/settings-updates.lua",
+          "fixture": "agriculture-arm-candidate-defaults",
+          "member": "settings-updates.lua",
+          "sha256": "B3B4B2416F2A15EA2F48742E5F57146448F1E215247040FD4E63BA0AD5D4997B"
+        },
+        {
+          "source": "tests/fixtures/agriculture-scale/matched-tier-1/info.json",
+          "fixture": "agriculture-tier-1",
+          "member": "info.json",
+          "sha256": "851F09E2127B6F31690EC363A55E4AD6F0152D65ED9A7BA328A57CC8A6182522"
+        },
+        {
+          "source": "tests/fixtures/agriculture-scale/matched-tier-1/settings-updates.lua",
+          "fixture": "agriculture-tier-1",
+          "member": "settings-updates.lua",
+          "sha256": "F759721FD3313B796DBBF2972972CD443B2C38A06B4BF2F085AE84881DE793D0"
+        },
+        {
+          "source": "tests/fixtures/agriculture-scale/matched-tier-32/info.json",
+          "fixture": "agriculture-tier-32",
+          "member": "info.json",
+          "sha256": "50A914A304243577005E87812B28C321A6210BBFAFC17D58271281A7D5133AE9"
+        },
+        {
+          "source": "tests/fixtures/agriculture-scale/matched-tier-32/settings-updates.lua",
+          "fixture": "agriculture-tier-32",
+          "member": "settings-updates.lua",
+          "sha256": "A50C16056D243F6D7D186C7ED80DCDF68B98B488778948EDD2B0CD7D3FA6C757"
+        },
+        {
+          "source": "tests/fixtures/agriculture-scale/matched-tier-128/info.json",
+          "fixture": "agriculture-tier-128",
+          "member": "info.json",
+          "sha256": "82C31674F7BE0B941CB86707333CFA6AF89004EF4A725B62FA867F603330512A"
+        },
+        {
+          "source": "tests/fixtures/agriculture-scale/matched-tier-128/settings-updates.lua",
+          "fixture": "agriculture-tier-128",
+          "member": "settings-updates.lua",
+          "sha256": "AF3F9A10E9BE75FE862A551533A31E02DD55658E0226FE123F3B7B6646FDD7DD"
+        },
+        {
+          "source": "tests/fixtures/agriculture-scale/active/info.json",
+          "fixture": "agriculture-active",
+          "member": "info.json",
+          "sha256": "1D625757C47770146905792541A8FA987D85F91A62197F6E3CD5FCC974FD84EB"
+        }
+      ],
+      "profiles": [
+        {
+          "path": "tests/profiles/runtime510-agriculture-candidate-defaults-1-f210-2123.json",
+          "sha256": "18EE9B33E59F52565854ACE9B2829A3B28A96BFEEDABE357FB60E1D1764A1FEA",
+          "original_capture_profile_sha256": "2A2FD5A0B30517895C2CD50A3F8AE82E98AA5FC4BCB4C203A720DA132820421D"
+        },
+        {
+          "path": "tests/profiles/runtime510-agriculture-candidate-defaults-32-f210-2123.json",
+          "sha256": "F8151809A8CF33A595AA93C9129EEFF229734CE5598E929B47D169BE1037A903",
+          "original_capture_profile_sha256": "9FF5328B78EE736A0F202B4B5B6F4F2EBADC8D92C88792941998194ADFD4AB6C"
+        },
+        {
+          "path": "tests/profiles/runtime510-agriculture-candidate-defaults-128-f210-2123.json",
+          "sha256": "4E6F01B35143D6E7979F81A03C1A2268E6FE2FDF0C4FDBAC18EB5E3BC2144881",
+          "original_capture_profile_sha256": "D764A76983D9BFEEE7FECCA828982D4EB4FEBC13FF353B6F69C68EFE8A71972D"
+        }
+      ],
+      "required_markers": [
+        "prepared",
+        "start",
+        "complete"
+      ],
+      "scope": "Candidate10 raw-Git closure only. Published rows consume their separately validated original505R02 profiles and fixture archives; these current member declarations do not rewrite or repack them."
+    }
+  },
+  "active_seed_capture": {
+    "repair": {
+      "count": 1,
+      "arms": [
+        "candidate"
+      ],
+      "runner": "tools/Invoke-NativeFixture.ps1",
+      "case_name": "repair-stress-active",
+      "required_prepared_witness": {
+        "total_eligible_walls": 1000,
+        "first_capacity_walls": 256,
+        "eligible_overflow_walls": 744,
+        "initial_changed": 0,
+        "pending_physical_work": true
+      }
+    },
+    "agriculture": {
+      "count": 3,
+      "tiers": [
+        1,
+        32,
+        128
+      ],
+      "arms": [
+        "candidate-defaults"
+      ],
+      "runner": "Invoke-AgricultureScale.ps1",
+      "case_name": "agriculture-scale-active",
+      "required_prepared_witness": {
+        "real_lab_agriculture_completions": 2,
+        "native_planting_events_observed": 0,
+        "pending_physical_work": true
+      }
+    },
+    "closed_save_name": "mir5-native-active.zip",
+    "preparation_outside_timed_benchmark": true,
+    "published_prerequisites_reused": 4
+  },
+  "unscored_marker_pilot": {
+    "count": 4,
+    "ticks": 25000,
+    "not_in_schedule_total": true,
+    "not_a_timing_or_acceptance_result": true,
+    "required_per_active_seed": [
+      "one typed prepared marker from capture",
+      "one typed pending start marker",
+      "one typed passed complete marker",
+      "fatal native log refusal",
+      "repair start witness preserves 1000/256/744 boundaries and completion witness proves native repair",
+      "agriculture start witness preserves two labs, both force tower counts and zero prior planting; completion witness proves exactly 2N native planting events"
+    ],
+    "published_prerequisites_reused": 4
+  },
+  "execution_admission": {
+    "preparation_outside_scored_timing": [
+      "Validate the four current candidate origins and separately validate the complete original505R02 prerequisite receipts before selecting four unchanged published inputs. Every origin keeps its own source/profile/fixture/engine/native result and raw marker identities.",
+      "Protect pending source saves and verify each selected archive in the direct library without dependency copy/hardlink/extraction. Reuse never renames an old observation or makes a missing input present.",
+      "Run four fresh formal candidate25000-update physical marker pilots with the committed reviewed controller and this committed plan. Require unique pending start and passed completion, repair1000/256/744/8 and exact agriculture2N with two real labs and both forces. Prior custom pilots remain separate non-admission observations.",
+      "Freeze reviewed exact origin and formal pilot receipt hashes, controller and plan before scored timing. Execute all68 observations in one quiet protected block:16 warmups and52 scored. Keep original counterbalancing, time/memory rules and stop-on-admission/invariant failure. No favorable prefix, retry selection or pooling."
+    ],
+    "missing_inputs_refuse": true,
+    "results": []
+  },
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "input_change_scope": {
+    "previous_plan": "spec/evidence/runtime505-active-plan-r02.json",
+    "published_reference_unchanged": true,
+    "engine_unchanged": true,
+    "physical_counts_and_oracles_unchanged": true,
+    "fresh_matched_map_seed": 424242,
+    "clear_only_authored_crop_footprints_before_timed_work": true,
+    "threshold_schedule_endpoint_changes": false,
+    "candidate_changed_to_exact_published10": true,
+    "mixed_prerequisite_origins_explicit": true
+  },
+  "published_reuse": {
+    "kind": "exact-original505-ground-r02-four-published-inputs",
+    "plan_path": "spec/evidence/runtime505-active-plan-r02.json",
+    "plan_sha256": "5F73A850827290FE760E7C04B3F60C991E3205B08043D046852DB968A267212C",
+    "harness_revision": "23ab190b0037dfb0c9765df94f951300b5a05a16",
+    "receipt_capsule": "spec/evidence/runtime505-ground-physical-native-receipts-r02.json.gz",
+    "original_receipts": [
+      {
+        "capsule_member": "original/active-seed-captures.json",
+        "sha256": "A449FF36E95491F7D3F4ED24217BCCED193F1E5E73D5A123DB581DB86363FFD6",
+        "bytes": 72034
+      },
+      {
+        "capsule_member": "original/active-marker-pilots.json",
+        "sha256": "4AD021E596B64752FBBA16BC3A66BC271BEF3D16DD95D1833976F57B0F4A3DE6",
+        "bytes": 149669
+      }
+    ],
+    "ids": [
+      "repair-published",
+      "agriculture-published-1",
+      "agriculture-published-32",
+      "agriculture-published-128"
+    ],
+    "requirements": [
+      "Validate both complete original eight-row receipts using their existing exact-plan readers before selecting four published rows.",
+      "Rehash actual original source save, profile, fixture and player containers, engine and native marker logs. Missing actual bodies refuse execution.",
+      "Published sources retain original receipt hashes, raw-Git harness, fixture payloads and execution identities. Never rebuild these archives from current sources.",
+      "Run all newly scheduled published timing observations fresh on this machine alongside current candidate; only prerequisites are reused."
+    ]
+  },
+  "candidate_origins": {
+    "kind": "MIR5RuntimeBenchmark510CandidateOriginsV1",
+    "count": 4,
+    "ids": [
+      "repair-candidate",
+      "agriculture-candidate-defaults-1",
+      "agriculture-candidate-defaults-32",
+      "agriculture-candidate-defaults-128"
+    ],
+    "requirements": [
+      "Read original native-result bodies, not assertions alone; retain actual source revision/profile/save/engine/selected archives/prepared log identity.",
+      "Repair original failed observer receipt and post-terminal readback remain adverse evidence; a fresh explicit-observer verified capture supplies formal repair origin.",
+      "Three successful agriculture pending sources retain their actual280230f95223f0dbd7c851d5a1840ee0e5e0d5f3 identity, without relabeling as the current merged harness.",
+      "Existing custom pilots are unscored physical observations only. Run four separately retained formal pilots through the reviewed committed controller and this committed plan before scored timing.",
+      "Bind exact candidate-origin receipt SHA/bytes and new formal pilot receipt SHA/bytes in independently reviewed scored admission.",
+      "Canonical tracked profile LF normalization is not a new native input. Preserve the original capture-profile SHA and verify complete parsed profile equality to the declared canonical JSON, including every exact archive pin; never relabel the original bytes."
+    ]
+  }
+}

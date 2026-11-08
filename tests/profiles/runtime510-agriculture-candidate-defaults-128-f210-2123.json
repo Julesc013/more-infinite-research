@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "kind": "mir5-active-agriculture-native-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.21010",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-agriculture-scale",
+      "version": "0.1.1",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-agriculture-scale-paired",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults",
+      "version": "0.1.1",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-agriculture-scale-matched-tier-128",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-agriculture-scale-active",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "more-infinite-research_5.0.21010.zip": "C625D648978F6FE677B5EDC5C68090A2AA9A939D48A54A736610D55E47337806",
+    "mir-fixture-mir5-agriculture-scale_0.1.1.zip": "EC7310BF73078FE11FA84DDCE1415DF12A6409CFFEC0142C12408E63016CCA47",
+    "mir-fixture-mir5-agriculture-scale-paired_0.1.0.zip": "05D17B49A9C0C5112F601B5295C748E55B5F9AAA29E9829D589997B0DDC3D422",
+    "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults_0.1.1.zip": "A570FB0F805987CED60217E68B74FFAA1B86F7522FCE08C49F6256D903367218",
+    "mir-fixture-mir5-agriculture-scale-active_0.1.0.zip": "AD229D20E72FA9BD5F5752399A13B77AD4FFC9D27BBF2CE9875024960BE2C348",
+    "mir-fixture-mir5-agriculture-scale-matched-tier-128_0.1.0.zip": "C97B2F698E34DB8A15C22CF13A02879AF792446E615C510E979EAADF23E50BF3"
+  },
+  "scope": "Exact published 5.0.10 rebind of the existing matched active Defaults workload; physical counts, independently captured science, effects and pending-work checks remain unchanged. Preparation is not a performance verdict."
+}
