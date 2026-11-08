@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "kind": "MIRSIF510EntryBoundaryNativeChainV1",
+  "status": "accepted-named-entry-save-two-cold-scope-not-general-sif-or-stable",
+  "source": {
+    "distribution": "4.7.20003",
+    "save_sha256": "7E27C53726DCD56D07A91AA35C68DB6CCA9D5118C3D3164C31786A92C588B8D8",
+    "bytes": 826968,
+    "kind": "explicit-published-native-fixture-seed-not-lab-earned",
+    "actual_labs": 0
+  },
+  "successor": {
+    "distribution": "5.0.20010",
+    "archive_sha256": "36F2E9D8C01507C2CBDC01AFF6C87399B40A9E0646F40DEC1F82628F5F50CBAB",
+    "actual_labs": 0
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "file_version": "2.0.77.84539",
+    "product_version": "2.0.77",
+    "base_version": "2.0.77"
+  },
+  "closure": [
+    "base@2.0.77",
+    "cr-commons@1.0.27",
+    "elevated-rails@2.0.77",
+    "mir-fixture-mir5-active-mods-observer@0.1.0",
+    "mir-fixture-mir5-sif-retained-manufacturing@0.1.0",
+    "more-infinite-research@5.0.20010",
+    "quality@2.0.77",
+    "space-age@2.0.77",
+    "space-is-fake@1.0.60"
+  ],
+  "public_harness": "ef5e297e1da5eb2df10cc5d35fbb5bd84183f26d",
+  "private_controller": {
+    "commit": "ffd191889b2a4270806fbc4cedd35ca3fa3fb334",
+    "path": "D:\\Projects\\Factorio\\.task-builds\\sif510-controller-r01\\Invoke-SIF510SameVersionEntry.ps1",
+    "sha256": "50D7822DD63D0D90EF517F5EC5104BF4E6FF735E9FE2F8A2DD8C1F0BBE62D239"
+  },
+  "binding_sha256": "651646E7B0A8B16390A2398E5B778709C8D51EC96396D98660B9B63A71499BC4",
+  "native_result_sha256": "056D98E789B36138F6A405463272B721FAA773C261A7365600DD928F86E75AED",
+  "controller_result_sha256": "EE738E6EE2351A26C5801AACE3E4DFBB0A2E142C7040FB1344A00C06CC00C380",
+  "observed_upgrade_event": {
+    "mod_changes": {
+      "more-infinite-research": {
+        "old_version": "4.7.20003",
+        "new_version": "5.0.20010"
+      }
+    },
+    "mod_startup_settings_changed": false
+  },
+  "observed_event_order": "level -> mir-fixture-mir5-sif-retained-manufacturing -> space-is-fake -> more-infinite-research",
+  "native_processes": 3,
+  "cold_reload_checks": 2,
+  "preserved": {
+    "five_hidden_paid_identities": true,
+    "recipe_effect_counts": [
+      3,
+      2,
+      1,
+      3,
+      2
+    ],
+    "paid_levels_and_partials": true,
+    "native_queue_and_progress": true,
+    "recipe_productivity_bonuses": true,
+    "foreign_state_and_fresh_force": true,
+    "read_only_cold_checks": true,
+    "both_protected_source_files": true,
+    "library_controls": true,
+    "owned_receiver_restoration": [
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-sif-retained-manufacturing_0.1.0.zip",
+        "action": "removed-temporary"
+      }
+    ]
+  },
+  "adverse": {
+    "path": "failed-observer-version-change/result.json",
+    "status": "failed",
+    "native_processes": 1,
+    "cause": "The0.1\u21920.5 observer version change invalidated the strict unchanged-other-mod historical mask. Refusal is an admission safeguard, not an established production defect.",
+    "error": "unknown first paid mask for research_low_density_structure/casting-low-density-structure"
+  },
+  "custody": {
+    "primary_root": "build/qualification/sif510-entry-custody-r01",
+    "manifest_sha256": "C539A3FF349DE7AAE24A7926530EE91F970DAC4B88974943E0D2C6E611547F79",
+    "files": 40,
+    "bytes": 2269138
+  },
+  "limits": [
+    "Controlled same observer version0.1 with intentionally different test-only receiver bytes; no assertion that every non-MIR archive byte is unchanged.",
+    "Source fixture seeds paid state; this is not lab-earned progression, GUI, performance or complete SIF acceptance.",
+    "The two named enabled flags retain the independently observed pre-MIR entry boundary; this does not claim original false-state preservation or attribute the engine-stage changes to MIR.",
+    "Original failed attempt and all prior historical scopes remain unchanged."
+  ],
+  "performance_acceptance": false,
+  "release_qualification": false,
+  "independent_review": {
+    "reviewer": "separate non-author local reviewer",
+    "verdict": "Native/controller hashes, actualMIR-onlyevent/order, fivehidden11effects/progress/queue/foreign/freshstate andtwo coldchecks accepted. Source/controls restored; testobserver bytevariant andoriginaladverse limits retained."
+  }
+}

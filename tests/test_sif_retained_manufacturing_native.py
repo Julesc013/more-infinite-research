@@ -123,6 +123,10 @@ class RetainedNativeFixtureTests(unittest.TestCase):
             script.active_mods["more-infinite-research"]="5.0.20002"
             script.active_mods["mir-fixture-mir5-sif-retained-manufacturing"]="0.2.0"
           end
+          function switch_current_entry_successor()
+            script.active_mods["more-infinite-research"]="5.0.20010"
+            script.active_mods["mir-fixture-mir5-sif-retained-manufacturing"]="0.5.0"
+          end
         ''')
         self.lua.execute('''
           script.event_order="level -> mir-fixture-mir5-sif-retained-manufacturing -> space-is-fake -> more-infinite-research"
@@ -160,10 +164,10 @@ class RetainedNativeFixtureTests(unittest.TestCase):
             game.forces['mir5-sif-retained-foreign'].technologies['mining-productivity-3'].enabled=foreign
             engine_writing=false
           end
-          function run_configuration()
+          function run_configuration(event)
             callback_phase="configuration";mir_config_seen=false
             for name in (script.event_order.." -> "):gmatch("(.-) %-> ") do
-              if name=="mir-fixture-mir5-sif-retained-manufacturing" then callbacks.config()
+              if name=="mir-fixture-mir5-sif-retained-manufacturing" then callbacks.config(event)
               elseif name=="more-infinite-research" then
                 if mir_callback then mir_callback() end;mir_config_seen=true
               end
@@ -172,7 +176,8 @@ class RetainedNativeFixtureTests(unittest.TestCase):
           end
           local create,save,query=game.create_force,game.server_save,remote.call
           local function after_config()
-            if script.active_mods['mir-fixture-mir5-sif-retained-manufacturing']=='0.4.0' then
+            local role=script.active_mods['mir-fixture-mir5-sif-retained-manufacturing']
+            if role=='0.4.0' or role=='0.5.0' or role=='0.1.0' and script.active_mods['more-infinite-research']=='5.0.20010' then
               assert(callback_phase=="after-configuration" and mir_config_seen,"fresh/API/save before all configuration callbacks")
             end
           end
@@ -224,6 +229,13 @@ class RetainedNativeFixtureTests(unittest.TestCase):
         self.lua.execute("guard_natives();guard_source_witnesses()")
         self.lua.globals().engine_flags(player, foreign)
 
+    def current_entry_setup(self, player, foreign):
+        self.source()
+        self.lua.execute("switch_current_entry_successor()")
+        self.load_control()
+        self.lua.execute("guard_natives();guard_source_witnesses()")
+        self.lua.globals().engine_flags(player, foreign)
+
     def test_entry_boundary_all_boolean_combinations_and_read_only_colds(self):
         info = json.loads((FIXTURE / "successor-entry-boundary/info.json").read_bytes())
         self.assertEqual((NAME, "0.4.0"), (info["name"], info["version"]))
@@ -250,6 +262,110 @@ class RetainedNativeFixtureTests(unittest.TestCase):
                     self.cold(); self.cold()
                     self.assertEqual(1, self.lua.globals().event_order_calls)
                     self.assertEqual(2, self.lua.globals().reset_calls)
+
+    def test_current_entry_boundary_preserves_source_through_two_read_only_colds(self):
+        info = json.loads((FIXTURE / "successor-current-entry-boundary/info.json").read_bytes())
+        profile = json.loads((ROOT / "tests/profiles/sif-retained-manufacturing-current-f200-2077.json").read_bytes())
+        self.assertEqual((NAME, "0.5.0", "2.0"), (info["name"], info["version"], info["factorio_version"]))
+        self.assertEqual(["base >= 2.0.77", "space-age >= 2.0.77"], info["dependencies"])
+        self.assertFalse(any(dependency.startswith("more-infinite-research") for dependency in info["dependencies"]))
+        self.assertEqual("36F2E9D8C01507C2CBDC01AFF6C87399B40A9E0646F40DEC1F82628F5F50CBAB",
+                         profile["archive_sha256"]["more-infinite-research_5.0.20010.zip"])
+        for player in (False, True):
+            for foreign in (False, True):
+                with self.subTest(player=player, foreign=foreign):
+                    self.setUp(); self.current_entry_setup(player, foreign)
+                    self.lua.execute("run_configuration()")
+                    self.assertEqual(1, self.lua.globals().create_calls)
+                    self.assertEqual(0, self.lua.globals().api_calls)
+                    self.assertEqual(1, self.lua.eval("#saves"))
+                    self.lua.execute("callbacks.tick()")
+                    self.assertEqual("successor-current-entry-boundary-proposal", self.lua.eval("markers[2].witnesses.role"))
+                    self.assertEqual("0.5.0", self.lua.eval("markers[2].witnesses.fixture_version"))
+                    self.assertEqual("5.0.20010", self.lua.eval("markers[2].witnesses.successor_mir"))
+                    self.assertEqual(player, self.lua.eval("markers[2].witnesses.entry_boundary.player_processing_enabled"))
+                    self.assertEqual(foreign, self.lua.eval("markers[2].witnesses.entry_boundary.foreign_mining_enabled"))
+                    self.assertFalse(self.lua.eval("markers[2].witnesses.entry_boundary.flag_deltas.player_processing.source"))
+                    self.assertFalse(self.lua.eval("markers[2].witnesses.entry_boundary.flag_deltas.foreign_mining.source"))
+                    self.assertEqual(2, self.lua.globals().create_calls)
+                    self.lua.execute("guard_all_storage()")
+                    self.cold(); self.cold()
+                    self.assertEqual(4, self.lua.eval("#markers"))
+                    self.assertEqual(15, self.lua.globals().api_calls)
+                    self.assertEqual(2, self.lua.globals().reset_calls)
+
+    def same_version_setup(self):
+        self.source()
+        self.lua.execute("script.active_mods['more-infinite-research']='5.0.20010'")
+        self.load_control()
+        self.lua.execute("guard_natives();guard_source_witnesses();engine_flags(true,true)")
+        self.lua.execute("upgrade_event={mod_startup_settings_changed=false,mod_changes={['more-infinite-research']={old_version='4.7.20003',new_version='5.0.20010'}}}")
+
+    def test_same_version_receiver_retains_real_mir_only_upgrade_and_two_colds(self):
+        info = json.loads((FIXTURE / "successor-current-same-version-entry/info.json").read_bytes())
+        profile = json.loads((ROOT / "tests/profiles/sif-retained-manufacturing-current-same-version-f200-2077.json").read_bytes())
+        self.assertEqual("0.1.0", info["version"])
+        self.assertEqual(["base >= 2.0.77", "space-age >= 2.0.77"], info["dependencies"])
+        self.assertEqual("0.1.0", next(row["version"] for row in profile["mods"] if row["name"] == NAME))
+        self.same_version_setup()
+        self.lua.execute("run_configuration(upgrade_event)")
+        self.assertEqual(1, self.lua.globals().create_calls)
+        self.assertEqual(0, self.lua.globals().api_calls)
+        self.assertEqual(1, self.lua.eval("#saves"))
+        self.lua.execute("callbacks.tick()")
+        self.assertTrue(self.lua.eval("markers[2].witnesses.same_version_observer"))
+        self.assertEqual("0.1.0", self.lua.eval("markers[2].witnesses.fixture_version"))
+        self.assertFalse(self.lua.eval("markers[2].witnesses.entry_boundary.upgrade_event.mod_startup_settings_changed"))
+        self.assertEqual("4.7.20003", self.lua.eval("markers[2].witnesses.entry_boundary.upgrade_event.mod_changes['more-infinite-research'].old_version"))
+        self.lua.execute("guard_all_storage()")
+        self.cold(); self.cold()
+        self.assertEqual(4, self.lua.eval("#markers"))
+
+    def test_same_version_receiver_rejects_changed_or_unproven_inputs_before_mutation(self):
+        for change in ["upgrade_event=nil", "upgrade_event.mod_startup_settings_changed=true",
+                       "upgrade_event.mod_changes['more-infinite-research'].old_version='4.7.20002'",
+                       "upgrade_event.mod_changes['space-is-fake']={old_version='1.0.59',new_version='1.0.60'}",
+                       "upgrade_event.mod_changes['mir-fixture-mir5-sif-retained-manufacturing']={old_version='0.1.0',new_version='0.5.0'}"]:
+            with self.subTest(change=change):
+                self.setUp(); self.same_version_setup(); self.lua.execute(change)
+                before = self.storage()
+                with self.assertRaisesRegex(LuaError, "MIR-only upgrade"):
+                    self.lua.execute("run_configuration(upgrade_event)")
+                self.assertEqual(before, self.storage())
+                self.assertEqual(1, self.lua.globals().create_calls)
+                self.assertEqual(0, self.lua.globals().api_calls)
+                self.assertEqual(1, self.lua.eval("#saves"))
+
+    def test_same_version_receiver_cannot_create_a_replacement_source(self):
+        self.lua.execute("script.active_mods['more-infinite-research']='5.0.20010'")
+        self.load_control()
+        with self.assertRaisesRegex(LuaError, "protected published source save required"):
+            self.lua.execute("callbacks.init()")
+        self.assertEqual("{}", self.storage())
+        self.assertEqual(0, self.lua.globals().create_calls)
+        self.assertEqual(0, self.lua.eval("#saves"))
+
+    def test_old_entry_role_refuses_current_successor_version_before_mutation(self):
+        self.source()
+        self.lua.execute("switch_current_entry_successor();script.active_mods['mir-fixture-mir5-sif-retained-manufacturing']='0.4.0'")
+        self.load_control()
+        before = self.storage()
+        with self.assertRaisesRegex(LuaError, "exact closure differs: more-infinite-research"):
+            self.lua.execute("callbacks.config()")
+        self.assertEqual(before, self.storage())
+        self.assertEqual(1, self.lua.eval("#saves"))
+        self.assertEqual(1, self.lua.globals().create_calls)
+
+    def test_future_entry_role_refuses_before_mutation(self):
+        self.source()
+        self.lua.execute("script.active_mods['more-infinite-research']='5.0.20010';script.active_mods['mir-fixture-mir5-sif-retained-manufacturing']='0.6.0'")
+        self.load_control()
+        before = self.storage()
+        with self.assertRaisesRegex(LuaError, "fixture version differs"):
+            self.lua.execute("callbacks.config()")
+        self.assertEqual(before, self.storage())
+        self.assertEqual(1, self.lua.eval("#saves"))
+        self.assertEqual(1, self.lua.globals().create_calls)
 
     def test_source_complete_entry_rejects_preexisting_baseline_without_recapture(self):
         self.entry_setup(True, False)
@@ -349,14 +465,18 @@ class RetainedNativeFixtureTests(unittest.TestCase):
             self.assertEqual(key, contract.rows[i].key)
             self.assertEqual(recipes, list(contract.rows[i].recipes.values()))
         self.assertEqual([3, 2, 1, 3, 2], [len(row[1]) for row in ROWS])
-        for role, version, mir, digest in (
-            ("published", "0.1.0", "4.7.20003", "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647"),
-            ("successor", "0.2.0", "5.0.20002", "920C68BD074718AB2A608D8B2FC3657AA1B9C8766A586618C4C0952BA50C3E40"),
+        self.assertEqual("5.0.20002", contract.successor)
+        self.assertEqual("5.0.20010", contract.current_successor)
+        for role, profile_role, version, mir, digest, dependency in (
+            ("published", "published", "0.1.0", "4.7.20003", "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+             "more-infinite-research = 4.7.20003"),
+            ("successor", "successor", "0.2.0", "5.0.20002", "920C68BD074718AB2A608D8B2FC3657AA1B9C8766A586618C4C0952BA50C3E40",
+             "more-infinite-research = 5.0.20002"),
         ):
             info = json.loads((FIXTURE / role / "info.json").read_bytes())
-            profile = json.loads((ROOT / f"tests/profiles/sif-retained-manufacturing-{role}-f200-2077.json").read_bytes())
+            profile = json.loads((ROOT / f"tests/profiles/sif-retained-manufacturing-{profile_role}-f200-2077.json").read_bytes())
             self.assertEqual((NAME, version, "2.0"), (info["name"], info["version"], info["factorio_version"]))
-            self.assertIn("more-infinite-research = " + mir, info["dependencies"])
+            self.assertIn(dependency, info["dependencies"])
             self.assertEqual(digest, profile["archive_sha256"][f"more-infinite-research_{mir}.zip"])
             selected = {r["name"]: r["version"] for r in profile["mods"] if r["enabled"]}
             self.assertEqual(9, len(selected))
