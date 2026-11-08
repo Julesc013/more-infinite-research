@@ -1,0 +1,9 @@
+{
+  "name": "mir-worker-storage-hotfix-native",
+  "version": "0.1.0",
+  "title": "MIR worker storage hotfix native fixture",
+  "author": "MIR maintainers",
+  "description": "Private native witness for WorkerRobotCargoSizeResearch finite tails and SIF science retirement.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.23", "space-age >= 2.1.23", "WorkerRobotCargoSizeResearch = 1.0.0", "more-infinite-research", "(?) space-is-fake"]
+}
