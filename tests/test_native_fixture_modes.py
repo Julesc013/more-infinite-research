@@ -51,6 +51,44 @@ if($calls.Count-ne1){throw 'active runner does not call admission'}
                                 capture_output=True, text=True)
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
+    def test_active_agriculture_admission_binds_current_core_and_retains_old(self):
+        script = r'''
+$ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+$tokens=$null; $errors=$null
+$ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
+if($errors.Count){throw 'runner parse failed'}
+foreach($name in @('Assert-Fixture','Assert-ActiveFixtureSelection')){
+ $nodes=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq$name},$true))
+ if($nodes.Count-ne1){throw 'active admission function absent'}
+ Invoke-Expression $nodes[0].Extent.Text
+}
+foreach($tier in @(1,32,128)){
+ $profile=Get-Content -LiteralPath (Join-Path $env:MIR_TEST_PROFILES "agriculture-active-matched-current-defaults-$tier-f210-2123.json") -Raw | ConvertFrom-Json -AsHashtable
+ $mir=@($profile.mods | Where-Object {$_.name-ceq'more-infinite-research'})
+ Assert-ActiveFixtureSelection 'agriculture-scale' $profile.mods $mir
+}
+foreach($case in @(
+ @{mir='5.0.21005'; core='0.1.0'; selector='0.1.0'; accepted=$true},
+ @{mir='4.7.21002'; core='0.1.0'; selector='0.1.0'; accepted=$true},
+ @{mir='5.0.21010'; core='0.1.1'; selector='0.1.0'; accepted=$true},
+ @{mir='5.0.21010'; core='0.1.0'; selector='0.1.0'; accepted=$false},
+ @{mir='5.0.21005'; core='0.1.1'; selector='0.1.0'; accepted=$false},
+ @{mir='5.0.21009'; core='0.1.1'; selector='0.1.0'; accepted=$false},
+ @{mir='5.0.21010'; core='0.1.1'; selector='0.2.0'; accepted=$false},
+ @{mir='5.0.21010'; core='0.1.1'; selector=''; accepted=$false}
+)){
+ $rows=@(@{name='mir-fixture-mir5-agriculture-scale';version=$case.core;enabled=$true})
+ if($case.selector){$rows+=@{name='mir-fixture-mir5-agriculture-scale-active';version=$case.selector;enabled=$true}}
+ $ok=$true;try{Assert-ActiveFixtureSelection 'agriculture-scale' $rows @(@{version=$case.mir})}catch{$ok=$false}
+ if($ok-ne$case.accepted){throw ('agriculture tuple admission differs: '+($case|ConvertTo-Json -Compress))}
+}
+'''
+        result = subprocess.run(['pwsh', '-NoProfile', '-NonInteractive', '-Command', script],
+                                env=dict(os.environ, MIR_TEST_RUNNER=str(ROOT / 'tools/Invoke-NativeFixture.ps1'),
+                                         MIR_TEST_PROFILES=str(ROOT / 'tests/profiles')),
+                                capture_output=True, text=True)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
     def test_retained_protected_profile_metadata_keeps_default_activation_arguments(self):
         script = r'''
 $ErrorActionPreference='Stop';Set-StrictMode -Version Latest

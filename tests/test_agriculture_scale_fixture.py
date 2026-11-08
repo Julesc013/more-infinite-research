@@ -212,7 +212,7 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             return {ok=ok,message=tostring(result),reads=reads,callbacks=callbacks}
           end
 
-          function scale_runtime(path, tier, opponent, arm, matched, active_seed, mir_version)
+          function scale_runtime(path, tier, opponent, arm, matched, active_seed, mir_version, core_version)
             arm = arm or "legacy"
             local candidate_packs = {
               "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
@@ -319,7 +319,7 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             local active = {
               base="2.1.23", ["space-age"]="2.1.23",
               ["more-infinite-research"] = mir_version or (arm == "published" and "4.7.21002" or "5.0.21000"),
-              ["mir-fixture-mir5-agriculture-scale"]="0.1.0"
+              ["mir-fixture-mir5-agriculture-scale"]=core_version or "0.1.0"
             }
             if arm == "candidate" or arm == "published" or arm == "candidate-defaults" then
               active["mir-fixture-mir5-agriculture-scale-paired"]="0.1.0"
@@ -333,6 +333,9 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             if active_seed then
               active["mir-fixture-mir5-agriculture-scale-active"]="0.1.0"
             end
+            if opponent == "wrong-engine" then active.base="2.1.22" end
+            if opponent == "wrong-space-age" then active["space-age"]="2.1.22" end
+            if opponent == "wrong-active-version" then active["mir-fixture-mir5-agriculture-scale-active"]="0.2.0" end
             if opponent == "mixed-legacy-tier" then
               active["mir-fixture-mir5-agriculture-scale-tier-1"]="0.1.0"
             end
@@ -986,6 +989,51 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             with self.subTest(opponent=opponent):
                 result = run(str(CORE / "control.lua"), 1, opponent, "candidate-defaults", True, True, "5.0.21005")
                 self.assertFalse(result["ok"])
+
+    def test_510_active_defaults_retains_physical_oracles_and_exact_profiles(self):
+        info = json.loads((CORE / "info-active-current-f210.json").read_text())
+        expected_info = json.loads((CORE / "info.json").read_text())
+        expected_info["version"] = "0.1.1"
+        expected_info["dependencies"][-1] = "more-infinite-research = 5.0.21010"
+        self.assertEqual(expected_info, info)
+        run = self.lua.eval("scale_runtime")
+        for tier in (1, 32, 128):
+            with self.subTest(tier=tier):
+                result = run(str(CORE / "control.lua"), tier, "", "candidate-defaults", True, True, "5.0.21010", "0.1.1")
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual(2, result["state"]["research_finished"])
+                self.assertEqual(2 * tier, result["seed_inserts"])
+                self.assertEqual(2 * tier, result["state"]["planted_events"])
+                reports = list(plain(result["reports"]).values())
+                self.assertEqual(["prepared", "start", "complete", "initial", "reload"], [row["stage"] for row in reports])
+                witness = reports[-1]["witnesses"]
+                self.assertEqual(7, len(witness["science_contract"]["packs"].values()))
+                self.assertEqual((17645, 18000), (witness["trained_remaining_ticks"], witness["foreign_remaining_ticks"]))
+                self.assertTrue(witness["cold_reload_witness"] and witness["on_load_read_only"])
+                previous = json.loads((ROOT / f"tests/profiles/runtime505-agriculture-candidate-defaults-{tier}-f210-2123-r01.json").read_text())
+                current = json.loads((ROOT / f"tests/profiles/agriculture-active-matched-current-defaults-{tier}-f210-2123.json").read_text())
+                previous["scope"] = current["scope"]
+                previous["mods"][5]["version"] = "5.0.21010"
+                previous["mods"][6]["version"] = "0.1.1"
+                del previous["archive_sha256"]["more-infinite-research_5.0.21005.zip"]
+                previous["archive_sha256"]["more-infinite-research_5.0.21010.zip"] = "C625D648978F6FE677B5EDC5C68090A2AA9A939D48A54A736610D55E47337806"
+                self.assertEqual(previous, current)
+                self.assertEqual("8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38", current["engine"]["sha256"])
+                self.assertEqual("A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0", current["archive_sha256"]["mir-fixture-mir5-active-mods-observer_0.1.0.zip"])
+        for version, core, active, arm, matched in (("5.0.21009", "0.1.1", True, "candidate-defaults", True),
+                                                     ("5.0.21011", "0.1.1", True, "candidate-defaults", True),
+                                                     ("5.0.21005", "0.1.1", True, "candidate-defaults", True),
+                                                     ("5.0.21010", "0.1.0", True, "candidate-defaults", True),
+                                                     ("5.0.21010", "0.1.1", False, "candidate-defaults", True),
+                                                     ("5.0.21010", "0.1.1", True, "candidate", True),
+                                                     ("5.0.21010", "0.1.1", True, "candidate-defaults", False)):
+            with self.subTest(version=version, core=core, active=active, arm=arm, matched=matched):
+                self.assertFalse(run(str(CORE / "control.lua"), 1, "", arm, matched, active, version, core)["ok"])
+        for opponent in ("wrong-engine", "wrong-space-age", "wrong-active-version", "settings-policy", "settings-gate",
+                         "wrong-timing", "wrong-force", "lost-tower", "load-repair", "lost-consumption",
+                         "active-early-event", "blocked-ground", "multiple-matched-tiers"):
+            with self.subTest(opponent=opponent):
+                self.assertFalse(run(str(CORE / "control.lua"), 1, opponent, "candidate-defaults", True, True, "5.0.21010", "0.1.1")["ok"])
 
     def test_exact_f210_api_declares_the_fixture_runtime_surface(self):
         api_path = f210_runtime_api_path()
