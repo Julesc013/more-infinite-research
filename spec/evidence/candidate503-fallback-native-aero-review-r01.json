@@ -1,0 +1,135 @@
+{
+  "schema": 1,
+  "kind": "MIR503FallbackNativeAeroReviewR01",
+  "status": "accepted original scoped native component; no current-candidate route qualification",
+  "component_index": "spec/evidence/candidate503-native-upgrades-r01.json",
+  "component": "C503-unknown-native-cost-with-uncovered-public-residual-research",
+  "original_review": {
+    "accepted_scope": "Fresh seven-mod F210 2.1.23 source case only: unknown polynomial steel-plate-productivity remains foreign and unearned; MIR public recipe-prod-research_steel-1 residual completes once for only mir-fixture-adopt-steel-plate at configured2/3/1.25/time1/effect17, with four science packs, save and two one-tick cold loads.",
+    "actor_sha256": "9E4A7F997B3D5F6C6FC1841EDD5593ED492ACF124AC5048F72BF5E80A39365BB",
+    "actual_observations": [
+      {
+        "completion_predicate_observed": true,
+        "exit_code": -1,
+        "log_sha256": "C69F1DCA227BE5DE8BA7550F9CDAA948ECE3068C02D845D8B9CE6A07D1DC0B57",
+        "stage": "production"
+      },
+      {
+        "completion_predicate_observed": false,
+        "exit_code": 0,
+        "log_sha256": "D4E09037D93D24B0446FBE112D8FEAB662C84C0F17EF14E83FF3ECEB04E4876F",
+        "stage": "reload-1"
+      },
+      {
+        "completion_predicate_observed": false,
+        "exit_code": 0,
+        "log_sha256": "15A16BC5DF007EB3C5719B7FA9B11A284335DEFEC7791BD1C37813DE2BF3E92B",
+        "stage": "reload-2"
+      }
+    ],
+    "caller_sha256": "F6948D678DF1ACDC2F063C1B72DBC15052C1D7CFC1F19A3CEF1CDE5E103DC6E3",
+    "candidate_author": "aa1f5760dc22e10d5c7ad58e30c6c2894a68f868",
+    "compressed_sha256": "14E79FEE7C94BE91AB07D6250CC0A4656B790145D57307C088994C5C330DBA51",
+    "decoded_sha256": "B2FED9B6E9113901CD6A569538B3346994242454BE2C59436E76457928DE2D7A",
+    "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "fixture_sha256": "8E13321A07AC2D0AB0D5504066F96AC1E8DAC128C660DDC64B0AF4C409CF30C8",
+    "git_blob": "a2a15f241ad8502614d9a009455361f47f8710ec",
+    "kind": "MIR503NativeOwnerFallbackOriginalReviewAeroR01",
+    "limitations": [
+      "Fresh fixture source, not a predecessor/save migration or all-settings result.",
+      "No arbitrary unknown polynomial, foreign owner, recipe, residual credit, cap, queue/cancel, client, physical manufacturing, performance, current510/dev or stable verdict.",
+      "Production exit -1 is completion-predicate stop after save; cold exits 0 are natural.",
+      "No native/host execution occurred in this review."
+    ],
+    "manifest_sha256": "184CD65F2C8F1724083A96DD12EB0285817E5E8B57742016C802B56392073648",
+    "native_execution_in_this_review": false,
+    "observed_result": "One by_script=false completion at tick119 grants .17 only to the named uncovered fixture recipe; steel-plate/casting-steel/bullet stay zero for player and foreign control. Corrected r02 is the valid named producer; r01 remains a data-stage failure (public residual progression).",
+    "originals_commit": "89eb3ed6494b230f863add899addd8f6dc166e5e",
+    "originals_path": "evidence/native-owner-fallback-native-chain-r01/original-bodies.json.gz",
+    "product_archive_sha256": "C622AC3A73603E7C127FA8168D12C5D878D52646226EC74190E70164D6E0D227",
+    "profile_sha256": "4F4ABD3242C7D634C457903BF296018D211E0CA5F2E9DF0178D86D4B0D887751",
+    "protected_save_bytes": 580053,
+    "protected_save_sha256": "80F2168FA1F1EAE82F725C5C9DA019177F33F0C801F0FBA2BB807C068239B7AE",
+    "release_qualification": false,
+    "source_correspondence_to_published510": {
+      "changed_consumed_paths": {
+        "data-final-fixes.lua": [
+          "9e7208cb296e8d47d4d8f0524223f4f86eaac0cd",
+          "f06a965441a5375191bd3c0f04452822395b7d6f"
+        ],
+        "research/native_adoption.lua": [
+          "a7b7a84cc9f7fd39bd4aac49d3e5228154724161",
+          "46f7706b81d9b375e5770d78981358de703b541f"
+        ],
+        "research/native_credit_contracts.lua": [
+          "a6f2f4010cee12b2f378fe7d7c051c6dcb0c47d4",
+          "85eae9ec7efab3b3522c5bd3caee0503524e1b60"
+        ],
+        "research/native_credit_definitions.lua": [
+          "e55169818cf51b1adab47754e97eaf56ef37d187",
+          "cdd1f334f4c70aba61a47c9e1f5fdadb1c4aec06"
+        ],
+        "runtime/bootstrap.lua": [
+          "417d5928299b1fb95b50d9b051a60bd9f27cf64b",
+          "70d41578bb940cf9b3d71fa5791e256e9e9b6f94"
+        ],
+        "runtime/native_credits.lua": [
+          "a1a70bd49e1677fc19b9e844993210898037ce5b",
+          "7611d4adff4b41d4195607dcf0dd4e163431b5ed"
+        ]
+      },
+      "decision": "No minimum current behavior correspondence is demonstrated: unchanged selectors are insufficient while data-stage admission and native-credit runtime inputs changed.",
+      "unchanged_context_only": {
+        "compatibility/modern_catalogue/base.lua": "634b27c63ccec2af44f823dc811d99f73fb96766",
+        "compatibility/modern_catalogue/space_age.lua": "dd876a2f67146d52af2a591286eced5d8e686951"
+      }
+    },
+    "stable_acceptance": false,
+    "status": "accepted-original-scoped-native-case; no current-route applicability asserted",
+    "verified_bodies": 90
+  },
+  "separate_root_readback": {
+    "receipt_sha256": "7CF278FDC4E7B9B156A96C4ECE9C3308B6682C43F0DB11C87B26A7927EB8DA69",
+    "observations": [
+      {
+        "stage": "production",
+        "log_sha256": "C69F1DCA227BE5DE8BA7550F9CDAA948ECE3068C02D845D8B9CE6A07D1DC0B57",
+        "exit_code": -1,
+        "completion_predicate_observed": true
+      },
+      {
+        "stage": "reload-1",
+        "log_sha256": "D4E09037D93D24B0446FBE112D8FEAB662C84C0F17EF14E83FF3ECEB04E4876F",
+        "exit_code": 0,
+        "completion_predicate_observed": false
+      },
+      {
+        "stage": "reload-2",
+        "log_sha256": "15A16BC5DF007EB3C5719B7FA9B11A284335DEFEC7791BD1C37813DE2BF3E92B",
+        "exit_code": 0,
+        "completion_predicate_observed": false
+      }
+    ],
+    "verified_original_bodies": 90,
+    "protected_save_sha256": "80F2168FA1F1EAE82F725C5C9DA019177F33F0C801F0FBA2BB807C068239B7AE"
+  },
+  "original_adverse": "The first named producer lacked the required admission metadata, so its data-stage public-residual assertion failed before a successful process row was appended. Its process1 stdout/resources remain actual failed execution evidence; the valid r02 adds the missing producer metadata and keeps the same actor/assertions. No product defect or passing r01 is invented.",
+  "review_validation_adverse": "The root receipt validator initially expected one completed-process row in that failed r01 result. The result has zero appended rows because compilation failed first; its engine stdout/resources prove the failed invocation. This predicate correction is retained locally in fallback-root-readback-adverse-r01.json and does not change original native evidence.",
+  "current_candidate_boundary": {
+    "published510": "958e34dd2701418c71f74ae094c26ff7cd467e6b",
+    "published510_player_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+    "reviewed_dev": "182f4ad6d8e87cbfd0ff330096f7f3482913c509",
+    "reviewed_dev_player_tree": "2487ba5ad1d2ba32b4bf48821bbb8bd078d5e64d",
+    "decision": "Matching Base/Space Age selectors alone do not establish unchanged admission/adoption/private-credit/bootstrap behavior. Keep this original case accepted at its original inputs without relabelling it as510.",
+    "exact_existing_case_to_resolve": "Review the valid r02 named producer against the fixed current package. If source equivalence cannot be established, reuse that same finite unknown-polynomial/residual scenario under explicitly pinned current engine/profile/controller inputs: foreign steel owner unchanged/unearned, visible public residual for only the named uncovered recipe, configured2/3/1.25/time1/reward17, one real completion/save/two cold loads. Verify current runtime credit state as applicable. No arbitrary unknown-cost, historical migration or broad settings/provider campaign follows.",
+    "owner": "Black Glass owns the existing native queue and exact composition; this record creates no additional dispatch slot or approval gate."
+  },
+  "limits": [
+    "Recipe-productivity modifiers are observed; physical manufacturing output is not.",
+    "This supplies later independent review for the original component whose pending observation remains preserved.",
+    "No package/player/controller/profile change or native execution occurred in this review."
+  ],
+  "native_execution_in_this_review": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}
