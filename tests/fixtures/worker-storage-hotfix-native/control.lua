@@ -40,7 +40,8 @@ local function marker(stage, force, state)
     witnesses={mir=script.active_mods[MIR], sif=script.active_mods["space-is-fake"] ~= nil,
       main=main and MAIN or nil, initial_level=main and 8 or nil, current_level=main and main.level or nil,
       provider=PROVIDER, worker_bonus=force.worker_robots_storage_bonus,
-      actual_lab_completions=state.completions, foreign_finite={4,5,6,7},
+      actual_lab_completions=state.completions, provider_lab_completions=state.provider_lab_completions,
+      foreign_finite={4,5,6,7},
       foreign_effect=1, white_retired=not not (script.active_mods["space-is-fake"]),
       initial_biolab_input_slots=state.input_slots,
       current_progress=force.research_progress, unrelated_progress=technology(force, OTHER).saved_progress,
@@ -49,10 +50,10 @@ local function marker(stage, force, state)
 end
 local function verify_provider(force, state)
   local provider, other = technology(force, PROVIDER), technology(force, OTHER)
-  if state.completions ~= 1 or provider.researched ~= true or force.worker_robots_storage_bonus ~= 7 then
+  if state.provider_lab_completions ~= 1 or provider.researched ~= true or force.worker_robots_storage_bonus ~= 7 then
     fail("provider-only earned baseline changed")
   end
-  if not close(other.saved_progress, .27) then fail("provider-only unrelated progress changed") end
+  if force.current_research ~= other or not close(force.research_progress, .27) then fail("provider-only unrelated progress changed") end
   local queue = force.research_queue or {}
   if #queue ~= 1 or queue[1] ~= other then fail("provider-only queue changed") end
 end
@@ -110,9 +111,9 @@ script.on_event(defines.events.on_research_finished, function(event)
   if not state or not event.research or event.research.force ~= force then return end
   if state.phase == "provider-earning" and event.research.name == PROVIDER then
     if event.by_script ~= false then fail("provider seven was not completed by a real lab") end
-    state.completions = 1
+    state.completions, state.provider_lab_completions = 1, 1
     local inventory, other = state.lab.get_inventory(defines.inventory.lab_input), technology(force, OTHER)
-    state.lab.energy = 0; inventory.clear(); force.research_queue = {other}; other.saved_progress = .27
+    state.lab.energy = 0; inventory.clear(); force.research_queue = {other}; force.research_progress = .27
     state.phase = "provider-ready"
     verify_provider(force, state)
     marker("initial", force, state)
@@ -142,12 +143,16 @@ script.on_configuration_changed(function()
   local state, force = storage.worker_storage_hotfix, game.forces.player
   if not state or state.phase ~= "provider-ready" or script.active_mods[MIR] == nil then return end
   verify_provider(force, state)
+  marker("before-first-add", force, state)
   local main = assert_prototypes(force)
   for _, prerequisite in pairs(main.prerequisites) do prerequisite.researched = true end
   if main.enabled ~= true or force.worker_robots_storage_bonus ~= 7 then fail("MIR first-add changed provider state before research") end
-  force.research_queue = {}
-  state.phase, state.mode = "researching", "provider-first-add"
-  start(force, state, main)
+  local other = technology(force, OTHER)
+  force.research_queue = {main, other}; force.research_progress = 0; other.saved_progress = .27
+  if force.current_research ~= main then fail("MIR8 was not made current after first add") end
+  state.input_slots, state.completions, state.phase, state.mode = #state.lab.get_inventory(defines.inventory.lab_input), 0,
+    "researching", "provider-first-add"
+  force.laboratory_speed_modifier = 1000
 end)
 
 script.on_event(defines.events.on_tick, function()
