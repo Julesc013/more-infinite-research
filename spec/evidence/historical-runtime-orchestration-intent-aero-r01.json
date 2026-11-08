@@ -503,5 +503,9 @@
   "test_intent_reconciliation_complete": false,
   "native_execution": false,
   "release_qualification": false,
-  "stable_acceptance": false
+  "stable_acceptance": false,
+  "source_binding_resolution_followup_r01": {
+    "evidence": "spec/evidence/scripted-effects-original-source-binding-aero-r01.json",
+    "scope": "The published F2104.7.21000 package-root dispatcher exactly matches the already-reviewed f1020959 adapter blob at original84bd157a. Retain the baseline inventory wrong source-path field; this additive record resolves its lookup without reopening a source-body frontier or granting native acceptance."
+  }
 }
