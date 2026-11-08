@@ -6,6 +6,7 @@ Date: 2026-11-09
 
     - Remove outdated active-lab science advice from translated direct-effect research descriptions.
     - Detect disabled Angel water-treatment prerequisites before publishing dependent research.
+    - Retain selected Library research while translated search results reload after changing tabs.
 
 ---------------------------------------------------------------------------------------------------
 Version: 5.0.10
