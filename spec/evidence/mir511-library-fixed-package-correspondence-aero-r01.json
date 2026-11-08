@@ -1,0 +1,292 @@
+{
+  "kind": "MIR511LibraryFixedPackageCorrespondenceAeroR01",
+  "status": "passed archive/source/member readback; independent artifact review/native/stable remain separate",
+  "source_commit": "f8a1320fd4808be312209358bce0b3e150dcb20e",
+  "reviewed_author_commit": "1389ef9ba39159fca141d668ac74e800c9a80d16",
+  "same_complete_git_tree": "3e7d9fde186179805e9c9576b3cc3e3692483554",
+  "player_tree": "dc3f9c1aa119f825dfb1cb5dac8ccf71ea1ddec0",
+  "authored_source_version": "5.0.11",
+  "default_distribution_version": "5.0.21011",
+  "packages": [
+    {
+      "target": "f006",
+      "filename": "more-infinite-research_5.0.00611.zip",
+      "version": "5.0.00611",
+      "bytes": 138610,
+      "sha256": "3AA3EB993BDD0C350E1A6F30BA0097259320B4B28023679F3C8F71B23B5B0419",
+      "members": 10,
+      "factorio_version": "0.6",
+      "old_sha256": "35EC45C37E784CF4621A65BB156FC5EEB0A7C1114FAD73ECDEAFC96F4A9FA867",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "minimum_base": "base >= 0.6.4",
+      "member_record_sha256": "582F101C206413347721CDFC4EB24F49C804998003EC059D5AAD5B4B8E1E6EC3"
+    },
+    {
+      "target": "f007",
+      "filename": "more-infinite-research_5.0.00711.zip",
+      "version": "5.0.00711",
+      "bytes": 138610,
+      "sha256": "6E3311CD47B34320467E121D8D27BFE37B1CA9AB60E86634F509DA6EB806CB0C",
+      "members": 10,
+      "factorio_version": "0.7",
+      "old_sha256": "D55D7AA500C0458FBA03D53D1B6FF086294308207AF5F07803216E167F39A659",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "minimum_base": "base >= 0.7.5",
+      "member_record_sha256": "08CD2F087E5C1D22492240CBDD1449F18C462C3E560843CC57F54E223E5F2DAE"
+    },
+    {
+      "target": "f008",
+      "filename": "more-infinite-research_5.0.00811.zip",
+      "version": "5.0.00811",
+      "bytes": 138608,
+      "sha256": "056B7404F8CB1D63ECD800F73C32DB82A883FDB379080C5A31C074930C91C380",
+      "members": 10,
+      "factorio_version": "0.8",
+      "old_sha256": "84E95DD271885EC495725DC950A31A3FA91BD1A9B84E2C09BCB7288DC0F420A6",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "minimum_base": "base >= 0.8.8",
+      "member_record_sha256": "D3C6651FBC79BAF2C13F931C7E0D0214C999E164A4C5B514925CF0727E184F4F"
+    },
+    {
+      "target": "f009",
+      "filename": "more-infinite-research_5.0.00911.zip",
+      "version": "5.0.00911",
+      "bytes": 138610,
+      "sha256": "AF02B5990BECC28FB180BDB1A5A4A33E56CB4B2DB7EFCC02FF1DF55B11944BB5",
+      "members": 10,
+      "factorio_version": "0.9",
+      "old_sha256": "811B3AEEFE10B8AB287F0038D0F686B179C7060AD9D962EDCE9E52F484992EE0",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "minimum_base": "base >= 0.9.8",
+      "member_record_sha256": "BBB4030F20842537A9E2005ABE737E173CA28BBECAF22B281D947FF3AC5EFAF2"
+    },
+    {
+      "target": "f010",
+      "filename": "more-infinite-research_5.0.01011.zip",
+      "version": "5.0.01011",
+      "bytes": 138609,
+      "sha256": "A0F28E3BECCCB4384C05C4EEFB9AEC30AF41330B89E0150E181168B002F4185B",
+      "members": 10,
+      "factorio_version": "0.10",
+      "old_sha256": "05C2EF7E2310CFE2EFB60C43F02231FCE44B81ED27FA799EF9A97F173E50B40A",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "minimum_base": "base >= 0.10.12",
+      "member_record_sha256": "5E8A1F8C374A45C66945ADBE9EF6D2BE456D512C7816353170F4A5490BF7D109"
+    },
+    {
+      "target": "f011",
+      "filename": "more-infinite-research_5.0.01111.zip",
+      "version": "5.0.01111",
+      "bytes": 138608,
+      "sha256": "36CD902006D63931D7C0A11CD16102BB8C369CBE3EB5A7E20D1CB65C7C12F973",
+      "members": 10,
+      "factorio_version": "0.11",
+      "old_sha256": "8EDCE292724C813106A2151298F9CD30A0BF9724C3F03B6C9997BE24CB57BEB0",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "minimum_base": "base >= 0.11.22",
+      "member_record_sha256": "9657D3838737FAA5636004D95360953EF127119BA95BDC2F2C9E0DC7DAD44784"
+    },
+    {
+      "target": "f012",
+      "filename": "more-infinite-research_5.0.01211.zip",
+      "version": "5.0.01211",
+      "bytes": 138612,
+      "sha256": "90C5E45F2533C72A0529A400C373E8A3E055DD4BA3CFFC0AB9AF1AAF120964EE",
+      "members": 10,
+      "factorio_version": "0.12",
+      "old_sha256": "C953E33662BF46F1F4F6B4A1D84C6F86F6E69FE87A32EA15A3E8FBD343C26C2F",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "minimum_base": "base >= 0.12.35",
+      "member_record_sha256": "5ACE8E2C880FF5074F3F35AADC807EA5CBD3FBC69E83148F2ADAA6AC5EBB803C"
+    },
+    {
+      "target": "f013",
+      "filename": "more-infinite-research_5.0.01311.zip",
+      "version": "5.0.01311",
+      "bytes": 665430,
+      "sha256": "941D3CF98C4B0975B1C0287107C38FC4AC08FEABC68B604EE350EF64B4626184",
+      "members": 127,
+      "factorio_version": "0.13",
+      "old_sha256": "97F3834F24590885D82B94E4C6221CEA52DC35BBAC51FB5D8422FD179141CCD7",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "minimum_base": "base >= 0.13.20",
+      "member_record_sha256": "18913E6665E2246437D9C1E51971E8ED08C8F0CEE802EE52B2F9EF4BB31279B8"
+    },
+    {
+      "target": "f014",
+      "filename": "more-infinite-research_5.0.01411.zip",
+      "version": "5.0.01411",
+      "bytes": 665433,
+      "sha256": "FB8E41897A8C955EDF4AA3098F80D27B0C3E93934EB2B7FE879E23DF6B33932D",
+      "members": 127,
+      "factorio_version": "0.14",
+      "old_sha256": "C0B95793C927A852E33AB96C052FC6E0B6F3513014595E007D54AD9D44121F75",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "minimum_base": "base >= 0.14.23",
+      "member_record_sha256": "C48EC4F7876E7162497F1EEC6CC37DDC517295C3B05F94B990A768E22C3BA99C"
+    },
+    {
+      "target": "f015",
+      "filename": "more-infinite-research_5.0.01511.zip",
+      "version": "5.0.01511",
+      "bytes": 665431,
+      "sha256": "C0835ECD77B9C4E5174C84FD144AE6CD01F85B066A726C386C5666EA5A33363B",
+      "members": 127,
+      "factorio_version": "0.15",
+      "old_sha256": "F7FA5065FD972FACE36EB2ADED79C95C3632EF881015D4F20DA1AE9FD71E61E9",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "minimum_base": "base >= 0.15.40",
+      "member_record_sha256": "CB087522754E307381C9D30F9ED9D692E3BAA0A82EB48AE686ECCE610A01359A"
+    },
+    {
+      "target": "f016",
+      "filename": "more-infinite-research_5.0.01611.zip",
+      "version": "5.0.01611",
+      "bytes": 665432,
+      "sha256": "588DD113F9D76FAE5EA3323BCF2C4278CE49BF800DCD8B724ED19BA0ECC9FEC0",
+      "members": 127,
+      "factorio_version": "0.16",
+      "old_sha256": "9C6A05861575736CBA22E63805C656041C9E7FB1D7A5B407527E502BBE77D6D6",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "minimum_base": "base >= 0.16.51",
+      "member_record_sha256": "A60FA40883D694767C4A981016919D8A3395F95469F2CBA30B9933C52E4476B3"
+    },
+    {
+      "target": "f017",
+      "filename": "more-infinite-research_5.0.01711.zip",
+      "version": "5.0.01711",
+      "bytes": 665432,
+      "sha256": "897860D72F83955E8079AD699A8E104906865FDB40B4C052A16E296141E2B982",
+      "members": 127,
+      "factorio_version": "0.17",
+      "old_sha256": "37E94BB4701162A4AC43984827065D8C4707FC2118A663D3CBBFF388A8A368B7",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "minimum_base": "base >= 0.17.79",
+      "member_record_sha256": "E0E2CE4C7D15A89FCCCCB58581EA36BE49DF5044EC354802D676220F1B635FAC"
+    },
+    {
+      "target": "f018",
+      "filename": "more-infinite-research_5.0.01811.zip",
+      "version": "5.0.01811",
+      "bytes": 665434,
+      "sha256": "9B877ADB28A52FC6032F80307ED08CBF96785D4EFE78D0F11CEBA515E646C52A",
+      "members": 127,
+      "factorio_version": "0.18",
+      "old_sha256": "15F9328BA2BCBB76275D805C3F2C959D8FDB283B4D6F256024F111A92735FACA",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "minimum_base": "base >= 0.18.47",
+      "member_record_sha256": "DEECD40D4834623D0D13A6CC391EBD160DE20C90D538A9F2F17471E4B1A8B394"
+    },
+    {
+      "target": "f100",
+      "filename": "more-infinite-research_5.0.10011.zip",
+      "version": "5.0.10011",
+      "bytes": 665425,
+      "sha256": "E2A83DBD87ED4EC8D3B4646DFC9E85FF75EFFBA2C8AFDD3AF546411F41720A6E",
+      "members": 127,
+      "factorio_version": "1.0",
+      "old_sha256": "A94ECAC5EA4D41F213674D010ABE78B8C96219D42870DE2D84B11FFA8B4B2699",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "minimum_base": "base >= 1.0.0",
+      "member_record_sha256": "21CFA4976087CF78CCB143C1080A4C486634587D822AC1A3D8F4EC2521E86C98"
+    },
+    {
+      "target": "f110",
+      "filename": "more-infinite-research_5.0.11011.zip",
+      "version": "5.0.11011",
+      "bytes": 665734,
+      "sha256": "E936166D87F527C3BBB0515398A89444E6BFB17AF72BDA176D9B533F071E831F",
+      "members": 128,
+      "factorio_version": "1.1",
+      "old_sha256": "869DC5B26C410453A70AEA97A651D84040A33DFBF77E36B83995D0C5CEC94832",
+      "changed_members": [
+        "changelog.txt"
+      ],
+      "minimum_base": "base >= 1.1.110",
+      "member_record_sha256": "D1D316434B4E32224C91978105C6AD32BBCDD2F2F6C177B3D1E39238BB26343B"
+    },
+    {
+      "target": "f200",
+      "filename": "more-infinite-research_5.0.20011.zip",
+      "version": "5.0.20011",
+      "bytes": 995003,
+      "sha256": "BC963519CDCC25508319DBA4CF99A3803F108030B57DA8A7A006E50E5D3CA9C6",
+      "members": 242,
+      "factorio_version": "2.0",
+      "old_sha256": "5D49CA3704AAE99FA256B54245DCF676E57E54541EF47B5FD2521D6C291D4679",
+      "changed_members": [
+        "changelog.txt",
+        "runtime/library.lua",
+        "runtime/library_translations.lua"
+      ],
+      "minimum_base": "base >= 2.0.77",
+      "member_record_sha256": "DC3C3D4EF8229F8FBB299DA81CE4B8E7EA8CE1FB8DF08EF97B2AEC26BE8AF2CB"
+    },
+    {
+      "target": "f210",
+      "filename": "more-infinite-research_5.0.21011.zip",
+      "version": "5.0.21011",
+      "bytes": 995429,
+      "sha256": "F25DB9283C2F8020907F8E2AD35132F0B6EEECE11263C82C69389EE8DAB3F09D",
+      "members": 243,
+      "factorio_version": "2.1",
+      "old_sha256": "74418DC171C8FA3F21486EF21B1FA8D348E99798E4F4D6DF5657024D2B87B892",
+      "changed_members": [
+        "changelog.txt",
+        "runtime/library.lua",
+        "runtime/library_translations.lua"
+      ],
+      "minimum_base": "base >= 2.1.23",
+      "member_record_sha256": "94372BE6673D90CDEADA810FEBF4CBD607BBA1A6AF374643B08BD196AB80820C"
+    }
+  ],
+  "checked": "All17 raw ZIP hashes/sizes/CRC, exact member sets/member hashes/root/allowlists/info/codec/floors; packaged Library bytes match frozen raw Git bodies. Old17 ZIPs rehashed unchanged. Info/floors/member sets stay identical; only changelog and two Library runtime files differ where present.",
+  "prior_proof": "spec/evidence/mir511-aero-independent-packages-r01.json",
+  "source_commit_scope": "Package source_commit is external-record provenance. Author1389 and mergedf8a have identical complete Git trees including packager/target/assets; no commit text enters ZIP payload. This proves input equality, not another package build.",
+  "edition_scope": "Nine stable-edition targets; F018 experimental0.18.47; F006-F012 best effort. Classes are not stable qualification.",
+  "local_custody": "build/qualification/mir511-selection-fixed-packages-aero-r01",
+  "readback_sha256": "2D3EA7C49395D2ADF1A12E6BAB203AECB09925D926EB6F597F2C388173115FF6",
+  "builder_environment": {
+    "python": "3.14.7",
+    "zlib": "1.3.1.zlib-ng"
+  },
+  "independent_artifact_review": "Pending separate reviewer/comparison; no additional Aero child started. Source correction itself was independently reviewed separately.",
+  "native_execution": false,
+  "release_qualification": false,
+  "stable_acceptance": false,
+  "published510_bytes_changed": false,
+  "old511_qualification_bytes_changed": false,
+  "limits": [
+    "No anonymous delivery, publication, GUI, client/export, save/migration or performance verdict.",
+    "Old7441/5D49 native observations keep their original identities. New F25D/BC96 bytes need their affected exact-package/native and candidate acceptance before publication.",
+    "This records one fixed private qualification batch; no public source patch is consumed and no tested/published package is overwritten."
+  ]
+}
