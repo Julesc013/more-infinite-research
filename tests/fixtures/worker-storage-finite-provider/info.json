@@ -1,0 +1,9 @@
+{
+  "name": "mir-worker-storage-finite-fixture",
+  "version": "0.1.0",
+  "title": "MIR finite worker storage test fixture",
+  "author": "MIR maintainers",
+  "description": "Synthetic finite robot carrying-capacity provider for regression tests; not a reproduction of an identified planet mod.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.23"]
+}

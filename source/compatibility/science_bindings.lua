@@ -363,29 +363,21 @@ local FAMILY_CONDITIONS = {
   research_science_pack_productivity = {phase_all_selected = true}
 }
 
--- SIF's data-updates stage retires space science before MIR's final-stage
--- continuations are emitted.  Keep the retained 4.2.1 correction to the two
--- observed stable identities and the named finite7 -> research-speed8 variant;
--- no other family is inferred from the active mod name or hidden state.
-local SIF_CONTINUATION_EXCLUSIONS = {
-  ["research-speed-7"] = {"space-science-pack"},
-  ["research-speed-8"] = {"space-science-pack"},
-  ["weapon-shooting-speed-7"] = {"space-science-pack"}
-}
+-- Space Is Fake retires the white science role, not two technology names.
+-- The science pass checks the current named source/replacement first: an
+-- independently supported producer keeps the role available. This is a
+-- finite SIF policy, not permission to retire arbitrary unsupported packs.
+function M.has_retired_space_role(target, mods)
+  return type(target) == "table" and (target.id == "f200" or target.id == "f210")
+    and type(mods) == "table" and mods["space-age"] ~= nil and mods["space-is-fake"] ~= nil
+end
 
-function M.conditions_for(family, technology_name, mods)
+function M.conditions_for(family)
   local source = FAMILY_CONDITIONS[family]
   local out = {}
   if source then
     for key, value in pairs(source) do
       out[key] = type(value) == "table" and copy_list(value) or value
-    end
-  end
-  if type(mods) == "table" and mods["space-is-fake"] ~= nil then
-    local excluded = SIF_CONTINUATION_EXCLUSIONS[technology_name]
-    if excluded then
-      out.excluded_science = copy_list(excluded)
-      out.excluded_prerequisites = copy_list(excluded)
     end
   end
   return out

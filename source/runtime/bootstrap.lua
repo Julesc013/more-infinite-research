@@ -16,6 +16,11 @@ local effective = require("runtime.configuration")
 local target = require("platform.target")
 local finite_research_speed = (target.id == "f200" or target.id == "f210")
   and require("runtime.finite_research_speed")
+local worker_robot_storage = (target.id == "f200" or target.id == "f210")
+  and require("runtime.worker_robot_storage")
+local function worker_storage_route()
+  return type(catalogue.worker_storage_route) == "function" and catalogue.worker_storage_route() or nil
+end
 local function finite_research_speed_provider()
   return type(catalogue.finite_research_speed_provider) == "function"
     and catalogue.finite_research_speed_provider() or nil
@@ -313,6 +318,7 @@ local function add_command()
 end
 
 local function on_init()
+  if worker_robot_storage then worker_robot_storage.on_init(worker_storage_route()) end
   if finite_research_speed then finite_research_speed.on_init(finite_research_speed_provider()) end
   initialize_imersite()
   lifecycle.on_init()
@@ -364,6 +370,7 @@ local function on_configuration_changed(event)
   -- This preflight must run before any lifecycle reconciler can write a level,
   -- ownership record, queue state, or disablement flag.
   local family_credit_plan
+  local worker_storage_plan = worker_robot_storage and worker_robot_storage.preflight(event, worker_storage_route())
   local finite_speed_plan = finite_research_speed
     and finite_research_speed.preflight(event, finite_research_speed_provider())
   if native_credits then
@@ -375,6 +382,7 @@ local function on_configuration_changed(event)
   local module_credit_plan = legacy_module_credits and legacy_module_credits.preflight(event)
   local cannon_credit_plan = legacy_cannon_credits and legacy_cannon_credits.preflight(event)
   local gun_credit_plan = native_gun_credits and native_gun_credits.preflight(event)
+  if worker_robot_storage then worker_robot_storage.apply(worker_storage_plan) end
   if finite_research_speed then finite_research_speed.apply(finite_speed_plan) end
   reconcile_imersite()
   lifecycle.on_configuration_changed(event)
@@ -410,6 +418,7 @@ local function on_configuration_changed(event)
 end
 
 local function on_load()
+  if worker_robot_storage then worker_robot_storage.on_load(worker_storage_route()) end
   if finite_research_speed then finite_research_speed.on_load(finite_research_speed_provider()) end
   lifecycle.on_load()
   if native_credits then native_credits.on_load() end

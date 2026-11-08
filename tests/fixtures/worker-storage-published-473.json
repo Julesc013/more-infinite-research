@@ -1,0 +1,119 @@
+{
+  "schema": 1,
+  "kind": "IndependentPublishedWorkerStorageObservation",
+  "source": {
+    "archive": "more-infinite-research_4.7.21003.zip",
+    "archive_sha256": "b6eb9430056abd384db00f94929fe7dac0a37441acf4bc277946689682628852",
+    "engine": "Factorio 2.1.24 official Linux headless",
+    "capture_log_sha256": "c905072eaa031f51ab42bccfda3678b19cc40cb929ba48f0feecb19a30ec2ce2",
+    "capture_receipt_sha256": "7d85c79468c882f5e3779e2075a1a55a08d27be63e8d0d681309f82df352f6fe",
+    "provider": "tests/fixtures/worker-storage-finite-provider/data-updates.lua",
+    "provider_sha256": "69ba675379edb935267f59700bec031033fb6d4354d0d7d02945ec5912ebd6e6",
+    "scope": "Synthetic finite fourth level; default startup settings; not the unnamed reporter mod.",
+    "native_data_dump_sha256": "f21a23132321dda647c81fc1d21e65f07d9e5b27bc7b94127b77850f7c6e3226"
+  },
+  "observation": {
+    "stage": "init",
+    "engine": "2.1.24",
+    "mods": {
+      "base": "2.1.24",
+      "mir-worker-storage-finite-fixture": "0.1.0",
+      "more-infinite-research": "4.7.21003",
+      "mir-worker-storage-native-observer": "0.1.1"
+    },
+    "tick": 0,
+    "next_level": 5,
+    "researched": false,
+    "completed": 0,
+    "enabled": true,
+    "worker_bonus": 5,
+    "finite_researched": true,
+    "finite_maximum": 4,
+    "finite_effect": 2,
+    "research_progress": 0,
+    "saved_progress": 0,
+    "queue": {},
+    "foreign_progress": 0,
+    "native_lab_completions": 0,
+    "prototype": {
+      "count_formula": "1012.5*1.5^(L-5)",
+      "research_time": 3600,
+      "effects": [
+        {
+          "hidden": false,
+          "type": "worker-robot-storage",
+          "modifier": 2
+        }
+      ],
+      "ingredients": [
+        {
+          "name": "automation-science-pack",
+          "amount": 2
+        },
+        {
+          "name": "logistic-science-pack",
+          "amount": 3
+        },
+        {
+          "name": "utility-science-pack",
+          "amount": 4
+        }
+      ]
+    }
+  },
+  "legacy_science_contract": {
+    "file": "prototypes/mir/settings/defaults.lua",
+    "family": "worker-robots-storage",
+    "science_packs": "inherit",
+    "add_science_packs": [
+      "electromagnetic-science-pack"
+    ]
+  },
+  "published_technology": {
+    "name": "worker-robots-storage-5",
+    "localised_name": [
+      "technology-name.worker-robots-storage"
+    ],
+    "localised_description": [
+      "technology-description.worker-robots-storage"
+    ],
+    "icon": "__base__/graphics/technology/worker-robots-storage.png",
+    "icon_size": 256,
+    "effects": [
+      {
+        "type": "worker-robot-storage",
+        "modifier": 2
+      }
+    ],
+    "prerequisites": [
+      "worker-robots-storage-3",
+      "worker-robots-storage-4",
+      "automation-science-pack",
+      "logistic-science-pack",
+      "utility-science-pack"
+    ],
+    "unit": {
+      "ingredients": [
+        [
+          "automation-science-pack",
+          2
+        ],
+        [
+          "logistic-science-pack",
+          3
+        ],
+        [
+          "utility-science-pack",
+          4
+        ]
+      ],
+      "count_formula": "1012.5*1.5^(L-5)",
+      "time": 60
+    },
+    "max_level": "infinite",
+    "level": 5,
+    "hidden": false,
+    "upgrade": true,
+    "type": "technology"
+  }
+}

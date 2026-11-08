@@ -402,7 +402,7 @@ class ScienceTests(unittest.TestCase):
           assert(all_result.reason == "all-unbound-sources" and all_context.unbound_science_sources["unbound-lab-card"] == "all")
         ''')
 
-    def test_sif_retires_space_from_only_the_two_level_seven_continuations_under_every_policy(self):
+    def test_sif_retired_role_cannot_be_reintroduced_by_bindings_or_policies(self):
         self.lua.execute(r'''
           local policies = {
             "configured", "space", "space-and-promethium", "space-age-progression",
@@ -476,16 +476,14 @@ class ScienceTests(unittest.TestCase):
             return raw
           end
 
-          -- This is the pre-fix diagnostic: without the named binding, the
-          -- archived prerequisite rewrite makes the policy-added space source
-          -- invalid before a continuation can be published.
+          -- Retirement is a context rule, so an explicit otherwise-empty
+          -- binding cannot bypass it as it did in the released implementation.
           local unbound = technology(rows[1].ingredients, rows[1].prerequisites)
           unbound.name, unbound.family = rows[1].id, rows[1].family
           local unbound_report = science.apply_family({unbound}, {[1]={}}, {raw=sif_raw(), target={id="f210"},
             mods={["space-age"]="2.1.23", ["space-is-fake"]="observed"},
             options={["mir-science-pack-ingredient-policy"]="space"}})[1]
-          assert(not unbound_report.enabled and unbound_report.reason:match(
-            "^invalid%-science%-source:space%-science%-pack:"))
+          assert(unbound_report.enabled and names(unbound.unit.ingredients) == rows[1].expected.space)
 
           for _, target in ipairs({"f200", "f210"}) do
             for _, definition in ipairs(rows) do
@@ -523,30 +521,27 @@ class ScienceTests(unittest.TestCase):
             end
           end
 
-          -- Explicit required science and the selected Space Age end-game
-          -- gate remain hard requirements; only policy-selected retired space
-          -- science is excluded for the two named rows.
+          -- A retired role cannot be restored by required_science, including
+          -- on another owned identity. Other requirements and the actual
+          -- Space Age end-game gate keep their authority.
           local raw = sif_raw()
           local required = technology({{"automation-science-pack",37}}, {"finite-anchor"})
           required.name, required.family = "unrelated-owned-row", "unrelated-owned-row"
           local report = science.apply(required, {required_science={"space-science-pack"}}, science.prepare({raw=raw,
             target={id="f210"}, mods={["space-age"]="2.1.23", ["space-is-fake"]="observed"},
             options={["mir-science-pack-ingredient-policy"]="configured"}}))
-          assert(report.enabled and names(required.unit.ingredients) == "automation-science-pack:37,space-science-pack:1")
+          assert(report.enabled and names(required.unit.ingredients) == "automation-science-pack:37")
 
-          -- Even on one of the two bound names, an explicit requirement is
-          -- appended after the finite policy exclusion.  The exclusion cannot
-          -- silently override a declared hard requirement.
+          -- The formerly name-bound route receives the same complete policy.
           local named_required = technology(rows[1].ingredients, rows[1].prerequisites)
           named_required.name, named_required.family = rows[1].id, rows[1].family
-          local named_binding = bindings.conditions_for(rows[1].family, rows[1].id,
-            {["space-is-fake"]="observed"})
+          local named_binding = bindings.conditions_for(rows[1].family)
           named_binding.required_science = {"space-science-pack"}
           report = science.apply(named_required, named_binding, science.prepare({raw=sif_raw(), target={id="f210"},
             mods={["space-age"]="2.1.23", ["space-is-fake"]="observed"},
             options={["mir-science-pack-ingredient-policy"]="space"}}))
           assert(report.enabled and names(named_required.unit.ingredients) ==
-            "automation-science-pack:2,logistic-science-pack:3,chemical-science-pack:5,production-science-pack:7,utility-science-pack:11,military-science-pack:13,space-science-pack:1")
+            "automation-science-pack:2,logistic-science-pack:3,chemical-science-pack:5,production-science-pack:7,utility-science-pack:11,military-science-pack:13")
 
           local gated = technology(rows[1].ingredients, rows[1].prerequisites)
           gated.name, gated.family = rows[1].id, rows[1].family
@@ -581,6 +576,8 @@ class ScienceTests(unittest.TestCase):
           local function sif_owner_raw(target)
             local raw = raw_with(packs, {whole=packs})
             install_sources(raw, true, target)
+            raw.technology["space-science-pack"].prerequisites = {
+              "utility-science-pack", "production-science-pack"}
             raw.technology["promethium-science-pack"].prerequisites = sif_prerequisites(target)
             raw.technology["quantum-processor"] = {}
             return raw
@@ -639,6 +636,71 @@ class ScienceTests(unittest.TestCase):
             assert(bindings.select({id=target}, mods).source_contracts["promethium-science-pack"].owner_prerequisites[1]
               == "agricultural-science-pack")
           end
+        ''')
+
+    def test_sif_role_selection_has_a_surviving_gate_and_valid_source_contract(self):
+        self.lua.execute(r'''
+          for _, target in ipairs({"f200", "f210"}) do
+            for _, additions in ipairs({{}, {Muria="controlled"}, {secretas="controlled"},
+              {bobtech="controlled"}, {["space-exploration"]="controlled"}}) do
+              local mods={base=target=="f200" and "2.0.77" or "2.1.23",
+                ["space-age"]=target=="f200" and "2.0.77" or "2.1.23",["space-is-fake"]="controlled"}
+              for name,version in pairs(additions) do mods[name]=version end
+              assert(bindings.has_retired_space_role({id=target},mods))
+              local selected=bindings.select({id=target},mods)
+              assert(type(selected.source_contracts["space-science-pack"])=="table")
+              assert(selected.end_game.pack=="promethium-science-pack"
+                and table.concat(selected.end_game.prerequisites,",")=="promethium-science-pack")
+            end
+          end
+          local k2={base="2.1.23",["space-age"]="2.1.23",["space-is-fake"]="controlled",
+            Krastorio2="2.1.4",["Krastorio2-spaced-out"]="2.0.19",Krastorio2Assets="2.1.0",["k2so-assets"]="1.0.7"}
+          local selected=bindings.select({id="f210"},k2)
+          assert(selected.source_contracts["space-science-pack"] and selected.end_game.pack=="promethium-science-pack")
+          assert(not bindings.has_retired_space_role({id="f110"},k2))
+          k2["space-age"]=nil
+          assert(not bindings.has_retired_space_role({id="f210"},k2))
+        ''')
+
+    def test_sif_retirement_reuses_one_source_check_and_preserves_other_constraints(self):
+        self.lua.execute(r'''
+          local packs={"automation-science-pack","logistic-science-pack","chemical-science-pack",
+            "production-science-pack","military-science-pack","utility-science-pack","space-science-pack",
+            "agricultural-science-pack","metallurgic-science-pack","electromagnetic-science-pack",
+            "cryogenic-science-pack","promethium-science-pack"}
+          local raw=raw_with(packs,{whole=packs});install_sources(raw,true,"f210")
+          raw.technology["space-science-pack"].prerequisites={"utility-science-pack","production-science-pack"}
+          raw.technology["promethium-science-pack"].prerequisites={"agricultural-science-pack",
+            "metallurgic-science-pack","electromagnetic-science-pack","quantum-processor"}
+          raw.technology["quantum-processor"]={}
+          local rows={}
+          for index=1,80 do
+            rows[index]=technology({{"automation-science-pack",7},{"space-science-pack",11}},
+              {"finite-anchor","space-science-pack"})
+            rows[index].name="controlled-owned-row-"..index
+          end
+          local context=science.prepare({raw=raw,target={id="f210"},mods={
+            ["space-age"]="2.1.23",["space-is-fake"]="controlled"},options={}})
+          local reports=science.apply_family(rows,nil,context,context)
+          local recipe_count=0;for _ in pairs(raw.recipe) do recipe_count=recipe_count+1 end
+          assert(context.direct_replacement_recipe_visits==recipe_count,"retirement rescanned recipes per row")
+          for index,row in ipairs(rows) do
+            assert(reports[index].enabled and names(row.unit.ingredients)=="automation-science-pack:7")
+            assert(table.concat(row.prerequisites,",")=="finite-anchor")
+          end
+          local row=technology({{"automation-science-pack",7},{"space-science-pack",11}},
+            {"finite-anchor","space-science-pack"})
+          local report=science.apply(row,{required_science={"space-science-pack","cryogenic-science-pack"},
+            phase_any_science={"space-science-pack","cryogenic-science-pack"}},context)
+          assert(report.enabled and names(row.unit.ingredients)=="automation-science-pack:7,cryogenic-science-pack:1")
+          -- An intentionally malformed declared source is never converted
+          -- into the retirement case, even if an alternate producer exists.
+          local invalid=science.prepare({raw=raw,target={id="f210"},mods=context.mods,options={}})
+          invalid.binding=bindings.select({id="f210"},context.mods)
+          invalid.binding.source_contracts["space-science-pack"]={kind="alternatives",pack="space-science-pack",
+            direct_recipe_replacement=true,alternatives={{kind="alternatives",pack="space-science-pack",alternatives={}}}}
+          local ok,message=pcall(science.apply,row,{},invalid)
+          assert(not ok and tostring(message):find("MIR SIF science binding: nested-alternative",1,true))
         ''')
 
     def test_sif_real_space_age_continuations_keep_the_full_vector_and_retire_only_the_named_gate(self):

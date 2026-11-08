@@ -1028,10 +1028,11 @@ function M.select(active_mods, raw, withheld)
     end
   end
   local bob_tech_materials = not bob_angel_f210 and require("compatibility.bob_tech_profile").applies(active_mods)
-  local external_continuations = {}
-  local continuations = M.continuations(active_mods, raw, external_continuations)
+  local external_continuations, worker_storage = {}, {}
+  local continuations = M.continuations(active_mods, raw, external_continuations, worker_storage)
   return {profile = profile, definitions = supported_definitions(definitions), continuations = continuations,
     external_continuations = external_continuations,
+    worker_storage = next(worker_storage) ~= nil and worker_storage or nil,
     bob_tech_progression = not bob_angel_f210 and target.id == "f210" and type(active_mods) == "table" and active_mods.bobtech ~= nil
       and require("compatibility.modern_catalogue.bob_tech_progression").select(active_mods) or nil,
     native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
@@ -1173,12 +1174,13 @@ local function existing_infinite_owner(row, technology)
   return true
 end
 
-function M.omit_existing_continuations(rows, technology_prototypes)
+function M.omit_existing_continuations(rows, technology_prototypes, worker_storage)
   if technology_prototypes == nil then return rows end
   local shared = {}
   for _, row in ipairs(CONTINUATIONS) do shared[row.id] = true end
   shared["research-speed-8"] = true
   shared["worker-robots-storage-9"] = true
+  if worker_storage ~= nil then shared[worker_storage.technology] = true end
   local retained = {}
   for _, row in ipairs(rows) do
     if not (shared[row.id] and technology_prototypes[row.id] ~= nil) then
@@ -1188,9 +1190,10 @@ function M.omit_existing_continuations(rows, technology_prototypes)
   return retained
 end
 
-function M.continuations(active_mods, raw, external_continuations)
+function M.continuations(active_mods, raw, external_continuations, worker_storage)
   local rows = copy(CONTINUATIONS)
   local secretas_external = false
+  local worker_route
   local bob_angel_f210 = M.bob_angel_f210_profile(active_mods)
   local bob_angel_f200_combined = M.bob_angel_f200_combined_profile(active_mods)
   if M.is_bob_angel(active_mods) then
@@ -1288,9 +1291,9 @@ function M.continuations(active_mods, raw, external_continuations)
         M.science_ingredients(row.science, row.science_amounts))
     end
     if row.id == "worker-robots-storage-4" and M.has_secretas(active_mods) then
-      -- Only this named finite route receives a later identity. A meaningful
-      -- existing infinite owner anywhere on its six known stages wins instead;
-      -- this is not suffix discovery or permission to skip unrelated clashes.
+      -- Retain Secretas's published ninth identity and exact finite route.
+      -- A meaningful existing infinite owner on its six known stages wins;
+      -- other providers use the separately validated connected chain below.
       local existing = type(raw) == "table" and raw.technology
       if type(existing) == "table" then
         local candidate = copy(row)
@@ -1302,11 +1305,18 @@ function M.continuations(active_mods, raw, external_continuations)
       end
       require("compatibility.modern_catalogue.secretas").worker_continuation(row,
         not secretas_external and raw or nil)
+    elseif row.id == "worker-robots-storage-4" and (target.id == "f200" or target.id == "f210")
+        and not bob_angel_f200_combined and not M.retains_bob_native_continuations(active_mods)
+        and type(raw) == "table" and type(raw.technology) == "table"
+        and raw.technology[row.id] ~= nil then
+      worker_route = require("compatibility.worker_robot_storage").adapt(row, raw,
+        existing_infinite_owner, helpers and helpers.evaluate_expression,
+        M.science_ingredients(row.science, row.science_amounts))
     end
   end
   -- Only meaningful, already-infinite native owners may replace these
-  -- optional extensions. Finite/malformed/unrelated collisions still reach
-  -- the unchanged Generator rejection. Runtime uses creation custody below
+  -- optional extensions. Unadapted or unrelated collisions still reach the
+  -- strict Generator rejection. Runtime uses creation custody below
   -- this admission boundary and never claims a foreign owner for caps.
   local existing = type(raw) == "table" and raw.technology
   local admitted = {}
@@ -1315,7 +1325,10 @@ function M.continuations(active_mods, raw, external_continuations)
     for _, row in ipairs(rows) do
       if existing_infinite_owner(row, existing[row.id]) then admitted[row.id] = existing[row.id] end
     end
-    rows = M.omit_existing_continuations(rows, admitted)
+    rows = M.omit_existing_continuations(rows, admitted, worker_route)
+  end
+  if worker_storage ~= nil and worker_route ~= nil then
+    for key, value in pairs(worker_route) do worker_storage[key] = value end
   end
   -- The optional caller-owned output keeps the longstanding single array
   -- return intact, including Python/Lua consumers of this private selector.
