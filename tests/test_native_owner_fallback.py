@@ -1,5 +1,6 @@
 """Published native-cost nonbinding and ordinary Space Age fallback expectations; host only."""
 import argparse
+import json
 from pathlib import Path
 import sys
 import unittest
@@ -73,6 +74,52 @@ class NativeOwnerFallbackTests(unittest.TestCase):
                 self.assertEqual(31, row["unit"]["time"])
                 packs = {ingredient[0] if isinstance(ingredient, list) else ingredient["name"] for ingredient in row["unit"]["ingredients"]}
                 self.assertEqual(BASE_SCIENCE | EXTRA_SCIENCE[family], packs)
+
+    def test_recovered_eligible_steel_fixture_asserts_current_pipeline_and_rejects_ineligible_recipe(self):
+        helper = Path(__file__).resolve().parent / "fixtures/native-owner-fallback/helper"
+        for eligible in (True, False):
+            with self.subTest(eligible=eligible):
+                case = fixture.NativeFamilyProductTargetTests()
+                case.setUp()
+                # Deterministic host serialization checks the complete foreign
+                # prototype; the native fixture uses the engine's serpent.
+                case.lua.globals().fixture_serialize = lambda row: json.dumps(fixture.plain(row), sort_keys=True)
+                case.lua.globals().fixture_helper = helper.as_posix()
+                case.lua.execute('''
+                  serpent={block=function(row) return fixture_serialize(row) end}
+                  -- Settings prototypes/defaults stay in their own stage;
+                  -- game data receives only their effective startup values.
+                  local game_data=data
+                  data={raw={}}
+                  local declarations=require("research.settings").prototypes()
+                  for _,row in ipairs(declarations) do
+                    data.raw[row.type]=data.raw[row.type] or {}
+                    data.raw[row.type][row.name]=row
+                  end
+                  dofile(fixture_helper.."/settings-updates.lua")
+                  for _,row in ipairs(declarations) do settings.startup[row.name].value=row.default_value end
+                  data=game_data
+                  for _,name in ipairs({"mir-fixture-adopt-low-density-structure","mir-fixture-adopt-plastic-bar",
+                      "mir-fixture-adopt-processing-unit","mir-fixture-adopt-rocket-fuel","mir-fixture-adopt-steel-plate"}) do
+                    data.raw.recipe[name]=nil
+                  end
+                  mods={base="2.1.23",quality="2.1.23",recycler="2.1.23",["elevated-rails"]="2.1.23",
+                    ["space-age"]="2.1.23",["more-infinite-research"]="5.0.21011",
+                    ["mir-fixture-native-owner-fallback"]="0.2.0"}
+                  dofile(fixture_helper.."/data-updates.lua")
+                ''')
+                if not eligible:
+                    # Preserve the original producer refusal as an opponent;
+                    # do not weaken its independently required permission.
+                    case.lua.execute('data.raw.recipe["mir-fixture-adopt-steel-plate"].allow_productivity=false')
+                before = case.owner_rows()
+                case.pipeline()
+                self.assertEqual(before, case.owner_rows())
+                if eligible:
+                    case.lua.execute('dofile(fixture_helper.."/data-final-fixes.lua")')
+                else:
+                    with self.assertRaisesRegex(Exception, "public residual progression"):
+                        case.lua.execute('dofile(fixture_helper.."/data-final-fixes.lua")')
 
     def test_zero_native_time_uses_the_published_mir_default_for_its_own_paid_or_public_row(self):
         # Published MIR stream time is 60. A zero native-owner inherit sentinel

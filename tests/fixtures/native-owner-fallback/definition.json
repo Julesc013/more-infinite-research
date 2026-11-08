@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "kind": "MIRNativeOwnerFallbackPreparedDefinitionV1",
+  "status": "prepared-existing-case; no-final-archive-controller-or-native-binding",
+  "original_repository": "Julesc013/mir-native-worker (now Julesc013/scratchpad)",
+  "originals_commit": "89eb3ed6494b230f863add899addd8f6dc166e5e",
+  "originals_path": "evidence/native-owner-fallback-native-chain-r01/original-bodies.json.gz",
+  "originals_sha256": "14E79FEE7C94BE91AB07D6250CC0A4656B790145D57307C088994C5C330DBA51",
+  "original_native_review": "spec/evidence/candidate503-fallback-native-aero-review-r01.json",
+  "prepared_against_commit": "b2f05ce742a8d94e84dee79d07a0a36dcee58bbf",
+  "prepared_against_player_tree": "4bcdf2b89d63d38fe6cb0b66840a83096a56dd0c",
+  "prepared_against_is_not_final_package_binding": true,
+  "source_members": [
+    {
+      "path": "control.lua",
+      "original_path": "fixtures/sourceb-native-owner-fallback-r02/control.lua",
+      "original_bytes": 7618,
+      "original_sha256": "9E4A7F997B3D5F6C6FC1841EDD5593ED492ACF124AC5048F72BF5E80A39365BB",
+      "prepared_bytes": 7618,
+      "prepared_sha256": "383A5B387EF1D4D9C8B2A39AAB35042255EC431DFAA1C307B26BDC319947D355",
+      "change": "strict MIR and fixture version pins only"
+    },
+    {
+      "path": "helper/data-updates.lua",
+      "original_path": "fixtures/sourceb-native-owner-fallback-r02/helper/data-updates.lua",
+      "original_bytes": 622,
+      "original_sha256": "64F93F59D369759E6949DB646228FCF17965D4EFE8F10E4C2724FFEF2B43FC4F",
+      "prepared_bytes": 622,
+      "prepared_sha256": "64F93F59D369759E6949DB646228FCF17965D4EFE8F10E4C2724FFEF2B43FC4F",
+      "change": "byte-identical original eligible-r02 body"
+    },
+    {
+      "path": "helper/data-final-fixes.lua",
+      "original_path": "fixtures/sourceb-native-owner-fallback-r02/helper/data-final-fixes.lua",
+      "original_bytes": 1228,
+      "original_sha256": "1F674E3DA4F7864C2B4836C57B3E78C8853692FD7A265C98B98306C035D23162",
+      "prepared_bytes": 1228,
+      "prepared_sha256": "1F674E3DA4F7864C2B4836C57B3E78C8853692FD7A265C98B98306C035D23162",
+      "change": "byte-identical original eligible-r02 body"
+    },
+    {
+      "path": "helper/settings-updates.lua",
+      "original_path": "fixtures/sourceb-native-owner-fallback-r02/helper/settings-updates.lua",
+      "original_bytes": 452,
+      "original_sha256": "7A3BB5FCE5DDA82DCBDE48B4E204F8961E87F42AB920B8C63D7CBE0F22F52287",
+      "prepared_bytes": 452,
+      "prepared_sha256": "7A3BB5FCE5DDA82DCBDE48B4E204F8961E87F42AB920B8C63D7CBE0F22F52287",
+      "change": "byte-identical original eligible-r02 body"
+    },
+    {
+      "path": "helper/info.json",
+      "original_path": "fixtures/sourceb-native-owner-fallback-r02/helper/info.json",
+      "original_bytes": 262,
+      "original_sha256": "A2AC469586352CB7F905F2AB00AD184C113ADEE0ABF2A1B27011B6ACDA2A8837",
+      "prepared_bytes": 262,
+      "prepared_sha256": "50388D7760714C0C3C336EEFC7CB214AB38C36BF4F539F2E15878975781F779D",
+      "change": "strict MIR and fixture version pins only"
+    }
+  ],
+  "scenario_actor": "control.lua",
+  "fixture_source_directory": "helper",
+  "fixture_zip_members": [
+    "info.json",
+    "data-updates.lua",
+    "data-final-fixes.lua",
+    "settings-updates.lua"
+  ],
+  "fixture_has_control_lua": false,
+  "profile": "tests/profiles/native-owner-fallback-current-f210-2123.json",
+  "selected_settings": {
+    "base": 2,
+    "increment": 3,
+    "growth": 1.25,
+    "time_seconds": 1,
+    "effect_percent": 17
+  },
+  "independent_producer": {
+    "published_path": "fixtures/vanilla-family-adoption-recipes/data.lua",
+    "sha256": "22B80CE74F4940FC4BCE4CA77F36120D6557E15520424987297C343F1305B9A9",
+    "eligible_r02_correction": "Keep categories/main_product/allow_productivity=true/auto_recycle=false from the original valid producer; do not revive the ineligible r01 recipe."
+  },
+  "expected": [
+    "Unknown polynomial1000 + 100 * L^2 steel-plate-productivity retains its complete prototype and unearned steel/casting/bullet state.",
+    "Public recipe-prod-research_steel-1 has four historical science packs and one .17 effect only for mir-fixture-adopt-steel-plate.",
+    "One ordinary native laboratory completion consumes two of each four supplied six-pack sciences, stops the lab, grants .17 only to the uncovered fixture recipe, saves and verifies the same earned/foreign frame in two one-tick cold loads.",
+    "Foreign control force keeps its disabled/hidden public research and all unrelated state; no scripted completion, MIR-handler invocation or post-MIR cost acceleration."
+  ],
+  "required_before_native": [
+    "Use the final reviewed unpublished11 player/package and exact engine/API/data/controller bindings; existing7441 is not silently updated or re-used as changed bytes.",
+    "Project scenario actor separately and package only the four helper members from the exact committed raw Git bodies.",
+    "Complete existing guarded native composition/resource/identity/library-restoration and independent admission; this definition grants no dispatch authority."
+  ],
+  "native_execution": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}
