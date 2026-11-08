@@ -1,0 +1,1251 @@
+{
+  "kind": "MIRLibraryRetentionIndependentResultReviewV1",
+  "reviewed_at_utc": "2026-11-08T22:32:44.182018+00:00",
+  "reviewer": "independent non-author /root/native_owner510_review",
+  "verdict": "ACCEPT observed EN corrected-selection predicates; preserve ADVERSE whole session and incomplete natural retirement",
+  "selection_scope_supported": true,
+  "whole_session_pass": false,
+  "natural_exit_pass": false,
+  "native_retry_authorized_by_this_report": false,
+  "reason": "The same worker robot battery row/detail and battery query with two matches were retained across Queue, Debug and Settings without reselection. Those observations completed before retirement. The owner then reached the unchanged1200s governor; final main-menu Exit input refused the missing PID and sent0 events. This supports the narrow selection correction but cannot establish a completed naturally retired EN session.",
+  "execution_identity": {
+    "source_head": "1389ef9ba39159fca141d668ac74e800c9a80d16",
+    "player_tree": "dc3f9c1aa119f825dfb1cb5dac8ccf71ea1ddec0",
+    "plan": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library511-retention-en-r02-native-custody-r01\\packet\\plan.json",
+      "bytes": 7931,
+      "sha256": "8F06061F4506686FB7D484F231E5279CCD946DF6DF250ED56155F14EBADB8BB6"
+    },
+    "candidate": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir511-qualification-r02/more-infinite-research_5.0.21011.zip",
+      "bytes": 995429,
+      "sha256": "F25DB9283C2F8020907F8E2AD35132F0B6EEECE11263C82C69389EE8DAB3F09D"
+    },
+    "engine": {
+      "path": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+      "bytes": 49398736,
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+    },
+    "engine_actual": "2.1.23 build87750 win64",
+    "active_mods": "base@2.1.23|mir-fixture-mir5-active-mods-observer@0.1.0|more-infinite-research@5.0.21011",
+    "owner": {
+      "process_id": 16264,
+      "process_start_utc": "2026-11-08T21:43:52.3339156Z",
+      "plan": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library511-retention-inputs-r02\\en\\plan.json",
+      "plan_sha256": "8F06061F4506686FB7D484F231E5279CCD946DF6DF250ED56155F14EBADB8BB6",
+      "native_input_sent": false
+    },
+    "native_pid": 7760,
+    "native_start_utc": "2026-11-08T21:43:56.8709897Z",
+    "window_handle": 14945136,
+    "geometry": [
+      0,
+      0,
+      2560,
+      1440
+    ],
+    "locale": "en",
+    "published_package": false
+  },
+  "independent_checks": {
+    "manifest": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library511-retention-en-r02-native-custody-r01\\MANIFEST.json",
+      "bytes": 57572,
+      "sha256": "606144F9D097317A1055AF354C99F176183D4532C24BF960DF7BE7B085F88F24"
+    },
+    "member_count": 166,
+    "member_bytes": 86547669,
+    "all_copies_and_origins_rehashed": true,
+    "mismatches": [],
+    "all15_declared_input_pins_rehashed": [
+      {
+        "name": "engine",
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "bytes": 49398736,
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      {
+        "name": "candidate",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir511-qualification-r02\\more-infinite-research_5.0.21011.zip",
+        "bytes": 995429,
+        "sha256": "F25DB9283C2F8020907F8E2AD35132F0B6EEECE11263C82C69389EE8DAB3F09D"
+      },
+      {
+        "name": "profile",
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retention-inputs-en-r02\\profile.json",
+        "bytes": 1049,
+        "sha256": "E358A099ACC093CBEF69781CC396297C85A2F065A870F711C93F62D134185EE1"
+      },
+      {
+        "name": "config",
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retention-inputs-en-r02\\en.ini",
+        "bytes": 353,
+        "sha256": "CAF343E39296872670B26BC332642A585B2B818779A93D0F66C31CFCAA247CF8"
+      },
+      {
+        "name": "seed",
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retention-inputs-en-r02\\protected-source-copy.zip",
+        "bytes": 893285,
+        "sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD"
+      },
+      {
+        "name": "protected_original",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\migration-origins\\pure-published-source-r01\\work110-f210-default-r02-controller\\retained-native\\write-data\\saves\\mir-pure-predecessor.zip",
+        "bytes": 893285,
+        "sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD"
+      },
+      {
+        "name": "direct_observer",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+        "bytes": 835,
+        "sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0"
+      },
+      {
+        "name": "custody_helper",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\api-boundary-f210-native-r01-controller\\Existing-OwnedArchiveFunctions.ps1",
+        "bytes": 4973,
+        "sha256": "65C8F23A4D9AA872CF0D6BD2BCCC35960162B358E1B87465303BF5658FEE2356"
+      },
+      {
+        "name": "owner_script",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-tab-layout-native-r01\\Invoke-NormalDisplay.ps1",
+        "bytes": 6644,
+        "sha256": "C2F4209DBAD007B5CC31B76C1D0155335513F1F9F5769AA5FB82C6411624BC18"
+      },
+      {
+        "name": "automation_inputs.capture_actor",
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-input-controller-r01\\Invoke-ImportedOwnedCaptureActor.ps1",
+        "bytes": 8746,
+        "sha256": "9F4DBE3FA831683F6773872BF073BAAF5F63463131DF45BA0E38C7808CEEC490"
+      },
+      {
+        "name": "automation_inputs.capture_caller",
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-input-controller-r01\\Invoke-ImportedLibraryNativeInput.ps1",
+        "bytes": 135375,
+        "sha256": "3F356D94CF0895E4448C6A811F4BCB834C45F5A6E7266D01A051787BEE782E38"
+      },
+      {
+        "name": "automation_inputs.owned_window",
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\tools\\lib\\validation\\responsive-menu\\OwnedMenuWindow.ps1",
+        "bytes": 33978,
+        "sha256": "16690F31241D232BF8161F40854EB33CCDE176ADA6AF11A11CA0ABE2CF344583"
+      },
+      {
+        "name": "automation_inputs.input_actor",
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\tools\\Invoke-LibraryNativeInput.ps1",
+        "bytes": 15679,
+        "sha256": "8F55CAD7A03163E51F70B245A3320CFE5AFE4450A2FEE7D0569E08AB88F76096"
+      },
+      {
+        "name": "operator_helpers.capture",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-tab-layout-native-r01\\Capture-NormalDisplay.ps1",
+        "bytes": 5298,
+        "sha256": "8C24CC2800F89B4CB515D0FF9FA090C41917C6D6E70F0D9EB3E25D4725293052"
+      },
+      {
+        "name": "operator_helpers.input",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library-tab-layout-native-r01\\Input-NormalDisplay.ps1",
+        "bytes": 2824,
+        "sha256": "B8E687BE71FD4B0FFD6B26CF10F675553C44F878756A0B19448331F8B085DA03"
+      }
+    ],
+    "all16_captures_and16_actor_binding_spec_receipts_rehashed": true,
+    "all16_original_pngs_independently_viewed": true,
+    "view_detail": "high; display scaled to2048x1152 from retained2560x1440 originals; no original mutation",
+    "successful_actor_guard_checks": "15 successful actors match PID/start/engine/client-en/ownedwindow geometry; no foreground/occlusion/geometry rejection, physical pointer readback matches, no held key. Native readback comes from PNGs, not receipt native_game_observation=false. Final failed actor did not establish a window and correctly sent0 inputs.",
+    "capture_age_source": "Original binding file timestamp minus capture actor start, plus unchanged wrapper admission at input. All are below120s; no timestamp was fabricated or altered.",
+    "capture_age_min_seconds": 38.472,
+    "capture_age_max_seconds": 100.008,
+    "physical_input_event_count": 54,
+    "successful_actors": 15,
+    "failed_actors": 1
+  },
+  "observed_ui": [
+    {
+      "predicate": "Open English Library from observed map/intro via existing shortcut",
+      "status": "observed",
+      "captures": [
+        "loaded-map-before-input",
+        "intro-dismissed",
+        "library-open"
+      ]
+    },
+    {
+      "predicate": "Battery query yields Battery productivity and Worker robot battery; explicit row2 worker selection shows direct effect",
+      "status": "observed",
+      "captures": [
+        "research-query-focused",
+        "research-battery-filtered",
+        "worker-battery-description"
+      ],
+      "detail": "Worker robot battery benefit Battery size, Next level:+10%; no inferred recipe-productivity replacement."
+    },
+    {
+      "predicate": "Queue then Debug preserves selected technology identity",
+      "status": "observed",
+      "captures": [
+        "queue-view",
+        "debug-selected-identity"
+      ],
+      "selected_id": "recipe-prod-research_robot_battery-1"
+    },
+    {
+      "predicate": "Research settings search performs actual positive reduction",
+      "status": "observed",
+      "captures": [
+        "settings-baseline",
+        "settings-query-focused",
+        "settings-braking-filtered"
+      ],
+      "baseline_groups": 123,
+      "typed_query": "braking",
+      "matching_groups": 1,
+      "detail": "Braking force selected; Enabled On, basecost115, addedcost0, multiplier≈1.33333, Unlimited,60seconds/unit,effect15; Configuration source Mod setting."
+    },
+    {
+      "predicate": "Return Research without reselection retains same worker row and detail",
+      "status": "observed",
+      "captures": [
+        "research-return"
+      ],
+      "retained_query": "battery",
+      "matching_rows": 2,
+      "selected_id_correspondence": "Worker robot battery is still highlighted row2 and same Battery size/+10% detail; Debug earlier identified recipe-prod-research_robot_battery-1.",
+      "no_reselection": "Actual actor sequence contains a single worker selection, followed only by tab/search actions through research-return."
+    },
+    {
+      "predicate": "Orderly map retirement progressed but final process retirement was incomplete",
+      "status": "adverse at session level",
+      "captures": [
+        "library-closed",
+        "game-menu",
+        "exit-map-result",
+        "main-menu"
+      ],
+      "detail": "Library closed; game menu Exit produced an actual unsaved confirmation; actual Quit returned to main menu. Final Exit was attempted after governor and refused missingPID."
+    }
+  ],
+  "retirement_adverse": {
+    "owner_result": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\owner-result.json",
+      "bytes": 2374,
+      "sha256": "988CBAB71441214F54D045617BAF3784F983F25A4D871122F8A20B7EC63EF897"
+    },
+    "owner_status": "adverse",
+    "error": "[mir441-process-timeout]",
+    "ledger": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\process-1.resources.jsonl",
+      "bytes": 2311717,
+      "sha256": "11F37165CA2250E383C1A11DE8F572114880F88C02501FDB0E6240B303BD3091"
+    },
+    "ledger_rows": 3778,
+    "ledger_final": {
+      "observed_at": "2026-11-08T22:03:57.4294863+00:00",
+      "phase": "interrupted",
+      "timed_out": true,
+      "error": "[mir441-process-timeout]",
+      "resource_admission": null,
+      "peak_working_set_bytes": 1618771968,
+      "peak_sampled_private_bytes": 2821558272
+    },
+    "log": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\write-data\\factorio-current.log",
+      "bytes": 21389,
+      "sha256": "7EFBC043D1E52A3ABC6BBBF8D8CE24E0F672BA8B2618B97E2455FFDEA174C8F7"
+    },
+    "exact_log_events": [
+      "1117.671 Info AppManager.cpp:364: Deleting active scenario.",
+      "1200.353 Quitting: window closed.",
+      "1200.476 Goodbye"
+    ],
+    "main_menu_capture_utc": "2026-11-08T22:02:34.6597318Z",
+    "final_failed_receipt": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\quit-main-menu\\run\\input-actor-result.json",
+      "bytes": 1809,
+      "sha256": "45FA9D00FE4136D939E558C55D7093FBBDDD830A9F5B346D7A8BB7CEE4BA94BF"
+    },
+    "final_failure": "Cannot find a process with the process identifier7760.",
+    "final_input_events": 0,
+    "final_window": null,
+    "final_pointer_and_key_events_empty": true,
+    "interpretation": "The map was left after an observed unsaved confirmation and actual Quit. The owner remained active at main menu until its1200s deadline. Goodbye in the log does not establish natural-exit acceptance when the resource ledger and owner result explicitly record timeout. No retry or substituted-process input occurred. No evidence ties this retirement timeout to a MIR selection failure."
+  },
+  "protection_and_restoration": {
+    "owner_original_library_restored": true,
+    "owner_factorio_zero": true,
+    "current_controls_independently_match_before": [
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mod-list.json",
+        "exists": true,
+        "bytes": 39201,
+        "sha256": "48C46678CC8369DB15CC12CDFB23309EB076DC4433B76E9426083D0074BCCC91"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mod-settings.dat",
+        "exists": true,
+        "bytes": 60744,
+        "sha256": "667897C514B66298A1E400058B65EA14EB36322D88864B98AE38E4C9B81387BC"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\.mir-active-profile.json",
+        "exists": false,
+        "bytes": 0,
+        "sha256": ""
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21011.zip",
+        "exists": false,
+        "bytes": 0,
+        "sha256": ""
+      }
+    ],
+    "factorio_process_count_at_review": 0,
+    "seed_and_original_unchanged": true,
+    "archive_crc_readback": [
+      {
+        "location": "custody",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library511-retention-en-r02-native-custody-r01\\staged-inputs\\_autosave1.zip",
+        "bytes": 3365041,
+        "sha256": "27F2CEB25CA3202A96FFEC142E0894C92E7E6F121A7FDB354DB66EFB8CAAEBE4",
+        "zip_members": 61,
+        "crc_pass": true
+      },
+      {
+        "location": "origin",
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retention-inputs-en-r02\\_autosave1.zip",
+        "bytes": 3365041,
+        "sha256": "27F2CEB25CA3202A96FFEC142E0894C92E7E6F121A7FDB354DB66EFB8CAAEBE4",
+        "zip_members": 61,
+        "crc_pass": true
+      },
+      {
+        "location": "custody",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library511-retention-en-r02-native-custody-r01\\staged-inputs\\_autosave2.zip",
+        "bytes": 3061378,
+        "sha256": "B37367997551247B610B6F56DFACB586F33B3DCF63C8FC84909B821B37D8AD2F",
+        "zip_members": 61,
+        "crc_pass": true
+      },
+      {
+        "location": "origin",
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retention-inputs-en-r02\\_autosave2.zip",
+        "bytes": 3061378,
+        "sha256": "B37367997551247B610B6F56DFACB586F33B3DCF63C8FC84909B821B37D8AD2F",
+        "zip_members": 61,
+        "crc_pass": true
+      },
+      {
+        "location": "custody",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library511-retention-en-r02-native-custody-r01\\staged-inputs\\_autosave3.zip",
+        "bytes": 3206739,
+        "sha256": "B1C0B20F70BA5F28589021DC1B2C9CA443884F4D6D9BD1666B0DEB087EFEC119",
+        "zip_members": 61,
+        "crc_pass": true
+      },
+      {
+        "location": "origin",
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retention-inputs-en-r02\\_autosave3.zip",
+        "bytes": 3206739,
+        "sha256": "B1C0B20F70BA5F28589021DC1B2C9CA443884F4D6D9BD1666B0DEB087EFEC119",
+        "zip_members": 61,
+        "crc_pass": true
+      },
+      {
+        "location": "custody",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library511-retention-en-r02-native-custody-r01\\staged-inputs\\protected-source-copy.zip",
+        "bytes": 893285,
+        "sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD",
+        "zip_members": 56,
+        "crc_pass": true
+      },
+      {
+        "location": "origin",
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retention-inputs-en-r02\\protected-source-copy.zip",
+        "bytes": 893285,
+        "sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD",
+        "zip_members": 56,
+        "crc_pass": true
+      },
+      {
+        "location": "protected_original",
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\migration-origins\\pure-published-source-r01\\work110-f210-default-r02-controller\\retained-native\\write-data\\saves\\mir-pure-predecessor.zip",
+        "bytes": 893285,
+        "sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD",
+        "zip_members": 56,
+        "crc_pass": true
+      }
+    ],
+    "incidental_autosave_events": 43,
+    "autosave_first_log": " 179.130 Info AppManager.cpp:335: Saving to _autosave1 (blocking).",
+    "autosave_last_log": " 971.551 Info AppManager.cpp:335: Saving to _autosave1 (blocking).",
+    "autosave_status": "Three rotating autosave files are preserved in custody and CRC checked; no explicit save input was sent. Autosaves are incidental outputs, not accepted successors or new saved-state qualification."
+  },
+  "captures": [
+    {
+      "label": "debug-selected-identity",
+      "actor_start_utc": "2026-11-08T21:52:45.4662131Z",
+      "result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\debug-selected-identity\\result.json",
+        "bytes": 3571,
+        "sha256": "45D856DB6C3DDAD0154E7BC84313F038D3F03D0AA5C519F73B36F26E3700EEC7"
+      },
+      "png": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\debug-selected-identity\\capture.png",
+        "bytes": 3657934,
+        "sha256": "D500A456B3901BB4E0F43611092097C8D2C371478A4FED6FABCABD437B10ED24"
+      },
+      "status": "capture-returned",
+      "independently_viewed": true
+    },
+    {
+      "label": "exit-map-result",
+      "actor_start_utc": "2026-11-08T22:01:30.6175213Z",
+      "result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\exit-map-result\\result.json",
+        "bytes": 3555,
+        "sha256": "5BFA77DD31CD18F0F8C82B8E2AACF26E3F41D778245E378AD4B194B5E48CF32D"
+      },
+      "png": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\exit-map-result\\capture.png",
+        "bytes": 4546829,
+        "sha256": "9D114B9266F94A80D787CAC98CAFA3E9033E36BF72DB30058BDCFCC5A17D0214"
+      },
+      "status": "capture-returned",
+      "independently_viewed": true
+    },
+    {
+      "label": "game-menu",
+      "actor_start_utc": "2026-11-08T22:00:13.2227632Z",
+      "result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\game-menu\\result.json",
+        "bytes": 3543,
+        "sha256": "787055029469919C8C8F6325223C35E832485B84AA56335737DA041FFFCC2054"
+      },
+      "png": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\game-menu\\capture.png",
+        "bytes": 4538320,
+        "sha256": "CF719CADF84FD7CBB3D310E65D7FD86722E4A162BC6C34FCFD22ED990F699F7E"
+      },
+      "status": "capture-returned",
+      "independently_viewed": true
+    },
+    {
+      "label": "intro-dismissed",
+      "actor_start_utc": "2026-11-08T21:46:48.3756628Z",
+      "result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\intro-dismissed\\result.json",
+        "bytes": 3555,
+        "sha256": "E433B57FCE2CC79BEFD3E012FC8B8DEE3F3C2A76B9313A5135376458234B6481"
+      },
+      "png": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\intro-dismissed\\capture.png",
+        "bytes": 6730192,
+        "sha256": "718B6C01237EAFE9FBC62EB1B615A91556040428436767260A25775EEC6BE03E"
+      },
+      "status": "capture-returned",
+      "independently_viewed": true
+    },
+    {
+      "label": "library-closed",
+      "actor_start_utc": "2026-11-08T21:58:50.3310840Z",
+      "result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\library-closed\\result.json",
+        "bytes": 3553,
+        "sha256": "37CE111BDA0EC034642BA0BA88D3256139A08E57B3363C097AF6090F2C132055"
+      },
+      "png": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\library-closed\\capture.png",
+        "bytes": 6342860,
+        "sha256": "A4C7A27617B4C7EB6AC0A638E95D1045340E7F4E1DC53F505758F45841D12726"
+      },
+      "status": "capture-returned",
+      "independently_viewed": true
+    },
+    {
+      "label": "library-open",
+      "actor_start_utc": "2026-11-08T21:47:52.2687861Z",
+      "result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\library-open\\result.json",
+        "bytes": 3549,
+        "sha256": "D8CD2CCCEC0EFCC13A9CD835C230A7ADA0A4B0C80C69155F0B752B4788ED7960"
+      },
+      "png": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\library-open\\capture.png",
+        "bytes": 4253112,
+        "sha256": "C1EEBAF7D0FD0102A78A32A186CF2981168DA09BB7A1E3F0CCFC69044E8E9D1E"
+      },
+      "status": "capture-returned",
+      "independently_viewed": true
+    },
+    {
+      "label": "loaded-map-before-input",
+      "actor_start_utc": "2026-11-08T21:46:08.9977246Z",
+      "result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\loaded-map-before-input\\result.json",
+        "bytes": 3571,
+        "sha256": "30D9815726E123060FD830868D7C7A8EA295DCBFD4505EEBF9C2AF5E36A44F3C"
+      },
+      "png": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\loaded-map-before-input\\capture.png",
+        "bytes": 4794285,
+        "sha256": "1E353CB25E67C342D0AFDD028DAB79F2517CEE780BE4170FC2833BB9BAEF1586"
+      },
+      "status": "capture-returned",
+      "independently_viewed": true
+    },
+    {
+      "label": "main-menu",
+      "actor_start_utc": "2026-11-08T22:02:34.6597318Z",
+      "result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\main-menu\\result.json",
+        "bytes": 3543,
+        "sha256": "EE2C742C980B6F73343AE5885021FDD0FE9F4FB21B5B754EE5FB96F50375CAA3"
+      },
+      "png": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\main-menu\\capture.png",
+        "bytes": 7293531,
+        "sha256": "8AF8B5B12744C6444986292B35F882D7C425D76A2E85C0BB9E9153A6CA10067E"
+      },
+      "status": "capture-returned",
+      "independently_viewed": true
+    },
+    {
+      "label": "queue-view",
+      "actor_start_utc": "2026-11-08T21:51:55.6357942Z",
+      "result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\queue-view\\result.json",
+        "bytes": 3545,
+        "sha256": "E75DF263901B57827A050054A3A4CE689113179881C4B56CE818C6B816F862A8"
+      },
+      "png": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\queue-view\\capture.png",
+        "bytes": 3094357,
+        "sha256": "AD7C8BA4C4A23467BF78E0A13B46497D68E24C7C3120BBE9C07A0C6D9795B1CC"
+      },
+      "status": "capture-returned",
+      "independently_viewed": true
+    },
+    {
+      "label": "research-battery-filtered",
+      "actor_start_utc": "2026-11-08T21:49:46.8778602Z",
+      "result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\research-battery-filtered\\result.json",
+        "bytes": 3575,
+        "sha256": "60B0CE6F19B36439026A1A57873FED9704E5C9E4780A64D18BAEDFA7463D567A"
+      },
+      "png": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\research-battery-filtered\\capture.png",
+        "bytes": 2912688,
+        "sha256": "3F724454E4DC151A727837C4351A36864FCA8A39E08A3B28E7D82207118C6AD9"
+      },
+      "status": "capture-returned",
+      "independently_viewed": true
+    },
+    {
+      "label": "research-query-focused",
+      "actor_start_utc": "2026-11-08T21:48:44.3451186Z",
+      "result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\research-query-focused\\result.json",
+        "bytes": 3569,
+        "sha256": "6351BFD83F8610EA454BB259530732707A6019987ADBE14B9E4FB8035EF3A638"
+      },
+      "png": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\research-query-focused\\capture.png",
+        "bytes": 4073569,
+        "sha256": "124D8B7E93624781639ADB086870D2BEBC3CA103E3EF6B9E1496B8EF9DB6D0DE"
+      },
+      "status": "capture-returned",
+      "independently_viewed": true
+    },
+    {
+      "label": "research-return",
+      "actor_start_utc": "2026-11-08T21:57:52.8222974Z",
+      "result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\research-return\\result.json",
+        "bytes": 3555,
+        "sha256": "9260D43549D330FBBAEA50CB54E5122C7E853B158F4A0EEAADD11788BBD69ED8"
+      },
+      "png": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\research-return\\capture.png",
+        "bytes": 4150837,
+        "sha256": "7D87AC323980969538031B6AED05395DAC06C4B1371742D875F8236080DA7303"
+      },
+      "status": "capture-returned",
+      "independently_viewed": true
+    },
+    {
+      "label": "settings-baseline",
+      "actor_start_utc": "2026-11-08T21:54:01.5876434Z",
+      "result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\settings-baseline\\result.json",
+        "bytes": 3559,
+        "sha256": "B3A65D25370A90541D813841CD429F91FAE87A190AE7A10F6482FC3D56F987E2"
+      },
+      "png": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\settings-baseline\\capture.png",
+        "bytes": 3886762,
+        "sha256": "A1B1B79E75D342F0C7FC5C6AB8626D08A7A11DA6AD497336C91C7999380172D4"
+      },
+      "status": "capture-returned",
+      "independently_viewed": true
+    },
+    {
+      "label": "settings-braking-filtered",
+      "actor_start_utc": "2026-11-08T21:56:23.3142322Z",
+      "result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\settings-braking-filtered\\result.json",
+        "bytes": 3575,
+        "sha256": "F8FFA0451880616CC0218E1B47305072A376BBB783EEBDCA88FA69DFBC094F9F"
+      },
+      "png": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\settings-braking-filtered\\capture.png",
+        "bytes": 2880158,
+        "sha256": "7669A36A81A6E1CB6C94391F679F981803647DA607418A3768EFF9D204C4D2D6"
+      },
+      "status": "capture-returned",
+      "independently_viewed": true
+    },
+    {
+      "label": "settings-query-focused",
+      "actor_start_utc": "2026-11-08T21:55:08.5402123Z",
+      "result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\settings-query-focused\\result.json",
+        "bytes": 3569,
+        "sha256": "6AC3428B4200BB17D951B2F457A06D71D378FA0C94C31D04BBDA1FC816B0419F"
+      },
+      "png": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\settings-query-focused\\capture.png",
+        "bytes": 3591485,
+        "sha256": "6E9E604AB60C9E46FF76738145D0FE5F108CA6CA445B325F06248CEC8CE038FD"
+      },
+      "status": "capture-returned",
+      "independently_viewed": true
+    },
+    {
+      "label": "worker-battery-description",
+      "actor_start_utc": "2026-11-08T21:50:53.7047335Z",
+      "result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\worker-battery-description\\result.json",
+        "bytes": 3577,
+        "sha256": "086F33DBD5079D4BEC213AA65ACE9A7C8A7CA2A5D9B8F4818FC62448D158F415"
+      },
+      "png": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\captures\\worker-battery-description\\capture.png",
+        "bytes": 4099008,
+        "sha256": "91126EF29F20378E5FA300E2E3C970BAA4FAFCAE824A97900DA06797CD52BD92"
+      },
+      "status": "capture-returned",
+      "independently_viewed": true
+    }
+  ],
+  "actions_in_actual_order": [
+    {
+      "label": "dismiss-intro",
+      "binding": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\dismiss-intro\\binding.json",
+        "bytes": 1693,
+        "sha256": "1795049F19BB3B100D1542151FD94CEFB405AA1162DAF5ADAA2D12CBC2C652FE"
+      },
+      "spec": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\dismiss-intro\\spec.json",
+        "bytes": 319,
+        "sha256": "15BD32821FA5CBB4D5B22A8FE99C1449B0331A78A8A98E4C2F1E06240D66F79B"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\dismiss-intro\\run\\input-actor-result.json",
+        "bytes": 2157,
+        "sha256": "8D98B9292E26AD8C5F03FDAA3A9B94B0FE81946DE6EDE499ADF53643EFE8F7E1"
+      },
+      "capture_age_at_binding_seconds": 38.472,
+      "status": "input-sent-native-readback-required",
+      "input_events_sent": 2,
+      "failure": "",
+      "action": {
+        "action": "tab"
+      },
+      "window": {
+        "process_id": 7760,
+        "start_utc": "2026-11-08T21:43:56.8709897Z",
+        "handle": 14945136,
+        "x": 0,
+        "y": 0,
+        "width": 2560,
+        "height": 1440
+      },
+      "held_key": false
+    },
+    {
+      "label": "open-library-shortcut",
+      "binding": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\open-library-shortcut\\binding.json",
+        "bytes": 1695,
+        "sha256": "F29E451BBFA192E23027344846A33FEA7328C88E00EA71194729268243666D0A"
+      },
+      "spec": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\open-library-shortcut\\spec.json",
+        "bytes": 349,
+        "sha256": "FC6226EA2166FF9E92619C7F7E484EA795B2EFD5F3A2A6FB2E6195780E4FA1D0"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\open-library-shortcut\\run\\input-actor-result.json",
+        "bytes": 2127,
+        "sha256": "96FF46ECC2AD5AD263FE6B729AE7511708609613D71555977E4ACA53A8173CB5"
+      },
+      "capture_age_at_binding_seconds": 63.328,
+      "status": "input-sent-native-readback-required",
+      "input_events_sent": 2,
+      "failure": "",
+      "action": {
+        "action": "click",
+        "x": 1628,
+        "y": 1355
+      },
+      "window": {
+        "process_id": 7760,
+        "start_utc": "2026-11-08T21:43:56.8709897Z",
+        "handle": 14945136,
+        "x": 0,
+        "y": 0,
+        "width": 2560,
+        "height": 1440
+      },
+      "held_key": false
+    },
+    {
+      "label": "focus-research-query",
+      "binding": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\focus-research-query\\binding.json",
+        "bytes": 1687,
+        "sha256": "818246562EDBCA6EB7A7AE8ADE427951CD7B43355895FB045212D658C0FE65A3"
+      },
+      "spec": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\focus-research-query\\spec.json",
+        "bytes": 348,
+        "sha256": "89CAE55EA6FF6A365E0C4504636E052170B8A5343110521740ABF17756A1876A"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\focus-research-query\\run\\input-actor-result.json",
+        "bytes": 2125,
+        "sha256": "3FC76CC1BBCE5FF4A2F601556AC6F3ADC29515C2C10F67204AECC88A9D86AF14"
+      },
+      "capture_age_at_binding_seconds": 51.433,
+      "status": "input-sent-native-readback-required",
+      "input_events_sent": 2,
+      "failure": "",
+      "action": {
+        "action": "click",
+        "x": 1010,
+        "y": 294
+      },
+      "window": {
+        "process_id": 7760,
+        "start_utc": "2026-11-08T21:43:56.8709897Z",
+        "handle": 14945136,
+        "x": 0,
+        "y": 0,
+        "width": 2560,
+        "height": 1440
+      },
+      "held_key": false
+    },
+    {
+      "label": "type-research-battery",
+      "binding": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\type-research-battery\\binding.json",
+        "bytes": 1708,
+        "sha256": "A2B09B7F493C4D30159A9456BE7BAB272FA496ED6088D4AD29A4B03B7556EE05"
+      },
+      "spec": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\type-research-battery\\spec.json",
+        "bytes": 342,
+        "sha256": "F0A8A54EE62C13AD9F7B6B86094B00475D619ED76E1EE91C1578712A33B33BA9"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\type-research-battery\\run\\input-actor-result.json",
+        "bytes": 1951,
+        "sha256": "D31B8AA357418AF645FB40D74C6F310962A1EE160C98BEE7216FB4173275DF89"
+      },
+      "capture_age_at_binding_seconds": 61.639,
+      "status": "input-sent-native-readback-required",
+      "input_events_sent": 14,
+      "failure": "",
+      "action": {
+        "action": "text",
+        "text": "battery"
+      },
+      "window": {
+        "process_id": 7760,
+        "start_utc": "2026-11-08T21:43:56.8709897Z",
+        "handle": 14945136,
+        "x": 0,
+        "y": 0,
+        "width": 2560,
+        "height": 1440
+      },
+      "held_key": false
+    },
+    {
+      "label": "select-worker-battery",
+      "binding": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\select-worker-battery\\binding.json",
+        "bytes": 1715,
+        "sha256": "38315A7007F0FDD8A92621BDD39FD8B2243E2F020A32040FE042B19AB7E192B2"
+      },
+      "spec": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\select-worker-battery\\spec.json",
+        "bytes": 347,
+        "sha256": "18C20A8CC4866A169CD89A56E1751816F096B8FDE021BDA7A9274499F45DA728"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\select-worker-battery\\run\\input-actor-result.json",
+        "bytes": 2123,
+        "sha256": "1B091413A36333FD1D0C6EC226019D2180E5FA76E43D7127FC1FFCCF9C5564E2"
+      },
+      "capture_age_at_binding_seconds": 66.249,
+      "status": "input-sent-native-readback-required",
+      "input_events_sent": 2,
+      "failure": "",
+      "action": {
+        "action": "click",
+        "x": 900,
+        "y": 649
+      },
+      "window": {
+        "process_id": 7760,
+        "start_utc": "2026-11-08T21:43:56.8709897Z",
+        "handle": 14945136,
+        "x": 0,
+        "y": 0,
+        "width": 2560,
+        "height": 1440
+      },
+      "held_key": false
+    },
+    {
+      "label": "open-queue-tab",
+      "binding": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\open-queue-tab\\binding.json",
+        "bytes": 1703,
+        "sha256": "9E696339A28CF07ACB38999CB25A4A82B1FB952C7D15AEE3D7EDC8A1B51A1132"
+      },
+      "spec": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\open-queue-tab\\spec.json",
+        "bytes": 347,
+        "sha256": "056FBCF13D59EF8709C0BB1D067854629896671523A8CFFDF88661CC6D8341B7"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\open-queue-tab\\run\\input-actor-result.json",
+        "bytes": 2123,
+        "sha256": "5B6E6773F0ACE556D03FC607F23E5D3C9F351D9A2BDFD0C3EE6659D21902C88D"
+      },
+      "capture_age_at_binding_seconds": 61.39,
+      "status": "input-sent-native-readback-required",
+      "input_events_sent": 2,
+      "failure": "",
+      "action": {
+        "action": "click",
+        "x": 826,
+        "y": 208
+      },
+      "window": {
+        "process_id": 7760,
+        "start_utc": "2026-11-08T21:43:56.8709897Z",
+        "handle": 14945136,
+        "x": 0,
+        "y": 0,
+        "width": 2560,
+        "height": 1440
+      },
+      "held_key": false
+    },
+    {
+      "label": "open-debug-tab",
+      "binding": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\open-debug-tab\\binding.json",
+        "bytes": 1671,
+        "sha256": "26693A86166A7CB3FDCAE09833A35C75F9929A022A24E807932D2965332D7505"
+      },
+      "spec": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\open-debug-tab\\spec.json",
+        "bytes": 348,
+        "sha256": "6DD2ED0E8F715C63885AD4D79C672D1F2E0CA826E7D8816D35D69E1736818F1D"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\open-debug-tab\\run\\input-actor-result.json",
+        "bytes": 2125,
+        "sha256": "118B8A5C16FDA6FF4E51181DD289F77EBF5FB463729956BB064F8DD1D78E6C49"
+      },
+      "capture_age_at_binding_seconds": 49.04,
+      "status": "input-sent-native-readback-required",
+      "input_events_sent": 2,
+      "failure": "",
+      "action": {
+        "action": "click",
+        "x": 1036,
+        "y": 208
+      },
+      "window": {
+        "process_id": 7760,
+        "start_utc": "2026-11-08T21:43:56.8709897Z",
+        "handle": 14945136,
+        "x": 0,
+        "y": 0,
+        "width": 2560,
+        "height": 1440
+      },
+      "held_key": false
+    },
+    {
+      "label": "open-settings-tab",
+      "binding": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\open-settings-tab\\binding.json",
+        "bytes": 1703,
+        "sha256": "36D94309B3C6073B767DC192B19D7E7F2A137B2AB8742B11BB8C3EEEAD7F5CB1"
+      },
+      "spec": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\open-settings-tab\\spec.json",
+        "bytes": 347,
+        "sha256": "AE5133E291B79E6A5C948F79B43D2CB8EB366128B97D587CEAD8BC03504BD931"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\open-settings-tab\\run\\input-actor-result.json",
+        "bytes": 2123,
+        "sha256": "AB5C82AB78ABBC20BC3A71BCF469A10FE70F0D81C673CB4B34F2A160D47C6547"
+      },
+      "capture_age_at_binding_seconds": 75.558,
+      "status": "input-sent-native-readback-required",
+      "input_events_sent": 2,
+      "failure": "",
+      "action": {
+        "action": "click",
+        "x": 932,
+        "y": 208
+      },
+      "window": {
+        "process_id": 7760,
+        "start_utc": "2026-11-08T21:43:56.8709897Z",
+        "handle": 14945136,
+        "x": 0,
+        "y": 0,
+        "width": 2560,
+        "height": 1440
+      },
+      "held_key": false
+    },
+    {
+      "label": "focus-settings-query",
+      "binding": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\focus-settings-query\\binding.json",
+        "bytes": 1697,
+        "sha256": "69E7BDB0563F4CD5A96A18165A91FAFBBBA88BE125C256D8C072308C091B26DB"
+      },
+      "spec": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\focus-settings-query\\spec.json",
+        "bytes": 348,
+        "sha256": "AB8845972E67E08CA3955283E1608645F783D97E57F7395F6431D25116515C38"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\focus-settings-query\\run\\input-actor-result.json",
+        "bytes": 2125,
+        "sha256": "786A7D1E8119723D0C10F017DD4A058F1F8EF0824A4EA98E3EE02307EF82EFBF"
+      },
+      "capture_age_at_binding_seconds": 66.373,
+      "status": "input-sent-native-readback-required",
+      "input_events_sent": 2,
+      "failure": "",
+      "action": {
+        "action": "click",
+        "x": 1010,
+        "y": 298
+      },
+      "window": {
+        "process_id": 7760,
+        "start_utc": "2026-11-08T21:43:56.8709897Z",
+        "handle": 14945136,
+        "x": 0,
+        "y": 0,
+        "width": 2560,
+        "height": 1440
+      },
+      "held_key": false
+    },
+    {
+      "label": "type-settings-braking",
+      "binding": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\type-settings-braking\\binding.json",
+        "bytes": 1708,
+        "sha256": "67D6AE024DA6D4928A221762CAB96C4920C052B071D896C8CB75E07A45FF3CA6"
+      },
+      "spec": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\type-settings-braking\\spec.json",
+        "bytes": 342,
+        "sha256": "4CB64837A0A408AD7B4CBD4213C880662DC670A13ACA9E9C0D006E874E541BBE"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\type-settings-braking\\run\\input-actor-result.json",
+        "bytes": 1951,
+        "sha256": "BD3CF60DD9614E210F96463F4D7873BD5901D4D8262773FE552B8B84E0491DD8"
+      },
+      "capture_age_at_binding_seconds": 73.871,
+      "status": "input-sent-native-readback-required",
+      "input_events_sent": 14,
+      "failure": "",
+      "action": {
+        "action": "text",
+        "text": "braking"
+      },
+      "window": {
+        "process_id": 7760,
+        "start_utc": "2026-11-08T21:43:56.8709897Z",
+        "handle": 14945136,
+        "x": 0,
+        "y": 0,
+        "width": 2560,
+        "height": 1440
+      },
+      "held_key": false
+    },
+    {
+      "label": "return-research-tab",
+      "binding": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\return-research-tab\\binding.json",
+        "bytes": 1711,
+        "sha256": "88025E45F2D9328E3B0E999245F588C630B7C0BA86C2C836A2B4E22BA8BDD97D"
+      },
+      "spec": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\return-research-tab\\spec.json",
+        "bytes": 347,
+        "sha256": "B1F5919810D18166F8C339522400805D5CFA780F0BC7ADF184B5342FB852115B"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\return-research-tab\\run\\input-actor-result.json",
+        "bytes": 2123,
+        "sha256": "4B102F318D0A920A9F8669B6AC91305577EEBEA2E53632BDB232A07447B346C3"
+      },
+      "capture_age_at_binding_seconds": 88.93,
+      "status": "input-sent-native-readback-required",
+      "input_events_sent": 2,
+      "failure": "",
+      "action": {
+        "action": "click",
+        "x": 720,
+        "y": 208
+      },
+      "window": {
+        "process_id": 7760,
+        "start_utc": "2026-11-08T21:43:56.8709897Z",
+        "handle": 14945136,
+        "x": 0,
+        "y": 0,
+        "width": 2560,
+        "height": 1440
+      },
+      "held_key": false
+    },
+    {
+      "label": "close-library",
+      "binding": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\close-library\\binding.json",
+        "bytes": 1679,
+        "sha256": "5506A6CE73B7A66205E34455BB7E521F44C30471072AA434842CCC7924FA7EA5"
+      },
+      "spec": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\close-library\\spec.json",
+        "bytes": 348,
+        "sha256": "3C961BE19FF9224263C35EF56D12AB9CD683DE7EE6AB75E4EC4B0676FA7BD8A5"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\close-library\\run\\input-actor-result.json",
+        "bytes": 2125,
+        "sha256": "A9AAEE2E07D5AA05E0801AAD6A459F70419629EEA3E06B4DC22ED11EC2288C01"
+      },
+      "capture_age_at_binding_seconds": 56.951,
+      "status": "input-sent-native-readback-required",
+      "input_events_sent": 2,
+      "failure": "",
+      "action": {
+        "action": "click",
+        "x": 1887,
+        "y": 148
+      },
+      "window": {
+        "process_id": 7760,
+        "start_utc": "2026-11-08T21:43:56.8709897Z",
+        "handle": 14945136,
+        "x": 0,
+        "y": 0,
+        "width": 2560,
+        "height": 1440
+      },
+      "held_key": false
+    },
+    {
+      "label": "open-game-menu",
+      "binding": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\open-game-menu\\binding.json",
+        "bytes": 1680,
+        "sha256": "509C0AC4EA14946E8309738159FBEDC6558AA87C3617748C2A807B2919DD4BE0"
+      },
+      "spec": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\open-game-menu\\spec.json",
+        "bytes": 322,
+        "sha256": "2228F8F9775009C14D662D10C51D41570633C465BCEABF9C3789B4A896D7EDA4"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\open-game-menu\\run\\input-actor-result.json",
+        "bytes": 2158,
+        "sha256": "11556C5CC81A10FE29B447BC5D9E6E1026C1222076BEE764C168A254FBC7EA11"
+      },
+      "capture_age_at_binding_seconds": 81.922,
+      "status": "input-sent-native-readback-required",
+      "input_events_sent": 2,
+      "failure": "",
+      "action": {
+        "action": "escape"
+      },
+      "window": {
+        "process_id": 7760,
+        "start_utc": "2026-11-08T21:43:56.8709897Z",
+        "handle": 14945136,
+        "x": 0,
+        "y": 0,
+        "width": 2560,
+        "height": 1440
+      },
+      "held_key": false
+    },
+    {
+      "label": "exit-map",
+      "binding": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\exit-map\\binding.json",
+        "bytes": 1657,
+        "sha256": "2B92BC1ED231AFC8A6E7A7862715AB06371D1EAE0C680FF7EDAFE5D4B9D7455F"
+      },
+      "spec": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\exit-map\\spec.json",
+        "bytes": 348,
+        "sha256": "12ECD689283ECFE5F08E87543D886D6E4B967313A3370AF1308B92B1DDC26105"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\exit-map\\run\\input-actor-result.json",
+        "bytes": 2125,
+        "sha256": "33E6B3599BAE8A39AC1825E5761247ADE48E298D7FB90E96AB8620F38E353735"
+      },
+      "capture_age_at_binding_seconds": 76.846,
+      "status": "input-sent-native-readback-required",
+      "input_events_sent": 2,
+      "failure": "",
+      "action": {
+        "action": "click",
+        "x": 1146,
+        "y": 914
+      },
+      "window": {
+        "process_id": 7760,
+        "start_utc": "2026-11-08T21:43:56.8709897Z",
+        "handle": 14945136,
+        "x": 0,
+        "y": 0,
+        "width": 2560,
+        "height": 1440
+      },
+      "held_key": false
+    },
+    {
+      "label": "confirm-quit-without-save",
+      "binding": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\confirm-quit-without-save\\binding.json",
+        "bytes": 1703,
+        "sha256": "06418853E5B74511E992B7171F6D473D0F751E82B570AFC6F34FA3284E594E6D"
+      },
+      "spec": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\confirm-quit-without-save\\spec.json",
+        "bytes": 348,
+        "sha256": "D7B367C14851BD814A3E386BDDFB549315B2F586FBB6723306E5C3BDFB02ED62"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\confirm-quit-without-save\\run\\input-actor-result.json",
+        "bytes": 2125,
+        "sha256": "CE4DDBA773A5A2F5336DF14C4935B139E4DC5D6B8079B7A5D368B091032DB232"
+      },
+      "capture_age_at_binding_seconds": 63.45,
+      "status": "input-sent-native-readback-required",
+      "input_events_sent": 2,
+      "failure": "",
+      "action": {
+        "action": "click",
+        "x": 1418,
+        "y": 766
+      },
+      "window": {
+        "process_id": 7760,
+        "start_utc": "2026-11-08T21:43:56.8709897Z",
+        "handle": 14945136,
+        "x": 0,
+        "y": 0,
+        "width": 2560,
+        "height": 1440
+      },
+      "held_key": false
+    },
+    {
+      "label": "quit-main-menu",
+      "binding": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\quit-main-menu\\binding.json",
+        "bytes": 1669,
+        "sha256": "9C2ED1C9FE4A29593AE83F5D6BD0F4BD544480099C2AD09E2C2C3DF640420AD0"
+      },
+      "spec": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\quit-main-menu\\spec.json",
+        "bytes": 348,
+        "sha256": "DFD1A80A325675690C9D4921880C7499DFA4A99249A9D37DA544D5AA27BE2FC8"
+      },
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-en-r02\\actors\\quit-main-menu\\run\\input-actor-result.json",
+        "bytes": 1809,
+        "sha256": "45FA9D00FE4136D939E558C55D7093FBBDDD830A9F5B346D7A8BB7CEE4BA94BF"
+      },
+      "capture_age_at_binding_seconds": 100.008,
+      "status": "failed",
+      "input_events_sent": 0,
+      "failure": "Cannot find a process with the process identifier 7760.",
+      "action": {
+        "action": "click",
+        "x": 1146,
+        "y": 946
+      },
+      "window": null,
+      "held_key": false
+    }
+  ],
+  "root_observations": {
+    "record": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library511-retention-en-r02-native-custody-r01\\packet\\root-observations-r01.json",
+      "bytes": 2019,
+      "sha256": "3CC9710C01A42912F15DC6020B3C5C498BC89A2FE0C789FBDCE05C663C877151"
+    },
+    "correspondence": "Agrees with independent PNG and receipt readback: positive functional selection predicates and adverse retirement are separate."
+  },
+  "prior_results_preserved": [
+    {
+      "report": "library511-retention-de-independent-result-review-r01.json",
+      "sha256": "E4C8523C77A2F0AC3B08CA773A67D59E0C3E8BC1DFD4FC6F82F2607D0C245E4C",
+      "scope": "Separate corrected DE r04 exact-route acceptance including natural0 retirement; not borrowed for EN session completion."
+    },
+    {
+      "report": "library511-one-de-independent-result-review-r01.json",
+      "sha256": "15D9A60FD1103CF0D042CFFB436F4F72CC667C141FFC0024457BCC09504420A7",
+      "scope": "Original7441 German selection failure remains adverse under its original identity."
+    },
+    {
+      "scope": "Corrected DE r02 timeout before Settings/return and r03 stale-write-data/seed admission refusal remain preserved; no relabeling or erasure."
+    }
+  ],
+  "limits": [
+    "This is actual EN one-client view-only selection evidence on exact1389/F25 with qualified internal5.0.6 work seed8B32. It does not relabel the old7441 run or qualify raw1.1 upgrade.",
+    "No whole EN session or natural retirement pass. The explicit1200s timeout and final missingPID refusal remain adverse.",
+    "No full Library, export/import/apply, failure injection, persistence/rejoin, dual-client/whole-menu, gameplay/save, performance or stable/release acceptance.",
+    "Reviewer launched no native process, test suite or build, changed no source/controller/input/custody artifact and wrote only this new report.",
+    "Required read-only bounded development-health inspection returned attention; no cleanup or resource-policy change was made."
+  ]
+}

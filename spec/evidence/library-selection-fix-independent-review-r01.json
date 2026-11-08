@@ -1,0 +1,167 @@
+{
+  "kind": "MIRLibrarySelectionFixIndependentSourceReviewV1",
+  "reviewed_at_utc": "2026-11-08T20:04:36.863159+00:00",
+  "reviewer": "independent non-author /root/native_owner510_review",
+  "scope": "Bounded read-only PR1838 correction source/tests/history/evidence review. Only this new report authored. No tests, builds, native, source/controller/report edits or child agents.",
+  "verdict": "ACCEPT source correction for the demonstrated localized-selection failure; no concrete source blocker found in this bounded diff. Required exact-head CI remains mandatory. Corrected-package native retention is NOT YET ACCEPTED.",
+  "refs": {
+    "pull_request": 1838,
+    "base": "b2f05ce742a8d94e84dee79d07a0a36dcee58bbf",
+    "head": "1389ef9ba39159fca141d668ac74e800c9a80d16",
+    "player_tree": "dc3f9c1aa119f825dfb1cb5dac8ccf71ea1ddec0",
+    "worktree": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01",
+    "clean": true,
+    "head_equal_tracking_ref": true,
+    "prior_player_tree": "4bcdf2b89d63d38fe6cb0b66840a83096a56dd0c",
+    "fixed_original_player_zip_sha256": "74418DC171C8FA3F21486EF21B1FA8D348E99798E4F4D6DF5657024D2B87B892",
+    "fixed_original_zip_replaced": false,
+    "new_corrected_zip_reviewed": false
+  },
+  "exact_delta": {
+    "files": {
+      "CHANGELOG.md": {
+        "bytes": 126592,
+        "raw_git_sha256": "4868E100A36FF7417942BA891357DE6C0DC6AD6BFC23517EFB1482068219AFE3"
+      },
+      "docs/progress.md": {
+        "bytes": 459151,
+        "raw_git_sha256": "0BD4F4CC608C43E5ADBFFEDF7AB5B4480AAC88DB8A63BB768DA96C304DED3D90"
+      },
+      "source/changelog.txt": {
+        "bytes": 136971,
+        "raw_git_sha256": "248C64C58611B0E411B7A87FC0A40E2E2C32E595602F8AA83A0E01EBC8E7A480"
+      },
+      "source/runtime/library.lua": {
+        "bytes": 149439,
+        "raw_git_sha256": "2ED1B1CD08D56347AAD8CA7FFA4E8A9BA4165973112AB4934D1EA8CAE443F9B7"
+      },
+      "source/runtime/library_translations.lua": {
+        "bytes": 18147,
+        "raw_git_sha256": "9272332AF248C8CE8998D60916F1A33B380D7ACB4DFD6E6347AF7AA69A8B8981"
+      },
+      "spec/evidence/library511-one-de-independent-result-review-r01.json": {
+        "bytes": 26061,
+        "raw_git_sha256": "15D9A60FD1103CF0D042CFFB436F4F72CC667C141FFC0024457BCC09504420A7"
+      },
+      "spec/evidence/library511-one-en-independent-result-review-r01.json": {
+        "bytes": 21032,
+        "raw_git_sha256": "B16B4C9610A6DA8260009263E0C6832369419ABE4F7AE818DA85BEFA4ED44FFB"
+      },
+      "tests/test_library.py": {
+        "bytes": 272552,
+        "raw_git_sha256": "56DAFBB7A5EAB16C18D491824F557C267AE3626BBAB33484C4CFADFB37621658"
+      }
+    },
+    "production_members_changed": [
+      "source/runtime/library.lua",
+      "source/runtime/library_translations.lua",
+      "source/changelog.txt"
+    ],
+    "library_change": "13diff lines: add localized-search-pending parameter; defer fallback while retained selection exists and genuine translation work remains; dispatch existing bounded requests before readiness/content update.",
+    "translations_change": "7line internal read-only is_complete(cache,scope) helper, guarded by existing valid/current-scope checks.",
+    "focused_controls": "95lines/2new Library tests use the real presentation model. No original test expectation or existing guard is removed.",
+    "other_delta": "One authored release-note bullet and matching rendered bullet; scoped progress plus verbatim original EN/DE independent reports. No settings/API IDs, schema, budgets, target floors, new lifecycle callback or player source copy introduced.",
+    "whitespace_diff_check_passed": true
+  },
+  "behavior_review": [
+    {
+      "subject": "Partial localized results",
+      "finding": "The visible list can update while the chosen subject is temporarily absent, but selected_index0 no longer overwrites view.selected if a nonempty search has incomplete translations and actual issued request IDs. Once the selected row arrives, row_index finds it and existing selection/detail rendering resumes immediately; it does not wait for unrelated labels to finish."
+    },
+    {
+      "subject": "Final genuine exclusion",
+      "finding": "is_complete counts resolved entries including failed/fallback resolutions. After the final batch marks refresh, the guard becomes false. An actually excluded subject with visible alternatives gets the prior rows[1] fallback. A completed empty result retains inert focus as before. The real-model control exercises final nonmatch, avoiding an indefinitely sticky-selection fix."
+    },
+    {
+      "subject": "Unavailable or refusing native request API",
+      "finding": "Existing dispatch occurs before readiness evaluation. Missing/refused request_translation yields no issued IDs; needs_maintenance is false, so partial/unissued catalogue work cannot suppress ordinary raw-ID fallback. Both cases are explicit focused opponents. Request retry/work/window limits are unchanged."
+    },
+    {
+      "subject": "Empty/raw queries and explicit filtering",
+      "finding": "Empty query never enters the hold. A retained subject already matching current rows remains selected regardless of pending state. A selected subject absent from a nonempty query can temporarily leave no selected visible row until translation readiness settles; this is the intended behavior change, not a global ban on useful fallback. New or truly excluded focus still falls back when the result is settled."
+    },
+    {
+      "subject": "Hidden/private focus",
+      "finding": "The existing private-credit and explicitly hidden reserved-selection guard remains byte-for-byte in the branch condition. No hidden credit is exposed or force/research state rewritten."
+    },
+    {
+      "subject": "Stale scope and cold/load behavior",
+      "finding": "is_complete only checks existing validated/current scope and scalar completion counts, returning nil for invalid/stale caches. It does not publish labels, initialize/repair storage, release IDs or mutate ledgers. Its sole call is in an eligible Research render, not on_load. Existing reconnection/hydration, stale reply release and expiry paths are unchanged."
+    },
+    {
+      "subject": "Selection can settle after expiry",
+      "finding": "The unchanged outstanding16/dispatch16/refresh8/retry2/expiry1800 machinery resolves successful or fallback entries and refreshes at completion. Current pending work can delay replacement; stale outstanding rights can delay fresh dispatch only through the preexisting bounded request/expiry lifecycle. No new timer or permanent polling was added."
+    },
+    {
+      "subject": "No hidden work/new mutation owner",
+      "finding": "Only order within the existing open connected rooted Research render changes: one existing bounded dispatch moves before content/readiness. Closed/Queue/Debug expiry-only gating and lifetime/cache discard paths remain. is_complete is constant-size read-only inspection; no whole-catalogue clone, native catalogue traversal, extra per-tick work, storage schema, gameplay/API registration or export authority is added."
+    }
+  ],
+  "regression_evidence": {
+    "logs": {
+      "library-selection-fix-red-r01.log": {
+        "bytes": 296,
+        "sha256": "82DFBE3D9A6AA33AF22FE15273391EDB01B3E1CFADC671AE43E8556D6C354C82"
+      },
+      "library-selection-fix-red-r02.log": {
+        "bytes": 1784,
+        "sha256": "BA5B0ED5748FD6600C327E34F3BF21D607140A9CC3AB1D11701C22A05D310C90"
+      },
+      "library-selection-fix-library-r03.log": {
+        "bytes": 21751,
+        "sha256": "9A01B4E197808ABF3B4F885614055EA1FA0B8492F75B1EA202F095ED1252E6E0"
+      },
+      "library-selection-fix-translations-r01.log": {
+        "bytes": 3188,
+        "sha256": "556F35BD0FA0A9936E9EAAC13B97AC259230A6DEECB22914B4CE802C638648B8"
+      },
+      "library-selection-fix-model-r01.log": {
+        "bytes": 7350,
+        "sha256": "49DB2385E1686D236334E7AF282BCAD4E0649396895791DD51B08BCA7302FC9C"
+      },
+      "library-selection-fix-host-plan-r01.json": {
+        "bytes": 121,
+        "sha256": "D6DFF5C5DC5714EA40E8A41A6B4EE5274525E921BDC473E231C5BD9058905E0C"
+      }
+    },
+    "unsuccessful_initial_reproducer": "red-r01 is one passing2row attempt on old behavior. It did not force an8reply partial refresh and is preserved as an unsuccessful reproducer, not claimed red evidence.",
+    "meaningful_red": "red-r02 old implementation fails exactly at Lua assertion: a partial translation refresh replaced the player selected research. Nine subjects force a refresh before the retained target reply.",
+    "real_model_control": "The committed test removes the presentation-model preload/cache so real filtering/detail logic executes. It establishes two translated matches, selects the translation-only target, leaves/returns Research, checks identity before/after partial8reply refresh, completes target reply and checks visible selected label. A further completed nonmatch must select the remaining visible subject. Queue/current/progress/native research witnesses remain unchanged.",
+    "raw_fallback_control": "Both missing and nil-refusing native request APIs must return a selected visible raw-ID fallback with zero issued requests.",
+    "corrected_log_readback": {
+      "Library": 117,
+      "translations": 18,
+      "model": 40,
+      "statuses": "All named logs end OK. Existing warm/cold/foreign/stale cases remain in the Library log."
+    },
+    "reviewer_rerun": false,
+    "host_provenance_limit": "Logs were read/rehashed, not independently rerun. The121byte host-plan file is a retained PowerShell object display with controls=System.Object[] rather than a decoded execution inventory; it supplies no native acceptance or additional scenario proof. Required exact-head CI remains independently enforced."
+  },
+  "history_and_evidence_custody": {
+    "author_rendered_changelog_pair": "Exactly one matching bullet added in source11. Removing it from each raw Git file produces the entire parent file byte-for-byte, preserving all authored older history.",
+    "EN_committed_review_sha256": "B16B4C9610A6DA8260009263E0C6832369419ABE4F7AE818DA85BEFA4ED44FFB",
+    "DE_committed_review_sha256": "15D9A60FD1103CF0D042CFFB436F4F72CC667C141FFC0024457BCC09504420A7",
+    "both_committed_reports_verbatim_equal_primary_originals": true,
+    "progress_fidelity": "Keeps EN repair wrong-scope predicate unmet, DE product-selection adverse, positive named observations, autosave/missing-lifecycle limits and independent original package identities. Source/host correction is not described as a corrected native pass.",
+    "CI": "Task packet says fixed-head full CI running. This review did not claim or independently read back CI completion."
+  },
+  "minimal_affected_native_acceptance": {
+    "required_corrected_result": "Bind an exact newly composed corrected player ZIP/tree to the existing one-client owner and unchanged engine/save/profile/actors/resources. Repeat the observed DE sequence: real Akku search, select worker battery, Queue/Debug/Settings with positive Brems query, return Research and require retained worker identity/detail with same query/two rows. Preserve result/receipt/PNG/retirement/control restoration under a new exact identity; fixed7441 adverse stays intact.",
+    "narrow_complement": "An EN battery raw-name/query tab-return readback is the narrow complementary visible check for this broader nonempty-query guard/dispatch ordering. It can use the existing serial one-client flow; no new actor, synthetic engine events, simultaneous-client or generic campaign is required.",
+    "exports": "The prepared old7441 three-export packet remains useful only under its original identity. Its codec/file writers are unchanged by this diff, but executing it does not establish the new player Library renderer/retention. Any corrected-player final UI/export claim must name the actually consumed corrected package and applicable actual smoke.",
+    "unrelated_results": "Only Library rendering/translations plus changelog player members differ. Closed/headless earned lab, native effects, API consumers and active-work results retain their original identities and can be considered for consumed-path reuse; this fix alone does not demand rerunning every historical/gameplay/performance case. It does not promote those results to a new whole-package qualification.",
+    "not_closed": [
+      "Corrected-package native retention",
+      "Required exact-head CI completion/normal checked merge",
+      "Remaining Library exports/filters/lifecycle/foreign controls and simultaneous clients",
+      "Whole-product/Library performance",
+      "Stable/release acceptance"
+    ]
+  },
+  "limits": [
+    "This is source acceptance of a bounded correction with meaningful existing host evidence, not an executable-packet GO or gameplay/native result.",
+    "No new native callback-order observation was invented: the preserved DE failure remains the actual incident, and the partial-reply host test is a separate source reproducer.",
+    "No reviewer changes to fixed7441, originals, previous reports/logs, source/tests or controller safeguards.",
+    "Required workspace health scan ran before this output (bounded read-only, statusattention); no cleanup or evidence deletion performed."
+  ]
+}
