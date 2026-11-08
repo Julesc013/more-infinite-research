@@ -155,5 +155,10 @@
     "record": "spec/evidence/candidate510-settings-cap-applicability-aero-r01.json",
     "component": "C503-configured-native-cost-time-effect-with-foreign-reward",
     "scope": "Later independent acceptance of the original named native case only; current-candidate applicability remains separately bounded. Original observations and pending marker are preserved."
+  },
+  "unknown_cost_fallback_independent_review_followup": {
+    "record": "spec/evidence/candidate503-fallback-native-aero-review-r01.json",
+    "component": "C503-unknown-native-cost-with-uncovered-public-residual-research",
+    "scope": "Later independent review accepts the original fresh named residual lab/save/two-cold component only. Original observations/pending marker/adverse remain unchanged; current source/runtime applicability is separate."
   }
 }
