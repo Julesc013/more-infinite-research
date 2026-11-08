@@ -73,6 +73,17 @@ local function close(left, right)
     and math.abs(left - right) <= EFFECT_TOLERANCE
 end
 
+-- The authored metadata retains Lua doubles. Native productivity effects use
+-- EffectValue's four-decimal truncation and are exposed as float at runtime.
+-- Admit that conversion only; signed-pair and main/carrier equality retain
+-- their existing checks and no saved contribution is inferred or rewritten.
+local function native_effect_change_matches(actual, expected)
+  if close(actual, expected) then return true end
+  local tolerance = math.max(EFFECT_TOLERANCE, math.abs(expected) * 2 ^ -24)
+  local truncated = math.floor(expected * 10000 + EFFECT_TOLERANCE) / 10000
+  return actual >= truncated - tolerance and actual <= expected + tolerance
+end
+
 local function integer(value)
   return type(value) == "number" and value == value
     and value ~= math.huge and value ~= -math.huge and value == math.floor(value)
@@ -199,7 +210,7 @@ local function inspect_with_mask(force, descriptor, scope)
       or negative_scalar == nil or not close(negative_scalar, -positive_scalar) then
     return nil
   end
-  if descriptor.collected and not close(positive_scalar, descriptor.change) then return nil end
+  if descriptor.collected and not native_effect_change_matches(positive_scalar, descriptor.change) then return nil end
   local positive_completed = completed_infinite(positive)
   local negative_completed = completed_infinite(negative)
   if positive_completed == nil or negative_completed == nil then return nil end
@@ -228,6 +239,74 @@ local function inspect_with_mask(force, descriptor, scope)
   }
 end
 
+-- Error-path-only observation; no state/level writes or broad scans.
+local function family_failure_detail(force, descriptor, scope)
+  local function text(value)
+    local kind = type(value)
+    if kind == "string" then
+      local escaped = value:gsub("[%z\1-\31\127-\255]", function(c)
+        return string.format("\\x%02X", string.byte(c))
+      end)
+      if #escaped > 180 then escaped = escaped:sub(1, 177) .. "..." end
+      return string.format("%q", escaped)
+    end
+    if kind == "number" or kind == "boolean" or value == nil then return tostring(value) end
+    return "<" .. kind .. ">"
+  end
+  local fields = {}
+  local function add(name, value) fields[#fields + 1] = name .. "=" .. text(value) end
+  add("family", descriptor.family)
+  add("recipe", descriptor.recipe)
+  add("force", force and force.index)
+  add("expected_change", descriptor.change)
+  add("scope_valid", scope and scope.valid)
+  if scope and scope.values then add("main_recipe_change", scope.values[descriptor.recipe]) end
+  local technologies = force and force.technologies
+  for _, part in ipairs({{"main", descriptor.main_id}, {"positive", descriptor.positive_id},
+      {"negative", descriptor.negative_id}}) do
+    local label, id = part[1], part[2]
+    local technology = technologies and technologies[id]
+    add(label .. ".id", id)
+    if technology == nil then
+      add(label .. ".present", false)
+    elseif technology.valid == false then
+      add(label .. ".valid", false)
+    else
+      add(label .. ".name", technology.name)
+      add(label .. ".level", technology.level)
+      add(label .. ".researched", technology.researched)
+      local prototype = technology.prototype
+      if prototype == nil then
+        add(label .. ".prototype", "missing")
+      elseif prototype.valid == false then
+        add(label .. ".prototype_valid", false)
+      else
+        add(label .. ".prototype_name", prototype.name)
+        add(label .. ".first", prototype.level)
+        add(label .. ".max", prototype.max_level)
+        add(label .. ".hidden", prototype.hidden)
+        add(label .. ".enabled", prototype.enabled)
+        add(label .. ".visible_disabled", prototype.visible_when_disabled)
+        local effects = prototype.effects
+        add(label .. ".effects_type", type(effects))
+        if type(effects) == "table" then
+          add(label .. ".effects_count", #effects)
+          if label ~= "main" then
+            local effect = effects[1]
+            if type(effect) == "table" then
+              add(label .. ".effect_type", effect.type)
+              add(label .. ".recipe", effect.recipe)
+              add(label .. ".change", effect.change)
+            end
+          end
+        end
+      end
+    end
+  end
+  return "MIR native family credit has invalid main or carrier [MIR-FAMILY-CREDIT "
+    .. table.concat(fields, "; ") .. "]"
+end
+
 local function family_observations(force)
   local out, scopes = {}, {}
   for _, descriptor in ipairs(DESCRIPTORS) do
@@ -249,7 +328,7 @@ local function family_observations(force)
         scopes[descriptor.main_id] = scope
       end
       local observation = inspect_with_mask(force, descriptor, scope)
-      if observation == nil then error("MIR native family credit has invalid main or carrier: " .. descriptor.key, 3) end
+      if observation == nil then error(family_failure_detail(force, descriptor, scope), 3) end
       out[#out + 1] = observation
     end
   end

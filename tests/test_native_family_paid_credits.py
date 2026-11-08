@@ -5,6 +5,7 @@ save, renderer or scientific-work qualification follows from these controls.
 """
 import argparse
 import json
+import struct
 from pathlib import Path
 import sys
 import unittest
@@ -99,6 +100,120 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
           end
           reload_credits()
         ''')
+
+    def test_native_effect_precision_on_init_across_all_five_families(self):
+        # Runtime change is float; prototype EffectValue truncates beyond four
+        # decimals. The .56789 -> .5678 pair is the literal API-doc example.
+        # Adjacent legal effect quanta must still fail, including near1000.
+        cases = [(str(v), v, v, True) for v in (.1, .17, .25, .3, .7, 1.17, 3.3)]
+        cases += [
+            ("four-decimal-example", .56789, .5678, True),
+            ("different-effect", .3, .31, False),
+            ("zero", .3, 0, False),
+            ("negative", .3, -.3, False),
+            ("one-quantum-low", .3, .2999, False),
+            ("one-quantum-high", .3, .3001, False),
+            ("below-truncated", .56789, .5677, False),
+            ("above-truncated", .56789, .5679, False),
+            ("large-valid", 999.1, 999.1, True),
+            ("large-quantum-low", 999.1, 999.0999, False),
+            ("large-quantum-high", 999.1, 999.1001, False),
+        ]
+        families = ("research_low_density_structure", "research_plastic",
+                    "research_processing_unit", "research_rocket_fuel", "research_steel")
+        for target in ("f200", "f210"):
+            for family in families:
+                for name, authored, native, wanted in cases:
+                    with self.subTest(target=target, family=family, case=name):
+                        self.setUp()
+                        self.lua.globals().case_family = family
+                        self.lua.globals().case_target = target
+                        self.lua.globals().authored_change = authored
+                        self.lua.globals().native_change = struct.unpack("<f", struct.pack("<f", native))[0]
+                        self.lua.execute(r'''
+                          GROUPS={[case_family]={{recipe="multi-native",change=authored_change}}}
+                          reload_credits(nil,case_target)
+                          local force=make_collected_force(1,1,{[key(case_family,"multi-native")]=true})
+                          for _,d in ipairs(native_credit_definitions.collected_descriptors(GROUPS))do
+                            force.technologies[d.main_id].prototype.effects[1].change=native_change
+                            force.technologies[d.positive_id].prototype.effects[1].change=native_change
+                            force.technologies[d.negative_id].prototype.effects[1].change=-native_change
+                          end
+                          local foreign=force.technologies.foreign
+                          foreign.saved_progress=.27
+                          local queue={foreign};force.research_queue=queue
+                          observed_ok,observed_error=pcall(native_credits.on_init)
+                          assert(force.research_queue==queue and queue[1]==foreign
+                            and foreign.saved_progress==.27 and foreign.level==3)
+                          if not observed_ok then
+                            assert(storage.mir_native_credits==nil,"failed preflight wrote storage")
+                            for _,state in pairs(force._states)do
+                              assert(state.writes.level==0 and state.writes.enabled==0,
+                                "failed preflight wrote native state")
+                            end
+                          end
+                          no_foreign_write(force)
+                        ''')
+                        self.assertEqual(wanted, self.lua.globals().observed_ok,
+                                         str(self.lua.globals().observed_error))
+
+    def test_native_precision_keeps_paid_credit_and_foreign_partial_work(self):
+        for family in ("research_low_density_structure", "research_plastic",
+                       "research_processing_unit", "research_rocket_fuel", "research_steel"):
+            with self.subTest(family=family):
+                self.setUp()
+                self.lua.globals().case_family = family
+                self.lua.globals().native_change = struct.unpack("<f", struct.pack("<f", .3))[0]
+                self.lua.execute(r'''
+                  GROUPS={[case_family]={{recipe="multi-native",change=.3}}};reload_credits()
+                  local force=make_collected_force(1,1,{[key(case_family,"multi-native")]=true})
+                  local d=native_credit_definitions.collected_descriptors(GROUPS)[1]
+                  local main=force.technologies[d.main_id]
+                  local positive,negative=force.technologies[d.positive_id],force.technologies[d.negative_id]
+                  main.prototype.effects[1].change=native_change
+                  positive.prototype.effects[1].change=native_change
+                  negative.prototype.effects[1].change=-native_change
+                  local foreign=force.technologies.foreign;foreign.saved_progress=.27
+                  local queue={foreign};force.research_queue=queue
+                  native_credits.on_init();advance(force,d.main_id,4,false)
+                  local earned=3*native_change
+                  set_mask(force,{},true);native_credits.on_configuration_changed()
+                  assert(record(force,case_family,"multi-native").offset==3)
+                  assert(positive.level==4 and negative.level==1 and main.level==4)
+                  close((positive.level-negative.level)*positive.prototype.effects[1].change,earned)
+                  set_mask(force,{[key(case_family,"multi-native")]=true})
+                  main.prototype.effects[1].change=native_change
+                  native_credits.on_configuration_changed()
+                  assert(record(force,case_family,"multi-native").offset==0)
+                  assert(positive.level==1 and negative.level==1 and main.level==4)
+                  close((main.level-1)*main.prototype.effects[1].change,earned)
+                  assert(force.research_queue==queue and queue[1]==foreign and foreign.saved_progress==.27)
+                  no_foreign_write(force)
+                ''')
+
+    def test_invalid_family_error_is_printable_and_preserves_preflight(self):
+        self.lua.execute(r'''
+          GROUPS={research_low_density_structure={{recipe="multi-native",change=.3}}};reload_credits()
+          local force=make_collected_force(1,1,{[key("research_low_density_structure","multi-native")]=true})
+          local d=native_credit_definitions.collected_descriptors(GROUPS)[1]
+          force.technologies[d.main_id].prototype.effects[1].change=.31
+          force.technologies[d.positive_id].prototype.effects[1].change=.31
+          force.technologies[d.negative_id].prototype.effects[1].change=-.31
+          local ok,message=pcall(native_credits.on_init)
+          assert(not ok and storage.mir_native_credits==nil)
+          for _,state in pairs(force._states)do
+            assert(state.writes.level==0 and state.writes.enabled==0)
+          end
+          no_foreign_write(force)
+          observed_error=tostring(message)
+        ''')
+        message = self.lua.globals().observed_error
+        self.assertIn('family="research_low_density_structure"', message)
+        self.assertIn('recipe="multi-native"', message)
+        self.assertIn("expected_change=0.3", message)
+        self.assertIn("positive.change=0.31", message)
+        self.assertNotIn("\0", message)
+        self.assertLess(len(message), 8000)
 
     def test_two_histories_keep_distinct_paid_masks_at_identical_destination(self):
         self.lua.execute(r'''
