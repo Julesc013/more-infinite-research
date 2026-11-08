@@ -17708,13 +17708,20 @@
               "existing_result": "Resolved record retains117pinned-Lua52 host passes plus named broken opponents; API Alpha/Beta native and research-tab multiplayer observations have distinct scopes.",
               "steps": [
                 "Establish a nonempty Research query and snapshot native research/queue state.",
-                "Call more-infinite-research-browser.open(player_index,{tab=\"settings\",search=\"repair\"}); observe the Settings input and actual filtered rows while the Research query is unchanged.",
+                "Call more-infinite-research-browser.open(player_index,{tab=\"settings\",settings_scope=\"options\",search=\"repair\"}); observe the Settings input and actual nonempty filtered rows and the Other options scope label while the Research query is unchanged.",
                 "With Settings retained, call open(player_index,{search=\"default\"}); observe the new Settings input/filtered rows and unchanged Research query.",
                 "Return to Research; verify its earlier query and native research/queue state are unchanged. Record actual package/controller/player/engine and relevant client identity."
               ],
               "native_owner": "Black Glass",
               "independent_review": "Aero",
-              "status": "native-not-observed; source-and-host-only-correction"
+              "status": "native-not-observed; source-and-host-only-correction",
+              "prepared_options_scope_correction_r01": {
+                "evidence": "tests/fixtures/library-legacy-settings-search/README.md",
+                "prepared_commit": "f4c2b9fb129a6f4cd9fe1c8a75cd83efa4cce4f3",
+                "independent_oracle": "Authored historical_settings.options assigns passive repair to Other options; actual Library filtering observes repair>0 only in Options and repair=0 in Research. Separate non-author review accepted the corrected helper and its per-phase displayed scope assertion.",
+                "superseded_prepared_step": "Call more-infinite-research-browser.open(player_index,{tab=\"settings\",search=\"repair\"}); observe the Settings input and actual filtered rows while the Research query is unchanged.",
+                "scope": "Correct the prepared input only. Preserve the original English zero-result native predicate, original green mock-only helper result and all unfinished native/stable gates. This update does not imply that the helper has been integrated or executed natively."
+              }
             }
           ],
           "current_dispatch_input_boundary": {
