@@ -128,11 +128,14 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                         self.setUp()
                         self.lua.globals().case_family = family
                         self.lua.globals().case_target = target
+                        self.lua.globals().case_base = "2.0.77" if target == "f200" else "2.1.23"
+                        self.lua.globals().case_mir = "5.0.20011" if target == "f200" else "5.0.21011"
                         self.lua.globals().authored_change = authored
                         self.lua.globals().native_change = struct.unpack("<f", struct.pack("<f", native))[0]
                         self.lua.execute(r'''
                           GROUPS={[case_family]={{recipe="multi-native",change=authored_change}}}
-                          reload_credits(nil,case_target)
+                          reload_credits({base=case_base,["space-age"]=case_base,
+                            ["more-infinite-research"]=case_mir},case_target)
                           local force=make_collected_force(1,1,{[key(case_family,"multi-native")]=true})
                           for _,d in ipairs(native_credit_definitions.collected_descriptors(GROUPS))do
                             force.technologies[d.main_id].prototype.effects[1].change=native_change
