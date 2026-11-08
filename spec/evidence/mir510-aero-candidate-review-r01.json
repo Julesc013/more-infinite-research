@@ -100,5 +100,17 @@
     "saved_state_qualification": false,
     "full_release_qualification": false,
     "published": false
+  },
+  "prior_native_source_comparison": {
+    "original_receipt": "spec/evidence/mir509-reassessment-worker-native-r01.json",
+    "original_source_commit": "cf7fa0c54dab33735e38abe5ed450a6f79c1de5e",
+    "current_candidate_commit": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+    "changed_player_files": [
+      "source/changelog.txt",
+      "source/info.json",
+      "source/platform/target.lua"
+    ],
+    "observation": "All gameplay construction, runtime and migration Lua modules match the original controlled native source; distribution literal changed5.0.21009 to5.0.21010 and changelog/info metadata changed.",
+    "limit": "Original native evidence retains its original engine2.1.24, source/package/controller/profile and synthetic provider identity. This source comparison creates no new native result, no F200/SIF/reporter qualification, and no exact final10 package claim."
   }
 }
