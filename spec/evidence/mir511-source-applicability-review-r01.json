@@ -1,0 +1,119 @@
+{
+  "schema": 1,
+  "kind": "MIR511SourceMetadataAndConsumedPathApplicabilityReviewV1",
+  "reviewer": "/root/native_owner510_review",
+  "role": "independent non-author read-only source review",
+  "verdict": "ACCEPTED exact four-file metadata change and scoped consumed-path reuse; exact11 package/native/Library and required CI gates remain separate",
+  "candidate": {
+    "pull_request": 1832,
+    "head": "706dd02cc86993cd4d20b769aca85f2a661ea786",
+    "parent": "182f4ad6d8e87cbfd0ff330096f7f3482913c509",
+    "source_tree": "4bcdf2b89d63d38fe6cb0b66840a83096a56dd0c",
+    "parent_source_tree": "2487ba5ad1d2ba32b4bf48821bbb8bd078d5e64d",
+    "published10_tag_commit": "958e34dd2701418c71f74ae094c26ff7cd467e6b",
+    "published10_source_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+    "checkout_clean_and_head_parent_verified": true,
+    "maturity": "unpublished private source11 candidate; no stable or delivery verdict"
+  },
+  "exact_metadata_delta": {
+    "files": [
+      {"path": "CHANGELOG.md", "bytes": 126497, "sha256": "18CA44F88AC99D40C0D77180D0C571523F2E04FCF2D291B9879E0028053B9AC6"},
+      {"path": "source/changelog.txt", "bytes": 136872, "sha256": "3BB44550F0E06DCA459AC89712704773F70558B329A28AEBCD1C6C6FA248D5E9"},
+      {"path": "source/info.json", "bytes": 813, "sha256": "33935388EDF41F01BCFB8E4FF01D4A1DFE517AD4C7B2F3CB9BEA8059B49E80C4"},
+      {"path": "source/platform/target.lua", "bytes": 502, "sha256": "E9D80434560AC9AFD9BB58D5063AD7053A1127195BA3AF63AACD32BD7F0A0524"}
+    ],
+    "other_changed_files": [],
+    "versions": "info.version and target.distribution_version both5.0.21011; authored/generated current history both5.0.11 dated2026-11-09. Numeric codec21011 retains edition210 and source patch11.",
+    "history": "Independent raw-Git comparisons establish exact prior authored preamble/history preservation and source/changelog.txt ending with the entire unchanged prior changelog. Exactly one new source11 entry is added to each history.",
+    "preserved": "After substituting only the distribution version, info JSON and target.lua equal the parent. Base floor2.1.23, two-part factorio_version2.1, target capabilities, package name, dependency IDs, technology/settings/API identities, target records and migration filenames/bodies remain unchanged.",
+    "caller_consistency": "Unchanged tools/release.py derives source5.0.11/v5.0.11/MIR5.0.11 from info5.0.21011, checks the source changelog header and exact target-version agreement, and preserves per-edition codec generation. This review reads those paths without building assets.",
+    "validation_limit": "Root reports37 narrow controls (changelog6/package17/pinned Lua5.2 targets14), formatter freshness, static and whitespace checks passed; required CI was running in the supplied task. Reviewer did not rerun tests/builds or verify a later CI result."
+  },
+  "published10_to_parent_scope": {
+    "changed_source_files": 52,
+    "locale_files": 50,
+    "locale_proof": "Every changed locale has unchanged line count and exactly one changed line: the value of more-infinite-research.direct_effect. EN and DE remove obsolete active-lab science advice while retaining the repeatable-bonus description.",
+    "lua_files": ["source/compatibility/modern_catalogue.lua", "source/research/modern.lua"],
+    "lua_proof": "Selection adds the private bob_angel_disabled_water_gate fact only after is_bob_angel. That selector requires the exact F200 no-BobTech Bob/Angel closure, including bobplates and angelssmelting. The constructor only enters its new finite prerequisite check when this fact is true. Non-BA selection yields false and skips the new loop; there is no changed prototype write on these paths.",
+    "inactive_for_named_profiles": "Read actual worker Base and SIF/worker Space Age profiles, the accepted F200 SIF entry closure, all four repair/agriculture candidate profiles and the seven-mod configured-steel result. None contains the Bob/Angel pair/closure. Plain Base/Space Age API profiles likewise lack it. The F210 target independently excludes the F200-only selector.",
+    "boundary": "This proves inactivity for these named non-BA profiles, not for arbitrary mod combinations or the changed F200 Bob/Angel admission itself. Its accepted prior review/controls retain their own scope."
+  },
+  "version_consumers_reviewed": [
+    {
+      "paths": ["source/api/v1/data.lua:300", "source/api/v1/runtime.lua:23"],
+      "effect": "get_version().product changes to5.0.21011; API major/minor and capabilities/method code do not change. Current API/SDK controls derive the expected product from info.json; fixed historical-opponent values remain deliberate."
+    },
+    {
+      "paths": ["source/runtime/settings_profile.lua:12", "source/runtime/settings_commands.lua:61", "source/runtime/diagnostics.lua:34"],
+      "effect": "Settings exports, API export metadata and diagnostic MIR/mod-version fields observe script.active_mods and must report11 for an11 package. Old expected strings and package bindings are not reusable unchanged."
+    },
+    {
+      "paths": ["source/runtime/lifecycle.lua:538", "source/runtime/native_gun_credits.lua:176", "source/runtime/legacy_module_credits.lua:46", "source/runtime/legacy_cannon_credits.lua:36"],
+      "effect": "Existing destination guards compare event.new_version, actual active MIR version and target.distribution_version. Coherent target/info11 preserves that equality; the guards are not inert labels and their historical-origin predicates remain binding."
+    },
+    {
+      "paths": ["source/runtime/worker_robot_storage.lua:90", "source/runtime/native_credits.lua:401", "source/runtime/bootstrap.lua:349"],
+      "effect": "Worker first-install/new-version equality and the5.0.210xx destination pattern admit coherent11 without changing route ownership. Named SIF legacy context accepts the5.0.200xx destination pattern while retaining exact old version, unchanged-other-mod and unchanged-settings requirements. Existing valid credit/worker ledgers remain the ordinary path. Changing10 to11 invokes the real configuration callback and is not itself a native upgrade result."
+    }
+  ],
+  "consumed_code_identity": {
+    "published10_and_head_runtime_tree": "c74f6ebca127d36dd355fd6cf27eb48ed58b55ad",
+    "published10_and_head_api_tree": "e707b13432a2a9c85713943e158b9a71eb9fc933",
+    "all_runtime_api_override_settings_and_migration_bodies_unchanged": true,
+    "important_unchanged_payloads": {
+      "source/api/v1/data.lua": "9CCDD2B5FFBE14156D002F50ECEB9799F70124CADA0A0A3767D84CA242413FA5",
+      "source/api/v1/runtime.lua": "5FA121E602EF99CC67DAE4C1E17C5334A8FB26BBEF97F00BF0AE9AE242D9C873",
+      "source/runtime/bootstrap.lua": "5FA06DB840E7525F09CF64FC2FC29EF70842B21CD48F8847FF4AB32932AE3AD5",
+      "source/runtime/native_credits.lua": "AD2EDCFD06DE2CB394501598F9A6A418C8FDA2CBAC89D139D1325C267FE857E2",
+      "source/runtime/worker_robot_storage.lua": "D85F40AFC20EECFA45C8F8D95B77DD61F10FFF7E95CAAC616A3D04C78EB0130E",
+      "source/runtime/library.lua": "9F723536A375DA72360351B626FAB19E35CAC05BD5BDD6F035F382A36D17338A",
+      "source/runtime/scripted_effects.lua": "A4018142388F74050D51BF2E324A93972F4791363CDF72618478F7D03C3C271A"
+    }
+  },
+  "scoped_reuse_decisions": [
+    {
+      "component": "Named worker Base/SIF Space Age data, useful lab, first-add/provider-earned and cold endpoints",
+      "evidence": "spec/evidence/candidate510-affected-native-r01.json",
+      "evidence_sha256": "3E2B9913183BF89EB6777414D732D87461DCFD1E083E579ACEA8B9B580FE446B",
+      "decision": "Reuse the original bounded worker/SIF semantics under original8e5/C625/controller/engine identities. The BA branch is inactive and worker/science/runtime implementations are unchanged. Do not rename these executions11, infer arbitrary provider changes, or treat them as an11 package/configuration test."
+    },
+    {
+      "component": "MIR-only4.7.20003 to5.0.20010 SIF entry/save/two-cold boundary",
+      "evidence": "spec/evidence/sif510-entry-boundary-native-chain-r01.json",
+      "evidence_sha256": "D4150222ACA15398682ACA352F3AFE7B79660C60A1A2FB72F7B2A4734001FD27",
+      "decision": "Reuse the reviewed seeded paid-mask/state-preservation behavior as unchanged-component evidence. The exact11 destination satisfies the same destination family but has not been executed here. Preserve the observer-byte-variant caveat, pre-MIR enabled-flag limits and original changed-observer refusal."
+    },
+    {
+      "component": "Repair/agriculture1,32,128 active-work comparison",
+      "evidence": "spec/evidence/runtime510-active-analysis-native-chain-r01.json",
+      "evidence_sha256": "6A2973014AAFC9FFE916418CB573BFE51FAF5BD623D69B87DEAA3A907CA3C6BD",
+      "decision": "Carry the accepted complete10 active-component evidence and its exact limits forward by consumed-path review: timed runtime bodies, physical effects/settings and relevant non-BA construction are unchanged. No repeat of68 observations is justified solely by this delta. Original timing/memory numbers remain measurements ofC625/10, not newly measured11 values or whole-product/Library performance."
+    },
+    {
+      "component": "Documented API1.0 data/runtime methods and query isolation",
+      "evidence": "spec/evidence/candidate510-api-method-applicability-aero-r01.json",
+      "evidence_sha256": "A83A31E2923605A245424927DF491BDBE0FD32082E42BE4B7BD38A3BF2F41244",
+      "decision": "Reuse the original qualified method semantics and read-only boundaries with the deliberate product-version response change. No duplicate N1/N2 campaign follows from unchanged methods. Version11 responses and exports need correct new expectations; this does not qualify whole bootstrap/save/client/Library paths."
+    },
+    {
+      "component": "Fresh configured-steel native tuple, save and two colds",
+      "evidence": "build/qualification/native-owner510-independent-result-review-r01.json",
+      "evidence_sha256": "F15DFE67FE3621A8554C81CCA8EB17301BD7F55C7B5844E8BBBF0D5105CBD250",
+      "decision": "Reuse the exact one-lab cost/time/science/native17percent/foreign7percent/private-holder evidence as unchanged-component proof. Non-BA common changes do not alter the tested steel construction. Keep the actualC625/10 and8B1F actor identities; its actor closure and owned observer exact=10 dependency make the old packet nondispatchable against11 unchanged."
+    }
+  ],
+  "precise_remaining_differences": [
+    "Required CI must pass on the actual reviewed/integration head. The37 reported local controls do not replace that gate.",
+    "Build/freeze/read back the exact committed11 artifacts before native or publication claims: root/info/changelog/target/version codec and unchanged floors/capabilities must agree. This review supplies no11 ZIP hash or native whole-source qualification.",
+    "Use the existing bounded final package/configuration smoke to demonstrate the real10-to11 on_configuration_changed boundary on a protected10 save, retaining relevant earned/progress/queue/foreign state, saving and cold checks. Do not recreate all historical origins or repeat all named gameplay/performance cases. Imported5.0.6 Library input alone is not evidence of a10-to11 save route; overlapping checks may share the intended endpoint.",
+    "The50 direct_effect values are consumed through native technology.localised_description and Library detail rendering (runtime/library.lua reads that description). Bind the new11 player/observer/profile, then perform the already planned EN/DE description/render/input checks. Verify version11 API/export/diagnostic fields where those existing actions expose them, rather than retaining10 literals.",
+    "The existing one-client4096MiB Library ownerC2F preparation remains a bounded next packet requiring its actual composition/guards. It does not inherit the blocked7168MiB two-client or simultaneous-client scope, and no reserve may be lowered to equate them."
+  ],
+  "source_defects_found": [],
+  "review_limits": [
+    "Static source/applicability review only; reviewer ran no tests, native engines or builds and wrote only this new report.",
+    "Original native results, adverse receipts, public5.0.10 bytes and published tag remain under their original identities; no historical record is rewritten.",
+    "No arbitrary modpack, changed BA branch native verdict, current11 GUI/client/performance measurement, stable acceptance, tag or publication is established.",
+    "The remaining differences use existing qualification work and gates; this report creates no general campaign, new framework or human permission gate."
+  ]
+}
