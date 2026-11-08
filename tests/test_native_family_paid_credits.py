@@ -855,6 +855,89 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
           no_foreign_write(force)
         ''')
 
+    def _published_473_sif_current_fixture(self):
+        self.lua.execute("GROUPS={}")
+        self._add_published_sif_recipients()
+        self.lua.execute(r'''
+          -- Default published paid amounts and identities come from the
+          -- independent retained fixture, not the destination's recipe scan.
+          for _,rows in pairs(GROUPS) do for _,row in ipairs(rows) do row.change=.1 end end
+          reload_credits({base="2.0.77",["elevated-rails"]="2.0.77",quality="2.0.77",
+            ["space-age"]="2.0.77",["space-is-fake"]="1.0.60",["cr-commons"]="1.0.27",
+            ["more-infinite-research"]="5.0.20010",
+            ["mir-fixture-mir5-sif-retained-manufacturing"]="0.5.0",
+            ["mir-fixture-mir5-active-mods-observer"]="0.1.0"},"f200")
+          sif_paid_rows={"research_low_density_structure","research_plastic",
+            "research_processing_unit","research_rocket_fuel","research_steel"}
+          local mask={}
+          for family,rows in pairs(GROUPS) do
+            for _,row in ipairs(rows) do mask[key(family,row.recipe)]=true end
+          end
+          sif_force=make_collected_force(1,1,mask,true)
+          for index,family in ipairs(sif_paid_rows) do
+            local id="recipe-prod-"..family.."-1"
+            sif_force._states[id].level=index+1
+            sif_force.technologies[id].saved_progress=index/10
+          end
+          sif_queue={sif_force.technologies.foreign,
+            sif_force.technologies["recipe-prod-research_plastic-1"]}
+          sif_force.research_queue=sif_queue;sif_force.current_research=sif_queue[1]
+          sif_event={mod_startup_settings_changed=false,mod_changes={
+            ["more-infinite-research"]={old_version="4.7.20003",new_version="5.0.20010"}}}
+          function assert_sif_paid_state_unchanged()
+            for index,family in ipairs(sif_paid_rows) do
+              local main=sif_force.technologies["recipe-prod-"..family.."-1"]
+              assert(main.level==index+1 and not main.researched and main.saved_progress==index/10)
+            end
+            assert(sif_force.research_queue==sif_queue and sif_force.current_research==sif_queue[1]
+              and sif_force.research_progress==.42,"paid queue/progress changed")
+            no_foreign_write(sif_force)
+          end
+        ''')
+
+    def test_473_sif_same_fixture_mir_only_event_preserves_all_eleven_paid_routes(self):
+        self._published_473_sif_current_fixture()
+        self.lua.execute(r'''
+          local plan=native_credits.preflight_family_transition(sif_event)
+          assert(next(storage)==nil,"preflight wrote MIR storage")
+          for _,state in pairs(sif_force._states) do
+            assert(state.writes.level==0 and state.writes.enabled==0,"preflight changed native state")
+          end
+          assert_sif_paid_state_unchanged()
+          native_credits.on_configuration_changed(sif_event,plan)
+          local count=0
+          for index,family in ipairs(sif_paid_rows) do
+            for _,row in ipairs(GROUPS[family]) do
+              count=count+1
+              close(own_contribution(sif_force,family,row.recipe),index*.1)
+              assert(record(sif_force,family,row.recipe).included==true,"published paid route lost")
+            end
+          end
+          assert(count==11,"published paid vector changed")
+          assert_sif_paid_state_unchanged()
+        ''')
+
+    def test_473_sif_first_paid_mask_refuses_changed_fixture_or_startup_inputs(self):
+        for opponent in ("fixture-version", "startup-settings"):
+            with self.subTest(opponent=opponent):
+                self.setUp()
+                self._published_473_sif_current_fixture()
+                self.lua.globals().sif_opponent = opponent
+                self.lua.execute(r'''
+                  if sif_opponent=="fixture-version" then
+                    sif_event.mod_changes["mir-fixture-mir5-sif-retained-manufacturing"]=
+                      {old_version="0.1.0",new_version="0.5.0"}
+                  else sif_event.mod_startup_settings_changed=true end
+                  local ok,message=pcall(native_credits.preflight_family_transition,sif_event)
+                  assert(not ok and tostring(message):find("unknown first paid mask",1,true),
+                    "changed inputs invented a first paid mask: "..tostring(message))
+                  assert(next(storage)==nil,"refusal wrote MIR storage")
+                  for _,state in pairs(sif_force._states) do
+                    assert(state.writes.level==0 and state.writes.enabled==0,"refusal changed native state")
+                  end
+                  assert_sif_paid_state_unchanged()
+                ''')
+
     def test_unknown_zero_completed_private_investment_cannot_invent_a_baseline(self):
         for kind in ("queued", "detached-partial"):
             with self.subTest(kind=kind):
