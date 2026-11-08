@@ -26,6 +26,23 @@
     "expanded_sif_policy_fixture_commit": "fcb364cda9229e1679fc6b6c8eff02323efabdab",
     "fixture_scope": "Private native-observer controllers are qualification inputs, not player-source content."
   },
+  "retained_native_custody": {
+    "original_manifest": {
+      "path": "build/qualification/mir510-native-custody-r01/MANIFEST.json",
+      "sha256": "fa2cf9c727f97c50686f9f7fd47f3c07d0f3d7f65c6f128a3e37ba0d8e48b502",
+      "files": 193,
+      "bytes": 176460726,
+      "status": "unchanged"
+    },
+    "all_science_addendum": {
+      "path": "build/qualification/mir510-native-custody-r01/ALL-SCIENCE-ADDENDUM.json",
+      "sha256": "91dda774554b447f8514990172ddb1d55b7c01661e7156a937ca072b48b04683",
+      "files": 23,
+      "bytes": 1722608,
+      "source_commit": "be6b06dba9a4338756737b569c6b55e2123e7161",
+      "status": "original paths retained and copies verified"
+    }
+  },
   "adverse_observations": [
     {
       "id": "published-509-worker-collision",
@@ -60,6 +77,18 @@
       "result_sha256": "9637d8341d28b8139c77278c3d5da1de844a046361f8f0bef5ca2369e91f1f50",
       "source_commit": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
       "finding": "The finite foreign route is retained while the affected final Space Is Fake output removes retired white science."
+    },
+    {
+      "id": "factorio-20077-space-is-fake-final-science",
+      "result": "build/qualification/mir510-sif-f200-result.json",
+      "result_sha256": "47ce4f27ecd28a4dd935f9394b6fb8cd338ad1a6dfcb96ff7ab0494b979f184b",
+      "source_commit": "86c5afa9b6895ddf0bbbe25e4bd7e95d2f340f2e",
+      "engine": "Factorio 2.0.77",
+      "mir_archive": {
+        "version": "5.0.20010",
+        "sha256": "36F2E9D8C01507C2CBDC01AFF6C87399B40A9E0646F40DEC1F82628F5F50CBAB"
+      },
+      "finding": "The configured-default SIF startup and final-science capture completes on the actual 2.0.77 engine for both named level-seven continuations after SIF retirement. It is data-stage output evidence only."
     },
     {
       "id": "verified-upstream-source-reconstruction",
@@ -124,7 +153,7 @@
       "result_sha256": "6bf78e49b0d528795511dbeb2b09d8f1fc28abd4d9cf2a5ed0bdcc7c8ebb603d",
       "controller_commit": "5b24c839f30081e20c621097f0576499ac5e89c2",
       "input_save_sha256": "D55F82E3176AB03F02A34B892781BC08CD97B4EAA401029EBAFEEF14CCBD458A",
-      "finding": "Before any test stimulus, the protected provider-only input retains provider level 7, foreign finite 4..7, bonus 7, retired-white-science state, and current progress 0.27. Corrected MIR is then first added, real MIR level 8 completes, and the output survives two byte-identical cold reloads."
+      "finding": "On first configuration addition of corrected MIR, the before-first-add marker is emitted after MIR admission and before the fixture deliberately queues the MIR level-8 lab. It retains provider level 7, foreign finite 4..7, bonus 7, retired-white-science state, and current progress 0.27; the intentional MIR level-8 lab then completes and the output survives two byte-identical cold reloads."
     }
   ],
   "sentinel_interpretation": "The 0.42 main and 0.27 unrelated-progress values in the native fixtures are controlled preservation sentinels, not science earned by the test. Only the explicitly recorded provider level-7 and MIR level-8 lab completions are gameplay-earned research witnesses.",

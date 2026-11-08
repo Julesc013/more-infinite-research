@@ -34,13 +34,15 @@ The earlier Space Is Fake behavior targeted a small continuation-name set, which
 
 The finite default, finite SIF, verified-upstream-source reconstruction, and provider-infinite data-stage captures pass for the accepted source. They show the expected finite handoff or external infinite owner; the source reconstruction is based on selected verified upstream blobs, not an official WorkerRobotCargoSizeResearch download and not the reporter's full modpack.
 
+The configured-default SIF capture also starts on actual Factorio 2.0.77 with Space Is Fake 1.0.60 and the 5.0.20010 package, and records final-science output for both named level-seven continuations after SIF retirement. It is a data-stage observation only, not a save or gameplay verdict.
+
 The expanded all-science and end-game-gate capture, driven by controller `fcb364cda9229e1679fc6b6c8eff02323efabdab`, checks 130 MIR-added technologies against the no-MIR upstream difference and reports no retired white science in the applicable final output. It is a Factorio data-stage observation, not a gameplay or save claim.
 
 The Base and combined SIF/worker native fixtures on Factorio 2.1.23 each complete a real MIR level-8 lab research, preserve foreign finite levels 4–7 with their +1 effect, and pass two byte-identical cold reloads. The combined fixture also witnesses the retired-white-science result.
 
 The expanded all-science plus space-gate native profile at reconciliation head `be6b06d` also completes real MIR level 8 to level 9/bonus 8, retains foreign finite levels 4–7, observes retired white science absent, and passes two byte-identical cold reloads.
 
-The provider-first boundary begins with controlled prerequisites only through provider level 6, then earns provider level 7 through a real biolab completion. That provider-only save passes two byte-identical cold reloads; adding corrected MIR first verifies the preserved state before test stimulus, then completes real MIR level 8 and again passes two byte-identical cold reloads.
+The provider-first boundary begins with controlled prerequisites only through provider level 6, then earns provider level 7 through a real biolab completion. That provider-only save passes two byte-identical cold reloads; on first configuration addition of corrected MIR, the preservation marker is emitted after MIR admission but before the fixture deliberately queues the MIR level-8 lab, which then completes and again passes two byte-identical cold reloads.
 
 The native values 0.42 and 0.27 are controlled progress-preservation sentinels, not earned science. The actual research witnesses are the explicitly recorded provider level-7 and MIR level-8 lab completions.
 
@@ -55,5 +57,7 @@ Those are preserved adverse controller results, not product pass/fail evidence. 
 The positive save route is an earned provider level 7 followed by first addition of corrected MIR; it does not claim safety for a provider add, removal, or change after MIR worker research is already earned. Existing 4.7.3 Linux native evidence remains evidence only for its original scope and is not relabelled as 5.0.10 coverage.
 
 The bounded follow-up is to retain source-level finite/infinite provider reproductions, one candidate-specific SIF-plus-provider normal-pipeline capture, and the small native first-add controller with exact fixture API/property checks. This is targeted regression maintenance, not a repository reorganisation or a new testing campaign.
+
+The original native custody manifest remains unchanged at 193 files and 176,460,726 bytes, SHA-256 `fa2cf9c727f97c50686f9f7fd47f3c07d0f3d7f65c6f128a3e37ba0d8e48b502`. Its all-science addendum retains and verifies 23 additional files totaling 1,722,608 bytes, SHA-256 `91dda774554b447f8514990172ddb1d55b7c01661e7156a937ca072b48b04683`.
 
 Before any GitHub prerelease, the reconciliation-head CI, frozen inventory and asset hashes, administration and immutability probes, staged-asset checks, anonymous download hash verification, and local `dist` custody must pass. Publication must remain a prerelease and must describe these boundaries accurately.
