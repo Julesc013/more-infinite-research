@@ -69,8 +69,10 @@ class IroncladF210PipelineTests(unittest.TestCase):
         lua.globals().startup_values = _lua_value(lua, startup or {})
         lua.execute(r'''
           mods, script, helpers, log = active_mods, nil, {}, function() end
-          settings = {startup = startup_values}
-          data = {raw = captured_raw}
+          -- Settings declarations have their own prototype registry. Only
+          -- configured values cross into the captured game-data world.
+          settings = nil
+          data = {raw = {}}
           emitted, publications = {}, 0
           function data:extend(rows)
             local technology = false
@@ -88,9 +90,11 @@ class IroncladF210PipelineTests(unittest.TestCase):
             for name in pairs(data.raw[kind] or {}) do declared_settings[name] = true end
           end
           for name in pairs(startup_values) do assert(declared_settings[name], "unknown startup setting " .. name) end
+          settings = {startup = startup_values}
           for _, spec in ipairs(require("research.settings").prototypes()) do
             if settings.startup[spec.name] == nil then settings.startup[spec.name] = {value = spec.default_value} end
           end
+          data = {raw = captured_raw, extend = data.extend}
           assert(loadfile(player_root .. "/data.lua"))()
           emitted, publications = {}, 0
           outcome, message = pcall(function() assert(loadfile(player_root .. "/data-final-fixes.lua"))() end)
@@ -133,6 +137,9 @@ class IroncladF210PipelineTests(unittest.TestCase):
                 expected = self.context["cases"][case_id]["expected"][row["name"]]
                 self.assertEqual(contract(expected), contract(row))
                 self.assertEqual(1, lua.globals().publications)
+                for kind in ("bool-setting", "int-setting", "double-setting", "string-setting"):
+                    self.assertIsNone(lua.globals().data.raw[kind],
+                                      "game data must not receive raw settings-stage prototypes")
 
     def test_configured_effect_cost_time_and_disabled_identity_keep_native_mortar_ratio(self):
         lua = self.stage("q118", startup={
