@@ -5,7 +5,7 @@ applies_to: "MIR development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-11-02
+last_reviewed: 2026-11-09
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -21,6 +21,8 @@ source_of_truth_for:
 Before retiring a real externally consumed old contract, record its consumers, preserved fields, explicit converter/adapter or documented major-version transition. Unconsumed previews retain their history and unresolved status without their platform being copied into the player mod. No new parallel `mep/` subsystem.
 
 This file freezes **MIR API 1.0.0** for MIR5. The [scoped qualification decision](evidence/api1-documented-subset-qualification-r01.json) reconciles actual F2002.0.77/D3 and F2102.1.23/8DC present-MIR boundary, physical/save and client evidence, exact original absence guards and combined host admission budgets. MIR5 betas are published; stable whole-product acceptance remains incomplete. The decision retains its original source, package and execution identities. Review the final candidate's consumed inputs before reusing those results; run affected documented methods and closures without restarting an unchanged API campaign.
+
+The [published5.0.10 method comparison](evidence/candidate510-api-method-applicability-aero-r01.json) verifies unchanged data/runtime API modules in both modern packages, unchanged registration helpers and a Generator change confined to duplicate diagnostics. It supports reuse of the original documented method semantics; changed bootstrap, saved-state and client paths remain subject to the existing affected lifecycle checks. It supplies no new native execution or stable verdict, and the final candidate still requires exact consumed-input readback.
 
 The native interface uses `api/v1/` and `more-infinite-research.api.v1`; this major-version boundary is independent of the product staging directory. It does not reuse the old `MIR4ApiResponseV1` wire contract. The supplied earlier pack's unversioned candidate paths are superseded before implementation; no deployed consumer compatibility is asserted. Product `5.0.0`, API `1.0`, target engine and SDK versions are distinct. Additive compatible capability changes can increment an API minor; changed meaning/removal requires a major transition. Preserve existing externally consumed identifiers where their audit establishes an obligation.
 
