@@ -12,6 +12,8 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import zipfile
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -793,6 +795,361 @@ class Current505GroundRuntimeBenchmarkAnalysisTests(unittest.TestCase):
         self.assertEqual(MODULE.CANDIDATE_LEAF, "more-infinite-research_5.0.21005.zip")
         MODULE.select_cohort("r06")
         self.assertEqual(MODULE.CANDIDATE_LEAF, "more-infinite-research_5.0.21000.zip")
+
+
+
+class Current510MixedRuntimeBenchmarkAnalysisTests(unittest.TestCase):
+    def setUp(self) -> None:
+        MODULE.select_cohort("current510-mixed")
+        self.plan = _plan()
+        self.profiles = MODULE._validate_plan(self.plan, MODULE.PLAN_SHA256)["profiles"]
+        self.frozen = MODULE._frozen_mixed_prerequisites()
+        self.old_plan = json.loads((ROOT / "spec/evidence/runtime505-active-plan-r02.json").read_bytes())
+        self.old_capture = self.frozen["original/active-seed-captures.json"]
+        self.old_pilot = self.frozen["original/active-marker-pilots.json"]
+        self.origins = self.frozen["candidate/original-origins.json"]
+        self.pilot = self.frozen["candidate/formal-marker-pilots.json"]
+        helpers = [{"path": row["path"], "raw_git_sha256": row["sha256"], "executed_sha256": row["sha256"], "bytes": 1}
+                   for row in self.old_plan["public_harness"]["git_blob_sha256"]]
+        self.mixed = {
+            "published": {
+                "plan": {"plan": self.old_plan, "sha256": MODULE._CURRENT505_GROUND_BINDINGS["PLAN_SHA256"],
+                         "source_revision": MODULE._CURRENT505_GROUND_BINDINGS["PLAN_REVISION"], "active_cohort": "current505-ground-r02"},
+                "raw_helper_stage": "D:/synthetic/old-stage", "raw_helpers": helpers,
+                "capture": {"path": "D:/synthetic/old-capture.json", "sha256": MODULE._CURRENT505_GROUND_BINDINGS["ACTIVE_SEED_CAPTURE_SHA256"], "record": self.old_capture},
+                "pilot": {"path": "D:/synthetic/old-pilot.json", "sha256": MODULE._CURRENT505_GROUND_BINDINGS["MARKER_PILOT_SHA256"], "record": self.old_pilot},
+            },
+            "candidate": {
+                "origins": {"path": "D:/synthetic/current-origins.json", "sha256": MODULE._CURRENT510_ORIGINS_SHA256, "record": self.origins},
+                "pilot": {"path": "D:/synthetic/current-pilot.json", "sha256": MODULE._CURRENT510_PILOT_SHA256, "record": self.pilot},
+            },
+        }
+        self.old_by_native = {row["native_result_path"]: row for row in self.old_capture["captures"] if row["arm"] == "published"}
+        self.original_read_json = MODULE._read_json
+
+    def tearDown(self) -> None:
+        MODULE.select_cohort("r06")
+
+    def _read_synthetic(self, path, limit, label):
+        if label != "published native result":
+            return self.original_read_json(path, limit, label)
+        row = self.old_by_native[str(path)]
+        return ({"source_head": MODULE._CURRENT505_GROUND_BINDINGS["PLAN_SOURCE"],
+                 "status": "passed-private-native-active-seed-preparation",
+                 "mir_archive": {"path": "D:/synthetic/player.zip", "sha256": MODULE.PUBLISHED_SHA256},
+                 "engine": {"path": "D:/synthetic/factorio.exe", "sha256": MODULE.ENGINE_SHA256},
+                 "profile": {"sha256": row["profile"]["sha256"]},
+                 "active_seed": {"sha256": row["active_seed"]["sha256"]},
+                 "active_preparation": {"marker": row["prepared_marker"]}}, "A" * 64)
+
+    def _patches(self):
+        return (
+            mock.patch.object(MODULE, "_verified_file", side_effect=lambda path, digest, label, size=None: Path(str(path))),
+            mock.patch.object(MODULE, "_validate_current510_origin", side_effect=lambda row, expected, profile, plan: row),
+            mock.patch.object(MODULE, "_verify_pilot_files"),
+            mock.patch.object(MODULE, "_read_json", side_effect=self._read_synthetic),
+            mock.patch.object(MODULE, "_validate_fixture_members"),
+        )
+
+    def _validated(self, mixed=None):
+        with self._patches()[0], self._patches()[1], self._patches()[2], self._patches()[3], self._patches()[4]:
+            return MODULE._validate_current510_mixed({"mixed_prerequisites": mixed or self.mixed}, self.profiles)
+
+    def test_frozen_plan_and_capsule_bind_distinct_original_identities(self) -> None:
+        self.assertEqual(len(self.profiles), 8)
+        self.assertEqual(len(self.frozen), 4)
+        captures, pilots, _ = self._validated()
+        self.assertEqual((len(captures), len(pilots)), (8, 8))
+        for change in (lambda p: p["candidate"]["f210_archive"].__setitem__("sha256", "0" * 64),
+                       lambda p: p["schedule"].__setitem__("total_launches", 67),
+                       lambda p: p["active_fixture_contract"]["repair"]["profiles"].append({})):
+            changed = copy.deepcopy(self.plan)
+            change(changed)
+            with self.assertRaises(MODULE.RuntimeBenchmarkAnalysisError):
+                MODULE._validate_plan(changed, MODULE.PLAN_SHA256)
+        self.assertEqual(MODULE.KIND, MODULE._CURRENT510_BINDINGS["KIND"])
+
+    def test_mixed_prerequisite_opponents_are_refused_without_metrics(self) -> None:
+        for label, mutate in {
+            "old-capture-hash": lambda x: x["published"]["capture"].__setitem__("sha256", "0" * 64),
+            "old-pilot-record": lambda x: x["published"]["pilot"]["record"]["observations"].pop(),
+            "old-harness": lambda x: x["published"]["raw_helpers"][0].__setitem__("executed_sha256", "0" * 64),
+            "new-origin-hash": lambda x: x["candidate"]["origins"].__setitem__("sha256", "0" * 64),
+            "new-source": lambda x: x["candidate"]["origins"]["record"]["rows"][0]["source_harness"].__setitem__("commit", "0" * 40),
+            "new-pilot-count": lambda x: x["candidate"]["pilot"]["record"]["observations"].pop(),
+            "new-pilot-controller": lambda x: x["candidate"]["pilot"]["record"]["private_controller"].__setitem__("revision", "0" * 40),
+        }.items():
+            with self.subTest(label=label):
+                altered = copy.deepcopy(self.mixed)
+                mutate(altered)
+                with self.assertRaises(MODULE.RuntimeBenchmarkAnalysisError):
+                    self._validated(altered)
+
+    def _synthetic_result(self):
+        captures, pilots, _ = self._validated()
+        provenance = MODULE._current510_row_provenance(captures)
+        for row in MODULE._active_rows():
+            if row["arm"] != "published":
+                scenario = "repair-active" if row["kind"] == "repair-stress" else "agriculture-active"
+                provenance[row["id"]]["canonical_profile_sha256"] = self.profiles[(scenario, row["tier"], row["arm"])]["sha256"]
+        schedule = _independent_schedule()
+        observations = []
+        MODULE.select_cohort("current505-ground")
+        try:
+            old_ref = {"record": self.old_capture}
+            for selected in schedule:
+                sample = _observation(self.old_plan, selected, old_ref)
+                scenario, tier, arm = selected["scenario"], selected["tier"], selected["arm"]
+                identifier = "repair-" + arm if scenario == "repair-active" else f"agriculture-{arm}-{tier}"
+                profile = self.profiles[(scenario, tier, arm)]
+                seed = captures[identifier]["active_seed"]
+                sample["profile"] = {"path": "D:/owned/pinned-source/" + profile["path"], "sha256": profile["sha256"]}
+                sample["archives"] = copy.deepcopy(pilots[identifier]["archives"])
+                sample["seed"].update({"source_path": seed["path"], "source_sha256": seed["sha256"], "owned_sha256": seed["sha256"], "bytes": seed["bytes"]})
+                for part in ("source", "owned"):
+                    sample["seed_integrity_after_sample"][part].update({"expected_sha256": seed["sha256"], "actual_sha256": seed["sha256"]})
+                sample["library_control_restoration"]["profile_sha256"] = profile["sha256"]
+                sample["library_control_restoration"]["selected"] = copy.deepcopy(pilots[identifier]["library_control_restoration"]["selected"])
+                sample["input_provenance"] = copy.deepcopy(provenance[identifier])
+                observations.append(sample)
+        finally:
+            MODULE.select_cohort("current510-mixed")
+        return {
+            "schema": 1, "kind": MODULE.RESULT_KIND, "status": "observed-not-performance-accepted",
+            "plan": {"path": MODULE.PLAN_PATH, "source_revision": MODULE.PLAN_REVISION, "sha256": MODULE.PLAN_SHA256},
+            "private_controller": {"revision": MODULE._CURRENT510_CONTROLLER_REVISION, "path": "Invoke-RuntimeBenchmark.ps1",
+                                   "raw_git_sha256": MODULE._CURRENT510_CONTROLLER_SHA256, "executed_sha256": MODULE._CURRENT510_CONTROLLER_SHA256,
+                                   "executed_matches_raw_git": True},
+            "raw_helper_source": {"revision": MODULE.PLAN_SOURCE, "stage_checkout_revision": MODULE.PLAN_REVISION,
+                                  "members": [{"path": row["path"], "raw_git_sha256": row["sha256"], "executed_sha256": row["sha256"], "bytes": 1}
+                                              for row in self.plan["public_harness"]["git_blob_sha256"]]},
+            "prepared_inputs_path": "runtime-benchmark-active-prepared.json", "prepared_inputs_sha256": "C" * 64,
+            "mixed_prerequisites": copy.deepcopy(self.mixed), "row_provenance": provenance,
+            "schedule": schedule, "observations": observations, "performance_qualification": False, "release_qualification": False,
+        }
+
+    def test_synthetic_68_scores_keep_original_math_and_refuse_mixed_opponents(self) -> None:
+        result = self._synthetic_result()
+        def analyze(value):
+            patches = self._patches()
+            with patches[0], patches[1], patches[2], patches[3], patches[4], mock.patch.object(MODULE, "_validate_current510_custody"), mock.patch.object(MODULE, "_verify_current510_controller_file"):
+                return MODULE.analyze(self.plan, MODULE.PLAN_SHA256, value, _hash(_encode(value)))
+        analysis = analyze(result)
+        self.assertEqual(analysis["kind"], "MIR510MixedActiveRuntimeAnalysisV1")
+        self.assertEqual(len(analysis["schedule"]), 68)
+        self.assertEqual(analysis["analysis_verdict"]["status"], "within-predeclared-limits")
+        self.assertFalse(analysis["claims"]["release_qualification"])
+        for label, mutate in {
+            "missing-score": lambda r: r["observations"].pop(),
+            "controller-head": lambda r: r["private_controller"].__setitem__("revision", "0" * 40),
+            "controller-bytes": lambda r: r["private_controller"].__setitem__("raw_git_sha256", "0" * 64),
+            "stage-head": lambda r: r["raw_helper_source"].__setitem__("stage_checkout_revision", "0" * 40),
+            "old-origin": lambda r: r["row_provenance"]["repair-published"].__setitem__("source_harness", "0" * 40),
+            "current-origin": lambda r: r["row_provenance"]["repair-candidate"].__setitem__("original_profile_sha256", "0" * 64),
+            "sample-provenance": lambda r: r["observations"][0]["input_provenance"].__setitem__("pilot_receipt_sha256", "0" * 64),
+            "sample-fixture": lambda r: r["observations"][0]["archives"].__setitem__("unexpected.zip", "A" * 64),
+            "sample-seed": lambda r: r["observations"][0]["seed"].__setitem__("source_sha256", "A" * 64),
+            "sample-physical": lambda r: r["observations"][0]["physical_markers"]["complete"]["witnesses"].__setitem__("pending_physical_work", True),
+        }.items():
+            with self.subTest(label=label):
+                altered = copy.deepcopy(result)
+                mutate(altered)
+                with self.assertRaises(MODULE.RuntimeBenchmarkAnalysisError):
+                    analyze(altered)
+        for row in result["observations"]:
+            if row["arm"] == "candidate":
+                row["timing"]["average_milliseconds_per_tick"] = 1000.0
+        self.assertEqual(analyze(result)["analysis_verdict"]["status"], "outside-predeclared-limits")
+
+    def test_current_controller_body_requires_explicit_hash_bound_file(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            controller = Path(directory) / "synthetic-controller.ps1"
+            controller.write_bytes(b"independent synthetic committed controller")
+            with mock.patch.object(MODULE, "_CURRENT510_CONTROLLER_SHA256", _hash(controller.read_bytes())):
+                MODULE._verify_current510_controller_file(controller)
+                with self.assertRaisesRegex(MODULE.RuntimeBenchmarkAnalysisError, "explicit retained controller"):
+                    MODULE._verify_current510_controller_file(None)
+                controller.write_bytes(b"different bytes")
+                with self.assertRaises(MODULE.RuntimeBenchmarkAnalysisError):
+                    MODULE._verify_current510_controller_file(controller)
+
+    def test_cli_requires_explicit_current_controller_before_reading_result(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            completed = subprocess.run([sys.executable, str(TOOL_PATH), "--cohort", "current510-mixed",
+                "--raw-plan", str(root / "absent-plan.json"), "--expected-plan-sha256", MODULE.PLAN_SHA256,
+                "--result", str(root / "absent-result.json"), "--expected-result-sha256", "A" * 64,
+                "--output", str(root / "output.json")], capture_output=True, text=True, check=False)
+            self.assertEqual(completed.returncode, 1)
+            self.assertIn("explicit retained controller", completed.stderr)
+            self.assertFalse((root / "output.json").exists())
+
+    def test_fixture_archive_members_are_exact_and_independent(self) -> None:
+        name, version = "mir-fixture-mir5-repair-stress", "0.2.1"
+        control, metadata = b"synthetic independent control", b"synthetic independent metadata"
+        plan = {"active_fixture_contract": {"repair": {"fixture_source_members": [
+            {"fixture": "repair-stress", "member": "control.lua", "sha256": _hash(control)},
+            {"fixture": "repair-candidate", "member": "info.json", "sha256": _hash(metadata)},
+        ]}}}
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / (name + "_" + version + ".zip")
+            fixture = {"name": name, "version": version, "path": str(path)}
+            def write(control_body=control, extra=False):
+                with zipfile.ZipFile(path, "w") as archive:
+                    archive.writestr(f"{name}_{version}/control.lua", control_body)
+                    archive.writestr(f"{name}_{version}/info.json", metadata)
+                    if extra:
+                        archive.writestr(f"{name}_{version}/unexpected.lua", b"extra")
+            write()
+            MODULE._validate_fixture_members(fixture, plan, "repair", "candidate", 0)
+            write(b"different")
+            with self.assertRaises(MODULE.RuntimeBenchmarkAnalysisError):
+                MODULE._validate_fixture_members(fixture, plan, "repair", "candidate", 0)
+            write(extra=True)
+            with self.assertRaises(MODULE.RuntimeBenchmarkAnalysisError):
+                MODULE._validate_fixture_members(fixture, plan, "repair", "candidate", 0)
+
+    def test_original_profile_normalization_and_native_identity_with_synthetic_files(self) -> None:
+        origin = copy.deepcopy(self.origins["rows"][0])
+        expected = next(row for row in MODULE._active_rows() if row["id"] == origin["id"])
+        profile = self.profiles[("repair-active", 0, "candidate")]
+        canonical = json.loads((ROOT / profile["path"]).read_bytes())
+        raw_harness = b"independent synthetic native harness"
+        native = {
+            "source_head": origin["source_harness"]["commit"], "source_dirty": False,
+            "harness_sha256": _hash(raw_harness), "status": "passed-private-native-active-seed-preparation",
+            "profile": copy.deepcopy(origin["profile"]), "mir_archive": copy.deepcopy(origin["mir_archive"]),
+            "engine": copy.deepcopy(origin["engine"]), "active_seed": copy.deepcopy(origin["active_seed"]),
+            "library_control_restoration": {"status": "restored-direct-library-controls"},
+            "active_preparation": {"marker": copy.deepcopy(origin["prepared_marker"])},
+            "fixtures": [{"archive": row["path"], "sha256": row["sha256"]} for row in origin["fixtures"]],
+        }
+        def read_reference(ref, label):
+            return canonical if label == "current510 original profile" else native
+        def git_result(args, **kwargs):
+            return origin["source_harness"]["tree"] + "\n" if "rev-parse" in args else raw_harness
+        marker_bytes = ("[MIR5_RUNTIME_ACTIVE] " + json.dumps(origin["prepared_marker"]) + "\n").encode()
+        real_bounded = MODULE._read_bounded
+        def read_bounded(path, limit, label):
+            return marker_bytes if label == "current510 prepared log" else real_bounded(path, limit, label)
+        def validate(value):
+            with mock.patch.object(MODULE, "_verified_file", side_effect=lambda path, digest, label, size=None: Path(str(path))), \
+                 mock.patch.object(MODULE, "_verified_json_reference", side_effect=read_reference), \
+                 mock.patch.object(MODULE.subprocess, "check_output", side_effect=git_result), \
+                 mock.patch.object(MODULE, "_read_bounded", side_effect=read_bounded), \
+                 mock.patch.object(MODULE, "_validate_fixture_members"):
+                MODULE._validate_current510_origin(value, expected, profile, self.plan)
+        validate(origin)
+        for label, mutate in {
+            "wrong-profile-hash": lambda r: r["profile"].__setitem__("sha256", "0" * 64),
+            "wrong-source-tree": lambda r: r["source_harness"].__setitem__("tree", "0" * 40),
+            "wrong-fixture-version": lambda r: r["fixtures"][0].__setitem__("version", "0.2.0"),
+            "missing-fixture": lambda r: r["fixtures"].pop(),
+            "wrong-player": lambda r: r["mir_archive"].__setitem__("sha256", "0" * 64),
+            "wrong-engine": lambda r: r["engine"].__setitem__("sha256", "0" * 64),
+            "wrong-native-marker": lambda r: r["prepared_marker"]["witnesses"].__setitem__("initial_changed", 1),
+        }.items():
+            with self.subTest(label=label):
+                altered = copy.deepcopy(origin)
+                mutate(altered)
+                with self.assertRaises(MODULE.RuntimeBenchmarkAnalysisError):
+                    validate(altered)
+        with mock.patch.object(MODULE, "_verified_file", side_effect=lambda path, digest, label, size=None: Path(str(path))), \
+             mock.patch.object(MODULE, "_verified_json_reference", side_effect=lambda ref, label: {**canonical, "settings_mode": "wrong"} if label == "current510 original profile" else native), \
+             mock.patch.object(MODULE.subprocess, "check_output", side_effect=git_result):
+            with self.assertRaisesRegex(MODULE.RuntimeBenchmarkAnalysisError, "normalized profile"):
+                MODULE._validate_current510_origin(origin, expected, profile, self.plan)
+
+    def test_mixed_prepared_sidecar_binds_all_eight_profiles_and_seeds(self) -> None:
+        result = self._synthetic_result()
+        captures, pilots, _ = self._validated()
+        bindings = {}
+        for row in MODULE._active_rows():
+            scenario = "repair-active" if row["kind"] == "repair-stress" else "agriculture-active"
+            profile = self.profiles[(scenario, row["tier"], row["arm"])]
+            seed = captures[row["id"]]["active_seed"]
+            bindings[row["id"]] = {"engine": {"version": "2.1.23", "sha256": MODULE.ENGINE_SHA256},
+                "library": "D:/Projects/Factorio/testmods/2.1",
+                "profile": {"path": "D:/owned/pinned-source/" + profile["path"], "sha256": profile["sha256"]},
+                "archives": copy.deepcopy(pilots[row["id"]]["archives"]),
+                "seed": {"path": seed["path"], "sha256": seed["sha256"], "bytes": seed["bytes"]}}
+        sidecar = {"schema": 1, "kind": "MIR5ActiveRuntimeBenchmarkPreparedInputsV1",
+                   "status": "validated-accepted-active-inputs-no-new-native", "native_launches": 0,
+                   "performance_qualification": False, "release_qualification": False, "bindings": bindings,
+                   **{key: copy.deepcopy(result[key]) for key in ("plan", "private_controller", "raw_helper_source", "mixed_prerequisites", "row_provenance", "schedule")}}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            def validate(value):
+                payload = _encode(value)
+                (root / "runtime-benchmark-active-prepared.json").write_bytes(payload)
+                result["prepared_inputs_sha256"] = _hash(payload)
+                patches = self._patches()
+                with patches[0], patches[1], patches[2], patches[3], patches[4]:
+                    MODULE._validate_prepared_inputs_sidecar(root / "runtime-benchmark-active-observed.json", result)
+            validate(sidecar)
+            for label, mutate in {
+                "missing-binding": lambda v: v["bindings"].pop("repair-published"),
+                "wrong-original-seed": lambda v: v["bindings"]["repair-published"]["seed"].__setitem__("sha256", "0" * 64),
+                "wrong-candidate-profile": lambda v: v["bindings"]["repair-candidate"]["profile"].__setitem__("sha256", "0" * 64),
+                "wrong-archive-closure": lambda v: v["bindings"]["repair-candidate"]["archives"].__setitem__("extra.zip", "A" * 64),
+                "changed-provenance": lambda v: v["row_provenance"]["repair-candidate"].__setitem__("original_profile_sha256", "0" * 64),
+            }.items():
+                with self.subTest(label=label):
+                    bad = copy.deepcopy(sidecar)
+                    mutate(bad)
+                    with self.assertRaises(MODULE.RuntimeBenchmarkAnalysisError):
+                        validate(bad)
+
+    def test_custody_exact_closure_restoration_and_opponents(self) -> None:
+        identifier = "repair-warmup-published-1"
+        fixture = {"archive": "D:/original/mir-fixture-mir5-repair-stress_0.1.0.zip", "sha256": "A" * 64}
+        leaf = "mir-fixture-mir5-repair-stress_0.1.0.zip"
+        root = "D:/owned/run"
+        record = {"schema": 1, "kind": "MIR5RuntimeBenchmark510FixtureCustodyV1", "reserved_mib": 2,
+                  "body_succeeded": True, "restoration_failures": [], "fixtures": [{
+                      "leaf": leaf, "source": fixture["archive"], "destination": "D:/Projects/Factorio/testmods/2.1/" + leaf,
+                      "selected_sha256": fixture["sha256"], "prior_exists": True, "prior_sha256": "B" * 64,
+                      "prior_bytes": 17, "snapshot": root + "/fixture-custody/" + identifier + "/prior/" + leaf,
+                      "changed": True, "restoration_status": "verified", "restored_sha256": "B" * 64, "restored_bytes": 17}]}
+        active = {"kind": "repair-stress", "arm": "published", "tier": 0}
+        start = _marker("repair-stress", "start", "pending", _pilot_witness(active, False))
+        complete = _marker("repair-stress", "complete", "passed", _pilot_witness(active, True))
+        sample = {"seed": {"owned_path": root + "/pinned-source/build/tmp/active-launches/" + identifier + "/input/fresh-owned-active-seed.zip"},
+                  "fixture_custody_reserve_mib": 2,
+                  "fixture_custody": {"path": root + "/fixture-custody/" + identifier + "/fixture-custody-result.json", "sha256": "C" * 64, "record": record},
+                  "physical_markers": {"start": start, "complete": complete, "fixture_log": root + "/fixture.log", "fixture_log_sha256": "D" * 64,
+                                       "stdout": root + "/stdout.txt", "stdout_sha256": "E" * 64}}
+        schedule = {"id": identifier, "scenario": "repair-active"}
+        provenance = {"fixtures": [fixture]}
+        journal = [{**record["fixtures"][0], "restoration_status": "pending", "restored_sha256": "", "restored_bytes": 0}]
+        marker_log = ("[MIR5_RUNTIME_ACTIVE] " + json.dumps(start) + "\n[MIR5_RUNTIME_ACTIVE] " + json.dumps(complete) + "\n").encode()
+        def read_bounded(path, limit, label):
+            if label == "current510 custody journal":
+                return _encode(journal)
+            if label == "current510 custody result bytes":
+                return _encode(record)
+            return marker_log
+        def validate(value):
+            with mock.patch.object(MODULE, "_verified_json_reference", return_value=value["fixture_custody"]["record"]), \
+                 mock.patch.object(MODULE, "_verified_file", side_effect=lambda path, digest, label, size=None: Path(str(path))), \
+                 mock.patch.object(MODULE, "_read_bounded", side_effect=read_bounded):
+                MODULE._validate_current510_custody(value, schedule, provenance)
+        validate(sample)
+        for label, mutate in {
+            "missing-fixture": lambda s: s["fixture_custody"]["record"]["fixtures"].clear(),
+            "not-restored": lambda s: s["fixture_custody"]["record"]["fixtures"][0].__setitem__("restoration_status", "failed"),
+            "wrong-restore-hash": lambda s: s["fixture_custody"]["record"]["fixtures"][0].__setitem__("restored_sha256", "F" * 64),
+            "wrong-destination": lambda s: s["fixture_custody"]["record"]["fixtures"][0].__setitem__("destination", "D:/other/" + leaf),
+            "wrong-source": lambda s: s["fixture_custody"]["record"]["fixtures"][0].__setitem__("source", "D:/other/" + leaf),
+            "no-snapshot": lambda s: s["fixture_custody"]["record"]["fixtures"][0].__setitem__("snapshot", ""),
+            "over-budget": lambda s: s["fixture_custody"]["record"].__setitem__("reserved_mib", 120),
+            "wrong-raw-marker": lambda s: s["physical_markers"]["complete"]["witnesses"].__setitem__("initial_changed", 255),
+        }.items():
+            with self.subTest(label=label):
+                bad = copy.deepcopy(sample)
+                mutate(bad)
+                with self.assertRaises(MODULE.RuntimeBenchmarkAnalysisError):
+                    validate(bad)
 
 
 if __name__ == "__main__":
