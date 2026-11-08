@@ -17293,7 +17293,7 @@
           "owner": "Black Glass",
           "independent_review": "Aero",
           "status": "partial:509 actual layout/captions/selected scrolling accepted in scope; direct-effect description correction and remaining Library controls/client acceptance open",
-          "readiness": "Aero owns the direct_effect value in50locale files and its exact historical-projection allowance on fix/mir5-library-benefit-copy-aero-r01; Black Glass owns final-package EN/DE detail input/capture. Published510 bytes stay unchanged.",
+          "readiness": "Aero delivered direct_effect correction in PR1817/head a938ef8902cb0a744021f59f77ebee8999cc5b97, preserving50original translated benefit prefixes and original B6 projection hashes; locale controls8/8 and non-author mechanical review pass. Black Glass alone accepts integration and performs final-package EN/DE detail capture. Published510 bytes stay unchanged.",
           "next_work_inputs": [
             "tests/fixtures/library-native-input/control.lua",
             "tests/profiles/library-native-input-imported110-f210-2123-r15.json",
@@ -17306,7 +17306,9 @@
               "missing_check": "After the bounded locale correction, open the same worker-battery detail on the chosen next-source package in English/German; observe accurate benefit-only description and retained fixed tabs, selection and inner scroll.",
               "source_owner": "Aero",
               "native_owner": "Black Glass",
-              "status": "source-correction-in-progress; native-not-run"
+              "status": "source-correction-reviewed-and-delivered-in-PR1817; native-not-run",
+              "source_commit": "a938ef8902cb0a744021f59f77ebee8999cc5b97",
+              "source_review": "Independent non-author root verified all50committed locale changes against original published prefixes and unchanged B6 hashes/other corrections."
             }
           ]
         },
@@ -17561,7 +17563,7 @@
           "owner": "Aero; Black Glass executes affected checks",
           "independent_review": "Aero",
           "status": "partial: tab-aware legacy search implemented/host-tested; actual Settings-tab/retained-tab GUI and changed current state/client applicability remain open",
-          "readiness": "Native execution is not ready from the canonical historical tuples alone: Black Glass adopts a matching in-progress private510caller if present, otherwise establishes the bounded exact fixture/archive/profile binding, then observes the four concrete steps. Aero has reconciled the shipped4.7.3 contract/current source and corrected SDK wording; no prospective Aero dispatch approval is required.",
+          "readiness": "The matching510fixture binding is already prepared in Black Glass PR1813: exact input0.3.8/export0.4.3 F200/F210 tuples with56reported host controls. Adopt that existing work after checked integration, bind actual archive/profile/caller inputs and observe the four concrete steps; no competing preparation or prospective Aero dispatch approval is required. Native Settings-tab/retained-tab output remains unobserved.",
           "next_work_inputs": [
             "spec/evidence/api1-documented-subset-qualification-r01.json",
             "spec/evidence/api-production-current7b0-aero-applicability-r01.json",
@@ -17571,7 +17573,8 @@
             "tests/fixtures/library-multiplayer/control.lua",
             "tests/fixtures/library-native-input/control.lua",
             "tests/test_library.py:LibraryTests.test_legacy_remote_search_uses_selected_or_retained_tab_without_cross_query_writes",
-            "tests/test_bootstrap.py:BootstrapTests.test_control_composes_lifecycle_library_api_legacy_interface_and_command"
+            "tests/test_bootstrap.py:BootstrapTests.test_control_composes_lifecycle_library_api_legacy_interface_and_command",
+            "https://github.com/Julesc013/more-infinite-research/pull/1813"
           ],
           "concrete_remaining_cases": [
             {
@@ -17593,8 +17596,15 @@
             "native_input_fixture": "tests/fixtures/library-native-input/control.lua admits observer0.3.7/MIR509 through exact guards; no510 admission at this reviewed source.",
             "export_fixture": "tests/fixtures/library-native-input/support-exports.lua qualified507/508 tuples do not select510.",
             "profiles": "R15native-input and R04support-export profiles retain their original package/observer hashes. Do not edit them in place and relabel the old preparations as current.",
-            "required_next_action": "Black Glass adopts a matching in-progress private510caller if present, otherwise makes one bounded exact fixture/archive/profile binding and preserves original controls before native dispatch. Source/host preparation is not a native result.",
-            "input_child": "tools/Invoke-LibraryNativeInput.ps1 requires an already-owned governed client and a hashed action spec; it neither launches Factorio nor grants native qualification."
+            "required_next_action": "Adopt Black Glass PR1813 matching510fixture binding after its checked integration; preserve the historical tuples/profiles and complete exact archive/profile/caller admission before native dispatch. This source/host preparation is not a native result.",
+            "input_child": "tools/Invoke-LibraryNativeInput.ps1 requires an already-owned governed client and a hashed action spec; it neither launches Factorio nor grants native qualification.",
+            "matching_in_progress_binding": {
+              "pull_request": "https://github.com/Julesc013/more-infinite-research/pull/1813",
+              "head": "ff99ae76b5fc4cde2518a3f8f38b2a0913ce7d9c",
+              "scope": "Black Glass prepared exact510 native-input0.3.8 and support-export0.4.3 F200/F210 tuples; reported56host controls. Adopt this existing work after checked integration and actual profile/archive/caller admission, not a competing binding.",
+              "native_execution": false
+            },
+            "reviewed_source_commit": "fd5e77492c79fe325bb0ae7e26608d1af10c1eb7"
           }
         },
         {
