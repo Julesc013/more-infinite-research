@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "kind": "MIRNativeOwner511ForwardIndependentResultReviewV1",
+  "reviewer": "/root/native_owner510_review",
+  "role": "independent non-author result and custody review",
+  "verdict": "ACCEPTED exact prospective configured-steel source10-to11 forward route",
+  "accepted_scope": "One actual native source lab completion, source save/two read-only cold reloads, MIR-only10-to11 configuration entry before MIR, unchanged earned/private/foreign/lab frame after MIR, distinct upgraded save and two further read-only cold reloads on the exact admitted packages/controller/engine.",
+  "native_processes": 6,
+  "new_source_lab_completions": 1,
+  "new_target_lab_completions": 0,
+  "cumulative_lab_completions_counted_once": 1,
+  "stable_or_release_verdict": false,
+  "reviewer_native_tests_builds_or_source_edits": false,
+  "identity_observed": "BLACKGLASS-WIN1\\Jules",
+  "exact_inputs": {
+    "public_runner_commit": "21be82a8c0637db49722c3c20bbf9c05080ba095",
+    "private_controller_commit": "336b435776192c97fdd13de568c9d7459382535d",
+    "caller_sha256": "C6AB7DF2AC19818B490AE4CA41B4BC5A132996C94062B56DAE1309F6CBF54127",
+    "actor_sha256": "39CEE3E0A2918DF244120F64CBC84DE6021C4801A95A6E4840A6ADE77591CA61",
+    "same_observer_archive_sha256_both_legs": "15A6D3100E3CFCD7A0D1EB34ECE4CA2249F3C75E623608907F3E9930A37EA9F5",
+    "observer_bytes": 2130,
+    "engine": "standalone Factorio2.1.23/build87750",
+    "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "source_player_commit": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+    "source_player_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+    "source_player_sha256": "C625D648978F6FE677B5EDC5C68090A2AA9A939D48A54A736610D55E47337806",
+    "target_player_commit": "706dd02cc86993cd4d20b769aca85f2a661ea786",
+    "target_player_tree": "4bcdf2b89d63d38fe6cb0b66840a83096a56dd0c",
+    "target_player_sha256": "74418DC171C8FA3F21486EF21B1FA8D348E99798E4F4D6DF5657024D2B87B892",
+    "source_manifest_sha256": "108EBAAA858D348BC0833F136418D34028C6CED4E087F75B4DE2ABDF35BC1C0C",
+    "source_composition_sha256": "200BC5DB18929DA42AF1899356410D57C4E770083D902C01E3EC03D2690EAF63",
+    "source_execute_custody_sha256": "00561E796184FBF7B4269AE9F67709FA6A0796616B18DB9504D2FB49E1DC554C",
+    "target_manifest_sha256": "CBDCFA8869194F7B6560740221A2073462D9CE8BAAB4739B261EB8354F57B65E",
+    "target_composition_sha256": "7040E2A4E8A17AB098E7BFC40216E16F9BF2E7C15E07C6D9E1EBF1A032EEB662",
+    "target_execute_custody_sha256": "6241F85A1EADFADA007242DAFBC2D99A33F2F9AA25B94ABD6BB23E388B7EC1B6",
+    "source_26_and_target_27_bound_inputs_still_match": true,
+    "both_actual_packets_equal_admitted_compositions": true,
+    "both_execute_records_equal_native_result_semantics": true,
+    "identity_limit": "Runner21be is not player source. Source8e5/C625 and target706dd/7441 remain distinct. Later test-only heads retain the same target player tree but are not renamed native executions."
+  },
+  "complete_primary_custody": {
+    "path": "build/qualification/native-owner511-forward-native-custody-r01",
+    "manifest_sha256": "A6C91A73B13426A05D5F415EC48898052104194A754F2F15EF34F940E2EC1C79",
+    "files": 93,
+    "bytes": 8158997,
+    "all_93_members_rehashed": true,
+    "missing_extra_or_mismatching_members": [],
+    "origins": "All90 filesystem-origin members byte-equal their original locations. Three raw-controller members have explicit Git336b435 origins rather than filesystem paths; each separately byte-compares to its full336b435 committed blob. CallerC6AB, actor39CEE and test30C1229 hashes agree. Both admission reports and actual host transcript are retained.",
+    "review_record_limit": "This new final review is outside the unchanged93-file custody manifest."
+  },
+  "source_result": {
+    "verdict": "ACCEPTED prospective source endpoint under its own identity",
+    "processes": [
+      {"stage": "production", "pid": 29528, "exit_code": -1, "completion_predicate_observed": true, "timed_out": false, "log_sha256": "953D27AFF612E05F4DE7F49BF4841C0B19DD4BB03DE42F8EC521CB10FF5AC50C"},
+      {"stage": "reload-1", "pid": 28472, "exit_code": 0, "timed_out": false, "log_sha256": "2F82A144B34E313BBEEA366DBF6DB17E320BC2B2CD6FB805DB011E2172A4A427"},
+      {"stage": "reload-2", "pid": 14328, "exit_code": 0, "timed_out": false, "log_sha256": "16BD6746C4596D7673C191A4E1549831FEE80DEA87CAEC0B873AB1A4691D0902"}
+    ],
+    "completion": {"technology": "steel-plate-productivity", "by_script": false, "tick": 119},
+    "save": {"bytes": 826984, "sha256": "8A04048E22091BE1DAB09FB3BBB5415629971B4AD54D5ED20979E893D03B8514"},
+    "interpretation": "The newly declared source actually earns one lab on unchanged published10 player bytes. Its two colds retain that completion; they add no labs. This is not a modified or relabelled version of the earlier strict968A save."
+  },
+  "target_result": {
+    "verdict": "ACCEPTED exact10-to11 configuration/save/two-cold endpoint",
+    "processes": [
+      {"stage": "production", "pid": 28180, "exit_code": -1, "completion_predicate_observed": true, "timed_out": false, "duration_seconds": 3.563982, "log_sha256": "E9435BB4E4632BDBC9A6EA1DD9A5431AAF0165D0FF92473299FEBAABD95A1E65"},
+      {"stage": "reload-1", "pid": 37752, "exit_code": 0, "timed_out": false, "duration_seconds": 2.01959, "log_sha256": "76545B4287071525D7B8BFE36C863F64F7ABC82F6941EB7992C6A62F38309D19"},
+      {"stage": "reload-2", "pid": 20312, "exit_code": 0, "timed_out": false, "duration_seconds": 2.274503, "log_sha256": "DA3CE7444E0A495AED465DC593D8DD3EAFF5C9E794FCB975A08F9186DF5F39DB"}
+    ],
+    "entry": "Production has exactly one MIR5_NATIVE_OWNER_ENTRY at line135. Actual script.get_event_order is level -> more-infinite-research. The executed actor guard requires exact MIR10-to11/only-MIR mod_changes and startupfalse before fixture storage writes; the event table is guard-validated rather than separately serialized in this log.",
+    "before_after": "Entry player/foreign snapshots exactly equal the original source frame and post-MIR marker frame. Entry precedes next-tick upgrade-complete line140, saving line141 and Saving finished line142. Both cold markers retain the identical saved entry and post-MIR frame. No new target completion or reseeding occurs.",
+    "entry_limit": "Observed entry is before MIR's configuration callback, after engine loading/prototype migration. No direct MIR private-storage or pre-engine migration observation is claimed.",
+    "save": {"bytes": 827284, "sha256": "05BBCFE330AE1AF4F7C8294C8472CEDBFDE0CC0A8EDD8932C2CEA7D79631A211"},
+    "cold_method": "Two separate processes load the same upgraded complete save with benchmark-ticks1/benchmark-runs1/benchmark-sanitize, emit one upgrade-cold marker, report one update, contain no save lines and naturally exit0. The source completion object remains exactlytick119/by_script=false in all six records."
+  },
+  "preserved_semantics": {
+    "tuple": {"base": 2, "increment": 3, "growth": 1.25, "time": 1, "effect": 17},
+    "map_technology_price_multiplier": 1,
+    "native_formula": "(2+3*(L-1))*1.25^(L-1)",
+    "player": {"level": 2, "steel": 0.17, "casting": 0.17, "bullet": 0.07, "saved": 0, "current": false, "progress": 0, "queue_empty": true, "mining": 0, "lab_speed": 0},
+    "remaining_each_of_four_sciences": 4,
+    "post_level2_native_units": 6,
+    "private_units": 2,
+    "private": "Historical main remains hidden/empty effects, level1/saved0, actual enabled=true/visible=false. Formula and energy60 checks remain strict.",
+    "foreign": "Foreign owner remains level1/disabled/invisible with steel/casting/bullet0 and unchanged unearned private holder. Lab remains valid, stopped and disabled by script under the exact actor guards.",
+    "source_target_and_cold_state_comparison": "All source and target actual state frames match; target cold payloads equal target production except stage. One source completion is counted once, not once per process or cold marker."
+  },
+  "save_and_archive_integrity": {
+    "source_native_protected_and_both_target_inputs_rehashed_unchanged": true,
+    "target_native_and_protected_saves_rehashed_equal": true,
+    "all_primary_custody_copies_match_manifest_and_originals": true,
+    "embedded_actor_both_source_and_target": "39CEE3E0A2918DF244120F64CBC84DE6021C4801A95A6E4840A6ADE77591CA61",
+    "method": "Reviewer opened and hashed embedded actors in original/protected/input saves and compared all copied bytes. Actual engine cold loads and unchanged caller save-hash checks establish the retained read-only-save endpoints; root's full CRC observations remain separately reported.",
+    "same_observer_both_legs": true,
+    "package_provenance": "Target admission already independently compared all243 target ZIP members to committed706dd source and the standard materialized target metadata. The exact7441 player hash and all selected input hashes remain unchanged after execution."
+  },
+  "selection_restoration_resources": {
+    "six_actual_engine_headers": "Factorio2.1.23/build87750 from the pinned standalone executable",
+    "actual_mods_each_leg": "Exactly the five official2.1.23 mods (base/elevated-rails/quality/recycler/space-age), identical observer0.2 and MIR10 or11 as declared; one strict native mod-table witness per engine. Only MIR changes across the boundary.",
+    "two_controls_plus_19_mir_archives_current_match_each_leg": true,
+    "temporary_target11_and_observer_removed": true,
+    "active_profile_journal_absent": true,
+    "factorio_processes_at_review": 0,
+    "fatal_diagnostics": 0,
+    "stderr_output": "all six empty",
+    "process_protocol": "Both production supervised-1 exits follow successful save predicates. All four cold exits are natural0. No timeout/failure/cleanup failure; six distinct process IDs and sequential completed resource ledgers.",
+    "admitted_limits": {"expected_peak_memory_mib": 4096, "max_output_mib": 128, "timeout_seconds_per_process": 180},
+    "limit": "Durations and existing sampled-watchdog memory records are governance/custody observations, not a performance result."
+  },
+  "line_ending_followup_review": {
+    "head": "573061eb4ffbb488b987b065b28923836e986d12",
+    "compared_to": "9a9e8d15af67dc477717408b17fd56543b1eaf0b",
+    "verdict": "ACCEPTED .gitattributes-only checkout-byte correction",
+    "delta": "Exactly two added lines: a comment and tests/fixtures/runtime510-selected-mir-info.json text eol=lf. No fixture content, hash assertion, opponent, selected profile or dependency guard changes.",
+    "independent_byte_readback": {"lf_bytes": 813, "lf_sha256": "4FAED4857D3F5686344546F10918DAD550686D36DB50BACB4B3F3571882CD7CD", "crlf_bytes": 842, "crlf_sha256": "28F66C82A911BA28E6435AC2E60B1468257367EC1D4E7644C044779AB8F44971"},
+    "basis": "A read-only in-memory LF-to-CRLF conversion exactly reproduces the reported second CI hash. The named eol=lf rule protects the independently frozen raw10 metadata in Windows checkouts; the strict4FAED assertion remains. Player tree is still4bcdf2b89d63d38fe6cb0b66840a83096a56dd0c, so these test/attribute changes do not alter the tested player assets.",
+    "ci_limit": "Both original failed CI runs remain preserved. Root's Git-filter checks are not rerun here. Fresh required CI was reported running; this report does not claim that it passed."
+  },
+  "changes_required_for_this_scoped_result_acceptance": [],
+  "limits": [
+    "Exact configured-steel source10-to11 route only; it does not qualify every source11 input or an arbitrary settings/provider/engine transition.",
+    "No historical first-mask inference, direct MIR private-storage, nonzero partial-investment case, physical manufacturing, GUI/client/multiplayer, performance, whole-catalogue or stable/release verdict.",
+    "Original strict968A save, earlier adverses, published10 packages and all native/source/controller identities remain unchanged. This prospective source is explicitly distinct.",
+    "Reviewer launched no native process, test or build, changed no code and wrote only this new report."
+  ]
+}
