@@ -33,6 +33,8 @@ After each native lab completion the expected carrying-capacity bonus is `5 + 2 
 
 Create the seed with the normal `--create` entry point. Use an isolated headless server with public and LAN visibility disabled, `auto_pause=false`, a localhost bind, and an existing writable `saves` directory. Supply the full official server-settings template with those overrides. Start a mode through the fixture's explicit test interface: `remote.call("mir-worker-storage-native-observer", "begin", "source")`. The first Lua console command may require the normal Factorio confirmation; repeat it only when that warning is observed.
 
+Before an earning leg, the controller records `force.laboratory_speed_modifier` and reapplies the fixture's value1000 after any configuration change, then calls the mode interface. The original-to-candidate configuration reset that directly injected accelerator to0. The earlier unchanged-accelerator controller timed out while earning; its preserved receipt does not qualify completion. This explicit test stimulus does not change the candidate's worker bonus, research cost or unit time. Do not reapply any accelerator for read-only cold reloads.
+
 Always give the server a disposable byte-for-byte copy of the protected input save. A normal SIGINT shutdown writes the running map back to its input path. Verify the protected original's SHA256 before and after execution and retain the exact output save separately.
 
 Accept an earning leg only when the engine emits the corresponding `*-finished.json`, the named output ZIP is complete, and the log confirms the save. Exit code zero alone does not prove completion. The observer writes bounded facts under `script-output/worker-storage/` and the log prefix `MIR_WORKER_NATIVE`.
