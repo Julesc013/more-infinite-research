@@ -9124,6 +9124,11 @@
               {
                 "action": "retain-affected-boundary-selection",
                 "meaning": "Changed member bytes are not a runtime-equivalence verdict; retain the original consumed-input review and execute only a demonstrated affected setting, configuration, or removal/readdition boundary."
+              },
+              {
+                "action": "preserve-storage4-prepublication-absence-inference",
+                "record": "spec/evidence/cap-preservation-provenance-aero-r01.json",
+                "meaning": "The exact successful C93 Base gear-case fixture logically establishes storage4 absence before C93 Generator publication; it carries only to the same current four-mod Base preselection closure and is not a retained raw dump or current native verdict."
               }
             ],
             "remaining_executable_check": "Review consumed inputs of the original gear/worker native chains against the frozen successor; execute only affected setting/configuration/removal-readdition boundaries.",

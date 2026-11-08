@@ -55,6 +55,51 @@
         {"path": "compatibility/modern_catalogue.lua", "c93_sha256": "F2BC157E5EEB650257BF478D569B9C5A197F8EB038BD1B78B4C8AE8654642E67", "c93_bytes": 28767, "published510_git_blob": "d483c1b54b114c07190eb6cd44860e8c02195657", "published510_sha256": "B0BB13FF52506D36030C59D157132A68D9EF046F87343E18B953B3E2DA5487E9", "published510_bytes": 72594, "relation": "changed"},
         {"path": "runtime/catalogue.lua", "c93_member_absent": true, "published510_git_blob": "36ff5c360450f185afcbfc72b60cb95eb0908670", "published510_sha256": "E913D1940B684C7DA6F4F5BBAB3DAE0780BF8A1215F0DACA254793B15BE50467", "published510_bytes": 9253, "relation": "absent-from-c93"}
       ]
+    },
+    "worker_robots_storage_4_prepublication_absence_inference": {
+      "classification": "logical inference from the exact recovered C93 source and original successful native receipt; not a retained raw dump",
+      "historical_identity": {
+        "source_commit": "bb602332f6526920b0c455718c9210ae08722f15",
+        "archive_sha256": "C93B3CF3DD904AFBAD3555EFBC6F858D86C9B54100B866D0B2FB03E68D2F6ED8",
+        "receipt": "spec/evidence/f200-legacy-gear-qualified-upgrade-native.json.gz",
+        "receipt_uncompressed_sha256": "31752612BBA2202D542CF3EA54B5AD8665BC3A247F49507F13ACD4B12797244B",
+        "case": "f200-positive-legacy-cap",
+        "profile": {
+          "path": "tests/mir5/profiles/f200-legacy-cap-mir5-2077.json",
+          "sha256": "E275646939E63A5E443F8B86702822212E9984B83FD7DAC0E60FE1D0437FE3E9"
+        },
+        "gear_case_fixture": {
+          "name": "mir-fixture-mir5-f200-legacy-cap",
+          "version": "0.2.0",
+          "sha256": "D525B92EFA7A199D15548E84A512A9DA71953D47C141F56549544927BD61F231"
+        },
+        "active_mods_observer": {
+          "name": "mir-fixture-mir5-active-mods-observer",
+          "version": "0.1.0",
+          "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+        },
+        "base": {"version": "2.0.77", "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"},
+        "native_status": "passed-private-native-fixture"
+      },
+      "c93_construction": {
+        "definition": "compatibility/modern_catalogue.lua lines 317-343 declares worker-robots-storage-4 in BASE.definitions",
+        "f200_base_selection": "select lines 487-525 copies BASE.definitions; Base has no Space Age or optional profile omission",
+        "disabled_stream_boundary": "research/modern.lua lines 94-108 creates the technology for every selected definition and only assigns enabled=false when the stream is disabled",
+        "strict_duplicate_preflight": "research/generator.lua lines 47-56 rejects raw.technology[prototype.name] before data_stage:extend(prototypes) at line 125"
+      },
+      "inferred_original_fact": "Because the receipt records the exact C93 archive and successful Base production/reload process, data.raw.technology['worker-robots-storage-4'] was absent immediately before C93 Generator publication in that exact native closure.",
+      "current_same_closure_carriage": {
+        "profile_bytes_equal_original": "tests/profiles/f200-legacy-cap-mir5-2077.json remains SHA256 E275646939E63A5E443F8B86702822212E9984B83FD7DAC0E60FE1D0437FE3E9",
+        "preselection_writes": "current data.lua emits only the Library shortcut and more-infinite-research-native-adoptions type mod-data; it emits no technology",
+        "inactive_optional_writers": "current data-final-fixes.lua recipe-schema branch requires Base2.1 plus named ATAN input, and prerequisite repair requires Angel or Astroponics input; neither is present in the exact four-mod Base closure",
+        "unchanged_or_nonwriting_inputs": "Base engine D3 and observer archive 723D are the original inputs; the observer body is byte-identical and logging-only. The gear-case fixture metadata is byte-identical; its later broadened assertion body, like its original body, only inspects/adjusts the gear technology and never writes worker-robots-storage-4.",
+        "current_reader_limit": "The current selector has an explicit existing-worker route only when raw.technology['worker-robots-storage-4'] is already present. The carried absent input does not select that route."
+      },
+      "does_not_prove": [
+        "A retained data.raw dump or absence after C93/current publication.",
+        "Absence under a foreign-provider, extra-mod, or other profile closure.",
+        "Current whole-package startup, native acceptance, or release qualification."
+      ]
     }
   },
   "private_v2_producer_reconciliation": {
