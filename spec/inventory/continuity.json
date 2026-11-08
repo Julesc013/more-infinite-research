@@ -17239,6 +17239,39 @@
           "cases": 4,
           "method": "Both controls pass unchanged source; old accepts dropped-valid-unlock opponent/new rejects it. Only the selected control is rerun, not the whole host/native programme."
         }
+      },
+      {
+        "reviewed_on": "2026-11-09",
+        "reviewed_current_commit": "e080b2e2c006c3d24af92eff02be089ec5999ab8",
+        "subjects": [
+          "CONT-05",
+          "CONT-12",
+          "VER-07"
+        ],
+        "scope": "Complete one exact published test body plus current science and named SIF paid-retention controls/contracts. Other historical variants, helper implementations, inter-release/discussion inputs and whole-product native outcomes are not declared complete.",
+        "source": {
+          "tag": "v4.7.3",
+          "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+          "path": "tests/compiler/science_planning.lua",
+          "git_blob": "a7d4ce66b7e1c6ad6f6d9e29679d9c60ea6f9d39",
+          "sha256": "5C852897A5EEDA04E69779B4B116E74E222B19F26B2529B73A4063390F035CD1",
+          "bytes": 47561,
+          "lines": 719,
+          "scope": "Controlled module/service test with explicit synthetic assumptions; not Factorio, K2 ecosystem or historical native execution."
+        },
+        "evidence": "spec/evidence/historical-science-policy-intent-aero-r01.json",
+        "disposition": "consolidate",
+        "outcome": "One exact719-line published science-policy test body is mapped to current science and dedicated SIF paid-retention expectations/evidence. Retired compiler/service-discovery mechanics remain obsolete; BA changed-fact mapping and final-candidate native applicability stay explicit. No original test or known native result is erased.",
+        "remaining": {
+          "owner": "Aero",
+          "task": "Reconcile BA05-BA08 conditional retained Bob/Angel selection/gate cases against current admitted profile and exact changed-fact opponents; record coverage, a demonstrated defect, or an explicitly evidenced support boundary. Do not rerun the already mapped ER suite merely because another release shipped.",
+          "native_owner_if_affected": "Black Glass"
+        },
+        "native_execution": false,
+        "player_source_changed": false,
+        "original_requests_changed": false,
+        "inventory_complete": false,
+        "independent_review": "Separate bounded review corrected summary line count to actual719; no false native/current/stable acceptance was found. Other semantic/native gaps remain as recorded."
       }
     ],
     "stable_coverage_review": {
