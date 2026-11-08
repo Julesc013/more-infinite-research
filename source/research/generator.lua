@@ -52,7 +52,13 @@ function M.install(prototypes, data_stage)
       reject("entry " .. index .. " must name a technology")
     end
     local name = prototype.name
-    if names[name] or (raw.technology and raw.technology[name]) then reject("duplicate technology " .. name) end
+    if names[name] then reject("duplicate technology " .. name .. " within MIR emission") end
+    local existing = raw.technology and raw.technology[name]
+    if existing then
+      local maximum = type(existing) == "table" and existing.max_level
+      reject("duplicate technology " .. name .. " already exists in data.raw.technology (max_level="
+        .. tostring(maximum == nil and "single" or maximum) .. ")")
+    end
     names[name], indegree[name], followers[name] = prototype, 0, {}
   end
 

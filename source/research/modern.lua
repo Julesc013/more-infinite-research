@@ -195,6 +195,13 @@ local function continuation_formula(definition, stream)
 end
 
 local function continuation_effects(definition, stream)
+  if definition.inherited_worker_storage_effects then
+    local effects = copy(definition.inherited_worker_storage_effects)
+    if definition.scale_inherited_worker_storage_effects then
+      for _, effect in ipairs(effects) do effect.modifier = effect.modifier * stream.effect_percent end
+    end
+    return effects
+  end
   if definition.inherited_research_speed_effects then
     local effects = copy(definition.inherited_research_speed_effects)
     for _, effect in ipairs(effects) do

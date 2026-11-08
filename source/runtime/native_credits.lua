@@ -332,6 +332,39 @@ local function family_failure(message)
   error("MIR native family credit: " .. message, 3)
 end
 
+-- A failed configuration cannot open the Library's report exporter. Put the
+-- already-observed earning identity and transition in the ordinary error;
+-- do not allocate history, inspect the whole force, or guess the old mask.
+local function unknown_paid_mask(event, force, observation, queued, current)
+  local function value(item)
+    if type(item) == "string" then return item:gsub("[%z\1-\31\127]", " "):sub(1, 96) end
+    if type(item) == "number" or type(item) == "boolean" then return tostring(item) end
+    return "unknown"
+  end
+  local active = script and script.active_mods or {}
+  local changes = type(event) == "table" and event.mod_changes
+  local change = type(changes) == "table" and changes[MIR_MOD]
+  local source
+  if type(change) == "table" then source = change.old_version or "absent"
+  elseif type(event) == "table" then source = active[MIR_MOD] end
+  local startup_changed
+  if type(event) == "table" then startup_changed = event.mod_startup_settings_changed end
+  local descriptor = observation.descriptor
+  local main = force.technologies[descriptor.main_id]
+  local fields = {
+    "MIR-CREDIT-HISTORY", "family=" .. value(descriptor.family), "recipe=" .. value(descriptor.recipe),
+    "technology=" .. value(descriptor.main_id), "force=" .. value(force.index),
+    "completed=" .. value(observation.completed), "included=" .. value(observation.included),
+    "private=" .. value(observation.private), "queued=" .. value(queued[descriptor.main_id] or 0),
+    "saved_progress=" .. value(main and main.saved_progress), "offset=" .. value(observation.offset),
+    "source=" .. value(source), "destination=" .. value(active[MIR_MOD]), "base=" .. value(active.base),
+    "startup_changed=" .. value(startup_changed),
+    "ledger=" .. (current and "present" or "absent"), "family_history=absent",
+  }
+  family_failure("unknown first paid mask; restore original save and inputs; an independently known historical mask is required ["
+    .. table.concat(fields, " ") .. "]")
+end
+
 local function queued_counts(force)
   local counts = {}
   for _, technology in ipairs(force.research_queue or {}) do
@@ -617,7 +650,7 @@ function M.preflight_family_transition(event, fresh, selected_force)
           -- Unchanged engine/mod/settings inputs do not prove that a new MIR
           -- version emitted the old recipe mask. Only the known source masks
           -- above or a complete saved ledger can establish prior paid rights.
-          else family_failure("unknown first paid mask; restore original save and inputs; an independently known historical mask is required") end
+          else unknown_paid_mask(event, force, observation, queued, current) end
           payable, pending = prior_included, queued[descriptor.main_id] or 0
         end
         local offset = observation.offset + ((prior_included and 1 or 0) - (observation.included and 1 or 0)) * observation.completed

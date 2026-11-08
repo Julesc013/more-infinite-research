@@ -210,9 +210,16 @@ class ContinuationOwnershipTests(unittest.TestCase):
           assert(reports[1].enabled~=false,reports[1].reason)
           assert(names(out.unit.ingredients)=="automation-science-pack:1,logistic-science-pack:1,chemical-science-pack:1,production-science-pack:1,military-science-pack:1,utility-science-pack:1",names(out.unit.ingredients))
           assert(table.concat(out.prerequisites,",")=="research-speed-6,research-speed-7,automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack,military-science-pack,utility-science-pack",table.concat(out.prerequisites,","))
-          local sif=bindings.conditions_for("research-speed","research-speed-8",{["space-is-fake"]="1.0.60"})
-          assert(#sif.excluded_science==1 and sif.excluded_science[1]=="space-science-pack")
-          assert(sif.excluded_prerequisites[1]=="space-science-pack")
+          -- The shifted identity is covered by the actual science pass,
+          -- including an inherited retired ingredient/gate, not a name table.
+          out.unit.ingredients[#out.unit.ingredients+1]={"space-science-pack",7}
+          out.prerequisites[#out.prerequisites+1]="space-science-pack"
+          raw.technology["space-science-pack"].enabled=false
+          reports=science.apply_family({out},nil,{raw=raw,options=values.options,target={id="f210"},
+            mods={base="2.1.23",["space-age"]="2.1.23",["space-is-fake"]="1.0.78"}})
+          assert(reports[1].enabled~=false,reports[1].reason)
+          assert(not names(out.unit.ingredients):find("space-science-pack",1,true))
+          assert(not table.concat(out.prerequisites,","):find("space-science-pack",1,true))
         ''')
 
     def test_finite_research_speed_runtime_caps_target_only_mir_eight(self):

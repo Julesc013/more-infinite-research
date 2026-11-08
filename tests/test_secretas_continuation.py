@@ -194,11 +194,16 @@ class SecretasContinuationTests(unittest.TestCase):
             for name, expected in inputs.items():
                 self.assertEqual(expected, scaffold.plain_lua(lua.globals().data.raw.technology[name]))
 
-    def test_absent_provider_and_internal_duplicates_keep_generator_protection(self):
+    def test_valid_unnamed_provider_continues_and_internal_duplicates_still_refuse(self):
         lua = self.stage(provider=False)
-        with self.assertRaisesRegex(LuaError, "duplicate technology worker-robots-storage-4"):
-            self.pipeline(lua)
-        self.assertEqual(0, lua.globals().data.writes)
+        # The previous expectation required a crash for these same valid
+        # finite inputs without the Secretas flag. Ownership follows the
+        # actual connected chain, not the provider's display name.
+        self.pipeline(lua)
+        self.assertEqual(1, lua.globals().data.writes)
+        for name, expected in finite_inputs().items():
+            self.assertEqual(expected, scaffold.plain_lua(lua.globals().data.raw.technology[name]))
+        self.oracle(lua)
         lua = self.stage()
         lua.execute('''
           local selected=modern_catalogue.continuations(mods,data.raw)

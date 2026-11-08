@@ -171,7 +171,8 @@ for family, targets in pairs(native_credit_targets) do
   native_credit_groups[family] = rows
 end
 local native_adoption_patch = modern and require("research.native_adoption").plan(
-  data.raw, native_owner_targets, withheld_native_owners, native_credit_groups)
+  data.raw, native_owner_targets, withheld_native_owners, native_credit_groups,
+  modern_selection.worker_storage)
 
 if modern_selection and modern_selection.bob_angel_f200_combined then
   require("compatibility.modern_catalogue.bob_angel_f200_combined").apply_effect_order(technologies)
@@ -245,7 +246,14 @@ local science_environment = {
 local science_context = science.prepare(science_environment)
 local electric_full
 if modern_selection then electric_full = modern.retain_external_weapon_coverage(modern_selection, technologies, science_context) end
-science.apply_family(technologies, nil, science_environment, science_context)
+local science_family_bindings
+local worker_storage = modern_selection and modern_selection.worker_storage
+if worker_storage and worker_storage.owned then
+  local binding = require("compatibility.science_bindings").conditions_for("worker-robots-storage")
+  binding.inherit_worker_storage_prerequisites = true
+  science_family_bindings = {[worker_storage.technology]=binding}
+end
+science.apply_family(technologies, science_family_bindings, science_environment, science_context)
 if electric_full then
   for _, technology in ipairs(technologies) do
     if technology.name == electric_full.name then

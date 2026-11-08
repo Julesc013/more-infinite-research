@@ -879,6 +879,57 @@ local function direct_replacement_contract(context, selected, view, pack, contra
   return context.direct_replacement_sources[pack] or contract
 end
 
+-- Resolve this one declared retirement once for the whole detached catalogue.
+-- SIF's removed source must not become available again through a renamed
+-- continuation, a required-pack list, or a later policy/gate addition. A
+-- current positive named source (including the existing direct replacement
+-- rule) wins; merely loading SIF never removes usable white science.
+local function space_science_retired(context, selected, view)
+  if context.space_science_retired ~= nil then return context.space_science_retired end
+  if not bindings.has_retired_space_role(context.target, context.mods) then
+    context.space_science_retired = false
+    return false
+  end
+  local pack = "space-science-pack"
+  for _, kind in ipairs({"recipe", "technology"}) do
+    local rows = context.raw[kind]
+    if rows ~= nil and (type(rows) ~= "table" or rows[pack] ~= nil and type(rows[pack]) ~= "table") then
+      error("MIR SIF science source: malformed " .. kind .. ":" .. pack, 2)
+    end
+  end
+  local recipe = (context.raw.recipe or {})[pack]
+  if recipe ~= nil and not recipe_forms(recipe) then
+    error("MIR SIF science source: malformed recipe difficulty forms:" .. pack, 2)
+  end
+  local contract = selected.source_contracts and selected.source_contracts[pack]
+  local shape_valid, shape_reason = validate_contract_shape(contract, pack)
+  if not shape_valid then error("MIR SIF science binding: " .. tostring(shape_reason), 2) end
+  local supported, reason = validate_source_contract(context.raw, contract, pack)
+  -- Invalid declaration structure is a programming error, not evidence that
+  -- a science role was intentionally retired. Do not catch validator errors.
+  if not supported and (reason == "nested-alternative" or reason == "cyclic-alternative"
+      or reason == "missing-contract-pack" or reason == "unbound"
+      or tostring(reason):match("^contract%-pack%-mismatch:")
+      or tostring(reason):match("^unknown%-contract:")) then
+    error("MIR SIF science binding: " .. tostring(reason), 2)
+  end
+  if not supported then
+    contract = direct_replacement_contract(context, selected, view, pack, contract)
+    supported = validate_source_contract(context.raw, contract, pack)
+  end
+  context.space_science_retired = not supported
+  return context.space_science_retired
+end
+
+local function without_retired_space(names, retired)
+  if not retired then return copy_list(names) end
+  local out = {}
+  for _, name in ipairs(names or {}) do
+    if name ~= "space-science-pack" then out[#out + 1] = name end
+  end
+  return out
+end
+
 local function reported_policy(policy, context)
   if policy == POLICY_DEFAULT then return "configured" end
   for _, unresolved_policy in pairs(context.unbound_science_sources or {}) do
@@ -1033,11 +1084,12 @@ function M.apply(technology, binding, context)
   if not source or #source == 0 then return disable(technology, reason or "missing-science-ingredients") end
   local selected, view = selected_binding(context), collector(context)
   local raw = context.raw
+  local retired_space = space_science_retired(context, selected, view)
   if option(context, "mir-science-pack-ingredient-policy", POLICY_DEFAULT) == "all" then
     bind_fresh_sources(context, selected, view, source)
   end
 
-  local required = copy_list(binding.required_science)
+  local required = without_retired_space(binding.required_science, retired_space)
   for _, name in ipairs(required) do
     if not item_exists(raw, name) then return disable(technology, "missing-required-science:" .. name, source) end
     if name == "cryogenic-science-pack" then
@@ -1052,6 +1104,10 @@ function M.apply(technology, binding, context)
   local ingredients, policy, additions, addition_contracts = policy_ingredients(source, binding, context, selected, view)
   ingredients, additions, addition_contracts = exclude_science(
     ingredients, additions, addition_contracts, binding.excluded_science)
+  if retired_space then
+    ingredients, additions, addition_contracts = exclude_science(
+      ingredients, additions, addition_contracts, {"space-science-pack"})
+  end
   for _, name in ipairs(additions) do
     addition_contracts[name] = direct_replacement_contract(
       context, selected, view, name, addition_contracts[name])
@@ -1084,7 +1140,7 @@ function M.apply(technology, binding, context)
   if binding.phase_all_selected == true then
     for _, row in ipairs(ingredients) do required[#required + 1] = row[1] end
   end
-  local phase_any, phase_seen = copy_list(binding.phase_any_science), {}
+  local phase_any, phase_seen = without_retired_space(binding.phase_any_science, retired_space), {}
   for _, name in ipairs(phase_any) do phase_seen[name] = true end
   for _, name in ipairs(k2_phase_any) do append_name(phase_any, phase_seen, name) end
   if #phase_any > 0 then
@@ -1099,9 +1155,13 @@ function M.apply(technology, binding, context)
   -- Filter that local source list only; later explicit policy/gate additions
   -- retain their authority. Never infer prerequisites from foreign prototypes.
   local prerequisites = merge_prerequisites(technology.prerequisites, policy_prereqs, binding.excluded_prerequisites)
+  if retired_space then prerequisites = without_retired_space(prerequisites, true) end
   if option(context, "ips-require-space-gate", false) == true and binding.space_gate ~= false then
     local gate = selected.end_game
     if not gate then return disable(technology, "missing-end-game-gate", ingredients, prerequisites) end
+    if retired_space and gate.pack == "space-science-pack" then
+      error("MIR SIF science binding: retired space science cannot be the end-game gate", 2)
+    end
     if not item_exists(raw, gate.pack) then return disable(technology, "missing-end-game-science:" .. gate.pack, ingredients, prerequisites) end
     local contract = type(selected.source_contracts) == "table" and selected.source_contracts[gate.pack] or nil
     contract = direct_replacement_contract(context, selected, view, gate.pack, contract)
@@ -1115,6 +1175,7 @@ function M.apply(technology, binding, context)
     else
       gate_prerequisites = gate.prerequisites
     end
+    if retired_space then gate_prerequisites = without_retired_space(gate_prerequisites, true) end
     for _, name in ipairs(gate_prerequisites) do
       if not technology_exists(raw, name) then
         return disable(technology, "missing-end-game-gate-prerequisite:" .. name, ingredients, prerequisites)
@@ -1140,6 +1201,29 @@ function M.apply(technology, binding, context)
   return {enabled = technology.enabled ~= false, reason = "lab-reduced", ingredients = best, prerequisites = prerequisites}
 end
 
+-- Published worker continuations inherited their finite tail's science and
+-- attached the admitted pack gates after lab selection. Reuse this phase's
+-- named source bindings; an unknown pack never triggers prerequisite discovery.
+local function append_worker_storage_prerequisites(technology, context)
+  local selected, view = selected_binding(context), collector(context)
+  local names, seen = {}, {}
+  for _, ingredient in ipairs(technology.unit.ingredients) do
+    local pack = ingredient[1]
+    local contract = selected.source_contracts and selected.source_contracts[pack]
+    contract = direct_replacement_contract(context, selected, view, pack, contract)
+    local replacement = context.direct_replacement_sources and context.direct_replacement_sources[pack]
+    local prerequisites = (selected.pack_prerequisites or {})[pack] or {}
+    if replacement ~= nil and replacement == contract then
+      prerequisites = replacement.owner and {replacement.owner} or {}
+    end
+    for _, name in ipairs(prerequisites) do
+      local owner = (context.raw.technology or {})[name]
+      if type(owner) == "table" and owner.enabled ~= false then append_name(names, seen, name) end
+    end
+  end
+  technology.prerequisites = merge_prerequisites(technology.prerequisites, names)
+end
+
 -- A caller may share a prepared view with its earlier read-only owner check
 -- in this same immutable phase; ordinary callers still get a fresh context.
 function M.apply_family(rows, family_bindings, environment, prepared_context)
@@ -1154,12 +1238,16 @@ function M.apply_family(rows, family_bindings, environment, prepared_context)
     end
     if binding == nil then
       local family = row.name:match("^recipe%-prod%-(.-)%-%d+$") or row.name:match("^(.-)%-%d+$")
-      binding = bindings.conditions_for(family, row.name, environment.mods)
+      binding = bindings.conditions_for(family)
       if row.name == "mir-k2-imersite-staged-state-1" or row.name == "mir-k2-imersite-continuation-state-4" then
         binding.preserve_identity, binding.space_gate = true, false
       end
     end
     local report = M.apply(row, binding, context)
+    if binding.inherit_worker_storage_prerequisites == true then
+      append_worker_storage_prerequisites(row, context)
+      report.prerequisites = row.prerequisites
+    end
     reports[index] = report
     if context.options["mir-debug-generation-report"] == true and type(environment.log) == "function" then
       environment.log(diagnostic_line(row, report))
