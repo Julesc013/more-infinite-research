@@ -20,28 +20,40 @@ local function same(a, b, path)
 end
 local function stage()
   local version = script.active_mods[C.fixture]
-  local source = version=="0.1.0"
-  local successor
-  if version=="0.2.0" or version=="0.4.0" then
-    successor=C.successor
-  elseif version=="0.5.0" then
-    successor=C.current_successor
-  elseif not source then
+  local role, mir
+  if version=="0.1.0" then
+    role,mir="published-source",C.source
+  elseif version=="0.2.0" then
+    role,mir="successor",C.successor
+  elseif version=="0.4.0" then
+    role,mir="entry-successor",C.successor
+  elseif version==C.current_fixture then
+    if script.active_mods["more-infinite-research"]==C.source then
+      role,mir="current-source",C.source
+    elseif script.active_mods["more-infinite-research"]==C.current_successor then
+      role,mir="current-entry-successor",C.current_successor
+    else
+      fail("current fixture MIR version differs")
+    end
+  else
     fail("fixture version differs")
   end
   local expected = {base="2.0.77",["elevated-rails"]="2.0.77",quality="2.0.77",
     ["space-age"]="2.0.77",["space-is-fake"]="1.0.60",["cr-commons"]="1.0.27",
-    [C.fixture]=version,["more-infinite-research"]=source and C.source or successor,
+    [C.fixture]=version,["more-infinite-research"]=mir,
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
   for name, value in pairs(expected) do
     if script.active_mods[name]~=value then fail("exact closure differs: " .. name) end
   end
   for name in pairs(script.active_mods) do if expected[name]==nil then fail("unexpected mod: " .. name) end end
-  return source
+  return role
 end
-local function entry_boundary_mode()
-  local version=script.active_mods[C.fixture]
-  return version=="0.4.0" or version=="0.5.0"
+local function source_stage(role)
+  return role=="published-source" or role=="current-source"
+end
+local function entry_boundary_mode(role)
+  role=role or stage()
+  return role=="entry-successor" or role=="current-entry-successor"
 end
 local function require_early_order(order)
   if type(order)~="string" then fail("entry boundary event order absent") end
@@ -59,6 +71,23 @@ local function require_early_order(order)
   if table.concat(names," -> ")~=order or not fixture_index or not mir_index or fixture_index>=mir_index then
     fail("entry boundary must precede MIR configuration")
   end
+end
+local function require_current_entry_event(event)
+  if type(event)~="table" or event.mod_startup_settings_changed~=false then
+    fail("current entry requires unchanged startup settings")
+  end
+  local changes=event.mod_changes
+  local mir=type(changes)=="table" and changes["more-infinite-research"] or nil
+  if type(mir)~="table" or mir.old_version~=C.source or mir.new_version~=C.current_successor then
+    fail("current entry requires exact MIR transition")
+  end
+  for name,change in pairs(changes) do
+    if name~="more-infinite-research" and (type(change)~="table" or change.old_version~=change.new_version) then
+      fail("current entry requires MIR-only version change")
+    end
+  end
+  return {mir_old_version=mir.old_version,mir_new_version=mir.new_version,
+    mod_startup_settings_changed=event.mod_startup_settings_changed}
 end
 local function clone(value)
   if type(value)~="table" then return value end
@@ -148,7 +177,8 @@ local function zero_manufacturing(force)
 end
 local function verify(state, successor)
   if type(state)~="table" or state.kind~="explicit-published-native-fixture-seed-not-lab-earned"
-      or state.source_mir~=C.source then fail("published source witness absent") end
+      or state.source_mir~=C.source or (state.source_fixture_version~=nil
+        and state.source_fixture_version~=C.current_fixture) then fail("published source witness absent") end
   local expected_player,expected_foreign=expected_snapshots(state)
   same(snapshot(game.forces.player),expected_player,"player")
   local foreign=game.forces[state.foreign_index]
@@ -190,21 +220,35 @@ local function entry_marker(phase,state)
     witnesses.successor_mir=C.current_successor
     witnesses.role="successor-current-entry-boundary-proposal"
     witnesses.fixture_version=version
+    witnesses.source_fixture_version=state.source_fixture_version
   end
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({case=C.case,stage=phase,status="passed",
     witnesses=witnesses}))
 end
 local function marker(phase,state,source)
+  local current_source=source and state.source_fixture_version==C.current_fixture
+  local witnesses={source_mir=C.source,successor_mir=current_source and C.current_successor or C.successor,
+    role=current_source and "current-published-fixture-source" or source and "published" or "successor",
+    source_kind=state.kind,source_actual_labs=0,successor_actual_labs=0,
+    source_snapshot=state.player,foreign_snapshot=state.foreign,fresh_index=state.fresh_index,
+    five_hidden_rows=true,exact_effect_counts={3,2,1,3,2},processing_unit_scrap=false,
+    actual_gui_input=false,hidden_library_enqueue_not_exercised=true,on_load_read_only=phase=="reload"}
+  if current_source then witnesses.source_fixture_version=state.source_fixture_version end
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({case=C.case,stage=phase,status="passed",
-    witnesses={source_mir=C.source,successor_mir=C.successor,role=source and "published" or "successor",
-      source_kind=state.kind,source_actual_labs=0,successor_actual_labs=0,
-      source_snapshot=state.player,foreign_snapshot=state.foreign,fresh_index=state.fresh_index,
-      five_hidden_rows=true,exact_effect_counts={3,2,1,3,2},processing_unit_scrap=false,
-      actual_gui_input=false,hidden_library_enqueue_not_exercised=true,on_load_read_only=phase=="reload"}}))
+    witnesses=witnesses}))
 end
-local function prepare_source()
-  if not stage() then fail("protected published source save required") end
-  if storage[KEY]~=nil or game.forces[FOREIGN_FORCE] or game.forces[FRESH_FORCE] then fail("source fixture collision") end
+local function prepare_source(role)
+  if not source_stage(role or stage()) then fail("protected published source save required") end
+  local pending=storage[KEY]
+  if role=="current-source" then
+    if type(pending)~="table" or pending.kind~="current-fixture-source-awaiting-seed"
+        or pending.source_mir~=C.source or pending.source_fixture_version~=C.current_fixture
+        or pending.phase~="current-source-awaiting-seed" then fail("current source fixture collision") end
+    -- Claim the fresh marker before mutating any source witness. A stopped
+    -- partial source may fail closed; it never re-enters a seed/reseed path.
+    pending.phase="current-source-seeding"
+  elseif pending~=nil then fail("source fixture collision") end
+  if game.forces[FOREIGN_FORCE] or game.forces[FRESH_FORCE] then fail("source fixture collision") end
   local force=game.forces.player
   assert_rows(force)
   for _, row in ipairs(C.rows) do
@@ -244,15 +288,35 @@ local function prepare_source()
   foreign.reset_technology_effects();foreign_native.enabled=false;zero_manufacturing(foreign)
   local foreign_snapshot=snapshot(foreign)
   if foreign_snapshot.foreign.enabled~=false then fail("disabled foreign source was not retained") end
-  storage[KEY]={kind="explicit-published-native-fixture-seed-not-lab-earned",source_mir=C.source,
+  local captured={kind="explicit-published-native-fixture-seed-not-lab-earned",source_mir=C.source,
     phase="source-pending",player=player,foreign_index=foreign.index,foreign=foreign_snapshot}
+  if role=="current-source" then captured.source_fixture_version=C.current_fixture end
+  storage[KEY]=captured
 end
-script.on_init(prepare_source)
-script.on_configuration_changed(function()
-  if stage() then fail("unexpected source configuration change") end
+script.on_init(function()
+  local role=stage()
+  if role=="current-source" then
+    if storage[KEY]~=nil or game.forces[FOREIGN_FORCE] or game.forces[FRESH_FORCE] then fail("source fixture collision") end
+    -- The normal runner creates, exits, then loads the save. Persist only a
+    -- fixture-local pending marker now; the actual source seed is first tick,
+    -- after published MIR initialization, and cannot be replayed once claimed.
+    storage[KEY]={kind="current-fixture-source-awaiting-seed",source_mir=C.source,
+      source_fixture_version=C.current_fixture,phase="current-source-awaiting-seed"}
+    return
+  end
+  prepare_source(role)
+end)
+script.on_configuration_changed(function(event)
+  local role=stage()
+  local transition
+  if role=="current-entry-successor" then transition=require_current_entry_event(event) end
+  if source_stage(role) then fail("unexpected source configuration change") end
   local state=storage[KEY]
   if type(state)~="table" or state.phase~="source-complete" then fail("protected completed source required") end
-  if entry_boundary_mode() then
+  if role=="current-entry-successor" and state.source_fixture_version~=C.current_fixture then
+    fail("current source fixture witness absent")
+  end
+  if entry_boundary_mode(role) then
     if state.entry_boundary~=nil then fail("entry boundary already captured") end
     local order=script.get_event_order();require_early_order(order)
     local player=snapshot(game.forces.player)
@@ -273,6 +337,7 @@ script.on_configuration_changed(function()
       player=player,foreign=foreign,player_prototypes=player_prototypes,foreign_prototypes=foreign_prototypes,
       flag_deltas={player_processing={source=state.player.technologies[id(C.rows[3])].enabled,entry=player_flag},
         foreign_mining={source=state.foreign.foreign.enabled,entry=foreign_flag}}}
+    if transition then state.entry_boundary.transition=transition end
     state.phase="entry-boundary-pending"
     loaded,reported=false,false
     return -- No post-configuration verification, API, fresh force or save before MIR config.
@@ -287,9 +352,15 @@ end)
 script.on_load(function() loaded,reported=true,false end)
 script.on_event(defines.events.on_tick,function()
   if reported then return end
-  local source=stage();local state=storage[KEY]
+  local role=stage()
+  local initial=storage[KEY]
+  if role=="current-source" and type(initial)=="table" and initial.phase=="current-source-awaiting-seed" then
+    prepare_source(role)
+    return
+  end
+  local source=source_stage(role);local state=initial
   if type(state)~="table" then fail("fixture state absent") end
-  if entry_boundary_mode() and state.phase=="entry-boundary-pending" then
+  if entry_boundary_mode(role) and state.phase=="entry-boundary-pending" then
     -- First tick follows all configuration callbacks. Check preservation before
     -- the one intentional fresh-force creation, then the ordinary API/save path.
     verify(state,false)
@@ -300,7 +371,7 @@ script.on_event(defines.events.on_tick,function()
     state.phase="entry-boundary-complete"
     entry_marker("initial",state);reported=true;game.server_save(SAVE)
     return
-  elseif entry_boundary_mode() and loaded and state.phase=="entry-boundary-complete" then
+  elseif entry_boundary_mode(role) and loaded and state.phase=="entry-boundary-complete" then
     verify(state,true);entry_marker("reload",state);reported=true
     return
   end

@@ -1,9 +1,9 @@
 {
   "name": "mir-fixture-mir5-sif-retained-manufacturing",
   "version": "0.5.0",
-  "title": "MIR SIF current entry-boundary successor proposal (not armed)",
+  "title": "MIR SIF current same-fixture entry-boundary proposal (not armed)",
   "author": "MIR maintainers",
-  "description": "Test-only proposed published5.0.20010 entry boundary; requires independent review and complete native packet binding.",
+  "description": "Test-only proposed same-fixture published4.7.20003 to published5.0.20010 entry boundary; requires independent review and complete native packet binding.",
   "factorio_version": "2.0",
   "dependencies": [
     "base >= 2.0.77",

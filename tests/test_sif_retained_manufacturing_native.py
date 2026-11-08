@@ -119,14 +119,23 @@ class RetainedNativeFixtureTests(unittest.TestCase):
             return {name=name,force_index=index,level=api_wrong and t.level+1 or t.level,researched=t.researched,
               enabled=t.enabled,saved_progress=t.saved_progress}
           end}
-          function switch_successor()
-            script.active_mods["more-infinite-research"]="5.0.20002"
-            script.active_mods["mir-fixture-mir5-sif-retained-manufacturing"]="0.2.0"
+          configuration_event={mod_changes={},mod_startup_settings_changed=false}
+          local function transition(mir,fixture)
+            local before={};for name,version in pairs(script.active_mods) do before[name]=version end
+            script.active_mods["more-infinite-research"]=mir
+            script.active_mods["mir-fixture-mir5-sif-retained-manufacturing"]=fixture
+            local changes,names={},{}
+            for name in pairs(before) do names[name]=true end
+            for name in pairs(script.active_mods) do names[name]=true end
+            for name in pairs(names) do
+              if before[name]~=script.active_mods[name] then
+                changes[name]={old_version=before[name],new_version=script.active_mods[name]}
+              end
+            end
+            configuration_event={mod_changes=changes,mod_startup_settings_changed=false}
           end
-          function switch_current_entry_successor()
-            script.active_mods["more-infinite-research"]="5.0.20010"
-            script.active_mods["mir-fixture-mir5-sif-retained-manufacturing"]="0.5.0"
-          end
+          function switch_successor() transition("5.0.20002","0.2.0") end
+          function switch_current_entry_successor() transition("5.0.20010","0.5.0") end
         ''')
         self.lua.execute('''
           script.event_order="level -> mir-fixture-mir5-sif-retained-manufacturing -> space-is-fake -> more-infinite-research"
@@ -167,17 +176,25 @@ class RetainedNativeFixtureTests(unittest.TestCase):
           function run_configuration()
             callback_phase="configuration";mir_config_seen=false
             for name in (script.event_order.." -> "):gmatch("(.-) %-> ") do
-              if name=="mir-fixture-mir5-sif-retained-manufacturing" then callbacks.config()
+              if name=="mir-fixture-mir5-sif-retained-manufacturing" then callbacks.config(configuration_event)
               elseif name=="more-infinite-research" then
                 if mir_callback then mir_callback() end;mir_config_seen=true
               end
             end
             callback_phase="after-configuration"
           end
+          function run_current_source_initialization()
+            callback_phase="initialization";mir_init_seen=false
+            for name in (script.event_order.." -> "):gmatch("(.-) %-> ") do
+              if name=="mir-fixture-mir5-sif-retained-manufacturing" then callbacks.init()
+              elseif name=="more-infinite-research" then mir_init_seen=true end
+            end
+            callback_phase="after-initialization"
+          end
           local create,save,query=game.create_force,game.server_save,remote.call
           local function after_config()
             local role=script.active_mods['mir-fixture-mir5-sif-retained-manufacturing']
-            if role=='0.4.0' or role=='0.5.0' then
+            if role=='0.4.0' or (role=='0.5.0' and script.active_mods['more-infinite-research']=='5.0.20010') then
               assert(callback_phase=="after-configuration" and mir_config_seen,"fresh/API/save before all configuration callbacks")
             end
           end
@@ -207,7 +224,7 @@ class RetainedNativeFixtureTests(unittest.TestCase):
     def successor(self):
         self.lua.execute("switch_successor()")
         self.load_control()
-        self.lua.execute("callbacks.config(); callbacks.tick()")
+        self.lua.execute("callbacks.config(configuration_event); callbacks.tick()")
 
     def cold(self):
         before = self.storage()
@@ -229,8 +246,28 @@ class RetainedNativeFixtureTests(unittest.TestCase):
         self.lua.execute("guard_natives();guard_source_witnesses()")
         self.lua.globals().engine_flags(player, foreign)
 
+    def current_source(self):
+        self.lua.execute("script.active_mods['mir-fixture-mir5-sif-retained-manufacturing']='0.5.0'")
+        self.load_control()
+        self.lua.execute("run_current_source_initialization()")
+        self.assertTrue(self.lua.globals().mir_init_seen)
+        self.assertEqual("current-fixture-source-awaiting-seed",
+                         self.lua.eval("storage.mir5_sif_retained_manufacturing.kind"))
+        self.assertEqual("current-source-awaiting-seed",
+                         self.lua.eval("storage.mir5_sif_retained_manufacturing.phase"))
+        self.assertEqual(0, self.lua.eval("#saves"))
+        # The normal fixture runner exits after create and starts a fresh
+        # process for load. Reload before the first seed tick so no local
+        # pending flag can make this host control pass.
+        self.load_control()
+        self.lua.execute("callbacks.load()")
+        self.assertEqual("current-source-awaiting-seed",
+                         self.lua.eval("storage.mir5_sif_retained_manufacturing.phase"))
+        self.lua.execute("callbacks.tick();callbacks.tick()")
+        self.assertEqual("0.5.0", self.lua.eval("storage.mir5_sif_retained_manufacturing.source_fixture_version"))
+
     def current_entry_setup(self, player, foreign):
-        self.source()
+        self.current_source()
         self.lua.execute("switch_current_entry_successor()")
         self.load_control()
         self.lua.execute("guard_natives();guard_source_witnesses()")
@@ -265,16 +302,23 @@ class RetainedNativeFixtureTests(unittest.TestCase):
 
     def test_current_entry_boundary_preserves_source_through_two_read_only_colds(self):
         info = json.loads((FIXTURE / "successor-current-entry-boundary/info.json").read_bytes())
+        source_profile = json.loads((ROOT / "tests/profiles/sif-retained-manufacturing-current-source-f200-2077.json").read_bytes())
         profile = json.loads((ROOT / "tests/profiles/sif-retained-manufacturing-current-f200-2077.json").read_bytes())
         self.assertEqual((NAME, "0.5.0", "2.0"), (info["name"], info["version"], info["factorio_version"]))
         self.assertEqual(["base >= 2.0.77", "space-age >= 2.0.77"], info["dependencies"])
         self.assertFalse(any(dependency.startswith("more-infinite-research") for dependency in info["dependencies"]))
+        self.assertEqual("FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+                         source_profile["archive_sha256"]["more-infinite-research_4.7.20003.zip"])
         self.assertEqual("36F2E9D8C01507C2CBDC01AFF6C87399B40A9E0646F40DEC1F82628F5F50CBAB",
                          profile["archive_sha256"]["more-infinite-research_5.0.20010.zip"])
         for player in (False, True):
             for foreign in (False, True):
                 with self.subTest(player=player, foreign=foreign):
                     self.setUp(); self.current_entry_setup(player, foreign)
+                    self.assertEqual("4.7.20003", self.lua.eval("configuration_event.mod_changes['more-infinite-research'].old_version"))
+                    self.assertEqual("5.0.20010", self.lua.eval("configuration_event.mod_changes['more-infinite-research'].new_version"))
+                    self.assertTrue(self.lua.eval("configuration_event.mod_changes['mir-fixture-mir5-sif-retained-manufacturing']==nil"))
+                    self.assertFalse(self.lua.eval("configuration_event.mod_startup_settings_changed"))
                     self.lua.execute("run_configuration()")
                     self.assertEqual(1, self.lua.globals().create_calls)
                     self.assertEqual(0, self.lua.globals().api_calls)
@@ -285,6 +329,9 @@ class RetainedNativeFixtureTests(unittest.TestCase):
                     self.assertEqual("5.0.20010", self.lua.eval("markers[2].witnesses.successor_mir"))
                     self.assertEqual(player, self.lua.eval("markers[2].witnesses.entry_boundary.player_processing_enabled"))
                     self.assertEqual(foreign, self.lua.eval("markers[2].witnesses.entry_boundary.foreign_mining_enabled"))
+                    self.assertEqual("4.7.20003", self.lua.eval("markers[2].witnesses.entry_boundary.transition.mir_old_version"))
+                    self.assertEqual("5.0.20010", self.lua.eval("markers[2].witnesses.entry_boundary.transition.mir_new_version"))
+                    self.assertFalse(self.lua.eval("markers[2].witnesses.entry_boundary.transition.mod_startup_settings_changed"))
                     self.assertFalse(self.lua.eval("markers[2].witnesses.entry_boundary.flag_deltas.player_processing.source"))
                     self.assertFalse(self.lua.eval("markers[2].witnesses.entry_boundary.flag_deltas.foreign_mining.source"))
                     self.assertEqual(2, self.lua.globals().create_calls)
@@ -293,6 +340,42 @@ class RetainedNativeFixtureTests(unittest.TestCase):
                     self.assertEqual(4, self.lua.eval("#markers"))
                     self.assertEqual(15, self.lua.globals().api_calls)
                     self.assertEqual(2, self.lua.globals().reset_calls)
+
+    def test_current_entry_rejects_fixture_or_input_change_before_entry_write(self):
+        self.source()
+        self.lua.execute("switch_current_entry_successor()")
+        self.load_control()
+        self.lua.execute("guard_natives();guard_source_witnesses()")
+        self.assertEqual("0.1.0", self.lua.eval("configuration_event.mod_changes['mir-fixture-mir5-sif-retained-manufacturing'].old_version"))
+        self.assertEqual("0.5.0", self.lua.eval("configuration_event.mod_changes['mir-fixture-mir5-sif-retained-manufacturing'].new_version"))
+        before = self.storage()
+        counts = self.lua.eval("{#saves,reset_calls,create_calls,api_calls}")
+        original = [counts[n] for n in range(1, 5)]
+        with self.assertRaisesRegex(LuaError, "current entry requires MIR-only version change"):
+            self.lua.execute("run_configuration()")
+        self.assertEqual(before, self.storage())
+        self.assertEqual(original, [self.lua.eval("#saves"), self.lua.globals().reset_calls,
+                                    self.lua.globals().create_calls, self.lua.globals().api_calls])
+
+    def test_current_entry_rejects_startup_or_other_changed_input_before_entry_write(self):
+        mutations = [
+            ("configuration_event.mod_startup_settings_changed=true", "unchanged startup settings"),
+            ("configuration_event.mod_changes['space-is-fake']={old_version='1.0.59',new_version='1.0.60'}",
+             "MIR-only version change"),
+            ("configuration_event.mod_changes['more-infinite-research'].old_version='4.7.20002'",
+             "exact MIR transition"),
+        ]
+        for mutation, message in mutations:
+            with self.subTest(mutation=mutation):
+                self.setUp(); self.current_entry_setup(False, False)
+                self.lua.execute(mutation)
+                before = self.storage()
+                counts = self.lua.eval("{#saves,reset_calls,create_calls,api_calls}")
+                original = [counts[n] for n in range(1, 5)]
+                with self.assertRaisesRegex(LuaError, message): self.lua.execute("run_configuration()")
+                self.assertEqual(before, self.storage())
+                self.assertEqual(original, [self.lua.eval("#saves"), self.lua.globals().reset_calls,
+                                            self.lua.globals().create_calls, self.lua.globals().api_calls])
 
     def test_old_entry_role_refuses_current_successor_version_before_mutation(self):
         self.source()
@@ -415,6 +498,7 @@ class RetainedNativeFixtureTests(unittest.TestCase):
             self.assertEqual(recipes, list(contract.rows[i].recipes.values()))
         self.assertEqual([3, 2, 1, 3, 2], [len(row[1]) for row in ROWS])
         self.assertEqual("5.0.20002", contract.successor)
+        self.assertEqual("0.5.0", contract.current_fixture)
         self.assertEqual("5.0.20010", contract.current_successor)
         for role, profile_role, version, mir, digest, dependency in (
             ("published", "published", "0.1.0", "4.7.20003", "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
@@ -434,6 +518,21 @@ class RetainedNativeFixtureTests(unittest.TestCase):
             self.assertEqual(version, selected[NAME])
             self.assertNotIn("recycler", selected)
             self.assertEqual("2.0.77", profile["engine"]["version"])
+        for profile_name, mir, digest in (
+            ("sif-retained-manufacturing-current-source-f200-2077.json", "4.7.20003",
+             "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647"),
+            ("sif-retained-manufacturing-current-f200-2077.json", "5.0.20010",
+             "36F2E9D8C01507C2CBDC01AFF6C87399B40A9E0646F40DEC1F82628F5F50CBAB"),
+        ):
+            profile = json.loads((ROOT / "tests/profiles" / profile_name).read_bytes())
+            selected = {r["name"]: r["version"] for r in profile["mods"] if r["enabled"]}
+            self.assertEqual(9, len(selected))
+            self.assertEqual("0.5.0", selected[NAME])
+            self.assertEqual(mir, selected["more-infinite-research"])
+            self.assertEqual(digest, profile["archive_sha256"][f"more-infinite-research_{mir}.zip"])
+            self.assertEqual("1.0.60", selected["space-is-fake"])
+            self.assertEqual("1.0.27", selected["cr-commons"])
+            self.assertNotIn("recycler", selected)
 
     def test_actual_lua_lifecycle_preserves_source_and_two_read_only_colds(self):
         self.source()
