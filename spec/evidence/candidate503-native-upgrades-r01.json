@@ -150,5 +150,10 @@
     ],
     "publication_record": "candidate503-github-prerelease-delivery-chain-r01.json",
     "stable_acceptance": false
+  },
+  "configured_settings_independent_review_followup": {
+    "record": "spec/evidence/candidate510-settings-cap-applicability-aero-r01.json",
+    "component": "C503-configured-native-cost-time-effect-with-foreign-reward",
+    "scope": "Later independent acceptance of the original named native case only; current-candidate applicability remains separately bounded. Original observations and pending marker are preserved."
   }
 }

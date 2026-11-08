@@ -1,0 +1,210 @@
+{
+  "schema": 1,
+  "kind": "MIR510SettingsCapApplicabilityAeroR01",
+  "status": "bounded original-native review and direct-gun source applicability; not current whole-route qualification",
+  "requirements": [
+    "CONT-03",
+    "CONT-07",
+    "CONT-11",
+    "VER-06"
+  ],
+  "worklist": "docs/progress.md; this record explains existing settings/cap applicability and creates no separate native dispatch queue",
+  "published510": {
+    "commit": "958e34dd2701418c71f74ae094c26ff7cd467e6b",
+    "player_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0"
+  },
+  "reviewed_dev": {
+    "commit": "808e9f54a8b5663190017405ff8a308bf16f6f3e",
+    "player_tree": "2487ba5ad1d2ba32b4bf48821bbb8bd078d5e64d"
+  },
+  "original_configured_steel_native_review": {
+    "component_index": "spec/evidence/candidate503-native-upgrades-r01.json",
+    "component": "C503-configured-native-cost-time-effect-with-foreign-reward",
+    "candidate_player_tree": "8489d53e7202ce29962e364110ccb36cc261c8cc",
+    "review": {
+      "kind": "MIR503NativeOwnerConfiguredSettingsOriginalReviewAeroR01",
+      "status": "accepted-original-scoped-native-case; not current-candidate qualification",
+      "originals_commit": "e52d444ef16928231fd96e21ed769fe21d7e06a1",
+      "originals_path": "evidence/native-owner-settings-native-chain-r01/original-bodies.json.gz",
+      "compressed_sha256": "A857442842BAF054708304F91DB697D44E7CC0EF9948CF2848533ECEF52A60AD",
+      "decoded_sha256": "0CFFB48A0798C11DED24E819402E2A675DCD41BBAE1E913B11AAE0D706C0FA5E",
+      "verified_bodies": 87,
+      "candidate_author": "aa1f5760dc22e10d5c7ad58e30c6c2894a68f868",
+      "product_archive_sha256": "C622AC3A73603E7C127FA8168D12C5D878D52646226EC74190E70164D6E0D227",
+      "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+      "profile_sha256": "D04D547ACAA30A4CE0306FC631A8B979D779611967C3822CBE54E53D9CCC46B6",
+      "actor_sha256": "4F1975B9A777E71CED42BA000866FAECE96B42DA479036483FB2B4B1CB006391",
+      "caller_sha256": "7F82A5729349B26E1B568DFEDCEA0A9CD1024E3D9F7A642B81CC36D44BC9F45A",
+      "fixture_sha256": "EA0EFBC735BEC4809569053F17C99A4F4884F4E8A47D6D616E9441A62B2C6300",
+      "manifest_sha256": "44178EDD1FCF4EF16BD512ED58A83034A84248606712CCB0DBB1CD8B33DB53C8",
+      "protected_save_sha256": "63CE7998AE1956A1318CAF4E04C81E8F9AA51259349F1190F5034E27339AA693",
+      "protected_save_bytes": 584858,
+      "actual_observations": [
+        {
+          "stage": "production",
+          "log_sha256": "76D9EF258D281EADA52A878EFA7951E9C9981FE8703FD7208295B8B39F94AE12",
+          "exit_code": -1,
+          "completion_predicate_observed": true
+        },
+        {
+          "stage": "reload-1",
+          "log_sha256": "4FAA9BE50EBFBA8655E2C2C71F90EF5592118FE81223909D292A34DABB6DE420",
+          "exit_code": 0,
+          "completion_predicate_observed": false
+        },
+        {
+          "stage": "reload-2",
+          "log_sha256": "CF37D5E12441F5E95AD8338270FCE71EE51E29909F6BBA43434B5F5103F34AE5",
+          "exit_code": 0,
+          "completion_predicate_observed": false
+        }
+      ],
+      "original_adverse_preserved": true,
+      "source_custody": "Two controls and seventeen previous MIR archive checks are recorded by the original guarded caller and root readback; remote historical engine/dependency binaries were not downloaded or rehashed on Aero.",
+      "limitations": [
+        "Fresh fixed settings/foreign reward/one lab/save/two one-tick cold observations only.",
+        "Production exit -1 is the recorded governor predicate stop after save; both cold observations exit 0 naturally.",
+        "No original-save cost conversion, queue/cancel/cap transition, physical manufacturing, client or performance verdict.",
+        "No current 5.0.10 or later-candidate native execution or blanket applicability verdict."
+      ],
+      "native_execution_in_this_review": false,
+      "stable_qualification": false
+    },
+    "independent_review": "Root receipt/actor/caller review plus a separate non-author receipt review accepted the named original scope. The original component pending marker remains its historical observation; this additive followup supplies the later review.",
+    "actual_case": "Fresh seven-mod Space Age 2.1.23 selection: Base, elevated-rails, quality, recycler, space-age, MIR5.0.21003 and mir-fixture-native-owner-settings0.1.0. Historical packet/scenario names do not imply K2SO is installed.",
+    "observed_behavior": "Selected native steel cost tuple2/3/1.25, research time1 and reward17 retains the four-pack science vector and the independently added bullet7% reward. One actual by_script=false native completion consumes2 units of each supplied science pack and grants17% steel-plate/casting-steel recipe productivity plus7% bullet damage. Foreign state and the hidden unearned private holder recipe-prod-research_steel-1 remain exact through save and two one-tick cold observations.",
+    "local_review_sha256": "701BC52AFB4B7253D381AEDC5D96EB3D4B3214AE3E019B2E3672EFED3F3E3EA7",
+    "local_verifier_sha256": "C02E37032068A6A574082D8C1B432622F5676AF060C33F4827277462276DEA56",
+    "current_candidate_limit": "This accepts the original native case only. Matching cost helpers do not establish current bootstrap, private-credit, cap or saved-state equivalence.",
+    "foreign_reward_provenance": {
+      "fixture_body": "fixtures/sourceb-native-owner-settings-r02/helper/data-updates.lua in the exact87-body originals",
+      "type": "ammo-damage",
+      "ammo_category": "bullet",
+      "modifier": 0.07,
+      "observation": "The actor reads force.get_ammo_damage_modifier(\"bullet\"). This foreign reward on the steel owner is distinct from MIR research_bullets/firearm-magazine recipe productivity."
+    }
+  },
+  "configured_steel_source_applicability": {
+    "status": "steel cost/time/effect source branch retained; complete current runtime/save-route equivalence not established",
+    "original_source": "aa1f5760dc22e10d5c7ad58e30c6c2894a68f868",
+    "source_continuity": [
+      {
+        "path": "source/compatibility/native_owner_cost.lua",
+        "original_and_published510_blob": "56dcb554a82a7f4771ac0a0befb34a9dbe8d452c"
+      },
+      {
+        "path": "source/research/cost.lua",
+        "original_and_published510_blob": "3d4927b8258cb7b843be7470bf21d9c353970227"
+      },
+      {
+        "path": "source/research/settings_profile.lua",
+        "original_and_published510_blob": "87522d4c648543cb83138014aa24edcd835cb657"
+      }
+    ],
+    "selected_route": "The authored Space Age steel owner keeps steel-plate/casting-steel and its inherited1.5^L*1000 input. The existing explicit projection path emits (2+3*(L-1))*1.25^(L-1), time1 and recipe reward0.17 while preserving the extra bullet reward0.07.",
+    "unselected_changes": "The exact profile contains no Bob/Angel, so current-dev disabled-water-gate additions are inactive. The steel cap default remains0; the added positive-cap presentation branches are inactive.",
+    "changed_consumed_orchestration": [
+      "source/research/product_target_extension.lua native-owner/credit-only routing",
+      "source/data-final-fixes.lua adoption, prepared science and carrier handling",
+      "source/runtime/native_credits.lua legacy-family context and transition preflight"
+    ],
+    "minimum_current_boundary": "Use the existing fresh configured-steel case on the fixed current candidate and exact accepted Space Age profile. Explicitly verify map technology-price multiplier1 and the effective/prototype steel/private-holder units; observe the same one real completion, foreign/private state and applicable mir_native_credits state, then save and two cold loads. Retain the original tuple, four sciences and foreign reward; no old-save conversion, unknown-cost fallback or broad cost/settings campaign is added.",
+    "ownership_and_scope": "Black Glass owns the native queue and exact committed composition. This identifies the outstanding current-runtime applicability boundary, not a new dispatch slot, production defect, native execution or qualification.",
+    "boundary": "Keep the original fresh configured-cost/time/reward case distinct from old-save normalized paid-work conversion and from unknown-cost residual fallback."
+  },
+  "mixed_gun_direct_method_applicability": {
+    "original_component_index": "spec/evidence/candidate504-mixed-gun-native-r01.json",
+    "original_source": "026f6a3965a2d51e1dffa9782f3a8b2bea78b6a5",
+    "original_player_tree": "a2ba6eeaf06292cd90b7d7c5a687cf96cf84529f",
+    "original_archives": {
+      "f200": "34F14D93A1262F32B45EBAB40B1C640B8B8FBE41B718492227024649E9E75268",
+      "f210": "154707C40ED772A09387BF4FB673D337796FFBCEAF1C3C57EA7DB9C3F608E922"
+    },
+    "member_bindings": {
+      "kind": "MIR504GunSourceMemberBindingsAeroR01",
+      "commits": {
+        "original504": "026f6a3965a2d51e1dffa9782f3a8b2bea78b6a5",
+        "accepted509": "1bd92e4d4d3e13b74799a26362072811925203f7",
+        "published510": "958e34dd2701418c71f74ae094c26ff7cd467e6b",
+        "current_dev": "808e9f54a8b5663190017405ff8a308bf16f6f3e"
+      },
+      "members": [
+        {
+          "path": "source/research/native_gun_credit_definitions.lua",
+          "blobs": {
+            "original504": "6d92d8bd20a3b3b18311000f1b8caa4c13c8f913",
+            "accepted509": "815ffe51792bf2b490e9a1735b13498fa65f0a77",
+            "published510": "815ffe51792bf2b490e9a1735b13498fa65f0a77",
+            "current_dev": "815ffe51792bf2b490e9a1735b13498fa65f0a77"
+          },
+          "509_510_dev_equal": true
+        },
+        {
+          "path": "source/runtime/native_gun_credits.lua",
+          "blobs": {
+            "original504": "4e4cae756a6488477fd311aa5c0f44854e45069b",
+            "accepted509": "4fddf12ef7561e663789b5ce680597503dccc8d0",
+            "published510": "4fddf12ef7561e663789b5ce680597503dccc8d0",
+            "current_dev": "4fddf12ef7561e663789b5ce680597503dccc8d0"
+          },
+          "509_510_dev_equal": true
+        },
+        {
+          "path": "source/research/native_direct_definitions.lua",
+          "blobs": {
+            "original504": "07e1b9162be6502d69fdd6c202e15613c6f4ac5e",
+            "accepted509": "07e1b9162be6502d69fdd6c202e15613c6f4ac5e",
+            "published510": "07e1b9162be6502d69fdd6c202e15613c6f4ac5e",
+            "current_dev": "07e1b9162be6502d69fdd6c202e15613c6f4ac5e"
+          },
+          "509_510_dev_equal": true
+        },
+        {
+          "path": "source/compatibility/modern_catalogue/base.lua",
+          "blobs": {
+            "original504": "634b27c63ccec2af44f823dc811d99f73fb96766",
+            "accepted509": "634b27c63ccec2af44f823dc811d99f73fb96766",
+            "published510": "634b27c63ccec2af44f823dc811d99f73fb96766",
+            "current_dev": "634b27c63ccec2af44f823dc811d99f73fb96766"
+          },
+          "509_510_dev_equal": true
+        },
+        {
+          "path": "source/compatibility/modern_catalogue/space_age.lua",
+          "blobs": {
+            "original504": "dd876a2f67146d52af2a591286eced5d8e686951",
+            "accepted509": "dd876a2f67146d52af2a591286eced5d8e686951",
+            "published510": "dd876a2f67146d52af2a591286eced5d8e686951",
+            "current_dev": "dd876a2f67146d52af2a591286eced5d8e686951"
+          },
+          "509_510_dev_equal": true
+        },
+        {
+          "path": "source/runtime/lifecycle.lua",
+          "blobs": {
+            "original504": "e2247df1b08c611bd28e75fa02e70e3e2a6e7faa",
+            "accepted509": "c38ab03888ef0f53f8d800a401da1ae03a3d2e25",
+            "published510": "c38ab03888ef0f53f8d800a401da1ae03a3d2e25",
+            "current_dev": "c38ab03888ef0f53f8d800a401da1ae03a3d2e25"
+          },
+          "509_510_dev_equal": true
+        }
+      ],
+      "scope": "Exact member identity only; not a whole bootstrap/save/native applicability verdict."
+    },
+    "meaningful_holder_change_since504": "The historical holder now declares ignore_tech_cost_multiplier=true. The native_gun_credits runtime hunk changes a diagnostic. The separate509 affected-native record qualifies its named multiplier4 fresh/first-add F200/F210 and paid F210508-to509 save/two-cold scopes; these are not relabelled as504 or510 executions.",
+    "separate_cost_evidence": "spec/evidence/candidate509-affected-native-r01.json",
+    "lifecycle_gate": "source/runtime/lifecycle.lua cancel_unavailable_research admits only authored_generated rows with declaration.cancel_queued_when_unavailable=true. source/research/catalogue.lua sets this flag only for guarded material rows. The native-direct research_electric_shooting_speed declaration has no such flag, so this addition does not itself change that mixed-gun row.",
+    "reuse_decision": "Retain the named504 native observations under their exact original inputs, and reuse direct-gun method/holder semantics together with the separately qualified509 multiplier correction. No whole504 bootstrap/save route is declared current-qualified.",
+    "whole_route_boundary": "Bootstrap, data-final and modern branches changed for worker, finite-owner and recipe-credit paths. Whole first-entry/removal/effects-reset/return/destination-merge reuse requires exact-profile branch inactivity and source-ledger proof. Select an actual affected boundary only if that review demonstrates one; no worker-plus-gun scenario is created merely because both features exist.",
+    "preserved_adverses": "The original8751A847 whole-provider and signed-arithmetic claims remain FAILED/UNQUALIFIED. Generic provider/prerequisite/science/cost interchangeability and arbitrary provider transitions remain unqualified."
+  },
+  "validation": [
+    "Exact original87-body/three-log/protected-save readback and separate non-author review.",
+    "Exact Git member identities and bounded lifecycle gate inspection.",
+    "Original evidence-index content preserved with additive links only."
+  ],
+  "native_execution_in_this_review": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}

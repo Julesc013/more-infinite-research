@@ -483,5 +483,9 @@
     "No Library real-input/client,multiplayer,physical manufacturing,whole-product performance,all-profile or stable verdict."
   ],
   "release_qualification": false,
-  "stable_acceptance": false
+  "stable_acceptance": false,
+  "published510_direct_gun_applicability_followup": {
+    "record": "spec/evidence/candidate510-settings-cap-applicability-aero-r01.json",
+    "scope": "Direct-gun methods/holders plus separate509 multiplier evidence only; no whole504 bootstrap/save-route or current-native verdict."
+  }
 }
