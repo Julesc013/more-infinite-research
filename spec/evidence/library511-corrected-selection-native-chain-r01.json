@@ -1,0 +1,155 @@
+{
+  "kind": "MIRLibrary511CorrectedSelectionNativeChainV1",
+  "scope": "Localized selection correction only; German full declared route and English positive UI predicates with adverse retirement.",
+  "source": {
+    "author": "1389ef9ba39159fca141d668ac74e800c9a80d16",
+    "pr": 1838,
+    "integrated": "f8a1320fd4808be312209358bce0b3e150dcb20e",
+    "player_tree": "dc3f9c1aa119f825dfb1cb5dac8ccf71ea1ddec0",
+    "version": "5.0.11",
+    "published": false
+  },
+  "candidate": {
+    "version": "5.0.21011",
+    "bytes": 995429,
+    "sha256": "F25DB9283C2F8020907F8E2AD35132F0B6EEECE11263C82C69389EE8DAB3F09D",
+    "changed_members_from_original7441": [
+      "changelog.txt",
+      "runtime/library.lua",
+      "runtime/library_translations.lua"
+    ]
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "seed": {
+    "bytes": 893285,
+    "sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD",
+    "origin": "Qualified internal5.0.6 work save, not raw1.1"
+  },
+  "source_controls": {
+    "real_model_red": "Original partial-response control fails at replaced selection; initial two-row attempt did not reproduce.",
+    "corrected": {
+      "library": 117,
+      "translations": 18,
+      "model": 40
+    },
+    "required_ci": "Four exact1389 checks pass before integration."
+  },
+  "german": {
+    "plan_sha256": "5AFBCAD1F9CCCCA3927B8B84853823A4BAF76A410087596EC065152B89F36490",
+    "verdict": "ACCEPTED exact corrected route",
+    "native_pid": 30780,
+    "start_utc": "2026-11-08T21:33:54.1105787Z",
+    "exit_code": 0,
+    "timed_out": false,
+    "duration_seconds": 425.477135,
+    "observed": "Akku/two rows/select worker row2; Queue/Debug confirm ID; Settings Brems123→1 with values/provenance; return retains akku/two rows/SAME worker highlight/detail without reselection.",
+    "retirement": "Normal menus/user-quit. Direct main menu; capture named unsaved-confirmation contains no dialog."
+  },
+  "english": {
+    "plan_sha256": "8F06061F4506686FB7D484F231E5279CCD946DF6DF250ED56155F14EBADB8BB6",
+    "selection_scope": "ACCEPTED observed predicates",
+    "whole_session": "ADVERSE",
+    "natural_exit_pass": false,
+    "native_pid": 7760,
+    "start_utc": "2026-11-08T21:43:56.8709897Z",
+    "owner_error": "[mir441-process-timeout]",
+    "observed": "battery/two rows/worker row2; Queue/Debug ID; Settings braking123→1; return retains battery/two rows/SAME worker highlight/detail.",
+    "retirement": "Closed Library/game-menu Exit/actual unsaved confirmation/Quit/main menu. Final Exit refused missingPID after1200s and sent0 events."
+  },
+  "preservation": "Published10/original7441/currentF25/protected original+seed unchanged; original controls restored both. No explicit save; incidental autosaves preserved with no personal/save/lifecycle acceptance.",
+  "prior_adverses": [
+    "Original7441 German selection loss remains public15D9A60F.",
+    "Corrected DEr02 timeout before Settings/return remains incomplete.",
+    "DEr03 output-only relocation refused before native; config/seed still referred to old paths. r04 uses isolated roots.",
+    "Limited export attempt: stale-capture refusal before first export click; later timeout. Zero export clicks/files; no export pass.",
+    "Private1e9f142 normalized new JSON CRLF; preserved follow-upa38c0b9 restores exact raw review/index bytes. Gzip bodies unchanged; complete12-file remote readback passes."
+  ],
+  "independent_reports": [
+    {
+      "path": "spec/evidence/library-selection-fix-independent-review-r01.json",
+      "bytes": 13458,
+      "sha256": "6F8E72AF4C381CD8A3E3ACE2744B6492A73323C9EDC304793C953BB76277B36E"
+    },
+    {
+      "path": "spec/evidence/library511-retention-r04-independent-admission-r01.json",
+      "bytes": 7138,
+      "sha256": "A24CE35BC78CEB0B591994084A99C55F6DDF47C2DE5BE7882A541FE7B0F7F697"
+    },
+    {
+      "path": "spec/evidence/library511-retention-de-independent-result-review-r01.json",
+      "bytes": 23117,
+      "sha256": "E4C8523C77A2F0AC3B08CA773A67D59E0C3E8BC1DFD4FC6F82F2607D0C245E4C"
+    },
+    {
+      "path": "spec/evidence/library511-retention-en-independent-result-review-r01.json",
+      "bytes": 56870,
+      "sha256": "C69FE1C36EC78E98A7FA9292F68BE1F4F0BE308A7FBE5842BB86E1A3FA0CBC57"
+    },
+    {
+      "path": "spec/evidence/library511-retention-private-remote-readback-r01.json",
+      "bytes": 3272,
+      "sha256": "DF52BD20CFE1563A4D2BDAB2958D37A1248ADEC44F3942789C0DD4BB200D9B81"
+    }
+  ],
+  "custody": {
+    "repository": "Julesc013/scratchpad",
+    "branch": "evidence/library511-retention-blackglass-r01",
+    "commit": "a38c0b9fbfe2ae776e0118a11029bef7fc50b51f",
+    "directory": "evidence/library511-retention-blackglass-r01",
+    "manifest_sha256": "17FF24CD8A5A2C1C467A834E6ADF655E4D032DFD64121AB008AC8DD083A212DC",
+    "remote_readback": "All12 scoped remote blobs equal local exact bodies; branch equals commit.",
+    "cases": [
+      {
+        "case": "library511-retention-de-r02-adverse-custody-r01",
+        "local_manifest_sha256": "BA1B935E52C6556963DF72D3EFBEE1FF432B7FCD2EFFE99C55595C7013535DB7",
+        "copied_files": 91,
+        "copied_bytes": 49127451,
+        "remote_archive": "library511-retention-de-r02-adverse-custody-r01.json.gz",
+        "remote_archive_bytes": 45146736,
+        "remote_archive_sha256": "82E8802E52CADDFDAF1FA405C315FB9FD22FC547A85E2E898EEFE5B9F1A60FD5",
+        "remote_records_including_manifest": 92
+      },
+      {
+        "case": "library511-retention-de-r04-native-custody-r01",
+        "local_manifest_sha256": "88B08BF72E32DA063AF5AFB5B5EF85C67B7C0F08623479AC8DF582BBFCA41805",
+        "copied_files": 157,
+        "copied_bytes": 77732694,
+        "remote_archive": "library511-retention-de-r04-native-custody-r01.json.gz",
+        "remote_archive_bytes": 75078389,
+        "remote_archive_sha256": "F4A6C53FB5BFD43EEFE78A009D1508DAA70AAB14D8A69FEE6F14B909D8C14860",
+        "remote_records_including_manifest": 158
+      },
+      {
+        "case": "library511-retention-en-r02-native-custody-r01",
+        "local_manifest_sha256": "606144F9D097317A1055AF354C99F176183D4532C24BF960DF7BE7B085F88F24",
+        "copied_files": 166,
+        "copied_bytes": 86547669,
+        "remote_archive": "library511-retention-en-r02-native-custody-r01.json.gz",
+        "remote_archive_bytes": 82473970,
+        "remote_archive_sha256": "D8938594E8C142FF199160D4EB8E6FE63517B72BB8ADAF392330688E8B9D3112",
+        "remote_records_including_manifest": 167
+      },
+      {
+        "case": "library511-one-export-adverse-custody-r01",
+        "local_manifest_sha256": "3D8EEF3CB4B0B1C1B371B33F1E60BFA6D948698CE5B33B98506FBF842E042277",
+        "copied_files": 113,
+        "copied_bytes": 60492080,
+        "remote_archive": "library511-one-export-adverse-custody-r01.json.gz",
+        "remote_archive_bytes": 56519391,
+        "remote_archive_sha256": "D6C6760B120D05B397F62F90BEDEF03CEA743716290728C2B8E7A5D265DBE498",
+        "remote_records_including_manifest": 114
+      }
+    ]
+  },
+  "limits": [
+    "Selection correction only; EN whole-session retirement stays adverse.",
+    "No full Library/filter/scroll/sizes/privacy/export/import/apply/client lifecycle/personal-save acceptance.",
+    "No new gameplay/compatibility/API/whole-product performance/all-edition/stable verdict.",
+    "Corrected F200995003B/BC963519 is packaging only, not native evidence."
+  ],
+  "release_qualification": false,
+  "stable_acceptance": false
+}
