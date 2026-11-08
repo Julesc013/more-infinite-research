@@ -124,6 +124,7 @@ class PackTests(unittest.TestCase):
                 "compatibility/modern_catalogue/py.lua",
                 "compatibility/modern_catalogue/py_f210.lua",
                 "compatibility/native_modded_continuations.lua",
+                "compatibility/worker_robot_storage.lua",
                 "compatibility/atan_profile.lua",
                 "compatibility/modern_catalogue/space_age.lua",
                 "compatibility/modern_catalogue/sif_retained.lua",
