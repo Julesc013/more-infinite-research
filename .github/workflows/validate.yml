@@ -119,6 +119,21 @@ jobs:
           [IO.File]::WriteAllText($outputPath, (($record | ConvertTo-Json -Depth 32) + "`n"), [Text.UTF8Encoding]::new($false))
           $planHash = (Get-FileHash -LiteralPath $outputPath -Algorithm SHA256).Hash.ToUpperInvariant()
           "plan_sha256=$planHash" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+      - name: Select the pinned Python ABI for registration checks
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.14'
+          architecture: x64
+          check-latest: false
+      - name: Check package boundaries and control registration
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $controls = @('tests/test_pack.py', 'tests/test_host_controls.py')
+          foreach ($control in $controls) {
+            & python -B $control
+            if ($LASTEXITCODE -ne 0) { throw "Early MIR5 control failed: $control" }
+          }
       - id: artifact
         name: Bind plan artifact identity
         shell: pwsh
