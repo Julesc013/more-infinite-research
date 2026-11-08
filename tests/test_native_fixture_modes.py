@@ -9,6 +9,48 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class NativeFixtureModeControls(unittest.TestCase):
+    def test_active_repair_admission_binds_current_fixture_and_retains_old_tuples(self):
+        script = r'''
+$ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+$tokens=$null; $errors=$null
+$ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
+if($errors.Count){throw 'runner parse failed'}
+foreach($name in @('Assert-Fixture','Assert-ActiveFixtureSelection')){
+ $nodes=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq$name},$true))
+ if($nodes.Count-ne1){throw 'active admission function absent'}
+ Invoke-Expression $nodes[0].Extent.Text
+}
+$profile=Get-Content -LiteralPath $env:MIR_TEST_PROFILE -Raw | ConvertFrom-Json -AsHashtable
+$mir=@($profile.mods | Where-Object {$_.name-ceq'more-infinite-research'})
+Assert-ActiveFixtureSelection 'repair-stress' $profile.mods $mir
+foreach($case in @(
+ @{mir='4.7.21002'; fixture='0.1.0'; selector='0.1.0'; accepted=$true},
+ @{mir='5.0.21000'; fixture='0.2.0'; selector='0.1.0'; accepted=$true},
+ @{mir='5.0.21001'; fixture='0.2.0'; selector='0.1.0'; accepted=$true},
+ @{mir='5.0.21005'; fixture='0.2.0'; selector='0.1.0'; accepted=$true},
+ @{mir='5.0.21010'; fixture='0.2.1'; selector='0.1.0'; accepted=$true},
+ @{mir='5.0.21010'; fixture='0.2.0'; selector='0.1.0'; accepted=$false},
+ @{mir='5.0.21005'; fixture='0.2.1'; selector='0.1.0'; accepted=$false},
+ @{mir='5.0.21009'; fixture='0.2.1'; selector='0.1.0'; accepted=$false},
+ @{mir='5.0.21011'; fixture='0.2.1'; selector='0.1.0'; accepted=$false},
+ @{mir='5.0.20010'; fixture='0.2.1'; selector='0.1.0'; accepted=$false},
+ @{mir='5.0.21010'; fixture='0.2.1'; selector='0.2.0'; accepted=$false},
+ @{mir='5.0.21010'; fixture='0.2.1'; selector=''; accepted=$false}
+)){
+ $rows=@(@{name='mir-fixture-mir5-repair-stress';version=$case.fixture;enabled=$true})
+ if($case.selector){$rows+=@{name='mir-fixture-mir5-repair-stress-active';version=$case.selector;enabled=$true}}
+ $ok=$true;try{Assert-ActiveFixtureSelection 'repair-stress' $rows @(@{version=$case.mir})}catch{$ok=$false}
+ if($ok-ne$case.accepted){throw ('active tuple admission differs: '+($case|ConvertTo-Json -Compress))}
+}
+$calls=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.CommandAst]-and$n.Extent.Text-ceq'Assert-ActiveFixtureSelection $ActiveSeedKind $rows $mirRows'},$true))
+if($calls.Count-ne1){throw 'active runner does not call admission'}
+'''
+        result = subprocess.run(['pwsh', '-NoProfile', '-NonInteractive', '-Command', script],
+                                env=dict(os.environ, MIR_TEST_RUNNER=str(ROOT / 'tools/Invoke-NativeFixture.ps1'),
+                                         MIR_TEST_PROFILE=str(ROOT / 'tests/profiles/repair-stress-active-current-f210-2123.json')),
+                                capture_output=True, text=True)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
     def test_retained_protected_profile_metadata_keeps_default_activation_arguments(self):
         script = r'''
 $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
