@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "kind": "MIR510ActiveRuntimeNativeAnalysisChainV1",
+  "status": "accepted-exact-complete-active-work-comparison-not-whole-product-or-stable",
+  "candidate": {
+    "source": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+    "archive_sha256": "C625D648978F6FE677B5EDC5C68090A2AA9A939D48A54A736610D55E47337806",
+    "bytes": 996956
+  },
+  "published_reference": {
+    "archive": "more-infinite-research_4.7.21002.zip",
+    "sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F"
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "plan": {
+    "revision": "8ab529a090128979014ebfe968b794b7511679f0",
+    "sha256": "9CDED5FE074894D734210CB432384BF4B509D69AD9CB527424701358EF7054F9"
+  },
+  "controller": {
+    "revision": "d35f0bb2d23c1517af5025685f05f1527ef3e648",
+    "sha256": "2AF27FC250BEC34D8626A1028C136FA879D0CA85ECE6827D930A32EAB88CF5D1"
+  },
+  "reader_revision": "3ac634aba507c2efd6aac6c0af54e484ce70dea3",
+  "raw_result": {
+    "sha256": "711A80F535CB10E126DD924B44AB7210F1D31C79CE8828865404B94B22E9AF46",
+    "bytes": 2375797
+  },
+  "analysis": {
+    "path": "spec/evidence/runtime510-active-analysis-r01.json",
+    "sha256": "E8C650B96CA68FCB52E6646B62AC7B8FEAC4AE7CF85A72C4E0DD277740427AC9",
+    "verdict": "within-predeclared-limits"
+  },
+  "counts": {
+    "observations": 68,
+    "warmups": 16,
+    "scored": 52,
+    "paired_blocks": 26,
+    "published": 34,
+    "candidate": 34,
+    "repair": 20,
+    "agriculture": 48
+  },
+  "physical": {
+    "repair": "All20 retain1000/256/744 boundaries,256initial and8reactivation changes.",
+    "agriculture": "All48 retain2real lab completions in prepared state,Nplayer+Nforeign towers and2Nnative planting events.",
+    "protected_seeds_unchanged": true,
+    "own_fixture_restoration_verified": 68
+  },
+  "custody": {
+    "primary_root": "build/qualification/runtime510-scored-custody-r01",
+    "manifest_sha256": "774313FA2EDA851633E35DCA7C0341D4ECC3CD7BF0A0FF56926F6B8F2BF81C62",
+    "files": 968,
+    "bytes": 76336084
+  },
+  "independent_review": {
+    "reviewer": "separate non-author local reviewer",
+    "verdict": "Accepted exact current10 mixed comparison only. Independently recomputed all16median/allowance/comparison cells and26counterbalanced blocks; rehashed968files with no discrepancy. All published128-minus1 denominators are finite/positive; negative candidate OS increment is reported normally.",
+    "reader_method": "Schedule, memory validation, summary, comparison and increment functions byte-identical to prior qualified reader. Measurements remained unread until reader review."
+  },
+  "limits": [
+    "This is the exact active scripted-work comparison on this host and pinned2.1.23 inputs, not whole-product responsive-menu/load/factory/Library performance.",
+    "No equivalence, universal speed, stable or release qualification follows. The50percent MIR-added responsive-menu objective belongs to its separate predeclared high-cost profiles.",
+    "Original505 published prerequisites and current10 candidate prerequisites retain separate identities; originaladverse and custompost-launch-custody pilots stay outside admission."
+  ],
+  "performance_comparison_scope_accepted": true,
+  "release_qualification": false
+}
