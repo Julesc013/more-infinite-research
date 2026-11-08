@@ -267,7 +267,8 @@ class RetainedNativeFixtureTests(unittest.TestCase):
         info = json.loads((FIXTURE / "successor-current-entry-boundary/info.json").read_bytes())
         profile = json.loads((ROOT / "tests/profiles/sif-retained-manufacturing-current-f200-2077.json").read_bytes())
         self.assertEqual((NAME, "0.5.0", "2.0"), (info["name"], info["version"], info["factorio_version"]))
-        self.assertIn("more-infinite-research >= 5.0.20010", info["dependencies"])
+        self.assertEqual(["base >= 2.0.77", "space-age >= 2.0.77"], info["dependencies"])
+        self.assertFalse(any(dependency.startswith("more-infinite-research") for dependency in info["dependencies"]))
         self.assertEqual("36F2E9D8C01507C2CBDC01AFF6C87399B40A9E0646F40DEC1F82628F5F50CBAB",
                          profile["archive_sha256"]["more-infinite-research_5.0.20010.zip"])
         for player in (False, True):
@@ -420,9 +421,6 @@ class RetainedNativeFixtureTests(unittest.TestCase):
              "more-infinite-research = 4.7.20003"),
             ("successor", "successor", "0.2.0", "5.0.20002", "920C68BD074718AB2A608D8B2FC3657AA1B9C8766A586618C4C0952BA50C3E40",
              "more-infinite-research = 5.0.20002"),
-            ("successor-current-entry-boundary", "current", "0.5.0", "5.0.20010",
-             "36F2E9D8C01507C2CBDC01AFF6C87399B40A9E0646F40DEC1F82628F5F50CBAB",
-             "more-infinite-research >= 5.0.20010"),
         ):
             info = json.loads((FIXTURE / role / "info.json").read_bytes())
             profile = json.loads((ROOT / f"tests/profiles/sif-retained-manufacturing-{profile_role}-f200-2077.json").read_bytes())
