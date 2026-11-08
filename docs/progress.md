@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-08
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,7 +14,13 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
-## Current checkpoint (2026-11-07)
+## Current repair checkpoint (2026-11-08)
+
+[PR #1808](https://github.com/Julesc013/more-infinite-research/pull/1808) repairs the catalogue-wide SIF retirement rule and foreign finite worker-storage continuation, and adds bounded context to the still-unresolved unknown-paid-mask refusal. The [reassessment](reassessment-2026-11-08.md) explains exact changes, original-package comparisons, corrected test expectations and limits. The [native receipt](../spec/evidence/mir509-reassessment-worker-native-r01.json) accepts original473 actual lab/save, committed candidate upgrade/next lab/save, two unchanged-byte cold reloads and fresh candidate work in the controlled2.1.24 Base/provider selection. The first hosted run caught a stale mutation target; its test-only correction adds separate internal/existing-owner opponents without changing the native-tested player bytes. Actual SIF/F200/reporter-profile/native-cap and full Library/stable gates remain open. Black Glass retains release integration and publication under #1807; published509 assets remain unchanged.
+
+The refreshed public discussion index has46threads/281posts. Driku explicitly confirmed the509 existing-save load after reporting2× research costs; this is reporter confirmation, not a new exact564-mod reconstruction. The new robot collision and SIF science recurrence remain distinct reports. The earlier release/delivery checkpoint below retains its original date and evidence scope.
+
+## Delivered release checkpoint (2026-11-07)
 
 | Item | State |
 |---|---|
