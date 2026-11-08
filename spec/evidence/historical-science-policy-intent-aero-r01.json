@@ -180,9 +180,8 @@
     }
   },
   "next_bounded_work": {
-    "owner": "Aero",
-    "task": "Reconcile BA05-BA08 conditional retained Bob/Angel selection/gate cases against current admitted profile and exact changed-fact opponents; record coverage, a demonstrated defect, or an explicitly evidenced support boundary. Do not rerun the already mapped ER suite merely because another release shipped.",
-    "native_owner_if_affected": "Black Glass"
+    "owner": "Black Glass integration and affected native owner; Aero independent reconciliation",
+    "task": "Review the delivered BA08 correction against the current candidate, retain the unchanged baseline output/disabled-stream/foreign-input controls, and recheck applicable native profile paths only if consumed inputs change. SCI-RESEARCH-01 exact provider/profile/protected-save evidence remains absent; original ER/native evidence keeps its named identity. No planner restoration or completed campaign restart."
   },
   "claims": {
     "native_execution": false,
@@ -191,5 +190,120 @@
     "original_requests_changed": false,
     "historical_inventory_complete": false,
     "stable_qualification": false
+  },
+  "claims_scope": "Original exact-body review claims below retain their original false execution flags; the additive followup records later host observations separately. Neither scope asserts native or stable qualification.",
+  "initial_next_bounded_work": {
+    "owner": "Aero",
+    "task": "Reconcile BA05-BA08 conditional retained Bob/Angel selection/gate cases against current admitted profile and exact changed-fact opponents; record coverage, a demonstrated defect, or an explicitly evidenced support boundary. Do not rerun the already mapped ER suite merely because another release shipped.",
+    "native_owner_if_affected": "Black Glass"
+  },
+  "followup_reconciliation": {
+    "reviewed_on": "2026-11-09",
+    "scope": "BA05-BA08 changed-fact admission and N/O historical-mechanism applicability only",
+    "reviewed_original_current_source": "e080b2e2c006c3d24af92eff02be089ec5999ab8",
+    "ba_diagnostic": {
+      "path": "build/qualification/mir5-bob-angel-retention-review-aero-r01/current-data-final-changed-facts.json",
+      "sha256": "A8ECF5446CFB2192469FF0C88F2666B6AD772F468D73393904917351FCAFA47B",
+      "profile": "tests/profiles/bob-angel-f200-2077.json",
+      "captured_input": "tests/fixtures/bob-angel-f200-catalogue-inputs.json",
+      "composition": "normal source data.lua plus data-final-fixes.lua; independent captured foreign rows",
+      "native_execution": false
+    },
+    "ba_decisions": [
+      {
+        "cases": "BA05",
+        "disposition": "replaced-by-current-shared-lab-policy",
+        "finding": "Reducing the captured accepting lab to automation only produces automation-only bullets under the existing reduction policy; the named authored gates remain. The old conditional full-vector planner fallback is not restored. Existing no-lab-union/required-pack controls retain their boundaries."
+      },
+      {
+        "cases": "BA06-BA07",
+        "disposition": "retired-derivation-is-not-an-authored-input",
+        "finding": "Changing the production-science owner prerequisites or removing the utility tool does not affect the current no-BobTech bullets A/L/military vector. The actual authored vectors/gates are in modern_catalogue/bob_angel.lua and modern_catalogue.lua; the separate SpaceAge+BobTech combined profile is not this old case."
+      },
+      {
+        "cases": "BA08",
+        "disposition": "demonstrated-admission-gap-correction-delivered-for-review",
+        "finding": "The independent baseline has enabled water treatment. Setting angels-water-treatment.enabled=false still emitted enabled bullets on the original current source. The bounded correction rejects enabled available authored rows requiring that named gate before any later data-final publication, while all intentionally disabled gated streams remain disabled/publishable and foreign input is unchanged. This is a host changed-input opponent, not a reproduced upstream/reporter/native defect."
+      }
+    ],
+    "ba_correction": {
+      "author_commit": "2f8dc0b2ff485e3e6e2391ceab48ef216d120ccd",
+      "base": "e080b2e2c006c3d24af92eff02be089ec5999ab8",
+      "base_player_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+      "player_tree": "ef1f38bee0061c2e43f54cd1ceaccadfb06471dc",
+      "whole_tree": "89e7a924815318867406755b2dc82f2c178c8af8",
+      "scope": [
+        "source/compatibility/modern_catalogue.lua",
+        "source/research/modern.lua",
+        "tests/test_bob_angel_catalogue.py"
+      ],
+      "integrator": "Black Glass alone; no automatic merge into frozen inputs",
+      "host_controls": [
+        {
+          "path": "build/qualification/mir5-bob-angel-gate-aero-r01/test_bob_angel_catalogue-post-comment.txt",
+          "tests": 4,
+          "sha256": "754D92A4B0AFC686388F56ED9D55ABD0D577C7C1A456545C374FE16169DF0290"
+        },
+        {
+          "path": "build/qualification/mir5-bob-angel-gate-aero-r01/test_bob_angel_f200_combined_profile-post-comment.txt",
+          "tests": 10,
+          "sha256": "9B1226497CED0F03625F6423EE7B0960EBBEA67EBEB3FC951103CA6C85107543"
+        },
+        {
+          "path": "build/qualification/mir5-bob-angel-gate-aero-r01/test_modern_targets-post-comment.txt",
+          "tests": 5,
+          "sha256": "D4C07173D4738CCADEEEE2C65B6214AB4C1E2CDE3807CAD982250D8DD90262AB"
+        }
+      ],
+      "adverses_retained": [
+        "test_bob_angel_catalogue-red-before-source.txt: intended red, changed gate was admitted",
+        "test_bob_angel_catalogue-green.txt: failed test expectation of global zero writes; data.lua had already emitted its shortcut. Corrected to no later publication, not a claimed product defect."
+      ],
+      "native_execution": false,
+      "package_built": false,
+      "published510_changed": false,
+      "pull_request": "https://github.com/Julesc013/more-infinite-research/pull/1822"
+    },
+    "native_owner_mapping": [
+      {
+        "cases": "N01",
+        "current": "source/research/modern.lua named-owner preflight/patching and source/data-final-fixes.lua integration; tests/test_generator.py:test_native_owner_patches_are_atomic_profile_bound_and_preserve_unowned_fields plus tests/test_native_owner_fallback.py",
+        "limit": "Host atomicity/identity/foreign-row controls; not native reporter evidence."
+      },
+      {
+        "cases": "N02-N04",
+        "current": "The original tests inject synthetic disabled/unreachable reasons through retired native_owner_binding services. Current named fallback is limited to explicitly withheld owners and unclassifiable cost shapes. No global researchability or recursive fallback traversal remains.",
+        "limit": "Do not infer an exact supported-profile failure or restore the old planner from these synthetic reason strings."
+      },
+      {
+        "cases": "O01-O02",
+        "current": "tests/test_science.py:test_external_owner_inputs_require_authored_sources_and_one_accepting_lab_without_mutation and exact competing-productivity provider controls preserve bounded admission/unowned fields; disabled opponent is exact-provider scoped.",
+        "limit": "Historical kr-imersite-productivity is not an exact current K2SO owner binding; this is not reporter-profile reproduction."
+      },
+      {
+        "cases": "O03-O04",
+        "current": "Synthetic generic cycle/unreachable owner service cases have no independently applicable named current provider binding.",
+        "limit": "Retire the generic service mechanism; preserve any actual named foreign ownership/save obligation separately."
+      }
+    ],
+    "specific_missing_native_obligation": {
+      "request_id": "SCI-RESEARCH-01",
+      "contract": "spec/programmes/community-requests.json",
+      "missing": "Recover exact Space-Lab-Research-61 provider/package/engine/mod/settings closure and protected save; qualify startup/ownership without duplicate effects and preserve foreign identity/earned levels/progress/queue through save and two cold reloads.",
+      "existing_result_limit": "Representative startup observations do not instantiate the reporter provider or protect its earned state; original requested-not-qualified status remains unchanged.",
+      "owner": "Black Glass native owner; source recovery may proceed independently on Aero"
+    },
+    "review": {
+      "reader_role": "mir_luna_xhigh for N/O mapping; separate root non-author source diff review of Terra correction",
+      "source_review": "Separate non-author mir_luna_xhigh accepted commit2f8dc0b2 after actual three-file/ordering/source-tree review; root also independently inspected the complete diff. Reviewer executed no tests/native and granted no gameplay/save/client/performance/release acceptance.",
+      "metadata_review": "Separate read-only mir_luna_xhigh review accepted the scoped BA/N/O reconciliation after unrelated encoding mutations were restored from the exact original UTF-8 Git blob. Whole-inventory preservation invariant, static repository and whitespace controls pass; original requests/decisions and original false execution claims are preserved."
+    },
+    "claims": {
+      "new_host_execution": true,
+      "native_execution": false,
+      "original_requests_changed": false,
+      "historical_inventory_complete": false,
+      "stable_qualification": false
+    }
   }
 }

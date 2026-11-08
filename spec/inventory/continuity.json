@@ -9085,12 +9085,72 @@
               "tests/test_library.py"
             ],
             "original_evidence": [],
-            "remaining_executable_check": "Bind the retained hidden preference to the selected successor and observe the affected nondefault catalogue/Library output. Keep callback-stage isolation host controls; do not recreate the retired compiler DTO.",
+            "remaining_executable_check": "No additional SCB host case is required: the existing complete-output classic/full control binds both modern targets, while existing query/Library parse-closure controls cover callback isolation. Final native rendered/client/save acceptance remains under the existing Library worklist; this host-only historical body does not create a separate native campaign.",
             "owner": {
               "reconciliation": "Aero",
               "native": "Black Glass"
             },
-            "limits": "The old compiler_scope field and declaration-module names are implementation-only. The saved setting identity and no-reduced-catalogue behavior remain retained; no new native result is claimed."
+            "limits": "The old compiler_scope field and declaration-module names are implementation-only. The saved setting identity and no-reduced-catalogue behavior remain retained; no new native result is claimed.",
+            "initial_remaining_executable_check": "Bind the retained hidden preference to the selected successor and observe the affected nondefault catalogue/Library output. Keep callback-stage isolation host controls; do not recreate the retired compiler DTO.",
+            "current_host_applicability": {
+              "reviewed_on": "2026-11-09",
+              "published_source": "958e34dd2701418c71f74ae094c26ff7cd467e6b",
+              "published_player_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+              "inspected_dev": "c2813c71738949cb334a4eadd0c1edc87eec4da6",
+              "dev_player_tree": "8181cc86255ddf238ec9970009076f836d35c88f",
+              "original_cases": "SCB-01..05; original host-only body, factorio_processes=0",
+              "original_body": {
+                "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+                "path": "tests/runtime/classic_profile_browser_status.lua",
+                "blob": "53e6464262ceebf3abe6d9ea3f6cb92e1dcdd791"
+              },
+              "case_mapping": [
+                {
+                  "control": "tests/test_generator.py:test_saved_classic_and_full_select_the_same_complete_native_output",
+                  "scope": "Both F200/F210, unset/full/classic: exact hidden setting identity/default/allowed values, equal complete data/final output, one shortcut/one final publication, no retired compiler/planner/registry imports."
+                },
+                {
+                  "control": "tests/test_historical_direct.py:test_historical_settings_keep_exact_names_defaults_and_time_sentinel",
+                  "scope": "Retained hidden setting identity, full default and full/classic allowed values among original historical setting contracts."
+                },
+                {
+                  "control": "tests/test_library_model.py:test_real_catalogue_queries_need_no_imports_or_reselection_after_control_parse",
+                  "scope": "Parse-time catalogue selection, detached rows, no reselection or late imports across current profiles."
+                },
+                {
+                  "control": "tests/test_library.py:_assert_real_selected_catalogue_opens_without_runtime_imports",
+                  "scope": "Existing three real-profile callers open the Library after require is blocked; parsed rows remain available. This helper is not itself counted as another test."
+                },
+                {
+                  "control": "tests/test_settings_profile.py:test_settings_queries_and_runtime_profile_facade_work_after_module_loading_closes",
+                  "scope": "Post-parse Settings query/facade reads without importing modules."
+                },
+                {
+                  "control": "tests/test_settings_profile.py:test_settings_descriptors_remain_stable_after_caller_mutation_and_parse_closure",
+                  "scope": "Detached Settings descriptors retain their original query semantics after parse closure/caller mutation."
+                },
+                {
+                  "control": "tests/test_library.py:test_source_keeps_event_registration_and_old_compiler_outside_the_slice",
+                  "scope": "Static exclusion of retired compiler/prototypes.mir and event/remote/queue authority from Library implementation."
+                }
+              ],
+              "existing_generator_result": {
+                "source": "32feeb99db3cb998f30aa73d11e8f3ebdbd487e6",
+                "path": "build/qualification/mir5-api510-applicability-aero-r01/generator.txt",
+                "sha256": "F98166B75809A7367AB6329A704B277403EDC37BD6AE14D942FFF2C6AF07285A",
+                "suite_tests": 56,
+                "named_classic_control": "passed",
+                "execution": "Existing pinned Lupa2.6/Lua5.2 run reused; no repeat execution for this review."
+              },
+              "legacy_transport": "No current consumer exists for old more-infinite-research-compiler-profile mod_data. Retire that DTO/mechanism rather than recreate it or add an implementation-mirroring ignored-input test. Keep the hidden serialized setting and complete Library behavior.",
+              "review": "Read-only mir_luna_xhigh examined both historical bodies and actual named current controls; root independently read the full classic/full control, historical setting expectations and retained actual passing host line.",
+              "limits": "Current dev differs from published510 in locale values only; this supports code-scoped applicability, not a new native/rendered/client/save/performance observation. Original evidence remains empty for historical executions, all other subject/request decisions remain unchanged.",
+              "new_tests_added": false,
+              "new_host_execution": false,
+              "native_execution": false,
+              "inventory_complete": false,
+              "stable_qualification": false
+            }
           },
           {
             "subjects": [
@@ -17287,15 +17347,20 @@
         "disposition": "consolidate",
         "outcome": "One exact719-line published science-policy test body is mapped to current science and dedicated SIF paid-retention expectations/evidence. Retired compiler/service-discovery mechanics remain obsolete; BA changed-fact mapping and final-candidate native applicability stay explicit. No original test or known native result is erased.",
         "remaining": {
-          "owner": "Aero",
-          "task": "Reconcile BA05-BA08 conditional retained Bob/Angel selection/gate cases against current admitted profile and exact changed-fact opponents; record coverage, a demonstrated defect, or an explicitly evidenced support boundary. Do not rerun the already mapped ER suite merely because another release shipped.",
-          "native_owner_if_affected": "Black Glass"
+          "owner": "Black Glass integration and affected native owner; Aero independent reconciliation",
+          "task": "Review the delivered BA08 correction against the current candidate, retain the unchanged baseline output/disabled-stream/foreign-input controls, and recheck applicable native profile paths only if consumed inputs change. SCI-RESEARCH-01 exact provider/profile/protected-save evidence remains absent; original ER/native evidence keeps its named identity. No planner restoration or completed campaign restart."
         },
         "native_execution": false,
         "player_source_changed": false,
         "original_requests_changed": false,
         "inventory_complete": false,
-        "independent_review": "Separate bounded review corrected summary line count to actual719; no false native/current/stable acceptance was found. Other semantic/native gaps remain as recorded."
+        "independent_review": "Separate bounded review corrected summary line count to actual719; no false native/current/stable acceptance was found. Other semantic/native gaps remain as recorded.",
+        "initial_remaining": {
+          "owner": "Aero",
+          "task": "Reconcile BA05-BA08 conditional retained Bob/Angel selection/gate cases against current admitted profile and exact changed-fact opponents; record coverage, a demonstrated defect, or an explicitly evidenced support boundary. Do not rerun the already mapped ER suite merely because another release shipped.",
+          "native_owner_if_affected": "Black Glass"
+        },
+        "followup": "Additive BA/N/O reconciliation in the same evidence record preserves the initial unresolved mapping: BA05 uses current reduction, BA06-07 do not affect the authored vector, BA08 has a scoped changed-input guard for review; synthetic generic owner traversal remains retired while exact SCI-RESEARCH-01 provider/save qualification stays open. Later19host controls are explicitly separate from the original no-execution body review. No native or stable verdict."
       }
     ],
     "stable_coverage_review": {
