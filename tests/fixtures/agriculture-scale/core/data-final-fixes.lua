@@ -26,7 +26,12 @@ local function descriptor()
   local active = mods and mods[ACTIVE]
   assert(active == nil or active == "0.1.0", "agriculture active fixture selector version differs")
   local candidate = mods and mods[CANDIDATE] == "0.1.0"
-  local defaults = mods and mods[DEFAULTS] == "0.1.0"
+  local defaults = mods and (mods[DEFAULTS] == "0.1.0" or mods[DEFAULTS] == "0.1.1")
+  if mods and (mods[DEFAULTS] == "0.1.1" or mods["mir-fixture-mir5-agriculture-scale"] == "0.1.1") then
+    assert(mods[DEFAULTS] == "0.1.1" and mods["mir-fixture-mir5-agriculture-scale"] == "0.1.1"
+      and mods["more-infinite-research"] == "5.0.21010" and paired and active == "0.1.0",
+      "current agriculture Defaults fixture requires exact active identity")
+  end
   local published = mods and mods[PUBLISHED] == "0.1.0"
   if paired then
     assert((candidate and 1 or 0) + (defaults and 1 or 0) + (published and 1 or 0) == 1,
