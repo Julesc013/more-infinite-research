@@ -5,7 +5,7 @@ applies_to: "MIR API1.0"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-03
+last_reviewed: 2026-11-09
 ---
 
 # MIR API 1.0 SDK (unreleased)
@@ -65,7 +65,7 @@ The pinned MIR 4.7 F210 player archive shipped two conditional, unversioned runt
 
 Current MIR 5 control source collision-checks and registers both historical names, but this is a source and host-control bridge, not native or compatibility qualification. The settings facade retains the two method names, strict compact test, effective registered-setting export, metadata fields `mir_version`, `factorio_version`, and `import_setting`, and the validation count/result shape. It exports only the current MIR 5 registered settings through the MIRSET1 codec; it does not recreate the historical setting catalogue or apply a decoded profile.
 
-The browser bridge maps historical `search` to the current `query` and accepts `family`, `status`, `sort`, `selected`, `hidden`, and integral `page` from 1 through 30000. It verifies a selected technology against the player's native force before passing it to the Library and retains the boolean open result. The current bridge also accepts `mode`, `tab`, `settings_scope`, `settings_search` and `visibility`; Library host controls cover their current mapping. Rendered joined-client behavior still requires native qualification. The bridged `page` is a saved continuous UI position, and neither historical nor current `open` supplies a remote row/page response envelope; pagination equivalence has not been established.
+The browser bridge routes historical `search` by the selected tab, or the retained tab when `tab` is omitted: Settings updates only the Settings search; other tabs update only the Research search. The other search value is retained, and text keeps the historical 160-byte bound. It accepts `family`, `status`, `sort`, `selected`, `hidden`, and integral `page` from 1 through 30000. It verifies a selected technology against the player's native force before passing it to the Library and retains the boolean open result. The current bridge also accepts `mode`, `tab`, `settings_scope`, `settings_search` and `visibility`; Library host controls cover their current mapping. Rendered joined-client behavior still requires native qualification. The bridged `page` is a saved continuous UI position, and neither historical nor current `open` supplies a remote row/page response envelope; pagination equivalence has not been established.
 
 No identified independent old consumer exists within the pinned source and archive search scope. The required and optional `examples/` trees are current MIR 5 public usage examples, not evidence of a previous consumer. MIR4 API-preview response fields and MEP envelope fields are developer-only historical preview shapes: MIR 5 neither emits nor imports them. Both historical runtime interfaces remain registered. Before retiring a real externally consumed old contract, [API-01](../spec/api.md) requires recording its consumers and preserved fields, with an explicit converter/adapter or documented major-version transition. The existing bridges and current examples do not prove an old consumer has migrated; that qualification remains separate.
 
