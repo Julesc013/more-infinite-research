@@ -1,0 +1,8 @@
+{
+  "name":"mir-worker-storage-infinite-selector",
+  "version":"0.1.0",
+  "title":"Private worker provider infinite-mode selector",
+  "author":"MIR maintainers",
+  "factorio_version":"2.1",
+  "dependencies":["base >= 2.1.23", "WorkerRobotCargoSizeResearch = 1.0.0"]
+}
