@@ -9,6 +9,7 @@ $repo = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 
 $controls = @(
   [ordered]@{path='tests/test_generator.py';lua=$true},
+  [ordered]@{path='tests/test_library_render_capture.py';lua=$true},
   [ordered]@{path='tests/test_continuation_ownership.py';lua=$true},
   [ordered]@{path='tests/test_native_research_speed_finite_fixture.py';lua=$true},
   [ordered]@{path='tests/test_secretas_continuation.py';lua=$true},
