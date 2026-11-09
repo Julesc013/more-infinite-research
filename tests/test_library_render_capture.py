@@ -16,7 +16,8 @@ class LibraryRenderCaptureTests(unittest.TestCase):
         self.lua.execute(r'''
           local tick_callback
           storage={}
-          script={on_nth_tick=function(n,fn) assert(n==30);tick_callback=fn end}
+          script={active_mods={base="2.1.23",["more-infinite-research"]="5.0.21012"},
+            on_nth_tick=function(n,fn) assert(n==30);tick_callback=fn end}
           local tech={name="worker-robots-storage-4",level=4,researched=false,enabled=true}
           local force={technologies={[tech.name]=tech},recipes={iron={enabled=true}},
             research_queue={},research_progress=0,worker_robots_storage_bonus=0}
@@ -28,12 +29,13 @@ class LibraryRenderCaptureTests(unittest.TestCase):
             display_scale=1.25,display_resolution={width=1920,height=1080},
             gui={screen={mir_research_browser=root}}}
           screenshots,writes,calls,flushes={}, {}, {},0
-          game={tick=0,active_mods={base="2.1.23",["more-infinite-research"]="5.0.21012"},
+          game={tick=0,
             connected_players={player},take_screenshot=function(args)
               assert(args.show_gui and args.force_render and args.by_player==1 and args.player==player)
               assert(args.resolution==nil and args.anti_alias==false)
               screenshots[#screenshots+1]={args=args,tick=game.tick}
             end,set_wait_for_screenshots_to_finish=function() flushes=flushes+1 end}
+          setmetatable(game,{__index=function(_,key) error("undeclared LuaGameScript member: "..key) end})
           remote={interfaces={["more-infinite-research-browser"]={open=true}},
             call=function(interface,method,index,options)
               assert(interface=="more-infinite-research-browser" and method=="open" and index==1)
@@ -73,8 +75,8 @@ class LibraryRenderCaptureTests(unittest.TestCase):
         self.lua.execute('player.locale="de";run();assert(writes["mir-library-render/de/complete.json"])')
 
     def test_exact_engine_and_package_are_required(self):
-        for opponent in ['game.active_mods.base="2.1.24"',
-                         'game.active_mods["more-infinite-research"]="5.0.21011"']:
+        for opponent in ['script.active_mods.base="2.1.24"',
+                         'script.active_mods["more-infinite-research"]="5.0.21011"']:
             with self.subTest(opponent=opponent):
                 self.setUp()
                 self.lua.execute(opponent)
@@ -132,6 +134,13 @@ class LibraryRenderCaptureTests(unittest.TestCase):
           run();assert(screenshots[1].tick==first and flushes==1)
           local count=#calls;run();assert(#calls==count and #screenshots==7 and flushes==1)
         ''')
+
+    def test_locale_may_settle_before_first_render_but_not_during_sequence(self):
+        self.lua.execute('step(1);player.locale="de";run();assert(writes["mir-library-render/de/complete.json"])')
+        self.setUp()
+        self.lua.execute('step(7);player.locale="de"')
+        with self.assertRaisesRegex(Exception, "locale changed"):
+            self.lua.execute('run()')
 
     def test_fixture_metadata_and_no_mutation_authority(self):
         info = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))

@@ -70,15 +70,16 @@ script.on_nth_tick(30, function()
   local state = storage.mir_render_capture
   if not state then
     if #game.connected_players == 0 then return end
-    require_that(game.active_mods.base == "2.1.23" and game.active_mods["more-infinite-research"] == "5.0.21012",
+    require_that(script.active_mods.base == "2.1.23" and script.active_mods["more-infinite-research"] == "5.0.21012",
       "exact engine/package tuple differs")
     state = {index = 1, phase = "initial", after = game.tick + 180, observations = {}}
     storage.mir_render_capture = state
     local player = player_for(state)
-    state.player, state.locale, state.native = player.index, player.locale, snapshot(player.force)
+    state.player, state.native = player.index, snapshot(player.force)
   end
   if state.phase == "complete" or game.tick < state.after then return end
   local player = player_for(state)
+  state.locale = state.locale or player.locale -- Bind after the initial connection/locale settlement.
   require_that(player.locale == state.locale, "locale changed during capture")
   unchanged(state, player)
   if state.phase == "initial" or state.phase == "next" then
