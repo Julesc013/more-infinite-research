@@ -1,6 +1,7 @@
 -- One authored native holder for explicitly prepared default worker-storage4.
 -- Data callers supply the ordinary MIR default, never a foreign prototype.
 local M = {id="mir-worker-storage-preservation-4", canonical="worker-robots-storage-4"}
+local target = require("platform.target")
 local MAX = 4294967295
 
 local function copy(value)
@@ -51,8 +52,13 @@ function M.fingerprint(prototype)
   local effects = prototype.effects
   assert(type(effects) == "table" and #effects == 1, "MIR worker recovery requires the authored worker effect")
   local effect = effects[1]
-  assert(type(effect) == "table" and effect.type == "worker-robot-storage"
-    and finite(effect.modifier) and effect.modifier >= 0 and type(effect.hidden) == "boolean",
+  assert(type(effect) == "table", "MIR worker recovery effect contract is invalid")
+  local hidden = effect.hidden
+  -- F200's runtime TechnologyModifier omits hidden. Its absence represents
+  -- false; F210 requires the boolean. Never change the native effect table.
+  if hidden == nil and target.id == "f200" then hidden = false end
+  assert(effect.type == "worker-robot-storage"
+    and finite(effect.modifier) and effect.modifier >= 0 and type(hidden) == "boolean",
     "MIR worker recovery effect contract is invalid")
   for key in pairs(effect) do
     assert(key == "type" or key == "modifier" or key == "hidden", "MIR worker recovery effect has an unsupported field")
@@ -61,7 +67,7 @@ function M.fingerprint(prototype)
   assert(type(ingredients) == "table" and #ingredients > 0 and #ingredients <= 32,
     "MIR worker recovery science contract is invalid")
   assert(type(prototype.ignore_tech_cost_multiplier) == "boolean", "MIR worker recovery map-price contract is unavailable")
-  local out = {"worker-storage-1", atom(effect.type), atom(effect.modifier), tostring(effect.hidden),
+  local out = {"worker-storage-1", atom(effect.type), atom(effect.modifier), tostring(hidden),
     tostring(prototype.ignore_tech_cost_multiplier)}
   local formula = prototype.research_unit_count_formula
   if formula ~= nil then
@@ -103,7 +109,9 @@ end
 local function emitted_contract(row)
   assert(type(row) == "table" and row.name == M.canonical and type(row.unit) == "table")
   local effects, ingredients, prerequisites = copy(row.effects), {}, {}
-  for _, effect in ipairs(effects) do if effect.hidden == nil then effect.hidden = false end end
+  for _, effect in ipairs(effects) do
+    if effect.hidden == nil and target.id == "f210" then effect.hidden = false end
+  end
   for index, ingredient in ipairs(row.unit.ingredients) do
     ingredients[index] = {name=ingredient[1], amount=ingredient[2]}
   end

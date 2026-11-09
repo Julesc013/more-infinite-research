@@ -149,6 +149,54 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
         self.lua.execute('package.path=player_root.."/?.lua;"..player_root.."/?/init.lua";package.cpath=""')
         self.lua.execute(RECOVERY_WORLD)
 
+    def sdk_world(self, target):
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        lua.globals().player_root = self.lua.globals().player_root
+        lua.globals().declared_target = target
+        lua.execute('package.path=player_root.."/?.lua;"..player_root.."/?/init.lua";package.cpath="";'
+                    'package.loaded["platform.target"]={id=declared_target}')
+        lua.execute(RECOVERY_WORLD)
+        return lua
+
+    def test_declared_package_target_uses_its_sdk_effect_shape_on_empty_init(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                lua = self.sdk_world(target)
+                lua.execute(r'''
+                  local effect=prototypes.technology[ID].effects[1]
+                  assert(declared_target=="f200" and effect.hidden==nil
+                    or declared_target=="f210" and effect.hidden==false)
+                  -- The world hint remains2.1; the declared package target
+                  -- alone selects its supported SDK effect representation.
+                  assert(script.active_mods.base=="2.1.23")
+                  history.on_init(nil)
+                  assert(writes==0 and storage.mir_worker_storage_route.current.kind=="default")
+                  assert(declared_target=="f200" and effect.hidden==nil
+                    or declared_target=="f210" and effect.hidden==false)
+                ''')
+
+    def test_target_specific_hidden_opponents_refuse_before_init_writes(self):
+        for target, expressions in (("f200", ('"false"', '0', '{}')),
+                                    ("f210", ('nil', '"false"', '0', '{}'))):
+            for expression in expressions:
+                with self.subTest(target=target, expression=expression):
+                    lua = self.sdk_world(target)
+                    lua.execute('prototypes.technology[ID].effects[1].hidden='+expression+r'''
+                      writes=0;local ok,message=pcall(history.on_init,nil)
+                      assert(not ok and tostring(message):find("effect contract is invalid",1,true))
+                      assert(writes==0 and storage.mir_worker_storage_route==nil)
+                    ''')
+
+    def test_f200_absent_hidden_normalizes_without_writing_native_fields(self):
+        lua = self.sdk_world("f200")
+        lua.execute(r'''
+          local recovery=require("research.worker_storage_recovery")
+          local prototype=prototypes.technology[ID];local effect=prototype.effects[1]
+          local absent=recovery.fingerprint(prototype);assert(effect.hidden==nil and writes==0)
+          effect.hidden=false;assert(recovery.fingerprint(prototype)==absent)
+          effect.hidden=true;assert(recovery.fingerprint(prototype)~=absent)
+        ''')
+
     def test_prepare_moves_actual_counts_complete_queue_and_partial_frames_once(self):
         self.lua.execute(r'''
           seed();local a,b,c=player.worker_robots_storage_bonus,uninvested.worker_robots_storage_bonus,suspended.worker_robots_storage_bonus

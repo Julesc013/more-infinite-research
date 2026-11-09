@@ -24,9 +24,11 @@ def expected_private_worker_row(inactive_science=None, space_age=False):
 MINIMAL_NATIVE_FACTS = r'''
 function install_worker_recovery_facts(worlds)
   local ID="mir-worker-storage-preservation-4"
+  local effect={type="worker-robot-storage",modifier=1}
+  if require("platform.target").id=="f210" then effect.hidden=false end
   prototypes=prototypes or {};prototypes.technology=prototypes.technology or {}
   prototypes.technology[ID]=prototypes.technology[ID] or {name=ID,level=4,max_level=4294967295,enabled=false,hidden=true,
-    effects={{type="worker-robot-storage",modifier=1,hidden=false}},ignore_tech_cost_multiplier=false,
+    effects={effect},ignore_tech_cost_multiplier=false,
     research_unit_count_formula="100*2^(L-4)",
     research_unit_energy=1800,research_unit_ingredients={{name="automation-science-pack",amount=1}},prerequisites={}}
   if not prototypes._worker_recovery_history then
@@ -52,8 +54,10 @@ ID="mir-worker-storage-preservation-4";CANONICAL="worker-robots-storage-4";OTHER
 storage={};writes=0;messages={};creators={[ID]="more-infinite-research",[CANONICAL]="more-infinite-research"}
 script={active_mods={base="2.1.23",["more-infinite-research"]="5.0.21011"}}
 local function prototype(name)
+ local effect={type="worker-robot-storage",modifier=1}
+ if require("platform.target").id=="f210" then effect.hidden=false end
  return {name=name,level=4,max_level=4294967295,enabled=name~=ID,hidden=name==ID,
-   effects={{type="worker-robot-storage",modifier=1,hidden=false}},ignore_tech_cost_multiplier=false,
+   effects={effect},ignore_tech_cost_multiplier=false,
    research_unit_count_formula="100*2^(L-4)",
    research_unit_energy=1800,research_unit_ingredients={{name="automation-science-pack",amount=1}},
    prerequisites={foundation={name="foundation"}}}
