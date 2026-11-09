@@ -72,6 +72,8 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
             # Transport the actual runtime API shape. A data-stage omitted
             # enabled default is exposed as true, unit.time is in ticks, and
             # native research ingredients use named fields rather than pairs.
+            # Freshly constructed native rows expose zero saved research work.
+            technology.saved_progress = 0
             unit = prototype.get("unit", {})
             if "count" in unit:
                 technology.research_unit_count = unit["count"]

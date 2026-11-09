@@ -15,6 +15,7 @@ import json
 from pathlib import Path
 import sys
 import unittest
+from worker_storage_recovery_fixture import expected_private_worker_row
 
 from native_credit_oracle import (
     NATIVE_FAMILY_RECIPES, current_native_credit_rows,
@@ -180,7 +181,8 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
         credits = current_native_credit_rows(rows, raw["recipe"], family_recipes=families)
         if "cannon-shell" not in raw.get("ammo-category", {}):
             credits.pop("mir-legacy-cannon-credit-rocket-shooting-speed", None)
-        return {**self.private_mains, **credits}
+        return {**self.private_mains, **credits,
+                "mir-worker-storage-preservation-4": expected_private_worker_row("automation-science-pack")}
 
     def assert_private_rows(self, emitted, public, raw):
         expected = self.expected_private_rows(public, raw)
@@ -414,6 +416,16 @@ class BobAngelF200CombinedProfileTests(unittest.TestCase):
         self.assertIn("missing recipe bob-mech-armor-plate", str(lua.globals().message))
         self.assertEqual(plain(lua.globals().emitted), {})
         self.assertEqual(lua.globals().technology_publications, 0)
+
+    def test_unused_worker_holder_does_not_require_removed_default_inputs(self):
+        raw = deepcopy(self.context["raw"])
+        raw["technology"].pop("worker-robots-storage-2", None)
+        raw["technology"].pop("worker-robots-storage-3", None)
+        raw.get("tool", {}).pop("utility-science-pack", None)
+        lua = self.data_final_stage(raw=raw)
+        holder = plain(lua.globals().emitted)["mir-worker-storage-preservation-4"]
+        self.assertEqual(holder, expected_private_worker_row("automation-science-pack"))
+        self.assertEqual(lua.globals().technology_publications, 1)
 
     def test_recipe_activation_keeps_complete_authored_output_and_foreign_state(self):
         expected = {name: row["row"] for name, row in self.oracle["technology"]["added"].items()}

@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import sys
 import unittest
+from worker_storage_recovery_fixture import MINIMAL_NATIVE_FACTS
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -751,6 +752,7 @@ class LibraryTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().player_root = (ROOT / "source").as_posix()
+        self.lua.execute(MINIMAL_NATIVE_FACTS)
         self.lua.execute(r'''
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
@@ -1074,6 +1076,8 @@ class LibraryTests(unittest.TestCase):
 
           function boot_native_events()
             boot()
+            library_private_credit_ids["mir-worker-storage-preservation-4"] = true
+            install_worker_recovery_facts({player.force})
             gear.force, foreign.force = player.force, player.force
             route_native_events(false)
           end

@@ -68,6 +68,14 @@ class SecretasContinuationTests(unittest.TestCase):
           for _,spec in ipairs(config.prototypes()) do startup[spec.name]={value=spec.default_value} end
           for name,value in pairs(selected_changes) do startup[name].value=value end
           settings,data,helpers,log={startup=startup},full_world(mods,true),nil,function() end
+          -- The always-present default preservation row retains native2 as
+          -- an authored prerequisite even while public research starts at9.
+          data.raw.technology["worker-robots-storage-2"]=data.raw.technology["worker-robots-storage-2"]
+            or {type="technology",name="worker-robots-storage-2"}
+          data.raw.technology["worker-robots-storage-3"]=data.raw.technology["worker-robots-storage-3"]
+            or {type="technology",name="worker-robots-storage-3",prerequisites={"worker-robots-storage-2"},
+              effects={{type="worker-robot-storage",modifier=1}},
+              unit={count=450,time=60,ingredients={{"automation-science-pack",1}}}}
           for name,row in pairs(finite_rows) do data.raw.technology[name]=row end
           data.raw.tool["golden-science-pack"]={}
           data.raw.lab.fixture.inputs[#data.raw.lab.fixture.inputs+1]="golden-science-pack"

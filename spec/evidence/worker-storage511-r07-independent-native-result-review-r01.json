@@ -1,0 +1,123 @@
+{
+  "kind": "MIRWorker511R07IndependentNativeResultReviewV1",
+  "reviewed_at_utc": "2026-11-09T08:54:52.232267+00:00",
+  "verdict": "PASS named prepared-default-to-Secretas native route, ordinary work/retirement/save/two-colds; beta remains pending separate mandatory cases",
+  "commit": "203e0af5e1ea8925c1909e1dc97cef3dab3c961b",
+  "source": "93d30a248e71e5248eeb87072c27332fe68b9137",
+  "package": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir511-cumulative-assets-r04\\more-infinite-research_5.0.21011.zip",
+    "exists": true,
+    "bytes": 1006768,
+    "sha256": "C3CB6462E3285DA222664D2174EAA16E63577BF9970804E410B127A43C773D14"
+  },
+  "pins": {
+    "packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r07-controller\\packet.json",
+      "bytes": 596649,
+      "sha256": "7A3BC9CF45BBC4206106088CC558C084DFC9CA11CD76DC1F9B70D57E2EED7D59"
+    },
+    "caller": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r07-controller\\Invoke-ProviderContinuation.ps1",
+      "bytes": 20560,
+      "sha256": "E54FC3533672389A292944E9A04B4775F3737C12A62B2D8505C55E4A2FC61645"
+    },
+    "terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r07-controller\\execution-Execute-r04\\terminal.json",
+      "bytes": 672715,
+      "sha256": "CB1CC61E004F6DEF560C6A47FD5A88BBA37C9741B14F9A71CF4A985115C967CC"
+    },
+    "raw_server": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r07-controller\\Execute-r04-provider\\server.log",
+      "bytes": 168032,
+      "sha256": "20C9C7D626396C2711876CBCF27C961A7AC661E727C70D50E1798AEFB33FBD5C"
+    }
+  },
+  "actual": {
+    "processes": 3,
+    "roles": [
+      "server",
+      "cold1",
+      "cold2"
+    ],
+    "server_exit": "-1 through passed closed-save completion predicate, nontimeout",
+    "cold_exits": [
+      0,
+      0
+    ],
+    "new_ordinary_completions": 5,
+    "composition": "2 private+2 sentinel+1 foreign finite4; by_scriptfalse provenance guards in exact embedded actor passed",
+    "prior_distinct_source_completions": 7,
+    "cumulative_counts": {
+      "player": 7,
+      "worker-suspended": 5
+    },
+    "cold_counters_add_no_completions": true,
+    "resume_tick": 30797,
+    "retirement_tick": 45277,
+    "endpoint_tick": 49324,
+    "retired_private": {
+      "player": {
+        "next_level": 9,
+        "bonus": 8
+      },
+      "worker-suspended": {
+        "next_level": 8,
+        "bonus": 7
+      },
+      "both": "unresearched/disabled/saved0/currentempty; visibility retained"
+    },
+    "final_native_bonuses": {
+      "player": 9,
+      "worker-suspended": 7,
+      "worker-uninvested": 3
+    },
+    "foreign_finite": "Only player4 researched;5..8 unearned allforces. MIR9 remains cap8 disabled.",
+    "all_other_force_frames_equal_entry": true,
+    "endpoint_and_cold_frames_exact_equal": true,
+    "endpoint_save": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r07-controller\\protected\\provider.zip",
+      "exists": true,
+      "bytes": 806503,
+      "sha256": "DCE40473A6C416BF872EC5ABF7D191D9791302465F09B642C2184EC8A9055FCE"
+    },
+    "saved_zip_members": 7,
+    "saved_zip_crc_and_actor_hash_valid": true,
+    "closed_save_bytes_unchanged_through_colds": true
+  },
+  "custody": {
+    "members": 21,
+    "all_frozen_and_retained_bodies_match_recorded_hashes": true,
+    "input9A9": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r03-controller\\protected\\prepare.zip",
+      "exists": true,
+      "bytes": 799400,
+      "sha256": "9A9A7289AFA956A35D0793A2171EF56597152BA2000D70E251A1241BE776CF69"
+    },
+    "activation_restored": "restored-direct-library-controls",
+    "archive_restoration": [
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-worker-recovery511_0.4.0.zip",
+        "action": "removed-temporary"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21011.zip",
+        "action": "removed-temporary"
+      }
+    ],
+    "prior_controls": 2,
+    "prior_archives": 19,
+    "recorded_factorio0": true,
+    "live_library_rechecked": false
+  },
+  "scope": [
+    "Source203/93d, Factorio2.1.23, actualSecretas1.0.38, matchingcap8/mapprice1.25 only.",
+    "Four prior successful source/prepare processes retain originald840/FFB provenance. This is3new processes and5new completions, not source/cold re-earned counts.",
+    "Original r03provider/r04/r05/r06 adverses preserved; this new pass does not relabel them."
+  ],
+  "remaining": [
+    "Mandatory first-add MIR toexistingSecretas, unchangedSecretas published510 upgrade, cap/enable changes after retirement.",
+    "Final17 package/readback, exact requiredCI, finalbeta notes/source/tag/publication gates.",
+    "FullFerrum/reporter profile unavailable, physicalcargo/performance/stable not established."
+  ],
+  "reviewer_native_or_source_actions": 0
+}

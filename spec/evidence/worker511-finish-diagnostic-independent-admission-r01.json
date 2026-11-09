@@ -1,0 +1,27 @@
+{
+  "kind": "MIRWorker511FinishDiagnosticIndependentDeltaReviewV1",
+  "reviewed_at_utc": "2026-11-09T08:32:27.862903+00:00",
+  "verdict": "APPROVE source/artifact delta for ONE explicit observational diagnostic only; Root exactpacket admission required",
+  "base_commit": "d4beb15429e22bab89d474f65ff67a6bf991a9ae",
+  "diagnostic_commit": "5348683b25817d10f4b39284770bb644ce0f80f1",
+  "diagnostic_source": "4a1401a922aab0b6d52a3eb7dcbd1c3af18edd8d",
+  "zip": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\worker511-finish-diagnostic-r02\\more-infinite-research_5.0.21011.zip",
+    "bytes": 1006782,
+    "sha256": "2139763F8071B0BF3F30AA668BC2F00F30AB7A87221B482AC95F7AB6C2F36046"
+  },
+  "scope": [
+    "Onlyworker_robot_storage.lua changes in Source and ZIP; exact packaged body equals committed diagnostic blob.",
+    "Existing combined guard and refusal unchanged. Diagnostic logs bounded force/current/queuefirst+length/currentprogress/type/native level/researched and separate guard booleans only when original guard fails.",
+    "Finished event context logs bounded force/research name and tick/finished/by_script before unchanged snapshot.",
+    "No settings/queue/nativelevel/progress/pcall/ownership/history or acceptance changes; no production fix inferred.",
+    "ZIP CRCvalid; all other member bodies equal original449964 candidate."
+  ],
+  "native_limit": "One Root-owned instrumented engine from exact original9A9 prepared input, same closed resume/provider protocol; expect unchanged refusal and capture actual fields. No pass/release claim, retry, or guard weakening.",
+  "reviewer_actions": {
+    "engines": 0,
+    "builds": 0,
+    "host_tests": 0,
+    "source_or_packet_edits": 0
+  }
+}

@@ -9,6 +9,7 @@ import unittest
 import zipfile
 
 from historical_sources import PUBLISHED_COMMIT, read_published_source
+from worker_storage_recovery_fixture import expected_private_worker_row
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -438,6 +439,11 @@ class BobTechMaterialTests(unittest.TestCase):
         fixture_values = _plain(self.values())
         fixture_values["options"] = {}
         lua.globals().fixture_values = _lua_value(lua, fixture_values)
+        authored_worker = expected_private_worker_row()
+        authored_worker.update(name="worker-robots-storage-4", hidden=False)
+        for field in ("enabled", "visible_when_disabled", "order"):
+            authored_worker.pop(field)
+        lua.globals().fixture_worker = _lua_value(lua, authored_worker)
         lua.execute(r'''
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
@@ -451,18 +457,26 @@ class BobTechMaterialTests(unittest.TestCase):
             return {gears=function() return {type="technology", name="fixture-gears", unit={time=1, ingredients={{"automation-science-pack", 1}}}} end}
           end
           package.preload["research.generator"] = function()
-            return {install=function(rows, stage) stage.installed = rows end}
+            return {install=function(rows, stage) stage.installs=(stage.installs or 0)+1;stage.installed=rows end}
           end
           package.preload["compatibility.modern_catalogue"] = function()
             return {is_k2_base=function() return false end, is_k2so=function() return false end,
               retains_bob_native_continuations=function() return false end,
               native_owner_fallbacks=function() return {} end,
+              continuations=function() return {{id="worker-robots-storage-4",defaults={
+                enabled=true,base_cost=200,effect_percent=1,growth_factor=1.5,
+                linear_increment=0,max_level=0,research_time=60}}} end,
               select=function() return {bob_angel=false, bob_tech_materials=true, definitions={}, continuations={}} end}
           end
           package.preload["research.modern"] = function()
             return {preflight_recipe_patches=function() end, preflight_native_owner_patches=function() return {} end,
               native_owner_product_targets=function() return {} end, preflight_collected_native_owner_targets=function() end,
               technologies=function() return {} end, apply_weapon_speed_overlap=function() end,
+              continuation=function(definition, values)
+                assert(definition.id=="worker-robots-storage-4"
+                  and values.streams["worker-robots-storage"].effect_percent==1)
+                return fixture_worker
+              end,
               retain_external_weapon_coverage=function(selection, rows, context)
                 assert(#selection.definitions==0 and context==science_context)
                 context.ownership_checked=true
@@ -489,6 +503,9 @@ class BobTechMaterialTests(unittest.TestCase):
           require("data-final-fixes")
         ''')
         installed = _plain(lua.globals().data["installed"])
+        self.assertEqual(lua.globals().data["installs"], 1)
+        worker = next(row for row in installed if row["name"] == "mir-worker-storage-preservation-4")
+        self.assertEqual(worker, expected_private_worker_row("automation-science-pack"))
         emitted = {row["name"] for row in installed}
         expected = {
             "recipe-prod-research_material_tin-1",
@@ -498,6 +515,7 @@ class BobTechMaterialTests(unittest.TestCase):
             "recipe-prod-research_material_invar-4",
         }
         self.assertTrue(expected <= emitted)
+        self.assertEqual(emitted, expected | {"fixture-gears", "mir-worker-storage-preservation-4"})
         self.assertNotIn("recipe-prod-research_material_tin-4", emitted)
 
 

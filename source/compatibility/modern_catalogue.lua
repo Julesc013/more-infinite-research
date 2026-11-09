@@ -1314,6 +1314,14 @@ function M.continuations(active_mods, raw, external_continuations, worker_storag
       end
       require("compatibility.modern_catalogue.secretas").worker_continuation(row,
         not secretas_external and raw or nil)
+      if raw ~= nil then
+        -- Record the admitted current chain independently of Secretas's
+        -- authored ninth-row construction/science policy. The adapter may
+        -- alter only this detached probe, never the emitted row or provider.
+        worker_route = require("compatibility.worker_robot_storage").adapt(copy(row), raw,
+          existing_infinite_owner, helpers and helpers.evaluate_expression,
+          M.science_ingredients(row.science, row.science_amounts))
+      end
     elseif row.id == "worker-robots-storage-4" and (target.id == "f200" or target.id == "f210")
         and not bob_angel_f200_combined and not M.retains_bob_native_continuations(active_mods)
         and type(raw) == "table" and type(raw.technology) == "table"
