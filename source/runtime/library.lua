@@ -2341,9 +2341,9 @@ local function create_frame(player, view)
   drag.style.height = library_layout.titlebar_action_size
   drag.drag_target = frame
 
-  icon_button(title, "layout_smaller", "utility/left_arrow", {"mir-browser.layout-smaller"})
-  icon_button(title, "layout_larger", "utility/right_arrow", {"mir-browser.layout-larger"})
-  icon_button(title, "layout_reset", "utility/reset", {"mir-browser.layout-reset"})
+  icon_button(title, "layout_smaller", "utility/backward_arrow", {"mir-browser.layout-smaller"})
+  icon_button(title, "layout_larger", "utility/forward_arrow", {"mir-browser.layout-larger"})
+  icon_button(title, "layout_reset", "utility/reset_white", {"mir-browser.layout-reset"})
   icon_button(title, "close", "utility/close", {"mir-browser.close"})
 
   create_tabs(frame, player, view)

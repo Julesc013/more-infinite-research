@@ -1,0 +1,40 @@
+{
+  "kind": "MIRLibrary512RenderFinalIntroWaitIndependentReviewV1",
+  "verdict": "GO exact edb/R07 serial render-only attempt under Root admission; no remaining concrete blocker found. Actual completed seven-image/pixel review still required.",
+  "actor_commit": "edbdbce9b69f72c64e24f7749e93ad62ed47d4af",
+  "actor_bytes": 8038,
+  "actor_sha256": "85EDDB464440167E33D8DFC5C17EF9B32704A5DF12D4FBB1E8E008DC785FC1E5",
+  "archive_sha256": "4DE22C96EE4CD17200E7686D700C4055C610F34FCF4C6FFD7BCF710E79A20DBD",
+  "plans": [
+    {
+      "locale": "en",
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-render-native-r07-controller\\en-plan.json",
+      "sha256": "4DE1FBEC0B876AB70F711BB2CE5E7C91D52F3FB86C3FBF6967ED1FA66109583F",
+      "actual_compose_restored_zero_native": true
+    },
+    {
+      "locale": "de",
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-render-native-r07-controller\\de-plan.json",
+      "sha256": "C03125DEA7A48ADD83016826CC5029EAF851A951F2ED376AAD26A75C0F492514",
+      "actual_compose_restored_zero_native": true
+    }
+  ],
+  "delta": "Only wait while actual connected player controller_type equals documented defines.controllers.cutscene before capture-state initialization. Getter/enum are supported in pinned2.1.23; no controller mutation, exit_cutscene or synthetic input.",
+  "inherited_reviews": [
+    "library512-render-intro-setup-independent-review-r01.json",
+    "library512-render-controller-mode-followup-review-r01.json",
+    "library512-render-actor-independent-review-addendum-r01.json"
+  ],
+  "checks": [
+    "Public Base skip-intro setup remains supported by actual Base code and suppresses only the ending modal.",
+    "New nonmutating controller guard prevents beginning page sequence during the natural cutscene; original named-native baseline is captured afterward.",
+    "Original180/60settlement/flush/publicBrowser/render-only obligations and exact Source9b/AA26 remain unchanged.",
+    "Same legal default-cadence F4 owner and3E validator; predicate observed, closed stdout marker, realPNG/complete metadata,4GiB240s512MiB and exact restoration remain mandatory.",
+    "Both new plans/input hashes and archive rawGit member/CRC verified; realCompose records match new hashes, before==after, native0/restored."
+  ],
+  "limits": [
+    "R06 one-process timeout/twoPNG output remains adverse, not seven-page acceptance.",
+    "No game/activation/code edits by reviewer.",
+    "Only render attempt; no input/menu/resize/export/save/lifecycle/dual/performance/stable verdict."
+  ]
+}

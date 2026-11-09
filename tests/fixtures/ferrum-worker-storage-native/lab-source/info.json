@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-ferrum-worker-storage-native-lab",
+  "version": "0.1.0",
+  "title": "Disposable Ferrum worker laboratory stimulus",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": ["base = 2.1.23", "space-age = 2.1.23", "planet-ferrum = 0.1.5", "? more-infinite-research = 5.0.21012"]
+}
