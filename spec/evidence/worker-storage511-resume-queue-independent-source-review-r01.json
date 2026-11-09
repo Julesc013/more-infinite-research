@@ -1,0 +1,119 @@
+{
+  "kind": "MIRWorker511OwnedQueueIndependentSourceReviewV1",
+  "reviewed_at_utc": "2026-11-09T08:22:57.018994+00:00",
+  "verdict": "APPROVE bounded source delta for exact new native qualification; CI/merge/release acceptance separate",
+  "findings": [],
+  "commit": "d4beb15429e22bab89d474f65ff67a6bf991a9ae",
+  "tree": "e3db94ea201a9e7bf9908d810ad5ae7b040c01a1",
+  "parent": "c3df97704ff87933ae5fce076d78cbff24e8ca89",
+  "source_before": "d840d03890b3809646fe9b324bf62c7da91993ab",
+  "source_after": "a8f46c7a91cdfa6414d93eb3db435706b0edc83d",
+  "authorship": "Reviewer did not author worker production or its changed history tests. Reviewer authored two additional host opponents in this new evidence folder only.",
+  "changed_paths": [
+    "source/runtime/worker_robot_storage.lua",
+    "tests/test_worker_storage_history.py"
+  ],
+  "mechanism_review": [
+    "A lexical owned force index protects only same-force callbacks during assign_queue and both owned caps operations. Other-force/external callbacks still execute strict checks.",
+    "Each operation saves previous owner, uses pcall, restores owner on success or failure/nesting, and rethrows errors. No on_load/persistent gate state or broad event disablement.",
+    "Original queue membership/order/current and saved/current progress restoration assertions remain inside assign_queue. Resume additionally validates all prepared forces with prepared_current after the completed write.",
+    "Caps mutation now ends with strict snapshot plus exact recorded next-level/enabled/visibility checks. Retirement and pending reconciliation share the gate.",
+    "Structural contracts, provenance/history, all-force preflight before prepare writes, counts/quotas, disabled ownership, prices/science/effects, native level arithmetic, external current/queue/progress guards and retirement accounting remain unchanged.",
+    "No bootstrap, data, catalogue, declarations, platform/SDK, settings, packaging/control scripts, frozen facts, public research or changelog change."
+  ],
+  "validation": {
+    "materialized_host_plan": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-resume-queue-independent-r01-controller\\host-plan.json",
+      "bytes": 15883,
+      "sha256": "41BDEF630EFDE93EC41DAC977D979C66774EE2D2E279CAE13F27DDFE82507FFE"
+    },
+    "pinned_lua52": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir421-lua-runtime\\lupa\\lua52.cp314-win_amd64.pyd",
+      "bytes": 507904,
+      "sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899"
+    },
+    "independent_history_run": {
+      "tests": 34,
+      "result": "PASS",
+      "log": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-resume-queue-independent-r01-controller\\history.log",
+        "bytes": 138,
+        "sha256": "F0CC280B6D6C01A2C334CA3200F809E21B37250A2551827FAB61C2787CF4AA15"
+      }
+    },
+    "additional_independent_opponents": {
+      "script": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-resume-queue-independent-r01-controller\\independent-opponents.py",
+        "bytes": 4108,
+        "sha256": "C9ED44406418E0731D69CF2882FBEB3727E9E82F74CA4125FCC8B11FDCAE7A76"
+      },
+      "green": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-resume-queue-independent-r01-controller\\independent-opponents.log",
+        "bytes": 147,
+        "sha256": "9E931E76CE6C53E7C87E751F55A4A2BBA80B52A7C028785A34CA65F4C17E8149"
+      },
+      "old_c3_red": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-resume-queue-independent-r01-controller\\independent-old-red.log",
+        "bytes": 164,
+        "sha256": "F9727DCE1A2D90AEBBD435A85392AB8C7AB9F66632B243E477EB705DF12BDDC6"
+      },
+      "cases": [
+        "Nested valid other-force caps operation restores outer owner; same-force transient is muted only while owned, cross-force transient still refuses.",
+        "Caps setter exception propagates and restores external strict refusal; no rollback or safe-continuation claim after error."
+      ]
+    },
+    "author_evidence_read_only_reviewed": {
+      "red": "32 controls,5errors retained before fix (not a34-test full red).",
+      "history": "34 pass exact committed source",
+      "bootstrap": "31 pass author result; not rerun by reviewer",
+      "root": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-resume-queue-fix-r01-controller"
+    },
+    "git_diff_check": "PASS",
+    "exact_committed_worktree_clean": true,
+    "native_runs": 0,
+    "builds": 0,
+    "broad_host_runs": 0
+  },
+  "credit33_applicability": {
+    "verdict": "Unaffected normal-credit route applicability is supported; retain original actual execution pins. Bind final new package/control provenance separately.",
+    "original_result": "credit511-native-independent-result-review-r01.json SHA0428C6D50D7C363A84E80E2E93C1780754F327AA87BA4C29528B2C2157051759",
+    "previous_science_delta_review": "worker511-science-item-independent-review-r01.json SHACF8E075C296D293FF3ECE8B17C66D49F0745B8CDB2E19E1E23F1994FA603BD81",
+    "consumed_path_proof": [
+      "All NoMIR/published510 producer inputs are unchanged and do not consume this candidate module.",
+      "The closed credit actors/schedule never invoke worker preparation or resume. Their new worlds/NoMIR predecessors/published510 predecessors cannot carry the new prepared-kind recovery state.",
+      "Candidate default-route initialization/load/apply/configuration/fingerprint logic is unchanged; reconnect yields pendingfalse for ordinary route records.",
+      "on_research_event returns immediately at unchanged if-not-pending gate. New owned queue/settled checks and prepared-only resume path are not exercised in those credit routes.",
+      "Data/prototypes/default holder contract/native credit code and all credit scalar oracles, actors/profiles/science/costs are byte unchanged by this unit."
+    ],
+    "limits": "This is source applicability, not33 new native executions under a8. Final asset/member diff and matching fixture/source/control binding must be read back; unexplained changes invalidate reuse."
+  },
+  "four_process_prefix_applicability": {
+    "verdict": "Exact r03 protected source/prepared outputs remain legitimate earned predecessor inputs for a8 provider continuation. Preserve r03 Source/package execution identity; no claim that these were freshly executed under a8.",
+    "original_actual_prefix": "4 successful processes: published510 source/server+cold, d840 preparation/server+cold. r03 fifth provider data failure remains adverse.",
+    "source_producer": "Both published510 source processes consume no candidate code and are unchanged.",
+    "preparation": "Native transfer contract, all-force preflight, level/materialization setters, queue order/progress restoration and saved representation remain unchanged. During first prepare, pending is false until all transfer writes complete; nested research callbacks already return before the new owned-force gate. The wrapper changes local ownership/error handling, not successful native writes.",
+    "idempotence_and_cold": "Second prepare remains read-only prepared_current; prepared on_load/reconnect is unchanged and gate is lexical/nonpersistent.",
+    "protected_input": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r03-controller\\protected\\prepare.zip",
+      "bytes": 799400,
+      "sha256": "9A9A7289AFA956A35D0793A2171EF56597152BA2000D70E251A1241BE776CF69"
+    },
+    "qualification": "Old d840 preparation evidence supports the unchanged successful transfer contract and exact input custody. New a8 provider load/resume/retirement result is mandatory; do not relabel prior execution as a8."
+  },
+  "completion_risk_and_native_gates": {
+    "source_assessment": "No finished/progress-range relaxation was added. next-level arithmetic already supports completed/true and advanced/false. Immediate finished current/queue/progress remains unverified because no actual candidate P completion was reached in r04. SDK-based99B326 audit remains applicable.",
+    "mandatory_next": [
+      "Freeze exact a8 source/new package, package member/provenance checks, unchanged actor63BA and fixture0.4/engine/profile/cap8/price1.25, exact protected9A9 predecessor COPY.",
+      "Native provider-ready frame equality, actual resume of suspended partial while retaining unrelated current0.010009999999999998 and exact queue order, bonus/flags/price.",
+      "Actual ordinary by_scriptfalse private completion and retirement for both invested forces; preserve original uninvested disabled force and other forces.",
+      "Ordinary foreign finite stage4 must earn its own bonus without granting5..8; final expected cumulative ordinary counts player7/suspended5 (five new completions after seven source completions).",
+      "Endpoint save plus TWO read-only cold reloads with exact frame/counter/save-byte equality and complete raw/control/archive restoration."
+    ],
+    "note": "The actual unrelated sentinel current is0.010009999999999998;42% was used by host opponents only, not the native source. No synthetic current-progress claim."
+  },
+  "limits": [
+    "r04 production resume failure and secondary actor/RCONfailure stay adverse. No provider endpoint, retirement or cold pass yet.",
+    "No Ferrum/reporter-save/full-profile, physical cargo, changed cap/enable, provider removal/readdition, first-add/unchanged-provider, overhaul, performance, stable or publication claim.",
+    "No production/test edits, direct-library/native/build actions by reviewer. Source approval is conditional for new native qualification, not merge or release."
+  ]
+}

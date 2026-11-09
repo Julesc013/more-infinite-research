@@ -1,0 +1,97 @@
+{
+  "kind": "MIRLibrary511RetentionDERevision04IndependentAdmissionV1",
+  "reviewed_at_utc": "2026-11-08T21:32:23.130366+00:00",
+  "reviewer": "independent non-author /root/native_owner510_review",
+  "verdict": "GO exact DE r04 packet only. Corrected-package native retention remains pending.",
+  "scope": "Bounded read-only delta/complete current tuple and actual offline composition review versus accepted r02; no source/history re-audit, tests, build, native, desktop input or child agents. Only this new report authored.",
+  "plan": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library511-retention-inputs-r04\\de\\plan.json",
+    "bytes": 8807,
+    "sha256": "5AFBCAD1F9CCCCA3927B8B84853823A4BAF76A410087596EC065152B89F36490",
+    "source_head": "1389ef9ba39159fca141d668ac74e800c9a80d16",
+    "player_tree": "dc3f9c1aa119f825dfb1cb5dac8ccf71ea1ddec0",
+    "runner_clean": true,
+    "prior_complete_admission_sha256": "8A2903979C0AA7C8043E551A29B6560FF4E51E33C1AF9B6EB8A19BD69E8B161E",
+    "source_review_sha256": "6F8E72AF4C381CD8A3E3ACE2744B6492A73323C9EDC304793C953BB76277B36E"
+  },
+  "unchanged_inputs": {
+    "all15declared_file_records_rehashed": true,
+    "mismatches": 0,
+    "candidate_sha256": "F25DB9283C2F8020907F8E2AD35132F0B6EEECE11263C82C69389EE8DAB3F09D",
+    "candidate_bytes": 995429,
+    "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "engine_version": "2.1.23",
+    "profile_sha256": "E358A099ACC093CBEF69781CC396297C85A2F065A870F711C93F62D134185EE1",
+    "profile_declared_MIR_pin_matches_candidate": true,
+    "seed_and_protected_original_sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD",
+    "seed_bytes": 893285,
+    "observer_sha256": "A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0",
+    "selection": [
+      "base@2.1.23",
+      "more-infinite-research@5.0.21011",
+      "mir-fixture-mir5-active-mods-observer@0.1.0"
+    ],
+    "settings_mode": "Defaults",
+    "owner_helpers_actors_limits_and_expected_UI_unchanged_from_r02": true
+  },
+  "r03_refusal_preserved": {
+    "plan_sha256": "F2BCF3547F0C0AE57E80ED315D3656BD947DD5E7104C13BB1D1AD8DF9E9AED6A",
+    "actual_offline_sha256": "977C2606A4A1B8DC76BAD7283DEB788A838A319F6339A2748EB566344155651A",
+    "reason": "Output/capture relocated to r03 but unchanged config still wrote to r02/write-data. Reused r02seed directory would also receive ordinary autosaves beside the prior seed. This crossed new output accounting and preserved prior-result paths despite an offline PASS.",
+    "native_admitted": false,
+    "native_run": false,
+    "original_r03_plan_rehashed_unchanged": true
+  },
+  "r04_isolation": {
+    "fresh_stage": "D:/Projects/Factorio/.task-builds/library-selection-fix-r01/build/tmp/library511-retention-inputs-de-r04",
+    "stage_contains_only": [
+      "de.ini",
+      "profile.json",
+      "protected-source-copy.zip"
+    ],
+    "stage_files_have_single_link": true,
+    "config_bytes": 353,
+    "config_sha256": "AAB3A2F8F8242918C07E04F38B3D0CB089B9D8D3103787EBEF660D115C868775",
+    "write_data": "D:/Projects/Factorio/.task-builds/library-selection-fix-r01/build/tmp/library511-retain-de-r04/write-data",
+    "write_data_equals_native_output_child": true,
+    "native_output": "D:/Projects/Factorio/.task-builds/library-selection-fix-r01/build/tmp/library511-retain-de-r04",
+    "capture_root": "D:/Projects/Factorio/.task-builds/library-selection-fix-r01/build/tmp/library511-retain-de-r04/captures",
+    "offline_output": "D:/Projects/Factorio/.task-builds/library-selection-fix-r01/build/tmp/library511-retain-de-r04-offline",
+    "native_output_and_capture_absent_at_review": true,
+    "fresh_seed_directory_distinct_from_r02_and_r03": true,
+    "read_data_unchanged": "D:/Games/Factorio/2.1/data",
+    "effect": "Engine logs/temp/player data use new governed r04write-data; incidental autosaves go beside the fresh r04seed, preserving prior r02locations. No guard or file-role expansion."
+  },
+  "actual_offline": {
+    "path": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-de-r04-offline\\owner-result.json",
+    "bytes": 2397,
+    "sha256": "A89B2B1FEB234BAB25935B467C4274C5BB7BE862D5DE3FA75687E3248EC15EF6",
+    "bound_plan_sha256": "5AFBCAD1F9CCCCA3927B8B84853823A4BAF76A410087596EC065152B89F36490",
+    "status": "passed-offline-composition-only",
+    "native_processes": 0,
+    "before_after_equal": true,
+    "current_direct_controls_independently_equal_before": true,
+    "original_library_restored": true,
+    "factorio_zero_receipt_and_current_process_readback": true,
+    "stdout_sha256": "E76FFDE58441093C64A383C865728FE6D7A656FEB42CCE91DEF688707BBC2D42",
+    "unchanged_controls": {
+      "mod_list_sha256": "48C46678CC8369DB15CC12CDFB23309EB076DC4433B76E9426083D0074BCCC91",
+      "mod_settings_sha256": "667897C514B66298A1E400058B65EA14EB36322D88864B98AE38E4C9B81387BC",
+      "active_profile_absent": true,
+      "temporary_MIR11_archive_absent": true
+    }
+  },
+  "bounded_execution": [
+    "Same DE Akku→explicit worker battery→Queue→Debug selected worker→Settings positive Brems→Research SAMEquery/rows/worker highlight/detail. Exact r02expected_UI string is unchanged. No reselection/retry or additional functional action.",
+    "Use existing unchanged C2F owner and admitted helpers only; explicitclient-de, real live owner/native PID/start/executable bindings and fresh inspected original2560PNG before every input. High-detail display scaling does not resize native window or change physical geometry/hit-test checks.",
+    "Keep4096MiB/512MiB/1200s lifetime and120s capture freshness exactly. Operator disposition changes only scheduling: no unrelated reading/drafting/custody/reviews during live UI; prompt observed natural retirement.",
+    "Stop functional progression on unexpected state, preserve exact adverse and retire only owned client through existing guards. Prior DEr02 governed timeout before Settings/return is not a corrected retention pass or established product failure.",
+    "Unchanged separately admitted ENr02 remains its own next serial scope only after DEretirement/Factorio0/control restoration. This report grants no export, import/apply, new actor, synthetic event, resize, multiplayer/lifecycle/performance or stable acceptance."
+  ],
+  "prior_adverse_limit": "Root-provided DEr02 adverse custody BA1B935E52C6556963DF72D3EFBEE1FF432B7FCD2EFFE99C55595C7013535DB7 remains separate (91files49,127,451bytes). This admission did not expand into independent actual-result/custody review of that timeout.",
+  "limits": [
+    "Admission only; actual corrected retention still needs observed result/readback under this exact identity.",
+    "All prior7441 product adverse, ENscope error, stale-export refusal/timeout, r01profile mismatch and r03path refusal remain preserved.",
+    "Required workspace health read-only bounded scan ran before this output, statusattention; no cleanup performed."
+  ]
+}

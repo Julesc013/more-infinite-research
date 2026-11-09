@@ -1,0 +1,240 @@
+{
+  "kind": "MIRCumulativeCredit511IndependentRootNativeReadbackV1",
+  "observed_at_utc": "2026-11-09T05:18:06.308395+00:00",
+  "source_commit": "cabf94efc9b529c4c555743b7139b3cf11b9c20d",
+  "source_tree": "b91641744ad6f866e189c53f7f8e11d1a6e28a02",
+  "status": "named-credit-native-qualification-passed",
+  "jobs": [
+    {
+      "job": "f200-minimum-fresh",
+      "role": "fresh",
+      "case": "f200-minimum",
+      "processes": 3,
+      "completed_ordinary_labs": 5,
+      "protected_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-cumulative-r01-controller\\jobs\\f200-minimum-fresh\\protected\\credit511-complete.zip",
+        "exists": true,
+        "bytes": 759145,
+        "sha256": "37509D867834D7C5FA578672DC4DC093E25104C90973CD3CAB8D187DDB0578D1"
+      },
+      "receipt_sha256": "5B6A0D7DB62CEC187B3C80BEF655F6A57D42B7BF000790E3B2F163D5FD03EB8D",
+      "target_scalar": 0
+    },
+    {
+      "job": "f200-minimum-nomir-source",
+      "role": "nomir-source",
+      "case": "f200-minimum",
+      "processes": 1,
+      "completed_ordinary_labs": 1,
+      "protected_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-cumulative-r01-controller\\jobs\\f200-minimum-nomir-source\\protected\\credit511-complete.zip",
+        "exists": true,
+        "bytes": 694361,
+        "sha256": "EE2AEE695C2616E14E62DD69FAA07E505644403731EB59D31E37FB35AB137470"
+      },
+      "receipt_sha256": "70A5776F37841D772B04814648160C3830D41D1D7B00E985F18F018C0DE0221C",
+      "target_scalar": null
+    },
+    {
+      "job": "f200-minimum-first-add",
+      "role": "first-add",
+      "case": "f200-minimum",
+      "processes": 3,
+      "completed_ordinary_labs": 0,
+      "protected_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-cumulative-r01-controller\\jobs\\f200-minimum-first-add\\protected\\credit511-complete.zip",
+        "exists": true,
+        "bytes": 712744,
+        "sha256": "38F257EF91CBBB83DB60302FC823C9B80F4432C2B3E0C41C2BCD052C22D5B439"
+      },
+      "receipt_sha256": "E0771F4558CF389E721336B2B6C069B5C1BD5C9D6D240A127B82C5671EA01EAF",
+      "target_scalar": 0
+    },
+    {
+      "job": "f200-minimum-paid510-source",
+      "role": "paid510-source",
+      "case": "f200-minimum",
+      "processes": 1,
+      "completed_ordinary_labs": 5,
+      "protected_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-cumulative-r01-controller\\jobs\\f200-minimum-paid510-source\\protected\\credit511-complete.zip",
+        "exists": true,
+        "bytes": 758812,
+        "sha256": "CFDBBDC6754A1D7190B57DE00AE0A12AA5B55949D45BE3B726AD3EFBCDB63F96"
+      },
+      "receipt_sha256": "6365F78B2A4040D8C6A5D1D084D06D5F5536A34CA6C20BFF748B2B6C29F77D06",
+      "target_scalar": 0.10000000149011612
+    },
+    {
+      "job": "f200-minimum-paid510-upgrade",
+      "role": "paid510-upgrade",
+      "case": "f200-minimum",
+      "processes": 3,
+      "completed_ordinary_labs": 0,
+      "protected_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-cumulative-r01-controller\\jobs\\f200-minimum-paid510-upgrade\\protected\\credit511-complete.zip",
+        "exists": true,
+        "bytes": 758959,
+        "sha256": "24E65CCE6E3BC7B63E726425E916C798DABA0B11C8C5D5803C274CD376A1F3CF"
+      },
+      "receipt_sha256": "303A766304FA9D79C692D0D185F2075D31E08BF70B4702C4CAEDDEA2D66726FF",
+      "target_scalar": 0
+    },
+    {
+      "job": "f200-thirty-fresh",
+      "role": "fresh",
+      "case": "f200-thirty",
+      "processes": 3,
+      "completed_ordinary_labs": 5,
+      "protected_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-cumulative-r01-controller\\jobs\\f200-thirty-fresh\\protected\\credit511-complete.zip",
+        "exists": true,
+        "bytes": 564645,
+        "sha256": "AA5ADCCFF2F8FB5E658AF592BFEB09C326400D63342441FB9DD44E6D85463C7D"
+      },
+      "receipt_sha256": "E890B130B9092279F7431059863CE15895170433759604F34A52EA6247A6B5BB",
+      "target_scalar": 0.30000001192092896
+    },
+    {
+      "job": "f200-thirty-nomir-source",
+      "role": "nomir-source",
+      "case": "f200-thirty",
+      "processes": 1,
+      "completed_ordinary_labs": 1,
+      "protected_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-cumulative-r01-controller\\jobs\\f200-thirty-nomir-source\\protected\\credit511-complete.zip",
+        "exists": true,
+        "bytes": 654961,
+        "sha256": "3BF7B650F4956A5B535FE0551F12ED7358EB79B14BCD60055BE4108DEC371B2D"
+      },
+      "receipt_sha256": "DBBAE32A1C75742453AEB129EC8219D60A31E700D5F4B6D27E15D9E83B853315",
+      "target_scalar": null
+    },
+    {
+      "job": "f200-thirty-first-add",
+      "role": "first-add",
+      "case": "f200-thirty",
+      "processes": 3,
+      "completed_ordinary_labs": 0,
+      "protected_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-cumulative-r01-controller\\jobs\\f200-thirty-first-add\\protected\\credit511-complete.zip",
+        "exists": true,
+        "bytes": 672795,
+        "sha256": "094671854149C2D8EBD5EE6A3E08F591A965AE58878F2B17067297A7871DEB8E"
+      },
+      "receipt_sha256": "63D63E8B1B8639A55A58EEEF32ECEE1352BEC1EECD6A5E1D5B26D253B28AB0A9",
+      "target_scalar": 0.30000001192092896
+    },
+    {
+      "job": "f200-thirty-paid510-source",
+      "role": "paid510-source",
+      "case": "f200-thirty",
+      "processes": 1,
+      "completed_ordinary_labs": 5,
+      "protected_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-cumulative-r01-controller\\jobs\\f200-thirty-paid510-source\\protected\\credit511-complete.zip",
+        "exists": true,
+        "bytes": 649737,
+        "sha256": "F20E760C7F45F0C492F5FCB868849AD2CC1D9BF952ED09BE5073FC168994336C"
+      },
+      "receipt_sha256": "4E895BB4B86044A0B64CEDFAF071B94486E0C5C1C62E42F99976401B7EDAE1BB",
+      "target_scalar": 0.10000000149011612
+    },
+    {
+      "job": "f200-thirty-paid510-upgrade",
+      "role": "paid510-upgrade",
+      "case": "f200-thirty",
+      "processes": 3,
+      "completed_ordinary_labs": 0,
+      "protected_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-cumulative-r01-controller\\jobs\\f200-thirty-paid510-upgrade\\protected\\credit511-complete.zip",
+        "exists": true,
+        "bytes": 649884,
+        "sha256": "AEAE8DD0003CDD8714FA141ACBCAE3EE4CA35E746A231584CFA275C324186822"
+      },
+      "receipt_sha256": "38C776335472830D7E80A6F306B147F952E45B824A41253CD4E5632825139110",
+      "target_scalar": 0.30000001192092896
+    },
+    {
+      "job": "f210-rounded-fresh",
+      "role": "fresh",
+      "case": "f210-rounded",
+      "processes": 3,
+      "completed_ordinary_labs": 5,
+      "protected_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-cumulative-r01-controller\\jobs\\f210-rounded-fresh\\protected\\credit511-complete.zip",
+        "exists": true,
+        "bytes": 845253,
+        "sha256": "1D9F6CA9F6DCCAE2EFD3C38CE1BEEE98D07BE8B1246DCD5316373E7A7039728A"
+      },
+      "receipt_sha256": "1673B4B5E7FC48E458FA27B88B63B90E066C7CB069347E6FB92789088FB45453",
+      "target_scalar": 0.5679
+    },
+    {
+      "job": "f210-rounded-nomir-source",
+      "role": "nomir-source",
+      "case": "f210-rounded",
+      "processes": 1,
+      "completed_ordinary_labs": 1,
+      "protected_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-cumulative-r01-controller\\jobs\\f210-rounded-nomir-source\\protected\\credit511-complete.zip",
+        "exists": true,
+        "bytes": 655754,
+        "sha256": "24CACF4E1862FF8182224A1AD3ED4B01998CC4A6DEDAFED4A7B350FCA33CAB4A"
+      },
+      "receipt_sha256": "FAB072E72BD147ED52776AEBF77A1FCA92A6B9831CB8D6190FFA43264A71B074",
+      "target_scalar": null
+    },
+    {
+      "job": "f210-rounded-first-add",
+      "role": "first-add",
+      "case": "f210-rounded",
+      "processes": 3,
+      "completed_ordinary_labs": 0,
+      "protected_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-cumulative-r01-controller\\jobs\\f210-rounded-first-add\\protected\\credit511-complete.zip",
+        "exists": true,
+        "bytes": 674055,
+        "sha256": "EA2B0FA4A74BDA778DB1CE63092EBC260DE49C2AAA470332D0B47373E2998E7B"
+      },
+      "receipt_sha256": "429F0E3C48C1C7711191ECB9A4ED9CF635AD3873E1A5317EBB69E091587FC4DC",
+      "target_scalar": 0.5679
+    },
+    {
+      "job": "f210-rounded-paid510-source",
+      "role": "paid510-source",
+      "case": "f210-rounded",
+      "processes": 1,
+      "completed_ordinary_labs": 5,
+      "protected_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-cumulative-r01-controller\\jobs\\f210-rounded-paid510-source\\protected\\credit511-complete.zip",
+        "exists": true,
+        "bytes": 635592,
+        "sha256": "85EE0B607758A882A718D847997BD7280074F455210D28F34D8DC09DF9D6A24A"
+      },
+      "receipt_sha256": "6D100165C5945BC7228D828F89D95DEA055B6F55E846B01F6683132979D19F2C",
+      "target_scalar": 0.1
+    },
+    {
+      "job": "f210-rounded-paid510-upgrade",
+      "role": "paid510-upgrade",
+      "case": "f210-rounded",
+      "processes": 3,
+      "completed_ordinary_labs": 0,
+      "protected_save": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-cumulative-r01-controller\\jobs\\f210-rounded-paid510-upgrade\\protected\\credit511-complete.zip",
+        "exists": true,
+        "bytes": 635778,
+        "sha256": "2C77D71E2311697E95286F24FAFFEA7E52A8B3F3EDCE2C6C701D7441E3C30DB3"
+      },
+      "receipt_sha256": "D296174E3B7DF2C4A04BA2BFED3DDD6C66ADFBE4C70B07E873C24A446CF8A2EF",
+      "target_scalar": 0.5679
+    }
+  ],
+  "native_processes": 33,
+  "distinct_ordinary_lab_completions": 33,
+  "unique_inputs_rehashed": 104,
+  "unique_save_files_crc_actor_and_hash_checked": 30,
+  "limits": "Base-only2.0.77/2.1.23, minimum/30%/56.789% named credit cases, legal10%-earned510 predecessors, new native foreign ownership controls. Earlier manual-offset case remains adverse. Worker recovery, named planet profiles, reporter saves, clients/performance and stable/release acceptance are separate.",
+  "release_qualification": false
+}

@@ -1,0 +1,154 @@
+{
+  "kind": "MIRWorkerStorage511IndependentSourceDeltaReviewV2",
+  "observed_at_utc": "2026-11-09T04:53:59.106394+00:00",
+  "reviewer_role": "fresh non-author bounded source reviewer; no production edits or children",
+  "verdict": "source-approved-for-native-qualification-with-CI-pending",
+  "reviewed_head": "cabf94efc9b529c4c555743b7139b3cf11b9c20d",
+  "reviewed_tree": "0a4964cbddb5d65963ffb0eb5c5aee22c90b0dcc",
+  "reviewed_source_tree": "b91641744ad6f866e189c53f7f8e11d1a6e28a02",
+  "base": "c5e86d5fc36b3816ec439d2d3f0cbd7f4863de8d",
+  "original_review_preserved": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-source-review-r01.json",
+    "bytes": 16219,
+    "sha256": "072FB73B5628116DE9EF26AB81BCB2F3F2AD1122A6586796688F584EB6B24531"
+  },
+  "closed_finding": {
+    "id": "P1-F200-TECHNOLOGY-MODIFIER-HIDDEN",
+    "status": "resolved-at-reviewed-source",
+    "resolution": "Package platform.target explicitly selects the SDK shape. Only F200 nil effect.hidden becomes local false; original native effect table remains untouched. F210 still requires boolean; any present invalid type remains rejected for either target. Fingerprint encodes this local normalized scalar. Data emitted-contract projection changes only its detached copied effects, normalizing omitted prototype defaults for F210; input authored/emitted tables remain unchanged.",
+    "original_counterexample": "Original review fixtures and reports remain byte-exact. Independent updated controls reuse the original frozen c5 world and actual installed SDK schemas, explicitly select package target before module import, and retain identical world-base2.1 hint for both cases. Both SDK-valid initializations are now green with0 native setters,0 effect-table writes and unchanged complete effect shape.",
+    "counterexample_adverses": "F200 string/number/table hidden; F210 nil/string/number/table hidden all refuse before native/history writes. Read-only proxy effect tables throw on any assignment. F200 absent and false fingerprints match; true fingerprints differ, preserving actual hidden differences.",
+    "evidence": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r02\\sdk-delta-controls-result.json",
+      "bytes": 5270,
+      "sha256": "9D7AAA0D0ADA892F0D9F4D55FDDA7E5A94CC15801C8252C7696563C729A5317E"
+    }
+  },
+  "new_findings": [],
+  "delta_review": {
+    "exact_changed_files": [
+      "source/research/worker_storage_recovery.lua",
+      "tests/test_worker_storage_history.py",
+      "tests/worker_storage_recovery_fixture.py"
+    ],
+    "only_production_change": "source/research/worker_storage_recovery.lua",
+    "unchanged_consumed_paths": [
+      "source/runtime/worker_robot_storage.lua",
+      "source/runtime/bootstrap.lua",
+      "source/data-final-fixes.lua",
+      "source/compatibility/modern_catalogue.lua",
+      "source/research/catalogue.lua",
+      "docs/support.md"
+    ],
+    "target_identity": "Declared materialized package target, never game/base version guessing. Required at module load, not imported in a callback.",
+    "no_write_boundary": "Hidden normalization is a local variable only. Independent empty table proxies with __index/__pairs and throwing __newindex expose any effect assignment. All9 SDK cases observed0 setters and0 effect-table writes. Successful init writes its ordinary explicit route record; adverses write no saved history.",
+    "contract_strength": "Effect type/modifier/range/extra-field checks, ignored-price flag and full unit/science/prerequisite fingerprint remain strict. No cap, saved-shape, creation-history, force/queue/progress transfer, retirement quota, prepared policy, hook or original-version guards changed.",
+    "data_behavior": "Both affected F200/F210 fixed published-output oracle controls pass. Full canonical/private rows remain selected against exact authored contract; unsupported/mismatched overhaul holder behavior is unchanged from c5."
+  },
+  "tests": {
+    "plan": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r02\\host-plan.json",
+      "bytes": 15883,
+      "sha256": "41BDEF630EFDE93EC41DAC977D979C66774EE2D2E279CAE13F27DDFE82507FFE"
+    },
+    "lua52": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir421-lua-runtime\\lupa\\lua52.cp314-win_amd64.pyd",
+      "bytes": 507904,
+      "sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899"
+    },
+    "history": {
+      "tests": 28,
+      "passed": 28,
+      "log": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r02\\history28.log",
+        "bytes": 132,
+        "sha256": "47ABB74B42D57138E0D1DDD3CA4AF28911943903EA8E15447176F9CD821AFC78"
+      }
+    },
+    "affected_output_oracles": {
+      "tests": 2,
+      "passed": 2,
+      "log": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r02\\emitted-contract-pipeline-controls.log",
+        "bytes": 451,
+        "sha256": "57D7268E7E28E495DFE9E5B2CC3E298A9BAF8FEB570175B24788F18B8BA15C0C"
+      }
+    },
+    "independent_schema_cases": {
+      "cases": 9,
+      "passed": 9,
+      "result": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r02\\sdk-delta-controls-result.json",
+        "bytes": 5270,
+        "sha256": "9D7AAA0D0ADA892F0D9F4D55FDDA7E5A94CC15801C8252C7696563C729A5317E"
+      }
+    },
+    "independent_additional_properties": [
+      "F200 absent/false equivalence; true distinct",
+      "F200 emitted-contract inputs retain omitted hidden shape"
+    ],
+    "scope": "Narrow host controls only; no full-suite/build/native/library action. Prior51 controls are not relabeled as rerun at this head."
+  },
+  "CI_status_and_authority": {
+    "status": "pending-required-followup",
+    "known_parent_report": "Host-controls failed on SE/K2SE public row accounting of new private ID; author owns test-only follow-up. This review does not approve that pending test diff.",
+    "allowed_next_step": "Reviewed source may enter exact cumulative native qualification after Root admission.",
+    "merge_or_release_approval": false,
+    "mandatory_before_merge": "Read exact final follow-up diff/head; require only tests and unchanged production source b91641744ad6f866e189c53f7f8e11d1a6e28a02 unless newly reviewed. Read back exact remote source and required successful CI before checked merge."
+  },
+  "native_limits": {
+    "native_acceptance": false,
+    "all_prior_native_gates_still_required": true,
+    "mandatory_cases_from_original_review": [
+      "After the API blocker is corrected and exact cumulative source/packages/controllers are frozen, actual F2002.0.77 and F2102.1.23 fresh initialization plus no-MIR first addition must load the empty holder without grants/foreign writes.",
+      "On protected actual original default4 saves, explicitly prepare several forces covering earned-only, current partial, queue-only and repeated queued levels, queued partial and detached partial, uninvested/foreign-disabled rows, finite cap at/above work boundary; compare earned cargo and all unrelated current/queue/progress before and after native setters.",
+      "Save the prepared copy, exit, add the exact admitted finite provider with unchanged cap/enable/cost/science/effect/prerequisites, then demonstrate ordinary by_script=false lab completion only for authorized old work and exact native retirement; detached resume and originally-disabled refusal require their actual endpoints.",
+      "Demonstrate provider-private work retirement releases later normal public cap/enable changes without changing earned credits, while pending private work and pre-provider default phase continue to refuse mismatches before MIR writes.",
+      "First MIR addition to a progressed existing provider and exact unchanged-provider5.0.10 upgrade must preserve actual finite levels/cargo/current/queued/saved work without invented finite grants. Exact admitted legacy4.7.3 ownership path requires its actual source save.",
+      "Exercise actual force created/reset/merged and cold load/join subscription reconstruction; no hidden ongoing private work may appear for empty forces, and independent partials must follow engine merge semantics without MIR summation.",
+      "Each affected accepted route needs saved successor plus two separate cold reloads with exact save hashes/native equality, strict history/foreign state intact. K2/SE preparation, reporter-save restoration, worker physical cargo and stable/release acceptance remain separate unqualified scopes."
+    ],
+    "additional_SDK_affected_case": "Actual F200 fresh initialization and first addition must observe omitted hidden representation without startup refusal, preserve the original effect table and all foreign state; F210 positive shape remains strict. Root owns current r06 diagnostic separately.",
+    "current_r06": "Diagnostic instrumentation of older D4BE; no new production source acceptance is inferred here."
+  },
+  "source_scope": "Ordinary Base/SpaceAge default4 preparation only. K2/SE/other overhaul preparation and another provider transition/removal remain unqualified. Pending private-work cap/enable matching is temporary; general native cap behavior is not claimed.",
+  "custody": {
+    "projection.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r02\\projection.json",
+      "bytes": 662,
+      "sha256": "0AEFCFA5812F9E2A6B515033F03E032C704A747BB88884D3D358C754D6A1AD37"
+    },
+    "host-plan.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r02\\host-plan.json",
+      "bytes": 15883,
+      "sha256": "41BDEF630EFDE93EC41DAC977D979C66774EE2D2E279CAE13F27DDFE82507FFE"
+    },
+    "history28.log": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r02\\history28.log",
+      "bytes": 132,
+      "sha256": "47ABB74B42D57138E0D1DDD3CA4AF28911943903EA8E15447176F9CD821AFC78"
+    },
+    "emitted-contract-pipeline-controls.log": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r02\\emitted-contract-pipeline-controls.log",
+      "bytes": 451,
+      "sha256": "57D7268E7E28E495DFE9E5B2CC3E298A9BAF8FEB570175B24788F18B8BA15C0C"
+    },
+    "sdk-delta-controls.py": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r02\\sdk-delta-controls.py",
+      "bytes": 5051,
+      "sha256": "9E1F6C88039577ACB0A3603A793AA535CE8CD4E06BF1609F5F3D15C80C2E9634"
+    },
+    "sdk-delta-controls-result.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r02\\sdk-delta-controls-result.json",
+      "bytes": 5270,
+      "sha256": "9D7AAA0D0ADA892F0D9F4D55FDDA7E5A94CC15801C8252C7696563C729A5317E"
+    }
+  },
+  "native_launches": 0,
+  "builds": 0,
+  "library_mutation": false,
+  "production_source_edits": false,
+  "children_spawned": 0,
+  "release_qualification": false,
+  "stable_acceptance": false
+}

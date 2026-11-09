@@ -1,0 +1,81 @@
+{
+  "kind": "MIR511CombinedSIFWorkerIndependentReviewR02V1",
+  "reviewed_at_utc": "2026-11-09T08:57:28.739066+00:00",
+  "verdict": "PASS named default data-stage output; applies to final93d data inputs, with original actual a8 pins retained",
+  "actual_source": {
+    "commit": "d4beb15429e22bab89d474f65ff67a6bf991a9ae",
+    "source": "a8f46c7a91cdfa6414d93eb3db435706b0edc83d"
+  },
+  "pins": {
+    "root_readback": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\sif-worker511-combined-output-r02-controller\\root-output-readback-r03.json",
+      "bytes": 10348,
+      "sha256": "FF488716BA18641A50C31E72B6C358B97BC527385D9FDF05536702574B0E583B"
+    },
+    "capture": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\sif-worker511-combined-output-r02-controller\\capture-terminal.json",
+      "bytes": 18642,
+      "sha256": "518DC2DCDFD4222A9331EB852F0D8EA8419B548541DE6D27B687579AFFE0AE08"
+    },
+    "restoration": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\sif-worker511-combined-output-r02-controller\\root-execution-restoration.json",
+      "bytes": 6936,
+      "sha256": "BBDCC1FD2F63E71258520C6C9824635CA48B13CF1DF0155566C064188D888104"
+    },
+    "data_raw": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r03\\build\\tmp\\sif-worker511-combined-data-r03\\write-data\\script-output\\data-raw-dump.json",
+      "bytes": 29785382,
+      "sha256": "88C1621832E47D3B322236E9944FDC4A01676BE6F5E16B8CB3486DD4C2E8EE26"
+    }
+  },
+  "actual": {
+    "engines": 1,
+    "natural_exit": 0,
+    "nontimeout": true,
+    "exact_loaded_mods": [
+      "base@2.1.23",
+      "cr-commons@1.0.33",
+      "cr-extras@1.0.10",
+      "elevated-rails@2.1.23",
+      "mir-fixture-mir5-active-mods-observer@0.1.0",
+      "more-infinite-research@5.0.21011",
+      "quality@2.1.23",
+      "recycler@2.1.23",
+      "space-age@2.1.23",
+      "space-is-fake@1.0.78",
+      "WorkerRobotCargoSizeResearch@1.0.0"
+    ],
+    "provider4_to7": {
+      "count": [
+        1000,
+        2000,
+        4000,
+        8000
+      ],
+      "effect": 1,
+      "time_seconds": 60,
+      "finite": true
+    },
+    "MIR8": {
+      "infinite": true,
+      "after": 7,
+      "formula": "3417.1875*1.5^(L-8)",
+      "published_defaults": "v5.0.10 base200/growth1.5/increment0/time60"
+    },
+    "recipe_rows": 70,
+    "selected_science_rows": 78,
+    "white_free_gates_and_science_items_exist": true,
+    "private": "Disabled hidden full default native contract, effect1/infinite/675*1.5^(L-4)/60s/six science ingredients/eight required gates; not old placeholder.",
+    "recorded_library_restored": true
+  },
+  "final_source_applicability": {
+    "candidate": "203e0af5/93d30a2",
+    "basis": "Final72249 package review proves modern archive delta from actuala8 package is solely runtime/worker_robot_storage.lua; all prototype/settings/catalogue/data code and profile/engine/provider/observer inputs are unchanged. Runtime code is not consumed in Factorio data stage. This is applicability, not a new engine execution under93d."
+  },
+  "limits": [
+    "Data output only; no worker recovery/gameplay/save/cap/reload/performance/stable claim from this process. R07 separately qualifies its named worker route.",
+    "Other science-policy variations retain their own evidence scope.",
+    "Restoration receipts/assertions reviewed; reviewer did not inspect live direct library while Root owns native lane.",
+    "No Source/docs edits, builds, host suite or native runs by reviewer."
+  ]
+}

@@ -1,0 +1,2690 @@
+{
+  "kind": "MIR511WorkerR07RootActualReadbackV1",
+  "status": "named-Secretas-provider-transition-native-save-two-colds-passed",
+  "observed_at_utc": "2026-11-09T08:53:53.898129+00:00",
+  "source_commit": "203e0af5e1ea8925c1909e1dc97cef3dab3c961b",
+  "source_tree": "93d30a248e71e5248eeb87072c27332fe68b9137",
+  "package_sha256": "C3CB6462E3285DA222664D2174EAA16E63577BF9970804E410B127A43C773D14",
+  "terminal_sha256": "CB1CC61E004F6DEF560C6A47FD5A88BBA37C9741B14F9A71CF4A985115C967CC",
+  "actual_processes": 3,
+  "new_ordinary_lab_completions": 5,
+  "original_source_completions": 7,
+  "total_distinct_ordinary_completions": 12,
+  "cold_repeats_are_not_new_completions": true,
+  "server_stop": "admitted save-completion predicate;exit-1",
+  "cold_exits": [
+    0,
+    0
+  ],
+  "protected_save": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r07-controller\\protected\\provider.zip",
+    "exists": true,
+    "bytes": 806503,
+    "sha256": "DCE40473A6C416BF872EC5ABF7D191D9791302465F09B642C2184EC8A9055FCE"
+  },
+  "prepared_input_sha256": "9A9A7289AFA956A35D0793A2171EF56597152BA2000D70E251A1241BE776CF69",
+  "endpoint": {
+    "stage": "provider-save",
+    "tick": 49324,
+    "mods": {
+      "base": "2.1.23",
+      "elevated-rails": "2.1.23",
+      "recycler": "2.1.23",
+      "quality": "2.1.23",
+      "space-age": "2.1.23",
+      "more-infinite-research": "5.0.21011",
+      "secretas": "1.0.38",
+      "mir-fixture-worker-recovery511": "0.4.0",
+      "pretty-frozeta": "1.0.1"
+    },
+    "cap": 8,
+    "price": 1.25,
+    "frames": {
+      "player": {
+        "name": "player",
+        "index": 1,
+        "bonus": 9,
+        "lab_speed_bonus": 0,
+        "current": false,
+        "progress": 0,
+        "queue": {},
+        "rows": {
+          "worker-robots-storage-4": {
+            "level": 4,
+            "researched": true,
+            "enabled": true,
+            "visible": true,
+            "saved": 0,
+            "count": 1125,
+            "first": 4,
+            "maximum": 4,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "mir-worker-storage-preservation-4": {
+            "level": 9,
+            "researched": false,
+            "enabled": false,
+            "visible": true,
+            "saved": 0,
+            "count": 6406,
+            "first": 4,
+            "maximum": 4294967295,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": "675*1.5^(L-4)",
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "more-infinite-research"
+          },
+          "mir-worker-recovery-sentinel": {
+            "level": 1,
+            "researched": true,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 1250,
+            "first": 1,
+            "maximum": 1,
+            "effects": {},
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "mir-fixture-worker-recovery511"
+          },
+          "worker-robots-storage-5": {
+            "level": 5,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 2250,
+            "first": 5,
+            "maximum": 5,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-6": {
+            "level": 6,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 4500,
+            "first": 6,
+            "maximum": 6,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-7": {
+            "level": 7,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 9000,
+            "first": 7,
+            "maximum": 7,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-8": {
+            "level": 8,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 18000,
+            "first": 8,
+            "maximum": 8,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "promethium-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-9": {
+            "level": 9,
+            "researched": false,
+            "enabled": false,
+            "visible": true,
+            "saved": 0,
+            "count": 6406,
+            "first": 9,
+            "maximum": 4294967295,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": "5125.78125*1.5^(L-9)",
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "promethium-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "more-infinite-research"
+          }
+        }
+      },
+      "enemy": {
+        "name": "enemy",
+        "index": 2,
+        "bonus": 0,
+        "lab_speed_bonus": 0,
+        "current": false,
+        "progress": 0,
+        "queue": {},
+        "rows": {
+          "worker-robots-storage-4": {
+            "level": 4,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 1125,
+            "first": 4,
+            "maximum": 4,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "mir-worker-storage-preservation-4": {
+            "level": 4,
+            "researched": false,
+            "enabled": false,
+            "visible": false,
+            "saved": 0,
+            "count": 843,
+            "first": 4,
+            "maximum": 4294967295,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": "675*1.5^(L-4)",
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "more-infinite-research"
+          },
+          "mir-worker-recovery-sentinel": {
+            "level": 1,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 1250,
+            "first": 1,
+            "maximum": 1,
+            "effects": {},
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "mir-fixture-worker-recovery511"
+          },
+          "worker-robots-storage-5": {
+            "level": 5,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 2250,
+            "first": 5,
+            "maximum": 5,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-6": {
+            "level": 6,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 4500,
+            "first": 6,
+            "maximum": 6,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-7": {
+            "level": 7,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 9000,
+            "first": 7,
+            "maximum": 7,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-8": {
+            "level": 8,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 18000,
+            "first": 8,
+            "maximum": 8,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "promethium-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-9": {
+            "level": 9,
+            "researched": false,
+            "enabled": false,
+            "visible": true,
+            "saved": 0,
+            "count": 6406,
+            "first": 9,
+            "maximum": 4294967295,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": "5125.78125*1.5^(L-9)",
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "promethium-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "more-infinite-research"
+          }
+        }
+      },
+      "neutral": {
+        "name": "neutral",
+        "index": 3,
+        "bonus": 0,
+        "lab_speed_bonus": 0,
+        "current": false,
+        "progress": 0,
+        "queue": {},
+        "rows": {
+          "worker-robots-storage-4": {
+            "level": 4,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 1125,
+            "first": 4,
+            "maximum": 4,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "mir-worker-storage-preservation-4": {
+            "level": 4,
+            "researched": false,
+            "enabled": false,
+            "visible": false,
+            "saved": 0,
+            "count": 843,
+            "first": 4,
+            "maximum": 4294967295,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": "675*1.5^(L-4)",
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "more-infinite-research"
+          },
+          "mir-worker-recovery-sentinel": {
+            "level": 1,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 1250,
+            "first": 1,
+            "maximum": 1,
+            "effects": {},
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "mir-fixture-worker-recovery511"
+          },
+          "worker-robots-storage-5": {
+            "level": 5,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 2250,
+            "first": 5,
+            "maximum": 5,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-6": {
+            "level": 6,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 4500,
+            "first": 6,
+            "maximum": 6,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-7": {
+            "level": 7,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 9000,
+            "first": 7,
+            "maximum": 7,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-8": {
+            "level": 8,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 18000,
+            "first": 8,
+            "maximum": 8,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "promethium-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-9": {
+            "level": 9,
+            "researched": false,
+            "enabled": false,
+            "visible": true,
+            "saved": 0,
+            "count": 6406,
+            "first": 9,
+            "maximum": 4294967295,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": "5125.78125*1.5^(L-9)",
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "promethium-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "more-infinite-research"
+          }
+        }
+      },
+      "worker-suspended": {
+        "name": "worker-suspended",
+        "index": 4,
+        "bonus": 7,
+        "lab_speed_bonus": 0,
+        "current": false,
+        "progress": 0,
+        "queue": {},
+        "rows": {
+          "worker-robots-storage-4": {
+            "level": 4,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 1125,
+            "first": 4,
+            "maximum": 4,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "mir-worker-storage-preservation-4": {
+            "level": 8,
+            "researched": false,
+            "enabled": false,
+            "visible": false,
+            "saved": 0,
+            "count": 4271,
+            "first": 4,
+            "maximum": 4294967295,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": "675*1.5^(L-4)",
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "more-infinite-research"
+          },
+          "mir-worker-recovery-sentinel": {
+            "level": 1,
+            "researched": true,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 1250,
+            "first": 1,
+            "maximum": 1,
+            "effects": {},
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "mir-fixture-worker-recovery511"
+          },
+          "worker-robots-storage-5": {
+            "level": 5,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 2250,
+            "first": 5,
+            "maximum": 5,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-6": {
+            "level": 6,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 4500,
+            "first": 6,
+            "maximum": 6,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-7": {
+            "level": 7,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 9000,
+            "first": 7,
+            "maximum": 7,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-8": {
+            "level": 8,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 18000,
+            "first": 8,
+            "maximum": 8,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "promethium-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-9": {
+            "level": 9,
+            "researched": false,
+            "enabled": false,
+            "visible": true,
+            "saved": 0,
+            "count": 6406,
+            "first": 9,
+            "maximum": 4294967295,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": "5125.78125*1.5^(L-9)",
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "promethium-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "more-infinite-research"
+          }
+        }
+      },
+      "worker-uninvested": {
+        "name": "worker-uninvested",
+        "index": 5,
+        "bonus": 3,
+        "lab_speed_bonus": 0,
+        "current": "mir-worker-recovery-sentinel",
+        "progress": 0.010009999999999998,
+        "queue": [
+          "mir-worker-recovery-sentinel"
+        ],
+        "rows": {
+          "worker-robots-storage-4": {
+            "level": 4,
+            "researched": false,
+            "enabled": false,
+            "visible": true,
+            "saved": 0,
+            "count": 1125,
+            "first": 4,
+            "maximum": 4,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "mir-worker-storage-preservation-4": {
+            "level": 4,
+            "researched": false,
+            "enabled": false,
+            "visible": true,
+            "saved": 0,
+            "count": 843,
+            "first": 4,
+            "maximum": 4294967295,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": "675*1.5^(L-4)",
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "more-infinite-research"
+          },
+          "mir-worker-recovery-sentinel": {
+            "level": 1,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 1250,
+            "first": 1,
+            "maximum": 1,
+            "effects": {},
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "mir-fixture-worker-recovery511"
+          },
+          "worker-robots-storage-5": {
+            "level": 5,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 2250,
+            "first": 5,
+            "maximum": 5,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-6": {
+            "level": 6,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 4500,
+            "first": 6,
+            "maximum": 6,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-7": {
+            "level": 7,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 9000,
+            "first": 7,
+            "maximum": 7,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-8": {
+            "level": 8,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "count": 18000,
+            "first": 8,
+            "maximum": 8,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": false,
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "promethium-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "secretas"
+          },
+          "worker-robots-storage-9": {
+            "level": 9,
+            "researched": false,
+            "enabled": false,
+            "visible": true,
+            "saved": 0,
+            "count": 6406,
+            "first": 9,
+            "maximum": 4294967295,
+            "effects": [
+              {
+                "hidden": false,
+                "type": "worker-robot-storage",
+                "modifier": 1
+              }
+            ],
+            "formula": "5125.78125*1.5^(L-9)",
+            "time": 3600,
+            "science": [
+              {
+                "name": "automation-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "logistic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "chemical-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "production-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "utility-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "space-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "metallurgic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "agricultural-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "electromagnetic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "cryogenic-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "golden-science-pack",
+                "amount": 1
+              },
+              {
+                "name": "promethium-science-pack",
+                "amount": 1
+              }
+            ],
+            "created": "more-infinite-research"
+          }
+        }
+      }
+    },
+    "ordinary_completions": {
+      "worker-suspended": 5,
+      "player": 7
+    },
+    "administrative_events": [
+      {
+        "technology": "electric-mining-drill",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "military",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "stone-wall",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "landfill",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "military-2",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "military-science-pack",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "stronger-explosives-1",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "stronger-explosives-2",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "explosives",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "rocketry",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "planet-discovery-gleba",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "planet-discovery-vulcanus",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "agriculture",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "calcite-processing",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "heating-tower",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "tungsten-carbide",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "foundry",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "jellynut",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "yumako",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "artificial-soil",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "big-mining-drill",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "biochamber",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "bioflux",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "tungsten-steel",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "bacteria-cultivation",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "bioflux-processing",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "metallurgic-science-pack",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "agricultural-science-pack",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "asteroid-reprocessing",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "advanced-asteroid-processing",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "carbon-fiber",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "rocket-turret",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "planet-discovery-aquilo",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "lithium-processing",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "cryogenic-plant",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "cryogenic-science-pack",
+        "force": "player",
+        "by_script": true
+      },
+      {
+        "technology": "planet-discovery-secretas",
+        "force": "player",
+        "by_script": true
+      }
+    ],
+    "transfer_events": [
+      {
+        "technology": "mir-worker-storage-preservation-4",
+        "force": "player",
+        "by_script": true,
+        "level": 5
+      },
+      {
+        "technology": "mir-worker-storage-preservation-4",
+        "force": "player",
+        "by_script": true,
+        "level": 6
+      },
+      {
+        "technology": "mir-worker-storage-preservation-4",
+        "force": "player",
+        "by_script": true,
+        "level": 7
+      },
+      {
+        "technology": "mir-worker-storage-preservation-4",
+        "force": "player",
+        "by_script": true,
+        "level": 8
+      },
+      {
+        "technology": "mir-worker-storage-preservation-4",
+        "force": "worker-suspended",
+        "by_script": true,
+        "level": 5
+      },
+      {
+        "technology": "mir-worker-storage-preservation-4",
+        "force": "worker-suspended",
+        "by_script": true,
+        "level": 6
+      },
+      {
+        "technology": "mir-worker-storage-preservation-4",
+        "force": "worker-suspended",
+        "by_script": true,
+        "level": 7
+      }
+    ],
+    "extra": false
+  },
+  "limits": "Factorio2.1.23+Secretas1.0.38+pretty-frozeta1.0.1; actual preparation prefix retains d840 identity. No fullFerrum, physical cargo, post-retirement changed settings, first-MIR/unchanged-provider upgrade, performance or stable qualification.",
+  "release_qualification": false
+}

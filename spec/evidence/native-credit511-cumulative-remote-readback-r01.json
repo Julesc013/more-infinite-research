@@ -1,0 +1,29 @@
+{
+  "kind": "MIRExactRemoteCustodyReadbackV1",
+  "observed_at_utc": "2026-11-09T05:20:41.183632+00:00",
+  "repository": "Julesc013/scratchpad",
+  "commit": "72e6fe97fc888a2ae9c9ee511d8ba4a0059f5a59",
+  "branch": "evidence/mir511-incident-native-blackglass-r01",
+  "status": "all-three-remote-blobs-match-local-original-bodies",
+  "files": [
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/credit-cumulative-native-r01/.gitattributes",
+      "git_blob": "57cdc50305d07f35133f80962644debd6b846bf3",
+      "bytes": 12,
+      "sha256": "DC867BFA424D5804F4B790B2901BB95C32DF7BB3341B3AAC822DFC76751093FE"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/credit-cumulative-native-r01/MANIFEST.json",
+      "git_blob": "f29f14667ad30b52268c0619bfe45fa815b786b1",
+      "bytes": 250752,
+      "sha256": "0AC0A220390EF42B152D18D530F5682C93D5D6798E7F88FFE35AF390D47A23AC"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/credit-cumulative-native-r01/original-bodies.json.gz",
+      "git_blob": "f485e191fcf4bb04df3f90a93fa3c404369ddd5c",
+      "bytes": 44417419,
+      "sha256": "0ACA70BEE57DA27589F7AB9BF7D4C47FE4554671D53F686089CD9D1DE1C66C06"
+    }
+  ],
+  "scope": "617originalbodies/56625055bytes;15jobs/33processes/33distinctlabs under cabf/sourceb916; no worker or release verdict."
+}

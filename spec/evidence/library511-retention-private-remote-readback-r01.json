@@ -1,0 +1,80 @@
+{
+  "commit": "a38c0b9fbfe2ae776e0118a11029bef7fc50b51f",
+  "files": 12,
+  "all_remote_blobs_equal": true,
+  "members": [
+    {
+      "path": ".gitattributes",
+      "bytes": 18,
+      "sha256": "37E0686698CDAF2FC8A2DB26CF72CA9F2C0941EA27C1F2D7C753F58A36821E88",
+      "git_blob": "e246bb6d1b62dcaf8cf28906bd7fdc669b6ea857"
+    },
+    {
+      "path": "library511-one-export-adverse-custody-r01.json.gz",
+      "bytes": 56519391,
+      "sha256": "D6C6760B120D05B397F62F90BEDEF03CEA743716290728C2B8E7A5D265DBE498",
+      "git_blob": "f6336f43506168201ea7093647e2539494af33f0"
+    },
+    {
+      "path": "library511-retention-de-r02-adverse-custody-r01.json.gz",
+      "bytes": 45146736,
+      "sha256": "82E8802E52CADDFDAF1FA405C315FB9FD22FC547A85E2E898EEFE5B9F1A60FD5",
+      "git_blob": "c5fd06e29caffa6d647e8c893647286e510ac7f5"
+    },
+    {
+      "path": "library511-retention-de-r04-native-custody-r01.json.gz",
+      "bytes": 75078389,
+      "sha256": "F4A6C53FB5BFD43EEFE78A009D1508DAA70AAB14D8A69FEE6F14B909D8C14860",
+      "git_blob": "11c4a54a5a48f7dc60184370f1224cfa2c9beba2"
+    },
+    {
+      "path": "library511-retention-en-r02-native-custody-r01.json.gz",
+      "bytes": 82473970,
+      "sha256": "D8938594E8C142FF199160D4EB8E6FE63517B72BB8ADAF392330688E8B9D3112",
+      "git_blob": "7b45390644a4160d38dcbe94c3416cc2b1c7cf56"
+    },
+    {
+      "path": "MANIFEST.json",
+      "bytes": 219156,
+      "sha256": "17FF24CD8A5A2C1C467A834E6ADF655E4D032DFD64121AB008AC8DD083A212DC",
+      "git_blob": "6ffca590c884700b713cafb7271d4b531ff087e9"
+    },
+    {
+      "path": "reviews/library-selection-fix-independent-review-r01.json",
+      "bytes": 13458,
+      "sha256": "6F8E72AF4C381CD8A3E3ACE2744B6492A73323C9EDC304793C953BB76277B36E",
+      "git_blob": "35d8ed9b1e40175ad9bf95a4dfe4354e9be37a9d"
+    },
+    {
+      "path": "reviews/library511-retention-de-independent-result-review-r01.json",
+      "bytes": 23117,
+      "sha256": "E4C8523C77A2F0AC3B08CA773A67D59E0C3E8BC1DFD4FC6F82F2607D0C245E4C",
+      "git_blob": "368145790508237da8d770a41b709a6d875ab395"
+    },
+    {
+      "path": "reviews/library511-retention-en-independent-result-review-r01.json",
+      "bytes": 56870,
+      "sha256": "C69FE1C36EC78E98A7FA9292F68BE1F4F0BE308A7FBE5842BB86E1A3FA0CBC57",
+      "git_blob": "67a09f6af179b26f68c6729b33cf5222bc482baf"
+    },
+    {
+      "path": "reviews/library511-retention-independent-admission-r01.json",
+      "bytes": 15442,
+      "sha256": "8A2903979C0AA7C8043E551A29B6560FF4E51E33C1AF9B6EB8A19BD69E8B161E",
+      "git_blob": "3929785984e176c3efcd07a3bc98785c4226771f"
+    },
+    {
+      "path": "reviews/library511-retention-r04-independent-admission-r01.json",
+      "bytes": 7138,
+      "sha256": "A24CE35BC78CEB0B591994084A99C55F6DDF47C2DE5BE7882A541FE7B0F7F697",
+      "git_blob": "f5da2060dc62e7a9090a94f5481a1c7567225e61"
+    },
+    {
+      "path": "reviews/native-fallback511-independent-source-review-r01.json",
+      "bytes": 2125,
+      "sha256": "7E5556B08515C9EF3F4149245394214BA2E6F77673AFDB5115F3612648684EFA",
+      "git_blob": "c940098011da518dc47b985963d288f16b2fa1b2"
+    }
+  ],
+  "prior_adverse": "First1e9f142 commit normalized new review/index CRLF; preserved. Follow-up scopes raw JSON attributes; gzip payloads unchanged."
+}

@@ -1,0 +1,232 @@
+{
+  "kind": "MIRCredit511NonAuthorProductionNativeResultReviewV1",
+  "verdict": "qualified-pass-for-exact-named-Base-credit-scenarios",
+  "source_commit": "cabf94efc9b529c4c555743b7139b3cf11b9c20d",
+  "source_tree": "b91641744ad6f866e189c53f7f8e11d1a6e28a02",
+  "role": "Reviewer did not author credit production source; authored the new fixture/packet. Root independently admitted the method and executed/read back results. This is an additional direct raw-receipt review, not a claim of independent fixture authorship.",
+  "packages": {
+    "F200": {
+      "bytes": 1005873,
+      "sha256": "7AAD340E694DDE976CE569A4CE22D165EA6625DE6D1BD208ABA94078BC4C7EBD"
+    },
+    "F210": {
+      "bytes": 1006299,
+      "sha256": "7DD758DE41E195D6B41C3F8AC70C2C78AC1ED937E1560B0836D21E0187BD729D"
+    }
+  },
+  "engines": {
+    "F200": {
+      "version": "2.0.77",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "F210": {
+      "version": "2.1.23",
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+    }
+  },
+  "packet": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-cumulative-r01-controller\\PACKET.json",
+    "sha256": "40E637B3DD84EAC2FE514887A73975AFFAA478D3558243E939956081DFA6369E"
+  },
+  "root_readback": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-cumulative-root-readback-r01.json",
+    "sha256": "DFCB2E018EE318A7F344F95A9EF89E662CCA4EA408C3C741A0BFCB5BBEBB92A5"
+  },
+  "source_review": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-source-review-r02.json",
+    "sha256": "D8845D66807A8A99CDBFF3FD7E91065AB45E4907BA167230D1EA47076A143069"
+  },
+  "method": "Read exact schedule, complete caller save/cold guards, all15 source/target manifests and execution receipts; independently parse each raw Factorio log marker and compare it to the receipt. Compare native fields to fixed admitted constants rather than deriving expectations from receipts. Read resource ledgers for unique process IDs. Rehash current bound inputs/restoration states and every complete/protected save; CRC-check each archive and its embedded exact actor. No reruns or packet changes.",
+  "actual": {
+    "status": "bounded-independent-native-result-check-passed",
+    "jobs": [
+      {
+        "job": "f200-minimum-fresh",
+        "role": "fresh",
+        "processes": 3,
+        "new_labs": 5,
+        "save_sha256": "37509D867834D7C5FA578672DC4DC093E25104C90973CD3CAB8D187DDB0578D1",
+        "receipt_sha256": "5B6A0D7DB62CEC187B3C80BEF655F6A57D42B7BF000790E3B2F163D5FD03EB8D",
+        "scalar": 0
+      },
+      {
+        "job": "f200-minimum-nomir-source",
+        "role": "nomir-source",
+        "processes": 1,
+        "new_labs": 1,
+        "save_sha256": "EE2AEE695C2616E14E62DD69FAA07E505644403731EB59D31E37FB35AB137470",
+        "receipt_sha256": "70A5776F37841D772B04814648160C3830D41D1D7B00E985F18F018C0DE0221C",
+        "scalar": null
+      },
+      {
+        "job": "f200-minimum-first-add",
+        "role": "first-add",
+        "processes": 3,
+        "new_labs": 0,
+        "save_sha256": "38F257EF91CBBB83DB60302FC823C9B80F4432C2B3E0C41C2BCD052C22D5B439",
+        "receipt_sha256": "E0771F4558CF389E721336B2B6C069B5C1BD5C9D6D240A127B82C5671EA01EAF",
+        "scalar": 0
+      },
+      {
+        "job": "f200-minimum-paid510-source",
+        "role": "paid510-source",
+        "processes": 1,
+        "new_labs": 5,
+        "save_sha256": "CFDBBDC6754A1D7190B57DE00AE0A12AA5B55949D45BE3B726AD3EFBCDB63F96",
+        "receipt_sha256": "6365F78B2A4040D8C6A5D1D084D06D5F5536A34CA6C20BFF748B2B6C29F77D06",
+        "scalar": 0.10000000149011612
+      },
+      {
+        "job": "f200-minimum-paid510-upgrade",
+        "role": "paid510-upgrade",
+        "processes": 3,
+        "new_labs": 0,
+        "save_sha256": "24E65CCE6E3BC7B63E726425E916C798DABA0B11C8C5D5803C274CD376A1F3CF",
+        "receipt_sha256": "303A766304FA9D79C692D0D185F2075D31E08BF70B4702C4CAEDDEA2D66726FF",
+        "scalar": 0
+      },
+      {
+        "job": "f200-thirty-fresh",
+        "role": "fresh",
+        "processes": 3,
+        "new_labs": 5,
+        "save_sha256": "AA5ADCCFF2F8FB5E658AF592BFEB09C326400D63342441FB9DD44E6D85463C7D",
+        "receipt_sha256": "E890B130B9092279F7431059863CE15895170433759604F34A52EA6247A6B5BB",
+        "scalar": 0.30000001192092896
+      },
+      {
+        "job": "f200-thirty-nomir-source",
+        "role": "nomir-source",
+        "processes": 1,
+        "new_labs": 1,
+        "save_sha256": "3BF7B650F4956A5B535FE0551F12ED7358EB79B14BCD60055BE4108DEC371B2D",
+        "receipt_sha256": "DBBAE32A1C75742453AEB129EC8219D60A31E700D5F4B6D27E15D9E83B853315",
+        "scalar": null
+      },
+      {
+        "job": "f200-thirty-first-add",
+        "role": "first-add",
+        "processes": 3,
+        "new_labs": 0,
+        "save_sha256": "094671854149C2D8EBD5EE6A3E08F591A965AE58878F2B17067297A7871DEB8E",
+        "receipt_sha256": "63D63E8B1B8639A55A58EEEF32ECEE1352BEC1EECD6A5E1D5B26D253B28AB0A9",
+        "scalar": 0.30000001192092896
+      },
+      {
+        "job": "f200-thirty-paid510-source",
+        "role": "paid510-source",
+        "processes": 1,
+        "new_labs": 5,
+        "save_sha256": "F20E760C7F45F0C492F5FCB868849AD2CC1D9BF952ED09BE5073FC168994336C",
+        "receipt_sha256": "4E895BB4B86044A0B64CEDFAF071B94486E0C5C1C62E42F99976401B7EDAE1BB",
+        "scalar": 0.10000000149011612
+      },
+      {
+        "job": "f200-thirty-paid510-upgrade",
+        "role": "paid510-upgrade",
+        "processes": 3,
+        "new_labs": 0,
+        "save_sha256": "AEAE8DD0003CDD8714FA141ACBCAE3EE4CA35E746A231584CFA275C324186822",
+        "receipt_sha256": "38C776335472830D7E80A6F306B147F952E45B824A41253CD4E5632825139110",
+        "scalar": 0.30000001192092896
+      },
+      {
+        "job": "f210-rounded-fresh",
+        "role": "fresh",
+        "processes": 3,
+        "new_labs": 5,
+        "save_sha256": "1D9F6CA9F6DCCAE2EFD3C38CE1BEEE98D07BE8B1246DCD5316373E7A7039728A",
+        "receipt_sha256": "1673B4B5E7FC48E458FA27B88B63B90E066C7CB069347E6FB92789088FB45453",
+        "scalar": 0.5679
+      },
+      {
+        "job": "f210-rounded-nomir-source",
+        "role": "nomir-source",
+        "processes": 1,
+        "new_labs": 1,
+        "save_sha256": "24CACF4E1862FF8182224A1AD3ED4B01998CC4A6DEDAFED4A7B350FCA33CAB4A",
+        "receipt_sha256": "FAB072E72BD147ED52776AEBF77A1FCA92A6B9831CB8D6190FFA43264A71B074",
+        "scalar": null
+      },
+      {
+        "job": "f210-rounded-first-add",
+        "role": "first-add",
+        "processes": 3,
+        "new_labs": 0,
+        "save_sha256": "EA2B0FA4A74BDA778DB1CE63092EBC260DE49C2AAA470332D0B47373E2998E7B",
+        "receipt_sha256": "429F0E3C48C1C7711191ECB9A4ED9CF635AD3873E1A5317EBB69E091587FC4DC",
+        "scalar": 0.5679
+      },
+      {
+        "job": "f210-rounded-paid510-source",
+        "role": "paid510-source",
+        "processes": 1,
+        "new_labs": 5,
+        "save_sha256": "85EE0B607758A882A718D847997BD7280074F455210D28F34D8DC09DF9D6A24A",
+        "receipt_sha256": "6D100165C5945BC7228D828F89D95DEA055B6F55E846B01F6683132979D19F2C",
+        "scalar": 0.1
+      },
+      {
+        "job": "f210-rounded-paid510-upgrade",
+        "role": "paid510-upgrade",
+        "processes": 3,
+        "new_labs": 0,
+        "save_sha256": "2C77D71E2311697E95286F24FAFFEA7E52A8B3F3EDCE2C6C701D7441E3C30DB3",
+        "receipt_sha256": "D296174E3B7DF2C4A04BA2BFED3DDD6C66ADFBE4C70B07E873C24A446CF8A2EF",
+        "scalar": 0.5679
+      }
+    ],
+    "native_processes": 33,
+    "distinct_pids": 33,
+    "raw_markers": 33,
+    "new_ordinary_labs": 33,
+    "cold_jobs": 9,
+    "cold_processes": 18,
+    "save_files": 30,
+    "unique_inputs_and_restoration_states": 104,
+    "source_commit": "cabf94efc9b529c4c555743b7139b3cf11b9c20d",
+    "source_tree": "b91641744ad6f866e189c53f7f8e11d1a6e28a02",
+    "production_completion_predicate_exits": [
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1
+    ],
+    "Factorio_processes": 0,
+    "root_readback_sha256": "DFCB2E018EE318A7F344F95A9EF89E662CCA4EA408C3C741A0BFCB5BBEBB92A5",
+    "caller_sha256": "47871EA2EEA23F266BC7F7F4288529FB6E63CDAB48403A95493C1E1EAFC8ACC6"
+  },
+  "checks": {
+    "closed_schedule": "All36 admitted commands (six Bind plus15 Compose plus15 Execute) exited0; all15 job endpoints complete.",
+    "ordinary_labs": "Six MIR source endpoints each completed five ordinary by_script=false labs, one per named family; three NoMIR sources each completed one automation lab. Total33 distinct completions. Six target jobs and18 cold-process markers inherit counters and add zero new labs.",
+    "process_outcomes": "All15 production engines intentionally ended with exit-1 after admitted save-completion predicate was observed; this is the declared governor success path, not natural-exit0. All18 independent cold processes exited0. No timeout or fatal completed-log diagnostic observed. Ledgers contain33 distinct native PIDs.",
+    "native_expectations": "F200 minimum0.01%:0; F20030%:0.30000001192092896; F21056.789%:5679/10000. Legal published5.0.10 paid sources use10% (F2000.10000000149011612, F2100.1). Fresh/paid source completed main level2, first addition main level1, paid upgrade main level2. All five named families and signed, unearned, disabled level1 carriers agree in each raw marker.",
+    "foreign_work": "Ordered independent current/queued names and current42% (native JSON0.42000000000000004), detached27%, automation disablement and all other full foreign snapshots remain equal through source entry, addition/upgrade, save and both cold observations.",
+    "native_foreign_owners": "Both forces retain all four exact authored owner identities, creation custody, one effect and modifier, researched ownership, enabled/visibility flags, finite level1 range, saved0 and no prerequisites. Player mining.25/lab.5 and other mining.5/lab.75 remain exact. F200 runtime effects omit hidden; F210 effects report hidden=false, confirming the reviewed target-specific SDK boundary in these actual runs.",
+    "source_custody": "Every dependent manifest matches its actual successful source protected-save record. Contained input-copy bytes match that record; source foreign frames equal target entry frames. All30 complete/protected archives pass CRC and contain the exact actor hash. Complete/protected save hashes agree after both cold processes; caller asserts original save state after each cold, without saving a replacement.",
+    "restoration": "All104 unique bound/control/prior-archive states currently match their exact existence/size/hash records. Every activation receipt reports restored direct-library controls, with zero dependency payload copies, links or extraction. No cleanup failure; actual Factorio process count0.",
+    "audit_error": "One initial read-only verifier draft had a Python syntax error before execution; corrected in memory. It started no process, wrote no evidence and was not a native failure."
+  },
+  "limits": [
+    "Only the exact Base-only2.0.77/2.1.23 named credit cases and legal10%-paid5.0.10 origins in this finite schedule are accepted.",
+    "The new durable native-owned foreign controls are a different scenario from the original manual aggregate-offset case. Original r04 failure and r05/r06 observations remain adverse and byte-preserved. Values already zero before original bootstrap on_init do not establish engine-versus-migration causation or a generic configuration reset.",
+    "Worker-storage preparation/provider transitions, physical cargo, Secretas/Ferrum and other named planet profiles, actual reporter saves, clients/multiplayer, performance and broad historical origins are separate gates.",
+    "This result does not approve test-only CI follow-ups, merge, release publication or stable acceptance. Later changed consumed production/package/controller inputs require qualification or justified exact-input reuse."
+  ],
+  "native_reruns": 0,
+  "packet_edits": false,
+  "production_edits": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}

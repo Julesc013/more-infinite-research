@@ -1,0 +1,314 @@
+{
+  "schema": 1,
+  "kind": "MIRNativeFallback511IndependentResultReviewV1",
+  "reviewed_at_utc": "2026-11-08T23:23:51.848081+00:00",
+  "reviewer": {
+    "agent": "fallback511_result_review",
+    "role": "fresh non-author result reviewer",
+    "windows_identity": "BLACKGLASS-WIN1\\Jules",
+    "independence": "Reviewer did not author the product, prepared fixture or current controller and did not execute this native case. A different worker prepared the caller; root executed it.",
+    "native_execution_in_this_review": false,
+    "host_suite_execution_in_this_review": false
+  },
+  "verdict": "ACCEPTED exact current11 named unknown-polynomial foreign-owner/public-residual lab, save and two-cold-load case only",
+  "native_result_accepted_for_named_case": true,
+  "blocking_findings": [],
+  "source_commit": "1389ef9ba39159fca141d668ac74e800c9a80d16",
+  "source_player_tree": "dc3f9c1aa119f825dfb1cb5dac8ccf71ea1ddec0",
+  "product_archive": {
+    "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir511-qualification-r02/more-infinite-research_5.0.21011.zip",
+    "bytes": 995429,
+    "sha256": "F25DB9283C2F8020907F8E2AD35132F0B6EEECE11263C82C69389EE8DAB3F09D"
+  },
+  "product_distribution_version": "5.0.21011",
+  "engine": {
+    "path": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+    "bytes": 49398736,
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "version": "2.1.23",
+    "build": 87750,
+    "installation": "standalone D:/Games/Factorio/2.1"
+  },
+  "actual_mod_selection": [
+    "base@2.1.23",
+    "elevated-rails@2.1.23",
+    "mir-fixture-native-owner-fallback@0.2.0",
+    "more-infinite-research@5.0.21011",
+    "quality@2.1.23",
+    "recycler@2.1.23",
+    "space-age@2.1.23"
+  ],
+  "profile": {
+    "path": "build/qualification/native-fallback511-current-r01-native-custody-r01/packet/profile.json",
+    "bytes": 1251,
+    "sha256": "4870919DA88B1DF05536EA69491D705C84D36445EA7C900673F41944D543A736"
+  },
+  "controller_manifest": {
+    "path": "build/qualification/native-fallback511-current-r01-native-custody-r01/packet/manifest.json",
+    "bytes": 16386,
+    "sha256": "B854A26727B6440DE2B22A23827B41B6BB5C1B21E3D8EE16ACD2228EA9785DE5"
+  },
+  "composition": {
+    "path": "build/qualification/native-fallback511-current-r01-native-custody-r01/execution/composition.json",
+    "bytes": 19663,
+    "sha256": "56D364A3A9682FD3E546C0C64E81B94DEFCF859AB7D39DE863D32BFFC02727EC"
+  },
+  "caller": {
+    "path": "build/qualification/native-fallback511-current-r01-native-custody-r01/packet/Invoke-NativeOwnerFallback511CurrentR01.ps1",
+    "bytes": 14693,
+    "sha256": "A1A94C598E863C1D6B9D577E3EA448F30F163700465183E60CAC3370D67778CA"
+  },
+  "actor": {
+    "path": "build/qualification/native-fallback511-current-r01-native-custody-r01/packet/projection/control.lua",
+    "bytes": 7618,
+    "sha256": "383A5B387EF1D4D9C8B2A39AAB35042255EC431DFAA1C307B26BDC319947D355"
+  },
+  "fixture_archive": {
+    "path": "build/qualification/native-fallback511-current-r01-native-custody-r01/packet/mir-fixture-native-owner-fallback_0.2.0.zip",
+    "bytes": 2157,
+    "sha256": "EA40DCD794D796C03E0843E2F43816561EAE0BC7A1D8B067BB5D8C86285357DA"
+  },
+  "independent_expectations": {
+    "definition": {
+      "path": "tests/fixtures/native-owner-fallback/definition.json",
+      "bytes": 5173,
+      "sha256": "72B082677BE0AE2EACD8BAEFD5063928628A66CD1AF2F477A96E9C56DE5097AB"
+    },
+    "original_review": {
+      "path": "spec/evidence/candidate503-fallback-native-aero-review-r01.json",
+      "bytes": 8545,
+      "sha256": "B06E8363A65408E1101930F1EF214FFEBDC5C178156E2FA3F2C3E9293B0020AD"
+    },
+    "prepared_fixture_commit": "5d8a35c3822af1ccf3f362256a2bf12167e7b83d",
+    "current_source_review": {
+      "path": "build/qualification/native-fallback511-independent-source-review-r01.json",
+      "bytes": 2125,
+      "sha256": "7E5556B08515C9EF3F4149245394214BA2E6F77673AFDB5115F3612648684EFA"
+    },
+    "pre_execution_independent_admission": {
+      "path": "build/qualification/native-fallback511-root-independent-admission-r01.json",
+      "bytes": 1293,
+      "sha256": "3320620629B004BD516FA87A101C2DF386D70E63EEBA818310FEE28039E15DBD"
+    },
+    "expected": "Complete foreign steel-plate-productivity prototype with unknown 1000 + 100 * L^2 cost stays unchanged and unearned. Public recipe-prod-research_steel-1 retains four historical sciences/prerequisites and configured2/3/1.25/time1/effect17, rewarding only eligible mir-fixture-adopt-steel-plate. One ordinary lab completion consumes2 of each supplied6 science packs, stops lab, saves and preserves earned/private/foreign state through two read-only one-tick cold loads."
+  },
+  "custody": {
+    "manifest": {
+      "path": "build/qualification/native-fallback511-current-r01-native-custody-r01/MANIFEST.json",
+      "bytes": 22044,
+      "sha256": "F0D5AD78C5E1471CBB408D0E3C24141EC20E92BAB8EC2C6DF2BE020891BA2A98"
+    },
+    "member_count": 65,
+    "member_bytes": 2317497,
+    "primary_members_rehashed": 65,
+    "original_location_members_rehashed": 65,
+    "mismatches": 0,
+    "original_packet_root": "build/qualification/native-fallback511-current-r01-controller",
+    "actual_execution_root": "D:\\Projects\\Factorio\\.task-builds\\native-fallback511-current-r01\\build\\tmp\\native-fallback511-current-r01",
+    "native_result": {
+      "path": "build/qualification/native-fallback511-current-r01-native-custody-r01/execution/native/result.json",
+      "bytes": 38703,
+      "sha256": "079272221C71B33A580C3C0D756FCB89B6A3897B91F2DAB48CEBC0981A8EC0A6"
+    },
+    "execute_custody": {
+      "path": "build/qualification/native-fallback511-current-r01-native-custody-r01/execution/execute-custody.json",
+      "bytes": 38702,
+      "sha256": "03B5E02919409F683EF42D68B081774A6CD4E2D2F9FCAC56F2B554B365AEF548"
+    },
+    "native_result_equals_execute_custody_json": true
+  },
+  "checks": {
+    "bound_inputs": {
+      "count": 32,
+      "all_current_bytes_and_sha256_match": true
+    },
+    "source_checkout": {
+      "exact_frozen_commit": true,
+      "clean": true,
+      "player_tree_verified_by_git": true
+    },
+    "product": {
+      "crc_passed": true,
+      "member_count": 243,
+      "all_candidate_member_sizes_and_hashes_match": true,
+      "candidate_record": {
+        "path": "build/packages/mir511-qualification-r02/f210-candidate.json",
+        "bytes": 41330,
+        "sha256": "C351B21E56E2456640F9B0249F2998FB1C228EE62D04C705960D5DCDDD310FF8"
+      },
+      "raw_source_exact_members": 242,
+      "only_raw_difference": "platform/target.lua is edition materialization with the same f210,2.1,2.1.23,5.0.21011 and capability values as frozen source. No player body difference was found."
+    },
+    "caller_projection": {
+      "original_sha256": "F6948D678DF1ACDC2F063C1B72DBC15052C1D7CFC1F19A3CEF1CDE5E103DC6E3",
+      "record": {
+        "path": "build/qualification/native-fallback511-current-r01-native-custody-r01/packet/caller-projection.json",
+        "bytes": 5514,
+        "sha256": "26214C8ECF44D50890A8AE7DA7FE7731EB76F584B46B3D821DC7FC3DED9BC031"
+      },
+      "independent_exact_byte_reconstruction_from_five_pin_literals_passed": true,
+      "lifecycle_resource_restoration_or_oracle_changes": false
+    },
+    "fixture_projection": {
+      "all_six_selected_committed_raw_git_files_match": true,
+      "helper_crc_passed": true,
+      "exact_helper_members": [
+        "data-final-fixes.lua",
+        "data-updates.lua",
+        "info.json",
+        "settings-updates.lua"
+      ],
+      "helper_has_no_control_lua": true,
+      "scenario_actor_separate": true
+    },
+    "actual_logs": "All three complete engine logs reviewed; each has exactly one expected marker and exact active-mod observation. Actual loads show MIR5.0.21011 despite unrelated duplicate-archive discovery messages. No fatal diagnostic matched in logs/stdout/stderr.",
+    "governor": "All three resource ledgers have matching completed terminals, distinct process IDs and no timeout. Production predicate requires marker plus Saving finished plus completed save; current caller and pinned governor explicitly allow supervised stop after that predicate. Exit-1 is expected supervised termination, never a natural exit0.",
+    "cold_endpoints": "Each engine log loads the exact835331-byte completed save with --benchmark-ticks1 --benchmark-runs1 --benchmark-sanitize, emits one cold-complete marker and says Goodbye; both natural exits are0. These are state/reload checks, not performance samples.",
+    "restoration": {
+      "original_mod_list_and_settings_rehashed": 2,
+      "prior_MIR_archives_rehashed": 19,
+      "exact_original_MIR_archive_path_set_restored": true,
+      "temporary_product_and_fixture_archives_absent": true,
+      "no_Factorio_process_found_at_readback": true,
+      "dependency_payload_bytes_copied": 0,
+      "archive_links_created": 0,
+      "archive_extractions": 0
+    }
+  },
+  "observed": {
+    "production_complete_marker_time_seconds": 4.786,
+    "saving_finished_log_time_seconds": 4.852,
+    "ordinary_completion": {
+      "name": "recipe-prod-research_steel-1",
+      "by_script": false,
+      "tick": 119,
+      "count": 1
+    },
+    "player": {
+      "public_level": 2,
+      "uncovered_recipe_productivity": 0.17,
+      "steel_productivity": 0,
+      "casting_productivity": 0,
+      "bullet_damage": 0,
+      "private_owner_level": 1,
+      "private_owner_researched": false,
+      "saved_progress": 0,
+      "research_progress": 0,
+      "queue_empty": true,
+      "mining_bonus": 0,
+      "lab_speed_bonus": 0
+    },
+    "foreign": "Control force native-owner-settings-control retains public level1/researched=false/enabled=false/visible=false, private owner level1/unearned, empty queue and zero steel/casting/bullet/uncovered/mining/lab-speed bonuses.",
+    "science": "automation, logistic, chemical and production science each6 to4; actor verify asserts one completion and lab.disabled_by_script=true/lab.active=false.",
+    "native_owner": "Data-final-fixes exact complete-prototype equality assertion passes after MIR; actor rechecks unknown polynomial, native max level/time and all three original steel/casting/bullet effects on both forces and both cold loads.",
+    "two_cold_markers_equal_production_after_stage_normalization": true,
+    "cold_marker_completion_count_is_persisted_witness_not_two_new_completions": true
+  },
+  "processes": [
+    {
+      "stage": "production",
+      "log": {
+        "path": "build/qualification/native-fallback511-current-r01-native-custody-r01/execution/native/production.factorio.log",
+        "bytes": 14784,
+        "sha256": "DCBDB99DC5861773138E6B02CD840C45F7C9A33ADFE821FB5E5BA2006C389F95"
+      },
+      "resource_ledger": {
+        "path": "build/qualification/native-fallback511-current-r01-native-custody-r01/execution/native/process-1.resources.jsonl",
+        "bytes": 3848,
+        "sha256": "B535036AD923B753EF8E532D34BC56F199D1CCB140609C263F5BBE6F37C5F9B7"
+      },
+      "pid": 28096,
+      "duration_seconds": 5.710642,
+      "exit_code": -1,
+      "timed_out": false,
+      "completion_predicate_observed": true,
+      "program_arguments_from_engine_log": "\"D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe\" \"--config\" \"D:\\Projects\\Factorio\\.task-builds\\native-fallback511-current-r01\\build\\tmp\\native-fallback511-current-r01\\native\\config.ini\" \"--mod-directory\" \"D:\\Projects\\Factorio\\testmods\\2.1\" \"--no-log-rotation\" \"--disable-audio\" \"--server-settings\" \"D:\\Projects\\Factorio\\.task-builds\\native-fallback511-current-r01\\build\\tmp\\native-fallback511-current-r01\\native\\server-settings.json\" \"--bind\" \"127.0.0.1\" \"--start-server-load-scenario\" \"k2so-paid-upgrade-r01\" ",
+      "marker_stage": "complete",
+      "raw_marker_matches_result": true,
+      "exact_seven_mod_selection_verified": true,
+      "fatal_diagnostic_found": false
+    },
+    {
+      "stage": "reload-1",
+      "log": {
+        "path": "build/qualification/native-fallback511-current-r01-native-custody-r01/execution/native/reload-1.factorio.log",
+        "bytes": 14001,
+        "sha256": "CD93FC6361435B1B993F4EC80C2D592E1500FBBC4625C7BF3931E22468D75D51"
+      },
+      "resource_ledger": {
+        "path": "build/qualification/native-fallback511-current-r01-native-custody-r01/execution/native/process-2.resources.jsonl",
+        "bytes": 2001,
+        "sha256": "92ED154BC1954A580779F176AB13E21553EC3C0C433A052CCB91629B1623923D"
+      },
+      "pid": 36804,
+      "duration_seconds": 2.031023,
+      "exit_code": 0,
+      "timed_out": false,
+      "completion_predicate_observed": false,
+      "program_arguments_from_engine_log": "\"D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe\" \"--config\" \"D:\\Projects\\Factorio\\.task-builds\\native-fallback511-current-r01\\build\\tmp\\native-fallback511-current-r01\\native\\config.ini\" \"--mod-directory\" \"D:\\Projects\\Factorio\\testmods\\2.1\" \"--no-log-rotation\" \"--disable-audio\" \"--benchmark\" \"D:\\Projects\\Factorio\\.task-builds\\native-fallback511-current-r01\\build\\tmp\\native-fallback511-current-r01\\native\\write-data\\saves\\sourceb-native-owner-fallback-complete.zip\" \"--benchmark-ticks\" \"1\" \"--benchmark-runs\" \"1\" \"--benchmark-sanitize\" ",
+      "marker_stage": "cold-complete",
+      "raw_marker_matches_result": true,
+      "exact_seven_mod_selection_verified": true,
+      "fatal_diagnostic_found": false
+    },
+    {
+      "stage": "reload-2",
+      "log": {
+        "path": "build/qualification/native-fallback511-current-r01-native-custody-r01/execution/native/reload-2.factorio.log",
+        "bytes": 14001,
+        "sha256": "D04EE05B7A93737065A344D1627B0B92B297E8D7E709168CB4B4E5B2EC97F9DC"
+      },
+      "resource_ledger": {
+        "path": "build/qualification/native-fallback511-current-r01-native-custody-r01/execution/native/process-3.resources.jsonl",
+        "bytes": 2005,
+        "sha256": "C735F69AEFBD21E5580D88F94AF51E7451CDB5FC087BBF1F51DD4A036999F401"
+      },
+      "pid": 36992,
+      "duration_seconds": 1.936462,
+      "exit_code": 0,
+      "timed_out": false,
+      "completion_predicate_observed": false,
+      "program_arguments_from_engine_log": "\"D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe\" \"--config\" \"D:\\Projects\\Factorio\\.task-builds\\native-fallback511-current-r01\\build\\tmp\\native-fallback511-current-r01\\native\\config.ini\" \"--mod-directory\" \"D:\\Projects\\Factorio\\testmods\\2.1\" \"--no-log-rotation\" \"--disable-audio\" \"--benchmark\" \"D:\\Projects\\Factorio\\.task-builds\\native-fallback511-current-r01\\build\\tmp\\native-fallback511-current-r01\\native\\write-data\\saves\\sourceb-native-owner-fallback-complete.zip\" \"--benchmark-ticks\" \"1\" \"--benchmark-runs\" \"1\" \"--benchmark-sanitize\" ",
+      "marker_stage": "cold-complete",
+      "raw_marker_matches_result": true,
+      "exact_seven_mod_selection_verified": true,
+      "fatal_diagnostic_found": false
+    }
+  ],
+  "completed_save": {
+    "path": "build/qualification/native-fallback511-current-r01-native-custody-r01/execution/native/write-data/saves/sourceb-native-owner-fallback-complete.zip",
+    "bytes": 835331,
+    "sha256": "7D7F8E58B652495084777E66B787FEC48C8AE716F87E8A88BFD0F8B2FE07788B"
+  },
+  "protected_save": {
+    "path": "build/qualification/native-fallback511-current-r01-native-custody-r01/execution/protected/sourceb-native-owner-fallback-complete.zip",
+    "bytes": 835331,
+    "sha256": "7D7F8E58B652495084777E66B787FEC48C8AE716F87E8A88BFD0F8B2FE07788B"
+  },
+  "save_integrity": {
+    "both_archives_crc_passed": true,
+    "original_and_protected_bytes_equal": true,
+    "both_original_location_hashes_verified": true,
+    "embedded_actor_sha256": "383A5B387EF1D4D9C8B2A39AAB35042255EC431DFAA1C307B26BDC319947D355"
+  },
+  "historical_preservation": "Original C503 eligible-r02 acceptance retains its original source/package/engine/results; ineligible-r01 data-stage failure and validation-adverse records remain unchanged. This is a fresh current11 execution, not relabelled original evidence or an old-save upgrade.",
+  "workspace_health": {
+    "command": "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1 -AsJson -MaxScanSeconds 3 -MaxEntriesPerRoot 1000 -MaxWorktrees 16 -MaxBranches 128",
+    "side_effects": "none-report-only",
+    "status": "attention",
+    "free_mib": 94566,
+    "primary_dirty_count": 0,
+    "primary_ahead": 0,
+    "primary_behind": 0,
+    "limitation": "Bounded directory scans hit time budget; historical branch/worktree review advice remains. No disk pressure observed; all pre-existing worktrees, unique commits and evidence preserved. No cleanup performed."
+  },
+  "limits": [
+    "Exact fresh seven-mod F2102.1.23 fixture case and configured tuning only; no arbitrary unknown formulas, foreign owners, recipes, settings or provider combinations.",
+    "Recipe-productivity modifiers and ordinary research effects observed; no physical manufacturing output.",
+    "No predecessor/old-save migration, earned foreign-owner conversion, cap/queue-cancel campaign, clients or multiplayer result.",
+    "No comparative elapsed speed, memory, performance or stress acceptance; recorded durations describe the three observed processes only.",
+    "No whole stable MIR5 acceptance, API stability, release qualification or publication authority is established."
+  ],
+  "release_qualification": false,
+  "stable_acceptance": false
+}

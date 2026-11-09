@@ -1,0 +1,236 @@
+{
+  "kind": "MIRWorkerStorage511IndependentSourceReviewV1",
+  "observed_at_utc": "2026-11-09T04:34:04.003560+00:00",
+  "role": "fresh non-author read-only source reviewer; no children",
+  "verdict": "changes-required",
+  "reviewed_head": "c5e86d5fc36b3816ec439d2d3f0cbd7f4863de8d",
+  "reviewed_tree": "666e304cc947d77fec066cbd62198ec0d78b4fb1",
+  "reviewed_source_tree": "cabb934e197423e85cd6c0e86a4ca4ce01cad4d1",
+  "base": "2393492c6114046345024b74effa39bf884a6e34",
+  "initial_review_pin": "87dfbcf0c356da62d03da019acfa4d49d4e76979",
+  "method": "Read exact Git blobs at initial and final pins; reviewed the entire final follow-up delta. Executed an isolated exact tracked projection and bounded selected controls with pinned Lua5.2. No moving dirty worktree supplied source for the verdict.",
+  "findings": [
+    {
+      "id": "P1-F200-TECHNOLOGY-MODIFIER-HIDDEN",
+      "priority": "P1",
+      "title": "F200 initialization rejects its supported native effect schema",
+      "location": {
+        "path": "source/research/worker_storage_recovery.lua",
+        "line": 55
+      },
+      "source_predicate": "type(effect.hidden) == \"boolean\" is required for every target",
+      "entry_paths": [
+        "runtime.worker_robot_storage.on_init -> empty_private -> recovery.fingerprint",
+        "on_configuration_changed -> preflight -> empty_private -> recovery.fingerprint",
+        "prepare/private_contract and all later preserved-contract checks"
+      ],
+      "engine_contract": {
+        "F200": "Pinned2.0.77 runtime-api TechnologyModifier common parameters: type only; worker-robot-storage variant: modifier only. hidden is absent from this public runtime shape.",
+        "F210": "Pinned2.1.23 TechnologyModifier has required common hidden:boolean plus type; worker variant has modifier."
+      },
+      "reproducer": "Run python -B D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\sdk-schema-counterexample.py. It reads each exact installed runtime SDK to choose the effect shape, then invokes candidate on_init(nil) on an empty authored private world. All other world facts are the unchanged named host double.",
+      "expected": "A valid empty F200 private holder permits fresh initialization before any invested recovery.",
+      "actual": "F200 schema-shaped effect without hidden throws MIR worker recovery effect contract is invalid at fingerprint; no native setter/history write occurred. F210 required hidden=false control initializes successfully.",
+      "impact": "The new private holder is unconditional for F200/F210 and initialization fingerprints it even when no preparation is requested. The F200 startup path therefore requires an unavailable field. Current doubles conceal this target boundary by injecting hidden=false for both targets.",
+      "required_resolution": "Use exact target API facts for unavailable F200 hidden semantics while retaining strict F210 hidden validation and rejecting genuinely different supported effects. Add an independent schema-shaped F200 initialization/control opponent. No source fix authored by this reviewer.",
+      "evidence": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\sdk-schema-counterexample.json",
+        "bytes": 1653,
+        "sha256": "D6FA67555546BA8212F0BB8DE3B52E70FEF0721C2AC3258C10B9B2F8F97CC324"
+      },
+      "limits": "This is a pinned SDK/source-contract counterexample. No new Factorio process or actual-engine claim is made."
+    }
+  ],
+  "reviewed_invariants": [
+    {
+      "area": "all-force preflight and custody",
+      "observation": "prepare validates saved record shape, MIR canonical/private creation custody, exact effect/cost/science/prerequisite fingerprint, absent foreign5..9 tail, empty private investment and sorted all-force snapshots before first native setter. Late-force invalid-frame opponents remain fail-closed."
+    },
+    {
+      "area": "absent history and historical admission",
+      "observation": "Current default appearance does not admit an unrecorded changed finite endpoint. Actual live MIR-owned default4 can be explicitly prepared before transition. First-MIR finite route and unchanged-provider5.0.10 Secretas have narrow distinct admission; published4.7.3 transported-V3 ownership remains exact-version/event/shape guarded."
+    },
+    {
+      "area": "native transfer and queue",
+      "observation": "Copies actual next level via native level setter, restores enablement/visibility and both native saved/current progress, rewrites full queue with exact name/order readback, clears canonical progress again after setter caching, and compares unfinished native unit count. No direct aggregate cargo write or scripted bonus mirror."
+    },
+    {
+      "area": "quota, partial work and policy",
+      "observation": "allowance=max(queue occurrences, one actual partial), so a partial already attached to queued work adds no second count. Exact-cap and above-cap independent opponents passed. Partial foreign-disabled work remains locked. A prepared default or pending provider requires matching cap/enable; only provider phase with every private row retired and no actual allowance releases that temporary policy lock. No general cap-change native acceptance is inferred."
+    },
+    {
+      "area": "read-only load and force lifecycle",
+      "observation": "on_load validates/reconnects local pending state only; independent double throws on any game/prototype access and passed two calls without storage/native changes. Force hooks empty/disable new or reset private rows; merge records observed surviving native state rather than summing independent partials. Actual engine force/reset/merge semantics remain a native gate."
+    },
+    {
+      "area": "data boundary and public parity",
+      "observation": "Final c5 follow-up compares detached emitted default contract against authored default and checks default input availability for finite destinations; omitted/mismatched profiles use a stable uninvested holder using admitted gear science. Private holder is excluded from public catalogue. Fixed Base/F200/SpaceAge output oracles, K2 public/science boundaries and Secretas finite-source parity selected controls passed."
+    },
+    {
+      "area": "scope and claims",
+      "observation": "Support guide limits preparation to ordinary Base/SpaceAge default4, explicitly leaves K2/SE/overhaul preparation and provider removal/another transition unqualified, requires protected originals/save+exit/matching pending settings and acknowledges native qualification pending. Host totals are not native acceptance."
+    }
+  ],
+  "tests": {
+    "plan": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\host-plan.json",
+      "bytes": 15883,
+      "sha256": "41BDEF630EFDE93EC41DAC977D979C66774EE2D2E279CAE13F27DDFE82507FFE"
+    },
+    "lua_runtime": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir421-lua-runtime\\lupa\\lua52.cp314-win_amd64.pyd",
+      "bytes": 507904,
+      "sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899"
+    },
+    "existing_narrow_modules": {
+      "history": {
+        "tests": 25,
+        "passed": 25,
+        "log": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\test_worker_storage_history.py.log",
+          "bytes": 129,
+          "sha256": "0F19F4582AF4B9CA3FC48962CD05C2C493F0387D9F80D636CE4CE7B497D15B75"
+        }
+      },
+      "continuation": {
+        "tests": 15,
+        "passed": 15,
+        "log": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\test_worker_storage_continuation.py.log",
+          "bytes": 2940,
+          "sha256": "5D1D4FC81999D5E98CFBCD13BAD468EA53252BE729D9BE09F50A846D6361E44B"
+        }
+      }
+    },
+    "selected_pipeline": {
+      "tests": 7,
+      "passed": 7,
+      "skipped": 0,
+      "log": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\selected-pipeline-controls.log",
+        "bytes": 1467,
+        "sha256": "37453EF1BD9FFDCB9FB3A3FC405C9CAC26895D7C8DD14333E77CB5039C4696B3"
+      }
+    },
+    "independent_opponents": {
+      "tests": 4,
+      "passed": 4,
+      "result": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\narrow-controls-result.json",
+        "bytes": 869,
+        "sha256": "5AD50BE780004B99B8D1163FD00BEC1C8CB1673B381DBEB2BBD19C6707A4A555"
+      }
+    },
+    "schema_opponents": {
+      "cases": 2,
+      "F200_valid_initialization_counterexample": "reproduced",
+      "F210_positive_control": "passed",
+      "result": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\sdk-schema-counterexample.json",
+        "bytes": 1653,
+        "sha256": "D6FA67555546BA8212F0BB8DE3B52E70FEF0721C2AC3258C10B9B2F8F97CC324"
+      }
+    },
+    "total_successful_ordinary_host_controls": 51,
+    "preparation_errors": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\preparation-refusals.json",
+      "bytes": 382,
+      "sha256": "A04C3E2BF966119228B93B609D7867912BE261CF7826B114CDBFFD6744CEDA44"
+    },
+    "scope": "No full suite, player build, native process, library mutation or native acceptance."
+  },
+  "sdk_inputs": [
+    {
+      "path": "D:\\Games\\Factorio\\2.0\\doc-html\\runtime-api.json",
+      "bytes": 1878804,
+      "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578"
+    },
+    {
+      "path": "D:\\Games\\Factorio\\2.1\\doc-html\\runtime-api.json",
+      "bytes": 2132310,
+      "sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373"
+    }
+  ],
+  "remaining_mandatory_native_cases": [
+    "After the API blocker is corrected and exact cumulative source/packages/controllers are frozen, actual F2002.0.77 and F2102.1.23 fresh initialization plus no-MIR first addition must load the empty holder without grants/foreign writes.",
+    "On protected actual original default4 saves, explicitly prepare several forces covering earned-only, current partial, queue-only and repeated queued levels, queued partial and detached partial, uninvested/foreign-disabled rows, finite cap at/above work boundary; compare earned cargo and all unrelated current/queue/progress before and after native setters.",
+    "Save the prepared copy, exit, add the exact admitted finite provider with unchanged cap/enable/cost/science/effect/prerequisites, then demonstrate ordinary by_script=false lab completion only for authorized old work and exact native retirement; detached resume and originally-disabled refusal require their actual endpoints.",
+    "Demonstrate provider-private work retirement releases later normal public cap/enable changes without changing earned credits, while pending private work and pre-provider default phase continue to refuse mismatches before MIR writes.",
+    "First MIR addition to a progressed existing provider and exact unchanged-provider5.0.10 upgrade must preserve actual finite levels/cargo/current/queued/saved work without invented finite grants. Exact admitted legacy4.7.3 ownership path requires its actual source save.",
+    "Exercise actual force created/reset/merged and cold load/join subscription reconstruction; no hidden ongoing private work may appear for empty forces, and independent partials must follow engine merge semantics without MIR summation.",
+    "Each affected accepted route needs saved successor plus two separate cold reloads with exact save hashes/native equality, strict history/foreign state intact. K2/SE preparation, reporter-save restoration, worker physical cargo and stable/release acceptance remain separate unqualified scopes."
+  ],
+  "workspace_health": {
+    "status": "attention/advisory",
+    "free_mib": 93103,
+    "primary_dirty_count": 0,
+    "primary_ahead": 0,
+    "primary_behind": 0,
+    "limits": {
+      "seconds": 3,
+      "entries": 200,
+      "worktrees": 2,
+      "branches": 8
+    },
+    "attention": "bounded scan lower bounds and unrelated retained worktree/branch review; preserved all unrelated work and unique evidence; no cleanup"
+  },
+  "custody": {
+    "projection.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\projection.json",
+      "bytes": 433,
+      "sha256": "17A6205B2FE1F79E3873A51F569E71F89ECE705678DBD68BF2F45BBEED89B843"
+    },
+    "host-plan.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\host-plan.json",
+      "bytes": 15883,
+      "sha256": "41BDEF630EFDE93EC41DAC977D979C66774EE2D2E279CAE13F27DDFE82507FFE"
+    },
+    "test_worker_storage_history.py.log": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\test_worker_storage_history.py.log",
+      "bytes": 129,
+      "sha256": "0F19F4582AF4B9CA3FC48962CD05C2C493F0387D9F80D636CE4CE7B497D15B75"
+    },
+    "test_worker_storage_continuation.py.log": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\test_worker_storage_continuation.py.log",
+      "bytes": 2940,
+      "sha256": "5D1D4FC81999D5E98CFBCD13BAD468EA53252BE729D9BE09F50A846D6361E44B"
+    },
+    "selected-pipeline-controls.log": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\selected-pipeline-controls.log",
+      "bytes": 1467,
+      "sha256": "37453EF1BD9FFDCB9FB3A3FC405C9CAC26895D7C8DD14333E77CB5039C4696B3"
+    },
+    "narrow-controls.py": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\narrow-controls.py",
+      "bytes": 4930,
+      "sha256": "673243FC84204F5B187EB1D8896E53F9214948484CCDD9AE69B346DCE9E2EE53"
+    },
+    "narrow-controls-result.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\narrow-controls-result.json",
+      "bytes": 869,
+      "sha256": "5AD50BE780004B99B8D1163FD00BEC1C8CB1673B381DBEB2BBD19C6707A4A555"
+    },
+    "sdk-schema-counterexample.py": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\sdk-schema-counterexample.py",
+      "bytes": 2777,
+      "sha256": "CC89DDD047A86CFE489C776D71FEEFE54BE29654AA759FE5F7DF16850F37174B"
+    },
+    "sdk-schema-counterexample.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\sdk-schema-counterexample.json",
+      "bytes": 1653,
+      "sha256": "D6FA67555546BA8212F0BB8DE3B52E70FEF0721C2AC3258C10B9B2F8F97CC324"
+    },
+    "preparation-refusals.json": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-review-controls-r01\\preparation-refusals.json",
+      "bytes": 382,
+      "sha256": "A04C3E2BF966119228B93B609D7867912BE261CF7826B114CDBFFD6744CEDA44"
+    }
+  },
+  "source_edits": false,
+  "children_spawned": 0,
+  "native_launches": 0,
+  "library_mutation": false,
+  "builds": 0,
+  "release_qualification": false,
+  "stable_acceptance": false
+}

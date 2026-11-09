@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import sys
 import unittest
+from worker_storage_recovery_fixture import MINIMAL_NATIVE_FACTS
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -12,6 +13,7 @@ class LifecycleTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().player_root = (ROOT / "source").as_posix()
+        self.lua.execute(MINIMAL_NATIVE_FACTS)
         self.lua.execute('''
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
@@ -98,15 +100,21 @@ class LifecycleTests(unittest.TestCase):
               prototypes = {recipe = recipe_caps or {}, mod_data = native_mod_data,
                 get_history = native_prototype_history, technology = native_technology_prototypes}
             end
+            install_worker_recovery_facts(forces)
             mods = active_mods or {}
             handlers = retained_handlers or {events = {}}
             handlers.events = handlers.events or {}
             script = {
               active_mods = active_mods or {},
-              on_init = function(handler) handlers.init = handler end,
-              on_configuration_changed = function(handler) handlers.configuration = handler end,
+              on_init = function(handler) handlers.init = function(event) install_worker_recovery_facts();return handler(event) end end,
+              on_configuration_changed = function(handler) handlers.configuration = function(event) install_worker_recovery_facts();return handler(event) end end,
               on_load = function(handler) handlers.load = handler end,
-              on_event = function(id, handler) handlers.events[id] = handler end,
+              on_event = function(id, handler) handlers.events[id] = handler and function(event)
+                local force=event and rawget(event,"force")
+                if not force and event and type(event.research)=="table" then force=rawget(event.research,"force") end
+                if force then install_worker_recovery_facts({force}) end
+                return handler(event)
+              end or nil end,
               on_nth_tick = function(interval, handler)
                 handlers.nth = handlers.nth or {}
                 handlers.nth[interval] = handler
@@ -122,6 +130,7 @@ class LifecycleTests(unittest.TestCase):
             remote.remove_interface = function(_) remote.removed = true end
             package.loaded["control"] = nil
             package.loaded["runtime.bootstrap"] = nil
+            package.loaded["runtime.worker_robot_storage"] = nil
             package.loaded["runtime.library"] = nil
             package.loaded["runtime.catalogue"] = nil
             package.loaded["runtime.lifecycle"] = nil
@@ -397,9 +406,11 @@ class LifecycleTests(unittest.TestCase):
           local gear = technology("recipe-prod-research_gears-1", 6, true)
           local ordinary_force = force(2, {[gear.name]=gear})
           boot({ordinary_force}, 5)
+          local modern_native_facts = prototypes
           prototypes = setmetatable({}, {__index=function() error("ordinary profile read prototypes") end})
           local limits = require("runtime.lifecycle").cap_limits(ordinary_force)
           assert(limits[gear.name] == 5)
+          prototypes = modern_native_facts
           handlers.init()
           assert(gear.enabled == false and gear.level == 6)
         ''')
@@ -420,7 +431,8 @@ class LifecycleTests(unittest.TestCase):
           assert(type(handlers.events[8]) == "function"
             and remote.removed == false and next(storage) == nil)
           handlers.init(); handlers.configuration()
-          assert(next(storage) == nil, "unlimited settings allocated cap storage")
+          assert(storage.mir_caps == nil and storage.mir_worker_storage_route.schema == 2,
+            "unlimited settings did not retain only explicit worker route metadata")
           local before = next(storage)
           handlers.load()
           assert(before == next(storage), "on_load initialized or changed storage")
@@ -429,7 +441,7 @@ class LifecycleTests(unittest.TestCase):
           handlers.events[defines.events.on_force_created]({force = fresh})
           handlers.events[defines.events.on_force_reset]({force = fresh})
           handlers.events[defines.events.on_forces_merged]({source_index = 41, destination = fresh})
-          assert(next(storage) == nil, "unlimited force cleanup allocated cap storage")
+          assert(storage.mir_caps == nil, "unlimited force cleanup allocated cap storage")
         ''')
 
     def test_space_age_caps_have_independent_named_ownership(self):
@@ -930,7 +942,7 @@ class LifecycleTests(unittest.TestCase):
             "native-credit reset callback was removed by an unlimited cap profile")
           handlers.configuration()
           assert(second.enabled and not second.visible_when_disabled and storage.mir_caps == nil)
-          handlers.init()
+          handlers.configuration()
           assert(storage.mir_caps == nil, "unlimited callbacks allocated cap storage")
         ''')
 

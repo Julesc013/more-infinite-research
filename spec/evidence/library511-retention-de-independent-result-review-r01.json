@@ -1,0 +1,488 @@
+{
+  "kind": "MIRLibrary511GermanSelectionRetentionIndependentResultV1",
+  "reviewed_at_utc": "2026-11-08T22:02:34.589887+00:00",
+  "reviewer": "independent non-author /root/native_owner510_review",
+  "verdict": "ACCEPT exact corrected German selection-retention route on F25D/1389 under admitted DEr04. No broader Library/stable verdict.",
+  "scope": "Read-only completed DE result, actual15PNGs, all15action/capture bindings,157member custody, input hashes and bounded retirement/restoration readback. No native, tests, build, desktop input or child agents; separately running EN stage/root untouched.",
+  "exact_identity": {
+    "source_runner_head": "1389ef9ba39159fca141d668ac74e800c9a80d16",
+    "player_tree": "dc3f9c1aa119f825dfb1cb5dac8ccf71ea1ddec0",
+    "distribution": "5.0.21011",
+    "package_sha256": "F25DB9283C2F8020907F8E2AD35132F0B6EEECE11263C82C69389EE8DAB3F09D",
+    "package_bytes": 995429,
+    "published_package": false,
+    "plan_sha256": "5AFBCAD1F9CCCCA3927B8B84853823A4BAF76A410087596EC065152B89F36490",
+    "admission_sha256": "A24CE35BC78CEB0B591994084A99C55F6DDF47C2DE5BE7882A541FE7B0F7F697",
+    "native_root": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retain-de-r04",
+    "owner_result_sha256": "35229548C22DE5919EA9F4A676BD1D0CBC5276DDB374CEE3C23866F4ABE543B5",
+    "root_observations_sha256": "420E6FD0E2DEC06DF404E4091AA0C4356B2F6A26CF6C1EEB6BC2033871701CB0",
+    "engine": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+    "engine_version": "2.1.23 build87750",
+    "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "active_mods_from_actual_log": [
+      "base@2.1.23",
+      "mir-fixture-mir5-active-mods-observer@0.1.0",
+      "more-infinite-research@5.0.21011"
+    ],
+    "profile_sha256": "E358A099ACC093CBEF69781CC396297C85A2F065A870F711C93F62D134185EE1",
+    "settings_mode": "Defaults",
+    "protected_original_and_staged_seed_sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD",
+    "seed_bytes": 893285,
+    "seed_origin": "Qualified internal5.0.6 work save, not direct raw1.1 upgrade",
+    "all15declared_input_file_records_rehashed_match": true
+  },
+  "observed_native_result": {
+    "GUI_processes": 1,
+    "owner_pid": 24336,
+    "owner_start_utc": "2026-11-08T21:33:50.0539850Z",
+    "native_pid": 30780,
+    "native_start_utc": "2026-11-08T21:33:54.1105787Z",
+    "window_handle": 3870200,
+    "client_geometry": [
+      0,
+      0,
+      2560,
+      1440
+    ],
+    "locale": "de",
+    "run_status": "passed",
+    "exit_code": 0,
+    "timed_out": false,
+    "completion_predicate_observed": false,
+    "duration_seconds": 425.477135,
+    "peak_working_set_bytes": 1637490688,
+    "peak_sampled_private_bytes": 2544934912,
+    "stderr_bytes": 0,
+    "log_sha256": "6F9038AA3DA8291AF0EF9DBBEC8B55B68504ABE9CCF9C45728CEF715BA3AC158",
+    "resource_ledger_rows": 1334,
+    "resource_ledger_final": "completed/exit0 at2026-11-08T21:40:59.8253251+00:00; matches owner result and user-quit/Goodbye log",
+    "performance_acceptance": false
+  },
+  "accepted_observations": [
+    "Observed German intro explicitly offers Tab and is dismissed with guarded native Tab; observed shortcut opens the stable four-tab Library. Research baseline54rows.",
+    "Actual typed Akku yields2matching rows: Stromerzeugungs-Produktivität and Arbeitsroboter-Akkukapazität. One actual row2click selects worker battery.",
+    "Worker selected detail shows short translated repeatable bonus, Batterie-Kapazität:+10%, level2/9600units/60s/four science icons. No obsolete active-lab science advice in this direct-effect text.",
+    "Queue empty; Debug shows Factorio2.1.23/MIR5.0.21011/exact3mods and selected recipe-prod-research_robot_battery-1.",
+    "Settings Research scope baseline123groups; actual Brems search yields1Bremskraft group with enabled/base115/increment0/growth~1.33333/unlimited/time60/effect15 and mod-setting provenance.",
+    "Returning Research retains canonical casefolded akku, the same2matching rows and SAMErow2worker highlight/title/detail. No intervening reselection or retry occurred. The declared German retained-selection predicate is observed.",
+    "Library close and Escape open native game menu; exit-map goes directly to main menu. Actual main-menu Beenden click yields natural user-quit0 without timeout."
+  ],
+  "selection_proof": {
+    "contract": "RUN-04 personal focus/query retention and unchanged admitted DEr04predicate. This accepts the visible native route, not an inferred private storage/callback trace.",
+    "worker_before_png_sha256": "4386432A3D7B2CD33DD722AD9DBD4F8E7A619912F85098C7700C277F71164A7A",
+    "debug_selected_ID_png_sha256": "BA32734260EFBCCB654A439711A8FC0C35F71AFC2F36772FB33F748B00C49DCC",
+    "return_png_sha256": "F411B6915D6042EC292A0DCE12293A66916DBAF67B5FFA54D9BBBED6B19F3F6B",
+    "return_capture_at_utc": "2026-11-08T21:38:48.1220276Z",
+    "return_action": "Actual guarded Research tab click720,208 from settings-brems-filtered; no row click after original select-worker-battery.",
+    "selected_subject": "recipe-prod-research_robot_battery-1 / Arbeitsroboter-Akkukapazität",
+    "query": "Akku input / akku normalized retained query",
+    "matches": 2,
+    "no_reselection": true,
+    "native_callback_order_or_direct_storage_read_claim": false
+  },
+  "retirement_label_correction": {
+    "capture_label": "unsaved-confirmation",
+    "actual_state": "MAIN MENU, no confirmation dialog shown.",
+    "png_sha256": "82DFB3C9C3876D7476502300FD88031D26AE38B9FE3C97F7FEF11F09DDF3BD09",
+    "observed_actions": "exit-map1146,914 from game-menu, then quit-main-menu1146,946 from the observed main-menu capture.",
+    "explicit_save_input": false,
+    "save_activity_limit": "No manual save action was sent. Actual log contains16ordinary autosave events; latest3incidental autosaves are preserved. Do not claim no saves, an unsaved confirmation, or accepted successor/lifecycle continuity."
+  },
+  "receipt_audit": {
+    "capture_count": 15,
+    "input_receipt_count": 15,
+    "input_events_sent": 44,
+    "all15PNGs_actually_viewed": true,
+    "all_image_result_spec_and_binding_hashes_match": true,
+    "all_owned_PID_start_engine_roleclientDE_and2560geometry_consistent": true,
+    "all_capture_owner_PID_start_bindings_consistent": true,
+    "all_capture_methods": "owned-hwnd-printwindow-client",
+    "all_receipts_status": "input-sent-native-readback-required",
+    "all_native_game_observation_false": true,
+    "all_guard_failures_empty": true,
+    "foreground_geometry_occlusion_rejections": 0,
+    "all_requested_physical_mouse_positions_equal_readback": true,
+    "no_hardware_key_left_held": true,
+    "capture_age_seconds_to_binding_range": [
+      11.464,
+      35.748
+    ],
+    "freshness_limit_seconds": 120,
+    "original2560PNGs_preserved": "Viewed with high-detail2048display resize only; no native/window/PNG-body mutation.",
+    "captures": [
+      {
+        "label": "debug-selected-identity",
+        "at_utc": "2026-11-08T21:36:57.1702412Z",
+        "png_sha256": "BA32734260EFBCCB654A439711A8FC0C35F71AFC2F36772FB33F748B00C49DCC",
+        "result_sha256": "2F3C2D9FBEDAB78860ADB305566E3FBF85FC3F712209DCF663FAB06980BA78CA",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "game-menu",
+        "at_utc": "2026-11-08T21:39:49.5510365Z",
+        "png_sha256": "F0A7DAF5525FD4B5DEC5EF2839F7390EA369398AC9AF8DA81AD6F90D681BB804",
+        "result_sha256": "30EA87C79BFB6F507D3089D04B422DDF038D1C2E035FD814B31C120E84F333E6",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "intro-dismissed",
+        "at_utc": "2026-11-08T21:34:58.1775341Z",
+        "png_sha256": "0DE66B0F65EBADAF4C8FEE9A51A637D849F96EB3160992231B1DF54E5A76D064",
+        "result_sha256": "5246815527A0D6C9C52A6C27E748380C332A89F580CDB0F1C465CD631410DACD",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "library-closed",
+        "at_utc": "2026-11-08T21:39:18.1476480Z",
+        "png_sha256": "FDBEAA2936F44B3A3B5D8C3C23E02C64C39A089C13CC3AD61B5794BFC20C6F48",
+        "result_sha256": "37765D5E1949901ECAE5D7488FB2E5FB90AE5CB82ECFD696C4C1576880A0B742",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "library-open",
+        "at_utc": "2026-11-08T21:35:14.5696177Z",
+        "png_sha256": "0D7784CBD90B58DFAD94197405547B4EFC11C0D676C3A07C122F2A7F92D9BC5A",
+        "result_sha256": "6AA914EF36AFEEDB188DCBCA989733465D53D2AD1DB1448ABC88B123C063D5AC",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "loaded-map-before-input",
+        "at_utc": "2026-11-08T21:34:44.5901444Z",
+        "png_sha256": "34723B84F4FDBAD5E5139C61B2BC96A1177C2562A991F23FF43653D764A3B115",
+        "result_sha256": "9F4DA59BA4593F6FE9F200424349B5C9951CD10B8FABF5E20B7284ABB939A7C3",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "queue-view",
+        "at_utc": "2026-11-08T21:36:33.3779502Z",
+        "png_sha256": "944945B60EDE9A5B4889029E1FEE38406876AEA62A4B7FF0C6CA0E15967D8925",
+        "result_sha256": "312D3DF1ADE9FC34452950621B7AB53F622077D5A0C3AB07877099E42ED6FBE9",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "research-akku-filtered",
+        "at_utc": "2026-11-08T21:35:50.9729629Z",
+        "png_sha256": "B297D9CB3E09910ECC919196152C5B30CFFBBB82C95D3D2B46C5B716375CC837",
+        "result_sha256": "11D2D61E8B318934559B7260B80FE666C2B6AB0A6BB3A9C286103347EC73EBFD",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "research-query-focused",
+        "at_utc": "2026-11-08T21:35:32.1821418Z",
+        "png_sha256": "E56350C976F4F3BD7D66CDAD4B5CA7DC92399C936A4CED7823530C2BB5448D52",
+        "result_sha256": "36ACD9E7246D3944224F489C6B86BA1B20AE754F566B8972D6B9BB327BEAC02C",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "research-return",
+        "at_utc": "2026-11-08T21:38:48.1220276Z",
+        "png_sha256": "F411B6915D6042EC292A0DCE12293A66916DBAF67B5FFA54D9BBBED6B19F3F6B",
+        "result_sha256": "0309ED35FAB72C872F70195848713CE37347BD79EDE7E2987C0C6B82508F10EA",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "settings-baseline",
+        "at_utc": "2026-11-08T21:37:25.1127675Z",
+        "png_sha256": "25E1C8C2666428BF6837557BCE7F82242EF0996D6B80DB7BD5B332457B2CF32D",
+        "result_sha256": "C2BBD2E7DC632DB4ABFA1AA4EB68D1612C39758E244FD282396FAC0F9F4E212E",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "settings-brems-filtered",
+        "at_utc": "2026-11-08T21:38:20.2977288Z",
+        "png_sha256": "2C912407333C55871AA10F023C0DED1010AF2CFB6233D3C794FB7AA90C66527E",
+        "result_sha256": "D9A26DD37B31840C8EFA24888AD3ECDEC585C9AD89E49E51241E79F1C463F6D4",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "settings-query-focused",
+        "at_utc": "2026-11-08T21:37:51.8540803Z",
+        "png_sha256": "EC00B24DABBA67842601DDC3B8623DA356746C2E95DAE5D249A79DA8E992B317",
+        "result_sha256": "2CE275689513671ECE3BACEACD825AC44A747FCCC04E6866232A9218E68C23EF",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "unsaved-confirmation",
+        "at_utc": "2026-11-08T21:40:22.1449609Z",
+        "png_sha256": "82DFB3C9C3876D7476502300FD88031D26AE38B9FE3C97F7FEF11F09DDF3BD09",
+        "result_sha256": "004A0312F1A127B551FB19FA50A7BC065D7F3A3F7EEE6F19FB56BCB8D3FE55B6",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "worker-battery-description",
+        "at_utc": "2026-11-08T21:36:12.1521356Z",
+        "png_sha256": "4386432A3D7B2CD33DD722AD9DBD4F8E7A619912F85098C7700C277F71164A7A",
+        "result_sha256": "2904144FFB6E7871089EE9A5AA2729B07C069A6C9828CEE0DB6DB2C3AEDDA20E",
+        "actual_png_viewed": true
+      }
+    ],
+    "actions_in_actual_order": [
+      {
+        "label": "dismiss-intro",
+        "at_utc": "2026-11-08T21:34:58.092828+00:00",
+        "receipt_sha256": "08E15C00A1E0A726D5634D4929C75E6C6BE80CC9FC941911887E94085BB14C0D",
+        "action": "tab",
+        "text": null,
+        "coordinates": [
+          null,
+          null
+        ],
+        "capture": "loaded-map-before-input",
+        "capture_age_seconds_to_binding": 11.464,
+        "input_events_sent": 2
+      },
+      {
+        "label": "open-library-shortcut",
+        "at_utc": "2026-11-08T21:35:14.484343+00:00",
+        "receipt_sha256": "B67DD0DAE90BFF40EC9188127382B1F2D08A648C1CD299331CF232A9578AD234",
+        "action": "click",
+        "text": null,
+        "coordinates": [
+          1628,
+          1355
+        ],
+        "capture": "intro-dismissed",
+        "capture_age_seconds_to_binding": 14.31,
+        "input_events_sent": 2
+      },
+      {
+        "label": "focus-research-query",
+        "at_utc": "2026-11-08T21:35:32.095740+00:00",
+        "receipt_sha256": "5CCDFBFD6D88B0381AC6C8294D6D43AF9024E75AB881F7EAD7BBF38EFF569879",
+        "action": "click",
+        "text": null,
+        "coordinates": [
+          1010,
+          294
+        ],
+        "capture": "library-open",
+        "capture_age_seconds_to_binding": 15.947,
+        "input_events_sent": 2
+      },
+      {
+        "label": "type-research-akku",
+        "at_utc": "2026-11-08T21:35:50.889544+00:00",
+        "receipt_sha256": "C985E95AE7990930546089F386BB07A16BB937E6A9BEC99FC2D5DD1533770327",
+        "action": "text",
+        "text": "Akku",
+        "coordinates": [
+          null,
+          null
+        ],
+        "capture": "research-query-focused",
+        "capture_age_seconds_to_binding": 16.987,
+        "input_events_sent": 8
+      },
+      {
+        "label": "select-worker-battery",
+        "at_utc": "2026-11-08T21:36:12.067048+00:00",
+        "receipt_sha256": "091FA4BD3B267F5C456B9DBCE0572ACD4441DE9E7FEB9E43CDB2B8FDBE39FD98",
+        "action": "click",
+        "text": null,
+        "coordinates": [
+          900,
+          649
+        ],
+        "capture": "research-akku-filtered",
+        "capture_age_seconds_to_binding": 19.446,
+        "input_events_sent": 2
+      },
+      {
+        "label": "open-queue-tab",
+        "at_utc": "2026-11-08T21:36:33.295871+00:00",
+        "receipt_sha256": "1F396B003772C91DE2FB6CA7D010B48E9F4896EE5A296F34C6B8DE423D3C7292",
+        "action": "click",
+        "text": null,
+        "coordinates": [
+          840,
+          208
+        ],
+        "capture": "worker-battery-description",
+        "capture_age_seconds_to_binding": 19.619,
+        "input_events_sent": 2
+      },
+      {
+        "label": "open-debug-tab",
+        "at_utc": "2026-11-08T21:36:57.086164+00:00",
+        "receipt_sha256": "D16476382522ADA0F10A0F3D5527277106F29D8F8B16FD8F63E1227586AC1E95",
+        "action": "click",
+        "text": null,
+        "coordinates": [
+          1081,
+          208
+        ],
+        "capture": "queue-view",
+        "capture_age_seconds_to_binding": 22.217,
+        "input_events_sent": 2
+      },
+      {
+        "label": "open-settings-tab",
+        "at_utc": "2026-11-08T21:37:25.030418+00:00",
+        "receipt_sha256": "20EE8305482B7221903F95C548D7CD425F1335D153D4B7E9DA4F453E07E6AD15",
+        "action": "click",
+        "text": null,
+        "coordinates": [
+          966,
+          208
+        ],
+        "capture": "debug-selected-identity",
+        "capture_age_seconds_to_binding": 26.316,
+        "input_events_sent": 2
+      },
+      {
+        "label": "focus-settings-query",
+        "at_utc": "2026-11-08T21:37:51.765236+00:00",
+        "receipt_sha256": "9D2D157CEFFD34FDD7C1A40D2893362CC710F29461320271E520B30A185E8A71",
+        "action": "click",
+        "text": null,
+        "coordinates": [
+          1010,
+          298
+        ],
+        "capture": "settings-baseline",
+        "capture_age_seconds_to_binding": 25.148,
+        "input_events_sent": 2
+      },
+      {
+        "label": "type-settings-brems",
+        "at_utc": "2026-11-08T21:38:20.214034+00:00",
+        "receipt_sha256": "B0084F03A1A6A47CF96C2FFFD5B6E291B4DBF3BAE348F28208A34AB55EC81679",
+        "action": "text",
+        "text": "Brems",
+        "coordinates": [
+          null,
+          null
+        ],
+        "capture": "settings-query-focused",
+        "capture_age_seconds_to_binding": 26.562,
+        "input_events_sent": 10
+      },
+      {
+        "label": "return-research-tab",
+        "at_utc": "2026-11-08T21:38:48.039831+00:00",
+        "receipt_sha256": "D1D1EE5E0EE3298FBDF26BCF3731D8C41F320C3938E56E37C644FA9239D7B926",
+        "action": "click",
+        "text": null,
+        "coordinates": [
+          720,
+          208
+        ],
+        "capture": "settings-brems-filtered",
+        "capture_age_seconds_to_binding": 26.198,
+        "input_events_sent": 2
+      },
+      {
+        "label": "close-library",
+        "at_utc": "2026-11-08T21:39:18.065584+00:00",
+        "receipt_sha256": "88993B9EB5E7F891562246C381CC6CE0397BBFF0B13E1D3D94C9C899B4F4B235",
+        "action": "click",
+        "text": null,
+        "coordinates": [
+          1887,
+          148
+        ],
+        "capture": "research-return",
+        "capture_age_seconds_to_binding": 28.429,
+        "input_events_sent": 2
+      },
+      {
+        "label": "open-game-menu",
+        "at_utc": "2026-11-08T21:39:49.469975+00:00",
+        "receipt_sha256": "99BDEEC0D24AD174660D9F5BFAFC772823509574BA7D62CF2F3630830CE0FDB8",
+        "action": "escape",
+        "text": null,
+        "coordinates": [
+          null,
+          null
+        ],
+        "capture": "library-closed",
+        "capture_age_seconds_to_binding": 29.617,
+        "input_events_sent": 2
+      },
+      {
+        "label": "exit-map",
+        "at_utc": "2026-11-08T21:40:22.061081+00:00",
+        "receipt_sha256": "3557C712F6C12EC1357540AE8E1471AE6E772E4E17B97E2F28C04A7EBFF84258",
+        "action": "click",
+        "text": null,
+        "coordinates": [
+          1146,
+          914
+        ],
+        "capture": "game-menu",
+        "capture_age_seconds_to_binding": 31.048,
+        "input_events_sent": 2
+      },
+      {
+        "label": "quit-main-menu",
+        "at_utc": "2026-11-08T21:40:59.448717+00:00",
+        "receipt_sha256": "83D07AF3CE275943B1E347A79ACE30D79DCB62D41BCE6F2C9FAC6805134A36C9",
+        "action": "click",
+        "text": null,
+        "coordinates": [
+          1146,
+          946
+        ],
+        "capture": "unsaved-confirmation",
+        "capture_age_seconds_to_binding": 35.748,
+        "input_events_sent": 2
+      }
+    ]
+  },
+  "custody": {
+    "manifest": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library511-retention-de-r04-native-custody-r01\\MANIFEST.json",
+    "manifest_sha256": "88B08BF72E32DA063AF5AFB5B5EF85C67B7C0F08623479AC8DF582BBFCA41805",
+    "files": 157,
+    "bytes": 77732694,
+    "manifest_aggregate_equals_sum": true,
+    "all157copies_and_origins_independently_rehashed": true,
+    "mismatches": 0,
+    "includes": "All DE native output/PNGs/action receipts/resources/logs, exact plan/live-owner/root observations and staged profile/config/seed/ordinary autosaves. Shared helper/source package pins remain bound by the exact plan and prior admissions and were rehashed as15inputs; no missing helper copy is relabeled as a new native observation.",
+    "autosaves": [
+      {
+        "path": "staged-inputs/_autosave1.zip",
+        "origin": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retention-inputs-de-r04\\_autosave1.zip",
+        "bytes": 3279618,
+        "sha256": "74843DE3C65E4DBDAB01316C504E741526DC81C127FDFAF625B86F43C627A4F9"
+      },
+      {
+        "path": "staged-inputs/_autosave2.zip",
+        "origin": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retention-inputs-de-r04\\_autosave2.zip",
+        "bytes": 3208165,
+        "sha256": "7F5D8D7DA39A49F0E7201EEED919E2DA058A9321D7726CF98A6C55CB3B270B62"
+      },
+      {
+        "path": "staged-inputs/_autosave3.zip",
+        "origin": "D:\\Projects\\Factorio\\.task-builds\\library-selection-fix-r01\\build\\tmp\\library511-retention-inputs-de-r04\\_autosave3.zip",
+        "bytes": 3350549,
+        "sha256": "3506A95C5C9CBD6726CBC3E553C906104431163ADA428C67E9A2D6C96DB7851C"
+      }
+    ],
+    "all3autosave_copy_and_origin_closed_ZIP_CRC_pass": true
+  },
+  "restoration": {
+    "DE_completion_owner_before_after_equal": true,
+    "unchanged_pinned_C2F_finally_asserts_each_original_control": true,
+    "mod_list_sha256": "48C46678CC8369DB15CC12CDFB23309EB076DC4433B76E9426083D0074BCCC91",
+    "mod_settings_sha256": "667897C514B66298A1E400058B65EA14EB36322D88864B98AE38E4C9B81387BC",
+    "active_profile_and_temporary_MIR_archive_absent_in_DE_completion_receipt": true,
+    "factorio_zero_at_DE_completion_receipt": true,
+    "original_seed_copied_seed_and_fixed_package_rehashed_unchanged": true,
+    "live_library_limit": "Root has begun separately admitted serial EN. This review does not assert current global Factorio0 or compare current active EN library controls with DE original state. No EN stage/root read or mutation occurred."
+  },
+  "preserved_prior_results": {
+    "original7441_DE_adverse_report_sha256": "15D9A60FD1103CF0D042CFFB436F4F72CC667C141FFC0024457BCC09504420A7",
+    "original7441_identity": "573/4bc/7441 selected worker was replaced on return; remains an actual failed original route, not renamed current pass.",
+    "corrected_DE_r02_timeout_custody_sha256": "BA1B935E52C6556963DF72D3EFBEE1FF432B7FCD2EFFE99C55595C7013535DB7",
+    "r02_timeout_limit": "1200s operator/context timeout before Settings/return; prior partial observations retained and not product failure/pass.",
+    "r03_refused_plan_sha256": "F2BCF3547F0C0AE57E80ED315D3656BD947DD5E7104C13BB1D1AD8DF9E9AED6A",
+    "r03_refusal_limit": "Cross-root config/seed locator identified before native; unchanged packet retained.",
+    "current_pass_is_new_actual_execution": true
+  },
+  "limits": [
+    "Exact single-client German corrected-selection route only. Complementary EN is a separate active/result scope and not accepted by this report.",
+    "No full Library/filter/export/foreign-GUI/personal-save/rejoin, simultaneous clients/multiplayer, broad historical upgrade, gameplay completion, performance or stable/release verdict.",
+    "No public profile/API validation/export was called by reviewer; root observation pending-review field stays preserved verbatim in custody rather than rewritten.",
+    "Reviewer executed no native/tests/builds or source/actor/controller edits. Required bounded workspace health read-only scan ran before this report (statusattention); no cleanup."
+  ]
+}

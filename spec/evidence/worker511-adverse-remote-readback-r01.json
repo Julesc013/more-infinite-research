@@ -1,0 +1,44 @@
+{
+  "kind": "RemoteExactOriginalBodyReadbackV1",
+  "repo": "Julesc013/scratchpad",
+  "commit": "dcf94e8449a791ebf6f47056688ee1f62c3da159",
+  "all_exact": true,
+  "files": [
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/worker-recovery-r02-r04-originals/.gitattributes",
+      "bytes": 12,
+      "sha256": "DC867BFA424D5804F4B790B2901BB95C32DF7BB3341B3AAC822DFC76751093FE",
+      "git_blob": "57cdc50305d07f35133f80962644debd6b846bf3"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/worker-recovery-r02-r04-originals/MANIFEST.json",
+      "bytes": 156782,
+      "sha256": "B3C96A0A56B670ACFB5F6DFE3F69524B4FAA4E186E37EAD38BEB64A345E448EF",
+      "git_blob": "016c62cdf2e014759d3142fab034cbe66b71bfd7"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/worker-recovery-r02-r04-originals/original-bodies.json.gz",
+      "bytes": 14496419,
+      "sha256": "98BDE837D999A456FFB0C27EC24D9A9362A085594B5D80A94C393A4E53508CAB",
+      "git_blob": "eed7ea998efa5a2b3a99b3a8d9f4392453846e85"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/combined-sif-worker-output-r01/.gitattributes",
+      "bytes": 12,
+      "sha256": "DC867BFA424D5804F4B790B2901BB95C32DF7BB3341B3AAC822DFC76751093FE",
+      "git_blob": "57cdc50305d07f35133f80962644debd6b846bf3"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/combined-sif-worker-output-r01/MANIFEST.json",
+      "bytes": 6746,
+      "sha256": "9BA3AF17966CDDC36A5E6CD6FCC41374B04DBADDC4EC4B5BDC190BC007E224B7",
+      "git_blob": "dcaebecb2c0bed3a441cfed842eacf14474a6337"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/combined-sif-worker-output-r01/original-bodies.json.gz",
+      "bytes": 2964823,
+      "sha256": "24BFA5D559028255B2EF774BE3666DE283C0743BCEADD66A61C2526C1BB00372",
+      "git_blob": "8c23b057a5a10d112589536ef1e875c309c51f53"
+    }
+  ]
+}

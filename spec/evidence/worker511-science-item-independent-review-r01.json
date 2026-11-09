@@ -1,0 +1,214 @@
+{
+  "kind": "MIR511WorkerScienceItemIndependentSourceReviewV1",
+  "observed_at_utc": "2026-11-09T06:10:03.479728+00:00",
+  "verdict": "source-approved-for-new-freeze-and-bounded-root-admitted-native-qualification",
+  "findings": [],
+  "reviewed_head": "2ac34dcc33f3ea34084a540deeb4fe6028022c41",
+  "reviewed_tree": "9c8afa1ff43686c8d4f3153e195f76b2c0e3d270",
+  "source_tree": "d840d03890b3809646fe9b324bf62c7da91993ab",
+  "parent": "746212b2d0f70cd42e002e4abcb155d3fc368099",
+  "remote_readback": "Read-only GitHub git-commit API under expected Windows user returned exact reviewed tree9c8afa1ff43686c8d4f3153e195f76b2c0e3d270. Local Git confirms only source/data-final-fixes.lua and tests/test_worker_storage_continuation.py differ from parent.",
+  "diagnosis": "Old b916 finite-provider availability required every authored default worker science under data.raw.tool. Exact2.1 declarations instead use item, including SpaceAge electromagnetic science. A valid finite provider therefore selected the uninvested placeholder. Its different unit/science/prerequisite fingerprint cannot accept an invested full Base/SA prepared holder; the runtime guard correctly refuses rather than guessing.",
+  "exact_core_basis": [
+    {
+      "engine_line": "2.0",
+      "package": "base",
+      "file": {
+        "path": "D:\\Games\\Factorio\\2.0\\data\\base\\prototypes\\item.lua",
+        "bytes": 151832,
+        "sha256": "E992959C0B306DADE7B40156212890CE82F3A2A8B941667FCF3A0384A82F9B15"
+      },
+      "declarations": [
+        {
+          "name": "automation-science-pack",
+          "type": "tool",
+          "line": 684
+        },
+        {
+          "name": "logistic-science-pack",
+          "type": "tool",
+          "line": 703
+        },
+        {
+          "name": "chemical-science-pack",
+          "type": "tool",
+          "line": 1390
+        },
+        {
+          "name": "production-science-pack",
+          "type": "tool",
+          "line": 1428
+        },
+        {
+          "name": "utility-science-pack",
+          "type": "tool",
+          "line": 1447
+        }
+      ]
+    },
+    {
+      "engine_line": "2.0",
+      "package": "space-age",
+      "file": {
+        "path": "D:\\Games\\Factorio\\2.0\\data\\space-age\\prototypes\\item.lua",
+        "bytes": 61273,
+        "sha256": "09B025F12A1BD608EAD0F05E4FA1718DC2202E72319AAE0EDE26478121F78E51"
+      },
+      "declarations": [
+        {
+          "name": "electromagnetic-science-pack",
+          "type": "tool",
+          "line": 92
+        }
+      ]
+    },
+    {
+      "engine_line": "2.1",
+      "package": "base",
+      "file": {
+        "path": "D:\\Games\\Factorio\\2.1\\data\\base\\prototypes\\item.lua",
+        "bytes": 151999,
+        "sha256": "F15E0DBBF839CB8DAE9812DEFEAAC97AB81EC5433F663841E2833F82BAC542A6"
+      },
+      "declarations": [
+        {
+          "name": "automation-science-pack",
+          "type": "item",
+          "line": 685
+        },
+        {
+          "name": "logistic-science-pack",
+          "type": "item",
+          "line": 700
+        },
+        {
+          "name": "chemical-science-pack",
+          "type": "item",
+          "line": 1383
+        },
+        {
+          "name": "production-science-pack",
+          "type": "item",
+          "line": 1413
+        },
+        {
+          "name": "utility-science-pack",
+          "type": "item",
+          "line": 1428
+        }
+      ]
+    },
+    {
+      "engine_line": "2.1",
+      "package": "space-age",
+      "file": {
+        "path": "D:\\Games\\Factorio\\2.1\\data\\space-age\\prototypes\\item.lua",
+        "bytes": 61081,
+        "sha256": "49AE9C217352322D8AFB0A810131B5113C9B0A694714BA4F36BA78AB6CE20680"
+      },
+      "declarations": [
+        {
+          "name": "electromagnetic-science-pack",
+          "type": "item",
+          "line": 85
+        }
+      ]
+    }
+  ],
+  "source_review": {
+    "delta": "Six-line local change inside the already bounded finite_available loop: find each exact authored ingredient under tool OR item. No new discovery, traversal, prototype mutation or runtime fallback.",
+    "bounds_and_negative_guards": "Prerequisite availability, missing-stream/default-emission eligibility, authored-only holder construction, all Generator preflights and runtime exact custody/shape/history/fingerprint/force/queue/cap guards are unchanged. Missing in both item classes remains unavailable; required catalogue ingredient absence still refuses0writes, and missing default prerequisite still yields only an empty uninvested holder. Foreign provider prototypes remain untouched.",
+    "independence": "Expected full holder is the unchanged frozen published Base worker row, with authored private identity and SA addition. It is not derived from the new constructor output. F210 test moves every raw.tool entry into raw.item with type=item and removes raw.tool; all Base/SA x enabledfalse/true combinations are checked. F200 Tool cases remain covered.",
+    "unchanged_paths": "All source/runtime, source/research, source/compatibility, targets, SDK, tooling/scripts/CI, frozen fixtures and host driver are byte-identical to parent. Only the data-final availability predicate changes production behavior."
+  },
+  "independent_checks": {
+    "materialized_plan": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker511-science-item-independent-host-plan-r01.json",
+      "bytes": 15883,
+      "sha256": "41BDEF630EFDE93EC41DAC977D979C66774EE2D2E279CAE13F27DDFE82507FFE"
+    },
+    "pinned_Lua52": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir421-lua-runtime\\lupa\\lua52.cp314-win_amd64.pyd",
+      "bytes": 507904,
+      "sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899"
+    },
+    "continuation_module": {
+      "tests": 17,
+      "passed": 17,
+      "log": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker511-science-item-independent-continuation-r01.log",
+        "bytes": 3332,
+        "sha256": "5EF853668608A25FC18FE9A096BFC7C42D313DDDCD62C6CE1B6E5F85150AB3D4"
+      }
+    },
+    "whole_output_comparison": {
+      "cases": 7,
+      "status": "independently reproduced old/new entire emitted rows and transport equality, with exact canonical hashes matching preserved receipt",
+      "definition_review": "No filtering of emitted rows; each case asserts transport.worker_storage=nil. F210 shape is genuine item/no-tool. All3 native-credit settings plus4 Base/SA defaults included.",
+      "receipt": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker511-science-item-source-r01-controller\\unaffected-output-comparison.json",
+        "bytes": 2687,
+        "sha256": "CFF4CAB09A08CCC2EFA5193CD4FE93D0477BBDF0984DF3601321E9979E9932A7"
+      },
+      "comparison_program": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker511-science-item-source-r01-controller\\compare-unaffected-data.py",
+        "bytes": 4740,
+        "sha256": "40B8D744C986C40D9950BEEC33B1854A15B3720F3B44F1193A2B8BDF3FC6EC08"
+      }
+    },
+    "broader_author_controls": "Author reports94 pass/1 existing custody skip across continuation/Generator/Secretas/K2/SE; not rerun or claimed as independent counts here.",
+    "red_history": "Corrected negative fixture redr02 retains4 F210 failures/no errors; green17. Initial redr01 additionally expected a placeholder from a globally missing required pack; Generator correctly refused. Both logs remain preserved, and no production guard was weakened to satisfy that invalid first expectation.",
+    "red_r01": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker511-science-item-source-r01-controller\\unfixed-worker-continuation.log",
+      "bytes": 10171,
+      "sha256": "ED0041319A563031D6430237D41AAA1270363AF64EC182FCF517999AA67D5384"
+    },
+    "red_r02": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker511-science-item-source-r01-controller\\unfixed-worker-continuation-r02.log",
+      "bytes": 8423,
+      "sha256": "8C8FB5359D651514683A197869DAEC430D757BFCCFE12E9E73A0A2682D82376D"
+    },
+    "green_author": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker511-science-item-source-r01-controller\\fixed-worker-continuation.log",
+      "bytes": 3332,
+      "sha256": "0A720631C30A84D61823867B8C64E163CB80FC47CD171B8307F13C06892AFD45"
+    }
+  },
+  "credit33_consumed_input_applicability": {
+    "original_execution": "cabf94ef/sourceb916; exact original packages/controllers/fixtures/engines/saves and33 process receipts remain named and immutable. No new-source native execution or relabeling is claimed.",
+    "source_only_six_jobs": "Three NoMIR and three legal10%-paid510 source jobs do not load the changed candidate package. Their exact archived source observations and protected saves remain applicable unchanged. Any future reuse must preserve the existing exact source receipt/hash/actor admission protocol; no silent binding bypass is authorized.",
+    "candidate_nine_jobs": "Three fresh, three first-add and three paid-upgrade jobs use Base closures containing no finite worker route. The sole changed predicate is inside if finite_available, which those closures do not enter. The three native credit settings reproduce complete old/new prototype emission and transport, and all runtime modules remain byte-identical.",
+    "qualified_verdict": "Existing33 credit evidence is applicable to the named unchanged Base credit behavior by this explicit consumed-path/whole-output analysis. This is not a statement that new package bytes equal old package bytes or that33 engines ran on d840. No automatic33 rerun is required by this bounded change.",
+    "new_freeze_condition": "Root must freeze exact new committed packages and verify all other relevant package members, target definitions, settings/fixture/scenario/controller bytes and engine/upstream inputs remain unchanged before using this applicability. A changed relevant member or profile widens affected coverage under VER-06.",
+    "original_result_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\credit511-native-independent-result-review-r01.json",
+      "bytes": 12327,
+      "sha256": "0428C6D50D7C363A84E80E2E93C1780754F327AA87BA4C29528B2C2157051759"
+    }
+  },
+  "affected_native_gate": {
+    "new_combined_output": "The finite-provider branch IS consumed by SIF+Cargo; the new full private holder and its science binding differ from b916 placeholder. Repeat the one-engine combined data output check on the exact new freeze with independent full Base/SA private work-contract expectation and preserved finite/public output. Do not revise or relabel the old87D result.",
+    "new_worker7": "Rebind all seven pending worker command/preparation/provider/retirement/save/cold endpoints to the new exact source/package/controller admission. Base/SA full prepared source must match target full holder fingerprint; strict unavailable-input and foreign/queued/current/suspended/cap/history opponents remain. No b916 worker dispatch is authorized by this review.",
+    "permission_scope": "Source is accepted for Root to freeze/rebind and independently admit those bounded native cases. Reviewer starts no native process and does not modify the author pending packet. Required CI, gameplay qualification, reporter saves and release/stable gates remain separate."
+  },
+  "preserved_old_scopes": {
+    "source_b916_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-independent-source-review-r02.json",
+      "bytes": 11769,
+      "sha256": "D8845D66807A8A99CDBFF3FD7E91065AB45E4907BA167230D1EA47076A143069"
+    },
+    "combined_b916_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\sif-worker511-combined-independent-review-r01.json",
+      "bytes": 7571,
+      "sha256": "87D0DBC9604439676A068898FAB9E64EFFA0A003D36E239FE530E0BDB2791BD7"
+    },
+    "explanation": "Old b916 credit and combined-data passes retain their original input identities and scoped verdicts. The combined-data pass explicitly did not qualify worker recovery; it does not establish the corrected new private-holder contract. All original adverse/invalid-preparation receipts remain."
+  },
+  "native_runs": 0,
+  "production_edits": false,
+  "test_edits": false,
+  "controller_edits": false,
+  "library_mutation": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}
