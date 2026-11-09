@@ -1,0 +1,1 @@
+{"name":"mir-fixture-native-owner-fallback","version":"0.2.0","title":"Private uncovered native-owner fallback check","author":"MIR maintainers","factorio_version":"2.1","dependencies":["base = 2.1.23","space-age = 2.1.23","more-infinite-research = 5.0.21011"]}
