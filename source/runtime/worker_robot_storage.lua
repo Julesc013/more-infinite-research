@@ -147,6 +147,7 @@ end
 
 local recovery = require("research.worker_storage_recovery")
 local caps = require("runtime.caps")
+local target = require("platform.target")
 local pending = false
 local owned_queue_force
 local selected_cap, selected_enabled = 0, true
@@ -440,8 +441,8 @@ local function unchanged_unrecorded_secretas(event, route)
     if not (f200 or f210) or route.owned ~= true or event.mod_startup_settings_changed ~= false
         or mir.new_version ~= active[MIR] or type(mir.new_version) ~= "string"
         or type(active.base) ~= "string"
-        or not (f200 and mir.new_version:match("^5%.0%.200%d%d$") and active.base:match("^2%.0%.%d+$")
-          or f210 and mir.new_version:match("^5%.0%.210%d%d$") and active.base:match("^2%.1%.%d+$")) then
+        or not (f200 and target.id == "f200" and mir.new_version:match("^5%.0%.200%d%d$") and active.base:match("^2%.0%.%d+$")
+          or f210 and target.id == "f210" and mir.new_version:match("^5%.0%.210%d%d$") and active.base:match("^2%.1%.%d+$")) then
       return false
     end
     for name, change in pairs(changes) do

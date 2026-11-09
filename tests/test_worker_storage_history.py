@@ -283,6 +283,7 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
             for patch in ("09", "10", "11"):
                 with self.subTest(prefix=prefix, patch=patch):
                     self.setUp()
+                    self.lua = self.sdk_world("f200" if prefix == "200" else "f210")
                     self.lua.globals().old_version = "5.0." + prefix + patch
                     self.lua.globals().new_version = "5.0." + prefix + "12"
                     self.lua.globals().later_version = "5.0." + prefix + "13"
@@ -313,7 +314,7 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
     def test_new_known_secretas_readers_require_old_profile_provenance_before_writes(self):
         for patch in ("09", "11"):
             for opponent in ("startup", "unknown-startup", "base-change", "added", "removed", "updated",
-                             "missing-secretas", "foreign-tail", "endpoint", "wrong-new", "wrong-edition", "unknown-origin"):
+                             "missing-secretas", "foreign-tail", "endpoint", "wrong-new", "wrong-edition", "wrong-target", "unknown-origin"):
                 with self.subTest(patch=patch, opponent=opponent):
                     self.setUp()
                     self.lua.globals().old_version = "5.0.210" + patch
@@ -337,6 +338,7 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
                         script.active_mods['more-infinite-research']='5.0.20012'
                         e.mod_changes['more-infinite-research'].new_version='5.0.20012'
                       end
+                      if opponent=='wrong-target' then require('platform.target').id='f200' end
                       if opponent=='unknown-origin' then e.mod_changes['more-infinite-research'].old_version='5.0.21008' end
                       writes=0;local ok=pcall(history.preflight,e,route)
                       assert(not ok and writes==0 and storage.mir_worker_storage_route==nil,'unproven old route admitted')
