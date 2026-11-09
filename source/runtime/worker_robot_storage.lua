@@ -281,7 +281,13 @@ local function snapshot(force, id)
     saved[value.name] = value.saved_progress
   end
   local current = force.current_research and force.current_research.name or nil
-  if current ~= queue[1] or not progress(force.research_progress) then recover_error("inconsistent native current/queue frame") end
+  if current ~= queue[1] or not progress(force.research_progress) then
+    log(("[MIR_WORKER_FRAME_DIAGNOSTIC] force=%s current=%s first=%s length=%d progress=%s progress_type=%s level=%s researched=%s current_mismatch=%s progress_valid=%s")
+      :format(tostring(force.name):sub(1,128), tostring(current):sub(1,128), tostring(queue[1]):sub(1,128), #queue,
+        tostring(force.research_progress):sub(1,128), type(force.research_progress), tostring(technology.level),
+        tostring(technology.researched), tostring(current ~= queue[1]), tostring(progress(force.research_progress))))
+    recover_error("inconsistent native current/queue frame")
+  end
   local next_level = technology.level + (technology.researched and 1 or 0)
   if next_level >= 4294967295 then recover_error("worker level has no preservable continuation") end
   if technology.researched and (occurrences > 0 or technology.saved_progress > 0) then
