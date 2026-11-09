@@ -264,6 +264,45 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
           for i=1,2 do history.on_load(provider_route(5));assert(storage.mir_worker_storage_route==state and writes==0)end
         ''')
 
+    def test_unknown_history_reports_actual_route_and_event_without_default_inference(self):
+        self.lua.execute(r'''
+          seed();add_provider(5);writes=0
+          local ok,message=pcall(history.preflight,{mod_startup_settings_changed=false,
+            mod_changes={['more-infinite-research']={old_version="5.0.21010",new_version="5.0.21012"},
+              ['planet-ferrum']={new_version="0.1.5"}}},provider_route(5))
+          assert(not ok and writes==0 and storage.mir_worker_storage_route==nil)
+          assert(message:find("technology=worker-robots-storage-6",1,true))
+          assert(message:find("previous_mir=5.0.21010",1,true) and message:find("new_mir=5.0.21012",1,true))
+          assert(message:find("startup_changed=false",1,true) and message:find("saved_route=absent",1,true))
+          assert(message:find("current_route=finite",1,true) and message:find("planet-ferrum=unknown->0.1.5",1,true))
+          assert(not message:find("technology=default",1,true))
+        ''')
+
+    def test_explicit_unprepared_route_reports_surviving_marker_without_recovery_writes(self):
+        self.lua.execute(r'''
+          history.on_init(nil);local saved=storage.mir_worker_storage_route;seed();add_provider(8);writes=0
+          local ok,message=pcall(history.preflight,{mod_startup_settings_changed=true,
+            mod_changes={secretas={new_version="1.0.38"}}},provider_route(8))
+          assert(not ok and writes==0 and storage.mir_worker_storage_route==saved)
+          assert(message:find("unprepared worker route changed",1,true))
+          assert(message:find("technology=worker-robots-storage-9",1,true))
+          assert(message:find("previous_mir=unchanged",1,true) and message:find("saved_route=default",1,true))
+          assert(message:find("current_route=finite",1,true) and message:find("startup_changed=true",1,true))
+        ''')
+
+    def test_unknown_history_context_stays_bounded_printable_and_does_not_gain_authority(self):
+        self.lua.execute(r'''
+          seed();add_provider(5);writes=0
+          local old=string.rep("a",95).."\195\169\0\n"..string.rep("z",500)
+          local ok,message=pcall(history.preflight,{mod_changes={
+            ['more-infinite-research']={old_version=old,new_version="5.0.21012"},
+            secretas={new_version="1.0.38\0\n"}}},provider_route(5))
+          assert(not ok and writes==0 and storage.mir_worker_storage_route==nil)
+          assert(not message:find("[%z\1-\31\127-\255]") and #message<4096)
+          assert(message:find("\\xC3",1,true) and message:find("\\x00",1,true))
+          assert(message:find("startup_changed=unknown",1,true))
+        ''')
+
     def test_prepared_default_accepts_named_finite_routes_without_public_grants(self):
         for last in (5, 8):
             with self.subTest(last=last):
