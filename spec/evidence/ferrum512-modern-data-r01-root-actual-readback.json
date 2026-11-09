@@ -1,0 +1,343 @@
+{
+  "kind": "Ferrum512ModernConciseRootActualReadbackV1",
+  "actual_observations": [
+    {
+      "family": "f210",
+      "stage": "with-mir",
+      "data": "build\\qualification\\ferrum512-f210-data-r01-controller\\native-captures\\with-mir\\write-data\\script-output\\data-raw-dump.json",
+      "selection": null,
+      "status": "observed-final-data-independent-readback-required",
+      "native_result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 3.727871,
+        "peak_working_set_bytes": 539189248,
+        "peak_sampled_private_bytes": 537165824,
+        "admission": {
+          "observed_at": "2026-11-09T14:03:05.5615845+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 15484108800,
+            "committed_bytes": 24680427520,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 93007749120,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 204664164352,
+            "total_bytes": 599395090432
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "prototype-capture-engine",
+          "admission_wait_seconds": 30,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.118,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-11-09T14:03:05.4440578+00:00",
+          "deadline_at": "2026-11-09T14:03:35.4440578+00:00",
+          "admission": {
+            "observed_at": "2026-11-09T14:03:05.5615845+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 15484108800,
+              "committed_bytes": 24680427520,
+              "commit_limit_bytes": 41293737984
+            },
+            "work_volume": {
+              "name": "D:\\",
+              "free_bytes": 93007749120,
+              "total_bytes": 1500099112960
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 204664164352,
+              "total_bytes": 599395090432
+            }
+          }
+        }
+      },
+      "storage6": {
+        "unit": {
+          "count_formula": "1518.75*1.5^(L-6)",
+          "time": 60,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "utility-science-pack",
+              1
+            ],
+            [
+              "ferrum-robotics-science-pack",
+              1
+            ],
+            [
+              "electromagnetic-science-pack",
+              1
+            ]
+          ]
+        },
+        "effects": [
+          {
+            "type": "worker-robot-storage",
+            "modifier": 1
+          }
+        ],
+        "prerequisites": [
+          "worker-robots-storage-4",
+          "worker-robots-storage-5",
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "utility-science-pack",
+          "electromagnetic-science-pack"
+        ],
+        "max_level": "infinite",
+        "all_7_sciences": true,
+        "robotics_present": true,
+        "labs": [
+          "lab",
+          "biolab"
+        ]
+      }
+    },
+    {
+      "family": "f200",
+      "stage": "upstream",
+      "data": "build\\qualification\\ferrum512-f200-data-r01-controller\\native-captures\\upstream\\write-data\\script-output\\data-raw-dump.json",
+      "selection": null,
+      "status": "observed-final-data-independent-readback-required",
+      "native_result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 3.867271,
+        "peak_working_set_bytes": 474763264,
+        "peak_sampled_private_bytes": 472248320,
+        "admission": {
+          "observed_at": "2026-11-09T14:03:20.0345082+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 15479050240,
+            "committed_bytes": 24681549824,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 92946317312,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 204661706752,
+            "total_bytes": 599395090432
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "prototype-capture-engine",
+          "admission_wait_seconds": 30,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.105,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-11-09T14:03:19.9295326+00:00",
+          "deadline_at": "2026-11-09T14:03:49.9295326+00:00",
+          "admission": {
+            "observed_at": "2026-11-09T14:03:20.0345082+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 15479050240,
+              "committed_bytes": 24681549824,
+              "commit_limit_bytes": 41293737984
+            },
+            "work_volume": {
+              "name": "D:\\",
+              "free_bytes": 92946317312,
+              "total_bytes": 1500099112960
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 204661706752,
+              "total_bytes": 599395090432
+            }
+          }
+        }
+      }
+    },
+    {
+      "family": "f200",
+      "stage": "with-mir",
+      "data": "build\\qualification\\ferrum512-f200-data-r01-controller\\native-captures\\with-mir\\write-data\\script-output\\data-raw-dump.json",
+      "selection": null,
+      "status": "observed-final-data-independent-readback-required",
+      "native_result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 3.617949,
+        "peak_working_set_bytes": 518295552,
+        "peak_sampled_private_bytes": 513249280,
+        "admission": {
+          "observed_at": "2026-11-09T14:03:29.1524106+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 15230689280,
+            "committed_bytes": 24954015744,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 92888367104,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 204661248000,
+            "total_bytes": 599395090432
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "prototype-capture-engine",
+          "admission_wait_seconds": 30,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.085,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-11-09T14:03:29.0675969+00:00",
+          "deadline_at": "2026-11-09T14:03:59.0675969+00:00",
+          "admission": {
+            "observed_at": "2026-11-09T14:03:29.1524106+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 15230689280,
+              "committed_bytes": 24954015744,
+              "commit_limit_bytes": 41293737984
+            },
+            "work_volume": {
+              "name": "D:\\",
+              "free_bytes": 92888367104,
+              "total_bytes": 1500099112960
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 204661248000,
+              "total_bytes": 599395090432
+            }
+          }
+        }
+      },
+      "storage6": {
+        "unit": {
+          "count_formula": "1518.75*1.5^(L-6)",
+          "time": 60,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "utility-science-pack",
+              1
+            ],
+            [
+              "ferrum-robotics-science-pack",
+              1
+            ],
+            [
+              "electromagnetic-science-pack",
+              1
+            ]
+          ]
+        },
+        "effects": [
+          {
+            "type": "worker-robot-storage",
+            "modifier": 1
+          }
+        ],
+        "prerequisites": [
+          "worker-robots-storage-4",
+          "worker-robots-storage-5",
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "utility-science-pack",
+          "electromagnetic-science-pack"
+        ],
+        "max_level": "infinite",
+        "all_7_sciences": true,
+        "robotics_present": true,
+        "labs": [
+          "lab",
+          "biolab"
+        ]
+      }
+    }
+  ],
+  "scope": "Final data readback only, not gameplay/save/runtime/UI/performance/stable."
+}
