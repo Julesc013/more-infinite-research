@@ -1,0 +1,58 @@
+{
+  "kind": "MIRCredit511PartialQualificationAndEntryBoundaryDecisionV1",
+  "observed_at_utc": "2026-11-09T05:07:42.890624+00:00",
+  "source_commit": "2206691b3731b179b85ab95cebc4f679c320e9c1",
+  "source_tree": "7a3bcfebc558eb978b40ab77414f01da550b0754",
+  "status": "original-partial-and-adverse-records-preserved-next-cumulative-normal-check-required",
+  "reviewed_receipts": {
+    "r04": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-mir-qualification-r01-controller\\r04\\EXECUTION-PARTIAL-FIRST-ADD-FAILURE-r01.json",
+      "bytes": 40942,
+      "sha256": "6617BB568318E0F507516C9BB4A7C41A8CE2139BF9F73866DFC651E7C555A409"
+    },
+    "A": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-mir-qualification-r01-controller\\r05-two-target-diagnostic\\jobs\\A-mir-first-add\\execute-custody.json",
+      "bytes": 38449,
+      "sha256": "92513FA20EC975434A1DE58CE4182A653C5434B696E0CAD5C95AF8F6CEE9A65F"
+    },
+    "B": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-mir-qualification-r01-controller\\r05-two-target-diagnostic\\jobs\\B-nomir-version-control\\execute-custody.json",
+      "bytes": 37368,
+      "sha256": "A7749E49279D5EEF434007EE9E11F98EC28330985B01BD4DCA825BDC125E2D8D"
+    },
+    "C": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-mir-qualification-r01-controller\\r06-init-boundary-diagnostic\\jobs\\C-bootstrap-init-boundary\\execute-custody.json",
+      "bytes": 42819,
+      "sha256": "5535DF0447C7116376B9738DC50A9E19E6C4C42ACD2FCFD8F16DCC587AB8C5B1"
+    }
+  },
+  "r04_scope": {
+    "native_processes": 5,
+    "completed_jobs": 2,
+    "candidate_endpoints": 1,
+    "observed": "F200 minimum fresh: five ordinary native-family lab completions, completed save and two cold loads. NoMIR predecessor: one ordinary Automation completion and protected source.",
+    "limits": "Not cumulative b916 source. First-add target failed before completion/save/colds; twelve jobs and twenty-eight scheduled processes never started. Repeated cold markers count no additional lab completions."
+  },
+  "diagnostic_observations": {
+    "A": "Exact MIR first add: saved manual mining/lab offsets become zero; all recorded foreign queue, current42%, detached27%, technology flags and progress remain equal. Startup-settings-changed true.",
+    "B": "NoMIR fixture-version-only change: offsets and all recorded foreign state survive; startup-settings-changed false.",
+    "C": "Read-only markers immediately before/after original MIR bootstrap on_init statements both observe zero offsets at tick6001, before the level configuration callback.",
+    "native_processes": 3,
+    "process_classification": "Three expected original-guard refusals: actual exit1, passed=false, no timeout; observation only, no save/reload/qualification pass."
+  },
+  "decision": {
+    "established": "Loss of manually assigned fixture offsets precedes the original MIR initializer body; its initialization operations do not cause the already-observed loss.",
+    "unresolved": "Engine prototype handling, Lua migrations or other earlier callbacks are not distinguished. The two r05 targets differ in startup-setting changes; do not conclude generic configuration resets.",
+    "next_case": "Use separately authored durable native foreign bonus technologies and retain exact flags/effects, aggregate bonuses, current/ordered queue and suspended work with no post-load reapplication. Preserve this manual-offset adverse; new fixture does not convert it into a pass.",
+    "candidate": "One cumulative b916 production source frozen at cabf94ef for remaining credit and worker native gates; test-only CI corrections must preserve it."
+  },
+  "original_body_custody": {
+    "records": 805,
+    "original_bytes": 27442688,
+    "gzip_path": "D:\\Projects\\Factorio\\.task-builds\\library511-native-evidence-private-r01\\evidence\\mir511-incident-native-blackglass-r01\\credit-qualification-adverses-r01\\original-bodies.json.gz",
+    "gzip_bytes": 18193857,
+    "gzip_sha256": "0F36B11BA0DF75BFF9E681B2D5BFDC3D2A99EF0E985617BC0F89D4BB3E646649"
+  },
+  "native_cumulative_qualification": false,
+  "release_qualification": false
+}
