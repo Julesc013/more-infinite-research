@@ -1,0 +1,66 @@
+{
+  "kind": "MIRAeroLibraryFixturePrerequisiteIndependentSourceReviewV1",
+  "reviewer": "Black Glass root, non-author of Aero branch",
+  "head": "719abd75e9611a591b1c5244e6573e96cfc89f7d",
+  "source_tree": "93d30a248e71e5248eeb87072c27332fe68b9137",
+  "verdict": "APPROVE bounded test-only checked integration; not native acceptance",
+  "facts": {
+    "all56original_test_methods_AST_unchanged": true,
+    "all27old_metadata_bytes_unchanged": true,
+    "all_prior_tuple_and_protocol_guards_retained": true,
+    "new_tuples_exact_511_only": true,
+    "no_player_source_changes": true
+  },
+  "ci": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-09T10:55:26Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Julesc013/more-infinite-research/actions/runs/42604745671/job/129117726401",
+      "name": "branch-policy",
+      "startedAt": "2026-11-09T10:54:58Z",
+      "status": "COMPLETED",
+      "workflowName": "Branch Policy"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-09T10:55:45Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Julesc013/more-infinite-research/actions/runs/42604745818/job/129117727255",
+      "name": "verification-plan",
+      "startedAt": "2026-11-09T10:54:57Z",
+      "status": "COMPLETED",
+      "workflowName": "MIR 5 host controls"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-09T10:55:51Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Julesc013/more-infinite-research/actions/runs/42604745818/job/129117726907",
+      "name": "native-tooling-controls",
+      "startedAt": "2026-11-09T10:54:57Z",
+      "status": "COMPLETED",
+      "workflowName": "MIR 5 host controls"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-09T11:09:21Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Julesc013/more-infinite-research/actions/runs/42604745818/job/129118101130",
+      "name": "host-controls",
+      "startedAt": "2026-11-09T10:55:47Z",
+      "status": "COMPLETED",
+      "workflowName": "MIR 5 host controls"
+    }
+  ],
+  "limits": [
+    "Old frozen fixture ZIPs retain original source/member/archive identities; never rebuild them silently.",
+    "0.3.9/0.4.4 do not admit12. A separate explicit12 binding is required after UI source is coherent.",
+    "Native real EN/DE lifecycle/exports and resource/window/save/controller admission remain required."
+  ],
+  "review_notes": [
+    "control.lua adds exact current511 flags/tuples and support context; no research assertion or event protocol is removed.",
+    "support-exports retains all click/role/command/rejoin/restart/file guards and exact closure, only selecting new exact tuples.",
+    "One copied wrong-version test opponent repeats10; nonblocking because exact tuple guards retain refusal, not evidence for a new supported tuple."
+  ]
+}
