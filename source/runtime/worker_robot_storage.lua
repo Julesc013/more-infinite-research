@@ -422,14 +422,33 @@ local function prepared_current(state, current)
   return frames
 end
 
--- Preserve an older, unchanged Secretas route without inventing a historical
--- marker. That special route had no schema1 writer in the published5.0.10.
+-- Published9/10 constructed the named Secretas9 route without its history.
+-- Published11 accepted unchanged10, but failed to persist that accepted fact.
+-- Only a proven unchanged route can be adopted; this recovers no clamped work.
 local function unchanged_unrecorded_secretas(event, route)
   if not route or route.technology ~= "worker-robots-storage-9" or #route.finite ~= 5
       or not script.active_mods.secretas then return false end
   local changes = event.mod_changes or {}
   local mir = changes[MIR]
-  if not mir or (mir.old_version ~= "5.0.21010" and mir.old_version ~= "5.0.20010") then return false end
+  if not mir then return false end
+  local old = mir.old_version
+  local published10 = old == "5.0.21010" or old == "5.0.20010"
+  if not published10 then
+    local active = script.active_mods
+    local f200 = old == "5.0.20009" or old == "5.0.20011"
+    local f210 = old == "5.0.21009" or old == "5.0.21011"
+    if not (f200 or f210) or route.owned ~= true or event.mod_startup_settings_changed ~= false
+        or mir.new_version ~= active[MIR] or type(mir.new_version) ~= "string"
+        or type(active.base) ~= "string"
+        or not (f200 and mir.new_version:match("^5%.0%.200%d%d$") and active.base:match("^2%.0%.%d+$")
+          or f210 and mir.new_version:match("^5%.0%.210%d%d$") and active.base:match("^2%.1%.%d+$")) then
+      return false
+    end
+    for name, change in pairs(changes) do
+      if name ~= MIR and (type(change) ~= "table" or change.old_version == nil
+          or change.old_version ~= change.new_version or change.new_version ~= active[name]) then return false end
+    end
+  end
   for name, change in pairs(changes) do
     if name ~= MIR and change.old_version ~= change.new_version then return false end
   end
@@ -454,7 +473,9 @@ function M.preflight(event, route)
     return {recovery=true, state=state, empty=empty_private()}
   end
   local plan
-  if state == nil and unchanged_unrecorded_secretas(event or {}, route) then plan = nil
+  if state == nil and unchanged_unrecorded_secretas(event or {}, route) then
+    checked({schema=1, route=route})
+    plan = {schema=1, route=copy(route)}
   else
     local ok, result = pcall(legacy_preflight, event, route)
     if not ok then

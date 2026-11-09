@@ -278,6 +278,70 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
           assert(not message:find("technology=default",1,true))
         ''')
 
+    def test_known_secretas_upgrade_records_route_and_survives_the_next_upgrade(self):
+        for prefix, base in (("210", "2.1.23"), ("200", "2.0.77")):
+            for patch in ("09", "10", "11"):
+                with self.subTest(prefix=prefix, patch=patch):
+                    self.setUp()
+                    self.lua.globals().old_version = "5.0." + prefix + patch
+                    self.lua.globals().new_version = "5.0." + prefix + "12"
+                    self.lua.globals().later_version = "5.0." + prefix + "13"
+                    self.lua.globals().engine_version = base
+                    self.lua.execute(r'''
+                      script.active_mods={base=engine_version,secretas="1.0.38",['more-infinite-research']=new_version}
+                      add_provider(8);local route=provider_route(8);writes=0
+                      local plan=history.preflight({mod_startup_settings_changed=false,mod_changes={
+                        ['more-infinite-research']={old_version=old_version,new_version=new_version}}},route)
+                      assert(storage.mir_worker_storage_route==nil and writes==0,"preflight wrote state")
+                      history.apply(plan)
+                      local saved=storage.mir_worker_storage_route
+                      assert(saved and saved.schema==1 and saved.route.technology=='worker-robots-storage-9',
+                        'accepted legacy route was never recorded for the next upgrade')
+                      assert(saved.route~=route and saved.route.finite~=route.finite,"route aliases candidate metadata")
+                      assert(writes==0,"recording a known unchanged route changed native state")
+                      for _=1,2 do
+                        package.loaded['runtime.worker_robot_storage']=nil;history=require('runtime.worker_robot_storage')
+                        history.on_load();assert(storage.mir_worker_storage_route==saved and writes==0)
+                      end
+                      script.active_mods['more-infinite-research']=later_version
+                      local next_plan=history.preflight({mod_startup_settings_changed=false,mod_changes={
+                        ['more-infinite-research']={old_version=new_version,new_version=later_version}}},provider_route(8))
+                      history.apply(next_plan)
+                      assert(storage.mir_worker_storage_route==saved and writes==0,'next unchanged upgrade refused or rewrote state')
+                    ''')
+
+    def test_new_known_secretas_readers_require_old_profile_provenance_before_writes(self):
+        for patch in ("09", "11"):
+            for opponent in ("startup", "unknown-startup", "base-change", "added", "removed", "updated",
+                             "missing-secretas", "foreign-tail", "endpoint", "wrong-new", "wrong-edition", "unknown-origin"):
+                with self.subTest(patch=patch, opponent=opponent):
+                    self.setUp()
+                    self.lua.globals().old_version = "5.0.210" + patch
+                    self.lua.globals().opponent = opponent
+                    self.lua.execute(r'''
+                      script.active_mods={base="2.1.23",secretas="1.0.38",['more-infinite-research']='5.0.21012'}
+                      add_provider(8);local route=provider_route(8)
+                      local e={mod_startup_settings_changed=false,mod_changes={
+                        ['more-infinite-research']={old_version=old_version,new_version='5.0.21012'}}}
+                      if opponent=='startup' then e.mod_startup_settings_changed=true end
+                      if opponent=='unknown-startup' then e.mod_startup_settings_changed=nil end
+                      if opponent=='base-change' then e.mod_changes.base={old_version='2.1.22',new_version='2.1.23'} end
+                      if opponent=='added' then e.mod_changes.secretas={new_version='1.0.38'} end
+                      if opponent=='removed' then e.mod_changes.old_provider={old_version='1.0.0'} end
+                      if opponent=='updated' then e.mod_changes.other={old_version='1.0.0',new_version='1.1.0'} end
+                      if opponent=='missing-secretas' then script.active_mods.secretas=nil end
+                      if opponent=='foreign-tail' then route.owned=false;route.provider='foreign' end
+                      if opponent=='endpoint' then route=provider_route(5) end
+                      if opponent=='wrong-new' then e.mod_changes['more-infinite-research'].new_version='5.0.21013' end
+                      if opponent=='wrong-edition' then
+                        script.active_mods['more-infinite-research']='5.0.20012'
+                        e.mod_changes['more-infinite-research'].new_version='5.0.20012'
+                      end
+                      if opponent=='unknown-origin' then e.mod_changes['more-infinite-research'].old_version='5.0.21008' end
+                      writes=0;local ok=pcall(history.preflight,e,route)
+                      assert(not ok and writes==0 and storage.mir_worker_storage_route==nil,'unproven old route admitted')
+                    ''')
+
     def test_explicit_unprepared_route_reports_surviving_marker_without_recovery_writes(self):
         self.lua.execute(r'''
           history.on_init(nil);local saved=storage.mir_worker_storage_route;seed();add_provider(8);writes=0
