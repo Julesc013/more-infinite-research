@@ -6,6 +6,9 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 ### Bugfixes
 
+- Fix startup failures caused by valid productivity reward settings in Factorio 2.0 and 2.1.
+- Preserve earned robot cargo bonuses and unfinished work through supported provider additions using a prepared original-save copy.
+- Include recipe and research details in native bonus validation errors.
 - Remove outdated active-lab science advice from translated direct-effect research descriptions.
 - Detect disabled Angel water-treatment prerequisites before publishing dependent research.
 - Retain selected Library research while translated search results reload after changing tabs.
