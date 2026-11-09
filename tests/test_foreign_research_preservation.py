@@ -6,6 +6,7 @@ import sys
 import unittest
 
 from native_credit_oracle import verified_public_rows
+from worker_storage_recovery_fixture import expected_private_worker_row
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -451,8 +452,9 @@ class ForeignResearchPreservationTests(unittest.TestCase):
           local original_effects, original_unit = foreign.effects,foreign.unit
           settings,mods,data,helpers,log={startup=defaults()},{},environment,nil,function() end
           -- The same 54 public/24 original private rows plus one signed pair
-          -- for each of the five published Base native-family recipes.
-          assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 78+10)
+          -- for each of the five published Base native-family recipes, plus
+          -- the explicitly validated private worker holder.
+          assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 78+10+1)
           local science_pack_productivity
           for _, row in ipairs(environment.emitted) do
             if row.name == "recipe-prod-research_science_pack_productivity-1" then
@@ -476,6 +478,7 @@ class ForeignResearchPreservationTests(unittest.TestCase):
             row["name"]: test_generator.plain_lua(row)
             for row in host.lua.globals().foreign_output.values()
         }
+        self.assertEqual(actual.pop("mir-worker-storage-preservation-4"), expected_private_worker_row())
         public = verified_public_rows(
             actual,
             {str(name) for name in host.lua.globals().foreign_recipes.keys()},

@@ -7,6 +7,7 @@ import sys
 import unittest
 
 from historical_sources import read_published_source
+from worker_storage_recovery_fixture import expected_private_worker_row
 from native_credit_oracle import (
     NATIVE_FAMILY_RECIPES,
     captured_public_productivity_recipes,
@@ -620,7 +621,7 @@ class GeneratorTests(unittest.TestCase):
           -- This selected-source scaffold has no native-owner recipes, so
           -- five empty private mains and four mixed gun holders are added. Full owner/recipe
           -- fixtures independently cover the eleven canonical signed pairs.
-          assert(ok, message); assert(environment.writes == 1 and #environment.emitted == 99+5+4 and environment.emitted[1].enabled == false)
+          assert(ok, message); assert(environment.writes == 1 and #environment.emitted == 99+5+4+1 and environment.emitted[1].enabled == false)
           ok, message, environment = missing_active_space_age_binding()
           assert(not ok and tostring(message):find("missing required recipe casting-iron-gear-wheel", 1, true), tostring(message))
           assert(environment.writes == 0, "active binding wrote before named preflight")
@@ -1270,7 +1271,7 @@ class GeneratorTests(unittest.TestCase):
           data.raw.lab = setmetatable({}, {__pairs=function()
             reads = reads + 1; return next,labs,nil
           end})
-          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 78+10)
+          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 78+10+1)
           -- The retained science-pack family uses its existing bounded
           -- lab-input product binding plus the policy pass: no foreign
           -- technology read is introduced.
@@ -1288,7 +1289,7 @@ class GeneratorTests(unittest.TestCase):
               local pack, gate = false, false
               for _, ingredient in ipairs(row.unit.ingredients) do pack = pack or ingredient[1] == "space-science-pack" end
               for _, name in ipairs(row.prerequisites) do gate = gate or name == "space-science-pack" end
-              assert(pack and gate and row.enabled ~= false, row.name)
+              assert(pack and gate and (row.enabled ~= false or row.name == "mir-worker-storage-preservation-4"), row.name)
             end
           end
         ''')
@@ -1301,7 +1302,7 @@ class GeneratorTests(unittest.TestCase):
           data.raw.lab = {restricted={inputs={"automation-science-pack"}}}
           local foreign = {enabled=true,foreign=77}
           data.raw.technology["foreign"] = foreign
-          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 78+10)
+          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 78+10+1)
           for _, row in ipairs(data.emitted) do assert(row.enabled == false and #row.unit.ingredients > 0) end
           assert(data.raw.technology.foreign == foreign and foreign.enabled and foreign.foreign == 77)
         ''')
@@ -1901,13 +1902,13 @@ class GeneratorTests(unittest.TestCase):
           environment = full_world(k2mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 106+5+4)
+          assert(environment.writes == 1 and #environment.emitted == 106+5+4+1)
           local final_ids, final_count = {}, 0
           for _, row in ipairs(environment.emitted) do
             assert(final_ids[row.name] == nil, "duplicate generated K2SO technology " .. row.name)
             final_ids[row.name], final_count = row, final_count + 1
           end
-          assert(final_count == 106+5+4)
+          assert(final_count == 106+5+4+1)
           assert(final_ids["recipe-prod-research_gears-1"] and final_ids["recipe-prod-research_agricultural_growth_speed-1"]
             and final_ids["recipe-prod-research_spoilage_preservation-1"] and final_ids["recipe-prod-research_material_imersite-4"])
           assert(final_ids["recipe-prod-research_material_rare_metals-1"]
@@ -2194,7 +2195,7 @@ class GeneratorTests(unittest.TestCase):
           package.preload["compatibility.modern_catalogue.sif_retained"] = nil
           package.preload["overrides.prototype_limits"] = nil
           assert(ok, message)
-          assert(environment.writes == 1 and #environment.emitted == 78+10)
+          assert(environment.writes == 1 and #environment.emitted == 78+10+1)
           assert(package.loaded["compatibility.space_age_scripted_effects"] == nil)
           assert(package.loaded["research.scripted_effects"] == nil)
           assert(package.loaded["compatibility.modern_catalogue.sif_retained"] == nil)
@@ -2396,7 +2397,8 @@ class GeneratorTests(unittest.TestCase):
                     "K2SO output contains a duplicate technology ID; full expected rows must not hide it",
                 )
             private = native_family_preservation_rows(expected_profiles["base-f210"]) if profile != "base-f210" else {}
-            actual_public, actual_credit = split_public_and_native_credit_rows(actual, private)
+            worker = {"mir-worker-storage-preservation-4": expected_private_worker_row(space_age=profile != "base-f210")}
+            actual_public, actual_credit = split_public_and_native_credit_rows(actual, private | worker)
             self.assertEqual(actual_public, expected, profile)
             available = captured_public_productivity_recipes(expected)
             family_recipes = None
@@ -2407,7 +2409,7 @@ class GeneratorTests(unittest.TestCase):
                 available |= {recipe for recipes in family_recipes.values() for recipe in recipes}
             expected_credit = native_credit_carrier_rows(
                 expected | private, available, family_recipes
-            ) | private
+            ) | private | worker
             self.assertEqual(actual_credit, expected_credit, profile)
             self.assertEqual(set(actual), set(expected) | set(expected_credit), profile)
             expected_patches = patch_profiles[profile]
@@ -2455,7 +2457,8 @@ class GeneratorTests(unittest.TestCase):
             })
             actual = {row["name"]: plain_lua(row) for row in self.lua.globals().data.emitted.values()}
             private = native_family_preservation_rows(base_reference) if profile["id"] != "base-f200" else {}
-            actual_public, actual_credit = split_public_and_native_credit_rows(actual, private)
+            worker = {"mir-worker-storage-preservation-4": expected_private_worker_row(space_age=profile["id"] != "base-f200")}
+            actual_public, actual_credit = split_public_and_native_credit_rows(actual, private | worker)
             self.assertEqual(actual_public, expected, profile["id"])
             available = captured_public_productivity_recipes(expected)
             family_recipes = None
@@ -2466,7 +2469,7 @@ class GeneratorTests(unittest.TestCase):
                 available |= {recipe for recipes in family_recipes.values() for recipe in recipes}
             expected_credit = native_credit_carrier_rows(
                 expected | private, available, family_recipes
-            ) | private
+            ) | private | worker
             self.assertEqual(actual_credit, expected_credit, profile["id"])
             self.assertEqual(set(actual), set(expected) | set(expected_credit), profile["id"])
 
@@ -2535,7 +2538,7 @@ class GeneratorTests(unittest.TestCase):
           settings, mods, data, helpers, log = {startup = startup}, {}, environment, nil, function() end
           package.loaded["overrides.prototype_limits"] = nil
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 78+10)
+          assert(environment.writes == 1 and #environment.emitted == 78+10+1)
           assert(package.loaded["overrides.prototype_limits"] ~= nil)
           assert(environment.raw["fixture-receiver"].zero.energy_usage == "1W")
         ''')
@@ -2551,7 +2554,7 @@ class GeneratorTests(unittest.TestCase):
           local environment = full_world(mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 99+5+4)
+          assert(environment.writes == 1 and #environment.emitted == 99+5+4+1)
           local ids = {}
           for _, row in ipairs(environment.emitted) do ids[row.name] = row end
           assert(ids["recipe-prod-research_gears-1"] ~= nil)

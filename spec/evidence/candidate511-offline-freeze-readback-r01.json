@@ -1,0 +1,34 @@
+{
+  "kind": "MIRCumulative511OfflineFreezeReadbackV1",
+  "observed_at_utc": "2026-11-09T05:14:06.942612+00:00",
+  "source": {
+    "commit": "cabf94efc9b529c4c555743b7139b3cf11b9c20d",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21011",
+    "source_tree": "b91641744ad6f866e189c53f7f8e11d1a6e28a02",
+    "tree": "0a4964cbddb5d65963ffb0eb5c5aee22c90b0dcc"
+  },
+  "release": {
+    "source_label": "source5.0.11",
+    "source_version": "5.0.11",
+    "tag": "v5.0.11",
+    "title": "MIR 5.0.11"
+  },
+  "public_zip_count": 17,
+  "public_checksum_count": 2,
+  "inventory_sha256": "17C026591AAE4A5E7EDBA4971BA7C9EE1D8452D177E3562853535DDB84920A63",
+  "freeze_and_verify_exit_codes": [
+    0,
+    0
+  ],
+  "status": "offline-composition-and-reproduction-only",
+  "target_qualification_files_match_full_freeze": [
+    "f200",
+    "f210"
+  ],
+  "native_qualification": false,
+  "publication": false,
+  "limits": "Source b916 is frozen; required final CI, upgrade/worker/research native acceptance, independent verdict, promotion and delivery are still required."
+}

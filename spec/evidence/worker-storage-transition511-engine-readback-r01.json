@@ -1,0 +1,1214 @@
+{
+  "schema": 1,
+  "kind": "EngineOnlyWorkerStorageTransition511NativeReadback",
+  "status": "verified-exact-engine-observations-only",
+  "packet": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage-transition511-probe-r03-controller\\packet.json",
+    "bytes": 171068,
+    "sha256": "F608E997E110446CD8494C747C16A5E84CB39E5130552E8F4C0D9744DEDB19C1"
+  },
+  "actor": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage-transition511-probe-r03-controller\\Invoke-TransitionProbe.ps1",
+    "bytes": 11421,
+    "sha256": "F5CBD960945B16619C83D22AAFA44AC2571A83DADE6EFD8F78C651665BBD00CE"
+  },
+  "terminal": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage-transition511-probe-r03-controller\\execution-record\\terminal.json",
+    "bytes": 256791,
+    "sha256": "151FCF069AC78E79787329D2B173B2C62DA734E12556EF8F47C198A38027D810"
+  },
+  "native_processes": 6,
+  "pids": [
+    32372,
+    37644,
+    2432,
+    11772,
+    23500,
+    22080
+  ],
+  "actual_labs": 0,
+  "native_files_per_original_and_custody": 52,
+  "native_bytes_per_original_and_custody": 4744899,
+  "zip_crc_checks": [
+    {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-source\\write-data\\saves\\source.zip",
+      "bytes": 777637,
+      "sha256": "27D63574D1512DA176B969D3AC7596803D75032435F88F1DF47ADF274C030ED2",
+      "entries": 55,
+      "crc_passed": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage-transition511-probe-r03-controller\\native-source\\write-data\\saves\\source.zip",
+      "bytes": 777637,
+      "sha256": "27D63574D1512DA176B969D3AC7596803D75032435F88F1DF47ADF274C030ED2",
+      "entries": 55,
+      "crc_passed": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-finite\\write-data\\saves\\source-copy.zip",
+      "bytes": 777637,
+      "sha256": "27D63574D1512DA176B969D3AC7596803D75032435F88F1DF47ADF274C030ED2",
+      "entries": 55,
+      "crc_passed": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-finite\\write-data\\saves\\transition-complete.zip",
+      "bytes": 780060,
+      "sha256": "63ACE2AFF19EFFC50F6FA3008CBE728640DF3F38934BEBF978BA360A7607581E",
+      "entries": 55,
+      "crc_passed": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage-transition511-probe-r03-controller\\native-finite\\write-data\\saves\\source-copy.zip",
+      "bytes": 777637,
+      "sha256": "27D63574D1512DA176B969D3AC7596803D75032435F88F1DF47ADF274C030ED2",
+      "entries": 55,
+      "crc_passed": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage-transition511-probe-r03-controller\\native-finite\\write-data\\saves\\transition-complete.zip",
+      "bytes": 780060,
+      "sha256": "63ACE2AFF19EFFC50F6FA3008CBE728640DF3F38934BEBF978BA360A7607581E",
+      "entries": 55,
+      "crc_passed": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-renamed\\write-data\\saves\\source-copy.zip",
+      "bytes": 777637,
+      "sha256": "27D63574D1512DA176B969D3AC7596803D75032435F88F1DF47ADF274C030ED2",
+      "entries": 55,
+      "crc_passed": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-renamed\\write-data\\saves\\transition-complete.zip",
+      "bytes": 780147,
+      "sha256": "103CD177C8D681A0864CA4A01AC62A29DC34BF5177098D694E3F4CB561A8FF36",
+      "entries": 55,
+      "crc_passed": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage-transition511-probe-r03-controller\\native-renamed\\write-data\\saves\\source-copy.zip",
+      "bytes": 777637,
+      "sha256": "27D63574D1512DA176B969D3AC7596803D75032435F88F1DF47ADF274C030ED2",
+      "entries": 55,
+      "crc_passed": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage-transition511-probe-r03-controller\\native-renamed\\write-data\\saves\\transition-complete.zip",
+      "bytes": 780147,
+      "sha256": "103CD177C8D681A0864CA4A01AC62A29DC34BF5177098D694E3F4CB561A8FF36",
+      "entries": 55,
+      "crc_passed": true
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage-transition511-probe-r03-controller\\protected\\source.zip",
+      "bytes": 777637,
+      "sha256": "27D63574D1512DA176B969D3AC7596803D75032435F88F1DF47ADF274C030ED2",
+      "entries": 55,
+      "crc_passed": true
+    }
+  ],
+  "library_controls_restored": [
+    {
+      "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mod-list.json",
+      "exists": true,
+      "bytes": 39201,
+      "sha256": "48C46678CC8369DB15CC12CDFB23309EB076DC4433B76E9426083D0074BCCC91"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mod-settings.dat",
+      "exists": true,
+      "bytes": 60744,
+      "sha256": "667897C514B66298A1E400058B65EA14EB36322D88864B98AE38E4C9B81387BC"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mod-settings.json",
+      "exists": false,
+      "bytes": 0,
+      "sha256": ""
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\testmods\\2.1\\.mir-active-profile.json",
+      "exists": false,
+      "bytes": 0,
+      "sha256": ""
+    }
+  ],
+  "owned_fixture_archives_removed": true,
+  "protected_source": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage-transition511-probe-r03-controller\\protected\\source.zip",
+    "bytes": 777637,
+    "sha256": "27D63574D1512DA176B969D3AC7596803D75032435F88F1DF47ADF274C030ED2"
+  },
+  "cases": [
+    {
+      "id": "source",
+      "first_stage": "source-init",
+      "first_tick": 0,
+      "first_entry": [
+        {
+          "name": "player",
+          "index": 1,
+          "bonus": 7,
+          "current": "worker-robots-storage-4",
+          "progress": 0.375,
+          "queue": [
+            "worker-robots-storage-4",
+            "mir-fixture-worker-storage-transition511-queue"
+          ],
+          "technologies": {
+            "worker-robots-storage-4": {
+              "name": "worker-robots-storage-4",
+              "level": 8,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 4,
+              "max_level": 4294967295,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 1600,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "worker-robots-storage-5": false,
+            "worker-robots-storage-6": false,
+            "mir-fixture-worker-storage-transition511-legacy-4": false
+          }
+        },
+        {
+          "name": "mir-fixture-worker-storage-transition511-uninvested",
+          "index": 4,
+          "bonus": 3,
+          "current": "mir-fixture-worker-storage-transition511-queue",
+          "progress": 0.125,
+          "queue": [
+            "mir-fixture-worker-storage-transition511-queue"
+          ],
+          "technologies": {
+            "worker-robots-storage-4": {
+              "name": "worker-robots-storage-4",
+              "level": 4,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 4,
+              "max_level": 4294967295,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 100,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "worker-robots-storage-5": false,
+            "worker-robots-storage-6": false,
+            "mir-fixture-worker-storage-transition511-legacy-4": false
+          }
+        },
+        {
+          "name": "mir-fixture-worker-storage-transition511-suspended",
+          "index": 5,
+          "bonus": 6,
+          "current": "mir-fixture-worker-storage-transition511-queue",
+          "progress": 0.42000000000000004,
+          "queue": [
+            "mir-fixture-worker-storage-transition511-queue",
+            "worker-robots-storage-4"
+          ],
+          "technologies": {
+            "worker-robots-storage-4": {
+              "name": "worker-robots-storage-4",
+              "level": 7,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0.27,
+              "prototype_level": 4,
+              "max_level": 4294967295,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 800,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "worker-robots-storage-5": false,
+            "worker-robots-storage-6": false,
+            "mir-fixture-worker-storage-transition511-legacy-4": false
+          }
+        }
+      ],
+      "pre_save_and_cold_equal": true,
+      "source_baseline_preserved": true,
+      "completed_save": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-source\\write-data\\saves\\source.zip",
+        "bytes": 777637,
+        "sha256": "27D63574D1512DA176B969D3AC7596803D75032435F88F1DF47ADF274C030ED2"
+      },
+      "processes": [
+        {
+          "stage": "production",
+          "pid": 32372,
+          "exit_code": 0,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": false,
+          "ledger": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-source\\process-1.resources.jsonl",
+            "bytes": 3215,
+            "sha256": "1270D94DF68AA9C37AA2E19BEA9226F2565B6697453882E758E6936AA7BB4AB8"
+          },
+          "stdout": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-source\\process-1.stdout.txt",
+            "bytes": 23473,
+            "sha256": "FD6B0D4EF30F9CF9327F5E856CED26BECD50F6E7526DA76A38F725BC947457EB"
+          },
+          "stderr": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-source\\process-1.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          "peak_sampled_private_bytes": 232620032
+        },
+        {
+          "stage": "cold-read",
+          "pid": 37644,
+          "exit_code": 0,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": false,
+          "ledger": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-source\\process-2.resources.jsonl",
+            "bytes": 2005,
+            "sha256": "407BBD5C1CFF1B8AA43AB74597A7A06D3EC1BD158FDC78DA927D983ABBFD9CBB"
+          },
+          "stdout": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-source\\process-2.stdout.txt",
+            "bytes": 106,
+            "sha256": "CA761E3F40EB98C7B9EAE8752BD29E246B4F273E38AB3745797525F239568F1D"
+          },
+          "stderr": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-source\\process-2.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          "peak_sampled_private_bytes": 230326272
+        }
+      ],
+      "native_files": 16,
+      "native_bytes_per_copy": 982578,
+      "custody_manifest": {
+        "source": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-source",
+        "destination": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage-transition511-probe-r03-controller\\native-source",
+        "member_count": 16,
+        "members": [
+          {
+            "relative_path": "cold.log",
+            "bytes": 23425,
+            "sha256": "FAAC71865049CEABA68BF596A02DD37A521DBE8E39DF0FD3A56AB1D4C03D92A4"
+          },
+          {
+            "relative_path": "config.ini",
+            "bytes": 280,
+            "sha256": "DB910D36F52AA5886664F036206F3784814BFF835CABD65F8B337669F8EF8466"
+          },
+          {
+            "relative_path": "process-1.resources.jsonl",
+            "bytes": 3215,
+            "sha256": "1270D94DF68AA9C37AA2E19BEA9226F2565B6697453882E758E6936AA7BB4AB8"
+          },
+          {
+            "relative_path": "process-1.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          {
+            "relative_path": "process-1.stdout.txt",
+            "bytes": 23473,
+            "sha256": "FD6B0D4EF30F9CF9327F5E856CED26BECD50F6E7526DA76A38F725BC947457EB"
+          },
+          {
+            "relative_path": "process-2.resources.jsonl",
+            "bytes": 2005,
+            "sha256": "407BBD5C1CFF1B8AA43AB74597A7A06D3EC1BD158FDC78DA927D983ABBFD9CBB"
+          },
+          {
+            "relative_path": "process-2.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          {
+            "relative_path": "process-2.stdout.txt",
+            "bytes": 106,
+            "sha256": "CA761E3F40EB98C7B9EAE8752BD29E246B4F273E38AB3745797525F239568F1D"
+          },
+          {
+            "relative_path": "production.log",
+            "bytes": 23351,
+            "sha256": "92A45C77DE03939CEB96FE6370B2264735524D97FA6B46F4E0AA2EF4156BF5C2"
+          },
+          {
+            "relative_path": "result.json",
+            "bytes": 47775,
+            "sha256": "9190A7F8810DC24EADC94C542E9823BC1F42A4CB11CB67F1B000E3E2B9BCEADB"
+          },
+          {
+            "relative_path": "write-data/factorio-current.log",
+            "bytes": 23425,
+            "sha256": "FAAC71865049CEABA68BF596A02DD37A521DBE8E39DF0FD3A56AB1D4C03D92A4"
+          },
+          {
+            "relative_path": "write-data/factorio-previous.log",
+            "bytes": 23351,
+            "sha256": "92A45C77DE03939CEB96FE6370B2264735524D97FA6B46F4E0AA2EF4156BF5C2"
+          },
+          {
+            "relative_path": "write-data/player-data.json",
+            "bytes": 10851,
+            "sha256": "285ED61F8778CFF44FA173F8EDCC5E417F4DF8C1019A3DDD02814729CEE56EF9"
+          },
+          {
+            "relative_path": "write-data/saves/source.zip",
+            "bytes": 777637,
+            "sha256": "27D63574D1512DA176B969D3AC7596803D75032435F88F1DF47ADF274C030ED2"
+          },
+          {
+            "relative_path": "write-data/script-output/transition511/cold-read.json",
+            "bytes": 11841,
+            "sha256": "C48D9F3FBC7C13231DC1B24EF9B4E53662BC84458B15823EB344AB657786377E"
+          },
+          {
+            "relative_path": "write-data/script-output/transition511/source-init.json",
+            "bytes": 11843,
+            "sha256": "3AD8BE5A9248168578F3FA5BF555DA9AF25DA0FBEFCED206B31800684DAD7283"
+          }
+        ]
+      }
+    },
+    {
+      "id": "finite",
+      "first_stage": "target-config-entry",
+      "first_tick": 0,
+      "first_entry": [
+        {
+          "name": "player",
+          "index": 1,
+          "bonus": 4,
+          "current": "mir-fixture-worker-storage-transition511-queue",
+          "progress": 0,
+          "queue": [
+            "mir-fixture-worker-storage-transition511-queue"
+          ],
+          "technologies": {
+            "worker-robots-storage-4": {
+              "name": "worker-robots-storage-4",
+              "level": 4,
+              "researched": true,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 4,
+              "max_level": 4,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 100,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "worker-robots-storage-5": {
+              "name": "worker-robots-storage-5",
+              "level": 5,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 5,
+              "max_level": 5,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 200,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "worker-robots-storage-6": {
+              "name": "worker-robots-storage-6",
+              "level": 6,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 6,
+              "max_level": 4294967295,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 400,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "mir-fixture-worker-storage-transition511-legacy-4": false
+          }
+        },
+        {
+          "name": "mir-fixture-worker-storage-transition511-uninvested",
+          "index": 4,
+          "bonus": 3,
+          "current": "mir-fixture-worker-storage-transition511-queue",
+          "progress": 0.125,
+          "queue": [
+            "mir-fixture-worker-storage-transition511-queue"
+          ],
+          "technologies": {
+            "worker-robots-storage-4": {
+              "name": "worker-robots-storage-4",
+              "level": 4,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 4,
+              "max_level": 4,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 100,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "worker-robots-storage-5": {
+              "name": "worker-robots-storage-5",
+              "level": 5,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 5,
+              "max_level": 5,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 200,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "worker-robots-storage-6": {
+              "name": "worker-robots-storage-6",
+              "level": 6,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 6,
+              "max_level": 4294967295,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 400,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "mir-fixture-worker-storage-transition511-legacy-4": false
+          }
+        },
+        {
+          "name": "mir-fixture-worker-storage-transition511-suspended",
+          "index": 5,
+          "bonus": 4,
+          "current": "mir-fixture-worker-storage-transition511-queue",
+          "progress": 0.42000000000000004,
+          "queue": [
+            "mir-fixture-worker-storage-transition511-queue"
+          ],
+          "technologies": {
+            "worker-robots-storage-4": {
+              "name": "worker-robots-storage-4",
+              "level": 4,
+              "researched": true,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 4,
+              "max_level": 4,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 100,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "worker-robots-storage-5": {
+              "name": "worker-robots-storage-5",
+              "level": 5,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 5,
+              "max_level": 5,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 200,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "worker-robots-storage-6": {
+              "name": "worker-robots-storage-6",
+              "level": 6,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 6,
+              "max_level": 4294967295,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 400,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "mir-fixture-worker-storage-transition511-legacy-4": false
+          }
+        }
+      ],
+      "pre_save_and_cold_equal": true,
+      "source_baseline_preserved": true,
+      "completed_save": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-finite\\write-data\\saves\\transition-complete.zip",
+        "bytes": 780060,
+        "sha256": "63ACE2AFF19EFFC50F6FA3008CBE728640DF3F38934BEBF978BA360A7607581E"
+      },
+      "processes": [
+        {
+          "stage": "production",
+          "pid": 2432,
+          "exit_code": -1,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": true,
+          "ledger": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-finite\\process-1.resources.jsonl",
+            "bytes": 2018,
+            "sha256": "2518D6111DB58A9D2A0829E21D6CA66B1A619645EE7847D2F5B4FA3ABF2674A1"
+          },
+          "stdout": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-finite\\process-1.stdout.txt",
+            "bytes": 41198,
+            "sha256": "CA22819CA716C496C64F13BDFEBB1DC4A63260120250B5F7529426375BB35BB8"
+          },
+          "stderr": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-finite\\process-1.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          "peak_sampled_private_bytes": 240431104
+        },
+        {
+          "stage": "cold-read",
+          "pid": 11772,
+          "exit_code": 0,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": false,
+          "ledger": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-finite\\process-2.resources.jsonl",
+            "bytes": 2005,
+            "sha256": "7EE8F3DCA66DAD16417E0DA53E033999D9C2D63FCD0C795C5611910CBF5B699A"
+          },
+          "stdout": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-finite\\process-2.stdout.txt",
+            "bytes": 106,
+            "sha256": "FC495BCFCFE4993359687FAE4F27E18E990944BEE6E03D7E2684FDA23B53E18D"
+          },
+          "stderr": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-finite\\process-2.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          "peak_sampled_private_bytes": 206598144
+        }
+      ],
+      "native_files": 18,
+      "native_bytes_per_copy": 1870968,
+      "custody_manifest": {
+        "source": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-finite",
+        "destination": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage-transition511-probe-r03-controller\\native-finite",
+        "member_count": 18,
+        "members": [
+          {
+            "relative_path": "cold.log",
+            "bytes": 25235,
+            "sha256": "A00CC176D0A9A9F48C3A01E05725F5CD6842D553E797AC036787588AACDCD5CC"
+          },
+          {
+            "relative_path": "config.ini",
+            "bytes": 280,
+            "sha256": "D4F2344490DF89D04392F44737A9689EBBA4B1BBB6793AEFD431342E5D965E27"
+          },
+          {
+            "relative_path": "process-1.resources.jsonl",
+            "bytes": 2018,
+            "sha256": "2518D6111DB58A9D2A0829E21D6CA66B1A619645EE7847D2F5B4FA3ABF2674A1"
+          },
+          {
+            "relative_path": "process-1.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          {
+            "relative_path": "process-1.stdout.txt",
+            "bytes": 41198,
+            "sha256": "CA22819CA716C496C64F13BDFEBB1DC4A63260120250B5F7529426375BB35BB8"
+          },
+          {
+            "relative_path": "process-2.resources.jsonl",
+            "bytes": 2005,
+            "sha256": "7EE8F3DCA66DAD16417E0DA53E033999D9C2D63FCD0C795C5611910CBF5B699A"
+          },
+          {
+            "relative_path": "process-2.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          {
+            "relative_path": "process-2.stdout.txt",
+            "bytes": 106,
+            "sha256": "FC495BCFCFE4993359687FAE4F27E18E990944BEE6E03D7E2684FDA23B53E18D"
+          },
+          {
+            "relative_path": "production.log",
+            "bytes": 41073,
+            "sha256": "7EB18F106629B00BB026C97117BF64F5AC2884D7805A60B81984547F95A5657B"
+          },
+          {
+            "relative_path": "result.json",
+            "bytes": 82367,
+            "sha256": "564BC3C66E5F0D958A7BAC12D4EA1E136721D95E5537FEAFDB2277D7C7DD69C7"
+          },
+          {
+            "relative_path": "write-data/factorio-current.log",
+            "bytes": 25235,
+            "sha256": "A00CC176D0A9A9F48C3A01E05725F5CD6842D553E797AC036787588AACDCD5CC"
+          },
+          {
+            "relative_path": "write-data/factorio-previous.log",
+            "bytes": 41073,
+            "sha256": "7EB18F106629B00BB026C97117BF64F5AC2884D7805A60B81984547F95A5657B"
+          },
+          {
+            "relative_path": "write-data/player-data.json",
+            "bytes": 10851,
+            "sha256": "285ED61F8778CFF44FA173F8EDCC5E417F4DF8C1019A3DDD02814729CEE56EF9"
+          },
+          {
+            "relative_path": "write-data/saves/source-copy.zip",
+            "bytes": 777637,
+            "sha256": "27D63574D1512DA176B969D3AC7596803D75032435F88F1DF47ADF274C030ED2"
+          },
+          {
+            "relative_path": "write-data/saves/transition-complete.zip",
+            "bytes": 780060,
+            "sha256": "63ACE2AFF19EFFC50F6FA3008CBE728640DF3F38934BEBF978BA360A7607581E"
+          },
+          {
+            "relative_path": "write-data/script-output/transition511/cold-read.json",
+            "bytes": 13625,
+            "sha256": "7371183B704A8D030F2B62585BE7E28EAF5DF0E9E3FD27F074AA1C371EF41DAD"
+          },
+          {
+            "relative_path": "write-data/script-output/transition511/target-config-entry.json",
+            "bytes": 14574,
+            "sha256": "5D45F7D9A9B5F3CB007A409DF41B5E5F343C31DE79C436C9019CE4D714D6B89B"
+          },
+          {
+            "relative_path": "write-data/script-output/transition511/target-pre-save.json",
+            "bytes": 13631,
+            "sha256": "BD2E0BAD1B4B52EB9A4669FDD41F2094AFDEBBF55695DA2034DBEB9A5C59DACD"
+          }
+        ]
+      }
+    },
+    {
+      "id": "renamed",
+      "first_stage": "target-config-entry",
+      "first_tick": 0,
+      "first_entry": [
+        {
+          "name": "player",
+          "index": 1,
+          "bonus": 7,
+          "current": "mir-fixture-worker-storage-transition511-legacy-4",
+          "progress": 0.375,
+          "queue": [
+            "mir-fixture-worker-storage-transition511-legacy-4",
+            "mir-fixture-worker-storage-transition511-queue"
+          ],
+          "technologies": {
+            "worker-robots-storage-4": {
+              "name": "worker-robots-storage-4",
+              "level": 4,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 4,
+              "max_level": 4,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 100,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "worker-robots-storage-5": {
+              "name": "worker-robots-storage-5",
+              "level": 5,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 5,
+              "max_level": 5,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 200,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "worker-robots-storage-6": {
+              "name": "worker-robots-storage-6",
+              "level": 6,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 6,
+              "max_level": 4294967295,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 400,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "mir-fixture-worker-storage-transition511-legacy-4": {
+              "name": "mir-fixture-worker-storage-transition511-legacy-4",
+              "level": 8,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 4,
+              "max_level": 4294967295,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 1600,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            }
+          }
+        },
+        {
+          "name": "mir-fixture-worker-storage-transition511-uninvested",
+          "index": 4,
+          "bonus": 3,
+          "current": "mir-fixture-worker-storage-transition511-queue",
+          "progress": 0.125,
+          "queue": [
+            "mir-fixture-worker-storage-transition511-queue"
+          ],
+          "technologies": {
+            "worker-robots-storage-4": {
+              "name": "worker-robots-storage-4",
+              "level": 4,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 4,
+              "max_level": 4,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 100,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "worker-robots-storage-5": {
+              "name": "worker-robots-storage-5",
+              "level": 5,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 5,
+              "max_level": 5,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 200,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "worker-robots-storage-6": {
+              "name": "worker-robots-storage-6",
+              "level": 6,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 6,
+              "max_level": 4294967295,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 400,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "mir-fixture-worker-storage-transition511-legacy-4": {
+              "name": "mir-fixture-worker-storage-transition511-legacy-4",
+              "level": 4,
+              "researched": false,
+              "enabled": false,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 4,
+              "max_level": 4294967295,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 100,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            }
+          }
+        },
+        {
+          "name": "mir-fixture-worker-storage-transition511-suspended",
+          "index": 5,
+          "bonus": 6,
+          "current": "mir-fixture-worker-storage-transition511-queue",
+          "progress": 0.42000000000000004,
+          "queue": [
+            "mir-fixture-worker-storage-transition511-queue",
+            "mir-fixture-worker-storage-transition511-legacy-4"
+          ],
+          "technologies": {
+            "worker-robots-storage-4": {
+              "name": "worker-robots-storage-4",
+              "level": 4,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 4,
+              "max_level": 4,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 100,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "worker-robots-storage-5": {
+              "name": "worker-robots-storage-5",
+              "level": 5,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 5,
+              "max_level": 5,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 200,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "worker-robots-storage-6": {
+              "name": "worker-robots-storage-6",
+              "level": 6,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0,
+              "prototype_level": 6,
+              "max_level": 4294967295,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 400,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            },
+            "mir-fixture-worker-storage-transition511-legacy-4": {
+              "name": "mir-fixture-worker-storage-transition511-legacy-4",
+              "level": 7,
+              "researched": false,
+              "enabled": true,
+              "visible_when_disabled": false,
+              "saved_progress": 0.27,
+              "prototype_level": 4,
+              "max_level": 4294967295,
+              "effects": [
+                {
+                  "type": "worker-robot-storage",
+                  "modifier": 1
+                }
+              ],
+              "research_unit_count": 800,
+              "research_unit_count_formula": "100*2^(L-4)",
+              "research_unit_energy": 1800
+            }
+          }
+        }
+      ],
+      "pre_save_and_cold_equal": true,
+      "source_baseline_preserved": true,
+      "completed_save": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-renamed\\write-data\\saves\\transition-complete.zip",
+        "bytes": 780147,
+        "sha256": "103CD177C8D681A0864CA4A01AC62A29DC34BF5177098D694E3F4CB561A8FF36"
+      },
+      "processes": [
+        {
+          "stage": "production",
+          "pid": 23500,
+          "exit_code": -1,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": true,
+          "ledger": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-renamed\\process-1.resources.jsonl",
+            "bytes": 2021,
+            "sha256": "7B369AFE539E99930CB0BBFC8853E248C054A55AB86E03ACB73CCC76EA979FB6"
+          },
+          "stdout": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-renamed\\process-1.stdout.txt",
+            "bytes": 43809,
+            "sha256": "1F6BDD99AF717AA2E553CBFAB51D839F58BF1C2C6CB28E1E78C582C445A4D836"
+          },
+          "stderr": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-renamed\\process-1.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          "peak_sampled_private_bytes": 232493056
+        },
+        {
+          "stage": "cold-read",
+          "pid": 22080,
+          "exit_code": 0,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": false,
+          "ledger": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-renamed\\process-2.resources.jsonl",
+            "bytes": 2005,
+            "sha256": "B365128CD17D4678EE441967FBB8A0F228EE4298F3ED286632F91EDE80A23857"
+          },
+          "stdout": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-renamed\\process-2.stdout.txt",
+            "bytes": 106,
+            "sha256": "A82C79472F662836912761AE78D5DD086CF0326400541230575D5943EE941D5A"
+          },
+          "stderr": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-renamed\\process-2.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          "peak_sampled_private_bytes": 232067072
+        }
+      ],
+      "native_files": 18,
+      "native_bytes_per_copy": 1891353,
+      "custody_manifest": {
+        "source": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01\\build\\tmp\\worker-transition511-r03-renamed",
+        "destination": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage-transition511-probe-r03-controller\\native-renamed",
+        "member_count": 18,
+        "members": [
+          {
+            "relative_path": "cold.log",
+            "bytes": 26445,
+            "sha256": "2EB4A20C855D4A4FDAB6BF668380DDFE919B81CAEA9500025CA5B180B12E8245"
+          },
+          {
+            "relative_path": "config.ini",
+            "bytes": 281,
+            "sha256": "1CBFA815D7AB3D1A911334577CA087F5490DEB3552FB1E8529B5809782BE3E5D"
+          },
+          {
+            "relative_path": "process-1.resources.jsonl",
+            "bytes": 2021,
+            "sha256": "7B369AFE539E99930CB0BBFC8853E248C054A55AB86E03ACB73CCC76EA979FB6"
+          },
+          {
+            "relative_path": "process-1.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          {
+            "relative_path": "process-1.stdout.txt",
+            "bytes": 43809,
+            "sha256": "1F6BDD99AF717AA2E553CBFAB51D839F58BF1C2C6CB28E1E78C582C445A4D836"
+          },
+          {
+            "relative_path": "process-2.resources.jsonl",
+            "bytes": 2005,
+            "sha256": "B365128CD17D4678EE441967FBB8A0F228EE4298F3ED286632F91EDE80A23857"
+          },
+          {
+            "relative_path": "process-2.stderr.txt",
+            "bytes": 0,
+            "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+          },
+          {
+            "relative_path": "process-2.stdout.txt",
+            "bytes": 106,
+            "sha256": "A82C79472F662836912761AE78D5DD086CF0326400541230575D5943EE941D5A"
+          },
+          {
+            "relative_path": "production.log",
+            "bytes": 43683,
+            "sha256": "6A4477B0E7B8B2DE2FD4C34BA4FE854667515E30E8D5ACF0AA1B1095BC1F6C1D"
+          },
+          {
+            "relative_path": "result.json",
+            "bytes": 88722,
+            "sha256": "DD8F3D5D5AACD339430E8B3B535FF9445D031A71752620EA63F4454546FA4C2A"
+          },
+          {
+            "relative_path": "write-data/factorio-current.log",
+            "bytes": 26445,
+            "sha256": "2EB4A20C855D4A4FDAB6BF668380DDFE919B81CAEA9500025CA5B180B12E8245"
+          },
+          {
+            "relative_path": "write-data/factorio-previous.log",
+            "bytes": 43683,
+            "sha256": "6A4477B0E7B8B2DE2FD4C34BA4FE854667515E30E8D5ACF0AA1B1095BC1F6C1D"
+          },
+          {
+            "relative_path": "write-data/player-data.json",
+            "bytes": 10851,
+            "sha256": "285ED61F8778CFF44FA173F8EDCC5E417F4DF8C1019A3DDD02814729CEE56EF9"
+          },
+          {
+            "relative_path": "write-data/saves/source-copy.zip",
+            "bytes": 777637,
+            "sha256": "27D63574D1512DA176B969D3AC7596803D75032435F88F1DF47ADF274C030ED2"
+          },
+          {
+            "relative_path": "write-data/saves/transition-complete.zip",
+            "bytes": 780147,
+            "sha256": "103CD177C8D681A0864CA4A01AC62A29DC34BF5177098D694E3F4CB561A8FF36"
+          },
+          {
+            "relative_path": "write-data/script-output/transition511/cold-read.json",
+            "bytes": 14829,
+            "sha256": "F3D8B36F4417E91BBCC1490BA20E7B98DF0A4617C8B915A900DDF8F5E0138245"
+          },
+          {
+            "relative_path": "write-data/script-output/transition511/target-config-entry.json",
+            "bytes": 15854,
+            "sha256": "51525C5C7BDBF2C8425E0FE8562DB2D9F0B64C3951DCFEC6696B260DAB466BAE"
+          },
+          {
+            "relative_path": "write-data/script-output/transition511/target-pre-save.json",
+            "bytes": 14835,
+            "sha256": "2FB52743A52E917DAF850580B06F94E45CF8221777D2A6422D40CF944FC00C03"
+          }
+        ]
+      }
+    }
+  ],
+  "all_697_inputs_unchanged": true,
+  "r01_r02_preserved_unexecuted": true,
+  "runner_clean": true,
+  "observations": [
+    "Before the fixture target callback, finite worker4 is level4/researched for the two invested forces; native bonuses7\u21924 and6\u21924. Source current worker4 progress.375 is lost and next sentinel becomes current at0; suspended worker4 saved.27 and its queued identity are lost while unrelated sentinel.42 remains.",
+    "Uninvested worker4 remains level4/unresearched/disabled in the finite route, with native bonus3 and sentinel current.125 unchanged.",
+    "The separate JSON map retains old worker4 level/research/effect/flags/count fields, current progress and queue positions under private legacy4, with bonuses7/3/6. New foreign worker4/5/6 are unresearched; the source uninvested disablement follows legacy4, while new foreign4 is enabled.",
+    "Source cold equals its initial frame; each target first-entry, pre-save and cold state is exactly equal, using decimal-preserving JSON comparisons. Protected source and completed save bytes are unchanged across their consumed reads."
+  ],
+  "limits": "Exact standalone2.1.23/8DC NoMIR authored fixture only. Scripted seeded levels/progress, zero labs, one cold per case. No arbitrary provider/finite-old/external-route/mixed-effect/cap proof, production rename approval, paid-history recovery decision, gameplay acceptance, performance comparison or release verdict."
+}

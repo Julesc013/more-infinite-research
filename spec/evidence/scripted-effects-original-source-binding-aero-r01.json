@@ -1,0 +1,33 @@
+{
+  "kind": "MIRScriptedEffectsOriginalPathResolutionAeroR01",
+  "scope": "One F210 published4.7.21000 dispatcher member and its original source binding only.",
+  "requirements": [
+    "CONT-03",
+    "CONT-08",
+    "CONT-09",
+    "CONT-14",
+    "VER-07"
+  ],
+  "original_inventory": "spec/inventory/scripted-effects-baseline.json",
+  "original_inventory_sha256": "88AFE2125BA6A2778AA0534EBE955BFDE42082FAD73AF82F6E3326CAF69EABB3",
+  "pinned_source_commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+  "original_source_path": "source/prototypes/mir/runtime/scripted_techs.lua",
+  "original_path_absent_at_pinned_commit": true,
+  "resolved_source_path": "source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
+  "resolved_blob": "f1020959c1b1d861ff4a07437a1ea01da0460253",
+  "member": "more-infinite-research_4.7.21000/prototypes/mir/runtime/scripted_techs.lua",
+  "member_bytes": 3865,
+  "member_sha256": "E4812434404D3213079B7D21EC5006ECA3C766E90111AA2A344E74932B780559",
+  "published_package_sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1",
+  "package_member_equals_resolved_source": true,
+  "existing_review": "spec/evidence/historical-runtime-orchestration-intent-aero-r01.json",
+  "existing_review_disposition": "consolidate-named-event-and-lifecycle-obligations",
+  "decision": "The package-root member is a historical layout alias, already reviewed as the exact F210 adapter blob. It is not an unreviewed or missing source-body frontier. Retain the original wrong path field unchanged and use this additive resolution.",
+  "limits": [
+    "No historical receipt, source or native result changed.",
+    "No new source/body inventory, imported implementation or native realization is claimed.",
+    "This resolves only this source binding, not VER-07 or stable acceptance."
+  ],
+  "original_inventory_hash_scope": "Canonical Git blob bytes, independent of checkout line endings.",
+  "original_inventory_git_blob": "75a5546ff52cb0ec2f7ff2d4944ce7e486c3cdcd"
+}

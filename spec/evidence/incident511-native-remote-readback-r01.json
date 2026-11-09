@@ -1,0 +1,66 @@
+{
+  "kind": "MIR511IncidentNativeRemoteReadbackV1",
+  "utc": "2026-11-09T02:38:22.625689+00:00",
+  "repository": "Julesc013/scratchpad",
+  "branch": "evidence/mir511-incident-native-blackglass-r01",
+  "commit": "1b41963ca904238a8360ff7a0144e46b58574aa8",
+  "scope": "evidence/mir511-incident-native-blackglass-r01",
+  "all_remote_blobs_equal_exact_local": true,
+  "files": [
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/.gitattributes",
+      "git_blob": "469c88ac7613d791086de284b8cb78cfbf07780f",
+      "bytes": 13,
+      "sha256": "7DB6A4594CA028C9756C1C6F838E247424A086289BC4516147589EFDAF27380C"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/MANIFEST.json",
+      "git_blob": "314a1ec77725d0f766da117b8bb92d30053ee4fe",
+      "bytes": 275824,
+      "sha256": "41BBBF3B96DD625DC8CC58B45B4149F7F2FEC7884DC28D8F4131A0EED21AEB28"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/effect-conversion-r02-original-bodies.json.gz",
+      "git_blob": "923f9d719c034dee986d8f67ee0b4093f8559ed7",
+      "bytes": 1566608,
+      "sha256": "5A2C563204334B7E1B9379C2EC5840693F32F0AE42ECADCA455EFAF392D1D80C"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/effect-conversion-r03-original-bodies.json.gz",
+      "git_blob": "b5449214736aa9bd8e6eedfdcc891e9d2ed89443",
+      "bytes": 1526054,
+      "sha256": "2CF599E835DBA39D5929EC131ABA12E4763E6DACF3D3990CA66AE84CDE452703"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/native-credit511-observed-normalization-decision-r01.json",
+      "git_blob": "eb6190d98e81978e00a37c0670cf685c172fa6a2",
+      "bytes": 11918,
+      "sha256": "AE541A9A1C7195B48CCE4C4184E32C8CAB720671A469D610C55A94232AA493AA"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/native-credit511-observed-precision-independent-review-r01.json",
+      "git_blob": "184ea8758df9a1bfcfc9556c7b37e8809d1ed79a",
+      "bytes": 11722,
+      "sha256": "95C5DADCC3C541B19F7C8C5CFE530C062941B3E3426A6B96F79660E61A241C46"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/native-credit511-observed-precision-independent-review-r02.json",
+      "git_blob": "af39810a77c4a3d8084f0ce58cb5f2299ab4a2b3",
+      "bytes": 10998,
+      "sha256": "0E9F6F21E74B43E35B39381FAE6D750A46C9DDE6E88080A679796A10D88631DE"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/worker-transition-r03-original-bodies.json.gz",
+      "git_blob": "0a66e73e91b1ad688f6b566ac2b213905aa0637e",
+      "bytes": 5156527,
+      "sha256": "18F03BD9C7516D0C07D22B8177344AE0F8E229CC91D1FA8E5D92A8F93573D157"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/worker-transition511-root-independent-admission-r01.json",
+      "git_blob": "bfc682f03a4e44cb88cabf385e87e354765e84a7",
+      "bytes": 1706,
+      "sha256": "52FD8801B2D00B0E90097FC9259C9EBFBD370A48588E12D1DD47A488FAC91FBF"
+    }
+  ],
+  "limits": "Durable raw diagnostic custody only; no MIR gameplay or release verdict."
+}

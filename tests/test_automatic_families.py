@@ -10,6 +10,7 @@ import sys
 import unittest
 
 from native_credit_oracle import verified_public_rows
+from worker_storage_recovery_fixture import expected_private_worker_row
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -237,6 +238,7 @@ class AutomaticFamilyNonEmissionTests(unittest.TestCase):
             row["name"]: _plain(row)
             for row in lua.globals().data.emitted.values()
         }
+        self.assertEqual(emitted.pop("mir-worker-storage-preservation-4"), expected_private_worker_row())
         public = verified_public_rows(
             emitted,
             {str(name) for name in lua.globals().data.raw.recipe.keys()},

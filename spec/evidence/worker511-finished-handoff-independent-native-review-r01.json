@@ -1,0 +1,77 @@
+{
+  "kind": "MIRWorker511FinishedHandoffIndependentNativeReviewV1",
+  "reviewed_at_utc": "2026-11-09T08:40:49.964057+00:00",
+  "verdict": "Actual diagnostic resolves guard cause; expected adverse retained. No candidate or beta pass.",
+  "pins": {
+    "terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r06-diagnostic-controller\\execution-Execute-r04\\terminal.json",
+      "bytes": 25506,
+      "sha256": "EF31DC48376E6CD2C1B1274F2A7E7D8A65A68F924A32B11710CFF3F2A1062FE7"
+    },
+    "packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r06-diagnostic-controller\\packet.json",
+      "bytes": 596949,
+      "sha256": "C4DC8605289BCC56FA4A4A75777F552B716A31FE7A237BD4C86142E87C497E78"
+    },
+    "caller": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r06-diagnostic-controller\\Invoke-ProviderContinuation.ps1",
+      "bytes": 20560,
+      "sha256": "2E12D63342B36BDFC2A7354E79774050A0C8ED3689414A4F09B17CDC56D7E5EC"
+    },
+    "raw": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r06-diagnostic-controller\\Execute-r04-provider\\write-data\\factorio-current.log",
+      "bytes": 108566,
+      "sha256": "88387CDF733249E9D58A952E41EF81A1722A7B77F90BEE56B1AB78D38D0F2C26"
+    }
+  },
+  "diagnostic_only_source": "5348683b25817d10f4b39284770bb644ce0f80f1 /4a1401a922aab0b6d52a3eb7dcbd1c3af18edd8d",
+  "actual": {
+    "engines": 1,
+    "event_line": "   6.965 Script @__more-infinite-research__/runtime/worker_robot_storage.lua:639: [MIR_WORKER_EVENT_DIAGNOSTIC] force=worker-suspended research=mir-worker-recovery-sentinel tick=35259 finished=true by_script=false",
+    "frame_line": "   6.965 Script @__more-infinite-research__/runtime/worker_robot_storage.lua:285: [MIR_WORKER_FRAME_DIAGNOSTIC] force=worker-suspended current=nil first=mir-worker-storage-preservation-4 length=1 progress=0 progress_type=number level=7 researched=false current_mismatch=true progress_valid=true",
+    "event": {
+      "force": "worker-suspended",
+      "research": "mir-worker-recovery-sentinel",
+      "tick": 35259,
+      "finished": true,
+      "by_script": false
+    },
+    "frame": {
+      "current": null,
+      "queue_first": "mir-worker-storage-preservation-4",
+      "queue_length": 1,
+      "progress": 0,
+      "progress_type": "number",
+      "private_level": 7,
+      "private_researched": false,
+      "current_mismatch": true,
+      "progress_valid": true
+    },
+    "cause_boundary": "Engine has removed the completed unrelated sentinel from queue; a P head exists while force.current_research is nil at zero progress in this finished callback. It is not a progress1 failure.",
+    "private_completion_observed": false,
+    "endpoint_saves": 0,
+    "colds": 0,
+    "restoration_factorio0": true
+  },
+  "minimal_policy_supported": {
+    "context": "Only explicit verified finished-research context for same force may accept currentnil/nonemptyqueue/progressEXACT0 handoff. Snapshot must retain actual currentnil; no invented head-as-current and no premature .27 saved-to-current transfer.",
+    "scope": [
+      "Pass this context only from finished callback, to initial and postcaps snapshots; all preflight/prepare/resume/queued/started/cancelled use strict snapshot.",
+      "All saved_progress/science/custody/shape/level/history/quota/flags/force limits stay unchanged.",
+      "Present-current mismatch, empty-queue old-current mismatch, nonzero/negative/nonfinite/invalid progress, wrong/no finished context or mismatched force must still refuse.",
+      "Retain explicit previous-owner gate and post-operation stable checks, without introducing broad on_tick handling.",
+      "Fresh new-source native P completion/retirement/foreign4/save/two-cold and required separate first-add/unchanged-provider/cap-enable cases remain necessary."
+    ],
+    "approval_limit": "Policy direction only; exact committed correction and negative controls require independent source review. It does not authorize any broad snapshot weakening."
+  },
+  "custody": {
+    "members": 11,
+    "all_primary_and_frozen_bodies_exact": true,
+    "recorded_control_archive_restoration_reviewed": true,
+    "live_library_rechecked": false
+  },
+  "limits": [
+    "The exact scalar evidence belongs to instrumented r06. r05 remains an undiagnosed-field original adverse and is not relabelled as this execution.",
+    "No Source/docs/tests/packet/library changes or new native/build/host run by reviewer."
+  ]
+}

@@ -1,0 +1,371 @@
+{
+  "kind": "MIRNativeCredit511ObservedNormalizationDecisionV1",
+  "source_diagnostic_sha256": "DEA874731E66FAC8C61EC8E6E7F544CB1A7D7B35D21FFEE3ED1BE2BB7E5D1825",
+  "decision": "Author a narrow engine-family comparison, not an interval: F200 reproducesbinary32input\u2192binary32multiply100\u2192truncatetowardzero\u2192binary32divide100. F210 uses signedfloor(abs(authored)*10000+.5)/10000 as confirmed by36 exact in-engine equalitybooleans. Retain strict structure/custody/signed/main/ledger/no-write guards.",
+  "actual_observation_checks": [
+    {
+      "target": "f200",
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "exists": true,
+        "bytes": 43530192,
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "rows": 20,
+      "cases": [
+        {
+          "authored_literal": "0.3",
+          "observed_units": 30,
+          "actual_17g": "0.30000001192092896",
+          "actual_equals_round4_divide": false
+        },
+        {
+          "authored_literal": "0.56789",
+          "observed_units": 56,
+          "actual_17g": "0.56000000238418579",
+          "actual_equals_round4_divide": false
+        },
+        {
+          "authored_literal": "0.105",
+          "observed_units": 10,
+          "actual_17g": "0.10000000149011612",
+          "actual_equals_round4_divide": false
+        },
+        {
+          "authored_literal": "0.00001",
+          "observed_units": 0,
+          "actual_17g": "0",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "0.00009",
+          "observed_units": 0,
+          "actual_17g": "0",
+          "actual_equals_round4_divide": false
+        },
+        {
+          "authored_literal": "0.0001",
+          "observed_units": 0,
+          "actual_17g": "0",
+          "actual_equals_round4_divide": false
+        },
+        {
+          "authored_literal": "1.00123",
+          "observed_units": 100,
+          "actual_17g": "1",
+          "actual_equals_round4_divide": false
+        },
+        {
+          "authored_literal": "0.29",
+          "observed_units": 29,
+          "actual_17g": "0.28999999165534973",
+          "actual_equals_round4_divide": false
+        },
+        {
+          "authored_literal": "0.58",
+          "observed_units": 58,
+          "actual_17g": "0.57999998331069946",
+          "actual_equals_round4_divide": false
+        },
+        {
+          "authored_literal": "0.0099999998",
+          "observed_units": 1,
+          "actual_17g": "0.0099999997764825821",
+          "actual_equals_round4_divide": false
+        },
+        {
+          "authored_literal": "-0.3",
+          "observed_units": -30,
+          "actual_17g": "-0.30000001192092896",
+          "actual_equals_round4_divide": false
+        },
+        {
+          "authored_literal": "-0.56789",
+          "observed_units": -56,
+          "actual_17g": "-0.56000000238418579",
+          "actual_equals_round4_divide": false
+        },
+        {
+          "authored_literal": "-0.105",
+          "observed_units": -10,
+          "actual_17g": "-0.10000000149011612",
+          "actual_equals_round4_divide": false
+        },
+        {
+          "authored_literal": "-0.00001",
+          "observed_units": 0,
+          "actual_17g": "0",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-0.00009",
+          "observed_units": 0,
+          "actual_17g": "0",
+          "actual_equals_round4_divide": false
+        },
+        {
+          "authored_literal": "-0.0001",
+          "observed_units": 0,
+          "actual_17g": "0",
+          "actual_equals_round4_divide": false
+        },
+        {
+          "authored_literal": "-1.00123",
+          "observed_units": -100,
+          "actual_17g": "-1",
+          "actual_equals_round4_divide": false
+        },
+        {
+          "authored_literal": "-0.29",
+          "observed_units": -29,
+          "actual_17g": "-0.28999999165534973",
+          "actual_equals_round4_divide": false
+        },
+        {
+          "authored_literal": "-0.58",
+          "observed_units": -58,
+          "actual_17g": "-0.57999998331069946",
+          "actual_equals_round4_divide": false
+        },
+        {
+          "authored_literal": "-0.0099999998",
+          "observed_units": -1,
+          "actual_17g": "-0.0099999997764825821",
+          "actual_equals_round4_divide": false
+        }
+      ]
+    },
+    {
+      "target": "f210",
+      "engine": {
+        "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "exists": true,
+        "bytes": 49398736,
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "rows": 36,
+      "cases": [
+        {
+          "authored_literal": "0.3",
+          "observed_units": 3000,
+          "actual_17g": "0.3",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "0.56789",
+          "observed_units": 5679,
+          "actual_17g": "0.56789999999999994",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "0.105",
+          "observed_units": 1050,
+          "actual_17g": "0.105",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "0.00001",
+          "observed_units": 0,
+          "actual_17g": "0",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "0.00009",
+          "observed_units": 1,
+          "actual_17g": "0.0001",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "0.0001",
+          "observed_units": 1,
+          "actual_17g": "0.0001",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "1.00123",
+          "observed_units": 10012,
+          "actual_17g": "1.0012000000000001",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "0.29",
+          "observed_units": 2900,
+          "actual_17g": "0.29",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "0.58",
+          "observed_units": 5800,
+          "actual_17g": "0.57999999999999998",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "0.0099999998",
+          "observed_units": 100,
+          "actual_17g": "0.01",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "999.1",
+          "observed_units": 9991000,
+          "actual_17g": "999.10000000000002",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "999.10009",
+          "observed_units": 9991001,
+          "actual_17g": "999.1001",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "999.1001",
+          "observed_units": 9991001,
+          "actual_17g": "999.1001",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "0.00005",
+          "observed_units": 1,
+          "actual_17g": "0.0001",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "0.00015",
+          "observed_units": 1,
+          "actual_17g": "0.0001",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "0.00025",
+          "observed_units": 3,
+          "actual_17g": "0.00029999999999999991",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "0.56785",
+          "observed_units": 5679,
+          "actual_17g": "0.56789999999999994",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "0.30005",
+          "observed_units": 3001,
+          "actual_17g": "0.30009999999999999",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-0.3",
+          "observed_units": -3000,
+          "actual_17g": "-0.3",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-0.56789",
+          "observed_units": -5679,
+          "actual_17g": "-0.56789999999999994",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-0.105",
+          "observed_units": -1050,
+          "actual_17g": "-0.105",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-0.00001",
+          "observed_units": 0,
+          "actual_17g": "0",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-0.00009",
+          "observed_units": -1,
+          "actual_17g": "-0.0001",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-0.0001",
+          "observed_units": -1,
+          "actual_17g": "-0.0001",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-1.00123",
+          "observed_units": -10012,
+          "actual_17g": "-1.0012000000000001",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-0.29",
+          "observed_units": -2900,
+          "actual_17g": "-0.29",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-0.58",
+          "observed_units": -5800,
+          "actual_17g": "-0.57999999999999998",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-0.0099999998",
+          "observed_units": -100,
+          "actual_17g": "-0.01",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-999.1",
+          "observed_units": -9991000,
+          "actual_17g": "-999.10000000000002",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-999.10009",
+          "observed_units": -9991001,
+          "actual_17g": "-999.1001",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-999.1001",
+          "observed_units": -9991001,
+          "actual_17g": "-999.1001",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-0.00005",
+          "observed_units": -1,
+          "actual_17g": "-0.0001",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-0.00015",
+          "observed_units": -1,
+          "actual_17g": "-0.0001",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-0.00025",
+          "observed_units": -3,
+          "actual_17g": "-0.00029999999999999991",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-0.56785",
+          "observed_units": -5679,
+          "actual_17g": "-0.56789999999999994",
+          "actual_equals_round4_divide": true
+        },
+        {
+          "authored_literal": "-0.30005",
+          "observed_units": -3001,
+          "actual_17g": "-0.30009999999999999",
+          "actual_equals_round4_divide": true
+        }
+      ]
+    }
+  ],
+  "earlier_review_correction": "PRECISION-01 assumed documented F210truncation; native observations contradict it. In particular999.10009 and999.1001 share actual999.1001. Keep original report/adverse; choose actual native semantics. Original broadinterval also rejects valid F210round-up at.56789 while admitting lower.5678.",
+  "limits": "Finite observed cases establish source correction direction; actual MIR fresh/first-add/paid/save/two-cold and separate source review remain required. No exactreporter-save or release verdict.",
+  "source_or_credit_qualified": false,
+  "stable_acceptance": false
+}

@@ -1,0 +1,428 @@
+{
+  "kind": "MIR511CombinedSIFWorkerOutputReadbackV1",
+  "observed_at_utc": "2026-11-09T08:47:44.748704+00:00",
+  "status": "named-combined-data-output-regression-passed",
+  "source_commit": "d4beb15429e22bab89d474f65ff67a6bf991a9ae",
+  "source_tree": "a8f46c7a91cdfa6414d93eb3db435706b0edc83d",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "base_version": "2.1.23",
+    "factorio_version": "2.1"
+  },
+  "selected": [
+    "base@2.1.23",
+    "cr-commons@1.0.33",
+    "cr-extras@1.0.10",
+    "elevated-rails@2.1.23",
+    "mir-fixture-mir5-active-mods-observer@0.1.0",
+    "more-infinite-research@5.0.21011",
+    "quality@2.1.23",
+    "recycler@2.1.23",
+    "space-age@2.1.23",
+    "space-is-fake@1.0.78",
+    "WorkerRobotCargoSizeResearch@1.0.0"
+  ],
+  "data_dump": {
+    "path": "write-data/script-output/data-raw-dump.json",
+    "bytes": 29785382,
+    "sha256": "88C1621832E47D3B322236E9944FDC4A01676BE6F5E16B8CB3486DD4C2E8EE26"
+  },
+  "public_recipe_rows_checked": 70,
+  "exact_science_rows_checked": 78,
+  "finite_provider_rows": {
+    "worker-robots-storage-4": {
+      "type": "technology",
+      "name": "worker-robots-storage-4",
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/worker-robots-storage.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-capacity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "worker-robot-storage",
+          "modifier": 1
+        }
+      ],
+      "prerequisites": [
+        "worker-robots-storage-3",
+        "utility-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "count": 1000,
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ]
+        ],
+        "time": 60
+      },
+      "upgrade": true
+    },
+    "worker-robots-storage-5": {
+      "type": "technology",
+      "name": "worker-robots-storage-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/worker-robots-storage.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-capacity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "worker-robot-storage",
+          "modifier": 1
+        }
+      ],
+      "prerequisites": [
+        "worker-robots-storage-4"
+      ],
+      "unit": {
+        "count": 2000,
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ]
+        ],
+        "time": 60
+      },
+      "upgrade": true
+    },
+    "worker-robots-storage-6": {
+      "type": "technology",
+      "name": "worker-robots-storage-6",
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/worker-robots-storage.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-capacity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "worker-robot-storage",
+          "modifier": 1
+        }
+      ],
+      "prerequisites": [
+        "worker-robots-storage-5"
+      ],
+      "unit": {
+        "count": 4000,
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ]
+        ],
+        "time": 60
+      },
+      "upgrade": true
+    },
+    "worker-robots-storage-7": {
+      "type": "technology",
+      "name": "worker-robots-storage-7",
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/worker-robots-storage.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-capacity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "worker-robot-storage",
+          "modifier": 1
+        }
+      ],
+      "prerequisites": [
+        "worker-robots-storage-6"
+      ],
+      "unit": {
+        "count": 8000,
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ]
+        ],
+        "time": 60
+      },
+      "upgrade": true
+    }
+  },
+  "continuation": {
+    "type": "technology",
+    "name": "worker-robots-storage-8",
+    "icons": [
+      {
+        "icon": "__base__/graphics/technology/worker-robots-storage.png",
+        "icon_size": 256
+      },
+      {
+        "icon": "__core__/graphics/icons/technology/constants/constant-capacity.png",
+        "icon_size": 128,
+        "scale": 0.5,
+        "shift": [
+          50,
+          50
+        ],
+        "floating": true
+      }
+    ],
+    "localised_name": [
+      "technology-name.worker-robots-storage"
+    ],
+    "localised_description": [
+      "technology-description.worker-robots-storage"
+    ],
+    "level": 8,
+    "upgrade": true,
+    "hidden": false,
+    "max_level": "infinite",
+    "prerequisites": [
+      "worker-robots-storage-6",
+      "worker-robots-storage-7",
+      "automation-science-pack",
+      "logistic-science-pack",
+      "chemical-science-pack",
+      "production-science-pack",
+      "utility-science-pack",
+      "electromagnetic-science-pack"
+    ],
+    "effects": [
+      {
+        "type": "worker-robot-storage",
+        "modifier": 1
+      }
+    ],
+    "unit": {
+      "count_formula": "3417.1875*1.5^(L-8)",
+      "time": 60,
+      "ingredients": [
+        [
+          "automation-science-pack",
+          1
+        ],
+        [
+          "logistic-science-pack",
+          1
+        ],
+        [
+          "chemical-science-pack",
+          1
+        ],
+        [
+          "production-science-pack",
+          1
+        ],
+        [
+          "utility-science-pack",
+          1
+        ],
+        [
+          "electromagnetic-science-pack",
+          1
+        ]
+      ]
+    }
+  },
+  "private_holder": {
+    "type": "technology",
+    "name": "mir-worker-storage-preservation-4",
+    "icons": [
+      {
+        "icon": "__base__/graphics/technology/worker-robots-storage.png",
+        "icon_size": 256
+      },
+      {
+        "icon": "__core__/graphics/icons/technology/constants/constant-capacity.png",
+        "icon_size": 128,
+        "scale": 0.5,
+        "shift": [
+          50,
+          50
+        ],
+        "floating": true
+      }
+    ],
+    "localised_name": [
+      "technology-name.worker-robots-storage"
+    ],
+    "localised_description": [
+      "technology-description.worker-robots-storage"
+    ],
+    "level": 4,
+    "upgrade": true,
+    "hidden": true,
+    "max_level": "infinite",
+    "prerequisites": [
+      "worker-robots-storage-2",
+      "utility-science-pack",
+      "worker-robots-storage-3",
+      "automation-science-pack",
+      "logistic-science-pack",
+      "chemical-science-pack",
+      "production-science-pack",
+      "electromagnetic-science-pack"
+    ],
+    "effects": [
+      {
+        "type": "worker-robot-storage",
+        "modifier": 1
+      }
+    ],
+    "unit": {
+      "count_formula": "675*1.5^(L-4)",
+      "time": 60,
+      "ingredients": [
+        [
+          "automation-science-pack",
+          1
+        ],
+        [
+          "logistic-science-pack",
+          1
+        ],
+        [
+          "chemical-science-pack",
+          1
+        ],
+        [
+          "production-science-pack",
+          1
+        ],
+        [
+          "utility-science-pack",
+          1
+        ],
+        [
+          "electromagnetic-science-pack",
+          1
+        ]
+      ]
+    },
+    "visible_when_disabled": false,
+    "enabled": false,
+    "order": "zz[mir-worker-storage-preservation]"
+  },
+  "published_defaults_basis": {
+    "ref": "v5.0.10",
+    "blob": "d483c1b54b114c07190eb6cd44860e8c02195657",
+    "base_cost": 200,
+    "growth_factor": 1.5,
+    "increment": 0,
+    "research_time": 60
+  },
+  "root_restoration_receipt_sha256": "BBDCC1FD2F63E71258520C6C9824635CA48B13CF1DF0155566C064188D888104",
+  "limits": "One defaults data-stage dump only. SIF adapts provider science; finite4..7 effects/counts/time and MIR8 successor/default tuning are retained. All78 selected unit/science/gate rows contain no white science and their remaining science items exist. Disabled full default native preservation contract validated;675 default cost,1.5 growth,60s,six science ingredients and required gates. No worker recovery/gameplay/save/cap/reload/performance/release/stable verdict; other science-policy variations retain their original scope.",
+  "native_recovery_qualification": false,
+  "release_qualification": false
+}

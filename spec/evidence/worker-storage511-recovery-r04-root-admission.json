@@ -1,0 +1,19 @@
+{
+  "kind": "RootWorkerRecoveryR04AdmissionV1",
+  "execution_authorized": true,
+  "identity": "BLACKGLASS-WIN1\\Jules",
+  "packet_sha256": "0F3DA1A44BBA55FFD724A94427C46EDE55D7BDE42AC48454B83D98A611C33E4F",
+  "caller_sha256": "B1A52AA83386BC0559B9B3F8061DDCD2D14ED88B22DC133AB8E3847E41CCD35C",
+  "composition_sha256": "E350FB3BCECED8E8918B36D75DBD1A7EB44AE3645BED2C57204B2F8FC8F2A92F",
+  "scenario_sha256": "63BA77D7CC4F4235ADB0ECC09652F844910B4E5AEF7533A351CA93EB603A4DDD",
+  "source_tree": "d840d03890b3809646fe9b324bf62c7da91993ab",
+  "independent_root_review": [
+    "Read complete closed caller, finite3-engine schedule and stop-on-first-failure",
+    "Reviewed unchanged embedded actor and exact799400-byte prepared source custody",
+    "Fixture removes duplicated Golden input; actual Secretas appends it",
+    "Four prior successful processes are reused; fifth provider failure preserved",
+    "Actual native endpoints and saved state require independent post-run readback"
+  ],
+  "native_processes_max": 3,
+  "time_utc": "2026-11-09T08:01:08.2212361Z"
+}
