@@ -9,6 +9,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 - Keep Ferrum robotics science in continued worker robot cargo research on Factorio 2.0 and 2.1.
 - Restore 485 missing startup-setting labels from published translations across 49 languages.
 - Keep unavailable research explanations in separate, wrapping rows in the Research Library.
+- Preserve complete characters when limiting Library search text, including previously saved searches.
 
 ### Changes
 

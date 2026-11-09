@@ -124,10 +124,25 @@ local function ensure_state()
   return value
 end
 
+-- A valid UTF-8 input must remain valid when a byte budget is applied.
+local function utf8_prefix(value, limit)
+  local last = math.min(#value, limit)
+  local lead = last
+  while lead > 0 do
+    local byte = string.byte(value, lead)
+    if byte < 128 or byte > 191 then break end
+    lead = lead - 1
+  end
+  if lead == 0 then return "" end
+  local first = string.byte(value, lead)
+  local size = first < 128 and 1 or first < 224 and 2 or first < 240 and 3 or 4
+  if lead + size - 1 > last then last = lead - 1 end
+  return string.sub(value, 1, last)
+end
+
 local function text(value)
   if type(value) ~= "string" then return "" end
-  if #value > MAX_QUERY then return string.sub(value, 1, MAX_QUERY) end
-  return value
+  return utf8_prefix(value, MAX_QUERY)
 end
 
 local function technology_id(value)
@@ -1665,13 +1680,7 @@ local function setting_display(name, value)
   if #shown > 120 then
     -- Keep the authored compact preview without splitting a UTF-8 character.
     -- Configuration and profile export continue to use the original value.
-    local last = 117
-    while last > 0 do
-      local next_byte = string.byte(shown, last + 1)
-      if next_byte < 128 or next_byte > 191 then break end
-      last = last - 1
-    end
-    return string.sub(shown, 1, last) .. "..."
+    return utf8_prefix(shown, 117) .. "..."
   end
   return shown
 end

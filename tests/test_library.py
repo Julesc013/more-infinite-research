@@ -2074,6 +2074,68 @@ class LibraryTests(unittest.TestCase):
           assert(storage.mir_library.players[1].selected == gear.name)
         ''')
 
+
+    def test_search_byte_limits_keep_complete_utf8_in_both_tabs(self):
+        cases = (
+            ("x" * 161, "x" * 160),
+            ("x" * 158 + "é", "x" * 158 + "é"),
+            ("x" * 157 + "界", "x" * 157 + "界"),
+            ("x" * 156 + "🚀", "x" * 156 + "🚀"),
+            ("x" * 159 + "é-tail", "x" * 159),
+            ("x" * 158 + "界-tail", "x" * 158),
+            ("x" * 157 + "🚀-tail", "x" * 157),
+            ("ä" * 78 + "abcé", "ä" * 78 + "abc"),
+            ("界" * 54, "界" * 53),
+            ("🚀" * 41, "🚀" * 40),
+        )
+        for number, (query, expected) in enumerate(cases):
+            for route in ("gui-research", "gui-settings", "legacy-research", "legacy-settings",
+                          "saved-research", "saved-settings"):
+                with self.subTest(case=number, route=route):
+                    self.lua.globals().utf8_query = query
+                    self.lua.globals().utf8_expected = expected
+                    self.lua.globals().utf8_route = route
+                    self.lua.execute(r"""
+                      boot()
+                      local root = library.open(player, {query="copper", settings_search="repair"})
+                      local view = storage.mir_library.players[1]
+                      local before_level, before_queue = gear.level, player.force.research_queue
+                      local before_current, before_progress = player.force.current_research, player.force.research_progress
+                      local settings_route = utf8_route:find("settings", 1, true) ~= nil
+                      if utf8_route:sub(1, 3) == "gui" then
+                        if settings_route then library.open(player, {tab="settings"}) end
+                        local field = settings_route and root.mir_library_tabs.mir_library_settings_content.mir_library_settings_query
+                          or research_filters(root).mir_library_query
+                        field.text = utf8_query
+                        library.on_gui_text_changed({player_index=1, element=field})
+                        assert(field.text == utf8_query, "typing must keep the current native text/caret context")
+                      elseif utf8_route:sub(1, 6) == "legacy" then
+                        local options = {tab=settings_route and "settings" or "research", search=utf8_query}
+                        library.open(player, options)
+                        assert(options.search == utf8_query, "legacy caller input must stay detached")
+                      else
+                        library.close(player)
+                        local saved = storage.mir_library.players[1]
+                        saved[settings_route and "settings_query" or "query"] = utf8_query:sub(1, 160)
+                        root = library.open(player, {tab=settings_route and "settings" or "research"})
+                      end
+                      view = storage.mir_library.players[1]
+                      local actual = settings_route and view.settings_query or view.query
+                      assert(actual == utf8_expected and #actual <= 160,
+                        "query byte budget must preserve complete UTF-8 characters")
+                      assert((settings_route and view.query or view.settings_query) == (settings_route and "copper" or "repair"),
+                        "queries must remain independent")
+                      assert(player.gui.screen.mir_research_browser == root, "query rendering must retain the root")
+                      library.close(player)
+                      root = library.open(player)
+                      local field = settings_route and root.mir_library_tabs.mir_library_settings_content.mir_library_settings_query
+                        or research_filters(root).mir_library_query
+                      assert(field.text == utf8_expected, "reopen must render the safe retained query")
+                      assert(gear.level == before_level and player.force.research_queue == before_queue
+                        and player.force.current_research == before_current and player.force.research_progress == before_progress,
+                        "text presentation must leave native research untouched")
+                    """)
+
     def test_legacy_remote_search_uses_selected_or_retained_tab_without_cross_query_writes(self):
         self.lua.execute(r'''
           boot()
