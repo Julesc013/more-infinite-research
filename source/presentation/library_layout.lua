@@ -2,6 +2,8 @@
 -- Kept independent of Factorio GUI objects so sizing decisions stay small
 -- and testable without loading a game.
 local M = {}
+-- The native frame action and draggable header share one logical height.
+M.titlebar_action_size = 24
 
 local function finite(value)
   return type(value) == "number" and value == value and value > -math.huge and value < math.huge

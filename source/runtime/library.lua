@@ -2158,9 +2158,29 @@ end
 
 local function icon_button(parent, name, sprite, tooltip)
   local control = add(parent, {type = "sprite-button", name = PREFIX .. name,
-    style = "tool_button", sprite = sprite, tooltip = tooltip})
-  if control.style then control.style.width, control.style.height = 30, 30 end
+    style = "frame_action_button", sprite = sprite, tooltip = tooltip})
   return control
+end
+
+local function sync_titlebar(frame)
+  local title = frame[PREFIX .. "title"]
+  if not valid(title) then return end
+  title.drag_target = frame
+  local caption, drag = title[PREFIX .. "title_label"], title[PREFIX .. "drag"]
+  if valid(caption) then caption.ignored_by_interaction = true end
+  if valid(drag) then
+    drag.ignored_by_interaction = true
+    drag.style.height, drag.style.right_margin = library_layout.titlebar_action_size, 4
+  end
+  for _, name in ipairs({"layout_smaller", "layout_larger", "layout_reset", "close"}) do
+    local button = title[PREFIX .. name]
+    if valid(button) and button.style then
+      if button.style.name ~= "frame_action_button" then button.style.name = "frame_action_button" end
+      local size = library_layout.titlebar_action_size
+      if button.style.minimal_width ~= size or button.style.maximal_width ~= size then button.style.width = size end
+      if button.style.minimal_height ~= size or button.style.maximal_height ~= size then button.style.height = size end
+    end
+  end
 end
 
 local function create_filters(frame, player, view, width)
@@ -2222,6 +2242,7 @@ local function create_tabs(frame, player, view)
 end
 
 local function sync_frame_layout(player, view, frame)
+  sync_titlebar(frame)
   local width, height = library_layout.frame_size(player.display_resolution, player.display_scale, view.geometry)
   local pairs_per_row, control_width = library_layout.filter_layout(width)
   local content_width = style_pixels(width - 48)
@@ -2296,7 +2317,7 @@ local function create_frame(player, view)
   add(title, {type = "label", name = PREFIX .. "title_label", caption = {"mir-browser.title"}, style = "frame_title"})
   local drag = add(title, {type = "empty-widget", name = PREFIX .. "drag", style = "draggable_space_header"})
   drag.style.horizontally_stretchable = true
-  drag.style.height = 24
+  drag.style.height = library_layout.titlebar_action_size
   drag.drag_target = frame
 
   icon_button(title, "layout_smaller", "utility/left_arrow", {"mir-browser.layout-smaller"})
