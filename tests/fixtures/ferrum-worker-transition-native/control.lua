@@ -11,8 +11,15 @@ local FOREIGN = {table.unpack(BASE)}; FOREIGN[#FOREIGN + 1] = "ferrum-robotics-s
 local PUBLIC = {table.unpack(FOREIGN)}; PUBLIC[#PUBLIC + 1] = "electromagnetic-science-pack"
 local ROWS = {"worker-robots-storage-1", "worker-robots-storage-2", "worker-robots-storage-3",
   C, P, "worker-robots-storage-5", N, "worker-robots-storage-7", "worker-robots-storage-8", S, CAL}
+local TUPLES = {
+  ["2.1.23"]={mir="5.0.21012",ferrum="0.1.5",planets="2.4.0",spider="2.9.87",recycler=true,modifier_hidden=true},
+  ["2.0.77"]={mir="5.0.20012",ferrum="0.0.5",planets="1.18.0",spider="2.9.86",recycler=false,modifier_hidden=false}
+}
 local loaded, administrative, transferring = false, false, false
 local function check(ok, message) if not ok then error("[mir-ferrum-transition] " .. message, 2) end end
+local function tuple()
+  local selected=TUPLES[script.active_mods.base]; check(selected,"exact supported engine tuple"); return selected
+end
 local function same(a, b, path)
   path = path or "$"; check(type(a) == type(b), "frame type " .. path)
   if type(a) == "table" then
@@ -54,10 +61,12 @@ local function marker(stage)
     price=game.difficulty_settings.technology_price_multiplier, physical_robot_delivery=false}))
 end
 local function closure(provider)
-  local expected = {base="2.1.23", ["space-age"]="2.1.23", quality="2.1.23", ["elevated-rails"]="2.1.23",
-    recycler="2.1.23", ["more-infinite-research"]="5.0.21012", [LAB]="0.1.0",
+  local selected, base=tuple(),script.active_mods.base
+  local expected = {base=base, ["space-age"]=base, quality=base, ["elevated-rails"]=base,
+    ["more-infinite-research"]=selected.mir, [LAB]="0.1.0",
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
-  if provider then expected["planet-ferrum"], expected.PlanetsLib, expected["spider-launcher"] = "0.1.5", "2.4.0", "2.9.87" end
+  if selected.recycler then expected.recycler=base end
+  if provider then expected["planet-ferrum"], expected.PlanetsLib, expected["spider-launcher"] = selected.ferrum, selected.planets, selected.spider end
   same(script.active_mods, expected, "mods")
   check(game.difficulty_settings.technology_price_multiplier == 1, "matching map price1")
   check(settings.startup["mir-max-level-worker-robots-storage"].value == 8
@@ -73,7 +82,10 @@ local function science(t, expected)
 end
 local function effect(t)
   local e=t.prototype.effects
-  check(#e==1 and e[1].type=="worker-robot-storage" and e[1].modifier==1 and e[1].hidden==false, "native effect")
+  check(#e==1 and e[1].type=="worker-robot-storage" and e[1].modifier==1, "native effect")
+  -- Exact installed SDK representations. Never insert/normalize this member.
+  if tuple().modifier_hidden then check(e[1].hidden==false,"F210 native effect hidden")
+  else check(e[1].hidden==nil,"F200 native effect hidden must remain absent") end
 end
 local function default_contract(t)
   check(t and t.prototype.level==4 and t.prototype.max_level==4294967295

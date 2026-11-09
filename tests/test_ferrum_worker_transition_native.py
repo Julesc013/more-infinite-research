@@ -26,7 +26,8 @@ class FerrumWorkerTransitionNativeControls(unittest.TestCase):
         self.lua.globals().actor_path = (FIXTURE / "control.lua").as_posix()
         self.lua.globals().fingerprint = lambda v: json.dumps(plain(v), sort_keys=True)
         self.lua.execute(r'''
-          function run_transition(opponent,native_count,actor_override)
+          function run_transition(opponent,native_count,actor_override,target)
+            local modern=target~="f200"
             local C,P,N="worker-robots-storage-4","mir-worker-storage-preservation-4","worker-robots-storage-6"
             local S,CAL="mir-ferrum-transition-sentinel","mir-ferrum-transition-count-6"
             local LAB="mir-fixture-ferrum-worker-transition-lab"
@@ -36,9 +37,14 @@ class FerrumWorkerTransitionNativeControls(unittest.TestCase):
             local useful={table.unpack(foreign)};useful[7]="electromagnetic-science-pack"
             local mods={base="2.1.23",["space-age"]="2.1.23",quality="2.1.23",["elevated-rails"]="2.1.23",recycler="2.1.23",
               ["more-infinite-research"]="5.0.21012",[LAB]="0.1.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
-            if opponent=="wrong-engine"then mods.base="2.0.77"end
-            if opponent=="previous11"then mods["more-infinite-research"]="5.0.21011"end
-            if opponent=="future13"then mods["more-infinite-research"]="5.0.21013"end
+            if not modern then
+              for _,name in ipairs({"base","space-age","quality","elevated-rails"})do mods[name]="2.0.77"end
+              mods.recycler=nil;mods["more-infinite-research"]="5.0.20012"
+            end
+            if opponent=="wrong-engine"then mods.base=modern and"2.0.77"or"2.1.23"end
+            if opponent=="previous11"then mods["more-infinite-research"]=modern and"5.0.21011"or"5.0.20011"end
+            if opponent=="future13"then mods["more-infinite-research"]=modern and"5.0.21013"or"5.0.20013"end
+            if opponent=="cross-edition"then mods["more-infinite-research"]=modern and"5.0.20012"or"5.0.21012"end
             local callbacks,commands,logs,saves,store,creators,forces,labs={},{},{},{},{},{},{},{}
             local game={tick=0,forces=forces,difficulty_settings={technology_price_multiplier=1},surfaces={nauvis={}}}
             local function ingredients(list)local out={};for _,id in ipairs(list)do out[#out+1]={name=id,amount=1,type="item"}end;return out end
@@ -47,7 +53,8 @@ class FerrumWorkerTransitionNativeControls(unittest.TestCase):
               local t={name=id,force=f,level=first,researched=false,enabled=id~=P and id~=CAL,visible_when_disabled=false,saved_progress=0,prerequisites={}}
               local proto={level=first,max_level=formula and id~=CAL and 4294967295 or first,hidden=id==P or id==CAL,
                 research_unit_count_formula=formula,research_unit_energy=3600,research_unit_ingredients=ingredients(sci),
-                effects=worker and{{type="worker-robot-storage",modifier=1,hidden=false}}or{}}
+                effects=worker and{{type="worker-robot-storage",modifier=1}}or{}}
+              if worker and modern then proto.effects[1].hidden=false end
               t.prototype=proto;creators[id]=owner
               setmetatable(t,{__index=function(_,key)
                 if key=="research_unit_count"then
@@ -102,6 +109,9 @@ class FerrumWorkerTransitionNativeControls(unittest.TestCase):
               forces[name]=f;return f
             end
             force("player");force("enemy");force("neutral");game.create_force=force
+            if opponent=="missing-F210-hidden"then forces.player.technologies[C].prototype.effects[1].hidden=nil end
+            if opponent=="invalid-hidden"then forces.player.technologies[C].prototype.effects[1].hidden="false"end
+            if opponent=="present-F200-hidden"then forces.player.technologies[C].prototype.effects[1].hidden=false end
             game.surfaces.nauvis.set_tiles=function()end
             game.surfaces.nauvis.create_entity=function(spec)
               local items={};local inv={insert=function(row)local n=math.min(row.count,200-(items[row.name]or 0));items[row.name]=(items[row.name]or 0)+n;return n end,
@@ -172,8 +182,10 @@ class FerrumWorkerTransitionNativeControls(unittest.TestCase):
               technology(f,"worker-robots-storage-5",5,1012,foreign,{C},"planet-ferrum")
               technology(f,N,6,0,useful,{C,"worker-robots-storage-5",table.unpack(old)},"more-infinite-research","1518.75*1.5^(L-6)")
             end
-            mods["planet-ferrum"],mods.PlanetsLib,mods["spider-launcher"]="0.1.5","2.4.0","2.9.87"
-            if opponent=="wrong-provider"then mods["planet-ferrum"]="0.1.4"end
+            mods["planet-ferrum"],mods.PlanetsLib,mods["spider-launcher"]=modern and"0.1.5"or"0.0.5",modern and"2.4.0"or"1.18.0",modern and"2.9.87"or"2.9.86"
+            if opponent=="wrong-provider"then mods["planet-ferrum"]=modern and"0.1.4"or"0.0.4"end
+            if opponent=="wrong-PlanetsLib"then mods.PlanetsLib=modern and"1.18.0"or"2.4.0"end
+            if opponent=="wrong-spider"then mods["spider-launcher"]=modern and"2.9.86"or"2.9.87"end
             if opponent=="granted-foreign4"then forces.player.technologies[C].researched=true end
             if opponent=="lost-private-level"then forces.player.technologies[P].level=7 end
             if opponent=="lost-current"then forces.player.research_progress=.1 end
@@ -184,7 +196,7 @@ class FerrumWorkerTransitionNativeControls(unittest.TestCase):
             if opponent=="wrong-finite-level"then forces.player.technologies[C].level=5 end
             if opponent=="wrong-public-count"then rawset(forces.player.technologies[N],"research_unit_count",native_count+1)end
             if opponent=="wrong-cap"then env.settings.startup["mir-max-level-worker-robots-storage"].value=9 end
-            parse();callbacks.load();callbacks.config{mod_changes={["planet-ferrum"]={new_version=mods["planet-ferrum"]},PlanetsLib={new_version="2.4.0"},["spider-launcher"]={new_version="2.9.87"}}}
+            parse();callbacks.load();callbacks.config{mod_changes={["planet-ferrum"]={new_version=mods["planet-ferrum"]},PlanetsLib={new_version=mods.PlanetsLib},["spider-launcher"]={new_version=mods["spider-launcher"]}}}
             if opponent=="post-MIR-private"then forces.player.technologies[P].enabled=false end
             callbacks.tick{}
             local f=forces["worker-suspended"];local saved=f.technologies[P].saved_progress;local progress=f.research_progress
@@ -203,8 +215,40 @@ class FerrumWorkerTransitionNativeControls(unittest.TestCase):
           end
         ''')
 
-    def run_case(self, opponent=None, native_count=1518, actor_override=None):
-        return plain(self.lua.globals().run_transition(opponent, native_count, actor_override))
+    def run_case(self, opponent=None, native_count=1518, actor_override=None, target="f210"):
+        return plain(self.lua.globals().run_transition(opponent, native_count, actor_override, target))
+
+    def test_f200_same_four_process_model_keeps_absent_modifier_field_and_full_work(self):
+        for count in (1518, 1519):
+            with self.subTest(calibration=count):
+                result = self.run_case(native_count=count, target="f200")
+                self.assertEqual(result["frames"]["player"]["bonus"], 11)
+                self.assertEqual(result["frames"]["worker-suspended"]["bonus"], 7)
+                self.assertEqual(result["frames"]["worker-uninvested"]["bonus"], 3)
+                self.assertEqual(result["ordinary"]["player"]["worker-robots-storage-6"], 1)
+                self.assertEqual(len(result["consumption"]), 12)
+                self.assertEqual(result["readonly_colds"], 2)
+                for frame in result["frames"].values():
+                    self.assertNotIn("hidden", frame["rows"]["mir-worker-storage-preservation-4"]["effects"][0])
+
+    def test_exact_both_family_dependencies_editions_and_sdk_representations_reject_opponents(self):
+        for target in ("f200", "f210"):
+            opponents = ["wrong-engine", "cross-edition", "previous11", "future13", "wrong-provider",
+                         "wrong-PlanetsLib", "wrong-spider", "invalid-hidden"]
+            opponents.append("missing-F210-hidden" if target == "f210" else "present-F200-hidden")
+            for opponent in opponents:
+                with self.subTest(target=target, opponent=opponent), self.assertRaises(Exception):
+                    self.run_case(opponent, target=target)
+
+    def test_f200_lab_metadata_is_an_exact_counterpart_without_actor_or_data_copy(self):
+        for name, base, mir, ferrum in (("info.json", "2.1.23", "5.0.21012", "0.1.5"),
+                                       ("info-f200.json", "2.0.77", "5.0.20012", "0.0.5")):
+            row = json.loads((FIXTURE / "lab-source" / name).read_text())
+            self.assertEqual(row["version"], "0.1.0")
+            self.assertEqual(row["factorio_version"], base.rsplit(".", 1)[0])
+            self.assertEqual(row["dependencies"], [f"base = {base}", f"space-age = {base}",
+                f"more-infinite-research = {mir}", f"? planet-ferrum = {ferrum}"])
+        self.assertFalse((FIXTURE / "lab-source/control.lua").exists())
 
     def test_four_process_observer_model_preserves_entry_and_requires_all_ordinary_work(self):
         for count in (1518, 1519):

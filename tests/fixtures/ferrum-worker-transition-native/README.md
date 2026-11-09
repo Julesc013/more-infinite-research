@@ -1,7 +1,7 @@
 ---
 title: "Prepared MIR-default to full Ferrum worker transition observer"
 status: prepared
-applies_to: "Exact Factorio 2.1.23, MIR 5.0.21012 and Ferrum 0.1.5"
+applies_to: "Exact Factorio 2.1.23/Ferrum 0.1.5 and 2.0.77/Ferrum 0.0.5, matching MIR12"
 audience: developer
 doc_type: test-fixture
 owner: mir-maintainers
@@ -20,7 +20,7 @@ The lab is a separate disposable data-only mod. It clones only the ordinary lab 
 
 ## Exact inputs and independent obligations
 
-- Source: Base/Space Age/Quality/Elevated Rails/Recycler2.1.23, MIR5.0.21012, lab0.1.0 and the existing ActiveMods observer0.1.0. Destination adds only official Ferrum0.1.5, PlanetsLib2.4.0 and Spider Launcher2.9.87. No other mod/version or startup setting change is admitted. F200 is deliberately outside this fixture's exact tuple; the existing separate F200 evidence retains its own identity.
+- F210 source: Base/Space Age/Quality/Elevated Rails/Recycler2.1.23, MIR5.0.21012, lab0.1.0 and the existing ActiveMods observer0.1.0. Destination adds only official Ferrum0.1.5, PlanetsLib2.4.0 and Spider Launcher2.9.87. F200 source uses Base/Space Age/Quality/Elevated Rails2.0.77 (no Recycler), MIR5.0.20012 and the same lab/observer versions; destination adds only official Ferrum0.0.5, PlanetsLib1.18.0 and Spider Launcher2.9.86. Select `lab-source/info.json` for F210 or `info-f200.json` as `info.json` for F200, with the identical shared actor/data/settings bodies. No cross-edition/future version or other mod/startup-setting change is admitted. F210 requires its documented modifier `hidden=false`; F200 requires the observed SDK field absence and never writes a replacement field into snapshots.
 - Administrative source prerequisites grant only finite worker1–3 and non-worker science prerequisites. Native bonus3 is checked. The player then earns four default infinite worker completions through actual labs; another force earns three. Both continue to actual native partial worker work (next8 at least.35, next7 at least.27). The latter suspends that work behind unrelated current sentinel progress. An uninvested force keeps worker4 disabled and unrelated current work. No infinite level setter obtains these earnings or partials.
 - Before adding the provider, `/mir-worker-storage-recovery prepare` must actually run twice under the unchanged selection. The observer checks the first transferred frame and requires the second to be identical, including native bonus, full work contract, current/ordered queue/saved work and flags. Transfer-generated native callbacks are recorded separately from ordinary completions.
 - Provider entry requires exact private/earned/current/queue/suspended preservation, unearned finite4/5, unearned MIR6, retained original finite4 flags and no overlapping public7/8. It compares the independently retained default private contract, not a count reconstructed from clamped current worker4 or an aggregate bonus.
@@ -35,7 +35,7 @@ The lab is a separate disposable data-only mod. It clones only the ordinary lab 
 3. A separate read-only one-update cold load of a distinct copy of the exact protected destination must emit exactly one `destination-saved-cold`, exit naturally0 and leave its ZIP bytes unchanged.
 4. A second distinct process repeats the same immutable one-update check. No persisted cold counter, re-save, second gameplay update or changed actor is admitted.
 
-Root owns the controller, exact archive/engine/package/SDK pins, proper frozen Git runner, real zero-native composition, admission and execution. Reuse the existing direct-library activation/owned-archive/resource/shared-live-log/save-closed predicates and loopback RCON helper; no new orchestration framework. Proposed unchanged bounds are one process at a time,4096MiB,180seconds and64MiB per selection, first-error stop and byte-exact archive/control/original-save restoration. No engines, archive builds, activation or package changes are performed by this source unit.
+Root owns the controller, exact archive/engine/package/SDK pins, proper frozen Git runner, real zero-native composition, admission and execution. The same four-process protocol applies separately to each exact tuple (eight serial processes for both); neither engine's save is relabelled or loaded as the other. Reuse the existing direct-library activation/owned-archive/resource/shared-live-log/save-closed predicates and loopback RCON helper; no new orchestration framework. Proposed unchanged bounds are one process at a time,4096MiB,180seconds and64MiB per selection, first-error stop and byte-exact archive/control/original-save restoration. No engines, archive builds, activation or package changes are performed by this source unit.
 
 ## Issue1845 scope
 
