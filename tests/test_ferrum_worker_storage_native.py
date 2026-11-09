@@ -263,6 +263,7 @@ class FerrumWorkerStorageNativeControls(unittest.TestCase):
               if cargo_mode=="duplicate-command"then commands["mir-ferrum-worker-cargo"]{parameter="start"}end
               until_phase("cargo-destination-saved")
               if cargo_mode=="changed-cold-cargo"then boxes["requester-chest"].values["iron-plate"]=6 end
+              if cargo_mode=="changed-cold-position"then boxes["requester-chest"].entity.position.x=99 end
             end
             if opponent=="altered-cold"then forces["mir-ferrum-foreign"].research_progress=.123 end
             if opponent=="altered-cold-inventory"then lab.items[packs[1]]=1 end
@@ -309,10 +310,11 @@ class FerrumWorkerStorageNativeControls(unittest.TestCase):
                               ("stationary-load", "lacks observed"), ("duplicate-delivery", "iron conservation"),
                               ("changed-request", "request changed"), ("native-research-write", "cargo-native"),
                               ("foreign-frame", "cargo-native"), ("changed-robot", "robot changed"),
-                              ("timeout", "timeout"), ("changed-cold-cargo", "iron conservation")]:
+                              ("timeout", "timeout"), ("changed-cold-cargo", "iron conservation"),
+                              ("changed-cold-position", "cold-cargo")]:
             with self.subTest(mode=mode), self.assertRaisesRegex(Exception, message):
                 self.run_case(cargo_mode=mode)
-            if mode != "changed-cold-cargo":
+            if mode not in ("changed-cold-cargo", "changed-cold-position"):
                 state = self.lua.globals().last_ferrum_storage["mir_ferrum_worker_native"]
                 self.assertIsNone(state.cargo.completed)
                 self.assertFalse(state.cargo.report.physical_robot_delivery)

@@ -241,6 +241,7 @@ local function cargo_frame()
   local network = c.port.logistic_network
   local result = {provider = provider, requester = requester, docked = docked,
     port = c.port.unit_number, provider_id = c.provider.unit_number, requester_id = c.requester.unit_number,
+    positions = {port = copied(c.port.position), provider = copied(c.provider.position), requester = copied(c.requester.position)},
     active = {}, network_ready = network ~= nil}
   if not network then return result end
   check(#network.cells == 1 and network.all_logistic_robots == 1 and network.all_construction_robots == 0,
