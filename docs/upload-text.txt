@@ -1,11 +1,20 @@
-MIR 5.0.10
-Channel: GitHub prerelease. Mod Portal publication remains with the maintainer.
+MIR 5.0.11
+Channel: GitHub prerelease (beta), not marked latest. Mod Portal publication remains with the maintainer.
 
-Fixes worker robot cargo research conflicts and Space Is Fake science requirements.
+Fixes startup with fractional productivity rewards and adds preparation for worker cargo provider changes.
 
-- Preserve finite cargo research and continue after its actual endpoint; retain external infinite research.
-- Retire white science consistently from final MIR research under Space Is Fake.
-- Preserve the previous multiplier fix and improve saved bonus-history diagnostics.
-- Back up saves and matching mods. Provider changes on earned MIR worlds can be refused when ownership cannot be established.
+- Fix valid productivity reward settings causing startup errors on Factorio 2.0 and 2.1, including very small rewards.
+- Retain the selected Library research while translated search results reload after changing tabs.
+- Add an administrator/server command to prepare earned worker cargo bonuses and unfinished research before adding a finite cargo provider. Preparation covers the ordinary Base-game and Space Age worker research contract; the later provider transition remains under validation.
 
-https://github.com/Julesc013/more-infinite-research/blob/v5.0.10/docs/support.md
+Before adding a worker cargo provider:
+
+1. Protect the pre-change original save and its matching mods/settings. Load a copy with MIR 5.0.11 and the previous mod selection, then run /mir-worker-storage-recovery prepare as an administrator or server.
+2. On success, save under a new name and exit immediately. Keep the worker level cap and enable setting unchanged through the provider change and while preserved work remains.
+3. Add the intended provider to the prepared copy. Check cargo bonuses, current research and queue order before saving and reloading. Use /mir-worker-storage-recovery resume <force-name> to append detached partial work when needed.
+
+An already-clamped save requires the pre-change original. Preparation for overhauls and repeated provider changes remains unqualified.
+
+This is a GitHub beta with stable qualification unfinished. Full Ferrum-profile validation remains unverified because the required official mod archives were unavailable.
+
+https://github.com/Julesc013/more-infinite-research/blob/v5.0.11/docs/support.md
