@@ -1,0 +1,26 @@
+{
+  "kind": "RemoteExactOriginalBodyReadbackV1",
+  "repo": "Julesc013/scratchpad",
+  "commit": "1bd91338605a17b174ec6ef74257b54c1a6c59dc",
+  "all_exact": true,
+  "files": [
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/f200-worker-preservation-r01-originals/.gitattributes",
+      "bytes": 12,
+      "sha256": "DC867BFA424D5804F4B790B2901BB95C32DF7BB3341B3AAC822DFC76751093FE",
+      "git_blob": "57cdc50305d07f35133f80962644debd6b846bf3"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/f200-worker-preservation-r01-originals/MANIFEST.json",
+      "bytes": 53583,
+      "sha256": "70DF8BA1A4A7B250147BF2F55955C088150F9C12027D8F27AA1DA193B63F6425",
+      "git_blob": "68b677654fecbb5bf169963572b7493537309775"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/f200-worker-preservation-r01-originals/original-bodies.json.gz",
+      "bytes": 8051984,
+      "sha256": "F8C1AC51DEFF6F32831814B2874EA50B288BF025315FAD2D1798E742D8020F71",
+      "git_blob": "3e7ec7f02c15a9770131f181459754ee577ac04e"
+    }
+  ]
+}

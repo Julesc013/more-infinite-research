@@ -1,0 +1,59 @@
+{
+  "kind": "MIR511Active68ConsumedInputIndependentReviewV1",
+  "reviewed_at_utc": "2026-11-09T11:11:40Z",
+  "verdict": "The accepted 68-observation result remains valid for its original 5.0.10 inputs. No existing candidate timing/memory comparison cell is established for published 5.0.11 by consumed-input reuse. This is an applicability gap, not a measured regression.",
+  "authority": "VER-06 requires unchanged relevant source/package, engine/mod, settings, save/fixture, harness/scenario and endpoint inputs. PERF-03/04 preserve matched arms, counterbalancing and original tolerances; shared-path uncertainty cannot be converted to a pass.",
+  "original": {
+    "chain": "spec/evidence/runtime510-active-analysis-native-chain-r01.json",
+    "candidate_commit": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+    "candidate_source_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+    "candidate_archive": "more-infinite-research_5.0.21010.zip",
+    "candidate_archive_sha256": "C625D648978F6FE677B5EDC5C68090A2AA9A939D48A54A736610D55E47337806",
+    "reference_archive_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F",
+    "engine": "Factorio2.1.23 / 8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "plan_revision": "8ab529a090128979014ebfe968b794b7511679f0",
+    "plan_sha256": "9CDED5FE074894D734210CB432384BF4B509D69AD9CB527424701358EF7054F9",
+    "controller_revision": "d35f0bb2d23c1517af5025685f05f1527ef3e648",
+    "retained_executed_controller_sha256": "2AF27FC250BEC34D8626A1028C136FA879D0CA85ECE6827D930A32EAB88CF5D1",
+    "raw_observations_sha256": "711A80F535CB10E126DD924B44AB7210F1D31C79CE8828865404B94B22E9AF46",
+    "analysis_sha256": "E8C650B96CA68FCB52E6646B62AC7B8FEAC4AE7CF85A72C4E0DD277740427AC9",
+    "counts": {"observations": 68, "warmups": 16, "scored": 52, "pairs": 26, "published": 34, "candidate": 34}
+  },
+  "target": {
+    "published_main": "085df7ef6027f08cd2f4d43e348f1ea15f155168",
+    "source_tree": "93d30a248e71e5248eeb87072c27332fe68b9137",
+    "archive": "more-infinite-research_5.0.21011.zip",
+    "bytes": 1006768,
+    "sha256": "C3CB6462E3285DA222664D2174EAA16E63577BF9970804E410B127A43C773D14"
+  },
+  "exact_consumed_scope": {
+    "profiles": "All four candidate cases select the same pinned 2.1.23 official Base/elevated-rails/quality/recycler/Space Age set, MIR10, A15A observer and case-specific exact fixture archives. No overhaul/provider workload. Published prerequisites retain their original505R02 capture/fixture identities, not current-candidate identities.",
+    "settings": "Defaults activation. Repair fixture changes only the native passive-repair startup default from false to true. Agriculture candidate-defaults asserts configured science policy and false space-gate default; matched tier settings select 1/32/128 towers. The relevant settings/configuration source and override bodies were inspected; unchanged startup definitions alone do not prove unchanged loaded state.",
+    "repair_work": "Protected pending seed; first post-load tick damages 1000 eligible walls. Exact 256 tracked/744 overflow boundaries, 128 player plus128 reciprocal-friendly tracked walls, unchanged foreign/non-wall controls,256 initial changes and8 reactivation changes. No prior repair is counted as new measured work.",
+    "agriculture_work": "Protected pending seeds at N=1/32/128. Two actual lab completions precede saving. N player and N zero-research foreign towers start with zero planting events; first post-load insertion must produce exactly2N native on_tower_planted_seed events. Fresh common terrain seed424242/cleared authored crop footprints are retained preparation, not a different live factory workload.",
+    "endpoints": "Each actual process runs benchmark25000 updates, one run, sanitize, fresh owned seed copy and before/after source/owned hashes. Per-update engine average is distinct from process duration. Memory cells use process-lifetime OS peak working set plus maximum250ms-sampled working/private bytes, including loading. Original4GiB/120MiB per-launch admission and complete quiet-block policy remain fixed.",
+    "candidate_seed_sha256": {
+      "repair": "266658E77072B3637EC24A3FEF594FEB4E0D9C656B9B8049DC4CE5E78D142E9B",
+      "agriculture1": "64352C4C10775F8D9560DD33F8BEFF11CC2B04628121AE1A6ABED2516DB4C678",
+      "agriculture32": "9D36A60F3951A5836B64B1EED47B30CF73B929E23C1B2969E81C7641B79EB3A4",
+      "agriculture128": "774DFCFDD204F3499C7A80392E18F85DD44DFD44A1FE50965DB2292C11563476"
+    }
+  },
+  "independent_evidence_checks": {
+    "primary_custody": "All968 retained files/76,336,084 bytes rehashed against MANIFEST774313FA2EDA851633E35DCA7C0341D4ECC3CD7BF0A0FF56926F6B8F2BF81C62 with no discrepancy. Raw observed/prepared bodies match711A/DCFE, and the retained executed controller matches2AF2. This is custody/applicability review, not repeated statistical acceptance or native execution.",
+    "package_comparison": "Actual delivered10 C625 and11 C3CB ZIP bodies compared by member path. Sixty-three members differ:50 locales plus13 nonlocale members; total uncompressed player growth39,287 bytes. The target change is materially larger than version metadata.",
+    "unchanged_direct_workers": ["runtime/passive_repair.lua", "runtime/scripted_effects.lua", "runtime/configuration.lua", "runtime/settings_profile.lua", "runtime/settings_commands.lua", "runtime/spoilage_contribution.lua", "runtime/lifecycle.lua", "runtime/catalogue.lua", "settings.lua"],
+    "changed_resident_runtime": ["runtime/bootstrap.lua", "runtime/library.lua", "runtime/library_translations.lua", "runtime/native_credits.lua", "runtime/worker_robot_storage.lua"],
+    "changed_data_and_shared_declarations": ["compatibility/modern_catalogue.lua", "data-final-fixes.lua", "research/catalogue.lua", "research/modern.lua", "research/worker_storage_recovery.lua"],
+    "concrete_impact_boundary": "Modern data-final-fixes now authors a private worker-preservation prototype even in default Base/Space Age; bootstrap configures the larger worker module, adds command/event decisions and invokes changed worker load history. Worker force_events now requires the native preservation prototype and returns true. Native-credit normalization and Library resident bodies also changed. No current11 exact loaded-state/whole-emission equality proof or applicable active benchmark accompanies these10 seeds.",
+    "fixture_binding_gap": "Retained candidate repair/core-agriculture metadata requires MIR=5.0.21010. An unchanged fixture/profile cannot simply select11. Any new projected closure and current11 pending state must be admitted separately; silently loading an old10 seed as an11 upgrade would change the preparation contract.",
+    "timing_reason": "The direct repair/agriculture hot-loop bodies are unchanged, but changed prototype/resident module/event/load state leaves engine update/GC and surrounding dispatch impact unmeasured. This does not establish a nonzero impact; it prevents claiming unchanged numerical results.",
+    "memory_reason": "Every candidate process-memory cell consumes the changed resident code/prototype/locale/package load. Whole-process memory cannot be reused merely because the physical work handler is byte-identical."
+  },
+  "reuse_decision": {
+    "retained": "All68 original observations, their accepted16 comparisons and historical1-to128 increments remain accepted only under original10/reference execution identities and limits. The unchanged published source/prepared prerequisites and measurement method are reusable inputs after exact-byte admission; no recapture of an unchanged published prerequisite is implied.",
+    "unverified_for_11": "All16 candidate-vs-published cells: four metrics for repair and agriculture1/32/128. Candidate1-to128 derived increments also remain unverified for11. No old candidate timing/memory sample is relabelled; no old published sample becomes a contemporaneous paired baseline for a new11 launch.",
+    "smallest_missing_checks": "No blanket historical or whole-product campaign is requested. Choose an affected named workload prospectively. Its missing preparation is a narrowly projected11 fixture/profile plus an exact11 pending seed and one unscored25000-update physical pilot under the unchanged oracle. Reuse unchanged published pending inputs/pilot provenance. Under the existing protocol, the smallest complete repair comparison is2warmups per arm plus8counterbalanced pairs; each individual agriculture tier is2warmups per arm plus6pairs, measuring all four metrics together. A current1-to128 increment requires the complete1and128 units. Preserve the original tolerances/counterbalancing and finish each admitted unit without favorable-prefix selection; do not extend or lower rules from observed results. This review queues or authorizes none of those native units."
+  },
+  "limits": "No Source/docs/packets/libraries changed and no host/build/native launched. The quantitative non-reuse decision is confined to the named active scripted-work timing/memory cells. It is not a functional regression finding, new acceptance gate, whole-product performance result or stable/release verdict. Original adverse, unpublished pilots and505 prerequisite distinctions remain intact."
+}
