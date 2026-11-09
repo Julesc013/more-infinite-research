@@ -148,6 +148,54 @@ class WorkerStorageContinuationTests(unittest.TestCase):
         for name, row in inputs.items():
             self.assertEqual(row, scaffold.plain_lua(lua.globals().data.raw.technology[name]))
 
+    def test_finite_recovery_keeps_default_contract_with_each_engine_science_item_kind(self):
+        # Installed Core2.0.77 item.lua declares these packs as tools;
+        # Core2.1.23 declares them as items. The frozen published default,
+        # rather than the finite provider's different science/effect, owns
+        # the prepared private work contract in both engine families.
+        for target in ("f200", "f210"):
+            for space_age in (False, True):
+                for enabled in (False, True):
+                    with self.subTest(target=target, space_age=space_age, enabled=enabled):
+                        inputs = finite_chain(7)
+                        version = EDITIONS[target]["minimum_base"]
+                        lua = self.stage(inputs, target,
+                            changes={"mir-enable-worker-robots-storage": enabled},
+                            extra_mods={"space-age": version} if space_age else {})
+                        if target == "f210":
+                            lua.execute('''
+                              for name,row in pairs(data.raw.tool)do
+                                row.type="item";data.raw.item[name]=row
+                              end
+                              data.raw.tool=nil
+                            ''')
+                        self.pipeline(lua)
+                        holder = scaffold.plain_lua(
+                            lua.globals().data.raw.technology["mir-worker-storage-preservation-4"])
+                        self.assertEqual(expected_private_worker_row(space_age=space_age), holder)
+                        self.assertEqual(1, lua.globals().data.writes)
+                        for name, original in inputs.items():
+                            self.assertEqual(original, scaffold.plain_lua(
+                                lua.globals().data.raw.technology[name]))
+
+    def test_item_science_missing_required_pack_refuses_before_publication(self):
+        inputs = finite_chain(7)
+        lua = self.stage(inputs)
+        lua.execute('''
+          for name,row in pairs(data.raw.tool)do
+            row.type="item";data.raw.item[name]=row
+          end
+          data.raw.tool=nil
+          data.raw.item["chemical-science-pack"]=nil
+        ''')
+        # This is a required Base science input for the whole catalogue,
+        # so absence must still refuse instead of publishing partial research.
+        with self.assertRaisesRegex(LuaError, "invalid or missing research ingredient"):
+            self.pipeline(lua)
+        self.assertEqual(0, lua.globals().data.writes)
+        for name, original in inputs.items():
+            self.assertEqual(original, scaffold.plain_lua(lua.globals().data.raw.technology[name]))
+
     def test_only_explicit_electromagnetic_addition_and_requested_policy_expand_science(self):
         cases = [({}, {}, False, SCIENCE),
             ({"space-age": "2.1.24"}, {}, False, SCIENCE + [["electromagnetic-science-pack", 1]]),
