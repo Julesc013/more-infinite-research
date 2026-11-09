@@ -113,19 +113,20 @@ local function effect(t)
   else check(effects[1].hidden == nil or effects[1].hidden == false, "2.0 effect hidden") end
 end
 local function contracts(with_mir, initial)
+  -- Raw unit.time is60 seconds; the runtime energy getter reports3600 ticks.
   local f = game.forces.player
   for _, row in ipairs({{FOUR, 4, 675, {"worker-robots-storage-3", "ferrum-robotics-science-pack"}},
       {FIVE, 5, 1012, {FOUR}}}) do
     local t = f.technologies[row[1]]
     check(t and t.prototype.level == row[2] and t.prototype.max_level == row[2]
-      and t.research_unit_count == row[3] and t.prototype.research_unit_energy == 60
+      and t.research_unit_count == row[3] and t.prototype.research_unit_energy == 60 * 60
       and not t.prototype.research_unit_count_formula, "finite worker contract")
     check(prototypes.get_history("technology", t.name).created == "planet-ferrum", "finite creator")
     science(t, SOURCE_SCIENCE); effect(t); same(names(t.prerequisites), sorted(row[4]), "finite prerequisites")
   end
   local c = f.technologies[CALIBRATION]
   check(c and c.prototype.research_unit_count_formula == "1518.75" and c.prototype.hidden
-    and c.prototype.level == 6 and c.prototype.max_level == 6 and c.prototype.research_unit_energy == 60
+    and c.prototype.level == 6 and c.prototype.max_level == 6 and c.prototype.research_unit_energy == 60 * 60
     and #c.prototype.effects == 0 and not c.enabled and not c.researched and c.saved_progress == 0
     and prototypes.get_history("technology", CALIBRATION).created == LAB,
     "calibration must stay literal/uninvested")
@@ -144,7 +145,7 @@ local function contracts(with_mir, initial)
       {"worker-robots-storage-3", table.unpack(PRIVATE_SCIENCE)}}}) do
     local t = f.technologies[row[1]]
     check(t and t.prototype.level == row[2] and t.prototype.max_level == 4294967295
-      and t.prototype.research_unit_count_formula == row[3] and t.prototype.research_unit_energy == 60,
+      and t.prototype.research_unit_count_formula == row[3] and t.prototype.research_unit_energy == 60 * 60,
       "MIR formula/level/time contract")
     check(prototypes.get_history("technology", t.name).created == "more-infinite-research", "MIR creator")
     science(t, row[4]); effect(t); same(names(t.prerequisites), sorted(row[5]), "MIR prerequisites")

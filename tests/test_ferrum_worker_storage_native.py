@@ -51,7 +51,7 @@ class FerrumWorkerStorageNativeControls(unittest.TestCase):
             end
             local function technology(f,id,first,cost,science,prerequisites,creator,infinite,formula)
               local proto={level=first,max_level=infinite and 4294967295 or first,hidden=id==P or id==CAL,
-                research_unit_count_formula=formula,research_unit_energy=60,research_unit_ingredients=ingredients(science),
+                research_unit_count_formula=formula,research_unit_energy=3600,research_unit_ingredients=ingredients(science),
                 effects=(id:find("worker%-robots%-storage") or id==P)and effect()or{}}
               local t={name=id,prototype=proto,level=first,researched=false,enabled=id~=P and id~=CAL,
                 visible_when_disabled=false,saved_progress=0,prerequisites={},force=f}
@@ -105,6 +105,7 @@ class FerrumWorkerStorageNativeControls(unittest.TestCase):
               forces[name]=f;return f
             end
             force("player");force("enemy");force("neutral")
+            if opponent=="raw-seconds-energy"then forces.player.technologies[C4].prototype.research_unit_energy=60 end
             game.create_force=force
             game.server_save=function(name)saves[#saves+1]=name end
             game.surfaces.nauvis.set_tiles=function()end
@@ -228,6 +229,15 @@ class FerrumWorkerStorageNativeControls(unittest.TestCase):
             self.assertEqual(result["closed"]["player"]["bonus"], 6)
             self.assertTrue(result["closed"]["player"]["rows"]["worker-robots-storage-6"]["researched"])
 
+    def test_runtime_energy_is_ticks_not_raw_seconds(self):
+        for target in ("f210", "f200"):
+            result = self.run_case(target=target)
+            for name in ("worker-robots-storage-4", "worker-robots-storage-5", "worker-robots-storage-6",
+                         "mir-worker-storage-preservation-4", "mir-ferrum-count-control-6"):
+                self.assertEqual(result["entry"]["player"]["rows"][name]["time"], 3600)
+            with self.assertRaisesRegex(Exception, "finite worker contract"):
+                self.run_case("raw-seconds-energy", target)
+
     def test_scripted_duplicate_and_unconsumed_lab_completions_refuse(self):
         for target in ("f210", "f200"):
             for opponent, message in (("scripted-completion", "ordinary lab"),
@@ -290,6 +300,7 @@ class FerrumWorkerStorageNativeControls(unittest.TestCase):
         self.assertIn("space-science-pack", emitted[0]["inputs"])
         calibration = emitted[-1]
         self.assertEqual(calibration["unit"]["count_formula"], "1518.75")
+        self.assertEqual(calibration["unit"]["time"], 60)
         self.assertNotIn("count", calibration["unit"])
         self.assertTrue(calibration["hidden"])
         self.assertFalse(calibration["enabled"])
