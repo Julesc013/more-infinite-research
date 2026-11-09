@@ -39,11 +39,13 @@ class HostControlsTests(unittest.TestCase):
         paths = [row["path"] for row in controls]
         self.assertEqual(paths, [
             "tests/test_generator.py",
+            "tests/test_library_render_capture.py",
             "tests/test_continuation_ownership.py",
             "tests/test_native_research_speed_finite_fixture.py",
             "tests/test_secretas_continuation.py",
             "tests/test_worker_storage_continuation.py",
             "tests/test_worker_storage_history.py",
+            "tests/test_ferrum_worker_storage_native.py",
             "tests/test_ric_marine.py",
             "tests/test_discovery_tree_compatibility.py",
             "tests/test_early_target_adapter.py",

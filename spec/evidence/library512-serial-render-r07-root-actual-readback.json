@@ -1,0 +1,531 @@
+{
+  "kind": "MIRActualTwoSerialLibraryRenderReadbackR07",
+  "source": "f2ea5e9986768073a04aba47fffcd50254a1a5ad",
+  "player": "9b98529bc2e0f55ec75656d2a3b732d86e7176e3",
+  "package": "AA26E473C87CAA49CBBB43C09C343AC8FD129F79460C30BCDF88D9B6B0CA5365",
+  "scope": "14actualPNG/report captures with exact trusted inputs/fullrestoration. Pixel verdict pending; no pointer/menu/resize/export/save/lifecycle/dual/perf/stable verdict.",
+  "runs": [
+    {
+      "locale": "en",
+      "identity": {
+        "process_id": 39072,
+        "process_start_utc": "2026-11-09T17:18:59.2759610Z",
+        "executable": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "source_head": "f2ea5e9986768073a04aba47fffcd50254a1a5ad"
+      },
+      "governor": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 16.538359,
+        "peak_working_set_bytes": 1320611840,
+        "peak_sampled_private_bytes": 2436726784,
+        "admission": {
+          "observed_at": "2026-11-09T17:18:59.2435345+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 15373615104,
+            "committed_bytes": 24568246272,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 91461746688,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 204256940032,
+            "total_bytes": 599395090432
+          }
+        }
+      },
+      "verified_selected_archives": [
+        {
+          "name": "base",
+          "version": "2.1.23"
+        },
+        {
+          "name": "more-infinite-research",
+          "version": "5.0.21012"
+        },
+        {
+          "name": "mir-fixture-library-render-capture",
+          "version": "0.1.1"
+        }
+      ],
+      "actual_data_mods": {
+        "base": "2.1.23",
+        "more-infinite-research": "5.0.21012"
+      },
+      "actual_script_checksums": {
+        "level": "3368906707",
+        "mir-fixture-library-render-capture": "4121943095",
+        "more-infinite-research": "3641205889"
+      },
+      "images": [
+        {
+          "id": "01-research",
+          "bytes": 4953607,
+          "sha256": "C672D98E8928F784440068FDE795EF11270E2B0369AA6D121F20D68A323E8E5F",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "02-queue",
+          "bytes": 4754123,
+          "sha256": "F0E6BC9AB97932FD9D6EE0B4D7EC3881CAE8C17D980E9A6D54DEA0602C4B7980",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "03-settings-research",
+          "bytes": 4928009,
+          "sha256": "71F81EDCDDBDE7F6F571F020B9281A2DBDEBE7FB4922AE6A907FB8951FAF7504",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "04-settings-options",
+          "bytes": 5030923,
+          "sha256": "2687072D62BD6EB78206E6CDBFD5D23C8A4703EF8616BFC29950B2E93F16DC6E",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "05-help",
+          "bytes": 5016529,
+          "sha256": "FD7B21DCFCF74DAD7F3430235FA9C11CA8E0CF9F010C7AAF37216B2B9243A963",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "06-availability",
+          "bytes": 4914201,
+          "sha256": "3C4C5EF30A270910DCBB90EA982594260288B68B8CE1581F0B14C96788171F50",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "07-research-filtered",
+          "bytes": 5013647,
+          "sha256": "32C445D3B92A9AEDE335308A47D3C2205784EA77509195DE5C4EAF22E6BC28FD",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        }
+      ],
+      "setup": {
+        "kind": "public-freeplay-intro-only",
+        "original_skip_intro": false,
+        "original_flag_unset": true,
+        "saved_to_original": false
+      },
+      "native_named_snapshot_unchanged": true,
+      "originals_restored": true,
+      "custody": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-render-en-r07-native-custody",
+      "members": [
+        {
+          "path": "native-identity.json",
+          "bytes": 302,
+          "sha256": "D2F31C7015667947D6B77BC02B98D9475A6C631F76FF2363E658BFD3A9AABDA3"
+        },
+        {
+          "path": "owner-result.json",
+          "bytes": 4157,
+          "sha256": "3BDFBA8A35D371EFF5372E37724B79145308F6A860E72EDD3000BC31A607E1B2"
+        },
+        {
+          "path": "process-1.resources.jsonl",
+          "bytes": 9358,
+          "sha256": "02FB98A7C4BED0D88135A0068ADADA18006871392672D06983C6DF112711243E"
+        },
+        {
+          "path": "process-1.stderr.txt",
+          "bytes": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+        },
+        {
+          "path": "process-1.stdout.txt",
+          "bytes": 18647,
+          "sha256": "E1E9953F47065CCECC3856F7E55B88FC50C507639D3B76D8B3483EC37EE55040"
+        },
+        {
+          "path": "render-file-validation.json",
+          "bytes": 1665,
+          "sha256": "BF42C2ECA72BD5BBBEE37A9ADA276B7DDC6247302F56E2FDAC8018DEA25F239E"
+        },
+        {
+          "path": "write-data/achievements-modded.dat",
+          "bytes": 4428,
+          "sha256": "D7E13188B3390FC6E69C13CC83C864E87C3E0D686443C4C5E5E53C8918B115A0"
+        },
+        {
+          "path": "write-data/crop-cache.dat",
+          "bytes": 2598280,
+          "sha256": "6DC34028EE33883FE833FCA1F445140E18585E0FFC047C3DA1A46A64D7DC2F94"
+        },
+        {
+          "path": "write-data/factorio-current.log",
+          "bytes": 18452,
+          "sha256": "2B01AD7D5423318C07FB3A9FBD09A72412403B5A6A45B23642B3ACAD34C4968A"
+        },
+        {
+          "path": "write-data/player-data.json",
+          "bytes": 13013,
+          "sha256": "4C2C131371B667FE636FA3EFEA050B1D7D361FCE6061FE93688D1671C12F621A"
+        },
+        {
+          "path": "write-data/tips-and-tricks.log",
+          "bytes": 38,
+          "sha256": "B049B54887E88768CD86ED824B74529328F05A5C94B02B4067C3AD8AC7016C23"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/en/01-research.json",
+          "bytes": 224,
+          "sha256": "D1C3BA0FD85B809F4EE560529849CAB54B0C9C8A5C201236DD9BB182BB90E6CF"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/en/01-research.png",
+          "bytes": 4953607,
+          "sha256": "C672D98E8928F784440068FDE795EF11270E2B0369AA6D121F20D68A323E8E5F"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/en/02-queue.json",
+          "bytes": 221,
+          "sha256": "4A0A303289ED2ADB47B2A5D41CACE919D90EB83C9E0CF3814352E06ECEEBFD0D"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/en/02-queue.png",
+          "bytes": 4754123,
+          "sha256": "F0E6BC9AB97932FD9D6EE0B4D7EC3881CAE8C17D980E9A6D54DEA0602C4B7980"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/en/03-settings-research.json",
+          "bytes": 233,
+          "sha256": "93CD6B981AED9109BB71FBB6D71C438D729A9FECBD94C5935E186EAB3C136F00"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/en/03-settings-research.png",
+          "bytes": 4928009,
+          "sha256": "71F81EDCDDBDE7F6F571F020B9281A2DBDEBE7FB4922AE6A907FB8951FAF7504"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/en/04-settings-options.json",
+          "bytes": 232,
+          "sha256": "6477C17FC77EABB23F5428009C7CE8B06B4D7BC6892FCBC4F8CC489A7FD18EC1"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/en/04-settings-options.png",
+          "bytes": 5030923,
+          "sha256": "2687072D62BD6EB78206E6CDBFD5D23C8A4703EF8616BFC29950B2E93F16DC6E"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/en/05-help.json",
+          "bytes": 220,
+          "sha256": "71ED36880A0DAEC706E8360D25F4AAF3D3B2CC0464E39FC2827D576FF4CC555A"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/en/05-help.png",
+          "bytes": 5016529,
+          "sha256": "FD7B21DCFCF74DAD7F3430235FA9C11CA8E0CF9F010C7AAF37216B2B9243A963"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/en/06-availability.json",
+          "bytes": 228,
+          "sha256": "20FBA700BDE56646D6AAF1D42733EC198A1F3AEA42DB2817DC28F140E3A23CFD"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/en/06-availability.png",
+          "bytes": 4914201,
+          "sha256": "3C4C5EF30A270910DCBB90EA982594260288B68B8CE1581F0B14C96788171F50"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/en/07-research-filtered.json",
+          "bytes": 233,
+          "sha256": "B30427A748B178112850E58618F7FA9E0B238E7456BB4F42EF46C8C87D7B6030"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/en/07-research-filtered.png",
+          "bytes": 5013647,
+          "sha256": "32C445D3B92A9AEDE335308A47D3C2205784EA77509195DE5C4EAF22E6BC28FD"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/en/complete.json",
+          "bytes": 2000,
+          "sha256": "25F5A5CD17048A2D5C27546F366B91EB1F5490F7D368CF414943D4A3FE1E1F56"
+        }
+      ]
+    },
+    {
+      "locale": "de",
+      "identity": {
+        "process_id": 49076,
+        "process_start_utc": "2026-11-09T17:20:52.8778576Z",
+        "executable": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+        "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+        "source_head": "f2ea5e9986768073a04aba47fffcd50254a1a5ad"
+      },
+      "governor": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 16.762292,
+        "peak_working_set_bytes": 1329680384,
+        "peak_sampled_private_bytes": 2478456832,
+        "admission": {
+          "observed_at": "2026-11-09T17:20:52.8463546+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 15147397120,
+            "committed_bytes": 24849453056,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 91423887360,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 204238807040,
+            "total_bytes": 599395090432
+          }
+        }
+      },
+      "verified_selected_archives": [
+        {
+          "name": "base",
+          "version": "2.1.23"
+        },
+        {
+          "name": "more-infinite-research",
+          "version": "5.0.21012"
+        },
+        {
+          "name": "mir-fixture-library-render-capture",
+          "version": "0.1.1"
+        }
+      ],
+      "actual_data_mods": {
+        "base": "2.1.23",
+        "more-infinite-research": "5.0.21012"
+      },
+      "actual_script_checksums": {
+        "level": "3368906707",
+        "mir-fixture-library-render-capture": "4121943095",
+        "more-infinite-research": "3641205889"
+      },
+      "images": [
+        {
+          "id": "01-research",
+          "bytes": 4981722,
+          "sha256": "A690269C08F922C7A5B8F27BB4B2286C1693AB744D8E6597B84D1EAC4D74D693",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "02-queue",
+          "bytes": 4760863,
+          "sha256": "CDFA7E55E60F0436711255CEB8388F8D0B4749A35F31C31315CBB27A519D0AAC",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "03-settings-research",
+          "bytes": 4944052,
+          "sha256": "B6C74A3A7F0768E6CAC08D3E4608B523EB066E9BC9332C2024708A2BC1073825",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "04-settings-options",
+          "bytes": 5058462,
+          "sha256": "8423EEDF2210A9492F163534AE6574D14B98A9AB90BA30131C47CC4CE546C425",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "05-help",
+          "bytes": 5031312,
+          "sha256": "D5F2910FEB68560EB3333C533C32FE3EC5FFDAEBEE2BC4658C316E97E42AA902",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "06-availability",
+          "bytes": 4919387,
+          "sha256": "5C3420172E1841696C30575C0C26136E70D7E2855FB14068A80727633631F24E",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        },
+        {
+          "id": "07-research-filtered",
+          "bytes": 5034990,
+          "sha256": "E6654C1D53B2BCA4418458F61A1478F714358408DBB3F5FB42DBE9725CF81349",
+          "width": 2560,
+          "height": 1440,
+          "display_scale": 1.25
+        }
+      ],
+      "setup": {
+        "kind": "public-freeplay-intro-only",
+        "original_skip_intro": false,
+        "original_flag_unset": true,
+        "saved_to_original": false
+      },
+      "native_named_snapshot_unchanged": true,
+      "originals_restored": true,
+      "custody": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-render-de-r07-native-custody",
+      "members": [
+        {
+          "path": "native-identity.json",
+          "bytes": 302,
+          "sha256": "2FDF89BC46D3D816644D7F74041EF5746E2BEF25E90B55D20A11919715481836"
+        },
+        {
+          "path": "owner-result.json",
+          "bytes": 4157,
+          "sha256": "B16056E4EA0C7D113F6E22A9A361AC6977E0767B509975E1B963AAC57DD9803A"
+        },
+        {
+          "path": "process-1.resources.jsonl",
+          "bytes": 9369,
+          "sha256": "ADD15A42AA1AA6F9BD36C30A15EB4D10F6903381943268CC84974073F6B59E8B"
+        },
+        {
+          "path": "process-1.stderr.txt",
+          "bytes": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+        },
+        {
+          "path": "process-1.stdout.txt",
+          "bytes": 18647,
+          "sha256": "F7637B452A9DFB673CC13800EC9C34BB44BBC939DFCBAB0FCA63D07490924F41"
+        },
+        {
+          "path": "render-file-validation.json",
+          "bytes": 1665,
+          "sha256": "0AD31241558FB8F8D17DDFAADBB7A57E78744B8ADBAF6ADF7F0E50DFA2C4523B"
+        },
+        {
+          "path": "write-data/achievements-modded.dat",
+          "bytes": 4428,
+          "sha256": "D7E13188B3390FC6E69C13CC83C864E87C3E0D686443C4C5E5E53C8918B115A0"
+        },
+        {
+          "path": "write-data/crop-cache.dat",
+          "bytes": 2598280,
+          "sha256": "6DC34028EE33883FE833FCA1F445140E18585E0FFC047C3DA1A46A64D7DC2F94"
+        },
+        {
+          "path": "write-data/factorio-current.log",
+          "bytes": 18452,
+          "sha256": "7691EE35D5F7BA4F15F84D5005B78B52EAA078E64D99A457044491081E733EE0"
+        },
+        {
+          "path": "write-data/player-data.json",
+          "bytes": 13012,
+          "sha256": "569AEE6B818C43007C445FD78F9EF9E1CF32C8F8E8AA1113746CF9D2AC4D91BE"
+        },
+        {
+          "path": "write-data/tips-and-tricks.log",
+          "bytes": 37,
+          "sha256": "F502108C2BD27F037A5EA2EAE06C58F06CE5A444072805587C5C66D79981D61B"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/de/01-research.json",
+          "bytes": 224,
+          "sha256": "25E5C8D21313A4BCF4BA70D3F143E78485410C5051C30EC87575ACBD02C9889E"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/de/01-research.png",
+          "bytes": 4981722,
+          "sha256": "A690269C08F922C7A5B8F27BB4B2286C1693AB744D8E6597B84D1EAC4D74D693"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/de/02-queue.json",
+          "bytes": 221,
+          "sha256": "B944307E50D322ABA571FD627675F9B8EB4F7D7D77C5BE37FF5AD989F5E9B06E"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/de/02-queue.png",
+          "bytes": 4760863,
+          "sha256": "CDFA7E55E60F0436711255CEB8388F8D0B4749A35F31C31315CBB27A519D0AAC"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/de/03-settings-research.json",
+          "bytes": 233,
+          "sha256": "D746D95E1181ED1D870EC31BFCA82202DD79E1C6D4491544BB526CE8C05D43A6"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/de/03-settings-research.png",
+          "bytes": 4944052,
+          "sha256": "B6C74A3A7F0768E6CAC08D3E4608B523EB066E9BC9332C2024708A2BC1073825"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/de/04-settings-options.json",
+          "bytes": 232,
+          "sha256": "0DB8523D1AB6F58EC5511A2C3428A72295A52422CF923ADE990844680CCC66B2"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/de/04-settings-options.png",
+          "bytes": 5058462,
+          "sha256": "8423EEDF2210A9492F163534AE6574D14B98A9AB90BA30131C47CC4CE546C425"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/de/05-help.json",
+          "bytes": 220,
+          "sha256": "57531652238E86001F579C1A86E1E440C89BD9BC1121350E8254AE7D967D581A"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/de/05-help.png",
+          "bytes": 5031312,
+          "sha256": "D5F2910FEB68560EB3333C533C32FE3EC5FFDAEBEE2BC4658C316E97E42AA902"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/de/06-availability.json",
+          "bytes": 228,
+          "sha256": "EA879A8CB3A5B3A3D80BDBEC61A37BD845ABB83729178FF3DD8B913D8576010F"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/de/06-availability.png",
+          "bytes": 4919387,
+          "sha256": "5C3420172E1841696C30575C0C26136E70D7E2855FB14068A80727633631F24E"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/de/07-research-filtered.json",
+          "bytes": 233,
+          "sha256": "EF2267BB0D270C13C945A018268D892FB843A444D0B5DFFCB21448DFF51D1CB6"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/de/07-research-filtered.png",
+          "bytes": 5034990,
+          "sha256": "E6654C1D53B2BCA4418458F61A1478F714358408DBB3F5FB42DBE9725CF81349"
+        },
+        {
+          "path": "write-data/script-output/mir-library-render/de/complete.json",
+          "bytes": 2000,
+          "sha256": "7A02B771A54C8F8AE74268A3B3C2BBB810024FC8E51EAD298FCABA01553785BC"
+        }
+      ]
+    }
+  ]
+}
