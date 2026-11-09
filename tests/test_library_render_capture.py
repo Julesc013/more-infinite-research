@@ -16,6 +16,7 @@ class LibraryRenderCaptureTests(unittest.TestCase):
         self.lua.execute(r'''
           local tick_callback
           handlers={}
+          defines={controllers={cutscene=6}}
           storage={}
           script={active_mods={base="2.1.23",["more-infinite-research"]="5.0.21012"},
             on_nth_tick=function(n,fn) assert(n==30);tick_callback=fn end,
@@ -28,7 +29,7 @@ class LibraryRenderCaptureTests(unittest.TestCase):
           local root={valid=true,mir_library_tabs=tabs,location={x=20,y=30},
             style={minimal_width=1100,maximal_width=1100,maximal_height=800},
             get_mod=function() return "more-infinite-research" end}
-          player={valid=true,connected=true,index=1,locale="en",force=force,
+          player={valid=true,connected=true,index=1,locale="en",force=force,controller_type=1,
             display_scale=1.25,display_resolution={width=1920,height=1080},
             gui={screen={mir_research_browser=root}}}
           screenshots,writes,calls,flushes={}, {}, {},0
@@ -175,6 +176,16 @@ class LibraryRenderCaptureTests(unittest.TestCase):
         self.lua.execute(modal_model + 'intro_flag=nil;run();assert(#screenshots==2);assert(writes["mir-library-render/en/complete.json"]==nil)')
         self.setUp()
         self.lua.execute(modal_model + 'run();assert(#screenshots==7);assert(writes["mir-library-render/en/complete.json"])')
+
+    def test_initial_cutscene_finishes_naturally_before_any_library_open(self):
+        self.lua.execute(r'''
+          player.controller_type=defines.controllers.cutscene
+          step(30)
+          assert(storage.mir_render_capture==nil and #calls==0 and #screenshots==0)
+          player.controller_type=1
+          run()
+          assert(#screenshots==7 and writes["mir-library-render/en/complete.json"])
+        ''')
 
     def test_locale_may_settle_before_first_render_but_not_during_sequence(self):
         self.lua.execute('step(1);player.locale="de";run();assert(writes["mir-library-render/de/complete.json"])')

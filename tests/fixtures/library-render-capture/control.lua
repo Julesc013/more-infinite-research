@@ -87,6 +87,7 @@ script.on_nth_tick(30, function()
   local state = storage.mir_render_capture
   if not state then
     if #game.connected_players == 0 then return end
+    if game.connected_players[1].controller_type == defines.controllers.cutscene then return end
     require_that(script.active_mods.base == "2.1.23" and script.active_mods["more-infinite-research"] == "5.0.21012",
       "exact engine/package tuple differs")
     state = {index = 1, phase = "initial", after = game.tick + 180, observations = {}}
