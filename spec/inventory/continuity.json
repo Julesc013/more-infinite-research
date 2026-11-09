@@ -17416,6 +17416,34 @@
         },
         "native_execution": false,
         "inventory_complete": false
+      },
+      {
+        "reviewed_on": "2026-11-09",
+        "reviewed_against": "debd58b388f8f4c70241fc211dbe1322588321fe",
+        "subjects": [
+          "CONT-02",
+          "CONT-05",
+          "CONT-11",
+          "CONT-12",
+          "CONT-13",
+          "CONT-17"
+        ],
+        "scope": "Exactly three final published4.7.3 ModernLaunchReturn test/control bodies plus their three direct fixture bodies:6originals/36590bytes fully read and raw-Git hash-verified. Earlier variants, imported helpers, historical native receipts and whole source inventory remain separate.",
+        "evidence": {
+          "path": "spec/evidence/historical-modern-launch-test-intents-aero-r01.json",
+          "sha256": "949E860C8940C119AA38683F7E6F6445C43F5F7C2C191557825DBE54088FB663"
+        },
+        "disposition": "retain Base physical/source/partial-save intent; retire old runner/mock structure; oppose unsupported archived API before reuse",
+        "original_sources": 6,
+        "original_bytes": 36590,
+        "offline_opposition": "Loose original34PASS; exactSDK field trap rejects original; one-line in-memory proposal34PASS. Not native.",
+        "remaining_executable_check": "Check actual applicable Base factory/science evidence; consolidate uncovered required production/consumer/save behavior in the existing Black Glass queue. A reused actor needs reviewed current SDK/fixture/input bindings. No new rocket feature or native framework.",
+        "owner": {
+          "reconciliation": "Aero",
+          "integration_native_publication": "Black Glass"
+        },
+        "native_execution": false,
+        "inventory_complete": false
       }
     ],
     "stable_coverage_review": {

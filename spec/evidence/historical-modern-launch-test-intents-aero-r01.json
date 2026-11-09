@@ -1,0 +1,285 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalModernLaunchTestIntentReviewV1",
+  "requirement": "VER-07",
+  "subjects": [
+    "CONT-02",
+    "CONT-05",
+    "CONT-11",
+    "CONT-12",
+    "CONT-13",
+    "CONT-17"
+  ],
+  "reviewed_at_utc": "2026-11-09T19:40:52.635294+00:00",
+  "reviewed_against": "debd58b388f8f4c70241fc211dbe1322588321fe",
+  "player_source": "9b98529bc2e0f55ec75656d2a3b732d86e7176e3",
+  "review_branch_parent": "1fe56914582f79cda4a854458bc0c8cdc5d9cc87",
+  "scope": "Exactly three final published4.7.3 ModernLaunchReturn test/control bodies plus their three direct fixture bodies:6originals/36590bytes fully read and raw-Git hash-verified. Earlier variants, imported helpers, historical native receipts and whole source inventory remain separate.",
+  "original_sources": [
+    {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "tests/runtime/Test-MIRModernLaunchReturn.ps1",
+      "blob": "6e959064ea66f1a724d7882b1c88c32e1f0110ff",
+      "bytes": 13354,
+      "sha256": "24DBB42A127B298347A53B50F103E636D8195D732239F776287D38FFCB4CC2F2"
+    },
+    {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "tests/runtime/Test-MIRModernLaunchReturnStatic.ps1",
+      "blob": "139c0bb130cbda10c41bb987a511a676cb17e375",
+      "bytes": 3211,
+      "sha256": "46C13C20C69F8A1E308FCF506D4DBF58243BB0B6AEB56FF76DCD87D0ABB642E0"
+    },
+    {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "tests/runtime/modern_launch_return_controls.lua",
+      "blob": "bb5679a9f6c0f8b406e7743db69b573d8912f7d6",
+      "bytes": 7273,
+      "sha256": "B9300481E29A142F34CD95216910EF9235C5934A19040DB2771E9A62E8B8A3D4"
+    },
+    {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "fixtures/assert-modern-launch-return/control.lua",
+      "blob": "93789e0eae4ff8421a9dd88b1dc2f7debb9582b7",
+      "bytes": 10650,
+      "sha256": "67B0AC94DA3005392F92F72EE4044C14C32E87A2FFDD327814295548C4582A51"
+    },
+    {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "fixtures/assert-modern-launch-return/info.json",
+      "blob": "1ed7ab1e03f953ca75f98a4eaa9aa8755bf431da",
+      "bytes": 473,
+      "sha256": "7871E5B6F88F8BF97E3661FAA751BEFD530A2A53ABE9B219EE5185A1272EAB48"
+    },
+    {
+      "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+      "path": "fixtures/assert-modern-launch-return/scenario.json",
+      "blob": "086a59925b89382959225a7c43317b8b547810fb",
+      "bytes": 1629,
+      "sha256": "4D642EEFE1F30E1CF3C760CB2AEE548A7CE6DF5AB74A9AEDAC037FF848C17EDE"
+    }
+  ],
+  "original_scenario": {
+    "schema": 1,
+    "source_version": "4.2.2",
+    "settings_mode": "Defaults",
+    "scope": "Base-only native rocket construction, satellite return, lab consumption and saved research; declared factory setup, not an early-game playthrough, upgrade or graphical claim.",
+    "targets": {
+      "f200": {
+        "factorio_line": "2.0",
+        "engine_version": "2.0.77",
+        "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "runtime_api_sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578"
+      },
+      "f210": {
+        "factorio_line": "2.1",
+        "engine_version": "2.1.21",
+        "engine_sha256": "703D176F00CCAEB5F8FEB797E3299F637B12E48AA3C091919D668DD2BA4589C1",
+        "runtime_api_sha256": "F21602449EC6C077AFB4A26311EF075AF7AEDB8C067D53B9CC87EFCCCA4D761F"
+      }
+    },
+    "setup": [
+      "research required prerequisites",
+      "place silo, landing pad and lab",
+      "supply 1000 each processing-unit, low-density-structure and rocket-fuel",
+      "supply one satellite",
+      "supply non-space lab ingredients",
+      "supply electrical buffer energy",
+      "accelerate simulation ticks tenfold"
+    ],
+    "assertions": [
+      "ordinary lab-speed and weapon-speed level-seven continuations retain space science and launch prerequisite closure",
+      "100 native construction crafts consume exact inputs",
+      "one native satellite launch returns 1000 space science",
+      "lab consumes only science transferred from the receiver",
+      "positive fractional research progress, queue and retained science survive one completed-save reload"
+    ],
+    "required_reload_count": 1,
+    "production_timeout_seconds": 180,
+    "fixture_tick_limit": 60000
+  },
+  "groups": [
+    {
+      "id": "base-space-science-source-and-continuation-gates",
+      "subjects": [
+        "CONT-02",
+        "CONT-05",
+        "CONT-13"
+      ],
+      "disposition": "retain",
+      "independent_expectation": "Base+MIR+fixture only: enabled research-speed-7 and weapon-shooting-speed-7 keep positive space-science ingredients and prerequisite paths to rocket-silo. The recursive closure check is test-only, not permission for a production discovery solver.",
+      "current_implementation": [
+        "source/research/science.lua",
+        "source/compatibility/science_bindings.lua",
+        "source/research/modern.lua"
+      ],
+      "current_controls": [
+        "tests/test_science.py::test_hash_verified_native_source_oracle_accepts_base_and_space_age_white_paths",
+        "tests/test_generator.py::test_data_final_full_published_technology_output_matches_oracle",
+        "tests/test_generator.py::test_f200_complete_technology_output_matches_its_own_published_oracle"
+      ],
+      "current_evidence": "The current source oracle explicitly says selected-native-source-fields-not-gameplay-qualification. It validates the satellite trigger relation, not actual acquisition. SIF pack removal is a separate selected profile, not an instruction to remove ordinary Base space science.",
+      "remaining_executable_check": "Reuse applicable existing final-data/progression evidence under its original inputs. An uncovered actual Base production/consumer boundary belongs in the existing final factory/science selection, not a new research feature or source-only acceptance claim."
+    },
+    {
+      "id": "actual-construction-satellite-return-and-lab-use",
+      "subjects": [
+        "CONT-05",
+        "CONT-12",
+        "CONT-13"
+      ],
+      "disposition": "retain",
+      "independent_expectation": "Setup supplies prerequisites, entities, non-space inputs, power and10x tick speed. The actor observes100 native rocket-part crafts consuming1000 each processing-unit/low-density-structure/rocket-fuel, zero recipe productivity, one satellite/native launch and1000 returned space science in an empty pad. One lab ingredient vector is supplied, removing its space ingredient from the returned stock first. Positive native partial research plus an empty lab space-science slot proves consumption. The actor does not write rocket_parts, rockets_launched or research_progress.",
+      "current_implementation": [
+        "source/research/science.lua",
+        "source/compatibility/science_bindings.lua",
+        "source/overrides/prototype_limits.lua"
+      ],
+      "current_controls": [
+        "tests/test_science.py",
+        "tests/test_prototype_limits.py"
+      ],
+      "current_evidence": "The selected historical source bodies contain no actual launch result. Current declaration/permission controls, cable/material production results and the34-check simulated Lua control retain their own scopes; none establishes this particular satellite return.",
+      "remaining_executable_check": "Check for applicable trusted actual Base rocket-return evidence before a rerun. If this applicable production/consumer component remains uncovered, fold it into the established final factory/science case with current SDK/candidate bindings. Keep it unresolved until observed or an explicit supported-scope decision applies; do not create a new framework or broader rocket campaign."
+    },
+    {
+      "id": "partial-research-save-and-one-cold-boundary",
+      "subjects": [
+        "CONT-05",
+        "CONT-11"
+      ],
+      "disposition": "consolidate",
+      "independent_expectation": "Save research-speed-7 with a single queue entry and positive progress below1 after its returned science is consumed. One benchmark reload checks counts/current/queue and progress within1e-9; the caller additionally requires equal emitted progress/transfer/pad counts and unchanged seed/completed-save hashes. This completes no research level and proves no predecessor upgrade or two-cold route.",
+      "current_implementation": [
+        "source/runtime/caps.lua",
+        "source/runtime/lifecycle.lua",
+        "tools/Invoke-NativeFixture.ps1"
+      ],
+      "current_controls": [
+        "tests/test_caps.py",
+        "tests/test_historical_native_runner.py"
+      ],
+      "remaining_executable_check": "Keep the original one-reload scope separate from current completed-save/two-cold and historical upgrade requirements. Use applicable protected current results without counting a simulated callback or repeated predecessor load as successor persistence."
+    },
+    {
+      "id": "exact-inputs-restoration-and-retired-runner",
+      "subjects": [
+        "CONT-13",
+        "CONT-17"
+      ],
+      "disposition": "consolidate",
+      "independent_expectation": "The wrapper admits exact4.2.2 packages and scenario engine/API pins, verifies installed archives/selected versions and restores a transactional direct library. Preparation returns native_qualification=false. Production stopping requires output-file existence, aRESULT fragment and Saving finished, followed by unique stage parsing and physical-counter assertions. There is no separate ZIPCRC/closed-file validator. Natural reload, unchanged saves/source/engine and restoration are distinct checks.",
+      "current_implementation": [
+        "tools/Invoke-NativeFixture.ps1",
+        "tools/lib/validation/NativeProbeCommon.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1"
+      ],
+      "current_controls": [
+        "tests/test_historical_native_runner.py",
+        "tests/tooling/Test-MIRNativeProbeResources.ps1",
+        "tests/tooling/Test-MIRImmutableInputStaging.ps1"
+      ],
+      "remaining_executable_check": "Use current exact-input/resource/closed-save/restoration controls for any consolidated witness. Do not restore the runner or reuse4.2.2/F2102.1.21 locks blindly. Current primary floor remains2.1.23; no budget reduction or Steam mutation follows. Preparation, host arithmetic and tick acceleration supply no native/GUI/performance verdict."
+    },
+    {
+      "id": "SDK-opposed-queue-switch-before-any-reuse",
+      "subjects": [
+        "VER-02",
+        "VER-07",
+        "CONT-13"
+      ],
+      "disposition": "port-before-any-current-native-use",
+      "independent_expectation": "The fixture must use its selected public engine API. Its force.research_queue_enabled=true write names an attribute absent from exact2.0.77 and2.1.23 SDKs, while research_queue is writable. The loose force table masks the unsupported write. No literal occurrence was found in current canonical player Source.",
+      "finding_scope": "Static SDK incompatibility in a retired fixture, not an observed Factorio error or MIR12 player defect. Original2.1.21 SDK is not asserted inspected.",
+      "current_implementation": [
+        "spec/verification.md",
+        "docs/development.md"
+      ],
+      "current_controls": [],
+      "offline_opposition": {
+        "original_loose_mock": "PASS34",
+        "same_original_actor_one_SDK_opposed_field_trap": "REJECT at research_queue_enabled",
+        "one_obsolete_assignment_deleted_in_memory_same_trap": "PASS34 with identical original control output",
+        "script": "probe_queue_switch.py",
+        "report_sha256": "425BB274D13495EF05C1240BA4D292332005A7F2C76BEF5C7ABB1C1DEC76A117",
+        "SDKs": [
+          {
+            "version": "2.0.77",
+            "bytes": 1878804,
+            "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578",
+            "unsupported_field_present": false
+          },
+          {
+            "version": "2.1.23",
+            "bytes": 2132310,
+            "sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373",
+            "unsupported_field_present": false
+          }
+        ]
+      },
+      "proposal": {
+        "path": "retired-actor-queue-switch-proposal-r01.patch",
+        "bytes": 523,
+        "sha256": "51DBB12E1503EBFB2C7FC09A31C022605BEBF4238726CE2420D7337FEC7B48C0",
+        "change": "Delete only obsolete force.research_queue_enabled assignment; existing add_research and queue writes stay intact.",
+        "applied_to_active_repository": false
+      },
+      "remaining_executable_check": "Only if this retained actor is useful to the existing final case: prepare a separately owned/current fixture using the reviewed one-line equivalent and an SDK-opposed mock, then bind current versions/profiles/controller/closed-save checks before native execution. The patch addresses the archived path and remains unapplied; it grants no integration/launch authority. One-field opposition is not a full SDK validator."
+    }
+  ],
+  "related_deferred_requests": {
+    "ids": [
+      "ROCKET-01",
+      "ROCKET-02"
+    ],
+    "source": "spec/programmes/community-requests.json",
+    "original_decision": "defer-research; optional-startup-probe",
+    "status": "requested-not-qualified",
+    "qualification": [],
+    "boundary": "Default Base construction/space-science return admits no faster launch, extra payload, quality tier, buffered-rocket or mixed-cargo research. Every original request field remains unchanged."
+  },
+  "existing_source_oracle": {
+    "path": "tests/fixtures/science-source-native-oracle.json",
+    "sha256": "D0DAA800825AF7236D941FCD3890436E7B49DCE00877B01D82F5A1322A2DD049",
+    "kind": "selected-native-source-fields-not-gameplay-qualification"
+  },
+  "source_correspondence_reused": {
+    "record": "spec/evidence/historical-secretas-finite-test-intents-aero-r01.json",
+    "source": "9b98529bc2e0f55ec75656d2a3b732d86e7176e3",
+    "scope": "Only its exact11->12 tracked-source comparison is reused, not Secretas gameplay:145of148trackedLua unchanged, onlytargetversion/2GUI modules differ. This does not establish an actual rocket observation or final package qualification."
+  },
+  "custody": {
+    "repository": "Julesc013/scratchpad",
+    "branch": "evidence/mir511-package-correspondence-aero-r01",
+    "commit": "3bb7c3ab319798d2b0ba19f7a4bb60a779bfce69",
+    "path": "evidence/modern-launch512-historical-test-intents-aero-r01/INDEX.json",
+    "sha256": "6327BA85EFF37FD09257D192D1E5E68F35AFD417A4305CA5CE1D0FE3E847FEBB",
+    "payload_members": 12,
+    "payload_bytes": 71331,
+    "all_remote_equal": true
+  },
+  "host_selection": {
+    "Plan_controls": 175,
+    "Plan_sha256": "41BDEF630EFDE93EC41DAC977D979C66774EE2D2E279CAE13F27DDFE82507FFE",
+    "executed": "Only bounded isolated pinnedLua5.2 archived-control/SDK opposition; unchanged current gameplay suites are not repeated. Repository static check follows authoring.",
+    "Lua52_binary_sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899"
+  },
+  "ownership": {
+    "reconciliation": "Aero",
+    "integration_native_publication": "Black Glass"
+  },
+  "selected_source_disposition_complete": true,
+  "inventory_complete": false,
+  "source_reconciliation_complete": false,
+  "test_intent_reconciliation_complete": false,
+  "new_native_execution": false,
+  "new_player_builds": 0,
+  "new_CI_dispatch": false,
+  "release_qualification": false,
+  "limits": [
+    "The34host checks simulate construction, satellite return and progress; they are not34native tests or any actual rocket/lab result.",
+    "No current Source/fixture/test/controller/profile/engine/archive-library/save change. Original sources/SDKs stay preserved; the one-line proposal is not integrated.",
+    "No early-game playthrough, SpaceAge platform logistics, DLC-absent GUI, unsupported overhaul, upgrade, multiplayer, performance or stable acceptance follows."
+  ]
+}
