@@ -357,7 +357,15 @@ local function canonical_empty()
 end
 
 local function prepared_current(state, current)
-  if state.cap ~= selected_cap or state.family_enabled ~= selected_enabled then
+  local frames = prepared_frames(state)
+  local closed = state.phase == "provider"
+  for _, item in ipairs(frames) do
+    if item.record.pending or item.frame.allowance > 0 or item.frame.enabled then closed = false; break end
+  end
+  -- Matching policy protects the preparation and its unfinished work. Once
+  -- the admitted provider is active and every private row is retired, public
+  -- worker settings resume their ordinary lifecycle without touching credits.
+  if not closed and (state.cap ~= selected_cap or state.family_enabled ~= selected_enabled) then
     recover_error("worker cap or enable setting changed; use the exact prepared MIR settings")
   end
   if state.phase == "default" then
@@ -368,6 +376,7 @@ local function prepared_current(state, current)
   elseif not same_fact(state.current, current) then
     recover_error("prepared provider removal or changed continuation remains unqualified")
   end
+  return frames
 end
 
 -- Preserve an older, unchanged Secretas route without inventing a historical
@@ -390,9 +399,9 @@ function M.preflight(event, route)
     local current = fact(route)
     if state.kind == "prepared" then
       prepared_current(state, current)
-      prepared_frames(state)
       local next_state = clone(state)
       next_state.current = clone(current)
+      next_state.cap, next_state.family_enabled = selected_cap, selected_enabled
       if current.kind == "finite" then next_state.phase = "provider" end
       return {recovery=true, state=next_state}
     end
@@ -473,7 +482,7 @@ end
 function M.prepare(route)
   local state = checked_state()
   if state and state.schema == 2 and state.kind == "prepared" then
-    prepared_current(state, fact(route)); prepared_frames(state)
+    prepared_current(state, fact(route))
     return false, "Already prepared; keep its protected copy and do not repeat the transfer."
   end
   if state and (state.schema ~= 2 or state.kind ~= "route" or state.current.kind ~= "default") then
@@ -530,8 +539,7 @@ end
 function M.resume(force, route)
   local state = checked_state()
   if not state or state.schema ~= 2 or state.kind ~= "prepared" then recover_error("no prepared work exists") end
-  prepared_current(state, fact(route))
-  local all = prepared_frames(state)
+  local all = prepared_current(state, fact(route))
   local selected
   for _, item in ipairs(all) do if item.force == force then selected = item; break end end
   if not selected then recover_error("requested prepared force is unavailable") end

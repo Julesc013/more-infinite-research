@@ -94,7 +94,7 @@ source_of_truth_for:
 
 - An already-clamped save cannot prove the lost old level or progress. Return to a protected pre-change original copy; installing MIR and a new provider together does not perform this preparation. Adding MIR to an existing provider or upgrading with the same provider does not grant that provider's finite stages.
 - Only the old queued occurrences or detached partial level may finish at the matching old cost; the supporting research then stops. Use `/mir-worker-storage-recovery resume <force-name>` to append detached partial work while keeping the current unrelated research. Originally disabled work retains its lock and cannot be resumed by this command.
-- Changed research costs, science, effects, prerequisites, worker cap or enable setting refuse the prepared transition. Provider removal, another provider transition and arbitrary overhaul changes remain unqualified. Force merges follow Factorio's native research merge behavior; MIR does not combine independent partial levels.
+- Keep the worker cap and enable setting unchanged during preparation, provider entry and while any preserved work remains. After provider entry and retirement of all preserved work, ordinary cap and enable changes are allowed without changing its earned native benefit. Changed research costs, science, effects or prerequisites still refuse. Provider removal, another provider transition and arbitrary overhaul changes remain unqualified. Force merges follow Factorio's native research merge behavior; MIR does not combine independent partial levels.
 
 ### Overlapping weapon-speed research
 

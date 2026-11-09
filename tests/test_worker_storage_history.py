@@ -334,6 +334,80 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
           assert(not pcall(history.prepare,nil) and writes==0 and storage.mir_worker_storage_route==state)
         ''')
 
+    def test_closed_provider_recovery_allows_later_cap_and_enable_changes_without_native_writes(self):
+        self.lua.execute(r'''
+          seed();history.prepare(nil);add_provider(5)
+          history.apply(history.preflight({},provider_route(5)))
+          for _,f in ipairs({player,suspended})do
+            local p=f.technologies[ID]
+            f.research_queue={OTHER};f.research_progress=f==player and .51 or .42
+            p.level=p.level+1
+            history.on_research_event({research=p},true)
+          end
+          assert(not history.needs_research_events())
+          local original=storage.mir_worker_storage_route
+          local frames={}
+          for _,f in pairs(game.forces)do
+            local p=f.technologies[ID]
+            assert(not p.enabled and not original.forces[f.index].pending)
+            frames[f.index]={level=p.level,bonus=f.worker_robots_storage_bonus,queue=f.research_queue,
+              current=f.current_research,progress=f.research_progress,canonical_enabled=f.technologies[CANONICAL].enabled}
+          end
+          for _,policy in ipairs({{7,false},{0,true},{5,true}})do
+            history.configure(policy[1],policy[2]);writes=0
+            local plan=history.preflight({mod_startup_settings_changed=true},provider_route(5))
+            assert(storage.mir_worker_storage_route==original and writes==0,"preflight mutated settled state")
+            history.apply(plan)
+            original=storage.mir_worker_storage_route
+            assert(original.cap==policy[1] and original.family_enabled==policy[2] and writes==0)
+            for _,f in pairs(game.forces)do
+              local p,b=f.technologies[ID],frames[f.index]
+              assert(p.level==b.level and not p.enabled and f.worker_robots_storage_bonus==b.bonus)
+              assert(f.research_queue==b.queue and f.current_research==b.current and f.research_progress==b.progress)
+              assert(f.technologies[CANONICAL].enabled==b.canonical_enabled)
+              for level=4,6 do assert(not f.technologies['worker-robots-storage-'..level].researched)end
+            end
+          end
+          -- The normal public-tail cap writer still runs independently after
+          -- recovery admission; it may prune only its own above-cap work.
+          local name='worker-robots-storage-6';local tail=player.technologies[name]
+          tail.name=name;tail.visible_when_disabled=false
+          player.research_queue={OTHER,name};player.research_progress=.51
+          local bonus,private_level=player.worker_robots_storage_bonus,player.technologies[ID].level
+          local ownership={};require('runtime.caps').reconcile(player,{[name]=5},ownership)
+          assert(not tail.enabled and ownership[player.index][name].disabled)
+          assert(player.current_research.name==OTHER and player.research_progress==.51 and #player.research_queue==1)
+          assert(player.worker_robots_storage_bonus==bonus and player.technologies[ID].level==private_level
+            and not player.technologies[ID].enabled)
+        ''')
+
+    def test_policy_change_remains_temporary_while_provider_legacy_work_is_pending(self):
+        self.lua.execute(r'''
+          seed();history.prepare(nil);add_provider(5)
+          history.apply(history.preflight({},provider_route(5)))
+          local state=storage.mir_worker_storage_route
+          for _,policy in ipairs({{7,true},{0,false}})do
+            history.configure(policy[1],policy[2]);writes=0
+            local queue,bonus=player.research_queue,player.worker_robots_storage_bonus
+            assert(not pcall(history.preflight,{mod_startup_settings_changed=true},provider_route(5)))
+            assert(writes==0 and storage.mir_worker_storage_route==state and state.cap==0 and state.family_enabled)
+            assert(player.research_queue==queue and player.research_progress==.375 and player.worker_robots_storage_bonus==bonus)
+          end
+        ''')
+
+    def test_no_pending_marker_alone_cannot_release_preparation_or_actual_work_guards(self):
+        self.lua.execute(r'''
+          player.technologies[CANONICAL].level=8
+          history.prepare(nil);assert(not history.needs_research_events())
+          history.configure(7,false);writes=0
+          assert(not pcall(history.preflight,{},nil) and writes==0,"pre-entry settings were relaxed")
+          history.configure(0,true);add_provider(5)
+          history.apply(history.preflight({},provider_route(5)))
+          player.technologies[ID].saved_progress=.2
+          history.configure(7,false);writes=0
+          assert(not pcall(history.preflight,{},provider_route(5)) and writes==0,"actual detached work was ignored")
+        ''')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
