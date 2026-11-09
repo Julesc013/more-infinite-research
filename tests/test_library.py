@@ -10,6 +10,31 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_title_caption_and_handle_share_the_owned_header_drag_target(self):
+        self.lua.execute(r'''
+          boot()
+          local root=library.open(player,{query="gear",selected=gear.name})
+          local title=root.mir_library_title
+          local caption,handle=title.mir_library_title_label,title.mir_library_drag
+          -- Native draggable windows attach their target to the title flow;
+          -- the caption/handle pass interaction through it. Action buttons
+          -- keep their own input so this cannot disable close or resize.
+          assert(title.drag_target==root,"the owned title flow must provide the native drag target")
+          assert(caption.ignored_by_interaction==true and handle.ignored_by_interaction==true,
+            "the title caption and handle must pass native dragging to their title flow")
+          for _,name in ipairs({"layout_smaller","layout_larger","layout_reset","close"}) do
+            assert(title["mir_library_"..name].ignored_by_interaction~=true,
+              "header actions must keep their own native interaction")
+          end
+          assert(player.opened==root,"native keyboard close must still target the owned Library")
+          root.location={x=91,y=44}
+          library.on_gui_location_changed({player_index=1,element=root})
+          library.on_gui_closed({player_index=1,element=player.opened})
+          assert(not root.valid and storage.mir_library.players[1].query=="gear"
+            and storage.mir_library.players[1].location.x==91,
+            "native close must preserve the user's research query and dragged position")
+        ''')
+
     def test_outer_pages_reserve_the_authored_title_and_tab_height_budget(self):
         self.lua.execute(r'''
           boot()
