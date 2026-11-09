@@ -148,6 +148,7 @@ end
 local recovery = require("research.worker_storage_recovery")
 local caps = require("runtime.caps")
 local pending = false
+local owned_queue_force
 local selected_cap, selected_enabled = 0, true
 
 local function clone(value)
@@ -462,21 +463,27 @@ function M.configure(maximum, enabled)
 end
 
 local function assign_queue(force, frame, queue, moved)
-  force.research_queue = queue
-  local actual = force.research_queue or {}
-  if #actual ~= #queue then recover_error("native queue dropped a prepared entry; reload the original copy") end
-  for index, name in ipairs(queue) do
-    if actual[index].name ~= name then recover_error("native queue changed prepared order; reload the original copy") end
-  end
-  for name, saved in pairs(frame.queued_saved) do
-    local id = moved and name == recovery.canonical and recovery.id or name
-    if force.technologies[id].saved_progress ~= saved then force.technologies[id].saved_progress = saved end
-  end
-  local current = moved and frame.current == recovery.canonical and recovery.id or frame.current
-  if current then
-    if not force.current_research or force.current_research.name ~= current then recover_error("native current research changed") end
-    force.research_progress = frame.current_progress
-  end
+  local previous_owner = owned_queue_force
+  owned_queue_force = force.index
+  local ok, message = pcall(function()
+    force.research_queue = queue
+    local actual = force.research_queue or {}
+    if #actual ~= #queue then recover_error("native queue dropped a prepared entry; reload the original copy") end
+    for index, name in ipairs(queue) do
+      if actual[index].name ~= name then recover_error("native queue changed prepared order; reload the original copy") end
+    end
+    for name, saved in pairs(frame.queued_saved) do
+      local id = moved and name == recovery.canonical and recovery.id or name
+      if force.technologies[id].saved_progress ~= saved then force.technologies[id].saved_progress = saved end
+    end
+    local current = moved and frame.current == recovery.canonical and recovery.id or frame.current
+    if current then
+      if not force.current_research or force.current_research.name ~= current then recover_error("native current research changed") end
+      force.research_progress = frame.current_progress
+    end
+  end)
+  owned_queue_force = previous_owner
+  if not ok then error(message, 0) end
 end
 
 function M.prepare(route)
@@ -555,6 +562,7 @@ function M.resume(force, route)
   assign_queue(force, frame, queue)
   frame.technology.saved_progress = frame.saved_progress
   if frame.current then force.research_progress = frame.current_progress end
+  prepared_current(state, fact(route))
   return true, "Queued the preserved worker partial work for force " .. force.name .. "."
 end
 
@@ -611,11 +619,14 @@ function M.on_forces_merged(event)
 end
 
 function M.on_research_event(event, finished)
+  -- Native queue setters can emit queued events before current/progress have
+  -- settled. Our caller validates the completed frame after its owned write.
   if not pending then return false end
-  local state = checked_state()
-  if not state or state.kind ~= "prepared" then return false end
   local force = event and (event.force or event.research and event.research.force)
   if not force then return false end
+  if owned_queue_force ~= nil and owned_queue_force == force.index then return false end
+  local state = checked_state()
+  if not state or state.kind ~= "prepared" then return false end
   local record = state.forces[force.index]
   if not record then recover_error("research force has no prepared private history") end
   local frame = snapshot(force, recovery.id)
@@ -626,14 +637,24 @@ function M.on_research_event(event, finished)
   end
   local remaining = math.min(frame.allowance, math.max(0, record.limit - frame.next_level + 1))
   record.next_level, record.limit, record.pending = frame.next_level, frame.next_level + remaining - 1, remaining > 0
-  if not record.pending then
-    caps.remove_unavailable_from_queue(force, {[recovery.id]=true})
-    frame.technology.enabled = false
-    frame.technology.visible_when_disabled = record.visible
-    record.enabled = false
-  else
-    caps.reconcile(force, {[recovery.id]=record.limit}, {})
-    frame.technology.visible_when_disabled = record.visible
+  local previous_owner = owned_queue_force
+  owned_queue_force = force.index
+  local ok, message = pcall(function()
+    if not record.pending then
+      caps.remove_unavailable_from_queue(force, {[recovery.id]=true})
+      frame.technology.enabled = false
+      frame.technology.visible_when_disabled = record.visible
+      record.enabled = false
+    else
+      caps.reconcile(force, {[recovery.id]=record.limit}, {})
+      frame.technology.visible_when_disabled = record.visible
+    end
+  end)
+  owned_queue_force = previous_owner
+  if not ok then error(message, 0) end
+  local settled = snapshot(force, recovery.id)
+  if settled.next_level ~= record.next_level or settled.enabled ~= record.enabled or settled.visible ~= record.visible then
+    recover_error("private worker frame changed during owned queue mutation")
   end
   reconnect(state)
   return true

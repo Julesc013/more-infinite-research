@@ -312,6 +312,119 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
           assert(f.technologies[ID].saved_progress==.27)
         ''')
 
+    def test_owned_resume_defers_reentrant_transient_queue_frames_until_stable(self):
+        for transient in ("current_research", "research_progress"):
+            with self.subTest(transient=transient):
+                self.setUp()
+                self.lua.globals().transient_field = transient
+                self.lua.execute(r'''
+                  seed();suspended.research_queue={OTHER};suspended.research_progress=.42
+                  suspended.technologies[CANONICAL].saved_progress=.27;history.prepare(nil)
+                  local f=suspended;local mt=getmetatable(f);local read,write=mt.__index,mt.__newindex
+                  local changing=false;local callbacks=0;local before=f.worker_robots_storage_bonus
+                  mt.__index=function(o,k)if changing and k==transient_field then return nil end;return read(o,k)end
+                  mt.__newindex=function(o,k,v)
+                    if k=="research_queue"then changing=true;callbacks=callbacks+1
+                      assert(history.on_research_event({research=f.technologies[ID]})==false)
+                      changing=false
+                    end
+                    return write(o,k,v)
+                  end
+                  assert(history.resume(f,nil));assert(callbacks==1)
+                  assert(f.current_research.name==OTHER and f.research_progress==.42)
+                  assert(f.research_queue[2].name==ID and f.technologies[ID].saved_progress==.27)
+                  assert(f.worker_robots_storage_bonus==before)
+                  local record=storage.mir_worker_storage_route.forces[f.index]
+                  assert(record.next_level==7 and record.limit==7 and record.pending)
+                  changing=true;local ok,message=pcall(history.on_research_event,{research=f.technologies[ID]});changing=false
+                  assert(not ok and tostring(message):find("inconsistent native current/queue frame",1,true),"external guard weakened")
+                ''')
+
+    def test_owned_queue_gate_is_restored_after_native_setter_error(self):
+        self.lua.execute(r'''
+          seed();suspended.research_queue={OTHER};suspended.research_progress=.42
+          suspended.technologies[CANONICAL].saved_progress=.27;history.prepare(nil)
+          local f=suspended;local mt=getmetatable(f);local read,write=mt.__index,mt.__newindex
+          local changing=false
+          mt.__index=function(o,k)if changing and k=="research_progress"then return nil end;return read(o,k)end
+          mt.__newindex=function(o,k,v)
+            if k=="research_queue"then changing=true
+              local ok,message=pcall(history.on_research_event,{research=f.technologies[ID]});changing=false
+              assert(ok and message==false);error("injected native queue failure")
+            end
+            return write(o,k,v)
+          end
+          local ok,message=pcall(history.resume,f,nil)
+          assert(not ok and tostring(message):find("injected native queue failure",1,true))
+          changing=true;ok,message=pcall(history.on_research_event,{research=f.technologies[ID]});changing=false
+          assert(not ok and tostring(message):find("inconsistent native current/queue frame",1,true),"gate leaked after error")
+          mt.__newindex=write;assert(history.resume(f,nil))
+          assert(f.current_research.name==OTHER and f.research_progress==.42 and f.research_queue[2].name==ID)
+        ''')
+
+    def test_owned_queue_gate_does_not_mute_another_forces_external_event(self):
+        self.lua.execute(r'''
+          seed();suspended.research_queue={OTHER};suspended.research_progress=.42
+          suspended.technologies[CANONICAL].saved_progress=.27;history.prepare(nil)
+          local other=getmetatable(player);local read=other.__index;local broken=false
+          other.__index=function(o,k)if broken and k=="research_progress"then return nil end;return read(o,k)end
+          local mt=getmetatable(suspended);local write=mt.__newindex
+          mt.__newindex=function(o,k,v)
+            if k=="research_queue"then broken=true
+              local ok,message=pcall(history.on_research_event,{research=player.technologies[ID]});broken=false
+              assert(not ok and tostring(message):find("inconsistent native current/queue frame",1,true),"another force was muted")
+            end
+            return write(o,k,v)
+          end
+          assert(history.resume(suspended,nil))
+          assert(suspended.current_research.name==OTHER and suspended.research_progress==.42)
+        ''')
+
+    def test_retirement_owned_caps_queue_write_does_not_reenter_partial_state(self):
+        self.lua.execute(r'''
+          seed();history.prepare(nil);local f=player;local p=f.technologies[ID]
+          f.technologies[OTHER].saved_progress=.42;f.research_progress=0;p.level=9
+          local mt=getmetatable(f);local read,write=mt.__index,mt.__newindex;local changing=false;local callbacks=0
+          mt.__index=function(o,k)if changing and k=="research_progress"then return nil end;return read(o,k)end
+          mt.__newindex=function(o,k,v)
+            if k=="research_queue"then changing=true;callbacks=callbacks+1
+              assert(history.on_research_event({research=f.technologies[OTHER]})==false);changing=false
+            end
+            return write(o,k,v)
+          end
+          assert(history.on_research_event({research=p,by_script=false},true));assert(callbacks==1)
+          assert(f.current_research.name==OTHER and f.research_progress==.42 and #f.research_queue==1)
+          assert(not p.enabled and not storage.mir_worker_storage_route.forces[f.index].pending)
+        ''')
+
+    def test_owned_resume_still_refuses_a_malformed_settled_frame(self):
+        self.lua.execute(r'''
+          seed();suspended.research_queue={OTHER};suspended.research_progress=.42
+          suspended.technologies[CANONICAL].saved_progress=.27;history.prepare(nil)
+          local f=suspended;local mt=getmetatable(f);local read,write=mt.__index,mt.__newindex;local broken=false
+          mt.__index=function(o,k)if broken and k=="research_progress"then return nil end;return read(o,k)end
+          mt.__newindex=function(o,k,v)write(o,k,v);if k=="research_queue"then broken=true end end
+          local ok,message=pcall(history.resume,f,nil)
+          assert(not ok and tostring(message):find("inconsistent native current/queue frame",1,true),"settled invariant was skipped")
+        ''')
+
+    def test_pending_caps_reconcile_queue_write_has_the_same_owned_gate(self):
+        self.lua.execute(r'''
+          seed();history.prepare(nil);local f=player;local p=f.technologies[ID]
+          f.research_queue={ID,ID,OTHER};f.research_progress=.375
+          local mt=getmetatable(f);local read,write=mt.__index,mt.__newindex;local changing=false;local callbacks=0
+          mt.__index=function(o,k)if changing and k=="research_progress"then return nil end;return read(o,k)end
+          mt.__newindex=function(o,k,v)
+            if k=="research_queue"then changing=true;callbacks=callbacks+1
+              assert(history.on_research_event({research=p})==false);changing=false
+            end
+            return write(o,k,v)
+          end
+          assert(history.on_research_event({research=p}));assert(callbacks==1)
+          assert(f.current_research.name==ID and f.research_progress==.375 and #f.research_queue==2)
+          assert(f.research_queue[2].name==OTHER and storage.mir_worker_storage_route.forces[f.index].limit==8)
+        ''')
+
     def test_native_merge_reconciles_only_surviving_metadata_without_native_writes(self):
         self.lua.execute(r'''
           seed();history.prepare(nil)
