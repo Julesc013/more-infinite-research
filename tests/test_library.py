@@ -10,6 +10,26 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_retained_title_restyles_through_the_shared_native_element_setter(self):
+        self.lua.execute(r'''
+          boot()
+          local root=library.open(player,{query="gear",selected=gear.name})
+          local query=research_filters(root).mir_library_query
+          local close=root.mir_library_title.mir_library_close
+          -- The exact 2.0.77 API permits a string write to GuiElement.style,
+          -- while LuaStyle.name is read-only. Reproduce the old live toolbar
+          -- style without replacing the root/button or losing personal input.
+          assert(not pcall(function()close.style.name="tool_button"end),
+            "the shared GUI double must reject the unsupported2.0name write")
+          close.style="tool_button";close.style.width=30;close.style.height=30
+          assert(close.style.name=="tool_button")
+          assert(library.open(player)==root and root.mir_library_title.mir_library_close==close
+            and research_filters(root).mir_library_query==query)
+          assert(close.style.name=="frame_action_button" and close.style.maximal_width==24
+            and close.style.maximal_height==24 and query.text=="gear",
+            "refresh must portably restyle old live chrome and retain the query/caret")
+        ''')
+
     def test_title_caption_and_handle_share_the_owned_header_drag_target(self):
         self.lua.execute(r'''
           boot()
@@ -915,7 +935,7 @@ class LibraryTests(unittest.TestCase):
             }
           end
 
-          function gui_style()
+          function gui_style(style_name)
             local values = {}
             local function assert_int32(key, value)
               assert(type(value) == "number" and value == math.floor(value)
@@ -923,8 +943,12 @@ class LibraryTests(unittest.TestCase):
                 "LuaStyle." .. key .. " requires an int32")
             end
             return setmetatable({}, {
-              __index = function(_, key) return values[key] end,
+              __index = function(_, key)
+                if key=="name" then return style_name or "default" end
+                return values[key]
+              end,
               __newindex = function(_, key, value)
+                if key=="name" then error("LuaStyle.name is read only on2.0.77; assign LuaGuiElement.style") end
                 if key == "width" then
                   assert_int32(key, value)
                   -- LuaStyle.width writes both bounds. Keep this host double
@@ -972,11 +996,14 @@ class LibraryTests(unittest.TestCase):
               end
               local read_only_column_count = element.column_count
               local native_tags = copy_gui_tags(element.tags or {})
+              local native_style = gui_style(element.style_name)
               rawset(element, "column_count", nil)
               rawset(element, "tags", nil)
+              rawset(element, "style", nil)
               setmetatable(element, {
                 __index = function(_, key)
                   if key == "column_count" then return read_only_column_count end
+                  if key == "style" then return native_style end
                   if key == "children" then
                     local children={}
                     for _,child in ipairs(element._children) do if child.valid then children[#children+1]=child end end
@@ -986,6 +1013,10 @@ class LibraryTests(unittest.TestCase):
                 end,
                 __newindex = function(target, key, field)
                   if key == "column_count" then error("LuaGuiElement.column_count is read only") end
+                  if key == "style" then
+                    assert(type(field)=="string","LuaGuiElement.style writes require a prototype name")
+                    native_style=gui_style(field);rawset(target,"style_name",field);return
+                  end
                   if key == "tags" then native_tags=copy_gui_tags(field);return end
                   rawset(target, key, field)
                 end

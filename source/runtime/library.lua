@@ -2184,7 +2184,7 @@ local function sync_titlebar(frame, width)
   for _, name in ipairs({"layout_smaller", "layout_larger", "layout_reset", "close"}) do
     local button = title[PREFIX .. name]
     if valid(button) and button.style then
-      if button.style.name ~= "frame_action_button" then button.style.name = "frame_action_button" end
+      if button.style.name ~= "frame_action_button" then button.style = "frame_action_button" end
       local size = library_layout.titlebar_action_size
       if button.style.minimal_width ~= size or button.style.maximal_width ~= size then button.style.width = size end
       if button.style.minimal_height ~= size or button.style.maximal_height ~= size then button.style.height = size end
