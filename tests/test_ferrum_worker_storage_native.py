@@ -302,6 +302,11 @@ class FerrumWorkerStorageNativeControls(unittest.TestCase):
                          "worker-robots-storage-5": 1, "worker-robots-storage-6": 1})
         self.assertTrue(result["cold_readonly"])
         self.assertFalse(result["native_evidence"])
+        markers = [json.loads(line.split("] ", 1)[1]) for line in result["logs"]]
+        physical = [row["physical_frame"] for row in markers if row["stage"] == "cargo-destination-saved"]
+        colds = [row["physical_frame"] for row in markers if row["stage"] == "cold"]
+        self.assertEqual(len(physical), 1)
+        self.assertEqual(colds, [physical[0], physical[0]])
 
     def test_cargo_partial_missing_flight_identity_conservation_and_timeout_refuse(self):
         for mode, message in [("partial-trips", "one full seven"), ("non-normal", "normal cargo"),

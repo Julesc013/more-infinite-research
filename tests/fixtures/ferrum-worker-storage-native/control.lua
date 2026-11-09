@@ -88,13 +88,13 @@ local function frames()
   check(count <= 16, "bounded force count")
   return result
 end
-local function marker(stage)
+local function marker(stage, physical_frame)
   local s = storage[KEY]
   log("[MIR_FERRUM_WORKER_NATIVE] " .. helpers.table_to_json({stage = stage, phase = s.phase,
     tick = game.tick, mods = script.active_mods, frames = frames(), ordinary = s.ordinary,
     administrative_events = s.administrative_events, consumption = s.consumption,
     calibration_count = s.calibration_count or false, partials_are_scripted_sentinels = true,
-    cargo = s.cargo and s.cargo.report or nil}))
+    cargo = s.cargo and s.cargo.report or nil, physical_frame = physical_frame}))
 end
 local function science(t, expected)
   local actual, ids = {}, {}
@@ -215,8 +215,8 @@ local function begin(id)
   s.work = {id = id, units = t.research_unit_count, budgets = budgets, inserted = inserted, progress_seen = false}
   s.phase = "earning"; marker("lab-start"); feed()
 end
-local function close(phase, save)
-  local s = storage[KEY]; stopped(); s.phase = phase; s.closed = frames(); marker(phase); game.server_save(save)
+local function close(phase, save, physical_frame)
+  local s = storage[KEY]; stopped(); s.phase = phase; s.closed = frames(); marker(phase, physical_frame); game.server_save(save)
 end
 local function cargo_inventory(entity, index, item)
   check(entity and entity.valid and entity.quality.name == "normal", "normal cargo entity absent")
@@ -273,14 +273,14 @@ local function cargo_tick()
     check(current.provider == 0 and current.requester == 0, "loaded-flight source/destination")
     if not c.report.loaded then
       c.report.loaded = {tick = game.tick, frame = copied(current)}
-      marker("cargo-loaded-seven")
+      marker("cargo-loaded-seven", current)
     else
       local first = c.report.loaded.frame.active[1]
       check(first.unit == robot.unit, "cargo robot changed during flight")
       if first.position.x ~= robot.position.x or first.position.y ~= robot.position.y then
         if not c.report.flight then
           c.report.flight = {tick = game.tick, frame = copied(current)}
-          marker("cargo-seven-in-flight")
+          marker("cargo-seven-in-flight", current)
         end
       end
     end
@@ -291,7 +291,7 @@ local function cargo_tick()
       c.closed = current; c.completed = true
       c.report.delivered = {tick = game.tick, frame = copied(current)}
       c.report.physical_robot_delivery = true
-      close("cargo-destination-saved", "mir-ferrum-worker-cargo-destination")
+      close("cargo-destination-saved", "mir-ferrum-worker-cargo-destination", current)
     end
   end
 end
@@ -395,11 +395,13 @@ script.on_event(defines.events.on_tick, function()
     loaded = false; check(s.phase == "destination-saved" or s.phase == "cargo-destination-saved", "cold requires closed destination")
     closure(true); stopped(); same(frames(), s.closed, "cold"); contracts(true, false)
     same(s.ordinary, {[FOUR] = 1, [FIVE] = 1, [SIX] = 1}, "cold ordinary counts")
+    local physical_frame
     if s.phase == "cargo-destination-saved" then
       check(s.cargo and s.cargo.completed and s.cargo.report.physical_robot_delivery, "cold physical witness absent")
-      same(cargo_frame(), s.cargo.closed, "cold-cargo")
+      physical_frame = cargo_frame()
+      same(physical_frame, s.cargo.closed, "cold-cargo")
     end
-    marker("cold"); return
+    marker("cold", physical_frame); return
   end
   if s.phase == "cargo-active" then cargo_tick(); return end
   if s.phase == "source-init" then
