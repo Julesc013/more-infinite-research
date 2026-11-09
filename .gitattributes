@@ -17,6 +17,8 @@ tests/fixtures/runtime510-selected-mir-info.json text eol=lf
 tests/fixtures/competing-dynamic-f200-sa-captured-facts.json text eol=lf
 tests/fixtures/competing-dynamic-f200-sa-native-initial-levels.json text eol=lf
 tests/fixtures/create-research/* text eol=lf
+# Settings-search observers bind this probe by its exact LF byte hash.
+tests/fixtures/library-legacy-settings-search/probe.lua text eol=lf
 spec/inventory/*.json text eol=lf
 
 # Retain its CRLF bytes and the ordinary trailing-space/blank-line checks.

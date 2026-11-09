@@ -152,3 +152,18 @@ File targeting and I/O failures require separate actual server/EN/DE write-data 
 Keep original and failed receipts, actor identities, actual clicks, native headers/joins and all role-local exports. Verify exact file bytes/string round-trip, full/compact false and zero values through the existing codec/facade, latest-report overwrite/bounds/content and absence of unintended peer outputs. Check server-only startup headers separately for init/configuration and ensure ordinary load/rejoin alone does not rewrite them before an explicit export. The startup path cannot capture an OS-process launch or read factorio-current.log. This is functional qualification outside scored timings; final package hashes, all owned fixture containers, helper/actor/controller hashes, source saves, geometry and teardown/restoration still require binding by the native execution owner before dispatch.
 
 For published MIR 5.0.11, use the matching `info-input-511-f200.json` / `info-input-511-f210.json` metadata for input observer 0.3.9, or `info-exports-511-f200.json` / `info-exports-511-f210.json` for export observer 0.4.4. These retain the existing input/export protocols and bind exactly to MIR 5.0.20011 on Base 2.0.77 or MIR 5.0.21011 on Base 2.1.23. The older 0.3.8 / 0.4.3 tuples remain bound to MIR 5.0.10. The native execution owner still binds exact player ZIP, fixture, protected save, controller and resource admission before dispatch; host controls or fixture construction do not establish native acceptance.
+
+## Separate next-release bindings
+
+The next-release metadata below is test preparation for MIR 5.0.12. Keep every earlier metadata file and archive identity under its original version; do not substitute these files into a previous fixture archive.
+
+| Protocol | Observer | Metadata | Exact engine and MIR tuples |
+|---|---|---|---|
+| Settings search composition, then native input/lifecycle | 0.3.11 | `info-input-512-settings-api-f200.json`, `info-input-512-settings-api-f210.json` | Base 2.0.77 / MIR 5.0.20012; Base 2.1.23 / MIR 5.0.21012 |
+| Support exports | 0.4.5 | `info-exports-512-f200.json`, `info-exports-512-f210.json` | Base 2.0.77 / MIR 5.0.20012; Base 2.1.23 / MIR 5.0.21012 |
+
+Observer 0.3.11 requires the same fourteen prepare/check pairs from the unchanged `library-legacy-settings-search/probe.lua` body (SHA-256 `9917CA4DD0F9373E0D2480ABE74DD8520D34FA84C1F628DEAC6BA4F546800234`): all seven declared Settings search stages for EN and DE, before the full existing keyboard, drag, foreign-focus, removal/replacement, save and restart sequence. Observer 0.4.5 retains all thirteen click actions, two server commands, peer-local file and error checks, false/zero values, five joins and the saved-host lifecycle described above. Both retain strict earned/native/foreign-state preservation and exact engine, edition, player-version and observer closure checks; neither accepts a later release implicitly.
+
+The 12-only Research grid check follows the reviewed responsive layout: an owned frame's equal finite integer native minimum/maximum width bounds require five columns at width960 or above, three at620–959, two at440–619 and one below440. It reads the supported width bounds rather than the write-only `LuaStyle.width` convenience property. Earlier observers still require exactly two columns. Public element names, parent/type paths and mod ownership checks remain strict.
+
+These files do not establish native input, export, file, multiplayer or lifecycle acceptance. Static comparison covered the responsive hierarchy at `af5d96001f2d3e054986a20acfb867f2c8f2346a`; final coherent player-source review, exact package/fixture/controller bindings and native execution remain pending.

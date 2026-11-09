@@ -1,0 +1,59 @@
+{
+  "kind": "MIRReviewedLibraryFixtureCheckedMergeReadbackV1",
+  "pr": 1860,
+  "checked_head": "9c9d2cc994df44bb5b8e18ad497f09f9c0ea8ab0",
+  "merge": {
+    "headRefOid": "9c9d2cc994df44bb5b8e18ad497f09f9c0ea8ab0",
+    "mergeCommit": {
+      "oid": "e240252e84c6ebb42c2d148cc1055ebb9235d43d"
+    },
+    "mergedAt": "2026-11-09T14:17:50Z",
+    "state": "MERGED"
+  },
+  "primary_clean_remote_equal": true,
+  "player_source_unchanged": "ce8f1178c800ee90da2af087f602cf467c4a7fa7",
+  "fixture_bodies_equal_reviewed_a487": true,
+  "ci": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-09T13:56:15Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Julesc013/more-infinite-research/actions/runs/42629789657/job/129202801822",
+      "name": "branch-policy",
+      "startedAt": "2026-11-09T13:55:50Z",
+      "status": "COMPLETED",
+      "workflowName": "Branch Policy"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-09T13:56:45Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Julesc013/more-infinite-research/actions/runs/42629789585/job/129202801886",
+      "name": "verification-plan",
+      "startedAt": "2026-11-09T13:55:51Z",
+      "status": "COMPLETED",
+      "workflowName": "MIR 5 host controls"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-09T13:56:54Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Julesc013/more-infinite-research/actions/runs/42629789585/job/129202801370",
+      "name": "native-tooling-controls",
+      "startedAt": "2026-11-09T13:55:50Z",
+      "status": "COMPLETED",
+      "workflowName": "MIR 5 host controls"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-09T14:11:55Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/Julesc013/more-infinite-research/actions/runs/42629789585/job/129203292983",
+      "name": "host-controls",
+      "startedAt": "2026-11-09T13:56:47Z",
+      "status": "COMPLETED",
+      "workflowName": "MIR 5 host controls"
+    }
+  ],
+  "scope": "Reviewed test preparation; native and stable gates remain pending."
+}

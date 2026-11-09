@@ -1,0 +1,29 @@
+{
+  "kind": "MIRStartupTranslatedLabelsIndependentSourceReviewV1",
+  "reviewer": "Black Glass root, non-author",
+  "head": "5e329353aac4f86a561c2fa5c9209e96a76cc3af",
+  "base": "2623d3d8ffd1539d2b35f21b06bcd936856b6fa8",
+  "source_tree": "c34febdfe6655803fafd5140bf9adf43e39fcca6",
+  "verdict": "APPROVE bounded restoration and checked integration, native visual QA pending",
+  "verified": {
+    "published_archive": {
+      "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_4.7.21003.zip",
+      "bytes": 1463293,
+      "sha256": "b6eb9430056abd384db00f94929fe7dac0a37441acf4bc277946689682628852"
+    },
+    "languages": 49,
+    "missing_translated_names_restored": 485,
+    "english_unchanged_for_all10_restored_keys": true,
+    "every_added_value_byte_equal_published_value": true,
+    "every_existing_section_key_value_and_line_order_preserved": true,
+    "placeholder_identity_retained": true,
+    "no_Lua_settings_semantics_or_Aero_Library_changes": true,
+    "all_retained_control_bodies_rehashed": true,
+    "author16settings_plus8locale_controls_pass": true
+  },
+  "limits": [
+    "Fivechanged-English keys retaincurrentfallback, not claimedtranslated.",
+    "Palette/group/order code was already retained; no restored-layout or pixel-perfect native verdict is invented.",
+    "Complete Startup/Library normal+narrow EN/DE screenshot and affected interaction batch remains pending coherentUIcandidate."
+  ]
+}

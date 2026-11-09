@@ -10,6 +10,51 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryTests(unittest.TestCase):
+    def test_retained_title_restyles_through_the_shared_native_element_setter(self):
+        self.lua.execute(r'''
+          boot()
+          local root=library.open(player,{query="gear",selected=gear.name})
+          local query=research_filters(root).mir_library_query
+          local close=root.mir_library_title.mir_library_close
+          -- The exact 2.0.77 API permits a string write to GuiElement.style,
+          -- while LuaStyle.name is read-only. Reproduce the old live toolbar
+          -- style without replacing the root/button or losing personal input.
+          assert(not pcall(function()close.style.name="tool_button"end),
+            "the shared GUI double must reject the unsupported2.0name write")
+          close.style="tool_button";close.style.width=30;close.style.height=30
+          assert(close.style.name=="tool_button")
+          assert(library.open(player)==root and root.mir_library_title.mir_library_close==close
+            and research_filters(root).mir_library_query==query)
+          assert(close.style.name=="frame_action_button" and close.style.maximal_width==24
+            and close.style.maximal_height==24 and query.text=="gear",
+            "refresh must portably restyle old live chrome and retain the query/caret")
+        ''')
+
+    def test_title_caption_and_handle_share_the_owned_header_drag_target(self):
+        self.lua.execute(r'''
+          boot()
+          local root=library.open(player,{query="gear",selected=gear.name})
+          local title=root.mir_library_title
+          local caption,handle=title.mir_library_title_label,title.mir_library_drag
+          -- Native draggable windows attach their target to the title flow;
+          -- the caption/handle pass interaction through it. Action buttons
+          -- keep their own input so this cannot disable close or resize.
+          assert(title.drag_target==root,"the owned title flow must provide the native drag target")
+          assert(caption.ignored_by_interaction==true and handle.ignored_by_interaction==true,
+            "the title caption and handle must pass native dragging to their title flow")
+          for _,name in ipairs({"layout_smaller","layout_larger","layout_reset","close"}) do
+            assert(title["mir_library_"..name].ignored_by_interaction~=true,
+              "header actions must keep their own native interaction")
+          end
+          assert(player.opened==root,"native keyboard close must still target the owned Library")
+          root.location={x=91,y=44}
+          library.on_gui_location_changed({player_index=1,element=root})
+          library.on_gui_closed({player_index=1,element=player.opened})
+          assert(not root.valid and storage.mir_library.players[1].query=="gear"
+            and storage.mir_library.players[1].location.x==91,
+            "native close must preserve the user's research query and dragged position")
+        ''')
+
     def test_outer_pages_reserve_the_authored_title_and_tab_height_budget(self):
         self.lua.execute(r'''
           boot()
@@ -73,6 +118,7 @@ class LibraryTests(unittest.TestCase):
           assert(facts.mir_library_science_icons and facts.mir_library_production_check)
           assert(player.force.research_queue==queue and player.force.current_research==current
             and player.force.research_progress==progress)
+
           player.display_resolution={width=1280,height=720}
           library.close(player)
           root=library.open(player,{selected=gear.name})
@@ -116,6 +162,15 @@ class LibraryTests(unittest.TestCase):
           assert(list.style.minimal_height==page.style.maximal_height-130 and list.style.minimal_width==root.style.maximal_width-64)
           assert(player.force.research_queue==queue and player.force.current_research==current
             and player.force.research_progress==progress)
+          assert(list.visible==true and page.mir_library_queue_empty.visible==false)
+          -- Model an engine queue transition; rendering must only project it.
+          local empty={};player.force.research_queue=empty
+          assert(library.open(player,{tab="queue"})==root)
+          assert(page.mir_library_queue_list==list and list.visible==false
+            and page.mir_library_queue_empty.visible==true and #list.items==0,
+            "an empty queue must show its message without an empty full-height grid")
+          assert(player.force.research_queue==empty and player.force.current_research==current
+            and player.force.research_progress==progress)
         ''')
 
     def test_debug_restores_original_sections_and_two_panes_without_an_export_on_open(self):
@@ -154,7 +209,7 @@ class LibraryTests(unittest.TestCase):
           assert(query.style.maximal_width==root.style.maximal_width-64,
             "the original search uses the available window width")
           local grid=filters.mir_library_filter_grid
-          assert(grid.type=="table" and grid.column_count==2)
+          assert(grid.type=="table" and grid.column_count==5)
           local order={"family","status","mode","sort","visibility"}
           for i,name in ipairs(order) do
             local box=grid["mir_library_"..name.."_field"]
@@ -358,9 +413,9 @@ class LibraryTests(unittest.TestCase):
           assert(facts.mir_library_detail_context.mir_library_context_queue_guidance==nil)
           local divider=facts.mir_library_detail_benefits_divider
           assert(divider.type=="line" and divider.direction=="horizontal")
-          assert(divider.style.top_margin==10 and divider.style.bottom_margin==4
+          assert(divider.style.top_margin==12 and divider.style.bottom_margin==4
             and facts.mir_library_detail_benefits.style.bottom_margin==4,
-            "sections must retain the original native dividers and spacing")
+            "sections must retain the native dividers and common section spacing")
           local science=facts.mir_library_science_icons
           assert(science.type=="table" and science.column_count>=2)
           assert(science.mir_library_science_1.sprite=="item/red" and science.mir_library_science_2.sprite=="item/green")
@@ -880,7 +935,7 @@ class LibraryTests(unittest.TestCase):
             }
           end
 
-          function gui_style()
+          function gui_style(style_name)
             local values = {}
             local function assert_int32(key, value)
               assert(type(value) == "number" and value == math.floor(value)
@@ -888,8 +943,12 @@ class LibraryTests(unittest.TestCase):
                 "LuaStyle." .. key .. " requires an int32")
             end
             return setmetatable({}, {
-              __index = function(_, key) return values[key] end,
+              __index = function(_, key)
+                if key=="name" then return style_name or "default" end
+                return values[key]
+              end,
               __newindex = function(_, key, value)
+                if key=="name" then error("LuaStyle.name is read only on2.0.77; assign LuaGuiElement.style") end
                 if key == "width" then
                   assert_int32(key, value)
                   -- LuaStyle.width writes both bounds. Keep this host double
@@ -937,11 +996,14 @@ class LibraryTests(unittest.TestCase):
               end
               local read_only_column_count = element.column_count
               local native_tags = copy_gui_tags(element.tags or {})
+              local native_style = gui_style(element.style_name)
               rawset(element, "column_count", nil)
               rawset(element, "tags", nil)
+              rawset(element, "style", nil)
               setmetatable(element, {
                 __index = function(_, key)
                   if key == "column_count" then return read_only_column_count end
+                  if key == "style" then return native_style end
                   if key == "children" then
                     local children={}
                     for _,child in ipairs(element._children) do if child.valid then children[#children+1]=child end end
@@ -951,6 +1013,10 @@ class LibraryTests(unittest.TestCase):
                 end,
                 __newindex = function(target, key, field)
                   if key == "column_count" then error("LuaGuiElement.column_count is read only") end
+                  if key == "style" then
+                    assert(type(field)=="string","LuaGuiElement.style writes require a prototype name")
+                    native_style=gui_style(field);rawset(target,"style_name",field);return
+                  end
                   if key == "tags" then native_tags=copy_gui_tags(field);return end
                   rawset(target, key, field)
                 end
@@ -1425,7 +1491,7 @@ class LibraryTests(unittest.TestCase):
             and root.style.maximal_height <= 720/1.25)
           assert(root.auto_center == true and root.force_auto_center_calls == 1)
           local filters = research_filters(root)
-          assert(filters.type == "flow" and filters.mir_library_filter_grid.column_count == 2)
+          assert(filters.type == "flow" and filters.mir_library_filter_grid.column_count == 3)
           local family_style = filters["mir_library_filter_grid"]["mir_library_family_field"]["mir_library_family"].style
           assert(family_style.minimal_width == family_style.maximal_width and family_style.maximal_width <= 280)
           local content = research_content(root)
@@ -1599,7 +1665,7 @@ class LibraryTests(unittest.TestCase):
     def test_fractional_display_scale_writes_only_int32_gui_dimensions(self):
         self.lua.execute(r'''
           boot()
-          -- 1042 / 1.25 - 32 is 801.6, and the two-column control calculation
+          -- 1042 / 1.25 - 32 is 801.6, and the three-column control calculation
           -- is fractional again. The native LuaStyle setters take int32 only.
           player.display_resolution, player.display_scale = {width=1042,height=768}, 1.25
           local root = library.open(player,{selected=gear.name})
@@ -1608,12 +1674,12 @@ class LibraryTests(unittest.TestCase):
           assert(root.force_auto_center_calls == 1)
           local filters = research_filters(root)
           local family = filters["mir_library_filter_grid"]["mir_library_family_field"]["mir_library_family"]
-          assert(family.style.minimal_width == 280 and family.style.maximal_width == 280)
+          assert(family.style.minimal_width == 178 and family.style.maximal_width == 178)
           local tabs = root["mir_library_tabs"]
           assert(tabs.style.maximal_width == 608)
           local content = research_content(root)
           assert(content.style.minimal_width == 592 and content.style.maximal_width == 592)
-          assert(content.style.minimal_height == 180 and content.style.maximal_height == 180)
+          assert(content.style.minimal_height == 164 and content.style.maximal_height == 164)
           assert(content.type == "table" and content.column_count == 2)
           assert(content["mir_library_list_pane"]["mir_library_results"].style.minimal_width == 225)
           assert(content["mir_library_detail"].style.minimal_width == 339)
@@ -1893,6 +1959,35 @@ class LibraryTests(unittest.TestCase):
             "filter selection must update the retained view without replacing the window or query")
         ''')
 
+    def test_retained_filter_labels_follow_resize_within_the_same_column_band(self):
+        self.lua.execute(r'''
+          boot()
+          local root=library.open(player,{query="gear",selected=gear.name})
+          local filters=research_filters(root)
+          local grid=filters.mir_library_filter_grid
+          local query=filters.mir_library_query
+          local title=root.mir_library_title
+          local before_level,before_queue=gear.level,player.force.research_queue
+          assert(grid.column_count==3)
+          for _,action in ipairs({"larger","larger","smaller","smaller"}) do
+            library.on_gui_click({player_index=1,element=title["mir_library_layout_"..action]})
+            assert(research_filters(root)==filters and filters.mir_library_filter_grid==grid,
+              "same-column resizing must retain the live filters")
+            for _,name in ipairs({"family","status","mode","sort","visibility"}) do
+              local field=grid["mir_library_"..name.."_field"]
+              local label=field["mir_library_"..name.."_label"]
+              local control=field["mir_library_"..name]
+              assert(label.style.maximal_width==field.style.maximal_width,
+                "localized filter captions must use the current field width after "..action)
+              assert(control.style.maximal_width==field.style.maximal_width)
+            end
+            assert(filters.mir_library_query==query and query.text=="gear"
+              and storage.mir_library.players[1].selected==gear.name)
+          end
+          assert(gear.level==before_level and player.force.research_queue==before_queue,
+            "presentation resizing must leave native research unchanged")
+        ''')
+
     def test_layout_controls_resize_reset_and_rebuild_an_outdated_saved_window(self):
         self.lua.execute(r'''
           boot()
@@ -1982,7 +2077,7 @@ class LibraryTests(unittest.TestCase):
           boot()
           local root = library.open(player, {query="gear"})
           local original_root = root
-          assert(research_filters(root).mir_library_filter_grid.column_count == 2)
+          assert(research_filters(root).mir_library_filter_grid.column_count == 3)
           local filters = research_filters(root)
           filters["mir_library_filter_grid"]["mir_library_mode_field"]["mir_library_mode"].selected_index = 3
           library.on_gui_selection_state_changed({player_index=1, element=filters["mir_library_filter_grid"]["mir_library_mode_field"]["mir_library_mode"]})
@@ -2011,14 +2106,28 @@ class LibraryTests(unittest.TestCase):
             and live_children[2] == root["mir_library_tabs"],
             "Research controls must stay inside their tab, below stable navigation")
           assert(research_filters(root).parent == research_page(root))
-          assert(research_filters(root).mir_library_filter_grid.column_count == 2,
-            "authored fields remain two columns as the window grows")
+          assert(research_filters(root).mir_library_filter_grid.column_count == 3,
+            "medium windows use two rows of labelled controls")
           filters = research_filters(root)
           assert(filters["mir_library_query"].text == "gear"
             and filters["mir_library_filter_grid"]["mir_library_mode_field"]["mir_library_mode"].selected_index == 3
             and filters["mir_library_filter_grid"]["mir_library_status_field"]["mir_library_status"].selected_index == 4
             and filters["mir_library_filter_grid"]["mir_library_sort_field"]["mir_library_sort"].selected_index == 3,
             "recreated GUI controls must reflect the saved per-player filter state")
+
+          local query, old_grid = filters.mir_library_query, filters.mir_library_filter_grid
+          for _=1,2 do
+            library.on_gui_click({player_index=1,element=root.mir_library_title.mir_library_layout_larger})
+          end
+          filters=research_filters(root)
+          assert(root==original_root and root.mir_library_tabs==original_tabs and filters.mir_library_query==query,
+            "a filter-column change must retain the live root, tabs and query/caret")
+          assert(not old_grid.valid and filters.mir_library_filter_grid.column_count==5,
+            "wide windows rebuild the read-only grid into one row of five controls")
+          assert(filters.mir_library_filter_grid.mir_library_mode_field.mir_library_mode.selected_index==3
+            and filters.mir_library_filter_grid.mir_library_status_field.mir_library_status.selected_index==4
+            and filters.mir_library_filter_grid.mir_library_sort_field.mir_library_sort.selected_index==3,
+            "rebuilding the filter grid must preserve every selected value")
 
           root = library.open(player, {tab="settings", settings_scope="options", settings_search=""})
           local view = storage.mir_library.players[1]
@@ -4027,6 +4136,20 @@ class LibraryTests(unittest.TestCase):
           library.on_gui_selected_tab_changed({player_index = 1, element = tabs})
           assert(debug_tools(tabs["mir_library_help_content"])["mir_library_help_versions"].caption[1]
             == "mir-browser.debug-versions")
+          library.open(player,{tab="settings",settings_scope="research"})
+          local toolbar=settings_content.mir_library_settings_toolbar
+          assert(toolbar.mir_library_settings_research.toggled==true
+            and toolbar.mir_library_settings_options.toggled==false)
+          library.on_gui_click({player_index=1,element=toolbar.mir_library_settings_options})
+          assert(storage.mir_library.players[1].settings_scope=="options"
+            and toolbar.mir_library_settings_options.toggled==true
+            and toolbar.mir_library_settings_research.toggled==false,
+            "the native scope indicator must follow the actual saved view")
+          library.on_gui_click({player_index=1,element=toolbar.mir_library_settings_research})
+          assert(toolbar.mir_library_settings_research.toggled==true
+            and toolbar.mir_library_settings_options.toggled==false)
+          assert(player.force.research_queue==original_queue and player.force.current_research==original_current
+            and player.force.research_progress==original_progress)
         ''')
 
     def test_localized_settings_search_survives_load_without_rebuilding_its_request_scope(self):

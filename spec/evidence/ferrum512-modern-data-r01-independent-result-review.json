@@ -1,0 +1,513 @@
+{
+  "kind": "Ferrum512ModernFinalDataIndependentActualReviewV1",
+  "reviewed_at_utc": "2026-11-09T14:08:18.650270+00:00",
+  "verdict": "PASS exact frozen12 full-Ferrum final-data/default-science/startup observations on both modern engine families. All three new governed processes and the unchanged reused F210 upstream comparison satisfy the preserved independent prototype expectations. No blocking result finding within this data-only scope.",
+  "identity": {
+    "candidate_commit": "2623d3d8ffd1539d2b35f21b06bcd936856b6fa8",
+    "candidate_source_tree": "ce8f1178c800ee90da2af087f602cf467c4a7fa7",
+    "executing_harness_commit": "203e0af5e1ea8925c1909e1dc97cef3dab3c961b",
+    "executing_harness_source": "93d30a248e71e5248eeb87072c27332fe68b9137",
+    "harness_player_separation": "Native source_head203 names the executing canonical capture tool. Loaded player Sourcece8 is independently established by exact package/source member checks and archive hashes43663F/2E24DA; it is not relabelled93d or newerUI/settingssource.",
+    "prelaunch_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-modern-data-r01-independent-packet-review.json",
+      "bytes": 15980,
+      "sha256": "93B3DFDF87378FC27E09CC1EF33DE544370ACE1BCD08B4F2A801DA2E1B484739"
+    },
+    "root_admission": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-modern-data-r01-root-admission.json",
+      "bytes": 4969,
+      "sha256": "DBA1019CB66CE6B593D2FECD62CC8733F68D590BC4FC4024418CBFDAD9759607"
+    },
+    "preserved_f210_oracle": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum511-final-data-expectations-independent-r01.json",
+      "bytes": 11759,
+      "sha256": "06DA80A1F9CF863F0F729FA8C9B38DC4B30316CB3404CFA47A8E605DD20A1758"
+    },
+    "f200_oracle": "Explicitly frozen before engines in93B3 prelaunch review from actual2.0Base4205–4254 and byte-identicalFerrumtechs/final/science."
+  },
+  "actual_processes": {
+    "new_count": 3,
+    "natural_exit_codes": [
+      0,
+      0,
+      0
+    ],
+    "pids": [
+      43768,
+      51252,
+      39640
+    ],
+    "reused_prior_upstream_observations": 1,
+    "new_ordinary_lab_completions": 0,
+    "note": "F210 currentwithMIR once; F200 upstream and currentwithMIR onceeach. Original upstream-onlyF210 capture is reused under its unchanged original identity and is not counted as a fourth new engine."
+  },
+  "stages": [
+    {
+      "family": "f210",
+      "stage": "with-mir",
+      "pid": 43768,
+      "exit_code": 0,
+      "passed": true,
+      "timed_out": false,
+      "selected_count": 10,
+      "loaded_selection": [
+        "base@2.1.23",
+        "elevated-rails@2.1.23",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@5.0.21012",
+        "planet-ferrum@0.1.5",
+        "PlanetsLib@2.4.0",
+        "quality@2.1.23",
+        "recycler@2.1.23",
+        "space-age@2.1.23",
+        "spider-launcher@2.9.87"
+      ],
+      "data_raw": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f210-data-r01-controller\\native-captures\\with-mir\\write-data\\script-output\\data-raw-dump.json",
+        "bytes": 30372808,
+        "sha256": "F273E351F31D86D68145685473F392EECA72DA229065D670AECD96E95007B62E"
+      },
+      "settings": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f210-data-r01-controller\\native-captures\\with-mir\\write-data\\script-output\\mod-settings-dump.json",
+        "bytes": 754702,
+        "sha256": "3349DDEBD14A02273F187039533FA124D39657868DB511D56A3ADF4559DA1A5A"
+      },
+      "log": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f210-data-r01-controller\\native-captures\\with-mir\\write-data\\factorio-current.log",
+        "bytes": 12822,
+        "sha256": "D3BED94672C54E238D0B0CD70B4A4B0776796EB65CD3760635063A9DE3A71021"
+      },
+      "ledger": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f210-data-r01-controller\\native-captures\\with-mir\\process-1.resources.jsonl",
+        "bytes": 3223,
+        "sha256": "AD333105BDBA383B12408DB57DD5C0FA3EBB5A790E071739ACCA1814788E5E1D"
+      },
+      "actual_finalizer_order": [
+        "   1.416 Loading mod planet-ferrum 0.1.5 (data-final-fixes.lua)",
+        "   1.427 Loading mod more-infinite-research 5.0.21012 (data-final-fixes.lua)"
+      ],
+      "native_root": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\ferrum512-f210-data-r01\\with-mir",
+      "primary_copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f210-data-r01-controller\\native-captures\\with-mir",
+      "complete_raw_member_set_size_hash_verified": 9,
+      "kernel_control_restoration": "restored-direct-library-controls",
+      "outer_owned_archive_restoration": [
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21012.zip",
+          "action": "removed-temporary"
+        }
+      ]
+    },
+    {
+      "family": "f200",
+      "stage": "upstream",
+      "pid": 51252,
+      "exit_code": 0,
+      "passed": true,
+      "timed_out": false,
+      "selected_count": 8,
+      "loaded_selection": [
+        "base@2.0.77",
+        "elevated-rails@2.0.77",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "planet-ferrum@0.0.5",
+        "PlanetsLib@1.18.0",
+        "quality@2.0.77",
+        "space-age@2.0.77",
+        "spider-launcher@2.9.86"
+      ],
+      "data_raw": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\native-captures\\upstream\\write-data\\script-output\\data-raw-dump.json",
+        "bytes": 28415465,
+        "sha256": "C8D8213C1216004431A4AB849D10A978E30C234CF8E75990C1123005D68077A0"
+      },
+      "settings": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\native-captures\\upstream\\write-data\\script-output\\mod-settings-dump.json",
+        "bytes": 3150,
+        "sha256": "8BC71C7DB0F31A5356FCA9988A5B6BE7ECE20A52075E147CB9D3F1CEEBCF8732"
+      },
+      "log": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\native-captures\\upstream\\write-data\\factorio-current.log",
+        "bytes": 7309,
+        "sha256": "73D7811FC4668D21B1D80B49AC13F673EE287F0260F498C3B76C69A38F19B0E3"
+      },
+      "ledger": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\native-captures\\upstream\\process-1.resources.jsonl",
+        "bytes": 3221,
+        "sha256": "2F82E63EF3030D7902B718236F134898DA61FD976E19C383C2A17F2EB180129C"
+      },
+      "actual_finalizer_order": [
+        "   1.573 Loading mod planet-ferrum 0.0.5 (data-final-fixes.lua)"
+      ],
+      "native_root": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\ferrum512-f200-data-r01\\upstream",
+      "primary_copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\native-captures\\upstream",
+      "complete_raw_member_set_size_hash_verified": 9,
+      "kernel_control_restoration": "restored-direct-library-controls",
+      "outer_owned_archive_restoration": []
+    },
+    {
+      "family": "f200",
+      "stage": "with-mir",
+      "pid": 39640,
+      "exit_code": 0,
+      "passed": true,
+      "timed_out": false,
+      "selected_count": 9,
+      "loaded_selection": [
+        "base@2.0.77",
+        "elevated-rails@2.0.77",
+        "mir-fixture-mir5-active-mods-observer@0.1.0",
+        "more-infinite-research@5.0.20012",
+        "planet-ferrum@0.0.5",
+        "PlanetsLib@1.18.0",
+        "quality@2.0.77",
+        "space-age@2.0.77",
+        "spider-launcher@2.9.86"
+      ],
+      "data_raw": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\native-captures\\with-mir\\write-data\\script-output\\data-raw-dump.json",
+        "bytes": 28632860,
+        "sha256": "D85F4A85D57444B89B9A68365279D9BDF1298FF2B5B0A1067AF84F8077CDCB6D"
+      },
+      "settings": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\native-captures\\with-mir\\write-data\\script-output\\mod-settings-dump.json",
+        "bytes": 741255,
+        "sha256": "DBADBCF86263059C73DF3EA7452885790195239DCBB8C7E7217908FD2A4ADBF7"
+      },
+      "log": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\native-captures\\with-mir\\write-data\\factorio-current.log",
+        "bytes": 7617,
+        "sha256": "AD42BA977641B8895E70756DA8A5E53B3DC934EB4B0F118C3BD2151EC5E15F29"
+      },
+      "ledger": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\native-captures\\with-mir\\process-1.resources.jsonl",
+        "bytes": 3223,
+        "sha256": "B803D3FC5F54B69CBCCDC577D548CA7C53E43871583B53F65577DD5EC03EFA89"
+      },
+      "actual_finalizer_order": [
+        "   1.489 Loading mod planet-ferrum 0.0.5 (data-final-fixes.lua)",
+        "   1.501 Loading mod more-infinite-research 5.0.20012 (data-final-fixes.lua)"
+      ],
+      "native_root": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\ferrum512-f200-data-r01\\with-mir",
+      "primary_copy": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\native-captures\\with-mir",
+      "complete_raw_member_set_size_hash_verified": 9,
+      "kernel_control_restoration": "restored-direct-library-controls",
+      "outer_owned_archive_restoration": [
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20012.zip",
+          "action": "removed-temporary"
+        }
+      ]
+    }
+  ],
+  "prototype_comparisons": [
+    {
+      "family": "f210",
+      "terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f210-data-r01-controller\\execute-terminal.json",
+        "bytes": 29677,
+        "sha256": "C2530C3A580B683BFAE33E938A1C9058CC4EABEB7E7CCF809A2B9A5C3BBD2CE9"
+      },
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f210-data-r01-controller\\packet.json",
+        "bytes": 17993,
+        "sha256": "623DDBDCB949E48DB7EDD16653C01227B80BC93DBBCC523BBAFCB59186684033"
+      },
+      "caller": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f210-data-r01-controller\\Invoke-FerrumData.ps1",
+        "bytes": 9662,
+        "sha256": "F118689E6519291A97625DA63933D4C65B291B1FD7B7E493630123CE11674A73"
+      },
+      "composition": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f210-data-r01-controller\\composition.json",
+        "bytes": 21814,
+        "sha256": "C100838B18814E58BAE93229BB95651C2D9F59AAD4E1E78A439C9512E81E3CF2"
+      },
+      "qualification_player": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir512-ferrum-qualification-r01\\original\\more-infinite-research_5.0.21012.zip",
+        "bytes": 1006802,
+        "sha256": "43663FABEAE4D14A6414F363E3006B53B624DCF2EFAFBD1E5C73ABFE3F148A16"
+      },
+      "upstream_finite_costs": {
+        "worker4": 675,
+        "worker5": 1012
+      },
+      "native1_3_and_foreign4_5": [
+        {
+          "name": "worker-robots-storage-1",
+          "full_row_equal": true,
+          "canonical_full_row_sha256": "AE18B4571E95448B06681B99F0AFBE815764C181C2571C2B02892FD79AAFD844"
+        },
+        {
+          "name": "worker-robots-storage-2",
+          "full_row_equal": true,
+          "canonical_full_row_sha256": "4E7ECBE53415182A60DA5E7A29DD5B008171E3D3CF26F4C54F9D880C5D9BC463"
+        },
+        {
+          "name": "worker-robots-storage-3",
+          "full_row_equal": true,
+          "canonical_full_row_sha256": "334EBEF87B42BA7DAF2EE5DEE332BB4C39E9607B76E18C7B802B16CEDF307D37"
+        },
+        {
+          "name": "worker-robots-storage-4",
+          "full_row_equal": true,
+          "canonical_full_row_sha256": "1ED8D50C8FEC5D74ECD3BC95B889430D1F32DE41DFFA8E6C43E450063E147328"
+        },
+        {
+          "name": "worker-robots-storage-5",
+          "full_row_equal": true,
+          "canonical_full_row_sha256": "8CC386D274E3954AD0DEB72625240D12E914A0ED1612CE3FB02AF82653970342"
+        }
+      ],
+      "current6": {
+        "name": "worker-robots-storage-6",
+        "level": 6,
+        "max_level": "infinite",
+        "upgrade": true,
+        "hidden": false,
+        "prerequisites": [
+          "worker-robots-storage-4",
+          "worker-robots-storage-5",
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "utility-science-pack",
+          "electromagnetic-science-pack"
+        ],
+        "effects": [
+          {
+            "type": "worker-robot-storage",
+            "modifier": 1
+          }
+        ],
+        "unit": {
+          "count_formula": "1518.75*1.5^(L-6)",
+          "time": 60,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "utility-science-pack",
+              1
+            ],
+            [
+              "ferrum-robotics-science-pack",
+              1
+            ],
+            [
+              "electromagnetic-science-pack",
+              1
+            ]
+          ]
+        }
+      },
+      "current6_enabled_default": true,
+      "upstream6_absent": true,
+      "current7_absent": true,
+      "full_private_holder_equals_previously_qualified_authored_default": true,
+      "private_holder_canonical_sha256": "06B13317AF09A740B1787D73D1CE8D737AE8729CDFC338787A6770E408A8D068",
+      "compatible_labs_for_entire_seven_pack_vector": [
+        "lab",
+        "biolab"
+      ],
+      "concrete_science_kinds": {
+        "automation-science-pack": [
+          "item"
+        ],
+        "logistic-science-pack": [
+          "item"
+        ],
+        "chemical-science-pack": [
+          "item"
+        ],
+        "production-science-pack": [
+          "item"
+        ],
+        "utility-science-pack": [
+          "item"
+        ],
+        "ferrum-robotics-science-pack": [
+          "item"
+        ],
+        "electromagnetic-science-pack": [
+          "item"
+        ]
+      }
+    },
+    {
+      "family": "f200",
+      "terminal": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\execute-terminal.json",
+        "bytes": 54850,
+        "sha256": "014CE452E44493935EE279E99258ACC3D66389EA61A6E9341CEEB3965AEF19A0"
+      },
+      "packet": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\packet.json",
+        "bytes": 11391,
+        "sha256": "F07DE77C31E89826093F2C6B1F56279AF7B4F27B6A8184B505DAB75C5A4D01B7"
+      },
+      "caller": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\Invoke-FerrumData.ps1",
+        "bytes": 9671,
+        "sha256": "4B14AD9AF27DCCA2C0ECB71299E8C44CE9AF6F6AE03A00BB9E156811F944B3CA"
+      },
+      "composition": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum512-f200-data-r01-controller\\composition.json",
+        "bytes": 36429,
+        "sha256": "1856B2BF463458D41C0188BDE82321140A7DA59C536B487687B2D4576A71CEFA"
+      },
+      "qualification_player": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir512-ferrum-qualification-r01\\original\\more-infinite-research_5.0.20012.zip",
+        "bytes": 1006378,
+        "sha256": "2E24DAE2BD1D0D9277AA2C677D806535AE29E71A04F53401CEAF0B0424DE40D9"
+      },
+      "upstream_finite_costs": {
+        "worker4": 675,
+        "worker5": 1012
+      },
+      "native1_3_and_foreign4_5": [
+        {
+          "name": "worker-robots-storage-1",
+          "full_row_equal": true,
+          "canonical_full_row_sha256": "AE18B4571E95448B06681B99F0AFBE815764C181C2571C2B02892FD79AAFD844"
+        },
+        {
+          "name": "worker-robots-storage-2",
+          "full_row_equal": true,
+          "canonical_full_row_sha256": "4E7ECBE53415182A60DA5E7A29DD5B008171E3D3CF26F4C54F9D880C5D9BC463"
+        },
+        {
+          "name": "worker-robots-storage-3",
+          "full_row_equal": true,
+          "canonical_full_row_sha256": "334EBEF87B42BA7DAF2EE5DEE332BB4C39E9607B76E18C7B802B16CEDF307D37"
+        },
+        {
+          "name": "worker-robots-storage-4",
+          "full_row_equal": true,
+          "canonical_full_row_sha256": "1ED8D50C8FEC5D74ECD3BC95B889430D1F32DE41DFFA8E6C43E450063E147328"
+        },
+        {
+          "name": "worker-robots-storage-5",
+          "full_row_equal": true,
+          "canonical_full_row_sha256": "8CC386D274E3954AD0DEB72625240D12E914A0ED1612CE3FB02AF82653970342"
+        }
+      ],
+      "current6": {
+        "name": "worker-robots-storage-6",
+        "level": 6,
+        "max_level": "infinite",
+        "upgrade": true,
+        "hidden": false,
+        "prerequisites": [
+          "worker-robots-storage-4",
+          "worker-robots-storage-5",
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "utility-science-pack",
+          "electromagnetic-science-pack"
+        ],
+        "effects": [
+          {
+            "type": "worker-robot-storage",
+            "modifier": 1
+          }
+        ],
+        "unit": {
+          "count_formula": "1518.75*1.5^(L-6)",
+          "time": 60,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "utility-science-pack",
+              1
+            ],
+            [
+              "ferrum-robotics-science-pack",
+              1
+            ],
+            [
+              "electromagnetic-science-pack",
+              1
+            ]
+          ]
+        }
+      },
+      "current6_enabled_default": true,
+      "upstream6_absent": true,
+      "current7_absent": true,
+      "full_private_holder_equals_previously_qualified_authored_default": true,
+      "private_holder_canonical_sha256": "06B13317AF09A740B1787D73D1CE8D737AE8729CDFC338787A6770E408A8D068",
+      "compatible_labs_for_entire_seven_pack_vector": [
+        "lab",
+        "biolab"
+      ],
+      "concrete_science_kinds": {
+        "automation-science-pack": [
+          "tool"
+        ],
+        "logistic-science-pack": [
+          "tool"
+        ],
+        "chemical-science-pack": [
+          "tool"
+        ],
+        "production-science-pack": [
+          "tool"
+        ],
+        "utility-science-pack": [
+          "tool"
+        ],
+        "ferrum-robotics-science-pack": [
+          "tool"
+        ],
+        "electromagnetic-science-pack": [
+          "tool"
+        ]
+      }
+    }
+  ],
+  "independent_actual_readback": {
+    "data_and_load_order": "Reread actual raw JSON and logs, not only terminalstatus. Both actuallogs put Ferrumfinal beforeMIR: F2101.416→1.427; F2001.489→1.501. MIR6 now contains the exact frozen sevenpack sequence/amount1: five native packs,robotics,electromagnetic. Neither science policy nor expectation was changed to make the result pass.",
+    "foreign_and_native": "Full logical rows for nativeworker1–3 and foreignFerrum4/5 are equal respective upstream→current, including all effects,science,cost,time,prerequisites,icons/flags and other fields. Actualfinite4/5counts675/1012, effect1/time60 and robotics ingredient match independent derivation. Public6 absent upstream; current has exactly level6 infinite and no overlapping7.",
+    "continuation": "Actualunit.count_formula1518.75*1.5^(L-6), unit.countabsent,time60,effectstorage1,maxinfinite,level6,upgrade/visible/defaultenabled and exact eightprerequisites match preservedoracle. This checks the constructed native formula; no runtime evaluated research-unit count, consumption or earned work was observed.",
+    "private_holder": "Full privateP JSON equals the already independently qualified authoreddefault4 table, not currentFerrumfinite4/5: hidden/disabled/visible_when_disabledfalse,level4/infinite,cost675*1.5^(L-4),time60,effect1,normalfivepacks+EM and exactdefaultscience/nativeprerequisites/order/presentation. No unit1 placeholder or robotics-science contamination.",
+    "science_and_defaults": "Both actuallab andbiolab accept the entire sevenpack vector. Allseven resolve to concrete item prototypes on2.1.23 and tool prototypes on2.0.77. Raw settingsdump defaults match configured/reduce, blankprofileimport, worker enabledtrue/base200/growth1.5/increment0/max0/time60/effect1. Captures used ownedDefaults activation, not saved user setting overrides.",
+    "engine_selection_provenance": "All3 raw result engine/harness/profile/selectedarchive identities match admitted packets and exact loadedobserver lists10/8/9. Inputpayload hashes/CRCs pass, using protected qualification ZIPs for temporaryplayerarchive paths removed afterrun. Both full Sourcepackage member proofs remain bound by unchanged prelaunchinputs; both harness/candidate identities remain separate.",
+    "raw_custody": "All27 newraw members are independently verified by exact relativepath set,size,SHA256 in both original frozen203 native roots and primarynative-captures mirrors. Allnine priorF210upstream baseline files remain exact. Nonempty valid raw/settingsJSON and rawstdout/stderr/factorio logs are read; no fataldiagnostic. Distinct resourceledgers show completed natural0 processes, not timeout/predicate substitutions.",
+    "restoration": "All3 kernel records close direct-library controls; outertransactions remove temporary12MIR. Independent live checks afterrun match both original mod-list/settingsdat states and all19F210/18F200 prior MIRarchive bodies/names. Activeprofile and temporarysettingsJSON absent; Factorio0 independentlyobserved. No dependency payload copied,linked or extracted.",
+    "preserved_adverses": "Original published11 science omission remains an exact valid adverse under5D67, not a corrected11result. R01custodyalias/negative-reader-linewrap/cp1252 and repairrole/Gitroot preparation adverses remain retained. Successful12 data does not erase them or authorize replacing any published11bytes."
+  },
+  "scope_limits": "Only exact2623/Sourcece8,43663F/2E24DA qualification ZIPs,2.1.23+Ferrum0.1.5/PlanetsLib2.4/spider2.9.87 and2.0.77+Ferrum0.0.5/PlanetsLib1.18/spider2.9.86 final-data/defaultscience/startup. No map/runtimeinitialization, workerprepare/transfer, physicalcargo, ordinaryresearchlabs, cap/queuegameplay, save/two-cold, UI/startupsettingsfeature, API, timing/memory, distributionpublication or stable acceptance. Laterchangedcandidate needs consumed-input applicability or affectednewchecks.20repairtiming remainsheld until coherentcandidate/quietblock admission.",
+  "reviewer_activity": "Read-only artifact/source/JSON/log/CRC/hash/custody/restoration inspection and independent scalar/vector/equality recomputation. No Source/test/docs/controller/packet/library mutations, hostsuite/build or native launch; only this new primary review receipt written."
+}
