@@ -1,6 +1,6 @@
 {
   "name": "mir-fixture-library-render-capture",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "MIR Library render-only capture fixture",
   "author": "MIR maintainers",
   "factorio_version": "2.1",

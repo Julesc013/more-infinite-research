@@ -66,6 +66,23 @@ local function write(player, name, value)
   helpers.write_file("mir-library-render/" .. player.locale .. "/" .. name,
     helpers.table_to_json(value), false, player.index)
 end
+local function prepare_intro()
+  -- The protected freeplay save creates its first player on this client.
+  -- Its normal750-tick cutscene would open a modal introduction and pause
+  -- on_tick before the third capture. Use the scenario's public setup hook;
+  -- let the cutscene finish normally and leave the original save untouched.
+  require_that(remote.interfaces.freeplay and remote.interfaces.freeplay.get_skip_intro
+    and remote.interfaces.freeplay.set_skip_intro, "declared Base freeplay setup interface absent")
+  local previous = remote.call("freeplay", "get_skip_intro")
+  if not storage.mir_render_setup then
+    storage.mir_render_setup = {kind = "public-freeplay-intro-only", original_skip_intro = previous == true,
+      original_flag_unset = previous == nil, saved_to_original = false}
+  end
+  remote.call("freeplay", "set_skip_intro", true)
+  require_that(remote.call("freeplay", "get_skip_intro") == true, "freeplay intro suppression failed")
+end
+script.on_init(prepare_intro)
+script.on_configuration_changed(prepare_intro)
 script.on_nth_tick(30, function()
   local state = storage.mir_render_capture
   if not state then
@@ -85,9 +102,11 @@ script.on_nth_tick(30, function()
   if state.phase == "initial" or state.phase == "next" then
     local view = CASES[state.index]
     require_that(remote.interfaces[BROWSER] and remote.interfaces[BROWSER].open, "public Browser.open absent")
+    log("[MIR_LIBRARY_RENDER] open-begin " .. view.id)
     require_that(remote.call(BROWSER, "open", player.index, view) == true, "public Library did not open")
     shape(player, view)
     unchanged(state, player)
+    log("[MIR_LIBRARY_RENDER] open-complete " .. view.id)
     state.phase, state.after = "settle", game.tick + 180
   elseif state.phase == "settle" then
     local view = CASES[state.index]
@@ -98,6 +117,7 @@ script.on_nth_tick(30, function()
       show_gui = true, force_render = true, anti_alias = false,
       path = "mir-library-render/" .. player.locale .. "/" .. view.id .. ".png"}
     write(player, view.id .. ".json", observation)
+    log("[MIR_LIBRARY_RENDER] capture-requested " .. view.id)
     -- Leave the same real GUI in place through screenshot/render processing.
     state.phase, state.after = "capture", game.tick + 60
   elseif state.phase == "capture" then
@@ -113,6 +133,7 @@ script.on_nth_tick(30, function()
     require_that(#state.observations == #CASES, "capture count differs")
     write(player, "complete.json", {schema = 1, status = "render-requests-complete",
       locale = state.locale, player = state.player, observations = state.observations,
+      scenario_setup = storage.mir_render_setup,
       native_snapshot_unchanged = true, input_acceptance = false, settings_menu_acceptance = false,
       export_acceptance = false, lifecycle_acceptance = false, release_qualification = false})
     log("[MIR_LIBRARY_RENDER] render-requests-complete " .. state.locale)

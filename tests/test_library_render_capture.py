@@ -15,9 +15,12 @@ class LibraryRenderCaptureTests(unittest.TestCase):
         self.lua.globals().actor_path = (FIXTURE / "control.lua").as_posix()
         self.lua.execute(r'''
           local tick_callback
+          handlers={}
           storage={}
           script={active_mods={base="2.1.23",["more-infinite-research"]="5.0.21012"},
-            on_nth_tick=function(n,fn) assert(n==30);tick_callback=fn end}
+            on_nth_tick=function(n,fn) assert(n==30);tick_callback=fn end,
+            on_init=function(fn) handlers.init=fn end,
+            on_configuration_changed=function(fn) handlers.configuration=fn end}
           local tech={name="worker-robots-storage-4",level=4,researched=false,enabled=true}
           local force={technologies={[tech.name]=tech},recipes={iron={enabled=true}},
             research_queue={},research_progress=0,worker_robots_storage_bonus=0}
@@ -36,8 +39,15 @@ class LibraryRenderCaptureTests(unittest.TestCase):
               screenshots[#screenshots+1]={args=args,tick=game.tick}
             end,set_wait_for_screenshots_to_finish=function() flushes=flushes+1 end}
           setmetatable(game,{__index=function(_,key) error("undeclared LuaGameScript member: "..key) end})
-          remote={interfaces={["more-infinite-research-browser"]={open=true}},
+          intro_sets,intro_flag=0,nil
+          remote={interfaces={["more-infinite-research-browser"]={open=true},
+            freeplay={get_skip_intro=true,set_skip_intro=true}},
             call=function(interface,method,index,options)
+              if interface=="freeplay" then
+                if method=="get_skip_intro" then return intro_flag end
+                assert(method=="set_skip_intro" and index==true)
+                intro_sets=intro_sets+1;intro_flag=true;return
+              end
               assert(interface=="more-infinite-research-browser" and method=="open" and index==1)
               if #screenshots>0 then assert(game.tick-screenshots[#screenshots].tick>=60) end
               calls[#calls+1]=options
@@ -50,6 +60,7 @@ class LibraryRenderCaptureTests(unittest.TestCase):
             end}
           log=function() end
           dofile(actor_path)
+          handlers.init()
           function step(n) for i=1,n do game.tick=game.tick+30;tick_callback() end end
           function run() step(100) end
         ''')
@@ -134,6 +145,36 @@ class LibraryRenderCaptureTests(unittest.TestCase):
           run();assert(screenshots[1].tick==first and flushes==1)
           local count=#calls;run();assert(#calls==count and #screenshots==7 and flushes==1)
         ''')
+
+    def test_public_freeplay_setup_prevents_intro_modal_without_input_or_save(self):
+        self.lua.execute(r'''
+          assert(intro_sets==1 and intro_flag==true)
+          assert(storage.mir_render_setup.original_flag_unset and not storage.mir_render_setup.original_skip_intro)
+          assert(storage.mir_render_setup.saved_to_original==false)
+          handlers.configuration()
+          assert(intro_sets==2 and storage.mir_render_setup.original_flag_unset)
+          run()
+          assert(writes["mir-library-render/en/complete.json"].scenario_setup==storage.mir_render_setup)
+        ''')
+        self.setUp()
+        self.lua.execute('remote.interfaces.freeplay=nil')
+        with self.assertRaisesRegex(Exception, "freeplay setup interface absent"):
+            self.lua.execute('handlers.configuration()')
+
+    def test_unsuppressed_750_tick_base_intro_stalls_after_two_captures(self):
+        # Independent installed Base cutscene:450 transition+150 wait+150 transition,
+        # then show_message_dialog pauses ticks unless freeplay.skip_intro is set.
+        modal_model = r'''
+          local advance=step
+          function step(n)
+            for i=1,n do
+              if game.tick<750 or intro_flag then advance(1) end
+            end
+          end
+        '''
+        self.lua.execute(modal_model + 'intro_flag=nil;run();assert(#screenshots==2);assert(writes["mir-library-render/en/complete.json"]==nil)')
+        self.setUp()
+        self.lua.execute(modal_model + 'run();assert(#screenshots==7);assert(writes["mir-library-render/en/complete.json"])')
 
     def test_locale_may_settle_before_first_render_but_not_during_sequence(self):
         self.lua.execute('step(1);player.locale="de";run();assert(writes["mir-library-render/de/complete.json"])')
