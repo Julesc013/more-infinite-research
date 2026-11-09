@@ -1,0 +1,134 @@
+{
+  "kind": "MIRNativeCreditObservedPrecisionIndependentRereviewV1",
+  "observed_at_utc": "2026-11-09T01:58:48.600516+00:00",
+  "reviewer": "/root/precision511_source_review",
+  "scope": "Different non-author bounded rereview of the zero-effective delta only; no source edits, children, builds, full host suite, native execution or direct-library mutation.",
+  "pr": "https://github.com/Julesc013/more-infinite-research/pull/1850",
+  "commit": "2206691b3731b179b85ab95cebc4f679c320e9c1",
+  "source_tree": "7a3bcfebc558eb978b40ab77414f01da550b0754",
+  "parent": "fe492d2c4da9b021ff3720dea3b37b7e9f8f6ef5",
+  "source_worktree": "D:\\Projects\\Factorio\\.task-builds\\native-credit511-observed-precision-r01",
+  "source_verdict": "APPROVED for bounded normal integration and exact native qualification: the supported zero-effective setting defect is corrected without weakening unrelated custody, structural, paid-mask or count rules.",
+  "new_source_findings": [],
+  "prior_finding": {
+    "id": "PRECISION-511-ZERO-01",
+    "status": "source-and-host-counterexample-corrected; actual-MIR-native-qualification-pending",
+    "original_report": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-observed-precision-independent-review-r01.json",
+    "original_report_sha256": "95C5DADCC3C541B19F7C8C5CFE530C062941B3E3426A6B96F79660E61A241C46",
+    "original_report_preserved": true,
+    "counterexample_recheck": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-observed-precision-independent-review-r02\\zero-setting-counterexample.json",
+    "result": "The identical visible F200 Base0.01% setting resolves/emits0.0001; the unchanged independent native observation supplies0; actual on_init now succeeds, writes its ordinary baseline ledger and performs no native level/enabled writes."
+  },
+  "source_delta": {
+    "files": [
+      {
+        "path": "source/runtime/native_credits.lua",
+        "git_blob": "83c93584c04c6c414e30971670b909e74afc12b5",
+        "bytes": 47761,
+        "sha256": "E11AC70C18CAE71903FF0DCFDEC7A9780D6F438A87FB541198AD554FC1C4DDFD"
+      },
+      {
+        "path": "tests/test_native_family_paid_credits.py",
+        "git_blob": "3f8b40a38c8aa82512a04b84477e605bb9752379",
+        "bytes": 110945,
+        "sha256": "A7C949EC29451EBA96F5C43CC38FE8A203871AE4BFE572BB8CFC5AD4AE52BA6C"
+      }
+    ],
+    "runtime_diff": "8 added/3 deleted lines, confined to inspect_with_mask; native conversion helper and diagnostics unchanged.",
+    "test_diff": "Five added focused tests plus precision-oracle expectations now admit only the demonstrated target-normalized zero.",
+    "oracle_files_unchanged": {
+      "tests/fixtures/native-effect-conversion-f200.json": "e289b69f94db13fd35db461815837b84f4cccd7e",
+      "tests/fixtures/native-effect-conversion-f210.json": "dc001ff1c15cd6311c8c100d5ed16e906b82eece"
+    }
+  },
+  "review_findings": [
+    "A collected zero positive scalar reaches admission only after the existing exact target matcher proves its positive authored descriptor normalizes to0. A negative scalar remains invalid; missing, nonnumeric, nonfinite or structurally invalid effects are still rejected by carrier_scalar.",
+    "For that proven zero branch, the negative carrier must equal0 exactly. Any included main recipe effect must equal0 exactly; near-zero values that fall inside the old1e-8 comparison tolerance are rejected. A genuinely absent main recipe still means excluded, as before.",
+    "Noncollected zero yields no valid observation or credited ledger and makes no native write, preserving the prior bounded legacy behavior. Actual0 for an expected nonzero descriptor remains a preflight error.",
+    "All nonzero signed-pair/main comparisons retain the previous rules. Creation history, exact identity/shape/flags, completed integral counts, max levels, saved-offset agreement, complete masks and unknown-investment refusal are unchanged.",
+    "Zero effects never establish an unknown prior paid mask. Reconciliation continues to account solely in integer completed/offset/pending counts, preserves queued payable rights and rejects inconsistent saved histories; no division by reward or aggregate ownership inference is introduced.",
+    "Known zero-reward work can still move its signed count between main/carriers when inclusion changes. The focused controls preserve actual0 contribution, known queued completion, duplicate-event idempotence and foreign/current/queued/partial research state."
+  ],
+  "independent_counterexample_method": "Copied the original independent real-pipeline reproducer into new custody, replacing only the expected on_init success/state assertion, revision/status labels and the success metadata field. The settings/data/data-final-fixes path, emitted named recipe/carrier, independent native scalar and no-native-write/foreign-state assertions are retained. Original files and adverse report were never overwritten.",
+  "validation": {
+    "plan": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-observed-precision-independent-review-r02\\host-plan.json",
+    "plan_materialized_before_selected_tests": true,
+    "runtime": "D:/Projects/Factorio/more-infinite-research/build/tmp/mir421-lua-runtime",
+    "lua_version": "Lua5.2",
+    "lua52_extension_sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899",
+    "focused": {
+      "command": "python -B tests/test_native_family_paid_credits.py --lua-runtime-dir D:/Projects/Factorio/more-infinite-research/build/tmp/mir421-lua-runtime",
+      "passed": true,
+      "tests": 48,
+      "seconds": 12.396,
+      "log": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-observed-precision-independent-review-r02\\focused-48.log"
+    },
+    "legacy": {
+      "command": "python -B tests/test_native_credits.py --lua-runtime-dir D:/Projects/Factorio/more-infinite-research/build/tmp/mir421-lua-runtime",
+      "passed": true,
+      "tests": 17,
+      "seconds": 0.129,
+      "log": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-observed-precision-independent-review-r02\\legacy-17.log"
+    },
+    "opponents": "Across all5 families: main/nonzero and near-zero mismatch, negative/nonzero and near-zero mismatch, positive nonzero mismatch, duplicate/extra effects, foreign recipes/custody/identity, carrier flags/levels, nonintegral counts, nonboolean completion, unknown earned/private work, unproven/saved offset, incomplete masks and backwards completion all refuse before writes. Adjacent units and expected-nonzero actual0 remain opponents.",
+    "diff_check": "passed",
+    "remote_readback": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-observed-precision-independent-review-r02\\remote-readback.json",
+    "worktree_clean": true,
+    "primary_tracked_worktree_clean": true,
+    "workspace_health": {
+      "free_mib": 93683,
+      "primary_dirty": 0,
+      "advisory": "Bounded directory/history scan incomplete; existing worktrees/unique commits preserved; no cleanup."
+    },
+    "prior_numeric_review_reuse": "The59,902 independent binary32 opponents and56 native fixture/raw-log checks retain original r01 identity. Helper, both fixture blobs and hash-pinned r03 summary are unchanged; they were not rerun or relabeled."
+  },
+  "author_receipt": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-zero-effective-author-r01\\AUTHOR-RECEIPT.json",
+    "bytes": 12771,
+    "sha256": "37320BF68B9191E32B3C6DDECBB8F61754B1F393925229CB90851FA996AAD414",
+    "limits": "Author red5 F200/green10 and repository check are retained author evidence; this report independently ran the original counterexample and selected48+17 controls."
+  },
+  "remaining_native_gates": [
+    "Freeze the exact accepted source/player package/controller before native qualification; a matching source review or no-MIR conversion probe is not a native MIR init result.",
+    "Run actual MIR fresh/init and first-add scenarios on exact affected Factorio2.0.77 and2.1.23 inputs, including the allowed F200 minimum0.01% setting.",
+    "Observe paid counts, inclusion/private-holder/known unfinished-work transitions, native carrier behavior and preservation of foreign/current/queued/saved progress, including zero-effective cases and representative nonzero effects.",
+    "Save and verify2 cold reloads for each affected claimed route under unchanged candidate/settings/mod inputs.",
+    "Qualify the reporter low-density failure only after its actual save, startup settings and complete mod closure are identified. Root owns the separate Secretas/Ferrum and worker-storage fixes/native lane."
+  ],
+  "native_execution": false,
+  "release_qualification": false,
+  "stable_acceptance": false,
+  "custody": "Only new r02 review artifacts written under primary build/qualification. Original95C5 report, raw probes, author receipts, source, player ZIPs and frozen/delivered assets remain unchanged.",
+  "evidence_files": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-observed-precision-independent-review-r02\\focused-48.log",
+      "bytes": 153,
+      "sha256": "A0C094EBD599206B5C8757885D1BFC4585D3292311D5288ECAEFA1A42017F586"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-observed-precision-independent-review-r02\\host-plan.json",
+      "bytes": 15883,
+      "sha256": "41BDEF630EFDE93EC41DAC977D979C66774EE2D2E279CAE13F27DDFE82507FFE"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-observed-precision-independent-review-r02\\legacy-17.log",
+      "bytes": 3350,
+      "sha256": "9B1789886E7F3649287651F3E749DE18321F210C0FAAB35C975F89217B7F190D"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-observed-precision-independent-review-r02\\original-pipeline-corrected-expectation.py",
+      "bytes": 5082,
+      "sha256": "E1DCEFAC14D5BBE0B623B4A2B712A195E444F917870D770BB53BB9312E6A83F2"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-observed-precision-independent-review-r02\\remote-readback.json",
+      "bytes": 923,
+      "sha256": "41200BD41EFCEC22860A69303C9059FE3F139435C5A6FADEE907D4D25F2D938C"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit511-observed-precision-independent-review-r02\\zero-setting-counterexample.json",
+      "bytes": 1029,
+      "sha256": "FC977C5978A646B48F6B21C9BCFB23B693C93BB671CD9386371DEEB73C441E79"
+    }
+  ]
+}
