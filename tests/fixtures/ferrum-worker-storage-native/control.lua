@@ -88,12 +88,13 @@ local function frames()
   check(count <= 16, "bounded force count")
   return result
 end
-local function marker(stage)
+local function marker(stage, physical_frame)
   local s = storage[KEY]
   log("[MIR_FERRUM_WORKER_NATIVE] " .. helpers.table_to_json({stage = stage, phase = s.phase,
     tick = game.tick, mods = script.active_mods, frames = frames(), ordinary = s.ordinary,
     administrative_events = s.administrative_events, consumption = s.consumption,
-    calibration_count = s.calibration_count or false, partials_are_scripted_sentinels = true}))
+    calibration_count = s.calibration_count or false, partials_are_scripted_sentinels = true,
+    cargo = s.cargo and s.cargo.report or nil, physical_frame = physical_frame}))
 end
 local function science(t, expected)
   local actual, ids = {}, {}
@@ -214,9 +215,130 @@ local function begin(id)
   s.work = {id = id, units = t.research_unit_count, budgets = budgets, inserted = inserted, progress_seen = false}
   s.phase = "earning"; marker("lab-start"); feed()
 end
-local function close(phase, save)
-  local s = storage[KEY]; stopped(); s.phase = phase; s.closed = frames(); marker(phase); game.server_save(save)
+local function close(phase, save, physical_frame)
+  local s = storage[KEY]; stopped(); s.phase = phase; s.closed = frames(); marker(phase, physical_frame); game.server_save(save)
 end
+local function cargo_inventory(entity, index, item)
+  check(entity and entity.valid and entity.quality.name == "normal", "normal cargo entity absent")
+  local inventory = entity.get_inventory(index)
+  check(inventory ~= nil, "cargo inventory absent")
+  local count = inventory.get_item_count{name = item, quality = "normal"}
+  check(inventory.get_item_count() == count, "unexpected cargo item/quality")
+  return count
+end
+local function cargo_frame()
+  local c = storage[KEY].cargo
+  check(c.port.name == "roboport" and c.provider.name == "passive-provider-chest"
+    and c.requester.name == "requester-chest" and c.port.force.name == "player"
+    and c.provider.force.name == "player" and c.requester.force.name == "player", "cargo fixture identity changed")
+  local provider = cargo_inventory(c.provider, defines.inventory.chest, "iron-plate")
+  local requester = cargo_inventory(c.requester, defines.inventory.chest, "iron-plate")
+  local docked = cargo_inventory(c.port, defines.inventory.roboport_robot, "logistic-robot")
+  local slot = c.section.get_slot(1)
+  check(c.section.active and slot.min == 7 and slot.max == 7 and slot.value.name == "iron-plate"
+    and slot.value.type == "item" and slot.value.quality == "normal" and slot.value.comparator == "=",
+    "cargo request changed")
+  local network = c.port.logistic_network
+  local result = {provider = provider, requester = requester, docked = docked,
+    port = c.port.unit_number, provider_id = c.provider.unit_number, requester_id = c.requester.unit_number,
+    positions = {port = copied(c.port.position), provider = copied(c.provider.position), requester = copied(c.requester.position)},
+    active = {}, network_ready = network ~= nil}
+  if not network then return result end
+  check(#network.cells == 1 and network.all_logistic_robots == 1 and network.all_construction_robots == 0,
+    "cargo requires exactly one normal logistics robot/network")
+  result.available = network.available_logistic_robots
+  local carried = 0
+  for _, robot in pairs(network.logistic_robots) do
+    check(#result.active == 0 and robot.name == "logistic-robot" and robot.type == "logistic-robot"
+      and robot.prototype.max_payload_size == 1 and robot.force.name == "player"
+      and type(robot.unit_number) == "number", "cargo robot identity/base payload")
+    local count = cargo_inventory(robot, defines.inventory.robot_cargo, "iron-plate")
+    check(count == 0 or count == 7, "cargo must be one full seven-item load")
+    carried = carried + count
+    result.active[#result.active + 1] = {unit = robot.unit_number, count = count,
+      position = {x = robot.position.x, y = robot.position.y}, quality = robot.quality.name}
+  end
+  check(docked + #result.active == 1, "cargo robot conservation")
+  check(provider + requester + carried == 7, "cargo iron conservation")
+  return result
+end
+local function cargo_tick()
+  local s = storage[KEY]; local c = s.cargo
+  stopped(); same(frames(), s.closed, "cargo-native")
+  check(game.tick <= c.deadline, "cargo flight/delivery timeout")
+  local current = cargo_frame()
+  if not current.network_ready then return end
+  local robot = current.active[1]
+  if robot and robot.count == 7 then
+    check(current.provider == 0 and current.requester == 0, "loaded-flight source/destination")
+    if not c.report.loaded then
+      c.report.loaded = {tick = game.tick, frame = copied(current)}
+      marker("cargo-loaded-seven", current)
+    else
+      local first = c.report.loaded.frame.active[1]
+      check(first.unit == robot.unit, "cargo robot changed during flight")
+      if first.position.x ~= robot.position.x or first.position.y ~= robot.position.y then
+        if not c.report.flight then
+          c.report.flight = {tick = game.tick, frame = copied(current)}
+          marker("cargo-seven-in-flight", current)
+        end
+      end
+    end
+  end
+  if current.requester == 7 then
+    check(c.report.flight ~= nil and current.provider == 0, "delivery lacks observed seven-item flight")
+    if current.docked == 1 and #current.active == 0 and current.available == 1 then
+      c.closed = current; c.completed = true
+      c.report.delivered = {tick = game.tick, frame = copied(current)}
+      c.report.physical_robot_delivery = true
+      close("cargo-destination-saved", "mir-ferrum-worker-cargo-destination", current)
+    end
+  end
+end
+commands.add_command("mir-ferrum-worker-cargo", "Test fixture only: start the physical cargo witness.", function(command)
+  check(command.player_index == nil and command.parameter == "start", "cargo requires exact server-console command")
+  local s, f = storage[KEY], game.forces.player
+  check(s and s.phase == "destination-saved" and not s.cargo, "cargo requires fresh ordinary destination endpoint")
+  check(script.active_mods.base == "2.1.23" and target() == "5.0.21012", "cargo exact F210 tuple")
+  closure(true); stopped(); contracts(true, false); same(frames(), s.closed, "cargo-entry")
+  same(s.ordinary, {[FOUR] = 1, [FIVE] = 1, [SIX] = 1}, "cargo ordinary counts")
+  check(f.worker_robots_storage_bonus == 6 and prototypes.entity["logistic-robot"].max_payload_size == 1,
+    "cargo earned payload must be native1 plus earned6")
+  local surface = s.lab.surface
+  check(#surface.find_entities_filtered{area = {{-16, 8}, {16, 16}},
+    type = {"roboport", "logistic-container", "logistic-robot", "construction-robot"}} == 0,
+    "cargo setup area already has logistics entities")
+  local tiles = {}; for x = -16, 16 do for y = 8, 16 do
+    tiles[#tiles + 1] = {name = "grass-1", position = {x, y}}
+  end end
+  surface.set_tiles(tiles)
+  local function place(name, position)
+    local entity = surface.create_entity{name = name, position = position, force = f, quality = "normal"}
+    check(entity and entity.valid and entity.name == name and entity.quality.name == "normal", "cargo placement failed")
+    return entity
+  end
+  local port = place("roboport", {0, 12})
+  local provider = place("passive-provider-chest", {-12, 12})
+  local requester = place("requester-chest", {12, 12})
+  check(port.electric_buffer_size >= 40000000, "normal roboport power buffer unavailable")
+  port.energy = port.electric_buffer_size -- Labelled one-time administrative power supply only.
+  check(port.get_inventory(defines.inventory.roboport_robot).insert{name = "logistic-robot", count = 1, quality = "normal"} == 1,
+    "cargo robot setup insertion")
+  check(provider.get_inventory(defines.inventory.chest).insert{name = "iron-plate", count = 7, quality = "normal"} == 7,
+    "cargo provider setup insertion")
+  check(cargo_inventory(requester, defines.inventory.chest, "iron-plate") == 0, "requester must start empty")
+  local point = requester.get_logistic_point(defines.logistic_member_index.logistic_container)
+  check(point and point.sections_count <= 1, "cargo requester point absent/nonempty")
+  local section = point.sections_count == 0 and point.add_section() or point.get_section(1)
+  check(section and section.is_manual, "cargo manual requester section absent")
+  section.active = true
+  section.set_slot(1, {value = {type = "item", name = "iron-plate", quality = "normal", comparator = "="}, min = 7, max = 7})
+  s.cargo = {port = port, provider = provider, requester = requester, section = section,
+    deadline = game.tick + 7200, report = {physical_robot_delivery = false,
+      administrative_setup = {robot_items = 1, provider_iron = 7, requester_iron = 0,
+        normal_quality = true, one_time_port_energy = port.energy}, start_tick = game.tick}}
+  s.phase = "cargo-active"; marker("cargo-administrative-setup-only")
+end)
 script.on_init(function()
   game.difficulty_settings.technology_price_multiplier = 1
   closure(false)
@@ -270,11 +392,18 @@ script.on_event(defines.events.on_tick, function()
   local s, f = storage[KEY], game.forces.player
   check(s ~= nil, "scenario state absent")
   if loaded then
-    loaded = false; check(s.phase == "destination-saved", "cold requires closed destination")
+    loaded = false; check(s.phase == "destination-saved" or s.phase == "cargo-destination-saved", "cold requires closed destination")
     closure(true); stopped(); same(frames(), s.closed, "cold"); contracts(true, false)
     same(s.ordinary, {[FOUR] = 1, [FIVE] = 1, [SIX] = 1}, "cold ordinary counts")
-    marker("cold"); return
+    local physical_frame
+    if s.phase == "cargo-destination-saved" then
+      check(s.cargo and s.cargo.completed and s.cargo.report.physical_robot_delivery, "cold physical witness absent")
+      physical_frame = cargo_frame()
+      same(physical_frame, s.cargo.closed, "cold-cargo")
+    end
+    marker("cold", physical_frame); return
   end
+  if s.phase == "cargo-active" then cargo_tick(); return end
   if s.phase == "source-init" then
     closure(false); contracts(false)
     check(not f.technologies[FOUR].researched and not f.technologies[FIVE].researched, "source already earned")
@@ -323,5 +452,7 @@ end)
 remote.add_interface("mir-ferrum-worker-storage-native", {report = function()
   local s = storage[KEY]
   return {phase = s and s.phase or false, frames = frames(), ordinary = s and s.ordinary or false,
-    calibration_count = s and s.calibration_count or false, physical_robot_delivery = false}
+    calibration_count = s and s.calibration_count or false,
+    physical_robot_delivery = s and s.cargo and s.cargo.completed == true or false,
+    cargo = s and s.cargo and copied(s.cargo.report) or nil}
 end})
