@@ -1,0 +1,564 @@
+{
+  "kind": "MIRCurrent511NamedFallbackNativeChainV1",
+  "verdict": "ACCEPTED exact fresh named unknown-polynomial fallback lab/save/two-cold case",
+  "source": {
+    "runner": "1389ef9ba39159fca141d668ac74e800c9a80d16",
+    "player_tree": "dc3f9c1aa119f825dfb1cb5dac8ccf71ea1ddec0",
+    "fixture": "5d8a35c3822af1ccf3f362256a2bf12167e7b83d",
+    "fixture_pr": 1840
+  },
+  "candidate": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir511-qualification-r02\\more-infinite-research_5.0.21011.zip",
+    "exists": true,
+    "bytes": 995429,
+    "sha256": "F25DB9283C2F8020907F8E2AD35132F0B6EEECE11263C82C69389EE8DAB3F09D"
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+    "exists": true,
+    "bytes": 49398736,
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "manifest_sha256": "B854A26727B6440DE2B22A23827B41B6BB5C1B21E3D8EE16ACD2228EA9785DE5",
+  "composition_sha256": "56D364A3A9682FD3E546C0C64E81B94DEFCF859AB7D39DE863D32BFFC02727EC",
+  "root_admission_sha256": "3320620629B004BD516FA87A101C2DF386D70E63EEBA818310FEE28039E15DBD",
+  "caller_sha256": "A1A94C598E863C1D6B9D577E3EA448F30F163700465183E60CAC3370D67778CA",
+  "actor": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-fallback511-current-r01-controller\\projection\\control.lua",
+    "exists": true,
+    "bytes": 7618,
+    "sha256": "383A5B387EF1D4D9C8B2A39AAB35042255EC431DFAA1C307B26BDC319947D355"
+  },
+  "fixture_archive": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-fallback511-current-r01-controller\\mir-fixture-native-owner-fallback_0.2.0.zip",
+    "exists": true,
+    "bytes": 2157,
+    "sha256": "EA40DCD794D796C03E0843E2F43816561EAE0BC7A1D8B067BB5D8C86285357DA"
+  },
+  "limits": {
+    "expected_peak_memory_mib": 4096,
+    "max_output_mib": 128,
+    "timeout_seconds": 180
+  },
+  "processes": [
+    {
+      "stage": "production",
+      "result": {
+        "status": "passed",
+        "exit_code": -1,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 5.710642,
+        "peak_working_set_bytes": 443383808,
+        "peak_sampled_private_bytes": 441729024,
+        "admission": {
+          "observed_at": "2026-11-08T23:11:28.9359871+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 17141116928,
+            "committed_bytes": 21877088256,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 99163582464,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 204885901312,
+            "total_bytes": 599395090432
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "k2so-paid-production",
+          "admission_wait_seconds": 30,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.135,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-11-08T23:11:28.8015291+00:00",
+          "deadline_at": "2026-11-08T23:11:58.8015291+00:00",
+          "admission": {
+            "observed_at": "2026-11-08T23:11:28.9359871+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 17141116928,
+              "committed_bytes": 21877088256,
+              "commit_limit_bytes": 41293737984
+            },
+            "work_volume": {
+              "name": "D:\\",
+              "free_bytes": 99163582464,
+              "total_bytes": 1500099112960
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 204885901312,
+              "total_bytes": 599395090432
+            }
+          }
+        }
+      },
+      "log": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\native-fallback511-current-r01\\build\\tmp\\native-fallback511-current-r01\\native\\production.factorio.log",
+        "exists": true,
+        "bytes": 14784,
+        "sha256": "DCBDB99DC5861773138E6B02CD840C45F7C9A33ADFE821FB5E5BA2006C389F95"
+      },
+      "marker": {
+        "status": "passed",
+        "stage": "complete",
+        "actor_role": "ordinary",
+        "actual": {
+          "player": {
+            "name": "player",
+            "index": 1,
+            "level": 2,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "current": false,
+            "progress": 0,
+            "steel": 0,
+            "casting": 0,
+            "bullet": 0,
+            "uncovered": 0.17,
+            "private": {
+              "enabled": true,
+              "visible": false,
+              "level": 1,
+              "saved": 0,
+              "hidden": false
+            },
+            "queue": {},
+            "mining": 0,
+            "lab_speed": 0
+          },
+          "foreign": {
+            "name": "native-owner-settings-control",
+            "index": 4,
+            "level": 1,
+            "researched": false,
+            "enabled": false,
+            "visible": false,
+            "saved": 0,
+            "current": false,
+            "progress": 0,
+            "steel": 0,
+            "casting": 0,
+            "bullet": 0,
+            "uncovered": 0,
+            "private": {
+              "enabled": true,
+              "visible": false,
+              "level": 1,
+              "saved": 0,
+              "hidden": false
+            },
+            "queue": {},
+            "mining": 0,
+            "lab_speed": 0
+          }
+        },
+        "actual_lab_completions": 1,
+        "completion": {
+          "name": "recipe-prod-research_steel-1",
+          "by_script": false,
+          "tick": 119
+        },
+        "remaining_science": {
+          "automation-science-pack": 4,
+          "logistic-science-pack": 4,
+          "chemical-science-pack": 4,
+          "production-science-pack": 4
+        },
+        "selected_settings": {
+          "base": 2,
+          "increment": 3,
+          "growth": 1.25,
+          "time": 1,
+          "effect": 17
+        },
+        "native_cost_formula": "(2+3*(L-1))*1.25^(L-1)",
+        "no_acceleration_override": true
+      }
+    },
+    {
+      "stage": "reload-1",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 2.031023,
+        "peak_working_set_bytes": 140812288,
+        "peak_sampled_private_bytes": 133693440,
+        "admission": {
+          "observed_at": "2026-11-08T23:11:35.4438850+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 16613818368,
+            "committed_bytes": 22417391616,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 99160383488,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 204885921792,
+            "total_bytes": 599395090432
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "k2so-paid-reload-1",
+          "admission_wait_seconds": 30,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.061,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-11-08T23:11:35.3828192+00:00",
+          "deadline_at": "2026-11-08T23:12:05.3828192+00:00",
+          "admission": {
+            "observed_at": "2026-11-08T23:11:35.4438850+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 16613818368,
+              "committed_bytes": 22417391616,
+              "commit_limit_bytes": 41293737984
+            },
+            "work_volume": {
+              "name": "D:\\",
+              "free_bytes": 99160383488,
+              "total_bytes": 1500099112960
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 204885921792,
+              "total_bytes": 599395090432
+            }
+          }
+        }
+      },
+      "log": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\native-fallback511-current-r01\\build\\tmp\\native-fallback511-current-r01\\native\\reload-1.factorio.log",
+        "exists": true,
+        "bytes": 14001,
+        "sha256": "CD93FC6361435B1B993F4EC80C2D592E1500FBBC4625C7BF3931E22468D75D51"
+      },
+      "marker": {
+        "status": "passed",
+        "stage": "cold-complete",
+        "actor_role": "ordinary",
+        "actual": {
+          "player": {
+            "name": "player",
+            "index": 1,
+            "level": 2,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "current": false,
+            "progress": 0,
+            "steel": 0,
+            "casting": 0,
+            "bullet": 0,
+            "uncovered": 0.17,
+            "private": {
+              "enabled": true,
+              "visible": false,
+              "level": 1,
+              "saved": 0,
+              "hidden": false
+            },
+            "queue": {},
+            "mining": 0,
+            "lab_speed": 0
+          },
+          "foreign": {
+            "name": "native-owner-settings-control",
+            "index": 4,
+            "level": 1,
+            "researched": false,
+            "enabled": false,
+            "visible": false,
+            "saved": 0,
+            "current": false,
+            "progress": 0,
+            "steel": 0,
+            "casting": 0,
+            "bullet": 0,
+            "uncovered": 0,
+            "private": {
+              "enabled": true,
+              "visible": false,
+              "level": 1,
+              "saved": 0,
+              "hidden": false
+            },
+            "queue": {},
+            "mining": 0,
+            "lab_speed": 0
+          }
+        },
+        "actual_lab_completions": 1,
+        "completion": {
+          "name": "recipe-prod-research_steel-1",
+          "by_script": false,
+          "tick": 119
+        },
+        "remaining_science": {
+          "automation-science-pack": 4,
+          "logistic-science-pack": 4,
+          "chemical-science-pack": 4,
+          "production-science-pack": 4
+        },
+        "selected_settings": {
+          "base": 2,
+          "increment": 3,
+          "growth": 1.25,
+          "time": 1,
+          "effect": 17
+        },
+        "native_cost_formula": "(2+3*(L-1))*1.25^(L-1)",
+        "no_acceleration_override": true
+      }
+    },
+    {
+      "stage": "reload-2",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 1.936462,
+        "peak_working_set_bytes": 157339648,
+        "peak_sampled_private_bytes": 150712320,
+        "admission": {
+          "observed_at": "2026-11-08T23:11:38.1665345+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 16602181632,
+            "committed_bytes": 22427754496,
+            "commit_limit_bytes": 41293737984
+          },
+          "work_volume": {
+            "name": "D:\\",
+            "free_bytes": 99162603520,
+            "total_bytes": 1500099112960
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 204885921792,
+            "total_bytes": 599395090432
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "k2so-paid-reload-2",
+          "admission_wait_seconds": 30,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.061,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-11-08T23:11:38.1054123+00:00",
+          "deadline_at": "2026-11-08T23:12:08.1054123+00:00",
+          "admission": {
+            "observed_at": "2026-11-08T23:11:38.1665345+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 16602181632,
+              "committed_bytes": 22427754496,
+              "commit_limit_bytes": 41293737984
+            },
+            "work_volume": {
+              "name": "D:\\",
+              "free_bytes": 99162603520,
+              "total_bytes": 1500099112960
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 204885921792,
+              "total_bytes": 599395090432
+            }
+          }
+        }
+      },
+      "log": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\native-fallback511-current-r01\\build\\tmp\\native-fallback511-current-r01\\native\\reload-2.factorio.log",
+        "exists": true,
+        "bytes": 14001,
+        "sha256": "D04EE05B7A93737065A344D1627B0B92B297E8D7E709168CB4B4E5B2EC97F9DC"
+      },
+      "marker": {
+        "status": "passed",
+        "stage": "cold-complete",
+        "actor_role": "ordinary",
+        "actual": {
+          "player": {
+            "name": "player",
+            "index": 1,
+            "level": 2,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved": 0,
+            "current": false,
+            "progress": 0,
+            "steel": 0,
+            "casting": 0,
+            "bullet": 0,
+            "uncovered": 0.17,
+            "private": {
+              "enabled": true,
+              "visible": false,
+              "level": 1,
+              "saved": 0,
+              "hidden": false
+            },
+            "queue": {},
+            "mining": 0,
+            "lab_speed": 0
+          },
+          "foreign": {
+            "name": "native-owner-settings-control",
+            "index": 4,
+            "level": 1,
+            "researched": false,
+            "enabled": false,
+            "visible": false,
+            "saved": 0,
+            "current": false,
+            "progress": 0,
+            "steel": 0,
+            "casting": 0,
+            "bullet": 0,
+            "uncovered": 0,
+            "private": {
+              "enabled": true,
+              "visible": false,
+              "level": 1,
+              "saved": 0,
+              "hidden": false
+            },
+            "queue": {},
+            "mining": 0,
+            "lab_speed": 0
+          }
+        },
+        "actual_lab_completions": 1,
+        "completion": {
+          "name": "recipe-prod-research_steel-1",
+          "by_script": false,
+          "tick": 119
+        },
+        "remaining_science": {
+          "automation-science-pack": 4,
+          "logistic-science-pack": 4,
+          "chemical-science-pack": 4,
+          "production-science-pack": 4
+        },
+        "selected_settings": {
+          "base": 2,
+          "increment": 3,
+          "growth": 1.25,
+          "time": 1,
+          "effect": 17
+        },
+        "native_cost_formula": "(2+3*(L-1))*1.25^(L-1)",
+        "no_acceleration_override": true
+      }
+    }
+  ],
+  "completion_count": "One actual ordinary by_script=false completion at tick119; two cold markers repeat the saved witness and do not count as additional completions.",
+  "production_retirement": "Authorized completion predicate after marker plus completed save; exit-1 is supervised stop, not natural0. Both read-only cold loads exit0; no timeout.",
+  "selected_settings": {
+    "base": 2,
+    "increment": 3,
+    "growth": 1.25,
+    "time": 1,
+    "effect": 17
+  },
+  "earned_save": {
+    "path": "D:\\Projects\\Factorio\\.task-builds\\native-fallback511-current-r01\\build\\tmp\\native-fallback511-current-r01\\native\\write-data\\saves\\sourceb-native-owner-fallback-complete.zip",
+    "exists": true,
+    "bytes": 835331,
+    "sha256": "7D7F8E58B652495084777E66B787FEC48C8AE716F87E8A88BFD0F8B2FE07788B"
+  },
+  "protected_copy": {
+    "path": "D:\\Projects\\Factorio\\.task-builds\\native-fallback511-current-r01\\build\\tmp\\native-fallback511-current-r01\\protected\\sourceb-native-owner-fallback-complete.zip",
+    "exists": true,
+    "bytes": 835331,
+    "sha256": "7D7F8E58B652495084777E66B787FEC48C8AE716F87E8A88BFD0F8B2FE07788B"
+  },
+  "preservation": "All32 bound inputs, original controls and19 prior MIR archives restored/unchanged; owned temporary ZIPs absent, Factorio0; source/protected save CRC and embedded exactactor verified.",
+  "original_evidence": "spec/evidence/candidate503-fallback-native-aero-review-r01.json retains original accepted scope and ineligible-r01 failure. Raw eligible actor/helper bodies reverse to original versions exactly. This is a distinct current11 fresh execution, not relabeled503 or an oldsave upgrade.",
+  "local_custody": {
+    "manifest": "build/qualification/native-fallback511-current-r01-native-custody-r01/MANIFEST.json",
+    "sha256": "F0D5AD78C5E1471CBB408D0E3C24141EC20E92BAB8EC2C6DF2BE020891BA2A98",
+    "files": 65,
+    "bytes": 2317497
+  },
+  "remote_custody": {
+    "repository": "Julesc013/scratchpad",
+    "branch": "evidence/native-fallback511-current-r01",
+    "commit": "59d48f1df6768d2aca18a21f4872e2ef2264354a",
+    "directory": "evidence/native-fallback511-current-native-r01",
+    "archive": "original-bodies.json.gz",
+    "archive_bytes": 1905789,
+    "archive_sha256": "AF2D06259D24E5E6DF9EBA46AA9CEF90F1C31D24F9E4F1C8CC27B507AC1E1686",
+    "records_including_manifest": 66,
+    "original_bytes_including_manifest": 2339541,
+    "remote_readback": "All6 remote scoped blobs equal exact local bodies; remote branch equals commit."
+  },
+  "independent_reports": [
+    {
+      "path": "spec/evidence/native-fallback511-independent-result-review-r01.json",
+      "bytes": 17477,
+      "sha256": "CD219E15AEF42F5F2A9FA1C12B9A5FE8021D259FE3394B94E5C284033EE7806A"
+    },
+    {
+      "path": "spec/evidence/native-fallback511-private-remote-readback-r01.json",
+      "bytes": 1521,
+      "sha256": "9A4B0D6ED0C99AA0CE2303383A83500394EDEF3D51FEED9A5C7052C47BDB24F7"
+    }
+  ],
+  "limits_of_acceptance": [
+    "Fresh named unknown-polynomial foreign native owner plus one independently authored eligible uncovered steel recipe only.",
+    "No physical manufacturing, arbitrary settings/native-owner formulas, historical or paid-mask upgrade, client/Library/export or performance verdict.",
+    "Published10 and all frozen qualification ZIPs stay unchanged; no stable/release verdict."
+  ],
+  "release_qualification": false,
+  "stable_acceptance": false
+}

@@ -1,0 +1,43 @@
+{
+  "commit": "59d48f1df6768d2aca18a21f4872e2ef2264354a",
+  "files": 6,
+  "all_remote_blobs_equal": true,
+  "members": [
+    {
+      "path": ".gitattributes",
+      "bytes": 45,
+      "sha256": "BAA2509134A43E1959FA96138106D10BE105030D5F68F3E80CCDF7315510D232",
+      "git_blob": "2fc7a91972e442e45bc225696fd59b4e33cc13a0"
+    },
+    {
+      "path": "MANIFEST.json",
+      "bytes": 24638,
+      "sha256": "C745BECFF351A9BEC57E32A768330477B5E4321643C045FE7DE2B427DF765B03",
+      "git_blob": "1aed199aa8e093a84dafe66c711e20bd79702ca5"
+    },
+    {
+      "path": "native-fallback511-independent-result-review-r01.json",
+      "bytes": 17477,
+      "sha256": "CD219E15AEF42F5F2A9FA1C12B9A5FE8021D259FE3394B94E5C284033EE7806A",
+      "git_blob": "b9229b69efb90b8633168d4393522827d59748a3"
+    },
+    {
+      "path": "native-fallback511-independent-source-review-r01.json",
+      "bytes": 2125,
+      "sha256": "7E5556B08515C9EF3F4149245394214BA2E6F77673AFDB5115F3612648684EFA",
+      "git_blob": "c940098011da518dc47b985963d288f16b2fa1b2"
+    },
+    {
+      "path": "native-fallback511-root-independent-admission-r01.json",
+      "bytes": 1293,
+      "sha256": "3320620629B004BD516FA87A101C2DF386D70E63EEBA818310FEE28039E15DBD",
+      "git_blob": "928a195f7d64238253bbd7be65784ff271fcb99e"
+    },
+    {
+      "path": "original-bodies.json.gz",
+      "bytes": 1905789,
+      "sha256": "AF2D06259D24E5E6DF9EBA46AA9CEF90F1C31D24F9E4F1C8CC27B507AC1E1686",
+      "git_blob": "b8c8849fdbb20b7dc7463363f89fb0c8607db3ca"
+    }
+  ]
+}
