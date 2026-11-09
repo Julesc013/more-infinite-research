@@ -2,7 +2,11 @@
 -- Helper-free inputs carry the same immutable test catalogue locally; they do
 -- not activate the obsolete migration controller. Older protocols keep theirs.
 local INPUT_OBSERVER = script.active_mods["mir-fixture-mir5-library-native-input"]
-local CURRENT_511 = INPUT_OBSERVER=="0.3.9" or INPUT_OBSERVER=="0.4.4"
+local SETTINGS_API = INPUT_OBSERVER=="0.3.10"
+local settings_probe = SETTINGS_API and require("legacy-settings-search")
+local SETTINGS_STAGES = {"research", "settings-options-baseline", "settings-options-repair",
+  "settings-options-retained-default", "settings-options-no-match", "restore-settings-options-empty", "restore-research"}
+local CURRENT_511 = INPUT_OBSERVER=="0.3.9" or INPUT_OBSERVER=="0.4.4" or SETTINGS_API
 local CURRENT_510 = INPUT_OBSERVER=="0.3.8" or INPUT_OBSERVER=="0.4.3"
 local CURRENT_509 = INPUT_OBSERVER=="0.3.7"
 local HELPER_FREE_INPUT = INPUT_OBSERVER=="0.3.5" or INPUT_OBSERVER=="0.4.1" or INPUT_OBSERVER=="0.3.6" or INPUT_OBSERVER=="0.4.2" or CURRENT_509 or CURRENT_510 or CURRENT_511
@@ -382,6 +386,7 @@ local function report()
     en_controller_type=controller_type(en),de_controller_type=controller_type(de),
     controller_constants=controller_constants(),
     inspect_opened_snapshots=refs.inspect_opened_snapshots or false,
+    legacy_settings_search=s.legacy_settings_search or false,
     removed_index=s.removed_index or false,readonly_imported_probe=s.imported_probe_verified==true,
     imported_earnings=true,fixture_seeds_credit=false,load_observed=loaded_restart,
     en_geometry=s.en_index and geometry(game.get_player(s.en_index)) or nil,
@@ -437,10 +442,71 @@ local function arm_close(en, expected_phase)
   end
   s.close_expected={phase=expected_phase,player_index=en.index,ordinal=s.closed_events+1}
 end
+local function settings_peer(p)
+  local root,query=parts(p);local tabs=root.mir_library_tabs
+  local page=tabs.mir_library_settings_content
+  local field=valid(page) and page.mir_library_settings_query or nil
+  local dynamic=valid(page) and page.mir_library_settings_dynamic or nil
+  local list=valid(dynamic) and dynamic.mir_library_settings_list or nil
+  local count=valid(dynamic) and dynamic.mir_library_settings_count or nil
+  local scope=valid(dynamic) and dynamic.mir_library_settings_scope_label or nil
+  if valid(list) and (type(list.items)~="table" or #list.items>2048) then fail("peer Settings list bound differs") end
+  return root,query,helpers.table_to_json({tabs.selected_tab_index,query.text,
+    valid(field) and field.text or false,valid(list) and list.items or false,
+    valid(count) and count.caption or false,valid(scope) and scope.caption or false})
+end
+local function assert_settings_peer(p)
+  local root,query,value=settings_peer(p)
+  if root~=refs.settings_peer_root or query~=refs.settings_peer_query or value~=refs.settings_peer_value then
+    fail("Settings API changed the other client's view")
+  end
+end
+local function start_settings_api()
+  if not SETTINGS_API then fail("Settings API composition requires its exact observer") end
+  phase("waiting-clients");local s=state();local en,de=pair();assert_world();check_imported_literals()
+  if s.legacy_settings_search~=nil then fail("Settings API composition was already started") end
+  open(en,GEAR,GEAR);open(de,MINING,MINING,"native");assert_world()
+  refs.settings_probes={}
+  for index,p in ipairs({en,de}) do
+    refs.settings_probes[index]=settings_probe.new({player=p,assert_world=assert_world,
+      tick=function()return game.tick end,research_query=index==1 and GEAR or MINING})
+  end
+  s.legacy_settings_search={actor=1,stage=1,completed=false,observations={}}
+  s.phase="settings-api-prepare"
+end
+local function advance_settings_api(check)
+  if not SETTINGS_API then fail("Settings API composition requires its exact observer") end
+  phase(check and "settings-api-check" or "settings-api-prepare")
+  local s=state();local route=s.legacy_settings_search;local en,de=pair();assert_world()
+  if not route or not refs.settings_probes then fail("Settings API composition cannot resume a partial probe") end
+  local probe=refs.settings_probes[route.actor];local stage=SETTINGS_STAGES[route.stage]
+  local peer=route.actor==1 and de or en
+  if not check then
+    refs.settings_peer_root,refs.settings_peer_query,refs.settings_peer_value=settings_peer(peer)
+    probe.prepare(stage);assert_world();assert_settings_peer(peer)
+    route.ready_tick=game.tick+30;s.phase="settings-api-check"
+    return
+  end
+  assert_settings_peer(peer)
+  local observation=probe.check(stage);assert_world();assert_settings_peer(peer)
+  route.observations[#route.observations+1]={role=route.actor==1 and "en" or "de",stage=stage,
+    tick=game.tick,observation=observation}
+  route.stage=route.stage+1;route.ready_tick=nil
+  if route.stage>#SETTINGS_STAGES then route.stage=1;route.actor=route.actor+1 end
+  if route.actor>2 then
+    route.completed=true;s.phase="waiting-clients";refs.settings_probes=nil
+  else s.phase="settings-api-prepare" end
+end
 local function advance(step)
   local s=state()
-  if step=="inspect" then
+  if step=="settings-api-start" then start_settings_api()
+  elseif step=="settings-api-prepare" then advance_settings_api(false)
+  elseif step=="settings-api-check" then advance_settings_api(true)
+  elseif step=="inspect" then
     phase("waiting-clients");local en,de=pair();assert_world();check_imported_literals()
+    if SETTINGS_API and not (s.legacy_settings_search and s.legacy_settings_search.completed) then
+      fail("Settings API composition must complete before native input")
+    end
     exclusion_probe(en,de);refs.inspect_opened_snapshots={after_exclusion_probe=inspect_opened_snapshot(en,de)}
     open(en,"",GEAR);refs.inspect_opened_snapshots.after_final_open_en=inspect_opened_snapshot(en,de)
     open(de,MINING,MINING,"native");refs.inspect_opened_snapshots.after_final_open_de=inspect_opened_snapshot(en,de)
@@ -569,6 +635,8 @@ script.on_init(function()
     or (script.active_mods.base=="2.1.23" and observer_version=="0.3.8" and {mir="5.0.21010",observer="0.3.8"})
     or (script.active_mods.base=="2.0.77" and observer_version=="0.3.9" and {mir="5.0.20011",observer="0.3.9"})
     or (script.active_mods.base=="2.1.23" and observer_version=="0.3.9" and {mir="5.0.21011",observer="0.3.9"})
+    or (script.active_mods.base=="2.0.77" and observer_version=="0.3.10" and {mir="5.0.20011",observer="0.3.10"})
+    or (script.active_mods.base=="2.1.23" and observer_version=="0.3.10" and {mir="5.0.21011",observer="0.3.10"})
   if not expected or script.active_mods["more-infinite-research"]~=expected.mir
       or (not HELPER_FREE_INPUT and script.active_mods[historical.fixture]~=expected.fixture) then fail("imported native target differs") end
   local allowed={base=script.active_mods.base,["more-infinite-research"]=expected.mir,

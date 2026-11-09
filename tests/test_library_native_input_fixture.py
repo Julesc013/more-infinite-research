@@ -542,15 +542,75 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                         profile["owned_fixture"]["sha256"],
                     )
 
+    def test_511_settings_search_composition_metadata_preserves_prior_inputs(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                old = json.loads((FIXTURE / f"info-input-511-{target}.json").read_bytes())
+                new = json.loads((FIXTURE / f"info-input-511-settings-api-{target}.json").read_bytes())
+                self.assertEqual(new, dict(old, version="0.3.10"))
+                self.assertEqual(old["version"], "0.3.9")
+
+    def test_511_settings_search_composition_checks_both_clients_before_existing_input(self):
+        for target, player in (("f200", "5.0.20011"), ("f210", "5.0.21011")):
+            with self.subTest(target=target):
+                result = self.run_case(target, package_version=player, input_observer_version="0.3.10")
+                self.assertTrue(result["ok"], result["message"])
+                final = result["final"]
+                search = final["legacy_settings_search"]
+                self.assertTrue(search["completed"])
+                self.assertEqual(len(search["observations"]), 14)
+                for role in ("en", "de"):
+                    rows = [row for row in search["observations"] if row["role"] == role]
+                    self.assertEqual(len(rows), 7)
+                    self.assertEqual(rows[1]["observation"]["selected_tab"], 3)
+                    self.assertLess(rows[2]["observation"]["list_count"], rows[1]["observation"]["list_count"])
+                    self.assertEqual(rows[3]["observation"]["settings_text"], "default")
+                    self.assertEqual(rows[4]["observation"]["settings_text"], "x" * 160)
+                    self.assertEqual(rows[4]["observation"]["list_count"], 0)
+                    self.assertEqual(rows[6]["observation"]["settings_text"], "")
+                    self.assertEqual(rows[6]["observation"]["research_text"],
+                                     "recipe-prod-research_gears-1" if role == "en" else "recipe-prod-research_mining_drill-1")
+                self.assertEqual((final["private_queries"], final["actual_joins"],
+                                  final["requested_native_resets"], final["actual_removed_events"]), (48, 5, 2, 1))
+                self.assertTrue(result["readonly_report"])
+                self.assertFalse(result["native_input_evidence"])
+
+    def test_511_settings_search_composition_refuses_bad_phases_filters_peer_and_world_changes(self):
+        for target, player in (("f200", "5.0.20011"), ("f210", "5.0.21011")):
+            for opponent, message in (("settings-skipped", "step out of order: settings-api-prepare expected waiting-clients"),
+                                      ("settings-too-early", "check before GUI settle"),
+                                      ("settings-repeated", "already started"),
+                                      ("settings-unbounded", "settings query differs"),
+                                      ("settings-unfiltered", "repair filter differs"),
+                                      ("settings-wrong-scope", "Other options scope label differs"),
+                                      ("settings-peer-query", "other client's view"),
+                                      ("settings-peer-list", "other client's view"),
+                                      ("settings-midload", "cannot resume a partial probe"),
+                                      ("settings-native-mutation", "retained native technology changed")):
+                with self.subTest(target=target, opponent=opponent):
+                    result = self.run_case(target, opponent, player, "0.3.10")
+                    self.assertFalse(result["ok"], result["message"])
+                    self.assertIn(message, result["message"])
+                    self.assertEqual(result["saves"], {})
+            with self.subTest(target=target, opponent="wrong-published-package"):
+                self.assertFalse(self.run_case(target, package_version=player[:-2] + "10", input_observer_version="0.3.10")["ok"])
+            with self.subTest(target=target, opponent="old-observer-protocol"):
+                old = self.run_case(target, "settings-unsolicited", player, "0.3.9")
+                self.assertFalse(old["ok"])
+                self.assertIn("composition requires its exact observer", old["message"])
+
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().observer_path = (FIXTURE / "control.lua").as_posix()
         self.lua.globals().support_path = (FIXTURE / "support-exports.lua").as_posix()
         self.lua.globals().historical_path = (ROOT / "tests/fixtures/migration-origins/f200-110-successor/catalogue.lua").as_posix()
+        self.lua.globals().settings_probe_path = (ROOT / "tests/fixtures/library-legacy-settings-search/probe.lua").as_posix()
         self.lua.globals().fingerprint = lambda value: json.dumps(plain(value), sort_keys=True)
         self.lua.execute(r'''
           function run_input_observer(target,opponent,package_version,input_observer_version)
+            local settings_api=input_observer_version=="0.3.10"
             local authored_page=input_observer_version=="0.3.6" or input_observer_version=="0.3.7" or input_observer_version=="0.3.8" or input_observer_version=="0.4.3" or input_observer_version=="0.3.9" or input_observer_version=="0.4.4"
+            authored_page=authored_page or settings_api
             local helper_free=input_observer_version=="0.3.5" or input_observer_version=="0.4.1" or authored_page or input_observer_version=="0.4.2"
             local historical=assert(loadfile(historical_path))()
             local events={on_player_joined_game=1,on_gui_text_changed=2,on_gui_click=3,on_gui_location_changed=4,
@@ -639,8 +699,21 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
             local en,de
             local function build(p,options)
               options=options or memory[p.index]
+              if settings_api then
+                local old=memory[p.index] or {}
+                local tab=options.tab or old.tab or "research"
+                local research,settings_text=old.search or "",old.settings_text or ""
+                if options.search~=nil then
+                  if tab=="settings" then
+                    settings_text=opponent=="settings-unbounded" and options.search or options.search:sub(1,160)
+                  else research=options.search end
+                end
+                options={search=research,settings_text=settings_text,tab=tab,
+                  selected=options.selected or old.selected,family=options.family or old.family,sort=options.sort or old.sort}
+              end
               local search=options.search or ""
               memory[p.index]={search=search,selected=options.selected,family=options.family,sort=options.sort}
+              if settings_api then memory[p.index].tab=options.tab;memory[p.index].settings_text=options.settings_text end
               local root=p.gui.screen[root_name]
               if not root or not root.valid then
                 root=element("frame",root_name);root.location=p.remembered_location or {x=200,y=100};root.style.width=1000
@@ -725,6 +798,37 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
                 content.mir_library_list_pane=pane
                 content.mir_library_results,content.mir_library_actions=nil,nil
               end
+              if settings_api then
+                local function owned(kind,name,parent)
+                  local node=element(kind,name);node.parent=parent;node.get_mod=function()return "more-infinite-research"end
+                  parent[name]=node;return node
+                end
+                root.parent=p.gui.screen;root.tags={["more-infinite-research.library-root.v1"]=true}
+                local tabs=root.mir_library_tabs;tabs.selected_tab_index=options.tab=="settings" and 3 or 1
+                local settings_page=owned("scroll-pane","mir_library_settings_content",tabs)
+                local sq=owned("textfield","mir_library_settings_query",settings_page);sq.text=options.settings_text
+                local dynamic=owned("table","mir_library_settings_dynamic",settings_page)
+                local list=owned("list-box","mir_library_settings_list",dynamic)
+                local text=options.settings_text
+                list.items=text=="" and {"Repair","Default","Language","Other"}
+                  or (text=="repair" and {"Repair"} or (text=="default" and {"Default"} or {}))
+                if opponent=="settings-unfiltered" then list.items={"Repair","Default","Language","Other"} end
+                owned("label","mir_library_settings_count",dynamic).caption={"mir-browser.settings-count",#list.items}
+                owned("label","mir_library_settings_scope_label",dynamic).caption={
+                  opponent=="settings-wrong-scope" and "mir-browser.settings-scope-research" or "mir-browser.settings-scope-options"}
+                if options.tab=="settings" and text=="repair" then
+                  if opponent=="settings-native-mutation" then forces.player.technologies[gear].level=99 end
+                  if opponent=="settings-peer-query" then
+                    local other=p==en and de or en;local query_peer=other.gui.screen[root_name].mir_library_filters.mir_library_query
+                    query_peer.text="cross-client leak"
+                  end
+                  if opponent=="settings-peer-list" then
+                    local other=p==en and de or en
+                    other.gui.screen[root_name].mir_library_tabs.mir_library_settings_content
+                      .mir_library_settings_dynamic.mir_library_settings_list.items={"cross-client leak"}
+                  end
+                end
+              end
               p.opened=root
               return root
             end
@@ -790,8 +894,9 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               ["mir-fixture-mir5-library-native-input"]=input_observer_version or "0.3.0"}
             if helper_free then active[historical.fixture]=nil end
             local env;env={game=game,storage=store,settings={startup={}},defines={events=events,gui_type={custom=99},controllers={character=7,cutscene=11}},log=function(message)logs[#logs+1]=message end,
-              helpers={table_to_json=function()return "{}"end},
+              helpers={table_to_json=function(value)return settings_api and fingerprint(value) or "{}"end},
               require=function(name)
+                if name=="legacy-settings-search" then return assert(loadfile(settings_probe_path,"t",env))() end
                 if name=="support-exports" then return assert(loadfile(support_path,"t",env))() end
                 assert(name==(helper_free and "catalogue"
                   or "__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue"));return historical
@@ -884,6 +989,18 @@ class LibraryNativeInputFixtureControls(unittest.TestCase):
               en=join(0,"en");de=join(2,"de")
               if opponent=="duplicate-initial-join" then join(0,"en") end
               if opponent=="out-of-order" then step("prefix");return end
+              if opponent=="settings-unsolicited" then step("settings-api-start");return end
+              if settings_api then
+                step("settings-api-start")
+                if opponent=="settings-skipped" then step("inspect") end
+                for index=1,14 do
+                  step("settings-api-prepare")
+                  if opponent=="settings-midload" and index==1 then parse();callbacks.load() end
+                  if opponent~="settings-too-early" then game.tick=game.tick+30 end
+                  step("settings-api-check")
+                end
+                if opponent=="settings-repeated" then step("settings-api-start") end
+              end
               step("inspect")
               if opponent=="join-during-input" then join(2,"de") end
               if opponent=="observe-missing-query" then
