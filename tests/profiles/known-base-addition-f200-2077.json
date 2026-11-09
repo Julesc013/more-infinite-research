@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "kind": "mir5-known-base-addition-native",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {"version": "2.0.77", "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"},
+  "settings_mode": "Unchanged saved startup settings",
+  "mods": [
+    {"name": "base", "version": "2.0.77", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.20012", "enabled": true},
+    {"name": "mir-fixture-mir5-known-base-addition", "version": "0.1.0", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true}
+  ],
+  "archive_sha256": {"mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"},
+  "protected_input_requirement": {
+    "status": "missing-verified-pure-Base-derivative",
+    "old_mir": "5.0.20001",
+    "old_mods": ["base", "more-infinite-research"],
+    "parent_receipt": "spec/evidence/beta501-f200-successor-native-chain-r01.json",
+    "parent_save_sha256": "0C783E41265F9A0EF818E92B5B44435A4585329C06AC959FE988310CDFF3FBEA",
+    "parent_save_bytes": 2650701,
+    "warning": "Parent is instrumented and NOT directly admissible. Native owner must derive/verify another original-preserving copy under the same old MIR/Base with all three helpers removed, then record the exact new save hash and observed state. Do not recreate or relabel the accepted source stage.",
+    "game_speed": 1,
+    "startup_changed_on_successor": false
+  },
+  "scope": "Prepared successor selection only. One explicit late private plastic main and public low-density-structure, each with an unpaid new recipe. Preserve three original forces, current gear42%, queued plastic and detached gear27%; complete the genuine pre-existing gear/plastic queue at unchanged native cost/speed, save and two cold reads. Unknown/unchanged/removed old provider histories must still refuse. No reporter save, real-provider, F210, stable or native pass is implied. Root binds exact player/fixture/input hashes and existing controller before execution."
+}
