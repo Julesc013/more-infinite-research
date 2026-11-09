@@ -3,6 +3,8 @@ import argparse
 from pathlib import Path
 import sys
 import unittest
+from test_bob_tech_materials import _lua_value, _plain
+from worker_storage_recovery_fixture import expected_private_worker_row
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -104,6 +106,11 @@ class ModulePermissionsActivationTests(unittest.TestCase):
         """)
 
     def test_disabled_setting_never_loads_override_or_reads_raw(self):
+        authored_worker = expected_private_worker_row()
+        authored_worker.update(name="worker-robots-storage-4", hidden=False)
+        for field in ("enabled", "visible_when_disabled", "order"):
+            authored_worker.pop(field)
+        self.lua.globals().fixture_worker = _lua_value(self.lua, authored_worker)
         self.lua.execute(r"""
           settings = {startup = defaults()}
           helpers = nil
@@ -131,7 +138,7 @@ class ModulePermissionsActivationTests(unittest.TestCase):
           package.preload["research.productivity"] = function()
             return {gears = function(values)
               assert(values.unrestricted_modules == false)
-              return {type = "technology", name = "stub"}
+              return {type="technology",name="stub",unit={count=1,time=1,ingredients={{"automation-science-pack",1}}}}
             end}
           end
           package.preload["compatibility.modern_catalogue"] = function()
@@ -147,7 +154,9 @@ class ModulePermissionsActivationTests(unittest.TestCase):
             end, native_owner_fallbacks = function(active_mods,withheld)
               assert(active_mods==mods and (withheld==nil or next(withheld)==nil))
               return {}
-            end, select = function(active_mods)
+            end, continuations = function() return {{id="worker-robots-storage-4",defaults={
+              enabled=true,base_cost=200,effect_percent=1,growth_factor=1.5,
+              linear_increment=0,max_level=0,research_time=60}}} end, select = function(active_mods)
               assert(active_mods == mods)
               return {definitions = {}, continuations = {}, recipe_patches = {}}
             end}
@@ -169,6 +178,11 @@ class ModulePermissionsActivationTests(unittest.TestCase):
                 assert(#targets == 0 and #patches == 0)
               end,
               technologies = function(selection) assert(#selection.definitions == 0); return {} end,
+              continuation = function(definition, values)
+                assert(definition.id=="worker-robots-storage-4"
+                  and values.streams["worker-robots-storage"].effect_percent==1)
+                return fixture_worker
+              end,
               apply_weapon_speed_overlap = function(selection, generated)
                 assert(#selection.definitions == 0 and #generated == 0)
               end,
@@ -181,9 +195,17 @@ class ModulePermissionsActivationTests(unittest.TestCase):
               end
             }
           end
+          package.loaded["research.science"] = nil
+          package.preload["research.science"] = function()
+            return {prepare=function(environment) assert(environment.raw==raw);return {raw=raw} end,
+              apply_family=function(rows, bindings, environment, context)
+                assert(environment.raw==raw and context.raw==raw)
+              end}
+          end
           package.preload["research.generator"] = function()
             return {install = function(prototypes, stage)
-              assert(#prototypes == 1 and prototypes[1].name == "stub" and stage == data)
+              assert(#prototypes == 2 and prototypes[1].name == "stub" and stage == data)
+              module_installed = prototypes
               installs = installs + 1
             end}
           end
@@ -197,6 +219,8 @@ class ModulePermissionsActivationTests(unittest.TestCase):
           assert(package.loaded["research.legacy_module_credit_definitions"] == nil,
             "absent authored module research imported its credit definitions")
         """)
+        installed = _plain(self.lua.globals().module_installed)
+        self.assertEqual(installed[1], expected_private_worker_row("automation-science-pack"))
 
     def test_raw_true_applies_published_permissions_without_changing_gear_emission(self):
         self.lua.execute(r"""
