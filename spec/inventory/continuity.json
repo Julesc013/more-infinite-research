@@ -17768,13 +17768,19 @@
             "e433b389547b39bdda4a9906d0bf16968a64dd52:projects/mir/runs/aero-candidate508-final-wording-correspondence-r01/source-correspondence.json",
             "47462900d564a351fee74b3fa58fc97bd642197a:projects/mir/runs/aero-candidate508-public-delivery-r01/review.json",
             "c0f27a131a6a5cd9e3db8cb5db9181975cbcb93e:projects/mir/runs/aero-public508-final-publisher-review-r01/review.json",
-            "spec/evidence/candidate510-aero-delivery-r01.json"
+            "spec/evidence/candidate510-aero-delivery-r01.json",
+            "spec/evidence/candidate511-aero-delivery-r01.json",
+            "spec/evidence/mir511-final-r04-package-independent-review-r01.json",
+            "spec/evidence/worker-storage511-post-r04-independent-native-result-review-r01.json",
+            "spec/evidence/mir511-beta-independent-final-verdict-r02.json",
+            "spec/evidence/candidate511-github-prerelease-delivery-r01.json",
+            "spec/evidence/candidate511-independent-verified-delivery-r01.json"
           ],
-          "remaining_executable_check": "Use published510 tag/source/package hashes and candidate510-aero-delivery-r01 for the actual delivered inventory. Keep all nine stable-edition native/save/client/support requirements and earlier historical/best-effort limits distinct; root/info/changelog/floor and download checks are not native qualification. Review consumed inputs for unresolved edition boundaries and qualify only the chosen stable candidate. Changed package contents require a new unpublished patch, not replacement510 bytes.",
+          "remaining_executable_check": "Use published11 tag085df7ef/player93d and candidate511-aero-delivery-r01 for current17-archive/two-checksum public identities and21 Aero local files. Keep all nine stable-edition native/save/client/support requirements and F018/early best-effort limits distinct. Root/info/changelog/floor and download checks do not qualify native behavior. Review consumed inputs for unresolved boundaries and qualify one chosen stable candidate. Preserve original510 evidence and published11 bytes; changed player contents require the next unpublished source patch.",
           "owner": "Aero; Black Glass freezes candidate",
           "independent_review": "Aero",
-          "status": "partial:510 public17edition package metadata/integrity and19asset/21local-file delivery independently accepted; edition-native/stable/support verdicts remain scoped and incomplete",
-          "readiness": "Published510 public package metadata/integrity and all19anonymous/21local-file delivery identities are independently read back. Native/support/maturity requirements remain per edition and scope; no package rebuild or whole native-campaign restart follows from this documentation update.",
+          "status": "partial:511 accepted17-package metadata/integrity and19anonymous downloads/21Aero local files verified; edition-native/support/stable verdicts remain incomplete",
+          "readiness": "Exact published11 downloads equal independently accepted final93d/r04 hashes, with17 CRCs and both checksum sets verified. Aero19 assets and upload text equal the canonical Black Glass primary bytes; BG raw notes and Aero rendered notes are exact projections of the same approved tag. Qualified-beta native/delivery reviews are adopted at named scopes; all nine edition-native/support/stable requirements and historical best-effort limits remain distinct.",
           "next_work_inputs": [
             "README.md",
             "docs/support.md",
@@ -17783,8 +17789,20 @@
             "spec/evidence/candidate506-github-prerelease-delivery-chain-r01.json",
             "spec/evidence/candidate507-github-prerelease-delivery-chain-r01.json",
             "spec/evidence/candidate510-aero-delivery-r01.json",
-            "spec/evidence/candidate510-affected-native-r01.json"
-          ]
+            "spec/evidence/candidate510-affected-native-r01.json",
+            "spec/evidence/candidate511-aero-delivery-r01.json",
+            "spec/evidence/mir511-final-r04-package-independent-review-r01.json",
+            "spec/evidence/worker-storage511-post-r04-independent-native-result-review-r01.json",
+            "spec/evidence/mir511-beta-independent-final-verdict-r02.json",
+            "spec/evidence/candidate511-github-prerelease-delivery-r01.json",
+            "spec/evidence/candidate511-independent-verified-delivery-r01.json"
+          ],
+          "previous_published510_checkpoint": {
+            "source": "073c1a666b5532056285de86eb3a35c272a84b1f:spec/inventory/continuity.json",
+            "remaining_executable_check": "Use published510 tag/source/package hashes and candidate510-aero-delivery-r01 for the actual delivered inventory. Keep all nine stable-edition native/save/client/support requirements and earlier historical/best-effort limits distinct; root/info/changelog/floor and download checks are not native qualification. Review consumed inputs for unresolved edition boundaries and qualify only the chosen stable candidate. Changed package contents require a new unpublished patch, not replacement510 bytes.",
+            "status": "partial:510 public17edition package metadata/integrity and19asset/21local-file delivery independently accepted; edition-native/stable/support verdicts remain scoped and incomplete",
+            "readiness": "Published510 public package metadata/integrity and all19anonymous/21local-file delivery identities are independently read back. Native/support/maturity requirements remain per edition and scope; no package rebuild or whole native-campaign restart follows from this documentation update."
+          }
         },
         {
           "subjects": [
@@ -17843,21 +17861,39 @@
             "4aa5243c8f78386dce13251ed5672868884d612d:projects/mir/runs/aero-public507-final-publisher-review-r01/review.json",
             "47462900d564a351fee74b3fa58fc97bd642197a:projects/mir/runs/aero-candidate508-public-delivery-r01/review.json",
             "c0f27a131a6a5cd9e3db8cb5db9181975cbcb93e:projects/mir/runs/aero-public508-final-publisher-review-r01/review.json",
-            "spec/evidence/candidate510-aero-delivery-r01.json"
+            "spec/evidence/candidate510-aero-delivery-r01.json",
+            "spec/evidence/candidate511-aero-delivery-r01.json",
+            "spec/evidence/mir511-final-r04-package-independent-review-r01.json",
+            "spec/evidence/worker-storage511-post-r04-independent-native-result-review-r01.json",
+            "spec/evidence/mir511-beta-independent-final-verdict-r02.json",
+            "spec/evidence/candidate511-github-prerelease-delivery-r01.json",
+            "spec/evidence/candidate511-independent-verified-delivery-r01.json"
           ],
-          "remaining_executable_check": "Black Glass has delivered510; Aero independently read back all19assets and21local delivery files. Continue the existing rows through one qualified stable candidate, independent review, exact-head CI and verified stable GitHub delivery. Reuse these published bytes only if every applicable stable gate qualifies them unchanged; changed player contents use the next unpublished patch. No new beta sequence, Portal action, routine resume approval or competing publication is required.",
+          "remaining_executable_check": "Canonical073c supplies the previously missing first-MIR/provider-present, unchanged Secretas510 and retired cap/enable native closures on exact93d, plus independent qualified-beta delivery. Adopt those named results without repeating the cases or relabeling scripted precursors as ordinary-paid work. Continue all remaining existing rows through one qualified stable candidate, independent GO, exact-head checks, fresh administration/distinct immutability probes and verified stable GitHub/primary delivery. Unchanged11 may qualify only after every applicable gate passes; changed player bytes require the next unpublished source patch.",
           "owner": "Black Glass; Aero independently verifies delivery",
           "independent_review": "Aero",
-          "status": "partial:510 checked hotfix delivery accepted and independently read back; stable candidate qualification/independent GO/delivery remain open",
-          "readiness": "Published510 prerelease delivery is complete in its scope. Finish remaining stable rows on one selected candidate, independent GO and required checks; only Black Glass owns the next stable GitHub publication and verified delivery.",
+          "status": "partial:511 qualified GitHub beta/delivery adopted and independently matched by Aero public19/local21; full stable candidate/independent GO/delivery remain open",
+          "readiness": "Canonical final beta/native and separate independent delivery reviews are present at published93d identities. Aero verified19 public downloads and21 local files; Black Glass primary asset bytes and approved notes projections correspond exactly. Black Glass retains sole integration/publication. A qualified beta does not waive any remaining stable requirement or fresh stable publication probes.",
           "next_work_inputs": [
             "spec/verification.md",
             "tools/commands/release/Test-MIRGitHubAdministration.ps1",
             "spec/evidence/candidate505-github-prerelease-delivery-chain-r01.json",
             "spec/evidence/candidate506-github-prerelease-delivery-chain-r01.json",
             "spec/evidence/candidate507-github-prerelease-delivery-chain-r01.json",
-            "spec/evidence/candidate510-aero-delivery-r01.json"
-          ]
+            "spec/evidence/candidate510-aero-delivery-r01.json",
+            "spec/evidence/candidate511-aero-delivery-r01.json",
+            "spec/evidence/mir511-final-r04-package-independent-review-r01.json",
+            "spec/evidence/worker-storage511-post-r04-independent-native-result-review-r01.json",
+            "spec/evidence/mir511-beta-independent-final-verdict-r02.json",
+            "spec/evidence/candidate511-github-prerelease-delivery-r01.json",
+            "spec/evidence/candidate511-independent-verified-delivery-r01.json"
+          ],
+          "previous_published510_checkpoint": {
+            "source": "073c1a666b5532056285de86eb3a35c272a84b1f:spec/inventory/continuity.json",
+            "remaining_executable_check": "Black Glass has delivered510; Aero independently read back all19assets and21local delivery files. Continue the existing rows through one qualified stable candidate, independent review, exact-head CI and verified stable GitHub delivery. Reuse these published bytes only if every applicable stable gate qualifies them unchanged; changed player contents use the next unpublished patch. No new beta sequence, Portal action, routine resume approval or competing publication is required.",
+            "status": "partial:510 checked hotfix delivery accepted and independently read back; stable candidate qualification/independent GO/delivery remain open",
+            "readiness": "Published510 prerelease delivery is complete in its scope. Finish remaining stable rows on one selected candidate, independent GO and required checks; only Black Glass owns the next stable GitHub publication and verified delivery."
+          }
         }
       ],
       "verdict": "NOT READY for stable: resolve Settings content-fit and remaining Library controls/layouts/locales/clients/import-export/personal/Discovery Tree, historical/profile/API/state and whole-product performance decisions. Published508 package and beta delivery, bounded normal navigation and the actual full export are accepted only in their recorded scopes;507 imported lifecycle remains its own prior evidence.",
