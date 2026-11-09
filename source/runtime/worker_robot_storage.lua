@@ -635,6 +635,11 @@ function M.on_research_event(event, finished)
   if not state or state.kind ~= "prepared" then return false end
   local record = state.forces[force.index]
   if not record then recover_error("research force has no prepared private history") end
+  if finished then
+    log(("[MIR_WORKER_EVENT_DIAGNOSTIC] force=%s research=%s tick=%s finished=%s by_script=%s")
+      :format(tostring(force.name):sub(1,128), tostring(event.research and event.research.name):sub(1,128),
+        tostring(game.tick), tostring(finished), tostring(event.by_script)))
+  end
   local frame = snapshot(force, recovery.id)
   local advanced = finished and event.research and event.research.name == recovery.id
   if frame.next_level ~= record.next_level + (advanced and 1 or 0)
