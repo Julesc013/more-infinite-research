@@ -235,6 +235,7 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
 
     def test_changed_cap_enable_contract_or_intervening_canonical_work_refuses(self):
         for opponent in ('history.configure(9,true)', 'history.configure(0,false)', 'player.technologies[CANONICAL].saved_progress=.1',
+                         'prototypes.technology[ID].research_unit_count_formula=nil;prototypes.technology[ID].research_unit_count=1;prototypes.technology[ID].research_unit_energy=60;prototypes.technology[ID].prerequisites={}',
                          'storage.mir_worker_storage_route.forces[1].next_level=7', 'player.technologies[ID].enabled=false'):
             with self.subTest(opponent=opponent):
                 self.setUp()

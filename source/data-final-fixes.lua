@@ -264,13 +264,8 @@ if prerequisite_target.id == "f200" or prerequisite_target.id == "f210" then
   end
   assert(definition, "MIR worker recovery default declaration is absent")
   local recovery_values = values
-  local default_emitted = false
-  for _, row in ipairs(technologies) do if row.name == recovery.canonical then default_emitted = true; break end end
-  -- A profile retaining its own native worker row is not a default recovery
-  -- destination. Do not import removed Base inputs merely to hold zero work.
-  local unavailable = not default_emitted and not (worker_storage and worker_storage.finite and #worker_storage.finite > 0)
-  if values.streams["worker-robots-storage"] == nil then
-    unavailable = true
+  local missing_stream = values.streams["worker-robots-storage"] == nil
+  if missing_stream then
     recovery_values = {}
     for key, value in pairs(values) do recovery_values[key] = value end
     recovery_values.streams = {}
@@ -278,6 +273,24 @@ if prerequisite_target.id == "f200" or prerequisite_target.id == "f210" then
     recovery_values.streams["worker-robots-storage"] = definition.defaults
   end
   local authored = require("research.modern").continuation(definition, recovery_values)
+  local default_emitted = false
+  for _, row in ipairs(technologies) do
+    if row.name == recovery.canonical then default_emitted = recovery.matches_default(row, authored); break end
+  end
+  local finite_available = worker_storage and worker_storage.finite and #worker_storage.finite > 0
+  if finite_available then
+    -- Only the finite route's available authored default inputs may support
+    -- old default work. No foreign unit/effect is a source for this holder.
+    for _, name in ipairs(authored.prerequisites) do
+      if not data.raw.technology[name] then finite_available = false; break end
+    end
+    for _, ingredient in ipairs(authored.unit.ingredients) do
+      if not (data.raw.tool and data.raw.tool[ingredient[1]]) then finite_available = false; break end
+    end
+  end
+  -- A same-name SE/overhaul row can have a different work contract; settings
+  -- identity or its mere emission does not establish an available default4.
+  local unavailable = missing_stream or not default_emitted and not finite_available
   local row = unavailable and recovery.uninvested(authored, gear.unit.ingredients[1][1]) or recovery.prototype(authored)
   technologies[#technologies + 1] = row
   if not unavailable then

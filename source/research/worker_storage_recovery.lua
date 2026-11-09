@@ -98,4 +98,29 @@ function M.fingerprint(prototype)
   return table.concat(out, "|")
 end
 
+-- Compare only the caller's detached owned emissions. The projection uses
+-- authored unit fields; it is not an observation of native saved research.
+local function emitted_contract(row)
+  assert(type(row) == "table" and row.name == M.canonical and type(row.unit) == "table")
+  local effects, ingredients, prerequisites = copy(row.effects), {}, {}
+  for _, effect in ipairs(effects) do if effect.hidden == nil then effect.hidden = false end end
+  for index, ingredient in ipairs(row.unit.ingredients) do
+    ingredients[index] = {name=ingredient[1], amount=ingredient[2]}
+  end
+  for _, name in ipairs(row.prerequisites or {}) do
+    assert(type(name) == "string" and prerequisites[name] == nil)
+    prerequisites[name] = {name=name}
+  end
+  return M.fingerprint({level=row.level, max_level=row.max_level == "infinite" and MAX or row.max_level,
+    effects=effects, research_unit_count_formula=row.unit.count_formula, research_unit_count=row.unit.count,
+    research_unit_energy=row.unit.time * 60, research_unit_ingredients=ingredients, prerequisites=prerequisites,
+    ignore_tech_cost_multiplier=row.ignore_tech_cost_multiplier == true})
+end
+
+function M.matches_default(emitted, authored)
+  local expected = emitted_contract(authored)
+  local ok, actual = pcall(emitted_contract, emitted)
+  return ok and actual == expected
+end
+
 return M

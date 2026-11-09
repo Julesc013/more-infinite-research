@@ -7,6 +7,7 @@ import sys
 import unittest
 
 import test_generator as scaffold
+from worker_storage_recovery_fixture import expected_private_worker_row
 
 ROOT = Path(__file__).resolve().parents[1]
 EDITIONS = json.loads((ROOT / "targets/editions.json").read_text())["targets"]
@@ -133,6 +134,19 @@ class WorkerStorageContinuationTests(unittest.TestCase):
         published = PUBLISHED_WORKER["published_technology"]
         self.assertEqual(published["prerequisites"], row["prerequisites"])
         self.assertEqual(published["unit"], row["unit"])
+
+    def test_finite_route_missing_default_input_keeps_only_an_uninvested_holder(self):
+        inputs = finite_chain(5)
+        lua = self.stage(inputs)
+        lua.execute('data.raw.technology["worker-robots-storage-2"]=nil')
+        self.pipeline(lua)
+        holder = scaffold.plain_lua(lua.globals().data.raw.technology["mir-worker-storage-preservation-4"])
+        wanted = expected_private_worker_row("automation-science-pack")
+        wanted["prerequisites"] = []  # This scaffold represents empty Lua arrays as lists.
+        self.assertEqual(holder, wanted)
+        self.assertEqual(1, lua.globals().data.writes)
+        for name, row in inputs.items():
+            self.assertEqual(row, scaffold.plain_lua(lua.globals().data.raw.technology[name]))
 
     def test_only_explicit_electromagnetic_addition_and_requested_policy_expand_science(self):
         cases = [({}, {}, False, SCIENCE),

@@ -199,7 +199,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
         lua = self.stage()
         emitted = _plain(lua.globals().emitted)
         complete = deepcopy(self.expected_complete_data)
-        complete["technology"]["mir-worker-storage-preservation-4"] = expected_private_worker_row()
+        complete["technology"]["mir-worker-storage-preservation-4"] = expected_private_worker_row("automation-science-pack")
         self.assertTrue(catalogue._same(complete, emitted),
                         f"complete native output: {catalogue._changed_paths(complete, emitted)}")
         expected = deepcopy(self.expected_data)
