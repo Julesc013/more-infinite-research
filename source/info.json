@@ -24,6 +24,7 @@
     "(?) space-exploration",
     "? space-age >= 2.1.23",
     "? space-is-fake",
-    "? crushing-industry"
+    "? crushing-industry",
+    "? planet-ferrum"
   ]
 }
