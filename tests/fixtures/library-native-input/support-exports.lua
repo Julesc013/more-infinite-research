@@ -10,6 +10,7 @@ function M.register(context)
   local current_508 = context.current_508==true
   local current_510 = context.current_510==true
   local current_511 = context.current_511==true
+  local current_512 = context.current_512==true
   local refs, loaded = {}, false
   local actions = {
     {"en-full","en","full"},{"en-compact","en","compact"},{"en-diagnostics","en","diagnostics"},
@@ -204,11 +205,11 @@ function M.register(context)
   remote.add_interface(context.interface,{report=report,prepare=prepare,check=check,checkpoint=checkpoint})
   script.on_init(function()
     local mods=script.active_mods
-    local tuple=mods.base=="2.0.77" and {mir=qualified_input and (current_511 and "5.0.20011" or (current_510 and "5.0.20010" or (current_508 and "5.0.20008" or "5.0.20007"))) or "5.0.20000",fixture="0.3.0"}
-      or (mods.base=="2.1.23" and {mir=qualified_input and (current_511 and "5.0.21011" or (current_510 and "5.0.21010" or (current_508 and "5.0.21008" or "5.0.21007"))) or "5.0.21000",fixture="0.4.0"})
+    local tuple=mods.base=="2.0.77" and {mir=qualified_input and (current_512 and "5.0.20012" or (current_511 and "5.0.20011" or (current_510 and "5.0.20010" or (current_508 and "5.0.20008" or "5.0.20007")))) or "5.0.20000",fixture="0.3.0"}
+      or (mods.base=="2.1.23" and {mir=qualified_input and (current_512 and "5.0.21012" or (current_511 and "5.0.21011" or (current_510 and "5.0.21010" or (current_508 and "5.0.21008" or "5.0.21007")))) or "5.0.21000",fixture="0.4.0"})
     if not tuple then fail("exact engine target differs") end
     local allowed={base=mods.base,["more-infinite-research"]=tuple.mir,
-      ["mir-fixture-mir5-active-mods-observer"]="0.1.0",[NAME]=qualified_input and (current_511 and "0.4.4" or (current_510 and "0.4.3" or (current_508 and "0.4.2" or "0.4.1"))) or "0.4.0"}
+      ["mir-fixture-mir5-active-mods-observer"]="0.1.0",[NAME]=qualified_input and (current_512 and "0.4.5" or (current_511 and "0.4.4" or (current_510 and "0.4.3" or (current_508 and "0.4.2" or "0.4.1")))) or "0.4.0"}
     if not qualified_input then allowed[context.historical_fixture]=tuple.fixture end
     for name,version in pairs(mods) do if allowed[name]~=version then fail("unexpected export observer closure") end end
     for name,version in pairs(allowed) do if mods[name]~=version then fail("missing export observer closure") end end
