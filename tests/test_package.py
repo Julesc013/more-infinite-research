@@ -150,6 +150,11 @@ class PackageTests(unittest.TestCase):
                         crushing_ordering = "? crushing-industry"
                         self.assertNotIn(crushing_ordering, dependencies[target])
                         expected_dependencies.append(crushing_ordering)
+                    # Ferrum adds robotics science to space-capable labs in
+                    # final-fixes. MIR's final lab policy must consume it.
+                    ferrum_ordering = "? planet-ferrum"
+                    self.assertNotIn(ferrum_ordering, dependencies[target])
+                    expected_dependencies.append(ferrum_ordering)
                 self.assertEqual(info["factorio_version"], family)
                 self.assertEqual(info["dependencies"], expected_dependencies)
                 self.assertEqual(info["dependencies"][0], "base >= " + minimum)

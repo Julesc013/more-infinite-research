@@ -259,6 +259,50 @@ class WorkerStorageContinuationTests(unittest.TestCase):
         self.assertIn("fixture-utility-owner", diagnostic)
         self.assertFalse(lua.globals().data.raw.technology["utility-science-pack"].enabled)
 
+    def test_ferrum_final_lab_inputs_precede_default_worker_science_selection(self):
+        # The full-Ferrum native counterexample ran MIR final-fixes first.
+        # Ferrum's later lab patch could not restore science already reduced
+        # out of MIR6. Only the explicit optional edge reverses those two
+        # known finalizers; this is not a general mod loader simulation.
+        native_science = [[name, 1] for name in (
+            "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+            "production-science-pack", "utility-science-pack", "ferrum-robotics-science-pack")]
+        expected = native_science + [["electromagnetic-science-pack", 1]]
+        for target, ferrum_version in (("f200", "0.0.5"), ("f210", "0.1.5")):
+            with self.subTest(target=target):
+                inputs = finite_chain(5)
+                for level, count in ((4, 675), (5, 1012)):
+                    row = inputs[f"worker-robots-storage-{level}"]
+                    row["unit"] = {"count": count, "time": 60,
+                                   "ingredients": deepcopy(native_science)}
+                    row["effects"] = [{"type": "worker-robot-storage", "modifier": 1}]
+                lua = self.stage(inputs, target, extra_mods={
+                    "space-age": EDITIONS[target]["minimum_base"], "planet-ferrum": ferrum_version})
+                lua.execute('''
+                  data.raw.item["ferrum-robotics-science-pack"]={type="item",name="ferrum-robotics-science-pack"}
+                  function ferrum_final_lab_patch()
+                    for _,lab in pairs(data.raw.lab)do
+                      for _,input in ipairs(lab.inputs)do
+                        if input=="space-science-pack"then
+                          lab.inputs[#lab.inputs+1]="ferrum-robotics-science-pack";break
+                        end
+                      end
+                    end
+                  end
+                ''')
+                dependencies = (EDITIONS[target]["optional_dependencies"] if target == "f200"
+                    else json.loads((ROOT / "source/info.json").read_text())["dependencies"])
+                after_ferrum = "? planet-ferrum" in dependencies
+                if after_ferrum:
+                    lua.execute("ferrum_final_lab_patch()")
+                self.pipeline(lua)
+                if not after_ferrum:
+                    lua.execute("ferrum_final_lab_patch()")
+                row = scaffold.plain_lua(lua.globals().data.raw.technology["worker-robots-storage-6"])
+                self.assertEqual(expected, row["unit"]["ingredients"])
+                for name, original in inputs.items():
+                    self.assertEqual(original, scaffold.plain_lua(lua.globals().data.raw.technology[name]))
+
     def test_ranged_finite_tail_continues_after_its_real_last_level(self):
         inputs = finite_chain(5)
         inputs["worker-robots-storage-5"]["max_level"] = 9

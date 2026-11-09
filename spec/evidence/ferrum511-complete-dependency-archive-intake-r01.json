@@ -1,0 +1,93 @@
+{
+  "kind": "Ferrum511OfficialDependencyArchiveIntakeV1",
+  "verified_at_utc": "2026-11-09T12:03:07.342134+00:00",
+  "download_root": "E:\\Downloads",
+  "rows": [
+    {
+      "source": "E:\\Downloads\\PlanetsLib_1.18.0.zip",
+      "destination": "D:\\Projects\\Factorio\\testmods\\2.0\\PlanetsLib_1.18.0.zip",
+      "bytes": 1134873,
+      "sha256": "1CD7E398FD6CB3D1564FEA923B108EE8D1F9E5A7FD26569C65B66F48A341FBA5",
+      "official_portal_sha1": "6b4de4b2e5e419dbb0d6596d9c3d0b22cab15ccd",
+      "factorio_version": "2.0",
+      "info_version": "1.18.0",
+      "dependencies": [
+        "base >= 2.0.72",
+        "? space-age >= 2.0.72",
+        "? PlanetsLibTiers",
+        "(?) Cosmic-Social-Distancing >= 1.0.2",
+        "! MT-lib"
+      ],
+      "crc_all_members": true,
+      "original_retained": true,
+      "action": "existing-byte-identical",
+      "metadata_source": "https://mods.factorio.com/api/mods/PlanetsLib/full"
+    },
+    {
+      "source": "E:\\Downloads\\PlanetsLib_2.4.0.zip",
+      "destination": "D:\\Projects\\Factorio\\testmods\\2.1\\PlanetsLib_2.4.0.zip",
+      "bytes": 1018057,
+      "sha256": "68CF46F019A8F2CD21FE4B534129DF17D910E67FD2781DFDB7A94D129C04F618",
+      "official_portal_sha1": "00ca2817d24fef3e7f5a3ce4bdab316de70ed225",
+      "factorio_version": "2.1",
+      "info_version": "2.4.0",
+      "dependencies": [
+        "base >= 2.1.22",
+        "? space-age >= 2.1.7",
+        "? quality >= 2.1.7",
+        "? recycler >= 2.1.7",
+        "? PlanetsLibTiers",
+        "(?) Cosmic-Social-Distancing >= 1.0.2",
+        "! MT-lib"
+      ],
+      "crc_all_members": true,
+      "original_retained": true,
+      "action": "copied",
+      "metadata_source": "https://mods.factorio.com/api/mods/PlanetsLib/full"
+    },
+    {
+      "source": "E:\\Downloads\\spider-launcher_2.9.86.zip",
+      "destination": "D:\\Projects\\Factorio\\testmods\\2.0\\spider-launcher_2.9.86.zip",
+      "bytes": 8990308,
+      "sha256": "6B00C8BD030265E0767A731622663DE19C4A15FF3FE730CFF9F7826C1E57B4D2",
+      "official_portal_sha1": "59f947797b420ecbae66e525730c6e15e6433de5",
+      "factorio_version": "2.0",
+      "info_version": "2.9.86",
+      "dependencies": [
+        "base >= 2.0.43",
+        "? space-age",
+        "? space-exploration",
+        "? maraxsis",
+        "? ceelos-vehicle-tweaks"
+      ],
+      "crc_all_members": true,
+      "original_retained": true,
+      "action": "copied",
+      "metadata_source": "https://mods.factorio.com/api/mods/spider-launcher/full"
+    },
+    {
+      "source": "E:\\Downloads\\spider-launcher_2.9.87.zip",
+      "destination": "D:\\Projects\\Factorio\\testmods\\2.1\\spider-launcher_2.9.87.zip",
+      "bytes": 9011457,
+      "sha256": "25E1235F77986E17E03DBFF7D73CB96F6DFE83223A0F98F5AD3E12BCE01FCA3D",
+      "official_portal_sha1": "d009324764a0ac0c0e9345f335c7053bff6b7fab",
+      "factorio_version": "2.1",
+      "info_version": "2.9.87",
+      "dependencies": [
+        "base >= 2.0.43",
+        "? space-age",
+        "? space-exploration",
+        "? maraxsis",
+        "? ceelos-vehicle-tweaks"
+      ],
+      "crc_all_members": true,
+      "original_retained": true,
+      "action": "copied",
+      "metadata_source": "https://mods.factorio.com/api/mods/spider-launcher/full"
+    }
+  ],
+  "all_official_sha1_and_crc_passed": true,
+  "library_controls_changed": false,
+  "native_execution": false,
+  "remaining": "Previously missing fullFerrum input archives are now present; actual dependency-valid profile/research/state qualification still required against fixed published511."
+}
