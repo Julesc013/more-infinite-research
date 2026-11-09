@@ -445,7 +445,13 @@ end
 -- do not allocate history, inspect the whole force, or guess the old mask.
 local function unknown_paid_mask(event, force, observation, queued, current)
   local function value(item)
-    if type(item) == "string" then return item:gsub("[%z\1-\31\127]", " "):sub(1, 96) end
+    if type(item) == "string" then
+      -- Escape bounded raw bytes so control characters and a split UTF8
+      -- sequence cannot make the copied, single-line context unprintable.
+      return (item:sub(1, 96):gsub("[%z\1-\31\127-\255]", function(byte)
+        return string.format("\\x%02X", string.byte(byte))
+      end))
+    end
     if type(item) == "number" or type(item) == "boolean" then return tostring(item) end
     return "unknown"
   end
@@ -562,20 +568,40 @@ local function legacy_family_context(event)
     m4_base = admitted and data_only_mask == nil
     data_only_base = admitted and data_only_mask or nil
   end
-  -- Only the reviewed plain Base closure is admitted here. Other profiles,
-  -- provider changes and startup changes still require their own old mask.
-  local beta_base = same_inputs and type(active.base) == "string" and (
+  local beta_origin = type(active.base) == "string" and (
     active.base:match("^2%.0%.%d+$") and (old == "5.0.20000" or old == "5.0.20001" or old == "5.0.20002")
     or active.base:match("^2%.1%.%d+$") and (old == "5.0.21000" or old == "5.0.21001" or old == "5.0.21002"))
   -- The frozen pre-correction5.0.3 also has the broad sulfur binding. Valid
   -- corrected saves already have the named record and never use this reader.
-  local beta_unchanged = beta_base or same_inputs and type(active.base) == "string" and (
+  local beta_unchanged = same_inputs and (beta_origin or type(active.base) == "string" and (
     active.base:match("^2%.0%.%d+$") and old == "5.0.20003"
-    or active.base:match("^2%.1%.%d+$") and old == "5.0.21003")
-  if beta_base then
-    for name in pairs(active) do if name ~= "base" and name ~= MIR_MOD then beta_base = false end end
+    or active.base:match("^2%.1%.%d+$") and old == "5.0.21003"))
+  -- The event can also prove that the OLD closure was plain Base: every
+  -- extra active mod must be newly added, with no removed/updated provider.
+  -- This uses the published old mask even if a new provider makes today's
+  -- main private; today's effects never establish its previous paid rights.
+  local beta_added_base = valid and beta_origin and event.mod_startup_settings_changed == false and not plain_base
+    and (f200_destination and active.base:match("^2%.0%.") or f210_destination and active.base:match("^2%.1%."))
+  if beta_added_base then
+    for name, version in pairs(active) do
+      if name ~= "base" and name ~= MIR_MOD then
+        local change = changes[name]
+        if type(change) ~= "table" or change.old_version ~= nil or change.new_version ~= version then
+          beta_added_base = false
+        end
+      end
+    end
+    for name, change in pairs(changes) do
+      if name ~= MIR_MOD then
+        if type(change) ~= "table" or change.new_version ~= active[name] or active[name] == nil
+            or (name == "base" and change.old_version ~= active.base
+              or name ~= "base" and change.old_version ~= nil) then beta_added_base = false end
+      end
+    end
   end
+  local beta_base = beta_origin and (same_inputs and plain_base or beta_added_base)
   return {beta_base=beta_base, beta_unchanged=beta_unchanged, m4_base=m4_base,
+    beta_added_base=beta_added_base,
     data_only_base=data_only_base, base_paid_recipes=data_only_base or m4_base and m4_mask
       or beta_base and PUBLISHED_BASE_RECIPES,
     sif502=old == "5.0.20002" and previous_sif,
@@ -743,7 +769,7 @@ function M.preflight_family_transition(event, fresh, selected_force)
               complete_sif_checked = true
             end
             prior_included = SIF_RECIPES[family][descriptor.recipe] == true
-          elseif context.base_paid_recipes and not observation.private then
+          elseif context.base_paid_recipes and (not observation.private or context.beta_added_base) then
             if not complete_base_checked then
               for old_family, recipes in pairs(context.base_paid_recipes) do
                 if force.technologies[FAMILY_IDS[old_family]] == nil then family_failure("missing published Base paid identity") end
