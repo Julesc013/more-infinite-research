@@ -8,7 +8,7 @@ lab.inputs = {"automation-science-pack", "logistic-science-pack", "chemical-scie
   "production-science-pack", "utility-science-pack", "space-science-pack", "electromagnetic-science-pack"}
 local rows = {lab}
 for _, name in ipairs({"mir-ferrum-sentinel", "mir-ferrum-detached", "mir-ferrum-count-control-6"}) do
-  rows[#rows + 1] = {type = "technology", name = name, icon = "__base__/graphics/technology/automation.png",
+  rows[#rows + 1] = {type = "technology", name = name, icon = "__base__/graphics/technology/automation-1.png",
     icon_size = 256, effects = {}, prerequisites = {},
     enabled = name ~= "mir-ferrum-count-control-6", hidden = name == "mir-ferrum-count-control-6",
     unit = {count = 1000, time = 60, ingredients = {{"automation-science-pack", 1}}}}

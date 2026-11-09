@@ -317,6 +317,18 @@ class FerrumWorkerStorageNativeControls(unittest.TestCase):
                 f"planet-ferrum = {ferrum}", f"? more-infinite-research = {mir}"])
         self.assertFalse((FIXTURE / "lab-source/control.lua").exists())
 
+    def test_test_owned_icons_match_the_actual_modern_Base_asset(self):
+        self.lua.globals().lab_data_path = (FIXTURE / "lab-source/data.lua").as_posix()
+        icons = plain(self.lua.execute('''
+          local function clone(v)if type(v)~="table"then return v end;local r={};for k,x in pairs(v)do r[k]=clone(x)end;return r end
+          local rows;local env={table={deepcopy=clone},data={raw={lab={lab={name="lab",inputs={"automation-science-pack"}}}},extend=function(_,v)rows=v end}}
+          setmetatable(env,{__index=_G});assert(loadfile(lab_data_path,"t",env))()
+          local out={};for _,row in ipairs(rows)do if row.type=="technology"then out[#out+1]={row.icon,row.icon_size}end end;return out
+        '''))
+        # Independently observed on both pinned read-data trees: automation.png
+        # is absent; automation-1.png is the Base256px icon (480x256 mipmap strip).
+        self.assertEqual(icons, [["__base__/graphics/technology/automation-1.png", 256]] * 3)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
