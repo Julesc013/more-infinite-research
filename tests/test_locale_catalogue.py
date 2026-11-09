@@ -661,6 +661,23 @@ class LocaleCatalogueTests(unittest.TestCase):
         # translation of "worker robot" or a new gameplay identity.
         self.assertIn("Arbeitsroboter-Geschwindigkeit", german.get(keys[0], ""))
 
+    def test_german_queue_guidance_preserves_native_queue_authority(self) -> None:
+        # RUN-04 and the English guidance: queue actions belong to the native
+        # Technology screen. R07's German caption omitted that boundary.
+        browser = parse_cfg(LOCALE_ROOT / "de" / "mir-library.cfg")["mir-browser"]
+        guidance = browser["native-queue-guidance"]
+        with self.subTest(case="native-screen-actions"):
+            for term in ("Technologiefenster", "einreihen", "neu ordnen", "abbrechen"):
+                self.assertIn(term, guidance)
+        with self.subTest(case="read-only-library"):
+            self.assertRegex(guidance, r"Bibliothek.*ändert.*Forschungswarteschlange.*nicht")
+        # Native Core 2.1.23 translates force as Partei; this heading is in
+        # the shared CFG rather than the separate Library CFG.
+        common = parse_cfg(LOCALE_ROOT / "de" / "more-infinite-research.cfg")["mir-browser"]
+        with self.subTest(case="native-force-term"):
+            self.assertIn("Partei", common["queue"])
+            self.assertNotIn("Force", common["queue"])
+
     def test_source_reference_coverage_is_finite_and_explicit(self) -> None:
         expected = {
             f"{section}.{key}"
