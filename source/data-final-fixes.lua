@@ -285,7 +285,11 @@ if prerequisite_target.id == "f200" or prerequisite_target.id == "f210" then
       if not data.raw.technology[name] then finite_available = false; break end
     end
     for _, ingredient in ipairs(authored.unit.ingredients) do
-      if not (data.raw.tool and data.raw.tool[ingredient[1]]) then finite_available = false; break end
+      -- Factorio2.0 science packs are tools; Factorio2.1 uses ordinary items.
+      local name = ingredient[1]
+      if not ((data.raw.tool and data.raw.tool[name]) or (data.raw.item and data.raw.item[name])) then
+        finite_available = false; break
+      end
     end
   end
   -- A same-name SE/overhaul row can have a different work contract; settings
