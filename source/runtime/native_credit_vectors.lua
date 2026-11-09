@@ -33,7 +33,8 @@ function M.pair(positive, negative, anchor, reference, change, native_matches, o
     if coefficient<=0 or p[recipe]==nil or n[recipe]==nil then return nil end
     basis[recipe]=coefficient/r[anchor]
     local expected=change*basis[recipe]
-    if not native_matches(p[recipe],expected) or not opposite_matches(n[recipe],-p[recipe]) then return nil end
+    if not native_matches(p[recipe],expected) or p[recipe]==0 and n[recipe]~=0
+        or not opposite_matches(n[recipe],-p[recipe]) then return nil end
   end
   return p, basis
 end

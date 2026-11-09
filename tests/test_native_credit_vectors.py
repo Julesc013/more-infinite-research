@@ -328,6 +328,19 @@ class NativeCreditVectorTests(unittest.TestCase):
           assert(not ok and tostring(message):find('inconsistent expanded main',1,true)and row.offset==prior)
         ''')
 
+    def test_quantized_zero_vector_keeps_exact_zero_negative_components(self):
+        self.lua.execute(r'''
+          local f,d=vector_world(2,false,'f200',.0001)
+          for _,id in ipairs({d.positive_id,d.negative_id})do
+            for _,e in ipairs(f.technologies[id].prototype.effects)do e.change=0 end
+          end
+          f.technologies[d.negative_id].prototype.effects[2].change=1e-9
+          local ok=pcall(native_credits.on_init);assert(not ok);assert_no_vector_writes()
+          f.technologies[d.negative_id].prototype.effects[2].change=0
+          native_credits.on_init()
+          assert(record(f,d.family,d.recipe).basis['synthetic-recycling-2']==1)
+        ''')
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
