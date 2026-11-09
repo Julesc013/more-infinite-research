@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-library-render-capture",
+  "version": "0.1.2",
+  "title": "MIR Library render-only capture fixture",
+  "author": "MIR maintainers",
+  "factorio_version": "2.0",
+  "dependencies": ["base = 2.0.77", "~ more-infinite-research = 5.0.20012"]
+}

@@ -15,9 +15,13 @@ class LibraryRenderCaptureTests(unittest.TestCase):
         self.lua.globals().actor_path = (FIXTURE / "control.lua").as_posix()
         self.lua.execute(r'''
           local tick_callback
+          handlers={}
+          defines={controllers={cutscene=6}}
           storage={}
           script={active_mods={base="2.1.23",["more-infinite-research"]="5.0.21012"},
-            on_nth_tick=function(n,fn) assert(n==30);tick_callback=fn end}
+            on_nth_tick=function(n,fn) assert(n==30);tick_callback=fn end,
+            on_init=function(fn) handlers.init=fn end,
+            on_configuration_changed=function(fn) handlers.configuration=fn end}
           local tech={name="worker-robots-storage-4",level=4,researched=false,enabled=true}
           local force={technologies={[tech.name]=tech},recipes={iron={enabled=true}},
             research_queue={},research_progress=0,worker_robots_storage_bonus=0}
@@ -25,7 +29,7 @@ class LibraryRenderCaptureTests(unittest.TestCase):
           local root={valid=true,mir_library_tabs=tabs,location={x=20,y=30},
             style={minimal_width=1100,maximal_width=1100,maximal_height=800},
             get_mod=function() return "more-infinite-research" end}
-          player={valid=true,connected=true,index=1,locale="en",force=force,
+          player={valid=true,connected=true,index=1,locale="en",force=force,controller_type=1,
             display_scale=1.25,display_resolution={width=1920,height=1080},
             gui={screen={mir_research_browser=root}}}
           screenshots,writes,calls,flushes={}, {}, {},0
@@ -36,8 +40,15 @@ class LibraryRenderCaptureTests(unittest.TestCase):
               screenshots[#screenshots+1]={args=args,tick=game.tick}
             end,set_wait_for_screenshots_to_finish=function() flushes=flushes+1 end}
           setmetatable(game,{__index=function(_,key) error("undeclared LuaGameScript member: "..key) end})
-          remote={interfaces={["more-infinite-research-browser"]={open=true}},
+          intro_sets,intro_flag=0,nil
+          remote={interfaces={["more-infinite-research-browser"]={open=true},
+            freeplay={get_skip_intro=true,set_skip_intro=true}},
             call=function(interface,method,index,options)
+              if interface=="freeplay" then
+                if method=="get_skip_intro" then return intro_flag end
+                assert(method=="set_skip_intro" and index==true)
+                intro_sets=intro_sets+1;intro_flag=true;return
+              end
               assert(interface=="more-infinite-research-browser" and method=="open" and index==1)
               if #screenshots>0 then assert(game.tick-screenshots[#screenshots].tick>=60) end
               calls[#calls+1]=options
@@ -50,6 +61,7 @@ class LibraryRenderCaptureTests(unittest.TestCase):
             end}
           log=function() end
           dofile(actor_path)
+          handlers.init()
           function step(n) for i=1,n do game.tick=game.tick+30;tick_callback() end end
           function run() step(100) end
         ''')
@@ -73,6 +85,37 @@ class LibraryRenderCaptureTests(unittest.TestCase):
 
     def test_german_uses_actual_locale_and_separate_output(self):
         self.lua.execute('player.locale="de";run();assert(writes["mir-library-render/de/complete.json"])')
+
+    def test_both_exact_modern_tuples_complete_the_same_render_sequence(self):
+        for engine, package in [("2.0.77", "5.0.20012"), ("2.1.23", "5.0.21012")]:
+            with self.subTest(engine=engine, package=package):
+                self.setUp()
+                self.lua.globals().engine = engine
+                self.lua.globals().package = package
+                self.lua.execute(r'''
+                  script.active_mods.base=engine
+                  script.active_mods["more-infinite-research"]=package
+                  run()
+                  assert(#calls==7 and #screenshots==7 and flushes==1)
+                  local report=writes["mir-library-render/en/complete.json"]
+                  assert(report and report.native_snapshot_unchanged)
+                  assert(report.scenario_setup.original_flag_unset and intro_flag==true)
+                ''')
+
+    def test_cross_edition_missing_and_unqualified_tuples_refuse(self):
+        for engine, package in [("2.0.77", "5.0.21012"), ("2.1.23", "5.0.20012"),
+                                ("2.0.77", "5.0.20011"), ("2.0.77", "5.0.20013"),
+                                ("2.1.23", "5.0.21013"), ("2.0.76", "5.0.20012"),
+                                ("2.1.24", "5.0.21012"), ("2.0.77", None), (None, None)]:
+            with self.subTest(engine=engine, package=package):
+                self.setUp()
+                self.lua.globals().engine = engine
+                self.lua.globals().package = package
+                self.lua.execute('script.active_mods.base=engine;script.active_mods["more-infinite-research"]=package')
+                with self.assertRaisesRegex(Exception, "exact engine/package"):
+                    self.lua.execute('step(1)')
+                self.assertEqual(self.lua.eval('#calls'), 0)
+                self.assertEqual(self.lua.eval('#screenshots'), 0)
 
     def test_exact_engine_and_package_are_required(self):
         for opponent in ['script.active_mods.base="2.1.24"',
@@ -135,6 +178,46 @@ class LibraryRenderCaptureTests(unittest.TestCase):
           local count=#calls;run();assert(#calls==count and #screenshots==7 and flushes==1)
         ''')
 
+    def test_public_freeplay_setup_prevents_intro_modal_without_input_or_save(self):
+        self.lua.execute(r'''
+          assert(intro_sets==1 and intro_flag==true)
+          assert(storage.mir_render_setup.original_flag_unset and not storage.mir_render_setup.original_skip_intro)
+          assert(storage.mir_render_setup.saved_to_original==false)
+          handlers.configuration()
+          assert(intro_sets==2 and storage.mir_render_setup.original_flag_unset)
+          run()
+          assert(writes["mir-library-render/en/complete.json"].scenario_setup==storage.mir_render_setup)
+        ''')
+        self.setUp()
+        self.lua.execute('remote.interfaces.freeplay=nil')
+        with self.assertRaisesRegex(Exception, "freeplay setup interface absent"):
+            self.lua.execute('handlers.configuration()')
+
+    def test_unsuppressed_750_tick_base_intro_stalls_after_two_captures(self):
+        # Independent installed Base cutscene:450 transition+150 wait+150 transition,
+        # then show_message_dialog pauses ticks unless freeplay.skip_intro is set.
+        modal_model = r'''
+          local advance=step
+          function step(n)
+            for i=1,n do
+              if game.tick<750 or intro_flag then advance(1) end
+            end
+          end
+        '''
+        self.lua.execute(modal_model + 'intro_flag=nil;run();assert(#screenshots==2);assert(writes["mir-library-render/en/complete.json"]==nil)')
+        self.setUp()
+        self.lua.execute(modal_model + 'run();assert(#screenshots==7);assert(writes["mir-library-render/en/complete.json"])')
+
+    def test_initial_cutscene_finishes_naturally_before_any_library_open(self):
+        self.lua.execute(r'''
+          player.controller_type=defines.controllers.cutscene
+          step(30)
+          assert(storage.mir_render_capture==nil and #calls==0 and #screenshots==0)
+          player.controller_type=1
+          run()
+          assert(#screenshots==7 and writes["mir-library-render/en/complete.json"])
+        ''')
+
     def test_locale_may_settle_before_first_render_but_not_during_sequence(self):
         self.lua.execute('step(1);player.locale="de";run();assert(writes["mir-library-render/de/complete.json"])')
         self.setUp()
@@ -149,6 +232,19 @@ class LibraryRenderCaptureTests(unittest.TestCase):
         for forbidden in ["remote.add_interface", "raise_event", "require(", "server_save", "auto_save",
                           "research_queue =", ".researched =", ".level =", "root.style.width ="]:
             self.assertNotIn(forbidden, code)
+
+    def test_f200_metadata_is_a_distinct_exact_binding_for_the_shared_actor(self):
+        info = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
+        self.assertEqual(info, {
+            "name": "mir-fixture-library-render-capture",
+            "version": "0.1.2",
+            "title": "MIR Library render-only capture fixture",
+            "author": "MIR maintainers",
+            "factorio_version": "2.0",
+            "dependencies": ["base = 2.0.77", "~ more-infinite-research = 5.0.20012"],
+        })
+        f210 = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
+        self.assertEqual(f210["version"], "0.1.1")
 
 
 if __name__ == "__main__":
