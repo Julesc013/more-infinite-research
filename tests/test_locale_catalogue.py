@@ -225,6 +225,12 @@ ACCEPTED_POST_B6_CORRECTIONS = {
         ),
     },
     'de': {
+        # R07 visual review: use the native 2.1.23 Space Age item/recipe noun
+        # "Rakete fuer Gefangennahme" while retaining the original B6 literal.
+        'technology-name.more-infinite-research.research_capture_robot_rockets': (
+            'Produktivität von Raketen für Gefangennahme',
+            'Erfassen Sie die Produktivität von Bot-Raketen',
+        ),
         'technology-description.more-infinite-research.direct_effect': (
             "Fügt einen unendlich wiederholbaren Bonus hinzu.", "Fügt einen unendlich wiederholbaren Bonus hinzu. Wissenschaftspakete werden aus aktiven Laboren ausgewählt, damit die Technologie mit kompatiblen Mod-Sätzen erforschbar bleibt.",
         ),
@@ -629,6 +635,31 @@ class LocaleCatalogueTests(unittest.TestCase):
                     self.assertTrue(value.strip(), f"missing {section}.{key}")
                     arguments = set(re.findall(r"__(\d+)__", value))
                     self.assertEqual(arguments, {"1"} if key in NATIVE_SETTING_KEYS else set())
+
+    def test_german_visible_option_is_shorter_and_startup_names_are_translated(self) -> None:
+        # Actual R07 German images exposed the overlong Show option and six
+        # missing startup names. Native rendered fit remains a separate check.
+        browser = parse_cfg(LOCALE_ROOT / "de" / "mir-library.cfg")["mir-browser"]
+        with self.subTest(case="shorter-visibility-option"):
+            self.assertLess(len(browser["visibility-normal"]), len("Forschung in diesem Spiel"))
+            self.assertIn("Spiel", browser["visibility-normal"])
+        german = parse_cfg(LOCALE_ROOT / "de" / "more-infinite-research.cfg")["mod-setting-name"]
+        english = parse_cfg(LOCALE_ROOT / "en" / "more-infinite-research.cfg")["mod-setting-name"]
+        keys = (
+            "mir-max-level-worker-robots-speed", "mir-adjust-vanilla-weapon-speed-techs",
+            "mir-automatic-compiler-mode", "mir-automatic-create-research",
+            "mir-automatic-require-reviewed-data", "mir-compiler-profile",
+        )
+        tags = r"\[(?:/?font|/?color)(?:=[^\]]+)?\]"
+        for key in keys:
+            with self.subTest(key=key):
+                self.assertIn(key, german)
+                self.assertNotEqual(german[key], english[key])
+                self.assertEqual(re.findall(tags, german[key]), re.findall(tags, english[key]))
+                self.assertEqual(re.findall(r"__\d+__", german[key]), re.findall(r"__\d+__", english[key]))
+        # Base 2.1.23's technology-name.worker-robots-speed, not a literal
+        # translation of "worker robot" or a new gameplay identity.
+        self.assertIn("Arbeitsroboter-Geschwindigkeit", german.get(keys[0], ""))
 
     def test_source_reference_coverage_is_finite_and_explicit(self) -> None:
         expected = {
