@@ -1,0 +1,19 @@
+{
+  "kind": "Fetched-exact-D-render-and-adverse-custody-readback",
+  "commit": "a63d75e665dc9ee615508fa2572bf1d4616b3d64",
+  "rows": [
+    {
+      "folder": "evidence/library512-polish-d-r09-partial-adverse/",
+      "index_sha256": "A4A98A035C60F28D0E3A8523F5A4301022C3E95D4D27B5ECD70C48950DB100BB",
+      "payloads": 25,
+      "bytes": 12213031
+    },
+    {
+      "folder": "evidence/library512-polish-d-r10-union-actual/",
+      "index_sha256": "392E89409011B57AF7A1DCC39B38B507BFD23D3B933597A9C46A59CEB8ABDF2F",
+      "payloads": 144,
+      "bytes": 80298229
+    }
+  ],
+  "scope": "Original render and controller files only; no new engine or interaction acceptance."
+}
