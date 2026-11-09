@@ -2,9 +2,10 @@
 -- Helper-free inputs carry the same immutable test catalogue locally; they do
 -- not activate the obsolete migration controller. Older protocols keep theirs.
 local INPUT_OBSERVER = script.active_mods["mir-fixture-mir5-library-native-input"]
+local CURRENT_511 = INPUT_OBSERVER=="0.3.9" or INPUT_OBSERVER=="0.4.4"
 local CURRENT_510 = INPUT_OBSERVER=="0.3.8" or INPUT_OBSERVER=="0.4.3"
 local CURRENT_509 = INPUT_OBSERVER=="0.3.7"
-local HELPER_FREE_INPUT = INPUT_OBSERVER=="0.3.5" or INPUT_OBSERVER=="0.4.1" or INPUT_OBSERVER=="0.3.6" or INPUT_OBSERVER=="0.4.2" or CURRENT_509 or CURRENT_510
+local HELPER_FREE_INPUT = INPUT_OBSERVER=="0.3.5" or INPUT_OBSERVER=="0.4.1" or INPUT_OBSERVER=="0.3.6" or INPUT_OBSERVER=="0.4.2" or CURRENT_509 or CURRENT_510 or CURRENT_511
 local historical = HELPER_FREE_INPUT and require("catalogue")
   or require("__mir-fixture-mir5-migration-origin-f200-110-source__/catalogue")
 local KEY, INTERFACE = "mir5_library_native_input", "mir5-library-native-input"
@@ -13,17 +14,17 @@ local ROOT, FILTERS, QUERY = "mir_research_browser", "mir_library_filters", "mir
 local OTHER, OTHER_QUERY = "mir5_input_other", "mir5_input_other_query"
 local CURRENT_508 = INPUT_OBSERVER=="0.3.6" or INPUT_OBSERVER=="0.4.2"
 -- The authored Research page hierarchy introduced in8 is retained in9.
-local CURRENT_LAYOUT = CURRENT_508 or CURRENT_509 or CURRENT_510
+local CURRENT_LAYOUT = CURRENT_508 or CURRENT_509 or CURRENT_510 or CURRENT_511
 local DEFER_IMPORTED_BASELINE = (INPUT_OBSERVER=="0.3.4" or HELPER_FREE_INPUT) and
-  (script.active_mods["more-infinite-research"]=="5.0.20007" or script.active_mods["more-infinite-research"]=="5.0.21007" or (CURRENT_508 and (script.active_mods["more-infinite-research"]=="5.0.20008" or script.active_mods["more-infinite-research"]=="5.0.21008")) or (CURRENT_509 and (script.active_mods["more-infinite-research"]=="5.0.20009" or script.active_mods["more-infinite-research"]=="5.0.21009")) or (CURRENT_510 and (script.active_mods["more-infinite-research"]=="5.0.20010" or script.active_mods["more-infinite-research"]=="5.0.21010")))
+  (script.active_mods["more-infinite-research"]=="5.0.20007" or script.active_mods["more-infinite-research"]=="5.0.21007" or (CURRENT_508 and (script.active_mods["more-infinite-research"]=="5.0.20008" or script.active_mods["more-infinite-research"]=="5.0.21008")) or (CURRENT_509 and (script.active_mods["more-infinite-research"]=="5.0.20009" or script.active_mods["more-infinite-research"]=="5.0.21009")) or (CURRENT_510 and (script.active_mods["more-infinite-research"]=="5.0.20010" or script.active_mods["more-infinite-research"]=="5.0.21010")) or (CURRENT_511 and (script.active_mods["more-infinite-research"]=="5.0.20011" or script.active_mods["more-infinite-research"]=="5.0.21011")))
 local ALLOW_REMOVED_INDEX_REUSE = (INPUT_OBSERVER=="0.3.3" and (
   (script.active_mods.base=="2.0.77" and script.active_mods["more-infinite-research"]=="5.0.20001")
   or (script.active_mods.base=="2.1.23" and script.active_mods["more-infinite-research"]=="5.0.21001")))
   or ((INPUT_OBSERVER=="0.3.4" or HELPER_FREE_INPUT) and (
     (script.active_mods.base=="2.0.77" and (script.active_mods["more-infinite-research"]=="5.0.20001"
-      or script.active_mods["more-infinite-research"]=="5.0.20007" or (CURRENT_508 and script.active_mods["more-infinite-research"]=="5.0.20008") or (CURRENT_509 and script.active_mods["more-infinite-research"]=="5.0.20009") or (CURRENT_510 and script.active_mods["more-infinite-research"]=="5.0.20010")))
+      or script.active_mods["more-infinite-research"]=="5.0.20007" or (CURRENT_508 and script.active_mods["more-infinite-research"]=="5.0.20008") or (CURRENT_509 and script.active_mods["more-infinite-research"]=="5.0.20009") or (CURRENT_510 and script.active_mods["more-infinite-research"]=="5.0.20010") or (CURRENT_511 and script.active_mods["more-infinite-research"]=="5.0.20011")))
     or (script.active_mods.base=="2.1.23" and (script.active_mods["more-infinite-research"]=="5.0.21001"
-      or script.active_mods["more-infinite-research"]=="5.0.21007" or (CURRENT_508 and script.active_mods["more-infinite-research"]=="5.0.21008") or (CURRENT_509 and script.active_mods["more-infinite-research"]=="5.0.21009") or (CURRENT_510 and script.active_mods["more-infinite-research"]=="5.0.21010")))))
+      or script.active_mods["more-infinite-research"]=="5.0.21007" or (CURRENT_508 and script.active_mods["more-infinite-research"]=="5.0.21008") or (CURRENT_509 and script.active_mods["more-infinite-research"]=="5.0.21009") or (CURRENT_510 and script.active_mods["more-infinite-research"]=="5.0.21010") or (CURRENT_511 and script.active_mods["more-infinite-research"]=="5.0.21011")))))
 local GEAR, MINING = "recipe-prod-research_gears-1", "recipe-prod-research_mining_drill-1"
 local IDS = {"mir-legacy-module-credit-speed-module", "mir-legacy-module-credit-productivity-module",
   "mir-legacy-module-credit-efficiency-module", "mir-legacy-cannon-credit-rocket-shooting-speed"}
@@ -528,9 +529,9 @@ local function advance(step)
 end
 -- The separate0.4 observer reuses only these independent protected-save assertions.
 -- Original0.1/0.2 sources and packets remain pinned by their historical records.
-if INPUT_OBSERVER=="0.4.0" or INPUT_OBSERVER=="0.4.1" or INPUT_OBSERVER=="0.4.2" or INPUT_OBSERVER=="0.4.3" then
+if INPUT_OBSERVER=="0.4.0" or INPUT_OBSERVER=="0.4.1" or INPUT_OBSERVER=="0.4.2" or INPUT_OBSERVER=="0.4.3" or INPUT_OBSERVER=="0.4.4" then
   require("support-exports").register({key=KEY,interface=INTERFACE,world=world,assert_world=assert_world,
-    imported=check_imported_literals,historical_fixture=historical.fixture,qualified_input=HELPER_FREE_INPUT,current_508=CURRENT_LAYOUT,current_510=CURRENT_510})
+    imported=check_imported_literals,historical_fixture=historical.fixture,qualified_input=HELPER_FREE_INPUT,current_508=CURRENT_LAYOUT,current_510=CURRENT_510,current_511=CURRENT_511})
   return
 end
 remote.add_interface(INTERFACE,{report=report,advance=advance})
@@ -566,6 +567,8 @@ script.on_init(function()
     or (script.active_mods.base=="2.1.23" and observer_version=="0.3.7" and {mir="5.0.21009",observer="0.3.7"})
     or (script.active_mods.base=="2.0.77" and observer_version=="0.3.8" and {mir="5.0.20010",observer="0.3.8"})
     or (script.active_mods.base=="2.1.23" and observer_version=="0.3.8" and {mir="5.0.21010",observer="0.3.8"})
+    or (script.active_mods.base=="2.0.77" and observer_version=="0.3.9" and {mir="5.0.20011",observer="0.3.9"})
+    or (script.active_mods.base=="2.1.23" and observer_version=="0.3.9" and {mir="5.0.21011",observer="0.3.9"})
   if not expected or script.active_mods["more-infinite-research"]~=expected.mir
       or (not HELPER_FREE_INPUT and script.active_mods[historical.fixture]~=expected.fixture) then fail("imported native target differs") end
   local allowed={base=script.active_mods.base,["more-infinite-research"]=expected.mir,
