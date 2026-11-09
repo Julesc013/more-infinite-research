@@ -425,6 +425,77 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
           assert(f.research_queue[2].name==OTHER and storage.mir_worker_storage_route.forces[f.index].limit==8)
         ''')
 
+    def test_finished_sentinel_admits_only_observed_zero_progress_queue_gap(self):
+        self.lua.execute(r'''
+          seed();history.prepare(nil);local f=suspended;local p=f.technologies[ID]
+          local mt=getmetatable(f);local read,write=mt.__index,mt.__newindex;local queue_writes=0
+          mt.__index=function(o,k)
+            if k=="current_research"then return nil elseif k=="research_queue"then return {p}
+            elseif k=="research_progress"then return 0 end;return read(o,k)
+          end
+          mt.__newindex=function(o,k,v)if k=="research_queue"or k=="research_progress"then queue_writes=queue_writes+1 end;return write(o,k,v)end
+          assert(history.on_research_event({research=f.technologies[OTHER],by_script=false},true))
+          local record=storage.mir_worker_storage_route.forces[f.index]
+          assert(queue_writes==0 and f.current_research==nil and f.research_progress==0)
+          assert(p.level==7 and not p.researched and p.saved_progress==.27 and record.next_level==7 and record.limit==7 and record.pending)
+          writes=0;local ok,message=pcall(history.on_research_event,{research=f.technologies[OTHER]},false)
+          assert(not ok and tostring(message):find("inconsistent native current/queue frame",1,true) and writes==0)
+          package.loaded["runtime.worker_robot_storage"]=nil;history=require("runtime.worker_robot_storage");writes=0;history.on_load(nil)
+          ok,message=pcall(history.preflight,{},nil)
+          assert(not ok and tostring(message):find("inconsistent native current/queue frame",1,true) and writes==0,"finish context leaked into cold state")
+        ''')
+
+    def test_private_finished_gap_preserves_both_native_completed_representations(self):
+        for researched in (False, True):
+            with self.subTest(researched=researched):
+                self.setUp();self.lua.globals().completed_true=researched
+                self.lua.execute(r'''
+                  seed();history.prepare(nil);local f=player;local p=f.technologies[ID];local other=f.technologies[OTHER]
+                  p.level=completed_true and 8 or 9;p.researched=completed_true;other.saved_progress=.42
+                  local bonus=f.worker_robots_storage_bonus;local mt=getmetatable(f);local read=mt.__index
+                  mt.__index=function(o,k)
+                    if k=="current_research"then return nil elseif k=="research_queue"then return {other}
+                    elseif k=="research_progress"then return 0 end;return read(o,k)
+                  end
+                  assert(history.on_research_event({research=p,by_script=false},true))
+                  local record=storage.mir_worker_storage_route.forces[f.index]
+                  assert(record.next_level==9 and record.limit==8 and not record.pending and not p.enabled)
+                  assert(f.current_research==nil and f.research_progress==0 and other.saved_progress==.42 and f.worker_robots_storage_bonus==bonus)
+                ''')
+
+    def test_finish_gap_exclusions_refuse_before_native_writes(self):
+        for opponent in ("not-finished", "no-research", "wrong-force", "nonzero", "one", "nil", "present-mismatch"):
+            with self.subTest(opponent=opponent):
+                self.setUp();self.lua.globals().opponent=opponent
+                self.lua.execute(r'''
+                  seed();history.prepare(nil);local f=suspended;local p=f.technologies[ID]
+                  local mt=getmetatable(f);local read=mt.__index
+                  mt.__index=function(o,k)
+                    if k=="current_research"then return opponent=="present-mismatch"and f.technologies[OTHER]or nil
+                    elseif k=="research_queue"then return {p}
+                    elseif k=="research_progress"then if opponent=="nil"then return nil end;return opponent=="one"and 1 or opponent=="nonzero"and .1 or 0 end
+                    return read(o,k)
+                  end
+                  local event={research=f.technologies[OTHER],by_script=false}
+                  if opponent=="no-research"then event={force=f}elseif opponent=="wrong-force"then event={force=f,research=player.technologies[OTHER]}end
+                  writes=0;local ok,message=pcall(history.on_research_event,event,opponent~="not-finished")
+                  assert(not ok and tostring(message):find("inconsistent native current/queue frame",1,true),opponent)
+                  assert(writes==0,"invalid finish frame wrote native state")
+                ''')
+
+    def test_finish_context_does_not_cover_unsettled_owned_queue_rewrite(self):
+        self.lua.execute(r'''
+          seed();history.prepare(nil);local f=suspended;local p=f.technologies[ID];local other=f.technologies[OTHER]
+          local queue={p,p,other};local mt=getmetatable(f);local read,write=mt.__index,mt.__newindex;local queue_writes=0
+          mt.__index=function(o,k)
+            if k=="current_research"then return nil elseif k=="research_queue"then return queue
+            elseif k=="research_progress"then return 0 end;return read(o,k)
+          end
+          mt.__newindex=function(o,k,v)if k=="research_queue"then queue_writes=queue_writes+1;queue=v end;return write(o,k,v)end
+          local ok,message=pcall(history.on_research_event,{research=other,by_script=false},true)
+          assert(not ok and tostring(message):find("inconsistent native current/queue frame",1,true) and queue_writes==1,"owned setter escaped strict settled guard")
+        ''')
+
     def test_native_merge_reconciles_only_surviving_metadata_without_native_writes(self):
         self.lua.execute(r'''
           seed();history.prepare(nil)

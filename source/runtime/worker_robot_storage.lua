@@ -265,7 +265,7 @@ local function progress(value)
   return type(value) == "number" and value == value and value >= 0 and value < 1
 end
 
-local function snapshot(force, id)
+local function snapshot(force, id, finished_context)
   local technology = force.technologies[id]
   if not technology or not integer(technology.level) or technology.level < 4
       or type(technology.researched) ~= "boolean" or type(technology.enabled) ~= "boolean"
@@ -281,7 +281,14 @@ local function snapshot(force, id)
     saved[value.name] = value.saved_progress
   end
   local current = force.current_research and force.current_research.name or nil
-  if current ~= queue[1] or not progress(force.research_progress) then recover_error("inconsistent native current/queue frame") end
+  -- A finished callback can follow removal of its head but precede starting
+  -- the queued remainder. Keep that observed nil current and zero progress;
+  -- do not promote queued saved work into current research inside the event.
+  local waiting_after_finish = finished_context == true and current == nil and queue[1] ~= nil
+    and force.research_progress == 0
+  if (current ~= queue[1] and not waiting_after_finish) or not progress(force.research_progress) then
+    recover_error("inconsistent native current/queue frame")
+  end
   local next_level = technology.level + (technology.researched and 1 or 0)
   if next_level >= 4294967295 then recover_error("worker level has no preservable continuation") end
   if technology.researched and (occurrences > 0 or technology.saved_progress > 0) then
@@ -629,7 +636,9 @@ function M.on_research_event(event, finished)
   if not state or state.kind ~= "prepared" then return false end
   local record = state.forces[force.index]
   if not record then recover_error("research force has no prepared private history") end
-  local frame = snapshot(force, recovery.id)
+  local finished_context = finished == true and event.research and event.research.force
+    and event.research.force.index == force.index
+  local frame = snapshot(force, recovery.id, finished_context)
   local advanced = finished and event.research and event.research.name == recovery.id
   if frame.next_level ~= record.next_level + (advanced and 1 or 0)
       or frame.next_level > record.limit + 1 or frame.enabled ~= record.enabled or frame.visible ~= record.visible then
@@ -639,20 +648,22 @@ function M.on_research_event(event, finished)
   record.next_level, record.limit, record.pending = frame.next_level, frame.next_level + remaining - 1, remaining > 0
   local previous_owner = owned_queue_force
   owned_queue_force = force.index
+  local queue_changed = false
   local ok, message = pcall(function()
     if not record.pending then
-      caps.remove_unavailable_from_queue(force, {[recovery.id]=true})
+      queue_changed = caps.remove_unavailable_from_queue(force, {[recovery.id]=true}).queue_changed
       frame.technology.enabled = false
       frame.technology.visible_when_disabled = record.visible
       record.enabled = false
     else
-      caps.reconcile(force, {[recovery.id]=record.limit}, {})
+      local _, result = caps.reconcile(force, {[recovery.id]=record.limit}, {})
+      queue_changed = result.queue_changed
       frame.technology.visible_when_disabled = record.visible
     end
   end)
   owned_queue_force = previous_owner
   if not ok then error(message, 0) end
-  local settled = snapshot(force, recovery.id)
+  local settled = snapshot(force, recovery.id, finished_context and not queue_changed)
   if settled.next_level ~= record.next_level or settled.enabled ~= record.enabled or settled.visible ~= record.visible then
     recover_error("private worker frame changed during owned queue mutation")
   end
