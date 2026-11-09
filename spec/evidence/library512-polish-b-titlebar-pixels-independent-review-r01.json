@@ -1,0 +1,110 @@
+{
+  "kind": "library512-polish-b-titlebar-pixels-independent-review-r01",
+  "reviewed_at_utc": "2026-11-09T19:31:49.041664+00:00",
+  "verdict": "PASS_STATIC_NATIVE_TITLEBAR_GLYPH_VISIBILITY_BOUNDS_ALIGNMENT_AND_TITLE_FIT_IN_FOUR_NAMED_CAPTURES",
+  "findings": [],
+  "independence": "Reviewer authored neither the three sprite substitutions/proposal nor the German labels. Prior independent source review was separate. These four original PNGs were actually viewed at original detail using view_image; no crop, resize, image processing, regeneration or native rerun.",
+  "identity": {
+    "source": "e694c38cb650bc2da31f7f735ab595998485a7b1",
+    "player": "40a065c18b86437148acd60d7180666db7aaeb32",
+    "actual_readback": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-controller\\root-actual-readback.json",
+      "bytes": 134309,
+      "sha256": "7F631C3EBF5EBF7B85C0CB8060C4E27F586853B5D8896908D2497144F048BE7C"
+    },
+    "prior_source_input_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-independent-admission.json",
+      "bytes": 22547,
+      "sha256": "6254EE110517B03498DAFFCD10FA582B01B8694B934108D47F244384352020D1"
+    }
+  },
+  "observations": [
+    {
+      "case": "f210-normal-en",
+      "image": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\01-research.png",
+        "bytes": 4953680,
+        "sha256": "3EBA5BEE8D66C07E17177AD90AAA526190282155AB6E7033122B140CD9B9CC36"
+      },
+      "actual_width": 2560,
+      "actual_height": 1440,
+      "actual_display_scale": 1.25,
+      "candidate_sha256": "4A9B225D23F1C050A7D1E15104177C96EB9D9ECBD58EE257E370966F07208B74",
+      "actual_visual_verdict": "PASS_TITLEBAR_ONLY",
+      "observation": "Light backward/forward triangle and reset curved-arrow glyphs are clearly visible against their dark button faces. Unchanged close X is also visible. Four distinct square action bounds share a clean horizontal row, fit inside the header and show no clipping/overlap. Full MIR Research Library title fits with clear space before the drag area/actions."
+    },
+    {
+      "case": "f210-narrow-de",
+      "image": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\01-research.png",
+        "bytes": 991235,
+        "sha256": "B2A25887AC0C07099DBD71C8D28390446C0A8D327D5289806CEAA67774462ACF"
+      },
+      "actual_width": 960,
+      "actual_height": 720,
+      "actual_display_scale": 0.75,
+      "candidate_sha256": "4A9B225D23F1C050A7D1E15104177C96EB9D9ECBD58EE257E370966F07208B74",
+      "actual_visual_verdict": "PASS_TITLEBAR_ONLY",
+      "observation": "Light backward/forward triangle and reset curved-arrow glyphs are clearly visible against their dark button faces. Unchanged close X is also visible. Four distinct square action bounds share a clean horizontal row, fit inside the header and show no clipping/overlap. Full MIR-Forschungsbibliothek title fits before the drag area/actions; no title truncation or action overlap."
+    },
+    {
+      "case": "f200-normal-en",
+      "image": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\01-research.png",
+        "bytes": 7846170,
+        "sha256": "846374AFDFD7E199942C967BFC805C844918FF2662A01B488BF7D8FC48749964"
+      },
+      "actual_width": 3200,
+      "actual_height": 1800,
+      "actual_display_scale": 1.5,
+      "candidate_sha256": "8BDA0D49A35EA61960DDEF4A89B15365F1F562C60EA987B18CA6C1EDE3CB994D",
+      "actual_visual_verdict": "PASS_TITLEBAR_ONLY",
+      "observation": "Light backward/forward triangle and reset curved-arrow glyphs are clearly visible against their dark button faces. Unchanged close X is also visible. Four distinct square action bounds share a clean horizontal row, fit inside the header and show no clipping/overlap. Full MIR Research Library title fits with clear space before the drag area/actions."
+    },
+    {
+      "case": "f200-narrow-de",
+      "image": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-native-custody\\f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\01-research.png",
+        "bytes": 1597696,
+        "sha256": "C6F7D9D305D07EAB0D4C726846899B75019D703F7202324CF0C7E8626A688E3C"
+      },
+      "actual_width": 1200,
+      "actual_height": 900,
+      "actual_display_scale": 0.75,
+      "candidate_sha256": "8BDA0D49A35EA61960DDEF4A89B15365F1F562C60EA987B18CA6C1EDE3CB994D",
+      "actual_visual_verdict": "PASS_TITLEBAR_ONLY",
+      "observation": "Light backward/forward triangle and reset curved-arrow glyphs are clearly visible against their dark button faces. Unchanged close X is also visible. Four distinct square action bounds share a clean horizontal row, fit inside the header and show no clipping/overlap. Full MIR-Forschungsbibliothek title fits before the drag area/actions; no title truncation or action overlap."
+    }
+  ],
+  "common_judgment": {
+    "glyphs": "The light back/forward/reset substitutions render recognizably in both actual2.1.23 and2.0.77 native chrome. No missing texture, dark-on-dark invisible glyph or clipped reset stroke is visible. Close X remains recognizable.",
+    "bounds_alignment": "All four action backgrounds are separated, aligned on the same top/bottom header row and fully inside the Library. Title and drag strip do not encroach on actions. This judges rendered outlines, not functional hitboxes.",
+    "title": "English and German full captions are readable at the recorded scales and retain visual room before the drag strip. Both narrow German captions fit.",
+    "known_German_filter_correction": "The current B narrow German Show option reads In diesem Spiel and is visibly contained in these research images. This preserves the known correction; no separate filter behavior/localization acceptance is inferred."
+  },
+  "actual_geometry_boundary": "F210 normal is2560x1440/scale1.25 and narrow960x720/scale0.75. F200 normal is3200x1800/scale1.5 and narrow1200x900/scale0.75. Verdict uses these observed PNG/metadata dimensions and numeric scales, not the requested2560x1440/960x720 literals. F200 images are not relabelled as actual960x720 or as equivalent viewport coverage.",
+  "limits": [
+    "Only the static titlebar in01-research for the four named cases was reviewed. No duplicate all56-page review.",
+    "No hover/pressed/disabled-state, actual button click, focus, dragging, resize interaction, filter behavior, settings menu, export, personal lifecycle, save/client/multiplayer, performance or stable verdict.",
+    "Known adjacent Availability omission text remains with Root/Aero next coherent work; this task did not inspect/redesign that page. Other-page tooltip obstructions retain their prior status.",
+    "SourceB/e694/40a and its4A9B/8BDA packages keep these exact render identities; no published asset or Source change."
+  ],
+  "reviewer_activity": {
+    "new_files": [
+      "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-titlebar-pixels-independent-review-r01.json"
+    ],
+    "original_images_actually_viewed": 4,
+    "image_transformations": 0,
+    "Source_controller_or_packet_edits": 0,
+    "host_tests": 0,
+    "builds": 0,
+    "native_processes": 0,
+    "CI_or_library_operations": 0,
+    "workspace_health": {
+      "status": "attention",
+      "checkpoint_required": false,
+      "free_mib": 85608,
+      "bounded_scan_advisory": true
+    }
+  }
+}

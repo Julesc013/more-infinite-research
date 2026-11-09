@@ -1,0 +1,229 @@
+{
+  "kind": "Library512AvailabilityAndGermanIndependentSourceReviewV1",
+  "reviewed_at_utc": "2026-11-09T20:13:56.657716+00:00",
+  "reviewer": "Non-author bounded source/SDK review; no children",
+  "verdict": "GO for exact-source integration and affected native caption/Availability verification; no source blocker found",
+  "identity": {
+    "head": "44cf4f44b77d3de873e021c0cab29e8d7b478dae",
+    "parent": "fed3bad36382401be90c529a4928bbd09b07c38f",
+    "tree": "41fe077f2be6af1cca18a23025f5b0a04b0a781c",
+    "source": "b4f301846cf6e897cd2cb440916170a38d9ecfd2",
+    "worktree": "D:\\Projects\\Factorio\\.task-builds\\mir512-availability-polish-r01",
+    "baseline_head": "e694c38cb650bc2da31f7f735ab595998485a7b1",
+    "baseline_source": "40a065c18b86437148acd60d7180666db7aaeb32"
+  },
+  "scope": {
+    "production_delta_from_B": [
+      "source/runtime/library.lua: two Availability-only hunks",
+      "source/locale/de/mir-library.cfg: native-queue-guidance",
+      "source/locale/de/more-infinite-research.cfg: mod-setting-name.mir-cost-base and mir-browser.queue"
+    ],
+    "availability_author_commit_delta": [
+      "source/runtime/library.lua",
+      "tests/test_library.py"
+    ],
+    "excluded": "Unrelated retained cargo fixture changes in the broader history and Root disjoint changelog/progress/evidence WIP were not edited or treated as player-code defects. Approval binds these exact committed file bodies if a documentation commit changes HEAD."
+  },
+  "consumed_files": [
+    {
+      "path": "source/runtime/library.lua",
+      "git_blob": "7edf60e36862060565c6dadd8b7e0ef2499306d2",
+      "bytes": 152600,
+      "sha256": "57ECE6D795BBF49B22176AE7EDEC5A0BCDB7DF945433F3C368EEE46C5E16A2C9"
+    },
+    {
+      "path": "source/locale/de/mir-library.cfg",
+      "git_blob": "21177d6f16cf36724f1f77abeef3459dcc552b33",
+      "bytes": 7980,
+      "sha256": "CF0270923CCDE4CCAF5A72A6B2BE895B48E7EC6D73EA82F30E5BE03AA7AE4111"
+    },
+    {
+      "path": "source/locale/de/more-infinite-research.cfg",
+      "git_blob": "430f954e91412ccdd89c608584b8e913d2ba7d5c",
+      "bytes": 27292,
+      "sha256": "7DD5CD4812AD627C34D9B8322F0E2CB1054105A033CD4E311A5FF12938B160F4"
+    },
+    {
+      "path": "tests/test_library.py",
+      "git_blob": "1a71481bd2bf50a6e4dd1b1a362ff11135bc14ae",
+      "bytes": 284895,
+      "sha256": "937D7FFA22C4685498044E78D36C5BC95272865D15CE99C956EE90FDCA0D2A5C"
+    },
+    {
+      "path": "tests/test_locale_catalogue.py",
+      "git_blob": "2fb1e6d5d7f756cabf59e0d9523226b877c9fc42",
+      "bytes": 49555,
+      "sha256": "FAB73C11A4D7D1CBBF62DF69B145E395A7855CEA43858D29E8460349B321A2CA"
+    }
+  ],
+  "findings": [],
+  "reasoning": [
+    {
+      "topic": "Known actual-pixel defect",
+      "result": "The B review observed adjacent Availability explanations in the common two-column Research body. The correction inserts exactly one scroll pane, with a vertical flow and 12-pixel section spacing. Each unchanged localized explanation occupies the full usable entry width instead of a separate table column.",
+      "references": [
+        "source/runtime/library.lua:2009-2042",
+        "prior pixel receipt 22EEA19110972D018C466006D61668142CB82872D0ED0FAB397EC0614C39120B"
+      ]
+    },
+    {
+      "topic": "Bounds and scroll ownership",
+      "result": "Existing sync_frame_layout supplies integer body width/height before this projection. The new scroll pane uses body width minus16 and the existing body height; horizontal scrolling is never and vertical is auto. Entry flow is another16 narrower for native scrollbar/padding, fixed in width and unconstrained in height. The unchanged add helper sets label.single_line=false; explicit label width sets both bounds. Empty captions receive the same wrapping/width. No shared frame/layout constants or other page geometry changed.",
+      "references": [
+        "source/runtime/library.lua:1095-1112",
+        "source/runtime/library.lua:2020-2041",
+        "source/runtime/library.lua:2331-2334"
+      ]
+    },
+    {
+      "topic": "Cleanup, search and view state",
+      "result": "Availability still clears only its owned body and consumes the same rows, active mods, force, query and effective streams. A new viewport sentinel makes the Research boundary clear nested descendants; the direct empty/_1 sentinels still repair retained legacy labels. Ordinary Research refreshes retain their widgets. Existing event ownership, query/reset, visibility, selected research, native queue/current/progress and gameplay paths are unchanged. New controls preserve both empty/nonempty legacy cleanup opponents and all native no-write assertions.",
+      "references": [
+        "source/runtime/library.lua:1527-1536",
+        "source/runtime/library.lua:2011-2017",
+        "source/runtime/library.lua:2410-2420",
+        "tests/test_library.py:518-597"
+      ]
+    },
+    {
+      "topic": "Exact cross-engine GUI API",
+      "result": "Read actual installed 2.0.77 and2.1.23 runtime-api.json; hashes match the author extraction. Every consumed style/element member in that extraction matches actual SDK JSON. width/height write int32 bounds; single_line and vertical_spacing are writable on the relevant label/flow types; flow direction and scroll policies are admitted creation fields. No new LuaStyle.name writer or other version-specific member introduced."
+    },
+    {
+      "topic": "Recursive GUI double",
+      "result": "Both installed SDKs specify clear destroys children and invalidates their handles; destroy removes an element with its children. The revised double recursively destroys descendants and caches name before invalidation. This strengthens nested cleanup checks and preserves the strict invalid-object resize opponent. It is not native geometry or wheel-routing evidence.",
+      "references": [
+        "tests/test_library.py:1077-1089"
+      ]
+    },
+    {
+      "topic": "German semantics",
+      "result": "Queue guidance explicitly names native Technology-screen enqueue/reorder/cancel actions and says the Library does not change the force queue, matching RUN-04 and the unchanged English key. Partei matches actual Core force=Partei in both pinned engines (2.0 line1196;2.1 line1265). The new cost caption preserves exact [font=default-bold]...[/font] and __1__, and correctly says level-1 cost coefficient, matching the authored English setting contract; no cost calculation or setting identity changed. Existing locale assertions remain, with explicit action/authority/coefficient checks added."
+    }
+  ],
+  "contracts": [
+    "spec/runtime.md RUN-04",
+    "spec/verification.md: host, pixels and real input are independent scopes; exact consumed-input reuse only"
+  ],
+  "sdk": [
+    {
+      "path": "D:\\Games\\Factorio\\2.0\\doc-html\\runtime-api.json",
+      "bytes": 1878804,
+      "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578"
+    },
+    {
+      "path": "D:\\Games\\Factorio\\2.1\\doc-html\\runtime-api.json",
+      "bytes": 2132310,
+      "sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373"
+    }
+  ],
+  "author_evidence_readback": {
+    "handoff": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-availability-polish-r01\\build\\tmp\\availability-polish-r01-controls\\HANDOFF.json",
+      "bytes": 4531,
+      "sha256": "73E66780A20697A5BE37CF2A292374F7BC11AC16C75EA5CB0B1A93DE56D908D2"
+    },
+    "all_11_listed_evidence_bodies_rehashed": true,
+    "controls": [
+      {
+        "path": "old-horizontal-source-red.log",
+        "actual": "1 test, 1 expected error: explanations must not become adjacent Research table columns"
+      },
+      {
+        "path": "availability-narrow-green.log",
+        "actual": "4 tests PASS including widths1024/640/480,24 rows,empty,return/search/effective-stream controls"
+      },
+      {
+        "path": "library-full-green.log",
+        "actual": "Initial121 attempt had1 invalid-object resize-double error; retained adverse, not a pass"
+      },
+      {
+        "path": "recursive-double-and-availability-green.log",
+        "actual": "3 tests PASS after name captured before invalidation; strict invalid-object opponent retained"
+      },
+      {
+        "path": "library-full-final-green.log",
+        "actual": "121 tests PASS in2.509s"
+      }
+    ],
+    "evidence_pins": [
+      {
+        "name": "health.json",
+        "bytes": 39544,
+        "sha256": "A7B30AE032A9861798CB2EA3E73AF45F6BD95B419942F26767B0F92F1B9BCCB8"
+      },
+      {
+        "name": "host-plan.json",
+        "bytes": 16065,
+        "sha256": "C4A790C6F78A7EF5B4F2A031CADFCAA482EC150F5F0E077E8076A8CFA6394B16"
+      },
+      {
+        "name": "installed-widget-style-api.json",
+        "bytes": 11392,
+        "sha256": "8F5417E4BE3F5D926E39429FA87865343AAC6D5B776B0BD2E24F1D657B202EF5"
+      },
+      {
+        "name": "old-horizontal-source-red.log",
+        "bytes": 1575,
+        "sha256": "82F2D2106560F3ED945C394E57A7303B7593903DEF9BCB48F8477BB76E1A8B65"
+      },
+      {
+        "name": "availability-narrow-green.log",
+        "bytes": 863,
+        "sha256": "D8E80AE411FA040E43ECF562E9DB489D545CF26C00F159BE084E507E1FBA57D0"
+      },
+      {
+        "name": "library-full-green.log",
+        "bytes": 24282,
+        "sha256": "B1648E087E671F3E3D0200B18B4B9947C46195C6698A19F86787E4256D9BC35A"
+      },
+      {
+        "name": "recursive-double-and-availability-green.log",
+        "bytes": 657,
+        "sha256": "10612A9C46AE959B3727E51EA27BD0EA1799E8FA5A3F0FD92AB71CC8F6DD409D"
+      },
+      {
+        "name": "library-full-final-green.log",
+        "bytes": 22427,
+        "sha256": "294CCAD4200D6D95C74E89EA704FE1676489DBC0268DE51E630CA49577317ED9"
+      },
+      {
+        "name": "static.log",
+        "bytes": 460,
+        "sha256": "94150CDACF1DA520CB77ED58FC9DB40FB8C6F6A7FA428C9469C2EDE1753D8D80"
+      },
+      {
+        "name": "changelog.log",
+        "bytes": 68,
+        "sha256": "74AAF05A7AD2FE2850B8FCF71FF1FE15A674C818DC5CFA53A5F6867D3A2EC9B3"
+      },
+      {
+        "name": "validation.json",
+        "bytes": 1029,
+        "sha256": "AA110017584F40EAC5E23F2B693BAC89B9F0D95D6314A9F5B23A9F419BFF9E86"
+      }
+    ],
+    "reviewer_reran_host_controls": false
+  },
+  "remaining_verification": [
+    "Freeze/reproduce the resulting exact C packages and bind native inputs separately from original B screenshots/packages.",
+    "Inspect corrected Availability page06 at affected F200/F210 English/German normal and narrow actual dimensions/scales: distinct full-width explanations, complete wrapping, bounded height and no adjacent-entry concatenation.",
+    "Actual native scroll/input, empty/search/reset/return-to-Research remain separate from host structural proof. The retained24-row double does not prove real wheel routing or bottom reachability.",
+    "Inspect the three corrected German captions at their actual Queue/Settings endpoints for native fit; source semantics alone do not establish pixel fit.",
+    "No menu/input/export/lifecycle/multiplayer/performance/stable acceptance is granted here. Prior B actual/adverse receipts retain their original identities."
+  ],
+  "operations": {
+    "source_test_docs_packet_edits": 0,
+    "host_tests": 0,
+    "builds": 0,
+    "Compose": 0,
+    "native_processes": 0,
+    "CI": 0,
+    "only_new_output": "build/qualification/library512-availability-and-german-independent-source-review-r01.json",
+    "health_before_output": {
+      "status": "attention (bounded scan)",
+      "checkpoint_required": false,
+      "free_mib": 85428
+    }
+  }
+}

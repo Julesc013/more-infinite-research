@@ -1,0 +1,19 @@
+{
+  "kind": "MIR512CheckedBMergeReadbackR01",
+  "PR": 1863,
+  "reviewed_head": "e694c38cb650bc2da31f7f735ab595998485a7b1",
+  "dev": "52f98a9fdd03f7056ab0cf99a890d107130f896e",
+  "player": "40a065c18b86437148acd60d7180666db7aaeb32",
+  "whole_tree_equal": true,
+  "primary_clean_equal_remote": true,
+  "original_head_remote_preservation": "review/mir512-polish-b-e694-preserved-r01",
+  "method": "repository-supported checked squash; merge-commit method refused without changing repository controls",
+  "required_checks": [
+    "branch-policy",
+    "verification-plan",
+    "native-tooling-controls",
+    "host-controls"
+  ],
+  "source_packages_unchanged": true,
+  "stable_acceptance": false
+}
