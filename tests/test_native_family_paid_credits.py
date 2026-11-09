@@ -694,6 +694,31 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
           assert(storage.mir_native_credits==nil)
         ''')
 
+    def test_unknown_paid_mask_context_is_bounded_printable_even_at_utf8_boundary(self):
+        for kind in ("controls", "utf8-boundary"):
+            with self.subTest(kind=kind):
+                self.setUp()
+                self.lua.globals().context_kind = kind
+                self.lua.execute(r'''
+                  local source=context_kind=="controls" and "old\0\n\r\t\127\128\194\133\195\169"
+                    or string.rep("a",95).."\195\169"..string.rep("z",500)
+                  local force=make_collected_force(1,8,{},true)
+                  local ok,message=pcall(native_credits.on_configuration_changed,{
+                    mod_startup_settings_changed=true,mod_changes={
+                      ["more-infinite-research"]={old_version=source,new_version="5.0.21003"}}})
+                  assert(not ok,"unknown context acquired historical authority")
+                  message=tostring(message)
+                  local context=message:match("%[MIR%-CREDIT%-HISTORY .+%]")
+                  assert(context and not context:find("[%z\1-\31\127-\255]"),"nonprintable diagnostic context")
+                  assert(#context<4096,"unbounded diagnostic context")
+                  assert(context:find("\\xC3",1,true),"UTF8 byte identity was lost at the boundary")
+                  if context_kind=="controls" then
+                    assert(context:find("\\x00",1,true) and context:find("\\x80",1,true))
+                  end
+                  assert(storage.mir_native_credits==nil)
+                  for _,state in pairs(force._states) do assert(state.writes.level==0 and state.writes.enabled==0) end
+                ''')
+
     def _plain_beta_base(self, edition="f210", extra=False):
         # These five one-recipe public masks are independently retained in all
         # six published 5.0.0-5.0.2 Base ZIP observations (18 controlled cases).
@@ -747,6 +772,147 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                         and main.saved_progress==.27 and force.research_progress==.42)
                       no_foreign_write(force)
                     ''')
+
+    def test_known_base_origin_with_only_new_mods_preserves_paid_and_unfinished_work(self):
+        # The old public Base mask is independently fixed by the published
+        # 5.0.0-5.0.2 contract. Newly added mods had no old earning rights.
+        for edition, prefix in (("f200", "5.0.200"), ("f210", "5.0.210")):
+            for patch in ("00", "01", "02"):
+                for private, level in ((False, 8), (True, 8), (True, 1)):
+                    with self.subTest(edition=edition, patch=patch, private=private, level=level):
+                        self.setUp()
+                        self._plain_beta_base(edition, extra=True)
+                        self.lua.globals().old_base_beta = prefix + patch
+                        self.lua.globals().private_destination = private
+                        self.lua.globals().old_level = level
+                        self.lua.execute('''
+                          BASE_ACTIVE["more-infinite-research"]=base_edition=="f200" and "5.0.20012" or "5.0.21012"
+                          BASE_ACTIVE.provider="1.0.0";BASE_ACTIVE.observer="2.0.0"
+                          reload_credits(BASE_ACTIVE,base_edition)
+                          local force=make_collected_force(1,old_level,
+                            private_destination and {} or published_base_mask,private_destination)
+                          local main=force.technologies["recipe-prod-research_steel-1"]
+                          local detached=force.technologies["recipe-prod-research_plastic-1"]
+                          detached.saved_progress=.31
+                          main.saved_progress=.27;local queue={main,main,force.technologies.foreign}
+                          force.research_queue=queue;force.current_research=main
+                          native_credits.on_configuration_changed({mod_startup_settings_changed=false,
+                            mod_changes={["more-infinite-research"]={old_version=old_base_beta,
+                              new_version=BASE_ACTIVE["more-infinite-research"]},
+                              provider={new_version="1.0.0"},observer={new_version="2.0.0"}}})
+                          local function preserved()
+                            for family,recipes in pairs(GROUPS) do
+                              close(own_contribution(force,family,recipes[1].recipe),(old_level-1)*recipes[1].change)
+                            end
+                            close(own_contribution(force,"research_steel","new-unpaid-steel"),0)
+                            assert(main.level==old_level and not main.researched and main.saved_progress==.27)
+                            assert(detached.level==old_level and detached.saved_progress==.31
+                              and not detached.researched)
+                            assert(force.research_queue==queue and force.current_research==main
+                              and force.research_progress==.42)
+                            no_foreign_write(force)
+                          end
+                          preserved()
+                          for _=1,2 do
+                            reload_credits(BASE_ACTIVE,base_edition);native_credits.on_load()
+                            native_credits.on_configuration_changed();preserved()
+                          end
+                          if private_destination then
+                            local paid=record(force,"research_steel","steel-plate")
+                            local unpaid=record(force,"research_steel","new-unpaid-steel")
+                            assert(paid.private and paid.payable and paid.pending==2)
+                            assert(unpaid.private and not unpaid.payable and unpaid.pending==2)
+                            advance(force,main.name,old_level+1,false)
+                            native_credits.on_research_finished({research=main,by_script=false})
+                            close(own_contribution(force,"research_steel","steel-plate"),old_level*.17)
+                            close(own_contribution(force,"research_steel","new-unpaid-steel"),0)
+                            native_credits.on_research_finished({research=main,by_script=false})
+                            assert(paid.pending==1 and unpaid.pending==1)
+                            force.research_queue={force.technologies.foreign}
+                            force.current_research=force.technologies.foreign
+                            native_credits.on_research_cancelled({force=force,research={[main.name]=1}})
+                            advance(force,main.name,old_level+2,false)
+                            native_credits.on_research_finished({research=main,by_script=true})
+                            close(own_contribution(force,"research_steel","steel-plate"),old_level*.17)
+                            close(own_contribution(force,"research_steel","new-unpaid-steel"),0)
+                          end
+                        ''')
+
+    def test_current_added_mod_claim_cannot_replace_a_proven_old_base_closure(self):
+        for opponent in ("missing-change", "old-present", "old-false", "old-number", "old-empty",
+                         "updated-provider", "wrong-new", "removed-provider", "startup", "startup-unknown",
+                         "engine-change", "wrong-mir-new", "wrong-destination", "unknown-origin", "incomplete-old-mask"):
+            with self.subTest(opponent=opponent):
+                self.setUp()
+                self._plain_beta_base(extra=True)
+                self.lua.globals().opponent = opponent
+                self.lua.execute('''
+                  BASE_ACTIVE.provider="1.0.0"
+                  local changes={["more-infinite-research"]={old_version="5.0.21002",new_version="5.0.21003"},
+                    provider={new_version="1.0.0"}}
+                  local changed=false
+                  if opponent=="missing-change" then changes.provider=nil end
+                  if opponent=="old-present" then changes.provider.old_version="1.0.0" end
+                  if opponent=="old-false" then changes.provider.old_version=false end
+                  if opponent=="old-number" then changes.provider.old_version=1 end
+                  if opponent=="old-empty" then changes.provider.old_version="" end
+                  if opponent=="updated-provider" then changes.provider.old_version="0.9.0" end
+                  if opponent=="wrong-new" then changes.provider.new_version="2.0.0" end
+                  if opponent=="removed-provider" then changes.removed={old_version="1.0.0"} end
+                  if opponent=="startup" then changed=true end
+                  if opponent=="startup-unknown" then changed=nil end
+                  if opponent=="engine-change" then changes.base={old_version="2.1.22",new_version="2.1.23"} end
+                  if opponent=="wrong-mir-new" then changes["more-infinite-research"].new_version="5.0.21012" end
+                  if opponent=="wrong-destination" then
+                    BASE_ACTIVE["more-infinite-research"]="5.0.20012"
+                    changes["more-infinite-research"].new_version="5.0.20012"
+                  end
+                  if opponent=="unknown-origin" then changes["more-infinite-research"].old_version="5.0.21003" end
+                  if opponent=="incomplete-old-mask" then GROUPS.research_plastic=nil end
+                  reload_credits(BASE_ACTIVE,"f210")
+                  local force=make_collected_force(1,8,{},true)
+                  local main=force.technologies["recipe-prod-research_steel-1"]
+                  main.saved_progress=.27;local queue={main,force.technologies.foreign}
+                  force.research_queue=queue;force.current_research=main
+                  local ok,message=pcall(native_credits.on_configuration_changed,
+                    {mod_startup_settings_changed=changed,mod_changes=changes})
+                  assert(not ok and tostring(message):find("native family",1,true),"unproven old Base profile admitted")
+                  assert(storage.mir_native_credits==nil,"refusal allocated a baseline")
+                  for _,state in pairs(force._states) do assert(state.writes.level==0 and state.writes.enabled==0) end
+                  assert(main.level==8 and main.saved_progress==.27 and force.research_queue==queue
+                    and force.current_research==main and force.research_progress==.42)
+                  no_foreign_write(force)
+                ''')
+
+    def test_absent_history_cannot_distinguish_two_old_masks_at_identical_native_state(self):
+        self.lua.execute(r'''
+          reload_credits({base="2.1.24",["space-age"]="2.1.24",["more-infinite-research"]="5.0.21012"})
+          local family,recipe="research_steel","steel-plate"
+          local paid=make_collected_force(1,8,{[key(family,recipe)]=true})
+          local unpaid=make_collected_force(2,8,{})
+          -- Opposing old public outputs require different retained credits.
+          close(own_contribution(paid,family,recipe),7*.17)
+          close(own_contribution(unpaid,family,recipe),0)
+          set_mask(paid,{},true);set_mask(unpaid,{},true)
+          for name,a in pairs(paid._states) do
+            local b=unpaid._states[name]
+            assert(a.level==b.level and a.researched==b.researched and a.enabled==b.enabled)
+            assert(a.prototype.hidden==b.prototype.hidden and #a.prototype.effects==#b.prototype.effects)
+            for i,e in ipairs(a.prototype.effects) do
+              local other=b.prototype.effects[i]
+              assert(e.type==other.type and e.recipe==other.recipe and e.change==other.change)
+            end
+          end
+          for _,force in ipairs({paid,unpaid}) do
+            local ok,message=pcall(native_credits.preflight_family_transition,{
+              mod_startup_settings_changed=false,mod_changes={
+                ["more-infinite-research"]={old_version="5.0.21009",new_version="5.0.21012"}}},false,force)
+            assert(not ok and tostring(message):find("unknown first paid mask",1,true))
+            for _,state in pairs(force._states) do assert(state.writes.level==0 and state.writes.enabled==0) end
+            no_foreign_write(force)
+          end
+          assert(storage.mir_native_credits==nil)
+        ''')
 
     def test_plain_beta_base_reader_refuses_changed_unknown_or_foreign_inputs_before_writes(self):
         for opponent in ("startup", "added-provider", "removed-provider", "engine-change",
