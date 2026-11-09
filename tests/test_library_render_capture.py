@@ -86,6 +86,37 @@ class LibraryRenderCaptureTests(unittest.TestCase):
     def test_german_uses_actual_locale_and_separate_output(self):
         self.lua.execute('player.locale="de";run();assert(writes["mir-library-render/de/complete.json"])')
 
+    def test_both_exact_modern_tuples_complete_the_same_render_sequence(self):
+        for engine, package in [("2.0.77", "5.0.20012"), ("2.1.23", "5.0.21012")]:
+            with self.subTest(engine=engine, package=package):
+                self.setUp()
+                self.lua.globals().engine = engine
+                self.lua.globals().package = package
+                self.lua.execute(r'''
+                  script.active_mods.base=engine
+                  script.active_mods["more-infinite-research"]=package
+                  run()
+                  assert(#calls==7 and #screenshots==7 and flushes==1)
+                  local report=writes["mir-library-render/en/complete.json"]
+                  assert(report and report.native_snapshot_unchanged)
+                  assert(report.scenario_setup.original_flag_unset and intro_flag==true)
+                ''')
+
+    def test_cross_edition_missing_and_unqualified_tuples_refuse(self):
+        for engine, package in [("2.0.77", "5.0.21012"), ("2.1.23", "5.0.20012"),
+                                ("2.0.77", "5.0.20011"), ("2.0.77", "5.0.20013"),
+                                ("2.1.23", "5.0.21013"), ("2.0.76", "5.0.20012"),
+                                ("2.1.24", "5.0.21012"), ("2.0.77", None), (None, None)]:
+            with self.subTest(engine=engine, package=package):
+                self.setUp()
+                self.lua.globals().engine = engine
+                self.lua.globals().package = package
+                self.lua.execute('script.active_mods.base=engine;script.active_mods["more-infinite-research"]=package')
+                with self.assertRaisesRegex(Exception, "exact engine/package"):
+                    self.lua.execute('step(1)')
+                self.assertEqual(self.lua.eval('#calls'), 0)
+                self.assertEqual(self.lua.eval('#screenshots'), 0)
+
     def test_exact_engine_and_package_are_required(self):
         for opponent in ['script.active_mods.base="2.1.24"',
                          'script.active_mods["more-infinite-research"]="5.0.21011"']:
@@ -201,6 +232,19 @@ class LibraryRenderCaptureTests(unittest.TestCase):
         for forbidden in ["remote.add_interface", "raise_event", "require(", "server_save", "auto_save",
                           "research_queue =", ".researched =", ".level =", "root.style.width ="]:
             self.assertNotIn(forbidden, code)
+
+    def test_f200_metadata_is_a_distinct_exact_binding_for_the_shared_actor(self):
+        info = json.loads((FIXTURE / "info-f200.json").read_text(encoding="utf-8"))
+        self.assertEqual(info, {
+            "name": "mir-fixture-library-render-capture",
+            "version": "0.1.2",
+            "title": "MIR Library render-only capture fixture",
+            "author": "MIR maintainers",
+            "factorio_version": "2.0",
+            "dependencies": ["base = 2.0.77", "~ more-infinite-research = 5.0.20012"],
+        })
+        f210 = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
+        self.assertEqual(f210["version"], "0.1.1")
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 -- Test-only: render the public Library. No synthetic input or player-code import.
 local BROWSER = "more-infinite-research-browser"
 local ROOT = "mir_research_browser"
+local EXACT_PACKAGES = {["2.0.77"] = "5.0.20012", ["2.1.23"] = "5.0.21012"}
 local CASES = {
   {id = "01-research", tab = "research", search = "", visibility = 1},
   {id = "02-queue", tab = "queue"},
@@ -88,7 +89,8 @@ script.on_nth_tick(30, function()
   if not state then
     if #game.connected_players == 0 then return end
     if game.connected_players[1].controller_type == defines.controllers.cutscene then return end
-    require_that(script.active_mods.base == "2.1.23" and script.active_mods["more-infinite-research"] == "5.0.21012",
+    local expected_package = EXACT_PACKAGES[script.active_mods.base]
+    require_that(expected_package and script.active_mods["more-infinite-research"] == expected_package,
       "exact engine/package tuple differs")
     state = {index = 1, phase = "initial", after = game.tick + 180, observations = {}}
     storage.mir_render_capture = state
