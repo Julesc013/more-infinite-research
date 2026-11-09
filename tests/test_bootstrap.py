@@ -7,6 +7,7 @@ import argparse
 from pathlib import Path
 import sys
 import unittest
+from worker_storage_recovery_fixture import MINIMAL_NATIVE_FACTS
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -16,6 +17,7 @@ class BootstrapTests(unittest.TestCase):
         self.lua = lua if lua is not None else LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().player_root = (ROOT / "source").as_posix()
         self.lua.globals().data_source = (ROOT / "source/data.lua").as_posix()
+        self.lua.execute(MINIMAL_NATIVE_FACTS)
         self.lua.execute(r'''
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
@@ -230,11 +232,17 @@ class BootstrapTests(unittest.TestCase):
             end
             script = {
               active_mods = active_mods or {},
-              on_init = function(callback) handlers.init = callback end,
-              on_configuration_changed = function(callback) handlers.configuration = callback end,
+              on_init = function(callback) handlers.init = function(event) install_worker_recovery_facts();return callback(event) end end,
+              on_configuration_changed = function(callback) handlers.configuration = function(event) install_worker_recovery_facts();return callback(event) end end,
               on_load = function(callback) handlers.load = callback end,
               on_event = function(id, callback, filters)
-                handlers.events[id], handlers.filters[id] = callback, filters
+                handlers.events[id] = callback and function(event)
+                  local force=event and rawget(event,"force")
+                  if not force and event and type(event.research)=="table" then force=rawget(event.research,"force") end
+                  if force then install_worker_recovery_facts({force}) end
+                  return callback(event)
+                end or nil
+                handlers.filters[id] = filters
               end,
               on_nth_tick = function(interval, callback)
                 handlers.nth[interval] = callback
@@ -261,8 +269,10 @@ class BootstrapTests(unittest.TestCase):
           end
 
           function load_control()
+            install_worker_recovery_facts()
             package.loaded["control"] = nil
             package.loaded["runtime.bootstrap"] = nil
+            package.loaded["runtime.worker_robot_storage"] = nil
             package.loaded["platform.target"] = nil
             package.loaded["runtime.native_credits"] = nil
             package.loaded["runtime.legacy_module_credits"] = nil
@@ -521,7 +531,8 @@ class BootstrapTests(unittest.TestCase):
     def test_unlimited_control_omits_only_cap_event_callbacks(self):
         self.lua.execute('''
           install_modules(false); install_runtime(); load_control()
-          for id = 1, 6 do assert(handlers.events[id] == nil) end
+          for id = 1, 3 do assert(type(handlers.events[id]) == "function") end
+          for id = 4, 6 do assert(handlers.events[id] == nil) end
           assert(handlers.events[19] == nil and handlers.events[20] == nil)
           for id = 7, 13 do assert(type(handlers.events[id]) == "function") end
           for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
@@ -584,7 +595,8 @@ class BootstrapTests(unittest.TestCase):
             "unlimited effects reset skipped authored-prototype disablement")
           assert(storage.mir_native_credits == nil and handlers.nth[60] == nil and handlers.nth[61] == nil)
           install_modules(false, false, false, false); remote.interfaces = {}; load_control()
-          for _, id in ipairs({1, 2, 3, 4, 5, 6, 19, 20}) do assert(handlers.events[id] == nil) end
+          for _, id in ipairs({1, 2, 3}) do assert(type(handlers.events[id]) == "function") end
+          for _, id in ipairs({4, 5, 6, 19, 20}) do assert(handlers.events[id] == nil) end
         ''')
 
     def test_family_credit_preflight_refuses_before_any_configuration_write(self):
@@ -688,7 +700,7 @@ class BootstrapTests(unittest.TestCase):
           assert(module_credit_calls.reset.force == player.force)
           assert(cannon_credit_calls.reset.force == player.force)
           for _, id in ipairs({4, 5, 6, 19}) do assert(handlers.events[id] == nil) end
-          install_modules(false, false, false, false); remote.interfaces = {}; load_control()
+          install_modules(false, false, false, false); remote.interfaces = {}; storage={}; load_control()
           handlers.init(); handlers.configuration(event); handlers.load()
           assert(next(module_credit_calls) == nil)
           assert(next(cannon_credit_calls) == nil)
@@ -996,7 +1008,8 @@ class BootstrapTests(unittest.TestCase):
           handlers.nth[60]({tick = 660})
           assert(wall.health == 10 and handlers.nth[60] == nil)
           assert(#storage.mir.passive_repair.queue == 0 and not storage.mir.passive_repair.scheduled)
-          for id = 1, 6 do assert(handlers.events[id] == nil) end
+          for id = 1, 3 do assert(type(handlers.events[id]) == "function") end
+          for id = 4, 6 do assert(handlers.events[id] == nil) end
         ''')
 
     def test_repair_load_reconnects_without_save_writes_or_game_access_and_disable_clears(self):

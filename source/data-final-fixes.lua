@@ -250,8 +250,40 @@ local science_family_bindings
 local worker_storage = modern_selection and modern_selection.worker_storage
 if worker_storage and worker_storage.owned then
   local binding = require("compatibility.science_bindings").conditions_for("worker-robots-storage")
-  binding.inherit_worker_storage_prerequisites = true
+  binding.inherit_worker_storage_prerequisites = not modern_catalogue.has_secretas(mods)
   science_family_bindings = {[worker_storage.technology]=binding}
+end
+if prerequisite_target.id == "f200" or prerequisite_target.id == "f210" then
+  -- This stable private identity is built from MIR's authored Base/Space Age
+  -- default4, independently of a currently selected foreign finite route.
+  local recovery = require("research.worker_storage_recovery")
+  local baseline_mods = mods["space-age"] and {["space-age"]=mods["space-age"]} or {}
+  local definition
+  for _, row in ipairs(modern_catalogue.continuations(baseline_mods, nil)) do
+    if row.id == recovery.canonical then definition = row; break end
+  end
+  assert(definition, "MIR worker recovery default declaration is absent")
+  local recovery_values = values
+  local default_emitted = false
+  for _, row in ipairs(technologies) do if row.name == recovery.canonical then default_emitted = true; break end end
+  -- A profile retaining its own native worker row is not a default recovery
+  -- destination. Do not import removed Base inputs merely to hold zero work.
+  local unavailable = not default_emitted and not (worker_storage and worker_storage.finite and #worker_storage.finite > 0)
+  if values.streams["worker-robots-storage"] == nil then
+    unavailable = true
+    recovery_values = {}
+    for key, value in pairs(values) do recovery_values[key] = value end
+    recovery_values.streams = {}
+    for key, value in pairs(values.streams) do recovery_values.streams[key] = value end
+    recovery_values.streams["worker-robots-storage"] = definition.defaults
+  end
+  local authored = require("research.modern").continuation(definition, recovery_values)
+  local row = unavailable and recovery.uninvested(authored, gear.unit.ingredients[1][1]) or recovery.prototype(authored)
+  technologies[#technologies + 1] = row
+  if not unavailable then
+    science_family_bindings = science_family_bindings or {}
+    science_family_bindings[recovery.id] = require("compatibility.science_bindings").conditions_for("worker-robots-storage")
+  end
 end
 science.apply_family(technologies, science_family_bindings, science_environment, science_context)
 if electric_full then

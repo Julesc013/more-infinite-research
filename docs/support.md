@@ -5,7 +5,7 @@ applies_to: "MIR players and upgrades"
 audience: player
 doc_type: guide
 owner: mir-maintainers
-last_reviewed: 2026-11-07
+last_reviewed: 2026-11-09
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -82,6 +82,19 @@ source_of_truth_for:
 4. Only then change the provider, preference, settings or Factorio version.
 
 - MIR can refuse this first upgrade when it cannot determine a safe productivity preference. Do not remove a provider or change settings merely to force an upgrade through.
+
+### Preparing worker cargo research before adding a provider
+
+- This candidate adds an administrator/server preparation command for saves with MIR's original infinite worker cargo research beginning at level 4. Native qualification of the preparation and later provider transition is pending; use a disposable copy for testing.
+
+1. Keep the protected original save, previous enabled mods and exact MIR settings. Load a copy with this MIR candidate before adding the worker cargo provider.
+2. Run `/mir-worker-storage-recovery prepare`. It checks every force and the native research contract before moving earned and unfinished work to supporting native research. A refusal leaves the original recovery path necessary; do not grant levels manually.
+3. On success, save under a new name and exit immediately. Do not research the reset public worker level 4 or otherwise continue that preparation session.
+4. Add the intended finite worker cargo provider while retaining the MIR settings, including its worker enable switch and level cap. Load the prepared copy and check cargo capacity, all forces, unrelated current progress and queue order before saving and reloading it.
+
+- An already-clamped save cannot prove the lost old level or progress. Return to a protected pre-change original copy; installing MIR and a new provider together does not perform this preparation. Adding MIR to an existing provider or upgrading with the same provider does not grant that provider's finite stages.
+- Only the old queued occurrences or detached partial level may finish at the matching old cost; the supporting research then stops. Use `/mir-worker-storage-recovery resume <force-name>` to append detached partial work while keeping the current unrelated research. Originally disabled work retains its lock and cannot be resumed by this command.
+- Changed research costs, science, effects, prerequisites, worker cap or enable setting refuse the prepared transition. Provider removal, another provider transition and arbitrary overhaul changes remain unqualified. Force merges follow Factorio's native research merge behavior; MIR does not combine independent partial levels.
 
 ### Overlapping weapon-speed research
 

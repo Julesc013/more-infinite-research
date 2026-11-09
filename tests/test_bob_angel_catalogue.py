@@ -12,6 +12,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 import recover_modern_catalogue as catalogue
 from test_k2_base_catalogue import _lua_value, _plain
 from native_credit_oracle import NATIVE_CREDIT_DEFAULT_SCALAR, NATIVE_CREDIT_DESCRIPTORS, NATIVE_FAMILY_RECIPES, native_credit_carrier_rows, legacy_cannon_credit_rows, legacy_module_credit_rows, verified_public_rows
+from worker_storage_recovery_fixture import expected_private_worker_row
 
 SETTINGS_INTENT = ROOT / "spec/inventory/bob-angel-f200-intent-r03.json"
 SETTINGS_INTENT_SHA256 = "1D200906E8996F4049009EE6761E73C88FFC70824BC838496786A32EF927207C"
@@ -197,12 +198,15 @@ class BobAngelCatalogueTests(unittest.TestCase):
     def test_complete_native_definitions_and_foreign_inputs(self):
         lua = self.stage()
         emitted = _plain(lua.globals().emitted)
-        self.assertTrue(catalogue._same(self.expected_complete_data, emitted),
-                        f"complete native output: {catalogue._changed_paths(self.expected_complete_data, emitted)}")
+        complete = deepcopy(self.expected_complete_data)
+        complete["technology"]["mir-worker-storage-preservation-4"] = expected_private_worker_row()
+        self.assertTrue(catalogue._same(complete, emitted),
+                        f"complete native output: {catalogue._changed_paths(complete, emitted)}")
         expected = deepcopy(self.expected_data)
         self.assertEqual(len(expected["technology"]), 67)
         public = verified_public_rows(
-            emitted["technology"], self.inputs["raw"]["recipe"].keys()
+            {name: row for name, row in emitted["technology"].items() if name != "mir-worker-storage-preservation-4"},
+            self.inputs["raw"]["recipe"].keys()
         )
         self.assertEqual(set(public), set(expected["technology"]))
         for name, row in expected["technology"].items():
