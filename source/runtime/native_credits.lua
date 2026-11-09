@@ -6,6 +6,7 @@
 -- manufacturing work needs a temporary completion/cancellation subscription.
 local definitions = require("research.native_credit_definitions")
 local catalogue = require("runtime.catalogue")
+local target = require("platform.target")
 
 local M = {}
 
@@ -71,6 +72,40 @@ local pending_active = false
 local function close(left, right)
   return type(left) == "number" and type(right) == "number"
     and math.abs(left - right) <= EFFECT_TOLERANCE
+end
+
+-- IEEE binary32 round-to-nearest, ties-to-even. F200 converts the input,
+-- multiplication and final division separately; Lua arithmetic is double.
+local function binary32(value)
+  if value == 0 or value ~= value or value == math.huge or value == -math.huge then return value end
+  local sign = value < 0 and -1 or 1
+  local mantissa, exponent = math.frexp(math.abs(value))
+  local scaled = exponent < -125 and math.ldexp(math.abs(value), 149) or math.ldexp(mantissa, 24)
+  local rounded = math.floor(scaled)
+  local remainder = scaled - rounded
+  if remainder > .5 or remainder == .5 and rounded % 2 == 1 then rounded = rounded + 1 end
+  if exponent < -125 then return sign * math.ldexp(rounded, -149) end
+  if exponent > 128 or exponent == 128 and rounded == 16777216 then return sign * math.huge end
+  return sign * math.ldexp(rounded, exponent - 24)
+end
+
+-- Compare only the observed target representation of the positive collected
+-- scalar. These conversions were measured on2.0.77 and2.1.23; an interval can
+-- admit a different native quantum. No contribution or saved mask is inferred.
+local function native_effect_change_matches(actual, expected)
+  if type(actual) ~= "number" or type(expected) ~= "number"
+      or actual ~= actual or expected ~= expected or expected <= 0 then return false end
+  if target.id == "f200" then
+    -- EffectValue's signed16-bit hundredths wrap outside this authored range.
+    -- Refuse those descriptors rather than adopting a wrapped contribution.
+    if expected > 327.67 then return false end
+    local units = math.floor(binary32(binary32(expected) * 100))
+    return actual == binary32(units / 100)
+  elseif target.id == "f210" then
+    if expected > 1000 then return false end
+    return actual == math.floor(expected * 10000 + .5) / 10000
+  end
+  return false
 end
 
 local function integer(value)
@@ -195,11 +230,15 @@ local function inspect_with_mask(force, descriptor, scope)
   local negative = technologies[descriptor.negative_id]
   local positive_scalar = carrier_scalar(positive, descriptor, "positive")
   local negative_scalar = carrier_scalar(negative, descriptor, "negative")
-  if type(positive_scalar) ~= "number" or positive_scalar <= 0
-      or negative_scalar == nil or not close(negative_scalar, -positive_scalar) then
+  if type(positive_scalar) ~= "number" or positive_scalar < 0 or negative_scalar == nil then
     return nil
   end
-  if descriptor.collected and not close(positive_scalar, descriptor.change) then return nil end
+  if descriptor.collected and not native_effect_change_matches(positive_scalar, descriptor.change) then return nil end
+  if positive_scalar == 0 then
+    -- Only a valid collected descriptor normalized to zero can reach here.
+    -- Its paired effect must also be exactly zero; counts still prove history.
+    if not descriptor.collected or negative_scalar ~= 0 then return nil end
+  elseif not close(negative_scalar, -positive_scalar) then return nil end
   local positive_completed = completed_infinite(positive)
   local negative_completed = completed_infinite(negative)
   if positive_completed == nil or negative_completed == nil then return nil end
@@ -216,7 +255,8 @@ local function inspect_with_mask(force, descriptor, scope)
     effect = scope.values[descriptor.recipe]
     effects_valid = scope.valid and effect ~= false
   else effect, effects_valid = named_main_effect(prototype, descriptor.recipe) end
-  if not effects_valid or (effect ~= nil and not close(effect, positive_scalar)) then return nil end
+  if not effects_valid or (effect ~= nil and (positive_scalar == 0 and effect ~= 0
+      or not close(effect, positive_scalar))) then return nil end
   return {
     descriptor = descriptor,
     included = effect ~= nil,
@@ -226,6 +266,74 @@ local function inspect_with_mask(force, descriptor, scope)
     negative = negative,
     private = prototype.hidden == true,
   }
+end
+
+-- Error-path-only observation; no state/level writes or broad scans.
+local function family_failure_detail(force, descriptor, scope)
+  local function text(value)
+    local kind = type(value)
+    if kind == "string" then
+      local escaped = value:gsub("[%z\1-\31\127-\255]", function(c)
+        return string.format("\\x%02X", string.byte(c))
+      end)
+      if #escaped > 180 then escaped = escaped:sub(1, 177) .. "..." end
+      return string.format("%q", escaped)
+    end
+    if kind == "number" or kind == "boolean" or value == nil then return tostring(value) end
+    return "<" .. kind .. ">"
+  end
+  local fields = {}
+  local function add(name, value) fields[#fields + 1] = name .. "=" .. text(value) end
+  add("family", descriptor.family)
+  add("recipe", descriptor.recipe)
+  add("force", force and force.index)
+  add("expected_change", descriptor.change)
+  add("scope_valid", scope and scope.valid)
+  if scope and scope.values then add("main_recipe_change", scope.values[descriptor.recipe]) end
+  local technologies = force and force.technologies
+  for _, part in ipairs({{"main", descriptor.main_id}, {"positive", descriptor.positive_id},
+      {"negative", descriptor.negative_id}}) do
+    local label, id = part[1], part[2]
+    local technology = technologies and technologies[id]
+    add(label .. ".id", id)
+    if technology == nil then
+      add(label .. ".present", false)
+    elseif technology.valid == false then
+      add(label .. ".valid", false)
+    else
+      add(label .. ".name", technology.name)
+      add(label .. ".level", technology.level)
+      add(label .. ".researched", technology.researched)
+      local prototype = technology.prototype
+      if prototype == nil then
+        add(label .. ".prototype", "missing")
+      elseif prototype.valid == false then
+        add(label .. ".prototype_valid", false)
+      else
+        add(label .. ".prototype_name", prototype.name)
+        add(label .. ".first", prototype.level)
+        add(label .. ".max", prototype.max_level)
+        add(label .. ".hidden", prototype.hidden)
+        add(label .. ".enabled", prototype.enabled)
+        add(label .. ".visible_disabled", prototype.visible_when_disabled)
+        local effects = prototype.effects
+        add(label .. ".effects_type", type(effects))
+        if type(effects) == "table" then
+          add(label .. ".effects_count", #effects)
+          if label ~= "main" then
+            local effect = effects[1]
+            if type(effect) == "table" then
+              add(label .. ".effect_type", effect.type)
+              add(label .. ".recipe", effect.recipe)
+              add(label .. ".change", effect.change)
+            end
+          end
+        end
+      end
+    end
+  end
+  return "MIR native family credit has invalid main or carrier [MIR-FAMILY-CREDIT "
+    .. table.concat(fields, "; ") .. "]"
 end
 
 local function family_observations(force)
@@ -249,7 +357,7 @@ local function family_observations(force)
         scopes[descriptor.main_id] = scope
       end
       local observation = inspect_with_mask(force, descriptor, scope)
-      if observation == nil then error("MIR native family credit has invalid main or carrier: " .. descriptor.key, 3) end
+      if observation == nil then error(family_failure_detail(force, descriptor, scope), 3) end
       out[#out + 1] = observation
     end
   end

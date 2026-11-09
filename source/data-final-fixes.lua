@@ -250,8 +250,57 @@ local science_family_bindings
 local worker_storage = modern_selection and modern_selection.worker_storage
 if worker_storage and worker_storage.owned then
   local binding = require("compatibility.science_bindings").conditions_for("worker-robots-storage")
-  binding.inherit_worker_storage_prerequisites = true
+  binding.inherit_worker_storage_prerequisites = not modern_catalogue.has_secretas(mods)
   science_family_bindings = {[worker_storage.technology]=binding}
+end
+if prerequisite_target.id == "f200" or prerequisite_target.id == "f210" then
+  -- This stable private identity is built from MIR's authored Base/Space Age
+  -- default4, independently of a currently selected foreign finite route.
+  local recovery = require("research.worker_storage_recovery")
+  local baseline_mods = mods["space-age"] and {["space-age"]=mods["space-age"]} or {}
+  local definition
+  for _, row in ipairs(modern_catalogue.continuations(baseline_mods, nil)) do
+    if row.id == recovery.canonical then definition = row; break end
+  end
+  assert(definition, "MIR worker recovery default declaration is absent")
+  local recovery_values = values
+  local missing_stream = values.streams["worker-robots-storage"] == nil
+  if missing_stream then
+    recovery_values = {}
+    for key, value in pairs(values) do recovery_values[key] = value end
+    recovery_values.streams = {}
+    for key, value in pairs(values.streams) do recovery_values.streams[key] = value end
+    recovery_values.streams["worker-robots-storage"] = definition.defaults
+  end
+  local authored = require("research.modern").continuation(definition, recovery_values)
+  local default_emitted = false
+  for _, row in ipairs(technologies) do
+    if row.name == recovery.canonical then default_emitted = recovery.matches_default(row, authored); break end
+  end
+  local finite_available = worker_storage and worker_storage.finite and #worker_storage.finite > 0
+  if finite_available then
+    -- Only the finite route's available authored default inputs may support
+    -- old default work. No foreign unit/effect is a source for this holder.
+    for _, name in ipairs(authored.prerequisites) do
+      if not data.raw.technology[name] then finite_available = false; break end
+    end
+    for _, ingredient in ipairs(authored.unit.ingredients) do
+      -- Factorio2.0 science packs are tools; Factorio2.1 uses ordinary items.
+      local name = ingredient[1]
+      if not ((data.raw.tool and data.raw.tool[name]) or (data.raw.item and data.raw.item[name])) then
+        finite_available = false; break
+      end
+    end
+  end
+  -- A same-name SE/overhaul row can have a different work contract; settings
+  -- identity or its mere emission does not establish an available default4.
+  local unavailable = missing_stream or not default_emitted and not finite_available
+  local row = unavailable and recovery.uninvested(authored, gear.unit.ingredients[1][1]) or recovery.prototype(authored)
+  technologies[#technologies + 1] = row
+  if not unavailable then
+    science_family_bindings = science_family_bindings or {}
+    science_family_bindings[recovery.id] = require("compatibility.science_bindings").conditions_for("worker-robots-storage")
+  end
 end
 science.apply_family(technologies, science_family_bindings, science_environment, science_context)
 if electric_full then

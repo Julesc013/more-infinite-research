@@ -1,0 +1,309 @@
+{
+  "schema": 1,
+  "kind": "MIRHistoricalSciencePolicyTestIntentReviewV1",
+  "status": "one-published-body-reconciled-current-evidence-scopes-retained",
+  "reviewed_on": "2026-11-09",
+  "reviewed_current_commit": "e080b2e2c006c3d24af92eff02be089ec5999ab8",
+  "reviewed_player_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+  "subjects": [
+    "CONT-05",
+    "CONT-12",
+    "VER-07"
+  ],
+  "original": {
+    "tag": "v4.7.3",
+    "commit": "8643cc91bc915e008556a5315dbb0a743247e7ab",
+    "path": "tests/compiler/science_planning.lua",
+    "git_blob": "a7d4ce66b7e1c6ad6f6d9e29679d9c60ea6f9d39",
+    "sha256": "5C852897A5EEDA04E69779B4B116E74E222B19F26B2529B73A4063390F035CD1",
+    "bytes": 47561,
+    "lines": 719,
+    "scope": "Controlled module/service test with explicit synthetic assumptions; not Factorio, K2 ecosystem or historical native execution."
+  },
+  "scope": "Complete one exact published test body plus current science and named SIF paid-retention controls/contracts. Other historical variants, helper implementations, inter-release/discussion inputs and whole-product native outcomes are not declared complete.",
+  "groups": [
+    {
+      "original_cases": [
+        "K01-K08",
+        "V301-V309",
+        "V501-V503",
+        "V601-V603",
+        "V701-V703",
+        "V801-V803"
+      ],
+      "original_lines": [
+        111,
+        225
+      ],
+      "independent_expectation": "Finite K2 phase normalization preserves retained late packs, ingredient amounts/order and idempotence; earlier/future policy identities retain their original meaning.",
+      "disposition": "consolidate",
+      "current_controls": [
+        "tests/test_science.py:test_exact_k2so_phase_binding_normalizes_selected_policy_and_preserves_a_phase_trigger"
+      ],
+      "implementation": [
+        "source/research/science.lua"
+      ],
+      "limit": "Old V1/V3/V5/V6/V7/V8 tuple/policy identities are historical contexts, not six new current engine campaigns or an assertion of qualified future mod versions."
+    },
+    {
+      "original_cases": [
+        "S01-S07",
+        "BA01-BA08"
+      ],
+      "original_lines": [
+        227,
+        346
+      ],
+      "independent_expectation": "Explicit science exclusions/requirements and source provenance must not fabricate an early-science fallback; configured Bob/Angel retained vectors/gates are conditional on their declared current facts, and selected expansions keep their requested packs.",
+      "disposition": "consolidate",
+      "current_controls": [
+        "tests/test_science.py:test_policies_preserve_existing_order_amounts_and_append_only_missing_packs",
+        "tests/test_science.py:test_opted_named_science_sources_use_only_a_direct_replacement_after_failure",
+        "tests/test_bob_angel_f200_combined_profile.py"
+      ],
+      "implementation": [
+        "source/research/science.lua",
+        "source/compatibility/modern_catalogue/bob_angel_f200_combined.lua"
+      ],
+      "retired_mechanics": "compiler_context service registry, derived route planner and recursive acquisition statuses are superseded by ARCH-09/COMP-01/COMP-02. Preserve relevant outcomes through authored/direct-source bindings rather than restoring the planner.",
+      "remaining": "BA05-BA08 changed accepting-lab, declared direct-owner, missing-pack and unavailable retained military-gate expectations require a bounded current Bob/Angel suite/applicability decision beyond this science-file review. Existing changed-armor-owner and malformed-lab tests are not automatically the same semantic case. No production defect is established by this unresolved mapping.",
+      "unresolved_subcases": [
+        "BA05",
+        "BA06",
+        "BA07",
+        "BA08"
+      ]
+    },
+    {
+      "original_cases": [
+        "N01-N04",
+        "O01-O04"
+      ],
+      "original_lines": [
+        352,
+        480
+      ],
+      "independent_expectation": "Foreign owner/source/lab admission preserves unowned tables and requires one accepting lab; failure cannot silently fabricate native ownership or contributions.",
+      "disposition": "consolidate",
+      "current_controls": [
+        "tests/test_science.py:test_external_owner_inputs_require_authored_sources_and_one_accepting_lab_without_mutation",
+        "tests/test_native_owner_fallback.py:test_uncovered_producer_uses_existing_mir_identity_and_original_science",
+        "tests/test_native_owner_fallback.py:test_covered_only_preserves_native_and_a_private_empty_paid_identity",
+        "tests/test_native_owner_withheld_runtime.py:test_new_metadata_never_caps_or_cancels_native_research"
+      ],
+      "implementation": [
+        "source/research/science.lua",
+        "source/compatibility/modern_catalogue.lua"
+      ],
+      "limit": "These current controls map source/lab admission, covered/uncovered routes and foreign-state authority separately. Exact N02-N04/O02-O04 old disabled/cycle/unreachable-route fallback behavior is not declared fully qualified by those controls. The old planner.native_owner_binding argument/status API and recursive reachability service are retired; reconcile any valid named-profile fallback obligation separately from impossible/unsupported synthetic planner states. No universal adoption/fallback, source completeness or current-native verdict is granted.",
+      "unresolved_subcases": [
+        "N02",
+        "N03",
+        "N04",
+        "O02",
+        "O03",
+        "O04"
+      ]
+    },
+    {
+      "original_cases": [
+        "ER01-ER20"
+      ],
+      "original_lines": [
+        483,
+        611
+      ],
+      "independent_expectation": "Exact F200/SIF paid retention preserves five hidden historical IDs and eleven recipe rights; validate complete finite-positive coverage, reject malformed/duplicate/extra producers, retain independent input ownership, and prefer legitimate uncovered native adoption without double contribution.",
+      "disposition": "consolidate",
+      "current_controls": [
+        "tests/test_sif_retained_manufacturing.py:test_exact_published_paid_rows_are_hidden_and_keep_only_their_eleven_effects",
+        "tests/test_sif_retained_manufacturing.py:test_wrong_contexts_do_not_import_or_add_the_retention_body",
+        "tests/test_sif_retained_manufacturing.py:test_changed_native_binding_or_scope_refuses_the_retention",
+        "tests/test_sif_retained_manufacturing.py:test_wrong_owner_or_incomplete_coverage_refuses_before_mutation",
+        "tests/test_sif_retained_manufacturing.py:test_product_collection_cannot_reintroduce_processing_scrap_or_an_extra_producer",
+        "tests/test_sif_retained_manufacturing.py:test_each_selection_is_detached_and_nondefault_tuning_uses_the_existing_setting",
+        "tests/test_sif_retained_manufacturing.py:test_hidden_holders_do_not_withhold_legitimate_uncovered_native_recipe",
+        "tests/test_sif_retained_manufacturing_native.py:test_actual_lua_lifecycle_preserves_source_and_two_read_only_colds"
+      ],
+      "independent_expectations_fixture": "tests/fixtures/sif-retained-manufacturing/expectations.json",
+      "implementation": [
+        "source/compatibility/modern_catalogue/sif_retained.lua",
+        "source/compatibility/modern_catalogue.lua",
+        "source/research/modern.lua"
+      ],
+      "evidence": [
+        "spec/evidence/sif-entry-boundary-native-chain-r01.json",
+        "spec/evidence/sif-zero-time-inheritance-native-chain-r01.json"
+      ],
+      "consolidation": "The exact SIF1.0.60 predicate and existing1.0.61 opponent also exclude historical1.0.59; absence of a separately named1.0.59 subcase does not create an every-version test requirement. Old automatic_family/native_owner_binding/extra-owner-record and action-string shapes are retired mechanics.",
+      "remaining": "Review consumed-input applicability of the named original5.0.20002/F2002.0.77 paid-retention and zero-time scopes to the selected stable candidate. The current exact selector does not admit this retention rule for F210; do not extrapolate native paid-retention evidence to F210 or fabricate a new requirement without its original source/profile obligation."
+    },
+    {
+      "original_cases": [
+        "L01-L04",
+        "P01-P13",
+        "X-*",
+        "V310"
+      ],
+      "original_lines": [
+        628,
+        716
+      ],
+      "independent_expectation": "One lab must accept the retained science vector; reductions preserve required/phase triggers, exact amounts, deterministic ties, context isolation and input/output ownership.",
+      "disposition": "consolidate",
+      "current_controls": [
+        "tests/test_science.py:test_lab_policies_never_union_labs_and_disable_established_identity",
+        "tests/test_science.py:test_required_and_phase_science_survive_reduction_or_disable_before_publication",
+        "tests/test_science.py:test_prepared_context_reuses_lab_decisions_without_aliasing_current_rows"
+      ],
+      "implementation": [
+        "source/research/science.lua"
+      ],
+      "retired_mechanics": "Old planner status strings and synthetic Lignumis/service reachability assertions are not current public API requirements. Known authored/direct source support and honest failure boundaries remain required."
+    }
+  ],
+  "retained_native_limits": {
+    "paid_retention": "sif-entry-boundary-native-chain-r01 is fixture-seeded preservation on F2002.0.77/5.0.20002, source551532d4dd458445b19ed42e4e8d4a22d9ba628a, package71F8EF8E; it is not lab-earned, final10/11, GUI/client/performance or stable acceptance.",
+    "zero_time": "sif-zero-time-inheritance-native-chain-r01 is data-stage/default inheritance only on F2002.0.77, sourcef6756b90ea952b3b7a46a2452137a92661cefa7a, controlled private package07A62C82; no save/gameplay/client verdict."
+  },
+  "review": {
+    "reader_role": "mir_luna_xhigh",
+    "configured_model": "gpt-5.6-luna",
+    "initial_scope_adverse": "The first read compared ER only with test_science.py and therefore reported no counterpart there; the scoped follow-up found the existing dedicated paid-retention suite/evidence. Do not treat that initial file-limited observation as an actual overall coverage gap.",
+    "reader_native_execution": false,
+    "root_checks": "Raw Git blob/size/line count, actual current control-name existence, exact original native source/package identity readback and contract scope. The N/O group now names the actual productivity-owner fallback/withheld controls and explicitly leaves exact old unreachable-route fallback scope unresolved, rather than substituting shared continuation ownership tests.",
+    "independent_review": {
+      "role": "mir_luna_xhigh",
+      "reviewer": "separate bounded reviewer from the original extractor",
+      "initial_finding": "Continuity summary said721lines while raw Git/source records counted719.",
+      "disposition": "Corrected to actual719before commit; semantic grouping/source identity and all no-native/stable limits retained."
+    }
+  },
+  "next_bounded_work": {
+    "owner": "Black Glass integration and affected native owner; Aero independent reconciliation",
+    "task": "Review the delivered BA08 correction against the current candidate, retain the unchanged baseline output/disabled-stream/foreign-input controls, and recheck applicable native profile paths only if consumed inputs change. SCI-RESEARCH-01 exact provider/profile/protected-save evidence remains absent; original ER/native evidence keeps its named identity. No planner restoration or completed campaign restart."
+  },
+  "claims": {
+    "native_execution": false,
+    "new_host_execution": false,
+    "player_source_changed": false,
+    "original_requests_changed": false,
+    "historical_inventory_complete": false,
+    "stable_qualification": false
+  },
+  "claims_scope": "Original exact-body review claims below retain their original false execution flags; the additive followup records later host observations separately. Neither scope asserts native or stable qualification.",
+  "initial_next_bounded_work": {
+    "owner": "Aero",
+    "task": "Reconcile BA05-BA08 conditional retained Bob/Angel selection/gate cases against current admitted profile and exact changed-fact opponents; record coverage, a demonstrated defect, or an explicitly evidenced support boundary. Do not rerun the already mapped ER suite merely because another release shipped.",
+    "native_owner_if_affected": "Black Glass"
+  },
+  "followup_reconciliation": {
+    "reviewed_on": "2026-11-09",
+    "scope": "BA05-BA08 changed-fact admission and N/O historical-mechanism applicability only",
+    "reviewed_original_current_source": "e080b2e2c006c3d24af92eff02be089ec5999ab8",
+    "ba_diagnostic": {
+      "path": "build/qualification/mir5-bob-angel-retention-review-aero-r01/current-data-final-changed-facts.json",
+      "sha256": "A8ECF5446CFB2192469FF0C88F2666B6AD772F468D73393904917351FCAFA47B",
+      "profile": "tests/profiles/bob-angel-f200-2077.json",
+      "captured_input": "tests/fixtures/bob-angel-f200-catalogue-inputs.json",
+      "composition": "normal source data.lua plus data-final-fixes.lua; independent captured foreign rows",
+      "native_execution": false
+    },
+    "ba_decisions": [
+      {
+        "cases": "BA05",
+        "disposition": "replaced-by-current-shared-lab-policy",
+        "finding": "Reducing the captured accepting lab to automation only produces automation-only bullets under the existing reduction policy; the named authored gates remain. The old conditional full-vector planner fallback is not restored. Existing no-lab-union/required-pack controls retain their boundaries."
+      },
+      {
+        "cases": "BA06-BA07",
+        "disposition": "retired-derivation-is-not-an-authored-input",
+        "finding": "Changing the production-science owner prerequisites or removing the utility tool does not affect the current no-BobTech bullets A/L/military vector. The actual authored vectors/gates are in modern_catalogue/bob_angel.lua and modern_catalogue.lua; the separate SpaceAge+BobTech combined profile is not this old case."
+      },
+      {
+        "cases": "BA08",
+        "disposition": "demonstrated-admission-gap-correction-delivered-for-review",
+        "finding": "The independent baseline has enabled water treatment. Setting angels-water-treatment.enabled=false still emitted enabled bullets on the original current source. The bounded correction rejects enabled available authored rows requiring that named gate before any later data-final publication, while all intentionally disabled gated streams remain disabled/publishable and foreign input is unchanged. This is a host changed-input opponent, not a reproduced upstream/reporter/native defect."
+      }
+    ],
+    "ba_correction": {
+      "author_commit": "2f8dc0b2ff485e3e6e2391ceab48ef216d120ccd",
+      "base": "e080b2e2c006c3d24af92eff02be089ec5999ab8",
+      "base_player_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+      "player_tree": "ef1f38bee0061c2e43f54cd1ceaccadfb06471dc",
+      "whole_tree": "89e7a924815318867406755b2dc82f2c178c8af8",
+      "scope": [
+        "source/compatibility/modern_catalogue.lua",
+        "source/research/modern.lua",
+        "tests/test_bob_angel_catalogue.py"
+      ],
+      "integrator": "Black Glass alone; no automatic merge into frozen inputs",
+      "host_controls": [
+        {
+          "path": "build/qualification/mir5-bob-angel-gate-aero-r01/test_bob_angel_catalogue-post-comment.txt",
+          "tests": 4,
+          "sha256": "754D92A4B0AFC686388F56ED9D55ABD0D577C7C1A456545C374FE16169DF0290"
+        },
+        {
+          "path": "build/qualification/mir5-bob-angel-gate-aero-r01/test_bob_angel_f200_combined_profile-post-comment.txt",
+          "tests": 10,
+          "sha256": "9B1226497CED0F03625F6423EE7B0960EBBEA67EBEB3FC951103CA6C85107543"
+        },
+        {
+          "path": "build/qualification/mir5-bob-angel-gate-aero-r01/test_modern_targets-post-comment.txt",
+          "tests": 5,
+          "sha256": "D4C07173D4738CCADEEEE2C65B6214AB4C1E2CDE3807CAD982250D8DD90262AB"
+        }
+      ],
+      "adverses_retained": [
+        "test_bob_angel_catalogue-red-before-source.txt: intended red, changed gate was admitted",
+        "test_bob_angel_catalogue-green.txt: failed test expectation of global zero writes; data.lua had already emitted its shortcut. Corrected to no later publication, not a claimed product defect."
+      ],
+      "native_execution": false,
+      "package_built": false,
+      "published510_changed": false,
+      "pull_request": "https://github.com/Julesc013/more-infinite-research/pull/1822"
+    },
+    "native_owner_mapping": [
+      {
+        "cases": "N01",
+        "current": "source/research/modern.lua named-owner preflight/patching and source/data-final-fixes.lua integration; tests/test_generator.py:test_native_owner_patches_are_atomic_profile_bound_and_preserve_unowned_fields plus tests/test_native_owner_fallback.py",
+        "limit": "Host atomicity/identity/foreign-row controls; not native reporter evidence."
+      },
+      {
+        "cases": "N02-N04",
+        "current": "The original tests inject synthetic disabled/unreachable reasons through retired native_owner_binding services. Current named fallback is limited to explicitly withheld owners and unclassifiable cost shapes. No global researchability or recursive fallback traversal remains.",
+        "limit": "Do not infer an exact supported-profile failure or restore the old planner from these synthetic reason strings."
+      },
+      {
+        "cases": "O01-O02",
+        "current": "tests/test_science.py:test_external_owner_inputs_require_authored_sources_and_one_accepting_lab_without_mutation and exact competing-productivity provider controls preserve bounded admission/unowned fields; disabled opponent is exact-provider scoped.",
+        "limit": "Historical kr-imersite-productivity is not an exact current K2SO owner binding; this is not reporter-profile reproduction."
+      },
+      {
+        "cases": "O03-O04",
+        "current": "Synthetic generic cycle/unreachable owner service cases have no independently applicable named current provider binding.",
+        "limit": "Retire the generic service mechanism; preserve any actual named foreign ownership/save obligation separately."
+      }
+    ],
+    "specific_missing_native_obligation": {
+      "request_id": "SCI-RESEARCH-01",
+      "contract": "spec/programmes/community-requests.json",
+      "missing": "Recover exact Space-Lab-Research-61 provider/package/engine/mod/settings closure and protected save; qualify startup/ownership without duplicate effects and preserve foreign identity/earned levels/progress/queue through save and two cold reloads.",
+      "existing_result_limit": "Representative startup observations do not instantiate the reporter provider or protect its earned state; original requested-not-qualified status remains unchanged.",
+      "owner": "Black Glass native owner; source recovery may proceed independently on Aero"
+    },
+    "review": {
+      "reader_role": "mir_luna_xhigh for N/O mapping; separate root non-author source diff review of Terra correction",
+      "source_review": "Separate non-author mir_luna_xhigh accepted commit2f8dc0b2 after actual three-file/ordering/source-tree review; root also independently inspected the complete diff. Reviewer executed no tests/native and granted no gameplay/save/client/performance/release acceptance.",
+      "metadata_review": "Separate read-only mir_luna_xhigh review accepted the scoped BA/N/O reconciliation after unrelated encoding mutations were restored from the exact original UTF-8 Git blob. Whole-inventory preservation invariant, static repository and whitespace controls pass; original requests/decisions and original false execution claims are preserved."
+    },
+    "claims": {
+      "new_host_execution": true,
+      "native_execution": false,
+      "original_requests_changed": false,
+      "historical_inventory_complete": false,
+      "stable_qualification": false
+    }
+  }
+}

@@ -171,6 +171,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_module_permissions_activation.py",
             "tests/test_bootstrap.py",
             "tests/test_library.py",
+            "tests/test_library_legacy_settings_search_probe.py",
             "tests/test_library_multiplayer_fixture.py",
             "tests/test_library_native_input_fixture.py",
             "tests/test_library_paired_browser_fixture.py",

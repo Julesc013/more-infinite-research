@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "kind": "MIR511ConfiguredSteelForwardNativeChainV1",
+  "status": "accepted-scoped-actual-earned10-to11-save-two-cold-route",
+  "source": {
+    "commit": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+    "player_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+    "distribution": "5.0.21010",
+    "package_sha256": "C625D648978F6FE677B5EDC5C68090A2AA9A939D48A54A736610D55E47337806",
+    "package_bytes": 996956,
+    "protected_save_sha256": "8A04048E22091BE1DAB09FB3BBB5415629971B4AD54D5ED20979E893D03B8514",
+    "protected_save_bytes": 826984
+  },
+  "target": {
+    "commit": "706dd02cc86993cd4d20b769aca85f2a661ea786",
+    "player_tree": "4bcdf2b89d63d38fe6cb0b66840a83096a56dd0c",
+    "distribution": "5.0.21011",
+    "package_sha256": "74418DC171C8FA3F21486EF21B1FA8D348E99798E4F4D6DF5657024D2B87B892",
+    "package_bytes": 995123,
+    "protected_save_sha256": "05BBCFE330AE1AF4F7C8294C8472CEDBFDE0CC0A8EDD8932C2CEA7D79631A211",
+    "protected_save_bytes": 827284,
+    "published": false
+  },
+  "runner": {
+    "public_commit": "21be82a8c0637db49722c3c20bbf9c05080ba095",
+    "private_controller_commit": "336b435776192c97fdd13de568c9d7459382535d",
+    "caller_sha256": "C6AB7DF2AC19818B490AE4CA41B4BC5A132996C94062B56DAE1309F6CBF54127",
+    "actor_sha256": "39CEE3E0A2918DF244120F64CBC84DE6021C4801A95A6E4840A6ADE77591CA61",
+    "same_observer_both_legs_sha256": "15A6D3100E3CFCD7A0D1EB34ECE4CA2249F3C75E623608907F3E9930A37EA9F5",
+    "observer_bytes": 2130,
+    "engine_version": "2.1.23",
+    "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "composition": {
+    "source_manifest_sha256": "108EBAAA858D348BC0833F136418D34028C6CED4E087F75B4DE2ABDF35BC1C0C",
+    "source_actual_sha256": "200BC5DB18929DA42AF1899356410D57C4E770083D902C01E3EC03D2690EAF63",
+    "source_execute_custody_sha256": "00561E796184FBF7B4269AE9F67709FA6A0796616B18DB9504D2FB49E1DC554C",
+    "target_manifest_sha256": "CBDCFA8869194F7B6560740221A2073462D9CE8BAAB4739B261EB8354F57B65E",
+    "target_actual_sha256": "7040E2A4E8A17AB098E7BFC40216E16F9BF2E7C15E07C6D9E1EBF1A032EEB662",
+    "target_execute_custody_sha256": "6241F85A1EADFADA007242DAFBC2D99A33F2F9AA25B94ABD6BB23E388B7EC1B6",
+    "official_mods_both_legs": ["base@2.1.23", "elevated-rails@2.1.23", "quality@2.1.23", "recycler@2.1.23", "space-age@2.1.23"],
+    "same_fixture_both_legs": "mir-fixture-native-owner-settings@0.2.0",
+    "only_changed_mod": "more-infinite-research:5.0.21010->5.0.21011",
+    "startup_setting_changed": false,
+    "native_budget_mib": 4096,
+    "output_limit_mib": 128,
+    "timeout_seconds_per_process": 180
+  },
+  "actual": {
+    "native_processes": 6,
+    "new_source_lab_completions": 1,
+    "completion_by_script": false,
+    "completion_tick": 119,
+    "new_target_lab_completions": 0,
+    "actual_configuration_event_order": ["level", "more-infinite-research"],
+    "configuration_entry_precedes_mir": true,
+    "source_entry_post_mir_and_cold_frames_equal": true,
+    "configured_tuple": {"base": 2, "increment": 3, "growth": 1.25, "time_seconds": 1, "effect_percent": 17},
+    "map_price_multiplier": 1,
+    "owner_level": 2,
+    "owner_effective_units": 6,
+    "private_effective_units": 2,
+    "steel_and_casting_reward_each": 0.17,
+    "foreign_bullet_damage_reward": 0.07,
+    "remaining_each_of_four_sciences": 4,
+    "foreign_disablement_and_unearned_private_holder_preserved": true,
+    "two_read_only_cold_processes_per_leg": true,
+    "production_exits": [-1, -1],
+    "production_save_predicates_observed": true,
+    "cold_exits": [0, 0, 0, 0],
+    "timeouts": 0,
+    "source_and_successor_save_hashes_unchanged_on_cold_loads": true,
+    "embedded_actor_both_saves_verified": true,
+    "controls_and_19_prior_mir_archives_restored": true,
+    "temporary_target_and_observer_removed": true,
+    "remaining_factorio_processes_at_completion": 0
+  },
+  "independent_review": {
+    "source_admission_sha256": "291376C63318517A3F123CDBD11D2929A35984BAC951A0C6BF1349C61737B1FF",
+    "target_admission_sha256": "63AE723826C9047397D0A5B0BC04B90A74C2ABD5B372316C7FE8F01822DBA364",
+    "actual_result": "spec/evidence/native-owner511-forward-independent-result-review-r01.json",
+    "actual_result_sha256": "CABA4A5912977376B7C22954407624EAF81EF5E8D17A6E8151E01C1B4D4C4B62",
+    "verdict": "Accepted exact prospective configured-steel source10-to11 forward route; all93 retained members and actual state/custody records independently read back."
+  },
+  "custody": {
+    "primary_root": "build/qualification/native-owner511-forward-native-custody-r01",
+    "manifest_sha256": "A6C91A73B13426A05D5F415EC48898052104194A754F2F15EF34F940E2EC1C79",
+    "files": 93,
+    "bytes": 8158997,
+    "host_log_sha256": "DFA4A96C8B52FF627A54B7C7669A5A4613CAE4C046F94515006B4E1A95BF761F",
+    "host_controls_passed": 10
+  },
+  "limits": [
+    "The source is a newly declared prospective10 lab-earned save, not the earlier strict968A save whose actor rejects configuration. Both original identities remain intact.",
+    "Entry is before MIR's configuration callback, after engine loading/prototype migration; no pre-engine or direct MIR private-storage observation is claimed.",
+    "This exact configured-steel route does not establish arbitrary settings/provider/engine transitions, historical first-mask inference, nonzero partial investment, physical manufacturing, client/GUI, performance, whole-catalogue or stable acceptance.",
+    "Later test-only source heads retain player4bc and the fixed7441 asset; they are not renamed native executions. Published10 bytes remain unchanged."
+  ],
+  "release_qualification": false
+}

@@ -22,6 +22,7 @@ local ARMS = {
   ["candidate-mir5"] = {name = "candidate-mir5", version = "5.0.21000", science = CANDIDATE_SCIENCE},
   ["candidate-defaults-mir5"] = {name = "candidate-defaults-mir5", version = "5.0.21000", science = PUBLISHED_SCIENCE},
   ["candidate-defaults-mir5-505"] = {name = "candidate-defaults-mir5", version = "5.0.21005", science = PUBLISHED_SCIENCE},
+  ["candidate-defaults-mir5-510"] = {name = "candidate-defaults-mir5", version = "5.0.21010", science = PUBLISHED_SCIENCE},
   ["published-4.7.21002"] = {name = "published-4.7.21002", version = "4.7.21002", science = PUBLISHED_SCIENCE}
 }
 local TIERS = { [1] = true, [32] = true, [128] = true }
@@ -65,6 +66,11 @@ local function authored_arm(name)
     and script.active_mods[ACTIVE] == "0.1.0" then
     return ARMS["candidate-defaults-mir5-505"]
   end
+  if name == "candidate-defaults-mir5" and script.active_mods["more-infinite-research"] == "5.0.21010"
+    and script.active_mods["mir-fixture-mir5-agriculture-scale"] == "0.1.1" and script.active_mods[DEFAULTS] == "0.1.1"
+    and script.active_mods[ACTIVE] == "0.1.0" then
+    return ARMS["candidate-defaults-mir5-510"]
+  end
   return ARMS[name]
 end
 
@@ -75,8 +81,17 @@ local function selected_arm(value)
     fail("active agriculture selector version differs")
   end
   local candidate = script.active_mods[CANDIDATE] == "0.1.0"
-  local defaults = script.active_mods[DEFAULTS] == "0.1.0"
+  local defaults = script.active_mods[DEFAULTS] == "0.1.0" or script.active_mods[DEFAULTS] == "0.1.1"
   local published = script.active_mods[PUBLISHED] == "0.1.0"
+  if script.active_mods[DEFAULTS] == "0.1.1"
+    and (script.active_mods["mir-fixture-mir5-agriculture-scale"] ~= "0.1.1"
+      or script.active_mods["more-infinite-research"] ~= "5.0.21010" or not paired or active ~= "0.1.0") then
+    fail("current Defaults selector requires exact active agriculture identity")
+  end
+  if script.active_mods["mir-fixture-mir5-agriculture-scale"] == "0.1.1"
+    and (script.active_mods["more-infinite-research"] ~= "5.0.21010" or not paired or script.active_mods[DEFAULTS] ~= "0.1.1" or active ~= "0.1.0") then
+    fail("current agriculture fixture requires exact active Defaults identity")
+  end
   if paired then
     if (candidate and 1 or 0) + (defaults and 1 or 0) + (published and 1 or 0) ~= 1 then
       fail("paired agriculture fixture requires exactly one arm selector")

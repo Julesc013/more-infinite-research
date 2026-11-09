@@ -1,0 +1,31 @@
+{
+  "kind": "MIRExactRemoteCustodyReadbackV1",
+  "observed_at_utc": "2026-11-09T05:08:21.604752+00:00",
+  "repository": "Julesc013/scratchpad",
+  "commit": "f6046be608c8733e7fec62943c38129001beee94",
+  "branch": "evidence/mir511-incident-native-blackglass-r01",
+  "identity": "BLACKGLASS-WIN1\\Jules",
+  "account": "Julesc013",
+  "status": "all-three-remote-blobs-match-local-original-bodies",
+  "files": [
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/credit-qualification-adverses-r01/.gitattributes",
+      "git_blob": "57cdc50305d07f35133f80962644debd6b846bf3",
+      "bytes": 12,
+      "sha256": "DC867BFA424D5804F4B790B2901BB95C32DF7BB3341B3AAC822DFC76751093FE"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/credit-qualification-adverses-r01/MANIFEST.json",
+      "git_blob": "7e68d265d42971faeb630d726cd3421ed7b4c934",
+      "bytes": 334496,
+      "sha256": "FA4957C836B82F8A99C4D58A520A961A02EED694F3C94AF8C3B74265000064D9"
+    },
+    {
+      "path": "evidence/mir511-incident-native-blackglass-r01/credit-qualification-adverses-r01/original-bodies.json.gz",
+      "git_blob": "5212420186f285b0c97da12f7a0689f48b95b308",
+      "bytes": 18193857,
+      "sha256": "0F36B11BA0DF75BFF9E681B2D5BFDC3D2A99EF0E985617BC0F89D4BB3E646649"
+    }
+  ],
+  "qualification": false
+}

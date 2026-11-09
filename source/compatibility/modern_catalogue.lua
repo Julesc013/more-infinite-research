@@ -617,6 +617,14 @@ local function apply_bob_angel(definitions)
   end
 end
 
+local function bob_angel_disabled_water_gate(raw)
+  -- This is a named no-BobTech admission fact, not a prerequisite walker.
+  -- An absent gate retains the Generator's existing missing-name rejection.
+  local technologies = type(raw) == "table" and raw.technology or nil
+  local gate = type(technologies) == "table" and technologies["angels-water-treatment"] or nil
+  return type(gate) == "table" and gate.enabled == false
+end
+
 -- The F200 Space Age + BobTech tuple is not the retained no-BobTech profile.
 -- Its finite published vectors are selected only after the named provider
 -- gate and its own preflight. Do not relax the older selector or transport
@@ -1038,7 +1046,8 @@ function M.select(active_mods, raw, withheld)
     native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
     k2_imersite = k2so and k2so.imersite or false, sif_retained = sif_retained, native_paid = native_paid,
     k2_imersite_carriers = target.id == "f210" and k2_base,
-    bob_angel = bob_angel, bob_angel_f200_combined = bob_angel_f200_combined,
+    bob_angel = bob_angel, bob_angel_disabled_water_gate = bob_angel and bob_angel_disabled_water_gate(raw),
+    bob_angel_f200_combined = bob_angel_f200_combined,
     bob_core = bob_core, bob_plates_profile = bob_plates,
     bob_tech_materials = bob_tech_materials,
     angel_f210_profile = angel_f210, angel_materials = M.angel_material_definitions(active_mods),
@@ -1305,6 +1314,14 @@ function M.continuations(active_mods, raw, external_continuations, worker_storag
       end
       require("compatibility.modern_catalogue.secretas").worker_continuation(row,
         not secretas_external and raw or nil)
+      if raw ~= nil then
+        -- Record the admitted current chain independently of Secretas's
+        -- authored ninth-row construction/science policy. The adapter may
+        -- alter only this detached probe, never the emitted row or provider.
+        worker_route = require("compatibility.worker_robot_storage").adapt(copy(row), raw,
+          existing_infinite_owner, helpers and helpers.evaluate_expression,
+          M.science_ingredients(row.science, row.science_amounts))
+      end
     elseif row.id == "worker-robots-storage-4" and (target.id == "f200" or target.id == "f210")
         and not bob_angel_f200_combined and not M.retains_bob_native_continuations(active_mods)
         and type(raw) == "table" and type(raw.technology) == "table"

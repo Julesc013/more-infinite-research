@@ -1,0 +1,190 @@
+{
+  "schema": 1,
+  "kind": "MIRNativeCredit511PrecisionIndependentReviewV1",
+  "reviewed_at_utc": "2026-11-09T00:17:13.770642+00:00",
+  "reviewer": {
+    "agent": "fallback511_result_review",
+    "role": "non-author bounded code/numerical review",
+    "production_source_edits": false,
+    "native_execution": false,
+    "child_agents": false
+  },
+  "verdict": "CHANGES REQUIRED for PR1846 final aab51b88f; retain diagnostics but do not accept the numeric interval as a complete engine-precision rule",
+  "issue": "https://github.com/Julesc013/more-infinite-research/issues/1845",
+  "pr": "https://github.com/Julesc013/more-infinite-research/pull/1846",
+  "reviewed_head": "aab51b88fef05f56656c00cb431057072563ce0f",
+  "source_author_commit": "8e93cb0a14d6d83517a4a5b16986026b6a264c00",
+  "base_commit": "ee823e17bfe4c3422cc55aa68e857f9e55fdb491",
+  "source_body_identical_between_author_commit_and_final_head": true,
+  "review_worktree": "D:\\Projects\\Factorio\\.task-builds\\native-credit511-precision-review-r01",
+  "review_worktree_clean": true,
+  "source_blob": "c0e9bfed979c6c5f7d73afac35e2ed698fbb4f42",
+  "source_raw_git_sha256": "E5965E9E16CE80AD683963F10022B0E63C8221479B9EC633614A93E188A4D2D2",
+  "test_blob": "a82990e9e97c7a4c8fb15221d1f5eb07aa73c2d2",
+  "findings": [
+    {
+      "id": "PRECISION-01",
+      "severity": "blocking",
+      "location": "source/runtime/native_credits.lua:80-85",
+      "problem": "The interval includes the entire gap from truncated metadata to untruncated expected plus a relative float allowance. A genuine adjacent legal native effect quantum can therefore satisfy the metadata check, establishing a saved baseline despite disagreement.",
+      "counterexample": {
+        "target": "f210",
+        "authored_descriptor_change": 999.10009,
+        "four_decimal_truncation": 999.1,
+        "expected_truncated_float": 999.0999755859375,
+        "different_legal_native_quantum": 999.1001,
+        "different_quantum_as_float": 999.10009765625,
+        "predicate_tolerance": 5.9551005959510805e-05,
+        "predicate_lower": 999.0999404489941,
+        "predicate_upper": 999.100149551006,
+        "accepted_by_current_predicate": true,
+        "coherent_main_positive_negative_tuple_accepted_by_on_init_in_all_five_families": true,
+        "storage_baseline_created_in_all_five_families": true
+      },
+      "evidence_limit": "This is an actual Lua5.2 host execution of the PR module with a coherent legal native-value opponent, plus the documented truncation rule. It is not an observation of how a particular engine parses999.10009; conversion order must be confirmed natively. Exact-grid999.1 adjacent tests pass but do not cover this fractional endpoint.",
+      "required_resolution": "Use an engine-supported representational equivalence rule that does not admit a different legal EffectValue quantum. Add the fractional upper-end opponent and prove the intended conversion with exact native input/output; do not merely widen or tune this interval."
+    },
+    {
+      "id": "PRECISION-02",
+      "severity": "blocking-documentation-and-coverage-gap",
+      "location": "source/runtime/native_credits.lua:75-85; tests/test_native_family_paid_credits.py:104-161",
+      "problem": "The new comment/function and both-target mock cases assume four decimal EffectValue precision. Pinned2.0.77 prototype documentation specifies two decimals with range-327.68..327.67 and wrap outside; pinned2.1.23 specifies four decimals with range±1000. Runtime change isfloat on both. F200 cannot be justified using F210 conversion semantics.",
+      "counterexample": {
+        "target": "f200",
+        "authored_descriptor_change": 0.56789,
+        "documented_two_decimal_value": 0.56,
+        "documented_value_as_float": 0.5600000023841858,
+        "current_on_init_accepts_documented_value": false,
+        "current_on_init_accepts_f32_of_0_5678": true,
+        "all_five_families_exercised": true,
+        "failed_preflight_created_storage": false
+      },
+      "evidence_limit": "Pinned SDK documentation and host behavior establish a concrete target-contract mismatch, not measured native2.0.77 conversion. The39 passing tests synthetically feed identical four-decimal values on both targets, including999.1 outside F200 documented range. They are not exact-engine evidence.",
+      "required_resolution": "Reconcile the exact2.0.77 engine representation and documented limits before claiming cross-target correction; use target-specific documented/native observations and meaningful F200 cases."
+    }
+  ],
+  "accepted_aspects": [
+    "The original .3 double versus float0.30000001192092896 mismatch is corrected in the host model for all five authored families.",
+    "The diff changes only the collected-descriptor scalar equivalence check and error construction. Carrier identity, effect type/recipe/count, level/max-level, hidden/disabled/visible flags, finite positive scalar, signed pair, main/carrier equality and MIR creation-custody checks remain intact.",
+    "Main/carrier and signed-pair comparisons still use the original1e-8 close predicate. Missing/invalid observations remain a complete preflight refusal before ledger/native writes; saved paid-mask, queue and foreign-state code is unchanged.",
+    "Error details run only after a failed observation. Fixed named main/two-carrier reads, bounded escaped fields and printable family/recipe IDs add useful startup diagnostics without a success-path scan or state write.",
+    "Both authored commits remain unchanged and reachable; no production fix was made by this reviewer."
+  ],
+  "numeric_endpoints": {
+    "positive_domain": "Collected descriptor normalization already requires finite strictly positive change; zero/negative descriptors are rejected before the new function. Actual zero/negative/nonfinite carriers remain rejected by existing guards. Negative carrier symmetry remains strict.",
+    "rounding_bound": "abs(expected)*2^-24 is a conservative relative binary32 rounding allowance; combining it with a full truncation interval is the acceptance broadening in PRECISION-01.",
+    "zero_and_large_limits": "Positive authored values quantized to zero and values outside an engine EffectValue range require explicit engine policy; they are not qualified by these synthetic tests. The two target domains differ."
+  },
+  "sdk_evidence": [
+    {
+      "engine_version": "2.0.77",
+      "runtime_api": {
+        "path": "D:/Games/Factorio/2.0/doc-html/runtime-api.json",
+        "bytes": 1878804,
+        "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578"
+      },
+      "prototype_api": {
+        "path": "D:/Games/Factorio/2.0/doc-html/prototype-api.json",
+        "bytes": 1739413,
+        "sha256": "29772ECE6140B515D295A504C6F9AC5BC9E653D8B1470E8CD6DB825F93FCC756"
+      },
+      "runtime_change_type": "float",
+      "documented_EffectValue_precision_decimals": 2,
+      "documented_EffectValue_range": [
+        -327.68,
+        327.67
+      ]
+    },
+    {
+      "engine_version": "2.1.23",
+      "runtime_api": {
+        "path": "D:/Games/Factorio/2.1/doc-html/runtime-api.json",
+        "bytes": 2132310,
+        "sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373"
+      },
+      "prototype_api": {
+        "path": "D:/Games/Factorio/2.1/doc-html/prototype-api.json",
+        "bytes": 1866585,
+        "sha256": "03DB6BFFF8AB1DCF738A52F33331FB839E53DBAFCC576492CD297F94A4BA99F2"
+      },
+      "runtime_change_type": "float",
+      "documented_EffectValue_precision_decimals": 4,
+      "documented_EffectValue_range": [
+        -1000,
+        1000
+      ]
+    }
+  ],
+  "official_docs": {
+    "current_checked": "https://lua-api.factorio.com/latest/types/EffectValue.html",
+    "current_version_observed": "2.1.24",
+    "current_observation": "Four decimal precision and range±1000 agree with pinned2.1.23.",
+    "exact_version_web_attempts": "Official2.0.77 and2.1.23 EffectValue URLs were inaccessible through the web tool; pinned installed SDK JSON bytes above were read directly. No current documentation is substituted for the older engine."
+  },
+  "validation": {
+    "driver_plan_command": "tests/Test-MIR5HostControls.ps1 -Plan",
+    "plan": {
+      "path": "D:/Projects/Factorio/.task-builds/native-credit511-precision-review-r01/build/qualification/native-credit511-precision-review-r01/host-plan.json",
+      "bytes": 15883,
+      "sha256": "41BDEF630EFDE93EC41DAC977D979C66774EE2D2E279CAE13F27DDFE82507FFE"
+    },
+    "selected_control": "tests/test_native_family_paid_credits.py",
+    "test_command": "python -B tests/test_native_family_paid_credits.py --lua-runtime-dir D:/Projects/Factorio/more-infinite-research/build/tmp/mir421-lua-runtime",
+    "host_log": {
+      "path": "D:/Projects/Factorio/.task-builds/native-credit511-precision-review-r01/build/qualification/native-credit511-precision-review-r01/family-credit-host.log",
+      "bytes": 143,
+      "sha256": "65675B02020F533BE018DA2B197BE57A0E3E0965AE9CDB86837BACE01AAE376F"
+    },
+    "tests": 39,
+    "passed": 39,
+    "exit_code": 0,
+    "elapsed_reported_seconds": 6.677,
+    "pinned_lua52": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/tmp/mir421-lua-runtime/lupa/lua52.cp314-win_amd64.pyd",
+      "bytes": 507904,
+      "sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899"
+    },
+    "runtime_requirements": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/tmp/mir421-lua-runtime/requirements.txt",
+      "bytes": 90,
+      "sha256": "F77FB8AB757ABAD65931A09B67C7E7DAC8C26727175E6935B381344BF42E0872"
+    },
+    "independent_numeric_opponents": {
+      "path": "D:/Projects/Factorio/.task-builds/native-credit511-precision-review-r01/build/qualification/native-credit511-precision-review-r01/independent-numeric-opponents.json",
+      "bytes": 5697,
+      "sha256": "DA6EFC2CBB57438523EDC9D3075FFF5CDB0818F93BC666BCA4B036DDA4ADDF7E"
+    },
+    "opponent_tuples": 35,
+    "families": [
+      "research_low_density_structure",
+      "research_plastic",
+      "research_processing_unit",
+      "research_rocket_fuel",
+      "research_steel"
+    ],
+    "checks_not_run": "No whole host suite, native process, Library/performance/history campaign or package build. Four CI checks were reported by the integration owner; this review independently ran the selected39 host controls only."
+  },
+  "required_affected_native_evidence_after_source_resolution": [
+    "Freeze the corrected player and controller separately from prior F25/all17; verify exact engine hashes, two target versions, builtins, package/settings closure and actual descriptor/main/positive/negative values.",
+    "Fresh new worlds on2.0.77 and2.1.23: all five families, .3 representation and meaningful target-specific fractional/truncation boundary cases load through actual on_init. Genuine adjacent legal native quanta and structural mutations must refuse before state/native writes.",
+    "First add to protected copies of the exact reported saves or independently named equivalent first-add fixtures: observe the failed low-density identity and untouched foreign state, queue and saved/current progress. Missing reporter saves remain unverified; this PR alone does not prove those saves fixed.",
+    "Paid source upgrade at the exact old/current package and settings: preserve earned public/private carrier contribution, saved paid-mask custody and foreign work; never infer an unknown first paid mask. Exercise one ordinary affected laboratory completion where progression changes, retaining by_script=false, consumption and exact effects.",
+    "Save the actual resulting world, protect its bytes, then perform two separate read-only cold loads of that same save. Verify embedded observer/source bindings and repeated persisted witnesses, no new scripted completion, no duplicate credit and no configuration mutation."
+  ],
+  "scope_limits": [
+    "This review addresses the invalid main/carrier research_low_density_structure precision/diagnostic class only. It does not establish the exact cause or fix for the reporter saves, the earlier research-multiplier issue, Secretas or Ferrum/bootstrap/worker-storage changes owned separately.",
+    "No change to the prior F25 package or17-package inventory and no retroactive qualification claim.",
+    "No stable acceptance, release qualification or publication verdict."
+  ],
+  "workspace_health": {
+    "command": "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1 -AsJson -Mode Hook",
+    "status": "attention",
+    "side_effects": "none-report-only",
+    "free_mib": 94549,
+    "primary_dirty_before_review": 0,
+    "disposition": "Existing worktrees/branches/unique commits preserved. New detached review worktree contains only ignored review outputs; no cleanup, reset, rebase or source edits."
+  },
+  "native_execution": false,
+  "release_qualification": false,
+  "stable_acceptance": false
+}

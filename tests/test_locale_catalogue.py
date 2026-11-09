@@ -13,6 +13,7 @@ LOCALE_ROOT = ROOT / "source" / "locale"
 PUBLISHED_B6_ARCHIVE_SHA256 = "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
 NEW_ENGLISH_ONLY_KEY = "more-infinite-research.recipe_productivity"
 NEW_ENGLISH_ONLY_VALUE = "Recipe productivity"
+DIRECT_EFFECT_KEY = "technology-description.more-infinite-research.direct_effect"
 REFERENCE_PATTERN = re.compile(
     r"(?P<section>technology-name|technology-description|modifier-description)\.more-infinite-research\.(?P<key>[a-z0-9_]+)"
 )
@@ -123,10 +124,14 @@ CURRENT_TRANSLATION_OVERRIDES = {
     },
 }
 
-# Accepted meaning corrections from AstardGrimoire/more-infinite-research,
+# Accepted meaning corrections retain each reviewed current literal before normalizing
+# only that value to its historical B6 literal; the complete historical projection stays pinned.
+# The Russian corrections below originate in AstardGrimoire/more-infinite-research
 # commit 389a8b848145a89713be32b658c80113565246b4, locale/ru/more-infinite-research.cfg.
-# Require each reviewed current literal before normalizing only that value to
-# its historical B6 literal; the complete historical projection stays pinned.
+# Direct-effect #1768 uses the raw source/locale/<language>/more-infinite-research.cfg
+# blobs from published v5.0.10 commit 958e34dd2701418c71f74ae094c26ff7cd467e6b:
+# each pair preserves that translation's original first benefit sentence and restores
+# only the removed active-lab-science suffix while normalizing the B6 projection.
 ACCEPTED_POST_B6_CORRECTIONS = {
     'ru': {
         'technology-name.more-infinite-research.research_heavy_ammo': (
@@ -179,6 +184,254 @@ ACCEPTED_POST_B6_CORRECTIONS = {
         'modifier-description.more-infinite-research.agricultural_growth_speed': (
             'Скорость роста растений: +__1__% за уровень.',
             'Скорость роста сельского хозяйства: +__1__% за уровень.',
+        ),
+        'technology-description.more-infinite-research.direct_effect': (
+            "Добавляет бесконечно повторяемый бонус.", "Добавляет бесконечно повторяемый бонус. Исследовательские пакеты выбираются из активных лабораторий, чтобы технология оставалась исследуемой с совместимыми наборами модов.",
+        ),
+    },
+    'af': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Voeg 'n oneindige herhaalbare bonus by.", "Voeg 'n oneindige herhaalbare bonus by. Wetenskappakkette word uit aktiewe laboratoriums gekies, sodat die tegnologie navorsbaar bly met versoenbare mod-stelle.",
+        ),
+    },
+    'ar': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "يضيف مكافأة لا حصر لها قابلة للتكرار.", "يضيف مكافأة لا حصر لها قابلة للتكرار. يتم اختيار حزم العلوم من المعامل النشطة بحيث تظل التكنولوجيا قابلة للبحث باستخدام مجموعات التعديل المتوافقة.",
+        ),
+    },
+    'be': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Дадае бясконцы паўторны бонус.", "Дадае бясконцы паўторны бонус. Навуковыя пакеты выбіраюцца з дзеючых лабараторый, таму тэхналогія застаецца даступнай для даследавання з дапамогай сумяшчальных набораў модаў.",
+        ),
+    },
+    'bg': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Добавя безкраен повторяем бонус.", "Добавя безкраен повторяем бонус. Научните пакети се избират от активни лаборатории, така че технологията остава изследваема със съвместими комплекти модове.",
+        ),
+    },
+    'ca': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Afegeix una bonificació repetible infinita.", "Afegeix una bonificació repetible infinita. Els paquets de ciència es seleccionen dels laboratoris actius, de manera que la tecnologia segueix sent investigable amb conjunts de modificacions compatibles.",
+        ),
+    },
+    'cs': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Přidá nekonečný opakovatelný bonus.", "Přidá nekonečný opakovatelný bonus. Vědecké balíčky jsou vybírány z aktivních laboratoří, takže technologii lze zkoumat pomocí kompatibilních sad modů.",
+        ),
+    },
+    'da': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Tilføjer en uendelig gentagelig bonus.", "Tilføjer en uendelig gentagelig bonus. Science packs er udvalgt fra aktive laboratorier, så teknologien forbliver researchbar med kompatible modsæt.",
+        ),
+    },
+    'de': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Fügt einen unendlich wiederholbaren Bonus hinzu.", "Fügt einen unendlich wiederholbaren Bonus hinzu. Wissenschaftspakete werden aus aktiven Laboren ausgewählt, damit die Technologie mit kompatiblen Mod-Sätzen erforschbar bleibt.",
+        ),
+    },
+    'el': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Προσθέτει ένα άπειρο επαναλαμβανόμενο μπόνους.", "Προσθέτει ένα άπειρο επαναλαμβανόμενο μπόνους. Τα επιστημονικά πακέτα επιλέγονται από ενεργά εργαστήρια, ώστε η τεχνολογία να παραμένει ερευνήσιμη με συμβατά σετ mod.",
+        ),
+    },
+    'en': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Adds an infinite repeatable bonus.", "Adds an infinite repeatable bonus. Science packs are selected from active labs so the technology remains researchable with compatible mod sets.",
+        ),
+    },
+    'eo': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Aldonas senfinan ripeteblan gratifikon.", "Aldonas senfinan ripeteblan gratifikon. Sciencaj pakoj estas elektitaj el aktivaj laboratorioj, do la teknologio restas esplorebla kun kongruaj mod-aroj.",
+        ),
+    },
+    'es-ES': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Añade una bonificación infinita repetible.", "Añade una bonificación infinita repetible. Los paquetes de ciencia se seleccionan a partir de los laboratorios activos para que la tecnología siga siendo investigable con conjuntos de mods compatibles.",
+        ),
+    },
+    'et': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Lisab lõputu korratava boonuse.", "Lisab lõputu korratava boonuse. Teaduspaketid valitakse aktiivsetest laboritest, nii et tehnoloogia on ühilduvate modikomplektidega uuritav.",
+        ),
+    },
+    'eu': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Hobari errepikagarri infinitua gehitzen du.", "Hobari errepikagarri infinitua gehitzen du. Zientzia-paketeak laborategi aktiboetatik hautatzen dira, teknologiak mod-multzo bateragarriekin ikertu ahal izateko.",
+        ),
+    },
+    'fa': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "یک جایزه قابل تکرار بی نهایت اضافه می کند.", "یک جایزه قابل تکرار بی نهایت اضافه می کند. بسته‌های علمی از آزمایشگاه‌های فعال انتخاب می‌شوند، بنابراین فناوری با مجموعه‌های مد سازگار قابل تحقیق باقی می‌ماند.",
+        ),
+    },
+    'fi': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Lisää loputtoman toistettavan bonuksen.", "Lisää loputtoman toistettavan bonuksen. Tiedepaketit valitaan aktiivisista laboratorioista, joten tekniikka pysyy tutkittavissa yhteensopivien mod-sarjojen kanssa.",
+        ),
+    },
+    'fil': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Nagdaragdag ng walang katapusang nauulit na bonus.", "Nagdaragdag ng walang katapusang nauulit na bonus. Pinipili ang mga science pack mula sa mga aktibong lab upang manatiling masasaliksik ang teknolohiya sa mga katugmang mod set.",
+        ),
+    },
+    'fr': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Ajoute un bonus répétable à l'infini.", "Ajoute un bonus répétable à l'infini. Les packs de science sont choisis à partir des laboratoires actifs afin que la technologie reste recherchable avec les ensembles de mods compatibles.",
+        ),
+    },
+    'fy-NL': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Foeget in ûneinige werhelle bonus ta.", "Foeget in ûneinige werhelle bonus ta. Wittenskipspakketten wurde selektearre út aktive laboratoaren, sadat de technology ûndersiikber bliuwt mei kompatibele mod-sets.",
+        ),
+    },
+    'ga-IE': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Cuirtear bónas in-athdhéanta gan teorainn leis.", "Cuirtear bónas in-athdhéanta gan teorainn leis. Roghnaítear pacáistí eolaíochta ó shaotharlanna gníomhacha agus mar sin is féidir taighde a dhéanamh ar an teicneolaíocht le tacair modúil comhoiriúnacha.",
+        ),
+    },
+    'he': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "מוסיף בונוס אינסופי שניתן לחזור עליו.", "מוסיף בונוס אינסופי שניתן לחזור עליו. ערכות מדע נבחרות ממעבדות פעילות כך שהטכנולוגיה נשארת ניתנת למחקר עם ערכות מוד תואמות.",
+        ),
+    },
+    'hr': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Dodaje beskonačni ponovljivi bonus.", "Dodaje beskonačni ponovljivi bonus. Znanstveni paketi biraju se iz aktivnih laboratorija tako da se tehnologija može istražiti s kompatibilnim setovima modifikacija.",
+        ),
+    },
+    'hu': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Végtelen megismételhető bónuszt ad hozzá.", "Végtelen megismételhető bónuszt ad hozzá. A tudományos csomagokat az aktív laborokból választják ki, így a technológia kutatható marad a kompatibilis modkészletekkel.",
+        ),
+    },
+    'id': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Menambahkan bonus berulang yang tak terbatas.", "Menambahkan bonus berulang yang tak terbatas. Paket sains dipilih dari laboratorium aktif sehingga teknologinya tetap dapat diteliti dengan set mod yang kompatibel.",
+        ),
+    },
+    'is': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Bætir við óendanlega endurteknum bónus.", "Bætir við óendanlega endurteknum bónus. Vísindapakkar eru valdir úr virkum rannsóknarstofum þannig að tæknin er áfram rannsóknarhæf með samhæfum mod settum.",
+        ),
+    },
+    'it': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Aggiunge un bonus ripetibile all'infinito.", "Aggiunge un bonus ripetibile all'infinito. I pacchetti scientifici vengono scelti dai laboratori attivi, così la tecnologia rimane ricercabile con set di mod compatibili.",
+        ),
+    },
+    'ja': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "無限に繰り返し可能なボーナスを追加します。", "無限に繰り返し可能なボーナスを追加します。サイエンス パックはアクティブなラボから選択されるため、テクノロジーは互換性のある MOD セットで引き続き研究可能です。",
+        ),
+    },
+    'ka': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "ამატებს უსასრულო განმეორებად ბონუსს.", "ამატებს უსასრულო განმეორებად ბონუსს. სამეცნიერო პაკეტები შერჩეულია აქტიური ლაბორატორიებიდან, ასე რომ, ტექნოლოგია რჩება შესასწავლად თავსებადი მოდების კომპლექტებით.",
+        ),
+    },
+    'kk': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Шексіз қайталанатын бонус қосады.", "Шексіз қайталанатын бонус қосады. Ғылыми жинақтар белсенді зертханалардан таңдалады, сондықтан технология үйлесімді мод жиынтықтарымен зерттелетін болып қалады.",
+        ),
+    },
+    'ko': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "무한 반복 보너스를 추가합니다.", "무한 반복 보너스를 추가합니다. 과학 팩은 활성 실험실에서 선택되므로 해당 기술은 호환 가능한 모드 세트로 계속 연구할 수 있습니다.",
+        ),
+    },
+    'lt': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Prideda begalinę pakartojamą premiją.", "Prideda begalinę pakartojamą premiją. Mokslo paketai parenkami iš aktyvių laboratorijų, todėl technologiją galima ištirti naudojant suderinamus modifikacijų rinkinius.",
+        ),
+    },
+    'lv': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Pievieno bezgalīgu atkārtojamu bonusu.", "Pievieno bezgalīgu atkārtojamu bonusu. Zinātnes pakotnes ir atlasītas no aktīvām laboratorijām, tāpēc tehnoloģija joprojām ir pētāma ar saderīgiem moduļu komplektiem.",
+        ),
+    },
+    'nl': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Voegt een oneindig herhaalbare bonus toe.", "Voegt een oneindig herhaalbare bonus toe. Wetenschapspakketten worden geselecteerd uit actieve laboratoria, zodat de technologie onderzoekbaar blijft met compatibele mod-sets.",
+        ),
+    },
+    'no': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Legger til en uendelig repeterbar bonus.", "Legger til en uendelig repeterbar bonus. Vitenskapspakker er valgt fra aktive laboratorier, slik at teknologien forblir forskningbar med kompatible mod-sett.",
+        ),
+    },
+    'pl': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Dodaje nieskończenie powtarzalną premię.", "Dodaje nieskończenie powtarzalną premię. Pakiety naukowe są wybierane z aktywnych laboratoriów, aby technologia pozostała możliwa do zbadania z kompatybilnymi zestawami modów.",
+        ),
+    },
+    'pt-BR': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Adiciona um bônus infinito repetível.", "Adiciona um bônus infinito repetível. Os pacotes científicos são selecionados a partir dos laboratórios ativos para que a tecnologia continue pesquisável com conjuntos de mods compatíveis.",
+        ),
+    },
+    'pt-PT': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Adiciona um bônus repetível infinito.", "Adiciona um bônus repetível infinito. Os pacotes científicos são selecionados em laboratórios ativos para que a tecnologia permaneça pesquisável com conjuntos de mods compatíveis.",
+        ),
+    },
+    'ro': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Adaugă un bonus repetabil infinit.", "Adaugă un bonus repetabil infinit. Pachetele științifice sunt selectate din laboratoarele active, astfel încât tehnologia rămâne cercetabilă cu seturi de mod compatibile.",
+        ),
+    },
+    'sk': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Pridáva nekonečný opakovateľný bonus.", "Pridáva nekonečný opakovateľný bonus. Vedecké balíčky sa vyberajú z aktívnych laboratórií, takže technológia zostáva skúmateľná pomocou kompatibilných súprav modov.",
+        ),
+    },
+    'sl': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Doda neskončen ponovljiv bonus.", "Doda neskončen ponovljiv bonus. Znanstveni paketi so izbrani iz aktivnih laboratorijev, tako da je tehnologija še vedno raziskljiva z združljivimi sklopi modov.",
+        ),
+    },
+    'sq': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Shton një bonus të pafund të përsëritshëm.", "Shton një bonus të pafund të përsëritshëm. Paketat shkencore zgjidhen nga laboratorë aktivë, në mënyrë që teknologjia të mbetet e kërkueshme me grupe modash të përputhshme.",
+        ),
+    },
+    'sr': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Додаје бесконачан поновљив бонус.", "Додаје бесконачан поновљив бонус. Научни пакети се бирају из активних лабораторија, тако да се технологија може истражити са компатибилним сетовима модова.",
+        ),
+    },
+    'sv-SE': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Lägger till en oändlig upprepningsbar bonus.", "Lägger till en oändlig upprepningsbar bonus. Vetenskapspaket väljs från aktiva laboratorier så att tekniken förblir forskningsbar med kompatibla mod-set.",
+        ),
+    },
+    'th': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "เพิ่มโบนัสที่ทำซ้ำได้ไม่สิ้นสุด", "เพิ่มโบนัสที่ทำซ้ำได้ไม่สิ้นสุด ชุดวิทยาศาสตร์ได้รับการคัดเลือกจากห้องปฏิบัติการที่ใช้งานอยู่ ดังนั้นเทคโนโลยีจึงสามารถวิจัยได้ด้วยชุดม็อดที่เข้ากันได้",
+        ),
+    },
+    'tr': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Sonsuz tekrarlanabilir bonus ekler.", "Sonsuz tekrarlanabilir bonus ekler. Bilim paketleri aktif laboratuvarlardan seçilir, böylece teknoloji uyumlu mod setleriyle araştırılabilir kalır.",
+        ),
+    },
+    'uk': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Додає нескінченний повторюваний бонус.", "Додає нескінченний повторюваний бонус. Наукові пакети вибираються з активних лабораторій, тому технологію можна досліджувати за допомогою сумісних наборів модів.",
+        ),
+    },
+    'vi': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "Thêm phần thưởng có thể lặp lại vô hạn.", "Thêm phần thưởng có thể lặp lại vô hạn. Các gói khoa học được chọn từ các phòng thí nghiệm đang hoạt động nên công nghệ vẫn có thể nghiên cứu được với các bộ mod tương thích.",
+        ),
+    },
+    'zh-CN': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "添加无限可重复的奖励。", "添加无限可重复的奖励。科学包是从活跃的实验室中选择的，因此该技术仍然可以通过兼容的模组集进行研究。",
+        ),
+    },
+    'zh-TW': {
+        'technology-description.more-infinite-research.direct_effect': (
+            "添加無限可重複的獎勵。", "添加無限可重複的獎勵。科學包是從活躍的實驗室中選擇的，因此該技術仍然可以透過相容的模組集進行研究。",
         ),
     },
 }
@@ -326,6 +579,19 @@ def retained_projection(sections: dict[str, dict[str, str]]) -> dict[str, str]:
     return projection
 
 
+def direct_effect_first_benefit(language: str, historical: str) -> str:
+    if language == "th":
+        first_benefit, separator, _ = historical.partition(" ชุดวิทยาศาสตร์")
+        if not separator:
+            raise ValueError(f"missing Thai direct-effect benefit boundary: {language}")
+        return first_benefit
+    delimiter = "。" if language in {"ja", "zh-CN", "zh-TW"} else "."
+    first_benefit, separator, _ = historical.partition(delimiter)
+    if not separator:
+        raise ValueError(f"missing direct-effect benefit boundary: {language}")
+    return first_benefit + separator
+
+
 # Published 4.7.3 English keys, restricted to current native locale map and
 # current standalone declarations. Native descriptors supply one technology argument.
 NATIVE_SETTING_KEYS = (
@@ -385,6 +651,8 @@ class LocaleCatalogueTests(unittest.TestCase):
                 self.assertEqual(projection[full_key], expected, f"{language}: {full_key}")
             for full_key, (corrected, historical) in ACCEPTED_POST_B6_CORRECTIONS.get(language, {}).items():
                 self.assertEqual(projection[full_key], corrected, f"{language}: {full_key}")
+                if full_key == DIRECT_EFFECT_KEY:
+                    self.assertEqual(corrected, direct_effect_first_benefit(language, historical), language)
                 projection[full_key] = historical
             actual = hashlib.sha256(
                 json.dumps(projection, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")

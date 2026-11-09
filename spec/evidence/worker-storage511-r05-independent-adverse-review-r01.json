@@ -1,0 +1,119 @@
+{
+  "kind": "MIRWorker511R05IndependentAdverseReviewV1",
+  "reviewed_at_utc": "2026-11-09T08:31:25.026190+00:00",
+  "verdict": "Resume boundary passed; first finished callback adverse. No provider endpoint/cold or release acceptance.",
+  "source_commit": "d4beb15429e22bab89d474f65ff67a6bf991a9ae",
+  "source_tree": "a8f46c7a91cdfa6414d93eb3db435706b0edc83d",
+  "package": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir511-cumulative-assets-r03\\more-infinite-research_5.0.21011.zip",
+    "exists": true,
+    "bytes": 1006567,
+    "sha256": "4499642380DD04C1E5B0A105DAC4B88DDAEDB7013F9A57B5D112A5E1D987CF4A"
+  },
+  "pins": {
+    "terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r05-controller\\execution-Execute-r04\\terminal.json",
+      "bytes": 25411,
+      "sha256": "96F80D959A40ACD80D3A748E06A155D32E26AE63C22516AA9349080A43501EAF"
+    },
+    "packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r05-controller\\packet.json",
+      "bytes": 596355,
+      "sha256": "E71E97982C74600F1E933F12A09AC8C02676A99F48AD346B0D5EAE78AD41D2EA"
+    },
+    "caller": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r05-controller\\Invoke-ProviderContinuation.ps1",
+      "bytes": 20560,
+      "sha256": "E54FC3533672389A292944E9A04B4775F3737C12A62B2D8505C55E4A2FC61645"
+    },
+    "scenario": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r05-controller\\inputs\\control.lua",
+      "exists": true,
+      "bytes": 18662,
+      "sha256": "63BA77D7CC4F4235ADB0ECC09652F844910B4E5AEF7533A351CA93EB603A4DDD"
+    },
+    "raw_log": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r05-controller\\Execute-r04-provider\\write-data\\factorio-current.log",
+      "bytes": 107985,
+      "sha256": "8EB116BE0EC3237F3A9C8371CE49953447F55096773CB52866E5EA073BE23D0C"
+    }
+  },
+  "actual": {
+    "processes": 1,
+    "pids": [
+      2112
+    ],
+    "last_resource_record": {
+      "observed_at": "2026-11-09T08:26:32.9553477+00:00",
+      "phase": "completed",
+      "exit_code": -1,
+      "peak_working_set_bytes": 430440448,
+      "peak_sampled_private_bytes": 425644032,
+      "completion_predicate_observed": false
+    },
+    "marker_stages": [
+      [
+        "provider-configuration-pending",
+        30416
+      ],
+      [
+        "provider-ready",
+        30416
+      ],
+      [
+        "provider-resume-observed",
+        30797
+      ]
+    ],
+    "last_ordinary_counts": {
+      "worker-suspended": 3,
+      "player": 4
+    },
+    "successful_resume": "Suspended force queue[S,P], unrelated S current.010009999999999998, detached P saved.27004693049212736. Actor resume guard passed at30797; no finish marker afterward.",
+    "failure_tick": 35247,
+    "failure": "Production on_research_finished -> snapshot284 -> on_research_event632 -> bootstrap535; combined current/queue/progress refusal.",
+    "process_receipt": "Completed ledger exit-1, completion_predicatefalse. Normal case process/commands arrays empty because helper threw before append, not evidence of no RCON or no native.",
+    "endpoint_saves": 0,
+    "colds": 0,
+    "recorded_factorio_after_restoration": 0
+  },
+  "observed_vs_inferred": {
+    "known": "Exact combined guard failed. No force, event research id, current-name, queue contents or progress scalar are logged inside the failing callback.",
+    "not_known": "Which disjunct failed; whether this was private P or unrelated S; engine callback current/progress/level representation at failure.",
+    "timing_inference": {
+      "delta_ticks": 4450,
+      "remaining_sentinel_arithmetic": 4450.504495504496,
+      "limit": "Strongly consistent with suspended unrelated S finishing first, not proof of event id/force. Do not label P completion as observed."
+    }
+  },
+  "minimal_response": {
+    "proposal": "One explicit observational diagnostic candidate/packet under Root ownership, from original protected9A9 input and same resume/provider workflow. Immediately before unchanged snapshot refusal, record bounded force/index,current-name,queue-first+length,current-progress+type,private level/researched and separate guard booleans. Also include event research name/finished/tick at on_research_event before snapshot.",
+    "why": "Captures actual failing frame at guaranteed production point rather than relying on scenario callback order. No guard acceptance, native state reset, reward change, or speculative progress relaxation.",
+    "next": "After exact observation, independently review minimal source correction and meaningful negative controls, then fresh exact-source provider endpoint/save/two cold route. Immediate finished guard is demonstrated as a native blocker now, while its scalar cause is still unobserved."
+  },
+  "custody": {
+    "members": 11,
+    "all_primary_and_frozen_raw_bodies_match_recorded_hashes": true,
+    "protected_original_9A9_unchanged": true,
+    "prior_controls": 2,
+    "prior_archives": 19,
+    "recorded_activation_restoration": "restored-direct-library-controls",
+    "recorded_archive_restoration": [
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-worker-recovery511_0.4.0.zip",
+        "action": "removed-temporary"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21011.zip",
+        "action": "removed-temporary"
+      }
+    ],
+    "live_library_rechecked": false
+  },
+  "limits": [
+    "No new private or sentinel completion, retirement, ordinary foreign4, provider save or provider cold pass established.",
+    "a8 source approval was conditional for native; this new adverse is not waived by host checks or earlier queue fix.",
+    "Preserve all r02-r05 raw/admission/prefix/protected bytes and prior named credit evidence.",
+    "Reviewer ran no engine/build/new host suite and edited no source/docs/packet/library."
+  ]
+}

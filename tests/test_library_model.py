@@ -252,6 +252,7 @@ class LibraryModelTests(unittest.TestCase):
             expected[descriptor.id] = true
           end
           expected[require("research.legacy_cannon_credit_definitions").descriptor().id] = true
+          expected["mir-worker-storage-preservation-4"] = true
           expected["mir-k2-imersite-staged-state-1"] = true
           expected["mir-k2-imersite-continuation-state-4"] = true
           expected["mir-native-credit-research_electric_shooting_speed-electric-positive"] = true
@@ -264,7 +265,7 @@ class LibraryModelTests(unittest.TestCase):
             assert(value == true and expected[id] == true, "unexpected private credit identity: " .. tostring(id))
             count = count + 1
           end
-          assert(count == 10)
+          assert(count == 11)
           for id in pairs(expected) do assert(first[id] == true and second[id] == true) end
           local changed = "mir-legacy-module-credit-speed-module"
           first[changed] = false

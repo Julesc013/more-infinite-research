@@ -10,6 +10,7 @@ from repository_paths import reference_path
 import subprocess
 import sys
 import unittest
+from worker_storage_recovery_fixture import expected_private_worker_row
 
 from native_credit_oracle import (
     current_native_credit_rows as native_credit_carrier_rows,
@@ -416,10 +417,11 @@ class K2BaseCatalogueTests(unittest.TestCase):
         emitted_names = [str(name) for name in self.lua.globals().emitted.values()]
         self.assertEqual(len(emitted_names), len(set(emitted_names)), "duplicate K2 Base output")
         emitted_rows = {name: _plain(actual[name]) for name in emitted_names}
-        actual_public, actual_credit = split_public_and_native_credit_rows(emitted_rows)
+        private_worker = {"mir-worker-storage-preservation-4": expected_private_worker_row()}
+        actual_public, actual_credit = split_public_and_native_credit_rows(emitted_rows, private_worker)
         expected_credit = native_credit_carrier_rows(
             rows, set(self._captured_raw_subset()["recipe"])
-        )
+        ) | private_worker
         self.assertEqual(actual_public, rows)
         self.assertEqual(actual_credit, expected_credit)
         self.assertEqual(set(emitted_rows), set(rows) | set(expected_credit))
@@ -854,6 +856,13 @@ class K2BaseCatalogueTests(unittest.TestCase):
             actual, _ = self._run_f210_pipeline(case)
             facts = self.f210_facts["science_and_lab_facts"][case["id"]]
             with self.subTest(case=case["id"]):
+                # Full default work is meaningful only for the unchanged Base
+                # contract. SE's different authored public work gets an empty
+                # holder with no imported Base2/3/science prerequisites. Both
+                # expectations come from the frozen Base row, not that output.
+                wanted_holder = expected_private_worker_row(
+                    "automation-science-pack" if case["id"] == "k2se-base" else None)
+                self.assertEqual(actual["technology"]["mir-worker-storage-preservation-4"], wanted_holder)
                 self.assertEqual(gear["ingredients"], actual["recipe"][gear["recipe"]]["ingredients"])
                 self.assertEqual(gear["results"], actual["recipe"][gear["recipe"]]["results"])
                 for name, expected in facts["technologies"].items():

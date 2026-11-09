@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "kind": "MIR510ActivePhysicalPreparationObservationsV1",
+  "status": "passed-named-physical-scopes-not-performance-or-stable-accepted",
+  "candidate": {
+    "source": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+    "player_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+    "archive_sha256": "C625D648978F6FE677B5EDC5C68090A2AA9A939D48A54A736610D55E47337806",
+    "bytes": 996956
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "source_harnesses": {
+    "repair": "063c99cb209a16ac26c30560e9bbef0a41c957e8",
+    "agriculture": "280230f95223f0dbd7c851d5a1840ee0e5e0d5f3"
+  },
+  "pending_preparations": {
+    "repair": "Explicit observer/source r03 passes with same266658... seed as preserved failed terminal r01;1000 total,256 capacity,744 overflow,pending unchanged.",
+    "agriculture": "Tiers1/32/128 each earn two real lab completions; both forces have N towers and zero planting before saved pending work."
+  },
+  "custom_unscored_pilots": {
+    "repair": "Original r02 observes256 initial changes and8 reactivation changes with overflow/foreign preservation.",
+    "agriculture": {
+      "tiers": [
+        1,
+        32,
+        128
+      ],
+      "observed_events": [
+        2,
+        64,
+        256
+      ],
+      "real_lab_completions_per_case": 2,
+      "player_and_foreign_towers_per_case": "N/N",
+      "protected_sources_and_copies_byte_identical": true
+    }
+  },
+  "native_processes": {
+    "repair_capture_r01": 1,
+    "repair_pilot_r02": 1,
+    "repair_formal_capture_r03": 1,
+    "agriculture_captures": 6,
+    "agriculture_custom_pilots": 3,
+    "total": 12,
+    "prelaunch_guard_refusals": "Repair pilot r01 and capture r02 each started zero engines."
+  },
+  "adverse": {
+    "repair_capture_r01": "Native create/save succeeded; terminal selection verification failed because data-only observer was not explicitly bound. Original failed receipt and separate read-only correction retained.",
+    "repair_capture_r02": "Explicit observer required verified raw-Git FixtureSources input; prelaunch refused. r03 supplies exactly that projection.",
+    "repair_pilot_r01": "Profile reader excluded MIR; strict hash guard refused prelaunch. r02 selects the full declared closure.",
+    "custom_pilot_git_custody": "Sparse git add refused; private controller commit bf8f20c050d15abe1951d83ffcce2ad681104218 occurred after first agriculture pilot began. All custom pilot observations remain outside formal performance admission."
+  },
+  "independent_review": {
+    "reviewer": "non-author read-only local reviewer",
+    "verdict": "Approved fixture PR1818 and named physical observations only; fresh committed-controller pilots required for formal performance prerequisites."
+  },
+  "custody": {
+    "primary_root": "build/qualification/stable510-active-physical-custody-r01",
+    "manifest_sha256": "AB7DEC2199A5E76855212F81095F58C1D7F6156463083F40860083298A2CF332",
+    "file_count": 259,
+    "bytes": 16784855
+  },
+  "next": "Validate separately retained original505R02 published prerequisites plus four current candidate origins, then four formal candidate marker pilots through committed plan/controller, then frozen68-observation comparison.",
+  "performance_acceptance": false,
+  "release_qualification": false
+}

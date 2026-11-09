@@ -180,7 +180,7 @@ function repair_stress_load(path)
   return {ok = ok, message = tostring(result), writes = writes}
 end
 
-function repair_stress_observer_opponent(path, opponent, active, mir)
+function repair_stress_observer_opponent(path, opponent, active, mir, fixture)
   local callbacks, storage, reports, saves = {}, {}, {}, {}
   local next_unit, next_force = 0, 10
   local function make_force(name, index)
@@ -220,7 +220,7 @@ function repair_stress_observer_opponent(path, opponent, active, mir)
   local active_mods = active and {
     base = '2.1.23', ['elevated-rails'] = '2.1.23', quality = '2.1.23', recycler = '2.1.23',
     ['space-age'] = '2.1.23', ['more-infinite-research'] = mir or '5.0.21000',
-    ['mir-fixture-mir5-repair-stress'] = '0.2.0',
+    ['mir-fixture-mir5-repair-stress'] = fixture or '0.2.0',
     ['mir-fixture-mir5-repair-stress-active'] = '0.1.0'
   } or {
     base = '2.0.77', ['more-infinite-research'] = '5.0.20000',
@@ -440,6 +440,54 @@ end
         reports = [result["reports"][i] for i in range(1, len(result["reports"]) + 1)]
         self.assertEqual(["prepared", "start"], [row["stage"] for row in reports])
         self.assertTrue(reports[-1]["witnesses"]["pending_physical_work"])
+
+    def test_510_active_identity_profile_and_pending_physical_work(self):
+        guard = self.lua.eval("repair_stress_mode_guard")
+        f210 = ("2.1.23",) * 5
+        admitted = guard(str(CONTROL), *f210, "5.0.21010", "0.2.1", "0.1.0")
+        self.assertIn("runtime setting is not enabled", admitted["message"])
+        for args in (
+            (*f210, "5.0.21009", "0.2.1", "0.1.0"),
+            (*f210, "5.0.21011", "0.2.1", "0.1.0"),
+            (*f210, "5.0.20010", "0.2.1", "0.1.0"),
+            (*f210, "5.0.21010", "0.2.0", "0.1.0"),
+            (*f210, "5.0.21005", "0.2.1", "0.1.0"),
+            (*f210, "5.0.21010", "0.2.1", None),
+            (*f210, "5.0.21010", "0.2.1", "0.2.0"),
+            ("2.1.22", *f210[1:], "5.0.21010", "0.2.1", "0.1.0"),
+            ("2.1.23", "2.1.23", None, "2.1.23", "2.1.23", "5.0.21010", "0.2.1", "0.1.0"),
+        ):
+            with self.subTest(args=args):
+                rejected = guard(str(CONTROL), *args)
+                self.assertFalse(rejected["ok"])
+                self.assertNotIn("runtime setting is not enabled", rejected["message"])
+
+        run = self.lua.eval("repair_stress_observer_opponent")
+        result = run(str(CONTROL), "active-start", True, "5.0.21010", "0.2.1")
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual((1000, 128, 128, 744, 0, 1003),
+                         (result["total"], result["player"], result["friendly"], result["overflow"],
+                          result["damage_before_load"], result["damage_after_start"]))
+        reports = [result["reports"][i] for i in range(1, len(result["reports"]) + 1)]
+        self.assertEqual(["prepared", "start"], [row["stage"] for row in reports])
+        self.assertTrue(reports[-1]["witnesses"]["pending_physical_work"])
+        pending = run(str(CONTROL), "active-before-load", True, "5.0.21010", "0.2.1")
+        self.assertEqual(("active-pending", 0, 0), (pending["phase"], pending["damage_before_load"], pending["damage_after_start"]))
+
+        previous_info = json.loads((FIXTURE / "successor/info-f210-505.json").read_text())
+        previous_info["version"] = "0.2.1"
+        previous_info["dependencies"][-1] = "more-infinite-research = 5.0.21010"
+        self.assertEqual(previous_info, json.loads((FIXTURE / "info-active-current-f210.json").read_text()))
+        previous = json.loads((PROFILE_ROOT / "runtime505-repair-candidate-f210-2123-r01.json").read_text())
+        current = json.loads((PROFILE_ROOT / "repair-stress-active-current-f210-2123.json").read_text())
+        previous["scope"] = current["scope"]
+        previous["mods"][6]["version"] = "5.0.21010"
+        previous["mods"][7]["version"] = "0.2.1"
+        del previous["archive_sha256"]["more-infinite-research_5.0.21005.zip"]
+        previous["archive_sha256"]["more-infinite-research_5.0.21010.zip"] = "C625D648978F6FE677B5EDC5C68090A2AA9A939D48A54A736610D55E47337806"
+        self.assertEqual(previous, current)
+        self.assertEqual("8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38", current["engine"]["sha256"])
+        self.assertEqual("A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0", current["archive_sha256"]["mir-fixture-mir5-active-mods-observer_0.1.0.zip"])
 
     def test_native_shaped_settings_stage_precedes_runtime_setting_and_rejects_absence_or_drift(self):
         path = str(SETTINGS_UPDATE)

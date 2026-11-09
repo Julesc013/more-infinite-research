@@ -1,0 +1,76 @@
+{
+  "kind": "MIRWorker511FinishGapIndependentSourceReviewV1",
+  "reviewed_at_utc": "2026-11-09T08:48:05.461449+00:00",
+  "verdict": "APPROVE exact bounded correction for fresh native qualification; no release or native pass yet",
+  "findings": [],
+  "commit": "203e0af5e1ea8925c1909e1dc97cef3dab3c961b",
+  "tree": "91afea4a1d140b447fbb7c9ee81a9daa822f8c03",
+  "parent": "d4beb15429e22bab89d474f65ff67a6bf991a9ae",
+  "source": "93d30a248e71e5248eeb87072c27332fe68b9137",
+  "change_scope": [
+    "source/runtime/worker_robot_storage.lua",
+    "tests/test_worker_storage_history.py"
+  ],
+  "native_basis": {
+    "report": "worker511-finished-handoff-independent-native-review-r01.json",
+    "sha256": "8265034663C46E70585B1B645932AE3BA802A093EB2B0862E78B9289F8492CD2",
+    "actual": "r06 unrelated sentinel finished forworker-suspended; currentnil, firstP, queue1, progress0 valid, private7/unresearched. Diagnostic remains adverse."
+  },
+  "review": [
+    "snapshot optional finished_context derived only from finished==true and a research belonging to the same force.",
+    "Only exact currentnil/nonemptyqueue/zero progress handoff is permitted in that context. Actual currentnil and saved.27 remain unchanged; no head promotion or progress1 relaxation.",
+    "All other callers/context retain old strict current==queuefirst and progress[0,1) checks. Saved/queued fractions, shape/custody/fingerprint/history/nativelevel/flags/quota/count guards unchanged.",
+    "Postcaps can use finished context ONLY if caps reports no queue write. An owned changed queue requires strict settled snapshot; existing transaction/exception/otherforce gate retained.",
+    "caps.reconcile second return and remove-unavailable return both define boolean queue_changed on all paths.",
+    "No on_tick framework, Source/bootstrap/data/settings/catalogue/platform/SDK/tool/changelog or declared public research changes. Finish context is call-local and cannot persist into cold preflight."
+  ],
+  "validation": {
+    "independent_pinned_lua52_history": {
+      "tests": 38,
+      "result": "PASS",
+      "log": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-finish-gap-independent-r01-controller\\history.log",
+        "bytes": 142,
+        "sha256": "A916991EBEB2245EC7215C73DA9F7FBD38DA263D0CB741C3FC373DF9E3003411"
+      },
+      "plan": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-finish-gap-independent-r01-controller\\host-plan.json",
+        "bytes": 15883,
+        "sha256": "41BDEF630EFDE93EC41DAC977D979C66774EE2D2E279CAE13F27DDFE82507FFE"
+      }
+    },
+    "author_red_green": {
+      "old_d4": "38 tests,4errors retained",
+      "new203": "38 pass",
+      "bootstrap": "31 pass author evidence reviewed, not rerun by reviewer",
+      "folder": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-finish-gap-fix-r01-controller"
+    },
+    "negative_controls_reviewed": [
+      "Same handoff without finish, missing research or wrong research force refuses before native writes.",
+      "Nonzero,1,nil progress and present mismatched current refuse. Existing type/NaN/negative progress predicate unchanged.",
+      "Cold reload/preflight cannot inherit event context.",
+      "Both completed/true and advanced/false private finished representations preserve pending native accounting; no bonus/progress grants.",
+      "Owned caps rewrite with remaining gap refuses strict post-write snapshot."
+    ],
+    "git_diff_check": "PASS",
+    "worktree_clean_exact_commit": true,
+    "native_launches": 0,
+    "builds": 0,
+    "broad_host_runs": 0
+  },
+  "unaffected_applicability": {
+    "credit33": "Prior CD4 no-prepared-state proof remains valid. No normal-credit caller passes finished_context; pendingfalse early event return and all native credit/data/scalar/controller inputs unchanged. Preserve original actual pins; require final package/runtime-only member proof.",
+    "four_successful_prefix": "Published510 source2 processes unchanged. Prepared transfer/default contract, no-context preflight, first prepare pendingfalse mutation path, idempotent second prepare and on_load remain unchanged. Exact protected9A9 prepared predecessor valid; retain original d840/FFB execution identity, no relabeling as203.",
+    "packages": "Only modern runtimeworker member should change from r03. All15 historical/early archives expected byte-identical. Fresh exact freeze/member/hash checks required."
+  },
+  "mandatory_native": [
+    "New exactSource93d/newpackage/actor63BA/fixture0.4/engine/profile/cap8/price1.25 with original9A9 prepared COPY.",
+    "Actual resume preserves unrelated current and detached partial; unrelated sentinel handoff succeeds; private P ordinary completions/retirement retain exact bonus/count/flags/quota/queue work.",
+    "Ordinary foreign4 earns its own effect,5..8 remain unearned; endpoint save plusTWO cold loads with frame/counter/save-byte equality.",
+    "Required first-add MIR toexistingSecretas, unchangedSecretas published510 upgrade, and cap/enable changes after retirement still need exact native results."
+  ],
+  "limits": [
+    "Earlier r03provider/r04/r05/r06 failures remain adverse and source/package-scoped. No stable, fullFerrum/reporter, physicalcargo, performance or publication verdict.",
+    "This approves source for new native only. All required final candidate CI, package, native and beta disclosure gates remain separate."
+  ]
+}

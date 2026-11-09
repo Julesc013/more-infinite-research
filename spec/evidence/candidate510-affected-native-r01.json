@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "kind": "MIR510AffectedHotfixEvidenceV1",
+  "status": "bounded-hotfix-evidence-recorded; prerelease-publication-conditions-pending",
+  "scope": "WorkerRobotCargoSizeResearch continuation collision and Space Is Fake final-science output on the frozen MIR 5.0.10 candidate",
+  "candidate": {
+    "accepted_source_commit": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+    "accepted_source_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+    "reconciliation_commit": "be6b06dba9a4338756737b569c6b55e2123e7161",
+    "reconciliation_tree": "416e7b290caa3ce2c164e5496d482a2041e43e90",
+    "package": {
+      "version": "5.0.21010",
+      "sha256": "C625D648978F6FE677B5EDC5C68090A2AA9A939D48A54A736610D55E47337806"
+    },
+    "source_tree_reconciliation": "The accepted source commit and reconciliation commit have the same player source tree; reconciliation preserved published-main history without a player-source change."
+  },
+  "independent_review": {
+    "path": "spec/evidence/candidate510-independent-review-r01.json",
+    "source_receipt": "build/qualification/mir510-independent-review-r01.json",
+    "sha256": "d6639bb8959b479344d1b23a17aad5ea00f6a16845d3fb06c433ee96764f9e16",
+    "copy_mode": "byte-identical retained review receipt"
+  },
+  "controller_provenance": {
+    "fresh_worker_fixture_commit": "1e046ae3c08a601942efc5984c4cc96edd959a69",
+    "first_add_fixture_commit": "5b24c839f30081e20c621097f0576499ac5e89c2",
+    "expanded_sif_policy_fixture_commit": "fcb364cda9229e1679fc6b6c8eff02323efabdab",
+    "fixture_scope": "Private native-observer controllers are qualification inputs, not player-source content."
+  },
+  "retained_native_custody": {
+    "original_manifest": {
+      "path": "build/qualification/mir510-native-custody-r01/MANIFEST.json",
+      "sha256": "fa2cf9c727f97c50686f9f7fd47f3c07d0f3d7f65c6f128a3e37ba0d8e48b502",
+      "files": 193,
+      "bytes": 176460726,
+      "status": "unchanged"
+    },
+    "all_science_addendum": {
+      "path": "build/qualification/mir510-native-custody-r01/ALL-SCIENCE-ADDENDUM.json",
+      "sha256": "91dda774554b447f8514990172ddb1d55b7c01661e7156a937ca072b48b04683",
+      "files": 23,
+      "bytes": 1722608,
+      "source_commit": "be6b06dba9a4338756737b569c6b55e2123e7161",
+      "status": "original paths retained and copies verified"
+    }
+  },
+  "adverse_observations": [
+    {
+      "id": "published-509-worker-collision",
+      "status": "reproduced",
+      "record": "build/tmp/mir509-worker-negative-r01/process-1.stdout.txt",
+      "finding": "Published 5.0.21009 reaches the duplicate worker-robots-storage-4 preflight failure with the selected provider reconstruction."
+    },
+    {
+      "id": "fixture-v010-lua-technology-api",
+      "status": "rejected-controller",
+      "controller_commit": "c801c571e",
+      "finding": "The first private controller attempted to read LuaTechnology.amount while collecting prerequisite names. Factorio rejects that unsupported property; 1e046ae3 repairs the controller to retain names only. This is not a product pass or product failure."
+    },
+    {
+      "id": "fixture-v012-current-progress",
+      "status": "rejected-controller",
+      "controller_commit": "e78a4d1f02460d46c24e0127d364ef995f4b8040",
+      "finding": "The provider-first-add controller treated active current-research progress as another technology's saved progress. 1e571eb5 records and checks force current-research progress before stimulus; 5b24c839 clears the stale reload flag before the first-add run. This is not a product pass or product failure."
+    }
+  ],
+  "prototype_output_observations": [
+    {
+      "id": "finite-provider-default",
+      "result": "build/qualification/mir510-worker-default-result.json",
+      "result_sha256": "fef8f43266e83b1c8fea8819721c5aad4be5366f78942919f516b78ef8c562c9",
+      "source_commit": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+      "finding": "The provider finite 4..7 route remains foreign and MIR emits worker-robots-storage-8 after level 7."
+    },
+    {
+      "id": "finite-provider-space-is-fake",
+      "result": "build/qualification/mir510-sif-worker-result.json",
+      "result_sha256": "9637d8341d28b8139c77278c3d5da1de844a046361f8f0bef5ca2369e91f1f50",
+      "source_commit": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+      "finding": "The finite foreign route is retained while the affected final Space Is Fake output removes retired white science."
+    },
+    {
+      "id": "factorio-20077-space-is-fake-final-science",
+      "result": "build/qualification/mir510-sif-f200-result.json",
+      "result_sha256": "47ce4f27ecd28a4dd935f9394b6fb8cd338ad1a6dfcb96ff7ab0494b979f184b",
+      "source_commit": "86c5afa9b6895ddf0bbbe25e4bd7e95d2f340f2e",
+      "engine": "Factorio 2.0.77",
+      "mir_archive": {
+        "version": "5.0.20010",
+        "sha256": "36F2E9D8C01507C2CBDC01AFF6C87399B40A9E0646F40DEC1F82628F5F50CBAB"
+      },
+      "finding": "The configured-default SIF startup and final-science capture completes on the actual 2.0.77 engine for both named level-seven continuations after SIF retirement. It is data-stage output evidence only."
+    },
+    {
+      "id": "verified-upstream-source-reconstruction",
+      "result": "build/qualification/mir510-sif-worker-upstream-result.json",
+      "result_sha256": "c5bc2b2a81edf7301cdc79c93aa72e6dc424fff05d530988732f2750c22c74e5",
+      "source_commit": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+      "finding": "The default route is reproduced from selected verified upstream provider source. It is not an official provider ZIP and not the reporter's complete modpack."
+    },
+    {
+      "id": "provider-infinite-tail",
+      "result": "build/qualification/mir510-infinite-combined-result.json",
+      "result_sha256": "c71c7d0990d72e6a03332df0cf7446e8a0a5514524aca3d38a058789fcb2e2e2",
+      "source_commit": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+      "finding": "With the provider infinite option, external worker-robots-storage-8 follows level 7 and MIR worker-robots-storage-9 is absent."
+    },
+    {
+      "id": "expanded-final-sif-policy-and-gates",
+      "result": "build/qualification/mir510-all-science-combined-result.json",
+      "result_sha256": "21b54d959d8bfe187b32a060060239fc798c3f55d10fd7b55b7f0b94b573c32e",
+      "source_commit": "be6b06dba9a4338756737b569c6b55e2123e7161",
+      "controller_commit": "fcb364cda9229e1679fc6b6c8eff02323efabdab",
+      "finding": "The expanded all-science policy and end-game gate capture checks 130 MIR-added technologies against the no-MIR upstream difference and reports no retired white science in the applicable final output."
+    }
+  ],
+  "native_save_observations": [
+    {
+      "id": "base-worker-fresh",
+      "result": "build/qualification/mir510-lab-worker-r02-result.json",
+      "result_sha256": "ec3cedea8caf4ecaa8e8303ab50f7d27680a7b8ee67d7888d93e2d2b7d7798e7",
+      "source_commit": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+      "engine": "Factorio 2.1.23",
+      "finding": "A real MIR level-8 lab completion raises the worker bonus to 8, leaves foreign finite levels 4..7 at effect +1, and survives two byte-identical cold reloads."
+    },
+    {
+      "id": "space-is-fake-worker-fresh",
+      "result": "build/qualification/mir510-lab-combined-r02-result.json",
+      "result_sha256": "b1b9087e889f4243de06f89d055362257378f3d4ecc53602bb1e0db5593822aa",
+      "source_commit": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+      "engine": "Factorio 2.1.23",
+      "finding": "The combined SIF/worker fixture completes real MIR level 8 with retired white science absent, preserves the foreign finite route, and survives two byte-identical cold reloads."
+    },
+    {
+      "id": "all-science-space-gate-worker",
+      "result": "build/qualification/mir510-lab-all-science-result.json",
+      "result_sha256": "ff457866e0ef54e92bf96d01eda56de07bac603b0297e46891d998ca325d86be",
+      "source_commit": "be6b06dba9a4338756737b569c6b55e2123e7161",
+      "controller_commit": "fcb364cda9229e1679fc6b6c8eff02323efabdab",
+      "engine": "Factorio 2.1.23",
+      "profile_sha256": "32C6955ACBD0E6494E41C032C5A1255EB048146518193D613B832BEB24DD45AD",
+      "finding": "The expanded all-science plus space-gate profile completes real MIR level 8 to level 9/bonus 8 with retired white science absent, preserves foreign finite 4..7, and survives two byte-identical cold reloads."
+    },
+    {
+      "id": "provider-earned-predecessor",
+      "result": "build/qualification/mir510-provider-earned-r03-result.json",
+      "result_sha256": "04472704005090353a7878404a2ccdb19b10b0282f9f8a4b402b0117510e75d7",
+      "controller_commit": "5b24c839f30081e20c621097f0576499ac5e89c2",
+      "finding": "Only provider levels 1..6 are controlled prerequisites; an actual provider level-7 biolab completion earns bonus 7 and the resulting provider-only save survives two byte-identical cold reloads."
+    },
+    {
+      "id": "provider-earned-first-add",
+      "result": "build/qualification/mir510-first-add-r01-result.json",
+      "result_sha256": "6bf78e49b0d528795511dbeb2b09d8f1fc28abd4d9cf2a5ed0bdcc7c8ebb603d",
+      "controller_commit": "5b24c839f30081e20c621097f0576499ac5e89c2",
+      "input_save_sha256": "D55F82E3176AB03F02A34B892781BC08CD97B4EAA401029EBAFEEF14CCBD458A",
+      "finding": "On first configuration addition of corrected MIR, the before-first-add marker is emitted after MIR admission and before the fixture deliberately queues the MIR level-8 lab. It retains provider level 7, foreign finite 4..7, bonus 7, retired-white-science state, and current progress 0.27; the intentional MIR level-8 lab then completes and the output survives two byte-identical cold reloads."
+    }
+  ],
+  "sentinel_interpretation": "The 0.42 main and 0.27 unrelated-progress values in the native fixtures are controlled preservation sentinels, not science earned by the test. Only the explicitly recorded provider level-7 and MIR level-8 lab completions are gameplay-earned research witnesses.",
+  "limits": [
+    "Prototype captures establish the labelled final data output only; they are not gameplay, save, client, multiplayer, Library, performance, provider-removal, or arbitrary-provider-change qualification.",
+    "The positive preservation route is provider-earned level 7 followed by first addition of corrected MIR. It does not claim that adding or changing the provider after MIR worker research has already been earned is safe.",
+    "Existing 4.7.3 Linux native evidence retains its original scope and is not relabelled as 5.0.10 evidence."
+  ],
+  "publication_state": {
+    "accepted_candidate_required_suite": "174 selected checks passed at accepted source commit 8e5ce79be9595c888ed6cad4aa8d2eecd325767d.",
+    "reconciliation_head_fresh_ci": "pending for be6b06dba9a4338756737b569c6b55e2123e7161; the identical player tree does not substitute for this gate.",
+    "github_release": "not published",
+    "required_before_publication": "Fresh reconciliation CI, exact inventory and asset-hash recheck, administration and immutability probes, staged-asset verification, prerelease publication, anonymous-download hash verification, and local delivery custody remain required."
+  }
+}

@@ -18,13 +18,26 @@ local function same(a, b, path)
     for key in pairs(b) do if a[key]==nil then fail(path .. " unexpected " .. tostring(key)) end end
   elseif a~=b then fail(path .. " differs") end
 end
+local function current_same_version()
+  return script.active_mods[C.fixture]=="0.1.0"
+    and script.active_mods["more-infinite-research"]==C.current_successor
+end
 local function stage()
   local version = script.active_mods[C.fixture]
-  local source = version=="0.1.0"
-  if not source and version~="0.2.0" and version~="0.4.0" then fail("fixture version differs") end
+  local source = version=="0.1.0" and not current_same_version()
+  local successor
+  if current_same_version() then
+    successor=C.current_successor
+  elseif version=="0.2.0" or version=="0.4.0" then
+    successor=C.successor
+  elseif version=="0.5.0" then
+    successor=C.current_successor
+  elseif not source then
+    fail("fixture version differs")
+  end
   local expected = {base="2.0.77",["elevated-rails"]="2.0.77",quality="2.0.77",
     ["space-age"]="2.0.77",["space-is-fake"]="1.0.60",["cr-commons"]="1.0.27",
-    [C.fixture]=version,["more-infinite-research"]=source and C.source or C.successor,
+    [C.fixture]=version,["more-infinite-research"]=source and C.source or successor,
     ["mir-fixture-mir5-active-mods-observer"]="0.1.0"}
   for name, value in pairs(expected) do
     if script.active_mods[name]~=value then fail("exact closure differs: " .. name) end
@@ -33,7 +46,21 @@ local function stage()
   return source
 end
 local function entry_boundary_mode()
-  return script.active_mods[C.fixture]=="0.4.0"
+  local version=script.active_mods[C.fixture]
+  return version=="0.4.0" or version=="0.5.0" or current_same_version()
+end
+local function same_version_event(event)
+  if type(event)~="table" or event.mod_startup_settings_changed~=false
+      or type(event.mod_changes)~="table" then fail("MIR-only upgrade event absent") end
+  local mir=event.mod_changes["more-infinite-research"]
+  if type(mir)~="table" or mir.old_version~=C.source or mir.new_version~=C.current_successor then
+    fail("MIR-only upgrade versions differ")
+  end
+  for name,change in pairs(event.mod_changes) do
+    if name~="more-infinite-research" and (type(change)~="table" or change.old_version~=change.new_version) then
+      fail("MIR-only upgrade changed another mod: " .. tostring(name))
+    end
+  end
 end
 local function require_early_order(order)
   if type(order)~="string" then fail("entry boundary event order absent") end
@@ -170,14 +197,22 @@ local function verify(state, successor)
   end
 end
 local function entry_marker(phase,state)
+  local version=script.active_mods[C.fixture]
+  local witnesses={source_mir=C.source,successor_mir=C.successor,role="successor-entry-boundary-proposal",
+    source_kind=state.kind,source_actual_labs=0,successor_actual_labs=0,
+    source_snapshot=state.player,foreign_snapshot=state.foreign,entry_boundary=state.entry_boundary,
+    accepted_current={player=snapshot(game.forces.player),foreign=snapshot(game.forces[state.foreign_index])},
+    fresh_index=state.fresh_index,five_hidden_rows=true,exact_effect_counts={3,2,1,3,2},processing_unit_scrap=false,
+    actual_gui_input=false,hidden_library_enqueue_not_exercised=true,on_load_read_only=phase=="reload",
+    interpretation_review_required=true}
+  if version=="0.5.0" or current_same_version() then
+    witnesses.successor_mir=C.current_successor
+    witnesses.role="successor-current-entry-boundary-proposal"
+    witnesses.fixture_version=version
+    if current_same_version() then witnesses.same_version_observer=true end
+  end
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({case=C.case,stage=phase,status="passed",
-    witnesses={source_mir=C.source,successor_mir=C.successor,role="successor-entry-boundary-proposal",
-      source_kind=state.kind,source_actual_labs=0,successor_actual_labs=0,
-      source_snapshot=state.player,foreign_snapshot=state.foreign,entry_boundary=state.entry_boundary,
-      accepted_current={player=snapshot(game.forces.player),foreign=snapshot(game.forces[state.foreign_index])},
-      fresh_index=state.fresh_index,five_hidden_rows=true,exact_effect_counts={3,2,1,3,2},processing_unit_scrap=false,
-      actual_gui_input=false,hidden_library_enqueue_not_exercised=true,on_load_read_only=phase=="reload",
-      interpretation_review_required=true}}))
+    witnesses=witnesses}))
 end
 local function marker(phase,state,source)
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({case=C.case,stage=phase,status="passed",
@@ -233,8 +268,9 @@ local function prepare_source()
     phase="source-pending",player=player,foreign_index=foreign.index,foreign=foreign_snapshot}
 end
 script.on_init(prepare_source)
-script.on_configuration_changed(function()
+script.on_configuration_changed(function(event)
   if stage() then fail("unexpected source configuration change") end
+  if current_same_version() then same_version_event(event) end
   local state=storage[KEY]
   if type(state)~="table" or state.phase~="source-complete" then fail("protected completed source required") end
   if entry_boundary_mode() then
@@ -258,6 +294,11 @@ script.on_configuration_changed(function()
       player=player,foreign=foreign,player_prototypes=player_prototypes,foreign_prototypes=foreign_prototypes,
       flag_deltas={player_processing={source=state.player.technologies[id(C.rows[3])].enabled,entry=player_flag},
         foreign_mining={source=state.foreign.foreign.enabled,entry=foreign_flag}}}
+    if current_same_version() then
+      state.entry_boundary.upgrade_event={mod_changes=clone(event.mod_changes),mod_startup_settings_changed=false}
+      log("[MIR5_SIF_UPGRADE_EVENT] source=" .. C.source .. " destination=" .. C.current_successor
+        .. " startup_changed=false other_changed_mod_versions=0")
+    end
     state.phase="entry-boundary-pending"
     loaded,reported=false,false
     return -- No post-configuration verification, API, fresh force or save before MIR config.

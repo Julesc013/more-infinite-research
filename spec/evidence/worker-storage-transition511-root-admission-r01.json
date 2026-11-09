@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "utc": "2026-11-09T02:21:53.187630+00:00",
+  "reviewer": "Root non-author packet review",
+  "verdict": "GO exact six-process NoMIR seeded diagnostic only",
+  "packet_sha256": "F608E997E110446CD8494C747C16A5E84CB39E5130552E8F4C0D9744DEDB19C1",
+  "actor_sha256": "F5CBD960945B16619C83D22AAFA44AC2571A83DADE6EFD8F78C651665BBD00CE",
+  "verified_fixed_inputs": 697,
+  "runner": "D:\\Projects\\Factorio\\.task-builds\\worker-transition511-r01",
+  "runner_commit": "ae7e0692ec69ffa1f53cf9224b28fc2c858c80fb",
+  "limits": {
+    "expected_peak_memory_mib": 4096,
+    "total_native_new_output_mib": 128,
+    "case_output_mib": [
+      32,
+      48,
+      48
+    ],
+    "timeout_seconds_per_engine": 180,
+    "max_engines": 6,
+    "performance_claim": false
+  },
+  "checks": [
+    "All 697 fixed input bytes and hashes independently re-read",
+    "All ZIP members equal pinned author inputs; CRC valid",
+    "Frozen runner clean and exact; all three outputs absent and checkout-local",
+    "Base plus fixture only; no MIR",
+    "Actual documented whole research_queue writes and current/order assertions precede progress writes",
+    "Three seeded source frames checked before source marker",
+    "Shared live-log reader preserves file-sharing and disposal safeguards",
+    "Source and target each retain one read-only cold; protected source independently copied for both targets"
+  ],
+  "limits_of_verdict": [
+    "No labs or earned-by-lab claim",
+    "Target clamp and JSON-rename behavior remain unobserved",
+    "No production rename or recovery policy authorized by this diagnostic",
+    "No MIR initialization, save upgrade or release acceptance"
+  ]
+}

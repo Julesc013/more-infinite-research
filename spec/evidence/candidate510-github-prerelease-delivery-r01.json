@@ -1,0 +1,138 @@
+{
+  "kind": "MIR510VerifiedGitHubDeliveryV1",
+  "status": "DELIVERED-qualified-GitHub-prerelease-not-stable",
+  "verified_at_utc": "2026-11-08T13:28:00.412680+00:00",
+  "release": {
+    "id": 438263107,
+    "tag_name": "v5.0.10",
+    "name": "MIR 5.0.10",
+    "html_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.10",
+    "published_at": "2026-11-08T13:26:42Z",
+    "draft": false,
+    "prerelease": true,
+    "immutable": false
+  },
+  "source": {
+    "main": "958e34dd2701418c71f74ae094c26ff7cd467e6b",
+    "tree": "416e7b290caa3ce2c164e5496d482a2041e43e90",
+    "frozen": "8e5ce79be9595c888ed6cad4aa8d2eecd325767d",
+    "promotion": "be6b06dba9a4338756737b569c6b55e2123e7161",
+    "equal": true
+  },
+  "frozen_inventory": "D:/Projects/Factorio/.task-builds/mir510-freeze-r02/MIR5ReleaseAssetInventoryV1.json",
+  "public_assets_verified": 19,
+  "local_delivery_files_verified": 21,
+  "anonymous_download_verdict": "PASS",
+  "prior_releases_unchanged": 10,
+  "prior_tag_refs_unchanged": 20,
+  "local_dist": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.10",
+  "files": [
+    {
+      "name": "more-infinite-research_5.0.00610.zip",
+      "bytes": 138499,
+      "sha256": "5349e59ed6a4a0d8587385faf16ac1f70b3257471126b58df12eeda5da159ee1"
+    },
+    {
+      "name": "more-infinite-research_5.0.00710.zip",
+      "bytes": 138499,
+      "sha256": "48d4bbdbcace8ed035f3742f41cc53c051bcdee0edd90978ec447d87630f3d3f"
+    },
+    {
+      "name": "more-infinite-research_5.0.00810.zip",
+      "bytes": 138498,
+      "sha256": "b1472f4b0809600af5b88ebc930fc6e9eddc88adc077615f68ce23ac7db64e92"
+    },
+    {
+      "name": "more-infinite-research_5.0.00910.zip",
+      "bytes": 138499,
+      "sha256": "5e521cfe14551762063ae8621ce06e1d8d368af547903b3c41a5da5037a45964"
+    },
+    {
+      "name": "more-infinite-research_5.0.01010.zip",
+      "bytes": 138498,
+      "sha256": "6b0a0d86842427c03041a56162daa3fa6c1e78c0e92342c991f07c20bb1b8ff2"
+    },
+    {
+      "name": "more-infinite-research_5.0.01110.zip",
+      "bytes": 138499,
+      "sha256": "06b8ea163c38fb0838fad68ddda575ac41884f1470598741aad638545b9e6870"
+    },
+    {
+      "name": "more-infinite-research_5.0.01210.zip",
+      "bytes": 138502,
+      "sha256": "1f3ead28688700097b1ca99cd2b8b9cf81eed891f379c2d16907a2e98f62454e"
+    },
+    {
+      "name": "more-infinite-research_5.0.01310.zip",
+      "bytes": 667541,
+      "sha256": "3a4ea80d64fec8ca767357b3145a29bccd5f5d2b83d6c8ac2b4ea58ca5e8ba7a"
+    },
+    {
+      "name": "more-infinite-research_5.0.01410.zip",
+      "bytes": 667544,
+      "sha256": "e378fc432091a3a630a14945f21b8914cc7f87373e31bcbc720c6fe4044d2d36"
+    },
+    {
+      "name": "more-infinite-research_5.0.01510.zip",
+      "bytes": 667542,
+      "sha256": "e72a438857d6202f6dbeee8154eb92fe30973fbacbb046f38814ed2d0500569c"
+    },
+    {
+      "name": "more-infinite-research_5.0.01610.zip",
+      "bytes": 667543,
+      "sha256": "320facebddefeab22ab5ab119d042c84445e9e21a9e25c76cfd037d7c8b0e048"
+    },
+    {
+      "name": "more-infinite-research_5.0.01710.zip",
+      "bytes": 667543,
+      "sha256": "e6af7ad35a917adf8dbcb5696102caf00e6015f68b0276b275e681efa6aa5b88"
+    },
+    {
+      "name": "more-infinite-research_5.0.01810.zip",
+      "bytes": 667544,
+      "sha256": "e29cfbeb98a6fe2a4d8269c31db89db2a3030c4f403d33faf4afc026a6143f4b"
+    },
+    {
+      "name": "more-infinite-research_5.0.10010.zip",
+      "bytes": 667536,
+      "sha256": "36c538c5fd49280878bc65550e86575dcc7edd672fb4e531ccfde7b15640545a"
+    },
+    {
+      "name": "more-infinite-research_5.0.11010.zip",
+      "bytes": 667845,
+      "sha256": "d74d9ca7e1bd24db3ad1a7f917ab722a64b0ca05fa5320a9c3df1069c36fd61d"
+    },
+    {
+      "name": "more-infinite-research_5.0.20010.zip",
+      "bytes": 996531,
+      "sha256": "36f2e9d8c01507c2cbdc01aff6c87399b40a9e0646f40dec1f82628f5f50cbab"
+    },
+    {
+      "name": "more-infinite-research_5.0.21010.zip",
+      "bytes": 996956,
+      "sha256": "c625d648978f6fe677b5edc5c68090a2aa9a939d48a54a736610d55e47337806"
+    },
+    {
+      "name": "RELEASE_NOTES.md",
+      "bytes": 808,
+      "sha256": "b97718d949fcea46f3bc7883a33efbcc0ed4ae258d717347d79785a6169f63d0"
+    },
+    {
+      "name": "SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "037af82340abb32a8ce8c6e7c10fd4d081078f49d7bd6de19e0a6160b8e6f6ae"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "d45d61ff0811a35749e6928deb51cdef0c384918df46247eef06ab34cceb0fe4"
+    },
+    {
+      "name": "UPLOAD.txt",
+      "bytes": 659,
+      "sha256": "c12be0b95d7b83b15b699d90609fa7bf46288e269cbd1b2e81016f5cd073e4d3"
+    }
+  ],
+  "stable_acceptance": "NOT READY; Library/client/input/export/personal lifecycle, broader state/profile/history and performance queue remain open",
+  "provider_scope": "Private native package from hash-verified upstream WorkerRobotCargoSizeResearch source; not the official Portal archive or reporter entire pack"
+}

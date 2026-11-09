@@ -1,0 +1,38 @@
+{
+  "kind": "MIRCumulativeCredit511NativeEvidenceChainV1",
+  "source_commit": "cabf94efc9b529c4c555743b7139b3cf11b9c20d",
+  "source_tree": "b91641744ad6f866e189c53f7f8e11d1a6e28a02",
+  "native_packet_sha256": "40E637B3DD84EAC2FE514887A73975AFFAA478D3558243E939956081DFA6369E",
+  "packages": {
+    "f200": {
+      "bytes": 1005873,
+      "sha256": "7AAD340E694DDE976CE569A4CE22D165EA6625DE6D1BD208ABA94078BC4C7EBD"
+    },
+    "f210": {
+      "bytes": 1006299,
+      "sha256": "7DD758DE41E195D6B41C3F8AC70C2C78AC1ED937E1560B0836D21E0187BD729D"
+    }
+  },
+  "verdict": "named-native-credit-cases-accepted",
+  "native_processes": 33,
+  "ordinary_lab_completions": 33,
+  "root_readback": {
+    "path": "native-credit511-cumulative-root-readback-r01.json",
+    "sha256": "DFCB2E018EE318A7F344F95A9EF89E662CCA4EA408C3C741A0BFCB5BBEBB92A5"
+  },
+  "independent_non_production_author_review": {
+    "path": "credit511-native-independent-result-review-r01.json",
+    "sha256": "0428C6D50D7C363A84E80E2E93C1780754F327AA87BA4C29528B2C2157051759"
+  },
+  "raw_originals": {
+    "repository": "Julesc013/scratchpad",
+    "commit": "72e6fe97fc888a2ae9c9ee511d8ba4a0059f5a59",
+    "records": 617,
+    "original_bytes": 56625055,
+    "archive_sha256": "0ACA70BEE57DA27589F7AB9BF7D4C47FE4554671D53F686089CD9D1DE1C66C06",
+    "remote_readback": "native-credit511-cumulative-remote-readback-r01.json",
+    "remote_readback_sha256": "A4382ECD705E2E5359E1C467B7F650D9C9C3CAEB80E1CE707AE93EB74E99172E"
+  },
+  "limits": "Named Base2.0.77/2.1.23 credit settings and legal10%-earned510 source transitions only. Old manual-offset failure remains adverse. Worker preparation/planet/provider/cap, exact reporter saves, clients/performance, release and stable qualification remain separate.",
+  "release_qualification": false
+}

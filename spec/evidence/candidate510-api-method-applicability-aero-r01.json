@@ -1,0 +1,188 @@
+{
+  "schema": 1,
+  "kind": "MIR510ScopedAPIMethodApplicabilityV1",
+  "prior_qualification_source": "42032477d45ced683e72736a4fe30a7a3195b995",
+  "published_source": "958e34dd2701418c71f74ae094c26ff7cd467e6b",
+  "published_player_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+  "pairs": [
+    {
+      "target": "f200",
+      "prior": {
+        "path": "build/packages/support-exports-aero-independent-r01/more-infinite-research_5.0.20000.zip",
+        "version": "5.0.20000",
+        "bytes": 696588,
+        "sha256": "7CAC54475107736106D84AF98D50A8622E095B6658F1E3682643FE0CBA8BAEF0"
+      },
+      "published510": {
+        "path": "dist/v5.0.10/more-infinite-research_5.0.20010.zip",
+        "version": "5.0.20010",
+        "bytes": 996531,
+        "sha256": "36F2E9D8C01507C2CBDC01AFF6C87399B40A9E0646F40DEC1F82628F5F50CBAB"
+      },
+      "identical_payloads": [
+        {
+          "path": "api/v1/data.lua",
+          "bytes": 12993,
+          "sha256": "9CCDD2B5FFBE14156D002F50ECEB9799F70124CADA0A0A3767D84CA242413FA5",
+          "identical": true
+        },
+        {
+          "path": "api/v1/runtime.lua",
+          "bytes": 3663,
+          "sha256": "5FA121E602EF99CC67DAE4C1E17C5334A8FB26BBEF97F00BF0AE9AE242D9C873",
+          "identical": true
+        },
+        {
+          "path": "control.lua",
+          "bytes": 248,
+          "sha256": "17201196D4EB573265CE34C0599748ED78DF856EBFCB4229018C05C4E056C0C9",
+          "identical": true
+        },
+        {
+          "path": "runtime/configuration.lua",
+          "bytes": 347,
+          "sha256": "21C832FF2C234C178D86DA51E24ABA34A51724A009E9E8299EBBF62F91EDAD5E",
+          "identical": true
+        }
+      ],
+      "target_delta": {
+        "only_distribution_version_changed": true,
+        "old_sha256": "C76444C8F5891C057082F6CDDD6DDA51BE91ADD1FE3369B8261EDC78578D852B",
+        "new_sha256": "CEC7707937A0EC72BF58D0D68FAEC6DF4A9FE626D48EAB72793A4CD280FA58BB"
+      }
+    },
+    {
+      "target": "f210",
+      "prior": {
+        "path": "build/packages/support-exports-aero-independent-r01/more-infinite-research_5.0.21000.zip",
+        "version": "5.0.21000",
+        "bytes": 696972,
+        "sha256": "B63743C36432E4C41CC0F56D5A48CABE81924D426EF11045095A9D5ED0430D7B"
+      },
+      "published510": {
+        "path": "dist/v5.0.10/more-infinite-research_5.0.21010.zip",
+        "version": "5.0.21010",
+        "bytes": 996956,
+        "sha256": "C625D648978F6FE677B5EDC5C68090A2AA9A939D48A54A736610D55E47337806"
+      },
+      "identical_payloads": [
+        {
+          "path": "api/v1/data.lua",
+          "bytes": 12993,
+          "sha256": "9CCDD2B5FFBE14156D002F50ECEB9799F70124CADA0A0A3767D84CA242413FA5",
+          "identical": true
+        },
+        {
+          "path": "api/v1/runtime.lua",
+          "bytes": 3663,
+          "sha256": "5FA121E602EF99CC67DAE4C1E17C5334A8FB26BBEF97F00BF0AE9AE242D9C873",
+          "identical": true
+        },
+        {
+          "path": "control.lua",
+          "bytes": 248,
+          "sha256": "17201196D4EB573265CE34C0599748ED78DF856EBFCB4229018C05C4E056C0C9",
+          "identical": true
+        },
+        {
+          "path": "runtime/configuration.lua",
+          "bytes": 347,
+          "sha256": "21C832FF2C234C178D86DA51E24ABA34A51724A009E9E8299EBBF62F91EDAD5E",
+          "identical": true
+        }
+      ],
+      "target_delta": {
+        "only_distribution_version_changed": true,
+        "old_sha256": "4826A89FD40A9F0CEF385EC0B9F8CCE02CF1B7AE64A78AE431920A55DC56A601",
+        "new_sha256": "EA5BB9EBFD4765751CC3B7DE34D06E1B1D68D8432C8CD18C0DD840867A12F4D8"
+      }
+    }
+  ],
+  "generator_delta": {
+    "old_sha256": "88626C760C43D51FEDB3C7233523FAD3355404C3548A79F872940E6B019FE526",
+    "new_sha256": "3F83E0648A744561F8F3F08D0DF563D441BC2DB69C98494AB25B31AFC75F9717",
+    "only_duplicate_diagnostic_split": true,
+    "accepted_publication_path_unchanged": true
+  },
+  "registration": {
+    "api_method_registration_unchanged": true,
+    "collision_helper_unchanged": true,
+    "registration_sha256": "1B40767265236527638F948DC299E04855F48D83D760ADFEDABC5F77D0605EA8",
+    "helper_sha256": "6EC83DDDE530405D187FA7CB9A92466CDA503942CCD3AE91108FAF21496F69F6",
+    "whole_bootstrap_identical": false
+  },
+  "host_source": "32feeb99db3cb998f30aa73d11e8f3ebdbd487e6",
+  "host_results": [
+    {
+      "path": "build/qualification/mir5-api510-applicability-aero-r01/api.txt",
+      "tests": 16,
+      "bytes": 2660,
+      "sha256": "94504EAEE3DB0A8500760337DE81B79D30D3539AD1FCB38E150A37CF08B59FDB"
+    },
+    {
+      "path": "build/qualification/mir5-api510-applicability-aero-r01/runtime-api.txt",
+      "tests": 5,
+      "bytes": 884,
+      "sha256": "ADCE3E5EEFD794B9478BA92C4D2696653D634FCA48DC2F3CB0F827A77CB16955"
+    },
+    {
+      "path": "build/qualification/mir5-api510-applicability-aero-r01/generator.txt",
+      "tests": 56,
+      "bytes": 9826,
+      "sha256": "F98166B75809A7367AB6329A704B277403EDC37BD6AE14D942FFF2C6AF07285A"
+    }
+  ],
+  "new_native_execution": false,
+  "stable_qualification": false,
+  "status": "unchanged-documented-methods-reviewed-global-lifecycle-remains-separate",
+  "requirement": "API-01 / final candidate consumed-input applicability; no new API contract or acceptance programme",
+  "prior_qualification": "spec/evidence/api1-documented-subset-qualification-r01.json",
+  "comparison_custody": {
+    "path": "build/qualification/mir5-api510-applicability-aero-r01/package-comparison.json",
+    "sha256": "FF00EC8955282FBF8BA2B336229A589A7DC21B2912F380CC04C26646E0E0BBD0",
+    "helper": "build/qualification/mir5-api510-applicability-aero-r01/inspect.py"
+  },
+  "applicability_decisions": [
+    {
+      "surface": "data get_version/get_capabilities/add_technology/add_technologies/add_productivity",
+      "verdict": "reuse-original-method-semantics-under-the-original-documented-subset",
+      "basis": "Both accepted original modern ZIPs match their recorded hashes. Each published510 ZIP has the exact same API data module. The complete Generator is identical after replacing only the split duplicate diagnostic with its prior expression; admission predicates and single accepted data:extend path are unchanged. Target capabilities and edition floors are byte-identical after the documented product-version substitution. Existing original data/final-fixes/physical observations retain their actual source, packages and engine identities."
+    },
+    {
+      "surface": "runtime get_version/get_capabilities/get_research",
+      "verdict": "reuse-original-query-semantics-and-read-only-boundary",
+      "basis": "Runtime API module, control entry, runtime configuration, method registration and collision helper are unchanged. The target product version advances from the original package number to510 as documented. Native queries still read the engine state they are passed; no new data storage, mutation or method contract is introduced."
+    },
+    {
+      "surface": "whole bootstrap, saved state, private credits, Library and joining clients",
+      "verdict": "not-established-by-module-identity",
+      "basis": "The whole bootstrap is changed: catalogue binding, worker/finite-speed providers, paid-credit lifecycle, Discovery Tree and Library event paths differ. The data entry also emits a named native-adoption transport prototype. Original API1N1/N2/client executions must not be relabelled as current510 executions or used to close these changed global paths. Current worker/SIF upgrade evidence and the existing Library/imported/client/save worklist own their exact scopes; this record adds no native pass."
+    },
+    {
+      "surface": "next candidate",
+      "verdict": "recheck-consumed-inputs-at-final-freeze",
+      "basis": "This comparison is for published510/playerf4e45e56 only. A locale-only change leaves these method payloads untouched; any later source candidate still needs exact package readback and review of affected closures. No unpublished candidate or stable verdict is inferred."
+    }
+  ],
+  "validation": {
+    "lua": "pinned Lupa2.6/lupa.lua52 Lua5.2",
+    "runtime_module_sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899",
+    "host_plan_inspected": true,
+    "new_controls_added": false,
+    "native_processes": 0,
+    "raw_comparison_result": "passed: two exact archive pairs, four identical payloads per pair, target-only-version delta, full Generator diagnostic-only comparison, exact registration/helper comparison",
+    "claims": "77 existing focused host controls pass (data16/runtime5/Generator56); these are host observations, not gameplay, client, save or performance acceptance."
+  },
+  "limits": [
+    "No expanded API schema, historical-target promise, universal modpack support, native boundary timing or maximum-input performance claim.",
+    "Original API1qualification retains all exact engine/package/source identities, original absence limitations and private F210 caller adverse.",
+    "This record removes no existing stable requirement and creates no new dispatch table. docs/progress.md remains the current worklist; Black Glass owns native execution, integration and publication.",
+    "Published510 bytes are unchanged; no build, tag, release edit or native launch occurred."
+  ],
+  "independent_review": {
+    "role": "mir_luna_xhigh",
+    "mode": "read-only actual record, proof script and retained scope review",
+    "verdict": "No concrete blocker; suitable as scoped API-method applicability evidence only. Original N1/N2/client executions are not relabelled as current510; changed global lifecycle and final-candidate checks stay separate.",
+    "reviewer_wrote_artifact": false
+  }
+}

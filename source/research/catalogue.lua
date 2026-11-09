@@ -9,6 +9,7 @@ local GEAR_ID = "recipe-prod-research_gears-1"
 local AGRICULTURE_ID = "recipe-prod-research_agricultural_growth_speed-1"
 local SPOILAGE_ID = "recipe-prod-research_spoilage_preservation-1"
 local INTERNAL_CREDIT_IDS = {
+  ["mir-worker-storage-preservation-4"] = true,
   ["mir-legacy-module-credit-speed-module"] = true,
   ["mir-legacy-module-credit-productivity-module"] = true,
   ["mir-legacy-module-credit-efficiency-module"] = true,

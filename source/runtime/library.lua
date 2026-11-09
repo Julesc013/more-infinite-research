@@ -1521,7 +1521,7 @@ local function update_list_items(list, items, selected_index)
   return changed, selection_changed
 end
 
-local function update_research_content(content, player, view, context, translations)
+local function update_research_content(content, player, view, context, translations, localized_search_pending)
   if not valid(content) then return end
   -- Availability is a different projection in the same body. Clear it only
   -- at that boundary; ordinary Research refreshes retain their widgets.
@@ -1541,7 +1541,11 @@ local function update_research_content(content, player, view, context, translati
   -- Filter changes choose a useful visible subject. Keep explicitly hidden
   -- personal focus and stale private-credit selections inert, as before.
   local reserved_selection = private_credit_id(view.selected) or view.hidden[view.selected] == true
-  if selected_index == 0 and #rows > 0 and not reserved_selection then
+  -- A returning tab can initially contain only the first translated matches.
+  -- Keep personal focus inert until the localized search can decide whether
+  -- that research is absent; a partial batch must not replace it permanently.
+  local waiting_for_selection = view.selected ~= nil and localized_search_pending
+  if selected_index == 0 and #rows > 0 and not reserved_selection and not waiting_for_selection then
     selected_index, view.selected = 1, rows[1].id
   end
   local width = content.style and content.style.maximal_width or 592
@@ -2354,8 +2358,11 @@ local function render(player, view, context, preserve_query)
     update_availability_content(content, player, view)
   elseif view.tab == "research" then
     local translations = open_translation_cache(player, view)
-    update_research_content(content, player, view, context, translated_labels(translations))
     dispatch_translations(player, translations)
+    local search_pending = view.query ~= "" and translations ~= nil
+      and translation_queue.is_complete(translations.cache, translations.scope) == false
+      and translation_queue.needs_maintenance(translations.cache)
+    update_research_content(content, player, view, context, translated_labels(translations), search_pending)
     update_discovery_indicator(content, translations)
   elseif view.tab == "settings" then
     local translations = open_translation_cache(player, view)

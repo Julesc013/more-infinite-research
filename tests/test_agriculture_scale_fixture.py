@@ -4,10 +4,12 @@ These controls load only fixture-owned Lua against small doubles. They never
 launch Factorio or interpret profiler text as a timing result.
 """
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
 import re
+import subprocess
 import sys
 import unittest
 
@@ -79,7 +81,7 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
         self.lua.globals().published_arm_settings = (FIXTURE / "arm-published" / "settings-updates.lua").as_posix()
         self.lua.globals().defaults_arm_settings = (FIXTURE / "arm-candidate-defaults" / "settings-updates.lua").as_posix()
         self.lua.execute(r'''
-          function scale_data(selector_path, opponent, arm, matched_tier, active_seed)
+          function scale_data(selector_path, opponent, arm, matched_tier, active_seed, current)
             arm = arm or "legacy"
             local candidate_science = {
               "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
@@ -135,6 +137,16 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             end
             if active_seed then
               active["mir-fixture-mir5-agriculture-scale-active"] = "0.1.0"
+            end
+            if current then
+              active["mir-fixture-mir5-agriculture-scale"] = "0.1.1"
+              active["mir-fixture-mir5-agriculture-scale-arm-candidate-defaults"] = "0.1.1"
+              active["more-infinite-research"] = "5.0.21010"
+              if opponent == "wrong-current-core" then active["mir-fixture-mir5-agriculture-scale"] = "0.1.0" end
+              if opponent == "wrong-current-arm" then active["mir-fixture-mir5-agriculture-scale-arm-candidate-defaults"] = "0.1.0" end
+              if opponent == "wrong-current-mir" then active["more-infinite-research"] = "5.0.21005" end
+              if opponent == "wrong-current-active" then active["mir-fixture-mir5-agriculture-scale-active"] = nil end
+              if opponent == "wrong-current-paired" then active["mir-fixture-mir5-agriculture-scale-paired"] = nil end
             end
             if opponent == "mixed-legacy-tier" then
               active["mir-fixture-mir5-agriculture-scale-tier-1"] = "0.1.0"
@@ -212,7 +224,7 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             return {ok=ok,message=tostring(result),reads=reads,callbacks=callbacks}
           end
 
-          function scale_runtime(path, tier, opponent, arm, matched, active_seed, mir_version)
+          function scale_runtime(path, tier, opponent, arm, matched, active_seed, mir_version, core_version, defaults_version)
             arm = arm or "legacy"
             local candidate_packs = {
               "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
@@ -319,11 +331,11 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             local active = {
               base="2.1.23", ["space-age"]="2.1.23",
               ["more-infinite-research"] = mir_version or (arm == "published" and "4.7.21002" or "5.0.21000"),
-              ["mir-fixture-mir5-agriculture-scale"]="0.1.0"
+              ["mir-fixture-mir5-agriculture-scale"]=core_version or "0.1.0"
             }
             if arm == "candidate" or arm == "published" or arm == "candidate-defaults" then
               active["mir-fixture-mir5-agriculture-scale-paired"]="0.1.0"
-              active["mir-fixture-mir5-agriculture-scale-arm-" .. arm]="0.1.0"
+              active["mir-fixture-mir5-agriculture-scale-arm-" .. arm]=arm == "candidate-defaults" and (defaults_version or "0.1.0") or "0.1.0"
             else
               active["mir-fixture-mir5-agriculture-scale-tier-" .. tostring(tier)]="0.1.0"
             end
@@ -333,6 +345,9 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             if active_seed then
               active["mir-fixture-mir5-agriculture-scale-active"]="0.1.0"
             end
+            if opponent == "wrong-engine" then active.base="2.1.22" end
+            if opponent == "wrong-space-age" then active["space-age"]="2.1.22" end
+            if opponent == "wrong-active-version" then active["mir-fixture-mir5-agriculture-scale-active"]="0.2.0" end
             if opponent == "mixed-legacy-tier" then
               active["mir-fixture-mir5-agriculture-scale-tier-1"]="0.1.0"
             end
@@ -986,6 +1001,133 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             with self.subTest(opponent=opponent):
                 result = run(str(CORE / "control.lua"), 1, opponent, "candidate-defaults", True, True, "5.0.21005")
                 self.assertFalse(result["ok"])
+
+    def test_510_active_defaults_retains_physical_oracles_and_exact_profiles(self):
+        info = json.loads((CORE / "info-active-current-f210.json").read_text())
+        expected_info = json.loads((CORE / "info.json").read_text())
+        expected_info["version"] = "0.1.1"
+        expected_info["dependencies"][-1] = "more-infinite-research = 5.0.21010"
+        self.assertEqual(expected_info, info)
+        expected_arm = json.loads((FIXTURE / "arm-candidate-defaults/info-505.json").read_text())
+        expected_arm["version"] = "0.1.1"
+        expected_arm["dependencies"][1] = "more-infinite-research = 5.0.21010"
+        self.assertEqual(expected_arm, json.loads((FIXTURE / "arm-candidate-defaults/info-active-current-f210.json").read_text()))
+        run = self.lua.eval("scale_runtime")
+        for tier in (1, 32, 128):
+            with self.subTest(tier=tier):
+                result = run(str(CORE / "control.lua"), tier, "", "candidate-defaults", True, True, "5.0.21010", "0.1.1", "0.1.1")
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual(2, result["state"]["research_finished"])
+                self.assertEqual(2 * tier, result["seed_inserts"])
+                self.assertEqual(2 * tier, result["state"]["planted_events"])
+                reports = list(plain(result["reports"]).values())
+                self.assertEqual(["prepared", "start", "complete", "initial", "reload"], [row["stage"] for row in reports])
+                witness = reports[-1]["witnesses"]
+                self.assertEqual(7, len(witness["science_contract"]["packs"].values()))
+                self.assertEqual((17645, 18000), (witness["trained_remaining_ticks"], witness["foreign_remaining_ticks"]))
+                self.assertTrue(witness["cold_reload_witness"] and witness["on_load_read_only"])
+                previous = json.loads((ROOT / f"tests/profiles/runtime505-agriculture-candidate-defaults-{tier}-f210-2123-r01.json").read_text())
+                current = json.loads((ROOT / f"tests/profiles/agriculture-active-matched-current-defaults-{tier}-f210-2123.json").read_text())
+                previous["scope"] = current["scope"]
+                previous["mods"][5]["version"] = "5.0.21010"
+                previous["mods"][6]["version"] = "0.1.1"
+                previous["mods"][8]["version"] = "0.1.1"
+                del previous["archive_sha256"]["more-infinite-research_5.0.21005.zip"]
+                previous["archive_sha256"]["more-infinite-research_5.0.21010.zip"] = "C625D648978F6FE677B5EDC5C68090A2AA9A939D48A54A736610D55E47337806"
+                self.assertEqual(previous, current)
+                self.assertEqual("8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38", current["engine"]["sha256"])
+                self.assertEqual("A15A7D628D66953D2E0C4D4FA288F47CBF9C5678327C7EB3D23ADB5DC78331C0", current["archive_sha256"]["mir-fixture-mir5-active-mods-observer_0.1.0.zip"])
+        for version, core, active, arm, matched in (("5.0.21009", "0.1.1", True, "candidate-defaults", True),
+                                                     ("5.0.21011", "0.1.1", True, "candidate-defaults", True),
+                                                     ("5.0.21005", "0.1.1", True, "candidate-defaults", True),
+                                                     ("5.0.21000", "0.1.0", True, "candidate-defaults", True),
+                                                     ("5.0.21010", "0.1.0", True, "candidate-defaults", True),
+                                                     ("5.0.21010", "0.1.1", False, "candidate-defaults", True),
+                                                     ("5.0.21010", "0.1.1", True, "candidate", True),
+                                                     ("5.0.21010", "0.1.1", True, "candidate-defaults", False)):
+            with self.subTest(version=version, core=core, active=active, arm=arm, matched=matched):
+                self.assertFalse(run(str(CORE / "control.lua"), 1, "", arm, matched, active, version, core, "0.1.1")["ok"])
+        self.assertFalse(run(str(CORE / "control.lua"), 1, "", "candidate-defaults", True, True, "5.0.21010", "0.1.1", "0.1.0")["ok"])
+        for opponent in ("wrong-engine", "wrong-space-age", "wrong-active-version", "settings-policy", "settings-gate",
+                         "wrong-timing", "wrong-force", "lost-tower", "load-repair", "lost-consumption",
+                         "active-early-event", "blocked-ground", "multiple-matched-tiers"):
+            with self.subTest(opponent=opponent):
+                self.assertFalse(run(str(CORE / "control.lua"), 1, opponent, "candidate-defaults", True, True, "5.0.21010", "0.1.1", "0.1.1")["ok"])
+
+    def test_510_data_stage_admits_only_exact_active_defaults_tuple(self):
+        run = self.lua.eval("scale_data")
+        for tier in (1, 32, 128):
+            selector = (FIXTURE / f"matched-tier-{tier}/settings-updates.lua").as_posix()
+            with self.subTest(tier=tier):
+                result = plain(run(selector, "", "candidate-defaults", tier, True, True))
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual(tier, result["selected_tier"])
+            for opponent in ("wrong-current-core", "wrong-current-arm", "wrong-current-mir", "wrong-current-active",
+                             "wrong-current-paired", "ingredient", "prerequisite", "formula", "effect", "settings-policy"):
+                with self.subTest(tier=tier, opponent=opponent):
+                    self.assertFalse(plain(run(selector, opponent, "candidate-defaults", tier, True, True))["ok"])
+
+    def test_510_complete_selected_metadata_dependency_composition(self):
+        # This fixed10 control consumes original metadata, independently frozen
+        # from8e5ce79b:source/info.json; later source versions are separate inputs.
+        mir_info = ROOT / "tests/fixtures/runtime510-selected-mir-info.json"
+        self.assertEqual("4FAED4857D3F5686344546F10918DAD550686D36DB50BACB4B3F3571882CD7CD",
+                         hashlib.sha256(mir_info.read_bytes()).hexdigest().upper())
+        # Official 2.1.23 dependency declarations independently read from the
+        # selected engine's data/*/info.json. No Factorio process or archive is created.
+        official = {
+            "base": [], "elevated-rails": ["base >= 2.1.0"],
+            "quality": ["base >= 2.1.0", "recycler >= 2.1.0"],
+            "recycler": ["base >= 2.1.0"],
+            "space-age": ["base >= 2.1.0", "elevated-rails >= 2.1.0", "+ quality >= 2.1.0", "recycler >= 2.1.0"],
+        }
+        script = r'''
+$ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+. $env:MIR_DEPENDENCY_CHECKER
+$selected=@($env:MIR_SELECTED | ConvertFrom-Json -AsHashtable)
+foreach($row in $selected){
+ if($row.info.name -cne $row.name -or $row.info.version -cne $row.version){throw 'selected metadata identity differs'}
+}
+Assert-MIRLibraryDependencies -Selected $selected
+'''
+        for tier in (1, 32, 128):
+            profile = json.loads((ROOT / f"tests/profiles/agriculture-active-matched-current-defaults-{tier}-f210-2123.json").read_text())
+            fixture_paths = {
+                "mir-fixture-mir5-active-mods-observer": ROOT / "tests/fixtures/active-mods-observer/info.json",
+                "mir-fixture-mir5-agriculture-scale": CORE / "info-active-current-f210.json",
+                "mir-fixture-mir5-agriculture-scale-paired": FIXTURE / "paired/info.json",
+                "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults": FIXTURE / "arm-candidate-defaults/info-active-current-f210.json",
+                f"mir-fixture-mir5-agriculture-scale-matched-tier-{tier}": FIXTURE / f"matched-tier-{tier}/info.json",
+                "mir-fixture-mir5-agriculture-scale-active": FIXTURE / "active/info.json",
+                "more-infinite-research": mir_info,
+            }
+            rows = []
+            for row in profile["mods"]:
+                self.assertTrue(row["enabled"])
+                name = row["name"]
+                info = ({"name": name, "version": "2.1.23", "dependencies": official[name]}
+                        if name in official else json.loads(fixture_paths[name].read_text()))
+                rows.append({"name": name, "version": row["version"], "info": info})
+            self.assertEqual(12, len(rows))
+            for arm_file, allowed in ((None, True), ("info.json", False), ("info-505.json", False),
+                                      ("wrong-mir-info", False)):
+                with self.subTest(tier=tier, arm_file=arm_file):
+                    selected = json.loads(json.dumps(rows))
+                    if arm_file == "wrong-mir-info":
+                        mir = next(row for row in selected if row["name"] == "more-infinite-research")
+                        mir["info"]["version"] = "5.0.21011"
+                    elif arm_file:
+                        arm = next(row for row in selected if row["name"] == "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults")
+                        arm["info"] = json.loads((FIXTURE / "arm-candidate-defaults" / arm_file).read_text())
+                        arm["version"] = arm["info"]["version"]
+                    result = subprocess.run(["pwsh", "-NoProfile", "-NonInteractive", "-Command", script],
+                        env=dict(os.environ, MIR_DEPENDENCY_CHECKER=str(ROOT / "tools/lib/compatibility/LibraryActivation.ps1"),
+                                 MIR_SELECTED=json.dumps(selected)), capture_output=True, text=True)
+                    self.assertEqual(allowed, result.returncode == 0, result.stdout + result.stderr)
+                    if not allowed:
+                        expected = ("selected metadata identity differs" if arm_file == "wrong-mir-info"
+                                    else "mir-library-dependency-version")
+                        self.assertIn(expected, result.stderr)
 
     def test_exact_f210_api_declares_the_fixture_runtime_surface(self):
         api_path = f210_runtime_api_path()

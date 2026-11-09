@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import sys
 import unittest
+from worker_storage_recovery_fixture import MINIMAL_NATIVE_FACTS
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -751,6 +752,7 @@ class LibraryTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().player_root = (ROOT / "source").as_posix()
+        self.lua.execute(MINIMAL_NATIVE_FACTS)
         self.lua.execute(r'''
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
@@ -1074,6 +1076,8 @@ class LibraryTests(unittest.TestCase):
 
           function boot_native_events()
             boot()
+            library_private_credit_ids["mir-worker-storage-preservation-4"] = true
+            install_worker_recovery_facts({player.force})
             gear.force, foreign.force = player.force, player.force
             route_native_events(false)
           end
@@ -2711,6 +2715,101 @@ class LibraryTests(unittest.TestCase):
             and value.tooltip[4][1] == "mir-browser.source-mirset1",
             "finite imported cap lost its valid zero default/direct provenance")
           assert(settings.startup[name].value == 0 and gear.level == 3 and gear.researched and not gear.enabled)
+        ''')
+
+    def test_localized_search_retains_selection_while_returning_tab_translations_arrive(self):
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          boot()
+          player.locale = "de"
+          gear.localised_name = {"technology-name.fixture-robot-battery"}
+          foreign.localised_name = {"technology-name.fixture-first-result"}
+          library_declarations = {
+            {id=foreign.name,name="Akku fallback",family="mir",finite=true,max_level=3}
+          }
+          -- A partial translated-search refresh can expose another matching
+          -- row before the previously selected research's reply arrives.
+          for index=1,7 do
+            local id="unrelated-translation-"..index
+            player.force.technologies[id]={valid=true,name=id,level=1,enabled=true,researched=false,
+              visible_when_disabled=false,localised_name="Unrelated research",prototype={max_level=1}}
+            library_declarations[#library_declarations+1]={id=id,name="Unrelated research",family="mir",finite=true,max_level=1}
+          end
+          library_declarations[#library_declarations+1]={id=gear.name,name="Robot battery",family="mir",finite=false,max_level="infinite"}
+          local target_label="Arbeitsroboter Akkukapazität"
+          local function translated(value)
+            if type(value)=="string" then return value end
+            if value[1]=="technology-name.fixture-robot-battery" then return target_label end
+            if value[1]=="technology-name.fixture-first-result" then return "Akku fallback" end
+            if value[1]=="?" then return translated(value[2]) end
+            assert(value[1]=="")
+            local result={}
+            for index=2,#value do result[#result+1]=translated(value[index]) end
+            return table.concat(result)
+          end
+          local function finish_requests(first,last)
+            last=last or #player.translation_requests
+            for index=first,last do
+              local request=player.translation_requests[index]
+              library.on_string_translated{player_index=1,id=request.id,translated=true,
+                result=translated(request.localised)}
+            end
+          end
+          local queue,current,progress=player.force.research_queue,player.force.current_research,player.force.research_progress
+          local root=library.open(player,{selected=gear.name})
+          finish_requests(1)
+          library.open(player,{query="akku",selected=gear.name})
+          assert(storage.mir_library.players[1].selected==gear.name)
+          assert(#research_content(root).mir_library_list_pane.mir_library_results.items==2)
+          local tabs=root.mir_library_tabs
+          tabs.selected_tab_index=2
+          library.on_gui_selected_tab_changed{player_index=1,element=tabs}
+          local first=#player.translation_requests+1
+          tabs.selected_tab_index=1
+          library.on_gui_selected_tab_changed{player_index=1,element=tabs}
+          assert(storage.mir_library.players[1].selected==gear.name,
+            "returning before localized search is ready replaced the player's selected research")
+          finish_requests(first,first+7)
+          assert(#research_content(root).mir_library_list_pane.mir_library_results.items==1,
+            "the partial refresh must expose the other matching research before the selected reply")
+          assert(storage.mir_library.players[1].selected==gear.name,
+            "a partial translation refresh replaced the player's selected research")
+          finish_requests(first+8)
+          assert(storage.mir_library.players[1].query=="akku" and storage.mir_library.players[1].selected==gear.name,
+            "completed localized search did not retain the selected research")
+          local list=research_content(root).mir_library_list_pane.mir_library_results
+          assert(#list.items==2 and list.items[list.selected_index][3]=="Arbeitsroboter Akkukapazität")
+          -- Once a completed search really excludes the former selection,
+          -- choose its visible result rather than preserving stale focus.
+          tabs.selected_tab_index=2
+          library.on_gui_selected_tab_changed{player_index=1,element=tabs}
+          first=#player.translation_requests+1
+          target_label="Robot battery"
+          tabs.selected_tab_index=1
+          library.on_gui_selected_tab_changed{player_index=1,element=tabs}
+          finish_requests(first)
+          list=research_content(root).mir_library_list_pane.mir_library_results
+          assert(#list.items==1 and list.selected_index==1 and storage.mir_library.players[1].selected==foreign.name,
+            "a completed nonmatching search must still choose the visible research")
+          assert(player.force.research_queue==queue and player.force.current_research==current
+            and player.force.research_progress==progress and gear.level==3 and gear.researched and not gear.enabled)
+        ''')
+
+    def test_search_without_native_translation_still_selects_a_visible_fallback(self):
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          for case=1,2 do
+            boot()
+            if case==1 then player.request_translation=nil
+            else player.request_translation=function() return nil end end
+            local root=library.open(player,{family="all",query="foreign",selected=gear.name})
+            local list=research_content(root).mir_library_list_pane.mir_library_results
+            assert(#list.items==1 and list.selected_index==1 and storage.mir_library.players[1].selected==foreign.name,
+              "an unavailable/refused translation API must not leave a raw search waiting for callbacks")
+            assert(#player.translation_requests==0)
+          end
         ''')
 
     def test_full_translation_callback_keeps_late_recipe_item_and_fluid_search_terms(self):

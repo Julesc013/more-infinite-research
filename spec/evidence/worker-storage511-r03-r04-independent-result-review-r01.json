@@ -1,0 +1,289 @@
+{
+  "kind": "MIRWorker511NativePrefixAndProviderAdverseIndependentReviewV1",
+  "reviewed_at_utc": "2026-11-09T08:08:55.479800+00:00",
+  "verdict": "r03-source-and-preparation-prefix-accepted-for-exact-r04-input-reuse; r03-provider-data-adverse-and-r04-provider-runtime-adverse-retained; provider-qualification-blocked",
+  "source_commit": "2ac34dcc33f3ea34084a540deeb4fe6028022c41",
+  "source_tree": "d840d03890b3809646fe9b324bf62c7da91993ab",
+  "candidate_package": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir511-cumulative-assets-r02\\more-infinite-research_5.0.21011.zip",
+    "exists": true,
+    "bytes": 1006359,
+    "sha256": "FFB30DC15DF2BC529EAADFF6F499E451C6A8F3166FC01C80817D8EC920C3F288"
+  },
+  "review_scope": "Read-only raw/custody/CRC/actor/frame and caller input-reuse review; no native/test/build/source/docs/library action.",
+  "pins": {
+    "r03_terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r03-controller\\execution-Execute-r04\\terminal.json",
+      "bytes": 260784,
+      "sha256": "524BF146FE0140004BC8C3E6AFA2C2FDED981F0C2064A7258FFE1192D8D4D106"
+    },
+    "r03_admission": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-r03-root-admission.json",
+      "bytes": 1643,
+      "sha256": "694B98826B0B03671D3A908805AA1944603E0FD6E5616067EE620FA09509C10D"
+    },
+    "r04_terminal": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r04-controller\\execution-Execute-r04\\terminal.json",
+      "bytes": 25499,
+      "sha256": "926997AE4CDC84D98E0BFE74D9B57600B5E6D11EEA1BB383A24E66BE9BBA8BD7"
+    },
+    "r04_admission": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-r04-root-admission.json",
+      "bytes": 1082,
+      "sha256": "6EC094DE6D1823AFEA125638CA1C1595C20FD28BD03244C669763D68B35D7DE0"
+    },
+    "r04_packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r04-controller\\packet.json",
+      "bytes": 594041,
+      "sha256": "0F3DA1A44BBA55FFD724A94427C46EDE55D7BDE42AC48454B83D98A611C33E4F"
+    },
+    "r04_caller": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r04-controller\\Invoke-ProviderContinuation.ps1",
+      "bytes": 19640,
+      "sha256": "B1A52AA83386BC0559B9B3F8061DDCD2D14ED88B22DC133AB8E3847E41CCD35C"
+    },
+    "r04_composition": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r04-controller\\composition.json",
+      "bytes": 24138,
+      "sha256": "E350FB3BCECED8E8918B36D75DBD1A7EB44AE3645BED2C57204B2F8FC8F2A92F"
+    },
+    "r04_handoff": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r04-controller\\HANDOFF.json",
+      "bytes": 11813,
+      "sha256": "DC56365949F011FE39975513CA55629343E33EE2F6754663A7511B7089EF7DF4"
+    },
+    "actor": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r04-controller\\inputs\\control.lua",
+      "exists": true,
+      "bytes": 18662,
+      "sha256": "63BA77D7CC4F4235ADB0ECC09652F844910B4E5AEF7533A351CA93EB603A4DDD"
+    }
+  },
+  "prefix": {
+    "actual_r03_processes": 5,
+    "successful_prefix_processes": 4,
+    "source_ordinary_lab_completions": {
+      "player": 4,
+      "worker-suspended": 3
+    },
+    "source_tick": 30021,
+    "prepare_tick": 30415,
+    "actual_colds": 2,
+    "cold_scope": "One source cold and one prepared cold, not two per stage. Each exit0, exact frames/counts match its saved endpoint; neither adds ordinary completions.",
+    "server_completion_scope": "Source/preparation server exits-1 are accepted only through passed closed-save completion predicates; both nontimeout.",
+    "source_actual_next_levels_before_deferred_queue": "Seven diagnostics show advanced/unresearched next5..8, currentfalse and empty queue; they establish this observed old510 route only.",
+    "native_bonuses": {
+      "player": 7,
+      "worker-suspended": 6,
+      "worker-uninvested": 3
+    },
+    "player_current_partial": 0.3500596399489772,
+    "suspended_detached_partial": 0.27004693049212736,
+    "map_price": 1.25,
+    "cap": 8,
+    "all_five_force_frames_independently_verified": true,
+    "prepared_current_count4271_and_detached_count2847_retained": true,
+    "prepare_twice": "Actual four-command sequence and Prepared5forces/Alreadyprepared replies verified. Second call does not add transfer or ordinary completions.",
+    "transfer_callbacks": {
+      "count": 7,
+      "by_script": true,
+      "not_ordinary_completions": true
+    },
+    "all_cost_science_effect_formula_time_flags_current_queue_sentinel_and_native_bonus_checks": true,
+    "saved_archives": [
+      {
+        "save": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r03-controller\\protected\\source.zip",
+          "exists": true,
+          "bytes": 798826,
+          "sha256": "FB4385B5AFB23F561DA1B23E4D18A88E7BAD1EEA8143F4DC28D6D6FEAF462B90"
+        },
+        "members": 7,
+        "all_crc_valid": true,
+        "embedded_actor_sha256": "63BA77D7CC4F4235ADB0ECC09652F844910B4E5AEF7533A351CA93EB603A4DDD"
+      },
+      {
+        "save": {
+          "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r03-controller\\protected\\prepare.zip",
+          "exists": true,
+          "bytes": 799400,
+          "sha256": "9A9A7289AFA956A35D0793A2171EF56597152BA2000D70E251A1241BE776CF69"
+        },
+        "members": 7,
+        "all_crc_valid": true,
+        "embedded_actor_sha256": "63BA77D7CC4F4235ADB0ECC09652F844910B4E5AEF7533A351CA93EB603A4DDD"
+      }
+    ]
+  },
+  "reuse_and_fixture": {
+    "exact_prepared": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r03-controller\\protected\\prepare.zip",
+      "exists": true,
+      "bytes": 799400,
+      "sha256": "9A9A7289AFA956A35D0793A2171EF56597152BA2000D70E251A1241BE776CF69"
+    },
+    "prepared_source_protected_and_r04_input_binding_equal": true,
+    "caller_binding": "Validates original r03 Root admission/packet/caller/composition, exact4 passed prefix roles/results, actual4/3 counts, actual prepare-twice commands, source-to-prepared hashes and embeddedactor before copying the protected input. New r04 has only provider server+2plannedcolds; no producer or prepare dispatch.",
+    "fixture_versions": [
+      "0.3.0",
+      "0.4.0"
+    ],
+    "changed_zip_members": [
+      "data.lua",
+      "info.json"
+    ],
+    "all_other_fixture_member_bodies_exact": true,
+    "info_only_version_changed": true,
+    "data_only_change": "Remove owned conditional Golden append. Ten original base inputs, speed1001 and technology body unchanged. This branch was inactive during no-Secretas source/preparation.",
+    "upstream_proof": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-storage511-recovery-native-r04-controller\\inputs\\secretas-lab-mutator-proof.json",
+      "bytes": 761,
+      "sha256": "ABB3BFDED59D348C405B57C8B0D5DD80ADDE2BD9021969F610D2432E4983BD37"
+    },
+    "upstream_scope": "Retained actual first5 Secretas data-updates lines append Golden to every lab. Isolated2-versus1 control is not a full-mod/native verdict. Actual r04 data setup reached provider-ready, so prior duplicate was removed.",
+    "future_source_changes": "No automatic reuse admission for a subsequent production fix; consumed paths and exact input artifacts must be reviewed again."
+  },
+  "adverses": {
+    "r03_provider": {
+      "actual_processes": 1,
+      "failure": "Data-stage entity setup: golden-science-pack specified twice in fixture lab.",
+      "provider_world_loaded": false,
+      "endpoints": 0,
+      "colds": 0,
+      "not_relabelled_pass": true
+    },
+    "r04_provider": {
+      "actual_processes": 1,
+      "pids": [
+        42284
+      ],
+      "terminal_failure": "[worker-recovery511-packet] RCON connection closed during packet read",
+      "resource_terminal": {
+        "observed_at": "2026-11-09T08:01:17.0753443+00:00",
+        "phase": "interrupted",
+        "timed_out": false,
+        "error": "[worker-recovery511-packet] RCON connection closed during packet read",
+        "resource_admission": null,
+        "peak_working_set_bytes": 427794432,
+        "peak_sampled_private_bytes": 422588416
+      },
+      "markers": [
+        [
+          "provider-configuration-pending",
+          30416
+        ],
+        [
+          "provider-ready",
+          30416
+        ]
+      ],
+      "provider_entry": "All five prepared private/sentinel rows, queues/current/progress/bonus/lab-speed frames match exactly at provider-ready30416.",
+      "primary_production_failure": "MIR on_research_queued snapshot283 via on_research_event621/bootstrap640, caught/logged by MIR command564 during resume.",
+      "exact_scalar_boundary": "283 refuses current!=queue[1] OR invalid research_progress. Raw does not print individual failing values.",
+      "source_flow_inference": "M.resume calls assign_queue whole-setter; its reentrant queued callback observes a frame that fails strict snapshot before the owned setter/restoration finishes. SDK does not promise atomic callback snapshots. Exact transient scalar is unobserved.",
+      "secondary_failure": "Subsequent actor run-provider refuses frame-extra at tick30744; caller then records RCONconnectionclosed. This is not the primary production cause.",
+      "commands_array_caveat": "Empty because connection failure occurs before command list is copied into case record. Raw proves MIR resume path was invoked; do not claim zero RCON or successful command completion.",
+      "completed_provider_process_receipts": 0,
+      "endpoint_save": false,
+      "colds": 0,
+      "native_exit_code": "No completed process result captured; resource record interrupted/nontimeout on RCONfailure. Do not invent natural exit code."
+    }
+  },
+  "minimal_fix_review_requirements": [
+    "Retain strict stable current/queue/progress/shape/custody/earned-level/flags/count/quota checks. Do not accept inconsistent external frames.",
+    "If suppressing internal reentrant callbacks, scope guard to owned mutation only, restore it on error, and independently validate exact settled native frame before accepting the command/state.",
+    "Review ordinary external/player queue/cancel/start/finish event semantics as well as resume; do not assume all queued callbacks are atomic.",
+    "Keep secondary actor evidence and stop on unexpected command errors; no production success from a fixture guard change.",
+    "Fresh exact-source/package provider resume/retirement/ordinary foreign research/save/two-cold endpoint still required."
+  ],
+  "custody_and_restoration": {
+    "all54_recorded_primary_members_match_frozen_originals_exact": true,
+    "cases": [
+      {
+        "revision": "r03",
+        "case": "source",
+        "members": 16,
+        "all_original_and_retained_bodies_exact": true,
+        "prior_controls": 2,
+        "prior_mir_archives": 19,
+        "activation": "restored-direct-library-controls",
+        "archive_restoration": [
+          {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-worker-recovery511_0.3.0.zip",
+            "action": "removed-temporary"
+          },
+          {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21010.zip",
+            "action": "unchanged"
+          }
+        ]
+      },
+      {
+        "revision": "r03",
+        "case": "prepare",
+        "members": 17,
+        "all_original_and_retained_bodies_exact": true,
+        "prior_controls": 2,
+        "prior_mir_archives": 19,
+        "activation": "restored-direct-library-controls",
+        "archive_restoration": [
+          {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-worker-recovery511_0.3.0.zip",
+            "action": "removed-temporary"
+          },
+          {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21011.zip",
+            "action": "removed-temporary"
+          }
+        ]
+      },
+      {
+        "revision": "r03",
+        "case": "provider",
+        "members": 10,
+        "all_original_and_retained_bodies_exact": true,
+        "prior_controls": 2,
+        "prior_mir_archives": 19,
+        "activation": "restored-direct-library-controls",
+        "archive_restoration": [
+          {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-worker-recovery511_0.3.0.zip",
+            "action": "removed-temporary"
+          },
+          {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21011.zip",
+            "action": "removed-temporary"
+          }
+        ]
+      },
+      {
+        "revision": "r04",
+        "case": "provider",
+        "members": 11,
+        "all_original_and_retained_bodies_exact": true,
+        "prior_controls": 2,
+        "prior_mir_archives": 19,
+        "activation": "restored-direct-library-controls",
+        "archive_restoration": [
+          {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-worker-recovery511_0.4.0.zip",
+            "action": "removed-temporary"
+          },
+          {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21011.zip",
+            "action": "removed-temporary"
+          }
+        ]
+      }
+    ],
+    "recorded_factorio_processes_after_each_schedule": 0,
+    "live_library_rechecked": false,
+    "qualification": "Caller restoration records and post-finally prior-control/archive/protected-input assertions reviewed. No current live-library state claim."
+  },
+  "limits": [
+    "Source/preparation prefix only; no completed provider continuation, retirement, ordinary foreign stage, provider endpoint save or provider cold pass.",
+    "No physical robot cargo, cap/enable changes after retirement, first-add MIR to an existing provider, unchanged-provider510 upgrade, provider removal/readdition, overhaul, Ferrum, performance, stable or release verdict.",
+    "All r02/r03/r04 adverse bytes, original source/prepared saves and published packages remain preserved.",
+    "No new engines, host controls, source/tests/docs/packet edits, or direct-library transactions by reviewer."
+  ]
+}

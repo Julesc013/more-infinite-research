@@ -12,6 +12,7 @@ import sys
 import unittest
 
 from repository_paths import reference_path
+from worker_storage_recovery_fixture import MINIMAL_NATIVE_FACTS
 
 ROOT = Path(__file__).resolve().parents[1]
 PLAYER = ROOT / "source"
@@ -131,6 +132,7 @@ class CompetingProductivityTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().player_root = PLAYER.as_posix()
+        self.lua.execute(MINIMAL_NATIVE_FACTS)
         self.lua.execute(r'''
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
@@ -516,10 +518,15 @@ class CompetingProductivityTests(unittest.TestCase):
           remote={interfaces={},add_interface=function(name, value) remote.interfaces[name]=value end}
           commands={add_command=function() end}
           storage={}; game={forces={}}
+          install_worker_recovery_facts()
           local bootstrap = require("runtime.bootstrap")
           bootstrap.register()
           handlers.init(); handlers.configuration({}); handlers.load()
-          handlers.events[1]({force={index=1}}); handlers.events[2]({force={index=1}})
+          local created={index=1,technologies={},research_queue={},research_progress=0}
+          install_worker_recovery_facts({created})
+          handlers.events[1]({force=created}); handlers.events[2]({force=created})
+          local private=created.technologies["mir-worker-storage-preservation-4"]
+          assert(private.level==4 and not private.researched and not private.enabled and private.saved_progress==0)
           handlers.events[3]({source_index=1,destination={index=2}})
           handlers.events[4]({research={name="epr_iron-plate-productivity-5",force={index=1}}})
           handlers.events[5]({research={name="epr_iron-plate-productivity-5",force={index=1}}})
@@ -541,6 +548,8 @@ class CompetingProductivityTests(unittest.TestCase):
           script = {active_mods={["fish-productivity"]="1.0.0"}, on_init=function(f) handlers.init=f end,
             on_configuration_changed=function(f) handlers.configuration=f end, on_load=function(f) handlers.load=f end,
             on_event=function(id, f) handlers.events[id]=f end, on_nth_tick=function() end}
+          storage={}; game={forces={}}
+          install_worker_recovery_facts()
           package.loaded["runtime.bootstrap"] = nil
           local fixed_provider = require("runtime.bootstrap")
           fixed_provider.register()
@@ -559,6 +568,7 @@ class CompetingProductivityTests(unittest.TestCase):
           storage = {mir_competing_productivity={schema=1, owned_disabled={[81]={
             ["epr_iron-plate-productivity-5"]={disabled=true, visible_when_disabled=false}}}}}
           game = {forces={[81]={index=81, technologies={["epr_iron-plate-productivity-5"]=foreign}}}}
+          install_worker_recovery_facts()
           package.loaded["runtime.bootstrap"] = nil
           local without_provider = require("runtime.bootstrap")
           without_provider.register()

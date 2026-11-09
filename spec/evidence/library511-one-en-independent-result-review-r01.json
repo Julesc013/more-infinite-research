@@ -1,0 +1,413 @@
+{
+  "kind": "MIRLibrary511EnglishIndependentResultReviewV1",
+  "reviewed_at_utc": "2026-11-08T19:18:55.963589+00:00",
+  "reviewer": "independent non-author /root/native_owner510_review",
+  "execution_identity": "BLACKGLASS-WIN1\\Jules",
+  "review_scope": "Read-only actual EN r03 UI, receipts, original save/control restoration and independent Settings-scope expectation. No native launch, desktop input, tests, build or source edit by reviewer.",
+  "verdict": "ACCEPT named observed EN states and custody; original Settings nonempty predicate UNMET due to wrong-scope fixture expectation. No whole-sequence pass and no product search defect established.",
+  "source": {
+    "runner_head": "573061eb4ffbb488b987b065b28923836e986d12",
+    "runner_clean": true,
+    "player_source_head": "706dd02cc86993cd4d20b769aca85f2a661ea786",
+    "player_tree": "4bcdf2b89d63d38fe6cb0b66840a83096a56dd0c",
+    "candidate_bytes": 995123,
+    "candidate_sha256": "74418DC171C8FA3F21486EF21B1FA8D348E99798E4F4D6DF5657024D2B87B892",
+    "distribution": "5.0.21011",
+    "published_package": false
+  },
+  "admitted_plan": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library511-one-client-inputs-r03\\en\\plan.json",
+    "bytes": 6711,
+    "sha256": "274A62E08962F8FBC3CBCF924A664E38BB73DB9C952B02B3F31A7F4FEFD6798F",
+    "prior_admission_sha256": "4DBAC7A94DC4414C4B799598F68940B4B3A17A9E574204B8C027F37842D3A9D2",
+    "original_nonempty_repair_predicate_preserved": true
+  },
+  "actual_native": {
+    "root": "D:\\Projects\\Factorio\\.task-builds\\mir511-candidate-r01\\build\\tmp\\library511-one-en-r03",
+    "owner_result_sha256": "59738223DD22C13CB24634ABF631A666E160F75225CBBA00665BFFEB723A71CA",
+    "owner_status": "native-process-completed-ui-verdict-separate",
+    "owner_pid": 17452,
+    "owner_start_utc": "2026-11-08T18:56:36.2578910Z",
+    "native_pid": 29688,
+    "native_start_utc": "2026-11-08T18:56:40.5850510Z",
+    "engine_version": "2.1.23 build87750",
+    "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "window_handle": 4066950,
+    "client_geometry": [
+      0,
+      0,
+      2560,
+      1440
+    ],
+    "engine_process_count": 1,
+    "exit_code": 0,
+    "timed_out": false,
+    "duration_seconds": 822.812015,
+    "peak_working_set_bytes": 1225433088,
+    "peak_sampled_private_bytes": 2330558464,
+    "performance_acceptance": false,
+    "active_mods": [
+      "base@2.1.23",
+      "mir-fixture-mir5-active-mods-observer@0.1.0",
+      "more-infinite-research@5.0.21011"
+    ],
+    "active_mods_from_actual_log": true,
+    "log_sha256": "EA48D6C15D45173ACB5341C081839CE7CA9CB4E0A4FFEC082EA956AA8699C028",
+    "stderr_bytes": 0
+  },
+  "observed_states": [
+    "Loaded protected internal5.0.6 seed copy; intro explicitly offers Tab and is dismissed with actual guarded Tab.",
+    "Observed native shortcut opens Library; initial Research shows54 matching technologies and fixed Research/Queue/Settings/Debug tabs.",
+    "Actual typed battery reduces Research to2 rows: Battery productivity and Worker robot battery.",
+    "Selected Worker robot battery displays Adds an infinite repeatable bonus; Battery size: +10%, with no obsolete active-lab science advice in that direct-effect description.",
+    "Queue displays an empty native queue and native-screen handoff explanation; Debug displays Factorio2.1.23/MIR5.0.21011 and exact3mod closure.",
+    "Settings baseline displays123 setting groups, Research settings scope, Braking force configured values/provenance; Other options is separately available.",
+    "Actual typed repair in Research settings displays0 setting groups and No settings match this search. Original nonempty reduced-list predicate is unmet.",
+    "Planned return to Research retains battery query,2 matches and Worker robot battery selection/description.",
+    "Library closes; observed game menu/unsaved confirmation uses Quit; main menu is captured, then observed Exit yields user-quit/Goodbye and process0."
+  ],
+  "settings_expectation_review": {
+    "classification": "Known fixture/plan scope assumption error; no demonstrated product defect in this result.",
+    "normative_basis": [
+      "spec/runtime.md RUN-04 retains search, settings explanation, personal query and translations. It does not require searches to ignore the selected scope.",
+      "spec/settings.md SET-01 preserves historical settings identities.",
+      "spec/verification.md VER-02/VER-06 forbids adopting unexpected candidate output as a replacement oracle. Original EN predicate remains unmet."
+    ],
+    "independent_historical_reference": "Published10 tag958e34dd2701418c71f74ae094c26ff7cd467e6b, compared raw Git blobs to runner573; relevant source and existing independent tests identical.",
+    "historical_raw_source": {
+      "source/runtime/library.lua": {
+        "raw_git_sha256": "9F723536A375DA72360351B626FAB19E35CAC05BD5BDD6F035F382A36D17338A",
+        "equal_published10": true
+      },
+      "source/research/historical_settings.lua": {
+        "raw_git_sha256": "F23AABE1910B6624C7B885E127AE5390063FB3E0381BA0EC71BB5829F3D0DBB7",
+        "equal_published10": true
+      },
+      "source/research/settings.lua": {
+        "raw_git_sha256": "328A16974CBDBD24027419561A861FF1D0175A9DB24641A6DD23E3DBA288149E",
+        "equal_published10": true
+      },
+      "tests/test_library.py": {
+        "raw_git_sha256": "ADC6BD72DA01C1027C538EBFD3D457A7C3247B925B7414E2ADD0F6B8865D8D68",
+        "equal_published10": true
+      }
+    },
+    "source_facts": [
+      "source/runtime/library.lua:350 defaults settings_scope to research;1710 assigns stream settings research and non-stream settings options;1862 filters selected scope before search.",
+      "source/research/historical_settings.lua:92 declares mir-enable-passive-repair as a static boolean setting, defaultfalse; source/research/settings.lua:331 maps passive_repair_enabled, without a research stream.",
+      "source/locale/en/more-infinite-research.cfg:126 names Passive wall and gate repair; German line93 names Passive Wand- und Torreparatur. Both are option labels, not research-group declarations.",
+      "tests/test_library.py:1928 already uses tab=settings,settings_scope=options,search=repair; this unchanged published10 control explicitly keeps Research query separate."
+    ],
+    "player_member_consistency": "Actual744ZIP runtime/library.lua, research/historical_settings.lua, research/settings.lua and EN/DE setting locales match raw573source members. No production change is indicated to make repair appear in Research settings.",
+    "positive_option_search_native_verdict": "UNVERIFIED: Other options was not selected or positively searched in this native run.",
+    "de_r03_unchanged_sequence": "HOLD/SUPERSEDE: Reparatur remains in Other options, so the default Research-scope nonempty expectation has the same unsupported assumption. Requires separately pinned correction and admission before execution; prior r03 GO does not apply to a corrected plan."
+  },
+  "input_capture_audit": {
+    "capture_count": 18,
+    "input_receipt_count": 16,
+    "total_input_events": 54,
+    "all_result_spec_image_binding_hashes_rechecked": true,
+    "all_same_pid_start_engine_window_geometry": true,
+    "all_capture_owner_pid_start_bound": true,
+    "all_16_receipts_status": "input-sent-native-readback-required",
+    "all_native_game_observation_false": true,
+    "all_guard_failure_strings_empty": true,
+    "foreground_geometry_occlusion_rejections": 0,
+    "all_pointer_requests_equal_physical_readback": true,
+    "no_hardware_key_left_held": true,
+    "capture_age_seconds_to_binding_range": [
+      11.509,
+      69.157
+    ],
+    "all_under120seconds": true,
+    "actual_order_limit": "After the zero-result capture, one already planned return-to-Research retention readback occurred before close/quit. Do not describe the sequence as only retirement inputs following the first zero observation. No alternate query, scope change, export, resize, gameplay control or synthetic Factorio event followed.",
+    "captures": [
+      {
+        "label": "after-confirmed-unsaved-quit",
+        "png_sha256": "1C0D2B9C5767BE913EE87123EA1CC5B3FC3C4671005EB8041B7C3CA63139A862",
+        "result_sha256": "F11A65D4E4DDD1D1159686307F7AB75AA3766CD6FBAD5BD3B92C967785D6651C",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "debug-version-view",
+        "png_sha256": "28965B428C37A35F83CA8598D3EE84CEDE4FEE9AD024D7CF046A331E35EFC73E",
+        "result_sha256": "3D6F39DF4D3481009FDF76BDDBD8601933765A5B7F076A04C9DB59350C37E1A9",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "exit-confirmation",
+        "png_sha256": "C0DF80CD49A34D23F6625D47655CAC65AA94134ED97F4C600DB3178CBD21CE6A",
+        "result_sha256": "76070E4E6160AA2EBA3E1D095C59DF6CAC5DEA26BC5EFAAAB758B7788DC301AA",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "game-menu",
+        "png_sha256": "3F865C84CCDF4F73683C108C68EECB5D93A0A7AA6176EAABDCC65DEE0D803E41",
+        "result_sha256": "6F74B4BEEA393AE321001DAFABAF7A800850FDA9CCBD05C79E561A9B4B4F682D",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "initial-owned-window",
+        "png_sha256": "0DDB2D0AF40DFDF9530B1DFF8F35977770E38129851B17920157DC0701C2F04E",
+        "result_sha256": "0CECAE2C0E4660F3552EABEC690D89A28E99ACE8831D4552088113A024B49E11",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "intro-dismissed",
+        "png_sha256": "235DAF39425FD76ACD0C47608A3F5A493ABAAB2AF70827E91DFAAA4C26BA46C9",
+        "result_sha256": "F42E48AB42D88AEFE650962CF93D34422D46D781C748832ACB374BE157182525",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "library-closed",
+        "png_sha256": "069D2E09523A9B6BA62F74E2B6362A2B2ABD4702CD24BAA5EF7169E01F6156F1",
+        "result_sha256": "AD61252CE7714EDAF6F4141875CD445B8A2A447DE85360D9B05503722BB3A209",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "library-first-open",
+        "png_sha256": "6FC2DE2A79287EFFB998723AE8A3B2F06EE94DA2D30A3ED468DF3C3BBC8BEDE3",
+        "result_sha256": "5B02BA860969117A10F28AAD44F2DDA20BDC585B27847E3C0E4F02A9C5D767B1",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "loaded-map-before-input",
+        "png_sha256": "F54A8D6CB3BED76680865E698AC1C3A99191219CFA0DFC7A3DBDC08DF2F6F413",
+        "result_sha256": "7A2FBF38231AA7FB3EFC0A38CF2806847AB057BC1AD24EA6E34A10D522B2F728",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "queue-view",
+        "png_sha256": "FD0552E7C7C9F2C377D722A9FAADE2EC1B3334EBD5780726A896043E11812C78",
+        "result_sha256": "45AF9A0660352C3F7F97D410F6A4A384524188215171402FACE6C32BB14CE3A4",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "research-battery-filtered",
+        "png_sha256": "2D3C64293448AB2D910B9296CDE01E0708F1A4E497B02B8D8A902A9A7E5A4042",
+        "result_sha256": "032FC84A588095BDDFC7B6B3207035C5F3F987AF64919186834739607C05F49E",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "research-query-focused",
+        "png_sha256": "041D3B5301B81FC3940BD8E2FE20C667A8EC5F7BA6515C0945EBB40A7017F550",
+        "result_sha256": "BE97720CD57031E72FE986C70C25BEBBB99742B0138EE4215D7B2274DBF5990E",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "research-return",
+        "png_sha256": "C75999159FEB0EEF8099EE9BF7859133C92A6CE41505989C4331153774EF56C7",
+        "result_sha256": "88AB876C41CB4CE7A0A47B6C00FCB17166DBB7AE90583D7ABACC8AB909624A7F",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "settings-baseline",
+        "png_sha256": "06CDE6CFFF5480BFD6F4C43F65B9297C431B2C28064BD6A6CE68CA5ACBE43F02",
+        "result_sha256": "CB66590A370E3912D89BC1DD1B1277513625E509ACB4C021A07431E92204CADC",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "settings-query-focused",
+        "png_sha256": "486A6BBE935540A9C588797D88CCA51B4001B40717CDADD1CBA851FF51C4259C",
+        "result_sha256": "8F861678A0FDBD062B4E5F37E13D7213633E802FB5E2987B1E8D4B8D358B37BC",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "settings-query-refreshed",
+        "png_sha256": "0505DF2EFCABC23A00B37FC13A4A2CD9F61859EF0F4439644FEB141640990A0B",
+        "result_sha256": "7DD1C128B4A8EB05273F6F0BAB8A2BF5561AC1584CB5E4C0F2F9D5D08D499AB5",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "settings-repair-filtered",
+        "png_sha256": "CFB87522119DA59EF2ED41B49376BB2DAD7D1D11D50898A4E3D4223F69A4D36A",
+        "result_sha256": "EC5EC15417FA2F47E2B5E4618B01350969333B8EE0810CDB33D948D0AF62A877",
+        "actual_png_viewed": true
+      },
+      {
+        "label": "worker-battery-description",
+        "png_sha256": "8A624163A32615B3F782916A35DD87A561CCF9BDB5B77ECEF942AAE5C717F820",
+        "result_sha256": "58B46A6F149145E08E749E06CD033CD4305517C913BD8D0F90EFD9C68CE3EF4C",
+        "actual_png_viewed": true
+      }
+    ],
+    "input_receipts": [
+      {
+        "label": "close-library",
+        "receipt_sha256": "D661B07F8074393D7220FA2CF6F1AB5BEB7A86B895582CFEEF30528BF7324C75",
+        "action": "click",
+        "text": null,
+        "capture_label": "research-return",
+        "capture_age_seconds_to_binding": 11.86,
+        "input_events_sent": 2
+      },
+      {
+        "label": "dismiss-observed-intro",
+        "receipt_sha256": "07CC78CF98438BA9EF7165D73DD7015991F90D422D397CDCA18D5E3971EC6189",
+        "action": "tab",
+        "text": null,
+        "capture_label": "loaded-map-before-input",
+        "capture_age_seconds_to_binding": 37.882,
+        "input_events_sent": 2
+      },
+      {
+        "label": "exit-game-menu",
+        "receipt_sha256": "A6CCF7E9DA092FDA13D9A1C09704ADD7EF6B371E35BD95D0D6E3A0FBB1174AE0",
+        "action": "click",
+        "text": null,
+        "capture_label": "game-menu",
+        "capture_age_seconds_to_binding": 13.553,
+        "input_events_sent": 2
+      },
+      {
+        "label": "exit-native-client",
+        "receipt_sha256": "13C124AF18D99F21D5E0A1441310FB1E822377BC7078461C1D4C199499066A92",
+        "action": "click",
+        "text": null,
+        "capture_label": "after-confirmed-unsaved-quit",
+        "capture_age_seconds_to_binding": 13.41,
+        "input_events_sent": 2
+      },
+      {
+        "label": "focus-research-query",
+        "receipt_sha256": "BFB1FD7EED2EF3A189B94554BE2BC51B16258D47041B1EA9EB9E3F06F9A3FD1E",
+        "action": "click",
+        "text": null,
+        "capture_label": "library-first-open",
+        "capture_age_seconds_to_binding": 21.106,
+        "input_events_sent": 2
+      },
+      {
+        "label": "focus-settings-query",
+        "receipt_sha256": "528AF44BE7DE1E74AF136D80DF96C2A00F032E6691EE3B0CA6F4C91196C6174C",
+        "action": "click",
+        "text": null,
+        "capture_label": "settings-baseline",
+        "capture_age_seconds_to_binding": 16.101,
+        "input_events_sent": 2
+      },
+      {
+        "label": "open-debug-tab",
+        "receipt_sha256": "68265040302FE289F7A959BB1D4C2713549316B24EE78ABE80DE44E4BEE3EE0D",
+        "action": "click",
+        "text": null,
+        "capture_label": "queue-view",
+        "capture_age_seconds_to_binding": 15.802,
+        "input_events_sent": 2
+      },
+      {
+        "label": "open-game-menu",
+        "receipt_sha256": "70FA522C4E1584F651CC7CF1151374583E6A1B0921CFD18518EFDD54DD82D1D2",
+        "action": "escape",
+        "text": null,
+        "capture_label": "library-closed",
+        "capture_age_seconds_to_binding": 13.546,
+        "input_events_sent": 2
+      },
+      {
+        "label": "open-observed-library-shortcut",
+        "receipt_sha256": "5826DE18BE32CC9787D6167772B09F635702DD3BE51BE59043AAFBFD164222BC",
+        "action": "click",
+        "text": null,
+        "capture_label": "intro-dismissed",
+        "capture_age_seconds_to_binding": 28.588,
+        "input_events_sent": 2
+      },
+      {
+        "label": "open-queue-tab",
+        "receipt_sha256": "2D025334824B9A2CF4230573EAB0719C56485178FAA0B10F6CF4C3928475021C",
+        "action": "click",
+        "text": null,
+        "capture_label": "worker-battery-description",
+        "capture_age_seconds_to_binding": 69.157,
+        "input_events_sent": 2
+      },
+      {
+        "label": "open-settings-tab",
+        "receipt_sha256": "3A3C2E6355F4938E83569B3F7A57661656C32695A30D74B1EEFE233F2772A1C9",
+        "action": "click",
+        "text": null,
+        "capture_label": "debug-version-view",
+        "capture_age_seconds_to_binding": 42.792,
+        "input_events_sent": 2
+      },
+      {
+        "label": "quit-without-saving",
+        "receipt_sha256": "2329BEBE73FC84ACE630484EA7BCC421DBB5E50EDC1FAE0F6E743553118E7CB6",
+        "action": "click",
+        "text": null,
+        "capture_label": "exit-confirmation",
+        "capture_age_seconds_to_binding": 14.596,
+        "input_events_sent": 2
+      },
+      {
+        "label": "return-research-after-settings-query",
+        "receipt_sha256": "C73971C82131568EAB1754031C1969F64D51073268D0C5D256782DCABADD35DA",
+        "action": "click",
+        "text": null,
+        "capture_label": "settings-repair-filtered",
+        "capture_age_seconds_to_binding": 13.235,
+        "input_events_sent": 2
+      },
+      {
+        "label": "select-worker-battery",
+        "receipt_sha256": "42DC858440585DB70056BAE84007A2B8EE088CAA478FDEDDC635C7CC32BD4B0F",
+        "action": "click",
+        "text": null,
+        "capture_label": "research-battery-filtered",
+        "capture_age_seconds_to_binding": 15.511,
+        "input_events_sent": 2
+      },
+      {
+        "label": "type-research-battery",
+        "receipt_sha256": "D70368EFFE38229FE7B7121B60D463025F8DC016E8FDFEBE93584C0F91F7436C",
+        "action": "text",
+        "text": "battery",
+        "capture_label": "research-query-focused",
+        "capture_age_seconds_to_binding": 15.771,
+        "input_events_sent": 14
+      },
+      {
+        "label": "type-settings-repair",
+        "receipt_sha256": "BC3BD1DB59B9F3731DFA33D779C3096BD87A9B87A2CB27BF33C8E4001CE958F5",
+        "action": "text",
+        "text": "repair",
+        "capture_label": "settings-query-refreshed",
+        "capture_age_seconds_to_binding": 11.509,
+        "input_events_sent": 12
+      }
+    ]
+  },
+  "restoration": {
+    "owner_before_after_records_equal": true,
+    "current_direct_control_hashes_independently_equal_before": true,
+    "mod_list_sha256": "48C46678CC8369DB15CC12CDFB23309EB076DC4433B76E9426083D0074BCCC91",
+    "mod_settings_sha256": "667897C514B66298A1E400058B65EA14EB36322D88864B98AE38E4C9B81387BC",
+    "active_profile_absent": true,
+    "temporary_MIR11_archive_absent": true,
+    "factorio_processes_observed_after": 0,
+    "original_bytes": 893285,
+    "original_sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD",
+    "staged_seed_hash_identical": true,
+    "candidate_hash_unchanged": true,
+    "save_claim_limit": "Quit without explicit saving was observed; actual log also records27 ordinary autosaves. Do not claim no save activity. Protected original and staged seed stayed unchanged; autosaves do not establish accepted successor/save-lifecycle behavior."
+  },
+  "custody": {
+    "root": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library511-one-en-native-custody-r01",
+    "original_manifest_sha256": "ACAF77760C9853FC7F68A7010737B2C44A91332A03EF2F916C60595DE0DCA1F4",
+    "original_manifest_adverse": "total_bytes was null;185 per-file rows intact. Original manifest preserved.",
+    "validated_manifest": "MANIFEST-validated-r02.json",
+    "validated_manifest_sha256": "565E417F1309409AF65AC736840DFF6C30B53C171DF43083EE40F5EE93DD0058",
+    "files": 185,
+    "bytes": 83786862,
+    "independently_rehashed_copies_and_origins": 185,
+    "mismatches": 0,
+    "member_rewrite_for_manifest_correction": false
+  },
+  "limits": [
+    "Named one-client English observations only. DE not launched when reviewed.",
+    "No full Library acceptance, positive Other-options search, exports, normal saved personal-view lifecycle, joining/rejoining, simultaneous clients, multiplayer, historical direct1.1 upgrade, performance or stable/release verdict.",
+    "One observed UI process is not another native gameplay/forward-lab completion. Preserve original8B32 qualified internal5.0.6 source identity.",
+    "Development health command ran before this report (Report/AsJson,3second/1000entry bounds); statusattention does not authorize deleting custody or changing shared work."
+  ]
+}
