@@ -13,6 +13,7 @@ import unittest
 
 import test_native_credits as fixture
 import test_bootstrap as bootstrap_fixture
+import test_generator as generator_fixture
 
 
 class NativeFamilyPaidCreditsTests(unittest.TestCase):
@@ -112,6 +113,221 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
     FAMILIES = ("research_low_density_structure", "research_plastic",
                 "research_processing_unit", "research_rocket_fuel", "research_steel")
 
+    def minimum_pipeline(self, target):
+        """Run real settings/data stages; only the native scalar is an oracle."""
+        generator_fixture.LuaRuntime = LuaRuntime
+        stage = generator_fixture.GeneratorTests()
+        stage.setUp()
+        stage.lua.globals().case_target = target
+        stage.lua.execute(r'''
+          local t=require("platform.target");t.id=case_target
+          local base=case_target=="f200" and "2.0.77" or "2.1.23"
+          t.factorio_version=case_target=="f200" and "2.0" or "2.1";t.minimum_base=base
+          mods={base=base};package.loaded["research.settings"]=nil;config=require("research.settings")
+          local startup={};minimum_settings={}
+          for _,row in ipairs(config.prototypes())do
+            startup[row.name]={value=row.default_value}
+            for _,family in ipairs({"research_low_density_structure","research_plastic",
+                "research_processing_unit","research_rocket_fuel","research_steel"})do
+              if row.name=="ips-effect-per-level-"..family then
+                assert(row.minimum_value==.01 and row.hidden~=true)
+                startup[row.name].value=.01;minimum_settings[family]=true
+              end
+            end
+          end
+          settings,data,helpers,log={startup=startup},full_world(mods,true),nil,function()end
+          function data:extend(rows)
+            self.writes=self.writes+1;self.emitted=rows
+            for _,row in ipairs(rows)do self.raw[row.type]=self.raw[row.type] or {};self.raw[row.type][row.name]=row end
+          end
+          dofile(player_root.."/data.lua");dofile(data_final_path)
+          emitted_groups=data.raw["mod-data"]["more-infinite-research-native-adoptions"].data.credits
+          emitted_prototypes=data.raw.technology
+          local resolved=config.resolve(startup)
+          for family in pairs(minimum_settings)do
+            assert(resolved.streams[family].effect_percent==.01 and #emitted_groups[family]==1)
+            local row=emitted_groups[family][1];assert(row.change==.0001)
+          end
+        ''')
+        g = stage.lua.globals()
+        return (generator_fixture.plain_lua(g.emitted_groups),
+                generator_fixture.plain_lua(g.emitted_prototypes))
+
+    def minimum_runtime(self, target, family, pipeline):
+        self.setUp()
+        groups, prototypes = pipeline
+        row = next(row for row in self.observed_oracle(target)["cases"]
+                   if float(row["authored_literal"]) == .0001)
+        self.assertEqual(0 if target == "f200" else 1, row["native_units"])
+        g = self.lua.globals()
+        g.case_family, g.case_target = family, target
+        g.emitted_groups = generator_fixture.lua_table(self.lua, {family: groups[family]})
+        g.emitted_prototypes = generator_fixture.lua_table(self.lua, prototypes)
+        g.native_units = row["native_units"]
+        self.lua.execute(r'''
+          GROUPS=emitted_groups
+          local base=case_target=="f200" and "2.0.77" or "2.1.23"
+          reload_credits({base=base,["more-infinite-research"]=case_target=="f200" and "5.0.20011" or "5.0.21011"},case_target)
+          native_change=case_target=="f200" and 0 or native_units/10000
+          d=native_credit_definitions.collected_descriptors(GROUPS)[1]
+          force=make_collected_force(1,1,{[d.key]=true})
+          for _,id in ipairs({d.main_id,d.positive_id,d.negative_id})do
+            local prototype=emitted_prototypes[id]
+            assert(prototype.max_level=="infinite" and #prototype.effects==1)
+            prototype.level=prototype.level or 1;prototype.max_level=UINT32_MAX
+            local effect=prototype.effects[1]
+            assert(effect.recipe==d.recipe and math.abs(effect.change)==.0001)
+            effect.change=id==d.negative_id and -native_change or native_change
+            force._states[id].prototype=prototype
+          end
+          main=force.technologies[d.main_id];positive=force.technologies[d.positive_id]
+          negative=force.technologies[d.negative_id];foreign=force.technologies.foreign
+          foreign.saved_progress=.27;queue={main,foreign};force.research_queue=queue
+          force.current_research=main;main.saved_progress=.31
+          function effective_contribution()
+            local function completed(t)return t.level-1+(t.researched and 1 or 0)end
+            local total=completed(positive)*positive.prototype.effects[1].change
+              +completed(negative)*negative.prototype.effects[1].change
+            for _,e in ipairs(main.prototype.effects)do total=total+completed(main)*e.change end
+            return total
+          end
+          function assert_partial_and_foreign()
+            assert(force.research_queue==queue and queue[1]==main and queue[2]==foreign
+              and force.current_research==main and force.research_progress==.42
+              and main.saved_progress==.31 and foreign.saved_progress==.27)
+            no_foreign_write(force)
+          end
+          function minimum_mask(included,private)
+            set_mask(force,included and {[d.key]=true} or {},private)
+            if included then main.prototype.effects[1].change=native_change end
+          end
+        ''')
+
+    def test_valid_minimum_settings_data_pipeline_initializes_all_five_families(self):
+        for target in ("f200", "f210"):
+            pipeline = self.minimum_pipeline(target)
+            for family in self.FAMILIES:
+                with self.subTest(target=target, family=family):
+                    self.minimum_runtime(target, family, pipeline)
+                    self.lua.execute(r'''
+                      native_credits.on_init()
+                      local r=record(force,d.family,d.recipe)
+                      assert(r.included and r.offset==0 and r.completed==0 and not r.private
+                        and r.pending==0 and r.payable and main.level==1)
+                      assert(positive.level==1 and negative.level==1 and effective_contribution()==0)
+                      assert(native_change==(case_target=="f200" and 0 or .0001))
+                      for _,state in pairs(force._states)do assert(state.writes.level==0 and state.writes.enabled==0) end
+                      assert_partial_and_foreign()
+                    ''')
+
+    def test_zero_native_reward_retains_integer_paid_counts_and_unfinished_work(self):
+        pipeline = self.minimum_pipeline("f200")
+        for family in self.FAMILIES:
+            with self.subTest(family=family):
+                self.minimum_runtime("f200", family, pipeline)
+                self.lua.execute(r'''
+                  native_credits.on_init();advance(force,d.main_id,4,false)
+                  native_credits.on_configuration_changed()
+                  local r=record(force,d.family,d.recipe)
+                  assert(r.offset==0 and r.completed==3 and effective_contribution()==0)
+                  minimum_mask(false,true);native_credits.on_configuration_changed()
+                  r=record(force,d.family,d.recipe)
+                  assert(r.offset==3 and r.completed==3 and r.private and not r.included
+                    and r.payable and r.pending==1 and native_credits.needs_research_events())
+                  assert(positive.level==4 and negative.level==1 and effective_contribution()==0)
+                  -- A known queued paid mask, not the zero aggregate, proves
+                  -- this one completion. A duplicate event cannot mint a count.
+                  advance(force,d.main_id,4,true)
+                  native_credits.on_research_finished({research=main,by_script=false})
+                  assert(r.offset==4 and r.completed==4 and r.pending==0 and not r.payable)
+                  assert(positive.level==5 and negative.level==1 and effective_contribution()==0)
+                  native_credits.on_research_finished({research=main,by_script=false})
+                  assert(r.offset==4 and positive.level==5 and not native_credits.needs_research_events())
+                  minimum_mask(true,false);native_credits.on_configuration_changed()
+                  r=record(force,d.family,d.recipe)
+                  assert(r.offset==0 and r.completed==4 and r.included and not r.private
+                    and r.pending==0 and r.payable)
+                  assert(positive.level==1 and negative.level==1 and main.level==4 and main.researched)
+                  assert(effective_contribution()==0);assert_partial_and_foreign()
+                ''')
+
+    def test_zero_native_reward_refuses_corrupt_named_shapes_before_writes(self):
+        pipeline = self.minimum_pipeline("f200")
+        opponents = {
+            "main-nonzero": 'main.prototype.effects[1].change=.0001',
+            "main-near-zero": 'main.prototype.effects[1].change=5e-9',
+            "negative-nonzero": 'negative.prototype.effects[1].change=-.0001',
+            "negative-near-zero": 'negative.prototype.effects[1].change=-5e-9',
+            "positive-nonzero": 'positive.prototype.effects[1].change=.01',
+            "negative-recipe": 'negative.prototype.effects[1].recipe="foreign"',
+            "main-duplicate": 'main.prototype.effects[2]=main.prototype.effects[1]',
+            "carrier-extra": 'positive.prototype.effects[2]=positive.prototype.effects[1]',
+            "carrier-visible": 'positive.prototype.hidden=false',
+            "carrier-enabled": 'negative.prototype.enabled=true',
+            "carrier-max": 'positive.prototype.max_level=99',
+            "main-identity": 'main.prototype.name="foreign"',
+            "noninteger-count": 'advance(force,d.positive_id,1.5,false)',
+            "false-completion": 'force._states[d.negative_id].researched=0',
+            "foreign-custody": '''foreign_creation=d.positive_id
+              reload_credits({base="2.0.77",["more-infinite-research"]="5.0.20011"},"f200")''',
+        }
+        for family in self.FAMILIES:
+            for name, corrupt in opponents.items():
+                with self.subTest(family=family, opponent=name):
+                    self.minimum_runtime("f200", family, pipeline)
+                    self.lua.globals().corrupt = corrupt
+                    self.lua.execute(r'''
+                      local ok=pcall(function()assert(loadstring(corrupt))();native_credits.on_init()end)
+                      assert(not ok and storage.mir_native_credits==nil)
+                      for _,state in pairs(force._states)do assert(state.writes.level==0 and state.writes.enabled==0) end
+                      assert_partial_and_foreign()
+                    ''')
+
+    def test_zero_native_reward_cannot_prove_unknown_or_inconsistent_paid_history(self):
+        pipeline = self.minimum_pipeline("f200")
+        for family in self.FAMILIES:
+            for opponent in ("unknown-paid", "unknown-private-work", "unproven-offset",
+                             "saved-offset", "missing-mask", "backwards-completed"):
+                with self.subTest(family=family, opponent=opponent):
+                    self.minimum_runtime("f200", family, pipeline)
+                    self.lua.globals().opponent = opponent
+                    self.lua.execute(r'''
+                      local state,records,history,r
+                      if opponent=="saved-offset" or opponent=="missing-mask" or opponent=="backwards-completed" then
+                        native_credits.on_init();state=storage.mir_native_credits
+                        records=state.forces[1];history=state.families[1];r=records[d.key]
+                        if opponent=="saved-offset" then r.offset=1 end
+                        if opponent=="missing-mask" then state.families[1]=nil end
+                        if opponent=="backwards-completed" then r.completed=1 end
+                      elseif opponent=="unknown-paid" then advance(force,d.main_id,4,false)
+                      elseif opponent=="unknown-private-work" then minimum_mask(false,true)
+                      else advance(force,d.positive_id,2,false) end
+                      local before=r and {r.included,r.offset,r.private,r.payable,r.pending,r.completed}
+                      local ok=pcall(native_credits.on_configuration_changed,{
+                        mod_startup_settings_changed=false,mod_changes={}})
+                      assert(not ok and storage.mir_native_credits==state)
+                      if state then
+                        assert(state.forces[1]==records and records[d.key]==r)
+                        assert(opponent=="missing-mask" and state.families[1]==nil
+                          or opponent~="missing-mask" and state.families[1]==history)
+                        local after={r.included,r.offset,r.private,r.payable,r.pending,r.completed}
+                        for i=1,6 do assert(after[i]==before[i]) end
+                      end
+                      for _,s in pairs(force._states)do assert(s.writes.level==0 and s.writes.enabled==0) end
+                      assert_partial_and_foreign()
+                    ''')
+
+    def test_zero_noncollected_carrier_still_has_no_valid_credit_observation(self):
+        self.lua.execute(r'''
+          GROUPS={};reload_credits()
+          local force=make_force(1,nil,nil,nil,{["copper-plate"]=0});game.forces[1]=force
+          local positive=holder(force,"copper-plate","positive")
+          local negative=holder(force,"copper-plate","negative")
+          native_credits.on_init()
+          assert(ledger(force,"copper-plate")==nil and positive.level==1 and negative.level==1)
+          assert(force._states[positive.name].writes.level==0 and force._states[negative.name].writes.level==0)
+        ''')
+
     def precision_attempt(self, target, family, authored, actual=None, units=None):
         self.setUp()
         g = self.lua.globals()
@@ -176,13 +392,13 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                 for family in self.FAMILIES:
                     with self.subTest(target=target, family=family, authored=authored):
                         ok, error = self.precision_attempt(target, family, authored, units=units)
-                        self.assertEqual(units > 0, ok, error)
+                        self.assertTrue(ok, error)
 
     def test_adjacent_actual_native_quanta_refuse_before_writes(self):
         for target in ("f200", "f210"):
             for row in self.observed_oracle(target)["cases"]:
                 authored, units = float(row["authored_literal"]), row["native_units"]
-                if authored <= 0 or units <= 0:
+                if authored <= 0:
                     continue
                 for opponent in (units - 1, units + 1):
                     for family in self.FAMILIES:
@@ -256,10 +472,11 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                         # sign inside Lua rather than losing it at the bridge.
                         self.assertEqual(math.copysign(math.inf, expected), reciprocal(value))
 
-    def test_precision_range_nonfinite_false_and_zero_carriers_refuse(self):
+    def test_precision_range_nonfinite_false_and_zero_corruption(self):
         cases = [("f200", 327.67, 32767, True), ("f200", 327.68, 1, False),
                  ("f210", 1000, 10000000, True), ("f210", 1000.00001, 10000000, False),
-                 ("f200", 2 ** -149, 0, False), ("f210", .00001, 0, False)]
+                 ("f200", 2 ** -149, 0, True), ("f210", .00001, 0, True),
+                 ("f200", .3, 0, False), ("f210", .3, 0, False)]
         for target, authored, units, wanted in cases:
             for family in self.FAMILIES:
                 with self.subTest(target=target, authored=authored, family=family):

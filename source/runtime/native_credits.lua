@@ -230,11 +230,15 @@ local function inspect_with_mask(force, descriptor, scope)
   local negative = technologies[descriptor.negative_id]
   local positive_scalar = carrier_scalar(positive, descriptor, "positive")
   local negative_scalar = carrier_scalar(negative, descriptor, "negative")
-  if type(positive_scalar) ~= "number" or positive_scalar <= 0
-      or negative_scalar == nil or not close(negative_scalar, -positive_scalar) then
+  if type(positive_scalar) ~= "number" or positive_scalar < 0 or negative_scalar == nil then
     return nil
   end
   if descriptor.collected and not native_effect_change_matches(positive_scalar, descriptor.change) then return nil end
+  if positive_scalar == 0 then
+    -- Only a valid collected descriptor normalized to zero can reach here.
+    -- Its paired effect must also be exactly zero; counts still prove history.
+    if not descriptor.collected or negative_scalar ~= 0 then return nil end
+  elseif not close(negative_scalar, -positive_scalar) then return nil end
   local positive_completed = completed_infinite(positive)
   local negative_completed = completed_infinite(negative)
   if positive_completed == nil or negative_completed == nil then return nil end
@@ -251,7 +255,8 @@ local function inspect_with_mask(force, descriptor, scope)
     effect = scope.values[descriptor.recipe]
     effects_valid = scope.valid and effect ~= false
   else effect, effects_valid = named_main_effect(prototype, descriptor.recipe) end
-  if not effects_valid or (effect ~= nil and not close(effect, positive_scalar)) then return nil end
+  if not effects_valid or (effect ~= nil and (positive_scalar == 0 and effect ~= 0
+      or not close(effect, positive_scalar))) then return nil end
   return {
     descriptor = descriptor,
     included = effect ~= nil,
