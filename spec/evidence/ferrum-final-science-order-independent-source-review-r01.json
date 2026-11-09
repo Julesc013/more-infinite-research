@@ -1,0 +1,118 @@
+{
+  "kind": "FerrumFinalScienceOrderIndependentSourceReviewV1",
+  "reviewed_at_utc": "2026-11-09T13:11:07.444797+00:00",
+  "verdict": "SOURCE APPROVED for bounded next-unpublished12 integration and exact native qualification. No blocking finding in91b four-file unit. This is not approval to replace published11 assets, merge without required checks, or claim native/stable acceptance.",
+  "identity": {
+    "base": "e36641ee5263bda904fbf4e19e3afd53cb3ae695",
+    "head": "91b72483fd0df521cd70462354f8f9234e29a9a9",
+    "tree": "d9161ac55d7b689968d5dd68e7133fb447c9b166",
+    "source_tree": "24cb61d9a8a9f7d82d00c131a18bb567c3a09620",
+    "changed_files": [
+      {
+        "path": "source/info.json",
+        "git_blob": "87340a316b0996b38901d651901e9fee2627cb54",
+        "bytes": 836,
+        "sha256": "E29B10C875D19769F35EF9D30BBD47A53934C703256450D0B6528D771FB87D3B"
+      },
+      {
+        "path": "targets/editions.json",
+        "git_blob": "89eaab12dbd130322eb1269083ed8fcfb2f21c50",
+        "bytes": 3302,
+        "sha256": "97E33BE08CE3C6C1F580ADE0E21635E7CB8F7CD52BE3839C716371BAEA6D095A"
+      },
+      {
+        "path": "tests/test_package.py",
+        "git_blob": "c952294dd682f041d2685e8d167d993303b65b26",
+        "bytes": 37625,
+        "sha256": "7713563B460687146BC9052C3635EAD9302BA1585EFB867D872340AD954244F8"
+      },
+      {
+        "path": "tests/test_worker_storage_continuation.py",
+        "git_blob": "2e92adaa1a99b1396d705bcc3028cb29e23bb2f5",
+        "bytes": 32784,
+        "sha256": "1EDEB299F5A0E4BF71CA0F9F350B11EA9AEDEC346B5161FF2FF0F4E541BE9B7B"
+      }
+    ],
+    "author_handoff": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\ferrum511-modern-order-r01\\build\\tmp\\ferrum511-order-r01-controls\\HANDOFF.json",
+      "bytes": 7772,
+      "sha256": "ECC2C68B5C7EA5D8E0323852EF7C5D3193C3427BD7E65930CF4654924E644F6A"
+    }
+  },
+  "independent_findings": [],
+  "source_review": {
+    "exact_scope": "Independently read exact committed diff frome366, not moving dirty files. Production change is only ordinary optional?planet-ferrum in canonical F210info and F200 optional-dependency row. No science policy, Generator, continuation formula/effects, runtime, recovery, caps, save handler, SDK, package/control script or other Source body changes. Source/distribution version remains11 intentionally for separate Root12 integration; no changed11 ZIP was built or admitted.",
+    "mechanism": "Existing actual C3CB logs prove MIR final-fixes ran before Ferrum, whose later finalizer adds robotics to accepting labs. Ordinary optional dependency makes active Ferrum load before MIR without requiring Ferrum when absent. This lets the unchanged existing terminal-science inheritance/defaultreduce consume the already-patched lab inputs rather than removing robotics prematurely. It changes ordering, not numerical/science rules or foreign provider rows.",
+    "dependency_closure": "Independently read actual upstream archive info members and installed pinned official info for both families. F200 actual closure: four official2.0.77 mods plusFerrum0.0.5,PlanetsLib1.18.0,spider2.9.86. F210 actual closure: five official2.1.23 mods plusFerrum0.1.5,PlanetsLib2.4.0,spider2.9.87. Parsed required/optional/hidden-optional/recommended edges only when selected; no-order/incompatible edges do not invent ordering. Both graphs are acyclic and no upstream path returns toMIR. NewMIR→Ferrum edge gives the intended finalizer order transitively afterPlanetsLib/spider. This is bounded to inspected closures, not arbitrary future mod combinations.",
+    "independent_composition": "Independently invoked unchanged package member composition in memory from exact committed old/new source blobs and target records; no ZIP/build output. All17 edition memberships match.15 older editions have every player member byte-identical; F200/F210 change onlyinfo.json, whose sole dependency delta is appended?planet-ferrum. All other info metadata/floors/versions unchanged, including F0180.18.47. Targets other thanF200 are byte-equivalent records; F200 changes only that one optional row.",
+    "test_expectations": "New worker regression independently authors five native packs+robotics+electromagnetic, eachamount1, finite costs675/1012/time60/effect1 and exact foreign-row preservation. It drives only the two known finalizers from the explicit metadata edge and states it is not a general loader simulation. Expected seven-pack vector is literal and remains identical onold/new; it is not copied or weakened from candidate output. Package exact dependency oracle appends only the named new optional edge while retaining independent historical inventory and all other expected rows."
+  },
+  "retained_validation_review": {
+    "plan": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\ferrum511-modern-order-r01\\build\\tmp\\ferrum511-order-r01-controls\\host-plan.json",
+      "bytes": 15883,
+      "sha256": "41BDEF630EFDE93EC41DAC977D979C66774EE2D2E279CAE13F27DDFE82507FFE"
+    },
+    "pinned_lua52_sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899",
+    "logs": [
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\ferrum511-modern-order-r01\\build\\tmp\\ferrum511-order-r01-controls\\red.stderr.txt",
+        "bytes": 7014,
+        "sha256": "190B9106F55A0D202455842D968178D5D9F482E651B09739CE26103325F6E8E3"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\ferrum511-modern-order-r01\\build\\tmp\\ferrum511-order-r01-controls\\green-focused.stderr.txt",
+        "bytes": 493,
+        "sha256": "231070A720C9E51175FBA9D00BD19D183365144A749E36B9098200B33BE11894"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\ferrum511-modern-order-r01\\build\\tmp\\ferrum511-order-r01-controls\\worker-suite.stderr.txt",
+        "bytes": 3522,
+        "sha256": "C92ECFED5EA1C927BB2AFFC100D4534E7E7E5F4D51B148EFA88919F158CE952B"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\ferrum511-modern-order-r01\\build\\tmp\\ferrum511-order-r01-controls\\science-package.stderr.txt",
+        "bytes": 989,
+        "sha256": "B86682215D5ECB09C60C474419BC22B924FDC79A38B8551EA77B4774969BE8AC"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\ferrum511-modern-order-r01\\build\\tmp\\ferrum511-order-r01-controls\\dependencies.stderr.txt",
+        "bytes": 245,
+        "sha256": "667CEE801245FAF189EB0B501738A3BCC49AEA2B472E1B06D7F2A60A8143F229"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\ferrum511-modern-order-r01\\build\\tmp\\ferrum511-order-r01-controls\\actual-dependency-parser.json",
+        "bytes": 107,
+        "sha256": "360662529573335C9C482F54FFAB4D59A9676AAA1D2881E2158CFEC9C12FEE5E"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\ferrum511-modern-order-r01\\build\\tmp\\ferrum511-order-r01-controls\\metadata-and-closure-proof.json",
+        "bytes": 8822,
+        "sha256": "459D042FB071E2B4A0871DD8C23C0F5B49CC492D96C658AD6914C3E7C9C8BF78"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\ferrum511-modern-order-r01\\build\\tmp\\ferrum511-order-r01-controls\\static.json",
+        "bytes": 460,
+        "sha256": "6A83B5A868164558CF8911A58B3C09DD6E95F58ADC15B56A136DB743AB76645B"
+      }
+    ],
+    "red": "Read raw old93d/e366 red: two methods yield four target-subtest failures, F200/F210 both missing explicit metadata edge and robotics ingredient. This retains the actual source-order counterexample; not a Factorio rerun.",
+    "green": "Read raw successful18 worker-continuation methods, four independently authored Generator science/lab controls, two package metadata controls and one declaration-parser control:25 distinct selected controls. The focused two methods are repeated among those groups and are not double-counted. Actual parser classifies?planet-ferrum optional/requiredfalse. All14 handoff log bodies independently match recordedsize/hash.",
+    "other_checks": "Author static/changelog freshness/diff checks pass; unchanged authored changelog/codecs are preserved. Author17 in-memory metadata proof agrees with independent recomposition. Reviewer did not rerun host suites or native; independent computation was limited to exact Git diff, selected actual dependency graphs and no-output member comparison."
+  },
+  "unchanged_native_oracle": {
+    "expectations": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum511-final-data-expectations-independent-r01.json",
+      "bytes": 11759,
+      "sha256": "06DA80A1F9CF863F0F729FA8C9B38DC4B30316CB3404CFA47A8E605DD20A1758"
+    },
+    "original_adverse": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\ferrum511-f210-data-r02-independent-result-review.json",
+      "bytes": 15855,
+      "sha256": "5D67B0BB2DDF3BFB9553345D930EE4649D0C39AFD00F36F24A0E62AF04912506"
+    },
+    "required": "Freeze coherent new12 source/metadata/changelog and package. On pinned full actual upstream profiles, verify Ferrum final beforeMIR, exact unchanged finite4/5 full rows,6 infinite1518.75*1.5^(L-6)/effect1/time60 and all seven packs includingrobotics+EM, exact prerequisites, concreteitem/tool definitions, at least one accepting actual lab and full hidden/disabled default4 privateholder. Preserve all old11 observations/adverse bytes. Both affected engine families need actual data qualification; runtime/prepare/cargo/save/two-cold gates remain separately required for any such claim."
+  },
+  "applicability_limits": "No-Ferrum profiles select no new active edge; their metadata changes do not supply actual performance or blanket evidence reuse. R03 published11 repair preparation remains named under203/Source93d/C3CB and is not relabelled12. No20 timing or newpackage native result exists here. RequiredCI/checked merge and separate12 integration review remain gates; beta maturity does not waive stable acceptance.",
+  "reviewer_activity": "Read-only exact source/test/archive/header/control-log review and independent in-memory member/graph checks. No Source/docs/controller/packet/library/native/privateGit edits, no ZIP creation/build, no host-suite rerun or Factorio launch; only this new primary review receipt written."
+}

@@ -1,0 +1,82 @@
+{
+  "kind": "MIR511RepairR02IndependentAdverseReviewV1",
+  "reviewed_at_utc": "2026-11-09T12:34:29.854769+00:00",
+  "verdict": "CONFIRMED zero-engine harness/workspace-health refusal with recorded full restoration. No native/actor/Source failure and no preparation or performance result. Preserve R02 and correct only in a new reviewed revision.",
+  "original_review": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r02-independent-packet-review.json",
+    "bytes": 10080,
+    "sha256": "F3C178A5AC610A66208D158A6D4304D1C5AFFDB4D773B0A0764C3D6166C36DF0"
+  },
+  "root_prepare_admission": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r02-root-prepare-admission.json",
+    "bytes": 1240,
+    "sha256": "43CB087CFBB8C9C4816B71CED9302C17E1FEFB5DC5837580DB4DE56361C9AC7C"
+  },
+  "pins": {
+    "packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r02-controller\\packet.json",
+      "bytes": 32064,
+      "sha256": "2527924D95311AB4B152E903F0B440FA887B7401086D37197BFB7995B458F48B"
+    },
+    "caller": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r02-controller\\Invoke-Repair511.ps1",
+      "bytes": 27575,
+      "sha256": "47888E13465A4535822BF70F964FD8A9266D06A595561255DFDAE59C658AA53E"
+    },
+    "composition": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r02-controller\\composition.json",
+      "bytes": 22770,
+      "sha256": "C771CF0FB33D202F339D0554F0F4E894BC8071147F1E3B1DFD65755B619BB87A"
+    },
+    "custody": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\runtime511-repair-r02-inputs\\benchmark\\build\\tmp\\runtime511-repair-r02\\archive-custody\\candidate-prepare\\result.json",
+      "bytes": 2515,
+      "sha256": "B9EE1942B3D13DCE8CFCA934D9663E16B88C4B37716B6A77C78A9F585C77F5DF"
+    },
+    "stdout": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r02-controller\\prepare.stdout.txt",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    "stderr": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r02-controller\\prepare.stderr.txt",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    }
+  },
+  "actual": {
+    "passed": false,
+    "error": "Repository root must name the Git worktree root, not a descendant: D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\runtime511-repair-r02-inputs\\capture",
+    "native_processes": 0,
+    "capture_output_root_absent": true,
+    "preparation_receipt_created": false,
+    "pilot_executed": false,
+    "scored_observations": 0
+  },
+  "diagnosis": "Exact projected capture helper reaches Test-MIRDevelopmentHealth.ps1 Hook at line847 after role/fixture/archive checks but before resource context creation line875 or any engine dispatch. The copied capture directory is inside the real frozen203 worktree; git rev-parse --show-toplevel resolves to that outer root. Health Resolve-MIRDevelopmentHealthRepository lines28–31 requires RepoRoot itself be the Git worktree root and rejects the descendant. Scratch containment acceptance is a different condition and did not establish this root invariant.",
+  "review_gap": "The preservedF3C178 preparation-only review accepted the R02 role-literal delta and stage scratch/CLI composition; it missed the reachable full-helper workspace-root requirement. Its static/zero-native controls are not relabelled as successful preparation. No actual two-process result followed that conditional approval.",
+  "restoration": {
+    "recorded_before_states": 8,
+    "recorded_archive_actions": [
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+        "action": "unchanged"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-repair-stress-active_0.1.0.zip",
+        "action": "unchanged"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-repair-stress_0.2.1.zip",
+        "action": "restored-prior"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21011.zip",
+        "action": "removed-temporary"
+      }
+    ],
+    "basis": "Outer owned-archive custody records restoration of prior repaircore, removal of temporary511, unchanged observer/selector, and original control-state custody. Root separately observed Factorio0. No later live snapshot is required during Root full-Ferrum ownership; do not mistake a subsequent admitted selection for failure of this completed restoration."
+  },
+  "required_followup": "New isolated proper Git worktree harness/root with actual full prelaunch health/root and resource/CLI admission, while preserving raw helper provenance and exact physical/numeric/custody rules. Do not bypass or weaken health, fabricate .git metadata, retry R02 unchanged or edit old adverse inputs. Twenty timing processes remain separately held by successful actual preparation SHA and accepted quiet block.",
+  "limits": "Read-only inspection only; only this new adverse receipt written. No controller/library/Source edit, host test, build or native launch by reviewer."
+}
