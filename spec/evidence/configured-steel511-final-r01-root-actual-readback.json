@@ -1,0 +1,80 @@
+{
+  "kind": "RootConfiguredSteel511FinalDestinationReadbackV1",
+  "source": "93d30a248e71e5248eeb87072c27332fe68b9137",
+  "product_sha256": "C3CB6462E3285DA222664D2174EAA16E63577BF9970804E410B127A43C773D14",
+  "actual_status": "named-current-destination-load-save-two-colds-passed",
+  "record_sha256": "1B599F6F1FC9AC5A4932860DA12DAA7EC9866AFFCC6AA0178555DF911445D26E",
+  "engine": "2.1.23",
+  "unchanged_genuine10_source_sha256": "8A04048E22091BE1DAB09FB3BBB5415629971B4AD54D5ED20979E893D03B8514",
+  "actual_native_processes": 3,
+  "new_laboratory_completions": 0,
+  "original_genuine_source_laboratory_completion_count": 1,
+  "event_order": "level -> more-infinite-research",
+  "actual": {
+    "player": {
+      "name": "player",
+      "index": 1,
+      "level": 2,
+      "researched": false,
+      "enabled": true,
+      "visible": false,
+      "saved": 0,
+      "current": false,
+      "progress": 0,
+      "steel": 0.17,
+      "casting": 0.17,
+      "bullet": 0.07,
+      "private": {
+        "enabled": true,
+        "visible": false,
+        "level": 1,
+        "saved": 0,
+        "hidden": true
+      },
+      "queue": {},
+      "mining": 0,
+      "lab_speed": 0
+    },
+    "foreign": {
+      "name": "native-owner-settings-control",
+      "index": 4,
+      "level": 1,
+      "researched": false,
+      "enabled": false,
+      "visible": false,
+      "saved": 0,
+      "current": false,
+      "progress": 0,
+      "steel": 0,
+      "casting": 0,
+      "bullet": 0,
+      "private": {
+        "enabled": true,
+        "visible": false,
+        "level": 1,
+        "saved": 0,
+        "hidden": true
+      },
+      "queue": {},
+      "mining": 0,
+      "lab_speed": 0
+    }
+  },
+  "remaining_science": {
+    "automation-science-pack": 4,
+    "logistic-science-pack": 4,
+    "chemical-science-pack": 4,
+    "production-science-pack": 4
+  },
+  "native_units": 6,
+  "private_units": 2,
+  "protected_save": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel511-final-r01-controller\\protected\\native-owner511-forward-upgrade-complete.zip",
+    "exists": true,
+    "bytes": 827261,
+    "sha256": "1567FF2EE6C90DB702A46AA5F6E6354CC2BCF63FAE44666678A89DC26F97B4D4"
+  },
+  "cold_frames_equal": true,
+  "crc_and_embedded_actor_verified": true,
+  "limits": "Destination-only exact17percent configured native steel/foreign/private/lab-state route; source lab and source colds retain original10 identities. Actor does not expose worker or all MIR carrier/ledger internals; no broader settings, provider, API, performance or stable verdict. Recorded completion restoration is preserved; concurrent subsequent owned zero-native repair leases are separate."
+}

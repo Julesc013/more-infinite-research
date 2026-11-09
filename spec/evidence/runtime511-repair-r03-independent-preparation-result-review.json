@@ -1,0 +1,411 @@
+{
+  "kind": "MIR511RepairR03IndependentPreparationActualReviewV1",
+  "reviewed_at_utc": "2026-11-09T13:03:29.784207+00:00",
+  "verdict": "PASS for exactly current511 pending active repair seed preparation and one unscored25000-update physical pilot. No timing/scored/performance or stable acceptance. No blocking preparation finding.",
+  "pins": {
+    "preparation": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime511-repair-r03\\preparation.json",
+      "bytes": 40187,
+      "sha256": "C282ACC86D34A12AFD534D9BCCB4099121976E17E7AC49D682E2CE6BFA6F3307"
+    },
+    "packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r03-controller\\packet.json",
+      "bytes": 36105,
+      "sha256": "8ED5D17EE98A2E95F283EDAD41EE70981C6E293C3EEAA9D4CED5059D64BC9601"
+    },
+    "caller": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r03-controller\\Invoke-Repair511.ps1",
+      "bytes": 28747,
+      "sha256": "35315764427073F43C0B0329969E58A68C2A2463DCC16EF2458EAEC4D150A232"
+    },
+    "composition": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r03-controller\\composition.json",
+      "bytes": 22467,
+      "sha256": "BE752EDAAA62C5E05EB5FBC987FEDDFACA1FFA061556C673A3A958633FE1259B"
+    },
+    "prior_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r03-independent-packet-review.json",
+      "bytes": 9877,
+      "sha256": "877E8FA12A573D84C619AB267212E3B4394ECC4E550749FA4C0AF4E19BF511E4"
+    },
+    "capture": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime511-repair-capture-harness-r03\\build\\tmp\\runtime511-repair-r03-capture\\result.json",
+      "bytes": 17690,
+      "sha256": "F257E3CCD69E7772DB312C79E041BEB846F9FD136DAC9683811E464C2A276E01"
+    },
+    "pilot": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime511-repair-r03\\preparation\\pilot\\result.json",
+      "bytes": 12734,
+      "sha256": "383325638840A7FF0EDB4A16EC564A8A43A93F3F2E881A16FF3E07D4C6B25CA9"
+    },
+    "outer_custody": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime511-repair-r03\\archive-custody\\candidate-prepare\\result.json",
+      "bytes": 2332,
+      "sha256": "4D9C9AB95F290A4E7FC2E9D4B579C83647451FBDC97B26C2F88594031E84CFAF"
+    }
+  },
+  "identity": {
+    "executing_capture_harness": "76de856a42903a05ab65020258c4af8f3eb128ad / exactCC32CD capturehelper / historical Sourcef4e45e56",
+    "executing_benchmark_harness": "32feeb99db3cb998f30aa73d11e8f3ebdbd487e6 / historical Sourcef4e45e56",
+    "loaded_player": "Published5.0.21011/C3CB6462E3285DA222664D2174EAA16E63577BF9970804E410B127A43C773D14; product203e0af5/Source93d30a248e71e5248eeb87072c27332fe68b9137 proven separately. Native source_head76de truthfully names the harness, not the loaded player.",
+    "engine": {
+      "path": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+      "bytes": 49398736,
+      "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+      "version": "2.1.23",
+      "data": "D:\\Games\\Factorio\\2.1\\data"
+    },
+    "actual_loaded_mods": [
+      "base@2.1.23",
+      "elevated-rails@2.1.23",
+      "mir-fixture-mir5-active-mods-observer@0.1.0",
+      "mir-fixture-mir5-repair-stress-active@0.1.0",
+      "mir-fixture-mir5-repair-stress@0.2.1",
+      "more-infinite-research@5.0.21011",
+      "quality@2.1.23",
+      "recycler@2.1.23",
+      "space-age@2.1.23"
+    ],
+    "profile": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/runtime511-repair-r03-controller/candidate-profile.json",
+      "bytes": 1839,
+      "sha256": "D3D9596BBF2A5657B721F397EF6BEF7EEED50847D6ADC8CC7950286C14B17782"
+    },
+    "rule": "Exact nine-mod Base/Space Age repair cohort, no fullFerrum selection or implied applicability to its separately demonstrated science defect."
+  },
+  "processes": {
+    "count": 2,
+    "capture_and_pilot": [
+      {
+        "pid": 46196,
+        "natural_exit_code": 0,
+        "ledger": {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\runtime511-repair-capture-harness-r03\\build\\tmp\\runtime511-repair-r03-capture\\process-1.resources.jsonl",
+          "bytes": 2614,
+          "sha256": "87E4186725638BBC01CC45123CF994AF4B34B82FAA949827959F36FC31D1C7E7"
+        }
+      },
+      {
+        "pid": 39180,
+        "natural_exit_code": 0,
+        "ledger": {
+          "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime511-repair-r03\\preparation\\pilot\\process-1.resources.jsonl",
+          "bytes": 10523,
+          "sha256": "0BBF1A5D6EAD360D5D42620E1CDA91D3C5EAB60527BBC2A76E133B86DDA34A41"
+        }
+      }
+    ],
+    "capture_scope": "One native --create saves a pending physical-work world; prepared marker initial_changed0/reactivation_changed0/pendingtrue.",
+    "pilot_scope": "One --benchmark25000/1/sanitize loads an owned byte-identical seed, emits pending-start then passed-complete and physical result; actual stdout reports25000 updates. Pilot remains scoredfalse/performance_acceptancefalse despite diagnostic timing/memory fields."
+  },
+  "actual_physical_witnesses": {
+    "capture_pending": {
+      "kind": "repair-stress",
+      "stage": "prepared",
+      "status": "pending",
+      "case": "repair-stress-f210",
+      "witnesses": {
+        "total_eligible_walls": 1000,
+        "first_capacity_walls": 256,
+        "eligible_overflow_walls": 744,
+        "first_capacity_player_walls": 128,
+        "first_capacity_reciprocal_friend_walls": 128,
+        "quiet_ticks": 600,
+        "service_ticks": 60,
+        "repair_amount": 1,
+        "native_damage_api": "LuaEntity.damage",
+        "native_damage_type": "electric",
+        "pending_physical_work": true,
+        "initial_changed": 0,
+        "reactivation_changed": 0,
+        "performance_qualified": false,
+        "runtime_elapsed_qualified": false
+      }
+    },
+    "pilot_start": {
+      "kind": "repair-stress",
+      "stage": "start",
+      "status": "pending",
+      "case": "repair-stress-f210",
+      "witnesses": {
+        "total_eligible_walls": 1000,
+        "first_capacity_walls": 256,
+        "eligible_overflow_walls": 744,
+        "first_capacity_player_walls": 128,
+        "first_capacity_reciprocal_friend_walls": 128,
+        "quiet_ticks": 600,
+        "service_ticks": 60,
+        "repair_amount": 1,
+        "native_damage_api": "LuaEntity.damage",
+        "native_damage_type": "electric",
+        "pending_physical_work": true,
+        "initial_changed": 0,
+        "reactivation_changed": 0,
+        "performance_qualified": false,
+        "runtime_elapsed_qualified": false
+      }
+    },
+    "pilot_complete": {
+      "kind": "repair-stress",
+      "stage": "complete",
+      "status": "passed",
+      "case": "repair-stress-f210",
+      "witnesses": {
+        "total_eligible_walls": 1000,
+        "first_capacity_walls": 256,
+        "eligible_overflow_walls": 744,
+        "first_capacity_player_walls": 128,
+        "first_capacity_reciprocal_friend_walls": 128,
+        "quiet_ticks": 600,
+        "service_ticks": 60,
+        "repair_amount": 1,
+        "native_damage_api": "LuaEntity.damage",
+        "native_damage_type": "electric",
+        "pending_physical_work": false,
+        "initial_changed": 256,
+        "reactivation_changed": 8,
+        "performance_qualified": false,
+        "runtime_elapsed_qualified": false
+      }
+    },
+    "independent_physical_marker": {
+      "stage": "initial",
+      "case": "repair-stress-f210",
+      "status": "passed",
+      "qualification": "native-runner-readback-required",
+      "witnesses": {
+        "mode": "f210-mir5-5.0.21011",
+        "total_eligible_walls": 1000,
+        "first_capacity_walls": 256,
+        "eligible_overflow_walls": 744,
+        "first_capacity_player_walls": 128,
+        "first_capacity_reciprocal_friend_walls": 128,
+        "quiet_ticks": 600,
+        "service_ticks": 60,
+        "repair_amount": 1,
+        "maximum_observed_repairs_per_service": 8,
+        "initial_first_repair_observed_tick": 601,
+        "initial_first_repair_service_tick": 600,
+        "reactivation_first_repair_observed_tick": 3121,
+        "reactivation_first_repair_service_tick": 3120,
+        "reactivation_count": 8,
+        "overflow_unchanged": true,
+        "nonfriendly_unchanged": true,
+        "nonwall_unchanged": true,
+        "native_damage_api": "LuaEntity.damage",
+        "native_damage_type": "electric",
+        "on_load_read_only": false,
+        "performance_qualified": false,
+        "runtime_elapsed_qualified": false,
+        "scope": "disposable-f210-passive-repair-queue-bound-only"
+      }
+    },
+    "readback": "Reread raw log JSON markers directly, not only embedded preparation summaries.1000 eligible=256 tracked+744overflow; tracked128player+128reciprocal friend; initial_changed256,reactivation_changed8,maximum observed repairs per service8. Overflow,nonfriendly and nonwall controls all unchanged. No ordinary research lab count or worker-storage gameplay claim."
+  },
+  "seed_integrity": {
+    "source": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime511-repair-capture-harness-r03\\build\\tmp\\runtime511-repair-r03-capture\\write-data\\saves\\mir5-native-active.zip",
+      "bytes": 871213,
+      "sha256": "01BA9674CDC236EBD34E4EE5AD4EE3C94C1F825EDA6B18EFEAD41AD05ACA7650"
+    },
+    "owned_copy": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime511-repair-r03\\preparation\\pilot\\input\\fresh-owned-active-seed.zip",
+      "bytes": 871213,
+      "sha256": "01BA9674CDC236EBD34E4EE5AD4EE3C94C1F825EDA6B18EFEAD41AD05ACA7650"
+    },
+    "crc_all_members": true,
+    "byte_identical_after_pilot": true,
+    "recorded_after_sample": {
+      "checkpoint": "after-sample",
+      "sample_id": "pilot-repair-candidate",
+      "source": {
+        "expected_sha256": "01BA9674CDC236EBD34E4EE5AD4EE3C94C1F825EDA6B18EFEAD41AD05ACA7650",
+        "actual_sha256": "01BA9674CDC236EBD34E4EE5AD4EE3C94C1F825EDA6B18EFEAD41AD05ACA7650",
+        "unchanged": true
+      },
+      "owned": {
+        "expected_sha256": "01BA9674CDC236EBD34E4EE5AD4EE3C94C1F825EDA6B18EFEAD41AD05ACA7650",
+        "actual_sha256": "01BA9674CDC236EBD34E4EE5AD4EE3C94C1F825EDA6B18EFEAD41AD05ACA7650",
+        "unchanged": true
+      }
+    },
+    "interpretation": "Original pending seed is not overwritten by pilot work. Capture and pilot are physically separate native processes, not two receipts for one engine."
+  },
+  "raw_memory_review": {
+    "receipt": {
+      "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime511-repair-r03\\preparation\\pilot\\process-memory-observations.json",
+      "bytes": 3547,
+      "sha256": "80978C3E27E624BF08712DDA8CE56F643AB3DB83E3CE4EB1867BD57F47A61177"
+    },
+    "matches_pilot_embedded_record": true,
+    "observations": 16,
+    "single_pid": 39180,
+    "target_interval_ms": 250,
+    "status": "complete-observation",
+    "incomplete_reasons": [],
+    "maximum_sampled_working_set_bytes": 498696192,
+    "maximum_sampled_private_bytes": 492466176,
+    "root_os_reported_peak_working_set_bytes": 499417088,
+    "limits": "Raw observation maxima independently recomputed; original owned-handle OS peak remains separate from sampled peaks. Sampling is bounded diagnostic custody for this unscored pilot, not a performance comparison or time/memory non-regression result."
+  },
+  "restoration": {
+    "capture": "restored-direct-library-controls",
+    "pilot": "restored-direct-library-controls",
+    "outer_custody_passed": true,
+    "actions": [
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+        "action": "unchanged"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-repair-stress-active_0.1.0.zip",
+        "action": "unchanged"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-repair-stress_0.2.1.zip",
+        "action": "restored-prior"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21011.zip",
+        "action": "removed-temporary"
+      }
+    ],
+    "independent_live_prior_states_equal": 8,
+    "factorio_processes_observed_after": 0,
+    "no_dependency_payload_copies_links_or_extractions": true
+  },
+  "raw_custody": {
+    "member_count": 18,
+    "members": [
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime511-repair-capture-harness-r03\\build\\tmp\\runtime511-repair-r03-capture\\config.ini",
+        "bytes": 291,
+        "sha256": "2D8761ACD5FD2E263EB53BA614751F49FE4F65E5B4A04F97886A56EF4ED9159E",
+        "scope": "capture",
+        "relative_path": "config.ini"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime511-repair-capture-harness-r03\\build\\tmp\\runtime511-repair-r03-capture\\create.factorio.log",
+        "bytes": 13548,
+        "sha256": "3BEF96DD2920BDE4F281D6E30FE2CD449A84779DF55250C45BBCC0923BDF1066",
+        "scope": "capture",
+        "relative_path": "create.factorio.log"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime511-repair-capture-harness-r03\\build\\tmp\\runtime511-repair-r03-capture\\process-1.resources.jsonl",
+        "bytes": 2614,
+        "sha256": "87E4186725638BBC01CC45123CF994AF4B34B82FAA949827959F36FC31D1C7E7",
+        "scope": "capture",
+        "relative_path": "process-1.resources.jsonl"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime511-repair-capture-harness-r03\\build\\tmp\\runtime511-repair-r03-capture\\process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "scope": "capture",
+        "relative_path": "process-1.stderr.txt"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime511-repair-capture-harness-r03\\build\\tmp\\runtime511-repair-r03-capture\\process-1.stdout.txt",
+        "bytes": 13689,
+        "sha256": "56C5A7B312C46FE8BCC426A37F1EF3394DE5AF6FCE5414EF1E8AF400EA0379FA",
+        "scope": "capture",
+        "relative_path": "process-1.stdout.txt"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime511-repair-capture-harness-r03\\build\\tmp\\runtime511-repair-r03-capture\\result.json",
+        "bytes": 17690,
+        "sha256": "F257E3CCD69E7772DB312C79E041BEB846F9FD136DAC9683811E464C2A276E01",
+        "scope": "capture",
+        "relative_path": "result.json"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime511-repair-capture-harness-r03\\build\\tmp\\runtime511-repair-r03-capture\\write-data\\factorio-current.log",
+        "bytes": 13548,
+        "sha256": "3BEF96DD2920BDE4F281D6E30FE2CD449A84779DF55250C45BBCC0923BDF1066",
+        "scope": "capture",
+        "relative_path": "write-data/factorio-current.log"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime511-repair-capture-harness-r03\\build\\tmp\\runtime511-repair-r03-capture\\write-data\\player-data.json",
+        "bytes": 13757,
+        "sha256": "8A069BEF1C79B3E4645FA51F3B08D891A3FA7105C8CAAFC633F7BA6B9D8C4D67",
+        "scope": "capture",
+        "relative_path": "write-data/player-data.json"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime511-repair-capture-harness-r03\\build\\tmp\\runtime511-repair-r03-capture\\write-data\\saves\\mir5-native-active.zip",
+        "bytes": 871213,
+        "sha256": "01BA9674CDC236EBD34E4EE5AD4EE3C94C1F825EDA6B18EFEAD41AD05ACA7650",
+        "scope": "capture",
+        "relative_path": "write-data/saves/mir5-native-active.zip"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime511-repair-r03\\preparation\\pilot\\config.ini",
+        "bytes": 312,
+        "sha256": "275B2D7B6546264ECEE09CA91F1065E35EDD13098C12C777DAF1AF7DDDD98D84",
+        "scope": "pilot",
+        "relative_path": "config.ini"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime511-repair-r03\\preparation\\pilot\\input\\fresh-owned-active-seed.zip",
+        "bytes": 871213,
+        "sha256": "01BA9674CDC236EBD34E4EE5AD4EE3C94C1F825EDA6B18EFEAD41AD05ACA7650",
+        "scope": "pilot",
+        "relative_path": "input/fresh-owned-active-seed.zip"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime511-repair-r03\\preparation\\pilot\\process-1.resources.jsonl",
+        "bytes": 10523,
+        "sha256": "0BBF1A5D6EAD360D5D42620E1CDA91D3C5EAB60527BBC2A76E133B86DDA34A41",
+        "scope": "pilot",
+        "relative_path": "process-1.resources.jsonl"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime511-repair-r03\\preparation\\pilot\\process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+        "scope": "pilot",
+        "relative_path": "process-1.stderr.txt"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime511-repair-r03\\preparation\\pilot\\process-1.stdout.txt",
+        "bytes": 114,
+        "sha256": "5325E41ECBE9C361F9E7814C0D04B733CFDC09A6512DEF9A1DCF2B742C4CA384",
+        "scope": "pilot",
+        "relative_path": "process-1.stdout.txt"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime511-repair-r03\\preparation\\pilot\\process-memory-observations.json",
+        "bytes": 3547,
+        "sha256": "80978C3E27E624BF08712DDA8CE56F643AB3DB83E3CE4EB1867BD57F47A61177",
+        "scope": "pilot",
+        "relative_path": "process-memory-observations.json"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime511-repair-r03\\preparation\\pilot\\result.json",
+        "bytes": 12734,
+        "sha256": "383325638840A7FF0EDB4A16EC564A8A43A93F3F2E881A16FF3E07D4C6B25CA9",
+        "scope": "pilot",
+        "relative_path": "result.json"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime511-repair-r03\\preparation\\pilot\\write-data\\factorio-current.log",
+        "bytes": 15447,
+        "sha256": "7AEBDE28DE7B93B80132EEC2BE66D0ABF8C33FEFD5DE4718197F4A57769E93F7",
+        "scope": "pilot",
+        "relative_path": "write-data/factorio-current.log"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\runtime510-active-plan-r01\\build\\tmp\\runtime510-host-origin-stage-r01\\build\\tmp\\runtime511-repair-r03\\preparation\\pilot\\write-data\\player-data.json",
+        "bytes": 13757,
+        "sha256": "8A069BEF1C79B3E4645FA51F3B08D891A3FA7105C8CAAFC633F7BA6B9D8C4D67",
+        "scope": "pilot",
+        "relative_path": "write-data/player-data.json"
+      }
+    ],
+    "disposition": "Raw files remain at explicitly named actual capture/benchmark worktree roots. This primary review preserves their exact discoverable path/size/hash manifest; it does not claim an unmade primary raw-tree mirror. Capture hashF257 equals pinned raw record. Embedded capture summary has only UTC versus+11 timezone serialization differences representing the same instants; endpoint/scalar/identity content is unchanged. Pilot raw result and memory equal embedded objects."
+  },
+  "remaining_gates": "Measurement directory absent and no20-observation schedule executed. Twenty timing processes still require separate exact actual preparation SHA and Root quiet-block admission, with current source applicability reassessed if a new12 package is chosen. No old samples, prefix retries or unscored pilot metrics may be pooled into acceptance.",
+  "limits": "Successful current511 repair-only preparation/physical pilot. Separate fullFerrum science failure remains a product defect with no expectation waiver. No Source/controller/library/native edits, host tests/builds or reruns by reviewer; only this new primary receipt written."
+}
