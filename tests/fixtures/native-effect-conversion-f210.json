@@ -1,0 +1,230 @@
+{
+  "schema": 1,
+  "kind": "MIRNativeEffectConversionObservedUnitsV1",
+  "target": "f210",
+  "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+  "source_probe_summary_sha256": "DEA874731E66FAC8C61EC8E6E7F544CB1A7D7B35D21FFEE3ED1BE2BB7E5D1825",
+  "source_probe_custody_sha256": "333D142711F1B86B1107A2ED202B315D2C9AA87F2A1A9D9EE59E65F431493118",
+  "independent_decision_sha256": "AE541A9A1C7195B48CCE4C4184E32C8CAB720671A469D610C55A94232AA493AA",
+  "native_conversion_observation_only": true,
+  "unit_scale": 10000,
+  "expected_transport": "Lua observed_units/10000; actual in-engine equality true for every row",
+  "cases": [
+    {
+      "authored_literal": "0.3",
+      "native_units": 3000,
+      "actual_17g": "0.3",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "0.56789",
+      "native_units": 5679,
+      "actual_17g": "0.56789999999999994",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "0.105",
+      "native_units": 1050,
+      "actual_17g": "0.105",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "0.00001",
+      "native_units": 0,
+      "actual_17g": "0",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "0.00009",
+      "native_units": 1,
+      "actual_17g": "0.0001",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "0.0001",
+      "native_units": 1,
+      "actual_17g": "0.0001",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "1.00123",
+      "native_units": 10012,
+      "actual_17g": "1.0012000000000001",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "0.29",
+      "native_units": 2900,
+      "actual_17g": "0.29",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "0.58",
+      "native_units": 5800,
+      "actual_17g": "0.57999999999999998",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "0.0099999998",
+      "native_units": 100,
+      "actual_17g": "0.01",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "999.1",
+      "native_units": 9991000,
+      "actual_17g": "999.10000000000002",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "999.10009",
+      "native_units": 9991001,
+      "actual_17g": "999.1001",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "999.1001",
+      "native_units": 9991001,
+      "actual_17g": "999.1001",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "0.00005",
+      "native_units": 1,
+      "actual_17g": "0.0001",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "0.00015",
+      "native_units": 1,
+      "actual_17g": "0.0001",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "0.00025",
+      "native_units": 3,
+      "actual_17g": "0.00029999999999999991",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "0.56785",
+      "native_units": 5679,
+      "actual_17g": "0.56789999999999994",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "0.30005",
+      "native_units": 3001,
+      "actual_17g": "0.30009999999999999",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "-0.3",
+      "native_units": -3000,
+      "actual_17g": "-0.3",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "-0.56789",
+      "native_units": -5679,
+      "actual_17g": "-0.56789999999999994",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "-0.105",
+      "native_units": -1050,
+      "actual_17g": "-0.105",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "-0.00001",
+      "native_units": 0,
+      "actual_17g": "0",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "-0.00009",
+      "native_units": -1,
+      "actual_17g": "-0.0001",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "-0.0001",
+      "native_units": -1,
+      "actual_17g": "-0.0001",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "-1.00123",
+      "native_units": -10012,
+      "actual_17g": "-1.0012000000000001",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "-0.29",
+      "native_units": -2900,
+      "actual_17g": "-0.29",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "-0.58",
+      "native_units": -5800,
+      "actual_17g": "-0.57999999999999998",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "-0.0099999998",
+      "native_units": -100,
+      "actual_17g": "-0.01",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "-999.1",
+      "native_units": -9991000,
+      "actual_17g": "-999.10000000000002",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "-999.10009",
+      "native_units": -9991001,
+      "actual_17g": "-999.1001",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "-999.1001",
+      "native_units": -9991001,
+      "actual_17g": "-999.1001",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "-0.00005",
+      "native_units": -1,
+      "actual_17g": "-0.0001",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "-0.00015",
+      "native_units": -1,
+      "actual_17g": "-0.0001",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "-0.00025",
+      "native_units": -3,
+      "actual_17g": "-0.00029999999999999991",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "-0.56785",
+      "native_units": -5679,
+      "actual_17g": "-0.56789999999999994",
+      "actual_equals_round4_divide": true
+    },
+    {
+      "authored_literal": "-0.30005",
+      "native_units": -3001,
+      "actual_17g": "-0.30009999999999999",
+      "actual_equals_round4_divide": true
+    }
+  ]
+}
