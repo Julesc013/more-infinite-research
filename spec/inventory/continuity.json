@@ -17412,13 +17412,16 @@
             "b9db85b04a2c70b8a71ab522f5cf00abc6c37eb5:projects/mir/runs/aero-candidate508-final-native-locale-packages-r02/ui-review.json",
             "b9db85b04a2c70b8a71ab522f5cf00abc6c37eb5:projects/mir/runs/aero-candidate508-final-native-locale-packages-r02/input-export-review.json",
             "f33323610c167d5bbd2890b90bb9028eac3e54bf:projects/mir/runs/library-outer-fit-native-r02/verdict.json",
-            "spec/evidence/library509-combined-observed-states-r01.json"
+            "spec/evidence/library509-combined-observed-states-r01.json",
+            "spec/evidence/library511-one-en-independent-result-review-r01.json",
+            "spec/evidence/library511-one-de-independent-result-review-r01.json",
+            "spec/evidence/library511-corrected-selection-native-chain-r01.json"
           ],
-          "remaining_executable_check": "Reuse the actual509 fixed-tab/normal-and-narrow English/German containment, compact captions, selected research and inner scrolling only at their original99143111/player5.0.21009 source identity after checking consumed inputs. The misleading direct_effect description is a confirmed separate content defect in that same509 capture and remains unchanged in510; correct only that locale value on a separate next-source branch, then Black Glass captures the same worker-battery detail in EN/DE on the final changed package. Other controls, relevant scroll/size/reset, Research Availability, native handoff and saved-view/client acceptance retain the existing bounded native obligations. Do not repeat passed509 layout observations merely because510 shipped, and do not use their component verdict as full Library acceptance.",
+          "remaining_executable_check": "Retain the actual509 fixed-tab/normal-and-narrow containment, captions and inner-scroll observations at their original99143111 inputs. The corrected benefit-only worker-battery description is already observed in English/German on7441. Corrected selection is accepted for the declared German F25D route and observed English predicates; English whole-session retirement remains adverse. The Library, translation, model and locale components below are byte-identical in published11, supporting bounded consumed-input review rather than automatic repetition after a release. Before attributing those native observations to the current candidate, Black Glass checks the actual data/settings/save/bootstrap inputs consumed by each route and runs only affected or still-missing checks. Other controls, scroll/size/reset, Research Availability, native handoff, exports, personal/saved-view and client lifecycle remain open; no full Library or stable acceptance follows.",
           "owner": "Black Glass",
           "independent_review": "Aero",
-          "status": "partial:509 actual layout/captions/selected scrolling accepted in scope; direct-effect description correction and remaining Library controls/client acceptance open",
-          "readiness": "Aero delivered direct_effect correction in PR1817/head a938ef8902cb0a744021f59f77ebee8999cc5b97, preserving50original translated benefit prefixes and original B6 projection hashes; locale controls8/8 and non-author mechanical review pass. Black Glass alone accepts integration and performs final-package EN/DE detail capture. Published510 bytes stay unchanged.",
+          "status": "partial:7441 truthful description observed EN/DE; F25D corrected selection accepted DE and observed EN; EN retirement and remaining Library/client/export acceptance open",
+          "readiness": "Locale correction PR1817/a938 and localized-selection correction PR1838/1389 are integrated. Accepted actual records and original adverse results below remain exact-source observations. Published11 retains identical Library/translation/model/locale components; no current-profile or complete GUI verdict is inferred from component identity. Black Glass owns remaining native applicability/execution and Aero owns this bounded evidence reconciliation.",
           "next_work_inputs": [
             "tests/fixtures/library-native-input/control.lua",
             "tests/profiles/library-native-input-imported110-f210-2123-r15.json",
@@ -17428,10 +17431,10 @@
             {
               "requirement": "CONT-10.truthful-research-description; issue1768",
               "existing_result": "spec/evidence/library509-combined-observed-states-r01.json separate_content_issue: actual509 worker-battery detail shows false active-lab selection claim",
-              "missing_check": "The fixed7441 English/German records below already observe the corrected benefit-only description under their original input identities. On the chosen candidate containing the separately reviewed localized-selection correction, verify that the explicitly selected worker battery and accurate description survive the affected tab route; retain the fixed-tab and inner-scroll expectations without treating these two records as an inner-scroll pass. Preserve the original German selection adverse and all separate Library/client/export/lifecycle/performance gates.",
+              "missing_check": "The original7441 description observations and later F25D corrected-selection observations below supply their named component results. Preserve the original German7441 selection failure and English F25D retirement timeout. Check actual consumed data/settings/save/bootstrap applicability before reuse on published11; run a new affected route only where those inputs change. Fixed-tab/inner-scroll and the separate Library/client/export/lifecycle/performance gates retain their existing exact observations and missing cases.",
               "source_owner": "Aero",
               "native_owner": "Black Glass",
-              "status": "description-observed-in-EN-and-DE-on-fixed7441; corrected-selection-native-regression-pending",
+              "status": "description-observed-EN-DE7441; corrected-selection-accepted-DE-and-observed-EN-F25D; current-profile-applicability-and-other-gates-open",
               "source_commit": "a938ef8902cb0a744021f59f77ebee8999cc5b97",
               "source_review": "Independent non-author root verified all50committed locale changes against original published prefixes and unchanged B6 hashes/other corrections.",
               "accepted_description_observations": {
@@ -17460,9 +17463,60 @@
                 "source": "ee823e17bfe4c3422cc55aa68e857f9e55fdb491:spec/inventory/continuity.json",
                 "status": "source-correction-reviewed-and-delivered-in-PR1817; native-not-run",
                 "missing_check": "After the bounded locale correction, open the same worker-battery detail on the chosen next-source package in English/German; observe accurate benefit-only description and retained fixed tabs, selection and inner scroll."
+              },
+              "accepted_corrected_selection_observations": {
+                "evidence": "spec/evidence/library511-corrected-selection-native-chain-r01.json",
+                "source_commit": "1389ef9ba39159fca141d668ac74e800c9a80d16",
+                "integrated_commit": "f8a1320fd4808be312209358bce0b3e150dcb20e",
+                "player_tree": "dc3f9c1aa119f825dfb1cb5dac8ccf71ea1ddec0",
+                "distribution": "5.0.21011",
+                "published_package": false,
+                "player_zip_sha256": "F25DB9283C2F8020907F8E2AD35132F0B6EEECE11263C82C69389EE8DAB3F09D",
+                "engine": "Factorio2.1.23",
+                "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+                "qualified_internal_seed_sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD",
+                "german": "Accepted exact declared route; explicit worker row2/query/two matches/same selection and detail after Settings-return; natural exit0, no timeout.",
+                "english": "Accepted observed matching selection/detail predicates; whole-session retirement remains adverse with process-timeout, no natural-exit pass.",
+                "limits": "No new full Library, inner-scroll, export, client, personal-save, current-profile, performance or stable verdict. The observed F25D archive remains unpublished and is not relabeled as the later public C3CB package."
+              },
+              "published511_component_correspondence": {
+                "tag": "v5.0.11",
+                "commit": "085df7ef6027f08cd2f4d43e348f1ea15f155168",
+                "player_tree": "93d30a248e71e5248eeb87072c27332fe68b9137",
+                "f210_zip_sha256": "C3CB6462E3285DA222664D2174EAA16E63577BF9970804E410B127A43C773D14",
+                "compared_with": "f8a1320fd4808be312209358bce0b3e150dcb20e",
+                "byte_identical_components": [
+                  {
+                    "path": "source/runtime/library.lua",
+                    "git_object": "24102cd11a7c7e2db37c1b1217b9c1471c5b996b",
+                    "unchanged": true
+                  },
+                  {
+                    "path": "source/runtime/library_translations.lua",
+                    "git_object": "45b334fa8b6a9f7a7f626ae613b73ecd58b597c7",
+                    "unchanged": true
+                  },
+                  {
+                    "path": "source/presentation/library_model.lua",
+                    "git_object": "3888894064432341a0c4cad339dfdca800521116",
+                    "unchanged": true
+                  },
+                  {
+                    "path": "source/locale",
+                    "git_object": "b8b779128d953ff376e965a0c6484278d398da54",
+                    "unchanged": true
+                  }
+                ],
+                "scope": "Exact Git-object correspondence only. Other construction/runtime/bootstrap/save/profile inputs changed; native observations keep their original identities and require consumed-input applicability for reuse. This does not grant a current-profile/native/stable pass."
               }
             }
-          ]
+          ],
+          "previous_row_checkpoint": {
+            "source": "104973f8dbf40dd926794fcb36ff8d3a8458b6ff:spec/inventory/continuity.json",
+            "remaining_executable_check": "Reuse the actual509 fixed-tab/normal-and-narrow English/German containment, compact captions, selected research and inner scrolling only at their original99143111/player5.0.21009 source identity after checking consumed inputs. The misleading direct_effect description is a confirmed separate content defect in that same509 capture and remains unchanged in510; correct only that locale value on a separate next-source branch, then Black Glass captures the same worker-battery detail in EN/DE on the final changed package. Other controls, relevant scroll/size/reset, Research Availability, native handoff and saved-view/client acceptance retain the existing bounded native obligations. Do not repeat passed509 layout observations merely because510 shipped, and do not use their component verdict as full Library acceptance.",
+            "status": "partial:509 actual layout/captions/selected scrolling accepted in scope; direct-effect description correction and remaining Library controls/client acceptance open",
+            "readiness": "Aero delivered direct_effect correction in PR1817/head a938ef8902cb0a744021f59f77ebee8999cc5b97, preserving50original translated benefit prefixes and original B6 projection hashes; locale controls8/8 and non-author mechanical review pass. Black Glass alone accepts integration and performs final-package EN/DE detail capture. Published510 bytes stay unchanged."
+          }
         },
         {
           "subjects": [
