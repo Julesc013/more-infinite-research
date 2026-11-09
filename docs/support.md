@@ -74,6 +74,8 @@ source_of_truth_for:
 
 ### Productivity providers and preferences
 
+- On Factorio 2.0.77 with the Base-game profile, a 0.01% recipe-productivity reward resolves to zero native bonus. The setting loads successfully; new levels add no productivity at that reward.
+
 - Use this additional caution only for a Factorio 2.0 save from MIR 4.7 with overlapping productivity from a known provider when you plan to change that provider, MIR's preference or relevant startup settings, especially as part of a move from Factorio 2.0 to 2.1:
 
 1. Keep the original Factorio version, enabled mods and startup settings.
