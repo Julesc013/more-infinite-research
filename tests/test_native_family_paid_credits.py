@@ -5,6 +5,7 @@ save, renderer or scientific-work qualification follows from these controls.
 """
 import argparse
 import json
+import math
 import struct
 from pathlib import Path
 import sys
@@ -20,6 +21,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
         case = fixture.NativeCreditRuntimeTests()
         case.setUp()
         self.lua = case.lua
+        self.lua.globals().fixture_float32 = lambda value: struct.unpack("<f", struct.pack("<f", value))[0]
         self.lua.execute(r'''
           GROUPS={research_steel={
             {recipe="alternate-steel",change=.17},{recipe="multi-native",change=.17},
@@ -28,6 +30,11 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
           local function copy(value)
             if type(value)~="table" then return value end
             local out={};for k,v in pairs(value) do out[k]=copy(v) end;return out
+          end
+          -- Ordinary fixture defaults are authored exact quanta. Precision
+          -- cases below replace these fields from independent observed units.
+          function fixture_effect(value)
+            return require("platform.target").id=="f200" and fixture_float32(value) or value
           end
           function reload_credits(active,target_id)
             script={active_mods=active or {base="2.1.23",["space-age"]="2.1.23",["more-infinite-research"]="5.0.21003"}}
@@ -55,7 +62,8 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                 local name=direction=="positive" and d.positive_id or d.negative_id
                 local t,s=make_technology(name,{name=name,level=1,max_level=UINT32_MAX,hidden=true,
                   enabled=false,visible_when_disabled=false,effects={{type="change-recipe-productivity",
-                    recipe=d.recipe,change=direction=="positive" and d.change or -d.change}}},1,false,false)
+                    recipe=d.recipe,change=direction=="positive" and fixture_effect(d.change)
+                      or -fixture_effect(d.change)}}},1,false,false)
                 t.force=force;force.technologies[name]=t;force._states[name]=s
               end
             end
@@ -70,7 +78,7 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
               local proto=force.technologies[d.main_id].prototype
               if not seen[d.main_id] then proto.effects={};proto.hidden=private==true;seen[d.main_id]=true end
               if mask[d.family.."\0"..d.recipe] then
-                proto.effects[#proto.effects+1]={type="change-recipe-productivity",recipe=d.recipe,change=d.change}
+                proto.effects[#proto.effects+1]={type="change-recipe-productivity",recipe=d.recipe,change=fixture_effect(d.change)}
               end
             end
           end
@@ -101,74 +109,190 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
           reload_credits()
         ''')
 
+    FAMILIES = ("research_low_density_structure", "research_plastic",
+                "research_processing_unit", "research_rocket_fuel", "research_steel")
+
+    def precision_attempt(self, target, family, authored, actual=None, units=None):
+        self.setUp()
+        g = self.lua.globals()
+        g.case_family, g.case_target = family, target
+        g.case_base = "2.0.77" if target == "f200" else "2.1.23"
+        g.case_mir = "5.0.20011" if target == "f200" else "5.0.21011"
+        g.authored_change = authored
+        if units is not None:
+            if target == "f200":
+                g.native_change = struct.unpack("<f", struct.pack("<f", units / 100))[0]
+            else:
+                # The native probe compared this exact Lua operation with the
+                # actual effect. Its static unit count is independent of MIR.
+                g.native_units = units
+                self.lua.execute("native_change=native_units/10000")
+        else:
+            g.native_change = actual
+        self.lua.execute(r'''
+          GROUPS={[case_family]={{recipe="multi-native",change=authored_change}}}
+          reload_credits({base=case_base,["space-age"]=case_base,
+            ["more-infinite-research"]=case_mir},case_target)
+          local force=make_collected_force(1,1,{[key(case_family,"multi-native")]=true})
+          for _,d in ipairs(native_credit_definitions.collected_descriptors(GROUPS))do
+            force.technologies[d.main_id].prototype.effects[1].change=native_change
+            force.technologies[d.positive_id].prototype.effects[1].change=native_change
+            force.technologies[d.negative_id].prototype.effects[1].change=
+              type(native_change)=="number" and -native_change or native_change
+          end
+          local foreign=force.technologies.foreign;foreign.saved_progress=.27
+          local queue={foreign};force.research_queue=queue
+          observed_ok,observed_error=pcall(native_credits.on_init)
+          assert(force.research_queue==queue and queue[1]==foreign
+            and foreign.saved_progress==.27 and foreign.level==3)
+          if not observed_ok then
+            assert(storage.mir_native_credits==nil,"failed preflight wrote storage")
+            for _,state in pairs(force._states)do
+              assert(state.writes.level==0 and state.writes.enabled==0,
+                "failed preflight wrote native state")
+            end
+          end
+          no_foreign_write(force)
+        ''')
+        return bool(g.observed_ok), str(g.observed_error)
+
+    @staticmethod
+    def observed_oracle(target):
+        path = fixture.ROOT / "tests/fixtures" / ("native-effect-conversion-" + target + ".json")
+        oracle = json.loads(path.read_text())
+        assert oracle["target"] == target
+        assert len(oracle["cases"]) == (20 if target == "f200" else 36)
+        assert all(type(row["native_units"]) is int for row in oracle["cases"])
+        if target == "f210":
+            assert all(row["actual_equals_round4_divide"] is True for row in oracle["cases"])
+        return oracle
+
     def test_native_effect_precision_on_init_across_all_five_families(self):
-        # Runtime change is float; prototype EffectValue truncates beyond four
-        # decimals. The .56789 -> .5678 pair is the literal API-doc example.
-        # Adjacent legal effect quanta must still fail, including near1000.
+        for target in ("f200", "f210"):
+            for row in self.observed_oracle(target)["cases"]:
+                authored, units = float(row["authored_literal"]), row["native_units"]
+                if authored <= 0:
+                    continue  # Signed carrier symmetry is exercised by each positive tuple.
+                for family in self.FAMILIES:
+                    with self.subTest(target=target, family=family, authored=authored):
+                        ok, error = self.precision_attempt(target, family, authored, units=units)
+                        self.assertEqual(units > 0, ok, error)
+
+    def test_adjacent_actual_native_quanta_refuse_before_writes(self):
+        for target in ("f200", "f210"):
+            for row in self.observed_oracle(target)["cases"]:
+                authored, units = float(row["authored_literal"]), row["native_units"]
+                if authored <= 0 or units <= 0:
+                    continue
+                for opponent in (units - 1, units + 1):
+                    for family in self.FAMILIES:
+                        with self.subTest(target=target, family=family, authored=authored, units=opponent):
+                            ok, error = self.precision_attempt(target, family, authored, units=opponent)
+                            self.assertFalse(ok, error)
+
+    def test_former_float32_f210_fixture_is_an_opponent_not_native_evidence(self):
+        # Preserve Aero aab51b88's original tuples and former verdicts. Native
+        # r02/r03 disproved this transport for F210; only the exact quarter
+        # happens to be the same value in both representations.
         cases = [(str(v), v, v, True) for v in (.1, .17, .25, .3, .7, 1.17, 3.3)]
         cases += [
             ("four-decimal-example", .56789, .5678, True),
-            ("different-effect", .3, .31, False),
-            ("zero", .3, 0, False),
-            ("negative", .3, -.3, False),
-            ("one-quantum-low", .3, .2999, False),
-            ("one-quantum-high", .3, .3001, False),
-            ("below-truncated", .56789, .5677, False),
-            ("above-truncated", .56789, .5679, False),
-            ("large-valid", 999.1, 999.1, True),
+            ("different-effect", .3, .31, False), ("zero", .3, 0, False),
+            ("negative", .3, -.3, False), ("one-quantum-low", .3, .2999, False),
+            ("one-quantum-high", .3, .3001, False), ("below-truncated", .56789, .5677, False),
+            ("above-truncated", .56789, .5679, False), ("large-valid", 999.1, 999.1, True),
             ("large-quantum-low", 999.1, 999.0999, False),
             ("large-quantum-high", 999.1, 999.1001, False),
         ]
-        families = ("research_low_density_structure", "research_plastic",
-                    "research_processing_unit", "research_rocket_fuel", "research_steel")
-        for target in ("f200", "f210"):
-            for family in families:
-                for name, authored, native, wanted in cases:
-                    with self.subTest(target=target, family=family, case=name):
-                        self.setUp()
-                        self.lua.globals().case_family = family
-                        self.lua.globals().case_target = target
-                        self.lua.globals().case_base = "2.0.77" if target == "f200" else "2.1.23"
-                        self.lua.globals().case_mir = "5.0.20011" if target == "f200" else "5.0.21011"
-                        self.lua.globals().authored_change = authored
-                        self.lua.globals().native_change = struct.unpack("<f", struct.pack("<f", native))[0]
-                        self.lua.execute(r'''
-                          GROUPS={[case_family]={{recipe="multi-native",change=authored_change}}}
-                          reload_credits({base=case_base,["space-age"]=case_base,
-                            ["more-infinite-research"]=case_mir},case_target)
-                          local force=make_collected_force(1,1,{[key(case_family,"multi-native")]=true})
-                          for _,d in ipairs(native_credit_definitions.collected_descriptors(GROUPS))do
-                            force.technologies[d.main_id].prototype.effects[1].change=native_change
-                            force.technologies[d.positive_id].prototype.effects[1].change=native_change
-                            force.technologies[d.negative_id].prototype.effects[1].change=-native_change
-                          end
-                          local foreign=force.technologies.foreign
-                          foreign.saved_progress=.27
-                          local queue={foreign};force.research_queue=queue
-                          observed_ok,observed_error=pcall(native_credits.on_init)
-                          assert(force.research_queue==queue and queue[1]==foreign
-                            and foreign.saved_progress==.27 and foreign.level==3)
-                          if not observed_ok then
-                            assert(storage.mir_native_credits==nil,"failed preflight wrote storage")
-                            for _,state in pairs(force._states)do
-                              assert(state.writes.level==0 and state.writes.enabled==0,
-                                "failed preflight wrote native state")
-                            end
-                          end
-                          no_foreign_write(force)
-                        ''')
-                        self.assertEqual(wanted, self.lua.globals().observed_ok,
-                                         str(self.lua.globals().observed_error))
+        for name, authored, supplied, former_wanted in cases:
+            for family in self.FAMILIES:
+                with self.subTest(case=name, family=family, former_verdict=former_wanted):
+                    actual = struct.unpack("<f", struct.pack("<f", supplied))[0]
+                    ok, error = self.precision_attempt("f210", family, authored, actual=actual)
+                    self.assertEqual(name == "0.25", ok, error)
+
+    def precision_functions(self):
+        # Inspect private closures only in this host test; no production API or
+        # diagnostic hook exists. Expected bit patterns come from Python struct.
+        self.lua.execute(r'''
+          local function upvalue(fn,wanted)
+            for i=1,100 do
+              local name,value=debug.getupvalue(fn,i)
+              if name==wanted then return value end
+              if name==nil then break end
+            end
+            error("missing private test subject "..wanted)
+          end
+          local observations=upvalue(native_credits.preflight_family_transition,"family_observations")
+          local inspect=upvalue(observations,"inspect_with_mask")
+          precision_match=upvalue(inspect,"native_effect_change_matches")
+          precision_binary32=upvalue(precision_match,"binary32")
+        ''')
+        return self.lua.globals().precision_match, self.lua.globals().precision_binary32
+
+    def test_binary32_rne_normal_subnormal_ties_zero_and_overflow(self):
+        _, cast = self.precision_functions()
+        tie = 1 + 2 ** -24
+        values = [0.0, -0.0, 2 ** -149, 2 ** -150, 3 * 2 ** -150,
+                  math.nextafter(2 ** -150, math.inf),
+                  (2 ** 23 - 1) * 2 ** -149, (2 ** 23 - .5) * 2 ** -149,
+                  2 ** -126, tie, math.nextafter(tie, 0), math.nextafter(tie, math.inf),
+                  1 + 3 * 2 ** -24, (2 - 2 ** -23) * 2 ** 127,
+                  (2 - 2 ** -24) * 2 ** 127, 1e300, math.inf, math.nan]
+        reciprocal = self.lua.eval("function(v)return 1/precision_binary32(v)end")
+        for value in values + [-v for v in values if v != 0]:
+            with self.subTest(value=value):
+                try:
+                    expected = struct.unpack("<f", struct.pack("<f", value))[0]
+                except OverflowError:
+                    expected = math.copysign(math.inf, value)
+                actual = cast(value)
+                if math.isnan(expected):
+                    self.assertTrue(math.isnan(actual))
+                else:
+                    self.assertEqual(expected, actual)
+                    if expected == 0:
+                        # Lupa can marshal Lua zero as Python int0; inspect its
+                        # sign inside Lua rather than losing it at the bridge.
+                        self.assertEqual(math.copysign(math.inf, expected), reciprocal(value))
+
+    def test_precision_range_nonfinite_false_and_zero_carriers_refuse(self):
+        cases = [("f200", 327.67, 32767, True), ("f200", 327.68, 1, False),
+                 ("f210", 1000, 10000000, True), ("f210", 1000.00001, 10000000, False),
+                 ("f200", 2 ** -149, 0, False), ("f210", .00001, 0, False)]
+        for target, authored, units, wanted in cases:
+            for family in self.FAMILIES:
+                with self.subTest(target=target, authored=authored, family=family):
+                    ok, error = self.precision_attempt(target, family, authored, units=units)
+                    self.assertEqual(wanted, ok, error)
+        for actual in (False, True, math.nan, math.inf, -math.inf):
+            for target in ("f200", "f210"):
+                ok, error = self.precision_attempt(target, "research_steel", .3, actual=actual)
+                self.assertFalse(ok, error)
+        self.setUp()
+        match, _ = self.precision_functions()
+        for actual, authored in ((False, .3), (.3, False), (.3, 0), (.3, -.3),
+                                 (.3, math.nan), (.3, math.inf), (math.inf, .3)):
+            self.assertFalse(match(actual, authored))
+        self.lua.execute('require("platform.target").id="unqualified"')
+        self.assertFalse(match(.3, .3))
 
     def test_native_precision_keeps_paid_credit_and_foreign_partial_work(self):
-        for family in ("research_low_density_structure", "research_plastic",
-                       "research_processing_unit", "research_rocket_fuel", "research_steel"):
-            with self.subTest(family=family):
+        for target, family in ((t, f) for t in ("f200", "f210") for f in self.FAMILIES):
+            with self.subTest(target=target, family=family):
                 self.setUp()
                 self.lua.globals().case_family = family
-                self.lua.globals().native_change = struct.unpack("<f", struct.pack("<f", .3))[0]
+                self.lua.globals().case_target = target
+                self.lua.globals().case_base = "2.0.77" if target == "f200" else "2.1.23"
+                self.lua.globals().case_mir = "5.0.20011" if target == "f200" else "5.0.21011"
+                if target == "f200":
+                    self.lua.globals().native_change = struct.unpack("<f", struct.pack("<f", 30 / 100))[0]
+                else:
+                    self.lua.execute("native_change=3000/10000")
                 self.lua.execute(r'''
-                  GROUPS={[case_family]={{recipe="multi-native",change=.3}}};reload_credits()
+                  GROUPS={[case_family]={{recipe="multi-native",change=.3}}}
+                  reload_credits({base=case_base,["space-age"]=case_base,
+                    ["more-infinite-research"]=case_mir},case_target)
                   local force=make_collected_force(1,1,{[key(case_family,"multi-native")]=true})
                   local d=native_credit_definitions.collected_descriptors(GROUPS)[1]
                   local main=force.technologies[d.main_id]
@@ -576,10 +700,10 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                       for _,d in ipairs(native_credit_definitions.collected_descriptors(GROUPS)) do
                         if d.family=="research_plastic" and d.recipe=="plastic-bar" then
                           for _,effect in ipairs(staged.technologies[d.main_id].prototype.effects) do
-                            if effect.recipe==d.recipe then effect.change=selected end
+                            if effect.recipe==d.recipe then effect.change=fixture_effect(selected) end
                           end
-                          staged.technologies[d.positive_id].prototype.effects[1].change=selected
-                          staged.technologies[d.negative_id].prototype.effects[1].change=-selected
+                          staged.technologies[d.positive_id].prototype.effects[1].change=fixture_effect(selected)
+                          staged.technologies[d.negative_id].prototype.effects[1].change=-fixture_effect(selected)
                         end
                       end
                       local direct=make_collected_force(2,2,data_mask,false)
@@ -671,9 +795,10 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                     if full_bootstrap:
                         bootstrap_fixture.BootstrapTests().setUp(self.lua)
                         self.lua.execute('''
-                          local real_credits=native_credits
+                          local real_credits,real_target=native_credits,require("platform.target")
                           install_modules(false,false,false,true);install_runtime(nil,BASE_ACTIVE);game.forces={}
                           package.preload["runtime.native_credits"]=function()return real_credits end
+                          package.preload["platform.target"]=function()return real_target end
                           load_control()
                         ''')
                     self.lua.globals().full_bootstrap = full_bootstrap
@@ -709,9 +834,10 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                     if full_bootstrap:
                         bootstrap_fixture.BootstrapTests().setUp(self.lua)
                         self.lua.execute('''
-                          local real_credits=native_credits
+                          local real_credits,real_target=native_credits,require("platform.target")
                           install_modules(false,false,false,true);install_runtime(nil,BASE_ACTIVE);game.forces={}
                           package.preload["runtime.native_credits"]=function()return real_credits end
+                          package.preload["platform.target"]=function()return real_target end
                           load_control()
                         ''')
                     self.lua.globals().full_bootstrap = full_bootstrap
@@ -794,9 +920,10 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                     if full_bootstrap:
                         bootstrap_fixture.BootstrapTests().setUp(self.lua)
                         self.lua.execute('''
-                          local real_credits=native_credits
+                          local real_credits,real_target=native_credits,require("platform.target")
                           install_modules(false,false,false,true);install_runtime(nil,BASE_ACTIVE);game.forces={}
                           package.preload["runtime.native_credits"]=function()return real_credits end
+                          package.preload["platform.target"]=function()return real_target end
                           load_control()
                         ''')
                     self.lua.globals().changed_startup = changed
@@ -839,9 +966,10 @@ class NativeFamilyPaidCreditsTests(unittest.TestCase):
                     if full_bootstrap:
                         bootstrap_fixture.BootstrapTests().setUp(self.lua)
                         self.lua.execute('''
-                          local real_credits=native_credits
+                          local real_credits,real_target=native_credits,require("platform.target")
                           install_modules(false,false,false,true);install_runtime(nil,BASE_ACTIVE);game.forces={}
                           package.preload["runtime.native_credits"]=function()return real_credits end
+                          package.preload["platform.target"]=function()return real_target end
                           load_control()
                         ''')
                     self.lua.globals().opponent = opponent

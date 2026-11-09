@@ -6,6 +6,7 @@
 -- manufacturing work needs a temporary completion/cancellation subscription.
 local definitions = require("research.native_credit_definitions")
 local catalogue = require("runtime.catalogue")
+local target = require("platform.target")
 
 local M = {}
 
@@ -73,15 +74,38 @@ local function close(left, right)
     and math.abs(left - right) <= EFFECT_TOLERANCE
 end
 
--- The authored metadata retains Lua doubles. Native productivity effects use
--- EffectValue's four-decimal truncation and are exposed as float at runtime.
--- Admit that conversion only; signed-pair and main/carrier equality retain
--- their existing checks and no saved contribution is inferred or rewritten.
+-- IEEE binary32 round-to-nearest, ties-to-even. F200 converts the input,
+-- multiplication and final division separately; Lua arithmetic is double.
+local function binary32(value)
+  if value == 0 or value ~= value or value == math.huge or value == -math.huge then return value end
+  local sign = value < 0 and -1 or 1
+  local mantissa, exponent = math.frexp(math.abs(value))
+  local scaled = exponent < -125 and math.ldexp(math.abs(value), 149) or math.ldexp(mantissa, 24)
+  local rounded = math.floor(scaled)
+  local remainder = scaled - rounded
+  if remainder > .5 or remainder == .5 and rounded % 2 == 1 then rounded = rounded + 1 end
+  if exponent < -125 then return sign * math.ldexp(rounded, -149) end
+  if exponent > 128 or exponent == 128 and rounded == 16777216 then return sign * math.huge end
+  return sign * math.ldexp(rounded, exponent - 24)
+end
+
+-- Compare only the observed target representation of the positive collected
+-- scalar. These conversions were measured on2.0.77 and2.1.23; an interval can
+-- admit a different native quantum. No contribution or saved mask is inferred.
 local function native_effect_change_matches(actual, expected)
-  if close(actual, expected) then return true end
-  local tolerance = math.max(EFFECT_TOLERANCE, math.abs(expected) * 2 ^ -24)
-  local truncated = math.floor(expected * 10000 + EFFECT_TOLERANCE) / 10000
-  return actual >= truncated - tolerance and actual <= expected + tolerance
+  if type(actual) ~= "number" or type(expected) ~= "number"
+      or actual ~= actual or expected ~= expected or expected <= 0 then return false end
+  if target.id == "f200" then
+    -- EffectValue's signed16-bit hundredths wrap outside this authored range.
+    -- Refuse those descriptors rather than adopting a wrapped contribution.
+    if expected > 327.67 then return false end
+    local units = math.floor(binary32(binary32(expected) * 100))
+    return actual == binary32(units / 100)
+  elseif target.id == "f210" then
+    if expected > 1000 then return false end
+    return actual == math.floor(expected * 10000 + .5) / 10000
+  end
+  return false
 end
 
 local function integer(value)
