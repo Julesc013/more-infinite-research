@@ -162,7 +162,7 @@ class FerrumWorkerStorageNativeControls(unittest.TestCase):
             if opponent=="lost-disabled-flag"then forces["mir-ferrum-foreign"].technologies[C4].enabled=true end
             if opponent=="wrong-source-science"then forces.player.technologies[C4].prototype.research_unit_ingredients[6].name="military-science-pack"end
             for _,f in pairs(forces)do
-              technology(f,P,4,675,private,{"worker-robots-storage-3",table.unpack(private)},"more-infinite-research",true,"675*1.5^(L-4)")
+              technology(f,P,4,675,private,{"worker-robots-storage-2","worker-robots-storage-3",table.unpack(private)},"more-infinite-research",true,"675*1.5^(L-4)")
               technology(f,N,6,0,useful,{C4,C5,table.unpack(private)},"more-infinite-research",true,"1518.75*1.5^(L-6)")
             end
             local n=forces.player.technologies[N]
@@ -172,6 +172,7 @@ class FerrumWorkerStorageNativeControls(unittest.TestCase):
             if opponent=="wrong-effect"then n.prototype.effects[1].modifier=2 end
             if opponent=="wrong-native-count"then rawset(n,"research_unit_count",native_count+1)end
             if opponent=="dummy-private"then forces.player.technologies[P].prototype.research_unit_energy=1 end
+            if opponent=="missing-private-worker2"then forces.player.technologies[P].prerequisites["worker-robots-storage-2"]=nil end
             if opponent=="private-foreign-investment"then forces["mir-ferrum-foreign"].technologies[P].level=5 end
             if opponent=="public7-overlap"then forces.player.technologies["worker-robots-storage-7"]=n end
             if opponent=="calibration-researched"then forces.player.technologies[CAL].researched=true end
@@ -237,6 +238,15 @@ class FerrumWorkerStorageNativeControls(unittest.TestCase):
                 self.assertEqual(result["entry"]["player"]["rows"][name]["time"], 3600)
             with self.assertRaisesRegex(Exception, "finite worker contract"):
                 self.run_case("raw-seconds-energy", target)
+
+    def test_private_holder_requires_direct_worker2_prerequisite(self):
+        for target in ("f210", "f200"):
+            with self.subTest(target=target), self.assertRaisesRegex(Exception, "MIR prerequisites"):
+                self.run_case("missing-private-worker2", target)
+            state = self.lua.globals().last_ferrum_storage["mir_ferrum_worker_native"]
+            self.assertIsNone(state.ordinary["worker-robots-storage-6"])
+            self.assertTrue(self.lua.globals().last_ferrum_lab.disabled_by_script)
+            self.assertEqual(plain(self.lua.globals().last_ferrum_saves), ["mir-ferrum-worker-source"])
 
     def test_scripted_duplicate_and_unconsumed_lab_completions_refuse(self):
         for target in ("f210", "f200"):

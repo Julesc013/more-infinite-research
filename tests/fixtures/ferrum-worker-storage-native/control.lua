@@ -142,7 +142,7 @@ local function contracts(with_mir, initial)
   for _, row in ipairs({{SIX, 6, "1518.75*1.5^(L-6)", MIR_SCIENCE,
       {FOUR, FIVE, table.unpack(PRIVATE_SCIENCE)}},
       {PRIVATE, 4, "675*1.5^(L-4)", PRIVATE_SCIENCE,
-      {"worker-robots-storage-3", table.unpack(PRIVATE_SCIENCE)}}}) do
+      {"worker-robots-storage-2", "worker-robots-storage-3", table.unpack(PRIVATE_SCIENCE)}}}) do
     local t = f.technologies[row[1]]
     check(t and t.prototype.level == row[2] and t.prototype.max_level == 4294967295
       and t.prototype.research_unit_count_formula == row[3] and t.prototype.research_unit_energy == 60 * 60,
