@@ -1959,6 +1959,35 @@ class LibraryTests(unittest.TestCase):
             "filter selection must update the retained view without replacing the window or query")
         ''')
 
+    def test_retained_filter_labels_follow_resize_within_the_same_column_band(self):
+        self.lua.execute(r'''
+          boot()
+          local root=library.open(player,{query="gear",selected=gear.name})
+          local filters=research_filters(root)
+          local grid=filters.mir_library_filter_grid
+          local query=filters.mir_library_query
+          local title=root.mir_library_title
+          local before_level,before_queue=gear.level,player.force.research_queue
+          assert(grid.column_count==3)
+          for _,action in ipairs({"larger","larger","smaller","smaller"}) do
+            library.on_gui_click({player_index=1,element=title["mir_library_layout_"..action]})
+            assert(research_filters(root)==filters and filters.mir_library_filter_grid==grid,
+              "same-column resizing must retain the live filters")
+            for _,name in ipairs({"family","status","mode","sort","visibility"}) do
+              local field=grid["mir_library_"..name.."_field"]
+              local label=field["mir_library_"..name.."_label"]
+              local control=field["mir_library_"..name]
+              assert(label.style.maximal_width==field.style.maximal_width,
+                "localized filter captions must use the current field width after "..action)
+              assert(control.style.maximal_width==field.style.maximal_width)
+            end
+            assert(filters.mir_library_query==query and query.text=="gear"
+              and storage.mir_library.players[1].selected==gear.name)
+          end
+          assert(gear.level==before_level and player.force.research_queue==before_queue,
+            "presentation resizing must leave native research unchanged")
+        ''')
+
     def test_layout_controls_resize_reset_and_rebuild_an_outdated_saved_window(self):
         self.lua.execute(r'''
           boot()

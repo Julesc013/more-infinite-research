@@ -2300,6 +2300,7 @@ local function sync_frame_layout(player, view, frame)
       if valid(field) then
         field.style.width = control_width
         field[PREFIX .. name .. "_label"].visible = true
+        field[PREFIX .. name .. "_label"].style.maximal_width = control_width
       end
       if valid(control) then control.style.width = control_width end
     end
