@@ -85,7 +85,7 @@ source_of_truth_for:
 
 ### Preparing worker cargo research before adding a provider
 
-- This candidate adds an administrator/server preparation command for the ordinary Base-game and Space Age default worker cargo contract beginning at level 4. K2, Space Exploration and other overhaul preparation are outside this recovery scope; their ordinary public research is retained. A different authored worker contract has an empty supporting holder and cannot be prepared. Native qualification of the preparation and later provider transition is pending; use a disposable copy for testing.
+- This candidate adds an administrator/server preparation command for the ordinary Base-game and Space Age default worker cargo contract beginning at level 4. K2, Space Exploration and other overhaul preparation are outside this recovery scope; their ordinary public research is retained. A different authored worker contract has an empty supporting holder and cannot be prepared. The named Factorio 2.1.23 test adds Secretas 1.0.38 to a prepared copy, preserves earned bonuses and current/queued/suspended work, completes further research, and passes two cold reloads. Factorio 2.0 recovery and the full Ferrum profile remain unqualified; keep the protected original and test a disposable copy.
 
 1. Keep the protected original save, previous enabled mods and exact MIR settings. Load a copy with this MIR candidate before adding the worker cargo provider.
 2. Run `/mir-worker-storage-recovery prepare`. It checks every force and the native research contract before moving earned and unfinished work to supporting native research. A refusal leaves the original recovery path necessary; do not grant levels manually.

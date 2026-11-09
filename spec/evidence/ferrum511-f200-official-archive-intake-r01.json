@@ -1,0 +1,14 @@
+{
+  "kind": "OfficialArchiveLibraryIntakeV1",
+  "source": "E:/Downloads/planet-ferrum_0.0.5.zip",
+  "destination": "D:/Projects/Factorio/testmods/2.0/planet-ferrum_0.0.5.zip",
+  "bytes": 25098621,
+  "sha256": "7B1276EA9181C4ED1DE4EE67085D4795EE1D37883F04AA2BA4BC12BAA4DB5246",
+  "official_portal_sha1": "e5420333b98f716122087d39c061bbb0fc56ae50",
+  "info_version": "0.0.5",
+  "factorio_version": "2.0",
+  "crc_all_members": true,
+  "original_retained": true,
+  "required_spider_launcher": ">=2.9.0",
+  "native_execution": false
+}

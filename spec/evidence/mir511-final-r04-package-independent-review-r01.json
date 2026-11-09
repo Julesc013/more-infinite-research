@@ -1,0 +1,202 @@
+{
+  "kind": "MIR511FinalR04IndependentPackageReviewV1",
+  "reviewed_at_utc": "2026-11-09T08:56:26.349068+00:00",
+  "verdict": "PASS exact17 final-source archives and receipt-backed reproduction; beta publication verdict separate",
+  "source": {
+    "commit": "203e0af5e1ea8925c1909e1dc97cef3dab3c961b",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21011",
+    "source_tree": "93d30a248e71e5248eeb87072c27332fe68b9137",
+    "tree": "91afea4a1d140b447fbb7c9ee81a9daa822f8c03"
+  },
+  "release": {
+    "source_label": "source5.0.11",
+    "source_version": "5.0.11",
+    "tag": "v5.0.11",
+    "title": "MIR 5.0.11"
+  },
+  "inventory": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir511-cumulative-assets-r04\\MIR5ReleaseAssetInventoryV1.json",
+    "bytes": 217537,
+    "sha256": "4CBBD915044002ACB2003F7B4293D5D190A7FEE8AD79443E039F545DC455CB5C"
+  },
+  "sealed_inventory_and_exact20file_set": true,
+  "assets": [
+    {
+      "target": "f013",
+      "name": "more-infinite-research_5.0.01311.zip",
+      "bytes": 665524,
+      "sha256": "C866EA38666F42DF903512069E49ACFCF75386253A8BE84FD9328FD2AC68BA68",
+      "members": 127,
+      "changed_from_r03": []
+    },
+    {
+      "target": "f014",
+      "name": "more-infinite-research_5.0.01411.zip",
+      "bytes": 665527,
+      "sha256": "60F4032F14F93CFFD7EB134DD0E2234DCB1B81AB63D8BF112B0C7C1D531A7435",
+      "members": 127,
+      "changed_from_r03": []
+    },
+    {
+      "target": "f015",
+      "name": "more-infinite-research_5.0.01511.zip",
+      "bytes": 665525,
+      "sha256": "73E798739C75C900D12027A8AC034CCD9AE2BC669ADE8147B53BB33707FABAB1",
+      "members": 127,
+      "changed_from_r03": []
+    },
+    {
+      "target": "f016",
+      "name": "more-infinite-research_5.0.01611.zip",
+      "bytes": 665526,
+      "sha256": "26A8F7190745EB760CD9E3A34769F2201870BBC6EB89EB25F87EC1A4B5E91F20",
+      "members": 127,
+      "changed_from_r03": []
+    },
+    {
+      "target": "f017",
+      "name": "more-infinite-research_5.0.01711.zip",
+      "bytes": 665526,
+      "sha256": "2DDE03B680E25A8325C5CB42AFE86E716BB4D2A30D8EDF7DCD6646941BF91281",
+      "members": 127,
+      "changed_from_r03": []
+    },
+    {
+      "target": "f018",
+      "name": "more-infinite-research_5.0.01811.zip",
+      "bytes": 665528,
+      "sha256": "7AE68B2BC10AEB93E9FD81172030B8B7E8F966181DE12FC0691062E157A69E96",
+      "members": 127,
+      "changed_from_r03": []
+    },
+    {
+      "target": "f100",
+      "name": "more-infinite-research_5.0.10011.zip",
+      "bytes": 665519,
+      "sha256": "F66B9E2F63CFEA55D4944B40689DFF8FE6433A12C753345551674F8ACCC4BC92",
+      "members": 127,
+      "changed_from_r03": []
+    },
+    {
+      "target": "f110",
+      "name": "more-infinite-research_5.0.11011.zip",
+      "bytes": 665828,
+      "sha256": "6F9EDD414015F488B408922CB0C8A566295AF4DF7D4F50ABA19C5967BC233F66",
+      "members": 128,
+      "changed_from_r03": []
+    },
+    {
+      "target": "f200",
+      "name": "more-infinite-research_5.0.20011.zip",
+      "bytes": 1006342,
+      "sha256": "78D673A8CA3360D0BF843447322CF4D3D6C453256A44CAB1748EE3128A08C5FC",
+      "members": 243,
+      "changed_from_r03": [
+        "runtime/worker_robot_storage.lua"
+      ]
+    },
+    {
+      "target": "f210",
+      "name": "more-infinite-research_5.0.21011.zip",
+      "bytes": 1006768,
+      "sha256": "C3CB6462E3285DA222664D2174EAA16E63577BF9970804E410B127A43C773D14",
+      "members": 244,
+      "changed_from_r03": [
+        "runtime/worker_robot_storage.lua"
+      ]
+    },
+    {
+      "target": "f006",
+      "name": "more-infinite-research_5.0.00611.zip",
+      "bytes": 138704,
+      "sha256": "5EE9D05728EA4AC5DDD1EC8189B3264DF4000295699A8F47F4848AAD2EE30035",
+      "members": 10,
+      "changed_from_r03": []
+    },
+    {
+      "target": "f007",
+      "name": "more-infinite-research_5.0.00711.zip",
+      "bytes": 138704,
+      "sha256": "EEC3BDF4B81ED022C1F6B6E9F42840509A53AB779C7242B69BAB9C3D6AA8F953",
+      "members": 10,
+      "changed_from_r03": []
+    },
+    {
+      "target": "f008",
+      "name": "more-infinite-research_5.0.00811.zip",
+      "bytes": 138702,
+      "sha256": "11836191DEE14AACF7AB432BC311FCDD3CC9B533554906F8D365E4D5D90B6420",
+      "members": 10,
+      "changed_from_r03": []
+    },
+    {
+      "target": "f009",
+      "name": "more-infinite-research_5.0.00911.zip",
+      "bytes": 138704,
+      "sha256": "17F4359243DA4F0F38C7D16E400C2B93C02DA28943FBE94348F0256C083FAC56",
+      "members": 10,
+      "changed_from_r03": []
+    },
+    {
+      "target": "f010",
+      "name": "more-infinite-research_5.0.01011.zip",
+      "bytes": 138703,
+      "sha256": "B8CBBEC9A330885DEE8989C794DD35EF3A11CFD6AC1347E748581D990BB7BC2C",
+      "members": 10,
+      "changed_from_r03": []
+    },
+    {
+      "target": "f011",
+      "name": "more-infinite-research_5.0.01111.zip",
+      "bytes": 138702,
+      "sha256": "A55E5728A0A923A0D4DCA6EADFB394BE9913AF43B3AFC7253D747A6FB012F1CD",
+      "members": 10,
+      "changed_from_r03": []
+    },
+    {
+      "target": "f012",
+      "name": "more-infinite-research_5.0.01211.zip",
+      "bytes": 138706,
+      "sha256": "36156F2C5D1B3A5671F880611334CF8375D2BC8CC8E9202994FD4C5B0D729516",
+      "members": 10,
+      "changed_from_r03": []
+    }
+  ],
+  "checksum_files": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir511-cumulative-assets-r04\\SHA256SUMS.txt",
+      "bytes": 1030,
+      "sha256": "45250D7BC91C39D94A40ED3DA7871DF2684444E35788A00344CA71E137265390"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir511-cumulative-assets-r04\\SHA256SUMS-early.txt",
+      "bytes": 721,
+      "sha256": "5FE3D5B3A5FEE5D24FF1E3F269E25F5565BC95316CBC45B7852143418CC310B0"
+    }
+  ],
+  "actual_checks": "All17 actual archive lengths/SHA/CRC/member bodies/unique safe root/identity projections/version codec/minimum dependencies/labels/excluded developer paths and exact checksum sets passed.",
+  "reproduction": {
+    "freeze": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir511-cumulative-freeze-r04\\freeze.stdout.json",
+      "bytes": 315895,
+      "sha256": "ABA0005C7C7B54F361B69F3AB3D0827EFDC5FBBE72C908838B45BE0072FEB661"
+    },
+    "verify": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\mir511-cumulative-freeze-r04\\verify.stdout.json",
+      "bytes": 315895,
+      "sha256": "ABA0005C7C7B54F361B69F3AB3D0827EFDC5FBBE72C908838B45BE0072FEB661"
+    },
+    "both_parsed_exact_inventory": true,
+    "scope": "Root actual release.verify rebuild/byte-equality receipts reviewed; no reviewer build."
+  },
+  "applicability": {
+    "historical_early15": "Byte-identical to r03 and transitively r02/r01; retain F0180.18.47experimental and earlydata-only limits.",
+    "modern2": "Only runtimeworker member changes from r03 to203/93d; exact body equals committed Source. Data/credit/SDK/targets/controllers unchanged.",
+    "credit33": "CD4+C793 no-prepared-state route proof now confirmed by final package member deltas. Preserve original actual native pins; no new33executions claimed.",
+    "SIF": "Final data-stage inputs byte-identical to actual a8 SIFcombined dump; runtimeworker is not consumed in data stage. Separate independent data readback follows."
+  },
+  "remaining": "Mandatory postnative cases, exact finalCI/source/docs beta verdict and checked publication. No stable/Ferrum/physicalcargo/performance claim."
+}
