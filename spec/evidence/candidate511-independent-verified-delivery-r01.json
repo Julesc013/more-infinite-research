@@ -1,0 +1,53 @@
+{
+  "kind": "MIR511IndependentVerifiedDeliveryV1",
+  "reviewed_at_utc": "2026-11-09T09:55:33.960077+00:00",
+  "verdict": "PASS exact qualified GitHub beta delivery; stable remains open",
+  "release": {
+    "id": 438952550,
+    "url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.11",
+    "title": "MIR 5.0.11",
+    "tag": "v5.0.11",
+    "published": "2026-11-09T09:46:12Z",
+    "public": true,
+    "prerelease": true,
+    "mutable": true,
+    "latest_stable": "v4.7.3"
+  },
+  "main": "085df7ef6027f08cd2f4d43e348f1ea15f155168",
+  "annotated_tag_commit_exact": true,
+  "inventory": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir511-cumulative-assets-r04\\MIR5ReleaseAssetInventoryV1.json",
+    "bytes": 217537,
+    "sha256": "4CBBD915044002ACB2003F7B4293D5D190A7FEE8AD79443E039F545DC455CB5C"
+  },
+  "live_API": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate511-independent-delivery-r01\\live-release.json",
+    "bytes": 40637,
+    "sha256": "2F5CA7D7F8F4A337FE2AFAF77894122A54734D785EA0479500A9652ED825E3C0"
+  },
+  "checks": [
+    "All19 live names/labels/sizes/APIsha256 match inventory;17ZIP labels exact,2checksum labels intentionallyempty (APIemptystring matches plannednull).",
+    "All19 primarydistasset bytes equal frozenR04; exact21file set and notes/uploadtext equal taggedsource; publicbody equals approved strippednotes.",
+    "Original19 anonymous result hashes independently compared with inventory;2modernZIPs additionally downloaded freshly withoutAuthorization andverified.",
+    "Latest stable remainsv4.7.3. Root11olderrelease/22oldtag preservation proof retained; no older release changes by reviewer."
+  ],
+  "fresh_anonymous_modern": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate511-independent-delivery-r01\\more-infinite-research_5.0.20011.zip",
+      "bytes": 1006342,
+      "sha256": "78D673A8CA3360D0BF843447322CF4D3D6C453256A44CAB1748EE3128A08C5FC"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate511-independent-delivery-r01\\more-infinite-research_5.0.21011.zip",
+      "bytes": 1006768,
+      "sha256": "C3CB6462E3285DA222664D2174EAA16E63577BF9970804E410B127A43C773D14"
+    }
+  ],
+  "root_delivery_receipt": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\candidate511-publication-r01\\verified-delivery.json",
+    "bytes": 6615,
+    "sha256": "33F3D33C9424A385053BAC0AF428AC54659C6AB661B83940646259449088CBAC"
+  },
+  "limits": "Beta/notlatest only. No stable/fullFerrum/2.0worker/physicalcargo/performance or ModPortal claim.",
+  "reviewer_actions": "Read-only APIs/Git/hashes and2anonymous downloads; no Source/docs/release/nativechanges."
+}

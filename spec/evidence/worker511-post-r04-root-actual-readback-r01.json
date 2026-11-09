@@ -1,0 +1,81 @@
+{
+  "kind": "RootPost511ActualReadbackV1",
+  "status": "all16-native-processes-and-four-save-two-cold-endpoints-passed",
+  "source_tree": "93d30a248e71e5248eeb87072c27332fe68b9137",
+  "terminal_sha256": "35218833B312B2A3FCD4279701B98FCDFC3B7D9C5B67C80D1D01D7B94D43EA9A",
+  "scripted_precursors": true,
+  "distinct_ordinary_endpoint_labs": 6,
+  "cases": [
+    {
+      "id": "first-source",
+      "processes": 1,
+      "ordinary": {},
+      "bonus": 8,
+      "phase": "source-saved"
+    },
+    {
+      "id": "first-add",
+      "processes": 3,
+      "ordinary": {
+        "mir-post-sentinel": 1,
+        "worker-robots-storage-9": 1
+      },
+      "bonus": 9,
+      "phase": "endpoint-saved"
+    },
+    {
+      "id": "unchanged-source",
+      "processes": 1,
+      "ordinary": {},
+      "bonus": 10,
+      "phase": "source-saved"
+    },
+    {
+      "id": "unchanged-upgrade",
+      "processes": 3,
+      "ordinary": {
+        "worker-robots-storage-9": 1
+      },
+      "bonus": 11,
+      "phase": "endpoint-saved"
+    },
+    {
+      "id": "caps-seed",
+      "processes": 1,
+      "ordinary": {},
+      "bonus": 7,
+      "phase": "prepared-saved"
+    },
+    {
+      "id": "caps-provider",
+      "processes": 1,
+      "ordinary": {
+        "mir-worker-storage-preservation-4": 1
+      },
+      "bonus": 8,
+      "phase": "provider-saved"
+    },
+    {
+      "id": "caps-enable",
+      "processes": 3,
+      "ordinary": {
+        "mir-worker-storage-preservation-4": 1,
+        "mir-post-sentinel": 1
+      },
+      "bonus": 8,
+      "phase": "cap-saved"
+    },
+    {
+      "id": "caps-disable",
+      "processes": 3,
+      "ordinary": {
+        "mir-worker-storage-preservation-4": 1,
+        "mir-post-sentinel": 1,
+        "mir-post-sentinel-two": 1
+      },
+      "bonus": 8,
+      "phase": "disabled-saved"
+    }
+  ],
+  "release_qualification": false
+}
