@@ -9,6 +9,7 @@ from pathlib import Path
 import sys
 import unittest
 from native_credit_oracle import legacy_cannon_credit_rows, legacy_module_credit_rows, native_credit_carrier_rows
+from worker_storage_recovery_fixture import expected_private_worker_row
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -133,9 +134,18 @@ class SpaceExplorationPipelineTests(unittest.TestCase):
             else boundary["k2se_pre_engine_equality_check"]["prerequisites"]
         )
         legacy_names = {"mir-k2-imersite-staged-state-1", "mir-k2-imersite-continuation-state-4"}
+        worker_id = "mir-worker-storage-preservation-4"
+        worker = emitted[worker_id]
+        self.assertEqual(worker, expected_private_worker_row("automation-science-pack"))
+        raw = self.context["cases"][case]["raw"]
+        science_items = set(raw.get("item", {})) | set(raw.get("tool", {}))
+        for ingredient in worker["unit"]["ingredients"]:
+            self.assertIn(ingredient[0], science_items, "private worker science must already exist")
+        self.assertFalse(set(worker["prerequisites"]) - set(raw["technology"]) - set(emitted))
         legacy = {name: row for name, row in emitted.items() if name in legacy_names}
         public = {name: row for name, row in emitted.items()
-                  if not name.startswith(("mir-native-credit-", "mir-legacy-module-credit-", "mir-legacy-cannon-credit-")) and name not in legacy_names}
+                  if not name.startswith(("mir-native-credit-", "mir-legacy-module-credit-", "mir-legacy-cannon-credit-"))
+                  and name not in legacy_names and name != worker_id}
         carriers = {name: row for name, row in emitted.items() if name.startswith("mir-native-credit-")}
         module_holders = {name: row for name, row in emitted.items() if name.startswith("mir-legacy-module-credit-")}
         cannon_holders = {name: row for name, row in emitted.items() if name.startswith("mir-legacy-cannon-credit-")}
