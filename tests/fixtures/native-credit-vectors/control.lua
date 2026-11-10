@@ -67,6 +67,11 @@ end
 local function status(t)
   return {level=t.level,researched=t.researched,enabled=t.enabled,visible=t.visible_when_disabled,saved=t.saved_progress}
 end
+local function unchanged(state)
+  local actual={public=status(tech(C.public)),sentinel=status(tech(C.sentinel))}
+  require_ok(state.unchanged and equal(actual,state.unchanged),'unchanged native reference/sentinel state differs')
+  return actual
+end
 local function bonuses()
   local out={};local f=game.forces.player
   for _,name in ipairs(C.recipes)do require_ok(f.recipes[name],'recipe absent '..name);out[name]=f.recipes[name].productivity_bonus end
@@ -92,7 +97,8 @@ local function inventory(state)
   return state.lab.get_inventory(defines.inventory.lab_input)
 end
 local function work(state)
-  local out={main=status(tech(C.main)),queue=queue(),unit=unit(),ordinary=state.ordinary,inserted=copy(state.inserted),inventory={}}
+  local out={main=status(tech(C.main)),queue=queue(),unit=unit(),ordinary=state.ordinary,
+    unchanged=unchanged(state),inserted=copy(state.inserted),inventory={}}
   for _,name in ipairs(C.packs)do out.inventory[name]=inventory(state).get_item_count(name)end
   return out
 end
@@ -117,7 +123,7 @@ local function marker(kind,state,extra)
       setup='scripted entity placement/science supply/finite prerequisites only',native_earned=true}}))
 end
 local function save(state,phase,name)
-  state.lab.active=false;state.phase=phase;state.endpoint=frame(state);state.saved_tick=game.tick
+  state.lab.disabled_by_script=true;state.phase=phase;state.endpoint=frame(state);state.saved_tick=game.tick
   marker('save',state,{name=name});game.server_save(name)
 end
 local function feed(state)
@@ -128,7 +134,7 @@ local function feed(state)
     local amount=inv.insert{name=name,count=1000}
     state.inserted[name]=(state.inserted[name]or 0)+amount
   end
-  state.lab.active=true
+  state.lab.disabled_by_script=false
 end
 local function charged(state,completed_cost,partial)
   local inv=inventory(state);local first
@@ -188,6 +194,7 @@ end)
 script.on_event(defines.events.on_research_finished,function(event)
   local state=storage[KEY];local t=event.research
   if not state or not t or t.force~=game.forces.player then return end
+  unchanged(state)
   if t.name~=C.main then
     if t.name:find('mir-native-credit-',1,true)==1 then
       -- Native reconciliation may report its own level-copy events. These
@@ -204,10 +211,11 @@ script.on_event(defines.events.on_research_finished,function(event)
   require_ok(state.phase=='earn-F0'or state.phase=='earn-F1'or state.phase=='earn-F2','main completion outside ordinary phase')
   state.ordinary=state.ordinary+1
   require_ok(state.ordinary<=(state.phase=='earn-F0'and 2 or state.phase=='earn-F1'and 3 or 4),'duplicate ordinary completion')
-  state.lab.active=false;state.after_finish=state.phase;state.phase='deferred-finish';state.transition_tick=game.tick
+  state.lab.disabled_by_script=true;state.after_finish=state.phase;state.phase='deferred-finish';state.transition_tick=game.tick
 end)
 script.on_event(defines.events.on_tick,function()
   local state=storage[KEY];if not state then return end
+  if state.phase~='initial-pending'then unchanged(state)end
   if cold then
     if not cold_logged then
       require_ok(state.endpoint and game.tick==state.saved_tick+1,'cold is not one update from an immutable saved endpoint')
@@ -220,9 +228,13 @@ script.on_event(defines.events.on_tick,function()
   if state.phase=='initial-pending'then
     contracts('F0');totals(0,0);carrier_counts(0,0)
     require_ok(completed(tech(C.main))==0 and completed(tech(C.public))==0,'initial main/reference already earned')
+    require_ok(tech(C.sentinel).level==1 and tech(C.sentinel).researched==false
+      and tech(C.sentinel).saved_progress==0,'initial sentinel already invested')
+    -- One genuine F0 baseline, never replaced at later configuration/saves.
+    state.unchanged={public=status(tech(C.public)),sentinel=status(tech(C.sentinel))}
     local s=game.surfaces[1];state.lab=s.create_entity{name=C.lab,position={0,0},force=game.forces.player}
     require_ok(state.lab and state.lab.valid~=false,'could not create actual native lab')
-    state.lab.active=false;state.phase='administrative-prerequisites'
+    state.lab.disabled_by_script=true;state.phase='administrative-prerequisites'
     for _,p in pairs(tech(C.main).prerequisites)do
       require_ok(p.name~=C.main and not p.name:find('mir-native-credit',1,true),'invalid prerequisite setup')
       p.research_recursive()
@@ -241,7 +253,7 @@ script.on_event(defines.events.on_tick,function()
     end
   elseif state.phase=='deferred-finish'then
     if game.tick<=state.transition_tick then return end
-    require_ok(state.lab.active==false and completed(tech(C.main))==state.ordinary,'native completion/deferred lab stop differs')
+    require_ok(state.lab.disabled_by_script==true and completed(tech(C.main))==state.ordinary,'native completion/deferred lab stop differs')
     contracts(selected())
     if state.after_finish=='earn-F0'then
       totals(0,state.ordinary*.1);carrier_counts(0,0)
@@ -257,7 +269,7 @@ script.on_event(defines.events.on_tick,function()
     require_ok(q.current==C.main and #q.names==2 and q.names[2]==C.sentinel,'pending ordered queue differs')
     if q.progress>=.2 then
       require_ok(q.progress<.3 and state.ordinary==3,'pending partial/ordinary count differs')
-      state.lab.active=false;charged(state,56000,true);totals(.1,.3)
+      state.lab.disabled_by_script=true;charged(state,56000,true);totals(.1,.3)
       save(state,'f1-pending-saved','native-vector-f1-pending')
     else feed(state)end
   elseif state.phase=='earn-F0'or state.phase=='earn-F1'or state.phase=='earn-F2'then feed(state)

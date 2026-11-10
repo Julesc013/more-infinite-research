@@ -74,7 +74,13 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
           local inv={counts={}}
           inv.insert=function(s)local n=math.min(s.count,1000-(inv.counts[s.name]or 0));inv.counts[s.name]=(inv.counts[s.name]or 0)+n;return n end
           inv.get_item_count=function(name)return inv.counts[name]or 0 end
-          local lab={valid=true,active=false};lab.get_inventory=function()return inv end
+          local lab=setmetatable({valid=true,disabled_by_script=true},{
+            __index=function(t,k)if k=='active'then return not t.disabled_by_script end end,
+            __newindex=function(t,k,v)
+              if k=='active'then error('native LuaEntity.active is read-only')end
+              rawset(t,k,v)
+            end})
+          lab.get_inventory=function()return inv end
           local game={tick=0,forces={player=f},difficulty_settings={technology_price_multiplier=1},surfaces={{}}}
           game.surfaces[1].create_entity=function(v)assert(v.name=='mir-vector-lab');return lab end
           game.server_save=function(name)saves[#saves+1]={name=name,tick=game.tick}end
@@ -133,7 +139,7 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
           assert(loadfile(fixture_path..'/control.lua','t',env))()
           local function step()
             game.tick=game.tick+1;callbacks.tick()
-            if lab.active and f.current_research==main then
+            if not lab.disabled_by_script and f.current_research==main then
               local cost=main.research_unit_count
               local n=math.min(100,cost*(1-f.research_progress))
               if opponent~='no-consumption'then for _,name in ipairs(C.packs)do assert(inv.counts[name]>=n);inv.counts[name]=inv.counts[name]-n end end
@@ -183,6 +189,8 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
             -- A native MIR level setter may emit a scripted carrier event;
             -- it must remain separate from all ordinary earnings.
             callbacks.finished{research=f.technologies[C.carrier('scrap-recycling','positive')],by_script=true}
+            if opponent=='public-flag-drift-config'then f.technologies[C.public].visible_when_disabled=true end
+            if opponent=='sentinel-flag-drift-config'then f.technologies[C.sentinel].visible_when_disabled=true end
             if opponent=='wrong-last-recipe'then f.recipes['mir-vector-synthetic-scrap-95'].productivity_bonus=99 end
             if opponent=='wrong-negative'and version=='0.2.0'then offset('scrap-recycling',-1)end
             if opponent=='lost-source-bonus'then bonus(0,.1)end
@@ -190,7 +198,10 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
             step()
           end
           configure('0.2.0','0.1.0');until_phase('f1-negative-saved');cold_read();cold_read()
-          commands_map['mir-native-credit-vectors']{parameter='continue'};until_phase('f1-pending-saved')
+          commands_map['mir-native-credit-vectors']{parameter='continue'}
+          if opponent=='public-flag-drift-ordinary'then f.technologies[C.public].visible_when_disabled=true end
+          if opponent=='sentinel-flag-drift-ordinary'then f.technologies[C.sentinel].visible_when_disabled=true end
+          until_phase('f1-pending-saved')
           if opponent=='duplicate'then callbacks.finished{research=main,by_script=false}end
           configure('0.3.0','0.2.0');until_phase('f2-positive-saved');cold_read();cold_read()
           commands_map['mir-native-credit-vectors']{parameter='continue'};until_phase('f2-final-saved');cold_read();cold_read()
@@ -274,6 +285,15 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
                 self.setUp()
                 self.assertRaisesRegex(LuaError, refusal, self.story, opponent=opponent)
 
+    def test_unchanged_public_reference_and_sentinel_flags_guard_configuration_and_ordinary_work(self):
+        for target in ("f200", "f210"):
+            for opponent in ("public-flag-drift-config", "sentinel-flag-drift-config",
+                             "public-flag-drift-ordinary", "sentinel-flag-drift-ordinary"):
+                with self.subTest(target=target, opponent=opponent):
+                    self.setUp()
+                    self.assertRaisesRegex(LuaError, "unchanged native reference/sentinel state", self.story,
+                                           target=target, opponent=opponent)
+
     def test_real_complete_credit_module_accepts_the_three_recipe_story(self):
         # Real module + real saved-ledger lifecycle; native objects remain host
         # doubles. The engine fixture itself never imports this runtime.
@@ -336,11 +356,12 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
 
     def test_actor_never_sets_native_rewards_or_partial_work(self):
         actor = (FIXTURE / "control.lua").read_text()
-        self.assertIsNone(re.search(r"\.(?:level|researched|saved_progress|research_progress|productivity_bonus)\s*=(?!=)", actor))
+        self.assertIsNone(re.search(r"\.(?:level|researched|saved_progress|research_progress|productivity_bonus|active)\s*=(?!=)", actor))
         for forbidden in ("reset_technology_effects", 'require("runtime.'):
             self.assertNotIn(forbidden, actor)
         self.assertIn("p.research_recursive()", actor)
         self.assertIn("game.tick<=state.transition_tick", actor)
+        self.assertIn("state.lab.disabled_by_script==true", actor)
 
 
 if __name__ == "__main__":
