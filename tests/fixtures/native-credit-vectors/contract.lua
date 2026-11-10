@@ -2,7 +2,7 @@
 local M = {
   mod="mir-fixture-native-credit-vectors", main="recipe-prod-research_low_density_structure-1",
   public="scrap-recycling-productivity", sentinel="mir-vector-sentinel",
-  lab="mir-vector-lab", formula="8000*2^(L-1)", seconds=60, ticks=3600,
+  lab="mir-vector-lab", lab_speed=115200, formula="8000*2^(L-1)", seconds=60, ticks=3600,
   packs={"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"},
   singles={"low-density-structure","casting-low-density-structure"},
 }

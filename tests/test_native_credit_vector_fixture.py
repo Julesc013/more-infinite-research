@@ -70,7 +70,10 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
           if target=='f210' then mods.recycler=base end
           if opponent=='wrong-engine'then mods.base='2.1.24'end
           if opponent=='wrong-mir'then mods['more-infinite-research']='5.0.21013'end
-          local f={technologies={},recipes={},research_progress=0,index=1,name='player'}
+          local f={technologies={},recipes={},research_progress=0,index=1,name='player',
+            laboratory_speed_modifier=0,laboratory_productivity_bonus=0}
+          if opponent=='nonzero-lab-speed'then f.laboratory_speed_modifier=.1 end
+          if opponent=='nonzero-lab-productivity'then f.laboratory_productivity_bonus=.1 end
           local inv={counts={}}
           inv.insert=function(s)local n=math.min(s.count,1000-(inv.counts[s.name]or 0));inv.counts[s.name]=(inv.counts[s.name]or 0)+n;return n end
           inv.get_item_count=function(name)return inv.counts[name]or 0 end
@@ -81,6 +84,10 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
               rawset(t,k,v)
             end})
           lab.get_inventory=function()return inv end
+          lab.name=C.lab
+          lab.prototype={get_researching_speed=function(quality)
+            assert(quality=='normal');return C.lab_speed+(opponent=='fractional-lab-rate'and 1 or 0)
+          end}
           local game={tick=0,forces={player=f},difficulty_settings={technology_price_multiplier=1},surfaces={{}}}
           game.surfaces[1].create_entity=function(v)assert(v.name=='mir-vector-lab');return lab end
           game.server_save=function(name)saves[#saves+1]={name=name,tick=game.tick}end
@@ -234,7 +241,9 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
               assert(#t[C.carrier('scrap-recycling','negative')].effects==97)
               assert(#t['processing-unit-productivity'].effects==2)
               assert(t[C.main].unit.count_formula=='8000*2^(L-1)'and t[C.main].unit.time==60)
-              assert(#data.raw.lab['mir-vector-lab'].inputs==4 and data.raw.lab['mir-vector-lab'].researching_speed==100001)
+              assert(#data.raw.lab['mir-vector-lab'].inputs==4 and data.raw.lab['mir-vector-lab'].researching_speed==115200)
+              assert(115200/3600==32)
+              for level=1,4 do assert((8000*2^(level-1))%32==0)end
             ''')
             self.assertEqual(size, len(self.lua.globals().data.raw.technology[self.lua.globals().C.main].effects))
 
@@ -274,6 +283,14 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
                 self.setUp()
                 self.assertRaisesRegex(LuaError, "MIR changed native pending/queue/unit/flags frame",
                                        self.story, target, "retired-main-flag-drift")
+
+    def test_whole_science_quantum_rejects_fractional_rate_and_lab_modifiers(self):
+        for target in ("f200", "f210"):
+            for opponent in ("fractional-lab-rate", "nonzero-lab-speed", "nonzero-lab-productivity"):
+                with self.subTest(target=target, opponent=opponent):
+                    self.setUp()
+                    message = "whole science quantum" if opponent == "fractional-lab-rate" else "lab modifiers"
+                    self.assertRaisesRegex(LuaError, message, self.story, target, opponent)
 
     def test_scripted_unconsumed_duplicate_and_unpaid_recipe_opponents(self):
         opponents = {"scripted": "main completion was scripted", "no-consumption": "actual science consumption",

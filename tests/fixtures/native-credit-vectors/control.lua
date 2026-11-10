@@ -20,6 +20,8 @@ local function selected()
   local phase=C.phase(script.active_mods)
   require_ok(settings.startup['mir-prefer-this-mod-for-competing-techs'].value==true,'prefer MIR differs')
   require_ok(game.difficulty_settings.technology_price_multiplier==1,'map price must be one')
+  require_ok(game.forces.player.laboratory_speed_modifier==0
+    and game.forces.player.laboratory_productivity_bonus==0,'force lab modifiers must be zero')
   return phase
 end
 local function vector(t,names,sign)
@@ -140,6 +142,17 @@ local function charged(state,completed_cost,partial)
   local inv=inventory(state);local first
   for _,name in ipairs(C.packs)do
     local spent=state.inserted[name]-inv.get_item_count(name)
+    if not (spent>=completed_cost-1 and (partial or spent<=completed_cost+1))then
+      local f=game.forces.player;local t=tech(C.main)
+      marker('science-charge-refusal',state,{name=name,completed_cost=completed_cost,partial=partial,
+        spent=spent,inserted=state.inserted[name],inventory_count=inv.get_item_count(name),
+        laboratory_productivity_bonus=f.laboratory_productivity_bonus,laboratory_speed_modifier=f.laboratory_speed_modifier,
+        main_level=t.level,main_researched=t.researched,main_completed=completed(t),
+        current_main_unit=unit(),science=copy(t.research_unit_ingredients),
+        predicted_next_paid_level=completed(t)+1,predicted_next_unmultiplied_count=8000*2^completed(t),
+        map_price_multiplier=game.difficulty_settings.technology_price_multiplier,
+        lab_name=state.lab.name,prototype_lab_researching_speed=state.lab.prototype.get_researching_speed('normal')})
+    end
     require_ok(spent>=completed_cost-1 and (partial or spent<=completed_cost+1),'actual science consumption differs '..name)
     if first then require_ok(math.abs(spent-first)<=1,'science pack charges disagree')else first=spent end
   end
@@ -234,12 +247,17 @@ script.on_event(defines.events.on_tick,function()
     local s=game.surfaces[1];state.lab=s.create_entity{name=C.lab,position={0,0},force=game.forces.player}
     require_ok(state.lab and state.lab.valid~=false,'could not create actual native lab')
     state.lab.disabled_by_script=true;state.phase='administrative-prerequisites'
+    local lab_speed=state.lab.prototype.get_researching_speed('normal')
+    require_ok(lab_speed==C.lab_speed and lab_speed/C.ticks==32,'exact whole science quantum differs')
     for _,p in pairs(tech(C.main).prerequisites)do
       require_ok(p.name~=C.main and not p.name:find('mir-native-credit',1,true),'invalid prerequisite setup')
       p.research_recursive()
     end
     contracts('F0');totals(0,0);require_ok(completed(tech(C.main))==0,'prerequisite setup granted main')
-    state.phase='earn-F0';enqueue(state,false);marker('zero-basis-ready',state)
+    state.phase='earn-F0';enqueue(state,false)
+    marker('zero-basis-ready',state,{lab_researching_speed=lab_speed,science_units_per_tick=32,
+      laboratory_speed_modifier=game.forces.player.laboratory_speed_modifier,
+      laboratory_productivity_bonus=game.forces.player.laboratory_productivity_bonus})
   elseif state.phase=='F1-entry-pending'or state.phase=='F2-entry-pending'then
     local phase=selected();contracts(phase)
     local actual_work=work(state)
