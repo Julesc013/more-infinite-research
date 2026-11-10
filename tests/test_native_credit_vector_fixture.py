@@ -185,12 +185,13 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
             if opponent=='lost-pending'and version=='0.3.0'then f.research_progress=0 end
             callbacks.config{mod_changes={[C.mod]={old_version=old,new_version=version}}}
             if version=='0.2.0'then offset('scrap-recycling',-2);bonus(0,.2)
-            else offset('scrap-recycling',1);for _,r in ipairs(C.singles)do offset(r,3)end;bonus(.1,.3);main.enabled=false end
+            else offset('scrap-recycling',1);for _,r in ipairs(C.singles)do offset(r,3)end;bonus(.1,.3)end
             -- A native MIR level setter may emit a scripted carrier event;
             -- it must remain separate from all ordinary earnings.
             callbacks.finished{research=f.technologies[C.carrier('scrap-recycling','positive')],by_script=true}
             if opponent=='public-flag-drift-config'then f.technologies[C.public].visible_when_disabled=true end
             if opponent=='sentinel-flag-drift-config'then f.technologies[C.sentinel].visible_when_disabled=true end
+            if opponent=='retired-main-flag-drift'and version=='0.3.0'then main.enabled=false end
             if opponent=='wrong-last-recipe'then f.recipes['mir-vector-synthetic-scrap-95'].productivity_bonus=99 end
             if opponent=='wrong-negative'and version=='0.2.0'then offset('scrap-recycling',-1)end
             if opponent=='lost-source-bonus'then bonus(0,.1)end
@@ -266,6 +267,13 @@ class NativeCreditVectorFixtureControls(unittest.TestCase):
             for mutation in mutations:
                 with self.subTest(target=target, mutation=mutation):
                     self.assertRaises(LuaError, phase, self.lua.table_from(active | mutation))
+
+    def test_retained_private_main_must_preserve_its_actual_force_flag(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                self.setUp()
+                self.assertRaisesRegex(LuaError, "MIR changed native pending/queue/unit/flags frame",
+                                       self.story, target, "retired-main-flag-drift")
 
     def test_scripted_unconsumed_duplicate_and_unpaid_recipe_opponents(self):
         opponents = {"scripted": "main completion was scripted", "no-consumption": "actual science consumption",

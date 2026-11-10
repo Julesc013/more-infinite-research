@@ -174,10 +174,9 @@ script.on_configuration_changed(function(event)
   expected.bonuses=nil;expected.technologies=nil;expected.prototypes=nil
   require_ok(equal(before,expected),'pre-MIR paid/pending frame changed')
   state.entry=frame(state);state.entry_work=copy(before)
-  -- Existing lifecycle policy disables an authored prototype whose default
-  -- became false. That declared retirement flag is independent of earnings;
-  -- all remaining work and flags must match the raw pre-MIR frame exactly.
-  if phase=='F2'then state.entry_work.main.enabled=false end
+  -- This retained native-owner holder is outside authored-generated cap
+  -- declarations. Keep its actual incoming force flags and paid queue exact;
+  -- the hidden/disabled prototype does not authorize changing those flags.
   state.phase=phase..'-entry-pending';state.deadline=game.tick+60000
   marker('pre-MIR-configuration-entry',state)
 end)
@@ -243,7 +242,9 @@ script.on_event(defines.events.on_tick,function()
     state.phase='earn-F0';enqueue(state,false);marker('zero-basis-ready',state)
   elseif state.phase=='F1-entry-pending'or state.phase=='F2-entry-pending'then
     local phase=selected();contracts(phase)
-    require_ok(equal(work(state),state.entry_work),'MIR changed native pending/queue/unit/flags frame')
+    local actual_work=work(state)
+    if not equal(actual_work,state.entry_work)then marker('work-mismatch',state,{expected=state.entry_work,actual=actual_work})end
+    require_ok(equal(actual_work,state.entry_work),'MIR changed native pending/queue/unit/flags frame')
     if phase=='F1'then
       totals(0,.2);carrier_counts(-2,0)
       save(state,'f1-negative-saved','native-vector-f1-negative')
