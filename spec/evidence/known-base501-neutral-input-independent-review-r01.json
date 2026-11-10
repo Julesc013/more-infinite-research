@@ -1,0 +1,37 @@
+{
+  "kind": "KnownBase501SuccessorNeutralScenarioInputIndependentReviewV1",
+  "reviewed_at_utc": "2026-11-10T04:08:04.260174+00:00",
+  "verdict": "GO this zero-engine input disposition only; successor fixture/owner/Compose/stage admission remains separate.",
+  "pins": {
+    "protected_source": "D38CD57B0C2310569DD3039AD9109EB7F6F19930E27BA73A8E86E9869F000CA2",
+    "derivative": "1FD23C73DFBCFB10F5D1D1F6808BDDA10B0E20F46137BBBB42649DD10B532AF7",
+    "derivative_bytes": 2611126,
+    "baseline": "78F19898C18458BB97F95F6677FC0A4477C3FC37D4E6BEA465E8A8634B1C0D2D",
+    "baseline_bytes": 202345,
+    "neutral_control": "70B2039F46EB0325D74A6219DD72186C6563DFD775884DD701DAA64E12A27BB0",
+    "member_custody": "196BACCB9DF8BA432D2B10FD487711C1BE7F7D73CB4F08D78510CD9048098EC4",
+    "preparation_script": "EF262724AD056871FCA3E374595AEB20DFBF1202A255B97A2C810D987F844153"
+  },
+  "independent_checks": [
+    "Both59-member ZIPs pass complete CRC; same member names and one changed body only: known-base501-pure-normalized/control.lua. All58 other member bodies match recorded hashes and source byte-for-byte,including level-init.dat,level.dat0,script.dat and metadata.",
+    "Replacement is exactly original48-byte require(__base__/script/freeplay/control.lua) body from protected historical0C783 control; separate neutral-control.lua matches. This removes the old501-only observational callback rather than widening its target authority. Existing native/script state is not reconstructed or edited.",
+    "SourceD38/2663230 remains exact and physically distinct from derivative; both nlink1. Original accepted normalization and original0C783 retain their own immutable identities.",
+    "Baseline source_save and source_terminal byte hashes match accepted native artifacts. Its marker equals the canonical server.log pure-saved JSON and exact terminal marker,including full875 effective settings,observed clock16,allnative frames,event and explicit scripted-precursor/paid-time limits.",
+    "Preparation script reads protected source and accepted marker,creates a new output exclusively,copies all ZipInfo/member bodies except originalcontrol,and verifies one change/CRC/originalhash. No game,Source or MIR ledger write is introduced."
+  ],
+  "scope_limits": [
+    "This derivative is deliberately edited observer-input custody,not an untouched engine-produced save. Its native/script payload identity does not by itself qualify target callbacks/research/save/colds.",
+    "The baseline event startup_changed=false belongs to same501 helper removal. Future501-to512 addition must supply its OWN actual false callback plus875 effective readback; do not replay the saved event as evidence.",
+    "Future fixture must bind accepted normalized fractions/clock16/actual normal units and native bonuses/flags,not old0.42/0.27/1. Retain Base authored-generated plastic post-MIR forcefalse policy; no SA retained-main exemption.",
+    "Root owner-preparation draft and pending fixture were not admitted here. No target engine,package,reporter or stable acceptance."
+  ],
+  "operations": {
+    "native": 0,
+    "builds": 0,
+    "host_tests": 0,
+    "Compose": 0,
+    "Source_controller_input_library_mutations": 0,
+    "private_repo_mutations": 0,
+    "only_new_file": "this receipt"
+  }
+}
