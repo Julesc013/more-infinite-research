@@ -1,0 +1,213 @@
+{
+  "kind": "MIRVectorF200WholeQuantumIndependentActualReviewV1",
+  "reviewed_at_utc": "2026-11-10T02:48:40.013742+00:00",
+  "verdict": "PASS only exact F200115200 synthetic whole97-vector F0/F1/F2 mechanism with four ordinary completions and four governed cold loads",
+  "tuple": {
+    "packet_sha256": "B9134EC88DB2A565A70601735B6A11363E61D19FD248C5760BEF3D8789D1F6BB",
+    "owner_sha256": "5DD293B27FCE1F9C835B4AF63B132328027C925CD45C9A98808BFDFD51635C3F",
+    "composition_sha256": "B323B6D30B281437AA3F9309C36605E61C0675C18F7C694F450FF4E35AC1C410",
+    "admission_sha256": "3FE68F9F7595FE57D3AA174505FD0C05EDE42E2BBAD3746E08BC10A0B5776117",
+    "terminal_sha256": "790A2C8DEB87FA0C0D7FA97A0BBF7AA75045BEEE44038579048A9CF2EE4981E3",
+    "harness": "371e26b2a08cd76748a85dfe24c50e36e6c7404d",
+    "Source": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+    "player_zip": "0C2F1D1FC3EBC65ABED34A449D060939DF0A3E46D3BB19211306D9F1BBB9478E",
+    "engine": "2.0.77/D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "actor": "29B788DA075422089D157C5467E5702D55311345417A0BFC3B1C8A03E350F92F"
+  },
+  "actual_processes": [
+    {
+      "stage": "f0",
+      "role": "server",
+      "pid": 50484,
+      "exit_code": -1
+    },
+    {
+      "stage": "f1-negative",
+      "role": "server",
+      "pid": 2576,
+      "exit_code": -1
+    },
+    {
+      "stage": "f1-negative",
+      "role": "cold1",
+      "pid": 276,
+      "exit_code": 0
+    },
+    {
+      "stage": "f1-negative",
+      "role": "cold2",
+      "pid": 18848,
+      "exit_code": 0
+    },
+    {
+      "stage": "f1-resume",
+      "role": "server",
+      "pid": 39704,
+      "exit_code": -1
+    },
+    {
+      "stage": "f2",
+      "role": "server",
+      "pid": 40360,
+      "exit_code": -1
+    },
+    {
+      "stage": "f2",
+      "role": "cold1",
+      "pid": 40972,
+      "exit_code": 0
+    },
+    {
+      "stage": "f2",
+      "role": "cold2",
+      "pid": 35724,
+      "exit_code": 0
+    }
+  ],
+  "exit_scope": "All four servers are trusted owned predicate stops after exact marker+Savingfinished+closed actualsave, not natural0. All four separate one-update cold processes exit naturally0. All eight actual ledgers are distinct, passed/no timeout; no outer-wrapper exit substituted.",
+  "actual_checkpoints": [
+    {
+      "kind": "zero-basis-ready",
+      "tick": 0,
+      "ordinary": 0,
+      "normal_lab_prototype_speed": 115200,
+      "configured_science_units_per_tick": 32,
+      "force_lab_speed_modifier": 0,
+      "force_lab_productivity_bonus": 0,
+      "native_main_reference_carriers_and_bonuses": "zero genuinely uninvested fresh basis; scripted finite prerequisites not counted"
+    },
+    {
+      "kind": "f0-saved",
+      "tick": 750,
+      "ordinary": 2,
+      "next_main_level": 3,
+      "spent_each_of_four_packs": 24000,
+      "all97_Scrap_bonus": 0,
+      "LDS_casting_bonus_actual": 0.20000000298023224
+    },
+    {
+      "kind": "f1-negative-saved",
+      "tick": 751,
+      "ordinary": 2,
+      "negative_Scrap_completed": 2,
+      "positive_Scrap_completed": 0,
+      "LDS_casting_carrier_completed": 0,
+      "all97_Scrap_bonus": 0,
+      "LDS_casting_bonus_actual": 0.20000000298023224,
+      "spent_each_pack": 24000,
+      "two_cold_fullframes_equal": true,
+      "cold_tick_each": 752
+    },
+    {
+      "kind": "f1-pending-saved",
+      "tick": 2173,
+      "ordinary": 3,
+      "next_main_level": 4,
+      "current": "recipe-prod-research_low_density_structure-1",
+      "queue": [
+        "recipe-prod-research_low_density_structure-1",
+        "mir-vector-sentinel"
+      ],
+      "native_lab_earned_progress": 0.2,
+      "spent_each_pack_at_pending_snapshot": 68800,
+      "all97_Scrap_bonus_actual": 0.10000000149011612,
+      "LDS_casting_bonus_actual": 0.30000001192092896,
+      "third_completed_charge": "Unchanged56000±1 check executes before starting the new partial and passed. No separate56000 raw scalar marker exists;68800 is the actual pending snapshot, not relabelled56000."
+    },
+    {
+      "kind": "f2-positive-saved",
+      "tick": 2174,
+      "ordinary": 3,
+      "preMIR_and_postMIR_main_work_flags": "Exactly equal incoming level4/false/enabledtrue/visiblefalse/saved0,64000unit/formula/time,queue and.2progress/inventory/inserted; hidden+disabled PROTOTYPE remains strict.",
+      "positive_Scrap_completed": 1,
+      "negative_Scrap_completed": 0,
+      "positive_LDS_casting_completed": 3,
+      "negative_LDS_casting_completed": 0,
+      "all97_Scrap_bonus_actual": 0.10000000149011612,
+      "LDS_casting_bonus_actual": 0.30000001192092896
+    },
+    {
+      "kind": "f2-final-saved",
+      "tick": 3789,
+      "ordinary": 4,
+      "new_F2_ordinary": 1,
+      "next_main_level": 5,
+      "main_force_enabled": true,
+      "main_prototype_hidden": true,
+      "main_prototype_enabled": false,
+      "current": "mir-vector-sentinel",
+      "queue": [
+        "mir-vector-sentinel"
+      ],
+      "progress": 0,
+      "spent_each_of_four_packs": 120000,
+      "positive_Scrap_completed": 2,
+      "negative_Scrap_completed": 0,
+      "positive_LDS_casting_completed": 4,
+      "negative_LDS_casting_completed": 0,
+      "all97_Scrap_bonus_actual": 0.20000000298023224,
+      "LDS_casting_bonus_actual": 0.4000000059604645,
+      "two_cold_fullframes_equal": true
+    }
+  ],
+  "command_and_setup_custody": "Exactly one server-only continue in F1resume and one in F2, both at declared ready phases. F2 distinct positivecheckpoint closed/hash-captured before command and remains unchanged afterward. Four ordinary by_script=false main completions; no direct scenario level/progress/bonus setters. Entity/void-lab/finite-prerequisite/science setup labelled administrative. Server on_load cold marker in F1resume is not counted as an additional governed cold process.",
+  "protected_saves": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit-vector512-native-r01-controller\\f200-r04\\protected\\f0.zip",
+      "exists": true,
+      "bytes": 865192,
+      "sha256": "A05BCBC09067473357C8184D0AE5AD18D7D61A6C344A48F8D2E27A4EAA423743"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit-vector512-native-r01-controller\\f200-r04\\protected\\f1-negative.zip",
+      "exists": true,
+      "bytes": 869081,
+      "sha256": "3F222480E61DFDE89B3B9446B5339AC48DB5A284B44B211B59B05DE2EC5D549A"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit-vector512-native-r01-controller\\f200-r04\\protected\\f1-resume.zip",
+      "exists": true,
+      "bytes": 869802,
+      "sha256": "F233B8E3AFA56F748BB30B6675CA9072A8114CA7C096458640AE2B8171B4FD2B"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-credit-vector512-native-r01-controller\\f200-r04\\protected\\f2.zip",
+      "exists": true,
+      "bytes": 868451,
+      "sha256": "150330B58B3158A0F147C6011800ED050F97BC638B9AFBC3193AE26D296E2FC8"
+    }
+  ],
+  "positive_checkpoint": {
+    "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-credit-vector-bg-r01\\build\\tmp\\native-vector-f200-f2-r04-native\\write-data\\saves\\native-vector-f2-positive.zip",
+    "exists": true,
+    "bytes": 868694,
+    "sha256": "C0F8C5D71D678EAA7F571806EFA5C95BE74E8CD722918697B31F9D8B4FD6C159"
+  },
+  "independent_verification": {
+    "original_to_primary_raw_members_rehashed": 75,
+    "fixed_input_hashes_rechecked": 20,
+    "all_eight_exact_six_mod_loaded_and_marker_tuples": true,
+    "all_canonical_logs_no_fatal_errors": true,
+    "complete97_reference_positive_negative_effect_vectors_exact_binary32_values": true,
+    "F200_absent_effect_hidden_field_not_fabricated": true,
+    "all99_recipe_totals_and_expected_signed_counts_verified": true,
+    "accepted_carrier_hidden_disabled_force_and_prototype_flags": true,
+    "public_reference_sentinel_full_status_baseline_unchanged": true,
+    "native_formula8000_times2_power_and3600ticks_unchanged": true,
+    "negative_two_cold_and_final_two_cold_entire_frames_equal_saved": true,
+    "four_protected_and_positivecheckpoint_fullZIP_CRC_embedded29B_actor": true,
+    "actual_produced_parent_copies_and_originals_hashes_unchanged": true,
+    "final_save_immutable_sha256": "150330B58B3158A0F147C6011800ED050F97BC638B9AFBC3193AE26D296E2FC8",
+    "positive_checkpoint_immutable_sha256": "C0F8C5D71D678EAA7F571806EFA5C95BE74E8CD722918697B31F9D8B4FD6C159",
+    "eight_distinct_ledger_PIDs_match_terminal": true,
+    "all_four_recorded_restorations_and_live_prior_controls_MIRarchives_match": true,
+    "factorio_processes_at_closed_terminal": 0
+  },
+  "history_and_limits": [
+    "This is the NEW115200-rate input. OriginalF200100001/PID34420 adverse and23328diagnostic/PID33940 remain retained; this pass does not establish their unique fractional/refill/engine cause or change native cost/tolerance.",
+    "Existing F210100001 accepted case remains separately bound, not relabelled115200. Player Source47537 unchanged throughout these fixture revisions.",
+    "Synthetic mechanism uses real45-line Cerys excerpt plus95synthetic aliases; not full Cerys or unknown reporter profile/save reproduction.",
+    "Fresh known zero basis and staged masks only, not automatic ambiguous historical paid-vector repair. No physical-cargo/UI/performance/stable or release verdict.",
+    "Reviewer launched no engine/Compose/build/CI and changed no Source/test/controller/library/input."
+  ]
+}
