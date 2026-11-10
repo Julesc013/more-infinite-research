@@ -56,9 +56,10 @@ class WorkerStorageProviderNativeTests(unittest.TestCase):
               f.rows[ids.private]=row(ids.private,n,({3417,2278,1518,675})[i],true,false,i==2 and .27 or i==3 and .23000000000000004 or 0)
               f.rows[ids.main]=row(ids.main,4,1000,true,false,0,n>=5)
               f.rows[ids.tail]=row(ids.tail,4,675,false,false)
-              for level=5,8 do local id="worker-robots-storage-"..level
-                f.rows[id]=row(id,level,({2000,4000,8000,16000})[level-4],true,false)
+              for level=5,7 do local id="worker-robots-storage-"..level
+                f.rows[id]=row(id,level,({2000,4000,8000})[level-4],true,false)
               end
+              f.rows["worker-robots-storage-8"]=row("worker-robots-storage-8",8,3417,true,false)
             end
             return out
           end
@@ -66,7 +67,10 @@ class WorkerStorageProviderNativeTests(unittest.TestCase):
             actual=actual or expected();world_frames=actual
             actor.frames=function()return deep(world_frames)end
             script.active_mods.WorkerRobotCargoSizeResearch="1.0.0"
-            settings={startup={["worker-robot-cargo-size-max-level"]={value=7},["worker-robot-cargo-size-infinite"]={value=false}}}
+            settings={startup={["worker-robot-cargo-size-max-level"]={value=7},["worker-robot-cargo-size-infinite"]={value=false},
+              ["mir-cost-base-worker-robots-storage"]={value=200},
+              ["mir-cost-linear-increment-worker-robots-storage"]={value=0},
+              ["mir-cost-growth-worker-robots-storage"]={value=1.5}}}
             inventory={};insert_calls=0
             local input={get_item_count=function(n)return inventory[n]or 0 end,
               insert=function(stack)insert_calls=insert_calls+1;inventory[stack.name]=(inventory[stack.name]or 0)+stack.count;return stack.count end}
@@ -78,7 +82,8 @@ class WorkerStorageProviderNativeTests(unittest.TestCase):
             prototypes={technology={},get_history=function(_,id)return {created=id:match("^worker%-robots%-storage%-[4-7]$")
               and "WorkerRobotCargoSizeResearch"or "more-infinite-research"}end}
             for _,f in ipairs(actual)do
-              local technologies={};game.forces[f.name]={name=f.name,technologies=technologies,worker_robots_storage_bonus=f.bonus}
+              local technologies={};game.forces[f.name]={name=f.name,technologies=technologies,worker_robots_storage_bonus=f.bonus,
+                laboratory_speed_modifier=0,laboratory_productivity_bonus=0}
               for id,r in pairs(f.rows)do
                 technologies[id]={name=id,level=r.level,researched=r.researched,enabled=r.enabled,
                   visible_when_disabled=r.visible,saved_progress=r.saved,research_unit_count=r.count}
@@ -91,6 +96,7 @@ class WorkerStorageProviderNativeTests(unittest.TestCase):
             local ingredients={};for _,p in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack",
               "production-science-pack","utility-science-pack","space-science-pack"})do ingredients[#ingredients+1]={name=p,amount=1}end
             prototypes.technology["worker-robots-storage-8"].research_unit_ingredients=ingredients
+            prototypes.technology["worker-robots-storage-8"].research_unit_count_formula="3417.1875*1.5^(L-8)"
             storage={worker_storage_default_native_fixture={phase="upgrade-saved",mode="upgrade",ordinary={},
               administrative={},inserted={},closed=source(),lab=lab}}
             logs={};written={};last_body=nil
@@ -260,16 +266,63 @@ class WorkerStorageProviderNativeTests(unittest.TestCase):
 
     def test_science_predictions_are_strict_independent_arithmetic(self):
         self.assertEqual(1984, math.ceil(3417 * (1 - .42000000000000004) / 32) * 32)
-        self.assertEqual(16000, 1000 * 2 ** (8 - 4))
-        self.assertEqual(500, 16000 // 32)
+        self.assertEqual(3417, math.floor(200 * 1.5 ** 7))
+        self.assertEqual(5125, math.floor(200 * 1.5 ** 8))
+        self.assertEqual(3424, math.ceil(3417 / 32) * 32)
+        self.assertEqual(107, math.ceil(3417 / 32))
         text = (FIXTURE / "provider_native.lua").read_text()
         self.assertIn('used[pack] == (i == 6 and 0 or 1984)', text)
-        self.assertIn('used[pack] - s.provider_continuation_consumed[pack] == 16000', text)
+        self.assertIn('used[pack] - s.provider_continuation_consumed[pack] == 3424', text)
         self.assertNotIn("storage.mir", text)
         self.assertNotIn('require("runtime.', text)
         cold = text.split("local function cold()", 1)[1].split("local callbacks", 1)[0]
         for forbidden in ("server_save", "research_queue =", "researched =", "insert{", "saved_progress ="):
             self.assertNotIn(forbidden, cold)
+
+    def test_selected_mir_curve_refuses_foreign_curve_and_changed_policy(self):
+        self.lua.execute(r"""
+          for _,bad in ipairs({function()world_frames[1].rows["worker-robots-storage-8"].count=16000
+              game.forces.player.technologies["worker-robots-storage-8"].research_unit_count=16000 end,
+            function()prototypes.technology["worker-robots-storage-8"].research_unit_count_formula="16000*2^(L-8)"end,
+            function()settings.startup["mir-cost-base-worker-robots-storage"].value=0 end,
+            function()settings.startup["mir-cost-growth-worker-robots-storage"].value=0 end,
+            function()settings.startup["mir-cost-linear-increment-worker-robots-storage"].value=1 end,
+            function()game.forces.player.laboratory_speed_modifier=.1 end,
+            function()game.forces.player.laboratory_productivity_bonus=.1 end})do
+            world();bad();assert(not pcall(callbacks.on_configuration_changed,event))
+            assert(storage.worker_storage_default_native_fixture.phase=="upgrade-saved" and insert_calls==0)
+          end
+        """)
+
+    def test_fresh_continuation_consumption_is_exact_3424_not_cost_or_old_curve(self):
+        self.lua.execute(r"""
+          for _,spent in ipairs({3424,3423,3425,3417,16000})do
+            world();local s=storage.worker_storage_default_native_fixture;local ids=actor.ids
+            s.provider_baseline=expected();s.phase="provider-continuation-finished"
+            s.ordinary={{name=ids.private,by_script=false},{name="worker-robots-storage-8",by_script=false}}
+            local before=deep(world_frames[1]);before.rows[ids.private]=row(ids.private,9,5125,false,false)
+            before.bonus=11;before.current="worker-robots-storage-8";before.progress=0
+            before.queue={"worker-robots-storage-8",ids.queued}
+            for level=5,7 do before.rows["worker-robots-storage-"..level].researched=true
+              game.forces.player.technologies["worker-robots-storage-"..level].researched=true end
+            s.provider_continuation_baseline={deep(before)}
+            world_frames[1]=deep(before);local earned=world_frames[1]
+            earned.rows["worker-robots-storage-8"]=row("worker-robots-storage-8",9,5125,true,false)
+            earned.bonus=12;earned.current=ids.queued;earned.queue={ids.queued}
+            local native=game.forces.player.technologies["worker-robots-storage-8"]
+            native.level=9;native.researched=false;native.research_unit_count=5125
+            s.provider_continuation_consumed={};s.inserted={};local saves=0
+            for i,pack in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack",
+              "production-science-pack","utility-science-pack","space-science-pack"})do
+              s.provider_continuation_consumed[pack]=i==6 and 0 or 1984
+              s.inserted[pack]=s.provider_continuation_consumed[pack]+spent
+            end
+            game.server_save=function(name)assert(name=="worker-default-provider-saved");saves=saves+1 end
+            local ok,why=pcall(callbacks.on_tick)
+            assert(ok==(spent==3424),tostring(why));assert(saves==(spent==3424 and 1 or 0))
+            assert(s.phase==(spent==3424 and "provider-saved"or "provider-continuation-finished"))
+          end
+        """)
 
 
 if __name__ == "__main__":

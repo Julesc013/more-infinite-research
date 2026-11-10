@@ -39,10 +39,12 @@ function P.expected_handover(before)
     force.rows[PRIVATE] = copy(owner); force.rows[PRIVATE].name = PRIVATE
     force.rows[MAIN] = row(MAIN, 4, 1000, n >= 5, true, false, 0)
     force.rows[TAIL] = row(TAIL, 4, 675, false, false, false, 0)
-    for level=5,8 do
+    for level=5,7 do
       local id = "worker-robots-storage-" .. level
       force.rows[id] = row(id, level, 1000 * 2 ^ (level - 4), false, true, false, 0)
     end
+    -- MIR settings keep their published L1 coefficient; finite7 does not replace it.
+    force.rows[CONTINUATION] = row(CONTINUATION, 8, math.floor(200 * 1.5 ^ 7), false, true, false, 0)
     if force.current == TAIL then force.current = PRIVATE end
     for j, id in ipairs(force.queue) do if id == TAIL then force.queue[j] = PRIVATE end end
   end
@@ -102,8 +104,14 @@ function P.bind(M)
       "provider selection/clock/map price")
     check(settings.startup["worker-robot-cargo-size-max-level"].value == 7
       and settings.startup["worker-robot-cargo-size-infinite"].value == false, "actual upstream defaults")
+    check(settings.startup["mir-cost-base-worker-robots-storage"].value == 200
+      and settings.startup["mir-cost-linear-increment-worker-robots-storage"].value == 0
+      and settings.startup["mir-cost-growth-worker-robots-storage"].value == 1.5, "selected MIR cost policy")
+    check(game.forces.player.laboratory_speed_modifier == 0
+      and game.forces.player.laboratory_productivity_bonus == 0, "unmodified 32-unit provider lab force")
     local p = prototypes.technology[CONTINUATION]
     check(p.level == 8 and p.max_level == 4294967295 and p.research_unit_energy == 3600
+      and p.research_unit_count_formula == "3417.1875*1.5^(L-8)"
       and #p.effects == 1 and p.effects[1].type == "worker-robot-storage" and p.effects[1].modifier == 1,
       "MIR8 native continuation contract")
     check(#p.research_unit_ingredients == 6, "MIR8 six sciences")
@@ -237,7 +245,7 @@ function P.bind(M)
       end
       s.provider_setting_up = nil
       check(force.worker_robots_storage_bonus == 11, "three scripted finite levels only")
-      check(force.technologies[CONTINUATION].research_unit_count == 16000, "MIR8 exact inherited price")
+      check(force.technologies[CONTINUATION].research_unit_count == 3417, "MIR8 exact configured price")
       force.research_queue = {CONTINUATION, QUEUED}; force.research_progress = 0
       s.provider_continuation_baseline = frames(); s.provider_continuation_consumed = consumed()
       private_retired(s.provider_continuation_baseline[1]); foreign_unchanged(frames())
@@ -251,17 +259,18 @@ function P.bind(M)
       M.same(f.queue, {QUEUED})
       local earned = f.rows[CONTINUATION]
       check(earned.enabled and not earned.visible and earned.saved == 0
-        and earned.count == 16000 * 2 ^ (earned.level - 8), "earned MIR8 exact flags/price")
+        and earned.count == math.floor(200 * 1.5 ^ (earned.level - 1)), "earned MIR8 exact flags/price")
       local expected = copy(s.provider_continuation_baseline[1])
       expected.rows[CONTINUATION], expected.bonus, expected.current, expected.progress, expected.queue =
         copy(earned), 12, QUEUED, 0, {QUEUED}
       M.same(expected, f, "$/continuation-earned-player")
       local used = consumed()
-      for _, pack in ipairs(SCIENCE) do check(used[pack] - s.provider_continuation_consumed[pack] == 16000,
-        "MIR8 exact16000 science " .. pack) end
+      -- Fresh count3417 uses 107 complete 32-unit lab ticks: ceil(3417/32)*32.
+      for _, pack in ipairs(SCIENCE) do check(used[pack] - s.provider_continuation_consumed[pack] == 3424,
+        "MIR8 exact3424 science " .. pack) end
       check(#s.ordinary == 2, "exact two provider ordinary completions")
       s.phase, s.closed, s.closed_lab = "provider-saved", copy(actual), lab_frame()
-      emit("provider-saved", {private_science=s.provider_private_consumed,continuation_science_each=16000})
+      emit("provider-saved", {private_science=s.provider_private_consumed,continuation_science_each=3424})
       check(game.is_multiplayer(), "provider save requires owned server")
       game.server_save("worker-default-provider-saved")
     end
