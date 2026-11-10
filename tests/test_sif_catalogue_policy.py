@@ -174,7 +174,7 @@ class SIFCataloguePolicyTests(unittest.TestCase):
                             expected["unit"]["ingredients"] = [ingredient for ingredient in expected["unit"]["ingredients"]
                                                                 if ingredient[0] != WHITE]
                             if "prerequisites" in expected:
-                                expected["prerequisites"] = [gate for gate in expected["prerequisites"] if gate != WHITE] or {}
+                                expected["prerequisites"] = [gate for gate in expected["prerequisites"] if gate != WHITE]
                             self.assertEqual(expected, row, name)
                             if row.get("enabled") is not False:
                                 self.assertNotIn(WHITE, [ingredient[0] for ingredient in row["unit"]["ingredients"]], name)

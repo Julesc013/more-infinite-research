@@ -145,6 +145,271 @@ class LifecycleTests(unittest.TestCase):
           end
         ''')
 
+    def test_full_worker_owner_is_capped_from_first_four_and_public_head_stays_retired(self):
+        self.lua.execute(r'''
+          for _, configured in ipairs({0, 4, 8}) do
+            local name, owner_name = "worker-robots-storage-4", "mir-worker-storage-default-4"
+            local head, owner = technology(name, 4, false), technology(owner_name, 4)
+            local f = force(91, {[name]=head, [owner_name]=owner}, {owner, owner}, owner, 0.37)
+            head.force, owner.force = f, f
+            boot({[91]=f}, 0, "", nil, nil, 0, nil, nil,
+              {["mir-max-level-worker-robots-storage"]=configured})
+            local catalogue, original = require("runtime.catalogue"), require("runtime.catalogue").declared
+            catalogue.declared = function()
+              local rows = original()
+              for _, row in ipairs(rows) do if row.id == name then
+                local ordinary = {};for key, value in pairs(row) do ordinary[key] = value end
+                row.fixed_maximum, ordinary.id, ordinary.progression = 4, owner_name, 4
+                rows[#rows+1] = ordinary;break
+              end end
+              return rows
+            end
+            package.loaded["runtime.lifecycle"] = nil
+            local lifecycle = require("runtime.lifecycle")
+            lifecycle.on_init()
+            assert(lifecycle.cap_limits(f)[name] == 4)
+            assert(lifecycle.cap_limits(f)[owner_name] == configured)
+            assert(not head.enabled and owner.enabled and f.current_research == owner and f.research_progress == 0.37)
+            assert(#f.research_queue == (configured == 4 and 1 or 2), "first native level cap discarded admitted work")
+            -- The native owner completed its first ordinary level. The worker
+            -- only settles the public prerequisite/debit; caps handle this event.
+            owner.level, head.level = 5, 5
+            f.research_queue, f.current_research, f.research_progress = {owner}, owner, 0.23
+            lifecycle.on_research_finished({research=owner})
+            assert(not head.enabled and owner.enabled == (configured ~= 4))
+            if configured ~= 4 then assert(f.current_research == owner and f.research_progress == 0.23) end
+          end
+        ''')
+
+    def test_split_worker_head_does_not_claim_an_external_disablement(self):
+        self.lua.execute(r'''
+          local name = "worker-robots-storage-4"
+          local head, gate = technology(name, 5, false), technology("mir-worker-storage-head-4", 4, false)
+          gate.researched = true
+          local f = force(92, {[name]=head, [gate.name]=gate})
+          head.force, gate.force = f, f
+          boot({[92]=f}, 0)
+          local catalogue, original = require("runtime.catalogue"), require("runtime.catalogue").declared
+          catalogue.declared = function()
+            local rows = original()
+            for _, row in ipairs(rows) do if row.id == name then row.fixed_maximum = 4 end end
+            return rows
+          end
+          package.loaded["runtime.lifecycle"] = nil
+          local lifecycle = require("runtime.lifecycle")
+          lifecycle.on_init()
+          gate.researched, head.level = false, 4
+          lifecycle.on_research_reversed({research=head})
+          assert(not head.enabled, "head cap restored another mod's disablement")
+        ''')
+
+    def test_split_worker_cap_restoration_right_follows_the_transferred_native_work(self):
+        self.lua.execute(r'''
+          for _, original_level in ipairs({4, 10}) do
+          for _, proof in ipairs({-1, 0, 1}) do
+            local name, tail_name = "worker-robots-storage-4", "mir-worker-storage-default-4"
+            local head, tail, gate = technology(name, original_level, false), technology(tail_name, 4),
+              technology("mir-worker-storage-head-4", 4, false)
+            head.visible_when_disabled = true
+            local f = force(93, {[name]=head, [tail_name]=tail, [gate.name]=gate})
+            head.force, tail.force, gate.force = f, f, f
+            local right = proof >= 0 and {disabled=proof == 1, visible_when_disabled=false} or nil
+            local saved = right and {mir_caps={schema=1, owned_disabled={[93]={[name]=right}}}} or {}
+            boot({[93]=f}, 0, "", saved)
+            local catalogue, original = require("runtime.catalogue"), require("runtime.catalogue").declared
+            catalogue.declared = function()
+              local rows = original()
+              for _, row in ipairs(rows) do
+                if row.id == name then
+                  local later = {}
+                  for key, value in pairs(row) do later[key] = value end
+                  row.fixed_maximum, later.id, later.progression = 4, tail_name, 4
+                  rows[#rows + 1] = later
+                  break
+                end
+              end
+              return rows
+            end
+            package.loaded["runtime.lifecycle"] = nil
+            local lifecycle = require("runtime.lifecycle")
+            local transfer = {kind="default-native-owner-transfer", items={{force=f, phase="owned", moved=true}}}
+            local cap_plan = lifecycle.preflight_worker_storage_split_caps(transfer)
+            assert(not right or storage.mir_caps.owned_disabled[93][name] == right,
+              "preflight consumed the old cap proof")
+            -- Simulate only the worker's exact native flag/level transfer.
+            tail.level, tail.enabled, tail.visible_when_disabled = head.level, head.enabled, head.visible_when_disabled
+            head.level, gate.researched = original_level >= 5 and 5 or 4, original_level >= 5
+            head.visible_when_disabled = original_level >= 5
+            lifecycle.apply_worker_storage_split_caps(cap_plan)
+            assert(not right or storage.mir_caps.owned_disabled[93][tail_name] == right,
+              "the original cap proof was replaced or lost")
+            lifecycle.on_init()
+            assert(tail.enabled == (proof == 1), "unlimited tail restoration ignored exact prior ownership")
+            assert(not head.enabled and head.visible_when_disabled == (original_level >= 5),
+              "transferred cap proof re-enabled the retired public head")
+            assert(tail.visible_when_disabled == (proof < 0), "tail visibility ownership did not follow its work")
+          end
+          end
+        ''')
+
+    def test_split_worker_cap_conflict_fails_without_consuming_either_right(self):
+        self.lua.execute(r'''
+          boot({}, 0)
+          local lifecycle = require("runtime.lifecycle")
+          local head, tail = {disabled=true}, {disabled=false}
+          local rights = {["worker-robots-storage-4"]=head, ["mir-worker-storage-default-4"]=tail}
+          storage.mir_caps = {schema=1, owned_disabled={[94]=rights}}
+          local ok = pcall(lifecycle.preflight_worker_storage_split_caps,
+            {kind="default-native-owner-transfer", items={{force={index=94}, phase="tail", moved=true}}})
+          assert(not ok and rights["worker-robots-storage-4"] == head
+            and rights["mir-worker-storage-default-4"] == tail, "conflicting cap proof was overwritten")
+        ''')
+
+    def test_full_worker_cap_raise_restores_only_actual_prior_enablement(self):
+        self.lua.execute(r'''
+          for _, external in ipairs({false, true}) do
+            local name, owner_name = "worker-robots-storage-4", "mir-worker-storage-default-4"
+            local head, owner = technology(name, 5, false), technology(owner_name, 5, not external)
+            local f = force(97, {[name]=head, [owner_name]=owner})
+            head.force, owner.force = f, f
+            local function load_caps(maximum, saved)
+              boot({[97]=f}, 0, "", saved, nil, 0, nil, nil, {["mir-max-level-worker-robots-storage"]=maximum})
+              local catalogue, original = require("runtime.catalogue"), require("runtime.catalogue").declared
+              catalogue.declared = function()
+                local rows = original()
+                for _, row in ipairs(rows) do if row.id == name then
+                  local ordinary = {};for key, value in pairs(row) do ordinary[key] = value end
+                  row.fixed_maximum, ordinary.id, ordinary.progression = 4, owner_name, 4
+                  rows[#rows+1] = ordinary;break
+                end end
+                return rows
+              end
+              package.loaded["runtime.lifecycle"] = nil
+              return require("runtime.lifecycle")
+            end
+            local lifecycle = load_caps(4)
+            lifecycle.on_init()
+            assert(not owner.enabled and storage.mir_caps.owned_disabled[97][owner_name].disabled == not external)
+            lifecycle = load_caps(8, storage)
+            lifecycle.on_init()
+            assert(owner.enabled == not external, "cap increase enabled a foreign-disabled native owner")
+            assert(not head.enabled, "cap increase enabled the retired public head")
+          end
+        ''')
+
+    def test_provider_handover_releases_positive_head_cap_rights_without_enabling_retired_owner(self):
+        self.lua.execute(r'''
+          for _, positive in ipairs({false,true}) do
+          for _, incoming_enabled in ipairs({false,true}) do
+          for _, already_enabled in ipairs({false,true}) do
+            local public=technology("worker-robots-storage-4",4,already_enabled)
+            public.researched,public.visible_when_disabled=true,true
+            public.prototype.enabled,public.prototype.visible_when_disabled=incoming_enabled,false
+            local owner=technology("mir-worker-storage-default-4",4,false)
+            local private=technology("mir-worker-storage-preservation-4",8)
+            local f=force(98,{[public.name]=public,[owner.name]=owner,[private.name]=private},{private},private,.42)
+            boot({[98]=f},0)
+            local right={disabled=positive,visible_when_disabled=false}
+            storage.mir_caps={schema=1,owned_disabled={[98]={[public.name]=right,[owner.name]={disabled=true}}}}
+            local lifecycle=require("runtime.lifecycle")
+            local plan=lifecycle.preflight_worker_storage_split_caps({kind="default-native-provider-handover",items={{force=f}}})
+            assert(public.enabled==already_enabled and public.visible_when_disabled)
+            lifecycle.apply_worker_storage_split_caps(plan)
+            assert(public.enabled==(already_enabled or positive and incoming_enabled))
+            assert(not public.visible_when_disabled and public.level==4 and public.researched)
+            assert(not owner.enabled and owner.level==4, "released cap right enabled retired default owner")
+            assert(not storage.mir_caps.owned_disabled[98])
+            assert(f.current_research==private and f.research_progress==.42 and #f.research_queue==1 and f.cancelled==0)
+          end end end
+        ''')
+
+    def test_provider_handover_cap_revalidation_refuses_stale_rights_before_flag_writes(self):
+        self.lua.execute(r'''
+          local public=technology("worker-robots-storage-4",4,false)
+          public.prototype.visible_when_disabled=false;public.visible_when_disabled=true
+          local f=force(99,{[public.name]=public})
+          boot({[99]=f},0)
+          local right={disabled=true,visible_when_disabled=false}
+          storage.mir_caps={schema=1,owned_disabled={[99]={[public.name]=right}}}
+          local lifecycle=require("runtime.lifecycle")
+          local plan=lifecycle.preflight_worker_storage_split_caps({kind="default-native-provider-handover",items={{force=f}}})
+          right.disabled=false
+          assert(not pcall(lifecycle.apply_worker_storage_split_caps,plan))
+          assert(not public.enabled and public.visible_when_disabled and storage.mir_caps.owned_disabled[99][public.name]==right)
+          right.disabled="invalid"
+          assert(not pcall(lifecycle.preflight_worker_storage_split_caps,{kind="default-native-provider-handover",items={{force=f}}}))
+          assert(not public.enabled and public.visible_when_disabled)
+        ''')
+
+    def test_provider_handover_installs_quota_only_after_native_work_is_settled(self):
+        self.lua.execute(r'''
+          boot({},1)
+          local worker,lifecycle=require("runtime.worker_robot_storage"),require("runtime.lifecycle")
+          local trace={};local function note(s)trace[#trace+1]=s end
+          local native={kind="default-native-provider-handover"}
+          worker.default_owner_preflight=function()note("native-preflight");return native end
+          worker.default_owner_delegated=function(plan)return plan==native end
+          worker.preflight=function(event,route,delegated)assert(delegated==native);note("legacy-preflight");return "quota"end
+          lifecycle.preflight_worker_storage_split_caps=function(plan)assert(plan==native);note("caps-preflight");return "rights"end
+          worker.default_owner_apply=function(plan)assert(plan==native);note("native-apply")end
+          worker.apply=function(plan)assert(plan=="quota");note("quota-apply")end
+          lifecycle.apply_worker_storage_split_caps=function(plan)assert(plan=="rights");note("rights-apply")end
+          lifecycle.on_configuration_changed=function()note("caps-config")end
+          handlers.configuration()
+          assert(table.concat(trace,",")=="native-preflight,legacy-preflight,caps-preflight,native-apply,quota-apply,rights-apply,caps-config")
+        ''')
+
+    def test_worker_split_preflights_before_writes_and_settles_before_caps(self):
+        self.lua.execute(r'''
+          boot({}, 1)
+          local worker, lifecycle = require("runtime.worker_robot_storage"), require("runtime.lifecycle")
+          local trace = {}
+          local function note(value) trace[#trace + 1] = value end
+          worker.preflight = function() note("legacy-preflight");return "legacy" end
+          worker.default_owner_preflight = function() note("split-preflight");return "split" end
+          lifecycle.preflight_worker_storage_split_caps = function(plan)
+            assert(plan == "split");note("caps-preflight");return "rights"
+          end
+          worker.apply = function(plan) assert(plan == "legacy");note("legacy-apply") end
+          worker.default_owner_apply = function(plan) assert(plan == "split");note("split-apply") end
+          lifecycle.apply_worker_storage_split_caps = function(plan)
+            assert(plan == "rights");note("rights-apply")
+          end
+          lifecycle.on_configuration_changed = function() note("caps-config") end
+          handlers.configuration()
+          assert(table.concat(trace, ",") == "split-preflight,legacy-preflight,caps-preflight,legacy-apply,split-apply,rights-apply,caps-config",
+            "worker/cap transfer performed writes before all preflights or applied caps too early")
+          trace = {}
+          worker.default_owner_on_research_finished = function() note("split-finished");return false end
+          worker.on_research_event = function() note("legacy-finished");return false end
+          lifecycle.caps_active = function() return true end
+          lifecycle.on_research_finished = function() note("caps-finished") end
+          local row = technology("worker-robots-storage-4", 5)
+          row.force = force(95, {[row.name]=row})
+          handlers.events[defines.events.on_research_finished]({research=row, by_script=false})
+          assert(table.concat(trace, ",") == "split-finished,legacy-finished,caps-finished",
+            "head cap ran before native queued work moved onto its stable tail")
+          trace = {}
+          worker.default_owner_mutating = function(event) return event.research.force.index == 95 end
+          handlers.events[defines.events.on_research_finished]({research=row, by_script=false})
+          assert(table.concat(trace, ",") == "split-finished,legacy-finished",
+            "nested native split event reconciled caps during queue mutation")
+          trace = {}
+          row.force.index = 96
+          handlers.events[defines.events.on_research_finished]({research=row, by_script=false})
+          assert(table.concat(trace, ",") == "split-finished,legacy-finished,caps-finished",
+            "native split guard suppressed another force's cap callback")
+          trace = {}
+          worker.default_owner_on_research_finished = function() note("split-finished");return true end
+          local tail = technology("mir-worker-storage-default-4", 5)
+          row.force.technologies[tail.name] = tail
+          tail.force = row.force
+          lifecycle.on_research_finished = function(event) note(event.research.name) end
+          handlers.events[defines.events.on_research_finished]({research=tail, by_script=false})
+          assert(table.concat(trace, ",") == "split-finished,legacy-finished,mir-worker-storage-default-4,worker-robots-storage-4",
+            "completion invoked an extra cap callback for a different technology")
+        ''')
+
     def test_fixture_boot_reconstructs_the_runtime_catalogue_for_a_changed_mod_configuration(self):
         self.lua.execute(r'''
           -- The authored catalogue/support contract assigns plastic to the

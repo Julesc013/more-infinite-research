@@ -149,6 +149,17 @@ class NativeOwnerFallbackTests(unittest.TestCase):
                   prototypes={technology={},mod_data={}}
                   local private=data.raw["mod-data"]["more-infinite-research-native-adoptions"]
                   prototypes.mod_data[private.name]={data=private.data}
+                  -- The real data stage also emitted these MIR-owned rows.
+                  -- Carry their exact native initial bounds into control.
+                  for _,name in ipairs({"worker-robots-storage-4","mir-worker-storage-default-4","mir-worker-storage-head-4"}) do
+                    local row=assert(data.raw.technology[name],"missing emitted worker prototype")
+                    prototypes.technology[name]={level=row.level or tonumber(name:match("%-(%d+)$")),
+                      max_level=row.max_level=="infinite"and 4294967295 or row.max_level}
+                  end
+                  prototypes.get_history=function(kind,name)
+                    assert(kind=="technology"and prototypes.technology[name],"unproved creation history")
+                    return{created="more-infinite-research"}
+                  end
                   -- Factorio parses control in a fresh Lua state. The host
                   -- harness has already imported this module in settings.
                   package.loaded["research.catalogue"]=nil

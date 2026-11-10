@@ -5,7 +5,7 @@ applies_to: "MIR 5 release development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-11-10
+last_reviewed: 2026-11-11
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,7 +14,21 @@ source_of_truth_for:
 
 # MIR 5 release progress
 
-## Current incident and release work (2026-11-10)
+## Active incident batch (2026-11-11)
+
+5.0.12 remains unpublished. The maintainer has authorized the necessary permanent native worker identity with compatibility handling and exact migration tests; that decision is no longer pending. Black Glass retains native execution, integration and publication. The [current incident checkpoint](https://github.com/Julesc013/more-infinite-research/issues/1845#issuecomment-6781983923) records the bounded work and remaining inputs; the older checkpoint below retains its historical scope.
+
+The worker correction remains in [draft PR1872](https://github.com/Julesc013/more-infinite-research/pull/1872). Its fixed Source681fdc20 default-route result includes ordinary research, exact current/queued/detached work, a saved upgrade and cold reads. Six later pure4.7.3 RCON/save/cold observations on Sourcef967b7c6 cover2.0.77 and2.1.23 and await final independent result adoption. Neither result is relabelled onto later player bytes. The actual finite-provider test then exposed a new production failure: after one force retired its preserved work while other forces remained pending, an ordinary queue setter caused MIR to reject a transient current/queue frame. Its earlier partial completion and strict1982-unit science depletion passed; the provider route as a whole did not.
+
+The bounded successor correction makes explicit queued observations read-only after validating private ownership/cursor/flags, keeps retired forces out of unrelated private reconciliation, and retains quota enforcement on settled started/cancelled/finished events. It also fixes independently reproduced default/Secretas admission refusals on supported same-family engine patches, requiring synchronized transitions for every active official DLC and retaining floor, downgrade, changed-selection and third-party guards. All121 history and10 Secretas host methods pass under pinnedLua5.2; the113 earlier history test-method ASTs remain unchanged. These host results do not establish affected native acceptance.
+
+[PR1873](https://github.com/Julesc013/more-infinite-research/pull/1873) is checked and integrated atb0235d7. It removes the unrelated nil-only recipe-productivity-cap rejection from the Bob Warfare binding while preserving the complete foreign recipe and all ingredient/product/science/owner checks. All four exact-head checks passed; the author's original05726d08 remains reachable on `review/mir512-bob-productivity-cap-aero-original-r01`. Actual Bob plus Remove Productivity Cap startup remains required before release.
+
+The supplied Ryutavi save, log and enabled list are protected and verified. The official2.1.24 standalone engine is downloaded, SHA256/CRC/metadata checked and installed separately; Steam depots and the existing2.1.23 test engine are unchanged.230 of233 exact third-party archives are verified in the direct2.1 library. The exact original `factorio-resource-formatter-mod0.0.2`, `steam-condenser0.1.0` and `universal-transmuter0.1.0` remain unavailable from the Portal and checked local locators; no newer version substitutes for them. The separate Jivaii1871 log confirms2.1.24/Ferrum but supplies no predecessor save or previous paid/work state. These are explicit reporter-coverage limits, not authentication failures or passing save tests.
+
+The next native assignment is the corrected finite-provider route on one frozen successor package, retaining the protected predecessor, exact upstream provider, independent price/science assertions, two ordinary completions, save and two cold reads. Independent source/result review, applicable reporter dispositions, required CI, complete package and checked GitHub delivery remain open. The existing Library/client/export/performance stable queue resumes after verified incident delivery; no completed campaign restarts merely because the patch number changes.
+
+## Previous incident checkpoint (2026-11-10)
 
 The maintainer requires applicable known defects to be resolved before another release. The next unpublished patch remains 5.0.12. Published 5.0.10 and 5.0.11 bytes remain unchanged. Black Glass owns integration, native execution and publication; Aero supplies bounded work without becoming a delivery dependency. Development integration and passing tests do not close an undelivered incident or establish stable acceptance.
 

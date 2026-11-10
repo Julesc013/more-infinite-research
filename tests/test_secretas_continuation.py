@@ -297,7 +297,8 @@ class SecretasContinuationTests(unittest.TestCase):
                     lua.globals().source_patch = int(SOURCE_VERSION.split(".")[-1]) % 100
                     lua.execute('''
                       package.path=player_root.."/?.lua;"..player_root.."/?/init.lua"; package.cpath=""
-                      package.loaded["platform.target"]={id=history_target}
+                      package.loaded["platform.target"]={id=history_target,
+                        minimum_base=history_target=="f200"and"2.0.77"or"2.1.23"}
                       local codec=tonumber(history_target:sub(2))*100
                       local mir="more-infinite-research"
                       local current=string.format("5.0.%05d",codec+source_patch)
@@ -320,6 +321,7 @@ class SecretasContinuationTests(unittest.TestCase):
                     lua.execute(MINIMAL_NATIVE_FACTS)
                     lua.execute('''
                       install_worker_recovery_facts()
+                      settings={startup={}} -- Native control always supplies this global.
                       local history=require("runtime.worker_robot_storage")
                       local selected=secretas_route()
                       local plan=history.preflight(mir_update(),selected)
