@@ -126,6 +126,39 @@ class RuntimeApiTests(unittest.TestCase):
                   assert(api.get_research(2, holder).name == holder and storage == nil)
                 ''')
 
+    def test_stable_worker_owner_and_foreign_first_stage_remain_literal_queries(self):
+        for target_id in ("f200", "f210"):
+            with self.subTest(target=target_id):
+                self.lua.globals().query_target = target_id
+                self.lua.execute('''
+                  package.loaded["platform.target"] = {id=query_target, research_levels=true}
+                  api = assert(loadfile(runtime_source))()
+                  storage = nil
+                  local public, owner = "worker-robots-storage-4", "mir-worker-storage-default-4"
+                  local technologies = {
+                    [public] = {level=5, researched=false, enabled=false, saved_progress=0,
+                      prototype={max_level=4294967295}},
+                    [owner] = {level=8, researched=false, enabled=true, saved_progress=.42,
+                      prototype={max_level=4294967295}}
+                  }
+                  game = {forces={[2]={valid=true, technologies=technologies}}}
+                  local head, tail = assert(api.get_research(2, public)), assert(api.get_research(2, owner))
+                  assert(head.name==public and head.level==5 and not head.enabled and head.saved_progress==0)
+                  assert(tail.name==owner and tail.level==8 and tail.enabled and tail.saved_progress==.42)
+                  tail.level=99; tail.saved_progress=0
+                  assert(technologies[owner].level==8 and technologies[owner].saved_progress==.42)
+                  technologies[public] = {level=4, researched=true, enabled=true,
+                    prototype={max_level=4}}
+                  head = assert(api.get_research(2, public))
+                  assert(head.name==public and head.level==4 and head.max_level==4 and head.researched)
+                  tail = assert(api.get_research(2, owner))
+                  assert(tail.name==owner and tail.level==8 and tail.saved_progress==.42)
+                  technologies[owner] = nil
+                  local absent, code = api.get_research(2, owner)
+                  assert(absent==nil and code=="technology_not_found")
+                  assert(api.get_research(2, public).max_level==4 and storage==nil)
+                ''')
+
     def test_runtime_source_has_no_registration_or_data_dependencies(self):
         text = (ROOT / "source/api/v1/runtime.lua").read_text()
         self.assertNotIn("remote.add_interface", text)

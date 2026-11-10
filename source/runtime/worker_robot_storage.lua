@@ -583,6 +583,26 @@ local DEFAULT_ORIGINS = {
   f210 = {["5.0.21009"]=true, ["5.0.21010"]=true, ["5.0.21011"]=true},
 }
 
+local function producer_edition(version)
+  if type(version) ~= "string" then return nil end
+  if version:match("^5%.0%.200%d%d$") then return "f200" end
+  if version:match("^5%.0%.210%d%d$") then return "f210" end
+end
+
+local function exact_base_hop(event, old_version, owned)
+  local active = script and script.active_mods or {}
+  local changes = event and event.mod_changes
+  local base = type(changes) == "table" and changes.base
+  local known = old_version == "4.7.20003" or DEFAULT_ORIGINS.f200[old_version]
+    or owned and producer_edition(old_version) == "f200"
+      and tonumber(old_version:sub(-2)) <= tonumber(target.distribution_version:sub(-2))
+  if not known or target.id ~= "f210" or target.minimum_base ~= "2.1.23" or active.base ~= "2.1.23"
+      or type(base) ~= "table" or base.old_version ~= "2.0.77" or base.new_version ~= "2.1.23" then return false end
+  for name in pairs(active) do if name ~= "base" and name ~= MIR then return false end end
+  for name in pairs(changes) do if name ~= "base" and name ~= MIR then return false end end
+  return true
+end
+
 local function equal_plain(left, right)
   if type(left) ~= type(right) then return false end
   if type(left) ~= "table" then return left == right end
@@ -633,14 +653,21 @@ local function owner_record()
       or value.producer.kind ~= "initial-empty" and type(value.producer.old_version) ~= "string" then
     recover_error("invalid default native-owner producer")
   end
-  local prefix = target.id == "f200" and "^5%.0%.200%d%d$" or "^5%.0%.210%d%d$"
-  local known = DEFAULT_ORIGINS[target.id]
-  if not value.producer.new_version:match(prefix)
-      or (older_empty or older_idle) and (target.id ~= "f200"
-        or value.producer.old_version ~= (older_empty and "5.0.20001" or "4.7.20003"))
-      or value.producer.kind == "unchanged-mir5-default" and (not known or not known[value.producer.old_version])
+  -- Producer facts describe their historical package, not the current
+  -- edition. A valid F200-owned native record survives the supported forward
+  -- engine hop; it is not rewritten into a fictional F210 producer.
+  local edition, old_edition = producer_edition(value.producer.new_version), producer_edition(value.producer.old_version)
+  local known = DEFAULT_ORIGINS[old_edition]
+  if not edition or edition ~= target.id and not (edition == "f200" and target.id == "f210")
+      or tonumber(value.producer.new_version:sub(-2)) > tonumber(target.distribution_version:sub(-2))
+      or older_empty and (edition ~= "f200" or value.producer.old_version ~= "5.0.20001")
+      or older_idle and value.producer.old_version ~= "4.7.20003"
+      or value.producer.kind == "unchanged-mir5-default" and (old_edition ~= edition or not known or not known[value.producer.old_version]
+        or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2)))
       or value.producer.kind == "recorded-default" and value.producer.old_version ~= value.producer.new_version
-        and (not known or not known[value.producer.old_version]) then
+        and (not known or not known[value.producer.old_version]
+          or tonumber(value.producer.old_version:sub(-2)) > tonumber(value.producer.new_version:sub(-2))
+          or old_edition ~= edition and not (old_edition == "f200" and edition == "f210")) then
     recover_error("unknown default native-owner producer")
   end
   if type(value.forces) ~= "table" or getmetatable(value.forces) ~= nil then
@@ -656,9 +683,9 @@ end
 -- These two older Base producers have separate, narrower native predicates.
 -- Neither belongs to the qualified9--11 producer set. New observer additions
 -- are excluded when proving the previous Base+MIR closure, never old mods.
-local function older_default_origin(event, change, active)
-  if target.id ~= "f200" or target.minimum_base ~= "2.0.77" or active.base ~= "2.0.77"
-      or event.mod_startup_settings_changed ~= false then
+local function older_default_origin(event, change, active, base_hop)
+  if not base_hop and (target.id ~= "f200" or target.minimum_base ~= "2.0.77" or active.base ~= "2.0.77"
+      or event.mod_startup_settings_changed ~= false) then
     recover_error("older default source requires unchanged Base2.0.77 settings")
   end
   for _, name in ipairs({"space-age", "quality", "elevated-rails", "recycler"}) do
@@ -708,18 +735,20 @@ local function default_origin(event, initializing, state)
   end
   if type(event) ~= "table" or type(event.mod_startup_settings_changed) ~= "boolean"
       or type(event.mod_changes) ~= "table" then recover_error("default transfer requires unchanged startup settings") end
-  if state == nil and event.mod_startup_settings_changed ~= false then
-    recover_error("unrecorded default source requires unchanged startup settings")
-  end
   local change = event.mod_changes[MIR]
   if change ~= nil and (type(change) ~= "table" or change.new_version ~= active[MIR]) then
     recover_error("default transfer package-change event is inconsistent")
   end
+  local base_hop = change and exact_base_hop(event, change.old_version)
+  if state == nil and event.mod_startup_settings_changed ~= false
+      and not (base_hop and change.old_version == "4.7.20003") then
+    recover_error("unrecorded default source requires unchanged startup settings")
+  end
   if state == nil and change and (change.old_version == "5.0.20001" or change.old_version == "4.7.20003") then
-    return older_default_origin(event, change, active)
+    return older_default_origin(event, change, active, base_hop)
   end
   for name, item in pairs(event.mod_changes) do
-    if name ~= MIR and (type(item) ~= "table" or item.old_version == nil
+    if name ~= MIR and not (base_hop and name == "base") and (type(item) ~= "table" or item.old_version == nil
         or item.old_version ~= item.new_version or item.new_version ~= active[name]) then
       recover_error("default transfer requires the unchanged mod selection")
     end
@@ -732,7 +761,7 @@ local function default_origin(event, initializing, state)
       recover_error("recorded default source cannot be a first-install event")
     end
     local old = change and change.old_version or active[MIR]
-    local known = DEFAULT_ORIGINS[target.id]
+    local known = DEFAULT_ORIGINS[base_hop and "f200" or target.id]
     if type(old) ~= "string" or old ~= active[MIR] and (not known or not known[old]) then
       recover_error("recorded default source has an inconsistent producer event")
     end
@@ -744,8 +773,10 @@ local function default_origin(event, initializing, state)
   end
   local official = {base=true, [MIR]=true, ["space-age"]=true, quality=true, ["elevated-rails"]=true, recycler=true}
   for name, version in pairs(active) do
-    if not official[name] or name ~= MIR and version ~= active.base then
-      recover_error("unrecorded default source requires its qualified official mod selection")
+    -- The unchanged-selection check above covers added, removed and updated
+    -- mods. Unrelated unchanged names do not invalidate surviving native work.
+    if official[name] and name ~= MIR and version ~= active.base then
+      recover_error("unrecorded default source requires matching official engine versions")
     end
   end
   return {kind="unchanged-mir5-default", old_version=change.old_version, new_version=active[MIR]}
@@ -779,9 +810,14 @@ local function head_gate_contract(source)
   end
 end
 
-local function gate_frame(force)
+local function gate_frame(force, configuration)
   local gate = force.technologies[recovery.head_id]
-  if not gate or (gate.level ~= 4 and gate.level ~= 5) or gate.researched ~= false or gate.enabled ~= false
+  -- Configuration can re-enable an already-paid native infinite level5 even
+  -- though its MIR prototype is disabled. Only that exact flag is settleable;
+  -- fresh/ordinary-event frames still require the debit to remain disabled.
+  local settleable = gate and configuration == true and gate.level == 5 and gate.enabled == true
+  if not gate or (gate.level ~= 4 and gate.level ~= 5) or gate.researched ~= false
+      or gate.enabled ~= false and not settleable
       or gate.visible_when_disabled ~= false or gate.saved_progress ~= 0 then
     recover_error("default head debit native state is invalid")
   end
@@ -889,6 +925,22 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       or type(event.mod_changes) ~= "table" or script.active_mods[MIR] ~= target.distribution_version) then
     recover_error("current default configuration event is unavailable")
   end
+  if context.configuration and owned and producer_edition(owned.producer.new_version) == "f200" and target.id == "f210"
+      and event.mod_changes.base ~= nil then
+    local base, mir = event.mod_changes.base, event.mod_changes[MIR]
+    if type(base) ~= "table" or type(base.old_version) ~= "string" or type(base.new_version) ~= "string"
+        or base.new_version ~= script.active_mods.base then
+      recover_error("owned default has an unsupported engine transition")
+    end
+    local same_family = base.old_version:match("^2%.1%.%d+$") and base.new_version:match("^2%.1%.%d+$")
+    if base.old_version ~= base.new_version and not same_family then
+      if type(mir) ~= "table" or mir.new_version ~= script.active_mods[MIR]
+          or not exact_base_hop(event, mir.old_version, true)
+          or tonumber(mir.old_version:sub(-2)) < tonumber(owned.producer.new_version:sub(-2)) then
+        recover_error("owned default has an unsupported engine transition")
+      end
+    end
+  end
   local record = owned and clone(owned) or {schema=3, kind="full-default", owner=id, source=recovery.canonical,
     gate=recovery.head_id, contract=contract, producer=producer, forces={}}
   record.contract = contract
@@ -898,7 +950,7 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
     local finished = context.finished_force == force.index
     local source = default_frame(force, recovery.canonical, finished)
     local destination = default_frame(force, id, finished)
-    local gate, prior = gate_frame(force), owned and owned.forces[force.index]
+    local gate, prior = gate_frame(force, owned ~= nil and context.configuration == true), owned and owned.forces[force.index]
     local refresh = context.created_force == force.index or context.reset_force == force.index
     if context.created_force == force.index and prior then recover_error("new default force already has history") end
     local action, next_force = "validate", prior and clone(prior) or nil
@@ -932,8 +984,10 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
         action = "first-credit"
       else recover_error("full default native owner/first-level debit changed") end
     end
+    if action == "validate" and gate.enabled then action = "settle-gate" end
     record.forces[force.index] = next_force
     items[#items + 1] = {force=force, source=source, destination=destination, gate=gate, gate_paid=gate_paid(gate),
+      gate_enabled=gate.enabled,
       bonus=native_bonus(force), phase="owned", moved=action == "transfer", action=action,
       target_enabled=source.enabled, target_visible=source.visible}
   end
@@ -951,6 +1005,12 @@ end
 function M.apply_default_owner_transfer(plan)
   if type(plan) ~= "table" or plan.kind ~= "default-native-owner-transfer" then recover_error("invalid default transfer plan") end
   local fresh = M.plan_default_owner_transfer(plan.event, nil, plan.initializing, plan.context)
+  -- Seal the raw config flag even when the new read would otherwise be a
+  -- no-op. A changed true/false sample must never bypass stale-plan checks.
+  for index, item in ipairs(fresh.items) do
+    local old = plan.items[index]
+    if not old or old.gate_enabled ~= item.gate_enabled then recover_error("head debit flag changed after default preflight") end
+  end
   if not fresh.changed then reconnect_default(fresh.record); return false end
   if plan.prior_state ~= fresh.prior_state or plan.prior_owner ~= fresh.prior_owner or plan.contract ~= fresh.contract
       or plan.cap ~= fresh.cap or plan.enabled ~= fresh.enabled or #plan.items ~= #fresh.items
@@ -991,6 +1051,8 @@ function M.apply_default_owner_transfer(plan)
         canonical.level = 5
         canonical.enabled, canonical.visible_when_disabled = false, frame.visible
         set_gate_paid(gate, true)
+      elseif item.action == "settle-gate" then
+        gate.enabled = false
       end
     end)
     default_mutating_force = previous
@@ -1018,7 +1080,8 @@ function M.apply_default_owner_transfer(plan)
       end
     elseif not equal_plain(frame_values(item.destination), frame_values(actual_owner)) then
       recover_error("native full default owner work changed during first-level credit")
-    elseif item.action == "validate" and not equal_plain(frame_values(item.source), frame_values(actual_source)) then
+    elseif (item.action == "validate" or item.action == "settle-gate")
+        and not equal_plain(frame_values(item.source), frame_values(actual_source)) then
       recover_error("validated native public first-level state changed")
     end
   end
@@ -1110,7 +1173,7 @@ local function plan_provider_handover(event, route)
     if not prior then recover_error("provider handover force authority is missing", route) end
     seen[force.index] = true
     local frame, destination = snapshot(force, recovery.ordinary_default_id), snapshot(force, recovery.id)
-    local public, gate = snapshot(force, recovery.canonical), gate_frame(force)
+    local public, gate = snapshot(force, recovery.canonical), gate_frame(force, true)
     local paid = frame.next_level >= 5
     if public.next_level ~= (paid and 5 or 4) or public.researched ~= paid or public.saved_progress ~= 0
         or public.occurrences ~= 0 or public.current == recovery.canonical or gate_paid(gate) ~= paid then
@@ -1135,7 +1198,7 @@ local function plan_provider_handover(event, route)
     prepared.forces[force.index] = {next_level=frame.next_level, limit=limit,
       pending=allowance>0, enabled=allowance>0 and frame.enabled or false, visible=frame.visible}
     record.forces[force.index].phase = "retired"
-    items[#items+1] = {force=force, source=frame, destination=destination, public=public, gate_paid=gate_paid(gate),
+    items[#items+1] = {force=force, source=frame, destination=destination, public=public, gate_paid=gate_paid(gate), gate_enabled=gate.enabled,
       release_public=release, bonus=native_bonus(force), phase="retired", moved=true}
   end
   for index in pairs(owned.forces) do if not seen[index] then recover_error("stale provider handover force history", route) end end
@@ -1157,7 +1220,7 @@ local function verify_provider_plan(plan, fresh)
       or #plan.items ~= #fresh.items then recover_error("stale full default provider handover") end
   for index, item in ipairs(fresh.items) do
     local old = plan.items[index]
-    if old.force.index ~= item.force.index or old.gate_paid ~= item.gate_paid or old.bonus ~= item.bonus
+    if old.force.index ~= item.force.index or old.gate_paid ~= item.gate_paid or old.gate_enabled ~= item.gate_enabled or old.bonus ~= item.bonus
         or old.release_public ~= item.release_public or not equal_plain(frame_values(old.source), frame_values(item.source))
         or not equal_plain(frame_values(old.destination), frame_values(item.destination))
         or not equal_plain(frame_values(old.public), frame_values(item.public)) then
@@ -1237,6 +1300,7 @@ local function apply_provider_handover(plan)
       if frame.current == recovery.ordinary_default_id then item.force.research_progress = frame.current_progress end
       if not frame.researched and holder.research_unit_count ~= frame.count then recover_error("provider transferred work price differs") end
       if item.release_public then item.public.technology.enabled = true end
+      if item.gate_enabled then item.force.technologies[recovery.head_id].enabled = false end
     end)
     default_mutating_force = previous
     if not ok then error(message, 0) end
@@ -1281,15 +1345,75 @@ local function retired_provider_current(event, route)
   end
   for _, stage in ipairs(route.finite) do
     local change = type(event) == "table" and type(event.mod_changes) == "table" and event.mod_changes[stage.provider]
-    if change and change.old_version ~= change.new_version then recover_error("retired provider change remains unqualified", route) end
+    if change and (type(change) ~= "table" or type(change.old_version) ~= "string" or change.old_version == ""
+        or type(change.new_version) ~= "string" or change.new_version ~= script.active_mods[stage.provider]) then
+      recover_error("retired provider update event is inconsistent", route)
+    end
   end
+  local items, changed = {}, false
   for _, force in ipairs(forces()) do
     local frame = snapshot(force, recovery.ordinary_default_id)
     if frame.next_level ~= 4 or frame.researched or frame.saved_progress ~= 0 or frame.occurrences ~= 0 or frame.enabled or frame.visible then
       recover_error("retired default owner gained unrecorded work", route)
     end
-    gate_frame(force)
+    local gate = gate_frame(force, true)
+    if gate.enabled and not state.forces[force.index] then recover_error("retired head has no recorded force authority", route) end
+    changed = changed or gate.enabled
+    items[#items+1] = {force=force, owner=frame, public=snapshot(force, recovery.canonical),
+      private=snapshot(force, recovery.id), gate_paid=gate_paid(gate), gate_enabled=gate.enabled, bonus=native_bonus(force)}
   end
+  if changed then
+    if type(event) ~= "table" or type(event.mod_startup_settings_changed) ~= "boolean"
+        or type(event.mod_changes) ~= "table" or script.active_mods[MIR] ~= target.distribution_version then
+      recover_error("retired head flag settlement requires a current configuration event", route)
+    end
+    return {kind="default-native-provider-gate-settle", event=clone(event), route=copy(route),
+      prior_owner=state, current=current, contract=contract, items=items, changed=true}
+  end
+end
+
+local function apply_retired_gate_settlement(plan)
+  local authorization = provider_plans[plan]
+  if not authorization or not equal_plain(plan.event, authorization.event) then recover_error("unissued retired head flag settlement") end
+  if authorization.applied then return false end
+  local fresh = retired_provider_current(plan.event, plan.route)
+  if not fresh or plan.prior_owner ~= fresh.prior_owner
+      or plan.contract ~= fresh.contract or not equal_plain(plan.current, fresh.current)
+      or #plan.items ~= #fresh.items then recover_error("stale retired head flag settlement") end
+  for index, item in ipairs(fresh.items) do
+    local old = plan.items[index]
+    if old.force.index ~= item.force.index or old.gate_paid ~= item.gate_paid or old.gate_enabled ~= item.gate_enabled
+        or old.bonus ~= item.bonus or not equal_plain(frame_values(old.owner), frame_values(item.owner))
+        or not equal_plain(frame_values(old.public), frame_values(item.public))
+        or not equal_plain(frame_values(old.private), frame_values(item.private)) then
+      recover_error("native frame changed after retired head preflight")
+    end
+  end
+  -- Legacy prepared quota commit legitimately replaces its schema2 table
+  -- before this operation. This plan owns no quota field; retain the current
+  -- table exactly while settling only the sealed native H flag.
+  local prior_state = storage[KEY]
+  for _, item in ipairs(fresh.items) do
+    if item.gate_enabled then
+      local previous = default_mutating_force
+      default_mutating_force = item.force.index
+      local ok, message = pcall(function() item.force.technologies[recovery.head_id].enabled = false end)
+      default_mutating_force = previous
+      if not ok then error(message, 0) end
+    end
+  end
+  for _, item in ipairs(fresh.items) do
+    local gate = gate_frame(item.force)
+    if gate_paid(gate) ~= item.gate_paid or native_bonus(item.force) ~= item.bonus
+        or not equal_plain(frame_values(item.owner), frame_values(snapshot(item.force, recovery.ordinary_default_id)))
+        or not equal_plain(frame_values(item.public), frame_values(snapshot(item.force, recovery.canonical)))
+        or not equal_plain(frame_values(item.private), frame_values(snapshot(item.force, recovery.id))) then
+      recover_error("retired head flag settlement changed native work/contribution")
+    end
+  end
+  if storage[OWNER_KEY] ~= fresh.prior_owner or storage[KEY] ~= prior_state then recover_error("retired head authority changed during settlement") end
+  authorization.applied = true
+  return true
 end
 
 local function default_active(route, split_current)
@@ -1306,7 +1430,11 @@ end
 
 function M.default_owner_preflight(event, route, split_current)
   local owned = owner_record()
-  if owned and owned.kind == "provider-retired" then retired_provider_current(event, route); return nil end
+  if owned and owned.kind == "provider-retired" then
+    local plan = retired_provider_current(event, route)
+    if plan then provider_plans[plan] = {event=clone(plan.event)} end
+    return plan
+  end
   if owned and route ~= nil then
     if split_current ~= true then recover_error("provider handover has no admitted owner data") end
     local plan = plan_provider_handover(event, route)
@@ -1320,6 +1448,7 @@ end
 function M.default_owner_apply(plan)
   if plan == nil then return false end
   if type(plan) == "table" and plan.kind == "default-native-provider-handover" then return apply_provider_handover(plan) end
+  if type(plan) == "table" and plan.kind == "default-native-provider-gate-settle" then return apply_retired_gate_settlement(plan) end
   return M.apply_default_owner_transfer(plan)
 end
 

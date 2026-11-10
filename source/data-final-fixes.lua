@@ -333,7 +333,7 @@ if worker_default_available then
 end
 native_adoption_patch = modern and require("research.native_adoption").plan(
   data.raw, native_owner_targets, withheld_native_owners, native_credit_groups,
-  modern_selection.worker_storage, worker_default_available)
+  modern_selection.worker_storage, worker_default_available or nil)
 if electric_full then
   for _, technology in ipairs(technologies) do
     if technology.name == electric_full.name then

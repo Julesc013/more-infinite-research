@@ -459,7 +459,7 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
         self.assertEqual(expected, worker_pipeline.scaffold.plain_lua(
             lua.globals().data.raw.technology["mir-worker-storage-preservation-4"]))
         lua.execute('''
-          assert(data.raw["mod-data"]["more-infinite-research-native-adoptions"].data.worker_default_split==false)
+          assert(data.raw["mod-data"]["more-infinite-research-native-adoptions"].data.worker_default_split==nil)
           assert(data.raw.technology["mir-worker-storage-default-4"]==nil)
           assert(data.raw.technology["mir-worker-storage-head-4"]==nil)
         ''')
