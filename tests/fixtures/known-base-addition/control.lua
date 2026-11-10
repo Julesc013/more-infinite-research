@@ -12,6 +12,12 @@ local FAMILIES = {
 }
 local loaded, reported = false, false
 local function fail(message) error("[mir5-known-base-addition] " .. message) end
+local function copy(value)
+  if type(value)~="table" then return value end
+  local out={}
+  for key,item in pairs(value)do out[key]=copy(item)end
+  return out
+end
 local function close(a,b) return type(a)=="number" and type(b)=="number" and math.abs(a-b)<=.000001 end
 local function equal(a,b,path)
   if type(a)~=type(b) then fail(path.." type differs") end
@@ -154,7 +160,7 @@ local function marker(stage,state)
     qualification="exact-protected-source-native-runtime-only",ordinary_completions=state.completions,
     initial=state.initial,final=state.final,on_load_read_only=stage=="reload",
     apparatus=state.apparatus,science=state.science,supply_log=state.supply_log,final_stock=state.final_stock,
-    startup=startup_snapshot(),mods=table.deepcopy(script.active_mods),clock=game.speed,event=table.deepcopy(state.event)}))
+    startup=startup_snapshot(),mods=copy(script.active_mods),clock=game.speed,event=copy(state.event)}))
 end
 local function stock(state)
   local counts={}
@@ -194,7 +200,7 @@ local function fill(state,research)
   state.science[research.name]={starting=stock(state),inserted={},started_tick=game.tick,
     unit={count=research.research_unit_count,time_ticks=research.prototype.research_unit_energy,
       formula=research.prototype.research_unit_count_formula or false,
-      science=table.deepcopy(research.research_unit_ingredients)}}
+      science=copy(research.research_unit_ingredients)}}
   refill(state,research)
   state.stocked=research.name
 end
@@ -235,7 +241,7 @@ script.on_configuration_changed(function(event)
   local state=storage[KEY]
   if not state or state.phase~="await-configuration" then fail("unexpected configuration stage")end
   state.initial=entry(event)
-  state.event={mod_startup_settings_changed=event.mod_startup_settings_changed,mod_changes=table.deepcopy(event.mod_changes)}
+  state.event={mod_startup_settings_changed=event.mod_startup_settings_changed,mod_changes=copy(event.mod_changes)}
   state.completions={};state.phase="ready";state.deadline=game.tick+36000
 end)
 script.on_event(defines.events.on_research_finished,function(event)
@@ -281,7 +287,7 @@ script.on_event(defines.events.on_tick,function()
     if state.stocked~=research.name then fill(state,research)else refill(state,research)end
   elseif state.phase=="settle" and game.tick>state.completed_tick then
     state.science[PLASTIC].consumed=consumed(state,PLASTIC)
-    local final=snapshots();local expected_all=table.deepcopy(state.initial)
+    local final=snapshots();local expected_all=copy(state.initial)
     local expected=expected_all[FORCES[2]]
     -- Only these two real native completions may change the protected snapshot.
     expected.rows[GEAR].level=expected.rows[GEAR].level+1;expected.rows[GEAR].saved=0

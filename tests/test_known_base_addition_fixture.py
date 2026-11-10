@@ -18,10 +18,11 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
         lua.globals().control_path = (FIXTURE / "control.lua").as_posix()
         lua.globals().base_lab_speed = base_lab_speed
         lua.execute('''
-          function table.deepcopy(value)
+          local function host_copy(value)
             if type(value)~="table"then return value end
-            local out={};for k,v in pairs(value)do out[k]=table.deepcopy(v)end;return out
+            local out={};for k,v in pairs(value)do out[k]=host_copy(v)end;return out
           end
+          assert(table.deepcopy==nil,"runtime must not supply the data-stage copy helper")
           storage,callbacks,markers={}, {}, {}
           defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}}
           script={active_mods={base="2.0.77",["more-infinite-research"]="5.0.20012",
@@ -29,7 +30,12 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
             on_init=function(f)callbacks.init=f end,on_load=function(f)callbacks.load=f end,
             on_configuration_changed=function(f)callbacks.configuration=f end,
             on_event=function(id,f)callbacks[id]=f end}
-          helpers={table_to_json=function(value)markers[#markers+1]=table.deepcopy(value);return "{}"end}
+          helpers={table_to_json=function(value)
+            assert(value.mods~=script.active_mods)
+            local state=storage.mir5_known_base_addition
+            assert(value.event~=state.event and value.event.mod_changes~=state.event.mod_changes)
+            markers[#markers+1]=host_copy(value);return "{}"
+          end}
           log=function()end
           local names={"player","mir5-migration-origin-f200-110-foreign","mir5-migration-origin-f200-110-detached"}
           local families={{"low_density_structure","low-density-structure"},{"plastic","plastic-bar"},
@@ -297,6 +303,10 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
           local state=storage.mir5_known_base_addition
           assert(state.phase=="completed" and #state.completions==2)
           assert(state.initial[foreign.name].progress==.42/8000 and state.final[foreign.name].progress==0)
+          assert(state.initial[foreign.name].rows[gear.name].level==1)
+          assert(state.initial[foreign.name].rows[plastic.name].level==2)
+          assert(state.initial[foreign.name].bonuses["iron-gear-wheel"]==0)
+          assert(state.initial[foreign.name].queue[1]==gear.name and #state.initial[foreign.name].queue==2)
           assert(#game.saves==1 and game.saves[1]=="mir5-native-complete")
           assert(#markers==1 and markers[1].stage=="initial")
           for _=1,2 do
@@ -521,7 +531,20 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
     def test_markers_expose_actual_875_mods_clock_event_for_owner_comparison(self):
         lua = self.controller()
         lua.execute('''
-          begin();finish_gear();finish_plastic();game.tick=14;callbacks[1]()
+          assert(table.deepcopy==nil)
+          callbacks.init();callbacks.configuration(event)
+          local state=storage.mir5_known_base_addition
+          assert(state.event.mod_changes~=event.mod_changes)
+          assert(state.event.mod_changes["more-infinite-research"]~=event.mod_changes["more-infinite-research"])
+          event.mod_changes["more-infinite-research"].old_version="host-mutated-after-callback"
+          assert(state.event.mod_changes["more-infinite-research"].old_version=="5.0.20001")
+          game.tick=11;callbacks[1]()
+          local science=state.science[gear.name].unit.science
+          assert(science~=gear.research_unit_ingredients and science[1]~=gear.research_unit_ingredients[1])
+          gear.research_unit_ingredients[1].amount=2
+          assert(science[1].amount==1)
+          gear.research_unit_ingredients[1].amount=1
+          finish_gear();finish_plastic();game.tick=14;callbacks[1]()
           callbacks.load();callbacks[1]()
           for _,m in ipairs(markers)do
             assert(m.clock==16 and m.mods.base=="2.0.77"and m.mods["more-infinite-research"]=="5.0.20012")
