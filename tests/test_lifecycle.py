@@ -145,6 +145,67 @@ class LifecycleTests(unittest.TestCase):
           end
         ''')
 
+    def test_split_worker_head_retires_only_after_the_native_gate_is_earned(self):
+        self.lua.execute(r'''
+          for _, configured in ipairs({0, 4, 8}) do
+            local name = "worker-robots-storage-4"
+            local head, tail, gate = technology(name, 4), technology("mir-worker-storage-default-5", 5),
+              technology("mir-worker-storage-head-4", 4, false)
+            local f = force(91, {[name]=head, [tail.name]=tail, [gate.name]=gate}, {head, head}, head, 0.37)
+            head.force, tail.force, gate.force = f, f, f
+            boot({[91]=f}, 0, "", nil, nil, 0, nil, nil,
+              {["mir-max-level-worker-robots-storage"]=configured})
+            local catalogue = require("runtime.catalogue")
+            local original = catalogue.declared
+            catalogue.declared = function()
+              local rows = original()
+              for _, row in ipairs(rows) do
+                if row.id == name then row.fixed_maximum = 4 end
+              end
+              return rows
+            end
+            package.loaded["runtime.lifecycle"] = nil
+            local lifecycle = require("runtime.lifecycle")
+            assert(lifecycle.caps_active(), "unlimited split head omitted its completion callback")
+            lifecycle.on_init()
+            assert(lifecycle.cap_limits(f)[name] == configured)
+            assert(head.enabled and f.current_research == head and f.research_progress == 0.37
+              and #f.research_queue == (configured == 4 and 1 or 2),
+              "unearned head lost work allowed by the configured cap: " .. configured)
+            -- The worker callback first transfers admitted later work. The
+            -- cap callback may then retire only the paid first public level.
+            gate.researched, head.level = true, 5
+            f.research_queue, f.current_research, f.research_progress = {tail, tail}, tail, 0.23
+            lifecycle.on_research_finished({research=head})
+            assert(lifecycle.cap_limits(f)[name] == 4 and not head.enabled)
+            assert(f.current_research == tail and f.research_progress == 0.23
+              and #f.research_queue == 2 and tail.enabled,
+              "head retirement changed stable-tail pending work")
+          end
+        ''')
+
+    def test_split_worker_head_does_not_claim_an_external_disablement(self):
+        self.lua.execute(r'''
+          local name = "worker-robots-storage-4"
+          local head, gate = technology(name, 5, false), technology("mir-worker-storage-head-4", 4, false)
+          gate.researched = true
+          local f = force(92, {[name]=head, [gate.name]=gate})
+          head.force, gate.force = f, f
+          boot({[92]=f}, 0)
+          local catalogue, original = require("runtime.catalogue"), require("runtime.catalogue").declared
+          catalogue.declared = function()
+            local rows = original()
+            for _, row in ipairs(rows) do if row.id == name then row.fixed_maximum = 4 end end
+            return rows
+          end
+          package.loaded["runtime.lifecycle"] = nil
+          local lifecycle = require("runtime.lifecycle")
+          lifecycle.on_init()
+          gate.researched, head.level = false, 4
+          lifecycle.on_research_reversed({research=head})
+          assert(not head.enabled, "head cap restored another mod's disablement")
+        ''')
+
     def test_fixture_boot_reconstructs_the_runtime_catalogue_for_a_changed_mod_configuration(self):
         self.lua.execute(r'''
           -- The authored catalogue/support contract assigns plastic to the

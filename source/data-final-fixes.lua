@@ -170,9 +170,7 @@ for family, targets in pairs(native_credit_targets) do
   table.sort(rows, function(left, right) return left.recipe < right.recipe end)
   native_credit_groups[family] = rows
 end
-local native_adoption_patch = modern and require("research.native_adoption").plan(
-  data.raw, native_owner_targets, withheld_native_owners, native_credit_groups,
-  modern_selection.worker_storage)
+local native_adoption_patch
 
 if modern_selection and modern_selection.bob_angel_f200_combined then
   require("compatibility.modern_catalogue.bob_angel_f200_combined").apply_effect_order(technologies)
@@ -248,6 +246,7 @@ local electric_full
 if modern_selection then electric_full = modern.retain_external_weapon_coverage(modern_selection, technologies, science_context) end
 local science_family_bindings
 local worker_storage = modern_selection and modern_selection.worker_storage
+local worker_default_authored, worker_default_available, worker_default_is_head
 if worker_storage and worker_storage.owned then
   local binding = require("compatibility.science_bindings").conditions_for("worker-robots-storage")
   binding.inherit_worker_storage_prerequisites = not modern_catalogue.has_secretas(mods)
@@ -273,6 +272,9 @@ if prerequisite_target.id == "f200" or prerequisite_target.id == "f210" then
     recovery_values.streams["worker-robots-storage"] = definition.defaults
   end
   local authored = require("research.modern").continuation(definition, recovery_values)
+  -- Capture the full MIR work contract before constructing or adapting any
+  -- split identities. The foreign finite provider is never its producer.
+  assert(recovery.matches_default(authored, authored), "MIR worker authored default contract is invalid")
   local default_emitted = false
   for _, row in ipairs(technologies) do
     if row.name == recovery.canonical then default_emitted = recovery.matches_default(row, authored); break end
@@ -295,6 +297,8 @@ if prerequisite_target.id == "f200" or prerequisite_target.id == "f210" then
   -- A same-name SE/overhaul row can have a different work contract; settings
   -- identity or its mere emission does not establish an available default4.
   local unavailable = missing_stream or not default_emitted and not finite_available
+  worker_default_authored, worker_default_available = authored, not unavailable
+  worker_default_is_head = not unavailable and default_emitted
   local row = unavailable and recovery.uninvested(authored, gear.unit.ingredients[1][1]) or recovery.prototype(authored)
   technologies[#technologies + 1] = row
   if not unavailable then
@@ -303,6 +307,26 @@ if prerequisite_target.id == "f200" or prerequisite_target.id == "f210" then
   end
 end
 science.apply_family(technologies, science_family_bindings, science_environment, science_context)
+if worker_default_available then
+  local recovery = require("research.worker_storage_recovery")
+  -- The detached default follows the same science policy as the legacy
+  -- holder. Construct the bookkeeping gate afterwards: it must not acquire
+  -- end-game science, price or prerequisite policy of its own.
+  science.apply_family({worker_default_authored}, {[recovery.canonical]=
+    require("compatibility.science_bindings").conditions_for("worker-robots-storage")},
+    science_environment, science_context)
+  local tail = recovery.default_tail(worker_default_authored)
+  if not worker_default_is_head then
+    -- Current finite profiles retain the old contract without offering a
+    -- second ordinary infinite route. Runtime retirement remains explicit.
+    tail.hidden, tail.enabled, tail.visible_when_disabled = true, false, false
+  end
+  technologies[#technologies + 1] = tail
+  technologies[#technologies + 1] = recovery.head_gate(worker_default_authored)
+end
+native_adoption_patch = modern and require("research.native_adoption").plan(
+  data.raw, native_owner_targets, withheld_native_owners, native_credit_groups,
+  modern_selection.worker_storage, worker_default_available)
 if electric_full then
   for _, technology in ipairs(technologies) do
     if technology.name == electric_full.name then

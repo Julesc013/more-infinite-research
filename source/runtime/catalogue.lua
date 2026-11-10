@@ -31,6 +31,10 @@ if target.id == "f200" or target.id == "f210" then
     foreign_technology_prototypes = {}
     local creators = {}
     local names = modern.continuation_names(script and script.active_mods)
+    if admission_facts.worker_default_split then
+      names[#names + 1] = "mir-worker-storage-default-5"
+      names[#names + 1] = "mir-worker-storage-head-4"
+    end
     if worker_storage ~= nil then
       local named = {}
       for _, name in ipairs(names) do named[name] = true end
@@ -59,6 +63,22 @@ if target.id == "f200" or target.id == "f210" then
             error("MIR runtime catalogue requires MIR creation custody for weapon-shooting-speed-9", 2)
           end
           foreign_technology_prototypes[name] = existing
+        end
+      end
+    end
+    if admission_facts.worker_default_split then
+      local tail, head = live_technologies["mir-worker-storage-default-5"], live_technologies["mir-worker-storage-head-4"]
+      if tail == nil or head == nil or tail.level ~= 5 or tail.max_level ~= 4294967295
+          or head.level ~= 4 or head.max_level ~= 4
+          or creators["mir-worker-storage-default-5"] ~= "more-infinite-research"
+          or creators["mir-worker-storage-head-4"] ~= "more-infinite-research" then
+        error("MIR worker default split requires its authored native tail and head gate", 2)
+      end
+      if worker_storage == nil then
+        local canonical = live_technologies["worker-robots-storage-4"]
+        if canonical == nil or canonical.level ~= 4 or canonical.max_level ~= 4294967295
+            or creators["worker-robots-storage-4"] ~= "more-infinite-research" then
+          error("MIR worker default split requires its MIR-owned default head", 2)
         end
       end
     end
@@ -109,6 +129,9 @@ if target.id == "f200" or target.id == "f210" then
   if worker_storage ~= nil and live_technologies == nil then
     error("MIR worker robot storage: missing admitted technology prototypes", 2)
   end
+  if admission_facts.worker_default_split and live_technologies == nil then
+    error("MIR worker default split requires native technology prototypes", 2)
+  end
 end
 
 local M = {}
@@ -121,6 +144,10 @@ function M.galore_sulfur_retired()
   return admission_facts.galore_sulfur_retired == true
 end
 
+function M.worker_default_split()
+  return admission_facts.worker_default_split == true
+end
+
 -- Select and retain the bounded authored rows during control parsing, before
 -- Factorio freezes imports for callbacks. Later callers receive detached rows
 -- from the pure catalogue's cache.
@@ -128,11 +155,13 @@ end
 -- shipped module; the real player module always supplies this preparation
 -- hook.
 if type(catalogue.prepare) == "function" then
-  catalogue.prepare(foreign_technology_prototypes, withheld_native_owners, finite_research_speed_provider ~= nil, worker_storage)
+  catalogue.prepare(foreign_technology_prototypes, withheld_native_owners, finite_research_speed_provider ~= nil, worker_storage,
+    admission_facts.worker_default_split)
 end
 
 function M.declared()
-  local rows = catalogue.declared(foreign_technology_prototypes, withheld_native_owners, finite_research_speed_provider ~= nil, worker_storage)
+  local rows = catalogue.declared(foreign_technology_prototypes, withheld_native_owners, finite_research_speed_provider ~= nil, worker_storage,
+    admission_facts.worker_default_split)
   if native_adoptions == nil or next(native_adoptions) == nil then return rows end
   for _, row in ipairs(rows) do
     local adoption = native_adoptions and native_adoptions[row.id]

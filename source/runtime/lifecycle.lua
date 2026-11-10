@@ -80,6 +80,17 @@ for index = 1, #DECLARATIONS do
   local row = {id = declaration.id, family = declaration.family, cap_setting = declaration.cap_setting,
     ownership_kind = declaration.ownership_kind, source = binding.source, operation = binding.operation,
     enabled = values.enabled, limit = values.max_level, declaration = declaration}
+  if declaration.fixed_maximum ~= nil then
+    if declaration.id ~= "worker-robots-storage-4" or declaration.family ~= "worker-robots-storage"
+        or declaration.fixed_maximum ~= 4 then
+      error("MIR caps invalid worker storage head declaration", 2)
+    end
+    row.fixed_maximum = 4
+    -- Before the first completion, repeated queued head entries are still
+    -- native work. The worker lifecycle moves them to the stable tail before
+    -- this cap starts retiring the completed public head.
+    CAPS_ACTIVE = true
+  end
   if declaration.productivity_ceiling ~= nil then
     local ceiling, percent = declaration.productivity_ceiling, values.effect_percent
     if type(ceiling) ~= "number" or not (ceiling > 0 and ceiling < math.huge)
@@ -172,7 +183,14 @@ local function useful_productivity_limit(row)
   PRODUCTIVITY_USEFUL_LIMITS[row.family] = highest
   return highest
 end
-local function effective_limit(row)
+local function effective_limit(row, force)
+  if row.fixed_maximum ~= nil then
+    local gate = force.technologies["mir-worker-storage-head-4"]
+    if gate == nil or type(gate.researched) ~= "boolean" then
+      error("MIR caps missing native worker storage head gate", 2)
+    end
+    if gate.researched then return bounded_useful_limit(row.limit, row.fixed_maximum) end
+  end
   local useful = useful_productivity_limit(row)
   if useful == nil then return row.limit end
   return bounded_useful_limit(STREAM_VALUES[row.family].max_level, useful)
@@ -326,11 +344,11 @@ local function full_limits_for(force, include_worker, selected_owner, owner_reso
   local limits, admitted = {}, {}
   if valid_force(force) then
     for name, row in pairs(STATIC_GENERATED_BY_ID) do
-      if authored_generated_admitted(force, row) then limits[name], admitted[name] = effective_limit(row), true end
+      if authored_generated_admitted(force, row) then limits[name], admitted[name] = effective_limit(row, force), true end
     end
     for name, row in pairs(NATIVE_OWNER_BY_ID) do
       if row.enabled and native_owner_admitted(force, row) then
-        limits[name], admitted[name] = effective_limit(row), true
+        limits[name], admitted[name] = effective_limit(row, force), true
       end
     end
     for name, row in pairs(RESTORATION_BY_ID) do
@@ -350,9 +368,9 @@ local function event_limits_for(force, name, include_worker)
   local row = DECLARATION_BY_ID[name]
   if row and row.enabled then
     if row.ownership_kind == "authored_generated" and authored_generated_admitted(force, row) then
-      return {[name] = effective_limit(row)}, {[name] = true}, nil
+      return {[name] = effective_limit(row, force)}, {[name] = true}, nil
     elseif row.ownership_kind == "nativeowner" and native_owner_admitted(force, row) then
-      return {[name] = effective_limit(row)}, {[name] = true}, nil
+      return {[name] = effective_limit(row, force)}, {[name] = true}, nil
     end
   end
   if name == WORKER_TAIL_NAMES[1] or name == WORKER_TAIL_NAMES[2] then
