@@ -5,6 +5,8 @@ local CASE, SAVE = "known-base-addition-f200-2077", "mir5-native-complete"
 local GEAR, PLASTIC = "recipe-prod-research_gears-1", "recipe-prod-research_plastic-1"
 local LAB, LAB_SPEED, STOCK, REFILL_AT = "mir-known-base-fast-lab", 14400, 100, 16
 local NORMAL_GEAR_COUNT, OLD_GEAR_COUNT = 8000, 1
+local WORKER = {"worker-robots-storage-4", "mir-worker-storage-default-4",
+  "mir-worker-storage-head-4", "mir-worker-storage-preservation-4"}
 local FORCES = {"player", "mir5-migration-origin-f200-110-foreign", "mir5-migration-origin-f200-110-detached"}
 local FAMILIES = {
   {"low_density_structure","low-density-structure"}, {"plastic","plastic-bar"},
@@ -55,6 +57,62 @@ local function forces()
     out[#out+1]=force
   end
   return out
+end
+local function worker_snapshot(force)
+  local out={bonus=force.worker_robots_storage_bonus,rows={}}
+  if type(out.bonus)~="number" then fail("worker bonus unavailable")end
+  for _,name in ipairs(WORKER)do
+    local t=technology(force,name);local p=t.prototype
+    if type(t.researched)~="boolean"or type(t.enabled)~="boolean"or type(t.visible_when_disabled)~="boolean"
+      or type(p.hidden)~="boolean"or type(p.enabled)~="boolean"or type(p.visible_when_disabled)~="boolean"
+      or type(p.ignore_tech_cost_multiplier)~="boolean"
+      or t.level~=4 or t.researched or t.saved_progress~=0 then fail("empty worker native state differs: "..name)end
+    if force.current_research and force.current_research.name==name then fail("empty worker is current")end
+    for _,queued in ipairs(force.research_queue or {})do if queued.name==name then fail("empty worker is queued")end end
+    if p.level~=4 or p.max_level~=(name==WORKER[3]and 4 or 4294967295)
+      or #p.effects~=1 or p.effects[1].type~="worker-robot-storage"
+      or p.effects[1].modifier~=(name==WORKER[3]and -1 or 1)then fail("worker prototype/effect differs: "..name)end
+    if name==WORKER[3]then
+      if t.research_unit_count~=1 or p.research_unit_energy~=60 or next(p.prerequisites)~=nil
+        or #t.research_unit_ingredients~=1 or t.research_unit_ingredients[1].name~="automation-science-pack"
+        or t.research_unit_ingredients[1].amount~=1 then fail("worker debit contract differs")end
+    else
+      local packs={"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","utility-science-pack"}
+      if t.research_unit_count~=675 or p.research_unit_count_formula~="675*1.5^(L-4)"
+        or p.research_unit_energy~=3600 or #t.research_unit_ingredients~=#packs then fail("worker cost/science differs")end
+      for i,pack in ipairs(packs)do local row=t.research_unit_ingredients[i]
+        if row.name~=pack or row.amount~=1 then fail("worker science differs")end
+      end
+    end
+    local prerequisites={};for key,value in pairs(p.prerequisites)do prerequisites[#prerequisites+1]=type(key)=="string"and key or value.name end
+    table.sort(prerequisites)
+    out.rows[name]={level=t.level,researched=t.researched,enabled=t.enabled,visible=t.visible_when_disabled,
+      saved=t.saved_progress,count=t.research_unit_count,hidden=p.hidden,prototype_enabled=p.enabled,
+      prototype_visible=p.visible_when_disabled,first=p.level,maximum=p.max_level,energy=p.research_unit_energy,
+      formula=p.research_unit_count_formula or false,ignore_price=p.ignore_tech_cost_multiplier,
+      science=copy(t.research_unit_ingredients),effects=copy(p.effects),prerequisites=prerequisites}
+  end
+  local c,t,h,p=out.rows[WORKER[1]],out.rows[WORKER[2]],out.rows[WORKER[3]],out.rows[WORKER[4]]
+  if c.hidden or t.hidden or not h.hidden or not p.hidden or h.enabled or h.visible or p.enabled or p.visible
+    or h.prototype_enabled~=false or h.prototype_visible~=false or p.prototype_enabled~=false or p.prototype_visible~=false then
+    fail("worker holder policy differs")
+  end
+  return out
+end
+local function worker_snapshots()
+  local out={};for _,force in pairs(game.forces)do out[force.name]=worker_snapshot(force)end;return out
+end
+local function worker_projection(state)
+  if game.difficulty_settings.technology_price_multiplier~=1 then fail("worker map price differs")end
+  if type(state.worker_source)~="table" then fail("incoming empty worker observation absent")end
+  local expected=copy(state.worker_source)
+  for _,frame in pairs(expected)do
+    local source,owner=frame.rows[WORKER[1]],frame.rows[WORKER[2]]
+    owner.enabled,owner.visible=source.enabled,source.visible
+    source.enabled=false
+  end
+  local actual=worker_snapshots();equal(actual,expected,"empty worker owner projection")
+  return actual
 end
 local function snapshot(force)
   local out={rows={},bonuses={},queue={},current=force.current_research and force.current_research.name or false,
@@ -171,6 +229,8 @@ local function marker(stage,state)
     scripted_carrier_events=state.scripted_carrier_events,
     initial=state.initial,final=state.final,on_load_read_only=stage=="reload",
     apparatus=state.apparatus,science=state.science,supply_log=state.supply_log,final_stock=state.final_stock,
+    worker_source=state.worker_source,worker_initial=state.worker_initial,worker_final=state.worker_final,
+    worker_provenance="incoming-candidate-native-empty-observation; prior-D38-C4-not-captured; runtime-older501-admission-required",
     startup=startup_snapshot(),mods=copy(script.active_mods),clock=game.speed,event=copy(state.event)}))
 end
 local function stock(state)
@@ -246,12 +306,18 @@ local function start_labs(state)
 end
 script.on_init(function()
   if storage[KEY]~=nil then fail("fixture was already in the source")end
-  storage[KEY]={phase="await-configuration"}
+  -- This is an incoming candidate-load observation, not a retroactive C4
+  -- capture in D38. MIR's older-source guard independently admits the source.
+  storage[KEY]={phase="await-configuration",worker_source=worker_snapshots()}
+  for _,force in ipairs(forces())do
+    if storage[KEY].worker_source[force.name].bonus~=0 then fail("known empty worker source bonus differs")end
+  end
 end)
 script.on_configuration_changed(function(event)
   local state=storage[KEY]
   if not state or state.phase~="await-configuration" then fail("unexpected configuration stage")end
   state.initial=entry(event)
+  state.worker_initial=worker_projection(state)
   state.event={mod_startup_settings_changed=event.mod_startup_settings_changed,mod_changes=copy(event.mod_changes)}
   state.completions={};state.scripted_carrier_events={};state.phase="ready";state.deadline=game.tick+36000
 end)
@@ -285,6 +351,7 @@ script.on_event(defines.events.on_tick,function()
     if state.phase~="completed" then fail("cold save is incomplete")end
     check_carriers(true)
     equal(snapshots(),state.final,"cold state")
+    equal(worker_projection(state),state.worker_final,"cold worker state")
     equal(stock(state),state.final_stock,"cold science stock")
     if not reported then marker("reload",state);reported=true end
     return
@@ -314,6 +381,7 @@ script.on_event(defines.events.on_tick,function()
     expected.bonuses["plastic-bar"]=expected.bonuses["plastic-bar"]+.1
     expected.current,expected.queue,expected.progress=false,{},0
     equal(final,expected_all,"post-lab state");check_carriers(true)
+    state.worker_final=worker_projection(state)
     state.final_stock=stock(state)
     state.final, state.phase=final,"completed"
     marker("initial",state);game.server_save(SAVE)
