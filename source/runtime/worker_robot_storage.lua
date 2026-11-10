@@ -152,6 +152,7 @@ local pending = false
 local default_head_pending = false
 local default_mutating_force
 local owned_queue_force
+local delegated_provider_preflight, delegated_provider_apply
 local selected_cap, selected_enabled = 0, true
 
 local function clone(value)
@@ -466,7 +467,8 @@ local function unchanged_unrecorded_secretas(event, route)
   return true
 end
 
-function M.preflight(event, route)
+function M.preflight(event, route, owner_plan)
+  if owner_plan ~= nil then return delegated_provider_preflight(event, route, owner_plan) end
   local state = checked_state()
   if state and state.schema == 2 then
     local current = fact(route)
@@ -503,6 +505,7 @@ function M.preflight(event, route)
 end
 
 function M.apply(plan)
+  if plan and plan.delegated_handover ~= nil then return delegated_provider_apply(plan) end
   if plan and plan.recovery then
     if plan.state then storage[KEY] = plan.state else legacy_apply(plan.legacy) end
     for _, item in ipairs(plan.empty or {}) do
@@ -538,8 +541,8 @@ function M.configure(maximum, enabled)
   selected_cap, selected_enabled = maximum or 0, enabled ~= false
 end
 
-local function assign_queue(force, frame, queue, moved, destination, activate_remainder)
-  destination = destination or recovery.id
+local function assign_queue(force, frame, queue, moved, destination, activate_remainder, source_id)
+  destination, source_id = destination or recovery.id, source_id or recovery.canonical
   local previous_owner = owned_queue_force
   owned_queue_force = force.index
   local ok, message = pcall(function()
@@ -550,12 +553,12 @@ local function assign_queue(force, frame, queue, moved, destination, activate_re
       if actual[index].name ~= name then recover_error("native queue changed prepared order; reload the original copy") end
     end
     for name, saved in pairs(frame.queued_saved) do
-      local id = moved and name == recovery.canonical and destination or name
+      local id = moved and name == source_id and destination or name
       if not (activate_remainder and queue[1] == id) and force.technologies[id].saved_progress ~= saved then
         force.technologies[id].saved_progress = saved
       end
     end
-    local current = moved and frame.current == recovery.canonical and destination or frame.current
+    local current = moved and frame.current == source_id and destination or frame.current
     if current then
       if not force.current_research or force.current_research.name ~= current then recover_error("native current research changed") end
       force.research_progress = frame.current_progress
@@ -587,9 +590,9 @@ local function equal_plain(left, right)
   return true
 end
 
-local function checked_default_force(record)
+local function checked_default_force(record, retired)
   fields(record, {phase=true, retired_flags=true})
-  if record.phase ~= "owned" then recover_error("invalid full default owner phase") end
+  if record.phase ~= (retired and "retired" or "owned") then recover_error("invalid full default owner phase") end
   fields(record.retired_flags, {enabled=true, visible=true, disabled_by_mir=true, visibility_hidden_by_mir=true})
   local flags = record.retired_flags
   if type(flags.enabled) ~= "boolean" or type(flags.visible) ~= "boolean"
@@ -601,19 +604,24 @@ end
 
 local function reconnect_default(state)
   -- Native H, not a cached level/progress field, proves the paid first level.
-  default_head_pending = state ~= nil
+  default_head_pending = state ~= nil and state.kind == "full-default"
 end
 
 local function owner_record()
   local value = storage[OWNER_KEY]
   if value == nil then return nil end
-  fields(value, {schema=true, kind=true, owner=true, source=true, gate=true, contract=true, producer=true, forces=true})
-  if value.schema ~= 3 or value.kind ~= "full-default" or value.owner ~= recovery.ordinary_default_id
+  fields(value, {schema=true, kind=true, owner=true, source=true, gate=true, contract=true, producer=true, forces=true, current=true})
+  local retired = value.kind == "provider-retired"
+  if value.schema ~= 3 or value.kind ~= "full-default" and not retired or value.owner ~= recovery.ordinary_default_id
       or value.source ~= recovery.canonical or value.gate ~= recovery.head_id
       or type(value.contract) ~= "string" or #value.contract > 8192
       or value.contract:sub(1, 16) ~= "worker-storage-1" then
     recover_error("invalid full default native-owner record")
   end
+  if retired then
+    checked_fact(value.current)
+    if value.current.kind ~= "finite" then recover_error("retired default owner has no admitted finite route") end
+  elseif value.current ~= nil then recover_error("ordinary default owner has a provider route") end
   fields(value.producer, {kind=true, old_version=true, new_version=true})
   if (value.producer.kind ~= "initial-empty" and value.producer.kind ~= "recorded-default"
       and value.producer.kind ~= "unchanged-mir5-default")
@@ -635,7 +643,7 @@ local function owner_record()
   end
   for index, record in pairs(value.forces) do
     if not integer(index) then recover_error("invalid default owner force index") end
-    checked_default_force(record)
+    checked_default_force(record, retired)
   end
   return value
 end
@@ -951,6 +959,255 @@ function M.apply_default_owner_transfer(plan)
   return true
 end
 
+-- One native transfer delegates to the existing prepared quota engine.
+-- These are ephemeral issued-plan identities, not saved work or a second ledger.
+local provider_plans = setmetatable({}, {__mode="k"})
+
+local function finite_provider_contract(route)
+  local current = fact(route)
+  if not current or current.kind ~= "finite" or route.finite[1].max_level ~= 4 then
+    recover_error("full default handover requires an admitted finite public4", route)
+  end
+  for _, stage in ipairs(route.finite) do
+    local prototype = native_prototype(stage.name)
+    local first = tonumber(stage.name:match("%-(%d+)$"))
+    if not prototype or prototype.level ~= first or prototype.max_level ~= stage.max_level
+        or creator(stage.name) ~= stage.provider then recover_error("finite provider prototype custody changed", route) end
+  end
+  local endpoint = native_prototype(route.technology)
+  if not endpoint or endpoint.level ~= route.level or endpoint.max_level ~= 4294967295
+      or creator(route.technology) ~= (route.owned and MIR or route.provider) then
+    recover_error("finite continuation prototype custody changed", route)
+  end
+  local public, owner = native_prototype(recovery.canonical), native_prototype(recovery.ordinary_default_id)
+  if not owner or creator(recovery.ordinary_default_id) ~= MIR then recover_error("full default owner custody changed", route) end
+  local contract = recovery.fingerprint(owner)
+  local private = native_prototype(recovery.id)
+  if private_contract() ~= contract or private.hidden ~= true or private.enabled ~= false
+      or private.visible_when_disabled ~= false then recover_error("full default/private contracts or private flags differ", route) end
+  -- Validate the complete new public contract without treating it as the old
+  -- cost basis. Only its single worker scalar sets the cancelling head debit.
+  local public_view = {level=4, max_level=4294967295, effects=public.effects, prerequisites=public.prerequisites,
+    research_unit_count_formula=public.research_unit_count_formula, research_unit_count=public.research_unit_count,
+    research_unit_energy=public.research_unit_energy, research_unit_ingredients=public.research_unit_ingredients,
+    ignore_tech_cost_multiplier=public.ignore_tech_cost_multiplier}
+  recovery.fingerprint(public_view)
+  head_gate_contract({effects=public.effects, research_unit_ingredients=owner.research_unit_ingredients,
+    ignore_tech_cost_multiplier=owner.ignore_tech_cost_multiplier})
+  return current, contract, public
+end
+
+local function provider_addition(event, route, owned)
+  if type(event) ~= "table" or event.mod_startup_settings_changed ~= false or type(event.mod_changes) ~= "table"
+      or script.active_mods[MIR] ~= target.distribution_version then
+    recover_error("full default handover requires unchanged startup settings and exact package", route)
+  end
+  local mir = event.mod_changes[MIR]
+  if mir and (type(mir) ~= "table" or type(mir.old_version) ~= "string" or mir.old_version ~= owned.producer.new_version
+      or mir.new_version ~= script.active_mods[MIR]) then
+    recover_error("full default handover package event is inconsistent", route)
+  end
+  for _, stage in ipairs(route.finite) do
+    local change = event.mod_changes[stage.provider]
+    if type(change) ~= "table" or change.old_version ~= nil or change.new_version ~= script.active_mods[stage.provider]
+        or type(change.new_version) ~= "string" then recover_error("finite provider must be a proved new addition", route) end
+  end
+  for name, change in pairs(event.mod_changes) do
+    if name ~= MIR and (type(change) ~= "table" or type(change.new_version) ~= "string"
+        or change.new_version ~= script.active_mods[name] or change.old_version ~= nil and change.old_version ~= change.new_version) then
+      recover_error("provider handover cannot combine removal or existing-mod updates", route)
+    end
+  end
+end
+
+local function plan_provider_handover(event, route)
+  local owned, state = owner_record(), checked_state()
+  if not owned or owned.kind ~= "full-default" or not state or state.schema ~= 2 or state.kind ~= "route"
+      or state.current.kind ~= "default" then recover_error("finite handover has no full default authority", route) end
+  local current, contract, public_prototype = finite_provider_contract(route)
+  if contract ~= owned.contract then recover_error("native full default contract changed before provider handover", route) end
+  provider_addition(event, route, owned)
+  empty_private()
+  local record = clone(owned)
+  record.kind, record.current = "provider-retired", clone(current)
+  local prepared = {schema=2, kind="prepared", phase="provider", current=clone(current), contract=contract,
+    cap=selected_cap, family_enabled=selected_enabled, forces={}}
+  local items, seen = {}, {}
+  for _, force in ipairs(forces()) do
+    local prior = owned.forces[force.index]
+    if not prior then recover_error("provider handover force authority is missing", route) end
+    seen[force.index] = true
+    local frame, destination = snapshot(force, recovery.ordinary_default_id), snapshot(force, recovery.id)
+    local public, gate = snapshot(force, recovery.canonical), gate_frame(force)
+    local paid = frame.next_level >= 5
+    if public.next_level ~= (paid and 5 or 4) or public.researched ~= paid or public.saved_progress ~= 0
+        or public.occurrences ~= 0 or public.current == recovery.canonical or gate.researched ~= paid then
+      recover_error("finite public first/debit does not match proved owner first level", route)
+    end
+    if destination.next_level ~= 4 or destination.researched or destination.saved_progress ~= 0
+        or destination.occurrences ~= 0 or destination.enabled or destination.visible then
+      recover_error("legacy private destination is not pristine", route)
+    end
+    if frame.occurrences > 0 then requeueable(force, frame, true, true) end
+    local allowance = frame.allowance
+    local flags = prior.retired_flags
+    local release = flags.disabled_by_mir and not public.enabled and public_prototype.enabled == true
+    prepared.forces[force.index] = {next_level=frame.next_level, limit=frame.next_level+allowance-1,
+      pending=allowance>0, enabled=allowance>0 and frame.enabled or false, visible=frame.visible}
+    record.forces[force.index].phase = "retired"
+    items[#items+1] = {force=force, source=frame, destination=destination, public=public, gate_paid=gate.researched,
+      release_public=release, bonus=native_bonus(force), phase="retired", moved=true}
+  end
+  for index in pairs(owned.forces) do if not seen[index] then recover_error("stale provider handover force history", route) end end
+  if #items == 0 then recover_error("provider handover requires native forces", route) end
+  return {kind="default-native-provider-handover", event=clone(event), route=copy(route), current=current,
+    prior_owner=owned, prior_state=state, record=record, prepared=prepared, items=items, contract=contract,
+    cap=selected_cap, enabled=selected_enabled, already_owned=true, changed=true}
+end
+
+local function verify_provider_plan(plan, fresh)
+  if plan.prior_owner ~= fresh.prior_owner or plan.prior_state ~= fresh.prior_state
+      or plan.contract ~= fresh.contract or plan.cap ~= fresh.cap or plan.enabled ~= fresh.enabled
+      or not equal_plain(plan.event, fresh.event) or not equal_plain(plan.current, fresh.current)
+      or not equal_plain(plan.record, fresh.record) or not equal_plain(plan.prepared, fresh.prepared)
+      or #plan.items ~= #fresh.items then recover_error("stale full default provider handover") end
+  for index, item in ipairs(fresh.items) do
+    local old = plan.items[index]
+    if old.force.index ~= item.force.index or old.gate_paid ~= item.gate_paid or old.bonus ~= item.bonus
+        or old.release_public ~= item.release_public or not equal_plain(frame_values(old.source), frame_values(item.source))
+        or not equal_plain(frame_values(old.destination), frame_values(item.destination))
+        or not equal_plain(frame_values(old.public), frame_values(item.public)) then
+      recover_error("native work changed after provider preflight")
+    end
+  end
+end
+
+function M.default_owner_delegated(plan)
+  return type(plan) == "table" and plan.kind == "default-native-provider-handover" and provider_plans[plan] ~= nil
+end
+
+delegated_provider_preflight = function(event, route, plan)
+  if not M.default_owner_delegated(plan) or not equal_plain(event, plan.event) or not same(route, plan.route) then
+    recover_error("unissued or mismatched provider delegation", route)
+  end
+  local authorization = provider_plans[plan]
+  if authorization.applied then recover_error("provider delegation was already applied", route) end
+  verify_provider_plan(plan, plan_provider_handover(event, route))
+  if not authorization.legacy then
+    authorization.legacy = {recovery=true, state=clone(plan.prepared), delegated_handover=plan}
+  end
+  if not equal_plain(authorization.legacy.state, plan.prepared) then recover_error("provider quota delegation changed") end
+  return authorization.legacy
+end
+
+delegated_provider_apply = function(legacy)
+  local plan, authorization = legacy.delegated_handover, provider_plans[legacy.delegated_handover]
+  if not M.default_owner_delegated(plan) or not authorization.applied or authorization.legacy ~= legacy
+      or storage[OWNER_KEY] ~= authorization.record then recover_error("native provider handover must precede legacy quota commit") end
+  if authorization.committed and storage[KEY] == legacy.state then return end
+  if storage[KEY] ~= plan.prior_state or not equal_plain(legacy.state, plan.prepared) then recover_error("provider quota state changed before commit") end
+  prepared_frames(legacy.state)
+  for _, item in ipairs(authorization.settled) do
+    if not equal_plain(item.private, frame_values(snapshot(item.force, recovery.id)))
+        or not equal_plain(item.public, frame_values(snapshot(item.force, recovery.canonical)))
+        or not equal_plain(item.owner, frame_values(snapshot(item.force, recovery.ordinary_default_id)))
+        or gate_frame(item.force).researched ~= item.gate_paid or native_bonus(item.force) ~= item.bonus then
+      recover_error("native provider frame changed before quota commit")
+    end
+  end
+  storage[KEY] = legacy.state
+  reconnect(legacy.state)
+  authorization.committed = true
+end
+
+local function apply_provider_handover(plan)
+  if not M.default_owner_delegated(plan) then recover_error("unissued provider native handover") end
+  local authorization = provider_plans[plan]
+  if authorization.applied then
+    if storage[OWNER_KEY] ~= authorization.record then recover_error("applied provider authority changed") end
+    return false
+  end
+  if not authorization.legacy then recover_error("provider legacy quota must be preflighted before native writes") end
+  local fresh = plan_provider_handover(plan.event, plan.route)
+  verify_provider_plan(plan, fresh)
+  if authorization.legacy.delegated_handover ~= plan or not equal_plain(authorization.legacy.state, fresh.prepared) then
+    recover_error("provider quota delegation changed before native writes")
+  end
+  for _, item in ipairs(fresh.items) do
+    local previous = default_mutating_force
+    default_mutating_force = item.force.index
+    local ok, message = pcall(function()
+      local frame, holder = item.source, item.destination.technology
+      holder.level = frame.next_level
+      holder.enabled = fresh.prepared.forces[item.force.index].enabled
+      holder.visible_when_disabled, holder.saved_progress = frame.visible, frame.saved_progress
+      frame.technology.level = 4
+      frame.technology.enabled, frame.technology.visible_when_disabled = false, false
+      frame.technology.saved_progress = 0
+      if frame.occurrences > 0 then
+        local queue = {}
+        for index, name in ipairs(frame.queue) do queue[index] = name == recovery.ordinary_default_id and recovery.id or name end
+        assign_queue(item.force, frame, queue, true, recovery.id, false, recovery.ordinary_default_id)
+      end
+      frame.technology.saved_progress, holder.saved_progress = 0, frame.saved_progress
+      if frame.current == recovery.ordinary_default_id then item.force.research_progress = frame.current_progress end
+      if not frame.researched and holder.research_unit_count ~= frame.count then recover_error("provider transferred work price differs") end
+      if item.release_public then item.public.technology.enabled = true end
+    end)
+    default_mutating_force = previous
+    if not ok then error(message, 0) end
+  end
+  local settled = {}
+  for _, item in ipairs(fresh.items) do
+    local owner, private = snapshot(item.force, recovery.ordinary_default_id), snapshot(item.force, recovery.id)
+    local public, gate = snapshot(item.force, recovery.canonical), gate_frame(item.force)
+    local expected = frame_values(item.source)
+    expected.researched = false
+    expected.enabled = fresh.prepared.forces[item.force.index].enabled
+    expected.current = expected.current == recovery.ordinary_default_id and recovery.id or expected.current
+    for index, name in ipairs(expected.queue) do if name == recovery.ordinary_default_id then expected.queue[index] = recovery.id end end
+    if expected.queued_saved[recovery.ordinary_default_id] ~= nil then
+      expected.queued_saved[recovery.id], expected.queued_saved[recovery.ordinary_default_id] = expected.queued_saved[recovery.ordinary_default_id], nil
+    end
+    if item.source.researched then expected.count = private.count end
+    local public_expected = frame_values(item.public)
+    public_expected.enabled = item.release_public or public_expected.enabled
+    public_expected.current, public_expected.current_progress = expected.current, expected.current_progress
+    public_expected.queue, public_expected.queued_saved = clone(expected.queue), clone(expected.queued_saved)
+    if not equal_plain(expected, frame_values(private)) or not equal_plain(public_expected, frame_values(public))
+        or owner.next_level ~= 4 or owner.researched or owner.saved_progress ~= 0 or owner.occurrences ~= 0
+        or owner.enabled or owner.visible or gate.researched ~= item.gate_paid or native_bonus(item.force) ~= item.bonus then
+      recover_error("provider handover did not preserve exact native work/contribution; reload the original copy")
+    end
+    settled[#settled+1] = {force=item.force, private=frame_values(private), public=frame_values(public),
+      owner=frame_values(owner), gate_paid=gate.researched, bonus=item.bonus}
+  end
+  if storage[OWNER_KEY] ~= fresh.prior_owner or storage[KEY] ~= fresh.prior_state then recover_error("provider history changed during native mutation") end
+  storage[OWNER_KEY] = fresh.record
+  authorization.record, authorization.applied, authorization.settled = fresh.record, true, settled
+  reconnect_default(fresh.record)
+  return true
+end
+
+local function retired_provider_current(event, route)
+  local state = owner_record()
+  local current, contract = finite_provider_contract(route)
+  if state.kind ~= "provider-retired" or not same_fact(state.current, current) or state.contract ~= contract then
+    recover_error("retired default provider removal/changed continuation remains unqualified", route)
+  end
+  for _, stage in ipairs(route.finite) do
+    local change = type(event) == "table" and type(event.mod_changes) == "table" and event.mod_changes[stage.provider]
+    if change and change.old_version ~= change.new_version then recover_error("retired provider change remains unqualified", route) end
+  end
+  for _, force in ipairs(forces()) do
+    local frame = snapshot(force, recovery.ordinary_default_id)
+    if frame.next_level ~= 4 or frame.researched or frame.saved_progress ~= 0 or frame.occurrences ~= 0 or frame.enabled or frame.visible then
+      recover_error("retired default owner gained unrecorded work", route)
+    end
+    gate_frame(force)
+  end
+end
+
 local function default_active(route, split_current)
   local state = owner_record()
   if not state and (split_current ~= true or route ~= nil) then return false end
@@ -964,12 +1221,21 @@ function M.default_owner_on_init(route, split_current)
 end
 
 function M.default_owner_preflight(event, route, split_current)
+  local owned = owner_record()
+  if owned and owned.kind == "provider-retired" then retired_provider_current(event, route); return nil end
+  if owned and route ~= nil then
+    if split_current ~= true then recover_error("provider handover has no admitted owner data") end
+    local plan = plan_provider_handover(event, route)
+    provider_plans[plan] = {}
+    return plan
+  end
   if not default_active(route, split_current) then return nil end
   return M.plan_default_owner_transfer(event, route, false, owner_record() and {configuration=true} or nil)
 end
 
 function M.default_owner_apply(plan)
   if plan == nil then return false end
+  if type(plan) == "table" and plan.kind == "default-native-provider-handover" then return apply_provider_handover(plan) end
   return M.apply_default_owner_transfer(plan)
 end
 
@@ -1000,16 +1266,22 @@ function M.default_owner_on_research_finished(event)
 end
 
 function M.default_owner_on_force_created(event)
+  local retired = owner_record()
+  if retired and retired.kind == "provider-retired" then return false end
   if not owner_record() or not event or not event.force then return false end
   return M.apply_default_owner_transfer(M.plan_default_owner_transfer(nil, nil, false, {created_force=event.force.index}))
 end
 
 function M.default_owner_on_force_reset(event)
+  local retired = owner_record()
+  if retired and retired.kind == "provider-retired" then return false end
   if not owner_record() or not event or not event.force then return false end
   return M.apply_default_owner_transfer(M.plan_default_owner_transfer(nil, nil, false, {reset_force=event.force.index}))
 end
 
 function M.default_owner_on_forces_merged(event)
+  local retired = owner_record()
+  if retired and retired.kind == "provider-retired" then return false end
   local state = owner_record()
   if not state or not event or not event.destination then return false end
   local destination, source_index = event.destination, event.source_index

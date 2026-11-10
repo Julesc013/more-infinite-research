@@ -297,6 +297,68 @@ class LifecycleTests(unittest.TestCase):
           end
         ''')
 
+    def test_provider_handover_releases_positive_head_cap_rights_without_enabling_retired_owner(self):
+        self.lua.execute(r'''
+          for _, positive in ipairs({false,true}) do
+          for _, incoming_enabled in ipairs({false,true}) do
+          for _, already_enabled in ipairs({false,true}) do
+            local public=technology("worker-robots-storage-4",4,already_enabled)
+            public.researched,public.visible_when_disabled=true,true
+            public.prototype.enabled,public.prototype.visible_when_disabled=incoming_enabled,false
+            local owner=technology("mir-worker-storage-default-4",4,false)
+            local private=technology("mir-worker-storage-preservation-4",8)
+            local f=force(98,{[public.name]=public,[owner.name]=owner,[private.name]=private},{private},private,.42)
+            boot({[98]=f},0)
+            local right={disabled=positive,visible_when_disabled=false}
+            storage.mir_caps={schema=1,owned_disabled={[98]={[public.name]=right,[owner.name]={disabled=true}}}}
+            local lifecycle=require("runtime.lifecycle")
+            local plan=lifecycle.preflight_worker_storage_split_caps({kind="default-native-provider-handover",items={{force=f}}})
+            assert(public.enabled==already_enabled and public.visible_when_disabled)
+            lifecycle.apply_worker_storage_split_caps(plan)
+            assert(public.enabled==(already_enabled or positive and incoming_enabled))
+            assert(not public.visible_when_disabled and public.level==4 and public.researched)
+            assert(not owner.enabled and owner.level==4, "released cap right enabled retired default owner")
+            assert(not storage.mir_caps.owned_disabled[98])
+            assert(f.current_research==private and f.research_progress==.42 and #f.research_queue==1 and f.cancelled==0)
+          end end end
+        ''')
+
+    def test_provider_handover_cap_revalidation_refuses_stale_rights_before_flag_writes(self):
+        self.lua.execute(r'''
+          local public=technology("worker-robots-storage-4",4,false)
+          public.prototype.visible_when_disabled=false;public.visible_when_disabled=true
+          local f=force(99,{[public.name]=public})
+          boot({[99]=f},0)
+          local right={disabled=true,visible_when_disabled=false}
+          storage.mir_caps={schema=1,owned_disabled={[99]={[public.name]=right}}}
+          local lifecycle=require("runtime.lifecycle")
+          local plan=lifecycle.preflight_worker_storage_split_caps({kind="default-native-provider-handover",items={{force=f}}})
+          right.disabled=false
+          assert(not pcall(lifecycle.apply_worker_storage_split_caps,plan))
+          assert(not public.enabled and public.visible_when_disabled and storage.mir_caps.owned_disabled[99][public.name]==right)
+          right.disabled="invalid"
+          assert(not pcall(lifecycle.preflight_worker_storage_split_caps,{kind="default-native-provider-handover",items={{force=f}}}))
+          assert(not public.enabled and public.visible_when_disabled)
+        ''')
+
+    def test_provider_handover_installs_quota_only_after_native_work_is_settled(self):
+        self.lua.execute(r'''
+          boot({},1)
+          local worker,lifecycle=require("runtime.worker_robot_storage"),require("runtime.lifecycle")
+          local trace={};local function note(s)trace[#trace+1]=s end
+          local native={kind="default-native-provider-handover"}
+          worker.default_owner_preflight=function()note("native-preflight");return native end
+          worker.default_owner_delegated=function(plan)return plan==native end
+          worker.preflight=function(event,route,delegated)assert(delegated==native);note("legacy-preflight");return "quota"end
+          lifecycle.preflight_worker_storage_split_caps=function(plan)assert(plan==native);note("caps-preflight");return "rights"end
+          worker.default_owner_apply=function(plan)assert(plan==native);note("native-apply")end
+          worker.apply=function(plan)assert(plan=="quota");note("quota-apply")end
+          lifecycle.apply_worker_storage_split_caps=function(plan)assert(plan=="rights");note("rights-apply")end
+          lifecycle.on_configuration_changed=function()note("caps-config")end
+          handlers.configuration()
+          assert(table.concat(trace,",")=="native-preflight,legacy-preflight,caps-preflight,native-apply,quota-apply,rights-apply,caps-config")
+        ''')
+
     def test_worker_split_preflights_before_writes_and_settles_before_caps(self):
         self.lua.execute(r'''
           boot({}, 1)
@@ -315,7 +377,7 @@ class LifecycleTests(unittest.TestCase):
           end
           lifecycle.on_configuration_changed = function() note("caps-config") end
           handlers.configuration()
-          assert(table.concat(trace, ",") == "legacy-preflight,split-preflight,caps-preflight,legacy-apply,split-apply,rights-apply,caps-config",
+          assert(table.concat(trace, ",") == "split-preflight,legacy-preflight,caps-preflight,legacy-apply,split-apply,rights-apply,caps-config",
             "worker/cap transfer performed writes before all preflights or applied caps too early")
           trace = {}
           worker.default_owner_on_research_finished = function() note("split-finished");return false end

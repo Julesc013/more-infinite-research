@@ -214,6 +214,38 @@ end
 -- stable tail. Move the existing cap restoration right with that work; a
 -- false flag alone never authorizes MIR to enable a technology later.
 function M.preflight_worker_storage_split_caps(plan)
+  if plan and plan.kind == "default-native-provider-handover" then
+    local state = existing_state()
+    if not state then return nil end
+    local items = {}
+    for _, item in ipairs(plan.items) do
+      local owned = state.owned_disabled[item.force.index]
+      if owned ~= nil and type(owned) ~= "table" then error("MIR invalid worker cap ownership", 2) end
+      if owned then
+        local records, snapshots = {}, {}
+        for _, name in ipairs({"worker-robots-storage-4", "mir-worker-storage-default-4"}) do
+          local record = owned[name]
+          if record ~= nil then
+            if type(record) ~= "table" then error("MIR invalid retiring worker cap right", 2) end
+            local copy = {}
+            for key, value in pairs(record) do
+              if (key ~= "disabled" and key ~= "visible_when_disabled" and key ~= "discovery_enabled")
+                  or type(value) ~= "boolean" then error("MIR invalid retiring worker cap right", 2) end
+              copy[key] = value
+            end
+            records[name], snapshots[name] = record, copy
+          end
+        end
+        local public = item.force.technologies["worker-robots-storage-4"]
+        if not public or not public.prototype or type(public.prototype.enabled) ~= "boolean"
+            or type(public.prototype.visible_when_disabled) ~= "boolean" then
+          error("MIR incoming worker provider flags are unavailable", 2)
+        end
+        items[#items + 1] = {force=item.force, owned=owned, records=records, snapshots=snapshots, public=public}
+      end
+    end
+    return {kind="provider-handover", state=state, items=items}
+  end
   if not plan or plan.kind ~= "default-native-owner-transfer" or plan.already_owned then return nil end
   local state = existing_state()
   if not state then return nil end
@@ -241,6 +273,42 @@ end
 function M.apply_worker_storage_split_caps(plan)
   if not plan then return end
   if existing_state() ~= plan.state then error("MIR worker cap ownership changed after preflight", 2) end
+  if plan.kind == "provider-handover" then
+    for _, item in ipairs(plan.items) do
+      if plan.state.owned_disabled[item.force.index] ~= item.owned
+          or item.force.technologies["worker-robots-storage-4"] ~= item.public then
+        error("MIR worker cap recipient changed after preflight", 2)
+      end
+      for _, name in ipairs({"worker-robots-storage-4", "mir-worker-storage-default-4"}) do
+        local record, snapshot = item.records[name], item.snapshots[name]
+        if item.owned[name] ~= record then error("MIR retiring worker cap right changed", 2) end
+        for key, value in pairs(record or {}) do
+          if snapshot[key] ~= value then error("MIR retiring worker cap right changed", 2) end
+        end
+        for key, value in pairs(snapshot or {}) do
+          if record[key] ~= value then error("MIR retiring worker cap right changed", 2) end
+        end
+      end
+    end
+    for _, item in ipairs(plan.items) do
+      local record = item.snapshots["worker-robots-storage-4"]
+      local public = item.public
+      -- The worker releases its own retirement flag. These positive cap
+      -- rights release only additional MIR writes, under incoming policy.
+      -- A negative cap baseline may have observed that retired head; it must
+      -- not disable the newly admitted provider or enable the retired owner.
+      if record then
+        if (record.disabled == true or record.discovery_enabled == true) and public.prototype.enabled then
+          public.enabled = true
+        end
+        if record.visible_when_disabled == false and public.visible_when_disabled == true
+            and not public.prototype.visible_when_disabled then public.visible_when_disabled = false end
+      end
+      item.owned["worker-robots-storage-4"], item.owned["mir-worker-storage-default-4"] = nil, nil
+      if next(item.owned) == nil then plan.state.owned_disabled[item.force.index] = nil end
+    end
+    return
+  end
   for _, item in ipairs(plan.items) do
     if item.owned["worker-robots-storage-4"] ~= item.record
         or item.owned["mir-worker-storage-default-4"] ~= nil then
