@@ -1,0 +1,850 @@
+{
+  "kind": "WorkerDefaultSnapshot512IndependentNativeObservationReviewV1",
+  "created_utc": "2026-11-10T09:57:28.927526+00:00",
+  "reviewer": "worker_transition_probe511, non-author of59d857 fixture and9B96owner",
+  "verdict": "observed-strict-work-mismatch-counterexample-with-separate-owner-classifier-adverse",
+  "original_owner_terminal_preserved": {
+    "file": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker-default-snapshot512-probe-r01/terminal.json",
+      "bytes": 40569,
+      "sha256": "B415DBD996A3B02BAE369E7B4A07BB519ABCC46896DDBDDA82DAE0F0B48786B7"
+    },
+    "status": "adverse-stopped-first-failure",
+    "failure": "[worker-snapshot512] Only the exact strict comparison refusal is an admitted counterexample",
+    "recorded_actual_processes": 3,
+    "production_preservation_acceptance": false,
+    "ordinary_completion_acceptance": false
+  },
+  "facts": {
+    "actual_distinct_native_processes": 3,
+    "actual_pid_source": "Raw running-process observations from allthree resourceledgers, not ownerattempt/contextscalar.",
+    "processes": [
+      {
+        "role": "source-create",
+        "actual_pid": 32820,
+        "ledger": {
+          "path": "D:/Projects/Factorio/.task-builds/mir512-default-worker-forward-r01/build/tmp/worker-default-snapshot512-probe-r01-source/process-1.resources.jsonl",
+          "bytes": 2606,
+          "sha256": "193682546182AF23F063F297CAA0FA8BF730FD21BE6928B24C4A1C00E8DB58C6"
+        },
+        "stdout": {
+          "path": "D:/Projects/Factorio/.task-builds/mir512-default-worker-forward-r01/build/tmp/worker-default-snapshot512-probe-r01-source/process-1.stdout.txt",
+          "bytes": 14534,
+          "sha256": "C6332B40F89E66EBAD7014FB4310A7C1FCA5CB0C899FC14D229D7B90686EE939"
+        },
+        "stderr": {
+          "path": "D:/Projects/Factorio/.task-builds/mir512-default-worker-forward-r01/build/tmp/worker-default-snapshot512-probe-r01-source/process-1.stderr.txt",
+          "bytes": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+        },
+        "terminal": {
+          "observed_at": "2026-11-10T09:50:41.2205123+00:00",
+          "phase": "completed",
+          "exit_code": 0,
+          "peak_working_set_bytes": 236658688,
+          "peak_sampled_private_bytes": 226635776,
+          "completion_predicate_observed": false
+        }
+      },
+      {
+        "role": "source-autosave",
+        "actual_pid": 52204,
+        "ledger": {
+          "path": "D:/Projects/Factorio/.task-builds/mir512-default-worker-forward-r01/build/tmp/worker-default-snapshot512-probe-r01-source/process-2.resources.jsonl",
+          "bytes": 4457,
+          "sha256": "7FD0D2CF113C7EA3B9BA0F1EA044BD79B98C11EFF23DDE80922C3E3AB8C8F9DD"
+        },
+        "stdout": {
+          "path": "D:/Projects/Factorio/.task-builds/mir512-default-worker-forward-r01/build/tmp/worker-default-snapshot512-probe-r01-source/process-2.stdout.txt",
+          "bytes": 27140,
+          "sha256": "FE9BCFED9D46753EDB133C822D8AC30A96DA256ED855552CE995A3F3F0EB0CB9"
+        },
+        "stderr": {
+          "path": "D:/Projects/Factorio/.task-builds/mir512-default-worker-forward-r01/build/tmp/worker-default-snapshot512-probe-r01-source/process-2.stderr.txt",
+          "bytes": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+        },
+        "terminal": {
+          "observed_at": "2026-11-10T09:50:49.2670236+00:00",
+          "phase": "completed",
+          "exit_code": -1,
+          "peak_working_set_bytes": 240238592,
+          "peak_sampled_private_bytes": 228122624,
+          "completion_predicate_observed": true
+        }
+      },
+      {
+        "role": "target-migration-entry",
+        "actual_pid": 40016,
+        "ledger": {
+          "path": "D:/Projects/Factorio/.task-builds/mir512-default-worker-forward-r01/build/tmp/worker-default-snapshot512-probe-r01-entry/process-1.resources.jsonl",
+          "bytes": 2005,
+          "sha256": "A26D7DA1584089F715837192648A42517885C60173DB9AEF77EA17EA45C03D09"
+        },
+        "stdout": {
+          "path": "D:/Projects/Factorio/.task-builds/mir512-default-worker-forward-r01/build/tmp/worker-default-snapshot512-probe-r01-entry/process-1.stdout.txt",
+          "bytes": 1350,
+          "sha256": "9391323D3CCF6297651943EDBFAF13C22B026EC9A1D228BDEA7690A93A4BC39D"
+        },
+        "stderr": {
+          "path": "D:/Projects/Factorio/.task-builds/mir512-default-worker-forward-r01/build/tmp/worker-default-snapshot512-probe-r01-entry/process-1.stderr.txt",
+          "bytes": 0,
+          "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+        },
+        "terminal": {
+          "observed_at": "2026-11-10T09:50:52.6609939+00:00",
+          "phase": "completed",
+          "exit_code": 1,
+          "peak_working_set_bytes": 186052608,
+          "peak_sampled_private_bytes": 177885184,
+          "completion_predicate_observed": false
+        }
+      }
+    ],
+    "source_snapshot_tick": 263,
+    "loaded_native_tick_before_configuration": 264,
+    "continuous_advances": 263,
+    "ordinary_completions": 0,
+    "source_marker_sequence": [
+      {
+        "stage": "continuous-source",
+        "tick": 259
+      },
+      {
+        "stage": "continuous-source",
+        "tick": 260
+      },
+      {
+        "stage": "continuous-source",
+        "tick": 261
+      },
+      {
+        "stage": "autosave-request",
+        "tick": 263
+      }
+    ],
+    "entry_marker_sequence": [
+      "lua-migration-entry"
+    ],
+    "equal_native_state": false,
+    "only_native_force_frame_changes": [
+      {
+        "force": "player",
+        "path": "native[0].progress",
+        "saved_raw_json_number": "0.38962962962962958357593379332683980464935302734375",
+        "loaded_raw_json_number": "0.39111111111111114269078825600445270538330078125",
+        "saved": 0.3896296296296296,
+        "loaded": 0.39111111111111113,
+        "observed_difference": 0.001481481481481528,
+        "actual_current_unit_count": 675,
+        "difference_times_current_count": 1.0000000000000315,
+        "all_other_force_native_fields_exactly_equal": true,
+        "source_pack_counts": {
+          "automation-science-pack": 74,
+          "logistic-science-pack": 74,
+          "chemical-science-pack": 74,
+          "production-science-pack": 74,
+          "utility-science-pack": 74
+        },
+        "loaded_pack_counts": {
+          "automation-science-pack": 73,
+          "logistic-science-pack": 73,
+          "chemical-science-pack": 73,
+          "production-science-pack": 73,
+          "utility-science-pack": 73
+        }
+      },
+      {
+        "force": "mir-fixture-worker-default-snapshot-queued",
+        "path": "native[1].progress",
+        "saved_raw_json_number": "0.42263000000000001676880856393836438655853271484375",
+        "loaded_raw_json_number": "0.42263999999999999346300683100707828998565673828125",
+        "saved": 0.42263,
+        "loaded": 0.42264,
+        "observed_difference": 1.0000000000010001e-05,
+        "actual_current_unit_count": 100000,
+        "difference_times_current_count": 1.000000000001,
+        "all_other_force_native_fields_exactly_equal": true,
+        "source_pack_counts": {
+          "automation-science-pack": 74,
+          "logistic-science-pack": 74,
+          "chemical-science-pack": 74,
+          "production-science-pack": 74,
+          "utility-science-pack": 74
+        },
+        "loaded_pack_counts": {
+          "automation-science-pack": 73,
+          "logistic-science-pack": 73,
+          "chemical-science-pack": 73,
+          "production-science-pack": 73,
+          "utility-science-pack": 73
+        }
+      },
+      {
+        "force": "mir-fixture-worker-default-snapshot-detached",
+        "path": "native[2].progress",
+        "saved_raw_json_number": "0.127629999999999999005240169935859739780426025390625",
+        "loaded_raw_json_number": "0.12763999999999999790389892950770445168018341064453125",
+        "saved": 0.12763,
+        "loaded": 0.12764,
+        "observed_difference": 1.0000000000010001e-05,
+        "actual_current_unit_count": 100000,
+        "difference_times_current_count": 1.000000000001,
+        "all_other_force_native_fields_exactly_equal": true,
+        "source_pack_counts": {
+          "automation-science-pack": 74,
+          "logistic-science-pack": 74,
+          "chemical-science-pack": 74,
+          "production-science-pack": 74,
+          "utility-science-pack": 74
+        },
+        "loaded_pack_counts": {
+          "automation-science-pack": 73,
+          "logistic-science-pack": 73,
+          "chemical-science-pack": 73,
+          "production-science-pack": 73,
+          "utility-science-pack": 73
+        }
+      }
+    ],
+    "serialized_saved_lua_exactly_matches_source_request_marker": true,
+    "protected_save_chain": [
+      {
+        "path": "D:/Projects/Factorio/.task-builds/mir512-default-worker-forward-r01/build/tmp/worker-default-snapshot512-probe-r01-source/write-data/saves/_autosave-mir-worker-default-snapshot.zip",
+        "bytes": 821931,
+        "sha256": "F13FF7586E9190869CDB11238CBBAC5167BF292CAFF034DE6AC1E5B553C64B6B",
+        "entries": 56,
+        "crc_passed": true
+      },
+      {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker-default-snapshot512-probe-r01/protected/source-autosave.zip",
+        "bytes": 821931,
+        "sha256": "F13FF7586E9190869CDB11238CBBAC5167BF292CAFF034DE6AC1E5B553C64B6B",
+        "entries": 56,
+        "crc_passed": true
+      },
+      {
+        "path": "D:/Projects/Factorio/.task-builds/mir512-default-worker-forward-r01/build/tmp/worker-default-snapshot512-probe-r01-entry/input/source-autosave.zip",
+        "bytes": 821931,
+        "sha256": "F13FF7586E9190869CDB11238CBBAC5167BF292CAFF034DE6AC1E5B553C64B6B",
+        "entries": 56,
+        "crc_passed": true
+      }
+    ],
+    "native_migration_frame": {
+      "schema": 1,
+      "native_tick": 264,
+      "saved_lua": {
+        "tick": 263,
+        "native": [
+          {
+            "name": "player",
+            "index": 1,
+            "bonus": 3,
+            "current": "worker-robots-storage-4",
+            "progress": 0.3896296296296296,
+            "queue": [
+              "worker-robots-storage-4",
+              "mir-fixture-worker-default-snapshot-sentinel"
+            ],
+            "main": {
+              "name": "worker-robots-storage-4",
+              "level": 4,
+              "researched": false,
+              "enabled": true,
+              "visible": false,
+              "saved_progress": 0,
+              "count": 675
+            },
+            "sentinel": {
+              "name": "mir-fixture-worker-default-snapshot-sentinel",
+              "level": 1,
+              "researched": false,
+              "enabled": true,
+              "visible": false,
+              "saved_progress": 0,
+              "count": 100000
+            },
+            "private": {
+              "name": "mir-worker-storage-preservation-4",
+              "level": 4,
+              "researched": false,
+              "enabled": false,
+              "visible": false,
+              "saved_progress": 0,
+              "count": 675
+            }
+          },
+          {
+            "name": "mir-fixture-worker-default-snapshot-queued",
+            "index": 4,
+            "bonus": 3,
+            "current": "mir-fixture-worker-default-snapshot-sentinel",
+            "progress": 0.42263,
+            "queue": [
+              "mir-fixture-worker-default-snapshot-sentinel",
+              "worker-robots-storage-4"
+            ],
+            "main": {
+              "name": "worker-robots-storage-4",
+              "level": 4,
+              "researched": false,
+              "enabled": true,
+              "visible": false,
+              "saved_progress": 0.27,
+              "count": 675
+            },
+            "sentinel": {
+              "name": "mir-fixture-worker-default-snapshot-sentinel",
+              "level": 1,
+              "researched": false,
+              "enabled": true,
+              "visible": false,
+              "saved_progress": 0,
+              "count": 100000
+            },
+            "private": {
+              "name": "mir-worker-storage-preservation-4",
+              "level": 4,
+              "researched": false,
+              "enabled": false,
+              "visible": false,
+              "saved_progress": 0,
+              "count": 675
+            }
+          },
+          {
+            "name": "mir-fixture-worker-default-snapshot-detached",
+            "index": 5,
+            "bonus": 3,
+            "current": "mir-fixture-worker-default-snapshot-sentinel",
+            "progress": 0.12763,
+            "queue": [
+              "mir-fixture-worker-default-snapshot-sentinel"
+            ],
+            "main": {
+              "name": "worker-robots-storage-4",
+              "level": 4,
+              "researched": false,
+              "enabled": true,
+              "visible": false,
+              "saved_progress": 0.23000000000000004,
+              "count": 675
+            },
+            "sentinel": {
+              "name": "mir-fixture-worker-default-snapshot-sentinel",
+              "level": 1,
+              "researched": false,
+              "enabled": true,
+              "visible": false,
+              "saved_progress": 0,
+              "count": 100000
+            },
+            "private": {
+              "name": "mir-worker-storage-preservation-4",
+              "level": 4,
+              "researched": false,
+              "enabled": false,
+              "visible": false,
+              "saved_progress": 0,
+              "count": 675
+            }
+          }
+        ],
+        "continuous_advances": 263,
+        "ordinary_completions": 0,
+        "labs": [
+          {
+            "force": "player",
+            "unit_number": 12,
+            "name": "mir-fixture-worker-default-snapshot-lab",
+            "disabled": false,
+            "status": 1,
+            "speed": 3600,
+            "packs": {
+              "automation-science-pack": 74,
+              "logistic-science-pack": 74,
+              "chemical-science-pack": 74,
+              "production-science-pack": 74,
+              "utility-science-pack": 74
+            },
+            "modules_empty": true,
+            "force_speed": 0,
+            "force_productivity": 0
+          },
+          {
+            "force": "mir-fixture-worker-default-snapshot-queued",
+            "unit_number": 13,
+            "name": "mir-fixture-worker-default-snapshot-lab",
+            "disabled": false,
+            "status": 1,
+            "speed": 3600,
+            "packs": {
+              "automation-science-pack": 74,
+              "logistic-science-pack": 74,
+              "chemical-science-pack": 74,
+              "production-science-pack": 74,
+              "utility-science-pack": 74
+            },
+            "modules_empty": true,
+            "force_speed": 0,
+            "force_productivity": 0
+          },
+          {
+            "force": "mir-fixture-worker-default-snapshot-detached",
+            "unit_number": 14,
+            "name": "mir-fixture-worker-default-snapshot-lab",
+            "disabled": false,
+            "status": 1,
+            "speed": 3600,
+            "packs": {
+              "automation-science-pack": 74,
+              "logistic-science-pack": 74,
+              "chemical-science-pack": 74,
+              "production-science-pack": 74,
+              "utility-science-pack": 74
+            },
+            "modules_empty": true,
+            "force_speed": 0,
+            "force_productivity": 0
+          }
+        ]
+      },
+      "native": [
+        {
+          "name": "player",
+          "index": 1,
+          "bonus": 3,
+          "current": "worker-robots-storage-4",
+          "progress": 0.39111111111111113,
+          "queue": [
+            "worker-robots-storage-4",
+            "mir-fixture-worker-default-snapshot-sentinel"
+          ],
+          "main": {
+            "name": "worker-robots-storage-4",
+            "level": 4,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved_progress": 0,
+            "count": 675
+          },
+          "sentinel": {
+            "name": "mir-fixture-worker-default-snapshot-sentinel",
+            "level": 1,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved_progress": 0,
+            "count": 100000
+          },
+          "private": {
+            "name": "mir-worker-storage-preservation-4",
+            "level": 4,
+            "researched": false,
+            "enabled": false,
+            "visible": false,
+            "saved_progress": 0,
+            "count": 675
+          }
+        },
+        {
+          "name": "mir-fixture-worker-default-snapshot-queued",
+          "index": 4,
+          "bonus": 3,
+          "current": "mir-fixture-worker-default-snapshot-sentinel",
+          "progress": 0.42264,
+          "queue": [
+            "mir-fixture-worker-default-snapshot-sentinel",
+            "worker-robots-storage-4"
+          ],
+          "main": {
+            "name": "worker-robots-storage-4",
+            "level": 4,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved_progress": 0.27,
+            "count": 675
+          },
+          "sentinel": {
+            "name": "mir-fixture-worker-default-snapshot-sentinel",
+            "level": 1,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved_progress": 0,
+            "count": 100000
+          },
+          "private": {
+            "name": "mir-worker-storage-preservation-4",
+            "level": 4,
+            "researched": false,
+            "enabled": false,
+            "visible": false,
+            "saved_progress": 0,
+            "count": 675
+          }
+        },
+        {
+          "name": "mir-fixture-worker-default-snapshot-detached",
+          "index": 5,
+          "bonus": 3,
+          "current": "mir-fixture-worker-default-snapshot-sentinel",
+          "progress": 0.12764,
+          "queue": [
+            "mir-fixture-worker-default-snapshot-sentinel"
+          ],
+          "main": {
+            "name": "worker-robots-storage-4",
+            "level": 4,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved_progress": 0.23000000000000004,
+            "count": 675
+          },
+          "sentinel": {
+            "name": "mir-fixture-worker-default-snapshot-sentinel",
+            "level": 1,
+            "researched": false,
+            "enabled": true,
+            "visible": false,
+            "saved_progress": 0,
+            "count": 100000
+          },
+          "private": {
+            "name": "mir-worker-storage-preservation-4",
+            "level": 4,
+            "researched": false,
+            "enabled": false,
+            "visible": false,
+            "saved_progress": 0,
+            "count": 675
+          }
+        }
+      ],
+      "equal_native_state": false,
+      "active_mods": {
+        "base": "2.1.23",
+        "more-infinite-research": "5.0.21012",
+        "mir-fixture-worker-default-snapshot": "0.1.1"
+      },
+      "game_speed": 1,
+      "labs": [
+        {
+          "force": "player",
+          "unit_number": 12,
+          "name": "mir-fixture-worker-default-snapshot-lab",
+          "disabled": false,
+          "status": 1,
+          "speed": 3600,
+          "packs": {
+            "automation-science-pack": 73,
+            "logistic-science-pack": 73,
+            "chemical-science-pack": 73,
+            "production-science-pack": 73,
+            "utility-science-pack": 73
+          },
+          "modules_empty": true,
+          "force_speed": 0,
+          "force_productivity": 0
+        },
+        {
+          "force": "mir-fixture-worker-default-snapshot-queued",
+          "unit_number": 13,
+          "name": "mir-fixture-worker-default-snapshot-lab",
+          "disabled": false,
+          "status": 1,
+          "speed": 3600,
+          "packs": {
+            "automation-science-pack": 73,
+            "logistic-science-pack": 73,
+            "chemical-science-pack": 73,
+            "production-science-pack": 73,
+            "utility-science-pack": 73
+          },
+          "modules_empty": true,
+          "force_speed": 0,
+          "force_productivity": 0
+        },
+        {
+          "force": "mir-fixture-worker-default-snapshot-detached",
+          "unit_number": 14,
+          "name": "mir-fixture-worker-default-snapshot-lab",
+          "disabled": false,
+          "status": 1,
+          "speed": 3600,
+          "packs": {
+            "automation-science-pack": 73,
+            "logistic-science-pack": 73,
+            "chemical-science-pack": 73,
+            "production-science-pack": 73,
+            "utility-science-pack": 73
+          },
+          "modules_empty": true,
+          "force_speed": 0,
+          "force_productivity": 0
+        }
+      ],
+      "setup": {
+        "scripted_prerequisites": true,
+        "scripted_initial_partials": true,
+        "lab_speed": 3600,
+        "native_unit_energy": 3600,
+        "no_claimed_ordinary_completions": true
+      },
+      "autosave_requested_tick": 263
+    },
+    "native_migration_raw_json": "{\"schema\":1,\"native_tick\":264,\"saved_lua\":{\"tick\":263,\"native\":[{\"name\":\"player\",\"index\":1,\"bonus\":3,\"current\":\"worker-robots-storage-4\",\"progress\":0.38962962962962958357593379332683980464935302734375,\"queue\":[\"worker-robots-storage-4\",\"mir-fixture-worker-default-snapshot-sentinel\"],\"main\":{\"name\":\"worker-robots-storage-4\",\"level\":4,\"researched\":false,\"enabled\":true,\"visible\":false,\"saved_progress\":0,\"count\":675},\"sentinel\":{\"name\":\"mir-fixture-worker-default-snapshot-sentinel\",\"level\":1,\"researched\":false,\"enabled\":true,\"visible\":false,\"saved_progress\":0,\"count\":100000},\"private\":{\"name\":\"mir-worker-storage-preservation-4\",\"level\":4,\"researched\":false,\"enabled\":false,\"visible\":false,\"saved_progress\":0,\"count\":675}},{\"name\":\"mir-fixture-worker-default-snapshot-queued\",\"index\":4,\"bonus\":3,\"current\":\"mir-fixture-worker-default-snapshot-sentinel\",\"progress\":0.42263000000000001676880856393836438655853271484375,\"queue\":[\"mir-fixture-worker-default-snapshot-sentinel\",\"worker-robots-storage-4\"],\"main\":{\"name\":\"worker-robots-storage-4\",\"level\":4,\"researched\":false,\"enabled\":true,\"visible\":false,\"saved_progress\":0.270000000000000017763568394002504646778106689453125,\"count\":675},\"sentinel\":{\"name\":\"mir-fixture-worker-default-snapshot-sentinel\",\"level\":1,\"researched\":false,\"enabled\":true,\"visible\":false,\"saved_progress\":0,\"count\":100000},\"private\":{\"name\":\"mir-worker-storage-preservation-4\",\"level\":4,\"researched\":false,\"enabled\":false,\"visible\":false,\"saved_progress\":0,\"count\":675}},{\"name\":\"mir-fixture-worker-default-snapshot-detached\",\"index\":5,\"bonus\":3,\"current\":\"mir-fixture-worker-default-snapshot-sentinel\",\"progress\":0.127629999999999999005240169935859739780426025390625,\"queue\":[\"mir-fixture-worker-default-snapshot-sentinel\"],\"main\":{\"name\":\"worker-robots-storage-4\",\"level\":4,\"researched\":false,\"enabled\":true,\"visible\":false,\"saved_progress\":0.2300000000000000266453525910037569701671600341796875,\"count\":675},\"sentinel\":{\"name\":\"mir-fixture-worker-default-snapshot-sentinel\",\"level\":1,\"researched\":false,\"enabled\":true,\"visible\":false,\"saved_progress\":0,\"count\":100000},\"private\":{\"name\":\"mir-worker-storage-preservation-4\",\"level\":4,\"researched\":false,\"enabled\":false,\"visible\":false,\"saved_progress\":0,\"count\":675}}],\"continuous_advances\":263,\"ordinary_completions\":0,\"labs\":[{\"force\":\"player\",\"unit_number\":12,\"name\":\"mir-fixture-worker-default-snapshot-lab\",\"disabled\":false,\"status\":1,\"speed\":3600,\"packs\":{\"automation-science-pack\":74,\"logistic-science-pack\":74,\"chemical-science-pack\":74,\"production-science-pack\":74,\"utility-science-pack\":74},\"modules_empty\":true,\"force_speed\":0,\"force_productivity\":0},{\"force\":\"mir-fixture-worker-default-snapshot-queued\",\"unit_number\":13,\"name\":\"mir-fixture-worker-default-snapshot-lab\",\"disabled\":false,\"status\":1,\"speed\":3600,\"packs\":{\"automation-science-pack\":74,\"logistic-science-pack\":74,\"chemical-science-pack\":74,\"production-science-pack\":74,\"utility-science-pack\":74},\"modules_empty\":true,\"force_speed\":0,\"force_productivity\":0},{\"force\":\"mir-fixture-worker-default-snapshot-detached\",\"unit_number\":14,\"name\":\"mir-fixture-worker-default-snapshot-lab\",\"disabled\":false,\"status\":1,\"speed\":3600,\"packs\":{\"automation-science-pack\":74,\"logistic-science-pack\":74,\"chemical-science-pack\":74,\"production-science-pack\":74,\"utility-science-pack\":74},\"modules_empty\":true,\"force_speed\":0,\"force_productivity\":0}]},\"native\":[{\"name\":\"player\",\"index\":1,\"bonus\":3,\"current\":\"worker-robots-storage-4\",\"progress\":0.39111111111111114269078825600445270538330078125,\"queue\":[\"worker-robots-storage-4\",\"mir-fixture-worker-default-snapshot-sentinel\"],\"main\":{\"name\":\"worker-robots-storage-4\",\"level\":4,\"researched\":false,\"enabled\":true,\"visible\":false,\"saved_progress\":0,\"count\":675},\"sentinel\":{\"name\":\"mir-fixture-worker-default-snapshot-sentinel\",\"level\":1,\"researched\":false,\"enabled\":true,\"visible\":false,\"saved_progress\":0,\"count\":100000},\"private\":{\"name\":\"mir-worker-storage-preservation-4\",\"level\":4,\"researched\":false,\"enabled\":false,\"visible\":false,\"saved_progress\":0,\"count\":675}},{\"name\":\"mir-fixture-worker-default-snapshot-queued\",\"index\":4,\"bonus\":3,\"current\":\"mir-fixture-worker-default-snapshot-sentinel\",\"progress\":0.42263999999999999346300683100707828998565673828125,\"queue\":[\"mir-fixture-worker-default-snapshot-sentinel\",\"worker-robots-storage-4\"],\"main\":{\"name\":\"worker-robots-storage-4\",\"level\":4,\"researched\":false,\"enabled\":true,\"visible\":false,\"saved_progress\":0.270000000000000017763568394002504646778106689453125,\"count\":675},\"sentinel\":{\"name\":\"mir-fixture-worker-default-snapshot-sentinel\",\"level\":1,\"researched\":false,\"enabled\":true,\"visible\":false,\"saved_progress\":0,\"count\":100000},\"private\":{\"name\":\"mir-worker-storage-preservation-4\",\"level\":4,\"researched\":false,\"enabled\":false,\"visible\":false,\"saved_progress\":0,\"count\":675}},{\"name\":\"mir-fixture-worker-default-snapshot-detached\",\"index\":5,\"bonus\":3,\"current\":\"mir-fixture-worker-default-snapshot-sentinel\",\"progress\":0.12763999999999999790389892950770445168018341064453125,\"queue\":[\"mir-fixture-worker-default-snapshot-sentinel\"],\"main\":{\"name\":\"worker-robots-storage-4\",\"level\":4,\"researched\":false,\"enabled\":true,\"visible\":false,\"saved_progress\":0.2300000000000000266453525910037569701671600341796875,\"count\":675},\"sentinel\":{\"name\":\"mir-fixture-worker-default-snapshot-sentinel\",\"level\":1,\"researched\":false,\"enabled\":true,\"visible\":false,\"saved_progress\":0,\"count\":100000},\"private\":{\"name\":\"mir-worker-storage-preservation-4\",\"level\":4,\"researched\":false,\"enabled\":false,\"visible\":false,\"saved_progress\":0,\"count\":675}}],\"equal_native_state\":false,\"active_mods\":{\"base\":\"2.1.23\",\"more-infinite-research\":\"5.0.21012\",\"mir-fixture-worker-default-snapshot\":\"0.1.1\"},\"game_speed\":1,\"labs\":[{\"force\":\"player\",\"unit_number\":12,\"name\":\"mir-fixture-worker-default-snapshot-lab\",\"disabled\":false,\"status\":1,\"speed\":3600,\"packs\":{\"automation-science-pack\":73,\"logistic-science-pack\":73,\"chemical-science-pack\":73,\"production-science-pack\":73,\"utility-science-pack\":73},\"modules_empty\":true,\"force_speed\":0,\"force_productivity\":0},{\"force\":\"mir-fixture-worker-default-snapshot-queued\",\"unit_number\":13,\"name\":\"mir-fixture-worker-default-snapshot-lab\",\"disabled\":false,\"status\":1,\"speed\":3600,\"packs\":{\"automation-science-pack\":73,\"logistic-science-pack\":73,\"chemical-science-pack\":73,\"production-science-pack\":73,\"utility-science-pack\":73},\"modules_empty\":true,\"force_speed\":0,\"force_productivity\":0},{\"force\":\"mir-fixture-worker-default-snapshot-detached\",\"unit_number\":14,\"name\":\"mir-fixture-worker-default-snapshot-lab\",\"disabled\":false,\"status\":1,\"speed\":3600,\"packs\":{\"automation-science-pack\":73,\"logistic-science-pack\":73,\"chemical-science-pack\":73,\"production-science-pack\":73,\"utility-science-pack\":73},\"modules_empty\":true,\"force_speed\":0,\"force_productivity\":0}],\"setup\":{\"scripted_prerequisites\":true,\"scripted_initial_partials\":true,\"lab_speed\":3600,\"native_unit_energy\":3600,\"no_claimed_ordinary_completions\":true},\"autosave_requested_tick\":263}"
+  },
+  "dispositions": [
+    {
+      "subject": "Actual engine observation",
+      "finding": "Serialized on_tick frame is tick263. On read-only Lua migration entry the actual native tick is264; allthree currentresearchfractions are larger, numerically consistent with one native researchunit per lab at speed3600/unitenergy3600. All remaining captured forcefields are exactly equal, including earnedbonus3, main/private/sentinellevels and flags, orderedqueues, queuedworker.saved.27 and detachedsaved.23000000000000004. Each of allfive native labpack counts is74 in the serialized263 witness and73 on migration entry. No tolerance or expectedframe was changed."
+    },
+    {
+      "subject": "Scope of counterexample",
+      "finding": "This is an actual counterexample to exact equality between the fixture on_tick snapshot and later loaded nativework for this autosave/2.1.23/exactBase+MIR boundary. It does not by itself prove a general reconstruction/preservationalgorithm or identify all internal save/load ordering. Target migration refused before configurationcallback/benchmarkupdate. No provideraddition, clamp, finiteownership or reporter-save was tested here."
+    },
+    {
+      "subject": "Owner defect",
+      "finding": "9B96 owner reads onlyfactorio-current.log for Classify-Entry refusaltext. Actual migration marker is in thatlog, but exactstrictrefusal/stack is emitted to capturedstdout. Because the expectedtext is absent from log, owner raises its own classifierguard after naturalnativeexit1. Original terminal remains adverse-stopped-first-failure and must not be rewritten/relabelled passed. Prior admission6142 did not cover this actual split-channel output and remains preserved. No rerun or ownerfix is necessary to retain the observed raw counterexample."
+    },
+    {
+      "subject": "Terminal categories",
+      "finding": "Create PID32820 naturalexit0/predicatefalse. Source serverPID52204 has predicateobservedtrue then owned stop exit−1; it is not a naturalexit0. TargetPID40016 naturalexit1/predicatefalse; ledgerphasecompleted, nointerrupted/timeout. Its stdout namesmigration0.1.1/snapshot.lua93 and exactequalityrefusal; no configuration-entry exists. Ownerclassifierfailure occurs after this actualnative terminal."
+    },
+    {
+      "subject": "Source closure",
+      "finding": "Source actuallog records continuous259/260/261 and request263, blockingautosave path and Savingfinished. Server only stops after explicitclosedZIP predicate. Three separate autosave/protected/targetinput files hashidenticalF13FF7/821931B with56CRC-cleanmembers. Source scriptcontinueslaboperation after request; no pause/science-removal introduced."
+    },
+    {
+      "subject": "Restoration and product identity",
+      "finding": "Both outer role records restored-direct-library-controls/restoredtrue/restoration_errornull, with zero dependencycopies/extractions/hardlinks. Independently rechecked allseven distinct beforecontrol/archive existence/bytes/hashes. LiveFactorio0. Frozen59d857 worktree clean, Source475 and exact10619 candidate unchanged. Sourceclosedoutput65files2936327B and entry7files855597B are below64MiB each; rawledgers show memoryfarbelow4GiB and normalcompletion rather than guardinterruption."
+    }
+  ],
+  "raw_inputs": {
+    "packet": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker-default-snapshot512-probe-r01/packet.json",
+      "bytes": 13931,
+      "sha256": "A3C58043BD0F69C0851E8A988BD6C7E2319FC66207245ECEB1F82DD845FDFC50"
+    },
+    "owner": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker-default-snapshot512-probe-r01/Invoke-Snapshot.ps1",
+      "bytes": 17312,
+      "sha256": "9B96A4C8D520FD0127D492DD74049CA0B15AA85019C61D91C36AAE74344A0585"
+    },
+    "actual_compose": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker-default-snapshot512-probe-r01/composition.json",
+      "bytes": 16104,
+      "sha256": "5FF4ACDA69A15FA28AD537C1A22E01BEDB8A2D8360590DEF71AA531A18F43948"
+    },
+    "fixture_review": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker-default-snapshot512-probe-r01/independent-review-r01.json",
+      "bytes": 12446,
+      "sha256": "42BA62CB49E4D0F1FBCFE5736191ABB6D3F1B6BF3EDDE50D38F1E5498ED74BCA"
+    },
+    "owner_admission": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker-default-snapshot512-probe-r01/independent-controller-review-r01.json",
+      "bytes": 19364,
+      "sha256": "6142E3DEDC68C4E7CA8B58E1F92BF45AEA01A3F1210239D12560FF158104DEDF"
+    },
+    "source_create_log": {
+      "path": "D:/Projects/Factorio/.task-builds/mir512-default-worker-forward-r01/build/tmp/worker-default-snapshot512-probe-r01-source/create.log",
+      "bytes": 14406,
+      "sha256": "62C5A07F1CA7DD690B7C90198C02EDB02F676EED3C3B779DA0359C788F506F36"
+    },
+    "source_server_log": {
+      "path": "D:/Projects/Factorio/.task-builds/mir512-default-worker-forward-r01/build/tmp/worker-default-snapshot512-probe-r01-source/source.log",
+      "bytes": 27007,
+      "sha256": "1D5F6CFE5D2FA1645FA71E0DE1672F77BBF5333B3BA41486B863DD4A0EED2D79"
+    },
+    "entry_native_log": {
+      "path": "D:/Projects/Factorio/.task-builds/mir512-default-worker-forward-r01/build/tmp/worker-default-snapshot512-probe-r01-entry/write-data/factorio-current.log",
+      "bytes": 19160,
+      "sha256": "8DEF5FE563F6F79826206318318932535F2FE2B182B1BAEABBD24C793DB36647"
+    },
+    "source_custody_result": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker-default-snapshot512-probe-r01/execute-custody/source/result.json",
+      "bytes": 32758,
+      "sha256": "745F84E9C6EF3DA47810E2654F543EF4DDF60E86D476C925920AD2C7CD942A1E"
+    },
+    "entry_custody_result": {
+      "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker-default-snapshot512-probe-r01/execute-custody/entry/result.json",
+      "bytes": 2805,
+      "sha256": "66C3B1925D504542EC5916915E126DA9BE74CEEF612DB2534D06FC01EACE9562"
+    }
+  },
+  "restoration_records": [
+    {
+      "role": "source",
+      "restored": true,
+      "restoration_error": null,
+      "exception": null,
+      "before": [
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mod-list.json",
+          "exists": true,
+          "bytes": 39201,
+          "sha256": "48C46678CC8369DB15CC12CDFB23309EB076DC4433B76E9426083D0074BCCC91"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mod-settings.dat",
+          "exists": true,
+          "bytes": 60744,
+          "sha256": "667897C514B66298A1E400058B65EA14EB36322D88864B98AE38E4C9B81387BC"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mod-settings.json",
+          "exists": false,
+          "bytes": 0,
+          "sha256": ""
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\.mir-active-profile.json",
+          "exists": false,
+          "bytes": 0,
+          "sha256": ""
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21012.zip",
+          "exists": false,
+          "bytes": 0,
+          "sha256": ""
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-worker-default-snapshot_0.1.0.zip",
+          "exists": false,
+          "bytes": 0,
+          "sha256": ""
+        }
+      ],
+      "restoration": {
+        "status": "restored-direct-library-controls",
+        "profile_sha256": "421B5149069FF7BF33003F87CC3E2AAB7EBAF44669356058CDDFCA438A8E8300",
+        "dependency_payload_bytes_copied": 0,
+        "archive_links_created": 0,
+        "archive_extractions": 0,
+        "owned_archive_names_temporarily_hidden": 0,
+        "selected": [
+          {
+            "name": "base",
+            "version": "2.1.23",
+            "path": "D:\\Games\\Factorio\\2.1\\data\\base\\info.json",
+            "builtin": true,
+            "identity": "1B6DF063:00CA000000065833",
+            "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F",
+            "bytes": 193
+          },
+          {
+            "name": "more-infinite-research",
+            "version": "5.0.21012",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21012.zip",
+            "builtin": false,
+            "identity": "1B6DF063:0004000000219EDD",
+            "sha256": "10619C8C1BF9F0A99DE8CC4E630CAE3BDE20101E02A11F88A5F92C433F70E3FF",
+            "bytes": 1022087
+          },
+          {
+            "name": "mir-fixture-worker-default-snapshot",
+            "version": "0.1.0",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-worker-default-snapshot_0.1.0.zip",
+            "builtin": false,
+            "identity": "1B6DF063:0004000000219EDE",
+            "sha256": "07A6F557AAFFCC2BD8306F46F7F26AED36C6B237AF003616AAB4E89E307ABFC5",
+            "bytes": 5719
+          }
+        ]
+      }
+    },
+    {
+      "role": "entry",
+      "restored": true,
+      "restoration_error": null,
+      "exception": "[worker-snapshot512] Only the exact strict comparison refusal is an admitted counterexample",
+      "before": [
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mod-list.json",
+          "exists": true,
+          "bytes": 39201,
+          "sha256": "48C46678CC8369DB15CC12CDFB23309EB076DC4433B76E9426083D0074BCCC91"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mod-settings.dat",
+          "exists": true,
+          "bytes": 60744,
+          "sha256": "667897C514B66298A1E400058B65EA14EB36322D88864B98AE38E4C9B81387BC"
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mod-settings.json",
+          "exists": false,
+          "bytes": 0,
+          "sha256": ""
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\.mir-active-profile.json",
+          "exists": false,
+          "bytes": 0,
+          "sha256": ""
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21012.zip",
+          "exists": false,
+          "bytes": 0,
+          "sha256": ""
+        },
+        {
+          "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-worker-default-snapshot_0.1.1.zip",
+          "exists": false,
+          "bytes": 0,
+          "sha256": ""
+        }
+      ],
+      "restoration": {
+        "status": "restored-direct-library-controls",
+        "profile_sha256": "BEFC5C6E2A71631C51ADA55ECC496E9B21C70073C30A2F495052880B47CB3270",
+        "dependency_payload_bytes_copied": 0,
+        "archive_links_created": 0,
+        "archive_extractions": 0,
+        "owned_archive_names_temporarily_hidden": 0,
+        "selected": [
+          {
+            "name": "base",
+            "version": "2.1.23",
+            "path": "D:\\Games\\Factorio\\2.1\\data\\base\\info.json",
+            "builtin": true,
+            "identity": "1B6DF063:00CA000000065833",
+            "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F",
+            "bytes": 193
+          },
+          {
+            "name": "more-infinite-research",
+            "version": "5.0.21012",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21012.zip",
+            "builtin": false,
+            "identity": "1B6DF063:0005000000219EE3",
+            "sha256": "10619C8C1BF9F0A99DE8CC4E630CAE3BDE20101E02A11F88A5F92C433F70E3FF",
+            "bytes": 1022087
+          },
+          {
+            "name": "mir-fixture-worker-default-snapshot",
+            "version": "0.1.1",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-worker-default-snapshot_0.1.1.zip",
+            "builtin": false,
+            "identity": "1B6DF063:0006000000219EF1",
+            "sha256": "F2CA458B0567750B92B637744E66959124F02B627E7AA231488952F392FF1C31",
+            "bytes": 6069
+          }
+        ]
+      }
+    }
+  ],
+  "limits": [
+    "Original terminal/adverse/GOreceipts and allnative inputs remain immutable. This independent review writes only thisJSON; no tests/builds/native/librarymutation/retry.",
+    "No production Source correction, new tolerance, reconstructed history or release/stable acceptance.",
+    "No ordinarycompletion was claimed or observed; scriptedprerequisites/initialforeignfractions remain diagnosticsetup.",
+    "One source-save/migration observation doesnotqualify allsave triggers, paidworkcompletion, otherengine, multiplayer or a permanent mirror."
+  ]
+}
