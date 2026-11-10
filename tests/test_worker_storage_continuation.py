@@ -74,8 +74,9 @@ class WorkerStorageContinuationTests(unittest.TestCase):
         lua.execute('''
           native_prototypes={}
           for name,row in pairs(data.raw.technology)do
-            if name:match("^worker%-robots%-storage%-%d+$")then
-              local level=tonumber(name:match("(%d+)$"))
+            if name:match("^worker%-robots%-storage%-%d+$") or name=="mir-worker-storage-default-5"
+                or name=="mir-worker-storage-head-4" then
+              local level=tonumber(name:match("(%d+)$")) or 1
               native_prototypes[name]={name=name,level=level,enabled=row.enabled~=false,
                 max_level=row.max_level=="infinite" and 4294967295 or row.max_level or level,
                 effects=row.effects,prerequisites=row.prerequisites}
