@@ -1,9 +1,9 @@
 {
   "kind": "MIR512ReporterDispositionsIndependentReviewV1",
-  "reviewed_at_utc": "2026-11-10T08:45:21Z",
-  "base_commit": "d6c03465e26b7f0b5e6a250a241c5516eaef275f",
+  "reviewed_at_utc": "2026-11-10T21:50:18.853377+00:00",
+  "base_commit": "c346399fdec4f20dc750002c650ff9751cccf30d",
   "player_source": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
-  "scope": "Reporter-history reconciliation using retained originals, live issues and accepted exact-input reviews. No source changes, game execution, test campaign, release authority or whole-issue closure.",
+  "scope": "Reporter-history reconciliation using protected originals, current issues and exact-input reviews. New supplied Ryutavi save/log/mod-list and the distinct issue1871 Ferrum log are retained privately. No source correction, game execution, reporter-save acceptance, publication authority or whole-issue closure.",
   "incident_recommendation": {
     "verdict": "NO-GO for claiming all reported save-load failures resolved or publishing under the current instruction to resolve applicable blockers first.",
     "reason": "The unchanged-Secretas persistence, complete credit-vector and known-Base mechanisms have accepted bounded evidence. The reported provider-change path and the actual unknown saved histories are not thereby qualified. No maintainer decision narrowing that obligation is recorded here.",
@@ -33,8 +33,22 @@
       "latest_report": "5.0.21011 worker history refusal at line 425 with technology=default. That fallback string does not establish a prior MIR-owned default route.",
       "applicable_correction": "Current candidate removes the blanket presence-change policy in favor of validated worker-state handling, and persists specifically proven unchanged-Secretas history. Prepared MIR-default4 transitions have separate evidence.",
       "accepted_evidence": "worker512-history-continuity-independent-result-review-r01.json",
-      "remaining": "The accepted unchanged-provider 11-to-12 case is not an unprepared provider addition/removal or Ferrum transition with unknown invested history. The latest predecessor, event and surviving saved authority are not supplied.",
-      "smallest_action": "Use an authentic surviving predecessor contract/state or a faithful supported provider-change reproduction. If the transition discards native state before runtime, preservation must happen before that loss. Do not silently infer paid work from the clamped destination or advertise preparation for a route that cannot perform it."
+      "remaining": "The supplied1871 log now establishes engine/current MIR/Ferrum and the matching refusal. It does not supply a protected predecessor save or earlier paid/current/queued/detached state. Accepted unchanged-Secretas persistence and a different WorkerRobotCargoSizeResearch case do not qualify this Ferrum transition.",
+      "smallest_action": "Use the actual Ferrum0.1.5 provider route with an authentic known predecessor, preserve earned bonus and all native work through provider addition, ordinary research and saved reloads on the fixed candidate. Reuse existing exact Ferrum inputs/observer work; do not restart unrelated campaigns or infer old default ownership from the fallback label.",
+      "issues": [
+        1845,
+        1871
+      ],
+      "retained_1871_log": {
+        "bytes": 210247,
+        "sha256": "3D2637327F6EC8E5FE58DDD6264F8BD708DC2EC191C414DB814FD8F0E373B5B6",
+        "source": "https://github.com/user-attachments/files/34640024/factorio-current.log",
+        "engine": "2.1.24 build87808",
+        "mir": "5.0.21011",
+        "ferrum": "0.1.5",
+        "failure": "on_configuration_changed worker_robot_storage.lua425 unknown previous continuation ownership; technology=default is the published11 fallback",
+        "observed": "Ferrum migrations0.0.2/0.0.3/0.0.5 run before the MIR refusal. The issue title reports adding Ferrum to an existing MIR save. No old MIR version, saved worker levels/work or authoritative pre-change route is supplied."
+      }
     },
     {
       "reporter": "Driku",
@@ -44,7 +58,12 @@
         "bytes": 27201055,
         "sha256": "BCD549813C04D3C8F3DB90D0A205703FE24DE6588518759DAE87508B316DAAE9",
         "download_mac_verified": true,
-        "header_engine_u16": [2, 1, 21, 11],
+        "header_engine_u16": [
+          2,
+          1,
+          21,
+          11
+        ],
         "header_mod_records": 463,
         "header_selected_versions": {
           "more-infinite-research": "4.3.21000",
@@ -81,7 +100,67 @@
         "native-credit-vector512-f200-independent-result-review-r01.json"
       ],
       "disposition": "Named 97-effect mechanism qualified on 2.0.77 and 2.1.23, including signed contributions, ordinary completions, pending work and cold loads. Actual Cerys loop plus synthetic aliases is explicitly identified.",
-      "remaining": "Exact remaining vector entries and actual modpack are unavailable. Do not claim an exact reporter-modpack pass, arbitrary productivity compatibility or automatic recovery of an unknown invested vector history. A concrete incompatible shape still needs its own correction."
+      "remaining": "The actual save, crash log and complete enabled-mod list are now available; the previous missing-input statement is superseded. Actual complete current recipe-effect maps and earned native bonuses/work still need observation on the final candidate. Only77 exact active archives were found in the Aero2.1 direct library; that incomplete local closure is not a reporter reproduction. The earlier Cerys/synthetic97 mechanism result retains its original scope.",
+      "supplied_originals": {
+        "save": {
+          "bytes": 11184926,
+          "sha256": "B94A26B175C3B424EC400C9EAD11D0214C2709C873F61CD8E1FBAD79B7ADD7ED",
+          "zip_members": 75,
+          "all_member_crcs": "PASS",
+          "engine_u16": [
+            2,
+            1,
+            24,
+            1
+          ],
+          "saved_mod_records": 242,
+          "record_start": 45,
+          "record_end": 5952,
+          "mir_in_saved_mod_header": false,
+          "limit": "Bounded contiguous short-name/three-byte-version mod metadata only; no native force/research/startup-state decode"
+        },
+        "log": {
+          "bytes": 523581,
+          "sha256": "18307B8A4935B0E8A91C61C0D93BB86694F5D82B0CED94DDE4DEB2000D861261",
+          "engine": "2.1.24 build87808",
+          "mir": "5.0.21011",
+          "failure_lines": [
+            5924,
+            5925
+          ],
+          "exact_reported_97_effect_on_init_shape": true
+        },
+        "mod_list": {
+          "bytes": 23406,
+          "sha256": "F542BF70C1661DDECB8216C9D9F24BC442A4F08F29EA8E0FFFD3BF4E1AD34B91",
+          "listed": 313,
+          "enabled": 239,
+          "complete_log_registry_matches_enabled_names": true
+        },
+        "saved_to_current": {
+          "added": {
+            "more-infinite-research": "5.0.21011"
+          },
+          "removed": {
+            "bobwarfare": "3.0.2",
+            "vanilla_galore_continued": "1.4.11",
+            "galore_lib": "2.6.0",
+            "space_age_galore": "1.6.14"
+          },
+          "retained_mod_version_changes": {},
+          "cerys": "Disabled in supplied list and absent from saved header/current registry",
+          "route": "MIR-absent saved selection to MIR on_init; addition or re-addition, not a proved old-MIR upgrade",
+          "limit": "A header without MIR does not establish that MIR was never installed earlier."
+        },
+        "selected_existing_versions": {
+          "productivity-through-science": "1.1.9",
+          "progressive-productivity": "1.1.6",
+          "recycler-recipes-fix": "0.2.0",
+          "recycler-progression": "1.1.1",
+          "remove-productivity-cap": "1.2.0"
+        }
+      },
+      "smallest_action": "Adopt protected supplied originals from private custody. Establish the exact complete active closure and startup values from the original save, inspect the actual signed vectors before MIR writes, then test candidate initialization, unaffected/earned bonus preservation, useful new research and saved reloads. Keep the reported bobwarfare startup problem separate from the MIR initialization failure; its source3.0.2 is disabled in the failed-session list."
     },
     {
       "reporter": "wakaba20202020",
@@ -124,5 +203,20 @@
   },
   "issue1845_refresh": "Opening updated to merged 5.0.12/fixed Source status and read back exactly; entire prior request retained verbatim below as history. State remains open. Before/after custody is in the private directory.",
   "engine_loss_boundary": "Existing worker512-context-and-history-authority-independent-review-r01.json records pre-Lua native clamping and a separate static JSON preservation control. The latter is not a reviewed production policy for first MIR installation, repeated provider changes or arbitrary reporter histories. Reuse those observations; do not rerun or call them a generic impossibility proof.",
-  "execution_limits": "No Factorio process, source/package/controller/Library mutation, host suite, build, CI launch, child worker or publication performed by this review. Private input intake and issue/body custody are not production fixes."
+  "execution_limits": "No Factorio process, source/package/controller/Library mutation, host suite, build, CI launch, child worker or publication performed by this review. Private input intake and issue/body custody are not production fixes.",
+  "supplied_reporter_custody": {
+    "private_repository": "Julesc013/scratchpad",
+    "branch": "evidence/mir512-reporter-originals-aero-r02",
+    "commit": "7553ec103922a6570b462927ba4070f7d6f0e28e",
+    "directory": "projects/mir/reporter-inputs/20261111-aero-r01",
+    "manifest_sha256": "D13883F1918CFC2D0A466CB17E8809A18D7DE3F4FEF0CC6812D8EC888424CAB5",
+    "remote_readback": "All9 stored blobs match fresh remote Git object bytes. Seven manifest-listed originals/metadata files total11976685bytes. Save all75 member CRCs pass. Original Downloads files unchanged. Full logs/save/mod lists stay private; no MEGA keys stored."
+  },
+  "current_candidate_boundary": {
+    "pr": 1872,
+    "head_at_review": "016ccd9b7afddc5d5e09d634ff598416ace5619a",
+    "status": "Isolated worker native-owner draft; current guard corrections and provider qualification remain Black Glass work. No new source acceptance by this record.",
+    "identity_decision": "Issue1845 comment6779844289 records maintainer authorization for the necessary stable native worker identity, subject to compatibility/migration verification. The older pending identity-decision blocker is superseded.",
+    "public_release": "v5.0.11 remains published;5.0.12 unpublished at this readback."
+  }
 }
