@@ -34,11 +34,15 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
           local names={"player","mir5-migration-origin-f200-110-foreign","mir5-migration-origin-f200-110-detached"}
           local families={{"low_density_structure","low-density-structure"},{"plastic","plastic-bar"},
             {"processing_unit","processing-unit"},{"rocket_fuel","rocket-fuel"},{"steel","steel-plate"}}
-          game={tick=10,speed=1,forces={},surface_calls=0,saves={}}
+          game={tick=10,speed=16,forces={},surface_calls=0,saves={},difficulty_settings={technology_price_multiplier=1}}
+          --875-shaped native readback stand-in; only the owner can compare
+          -- an actual engine dictionary with the protected source receipt.
+          settings={startup={}}
+          for i=1,875 do settings.startup["host-observed-setting-"..i]={value=i}end
           local function technology(force,name,level,hidden,enabled,recipe,change)
             local t={name=name,valid=true,force=force,level=level,researched=false,enabled=enabled,
               saved_progress=0,visible_when_disabled=false,
-              prototype={hidden=hidden,max_level=4294967295,effects={},research_unit_energy=3600,
+              prototype={hidden=hidden,enabled=enabled,max_level=4294967295,effects={},research_unit_energy=3600,ignore_tech_cost_multiplier=false,
                 research_unit_count_formula="8000*2^(L-1)"},research_unit_ingredients={}}
             for _,pack in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"})do
               t.research_unit_ingredients[#t.research_unit_ingredients+1]={name=pack,amount=1}
@@ -75,8 +79,8 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
           foreign=game.forces[names[2]];detached=game.forces[names[3]]
           gear=foreign.technologies["recipe-prod-research_gears-1"]
           plastic=foreign.technologies["recipe-prod-research_plastic-1"]
-          foreign.current_research=gear;foreign.research_queue={gear,plastic};foreign.research_progress=.42
-          detached.technologies["recipe-prod-research_gears-1"].saved_progress=.27
+          foreign.current_research=gear;foreign.research_queue={gear,plastic};foreign.research_progress=.42/8000
+          detached.technologies["recipe-prod-research_gears-1"].saved_progress=.27/8000
           function game.create_surface()
             game.surface_calls=game.surface_calls+1
             local surface={request_to_generate_chunks=function()end,force_generate_chunk_requests=function()end,set_tiles=function()end}
@@ -286,13 +290,13 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
     def test_actor_preserves_initial_receipt_and_requires_later_tick_before_save(self):
         lua = self.controller()
         lua.execute('''
-          begin();assert(game.speed==1 and foreign.research_progress==.42 and #foreign.research_queue==2)
+          begin();assert(game.speed==16 and foreign.research_progress==.42/8000 and #foreign.research_queue==2)
           assert(gear.level==1 and plastic.level==2 and #game.saves==0)
           finish_gear();finish_plastic();assert(#game.saves==0,"event-time state was counted as settled")
           game.tick=14;callbacks[1]()
           local state=storage.mir5_known_base_addition
           assert(state.phase=="completed" and #state.completions==2)
-          assert(state.initial[foreign.name].progress==.42 and state.final[foreign.name].progress==0)
+          assert(state.initial[foreign.name].progress==.42/8000 and state.final[foreign.name].progress==0)
           assert(#game.saves==1 and game.saves[1]=="mir5-native-complete")
           assert(#markers==1 and markers[1].stage=="initial")
           for _=1,2 do
@@ -300,7 +304,7 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
             callbacks[1]();callbacks[1]()
           end
           assert(#markers==3 and markers[2].stage=="reload" and markers[3].stage=="reload")
-          assert(#game.saves==1 and game.surface_calls==1 and game.speed==1)
+          assert(#game.saves==1 and game.surface_calls==1 and game.speed==16)
         ''')
 
     def test_actor_refuses_unproven_source_or_lost_state_before_lab_creation(self):
@@ -315,7 +319,7 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
                   if opponent=="old-helper"then event.mod_changes["mir-fixture-mir5-known-base-addition"].old_version="0.1.0"end
                   if opponent=="removed-provider"then event.mod_changes.removed={old_version="1.0.0"}end
                   if opponent=="wrong-origin"then event.mod_changes["more-infinite-research"].old_version="5.0.20009"end
-                  if opponent=="speed"then game.speed=16 end
+                  if opponent=="speed"then game.speed=1 end
                   if opponent=="lost-detached"then detached.technologies["recipe-prod-research_gears-1"].saved_progress=0 end
                   if opponent=="new-bonus"then foreign.recipes["mir-known-base-unpaid-plastic-bar"].productivity_bonus=.1 end
                   if opponent=="changed-base"then event.mod_changes.base={old_version="2.0.76",new_version="2.0.77"}end
@@ -362,7 +366,7 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
         # Even granting the OLD standard-lab actor the proposed fast speed,
         # its one-time6400 stock cannot pay the16000 plastic level.
         self.assertLess(64 * 100, 16000)
-        self.assertGreater(16000 * 3600 / 64, 180 * 60)
+        self.assertGreater(16000 * 3600 / 64, 180 * 60 * 16)
         lua = self.controller(base_lab_speed=14400)
         lua.execute('''
           begin()
@@ -411,7 +415,7 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
             assert(ledger.inserted[ingredient.name]>6400 and ledger.consumed[ingredient.name]>0)
           end
           assert(gear.prototype.research_unit_count_formula==gear_formula and plastic.prototype.research_unit_count_formula==plastic_formula)
-          assert(gear.prototype.research_unit_energy==3600 and plastic.prototype.research_unit_energy==3600 and game.speed==1)
+          assert(gear.prototype.research_unit_energy==3600 and plastic.prototype.research_unit_energy==3600 and game.speed==16)
           assert(#state.supply_log>2,"same-research refill was not observed")
         ''')
 
@@ -497,6 +501,48 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
                       assert(not ok,"captured foreign getter drift was accepted")
                       assert(#game.saves==0)
                     ''')
+
+
+    def test_observed_clock_and_tight_gear_work_guard_reject_wrong_inputs(self):
+        for mutation in ("game.speed=1", "foreign.research_progress=.42",
+                         "foreign.research_progress=foreign.research_progress+1e-12",
+                         "detached.technologies['recipe-prod-research_gears-1'].saved_progress=.27",
+                         "detached.technologies['recipe-prod-research_gears-1'].saved_progress=0",
+                         "gear.research_unit_count=8001", "game.difficulty_settings.technology_price_multiplier=2",
+                         "plastic.enabled=true", "plastic.prototype.enabled=true"):
+            with self.subTest(mutation=mutation):
+                lua = self.controller()
+                lua.execute(mutation)
+                lua.execute('''
+                  callbacks.init();local ok=pcall(callbacks.configuration,event)
+                  assert(not ok and game.surface_calls==0 and #game.saves==0,"wrong observed source input accepted")
+                ''')
+
+    def test_markers_expose_actual_875_mods_clock_event_for_owner_comparison(self):
+        lua = self.controller()
+        lua.execute('''
+          begin();finish_gear();finish_plastic();game.tick=14;callbacks[1]()
+          callbacks.load();callbacks[1]()
+          for _,m in ipairs(markers)do
+            assert(m.clock==16 and m.mods.base=="2.0.77"and m.mods["more-infinite-research"]=="5.0.20012")
+            local n=0;for name,value in pairs(settings.startup)do assert(m.startup[name]==value.value);n=n+1 end
+            assert(n==875 and m.event.mod_startup_settings_changed==false)
+            assert(m.event.mod_changes["more-infinite-research"].old_version=="5.0.20001")
+          end
+        ''')
+        source = {f"host-observed-setting-{i}": i for i in range(1, 876)}
+        observed = dict(lua.globals().markers[1].startup.items())
+        self.assertEqual(source, observed)
+        for changed in ({k: v for k, v in observed.items() if k != "host-observed-setting-875"},
+                        observed | {"host-observed-setting-1": "changed"}):
+            with self.assertRaises(AssertionError):
+                self.assertEqual(source, changed)  # exact owner comparison, not actor-inferred history
+        lua = self.controller()
+        lua.execute('''
+          settings.startup["host-observed-setting-875"]=nil
+          callbacks.init();local ok,message=pcall(callbacks.configuration,event)
+          assert(not ok and tostring(message):find("not875",1,true)and game.surface_calls==0)
+        ''')
 
 
 if __name__ == "__main__":

@@ -4,6 +4,7 @@ local FIXTURE, KEY = "mir-fixture-mir5-known-base-addition", "mir5_known_base_ad
 local CASE, SAVE = "known-base-addition-f200-2077", "mir5-native-complete"
 local GEAR, PLASTIC = "recipe-prod-research_gears-1", "recipe-prod-research_plastic-1"
 local LAB, LAB_SPEED, STOCK, REFILL_AT = "mir-known-base-fast-lab", 14400, 100, 16
+local NORMAL_GEAR_COUNT, OLD_GEAR_COUNT = 8000, 1
 local FORCES = {"player", "mir5-migration-origin-f200-110-foreign", "mir5-migration-origin-f200-110-detached"}
 local FAMILIES = {
   {"low_density_structure","low-density-structure"}, {"plastic","plastic-bar"},
@@ -81,8 +82,26 @@ local function check_carriers(completed)
     carriers(force,"mir-known-base-unpaid-low-density-structure","low_density_structure",1,2)
   end
 end
+local function startup_snapshot()
+  local out,n={},0
+  for name,value in pairs(settings.startup)do out[name]=value.value;n=n+1 end
+  if n~=875 then fail("actual startup dictionary is not875 values")end
+  return out
+end
+local function normal_level_one_gear(force)
+  local t=technology(force,GEAR);local p=t.prototype
+  if game.difficulty_settings.technology_price_multiplier~=1 or t.level~=1 or t.researched
+    or t.research_unit_count~=NORMAL_GEAR_COUNT or p.ignore_tech_cost_multiplier~=false
+    or p.research_unit_count_formula~="8000*2^(L-1)"or p.research_unit_energy~=3600 then
+    fail("guarded normal level1 gear cost differs")
+  end
+end
+local function gear_work(fraction,old_work)
+  return type(fraction)=="number"and math.abs(fraction*NORMAL_GEAR_COUNT-old_work*OLD_GEAR_COUNT)<1e-9
+end
 local function entry(event)
-  if game.speed~=1 or script.active_mods.base~="2.0.77"
+  startup_snapshot()
+  if game.speed~=16 or script.active_mods.base~="2.0.77"
     or script.active_mods["more-infinite-research"]~="5.0.20012"
     or script.active_mods[FIXTURE]~="0.1.0" then fail("exact successor inputs or ordinary speed differ")end
   local changes=event and event.mod_changes
@@ -111,17 +130,21 @@ local function entry(event)
       if family[1]~="steel" and (row.level~=2 or row.researched or not close(s.bonuses[family[2]],.1))then fail("old paid family differs")end
     end
     local plastic=s.rows[PLASTIC]
-    if not plastic.hidden or plastic.enabled then fail("plastic retirement differs")end
+    if not plastic.hidden or plastic.enabled or technology(force,PLASTIC).prototype.enabled~=false then fail("plastic retirement differs")end
     if s.rows["recipe-prod-research_low_density_structure-1"].hidden then fail("public LDS became private")end
     for _,recipe in ipairs({"plastic-bar","low-density-structure"})do
       if not close(s.bonuses["mir-known-base-unpaid-"..recipe],0)then fail("new recipe acquired old earnings")end
     end
     if not close(s.mining,0) or not close(s.battery,.1) or not close(s.cannon,0)then fail("unrelated old native effects differ")end
     if index==2 then
+      normal_level_one_gear(force)
       equal(s.queue,{GEAR,PLASTIC},"source queue")
-      if s.current~=GEAR or not close(s.progress,.42)then fail("current42% changed")end
+      if s.current~=GEAR or not gear_work(s.progress,.42)then fail("current known gear work changed")end
     elseif s.current~=false or #s.queue~=0 then fail("idle source force acquired research")end
-    if index==3 and not close(s.rows[GEAR].saved,.27)then fail("detached27% changed")end
+    if index==3 then
+      normal_level_one_gear(force)
+      if not gear_work(s.rows[GEAR].saved,.27)then fail("detached known gear work changed")end
+    end
   end
   check_carriers(false)
   return snapshots()
@@ -130,7 +153,8 @@ local function marker(stage,state)
   log("[MIR5_NATIVE_FIXTURE] RESULT "..helpers.table_to_json({case=CASE,stage=stage,status="passed",
     qualification="exact-protected-source-native-runtime-only",ordinary_completions=state.completions,
     initial=state.initial,final=state.final,on_load_read_only=stage=="reload",
-    apparatus=state.apparatus,science=state.science,supply_log=state.supply_log,final_stock=state.final_stock}))
+    apparatus=state.apparatus,science=state.science,supply_log=state.supply_log,final_stock=state.final_stock,
+    startup=startup_snapshot(),mods=table.deepcopy(script.active_mods),clock=game.speed,event=table.deepcopy(state.event)}))
 end
 local function stock(state)
   local counts={}
@@ -210,7 +234,9 @@ end)
 script.on_configuration_changed(function(event)
   local state=storage[KEY]
   if not state or state.phase~="await-configuration" then fail("unexpected configuration stage")end
-  state.initial=entry(event);state.completions={};state.phase="ready";state.deadline=game.tick+36000
+  state.initial=entry(event)
+  state.event={mod_startup_settings_changed=event.mod_startup_settings_changed,mod_changes=table.deepcopy(event.mod_changes)}
+  state.completions={};state.phase="ready";state.deadline=game.tick+36000
 end)
 script.on_event(defines.events.on_research_finished,function(event)
   local state=storage[KEY];local research=event.research
@@ -241,7 +267,7 @@ script.on_event(defines.events.on_tick,function()
   end
   if state.phase=="completed" then return end
   if state.phase=="await-configuration" then fail("a genuine predecessor configuration event is required")end
-  if game.speed~=1 then fail("ordinary game speed changed")end
+  if game.speed~=16 then fail("preserved game clock16 changed")end
   if game.tick>state.deadline then fail("queued ordinary labs exceeded deadline")end
   if state.phase=="ready" then start_labs(state)end
   if state.phase=="labs" then
