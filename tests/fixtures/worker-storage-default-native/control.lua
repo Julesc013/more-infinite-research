@@ -283,10 +283,14 @@ function M.on_tick()
     emit("upgrade-settle-observed"); M.same(s.expected_upgrade, M.frames()); save("upgrade-saved", M.frames())
   end
 end
+local callbacks = M
+if script.active_mods.WorkerRobotCargoSizeResearch then
+  callbacks = require("provider_native").bind(M)
+end
 script.on_init(function() end)
-script.on_load(function() loaded = true end) -- locals only; no game/storage writes.
-script.on_configuration_changed(M.on_configuration_changed)
-script.on_event(defines.events.on_tick, M.on_tick)
-script.on_event(defines.events.on_research_finished, M.on_finished)
-remote.add_interface("mir-worker-storage-default-native", {begin=M.begin})
+script.on_load(callbacks.on_load or function() loaded = true end) -- locals only; no game/storage writes.
+script.on_configuration_changed(callbacks.on_configuration_changed)
+script.on_event(defines.events.on_tick, callbacks.on_tick)
+script.on_event(defines.events.on_research_finished, callbacks.on_finished)
+remote.add_interface("mir-worker-storage-default-native", {begin=callbacks.begin or M.begin})
 return M

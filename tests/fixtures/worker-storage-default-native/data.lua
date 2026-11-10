@@ -4,7 +4,8 @@ local function copy(value)
   local out = {}; for key, item in pairs(value) do out[key] = copy(item) end; return out
 end
 local lab = copy(assert(data.raw.lab.lab))
-lab.name, lab.researching_speed = "mir-worker-default-native-lab", 3600
+lab.name = "mir-worker-default-native-lab"
+lab.researching_speed = mods and mods.WorkerRobotCargoSizeResearch and 115200 or 3600
 lab.energy_source, lab.energy_usage = {type="void"}, "1W"
 local rows = {lab}
 for _, suffix in ipairs({"current", "queued", "detached"}) do
