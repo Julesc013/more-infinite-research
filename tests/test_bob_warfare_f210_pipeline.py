@@ -100,6 +100,37 @@ class BobWarfareF210PipelineTests(unittest.TestCase):
                     self.assertEqual(contract(expected), contract(rows[name]), case + ":" + name)
                 self.assertEqual(1, lua.globals().technology_publications)
 
+    def test_native_recipe_caps_preserve_armor_binding_and_foreign_recipe(self):
+        # RecipePrototype permits nonnegative caps. Remove Productivity Cap
+        # 1.2.0 sets 99999.99 before MIR in the supplied reporter log; its Lua
+        # member SHA256 is 5323CD8F7CAF006A34B1864305919EA73475B4A3E3F1FF5FB77D45F2CF33C4D2.
+        recipe_name = "bob-mech-armor-plate"
+        for case in sorted(CASES):
+            for maximum in (0, 3, 99999.99):
+                with self.subTest(case=case, maximum=maximum):
+                    expected_recipe = deepcopy(self.context["cases"][case]["raw"]["recipe"][recipe_name])
+                    expected_recipe["maximum_productivity"] = maximum
+
+                    def capped(raw):
+                        raw["recipe"][recipe_name]["maximum_productivity"] = maximum
+
+                    lua = self.stage(case, mutate=capped)
+                    self.assertEqual(expected_recipe, _plain(lua.globals().data.raw.recipe[recipe_name]))
+                    emitted = _plain(lua.globals().emitted)
+                    for name, expected in self.context["cases"][case]["expected"].items():
+                        self.assertEqual(contract(expected), contract(emitted[name]), case + ":" + name)
+                    self.assertEqual(1, lua.globals().technology_publications)
+
+        # A benign cap never authorizes a changed ingredient/product binding.
+        def different_product(raw):
+            recipe = raw["recipe"][recipe_name]
+            recipe["maximum_productivity"] = 99999.99
+            recipe["results"][0]["amount"] = 2
+
+        lua = self.stage("q084", mutate=different_product, expect_failure=True)
+        self.assertIn("armor route changed", str(lua.globals().message))
+        self.assertEqual(0, lua.globals().technology_publications)
+
     def test_nondefault_armor_and_both_laser_categories_retain_configured_authority(self):
         lua = self.stage("q005", startup={
             "ips-cost-base-research_armor_components": {"value": 300},
