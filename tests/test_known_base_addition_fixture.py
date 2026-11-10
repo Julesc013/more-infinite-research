@@ -49,8 +49,9 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
           end
           for i,name in ipairs(names)do
             local force={name=name,index=i==1 and 1 or i==2 and 4 or 5,valid=true,technologies={},recipes={},
-              research_queue={},research_progress=0,mining_drill_productivity_bonus=0,worker_robots_battery_modifier=.1,
-              get_ammo_damage_modifier=function()return 0 end,laboratory_productivity_bonus=0,laboratory_speed_modifier=0}
+              research_queue={},research_progress=0,manual_mining_speed_modifier=0,mining_drill_productivity_bonus=1.25,
+              worker_robots_battery_modifier=.1,get_gun_speed_modifier=function()return 0 end,
+              get_ammo_damage_modifier=function()return .75 end,laboratory_productivity_bonus=0,laboratory_speed_modifier=0}
             game.forces[name]=force
             for _,family in ipairs(families)do
               technology(force,"recipe-prod-research_"..family[1].."-1",2,family[1]=="plastic",family[1]~="plastic")
@@ -349,7 +350,7 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
                   if opponent=="scripted"then ok=pcall(callbacks[2],{research=gear,by_script=true})
                   elseif opponent=="no-consumption"then ok=pcall(callbacks[2],{research=gear,by_script=false})
                   else
-                    finish_gear();finish_plastic();game.forces.player.mining_drill_productivity_bonus=.1
+                    finish_gear();finish_plastic();game.forces.player.manual_mining_speed_modifier=.1
                     game.tick=14;ok=pcall(callbacks[1])
                   end
                   assert(not ok,"false ordinary/preservation result accepted")
@@ -461,6 +462,41 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
                     assert(not ok and tostring(message):find("cold science stock",1,true))
                   end
                 ''')
+
+
+    def test_original_getter_identities_preserve_nonzero_unobserved_extras(self):
+        lua = self.controller()
+        lua.execute('''
+          begin()
+          local state=storage.mir5_known_base_addition
+          for name,force in pairs(game.forces)do
+            assert(state.initial[name].mining==0 and state.initial[name].cannon==0)
+            assert(force.mining_drill_productivity_bonus==1.25 and force.get_ammo_damage_modifier("cannon-shell")==.75)
+          end
+          finish_gear();finish_plastic();game.tick=14;callbacks[1]()
+          callbacks.load();callbacks[1]()
+          for name,force in pairs(game.forces)do
+            assert(state.final[name].mining==0 and state.final[name].cannon==0)
+            assert(force.mining_drill_productivity_bonus==1.25 and force.get_ammo_damage_modifier("cannon-shell")==.75)
+          end
+        ''')
+
+    def test_captured_manual_mining_and_gun_speed_drift_still_refuse(self):
+        for getter in ("manual-mining", "gun-speed"):
+            for phase in ("entry", "final"):
+                with self.subTest(getter=getter, phase=phase):
+                    lua = self.controller()
+                    lua.globals().getter, lua.globals().phase = getter, phase
+                    lua.execute('''
+                      if phase=="final"then begin();finish_gear();finish_plastic()end
+                      if getter=="manual-mining"then foreign.manual_mining_speed_modifier=.25
+                      else foreign.get_gun_speed_modifier=function()return .25 end end
+                      local ok,message
+                      if phase=="entry"then callbacks.init();ok,message=pcall(callbacks.configuration,event)
+                      else game.tick=14;ok,message=pcall(callbacks[1])end
+                      assert(not ok,"captured foreign getter drift was accepted")
+                      assert(#game.saves==0)
+                    ''')
 
 
 if __name__ == "__main__":

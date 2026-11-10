@@ -41,8 +41,8 @@ local function forces()
 end
 local function snapshot(force)
   local out={rows={},bonuses={},queue={},current=force.current_research and force.current_research.name or false,
-    progress=force.research_progress,mining=force.mining_drill_productivity_bonus,
-    battery=force.worker_robots_battery_modifier,cannon=force.get_ammo_damage_modifier("cannon-shell")}
+    progress=force.research_progress,mining=force.manual_mining_speed_modifier,
+    battery=force.worker_robots_battery_modifier,cannon=force.get_gun_speed_modifier("cannon-shell")}
   local function row(name)
     local t=technology(force,name)
     out.rows[name]={level=t.level,researched=t.researched,enabled=t.enabled,saved=t.saved_progress,
