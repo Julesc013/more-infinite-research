@@ -7,11 +7,22 @@ import unittest
 import test_bootstrap as bootstrap_fixture
 from worker_storage_recovery_fixture import MINIMAL_NATIVE_FACTS, RECOVERY_WORLD
 
+# Explicit parse-time runtime configuration for these native-fact doubles.
+# Real bootstrap controls use the actual resolver; older-origin controls below
+# also exercise an imported profile through that resolver.
+WORKER_RUNTIME_CONFIGURATION = r'''
+  package.loaded["runtime.configuration"]={streams={["worker-robots-storage"]={
+    base_cost=200,growth_factor=1.5,linear_increment=0,research_time=60,
+    effect_percent=1,max_level=0,enabled=true}}}
+'''
+RECOVERY_WORLD = WORKER_RUNTIME_CONFIGURATION + RECOVERY_WORLD
+
 
 class WorkerStorageHistoryTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().player_root = (Path(__file__).resolve().parents[1] / "source").as_posix()
+        self.lua.execute(WORKER_RUNTIME_CONFIGURATION)
         self.lua.execute(r'''
           package.path=player_root.."/?.lua;"..player_root.."/?/init.lua";package.cpath=""
           storage={};script={active_mods={base="2.1.24",["more-infinite-research"]="5.0.21009"}}
@@ -1445,6 +1456,170 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
           assert(quota.forces[2].next_level==4 and quota.forces[2].limit==3 and not quota.forces[2].pending)
           assert(uninvested.technologies[ID].level==4 and not uninvested.technologies[ID].enabled and uninvested.worker_robots_storage_bonus==20)
         ''')
+
+class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
+    """Separate all-force501-empty and473-paid-idle source restrictions."""
+
+    world = WorkerDefaultNativeOwnerTransferTests.world
+
+    def older_world(self, target="f200"):
+        lua = self.world(target)
+        lua.execute(r'''
+          for _,id in ipairs({CANONICAL,ORDINARY,ID})do
+            prototypes.technology[id].research_unit_count_formula="675*1.5^(L-4)"
+            prototypes.technology[id].research_unit_energy=3600
+            for _,force in pairs(game.forces)do
+              local t=force.technologies[id];local mt=getmetatable(t);local read=mt.__index
+              mt.__index=function(object,key)
+                if key=="research_unit_count"then return math.floor(675*1.5^(read(object,"level")-4))end
+                return read(object,key)
+              end
+            end
+          end
+          function older_event(old,addition)
+            local event=owner_event(old)
+            if addition then script.active_mods["test-observer"]="0.1.0"
+              event.mod_changes["test-observer"]={new_version="0.1.0"}end
+            return event
+          end
+          function paid_idle()
+            player.technologies[CANONICAL].level=5;uninvested.technologies[CANONICAL].level=5
+            suspended.technologies[CANONICAL].level=6
+            player.research_queue={OTHER};player.research_progress=.42
+            suspended.research_queue={OTHER};suspended.research_progress=.125
+            detached.technologies[OTHER].saved_progress=.27
+            uninvested.technologies[CANONICAL].enabled=false
+            writes=0;queue_writes={};progress_writes={}
+          end
+          function older_plan(event)return history.plan_default_owner_transfer(event,nil,false)end
+          function refuse_older(event,route)
+            local before=all_frames();writes=0
+            assert(not pcall(history.plan_default_owner_transfer,event,route,false))
+            assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
+          end
+        ''')
+        return lua
+
+    def test_501_empty_all_forces_admits_new_observer_without_zero_aggregate_inference(self):
+        lua=self.older_world();lua.execute(r'''
+          player.research_queue={OTHER};player.research_progress=.42
+          uninvested.technologies[CANONICAL].enabled=false
+          local event=older_event("5.0.20001",true);local before=all_frames();writes=0
+          queue_writes={};progress_writes={}
+          local plan=older_plan(event);assert(writes==0 and same(before,all_frames()))
+          assert(plan.record.producer.kind=="older-mir501-empty-default")
+          assert(history.apply_default_owner_transfer(plan))
+          for _,f in pairs(game.forces)do
+            local a,b=frame(f),before[f.index]
+            assert(a.owner.level==4 and not a.owner.researched and not a.debit.researched)
+            assert(a.owner.enabled==b.source.enabled and a.bonus==b.bonus and a.bonus==20)
+            assert(a.current==b.current and a.progress==b.progress and same(a.queue,b.queue))
+          end
+          assert(queue_writes[1]==nil and storage[OWNER_KEY].producer.old_version=="5.0.20001")
+        ''')
+
+    def test_473_paid_idle_preserves_native_levels_and_foreign_work(self):
+        lua=self.older_world();lua.execute(r'''
+          paid_idle();local event=older_event("4.7.20003",true);local before=all_frames()
+          local plan=older_plan(event);assert(writes==0 and plan.record.producer.kind=="published473-idle-default")
+          assert(history.apply_default_owner_transfer(plan))
+          for _,f in pairs(game.forces)do
+            local a,b=frame(f),before[f.index];local n=b.source.level
+            assert(a.owner.level==n and a.owner.count==b.source.count and a.owner.enabled==b.source.enabled)
+            assert(a.debit.researched==(n>=5)and a.bonus==b.bonus and same(a.private,b.private))
+            assert(a.current==b.current and a.progress==b.progress and same(a.queue,b.queue))
+            assert(a.other_saved==b.other_saved and queue_writes[f.index]==nil)
+          end
+          assert(player.technologies[ORDINARY].level==5 and player.technologies[ORDINARY].research_unit_count==1012)
+          assert(player.worker_robots_storage_bonus==21 and not uninvested.technologies[ORDINARY].enabled)
+        ''')
+
+    def test_one_force_paid_501_and_any_pending_older_work_refuse_before_writes(self):
+        for old, opponents in (("5.0.20001", (
+                'detached.technologies[CANONICAL].level=5',
+                'detached.technologies[CANONICAL].researched=true')),
+                ("4.7.20003", ())):
+            for opponent in opponents + (
+                    'detached.technologies[CANONICAL].saved_progress=.1',
+                    'detached.research_queue={CANONICAL}',
+                    'detached.research_queue={OTHER,CANONICAL}'):
+                with self.subTest(old=old, opponent=opponent):
+                    lua=self.older_world();lua.globals().old=old
+                    lua.execute(opponent+';refuse_older(older_event(old,true))')
+
+    def test_older_previous_profile_engine_event_and_current_route_opponents(self):
+        opponents=(
+            'script.active_mods.foreign="1"',
+            'script.active_mods.foreign="1";event.mod_changes.foreign={old_version="1",new_version="1"}',
+            'event.mod_changes.removed={old_version="1"}',
+            'script.active_mods.foreign="2";event.mod_changes.foreign={old_version="1",new_version="2"}',
+            'script.active_mods["test-observer"]="0.2.0"',
+            'event.mod_changes.base={old_version="2.0.76",new_version="2.0.77"}',
+            'event.mod_changes.base={new_version="2.0.77"}',
+            'event.mod_startup_settings_changed=true',
+            'event.mod_changes["more-infinite-research"].new_version="5.0.20013"',
+            'script.active_mods.base="2.0.78"',
+            'script.active_mods["space-age"]="2.0.77";event.mod_changes["space-age"]={new_version="2.0.77"}',
+            'creators[CANONICAL]="foreign"',
+            'add_provider(7);route=provider_route(7)',
+            'detached.technologies[ID].level=5',
+            'detached.technologies[ORDINARY].saved_progress=.1')
+        for old in ("5.0.20001","4.7.20003"):
+            for opponent in opponents:
+                with self.subTest(old=old, opponent=opponent):
+                    lua=self.older_world();lua.globals().old=old
+                    lua.execute('local event=older_event(old,true);local route=nil;'+opponent+';refuse_older(event,route)')
+        for target, old in (("f210","5.0.21001"),("f210","4.7.21003"),("f200","5.0.20002"),("f200","4.7.20002")):
+            lua=self.older_world(target);lua.globals().old=old;lua.execute('refuse_older(older_event(old))')
+
+    def test_473_requires_each_resolved_default_worker_value_and_selected_caps(self):
+        opponents=('values.base_cost=201','values.growth_factor=2','values.linear_increment=1',
+            'values.research_time=0','values.effect_percent=2','values.max_level=4','values.enabled=false',
+            'history.configure(4,true)','history.configure(0,false)',
+            'set_reward(0)','prototypes.technology[CANONICAL].level=5')
+        for opponent in opponents:
+            with self.subTest(opponent=opponent):
+                lua=self.older_world();lua.execute('paid_idle();local values=require("runtime.configuration").streams["worker-robots-storage"];'+
+                    opponent+';refuse_older(older_event("4.7.20003",true))')
+
+    def test_473_imported_profile_uses_actual_resolver_instead_of_raw_default_settings(self):
+        lua=self.older_world();lua.execute(r'''
+          settings={startup={
+            ["mir-enable-worker-robots-storage"]={value=true},["mir-cost-base-worker-robots-storage"]={value=200},
+            ["mir-cost-growth-worker-robots-storage"]={value=1.5},["mir-cost-linear-increment-worker-robots-storage"]={value=0},
+            ["mir-research-time-worker-robots-storage"]={value=60},["mir-effect-per-level-worker-robots-storage"]={value=1},
+            ["mir-max-level-worker-robots-storage"]={value=0},["mir-settings-profile-import"]={value="MIRSET1:host-profile"}}}
+          helpers={encode_string=function(s)return s end,decode_string=function(s)return s end,
+            json_to_table=function()return{schema=1,kind="mir-settings-profile",settings={
+              ["mir-effect-per-level-worker-robots-storage"]=2}}end}
+          package.loaded["runtime.configuration"]=nil;package.loaded["runtime.worker_robot_storage"]=nil
+          history=require("runtime.worker_robot_storage")
+          assert(settings.startup["mir-effect-per-level-worker-robots-storage"].value==1)
+          assert(require("runtime.configuration").streams["worker-robots-storage"].effect_percent==2)
+          paid_idle();refuse_older(older_event("4.7.20003",true))
+        ''')
+
+    def test_saved_older_producer_kinds_are_strict_and_cold_validation_is_storage_only(self):
+        for old, kind in (("5.0.20001","older-mir501-empty-default"),("4.7.20003","published473-idle-default")):
+            lua=self.older_world();lua.globals().old=old;lua.globals().kind=kind
+            lua.execute(r'''
+              if old=="4.7.20003"then paid_idle()end
+              history.apply_default_owner_transfer(older_plan(older_event(old,true)))
+              local saved=storage[OWNER_KEY];assert(saved.producer.kind==kind)
+              writes=0;local original_game,original_prototypes=game,prototypes
+              game=setmetatable({}, {__index=function()error("cold native game read")end})
+              prototypes=setmetatable({}, {__index=function()error("cold prototype read")end})
+              for i=1,2 do package.loaded["runtime.worker_robot_storage"]=nil;history=require("runtime.worker_robot_storage")
+                history.default_owner_on_load();assert(storage[OWNER_KEY]==saved and writes==0)end
+              game,prototypes=original_game,original_prototypes
+              for _,change in ipairs({function(p)p.old_version="5.0.20008"end,
+                function(p)p.new_version="5.0.21012"end,function(p)p.kind="unknown"end,
+                function(p)p.kind=kind=="older-mir501-empty-default"and"published473-idle-default"or"older-mir501-empty-default"end})do
+                local original=copy(saved.producer);change(saved.producer)
+                assert(not pcall(history.default_owner_on_load));saved.producer=original
+              end
+            ''')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)

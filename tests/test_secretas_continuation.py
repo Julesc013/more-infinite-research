@@ -320,6 +320,7 @@ class SecretasContinuationTests(unittest.TestCase):
                     lua.execute(MINIMAL_NATIVE_FACTS)
                     lua.execute('''
                       install_worker_recovery_facts()
+                      settings={startup={}} -- Native control always supplies this global.
                       local history=require("runtime.worker_robot_storage")
                       local selected=secretas_route()
                       local plan=history.preflight(mir_update(),selected)

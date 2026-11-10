@@ -148,6 +148,7 @@ end
 local recovery = require("research.worker_storage_recovery")
 local caps = require("runtime.caps")
 local target = require("platform.target")
+local effective_values = require("runtime.configuration")
 local pending = false
 local default_head_pending = false
 local default_mutating_force
@@ -623,8 +624,10 @@ local function owner_record()
     if value.current.kind ~= "finite" then recover_error("retired default owner has no admitted finite route") end
   elseif value.current ~= nil then recover_error("ordinary default owner has a provider route") end
   fields(value.producer, {kind=true, old_version=true, new_version=true})
+  local older_empty = value.producer.kind == "older-mir501-empty-default"
+  local older_idle = value.producer.kind == "published473-idle-default"
   if (value.producer.kind ~= "initial-empty" and value.producer.kind ~= "recorded-default"
-      and value.producer.kind ~= "unchanged-mir5-default")
+      and value.producer.kind ~= "unchanged-mir5-default" and not older_empty and not older_idle)
       or type(value.producer.new_version) ~= "string" or #value.producer.new_version > 64
       or value.producer.kind == "initial-empty" and value.producer.old_version ~= nil
       or value.producer.kind ~= "initial-empty" and type(value.producer.old_version) ~= "string" then
@@ -633,6 +636,8 @@ local function owner_record()
   local prefix = target.id == "f200" and "^5%.0%.200%d%d$" or "^5%.0%.210%d%d$"
   local known = DEFAULT_ORIGINS[target.id]
   if not value.producer.new_version:match(prefix)
+      or (older_empty or older_idle) and (target.id ~= "f200"
+        or value.producer.old_version ~= (older_empty and "5.0.20001" or "4.7.20003"))
       or value.producer.kind == "unchanged-mir5-default" and (not known or not known[value.producer.old_version])
       or value.producer.kind == "recorded-default" and value.producer.old_version ~= value.producer.new_version
         and (not known or not known[value.producer.old_version]) then
@@ -646,6 +651,49 @@ local function owner_record()
     checked_default_force(record, retired)
   end
   return value
+end
+
+-- These two older Base producers have separate, narrower native predicates.
+-- Neither belongs to the qualified9--11 producer set. New observer additions
+-- are excluded when proving the previous Base+MIR closure, never old mods.
+local function older_default_origin(event, change, active)
+  if target.id ~= "f200" or target.minimum_base ~= "2.0.77" or active.base ~= "2.0.77"
+      or event.mod_startup_settings_changed ~= false then
+    recover_error("older default source requires unchanged Base2.0.77 settings")
+  end
+  for _, name in ipairs({"space-age", "quality", "elevated-rails", "recycler"}) do
+    if active[name] ~= nil then recover_error("older default source requires its Base-only profile") end
+  end
+  for name, version in pairs(active) do
+    if name ~= "base" and name ~= MIR then
+      local addition = event.mod_changes[name]
+      if type(version) ~= "string" or type(addition) ~= "table" or addition.old_version ~= nil
+          or addition.new_version ~= version then recover_error("older default prior mod selection is not Base+MIR") end
+    end
+  end
+  for name, item in pairs(event.mod_changes) do
+    if name ~= MIR then
+      if type(item) ~= "table" or item.new_version ~= active[name] or type(item.new_version) ~= "string"
+          or name == "base" and item.old_version ~= "2.0.77"
+          or name ~= "base" and item.old_version ~= nil then
+        recover_error("older default source changed a previous mod or engine")
+      end
+    end
+  end
+  if change.old_version == "5.0.20001" then
+    return {kind="older-mir501-empty-default", old_version=change.old_version, new_version=active[MIR]}
+  end
+  local values = effective_values.streams and effective_values.streams["worker-robots-storage"]
+  local prototype = native_prototype(recovery.canonical)
+  local effect = prototype.effects and #prototype.effects == 1 and prototype.effects[1]
+  if type(values) ~= "table" or values.base_cost ~= 200 or values.growth_factor ~= 1.5
+      or values.linear_increment ~= 0 or values.research_time ~= 60 or values.effect_percent ~= 1
+      or values.max_level ~= 0 or values.enabled ~= true or selected_cap ~= 0 or selected_enabled ~= true
+      or prototype.level ~= 4 or prototype.max_level ~= 4294967295
+      or not effect or effect.type ~= "worker-robot-storage" or effect.modifier ~= 1 then
+    recover_error("published473 idle source requires the resolved default worker tuple")
+  end
+  return {kind="published473-idle-default", old_version=change.old_version, new_version=active[MIR]}
 end
 
 local function default_origin(event, initializing, state)
@@ -666,6 +714,9 @@ local function default_origin(event, initializing, state)
   local change = event.mod_changes[MIR]
   if change ~= nil and (type(change) ~= "table" or change.new_version ~= active[MIR]) then
     recover_error("default transfer package-change event is inconsistent")
+  end
+  if state == nil and change and (change.old_version == "5.0.20001" or change.old_version == "4.7.20003") then
+    return older_default_origin(event, change, active)
   end
   for name, item in pairs(event.mod_changes) do
     if name ~= MIR and (type(item) ~= "table" or item.old_version == nil
@@ -849,6 +900,14 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       if (initializing or refresh) and (source.next_level ~= 4 or source.researched
           or source.saved_progress ~= 0 or source.occurrences ~= 0) then
         recover_error("first initialization/new force cannot adopt existing default work")
+      end
+      if not owned and (producer.kind == "older-mir501-empty-default" or producer.kind == "published473-idle-default") then
+        if source.saved_progress ~= 0 or source.occurrences ~= 0 or source.current == recovery.canonical then
+          recover_error("older default source has unfinished native worker work")
+        end
+        if producer.kind == "older-mir501-empty-default" and (source.next_level ~= 4 or source.researched) then
+          recover_error("older MIR501 source requires every native worker4 to be empty")
+        end
       end
       if source.occurrences > 0 then requeueable(force, source, true, true) end
       action, moved = "transfer", true
