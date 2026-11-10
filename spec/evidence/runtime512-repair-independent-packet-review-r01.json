@@ -1,0 +1,53 @@
+{
+  "kind": "MIR512RepairOfflineAndPrepareOnlyIndependentAdmissionV1",
+  "reviewed_at_utc": "2026-11-10T05:03:02.910038+00:00",
+  "verdict": "GO PREPARE ONLY after Root admission: exactly one fresh current12 pending active repair seed capture and one unscored25000-update physical pilot,max2 native processes. All20 timing launches remain HELD.",
+  "pins": {
+    "packet": "4FB70A4B9BDD5FC0049F91EAEAADAA7D12023DB2BAF87590C2AA65417BC6543B",
+    "caller": "691319A003A048A666C4CE1D23C5AE198329A59450CFFE1FC4E77B81F00285D2",
+    "actual_zero_native_composition": "E59440E8E36044F945D968F7E637FCA31B11A233FB3001775A0B777AB5710087",
+    "player": "10619C8C1BF9F0A99DE8CC4E630CAE3BDE20101E02A11F88A5F92C433F70E3FF",
+    "source_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+    "player_Source": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+    "product_runner": "b05/Source47537",
+    "capture_harness": "be3048d0921b1caff56ed04a34e6c2b7e9511efb/Sourcef4e45e5667146ec57dee763137ea386f080b7bd0",
+    "benchmark_harness": "32feeb99db3cb998f30aa73d11e8f3ebdbd487e6/Sourcef4e45e5667146ec57dee763137ea386f080b7bd0",
+    "engine": "2.1.23/8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+  },
+  "independent_review": [
+    "Ninety-seven unique explicitly declared packet path/size/SHA records verified. Historical nested receipt snapshots are not treated as current file locators. Reference capture/pilot/seed/archive and three actually consumed fixture archives separately verified.",
+    "All24 executed helpers equal exact committed harness members and independently match original raw revisions,except exactly one capture roleliteral21010\u219221012. Both harnesses are proper clean Git worktree roots at assertedheads;old Sourcef4e is harness-only,not loaded player Source.",
+    "Six fixture source members independently compared to raw32fe origin/projection. Only repair control two current-version literals and info one dependency literal change510\u2192512;remainingfour source members unchanged. All3archiveCRCs/member/source-directory bodies match. A15A observer/DFF selector remain exact.",
+    "Caller full eligibility/Prepare/Measure boundaries reviewed against prior r03:current package is explicitly unpublished and validated through Source128inventory/independent608integrity/rootcustody/checkedentiretree+fourCI. Falsepublished-authority opponent refuses;historical11delivery record grants no current12 authority.",
+    "Prepare branch invokes only actual capture then one unscored pilot,checks capturehead/hash/cleanliness/archive/profile/restoration and unchanged physicalwitness,then returns before Measure. No implicit transition to20run timing;fresh output roots are required.",
+    "Actual two9mod Compose arms validate full source admission/threeFixtureSources,CLI/config/archive/dependency/resource namespace;native0/Factorio0. Five official mods+MIR+three fixtures only;no Ferrum/upstream dependency library copying or recreation.",
+    "Both recorded owned archive/control transactions passed8states each;live afterstates match. Capture and benchmark config hashes checked;capture context is contained in actual capturecheckout/build/tmp,benchmark roots in its own actual checkout/build/tmp. Actualhealth/descendantnegative/cross-worktree resource controls read.",
+    "Sixteen actual role controls andeight actual callerbinding opponents retain strictrole/wrongfuture/source/hash/helper/profile/harness/eligibility/packet refusal. Physical/math/seed/memory reader methods reuse only previously reviewed unchanged code;no old11candidate seed,pilot or measuredvalue is adopted as current."
+  ],
+  "reused_prior_review": {
+    "packet_review_path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r03-independent-packet-review.json",
+    "packet_review_sha256": "877E8FA12A573D84C619AB267212E3B4394ECC4E550749FA4C0AF4E19BF511E4",
+    "physical_preparation_review_path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\runtime511-repair-r03-independent-preparation-result-review.json",
+    "physical_preparation_review_sha256": "6BDC230BF87416C3365D04C7D95B6274B86E0AD6D7AF430E78973D49EF0F2410",
+    "scope": "Unchanged method,fixtures,numeric/physical1000eligible/256tracked/744overflow,128player+128reciprocalfriend,256initial+8reactivation witnesses and immutable505R02reference prerequisites only. Current12 functional endpoints must be observed anew."
+  },
+  "prepare_bounds": {
+    "native_processes_max": 2,
+    "capture": "600seconds/4096MiB/128MiB,one current12 pendingseed;no favorable retry",
+    "pilot": "900seconds/4096MiB/120MiB,25000updates,unscored physical endpoint;sampler250ms/max12000observations/8MiB receipt unchanged",
+    "required_actual": "Exact current archive/9mods/Defaults/provenance,1000/256/744 pendingseed and256+8realrepair/foreign/nonwall witnesses,immutableprotectedseed/nativeoutput/memorycustody and complete restoration. Any failure retained;stopfirstfailure."
+  },
+  "reference_scope": "Original505R02 published4.7.21002/A4BB and D3E04D pendingseed,A449 capture/4AD pilot stay exact historical prerequisites. All10 reference timing launches must still run fresh in the separate paired block.",
+  "timing_hold": [
+    "No scored/timing/memory/nonregression or stable acceptance from unscored preparation. New resident Library/credits/worker scope and loadedstate/OS memory require current measurement;directrepair files being unchanged is insufficient reuse.",
+    "Measure requires explicitRoot AcceptedQuietBlock and exactnew preparation SHA;complete20 schedule is4warmups+16scored/8counterbalancedpairs. No prefix/retry/pooling;reference and candidate each10fresh launches.",
+    "Hold builds/host/inference/other native workloads during a later admitted quiet block. This review does not admit that block or its comparison verdict."
+  ],
+  "control_receipt_sha256": {
+    "root-controls.json": "B52AF9E8D3552511175120E20A85DFBA8C20724AFC5D814269374C4D0888CC59",
+    "capture-role-controls-r01.json": "0206CD5EBC4690E36E024B9228C27297DAD3A79ECA3573B2CBCBE8411050A6A8",
+    "binding-controls.json": "13D31E6F1085644A92DA53D3AA01468F270C6AABAE2F5328B94FBDAB25907E5E",
+    "fixture-source-controls.json": "E22C56A7559DA885AA1FBF186E93533C3DC3621C24F781EA96E744FEC0E68ADB"
+  },
+  "limits": "Repair-only cohort,not agriculture/all68activecells/fullproduct/stable/release. No engine/Compose/build/host/CI rerun or Source/controller/library/private-repo mutation by reviewer;only this receipt written."
+}
