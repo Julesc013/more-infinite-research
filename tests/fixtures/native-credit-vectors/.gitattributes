@@ -1,0 +1,3 @@
+# Preserve byte-checked upstream material on every checkout platform.
+cerys-technology-first45.lua -text
+Cerys-LICENSE.txt -text
