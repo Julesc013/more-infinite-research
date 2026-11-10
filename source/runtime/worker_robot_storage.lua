@@ -163,6 +163,40 @@ local function clone(value)
   return out
 end
 
+-- Only the selected modern engine family and synchronized official patch
+-- versions can accompany an otherwise unchanged producer/mod selection.
+local ENGINE_MODS = {base=true, ["space-age"]=true, quality=true, ["elevated-rails"]=true, recycler=true}
+local function engine_patch(version)
+  local pattern = target.id == "f200" and "^2%.0%.(%d+)$" or target.id == "f210" and "^2%.1%.(%d+)$"
+  local text = pattern and type(version) == "string" and version:match(pattern)
+  local value = text and tonumber(text)
+  if not value or not integer(value) or tostring(value) ~= text then return nil end
+  return value
+end
+local function same_family_engine_patch(event)
+  local active = script and script.active_mods or {}
+  local changes = type(event) == "table" and event.mod_changes
+  local floor, current = engine_patch(target.minimum_base), engine_patch(active.base)
+  if not floor or not current or current < floor or type(changes) ~= "table" then return false end
+  local base = changes.base
+  if base ~= nil and (type(base) ~= "table" or base.new_version ~= active.base
+      or not engine_patch(base.old_version) or engine_patch(base.old_version) < floor
+      or engine_patch(base.old_version) > current) then return false end
+  for name in pairs(ENGINE_MODS) do
+    if active[name] ~= nil and active[name] ~= active.base then return false end
+    local change = changes[name]
+    if name ~= "base" and active[name] ~= nil and base and base.old_version ~= base.new_version
+        and change == nil then return false end
+    if change ~= nil then
+      if type(change) ~= "table" or type(change.old_version) ~= "string" or change.new_version ~= active[name]
+          or type(change.new_version) ~= "string" then return false end
+      if change.old_version ~= change.new_version and (not base or change.old_version ~= base.old_version
+          or change.new_version ~= base.new_version) then return false end
+    end
+  end
+  return true
+end
+
 local function history_context(event, route, state, current)
   local function value(item)
     if type(item) == "string" then
@@ -305,7 +339,7 @@ local function progress(value)
   return type(value) == "number" and value == value and value >= 0 and value < 1
 end
 
-local function snapshot(force, id, finished_context)
+local function snapshot(force, id, finished_context, queued_observation)
   local technology = force.technologies[id]
   if not technology or not integer(technology.level) or technology.level < 4
       or type(technology.researched) ~= "boolean" or type(technology.enabled) ~= "boolean"
@@ -327,7 +361,8 @@ local function snapshot(force, id, finished_context)
   local default_finished = finished_context == "default-head-finished"
   local waiting_after_finish = (finished_context == true or default_finished) and current == nil and queue[1] ~= nil
     and force.research_progress == 0
-  if (current ~= queue[1] and not waiting_after_finish) or not progress(force.research_progress) then
+  local unsettled_queue = queued_observation == true and current ~= queue[1]
+  if (current ~= queue[1] and not waiting_after_finish and not unsettled_queue) or not progress(force.research_progress) then
     recover_error("inconsistent native current/queue frame")
   end
   local next_level = technology.level + (technology.researched and 1 or 0)
@@ -445,6 +480,8 @@ local function unchanged_unrecorded_secretas(event, route)
   local mir = changes[MIR]
   if not mir then return false end
   local old = mir.old_version
+  if not same_family_engine_patch(event) then return false end
+  local official_patch = event.mod_startup_settings_changed == false
   local published10 = old == "5.0.21010" or old == "5.0.20010"
   if not published10 then
     local active = script.active_mods
@@ -458,12 +495,12 @@ local function unchanged_unrecorded_secretas(event, route)
       return false
     end
     for name, change in pairs(changes) do
-      if name ~= MIR and (type(change) ~= "table" or change.old_version == nil
+      if name ~= MIR and not (official_patch and ENGINE_MODS[name]) and (type(change) ~= "table" or change.old_version == nil
           or change.old_version ~= change.new_version or change.new_version ~= active[name]) then return false end
     end
   end
   for name, change in pairs(changes) do
-    if name ~= MIR and change.old_version ~= change.new_version then return false end
+    if name ~= MIR and not (official_patch and ENGINE_MODS[name]) and change.old_version ~= change.new_version then return false end
   end
   return true
 end
@@ -747,8 +784,10 @@ local function default_origin(event, initializing, state)
   if state == nil and change and (change.old_version == "5.0.20001" or change.old_version == "4.7.20003") then
     return older_default_origin(event, change, active, base_hop)
   end
+  local engine_patch_valid = same_family_engine_patch(event)
+  if not base_hop and not engine_patch_valid then recover_error("default transfer requires a supported same-family engine patch") end
   for name, item in pairs(event.mod_changes) do
-    if name ~= MIR and not (base_hop and name == "base") and (type(item) ~= "table" or item.old_version == nil
+    if name ~= MIR and not (base_hop and name == "base") and not (engine_patch_valid and ENGINE_MODS[name]) and (type(item) ~= "table" or item.old_version == nil
         or item.old_version ~= item.new_version or item.new_version ~= active[name]) then
       recover_error("default transfer requires the unchanged mod selection")
     end
@@ -768,7 +807,7 @@ local function default_origin(event, initializing, state)
     return {kind="recorded-default", old_version=old, new_version=active[MIR]}
   end
   local known = DEFAULT_ORIGINS[target.id]
-  if not change or not known or known[change.old_version] ~= true or active.base ~= target.minimum_base then
+  if not change or not known or known[change.old_version] ~= true or not engine_patch_valid then
     recover_error("unrecorded default source has no qualified MIR5 producer")
   end
   local official = {base=true, [MIR]=true, ["space-age"]=true, quality=true, ["elevated-rails"]=true, recycler=true}
@@ -1662,14 +1701,24 @@ function M.on_research_event(event, finished)
   if not state or state.kind ~= "prepared" then return false end
   local record = state.forces[force.index]
   if not record then recover_error("research force has no prepared private history") end
+  -- Other forces can keep the shared hook active after this force retires.
+  -- An unrelated queued research grants this retired force no private rights.
+  if not record.pending and (not event.research or event.research.name ~= recovery.id) then return false end
+  local queued_observation = finished ~= true and defines and defines.events
+    and event.name == defines.events.on_research_queued and event.research
+    and event.research.force == force and (event.force == nil or event.force == force)
   local finished_context = finished == true and event.research and event.research.force
     and event.research.force.index == force.index
-  local frame = snapshot(force, recovery.id, finished_context)
+  local frame = snapshot(force, recovery.id, finished_context, queued_observation)
   local advanced = finished and event.research and event.research.name == recovery.id
   if frame.next_level ~= record.next_level + (advanced and 1 or 0)
       or frame.next_level > record.limit + 1 or frame.enabled ~= record.enabled or frame.visible ~= record.visible then
     recover_error("private worker completion/history changed unexpectedly")
   end
+  -- Queue setter observations can precede their new current research. Validate
+  -- the private cursor/flags above, but never write from a queued observation. The
+  -- settled started/cancelled/finished callback enforces the same native quota.
+  if queued_observation then return false end
   local remaining = math.min(frame.allowance, math.max(0, record.limit - frame.next_level + 1))
   record.next_level, record.limit, record.pending = frame.next_level, frame.next_level + remaining - 1, remaining > 0
   local previous_owner = owned_queue_force

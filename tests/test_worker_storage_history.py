@@ -165,7 +165,7 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
         lua.globals().player_root = self.lua.globals().player_root
         lua.globals().declared_target = target
         lua.execute('package.path=player_root.."/?.lua;"..player_root.."/?/init.lua";package.cpath="";'
-                    'package.loaded["platform.target"]={id=declared_target}')
+                    'package.loaded["platform.target"]={id=declared_target,minimum_base=declared_target=="f200"and"2.0.77"or"2.1.23"}')
         lua.execute(RECOVERY_WORLD)
         return lua
 
@@ -2175,6 +2175,196 @@ class WorkerDefaultEditionContinuityTests(unittest.TestCase):
               local before=all_frames();writes=0
               assert(not pcall(history.default_owner_preflight,event,route,true)and writes==0 and same(before,all_frames()))
             ''')
+
+
+
+class WorkerPrivateQueueEventContextTests(unittest.TestCase):
+    def world(self,target="f210"):
+        lua=WorkerFullDefaultProviderHandoverTests.world(self,target)
+        lua.execute('defines={events={on_research_queued=25,on_research_started=26}}')
+        return lua
+
+    def test_retired_force_ignores_other_queue_event_while_another_force_is_pending(self):
+        for target in ("f200","f210"):
+            lua=self.world(target);lua.execute(r"""
+              full_source(1,true);finite_entry(1);handover()
+              local f=player;local p=f.technologies[ID]
+              local continuation=f.technologies["worker-robots-storage-6"]
+              continuation.name="worker-robots-storage-6";continuation.force=f;continuation.visible_when_disabled=false
+              f.research_queue={OTHER};f.research_progress=0;p.level=9
+              assert(history.on_research_event({research=p,by_script=false},true))
+              local state=storage.mir_worker_storage_route
+              assert(not state.forces[f.index].pending and state.forces[suspended.index].pending and history.needs_research_events())
+              local saved=copy(state);local mt=getmetatable(f);local read=mt.__index
+              mt.__index=function(o,k)if k=="research_queue"then return {f.technologies["worker-robots-storage-6"],f.technologies[OTHER]}end;return read(o,k)end
+              writes=0;assert(not history.on_research_event({force=f,research=f.technologies["worker-robots-storage-6"],name=25}))
+              assert(writes==0 and same(saved,state))
+              -- Unexpected private completion is still checked, even on this retired force.
+              assert(not pcall(history.on_research_event,{research=p,by_script=false},true)and writes==0)
+              mt.__index=read
+            """)
+
+    def test_pending_setter_observation_is_read_only_then_started_enforces_quota_and_finish(self):
+        for target in ("f200","f210"):
+            lua=self.world(target);lua.execute(r"""
+              full_source(1,true);finite_entry(1);handover()
+              local f=player;local mt=getmetatable(f);local read,write=mt.__index,mt.__newindex
+              local changing=false;local newqueue;local observed=0
+              mt.__index=function(o,k)if changing and k=="research_queue"then return newqueue end;return read(o,k)end
+              mt.__newindex=function(o,k,v)
+                if k=="research_queue"then
+                  newqueue={};for _,id in ipairs(v)do newqueue[#newqueue+1]=f.technologies[type(id)=="string"and id or id.name]end
+                  local before=copy(storage.mir_worker_storage_route);local count=writes
+                  changing=true;if observed==0 then assert(f.current_research.name~=f.research_queue[1].name)end
+                  local ok,result=pcall(history.on_research_event,{force=f,research=f.technologies[ID],name=25});changing=false
+                  assert(ok and result==false and writes==count and same(before,storage.mir_worker_storage_route));observed=observed+1
+                end
+                return write(o,k,v)
+              end
+              f.research_queue={OTHER,ID,ID}
+              assert(observed==1 and f.current_research.name==OTHER and #f.research_queue==3)
+              local quota=storage.mir_worker_storage_route.forces[f.index]
+              assert(quota.next_level==8 and quota.limit==8 and quota.pending)
+              assert(history.on_research_event({research=f.technologies[OTHER],name=26}))
+              assert(#f.research_queue==2 and f.research_queue[2].name==ID and quota.limit==8)
+              mt.__newindex=write;mt.__index=read
+              f.research_queue={OTHER};f.research_progress=.23;f.technologies[ID].level=9
+              assert(history.on_research_event({research=f.technologies[ID],by_script=false},true))
+              assert(not quota.pending and not f.technologies[ID].enabled and f.current_research.name==OTHER and f.research_progress==.23)
+            """)
+
+    def test_pending_other_and_private_queue_observations_are_always_read_only(self):
+        for transient in (False,True):
+            for private_event in (False,True):
+                lua=self.world();lua.globals().transient=transient;lua.globals().private_event=private_event
+                lua.execute(r"""
+                  full_source(1,true);finite_entry(1);handover()
+                  local f=player;local mt=getmetatable(f);local read=mt.__index
+                  if transient then mt.__index=function(o,k)
+                    if k=="research_queue"then return {f.technologies[OTHER],f.technologies[ID]}end;return read(o,k)end end
+                  local state=copy(storage.mir_worker_storage_route);local before=all_frames();writes=0
+                  assert((f.current_research.name~=f.research_queue[1].name)==transient)
+                  assert(not history.on_research_event({force=f,research=f.technologies[private_event and ID or OTHER],name=25}))
+                  assert(writes==0 and same(state,storage.mir_worker_storage_route)and same(before,all_frames()))
+                  mt.__index=read
+                """)
+
+    def test_queue_deferral_does_not_admit_other_contexts_bad_frames_or_config(self):
+        for opponent in ("started","progress","level","enabled","saved","configuration"):
+            lua=self.world();lua.globals().opponent=opponent;lua.execute(r"""
+              full_source(1,true);finite_entry(1);handover()
+              local f=player;local mt=getmetatable(f);local read=mt.__index
+              mt.__index=function(o,k)if k=="research_queue"then return {f.technologies[OTHER],f.technologies[ID]}end
+                if k=="research_progress"and opponent=="progress"then return 1 end;return read(o,k)end
+              if opponent=="level"then f.technologies[ID].level=9 end
+              if opponent=="enabled"then f.technologies[ID].enabled=false end
+              if opponent=="saved"then f.technologies[ID].saved_progress=1 end
+              local state=copy(storage.mir_worker_storage_route);writes=0
+              local ok
+              if opponent=="configuration"then ok=pcall(history.preflight,{},provider_route(5))
+              else ok=pcall(history.on_research_event,{force=f,research=f.technologies[ID],name=opponent=="started"and 26 or 25})end
+              assert(not ok and writes==0 and same(state,storage.mir_worker_storage_route))
+            """)
+
+
+class WorkerSameFamilyEnginePatchTests(unittest.TestCase):
+    def world(self,target="f210"):
+        return WorkerDefaultNativeOwnerTransferTests.world(self,target)
+
+    def test_known_unrecorded_defaults_accept_supported_current_and_synchronized_official_patch(self):
+        for target in ("f200","f210"):
+            for old_patch in (9,10,11):
+                for with_event in (False,True):
+                    lua=self.world(target);lua.globals().old_patch=old_patch;lua.globals().with_event=with_event
+                    lua.execute(r"""
+                      seed_owner();local target=require("platform.target");local oldbase=target.minimum_base
+                      local newbase=package_family=="f200"and"2.0.78"or"2.1.24"
+                      script.active_mods.base=newbase;local event=owner_event(string.format("5.0.%d",(package_family=="f200"and 20000 or 21000)+old_patch))
+                      for _,name in ipairs{"space-age","quality","elevated-rails","recycler"}do
+                        script.active_mods[name]=newbase
+                        if with_event then event.mod_changes[name]={old_version=oldbase,new_version=newbase}end
+                      end
+                      if with_event then event.mod_changes.base={old_version=oldbase,new_version=newbase}end
+                      local before=all_frames();writes=0;local plan=history.plan_default_owner_transfer(event,nil,false)
+                      assert(writes==0 and same(before,all_frames()));assert(history.apply_default_owner_transfer(plan))
+                      assert(storage[OWNER_KEY].producer.kind=="unchanged-mir5-default")
+                      for _,f in pairs(game.forces)do assert(f.worker_robots_storage_bonus==before[f.index].bonus)end
+                    """)
+
+    def test_all_empty_nil_history_defaults_accept_supported_patch_without_work_inference(self):
+        for target in ("f200","f210"):
+            for with_event in (False,True):
+                lua=self.world(target);lua.globals().with_event=with_event
+                lua.execute(r"""
+                  local target=require("platform.target");local oldbase=target.minimum_base
+                  for _,f in pairs(game.forces)do local c=f.technologies[CANONICAL]
+                    c.level=4;c.researched=false;c.saved_progress=0;f.research_queue={};f.research_progress=0
+                  end
+                  script.active_mods.base=package_family=="f200"and"2.0.78"or"2.1.24"
+                  local event=owner_event(package_family=="f200"and"5.0.20011"or"5.0.21011")
+                  if with_event then event.mod_changes.base={old_version=oldbase,new_version=script.active_mods.base}end
+                  local before=all_frames();writes=0;queue_writes={};progress_writes={}
+                  local plan=history.plan_default_owner_transfer(event,nil,false)
+                  assert(writes==0 and same(before,all_frames()));assert(history.apply_default_owner_transfer(plan))
+                  for _,f in pairs(game.forces)do assert(f.technologies[ORDINARY].level==4 and f.technologies[HEAD].level==4
+                    and f.worker_robots_storage_bonus==before[f.index].bonus)end
+                  assert(next(queue_writes)==nil and next(progress_writes)==nil)
+                """)
+
+    def test_secretas_known_origins_accept_only_the_same_official_patch_without_native_writes(self):
+        for target in ("f200","f210"):
+            for patch in (9,10,11):
+                for with_event in (False,True):
+                    lua=self.world(target);lua.globals().old_patch=patch;lua.globals().with_event=with_event
+                    lua.execute(r"""
+                      seed_owner();add_provider(8);local target=require("platform.target");local oldbase=target.minimum_base
+                      local newbase=package_family=="f200"and"2.0.78"or"2.1.24"
+                      script.active_mods.base=newbase;script.active_mods.secretas="1.0.38"
+                      local event=owner_event(string.format("5.0.%d",(package_family=="f200"and 20000 or 21000)+old_patch))
+                      for _,name in ipairs{"space-age","quality","elevated-rails","recycler"}do
+                        script.active_mods[name]=newbase;if with_event then event.mod_changes[name]={old_version=oldbase,new_version=newbase}end
+                      end
+                      if with_event then event.mod_changes.base={old_version=oldbase,new_version=newbase}end
+                      local before=all_frames();writes=0;local plan=history.preflight(event,provider_route(8));history.apply(plan)
+                      assert(writes==0 and same(before,all_frames())and storage.mir_worker_storage_route.route.technology=="worker-robots-storage-9")
+                    """)
+
+    def test_patch_exclusions_preserve_all_native_frames_before_refusal(self):
+        for target in ("f200","f210"):
+          for secretas in (False,True):
+            for opponent in ("old-floor","current-floor","downgrade","cross-family","base-new","DLC-old","DLC-new","DLC-add","DLC-remove","third-add","third-remove","third-update","startup","unknown-producer","DLC-without-base","DLC-without-event"):
+                lua=self.world(target);lua.globals().secretas_case=secretas;lua.globals().opponent=opponent
+                lua.execute(r"""
+                  seed_owner();local f200=package_family=="f200"
+                  local floor=f200 and "2.0.77"or"2.1.23";local current=f200 and "2.0.78"or"2.1.24"
+                  local below=f200 and "2.0.76"or"2.1.22";local higher=f200 and "2.0.79"or"2.1.25"
+                  local other_family=f200 and "2.1.23"or"2.0.77"
+                  local event=owner_event(f200 and "5.0.20011"or"5.0.21011");script.active_mods.base=current
+                  event.mod_changes.base={old_version=floor,new_version=current}
+                  script.active_mods.quality=current;event.mod_changes.quality={old_version=floor,new_version=current}
+                  if secretas_case then add_provider(8);script.active_mods.secretas="1.0.38"end
+                  if opponent=="old-floor"then event.mod_changes.base.old_version=below;event.mod_changes.quality.old_version=below
+                  elseif opponent=="current-floor"then script.active_mods.base=below;script.active_mods.quality=below
+                    event.mod_changes.base={old_version=below,new_version=below};event.mod_changes.quality={old_version=below,new_version=below}
+                  elseif opponent=="downgrade"then event.mod_changes.base.old_version=higher;event.mod_changes.quality.old_version=higher
+                  elseif opponent=="cross-family"then event.mod_changes.base.old_version=other_family;event.mod_changes.quality.old_version=other_family
+                  elseif opponent=="base-new"then event.mod_changes.base.new_version=higher
+                  elseif opponent=="DLC-old"then event.mod_changes.quality.old_version=below
+                  elseif opponent=="DLC-new"then script.active_mods.quality=higher;event.mod_changes.quality.new_version=higher
+                  elseif opponent=="DLC-add"then event.mod_changes.quality.old_version=nil
+                  elseif opponent=="DLC-remove"then script.active_mods.quality=nil;event.mod_changes.quality.new_version=nil
+                  elseif opponent=="third-add"then script.active_mods.qol="1";event.mod_changes.qol={new_version="1"}
+                  elseif opponent=="third-remove"then event.mod_changes.qol={old_version="1"}
+                  elseif opponent=="third-update"then script.active_mods.qol="2";event.mod_changes.qol={old_version="1",new_version="2"}
+                  elseif opponent=="startup"then event.mod_startup_settings_changed=true
+                  elseif opponent=="unknown-producer"then event.mod_changes["more-infinite-research"].old_version=f200 and "5.0.20008"or"5.0.21008"
+                  elseif opponent=="DLC-without-base"then event.mod_changes.base=nil
+                  elseif opponent=="DLC-without-event"then event.mod_changes.quality=nil end
+                  local before=all_frames();writes=0
+                  local ok=secretas_case and pcall(history.preflight,event,provider_route(8))or false
+                  if not secretas_case then ok=pcall(history.plan_default_owner_transfer,event,nil,false)end
+                  assert(not ok and writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil and storage.mir_worker_storage_route==nil)
+                """)
 
 
 if __name__ == "__main__":
