@@ -85,6 +85,7 @@ $controls = @(
   [ordered]@{path='tests/test_native_credits.py';lua=$true},
   [ordered]@{path='tests/test_native_family_paid_credits.py';lua=$true},
   [ordered]@{path='tests/test_native_credit_vectors.py';lua=$true},
+  [ordered]@{path='tests/test_native_credit_vector_fixture.py';lua=$true},
   [ordered]@{path='tests/test_legacy_module_credits.py';lua=$true},
   [ordered]@{path='tests/test_legacy_cannon_credits.py';lua=$true},
   [ordered]@{path='tests/test_legacy_preference_transition_fixture.py';lua=$true},
