@@ -1,0 +1,128 @@
+{
+  "kind": "MIR512ReporterDispositionsIndependentReviewV1",
+  "reviewed_at_utc": "2026-11-10T08:45:21Z",
+  "base_commit": "d6c03465e26b7f0b5e6a250a241c5516eaef275f",
+  "player_source": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+  "scope": "Reporter-history reconciliation using retained originals, live issues and accepted exact-input reviews. No source changes, game execution, test campaign, release authority or whole-issue closure.",
+  "incident_recommendation": {
+    "verdict": "NO-GO for claiming all reported save-load failures resolved or publishing under the current instruction to resolve applicable blockers first.",
+    "reason": "The unchanged-Secretas persistence, complete credit-vector and known-Base mechanisms have accepted bounded evidence. The reported provider-change path and the actual unknown saved histories are not thereby qualified. No maintainer decision narrowing that obligation is recorded here.",
+    "reuse": "Retain the accepted worker, both modern vector, known-Base, paid-steel and package results. Do not restart those campaigns because this reconciliation adds an evidence file.",
+    "next_action": "Integration owner gives each remaining transition an explicit supported disposition and selects only a concrete missing mechanism test or correction. A faithful developer reproduction and preservation test can establish a fix without a reporter reply; a different predecessor or the same generic error cannot.",
+    "stable": "Library input, export, client lifecycle, historical compatibility and performance acceptance remain separate from this incident decision."
+  },
+  "reporters": [
+    {
+      "reporter": "shxuai",
+      "issue": 1807,
+      "predecessor": "Reported MIR 5.0.21009 with WorkerRobotCargoSizeResearch; duplicate worker-robots-storage-4 during prototype preflight.",
+      "disposition": "Delivered 5.0.10 and explicit player confirmation. Issue 1807 is closed.",
+      "limit": "Does not establish preservation for adding or removing another provider on an invested existing save."
+    },
+    {
+      "reporter": "jouven",
+      "issue": 1807,
+      "predecessor": "Space Is Fake space-science requirements regressed before 5.0.10.",
+      "disposition": "Delivered 5.0.10 and explicit player confirmation. Issue 1807 is closed.",
+      "limit": "Final SIF/worker combined-output qualification is separately recorded; startup success alone is not its evidence."
+    },
+    {
+      "reporter": "jivaii",
+      "issue": 1845,
+      "known_transition": "Names Secretas and Frozeta. First 5.0.21010 trace reaches the explicit Secretas presence-change refusal; a separate Ferrum trace reports unknown worker-robots-storage-6 ownership.",
+      "latest_report": "5.0.21011 worker history refusal at line 425 with technology=default. That fallback string does not establish a prior MIR-owned default route.",
+      "applicable_correction": "Current candidate removes the blanket presence-change policy in favor of validated worker-state handling, and persists specifically proven unchanged-Secretas history. Prepared MIR-default4 transitions have separate evidence.",
+      "accepted_evidence": "worker512-history-continuity-independent-result-review-r01.json",
+      "remaining": "The accepted unchanged-provider 11-to-12 case is not an unprepared provider addition/removal or Ferrum transition with unknown invested history. The latest predecessor, event and surviving saved authority are not supplied.",
+      "smallest_action": "Use an authentic surviving predecessor contract/state or a faithful supported provider-change reproduction. If the transition discards native state before runtime, preservation must happen before that loss. Do not silently infer paid work from the clamped destination or advertise preparation for a route that cannot perform it."
+    },
+    {
+      "reporter": "Driku",
+      "issue": 1845,
+      "chronology": "Earlier 5.0.21005/21008 on_init gun-credit reports and research multiplier 2 precede supplied file links. Reporter then explicitly says 5.0.21009 loads successfully. New 5.0.21011 on_configuration_changed worker refusal is a separate later report.",
+      "retained_save": {
+        "bytes": 27201055,
+        "sha256": "BCD549813C04D3C8F3DB90D0A205703FE24DE6588518759DAE87508B316DAAE9",
+        "download_mac_verified": true,
+        "header_engine_u16": [2, 1, 21, 11],
+        "header_mod_records": 463,
+        "header_selected_versions": {
+          "more-infinite-research": "4.3.21000",
+          "secretas": "1.0.38",
+          "Cerys-Moon-of-Fulgora": "4.24.18",
+          "frozeta-nuclear-winter": "1.12.1"
+        },
+        "header_limit": "Read-only bounded contiguous records at offsets 44 through 11454, all 463 names unique. No Ferrum or WorkerRobotCargoSizeResearch record. No native force state, startup settings or upgrade acceptance decoded."
+      },
+      "retained_log": {
+        "bytes": 13626300,
+        "sha256": "168FFEC2721B647F5FCF6461D52892446F60B0CF9F3D5D84C9254652A99E5C9A",
+        "download_mac_verified": true,
+        "started": "2026-11-07 11:56:18; Factorio 2.1.24 build 87808",
+        "selected_loading_versions": {
+          "secretas": "1.0.38",
+          "Cerys-Moon-of-Fulgora": "4.25.0",
+          "frozeta-nuclear-winter": "1.12.7"
+        },
+        "limit": "Only MIR mention is duplicate installed archive/highest 5.0.21008. No MIR loading entry, MIR stack trace, map load or script.dat load. This startup log is not a later worker-failure reproduction."
+      },
+      "applicable_correction": "The accepted unchanged-Secretas mechanism is relevant only if the later saved route and changes satisfy its explicit provenance. Earlier native research-cost controls are not an exact reproduction of either supplied save or latest worker failure.",
+      "remaining": "The older save is authentic 4.3-plus-Secretas input, not a known 9/11 predecessor for the latest failure. The actual later saved predecessor and provider/settings changes remain unknown.",
+      "smallest_action": "Retain and use the newly reachable older originals for their actual historical scope. Do not relabel their eventual pass as resolution of the later worker failure. No fresh reporter request is required to begin a faithful developer reproduction."
+    },
+    {
+      "reporter": "Ryutavi",
+      "issue": 1845,
+      "known_shape": "5.0.21011 on_init; research_low_density_structure main is unresearched level 1, hidden and empty; scrap-recycling signed holders each have 97 effects, level 1 and unresearched. Trace names the selected recipe and changes +0.1/-0.1, not the remaining 96 complete entries.",
+      "applicable_correction": "Candidate validates complete signed recipe-effect vectors and their public-reference/main relationship, replacing the old exactly-one-effect assumption. Historical paid credit uses its saved earning basis; current vector validity alone does not establish earlier entitlement.",
+      "accepted_evidence": [
+        "native-credit-vector512-independent-source-review-r01.json",
+        "native-credit-vector512-f210-independent-result-review-r01.json",
+        "native-credit-vector512-f200-independent-result-review-r01.json"
+      ],
+      "disposition": "Named 97-effect mechanism qualified on 2.0.77 and 2.1.23, including signed contributions, ordinary completions, pending work and cold loads. Actual Cerys loop plus synthetic aliases is explicitly identified.",
+      "remaining": "Exact remaining vector entries and actual modpack are unavailable. Do not claim an exact reporter-modpack pass, arbitrary productivity compatibility or automatic recovery of an unknown invested vector history. A concrete incompatible shape still needs its own correction."
+    },
+    {
+      "reporter": "wakaba20202020",
+      "issue": 1806,
+      "known_transition": "5.0.21009 on_configuration_changed on Factorio 2.1.24, unknown first paid mask. Actual previous MIR, mods, settings and earning history are not supplied.",
+      "applicable_correction": "Known-Base 5.0.1 history now has an independently reviewed and natively tested bounded transition.",
+      "accepted_evidence": [
+        "known-base501-normalization-independent-result-review-r01.json",
+        "known-base512-successor-independent-result-review-r01.json"
+      ],
+      "remaining": "Synthetic provider addition from an authentic 5.0.20001 Base save on 2.0.77 is not the unknown reporter 2.1.24 path. Issue 1806 remains open.",
+      "smallest_action": "Recover a surviving earning basis or establish the actual predecessor contract with a faithful reproduction. Never assign the current expanded mask as historical paid ownership merely to permit loading."
+    }
+  ],
+  "other_named_issues": [
+    {
+      "issue": 621,
+      "state": "closed",
+      "basis": "Existing closure records rehashed published 4.2.2 delivery and retained upgrade/cold-load evidence. This review neither recreates erased research nor broadens that historical verdict."
+    },
+    {
+      "issue": 1768,
+      "state": "open",
+      "basis": "Layout/source/visual corrections exist; actual Library input, export and client lifecycle acceptance remains unqualified. A screenshot or source review alone cannot close those obligations."
+    },
+    {
+      "issue": 446,
+      "state": "open",
+      "basis": "Historical maintenance umbrella retains its underlying requirements. Its old release date does not erase unqualified progression, performance, UI or ecosystem obligations."
+    }
+  ],
+  "custody": {
+    "private_repository": "Julesc013/scratchpad",
+    "commit": "fd97ab744f19601c1e934f3f0a7d2a0f129ca9d2",
+    "directory": "projects/mir/reporter-inputs/driku-earlier512-r01",
+    "manifest_sha256": "31F13DECB6AE2490A4DC42F26B15D9953186C37407DE9FA7AF84B999EEB0F83A",
+    "attachment_sha256": "8D16829DDE3750B97807E7B371D245AB611D563D40E291B436CCC5BBD09DC333",
+    "privacy": "Original save and losslessly compressed log remain private. Public evidence contains hashes and selected technical facts; no link keys or signed download URLs.",
+    "remote_readback": "Exact remote branch/ref matched fd97ab7; all ten manifest-file bytes and hashes passed Git object readback, original log decompression hash matched, all 132 original save ZIP member CRCs passed. Supporting JSON normalization failures and both earlier commits remain retained. Originals were unchanged."
+  },
+  "issue1845_refresh": "Opening updated to merged 5.0.12/fixed Source status and read back exactly; entire prior request retained verbatim below as history. State remains open. Before/after custody is in the private directory.",
+  "engine_loss_boundary": "Existing worker512-context-and-history-authority-independent-review-r01.json records pre-Lua native clamping and a separate static JSON preservation control. The latter is not a reviewed production policy for first MIR installation, repeated provider changes or arbitrary reporter histories. Reuse those observations; do not rerun or call them a generic impossibility proof.",
+  "execution_limits": "No Factorio process, source/package/controller/Library mutation, host suite, build, CI launch, child worker or publication performed by this review. Private input intake and issue/body custody are not production fixes."
+}
