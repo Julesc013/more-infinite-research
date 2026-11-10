@@ -1298,6 +1298,81 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
           assert(not storage.mir_worker_storage_route.forces[f.index].pending)
         ''')
 
+    def test_boolean_startup_flags_preserve_four_force_authority_and_work(self):
+        for target in ("f200", "f210"):
+            for changed in (False, True):
+                lua=self.world(target);lua.globals().changed=changed
+                lua.execute(r'''
+                  full_source(2,true);finite_entry(1);history.configure(8,true)
+                  local event=provider_event();event.mod_startup_settings_changed=changed
+                  local before=all_frames();local old=storage[OWNER_KEY];local key=storage.mir_worker_storage_route
+                  local plan,legacy=delegate(event)
+                  assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==old and storage.mir_worker_storage_route==key)
+                  history.default_owner_apply(plan);history.apply(legacy)
+                  for _,f in pairs(game.forces)do local a,b=frame(f),before[f.index]
+                    assert(a.bonus==b.bonus and a.other_saved==b.other_saved and same(a.debit,b.debit))
+                    assert(a.private.level==b.owner.level and a.private.saved==b.owner.saved)
+                    assert(same(a.queue,(function()local q=copy(b.queue);for i,n in ipairs(q)do if n==ORDINARY then q[i]=ID end end;return q end)()))
+                    assert(a.current==(b.current==ORDINARY and ID or b.current)and a.progress==b.progress)
+                  end
+                  assert(storage.mir_worker_storage_route.cap==8 and storage.mir_worker_storage_route.family_enabled)
+                ''')
+
+    def test_missing_or_nonboolean_startup_flags_refuse_with_context_before_writes(self):
+        for value, label in (("nil", "unknown"), ('"true"', "true"), ('"false"', "false"), ("1", "1")):
+            lua=self.world();lua.globals().label=label
+            lua.execute('full_source(1,true);finite_entry(1);local event=provider_event();event.mod_startup_settings_changed='+value+r'''
+              local before=all_frames();local old=storage[OWNER_KEY];local key=storage.mir_worker_storage_route
+              local ok,message=pcall(history.default_owner_preflight,event,provider_route(5),true)
+              assert(not ok and writes==0 and same(before,all_frames())and storage[OWNER_KEY]==old and storage.mir_worker_storage_route==key)
+              assert(tostring(message):find("startup_changed="..label,1,true))
+              assert(tostring(message):find("startup_type="..type(event.mod_startup_settings_changed),1,true))
+              assert(tostring(message):find("new_mir=5.0.21012",1,true)and tostring(message):find("expected_mir=5.0.21012",1,true))
+            ''')
+
+    def test_current_pending_policy_rejects_disabled_overcap_and_last_force_before_writes(self):
+        cases=(('history.configure(0,false)', "enabled=false"),
+               ('history.configure(7,true)', "limit=8"),
+               ('player.research_queue={ORDINARY,ORDINARY,OTHER};player.research_progress=.375;history.configure(8,true)', "limit=9"),
+               ('detached.technologies[ORDINARY].level=9;detached.technologies[ORDINARY].saved_progress=.23;history.configure(8,true)', "limit=9"))
+        for change, detail in cases:
+            lua=self.world();lua.globals().detail=detail
+            lua.execute('full_source(1,true);finite_entry(1);'+change+r'''
+              local event=provider_event();event.mod_startup_settings_changed=true
+              local before=all_frames();local old=storage[OWNER_KEY];local key=storage.mir_worker_storage_route;writes=0
+              local ok,message=pcall(history.default_owner_preflight,event,provider_route(5),true)
+              assert(not ok and writes==0 and same(before,all_frames())and storage[OWNER_KEY]==old and storage.mir_worker_storage_route==key)
+              assert(tostring(message):find("pending default worker work exceeds the current enabled/cap policy",1,true))
+              assert(tostring(message):find(detail,1,true))
+            ''')
+
+    def test_no_pending_rights_do_not_require_enabled_or_unlimited_current_policy(self):
+        lua=self.world();lua.execute(r'''
+          full_source(1,true);finite_entry(1)
+          for _,f in pairs(game.forces)do f.research_queue={OTHER};f.research_progress=.42;f.technologies[ORDINARY].saved_progress=0 end
+          history.configure(4,false);writes=0
+          local event=provider_event();event.mod_startup_settings_changed=true;local before=all_frames()
+          handover(event)
+          for _,f in pairs(game.forces)do local r=storage.mir_worker_storage_route.forces[f.index]
+            assert(not r.pending and not r.enabled and r.limit==before[f.index].owner.level-1)
+            assert(f.worker_robots_storage_bonus==before[f.index].bonus and f.research_progress==.42)
+          end
+        ''')
+
+    def test_true_startup_flag_does_not_admit_changed_contract_or_stale_policy(self):
+        lua=self.world();lua.execute(r'''
+          full_source(1,true);finite_entry(1);local event=provider_event();event.mod_startup_settings_changed=true
+          prototypes.technology[ORDINARY].research_unit_count_formula="101*2^(L-4)"
+          local before=all_frames();local old=storage[OWNER_KEY];writes=0
+          assert(not pcall(history.default_owner_preflight,event,provider_route(5),true)and writes==0 and same(before,all_frames())and storage[OWNER_KEY]==old)
+        ''')
+        lua=self.world();lua.execute(r'''
+          full_source(1,true);finite_entry(1);history.configure(8,true)
+          local event=provider_event();event.mod_startup_settings_changed=true;local plan,legacy=delegate(event)
+          history.configure(7,true);local before=all_frames();local old=storage[OWNER_KEY];writes=0
+          assert(not pcall(history.default_owner_apply,plan)and writes==0 and same(before,all_frames())and storage[OWNER_KEY]==old)
+        ''')
+
     def test_repeated_and_detached_partial_work_use_existing_resume_and_retirement(self):
         lua=self.world();lua.execute(r'''
           full_source(1,false);player.research_queue={ORDINARY,ORDINARY,OTHER};player.research_progress=.375
@@ -1342,7 +1417,7 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
           'player.technologies[CANONICAL].researched=false','uninvested.technologies[CANONICAL].researched=true',
           'player.technologies[HEAD].researched=false','player.technologies[CANONICAL].saved_progress=.1',
           'detached.technologies[ID].saved_progress=.1','suspended.technologies[ID].enabled=true',
-          'event.mod_startup_settings_changed=true','event.mod_changes["more-infinite-research"]={old_version="4.7.21003",new_version="5.0.21012"}','event.mod_changes.provider.old_version="0.9"',
+          'event.mod_startup_settings_changed="true"','event.mod_changes["more-infinite-research"]={old_version="4.7.21003",new_version="5.0.21012"}','event.mod_changes.provider.old_version="0.9"',
           'event.mod_changes.provider.new_version="2.0"','event.mod_changes.other={old_version="1",new_version="2"};script.active_mods.other="2"',
           'script.active_mods["more-infinite-research"]="5.0.21013"','route.finite[1].provider="unknown"',
           'storage[OWNER_KEY].contract="unknown"','storage.mir_worker_storage_route.current={kind="external",provider="old"}',

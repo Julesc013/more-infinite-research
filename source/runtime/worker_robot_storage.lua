@@ -1057,9 +1057,12 @@ local function finite_provider_contract(route)
 end
 
 local function provider_addition(event, route, owned)
-  if type(event) ~= "table" or event.mod_startup_settings_changed ~= false or type(event.mod_changes) ~= "table"
+  if type(event) ~= "table" or type(event.mod_startup_settings_changed) ~= "boolean" or type(event.mod_changes) ~= "table"
       or script.active_mods[MIR] ~= target.distribution_version then
-    recover_error("full default handover requires unchanged startup settings and exact package", route)
+    local details = type(event) == "table" and event or {}
+    recover_error("full default handover requires a boolean startup event and exact package; startup_type="
+      .. type(details.mod_startup_settings_changed) .. " expected_mir=" .. target.distribution_version,
+      route, details, checked_state(), fact(route))
   end
   local mir = event.mod_changes[MIR]
   if mir and (type(mir) ~= "table" or type(mir.old_version) ~= "string" or mir.old_version ~= owned.producer.new_version
@@ -1109,9 +1112,17 @@ local function plan_provider_handover(event, route)
     end
     if frame.occurrences > 0 then requeueable(force, frame, true, true) end
     local allowance = frame.allowance
+    -- New provider settings may set the event flag without changing T4's saved
+    -- contract. Admit only actual pending work allowed by the current policy.
+    local limit = frame.next_level + allowance - 1
+    if allowance > 0 and (not selected_enabled or selected_cap > 0 and limit > selected_cap) then
+      recover_error("pending default worker work exceeds the current enabled/cap policy; force=" .. force.index
+        .. " enabled=" .. tostring(selected_enabled) .. " cap=" .. selected_cap .. " limit=" .. limit,
+        route, event, state, current)
+    end
     local flags = prior.retired_flags
     local release = flags.disabled_by_mir and not public.enabled and public_prototype.enabled == true
-    prepared.forces[force.index] = {next_level=frame.next_level, limit=frame.next_level+allowance-1,
+    prepared.forces[force.index] = {next_level=frame.next_level, limit=limit,
       pending=allowance>0, enabled=allowance>0 and frame.enabled or false, visible=frame.visible}
     record.forces[force.index].phase = "retired"
     items[#items+1] = {force=force, source=frame, destination=destination, public=public, gate_paid=gate.researched,
@@ -1125,6 +1136,10 @@ local function plan_provider_handover(event, route)
 end
 
 local function verify_provider_plan(plan, fresh)
+  local authorization = provider_plans[plan]
+  if not authorization or not equal_plain(plan.event, authorization.event) then
+    recover_error("issued provider handover event changed")
+  end
   if plan.prior_owner ~= fresh.prior_owner or plan.prior_state ~= fresh.prior_state
       or plan.contract ~= fresh.contract or plan.cap ~= fresh.cap or plan.enabled ~= fresh.enabled
       or not equal_plain(plan.event, fresh.event) or not equal_plain(plan.current, fresh.current)
@@ -1285,7 +1300,7 @@ function M.default_owner_preflight(event, route, split_current)
   if owned and route ~= nil then
     if split_current ~= true then recover_error("provider handover has no admitted owner data") end
     local plan = plan_provider_handover(event, route)
-    provider_plans[plan] = {}
+    provider_plans[plan] = {event=clone(plan.event)}
     return plan
   end
   if not default_active(route, split_current) then return nil end
