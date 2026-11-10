@@ -1,0 +1,37 @@
+{
+  "kind": "Known-published-Base-mask-new-provider-independent-source-review",
+  "reviewer": "Black Glass integration owner, not the change author",
+  "commit": "1b934f4dd6a739d77d05aa3284858ac797db0129",
+  "base": "e7a5a3d140e4c8cf232387d2038a4c8766a2ee76",
+  "player_source": "71692cc2d2061feffd0481560e593db62a1e0eb2",
+  "verdict": "PASS bounded source correction; native qualification and reporter repair remain open",
+  "reviewed_members": ["source/runtime/native_credits.lua", "tests/test_native_family_paid_credits.py"],
+  "findings": [],
+  "authority": [
+    "Old MIR version must be one of the known published Base0/1/2 producers in the same engine family; current MIR version must equal event new_version and the destination edition.",
+    "Added-provider admission requires unchanged startup settings. Each current non-Base/non-MIR mod must have an exact new version and no old version. Removed, old-present, updated, malformed and mismatched changes refuse.",
+    "A Base event, when present, must prove old and new version equal the active Base. Absence of Base change is ordinary unchanged-engine provenance.",
+    "Old public masks come from the independently retained published contract, never the destination's collected recipes. Completeness of the old family identities is checked before baseline application.",
+    "Private destination exception applies only with this new proven Base-origin route. It does not admit arbitrary private historical state.",
+    "Existing complete family ledgers and other historical readers are retained. The Galore unchanged-input gate is semantically unchanged.",
+    "Diagnostic formatting is bounded before escaping raw nonprintable/high bytes; it allocates no research state and does not change acceptance."
+  ],
+  "root_execution": {
+    "host_plan": "1806-root-host-plan.json",
+    "pinned_lua52_pyd_sha256": "FFD2BDD291C14548E5A92F1E77F08400E6C0D173D01D30C8CC0821E0AB10A899",
+    "command": "python -X utf8 -B tests/test_native_family_paid_credits.py --lua-runtime-dir D:/Projects/Factorio/more-infinite-research/build/tmp/mir421-lua-runtime",
+    "tests": 52,
+    "seconds": 13.083,
+    "exit_code": 0,
+    "log": "1806-root-family-controls.log",
+    "log_sha256": "79A2E67FDDDBB66CC9252782CDD5FCA9A65470D9A93F8E6DDD33AA61791764E5",
+    "diff_check": "pass",
+    "native_processes": 0
+  },
+  "required_next": [
+    "Exercise exact known published Base predecessor to new-provider successor, public/private and newly unpaid recipe boundaries, with genuine queued completion and protected save/two colds.",
+    "Reuse only exact applicable source-save evidence; do not treat host reloads as engine reloads.",
+    "Keep issue1806 open: its reporter's old MIR/mod/settings profile is not established by this bounded correction."
+  ],
+  "no_release_or_stable_approval": true
+}

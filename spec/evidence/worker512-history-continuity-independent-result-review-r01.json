@@ -1,0 +1,231 @@
+{
+  "kind": "Worker512HistoryContinuityIndependentActualReviewV1",
+  "reviewed_at_utc": "2026-11-10T01:02:11.308954+00:00",
+  "reviewer": "precision511_source_review; independent of worker production correction and current actor/controller authorship",
+  "verdict": "PASS for the exact unchanged-Secretas published11-to-candidate12 continuity, one additional ordinary completion, same12 configuration followup, and two immutable cold loads only",
+  "findings": [],
+  "candidate": {
+    "head": "b05a551778c5db44c3fc6011152dbd1e3ccdfe5b",
+    "source_tree": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+    "engine": "2.1.23",
+    "engine_sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38",
+    "player_version": "5.0.21012",
+    "player_sha256": "10619C8C1BF9F0A99DE8CC4E630CAE3BDE20101E02A11F88A5F92C433F70E3FF",
+    "player_bytes": 1022087
+  },
+  "admitted_tuple": {
+    "packet_sha256": "C573ABA1F89BA4D91F30E6D4CF23943D9C9DB24DD09B3C9127F7AD0DEA956AF1",
+    "owner_sha256": "45471F6802FF8EE31A2DBEB9B47588FC4F7D44B110903CC749D27CA0CEBED9A4",
+    "composition_sha256": "AC4235B6051D29D119E14E0E5002C5DAAE00A472BDC40A22939002C7EB4ACE76",
+    "observer_sha256": "54CFBE89A54A0584BCEEC6F06D7806A8A2CFD5BE045B37AA2C9CF8E0338A61BB",
+    "prior_independent_admission_sha256": "80BC8295E8F6F0E2B4AC375A05FD7A32DD723F097071FDE76483E5510DB42B2A",
+    "rejected_candidate_r01_sha256": "6464B104BA935D08830A4D28CC5C14C711C0DE14E556C70DC9F4258B62F7863C"
+  },
+  "actual_terminal": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker512-history-continuity-native-r01-controller\\candidate-r02\\execution-Execute-r01\\terminal.json",
+    "sha256": "602DA2C5DCF688005BD8FAB2428A8A59DFBD644D566F2AE719D5A3F99FE05B70",
+    "status": "observed-independent-result-review-required",
+    "failure": null,
+    "engine_invocations": 4,
+    "distinct_pids": [
+      29616,
+      30004,
+      42932,
+      46844
+    ],
+    "factorio_processes_after_run": 0
+  },
+  "processes": [
+    {
+      "stage": "upgrade",
+      "role": "server",
+      "pid": 29616,
+      "exit_code": -1,
+      "timed_out": false,
+      "completion_predicate_observed": true,
+      "seconds": 3.751808,
+      "ledger_sha256": "0EE0C6F21C0472D8BC864037A21AF8B3366B691058923E63D700A54A3A17B756"
+    },
+    {
+      "stage": "followup",
+      "role": "server",
+      "pid": 30004,
+      "exit_code": -1,
+      "timed_out": false,
+      "completion_predicate_observed": true,
+      "seconds": 2.4599,
+      "ledger_sha256": "899D489F61EBA8EC2CF3BBAB0564FFE5AE357990E32124188902BB3199E5BD6C"
+    },
+    {
+      "stage": "followup",
+      "role": "cold1",
+      "pid": 42932,
+      "exit_code": 0,
+      "timed_out": false,
+      "completion_predicate_observed": false,
+      "seconds": 2.078077,
+      "ledger_sha256": "C959BE3979C96ADAF9871C7E8280964CCB1A87BF9D15846710F075F1048FE5BE"
+    },
+    {
+      "stage": "followup",
+      "role": "cold2",
+      "pid": 46844,
+      "exit_code": 0,
+      "timed_out": false,
+      "completion_predicate_observed": false,
+      "seconds": 2.037327,
+      "ledger_sha256": "7746330FA31B9C01598016A0E242C9A388E3805FCC61AEB8F92BF98325214739"
+    }
+  ],
+  "exit_interpretation": "Both server exit -1 results are admitted owned stops after the exact done marker, Saving finished, and closed-save predicate. The two separate one-update cold processes exit naturally 0. Root wrapper exit0 is not substituted for these native results.",
+  "original_and_derivative": {
+    "original_published11_save_sha256": "2091F442193297860B776DB4DE9F08E9A66775980676C1DABB1B032104C607FC",
+    "original_bytes": 697610,
+    "original_unchanged_crc_pass": true,
+    "selected_observer_derivative_sha256": "DC4BCAD9F9C8E6C25F7D5938E95A5AF06741AC02556AE4E838913A543346EF50",
+    "selected_bytes": 665598,
+    "six_members": true,
+    "only_changed_member": "post-unchanged-endpoint/control.lua",
+    "other_five_native_members_byte_equal": true,
+    "baseline_actual_identity_retained": "PID32464 / original observer6F61 / derivative7D88; its original ADVERSE stdout checker and separate canonical-log PASS remain unchanged. This is not a new baseline run."
+  },
+  "canonical_observations": {
+    "markers": [
+      "pre-MIR-upgrade",
+      "post-MIR-upgrade",
+      "ordinary-work-start",
+      "ordinary-finished",
+      "earned-save",
+      "pre-MIR-followup",
+      "followup-complete",
+      "cold",
+      "cold"
+    ],
+    "ticks": [
+      384,
+      384,
+      531,
+      1309,
+      1313,
+      1314,
+      1314,
+      1315,
+      1315
+    ],
+    "pre_and_post_upgrade_all_four_force_frames_exact_original11": true,
+    "additional_ordinary_completions": 1,
+    "ordinary_counter_before": 1,
+    "ordinary_counter_after": 2,
+    "prior_scripted_precursors_not_counted_as_ordinary": true,
+    "server_commands": [
+      {
+        "stage": "upgrade",
+        "command": "/mir-worker-history-continuity start",
+        "count": 1
+      },
+      {
+        "stage": "followup",
+        "count": 0
+      }
+    ],
+    "ordinary_guard_evidence": "Actor lines112-123 require player N9, by_script=false, earlier strictly intermediate progress, exactly one event and positive depletion of every one of the12 baseline science ingredients before ordinary-finished can be emitted. All12 science rows are present in the actual frames. Individual consumption quantities are stored internally but not emitted by this observer; no invented scalar amounts are claimed. Scripted supplies and lab energy remain labelled setup.",
+    "endpoint_timing": "The final frame is checked four ticks after the completion callback, rather than claiming the intermediate ordinary-finished frame already has settled cap flags."
+  },
+  "strict_endpoint": {
+    "price": 1.25,
+    "cap": 12,
+    "family_enabled": true,
+    "only_changes_from_original11": [
+      {
+        "path": "player.bonus",
+        "before": 11,
+        "after": 12
+      },
+      {
+        "path": "player.rows.worker-robots-storage-9.level",
+        "before": 12,
+        "after": 13
+      },
+      {
+        "path": "player.rows.worker-robots-storage-9.count",
+        "before": 21623,
+        "after": 32436
+      },
+      {
+        "path": "player.rows.worker-robots-storage-9.enabled",
+        "before": true,
+        "after": false
+      },
+      {
+        "path": "player.rows.worker-robots-storage-9.visible",
+        "before": false,
+        "after": true
+      }
+    ],
+    "all_other_fields_of_all_four_force_frames_exact": true,
+    "current": "mir-post-sentinel",
+    "queue": [
+      "mir-post-sentinel"
+    ],
+    "progress": 0.125,
+    "native_formula_unchanged": "5125.78125*1.5^(L-9)",
+    "research_time_ticks": 3600,
+    "private_and_foreign_rows_unchanged": true
+  },
+  "followup_and_colds": {
+    "actual_same_MIR_version": "5.0.21012",
+    "fixture_change": "mir-fixture-worker511-post-unchanged0.1.0 to0.1.1; exactly info.version changes, all other ZIP members and metadata equal",
+    "unchanged_startup_and_single_mod_change_assertions_executed": true,
+    "followup_and_both_cold_frames_equal_final_earned_frames": true,
+    "cold_count": 2,
+    "cold_ticks": 1,
+    "new_cold_research_events": 0,
+    "protected_and_native_closed_save_hashes_still_equal_after_both_colds": true,
+    "continuity_inference": "Successful same12 configuration with the persisted saved route demonstrates the named prior nil-history continuity case now survives a second configuration event. This is behavioral persistence evidence, not a dump of every internal storage key."
+  },
+  "protected_saves": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker512-history-continuity-native-r01-controller\\candidate-r02\\protected\\upgrade.zip",
+      "exists": true,
+      "bytes": 699827,
+      "sha256": "1CAFDCE488F1C2E9F4FF6232174C18DCD7D7E6ABFBBE4F2EEAE5195BDE10C769"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker512-history-continuity-native-r01-controller\\candidate-r02\\protected\\followup.zip",
+      "exists": true,
+      "bytes": 699784,
+      "sha256": "BFD11A2A451C3DD390045B002420DEC31CBD89F01917444EF7E3EE6FE9B1DD55"
+    }
+  ],
+  "custody_and_restoration": {
+    "four_canonical_logs_reparsed_independently": true,
+    "all_four_actual_loaded_selections_match_nine_exact_active_mods": true,
+    "secretas": "1.0.38",
+    "pretty_frozeta": "1.0.1",
+    "fatal_log_or_stderr_errors": 0,
+    "native_original_to_primary_copied_members_rehashed": 37,
+    "fixed_bound_input_hashes_rechecked": 14,
+    "both_protected_ZIPs_full_CRC_and_embedded_actor_sha256_pass": true,
+    "upgrade_parent_matches_selected_derivative": true,
+    "followup_parent_matches_actual_produced_upgrade_protected_save": true,
+    "live_control_hashes_equal_both_pre_run_records": 2,
+    "live_prior_MIR_archive_hashes_equal_both_pre_run_records": 19,
+    "temporary_product_and_fixture_removed": true,
+    "recorded_activation_restoration": "restored-direct-library-controls for both stages; zero dependency copying, linking or extraction",
+    "live_windows_identity": "BLACKGLASS-WIN1\\Jules",
+    "live_factorio_processes": 0,
+    "private_remote_readback": "Root receipt candidate-actual-remote-readback-r02.json reports fetched-byte-exact commitcad40cfe0e113ea4c9c260827a45a64ce039e717 INDEX53AFCC4824D34089F9E6C75BEDB71AFDC10A07D41161C52D582C6EC90C379E0F /65files9426108B; this reviewer independently verified local original-to-primary37-member custody, not the remote transaction."
+  },
+  "canonical_log_hashes": {
+    "candidate-r02\\Execute-r01-upgrade\\server.log": "86B5359C2D602111D2D9024560E8D7AE3D1CEE51CBEDC64055F744AE0C5C1C60",
+    "candidate-r02\\Execute-r01-followup\\server.log": "78B15147436556A2D2C6A2DA5C5144F4C9FF23362FD1279B6B6D1A771F9EC287",
+    "candidate-r02\\Execute-r01-followup\\cold1.log": "9F53CB41A10264ED97A40754F7853B6E13102BB17DF2661B3EC034389CF7C693",
+    "candidate-r02\\Execute-r01-followup\\cold2.log": "9DB9A67F4E84AC341472EF118B3455ABACD45606EE4D9841EA7910B1DF87B7B6"
+  },
+  "limits": [
+    "Only the exact F210 unchanged-Secretas old11 nil-ledger route and current candidate tuple are qualified.",
+    "No automatic unprepared provider-addition or clamped-history recovery, unknown reporter profile/save, credit97-effect native case, F200, physical cargo, Library/UI, performance or stable acceptance is claimed.",
+    "The original baseline owner ADVERSE and candidate-r01 visibility-oracle rejection remain preserved; r03 future-expectation observer change is not relabelled as an old11 actual baseline run.",
+    "No Source/controller/packet/library edits, engine reruns, builds, CI launches or host tests were performed for this result review."
+  ]
+}

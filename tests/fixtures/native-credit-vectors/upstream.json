@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "upstream": "https://github.com/danielmartin0/Cerys-Moon-of-Fulgora",
+  "version": "4.24.16",
+  "archive_sha256": "36F13B3E65D4E9755B3F7431F12CABED19314025F2108C9A7B8D6C76D6127291",
+  "member": "Cerys-Moon-of-Fulgora_4.24.16/prototypes/override-final/technology.lua",
+  "member_bytes": 3885,
+  "member_sha256": "3CA60E01BD2CEF628C37569E6285EE83E0E1D4D695C3B432C58EA405862A88DA",
+  "selection": "unchanged complete lines 1-45, LF terminators",
+  "excerpt_sha256": "F9C5646B863A3FC3332A0616053913A713A778D563B5DB2B147EF5BE3F0B51B1",
+  "license": "CC-BY-NC-ND-4.0",
+  "license_sha256": "F7F28B8C7A1AF76B9874CA6D040E8B1EB6768FD1043106C9D315090EA96754E7",
+  "scope": "Unmodified upstream loop excerpt; not a full Cerys load, reporter reproduction or culprit finding. The 95 additional aliases are synthetic fixture data.",
+  "license_source_sha256": "38762E3777F4EC00A6F769062A7C3F704FB78CE08303ECFF88558DA4C49CF9EA",
+  "license_copy_change": "Complete text; one original empty EOF line removed for repository whitespace policy."
+}

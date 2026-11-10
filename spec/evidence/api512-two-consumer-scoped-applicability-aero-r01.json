@@ -1,0 +1,55 @@
+{
+  "kind": "MIR512APITwoConsumerScopedApplicabilityAeroV1",
+  "reviewed_utc": "2026-11-09T17:20:59.755865+00:00",
+  "requirement": "Reuse applicable completed evidence and rerun affected paths; specific two-independent-consumer prerequisite in spec/verification.md and documented API1.0.0 subset in spec/api.md.",
+  "candidate": {
+    "committed_source": "f2ea5e9986768073a04aba47fffcd50254a1a5ad",
+    "same_primary_source": "debd58b388f8f4c70241fc211dbe1322588321fe",
+    "player_tree": "9b98529bc2e0f55ec75656d2a3b732d86e7176e3",
+    "unpublished_version": "5.0.12",
+    "actual12_archive_independently_rehashed_here": false
+  },
+  "verdict": "APPLICABLE within the same two closed Space Age/Defaults headless API profiles on this exact committed player tree. No new affected two-consumer physical/save scenario is identified by the11-to12 delta. Keep original published11 native identities; final accepted12 ZIP-to-source correspondence remains a separate package gate.",
+  "original_accepted_records": [
+    "spec/evidence/api511-current-consumer-coverage-independent-review-r01.json",
+    "spec/evidence/api-production511-f200-independent-result-review-r01.json",
+    "spec/evidence/api-production511-f210-independent-result-review-r01.json"
+  ],
+  "reviewed_input_evidence": {
+    "committed_projection": "committed-consumed-module-readback-r01.json",
+    "original_capsule_readback": "original-two-engine-native-input-readback-r01.json",
+    "records_verified": 175,
+    "actual_factorio_logs_verified": 8,
+    "independently_installed_consumers": "Alpha and Beta; production observer remains a separate witness, not a replacement consumer."
+  },
+  "reasoning": [
+    "Both modern member projections have133 byte-identical Lua modules. Only platform/target.lua, presentation/library_layout.lua and runtime/library.lua differ. This includes exact API data/runtime modules, Generator, registration/control/bootstrap, configuration, lifecycle, native credits, catalogue and translations modules.",
+    "Platform target differs only by distribution_version11to12. get_version reads that field directly in unchanged code; API major/minor/capabilities/ResearchStatus meanings are unchanged. Source/target/edition projections and published ZIP bytes were actually compared.",
+    "The only new optional dependency is planet-ferrum. It is absent from both exact admitted profiles and all eight original actual active-mod markers. Its ordering correction is applicable to the separately tested Ferrum case, not these closed profiles. Inferring no new dependency edge here follows the named absent input and documented optional-dependency semantics; it is not a blanket claim for installed Ferrum/other profiles.",
+    "All four owned stimulus archives per engine were CRC-checked and read in memory. They never call the Library browser interface, create a player or access GUI. Original runs are the named headless create/physical-production/two-cold cases, and changed Lua functions are frame/layout/render paths. Library on_init remains empty; on_load/cache-reconnection and subscription decisions are unchanged. No changed gameplay or data-emission path was identified for this scope.",
+    "The exact original175-record custody was rehashed against both manifests. Eight actual Factorio stage logs match their profile mod tuples and retain Alpha/Beta markers. Original production and both cold witness rows retain100/100plates and200/202cables, explicit native researched setters and zero ordinary-lab claims. No old result is rewritten as a new12 execution."
+  ],
+  "pinned_dependency_reference": {
+    "local_sdk_version": "2.1.23",
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\doc-html\\auxiliary\\mod-structure.html",
+    "sha256": "A46F7B220E3168583C01FCA3EBC7BE1C8BAA015BAD39E770ECAF2493F9FB4A2B",
+    "section": "info.json / dependencies / Dependency",
+    "official_current_reference": "https://lua-api.factorio.com/latest/auxiliary/mod-structure.html",
+    "current_web_version_observed": "2.1.24; corroboration only, pinned localSDK used for exact engine documentation",
+    "archived_2_1_23_web_open": "unavailable through browsing tool; no change to local installed SDK"
+  },
+  "remaining": [
+    "Actual EN/DE current Library screenshot/input/resize/export/personal-state/save/client lifecycle checks remain affected and open; module-local API identity does not close those paths.",
+    "This is scoped reuse, not a new fresh12 native/save execution or an arbitrary modpack/general API/performance/stable verdict. Final delivery must independently bind actual accepted ZIP contents to Source9b and the exact qualified metadata.",
+    "Keep original consumer/observer archives immutable. Their exact11 tuple locks are not a dispatchable12 packet; if an affected future native case is required, prepare and review its exact new binding without relabelling old stimuli or results.",
+    "Historical/SIF/configured-steel/provider/cargo/client obligations keep their own evidence and remaining work; this slice does not reopen or close them."
+  ],
+  "reviewer_locator_correction": "initial-review-reader-assumption-adverse-r01.json retains the refused stdout-only assumption and corrected actual stage-log selection. No product failure or new process followed.",
+  "source_edits": false,
+  "docs_edits": false,
+  "new_tests_or_framework": false,
+  "native_processes_launched": 0,
+  "player_zips_built": 0,
+  "library_lease": false,
+  "stable_acceptance": false
+}

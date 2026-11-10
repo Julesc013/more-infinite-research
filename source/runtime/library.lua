@@ -124,10 +124,25 @@ local function ensure_state()
   return value
 end
 
+-- A valid UTF-8 input must remain valid when a byte budget is applied.
+local function utf8_prefix(value, limit)
+  local last = math.min(#value, limit)
+  local lead = last
+  while lead > 0 do
+    local byte = string.byte(value, lead)
+    if byte < 128 or byte > 191 then break end
+    lead = lead - 1
+  end
+  if lead == 0 then return "" end
+  local first = string.byte(value, lead)
+  local size = first < 128 and 1 or first < 224 and 2 or first < 240 and 3 or 4
+  if lead + size - 1 > last then last = lead - 1 end
+  return string.sub(value, 1, last)
+end
+
 local function text(value)
   if type(value) ~= "string" then return "" end
-  if #value > MAX_QUERY then return string.sub(value, 1, MAX_QUERY) end
-  return value
+  return utf8_prefix(value, MAX_QUERY)
 end
 
 local function technology_id(value)
@@ -1527,7 +1542,8 @@ local function update_research_content(content, player, view, context, translati
   if not valid(content) then return end
   -- Availability is a different projection in the same body. Clear it only
   -- at that boundary; ordinary Research refreshes retain their widgets.
-  if valid(content[PREFIX .. "availability_empty"]) or valid(content[PREFIX .. "availability_1"])
+  if valid(content[PREFIX .. "availability_viewport"])
+      or valid(content[PREFIX .. "availability_empty"]) or valid(content[PREFIX .. "availability_1"])
       or valid(content[PREFIX .. "actions"]) or valid(content[PREFIX .. "results"]) then
     content.clear()
   end
@@ -1664,13 +1680,7 @@ local function setting_display(name, value)
   if #shown > 120 then
     -- Keep the authored compact preview without splitting a UTF-8 character.
     -- Configuration and profile export continue to use the original value.
-    local last = 117
-    while last > 0 do
-      local next_byte = string.byte(shown, last + 1)
-      if next_byte < 128 or next_byte > 191 then break end
-      last = last - 1
-    end
-    return string.sub(shown, 1, last) .. "..."
+    return utf8_prefix(shown, 117) .. "..."
   end
   return shown
 end
@@ -2014,18 +2024,30 @@ local function update_availability_content(content, player, view)
   local active_mods = script and script.active_mods or {}
   local effective_streams = type(effective_configuration) == "table" and effective_configuration.streams or nil
   local rows = availability.rows(active_mods, target, player and player.force, view and view.query, effective_streams)
+  -- One full-width child owns scrolling; explanations are not Research table
+  -- columns. Leave the same scrollbar/padding budget as the other panes.
+  local width = math.max(1, (content.style and content.style.maximal_width or 592) - 16)
+  local height = content.style and content.style.maximal_height or 220
+  local viewport = add(content, {type = "scroll-pane", name = PREFIX .. "availability_viewport",
+    horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
+  viewport.style.width, viewport.style.height = width, height
+  local entries = add(viewport, {type = "flow", name = PREFIX .. "availability_entries", direction = "vertical"})
+  local entry_width = math.max(1, width - 16)
+  entries.style.width, entries.style.vertical_spacing = entry_width, library_layout.section_gap
   if #rows == 0 then
-    add(content, {type = "label", name = PREFIX .. "availability_empty", caption = {"mir-browser.availability-empty"}})
+    local label = add(entries, {type = "label", name = PREFIX .. "availability_empty", caption = {"mir-browser.availability-empty"}})
+    label.style.width = entry_width
     return
   end
   for index, row in ipairs(rows) do
-    add(content, {
+    local label = add(entries, {
       type = "label",
       name = PREFIX .. "availability_" .. index,
       caption = {"mir-browser.availability-entry",
         {"technology-name.more-infinite-research." .. row.family},
         {"mir-browser.availability-" .. row.reason}}
     })
+    label.style.width = entry_width
   end
 end
 

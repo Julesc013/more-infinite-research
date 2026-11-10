@@ -1,0 +1,1220 @@
+{
+  "kind": "Library512PolishDUnionActualResultAndPixelIndependentReviewV1",
+  "reviewed_at_utc": "2026-11-09T21:40:45.514488+00:00",
+  "reviewer": "Non-author read-only native-result and actual original-pixel review; no children",
+  "verdict": "PASS only exact eight successful Queue02/Availability06 render endpoints and visible caption/row-separation scope. No new defect found. Original B Availability concatenation defect closes for these exact D endpoints.",
+  "fixed_candidate": {
+    "head": "e7a5a3d140e4c8cf232387d2038a4c8766a2ee76",
+    "player_source": "f2dca1437ace61452289be9de0b8467959cd19e0",
+    "F210": "5B66581DB89D0738FCFA60B64D2DC3902C2662AC04802F785EA2850AB0818ADB/1018364B",
+    "F200": "4D4A566E967C7D2B06A5C496EEBD9C66E2874F1BDCE7C9FC1236AF76D9062EBA/1017940B",
+    "observed_checkout_clean": true
+  },
+  "execution_counts": {
+    "new_R10_processes": 7,
+    "successful_original_R09_EN_reused_processes": 1,
+    "successful_unique_endpoint_cases": 8,
+    "actual_original_PNGs": 16,
+    "PNG_bytes": 59575590,
+    "prior_R09_DE_adverse_attempts_retained": 1,
+    "total_attempts_in_union_history": 9,
+    "ordinary_labs": 0,
+    "actual_results": "All8successful processes exit0 AND passed AND completion_predicate_observed AND not timed_out. They are supervised render completion,not acceptance inferred from natural exit. No missing case or R09 all8pass claim."
+  },
+  "root_records": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-d-r10-controller\\native-terminal.json",
+      "bytes": 2731,
+      "sha256": "24B91E6349DA827C8D96993B1CDB9EC36675C35E060D2F431E8551D8B5FDB289"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-d-r10-controller\\native-progress.json",
+      "bytes": 2378,
+      "sha256": "A4A6F661B4E694810DF4CB61ABB47617D9D030C87651B27D19A0503EC412B1E8"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-d-r10-controller\\BATCH.json",
+      "bytes": 5975,
+      "sha256": "F2BAD8417F6AB228AB7B13C542CB81A86551B17379E733925199E0E33BFC5B29"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-d-r10-controller\\HANDOFF.json",
+      "bytes": 16420,
+      "sha256": "69F4276A1F277ADB5DCB2D71868911FC9AB26BF4C4CBC907FFE69479F839C2EE"
+    }
+  ],
+  "independent_admissions": [
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-d-r09-independent-admission-r01.json",
+      "bytes": 29741,
+      "sha256": "D59AFC2E3EFD5F89BB07B89F7F6082BCE9F641BEC2340B96B8705D068477F66B"
+    },
+    {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-d-r10-independent-admission-r01.json",
+      "bytes": 19310,
+      "sha256": "D771435C101B36EBA88F2828665710B6B503BBAD6674B64BC582332F6BFD33EB"
+    }
+  ],
+  "findings": [],
+  "pixel_scope_and_method": {
+    "method": "Actually viewed all16 original PNGs with view_image(detail original),two original files per case. No crop,rescale,contact sheet,redraw or screenshot edit. Independently hashed and parsed every original PNG signature/chunk CRC/IHDR/IEND/IDAT decode/scanline length and filters; matched actual numeric size/scale and page/complete report equality.",
+    "Availability": "Each endpoint shows the two unchanged agricultural-growth/spoilage Space Age explanations in separate full-width vertical rows with visible spacing. Both explanations are complete/readable and no longer concatenate as adjacent Research table labels. No horizontal clip or overlapping captions in any of the8actual06 images.",
+    "wrapping_limit": "The current two Availability captions now each fit on one line at all8observed endpoints. These images prove their fit and separation,not arbitrary longer multiline labels,24-row overflow,bottom reachability or real scroll input. Prior source/host wrapping controls retain separate scope.",
+    "German_Queue": "All4German02 images show explicit native-screen enqueue/reorder/cancel and Library-no-queue-authority guidance plus current research queue of Partei heading. Guidance is single-line at both normal endpoints and wraps cleanly to2lines at both narrow endpoints; button/heading/empty status remain separate,complete and readable.",
+    "geometry": "ActualF210normal2560x1440/1.25,narrow960x720/.75; actualF200normal3200x1800/1.5,narrow1200x900/.75. F200actuals are not relabeled as requested2560/960. Source/body widths and native reports match pixels.",
+    "covered_regions": "None in these16images. No tooltip overlays on the reviewed Queue/Availability content. This does not erase the10covered regions in earlierB56review.",
+    "unchanged_titlebar": "Prior actual native light glyph/titlebar review4C33 remains originalB evidence. B->C->D only Availability/text helpers/DEcaptions and changelog changes leave those titlebar sprite/layout paths unchanged; no whole-UI or interaction extension from this reuse."
+  },
+  "process_identity_and_input_checks": [
+    "Read every closed owner result,identity/resource ledger/stdout/stderr/native log/page/complete/validation report. All ledger process samples bind one exact PID matching identity; admission precedes recorded start,which precedes first resource observation; final ledger completion predicate true and exit0.",
+    "Rehashed every case plan and exact engine/package/fixture/profile/config/protected input. Frozen source and player IDs match plans/results; actual Base/MIR versions and two public-open/capture phases occur in correct order in logs,followed by exact locale completion marker and Goodbye. Empty stderr and no product/error/fatal trace found.",
+    "The exact actor native-state equality check passed across both public opens,captures and completion: player-force technology level/researched/enabled,recipe enabled flags,queue/current/progress and worker storage bonus. This is the declared snapshot scope,not every possible world/force field.",
+    "New R10 owner produced exact native identity and valid completion in all7real startups with no originalFileName failure. No per-sample null counter is recorded,so do not claim a genuine-null branch was observed natively. Its bounded true-null/error distinction remains backed by extracted12controls and the direct-getter counterexample."
+  ],
+  "restoration_and_custody": {
+    "all8_recorded_before_equals_after_and_restored": true,
+    "all8_close_Factorio_zero": true,
+    "current_live_control_archive_states_rehashed": 47,
+    "both_current_MIR_archive_sets_exact": true,
+    "current_Factorio_count": 0,
+    "protected_inputs": [
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r09-f210-normal-en-inputs\\protected-source-copy.zip",
+        "bytes": 893285,
+        "sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\migration-origins\\pure-published-source-r01\\work110-f210-default-r02-controller\\retained-native\\write-data\\saves\\mir-pure-predecessor.zip",
+        "bytes": 893285,
+        "sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-normal-de-inputs\\protected-source-copy.zip",
+        "bytes": 893285,
+        "sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-en-inputs\\protected-source-copy.zip",
+        "bytes": 893285,
+        "sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-de-inputs\\protected-source-copy.zip",
+        "bytes": 893285,
+        "sha256": "8B32A6674E4852153ABDC9E2B77C1974F66AE2FA477647486F06646FEC70BFCD"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-en-inputs\\protected-source-copy.zip",
+        "bytes": 905921,
+        "sha256": "56598A69E7AFD30023EE368D17BAD3325CB58A6FF08B26B2DA2BD0AABBB0D500"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\migration-origins\\pure-published-source-r01\\work110-f200-default-r01-controller\\retained-native\\write-data\\saves\\mir-pure-predecessor.zip",
+        "bytes": 905921,
+        "sha256": "56598A69E7AFD30023EE368D17BAD3325CB58A6FF08B26B2DA2BD0AABBB0D500"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-de-inputs\\protected-source-copy.zip",
+        "bytes": 905921,
+        "sha256": "56598A69E7AFD30023EE368D17BAD3325CB58A6FF08B26B2DA2BD0AABBB0D500"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-en-inputs\\protected-source-copy.zip",
+        "bytes": 905921,
+        "sha256": "56598A69E7AFD30023EE368D17BAD3325CB58A6FF08B26B2DA2BD0AABBB0D500"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-de-inputs\\protected-source-copy.zip",
+        "bytes": 905921,
+        "sha256": "56598A69E7AFD30023EE368D17BAD3325CB58A6FF08B26B2DA2BD0AABBB0D500"
+      }
+    ],
+    "inputs": "All8successful-case seed copies plus2protected originals rehashed after all native work and CRC-checked; exact original hashes retained. Packages/engines/fixture bytes still equal admitted pins. D worktree remains clean at e7a5/Sourcef2dca.",
+    "raw_authority": "This receipt pins original closed frozen-runner bodies. Root owns separate primary/private raw-copy custody; no new copy/remote-custody assertion is invented here.",
+    "prior_adverse": {
+      "readback": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-d-r10-controller\\r09-adverse-origin-readback.json",
+        "bytes": 2204,
+        "sha256": "F52FC3F9D6B9B27A4ED8129C59F5EF01E1DA2438C638E724FB0544463660D3B2"
+      },
+      "status": "Original R09 DE/220CC FileName observation failure remains an actual separate early-controller adverse,not a product/pixel pass. Successful R09 EN retains plan6F958/owner220CC/PID15692; all seven new cases use owner1C6D and fresh R10 roots."
+    }
+  },
+  "prior_evidence_limits": {
+    "B56_pixel_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-r08-independent-pixel-review-r01.json",
+      "bytes": 41996,
+      "sha256": "22EEA19110972D018C466006D61668142CB82872D0ED0FAB397EC0614C39120B"
+    },
+    "B_titlebar_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-polish-b-titlebar-pixels-independent-review-r01.json",
+      "bytes": 8028,
+      "sha256": "4C33D5BA719B6DF2C721D0CC7F7B1E11B67D972DAABAFC0E6597191884C595C7"
+    },
+    "reuse": "B56 review named Availability separation as its definite visual defect. This report closes only that defect at these8D02/06endpoints plus correctedGermanQueue caption fit. Other B views and covered areas retain their old identities and limitations."
+  },
+  "still_unverified": [
+    "Unicode typing/IME/caret and native saved-query continuity",
+    "Native Startup/menu level-1 cost caption",
+    "Actual scroll/mouse/keyboard/resize,search/filter/reset interactions",
+    "Exports/save-lifecycle/dual-client/multiplayer",
+    "Performance,whole UI pixel-perfect or stable acceptance"
+  ],
+  "operations": {
+    "source_tests_docs_controller_library_edits": 0,
+    "host_tests": 0,
+    "builds": 0,
+    "Compose": 0,
+    "native_reruns": 0,
+    "CI": 0,
+    "image_edits": 0,
+    "health_before_output": {
+      "status": "attention(bounded scan)",
+      "checkpoint_required": false,
+      "free_mib": 84991
+    },
+    "only_new_output": "build/qualification/library512-polish-d-r10-independent-result-and-pixel-review-r01.json"
+  },
+  "cases": [
+    {
+      "case": "f210-normal-en",
+      "execution_identity": "Original R09/220CC reused; not a R10 engine",
+      "plan": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/library512-polish-c-r09-controller/f210-normal-en-plan.json",
+        "bytes": 6277,
+        "sha256": "6F95825BA0DA12BAF730D3D8D96BA941E1252C375FFC5C45285BFF79496478BE"
+      },
+      "owner_sha256": "220CC6B7A5F1085868FCC9F1BA7B8F64C72C1F1BF3584CA81D0ACC4585B746E1",
+      "candidate": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-polish-d-r01/original/more-infinite-research_5.0.21012.zip",
+        "bytes": 1018364,
+        "sha256": "5B66581DB89D0738FCFA60B64D2DC3902C2662AC04802F785EA2850AB0818ADB"
+      },
+      "engine": {
+        "path": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+        "bytes": 49398736,
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "fixture": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/library512-polish-c-r09-controller/fixture-packages/f210/mir-fixture-library-render-capture_0.1.3.zip",
+        "bytes": 3092,
+        "sha256": "D4D6DDC37C62ED5D260A8EF604405F16265994660512A09DEAC593FC01139D2C"
+      },
+      "owner_result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r09-f210-normal-en\\owner-result.json",
+        "bytes": 4169,
+        "sha256": "6DE371FD8D54A70F9942695395929709D76924447884332E6039749DBF772251"
+      },
+      "native_identity": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r09-f210-normal-en\\native-identity.json",
+        "bytes": 302,
+        "sha256": "C994C0FF395007014948A135072675C86A188C7847F8E464E7FB22EC7419085C"
+      },
+      "observed_PID": 15692,
+      "observed_start_utc": "2026-11-09T20:58:55.5263740Z",
+      "observed_executable": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+      "actual_run": {
+        "status": "passed",
+        "exit_code": 0,
+        "passed": true,
+        "timed_out": false,
+        "completion_predicate_observed": true,
+        "duration_seconds": 24.437325
+      },
+      "resource_ledger": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r09-f210-normal-en\\process-1.resources.jsonl",
+        "bytes": 8144,
+        "sha256": "E037F131176CBF36A047ADDD2AA34A7532153BFA1C7715A4FF95A1CA8C263415"
+      },
+      "closed_stdout": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r09-f210-normal-en\\process-1.stdout.txt",
+        "bytes": 16801,
+        "sha256": "3FD56A1F055E31364780B7FA672988E0A476A4BBF3438E7D7C9B6CC6C4ACD2C4"
+      },
+      "closed_stderr": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r09-f210-normal-en\\process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "native_log": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r09-f210-normal-en\\write-data\\factorio-current.log",
+        "bytes": 16621,
+        "sha256": "6D66AF02531CB4C5AE53A47B1DEA9F42725489912F7CAC16E888CCA101246340"
+      },
+      "complete_report": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r09-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\complete.json",
+        "bytes": 853,
+        "sha256": "C5F73DBCA43B8F9F9F801559C6529A7B7A185637B64E0211E794ECBDCDCE0664"
+      },
+      "render_file_validation": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r09-f210-normal-en\\render-file-validation.json",
+        "bytes": 548,
+        "sha256": "69DFE82341B233846B82B882CD29DECF196B9EE84EE1240800FC6CCAE8965799"
+      },
+      "native_snapshot_unchanged": true,
+      "before_equals_after": true,
+      "restored": true,
+      "Factorio_zero_at_close": true,
+      "images": [
+        {
+          "id": "02-queue",
+          "original_PNG": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r09-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.png",
+            "bytes": 4774717,
+            "sha256": "DF23C2C66852BA4CF6E9B7F548D636BB43507F715E68B365E7F3A8DAB713C118"
+          },
+          "page_observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r09-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.json",
+            "bytes": 221,
+            "sha256": "501BDA906CBD099CBE01D3AA1F2FFFC458E1770B212F06F0DBA054C6DDAB661F"
+          },
+          "actual_resolution": {
+            "width": 2560,
+            "height": 1440
+          },
+          "actual_scale": 1.25,
+          "captured_tick": 64800,
+          "tab_index": 2,
+          "original_actually_viewed": true,
+          "visual_result": "PASS within requested page scope",
+          "covered_regions": [],
+          "pixel_note": "One-line English native-screen guidance; native-open button/current-force/empty caption fully visible."
+        },
+        {
+          "id": "06-availability",
+          "original_PNG": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r09-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.png",
+            "bytes": 4763378,
+            "sha256": "25499550F93C18A6C9083C2723918FFEE9087178C801FF46F41426DAFAE8DEC4"
+          },
+          "page_observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r09-f210-normal-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.json",
+            "bytes": 228,
+            "sha256": "239B852476A7FD6104E6AB1B817B397101C56179FFA9A79C4A6E5E828DEA6C0E"
+          },
+          "actual_resolution": {
+            "width": 2560,
+            "height": 1440
+          },
+          "actual_scale": 1.25,
+          "captured_tick": 65070,
+          "tab_index": 1,
+          "original_actually_viewed": true,
+          "visual_result": "PASS within requested page scope",
+          "covered_regions": [],
+          "pixel_note": "Two single-line complete explanations in distinct full-width rows,clear vertical gap; no concatenation or clipping."
+        }
+      ]
+    },
+    {
+      "case": "f210-normal-de",
+      "execution_identity": "New R10/1C6D actual process",
+      "plan": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/library512-polish-d-r10-controller/f210-normal-de-plan.json",
+        "bytes": 6824,
+        "sha256": "90E2DC034995656963196425BC4ADA9CA7216AE18E46260C27C7DCA213FFE54C"
+      },
+      "owner_sha256": "1C6DFBA5FBC89F28BB29512DFAEF58E5E7DAA5F9C1565F448635D441F7ED75EA",
+      "candidate": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-polish-d-r01/original/more-infinite-research_5.0.21012.zip",
+        "bytes": 1018364,
+        "sha256": "5B66581DB89D0738FCFA60B64D2DC3902C2662AC04802F785EA2850AB0818ADB"
+      },
+      "engine": {
+        "path": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+        "bytes": 49398736,
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "fixture": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/library512-polish-c-r09-controller/fixture-packages/f210/mir-fixture-library-render-capture_0.1.3.zip",
+        "bytes": 3092,
+        "sha256": "D4D6DDC37C62ED5D260A8EF604405F16265994660512A09DEAC593FC01139D2C"
+      },
+      "owner_result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-normal-de\\owner-result.json",
+        "bytes": 4169,
+        "sha256": "D1B9872058D15C7DBE074DB6FEB871582C3ECBCD9EBC6E090A3A1F08E8CFB8BE"
+      },
+      "native_identity": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-normal-de\\native-identity.json",
+        "bytes": 302,
+        "sha256": "CD312F41D5F42FD561835EC4A74BF88898C8427FD1C823CBDCDE65F78F3A6003"
+      },
+      "observed_PID": 17200,
+      "observed_start_utc": "2026-11-09T21:25:41.8447554Z",
+      "observed_executable": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+      "actual_run": {
+        "status": "passed",
+        "exit_code": 0,
+        "passed": true,
+        "timed_out": false,
+        "completion_predicate_observed": true,
+        "duration_seconds": 14.067314
+      },
+      "resource_ledger": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-normal-de\\process-1.resources.jsonl",
+        "bytes": 8142,
+        "sha256": "28D2D6CD12F9F004A4C071641F619935546D01AD872DEFC9AAC868C8FA587E80"
+      },
+      "closed_stdout": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-normal-de\\process-1.stdout.txt",
+        "bytes": 16801,
+        "sha256": "DD3049D991210A1A5527B6B73CE1676AF8FFBFB3ED5C417C514BAB6F7086223F"
+      },
+      "closed_stderr": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-normal-de\\process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "native_log": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-normal-de\\write-data\\factorio-current.log",
+        "bytes": 16621,
+        "sha256": "5B22704D94BF8910D3F3BA86754DC6660ECF708DFE36A21A7102EC300F33B347"
+      },
+      "complete_report": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\complete.json",
+        "bytes": 853,
+        "sha256": "5BC5252DEA6B36BCC150F41BF017E52CD3FA30ABFDBD7214E8BF4287B040C72E"
+      },
+      "render_file_validation": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-normal-de\\render-file-validation.json",
+        "bytes": 548,
+        "sha256": "20E69CE1D0CCB188E0EACA6482127D55E37FEECE1AF6CEDCAE7D48E98480BD0C"
+      },
+      "native_snapshot_unchanged": true,
+      "before_equals_after": true,
+      "restored": true,
+      "Factorio_zero_at_close": true,
+      "images": [
+        {
+          "id": "02-queue",
+          "original_PNG": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.png",
+            "bytes": 4782356,
+            "sha256": "FF304D8893411602A1CB16587FD47820A24F31F254B569CDBB9403AB36B0C22F"
+          },
+          "page_observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.json",
+            "bytes": 221,
+            "sha256": "5E5EBB0A5AB4E86588CD0B78540124DFEC4362DCE756377B2C4C7F9356A7A1BA"
+          },
+          "actual_resolution": {
+            "width": 2560,
+            "height": 1440
+          },
+          "actual_scale": 1.25,
+          "captured_tick": 64800,
+          "tab_index": 2,
+          "original_actually_viewed": true,
+          "visual_result": "PASS within requested page scope",
+          "covered_regions": [],
+          "pixel_note": "Complete German native-screen actions+Library no-queue-authority guidance fits one line. Partei heading and native-open button complete."
+        },
+        {
+          "id": "06-availability",
+          "original_PNG": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.png",
+            "bytes": 4768816,
+            "sha256": "273959418B49C08269BCAF4425C98C819FB89CC56E1AB47DE57E381CD06AC826"
+          },
+          "page_observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-normal-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.json",
+            "bytes": 228,
+            "sha256": "7FAB524152BC3EA9B0F54E5726105417F021C9EBA4F33336BFAF4310A2843414"
+          },
+          "actual_resolution": {
+            "width": 2560,
+            "height": 1440
+          },
+          "actual_scale": 1.25,
+          "captured_tick": 65070,
+          "tab_index": 1,
+          "original_actually_viewed": true,
+          "visual_result": "PASS within requested page scope",
+          "covered_regions": [],
+          "pixel_note": "Both full German explanations in separate single-line rows; wide usable area and visible vertical gap."
+        }
+      ]
+    },
+    {
+      "case": "f210-narrow-en",
+      "execution_identity": "New R10/1C6D actual process",
+      "plan": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/library512-polish-d-r10-controller/f210-narrow-en-plan.json",
+        "bytes": 6818,
+        "sha256": "2B2A6631E4CE16D577D7C2A2032C1CF02F57660888CD87004AEB2AEAE666E416"
+      },
+      "owner_sha256": "1C6DFBA5FBC89F28BB29512DFAEF58E5E7DAA5F9C1565F448635D441F7ED75EA",
+      "candidate": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-polish-d-r01/original/more-infinite-research_5.0.21012.zip",
+        "bytes": 1018364,
+        "sha256": "5B66581DB89D0738FCFA60B64D2DC3902C2662AC04802F785EA2850AB0818ADB"
+      },
+      "engine": {
+        "path": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+        "bytes": 49398736,
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "fixture": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/library512-polish-c-r09-controller/fixture-packages/f210/mir-fixture-library-render-capture_0.1.3.zip",
+        "bytes": 3092,
+        "sha256": "D4D6DDC37C62ED5D260A8EF604405F16265994660512A09DEAC593FC01139D2C"
+      },
+      "owner_result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-en\\owner-result.json",
+        "bytes": 4169,
+        "sha256": "5320919F8EE623F6F1CE6361488BBC95B638D589523573C0B50D1FDDF9CBDD72"
+      },
+      "native_identity": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-en\\native-identity.json",
+        "bytes": 302,
+        "sha256": "93183D3655E54A81F23AF05E2A5162FF60C1B789A54BAFD19A66DA1004D872AE"
+      },
+      "observed_PID": 25064,
+      "observed_start_utc": "2026-11-09T21:25:59.0913771Z",
+      "observed_executable": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+      "actual_run": {
+        "status": "passed",
+        "exit_code": 0,
+        "passed": true,
+        "timed_out": false,
+        "completion_predicate_observed": true,
+        "duration_seconds": 13.773974
+      },
+      "resource_ledger": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-en\\process-1.resources.jsonl",
+        "bytes": 8136,
+        "sha256": "85B26711C749F794A7B5BFB41F3BD68ED65B20A9680661E68D0BEB8B71FBC9CE"
+      },
+      "closed_stdout": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-en\\process-1.stdout.txt",
+        "bytes": 16799,
+        "sha256": "4948FE96407CB15B9644E937B413F25532516797E1C8B6EBABCFC144B8330E47"
+      },
+      "closed_stderr": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-en\\process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "native_log": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-en\\write-data\\factorio-current.log",
+        "bytes": 16619,
+        "sha256": "4882D6B55799551F6047D54D93BADBEC384E7A0F83B5707735D0ABABA4B7FC09"
+      },
+      "complete_report": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\complete.json",
+        "bytes": 843,
+        "sha256": "05F80EF162F5D47834AA20E514FE6E4C63B2D740F00113C2EEE29E4DE3C108A7"
+      },
+      "render_file_validation": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-en\\render-file-validation.json",
+        "bytes": 542,
+        "sha256": "12617355D76F574BEACA8BF4270AF088AB2628FC76E8A67090E7350513667258"
+      },
+      "native_snapshot_unchanged": true,
+      "before_equals_after": true,
+      "restored": true,
+      "Factorio_zero_at_close": true,
+      "images": [
+        {
+          "id": "02-queue",
+          "original_PNG": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.png",
+            "bytes": 941270,
+            "sha256": "A56C7BEE85035B9329D5509CE3B8C51ABD9CBE18BC3D10D3F76645A9ABE0F662"
+          },
+          "page_observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.json",
+            "bytes": 216,
+            "sha256": "E8CBE2027299AB7209167F324A86D73DB3FE6182D50E6108897F2A4408B2FEA7"
+          },
+          "actual_resolution": {
+            "width": 960,
+            "height": 720
+          },
+          "actual_scale": 0.75,
+          "captured_tick": 64800,
+          "tab_index": 2,
+          "original_actually_viewed": true,
+          "visual_result": "PASS within requested page scope",
+          "covered_regions": [],
+          "pixel_note": "English guidance wraps cleanly to2lines; open-screen button/force heading/empty caption remain separate and readable."
+        },
+        {
+          "id": "06-availability",
+          "original_PNG": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.png",
+            "bytes": 954527,
+            "sha256": "476D98E290F3F2E602BCDE241952DB8BCB7925EA41C5462DFFA1C606D18F8F62"
+          },
+          "page_observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.json",
+            "bytes": 223,
+            "sha256": "3C5FBABFE769E9DCB3A86609F01EE6AEAC8BFA2B56772F53982629479DC67211"
+          },
+          "actual_resolution": {
+            "width": 960,
+            "height": 720
+          },
+          "actual_scale": 0.75,
+          "captured_tick": 65070,
+          "tab_index": 1,
+          "original_actually_viewed": true,
+          "visual_result": "PASS within requested page scope",
+          "covered_regions": [],
+          "pixel_note": "Both explanations fit one line each across usable width; vertical separation obvious; five filters reflow3+2 and remain visible."
+        }
+      ]
+    },
+    {
+      "case": "f210-narrow-de",
+      "execution_identity": "New R10/1C6D actual process",
+      "plan": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/library512-polish-d-r10-controller/f210-narrow-de-plan.json",
+        "bytes": 6818,
+        "sha256": "72C583784AECDC20521FD532709E6263EB01E7539ABE35D53EC1E97DE1AE1A87"
+      },
+      "owner_sha256": "1C6DFBA5FBC89F28BB29512DFAEF58E5E7DAA5F9C1565F448635D441F7ED75EA",
+      "candidate": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-polish-d-r01/original/more-infinite-research_5.0.21012.zip",
+        "bytes": 1018364,
+        "sha256": "5B66581DB89D0738FCFA60B64D2DC3902C2662AC04802F785EA2850AB0818ADB"
+      },
+      "engine": {
+        "path": "D:/Games/Factorio/2.1/bin/x64/factorio.exe",
+        "bytes": 49398736,
+        "sha256": "8DC3979B88784C111D51EC942F04345554635A1B93B7BD7CF536A1E7E903DB38"
+      },
+      "fixture": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/library512-polish-c-r09-controller/fixture-packages/f210/mir-fixture-library-render-capture_0.1.3.zip",
+        "bytes": 3092,
+        "sha256": "D4D6DDC37C62ED5D260A8EF604405F16265994660512A09DEAC593FC01139D2C"
+      },
+      "owner_result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-de\\owner-result.json",
+        "bytes": 4169,
+        "sha256": "D59A2FB01A24349E8C8B6BC82C3EB77FCF45DE47AFC3B25264C2F56ACFC9DE60"
+      },
+      "native_identity": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-de\\native-identity.json",
+        "bytes": 302,
+        "sha256": "CBF82B293E2E33D291805B2866AB0E32938A316EDDF718C5ED6967065BAB19C8"
+      },
+      "observed_PID": 22836,
+      "observed_start_utc": "2026-11-09T21:26:14.9026502Z",
+      "observed_executable": "D:\\Games\\Factorio\\2.1\\bin\\x64\\factorio.exe",
+      "actual_run": {
+        "status": "passed",
+        "exit_code": 0,
+        "passed": true,
+        "timed_out": false,
+        "completion_predicate_observed": true,
+        "duration_seconds": 13.754615
+      },
+      "resource_ledger": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-de\\process-1.resources.jsonl",
+        "bytes": 8144,
+        "sha256": "39709869EFDA251CC0F2638B1C77463193CDF7E4F9DB3021CCC86940DF3BF629"
+      },
+      "closed_stdout": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-de\\process-1.stdout.txt",
+        "bytes": 16799,
+        "sha256": "6C6D52976612779E781F4AFD2726494E2A90C5A2DB111E213167AC82D857FDDE"
+      },
+      "closed_stderr": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-de\\process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "native_log": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-de\\write-data\\factorio-current.log",
+        "bytes": 16619,
+        "sha256": "58C32C8BD564563D7C9D8C04A24AA399FFC4850362C0CD4F6E2D80DBD36ACF95"
+      },
+      "complete_report": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\complete.json",
+        "bytes": 843,
+        "sha256": "829AF38B7E30C83A472A8B9A42F4DB9ACD98B7168230C5EA87B616F85EF94225"
+      },
+      "render_file_validation": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-de\\render-file-validation.json",
+        "bytes": 542,
+        "sha256": "C1FBF39A0D440871EC1A38A8B2B8B39EDEE973275CAF10CF5DB4C826D3C29531"
+      },
+      "native_snapshot_unchanged": true,
+      "before_equals_after": true,
+      "restored": true,
+      "Factorio_zero_at_close": true,
+      "images": [
+        {
+          "id": "02-queue",
+          "original_PNG": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.png",
+            "bytes": 944475,
+            "sha256": "112C0500CE84D23BBA988C81B1FE1D4DC49AED6E22DBA5FD4D548D86821FF055"
+          },
+          "page_observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.json",
+            "bytes": 216,
+            "sha256": "ACAC50CC5D469967B71FA7D2938920BCAAC6E5331BDD1F6AC40365EA9A46B706"
+          },
+          "actual_resolution": {
+            "width": 960,
+            "height": 720
+          },
+          "actual_scale": 0.75,
+          "captured_tick": 64800,
+          "tab_index": 2,
+          "original_actually_viewed": true,
+          "visual_result": "PASS within requested page scope",
+          "covered_regions": [],
+          "pixel_note": "Full German actions/authority guidance wraps cleanly to2lines; complete Partei heading/button/empty caption with no collision."
+        },
+        {
+          "id": "06-availability",
+          "original_PNG": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.png",
+            "bytes": 956901,
+            "sha256": "B29BC04FD0C6A31FF43006D0A3776ACA641B78E45584A73F142A83B5E2F56340"
+          },
+          "page_observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f210-narrow-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.json",
+            "bytes": 223,
+            "sha256": "53A6146737702756B05CFCC501600D1DA8DEF3CDCF4EFBA28ECC2BF35D9B14E4"
+          },
+          "actual_resolution": {
+            "width": 960,
+            "height": 720
+          },
+          "actual_scale": 0.75,
+          "captured_tick": 65070,
+          "tab_index": 1,
+          "original_actually_viewed": true,
+          "visual_result": "PASS within requested page scope",
+          "covered_regions": [],
+          "pixel_note": "Long agricultural German explanation fits one complete line; spoilage explanation on separate row. Clear spacing, no side-by-side fragments or clipping."
+        }
+      ]
+    },
+    {
+      "case": "f200-normal-en",
+      "execution_identity": "New R10/1C6D actual process",
+      "plan": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/library512-polish-d-r10-controller/f200-normal-en-plan.json",
+        "bytes": 6824,
+        "sha256": "771B58342181DD85AE73ADC1042BCC8F8BAA2AC68A2456D07C76BE391C2AD0F3"
+      },
+      "owner_sha256": "1C6DFBA5FBC89F28BB29512DFAEF58E5E7DAA5F9C1565F448635D441F7ED75EA",
+      "candidate": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-polish-d-r01/original/more-infinite-research_5.0.20012.zip",
+        "bytes": 1017940,
+        "sha256": "4D4A566E967C7D2B06A5C496EEBD9C66E2874F1BDCE7C9FC1236AF76D9062EBA"
+      },
+      "engine": {
+        "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+        "bytes": 43530192,
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "fixture": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/library512-polish-c-r09-controller/fixture-packages/f200/mir-fixture-library-render-capture_0.1.4.zip",
+        "bytes": 3093,
+        "sha256": "39076920FAA4EF64D33789E5697BAAAD0C88492DD79102858C40F42015BA6765"
+      },
+      "owner_result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-en\\owner-result.json",
+        "bytes": 4035,
+        "sha256": "C3132CAADEDF715DC79A5E7AAF2F588BB85E718DAD2493E2DE75BD452BBD6166"
+      },
+      "native_identity": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-en\\native-identity.json",
+        "bytes": 302,
+        "sha256": "D16BCB2838F13DD553880EC84C1643D038DD6ED04E09D45F60D63CCA7B047BD1"
+      },
+      "observed_PID": 34100,
+      "observed_start_utc": "2026-11-09T21:26:30.8053651Z",
+      "observed_executable": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+      "actual_run": {
+        "status": "passed",
+        "exit_code": 0,
+        "passed": true,
+        "timed_out": false,
+        "completion_predicate_observed": true,
+        "duration_seconds": 14.980272
+      },
+      "resource_ledger": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-en\\process-1.resources.jsonl",
+        "bytes": 8755,
+        "sha256": "98B27D649430BE11F9638523BA54BFA533783C9013056AEF0FF406440E2523DF"
+      },
+      "closed_stdout": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-en\\process-1.stdout.txt",
+        "bytes": 11648,
+        "sha256": "9ADDC0B2B1E28556C165643E9D30D00A99574B97EC203DADB81D98E00903599A"
+      },
+      "closed_stderr": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-en\\process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "native_log": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-en\\write-data\\factorio-current.log",
+        "bytes": 11517,
+        "sha256": "04F80C17EAF515053E5F65BCA81C4212C483A1F153A2141C37AF421453BDDDBC"
+      },
+      "complete_report": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\complete.json",
+        "bytes": 851,
+        "sha256": "F38E0CB82E49B6B7AA09E62CCDEEC8E3669C2911E8C6343A3B34D2271843FE3E"
+      },
+      "render_file_validation": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-en\\render-file-validation.json",
+        "bytes": 546,
+        "sha256": "4564D6027A07FAE172ABD4F406B79168F14A85F43D7391B04782FA7B1C789FD5"
+      },
+      "native_snapshot_unchanged": true,
+      "before_equals_after": true,
+      "restored": true,
+      "Factorio_zero_at_close": true,
+      "images": [
+        {
+          "id": "02-queue",
+          "original_PNG": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.png",
+            "bytes": 7584965,
+            "sha256": "C284C25228ACFCF0B38C786C9635565192D68D379063F56282707C310492B18E"
+          },
+          "page_observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.json",
+            "bytes": 220,
+            "sha256": "5DDDDD1D708CAAF172146C534045929E9A9DBF01B2CE704ADDA54D5713815266"
+          },
+          "actual_resolution": {
+            "width": 3200,
+            "height": 1800
+          },
+          "actual_scale": 1.5,
+          "captured_tick": 64740,
+          "tab_index": 2,
+          "original_actually_viewed": true,
+          "visual_result": "PASS within requested page scope",
+          "covered_regions": [],
+          "pixel_note": "Complete one-line English guidance/button/force/empty caption at actual3200x1800/scale1.5."
+        },
+        {
+          "id": "06-availability",
+          "original_PNG": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.png",
+            "bytes": 7684830,
+            "sha256": "FCEC789115A184F328A7A981E4071A1246E26CFDA59F34ADBC8B6427B7DA1F94"
+          },
+          "page_observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.json",
+            "bytes": 227,
+            "sha256": "8B97ADD946EEEABF7119C0A66027E02E77CF18850193CB741BC76C1447E7065A"
+          },
+          "actual_resolution": {
+            "width": 3200,
+            "height": 1800
+          },
+          "actual_scale": 1.5,
+          "captured_tick": 65010,
+          "tab_index": 1,
+          "original_actually_viewed": true,
+          "visual_result": "PASS within requested page scope",
+          "covered_regions": [],
+          "pixel_note": "Both complete explanations are distinct rows with ample usable width and clear gap."
+        }
+      ]
+    },
+    {
+      "case": "f200-normal-de",
+      "execution_identity": "New R10/1C6D actual process",
+      "plan": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/library512-polish-d-r10-controller/f200-normal-de-plan.json",
+        "bytes": 6824,
+        "sha256": "F02D8DBC6B817CFCD53589AE739C09837FBACFD6C6042506790793B25D218A2D"
+      },
+      "owner_sha256": "1C6DFBA5FBC89F28BB29512DFAEF58E5E7DAA5F9C1565F448635D441F7ED75EA",
+      "candidate": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-polish-d-r01/original/more-infinite-research_5.0.20012.zip",
+        "bytes": 1017940,
+        "sha256": "4D4A566E967C7D2B06A5C496EEBD9C66E2874F1BDCE7C9FC1236AF76D9062EBA"
+      },
+      "engine": {
+        "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+        "bytes": 43530192,
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "fixture": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/library512-polish-c-r09-controller/fixture-packages/f200/mir-fixture-library-render-capture_0.1.4.zip",
+        "bytes": 3093,
+        "sha256": "39076920FAA4EF64D33789E5697BAAAD0C88492DD79102858C40F42015BA6765"
+      },
+      "owner_result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-de\\owner-result.json",
+        "bytes": 4035,
+        "sha256": "9538152F9FB434456D69B77767B9BBE9042498A1DE9F6AD5D2515ADEC3141FAB"
+      },
+      "native_identity": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-de\\native-identity.json",
+        "bytes": 302,
+        "sha256": "19E9A03F628CF36818263E89CD6E0A0AB6E950E9F1A0D2FC3DDD3821972888B1"
+      },
+      "observed_PID": 29808,
+      "observed_start_utc": "2026-11-09T21:26:47.7254274Z",
+      "observed_executable": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+      "actual_run": {
+        "status": "passed",
+        "exit_code": 0,
+        "passed": true,
+        "timed_out": false,
+        "completion_predicate_observed": true,
+        "duration_seconds": 15.026723
+      },
+      "resource_ledger": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-de\\process-1.resources.jsonl",
+        "bytes": 8755,
+        "sha256": "5EE7AFB09ECEED56958ECC15B1AA811213EB88F6488E6003145F216AA5B4D85D"
+      },
+      "closed_stdout": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-de\\process-1.stdout.txt",
+        "bytes": 11648,
+        "sha256": "D071CFD168B6E80F31DC94633101F5264ECE1ABCADADA730C4BAA2E7567E7918"
+      },
+      "closed_stderr": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-de\\process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "native_log": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-de\\write-data\\factorio-current.log",
+        "bytes": 11517,
+        "sha256": "739635F709E6F6075F9B467BB344133CE019211777ED512738D99C9558753EFF"
+      },
+      "complete_report": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\complete.json",
+        "bytes": 851,
+        "sha256": "CA97F1FE97D595FE7A418C6E6F24C3D94F0D0A8857E2DEE9949E72280245EA0B"
+      },
+      "render_file_validation": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-de\\render-file-validation.json",
+        "bytes": 546,
+        "sha256": "8A4AAC786C7CB178C5704EDE9DDF0D01F1BE4ACC9C2127B77F76D66D326EC1CC"
+      },
+      "native_snapshot_unchanged": true,
+      "before_equals_after": true,
+      "restored": true,
+      "Factorio_zero_at_close": true,
+      "images": [
+        {
+          "id": "02-queue",
+          "original_PNG": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.png",
+            "bytes": 7595866,
+            "sha256": "B32EB2D560C3ED12BAF27D5E68222935D069F3A0B7A59702F9BA016F9496E6FD"
+          },
+          "page_observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.json",
+            "bytes": 220,
+            "sha256": "7E12EE984D43A1584398D7137F9CECC498F09A4FA118801BC83C118BEC8AD200"
+          },
+          "actual_resolution": {
+            "width": 3200,
+            "height": 1800
+          },
+          "actual_scale": 1.5,
+          "captured_tick": 64740,
+          "tab_index": 2,
+          "original_actually_viewed": true,
+          "visual_result": "PASS within requested page scope",
+          "covered_regions": [],
+          "pixel_note": "Complete one-line German guidance,Partei heading/button/empty caption at actual3200x1800/scale1.5."
+        },
+        {
+          "id": "06-availability",
+          "original_PNG": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.png",
+            "bytes": 7692181,
+            "sha256": "6EADA27F6A4D9FC42BE025508AA67C35E4AC20F487514ACFE4A895D096313537"
+          },
+          "page_observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-normal-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.json",
+            "bytes": 227,
+            "sha256": "C8D3B7FEED47810373E044613143DF2CFAD6F0439D563B20B751BF1F398F18D9"
+          },
+          "actual_resolution": {
+            "width": 3200,
+            "height": 1800
+          },
+          "actual_scale": 1.5,
+          "captured_tick": 65010,
+          "tab_index": 1,
+          "original_actually_viewed": true,
+          "visual_result": "PASS within requested page scope",
+          "covered_regions": [],
+          "pixel_note": "Full German agricultural and spoilage explanations each occupy their own row,with readable spacing."
+        }
+      ]
+    },
+    {
+      "case": "f200-narrow-en",
+      "execution_identity": "New R10/1C6D actual process",
+      "plan": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/library512-polish-d-r10-controller/f200-narrow-en-plan.json",
+        "bytes": 6818,
+        "sha256": "E2631099CC7AA46FD8FBEE70E7FA48C3E7440082E65DF5768922C1D2308098DB"
+      },
+      "owner_sha256": "1C6DFBA5FBC89F28BB29512DFAEF58E5E7DAA5F9C1565F448635D441F7ED75EA",
+      "candidate": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-polish-d-r01/original/more-infinite-research_5.0.20012.zip",
+        "bytes": 1017940,
+        "sha256": "4D4A566E967C7D2B06A5C496EEBD9C66E2874F1BDCE7C9FC1236AF76D9062EBA"
+      },
+      "engine": {
+        "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+        "bytes": 43530192,
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "fixture": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/library512-polish-c-r09-controller/fixture-packages/f200/mir-fixture-library-render-capture_0.1.4.zip",
+        "bytes": 3093,
+        "sha256": "39076920FAA4EF64D33789E5697BAAAD0C88492DD79102858C40F42015BA6765"
+      },
+      "owner_result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-en\\owner-result.json",
+        "bytes": 4035,
+        "sha256": "4A039A34610A613133ECC3BE932C870D415A4A63BFA3FE10828034C3291D1B31"
+      },
+      "native_identity": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-en\\native-identity.json",
+        "bytes": 301,
+        "sha256": "DAB4170BB75ABE5007E7B7D82B3237D2B23074228D20F2E3DCBCA49EEDAAF157"
+      },
+      "observed_PID": 2404,
+      "observed_start_utc": "2026-11-09T21:27:04.5598609Z",
+      "observed_executable": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+      "actual_run": {
+        "status": "passed",
+        "exit_code": 0,
+        "passed": true,
+        "timed_out": false,
+        "completion_predicate_observed": true,
+        "duration_seconds": 13.753911
+      },
+      "resource_ledger": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-en\\process-1.resources.jsonl",
+        "bytes": 8125,
+        "sha256": "5A9CED3A238B2F2BC40F80C9ABF25351BCF1146DA1DC9507DC1DDB322EBCE2BA"
+      },
+      "closed_stdout": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-en\\process-1.stdout.txt",
+        "bytes": 11646,
+        "sha256": "E9C8EC97156C82691FAA3AFC6B25D73A4347789EC91386A7F1A52D23535F5D94"
+      },
+      "closed_stderr": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-en\\process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "native_log": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-en\\write-data\\factorio-current.log",
+        "bytes": 11515,
+        "sha256": "E8BB84F4EC062E05955F23452FBB34D1F23EDE557FCAFA73E89551F7C1DD743A"
+      },
+      "complete_report": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\complete.json",
+        "bytes": 845,
+        "sha256": "64B568FD3D47AE89808F11A8DAEFEC510E82532A003BE4B1BE9A917CBF049D6E"
+      },
+      "render_file_validation": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-en\\render-file-validation.json",
+        "bytes": 546,
+        "sha256": "768FAEC9747F3D182DEA7D8586B54E5A3F95F09FA403F4ED3D50F9FDF1833E3F"
+      },
+      "native_snapshot_unchanged": true,
+      "before_equals_after": true,
+      "restored": true,
+      "Factorio_zero_at_close": true,
+      "images": [
+        {
+          "id": "02-queue",
+          "original_PNG": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.png",
+            "bytes": 1517800,
+            "sha256": "62873237964C0879F0E96277837F7004FFE73EFCB9E73C3A8137427DAA71E25E"
+          },
+          "page_observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\02-queue.json",
+            "bytes": 217,
+            "sha256": "32A42A348463867A16E1B5674B576B8FEB3CB7BD061ABFC4F887C5EC619C548E"
+          },
+          "actual_resolution": {
+            "width": 1200,
+            "height": 900
+          },
+          "actual_scale": 0.75,
+          "captured_tick": 64740,
+          "tab_index": 2,
+          "original_actually_viewed": true,
+          "visual_result": "PASS within requested page scope",
+          "covered_regions": [],
+          "pixel_note": "English guidance fits one line; button/heading/empty caption fit at actual1200x900/scale.75."
+        },
+        {
+          "id": "06-availability",
+          "original_PNG": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.png",
+            "bytes": 1545035,
+            "sha256": "BA86680DE788CF3C52A5030D96E0E59708A87700D2488388F9652DA70C06A61B"
+          },
+          "page_observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-en\\write-data\\script-output\\mir-library-render\\en\\06-availability.json",
+            "bytes": 224,
+            "sha256": "4453ECC0BA6CF881763625533D31056099654C32C56F0A7E0A5013D2D201BB49"
+          },
+          "actual_resolution": {
+            "width": 1200,
+            "height": 900
+          },
+          "actual_scale": 0.75,
+          "captured_tick": 65010,
+          "tab_index": 1,
+          "original_actually_viewed": true,
+          "visual_result": "PASS within requested page scope",
+          "covered_regions": [],
+          "pixel_note": "Both complete English explanations in separate full-width rows; no clipping or concatenation."
+        }
+      ]
+    },
+    {
+      "case": "f200-narrow-de",
+      "execution_identity": "New R10/1C6D actual process",
+      "plan": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/library512-polish-d-r10-controller/f200-narrow-de-plan.json",
+        "bytes": 6818,
+        "sha256": "76D693955FEC2BE3E520E14C2E434F298EE0757B0A14E4D2CF01A588F63702D2"
+      },
+      "owner_sha256": "1C6DFBA5FBC89F28BB29512DFAEF58E5E7DAA5F9C1565F448635D441F7ED75EA",
+      "candidate": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/packages/mir512-polish-d-r01/original/more-infinite-research_5.0.20012.zip",
+        "bytes": 1017940,
+        "sha256": "4D4A566E967C7D2B06A5C496EEBD9C66E2874F1BDCE7C9FC1236AF76D9062EBA"
+      },
+      "engine": {
+        "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+        "bytes": 43530192,
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "fixture": {
+        "path": "D:/Projects/Factorio/more-infinite-research/build/qualification/library512-polish-c-r09-controller/fixture-packages/f200/mir-fixture-library-render-capture_0.1.4.zip",
+        "bytes": 3093,
+        "sha256": "39076920FAA4EF64D33789E5697BAAAD0C88492DD79102858C40F42015BA6765"
+      },
+      "owner_result": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-de\\owner-result.json",
+        "bytes": 4034,
+        "sha256": "6C09CF6E9D41C8F4122EFF9ACEEFAF0A7D3F1061C4EFBB069B19F5F1DC899242"
+      },
+      "native_identity": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-de\\native-identity.json",
+        "bytes": 302,
+        "sha256": "CDCCBA9605B06FC733AA3D4A2696A13587DC89DE8303269D3036D31594638BE0"
+      },
+      "observed_PID": 50712,
+      "observed_start_utc": "2026-11-09T21:27:20.1630895Z",
+      "observed_executable": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+      "actual_run": {
+        "status": "passed",
+        "exit_code": 0,
+        "passed": true,
+        "timed_out": false,
+        "completion_predicate_observed": true,
+        "duration_seconds": 14.79796
+      },
+      "resource_ledger": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-de\\process-1.resources.jsonl",
+        "bytes": 8750,
+        "sha256": "1E2949FCD99D666C1B27219AC41444BE0AF0BDEB915A2C510045E7256B0953C4"
+      },
+      "closed_stdout": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-de\\process-1.stdout.txt",
+        "bytes": 11646,
+        "sha256": "0D8F2E38EB76AE69BB4B3DCE1E881F1A0761C5558DBA3D3024A3A53EF6A93C13"
+      },
+      "closed_stderr": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-de\\process-1.stderr.txt",
+        "bytes": 0,
+        "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+      },
+      "native_log": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-de\\write-data\\factorio-current.log",
+        "bytes": 11515,
+        "sha256": "2AFA275D6550670FBBC363CE1FF835431F460E113355AFB66B925C97221044D3"
+      },
+      "complete_report": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\complete.json",
+        "bytes": 845,
+        "sha256": "3100E5FA0ACA69DC29DB61468B4ABEE3FAA2B23AB170EA39F341DBA3FF37B078"
+      },
+      "render_file_validation": {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-de\\render-file-validation.json",
+        "bytes": 546,
+        "sha256": "3927C0DFCEDAFAB14C91CF8DE9FEF350739B8C89D8D3A753BB72C9941DEA37DA"
+      },
+      "native_snapshot_unchanged": true,
+      "before_equals_after": true,
+      "restored": true,
+      "Factorio_zero_at_close": true,
+      "images": [
+        {
+          "id": "02-queue",
+          "original_PNG": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.png",
+            "bytes": 1521088,
+            "sha256": "A6B09C6ABDE3B4143346D6E7D89B7F50B30AB0B86F8917FDAD88E4E98FF03324"
+          },
+          "page_observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\02-queue.json",
+            "bytes": 217,
+            "sha256": "E0EC7498A2D7E8EE3B4F549E1558571DEC4971FEFC56762D94E1BC64D3618487"
+          },
+          "actual_resolution": {
+            "width": 1200,
+            "height": 900
+          },
+          "actual_scale": 0.75,
+          "captured_tick": 64740,
+          "tab_index": 2,
+          "original_actually_viewed": true,
+          "visual_result": "PASS within requested page scope",
+          "covered_regions": [],
+          "pixel_note": "German native-screen/no-authority guidance wraps cleanly to2lines ending Partei nicht; heading/button/empty caption fit."
+        },
+        {
+          "id": "06-availability",
+          "original_PNG": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.png",
+            "bytes": 1547385,
+            "sha256": "0C1212E7B342AC49A74A3322107B571A4B30978734F5A48F999C19C885259FEB"
+          },
+          "page_observation": {
+            "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\build\\tmp\\library512-polish-d-r10-f200-narrow-de\\write-data\\script-output\\mir-library-render\\de\\06-availability.json",
+            "bytes": 224,
+            "sha256": "1E5C151EC13DA23DDBA7C5A7EF351F82FE8EBAAD934822FCD99CA6ACCD5260B4"
+          },
+          "actual_resolution": {
+            "width": 1200,
+            "height": 900
+          },
+          "actual_scale": 0.75,
+          "captured_tick": 65010,
+          "tab_index": 1,
+          "original_actually_viewed": true,
+          "visual_result": "PASS within requested page scope",
+          "covered_regions": [],
+          "pixel_note": "Both complete German explanations each fit one row with clear vertical gap. All five filter captions and short Show choice fit."
+        }
+      ]
+    }
+  ]
+}

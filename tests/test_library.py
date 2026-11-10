@@ -515,6 +515,56 @@ class LibraryTests(unittest.TestCase):
           assert(gear.level==3 and gear.enabled==false and player.force.research_progress==.5)
         ''')
 
+    def test_availability_entries_use_one_vertical_wrapping_bounded_viewport(self):
+        self.lua.execute('''
+          for _,width in ipairs{1024,640,480} do
+            boot()
+            local rows={}
+            for index=1,24 do
+              rows[index]={family=index%2==1 and "research_agricultural_growth_speed" or "research_spoilage_preservation",
+                reason="requires-space-age"}
+            end
+            require("presentation.availability").rows=function()return rows end
+            library.open(player)
+            storage.mir_library.players[1].geometry={width=width,height=480}
+            local queue,current,progress=player.force.research_queue,player.force.current_research,player.force.research_progress
+            local root=library.open(player,{tab="availability"})
+            local body=research_content(root)
+            local viewport=body.mir_library_availability_viewport
+            assert(viewport and viewport.type=="scroll-pane" and viewport.parent==body,
+              "Availability explanations must not become adjacent Research table columns")
+            assert(#body.children==1 and viewport.horizontal_scroll_policy=="never" and viewport.vertical_scroll_policy=="auto")
+            assert(viewport.style.minimal_width==body.style.maximal_width-16
+              and viewport.style.maximal_width==body.style.maximal_width-16)
+            assert(viewport.style.minimal_height==body.style.maximal_height
+              and viewport.style.maximal_height==body.style.maximal_height)
+            local entries=availability_entries(root)
+            assert(entries.type=="flow" and entries.direction=="vertical" and entries.parent==viewport)
+            assert(entries.style.vertical_spacing==12 and entries.style.maximal_height==nil,
+              "a long explanation list must grow inside its bounded native scroll viewport")
+            assert(entries.style.minimal_width==viewport.style.maximal_width-16
+              and entries.style.maximal_width==viewport.style.maximal_width-16)
+            assert(#entries.children==24 and entries.mir_library_availability_24.valid)
+            for index,row in ipairs(rows) do
+              local label=entries["mir_library_availability_"..index]
+              assert(label.type=="label" and label.parent==entries and entries.children[index]==label)
+              assert(label.style.single_line==false and label.style.minimal_width==entries.style.maximal_width
+                and label.style.maximal_width==entries.style.maximal_width,
+                "each complete explanation must wrap across the full usable list width")
+              assert(label.caption[1]=="mir-browser.availability-entry"
+                and label.caption[2][1]=="technology-name.more-infinite-research."..row.family
+                and label.caption[3][1]=="mir-browser.availability-"..row.reason)
+            end
+            rows={};library.open(player,{tab="availability"})
+            entries=availability_entries(root)
+            assert(#entries.children==1 and entries.mir_library_availability_empty.caption[1]=="mir-browser.availability-empty")
+            assert(entries.mir_library_availability_empty.style.single_line==false
+              and entries.mir_library_availability_empty.style.maximal_width==entries.style.maximal_width)
+            assert(player.force.research_queue==queue and player.force.current_research==current
+              and player.force.research_progress==progress and gear.level==3 and gear.enabled==false)
+          end
+        ''')
+
     def test_returning_from_availability_removes_its_projection_before_research(self):
         self.lua.execute('''
           for _,width in ipairs{592,528} do
@@ -528,18 +578,19 @@ class LibraryTests(unittest.TestCase):
             local root=library.open(player,{tab="research",visibility=3})
             local body=research_content(root)
             local name=empty and "mir_library_availability_empty" or "mir_library_availability_1"
-            local old=body[name]
-            assert(old and old.valid)
+            local viewport=body.mir_library_availability_viewport
+            local old=availability_entries(root)[name]
+            assert(viewport and viewport.valid and old and old.valid)
             local visibility=research_filters(root)["mir_library_filter_grid"]["mir_library_visibility_field"]["mir_library_visibility"]
             visibility.selected_index=1
             library.on_gui_selection_state_changed({player_index=1,element=visibility})
-            assert(not old.valid and body[name]==nil,
+            assert(not viewport.valid and body.mir_library_availability_viewport==nil and not old.valid and body[name]==nil,
               "Availability labels must not survive into the ordinary Research grid")
             assert(body.mir_library_list_pane.mir_library_results.valid and body.mir_library_detail.valid)
             -- Repair a retained body produced by the intermediate mixed-layout draft.
-            local orphan=body.add{type="label",name="mir_library_availability_1",caption="old projection"}
+            local orphan=body.add{type="label",name=name,caption="old projection"}
             library.open(player)
-            assert(not orphan.valid and body.mir_library_availability_1==nil)
+            assert(not orphan.valid and body[name]==nil)
             assert(body.mir_library_list_pane.mir_library_results.valid and body.mir_library_detail.valid)
           end
           end
@@ -1025,13 +1076,14 @@ class LibraryTests(unittest.TestCase):
               if element.name then value[element.name] = element end
               element.destroy = function()
                 if not element.valid then return end
+                local name = element.name
+                element.clear()
                 element.valid = false
-                if element.name then element._parent[element.name] = nil end
+                if name then element._parent[name] = nil end
               end
               element.clear = function()
                 for _, child in ipairs(element._children) do
-                  child.valid = false
-                  if child.name then element[child.name] = nil end
+                  child.destroy()
                 end
                 element._children = {}
               end
@@ -1065,6 +1117,9 @@ class LibraryTests(unittest.TestCase):
           function research_content(root)
             local page = research_page(root)
             return page and page["mir_library_research_content"] or (root and root["mir_library_content"])
+          end
+          function availability_entries(root)
+            return research_content(root).mir_library_availability_viewport.mir_library_availability_entries
           end
 
           function boot()
@@ -2019,6 +2074,68 @@ class LibraryTests(unittest.TestCase):
           assert(storage.mir_library.players[1].selected == gear.name)
         ''')
 
+
+    def test_search_byte_limits_keep_complete_utf8_in_both_tabs(self):
+        cases = (
+            ("x" * 161, "x" * 160),
+            ("x" * 158 + "é", "x" * 158 + "é"),
+            ("x" * 157 + "界", "x" * 157 + "界"),
+            ("x" * 156 + "🚀", "x" * 156 + "🚀"),
+            ("x" * 159 + "é-tail", "x" * 159),
+            ("x" * 158 + "界-tail", "x" * 158),
+            ("x" * 157 + "🚀-tail", "x" * 157),
+            ("ä" * 78 + "abcé", "ä" * 78 + "abc"),
+            ("界" * 54, "界" * 53),
+            ("🚀" * 41, "🚀" * 40),
+        )
+        for number, (query, expected) in enumerate(cases):
+            for route in ("gui-research", "gui-settings", "legacy-research", "legacy-settings",
+                          "saved-research", "saved-settings"):
+                with self.subTest(case=number, route=route):
+                    self.lua.globals().utf8_query = query
+                    self.lua.globals().utf8_expected = expected
+                    self.lua.globals().utf8_route = route
+                    self.lua.execute(r"""
+                      boot()
+                      local root = library.open(player, {query="copper", settings_search="repair"})
+                      local view = storage.mir_library.players[1]
+                      local before_level, before_queue = gear.level, player.force.research_queue
+                      local before_current, before_progress = player.force.current_research, player.force.research_progress
+                      local settings_route = utf8_route:find("settings", 1, true) ~= nil
+                      if utf8_route:sub(1, 3) == "gui" then
+                        if settings_route then library.open(player, {tab="settings"}) end
+                        local field = settings_route and root.mir_library_tabs.mir_library_settings_content.mir_library_settings_query
+                          or research_filters(root).mir_library_query
+                        field.text = utf8_query
+                        library.on_gui_text_changed({player_index=1, element=field})
+                        assert(field.text == utf8_query, "typing must keep the current native text/caret context")
+                      elseif utf8_route:sub(1, 6) == "legacy" then
+                        local options = {tab=settings_route and "settings" or "research", search=utf8_query}
+                        library.open(player, options)
+                        assert(options.search == utf8_query, "legacy caller input must stay detached")
+                      else
+                        library.close(player)
+                        local saved = storage.mir_library.players[1]
+                        saved[settings_route and "settings_query" or "query"] = utf8_query:sub(1, 160)
+                        root = library.open(player, {tab=settings_route and "settings" or "research"})
+                      end
+                      view = storage.mir_library.players[1]
+                      local actual = settings_route and view.settings_query or view.query
+                      assert(actual == utf8_expected and #actual <= 160,
+                        "query byte budget must preserve complete UTF-8 characters")
+                      assert((settings_route and view.query or view.settings_query) == (settings_route and "copper" or "repair"),
+                        "queries must remain independent")
+                      assert(player.gui.screen.mir_research_browser == root, "query rendering must retain the root")
+                      library.close(player)
+                      root = library.open(player)
+                      local field = settings_route and root.mir_library_tabs.mir_library_settings_content.mir_library_settings_query
+                        or research_filters(root).mir_library_query
+                      assert(field.text == utf8_expected, "reopen must render the safe retained query")
+                      assert(gear.level == before_level and player.force.research_queue == before_queue
+                        and player.force.current_research == before_current and player.force.research_progress == before_progress,
+                        "text presentation must leave native research untouched")
+                    """)
+
     def test_legacy_remote_search_uses_selected_or_retained_tab_without_cross_query_writes(self):
         self.lua.execute(r'''
           boot()
@@ -2461,20 +2578,19 @@ class LibraryTests(unittest.TestCase):
             player.force.current_research, player.force.research_progress
 
           local root = library.open(player, {tab = "availability"})
-          local content = research_content(root)
-          assert(content["mir_library_availability_1"] ~= nil and content["mir_library_availability_2"] ~= nil
-            and content["mir_library_availability_empty"] == nil)
+          assert(availability_entries(root)["mir_library_availability_1"] ~= nil and availability_entries(root)["mir_library_availability_2"] ~= nil
+            and availability_entries(root)["mir_library_availability_empty"] == nil)
           local query = research_filters(root)["mir_library_query"]
           query.text = "spoilage-preservation"
           library.on_gui_text_changed({player_index = 1, element = query})
-          assert(content["mir_library_availability_1"].caption[2][1]
+          assert(availability_entries(root)["mir_library_availability_1"].caption[2][1]
               == "technology-name.more-infinite-research.research_spoilage_preservation"
-            and content["mir_library_availability_2"] == nil)
+            and availability_entries(root)["mir_library_availability_2"] == nil)
 
           script.active_mods = {["space-age"] = "2.1.23"}
           query.text = ""
           library.on_gui_text_changed({player_index = 1, element = query})
-          assert(content["mir_library_availability_empty"] ~= nil,
+          assert(availability_entries(root)["mir_library_availability_empty"] ~= nil,
             "Space Age must not show the two requires-Space-Age rows")
 
           local owner = {valid = true, prototype = {effects = {
@@ -2482,15 +2598,15 @@ class LibraryTests(unittest.TestCase):
           }}}
           player.force.technologies["research-productivity"] = owner
           library.open(player, {tab = "availability", query = "lab"})
-          assert(content["mir_library_availability_1"].caption[2][1]
+          assert(availability_entries(root)["mir_library_availability_1"].caption[2][1]
               == "technology-name.more-infinite-research.research_lab_productivity"
-            and content["mir_library_availability_1"].caption[3][1]
+            and availability_entries(root)["mir_library_availability_1"].caption[3][1]
               == "mir-browser.availability-native-research-productivity")
 
           owner.prototype.effects[1].modifier = .1001
           library.open(player, {tab = "availability", query = ""})
-          assert(content["mir_library_availability_empty"] ~= nil
-            and content["mir_library_availability_1"] == nil,
+          assert(availability_entries(root)["mir_library_availability_empty"] ~= nil
+            and availability_entries(root)["mir_library_availability_1"] == nil,
             "a malformed named native owner must not produce an explanation")
           assert(player.force.research_queue == native_queue and player.force.current_research == native_current
             and player.force.research_progress == native_progress and gear.level == 3 and gear.enabled == false)
@@ -3980,10 +4096,10 @@ class LibraryTests(unittest.TestCase):
           library.on_gui_selection_state_changed({player_index = 1, element = visibility})
           view = storage.mir_library.players[1]
           assert(view.visibility == 3 and view.page == 1)
-          assert(research_content(root)["mir_library_availability_empty"] == nil)
-          assert(research_content(root)["mir_library_availability_1"].caption[2][1]
+          assert(availability_entries(root)["mir_library_availability_empty"] == nil)
+          assert(availability_entries(root)["mir_library_availability_1"].caption[2][1]
               == "technology-name.more-infinite-research.research_agricultural_growth_speed"
-            and research_content(root)["mir_library_availability_2"].caption[2][1]
+            and availability_entries(root)["mir_library_availability_2"].caption[2][1]
               == "technology-name.more-infinite-research.research_spoilage_preservation")
           family.selected_index = 7
           library.on_gui_selection_state_changed({player_index = 1, element = family})
@@ -4129,9 +4245,9 @@ class LibraryTests(unittest.TestCase):
           library.open(player, {tab = "availability"})
           assert(storage.mir_library.players[1].tab == "research"
             and storage.mir_library.players[1].visibility == 3)
-          assert(research_content(root)["mir_library_availability_empty"] == nil)
-          assert(research_content(root)["mir_library_availability_1"] ~= nil
-            and research_content(root)["mir_library_availability_2"] ~= nil)
+          assert(availability_entries(root)["mir_library_availability_empty"] == nil)
+          assert(availability_entries(root)["mir_library_availability_1"] ~= nil
+            and availability_entries(root)["mir_library_availability_2"] ~= nil)
           tabs.selected_tab_index = 4
           library.on_gui_selected_tab_changed({player_index = 1, element = tabs})
           assert(debug_tools(tabs["mir_library_help_content"])["mir_library_help_versions"].caption[1]

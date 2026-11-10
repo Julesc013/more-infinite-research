@@ -24,7 +24,7 @@ class FerrumWorkerStorageNativeControls(unittest.TestCase):
         self.lua.globals().actor_path = (FIXTURE / "control.lua").as_posix()
         self.lua.globals().fingerprint = lambda v: json.dumps(plain(v), sort_keys=True)
         self.lua.execute(r'''
-          function run_ferrum(target,opponent,native_count,actor_override)
+          function run_ferrum(target,opponent,native_count,actor_override,cargo_mode)
             local C4,C5,N,P="worker-robots-storage-4","worker-robots-storage-5","worker-robots-storage-6","mir-worker-storage-preservation-4"
             local S,T,CAL="mir-ferrum-sentinel","mir-ferrum-detached","mir-ferrum-count-control-6"
             local LAB="mir-fixture-ferrum-worker-storage-native-lab"
@@ -120,9 +120,77 @@ class FerrumWorkerStorageNativeControls(unittest.TestCase):
               last_ferrum_lab=lab
               return lab
             end
+            local surface=game.surfaces.nauvis
+            local commands,boxes,physical={}, {},{step=0,created=0}
+            local network={cells={{}},all_logistic_robots=1,all_construction_robots=0,
+              available_logistic_robots=1,logistic_robots={}}
+            local slot,section=nil,{}
+            section.is_manual=true;section.active=false
+            section.set_slot=function(index,value)assert(index==1);slot=value end
+            section.get_slot=function(index)assert(index==1);return slot end
+            local point={sections_count=0}
+            point.add_section=function()point.sections_count=1;return section end
+            point.get_section=function(index)assert(index==1);return section end
+            local create_lab=surface.create_entity
+            surface.find_entities_filtered=function()return{}end
+            local function box(name)
+              local values={}
+              local inventory={get_item_count=function(item)
+                if item==nil then local n=0;for _,v in pairs(values)do n=n+v end;return n end
+                if type(item)=="table"then assert(item.quality=="normal");item=item.name end
+                return values[item]or 0
+              end,insert=function(item)
+                assert(name~="requester-chest"and name~="robot","actor wrote delivery/cargo inventory")
+                assert(item.quality=="normal");values[item.name]=(values[item.name]or 0)+item.count;return item.count
+              end}
+              return{values=values,inventory=inventory}
+            end
+            surface.create_entity=function(spec)
+              if spec.name=="mir-ferrum-lab"then local v=create_lab(spec);v.surface=surface;return v end
+              physical.created=physical.created+1
+              local data=box(spec.name);boxes[spec.name]=data
+              local entity={valid=true,name=spec.name,quality={name=spec.quality},position={x=spec.position[1],y=spec.position[2]},
+                force=spec.force,unit_number=100+physical.created,type=spec.name=="roboport"and"roboport"or"logistic-container",
+                get_inventory=function()return data.inventory end}
+              if spec.name=="roboport"then entity.electric_buffer_size=100000000;entity.logistic_network=network end
+              if spec.name=="requester-chest"then entity.get_logistic_point=function(index)assert(index==1);return point end end
+              data.entity=entity;return entity
+            end
+            local robot_box=box("robot")
+            local robot={valid=true,name="logistic-robot",type="logistic-robot",quality={name="normal"},force=forces.player,
+              unit_number=200,prototype={max_payload_size=1},position={x=-10,y=12},get_inventory=function()return robot_box.inventory end}
+            local function cargo_native_step()
+              if not store.mir_ferrum_worker_native.cargo then return end
+              physical.step=physical.step+1
+              local mode=cargo_mode
+              if mode=="timeout"then game.tick=store.mir_ferrum_worker_native.cargo.deadline+1;return end
+              local p,r,d=boxes["passive-provider-chest"].values,boxes["requester-chest"].values,boxes.roboport.values
+              if physical.step==1 then
+                p["iron-plate"]=0;d["logistic-robot"]=0;robot_box.values["iron-plate"]=7
+                network.logistic_robots={robot};network.available_logistic_robots=0
+                if mode=="partial-trips"then p["iron-plate"]=6;robot_box.values["iron-plate"]=1 end
+                if mode=="non-normal"then robot.quality.name="uncommon"end
+                if mode=="extra-robot"then network.all_logistic_robots=2 end
+                if mode=="invented-iron"then p["iron-plate"]=1 end
+                if mode=="lost-iron"then robot_box.values["iron-plate"]=0;p["iron-plate"]=6 end
+                if mode=="changed-request"then slot.min=6 end
+                if mode=="native-research-write"then forces.player.worker_robots_storage_bonus=7 end
+                if mode=="foreign-frame"then forces["mir-ferrum-foreign"].research_progress=.1 end
+                if mode=="no-flight"then robot_box.values["iron-plate"]=0;r["iron-plate"]=7 end
+              elseif physical.step==2 then
+                if mode~="stationary-load"then robot.position={x=-8,y=12}end
+                if mode=="changed-robot"then robot.unit_number=201 end
+              elseif physical.step==3 then
+                robot_box.values["iron-plate"]=0;r["iron-plate"]=mode=="duplicate-delivery"and 8 or 7
+              else
+                d["logistic-robot"]=1;network.logistic_robots={};network.available_logistic_robots=1
+              end
+            end
             env={game=game,storage=store,remote={add_interface=function(n,v)interfaces[n]=v end},
-              prototypes={get_history=function(_,name)return{created=creators[name]}end},
-              helpers={table_to_json=fingerprint},defines={inventory={lab_input=1},events={on_tick=1,on_research_finished=2}},
+              prototypes={get_history=function(_,name)return{created=creators[name]}end,entity={["logistic-robot"]={max_payload_size=1}}},
+              commands={add_command=function(name,_,fn)commands[name]=fn end},
+              helpers={table_to_json=fingerprint},defines={inventory={lab_input=1,chest=2,roboport_robot=3,robot_cargo=4},
+                logistic_member_index={logistic_container=1},events={on_tick=1,on_research_finished=2}},
               log=function(text)logs[#logs+1]=text end}
             env._G=env;setmetatable(env,{__index=_G})
             local function parse()
@@ -145,6 +213,7 @@ class FerrumWorkerStorageNativeControls(unittest.TestCase):
                 end
               end
               if opponent=="no-progress-witness"then forces.player.research_progress=0 end
+              if cargo_mode then cargo_native_step()end
               callbacks.tick{}
             end
             local function until_phase(phase)
@@ -153,6 +222,7 @@ class FerrumWorkerStorageNativeControls(unittest.TestCase):
             end
             parse();callbacks.init();until_phase("source-saved")
             local state=store.mir_ferrum_worker_native
+            if cargo_mode=="source-phase"then commands["mir-ferrum-worker-cargo"]{parameter="start"}end
             if opponent=="premature-cold"then parse();callbacks.load();callbacks.tick{};error("premature cold admitted")end
             if opponent=="wrong-price"then game.difficulty_settings.technology_price_multiplier=2 end
             if opponent=="lost-source-bonus"then forces.player.worker_robots_storage_bonus=4 end
@@ -187,10 +257,19 @@ class FerrumWorkerStorageNativeControls(unittest.TestCase):
             if opponent=="post-MIR-foreign"then forces["mir-ferrum-foreign"].research_progress=.33 end
             if opponent=="post-MIR-private"then forces.player.technologies[P].enabled=true end
             until_phase("destination-saved")
+            if cargo_mode then
+              commands["mir-ferrum-worker-cargo"]{parameter=cargo_mode=="wrong-parameter"and"other"or"start",
+                player_index=cargo_mode=="player-command"and 1 or nil}
+              if cargo_mode=="duplicate-command"then commands["mir-ferrum-worker-cargo"]{parameter="start"}end
+              until_phase("cargo-destination-saved")
+              if cargo_mode=="changed-cold-cargo"then boxes["requester-chest"].values["iron-plate"]=6 end
+              if cargo_mode=="changed-cold-position"then boxes["requester-chest"].entity.position.x=99 end
+            end
             if opponent=="altered-cold"then forces["mir-ferrum-foreign"].research_progress=.123 end
             if opponent=="altered-cold-inventory"then lab.items[packs[1]]=1 end
             local function stable()return{phase=state.phase,ordinary=state.ordinary,consumption=state.consumption,source=state.source,
-              entry=state.entry,closed=state.closed,administrative_events=state.administrative_events}end
+              entry=state.entry,closed=state.closed,administrative_events=state.administrative_events,
+              cargo=state.cargo and state.cargo.report or nil}end
             local before=fingerprint(stable());local old_game,old_storage=env.game,env.storage
             parse();env.game=nil;env.storage=nil;callbacks.load();env.game,env.storage=old_game,old_storage
             assert(fingerprint(stable())==before,"on_load changed state")
@@ -202,8 +281,70 @@ class FerrumWorkerStorageNativeControls(unittest.TestCase):
           end
         ''')
 
-    def run_case(self, opponent=None, target="f210", native_count=1518, actor_override=None):
-        return plain(self.lua.globals().run_ferrum(target, opponent, native_count, actor_override))
+    def run_case(self, opponent=None, target="f210", native_count=1518, actor_override=None, cargo_mode=None):
+        return plain(self.lua.globals().run_ferrum(target, opponent, native_count, actor_override, cargo_mode))
+
+    def test_physical_cargo_phase_requires_loaded_flight_delivery_and_two_colds(self):
+        result = self.run_case(cargo_mode="normal")
+        report = result["report"]
+        self.assertTrue(report["physical_robot_delivery"])
+        cargo = report["cargo"]
+        self.assertEqual(cargo["loaded"]["frame"]["active"][0]["count"], 7)
+        self.assertEqual(cargo["flight"]["frame"]["active"][0]["count"], 7)
+        self.assertNotEqual(cargo["loaded"]["frame"]["active"][0]["position"],
+                            cargo["flight"]["frame"]["active"][0]["position"])
+        self.assertEqual(cargo["delivered"]["frame"]["requester"], 7)
+        self.assertEqual(cargo["delivered"]["frame"]["provider"], 0)
+        self.assertEqual(cargo["delivered"]["frame"]["docked"], 1)
+        self.assertEqual(result["saves"], ["mir-ferrum-worker-source", "mir-ferrum-worker-destination",
+                                         "mir-ferrum-worker-cargo-destination"])
+        self.assertEqual(result["ordinary"], {"worker-robots-storage-4": 1,
+                         "worker-robots-storage-5": 1, "worker-robots-storage-6": 1})
+        self.assertTrue(result["cold_readonly"])
+        self.assertFalse(result["native_evidence"])
+        markers = [json.loads(line.split("] ", 1)[1]) for line in result["logs"]]
+        physical = [row["physical_frame"] for row in markers if row["stage"] == "cargo-destination-saved"]
+        colds = [row["physical_frame"] for row in markers if row["stage"] == "cold"]
+        self.assertEqual(len(physical), 1)
+        self.assertEqual(colds, [physical[0], physical[0]])
+
+    def test_cargo_partial_missing_flight_identity_conservation_and_timeout_refuse(self):
+        for mode, message in [("partial-trips", "one full seven"), ("non-normal", "normal cargo"),
+                              ("extra-robot", "exactly one"), ("invented-iron", "iron conservation"),
+                              ("lost-iron", "iron conservation"), ("no-flight", "lacks observed"),
+                              ("stationary-load", "lacks observed"), ("duplicate-delivery", "iron conservation"),
+                              ("changed-request", "request changed"), ("native-research-write", "cargo-native"),
+                              ("foreign-frame", "cargo-native"), ("changed-robot", "robot changed"),
+                              ("timeout", "timeout"), ("changed-cold-cargo", "iron conservation"),
+                              ("changed-cold-position", "cold-cargo")]:
+            with self.subTest(mode=mode), self.assertRaisesRegex(Exception, message):
+                self.run_case(cargo_mode=mode)
+            if mode not in ("changed-cold-cargo", "changed-cold-position"):
+                state = self.lua.globals().last_ferrum_storage["mir_ferrum_worker_native"]
+                self.assertIsNone(state.cargo.completed)
+                self.assertFalse(state.cargo.report.physical_robot_delivery)
+                self.assertNotIn("mir-ferrum-worker-cargo-destination", plain(self.lua.globals().last_ferrum_saves))
+
+    def test_cargo_server_exact_phase_single_request_and_F210_binding(self):
+        for mode, message in [("player-command", "server-console"), ("wrong-parameter", "server-console"), ("source-phase", "fresh ordinary"),
+                              ("duplicate-command", "fresh ordinary")]:
+            with self.subTest(mode=mode), self.assertRaisesRegex(Exception, message):
+                self.run_case(cargo_mode=mode)
+        with self.assertRaisesRegex(Exception, "cargo exact F210"):
+            self.run_case(target="f200", cargo_mode="normal")
+
+    def test_cargo_flight_guard_is_a_meaningful_host_only_mutation(self):
+        actor = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        guard = '    check(c.report.flight ~= nil and current.provider == 0, "delivery lacks observed seven-item flight")'
+        self.assertEqual(actor.count(guard), 1)
+        with self.assertRaisesRegex(Exception, "lacks observed"):
+            self.run_case(cargo_mode="no-flight")
+        mutant = actor.replace(guard, "    -- Deliberate host-only defect: omit loaded-flight provenance.")
+        result = self.run_case(actor_override=mutant, cargo_mode="no-flight")
+        self.assertTrue(result["report"]["physical_robot_delivery"])
+        self.assertNotIn("loaded", result["report"]["cargo"])
+        self.assertNotIn("flight", result["report"]["cargo"])
+        self.assertFalse(result["native_evidence"])
 
     def test_source_destination_and_two_readonly_cold_callbacks(self):
         for target in ("f210", "f200"):

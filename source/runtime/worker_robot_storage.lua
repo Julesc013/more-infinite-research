@@ -6,7 +6,7 @@ local KEY, MIR = "mir_worker_storage_route", "more-infinite-research"
 
 local function refuse(reason, route)
   error("MIR worker storage history: " .. reason .. "; restore the previous mod selection and original save"
-    .. " [MIR-WORKER-HISTORY technology=" .. tostring(route and route.technology or "default") .. "]", 3)
+    .. " [MIR-WORKER-HISTORY technology=" .. tostring(route and route.technology or "unobserved") .. "]", 3)
 end
 
 local function integer(value)
@@ -147,6 +147,7 @@ end
 
 local recovery = require("research.worker_storage_recovery")
 local caps = require("runtime.caps")
+local target = require("platform.target")
 local pending = false
 local owned_queue_force
 local selected_cap, selected_enabled = 0, true
@@ -158,9 +159,44 @@ local function clone(value)
   return out
 end
 
-local function recover_error(reason)
-  refuse(reason .. "; keep the protected original COPY. Before adding the provider, load a copy with the previous"
-    .. " mod selection and matching MIR settings, run /mir-worker-storage-recovery prepare, then save and exit")
+local function history_context(event, route, state, current)
+  local function value(item)
+    if type(item) == "string" then
+      return (item:sub(1, 96):gsub("[%z\1-\32\127-\255]", function(byte)
+        return string.format("\\x%02X", string.byte(byte))
+      end))
+    end
+    if type(item) == "number" or type(item) == "boolean" then return tostring(item) end
+    return "unknown"
+  end
+  local details = type(event) == "table" and event or {}
+  local changes = details.mod_changes
+  local mir = type(changes) == "table" and changes[MIR]
+  local previous = type(mir) == "table" and (mir.old_version or "absent")
+    or type(changes) == "table" and "unchanged" or "unknown"
+  local active = script and script.active_mods or {}
+  local saved = state == nil and "absent" or state.schema == 1 and "finite"
+    or state.kind == "prepared" and "prepared-" .. state.phase or state.current.kind
+  local parts = {"previous_mir=" .. value(previous),
+    "new_mir=" .. value(type(mir) == "table" and mir.new_version or active[MIR]),
+    "startup_changed=" .. value(details.mod_startup_settings_changed),
+    "saved_route=" .. value(saved),
+    "current_route=" .. value(current and current.kind or route and "finite" or "unobserved")}
+  for _, name in ipairs({"secretas", "planet-ferrum", "WorkerRobotCargoSizeResearch"}) do
+    local change = type(changes) == "table" and changes[name]
+    if type(change) == "table" then
+      parts[#parts + 1] = name .. "=" .. value(change.old_version) .. "->" .. value(change.new_version)
+    end
+  end
+  return " [" .. table.concat(parts, " ") .. "]"
+end
+
+local function recover_error(reason, route, event, state, current)
+  if event ~= nil then reason = reason .. history_context(event, route, state, current) end
+  refuse(reason .. "; keep the protected original COPY. Load a separate copy with the previous mod selection"
+    .. " and matching MIR settings. Only if that copy has MIR-owned default infinite worker4, run"
+    .. " /mir-worker-storage-recovery prepare, then save and exit. Other prior routes require their own"
+    .. " verified history; this command cannot infer it", route)
 end
 
 local function fields(value, allowed)
@@ -387,14 +423,33 @@ local function prepared_current(state, current)
   return frames
 end
 
--- Preserve an older, unchanged Secretas route without inventing a historical
--- marker. That special route had no schema1 writer in the published5.0.10.
+-- Published9/10 constructed the named Secretas9 route without its history.
+-- Published11 accepted unchanged10, but failed to persist that accepted fact.
+-- Only a proven unchanged route can be adopted; this recovers no clamped work.
 local function unchanged_unrecorded_secretas(event, route)
   if not route or route.technology ~= "worker-robots-storage-9" or #route.finite ~= 5
       or not script.active_mods.secretas then return false end
   local changes = event.mod_changes or {}
   local mir = changes[MIR]
-  if not mir or (mir.old_version ~= "5.0.21010" and mir.old_version ~= "5.0.20010") then return false end
+  if not mir then return false end
+  local old = mir.old_version
+  local published10 = old == "5.0.21010" or old == "5.0.20010"
+  if not published10 then
+    local active = script.active_mods
+    local f200 = old == "5.0.20009" or old == "5.0.20011"
+    local f210 = old == "5.0.21009" or old == "5.0.21011"
+    if not (f200 or f210) or route.owned ~= true or event.mod_startup_settings_changed ~= false
+        or mir.new_version ~= active[MIR] or type(mir.new_version) ~= "string"
+        or type(active.base) ~= "string"
+        or not (f200 and target.id == "f200" and mir.new_version:match("^5%.0%.200%d%d$") and active.base:match("^2%.0%.%d+$")
+          or f210 and target.id == "f210" and mir.new_version:match("^5%.0%.210%d%d$") and active.base:match("^2%.1%.%d+$")) then
+      return false
+    end
+    for name, change in pairs(changes) do
+      if name ~= MIR and (type(change) ~= "table" or change.old_version == nil
+          or change.old_version ~= change.new_version or change.new_version ~= active[name]) then return false end
+    end
+  end
   for name, change in pairs(changes) do
     if name ~= MIR and change.old_version ~= change.new_version then return false end
   end
@@ -413,16 +468,20 @@ function M.preflight(event, route)
       if current.kind == "finite" then next_state.phase = "provider" end
       return {recovery=true, state=next_state}
     end
-    if not same_fact(state.current, current) then recover_error("unprepared worker route changed") end
+    if not same_fact(state.current, current) then
+      recover_error("unprepared worker route changed", route, event, state, current)
+    end
     return {recovery=true, state=state, empty=empty_private()}
   end
   local plan
-  if state == nil and unchanged_unrecorded_secretas(event or {}, route) then plan = nil
+  if state == nil and unchanged_unrecorded_secretas(event or {}, route) then
+    checked({schema=1, route=route})
+    plan = {schema=1, route=copy(route)}
   else
     local ok, result = pcall(legacy_preflight, event, route)
     if not ok then
       if tostring(result):find("previous continuation ownership is unknown", 1, true) then
-        recover_error("previous continuation ownership is unknown; only an original MIR-default4 copy can use this preparation")
+        recover_error("previous continuation ownership is unknown", route, event, state)
       end
       error(result, 0)
     end

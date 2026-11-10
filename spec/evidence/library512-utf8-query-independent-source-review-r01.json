@@ -1,0 +1,135 @@
+{
+  "kind": "Library512UTF8QueryIndependentSourceReviewV1",
+  "reviewed_at_utc": "2026-11-09T20:35:09.485395+00:00",
+  "verdict": "GO for bounded integration and Root-owned D controls; no source defect found in valid UTF-8 and old-truncated-tail scope",
+  "reviewer": "Non-author read-only review; no children",
+  "candidate": {
+    "worktree": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01",
+    "base_head": "12f73d5df6b3a8446d230063d819fd454465c8e5",
+    "base_source": "b96a9ef05c0d54bee8b1a4ba6fc85493675a8aef",
+    "state_at_review": "Exactly two modified files; applied uncommitted proposal, not a final candidate commit/source-tree claim",
+    "files": [
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\source\\runtime\\library.lua",
+        "bytes": 152920,
+        "sha256": "369403A8D4612F757F00D497361818256740F1290AC65D114A297157DC4B5504"
+      },
+      {
+        "path": "D:\\Projects\\Factorio\\.task-builds\\mir512-query-utf8-polish-r01\\tests\\test_library.py",
+        "bytes": 289138,
+        "sha256": "B322E660A1389A5EE4012B19CC5150C3BCE8614CD898F86B94714B6F4FB6C2BB"
+      }
+    ]
+  },
+  "proposal_custody": {
+    "scratchpad_commit": "5def95e45e32900d9f248724295680bf87290250",
+    "index": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-utf8-query-integration-r01\\INDEX.json",
+      "bytes": 3850,
+      "sha256": "1F304EBD32EAABBC4E3CC5410487DA07A8C83BCA692089D908B318983EA1EC95"
+    },
+    "preferred_patch": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-utf8-query-integration-r01\\library-utf8-query-proposal-r03.patch",
+      "bytes": 6068,
+      "sha256": "336EA5F9465178FF06A845EE65BE21DE4339D7D6FE61DEA06608BAAD1E15FD10"
+    },
+    "all_17_INDEX_bodies_rehashed": true,
+    "applied_diff_hunk_bodies_exactly_match_original_r03": true,
+    "method": "Compared both unified hunk bodies while ignoring git headers and shifted context line numbers. Reversing only the new helper/text/preview edits recovers the complete exact12f runtime body."
+  },
+  "findings": [],
+  "defect_and_scope": {
+    "old_behavior": "text() returned byte1..160 for overlong inputs, which can end inside a valid multibyte character; old saved160-byte results were returned unchanged thereafter. Six retained byte observations prove invalid old suffixes C3/E795/F09F9A and exact valid proposed prefixes159/158/157 bytes.",
+    "fixed_behavior": "The one local helper clamps last to min(length,budget), finds the lead byte of the final codepoint, and removes that codepoint only if its expected end lies beyond last. text() always calls it, so old incomplete saved tails are repaired even when length is already160. ASCII remains a160-byte contract; no character-count reinterpretation or schema migration.",
+    "contract_limit": "Valid UTF-8 input or a prefix produced by the old byte truncator. This is deliberately not a validator for arbitrary malformed caller strings, interior corruption, overlong encodings or invalid codepoints."
+  },
+  "independent_boundary_reasoning": {
+    "argument": "For valid input, bytes128..191 are continuation bytes, and the nearest preceding non-continuation at or before last is the start of the final codepoint. Its valid lead class determines length1/2/3/4. If lead+size-1<=last, the codepoint is complete and the original prefix remains byte-exact; otherwise lead-1 is the longest complete prefix. The same argument covers an old prefix ending after any initial subset of that final character. Only up to3 continuation bytes are inspected in this contract.",
+    "edge_cases": [
+      {
+        "input": "empty string",
+        "last": 0,
+        "result": "lead0 returns empty before any string.byte comparison"
+      },
+      {
+        "input": "complete standalone é / 界 / 🚀 (2/3/4bytes)",
+        "result": "lead1 and expected end equals length; each is retained exactly"
+      },
+      {
+        "input": "158ASCII+é /157ASCII+界 /156ASCII+🚀",
+        "result": "each complete character ends exactly at byte160 and remains exact"
+      },
+      {
+        "input": "159ASCII+é /158ASCII+界 /157ASCII+🚀, with trailing valid text",
+        "result": "byte160 lies inside final codepoint; results are exact159/158/157-byte complete ASCII prefixes"
+      },
+      {
+        "input": "old saved prefixes ending C3 /E795 /F09F9A",
+        "result": "same incomplete suffix is removed although total length is160; a standalone incomplete suffix would yield empty"
+      },
+      {
+        "input": "161ASCII / repeated2/3/4-byte text",
+        "result": "ASCII retains160; repeated complete codepoints retain the largest complete prefix within160 (including40 complete4-byte characters)"
+      }
+    ],
+    "preview": "For valid shown strings longer than120, old next-byte backtracking and new lead/end check produce the same longest complete prefix within117, then append the same three ASCII dots. Effective setting values, profile input and export are untouched; the existing imported-profile preview/effective-value control is preserved."
+  },
+  "state_and_UI_review": [
+    "local_view already normalizes query and settings_query independently through text; legacy selected-tab search and explicit query/settings_search still follow the same routing. No schema or public API change.",
+    "GUI handlers/render preserve the current field text/caret context while storing a safe query; reopening renders the safe retained query. New checks retain root identity, detached caller options, query independence, queue/current/progress/gear no-write assertions.",
+    "Only one new test is appended. Existing tests/assertions are not removed or weakened. Its10 literal expected query pairs cover6 routes: GUI, legacy and already-truncated saved queries in Research/Settings.",
+    "Complete inverse runtime-body comparison proves Availability viewport/cleanup, native light glyphs, common geometry, event ownership, queues/gameplay and all other runtime paths are unchanged from12f. Git diff names only runtime/library.lua and test_library.py, so all German CFGs and every other source path are untouched."
+  ],
+  "retained_proof_readback": {
+    "original_source_head": "52f98a9fdd03f7056ab0cf99a890d107130f896e",
+    "original_source": "40a065c18b86437148acd60d7180666db7aaeb32",
+    "raw_bytes": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-utf8-query-integration-r01\\raw-byte-boundary-observations-r03.json",
+      "bytes": 2924,
+      "sha256": "C64891016FE46239569DCCFEB32E7CD669EE2D917D383D1762B573E73139B7AB"
+    },
+    "original_red": {
+      "file": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-utf8-query-integration-r01\\actual-source-red-r03.txt",
+        "bytes": 46182,
+        "sha256": "62BDEA0E2D99AE4AA8264ECEE88089930A5A277E3AADFE70022A3A0287BE06FA"
+      },
+      "actual": "One actual-runtime regression with30 failing subcases/errors,0failures;60total boundary-route subcases. This is host evidence, not native GUI failure."
+    },
+    "proposed_green": {
+      "file": {
+        "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-utf8-query-integration-r01\\proposed-full-library-green-r03.txt",
+        "bytes": 23243,
+        "sha256": "51A8A93E5B656B7A7CB290F1FF8BF34D5B0923227F80D97DA8F604290A29D2EC"
+      },
+      "actual": "121 actual isolated-Lua5.2 host controls PASS with proposal preloaded in memory on original52f/B source;6.523s. Not relabeled as D integration result."
+    },
+    "readback": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\library512-utf8-query-integration-r01\\proposal-final-readback-r03.json",
+      "bytes": 3214,
+      "sha256": "DBDBE2383DC5BA7B8994E5C61F2CF3754FD59E8CACF30283A3FA450C67BC8DFE"
+    },
+    "preserved_adverses": "Initialr01 stale-view-table errors excluded by author; r02 prevention-only alternative does not repair old saved tails. All originals remain fixed.",
+    "reviewer_ran_tests": false,
+    "D_controls": "Root-owned narrow controls and complete122 Library controls pending at this review; the additional Availability test already exists in D base."
+  },
+  "remaining_limits": [
+    "Commit/freeze D exact source and run its own affected host controls before C/D native or CI admission; original C packages/results retain original identities.",
+    "Native GUI/IME/caret interaction and actual saved-game acceptance are not established by byte or host proof. A screenshot alone would not establish typing behavior.",
+    "No general malformed-input policy, full UI/input/export/lifecycle/multiplayer/performance or stable verdict is granted."
+  ],
+  "operations": {
+    "source_test_docs_controller_edits": 0,
+    "host_tests": 0,
+    "builds": 0,
+    "native": 0,
+    "Compose": 0,
+    "CI": 0,
+    "health_before_output": {
+      "status": "attention (bounded scan)",
+      "checkpoint_required": false,
+      "free_mib": 85110
+    },
+    "only_new_output": "build/qualification/library512-utf8-query-independent-source-review-r01.json"
+  }
+}
