@@ -1,0 +1,13 @@
+{
+  "kind": "API512OriginalNativeEvidenceRemoteReadbackV1",
+  "status": "all-original-bodies-roundtrip-equal",
+  "repository": "Julesc013/scratchpad",
+  "ref": "refs/heads/evidence/mir511-incident-native-blackglass-r01",
+  "commit": "1a8fed832f4fb5de2a854eb46d305310fc0185a5",
+  "index": "evidence/api512-production-r01-originals/INDEX.json",
+  "index_sha256": "2DC2D19D5B11D88862DF6BDCE52387C6FAEBF03EFFBD97CCF5836FFBD4D08835",
+  "files": 263,
+  "bytes": 17722966,
+  "source_player": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+  "limits": "Private raw custody of the named two-engine API512 batch and original preparation/adverse identities. This receipt supplies no additional gameplay or stable verdict."
+}
