@@ -567,6 +567,86 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
           assert(not ok and tostring(message):find("not875",1,true)and game.surface_calls==0)
         ''')
 
+    def test_only_eight_scripted_carriers_are_separate_from_ordinary_work(self):
+        lua = self.controller()
+        lua.execute('''
+          begin()
+          local state=storage.mir5_known_base_addition
+          local names={
+            "mir-native-credit-research_plastic-plastic-bar-positive",
+            "mir-native-credit-research_plastic-plastic-bar-negative",
+            "mir-native-credit-research_plastic-mir-known-base-unpaid-plastic-bar-positive",
+            "mir-native-credit-research_plastic-mir-known-base-unpaid-plastic-bar-negative",
+            "mir-native-credit-research_low_density_structure-low-density-structure-positive",
+            "mir-native-credit-research_low_density_structure-low-density-structure-negative",
+            "mir-native-credit-research_low_density_structure-mir-known-base-unpaid-low-density-structure-positive",
+            "mir-native-credit-research_low_density_structure-mir-known-base-unpaid-low-density-structure-negative"}
+          local stock=state.labs[1].get_inventory(1).get_item_count("automation-science-pack")
+          for i,name in ipairs(names)do
+            callbacks[2]({research=foreign.technologies[name],by_script=true})
+            assert(#state.completions==0 and gear.level==1 and plastic.level==2)
+            assert(state.phase=="labs"and state.stocked==gear.name and state.finish_pending==nil)
+            assert(state.labs[1].disabled_by_script==false)
+            assert(state.labs[1].get_inventory(1).get_item_count("automation-science-pack")==stock)
+            local recorded=state.scripted_carrier_events[i]
+            assert(recorded.name==name and recorded.by_script==true and recorded.force==foreign.name and recorded.tick==game.tick)
+          end
+          finish_gear()
+          local observe=callbacks[2]
+          callbacks[2]=function(event)
+            -- Model the Source level setter's nested carrier notification
+            -- before the fixture receives the outer ordinary plastic event.
+            if event.research==plastic and event.by_script==false then
+              local before=#state.completions
+              local carrier=foreign.technologies[names[1]]
+              carrier.enabled=true -- native setter notification precedes Source re-disablement
+              observe({research=carrier,by_script=true})
+              assert(carrier.enabled==true,"observer wrote or required a settled flag inside the setter")
+              carrier.enabled=false -- Source resumes its own setter after the nested notification
+              assert(#state.completions==before)
+            end
+            observe(event)
+          end
+          finish_plastic();game.tick=14;callbacks[1]()
+          assert(#state.completions==2 and #state.scripted_carrier_events==9 and #game.saves==1)
+          assert(#markers[1].ordinary_completions==2 and #markers[1].scripted_carrier_events==9)
+          callbacks.load();callbacks[1]();callbacks.load();callbacks[1]()
+          assert(#markers==3 and #game.saves==1 and #state.scripted_carrier_events==9)
+          for _,marker in ipairs(markers)do
+            assert(#marker.scripted_carrier_events==9 and #marker.ordinary_completions==2)
+          end
+        ''')
+
+    def test_ordinary_carriers_scripted_mains_and_unknown_events_still_refuse(self):
+        for opponent in ("ordinary-carrier", "missing-carrier-flag", "scripted-gear", "scripted-plastic",
+                         "unknown-scripted", "unknown-ordinary", "other-family-carrier", "missing-main-flag"):
+            with self.subTest(opponent=opponent):
+                lua = self.controller()
+                lua.globals().opponent = opponent
+                lua.execute('''
+                  begin();local state=storage.mir5_known_base_addition
+                  local research,by_script=gear,true
+                  if opponent=="ordinary-carrier"or opponent=="missing-carrier-flag"then
+                    research=foreign.technologies["mir-native-credit-research_plastic-plastic-bar-positive"]
+                    if opponent=="ordinary-carrier"then by_script=false else by_script=nil end
+                  elseif opponent=="scripted-plastic"then research=plastic
+                  elseif opponent=="missing-main-flag"then by_script=nil
+                  elseif opponent=="unknown-scripted"or opponent=="unknown-ordinary"or opponent=="other-family-carrier"then
+                    research={force=foreign,name=opponent=="other-family-carrier"
+                      and "mir-native-credit-research_processing_unit-processing-unit-positive"
+                      or "mir-native-credit-research_plastic-unowned-positive"}
+                    by_script=opponent~="unknown-ordinary"
+                  end
+                  local ok,message=pcall(callbacks[2],{research=research,by_script=by_script})
+                  assert(not ok,"unexpected event was accepted")
+                  message=tostring(message)
+                  assert(message:find("name="..research.name,1,true))
+                  assert(message:find("by_script="..tostring(by_script),1,true))
+                  assert(message:find("force="..foreign.name,1,true))
+                  assert(#state.completions==0 and #state.scripted_carrier_events==0)
+                  assert(gear.level==1 and plastic.level==2 and #game.saves==0 and #markers==0)
+                ''')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)

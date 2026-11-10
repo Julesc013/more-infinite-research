@@ -10,6 +10,16 @@ local FAMILIES = {
   {"low_density_structure","low-density-structure"}, {"plastic","plastic-bar"},
   {"processing_unit","processing-unit"}, {"rocket_fuel","rocket-fuel"}, {"steel","steel-plate"},
 }
+local CREDIT_CARRIERS = {
+  ["mir-native-credit-research_plastic-plastic-bar-positive"]=true,
+  ["mir-native-credit-research_plastic-plastic-bar-negative"]=true,
+  ["mir-native-credit-research_plastic-mir-known-base-unpaid-plastic-bar-positive"]=true,
+  ["mir-native-credit-research_plastic-mir-known-base-unpaid-plastic-bar-negative"]=true,
+  ["mir-native-credit-research_low_density_structure-low-density-structure-positive"]=true,
+  ["mir-native-credit-research_low_density_structure-low-density-structure-negative"]=true,
+  ["mir-native-credit-research_low_density_structure-mir-known-base-unpaid-low-density-structure-positive"]=true,
+  ["mir-native-credit-research_low_density_structure-mir-known-base-unpaid-low-density-structure-negative"]=true,
+}
 local loaded, reported = false, false
 local function fail(message) error("[mir5-known-base-addition] " .. message) end
 local function copy(value)
@@ -158,6 +168,7 @@ end
 local function marker(stage,state)
   log("[MIR5_NATIVE_FIXTURE] RESULT "..helpers.table_to_json({case=CASE,stage=stage,status="passed",
     qualification="exact-protected-source-native-runtime-only",ordinary_completions=state.completions,
+    scripted_carrier_events=state.scripted_carrier_events,
     initial=state.initial,final=state.final,on_load_read_only=stage=="reload",
     apparatus=state.apparatus,science=state.science,supply_log=state.supply_log,final_stock=state.final_stock,
     startup=startup_snapshot(),mods=copy(script.active_mods),clock=game.speed,event=copy(state.event)}))
@@ -242,13 +253,20 @@ script.on_configuration_changed(function(event)
   if not state or state.phase~="await-configuration" then fail("unexpected configuration stage")end
   state.initial=entry(event)
   state.event={mod_startup_settings_changed=event.mod_startup_settings_changed,mod_changes=copy(event.mod_changes)}
-  state.completions={};state.phase="ready";state.deadline=game.tick+36000
+  state.completions={};state.scripted_carrier_events={};state.phase="ready";state.deadline=game.tick+36000
 end)
 script.on_event(defines.events.on_research_finished,function(event)
   local state=storage[KEY];local research=event.research
   if not state or state.phase~="labs" or research.force~=forces()[2]then return end
+  local details=" name="..research.name.." by_script="..tostring(event.by_script).." force="..research.force.name
+  if CREDIT_CARRIERS[research.name]then
+    if event.by_script~=true then fail("credit carrier completion was not scripted:"..details)end
+    state.scripted_carrier_events[#state.scripted_carrier_events+1]={
+      name=research.name,by_script=event.by_script,force=research.force.name,tick=game.tick}
+    return
+  end
   local expected=#state.completions==0 and GEAR or PLASTIC
-  if event.by_script==true or research.name~=expected then fail("completion was not the declared ordinary queue")end
+  if event.by_script~=false or research.name~=expected then fail("completion was not the declared ordinary queue:"..details)end
   if state.stocked~=research.name then fail("completion has no matching supply ledger")end
   state.science[research.name].consumed_at_event=consumed(state,research.name)
   for _,lab in ipairs(state.labs)do lab.disabled_by_script=true end
