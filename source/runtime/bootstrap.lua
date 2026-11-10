@@ -25,6 +25,11 @@ end
 local function worker_storage_route()
   return type(catalogue.worker_storage_route) == "function" and catalogue.worker_storage_route() or nil
 end
+local WORKER_DEFAULT_SPLIT = worker_robot_storage and type(catalogue.worker_default_split) == "function"
+  and catalogue.worker_default_split() or false
+local function worker_storage_mutating(event)
+  return worker_robot_storage and worker_robot_storage.default_owner_mutating(event) or false
+end
 local function finite_research_speed_provider()
   return type(catalogue.finite_research_speed_provider) == "function"
     and catalogue.finite_research_speed_provider() or nil
@@ -331,7 +336,10 @@ local function add_command()
 end
 
 local function on_init()
-  if worker_robot_storage then worker_robot_storage.on_init(worker_storage_route()) end
+  if worker_robot_storage then
+    worker_robot_storage.on_init(worker_storage_route())
+    worker_robot_storage.default_owner_on_init(worker_storage_route(), WORKER_DEFAULT_SPLIT)
+  end
   if finite_research_speed then finite_research_speed.on_init(finite_research_speed_provider()) end
   initialize_imersite()
   lifecycle.on_init()
@@ -365,6 +373,9 @@ local function on_configuration_changed(event)
   local mir = type(changes) == "table" and changes["more-infinite-research"]
   local secretas = type(changes) == "table" and changes.secretas
   local worker_storage_plan = worker_robot_storage and worker_robot_storage.preflight(event, worker_storage_route())
+  local worker_default_plan = worker_robot_storage
+    and worker_robot_storage.default_owner_preflight(event, worker_storage_route(), WORKER_DEFAULT_SPLIT)
+  local worker_default_caps = lifecycle.preflight_worker_storage_split_caps(worker_default_plan)
   if (target.id == "f200" or target.id == "f210") and type(secretas) == "table"
       and ((secretas.old_version ~= nil) ~= (secretas.new_version ~= nil))
       and (mir == nil or mir.old_version ~= nil)
@@ -396,7 +407,11 @@ local function on_configuration_changed(event)
   local module_credit_plan = legacy_module_credits and legacy_module_credits.preflight(event)
   local cannon_credit_plan = legacy_cannon_credits and legacy_cannon_credits.preflight(event)
   local gun_credit_plan = native_gun_credits and native_gun_credits.preflight(event)
-  if worker_robot_storage then worker_robot_storage.apply(worker_storage_plan) end
+  if worker_robot_storage then
+    worker_robot_storage.apply(worker_storage_plan)
+    worker_robot_storage.default_owner_apply(worker_default_plan)
+    lifecycle.apply_worker_storage_split_caps(worker_default_caps)
+  end
   if finite_research_speed then finite_research_speed.apply(finite_speed_plan) end
   reconcile_imersite()
   lifecycle.on_configuration_changed(event)
@@ -432,7 +447,10 @@ local function on_configuration_changed(event)
 end
 
 local function on_load()
-  if worker_robot_storage then worker_robot_storage.on_load(worker_storage_route()) end
+  if worker_robot_storage then
+    worker_robot_storage.on_load(worker_storage_route())
+    worker_robot_storage.default_owner_on_load(WORKER_DEFAULT_SPLIT)
+  end
   if finite_research_speed then finite_research_speed.on_load(finite_research_speed_provider()) end
   lifecycle.on_load()
   if native_credits then native_credits.on_load() end
@@ -532,11 +550,20 @@ end
 
 local function on_research_finished(event)
   if not (event and event.research) or event.research.valid == false then return end
-  if worker_robot_storage and worker_robot_storage.on_research_event(event, true) then reconcile_library_events() end
+  local worker_default_changed = false
+  if worker_robot_storage then
+    worker_default_changed = worker_robot_storage.default_owner_on_research_finished(event)
+    if worker_robot_storage.on_research_event(event, true) or worker_default_changed then reconcile_library_events() end
+  end
   if native_credits and native_credits.on_research_finished
       and native_credits.on_research_finished(event) then reconcile_library_events() end
   if native_gun_credits and native_gun_credits.on_research_finished(event) then reconcile_library_events() end
-  if lifecycle.caps_active() then lifecycle.on_research_finished(event) end
+  if lifecycle.caps_active() and not worker_storage_mutating(event) then
+    lifecycle.on_research_finished(event)
+    if worker_default_changed then
+      lifecycle.on_research_finished({research=event.research.force.technologies["mir-worker-storage-default-5"]})
+    end
+  end
   if competing_productivity then competing_productivity.on_research_finished(event) end
   if scripted_effects then scripted_effects.on_research_finished(event) end
   request_library_refresh(event)
@@ -544,14 +571,14 @@ end
 
 local function on_research_reversed(event)
   if not (event and event.research) or event.research.valid == false then return end
-  if lifecycle.caps_active() then lifecycle.on_research_reversed(event) end
+  if lifecycle.caps_active() and not worker_storage_mutating(event) then lifecycle.on_research_reversed(event) end
   if competing_productivity then competing_productivity.on_research_reversed(event) end
   if scripted_effects then scripted_effects.on_research_reversed(event) end
   request_library_refresh(event)
 end
 
 local function on_technology_effects_reset(event)
-  lifecycle.on_technology_effects_reset(event)
+  if not worker_storage_mutating(event) then lifecycle.on_technology_effects_reset(event) end
   if native_credits then native_credits.on_technology_effects_reset(event) end
   if competing_productivity then competing_productivity.on_technology_effects_reset(event) end
   if scripted_effects then scripted_effects.on_technology_effects_reset(event) end
@@ -564,7 +591,7 @@ end
 local function on_research_started(event)
   if not (event and event.research) or event.research.valid == false then return end
   if worker_robot_storage and worker_robot_storage.on_research_event(event) then reconcile_library_events() end
-  if lifecycle.caps_active() then lifecycle.on_research_started(event) end
+  if lifecycle.caps_active() and not worker_storage_mutating(event) then lifecycle.on_research_started(event) end
   if competing_productivity then competing_productivity.on_research_started(event) end
   request_library_refresh(event)
 end
@@ -574,7 +601,7 @@ local function on_research_cancelled(event)
   if native_credits and native_credits.on_research_cancelled
       and native_credits.on_research_cancelled(event) then reconcile_library_events() end
   if native_gun_credits and native_gun_credits.on_research_cancelled(event) then reconcile_library_events() end
-  if lifecycle.caps_active() then lifecycle.on_research_cancelled(event) end
+  if lifecycle.caps_active() and not worker_storage_mutating(event) then lifecycle.on_research_cancelled(event) end
   if competing_productivity then competing_productivity.on_research_cancelled(event) end
   request_library_refresh(event)
 end
@@ -584,7 +611,10 @@ local function on_tower_planted_seed(event)
 end
 
 local function on_force_created(event)
-  if worker_robot_storage then worker_robot_storage.on_force_created(event) end
+  if worker_robot_storage then
+    worker_robot_storage.on_force_created(event)
+    worker_robot_storage.default_owner_on_force_created(event)
+  end
   if event and event.force then initialize_imersite(event.force) end
   if native_credits then native_credits.on_force_created(event) end
   if native_gun_credits then native_gun_credits.on_force_created(event) end
@@ -598,7 +628,10 @@ local function on_force_created(event)
 end
 
 local function on_force_reset(event)
-  if worker_robot_storage then worker_robot_storage.on_force_reset(event) end
+  if worker_robot_storage then
+    worker_robot_storage.on_force_reset(event)
+    worker_robot_storage.default_owner_on_force_reset(event)
+  end
   if event and event.force then initialize_imersite(event.force) end
   if native_credits then native_credits.on_force_reset(event) end
   if native_gun_credits then native_gun_credits.on_force_reset(event) end
@@ -610,7 +643,15 @@ local function on_force_reset(event)
 end
 
 local function on_forces_merged(event)
-  if worker_robot_storage then worker_robot_storage.on_forces_merged(event) end
+  local worker_merge_unqualified = false
+  if worker_robot_storage then
+    worker_robot_storage.on_forces_merged(event)
+    local _, disposition = worker_robot_storage.default_owner_on_forces_merged(event)
+    worker_merge_unqualified = disposition == "unqualified-native-merge-frame"
+    if worker_merge_unqualified then
+      log("MIR worker storage: mixed native merge work retained without cap reconciliation; this draft case is unqualified")
+    end
+  end
   if native_credits then native_credits.on_forces_merged(event) end
   if native_gun_credits then native_gun_credits.on_forces_merged(event) end
   if imersite and event and event.destination then
@@ -622,7 +663,7 @@ local function on_forces_merged(event)
     initialize_imersite(event.destination)
     reconcile_imersite(event.destination)
   end
-  lifecycle.on_forces_merged(event)
+  if not worker_merge_unqualified then lifecycle.on_forces_merged(event) end
   if competing_productivity then competing_productivity.on_forces_merged(event) end
   if scripted_effects then scripted_effects.on_forces_merged(event) end
   if legacy_module_credits and event and event.destination then
@@ -639,7 +680,7 @@ local function on_research_queued(event)
   if not (event and event.research) or event.research.valid == false then return end
   if worker_robot_storage and worker_robot_storage.on_research_event(event) then reconcile_library_events() end
   if DISCOVERY_TREE then
-    if lifecycle.caps_active() then lifecycle.on_discovery_tree_queue_changed(event) end
+    if lifecycle.caps_active() and not worker_storage_mutating(event) then lifecycle.on_discovery_tree_queue_changed(event) end
     if competing_productivity and competing_productivity.active() then competing_productivity.on_discovery_tree_queue_changed(event) end
   end
   request_library_refresh(event)

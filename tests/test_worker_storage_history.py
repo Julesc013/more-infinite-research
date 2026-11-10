@@ -746,7 +746,579 @@ class WorkerStorageRecoveryTests(unittest.TestCase):
           assert(not pcall(history.preflight,{},provider_route(5)) and writes==0,"actual detached work was ignored")
         ''')
 
+class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
+    """Draft transfer only: native-level effects are independent host expectations."""
 
+    def world(self, target="f210"):
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        lua.globals().player_root = (Path(__file__).resolve().parents[1] / "source").as_posix()
+        lua.globals().package_family = target
+        lua.execute(r'''
+          package.path=player_root.."/?.lua;"..player_root.."/?/init.lua";package.cpath=""
+          local f200=package_family=="f200"
+          package.loaded["platform.target"]={id=package_family,minimum_base=f200 and "2.0.77" or "2.1.23",
+            distribution_version=f200 and "5.0.20012" or "5.0.21012"}
+        ''')
+        lua.execute(RECOVERY_WORLD)
+        lua.execute(r'''
+          local target=require("platform.target")
+          script.active_mods.base=target.minimum_base;script.active_mods["more-infinite-research"]=target.distribution_version
+          ORDINARY="mir-worker-storage-default-5";HEAD="mir-worker-storage-head-4";OWNER_KEY="mir_worker_storage_native_owner"
+          local function copy(t)if type(t)~="table"then return t end local o={}for k,v in pairs(t)do o[k]=copy(v)end return o end
+          prototypes.technology[ORDINARY]=copy(prototypes.technology[CANONICAL])
+          prototypes.technology[ORDINARY].name=ORDINARY;prototypes.technology[ORDINARY].level=5
+          prototypes.technology[ORDINARY].hidden=false;prototypes.technology[ORDINARY].visible_when_disabled=false
+          prototypes.technology[ORDINARY].prerequisites[HEAD]={name=HEAD}
+          prototypes.technology[HEAD]=copy(prototypes.technology[CANONICAL])
+          local gate=prototypes.technology[HEAD]
+          gate.name=HEAD;gate.max_level=4;gate.hidden=true;gate.enabled=false;gate.visible_when_disabled=false
+          gate.effects[1].modifier=0;gate.research_unit_count_formula=nil;gate.research_unit_count=1
+          gate.research_unit_energy=60;gate.prerequisites={}
+          creators[ORDINARY]="more-infinite-research";creators[HEAD]="more-infinite-research"
+          detached=make_force("detached",4);game.forces.detached=detached
+          queue_writes={}
+          for _,force in pairs(game.forces)do
+            force.technologies[HEAD]={name=HEAD,level=4,researched=false,enabled=false,visible_when_disabled=false,
+              saved_progress=0,prototype=prototypes.technology[HEAD],force=force,prerequisites={}}
+            local t={name=ORDINARY,level=5,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
+              force=force,prototype=prototypes.technology[ORDINARY],
+              prerequisites={foundation={researched=true},[HEAD]=force.technologies[HEAD]}}
+            local function earned()return (t.level-5+(t.researched and 1 or 0))*prototypes.technology[ORDINARY].effects[1].modifier end
+            force.technologies[ORDINARY]=setmetatable({}, {__index=function(_,key)
+              if key=="research_unit_count"then return math.floor(100*2^(t.level-4))end;return t[key]
+            end,__newindex=function(_,key,value)
+              writes=writes+1
+              if key=="level"then local old=earned();t.level=value;t.researched=false;t.enabled=true;t.saved_progress=0;force.bonus=force.bonus+earned()-old
+              elseif key=="researched"then local old=earned();t.researched=value;force.bonus=force.bonus+earned()-old
+              else t[key]=value end
+            end})
+            -- Independent native queue admission: an infinite prerequisite's
+            -- paid first level suffices; an incomplete finite range does not.
+            local mt=getmetatable(force);local write=mt.__newindex
+            mt.__newindex=function(object,key,value)
+              if key=="research_queue"then
+                queue_writes[force.index]=(queue_writes[force.index]or 0)+1
+                local admitted={}
+                for _,id in ipairs(value)do
+                  local candidate=force.technologies[type(id)=="string"and id or id.name];local valid=candidate and candidate.enabled
+                  for _,p in pairs(candidate and candidate.prerequisites or {})do
+                    local proto=p.prototype
+                    if not p.researched and not(proto and proto.max_level==4294967295 and p.level>proto.level)then valid=false end
+                  end
+                  if valid then admitted[#admitted+1]=id end
+                end
+                value=admitted
+              end
+              write(object,key,value)
+            end
+          end
+          function owner_event(old)
+            return {mod_startup_settings_changed=false,mod_changes={["more-infinite-research"]={old_version=old,new_version=target.distribution_version}}}
+          end
+          function seed_owner()
+            seed();detached.technologies[CANONICAL].level=6;detached.technologies[CANONICAL].saved_progress=.23
+            detached.research_queue={OTHER};detached.research_progress=.625
+            for _,force in pairs(game.forces)do force.bonus=force.bonus+17 end
+            writes=0;queue_writes={}
+          end
+          function frame(force)
+            local q={}for i,t in ipairs(force.research_queue)do q[i]=t.name end
+            local c,t=force.technologies[CANONICAL],force.technologies[ORDINARY]
+            return {sourcelevel=c.level,sourceresearched=c.researched,sourceenabled=c.enabled,sourcevisible=c.visible_when_disabled,
+              sourcesaved=c.saved_progress,targetlevel=t.level,targetresearched=t.researched,targetenabled=t.enabled,
+              targetvisible=t.visible_when_disabled,targetsaved=t.saved_progress,gateresearched=force.technologies[HEAD].researched,
+              current=force.current_research and force.current_research.name,
+              progress=force.research_progress,queue=q,bonus=force.worker_robots_storage_bonus,othersaved=force.technologies[OTHER].saved_progress}
+          end
+          function same(a,b)if type(a)~=type(b)then return false end;if type(a)~="table"then return a==b end
+            for k,v in pairs(a)do if not same(v,b[k])then return false end end;for k in pairs(b)do if a[k]==nil then return false end end;return true end
+          function all_frames()local out={}for _,force in pairs(game.forces)do out[force.index]=frame(force)end;return out end
+        ''')
+        return lua
+
+    def test_transfer_preserves_four_native_frames_bonus_and_legacy_marker(self):
+        lua = self.world()
+        lua.execute(r'''
+          seed_owner();local old={schema=2,kind="route",current={kind="default"}};storage.mir_worker_storage_route=old
+          local before=all_frames();local plan=history.plan_default_owner_transfer(owner_event("5.0.21011"),nil,false)
+          assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+          assert(history.apply_default_owner_transfer(plan));local state=storage[OWNER_KEY]
+          assert(state.schema==2 and state.kind=="split-default" and state.owner==ORDINARY and state.source==CANONICAL)
+          assert(storage.mir_worker_storage_route==old and state.progress==nil)
+          local levels={8,5,7,6};local bonuses={24,20,23,22}
+          for _,f in pairs(game.forces)do
+            local c,t=f.technologies[CANONICAL],f.technologies[ORDINARY]
+            assert(c.level==(f.index==2 and 4 or 5) and not c.researched and c.saved_progress==0)
+            assert(c.enabled==before[f.index].sourceenabled and c.visible_when_disabled==before[f.index].sourcevisible)
+            assert(t.level==levels[f.index] and not t.researched and f.worker_robots_storage_bonus==bonuses[f.index])
+            local record=state.forces[f.index];assert(record.phase==(f.index==2 and "head" or "tail"))
+            assert(record.retired_flags.enabled==before[f.index].sourceenabled)
+            assert(record.retired_flags.disabled_by_mir==false and record.retired_flags.visibility_hidden_by_mir==false)
+            assert(f.technologies[HEAD].researched==(f.index~=2) and record.progress==nil and record.level==nil)
+            assert(f.technologies[ID].level==4 and not f.technologies[ID].enabled)
+          end
+          assert(player.current_research.name==ORDINARY and player.research_progress==.375 and player.research_queue[2].name==OTHER)
+          assert(suspended.current_research.name==OTHER and suspended.research_progress==.42 and suspended.research_queue[2].name==ORDINARY)
+          assert(suspended.technologies[ORDINARY].saved_progress==.27)
+          assert(detached.current_research.name==OTHER and detached.research_progress==.625 and detached.technologies[ORDINARY].saved_progress==.23)
+          assert(not uninvested.technologies[ORDINARY].enabled and uninvested.research_progress==.125)
+          assert(queue_writes[1]==1 and queue_writes[3]==1 and queue_writes[2]==nil and queue_writes[4]==nil)
+          writes=0;assert(history.apply_default_owner_transfer(plan)==false and writes==0 and storage[OWNER_KEY]==state)
+          player.technologies[ORDINARY].level=9;local after=all_frames();writes=0
+          local again=history.plan_default_owner_transfer(owner_event("5.0.21011"),nil,false)
+          assert(history.apply_default_owner_transfer(again)==false and writes==0 and same(after,all_frames()))
+        ''')
+
+    def test_completed_true_and_foreign_disabled_flags_keep_exact_native_benefit(self):
+        lua = self.world()
+        lua.execute(r'''
+          player.technologies[CANONICAL].level=8;player.technologies[CANONICAL].researched=true
+          player.technologies[CANONICAL].enabled=false;player.technologies[CANONICAL].visible_when_disabled=true
+          writes=0;local p=history.plan_default_owner_transfer(owner_event("5.0.21010"),nil,false)
+          history.apply_default_owner_transfer(p)
+          assert(player.worker_robots_storage_bonus==8 and player.technologies[ORDINARY].level==9)
+          assert(not player.technologies[ORDINARY].researched and not player.technologies[ORDINARY].enabled)
+          assert(player.technologies[ORDINARY].visible_when_disabled)
+          local flags=storage[OWNER_KEY].forces[1].retired_flags
+          assert(flags.enabled==false and flags.disabled_by_mir==false and flags.visible and not flags.visibility_hidden_by_mir)
+        ''')
+
+    def test_configured_zero_and_two_unit_effects_conserve_independent_native_totals(self):
+        for reward in (0, 2):
+            with self.subTest(reward=reward):
+                lua=self.world();lua.globals().reward=reward
+                lua.execute(r'''
+                  prototypes.technology[CANONICAL].effects[1].modifier=reward
+                  prototypes.technology[ORDINARY].effects[1].modifier=reward
+                  seed_owner();local expected={20+4*reward,20,20+3*reward,20+2*reward}
+                  history.apply_default_owner_transfer(history.plan_default_owner_transfer(owner_event("5.0.21011"),nil,false))
+                  for _,f in pairs(game.forces)do assert(f.worker_robots_storage_bonus==expected[f.index])end
+                ''')
+
+    def test_empty_initialization_and_exact_old_nil_producers_both_sdk_families(self):
+        for target in ("f200", "f210"):
+            with self.subTest(target=target):
+                lua=self.world(target)
+                lua.execute(r'''
+                  local plan=history.plan_default_owner_transfer(nil,nil,true);assert(writes==0)
+                  assert(history.apply_default_owner_transfer(plan) and storage.mir_worker_storage_route==nil)
+                ''')
+            for patch in (9,10,11):
+                with self.subTest(target=target,patch=patch):
+                    lua=self.world(target)
+                    lua.globals().old_patch=patch
+                    lua.execute(r'''
+                      seed_owner();local old=string.format("5.0.%s%02d",package_family=="f200" and "200" or "210",old_patch)
+                      local plan=history.plan_default_owner_transfer(owner_event(old),nil,false)
+                      assert(writes==0);history.apply_default_owner_transfer(plan)
+                      assert(storage.mir_worker_storage_route==nil and player.technologies[ORDINARY].level==8)
+                    ''')
+
+    def test_recorded_default_has_its_own_authority_but_prepared_conversion_is_not_admitted(self):
+        lua=self.world()
+        lua.execute(r'''
+          seed_owner();script.active_mods.foreign="1"
+          storage.mir_worker_storage_route={schema=2,kind="route",current={kind="default"}}
+          assert(history.apply_default_owner_transfer(history.plan_default_owner_transfer({mod_startup_settings_changed=false,mod_changes={}},nil,false)))
+        ''')
+        lua=self.world()
+        lua.execute(r'''
+          seed_owner();history.prepare(nil);local before=all_frames();writes=0
+          assert(not pcall(history.plan_default_owner_transfer,owner_event("5.0.21011"),nil,false))
+          assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+        ''')
+
+    def test_all_force_contract_custody_policy_and_origin_opponents_are_no_write(self):
+        opponents=[
+            'creators[CANONICAL]="foreign"','creators[ORDINARY]="foreign"',
+            'prototypes.technology[CANONICAL].max_level=4','prototypes.technology[ORDINARY].effects[1].modifier=2',
+            'prototypes.technology[ORDINARY].research_unit_energy=3600',
+            'prototypes.technology[ORDINARY].research_unit_ingredients[1].amount=2',
+            'prototypes.technology[ORDINARY].research_unit_count_formula="200*2^(L-4)"',
+            'prototypes.technology[ORDINARY].ignore_tech_cost_multiplier=true',
+            'prototypes.technology[ORDINARY].effects[2]={type="worker-robot-storage",modifier=1,hidden=false}',
+            'prototypes.technology[ORDINARY].prerequisites={different={name="different"}}',
+            'suspended.technologies[ORDINARY].saved_progress=.1','detached.technologies[ORDINARY].level=6',
+            'uninvested.technologies[ORDINARY].enabled=false','event.mod_startup_settings_changed=true',
+            'event.mod_changes["more-infinite-research"].old_version="5.0.21008"',
+            'event.mod_changes["more-infinite-research"].old_version="5.0.20011"',
+            'event.mod_changes["more-infinite-research"].new_version="5.0.21013"',
+            'event.mod_changes.foreign={old_version="1",new_version="2"}',
+            'script.active_mods.foreign="1"','prototypes.technology["worker-robots-storage-5"]={}',
+            'route=provider_route(5)', 'suspended.technologies[CANONICAL].saved_progress=1',
+            'creators[HEAD]="foreign"', 'prototypes.technology[HEAD].effects[1].modifier=1',
+            'prototypes.technology[HEAD].research_unit_count=2', 'prototypes.technology[HEAD].research_unit_energy=1',
+            'prototypes.technology[HEAD].research_unit_ingredients[1].name="wrong-pack"',
+            'prototypes.technology[ORDINARY].prerequisites[HEAD]=nil', 'suspended.technologies[HEAD].researched=true'
+        ]
+        for opponent in opponents:
+            with self.subTest(opponent=opponent):
+                lua=self.world();lua.execute('seed_owner();event=owner_event("5.0.21011");route=nil;'+opponent+r'''
+                  local before=all_frames();writes=0
+                  assert(not pcall(history.plan_default_owner_transfer,event,route,false),"opponent admitted")
+                  assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+                ''')
+
+    def test_initial_investment_stale_plan_and_malformed_owner_record_refuse(self):
+        lua=self.world();lua.execute(r'''
+          player.technologies[CANONICAL].saved_progress=.1;writes=0
+          assert(not pcall(history.plan_default_owner_transfer,nil,nil,true) and writes==0)
+        ''')
+        lua=self.world();lua.execute(r'''
+          seed_owner();local plan=history.plan_default_owner_transfer(owner_event("5.0.21011"),nil,false)
+          suspended.technologies[CANONICAL].saved_progress=.28;local before=all_frames();writes=0
+          assert(not pcall(history.apply_default_owner_transfer,plan) and writes==0 and same(before,all_frames()))
+        ''')
+        for opponent in ('schema=3','owner="worker-robots-storage-4"','unexpected=true'):
+            lua=self.world();lua.execute('storage[OWNER_KEY]={'+opponent+r'''};writes=0
+              assert(not pcall(history.plan_default_owner_transfer,owner_event("5.0.21011"),nil,false) and writes==0)
+            ''')
+
+    def test_multiple_queue_entries_and_unrelated_saved_work_are_transferred_exactly(self):
+        lua=self.world();lua.execute(r'''
+          seed_owner();player.research_queue={CANONICAL,CANONICAL,OTHER};player.research_progress=.375
+          player.technologies[OTHER].saved_progress=.19;writes=0;history.configure(9,true)
+          history.apply_default_owner_transfer(history.plan_default_owner_transfer(owner_event("5.0.21011"),nil,false))
+          assert(#player.research_queue==3 and player.research_queue[1].name==ORDINARY
+            and player.research_queue[2].name==ORDINARY and player.research_queue[3].name==OTHER)
+          assert(player.research_progress==.375 and player.technologies[OTHER].saved_progress==.19)
+          assert(player.worker_robots_storage_bonus==24 and player.technologies[ORDINARY].level==8)
+        ''')
+
+    def test_real_owner_record_opponents_do_not_grant_retirement_or_rewrite_native_work(self):
+        for opponent in (
+                'state.producer.old_version="5.0.21008"', 'state.producer.new_version="unproved"',
+                'state.forces[2].retired_flags.disabled_by_mir=true', 'state.forces[99]=state.forces[1]',
+                'state.contract="changed"', 'player.technologies[CANONICAL].saved_progress=.1'):
+            with self.subTest(opponent=opponent):
+                lua=self.world();lua.execute(r'''
+                  seed_owner();history.apply_default_owner_transfer(history.plan_default_owner_transfer(owner_event("5.0.21011"),nil,false))
+                  state=storage[OWNER_KEY]
+                '''+opponent+r'''
+                  local before=all_frames();writes=0
+                  assert(not pcall(history.plan_default_owner_transfer,owner_event("5.0.21011"),nil,false))
+                  assert(writes==0 and storage[OWNER_KEY]==state and same(before,all_frames()))
+                ''')
+
+    def test_level_setter_transient_disable_creates_no_worker_head_cap_right(self):
+        lua=self.world();lua.execute(r'''
+          seed_owner();local canonical=player.technologies[CANONICAL]
+          local mt=getmetatable(canonical);local write=mt.__newindex
+          mt.__newindex=function(object,key,value)
+            write(object,key,value)
+            if key=="level" and value==5 then write(object,"enabled",false)end
+          end
+          history.apply_default_owner_transfer(history.plan_default_owner_transfer(owner_event("5.0.21011"),nil,false))
+          local state=storage[OWNER_KEY];local flags=state.forces[1].retired_flags
+          assert(flags.enabled and flags.disabled_by_mir==false and canonical.enabled)
+          writes=0;assert(history.apply_default_owner_transfer(history.plan_default_owner_transfer({},nil,false))==false and writes==0)
+        ''')
+
+    def test_unpaid_head_current_queued_detached_and_flags_remain_native_for_zero_and_two(self):
+        for reward in (0, 2):
+            with self.subTest(reward=reward):
+                lua=self.world();lua.globals().reward=reward
+                lua.execute(r'''
+                  prototypes.technology[CANONICAL].effects[1].modifier=reward
+                  prototypes.technology[ORDINARY].effects[1].modifier=reward
+                  seed_owner()
+                  player.technologies[CANONICAL].level=4;player.technologies[CANONICAL].visible_when_disabled=true
+                  suspended.technologies[CANONICAL].level=4;suspended.technologies[CANONICAL].saved_progress=.27
+                  detached.technologies[CANONICAL].level=4;detached.technologies[CANONICAL].saved_progress=.23
+                  local before=all_frames();writes=0;queue_writes={};history.configure(4,true)
+                  history.apply_default_owner_transfer(history.plan_default_owner_transfer(owner_event("5.0.21011"),nil,false))
+                  for _,f in pairs(game.forces)do
+                    local actual,old=frame(f),before[f.index];local record=storage[OWNER_KEY].forces[f.index]
+                    assert(record.phase=="head" and not record.retired_flags.disabled_by_mir and not record.retired_flags.visibility_hidden_by_mir)
+                    for _,key in ipairs{"sourcelevel","sourceresearched","sourceenabled","sourcevisible","sourcesaved","current","progress","queue","bonus","othersaved"}do
+                      assert(same(actual[key],old[key]),key)
+                    end
+                    assert(actual.bonus==20 and actual.targetlevel==5 and not actual.targetenabled and not actual.targetresearched)
+                    assert(not actual.gateresearched and queue_writes[f.index]==nil)
+                  end
+                  assert(player.current_research.name==CANONICAL and player.research_progress==.375)
+                  assert(suspended.research_queue[2].name==CANONICAL and suspended.technologies[CANONICAL].saved_progress==.27)
+                  -- The eventual head completion is intentionally a later
+                  -- wiring obligation, not an on_tick snapshot conversion.
+                  player.technologies[CANONICAL].researched=true;writes=0
+                  assert(not pcall(history.plan_default_owner_transfer,{},nil,false) and writes==0)
+                ''')
+
+    def test_earned_public_first_level_keeps_foreign_prerequisite_and_exact_queue(self):
+        for reward in (0, 2):
+            with self.subTest(reward=reward):
+                lua=self.world();lua.globals().reward=reward
+                lua.execute(r'''
+                  prototypes.technology[CANONICAL].effects[1].modifier=reward
+                  prototypes.technology[ORDINARY].effects[1].modifier=reward
+                  seed_owner();player.technologies[OTHER].prerequisites={[CANONICAL]=player.technologies[CANONICAL]}
+                  player.research_queue={CANONICAL,OTHER};player.research_progress=.375;writes=0;queue_writes={}
+                  history.apply_default_owner_transfer(history.plan_default_owner_transfer(owner_event("5.0.21011"),nil,false))
+                  local head,tail=player.technologies[CANONICAL],player.technologies[ORDINARY]
+                  assert(head.level==5 and not head.researched and head.level>head.prototype.level)
+                  assert(tail.level==8 and not tail.researched and player.technologies[HEAD].researched)
+                  assert(player.worker_robots_storage_bonus==20+reward+3*reward)
+                  assert(#player.research_queue==2 and player.current_research.name==ORDINARY and player.research_queue[2].name==OTHER)
+                  assert(player.research_progress==.375 and queue_writes[1]==1)
+                ''')
+        lua=self.world();lua.execute(r'''
+          seed_owner();player.technologies[OTHER].prerequisites={finite={researched=false,level=5,prototype={level=4,max_level=8}}}
+          local before=all_frames();writes=0
+          assert(not pcall(history.plan_default_owner_transfer,owner_event("5.0.21011"),nil,false))
+          assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+        ''')
+
+    def test_old_reset_to_unpaid_public_four_loses_native_capacity_and_cannot_commit(self):
+        lua=self.world()
+        source=(Path(__file__).resolve().parents[1]/"source/runtime/worker_robot_storage.lua").read_text()
+        literal="if frame.next_level ~= 5 or frame.researched then canonical.level = 5 end"
+        self.assertEqual(source.count(literal),1)
+        lua.globals().mutant_runtime=source.replace(literal,"canonical.level = 4 -- injected prior reset defect",1)
+        lua.execute(r'''
+          history=assert(load(mutant_runtime))();seed_owner()
+          local plan=history.plan_default_owner_transfer(owner_event("5.0.21011"),nil,false)
+          local ok,err=pcall(history.apply_default_owner_transfer,plan)
+          assert(not ok and tostring(err):find("native default split did not preserve",1,true))
+          assert(player.worker_robots_storage_bonus==23 and storage[OWNER_KEY]==nil)
+        ''')
+
+class WorkerDefaultNativeLifecycleTests(unittest.TestCase):
+    def world(self, target="f210"):
+        lua=WorkerDefaultNativeOwnerTransferTests.world(self,target)
+        lua.execute(r'''
+          local gaps={}
+          for _,force in pairs(game.forces)do
+            local index=force.index
+            local mt=getmetatable(force);local read,write=mt.__index,mt.__newindex
+            mt.__index=function(object,key)
+              if gaps[index]and key=="current_research"then return nil end
+              if gaps[index]and key=="research_progress"then return 0 end
+              return read(object,key)
+            end
+            mt.__newindex=function(object,key,value)
+              if key=="research_queue"and gaps[index]then
+                local saved={}for _,entry in ipairs(read(object,"research_queue"))do saved[entry.name]=entry.saved_progress end
+                write(object,key,{})
+                for name,progress in pairs(saved)do force.technologies[name].saved_progress=progress end
+                gaps[index]=nil
+              end
+              write(object,key,value)
+            end
+          end
+          function init_default()
+            history.on_init(nil);assert(history.default_owner_on_init(nil,true))
+            writes=0;queue_writes={}
+          end
+          function finish_frame(force,representation,remainder,gap)
+            local head=force.technologies[CANONICAL]
+            force.research_progress=0;head.saved_progress=0
+            if representation=="completed"then head.researched=true else head.level=5 end
+            force.research_queue=remainder;force.research_progress=0
+            if gap then gaps[force.index]=true end
+            writes=0;queue_writes={}
+          end
+          function finish_event(force)return {research=force.technologies[CANONICAL],by_script=false,tick=100}end
+          function new_head_force(name,index)
+            local f=make_force(name,index)
+            f.technologies[HEAD]={name=HEAD,level=4,researched=false,enabled=false,visible_when_disabled=false,saved_progress=0,
+              research_unit_count=1,prototype=prototypes.technology[HEAD],force=f,prerequisites={}}
+            f.technologies[ORDINARY]={name=ORDINARY,level=5,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
+              research_unit_count=200,prototype=prototypes.technology[ORDINARY],force=f,
+              prerequisites={foundation={researched=true},[HEAD]=f.technologies[HEAD]}}
+            game.forces[name]=f;return f
+          end
+        ''')
+        return lua
+
+    def test_existing_init_order_no_split_noop_and_unsupported_owned_routes(self):
+        lua=self.world();lua.execute(r'''
+          init_default();assert(storage.mir_worker_storage_route.current.kind=="default")
+          assert(history.needs_research_events())
+          local state=storage[OWNER_KEY];local before=all_frames();writes=0
+          assert(not pcall(history.default_owner_preflight,{mod_startup_settings_changed=false,mod_changes={}},nil,false))
+          assert(not pcall(history.default_owner_preflight,{},provider_route(5),true))
+          assert(writes==0 and storage[OWNER_KEY]==state and same(before,all_frames()))
+        ''')
+        lua=self.world();lua.execute(r'''
+          game=nil;prototypes=nil
+          assert(history.default_owner_preflight({},nil,false)==nil)
+          assert(history.default_owner_preflight({},provider_route(5),true)==nil)
+          assert(history.default_owner_apply(nil)==false and history.default_owner_on_init(nil,false)==false)
+        ''')
+
+    def test_first_finish_nil_current_remainder_preserves_all_repeats_both_representations_and_families(self):
+        for target in ("f200","f210"):
+            for representation in ("completed","advanced"):
+                with self.subTest(target=target,representation=representation):
+                    lua=self.world(target);lua.globals().representation=representation
+                    lua.execute(r'''
+                      init_default();player.research_queue={CANONICAL,CANONICAL,CANONICAL,OTHER};player.research_progress=.375
+                      suspended.technologies[CANONICAL].saved_progress=.27;suspended.research_queue={OTHER,CANONICAL};suspended.research_progress=.42
+                      local untouched=frame(suspended)
+                      finish_frame(player,representation,{CANONICAL,CANONICAL,OTHER},true)
+                      assert(player.current_research==nil and player.research_progress==0)
+                      assert(history.default_owner_on_research_finished(finish_event(player)))
+                      assert(player.technologies[CANONICAL].level==5 and not player.technologies[CANONICAL].researched)
+                      assert(player.technologies[HEAD].researched and player.technologies[ORDINARY].level==5)
+                      assert(player.worker_robots_storage_bonus==4 and player.current_research.name==ORDINARY and player.research_progress==0)
+                      assert(#player.research_queue==3 and player.research_queue[2].name==ORDINARY and player.research_queue[3].name==OTHER)
+                      assert(same(untouched,frame(suspended)) and storage[OWNER_KEY].forces[1].phase=="tail")
+                    ''')
+
+    def test_finished_remainder_activates_saved_foreign_work_once_without_inventing_current(self):
+        lua=self.world();lua.execute(r'''
+          init_default();player.research_queue={CANONICAL,OTHER,CANONICAL};player.research_progress=.375
+          finish_frame(player,"completed",{OTHER,CANONICAL},true)
+          player.technologies[OTHER].saved_progress=.19
+          assert(player.current_research==nil and player.research_progress==0)
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          assert(player.current_research.name==OTHER and player.research_progress==.19 and player.technologies[OTHER].saved_progress==0)
+          assert(player.research_queue[2].name==ORDINARY and player.technologies[ORDINARY].saved_progress==0)
+          assert(player.worker_robots_storage_bonus==4)
+        ''')
+
+    def test_completed_still_current_progress_one_refuses_before_any_setter(self):
+        lua=self.world();lua.execute(r'''
+          init_default();player.research_queue={CANONICAL,CANONICAL};player.research_progress=1
+          player.technologies[CANONICAL].researched=true;local before=all_frames();local state=storage[OWNER_KEY];writes=0
+          assert(not pcall(history.default_owner_on_research_finished,finish_event(player)))
+          assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==state and not player.technologies[HEAD].researched)
+        ''')
+
+    def test_readonly_load_reconnects_heads_and_rejects_malformed_records_without_game(self):
+        lua=self.world();lua.execute(r'''
+          init_default();local state=storage[OWNER_KEY];local oldgame,oldprototypes=game,prototypes
+          game=setmetatable({},{__index=function()error("game read during load")end})
+          prototypes=setmetatable({},{__index=function()error("prototype read during load")end});writes=0
+          for i=1,2 do history.on_load();history.default_owner_on_load(true);assert(storage[OWNER_KEY]==state and history.needs_research_events())end
+          assert(writes==0);state.forces[1].unexpected=true
+          assert(not pcall(history.default_owner_on_load,true) and writes==0)
+          game,prototypes=oldgame,oldprototypes
+        ''')
+
+    def test_ordinary_setting_contract_updates_and_standard_capped_head_visibility_are_not_frozen(self):
+        lua=self.world();lua.execute(r'''
+          init_default();finish_frame(player,"advanced",{},false);history.default_owner_on_research_finished(finish_event(player))
+          local head=player.technologies[CANONICAL];head.enabled=false;head.visible_when_disabled=true
+          local state=storage[OWNER_KEY];local before=all_frames();local oldcontract=state.contract
+          prototypes.technology[CANONICAL].research_unit_energy=3600;prototypes.technology[ORDINARY].research_unit_energy=3600
+          prototypes.technology[CANONICAL].enabled=false;prototypes.technology[ORDINARY].enabled=false
+          history.configure(0,false);writes=0
+          local plan=history.default_owner_preflight({mod_startup_settings_changed=true,mod_changes={}},nil,true)
+          assert(plan.items and plan.already_owned and writes==0)
+          assert(history.default_owner_apply(plan) and writes==0 and same(before,all_frames()))
+          assert(storage[OWNER_KEY].contract~=oldcontract and storage[OWNER_KEY].forces[1].phase=="tail")
+          assert(not head.enabled and head.visible_when_disabled)
+        ''')
+
+    def test_manual_legacy_prepare_is_blocked_before_writes_on_native_owner(self):
+        lua=self.world();lua.execute(r'''
+          init_default();local before=all_frames();local state=storage[OWNER_KEY];writes=0
+          assert(not pcall(history.prepare,nil) and writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==state)
+        ''')
+
+    def test_mutating_guard_is_same_force_skips_nested_worker_and_restores_after_error(self):
+        for fail in (False,True):
+            with self.subTest(fail=fail):
+                lua=self.world();lua.globals().fail=fail
+                lua.execute(r'''
+                  init_default();player.technologies[CANONICAL].level=6;player.research_queue={CANONICAL};player.research_progress=0
+                  local t=player.technologies[ORDINARY];local mt=getmetatable(t);local write=mt.__newindex
+                  local checks=0
+                  mt.__newindex=function(object,key,value)
+                    if key=="level"then
+                      assert(history.default_owner_mutating{research={force=player}})
+                      assert(not history.default_owner_mutating{force=uninvested})
+                      assert(history.default_owner_on_research_finished(finish_event(player))==false);checks=checks+1
+                      if fail then error("injected native setter failure")end
+                    end
+                    write(object,key,value)
+                  end
+                  local ok,err=pcall(history.default_owner_on_research_finished,finish_event(player))
+                  assert(checks==1 and not history.default_owner_mutating{force=player})
+                  if fail then assert(not ok and tostring(err):find("injected native setter failure",1,true))
+                  else assert(ok and player.worker_robots_storage_bonus==5 and t.level==6)end
+                ''')
+
+    def test_force_creation_and_native_reset_never_restore_cached_earned_levels(self):
+        lua=self.world();lua.execute(r'''
+          init_default();local fresh=new_head_force("new",5);writes=0
+          history.on_force_created{force=fresh};assert(history.default_owner_on_force_created{force=fresh})
+          assert(storage[OWNER_KEY].forces[5].phase=="head" and not fresh.technologies[ORDINARY].enabled)
+          finish_frame(player,"advanced",{},false);history.default_owner_on_research_finished(finish_event(player))
+          player.technologies[ORDINARY].level=7;assert(player.worker_robots_storage_bonus==6)
+          player.research_queue={};player.technologies[CANONICAL].level=4;player.technologies[ORDINARY].level=5
+          player.technologies[HEAD].researched=false
+          history.on_force_reset{force=player};writes=0
+          assert(history.default_owner_on_force_reset{force=player})
+          assert(storage[OWNER_KEY].forces[1].phase=="head" and player.worker_robots_storage_bonus==3)
+          assert(player.technologies[CANONICAL].level==4 and player.technologies[ORDINARY].level==5)
+        ''')
+
+    def test_native_merge_updates_metadata_only_and_marks_unknown_mixed_pending_shape_unqualified(self):
+        lua=self.world();lua.execute(r'''
+          init_default();finish_frame(player,"advanced",{},false);history.default_owner_on_research_finished(finish_event(player))
+          game.forces.uninvested=nil;local before=all_frames();writes=0
+          local ok,kind=history.default_owner_on_forces_merged{source_index=2,destination=player}
+          assert(ok and kind=="native-merge-metadata-only" and writes==0 and same(before,all_frames()))
+          assert(storage[OWNER_KEY].forces[2]==nil and storage[OWNER_KEY].forces[1].phase=="tail")
+          game.forces.detached=nil;before=all_frames();writes=0
+          assert(history.default_owner_on_forces_merged{source_index=4,destination=suspended})
+          assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY].forces[3].phase=="head")
+        ''')
+        lua=self.world();lua.execute(r'''
+          init_default();finish_frame(player,"advanced",{},false);history.default_owner_on_research_finished(finish_event(player))
+          player.technologies[ORDINARY].level=8;player.research_queue={CANONICAL};player.research_progress=.2
+          game.forces.uninvested=nil;local before=all_frames();local state=storage[OWNER_KEY];writes=0
+          local ok,kind=history.default_owner_on_forces_merged{source_index=2,destination=player}
+          assert(not ok and kind=="unqualified-native-merge-frame" and writes==0)
+          assert(same(before,all_frames()) and storage[OWNER_KEY]==state)
+        ''')
+
+    def test_legal_unpaid_head_duplicate_queue_cap_four_preserves_work_before_policy(self):
+        lua=self.world();lua.execute(r'''
+          history.on_init(nil);player.research_queue={CANONICAL,CANONICAL,OTHER};player.research_progress=.37
+          player.technologies[OTHER].saved_progress=.19;history.configure(4,true)
+          local before=frame(player);writes=0;queue_writes={}
+          local plan=history.default_owner_preflight(owner_event("5.0.21011"),nil,true)
+          assert(writes==0);history.default_owner_apply(plan)
+          assert(player.current_research.name==CANONICAL and player.research_progress==.37)
+          assert(#player.research_queue==3 and player.research_queue[2].name==CANONICAL and queue_writes[1]==nil)
+          assert(player.technologies[OTHER].saved_progress==.19 and storage[OWNER_KEY].forces[1].phase=="head")
+          local caps=require("runtime.caps");local rights={}
+          caps.reconcile(player,{[CANONICAL]=4},rights)
+          assert(player.research_progress==.37 and #player.research_queue==2)
+          assert(player.research_queue[1].name==CANONICAL and player.research_queue[2].name==OTHER)
+          finish_frame(player,"advanced",{OTHER},true)
+          player.technologies[OTHER].saved_progress=.19
+          assert(history.default_owner_on_research_finished(finish_event(player)))
+          caps.reconcile(player,{[CANONICAL]=4,[ORDINARY]=4},rights)
+          assert(player.technologies[CANONICAL].level==5 and player.worker_robots_storage_bonus==4)
+          assert(player.technologies[ORDINARY].level==5 and not player.technologies[ORDINARY].researched)
+          assert(not player.technologies[ORDINARY].enabled and player.current_research.name==OTHER)
+          assert(#player.research_queue==1 and player.research_progress==.19)
+        ''')
+
+    def test_recorded_default_overcap_disabled_detached_work_survives_settings_change(self):
+        lua=self.world();lua.execute(r'''
+          history.on_init(nil);seed_owner();player.research_queue={OTHER};player.research_progress=.42
+          player.technologies[CANONICAL].saved_progress=.27;player.technologies[CANONICAL].enabled=false
+          history.configure(7,false);local event=owner_event("5.0.21011");event.mod_startup_settings_changed=true
+          local before=all_frames();local marker=storage.mir_worker_storage_route;writes=0;queue_writes={}
+          local plan=history.default_owner_preflight(event,nil,true);assert(writes==0)
+          history.default_owner_apply(plan)
+          assert(player.technologies[ORDINARY].level==8 and not player.technologies[ORDINARY].enabled)
+          assert(player.technologies[ORDINARY].saved_progress==.27 and player.worker_robots_storage_bonus==24)
+          assert(player.current_research.name==OTHER and player.research_progress==.42 and queue_writes[1]==nil)
+          assert(storage.mir_worker_storage_route==marker)
+        ''')
+        lua=self.world();lua.execute(r'''
+          history.on_init(nil);seed_owner();player.technologies[CANONICAL].enabled=false
+          local event=owner_event("5.0.21011");event.mod_startup_settings_changed=true
+          local before=all_frames();writes=0
+          assert(not pcall(history.default_owner_preflight,event,nil,true))
+          assert(writes==0 and same(before,all_frames()) and storage[OWNER_KEY]==nil)
+        ''')
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--lua-runtime-dir", type=Path, required=True)

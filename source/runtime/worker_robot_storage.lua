@@ -149,6 +149,8 @@ local recovery = require("research.worker_storage_recovery")
 local caps = require("runtime.caps")
 local target = require("platform.target")
 local pending = false
+local default_head_pending = false
+local default_mutating_force
 local owned_queue_force
 local selected_cap, selected_enabled = 0, true
 
@@ -320,14 +322,16 @@ local function snapshot(force, id, finished_context)
   -- A finished callback can follow removal of its head but precede starting
   -- the queued remainder. Keep that observed nil current and zero progress;
   -- do not promote queued saved work into current research inside the event.
-  local waiting_after_finish = finished_context == true and current == nil and queue[1] ~= nil
+  local default_finished = finished_context == "default-head-finished"
+  local waiting_after_finish = (finished_context == true or default_finished) and current == nil and queue[1] ~= nil
     and force.research_progress == 0
   if (current ~= queue[1] and not waiting_after_finish) or not progress(force.research_progress) then
     recover_error("inconsistent native current/queue frame")
   end
   local next_level = technology.level + (technology.researched and 1 or 0)
   if next_level >= 4294967295 then recover_error("worker level has no preservable continuation") end
-  if technology.researched and (occurrences > 0 or technology.saved_progress > 0) then
+  if technology.researched and (occurrences > 0 or technology.saved_progress > 0)
+      and not (default_finished and waiting_after_finish and technology.saved_progress == 0) then
     recover_error("completed worker row has ambiguous unfinished work")
   end
   return {technology=technology, next_level=next_level, researched=technology.researched,
@@ -338,12 +342,18 @@ local function snapshot(force, id, finished_context)
     allowance=math.max(occurrences, (technology.saved_progress > 0 or current == id and force.research_progress > 0) and 1 or 0)}
 end
 
-local function requeueable(force, frame, moved)
+local function requeueable(force, frame, moved, infinite_first)
   for _, name in ipairs(frame.queue) do
     local technology = force.technologies[name]
     if technology.enabled ~= true then recover_error("queued disabled research cannot be safely reassigned: " .. name) end
     for _, prerequisite in pairs(technology.prerequisites or {}) do
-      if prerequisite.researched ~= true then recover_error("queued research has an unmet prerequisite: " .. name) end
+      local prototype = infinite_first and prerequisite.prototype
+      local earned_infinite_first = prototype and prototype.max_level == 4294967295
+        and integer(prototype.level) and integer(prerequisite.level) and prerequisite.level > prototype.level
+        and prerequisite.researched == false
+      if prerequisite.researched ~= true and not earned_infinite_first then
+        recover_error("queued research has an unmet prerequisite: " .. name)
+      end
     end
   end
   if moved and frame.occurrences > 0 and not frame.enabled then recover_error("disabled worker queue cannot be transferred") end
@@ -518,7 +528,7 @@ function M.on_load()
 end
 
 function M.plan_prepared(plan) return plan and plan.recovery and plan.state and plan.state.kind == "prepared" or false end
-function M.needs_research_events() return pending end
+function M.needs_research_events() return pending or default_head_pending end
 function M.force_events()
   if not native_prototype(recovery.id) then recover_error("MIR preservation prototype is missing from this package") end
   return true -- New/reset native forces must receive the empty disabled holder.
@@ -528,7 +538,8 @@ function M.configure(maximum, enabled)
   selected_cap, selected_enabled = maximum or 0, enabled ~= false
 end
 
-local function assign_queue(force, frame, queue, moved)
+local function assign_queue(force, frame, queue, moved, destination, activate_remainder)
+  destination = destination or recovery.id
   local previous_owner = owned_queue_force
   owned_queue_force = force.index
   local ok, message = pcall(function()
@@ -539,20 +550,491 @@ local function assign_queue(force, frame, queue, moved)
       if actual[index].name ~= name then recover_error("native queue changed prepared order; reload the original copy") end
     end
     for name, saved in pairs(frame.queued_saved) do
-      local id = moved and name == recovery.canonical and recovery.id or name
-      if force.technologies[id].saved_progress ~= saved then force.technologies[id].saved_progress = saved end
+      local id = moved and name == recovery.canonical and destination or name
+      if not (activate_remainder and queue[1] == id) and force.technologies[id].saved_progress ~= saved then
+        force.technologies[id].saved_progress = saved
+      end
     end
-    local current = moved and frame.current == recovery.canonical and recovery.id or frame.current
+    local current = moved and frame.current == recovery.canonical and destination or frame.current
     if current then
       if not force.current_research or force.current_research.name ~= current then recover_error("native current research changed") end
       force.research_progress = frame.current_progress
+    elseif activate_remainder then
+      local first = frame.queue[1]
+      local expected = first and frame.queued_saved[first] or 0
+      if (force.current_research and force.current_research.name or nil) ~= queue[1]
+          or force.research_progress ~= expected then recover_error("native finished queue activation changed work") end
     end
   end)
   owned_queue_force = previous_owner
   if not ok then error(message, 0) end
 end
 
+-- Explicit default-only native ownership; event wiring and caps have separate owners.
+-- Native research remains authoritative after this one-time identity transfer.
+-- The older route/preparation key and legacy private holder keep their meanings.
+local OWNER_KEY = "mir_worker_storage_native_owner"
+local DEFAULT_ORIGINS = {
+  f200 = {["5.0.20009"]=true, ["5.0.20010"]=true, ["5.0.20011"]=true},
+  f210 = {["5.0.21009"]=true, ["5.0.21010"]=true, ["5.0.21011"]=true},
+}
+
+local function equal_plain(left, right)
+  if type(left) ~= type(right) then return false end
+  if type(left) ~= "table" then return left == right end
+  for key, value in pairs(left) do if not equal_plain(value, right[key]) then return false end end
+  for key in pairs(right) do if left[key] == nil then return false end end
+  return true
+end
+
+local function checked_default_force(record)
+  fields(record, {phase=true, retired_flags=true, tail_disabled_by_mir=true, tail_visibility_hidden_by_mir=true})
+  if record.phase ~= "head" and record.phase ~= "tail" then recover_error("invalid default owner phase") end
+  fields(record.retired_flags, {enabled=true, visible=true, disabled_by_mir=true, visibility_hidden_by_mir=true})
+  local flags = record.retired_flags
+  if type(flags.enabled) ~= "boolean" or type(flags.visible) ~= "boolean"
+      or flags.disabled_by_mir ~= false or flags.visibility_hidden_by_mir ~= false
+      or type(record.tail_disabled_by_mir) ~= "boolean" or type(record.tail_visibility_hidden_by_mir) ~= "boolean"
+      or record.phase == "tail" and (record.tail_disabled_by_mir or record.tail_visibility_hidden_by_mir) then
+    recover_error("invalid default gating rights; head caps belong to lifecycle")
+  end
+  return record
+end
+
+local function reconnect_default(state)
+  default_head_pending = false
+  if state then
+    for _, record in pairs(state.forces) do
+      if record.phase == "head" then default_head_pending = true; break end
+    end
+  end
+end
+
+local function owner_record()
+  local value = storage[OWNER_KEY]
+  if value == nil then return nil end
+  fields(value, {schema=true, kind=true, owner=true, source=true, gate=true, contract=true, producer=true, forces=true})
+  if value.schema ~= 2 or value.kind ~= "split-default" or value.owner ~= recovery.ordinary_default_id
+      or value.source ~= recovery.canonical or value.gate ~= recovery.head_id
+      or type(value.contract) ~= "string" or #value.contract > 8192
+      or value.contract:sub(1, 16) ~= "worker-storage-1" then
+    recover_error("invalid default native-owner record")
+  end
+  fields(value.producer, {kind=true, old_version=true, new_version=true})
+  if (value.producer.kind ~= "initial-empty" and value.producer.kind ~= "recorded-default"
+      and value.producer.kind ~= "unchanged-mir5-default")
+      or type(value.producer.new_version) ~= "string" or #value.producer.new_version > 64
+      or value.producer.kind == "initial-empty" and value.producer.old_version ~= nil
+      or value.producer.kind ~= "initial-empty" and type(value.producer.old_version) ~= "string" then
+    recover_error("invalid default native-owner producer")
+  end
+  local prefix = target.id == "f200" and "^5%.0%.200%d%d$" or "^5%.0%.210%d%d$"
+  local known = DEFAULT_ORIGINS[target.id]
+  if not value.producer.new_version:match(prefix)
+      or value.producer.kind == "unchanged-mir5-default" and (not known or not known[value.producer.old_version])
+      or value.producer.kind == "recorded-default" and value.producer.old_version ~= value.producer.new_version
+        and (not known or not known[value.producer.old_version]) then
+    recover_error("unknown default native-owner producer")
+  end
+  if type(value.forces) ~= "table" or getmetatable(value.forces) ~= nil then
+    recover_error("invalid default native-owner force phases")
+  end
+  for index, record in pairs(value.forces) do
+    if not integer(index) then recover_error("invalid default owner force index") end
+    checked_default_force(record)
+  end
+  return value
+end
+
+local function default_origin(event, initializing, state)
+  local active = script and script.active_mods or {}
+  if type(target.distribution_version) ~= "string" or active[MIR] ~= target.distribution_version then
+    recover_error("default transfer requires the declared MIR package version")
+  end
+  if initializing then
+    if event ~= nil or state ~= nil and (state.schema ~= 2 or state.kind ~= "route"
+        or state.current.kind ~= "default") then recover_error("initial default transfer has prior history") end
+    return {kind="initial-empty", new_version=active[MIR]}
+  end
+  if type(event) ~= "table" or type(event.mod_startup_settings_changed) ~= "boolean"
+      or type(event.mod_changes) ~= "table" then recover_error("default transfer requires unchanged startup settings") end
+  if state == nil and event.mod_startup_settings_changed ~= false then
+    recover_error("unrecorded default source requires unchanged startup settings")
+  end
+  local change = event.mod_changes[MIR]
+  if change ~= nil and (type(change) ~= "table" or change.new_version ~= active[MIR]) then
+    recover_error("default transfer package-change event is inconsistent")
+  end
+  for name, item in pairs(event.mod_changes) do
+    if name ~= MIR and (type(item) ~= "table" or item.old_version == nil
+        or item.old_version ~= item.new_version or item.new_version ~= active[name]) then
+      recover_error("default transfer requires the unchanged mod selection")
+    end
+  end
+  if state ~= nil then
+    if state.schema ~= 2 or state.kind ~= "route" or state.current.kind ~= "default" then
+      recover_error("legacy prepared/finite conversion is not a default-owner transfer")
+    end
+    if change and type(change.old_version) ~= "string" then
+      recover_error("recorded default source cannot be a first-install event")
+    end
+    local old = change and change.old_version or active[MIR]
+    local known = DEFAULT_ORIGINS[target.id]
+    if type(old) ~= "string" or old ~= active[MIR] and (not known or not known[old]) then
+      recover_error("recorded default source has an inconsistent producer event")
+    end
+    return {kind="recorded-default", old_version=old, new_version=active[MIR]}
+  end
+  local known = DEFAULT_ORIGINS[target.id]
+  if not change or not known or known[change.old_version] ~= true or active.base ~= target.minimum_base then
+    recover_error("unrecorded default source has no qualified MIR5 producer")
+  end
+  local official = {base=true, [MIR]=true, ["space-age"]=true, quality=true, ["elevated-rails"]=true, recycler=true}
+  for name, version in pairs(active) do
+    if not official[name] or name ~= MIR and version ~= active.base then
+      recover_error("unrecorded default source requires its qualified official mod selection")
+    end
+  end
+  return {kind="unchanged-mir5-default", old_version=change.old_version, new_version=active[MIR]}
+end
+
+local function frame_values(frame)
+  return {next_level=frame.next_level, researched=frame.researched, enabled=frame.enabled, visible=frame.visible,
+    saved_progress=frame.saved_progress, count=frame.count, current=frame.current,
+    current_progress=frame.current_progress, queue=clone(frame.queue), queued_saved=clone(frame.queued_saved)}
+end
+
+local function head_gate_contract(source)
+  local prototype = native_prototype(recovery.head_id)
+  if not prototype or prototype.name ~= recovery.head_id or creator(recovery.head_id) ~= MIR
+      or prototype.level ~= 4 or prototype.max_level ~= 4 or prototype.hidden ~= true
+      or prototype.enabled ~= false or prototype.visible_when_disabled ~= false
+      or prototype.research_unit_count_formula ~= nil or prototype.research_unit_count ~= 1
+      or prototype.research_unit_energy ~= 60 or next(prototype.prerequisites or {}) ~= nil
+      or prototype.ignore_tech_cost_multiplier ~= source.ignore_tech_cost_multiplier then
+    recover_error("default head gate contract is invalid")
+  end
+  local effects, ingredients = prototype.effects, prototype.research_unit_ingredients
+  local effect = type(effects) == "table" and #effects == 1 and effects[1]
+  local hidden = effect and effect.hidden
+  if hidden == nil and target.id == "f200" then hidden = false end
+  if not effect or effect.type ~= "worker-robot-storage" or effect.modifier ~= 0 or hidden ~= false
+      or type(ingredients) ~= "table" or #ingredients ~= 1
+      or ingredients[1].name ~= source.research_unit_ingredients[1].name or ingredients[1].amount ~= 1 then
+    recover_error("default head gate science/effect contract is invalid")
+  end
+end
+
+local function gate_frame(force)
+  local gate = force.technologies[recovery.head_id]
+  if not gate or gate.level ~= 4 or type(gate.researched) ~= "boolean" or gate.enabled ~= false
+      or gate.visible_when_disabled ~= false or gate.saved_progress ~= 0 then
+    recover_error("default head gate native state is invalid")
+  end
+  if force.current_research and force.current_research.name == recovery.head_id then recover_error("head gate cannot be current research") end
+  for _, entry in ipairs(force.research_queue or {}) do
+    if entry.name == recovery.head_id then recover_error("head gate cannot be queued research") end
+  end
+  return gate
+end
+
+function M.plan_default_owner_transfer(event, route, initializing, context)
+  context = context or {}
+  if type(initializing) ~= "boolean" or route ~= nil then recover_error("default-only transfer context required") end
+  local id = recovery.ordinary_default_id
+  if type(id) ~= "string" or id == recovery.canonical or id == recovery.id then recover_error("ordinary default identity is unavailable") end
+  local state, owned = checked_state(), owner_record()
+  if not same_fact(fact(nil), {kind="default"}) or creator(id) ~= MIR then
+    recover_error("default transfer requires exact MIR canonical/tail creation custody")
+  end
+  local source_prototype, prototype = native_prototype(recovery.canonical), native_prototype(id)
+  local contract = recovery.fingerprint(source_prototype)
+  if not recovery.matches_default_tail(source_prototype, prototype) or prototype.hidden ~= false
+      or type(prototype.enabled) ~= "boolean" or type(prototype.visible_when_disabled) ~= "boolean" then
+    recover_error("canonical4/default tail5 contract or flags differ")
+  end
+  head_gate_contract(source_prototype)
+  for level = 5, 9 do
+    if native_prototype("worker-robots-storage-" .. level) ~= nil then recover_error("default transfer has a foreign worker tail") end
+  end
+  empty_private()
+  local producer = owned and owned.producer or default_origin(event, initializing, state)
+  if state and (state.schema ~= 2 or state.kind ~= "route" or state.current.kind ~= "default") then
+    recover_error("legacy prepared/finite conversion is not implemented")
+  end
+  if owned and owned.contract ~= contract and not context.configuration then recover_error("default native-owner contract changed") end
+  if context.configuration and (type(event) ~= "table" or type(event.mod_startup_settings_changed) ~= "boolean"
+      or type(event.mod_changes) ~= "table" or script.active_mods[MIR] ~= target.distribution_version) then
+    recover_error("current default configuration event is unavailable")
+  end
+  local record = owned and clone(owned) or {schema=2, kind="split-default", owner=id, source=recovery.canonical,
+    gate=recovery.head_id, contract=contract, producer=producer, forces={}}
+  record.contract = contract -- current owned native contract, not a frozen private-recovery policy.
+  local items, seen, moved = {}, {}, false
+  for _, force in ipairs(forces()) do
+    seen[force.index] = true
+    if not context.finished_force or context.finished_force == force.index then
+      local finished = context.finished_force == force.index
+      local source = snapshot(force, recovery.canonical, finished and "default-head-finished" or nil)
+      local destination, gate = snapshot(force, id, finished and "default-head-finished" or nil), gate_frame(force)
+      local prior = owned and owned.forces[force.index]
+      local refresh = context.created_force == force.index or context.reset_force == force.index
+      if context.created_force == force.index and prior then recover_error("new default force already has history") end
+      if refresh and (source.next_level ~= 4 or source.researched or source.saved_progress ~= 0 or source.occurrences ~= 0
+          or destination.next_level ~= 5 or destination.researched or destination.saved_progress ~= 0
+          or destination.occurrences ~= 0 or gate.researched) then recover_error("new/reset force has unexplained default work") end
+      local phase, action, flags = source.next_level == 4 and "head" or "tail", "validate", nil
+      local target_enabled, target_visible = source.enabled, source.visible
+      local next_force = prior and clone(prior) or nil
+      if not prior or refresh then
+        if owned and not refresh then recover_error("default force history is missing") end
+        if destination.next_level ~= 5 or destination.researched or destination.saved_progress ~= 0
+            or destination.occurrences ~= 0 or destination.enabled ~= prototype.enabled
+            or destination.visible ~= prototype.visible_when_disabled or gate.researched then
+          recover_error("ordinary default tail/gate is not pristine")
+        end
+        if initializing and (phase ~= "head" or source.saved_progress ~= 0 or source.occurrences ~= 0) then
+          recover_error("first initialization cannot adopt existing default work")
+        end
+        -- Ownership is independent of current startup caps. Preserve the
+        -- exact native work first; the lifecycle applies policy afterward.
+        next_force = {phase=phase, retired_flags={enabled=source.enabled, visible=source.visible,
+          disabled_by_mir=false, visibility_hidden_by_mir=false},
+          tail_disabled_by_mir=false, tail_visibility_hidden_by_mir=false}
+        action = phase == "tail" and "split" or "gate-head"
+      elseif prior.phase == "head" then
+        if destination.next_level ~= 5 or destination.researched or destination.saved_progress ~= 0
+            or destination.occurrences ~= 0 or gate.researched then recover_error("unfinished default head has invested tail/gate") end
+        if source.next_level >= 5 then
+          if not (finished or context.configuration) then recover_error("earned head requires an explicit completion/configuration context") end
+          phase, action = "tail", "split"
+          target_enabled = source.enabled and (destination.enabled or prior.tail_disabled_by_mir)
+          target_visible = source.visible
+          if source.occurrences > 0 and not target_enabled then recover_error("foreign-disabled default tail cannot receive queued work") end
+          next_force.phase = "tail"
+          next_force.retired_flags = {enabled=source.enabled, visible=source.visible,
+            disabled_by_mir=false, visibility_hidden_by_mir=false}
+          next_force.tail_disabled_by_mir, next_force.tail_visibility_hidden_by_mir = false, false
+        else
+          phase = "head"
+          if source.researched then recover_error("invalid unpaid public head representation") end
+          action = (destination.enabled or destination.visible) and "gate-head" or "validate"
+        end
+      else
+        phase = "tail"
+        if source.next_level ~= 5 or source.researched or source.saved_progress ~= 0 or source.occurrences ~= 0
+            or gate.researched ~= true then recover_error("earned public head/default tail ownership changed") end
+        -- Head enabled/visibility belong solely to the normal lifecycle cap.
+      end
+      local activate = action == "split" and source.current == nil and source.queue[1] ~= nil
+      if activate and (not finished or source.current_progress ~= 0) then recover_error("default queue activation requires the exact finished context") end
+      if action == "split" then requeueable(force, source, true, true); moved = true end
+      record.forces[force.index] = next_force
+      items[#items + 1] = {force=force, source=source, destination=destination, gate=gate, phase=phase,
+        moved=action == "split", action=action, activate_remainder=activate,
+        target_enabled=target_enabled, target_visible=target_visible}
+    elseif not owned or not owned.forces[force.index] then recover_error("default event has unknown force history") end
+  end
+  if #items == 0 then recover_error("default transfer requires native force frames") end
+  if owned then
+    for index in pairs(owned.forces) do if not seen[index] then recover_error("stale default owner force phase") end end
+  end
+  local changed = not owned or not equal_plain(record, owned)
+  for _, item in ipairs(items) do if item.action ~= "validate" then changed = true end end
+  return {kind="default-native-owner-transfer", event=clone(event), context=clone(context), initializing=initializing,
+    prior_state=state, prior_owner=owned, contract=contract, cap=selected_cap, enabled=selected_enabled, items=items,
+    already_owned=owned ~= nil and not moved, changed=changed, record=record}
+end
+
+function M.apply_default_owner_transfer(plan)
+  if type(plan) ~= "table" or plan.kind ~= "default-native-owner-transfer" then recover_error("invalid default transfer plan") end
+  local fresh = M.plan_default_owner_transfer(plan.event, nil, plan.initializing, plan.context)
+  if not fresh.changed then reconnect_default(fresh.record); return false end
+  if plan.prior_state ~= fresh.prior_state or plan.prior_owner ~= fresh.prior_owner or plan.contract ~= fresh.contract
+      or plan.cap ~= fresh.cap or plan.enabled ~= fresh.enabled or #plan.items ~= #fresh.items then recover_error("stale default transfer plan") end
+  for index, item in ipairs(fresh.items) do
+    local old = plan.items[index]
+    if old.force.index ~= item.force.index or old.action ~= item.action
+        or not equal_plain(frame_values(old.source), frame_values(item.source))
+        or not equal_plain(frame_values(old.destination), frame_values(item.destination)) then
+      recover_error("native work changed after default preflight")
+    end
+  end
+  local id = recovery.ordinary_default_id
+  for _, item in ipairs(fresh.items) do
+    local previous = default_mutating_force
+    default_mutating_force = item.force.index
+    local ok, message = pcall(function()
+      local frame, holder, canonical, gate = item.source, item.destination.technology, item.source.technology, item.gate
+      if item.action == "gate-head" then
+        local record = fresh.record.forces[item.force.index]
+        record.tail_disabled_by_mir = record.tail_disabled_by_mir or holder.enabled
+        record.tail_visibility_hidden_by_mir = record.tail_visibility_hidden_by_mir or holder.visible_when_disabled
+        holder.enabled, holder.visible_when_disabled = false, false
+      elseif item.action == "split" then
+        if frame.next_level ~= 5 then holder.level = frame.next_level end
+        holder.enabled, holder.visible_when_disabled = item.target_enabled, item.target_visible
+        gate.researched = true
+        gate.enabled, gate.visible_when_disabled = false, false
+        if frame.next_level ~= 5 or frame.researched then canonical.level = 5 end
+        -- Restore the incoming flags after a native level write. The lifecycle
+        -- alone retires public4 at cap4 and owns its normal capped visibility.
+        canonical.enabled, canonical.visible_when_disabled = frame.enabled, frame.visible
+        canonical.saved_progress, holder.saved_progress = 0, frame.saved_progress
+        if frame.occurrences > 0 or item.activate_remainder then
+          local queue = {}
+          for index, name in ipairs(frame.queue) do queue[index] = name == recovery.canonical and id or name end
+          assign_queue(item.force, frame, queue, true, id, item.activate_remainder)
+        end
+        canonical.saved_progress = 0
+        if item.activate_remainder and item.force.current_research and item.force.current_research.name == id then
+          holder.saved_progress = 0
+        else holder.saved_progress = frame.saved_progress end
+        if frame.current == recovery.canonical then item.force.research_progress = frame.current_progress end
+        if not frame.researched and holder.research_unit_count ~= frame.count then recover_error("native default tail work price differs") end
+      end
+    end)
+    default_mutating_force = previous
+    if not ok then error(message, 0) end
+  end
+  for _, item in ipairs(fresh.items) do
+    local frame, gate = item.source, gate_frame(item.force)
+    local context = item.activate_remainder and "default-head-finished" or nil
+    local actual_source, actual_tail = snapshot(item.force, recovery.canonical, context), snapshot(item.force, id, context)
+    if item.action == "split" then
+      local expected = frame_values(frame)
+      expected.researched, expected.enabled, expected.visible = false, item.target_enabled, item.target_visible
+      if frame.researched then expected.count = actual_tail.count end
+      expected.current = frame.current == recovery.canonical and id or frame.current
+      for index, name in ipairs(expected.queue) do if name == recovery.canonical then expected.queue[index] = id end end
+      if expected.queued_saved[recovery.canonical] ~= nil then
+        expected.queued_saved[id], expected.queued_saved[recovery.canonical] = expected.queued_saved[recovery.canonical], nil
+      end
+      if item.activate_remainder then
+        expected.current = expected.queue[1]
+        expected.current_progress = frame.queued_saved[frame.queue[1]] or 0
+        if expected.current then expected.queued_saved[expected.current] = 0 end
+        if expected.current == id then expected.saved_progress = 0 end
+      end
+      if not equal_plain(expected, frame_values(actual_tail)) or actual_source.next_level ~= 5 or actual_source.researched
+          or actual_source.saved_progress ~= 0 or actual_source.occurrences ~= 0
+          or actual_source.enabled ~= frame.enabled or actual_source.visible ~= frame.visible or gate.researched ~= true then
+        recover_error("native default split did not preserve the exact settled frame; reload the original copy")
+      end
+    elseif item.phase == "head" then
+      if not equal_plain(frame_values(frame), frame_values(actual_source)) or actual_tail.next_level ~= 5 or actual_tail.researched
+          or actual_tail.saved_progress ~= 0 or actual_tail.occurrences ~= 0 or actual_tail.enabled or actual_tail.visible
+          or gate.researched then recover_error("native default head work changed; reload the original copy") end
+    elseif not equal_plain(frame_values(frame), frame_values(actual_source))
+        or not equal_plain(frame_values(item.destination), frame_values(actual_tail)) then
+      recover_error("validated native default owner changed")
+    end
+  end
+  if storage[OWNER_KEY] ~= fresh.prior_owner then recover_error("default ownership changed during native mutation; reload the original copy") end
+  storage[OWNER_KEY] = fresh.record
+  reconnect_default(fresh.record)
+  return true
+end
+local function default_active(route, split_current)
+  local state = owner_record()
+  if not state and (split_current ~= true or route ~= nil) then return false end
+  if split_current ~= true or route ~= nil then recover_error("native default owner provider/unavailable transition is not implemented") end
+  return true
+end
+
+function M.default_owner_on_init(route, split_current)
+  if not default_active(route, split_current) then return false end
+  return M.apply_default_owner_transfer(M.plan_default_owner_transfer(nil, route, true))
+end
+
+function M.default_owner_preflight(event, route, split_current)
+  if not default_active(route, split_current) then return nil end
+  return M.plan_default_owner_transfer(event, route, false, owner_record() and {configuration=true} or nil)
+end
+
+function M.default_owner_apply(plan)
+  if plan == nil then return false end
+  return M.apply_default_owner_transfer(plan)
+end
+
+function M.default_owner_on_load()
+  -- Only structural state validation and local event subscriptions on_load.
+  reconnect_default(owner_record())
+end
+
+function M.default_owner_mutating(event)
+  local force = event and (event.force or event.research and event.research.force)
+  return default_mutating_force ~= nil and force ~= nil and force.index == default_mutating_force
+end
+
+function M.default_owner_on_research_finished(event)
+  local force, research = event and event.research and event.research.force, event and event.research
+  if not default_head_pending or not force or M.default_owner_mutating(event) then return false end
+  local state = owner_record()
+  local record = state and state.forces[force.index]
+  if not record or record.phase ~= "head" or research.name ~= recovery.canonical then return false end
+  if type(event.by_script) ~= "boolean" then recover_error("default completion event has no native origin flag") end
+  local plan = M.plan_default_owner_transfer(nil, nil, false, {finished_force=force.index})
+  if #plan.items ~= 1 or not plan.items[1].moved then recover_error("default completion has not earned its first head") end
+  return M.apply_default_owner_transfer(plan)
+end
+
+function M.default_owner_on_force_created(event)
+  if not owner_record() or not event or not event.force then return false end
+  return M.apply_default_owner_transfer(M.plan_default_owner_transfer(nil, nil, false, {created_force=event.force.index}))
+end
+
+function M.default_owner_on_force_reset(event)
+  if not owner_record() or not event or not event.force then return false end
+  return M.apply_default_owner_transfer(M.plan_default_owner_transfer(nil, nil, false, {reset_force=event.force.index}))
+end
+
+function M.default_owner_on_forces_merged(event)
+  local state = owner_record()
+  if not state or not event or not event.destination then return false end
+  local destination, source_index = event.destination, event.source_index
+  if not integer(source_index) or source_index == destination.index or not state.forces[source_index]
+      or not state.forces[destination.index] then recover_error("default native merge has unknown force identity") end
+  local source = native_prototype(recovery.canonical)
+  if not same_fact(fact(nil), {kind="default"}) or creator(recovery.ordinary_default_id) ~= MIR
+      or not recovery.matches_default_tail(source, native_prototype(recovery.ordinary_default_id))
+      or recovery.fingerprint(source) ~= state.contract then recover_error("default merge contract changed") end
+  head_gate_contract(source)
+  local next_state, seen = clone(state), {}
+  next_state.forces[source_index] = nil
+  for _, force in ipairs(forces()) do
+    if force.index == source_index or not next_state.forces[force.index] then
+      return false, "unqualified-native-merge-frame"
+    end
+    seen[force.index] = true
+    local head, tail, gate = snapshot(force, recovery.canonical), snapshot(force, recovery.ordinary_default_id), gate_frame(force)
+    local phase
+    if not gate.researched and head.next_level == 4 and not head.researched
+        and tail.next_level == 5 and not tail.researched and tail.saved_progress == 0 and tail.occurrences == 0 then
+      phase = "head"
+    elseif gate.researched and head.next_level == 5 and not head.researched
+        and head.saved_progress == 0 and head.occurrences == 0 then phase = "tail"
+    else
+      -- The engine alone owns merged levels/queue/partials. A mixed native
+      -- contract is retained, never collapsed by inventing combined rights.
+      return false, "unqualified-native-merge-frame"
+    end
+    if force.index == destination.index then
+      local prior = state.forces[force.index]
+      next_state.forces[force.index] = {phase=phase,
+        retired_flags={enabled=head.enabled, visible=head.visible, disabled_by_mir=false, visibility_hidden_by_mir=false},
+        tail_disabled_by_mir=phase == "head" and prior.tail_disabled_by_mir and not tail.enabled,
+        tail_visibility_hidden_by_mir=phase == "head" and prior.tail_visibility_hidden_by_mir and not tail.visible}
+    elseif phase ~= next_state.forces[force.index].phase then return false, "unqualified-native-merge-frame" end
+  end
+  for index in pairs(next_state.forces) do if not seen[index] then return false, "unqualified-native-merge-frame" end end
+  storage[OWNER_KEY] = next_state
+  reconnect_default(next_state)
+  return true, "native-merge-metadata-only"
+end
+
 function M.prepare(route)
+  if storage[OWNER_KEY] ~= nil then recover_error("ordinary native default ownership cannot use legacy preparation") end
   local state = checked_state()
   if state and state.schema == 2 and state.kind == "prepared" then
     prepared_current(state, fact(route))
