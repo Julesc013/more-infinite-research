@@ -1,0 +1,284 @@
+{
+  "schema": 1,
+  "kind": "ConfiguredSteel512FinalConsumedInputIndependentReviewV1",
+  "reviewed_utc": "2026-11-10T06:26:09.145218+00:00",
+  "verdict": "Current12 destination reuse is NOT established. Retain the genuine10 source/colds and accepted11 destination. The smallest missing affected check is the existing target-only server/save/two-cold leg:3processes,zero newlabs. This is an applicability gap,not a predicted product defect.",
+  "findings": [],
+  "target": {
+    "source_release_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+    "player_source_tree": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+    "publication": "unpublished12",
+    "archive": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir512-source128-r01\\more-infinite-research_5.0.21012.zip",
+      "bytes": 1022087,
+      "sha256": "10619C8C1BF9F0A99DE8CC4E630CAE3BDE20101E02A11F88A5F92C433F70E3FF"
+    }
+  },
+  "retained_authorities": {
+    "previous_consumed_input_review": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel511-final-consumed-input-independent-review-r01.json",
+      "bytes": 9373,
+      "sha256": "F82FBADD9F77BA99553AF1B8800B816E4F551C34A0DFB3027E77F90F23C332D0"
+    },
+    "published11_actual_result": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel511-final-r01-independent-result-review.json",
+      "bytes": 7260,
+      "sha256": "677032DA83A4A95526E7AC8A47AC7BFF0AE8FD06A40A136A171B91FEED538B10"
+    },
+    "Aero_B_source_applicability": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\spec\\evidence\\configured-steel512-scoped-applicability-aero-r01.json",
+      "bytes": 7314,
+      "sha256": "2F12FC20827B2964337B41B32C9838EC5312A643F706A2AE28AE660A7B157C6D"
+    },
+    "actual_B_package_adoption": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\spec\\evidence\\mir512-b-actual-package-evidence-adoption-r01.json",
+      "bytes": 2471,
+      "sha256": "EA5EA50542F36D15E86D1D25C8B6D18457B0DAB2BE85183F3F13F08E150F4C54"
+    },
+    "old_published11_archive": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\dist\\v5.0.11\\more-infinite-research_5.0.21011.zip",
+      "bytes": 1006768,
+      "sha256": "C3CB6462E3285DA222664D2174EAA16E63577BF9970804E410B127A43C773D14"
+    }
+  },
+  "exact_case": "2.1.23/8DC plus five official modules and unchanged settings observer0.2.0. Configured steel base2/linear3/growth1.25/time1s/reward17%; mapprice1/foursciences. One actual source publicsteel lab completion attick119/by_scriptfalse gives nativeownerlevel2/effectiveunits6,steel/casting0.17 andforeignbullet0.07. Historicalprivate main isempty/hidden/level1/saved0/effectiveunits2. Foreignowner remainslevel1/disabled/invisible/unearned. No current/detachedpartialwork; stoppedlab retainsfourpacks each. It is not expanded97vector or pendingcreditwork.",
+  "actual_package_comparison": {
+    "named_modules": 19,
+    "unchanged_named_modules": 17,
+    "module_rows": [
+      {
+        "path": "runtime/bootstrap.lua",
+        "current_bytes": 37369,
+        "unchanged": true,
+        "current_sha256": "B34CB1F698C3AEF44B5E23ED58EDCCA83E751FF201AC28AEF58462577F8949A8"
+      },
+      {
+        "path": "runtime/native_credits.lua",
+        "current_bytes": 54427,
+        "unchanged": false,
+        "current_sha256": "537F7E94FD515D449435A8E52FE86DCB4BB372C612418846C0575583D8A5B7B5"
+      },
+      {
+        "path": "runtime/worker_robot_storage.lua",
+        "current_bytes": 37165,
+        "unchanged": false,
+        "current_sha256": "63C235C3DF5319343C19EB34B76F2DE9EE67D9D89013CD39AA85490DB31A8646"
+      },
+      {
+        "path": "runtime/lifecycle.lua",
+        "current_bytes": 36705,
+        "unchanged": true,
+        "current_sha256": "E9ABE68A1032B314FB425D36ED58A7CA917A634FCC920A812942A5C59267BBC6"
+      },
+      {
+        "path": "runtime/legacy_module_credits.lua",
+        "current_bytes": 10964,
+        "unchanged": true,
+        "current_sha256": "EB6E25EA62C46D8B104F6C6218FD42EF156D863B31C052EDF879E86A25067B81"
+      },
+      {
+        "path": "runtime/legacy_cannon_credits.lua",
+        "current_bytes": 10384,
+        "unchanged": true,
+        "current_sha256": "60FEE07DBFC9590F5426925E05CA287FC386DCDE5C2BF8EC405B99D2BA920DCD"
+      },
+      {
+        "path": "runtime/configuration.lua",
+        "current_bytes": 347,
+        "unchanged": true,
+        "current_sha256": "21C832FF2C234C178D86DA51E24ABA34A51724A009E9E8299EBBF62F91EDAD5E"
+      },
+      {
+        "path": "runtime/cap_admission.lua",
+        "current_bytes": 3454,
+        "unchanged": true,
+        "current_sha256": "D13110614A14B3BB3A525C47471C422B2449BBD121460251F7E248F8CD91BB34"
+      },
+      {
+        "path": "runtime/caps.lua",
+        "current_bytes": 12624,
+        "unchanged": true,
+        "current_sha256": "A50E7D56082E8454FA40FA0DB0CD7DA33B5441FAA7A39AABAD9438A77E5A3C52"
+      },
+      {
+        "path": "runtime/settings_profile.lua",
+        "current_bytes": 1551,
+        "unchanged": true,
+        "current_sha256": "8FD62FA72627DD36DD555AB315057DB40B10DDAA9739B6199110258B3C0658F1"
+      },
+      {
+        "path": "research/native_credit_definitions.lua",
+        "current_bytes": 9472,
+        "unchanged": true,
+        "current_sha256": "6DF5FADD1816418DA12ABEFF431102AD0152E8527153E6D8F69EC7EB2444C69C"
+      },
+      {
+        "path": "research/native_credit_contracts.lua",
+        "current_bytes": 3868,
+        "unchanged": true,
+        "current_sha256": "19A8C7C4B6A440851214EAF5BFEE0A17124FAD0F2490D1C94C6FB9967692D589"
+      },
+      {
+        "path": "research/native_adoption.lua",
+        "current_bytes": 7390,
+        "unchanged": true,
+        "current_sha256": "FE8D36252FC5F13ED3907E6259B8E0C02F9B8A95B7121AC0AFE23E1E9B0A3711"
+      },
+      {
+        "path": "research/product_target_extension.lua",
+        "current_bytes": 21618,
+        "unchanged": true,
+        "current_sha256": "9890FB58AA68B443EEE294A56131D3B5673211AF409A6851FE28AB08FB551306"
+      },
+      {
+        "path": "research/generator.lua",
+        "current_bytes": 5802,
+        "unchanged": true,
+        "current_sha256": "3F83E0648A744561F8F3F08D0DF563D441BC2DB69C98494AB25B31AFC75F9717"
+      },
+      {
+        "path": "research/modern.lua",
+        "current_bytes": 33501,
+        "unchanged": true,
+        "current_sha256": "F21C2EF1518D9B9961838202287B45E372FF02C37EB3711447059B77E9827A23"
+      },
+      {
+        "path": "research/settings.lua",
+        "current_bytes": 18813,
+        "unchanged": true,
+        "current_sha256": "328A16974CBDBD24027419561A861FF1D0175A9DB24641A6DD23E3DBA288149E"
+      },
+      {
+        "path": "compatibility/modern_catalogue.lua",
+        "current_bytes": 73604,
+        "unchanged": true,
+        "current_sha256": "F4BE827F5398B866D80108C5BC7C3FA5362A193A3FB0EA7EE3B605522E555709"
+      },
+      {
+        "path": "compatibility/modern_catalogue/space_age.lua",
+        "current_bytes": 42265,
+        "unchanged": true,
+        "current_sha256": "07F356E13EDFEADADB005A11C15555E28D783C493B59F66E24C8A053A2CAFFA0"
+      }
+    ],
+    "additional_new_module": {
+      "path": "runtime/native_credit_vectors.lua",
+      "bytes": 3690,
+      "sha256": "34F66B316D753CA61F1C146B9FC88DC580D45E07C0536993C71E5626AB5527E0"
+    },
+    "other_shared_unchanged": [
+      "runtime/bootstrap.lua",
+      "runtime/lifecycle.lua",
+      "runtime/caps.lua",
+      "data-final-fixes.lua"
+    ],
+    "scope": "The named current steel definitions/settings/nativeadoption/caps/data code remains unchanged relative to the accepted11 package. OptionalFerrum is absent. The earlierAero/B adoption remains valid only at its historical Source9b/40a; it doesnot cover later47537 credit/worker changes."
+  },
+  "reasoning": [
+    "Steel is one of the five collected native-credit families. Current family_observations reaches the changed preflight_basis and then stores observation.basis in family records during configuration. Its old-record fallback supplies a singleton basis only when the observed carrier is scalar; unknown invested expansion still refuses. No mismatch is predicted for this scalar17%closedprofile.",
+    "Old11 actor records public/native/private/foreign/lab frames,not every privatecarrier/basis record. It didnot execute the later47537 configuration and serialization code. The currentAPI12 pass starts fresh and doesnot cover this preserved10 old-ledger/configuration route.",
+    "Worker history/context code also changed. No preparedworker/provider work is claimed by this steelcase; do not broaden the missingcheck into worker recovery. The uncertain currentdestination closure can be resolved by the existing3process route alone."
+  ],
+  "original_source": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-owner511-forward-native-custody-r01\\source\\protected\\native-owner511-forward-source-complete.zip",
+    "bytes": 826984,
+    "sha256": "8A04048E22091BE1DAB09FB3BBB5415629971B4AD54D5ED20979E893D03B8514",
+    "CRC": "all7memberspass",
+    "members": [
+      {
+        "name": "native-owner511-forward-source-complete/control.lua",
+        "bytes": 11860,
+        "sha256": "39CEE3E0A2918DF244120F64CBC84DE6021C4801A95A6E4840A6ADE77591CA61",
+        "is_control": true
+      },
+      {
+        "name": "native-owner511-forward-source-complete/level-init.dat",
+        "bytes": 1075120,
+        "sha256": "33B8CDCBDB975F92E528A5705660E72035EEE316609BEB4D130B390AC3AA1EEA",
+        "is_control": false
+      },
+      {
+        "name": "native-owner511-forward-source-complete/level.dat1",
+        "bytes": 53289,
+        "sha256": "F41233CAD73F4B0693A91AF29FAE24056806158C64999377F3DAFD5F67382758",
+        "is_control": false
+      },
+      {
+        "name": "native-owner511-forward-source-complete/level.dat0",
+        "bytes": 381249,
+        "sha256": "5A31A8749C56264481BF59104B38FDD71FBEB934FFA4BD4A4CDD9DA4D8C6B7D2",
+        "is_control": false
+      },
+      {
+        "name": "native-owner511-forward-source-complete/level.datmetadata",
+        "bytes": 8,
+        "sha256": "8F9768331C619551E08CF2C41C3F37B96D2AF12DF5A7C3029778D1CB98F4D8AE",
+        "is_control": false
+      },
+      {
+        "name": "native-owner511-forward-source-complete/script.dat",
+        "bytes": 11873,
+        "sha256": "5C6BC07D60A120F7F481CD51A4CD96B2013442DCD257661A166FEE46147DF789",
+        "is_control": false
+      },
+      {
+        "name": "native-owner511-forward-source-complete/info.json",
+        "bytes": 5,
+        "sha256": "38E0B9DE817F645C4BEC37C0D4A3E58BAECCCB040F5718DC069A72C7385A0BED",
+        "is_control": false
+      }
+    ],
+    "embedded_actor_sha256": "39CEE3E0A2918DF244120F64CBC84DE6021C4801A95A6E4840A6ADE77591CA61",
+    "original_source_and_two_source_colds": "Accepted once under genuine10/C625. Reuse without rerun/researchgrant or recounting the same sourcecompletion."
+  },
+  "existing_executable_route": {
+    "caller": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel511-final-r01-controller\\Invoke-ConfiguredSteelDestination.ps1",
+      "bytes": 21980,
+      "sha256": "7B81BD094AA76DFCE33741892772723B8140AC3F9682D67953B91E941B834A92"
+    },
+    "manifest": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel511-final-r01-controller\\manifest.json",
+      "bytes": 17721,
+      "sha256": "EDC5EC42CCE2B70764B37A2621B8575237C54DE786700B1C95D0FCC2BE12FD2C"
+    },
+    "profile": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel511-final-r01-controller\\profile.json",
+      "bytes": 1199,
+      "sha256": "CCCDB0C45A1240108445C5F243A8DAF19DB55C8BA819010E9D10F193707603AA"
+    },
+    "old_composition": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel511-final-r01-controller\\composition.json",
+      "bytes": 20451,
+      "sha256": "BB4479BDB9AD52FFE42C6022532AA95A6D8AAA193221C07C3B9073AAC2F3EAB2"
+    },
+    "scenario_actor": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel511-final-r01-controller\\inputs\\control.lua",
+      "bytes": 11860,
+      "sha256": "39CEE3E0A2918DF244120F64CBC84DE6021C4801A95A6E4840A6ADE77591CA61"
+    },
+    "observer": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-owner511-forward-source-inputs-r01\\mir-fixture-native-owner-settings_0.2.0.zip",
+      "bytes": 2130,
+      "sha256": "15A6D3100E3CFCD7A0D1EB34ECE4CA2249F3C75E623608907F3E9930A37EA9F5"
+    },
+    "frozen_harness": "D:/Projects/Factorio/.task-builds/mir511-cumulative-native-r04 @203e0af5e1ea8925c1909e1dc97cef3dab3c961b / Source93d. Historical tools only; current12 loadedplayer must bind independently to128/475 and10619.",
+    "CLI": "pwsh -File <new copied caller> -Mode Plan|Compose|Execute -InputManifest <new manifest> -InputManifestSha256 <newSHA>; Execute additionally -CompositionSha256 <new actual zero-engine ComposeSHA>.",
+    "native_schedule": "One --start-server <fresh copied observer-only derivative of8A04>, then two --benchmark <new destination save> --benchmark-ticks1 --benchmark-runs1 --benchmark-sanitize processes. Production requires live marker+Savingfinished+closed save predicate; colds require natural0. No newlab.",
+    "limits": {
+      "expected_peak_memory_mib": 4096,
+      "max_output_mib": 128,
+      "timeout_seconds": 180
+    }
+  },
+  "smallest_rebind": [
+    "Use Rootowned NEW Q/configured-steel512-final-r01-controller and fresh contained executing-harness build/tmp roots for Compose/native/config/scenario/save/protectedcopy outputs. Keep original controller/manifest/oldproofs unchanged.",
+    "Create a separately hashed observer-only derivative of protected8A04: replace exactly the FIVE 5.0.21011 target literals in embedded control.lua with5.0.21012. All six other native/script members must equal original bytes; CRC both ZIPs. Stage/copy derivative immutably; preserve original8A04 and actor39CE independently before/after every outcome. Simply staging a newscenario actor is insufficient because target --start-server loads the save embedded control.lua.",
+    "Rebind caller target version/hash/size and expected actor to the new exact derivative; distinguish original39CE sourceproof from derived input/output actor. Profile remains exact sevenmods; observer15A6/engine8DC/API/Base data/settings/science/formula/nativeframes/order/labcount remain unchanged. Historical marker/stage/role names may remain legacy IDs if newpacket/readback explicitly records actual10\u219212 versions.",
+    "Current eligibility must bind unpublishedSource128/475 and exact10619/1022087B through currentinventory/independentintegrity60808/checked integration, separately from203/93d historicalharness and old11delivery. Do not require or pretend12 is already published.",
+    "Materialize existing Plan and realzero-engineCompose, wrongkind/hash/actor/sourceDigest/outputroot/caller/composition negatives, then admit exactly3 processes if guardsclose. Actual event must still show startup_changedfalse and only MIR10\u219212, level-before-MIR callbackorder, exactsource/entry/post-MIR/native/private/foreign/lab frames and same newSavehash throughboth colds. Do not relax anyframe ifnative differs."
+  ],
+  "limits": "Read-only applicability and executableinputinventory only. No packet wasprepared/queued/admitted, no native/build/test/library/Source orprivateGitmutation. No new ordinarycompletions,physicalmanufacturing,arbitrarysettings/providers,unknownreporter,fullprivateledger decoding,wholeproduct/performance/stable verdict.",
+  "native_admission": false,
+  "stable_acceptance": false
+}

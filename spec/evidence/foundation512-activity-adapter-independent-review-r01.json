@@ -1,0 +1,144 @@
+{
+  "schema": 1,
+  "kind": "Foundation512ActivityAdapterIndependentReviewV1",
+  "reviewed_utc": "2026-11-10T06:36:45.366628+00:00",
+  "verdict": "GO for Root guarded zero-engine Compose only on the exact frozen tuple. No native pilot or18-run timing admission.",
+  "findings": [],
+  "bindings": {
+    "packet": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation512-normal-comparison-preparation-r01\\adapter-r01\\packet.json",
+      "bytes": 35365,
+      "sha256": "3C3F0924BFBE1FEB5E33E697D63A41E6F521F26F657F59FCC549FEB2310E2C9E"
+    },
+    "caller": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation512-normal-comparison-preparation-r01\\adapter-r01\\Invoke-Foundation512Activity.ps1",
+      "bytes": 21157,
+      "sha256": "9D350A676294280626B2AC96B19484098BCD9966E3B24A83A94A5E2DDD3F783A"
+    },
+    "reader": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation512-normal-comparison-preparation-r01\\adapter-r01\\Prepare-Foundation512Activity.py",
+      "bytes": 22193,
+      "sha256": "F735718189161A2230165949E99480AB8D2D9782B7034C54277C67B1005B85CD"
+    },
+    "handoff": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation512-normal-comparison-preparation-r01\\adapter-r01\\HANDOFF.json",
+      "bytes": 12853,
+      "sha256": "25BFBA03851C0460CFBD373E38D3839EB04D6672FF9FB4C85EAE8E7CE1F1D4D4"
+    },
+    "manifest": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation512-normal-comparison-preparation-r01\\adapter-r01\\MANIFEST.json",
+      "bytes": 7004,
+      "sha256": "0AB50342A0F11F69383023650A594D118324E0122F059DF1DB78AAE5F1DCE607"
+    },
+    "caller_projection": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation512-normal-comparison-preparation-r01\\adapter-r01\\caller-metadata-projection.patch",
+      "bytes": 2826,
+      "sha256": "14169E8E20AA38B081DE9E53264B1C8DF56D85FF39326DA7001117C320F37311"
+    },
+    "reader_projection": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation512-normal-comparison-preparation-r01\\adapter-r01\\reader-metadata-projection.patch",
+      "bytes": 7449,
+      "sha256": "546D1949914B07364396EC90EA5A19577F6F5DFDE035A112D77288A5F4364820"
+    },
+    "projection_proof": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation512-normal-comparison-preparation-r01\\adapter-r01\\metadata-projection.json",
+      "bytes": 2803,
+      "sha256": "5C8C2CDF1AF848F612D5336A0DA6AEA43DEABDEEDF0DD092EAEF03CEDC0C0868"
+    },
+    "offline_controls": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation512-normal-comparison-preparation-r01\\adapter-r01\\offline-binding-controls.json",
+      "bytes": 3010,
+      "sha256": "55434609133E5E404BAA1900C295F02E523A253A579619F8AF99ABA8B8FCB2C6"
+    },
+    "actual_function_controls": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation512-normal-comparison-preparation-r01\\adapter-r01\\actual-function-controls.json",
+      "bytes": 1465,
+      "sha256": "A13810D9FFC0281256861189CCC5C33C5FBA726102708F4C2C8C14EAA2B66ED4"
+    }
+  },
+  "player": {
+    "source_release_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+    "source_tree": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+    "publication": "unpublished",
+    "candidate": {
+      "name": "more-infinite-research",
+      "version": "5.0.20012",
+      "archive": "more-infinite-research_5.0.20012.zip",
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir512-source128-r01\\more-infinite-research_5.0.20012.zip",
+      "bytes": 1021663,
+      "sha256": "0C2F1D1FC3EBC65ABED34A449D060939DF0A3E46D3BB19211306D9F1BBB9478E"
+    },
+    "profile": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation512-normal-comparison-preparation-r01\\profiles\\unscored-profile-B.json",
+      "bytes": 7969,
+      "sha256": "5D35A17A849335A496CC817F359DF26905F0C4C697D5C1E97A1339CE5B88EAD9"
+    }
+  },
+  "harness": {
+    "method_repo": "D:\\Projects\\Factorio\\.task-builds\\foundation512-normal-helper-r01",
+    "method_head": "e3925def0e840b53a027c92d0eefb8b72301a844",
+    "executing_public_repo": "D:\\Projects\\Factorio\\mir5-secretas-helper-5a31-r03",
+    "executing_public_head": "5a31ba5dde566c54b28092370478a80029e2fb69",
+    "verified": "Both are proper clean historical Git worktree roots. They supply orchestration/readers/governors; loaded player is separately pinned current12 Source128/47537, not either historical Source."
+  },
+  "unchanged_method": {
+    "projection": "Actual complete diffs match both supplied patches. Caller changes candidate identity, reader locator and VerifyOnly alias of Plan. Python AST comparison confirms only candidate_archive, committed_sources, validate_output_roots, validate_packet metadata changes plus validate_current_eligibility; scientific assembly/parser/oracle/read-log functions remain unchanged.",
+    "sampler_recovery": {
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\foundation512-normal-comparison-preparation-r01\\sampler-recovery.json",
+      "bytes": 3057,
+      "sha256": "EF6A754E905FB0BD1A7331B0E1DEB103CEB92C980F89CC0CFC99285FFEA44735"
+    },
+    "sampler": "Independently proved executed5F71B871 equals raw e3929A037AA8 with only1026LF\u2192CRLF expansions. LaterF7E worktree untouched. The separate normal18 method remains held.",
+    "observer": {
+      "name": "mir-fixture-mir5-large-factory-activity",
+      "version": "0.1.0",
+      "archive": "mir-fixture-mir5-large-factory-activity_0.1.0.zip",
+      "path": "D:\\Projects\\Factorio\\mir5-secretas-helper-5a31-r03\\build\\tmp\\foundation504-activity-r02-prepared\\mir-fixture-mir5-large-factory-activity_0.1.0.zip",
+      "bytes": 5904,
+      "sha256": "13C4CAA69F160BD67B1C5A136FDE49762B4614D85112388F6BBFB69B703746C4"
+    },
+    "observer_check": "Exact13C4CAA6 archive passes CRC; four observer/oracle members unchanged. Original57surface/600tick projection490A remains the independent authority."
+  },
+  "physical_checks": {
+    "unique_file_hashes_verified": 80,
+    "selected_rows": 37,
+    "archive_rows": 33,
+    "upstream_archive_rows": 31,
+    "settings": {
+      "requested_library_mode": "Defaults",
+      "required_observer_startup": {
+        "name": "mir5-large-factory-inventory-only",
+        "value": false
+      },
+      "original_saved": "unverified",
+      "per_player": "unobserved",
+      "historical_inheritance": "unverified"
+    },
+    "protected_save_sha256": "EAF0BF0877955312C7DE9E1309D6462535464FF2FDFEA7EF60BEE5CD18A04CDA",
+    "eligibility": "Inventory9E703598, independentintegrity60808, custody, checkedmerge/CI rehashed and cross-bound to Source128/47537 and0C2F.12 is unpublished;504/505 delivery is historical.",
+    "freshness": "Native and Compose roots absent; both are children of actual executing5a31/build/tmp. Q contains packet/evidence only."
+  },
+  "safety_and_scope": [
+    "Adapter can launch only one unscored ActivityDiagnostic:601benchmark updates/one run/sanitize/no per-tick verbose; observer window600ticks. No ordinary research or save output is claimed.",
+    "Actual Compose must reach the declared CLI under real activation/resource/immutable-input guards and suppress exactly one governed boundary. Terminal must bind this packet/caller/reader, suppressed=1, native=0, exceptionnull and restorationverified. VerifyOnly is not actual Compose.",
+    "Execute needs a separate exact Root phase admission and successful actual Compose hash. Natural0/non-timeout/no completion-predicate substitution, one PID across callbacks/ledger and closed-log hash remain strict.",
+    "Distinct original/owned read handles and ForceCopy staging preserve immutable source bytes/identities. Only owned observer/candidate are staged under exclusive direct2.0 lease, expected-writer checks and complete restoration/custody. No dependency-library copies.",
+    "Unchanged unscored budget8192MiB sampled-watchdog/1024MiB output/300s/30s bounded admission wait/default250ms sampling. Root reports insufficient headroom; actual guard must refuse while short. No budget/reserve reduction or hard-cap claim."
+  ],
+  "control_evidence": {
+    "counts": "18Python and9extracted actualPowerShell narrow controls recorded PASS; inspected without rerunning host tests.",
+    "adverses": "Original path-spelling refusal and actual-function control precedence refusal retained; corrections are offline evidence only."
+  },
+  "future_gates": {
+    "native_pilot": "Not admitted here. Requires successful actual zero-engine Compose, unchanged resource headroom, exclusive lane and separate exact Root Execute admission.",
+    "equivalence": "Activity-positive is insufficient: independently compare the full bounded57surface/600tick normal-item/machine projection to490A before any18timing admission. Preserve mismatch; never rewrite oracle.",
+    "timing18": "HELD. Original complete6A/A+12A/B observer-absent protocol, current bindings, actual composition, quiet block and predeclared analysis remain required. The pilot1024MiB output budget does not replace the original18-run2048MiB declaration."
+  },
+  "limits": [
+    "Only this receipt written; no Compose/engine/library/host/build/Source/doc/test/controller/privateGit mutation by reviewer.",
+    "No useful-work equivalence, save-preservation, isolated load/startup/menu, factory performance, retained-memory, release or stable acceptance. Saved/per-player/inheritance settings remain explicitly unverified."
+  ],
+  "native_execution_admitted": false,
+  "timing_admitted": false,
+  "stable_acceptance": false
+}

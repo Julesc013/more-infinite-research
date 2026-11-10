@@ -1,0 +1,16 @@
+{
+  "kind": "MIR512DesktopCaptureReconnectFailureR03",
+  "observed_utc": "2026-11-10T06:17:30.9379399Z",
+  "identity": "BLACKGLASS-WIN1\\Jules",
+  "automation": "official Computer Use node_repl + @oai/sky",
+  "recovery": "reset JavaScript kernel, reinitialize official client, fresh returned Downloads window; then one fresh-window retry",
+  "window_id": 17499638,
+  "captures_attempted": 2,
+  "error": "window capture timed out: timed out waiting on channel",
+  "successful_window_discovery": true,
+  "captured_images": 0,
+  "factorio_gui_launched": false,
+  "test_input_actions": 0,
+  "desktop_lock_status": "user previously confirmed unlocked; no locked-desktop claim",
+  "acceptance": "Library actual input/client/export and Startup visual gate remain unqualified"
+}
