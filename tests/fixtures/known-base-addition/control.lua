@@ -3,6 +3,7 @@
 local FIXTURE, KEY = "mir-fixture-mir5-known-base-addition", "mir5_known_base_addition"
 local CASE, SAVE = "known-base-addition-f200-2077", "mir5-native-complete"
 local GEAR, PLASTIC = "recipe-prod-research_gears-1", "recipe-prod-research_plastic-1"
+local LAB, LAB_SPEED, STOCK, REFILL_AT = "mir-known-base-fast-lab", 14400, 100, 16
 local FORCES = {"player", "mir5-migration-origin-f200-110-foreign", "mir5-migration-origin-f200-110-detached"}
 local FAMILIES = {
   {"low_density_structure","low-density-structure"}, {"plastic","plastic-bar"},
@@ -128,18 +129,60 @@ end
 local function marker(stage,state)
   log("[MIR5_NATIVE_FIXTURE] RESULT "..helpers.table_to_json({case=CASE,stage=stage,status="passed",
     qualification="exact-protected-source-native-runtime-only",ordinary_completions=state.completions,
-    initial=state.initial,final=state.final,on_load_read_only=stage=="reload"}))
+    initial=state.initial,final=state.final,on_load_read_only=stage=="reload",
+    apparatus=state.apparatus,science=state.science,supply_log=state.supply_log,final_stock=state.final_stock}))
 end
-local function fill(state,research)
+local function stock(state)
+  local counts={}
+  for name in pairs(state.packs)do
+    local total=0
+    for _,lab in ipairs(state.labs)do
+      if not lab.valid then fail("ordinary lab disappeared")end
+      total=total+lab.get_inventory(defines.inventory.lab_input).get_item_count(name)
+    end
+    counts[name]=total
+  end
+  return counts
+end
+local function refill(state,research)
+  local ledger=state.science[research.name];local added={}
   for _,lab in ipairs(state.labs)do
     if not lab.valid then fail("ordinary lab disappeared")end
-    local input=lab.get_inventory(defines.inventory.lab_input);input.clear()
+    local input=lab.get_inventory(defines.inventory.lab_input)
     for _,ingredient in ipairs(research.research_unit_ingredients)do
-      if input.insert{name=ingredient.name,count=100}~=100 then fail("science stock failed")end
+      local name=ingredient.name
+      if ledger.starting[name]==nil then fail("current research ingredients changed")end
+      local count=input.get_item_count(name)
+      if count<=REFILL_AT then
+        local amount=STOCK-count
+        if input.insert{name=name,count=amount}~=amount then fail("science stock failed")end
+        ledger.inserted[name]=(ledger.inserted[name]or 0)+amount
+        added[name]=(added[name]or 0)+amount
+      end
     end
-    lab.energy,lab.disabled_by_script=1000000000,false
+    if lab.disabled_by_script then lab.disabled_by_script=false end
   end
+  if next(added)then state.supply_log[#state.supply_log+1]={tick=game.tick,research=research.name,inserted=added}end
+end
+local function fill(state,research)
+  if state.science[research.name]then fail("declared research stocked twice")end
+  for _,ingredient in ipairs(research.research_unit_ingredients)do state.packs[ingredient.name]=true end
+  state.science[research.name]={starting=stock(state),inserted={},started_tick=game.tick,
+    unit={count=research.research_unit_count,time_ticks=research.prototype.research_unit_energy,
+      formula=research.prototype.research_unit_count_formula or false,
+      science=table.deepcopy(research.research_unit_ingredients)}}
+  refill(state,research)
   state.stocked=research.name
+end
+local function consumed(state,name)
+  local ledger=state.science[name];if not ledger then fail("ordinary research supply ledger absent")end
+  local remaining=stock(state);local spent={}
+  for _,ingredient in ipairs(ledger.unit.science)do
+    local pack=ingredient.name
+    spent[pack]=ledger.starting[pack]+(ledger.inserted[pack]or 0)-remaining[pack]
+    if spent[pack]<=0 then fail("ordinary completion consumed no "..pack)end
+  end
+  return spent
 end
 local function start_labs(state)
   local surface=game.create_surface("mir-known-base-addition-labs",{width=64,height=64})
@@ -147,12 +190,17 @@ local function start_labs(state)
   local tiles={}
   for y=-16,16 do for x=-16,16 do tiles[#tiles+1]={name="grass-1",position={x,y}}end end
   surface.set_tiles(tiles)
-  state.labs={}
+  state.labs={};state.packs={};state.science={};state.supply_log={}
   for y=0,7 do for x=0,7 do
-    local lab=surface.create_entity{name="lab",position={x*4-14,y*4-14},force=forces()[2]}
+    local lab=surface.create_entity{name=LAB,position={x*4-14,y*4-14},force=forces()[2]}
     if not lab or not lab.valid then fail("ordinary lab creation failed")end
+    if lab.prototype.get_researching_speed("normal")~=LAB_SPEED then fail("test lab speed differs")end
+    lab.disabled_by_script=true
     state.labs[#state.labs+1]=lab
   end end
+  state.apparatus={lab=LAB,count=#state.labs,prototype_speed=LAB_SPEED,
+    laboratory_speed_modifier=forces()[2].laboratory_speed_modifier,
+    laboratory_productivity_bonus=forces()[2].laboratory_productivity_bonus,game_speed=game.speed}
   fill(state,technology(forces()[2],GEAR));state.phase="labs"
 end
 script.on_init(function()
@@ -169,15 +217,14 @@ script.on_event(defines.events.on_research_finished,function(event)
   if not state or state.phase~="labs" or research.force~=forces()[2]then return end
   local expected=#state.completions==0 and GEAR or PLASTIC
   if event.by_script==true or research.name~=expected then fail("completion was not the declared ordinary queue")end
-  for _,ingredient in ipairs(research.research_unit_ingredients)do
-    local count=0
-    for _,lab in ipairs(state.labs)do count=count+lab.get_inventory(defines.inventory.lab_input).get_item_count(ingredient.name)end
-    if count>=#state.labs*100 then fail("ordinary completion consumed no "..ingredient.name)end
-  end
+  if state.stocked~=research.name then fail("completion has no matching supply ledger")end
+  state.science[research.name].consumed_at_event=consumed(state,research.name)
+  for _,lab in ipairs(state.labs)do lab.disabled_by_script=true end
+  state.finish_tick=game.tick
   state.completions[#state.completions+1]={name=research.name,tick=game.tick}
   if research.name==PLASTIC then
-    for _,lab in ipairs(state.labs)do lab.disabled_by_script=true;lab.get_inventory(defines.inventory.lab_input).clear()end
     state.completed_tick=game.tick;state.phase="settle"
+  else state.finish_pending=research.name
   end
 end)
 script.on_load(function() loaded,reported=true,false end)
@@ -188,6 +235,7 @@ script.on_event(defines.events.on_tick,function()
     if state.phase~="completed" then fail("cold save is incomplete")end
     check_carriers(true)
     equal(snapshots(),state.final,"cold state")
+    equal(stock(state),state.final_stock,"cold science stock")
     if not reported then marker("reload",state);reported=true end
     return
   end
@@ -197,11 +245,16 @@ script.on_event(defines.events.on_tick,function()
   if game.tick>state.deadline then fail("queued ordinary labs exceeded deadline")end
   if state.phase=="ready" then start_labs(state)end
   if state.phase=="labs" then
+    if state.finish_pending then
+      if game.tick<=state.finish_tick then return end
+      state.science[state.finish_pending].consumed=consumed(state,state.finish_pending)
+      state.finish_pending=nil
+    end
     local research=forces()[2].current_research
     if not research or research.name~=GEAR and research.name~=PLASTIC then fail("ordinary queued research disappeared")end
-    if state.stocked~=research.name then fill(state,research)end
-    for _,lab in ipairs(state.labs)do lab.energy=1000000000 end
+    if state.stocked~=research.name then fill(state,research)else refill(state,research)end
   elseif state.phase=="settle" and game.tick>state.completed_tick then
+    state.science[PLASTIC].consumed=consumed(state,PLASTIC)
     local final=snapshots();local expected_all=table.deepcopy(state.initial)
     local expected=expected_all[FORCES[2]]
     -- Only these two real native completions may change the protected snapshot.
@@ -211,6 +264,7 @@ script.on_event(defines.events.on_tick,function()
     expected.bonuses["plastic-bar"]=expected.bonuses["plastic-bar"]+.1
     expected.current,expected.queue,expected.progress=false,{},0
     equal(final,expected_all,"post-lab state");check_carriers(true)
+    state.final_stock=stock(state)
     state.final, state.phase=final,"completed"
     marker("initial",state);game.server_save(SAVE)
   end

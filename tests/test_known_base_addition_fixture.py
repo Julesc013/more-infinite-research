@@ -13,9 +13,10 @@ FIXTURE = ROOT / "tests/fixtures/known-base-addition"
 
 
 class KnownBaseAdditionFixtureTests(unittest.TestCase):
-    def controller(self):
+    def controller(self, base_lab_speed=1):
         lua = LuaRuntime(unpack_returned_tuples=True)
         lua.globals().control_path = (FIXTURE / "control.lua").as_posix()
+        lua.globals().base_lab_speed = base_lab_speed
         lua.execute('''
           function table.deepcopy(value)
             if type(value)~="table"then return value end
@@ -37,15 +38,19 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
           local function technology(force,name,level,hidden,enabled,recipe,change)
             local t={name=name,valid=true,force=force,level=level,researched=false,enabled=enabled,
               saved_progress=0,visible_when_disabled=false,
-              prototype={hidden=hidden,max_level=4294967295,effects={}},
-              research_unit_ingredients={{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1}}}
+              prototype={hidden=hidden,max_level=4294967295,effects={},research_unit_energy=3600,
+                research_unit_count_formula="8000*2^(L-1)"},research_unit_ingredients={}}
+            for _,pack in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"})do
+              t.research_unit_ingredients[#t.research_unit_ingredients+1]={name=pack,amount=1}
+            end
+            setmetatable(t,{__index=function(_,key)if key=="research_unit_count"then return 8000*2^(t.level-1)end end})
             if recipe then t.prototype.effects={{type="change-recipe-productivity",recipe=recipe,change=change}}end
             force.technologies[name]=t;return t
           end
           for i,name in ipairs(names)do
             local force={name=name,index=i==1 and 1 or i==2 and 4 or 5,valid=true,technologies={},recipes={},
               research_queue={},research_progress=0,mining_drill_productivity_bonus=0,worker_robots_battery_modifier=.1,
-              get_ammo_damage_modifier=function()return 0 end}
+              get_ammo_damage_modifier=function()return 0 end,laboratory_productivity_bonus=0,laboratory_speed_modifier=0}
             game.forces[name]=force
             for _,family in ipairs(families)do
               technology(force,"recipe-prod-research_"..family[1].."-1",2,family[1]=="plastic",family[1]~="plastic")
@@ -77,8 +82,13 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
             surface.create_entity=function(spec)
               local counts={};local inventory={clear=function()counts={}end,
                 insert=function(row)counts[row.name]=(counts[row.name]or 0)+row.count;return row.count end,
+                remove=function(row)local n=math.min(counts[row.name]or 0,row.count);counts[row.name]=(counts[row.name]or 0)-n;return n end,
                 get_item_count=function(name)return counts[name]or 0 end}
-              return {valid=true,force=spec.force,get_inventory=function()return inventory end}
+              return setmetatable({valid=true,name=spec.name,force=spec.force,disabled_by_script=false,
+                prototype={get_researching_speed=function(quality)
+                  assert(quality=="normal");return spec.name=="mir-known-base-fast-lab"and 14400 or base_lab_speed
+                end},get_inventory=function()return inventory end},
+                {__newindex=function(t,k,v)assert(k~="active","active is not a portable writable field");rawset(t,k,v)end})
             end
             return surface
           end
@@ -91,8 +101,10 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
           function consume()
             for _,lab in ipairs(storage.mir5_known_base_addition.labs)do
               local input=lab.get_inventory(1);local old=input.get_item_count("automation-science-pack")
-              input.clear();input.insert{name="automation-science-pack",count=old-1}
-              input.insert{name="logistic-science-pack",count=old-1}
+              input.clear()
+              for _,name in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"})do
+                input.insert{name=name,count=old-1}
+              end
             end
           end
           function finish_gear()
@@ -100,6 +112,7 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
             foreign.research_queue={plastic};foreign.research_progress=0
             foreign.recipes["iron-gear-wheel"].productivity_bonus=.1
             game.tick=12;callbacks[2]({research=gear,by_script=false});callbacks[1]()
+            game.tick=13;callbacks[1]() -- settle the native gear debit before stocking plastic
           end
           function finish_plastic()
             consume();plastic.level=plastic.level+1;foreign.current_research=nil;foreign.research_queue={}
@@ -129,6 +142,10 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
           local config=require("research.settings");local startup={}
           for _,row in ipairs(config.prototypes())do startup[row.name]={value=row.default_value}end
           settings,data,helpers,log={startup=startup},full_world(mods,true),nil,function()end
+          -- Explicit Base lab facts consumed by the new test-only clone.
+          data.raw.lab.lab={type="lab",name="lab",researching_speed=1,energy_source={type="electric"},
+            inputs={"automation-science-pack","logistic-science-pack","military-science-pack","chemical-science-pack",
+              "production-science-pack","utility-science-pack","space-science-pack"}}
           function data:extend(rows)
             self.writes=self.writes+1
             for _,row in ipairs(rows)do
@@ -337,6 +354,112 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
                   end
                   assert(not ok,"false ordinary/preservation result accepted")
                   assert(#game.saves==0 and #markers==0)
+                ''')
+
+
+    def test_normal_cost_16000_level_refills_past_6400_stock_without_cost_changes(self):
+        # Even granting the OLD standard-lab actor the proposed fast speed,
+        # its one-time6400 stock cannot pay the16000 plastic level.
+        self.assertLess(64 * 100, 16000)
+        self.assertGreater(16000 * 3600 / 64, 180 * 60)
+        lua = self.controller(base_lab_speed=14400)
+        lua.execute('''
+          begin()
+          local gear_formula=gear.prototype.research_unit_count_formula
+          local plastic_formula=plastic.prototype.research_unit_count_formula
+          for tick=12,500 do
+            game.tick=tick;callbacks[1]()
+            local state=storage.mir5_known_base_addition
+            if state.phase=="completed"then break end
+            local research=foreign.current_research
+            if research then
+              local cost=research.research_unit_count
+              local remaining=cost*(1-foreign.research_progress)
+              for _,lab in ipairs(state.labs)do
+                if not lab.disabled_by_script then
+                  local input=lab.get_inventory(1)
+                  local units=math.min(lab.prototype.get_researching_speed("normal")/research.prototype.research_unit_energy,remaining)
+                  for _,ingredient in ipairs(research.research_unit_ingredients)do
+                    units=math.min(units,input.get_item_count(ingredient.name)/ingredient.amount)
+                  end
+                  for _,ingredient in ipairs(research.research_unit_ingredients)do
+                    input.remove{name=ingredient.name,count=units*ingredient.amount}
+                  end
+                  foreign.research_progress=foreign.research_progress+units/cost;remaining=remaining-units
+                  if remaining<.00000001 then
+                    research.level=research.level+1;foreign.research_progress=0
+                    if research==gear then
+                      foreign.current_research=plastic;foreign.research_queue={plastic}
+                      foreign.recipes["iron-gear-wheel"].productivity_bonus=.1
+                    else
+                      foreign.current_research=nil;foreign.research_queue={}
+                      foreign.recipes["plastic-bar"].productivity_bonus=.2
+                      foreign.technologies["mir-native-credit-research_plastic-plastic-bar-positive"].level=3
+                    end
+                    callbacks[2]({research=research,by_script=false});break
+                  end
+                end
+              end
+            end
+          end
+          local state=storage.mir5_known_base_addition
+          assert(state.phase=="completed"and #state.completions==2,"normal16000 workload starved at6400stock")
+          assert(state.science[plastic.name].unit.count==16000 and state.science[gear.name].unit.count==8000)
+          for _,ingredient in ipairs(plastic.research_unit_ingredients)do
+            local ledger=state.science[plastic.name]
+            assert(ledger.inserted[ingredient.name]>6400 and ledger.consumed[ingredient.name]>0)
+          end
+          assert(gear.prototype.research_unit_count_formula==gear_formula and plastic.prototype.research_unit_count_formula==plastic_formula)
+          assert(gear.prototype.research_unit_energy==3600 and plastic.prototype.research_unit_energy==3600 and game.speed==1)
+          assert(#state.supply_log>2,"same-research refill was not observed")
+        ''')
+
+    def test_fast_lab_preserves_base_inputs_and_native_research_units(self):
+        lua = self.pipeline()
+        lua.execute('''
+          local base=data.raw.lab.lab
+          local lab=data.raw.lab["mir-known-base-fast-lab"]
+          assert(base.researching_speed==1 and base.energy_source.type=="electric")
+          assert(lab~=base and lab.inputs~=base.inputs and lab.type=="lab")
+          assert(lab.researching_speed==14400 and lab.energy_source.type=="void"and lab.minable==nil)
+          local expected={"automation-science-pack","logistic-science-pack","military-science-pack","chemical-science-pack",
+            "production-science-pack","utility-science-pack","space-science-pack"}
+          assert(#lab.inputs==#expected)
+          for i,name in ipairs(expected)do assert(lab.inputs[i]==name and base.inputs[i]==name)end
+          for _,id in ipairs({"recipe-prod-research_gears-1","recipe-prod-research_plastic-1"})do
+            local unit=data.raw.technology[id].unit
+            assert(unit.count==nil and unit.count_formula=="8000*2^(L-1)"and unit.time==60)
+            local packs={};for _,pair in ipairs(unit.ingredients)do packs[pair[1]]=pair[2]end
+            for _,name in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"})do
+              assert(packs[name]==1);packs[name]=nil
+            end
+            assert(next(packs)==nil)
+          end
+        ''')
+        actor = (FIXTURE / "control.lua").read_text()
+        for forbidden in ("lab.energy", ".active=", ".active =", "research_recursive", "reset_technology_effects",
+                          "game.speed=", "force.research_progress=", "input.clear()"):
+            self.assertNotIn(forbidden, actor)
+
+    def test_wrong_target_unconsumed_second_level_and_cold_stock_drift_refuse(self):
+        for opponent in ("wrong-target", "unconsumed-plastic", "cold-stock"):
+            with self.subTest(opponent=opponent):
+                lua = self.controller()
+                lua.globals().opponent = opponent
+                lua.execute('''
+                  begin();local ok,message
+                  if opponent=="wrong-target"then
+                    ok,message=pcall(callbacks[2],{research=plastic,by_script=false})
+                    assert(not ok and tostring(message):find("declared ordinary queue",1,true))
+                  elseif opponent=="unconsumed-plastic"then
+                    finish_gear();ok,message=pcall(callbacks[2],{research=plastic,by_script=false})
+                    assert(not ok and tostring(message):find("consumed no",1,true))
+                  else
+                    finish_gear();finish_plastic();game.tick=14;callbacks[1]()
+                    storage.mir5_known_base_addition.labs[1].get_inventory(1).remove{name="automation-science-pack",count=1}
+                    callbacks.load();ok,message=pcall(callbacks[1])
+                    assert(not ok and tostring(message):find("cold science stock",1,true))
+                  end
                 ''')
 
 

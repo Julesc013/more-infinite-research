@@ -1,5 +1,14 @@
 -- Two explicit new recipient routes; neither existed in the pure Base source.
 local rows = {}
+-- Apparatus only: retain Base's exact science inputs and all real research
+-- unit/effect contracts. Normal quality14400/3600 consumes4 units per tick
+-- at the preserved60-second research time before actual force modifiers.
+local lab=table.deepcopy(assert(data.raw.lab.lab,"known-Base fixture requires the native Base lab"))
+lab.name="mir-known-base-fast-lab"
+lab.minable=nil
+lab.energy_source={type="void"}
+lab.researching_speed=14400
+rows[#rows+1]=lab
 for _, recipe in ipairs({"plastic-bar", "low-density-structure"}) do
   local original = assert(data.raw.recipe[recipe], "known-Base fixture recipe absent: " .. recipe)
   local copy = table.deepcopy(original)
