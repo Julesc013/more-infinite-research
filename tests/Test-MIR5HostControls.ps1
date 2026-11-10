@@ -15,6 +15,7 @@ $controls = @(
   [ordered]@{path='tests/test_secretas_continuation.py';lua=$true},
   [ordered]@{path='tests/test_worker_storage_continuation.py';lua=$true},
   [ordered]@{path='tests/test_worker_storage_history.py';lua=$true},
+  [ordered]@{path='tests/test_worker_default_snapshot_probe.py';lua=$true},
   [ordered]@{path='tests/test_ferrum_worker_storage_native.py';lua=$true},
   [ordered]@{path='tests/test_ric_marine.py';lua=$true},
   [ordered]@{path='tests/test_discovery_tree_compatibility.py';lua=$true},

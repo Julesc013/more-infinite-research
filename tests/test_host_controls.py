@@ -45,6 +45,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_secretas_continuation.py",
             "tests/test_worker_storage_continuation.py",
             "tests/test_worker_storage_history.py",
+            "tests/test_worker_default_snapshot_probe.py",
             "tests/test_ferrum_worker_storage_native.py",
             "tests/test_ric_marine.py",
             "tests/test_discovery_tree_compatibility.py",
