@@ -265,14 +265,15 @@ class WorkerStorageProviderNativeTests(unittest.TestCase):
         ''')
 
     def test_science_predictions_are_strict_independent_arithmetic(self):
-        self.assertEqual(1984, math.ceil(3417 * (1 - .42000000000000004) / 32) * 32)
+        self.assertEqual(1982, math.ceil(3417 * (1 - .42000000000000004)))
+        self.assertEqual(62, math.ceil(3417 * (1 - .42000000000000004) / 32))
         self.assertEqual(3417, math.floor(200 * 1.5 ** 7))
         self.assertEqual(5125, math.floor(200 * 1.5 ** 8))
-        self.assertEqual(3424, math.ceil(3417 / 32) * 32)
+        self.assertEqual(5399, 1982 + 3417)
         self.assertEqual(107, math.ceil(3417 / 32))
         text = (FIXTURE / "provider_native.lua").read_text()
-        self.assertIn('used[pack] == (i == 6 and 0 or 1984)', text)
-        self.assertIn('used[pack] - s.provider_continuation_consumed[pack] == 3424', text)
+        self.assertIn('used[pack] == (i == 6 and 0 or 1982)', text)
+        self.assertIn('used[pack] - s.provider_continuation_consumed[pack] == 3417', text)
         self.assertNotIn("storage.mir", text)
         self.assertNotIn('require("runtime.', text)
         cold = text.split("local function cold()", 1)[1].split("local callbacks", 1)[0]
@@ -294,9 +295,9 @@ class WorkerStorageProviderNativeTests(unittest.TestCase):
           end
         """)
 
-    def test_fresh_continuation_consumption_is_exact_3424_not_cost_or_old_curve(self):
+    def test_private_and_fresh_consumption_use_exact_units_not_tick_batches(self):
         self.lua.execute(r"""
-          for _,spent in ipairs({3424,3423,3425,3417,16000})do
+          for _,spent in ipairs({3417,3416,3418,3424,16000})do
             world();local s=storage.worker_storage_default_native_fixture;local ids=actor.ids
             s.provider_baseline=expected();s.phase="provider-continuation-finished"
             s.ordinary={{name=ids.private,by_script=false},{name="worker-robots-storage-8",by_script=false}}
@@ -319,27 +320,45 @@ class WorkerStorageProviderNativeTests(unittest.TestCase):
             end
             game.server_save=function(name)assert(name=="worker-default-provider-saved");saves=saves+1 end
             local ok,why=pcall(callbacks.on_tick)
-            assert(ok==(spent==3424),tostring(why));assert(saves==(spent==3424 and 1 or 0))
-            assert(s.phase==(spent==3424 and "provider-saved"or "provider-continuation-finished"))
+            assert(ok==(spent==3417),tostring(why));assert(saves==(spent==3417 and 1 or 0))
+            assert(s.phase==(spent==3417 and "provider-saved"or "provider-continuation-finished"))
           end
         """)
 
-    def test_original_source_point42_is_preserved_with_exact_private_batch_prediction(self):
+        self.lua.execute(r"""
+          for _,spent in ipairs({1982,1981,1983,1984})do
+            world();local s=storage.worker_storage_default_native_fixture;local ids=actor.ids
+            s.provider_baseline=expected();s.phase="provider-private-finished"
+            local f=world_frames[1];f.rows[ids.private]=row(ids.private,9,5125,false,false)
+            f.bonus=8;f.current=ids.queued;f.progress=0;f.queue={ids.queued}
+            for _,pack in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack",
+              "production-science-pack","utility-science-pack"})do s.inserted[pack]=spent end
+            helpers.write_file=function(path)
+              if path:find("provider-administrative-setup-before",1,true)then error("HOST_AFTER_STRICT_PRIVATE_SCIENCE")end
+            end
+            local ok,why=pcall(callbacks.on_tick);assert(not ok)
+            assert((tostring(why):find("HOST_AFTER_STRICT_PRIVATE_SCIENCE",1,true)~=nil)==(spent==1982))
+            assert(s.provider_private_consumed~=nil==(spent==1982))
+            assert(s.phase=="provider-private-finished" and lab.disabled_by_script)
+          end
+        """)
+
+    def test_original_source_point42_is_preserved_with_exact_private_unit_prediction(self):
         self.lua.execute(r"""
           world();local s=storage.worker_storage_default_native_fixture
           s.closed[1].progress=.42;world_frames[1].progress=.42
           callbacks.on_configuration_changed(event)
           assert(s.closed[1].progress==.42 and world_frames[1].progress==.42)
           assert(s.provider_baseline[1].progress==.42 and s.provider_baseline[1].rows[actor.ids.private].count==3417)
-          assert(math.ceil(3417*(1-.42)/32)==62 and last_body.extra.expected_private_science_each==1984)
+          assert(math.ceil(3417*(1-.42))==1982 and last_body.extra.expected_private_science_each==1982)
           assert(insert_calls==0 and lab.disabled_by_script and s.phase=="provider-private-ready")
         """)
 
-    def test_actual_only_progress_drift_refuses_even_in_the_same_science_batch(self):
+    def test_actual_only_progress_drift_refuses_even_with_the_same_remaining_units(self):
         self.lua.execute(r"""
           world();local s=storage.worker_storage_default_native_fixture
           s.closed[1].progress=.42;world_frames[1].progress=.42001
-          assert(math.ceil(3417*(1-.42)/32)==62 and math.ceil(3417*(1-.42001)/32)==62)
+          assert(math.ceil(3417*(1-.42))==1982 and math.ceil(3417*(1-.42001))==1982)
           local ok,why=pcall(callbacks.on_configuration_changed,event)
           assert(not ok and tostring(why):find("provider-entry",1,true))
           assert(s.closed[1].progress==.42 and world_frames[1].progress==.42001)

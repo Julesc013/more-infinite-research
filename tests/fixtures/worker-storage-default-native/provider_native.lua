@@ -173,12 +173,12 @@ function P.bind(M)
     check(lab.disabled and lab.modules_empty and lab.speed == 115200, "paused 32-unit provider lab")
     for _, pack in ipairs(SCIENCE) do check(lab.inventory[pack] == 0, "empty protected lab") end
     check(expected[1].rows[PRIVATE].count == 3417
-      and math.ceil(expected[1].rows[PRIVATE].count * (1 - expected[1].progress) / 32) == 62,
-      "exact partial for strict1984 science prediction")
+      and math.ceil(expected[1].rows[PRIVATE].count * (1 - expected[1].progress)) == 1982,
+      "exact partial for strict1982 science prediction")
     -- No test setup write occurs before the complete four-force check above.
     s.provider_baseline, s.provider_input = copy(expected), copy(s.closed)
     s.mode, s.phase = "provider", "provider-private-ready"
-    emit("provider-entry-verified", {expected_private_science_each=1984, expected_private_white=0})
+    emit("provider-entry-verified", {expected_private_science_each=1982, expected_private_white=0})
   end
   function callbacks.on_finished(event)
     local s = state(); local id = event.research.name
@@ -230,7 +230,7 @@ function P.bind(M)
       expected.rows[PRIVATE], expected.bonus, expected.current, expected.progress, expected.queue =
         copy(f.rows[PRIVATE]), 8, QUEUED, 0, {QUEUED}
       M.same(expected, f, "$/private-earned-player")
-      for i, pack in ipairs(SCIENCE) do check(used[pack] == (i == 6 and 0 or 1984), "strict private science " .. pack) end
+      for i, pack in ipairs(SCIENCE) do check(used[pack] == (i == 6 and 0 or 1982), "strict private science " .. pack) end
       s.provider_private_consumed = copy(used)
       emit("provider-administrative-setup-before", {scripted_finite5_to7=true,ordinary=false})
       local force = game.forces.player
@@ -266,12 +266,12 @@ function P.bind(M)
         copy(earned), 12, QUEUED, 0, {QUEUED}
       M.same(expected, f, "$/continuation-earned-player")
       local used = consumed()
-      -- Fresh count3417 uses 107 complete 32-unit lab ticks: ceil(3417/32)*32.
-      for _, pack in ipairs(SCIENCE) do check(used[pack] - s.provider_continuation_consumed[pack] == 3424,
-        "MIR8 exact3424 science " .. pack) end
+      -- Speed determines the 107-tick duration; completion consumes only the 3417 required units.
+      for _, pack in ipairs(SCIENCE) do check(used[pack] - s.provider_continuation_consumed[pack] == 3417,
+        "MIR8 exact3417 science " .. pack) end
       check(#s.ordinary == 2, "exact two provider ordinary completions")
       s.phase, s.closed, s.closed_lab = "provider-saved", copy(actual), lab_frame()
-      emit("provider-saved", {private_science=s.provider_private_consumed,continuation_science_each=3424})
+      emit("provider-saved", {private_science=s.provider_private_consumed,continuation_science_each=3417})
       check(game.is_multiplayer(), "provider save requires owned server")
       game.server_save("worker-default-provider-saved")
     end
