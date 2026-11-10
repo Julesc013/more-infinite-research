@@ -172,7 +172,8 @@ function P.bind(M)
     local lab = lab_frame()
     check(lab.disabled and lab.modules_empty and lab.speed == 115200, "paused 32-unit provider lab")
     for _, pack in ipairs(SCIENCE) do check(lab.inventory[pack] == 0, "empty protected lab") end
-    check(expected[1].progress == .42000000000000004 and expected[1].rows[PRIVATE].count == 3417,
+    check(expected[1].rows[PRIVATE].count == 3417
+      and math.ceil(expected[1].rows[PRIVATE].count * (1 - expected[1].progress) / 32) == 62,
       "exact partial for strict1984 science prediction")
     -- No test setup write occurs before the complete four-force check above.
     s.provider_baseline, s.provider_input = copy(expected), copy(s.closed)

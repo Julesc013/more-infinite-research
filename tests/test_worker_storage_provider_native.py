@@ -324,6 +324,28 @@ class WorkerStorageProviderNativeTests(unittest.TestCase):
           end
         """)
 
+    def test_original_source_point42_is_preserved_with_exact_private_batch_prediction(self):
+        self.lua.execute(r"""
+          world();local s=storage.worker_storage_default_native_fixture
+          s.closed[1].progress=.42;world_frames[1].progress=.42
+          callbacks.on_configuration_changed(event)
+          assert(s.closed[1].progress==.42 and world_frames[1].progress==.42)
+          assert(s.provider_baseline[1].progress==.42 and s.provider_baseline[1].rows[actor.ids.private].count==3417)
+          assert(math.ceil(3417*(1-.42)/32)==62 and last_body.extra.expected_private_science_each==1984)
+          assert(insert_calls==0 and lab.disabled_by_script and s.phase=="provider-private-ready")
+        """)
+
+    def test_actual_only_progress_drift_refuses_even_in_the_same_science_batch(self):
+        self.lua.execute(r"""
+          world();local s=storage.worker_storage_default_native_fixture
+          s.closed[1].progress=.42;world_frames[1].progress=.42001
+          assert(math.ceil(3417*(1-.42)/32)==62 and math.ceil(3417*(1-.42001)/32)==62)
+          local ok,why=pcall(callbacks.on_configuration_changed,event)
+          assert(not ok and tostring(why):find("provider-entry",1,true))
+          assert(s.closed[1].progress==.42 and world_frames[1].progress==.42001)
+          assert(s.provider_baseline==nil and s.phase=="upgrade-saved" and insert_calls==0 and lab.disabled_by_script)
+        """)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
