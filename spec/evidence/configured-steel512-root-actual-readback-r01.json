@@ -1,0 +1,119 @@
+{
+  "kind": "RootConfiguredSteel512FinalDestinationReadbackV1",
+  "status": "named-current12-paid10-destination-save-two-cold-passed",
+  "player_source": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+  "source_release_commit": "12854b336976a046c73e05d5a20914e96fc1cd00",
+  "candidate": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\mir512-source128-r01\\more-infinite-research_5.0.21012.zip",
+    "exists": true,
+    "bytes": 1022087,
+    "sha256": "10619C8C1BF9F0A99DE8CC4E630CAE3BDE20101E02A11F88A5F92C433F70E3FF"
+  },
+  "manifest": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel512-final-r01-controller\\manifest.json",
+    "bytes": 20907,
+    "sha256": "E6228DFBA587CFCB0B6765298C756F6291639E07BB24F01E512082DF8376CE7D"
+  },
+  "caller": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel512-final-r01-controller\\Invoke-ConfiguredSteelDestination.ps1",
+    "bytes": 23767,
+    "sha256": "11CDC3353EB5991A2A3FC78C2FE8257F14B5F9D7DF591DD12006BA4D6B244C26"
+  },
+  "actual_result": {
+    "path": "D:\\Projects\\Factorio\\.task-builds\\mir511-cumulative-native-r04\\build\\tmp\\configured-steel512-final-r01\\execute-custody.json",
+    "bytes": 46378,
+    "sha256": "6373B116CFC09D763B9E9E6D73E3CB44632E7D20CC3680DA96843FDF22761D83"
+  },
+  "process_ids": [
+    41924,
+    37584,
+    6528
+  ],
+  "process_exit_codes": [
+    -1,
+    0,
+    0
+  ],
+  "current_lab_completions": 0,
+  "historical_genuine_source_lab_completions": 1,
+  "read_only_cold_loads": 2,
+  "original_source": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\native-owner511-forward-native-custody-r01\\source\\protected\\native-owner511-forward-source-complete.zip",
+    "exists": true,
+    "bytes": 826984,
+    "sha256": "8A04048E22091BE1DAB09FB3BBB5415629971B4AD54D5ED20979E893D03B8514"
+  },
+  "control_only_derivative": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel512-final-r01-controller\\inputs\\native-owner510-earned-control512.zip",
+    "exists": true,
+    "bytes": 785177,
+    "sha256": "A21B8070FD46A5E317F6B7AA65061C0CE8A49092E86FC3A763BEEA35503C537E"
+  },
+  "save_projection": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel512-final-r01-controller\\save-projection-proof.json",
+    "bytes": 4134,
+    "sha256": "07994719A78778ABAC56AA3C6917E0418CD742C118F8053211504F058A56687F"
+  },
+  "protected_destination": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel512-final-r01-controller\\protected\\native-owner512-upgrade-complete.zip",
+    "exists": true,
+    "bytes": 827351,
+    "sha256": "DE1D0301EE28D8C0F0DDB1753846088BBAA62D1876C12CB8B0D1E2D7A30C9591"
+  },
+  "actual": {
+    "player": {
+      "name": "player",
+      "index": 1,
+      "level": 2,
+      "researched": false,
+      "enabled": true,
+      "visible": false,
+      "saved": 0,
+      "current": false,
+      "progress": 0,
+      "steel": 0.17,
+      "casting": 0.17,
+      "bullet": 0.07,
+      "private": {
+        "enabled": true,
+        "visible": false,
+        "level": 1,
+        "saved": 0,
+        "hidden": true
+      },
+      "queue": {},
+      "mining": 0,
+      "lab_speed": 0
+    },
+    "foreign": {
+      "name": "native-owner-settings-control",
+      "index": 4,
+      "level": 1,
+      "researched": false,
+      "enabled": false,
+      "visible": false,
+      "saved": 0,
+      "current": false,
+      "progress": 0,
+      "steel": 0,
+      "casting": 0,
+      "bullet": 0,
+      "private": {
+        "enabled": true,
+        "visible": false,
+        "level": 1,
+        "saved": 0,
+        "hidden": true
+      },
+      "queue": {},
+      "mining": 0,
+      "lab_speed": 0
+    }
+  },
+  "independent_result": {
+    "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\configured-steel512-independent-actual-result-review-r01.json",
+    "bytes": 22397,
+    "sha256": "7914E07A16993686D02C0A444EF13944C898B58771653ED8830B5119D7F7810F"
+  },
+  "limits": "Exact configured-steel paid10-to-current12 destination. Historical actor_role remains its original label; only five target-version literals were projected. Original earned source work is counted once, not as three new lab completions. No general provider/settings, complete private-basis decoding, client, performance or stable verdict."
+}
