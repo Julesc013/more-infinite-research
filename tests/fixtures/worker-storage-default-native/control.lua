@@ -1,7 +1,7 @@
 -- Observer runs after MIR through its declared dependency. Script setup is
--- labelled; only by_script=false head/tail finishes count as ordinary work.
+-- labelled; only by_script=false native-owner finishes count as ordinary work.
 local M = {}
-local MAIN, TAIL, GATE = "worker-robots-storage-4", "mir-worker-storage-default-5", "mir-worker-storage-head-4"
+local MAIN, TAIL, GATE = "worker-robots-storage-4", "mir-worker-storage-default-4", "mir-worker-storage-head-4"
 local PRIVATE = "mir-worker-storage-preservation-4"
 local CURRENT, QUEUED, DETACHED = "mir-worker-default-native-current", "mir-worker-default-native-queued", "mir-worker-default-native-detached"
 local LAB, FIXTURE = "mir-worker-default-native-lab", "mir-worker-storage-default-native"
@@ -38,13 +38,11 @@ function M.expected_upgrade(before)
     local source = force.rows[MAIN]; local n = M.next_level(source)
     check(not source.researched, "closed source must use its native advanced representation")
     force.rows[GATE] = row(GATE, 4, false, false, 0, n >= 5)
-    force.rows[TAIL] = row(TAIL, n >= 5 and n or 5, n >= 5 and source.enabled or false,
-      n >= 5 and source.visible or false, n >= 5 and source.saved or 0)
-    if n >= 5 then
-      source.level, source.researched, source.enabled, source.visible, source.saved, source.count = 5, false, false, true, 0, price(5)
-      if force.current == MAIN then force.current = TAIL end
-      for i, name in ipairs(force.queue) do if name == MAIN then force.queue[i] = TAIL end end
-    end
+    force.rows[TAIL] = row(TAIL, n, source.enabled, source.visible, source.saved)
+    source.level, source.researched, source.enabled, source.visible, source.saved = n >= 5 and 5 or 4, false, false, n >= 5, 0
+    source.count = price(source.level)
+    if force.current == MAIN then force.current = TAIL end
+    for i, name in ipairs(force.queue) do if name == MAIN then force.queue[i] = TAIL end end
   end
   return expected
 end
@@ -54,7 +52,7 @@ function M.assert_callback_safe(player)
     "callback retained unsafe canonical head work")
   check(player.current ~= MAIN, "callback retained canonical current work")
   for _, name in ipairs(player.queue) do check(name ~= MAIN, "callback retained canonical queued work") end
-  check(gate and gate.researched == true and tail and tail.level >= 5, "callback stable gate/tail ownership")
+  check(gate and gate.researched == true and tail and M.next_level(tail) >= 5, "callback stable gate/tail ownership")
 end
 function M.assert_settled_flags(player)
   local head, tail, gate = player.rows[MAIN], player.rows[TAIL], player.rows[GATE]
@@ -135,7 +133,6 @@ local function contract(id, first, maximum, modifier)
   end
   local actual, expected = {}, id == GATE and {} or copy(PREREQUISITES)
   for key, prerequisite in pairs(p.prerequisites) do actual[#actual + 1] = type(key) == "string" and key or prerequisite.name end
-  if id == TAIL then expected[#expected + 1] = GATE end
   table.sort(actual); table.sort(expected); M.same(expected, actual, "$/prototype/" .. id .. "/prerequisites")
   for i, ingredient in ipairs(p.research_unit_ingredients) do
     check(ingredient.name == SCIENCE[i] and ingredient.amount == 1, "exact science vector " .. id)
@@ -145,7 +142,7 @@ local function contracts(old)
   contract(MAIN, 4, 4294967295, 1)
   contract(PRIVATE, 4, 4294967295, 1)
   if old then check(prototypes.technology[TAIL] == nil and prototypes.technology[GATE] == nil, "old11 has no draft identities")
-  else contract(TAIL, 5, 4294967295, 1); contract(GATE, 4, 4, 0) end
+  else contract(TAIL, 4, 4294967295, 1); contract(GATE, 4, 4, -1) end
 end
 local function setup(mode)
   local old = mode == "old-source"; closure(old); contracts(old)
@@ -153,17 +150,18 @@ local function setup(mode)
   storage[KEY] = s
   for i, name in ipairs(ROLES) do
     local force = game.forces[name] or game.create_force(name)
-    local main = force.technologies[MAIN]
+    local main = force.technologies[old and MAIN or TAIL]
     for _, prerequisite in pairs(main.prerequisites) do prerequisite.research_recursive() end
     check(main.level == 4 and not main.researched and main.enabled and main.research_unit_count == 675, "initial unpaid head4")
     for _, id in ipairs({CURRENT, QUEUED, DETACHED}) do
       local t = force.technologies[id]; check(t and t.enabled and not t.researched and t.level == 1, "unearned independent sentinel")
     end
     if old and i <= 3 then main.level = ({8,7,6})[i] end -- labelled administrative setup, no ordinary claim.
-    if i == 1 then force.research_queue = old and {MAIN, QUEUED} or {MAIN, MAIN, QUEUED}; if old then force.research_progress = .42 end
-    elseif i == 2 then force.research_queue = {CURRENT, MAIN, QUEUED}; force.research_progress = .125; main.saved_progress = .27
+    local owner_id = old and MAIN or TAIL
+    if i == 1 then force.research_queue = old and {owner_id, QUEUED} or {owner_id, owner_id, QUEUED}; if old then force.research_progress = .42 end
+    elseif i == 2 then force.research_queue = {CURRENT, owner_id, QUEUED}; force.research_progress = .125; main.saved_progress = .27
     elseif i == 3 then force.research_queue = {CURRENT}; force.research_progress = .19; main.saved_progress = .23
-    else force.research_queue = {MAIN}; force.research_progress = .37 end
+    else force.research_queue = {owner_id}; force.research_progress = .37 end
     force.technologies[DETACHED].saved_progress = .27
     check(force.worker_robots_storage_bonus == 3 + (main.level - 4), "scripted baseline contribution")
     check(force.laboratory_speed_modifier == 0 and force.laboratory_productivity_bonus == 0, "zero force lab bonuses")
@@ -241,10 +239,10 @@ function M.on_finished(event)
     check(#s.administrative < 512, "administrative marker bound")
     s.administrative[#s.administrative + 1] = {name=id, force=event.research.force.name, tick=event.tick, by_script=true}; return
   end
-  emit(id == MAIN and "completion-head-observed" or "completion-tail-observed",
+  emit(s.phase == "head-research" and "completion-head-observed" or "completion-tail-observed",
     {name=id, by_script=event.by_script, force=event.research.force.name})
   check(event.by_script == false and event.research.force == game.forces.player and s.mode == "first"
-    and (s.phase == "head-research" and id == MAIN or s.phase == "tail-research" and id == TAIL), "exact ordinary event order")
+    and (s.phase == "head-research" and id == TAIL or s.phase == "tail-research" and id == TAIL), "exact ordinary event order")
   s.ordinary[#s.ordinary + 1] = {name=id, tick=event.tick, by_script=false}
   local frames = M.frames(); foreign_unchanged(frames)
   M.assert_callback_safe(frames[1])

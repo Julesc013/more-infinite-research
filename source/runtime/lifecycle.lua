@@ -162,13 +162,6 @@ local PUBLISHED_F200_M4_VERSIONS = {
 -- remains useful while any named recipe has headroom, matching the historical
 -- per-effect OR semantics, so use the greatest route-derived level bound.
 local PRODUCTIVITY_USEFUL_LIMITS = {}
-local function worker_head_earned(force)
-  local gate = force.technologies["mir-worker-storage-head-4"]
-  if gate == nil or type(gate.researched) ~= "boolean" then
-    error("MIR caps missing native worker storage head gate", 2)
-  end
-  return gate.researched
-end
 local function useful_productivity_limit(row)
   if row.productivity_recipes == nil then return nil end
   local cached = PRODUCTIVITY_USEFUL_LIMITS[row.family]
@@ -192,7 +185,7 @@ local function useful_productivity_limit(row)
 end
 local function effective_limit(row, force)
   if row.fixed_maximum ~= nil then
-    if worker_head_earned(force) then return bounded_useful_limit(row.limit, row.fixed_maximum) end
+    return bounded_useful_limit(row.limit, row.fixed_maximum)
   end
   local useful = useful_productivity_limit(row)
   if useful == nil then return row.limit end
@@ -229,8 +222,8 @@ function M.preflight_worker_storage_split_caps(plan)
     local owned = state.owned_disabled[item.force.index]
     if owned ~= nil and type(owned) ~= "table" then error("MIR invalid worker cap ownership", 2) end
     local record = owned and owned["worker-robots-storage-4"]
-    if item.phase == "tail" and item.moved == true and record ~= nil then
-      if type(record) ~= "table" or owned["mir-worker-storage-default-5"] ~= nil then
+    if item.moved == true and record ~= nil then
+      if type(record) ~= "table" or owned["mir-worker-storage-default-4"] ~= nil then
         error("MIR conflicting worker cap restoration rights", 2)
       end
       local snapshot = {}
@@ -250,7 +243,7 @@ function M.apply_worker_storage_split_caps(plan)
   if existing_state() ~= plan.state then error("MIR worker cap ownership changed after preflight", 2) end
   for _, item in ipairs(plan.items) do
     if item.owned["worker-robots-storage-4"] ~= item.record
-        or item.owned["mir-worker-storage-default-5"] ~= nil then
+        or item.owned["mir-worker-storage-default-4"] ~= nil then
       error("MIR worker cap rights changed after preflight", 2)
     end
     for key, value in pairs(item.record) do
@@ -261,7 +254,7 @@ function M.apply_worker_storage_split_caps(plan)
     end
   end
   for _, item in ipairs(plan.items) do
-    item.owned["mir-worker-storage-default-5"] = item.record
+    item.owned["mir-worker-storage-default-4"] = item.record
     item.owned["worker-robots-storage-4"] = nil
   end
 end
@@ -302,14 +295,6 @@ end
 -- from a per-force cap disablement, so do not use ForceTechnology.enabled.
 local function authored_generated_admitted(force, row)
   if not valid_force(force) then return false end
-  local head = DECLARATION_BY_ID["worker-robots-storage-4"]
-  if row.id == "mir-worker-storage-default-5" and head and head.fixed_maximum == 4
-      and not worker_head_earned(force) then
-    -- The worker lifecycle owns this first-level gate. Treating its disabled
-    -- tail as an external cap baseline would lose MIR's later restoration
-    -- right when the first completion admits the tail above a finite cap.
-    return false
-  end
   local ok, enabled = pcall(function()
     local technology = force.technologies and force.technologies[row.id] or nil
     return technology and technology.prototype and technology.prototype.enabled == true

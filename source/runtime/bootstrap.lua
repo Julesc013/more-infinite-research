@@ -561,7 +561,9 @@ local function on_research_finished(event)
   if lifecycle.caps_active() and not worker_storage_mutating(event) then
     lifecycle.on_research_finished(event)
     if worker_default_changed then
-      lifecycle.on_research_finished({research=event.research.force.technologies["mir-worker-storage-default-5"]})
+      -- Its first native completion also fulfils the public prerequisite.
+      -- Reconcile only that changed head's presentation, never the work queue.
+      lifecycle.on_research_finished({research=event.research.force.technologies["worker-robots-storage-4"]})
     end
   end
   if competing_productivity then competing_productivity.on_research_finished(event) end

@@ -269,7 +269,7 @@ local function static_rows(existing_technology_prototypes, withheld_native_owner
     if worker_default_split and continuation.id == "worker-robots-storage-4" and worker_storage == nil then
       row.fixed_maximum = 4
       local tail = copy(row)
-      tail.id, tail.progression, tail.fixed_maximum = "mir-worker-storage-default-5", 5, nil
+      tail.id, tail.progression, tail.fixed_maximum = "mir-worker-storage-default-4", 4, nil
       rows[#rows + 1] = tail
     end
   end

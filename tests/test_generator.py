@@ -253,12 +253,11 @@ def expected_worker_default_split_rows(historical_canonical):
     assert historical_canonical["name"] == "worker-robots-storage-4"
     assert historical_canonical["level"] == 4 and historical_canonical["max_level"] == "infinite"
     tail = deepcopy(historical_canonical)
-    tail.update(name="mir-worker-storage-default-5", level=5, hidden=False)
-    tail["prerequisites"].append("mir-worker-storage-head-4")
+    tail.update(name="mir-worker-storage-default-4", level=4, hidden=False)
     gate = deepcopy(historical_canonical)
     gate.update(name="mir-worker-storage-head-4", level=4, max_level=4, hidden=True,
                 enabled=False, visible_when_disabled=False, prerequisites=[])
-    gate["effects"][0]["modifier"] = 0
+    gate["effects"][0]["modifier"] = -historical_canonical["effects"][0]["modifier"]
     gate["unit"] = {"count": 1, "time": 1,
                     "ingredients": [[historical_canonical["unit"]["ingredients"][0][0], 1]]}
     return {tail["name"]: tail, gate["name"]: gate}
@@ -1307,11 +1306,11 @@ class GeneratorTests(unittest.TestCase):
               assert(row.hidden and row.enabled == false and row.visible_when_disabled == false
                 and #row.unit.ingredients == 1 and row.unit.ingredients[1][1] == "automation-science-pack")
             elseif row.name == "mir-worker-storage-head-4" then
-              -- The zero-effect bookkeeping gate deliberately keeps one
+              -- The first-level native debit deliberately keeps one
               -- cheap source pack; it is not a player science-policy row.
               assert(row.hidden and row.enabled == false and row.visible_when_disabled == false
                 and row.max_level == 4 and #row.effects == 1
-                and row.effects[1].type == "worker-robot-storage" and row.effects[1].modifier == 0
+                and row.effects[1].type == "worker-robot-storage" and row.effects[1].modifier == -1
                 and row.unit.count == 1 and row.unit.time == 1 and #row.unit.ingredients == 1
                 and row.unit.ingredients[1][1] == "automation-science-pack"
                 and row.unit.ingredients[1][2] == 1 and #row.prerequisites == 0)
@@ -2429,7 +2428,7 @@ class GeneratorTests(unittest.TestCase):
             private = native_family_preservation_rows(expected_profiles["base-f210"]) if profile != "base-f210" else {}
             worker = {"mir-worker-storage-preservation-4": expected_private_worker_row(space_age=profile != "base-f210")}
             split = expected_worker_default_split_rows(expected["worker-robots-storage-4"])
-            expected["mir-worker-storage-default-5"] = split["mir-worker-storage-default-5"]
+            expected["mir-worker-storage-default-4"] = split["mir-worker-storage-default-4"]
             worker["mir-worker-storage-head-4"] = split["mir-worker-storage-head-4"]
             actual_public, actual_credit = split_public_and_native_credit_rows(actual, private | worker)
             self.assertEqual(actual_public, expected, profile)
@@ -2492,7 +2491,7 @@ class GeneratorTests(unittest.TestCase):
             private = native_family_preservation_rows(base_reference) if profile["id"] != "base-f200" else {}
             worker = {"mir-worker-storage-preservation-4": expected_private_worker_row(space_age=profile["id"] != "base-f200")}
             split = expected_worker_default_split_rows(expected["worker-robots-storage-4"])
-            expected["mir-worker-storage-default-5"] = split["mir-worker-storage-default-5"]
+            expected["mir-worker-storage-default-4"] = split["mir-worker-storage-default-4"]
             worker["mir-worker-storage-head-4"] = split["mir-worker-storage-head-4"]
             actual_public, actual_credit = split_public_and_native_credit_rows(actual, private | worker)
             self.assertEqual(actual_public, expected, profile["id"])

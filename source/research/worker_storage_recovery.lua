@@ -1,7 +1,7 @@
 -- One authored native holder for explicitly prepared default worker-storage4.
 -- Data callers supply the ordinary MIR default, never a foreign prototype.
 local M = {id="mir-worker-storage-preservation-4", canonical="worker-robots-storage-4"}
-M.ordinary_default_id = "mir-worker-storage-default-5"
+M.ordinary_default_id = "mir-worker-storage-default-4"
 M.ordinary_provider_id = "mir-worker-storage-provider-4"
 M.provider_debit_id = "mir-worker-storage-provider-debit-4"
 M.head_id = "mir-worker-storage-head-4"
@@ -212,53 +212,35 @@ function M.ordinary(authored, id)
   return out
 end
 
-function M.default_tail(authored)
+function M.default_owner(authored)
   assert(type(authored) == "table" and authored.name == M.canonical,
-    "MIR worker default tail requires authored canonical4")
+    "MIR worker default owner requires authored canonical4")
   local out = owner_source(authored, M.ordinary_default_id)
-  out.name, out.level, out.hidden = M.ordinary_default_id, 5, false
-  out.prerequisites = out.prerequisites or {}
-  assert(#out.prerequisites < 32, "MIR worker default tail has too many prerequisites")
-  for _, name in ipairs(out.prerequisites) do
-    assert(name ~= M.head_id, "MIR worker default source already has a head gate")
-  end
-  out.prerequisites[#out.prerequisites + 1] = M.head_id
+  out.name, out.hidden = M.ordinary_default_id, false
   return out
 end
 
-function M.head_gate(authored)
+function M.head_debit(authored, modifier)
   assert(type(authored) == "table" and authored.name == M.canonical,
-    "MIR worker head gate requires authored canonical4")
+    "MIR worker head debit requires authored canonical4")
   local out = owner_source(authored, M.head_id)
+  if modifier == nil then modifier = out.effects[1].modifier end
+  assert(finite(modifier) and modifier >= 0, "MIR worker head debit requires a nonnegative scalar")
   out.name, out.max_level = M.head_id, 4
   out.hidden, out.enabled, out.visible_when_disabled = true, false, false
-  out.effects[1].modifier = 0
+  out.effects[1].modifier = modifier == 0 and 0 or -modifier
   out.prerequisites = {}
   out.unit = {count=1, time=1, ingredients={{authored.unit.ingredients[1][1], 1}}}
   return out
 end
 
--- Native source4 and tail5 have different real initial levels. Their exact
--- work/effect contracts match after removing only the stable zero-effect gate.
--- This comparison never writes either native object or changes the legacy key.
-function M.matches_default_tail(source, tail)
+-- The detached owner starts at the same native level and retains the entire
+-- work contract. Public names and force flags confer no historical authority.
+function M.matches_default_owner(source, owner)
   local ok, matches = pcall(function()
     assert(source and source.name == M.canonical and source.level == 4)
-    assert(tail and tail.name == M.ordinary_default_id and tail.level == 5 and tail.max_level == MAX)
-    local expected = M.fingerprint(source)
-    local prerequisites, gate = {}, false
-    for key, prerequisite in pairs(tail.prerequisites or {}) do
-      local name = type(key) == "string" and key or prerequisite and prerequisite.name
-      assert(type(name) == "string" and name ~= M.canonical)
-      if name == M.head_id then assert(not gate); gate = true
-      else assert(prerequisites[name] == nil); prerequisites[name] = {name=name} end
-    end
-    assert(gate, "MIR worker default tail has no stable head gate")
-    return expected == M.fingerprint({level=4, max_level=tail.max_level, effects=tail.effects,
-      prerequisites=prerequisites, research_unit_count_formula=tail.research_unit_count_formula,
-      research_unit_count=tail.research_unit_count, research_unit_energy=tail.research_unit_energy,
-      research_unit_ingredients=tail.research_unit_ingredients,
-      ignore_tech_cost_multiplier=tail.ignore_tech_cost_multiplier})
+    assert(owner and owner.name == M.ordinary_default_id and owner.level == 4 and owner.max_level == MAX)
+    return M.fingerprint(source) == M.fingerprint(owner)
   end)
   return ok and matches
 end

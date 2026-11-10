@@ -310,19 +310,26 @@ science.apply_family(technologies, science_family_bindings, science_environment,
 if worker_default_available then
   local recovery = require("research.worker_storage_recovery")
   -- The detached default follows the same science policy as the legacy
-  -- holder. Construct the bookkeeping gate afterwards: it must not acquire
+  -- holder. Construct the first-level debit afterwards: it must not acquire
   -- end-game science, price or prerequisite policy of its own.
   science.apply_family({worker_default_authored}, {[recovery.canonical]=
     require("compatibility.science_bindings").conditions_for("worker-robots-storage")},
     science_environment, science_context)
-  local tail = recovery.default_tail(worker_default_authored)
+  local owner = recovery.default_owner(worker_default_authored)
   if not worker_default_is_head then
     -- Current finite profiles retain the old contract without offering a
     -- second ordinary infinite route. Runtime retirement remains explicit.
-    tail.hidden, tail.enabled, tail.visible_when_disabled = true, false, false
+    owner.hidden, owner.enabled, owner.visible_when_disabled = true, false, false
   end
-  technologies[#technologies + 1] = tail
-  technologies[#technologies + 1] = recovery.head_gate(worker_default_authored)
+  technologies[#technologies + 1] = owner
+  local head_scalar = worker_default_authored.effects[1].modifier
+  local public_head = data.raw.technology[recovery.canonical]
+  if not worker_default_is_head and public_head then
+    for _, effect in ipairs(public_head.effects or {}) do
+      if effect.type == "worker-robot-storage" then head_scalar = effect.modifier end
+    end
+  end
+  technologies[#technologies + 1] = recovery.head_debit(worker_default_authored, head_scalar)
 end
 native_adoption_patch = modern and require("research.native_adoption").plan(
   data.raw, native_owner_targets, withheld_native_owners, native_credit_groups,

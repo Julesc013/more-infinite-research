@@ -85,6 +85,9 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
                 technology.research_unit_count = unit["count"]
             elif unit.get("count_formula") == "1":
                 technology.research_unit_count = 1
+            elif name in ("worker-robots-storage-4", "mir-worker-storage-default-4", "mir-worker-storage-preservation-4"):
+                self.assertEqual("675*1.5^(L-4)", unit.get("count_formula"))
+                technology.research_unit_count = 675
             technology.research_unit_energy = unit["time"] * 60
             technology.research_unit_ingredients = data_fixture.generator_fixture.lua_table(lua, [
                 {"name": ingredient[0], "amount": ingredient[1]}
@@ -111,6 +114,9 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
         ''')
         lua.globals().world = lua.globals().force(41, technologies, lua.table(), None, 0)
         lua.globals().world.foreign_state = "preserve"
+        # This host force has no paid worker levels (Base rows are absent).
+        # The empty native transfer must retain its literal zero contribution.
+        lua.globals().world.worker_robots_storage_bonus = 0
         lua.globals().active_mods = data_fixture.generator_fixture.lua_table(lua, MODS)
         lua.execute('active_mods["more-infinite-research"]=require("platform.target").distribution_version')
         native_prototypes = lua.table()
@@ -159,7 +165,7 @@ class NativeOwnerCapAdoptionTests(unittest.TestCase):
                     # Global loss now fails at the earlier worker split
                     # custody boundary. The paid-only opponents above still
                     # independently reach the original native-family guard.
-                    expected_refusal = "MIR worker default split requires its authored native tail and head gate"
+                    expected_refusal = "MIR worker default requires its authored native owner and first-level debit"
                 with self.assertRaisesRegex(LuaError, expected_refusal):
                     self.boot(lua, 2)
                     lua.globals().handlers.init()

@@ -82,9 +82,9 @@ class WorkerStorageDefaultNativeTests(unittest.TestCase):
           assert(out[1].current==id.tail and out[1].queue[1]==id.tail and out[1].progress==.42)
           assert(out[2].current==id.current and out[2].queue[2]==id.tail and out[2].rows[id.tail].saved==.27)
           assert(out[3].current==id.current and out[3].rows[id.tail].saved==.23)
-          actor.same(out[4].rows[id.main],before[4].rows[id.main])
-          assert(not out[4].rows[id.gate].researched and not out[4].rows[id.tail].enabled)
-          assert(out[4].current==id.main and out[4].progress==.37)
+          assert(out[4].rows[id.main].level==4 and not out[4].rows[id.main].enabled and out[4].rows[id.main].saved==0)
+          assert(not out[4].rows[id.gate].researched and out[4].rows[id.tail].enabled and out[4].rows[id.tail].level==4)
+          assert(out[4].current==id.tail and out[4].progress==.37 and out[4].queue[1]==id.tail)
           for i=1,4 do actor.same(out[i].rows[id.detached],before[i].rows[id.detached])end
         ''')
 
@@ -133,7 +133,7 @@ class WorkerStorageDefaultNativeTests(unittest.TestCase):
           frames[1].current=id.main -- A proposed next-tick rewrite cannot admit this callback.
           actor.frames=function()return frames end
           local world={name="player"};game={tick=100,forces={player=world},server_save=function()error("unexpected save")end}
-          local ok,message=pcall(actor.on_finished,{research={name=id.main,force=world},by_script=false,tick=100})
+          local ok,message=pcall(actor.on_finished,{research={name=id.tail,force=world},by_script=false,tick=100})
           assert(not ok and tostring(message):find("canonical current work",1,true))
           assert(last_body.stage=="completion-head-observed" and last_body.frames[1].current==id.main)
           assert(state.phase=="head-research" and #written==1)

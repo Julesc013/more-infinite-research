@@ -32,7 +32,7 @@ if target.id == "f200" or target.id == "f210" then
     local creators = {}
     local names = modern.continuation_names(script and script.active_mods)
     if admission_facts.worker_default_split then
-      names[#names + 1] = "mir-worker-storage-default-5"
+      names[#names + 1] = "mir-worker-storage-default-4"
       names[#names + 1] = "mir-worker-storage-head-4"
     end
     if worker_storage ~= nil then
@@ -67,12 +67,12 @@ if target.id == "f200" or target.id == "f210" then
       end
     end
     if admission_facts.worker_default_split then
-      local tail, head = live_technologies["mir-worker-storage-default-5"], live_technologies["mir-worker-storage-head-4"]
-      if tail == nil or head == nil or tail.level ~= 5 or tail.max_level ~= 4294967295
+      local tail, head = live_technologies["mir-worker-storage-default-4"], live_technologies["mir-worker-storage-head-4"]
+      if tail == nil or head == nil or tail.level ~= 4 or tail.max_level ~= 4294967295
           or head.level ~= 4 or head.max_level ~= 4
-          or creators["mir-worker-storage-default-5"] ~= "more-infinite-research"
+          or creators["mir-worker-storage-default-4"] ~= "more-infinite-research"
           or creators["mir-worker-storage-head-4"] ~= "more-infinite-research" then
-        error("MIR worker default split requires its authored native tail and head gate", 2)
+        error("MIR worker default requires its authored native owner and first-level debit", 2)
       end
       if worker_storage == nil then
         local canonical = live_technologies["worker-robots-storage-4"]
