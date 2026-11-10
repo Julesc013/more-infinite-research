@@ -37,7 +37,7 @@ function M.expected_upgrade(before)
   for _, force in ipairs(expected) do
     local source = force.rows[MAIN]; local n = M.next_level(source)
     check(not source.researched, "closed source must use its native advanced representation")
-    force.rows[GATE] = row(GATE, 4, false, false, 0, n >= 5)
+    force.rows[GATE] = row(GATE, n >= 5 and 5 or 4, false, false, 0, false)
     force.rows[TAIL] = row(TAIL, n, source.enabled, source.visible, source.saved)
     source.level, source.researched, source.enabled, source.visible, source.saved = n >= 5 and 5 or 4, false, false, n >= 5, 0
     source.count = price(source.level)
@@ -52,7 +52,7 @@ function M.assert_callback_safe(player)
     "callback retained unsafe canonical head work")
   check(player.current ~= MAIN, "callback retained canonical current work")
   for _, name in ipairs(player.queue) do check(name ~= MAIN, "callback retained canonical queued work") end
-  check(gate and gate.researched == true and tail and M.next_level(tail) >= 5, "callback stable gate/tail ownership")
+  check(gate and gate.level == 5 and gate.researched == false and tail and M.next_level(tail) >= 5, "callback stable gate/tail ownership")
 end
 function M.assert_settled_flags(player)
   local head, tail, gate = player.rows[MAIN], player.rows[TAIL], player.rows[GATE]
@@ -142,7 +142,7 @@ local function contracts(old)
   contract(MAIN, 4, 4294967295, 1)
   contract(PRIVATE, 4, 4294967295, 1)
   if old then check(prototypes.technology[TAIL] == nil and prototypes.technology[GATE] == nil, "old11 has no draft identities")
-  else contract(TAIL, 4, 4294967295, 1); contract(GATE, 4, 4, -1) end
+  else contract(TAIL, 4, 4294967295, 1); contract(GATE, 4, 4294967295, -1) end
 end
 local function setup(mode)
   local old = mode == "old-source"; closure(old); contracts(old)
@@ -193,7 +193,8 @@ local function first_settled(final)
   local head, tail, gate = player.rows[MAIN], player.rows[TAIL], player.rows[GATE]
   M.assert_settled_flags(player)
   check(head.level == 5 and not head.researched and not head.enabled and head.saved == 0, "public fulfilled head preserved")
-  check(tail.level == (final and 6 or 5) and not tail.researched and tail.enabled and gate.researched, "native tail progression")
+  check(tail.level == (final and 6 or 5) and not tail.researched and tail.enabled
+    and gate.level == 5 and gate.researched == false, "native tail progression")
   check(player.current == (final and QUEUED or TAIL) and player.progress == 0, "settled native current/progress")
   M.same(player.queue, final and {QUEUED} or {TAIL, QUEUED}, "$/player/queue")
   return frames

@@ -40,7 +40,7 @@ class WorkerStorageProviderNativeTests(unittest.TestCase):
                 mining=0,manual_mining=0,lab_speed=0,lab_productivity=0,robot_speed=0,
                 rows={[ids.main]=row(ids.main,paid and 5 or 4,paid and 1012 or 675,false,paid),
                   [ids.tail]=row(ids.tail,n,({3417,2278,1518,675})[i],true,false,i==2 and .27 or i==3 and .23000000000000004 or 0),
-                  [ids.gate]=row(ids.gate,4,1,false,false,0,paid),[ids.private]=row(ids.private,4,675,false,false),
+                  [ids.gate]=row(ids.gate,paid and 5 or 4,1,false,false,0,false),[ids.private]=row(ids.private,4,675,false,false),
                   [ids.current]=row(ids.current,1,100000,true,false),[ids.queued]=row(ids.queued,1,100000,true,false),
                   [ids.detached]=row(ids.detached,1,100000,true,false,.27)}}
             end
@@ -82,7 +82,7 @@ class WorkerStorageProviderNativeTests(unittest.TestCase):
               for id,r in pairs(f.rows)do
                 technologies[id]={name=id,level=r.level,researched=r.researched,enabled=r.enabled,
                   visible_when_disabled=r.visible,saved_progress=r.saved,research_unit_count=r.count}
-                prototypes.technology[id]={level=r.level,max_level=(id==ids.main and 4 or id==ids.gate and 4 or 4294967295),
+                prototypes.technology[id]={level=id==ids.gate and 4 or r.level,max_level=(id==ids.main and 4 or 4294967295),
                   enabled=id~=ids.tail,hidden=id==ids.tail,visible_when_disabled=false,research_unit_count=r.count,
                   research_unit_energy=3600,effects={{type="worker-robot-storage",modifier=id==ids.gate and -1 or 1}},
                   research_unit_ingredients={}}
@@ -118,6 +118,9 @@ class WorkerStorageProviderNativeTests(unittest.TestCase):
         self.lua.execute(r'''
           for _,mutate in ipairs({function(f)f[1].rows[actor.ids.tail].researched=true end,
             function(f)f[2].rows[actor.ids.tail].count=2279 end,function(f)f[4].rows[actor.ids.gate].researched=true end,
+            function(f)f[1].rows[actor.ids.gate].level=4;f[1].rows[actor.ids.gate].researched=true end,
+            function(f)f[1].rows[actor.ids.gate].level=6 end,function(f)f[4].rows[actor.ids.gate].level=5 end,
+            function(f)f[1].rows[actor.ids.gate].enabled=true end,function(f)f[1].rows[actor.ids.gate].saved=.01 end,
             function(f)f[1].rows["worker-robots-storage-8"]={}end})do
             local before=source();mutate(before);assert(not pcall(provider.expected_handover,before))
           end

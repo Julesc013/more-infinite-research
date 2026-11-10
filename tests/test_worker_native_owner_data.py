@@ -148,7 +148,7 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
                   end
                 ''')
 
-    def test_head_debit_is_negative_finite_four_with_exact_first_source_science(self):
+    def test_head_debit_is_negative_infinite_four_with_exact_first_source_science(self):
         for target in ("f200", "f210"):
             with self.subTest(target=target):
                 self.stage(target).execute(r'''
@@ -156,12 +156,12 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
                     local source=authored();source.effects[1].modifier=modifier
                     source.unit.ingredients[1]={"logistic-science-pack",3};local before=deep(source)
                     local expected=deep(source)
-                    expected.name="mir-worker-storage-head-4";expected.level=4;expected.max_level=4
+                    expected.name="mir-worker-storage-head-4";expected.level=4;expected.max_level="infinite"
                     expected.hidden,expected.enabled,expected.visible_when_disabled=true,false,false
                     expected.effects[1].modifier=modifier==0 and 0 or -modifier;expected.prerequisites={}
                     expected.unit={count=1,time=1,ingredients={{"logistic-science-pack",1}}}
                     local gate=owner.head_debit(source);same(gate,expected);same(source,before)
-                    assert(gate.level==gate.max_level and gate.effects[1].modifier==-modifier)
+                    assert(gate.level==4 and gate.max_level=="infinite" and gate.effects[1].modifier==-modifier)
                     gate.unit.ingredients[1][1]="changed";gate.effects[1].modifier=99
                     same(source,before)
                   end
@@ -424,7 +424,7 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
                     assert(tail.unit.ingredients[i][1]==entry[1] and tail.unit.ingredients[i][2]==entry[2])
                   end
                   for i,name in ipairs(public.prerequisites)do assert(tail.prerequisites[i]==name)end
-                  assert(gate.hidden and gate.enabled==false and gate.max_level==4)
+                  assert(gate.hidden and gate.enabled==false and gate.max_level=="infinite")
                   assert(gate.unit.count==1 and gate.unit.time==1 and #gate.unit.ingredients==1)
                   assert(gate.unit.ingredients[1][1]==public.unit.ingredients[1][1])
                   assert(gate.effects[1].modifier==-public.effects[1].modifier and next(gate.prerequisites)==nil)

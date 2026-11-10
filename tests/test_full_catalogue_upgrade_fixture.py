@@ -99,11 +99,11 @@ class FullCatalogueUpgradeFixtureTests(unittest.TestCase):
             for i,id in ipairs{C,T,H,P,GEAR,PROBE}do
               local worker=i<=4;local debit=i==3;local hidden=i==3 or i==4
               local science={};for _,pack in ipairs(debit and{"automation-science-pack"}or{"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","utility-science-pack"})do science[#science+1]={name=pack,amount=1}end
-              f.technologies[id]={name=id,valid=true,force=f,level=i<=2 and 5 or worker and 4 or id==GEAR and 3 or 1,
-                researched=debit,enabled=modern and i==2 or not modern and i<=2 or not worker,
+              f.technologies[id]={name=id,valid=true,force=f,level=i<=3 and 5 or worker and 4 or id==GEAR and 3 or 1,
+                researched=false,enabled=modern and i==2 or not modern and i<=2 or not worker,
                 visible_when_disabled=modern and i==1 or false,saved_progress=0,
                 research_unit_count=debit and 1 or i<=2 and 1012 or 675,research_unit_ingredients=science,
-                prototype={level=worker and 4 or 1,max_level=debit and 4 or 4294967295,hidden=hidden,enabled=not hidden,
+                prototype={level=worker and 4 or 1,max_level=4294967295,hidden=hidden,enabled=not hidden,
                   visible_when_disabled=false,ignore_tech_cost_multiplier=false,prerequisites={},
                   research_unit_count_formula=not debit and"675*1.5^(L-4)"or nil,research_unit_energy=debit and 60 or 3600,
                   effects=worker and{{type="worker-robot-storage",modifier=debit and -1 or 1}}or{}}}
@@ -170,7 +170,8 @@ class FullCatalogueUpgradeFixtureTests(unittest.TestCase):
           configure();assert(#game.saves==0 and storage.mir5_full_catalogue_upgrade.phase=="known473-observed")
           callbacks[1]()
           assert(#game.saves==1 and #markers==1 and markers[1].worker_native_owner=="published473-idle-full4")
-          assert(markers[1].worker_frames.player.rows[T].level==5 and markers[1].worker_frames.player.rows[H].researched)
+          assert(markers[1].worker_frames.player.rows[T].level==5 and markers[1].worker_frames.player.rows[H].level==5
+            and markers[1].worker_frames.player.rows[H].researched==false)
           assert(markers[1].source_snapshot_origin.kind=="external_literal_expectations")
           assert(markers[1].witnesses.successor_gear_lab==0 and markers[1].witnesses.source_gear_lab==1)
           for _=1,2 do local oldgame=game;game=nil;callbacks.load();game=oldgame;callbacks[1]()end
@@ -183,7 +184,9 @@ class FullCatalogueUpgradeFixtureTests(unittest.TestCase):
                  'player.technologies[T].level=6','player.technologies[T].saved_progress=.01',
                  'player.technologies[C].enabled=true','player.technologies[C].visible_when_disabled=false',
                  'player.technologies[T].enabled=false','player.technologies[T].visible_when_disabled=true',
-                 'player.technologies[H].researched=false','player.technologies[H].prototype.effects[1].modifier=0',
+                 'player.technologies[H].researched=true','player.technologies[H].level=4','player.technologies[H].level=6',
+                 'player.technologies[H].prototype.max_level=4','player.technologies[H].prototype.research_unit_count_formula="1"',
+                 'player.technologies[H].prototype.effects[1].modifier=0',
                  'player.technologies[H].prototype.effects[1].modifier=-2','player.technologies[P].level=5',
                  'player.technologies[T].research_unit_count=1013','player.research_progress=player.research_progress+1e-14',
                  'paused.technologies[GEAR].saved_progress=paused.technologies[GEAR].saved_progress+1e-14',

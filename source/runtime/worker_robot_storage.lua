@@ -760,7 +760,7 @@ end
 local function head_gate_contract(source)
   local prototype = native_prototype(recovery.head_id)
   if not prototype or prototype.name ~= recovery.head_id or creator(recovery.head_id) ~= MIR
-      or prototype.level ~= 4 or prototype.max_level ~= 4 or prototype.hidden ~= true
+      or prototype.level ~= 4 or prototype.max_level ~= 4294967295 or prototype.hidden ~= true
       or prototype.enabled ~= false or prototype.visible_when_disabled ~= false
       or prototype.research_unit_count_formula ~= nil or prototype.research_unit_count ~= 1
       or prototype.research_unit_energy ~= 60 or next(prototype.prerequisites or {}) ~= nil
@@ -781,7 +781,7 @@ end
 
 local function gate_frame(force)
   local gate = force.technologies[recovery.head_id]
-  if not gate or gate.level ~= 4 or type(gate.researched) ~= "boolean" or gate.enabled ~= false
+  if not gate or (gate.level ~= 4 and gate.level ~= 5) or gate.researched ~= false or gate.enabled ~= false
       or gate.visible_when_disabled ~= false or gate.saved_progress ~= 0 then
     recover_error("default head debit native state is invalid")
   end
@@ -790,6 +790,18 @@ local function gate_frame(force)
     if entry.name == recovery.head_id then recover_error("head debit cannot be queued research") end
   end
   return gate
+end
+
+local function gate_paid(gate)
+  return gate.level == 5
+end
+
+local function set_gate_paid(gate, paid)
+  local level = paid and 5 or 4
+  if gate.level ~= level then gate.level = level end
+  -- A native level write enables the technology. This debit is never an
+  -- ordinary research route, including inside the guarded finish callback.
+  gate.enabled, gate.visible_when_disabled = false, false
 end
 
 local function default_contract()
@@ -852,7 +864,7 @@ local function full_pair(source, owner, gate)
   local paid = owner.next_level >= 5
   return source.next_level == (paid and 5 or 4) and not source.researched
     and source.saved_progress == 0 and source.occurrences == 0 and source.current ~= recovery.canonical and not source.enabled
-    and gate.researched == paid
+    and gate_paid(gate) == paid
 end
 
 local function native_bonus(force)
@@ -894,7 +906,7 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
       if owned and not refresh then recover_error("default force history is missing") end
       if destination.next_level ~= 4 or destination.researched or destination.saved_progress ~= 0
           or destination.occurrences ~= 0 or destination.enabled ~= prototype.enabled
-          or destination.visible ~= prototype.visible_when_disabled or gate.researched then
+          or destination.visible ~= prototype.visible_when_disabled or gate_paid(gate) then
         recover_error("full default owner/debit is not pristine")
       end
       if (initializing or refresh) and (source.next_level ~= 4 or source.researched
@@ -915,13 +927,13 @@ function M.plan_default_owner_transfer(event, route, initializing, context)
         disabled_by_mir=source.enabled, visibility_hidden_by_mir=false}}
     elseif not full_pair(source, destination, gate) then
       if finished and source.next_level == 4 and not source.researched and not source.enabled
-          and source.saved_progress == 0 and source.occurrences == 0 and source.current ~= recovery.canonical and not gate.researched
+          and source.saved_progress == 0 and source.occurrences == 0 and source.current ~= recovery.canonical and not gate_paid(gate)
           and destination.next_level >= 5 then
         action = "first-credit"
       else recover_error("full default native owner/first-level debit changed") end
     end
     record.forces[force.index] = next_force
-    items[#items + 1] = {force=force, source=source, destination=destination, gate=gate, gate_paid=gate.researched,
+    items[#items + 1] = {force=force, source=source, destination=destination, gate=gate, gate_paid=gate_paid(gate),
       bonus=native_bonus(force), phase="owned", moved=action == "transfer", action=action,
       target_enabled=source.enabled, target_visible=source.visible}
   end
@@ -963,8 +975,7 @@ function M.apply_default_owner_transfer(plan)
         local public_level = frame.next_level >= 5 and 5 or 4
         if canonical.level ~= public_level or canonical.researched then canonical.level = public_level end
         canonical.enabled, canonical.visible_when_disabled = false, frame.visible
-        gate.researched = frame.next_level >= 5
-        gate.enabled, gate.visible_when_disabled = false, false
+        set_gate_paid(gate, frame.next_level >= 5)
         canonical.saved_progress, holder.saved_progress = 0, frame.saved_progress
         if frame.occurrences > 0 then
           local queue = {}
@@ -979,8 +990,7 @@ function M.apply_default_owner_transfer(plan)
         -- at completion, including the observed nil-current/queued remainder.
         canonical.level = 5
         canonical.enabled, canonical.visible_when_disabled = false, frame.visible
-        gate.researched = true
-        gate.enabled, gate.visible_when_disabled = false, false
+        set_gate_paid(gate, true)
       end
     end)
     default_mutating_force = previous
@@ -1103,7 +1113,7 @@ local function plan_provider_handover(event, route)
     local public, gate = snapshot(force, recovery.canonical), gate_frame(force)
     local paid = frame.next_level >= 5
     if public.next_level ~= (paid and 5 or 4) or public.researched ~= paid or public.saved_progress ~= 0
-        or public.occurrences ~= 0 or public.current == recovery.canonical or gate.researched ~= paid then
+        or public.occurrences ~= 0 or public.current == recovery.canonical or gate_paid(gate) ~= paid then
       recover_error("finite public first/debit does not match proved owner first level", route)
     end
     if destination.next_level ~= 4 or destination.researched or destination.saved_progress ~= 0
@@ -1125,7 +1135,7 @@ local function plan_provider_handover(event, route)
     prepared.forces[force.index] = {next_level=frame.next_level, limit=limit,
       pending=allowance>0, enabled=allowance>0 and frame.enabled or false, visible=frame.visible}
     record.forces[force.index].phase = "retired"
-    items[#items+1] = {force=force, source=frame, destination=destination, public=public, gate_paid=gate.researched,
+    items[#items+1] = {force=force, source=frame, destination=destination, public=public, gate_paid=gate_paid(gate),
       release_public=release, bonus=native_bonus(force), phase="retired", moved=true}
   end
   for index in pairs(owned.forces) do if not seen[index] then recover_error("stale provider handover force history", route) end end
@@ -1185,7 +1195,7 @@ delegated_provider_apply = function(legacy)
     if not equal_plain(item.private, frame_values(snapshot(item.force, recovery.id)))
         or not equal_plain(item.public, frame_values(snapshot(item.force, recovery.canonical)))
         or not equal_plain(item.owner, frame_values(snapshot(item.force, recovery.ordinary_default_id)))
-        or gate_frame(item.force).researched ~= item.gate_paid or native_bonus(item.force) ~= item.bonus then
+        or gate_paid(gate_frame(item.force)) ~= item.gate_paid or native_bonus(item.force) ~= item.bonus then
       recover_error("native provider frame changed before quota commit")
     end
   end
@@ -1250,11 +1260,11 @@ local function apply_provider_handover(plan)
     public_expected.queue, public_expected.queued_saved = clone(expected.queue), clone(expected.queued_saved)
     if not equal_plain(expected, frame_values(private)) or not equal_plain(public_expected, frame_values(public))
         or owner.next_level ~= 4 or owner.researched or owner.saved_progress ~= 0 or owner.occurrences ~= 0
-        or owner.enabled or owner.visible or gate.researched ~= item.gate_paid or native_bonus(item.force) ~= item.bonus then
+        or owner.enabled or owner.visible or gate_paid(gate) ~= item.gate_paid or native_bonus(item.force) ~= item.bonus then
       recover_error("provider handover did not preserve exact native work/contribution; reload the original copy")
     end
     settled[#settled+1] = {force=item.force, private=frame_values(private), public=frame_values(public),
-      owner=frame_values(owner), gate_paid=gate.researched, bonus=item.bonus}
+      owner=frame_values(owner), gate_paid=gate_paid(gate), bonus=item.bonus}
   end
   if storage[OWNER_KEY] ~= fresh.prior_owner or storage[KEY] ~= fresh.prior_state then recover_error("provider history changed during native mutation") end
   storage[OWNER_KEY] = fresh.record

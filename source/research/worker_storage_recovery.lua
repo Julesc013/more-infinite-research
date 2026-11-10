@@ -226,7 +226,9 @@ function M.head_debit(authored, modifier)
   local out = owner_source(authored, M.head_id)
   if modifier == nil then modifier = out.effects[1].modifier end
   assert(finite(modifier) and modifier >= 0, "MIR worker head debit requires a nonnegative scalar")
-  out.name, out.max_level = M.head_id, 4
+  -- Keep the earned debit in a native level. A finite researched flag does
+  -- not preserve this negative worker effect through configuration loading.
+  out.name, out.max_level = M.head_id, "infinite"
   out.hidden, out.enabled, out.visible_when_disabled = true, false, false
   out.effects[1].modifier = modifier == 0 and 0 or -modifier
   out.prerequisites = {}

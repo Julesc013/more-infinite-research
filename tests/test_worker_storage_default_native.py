@@ -77,13 +77,15 @@ class WorkerStorageDefaultNativeTests(unittest.TestCase):
             assert(out[i].bonus==3+n-4 and out[i].rows[id.main].level==5 and out[i].rows[id.main].enabled==false)
             assert(out[i].rows[id.main].visible==true)
             assert(out[i].rows[id.main].count==1012 and out[i].rows[id.tail].level==n)
-            assert(out[i].rows[id.tail].count==({3417,2278,1518})[i] and out[i].rows[id.gate].researched)
+            assert(out[i].rows[id.tail].count==({3417,2278,1518})[i]
+              and out[i].rows[id.gate].level==5 and out[i].rows[id.gate].researched==false)
           end
           assert(out[1].current==id.tail and out[1].queue[1]==id.tail and out[1].progress==.42)
           assert(out[2].current==id.current and out[2].queue[2]==id.tail and out[2].rows[id.tail].saved==.27)
           assert(out[3].current==id.current and out[3].rows[id.tail].saved==.23)
           assert(out[4].rows[id.main].level==4 and not out[4].rows[id.main].enabled and out[4].rows[id.main].saved==0)
-          assert(not out[4].rows[id.gate].researched and out[4].rows[id.tail].enabled and out[4].rows[id.tail].level==4)
+          assert(out[4].rows[id.gate].level==4 and out[4].rows[id.gate].researched==false
+            and out[4].rows[id.tail].enabled and out[4].rows[id.tail].level==4)
           assert(out[4].current==id.tail and out[4].progress==.37 and out[4].queue[1]==id.tail)
           for i=1,4 do actor.same(out[i].rows[id.detached],before[i].rows[id.detached])end
         ''')
@@ -116,7 +118,8 @@ class WorkerStorageDefaultNativeTests(unittest.TestCase):
           for _,change in ipairs({function(x)x.current=id.main end,
             function(x)x.queue[1]=id.main end,function(x)x.rows[id.main].saved=.001 end,
             function(x)x.rows[id.main].level=4 end,function(x)x.rows[id.main].researched=true end,
-            function(x)x.rows[id.gate].researched=false end,function(x)x.rows[id.tail].level=4 end})do
+            function(x)x.rows[id.gate].level=4 end,function(x)x.rows[id.gate].researched=true end,
+            function(x)x.rows[id.tail].level=4 end})do
             local unsafe=deep(expected);change(unsafe)
             assert(not pcall(actor.assert_callback_safe,unsafe))
             -- A later tick could replace this frame; that cannot admit this callback.

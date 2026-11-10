@@ -69,7 +69,7 @@ if target.id == "f200" or target.id == "f210" then
     if admission_facts.worker_default_split then
       local tail, head = live_technologies["mir-worker-storage-default-4"], live_technologies["mir-worker-storage-head-4"]
       if tail == nil or head == nil or tail.level ~= 4 or tail.max_level ~= 4294967295
-          or head.level ~= 4 or head.max_level ~= 4
+          or head.level ~= 4 or head.max_level ~= 4294967295
           or creators["mir-worker-storage-default-4"] ~= "more-infinite-research"
           or creators["mir-worker-storage-head-4"] ~= "more-infinite-research" then
         error("MIR worker default requires its authored native owner and first-level debit", 2)

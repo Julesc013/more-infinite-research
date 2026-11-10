@@ -69,11 +69,12 @@ local function worker_snapshot(force)
       or t.level~=4 or t.researched or t.saved_progress~=0 then fail("empty worker native state differs: "..name)end
     if force.current_research and force.current_research.name==name then fail("empty worker is current")end
     for _,queued in ipairs(force.research_queue or {})do if queued.name==name then fail("empty worker is queued")end end
-    if p.level~=4 or p.max_level~=(name==WORKER[3]and 4 or 4294967295)
+    if p.level~=4 or p.max_level~=4294967295
       or #p.effects~=1 or p.effects[1].type~="worker-robot-storage"
       or p.effects[1].modifier~=(name==WORKER[3]and -1 or 1)then fail("worker prototype/effect differs: "..name)end
     if name==WORKER[3]then
-      if t.research_unit_count~=1 or p.research_unit_energy~=60 or next(p.prerequisites)~=nil
+      if t.research_unit_count~=1 or p.research_unit_count_formula~=nil
+        or p.research_unit_energy~=60 or next(p.prerequisites)~=nil
         or #t.research_unit_ingredients~=1 or t.research_unit_ingredients[1].name~="automation-science-pack"
         or t.research_unit_ingredients[1].amount~=1 then fail("worker debit contract differs")end
     else

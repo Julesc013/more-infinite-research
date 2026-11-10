@@ -120,11 +120,11 @@ local function worker_owner_snapshot(force)
   if game.difficulty_settings.technology_price_multiplier~=1 or out.bonus~=1 then fail("paid-idle worker native bonus/map price differs")end
   for index,name in ipairs(WORKER)do
     local t=technology(force,name);local p=t.prototype;local debit=index==3
-    local next_level=index<=2 and 5 or 4
-    if t.level~=next_level or t.researched~=debit or t.saved_progress~=0
+    local next_level=index<=3 and 5 or 4
+    if t.level~=next_level or t.researched~=false or t.saved_progress~=0
       or type(t.enabled)~="boolean" or type(t.visible_when_disabled)~="boolean"
       or t.enabled~=(index==2) or t.visible_when_disabled~=(index==1)
-      or p.hidden~=(index>=3) or p.level~=4 or p.max_level~=(debit and 4 or UINT32_MAX)
+      or p.hidden~=(index>=3) or p.level~=4 or p.max_level~=UINT32_MAX
       or p.enabled~=(index<=2) or p.visible_when_disabled~=false or p.ignore_tech_cost_multiplier~=false
       or #p.effects~=1 or p.effects[1].type~="worker-robot-storage"
       or p.effects[1].modifier~=(debit and -1 or 1)then fail("paid-idle worker owner state differs: "..name)end
@@ -134,7 +134,7 @@ local function worker_owner_snapshot(force)
     if t.research_unit_count~=(debit and 1 or index<=2 and 1012 or 675)
       or p.research_unit_energy~=(debit and 60 or 3600) or #t.research_unit_ingredients~=#packs
       or not debit and p.research_unit_count_formula~="675*1.5^(L-4)"
-      or debit and next(p.prerequisites)~=nil then fail("paid-idle worker cost differs")end
+      or debit and (p.research_unit_count_formula~=nil or next(p.prerequisites)~=nil)then fail("paid-idle worker cost differs")end
     for i,pack in ipairs(packs)do local row=t.research_unit_ingredients[i]
       if row.name~=pack or row.amount~=1 then fail("paid-idle worker science differs")end
     end

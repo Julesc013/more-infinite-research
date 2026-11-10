@@ -781,7 +781,7 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
           prototypes.technology[ORDINARY]=copy(prototypes.technology[CANONICAL])
           local owner=prototypes.technology[ORDINARY];owner.name=ORDINARY;owner.hidden=false;owner.visible_when_disabled=false
           local debit=copy(prototypes.technology[CANONICAL]);prototypes.technology[HEAD]=debit
-          debit.name=HEAD;debit.max_level=4;debit.hidden=true;debit.enabled=false;debit.visible_when_disabled=false
+          debit.name=HEAD;debit.max_level=4294967295;debit.hidden=true;debit.enabled=false;debit.visible_when_disabled=false
           debit.effects[1].modifier=-1;debit.research_unit_count_formula=nil;debit.research_unit_count=1
           debit.research_unit_energy=60;debit.prerequisites={}
           creators[ORDINARY]="more-infinite-research";creators[HEAD]="more-infinite-research"
@@ -808,7 +808,8 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
                 for _,id in ipairs{CANONICAL,ORDINARY,ID}do local t=force.technologies[id]
                   total=total+(t.level-4+(t.researched and 1 or 0))*prototypes.technology[id].effects[1].modifier
                 end
-                return total+(force.technologies[HEAD].researched and prototypes.technology[HEAD].effects[1].modifier or 0)
+                local h=force.technologies[HEAD]
+                return total+(h.level-4+(h.researched and 1 or 0))*prototypes.technology[HEAD].effects[1].modifier
               end
               if gaps[index]and key=="current_research"then return nil end
               if gaps[index]and key=="research_progress"then return 0 end
@@ -883,7 +884,7 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
                   for _,f in pairs(game.forces)do local a,b=frame(f),before[f.index];local paid=b.source.level>=5
                     assert(a.source.level==(paid and 5 or 4)and not a.source.researched and not a.source.enabled and a.source.saved==0)
                     assert(a.owner.level==b.source.level and not a.owner.researched and a.owner.enabled==b.source.enabled and a.owner.visible==b.source.visible)
-                    assert(a.owner.saved==b.source.saved and a.debit.researched==paid and not a.debit.enabled)
+                    assert(a.owner.saved==b.source.saved and a.debit.level==(paid and 5 or 4)and not a.debit.researched and not a.debit.enabled)
                     assert(a.bonus==20+(b.source.level-4)*scalar and a.bonus==b.bonus and a.other_saved==b.other_saved)
                     assert(same(a.private,b.private)and state.forces[f.index].phase=="owned")
                     assert(state.forces[f.index].retired_flags.disabled_by_mir==b.source.enabled)
@@ -1002,8 +1003,8 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
 
     def test_missing_debit_mutant_cannot_commit_independent_native_contribution(self):
         source=(Path(__file__).resolve().parents[1]/"source/runtime/worker_robot_storage.lua").read_text()
-        literal='gate.researched = frame.next_level >= 5';self.assertEqual(source.count(literal),1)
-        lua=self.world();lua.globals().mutant=source.replace(literal,'gate.researched = false -- injected missing debit',1)
+        literal='gate.level = level';self.assertEqual(source.count(literal),1)
+        lua=self.world();lua.globals().mutant=source.replace(literal,'gate.level = 4',1)
         lua.execute(r'''
           history=assert(load(mutant))();seed_owner();local ok,e=pcall(transfer)
           assert(not ok and tostring(e):find("native full default contribution",1,true)and storage[OWNER_KEY]==nil)
@@ -1048,7 +1049,7 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
               local plan=history.default_owner_preflight({mod_startup_settings_changed=true,mod_changes={}},nil,true)
               assert(history.default_owner_apply(plan)and writes==0 and same(before,all_frames()))
               assert(storage[OWNER_KEY].contract~=contract and player.worker_robots_storage_bonus==20+4*scalar)
-              assert(player.technologies[CANONICAL].level==5 and player.technologies[HEAD].researched)
+              assert(player.technologies[CANONICAL].level==5 and player.technologies[HEAD].level==5 and not player.technologies[HEAD].researched)
             ''')
 
 
@@ -1079,7 +1080,7 @@ class WorkerDefaultNativeLifecycleTests(unittest.TestCase):
                       local other=frame(suspended);finish_frame(player,representation,{ORDINARY,OTHER},true)
                       local before=frame(player);assert(history.default_owner_on_research_finished(finish_event(player)))
                       local actual=frame(player)
-                      assert(actual.source.level==5 and not actual.source.researched and not actual.source.enabled and actual.debit.researched)
+                      assert(actual.source.level==5 and not actual.source.researched and not actual.source.enabled and actual.debit.level==5 and not actual.debit.researched)
                       assert(same(before.owner,actual.owner)and same(before.queue,actual.queue)and actual.progress==0 and actual.current==nil)
                       assert(actual.bonus==20+scalar and actual.bonus==before.bonus and same(other,frame(suspended)))
                       assert(queue_writes[1]==nil and progress_writes[1]==nil and not history.default_owner_mutating{force=player})
@@ -1170,7 +1171,7 @@ class WorkerDefaultNativeLifecycleTests(unittest.TestCase):
           history.on_force_created{force=fresh};assert(history.default_owner_on_force_created{force=fresh})
           assert(storage[OWNER_KEY].forces[5].phase=="owned"and fresh.technologies[ORDINARY].level==4 and not fresh.technologies[CANONICAL].enabled)
           finish_frame(player,"advanced",{},false);history.default_owner_on_research_finished(finish_event(player));player.technologies[ORDINARY].level=8
-          player.technologies[CANONICAL].level=4;player.technologies[ORDINARY].level=4;player.technologies[HEAD].researched=false
+          player.technologies[CANONICAL].level=4;player.technologies[ORDINARY].level=4;player.technologies[HEAD].level=4;player.technologies[HEAD].enabled=false
           history.on_force_reset{force=player};writes=0;assert(history.default_owner_on_force_reset{force=player})
           assert(player.technologies[ORDINARY].level==4 and not player.technologies[CANONICAL].enabled and player.worker_robots_storage_bonus==20)
         ''')
@@ -1223,7 +1224,7 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
             public.research_unit_energy=3600;public.research_unit_ingredients={{name="automation-science-pack",amount=1},{name="space-science-pack",amount=1}}
             prototypes.technology[HEAD].effects[1].modifier=b==0 and 0 or -b
             for _,f in pairs(game.forces)do
-              local c=f.technologies[CANONICAL];local paid=f.technologies[HEAD].researched;local enabled,visible=c.enabled,c.visible_when_disabled
+              local c=f.technologies[CANONICAL];local paid=f.technologies[HEAD].level==5;local enabled,visible=c.enabled,c.visible_when_disabled
               -- Explicit host representation of already-loaded finite4, not a claim of new engine observation.
               c.level=4;c.researched=paid;c.enabled=enabled;c.visible_when_disabled=visible
               local mt=getmetatable(c);local read=mt.__index
@@ -1415,7 +1416,7 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
           'creators[ID]="foreign"','creators[HEAD]="foreign"','creators[CANONICAL]="wrong"',
           'creators["worker-robots-storage-6"]="wrong"','prototypes.technology["worker-robots-storage-5"].max_level=6',
           'player.technologies[CANONICAL].researched=false','uninvested.technologies[CANONICAL].researched=true',
-          'player.technologies[HEAD].researched=false','player.technologies[CANONICAL].saved_progress=.1',
+          'player.technologies[HEAD].level=4','player.technologies[CANONICAL].saved_progress=.1',
           'detached.technologies[ID].saved_progress=.1','suspended.technologies[ID].enabled=true',
           'event.mod_startup_settings_changed="true"','event.mod_changes["more-infinite-research"]={old_version="4.7.21003",new_version="5.0.21012"}','event.mod_changes.provider.old_version="0.9"',
           'event.mod_changes.provider.new_version="2.0"','event.mod_changes.other={old_version="1",new_version="2"};script.active_mods.other="2"',
@@ -1458,7 +1459,7 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
 
     def test_stale_last_force_and_changed_quota_refuse_before_first_native_setter(self):
         for change in ('detached.technologies[ORDINARY].saved_progress=.29','foreign_bonus[4]=21',
-                       'detached.technologies[HEAD].researched=false','plan.prepared.forces[1].limit=99',
+                       'detached.technologies[HEAD].level=4','plan.prepared.forces[1].limit=99',
                        'legacy.state.forces[1].limit=99','plan.event.mod_startup_settings_changed=true'):
             with self.subTest(change=change):
                 lua=self.world();lua.execute('full_source(1,true);finite_entry(1);local plan,legacy=delegate();'+change+r'''
@@ -1532,6 +1533,82 @@ class WorkerFullDefaultProviderHandoverTests(unittest.TestCase):
           assert(uninvested.technologies[ID].level==4 and not uninvested.technologies[ID].enabled and uninvested.worker_robots_storage_bonus==20)
         ''')
 
+class WorkerInfiniteHeadDebitTests(unittest.TestCase):
+    def world(self,target="f210"):
+        return WorkerFullDefaultProviderHandoverTests.world(self,target)
+
+    def test_zero_two_scalar_native_debit_count_is_one_or_zero_across_handover(self):
+        for target in ("f200","f210"):
+            for a,b in ((0,0),(0,2),(2,0),(2,2)):
+                lua=self.world(target);lua.globals().a=a;lua.globals().b=b;lua.execute(r'''
+                  full_source(a,true)
+                  local paid={}
+                  for _,f in pairs(game.forces)do local t,h=f.technologies[ORDINARY],f.technologies[HEAD]
+                    paid[f.index]=t.level>=5
+                    assert(h.level==(paid[f.index]and 5 or 4)and not h.researched and not h.enabled and not h.visible_when_disabled)
+                    assert(h.saved_progress==0 and h.research_unit_count==1 and f.worker_robots_storage_bonus==20+(t.level-4)*a)
+                  end
+                  finite_entry(b);local before=all_frames();handover()
+                  for _,f in pairs(game.forces)do local h=f.technologies[HEAD]
+                    assert(h.level==(paid[f.index]and 5 or 4)and not h.researched and not h.enabled and h.saved_progress==0)
+                    assert(f.worker_robots_storage_bonus==before[f.index].bonus)
+                  end
+                ''')
+
+    def test_finite_or_malformed_native_head_cannot_be_adopted_before_writes(self):
+        changes=('h.level=3;h.enabled=false','h.level=6;h.enabled=false','h.level=4.5;h.enabled=false',
+                 'h.level=5;h.enabled=false','h.researched=true','h.saved_progress=.01',
+                 'h.enabled=true','h.visible_when_disabled=true',
+                 'h.enabled=true;player.research_queue={h};h.enabled=false',
+                 'h.enabled=true;player.research_queue={OTHER,h};h.enabled=false',
+                 'prototypes.technology[HEAD].max_level=4','prototypes.technology[HEAD].research_unit_count_formula="1"')
+        for target in ("f200","f210"):
+            for change in changes:
+                with self.subTest(target=target,change=change):
+                    lua=self.world(target);lua.execute('seed_owner();local h=player.technologies[HEAD];'+change+r'''
+                      local before=all_frames();writes=0
+                      local ok=pcall(history.plan_default_owner_transfer,owner_event(package_family=="f200"and"5.0.20011"or"5.0.21011"),nil,false)
+                      assert(not ok and writes==0 and same(before,all_frames())and storage[OWNER_KEY]==nil)
+                    ''')
+
+    def test_retired_provider_validates_bounded_infinite_head_and_cold_load_does_not_repair_it(self):
+        for change in ('h.level=6;h.enabled=false','h.researched=true','h.saved_progress=.01',
+                       'h.enabled=true;player.research_queue={OTHER,h};h.enabled=false'):
+            lua=self.world();lua.execute('full_source(1,true);finite_entry(2);handover();local h=player.technologies[HEAD];'+change+r'''
+              local before=all_frames();local owner=storage[OWNER_KEY];local key=storage.mir_worker_storage_route;writes=0
+              local original_game,original_prototypes=game,prototypes
+              game=setmetatable({},{__index=function()error("on_load game read")end})
+              prototypes=setmetatable({},{__index=function()error("on_load prototype read")end})
+              history.on_load();history.default_owner_on_load()
+              game,prototypes=original_game,original_prototypes
+              assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==owner and storage.mir_worker_storage_route==key)
+              assert(not pcall(history.default_owner_preflight,{mod_startup_settings_changed=false,mod_changes={}},provider_route(5),true))
+              assert(writes==0 and same(before,all_frames())and storage[OWNER_KEY]==owner and storage.mir_worker_storage_route==key)
+            ''')
+
+    def test_first_debit_level_write_restores_hidden_flags_and_scoped_guard_even_on_error(self):
+        for fail in (False,True):
+            lua=self.world();lua.globals().fail=fail;lua.execute(r'''
+              init_default();finish_frame(player,"advanced",{OTHER},true)
+              local h=player.technologies[HEAD];local mt=getmetatable(h);local write=mt.__newindex;local seen=0
+              mt.__newindex=function(o,k,v)
+                if k=="level"then
+                  seen=seen+1;assert(v==5 and history.default_owner_mutating{force=player})
+                  assert(not history.default_owner_mutating{force=uninvested})
+                  assert(not history.default_owner_on_research_finished{research=h,by_script=true})
+                  if fail then error("injected debit setter failure")end
+                end
+                write(o,k,v)
+                if k=="level"then assert(h.enabled and h.researched==false)end
+              end
+              local ok,message=pcall(history.default_owner_on_research_finished,finish_event(player))
+              assert(seen==1 and not history.default_owner_mutating{force=player})
+              assert(queue_writes[1]==nil and progress_writes[1]==nil)
+              if fail then assert(not ok and tostring(message):find("injected debit setter failure",1,true))
+              else assert(ok and h.level==5 and not h.researched and not h.enabled and not h.visible_when_disabled and player.worker_robots_storage_bonus==21)end
+            ''')
+
+
 class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
     """Separate all-force501-empty and473-paid-idle source restrictions."""
 
@@ -1601,7 +1678,7 @@ class WorkerOlderDefaultAdmissionTests(unittest.TestCase):
           for _,f in pairs(game.forces)do
             local a,b=frame(f),before[f.index];local n=b.source.level
             assert(a.owner.level==n and a.owner.count==b.source.count and a.owner.enabled==b.source.enabled)
-            assert(a.debit.researched==(n>=5)and a.bonus==b.bonus and same(a.private,b.private))
+            assert(a.debit.level==(n>=5 and 5 or 4)and not a.debit.researched and a.bonus==b.bonus and same(a.private,b.private))
             assert(a.current==b.current and a.progress==b.progress and same(a.queue,b.queue))
             assert(a.other_saved==b.other_saved and queue_writes[f.index]==nil)
           end

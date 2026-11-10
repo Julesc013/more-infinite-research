@@ -93,7 +93,7 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
               local hidden=debit or private
               force.technologies[name]={name=name,valid=true,force=force,level=4,researched=false,
                 enabled=not hidden,visible_when_disabled=false,saved_progress=0,research_unit_count=debit and 1 or 675,
-                research_unit_ingredients=science,prototype={level=4,max_level=debit and 4 or 4294967295,
+                research_unit_ingredients=science,prototype={level=4,max_level=4294967295,
                   hidden=hidden,enabled=not hidden,visible_when_disabled=false,prerequisites=debit and{}or{["worker-robots-storage-3"]={name="worker-robots-storage-3"}},
                   research_unit_count_formula=not debit and"675*1.5^(L-4)"or nil,research_unit_energy=debit and 60 or 3600,
                   ignore_tech_cost_multiplier=false,effects={{type="worker-robot-storage",modifier=debit and -1 or 1}}}}

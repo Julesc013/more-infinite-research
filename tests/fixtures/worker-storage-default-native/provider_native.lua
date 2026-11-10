@@ -32,7 +32,9 @@ function P.expected_handover(before)
     local owner = force.rows[TAIL]; local n = ({8,7,6,4})[i]
     check(owner and owner.level == n and owner.researched == false
       and owner.count == math.floor(675 * 1.5 ^ (n - 4)), "exact full4 source cursor/price")
-    check(force.rows[GATE].researched == (n >= 5), "source debit paid bit")
+    local gate = force.rows[GATE]
+    check(gate.level == (n >= 5 and 5 or 4) and gate.researched == false and gate.count == 1
+      and gate.enabled == false and gate.visible == false and gate.saved == 0, "source debit paid level/flags/work")
     for _, id in ipairs(EXTRA) do check(force.rows[id] == nil, "source already contains provider rows") end
     force.rows[PRIVATE] = copy(owner); force.rows[PRIVATE].name = PRIVATE
     force.rows[MAIN] = row(MAIN, 4, 1000, n >= 5, true, false, 0)
@@ -108,7 +110,9 @@ function P.bind(M)
     for i, ingredient in ipairs(p.research_unit_ingredients) do
       check(ingredient.name == SCIENCE[i] and ingredient.amount == 1, "MIR8 exact science vector")
     end
-    check(prototypes.technology[GATE].effects[1].modifier == -1, "unchanged native debit")
+    local gate = prototypes.technology[GATE]
+    check(gate.level == 4 and gate.max_level == 4294967295 and gate.research_unit_count == 1
+      and gate.research_unit_count_formula == nil and gate.effects[1].modifier == -1, "unchanged native debit")
     check(prototypes.technology[TAIL].hidden and not prototypes.technology[TAIL].enabled,
       "retired default prototype is disabled and hidden")
   end
