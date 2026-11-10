@@ -77,7 +77,6 @@ function M.preflight(raw, active_mods)
   end
   if type(recipe) ~= "table" or recipe.enabled ~= false or recipe.hidden == true
       or recipe.allow_productivity ~= true
-      or recipe.maximum_productivity ~= nil
       or not ordinary(recipe.ingredients, {{type="item",name="low-density-structure",amount=5},
         {type="item",name=material,amount=2}})
       or not ordinary(recipe.results, {{type="item",name="bob-mech-armor-plate",amount=1}}, true) then
