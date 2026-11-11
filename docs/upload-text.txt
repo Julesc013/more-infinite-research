@@ -3,14 +3,14 @@ Channel: GitHub prerelease (beta), not marked latest. Mod Portal publication rem
 
 Repairs worker cargo upgrade handling and compatibility with expanded productivity research on Factorio 2.0 and 2.1.
 
-- Preserve admitted earlier MIR 5 worker cargo levels and unfinished research in permanent native research, supporting later provider changes without guessing erased history.
+- Preserve admitted earlier MIR 5 worker cargo levels and unfinished research in permanent native research without guessing erased history.
 - Retain Secretas worker history across successive updates, and keep Ferrum robotics science in continued cargo research.
 - Preserve complete productivity credits when other mods expand recipe research effects.
 - Allow Bob's Warfare with mods that set recipe productivity caps, preserving their configured limits.
 - Restore missing translated startup-setting labels and improve Library filter layout, wrapping, search text and German wording.
 
-Protect the original save and its matching mods/settings. First update a copy with the previous mod selection and settings, save separately, then make a supported provider change. After a successful native ownership transfer, the legacy worker preparation command is unnecessary. An already-clamped or unknown history can still require the protected original; keep it if the upgrade refuses.
+Protect the original save and its matching mods/settings. First update a copy with the previous mod selection and settings and save separately. Check the support guide before changing a provider; defer changes outside its qualified routes. After a successful native ownership transfer, the legacy worker preparation command is unnecessary. An already-clamped or unknown history can still require the protected original; keep it if the upgrade refuses.
 
-This is a GitHub beta. Full Library interaction/export/client and performance qualification remain unfinished. Not every reported save or mod combination has been reproduced.
+This is a GitHub beta. Full Library interaction/export/client and performance qualification remain unfinished. Full Ferrum-profile qualification remains unfinished; not every reported save or mod combination has been reproduced.
 
 [Installation, upgrade procedures and support limits](https://github.com/Julesc013/more-infinite-research/blob/v5.0.12/docs/support.md).
