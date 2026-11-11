@@ -1,14 +1,14 @@
 {
   "kind": "MIR512ReporterDispositionsIndependentReviewV1",
-  "reviewed_at_utc": "2026-11-10T21:50:18.853377+00:00",
-  "base_commit": "c346399fdec4f20dc750002c650ff9751cccf30d",
-  "player_source": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+  "reviewed_at_utc": "2026-11-11T10:09:23.796063+00:00",
+  "base_commit": "0dcfe34b862f7f9b8056c2035e8b5c9ef1ebf4b5",
+  "player_source": "a1a1a50f8cec5e5d021a40602add41d8e62d1036",
   "scope": "Reporter-history reconciliation using protected originals, current issues and exact-input reviews. New supplied Ryutavi save/log/mod-list and the distinct issue1871 Ferrum log are retained privately. No source correction, game execution, reporter-save acceptance, publication authority or whole-issue closure.",
   "incident_recommendation": {
-    "verdict": "NO-GO for claiming all reported save-load failures resolved or publishing under the current instruction to resolve applicable blockers first.",
-    "reason": "The unchanged-Secretas persistence, complete credit-vector and known-Base mechanisms have accepted bounded evidence. The reported provider-change path and the actual unknown saved histories are not thereby qualified. No maintainer decision narrowing that obligation is recorded here.",
-    "reuse": "Retain the accepted worker, both modern vector, known-Base, paid-steel and package results. Do not restart those campaigns because this reconciliation adds an evidence file.",
-    "next_action": "Integration owner gives each remaining transition an explicit supported disposition and selects only a concrete missing mechanism test or correction. A faithful developer reproduction and preservation test can establish a fix without a reporter reply; a different predecessor or the same generic error cannot.",
+    "verdict": "NO-GO on the unmodified current candidate: a demonstrated private-head multiplier contract defect and distinct affected native gates remain. This is not a demand to complete the broader stable programme first.",
+    "reason": "The main native-owner/provider mechanism now has accepted bounded evidence. Earlier MIR5 admission in PR1874, actual Bob/cap startup, available actual Rigor coverage and the new nonexempt private-head multiplier route have separate outstanding results. Missing exact reporter inputs limit claims; they are not themselves proof that a correction is broken.",
+    "reuse": "Retain exact accepted worker-provider, Secretas, both-modern controlled vector, known-Base and paid-steel scopes. Cloud17-package verification is offline evidence for0dcfe only, not native qualification or delivery.",
+    "next_action": "Black Glass reconciles current local work, integrates the independently reviewed four-file private-head proposal and finishes only the missing affected routes. Assign each reporter a supported disposition; do not require a personal reply where a faithful developer preservation reproduction proves the correction, and do not substitute an easier predecessor.",
     "stable": "Library input, export, client lifecycle, historical compatibility and performance acceptance remain separate from this incident decision."
   },
   "reporters": [
@@ -31,9 +31,9 @@
       "issue": 1845,
       "known_transition": "Names Secretas and Frozeta. First 5.0.21010 trace reaches the explicit Secretas presence-change refusal; a separate Ferrum trace reports unknown worker-robots-storage-6 ownership.",
       "latest_report": "5.0.21011 worker history refusal at line 425 with technology=default. That fallback string does not establish a prior MIR-owned default route.",
-      "applicable_correction": "Current candidate removes the blanket presence-change policy in favor of validated worker-state handling, and persists specifically proven unchanged-Secretas history. Prepared MIR-default4 transitions have separate evidence.",
+      "applicable_correction": "Merged native default-owner/provider handover and unchanged-Secretas persistence are relevant mechanisms; legacy prepared-default transitions retain separate evidence. Their success is not a reconstruction of the actual Ferrum history.",
       "accepted_evidence": "worker512-history-continuity-independent-result-review-r01.json",
-      "remaining": "The supplied1871 log now establishes engine/current MIR/Ferrum and the matching refusal. It does not supply a protected predecessor save or earlier paid/current/queued/detached state. Accepted unchanged-Secretas persistence and a different WorkerRobotCargoSizeResearch case do not qualify this Ferrum transition.",
+      "remaining": "The supplied issue1871 log establishes engine/current MIR/Ferrum and the matching refusal, but supplies no protected predecessor save or earlier paid/current/queued/detached state. The accepted WorkerRobotCargoSizeResearch developer transition does not establish this Ferrum history. A route-specific disposition remains required; no report closure is asserted.",
       "smallest_action": "Use the actual Ferrum0.1.5 provider route with an authentic known predecessor, preserve earned bonus and all native work through provider addition, ordinary research and saved reloads on the fixed candidate. Reuse existing exact Ferrum inputs/observer work; do not restart unrelated campaigns or infer old default ownership from the fallback label.",
       "issues": [
         1845,
@@ -85,7 +85,7 @@
         },
         "limit": "Only MIR mention is duplicate installed archive/highest 5.0.21008. No MIR loading entry, MIR stack trace, map load or script.dat load. This startup log is not a later worker-failure reproduction."
       },
-      "applicable_correction": "The accepted unchanged-Secretas mechanism is relevant only if the later saved route and changes satisfy its explicit provenance. Earlier native research-cost controls are not an exact reproduction of either supplied save or latest worker failure.",
+      "applicable_correction": "Accepted unchanged-Secretas persistence is relevant only if the later predecessor meets that contract. Merged early MIR5 default admission covers proven same-edition default routes, not every Secretas history. The new private-head2x/4x finding is directly relevant to the reported map multiplier but is a candidate regression, not proof of the earlier report repair.",
       "remaining": "The older save is authentic 4.3-plus-Secretas input, not a known 9/11 predecessor for the latest failure. The actual later saved predecessor and provider/settings changes remain unknown.",
       "smallest_action": "Retain and use the newly reachable older originals for their actual historical scope. Do not relabel their eventual pass as resolution of the later worker failure. No fresh reporter request is required to begin a faithful developer reproduction."
     },
@@ -100,7 +100,7 @@
         "native-credit-vector512-f200-independent-result-review-r01.json"
       ],
       "disposition": "Named 97-effect mechanism qualified on 2.0.77 and 2.1.23, including signed contributions, ordinary completions, pending work and cold loads. Actual Cerys loop plus synthetic aliases is explicitly identified.",
-      "remaining": "The actual save, crash log and complete enabled-mod list are now available; the previous missing-input statement is superseded. Actual complete current recipe-effect maps and earned native bonuses/work still need observation on the final candidate. Only77 exact active archives were found in the Aero2.1 direct library; that incomplete local closure is not a reporter reproduction. The earlier Cerys/synthetic97 mechanism result retains its original scope.",
+      "remaining": "Actual save/log/enabled list are retained. Rigor Module1.1.24 is the available real expansion mechanism; Cerys and Bob are absent from the failed-session selection. Complete real vectors, earning/work and save behavior still need native observation. Root reports230/233 exact third-party archives, with three unavailable versions listed separately; the earlier77-archive Aero cache observation is not the current global input gap. Prior Cerys/synthetic results keep their exact original scope.",
       "supplied_originals": {
         "save": {
           "bytes": 11184926,
@@ -160,7 +160,22 @@
           "remove-productivity-cap": "1.2.0"
         }
       },
-      "smallest_action": "Adopt protected supplied originals from private custody. Establish the exact complete active closure and startup values from the original save, inspect the actual signed vectors before MIR writes, then test candidate initialization, unaffected/earned bonus preservation, useful new research and saved reloads. Keep the reported bobwarfare startup problem separate from the MIR initialization failure; its source3.0.2 is disabled in the failed-session list."
+      "smallest_action": "Adopt protected supplied originals from private custody. Establish the exact complete active closure and startup values from the original save, inspect the actual signed vectors before MIR writes, then test candidate initialization, unaffected/earned bonus preservation, useful new research and saved reloads. Keep the reported bobwarfare startup problem separate from the MIR initialization failure; its source3.0.2 is disabled in the failed-session list.",
+      "actual_expansion_component": {
+        "mod": "rigor-module",
+        "version": "1.1.24",
+        "private_commit": "82555129e746ba83d37e48fcf56743f0c316be85",
+        "directory": "projects/mir/reporter-inputs/20261111-aero-r01/rigor-source-component",
+        "source_scope": "Public upstream GitLab blobs whose info declares1.1.24; not a hash-matched Portal archive or full reporter closure. Full license retained.",
+        "mechanism": "Technology expansion loop appends linked recipe-productivity effects to all matching technologies, including hidden signed MIR carriers and the public reference. Canonical default scale25 through2400 yields original plus96 recipe variants, but actual reporter maps were not decoded.",
+        "host_observation": "Actual source loop accepts the single-family zero-invested hidden-main/97-signed-carrier shape under current credit validation without changing modeled totals. Published11 rejects before writes. This is a component host model, not normal Factorio bootstrap, native credits/research or save/cold qualification."
+      },
+      "unavailable_exact_third_party_versions": {
+        "factorio-resource-formatter-mod": "0.0.2",
+        "steam-condenser": "0.1.0",
+        "universal-transmuter": "0.1.0"
+      },
+      "cache_scope": "230/233 is the integration-owner report in issue1845, not an Aero directory scan or proof that the remaining full modpack has been executed."
     },
     {
       "reporter": "wakaba20202020",
@@ -203,7 +218,7 @@
   },
   "issue1845_refresh": "Opening updated to merged 5.0.12/fixed Source status and read back exactly; entire prior request retained verbatim below as history. State remains open. Before/after custody is in the private directory.",
   "engine_loss_boundary": "Existing worker512-context-and-history-authority-independent-review-r01.json records pre-Lua native clamping and a separate static JSON preservation control. The latter is not a reviewed production policy for first MIR installation, repeated provider changes or arbitrary reporter histories. Reuse those observations; do not rerun or call them a generic impossibility proof.",
-  "execution_limits": "No Factorio process, source/package/controller/Library mutation, host suite, build, CI launch, child worker or publication performed by this review. Private input intake and issue/body custody are not production fixes.",
+  "execution_limits": "This reconciliation changes one evidence JSON relative to current dev and preserves original author commits by ordinary merge. No Factorio process, package build, owned production correction, controller/native selection change or publication. Referenced host proposals and old native results retain their separately stated inputs and limits.",
   "supplied_reporter_custody": {
     "private_repository": "Julesc013/scratchpad",
     "branch": "evidence/mir512-reporter-originals-aero-r02",
@@ -213,10 +228,30 @@
     "remote_readback": "All9 stored blobs match fresh remote Git object bytes. Seven manifest-listed originals/metadata files total11976685bytes. Save all75 member CRCs pass. Original Downloads files unchanged. Full logs/save/mod lists stay private; no MEGA keys stored."
   },
   "current_candidate_boundary": {
-    "pr": 1872,
-    "head_at_review": "016ccd9b7afddc5d5e09d634ff598416ace5619a",
-    "status": "Isolated worker native-owner draft; current guard corrections and provider qualification remain Black Glass work. No new source acceptance by this record.",
-    "identity_decision": "Issue1845 comment6779844289 records maintainer authorization for the necessary stable native worker identity, subject to compatibility/migration verification. The older pending identity-decision blocker is superseded.",
-    "public_release": "v5.0.11 remains published;5.0.12 unpublished at this readback."
+    "dev_head": "0dcfe34b862f7f9b8056c2035e8b5c9ef1ebf4b5",
+    "source_tree": "a1a1a50f8cec5e5d021a40602add41d8e62d1036",
+    "merged_prs": [
+      1872,
+      1873,
+      1874
+    ],
+    "status": "Merged development candidate; authentic earned08-to-owner-to-provider, actual Bob/cap and actual Rigor results remain unrecorded in inspected remote records. No current local process state inferred.",
+    "identity_decision": "Maintainer authorization in issue1845 comment6779844289 remains effective; no pending identity decision.",
+    "private_head_correction": {
+      "integrated": false,
+      "custody_commit": "bfa699b8004acffa1337c86fc791e1a564ee9ec0",
+      "patch_sha256": "afd51feb8f30c1e4d5c742f0644a1cb7ef81024ef57b2a8b2f9ee0e271d6eb4d",
+      "affected_methods_passed": 155,
+      "review": "independent accepted; full proposed modules executed in memory; projected map counts only, no native result"
+    },
+    "public_release": "v5.0.11 latest public at readback;5.0.12 unpublished; stable unqualified."
+  },
+  "previous_review": {
+    "commit": "b47678a1d486aec5f17d7f98791a01c582f6aaaa",
+    "reviewed_at_utc": "2026-11-10T21:50:18.853377+00:00",
+    "base_commit": "c346399fdec4f20dc750002c650ff9751cccf30d",
+    "player_source": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
+    "candidate_head_then": "016ccd9b7afddc5d5e09d634ff598416ace5619a",
+    "status": "Historical intake/source snapshot, superseded only as current status; original commit and inputs retained."
   }
 }
