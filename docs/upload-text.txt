@@ -5,8 +5,8 @@ Fixes recurring worker cargo save upgrades and expanded recipe-productivity cred
 
 - Preserve earned worker cargo research and unfinished work in permanent native research before adding a finite cargo provider. Eligible earlier MIR 5 default saves establish this history automatically when upgraded with their previous mods and settings.
 - Keep private worker bookkeeping independent of the map research price multiplier while preserving ordinary research prices.
-- Retain Secretas history across successive updates, Ferrum robotics science, and worker history through supported engine patch updates. Keep ordinary queue changes safe after preserved work finishes.
-- Accept complete productivity-credit effect vectors added by recipe-expansion mods, while retaining validation of their recipes, signs and amounts.
+- Retain Secretas history across successive updates and worker history through supported engine patch updates. Keep ordinary queue changes safe after preserved work finishes.
+- Fix initialization with Rigor Module's expanded productivity effects, while retaining complete validation of recipe, sign and amount maps.
 - Allow Bob's Warfare with recipe-productivity-cap mods and preserve their configured caps.
 - Preserve known Base-only research history on supported earlier MIR 5 upgrades.
 - Restore missing translated startup-setting labels and improve Library wrapping, filters, title-bar controls and saved search text.
