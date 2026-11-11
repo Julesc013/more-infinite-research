@@ -847,7 +847,7 @@ local function head_gate_contract(source)
       or prototype.enabled ~= false or prototype.visible_when_disabled ~= false
       or prototype.research_unit_count_formula ~= nil or prototype.research_unit_count ~= 1
       or prototype.research_unit_energy ~= 60 or next(prototype.prerequisites or {}) ~= nil
-      or prototype.ignore_tech_cost_multiplier ~= source.ignore_tech_cost_multiplier then
+      or prototype.ignore_tech_cost_multiplier ~= true then
     recover_error("default head debit contract is invalid")
   end
   local effects, ingredients = prototype.effects, prototype.research_unit_ingredients
