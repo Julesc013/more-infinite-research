@@ -783,7 +783,7 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
           local debit=copy(prototypes.technology[CANONICAL]);prototypes.technology[HEAD]=debit
           debit.name=HEAD;debit.max_level=4294967295;debit.hidden=true;debit.enabled=false;debit.visible_when_disabled=false
           debit.effects[1].modifier=-1;debit.research_unit_count_formula=nil;debit.research_unit_count=1
-          debit.research_unit_energy=60;debit.prerequisites={}
+          debit.research_unit_energy=60;debit.prerequisites={};debit.ignore_tech_cost_multiplier=true
           creators[ORDINARY]="more-infinite-research";creators[HEAD]="more-infinite-research"
           detached=make_force("detached",4);game.forces.detached=detached
           queue_writes={};progress_writes={};foreign_bonus={};gaps={}
@@ -933,6 +933,30 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
                 lua=self.world(target);lua.globals().old="5.0."+("200"if target=="f200"else"210")+str(patch).zfill(2)
                 lua.execute('seed_owner();assert(history.apply_default_owner_transfer(history.plan_default_owner_transfer(owner_event(old),nil,false)))')
 
+    def test_private_head_ignores_map_multiplier_without_exempting_ordinary_work(self):
+        for target in ("f200", "f210"):
+            for multiplier, public_exempt in ((1, False), (2, False), (4, False), (.5, True), (4, True)):
+                with self.subTest(target=target, multiplier=multiplier, public_exempt=public_exempt):
+                    lua=self.world(target)
+                    lua.globals().map_price=multiplier
+                    lua.globals().public_exempt=public_exempt
+                    lua.execute(r'''
+                      -- Runtime prototype counts already include the map multiplier.
+                      -- These are projected engine facts, not native qualification.
+                      game.difficulty_settings={technology_price_multiplier=map_price}
+                      for _,id in ipairs{CANONICAL,ORDINARY,ID}do
+                        prototypes.technology[id].ignore_tech_cost_multiplier=public_exempt
+                      end
+                      local head=prototypes.technology[HEAD]
+                      head.research_unit_count=head.ignore_tech_cost_multiplier and 1 or map_price
+                      seed_owner();local before=all_frames();writes=0
+                      local plan=history.plan_default_owner_transfer(owner_event(package_family=="f200"and"5.0.20011"or"5.0.21011"),nil,false)
+                      assert(plan and writes==0 and same(before,all_frames()))
+                      assert(head.ignore_tech_cost_multiplier and head.research_unit_count==1)
+                      assert(prototypes.technology[CANONICAL].ignore_tech_cost_multiplier==public_exempt)
+                      assert(prototypes.technology[ORDINARY].ignore_tech_cost_multiplier==public_exempt)
+                    ''')
+
     def test_initial_investment_unknown_producer_and_prepared_history_refuse_before_writes(self):
         for opponent in ('player.technologies[CANONICAL].saved_progress=.1','player.research_queue={CANONICAL}','player.technologies[CANONICAL].level=5'):
             lua=self.world();lua.execute(opponent+r''';local b=all_frames();writes=0
@@ -955,7 +979,7 @@ class WorkerDefaultNativeOwnerTransferTests(unittest.TestCase):
           'prototypes.technology[ORDINARY].effects[1].modifier=2','prototypes.technology[ORDINARY].research_unit_ingredients[1].amount=2',
           'prototypes.technology[ORDINARY].prerequisites[HEAD]={name=HEAD}','prototypes.technology[HEAD].effects[1].modifier=0',
           'prototypes.technology[HEAD].research_unit_count=2','prototypes.technology[HEAD].research_unit_energy=1',
-          'prototypes.technology[HEAD].research_unit_ingredients[1].name="wrong"','prototypes.technology[HEAD].ignore_tech_cost_multiplier=true',
+          'prototypes.technology[HEAD].research_unit_ingredients[1].name="wrong"','prototypes.technology[HEAD].ignore_tech_cost_multiplier=false',
           'detached.technologies[ORDINARY].saved_progress=.1','detached.technologies[ORDINARY].level=5',
           'suspended.technologies[HEAD].researched=true','suspended.technologies[HEAD].enabled=true',
           'uninvested.technologies[ORDINARY].enabled=false','suspended.technologies[CANONICAL].saved_progress=1',
