@@ -160,12 +160,22 @@ class WorkerNativeOwnerDataTests(unittest.TestCase):
                     expected.hidden,expected.enabled,expected.visible_when_disabled=true,false,false
                     expected.effects[1].modifier=modifier==0 and 0 or -modifier;expected.prerequisites={}
                     expected.unit={count=1,time=1,ingredients={{"logistic-science-pack",1}}}
+                    expected.ignore_tech_cost_multiplier=true
                     local gate=owner.head_debit(source);same(gate,expected);same(source,before)
                     assert(gate.level==4 and gate.max_level=="infinite" and gate.effects[1].modifier==-modifier)
                     gate.unit.ingredients[1][1]="changed";gate.effects[1].modifier=99
                     same(source,before)
                   end
                 ''')
+
+    def test_private_head_is_exempt_while_nonexempt_public_and_owner_costs_are_unchanged(self):
+        for target in ("f200", "f210"):
+            self.stage(target).execute(r'''
+              local source=authored();source.ignore_tech_cost_multiplier=false;local before=deep(source)
+              local head=owner.head_debit(source);local ordinary=owner.default_owner(source)
+              assert(head.ignore_tech_cost_multiplier==true and head.unit.count==1)
+              assert(ordinary.ignore_tech_cost_multiplier==false);same(ordinary.unit,before.unit);same(source,before)
+            ''')
 
     def test_head_and_full_owner_preserve_native_contribution_without_double_counting(self):
         for target in ("f200", "f210"):

@@ -256,7 +256,7 @@ def expected_worker_default_split_rows(historical_canonical):
     tail.update(name="mir-worker-storage-default-4", level=4, hidden=False)
     gate = deepcopy(historical_canonical)
     gate.update(name="mir-worker-storage-head-4", level=4, max_level="infinite", hidden=True,
-                enabled=False, visible_when_disabled=False, prerequisites=[])
+                enabled=False, visible_when_disabled=False, prerequisites=[], ignore_tech_cost_multiplier=True)
     gate["effects"][0]["modifier"] = -historical_canonical["effects"][0]["modifier"]
     gate["unit"] = {"count": 1, "time": 1,
                     "ingredients": [[historical_canonical["unit"]["ingredients"][0][0], 1]]}
@@ -1311,6 +1311,7 @@ class GeneratorTests(unittest.TestCase):
               assert(row.hidden and row.enabled == false and row.visible_when_disabled == false
                 and row.max_level == "infinite" and #row.effects == 1
                 and row.effects[1].type == "worker-robot-storage" and row.effects[1].modifier == -1
+                and row.ignore_tech_cost_multiplier == true
                 and row.unit.count == 1 and row.unit.time == 1 and #row.unit.ingredients == 1
                 and row.unit.ingredients[1][1] == "automation-science-pack"
                 and row.unit.ingredients[1][2] == 1 and #row.prerequisites == 0)

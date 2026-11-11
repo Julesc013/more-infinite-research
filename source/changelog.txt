@@ -4,6 +4,7 @@ Date: 2026-11-11
 
   Bugfixes:
 
+    - Prevent worker cargo upgrade failures when the map research price multiplier differs from 1.
     - Keep Ferrum robotics science in continued worker robot cargo research on Factorio 2.0 and 2.1.
     - Keep default worker cargo research in permanent native research on Factorio 2.0 and 2.1, preserving earned levels and
       unfinished work on admitted upgrades.
