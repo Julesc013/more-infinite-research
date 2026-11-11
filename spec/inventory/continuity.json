@@ -8487,11 +8487,13 @@
     "public_release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.12",
     "package_review": {
       "path": "spec/evidence/mir512-beta-independent-final-verdict-r01.json",
+      "git_revision": "eed111eed62c1988b08565ebaf4778be7f6f3201",
       "blob": "cc4763544fb9d46dc8f91fdf9f66faee027f74db",
       "scope": "Independent current-beta package and affected-result review; it is neither delivery verification nor stable acceptance."
     },
     "delivery_review": {
       "path": "spec/evidence/candidate512-github-prerelease-delivery-r01.json",
+      "git_revision": "eed111eed62c1988b08565ebaf4778be7f6f3201",
       "blob": "3c6dc1afd5cdd0e1d13bcaaebc98a61807b028e9",
       "scope": "Verified 19 anonymous public downloads and 21 local delivery files for the published GitHub prerelease; no native execution, full release qualification or stable acceptance."
     },
@@ -8501,64 +8503,15 @@
     "stable_qualification": false,
     "scope": "Published5.0.12 GitHub beta delivery is verified. Its package and affected-result reviews retain their named limits; Library/client/export, historical/profile/API/state and whole-product performance stable acceptance remain incomplete.",
     "previous_context": {
-    "source": "958e34dd2701418c71f74ae094c26ff7cd467e6b",
-    "source_tag": "v5.0.10",
-    "source_version": "5.0.10",
-    "player_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
-    "whole_tree": "416e7b290caa3ce2c164e5496d482a2041e43e90",
-    "public_release_id": 438263107,
-    "public_release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.10",
-    "package_review": {
-      "path": "spec/evidence/candidate510-independent-review-r01.json",
-      "scope": "Reviewed frozen hotfix beta; mandatory publication conditions are separately observed by delivery readback."
-    },
-    "delivery_review": {
-      "path": "spec/evidence/candidate510-aero-delivery-r01.json",
-      "sha256": "CDE1ED65DC88FBA3ECB193CAF116CD97823717095F7DCC3260E643B8037DA65D",
-      "scope": "Aero independently observes19anonymous downloads,17root/info/changelog/floor checks and21byte-verified local delivery files; no native execution or source rebuild."
-    },
-    "affected_native_evidence": "spec/evidence/candidate510-affected-native-r01.json",
-    "prerelease_delivery_verified": true,
-    "native_qualification_complete": false,
-    "release_qualification": false,
-    "stable_qualification": false,
-    "scope": "Published5.0.10 hotfix beta delivery is verified. Worker/SIF incident checks keep their exact affected native scopes. The stable worklist below remains authoritative for incomplete Library/client/export, historical/profile/API/state and whole-product performance acceptance. Published package bytes stay fixed; changed player contents require the next unpublished source patch.",
-    "previous_context": {
-      "source": "e296d40924f4d0f1d133eb5710f392b92ac42158",
-      "source_tag": "v5.0.7",
-      "source_version": "5.0.7",
-      "player_tree": "b3401ef94a9a84f80a9a953a85f90934e57d3750",
-      "whole_tree": "091f439f3890f9a7cb593f8776f3f76c575f317f",
-      "public_release_id": 436222708,
-      "public_release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.7",
-      "package_review": {
-        "path": "4c63bc125e9db91ab3a360f208eb75b68ab567ad:projects/mir/runs/aero-candidate507-r02-package-review-r01/review.json",
-        "sha256": "C3FC8BC45ED3651F583B5BA7074D0F52F7F7E294D0FD4296526D5E5367FB6EBC"
-      },
-      "delivery_review": {
-        "path": "4aa5243c8f78386dce13251ed5672868884d612d:projects/mir/runs/aero-public507-final-publisher-review-r01/review.json",
-        "sha256": "52A7BFDDF81C8A905BB23363265C4D71CD9E8B5C94A73A3B9C5A093D998E9566"
-      },
-      "prerelease_delivery_verified": true,
-      "native_qualification_complete": false,
-      "release_qualification": false,
-      "stable_qualification": false,
-      "scope": "MIR 5.0.7 beta is delivered. Its packages, named old-Base preservation checks and GitHub delivery are accepted within their recorded scopes. Full native and stable qualification remain incomplete; native results retain their original inputs.",
-      "previous_context": {
-        "source": "7b8cba314767da6aa5fcdc6c4d1c1f080c35800f",
-        "source_tag": "v5.0.6",
-        "player_tree": "147deb56b966707a832cfb35507c57528d599d36",
-        "original_record": "0330a3699e167a7f5825ebaffceeb9a5146f451b:spec/inventory/continuity.json",
-        "scope": "The original 5.0.6 candidate, reviews and preceding contexts remain at this immutable Git record. Earlier results keep their original identities."
-      },
-      "delivery_component_review": {
-        "path": "3819af8fafb2e7163bc79be6028e4a3721e156a5:projects/mir/runs/aero-public507-actual-delivery-r01/review.json",
-        "sha256": "4CAE7DB15D6686D168076947E8A2A1B5B95E373A76E7A2B3DF3E9A5BA82D5A9C"
-      },
-      "prerelease_publication_and_delivery_accepted": true,
-      "delivery_chain": "spec/evidence/candidate507-github-prerelease-delivery-chain-r01.json",
-      "next_changed_public_version": "5.0.8"
-    }
+      "source": "958e34dd2701418c71f74ae094c26ff7cd467e6b",
+      "source_tag": "v5.0.10",
+      "source_version": "5.0.10",
+      "player_tree": "f4e45e5667146ec57dee763137ea386f080b7bd0",
+      "whole_tree": "416e7b290caa3ce2c164e5496d482a2041e43e90",
+      "public_release_id": 438263107,
+      "public_release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v5.0.10",
+      "original_record": "eed111eed62c1988b08565ebaf4778be7f6f3201:spec/inventory/continuity.json",
+      "scope": "The complete published5.0.10 candidate, its reviews and every preceding context remain at this immutable Git record. Earlier results retain their original identities and scopes."
     }
   },
   "reference_path_policy": "Current source lookup pointers below use existing canonical paths. Removed MIR4 implementation locators are pinned under historical_source to the original recovery baseline; removed documentation pointers retain an explicit evidence_revision or historical_documentation commit. These source/doc lookups do not relabel historical execution identities or native scopes.",
