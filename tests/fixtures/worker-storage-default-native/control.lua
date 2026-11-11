@@ -83,7 +83,8 @@ local function closure(old, mode)
   check(v and active[FIXTURE] == "0.1.0" and active["more-infinite-research"] == (old and v.old or v.new), "exact engine/MIR/fixture tuple")
   local count = 0; for name in pairs(active) do check(name == "base" or name == FIXTURE or name == "more-infinite-research", "unexpected active mod"); count = count + 1 end
   local multiplier = game.difficulty_settings.technology_price_multiplier
-  local map_price_ok = mode == "first-map-price" and (multiplier == 2 or multiplier == 4) or multiplier == 1
+  local map_price_ok = mode == "first-map-price" and (multiplier == 2 or multiplier == 4)
+    or mode ~= "first-map-price" and multiplier == 1
   check(type(multiplier) == "number" and count == 3 and game.speed == 1 and map_price_ok, "selection/clock/map-price control")
   return multiplier
 end
@@ -216,7 +217,7 @@ local function first_settled(final)
   M.assert_settled_flags(player)
   check(head.level == 5 and not head.researched and not head.enabled and head.saved == 0, "public fulfilled head preserved")
   check(tail.level == (final and 6 or 5) and not tail.researched and tail.enabled
-    and gate.level == 5 and gate.researched == false, "native tail progression")
+    and gate.level == 5 and gate.researched == false and gate.count == 1, "native tail progression")
   check(player.current == (final and QUEUED or TAIL) and player.progress == 0, "settled native current/progress")
   M.same(player.queue, final and {QUEUED} or {TAIL, QUEUED}, "$/player/queue")
   return frames
@@ -275,7 +276,7 @@ function M.on_finished(event)
   -- Raw completed-event cursor/current/queue are retained above. No guessed
   -- transient representation is rewritten; next native tick checks exact work.
   s.phase = #s.ordinary == 1 and "head-finished" or "tail-finished"
-  if #s.ordinary == 2 then s.lab.disabled_by_script = true end
+  if #s.ordinary == 2 or s.mode == "first-map-price" then s.lab.disabled_by_script = true end
 end
 function M.on_tick()
   local s = storage[KEY]
@@ -298,7 +299,12 @@ function M.on_tick()
     emit("head-settle-observed"); local frames = first_settled(false)
     if s.mode == "first-map-price" then
       local inventory, expected = lab_frame().inventory, first_level4_science(s.map_price)
-      for _, pack in ipairs(SCIENCE) do check(s.inserted[pack] - inventory[pack] == expected, "first level4 science depletion " .. pack) end
+      for _, pack in ipairs(SCIENCE) do
+        local inserted, remaining = s.inserted[pack], inventory[pack]
+        check(type(inserted) == "number" and type(remaining) == "number" and inserted % 200 == 0
+          and remaining >= 0 and remaining < 200 and inserted - remaining == expected,
+          "first level4 science depletion " .. pack)
+      end
       check(#s.ordinary == 1, "one actual first level4 completion")
       local phase = "first-map-price-" .. s.map_price .. "x-level4-saved"
       save(phase, frames)
