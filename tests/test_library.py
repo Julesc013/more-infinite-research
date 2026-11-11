@@ -2577,6 +2577,8 @@ class LibraryTests(unittest.TestCase):
 
     def test_availability_mode_searches_authored_rows_without_native_actions(self):
         self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
           script = {active_mods = {}}
           boot()
           local native_queue, native_current, native_progress = player.force.research_queue,
@@ -2615,6 +2617,40 @@ class LibraryTests(unittest.TestCase):
             "a malformed named native owner must not produce an explanation")
           assert(player.force.research_queue == native_queue and player.force.current_research == native_current
             and player.force.research_progress == native_progress and gear.level == 3 and gear.enabled == false)
+        ''')
+
+    def test_availability_normalizes_detached_query_and_preserves_typed_text(self):
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          script = {active_mods = {["space-age"] = "2.1.23"}}
+          boot()
+          player.force.technologies["research-productivity"] = {
+            valid = true, prototype = {effects = {
+              {type = "laboratory-productivity", modifier = .1}
+            }}
+          }
+          local queue, current, progress = player.force.research_queue,
+            player.force.current_research, player.force.research_progress
+          for _, typed in ipairs{"  NATIVE--RESEARCH_PRODUCTIVITY  ",
+              "native  research__productivity"} do
+            local root = library.open(player, {tab="availability", query=typed})
+            local entries = availability_entries(root)
+            assert(entries.mir_library_availability_1 ~= nil
+              and entries.mir_library_availability_empty == nil,
+              "Availability lost canonical whitespace/separator matching")
+            assert(storage.mir_library.players[1].query == typed
+              and research_filters(root).mir_library_query.text == typed,
+              "Availability canonicalization rewrote typed query bytes")
+            library.close(player)
+            root = library.open(player)
+            assert(availability_entries(root).mir_library_availability_1 ~= nil
+              and storage.mir_library.players[1].query == typed,
+              "Availability query did not survive reopen")
+          end
+          assert(player.force.research_queue == queue and player.force.current_research == current
+            and player.force.research_progress == progress,
+            "Availability matching changed native research work")
         ''')
 
     def test_availability_uses_parse_time_effective_streams_without_profile_resolution_on_refresh(self):

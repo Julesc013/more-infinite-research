@@ -2022,7 +2022,7 @@ local function update_queue_content(content, player, view)
   content[PREFIX .. "queue_empty"].visible = #items == 0
 end
 
-local function update_availability_content(content, player, view)
+local function update_availability_content(content, player, view, context)
   if not valid(content) then return end
   content.clear()
   -- This bounded view has no compiler ledger and no native catalogue pass. It
@@ -2030,7 +2030,8 @@ local function update_availability_content(content, player, view)
   -- mod and named native-owner facts.
   local active_mods = script and script.active_mods or {}
   local effective_streams = type(effective_configuration) == "table" and effective_configuration.streams or nil
-  local rows = availability.rows(active_mods, target, player and player.force, view and view.query, effective_streams)
+  local query = model_view(view, context).search
+  local rows = availability.rows(active_mods, target, player and player.force, query, effective_streams)
   -- One full-width child owns scrolling; explanations are not Research table
   -- columns. Leave the same scrollbar/padding budget as the other panes.
   local width = math.max(1, (content.style and content.style.maximal_width or 592) - 16)
@@ -2426,7 +2427,7 @@ local function render(player, view, context, preserve_query)
   local content = tab_content(frame, view.tab)
   if view.tab == "research" and view.visibility == 3 then
     discard_translation_cache(player.index)
-    update_availability_content(content, player, view)
+    update_availability_content(content, player, view, context)
   elseif view.tab == "research" then
     local translations = open_translation_cache(player, view)
     dispatch_translations(player, translations)
