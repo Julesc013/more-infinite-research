@@ -3852,13 +3852,13 @@ class LibraryTests(unittest.TestCase):
           local retired_id = "worker-robots-storage-4"
           local tail_id = "mir-worker-storage-default-4"
           local debit_id = "mir-worker-storage-head-4"
-          local function prototype(name, hidden)
-            return {name=name, level=4, max_level=4294967295, hidden=hidden == true,
-              enabled=hidden ~= true, effects={{type="worker-robot-storage", modifier=1}}}
+          local function prototype(name, maximum, hidden, effects)
+            return {name=name, level=4, max_level=maximum, hidden=hidden == true,
+              enabled=hidden ~= true, effects=effects}
           end
-          local retired_prototype = prototype(retired_id, false)
-          local tail_prototype = prototype(tail_id, false)
-          local debit_prototype = prototype(debit_id, true)
+          local retired_prototype = prototype(retired_id, 4294967295, false, {{type="worker-robot-storage", modifier=1}})
+          local tail_prototype = prototype(tail_id, 4294967295, false, {{type="worker-robot-storage", modifier=1}})
+          local debit_prototype = prototype(debit_id, 4294967295, true, {})
           prototypes = {
             mod_data={["more-infinite-research-native-adoptions"]={data={
               schema=1, owners={}, worker_default_split=true
@@ -3892,6 +3892,14 @@ class LibraryTests(unittest.TestCase):
           assert(declared[retired_id].fixed_maximum == 4 and declared[tail_id].fixed_maximum == nil,
             "the retired finite head and ordinary tail lost their separate contracts")
 
+          local head_object, tail_object = player.force.technologies[retired_id], player.force.technologies[tail_id]
+          local head_level, tail_level = retired.level, tail.level
+          local head_enabled, tail_enabled = retired.enabled, tail.enabled
+          local head_researched, tail_researched = retired.researched, tail.researched
+          local head_visible, tail_visible = retired.visible_when_disabled, tail.visible_when_disabled
+          local bonus, queue, current, progress = player.force.worker_robots_storage_bonus,
+            player.force.research_queue, player.force.current_research, player.force.research_progress
+
           -- After parse, callbacks must consume those retained rows and never
           -- re-import a model or reconstruct a substituted ownership route.
           require = function(name) error("Library callback imported " .. tostring(name)) end
@@ -3903,10 +3911,6 @@ class LibraryTests(unittest.TestCase):
             ["mir_library_detail_heading"]["mir_library_detail_title"].caption == tail.localised_name,
             "Library selection or detail relabeled the ordinary default worker tail")
 
-          local head_object, tail_object = player.force.technologies[retired_id], player.force.technologies[tail_id]
-          local head_level, tail_level = retired.level, tail.level
-          local bonus, current, progress = player.force.worker_robots_storage_bonus,
-            player.force.current_research, player.force.research_progress
           local actions = content["mir_library_list_pane"]["mir_library_actions"]
           library.on_gui_click({player_index=1, element=actions["mir_library_open_native"]})
           assert(player.opened_technology == tail and player.opened_technology ~= retired,
@@ -3914,6 +3918,9 @@ class LibraryTests(unittest.TestCase):
           assert(player.force.technologies[retired_id] == head_object and player.force.technologies[tail_id] == tail_object
             and retired.prototype == retired_prototype and tail.prototype == tail_prototype
             and retired.level == head_level and tail.level == tail_level
+            and retired.enabled == head_enabled and tail.enabled == tail_enabled
+            and retired.researched == head_researched and tail.researched == tail_researched
+            and retired.visible_when_disabled == head_visible and tail.visible_when_disabled == tail_visible
             and player.force.worker_robots_storage_bonus == bonus
             and player.force.research_queue == queue and player.force.current_research == current
             and player.force.research_progress == progress
