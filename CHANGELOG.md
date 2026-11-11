@@ -8,6 +8,7 @@ This is the authoritative product changelog. Each MIR 1–3 master release appea
 
 - Keep Ferrum robotics science in continued worker robot cargo research on Factorio 2.0 and 2.1.
 - Keep default worker cargo research in permanent native research on Factorio 2.0 and 2.1, preserving earned levels and unfinished work on admitted upgrades.
+- Preserve earlier MIR 5 default worker cargo research when upgrading and later adding a supported provider.
 - Retain worker cargo history across supported engine patch updates, Factorio 2.0-to-2.1 upgrades and provider updates that leave the research contract unchanged.
 - Keep ordinary research queue changes safe after a force finishes its preserved worker cargo research.
 - Allow Bob's Warfare with mods that set recipe productivity caps, preserving their configured limits.
