@@ -3021,6 +3021,60 @@ class LibraryTests(unittest.TestCase):
             and player.force.research_progress==progress and gear.level==3 and gear.researched and not gear.enabled)
         ''')
 
+    def test_german_localized_search_casefolds_after_late_translation_and_reopen(self):
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          boot()
+          player.locale = "de"
+          gear.localised_name = {"technology-name.fixture-german-library"}
+          library_declarations = {
+            {id=gear.name,name="Robot battery",family="mir",finite=false,max_level="infinite"}
+          }
+          local original_queue, original_current, original_progress = player.force.research_queue,
+            player.force.current_research, player.force.research_progress
+          local root = library.open(player, {query="FUSS", selected=gear.name})
+          local function german_request(first)
+            for index=first or 1,#player.translation_requests do
+              local request = player.translation_requests[index]
+              if type(request.localised) == "table"
+                  and request.localised[1] == "technology-name.fixture-german-library" then
+                return request
+              end
+            end
+            return nil
+          end
+          local request = assert(german_request(), "localized row did not request its German label")
+          assert(storage.mir_library.players[1].query == "FUSS"
+            and #research_content(root).mir_library_list_pane.mir_library_results.items == 0,
+            "the raw fallback must not masquerade as a translated German match")
+          library.on_string_translated({player_index=1,id=request.id,translated=true,
+            result="Fuß Größe Ärger Übung"})
+          local list = research_content(root).mir_library_list_pane.mir_library_results
+          assert(#list.items == 1 and list.items[1][3] == "Fuß Größe Ärger Übung",
+            "a late German translation did not make its row discoverable")
+          local query = research_filters(root).mir_library_query
+          query.text = "GRÖSSE"
+          library.on_gui_text_changed({player_index=1,element=query})
+          assert(#list.items == 1 and storage.mir_library.players[1].query == "GRÖSSE",
+            "German uppercase query did not preserve its exact saved bytes")
+          library.close(player)
+          local first = #player.translation_requests + 1
+          root = library.open(player)
+          assert(storage.mir_library.players[1].query == "GRÖSSE"
+            and research_filters(root).mir_library_query.text == "GRÖSSE",
+            "reopening lost the saved localized query")
+          request = assert(german_request(first), "reopened localized row did not request its German label")
+          library.on_string_translated({player_index=1,id=request.id,translated=true,
+            result="Fuß Größe Ärger Übung"})
+          list = research_content(root).mir_library_list_pane.mir_library_results
+          assert(#list.items == 1 and list.items[1][3] == "Fuß Größe Ärger Übung",
+            "saved German query did not match after its late reopen translation")
+          assert(player.force.research_queue == original_queue and player.force.current_research == original_current
+            and player.force.research_progress == original_progress and gear.level == 3 and gear.researched
+            and not gear.enabled, "localized search changed native research state")
+        ''')
+
     def test_search_without_native_translation_still_selects_a_visible_fallback(self):
         self.lua.execute(r'''
           package.preload["presentation.library_model"] = nil
@@ -4399,6 +4453,58 @@ class LibraryTests(unittest.TestCase):
           local list = dynamic["mir_library_settings_list"]
           assert(#list.items == 1 and dynamic["mir_library_settings_count"].caption[2] == 1,
             "the localized field label should find its group after loading")
+        ''')
+
+    def test_german_localized_settings_search_casefolds_after_late_translation_and_reopen(self):
+        self.lua.execute(r'''
+          boot()
+          player.locale = "de"
+          local catalog = require("research.settings")
+          local specs = {}
+          for _, prototype in ipairs(catalog.prototypes()) do specs[prototype.name] = prototype end
+          local target = assert(catalog.registered_names()[1])
+          local scope = catalog.spec(target).stream and "research" or "options"
+          local function equal(left, right)
+            if type(left) ~= type(right) then return false end
+            if type(left) ~= "table" then return left == right end
+            for key, value in pairs(left) do if not equal(value, right[key]) then return false end end
+            for key in pairs(right) do if left[key] == nil then return false end end
+            return true
+          end
+          local function target_request(first)
+            for index=first or 1,#player.translation_requests do
+              local request = player.translation_requests[index]
+              if equal(request.localised, specs[target].localised_name) then return request end
+            end
+            return nil
+          end
+          local root = library.open(player, {tab="settings", settings_scope=scope})
+          local request = assert(target_request(), "settings label was not requested for translation")
+          library.on_string_translated({player_index=1,id=request.id,translated=true,
+            result="Größe der Forschung"})
+          local content = root.mir_library_tabs.mir_library_settings_content
+          local query = content.mir_library_settings_query
+          query.text = "GRÖSSE"
+          library.on_gui_text_changed({player_index=1,element=query})
+          local dynamic = content.mir_library_settings_dynamic
+          assert(#dynamic.mir_library_settings_list.items == 1
+            and dynamic.mir_library_settings_count.caption[2] == 1
+            and storage.mir_library.players[1].settings_search == "GRÖSSE",
+            "late German settings translation did not casefold the query")
+          library.close(player)
+          local first = #player.translation_requests + 1
+          root = library.open(player, {tab="settings"})
+          content = root.mir_library_tabs.mir_library_settings_content
+          assert(content.mir_library_settings_query.text == "GRÖSSE"
+            and storage.mir_library.players[1].settings_search == "GRÖSSE",
+            "reopening lost the saved localized settings query")
+          request = assert(target_request(first), "reopened settings did not request its localized label")
+          library.on_string_translated({player_index=1,id=request.id,translated=true,
+            result="Größe der Forschung"})
+          dynamic = content.mir_library_settings_dynamic
+          assert(#dynamic.mir_library_settings_list.items == 1
+            and dynamic.mir_library_settings_count.caption[2] == 1,
+            "saved German settings query did not match its late reopened translation")
         ''')
 
     def test_new_tab_and_settings_callbacks_do_not_claim_an_unowned_gui(self):

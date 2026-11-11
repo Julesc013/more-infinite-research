@@ -640,6 +640,27 @@ class LibraryModelTests(unittest.TestCase):
           assert(#hidden == 1 and hidden[1].hidden and hidden[1].status == "ready")
         ''')
 
+    def test_localized_german_search_casefolds_without_losing_diacritics(self):
+        self.lua.execute('''
+          local id = "recipe-prod-research_gears-1"
+          local gear = technology(id, {level = 3})
+          local force = {technologies = {[id] = gear}, research_queue = {}}
+          local declared = {{id = id, family = "research_gears"}}
+          local translated = {[id] = "Fuß Größe Ärger Übung"}
+          for _, search in ipairs{
+            "FUSS", "fuss", "GRÖSSE", "grösse", "ÄRGER", "ärger", "ÜBUNG", "übung"
+          } do
+            local rows = model.rows(force, declared, {search = search}, translated)
+            assert(#rows == 1 and rows[1].id == id,
+              "localized German search lost its Unicode casefold: " .. search)
+          end
+          assert(#model.rows(force, declared, {search = "arger"}, translated) == 0,
+            "localized search must not strip the umlaut while casefolding")
+          assert(gear.level == 3 and gear.enabled and not gear.researched
+            and #force.research_queue == 0,
+            "localized row search changed native research state")
+        ''')
+
     def test_stable_secondary_recipe_ids_remain_searchable_without_translated_labels(self):
         self.lua.execute('''
           local id = "recipe-prod-research_gears-1"
