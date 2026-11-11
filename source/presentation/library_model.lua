@@ -37,19 +37,35 @@ local function native_read(value, key)
 end
 
 local function ascii_casefold(value)
-  return (string.gsub(value, "%u", function(letter)
+  return (string.gsub(value, "[A-Z]", function(letter)
     return string.char(string.byte(letter) + 32)
   end))
 end
 
-local function searchable(value)
-  local normalized = string.gsub(ascii_casefold(value), "[%s_-]+", " ")
+-- The runtime may inject Factorio's multilingual lowercasing helper. This
+-- detached model never reads engine globals itself; the explicit sharp-S
+-- spelling keeps the existing German full-fold search expectation narrow.
+function M.search_text(value, context)
+  if type(value) ~= "string" then return nil end
+  local normalizer = type(context) == "table" and context.search_normalizer or nil
+  if type(normalizer) == "function" then
+    local ok, normalized = pcall(normalizer, value)
+    if ok and type(normalized) == "string" then value = normalized
+    else value = ascii_casefold(value) end
+  else
+    value = ascii_casefold(value)
+  end
+  return (value:gsub("\195\159", "ss"))
+end
+
+local function searchable(value, context)
+  local normalized = string.gsub(M.search_text(value, context), "[%s_-]+", " ")
   return normalized:gsub("^ ", ""):gsub(" $", "")
 end
 
-local function matches(value, search)
-  if string.find(ascii_casefold(value), search, 1, true) then return true end
-  return string.find(searchable(value), search, 1, true) ~= nil
+local function matches(value, search, context)
+  if string.find(M.search_text(value, context), search, 1, true) then return true end
+  return string.find(searchable(value, context), search, 1, true) ~= nil
 end
 
 local function copy_hidden(value)
@@ -82,7 +98,7 @@ end
 
 -- Preserve the shipped schema-3 defaults and portable search/sort enums while
 -- copying every retained value away from host-owned player state.
-function M.normalize(view)
+function M.normalize(view, context)
   view = type(view) == "table" and view or {}
   local mode = tonumber(view.mode)
   if not finite_integer(mode) or mode < 1 or mode > 3 then mode = 1 end
@@ -104,7 +120,7 @@ function M.normalize(view)
     mode = mode,
     status = status,
     page = page,
-    search = searchable(search),
+    search = searchable(search, context),
     tab = accepted(view.tab, {"research", "settings", "queue", "help"}, "research"),
     settings_scope = accepted(view.settings_scope, {"research", "options"}, "research"),
     effect_page = finite_integer(effect_page) and math.max(1, math.floor(effect_page)) or 1,
@@ -114,7 +130,7 @@ function M.normalize(view)
     family = bounded_string(view.family, MAX_SEARCH) or "mir",
     sort = accepted(view.sort, {"progression", "native", "name-asc", "name-desc"}, "progression"),
     stable_sort = accepted(view.stable_sort, {"progression", "native"}, "progression"),
-    settings_search = searchable(settings_search),
+    settings_search = searchable(settings_search, context),
     visibility = visibility,
     hidden = copy_hidden(view.hidden)
   }
@@ -432,7 +448,7 @@ end
 -- Inspect only this eligible research's finite native array, lazily after a
 -- text miss. Detail previews and localized-subject limits must not truncate
 -- identity search; no recipe objects or live productivity values are needed.
-local function recipe_id_matches(technology, search)
+local function recipe_id_matches(technology, search, context)
   local effects = native_read(native_read(technology, "prototype"), "effects")
   if effects == nil then return false end
   local ok, matched = pcall(function()
@@ -441,7 +457,7 @@ local function recipe_id_matches(technology, search)
       local kind = native_read(effect, "type")
       if kind == "unlock-recipe" or kind == "change-recipe-productivity" then
         local id = bounded_string(native_read(effect, "recipe"), MAX_TEXT)
-        if id and matches(id, search) then return true end
+        if id and matches(id, search, context) then return true end
       end
     end
     return false
@@ -449,15 +465,15 @@ local function recipe_id_matches(technology, search)
   return ok and matched == true
 end
 
-local function row_matches(row, view, technology)
+local function row_matches(row, view, technology, context)
   if not family_matches(row, view.family) or not status_matches(row, view.status)
     or not mode_matches(row, view.mode) then return false end
   if view.visibility == 1 and view.hidden[row.id] then return false end
   if view.visibility == 2 and not view.hidden[row.id] then return false end
   if view.search == "" then return true end
   return matches(row.id .. " " .. row.family .. " " .. row.name .. " " .. (row.search_text or "")
-    .. " " .. (row.recipe or "") .. " " .. (row.locale_key or ""), view.search)
-    or recipe_id_matches(technology, view.search)
+    .. " " .. (row.recipe or "") .. " " .. (row.locale_key or ""), view.search, context)
+    or recipe_id_matches(technology, view.search, context)
 end
 
 local function ordered(left, right, sort)
@@ -481,7 +497,7 @@ end
 -- only. Explicit external or all views may enumerate the native catalogue
 -- exactly once.
 function M.rows(force, catalogue, view, translations, context)
-  local normalized = M.normalize(view)
+  local normalized = M.normalize(view, context)
   local declared, by_id = declarations(catalogue)
   local queue_count, queue_index, current = queue_facts(force)
   local candidates = {}
@@ -522,7 +538,7 @@ function M.rows(force, catalogue, view, translations, context)
     if technology ~= nil and not private_credit(context, id) and M.technology_visible(technology, id, context) then
       local row = row_for(force, by_id[id], id, technology, queue_count, queue_index, current, translations, context)
       row.hidden = normalized.hidden[id] == true
-      if row_matches(row, normalized, technology) then selected[#selected + 1] = row end
+      if row_matches(row, normalized, technology, context) then selected[#selected + 1] = row end
     end
   end
   table.sort(selected, function(left, right) return ordered(left, right, normalized.sort) end)
@@ -608,7 +624,7 @@ end
 -- Detail reads one selected native technology directly. It never builds the
 -- full native catalogue or asks Factorio to translate, navigate, or mutate.
 function M.detail(force, catalogue, view, translations, context)
-  local normalized = M.normalize(view)
+  local normalized = M.normalize(view, context)
   local id = normalized.selected
   if id == nil then return nil, "no_selection" end
   if private_credit(context, id) then return nil, "technology_not_found" end

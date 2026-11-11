@@ -350,7 +350,9 @@ local function local_view(raw)
     selected = value.selected
   })
   if type(normalized) == "table" then
-    value.query = text(normalized.search or value.query)
+    -- Retain exactly what the player typed. The model receives a detached,
+    -- normalized search view during rendering; storing that value would lose
+    -- case and prevent a native multilingual normalizer from seeing it later.
     value.family = family_option(normalized.family) or "mir"
     value.mode = whole_option(normalized.mode, 1, 3) or 1
     value.status = type(normalized.status) == "number" and normalized.status or 1
@@ -724,7 +726,7 @@ local function legacy_marker(player, frame)
   return type_ok and marker_type == "tabbed-pane" and marker or nil
 end
 
-local function model_view(view)
+local function model_view(view, context)
   return library_model.normalize({
     search = view.query,
     family = view.family,
@@ -736,7 +738,7 @@ local function model_view(view)
     visibility = view.visibility,
     hidden = view.hidden,
     selected = view.selected
-  })
+  }, context)
 end
 
 local function context_for(force)
@@ -746,6 +748,10 @@ local function context_for(force)
     research_triggers_supported = target.id == "f200" or target.id == "f210",
     recipe_productivity_supported = target.recipe_productivity == true
   }
+  local multilingual_to_lower = helpers and helpers.multilingual_to_lower
+  if type(multilingual_to_lower) == "function" then
+    context.search_normalizer = multilingual_to_lower
+  end
   if DISCOVERY_TREE and type(discovery_visibility_provider) == "function" then
     context.discovery_visibility = discovery_visibility_provider(force)
   end
@@ -962,14 +968,14 @@ local function update_discovery_indicator(content, record)
 end
 
 local function rows_for(player, view, context, labels)
-  local rows = library_model.rows(player.force, authored_declarations(), model_view(view), labels or EMPTY_TRANSLATIONS, context)
+  local rows = library_model.rows(player.force, authored_declarations(), model_view(view, context), labels or EMPTY_TRANSLATIONS, context)
   if type(rows) ~= "table" then return {} end
   return rows
 end
 
 local function selected_detail(player, view, context, labels)
   if not view.selected then return nil end
-  return library_model.detail(player.force, authored_declarations(), model_view(view), labels or EMPTY_TRANSLATIONS, context)
+  return library_model.detail(player.force, authored_declarations(), model_view(view, context), labels or EMPTY_TRANSLATIONS, context)
 end
 
 local function set_shortcut(player, toggled)
@@ -1778,7 +1784,7 @@ local function setting_catalogue()
   return setting_groups_cache
 end
 
-local function setting_search_matches(group, query, translations)
+local function setting_search_matches(group, query, translations, context)
   if query == "" then return true end
   local haystack = group.search
   if type(translations) == "table" then
@@ -1787,8 +1793,9 @@ local function setting_search_matches(group, query, translations)
       if type(label) == "string" and label ~= "" then haystack = haystack .. " " .. label end
     end
   end
-  haystack = haystack:lower():gsub("[-_]", " ")
-  return haystack:find(query:lower():gsub("[-_]", " "), 1, true) ~= nil
+  haystack = library_model.search_text(haystack, context):gsub("[-_]", " ")
+  query = library_model.search_text(query, context):gsub("[-_]", " ")
+  return haystack:find(query, 1, true) ~= nil
 end
 
 local function settings_group_key(setting_name)
@@ -1799,7 +1806,7 @@ local function settings_group_key(setting_name)
   return stream and type(stream.key) == "string" and stream.key or setting_name
 end
 
-local function update_settings_content(content, view, preserve_query, translations)
+local function update_settings_content(content, view, preserve_query, translations, context)
   if not valid(content) then return end
   local width = content.style and (content.style.maximal_width or content.style.width) or 592
   local available_height = content.style and (content.style.maximal_height or content.style.height) or 220
@@ -1878,7 +1885,7 @@ local function update_settings_content(content, view, preserve_query, translatio
   end
   local visible, items = {}, {}
   for _, group in ipairs(groups) do
-    if group.scope == view.settings_scope and setting_search_matches(group, view.settings_query, translations) then
+    if group.scope == view.settings_scope and setting_search_matches(group, view.settings_query, translations, context) then
       visible[#visible + 1], items[#items + 1] = group, group.title
     end
   end
@@ -2015,7 +2022,7 @@ local function update_queue_content(content, player, view)
   content[PREFIX .. "queue_empty"].visible = #items == 0
 end
 
-local function update_availability_content(content, player, view)
+local function update_availability_content(content, player, view, context)
   if not valid(content) then return end
   content.clear()
   -- This bounded view has no compiler ledger and no native catalogue pass. It
@@ -2023,7 +2030,8 @@ local function update_availability_content(content, player, view)
   -- mod and named native-owner facts.
   local active_mods = script and script.active_mods or {}
   local effective_streams = type(effective_configuration) == "table" and effective_configuration.streams or nil
-  local rows = availability.rows(active_mods, target, player and player.force, view and view.query, effective_streams)
+  local query = model_view(view, context).search
+  local rows = availability.rows(active_mods, target, player and player.force, query, effective_streams)
   -- One full-width child owns scrolling; explanations are not Research table
   -- columns. Leave the same scrollbar/padding budget as the other panes.
   local width = math.max(1, (content.style and content.style.maximal_width or 592) - 16)
@@ -2419,7 +2427,7 @@ local function render(player, view, context, preserve_query)
   local content = tab_content(frame, view.tab)
   if view.tab == "research" and view.visibility == 3 then
     discard_translation_cache(player.index)
-    update_availability_content(content, player, view)
+    update_availability_content(content, player, view, context)
   elseif view.tab == "research" then
     local translations = open_translation_cache(player, view)
     dispatch_translations(player, translations)
@@ -2431,7 +2439,7 @@ local function render(player, view, context, preserve_query)
   elseif view.tab == "settings" then
     local translations = open_translation_cache(player, view)
     local labels = translated_labels(translations)
-    update_settings_content(content, view, preserve_query, labels)
+    update_settings_content(content, view, preserve_query, labels, context)
     dispatch_translations(player, translations)
   else
     -- A closed Research tab must not retain a local catalogue or spend more
@@ -2687,16 +2695,18 @@ function M.on_gui_selection_state_changed(event)
     if groups == nil then return end
     local view = view_for(player.index)
     local translations = translated_labels(translation_caches[player.index])
+    local context = context_for(player.force)
     local visible = {}
     for _, group in ipairs(groups) do
-      if group.scope == view.settings_scope and setting_search_matches(group, view.settings_query, translations) then
+      if group.scope == view.settings_scope and setting_search_matches(group, view.settings_query, translations,
+          context) then
         visible[#visible + 1] = group
       end
     end
     local group = visible[element.selected_index]
     if group == nil then return end
     view.setting_selected = group.key
-    render(player, view)
+    render(player, view, context)
   elseif element.name == PREFIX .. "queue_list" then
     if not owns_element(player, element, {
       PREFIX .. "queue_list", PREFIX .. "queue_content", PREFIX .. "tabs", ROOT

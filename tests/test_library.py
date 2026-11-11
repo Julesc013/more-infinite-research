@@ -943,6 +943,11 @@ class LibraryTests(unittest.TestCase):
                   selected = type(view.selected) == "string" and view.selected or nil
                 }
               end,
+              search_text = function(value)
+                if type(value) ~= "string" then return nil end
+                value = value:gsub("[A-Z]", function(letter) return string.char(string.byte(letter) + 32) end)
+                return (value:gsub("\195\159", "ss"))
+              end,
               rows = function(force, rows, view, translations)
                 assert(type(translations) == "table")
                 local output = {}
@@ -2572,6 +2577,8 @@ class LibraryTests(unittest.TestCase):
 
     def test_availability_mode_searches_authored_rows_without_native_actions(self):
         self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
           script = {active_mods = {}}
           boot()
           local native_queue, native_current, native_progress = player.force.research_queue,
@@ -2610,6 +2617,40 @@ class LibraryTests(unittest.TestCase):
             "a malformed named native owner must not produce an explanation")
           assert(player.force.research_queue == native_queue and player.force.current_research == native_current
             and player.force.research_progress == native_progress and gear.level == 3 and gear.enabled == false)
+        ''')
+
+    def test_availability_normalizes_detached_query_and_preserves_typed_text(self):
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          script = {active_mods = {["space-age"] = "2.1.23"}}
+          boot()
+          player.force.technologies["research-productivity"] = {
+            valid = true, prototype = {effects = {
+              {type = "laboratory-productivity", modifier = .1}
+            }}
+          }
+          local queue, current, progress = player.force.research_queue,
+            player.force.current_research, player.force.research_progress
+          for _, typed in ipairs{"  NATIVE--RESEARCH_PRODUCTIVITY  ",
+              "native  research__productivity"} do
+            local root = library.open(player, {tab="availability", query=typed})
+            local entries = availability_entries(root)
+            assert(entries.mir_library_availability_1 ~= nil
+              and entries.mir_library_availability_empty == nil,
+              "Availability lost canonical whitespace/separator matching")
+            assert(storage.mir_library.players[1].query == typed
+              and research_filters(root).mir_library_query.text == typed,
+              "Availability canonicalization rewrote typed query bytes")
+            library.close(player)
+            root = library.open(player)
+            assert(availability_entries(root).mir_library_availability_1 ~= nil
+              and storage.mir_library.players[1].query == typed,
+              "Availability query did not survive reopen")
+          end
+          assert(player.force.research_queue == queue and player.force.current_research == current
+            and player.force.research_progress == progress,
+            "Availability matching changed native research work")
         ''')
 
     def test_availability_uses_parse_time_effective_streams_without_profile_resolution_on_refresh(self):
@@ -3019,6 +3060,74 @@ class LibraryTests(unittest.TestCase):
             "a completed nonmatching search must still choose the visible research")
           assert(player.force.research_queue==queue and player.force.current_research==current
             and player.force.research_progress==progress and gear.level==3 and gear.researched and not gear.enabled)
+        ''')
+
+    def test_german_localized_search_casefolds_after_late_translation_and_reopen(self):
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          local sharp_s = string.char(195, 159)
+          local upper_a, lower_a = string.char(195, 132), string.char(195, 164)
+          local upper_o, lower_o = string.char(195, 150), string.char(195, 182)
+          local upper_u, lower_u = string.char(195, 156), string.char(195, 188)
+          local normalizer_calls = {}
+          helpers = {multilingual_to_lower = function(value)
+            normalizer_calls[#normalizer_calls + 1] = value
+            value = value:gsub(upper_a, lower_a):gsub(upper_o, lower_o):gsub(upper_u, lower_u)
+            return (value:gsub("[A-Z]", function(letter) return string.char(string.byte(letter) + 32) end))
+          end}
+          local localized_label = "Fu" .. sharp_s .. " Gr" .. lower_o .. sharp_s .. "e "
+            .. upper_a .. "rger " .. upper_u .. "bung"
+          local uppercase_query = "GR" .. upper_o .. "SSE"
+          boot()
+          player.locale = "de"
+          gear.localised_name = {"technology-name.fixture-german-library"}
+          library_declarations = {
+            {id=gear.name,name="Robot battery",family="mir",finite=false,max_level="infinite"}
+          }
+          local original_queue, original_current, original_progress = player.force.research_queue,
+            player.force.current_research, player.force.research_progress
+          local root = library.open(player, {query="FUSS", selected=gear.name})
+          local function german_request(first)
+            for index=first or 1,#player.translation_requests do
+              local request = player.translation_requests[index]
+              if type(request.localised) == "table"
+                  and request.localised[1] == "technology-name.fixture-german-library" then
+                return request
+              end
+            end
+            return nil
+          end
+          local request = assert(german_request(), "localized row did not request its German label")
+          assert(storage.mir_library.players[1].query == "FUSS"
+            and #research_content(root).mir_library_list_pane.mir_library_results.items == 0,
+            "the raw fallback must not masquerade as a translated German match")
+          library.on_string_translated({player_index=1,id=request.id,translated=true,
+            result=localized_label})
+          local list = research_content(root).mir_library_list_pane.mir_library_results
+          assert(#list.items == 1 and list.items[1][3] == localized_label,
+            "a late German translation did not make its row discoverable")
+          local query = research_filters(root).mir_library_query
+          query.text = uppercase_query
+          library.on_gui_text_changed({player_index=1,element=query})
+          assert(#list.items == 1 and storage.mir_library.players[1].query == uppercase_query,
+            "German uppercase query did not preserve its exact saved bytes")
+          library.close(player)
+          local first = #player.translation_requests + 1
+          root = library.open(player)
+          assert(storage.mir_library.players[1].query == uppercase_query
+            and research_filters(root).mir_library_query.text == uppercase_query,
+            "reopening lost the saved localized query")
+          request = assert(german_request(first), "reopened localized row did not request its German label")
+          library.on_string_translated({player_index=1,id=request.id,translated=true,
+            result=localized_label})
+          list = research_content(root).mir_library_list_pane.mir_library_results
+          assert(#list.items == 1 and list.items[1][3] == localized_label,
+            "saved German query did not match after its late reopen translation")
+          assert(#normalizer_calls > 0, "Library rows did not call the injected native normalizer")
+          assert(player.force.research_queue == original_queue and player.force.current_research == original_current
+            and player.force.research_progress == original_progress and gear.level == 3 and gear.researched
+            and not gear.enabled, "localized search changed native research state")
         ''')
 
     def test_search_without_native_translation_still_selects_a_visible_fallback(self):
@@ -4399,6 +4508,96 @@ class LibraryTests(unittest.TestCase):
           local list = dynamic["mir_library_settings_list"]
           assert(#list.items == 1 and dynamic["mir_library_settings_count"].caption[2] == 1,
             "the localized field label should find its group after loading")
+        ''')
+
+    def test_german_localized_settings_search_casefolds_after_late_translation_and_reopen(self):
+        self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          local sharp_s = string.char(195, 159)
+          local upper_o, lower_o = string.char(195, 150), string.char(195, 182)
+          local normalizer_calls = {}
+          helpers = {multilingual_to_lower = function(value)
+            normalizer_calls[#normalizer_calls + 1] = value
+            value = value:gsub(upper_o, lower_o)
+            return (value:gsub("[A-Z]", function(letter) return string.char(string.byte(letter) + 32) end))
+          end}
+          local localized_label = "Gr" .. lower_o .. sharp_s .. "e der Forschung"
+          local uppercase_query = "GR" .. upper_o .. "SSE"
+          boot()
+          player.locale = "de"
+          local catalog = require("research.settings")
+          local specs = {}
+          for _, prototype in ipairs(catalog.prototypes()) do specs[prototype.name] = prototype end
+          local target = assert(catalog.registered_names()[1])
+          local scope = catalog.spec(target).stream and "research" or "options"
+          local function equal(left, right)
+            if type(left) ~= type(right) then return false end
+            if type(left) ~= "table" then return left == right end
+            for key, value in pairs(left) do if not equal(value, right[key]) then return false end end
+            for key in pairs(right) do if left[key] == nil then return false end end
+            return true
+          end
+          local function target_request(first)
+            for index=first or 1,#player.translation_requests do
+              local request = player.translation_requests[index]
+              if equal(request.localised, specs[target].localised_name) then return request end
+            end
+            return nil
+          end
+          local root = library.open(player, {tab="settings", settings_scope=scope})
+          local request = assert(target_request(), "settings label was not requested for translation")
+          library.on_string_translated({player_index=1,id=request.id,translated=true,
+            result=localized_label})
+          local content = root.mir_library_tabs.mir_library_settings_content
+          local query = content.mir_library_settings_query
+          query.text = uppercase_query
+          library.on_gui_text_changed({player_index=1,element=query})
+          local dynamic = content.mir_library_settings_dynamic
+          assert(#dynamic.mir_library_settings_list.items == 1
+            and dynamic.mir_library_settings_count.caption[2] == 1
+            and storage.mir_library.players[1].settings_query == uppercase_query,
+            "late German settings translation did not casefold the query")
+          library.close(player)
+          root = library.open(player, {tab="settings"})
+          content = root.mir_library_tabs.mir_library_settings_content
+          assert(content.mir_library_settings_query.text == uppercase_query
+            and storage.mir_library.players[1].settings_query == uppercase_query,
+            "reopening lost the saved localized settings query")
+          assert(#normalizer_calls > 0, "Settings did not call the injected native normalizer")
+        ''')
+
+    def test_settings_search_preserves_literal_repeated_spacing(self):
+        self.lua.execute(r'''
+          boot()
+          local catalog = require("research.settings")
+          local specs = {}
+          for _, prototype in ipairs(catalog.prototypes()) do specs[prototype.name] = prototype end
+          local target = assert(catalog.registered_names()[1])
+          local scope = catalog.spec(target).stream and "research" or "options"
+          local function equal(left, right)
+            if type(left) ~= type(right) then return false end
+            if type(left) ~= "table" then return left == right end
+            for key, value in pairs(left) do if not equal(value, right[key]) then return false end end
+            for key in pairs(right) do if left[key] == nil then return false end end
+            return true
+          end
+          local root = library.open(player, {tab="settings", settings_scope=scope})
+          local request
+          for _, candidate in ipairs(player.translation_requests) do
+            if equal(candidate.localised, specs[target].localised_name) then request = candidate; break end
+          end
+          assert(request, "settings label was not requested for the literal-spacing control")
+          library.on_string_translated({player_index=1,id=request.id,translated=true,
+            result="literal--spacing"})
+          local content = root.mir_library_tabs.mir_library_settings_content
+          local query = content.mir_library_settings_query
+          query.text = "literal spacing"
+          library.on_gui_text_changed({player_index=1,element=query})
+          local dynamic = content.mir_library_settings_dynamic
+          assert(#dynamic.mir_library_settings_list.items == 0
+            and dynamic.mir_library_settings_count.caption[2] == 0,
+            "settings search must retain repeated spacing after literal hyphen replacement")
         ''')
 
     def test_new_tab_and_settings_callbacks_do_not_claim_an_unowned_gui(self):
