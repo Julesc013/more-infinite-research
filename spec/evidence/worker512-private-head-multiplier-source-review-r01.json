@@ -1,0 +1,83 @@
+{
+  "verdict": "GO for exact bounded two-production-line source correction; no native/release acceptance.",
+  "scope": "Tiny independent read-only PR1876 review/adoption expectations. Fixture/controller construction explicitly HELD for reachable Aero preparation; no duplicate implementation.",
+  "source": {
+    "pr": "https://github.com/Julesc013/more-infinite-research/pull/1876",
+    "head": "1ca6db19f10ac3e7806574142ee43bce0bfddc86",
+    "player_source_root_reported": "0efb446b5bdadec2be7d1bee1b68b5065a85134f",
+    "merge_readback": "5777c819a559fb2ed2ba07b32faa5b4b1edae045",
+    "PR_connector_state": "merged",
+    "changed_files": 7,
+    "content_review": "Exact full PR diff via connected GitHub read-only tool, not local Git operations."
+  },
+  "reason": "Only private H constructor sets ignore_tech_cost_multiplier=true. Runtime head_gate_contract requires that boolean independently rather than inheriting public/default policy. Native H basecount1 remains effective1 on increased-price maps. All public/default/preservation units, formulas, science, time, effects and cost flags are untouched by the two-line implementation diff.",
+  "test_review": "Current generator expectation correctly adds true only to H; immutable historical rows untouched. Constructor test checks ordinary unit/source immutability; runtime host model covers1/2/4 and exempt controls, corrected false-flag negative remains before writes. Root/Aero report four CI checks and296 methods green; not independently rerun here and not native evidence.",
+  "sdk": [
+    {
+      "path": "D:\\Games\\Factorio\\2.0\\doc-html\\runtime-api.json",
+      "version": "2.0.77",
+      "sha256": "594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578",
+      "fields": [
+        {
+          "class": "LuaTechnology",
+          "name": "research_unit_count",
+          "description": "The number of research units required for this technology.\n\nThis is multiplied by the current research cost multiplier, unless [LuaTechnologyPrototype::ignore_tech_cost_multiplier](runtime:LuaTechnologyPrototype::ignore_tech_cost_multiplier) is `true`.",
+          "read_type": "uint32"
+        },
+        {
+          "class": "LuaTechnologyPrototype",
+          "name": "ignore_tech_cost_multiplier",
+          "description": "If this technology ignores the technology cost multiplier setting.\n\n[LuaTechnologyPrototype::research_unit_count](runtime:LuaTechnologyPrototype::research_unit_count) will already take this setting into account.",
+          "read_type": "boolean"
+        },
+        {
+          "class": "LuaTechnologyPrototype",
+          "name": "research_unit_count",
+          "description": "The number of research units required for this technology.\n\nThis is multiplied by the current research cost multiplier, unless [LuaTechnologyPrototype::ignore_tech_cost_multiplier](runtime:LuaTechnologyPrototype::ignore_tech_cost_multiplier) is `true`.",
+          "read_type": "uint32"
+        }
+      ]
+    },
+    {
+      "path": "D:\\Games\\Factorio\\2.1\\doc-html\\runtime-api.json",
+      "version": "2.1.23",
+      "sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373",
+      "fields": [
+        {
+          "class": "LuaTechnology",
+          "name": "research_unit_count",
+          "description": "The number of research units required for this technology.\n\nThis is multiplied by the current research cost multiplier, unless [LuaTechnologyPrototype::ignore_tech_cost_multiplier](runtime:LuaTechnologyPrototype::ignore_tech_cost_multiplier) is `true`.",
+          "read_type": "uint32"
+        },
+        {
+          "class": "LuaTechnologyPrototype",
+          "name": "ignore_tech_cost_multiplier",
+          "description": "If this technology ignores the technology cost multiplier setting.\n\n[LuaTechnologyPrototype::research_unit_count](runtime:LuaTechnologyPrototype::research_unit_count) will already take this setting into account.",
+          "read_type": "boolean"
+        },
+        {
+          "class": "LuaTechnologyPrototype",
+          "name": "research_unit_count",
+          "description": "The number of research units required for this technology.\n\nThis is multiplied by the current research cost multiplier, unless [LuaTechnologyPrototype::ignore_tech_cost_multiplier](runtime:LuaTechnologyPrototype::ignore_tech_cost_multiplier) is `true`.",
+          "read_type": "uint32"
+        }
+      ]
+    }
+  ],
+  "adoption_expectations": [
+    {
+      "case": "2x and4x fresh normal initialization",
+      "required": "Actual map multiplier must already be2/4 BEFORE MIR on_init. Observe Native H prototype ignore=true/effectivecount1 and ordinary flagfalse/unchanged formula/time/science, then at least one by_script=false useful completion with exact actual charge, first C4/H credit, pending/queue/foreign/caps, closed save and two immutable cold reads. Do not set multiplier only after MIR initialized."
+    },
+    {
+      "case": "2x and4x valid published11 upgrade",
+      "required": "Use authentic published11 source at same multiplier/selection/settings, with native earned/pending/current/queued/detached facts captured. Target must preserve exact native work/bonuses and original ordinary price; private H count1/exempt. Reuse reachable prepared source and existing helpers; do not fabricate invalid08 predecessor."
+    },
+    {
+      "case": "independent price authority",
+      "required": "SDK says both technology and prototype count getters already include map multiplier; do not multiply them again. With independently pinned default675*1.5^(L-4), first N4 is1350 at2x and2700 at4x. Later fractional formula levels must use pinned engine contract or observed authentic published11 price reference; do not guess floor(base)*multiplier or derive expected price from the candidate."
+    }
+  ],
+  "evidence_boundaries": "Preserve SourceC1x source2/upgrade1/provider3 receipts under original SourceC/package/fixture identities. H flag is consumed in affected initialization/config/native guards, so those1x results are not relabelled new2x/4x executions. Source/productive public research costs remain real requirements.",
+  "status": "HOLD further prep pending Aero short-checkpoint reachable packet. Root owns candidate selection/assets/integration/Compose/native and publication. No source/native/Git/build/library/profile mutation or host suite by this reviewer."
+}
