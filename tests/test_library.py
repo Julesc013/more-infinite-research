@@ -943,6 +943,9 @@ class LibraryTests(unittest.TestCase):
                   selected = type(view.selected) == "string" and view.selected or nil
                 }
               end,
+              casefold_search_text = function(value)
+                return type(value) == "string" and string.lower(value) or nil
+              end,
               rows = function(force, rows, view, translations)
                 assert(type(translations) == "table")
                 local output = {}
@@ -4457,6 +4460,8 @@ class LibraryTests(unittest.TestCase):
 
     def test_german_localized_settings_search_casefolds_after_late_translation_and_reopen(self):
         self.lua.execute(r'''
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
           boot()
           player.locale = "de"
           local catalog = require("research.settings")
@@ -4505,6 +4510,39 @@ class LibraryTests(unittest.TestCase):
           assert(#dynamic.mir_library_settings_list.items == 1
             and dynamic.mir_library_settings_count.caption[2] == 1,
             "saved German settings query did not match its late reopened translation")
+        ''')
+
+    def test_settings_search_preserves_literal_repeated_spacing(self):
+        self.lua.execute(r'''
+          boot()
+          local catalog = require("research.settings")
+          local specs = {}
+          for _, prototype in ipairs(catalog.prototypes()) do specs[prototype.name] = prototype end
+          local target = assert(catalog.registered_names()[1])
+          local scope = catalog.spec(target).stream and "research" or "options"
+          local function equal(left, right)
+            if type(left) ~= type(right) then return false end
+            if type(left) ~= "table" then return left == right end
+            for key, value in pairs(left) do if not equal(value, right[key]) then return false end end
+            for key in pairs(right) do if left[key] == nil then return false end end
+            return true
+          end
+          local root = library.open(player, {tab="settings", settings_scope=scope})
+          local request
+          for _, candidate in ipairs(player.translation_requests) do
+            if equal(candidate.localised, specs[target].localised_name) then request = candidate; break end
+          end
+          assert(request, "settings label was not requested for the literal-spacing control")
+          library.on_string_translated({player_index=1,id=request.id,translated=true,
+            result="literal--spacing"})
+          local content = root.mir_library_tabs.mir_library_settings_content
+          local query = content.mir_library_settings_query
+          query.text = "literal spacing"
+          library.on_gui_text_changed({player_index=1,element=query})
+          local dynamic = content.mir_library_settings_dynamic
+          assert(#dynamic.mir_library_settings_list.items == 0
+            and dynamic.mir_library_settings_count.caption[2] == 0,
+            "settings search must retain repeated spacing after literal hyphen replacement")
         ''')
 
     def test_new_tab_and_settings_callbacks_do_not_claim_an_unowned_gui(self):
