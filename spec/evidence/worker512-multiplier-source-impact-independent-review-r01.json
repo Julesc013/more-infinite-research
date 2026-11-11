@@ -1,0 +1,34 @@
+{
+  "kind": "MIR512AeroPrivateHeadMultiplierVER06V1",
+  "reviewer": "non-author",
+  "scope": "Read-only effect review of Aero PR1876 head 1ca6db19f10ac3e7806574142ee43bce0bfddc86/source 0efb446b5bdadec2be7d1bee1b68b5065a85134f against the accepted immutable 1x SourceC chain.",
+  "range": {
+    "base": "0dcfe34b862f7f9b8056c2035e8b5c9ef1ebf4b5",
+    "head": "1ca6db19f10ac3e7806574142ee43bce0bfddc86",
+    "source": "0efb446b5bdadec2be7d1bee1b68b5065a85134f"
+  },
+  "functional_diff": {
+    "source/research/worker_storage_recovery.lua:head_debit": "The generated hidden private debit head now sets ignore_tech_cost_multiplier=true.",
+    "source/runtime/worker_robot_storage.lua:head_gate_contract": "The runtime admission contract now requires the private head flag to be true rather than matching the historical source row's flag.",
+    "other_player_paths": "The range changes no ordinary/default owner calculation, public owner price, science ingredients, queue/force custody, handover admission, or caps body. Changelog and host-oracle updates are separate supporting changes."
+  },
+  "evidence_impact": {
+    "prior_1x": {
+      "review": "REVIEW-r19.json",
+      "package_sha256": "2FFDEA49D8BC9D59C68ED19E6E4F4EBBFFD05E17D2AF8E81B12F6036F04C8F0D",
+      "verdict": "Historic exact-input evidence remains valid for SourceC 1x only; it must not be relabelled as an execution of source 0efb."
+    },
+    "why_no_automatic_current_adoption": "Even at multiplier 1 the new candidate emits and requires a different private-head prototype field. The old terminal therefore does not execute the current runtime identity contract, despite the numeric private head count remaining one at multiplier 1.",
+    "static_preservation": "The two changed functional sites are private-head-only. The prior 1x result remains relevant background evidence for unchanged ordinary/public cost, science, custody, save, and cold behavior, but it is not a current-candidate native pass."
+  },
+  "required_new_qualification": [
+    "Run actual current-source native cases at map technology price multipliers 2 and 4.",
+    "For each, verify the private head remains one exempt debit while ordinary/public research retains the engine multiplier behavior; include the affected upgrade/transfer and saved/cold state required by the qualification plan.",
+    "Bind the exact new player ZIP/source identity and preserve the old 1x terminal without relabelling it."
+  ],
+  "verdict": "GO_FOR_SEPARATE_CURRENT_2X_4X_QUALIFICATION; NO_AUTOMATIC_CURRENT_REUSE_OF_R19",
+  "limits": [
+    "This is source/diff review, not native qualification of the new candidate.",
+    "It neither invalidates r19's exact SourceC 1x result nor treats that result as a pass for source 0efb."
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "kind": "MIR512FinalNativePrivateCustodyReadbacksV1",
+  "scope": "Exact original accepted and adverse bodies; each keeps its source/input scope. SourceC584 +Rigor193 +current multiplier536 originals.",
+  "readbacks": {
+    "sourcec": {
+      "kind": "MIR512SourceCPrivateRemoteReadbackV1",
+      "commit": "f26da88cd6b59038f9313cd8661e68643a761748",
+      "path": "projects/mir/runs/worker512-sourcec-and-final-sourceb-r01",
+      "files": [
+        {
+          "name": ".gitattributes",
+          "blob": "625449502ba4b4d7c229c6ccee42e3ec41cc780c",
+          "bytes": 9,
+          "sha256": "8B9C3028D6467FF3BE7C793141927841D70F47F52D0590677438F488CA154992"
+        },
+        {
+          "name": "INDEX.json",
+          "blob": "32bd0445501908a1b349c86cf673df357b15e3f8",
+          "bytes": 216189,
+          "sha256": "5A67610CBAC7EDF423CB7567A7CA26ED01B22202DB8203C3AB26BEDD507A92E8"
+        },
+        {
+          "name": "REVIEW-r19.json",
+          "blob": "cfcd2151920562bce947f4b6edec981f68c58eef",
+          "bytes": 4237,
+          "sha256": "D8E569C7B963D84CD3311A135CADF2EC9FDC8B670AF7DACC38D2810BFD5201E6"
+        },
+        {
+          "name": "REVIEW-r20.json",
+          "blob": "cb051d909e70dfde616fca3fc33e26d61b9f3f62",
+          "bytes": 2754,
+          "sha256": "57385F8C2A918EE9B786DE56263715A600F343BAB75526DCA6166331C514516B"
+        },
+        {
+          "name": "SOURCE-D-ASSET-READBACK.json",
+          "blob": "81470bb2217dc6bb64dbba89c69dad3a8a80919b",
+          "bytes": 8610,
+          "sha256": "2C787292F3D2CF751E873CC31B7FEFB8E5A5E5ECDD40B7F96742553A99C2F8E5"
+        },
+        {
+          "name": "originals.json.gz",
+          "blob": "6cc198a857477e524cac72cd8ccf90c5c32e5367",
+          "bytes": 26909732,
+          "sha256": "3310A7C89FDF11F77EE9D73AA563AE1D2739667B511B07BF6A688A54E518C9F4"
+        }
+      ],
+      "original_count": 584,
+      "decoded_bytes": 103933296,
+      "all_git_blobs_and_originals_verified": true,
+      "scope": "Retains original SourceC1x and SourceB identities; no SourceD native/release verdict"
+    },
+    "rigor": {
+      "kind": "MIR512RigorPrivateRemoteReadbackV1",
+      "commit": "28be04453ffd750add536f96510f9d82f0810627",
+      "path": "projects/mir/runs/rigor512-current-source-d-r01",
+      "original_count": 193,
+      "decoded_bytes": 7356008,
+      "blobs": [
+        {
+          "name": ".gitattributes",
+          "blob": "625449502ba4b4d7c229c6ccee42e3ec41cc780c",
+          "bytes": 9,
+          "sha256": "8B9C3028D6467FF3BE7C793141927841D70F47F52D0590677438F488CA154992"
+        },
+        {
+          "name": "INDEX.json",
+          "blob": "5cf21e6042ef43781727100039bd18a6e3b2f2b2",
+          "bytes": 39744,
+          "sha256": "C6B9357D191DC124026E2E7087FBEC72DBAE8B083DCC5564A470B6AC776BE033"
+        },
+        {
+          "name": "originals.json.gz",
+          "blob": "d755a3df438fcde601d83db1b0d2bac60c3821f4",
+          "bytes": 4070271,
+          "sha256": "7077996288956A41955C86CE9868A8E7ED238D959318C23C8F1719B79804ECFB"
+        }
+      ],
+      "all_git_blobs_and_originals_verified": true,
+      "scope": "Raw current Rigor observations and adverses; non-author result review remains separate."
+    },
+    "multiplier": {
+      "kind": "MIR512MultiplierPrivateRemoteReadbackV1",
+      "commit": "bf2c304d9299d3656c1336f0992f0adbc3879b7b",
+      "path": "projects/mir/runs/multiplier512-current-source-d-r01",
+      "original_count": 536,
+      "decoded_bytes": 13193737,
+      "blobs": [
+        {
+          "name": ".gitattributes",
+          "blob": "625449502ba4b4d7c229c6ccee42e3ec41cc780c",
+          "bytes": 9,
+          "sha256": "8B9C3028D6467FF3BE7C793141927841D70F47F52D0590677438F488CA154992"
+        },
+        {
+          "name": "INDEX.json",
+          "blob": "92e7bfab3f3377d38b63e970fd612a343fe08b66",
+          "bytes": 116573,
+          "sha256": "D85FB8031A93BD49D2F883008E3A84ED367B2ED7473788597362816D5D2A5464"
+        },
+        {
+          "name": "REVIEW-r23.json",
+          "blob": "cc4763544fb9d46dc8f91fdf9f66faee027f74db",
+          "bytes": 6375,
+          "sha256": "56DA22707DE838E035B6897DD9C6F481452002B53C1F6E75BC20539B9D5FB764"
+        },
+        {
+          "name": "REVIEW-r23.md",
+          "blob": "0aa1a1d6792861a379a3905f21f249abe8d47b3e",
+          "bytes": 1835,
+          "sha256": "6FED809819BCFB24306AAEDFBCFABC98071431BC50F417D5AA8CA114766CCBCC"
+        },
+        {
+          "name": "originals.json.gz",
+          "blob": "f24110073581f68d55d2347f4a307b2f243bedeb",
+          "bytes": 5804740,
+          "sha256": "13AA379C85E331E945C1F4C1A8243184C2E6F00566EA378850311C04FE69BC05"
+        }
+      ],
+      "all_git_blobs_and_originals_verified": true,
+      "independent_verdict_sha256": "56DA22707DE838E035B6897DD9C6F481452002B53C1F6E75BC20539B9D5FB764",
+      "scope": "Exactcurrent12process2x/4x plusoriginaladverses; betaonlyverdict stillrequiresnormaldelivery."
+    }
+  }
+}
