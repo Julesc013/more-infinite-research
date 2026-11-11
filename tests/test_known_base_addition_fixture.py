@@ -28,7 +28,7 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
           script={active_mods={base="2.0.77",["more-infinite-research"]="5.0.20012",
             ["mir-fixture-mir5-known-base-addition"]="0.1.0"},
             on_init=function(f)callbacks.init=f end,on_load=function(f)callbacks.load=f end,
-            on_configuration_changed=function(f)callbacks.configuration=f end,
+            on_configuration_changed=function(f)callbacks.configuration=function(e)host_worker_transfer();f(e)end end,
             on_event=function(id,f)callbacks[id]=f end}
           helpers={table_to_json=function(value)
             assert(value.mods~=script.active_mods)
@@ -83,6 +83,29 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
             end
           end
           foreign=game.forces[names[2]];detached=game.forces[names[3]]
+          WORKER={"worker-robots-storage-4","mir-worker-storage-default-4","mir-worker-storage-head-4","mir-worker-storage-preservation-4"}
+          for _,force in pairs(game.forces)do
+            force.worker_robots_storage_bonus=0
+            for index,name in ipairs(WORKER)do
+              local debit=index==3;local private=index==4
+              local science={}
+              for _,pack in ipairs(debit and{"automation-science-pack"}or{"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","utility-science-pack"})do science[#science+1]={name=pack,amount=1}end
+              local hidden=debit or private
+              force.technologies[name]={name=name,valid=true,force=force,level=4,researched=false,
+                enabled=not hidden,visible_when_disabled=false,saved_progress=0,research_unit_count=debit and 1 or 675,
+                research_unit_ingredients=science,prototype={level=4,max_level=4294967295,
+                  hidden=hidden,enabled=not hidden,visible_when_disabled=false,prerequisites=debit and{}or{["worker-robots-storage-3"]={name="worker-robots-storage-3"}},
+                  research_unit_count_formula=not debit and"675*1.5^(L-4)"or nil,research_unit_energy=debit and 60 or 3600,
+                  ignore_tech_cost_multiplier=false,effects={{type="worker-robot-storage",modifier=debit and -1 or 1}}}}
+            end
+          end
+          function host_worker_transfer()
+            -- Independent native setter outcome stand-in, never product imports.
+            for _,force in pairs(game.forces)do
+              local c,t=force.technologies[WORKER[1]],force.technologies[WORKER[2]]
+              t.enabled,t.visible_when_disabled=c.enabled,c.visible_when_disabled;c.enabled=false
+            end
+          end
           gear=foreign.technologies["recipe-prod-research_gears-1"]
           plastic=foreign.technologies["recipe-prod-research_plastic-1"]
           foreign.current_research=gear;foreign.research_queue={gear,plastic};foreign.research_progress=.42/8000
@@ -178,6 +201,65 @@ class KnownBaseAdditionFixtureTests(unittest.TestCase):
         if retire:
             lua.execute('dofile(addition_fixture.."/data-final-fixes.lua")')
         return lua
+
+    def test_empty_worker_native_projection_is_explicit_and_immutable_on_two_colds(self):
+        lua=self.controller();lua.execute('''
+          begin();local state=storage.mir5_known_base_addition
+          for name,source in pairs(state.worker_source)do
+            local actual=state.worker_initial[name]
+            assert(source.rows[WORKER[1]].enabled and not actual.rows[WORKER[1]].enabled)
+            assert(actual.rows[WORKER[2]].enabled and actual.bonus==0)
+            for _,id in ipairs(WORKER)do assert(actual.rows[id].level==4 and not actual.rows[id].researched and actual.rows[id].saved==0)end
+          end
+          finish_gear();finish_plastic();game.tick=14;callbacks[1]()
+          assert(markers[1].worker_provenance:find("prior-D38-C4-not-captured",1,true))
+          for _=1,2 do local oldgame=game;game=nil;callbacks.load();game=oldgame;callbacks[1]()end
+          assert(#markers==3 and #game.saves==1)
+          for _,marker in ipairs(markers)do
+            assert(marker.worker_final.player.bonus==0 and marker.worker_final.player.rows[WORKER[2]].enabled)
+          end
+          markers[1].worker_source.player.rows[WORKER[1]].enabled=false
+          assert(state.worker_source.player.rows[WORKER[1]].enabled)
+        ''')
+
+    def test_empty_worker_source_rejects_earned_current_queued_saved_and_nonboolean_flags(self):
+        for change in ('c.level=5','c.researched=true','c.saved_progress=.01',
+                       'foreign.current_research=c','foreign.research_queue={gear,c}',
+                       'c.enabled=nil','c.visible_when_disabled=0','foreign.worker_robots_storage_bonus=1'):
+            with self.subTest(change=change):
+                lua=self.controller();lua.execute('local c=foreign.technologies[WORKER[1]];'+change+'''
+                  local ok=pcall(callbacks.init)
+                  assert(not ok and game.surface_calls==0 and #game.saves==0 and #markers==0)
+                ''')
+
+    def test_worker_missing_holder_wrong_projection_and_late_drift_remain_fatal(self):
+        changes=('foreign.technologies[WORKER[2]]=nil','foreign.technologies[WORKER[3]]=nil',
+                 'c.enabled=true','t.enabled=false','t.visible_when_disabled=true','t.saved_progress=.01',
+                 't.level=5','h.researched=true','h.visible_when_disabled=true','p.enabled=true',
+                 'foreign.worker_robots_storage_bonus=1','t.prototype.research_unit_count_formula="676*1.5^(L-4)"',
+                 't.prototype.hidden=nil','t.prototype.enabled="true"',
+                 't.research_unit_ingredients[1].amount=2')
+        for change in changes:
+            with self.subTest(change=change):
+                lua=self.controller();lua.globals().change=change
+                lua.execute('''
+                  callbacks.init();local original=host_worker_transfer
+                  host_worker_transfer=function()original()
+                    c=foreign.technologies[WORKER[1]];t=foreign.technologies[WORKER[2]]
+                    h=foreign.technologies[WORKER[3]];p=foreign.technologies[WORKER[4]]
+                    assert(load(change))()
+                  end
+                  local ok=pcall(callbacks.configuration,event)
+                  assert(not ok and game.surface_calls==0 and #game.saves==0 and #markers==0)
+                ''')
+        for cold in (False, True):
+            lua=self.controller();lua.globals().cold=cold;lua.execute('''
+              begin();finish_gear();finish_plastic();game.tick=14
+              if cold then callbacks[1]();callbacks.load()end
+              detached.technologies[WORKER[2]].saved_progress=.01
+              local count=#game.saves;local ok=pcall(callbacks[1])
+              assert(not ok and #game.saves==count)
+            ''')
 
     def test_real_pipeline_retains_both_new_credit_routes_and_public_lds(self):
         lua = self.pipeline()

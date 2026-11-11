@@ -184,7 +184,8 @@ class NativeOwnerFieldTuningTests(unittest.TestCase):
                 for name, _ in data_fixture.OWNERS.values():
                     self.assertFalse(lua.globals().world.technologies[name].enabled)
                 harness.boot(lua, 0, storage=data_fixture.generator_fixture.lua_table(lua, retained))
-                lua.globals().handlers.configuration(lua.table())
+                lua.globals().handlers.configuration(data_fixture.generator_fixture.lua_table(lua, {
+                    "mod_startup_settings_changed": True, "mod_changes": {}}))
                 for name, _ in data_fixture.OWNERS.values():
                     self.assertTrue(lua.globals().world.technologies[name].enabled)
                     self.assertEqual(3, lua.globals().world.technologies[name].level)

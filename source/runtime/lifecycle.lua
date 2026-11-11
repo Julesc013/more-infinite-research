@@ -80,6 +80,17 @@ for index = 1, #DECLARATIONS do
   local row = {id = declaration.id, family = declaration.family, cap_setting = declaration.cap_setting,
     ownership_kind = declaration.ownership_kind, source = binding.source, operation = binding.operation,
     enabled = values.enabled, limit = values.max_level, declaration = declaration}
+  if declaration.fixed_maximum ~= nil then
+    if declaration.id ~= "worker-robots-storage-4" or declaration.family ~= "worker-robots-storage"
+        or declaration.fixed_maximum ~= 4 then
+      error("MIR caps invalid worker storage head declaration", 2)
+    end
+    row.fixed_maximum = 4
+    -- Before the first completion, repeated queued head entries are still
+    -- native work. The worker lifecycle moves them to the stable tail before
+    -- this cap starts retiring the completed public head.
+    CAPS_ACTIVE = true
+  end
   if declaration.productivity_ceiling ~= nil then
     local ceiling, percent = declaration.productivity_ceiling, values.effect_percent
     if type(ceiling) ~= "number" or not (ceiling > 0 and ceiling < math.huge)
@@ -172,7 +183,10 @@ local function useful_productivity_limit(row)
   PRODUCTIVITY_USEFUL_LIMITS[row.family] = highest
   return highest
 end
-local function effective_limit(row)
+local function effective_limit(row, force)
+  if row.fixed_maximum ~= nil then
+    return bounded_useful_limit(row.limit, row.fixed_maximum)
+  end
   local useful = useful_productivity_limit(row)
   if useful == nil then return row.limit end
   return bounded_useful_limit(STREAM_VALUES[row.family].max_level, useful)
@@ -194,6 +208,123 @@ local function ensure_state()
   value = {schema = SCHEMA, owned_disabled = {}}
   storage[STORAGE_KEY] = value
   return value
+end
+
+-- The native split moves the old repeat levels and their force flags to the
+-- stable tail. Move the existing cap restoration right with that work; a
+-- false flag alone never authorizes MIR to enable a technology later.
+function M.preflight_worker_storage_split_caps(plan)
+  if plan and plan.kind == "default-native-provider-handover" then
+    local state = existing_state()
+    if not state then return nil end
+    local items = {}
+    for _, item in ipairs(plan.items) do
+      local owned = state.owned_disabled[item.force.index]
+      if owned ~= nil and type(owned) ~= "table" then error("MIR invalid worker cap ownership", 2) end
+      if owned then
+        local records, snapshots = {}, {}
+        for _, name in ipairs({"worker-robots-storage-4", "mir-worker-storage-default-4"}) do
+          local record = owned[name]
+          if record ~= nil then
+            if type(record) ~= "table" then error("MIR invalid retiring worker cap right", 2) end
+            local copy = {}
+            for key, value in pairs(record) do
+              if (key ~= "disabled" and key ~= "visible_when_disabled" and key ~= "discovery_enabled")
+                  or type(value) ~= "boolean" then error("MIR invalid retiring worker cap right", 2) end
+              copy[key] = value
+            end
+            records[name], snapshots[name] = record, copy
+          end
+        end
+        local public = item.force.technologies["worker-robots-storage-4"]
+        if not public or not public.prototype or type(public.prototype.enabled) ~= "boolean"
+            or type(public.prototype.visible_when_disabled) ~= "boolean" then
+          error("MIR incoming worker provider flags are unavailable", 2)
+        end
+        items[#items + 1] = {force=item.force, owned=owned, records=records, snapshots=snapshots, public=public}
+      end
+    end
+    return {kind="provider-handover", state=state, items=items}
+  end
+  if not plan or plan.kind ~= "default-native-owner-transfer" or plan.already_owned then return nil end
+  local state = existing_state()
+  if not state then return nil end
+  local items = {}
+  for _, item in ipairs(plan.items) do
+    local owned = state.owned_disabled[item.force.index]
+    if owned ~= nil and type(owned) ~= "table" then error("MIR invalid worker cap ownership", 2) end
+    local record = owned and owned["worker-robots-storage-4"]
+    if item.moved == true and record ~= nil then
+      if type(record) ~= "table" or owned["mir-worker-storage-default-4"] ~= nil then
+        error("MIR conflicting worker cap restoration rights", 2)
+      end
+      local snapshot = {}
+      for key, value in pairs(record) do
+        if (key ~= "disabled" and key ~= "visible_when_disabled" and key ~= "discovery_enabled")
+            or type(value) ~= "boolean" then error("MIR invalid worker cap restoration right", 2) end
+        snapshot[key] = value
+      end
+      items[#items + 1] = {owned=owned, record=record, snapshot=snapshot}
+    end
+  end
+  return {state=state, items=items}
+end
+
+function M.apply_worker_storage_split_caps(plan)
+  if not plan then return end
+  if existing_state() ~= plan.state then error("MIR worker cap ownership changed after preflight", 2) end
+  if plan.kind == "provider-handover" then
+    for _, item in ipairs(plan.items) do
+      if plan.state.owned_disabled[item.force.index] ~= item.owned
+          or item.force.technologies["worker-robots-storage-4"] ~= item.public then
+        error("MIR worker cap recipient changed after preflight", 2)
+      end
+      for _, name in ipairs({"worker-robots-storage-4", "mir-worker-storage-default-4"}) do
+        local record, snapshot = item.records[name], item.snapshots[name]
+        if item.owned[name] ~= record then error("MIR retiring worker cap right changed", 2) end
+        for key, value in pairs(record or {}) do
+          if snapshot[key] ~= value then error("MIR retiring worker cap right changed", 2) end
+        end
+        for key, value in pairs(snapshot or {}) do
+          if record[key] ~= value then error("MIR retiring worker cap right changed", 2) end
+        end
+      end
+    end
+    for _, item in ipairs(plan.items) do
+      local record = item.snapshots["worker-robots-storage-4"]
+      local public = item.public
+      -- The worker releases its own retirement flag. These positive cap
+      -- rights release only additional MIR writes, under incoming policy.
+      -- A negative cap baseline may have observed that retired head; it must
+      -- not disable the newly admitted provider or enable the retired owner.
+      if record then
+        if (record.disabled == true or record.discovery_enabled == true) and public.prototype.enabled then
+          public.enabled = true
+        end
+        if record.visible_when_disabled == false and public.visible_when_disabled == true
+            and not public.prototype.visible_when_disabled then public.visible_when_disabled = false end
+      end
+      item.owned["worker-robots-storage-4"], item.owned["mir-worker-storage-default-4"] = nil, nil
+      if next(item.owned) == nil then plan.state.owned_disabled[item.force.index] = nil end
+    end
+    return
+  end
+  for _, item in ipairs(plan.items) do
+    if item.owned["worker-robots-storage-4"] ~= item.record
+        or item.owned["mir-worker-storage-default-4"] ~= nil then
+      error("MIR worker cap rights changed after preflight", 2)
+    end
+    for key, value in pairs(item.record) do
+      if item.snapshot[key] ~= value then error("MIR worker cap right changed after preflight", 2) end
+    end
+    for key, value in pairs(item.snapshot) do
+      if item.record[key] ~= value then error("MIR worker cap right changed after preflight", 2) end
+    end
+  end
+  for _, item in ipairs(plan.items) do
+    item.owned["mir-worker-storage-default-4"] = item.record
+    item.owned["worker-robots-storage-4"] = nil
+  end
 end
 
 local function discard_empty_state(value)
@@ -326,11 +457,11 @@ local function full_limits_for(force, include_worker, selected_owner, owner_reso
   local limits, admitted = {}, {}
   if valid_force(force) then
     for name, row in pairs(STATIC_GENERATED_BY_ID) do
-      if authored_generated_admitted(force, row) then limits[name], admitted[name] = effective_limit(row), true end
+      if authored_generated_admitted(force, row) then limits[name], admitted[name] = effective_limit(row, force), true end
     end
     for name, row in pairs(NATIVE_OWNER_BY_ID) do
       if row.enabled and native_owner_admitted(force, row) then
-        limits[name], admitted[name] = effective_limit(row), true
+        limits[name], admitted[name] = effective_limit(row, force), true
       end
     end
     for name, row in pairs(RESTORATION_BY_ID) do
@@ -350,9 +481,9 @@ local function event_limits_for(force, name, include_worker)
   local row = DECLARATION_BY_ID[name]
   if row and row.enabled then
     if row.ownership_kind == "authored_generated" and authored_generated_admitted(force, row) then
-      return {[name] = effective_limit(row)}, {[name] = true}, nil
+      return {[name] = effective_limit(row, force)}, {[name] = true}, nil
     elseif row.ownership_kind == "nativeowner" and native_owner_admitted(force, row) then
-      return {[name] = effective_limit(row)}, {[name] = true}, nil
+      return {[name] = effective_limit(row, force)}, {[name] = true}, nil
     end
   end
   if name == WORKER_TAIL_NAMES[1] or name == WORKER_TAIL_NAMES[2] then
