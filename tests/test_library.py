@@ -3839,7 +3839,7 @@ class LibraryTests(unittest.TestCase):
     def test_real_catalogue_library_handoff_keeps_the_default_worker_tail_literal(self):
         self.lua.execute(r'''
           -- Parse the same admitted default-worker route that control.lua
-          -- retains: its finite retired head, public tail and private debit
+          -- retains: its retired level-4 row, public tail and private debit
           -- all have separate native identities.
           package.preload["research.catalogue"] = nil
           package.preload["presentation.library_model"] = nil
