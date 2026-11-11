@@ -1,14 +1,14 @@
 {
   "kind": "MIR512ReporterDispositionsIndependentReviewV1",
-  "reviewed_at_utc": "2026-11-11T10:09:23.796063+00:00",
-  "base_commit": "0dcfe34b862f7f9b8056c2035e8b5c9ef1ebf4b5",
-  "player_source": "a1a1a50f8cec5e5d021a40602add41d8e62d1036",
+  "reviewed_at_utc": "2026-11-11T11:58:35.584016+00:00",
+  "base_commit": "5777c819a559fb2ed2ba07b32faa5b4b1edae045",
+  "player_source": "0efb446b5bdadec2be7d1bee1b68b5065a85134f",
   "scope": "Reporter-history reconciliation using protected originals, current issues and exact-input reviews. New supplied Ryutavi save/log/mod-list and the distinct issue1871 Ferrum log are retained privately. No source correction, game execution, reporter-save acceptance, publication authority or whole-issue closure.",
   "incident_recommendation": {
-    "verdict": "NO-GO on the unmodified current candidate: a demonstrated private-head multiplier contract defect and distinct affected native gates remain. This is not a demand to complete the broader stable programme first.",
-    "reason": "The main native-owner/provider mechanism now has accepted bounded evidence. Earlier MIR5 admission in PR1874, actual Bob/cap startup, available actual Rigor coverage and the new nonexempt private-head multiplier route have separate outstanding results. Missing exact reporter inputs limit claims; they are not themselves proof that a correction is broken.",
-    "reuse": "Retain exact accepted worker-provider, Secretas, both-modern controlled vector, known-Base and paid-steel scopes. Cloud17-package verification is offline evidence for0dcfe only, not native qualification or delivery.",
-    "next_action": "Black Glass reconciles current local work, integrates the independently reviewed four-file private-head proposal and finishes only the missing affected routes. Assign each reporter a supported disposition; do not require a personal reply where a faithful developer preservation reproduction proves the correction, and do not substitute an easier predecessor.",
+    "verdict": "No publication GO asserted: the private-head source defect is now integrated and all four reviewed-head checks pass, but affected native and final delivery gates still require their exact results.",
+    "reason": "PR1876 is merged in5777c819 with the exact reviewed/all-green1ca tree. The authentic earlier-save route, actual Bob/cap startup, available actual Rigor coverage and nonexempt private-head native preservation remain unrecorded in the inspected remote result set; current local execution is not inferred. Missing exact reporter inputs limit claims rather than proving code broken.",
+    "reuse": "Retain exact accepted worker-provider, Secretas, controlled vector, known-Base and steel scopes. Use the new17-package Source0efb preparation instead of relabelling old0dcfe packages. All38 published10/11 asset API digests and scoped local copies still match accepted delivery; no new anonymous download or game result inferred.",
+    "next_action": "Black Glass adopts/reconciles the merged correction, reuses matching accepted or in-progress native work and finishes only the distinct affected native/result/delivery gates. This record supplies no additional routine approval requirement and does not replace reporter-specific dispositions with easier predecessor tests.",
     "stable": "Library input, export, client lifecycle, historical compatibility and performance acceptance remain separate from this incident decision."
   },
   "reporters": [
@@ -228,23 +228,41 @@
     "remote_readback": "All9 stored blobs match fresh remote Git object bytes. Seven manifest-listed originals/metadata files total11976685bytes. Save all75 member CRCs pass. Original Downloads files unchanged. Full logs/save/mod lists stay private; no MEGA keys stored."
   },
   "current_candidate_boundary": {
-    "dev_head": "0dcfe34b862f7f9b8056c2035e8b5c9ef1ebf4b5",
-    "source_tree": "a1a1a50f8cec5e5d021a40602add41d8e62d1036",
+    "dev_head": "5777c819a559fb2ed2ba07b32faa5b4b1edae045",
+    "source_tree": "0efb446b5bdadec2be7d1bee1b68b5065a85134f",
     "merged_prs": [
       1872,
       1873,
-      1874
+      1874,
+      1876
     ],
-    "status": "Merged development candidate; authentic earned08-to-owner-to-provider, actual Bob/cap and actual Rigor results remain unrecorded in inspected remote records. No current local process state inferred.",
+    "status": "Merged private-head correction. Entire dev5777c819 tree equals independently reviewed/all-green head1ca6db19. Prepared packages reproduce from exact same player Source; no fresh native/release verdict by this record.",
     "identity_decision": "Maintainer authorization in issue1845 comment6779844289 remains effective; no pending identity decision.",
     "private_head_correction": {
-      "integrated": false,
+      "integrated": true,
       "custody_commit": "bfa699b8004acffa1337c86fc791e1a564ee9ec0",
       "patch_sha256": "afd51feb8f30c1e4d5c742f0644a1cb7ef81024ef57b2a8b2f9ee0e271d6eb4d",
       "affected_methods_passed": 155,
-      "review": "independent accepted; full proposed modules executed in memory; projected map counts only, no native result"
+      "review": "independent accepted; actual edited files tested; original current-oracle CI failure retained and corrected without changing captured history; native preservation still separate",
+      "mir_pr": 1876,
+      "reviewed_head": "1ca6db19f10ac3e7806574142ee43bce0bfddc86",
+      "integrated_dev": "5777c819a559fb2ed2ba07b32faa5b4b1edae045",
+      "actual_selected_methods_passed": 296,
+      "required_checks": "all four SUCCESS on exact1ca"
     },
-    "public_release": "v5.0.11 latest public at readback;5.0.12 unpublished; stable unqualified."
+    "public_release": "v5.0.11 latest public at readback;5.0.12 unpublished; stable unqualified.",
+    "prepared_assets": {
+      "private_repo": "Julesc013/scratchpad",
+      "commit": "5eb76416e323f6951c03001d85a18a731e1a0fe7",
+      "path": "projects/mir/candidate-assets/512-private-head-aero-r01",
+      "inventory_sha256": "494df147d88a3547c3619a23b22dfa0f46f3e5402329d9cfe4eb4e4f54cc1c56",
+      "frozen_commit": "650220848175c2c5f96b6fbce626a7fa89a8eb5d",
+      "player_source": "0efb446b5bdadec2be7d1bee1b68b5065a85134f",
+      "zip_count": 17,
+      "checksum_files": 2,
+      "members": 1576,
+      "scope": "Offline exact reproducibility/CRC and fresh remote byte readback only; Root selects/adopts and qualifies final assets. Source/tools/targets unchanged through1ca/5777; only later test expectation changed."
+    }
   },
   "previous_review": {
     "commit": "b47678a1d486aec5f17d7f98791a01c582f6aaaa",
@@ -253,5 +271,14 @@
     "player_source": "47537eb97e4ea481540fdca7ef7f63aa4c43ba7f",
     "candidate_head_then": "016ccd9b7afddc5d5e09d634ff598416ace5619a",
     "status": "Historical intake/source snapshot, superseded only as current status; original commit and inputs retained."
-  }
+  },
+  "review_history": [
+    {
+      "commit": "4f9e50f85f24f97f6d77be73241c5608ded81c9b",
+      "reviewed_at_utc": "2026-11-11T10:09:23.796063+00:00",
+      "base_commit": "0dcfe34b862f7f9b8056c2035e8b5c9ef1ebf4b5",
+      "player_source": "a1a1a50f8cec5e5d021a40602add41d8e62d1036",
+      "private_head_was_integrated": false
+    }
+  ]
 }
