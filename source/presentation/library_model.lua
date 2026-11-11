@@ -37,18 +37,27 @@ local function native_read(value, key)
 end
 
 local function ascii_casefold(value)
-  return (string.gsub(value, "%u", function(letter)
+  return (string.gsub(value, "[A-Z]", function(letter)
     return string.char(string.byte(letter) + 32)
   end))
 end
 
+local GERMAN_SEARCH_FOLD = {["Ä"]="ä", ["Ö"]="ö", ["Ü"]="ü", ["ß"]="ss"}
+
+-- Match complete UTF-8 characters. Only matching text is folded; saved input
+-- and display text keep their original bytes, and sorting keeps its own policy.
+function M.search_casefold(value)
+  local folded = ascii_casefold(value)
+  return (folded:gsub("\195.", GERMAN_SEARCH_FOLD):gsub("ẞ", "ss"))
+end
+
 local function searchable(value)
-  local normalized = string.gsub(ascii_casefold(value), "[%s_-]+", " ")
+  local normalized = string.gsub(M.search_casefold(value), "[%s_-]+", " ")
   return normalized:gsub("^ ", ""):gsub(" $", "")
 end
 
 local function matches(value, search)
-  if string.find(ascii_casefold(value), search, 1, true) then return true end
+  if string.find(M.search_casefold(value), search, 1, true) then return true end
   return string.find(searchable(value), search, 1, true) ~= nil
 end
 

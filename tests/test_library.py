@@ -877,6 +877,8 @@ class LibraryTests(unittest.TestCase):
             }
           end
 
+          local search_casefold = require("presentation.library_model").search_casefold
+          package.loaded["presentation.library_model"] = nil
           package.preload["presentation.library_model"] = function()
             local function copy(row, technology, queued_count, queue_index, current, display_name)
               local result = {
@@ -909,6 +911,7 @@ class LibraryTests(unittest.TestCase):
               return count, first, current_name == id
             end
             return {
+              search_casefold = search_casefold,
               normalize = function(view)
                 local mode = type(view.mode) == "number" and view.mode or 1
                 if mode < 1 or mode > 3 or mode ~= math.floor(mode) then mode = 1 end

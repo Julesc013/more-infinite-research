@@ -350,7 +350,7 @@ local function local_view(raw)
     selected = value.selected
   })
   if type(normalized) == "table" then
-    value.query = text(normalized.search or value.query)
+    -- Matching owns its folded copy; the player's bounded input stays verbatim.
     value.family = family_option(normalized.family) or "mir"
     value.mode = whole_option(normalized.mode, 1, 3) or 1
     value.status = type(normalized.status) == "number" and normalized.status or 1
@@ -1787,8 +1787,8 @@ local function setting_search_matches(group, query, translations)
       if type(label) == "string" and label ~= "" then haystack = haystack .. " " .. label end
     end
   end
-  haystack = haystack:lower():gsub("[-_]", " ")
-  return haystack:find(query:lower():gsub("[-_]", " "), 1, true) ~= nil
+  haystack = library_model.search_casefold(haystack):gsub("[-_]", " ")
+  return haystack:find(library_model.search_casefold(query):gsub("[-_]", " "), 1, true) ~= nil
 end
 
 local function settings_group_key(setting_name)
