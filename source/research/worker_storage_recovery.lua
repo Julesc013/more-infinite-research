@@ -233,6 +233,7 @@ function M.head_debit(authored, modifier)
   out.effects[1].modifier = modifier == 0 and 0 or -modifier
   out.prerequisites = {}
   out.unit = {count=1, time=1, ingredients={{authored.unit.ingredients[1][1], 1}}}
+  out.ignore_tech_cost_multiplier = true
   return out
 end
 

@@ -1,0 +1,169 @@
+{
+  "kind": "MIR512MultiplierAeroFreezeExactRemoteReadbackV1",
+  "remote_commit": "5eb76416e323f6951c03001d85a18a731e1a0fe7",
+  "remote_path": "projects/mir/candidate-assets/512-private-head-aero-r01",
+  "destination": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01",
+  "source": {
+    "commit": "650220848175c2c5f96b6fbce626a7fa89a8eb5d",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21012",
+    "source_tree": "0efb446b5bdadec2be7d1bee1b68b5065a85134f",
+    "tree": "20aa23599780b6f4c9367e5fdebb3e465fa694fc"
+  },
+  "inventory_file_sha256": "494DF147D88A3547C3619A23B22DFA0F46F3E5402329D9CFE4EB4E4F54CC1C56",
+  "inventory_canonical_sha256": "6b00031ff29550a06100ec54f7f644c7dac0bf2b982916e940bdcfa5ca951890",
+  "copied": [
+    {
+      "name": "MIR5ReleaseAssetInventoryV1.json",
+      "git_blob": "7e327907657df37d7ea2eab4c37ab220c33a14f8",
+      "bytes": 217845,
+      "sha256": "494DF147D88A3547C3619A23B22DFA0F46F3E5402329D9CFE4EB4E4F54CC1C56",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\MIR5ReleaseAssetInventoryV1.json"
+    },
+    {
+      "name": "SHA256SUMS-early.txt",
+      "git_blob": "247d96932c87b6c9c65801476e4afaeaff36c7ba",
+      "bytes": 721,
+      "sha256": "CE79332F6460664AB773C5CC7EF92DCD6A5F7DC10379F511E569F278376EE1D8",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\SHA256SUMS-early.txt"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "git_blob": "ee4173457f15303e72f28f6afb90832a6fe0d16f",
+      "bytes": 1030,
+      "sha256": "1E1BF2880EE142E0A7DA408970EB009AA38F2763F34FC2E72591F7888415A339",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\SHA256SUMS.txt"
+    },
+    {
+      "name": "custody.json",
+      "git_blob": "b48b184d75151a4b9e9e061ca168ffe62d3fc32d",
+      "bytes": 4447,
+      "sha256": "A554FEB579051FBCA3EF7B8137C7BE44379AE1A7003CB8C529618866D8AE0AC1",
+      "path": "D:\\Projects\\Factorio\\more-infinite-research\\build\\qualification\\worker-private-head-multiplier512-r01\\root-integration\\upstream-custody.json"
+    },
+    {
+      "name": "more-infinite-research_5.0.00612.zip",
+      "git_blob": "085235f5c71b2f2e715ad0c96f0a87bcb5e54083",
+      "bytes": 139208,
+      "sha256": "790CDD3D3DCBD117226C77757EA46EDBD8FB8A38FF6DC927CDB7BF867ED1146B",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\more-infinite-research_5.0.00612.zip"
+    },
+    {
+      "name": "more-infinite-research_5.0.00712.zip",
+      "git_blob": "a72a335e1825ae5482eb0f51874728993ef2eb5b",
+      "bytes": 139208,
+      "sha256": "70417C0D7C7B81DE8D66708BCC6890740494929019C2FC9C59B49DF28E210C43",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\more-infinite-research_5.0.00712.zip"
+    },
+    {
+      "name": "more-infinite-research_5.0.00812.zip",
+      "git_blob": "6e7450592bf9c051be7be6b0c9086fed6fa35a57",
+      "bytes": 139206,
+      "sha256": "3D9067F0D98BFDA704E2D5688A93B0195B03ABD51BBE868A27844813E7E7F25E",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\more-infinite-research_5.0.00812.zip"
+    },
+    {
+      "name": "more-infinite-research_5.0.00912.zip",
+      "git_blob": "c286adc37747416a5a2de07216e418feb868cc46",
+      "bytes": 139208,
+      "sha256": "056947367706DE4A8A23EE4A3F21051D2F0B0C779D44ADE1C39AC91CABA661B7",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\more-infinite-research_5.0.00912.zip"
+    },
+    {
+      "name": "more-infinite-research_5.0.01012.zip",
+      "git_blob": "5fd52d17cae06d57d859f0457102083640249cd6",
+      "bytes": 139207,
+      "sha256": "6F4863871D5B1C3DD3562ACDF41193C693532E42FB75C16084B7E1662CBBD8B3",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\more-infinite-research_5.0.01012.zip"
+    },
+    {
+      "name": "more-infinite-research_5.0.01112.zip",
+      "git_blob": "f2eee6c6d2a3b88dd72a1b6e464494bf87cc1033",
+      "bytes": 139207,
+      "sha256": "A6500BFC46DDF8D5A7F6A562F50823E7AFAE21967822F49B74AB2FC675FAD914",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\more-infinite-research_5.0.01112.zip"
+    },
+    {
+      "name": "more-infinite-research_5.0.01212.zip",
+      "git_blob": "92a9a9082722454c54aa03abe71e621d5a73e1b0",
+      "bytes": 139209,
+      "sha256": "4035460D5DAA083DF33D5F1BFE46FE5BFAFC31AB27B036679648D2958BF7F716",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\more-infinite-research_5.0.01212.zip"
+    },
+    {
+      "name": "more-infinite-research_5.0.01312.zip",
+      "git_blob": "aa6e8f90972895d072b4c1e733d43080769aefa1",
+      "bytes": 676368,
+      "sha256": "19B78B33F9E713D15F290081F5B210B6E2521C99A8C910443208A1D86977EDCF",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\more-infinite-research_5.0.01312.zip"
+    },
+    {
+      "name": "more-infinite-research_5.0.01412.zip",
+      "git_blob": "0319b870e8562bbf6657857921204210b1cb68d6",
+      "bytes": 676371,
+      "sha256": "E0F8283C6E05BE9B4F140DEB7D82074B7315FA1CA208FE94667B6EB811BF2AD4",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\more-infinite-research_5.0.01412.zip"
+    },
+    {
+      "name": "more-infinite-research_5.0.01512.zip",
+      "git_blob": "f9f90f98df7e757f02bdd691667520aeaffc3408",
+      "bytes": 676369,
+      "sha256": "1E4B5858E6F2A68A19E882B3AB8A3427A928CD4C487467E0A672D2BACB4DFF19",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\more-infinite-research_5.0.01512.zip"
+    },
+    {
+      "name": "more-infinite-research_5.0.01612.zip",
+      "git_blob": "257191b46d63ab22fd2355bfbcf62f4448c8ecea",
+      "bytes": 676370,
+      "sha256": "67F997E4CF8F44CA34D93D05F192B85550E69B702BD11B85616FB39DE586B05B",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\more-infinite-research_5.0.01612.zip"
+    },
+    {
+      "name": "more-infinite-research_5.0.01712.zip",
+      "git_blob": "693c0c6d66e68b0f28164d4c24c4d247cd629978",
+      "bytes": 676371,
+      "sha256": "0078F5BAED8E0EE26439B56CEAC393E49AEFAD24FDB26CD258B9FAD19C541363",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\more-infinite-research_5.0.01712.zip"
+    },
+    {
+      "name": "more-infinite-research_5.0.01812.zip",
+      "git_blob": "bb808858df16ba449a32231baac585186f486b31",
+      "bytes": 676372,
+      "sha256": "0C520B5D57504CB8898B60617FE2EDE27D211001E155469A6B56832F1047B49E",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\more-infinite-research_5.0.01812.zip"
+    },
+    {
+      "name": "more-infinite-research_5.0.10012.zip",
+      "git_blob": "724aed18d7b73f7dea7a051405622fc23e371625",
+      "bytes": 676362,
+      "sha256": "5DDE0E619A42DEAE842B1C1A0EA76DA8A2AE29EFDABB4EDD2C7EA385A7686DB4",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\more-infinite-research_5.0.10012.zip"
+    },
+    {
+      "name": "more-infinite-research_5.0.11012.zip",
+      "git_blob": "edd3b02de585c3bc41d71b34db5bf7eb75bd41b7",
+      "bytes": 676673,
+      "sha256": "5E5577FE468C89C10A0195CF18826901402BB9FD36A658719BA41EB7675BAB98",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\more-infinite-research_5.0.11012.zip"
+    },
+    {
+      "name": "more-infinite-research_5.0.20012.zip",
+      "git_blob": "50fcb135afdac87d759f657439728043122b0ec0",
+      "bytes": 1037776,
+      "sha256": "76517C54FAE4B62DC1828350A8DEB32C39164822525AF51446369433C764C27D",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\more-infinite-research_5.0.20012.zip"
+    },
+    {
+      "name": "more-infinite-research_5.0.21012.zip",
+      "git_blob": "de82a1a8579248fb6d70222cbf7bd6e370598f0d",
+      "bytes": 1038200,
+      "sha256": "7AA6DE4F9688B9DC60AE5F2E9B116F388152EA85848E6C9B74E8ABFD0FC192C7",
+      "path": "D:\\Projects\\Factorio\\mir5-freeze\\mir512-multiplier-aero-1ca-r01\\more-infinite-research_5.0.21012.zip"
+    }
+  ],
+  "player_zips": 17,
+  "all_archive_hashes_and_crcs_passed": true,
+  "scope": "Exact prepared assets only; no native/release acceptance."
+}

@@ -1,16 +1,26 @@
 MIR 5.0.12
 Channel: GitHub prerelease (beta), not marked latest. Mod Portal publication remains with the maintainer.
 
-Repairs worker cargo upgrade handling and compatibility with expanded productivity research on Factorio 2.0 and 2.1.
+Fixes recurring worker cargo save upgrades and expanded recipe-productivity credits on Factorio 2.0 and 2.1.
 
-- Preserve admitted earlier MIR 5 worker cargo levels and unfinished research in permanent native research without guessing erased history.
-- Retain Secretas worker history across successive updates, and keep Ferrum robotics science in continued cargo research.
-- Preserve complete productivity credits when other mods expand recipe research effects.
-- Allow Bob's Warfare with mods that set recipe productivity caps, preserving their configured limits.
-- Restore missing translated startup-setting labels and improve Library filter layout, wrapping, search text and German wording.
+- Preserve earned worker cargo research and unfinished work in permanent native research before adding a finite cargo provider. Eligible earlier MIR 5 default saves establish this history automatically when upgraded with their previous mods and settings.
+- Keep private worker bookkeeping independent of the map research price multiplier while preserving ordinary research prices.
+- Retain Secretas history across successive updates, Ferrum robotics science, and worker history through supported engine patch updates. Keep ordinary queue changes safe after preserved work finishes.
+- Accept complete productivity-credit effect vectors added by recipe-expansion mods, while retaining validation of their recipes, signs and amounts.
+- Allow Bob's Warfare with recipe-productivity-cap mods and preserve their configured caps.
+- Preserve known Base-only research history on supported earlier MIR 5 upgrades.
+- Restore missing translated startup-setting labels and improve Library wrapping, filters, title-bar controls and saved search text.
 
-Protect the original save and its matching mods/settings. First update a copy with the previous mod selection and settings and save separately. Check the support guide before changing a provider; defer changes outside its qualified routes. After a successful native ownership transfer, the legacy worker preparation command is unnecessary. An already-clamped or unknown history can still require the protected original; keep it if the upgrade refuses.
+Before adding a worker cargo provider:
 
-This is a GitHub beta. Full Library interaction/export/client and performance qualification remain unfinished. Full Ferrum-profile qualification remains unfinished; not every reported save or mod combination has been reproduced.
+1. Protect the original save and its matching mods/settings. Update a copy to MIR 5.0.12 with the previous enabled mods and unchanged MIR settings, then save separately and exit.
+2. Add the provider to that saved copy. Keep the worker enable setting and level cap unchanged while preserved work remains. Check cargo bonuses, current research and queue order before saving again.
+3. If needed, `/mir-worker-storage-recovery resume <force-name>` appends detached partial work. The legacy `prepare` command is unnecessary once permanent native ownership is established.
 
-[Installation, upgrade procedures and support limits](https://github.com/Julesc013/more-infinite-research/blob/v5.0.12/docs/support.md).
+An older save already changed and clamped by a provider needs its protected pre-change original. Repeated provider changes and arbitrary overhaul transitions remain unqualified. The known failure mechanisms have focused qualification; this does not establish that every reporter's complete modpack has been tested.
+
+Script integrations should query `mir-worker-storage-default-4` for ordinary default cargo research. `worker-robots-storage-4` remains a separate prerequisite or foreign finite stage; see the [API guide](https://github.com/Julesc013/more-infinite-research/blob/v5.0.12/docs/api.md).
+
+This is a GitHub beta. Library interaction/export/client-lifecycle and whole-product performance acceptance remain unfinished for stable.
+
+[Installation, upgrade precautions and support](https://github.com/Julesc013/more-infinite-research/blob/v5.0.12/docs/support.md).

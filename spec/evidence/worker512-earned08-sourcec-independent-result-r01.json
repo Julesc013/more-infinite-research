@@ -1,0 +1,60 @@
+{
+  "kind": "MIR512Source08SourceCProviderFullChainIndependentReviewV1",
+  "reviewer": "non-author",
+  "scope": "Adopt the completed six-process 1x Source08 -> SourceC -> provider/save/two-cold chain only; do not relabel it as the subsequent multiplier-repair candidate.",
+  "evidence": {
+    "source_r02_terminal": {"path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker08-sourcec512-r02/terminal.json", "sha256": "BCE1C1D71AED3BD83FECD385BBFD2FDE93C3DBB20D81DF7BAE75E6E3A2D4B6CC"},
+    "source_r17_review": {"path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker512-final-non-author-review-r01/REVIEW-r17.json", "sha256": "F17A55C58CF69D90694BB9C744A5AB91B753665BE876F29DDF7746E120D8AE6C"},
+    "upgrade_r03_terminal": {"path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker08-sourcec512-r03/terminal.json", "sha256": "CF0E9E3AEBE0EE896BB8FC47B4A6C1E49D11AB61DE53822EBC36E719B9027819"},
+    "upgrade_r18_review": {"path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker512-final-non-author-review-r01/REVIEW-r18.json", "sha256": "D20595B4F519EEAA13FCC86D606CC2257DC443F2577099AF4280ABC143277571"},
+    "provider_terminal": {"path": "D:/Projects/Factorio/more-infinite-research/build/qualification/worker08-sourcec512-r03/provider/terminal.json", "sha256": "A4AEC120B8BC476279106A850E2033A700A91964EFDB5C71A4D489F10EA1EAF1"},
+    "provider_packet": {"sha256": "56A6FC8B89D8B0D5DD74AFC4846571D486648BE2B6126EFF6C2E8C60616BC1F2"},
+    "provider_owner": {"sha256": "12F870249F77898C7D6BBFBA5A57BCB099A133DF134543175AE9334162100D84"},
+    "provider_composition": {"sha256": "244DCA9B5D90FC1EA4DB7DE0845C456DAF208B9CFC6D1C1E9999C3423E2B5B2E"}
+  },
+  "chain": {
+    "historical_source": {
+      "actual_processes": 2,
+      "pids": [47364, 22808],
+      "earned_ordinary": 9,
+      "force_split": {"player": 4, "mir-worker-default-queued": 3, "mir-worker-default-detached": 2},
+      "science_each_pack": {"player": 5483, "mir-worker-default-queued": 3205, "mir-worker-default-detached": 1687, "total": 10375},
+      "protected_sha256": "03C50871AB31A0D1354362D6BBD679C974F1D25637DC4ADF0F9065C6F214C2F5"
+    },
+    "sourcec_upgrade": {
+      "actual_processes": 1,
+      "pid": 15608,
+      "retained_source_ordinary": 9,
+      "new_source_ordinary": 0,
+      "protected_sha256": "19AB0AEFE4DE1972CCF03D4E7ACEE25E59752461F9E6F356DB96108FF80DC4F5",
+      "crc_passed": true
+    },
+    "provider": {
+      "actual_processes": 3,
+      "pids": [12820, 47724, 3376],
+      "input_sha256_matches_upgrade": true,
+      "ordinary": ["mir-worker-storage-preservation-4", "worker-robots-storage-8"],
+      "private_science_each_old_five_packs": 1982,
+      "continuation_science_each_new_six_packs": 3417,
+      "endpoint_bonuses": {"player": 12, "mir-worker-default-queued": 6, "mir-worker-default-detached": 5, "mir-worker-default-unpaid": 3},
+      "protected_save": {"bytes": 183755, "sha256": "6649942E3B5567CA668AEA44FD2046AFCA70489D8EF80C2159598D0733D6DAC9", "zip_entries": 55, "crc_passed": true},
+      "colds": 2,
+      "cold_input_hash_matches_protected": true,
+      "cold_vectors_equal_saved": true,
+      "restored": true,
+      "factorio_processes_after": 0
+    }
+  },
+  "controls": {
+    "provider_validate": "passed-zero-native-library-activity",
+    "owner_controls": 42,
+    "prefix_controls": 18,
+    "projection": "17 unchanged functions; Check-Prefix only changed to bind the accepted r02 source2/r03 upgrade1 parent chain"
+  },
+  "verdict": "GO_FOR_EXACT_SOURCEC_1X_SIX_PROCESS_CHAIN_ONLY",
+  "limits": [
+    "The r02 upgrade adverse remains preserved; r17 adopted only its two authentic source processes and r18 adopted the distinct one-process r03 upgrade. No adverse is relabelled as success.",
+    "This evidence is pinned to SourceC package 5.0.21012 SHA256 2FFDEA49D8BC9D59C68ED19E6E4F4EBBFFD05E17D2AF8E81B12F6036F04C8F0D and the 1x cost-multiplier cohort. It does not qualify the later Aero multiplier repair/source 0EFB446B5BDADEC2BE7D1BEE1B68B5065A85134F or its required 2x/4x native save/cold cases.",
+    "No reporter-save, Library/API, client, performance, physical-cargo, or release-acceptance claim follows."
+  ]
+}
