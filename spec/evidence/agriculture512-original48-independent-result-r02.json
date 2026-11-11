@@ -1,0 +1,24 @@
+{
+  "kind": "RootRecordedIndependentAgriculture48ResultV1",
+  "reviewer": "/root/stable_ui_packet_review512",
+  "configured_role": "mir_terra_review_xhigh",
+  "recorded_from": "Independent reviewer message; Root persisted, no backend identity assertion",
+  "verdict": "GO for exact48 original matched agriculture comparisons",
+  "owner_sha256": "C56E8E240603D1F5A9E5330AC4BE96BE8EEBA240A4E33CC1E8C5D8C976EE040F",
+  "packet_sha256": "9184378047AF73725F8CFDD6A0D34457FB81F9BBBD9E76BFC8293CFA11CE1249",
+  "composition_sha256": "E517DA1C8A55C3CB349C924E0B8FAC4BE36A264F0D8D80134992A9423E332A22",
+  "terminal_sha256": "A54A3419A4E2DB97AE485A79291A07CC824E99980B13B54A06C062F3E1F9398F",
+  "analysis_sha256": "041F7A8FE66D473630DB66B90328C71BD268DB07C5F6360910484B61BF755EB0",
+  "actual_processes": 48,
+  "warmups": 12,
+  "scored": 36,
+  "all12_original_comparisons_pass": true,
+  "raw_markers_seed_hashes_custody_restoration_verified": true,
+  "remaining_factorio": 0,
+  "ordinary_completions_scope": "Two per six predecessor seeds, counted once; saved witnesses are replayed, not96 newly earned completions",
+  "limits": [
+    "ExactSpaceAgeagriculture2.1.23 only; no general50%/scalability/startup/heavy/otherengine/retainedmemory/Library/client/stable/release claim",
+    "128minus1 OSpeak: published4603904B,candidate21178368B,relative360.0089%; preserve this scoped adverse/noise result",
+    "Sampled working/private baselineincrements negative: no valid percentage or inferredincrementnonregression"
+  ]
+}
